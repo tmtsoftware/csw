@@ -9,10 +9,7 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-location-server`,
   `csw-location-client`,
   `csw-location-agent`,
-  `csw-config-api`,
-  `csw-config-server`,
-  `csw-config-client`,
-  `csw-config-cli`,
+  `csw-config`,
   `csw-logging`,
   `csw-logging-macros`,
   `csw-params-jvm`,
@@ -140,13 +137,24 @@ lazy val `csw-location-agent` = project
   )
 
 /* ================= Config Service ============== */
+lazy val `csw-config` = project
+  .in(file("csw-config"))
+  .aggregate(
+    `csw-config-api`,
+    `csw-config-server`,
+    `csw-config-client`,
+    `csw-config-cli`
+  )
+
 lazy val `csw-config-api` = project
+  .in(file("csw-config/csw-config-api"))
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.ConfigApi.value
   )
 
 lazy val `csw-config-server` = project
+  .in(file("csw-config/csw-config-server"))
   .dependsOn(
     `csw-config-api`,
     `csw-location-client`,
@@ -160,6 +168,7 @@ lazy val `csw-config-server` = project
   )
 
 lazy val `csw-config-client` = project
+  .in(file("csw-config/csw-config-client"))
   .dependsOn(
     `csw-config-api`,
     `csw-location-api`,
@@ -173,6 +182,7 @@ lazy val `csw-config-client` = project
   )
 
 lazy val `csw-config-cli` = project
+  .in(file("csw-config/csw-config-cli"))
   .dependsOn(
     `csw-config-client`,
     `csw-location-client`,
