@@ -2,13 +2,11 @@ package csw.auth
 
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.unmarshalling.GenericUnmarshallers
-import csw.aas.http.AuthorizationPolicy._
-import csw.auth.adapters.akka.http.Authentication
-import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import csw.aas.core.token.TokenFactory
+import csw.aas.http.AuthorizationPolicy._
 import csw.aas.http.{Authentication, SecurityDirectives}
-import csw.auth.http.Authentication
+import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 
 object ExampleServer extends HttpApp with App with GenericUnmarshallers with PlayJsonSupport {
 
