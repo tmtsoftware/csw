@@ -16,9 +16,13 @@ RUN yum install -y wget
 # installing scala and sbt
 RUN yum install -y https://downloads.lightbend.com/scala/$SCALA_VERSION/scala-$SCALA_VERSION.rpm
 RUN yum install -y https://dl.bintray.com/sbt/rpm/sbt-$SBT_VERSION.rpm
-RUN sbt update
+
+# Make sure you are building this image from csw root directory
+ADD . /csw
 
 # go inside csw
 WORKDIR /csw
+
+RUN sbt compile
 
 ENTRYPOINT ["sbt", "csw-time-client/linux:test"]
