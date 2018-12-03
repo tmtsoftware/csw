@@ -14,10 +14,13 @@ import org.scalatest.time.SpanSugar.convertDoubleToGrainOfTime
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with Eventually {
-  val TaiOffset = 37
+  private val TaiOffset = 37 // At the time of writing this, TAI is ahead of UTC by 37 seconds.
+
+  var timeService: TimeServiceImpl = _
 
   override protected def beforeAll(): Unit = {
-    val timeService = new TimeServiceImpl()
+    implicit val system: ActorSystem = ActorSystem("time-service")
+    timeService = new TimeServiceImpl()
     timeService.setTaiOffset(TaiOffset)
   }
 
@@ -26,8 +29,6 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
   //DEOPSCSW-532: Synchronize activities with other comp. using UTC
   //DEOPSCSW-533: Access parts of UTC date.time in Java and Scala
   test("should get UTC time", Linux) {
-    val timeService: TimeService = new TimeServiceImpl()
-
     val utcInstant            = timeService.utcTime()
     val fixedInstant: Instant = Instant.now()
 
@@ -38,8 +39,8 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
 
   //DEOPSCSW-534: PTP accuracy and precision while reading UTC
   test("should get precision up to nanoseconds in UTC time", Linux) {
-    val timeService: TimeService = new TimeServiceImpl()
-
+    //todo: patience config in constructor
+    //todo: comment why test is written with eventually
     eventually(timeout = timeout(50.millis), interval = interval(10.millis))(
       timeService.utcTime().value.formatNanos should not endWith "000"
     )
@@ -67,8 +68,6 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
   //DEOPSCSW-536: Access parts of TAI date/time in Java and Scala
   //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
   test("should get TAI time", Linux) {
-    val timeService: TimeService = new TimeServiceImpl()
-
     val taiOffset = 37
 
     val taiInstant          = timeService.taiTime()
@@ -81,8 +80,6 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
 
   //DEOPSCSW-538: PTP accuracy and precision while reading TAI
   test("should get precision up to nanoseconds in TAI time", Linux) {
-    val timeService: TimeService = new TimeServiceImpl()
-
     eventually(timeout = timeout(50.millis), interval = interval(10.millis))(
       timeService.taiTime().value.formatNanos should not endWith "000"
     )
@@ -106,8 +103,6 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
 
   //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
   test("should get TAI offset", Linux) {
-    val timeService: TimeService = new TimeServiceImpl()
-
     val offset = timeService.taiOffset()
     offset shouldEqual TaiOffset
   }
@@ -116,8 +111,6 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
 
   //DEOPSCSW-542: Schedule a task to execute in future
   test("should schedule a task once at given start time with allowed jitter of 5ms", Linux) {
-    val timeService: TimeService = new TimeServiceImpl()
-
     implicit val sys: ActorSystem = ActorSystem.create("time-service")
     val testProbe                 = TestProbe()
     val probeMsg                  = "Scheduled"

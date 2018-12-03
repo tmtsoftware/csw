@@ -13,10 +13,9 @@ import csw.time.client.internal.native_models.{NTPTimeVal, TimeSpec, Timex}
 
 import scala.concurrent.duration.FiniteDuration
 
-class TimeServiceImpl() extends TimeService {
-  val ClockRealtime       = 0
-  val ClockTAI            = 11
-  private val actorSystem = ActorSystem("TimeService")
+class TimeServiceImpl(implicit actorSystem: ActorSystem) extends TimeService {
+  private val ClockRealtime = 0 // todo: can this go in constants with some docs?
+  private val ClockTAI      = 11
 
   override def utcTime(): UtcInstant = UtcInstant(instantFor(ClockRealtime))
 
@@ -47,6 +46,7 @@ class TimeServiceImpl() extends TimeService {
     FiniteDuration(duration.toNanos, NANOSECONDS)
   }
 
+  // todo: without sudo or somehow handle it internally?
   // sets the tai offset on kernel (needed when ptp is not setup)
   private[time] def setTaiOffset(offset: Int): Unit = {
     val timex = new Timex()
@@ -55,8 +55,6 @@ class TimeServiceImpl() extends TimeService {
     timex.constant = new NativeLong(offset)
     TimeLibrary.ntp_adjtime(timex)
     println(s"Status of Tai offset command=" + timex.status)
-    timex.clear()
-
     println(s"Tai offset set to [${taiOffset()}]")
   }
 
