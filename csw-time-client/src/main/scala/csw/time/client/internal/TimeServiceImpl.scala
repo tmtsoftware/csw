@@ -10,7 +10,7 @@ import csw.time.api.models.CswInstant.{TaiInstant, UtcInstant}
 import csw.time.api.scaladsl.TimeService
 import csw.time.client.internal.extensions.RichCancellableExt.RichCancellable
 import csw.time.client.internal.native_models.ClockId.{ClockRealtime, ClockTAI}
-import csw.time.client.internal.native_models.{NTPTimeVal, TimeSpec, Timex}
+import csw.time.client.internal.native_models._
 
 import scala.concurrent.duration.FiniteDuration
 

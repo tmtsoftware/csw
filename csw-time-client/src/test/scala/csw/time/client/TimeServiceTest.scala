@@ -120,7 +120,7 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
       testProbe.ref ! timeService.taiTime()
     }
 
-    val actualScheduleTime: TaiInstant = testProbe.expectMsgClass(Class[TaiInstant])
+    val actualScheduleTime: TaiInstant = testProbe.expectMsgType[TaiInstant]
 
     println(s"Ideal Schedule Time: $idealScheduleTime")
     println(s"Actual Schedule Time: $actualScheduleTime")
