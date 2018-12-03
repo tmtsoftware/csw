@@ -269,6 +269,7 @@ object Dependencies {
       Libs.`threeten-extra`,
       Libs.`jna`,
       Akka.`akka-actor`,
+      Libs.`scala-java8-compat`,
       Libs.`junit-interface`          % Test,
       Libs.`scalatest`.value          % Test,
       Akka.`akka-actor-testkit-typed` % Test,

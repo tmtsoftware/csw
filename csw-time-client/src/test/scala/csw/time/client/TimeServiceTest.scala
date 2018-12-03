@@ -113,17 +113,14 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
   test("should schedule a task once at given start time with allowed jitter of 5ms", Linux) {
     implicit val sys: ActorSystem = ActorSystem.create("time-service")
     val testProbe                 = TestProbe()
-    val probeMsg                  = "Scheduled"
 
-    var actualScheduleTime: TaiInstant = null
     val idealScheduleTime: TaiInstant  = TaiInstant(timeService.taiTime().value.plusSeconds(1))
 
     timeService.scheduleOnce(idealScheduleTime) {
-      actualScheduleTime = timeService.taiTime()
-      testProbe.ref ! probeMsg
+      testProbe.ref ! timeService.taiTime()
     }
 
-    testProbe.expectMsg(probeMsg)
+    val actualScheduleTime: TaiInstant = testProbe.expectMsgClass(Class[TaiInstant])
 
     println(s"Ideal Schedule Time: $idealScheduleTime")
     println(s"Actual Schedule Time: $actualScheduleTime")
