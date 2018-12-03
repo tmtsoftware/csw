@@ -1,11 +1,13 @@
 package csw.time.client;
 
+import akka.actor.ActorSystem;
 import csw.time.api.models.CswInstant.TaiInstant;
 import csw.time.api.models.CswInstant.UtcInstant;
-import csw.time.api.scaladsl.TimeService;
 import csw.time.client.internal.TimeServiceImpl;
 import csw.time.client.javadsl.tags.LinuxTag;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.scalatest.junit.JUnitSuite;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -16,13 +18,22 @@ import static org.junit.Assert.assertEquals;
 @LinuxTag
 public class JTimeServiceTest {
 
+    private static int TaiOffset = 37;
+    private static TimeServiceImpl timeService = null;
+
+    @BeforeClass
+    public static void beforeClass() {
+        ActorSystem system = ActorSystem.create("time-service");
+        timeService = new TimeServiceImpl(system);
+        timeService.setTaiOffset(TaiOffset);
+    }
+
+
     //------------------------------UTC-------------------------------
 
     //DEOPSCSW-533: Access parts of UTC date.time in Java and Scala
     @Test
     public void shouldGetUTCTime(){
-        TimeService timeService = new TimeServiceImpl();
-
         UtcInstant utcInstant = timeService.utcTime();
         Instant fixedInstant = Instant.now();
 
@@ -54,11 +65,8 @@ public class JTimeServiceTest {
     //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
     @Test
     public void shouldGetTAITime(){
-        TimeService timeService = new TimeServiceImpl();
-
-        int taiOffset = 37;
         TaiInstant taiInstant = timeService.taiTime();
-        Instant TaiInstant = Instant.now().plusSeconds(taiOffset);
+        Instant TaiInstant = Instant.now().plusSeconds(TaiOffset);
 
         long expectedMillis = TaiInstant.toEpochMilli();
 
@@ -68,13 +76,9 @@ public class JTimeServiceTest {
     //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
     @Test
     public void shouldGetTAIOffset(){
-        TimeService timeService = new TimeServiceImpl();
-
-        int expectedOffset = 37;
-
         int offset = timeService.taiOffset();
 
-        assertEquals(expectedOffset, offset);
+        assertEquals(TaiOffset, offset);
     }
 
     //DEOPSCSW-536: Access parts of TAI date.time in Java and Scala
