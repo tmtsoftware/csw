@@ -7,7 +7,7 @@ import akka.http.scaladsl.Http
 import akka.stream.Materializer
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
-import csw.auth.adapters.akka.http.SecurityDirectives
+import csw.aas.http.SecurityDirectives
 import csw.config.server.{ServerWiring, Settings}
 import csw.testkit.internal.{MockedAuthentication, TestKitUtils}
 

@@ -26,7 +26,7 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-alarm-api`,
   `csw-alarm-client`,
   `csw-alarm-cli`,
-  `csw-auth`,
+  `csw-aas`,
   `csw-time-api`,
   `csw-time-client`,
   `csw-database-api`,
@@ -150,7 +150,7 @@ lazy val `csw-config-server` = project
   .dependsOn(
     `csw-config-api`,
     `csw-location-client`,
-    `akka-http-adapter`,
+    `csw-aas-http`,
     `csw-location-server` % "test->test",
     `csw-commons`         % "compile->compile;test->test"
   )
@@ -176,7 +176,7 @@ lazy val `csw-config-cli` = project
   .dependsOn(
     `csw-config-client`,
     `csw-location-client`,
-    `native-client-adapter`,
+    `csw-aas-native`,
     `csw-location-server` % "multi-jvm->multi-jvm",
     `csw-config-server`   % "test->test;multi-jvm->test",
     `csw-commons`         % "test->test"
@@ -390,7 +390,7 @@ lazy val examples = project
   .dependsOn(
     `csw-location-server`,
     `csw-config-client`,
-    `akka-http-adapter`,
+    `csw-aas-http`,
     `csw-logging`,
     `csw-params-jvm`,
     `csw-framework`,
@@ -442,31 +442,31 @@ alarm := {
 // ================================================
 /* ===================== Auth ================== */
 // ================================================
-lazy val `csw-auth` = project
-  .in(file("csw-auth"))
+lazy val `csw-aas` = project
+  .in(file("csw-aas"))
   .aggregate(
-    `native-client-adapter`,
-    `auth-core`,
-    `akka-http-adapter`
+    `csw-aas-core`,
+    `csw-aas-http`,
+    `csw-aas-native`
   )
 
-lazy val `auth-core` = project
-  .in(file("csw-auth/auth-core"))
+lazy val `csw-aas-core` = project
+  .in(file("csw-aas/csw-aas-core"))
   .dependsOn(`csw-logging`)
   .settings(
     libraryDependencies ++= Dependencies.AuthAdapterCore.value
   )
 
-lazy val `akka-http-adapter` = project
-  .in(file("csw-auth/akka-http-adapter"))
-  .dependsOn(`auth-core`)
+lazy val `csw-aas-http` = project
+  .in(file("csw-aas/csw-aas-http"))
+  .dependsOn(`csw-aas-core`)
   .settings(
     libraryDependencies ++= Dependencies.AuthAkkaHttpAdapter.value
   )
 
- lazy val `native-client-adapter` = project
-  .in(file("csw-auth/native-client-adapter"))
-  .dependsOn(`auth-core`)
+ lazy val `csw-aas-native` = project
+  .in(file("csw-aas/csw-aas-native"))
+  .dependsOn(`csw-aas-core`)
   .settings(
     libraryDependencies ++= Dependencies.AuthNativeClientAdapter.value
   )

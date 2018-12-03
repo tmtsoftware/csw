@@ -3,9 +3,8 @@ package csw.config.server.http
 import akka.Done
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
-import csw.auth.adapters.akka.http.AuthorizationPolicy.ResourceRolePolicy
-import csw.auth.adapters.akka.http.SecurityDirectives
-import csw.auth.core.token.AccessToken
+import csw.aas.http.AuthorizationPolicy.ResourceRolePolicy
+import csw.aas.http.SecurityDirectives
 import csw.config.api.scaladsl.ConfigService
 import csw.config.server.ActorRuntime
 import csw.config.server.svn.SvnConfigServiceFactory

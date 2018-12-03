@@ -1,6 +1,6 @@
 package csw.config.cli
 
-import csw.auth.adapters.nativeapp.api.NativeAppAuthAdapter
+import csw.aas.native.api.NativeAppAuthAdapter
 import csw.config.api.TokenFactory
 
 class CliTokenFactory(nativeAuthAdapter: NativeAppAuthAdapter) extends TokenFactory {

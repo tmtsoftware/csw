@@ -6,7 +6,7 @@ import java.time.Instant
 import akka.actor.ActorSystem
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.stream.ActorMaterializer
-import csw.auth.adapters.nativeapp.api.NativeAppAuthAdapter
+import csw.aas.native.api.NativeAppAuthAdapter
 import csw.config.api.models.ConfigId
 import csw.config.cli.args.{ArgsParser, Options}
 import csw.config.cli.wiring.Wiring
@@ -197,6 +197,7 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
     val user2 = "user2"
     val user3 = "user3"
     when(validToken.preferred_username).thenReturn(Some(user1), Some(user2), Some(user3))
+    when(validToken.userOrClientName).thenReturn(user1, user2, user3)
 
     //  create file
     val parsedCreateArgs: Option[Options] = argsParser.parse(createMinimalArgs)
@@ -229,6 +230,7 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
     val user4 = "user4"
     val user5 = "user5"
     when(validToken.preferred_username).thenReturn(Some(user1), Some(user2), Some(user3), Some(user4), Some(user5))
+    when(validToken.userOrClientName).thenReturn(user1, user2, user3, user4, user5)
 
     //  create file
     val parsedCreateArgs: Option[Options] = argsParser.parse(createMinimalArgs)
