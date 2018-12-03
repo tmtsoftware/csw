@@ -2,10 +2,10 @@ package csw.auth.core
 
 import csw.auth.core.TokenVerificationFailure.{InvalidToken, TokenExpired}
 import csw.auth.core.token.AccessToken
-import csw.auth.core.token.claims.{Access, Audience}
+import csw.auth.core.token.claims.{Access, Audience, Authorization}
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.exceptions.{TokenNotActiveException, TokenSignatureInvalidException}
-import org.keycloak.representations.{AccessToken ⇒ KeycloakAccessToken}
+import org.keycloak.representations.{AccessToken => KeycloakAccessToken}
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{EitherValues, FunSuite, Matchers}
@@ -46,7 +46,7 @@ class TokenVerifierTest extends FunSuite with MockitoSugar with Matchers with Ei
       iat = Option(1542822557),
       exp = Option(1542822617),
       iss = Option("http://localhost:8080/auth/realms/master"),
-      aud = Option(Audience("new-test")),
+      aud = Audience("new-test"),
       jti = Option("e7b3700b-0681-4834-9a4f-2259be39dbe5"),
       given_name = Option(""),
       family_name = Option(""),
@@ -54,9 +54,9 @@ class TokenVerifierTest extends FunSuite with MockitoSugar with Matchers with Ei
       preferred_username = Option("emma"),
       email = None,
       scope = Option("openid email profile"),
-      realm_access = Option(Access(Set("offline_access", "uma_authorization"))),
+      realm_access = Access(Set("offline_access", "uma_authorization")),
       resource_access = Map("account" -> Access(Set("manage-account", "manage-account-links", "view-profile"))),
-      authorization = None
+      authorization = Authorization.empty
     )
 
     when(keycloakTokenVerifier.verifyToken(token, deployment)).thenReturn(Success(keycloakAccessToken))

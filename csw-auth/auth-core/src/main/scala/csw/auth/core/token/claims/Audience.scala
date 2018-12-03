@@ -2,13 +2,13 @@ package csw.auth.core.token.claims
 
 import play.api.libs.json._
 
-case class Audience(value: Seq[String])
+case class Audience(value: Seq[String] = Seq.empty)
 
 object Audience {
 
-  def apply(aud: String): Audience = Audience(Seq(aud))
+  val empty: Audience = Audience()
 
-  def apply(): Audience = Audience(Seq.empty)
+  def apply(aud: String): Audience = Audience(Seq(aud))
 
   implicit val format: Format[Audience] = new Format[Audience] {
     override def writes(obj: Audience): JsValue = obj.value match {

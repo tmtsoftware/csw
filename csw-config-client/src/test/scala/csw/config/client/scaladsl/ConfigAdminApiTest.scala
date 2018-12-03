@@ -126,6 +126,7 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
     val user2 = "user2"
     val user3 = "user3"
     when(validToken.preferred_username).thenReturn(Some(user1), Some(user2), Some(user3))
+    when(validToken.userOrClientName).thenReturn(user1, user2, user3)
 
     val file = Paths.get("/tmt/lgs/trombone/hcd.conf")
 
@@ -160,6 +161,7 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
     val user4 = "user4"
     val user5 = "user5"
     when(validToken.preferred_username).thenReturn(Some(user1), Some(user2), Some(user3), Some(user4), Some(user5))
+    when(validToken.userOrClientName).thenReturn(user1, user2, user3, user4, user5)
 
     val file = Paths.get("/tmt/test/setactive/getactive/resetactive/active.conf")
     // on create call, active file gets created with this comment by default, note that this is an internal implementation
@@ -194,6 +196,7 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
     val user1 = "user1"
     val user2 = "user2"
     when(validToken.preferred_username).thenReturn(Some(user1), Some(user2))
+    when(validToken.userOrClientName).thenReturn(user1, user2)
 
     val file1 = Paths.get("/tmt/lgs/trombone/hcd1.conf")
     val file2 = Paths.get("/tmt/lgs/trombone/hcd2.conf")

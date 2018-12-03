@@ -316,7 +316,13 @@ class ConfigServiceRouteTest
     val bilal  = "bilal"
     val poorva = "poorva"
 
-    when(validToken.preferred_username).thenReturn(Some(bilal)).thenReturn(Some(poorva))
+    when(validToken.preferred_username)
+      .thenReturn(Some(bilal))
+      .thenReturn(Some(poorva))
+
+    when(validToken.userOrClientName)
+      .thenReturn(bilal)
+      .thenReturn(poorva)
 
     // consumes 2 revisions, one for actual file one for active file
     // first request will use username=bilal
@@ -530,7 +536,15 @@ class ConfigServiceRouteTest
     val poorva  = "poorva"
     val shubham = "shubham"
 
-    when(validToken.preferred_username).thenReturn(Some(bilal)).thenReturn(Some(poorva)).thenReturn(Some(shubham))
+    when(validToken.preferred_username)
+      .thenReturn(Some(bilal))
+      .thenReturn(Some(poorva))
+      .thenReturn(Some(shubham))
+
+    when(validToken.userOrClientName)
+      .thenReturn(bilal)
+      .thenReturn(poorva)
+      .thenReturn(shubham)
 
     //consumes 2 revisions, one for actual file one for active file
     // first request will use username=bilal

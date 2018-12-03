@@ -22,7 +22,7 @@ class RPTTest extends FunSuite with MockitoSugar with Matchers {
       iat = Option(1542822557),
       exp = Option(1542822617),
       iss = Option("http://localhost:8080/auth/realms/master"),
-      aud = Option(Audience("new-test")),
+      aud = Audience("new-test"),
       jti = Option("e7b3700b-0681-4834-9a4f-2259be39dbe5"),
       given_name = Option(""),
       family_name = Option(""),
@@ -30,9 +30,9 @@ class RPTTest extends FunSuite with MockitoSugar with Matchers {
       preferred_username = Option("emma"),
       email = None,
       scope = Option("openid email profile"),
-      realm_access = Option(Access(Set("offline_access", "uma_authorization"))),
+      realm_access = Access(Set("offline_access", "uma_authorization")),
       resource_access = Map("account" -> Access(Set("manage-account", "manage-account-links", "view-profile"))),
-      authorization = None
+      authorization = Authorization.empty
     )
     val rpt = RPT(authzClient)
 
@@ -58,7 +58,7 @@ class RPTTest extends FunSuite with MockitoSugar with Matchers {
       iat = Option(1543474907),
       exp = Option(1543475507),
       iss = Option("http://localhost:8080/auth/realms/example"),
-      aud = Option(Audience(ArrayBuffer("example-app", "example-server"))),
+      aud = Audience(ArrayBuffer("example-app", "example-server")),
       jti = Option("f493fc38-735a-4c3d-a2e7-5928e8a8e0c1"),
       given_name = Option("test-user"),
       family_name = None,
@@ -66,15 +66,13 @@ class RPTTest extends FunSuite with MockitoSugar with Matchers {
       preferred_username = Option("test-user"),
       email = None,
       scope = Option("profile email"),
-      realm_access = Option(Access(Set("offline_access", "uma_authorization", "example-admin-role"))),
+      realm_access = Access(Set("offline_access", "uma_authorization", "example-admin-role")),
       resource_access = Map("account"        → Access(Set("manage-account", "manage-account-links", "view-profile")),
                             "example-server" → Access(Set("person-role"))),
-      authorization = Option(
-        Authorization(
-          Set(
-            Permission("f1d4514d-4bfb-48e2-9448-f92a94ffca4d", "person", Option(Set("delete"))),
-            Permission("e70cc08b-5ead-4228-afb3-a75503c1bf37", "Default Resource", None)
-          )
+      authorization = Authorization(
+        Set(
+          Permission("f1d4514d-4bfb-48e2-9448-f92a94ffca4d", "person", Set("delete")),
+          Permission("e70cc08b-5ead-4228-afb3-a75503c1bf37", "Default Resource", Set.empty)
         )
       )
     )

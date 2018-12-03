@@ -1,12 +1,13 @@
 package csw.auth.core
 
 import csw.auth.core.TokenVerificationFailure.{InvalidToken, TokenExpired}
+import csw.auth.core.commons.AuthLogger
 import csw.auth.core.token.AccessToken
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.adapters.rotation.AdapterTokenVerifier
 import org.keycloak.common.VerificationException
 import org.keycloak.exceptions.TokenNotActiveException
-import org.keycloak.representations.{AccessToken ⇒ KeycloakAccessToken}
+import org.keycloak.representations.{AccessToken => KeycloakAccessToken}
 import pdi.jwt.{JwtJson, JwtOptions}
 
 import scala.util.Try
@@ -18,14 +19,23 @@ private[auth] class KeycloakTokenVerifier {
 
 class TokenVerifier private[auth] (keycloakTokenVerifier: KeycloakTokenVerifier) {
 
+  private val logger = AuthLogger.getLogger
+  import logger._
+
   def verifyAndDecode(token: String): Either[TokenVerificationFailure, AccessToken] = {
+    val keycloakToken: Either[TokenVerificationFailure, KeycloakAccessToken] =
+      keycloakTokenVerifier.verifyToken(token, Keycloak.deployment).toEither.left.flatMap {
+        case _: TokenNotActiveException => {
+          warn(s"token is expired")
+          Left(TokenExpired)
+        }
+        case ex: VerificationException => {
+          error("token verification failed", ex = ex)
+          Left(InvalidToken(ex.getMessage))
+        }
+      }
 
-    val keycloakToken = keycloakTokenVerifier.verifyToken(token, Keycloak.deployment).toEither.left.flatMap {
-      case _: TokenNotActiveException => Left(TokenExpired)
-      case ex: VerificationException  => Left(InvalidToken(ex.getMessage))
-    }
-
-    keycloakToken.flatMap { _ =>
+    val result = keycloakToken.flatMap { _ =>
       JwtJson
         .decodeJson(token, JwtOptions(signature = false, expiration = false, notBefore = false))
         .map(_.as[AccessToken])
@@ -35,6 +45,13 @@ class TokenVerifier private[auth] (keycloakTokenVerifier: KeycloakTokenVerifier)
           Left(InvalidToken(e.getMessage))
         }
     }
+
+    result match {
+      case Left(e) => error("token verification failed", Map("error" -> e))
+      case x       => x
+    }
+
+    result
   }
 }
 

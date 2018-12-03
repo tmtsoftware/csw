@@ -199,6 +199,9 @@ public class JConfigAdminApiTest extends JUnitSuite {
         when(jConfigClientBaseSuite.validToken().preferred_username())
                 .thenReturn(new Some(firstUser),new Some(secondUser),new Some(thirdUser));
 
+        when(jConfigClientBaseSuite.validToken().userOrClientName())
+                .thenReturn(firstUser, secondUser, thirdUser);
+
         try{
             exception.expectCause(isA(FileNotFound.class));
             configService.history(path).get();
@@ -259,6 +262,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
         String firstUser = "firstUser";
         String secondUser = "secondUser";
         when(jConfigClientBaseSuite.validToken().preferred_username()).thenReturn(new Some(firstUser),new Some(secondUser));
+        when(jConfigClientBaseSuite.validToken().userOrClientName()).thenReturn(firstUser, secondUser);
 
         String tromboneConfigComment = "hello trombone";
         String assemblyConfigComment = "hello assembly";
@@ -391,6 +395,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
         String firstUser = "firstUser";
         String secondUser = "secondUser";
         when(jConfigClientBaseSuite.validToken().preferred_username()).thenReturn(new Some(firstUser),new Some(secondUser));
+        when(jConfigClientBaseSuite.validToken().userOrClientName()).thenReturn(firstUser, secondUser);
 
         String tromboneConfigComment = "test{Annex file no1}";
         String assemblyConfigComment = "test{Annex file no2}";
@@ -502,6 +507,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
         String firstUser = "firstUser";
         String secondUser = "secondUser";
         when(jConfigClientBaseSuite.validToken().preferred_username()).thenReturn(new Some(firstUser),new Some(secondUser));
+        when(jConfigClientBaseSuite.validToken().userOrClientName()).thenReturn(firstUser,secondUser);
 
         // Add files to repo
         ConfigId tromboneConfigId = configService

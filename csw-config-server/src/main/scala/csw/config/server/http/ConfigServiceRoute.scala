@@ -27,19 +27,11 @@ class ConfigServiceRoute(
   import actorRuntime._
   import securityDirectives._
 
-  private val defaultUserName = "Unknown"
+  private val unknownUser = "Unknown"
 
-  private def configService(userName: String = defaultUserName): ConfigService = configServiceFactory.make(userName)
+  private def configService(userName: String = unknownUser): ConfigService = configServiceFactory.make(userName)
 
   private val AdminRole = "admin"
-
-  private implicit class RichAccessToken(at: AccessToken) {
-    def userOrClientName: String = (at.preferred_username, at.clientId) match {
-      case (Some(userName), _)    ⇒ userName
-      case (None, Some(clientId)) ⇒ clientId
-      case _                      ⇒ defaultUserName
-    }
-  }
 
   def route: Route = routeLogger {
     handleExceptions(configHandlers.jsonExceptionHandler) {

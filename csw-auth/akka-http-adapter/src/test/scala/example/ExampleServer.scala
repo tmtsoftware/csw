@@ -1,12 +1,16 @@
 package example
+import akka.actor.ActorSystem
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.unmarshalling.GenericUnmarshallers
 import csw.auth.adapters.akka.http.AuthorizationPolicy.{EmptyPolicy, ResourceRolePolicy}
 import csw.auth.adapters.akka.http.{Authentication, SecurityDirectives}
 import csw.auth.core.token.TokenFactory
+import csw.logging.scaladsl.LoggingSystemFactory
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 
 object ExampleServer extends HttpApp with App with GenericUnmarshallers with PlayJsonSupport {
+
+  LoggingSystemFactory.start("example-server", "", "", ActorSystem())
 
   private val directives = SecurityDirectives(new Authentication(new TokenFactory))
 

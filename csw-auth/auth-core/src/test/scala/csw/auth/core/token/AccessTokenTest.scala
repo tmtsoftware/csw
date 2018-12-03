@@ -5,14 +5,14 @@ import org.scalatest.{FunSuite, Matchers}
 class AccessTokenTest extends FunSuite with Matchers {
 
   test("should able to check permissions for access token") {
-    val permission: Set[Permission] = Set(Permission("test-resource-id", "test-resource", Option(Set("test-scope"))))
-    val accessToken                 = AccessToken(authorization = Some(Authorization(permission)))
+    val permission: Set[Permission] = Set(Permission("test-resource-id", "test-resource", Set("test-scope")))
+    val accessToken                 = AccessToken(authorization = Authorization(permission))
 
     accessToken.hasPermission("test-scope", "test-resource") shouldEqual true
   }
 
   test("should able to check permissions if it does not exist in access token") {
-    val accessToken = AccessToken(authorization = Some(Authorization()))
+    val accessToken = AccessToken(authorization = Authorization.empty)
 
     accessToken.hasPermission("test-scope", "test-resource") shouldEqual false
   }
@@ -36,13 +36,13 @@ class AccessTokenTest extends FunSuite with Matchers {
   }
 
   test("should able to check realm role for access token") {
-    val accessToken = AccessToken(realm_access = Some(Access(Set("test-realm-role"))))
+    val accessToken = AccessToken(realm_access = Access(Set("test-realm-role")))
 
     accessToken.hasRealmRole("test-realm-role") shouldEqual true
   }
 
   test("should fail check for realm role") {
-    val accessToken = AccessToken(realm_access = Some(Access(Set("test-realm-role"))))
+    val accessToken = AccessToken(realm_access = Access(Set("test-realm-role")))
 
     accessToken.hasRealmRole("invalid-realm-role") shouldEqual false
   }
