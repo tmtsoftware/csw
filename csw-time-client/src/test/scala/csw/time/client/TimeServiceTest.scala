@@ -12,17 +12,21 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.time.SpanSugar.convertDoubleToGrainOfTime
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
+import scala.concurrent.Await
+
 class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with Eventually {
   private val TaiOffset = 37 // At the time of writing this, TAI is ahead of UTC by 37 seconds.
 
   override implicit val patienceConfig: PatienceConfig = PatienceConfig(50.millis, 10.millis)
+  implicit val system: ActorSystem                     = ActorSystem("time-service")
   var timeService: TimeServiceImpl                     = _
 
   override protected def beforeAll(): Unit = {
-    implicit val system: ActorSystem = ActorSystem("time-service")
     timeService = new TimeServiceImpl()
     timeService.setTaiOffset(TaiOffset)
   }
+
+  override protected def afterAll(): Unit = Await.result(system.terminate(), 5.seconds)
 
   //------------------------------UTC-------------------------------
 
@@ -111,10 +115,9 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
 
   //DEOPSCSW-542: Schedule a task to execute in future
   test("should schedule a task once at given start time with allowed jitter of 5ms", Linux) {
-    implicit val sys: ActorSystem = ActorSystem.create("time-service")
-    val testProbe                 = TestProbe()
+    val testProbe = TestProbe()
 
-    val idealScheduleTime: TaiInstant  = TaiInstant(timeService.taiTime().value.plusSeconds(1))
+    val idealScheduleTime: TaiInstant = TaiInstant(timeService.taiTime().value.plusSeconds(1))
 
     timeService.scheduleOnce(idealScheduleTime) {
       testProbe.ref ! timeService.taiTime()

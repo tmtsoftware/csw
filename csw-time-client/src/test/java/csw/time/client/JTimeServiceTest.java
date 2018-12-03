@@ -3,7 +3,6 @@ package csw.time.client;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.testkit.TestProbe;
-import csw.time.api.javadsl.ITimeService;
 import csw.time.api.models.Cancellable;
 import csw.time.api.models.CswInstant.TaiInstant;
 import csw.time.api.models.CswInstant.UtcInstant;
@@ -12,6 +11,7 @@ import csw.time.client.internal.javawrappers.JTimeServiceImpl;
 import csw.time.client.javadsl.tags.LinuxTag;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.scalatest.junit.JUnitSuite;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -21,10 +21,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @LinuxTag
-public class JTimeServiceTest {
+public class JTimeServiceTest extends JUnitSuite {
 
     private static int TaiOffset = 37;
-    private static JTimeServiceImpl jTimeService = null;
+    private static JTimeServiceImpl jTimeService;
 
     @BeforeClass
     public static void beforeClass() {
@@ -33,7 +33,6 @@ public class JTimeServiceTest {
         jTimeService = new JTimeServiceImpl(timeService);
         timeService.setTaiOffset(TaiOffset);
     }
-
 
     //------------------------------UTC-------------------------------
 
@@ -72,9 +71,9 @@ public class JTimeServiceTest {
     @Test
     public void shouldGetTAITime(){
         TaiInstant taiInstant = jTimeService.taiTime();
-        Instant TaiInstant = Instant.now().plusSeconds(TaiOffset);
+        Instant expectedTaiInstant = Instant.now().plusSeconds(TaiOffset);
 
-        long expectedMillis = TaiInstant.toEpochMilli();
+        long expectedMillis = expectedTaiInstant.toEpochMilli();
 
         assertEquals(expectedMillis, taiInstant.value().toEpochMilli());
     }
