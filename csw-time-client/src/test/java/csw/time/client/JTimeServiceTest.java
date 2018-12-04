@@ -8,8 +8,8 @@ import csw.time.api.models.CswInstant.TaiInstant;
 import csw.time.api.models.CswInstant.UtcInstant;
 import csw.time.client.internal.TimeServiceImpl;
 import csw.time.client.internal.javawrappers.JTimeServiceImpl;
-import csw.time.client.javadsl.tags.LinuxTag;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.scalatest.junit.JUnitSuite;
 
@@ -20,7 +20,7 @@ import java.time.ZonedDateTime;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@LinuxTag
+@Ignore
 public class JTimeServiceTest extends JUnitSuite {
 
     private static int TaiOffset = 37;
