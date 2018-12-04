@@ -48,7 +48,7 @@ class NativeAppAuthAdapterImplMockTest extends FunSuite with MockitoSugar with M
     when(tokenVerifier.verifyAndDecode(accessTokenStr)).thenReturn(Right(accessToken))
     when(tokenVerifier.verifyAndDecode(refreshedAccessTokenStr)).thenReturn(Right(refreshedAccessToken))
 
-    val authService = new NativeAppAuthAdapterImpl(keycloakInstalled, Some(store), tokenVerifier)
+    val authService = new NativeAppAuthAdapterImpl(keycloakInstalled, tokenVerifier, Some(store))
   }
 
   test("login") {

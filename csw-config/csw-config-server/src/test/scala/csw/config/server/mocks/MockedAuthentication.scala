@@ -3,9 +3,11 @@ package csw.config.server.mocks
 import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
 import akka.http.scaladsl.server.Directives.Authenticator
 import akka.http.scaladsl.server.directives.Credentials.Provided
+import csw.aas.core.deployment.AuthConfig
 import csw.aas.core.token.AccessToken
 import csw.aas.http.{Authentication, SecurityDirectives}
 import csw.config.api.TokenFactory
+import org.keycloak.adapters.KeycloakDeployment
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 
@@ -13,7 +15,15 @@ class JMockedAuthentication extends MockedAuthentication
 
 trait MockedAuthentication extends MockitoSugar {
   val authentication: Authentication = mock[Authentication]
-  val securityDirectives             = SecurityDirectives(authentication)
+
+  private val keycloakDeployment = new KeycloakDeployment()
+  keycloakDeployment.setRealm("TMT")
+  keycloakDeployment.setResourceName("test")
+
+  private val authConfig: AuthConfig = mock[AuthConfig]
+  when(authConfig.getDeployment).thenReturn(keycloakDeployment)
+
+  val securityDirectives = SecurityDirectives(authentication, authConfig)
 
   val roleMissingTokenStr = "rolemissing"
   val validTokenStr       = "valid"
@@ -30,8 +40,8 @@ trait MockedAuthentication extends MockitoSugar {
     case Provided(`validTokenStr`)       ⇒ Some(validToken)
     case _                               ⇒ None
   }
-  when(roleMissingToken.hasResourceRole("admin")).thenReturn(false)
-  when(validToken.hasResourceRole("admin")).thenReturn(true)
+  when(roleMissingToken.hasResourceRole("admin", "test")).thenReturn(false)
+  when(validToken.hasResourceRole("admin", "test")).thenReturn(true)
   when(validToken.preferred_username).thenReturn(Some(preferredUserName))
   when(validToken.userOrClientName).thenReturn(preferredUserName)
   when(authentication.authenticator).thenReturn(authenticator)

@@ -2,7 +2,7 @@ package csw.aas.core
 
 import csw.aas.core.TokenVerificationFailure.{InvalidToken, TokenExpired}
 import csw.aas.core.commons.AuthLogger
-import csw.aas.core.deployment.Keycloak
+import csw.aas.core.deployment.AuthConfig
 import csw.aas.core.token.AccessToken
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.adapters.rotation.AdapterTokenVerifier
@@ -15,17 +15,19 @@ import scala.util.Try
 
 private[aas] class KeycloakTokenVerifier {
   def verifyToken(token: String, keycloakDeployment: KeycloakDeployment): Try[KeycloakAccessToken] =
-    Try { AdapterTokenVerifier.verifyToken(token, Keycloak.deployment) }
+    Try { AdapterTokenVerifier.verifyToken(token, keycloakDeployment) }
 }
 
-class TokenVerifier private[aas] (keycloakTokenVerifier: KeycloakTokenVerifier) {
+class TokenVerifier private[aas] (keycloakTokenVerifier: KeycloakTokenVerifier, authConfig: AuthConfig) {
 
   private val logger = AuthLogger.getLogger
   import logger._
 
+  private val keycloakDeployment = authConfig.getDeployment
+
   def verifyAndDecode(token: String): Either[TokenVerificationFailure, AccessToken] = {
     val keycloakToken: Either[TokenVerificationFailure, KeycloakAccessToken] =
-      keycloakTokenVerifier.verifyToken(token, Keycloak.deployment).toEither.left.flatMap {
+      keycloakTokenVerifier.verifyToken(token, keycloakDeployment).toEither.left.flatMap {
         case _: TokenNotActiveException => {
           warn(s"token is expired")
           Left(TokenExpired)
@@ -57,5 +59,6 @@ class TokenVerifier private[aas] (keycloakTokenVerifier: KeycloakTokenVerifier) 
 }
 
 object TokenVerifier {
-  def apply(): TokenVerifier = new TokenVerifier(new KeycloakTokenVerifier)
+  def apply(authConfig: AuthConfig): TokenVerifier =
+    new TokenVerifier(new KeycloakTokenVerifier, authConfig)
 }

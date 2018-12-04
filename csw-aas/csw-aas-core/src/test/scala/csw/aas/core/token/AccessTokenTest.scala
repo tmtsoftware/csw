@@ -53,20 +53,20 @@ class AccessTokenTest extends FunSuite with Matchers {
     val resourceAccess: Map[String, Access] = Map("test-resource" -> Access(Set("test-resource-role")))
     val accessToken                         = token.AccessToken(resource_access = resourceAccess)
 
-    accessToken.hasResourceRole("test-resource-role") shouldEqual true
+    accessToken.hasResourceRole("test-resource-role", "test-resource") shouldEqual true
   }
 
   test("should fail check for resource role if role is present for other resource") {
     val resourceAccess: Map[String, Access] = Map("other-resource" -> Access(Set("test-resource-role")))
     val accessToken                         = token.AccessToken(resource_access = resourceAccess)
 
-    accessToken.hasResourceRole("test-resource-role") shouldEqual false
+    accessToken.hasResourceRole("test-resource-role", "test-resource") shouldEqual false
   }
 
   test("should fail check for resource role") {
     val resourceAccess: Map[String, Access] = Map("test-resource" -> Access(Set("test-resource-role")))
     val accessToken                         = token.AccessToken(resource_access = resourceAccess)
 
-    accessToken.hasResourceRole("invalid-resource-role") shouldEqual false
+    accessToken.hasResourceRole("invalid-resource-role", "test-resource") shouldEqual false
   }
 }

@@ -4,19 +4,23 @@ import akka.http.scaladsl.model.{HttpMethod, HttpMethods}
 import akka.http.scaladsl.server.Directives.{authenticateOAuth2, authorize => keycloakAuthorize, _}
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.directives.AuthenticationDirective
-import csw.aas.core.deployment.Keycloak
+import csw.aas.core.deployment.AuthConfig
 import csw.aas.core.token.AccessToken
 import csw.aas.http.AuthorizationPolicy.{EmptyPolicy, _}
+import org.keycloak.adapters.KeycloakDeployment
 
-class SecurityDirectives(authentication: Authentication) {
+class SecurityDirectives(authentication: Authentication, authConfig: AuthConfig) {
 
-  private val realm: String = Keycloak.deployment.getRealm
+  private val keycloakDeployment: KeycloakDeployment = authConfig.getDeployment
+
+  private val realm: String        = keycloakDeployment.getRealm
+  private val resourceName: String = keycloakDeployment.getResourceName
 
   private[aas] def authenticate: AuthenticationDirective[AccessToken] = authenticateOAuth2(realm, authentication.authenticator)
 
   private[aas] def authorize(authorizationPolicy: AuthorizationPolicy, accessToken: AccessToken): Directive0 =
     authorizationPolicy match {
-      case ResourceRolePolicy(name)         => keycloakAuthorize(accessToken.hasResourceRole(name))
+      case ResourceRolePolicy(name)         => keycloakAuthorize(accessToken.hasResourceRole(name, resourceName))
       case RealmRolePolicy(name)            => keycloakAuthorize(accessToken.hasRealmRole(name))
       case PermissionPolicy(name, resource) => keycloakAuthorize(accessToken.hasPermission(name, resource))
       case CustomPolicy(predicate)          => keycloakAuthorize(predicate(accessToken))
@@ -45,5 +49,6 @@ class SecurityDirectives(authentication: Authentication) {
 
 //todo: do we really need this object and factory, why not simply new?
 object SecurityDirectives {
-  def apply(authentication: Authentication): SecurityDirectives = new SecurityDirectives(authentication)
+  def apply(authentication: Authentication, authConfig: AuthConfig): SecurityDirectives =
+    new SecurityDirectives(authentication, authConfig)
 }

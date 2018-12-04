@@ -1,7 +1,7 @@
 package csw.aas.core
 
 import csw.aas.core.TokenVerificationFailure.{InvalidToken, TokenExpired}
-import csw.aas.core.deployment.Keycloak
+import csw.aas.core.deployment.AuthConfig
 import csw.aas.core.token.AccessToken
 import csw.aas.core.token.claims.{Access, Audience, Authorization}
 import org.keycloak.adapters.KeycloakDeployment
@@ -15,16 +15,21 @@ import scala.util.{Failure, Success}
 
 class TokenVerifierTest extends FunSuite with MockitoSugar with Matchers with EitherValues {
   private val keycloakTokenVerifier: KeycloakTokenVerifier = mock[KeycloakTokenVerifier]
-  private val deployment: KeycloakDeployment               = Keycloak.deployment
-  private val keycloakAccessToken: KeycloakAccessToken     = new KeycloakAccessToken()
-  private val tmtTokenVerifier: TokenVerifier              = new TokenVerifier(keycloakTokenVerifier)
+  private val authConfig: AuthConfig                       = mock[AuthConfig]
+  private val deployment: KeycloakDeployment               = authConfig.getDeployment
+
+  when(authConfig.getDeployment).thenReturn(deployment)
+
+  private val keycloakAccessToken: KeycloakAccessToken = new KeycloakAccessToken()
+  private val tmtTokenVerifier: TokenVerifier          = new TokenVerifier(keycloakTokenVerifier, authConfig)
 
   test("should throw exception while verifyAndDecode token") {
     val token                  = "test-token"
     val validationExceptionMsg = "invalid token"
     val validationException    = new TokenSignatureInvalidException(keycloakAccessToken, validationExceptionMsg)
 
-    when(keycloakTokenVerifier.verifyToken(token, deployment)).thenReturn(Failure(validationException))
+    when(keycloakTokenVerifier.verifyToken(token, deployment))
+      .thenReturn(Failure(validationException))
 
     tmtTokenVerifier.verifyAndDecode(token).left.value shouldBe InvalidToken(validationExceptionMsg)
   }

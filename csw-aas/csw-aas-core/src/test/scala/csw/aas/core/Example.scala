@@ -1,6 +1,6 @@
 package csw.aas.core
 
-import csw.aas.core.deployment.Keycloak
+import csw.aas.core.deployment.AuthConfig
 import csw.aas.core.token.RPT
 import org.keycloak.authorization.client.{AuthzClient, Configuration}
 import play.api.libs.json.Json
@@ -9,13 +9,16 @@ import scala.util.{Failure, Success}
 
 private[aas] object Example extends App {
 
+  val keycloakDeployment = AuthConfig.loadFromAppConfig.getDeployment
+
   private val configuration: Configuration = new Configuration(
-    Keycloak.deployment.getAuthServerBaseUrl,
-    Keycloak.deployment.getRealm,
-    Keycloak.deployment.getResourceName,
-    Keycloak.deployment.getResourceCredentials,
-    Keycloak.deployment.getClient
+    keycloakDeployment.getAuthServerBaseUrl,
+    keycloakDeployment.getRealm,
+    keycloakDeployment.getResourceName,
+    keycloakDeployment.getResourceCredentials,
+    keycloakDeployment.getClient
   )
+
   private val authzClient: AuthzClient = AuthzClient.create(configuration)
 
   val accessToken = RPT(authzClient).create(

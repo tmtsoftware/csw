@@ -1,14 +1,14 @@
 package csw.aas.native
 
-import csw.aas.core.deployment.Keycloak
+import csw.aas.core.deployment.AuthConfig
 import csw.aas.native.api.{AuthStore, NativeAppAuthAdapter}
 import csw.aas.native.internal.NativeAppAuthAdapterImpl
 
 //todo: can we use DI and inject Keycloak here?
 object NativeAppAuthAdapterFactory {
 
-  def make(): NativeAppAuthAdapter = new NativeAppAuthAdapterImpl(Keycloak.deployment)
+  def make(authConfig: AuthConfig): NativeAppAuthAdapter = new NativeAppAuthAdapterImpl(authConfig)
 
-  def make(secretStore: AuthStore): NativeAppAuthAdapter =
-    new NativeAppAuthAdapterImpl(Keycloak.deployment, authStore = secretStore)
+  def make(authConfig: AuthConfig, secretStore: AuthStore): NativeAppAuthAdapter =
+    new NativeAppAuthAdapterImpl(authConfig, authStore = secretStore)
 }

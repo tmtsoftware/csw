@@ -462,9 +462,9 @@ lazy val `csw-aas` = project
 
 lazy val `csw-aas-core` = project
   .in(file("csw-aas/csw-aas-core"))
-  .dependsOn(`csw-logging`)
+  .dependsOn(`csw-logging`, `csw-location-api`)
   .settings(
-    libraryDependencies ++= Dependencies.AuthAdapterCore.value
+    libraryDependencies ++= Dependencies.CswAasCore.value
   )
 
 lazy val `csw-aas-http` = project

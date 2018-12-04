@@ -2,6 +2,7 @@ package csw.config.server
 
 import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
+import csw.aas.core.deployment.AuthConfig
 import csw.aas.core.token.TokenFactory
 import csw.aas.http.{Authentication, SecurityDirectives}
 import csw.config.server.files._
@@ -28,8 +29,9 @@ private[csw] class ServerWiring {
   lazy val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
 
   lazy val configHandlers     = new ConfigHandlers
-  lazy val authentication     = new Authentication(new TokenFactory)
-  lazy val securityDirectives = SecurityDirectives(authentication)
+  lazy val authConfig         = AuthConfig.loadFromAppConfig
+  lazy val authentication     = new Authentication(new TokenFactory(authConfig))
+  lazy val securityDirectives = SecurityDirectives(authentication, authConfig)
   lazy val configServiceRoute = new ConfigServiceRoute(configServiceFactory, actorRuntime, configHandlers, securityDirectives)
 
   lazy val httpService: HttpService = new HttpService(locationService, configServiceRoute, settings, actorRuntime)

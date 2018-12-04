@@ -3,6 +3,7 @@ package example
 import akka.actor.ActorSystem
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.unmarshalling.GenericUnmarshallers
+import csw.aas.core.deployment.AuthConfig
 import csw.aas.core.token.TokenFactory
 import csw.aas.http.AuthorizationPolicy.{EmptyPolicy, ResourceRolePolicy}
 import csw.aas.http.{Authentication, SecurityDirectives}
@@ -13,7 +14,10 @@ object ExampleServer extends HttpApp with App with GenericUnmarshallers with Pla
 
   LoggingSystemFactory.start("example-server", "", "", ActorSystem())
 
-  private val directives = SecurityDirectives(new Authentication(new TokenFactory))
+  private val authConfig     = AuthConfig.loadFromAppConfig
+  private val tokenFactory   = new TokenFactory(authConfig)
+  private val authentication = new Authentication(tokenFactory)
+  private val directives     = SecurityDirectives(authentication, authConfig)
 
   import directives._
   private val HOST = "localhost"

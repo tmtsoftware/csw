@@ -2,6 +2,7 @@ package csw.config.cli.wiring
 
 import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
+import csw.aas.core.deployment.AuthConfig
 import csw.aas.native.NativeAppAuthAdapterFactory
 import csw.aas.native.api.NativeAppAuthAdapter
 import csw.aas.native.scaladsl.FileAuthStore
@@ -25,7 +26,8 @@ private[config] class Wiring {
   lazy val actorRuntime                            = new ActorRuntime(actorSystem)
   lazy val locationService: LocationService        = HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
   lazy val authStore                               = new FileAuthStore(settings.authStorePath)
-  lazy val nativeAuthAdapter: NativeAppAuthAdapter = NativeAppAuthAdapterFactory.make(authStore)
+  lazy val authConfig                              = AuthConfig.loadFromAppConfig
+  lazy val nativeAuthAdapter: NativeAppAuthAdapter = NativeAppAuthAdapterFactory.make(authConfig, authStore)
   lazy val tokenFactory: TokenFactory              = new CliTokenFactory(nativeAuthAdapter)
   lazy val configService: ConfigService            = ConfigClientFactory.adminApi(actorRuntime.actorSystem, locationService, tokenFactory)
   lazy val printLine: Any ⇒ Unit                   = println

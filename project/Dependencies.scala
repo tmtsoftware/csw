@@ -312,13 +312,15 @@ object Dependencies {
     )
   )
 
-  val AuthAdapterCore = Def.setting(
+  val CswAasCore = Def.setting(
     Seq(
       Libs.`jwt-play-json`,
       Libs.`config`,
       Keycloak.`keycloak-core`,
       Keycloak.`keycloak-adapter-core`,
       Keycloak.`keycloak-authz`,
+      AkkaHttp.`akka-http`,
+      Libs.`scala-async`,
       //(legacy dependencies) required*
       Libs.`jboss-logging`,
       Libs.httpclient,

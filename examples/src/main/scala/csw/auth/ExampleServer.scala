@@ -3,6 +3,7 @@ package csw.auth
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.unmarshalling.GenericUnmarshallers
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
+import csw.aas.core.deployment.AuthConfig
 import csw.aas.core.token.TokenFactory
 import csw.aas.http.AuthorizationPolicy._
 import csw.aas.http.{Authentication, SecurityDirectives}
@@ -10,7 +11,10 @@ import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 
 object ExampleServer extends HttpApp with App with GenericUnmarshallers with PlayJsonSupport {
 
-  private val directives = SecurityDirectives(new Authentication(new TokenFactory))
+  private val authConfig     = AuthConfig.loadFromAppConfig
+  private val tokenFactory   = new TokenFactory(authConfig)
+  private val authentication = new Authentication(tokenFactory)
+  private val directives     = SecurityDirectives(authentication, authConfig)
 
   import directives._
   private val HOST = "localhost"

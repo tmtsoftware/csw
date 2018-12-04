@@ -1,7 +1,6 @@
 package csw.aas.core.token
 
 import csw.aas.core.commons.AuthLogger
-import csw.aas.core.deployment.Keycloak
 import csw.aas.core.token.claims.{Access, Audience, Authorization}
 import play.api.libs.json._
 
@@ -39,13 +38,12 @@ case class AccessToken(
     result
   }
 
-  def hasResourceRole(role: String): Boolean = {
-    val clientName: String = Keycloak.deployment.getResourceName
-    val result = this.resource_access.get(clientName) match {
+  def hasResourceRole(role: String, resourceName: String): Boolean = {
+    val result = this.resource_access.get(resourceName) match {
       case Some(access) => access.roles.contains(role)
       case _            => false
     }
-    debug(s"'$userOrClientName' doesn't have resource role `$role` for client `$clientName`")
+    debug(s"'$userOrClientName' doesn't have resource role `$role` for client `$resourceName`")
     result
   }
 

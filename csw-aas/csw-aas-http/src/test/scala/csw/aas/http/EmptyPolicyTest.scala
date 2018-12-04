@@ -6,6 +6,7 @@ import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
 import akka.http.scaladsl.server.directives.Credentials.Provided
 import akka.http.scaladsl.server.{Directives, Route}
 import akka.http.scaladsl.testkit._
+import csw.aas.core.deployment.AuthConfig
 import csw.aas.core.token.AccessToken
 import csw.aas.http.AuthorizationPolicy.EmptyPolicy
 import org.mockito.Mockito.when
@@ -14,9 +15,11 @@ import org.scalatest.{FunSuite, Matchers}
 
 class EmptyPolicyTest extends FunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
+  private val authConfig = AuthConfig.loadFromAppConfig
+
   test("empty policy should return AuthenticationFailedRejection when token is invalid") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication)
+    val securityDirectives             = new SecurityDirectives(authentication, authConfig)
 
     val invalidTokenStr    = "invalid"
     val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
@@ -43,7 +46,7 @@ class EmptyPolicyTest extends FunSuite with MockitoSugar with Directives with Sc
 
   test("empty policy should return AuthenticationFailedRejection when token is not present") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication)
+    val securityDirectives             = new SecurityDirectives(authentication, authConfig)
 
     val authenticator: Authenticator[AccessToken] = _ ⇒ None
 
@@ -64,7 +67,7 @@ class EmptyPolicyTest extends FunSuite with MockitoSugar with Directives with Sc
 
   test("empty policy should return 200 OK when token is valid & has permission") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication)
+    val securityDirectives             = new SecurityDirectives(authentication, authConfig)
 
     val validTokenWithPermissionStr    = "validTokenWithPermissionStr"
     val validTokenWithPermissionHeader = Authorization(OAuth2BearerToken(validTokenWithPermissionStr))

@@ -2,12 +2,16 @@ package csw.aas.native
 
 import java.nio.file.Paths
 
+import csw.aas.core.deployment.AuthConfig
 import csw.aas.native.scaladsl.FileAuthStore
 
 import scala.concurrent.duration.DurationLong
 
 object Example extends App {
-  val keycloak = NativeAppAuthAdapterFactory.make(new FileAuthStore(Paths.get("/tmp/auth")))
+
+  val authConfig = AuthConfig.loadFromAppConfig
+
+  val keycloak = NativeAppAuthAdapterFactory.make(authConfig, new FileAuthStore(Paths.get("/tmp/auth")))
 
   println("login initiated")
   keycloak.login()
