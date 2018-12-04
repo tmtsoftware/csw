@@ -11,18 +11,14 @@ import csw.time.api.scaladsl.TimeService
 import csw.time.client.internal.TimeLibraryUtil.Linux
 import csw.time.client.internal.extensions.RichCancellableExt.RichCancellable
 import csw.time.client.internal.native_models.{NTPTimeVal, TimeSpec, Timex}
-import csw.time.client.internal.native_models.ClockId.{ClockRealtime, ClockTAI}
-import csw.time.client.internal.native_models._
 
 import scala.concurrent.duration.FiniteDuration
 
-class TimeServiceImpl() extends TimeService {
+class TimeServiceImpl(implicit actorSystem: ActorSystem) extends TimeService {
   val ClockRealtime       = 0
   val ClockTAI            = 11
-  private val actorSystem = ActorSystem("TimeService")
   private val osType      = TimeLibraryUtil.osType
 
-class TimeServiceImpl(implicit actorSystem: ActorSystem) extends TimeService {
   override def utcTime(): UtcInstant = UtcInstant(instantFor(ClockRealtime))
 
   override def taiTime(): TaiInstant = TaiInstant(instantFor(ClockTAI))
@@ -60,6 +56,19 @@ class TimeServiceImpl(implicit actorSystem: ActorSystem) extends TimeService {
     val duration = Duration.between(now, time.value)
     FiniteDuration(duration.toNanos, NANOSECONDS)
   }
+
+
+  // todo: without sudo or somehow handle it internally?
+  // sets the tai offset on kernel (needed when ptp is not setup)
+  private[time] def setTaiOffset(offset: Int): Unit = {
+    val timex = new Timex()
+
+    timex.modes = 128
+    timex.constant = new NativeLong(offset)
+    TimeLibraryUtil.ntp_adjtime(timex)
+    println(s"Status of Tai offset command=" + timex.status)
+    println(s"Tai offset set to [${taiOffset()}]")
+  }
 }
 
 /**
@@ -76,18 +85,6 @@ object TimeLibraryUtil {
       case _ =>
         TimeLibraryOther.ntp_adjtime(timex)
     }
-  }
-
-  // todo: without sudo or somehow handle it internally?
-  // sets the tai offset on kernel (needed when ptp is not setup)
-  private[time] def setTaiOffset(offset: Int): Unit = {
-    val timex = new Timex()
-
-    timex.modes = 128
-    timex.constant = new NativeLong(offset)
-    TimeLibrary.ntp_adjtime(timex)
-    println(s"Status of Tai offset command=" + timex.status)
-    println(s"Tai offset set to [${taiOffset()}]")
   }
 
   def ntp_gettimex(timex: NTPTimeVal): Int = {

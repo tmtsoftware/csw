@@ -1,5 +1,6 @@
 package csw.time.client.internal;
 
+import com.sun.jna.NativeLong;
 import csw.time.client.internal.native_models.NTPTimeVal;
 import csw.time.client.internal.native_models.TimeSpec;
 import csw.time.client.internal.native_models.Timex;
@@ -8,7 +9,6 @@ import java.time.Instant;
 
 // TimeLibrary is responsible for making native calls for time
 public class TimeLibraryOther {
-    private static int ADJ_TAI = 0x0080;  // set TAI offset
 
     // For adjtime return value ntp_gettimex, ntp_adjtime
     private static int TIME_OK = 0;
@@ -25,14 +25,12 @@ public class TimeLibraryOther {
     }
 
     public static int clock_gettime(int clockId, TimeSpec timeSpec) {
-        int ClockRealtime       = 0;
         int ClockTAI            = 11;
 
         // Just use system clock and add offset if TAI clock
         Instant instant = Instant.now();
-        timeSpec.seconds = instant.getEpochSecond();
-        timeSpec.nanoseconds = (long)instant.getNano() + 1;  // Adding one to get the precision tests to work- discuss
-        if (clockId == ClockTAI) timeSpec.seconds += getTaiOffset();
+        timeSpec.seconds = new NativeLong(instant.getEpochSecond() + ((clockId == ClockTAI) ? getTaiOffset() : 0));
+        timeSpec.nanoseconds = new NativeLong(instant.getNano() + 1);  // Adding one to get the precision tests to work- discuss
         return 0;  // SUCCESS
     }
 
@@ -42,8 +40,9 @@ public class TimeLibraryOther {
     }
 
     public static int ntp_adjtime(Timex timex) {
+        int ADJ_TAI = 0x0080;  // set TAI offset
         if (timex.modes == ADJ_TAI) {
-            _TaiOffset = (int)timex.constant;
+            _TaiOffset = (int)timex.constant.longValue();
         }
         return TIME_OK;
     }
