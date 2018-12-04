@@ -53,10 +53,6 @@ object AuthConfig {
     new AuthConfig(config, Some(authServerLocation))
   }
 
-  def fromConfig(config: Config): AuthConfig = new AuthConfig(config, None)
-
-  def fromConfig(config: Config, authServerLocation: HttpLocation): AuthConfig = new AuthConfig(config, Some(authServerLocation))
-
   private[aas] implicit def deploymentToConfig(deployment: KeycloakDeployment): Configuration = {
     new Configuration(
       deployment.getAuthServerBaseUrl,

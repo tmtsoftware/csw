@@ -38,7 +38,7 @@ object ExampleServer extends HttpApp with App with GenericUnmarshallers with Pla
   val registrationResult: RegistrationResult = authLocation.register()
 
   //create new authConfig using resolved auth server location
-  private val authConfig = AuthConfig.loadFromAppConfig
+  private val authConfig = AuthConfig.loadFromAppConfig(authLocation.resolve)
 
   private val authentication = Authentication(TokenFactory(authConfig))
   private val directives     = SecurityDirectives(authentication, authConfig)
