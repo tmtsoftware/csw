@@ -290,6 +290,7 @@ object Dependencies {
       Libs.`scala-async`,
       Slick.`slick`,
       Slick.`slick-hikaricp`,
+      Libs.`jooq`,
       Libs.`scalatest`.value % Test,
       Akka.`akka-actor`      % Test,
       Libs.`junit`           % Test,

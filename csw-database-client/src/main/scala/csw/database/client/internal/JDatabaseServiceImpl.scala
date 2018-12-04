@@ -15,14 +15,14 @@ import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.ExecutionContext
 
 class JDatabaseServiceImpl(databaseService: DatabaseService, ec: ExecutionContext) extends IDatabaseService {
-  override def select[T](
+  override def query[T](
       sql: String,
       paramBinder: Consumer[PositionedParameters],
       resultMapper: function.Function[DBRow, T]
   ): CompletableFuture[util.List[T]] =
     selectInternal(sql, toSlickParam(paramBinder), resultMapper)
 
-  override def select[T](sql: String, resultMapper: function.Function[DBRow, T]): CompletableFuture[util.List[T]] =
+  override def query[T](sql: String, resultMapper: function.Function[DBRow, T]): CompletableFuture[util.List[T]] =
     selectInternal(sql, SetParameter.SetUnit, resultMapper)
 
   private def selectInternal[T](

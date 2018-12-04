@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -65,14 +64,14 @@ public class JDatabaseServiceTest extends JUnitSuite {
 
         // assert creation of database
         String getDatabases = "SELECT datname FROM pg_database WHERE datistemplate = false";
-        List<String> resultSet = databaseService.select(getDatabases, DBRow::nextString).get(5, SECONDS);
+        List<String> resultSet = databaseService.query(getDatabases, DBRow::nextString).get(5, SECONDS);
         assertTrue(resultSet.contains("box_office"));
 
         // drop box_office database
         databaseService.update("DROP DATABASE box_office").get(5, SECONDS);
 
         // assert removal of database
-        List<String> resultSet2 = databaseService.select(getDatabases, DBRow::nextString).get(5, SECONDS);
+        List<String> resultSet2 = databaseService.query(getDatabases, DBRow::nextString).get(5, SECONDS);
         assertFalse(resultSet2.contains("box_office"));
     }
 
@@ -84,26 +83,26 @@ public class JDatabaseServiceTest extends JUnitSuite {
 
         // assert creation of table
         String getTables = "select table_name from information_schema.tables";
-        List<String> tableResultSet = databaseService.select(getTables, DBRow::nextString).get(5, SECONDS);
+        List<String> tableResultSet = databaseService.query(getTables, DBRow::nextString).get(5, SECONDS);
         assertTrue(tableResultSet.contains("films"));
 
         // assert the count of the columns in films
         String getColumnCount = "SELECT Count(*) FROM INFORMATION_SCHEMA.Columns where TABLE_NAME = 'films'";
-        List<Integer> resultSetBeforeAlter = databaseService.select(getColumnCount, DBRow::nextInt).get(5, SECONDS);
+        List<Integer> resultSetBeforeAlter = databaseService.query(getColumnCount, DBRow::nextInt).get(5, SECONDS);
         assertEquals(Integer.valueOf(1), resultSetBeforeAlter.get(0));
 
         // add one more column in films
         databaseService.update("ALTER TABLE films ADD COLUMN name VARCHAR(10)").get(5, SECONDS);
 
         // assert increased count of column in films
-        List<Integer> resultSetAfterAlter = databaseService.select(getColumnCount, DBRow::nextInt).get(5, SECONDS);
+        List<Integer> resultSetAfterAlter = databaseService.query(getColumnCount, DBRow::nextInt).get(5, SECONDS);
         assertEquals(Integer.valueOf(2), resultSetAfterAlter.get(0));
 
         // drop table
         databaseService.update("DROP TABLE films").get(5, SECONDS);
 
         // assert removal of table
-        List<String> tableResultSet2 = databaseService.select(getTables, DBRow::nextString).get(5, SECONDS);
+        List<String> tableResultSet2 = databaseService.query(getTables, DBRow::nextString).get(5, SECONDS);
         assertFalse(tableResultSet2.contains("films"));
     }
 
@@ -124,7 +123,7 @@ public class JDatabaseServiceTest extends JUnitSuite {
 
         // query the table and assert on data received
         List<Film> resultSet =
-                databaseService.select(
+                databaseService.query(
                         "SELECT * FROM films where name = ?",
                         params -> params.setString(movie_1),
                         result -> new Film(result.nextInt(), result.nextString())
@@ -162,7 +161,7 @@ public class JDatabaseServiceTest extends JUnitSuite {
 
         // query with joins and group by
         List<FilmBudget> resultSet = databaseService
-                .select(
+                .query(
                         "SELECT films.name, SUM(budget.amount) " +
                                 "FROM films INNER JOIN budget " +
                                 "ON films.id = budget.movie_id " +
@@ -199,7 +198,7 @@ public class JDatabaseServiceTest extends JUnitSuite {
         databaseService.update("UPDATE films SET name = 'movie_3' WHERE name = ?", pp -> pp.setString(movie_2));
 
         // assert the record is updated
-        List<Integer> resultSet = databaseService.select("SELECT count(*) AS rowCount from films where name = ?",
+        List<Integer> resultSet = databaseService.query("SELECT count(*) AS rowCount from films where name = ?",
                 pp -> pp.setString(movie_2),
                 DBRow::nextInt).get(5, SECONDS);
         assertEquals(Integer.valueOf(0), resultSet.get(0));
@@ -223,7 +222,7 @@ public class JDatabaseServiceTest extends JUnitSuite {
         databaseService.update("DELETE from films WHERE name = ?", pp -> pp.setString(movie_4)).get(5, SECONDS);
 
         // assert the removal of record
-        List<Integer> resultSet = databaseService.select("SELECT count(*) AS rowCount from films", DBRow::nextInt).get(5, SECONDS);
+        List<Integer> resultSet = databaseService.query("SELECT count(*) AS rowCount from films", DBRow::nextInt).get(5, SECONDS);
         assertEquals(Integer.valueOf(2), resultSet.get(0));
 
         databaseService.update("DROP TABLE films").get(5, SECONDS);
