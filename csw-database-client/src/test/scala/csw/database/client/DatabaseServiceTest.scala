@@ -124,26 +124,15 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
           sqlu"CREATE TABLE films (id SERIAL PRIMARY KEY, name VARCHAR (10) UNIQUE NOT NULL)",
           sqlu"INSERT INTO films(name) VALUES ('movie_1')",
           sqlu"INSERT INTO films(name) VALUES ('movie_4')",
-          sqlu"INSERT INTO films(name) VALUES ('movie_2')"
-        )
-      )
-      .futureValue
-
-    // create budget
-    databaseService
-      .update(sqlu"""
+          sqlu"INSERT INTO films(name) VALUES ('movie_2')",
+          sqlu"""
                CREATE TABLE budget (
                id SERIAL PRIMARY KEY,
                movie_id INTEGER,
                movie_name VARCHAR(10),
                amount NUMERIC,
                FOREIGN KEY (movie_id) REFERENCES films(id) ON DELETE CASCADE
-               )""")
-      .futureValue
-
-    databaseService
-      .updateAll(
-        List(
+               )""",
           sqlu"INSERT INTO budget(movie_id, movie_name, amount) VALUES (1, 'movie_1', 5000)",
           sqlu"INSERT INTO budget(movie_id, movie_name, amount) VALUES (2, 'movie_4', 6000)",
           sqlu"INSERT INTO budget(movie_id, movie_name, amount) VALUES (3, 'movie_2', 7000)",
@@ -194,19 +183,19 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
 
 //  //DEOPSCSW-612: Examples of deleting records
   test("should be able to delete records") {
+    val movie4 = "movie_4"
     // create films
     databaseService
       .updateAll(
         List(
           sqlu"CREATE TABLE films (id SERIAL PRIMARY KEY, name VARCHAR (10) UNIQUE NOT NULL)",
           sqlu"INSERT INTO films(name) VALUES ('movie_1')",
-          sqlu"INSERT INTO films(name) VALUES ('movie_4')",
-          sqlu"INSERT INTO films(name) VALUES ('movie_2')"
+          sqlu"INSERT INTO films(name) VALUES ($movie4)",
+          sqlu"INSERT INTO films(name) VALUES ('movie_2')",
+          sqlu"DELETE from films WHERE name = $movie4"
         )
       )
       .futureValue
-
-    databaseService.update(sqlu"DELETE from films WHERE name = 'movie_4'").futureValue
 
     val resultSet =
       databaseService.query(sql"SELECT count(*) AS rowCount from films".as[Int]).futureValue

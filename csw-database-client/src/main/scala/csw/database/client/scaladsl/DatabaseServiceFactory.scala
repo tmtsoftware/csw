@@ -45,7 +45,7 @@ class DatabaseServiceFactory {
   private def getConfigWithUrl(url: String): Config = {
     ConfigFactory
       .load()
-      .getConfig("postgresConfig")
+      .getConfig("csw-database")
       .withValue("url", ConfigValueFactory.fromAnyRef(url))
   }
 
