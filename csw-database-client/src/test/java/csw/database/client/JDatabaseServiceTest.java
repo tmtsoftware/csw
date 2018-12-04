@@ -4,6 +4,7 @@ import akka.actor.ActorSystem;
 import com.opentable.db.postgres.embedded.EmbeddedPostgres;
 import csw.database.api.javadsl.IDatabaseService;
 import csw.database.api.models.DBRow;
+import csw.database.api.models.SqlParamStore;
 import csw.database.client.scaladsl.DatabaseServiceFactory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -58,12 +60,18 @@ public class JDatabaseServiceTest extends JUnitSuite {
     //DEOPSCSW-608: Examples of creating a database in the database service
     @Test
     public void shouldBeAbleToCreateANewDatabase() throws InterruptedException, ExecutionException, TimeoutException {
+        // create box_office database
         databaseService.update("CREATE DATABASE box_office").get(5, SECONDS);
+
+        // assert creation of database
         String getDatabases = "SELECT datname FROM pg_database WHERE datistemplate = false";
         List<String> resultSet = databaseService.select(getDatabases, DBRow::nextString).get(5, SECONDS);
         assertTrue(resultSet.contains("box_office"));
 
+        // drop box_office database
         databaseService.update("DROP DATABASE box_office").get(5, SECONDS);
+
+        // assert removal of database
         List<String> resultSet2 = databaseService.select(getDatabases, DBRow::nextString).get(5, SECONDS);
         assertFalse(resultSet2.contains("box_office"));
     }
@@ -71,21 +79,30 @@ public class JDatabaseServiceTest extends JUnitSuite {
     //DEOPSCSW-622: Modify a table using update sql string
     @Test
     public void shouldBeAbleToAlterOrDropATable() throws InterruptedException, ExecutionException, TimeoutException {
+        // create films
         databaseService.update("CREATE TABLE films (id SERIAL PRIMARY KEY)").get(5, SECONDS);
-        String getColumnCount = "SELECT Count(*) FROM INFORMATION_SCHEMA.Columns where TABLE_NAME = 'films'";
-        List<Integer> resultSetBeforeAlter = databaseService.select(getColumnCount, DBRow::nextInt).get(5, SECONDS);
-        assertEquals(Integer.valueOf(1), resultSetBeforeAlter.get(0));
 
-        databaseService.update("ALTER TABLE films ADD COLUMN name VARCHAR(10)").get(5, SECONDS);
-        List<Integer> resultSetAfterAlter = databaseService.select(getColumnCount, DBRow::nextInt).get(5, SECONDS);
-        assertEquals(Integer.valueOf(2), resultSetAfterAlter.get(0));
-
+        // assert creation of table
         String getTables = "select table_name from information_schema.tables";
         List<String> tableResultSet = databaseService.select(getTables, DBRow::nextString).get(5, SECONDS);
         assertTrue(tableResultSet.contains("films"));
 
+        // assert the count of the columns in films
+        String getColumnCount = "SELECT Count(*) FROM INFORMATION_SCHEMA.Columns where TABLE_NAME = 'films'";
+        List<Integer> resultSetBeforeAlter = databaseService.select(getColumnCount, DBRow::nextInt).get(5, SECONDS);
+        assertEquals(Integer.valueOf(1), resultSetBeforeAlter.get(0));
+
+        // add one more column in films
+        databaseService.update("ALTER TABLE films ADD COLUMN name VARCHAR(10)").get(5, SECONDS);
+
+        // assert increased count of column in films
+        List<Integer> resultSetAfterAlter = databaseService.select(getColumnCount, DBRow::nextInt).get(5, SECONDS);
+        assertEquals(Integer.valueOf(2), resultSetAfterAlter.get(0));
+
+        // drop table
         databaseService.update("DROP TABLE films").get(5, SECONDS);
 
+        // assert removal of table
         List<String> tableResultSet2 = databaseService.select(getTables, DBRow::nextString).get(5, SECONDS);
         assertFalse(tableResultSet2.contains("films"));
     }
@@ -93,49 +110,38 @@ public class JDatabaseServiceTest extends JUnitSuite {
     //DEOPSCSW-613: Examples of querying records
     //DEOPSCSW-616: Create a method to send a query (select) sql string to a database
     //DEOPSCSW-610: Examples of Reading Records
+    //DEOPSCSW-609: Examples of Record creation
     @Test
     public void shouldBeAbleToQueryRecordsFromTheTable() throws InterruptedException, ExecutionException, TimeoutException {
-        List<String> queries = new ArrayList<>();
-        queries.add("CREATE TABLE films (id SERIAL PRIMARY KEY, name VARCHAR (10) UNIQUE NOT NULL)");
-        queries.add("INSERT INTO films(name) VALUES ('movie_1')");
 
-        // create films db
-        databaseService.updateAll(queries).get(5, SECONDS);
+        // create films and insert movie_1
+        String movie_1 = "movie_1";
+        databaseService.update("CREATE TABLE films (id SERIAL PRIMARY KEY, name VARCHAR (10) UNIQUE NOT NULL)").get(5, SECONDS);
+        databaseService.update(
+                "INSERT INTO films(name) VALUES (?)",
+                params -> params.setString(movie_1)
+        ).get(5, SECONDS);
 
+        // query the table and assert on data received
         List<Film> resultSet =
                 databaseService.select(
-                        "SELECT * FROM films where name = 'movie_1'",
-                        r -> new Film(r.nextInt(), r.nextString())
+                        "SELECT * FROM films where name = ?",
+                        params -> params.setString(movie_1),
+                        result -> new Film(result.nextInt(), result.nextString())
                 ).get(5, SECONDS);
 
-        assertTrue(resultSet.contains(new Film(1, "movie_1")));
-
-        databaseService.update("DROP TABLE films").get(5, SECONDS);
-    }
-
-    //DEOPSCSW-609: Examples of creating records in a database in the database service
-    //DEOPSCSW-613: Examples of querying records in a database in the database service
-    @Test
-    public void shouldBeAbleToCreateTableAndInsertDataInIt() throws InterruptedException, ExecutionException, TimeoutException {
-        List<String> queries = new ArrayList<>();
-        queries.add("CREATE TABLE films (id SERIAL PRIMARY KEY, name VARCHAR (10) UNIQUE NOT NULL)");
-        queries.add("INSERT INTO films(name) VALUES ('movie_1')");
-        queries.add("INSERT INTO films(name) VALUES ('movie_4')");
-        queries.add("INSERT INTO films(name) VALUES ('movie_2')");
-
-        databaseService.updateAll(queries).get(5, SECONDS);
-
-        List<Integer> resultSet = databaseService.select("SELECT count(*) AS rowCount from films", DBRow::nextInt).get(5, SECONDS);
-        assertEquals(Integer.valueOf(3), resultSet.get(0));
+        assertEquals(movie_1, resultSet.get(0).name);
 
         databaseService.update("DROP TABLE films").get(5, SECONDS);
     }
 
     //DEOPSCSW-607: Complex relational database example
-    //DEOPSCSW-609: Examples of creating records in a database in the database service
-    //DEOPSCSW-613: Examples of querying records in a database in the database service
+    //DEOPSCSW-609: Examples of Record creation
+    //DEOPSCSW-613: Examples of querying records
+    //DEOPSCSW-610: Examples of Reading Records
     @Test
     public void shouldBeAbleToCreateJoinAndGroupRecordsUsingForeignKey() throws InterruptedException, ExecutionException, TimeoutException {
+        // create tables films and budget and insert records
         List<String> queries = new ArrayList<>();
         queries.add("CREATE TABLE films (id SERIAL PRIMARY KEY, name VARCHAR (10) UNIQUE NOT NULL)");
         queries.add("INSERT INTO films(name) VALUES ('movie_1')");
@@ -154,6 +160,7 @@ public class JDatabaseServiceTest extends JUnitSuite {
 
         databaseService.updateAll(queries).get(5, SECONDS);
 
+        // query with joins and group by
         List<FilmBudget> resultSet = databaseService
                 .select(
                         "SELECT films.name, SUM(budget.amount) " +
@@ -180,14 +187,21 @@ public class JDatabaseServiceTest extends JUnitSuite {
     //DEOPSCSW-619: Create a method to send an update sql string to a database
     @Test
     public void shouldBeAbleToUpdateRecord() throws InterruptedException, ExecutionException, TimeoutException {
-        List<String> queries = new ArrayList<>();
-        queries.add("CREATE TABLE films (id SERIAL PRIMARY KEY, name VARCHAR (10) UNIQUE NOT NULL)");
-        queries.add("INSERT INTO films(name) VALUES ('movie_2')");
-        queries.add("UPDATE films SET name = 'movie_3' WHERE name = 'movie_2'");
+        // create films and insert record
+        String movie_2 = "movie_2";
+        SqlParamStore sqlParamStore = new SqlParamStore()
+                .add("CREATE TABLE films (id SERIAL PRIMARY KEY, name VARCHAR (10) UNIQUE NOT NULL)")
+                .add("INSERT INTO films(name) VALUES (?)", pp -> pp.setString(movie_2));
 
-        databaseService.updateAll(queries).get(5, SECONDS);
+        databaseService.updateAll(sqlParamStore).get(5, SECONDS);
 
-        List<Integer> resultSet = databaseService.select("SELECT count(*) AS rowCount from films where name = 'movie_4'", DBRow::nextInt).get(5, SECONDS);
+        // update record value
+        databaseService.update("UPDATE films SET name = 'movie_3' WHERE name = ?", pp -> pp.setString(movie_2));
+
+        // assert the record is updated
+        List<Integer> resultSet = databaseService.select("SELECT count(*) AS rowCount from films where name = ?",
+                pp -> pp.setString(movie_2),
+                DBRow::nextInt).get(5, SECONDS);
         assertEquals(Integer.valueOf(0), resultSet.get(0));
 
         databaseService.update("DROP TABLE films").get(5, SECONDS);
@@ -196,14 +210,19 @@ public class JDatabaseServiceTest extends JUnitSuite {
     //DEOPSCSW-612: Examples of deleting records
     @Test
     public void shouldBeAbleToDeleteRecordsFromTable() throws InterruptedException, ExecutionException, TimeoutException {
+        // create films and insert records
+        String movie_4 = "movie_4";
         List<String> queries = new ArrayList<>();
         queries.add("CREATE TABLE films (id SERIAL PRIMARY KEY, name VARCHAR (10) UNIQUE NOT NULL)");
         queries.add("INSERT INTO films(name) VALUES ('movie_1')");
         queries.add("INSERT INTO films(name) VALUES ('movie_4')");
         queries.add("INSERT INTO films(name) VALUES ('movie_2')");
-        queries.add("DELETE from films WHERE name = 'movie_4'");
-
         databaseService.updateAll(queries).get(5, SECONDS);
+
+        // delete movie_4
+        databaseService.update("DELETE from films WHERE name = ?", pp -> pp.setString(movie_4)).get(5, SECONDS);
+
+        // assert the removal of record
         List<Integer> resultSet = databaseService.select("SELECT count(*) AS rowCount from films", DBRow::nextInt).get(5, SECONDS);
         assertEquals(Integer.valueOf(2), resultSet.get(0));
 
@@ -213,23 +232,11 @@ public class JDatabaseServiceTest extends JUnitSuite {
 
 class Film {
     private Integer id;
-    private String name;
+    String name;
 
-    public Film(Integer id, String name) {
+    Film(Integer id, String name) {
         this.id = id;
         this.name = name;
-    }
-
-    @Override
-    public boolean equals(Object operand) {
-        if (operand == this) {
-            return true;
-        }
-        if (!(operand instanceof Film)) {
-            return false;
-        }
-        Film current = (Film) operand;
-        return name.equals(current.name) && id.equals(current.id);
     }
 }
 
@@ -237,7 +244,7 @@ class FilmBudget {
     private String name;
     private Integer amt;
 
-    public FilmBudget(String name, Integer amt) {
+    FilmBudget(String name, Integer amt) {
         this.name = name;
         this.amt = amt;
     }
