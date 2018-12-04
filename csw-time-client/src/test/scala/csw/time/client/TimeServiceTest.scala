@@ -6,7 +6,7 @@ import akka.actor.ActorSystem
 import akka.testkit.TestProbe
 import csw.time.api.models.CswInstant.{TaiInstant, UtcInstant}
 import csw.time.client.extensions.RichInstant.RichInstant
-import csw.time.client.internal.TimeServiceImpl
+import csw.time.client.internal.{TimeLibraryUtil, TimeServiceImpl}
 import csw.time.client.tags.Linux
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.SpanSugar.convertDoubleToGrainOfTime
@@ -130,7 +130,11 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
     println(s"Ideal Schedule Time: $idealScheduleTime")
     println(s"Actual Schedule Time: $actualScheduleTime")
 
-    val allowedJitterInNanos = 5 * 1000 * 1000 // should be ideally 400µs as per 3σ statistics from manual tests
+
+    val allowedJitterInNanos = (TimeLibraryUtil.osType) match {
+      case TimeLibraryUtil.Linux => 5 * 1000 * 1000 // should be ideally 400µs as per 3σ statistics from manual tests
+      case _                     => 7 * 1000 * 1000
+    }
 
     actualScheduleTime.value.getEpochSecond - idealScheduleTime.value.getEpochSecond shouldBe 0
     actualScheduleTime.value.getNano - idealScheduleTime.value.getNano should be < allowedJitterInNanos
