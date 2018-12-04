@@ -15,9 +15,9 @@ import csw.time.client.internal.native_models.{NTPTimeVal, TimeSpec, Timex}
 import scala.concurrent.duration.FiniteDuration
 
 class TimeServiceImpl(implicit actorSystem: ActorSystem) extends TimeService {
-  val ClockRealtime       = 0
-  val ClockTAI            = 11
-  private val osType      = TimeLibraryUtil.osType
+  val ClockRealtime  = 0
+  val ClockTAI       = 11
+  private val osType = TimeLibraryUtil.osType
 
   override def utcTime(): UtcInstant = UtcInstant(instantFor(ClockRealtime))
 
@@ -56,7 +56,6 @@ class TimeServiceImpl(implicit actorSystem: ActorSystem) extends TimeService {
     val duration = Duration.between(now, time.value)
     FiniteDuration(duration.toNanos, NANOSECONDS)
   }
-
 
   // todo: without sudo or somehow handle it internally?
   // sets the tai offset on kernel (needed when ptp is not setup)

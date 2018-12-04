@@ -130,8 +130,7 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
     println(s"Ideal Schedule Time: $idealScheduleTime")
     println(s"Actual Schedule Time: $actualScheduleTime")
 
-
-    val allowedJitterInNanos = (TimeLibraryUtil.osType) match {
+    val allowedJitterInNanos = TimeLibraryUtil.osType match {
       case TimeLibraryUtil.Linux => 5 * 1000 * 1000 // should be ideally 400µs as per 3σ statistics from manual tests
       case _                     => 7 * 1000 * 1000
     }
