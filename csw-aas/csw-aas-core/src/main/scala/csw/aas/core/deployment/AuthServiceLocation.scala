@@ -50,6 +50,6 @@ class AuthServiceLocation(locationService: LocationService) {
 }
 
 object AuthServiceLocation {
-  def apply(locationService: LocationService)(implicit executionContext: ExecutionContext): AuthServiceLocation =
+  def apply(locationService: LocationService): AuthServiceLocation =
     new AuthServiceLocation(locationService)
 }
