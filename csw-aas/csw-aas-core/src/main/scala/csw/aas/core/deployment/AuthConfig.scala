@@ -5,34 +5,27 @@ import akka.http.scaladsl.model.Uri
 import akka.http.scaladsl.model.Uri.Path
 import com.typesafe.config._
 import csw.aas.core.commons.AuthLogger
-import csw.aas.core.deployment.AuthConfig.AuthServiceLocation
-import csw.location.api.models.Location
+import csw.location.api.models.HttpLocation
 import org.keycloak.adapters.{KeycloakDeployment, KeycloakDeploymentBuilder}
 import org.keycloak.authorization.client.Configuration
 
 import scala.language.implicitConversions
 
-class AuthConfig private (config: Config, authServiceLocation: Option[AuthServiceLocation]) {
+class AuthConfig private (config: Config, authServiceLocation: Option[HttpLocation]) {
 
   private val logger = AuthLogger.getLogger
   import logger._
-
-  def this(authServerLocation: Option[AuthServiceLocation] = None) =
-    this(ConfigFactory.load().getConfig("auth-config"), authServerLocation)
 
   private[csw] def getDeployment: KeycloakDeployment =
     authServiceLocation match {
       case None => convertToDeployment(config)
       case Some(location) =>
-        debug("resolving keycloak server")
-        val uri: Uri     = Uri(location.uri.toString)
-        val fullUrl: Uri = uri.withPath(Path / "auth")
-        val newConfig    = config.withValue("auth-server-url", ConfigValueFactory.fromAnyRef(fullUrl.toString()))
-        convertToDeployment(newConfig)
+        val configWithResolvedAuthUrl = config.withValue("auth-server-url", ConfigValueFactory.fromAnyRef(location.uri.toString))
+        convertToDeployment(configWithResolvedAuthUrl)
     }
 
   private def convertToDeployment(config: Config): KeycloakDeployment = {
-    debug("converting config to json")
+    debug("converting auth config to json")
     val configJSON: String = config.root().render(ConfigRenderOptions.concise())
 
     val inputStream: InputStream = new ByteArrayInputStream(configJSON.getBytes())
@@ -47,19 +40,26 @@ class AuthConfig private (config: Config, authServiceLocation: Option[AuthServic
 
 object AuthConfig {
 
-  type AuthServiceLocation = Location
+  private val logger = AuthLogger.getLogger
+  import logger._
 
-  def loadFromAppConfig: AuthConfig = new AuthConfig()
+  def loadFromAppConfig: AuthConfig = {
+    debug("loading auth config")
+    val config = ConfigFactory.load().getConfig("auth-config")
+    new AuthConfig(config, None)
+  }
+
+  def loadFromAppConfig(authServerLocation: HttpLocation): AuthConfig = {
+    debug("loading auth config")
+    val config = ConfigFactory.load().getConfig("auth-config")
+    new AuthConfig(config, Some(authServerLocation))
+  }
 
   def fromConfig(config: Config): AuthConfig = new AuthConfig(config, None)
 
-  def resolveFromLocationServer(authServerLocation: AuthServiceLocation): AuthConfig =
-    new AuthConfig(Some(authServerLocation))
+  def fromConfig(config: Config, authServerLocation: HttpLocation): AuthConfig = new AuthConfig(config, Some(authServerLocation))
 
-  def resolveFromLocationServer(config: Config, authServerLocation: AuthServiceLocation): AuthConfig =
-    new AuthConfig(config, Some(authServerLocation))
-
-  implicit def deploymentToConfig(deployment: KeycloakDeployment): Configuration = {
+  private[aas] implicit def deploymentToConfig(deployment: KeycloakDeployment): Configuration = {
     new Configuration(
       deployment.getAuthServerBaseUrl,
       deployment.getRealm,

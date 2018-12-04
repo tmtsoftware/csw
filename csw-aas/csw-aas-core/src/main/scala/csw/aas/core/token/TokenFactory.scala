@@ -26,3 +26,7 @@ class TokenFactory(authConfig: AuthConfig) {
     }
   }
 }
+
+object TokenFactory {
+  def apply(authConfig: AuthConfig): TokenFactory = new TokenFactory(authConfig)
+}
