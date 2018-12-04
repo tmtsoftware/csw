@@ -31,6 +31,7 @@ class AuthServiceLocation(locationService: LocationService) {
    * @return A future that completes with Location representing keycloak server location
    */
   def resolve(implicit executionContext: ExecutionContext): Future[HttpLocation] = async {
+    debug("resolving aas via location service")
     val location = await(locationService.resolve(httpConnection, 5.seconds)).getOrElse(
       {
         error(s"auth service connection=${httpConnection.name} could not be resolved")
@@ -39,13 +40,17 @@ class AuthServiceLocation(locationService: LocationService) {
         )
       }
     )
+    debug(s"aas resolved to ${location.uri.toString}")
     location
   }
 
   private[csw] def register(): Future[RegistrationResult] = {
-    val authServicePath  = "auth"
-    val httpRegistration = HttpRegistration(httpConnection, authServicePort, authServicePath)
-    locationService.register(httpRegistration)
+    val authServicePath = "auth"
+    debug("registering aas with location service")
+    val httpRegistration   = HttpRegistration(httpConnection, authServicePort, authServicePath)
+    val registrationResult = locationService.register(httpRegistration)
+    debug("aas registered with location service")
+    registrationResult
   }
 }
 

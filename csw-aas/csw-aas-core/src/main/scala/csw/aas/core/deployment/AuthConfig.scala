@@ -16,8 +16,12 @@ class AuthConfig private (config: Config, authServiceLocation: Option[HttpLocati
 
   private[csw] def getDeployment: KeycloakDeployment =
     authServiceLocation match {
-      case None => convertToDeployment(config)
+      case None => {
+        debug("creating keycloak deployment with configured keycloak location")
+        convertToDeployment(config)
+      }
       case Some(location) =>
+        debug("creating keycloak deployment with resolved keycloak location")
         val configWithResolvedAuthUrl = config.withValue("auth-server-url", ConfigValueFactory.fromAnyRef(location.uri.toString))
         convertToDeployment(configWithResolvedAuthUrl)
     }
