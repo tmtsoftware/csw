@@ -45,6 +45,8 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
   test("should get precision up to nanoseconds in UTC time", Linux) {
     // This test is written in eventually block because coincidentally digits at nano place can be "000".
     // To cover that edge-case eventually is used.
+    // formatNanos formats instant in 9 digits precision and if clock does not support nano precision (supports us precision)
+    // then last 3 digits will be printed as 000 (This test will fail with jdk's Instant.now call which does not provide nano precision)
 
     eventually(timeService.utcTime().value.formatNanos should not endWith "000")
   }
