@@ -39,11 +39,11 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
     val getDatabases = sql"SELECT datname FROM pg_database WHERE datistemplate = false".as[String]
 
     databaseService.update(sqlu"CREATE DATABASE box_office").futureValue(Interval(Span(5, Seconds)))
-    val resultSet = databaseService.select(getDatabases).futureValue
+    val resultSet = databaseService.query(getDatabases).futureValue
     resultSet should contain("box_office")
 
     databaseService.update(sqlu"DROP DATABASE box_office").futureValue
-    val resultSet2 = databaseService.select(getDatabases).futureValue
+    val resultSet2 = databaseService.query(getDatabases).futureValue
     resultSet2 should not contain "box_office"
   }
 
@@ -51,19 +51,19 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
   test("should be able to alter/drop a table") {
     databaseService.update(sqlu"CREATE TABLE films (id SERIAL PRIMARY KEY)").futureValue
     val getColumnCount       = sql"SELECT Count(*) FROM INFORMATION_SCHEMA.Columns where TABLE_NAME = 'films'".as[Int]
-    val resultSetBeforeAlter = databaseService.select(getColumnCount).futureValue
+    val resultSetBeforeAlter = databaseService.query(getColumnCount).futureValue
     resultSetBeforeAlter.headOption shouldBe Some(1)
 
     databaseService.update(sqlu"ALTER TABLE films ADD COLUMN name VARCHAR(10)").futureValue
-    val resultSetAfterAlter = databaseService.select(getColumnCount).futureValue
+    val resultSetAfterAlter = databaseService.query(getColumnCount).futureValue
     resultSetAfterAlter.headOption shouldBe Some(2)
 
     val getTables      = sql"select table_name from information_schema.tables".as[String]
-    val tableResultSet = databaseService.select(getTables).futureValue
+    val tableResultSet = databaseService.query(getTables).futureValue
     tableResultSet should contain("films")
 
     databaseService.update(sqlu"DROP TABLE films").futureValue
-    val tableResultSet2 = databaseService.select(getTables).futureValue
+    val tableResultSet2 = databaseService.query(getTables).futureValue
 
     tableResultSet2 should not contain "new_table"
   }
@@ -80,7 +80,7 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
 
     val resultSet: Seq[(Int, String)] =
       databaseService
-        .select(sql"SELECT * FROM films where name = 'movie_1'".as[(Int, String)])
+        .query(sql"SELECT * FROM films where name = 'movie_1'".as[(Int, String)])
         .futureValue
     resultSet.headOption shouldEqual Some((1, "movie_1"))
 
@@ -106,7 +106,7 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
       .futureValue
 
     val resultSet =
-      databaseService.select(sql"SELECT count(*) AS rowCount from films".as[Int]).futureValue
+      databaseService.query(sql"SELECT count(*) AS rowCount from films".as[Int]).futureValue
     resultSet.headOption shouldBe Some(3)
 
     databaseService.update(sqlu"DROP TABLE films").futureValue
@@ -154,7 +154,7 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
 
     val resultSet =
       databaseService
-        .select(sql"""
+        .query(sql"""
               |SELECT films.name, SUM(budget.amount)
               |    FROM films
               |    INNER JOIN budget
@@ -184,7 +184,7 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
 
     val resultSet =
       databaseService
-        .select(sql"SELECT count(*) AS rowCount from films where name = 'movie_2'".as[Int])
+        .query(sql"SELECT count(*) AS rowCount from films where name = 'movie_2'".as[Int])
         .futureValue
 
     resultSet.headOption shouldBe Some(0)
@@ -209,7 +209,7 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
     databaseService.update(sqlu"DELETE from films WHERE name = 'movie_4'").futureValue
 
     val resultSet =
-      databaseService.select(sql"SELECT count(*) AS rowCount from films".as[Int]).futureValue
+      databaseService.query(sql"SELECT count(*) AS rowCount from films".as[Int]).futureValue
     resultSet.headOption shouldBe Some(2)
 
     databaseService.update(sqlu"DROP TABLE films").futureValue

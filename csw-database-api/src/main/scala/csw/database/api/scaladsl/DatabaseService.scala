@@ -1,11 +1,11 @@
 package csw.database.api.scaladsl
 
-import csw.database.api.scaladsl.Aliases.{Select, Update}
+import csw.database.api.scaladsl.Aliases.{SelectQuery, UpdateStatement}
 
 import scala.concurrent.Future
 
 trait DatabaseService {
-  def select[T](sql: Select[T]): Future[Seq[T]]
-  def update(sqlu: Update): Future[Int]
-  def updateAll(sqlu: List[Update]): Future[Unit]
+  def query[T](sql: SelectQuery[T]): Future[Seq[T]]
+  def update(sqlu: UpdateStatement): Future[Int]
+  def updateAll(sqlu: List[UpdateStatement]): Future[Unit]
 }

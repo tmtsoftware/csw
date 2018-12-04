@@ -6,7 +6,7 @@ import java.util.function.Consumer
 
 import csw.database.api.javadsl.IDatabaseService
 import csw.database.api.models.{DBRow, SqlParamStore}
-import csw.database.api.scaladsl.Aliases.Update
+import csw.database.api.scaladsl.Aliases.UpdateStatement
 import csw.database.api.scaladsl.DatabaseService
 import slick.jdbc.{GetResult, PositionedParameters, SQLActionBuilder, SetParameter}
 
@@ -31,7 +31,7 @@ class JDatabaseServiceImpl(databaseService: DatabaseService, ec: ExecutionContex
       resultMapper: function.Function[DBRow, T]
   ): CompletableFuture[util.List[T]] = {
     val action = SQLActionBuilder(sql, setParameter).as(toSlickResult(resultMapper))
-    databaseService.select(action).map(seqAsJavaList)(ec).toJava.toCompletableFuture
+    databaseService.query(action).map(seqAsJavaList)(ec).toJava.toCompletableFuture
   }
 
   override def update(sql: String, paramBinder: Consumer[PositionedParameters]): CompletableFuture[Integer] =
@@ -45,7 +45,7 @@ class JDatabaseServiceImpl(databaseService: DatabaseService, ec: ExecutionContex
   }
 
   override def updateAll(sqlParamStore: SqlParamStore): CompletableFuture[Unit] = {
-    val actions: List[Update] = sqlParamStore.sqlToParamBinder.map {
+    val actions: List[UpdateStatement] = sqlParamStore.sqlToParamBinder.map {
       case (sql, paramBinder) ⇒ SQLActionBuilder(sql, toSlickParam(paramBinder)).asUpdate
     }.toList
 
@@ -53,7 +53,7 @@ class JDatabaseServiceImpl(databaseService: DatabaseService, ec: ExecutionContex
   }
 
   override def updateAll(sqls: util.List[String]): CompletableFuture[Unit] = {
-    val update: List[Update] = sqls.asScala.toList.map(sql ⇒ SQLActionBuilder(sql, SetParameter.SetUnit).asUpdate)
+    val update: List[UpdateStatement] = sqls.asScala.toList.map(sql ⇒ SQLActionBuilder(sql, SetParameter.SetUnit).asUpdate)
     databaseService.updateAll(update).toJava.toCompletableFuture
   }
 
