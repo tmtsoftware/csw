@@ -15,7 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
  */
 class AuthServiceLocation(locationService: LocationService) {
 
-  private val authServicePort  = 3000
+  private val authServicePort  = 8080
   private val registrationName = "Keycloak"
   private val componentId      = ComponentId(registrationName, ComponentType.Service)
   private val httpConnection   = HttpConnection(componentId)
@@ -36,7 +36,8 @@ class AuthServiceLocation(locationService: LocationService) {
   }
 
   private[csw] def register(): Future[RegistrationResult] = {
-    val httpRegistration = HttpRegistration(httpConnection, authServicePort, "auth")
+    val authServicePath  = "auth"
+    val httpRegistration = HttpRegistration(httpConnection, authServicePort, authServicePath)
     locationService.register(httpRegistration)
   }
 }
