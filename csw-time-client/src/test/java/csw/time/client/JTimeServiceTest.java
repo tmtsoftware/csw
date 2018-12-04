@@ -6,6 +6,7 @@ import akka.testkit.TestProbe;
 import csw.time.api.models.Cancellable;
 import csw.time.api.models.CswInstant.TaiInstant;
 import csw.time.api.models.CswInstant.UtcInstant;
+import csw.time.client.internal.TimeLibraryUtil;
 import csw.time.client.internal.TimeServiceImpl;
 import csw.time.client.internal.javawrappers.JTimeServiceImpl;
 import org.junit.BeforeClass;
@@ -117,7 +118,12 @@ public class JTimeServiceTest extends JUnitSuite {
         System.out.println("Ideal Schedule Time: "+idealScheduleTime);
         System.out.println("Actual Schedule Time: "+actualScheduleTime);
 
-        int allowedJitterInNanos = 5 * 1000 * 1000;
+        int allowedJitterInNanos;
+        if (TimeLibraryUtil.osType() == TimeLibraryUtil.Linux$.MODULE$) {
+            allowedJitterInNanos = 5 * 1000 * 1000;
+        } else {
+            allowedJitterInNanos = 7 * 1000 * 1000;
+        }
         assertEquals(actualScheduleTime.value().getEpochSecond() - idealScheduleTime.value().getEpochSecond(), 0);
         assertTrue(actualScheduleTime.value().getNano() - idealScheduleTime.value().getNano() < allowedJitterInNanos);
     }
