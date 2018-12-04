@@ -34,7 +34,8 @@ case class AccessToken(
 
   def hasPermission(scope: String, resource: String = "Default Resource"): Boolean = {
     val result = authorization.permissions.exists(p ⇒ p.rsname == resource && p.scopes.contains(scope))
-    debug(s"'$userOrClientName' doesn't have permission `$scope` for resource `$resource`")
+    if (!result) debug(s"'$userOrClientName' doesn't have permission '$scope' for resource '$resource'")
+    else debug(s"authorization granted for user '$userOrClientName' via permission '$scope' and resource '$resource'")
     result
   }
 
@@ -43,13 +44,15 @@ case class AccessToken(
       case Some(access) => access.roles.contains(role)
       case _            => false
     }
-    debug(s"'$userOrClientName' doesn't have resource role `$role` for client `$resourceName`")
+    if (!result) debug(s"'$userOrClientName' doesn't have resource role '$role' for client '$resourceName'")
+    else debug(s"authorization granted for user '$userOrClientName' via resource role '$role' and resource '$resourceName'")
     result
   }
 
   def hasRealmRole(role: String): Boolean = {
     val result = this.realm_access.roles.contains(role)
-    debug(s"'$userOrClientName' doesn't have realm role `$role`")
+    if (!result) debug(s"'$userOrClientName' doesn't have realm role '$role'")
+    else debug(s"authorization granted for user '$userOrClientName' via realm role '$role'")
     result
   }
 

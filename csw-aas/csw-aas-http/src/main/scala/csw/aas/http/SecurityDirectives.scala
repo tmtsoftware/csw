@@ -4,6 +4,7 @@ import akka.http.scaladsl.model.{HttpMethod, HttpMethods}
 import akka.http.scaladsl.server.Directives.{authenticateOAuth2, authorize => keycloakAuthorize, _}
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.directives.AuthenticationDirective
+import csw.aas.core.commons.AuthLogger
 import csw.aas.core.deployment.AuthConfig
 import csw.aas.core.token.AccessToken
 import csw.aas.http.AuthorizationPolicy.{EmptyPolicy, _}
@@ -12,9 +13,11 @@ import org.keycloak.adapters.KeycloakDeployment
 class SecurityDirectives(authentication: Authentication, authConfig: AuthConfig) {
 
   private val keycloakDeployment: KeycloakDeployment = authConfig.getDeployment
+  private val realm: String                          = keycloakDeployment.getRealm
+  private val resourceName: String                   = keycloakDeployment.getResourceName
 
-  private val realm: String        = keycloakDeployment.getRealm
-  private val resourceName: String = keycloakDeployment.getResourceName
+  private val logger = AuthLogger.getLogger
+  import logger._
 
   private[aas] def authenticate: AuthenticationDirective[AccessToken] = authenticateOAuth2(realm, authentication.authenticator)
 
@@ -23,8 +26,14 @@ class SecurityDirectives(authentication: Authentication, authConfig: AuthConfig)
       case ResourceRolePolicy(name)         => keycloakAuthorize(accessToken.hasResourceRole(name, resourceName))
       case RealmRolePolicy(name)            => keycloakAuthorize(accessToken.hasRealmRole(name))
       case PermissionPolicy(name, resource) => keycloakAuthorize(accessToken.hasPermission(name, resource))
-      case CustomPolicy(predicate)          => keycloakAuthorize(predicate(accessToken))
-      case EmptyPolicy                      => Directive.Empty
+      case CustomPolicy(predicate) =>
+        keycloakAuthorize({
+          val result = predicate(accessToken)
+          if (!result) debug(s"'${accessToken.userOrClientName}' failed custom policy authorization")
+          else debug(s"authorization succeeded for '${accessToken.userOrClientName}' via a custom policy")
+          result
+        })
+      case EmptyPolicy => Directive.Empty
     }
 
   private def sMethod(httpMethod: HttpMethod, authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] =

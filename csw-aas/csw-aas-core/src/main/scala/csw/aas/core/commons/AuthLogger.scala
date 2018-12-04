@@ -2,4 +2,4 @@ package csw.aas.core.commons
 
 import csw.logging.scaladsl.LoggerFactory
 
-private[aas] object AuthLogger extends LoggerFactory("auth-core")
+private[aas] object AuthLogger extends LoggerFactory("csw-aas")

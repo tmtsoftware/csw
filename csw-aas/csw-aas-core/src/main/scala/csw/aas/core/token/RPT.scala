@@ -19,7 +19,7 @@ private[aas] class RPT(authzClient: AuthzClient) {
     } yield accessToken
 
     result match {
-      case Success(value) => { debug("successfully fetched RPT from keycloak"); Success(value) }
+      case Success(value) => { debug(s"successfully fetched RPT from keycloak for ${value.userOrClientName}"); Success(value) }
       case Failure(e)     => { error("error while fetching RPT from keycloak", ex = e); Failure(e) }
     }
   }

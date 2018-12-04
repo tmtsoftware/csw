@@ -1,8 +1,6 @@
 package csw.aas.core.deployment
 import java.io.{ByteArrayInputStream, InputStream}
 
-import akka.http.scaladsl.model.Uri
-import akka.http.scaladsl.model.Uri.Path
 import com.typesafe.config._
 import csw.aas.core.commons.AuthLogger
 import csw.location.api.models.HttpLocation

@@ -5,7 +5,7 @@ import csw.aas.core.deployment.AuthConfig
 import csw.aas.core.deployment.AuthConfig._
 import org.keycloak.authorization.client.AuthzClient
 
-import scala.util.{Failure, Try}
+import scala.util.{Failure, Success, Try}
 
 class TokenFactory(authConfig: AuthConfig) {
 
@@ -22,7 +22,10 @@ class TokenFactory(authConfig: AuthConfig) {
       case Failure(e) =>
         error("token string could not be converted to RPT", ex = e)
         Failure(e)
-      case x => x
+      case x @ Success(value) => {
+        debug(s"authentication succeeded for ${value.userOrClientName}")
+        x
+      }
     }
   }
 }

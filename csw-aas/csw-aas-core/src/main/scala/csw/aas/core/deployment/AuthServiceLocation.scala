@@ -1,5 +1,6 @@
 package csw.aas.core.deployment
 
+import csw.aas.core.commons.AuthLogger
 import csw.location.api.models.Connection.HttpConnection
 import csw.location.api.models._
 import csw.location.api.scaladsl.LocationService
@@ -15,6 +16,9 @@ import scala.concurrent.{ExecutionContext, Future}
  */
 class AuthServiceLocation(locationService: LocationService) {
 
+  private val logger = AuthLogger.getLogger
+  import logger._
+
   private val authServicePort  = 8080
   private val registrationName = "Keycloak"
   private val componentId      = ComponentId(registrationName, ComponentType.Service)
@@ -28,9 +32,12 @@ class AuthServiceLocation(locationService: LocationService) {
    */
   def resolve(implicit executionContext: ExecutionContext): Future[HttpLocation] = async {
     val location = await(locationService.resolve(httpConnection, 5.seconds)).getOrElse(
-      throw new RuntimeException(
-        s"auth service connection=${httpConnection.name} could not be resolved"
-      )
+      {
+        error(s"auth service connection=${httpConnection.name} could not be resolved")
+        throw new RuntimeException(
+          s"auth service connection=${httpConnection.name} could not be resolved"
+        )
+      }
     )
     location
   }
