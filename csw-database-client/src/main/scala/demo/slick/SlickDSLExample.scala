@@ -1,9 +1,9 @@
-package demo
+package demo.slick
 
 import slick.dbio.Effect
 import slick.jdbc.PostgresProfile
-import slick.jdbc.PostgresProfile.api._
 import slick.sql.FixedSqlAction
+import slick.jdbc.PostgresProfile.api._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
@@ -13,7 +13,8 @@ object SlickDSLExample extends App {
 
   import Schema._
 
-  val db: PostgresProfile.backend.Database = Database.forURL("jdbc:postgresql://localhost:5432/bharats?user=bharats")
+  val db: PostgresProfile.backend.Database =
+    Database.forURL("jdbc:postgresql://localhost:5432/bharats?user=bharats&password=feroh")
 
   val schema = suppliers.schema ++ coffees.schema
 
@@ -54,22 +55,23 @@ object SlickDSLExample extends App {
   def updateCoffees(): Future[Int] = {
     println("updating:")
     println("*" * 20)
-    val q = for { c <- coffees if c.name === "Espresso" } yield c.price
-    db.run(q.update(10.49))
+    val priceField: Query[Rep[Double], Double, Seq] = for { c <- coffees if c.name === "Espresso" } yield c.price
+    db.run(priceField.update(10.49))
   }
 
   def deleteCoffees(): Future[Int] = {
     println("deleting:")
     println("*" * 20)
-    val q = coffees.filter(_.supID === 101)
-    db.run(q.delete)
+    val record: Query[Coffees, (String, Int, Double, Int, Int), Seq] = coffees.filter(_.supID === 101)
+    db.run(record.delete)
   }
 
   def queryCoffees: Future[Unit] = {
     // Read all coffees and print them to the console
     println("Coffees:")
     println("*" * 20)
-    db.run(coffees.result).map(_.foreach(println))
+    val result = coffees.result
+    db.run(result).map(_.foreach(println))
     // Equivalent SQL code:
     // select COF_NAME, SUP_ID, PRICE, SALES, TOTAL from COFFEES
   }
@@ -79,13 +81,13 @@ object SlickDSLExample extends App {
     // all coffees costing less than $9.00
     println("Performing Joins:")
     println("*" * 20)
-    val q2 = for {
+    val coffeeAndSupplier = for {
       c <- coffees if c.price < 9.0
       s <- suppliers if s.id === c.supID
     } yield (c.name, s.name)
     // Equivalent SQL code:
     // select c.COF_NAME, s.SUP_NAME from COFFEES c, SUPPLIERS s where c.PRICE < 9.0 and s.SUP_ID = c.SUP_ID
-    db.run(q2.result)
+    db.run(coffeeAndSupplier.result)
       .map(_.foreach(t => println(t._1 + " supplied by " + t._2)))
   }
 

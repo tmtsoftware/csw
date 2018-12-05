@@ -52,7 +52,6 @@ object Libs {
 
   val `postgresql`          = "org.postgresql"            % "postgresql"          % "42.2.5"
   val `postgresql-embedded` = "ru.yandex.qatools.embed"   % "postgresql-embedded" % "2.10"
-  val `jooq`                = "org.jooq"                  % "jooq"                % "3.11.7"
   val `otj-pg-embedded`     = "com.opentable.components"  % "otj-pg-embedded"     % "0.12.5"
   val httpclient            = "org.apache.httpcomponents" % "httpclient"          % "4.5.6"
   val `jboss-logging`       = "org.jboss.logging"         % "jboss-logging"       % "3.3.2.Final"
@@ -116,4 +115,11 @@ object Slick {
   val Version          = "3.2.3"
   val `slick`          = "com.typesafe.slick" %% "slick" % Version
   val `slick-hikaricp` = "com.typesafe.slick" %% "slick-hikaricp" % Version
+}
+
+object Jooq {
+  val Version        = "3.11.7"
+  val `jooq`         = "org.jooq" % "jooq" % Version
+  val `jooq-meta`    = "org.jooq" % "jooq-meta" % Version
+  val `jooq-codegen` = "org.jooq" % "jooq-codegen" % Version
 }

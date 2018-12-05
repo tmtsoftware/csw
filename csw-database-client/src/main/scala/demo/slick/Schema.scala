@@ -1,4 +1,4 @@
-package demo
+package demo.slick
 
 import slick.jdbc.PostgresProfile.api._
 
