@@ -9,6 +9,7 @@ keycloakServerPath=${keycloakDir}/${keycloakServer}.tar.gz
 port=8082
 host="0.0.0.0"
 userName=""
+password=""
 
 # Run from the directory containing the script
 cd "$( dirname "${BASH_SOURCE[0]}" )"
@@ -55,6 +56,9 @@ function parse_cmd_args {
                 --user | -u)
                 userName=$2
                 ;;
+                --password)
+                password=$2
+                ;;
             esac
         shift
     done
@@ -64,14 +68,18 @@ function parse_cmd_args {
          exit 1
     fi
 
+    if [[ ${password} == "" ]]; then
+         echo "[ERROR] password is missing. Please provide password (--password)"
+         exit 1
+    fi
+
 }
 
 function addUserAndStartServer {
     cd ${keycloakDir}/${keycloakServer}/bin
     echo "[INFO] starting server at $host:$port"
-    sh add-user-keycloak.sh --user ${userName}
-    sh standalone.sh -Djboss.bind.address=${host} -Djboss.http.port=${port}
-
+    sh add-user-keycloak.sh --user ${userName} -p ${password}
+    sh standalone.sh -Djboss.bind.address=${host} -Djboss.http.port=${port} -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=/Users/in-poorvag/TMT/csw-prod/scripts/csw-auth/prod/tmt-realm-export.json
 }
 
 function start {
