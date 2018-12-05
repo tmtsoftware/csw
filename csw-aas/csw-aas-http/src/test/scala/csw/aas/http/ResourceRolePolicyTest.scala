@@ -7,21 +7,16 @@ import akka.http.scaladsl.server.directives.Credentials.Provided
 import akka.http.scaladsl.server.{Directives, Route}
 import akka.http.scaladsl.testkit._
 import csw.aas.core.token.AccessToken
-import AuthorizationPolicy.ResourceRolePolicy
-import csw.aas.core.deployment.AuthConfig
-import org.keycloak.adapters.KeycloakDeployment
+import csw.aas.http.AuthorizationPolicy.ResourceRolePolicy
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
 class ResourceRolePolicyTest extends FunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
-  private val authConfig                             = AuthConfig.loadFromAppConfig
-  private val keycloakDeployment: KeycloakDeployment = authConfig.getDeployment
-
   test("resourceRole policy should return AuthenticationFailedRejection when token is invalid") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, authConfig)
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
 
     val invalidTokenStr    = "invalid"
     val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
@@ -48,7 +43,7 @@ class ResourceRolePolicyTest extends FunSuite with MockitoSugar with Directives 
 
   test("resourceRole policy should return AuthenticationFailedRejection when token is not present") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, authConfig)
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
 
     val authenticator: Authenticator[AccessToken] = _ ⇒ None
 
@@ -69,7 +64,7 @@ class ResourceRolePolicyTest extends FunSuite with MockitoSugar with Directives 
 
   test("resourceRole policy should return AuthorizationFailedRejection when token does not have resourceRole") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, authConfig)
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
 
     val validTokenWithoutResourceRoleStr = "validTokenWithoutResourceRoleStr"
 
@@ -77,7 +72,7 @@ class ResourceRolePolicyTest extends FunSuite with MockitoSugar with Directives 
 
     val validTokenWithoutResourceRoleHeader = Authorization(OAuth2BearerToken(validTokenWithoutResourceRoleStr))
 
-    when(validTokenWithoutResourceRole.hasResourceRole("admin", keycloakDeployment.getResourceName))
+    when(validTokenWithoutResourceRole.hasResourceRole("admin", "test"))
       .thenReturn(false)
 
     val authenticator: Authenticator[AccessToken] = {
@@ -102,12 +97,12 @@ class ResourceRolePolicyTest extends FunSuite with MockitoSugar with Directives 
 
   test("resourceRole policy should return 200 OK when token is valid & has resourceRole") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, authConfig)
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
 
     val validTokenWithResourceRoleStr    = "validTokenWithResourceRoleStr"
     val validTokenWithResourceRole       = mock[AccessToken]
     val validTokenWithResourceRoleHeader = Authorization(OAuth2BearerToken(validTokenWithResourceRoleStr))
-    when(validTokenWithResourceRole.hasResourceRole("admin", keycloakDeployment.getResourceName))
+    when(validTokenWithResourceRole.hasResourceRole("admin", "test"))
       .thenReturn(true)
 
     val authenticator: Authenticator[AccessToken] = {

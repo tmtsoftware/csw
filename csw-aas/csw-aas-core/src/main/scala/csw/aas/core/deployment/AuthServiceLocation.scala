@@ -19,7 +19,6 @@ class AuthServiceLocation(locationService: LocationService) {
   private val logger = AuthLogger.getLogger
   import logger._
 
-  private val authServicePort  = 8080
   private val registrationName = "Keycloak"
   private val componentId      = ComponentId(registrationName, ComponentType.Service)
   private val httpConnection   = HttpConnection(componentId)
@@ -45,6 +44,7 @@ class AuthServiceLocation(locationService: LocationService) {
   }
 
   private[csw] def register(): Future[RegistrationResult] = {
+    val authServicePort = 8080
     val authServicePath = "auth"
     debug("registering aas with location service")
     val httpRegistration   = HttpRegistration(httpConnection, authServicePort, authServicePath)

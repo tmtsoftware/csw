@@ -23,7 +23,7 @@ trait MockedAuthentication extends MockitoSugar {
   private val authConfig: AuthConfig = mock[AuthConfig]
   when(authConfig.getDeployment).thenReturn(keycloakDeployment)
 
-  val securityDirectives = SecurityDirectives(authentication, authConfig)
+  val securityDirectives = new SecurityDirectives(authentication, keycloakDeployment.getRealm, keycloakDeployment.getResourceName)
 
   val roleMissingTokenStr = "rolemissing"
   val validTokenStr       = "valid"
@@ -52,5 +52,4 @@ trait MockedAuthentication extends MockitoSugar {
 
   val factory: TokenFactory = mock[TokenFactory]
   when(factory.getToken).thenReturn(validTokenStr)
-
 }

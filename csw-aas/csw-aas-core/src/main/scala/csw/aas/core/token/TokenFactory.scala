@@ -3,16 +3,17 @@ package csw.aas.core.token
 import csw.aas.core.commons.AuthLogger
 import csw.aas.core.deployment.AuthConfig
 import csw.aas.core.deployment.AuthConfig._
+import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.authorization.client.AuthzClient
 
 import scala.util.{Failure, Success, Try}
 
-class TokenFactory(authConfig: AuthConfig) {
+class TokenFactory(keycloakDeployment: KeycloakDeployment) {
 
   private val logger = AuthLogger.getLogger
   import logger._
 
-  private lazy val authzClient: AuthzClient = AuthzClient.create(authConfig.getDeployment)
+  private lazy val authzClient: AuthzClient = AuthzClient.create(keycloakDeployment)
 
   private lazy val rpt: RPT = RPT(authzClient)
 
@@ -28,8 +29,4 @@ class TokenFactory(authConfig: AuthConfig) {
       }
     }
   }
-}
-
-object TokenFactory {
-  def apply(authConfig: AuthConfig): TokenFactory = new TokenFactory(authConfig)
 }

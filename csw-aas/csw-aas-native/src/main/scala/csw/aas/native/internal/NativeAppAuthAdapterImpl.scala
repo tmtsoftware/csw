@@ -2,7 +2,6 @@ package csw.aas.native.internal
 
 import csw.aas.core.TokenVerificationFailure.TokenExpired
 import csw.aas.core.TokenVerifier
-import csw.aas.core.deployment.AuthConfig
 import csw.aas.core.token.AccessToken
 import csw.aas.native.api.{AuthStore, NativeAppAuthAdapter}
 import org.keycloak.adapters.installed.KeycloakInstalled
@@ -14,12 +13,6 @@ private[aas] class NativeAppAuthAdapterImpl(
     tokenVerifier: TokenVerifier,
     maybeStore: Option[AuthStore] = None
 ) extends NativeAppAuthAdapter {
-
-  def this(authConfig: AuthConfig) =
-    this(new KeycloakInstalled(authConfig.getDeployment), TokenVerifier(authConfig))
-
-  def this(authConfig: AuthConfig, authStore: AuthStore) =
-    this(new KeycloakInstalled(authConfig.getDeployment), TokenVerifier(authConfig), Some(authStore))
 
   override def login(): Unit = {
     keycloakInstalled.login()

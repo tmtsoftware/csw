@@ -5,6 +5,7 @@ import java.nio.file.{Files, Paths}
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
+import csw.aas.native.api.NativeAppAuthAdapter
 import csw.config.api.models.ConfigData
 import csw.config.cli.wiring.Wiring
 import csw.config.client.internal.ActorRuntime
@@ -32,6 +33,8 @@ class ConfigCliAppTest(ignore: Int)
   import config._
 
   private val testFileUtils = new TestFileUtils(new Settings(ConfigFactory.load()))
+
+  val nativeAuthAdapter: NativeAppAuthAdapter = mock[NativeAppAuthAdapter]
 
   override def afterAll(): Unit = {
     super.afterAll()
@@ -67,7 +70,7 @@ class ConfigCliAppTest(ignore: Int)
       implicit val system: ActorSystem    = ActorSystem()
       implicit val mat: ActorMaterializer = ActorMaterializer()
 
-      def cliApp() = Wiring.noPrinting(HttpLocationServiceFactory.makeLocalClient, factory).cliApp
+      def cliApp() = Wiring.noPrinting(HttpLocationServiceFactory.makeLocalClient, factory, nativeAuthAdapter).cliApp
 
       cliApp().start("csw-config-cli", Array("create", repoPath1, "-i", inputFilePath, "-c", comment))
       enterBarrier("client1-create")

@@ -5,16 +5,17 @@ import akka.http.scaladsl.server.Directives.{authenticateOAuth2, authorize => ke
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.directives.AuthenticationDirective
 import csw.aas.core.commons.AuthLogger
-import csw.aas.core.deployment.AuthConfig
-import csw.aas.core.token.AccessToken
+import csw.aas.core.deployment.{AuthConfig, AuthServiceLocation}
+import csw.aas.core.token.{AccessToken, TokenFactory}
 import csw.aas.http.AuthorizationPolicy.{EmptyPolicy, _}
+import csw.location.api.models.HttpLocation
+import csw.location.api.scaladsl.LocationService
 import org.keycloak.adapters.KeycloakDeployment
 
-class SecurityDirectives(authentication: Authentication, authConfig: AuthConfig) {
+import scala.concurrent.duration.DurationDouble
+import scala.concurrent.{Await, ExecutionContext}
 
-  private val keycloakDeployment: KeycloakDeployment = authConfig.getDeployment
-  private val realm: String                          = keycloakDeployment.getRealm
-  private val resourceName: String                   = keycloakDeployment.getResourceName
+class SecurityDirectives private[csw] (authentication: Authentication, realm: String, resourceName: String) {
 
   private val logger = AuthLogger.getLogger
   import logger._
@@ -56,8 +57,19 @@ class SecurityDirectives(authentication: Authentication, authConfig: AuthConfig)
     sMethod(HttpMethods.CONNECT, authorizationPolicy)
 }
 
-//todo: do we really need this object and factory, why not simply new?
 object SecurityDirectives {
-  def apply(authentication: Authentication, authConfig: AuthConfig): SecurityDirectives =
-    new SecurityDirectives(authentication, authConfig)
+  def apply(): SecurityDirectives = {
+    val authConfig                             = AuthConfig.loadFromAppConfig
+    val keycloakDeployment: KeycloakDeployment = authConfig.getDeployment
+    val authentication                         = new Authentication(new TokenFactory(keycloakDeployment))
+    new SecurityDirectives(authentication, keycloakDeployment.getRealm, keycloakDeployment.getResourceName)
+  }
+
+  def apply(locationService: LocationService)(implicit ec: ExecutionContext): SecurityDirectives = {
+    val authLocation: HttpLocation             = Await.result(AuthServiceLocation(locationService).resolve, 5.seconds)
+    val authConfig                             = AuthConfig.loadFromAppConfig(authLocation)
+    val keycloakDeployment: KeycloakDeployment = authConfig.getDeployment
+    val authentication                         = new Authentication(new TokenFactory(keycloakDeployment))
+    new SecurityDirectives(authentication, keycloakDeployment.getRealm, keycloakDeployment.getResourceName)
+  }
 }

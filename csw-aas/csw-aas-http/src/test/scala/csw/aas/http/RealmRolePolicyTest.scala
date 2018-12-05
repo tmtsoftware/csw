@@ -7,19 +7,16 @@ import akka.http.scaladsl.server.directives.Credentials.Provided
 import akka.http.scaladsl.server.{Directives, Route}
 import akka.http.scaladsl.testkit._
 import csw.aas.core.token.AccessToken
-import AuthorizationPolicy.RealmRolePolicy
-import csw.aas.core.deployment.AuthConfig
+import csw.aas.http.AuthorizationPolicy.RealmRolePolicy
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
 class RealmRolePolicyTest extends FunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
-  private val authConfig = AuthConfig.loadFromAppConfig
-
   test("realmRole policy should return AuthenticationFailedRejection when token is invalid") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, authConfig)
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
 
     val invalidTokenStr    = "invalid"
     val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
@@ -46,7 +43,7 @@ class RealmRolePolicyTest extends FunSuite with MockitoSugar with Directives wit
 
   test("realmRole policy should return AuthenticationFailedRejection when token is not present") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, authConfig)
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
 
     val authenticator: Authenticator[AccessToken] = _ ⇒ None
 
@@ -67,7 +64,7 @@ class RealmRolePolicyTest extends FunSuite with MockitoSugar with Directives wit
 
   test("realmRole policy should return AuthorizationFailedRejection when token does not have realmRole") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, authConfig)
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
 
     val validTokenWithoutRealmRoleStr = "validTokenWithoutRealmRoleStr"
 
@@ -100,7 +97,7 @@ class RealmRolePolicyTest extends FunSuite with MockitoSugar with Directives wit
 
   test("realmRole policy should return 200 OK when token is valid & has realmRole") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, authConfig)
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
 
     val validTokenWithRealmRoleStr    = "validTokenWithRealmRoleStr"
     val validTokenWithRealmRole       = mock[AccessToken]

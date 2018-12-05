@@ -45,7 +45,7 @@ object AuthConfig {
   private val logger = AuthLogger.getLogger
   import logger._
 
-  def loadFromAppConfig: AuthConfig = {
+  private[csw] def loadFromAppConfig: AuthConfig = {
     debug("loading auth config")
     val config = ConfigFactory.load().getConfig("auth-config")
     new AuthConfig(config, None)

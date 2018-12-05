@@ -10,7 +10,3 @@ class Authentication(tokenFactory: TokenFactory) {
     case _               ⇒ None
   }
 }
-
-object Authentication {
-  def apply(tokenFactory: TokenFactory): Authentication = new Authentication(tokenFactory)
-}

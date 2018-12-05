@@ -476,7 +476,7 @@ lazy val `csw-aas-http` = project
 
  lazy val `csw-aas-native` = project
   .in(file("csw-aas/csw-aas-native"))
-  .dependsOn(`csw-aas-core`)
+  .dependsOn(`csw-aas-core`, `csw-location-client` % "test->compile")
   .settings(
     libraryDependencies ++= Dependencies.AuthNativeClientAdapter.value
   )
