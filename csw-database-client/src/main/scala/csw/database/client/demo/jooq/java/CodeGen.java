@@ -1,4 +1,4 @@
-package demo.jooq.java;
+package csw.database.client.demo.jooq.java;
 
 import org.jooq.codegen.GenerationTool;
 import org.jooq.meta.jaxb.*;
@@ -9,9 +9,9 @@ public class CodeGen {
         Configuration configuration = new Configuration()
                 .withJdbc(new Jdbc()
                         .withDriver("org.postgresql.Driver")
-                        .withUrl("jdbc:postgresql:postgres")
-                        .withUser("userName")
-                        .withPassword("password"))
+                        .withUrl("jdbc:postgresql:bharats")
+                        .withUser("bharats")
+                        .withPassword("feroh"))
                 .withGenerator(new Generator()
                         .withDatabase(new Database()
                                 .withIncludeRoutines(false)
@@ -20,7 +20,7 @@ public class CodeGen {
                                 .withExcludes("")
                                 .withInputSchema("public"))
                         .withTarget(new Target()
-                                .withPackageName("demo.jooq.java.generate")
+                                .withPackageName("csw.database.client.demo.jooq.java.generate")
                                 .withDirectory("csw-database-client/src/main/scala")));
 
         try {

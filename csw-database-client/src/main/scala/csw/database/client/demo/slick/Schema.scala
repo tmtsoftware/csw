@@ -1,4 +1,4 @@
-package demo.slick
+package csw.database.client.demo.slick
 
 import slick.jdbc.PostgresProfile.api._
 

@@ -1,4 +1,4 @@
-package demo.slick
+package csw.database.client.demo.slick
 
 import slick.dbio.Effect
 import slick.jdbc.PostgresProfile
