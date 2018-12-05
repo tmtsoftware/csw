@@ -1,4 +1,5 @@
-package csw.database.client.demo.jooq.java
+package csw.database.client.demo.jooq
+
 import org.jooq.codegen.GenerationTool
 import org.jooq.meta.jaxb._
 
