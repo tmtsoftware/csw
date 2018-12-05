@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-currentDirectory=$( dirname "${BASH_SOURCE[0]}" )
-keycloakDir=${currentDirectory}/keycloak
+currentDir=$(pwd)
+keycloakDir=${currentDir}
 keycloakVersion=4.6.0
-keycloakServer=keycloak-${keycloakVersion}.Final
-keycloakServerPath=${keycloakDir}/${keycloakServer}.tar.gz
+keycloakBinaryUnzipped=keycloak-${keycloakVersion}.Final
+keycloakBinaryZipped=${keycloakBinaryUnzipped}.tar.gz
 
 port=8082
 host="0.0.0.0"
@@ -15,22 +15,22 @@ password=""
 cd "$( dirname "${BASH_SOURCE[0]}" )"
 
 function unzipTar {
-    echo "Unzipping $keycloakServerPath"
-    tar -xzf ${keycloakServer}.tar.gz
-    echo "Unzipped $keycloakServerPath"
+    echo "Unzipping  $keycloakDir/$keycloakBinaryZipped"
+    tar -xzf ${keycloakBinaryUnzipped}.tar.gz
+    echo "Unzipped $keycloakDir/$keycloakBinaryZipped"
 }
 
 function checkIfKeycloakIsInstalled {
-    if test -x ${keycloakDir}/${keycloakServer}; then
-    echo "$keycloakServer is already installed"
-    elif test -e ${keycloakDir}/${keycloakServer}.tar.gz ; then
-    echo "$keycloakServerPath is already downloaded."
+    if test -x ${keycloakDir}/${keycloakBinaryUnzipped}; then
+    echo "$keycloakBinaryUnzipped is already installed"
+    elif test -e ${keycloakDir}/${keycloakBinaryUnzipped}.tar.gz ; then
+    echo "$keycloakDir/$keycloakBinaryZipped is already downloaded."
     cd ${keycloakDir}
     unzipTar
     else
-      echo "Installing $keycloakServer"
+      echo "Installing $keycloakBinaryUnzipped"
       test -d ${keycloakDir} || mkdir -p ${keycloakDir}
-      curl https://downloads.jboss.org/keycloak/${keycloakVersion}.Final/${keycloakServer}.tar.gz --output ${keycloakServerPath}
+      curl https://downloads.jboss.org/keycloak/${keycloakVersion}.Final/${keycloakBinaryUnzipped}.tar.gz --output ${keycloakDir}/${keycloakBinaryZipped}
       cd ${keycloakDir}
       unzipTar
     fi
@@ -76,10 +76,10 @@ function parse_cmd_args {
 }
 
 function addUserAndStartServer {
-    cd ${keycloakDir}/${keycloakServer}/bin
+    cd ${keycloakDir}/${keycloakBinaryUnzipped}/bin
     echo "[INFO] starting server at $host:$port"
     sh add-user-keycloak.sh --user ${userName} -p ${password}
-    sh standalone.sh -Djboss.bind.address=${host} -Djboss.http.port=${port} -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=/Users/in-poorvag/TMT/csw-prod/scripts/csw-auth/prod/tmt-realm-export.json
+    sh standalone.sh -Djboss.bind.address=${host} -Djboss.http.port=${port} -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=${keycloakDir}/tmt-realm-export.json
 }
 
 function start {
