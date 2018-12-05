@@ -34,8 +34,6 @@ public class JTimeServiceTest extends JUnitSuite {
         Await.result( system.terminate(), FiniteDuration.create(5, TimeUnit.SECONDS));
     }
 
-    //------------------------------UTC-------------------------------
-
     //DEOPSCSW-533: Access parts of UTC date.time in Java and Scala
     @Test
     public void shouldGetUTCTime(){
@@ -46,8 +44,6 @@ public class JTimeServiceTest extends JUnitSuite {
 
         assertEquals((double)expectedMillis, (double)utcInstant.value().toEpochMilli(), 5.0); // Scala test uses +-5...
     }
-
-    //------------------------------TAI-------------------------------
 
     //DEOPSCSW-536: Access parts of TAI date/time in Java and Scala
     //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
@@ -64,20 +60,19 @@ public class JTimeServiceTest extends JUnitSuite {
     //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
     @Test
     public void shouldGetTAIOffset(){
-        int offset = jTimeService.taiOffset();
-
-        assertEquals(TaiOffset, offset);
+        assertEquals(TaiOffset, jTimeService.taiOffset());
     }
 
-    @Ignore
+    @Test
     public void shouldScheduleTaskAtStartTime(){
         ActorSystem actorSystem = ActorSystem.create("time-service");
         TestProbe testProbe = new TestProbe(actorSystem);
 
         TaiInstant idealScheduleTime = new TaiInstant(jTimeService.taiTime().value().plusSeconds(1));
-        Consumer<Void> task = consumer -> testProbe.ref().tell(jTimeService.taiTime(), ActorRef.noSender());
 
-        Cancellable cancellable = jTimeService.scheduleOnce(idealScheduleTime, task);
+        Runnable task = () -> testProbe.ref().tell(jTimeService.taiTime(), ActorRef.noSender());
+
+        jTimeService.scheduleOnce(idealScheduleTime, task);
 
         TaiInstant actualScheduleTime = testProbe.expectMsgClass(TaiInstant.class);
 

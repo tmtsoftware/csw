@@ -1,5 +1,4 @@
 package csw.time.api.javadsl
-import java.util.function.Consumer
 
 import csw.time.api.models.Cancellable
 import csw.time.api.models.CswInstant.{TaiInstant, UtcInstant}
@@ -11,7 +10,7 @@ trait ITimeService {
 
   def taiOffset(): Int
 
-  def scheduleOnce(startTime: TaiInstant, task: Consumer[Void]): Cancellable
+  def scheduleOnce(startTime: TaiInstant, task: Runnable): Cancellable
 
   private[time] def setTaiOffset(offset: Int): Unit
 }

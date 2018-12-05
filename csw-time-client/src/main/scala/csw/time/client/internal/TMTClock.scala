@@ -1,11 +1,9 @@
 package csw.time.client.internal
 
 import java.time.Instant
-import java.util.Locale
 
 import com.sun.jna.NativeLong
 import csw.time.api.models.CswInstant.{TaiInstant, UtcInstant}
-import csw.time.client.internal.OSType.{Linux, Other}
 import csw.time.client.internal.native_models.ClockId.{ClockRealtime, ClockTAI}
 import csw.time.client.internal.native_models.{NTPTimeVal, TimeSpec, Timex}
 
