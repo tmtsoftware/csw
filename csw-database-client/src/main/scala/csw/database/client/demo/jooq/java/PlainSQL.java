@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutionException;
 
 public class PlainSQL {
     public static void main(String[] args) throws ExecutionException, InterruptedException {
-        DSLContext dsl = DSL.using("jdbc:postgresql://localhost:5432/postgres?user=salonivithalani");
+        DSLContext dsl = DSL.using("jdbc:postgresql://localhost:5432/postgres?user=<username>");
 
         // ***************************************************************** //
 

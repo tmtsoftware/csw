@@ -1,8 +1,6 @@
 package csw.database.client.demo.jooq.scala
-import java.util
-
-import org.jooq.{Record, Result}
 import org.jooq.impl.DSL
+import org.jooq.{Record, Result}
 
 import scala.collection.JavaConverters.collectionAsScalaIterableConverter
 import scala.compat.java8.FutureConverters.CompletionStageOps
@@ -11,7 +9,7 @@ import scala.concurrent.{Await, Future}
 
 object PlainSQL {
   def main(args: Array[String]): Unit = {
-    val dsl = DSL.using("jdbc:postgresql://localhost:5432/postgres?user=salonivithalani")
+    val dsl = DSL.using("jdbc:postgresql://localhost:5432/postgres?user=<username>")
 
     // ***************************************************************** //
 
@@ -76,6 +74,4 @@ object PlainSQL {
   }
 }
 
-case class Film(id: Int, name: String) {
-  override def toString: String = s"id : $id name: $name"
-}
+case class Film(id: Int, name: String)
