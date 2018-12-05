@@ -263,6 +263,12 @@ object Dependencies {
     )
   )
 
+  val TimeApi = Def.setting(
+    Seq(
+      Libs.`scalatest`.value % Test
+    )
+  )
+
   val TimeClient = Def.setting(
     Seq(
       Libs.`time4j`,

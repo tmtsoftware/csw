@@ -336,16 +336,11 @@ lazy val `csw-alarm-cli` = project
 /* ================= Time Service ============== */
 
 lazy val `csw-time-api` = project
-
-lazy val Linux = config("linux").extend(Test)
+  .settings(libraryDependencies ++= Dependencies.TimeApi.value)
 
 lazy val `csw-time-client` = project
   .dependsOn(`csw-time-api`, `csw-logging`)
-  .configs(Linux)
   .settings(libraryDependencies ++= Dependencies.TimeClient.value)
-  .settings(inConfig(Linux)(Defaults.testTasks): _*)
-  .settings(testOptions in Linux -= Tests.Argument("-l", "csw.time.client.tags.Linux"))
-  .settings(testOptions in Linux ++= Seq(Tests.Argument("-n", "csw.time.client.tags.Linux")))
 
 lazy val `csw-testkit` = project
   .dependsOn(

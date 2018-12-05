@@ -12,4 +12,6 @@ trait ITimeService {
   def taiOffset(): Int
 
   def scheduleOnce(startTime: TaiInstant, task: Consumer[Void]): Cancellable
+
+  private[time] def setTaiOffset(offset: Int): Unit
 }

@@ -10,13 +10,13 @@ import scala.compat.java8.FunctionConverters.enrichAsScalaFromConsumer
 class JTimeServiceImpl(timeService: TimeService) extends ITimeService {
 
   override def utcTime(): CswInstant.UtcInstant = timeService.utcTime()
-
   override def taiTime(): CswInstant.TaiInstant = timeService.taiTime()
-
-  override def taiOffset(): Int = timeService.taiOffset()
+  override def taiOffset(): Int                 = timeService.taiOffset()
 
   override def scheduleOnce(
       startTime: CswInstant.TaiInstant,
       task: Consumer[Void]
   ): Cancellable = timeService.scheduleOnce(startTime)(task.asScala)
+
+  override private[time] def setTaiOffset(offset: Int): Unit = timeService.setTaiOffset(offset)
 }

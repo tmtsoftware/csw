@@ -25,4 +25,4 @@ WORKDIR /csw
 
 RUN sbt compile
 
-ENTRYPOINT ["sbt", "csw-time-client/linux:test"]
+ENTRYPOINT ["sbt", "csw-time-client/test"]

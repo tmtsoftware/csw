@@ -11,4 +11,6 @@ trait TimeService {
   def taiOffset(): Int
 
   def scheduleOnce(startTime: TaiInstant)(task: => Unit): Cancellable
+
+  private[time] def setTaiOffset(offset: Int): Unit
 }
