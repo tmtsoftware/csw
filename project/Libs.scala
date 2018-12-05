@@ -4,7 +4,7 @@ import sbt._
 import scalapb.compiler.Version.scalapbVersion
 
 object Libs {
-  val ScalaVersion   = "2.12.7"
+  val ScalaVersion   = "2.12.8"
   val AcyclicVersion = "0.1.8"
 
   val `scalatest` = dep("org.scalatest" %%% "scalatest" % "3.0.5") //Apache License 2.0

@@ -359,8 +359,11 @@ lazy val `csw-database-api` = project
   )
 
 lazy val `csw-database-client` = project
+  .enablePlugins(JooqCodegen)
   .dependsOn(`csw-database-api`, `csw-location-api`)
   .settings(
+    jooqVersion := "3.11.7",
+    jooqCodegenConfig := baseDirectory.value / "jooq-codegen.xml",
     parallelExecution in Test := false,
     libraryDependencies ++= Dependencies.DatabaseClient.value
   )
