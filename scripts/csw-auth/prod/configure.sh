@@ -6,7 +6,7 @@ keycloakVersion=4.6.0
 keycloakBinaryUnzipped=keycloak-${keycloakVersion}.Final
 keycloakBinaryZipped=${keycloakBinaryUnzipped}.tar.gz
 
-port=8082
+port=8081
 host="0.0.0.0"
 userName=""
 password=""

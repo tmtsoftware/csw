@@ -34,13 +34,17 @@ config_port=5000
 sentinel_port=26379
 event_master_port=6379
 alarm_master_port=7379
+keycloak_server_port=8081
 initSvnRepo="--initRepo"
+keycloak_admin_user="admin"
+keycloak_admin_password="admin"
 
 # Always start cluster seed application
 shouldStartSeed=true
 shouldStartConfig=false
 shouldStartEvent=false
 shouldStartAlarm=false
+shouldStartKeycloak=false
 
 script_name=$0
 
@@ -69,6 +73,10 @@ eventMasterPortFile=${logDir}/event_master.port
 alarmMasterLogFile=${logDir}/alarm_master.log
 alarmMasterPidFile=${logDir}/alarm_master.pid
 alarmMasterPortFile=${logDir}/alarm_master.port
+
+keycloakServerLogFile=${logDir}/keycloak_server.log
+keycloakServerPidFile=${logDir}/keycloak_server.pid
+keycloakServerPortFile=${logDir}/keycloak_server.port
 
 sentinelConf="../conf/redis_sentinel/sentinel.conf"
 eventMasterConf="../conf/event_service/master.conf"
@@ -171,6 +179,19 @@ function start_sentinel() {
     fi
 }
 
+function start_keycloak() {
+    if [ -x "$location_agent_script" ]; then
+        echo "Starting Keycloak Server..."
+        nohup ./csw-location-agent --name Keycloak -c "./configure.sh -p $keycloak_server_port -u $keycloak_admin_user --password $keycloak_admin_password" -p "$keycloak_server_port" > ${keycloakServerLogFile} 2>&1 &
+        echo $! > ${keycloakServerPidFile}
+        echo ${keycloak_server_port} > ${keycloakServerPortFile}
+    else
+        echo "[ERROR] $location_agent_script script does not exist, please make sure that $location_agent_script resides in same directory as $script_name"
+        exit 1
+    fi
+}
+
+
 function start_event() {
     echo "[EVENT] Starting Event Service..."
     start_redis ${eventMasterConf} ${eventMasterLogFile} ${eventMasterPidFile} ${event_master_port} ${eventMasterPortFile}
@@ -207,6 +228,7 @@ function enableAllServicesForRunning {
     shouldStartConfig=true
     shouldStartEvent=true
     shouldStartAlarm=true
+    shouldStartKeycloak=true
 }
 
 function start_services {
@@ -215,6 +237,7 @@ function start_services {
     if [[ "$shouldStartEvent" = true ]]; then start_event; fi
     if [[ "$shouldStartAlarm" = true ]]; then start_alarm; fi
     if [[ ("$shouldStartEvent" = true) || ("$shouldStartAlarm" = true) ]]; then start_sentinel; fi
+    if [[ ("$shouldStartKeycloak" = true) ]]; then start_keycloak; fi
 }
 
 function usage {
@@ -228,6 +251,7 @@ function usage {
     echo "  --initRepo                      create new svn repo, default: use existing svn repo"
     echo "  --event | -es <esPort>          start event service on provided port, default: 6379"
     echo "  --alarm | -as <asPort>          start alarm service on provided port, default: 7379"
+    echo "  --keycloak | -ks <ksPort> [-u <username> | -p <password>]     start keycloak server on provided port, default: 8081, with username and password, default username and password: admin"
     echo
     echo "Commands:"
     echo "  start      Starts all csw services if no options provided"
@@ -279,6 +303,14 @@ function parse_cmd_args {
                             shouldStartAlarm=true
                             if isPortProvided $2; then sentinel_port="$2"; shift; fi
                             ;;
+                        --keycloak | -ks )
+                           shouldStartKeycloak=true
+                           if isPortProvided $2; then keycloak_server_port="$2"; shift; fi
+                           if [[ $# -gt 4 ]]; then
+                             if [[ $2 == "-u" ]]; then keycloak_admin_user=$3; shift; shift; fi
+                             if [[ $2 == "-p" ]]; then keycloak_admin_password=$3; shift; shift; fi
+                           fi
+                           ;;
                         --help)
                             usage
                             ;;
@@ -342,6 +374,19 @@ function parse_cmd_args {
                 kill ${PID} &> /dev/null
                 rm -f ${configPidFile} ${configLogFile}
                 echo "[CONFIG] Config Service stopped"
+            fi
+
+             # Stop Keycloak Server
+            if [ ! -f ${keycloakServerPidFile} ]; then
+                echo "[KEYCLOAK] Keycloak Server $keycloakServerPidFile does not exist, process is not running."
+            else
+                local PID=$(cat ${keycloakServerPidFile})
+                local OTHER_PID=$(pgrep -f ${keycloak_server_port})
+                echo "[KEYCLOAK] Stopping Keycloak Server... $OTHER_PID"
+                kill ${PID} &> /dev/null
+                kill ${OTHER_PID} &> /dev/null
+                rm -f ${keycloakServerPidFile} ${keycloakServerLogFile} ${keycloakServerPortFile}
+                echo "[KEYCLOAK] Keycloak Server stopped"
             fi
             ;;
         *)
