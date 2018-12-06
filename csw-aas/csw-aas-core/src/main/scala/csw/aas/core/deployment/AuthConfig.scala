@@ -16,11 +16,10 @@ class AuthConfig private (config: Config, authServiceLocation: Option[HttpLocati
 
   private[csw] def getDeployment: KeycloakDeployment =
     authServiceLocation match {
-      case None => {
+      case None ⇒
         debug("creating keycloak deployment with configured keycloak location")
         convertToDeployment(config)
-      }
-      case Some(location) =>
+      case Some(location) ⇒
         debug("creating keycloak deployment with resolved keycloak location")
         val configWithResolvedAuthUrl = config.withValue("auth-server-url", ConfigValueFactory.fromAnyRef(location.uri.toString))
         convertToDeployment(configWithResolvedAuthUrl)
@@ -45,19 +44,13 @@ object AuthConfig {
   private val logger = AuthLogger.getLogger
   import logger._
 
-  private[csw] def loadFromAppConfig: AuthConfig = {
+  def loadFromAppConfig(authServerLocation: Option[HttpLocation] = None): AuthConfig = {
     debug("loading auth config")
     val config = ConfigFactory.load().getConfig("auth-config")
-    new AuthConfig(config, None)
+    new AuthConfig(config, authServerLocation)
   }
 
-  def loadFromAppConfig(authServerLocation: HttpLocation): AuthConfig = {
-    debug("loading auth config")
-    val config = ConfigFactory.load().getConfig("auth-config")
-    new AuthConfig(config, Some(authServerLocation))
-  }
-
-  private[aas] implicit def deploymentToConfig(deployment: KeycloakDeployment): Configuration = {
+  private[aas] implicit def deploymentToConfig(deployment: KeycloakDeployment): Configuration =
     new Configuration(
       deployment.getAuthServerBaseUrl,
       deployment.getRealm,
@@ -65,5 +58,4 @@ object AuthConfig {
       deployment.getResourceCredentials,
       deployment.getClient
     )
-  }
 }

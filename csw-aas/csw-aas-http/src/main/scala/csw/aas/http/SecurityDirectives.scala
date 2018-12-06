@@ -29,12 +29,12 @@ class SecurityDirectives private[csw] (authentication: Authentication, realm: St
       case RealmRolePolicy(name)            => keycloakAuthorize(accessToken.hasRealmRole(name))
       case PermissionPolicy(name, resource) => keycloakAuthorize(accessToken.hasPermission(name, resource))
       case CustomPolicy(predicate) =>
-        keycloakAuthorize({
+        keycloakAuthorize {
           val result = predicate(accessToken)
           if (!result) debug(s"'${accessToken.userOrClientName}' failed custom policy authorization")
           else debug(s"authorization succeeded for '${accessToken.userOrClientName}' via a custom policy")
           result
-        })
+        }
       case EmptyPolicy => Directive.Empty
     }
 
@@ -60,7 +60,7 @@ class SecurityDirectives private[csw] (authentication: Authentication, realm: St
 
 object SecurityDirectives {
   def apply(implicit ec: ExecutionContext): SecurityDirectives = {
-    val authConfig                             = AuthConfig.loadFromAppConfig
+    val authConfig                             = AuthConfig.loadFromAppConfig()
     val keycloakDeployment: KeycloakDeployment = authConfig.getDeployment
     val authentication                         = new Authentication(new TokenFactory(keycloakDeployment))
     new SecurityDirectives(authentication, keycloakDeployment.getRealm, keycloakDeployment.getResourceName)
@@ -69,7 +69,7 @@ object SecurityDirectives {
   def apply(locationService: LocationService)(implicit ec: ExecutionContext): SecurityDirectives = {
     //todo: see if its possible to remove blocking here
     val authLocation: HttpLocation             = Await.result(AuthServiceLocation(locationService).resolve, 5.seconds)
-    val authConfig                             = AuthConfig.loadFromAppConfig(authLocation)
+    val authConfig                             = AuthConfig.loadFromAppConfig(Some(authLocation))
     val keycloakDeployment: KeycloakDeployment = authConfig.getDeployment
     val authentication                         = new Authentication(new TokenFactory(keycloakDeployment))
     new SecurityDirectives(authentication, keycloakDeployment.getRealm, keycloakDeployment.getResourceName)

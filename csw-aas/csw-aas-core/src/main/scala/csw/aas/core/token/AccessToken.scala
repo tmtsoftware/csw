@@ -40,10 +40,7 @@ case class AccessToken(
   }
 
   def hasResourceRole(role: String, resourceName: String): Boolean = {
-    val result = this.resource_access.get(resourceName) match {
-      case Some(access) => access.roles.contains(role)
-      case _            => false
-    }
+    val result = this.resource_access.get(resourceName).exists(_.roles.contains(role))
     if (!result) debug(s"'$userOrClientName' doesn't have resource role '$role' for client '$resourceName'")
     else debug(s"authorization granted for user '$userOrClientName' via resource role '$role' and resource '$resourceName'")
     result

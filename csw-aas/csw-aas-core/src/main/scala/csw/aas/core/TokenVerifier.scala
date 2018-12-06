@@ -29,14 +29,12 @@ class TokenVerifier private[aas] (keycloakTokenVerifier: KeycloakTokenVerifier, 
   def verifyAndDecode(token: String): Either[TokenVerificationFailure, AccessToken] = {
     val keycloakToken: Either[TokenVerificationFailure, KeycloakAccessToken] =
       keycloakTokenVerifier.verifyToken(token, keycloakDeployment).toEither.left.flatMap {
-        case _: TokenNotActiveException => {
+        case _: TokenNotActiveException =>
           warn(s"token is expired")
           Left(TokenExpired)
-        }
-        case ex: VerificationException => {
+        case ex: VerificationException =>
           error("token verification failed", ex = ex)
           Left(InvalidToken(ex.getMessage))
-        }
       }
 
     keycloakToken.flatMap { _ =>
@@ -46,10 +44,9 @@ class TokenVerifier private[aas] (keycloakTokenVerifier: KeycloakTokenVerifier, 
         .toEither
         .left
         .flatMap {
-          case NonFatal(e) => {
+          case NonFatal(e) =>
             error("token verification failed", Map("error" -> e))
             Left(InvalidToken(e.getMessage))
-          }
         }
     }
   }

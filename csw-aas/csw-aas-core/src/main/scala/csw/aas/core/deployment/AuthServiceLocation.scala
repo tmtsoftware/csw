@@ -34,9 +34,7 @@ class AuthServiceLocation(locationService: LocationService) {
     val location = await(locationService.resolve(httpConnection, 5.seconds)).getOrElse(
       {
         error(s"auth service connection=${httpConnection.name} could not be resolved")
-        throw new RuntimeException(
-          s"auth service connection=${httpConnection.name} could not be resolved"
-        )
+        throw new RuntimeException(s"auth service connection=${httpConnection.name} could not be resolved")
       }
     )
     debug(s"aas resolved to ${location.uri.toString}")

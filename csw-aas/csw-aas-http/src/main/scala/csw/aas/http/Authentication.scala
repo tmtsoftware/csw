@@ -8,7 +8,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 private[csw] class Authentication(tokenFactory: TokenFactory)(implicit ec: ExecutionContext) {
   def authenticator: AsyncAuthenticator[AccessToken] = {
-    case Provided(token) ⇒ tokenFactory.makeToken(token).map(at => Some(at))
+    case Provided(token) ⇒ tokenFactory.makeToken(token).map(Some(_))
     case _               ⇒ Future.successful(None)
   }
 }
