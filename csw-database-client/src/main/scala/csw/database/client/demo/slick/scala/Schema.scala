@@ -1,8 +1,6 @@
-package csw.database.client.demo.slick
-
+package csw.database.client.demo.slick.scala
 import slick.jdbc.PostgresProfile.api._
 import slick.lifted.{ForeignKeyQuery, ProvenShape}
-
 object Schema {
   // Definition of the SUPPLIERS table
   class Suppliers(tag: Tag) extends Table[(Int, String, String, String, String, String)](tag, "SUPPLIERS") {

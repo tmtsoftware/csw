@@ -1,15 +1,13 @@
-package csw.database.client.demo.slick
-
+package csw.database.client.demo.slick.scala
 import slick.dbio.Effect
 import slick.jdbc.PostgresProfile
-import slick.sql.FixedSqlAction
 import slick.jdbc.PostgresProfile.api._
+import slick.sql.FixedSqlAction
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
-
-object SlickDSLExample extends App {
+import scala.concurrent.ExecutionContext.Implicits.global
+object SlickDSL extends App {
 
   import Schema._
 
@@ -21,11 +19,6 @@ object SlickDSLExample extends App {
   def createTables(): FixedSqlAction[Unit, NoStream, Effect.Schema] = {
     // Create the tables, including primary and foreign keys
     schema.create
-  }
-
-  def dropTables(): Future[Unit] = {
-    // Create the tables, including primary and foreign keys
-    db.run(schema.drop)
   }
 
   def insertIntoSuppliers(): FixedSqlAction[Option[Int], NoStream, Effect.Write] = {
@@ -52,6 +45,16 @@ object SlickDSLExample extends App {
     // insert into COFFEES(COF_NAME, SUP_ID, PRICE, SALES, TOTAL) values (?,?,?,?,?)
   }
 
+  def queryCoffees: Future[Unit] = {
+    // Read all coffees and print them to the console
+    println("Coffees:")
+    println("*" * 20)
+    val result = coffees.result
+    db.run(result).map(_.foreach(println))
+    // Equivalent SQL code:
+    // select COF_NAME, SUP_ID, PRICE, SALES, TOTAL from COFFEES
+  }
+
   def updateCoffees(): Future[Int] = {
     println("updating:")
     println("*" * 20)
@@ -64,16 +67,6 @@ object SlickDSLExample extends App {
     println("*" * 20)
     val record: Query[Coffees, (String, Int, Double, Int, Int), Seq] = coffees.filter(_.supID === 101)
     db.run(record.delete)
-  }
-
-  def queryCoffees: Future[Unit] = {
-    // Read all coffees and print them to the console
-    println("Coffees:")
-    println("*" * 20)
-    val result = coffees.result
-    db.run(result).map(_.foreach(println))
-    // Equivalent SQL code:
-    // select COF_NAME, SUP_ID, PRICE, SALES, TOTAL from COFFEES
   }
 
   def joinQueryOnSupplierAndCoffees: Future[Unit] = {
@@ -89,6 +82,11 @@ object SlickDSLExample extends App {
     // select c.COF_NAME, s.SUP_NAME from COFFEES c, SUPPLIERS s where c.PRICE < 9.0 and s.SUP_ID = c.SUP_ID
     db.run(coffeeAndSupplier.result)
       .map(_.foreach(t => println(t._1 + " supplied by " + t._2)))
+  }
+
+  def dropTables(): Future[Unit] = {
+    // Create the tables, including primary and foreign keys
+    db.run(schema.drop)
   }
 
   try {
