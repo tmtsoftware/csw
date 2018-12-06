@@ -12,12 +12,12 @@ trait TestProperties {
 object TestProperties {
   class LinuxProperties extends TestProperties {
     override val precision: Int            = 9
-    override val allowedJitterInNanos: Int = 5.millis.toNanos.toInt
+    override val allowedJitterInNanos: Int = 50.millis.toNanos.toInt
   }
 
   class NonLinuxProperties extends TestProperties {
     override val precision: Int            = 3
-    override val allowedJitterInNanos: Int = 7.millis.toNanos.toInt
+    override val allowedJitterInNanos: Int = 50.millis.toNanos.toInt
   }
 
   val instance: TestProperties = OSType.value match {
