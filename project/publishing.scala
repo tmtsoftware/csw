@@ -58,17 +58,17 @@ object DeployApp extends AutoPlugin {
     )
 
   private def scriptsAndConfsMapping = Def.task {
-    val scriptsDir     = baseDirectory.value.getParentFile / "scripts"
-    val keycloakDir    = scriptsDir / "csw-auth" / "prod"
-    val serviceScript  = scriptsDir / "csw-services.sh"
-    val prodScript     = scriptsDir / "redis-sentinel-prod.sh"
-    val keycloakScript = keycloakDir / "configure.sh"
-    val confs          = Path.directory(new File(scriptsDir, "conf"))
+    val scriptsDir       = baseDirectory.value.getParentFile / "scripts"
+    val authServerDir    = scriptsDir / "csw-auth" / "prod"
+    val serviceScript    = scriptsDir / "csw-services.sh"
+    val prodScript       = scriptsDir / "redis-sentinel-prod.sh"
+    val authServerScript = authServerDir / "configure.sh"
+    val confs            = Path.directory(new File(scriptsDir, "conf"))
 
     confs :+
     ((serviceScript, s"bin/${serviceScript.getName}")) :+
     ((prodScript, s"bin/${prodScript.getName}")) :+
-    ((keycloakScript, s"bin/${keycloakScript.getName}"))
+    ((authServerScript, s"bin/${authServerScript.getName}"))
   }
 }
 

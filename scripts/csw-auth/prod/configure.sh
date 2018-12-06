@@ -38,8 +38,6 @@ function checkIfKeycloakIsInstalled {
     fi
 }
 
-# ./configure.sh --port 8080 --addr 121.1.1.1 --dir path
-
 function parse_cmd_args {
     while [[ $# -gt 0 ]]
         do
@@ -85,7 +83,6 @@ function addUserAndStartServer {
 }
 
 function start {
-#cd to keycloak dir only once
     parse_cmd_args "$@"
     checkIfKeycloakIsInstalled
     addUserAndStartServer

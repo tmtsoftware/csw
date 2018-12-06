@@ -34,17 +34,17 @@ config_port=5000
 sentinel_port=26379
 event_master_port=6379
 alarm_master_port=7379
-keycloak_server_port=8081
+AAS_port=8081
 initSvnRepo="--initRepo"
-keycloak_admin_user="admin"
-keycloak_admin_password="admin"
+AAS_admin_user="admin"
+AAS_admin_password="admin"
 
 # Always start cluster seed application
 shouldStartSeed=true
 shouldStartConfig=false
 shouldStartEvent=false
 shouldStartAlarm=false
-shouldStartKeycloak=false
+shouldStartAAS=false
 
 script_name=$0
 
@@ -74,9 +74,9 @@ alarmMasterLogFile=${logDir}/alarm_master.log
 alarmMasterPidFile=${logDir}/alarm_master.pid
 alarmMasterPortFile=${logDir}/alarm_master.port
 
-keycloakServerLogFile=${logDir}/keycloak_server.log
-keycloakServerPidFile=${logDir}/keycloak_server.pid
-keycloakServerPortFile=${logDir}/keycloak_server.port
+AASLogFile=${logDir}/AAS.log
+AASPidFile=${logDir}/AAS.pid
+AASPortFile=${logDir}/AAS.port
 
 sentinelConf="../conf/redis_sentinel/sentinel.conf"
 eventMasterConf="../conf/event_service/master.conf"
@@ -179,12 +179,12 @@ function start_sentinel() {
     fi
 }
 
-function start_keycloak() {
+function start_AAS() {
     if [ -x "$location_agent_script" ]; then
-        echo "Starting Keycloak Server..."
-        nohup ./csw-location-agent --name Keycloak -c "./configure.sh -p $keycloak_server_port -u $keycloak_admin_user --password $keycloak_admin_password" -p "$keycloak_server_port" > ${keycloakServerLogFile} 2>&1 &
-        echo $! > ${keycloakServerPidFile}
-        echo ${keycloak_server_port} > ${keycloakServerPortFile}
+        echo "[AAS] Starting Auth server..."
+        nohup ./csw-location-agent --name AAS -c "./configure.sh -p $AAS_port -u $AAS_admin_user --password $AAS_admin_password" -p "$AAS_port" > ${AASLogFile} 2>&1 &
+        echo $! > ${AASPidFile}
+        echo ${AAS_port} > ${AASPortFile}
     else
         echo "[ERROR] $location_agent_script script does not exist, please make sure that $location_agent_script resides in same directory as $script_name"
         exit 1
@@ -228,7 +228,7 @@ function enableAllServicesForRunning {
     shouldStartConfig=true
     shouldStartEvent=true
     shouldStartAlarm=true
-    shouldStartKeycloak=true
+    shouldStartAAS=true
 }
 
 function start_services {
@@ -237,7 +237,7 @@ function start_services {
     if [[ "$shouldStartEvent" = true ]]; then start_event; fi
     if [[ "$shouldStartAlarm" = true ]]; then start_alarm; fi
     if [[ ("$shouldStartEvent" = true) || ("$shouldStartAlarm" = true) ]]; then start_sentinel; fi
-    if [[ ("$shouldStartKeycloak" = true) ]]; then start_keycloak; fi
+    if [[ ("$shouldStartAAS" = true) ]]; then start_AAS; fi
 }
 
 function usage {
@@ -251,7 +251,7 @@ function usage {
     echo "  --initRepo                      create new svn repo, default: use existing svn repo"
     echo "  --event | -es <esPort>          start event service on provided port, default: 6379"
     echo "  --alarm | -as <asPort>          start alarm service on provided port, default: 7379"
-    echo "  --keycloak | -ks <ksPort> [-u <username> | -p <password>]     start keycloak server on provided port, default: 8081, with username and password, default username and password: admin"
+    echo "  --auth | -aas <aasPort> [-u <username> | -p <password>]     start auth server on provided port, default: 8081, with username and password, default username and password: admin"
     echo
     echo "Commands:"
     echo "  start      Starts all csw services if no options provided"
@@ -303,12 +303,12 @@ function parse_cmd_args {
                             shouldStartAlarm=true
                             if isPortProvided $2; then sentinel_port="$2"; shift; fi
                             ;;
-                        --keycloak | -ks )
-                           shouldStartKeycloak=true
-                           if isPortProvided $2; then keycloak_server_port="$2"; shift; fi
+                        --auth | -aas )
+                           shouldStartAAS=true
+                           if isPortProvided $2; then AAS_port="$2"; shift; fi
                            if [[ $# -gt 4 ]]; then
-                             if [[ $2 == "-u" ]]; then keycloak_admin_user=$3; shift; shift; fi
-                             if [[ $2 == "-p" ]]; then keycloak_admin_password=$3; shift; shift; fi
+                             if [[ $2 == "-u" ]]; then AAS_admin_user=$3; shift; shift; fi
+                             if [[ $2 == "-p" ]]; then AAS_admin_password=$3; shift; shift; fi
                            fi
                            ;;
                         --help)
@@ -376,17 +376,17 @@ function parse_cmd_args {
                 echo "[CONFIG] Config Service stopped"
             fi
 
-             # Stop Keycloak Server
-            if [ ! -f ${keycloakServerPidFile} ]; then
-                echo "[KEYCLOAK] Keycloak Server $keycloakServerPidFile does not exist, process is not running."
+             # Stop auth Server
+            if [ ! -f ${AASPidFile} ]; then
+                echo "[AAS] Auth Server $AASPidFile does not exist, process is not running."
             else
-                local PID=$(cat ${keycloakServerPidFile})
-                local OTHER_PID=$(pgrep -f ${keycloak_server_port})
-                echo "[KEYCLOAK] Stopping Keycloak Server... $OTHER_PID"
+                local PID=$(cat ${AASPidFile})
+                local OTHER_PID=$(pgrep -f ${AAS_port})
+                echo "[AAS] Stopping Auth Server..."
                 kill ${PID} &> /dev/null
                 kill ${OTHER_PID} &> /dev/null
-                rm -f ${keycloakServerPidFile} ${keycloakServerLogFile} ${keycloakServerPortFile}
-                echo "[KEYCLOAK] Keycloak Server stopped"
+                rm -f ${AASPidFile} ${AASLogFile} ${AASPortFile}
+                echo "[AAS] Auth Server stopped"
             fi
             ;;
         *)
