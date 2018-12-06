@@ -1,7 +1,10 @@
 //package csw.database.client.demo.jooq.java;
 //
-//import org.jooq.*;
-//import org.jooq.impl.DSL;
+//import csw.database.client.demo.jooq.dsl_handle.DatabaseService;
+//import org.jooq.DSLContext;
+//import org.jooq.Record3;
+//import org.jooq.Result;
+//import org.jooq.ResultQuery;
 //
 //import java.util.List;
 //import java.util.concurrent.ExecutionException;
@@ -11,7 +14,7 @@
 //
 //public class JOOQDSL {
 //    public static void main(String[] args) throws ExecutionException, InterruptedException {
-//        DSLContext dsl = DSL.using("jdbc:postgresql://localhost:5432/postgres?user=<username>");
+//        DSLContext dsl = DatabaseService.defaultDSL();
 //
 //        ResultQuery<Record3<String, String, String>> query =
 //                dsl.select(BOOK.TITLE, AUTHOR.FIRST_NAME, AUTHOR.LAST_NAME)

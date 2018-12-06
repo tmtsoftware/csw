@@ -11,7 +11,7 @@ class CodeGenUtil {
         new Jdbc()
           .withDriver("org.postgresql.Driver")
           .withUrl("jdbc:postgresql:postgres")
-          .withUser("<username>")
+          .withUser("salonivithalani")
       )
       .withGenerator(
         new Generator()

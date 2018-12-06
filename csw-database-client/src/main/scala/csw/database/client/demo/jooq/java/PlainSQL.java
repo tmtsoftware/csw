@@ -1,38 +1,20 @@
 package csw.database.client.demo.jooq.java;
 
+import csw.database.client.demo.jooq.dsl_handle.DatabaseService;
 import org.jooq.DSLContext;
 import org.jooq.Query;
 import org.jooq.Record;
 import org.jooq.Result;
-import org.jooq.impl.DSL;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
 
 public class PlainSQL {
     public static void main(String[] args) throws ExecutionException, InterruptedException {
-        DSLContext dsl = DSL.using("jdbc:postgresql://localhost:5432/postgres?user=<username>");
 
-        // ***************************************************************** //
-
-        Integer result = dsl.query("CREATE DATABASE box_office")
-                .executeAsync()
-                .toCompletableFuture()
-                .get();
-
-        System.out.println("CREATE DATABASE box_office - " + result);
-
-        // ***************************************************************** //
-
-        Integer result1 = dsl.query("DROP DATABASE box_office")
-                .executeAsync()
-                .toCompletableFuture()
-                .get();
-
-        System.out.println("DROP DATABASE box_office - " + result1);
-
-        // ***************************************************************** //
+        DSLContext dsl = DatabaseService.defaultDSL();
 
         Integer result2 = dsl.query("CREATE TABLE IF NOT EXISTS films (id SERIAL PRIMARY KEY, name VARCHAR (10) NOT NULL)")
                 .executeAsync()

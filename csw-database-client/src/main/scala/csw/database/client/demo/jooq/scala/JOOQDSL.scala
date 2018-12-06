@@ -1,16 +1,15 @@
 //package csw.database.client.demo.jooq.scala
+//import csw.database.client.demo.jooq.dsl_handle.DatabaseService
 //import csw.database.client.demo.jooq.java.generate.Tables.{AUTHOR, BOOK}
-//import org.jooq.impl.DSL
-//import org.jooq.{Record3, ResultQuery}
+//import csw.database.client.demo.jooq.scala.JooqExtentions.RichResultQuery
+//import org.jooq._
 //
-//import scala.collection.JavaConverters.collectionAsScalaIterableConverter
-//import scala.compat.java8.FutureConverters.CompletionStageOps
 //import scala.concurrent.duration.DurationDouble
 //import scala.concurrent.{Await, Future}
 //
 //object JOOQDSL {
 //  def main(args: Array[String]): Unit = {
-//    val dsl = DSL.using("jdbc:postgresql://localhost:5432/postgres?user=<username>")
+//    val dsl = DatabaseService.defaultDSL
 //
 //    val query: ResultQuery[Record3[String, String, String]] = dsl
 //      .select(BOOK.TITLE, AUTHOR.FIRST_NAME, AUTHOR.LAST_NAME)
@@ -26,11 +25,8 @@
 //    println("-----------------------------")
 //
 //    import scala.concurrent.ExecutionContext.Implicits.global
-//    val resultF: Future[List[BookData]] =
-//      query
-//        .fetchAsync()
-//        .toScala
-//        .map(_.map(_.into(classOf[BookData])).asScala.toList)
+//
+//    val resultF: Future[List[BookData]] = query.fetchAsyncScala[BookData]
 //
 //    val bookData = Await.result(resultF, 5.seconds)
 //
