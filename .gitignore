@@ -40,3 +40,5 @@ snapshots
 .bloop
 project/.bloop
 project/project/.bloop
+scripts/csw-auth/prod/keycloak-4.6.0.Final
+scripts/csw-auth/prod/keycloak-4.6.0.Final.tar.gz

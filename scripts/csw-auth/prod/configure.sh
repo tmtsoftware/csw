@@ -11,6 +11,8 @@ host="0.0.0.0"
 userName=""
 password=""
 
+importJsonPath="../conf/auth_service/tmt-realm-export.json"
+
 # Run from the directory containing the script
 cd "$( dirname "${BASH_SOURCE[0]}" )"
 
@@ -79,7 +81,7 @@ function addUserAndStartServer {
     cd ${keycloakDir}/${keycloakBinaryUnzipped}/bin
     echo "[INFO] starting server at $host:$port"
     sh add-user-keycloak.sh --user ${userName} -p ${password}
-    sh standalone.sh -Djboss.bind.address=${host} -Djboss.http.port=${port} -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=${keycloakDir}/tmt-realm-export.json
+    sh standalone.sh -Djboss.bind.address=${host} -Djboss.http.port=${port} -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=${keycloakDir}/${importJsonPath}
 }
 
 function start {
