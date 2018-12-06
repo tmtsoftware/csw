@@ -195,7 +195,7 @@ public class JDatabaseServiceTest extends JUnitSuite {
         databaseService.updateAll(sqlParamStore).get(5, SECONDS);
 
         // update record value
-        databaseService.update("UPDATE films SET name = 'movie_3' WHERE name = ?", pp -> pp.setString(movie_2));
+        databaseService.update("UPDATE films SET name = 'movie_3' WHERE name = ?", pp -> pp.setString(movie_2)).get(5, SECONDS);
 
         // assert the record is updated
         List<Integer> resultSet = databaseService.query("SELECT count(*) AS rowCount from films where name = ?",
