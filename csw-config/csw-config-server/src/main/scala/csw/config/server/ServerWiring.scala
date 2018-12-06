@@ -30,7 +30,7 @@ private[csw] class ServerWiring {
 
   lazy val configHandlers = new ConfigHandlers
   //todo: use the location server here once dev deployment story is done
-  lazy val securityDirectives = SecurityDirectives()
+  lazy val securityDirectives = SecurityDirectives(actorRuntime.ec)
   lazy val configServiceRoute = new ConfigServiceRoute(configServiceFactory, actorRuntime, configHandlers, securityDirectives)
 
   lazy val httpService: HttpService = new HttpService(locationService, configServiceRoute, settings, actorRuntime)

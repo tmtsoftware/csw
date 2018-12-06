@@ -12,6 +12,8 @@ import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
+import scala.concurrent.Future
+
 class RealmRolePolicyTest extends FunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
   test("realmRole policy should return AuthenticationFailedRejection when token is invalid") {
@@ -21,9 +23,9 @@ class RealmRolePolicyTest extends FunSuite with MockitoSugar with Directives wit
     val invalidTokenStr    = "invalid"
     val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
 
-    val authenticator: Authenticator[AccessToken] = {
-      case Provided(`invalidTokenStr`) ⇒ None
-      case _                           ⇒ None
+    val authenticator: AsyncAuthenticator[AccessToken] = {
+      case Provided(`invalidTokenStr`) ⇒ Future.successful(None)
+      case _                           ⇒ Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
@@ -45,7 +47,7 @@ class RealmRolePolicyTest extends FunSuite with MockitoSugar with Directives wit
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
 
-    val authenticator: Authenticator[AccessToken] = _ ⇒ None
+    val authenticator: AsyncAuthenticator[AccessToken] = _ ⇒ Future.successful(None)
 
     when(authentication.authenticator).thenReturn(authenticator)
 
@@ -75,9 +77,9 @@ class RealmRolePolicyTest extends FunSuite with MockitoSugar with Directives wit
     when(validTokenWithoutRealmRole.hasRealmRole("admin"))
       .thenReturn(false)
 
-    val authenticator: Authenticator[AccessToken] = {
-      case Provided(`validTokenWithoutRealmRoleStr`) ⇒ Some(validTokenWithoutRealmRole)
-      case _                                         ⇒ None
+    val authenticator: AsyncAuthenticator[AccessToken] = {
+      case Provided(`validTokenWithoutRealmRoleStr`) ⇒ Future.successful(Some(validTokenWithoutRealmRole))
+      case _                                         ⇒ Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
@@ -105,9 +107,9 @@ class RealmRolePolicyTest extends FunSuite with MockitoSugar with Directives wit
     when(validTokenWithRealmRole.hasRealmRole("admin"))
       .thenReturn(true)
 
-    val authenticator: Authenticator[AccessToken] = {
-      case Provided(`validTokenWithRealmRoleStr`) ⇒ Some(validTokenWithRealmRole)
-      case _                                      ⇒ None
+    val authenticator: AsyncAuthenticator[AccessToken] = {
+      case Provided(`validTokenWithRealmRoleStr`) ⇒ Future.successful(Some(validTokenWithRealmRole))
+      case _                                      ⇒ Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)

@@ -12,6 +12,8 @@ import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
+import scala.concurrent.Future
+
 class ResourceRolePolicyTest extends FunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
   test("resourceRole policy should return AuthenticationFailedRejection when token is invalid") {
@@ -21,9 +23,9 @@ class ResourceRolePolicyTest extends FunSuite with MockitoSugar with Directives 
     val invalidTokenStr    = "invalid"
     val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
 
-    val authenticator: Authenticator[AccessToken] = {
-      case Provided(`invalidTokenStr`) ⇒ None
-      case _                           ⇒ None
+    val authenticator: AsyncAuthenticator[AccessToken] = {
+      case Provided(`invalidTokenStr`) ⇒ Future.successful(None)
+      case _                           ⇒ Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
@@ -45,7 +47,7 @@ class ResourceRolePolicyTest extends FunSuite with MockitoSugar with Directives 
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
 
-    val authenticator: Authenticator[AccessToken] = _ ⇒ None
+    val authenticator: AsyncAuthenticator[AccessToken] = _ ⇒ Future.successful(None)
 
     when(authentication.authenticator).thenReturn(authenticator)
 
@@ -75,9 +77,9 @@ class ResourceRolePolicyTest extends FunSuite with MockitoSugar with Directives 
     when(validTokenWithoutResourceRole.hasResourceRole("admin", "test"))
       .thenReturn(false)
 
-    val authenticator: Authenticator[AccessToken] = {
-      case Provided(`validTokenWithoutResourceRoleStr`) ⇒ Some(validTokenWithoutResourceRole)
-      case _                                            ⇒ None
+    val authenticator: AsyncAuthenticator[AccessToken] = {
+      case Provided(`validTokenWithoutResourceRoleStr`) ⇒ Future.successful(Some(validTokenWithoutResourceRole))
+      case _                                            ⇒ Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
@@ -105,9 +107,9 @@ class ResourceRolePolicyTest extends FunSuite with MockitoSugar with Directives 
     when(validTokenWithResourceRole.hasResourceRole("admin", "test"))
       .thenReturn(true)
 
-    val authenticator: Authenticator[AccessToken] = {
-      case Provided(`validTokenWithResourceRoleStr`) ⇒ Some(validTokenWithResourceRole)
-      case _                                         ⇒ None
+    val authenticator: AsyncAuthenticator[AccessToken] = {
+      case Provided(`validTokenWithResourceRoleStr`) ⇒ Future.successful(Some(validTokenWithResourceRole))
+      case _                                         ⇒ Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)

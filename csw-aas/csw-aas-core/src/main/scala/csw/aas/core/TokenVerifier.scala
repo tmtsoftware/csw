@@ -12,6 +12,7 @@ import org.keycloak.representations.{AccessToken => KeycloakAccessToken}
 import pdi.jwt.{JwtJson, JwtOptions}
 
 import scala.util.Try
+import scala.util.control.NonFatal
 
 private[aas] class KeycloakTokenVerifier {
   def verifyToken(token: String, keycloakDeployment: KeycloakDeployment): Try[KeycloakAccessToken] =
@@ -38,23 +39,19 @@ class TokenVerifier private[aas] (keycloakTokenVerifier: KeycloakTokenVerifier, 
         }
       }
 
-    val result = keycloakToken.flatMap { _ =>
+    keycloakToken.flatMap { _ =>
       JwtJson
         .decodeJson(token, JwtOptions(signature = false, expiration = false, notBefore = false))
         .map(_.as[AccessToken])
         .toEither
         .left
-        .flatMap { e: Throwable => // todo: shouldn't we just catch NonFatal errors and rethrow Fatal?
-          Left(InvalidToken(e.getMessage))
+        .flatMap {
+          case NonFatal(e) => {
+            error("token verification failed", Map("error" -> e))
+            Left(InvalidToken(e.getMessage))
+          }
         }
     }
-
-    result match {
-      case Left(e) => error("token verification failed", Map("error" -> e))
-      case x       => x
-    }
-
-    result
   }
 }
 

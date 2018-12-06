@@ -12,6 +12,8 @@ import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
+import scala.concurrent.Future
+
 class EmptyPolicyTest extends FunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
   test("empty policy should return AuthenticationFailedRejection when token is invalid") {
@@ -22,9 +24,9 @@ class EmptyPolicyTest extends FunSuite with MockitoSugar with Directives with Sc
     val invalidTokenStr    = "invalid"
     val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
 
-    val authenticator: Authenticator[AccessToken] = {
-      case Provided(`invalidTokenStr`) ⇒ None
-      case _                           ⇒ None
+    val authenticator: AsyncAuthenticator[AccessToken] = {
+      case Provided(`invalidTokenStr`) ⇒ Future.successful(None)
+      case _                           ⇒ Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
@@ -46,7 +48,7 @@ class EmptyPolicyTest extends FunSuite with MockitoSugar with Directives with Sc
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
 
-    val authenticator: Authenticator[AccessToken] = _ ⇒ None
+    val authenticator: AsyncAuthenticator[AccessToken] = _ ⇒ Future.successful(None)
 
     when(authentication.authenticator).thenReturn(authenticator)
 
@@ -75,9 +77,9 @@ class EmptyPolicyTest extends FunSuite with MockitoSugar with Directives with Sc
     when(validTokenWithPermission.hasPermission(scope = "read", resource = "Default Resource"))
       .thenReturn(true)
 
-    val authenticator: Authenticator[AccessToken] = {
-      case Provided(`validTokenWithPermissionStr`) ⇒ Some(validTokenWithPermission)
-      case _                                       ⇒ None
+    val authenticator: AsyncAuthenticator[AccessToken] = {
+      case Provided(`validTokenWithPermissionStr`) ⇒ Future.successful(Some(validTokenWithPermission))
+      case _                                       ⇒ Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)

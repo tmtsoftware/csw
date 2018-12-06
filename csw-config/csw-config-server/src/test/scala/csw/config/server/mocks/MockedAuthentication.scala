@@ -1,7 +1,7 @@
 package csw.config.server.mocks
 
 import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
-import akka.http.scaladsl.server.Directives.Authenticator
+import akka.http.scaladsl.server.Directives.AsyncAuthenticator
 import akka.http.scaladsl.server.directives.Credentials.Provided
 import csw.aas.core.deployment.AuthConfig
 import csw.aas.core.token.AccessToken
@@ -10,6 +10,8 @@ import csw.config.api.TokenFactory
 import org.keycloak.adapters.KeycloakDeployment
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
+
+import scala.concurrent.Future
 
 class JMockedAuthentication extends MockedAuthentication
 
@@ -35,10 +37,10 @@ trait MockedAuthentication extends MockitoSugar {
   val validToken: AccessToken       = mock[AccessToken]
   val invalidToken: AccessToken     = mock[AccessToken]
 
-  private val authenticator: Authenticator[AccessToken] = {
-    case Provided(`roleMissingTokenStr`) ⇒ Some(roleMissingToken)
-    case Provided(`validTokenStr`)       ⇒ Some(validToken)
-    case _                               ⇒ None
+  private val authenticator: AsyncAuthenticator[AccessToken] = {
+    case Provided(`roleMissingTokenStr`) ⇒ Future.successful(Some(roleMissingToken))
+    case Provided(`validTokenStr`)       ⇒ Future.successful(Some(validToken))
+    case _                               ⇒ Future.successful(None)
   }
   when(roleMissingToken.hasResourceRole("admin", "test")).thenReturn(false)
   when(validToken.hasResourceRole("admin", "test")).thenReturn(true)

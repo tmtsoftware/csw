@@ -1,7 +1,7 @@
 package csw.aas.http
 
 import akka.http.scaladsl.model.{HttpMethod, HttpMethods}
-import akka.http.scaladsl.server.Directives.{authenticateOAuth2, authorize => keycloakAuthorize, _}
+import akka.http.scaladsl.server.Directives.{authorize => keycloakAuthorize, _}
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.directives.AuthenticationDirective
 import csw.aas.core.commons.AuthLogger
@@ -20,7 +20,8 @@ class SecurityDirectives private[csw] (authentication: Authentication, realm: St
   private val logger = AuthLogger.getLogger
   import logger._
 
-  private[aas] def authenticate: AuthenticationDirective[AccessToken] = authenticateOAuth2(realm, authentication.authenticator)
+  private[aas] def authenticate: AuthenticationDirective[AccessToken] =
+    authenticateOAuth2Async(realm, authentication.authenticator)
 
   private[aas] def authorize(authorizationPolicy: AuthorizationPolicy, accessToken: AccessToken): Directive0 =
     authorizationPolicy match {
@@ -58,7 +59,7 @@ class SecurityDirectives private[csw] (authentication: Authentication, realm: St
 }
 
 object SecurityDirectives {
-  def apply(): SecurityDirectives = {
+  def apply(implicit ec: ExecutionContext): SecurityDirectives = {
     val authConfig                             = AuthConfig.loadFromAppConfig
     val keycloakDeployment: KeycloakDeployment = authConfig.getDeployment
     val authentication                         = new Authentication(new TokenFactory(keycloakDeployment))
@@ -66,6 +67,7 @@ object SecurityDirectives {
   }
 
   def apply(locationService: LocationService)(implicit ec: ExecutionContext): SecurityDirectives = {
+    //todo: see if its possible to remove blocking here
     val authLocation: HttpLocation             = Await.result(AuthServiceLocation(locationService).resolve, 5.seconds)
     val authConfig                             = AuthConfig.loadFromAppConfig(authLocation)
     val keycloakDeployment: KeycloakDeployment = authConfig.getDeployment

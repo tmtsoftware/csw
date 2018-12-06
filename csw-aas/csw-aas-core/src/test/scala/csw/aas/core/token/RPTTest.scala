@@ -1,17 +1,24 @@
 package csw.aas.core.token
 
 import csw.aas.core.token.claims.{Access, Audience, Authorization, Permission}
-import org.keycloak.authorization.client.AuthzClient
 import org.keycloak.authorization.client.resource.AuthorizationResource
+import org.keycloak.authorization.client.{AuthorizationDeniedException, AuthzClient}
 import org.keycloak.representations.idm.authorization.AuthorizationResponse
 import org.mockito.Mockito.when
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
+import org.scalatest.time.{Seconds, Span}
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.collection.mutable.ArrayBuffer
-import scala.util.{Failure, Success}
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationDouble
+import scala.concurrent.ExecutionContext.Implicits.global
 
-class RPTTest extends FunSuite with MockitoSugar with Matchers {
+class RPTTest extends FunSuite with MockitoSugar with Matchers with ScalaFutures {
+
+  implicit override val patienceConfig: PatienceConfig = PatienceConfig(Span(1, Seconds), Span(1, Seconds))
+
   test("should create accessToken") {
     val authzClient           = mock[AuthzClient]
     val authorizationResource = mock[AuthorizationResource]
@@ -41,7 +48,7 @@ class RPTTest extends FunSuite with MockitoSugar with Matchers {
     when(authorizationResource.authorize()).thenReturn(authorizationResponse)
     when(authorizationResponse.getToken).thenReturn(token)
 
-    rpt.create(token) shouldEqual Success(expectedToken)
+    rpt.create(token).futureValue shouldEqual expectedToken
   }
 
   test("should create RPTn") {
@@ -83,20 +90,18 @@ class RPTTest extends FunSuite with MockitoSugar with Matchers {
     when(authorizationResource.authorize()).thenReturn(authorizationResponse)
     when(authorizationResponse.getToken).thenReturn(rptStr)
 
-    rpt.create(tokenStr) shouldEqual Success(expectedPRT)
+    rpt.create(tokenStr).futureValue shouldEqual expectedPRT
   }
 
   test("should fail for creating accessToken") {
     val authzClient           = mock[AuthzClient]
     val authorizationResource = mock[AuthorizationResource]
-    val authorizationResponse = mock[AuthorizationResponse]
     val token                 = "asd.adsasd.asd.qwe"
     val rpt                   = RPT(authzClient)
 
     when(authzClient.authorization(token)).thenReturn(authorizationResource)
-    when(authorizationResource.authorize()).thenReturn(authorizationResponse)
-    when(authorizationResponse.getToken).thenReturn(token)
-
-    rpt.create(token) shouldBe a[Failure[_]]
+    when(authorizationResource.authorize())
+      .thenThrow(new AuthorizationDeniedException("token is invalid", new RuntimeException))
+    a[AuthorizationDeniedException] shouldBe thrownBy(Await.result(rpt.create(token), 5.seconds))
   }
 }

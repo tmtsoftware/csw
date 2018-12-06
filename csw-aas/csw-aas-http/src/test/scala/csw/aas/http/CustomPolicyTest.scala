@@ -12,6 +12,8 @@ import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
+import scala.concurrent.Future
+
 class CustomPolicyTest extends FunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
   test("custom policy should return AuthenticationFailedRejection when token is invalid") {
@@ -21,9 +23,9 @@ class CustomPolicyTest extends FunSuite with MockitoSugar with Directives with S
     val invalidTokenStr    = "invalid"
     val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
 
-    val authenticator: Authenticator[AccessToken] = {
-      case Provided(`invalidTokenStr`) ⇒ None
-      case _                           ⇒ None
+    val authenticator: AsyncAuthenticator[AccessToken] = {
+      case Provided(`invalidTokenStr`) ⇒ Future.successful(None)
+      case _                           ⇒ Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
@@ -46,7 +48,7 @@ class CustomPolicyTest extends FunSuite with MockitoSugar with Directives with S
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
 
-    val authenticator: Authenticator[AccessToken] = _ ⇒ None
+    val authenticator: AsyncAuthenticator[AccessToken] = _ ⇒ Future.successful(None)
 
     when(authentication.authenticator).thenReturn(authenticator)
 
@@ -72,9 +74,9 @@ class CustomPolicyTest extends FunSuite with MockitoSugar with Directives with S
 
     val validTokenWithPolicyViolation = mock[AccessToken]
 
-    val authenticator: Authenticator[AccessToken] = {
-      case Provided(`validTokenWithPolicyViolationStr`) ⇒ Some(validTokenWithPolicyViolation)
-      case _                                            ⇒ None
+    val authenticator: AsyncAuthenticator[AccessToken] = {
+      case Provided(`validTokenWithPolicyViolationStr`) ⇒ Future.successful(Some(validTokenWithPolicyViolation))
+      case _                                            ⇒ Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
@@ -101,9 +103,9 @@ class CustomPolicyTest extends FunSuite with MockitoSugar with Directives with S
 
     val validTokenWithPolicyMatch = mock[AccessToken]
 
-    val authenticator: Authenticator[AccessToken] = {
-      case Provided(`validTokenWithPolicyMatchStr`) ⇒ Some(validTokenWithPolicyMatch)
-      case _                                        ⇒ None
+    val authenticator: AsyncAuthenticator[AccessToken] = {
+      case Provided(`validTokenWithPolicyMatchStr`) ⇒ Future.successful(Some(validTokenWithPolicyMatch))
+      case _                                        ⇒ Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)

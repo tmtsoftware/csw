@@ -12,6 +12,8 @@ import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
+import scala.concurrent.Future
+
 class PermissionPolicyTest extends FunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
   test("permission policy should return AuthenticationFailedRejection when token is invalid") {
@@ -21,9 +23,9 @@ class PermissionPolicyTest extends FunSuite with MockitoSugar with Directives wi
     val invalidTokenStr    = "invalid"
     val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
 
-    val authenticator: Authenticator[AccessToken] = {
-      case Provided(`invalidTokenStr`) ⇒ None
-      case _                           ⇒ None
+    val authenticator: AsyncAuthenticator[AccessToken] = {
+      case Provided(`invalidTokenStr`) ⇒ Future.successful(None)
+      case _                           ⇒ Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
@@ -45,7 +47,7 @@ class PermissionPolicyTest extends FunSuite with MockitoSugar with Directives wi
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
 
-    val authenticator: Authenticator[AccessToken] = _ ⇒ None
+    val authenticator: AsyncAuthenticator[AccessToken] = _ ⇒ Future.successful(None)
 
     when(authentication.authenticator).thenReturn(authenticator)
 
@@ -74,9 +76,9 @@ class PermissionPolicyTest extends FunSuite with MockitoSugar with Directives wi
     when(validTokenWithoutPermission.hasPermission("read"))
       .thenReturn(false)
 
-    val authenticator: Authenticator[AccessToken] = {
-      case Provided(`validTokenWithoutPermissionStr`) ⇒ Some(validTokenWithoutPermission)
-      case _                                          ⇒ None
+    val authenticator: AsyncAuthenticator[AccessToken] = {
+      case Provided(`validTokenWithoutPermissionStr`) ⇒ Future.successful(Some(validTokenWithoutPermission))
+      case _                                          ⇒ Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
@@ -106,9 +108,9 @@ class PermissionPolicyTest extends FunSuite with MockitoSugar with Directives wi
     when(validTokenWithPermission.hasPermission(scope = "read", resource = "Default Resource"))
       .thenReturn(true)
 
-    val authenticator: Authenticator[AccessToken] = {
-      case Provided(`validTokenWithPermissionStr`) ⇒ Some(validTokenWithPermission)
-      case _                                       ⇒ None
+    val authenticator: AsyncAuthenticator[AccessToken] = {
+      case Provided(`validTokenWithPermissionStr`) ⇒ Future.successful(Some(validTokenWithPermission))
+      case _                                       ⇒ Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)

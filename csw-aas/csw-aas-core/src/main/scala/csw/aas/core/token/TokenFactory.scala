@@ -1,12 +1,12 @@
 package csw.aas.core.token
 
 import csw.aas.core.commons.AuthLogger
-import csw.aas.core.deployment.AuthConfig
 import csw.aas.core.deployment.AuthConfig._
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.authorization.client.AuthzClient
 
-import scala.util.{Failure, Success, Try}
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 class TokenFactory(keycloakDeployment: KeycloakDeployment) {
 
@@ -17,9 +17,9 @@ class TokenFactory(keycloakDeployment: KeycloakDeployment) {
 
   private lazy val rpt: RPT = RPT(authzClient)
 
-  private[aas] def makeToken(token: String): Try[AccessToken] = {
+  private[aas] def makeToken(token: String)(implicit ec: ExecutionContext): Future[AccessToken] = {
     val result = rpt.create(token)
-    result match {
+    result.onComplete {
       case Failure(e) =>
         error("token string could not be converted to RPT", ex = e)
         Failure(e)
@@ -28,5 +28,6 @@ class TokenFactory(keycloakDeployment: KeycloakDeployment) {
         x
       }
     }
+    result
   }
 }

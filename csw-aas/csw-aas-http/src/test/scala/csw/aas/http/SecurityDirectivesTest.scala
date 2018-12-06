@@ -12,6 +12,8 @@ import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
+import scala.concurrent.Future
+
 class SecurityDirectivesTest extends FunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
   test("sGet using customPolicy should return 200 OK when policy matches") {
@@ -24,9 +26,9 @@ class SecurityDirectivesTest extends FunSuite with MockitoSugar with Directives 
 
     val validTokenWithPolicyMatch = mock[AccessToken]
 
-    val authenticator: Authenticator[AccessToken] = {
-      case Provided(`validTokenWithPolicyMatchStr`) ⇒ Some(validTokenWithPolicyMatch)
-      case _                                        ⇒ None
+    val authenticator: AsyncAuthenticator[AccessToken] = {
+      case Provided(`validTokenWithPolicyMatchStr`) ⇒ Future.successful(Some(validTokenWithPolicyMatch))
+      case _                                        ⇒ Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
@@ -51,9 +53,9 @@ class SecurityDirectivesTest extends FunSuite with MockitoSugar with Directives 
     when(validTokenWithRealmRole.hasRealmRole("admin"))
       .thenReturn(true)
 
-    val authenticator: Authenticator[AccessToken] = {
-      case Provided(`validTokenWithRealmRoleStr`) ⇒ Some(validTokenWithRealmRole)
-      case _                                      ⇒ None
+    val authenticator: AsyncAuthenticator[AccessToken] = {
+      case Provided(`validTokenWithRealmRoleStr`) ⇒ Future.successful(Some(validTokenWithRealmRole))
+      case _                                      ⇒ Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
@@ -80,9 +82,9 @@ class SecurityDirectivesTest extends FunSuite with MockitoSugar with Directives 
     when(validTokenWithPermission.hasPermission("read", "Default Resource"))
       .thenReturn(true)
 
-    val authenticator: Authenticator[AccessToken] = {
-      case Provided(`validTokenWithPermissionStr`) ⇒ Some(validTokenWithPermission)
-      case _                                       ⇒ None
+    val authenticator: AsyncAuthenticator[AccessToken] = {
+      case Provided(`validTokenWithPermissionStr`) ⇒ Future.successful(Some(validTokenWithPermission))
+      case _                                       ⇒ Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
@@ -107,9 +109,9 @@ class SecurityDirectivesTest extends FunSuite with MockitoSugar with Directives 
     when(validTokenWithResourceRole.hasResourceRole("admin", "test"))
       .thenReturn(true)
 
-    val authenticator: Authenticator[AccessToken] = {
-      case Provided(`validTokenWithResourceRoleStr`) ⇒ Some(validTokenWithResourceRole)
-      case _                                         ⇒ None
+    val authenticator: AsyncAuthenticator[AccessToken] = {
+      case Provided(`validTokenWithResourceRoleStr`) ⇒ Future.successful(Some(validTokenWithResourceRole))
+      case _                                         ⇒ Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
@@ -134,9 +136,9 @@ class SecurityDirectivesTest extends FunSuite with MockitoSugar with Directives 
     when(validTokenWithResourceRole.hasResourceRole("admin", "test"))
       .thenReturn(true)
 
-    val authenticator: Authenticator[AccessToken] = {
-      case Provided(`validTokenWithResourceRoleStr`) ⇒ Some(validTokenWithResourceRole)
-      case _                                         ⇒ None
+    val authenticator: AsyncAuthenticator[AccessToken] = {
+      case Provided(`validTokenWithResourceRoleStr`) ⇒ Future.successful(Some(validTokenWithResourceRole))
+      case _                                         ⇒ Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
@@ -155,7 +157,7 @@ class SecurityDirectivesTest extends FunSuite with MockitoSugar with Directives 
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
     import securityDirectives._
 
-    val authenticator: Authenticator[AccessToken] = _ ⇒ None
+    val authenticator: AsyncAuthenticator[AccessToken] = _ ⇒ Future.successful(None)
 
     when(authentication.authenticator).thenReturn(authenticator)
 
