@@ -3,7 +3,7 @@
     <jdbc>
         <driver>org.postgresql.Driver</driver>
         <url>jdbc:postgresql:postgres</url>
-        <user>mushtaq</user>
+        <user>salonivithalani</user>
     </jdbc>
     <generator>
         <name>org.jooq.codegen.DefaultGenerator</name>

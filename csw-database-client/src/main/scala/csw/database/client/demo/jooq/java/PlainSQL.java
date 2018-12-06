@@ -9,7 +9,6 @@ import org.jooq.Result;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinPool;
 
 public class PlainSQL {
     public static void main(String[] args) throws ExecutionException, InterruptedException {
