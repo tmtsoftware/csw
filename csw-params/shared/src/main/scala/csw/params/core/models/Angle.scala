@@ -86,11 +86,7 @@ object Angle {
 
   implicit val format: Format[Angle] = new Format[Angle] {
     override def writes(obj: Angle): JsValue           = JsNumber(obj.uas)
-    override def reads(json: JsValue): JsResult[Angle] = {
-      val x = json.as[Long]
-      println("X: " + x)
-      JsSuccess(Angle(x))
-    }
+    override def reads(json: JsValue): JsResult[Angle] = JsSuccess(Angle(json.as[Long]))
   }
 
   /** used in implicit conversion to support `1.degree`, `1.arcMinute` etc */

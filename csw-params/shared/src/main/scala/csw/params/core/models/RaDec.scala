@@ -1,7 +1,7 @@
 package csw.params.core.models
 
 import csw.params.core.generics.SimpleKeyType
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json._
 
 /**
  * Holds Ra(Right Ascension) and Dec(Declination) values
@@ -27,91 +27,94 @@ object PositionsHelpers {
   val GUIDE2 = Tag("quide2")
   val GUIDE3 = Tag("quide3")
 
-  val ICRS_C = Choice("ICRS")
-  val FK4_C  = Choice("FK4")
-  val FK5_C  = Choice("FK5")
-
-  sealed trait EQ_FRAME {
-    def toChoice: Choice
-  }
-  case object ICRS extends EQ_FRAME {
-    val toChoice = ICRS_C
-  }
-  case object FK4 extends EQ_FRAME {
-    val toChoice = FK4_C
-  }
-  case object FK5 extends EQ_FRAME {
-    val toChoice = FK5_C
-  }
-  /*
-  trait EqCoordinate {
-    def tag: Tag
-    def catalogName: String
-    def frame: EQ_FRAME
-    def ra: String
-    def dec: String
-    def pmx: Float
-    def pmy: Float
-    override def toString = s"EqCoordinate($tag,$catalogName,$frame,$ra,$dec,$pmx,$pmy)"
-  }
-   */
+  implicit val tagFormat: OFormat[Tag] = Json.format[Tag]
 
 
-  case class EqCoordinate(ra: Angle, dec: Angle) {
+  trait EQ_FRAME
+  case object ICRS extends EQ_FRAME
+  case object FK4 extends EQ_FRAME
+  case object FK5 extends EQ_FRAME
 
-    override def toString():String = Angle.raToString(ra.toRadian) + " " + Angle.deToString(dec.toRadian)
+  object EQ_FRAME {
+    implicit val format: Format[EQ_FRAME] = new Format[EQ_FRAME] {
+      override def writes(obj: EQ_FRAME): JsValue = JsString(obj.toString)
+      override def reads(json: JsValue): JsResult[EQ_FRAME] = {
+        val x:String = json.as[String]
+        val rr = x match {
+          case "ICRS" => ICRS
+          case "FK4" => FK4
+          case "FK5" => FK5
+          case _ => ICRS
+        }
+        JsSuccess(rr)
+      }
+    }
+  }
+
+  case class ProperMotion(pmx: Double, pmy: Double) {
+    override def toString: String = s"$pmx/$pmy"
+  }
+
+  case class EqCoordinate(tag: Tag, ra: Angle, dec: Angle, frame: EQ_FRAME, catalogName: String, pm: ProperMotion) {
+
+    override def toString(): String = s"${Angle.raToString(ra.toRadian)}  ${Angle.deToString(dec.toRadian)}" +
+      s" ${frame.toString} $catalogName ${tag} ${pm.toString}"
+  }
+
+  object ProperMotion {
+    val DEFAULT_PROPERMOTION = ProperMotion(0.0, 0.0)
+    //used by play-json
+    implicit val pmFormat: OFormat[ProperMotion] = Json.format[ProperMotion]
   }
 
   object EqCoordinate {
-    // Converts Strings
-    def apply(raStr: String, decStr: String): EqCoordinate = {
-      val ra = Angle.parseRa(raStr)
-      val dec = Angle.parseDe(decStr)
-      new EqCoordinate(ra, dec)
+
+    val DEFAULT_FRAME = ICRS
+    val DEFAULT_TAG = BASE
+    val DEFAULT_PMX = ProperMotion.DEFAULT_PROPERMOTION.pmx
+    val DEFAULT_PMY = ProperMotion.DEFAULT_PROPERMOTION.pmy
+    val DEFAULT_CATNAME = "none"
+
+    def apply(ra: Any = 0.0, dec: Any = 0.0, frame: EQ_FRAME = DEFAULT_FRAME, tag:Tag = DEFAULT_TAG,
+              catalogName: String = DEFAULT_CATNAME,
+              pmx:Double = DEFAULT_PMX, pmy:Double = DEFAULT_PMY): EqCoordinate = {
+      val raAngle:Angle = ra match {
+        case ras:String => Angle.parseRa(ras)
+        case rad:Double => Angle.double2angle(rad).degree
+        case raa:Angle => raa
+      }
+      val decAngle:Angle = dec match {
+        case des:String => Angle.parseDe(des)
+        case ded:Double => Angle.double2angle(ded).degree
+        case dea:Angle => dea
+      }
+      new EqCoordinate(tag, raAngle, decAngle, ICRS, catalogName, ProperMotion(pmx,pmy))
     }
 
-    // Converts to doubles each as degrees
-    def apply(rad: Double, decd: Double): EqCoordinate = {
-      val ra = Angle.double2angle(rad).degree
-      val dec:Angle = Angle.double2angle(decd).degree
-      new EqCoordinate(ra, dec)
-    }
-
-    def apply(radec: String): EqCoordinate = {
+    /**
+     * This allows creation of an EqCoordinate from a string of ra and dec with formats:
+     * 20 54 05.689 +37 01 17.38
+     * 10:12:45.3-45:17:50
+     * 15h17m-11d10m
+     * 15h17+89d15
+     * 275d11m15.6954s+17d59m59.876s
+     * 12.34567h-17.87654d
+     *
+     * @param radec
+     * @return
+     */
+    def asBoth(radec: String, frame: EQ_FRAME = DEFAULT_FRAME, tag:Tag = DEFAULT_TAG,
+               catalogName: String = DEFAULT_CATNAME,
+               pmx:Double = DEFAULT_PMX, pmy:Double = DEFAULT_PMY): EqCoordinate = {
       val (ra, dec) = Angle.parseRaDe(radec)
-      new EqCoordinate(ra, dec)
+      apply(tag, ra, dec, frame, catalogName, ProperMotion(pmx, pmy))
     }
 
     //used by play-json
     implicit val eqFormat: OFormat[EqCoordinate] = Json.format[EqCoordinate]
-
-    /*
-    def apply(tag: Tag = BASE,
-              catalogName: String = "none",
-              frame: EQ_FRAME = ICRS,
-              pmx: Float = 0.0f,
-              pmy: Float = 0.0f): EqCoordinate = new EqCoordinateImpl(tag, catalogName, frame, "1.0", "2.0", pmx, pmy)
-   */
   }
+
   case object EqCoordinateKey extends SimpleKeyType[EqCoordinate]
 
-  implicit val tagFormat: OFormat[Tag] = Json.format[Tag]
-
-  //used by play-json
- // implicit val eqCoordinateFormat: OFormat[EqCoordinate] = Json.format[EqCoordinate]
 
 }
-/*
-val catNameKey = KeyType.StringKey.make("catalogName") // catalog name
-  val longKey = KeyType.StringKey.make("ra") // long = ra for equatorial-based frames
-  val latKey = KeyType.StringKey.make("dec") // lat = dec "" -- not sure this is necessary with this model
-  val epochKey = KeyType.DoubleKey.make("epoch")
-val equinoxKey = KeyType.DoubleKey.make("equinox")
-val pmxKey = KeyType.FloatKey.make("pmx")
-val pmyKey = KeyType.FloatKey.make("pmy")
-  val parallaxKey = KeyType.FloatKey.make(name = "parallax")
-  val velocityKey = KeyType.FloatKey.make(name = "rv")
- */
-// Equitorial coordinate frame
-
-// val frameKey = ChoiceKey.make("frame", ICRS_C, FK4_C, FK5_C)
