@@ -18,5 +18,6 @@ case class Options(
     port: Option[Int] = None,
     appConfigFile: Option[File] = None,
     delay: Option[Int] = None,
-    noExit: Boolean = false
+    noExit: Boolean = false,
+    asHttp: Boolean = false
 )

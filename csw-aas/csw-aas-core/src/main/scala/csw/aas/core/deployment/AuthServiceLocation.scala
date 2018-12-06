@@ -19,7 +19,7 @@ class AuthServiceLocation(locationService: LocationService) {
   private val logger = AuthLogger.getLogger
   import logger._
 
-  private val registrationName = "Keycloak"
+  private val registrationName = "AAS"
   private val componentId      = ComponentId(registrationName, ComponentType.Service)
   private val httpConnection   = HttpConnection(componentId)
 

@@ -50,6 +50,10 @@ class ArgsParser(name: String) {
       c.copy(noExit = true)
     } text "for testing: prevents application from exiting after running command"
 
+    opt[Unit]("http") action { (_, c) ⇒
+      c.copy(asHttp = true)
+    } text "flag to register http services"
+
     help("help")
     version("version")
   }

@@ -8,8 +8,8 @@ import csw.location.agent.commons.CoordinatedShutdownReasons.{FailureReason, Pro
 import csw.location.agent.commons.LocationAgentLogger
 import csw.location.agent.models.Command
 import csw.location.agent.wiring.Wiring
-import csw.location.api.models.Connection.TcpConnection
-import csw.location.api.models.{ComponentId, ComponentType, RegistrationResult, TcpRegistration}
+import csw.location.api.models.Connection.{HttpConnection, TcpConnection}
+import csw.location.api.models._
 import csw.logging.scaladsl.Logger
 
 import scala.collection.immutable.Seq
@@ -40,7 +40,11 @@ class LocationAgent(names: List[String], command: Command, wiring: Wiring) {
       Thread.sleep(command.delay)
 
       //Register all connections
-      val results = Await.result(Future.traverse(names)(registerName), 10.seconds)
+      val results = if (command.asHttp) {
+        Await.result(Future.traverse(names)(registerHttpName), 10.seconds)
+      } else {
+        Await.result(Future.traverse(names)(registerTcpName), 10.seconds)
+      }
       unregisterOnTermination(results)
 
       process
@@ -53,10 +57,17 @@ class LocationAgent(names: List[String], command: Command, wiring: Wiring) {
   // ================= INTERNAL API =================
 
   // Registers a single service as a TCP service
-  private def registerName(name: String): Future[RegistrationResult] = {
+  private def registerTcpName(name: String): Future[RegistrationResult] = {
     val componentId = ComponentId(name, ComponentType.Service)
     val connection  = TcpConnection(componentId)
     locationService.register(TcpRegistration(connection, command.port))
+  }
+
+  // Registers a single service as a HTTP service
+  private def registerHttpName(name: String): Future[RegistrationResult] = {
+    val componentId = ComponentId(name, ComponentType.Service)
+    val connection  = HttpConnection(componentId)
+    locationService.register(HttpRegistration(connection, command.port, ""))
   }
 
   // Registers a shutdownHook to handle service un-registration during abnormal exit
