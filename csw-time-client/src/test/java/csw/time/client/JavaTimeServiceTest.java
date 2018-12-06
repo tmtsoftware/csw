@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class JTimeServiceTest extends JUnitSuite {
+public class JavaTimeServiceTest extends JUnitSuite {
 
     private static int TaiOffset = 37;
     private TestProperties testProperties = TestProperties$.MODULE$.instance();

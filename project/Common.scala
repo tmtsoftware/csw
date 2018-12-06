@@ -39,8 +39,7 @@ object Common extends AutoPlugin {
     javacOptions in (Compile, doc) ++= Seq("-Xdoclint:none"),
     testOptions in Test ++= Seq(
       // show full stack traces and test case durations
-      Tests.Argument("-oDF"),
-      Tests.Argument("-l", "csw.time.client.tags.Linux")
+      Tests.Argument("-oDF")
     ),
     publishArtifact in (Test, packageBin) := true,
     version := {
