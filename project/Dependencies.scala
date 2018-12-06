@@ -291,7 +291,7 @@ object Dependencies {
 
   val DatabaseClient = Def.setting(
     Seq(
-      Libs.`postgresql` % "jooq",
+      Libs.`postgresql`,
       Libs.`scala-java8-compat`,
       Libs.`scala-async`,
       Slick.`slick`,
