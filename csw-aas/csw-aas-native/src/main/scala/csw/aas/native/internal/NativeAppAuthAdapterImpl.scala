@@ -3,10 +3,13 @@ package csw.aas.native.internal
 import csw.aas.core.TokenVerificationFailure.TokenExpired
 import csw.aas.core.TokenVerifier
 import csw.aas.core.token.AccessToken
+import csw.aas.core.utils.Conversions.RichEitherTFuture
 import csw.aas.native.api.{AuthStore, NativeAppAuthAdapter}
 import org.keycloak.adapters.installed.KeycloakInstalled
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.{DurationLong, FiniteDuration}
+import scala.language.implicitConversions
 
 private[aas] class NativeAppAuthAdapterImpl(
     val keycloakInstalled: KeycloakInstalled,
@@ -58,12 +61,12 @@ private[aas] class NativeAppAuthAdapterImpl(
         case e: Exception ⇒
           throw new RuntimeException(s"Error in refreshing token: try login before executing this command ${e.getMessage}")
       }
-      accessTokenStr.flatMap(tokenVerifier.verifyAndDecode(_).toOption)
+      accessTokenStr.flatMap(atr => tokenVerifier.verifyAndDecode(atr).block().toOption)
     }
 
     val mayBeAccessTokenVerification = maybeStore match {
-      case Some(store) => store.getAccessTokenString.map(tokenVerifier.verifyAndDecode)
-      case None        => Some(tokenVerifier.verifyAndDecode(keycloakInstalled.getTokenString))
+      case Some(store) => store.getAccessTokenString.map(atr => tokenVerifier.verifyAndDecode(atr).block())
+      case None        => Some(tokenVerifier.verifyAndDecode(keycloakInstalled.getTokenString).block())
     }
 
     mayBeAccessTokenVerification flatMap {

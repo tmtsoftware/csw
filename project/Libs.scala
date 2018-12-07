@@ -59,6 +59,11 @@ object Libs {
   val `os-lib`              = "com.lihaoyi"               %% "os-lib"             % "0.2.5"
 }
 
+object Typelevel {
+  val Version        = "1.1.0"
+  val `cats-effects` = "org.typelevel" %% "cats-effect" % Version
+}
+
 object Jackson {
   val Version                = "2.9.7"
   val `jackson-core`         = "com.fasterxml.jackson.core" % "jackson-core" % Version

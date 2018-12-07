@@ -329,6 +329,7 @@ object Dependencies {
       Keycloak.`keycloak-authz`,
       AkkaHttp.`akka-http`,
       Libs.`scala-async`,
+      Typelevel.`cats-effects`,
       //(legacy dependencies) required*
       Libs.`jboss-logging`,
       Libs.httpclient,

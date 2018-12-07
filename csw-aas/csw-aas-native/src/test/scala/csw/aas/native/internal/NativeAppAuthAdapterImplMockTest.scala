@@ -1,5 +1,6 @@
 package csw.aas.native.internal
 
+import cats.data.EitherT
 import csw.aas.core.TokenVerificationFailure.TokenExpired
 import csw.aas.core.TokenVerifier
 import csw.aas.core.token.AccessToken
@@ -12,9 +13,14 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationInt
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.language.implicitConversions
 
 //DEOPSCSW-575: Client Library for AAS to be accessed by CSW cli apps
 class NativeAppAuthAdapterImplMockTest extends FunSuite with MockitoSugar with Matchers {
+
+  implicit def wrapEither[A, B](either: Either[A, B]): EitherT[Future, A, B] = EitherT[Future, A, B](Future.successful(either))
 
   class AuthMocks {
     val keycloakInstalled: KeycloakInstalled     = mock[KeycloakInstalled]
