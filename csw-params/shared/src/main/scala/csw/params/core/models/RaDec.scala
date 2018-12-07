@@ -55,10 +55,30 @@ object PositionsHelpers {
     override def toString: String = s"$pmx/$pmy"
   }
 
-  case class EqCoordinate(tag: Tag, ra: Angle, dec: Angle, frame: EQ_FRAME, catalogName: String, pm: ProperMotion) {
+  trait Coordinate {
+    def tag: Tag
+  }
+
+  object Coordinate {
+    implicit val format: Format[Coordinate] = new Format[Coordinate] {
+      override def writes(obj: Coordinate): JsValue = JsString(obj.tag.toString)
+      override def reads(json: JsValue): JsResult[Coordinate] = {
+        val x:String = json.as[String]
+        JsSuccess(EqCoordinate(ra = 15.0, dec = 60.0))
+      }
+    }
+  }
+
+  case class EqCoordinate(tag: Tag, ra: Angle, dec: Angle, frame: EQ_FRAME, catalogName: String, pm: ProperMotion) extends Coordinate {
+
+    def withPM(pmx: Double, pmy:Double): EqCoordinate = this.copy(pm = ProperMotion(pmx, pmy))
 
     override def toString(): String = s"${Angle.raToString(ra.toRadian)}  ${Angle.deToString(dec.toRadian)}" +
       s" ${frame.toString} $catalogName ${tag} ${pm.toString}"
+  }
+
+  case class AltAzCoordinate(tag: Tag, alt: Angle, az: Angle) {
+    override def toString(): String = s"${alt.toDegree}  ${az.toDegree}"
   }
 
   object ProperMotion {
@@ -112,9 +132,12 @@ object PositionsHelpers {
 
     //used by play-json
     implicit val eqFormat: OFormat[EqCoordinate] = Json.format[EqCoordinate]
+
+
   }
 
   case object EqCoordinateKey extends SimpleKeyType[EqCoordinate]
 
+  case object CoordinateKey extends SimpleKeyType[Coordinate]
 
 }
