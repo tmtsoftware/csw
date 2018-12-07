@@ -14,6 +14,7 @@ import org.scalatest.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.FiniteDuration;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -45,6 +46,15 @@ public class JavaTimeServiceTest extends JUnitSuite {
         assertEquals((double)expectedMillis, (double)utcInstant.value().toEpochMilli(), 5.0); // Scala test uses +-5...
     }
 
+    //DEOPSCSW-537: Optimum way for conversion from UTC to TAI
+    @Test
+    public void shouldConvertUtcToTai(){
+        UtcInstant utcInstant = jTimeService.utcTime();
+        TaiInstant taiInstant = jTimeService.toTai(utcInstant);
+
+        assertEquals(Duration.between(utcInstant.value(),taiInstant.value()).getSeconds(), TaiOffset);
+    }
+
     //DEOPSCSW-536: Access parts of TAI date/time in Java and Scala
     //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
     @Test
@@ -63,6 +73,17 @@ public class JavaTimeServiceTest extends JUnitSuite {
         assertEquals(TaiOffset, jTimeService.taiOffset());
     }
 
+    //DEOPSCSW-537: Optimum way for conversion from UTC to TAI
+    @Test
+    public void shouldConvertTaiToUtc(){
+        TaiInstant taiInstant = jTimeService.taiTime();
+        UtcInstant utcInstant = jTimeService.toUtc(taiInstant);
+
+        assertEquals(Duration.between(utcInstant.value(),taiInstant.value()).getSeconds(), TaiOffset);
+    }
+
+
+    //DEOPSCSW-542: Schedule a task to execute in future
     @Test
     public void shouldScheduleTaskAtStartTime(){
         ActorSystem actorSystem = ActorSystem.create("time-service");

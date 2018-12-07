@@ -31,4 +31,7 @@ class TimeServiceImpl(clock: TMTClock)(implicit actorSystem: ActorSystem) extend
 
   private[time] def setTaiOffset(offset: Int): Unit = clock.setOffset(offset)
 
+  override def toTai(utcInstant: UtcInstant): TaiInstant = TaiInstant(utcInstant.value.plusSeconds(clock.offset))
+
+  override def toUtc(taiInstant: TaiInstant): UtcInstant = UtcInstant(taiInstant.value.minusSeconds(clock.offset))
 }

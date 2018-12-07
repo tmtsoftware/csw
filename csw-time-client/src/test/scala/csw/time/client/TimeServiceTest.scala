@@ -48,6 +48,15 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
     eventually(timeService.utcTime().value.formatNanos(precision) should not endWith "000")
   }
 
+  //DEOPSCSW-537: Optimum way for conversion from UTC to TAI
+  test("should convert UTC time to TAI time") {
+    val utcInstant = timeService.utcTime()
+
+    val taiInstant = timeService.toTai(utcInstant)
+
+    Duration.between(utcInstant.value, taiInstant.value).getSeconds shouldBe TaiOffset
+  }
+
   //------------------------------TAI-------------------------------
 
   //DEOPSCSW-535: Synchronize activities with other comp, using TAI
@@ -74,6 +83,15 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
   test("should get TAI offset") {
     val offset = timeService.taiOffset()
     offset shouldEqual TaiOffset
+  }
+
+  //DEOPSCSW-537: Optimum way for conversion from UTC to TAI
+  test("should convert TAI time to UTC time") {
+    val taiInstant = timeService.taiTime()
+
+    val utcInstant = timeService.toUtc(taiInstant)
+
+    Duration.between(utcInstant.value, taiInstant.value).getSeconds shouldBe TaiOffset
   }
 
   //------------------------------Scheduling-------------------------------

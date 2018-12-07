@@ -13,5 +13,7 @@ class JTimeServiceImpl(timeService: TimeService) extends ITimeService {
   override def scheduleOnce(startTime: CswInstant.TaiInstant, task: Runnable): Cancellable =
     timeService.scheduleOnce(startTime)(task.run())
 
-  override private[time] def setTaiOffset(offset: Int): Unit = timeService.setTaiOffset(offset)
+  override private[time] def setTaiOffset(offset: Int): Unit                   = timeService.setTaiOffset(offset)
+  override def toTai(utcInstant: CswInstant.UtcInstant): CswInstant.TaiInstant = timeService.toTai(utcInstant)
+  override def toUtc(taiInstant: CswInstant.TaiInstant): CswInstant.UtcInstant = timeService.toUtc(taiInstant)
 }
