@@ -182,7 +182,7 @@ function start_sentinel() {
 function start_AAS() {
     if [ -x "$location_agent_script" ]; then
         echo "[AAS] Starting Auth server..."
-        nohup ./csw-location-agent --name AAS -c "./configure.sh -p $AAS_port -u $AAS_admin_user --password $AAS_admin_password" -p "$AAS_port" > ${AASLogFile} 2>&1 &
+        nohup ./csw-location-agent --name AAS --http -c "./configure.sh -p $AAS_port -u $AAS_admin_user --password $AAS_admin_password" -p "$AAS_port" > ${AASLogFile} 2>&1 &
         echo $! > ${AASPidFile}
         echo ${AAS_port} > ${AASPortFile}
     else
