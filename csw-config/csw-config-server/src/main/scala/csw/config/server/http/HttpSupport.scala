@@ -4,9 +4,10 @@ import java.nio.file.{Path, Paths}
 import java.time.Instant
 import java.util.regex.{Pattern, PatternSyntaxException}
 
+import akka.http.javadsl.model.headers.Authorization
 import akka.http.scaladsl.marshalling.{Marshaller, ToEntityMarshaller}
 import akka.http.scaladsl.model.headers.HttpEncoding
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpRequest}
+import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpHeader, HttpRequest}
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.directives.{DebuggingDirectives, LoggingMagnet}
 import akka.http.scaladsl.unmarshalling.{FromEntityUnmarshaller, Unmarshaller}
@@ -15,12 +16,15 @@ import csw.config.api.internal.JsonSupport
 import csw.config.api.models.{ConfigData, ConfigId, FileType}
 import csw.config.server.commons.{ConfigServerLogger, PathValidator}
 import csw.logging.scaladsl.Logger
+import csw.params.extensions.OptionConverters.RichOptional
 
 /**
  * Helper class for ConfigServiceRoute
  */
 trait HttpSupport extends Directives with JsonSupport {
-  private val log: Logger = ConfigServerLogger.getLogger
+  private val log: Logger         = ConfigServerLogger.getLogger
+  private val authorizationHeader = "authorization"
+  private val maskedToken         = "***********"
 
   def prefix(prefix: String): Directive1[Path] = path(prefix / Remaining).flatMap { path =>
     validate(PathValidator.isValid(path), PathValidator.message(path)).tmap[Path] { _ =>
@@ -29,11 +33,24 @@ trait HttpSupport extends Directives with JsonSupport {
   }
 
   // log every request when received at HttpServer
-  private def logRequest(req: HttpRequest): Unit =
+  private def logRequest(req: HttpRequest): Unit = {
+    val maskedHeader: Option[HttpHeader] = req
+      .getHeader(authorizationHeader)
+      .asScala
+      .map(_ ⇒ Authorization.oauth2(maskedToken))
+
+    val maskedReq = maskedHeader match {
+      case Some(header) ⇒ req.removeHeader(authorizationHeader).addHeader(header)
+      case None         ⇒ req
+    }
+
     log.info(
       "HTTP request received",
-      Map("url" → req.uri.toString(), "method" → req.method.value.toString, "headers" → req.headers.mkString(","))
+      Map("url"     → maskedReq.uri.toString(),
+          "method"  → maskedReq.method.value.toString,
+          "headers" → maskedReq.headers.mkString(","))
     )
+  }
   val routeLogger: Directive0 = DebuggingDirectives.logRequest(LoggingMagnet(_ => logRequest))
 
   val idParam: Directive1[Option[ConfigId]]  = parameter('id.?).map(_.map(new ConfigId(_)))
