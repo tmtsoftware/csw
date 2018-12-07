@@ -35,10 +35,10 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
   test("test parser for http command line argument") {
     val port     = 5555
     val services = "aas"
-    val args     = Array("--name", services, "--port", port.toString, "--command", "sleep 5", "--http")
+    val args     = Array("--name", services, "--port", port.toString, "--command", "sleep 5", "--http", "testPath")
 
     val x: Option[Options] = silentParse(args)
-    x should contain(Options(List("aas"), Some("sleep 5"), Some(port), None, None, asHttp = true))
+    x should contain(Options(List("aas"), Some("sleep 5"), Some(port), None, None, httpPath = Some("testPath")))
   }
 
   test("test parser with invalid service name combinations") {

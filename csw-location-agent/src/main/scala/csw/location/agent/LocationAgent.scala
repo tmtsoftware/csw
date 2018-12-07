@@ -40,9 +40,11 @@ class LocationAgent(names: List[String], command: Command, wiring: Wiring) {
       Thread.sleep(command.delay)
 
       //Register all connections as Http or Tcp
-      val results =
-        if (command.asHttp) Await.result(Future.traverse(names)(registerHttpName), 10.seconds)
-        else Await.result(Future.traverse(names)(registerTcpName), 10.seconds)
+      val results = command.httpPath match {
+        case Some(path) ⇒ Await.result(Future.traverse(names)(name ⇒ registerHttpName(name, path)), 10.seconds)
+        case None       ⇒ Await.result(Future.traverse(names)(registerTcpName), 10.seconds)
+      }
+
       unregisterOnTermination(results)
 
       process
@@ -60,10 +62,10 @@ class LocationAgent(names: List[String], command: Command, wiring: Wiring) {
   }
 
   // Registers a single service as a HTTP service
-  private def registerHttpName(name: String): Future[RegistrationResult] = {
+  private def registerHttpName(name: String, path: String): Future[RegistrationResult] = {
     val componentId = ComponentId(name, ComponentType.Service)
     val connection  = HttpConnection(componentId)
-    locationService.register(HttpRegistration(connection, command.port, ""))
+    locationService.register(HttpRegistration(connection, command.port, path))
   }
 
   // Registers a shutdownHook to handle service un-registration during abnormal exit

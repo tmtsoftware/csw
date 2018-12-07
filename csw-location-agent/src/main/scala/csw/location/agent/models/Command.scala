@@ -12,7 +12,7 @@ import csw.location.agent.utils.{OptionsHandler, Utils}
  * @param delay Number of milliseconds
  * @param noExit prevents application from exiting after running the command
  */
-case class Command(commandText: String, port: Int, delay: Int, noExit: Boolean, asHttp: Boolean)
+case class Command(commandText: String, port: Int, delay: Int, noExit: Boolean, httpPath: Option[String])
 
 object Command {
   val defaultDelay = 1000
@@ -24,6 +24,6 @@ object Command {
       .stringOpt("command", options.command)
       .getOrElse("false") //if command is not specified, registration will proceed with "false" command.
       .replace("%port", port.toString)
-    Command(command, port, options.delay.getOrElse(defaultDelay), options.noExit, options.asHttp)
+    Command(command, port, options.delay.getOrElse(defaultDelay), options.noExit, options.httpPath)
   }
 }

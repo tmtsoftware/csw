@@ -41,8 +41,9 @@ class MainTest extends ScalaTestFrameworkTestKit with FunSuiteLike {
   test("Test with command line args with http option") {
     val name = "test3"
     val port = 9998
-    val args = Array("--name", name, "--command", "sleep 200", "--port", port.toString, "--no-exit", "--http")
-    testWithHttp(args, name, port)
+    val path = "testPath"
+    val args = Array("--name", name, "--command", "sleep 200", "--port", port.toString, "--no-exit", "--http", path)
+    testWithHttp(args, name, port, path)
   }
 
   test("Test with config file") {
@@ -69,14 +70,14 @@ class MainTest extends ScalaTestFrameworkTestKit with FunSuiteLike {
     eventually(locationService.list.await shouldBe List.empty)
   }
 
-  private def testWithHttp(args: Array[String], name: String, port: Int) = {
+  private def testWithHttp(args: Array[String], name: String, port: Int, path: String) = {
     val process = Main.start(args).get
 
     val connection       = HttpConnection(ComponentId(name, ComponentType.Service))
     val resolvedLocation = locationService.resolve(connection, 5.seconds).await.get
 
     resolvedLocation.connection shouldBe connection
-    resolvedLocation.uri shouldBe new URI(s"http://${Networks().hostname}:$port/")
+    resolvedLocation.uri shouldBe new URI(s"http://${Networks().hostname}:$port/$path")
 
     process.destroy()
     eventually(locationService.list.await shouldBe List.empty)
