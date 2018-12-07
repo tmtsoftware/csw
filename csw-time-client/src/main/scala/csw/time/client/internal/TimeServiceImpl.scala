@@ -17,9 +17,9 @@ class TimeServiceImpl(clock: TMTClock)(implicit actorSystem: ActorSystem) extend
   override def taiTime(): TaiInstant = clock.taiInstant
   override def taiOffset(): Int      = clock.offset
 
-  override def scheduleOnce(startTime: TaiInstant)(task: => Unit): Cancellable = {
+  override def scheduleOnce(startTime: TaiInstant)(task: Runnable): Cancellable = {
     val delay                 = delayFrom(startTime)
-    val underlyingCancellable = actorSystem.scheduler.scheduleOnce(delay)(task)(actorSystem.dispatcher)
+    val underlyingCancellable = actorSystem.scheduler.scheduleOnce(delay)(task.run())(actorSystem.dispatcher)
     underlyingCancellable.toTsCancellable
   }
 

@@ -3,12 +3,12 @@ package csw.time.client;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.testkit.TestProbe;
-import csw.time.api.javadsl.ITimeService;
 import csw.time.api.models.Cancellable;
 import csw.time.api.models.CswInstant.TaiInstant;
 import csw.time.api.models.CswInstant.UtcInstant;
+import csw.time.api.scaladsl.TimeService;
+import csw.time.client.extensions.RichInstant;
 import org.junit.AfterClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.scalatest.junit.JUnitSuite;
 import scala.concurrent.Await;
@@ -17,9 +17,9 @@ import scala.concurrent.duration.FiniteDuration;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class JavaTimeServiceTest extends JUnitSuite {
@@ -28,12 +28,14 @@ public class JavaTimeServiceTest extends JUnitSuite {
     private TestProperties testProperties = TestProperties$.MODULE$.instance();
 
     private static ActorSystem system = ActorSystem.create("time-service");
-    private static ITimeService jTimeService = TimeServiceFactory.jMake(TaiOffset, system);
+    private static TimeService jTimeService = TimeServiceFactory.make(TaiOffset, system);
 
     @AfterClass
     public static void teardown() throws Exception {
         Await.result( system.terminate(), FiniteDuration.create(5, TimeUnit.SECONDS));
     }
+
+    //------------------------------UTC-------------------------------
 
     //DEOPSCSW-533: Access parts of UTC date.time in Java and Scala
     @Test
@@ -54,6 +56,16 @@ public class JavaTimeServiceTest extends JUnitSuite {
 
         assertEquals(Duration.between(utcInstant.value(),taiInstant.value()).getSeconds(), TaiOffset);
     }
+
+    //DEOPSCSW-534: PTP accuracy and precision while reading UTC
+    @Test
+    public void shouldGetMaximumPrecisionSupportedBySystemInUtc(){
+
+        assertFalse(new RichInstant().formatNanos(testProperties.precision(),  jTimeService.utcTime().value()).endsWith("000"));
+
+    }
+
+    //------------------------------TAI-------------------------------
 
     //DEOPSCSW-536: Access parts of TAI date/time in Java and Scala
     //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
@@ -82,12 +94,20 @@ public class JavaTimeServiceTest extends JUnitSuite {
         assertEquals(Duration.between(utcInstant.value(),taiInstant.value()).getSeconds(), TaiOffset);
     }
 
+    //DEOPSCSW-538: PTP accuracy and precision while reading TAI
+    @Test
+    public void shouldGetMaximumPrecisionSupportedBySystemInTai(){
+
+        assertFalse(new RichInstant().formatNanos(testProperties.precision(), jTimeService.taiTime().value()).endsWith("000"));
+
+    }
+
+    //------------------------------Scheduling-------------------------------
 
     //DEOPSCSW-542: Schedule a task to execute in future
     @Test
     public void shouldScheduleTaskAtStartTime(){
-        ActorSystem actorSystem = ActorSystem.create("time-service");
-        TestProbe testProbe = new TestProbe(actorSystem);
+        TestProbe testProbe = new TestProbe(system);
 
         TaiInstant idealScheduleTime = new TaiInstant(jTimeService.taiTime().value().plusSeconds(1));
 
