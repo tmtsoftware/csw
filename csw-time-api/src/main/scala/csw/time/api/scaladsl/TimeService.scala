@@ -10,11 +10,9 @@ trait TimeService {
 
   def taiTime(): TaiInstant
 
-  def taiOffset(): Int
+  def toUtc(taiInstant: TaiInstant): UtcInstant
 
   def toTai(utcInstant: UtcInstant): TaiInstant
-
-  def toUtc(taiInstant: TaiInstant): UtcInstant
 
   def scheduleOnce(startTime: TaiInstant)(task: Runnable): Cancellable
 

@@ -1,10 +1,10 @@
-package csw.time.client.extensions
+package csw.time.client
 
 import java.time.Instant
 
-class RichInstant {
+class TestUtil {
 
-  def formatNanos(precision: Int, instant: Instant): String = {
+  def formatWithPrecision(instant: Instant, precision: Int): String = {
     val nanos = instant.getNano
     val d     = Math.pow(10, 9 - precision).toInt
     (nanos / d).toString

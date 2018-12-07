@@ -10,9 +10,9 @@ import csw.time.api.models.Cancellable;
 import csw.time.api.models.CswInstant.TaiInstant;
 import csw.time.api.models.CswInstant.UtcInstant;
 import csw.time.api.scaladsl.TimeService;
-import csw.time.client.extensions.RichInstant;
 import org.junit.Rule;
 import org.junit.Test;
+import org.scalatest.junit.JUnitSuite;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -22,17 +22,19 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-public class TimeServiceTest {
+public class TimeServiceTest extends JUnitSuite {
     @Rule
     public TestKitJunitResource testKit = new TestKitJunitResource(ManualTime.config());
 
     private static int TaiOffset = 37;
+    private TestUtil testUtil = new TestUtil();
     private TestProperties testProperties = TestProperties$.MODULE$.instance();
-
     private ActorSystem untypedSystem = ActorSystemAdapter.toUntyped(testKit.system());
+    private ManualTime manualTime = ManualTime.get(testKit.system());
+
     private TimeService timeService = TimeServiceFactory.make(TaiOffset, untypedSystem);
 
-    private ManualTime manualTime = ManualTime.get(testKit.system());
+
 
     //------------------------------UTC-------------------------------
 
@@ -60,7 +62,7 @@ public class TimeServiceTest {
     //DEOPSCSW-534: PTP accuracy and precision while reading UTC
     @Test
     public void should_get_maximum_precision_supported_by_system_in_utc(){
-        assertFalse(new RichInstant().formatNanos(testProperties.precision(),  timeService.utcTime().value()).endsWith("000"));
+        assertFalse(new TestUtil().formatWithPrecision(timeService.utcTime().value(), testProperties.precision()).endsWith("000"));
     }
 
     //------------------------------TAI-------------------------------
@@ -77,12 +79,6 @@ public class TimeServiceTest {
         assertEquals(expectedMillis, taiInstant.value().toEpochMilli());
     }
 
-    //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
-    @Test
-    public void should_get_tai_offset(){
-        assertEquals(TaiOffset, timeService.taiOffset());
-    }
-
     //DEOPSCSW-537: Scala and Java API for conversion between TAI and UTC
     //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
     @Test
@@ -96,7 +92,7 @@ public class TimeServiceTest {
     //DEOPSCSW-538: PTP accuracy and precision while reading TAI
     @Test
     public void should_get_maximum_precision_supported_by_system_in_tai(){
-        assertFalse(new RichInstant().formatNanos(testProperties.precision(), timeService.taiTime().value()).endsWith("000"));
+        assertFalse(testUtil.formatWithPrecision(timeService.taiTime().value(), testProperties.precision()).endsWith("000"));
     }
 
     //------------------------------Scheduling-------------------------------
