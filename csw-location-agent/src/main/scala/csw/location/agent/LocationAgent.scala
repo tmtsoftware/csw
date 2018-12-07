@@ -40,11 +40,9 @@ class LocationAgent(names: List[String], command: Command, wiring: Wiring) {
       Thread.sleep(command.delay)
 
       //Register all connections as Http or Tcp
-      val results = if (command.asHttp) {
-        Await.result(Future.traverse(names)(registerHttpName), 10.seconds)
-      } else {
-        Await.result(Future.traverse(names)(registerTcpName), 10.seconds)
-      }
+      val results =
+        if (command.asHttp) Await.result(Future.traverse(names)(registerHttpName), 10.seconds)
+        else Await.result(Future.traverse(names)(registerTcpName), 10.seconds)
       unregisterOnTermination(results)
 
       process
@@ -84,7 +82,7 @@ class LocationAgent(names: List[String], command: Command, wiring: Wiring) {
   private def unregisterServices(results: Seq[RegistrationResult]): Future[Done] = {
     log.info("Shutdown hook reached, un-registering connections", Map("services" → results.map(_.location.connection.name)))
     Future.traverse(results)(_.unregister()).map { _ =>
-      log.info(s"Services are unregistered")
+      log.info("Services are unregistered")
       Done
     }
   }

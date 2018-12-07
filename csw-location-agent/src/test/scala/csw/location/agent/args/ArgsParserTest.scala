@@ -31,6 +31,16 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
     x should contain(Options(List("redis", "alarm", "watchdog"), Some("sleep 5"), Some(port), None, None))
   }
 
+  // DEOPSCSW-628: Add support for registering service as HTTP in location agent
+  test("test parser for http command line argument") {
+    val port     = 5555
+    val services = "aas"
+    val args     = Array("--name", services, "--port", port.toString, "--command", "sleep 5", "--http")
+
+    val x: Option[Options] = silentParse(args)
+    x should contain(Options(List("aas"), Some("sleep 5"), Some(port), None, None, asHttp = true))
+  }
+
   test("test parser with invalid service name combinations") {
     val port = 5555
     val listOfInvalidServices: List[String] =
