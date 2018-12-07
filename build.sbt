@@ -353,15 +353,8 @@ lazy val `csw-testkit` = project
 /* ================= Database Service ============== */
 
 lazy val `csw-database-client` = project
-//  .enablePlugins(JooqCodegen)
   .dependsOn(`csw-location-api`)
-  .settings(
-    jooqVersion := "3.11.7",
-    jooqCodegenConfig := baseDirectory.value / "jooq-codegen.xml",
-    jooqCodegenStrategy:= CodegenStrategy.Never,
-    parallelExecution in Test := false,
-    libraryDependencies ++= Dependencies.DatabaseClient.value
-  )
+  .settings(libraryDependencies ++= Dependencies.DatabaseClient.value)
 
 /* =============== Common Utilities ============ */
 lazy val `csw-network-utils` = project
