@@ -53,12 +53,12 @@ object DeployApp extends AutoPlugin {
   override def projectSettings: Seq[Setting[_]] =
     SettingsHelper.makeDeploymentSettings(Universal, packageBin in Universal, "zip") ++
     SettingsHelper.makeDeploymentSettings(UniversalDocs, packageBin in UniversalDocs, "zip") ++ Seq(
-      target in Universal := baseDirectory.value.getParentFile / "target" / "universal",
+      target in Universal := file(".") / "target" / "universal",
       mappings in Universal := (mappings in Universal).value ++ scriptsAndConfsMapping.value
     )
 
   private def scriptsAndConfsMapping = Def.task {
-    val scriptsDir       = baseDirectory.value.getParentFile / "scripts"
+    val scriptsDir       = file(".") / "scripts"
     val authServerDir    = scriptsDir / "csw-auth" / "prod"
     val serviceScript    = scriptsDir / "csw-services.sh"
     val prodScript       = scriptsDir / "redis-sentinel-prod.sh"
