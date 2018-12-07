@@ -9,6 +9,7 @@ A utility application that starts a given external program, registers a comma se
 * **`--port`** the optional port number the application listens on (default: use value of $name.port from config file, or use a random, free port.)
 * **<app-config>** an optional config file in HOCON format. Will be automatically picked based on --names parameter (Options specified as: $name.command, $name.port, etc.)
 * **`--delay`** the number of milliseconds to wait for the app to start before registering it with the Location Service (default: 1000)
+* **`--http`** is an optional parameter. To register services as Http. (default: false, i.e Services will be registered as Tcp)
 * **`--no-exit`** For testing: prevents application from exiting after running command
 * **`--help`** Prints the help message.
 * **`--version`** Prints the version of the application.
@@ -29,17 +30,23 @@ Application will sleep for 30 seconds. Then, will register a service named foo o
 
 3. 
 ```
-csw-location-agent --name "myHttpService" --command "python -m SimpleHTTPServer 8080" --port 8080
+csw-location-agent --name "myHttpServiceAsTcp" --command "python -m SimpleHTTPServer 8080" --port 8080
 ```  
-Application will start a simple HTTP service on port 8080. Then, will register myHttpService as a TCP service with Location Service.
+Application will start a simple HTTP service on port 8080. Then, will register myHttpServiceAsTcp as a TCP service with Location Service.
 
 4. 
+```
+csw-location-agent --name "myHttpServiceAsHttp" --command "python -m SimpleHTTPServer 8080" --port 8080 --http
+```  
+Application will start a simple HTTP service on port 8080. Then, will register myHttpServiceAsHttp as a Http service with Location Service.
+
+5. 
 ```
 csw-location-agent --help
 ```  
 Prints help message
 
-5. 
+6. 
 ```
 csw-location-agent --version
 ```  

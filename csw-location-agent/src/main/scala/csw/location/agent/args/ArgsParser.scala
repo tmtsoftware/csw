@@ -52,7 +52,7 @@ class ArgsParser(name: String) {
 
     opt[Unit]("http") action { (_, c) ⇒
       c.copy(asHttp = true)
-    } text "flag to register http services"
+    } text "flag to register services as Http"
 
     help("help")
     version("version")

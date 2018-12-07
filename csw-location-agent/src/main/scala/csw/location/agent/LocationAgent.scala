@@ -39,7 +39,7 @@ class LocationAgent(names: List[String], command: Command, wiring: Wiring) {
       // delay the registration of component after executing the command
       Thread.sleep(command.delay)
 
-      //Register all connections
+      //Register all connections as Http or Tcp
       val results = if (command.asHttp) {
         Await.result(Future.traverse(names)(registerHttpName), 10.seconds)
       } else {
