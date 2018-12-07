@@ -8,16 +8,6 @@ import com.typesafe.config.{Config, ConfigFactory, ConfigResolveOptions}
 object Utils {
 
   /**
-   * Finds a random, free port to use
-   */
-  def getFreePort: Int = {
-    val sock = new ServerSocket(0)
-    val port = sock.getLocalPort
-    sock.close()
-    port
-  }
-
-  /**
    * Returns an `Option` of `Config` pointed by the file parameter, else None.
    */
   def getAppConfig(file: File): Option[Config] =

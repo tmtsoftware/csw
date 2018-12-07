@@ -2,6 +2,7 @@ package csw.location.agent.utils
 
 import com.typesafe.config.Config
 import csw.location.agent.args.Options
+import csw.network.utils.SocketUtils
 
 /**
  * Exposes utility methods to parse string, int, port options.
@@ -23,5 +24,5 @@ final case class OptionsHandler(options: Options, appConfig: Option[Config]) {
     stringOpt(str, arg.map(_.toString)).map(_.toInt)
 
   def portOpt(portKey: String, portValue: Option[Int]): Int =
-    intOpt(portKey, portValue).getOrElse(Utils.getFreePort)
+    intOpt(portKey, portValue).getOrElse(SocketUtils.getFreePort)
 }

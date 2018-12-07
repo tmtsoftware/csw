@@ -17,7 +17,7 @@ private[agent] class ActorRuntime(_actorSystem: ActorSystem) {
   implicit val mat: Materializer            = ActorMaterializer()
   implicit val scheduler: Scheduler         = system.scheduler
 
-  val coordinatedShutdown = CoordinatedShutdown(system)
+  val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(system)
 
   def startLogging(name: String): LoggingSystem =
     LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, system)

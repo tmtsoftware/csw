@@ -47,9 +47,7 @@ class LocationAgent(names: List[String], command: Command, wiring: Wiring) {
 
       process
     } catch {
-      case NonFatal(ex) ⇒
-        shutdown(FailureReason(ex))
-        throw ex
+      case NonFatal(ex) ⇒ shutdown(FailureReason(ex)); throw ex
     }
 
   // ================= INTERNAL API =================
