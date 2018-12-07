@@ -23,9 +23,12 @@ object JooqExtentions {
 
   implicit class RichQueries(val queries: Queries) extends AnyVal {
     def executeBatchAsync()(implicit ec: ExecutionContext): Future[List[Int]] = {
-      concurrent.blocking(
-        Future { queries.executeBatch().toList }
-      )
+      Future {
+        concurrent.blocking {
+          queries.executeBatch().toList
+        }
+      }
     }
   }
+
 }

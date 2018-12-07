@@ -48,7 +48,7 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
     // assert creation of database
     val getDatabaseQuery = dsl.resultQuery("SELECT datname FROM pg_database WHERE datistemplate = false")
 
-    val resultSet = getDatabaseQuery.fetchAsyncScala[String].futureValue
+    val resultSet = getDatabaseQuery.fetchAsyncScala[String].futureValue(Interval(Span(5, Seconds)))
 
     resultSet should contain("box_office")
 
