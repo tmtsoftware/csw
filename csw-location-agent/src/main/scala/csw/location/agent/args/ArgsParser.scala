@@ -52,7 +52,7 @@ class ArgsParser(name: String) {
 
     opt[String]("http") action { (p, c) ⇒
       c.copy(httpPath = Some(p))
-    } text "flag to register services as Http, by default services will be registered as tcp "
+    } text "The parameter is optional. Registers services as http with path provided, by default services will be registered as tcp "
 
     help("help")
     version("version")

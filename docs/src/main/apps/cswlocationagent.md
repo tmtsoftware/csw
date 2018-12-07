@@ -9,7 +9,7 @@ A utility application that starts a given external program, registers a comma se
 * **`--port`** the optional port number the application listens on (default: use value of $name.port from config file, or use a random, free port.)
 * **<app-config>** an optional config file in HOCON format. Will be automatically picked based on --names parameter (Options specified as: $name.command, $name.port, etc.)
 * **`--delay`** the number of milliseconds to wait for the app to start before registering it with the Location Service (default: 1000)
-* **`--http`** is an optional parameter. To register services as Http. (default: false, i.e Services will be registered as Tcp)
+* **`--http`** is an optional parameter. To register services as Http with provided path. (default: none, i.e Services will be registered as Tcp)
 * **`--no-exit`** For testing: prevents application from exiting after running command
 * **`--help`** Prints the help message.
 * **`--version`** Prints the version of the application.
@@ -36,9 +36,9 @@ Application will start a simple HTTP service on port 8080. Then, will register m
 
 4. 
 ```
-csw-location-agent --name "myHttpServiceAsHttp" --command "python -m SimpleHTTPServer 8080" --port 8080 --http
+csw-location-agent --name "myHttpServiceAsHttp" --command "python -m SimpleHTTPServer 8080" --port 8080 --http "path"
 ```  
-Application will start a simple HTTP service on port 8080. Then, will register myHttpServiceAsHttp as a Http service with Location Service.
+Application will start a simple HTTP service on port 8080. Then, will register myHttpServiceAsHttp as a Http service with provided path with Location Service.
 
 5. 
 ```

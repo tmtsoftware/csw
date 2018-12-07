@@ -61,7 +61,7 @@ class LocationAgent(names: List[String], command: Command, wiring: Wiring) {
     locationService.register(TcpRegistration(connection, command.port))
   }
 
-  // Registers a single service as a HTTP service
+  // Registers a single service as a HTTP service with provided path
   private def registerHttpName(name: String, path: String): Future[RegistrationResult] = {
     val componentId = ComponentId(name, ComponentType.Service)
     val connection  = HttpConnection(componentId)

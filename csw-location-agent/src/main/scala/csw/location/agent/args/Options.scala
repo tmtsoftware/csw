@@ -11,7 +11,7 @@ import java.io.File
  * @param appConfigFile Optional config file in HOCON format
  * @param delay         Number of milliseconds to wait for the app to start
  * @param noExit        For testing, prevents application from exiting after running the command
- * @param httpPath      For registering services as Http location with the given root path
+ * @param httpPath      For registering services as Http location with the given path
  */
 case class Options(
     names: List[String] = Nil,
