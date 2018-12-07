@@ -283,19 +283,12 @@ object Dependencies {
     )
   )
 
-  val DatabaseApi = Def.setting(
-    Seq(
-      Slick.`slick`
-    )
-  )
-
   val DatabaseClient = Def.setting(
     Seq(
       Libs.`postgresql`,
       Libs.`scala-java8-compat`,
       Libs.`scala-async`,
-      Slick.`slick`,
-      Slick.`slick-hikaricp`,
+      Libs.`hikaricp`,
       Jooq.`jooq`,
       Jooq.`jooq-meta`,
       Jooq.`jooq-codegen`,

@@ -26,7 +26,6 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-aas`,
   `csw-time-api`,
   `csw-time-client`,
-  `csw-database-api`,
   `csw-database-client`,
   `csw-network-utils`,
   `csw-commons`,
@@ -353,14 +352,9 @@ lazy val `csw-testkit` = project
 
 /* ================= Database Service ============== */
 
-lazy val `csw-database-api` = project
-  .settings(
-    libraryDependencies ++= Dependencies.DatabaseApi.value
-  )
-
 lazy val `csw-database-client` = project
 //  .enablePlugins(JooqCodegen)
-  .dependsOn(`csw-database-api`, `csw-location-api`)
+  .dependsOn(`csw-location-api`)
   .settings(
     jooqVersion := "3.11.7",
     jooqCodegenConfig := baseDirectory.value / "jooq-codegen.xml",
