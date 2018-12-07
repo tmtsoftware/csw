@@ -37,6 +37,7 @@ class MainTest extends ScalaTestFrameworkTestKit with FunSuiteLike {
     testWithTcp(args, name, port)
   }
 
+  //DEOPSCSW-628: Add support for registering service as HTTP in location agent
   test("Test with command line args with http option") {
     val name = "test3"
     val port = 9998

@@ -14,6 +14,7 @@ import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.Future
 
+//DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
 class PermissionPolicyTest extends FunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
   test("permission policy should return AuthenticationFailedRejection when token is invalid") {

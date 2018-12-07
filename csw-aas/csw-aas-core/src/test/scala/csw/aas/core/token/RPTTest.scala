@@ -15,6 +15,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.ExecutionContext.Implicits.global
 
+// DEOPSCSW-578: Programming Interface for accessing userinfo
 class RPTTest extends FunSuite with MockitoSugar with Matchers with ScalaFutures {
 
   implicit override val patienceConfig: PatienceConfig = PatienceConfig(Span(1, Seconds), Span(1, Seconds))

@@ -90,6 +90,7 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
   }
 
   // DEOPSCSW-576: Auth token for Configuration service
+  // DEOPSCSW-69: Use authorization token to get identity of user creating/updating a configuration file
   test("should throw Unauthorized exception when not logged in") {
     val invalidTFactory: TokenFactory = mock[TokenFactory]
     when(invalidTFactory.getToken).thenReturn("")
@@ -105,6 +106,7 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
   }
 
   // DEOPSCSW-576: Auth token for Configuration service
+  // DEOPSCSW-69: Use authorization token to get identity of user creating/updating a configuration file
   test("should throw NotAllowed exception when user does not have correct role") {
     val invalidTFactory: TokenFactory = mock[TokenFactory]
     when(invalidTFactory.getToken).thenReturn(roleMissingTokenStr)

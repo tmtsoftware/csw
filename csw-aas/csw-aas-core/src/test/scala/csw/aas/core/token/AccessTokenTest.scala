@@ -4,6 +4,7 @@ import csw.aas.core.token
 import csw.aas.core.token.claims.{Access, Authorization, Permission}
 import org.scalatest.{FunSuite, Matchers}
 
+//DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
 class AccessTokenTest extends FunSuite with Matchers {
 
   test("should able to check permissions for access token") {

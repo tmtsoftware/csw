@@ -267,6 +267,8 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
   }
 
   // DEOPSCSW-576: Auth token for Configuration service
+  // DEOPSCSW-69: Use authorization token to get identity of user creating/updating a configuration file
+  // DEOPSCSW-65: Support name or role of configuration file creator/updater
   test("login") {
     commandLineRunner.login()
     verify(nativeAuthAdapter).login()

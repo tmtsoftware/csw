@@ -16,6 +16,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.language.implicitConversions
 
+//DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
 class TokenVerifierTest extends FunSuite with MockitoSugar with Matchers with EitherValues {
   private val keycloakTokenVerifier: KeycloakTokenVerifier = mock[KeycloakTokenVerifier]
   private val authConfig: AuthConfig                       = mock[AuthConfig]
