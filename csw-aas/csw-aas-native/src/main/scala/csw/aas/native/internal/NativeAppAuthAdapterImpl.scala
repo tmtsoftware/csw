@@ -7,15 +7,16 @@ import csw.aas.core.utils.Conversions.RichEitherTFuture
 import csw.aas.native.api.{AuthStore, NativeAppAuthAdapter}
 import org.keycloak.adapters.installed.KeycloakInstalled
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.{DurationLong, FiniteDuration}
-import scala.language.implicitConversions
+import scala.util.Try
 
 private[aas] class NativeAppAuthAdapterImpl(
     val keycloakInstalled: KeycloakInstalled,
     tokenVerifier: TokenVerifier,
     maybeStore: Option[AuthStore] = None
-) extends NativeAppAuthAdapter {
+)(implicit executionContext: ExecutionContext)
+    extends NativeAppAuthAdapter {
 
   override def login(): Unit = {
     keycloakInstalled.login()
@@ -56,20 +57,20 @@ private[aas] class NativeAppAuthAdapterImpl(
 
   override def getAccessToken(minValidity: FiniteDuration = 0.seconds): Option[AccessToken] = {
     def getNewToken: Option[AccessToken] = {
-      try refreshAccessToken()
-      catch {
+      Try(refreshAccessToken()).recover {
         case e: Exception ⇒
           throw new RuntimeException(s"Error in refreshing token: try login before executing this command ${e.getMessage}")
       }
+
       accessTokenStr.flatMap(atr => tokenVerifier.verifyAndDecode(atr).block().toOption)
     }
 
     val mayBeAccessTokenVerification = maybeStore match {
-      case Some(store) => store.getAccessTokenString.map(atr => tokenVerifier.verifyAndDecode(atr).block())
+      case Some(store) => store.getAccessTokenString.map(tokenVerifier.verifyAndDecode(_).block())
       case None        => Some(tokenVerifier.verifyAndDecode(keycloakInstalled.getTokenString).block())
     }
 
-    mayBeAccessTokenVerification flatMap {
+    mayBeAccessTokenVerification.flatMap {
       case Right(at)          => if (isExpired(at, minValidity)) getNewToken else Some(at)
       case Left(TokenExpired) => getNewToken
       case _                  => None
@@ -84,14 +85,12 @@ private[aas] class NativeAppAuthAdapterImpl(
     updateAuthStore()
   }
 
-  private def accessTokenStr = maybeStore match {
-    case Some(store) ⇒ store.getAccessTokenString
-    case None        ⇒ Option(keycloakInstalled.getTokenString)
-  }
+  private def accessTokenStr  = queryToken(_.getAccessTokenString, keycloakInstalled.getTokenString)
+  private def refreshTokenStr = queryToken(_.getRefreshTokenString, keycloakInstalled.getRefreshToken)
 
-  private def refreshTokenStr = maybeStore match {
-    case Some(store) ⇒ store.getRefreshTokenString
-    case None        ⇒ Option(keycloakInstalled.getRefreshToken)
+  private def queryToken(withStore: AuthStore ⇒ Option[String], withoutStore: ⇒ String) = maybeStore match {
+    case Some(store) ⇒ withStore(store)
+    case None        ⇒ Option(withoutStore)
   }
 
   private def updateAuthStore(): Unit = {

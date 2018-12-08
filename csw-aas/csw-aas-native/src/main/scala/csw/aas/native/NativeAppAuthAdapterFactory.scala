@@ -39,14 +39,14 @@ object NativeAppAuthAdapterFactory {
    * @param secretStore The store where all tokens will be stored. If you don't provide this a default file auth store will be used
    * @return
    */
-  def make(secretStore: AuthStore): NativeAppAuthAdapter = make(Some(secretStore))
+  def make(secretStore: AuthStore)(implicit executionContext: ExecutionContext): NativeAppAuthAdapter = make(Some(secretStore))
 
   /**
    * Creates an instance of NativeAppAuthAdapter. Does not resolve authentication service using location service. Instead it uses "auth-config.auth-server-url"
    * config parameter to resolve authentication service. Uses the default file auth store for storing all tokens
    * @return
    */
-  def make: NativeAppAuthAdapter = make(None)
+  def make(implicit executionContext: ExecutionContext): NativeAppAuthAdapter = make(None)
 
   private def make(locationService: LocationService, secretStore: Option[AuthStore])(
       implicit executionContext: ExecutionContext
@@ -57,7 +57,7 @@ object NativeAppAuthAdapterFactory {
     new NativeAppAuthAdapterImpl(new KeycloakInstalled(authConfig.getDeployment), tokenVerifier, secretStore)
   }
 
-  private def make(secretStore: Option[AuthStore]): NativeAppAuthAdapter = {
+  private def make(secretStore: Option[AuthStore])(implicit executionContext: ExecutionContext): NativeAppAuthAdapter = {
     val authConfig    = AuthConfig.loadFromAppConfig()
     val tokenVerifier = TokenVerifier(authConfig)
     new NativeAppAuthAdapterImpl(new KeycloakInstalled(authConfig.getDeployment), tokenVerifier, secretStore)

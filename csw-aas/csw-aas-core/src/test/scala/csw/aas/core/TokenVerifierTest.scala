@@ -1,5 +1,7 @@
 package csw.aas.core
 
+import cats.data.EitherT
+import cats.implicits._
 import csw.aas.core.TokenVerificationFailure.{InvalidToken, TokenExpired}
 import csw.aas.core.deployment.AuthConfig
 import csw.aas.core.token.AccessToken
@@ -7,14 +9,13 @@ import csw.aas.core.token.claims.{Access, Audience, Authorization}
 import csw.aas.core.utils.Conversions.RichEitherTFuture
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.exceptions.{TokenNotActiveException, TokenSignatureInvalidException}
-import org.keycloak.representations.{AccessToken => KeycloakAccessToken}
+import org.keycloak.representations.{AccessToken ⇒ KeycloakAccessToken}
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{EitherValues, FunSuite, Matchers}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.language.implicitConversions
 
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
 class TokenVerifierTest extends FunSuite with MockitoSugar with Matchers with EitherValues {
@@ -28,22 +29,23 @@ class TokenVerifierTest extends FunSuite with MockitoSugar with Matchers with Ei
   private val tmtTokenVerifier: TokenVerifier          = new TokenVerifier(keycloakTokenVerifier, authConfig)
 
   test("should throw exception while verifyAndDecode token") {
-    val token                  = "test-token"
-    val validationExceptionMsg = "invalid token"
-    val validationException    = new TokenSignatureInvalidException(keycloakAccessToken, validationExceptionMsg)
+    val token                          = "test-token"
+    val validationExceptionMsg         = "invalid token"
+    val validationException: Throwable = new TokenSignatureInvalidException(keycloakAccessToken, validationExceptionMsg)
 
     when(keycloakTokenVerifier.verifyToken(token, deployment))
-      .thenReturn(Future.failed(validationException))
+      .thenReturn(EitherT.leftT[Future, KeycloakAccessToken](validationException))
 
     tmtTokenVerifier.verifyAndDecode(token).block().left.value shouldBe InvalidToken(validationExceptionMsg)
   }
 
   test("should throw TokenExpired exception while verifying token") {
-    val token                    = "test-token"
-    val tokenExpiredExceptionMsg = "Token expired"
-    val tokenExpiredException    = new TokenNotActiveException(keycloakAccessToken, tokenExpiredExceptionMsg)
+    val token                            = "test-token"
+    val tokenExpiredExceptionMsg         = "Token expired"
+    val tokenExpiredException: Throwable = new TokenNotActiveException(keycloakAccessToken, tokenExpiredExceptionMsg)
 
-    when(keycloakTokenVerifier.verifyToken(token, deployment)).thenReturn(Future.failed(tokenExpiredException))
+    when(keycloakTokenVerifier.verifyToken(token, deployment))
+      .thenReturn(EitherT.leftT[Future, KeycloakAccessToken](tokenExpiredException))
 
     tmtTokenVerifier.verifyAndDecode(token).block().left.value shouldBe TokenExpired
   }
@@ -69,7 +71,7 @@ class TokenVerifierTest extends FunSuite with MockitoSugar with Matchers with Ei
       authorization = Authorization.empty
     )
 
-    when(keycloakTokenVerifier.verifyToken(token, deployment)).thenReturn(Future.successful(keycloakAccessToken))
+    when(keycloakTokenVerifier.verifyToken(token, deployment)).thenReturn(EitherT.rightT[Future, Throwable](keycloakAccessToken))
 
     tmtTokenVerifier.verifyAndDecode(token).block().right.value shouldBe expectedToken
   }
@@ -79,7 +81,8 @@ class TokenVerifierTest extends FunSuite with MockitoSugar with Matchers with Ei
       "ey.wer.erwe.werw"
     val expectedExceptionMsg = "Expected token [ey.wer.erwe.werw] to be composed of 2 or 3 parts separated by dots."
 
-    when(keycloakTokenVerifier.verifyToken(invalidJsonToken, deployment)).thenReturn(Future.successful(keycloakAccessToken))
+    when(keycloakTokenVerifier.verifyToken(invalidJsonToken, deployment))
+      .thenReturn(EitherT.rightT[Future, Throwable](keycloakAccessToken))
 
     tmtTokenVerifier.verifyAndDecode(invalidJsonToken).block().left.value shouldBe InvalidToken(expectedExceptionMsg)
   }

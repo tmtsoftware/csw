@@ -26,7 +26,7 @@ private[config] class Wiring {
   lazy val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
   lazy val authStore                        = new FileAuthStore(settings.authStorePath)
   //todo: pass location service reference to NativeAppAuthAdapterFactory.make after dev deployment story is done
-  lazy val nativeAuthAdapter: NativeAppAuthAdapter = NativeAppAuthAdapterFactory.make(authStore)
+  lazy val nativeAuthAdapter: NativeAppAuthAdapter = NativeAppAuthAdapterFactory.make(authStore)(actorRuntime.ec)
   lazy val tokenFactory: TokenFactory              = new CliTokenFactory(nativeAuthAdapter)
   lazy val configService: ConfigService            = ConfigClientFactory.adminApi(actorRuntime.actorSystem, locationService, tokenFactory)
   lazy val printLine: Any ⇒ Unit                   = println
