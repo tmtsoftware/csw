@@ -8,11 +8,17 @@ import org.keycloak.adapters.{KeycloakDeployment, KeycloakDeploymentBuilder}
 import org.keycloak.authorization.client.Configuration
 
 import scala.language.implicitConversions
+import scala.util.Try
 
 class AuthConfig private (config: Config, authServiceLocation: Option[HttpLocation]) {
 
   private val logger = AuthLogger.getLogger
   import logger._
+
+  val permissionsEnabled: Boolean = {
+    val mayBeValue = Try { config.getBoolean("enable-permissions") }.toOption
+    mayBeValue.nonEmpty && mayBeValue.get
+  }
 
   private[csw] def getDeployment: KeycloakDeployment =
     authServiceLocation match {
@@ -26,8 +32,11 @@ class AuthConfig private (config: Config, authServiceLocation: Option[HttpLocati
     }
 
   private def convertToDeployment(config: Config): KeycloakDeployment = {
+    val safeConfig = config.withoutPath("enable-permissions")
+
     debug("converting auth config to json")
-    val configJSON: String = config.root().render(ConfigRenderOptions.concise())
+
+    val configJSON: String = safeConfig.root().render(ConfigRenderOptions.concise())
 
     val inputStream: InputStream = new ByteArrayInputStream(configJSON.getBytes())
 

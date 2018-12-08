@@ -4,6 +4,7 @@ import akka.http.scaladsl.model.{HttpMethod, HttpMethods}
 import akka.http.scaladsl.server.Directives.{authorize => keycloakAuthorize, _}
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.directives.AuthenticationDirective
+import csw.aas.core.TokenVerifier
 import csw.aas.core.commons.AuthLogger
 import csw.aas.core.deployment.{AuthConfig, AuthServiceLocation}
 import csw.aas.core.token.{AccessToken, TokenFactory}
@@ -62,7 +63,8 @@ object SecurityDirectives {
   def apply(implicit ec: ExecutionContext): SecurityDirectives = {
     val authConfig                             = AuthConfig.loadFromAppConfig()
     val keycloakDeployment: KeycloakDeployment = authConfig.getDeployment
-    val authentication                         = new Authentication(new TokenFactory(keycloakDeployment))
+    val tokenVerifier                          = TokenVerifier(authConfig)
+    val authentication                         = new Authentication(new TokenFactory(keycloakDeployment, tokenVerifier, authConfig.permissionsEnabled))
     new SecurityDirectives(authentication, keycloakDeployment.getRealm, keycloakDeployment.getResourceName)
   }
 
@@ -71,7 +73,8 @@ object SecurityDirectives {
     val authLocation: HttpLocation             = Await.result(AuthServiceLocation(locationService).resolve, 5.seconds)
     val authConfig                             = AuthConfig.loadFromAppConfig(Some(authLocation))
     val keycloakDeployment: KeycloakDeployment = authConfig.getDeployment
-    val authentication                         = new Authentication(new TokenFactory(keycloakDeployment))
+    val tokenVerifier                          = TokenVerifier(authConfig)
+    val authentication                         = new Authentication(new TokenFactory(keycloakDeployment, tokenVerifier, authConfig.permissionsEnabled))
     new SecurityDirectives(authentication, keycloakDeployment.getRealm, keycloakDeployment.getResourceName)
   }
 }
