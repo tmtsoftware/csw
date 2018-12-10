@@ -14,9 +14,9 @@ import scala.concurrent.duration.{DurationInt, FiniteDuration}
 class TimeServiceImpl(clock: TMTClock)(implicit actorSystem: ActorSystem) extends TimeService {
   import actorSystem.dispatcher
 
-  override def utcTimeAt(zoneId: ZoneId): UTCTime = clock.utcTime(zoneId)
+  override def utcTime(): UTCTime = clock.utcTime()
 
-  override def taiTimeAt(zoneId: ZoneId): TAITime = clock.taiTime(zoneId)
+  override def taiTime(): TAITime = clock.taiTime()
 
   override def scheduleOnce(startTime: TAITime)(task: Runnable): Cancellable =
     actorSystem.scheduler
@@ -40,7 +40,7 @@ class TimeServiceImpl(clock: TMTClock)(implicit actorSystem: ActorSystem) extend
   private[time] def setTaiOffset(offset: Int): Unit = clock.setOffset(offset)
 
   private def delayFrom(time: TAITime): FiniteDuration = {
-    val now      = taiTimeAt(time.value.getZone).value // use same zone as provided in time for duration calculation
+    val now      = taiTime().at(time.value.getZone).value // use same zone as provided in time for duration calculation
     val duration = Duration.between(now, time.value)
     FiniteDuration(duration.toNanos, NANOSECONDS)
   }

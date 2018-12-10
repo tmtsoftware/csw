@@ -2,9 +2,9 @@ package csw.time.client
 
 import csw.time.api.models.TMTTime
 
-class TestUtil {
+object TestUtil {
 
-  def formatWithPrecision(tmtTime: TMTTime, precision: Int): String = {
+  def formatWithPrecision(tmtTime: TMTTime[_], precision: Int): String = {
     val nanos = tmtTime.value.getNano
     val d     = Math.pow(10, 9 - precision).toInt
     (nanos / d).toString

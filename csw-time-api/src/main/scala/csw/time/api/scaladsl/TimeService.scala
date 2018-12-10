@@ -1,23 +1,14 @@
 package csw.time.api.scaladsl
 
-import java.time.{Duration, ZoneId, ZoneOffset}
+import java.time.Duration
 
 import csw.time.api.models.Cancellable
 import csw.time.api.models.TMTTime.{TAITime, UTCTime}
 
 trait TimeService {
-  private val localZoneId: ZoneId  = ZoneId.systemDefault()
-  private val hawaiiZoneId: ZoneId = ZoneId.of("US/Hawaii")
+  def utcTime(): UTCTime
 
-  def utcTime(): UTCTime         = utcTimeAt(ZoneOffset.UTC)
-  def utcTimeAtLocal(): UTCTime  = utcTimeAt(localZoneId)
-  def utcTimeAtHawaii(): UTCTime = utcTimeAt(hawaiiZoneId)
-  def utcTimeAt(zoneId: ZoneId): UTCTime
-
-  def taiTime(): TAITime         = taiTimeAt(ZoneOffset.UTC)
-  def taiTimeAtLocal(): TAITime  = taiTimeAt(localZoneId)
-  def taiTimeAtHawaii(): TAITime = taiTimeAt(hawaiiZoneId)
-  def taiTimeAt(zoneId: ZoneId): TAITime
+  def taiTime(): TAITime
 
   def toUTC(taiInstant: TAITime): UTCTime
   def toTAI(utcInstant: UTCTime): TAITime

@@ -16,8 +16,6 @@ import org.scalatest.junit.JUnitSuite;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +27,6 @@ public class TimeServiceTest extends JUnitSuite {
     public TestKitJunitResource testKit = new TestKitJunitResource(ManualTime.config());
 
     private static int TaiOffset = 37;
-    private TestUtil testUtil = new TestUtil();
     private TestProperties testProperties = TestProperties$.MODULE$.instance();
     private ActorSystem untypedSystem = ActorSystemAdapter.toUntyped(testKit.system());
     private ManualTime manualTime = ManualTime.get(testKit.system());
@@ -41,7 +38,7 @@ public class TimeServiceTest extends JUnitSuite {
     //DEOPSCSW-533: Access parts of UTC date.time in Java and Scala
     @Test
     public void should_get_utctime() {
-        UTCTime utcTime = timeService.utcTimeAtLocal();
+        UTCTime utcTime = timeService.utcTime();
         Instant fixedInstant = Instant.now();
 
         long expectedMillis = fixedInstant.toEpochMilli();
@@ -53,7 +50,7 @@ public class TimeServiceTest extends JUnitSuite {
     //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
     @Test
     public void should_convert_utc_to_tai() {
-        UTCTime utcTime = timeService.utcTimeAtLocal();
+        UTCTime utcTime = timeService.utcTime();
         TAITime taiTime = timeService.toTAI(utcTime);
 
         assertEquals(Duration.between(utcTime.value(), taiTime.value()).getSeconds(), TaiOffset);
@@ -62,7 +59,7 @@ public class TimeServiceTest extends JUnitSuite {
     //DEOPSCSW-534: PTP accuracy and precision while reading UTC
     @Test
     public void should_get_maximum_precision_supported_by_system_in_utc() {
-        assertFalse(new TestUtil().formatWithPrecision(timeService.utcTimeAtLocal(), testProperties.precision()).endsWith("000"));
+        assertFalse(TestUtil.formatWithPrecision(timeService.utcTime(), testProperties.precision()).endsWith("000"));
     }
 
     //------------------------------TAI-------------------------------
@@ -71,7 +68,7 @@ public class TimeServiceTest extends JUnitSuite {
     //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
     @Test
     public void should_get_tai_time() {
-        TAITime taiTime = timeService.taiTimeAtLocal();
+        TAITime taiTime = timeService.taiTime();
         Instant expectedTaiInstant = Instant.now().plusSeconds(TaiOffset);
 
         long expectedMillis = expectedTaiInstant.toEpochMilli();
@@ -83,7 +80,7 @@ public class TimeServiceTest extends JUnitSuite {
     //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
     @Test
     public void should_convert_tai_to_utc() {
-        TAITime taiTime = timeService.taiTimeAtLocal();
+        TAITime taiTime = timeService.taiTime();
         UTCTime utcTime = timeService.toUTC(taiTime);
 
         assertEquals(Duration.between(utcTime.value(), taiTime.value()).getSeconds(), TaiOffset);
@@ -92,7 +89,7 @@ public class TimeServiceTest extends JUnitSuite {
     //DEOPSCSW-538: PTP accuracy and precision while reading TAI
     @Test
     public void should_get_maximum_precision_supported_by_system_in_tai() {
-        assertFalse(testUtil.formatWithPrecision(timeService.taiTimeAtLocal(), testProperties.precision()).endsWith("000"));
+        assertFalse(TestUtil.formatWithPrecision(timeService.taiTime(), testProperties.precision()).endsWith("000"));
     }
 
     //------------------------------Scheduling-------------------------------
@@ -103,7 +100,7 @@ public class TimeServiceTest extends JUnitSuite {
         TestProbe testProbe = new TestProbe(untypedSystem);
         String probeMsg = "some message";
 
-        TAITime idealScheduleTime = new TAITime(timeService.taiTimeAtLocal().value().plusSeconds(1));
+        TAITime idealScheduleTime = new TAITime(timeService.taiTime().value().plusSeconds(1));
 
         Runnable task = () -> testProbe.ref().tell(probeMsg, ActorRef.noSender());
 
@@ -131,7 +128,7 @@ public class TimeServiceTest extends JUnitSuite {
     public void should_schedule_a_task_periodically_at_given_interval_after_start_time() {
         List<String> list = new ArrayList<>();
 
-        TAITime startTime = new TAITime(timeService.taiTimeAtLocal().value().plusSeconds(1));
+        TAITime startTime = new TAITime(timeService.taiTime().value().plusSeconds(1));
 
         Cancellable cancellable = timeService.schedulePeriodically(startTime, Duration.ofMillis(100), () -> list.add("x"));
 
@@ -142,53 +139,4 @@ public class TimeServiceTest extends JUnitSuite {
         cancellable.cancel();
         assertEquals(list.size(), 6);
     }
-
-    // DEOPSCSW-539: Ability to read local time that is synchronized with PTP time, at remote observing sites
-    @Test
-    public void should_get_utc_hawaii_time() {
-        ZoneId zoneId = ZoneId.of("US/Hawaii");
-
-        ZonedDateTime utcTimeAtHawaii = timeService.utcTimeAtHawaii().value();
-        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
-
-        assertEquals(utcTimeAtHawaii.getZone(), zoneId);
-        assertEquals(zonedDateTime.toInstant().toEpochMilli(), utcTimeAtHawaii.toInstant().toEpochMilli(), 100);
-    }
-
-    // DEOPSCSW-539: Ability to read local time that is synchronized with PTP time, at remote observing sites
-    @Test
-    public void should_get_utc_local_time() {
-        ZoneId zoneId = ZoneId.systemDefault();
-
-        ZonedDateTime utcTimeAtLocal = timeService.utcTimeAtLocal().value();
-        ZonedDateTime timeNow = ZonedDateTime.now(zoneId);
-
-        assertEquals(utcTimeAtLocal.getZone(), zoneId);
-        assertEquals(timeNow.toInstant().toEpochMilli(), utcTimeAtLocal.toInstant().toEpochMilli(), 100);
-    }
-
-    // DEOPSCSW-539: Ability to read local time that is synchronized with PTP time, at remote observing sites
-    @Test
-    public void should_get_tai_hawaii_time() {
-        ZoneId zoneId = ZoneId.of("US/Hawaii");
-
-        ZonedDateTime utcTimeAtHawaii = timeService.taiTimeAtHawaii().value();
-        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId).plusSeconds(TaiOffset);
-
-        assertEquals(utcTimeAtHawaii.getZone(), zoneId);
-        assertEquals(zonedDateTime.toInstant().toEpochMilli(), utcTimeAtHawaii.toInstant().toEpochMilli(), 100);
-    }
-
-    // DEOPSCSW-539: Ability to read local time that is synchronized with PTP time, at remote observing sites
-    @Test
-    public void should_get_tai_local_time() {
-        ZoneId zoneId = ZoneId.systemDefault();
-
-        ZonedDateTime utcTimeAtLocal = timeService.taiTimeAtLocal().value();
-        ZonedDateTime timeNow = ZonedDateTime.now(zoneId).plusSeconds(TaiOffset);
-
-        assertEquals(utcTimeAtLocal.getZone(), zoneId);
-        assertEquals(timeNow.toInstant().toEpochMilli(), utcTimeAtLocal.toInstant().toEpochMilli(), 100);
-    }
-
 }

@@ -1,6 +1,6 @@
 package csw.time.client.internal
 
-import java.time.{Instant, ZoneId, ZonedDateTime}
+import java.time.{Instant, ZoneId, ZoneOffset, ZonedDateTime}
 
 import com.sun.jna.NativeLong
 import csw.time.api.models.TMTTime.{TAITime, UTCTime}
@@ -11,8 +11,8 @@ import scala.util.Try
 import scala.util.control.NonFatal
 
 trait TMTClock {
-  def utcTime(zoneId: ZoneId): UTCTime
-  def taiTime(zoneId: ZoneId): TAITime
+  def utcTime(): UTCTime
+  def taiTime(): TAITime
   def offset: Int
   def setOffset(offset: Int): Unit
 }
@@ -26,8 +26,8 @@ object TMTClock {
 
   class LinuxClock extends TMTClock {
 
-    override def utcTime(zoneId: ZoneId): UTCTime = UTCTime(timeFor(ClockRealtime, zoneId))
-    override def taiTime(zoneId: ZoneId): TAITime = TAITime(timeFor(ClockTAI, zoneId))
+    override def utcTime(): UTCTime = UTCTime(timeFor(ClockRealtime))
+    override def taiTime(): TAITime = TAITime(timeFor(ClockTAI))
 
     override def offset: Int = {
       val timeVal = new NTPTimeVal()
@@ -35,7 +35,7 @@ object TMTClock {
       timeVal.tai
     }
 
-    private def timeFor(clockId: Int, zoneId: ZoneId): ZonedDateTime = {
+    private def timeFor(clockId: Int, zoneId: ZoneId = ZoneOffset.UTC): ZonedDateTime = {
       val timeSpec = new TimeSpec()
       TimeLibrary.clock_gettime(clockId, timeSpec)
       Instant.ofEpochSecond(timeSpec.seconds.longValue(), timeSpec.nanoseconds.longValue()).atZone(zoneId)
@@ -55,8 +55,8 @@ object TMTClock {
   }
 
   class NonLinuxClock(val offset: Int) extends TMTClock {
-    override def utcTime(zoneId: ZoneId): UTCTime = UTCTime(ZonedDateTime.now(zoneId))
-    override def taiTime(zoneId: ZoneId): TAITime = TAITime(ZonedDateTime.now(zoneId).plusSeconds(offset))
+    override def utcTime(): UTCTime = UTCTime(ZonedDateTime.now(ZoneOffset.UTC))
+    override def taiTime(): TAITime = TAITime(ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(offset))
 
     override def setOffset(offset: Int): Unit = {}
   }
