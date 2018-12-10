@@ -2,22 +2,17 @@ package csw.time.client
 
 import csw.time.client.internal.OSType
 
-import scala.concurrent.duration.DurationLong
-
 trait TestProperties {
   def precision: Int
-  def allowedJitterInNanos: Int
 }
 
 object TestProperties {
   class LinuxProperties extends TestProperties {
-    override val precision: Int            = 9
-    override val allowedJitterInNanos: Int = 50.millis.toNanos.toInt
+    override val precision: Int = 9
   }
 
   class NonLinuxProperties extends TestProperties {
-    override val precision: Int            = 3
-    override val allowedJitterInNanos: Int = 50.millis.toNanos.toInt
+    override val precision: Int = 3
   }
 
   val instance: TestProperties = OSType.value match {
