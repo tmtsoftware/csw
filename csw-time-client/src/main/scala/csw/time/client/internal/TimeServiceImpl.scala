@@ -1,6 +1,6 @@
 package csw.time.client.internal
 
-import java.time.{Duration, ZoneId}
+import java.time.Duration
 import java.util.concurrent.TimeUnit.NANOSECONDS
 
 import akka.actor.ActorSystem

@@ -22,7 +22,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-public class TimeServiceTest extends JUnitSuite {
+public class JTimeServiceTest extends JUnitSuite {
     @Rule
     public TestKitJunitResource testKit = new TestKitJunitResource(ManualTime.config());
 
