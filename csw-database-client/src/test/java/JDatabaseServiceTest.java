@@ -24,6 +24,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.*;
 
 //DEOPSCSW-601: Create Database API
+//DEOPSCSW-616: Create a method to send a query (select) sql string to a database
 public class JDatabaseServiceTest extends JUnitSuite {
 
     private static ActorSystem system;
