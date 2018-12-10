@@ -1,17 +1,18 @@
 package csw.time.client.internal
 
-import java.time.Instant
+import java.time.{Instant, ZoneId, ZonedDateTime}
 
 import com.sun.jna.NativeLong
-import csw.time.api.models.CswInstant.{TaiInstant, UtcInstant}
+import csw.time.api.models.TMTTime.{TAITime, UTCTime}
 import csw.time.client.internal.native_models.ClockId.{ClockRealtime, ClockTAI}
 import csw.time.client.internal.native_models.{NTPTimeVal, TimeSpec, Timex}
 
+import scala.util.Try
 import scala.util.control.NonFatal
 
 trait TMTClock {
-  def utcInstant: UtcInstant
-  def taiInstant: TaiInstant
+  def utcTime(zoneId: ZoneId): UTCTime
+  def taiTime(zoneId: ZoneId): TAITime
   def offset: Int
   def setOffset(offset: Int): Unit
 }
@@ -24,8 +25,9 @@ object TMTClock {
   }
 
   class LinuxClock extends TMTClock {
-    override def utcInstant: UtcInstant = UtcInstant(instantFor(ClockRealtime))
-    override def taiInstant: TaiInstant = TaiInstant(instantFor(ClockTAI))
+
+    override def utcTime(zoneId: ZoneId): UTCTime = UTCTime(timeFor(ClockRealtime, zoneId))
+    override def taiTime(zoneId: ZoneId): TAITime = TAITime(timeFor(ClockTAI, zoneId))
 
     override def offset: Int = {
       val timeVal = new NTPTimeVal()
@@ -33,10 +35,10 @@ object TMTClock {
       timeVal.tai
     }
 
-    private def instantFor(clockId: Int): Instant = {
+    private def timeFor(clockId: Int, zoneId: ZoneId): ZonedDateTime = {
       val timeSpec = new TimeSpec()
       TimeLibrary.clock_gettime(clockId, timeSpec)
-      Instant.ofEpochSecond(timeSpec.seconds.longValue(), timeSpec.nanoseconds.longValue())
+      Instant.ofEpochSecond(timeSpec.seconds.longValue(), timeSpec.nanoseconds.longValue()).atZone(zoneId)
     }
 
     // todo: without sudo or somehow handle it internally?
@@ -45,9 +47,7 @@ object TMTClock {
       val timex = new Timex()
       timex.modes = 128
       timex.constant = new NativeLong(offset)
-      try {
-        TimeLibrary.ntp_adjtime(timex)
-      } catch {
+      Try(TimeLibrary.ntp_adjtime(timex)).recover {
         case NonFatal(e) =>
           throw new RuntimeException("Failed to set offset, make sure you have sudo access to perform this action.", e.getCause)
       }
@@ -55,8 +55,8 @@ object TMTClock {
   }
 
   class NonLinuxClock(val offset: Int) extends TMTClock {
-    override def utcInstant: UtcInstant = UtcInstant(Instant.now())
-    override def taiInstant: TaiInstant = TaiInstant(Instant.now().plusSeconds(offset))
+    override def utcTime(zoneId: ZoneId): UTCTime = UTCTime(ZonedDateTime.now(zoneId))
+    override def taiTime(zoneId: ZoneId): TAITime = TAITime(ZonedDateTime.now(zoneId).plusSeconds(offset))
 
     override def setOffset(offset: Int): Unit = {}
   }
