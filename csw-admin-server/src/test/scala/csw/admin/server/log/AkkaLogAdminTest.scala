@@ -10,8 +10,8 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest, StatusCodes, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import com.typesafe.config.ConfigFactory
-import csw.admin.server.wiring.AdminWiring
 import csw.admin.server.log.http.HttpSupport
+import csw.admin.server.wiring.AdminWiring
 import csw.command.client.messages.CommandMessage.Oneway
 import csw.command.client.messages.ContainerCommonMessage.GetComponents
 import csw.command.client.messages.ContainerMessage
@@ -23,7 +23,6 @@ import csw.location.api.models.ComponentId
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.client.ActorSystemFactory
-import csw.location.server.http.HTTPLocationService
 import csw.logging.internal.LoggingLevels.{ERROR, Level, WARN}
 import csw.logging.internal._
 import csw.logging.models.LogMetadata

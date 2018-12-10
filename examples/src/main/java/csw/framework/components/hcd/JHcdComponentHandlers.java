@@ -25,6 +25,7 @@ import csw.location.api.javadsl.ILocationService;
 import csw.logging.javadsl.ILogger;
 
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
@@ -72,10 +73,10 @@ public class JHcdComponentHandlers extends JComponentHandlers {
         worker = ctx.spawnAnonymous(WorkerActor.make(hcdConfig));
 
         // initialise some state by using the worker actor created above
-        CompletionStage<Integer> askCurrent = AskPattern.ask(worker, WorkerActorMsgs.JInitialState::new, new Timeout(5, TimeUnit.SECONDS), ctx.getSystem().scheduler());
+        CompletionStage<Integer> askCurrent = AskPattern.ask(worker, WorkerActorMsgs.JInitialState::new, Duration.ofSeconds(5), ctx.getSystem().scheduler());
         CompletableFuture<Void> currentFuture = askCurrent.thenAccept(c -> current = c).toCompletableFuture();
 
-        CompletionStage<Integer> askStats = AskPattern.ask(worker, WorkerActorMsgs.JInitialState::new, new Timeout(5, TimeUnit.SECONDS), ctx.getSystem().scheduler());
+        CompletionStage<Integer> askStats = AskPattern.ask(worker, WorkerActorMsgs.JInitialState::new, Duration.ofSeconds(5), ctx.getSystem().scheduler());
         CompletableFuture<Void> statsFuture = askStats.thenAccept(s -> stats = s).toCompletableFuture();
 
         return CompletableFuture.allOf(currentFuture, statsFuture);

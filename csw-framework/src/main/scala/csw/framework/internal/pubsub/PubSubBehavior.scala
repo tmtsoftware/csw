@@ -34,7 +34,7 @@ private[framework] class PubSubBehavior[T: Nameable](ctx: ActorContext[PubSub[T]
   }
 
   override def onSignal: PartialFunction[Signal, Behavior[PubSub[T]]] = {
-    case Terminated(ref) ⇒ unsubscribe(ref.upcast); this
+    case Terminated(ref) ⇒ unsubscribe(ref.unsafeUpcast); this
   }
 
   private def subscribe(actorRef: ActorRef[T], mayBeNames: Option[Set[StateName]]): Unit =

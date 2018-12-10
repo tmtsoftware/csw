@@ -153,7 +153,7 @@ private[framework] final class SupervisorBehavior(
    */
   private def onCommon(commonMessage: ComponentCommonMessage): Unit = commonMessage match {
     case LifecycleStateSubscription(subscriberMessage) ⇒ pubSubLifecycle ! subscriberMessage
-    case ComponentStateSubscription(subscriberMessage) ⇒ currentStatePublisher.publisherActor.upcast ! subscriberMessage
+    case ComponentStateSubscription(subscriberMessage) ⇒ currentStatePublisher.publisherActor.unsafeUpcast ! subscriberMessage
     case GetSupervisorLifecycleState(replyTo)          ⇒ replyTo ! lifecycleState
     case Restart                                       ⇒ onRestart()
     case Shutdown                                      ⇒ onShutdown()

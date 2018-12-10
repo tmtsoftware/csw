@@ -252,7 +252,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     supervisorLifecycleStateProbe.expectMessage(SupervisorLifecycleState.Idle)
 
     intercept[InitializationFailed.type] {
-      supervisorBehaviorKit.signal(Terminated(childComponentInbox.ref)(new FailureStop(message = "reason of failing") {}))
+      supervisorBehaviorKit.signal(Terminated(childComponentInbox.ref))
     }
   }
 

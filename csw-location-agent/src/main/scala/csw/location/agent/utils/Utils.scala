@@ -1,7 +1,6 @@
 package csw.location.agent.utils
 
 import java.io.File
-import java.net.ServerSocket
 
 import com.typesafe.config.{Config, ConfigFactory, ConfigResolveOptions}
 
