@@ -5,6 +5,7 @@ keycloakDir=${currentDir}
 keycloakVersion=4.6.0
 keycloakBinaryUnzipped=keycloak-${keycloakVersion}.Final
 keycloakBinaryZipped=${keycloakBinaryUnzipped}.tar.gz
+script_name=$0
 
 port=8081
 host="0.0.0.0"
@@ -54,11 +55,14 @@ function parse_cmd_args {
                    keycloakDir=$2
                    ;;
                 --user | -u)
-                userName=$2
-                ;;
+                    userName=$2
+                    ;;
                 --password)
-                password=$2
-                ;;
+                    password=$2
+                    ;;
+                --help)
+                    usage
+                    ;;
             esac
         shift
     done
@@ -75,17 +79,38 @@ function parse_cmd_args {
 
 }
 
-function addUserAndStartServer {
+function usage {
+    echo
+    echo -e "usage: $script_name [--port | -p <port>] [--host | -h <host>] [--dir | -d <dir>] [--user | -u <user>] [--password  <password>]\n"
+
+    echo "Options:"
+    echo "  --port | -p <port>              start AAS on provided port, default: 8081"
+    echo "  --host | -h <host>              start AAS on provided ip address, default: starts on ip associated with provided interface and localhost if to be accessed by same machine"
+    echo "  --dir | -d <dir>                installs AAS binary on provided directory, default: current working dir"
+    echo "  --user | -u <user_name>         add AAS with provided user as admin"
+    echo "  --password <password>           add provided password for admin user"
+    exit 1
+}
+
+
+function addAdminUser {
     cd ${keycloakDir}/${keycloakBinaryUnzipped}/bin
-    echo "[INFO] starting server at $host:$port"
+    echo "[INFO] Adding user"
     sh add-user-keycloak.sh --user ${userName} -p ${password}
-    sh standalone.sh -Djboss.bind.address=${host} -Djboss.http.port=${port} -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=${keycloakDir}/${importJsonPath}
+}
+
+function startAndRegister {
+    cd ${currentDir}
+    pwd
+    echo "[INFO] starting server at $host:$port"
+    ./csw-location-agent --name AAS --http "auth" -c "sh ${keycloakDir}/${keycloakBinaryUnzipped}/bin/standalone.sh -Djboss.bind.address=${host} -Djboss.http.port=${port} -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=${currentDir}/${importJsonPath}" -p "$port"
 }
 
 function start {
     parse_cmd_args "$@"
     checkIfKeycloakIsInstalled
-    addUserAndStartServer
+    addAdminUser
+    startAndRegister
 }
 
 start "$@"
