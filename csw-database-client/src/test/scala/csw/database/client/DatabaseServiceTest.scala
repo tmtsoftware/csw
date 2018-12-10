@@ -1,11 +1,8 @@
 package csw.database.client
 
-import java.nio.file.Paths
-
 import akka.actor.ActorSystem
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
-import com.typesafe.config.{Config, ConfigFactory}
-import csw.database.client.scaladsl.DatabaseService
+import com.typesafe.config.Config
 import csw.database.client.scaladsl.JooqExtentions.{RichQueries, RichQuery, RichResultQuery}
 import org.jooq.DSLContext
 import org.scalatest.concurrent.PatienceConfiguration.Interval
@@ -17,20 +14,12 @@ import scala.concurrent.ExecutionContext
 
 //DEOPSCSW-601: Create Database API
 class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with BeforeAndAfterAll {
-  private val system: ActorSystem   = ActorSystem("test")
-  implicit val ec: ExecutionContext = system.dispatcher
 
-  val postgres: EmbeddedPostgres = EmbeddedPostgres.builder
-    .setDataDirectory(Paths.get("/tmp/postgresDataDir"))
-    .setCleanDataDirectory(true)
-    .setPgBinaryResolver(new PostgresBinaryResolver)
-    .start
-
-  //DEOPSCSW-620: Session Creation to access data
-  private val portConfig     = s"csw-database.hikari-datasource.dataSource.portNumber = ${postgres.getPort}"
-  private val config: Config = ConfigFactory.parseString(portConfig).withFallback(system.settings.config)
-
-  val dsl: DSLContext = new DatabaseService(config).defaultDSL
+  private val system: ActorSystem           = ActorSystem("test")
+  private implicit val ec: ExecutionContext = system.dispatcher
+  private val postgres: EmbeddedPostgres    = DatabaseServiceTestContext.postgres()
+  private val config: Config                = DatabaseServiceTestContext.config(system, postgres.getPort)
+  private val dsl: DSLContext               = new DatabaseService(config).defaultDSL
 
   override def afterAll(): Unit = {
     postgres.close()
@@ -207,7 +196,7 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
     dsl.query("DROP TABLE films").executeAsyncScala().futureValue
   }
 
-  //  //DEOPSCSW-612: Examples of deleting records
+  //DEOPSCSW-612: Examples of deleting records
   test("should be able to delete records") {
     // create films and insert records
     val movie4 = "movie_4"

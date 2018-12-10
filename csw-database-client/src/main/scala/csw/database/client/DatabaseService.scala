@@ -1,4 +1,5 @@
-package csw.database.client.scaladsl
+package csw.database.client
+
 import java.util.Properties
 
 import com.typesafe.config.Config
