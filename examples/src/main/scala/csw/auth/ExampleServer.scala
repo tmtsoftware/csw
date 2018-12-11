@@ -20,7 +20,7 @@ object ExampleServer extends HttpApp with App with GenericUnmarshallers with Pla
 
   import Async._
 
-  LoggingSystemFactory.start("example-http-server", "", "", Async.actorSystem)
+  LoggingSystemFactory.start("example-server", "", "", Async.actorSystem)
 
   //ensure location service is up
   LocationServerStatus.requireUpLocally(5.seconds)
