@@ -43,6 +43,9 @@ object JKeyType {
   val UTCTimeKey = KeyType.UTCTimeKey
   val TAITimeKey = KeyType.TAITimeKey
 
+  // Coordinate keys
+  val EqCoordinateKey = KeyType.EqCoordKey
+
   val BooleanKey = JSimpleKeyType.BooleanKey
   val CharKey    = JSimpleKeyType.CharKey
 

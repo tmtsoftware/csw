@@ -1,6 +1,7 @@
 package csw.params.core.generics
 
 import csw.params.core.formats.JsonSupport
+import csw.params.core.models.Coords.EqCoord
 import csw.params.core.models.Units.second
 import csw.params.core.models.{Units, _}
 import csw.time.core.models.{TAITime, UTCTime}
@@ -89,6 +90,9 @@ object KeyType extends Enum[KeyType[_]] with PlayJsonEnum[KeyType[_]] {
   case object StructKey  extends SimpleKeyType[Struct]
   case object UTCTimeKey extends SimpleKeyTypeWithUnits[UTCTime](second)
   case object TAITimeKey extends SimpleKeyTypeWithUnits[TAITime](second)
+
+  // New Coordinate Keys
+  case object EqCoordKey extends SimpleKeyType[EqCoord]
 
   //scala
   case object BooleanKey extends SimpleKeyType[Boolean]
