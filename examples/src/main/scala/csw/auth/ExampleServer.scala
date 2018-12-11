@@ -48,6 +48,9 @@ object ExampleServer extends HttpApp with App with GenericUnmarshallers with Pla
       sPut(ResourceRolePolicy("person-role")) { _ ⇒
         complete("Person updated OK")
       } ~
+      sPatch(ResourceRolePolicy("some-role")) { _ ⇒
+        complete("Person updated OK")
+      } ~
       sHead(CustomPolicy(at ⇒ at.given_name.contains("test-user"))) { _ ⇒
         complete("Custom policy OK")
       }

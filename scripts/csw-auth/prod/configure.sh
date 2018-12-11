@@ -12,8 +12,10 @@ host="0.0.0.0"
 userName=""
 password=""
 testMode=false
+exampleDemo=false
 
-importJsonPath="../conf/auth_service/tmt-realm-export.json"
+configImportJsonPath="../conf/auth_service/tmt-realm-export.json"
+exampleImportJsonPath="../conf/auth_service/example-realm.json"
 
 # Run from the directory containing the script
 cd "$( dirname "${BASH_SOURCE[0]}" )"
@@ -64,6 +66,9 @@ function parse_cmd_args {
                 --testMode)
                     testMode=true
                     ;;
+                --example)
+                    exampleDemo=true
+                    ;;
                 --help)
                     usage
                     ;;
@@ -93,6 +98,8 @@ function usage {
     echo "  --dir | -d <dir>                installs AAS binary on provided directory, default: current working dir"
     echo "  --user | -u <user_name>         add AAS with provided user as admin"
     echo "  --password <password>           add provided password for admin user"
+    echo "  --testMode                      Optional parameter which sets up AAS for config server and cli testing"
+    echo "  --example                       Optional parameter which sets up AAS for example server and react app demo"
     exit 1
 }
 
@@ -104,7 +111,7 @@ function addAdminUser {
 }
 
 function is_AAS_running {
-    local http_code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:${port}/auth/${userName}/realms)
+    local http_code=$(curl -s -o /dev/null -w "%{http_code}" http://${host}:${port}/auth/admin/realms)
     if [[ $http_code -eq 401 ]]; then
         return 0
     else
@@ -125,31 +132,44 @@ function wait_till_AAS_starts {
 function addTestUsers {
     cd ${keycloakDir}/${keycloakBinaryUnzipped}/bin
     echo "[INFO] Adding test users"
-    sh add-user-keycloak.sh -u kevin -p abcd -r TMT
-    sh add-user-keycloak.sh -u frank -p abcd -r TMT
+    if ${exampleDemo} ; then
+        sh add-user-keycloak.sh -u test-user -p abcd -r example
+    else
+        sh add-user-keycloak.sh -u kevin -p abcd -r TMT
+        sh add-user-keycloak.sh -u frank -p abcd -r TMT
+    fi
 }
 
 function associateRoleToTestUsers {
     wait_till_AAS_starts
     cd ${keycloakDir}/${keycloakBinaryUnzipped}/bin
-    echo "[INFO] Associate roles to test users"
-    sh kcadm.sh config credentials --server http://${host}:${port}/auth --realm master --user ${userName} --password ${password}
-    sh kcadm.sh add-roles --uusername kevin --rolename admin --cclientid csw-config-server -r TMT
+        sh kcadm.sh config credentials --server http://${host}:${port}/auth --realm master --user ${userName} --password ${password}
+    if ${exampleDemo} ; then
+        echo "[INFO] Associate roles to example users"
+        sh kcadm.sh add-roles --uusername test-user --rolename person-role --cclientid example-server -r example
+        sh kcadm.sh add-roles --uusername test-user --rolename example-admin-role -r example
+    else
+        echo "[INFO] Associate roles to test users"
+        sh kcadm.sh add-roles --uusername kevin --rolename admin --cclientid csw-config-server -r TMT
+    fi
 }
 
 function startAndRegister {
     cd ${currentDir}
-    pwd
     echo "[INFO] starting server at $host:$port"
-    sh csw-location-agent --name AAS --http "auth" -c "sh ${keycloakDir}/${keycloakBinaryUnzipped}/bin/standalone.sh -Djboss.bind.address=${host} -Djboss.http.port=${port} -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=${currentDir}/${importJsonPath}" -p "$port"
+    path=${currentDir}/${configImportJsonPath}
+    if $exampleDemo; then
+        path=${currentDir}/${exampleImportJsonPath}
+    fi
+    sh csw-location-agent --name AAS --http "auth" -c "sh ${keycloakDir}/${keycloakBinaryUnzipped}/bin/standalone.sh -Djboss.bind.address=${host} -Djboss.http.port=${port} -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=$path" -p "$port"
 }
 
 function start {
     parse_cmd_args "$@"
     checkIfKeycloakIsInstalled
     addAdminUser
-    if ${testMode} ; then addTestUsers ; fi
-    if ${testMode} ; then
+    if [[ ${testMode} || ${exampleDemo} ]] ; then addTestUsers ; fi
+    if [[ ${testMode} || ${exampleDemo} ]] ; then
      associateRoleToTestUsers &
     fi
     startAndRegister

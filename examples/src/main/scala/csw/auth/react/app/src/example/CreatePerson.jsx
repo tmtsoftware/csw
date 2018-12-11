@@ -15,6 +15,8 @@ class CreatePerson extends React.Component {
 
     sendUpdateRequest = () => {this.sendRequest("PUT")};
 
+    sendPatchRequest = () => {this.sendRequest("PATCH")};
+
     sendRequest = (method) => {
         setTimeout(async () => {
             const keycloak = await this.props.keycloak;
@@ -42,6 +44,8 @@ class CreatePerson extends React.Component {
             <button onClick={this.sendDeleteRequest}>Delete Person</button>
             <br/>
             <button onClick={this.sendUpdateRequest}>Update Person</button>
+            <br/>
+            <button onClick={this.sendPatchRequest}>Not permitted Route</button>
         </div>
     }
 }
