@@ -42,9 +42,6 @@ object ExampleServer extends HttpApp with App with GenericUnmarshallers with Pla
       sPost(RealmRolePolicy("example-admin-role")) { _ ⇒
         complete("Person created OK")
       } ~
-      sDelete(PermissionPolicy("delete", "person")) { _ ⇒
-        complete("Person deleted OK")
-      } ~
       sPut(ResourceRolePolicy("person-role")) { _ ⇒
         complete("Person updated OK")
       } ~

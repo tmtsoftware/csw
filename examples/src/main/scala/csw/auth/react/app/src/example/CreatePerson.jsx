@@ -11,8 +11,6 @@ class CreatePerson extends React.Component {
 
     sendCreateRequest = () =>  {this.sendRequest("POST")};
 
-    sendDeleteRequest = () => {this.sendRequest("DELETE")};
-
     sendUpdateRequest = () => {this.sendRequest("PUT")};
 
     sendPatchRequest = () => {this.sendRequest("PATCH")};
@@ -40,8 +38,6 @@ class CreatePerson extends React.Component {
     render() {
         return <div>
             <button onClick={this.sendCreateRequest}>Create Person</button>
-            <br/>
-            <button onClick={this.sendDeleteRequest}>Delete Person</button>
             <br/>
             <button onClick={this.sendUpdateRequest}>Update Person</button>
             <br/>
