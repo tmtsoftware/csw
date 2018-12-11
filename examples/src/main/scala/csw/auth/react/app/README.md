@@ -1,5 +1,15 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+Please update react/app/public/keycloak.json file for following:
+```json
+"auth-server-url": "http://{ip}:8081/auth"
+``` 
+Please replace {ip} with your own ip.
+e.g. -
+```json
+"auth-server-url": "http://192.168.1.6:8081/auth",
+``` 
+
 ## Available Scripts
 
 In the project directory, you can run:

@@ -1,6 +1,6 @@
 {
   "realm": "example",
-  "auth-server-url": "http://10.131.20.93:8081/auth",
+  "auth-server-url": "http://192.168.1.6:8081/auth",
   "ssl-required": "external",
   "resource": "example-app",
   "public-client": true,
