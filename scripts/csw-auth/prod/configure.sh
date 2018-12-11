@@ -11,6 +11,7 @@ port=8081
 host="0.0.0.0"
 userName=""
 password=""
+testMode=false
 
 importJsonPath="../conf/auth_service/tmt-realm-export.json"
 
@@ -60,6 +61,9 @@ function parse_cmd_args {
                 --password)
                     password=$2
                     ;;
+                --testMode)
+                    testMode=true
+                    ;;
                 --help)
                     usage
                     ;;
@@ -99,17 +103,55 @@ function addAdminUser {
     sh add-user-keycloak.sh --user ${userName} -p ${password}
 }
 
+function is_AAS_running {
+    local http_code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:${port}/auth/${userName}/realms)
+    if [[ $http_code -eq 401 ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+function wait_till_AAS_starts {
+    until is_AAS_running; do
+        echo AAS still not running, waiting 5 seconds
+        sleep 5
+    done
+
+    echo AAS is running, proceeding with configuration
+}
+
+
+function addTestUsers {
+    cd ${keycloakDir}/${keycloakBinaryUnzipped}/bin
+    echo "[INFO] Adding test users"
+    sh add-user-keycloak.sh -u kevin -p abcd -r TMT
+    sh add-user-keycloak.sh -u frank -p abcd -r TMT
+}
+
+function associateRoleToTestUsers {
+    wait_till_AAS_starts
+    cd ${keycloakDir}/${keycloakBinaryUnzipped}/bin
+    echo "[INFO] Associate roles to test users"
+    sh kcadm.sh config credentials --server http://${host}:${port}/auth --realm master --user ${userName} --password ${password}
+    sh kcadm.sh add-roles --uusername kevin --rolename admin --cclientid csw-config-server -r TMT
+}
+
 function startAndRegister {
     cd ${currentDir}
     pwd
     echo "[INFO] starting server at $host:$port"
-    ./csw-location-agent --name AAS --http "auth" -c "sh ${keycloakDir}/${keycloakBinaryUnzipped}/bin/standalone.sh -Djboss.bind.address=${host} -Djboss.http.port=${port} -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=${currentDir}/${importJsonPath}" -p "$port"
+    sh csw-location-agent --name AAS --http "auth" -c "sh ${keycloakDir}/${keycloakBinaryUnzipped}/bin/standalone.sh -Djboss.bind.address=${host} -Djboss.http.port=${port} -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=${currentDir}/${importJsonPath}" -p "$port"
 }
 
 function start {
     parse_cmd_args "$@"
     checkIfKeycloakIsInstalled
     addAdminUser
+    if ${testMode} ; then addTestUsers ; fi
+    if ${testMode} ; then
+     associateRoleToTestUsers &
+    fi
     startAndRegister
 }
 
