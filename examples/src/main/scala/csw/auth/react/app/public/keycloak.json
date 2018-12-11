@@ -1,0 +1,10 @@
+{
+  "realm": "example",
+  "auth-server-url": "http://10.131.20.93:8081/auth",
+  "ssl-required": "external",
+  "resource": "example-app",
+  "public-client": true,
+  "verify-token-audience": true,
+  "use-resource-role-mappings": true,
+  "confidential-port": 0
+}
