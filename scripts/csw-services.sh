@@ -81,6 +81,7 @@ AASPortFile=${logDir}/AAS.port
 sentinelConf="../conf/redis_sentinel/sentinel.conf"
 eventMasterConf="../conf/event_service/master.conf"
 alarmMasterConf="../conf/alarm_service/master.conf"
+keycloakScript="keycloak-4.6.0.Final/bin"
 
 sortVersion="sort -V"
 
@@ -179,12 +180,39 @@ function start_sentinel() {
     fi
 }
 
+function is_AAS_running {
+    local http_code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:${AAS_port}/auth/${AAS_admin_user}/realms)
+    if [[ $http_code -eq 401 ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+function configure_AAS {
+    until is_AAS_running; do
+        echo AAS still not running, waiting 5 seconds
+        sleep 5
+    done
+
+    echo AAS is running, proceeding with configuration
+}
+
+function add_test_users_associate_roles() {
+    echo "[AAS] Adding test users"
+    cd ${keycloakScript}
+    sh add-user-keycloak.sh -u kevin -p abcd -r TMT
+    sh add-user-keycloak.sh -u frank -p abcd -r TMT
+}
+
 function start_AAS() {
     if [ -x "$location_agent_script" ]; then
         echo "[AAS] Starting Auth server..."
         nohup ./configure.sh -p $AAS_port -u $AAS_admin_user --password $AAS_admin_password &> ${AASLogFile} &
         echo $! > ${AASPidFile}
         echo ${AAS_port} > ${AASPortFile}
+        configure_AAS
+        add_test_users_associate_roles
     else
         echo "[ERROR] $location_agent_script script does not exist, please make sure that $location_agent_script resides in same directory as $script_name"
         exit 1
