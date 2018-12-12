@@ -36,7 +36,7 @@ public class JDatabaseServiceTest extends JUnitSuite {
         system = ActorSystem.apply("test");
         postgres = DatabaseServiceTestContext.postgres();
         Config config = DatabaseServiceTestContext.config(system, postgres.getPort());
-        dsl = new DatabaseService(config).defaultDSL();
+        dsl = new DatabaseService(config).createDsl("postgres");
 
     }
 

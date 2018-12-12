@@ -20,7 +20,7 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
   private implicit val ec: ExecutionContext = system.dispatcher
   private val postgres: EmbeddedPostgres    = DatabaseServiceTestContext.postgres()
   private val config: Config                = DatabaseServiceTestContext.config(system, postgres.getPort)
-  private val dsl: DSLContext               = new DatabaseService(config).defaultDSL
+  private val dsl: DSLContext               = new DatabaseService(config).createDsl("postgres")
 
   override def afterAll(): Unit = {
     postgres.close()
