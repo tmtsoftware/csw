@@ -7,7 +7,8 @@ import csw.config.server.ServerWiring
 import csw.config.server.commons.ConfigServiceConnection
 import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.location.api.exceptions.OtherLocationIsRegistered
-import csw.location.api.models.HttpRegistration
+import csw.location.api.models.Connection.HttpConnection
+import csw.location.api.models.{ComponentId, ComponentType, HttpRegistration}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.http.HTTPLocationService
 import csw.network.utils.Networks
@@ -19,6 +20,10 @@ class HttpServiceTest extends HTTPLocationService {
   implicit val system: ActorSystem    = ActorSystem("test")
   implicit val mat: ActorMaterializer = ActorMaterializer()
   private val testLocationService     = HttpLocationServiceFactory.makeLocalClient
+
+  //register AAS with location service
+  private val AASPort = 8080
+  testLocationService.register(HttpRegistration(HttpConnection(ComponentId("AAS", ComponentType.Service)), AASPort, "auth"))
 
   override def afterAll(): Unit = {
     system.terminate().await
