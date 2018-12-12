@@ -66,7 +66,7 @@ function parse_cmd_args {
                 --testMode)
                     testMode=true
                     ;;
-                --example)
+                --exampleMode)
                     exampleDemo=true
                     ;;
                 --help)
@@ -99,7 +99,7 @@ function usage {
     echo "  --user | -u <user_name>         add AAS with provided user as admin"
     echo "  --password <password>           add provided password for admin user"
     echo "  --testMode                      Optional parameter which sets up AAS for config server and cli testing"
-    echo "  --example                       Optional parameter which sets up AAS for example server and react app demo"
+    echo "  --exampleMode                   Optional parameter which sets up AAS for example server and react app demo"
     exit 1
 }
 

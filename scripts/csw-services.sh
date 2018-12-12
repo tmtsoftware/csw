@@ -232,13 +232,33 @@ function enableAllServicesForRunning {
     shouldStartAAS=true
 }
 
+function is_AAS_running {
+    local http_code=$(curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:${AAS_port}/auth/admin/realms)
+    if [[ $http_code -eq 401 ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+function wait_till_AAS_starts {
+    until is_AAS_running; do
+        echo AAS still not running, waiting 5 seconds
+        sleep 5
+    done
+    echo AAS is running, proceeding with configuration
+}
+
 function start_services {
     if [[ "$shouldStartSeed" = true ]]; then start_seed ; fi
-    if [[ "$shouldStartConfig" = true ]]; then start_config ; fi
+    if [[ ("$shouldStartAAS" = true) ]]; then start_AAS; fi
+    if [[ "$shouldStartConfig" = true ]]; then
+        wait_till_AAS_starts
+        start_config
+    fi
     if [[ "$shouldStartEvent" = true ]]; then start_event; fi
     if [[ "$shouldStartAlarm" = true ]]; then start_alarm; fi
     if [[ ("$shouldStartEvent" = true) || ("$shouldStartAlarm" = true) ]]; then start_sentinel; fi
-    if [[ ("$shouldStartAAS" = true) ]]; then start_AAS; fi
 }
 
 function usage {
@@ -289,6 +309,7 @@ function parse_cmd_args {
                             shift
                             ;;
                         --config)
+                            shouldStartAAS=true
                             shouldStartConfig=true
                             if isPortProvided $2; then config_port="$2"; shift; fi
                             ;;
