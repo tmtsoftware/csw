@@ -18,8 +18,10 @@ private[csw] class ServerWiring {
   lazy val config: Config = ConfigFactory.load()
   lazy val settings       = new Settings(config)
 
-  lazy val actorSystem      = ActorSystem("config-server")
-  lazy val actorRuntime     = new ActorRuntime(actorSystem, settings)
+  lazy val actorSystem  = ActorSystem("config-server")
+  lazy val actorRuntime = new ActorRuntime(actorSystem, settings)
+  import actorRuntime._
+
   lazy val annexFileRepo    = new AnnexFileRepo(actorRuntime.blockingIoDispatcher)
   lazy val annexFileService = new AnnexFileService(settings, annexFileRepo, actorRuntime)
 
@@ -30,7 +32,7 @@ private[csw] class ServerWiring {
 
   lazy val configHandlers = new ConfigHandlers
   //todo: use the location server here once dev deployment story is done
-  lazy val securityDirectives = SecurityDirectives(actorRuntime.ec)
+  lazy val securityDirectives = SecurityDirectives(locationService)
   lazy val configServiceRoute = new ConfigServiceRoute(configServiceFactory, actorRuntime, configHandlers, securityDirectives)
 
   lazy val httpService: HttpService = new HttpService(locationService, configServiceRoute, settings, actorRuntime)
