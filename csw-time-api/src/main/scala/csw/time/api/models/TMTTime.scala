@@ -2,12 +2,13 @@ package csw.time.api.models
 
 import java.time.{ZoneId, ZonedDateTime}
 
-sealed trait TMTTime[T <: TMTTime[T]] { self: T =>
-  val value: ZonedDateTime
+sealed abstract class TMTTime[T <: TMTTime[T]] {
+  def value: ZonedDateTime
+  def copy(value: ZonedDateTime): T
 
-  def at(zoneId: ZoneId): T
-  def atLocal: T
-  def atHawaii: T
+  def at(zoneId: ZoneId): T = copy(atZone(zoneId))
+  def atLocal: T            = copy(localZDT)
+  def atHawaii: T           = copy(hawaiiZDT)
 
   private[time] def atZone(zoneId: ZoneId) = value.toInstant.atZone(zoneId)
 
@@ -17,14 +18,9 @@ sealed trait TMTTime[T <: TMTTime[T]] { self: T =>
 
 object TMTTime {
   case class UTCTime(value: ZonedDateTime) extends TMTTime[UTCTime] {
-    override def at(zoneId: ZoneId): UTCTime = copy(atZone(zoneId))
-    override def atLocal: UTCTime            = copy(localZDT)
-    override def atHawaii: UTCTime           = copy(hawaiiZDT)
+    override def copy(value: ZonedDateTime): UTCTime = UTCTime(value)
   }
-
   case class TAITime(value: ZonedDateTime) extends TMTTime[TAITime] {
-    override def at(zoneId: ZoneId): TAITime = copy(atZone(zoneId))
-    override def atLocal: TAITime            = copy(localZDT)
-    override def atHawaii: TAITime           = copy(hawaiiZDT)
+    override def copy(value: ZonedDateTime): TAITime = TAITime(value)
   }
 }
