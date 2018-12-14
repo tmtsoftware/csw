@@ -13,6 +13,7 @@ import csw.time.api.scaladsl.TimeService;
 import org.junit.Rule;
 import org.junit.Test;
 import org.scalatest.junit.JUnitSuite;
+import scala.concurrent.duration.FiniteDuration;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -20,9 +21,11 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class TimeServiceTest extends JUnitSuite {
     @Rule
@@ -138,6 +141,7 @@ public class TimeServiceTest extends JUnitSuite {
     }
 
     //DEOPSCSW-544: Schedule a task to be executed repeatedly
+    //DEOPSCSW-547: Cancel scheduled timers for periodic tasks
     @Test
     public void should_schedule_a_task_periodically_at_given_interval() {
         List<String> list = new ArrayList<>();
@@ -151,6 +155,7 @@ public class TimeServiceTest extends JUnitSuite {
     }
 
     //DEOPSCSW-544: Start a repeating task with initial offset
+    //DEOPSCSW-547: Cancel scheduled timers for periodic tasks
     @Test
     public void should_schedule_a_task_periodically_at_given_interval_after_start_time() {
         List<String> list = new ArrayList<>();
@@ -166,4 +171,19 @@ public class TimeServiceTest extends JUnitSuite {
         cancellable.cancel();
         assertEquals(list.size(), 6);
     }
+
+    //DEOPSCSW-547: Cancel scheduled timers for single scheduled tasks
+    @Test
+    public void should_cancel_single_scheduled_task(){
+        TestProbe testProbe = new TestProbe(untypedSystem);
+        String probeMsg = "some message";
+        TAITime idealScheduleTime = new TAITime(timeService.taiTime().value().plusSeconds(1));
+
+        Runnable task = () -> testProbe.ref().tell(probeMsg, ActorRef.noSender());
+
+        Cancellable cancellable = timeService.scheduleOnce(idealScheduleTime, task);
+        cancellable.cancel();
+        testProbe.expectNoMessage(FiniteDuration.apply(500, TimeUnit.MILLISECONDS));
+    }
+
 }
