@@ -1,11 +1,11 @@
 package csw.time.client
 
-import csw.time.api.models.TMTTime
+import java.time.Instant
 
 object TestUtil {
 
-  def formatWithPrecision(tmtTime: TMTTime[_], precision: Int): String = {
-    val nanos = tmtTime.value.getNano
+  def formatWithPrecision(tmtTime: Instant, precision: Int): String = {
+    val nanos = tmtTime.getNano
     val d     = Math.pow(10, 9 - precision).toInt
     (nanos / d).toString
   }

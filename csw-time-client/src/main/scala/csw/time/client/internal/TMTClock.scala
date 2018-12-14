@@ -1,6 +1,6 @@
 package csw.time.client.internal
 
-import java.time.{Instant, ZoneId, ZoneOffset, ZonedDateTime}
+import java.time.Instant
 
 import com.sun.jna.NativeLong
 import csw.time.api.models.TMTTime.{TAITime, UTCTime}
@@ -35,10 +35,10 @@ object TMTClock {
       timeVal.tai
     }
 
-    private def timeFor(clockId: Int, zoneId: ZoneId = ZoneOffset.UTC): ZonedDateTime = {
+    private def timeFor(clockId: Int): Instant = {
       val timeSpec = new TimeSpec()
       TimeLibrary.clock_gettime(clockId, timeSpec)
-      Instant.ofEpochSecond(timeSpec.seconds.longValue(), timeSpec.nanoseconds.longValue()).atZone(zoneId)
+      Instant.ofEpochSecond(timeSpec.seconds.longValue(), timeSpec.nanoseconds.longValue())
     }
 
     // todo: without sudo or somehow handle it internally?
@@ -55,8 +55,8 @@ object TMTClock {
   }
 
   class NonLinuxClock(val offset: Int) extends TMTClock {
-    override def utcTime(): UTCTime = UTCTime(ZonedDateTime.now(ZoneOffset.UTC))
-    override def taiTime(): TAITime = TAITime(ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(offset))
+    override def utcTime(): UTCTime = UTCTime(Instant.now())
+    override def taiTime(): TAITime = TAITime(Instant.now().plusSeconds(offset))
 
     override def setOffset(offset: Int): Unit = {}
   }

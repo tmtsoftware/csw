@@ -15,5 +15,4 @@ object TimeServiceFactory {
     timeService.setTaiOffset(offset)
     timeService
   }
-
 }

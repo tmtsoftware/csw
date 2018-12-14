@@ -40,7 +40,7 @@ class TimeServiceImpl(clock: TMTClock)(implicit actorSystem: ActorSystem) extend
   private[time] def setTaiOffset(offset: Int): Unit = clock.setOffset(offset)
 
   private def delayFrom(time: TAITime): FiniteDuration = {
-    val now      = taiTime().at(time.value.getZone).value // use same zone as provided in time for duration calculation
+    val now      = taiTime().value
     val duration = Duration.between(now, time.value)
     FiniteDuration(duration.toNanos, NANOSECONDS)
   }

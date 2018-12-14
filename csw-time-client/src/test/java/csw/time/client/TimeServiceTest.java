@@ -17,7 +17,6 @@ import scala.concurrent.duration.FiniteDuration;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +47,7 @@ public class TimeServiceTest extends JUnitSuite {
 
         long expectedMillis = fixedInstant.toEpochMilli();
 
-        assertEquals((double) expectedMillis, (double) utcTime.value().toInstant().toEpochMilli(), 5);
+        assertEquals((double) expectedMillis, (double) utcTime.value().toEpochMilli(), 5);
     }
 
     //DEOPSCSW-537: Scala and Java API for conversion between TAI and UTC
@@ -64,7 +63,7 @@ public class TimeServiceTest extends JUnitSuite {
     //DEOPSCSW-534: PTP accuracy and precision while reading UTC
     @Test
     public void should_get_maximum_precision_supported_by_system_in_utc() {
-        assertFalse(TestUtil.formatWithPrecision(timeService.utcTime(), testProperties.precision()).endsWith("000"));
+        assertFalse(TestUtil.formatWithPrecision(timeService.utcTime().value(), testProperties.precision()).endsWith("000"));
     }
 
     //DEOPSCSW-541: PTP accuracy and precision while reading remote location time
@@ -72,12 +71,12 @@ public class TimeServiceTest extends JUnitSuite {
     public void should_get_maximum_precision_while_reading_remote_location_utc_time() {
         UTCTime utcTime = timeService.utcTime();
 
-        UTCTime utcHawaiiTime = utcTime.atHawaii();
-        UTCTime utcLocalTime = utcTime.atLocal();
+        ZonedDateTime utcHawaiiTime = utcTime.atHawaii();
+        ZonedDateTime utcLocalTime = utcTime.atLocal();
 
-        assertFalse(TestUtil.formatWithPrecision(utcTime, testProperties.precision()).endsWith("000"));
-        assertFalse(TestUtil.formatWithPrecision(utcHawaiiTime, testProperties.precision()).endsWith("000"));
-        assertFalse(TestUtil.formatWithPrecision(utcLocalTime, testProperties.precision()).endsWith("000"));
+        assertFalse(TestUtil.formatWithPrecision(utcTime.value(), testProperties.precision()).endsWith("000"));
+        assertFalse(TestUtil.formatWithPrecision(utcHawaiiTime.toInstant(), testProperties.precision()).endsWith("000"));
+        assertFalse(TestUtil.formatWithPrecision(utcLocalTime.toInstant(), testProperties.precision()).endsWith("000"));
     }
 
     //------------------------------TAI-------------------------------
@@ -91,7 +90,7 @@ public class TimeServiceTest extends JUnitSuite {
 
         long expectedMillis = expectedTaiInstant.toEpochMilli();
 
-        assertEquals(expectedMillis, taiTime.value().toInstant().toEpochMilli(), 5);
+        assertEquals(expectedMillis, taiTime.value().toEpochMilli(), 5);
     }
 
     //DEOPSCSW-537: Scala and Java API for conversion between TAI and UTC
@@ -107,19 +106,15 @@ public class TimeServiceTest extends JUnitSuite {
     //DEOPSCSW-538: PTP accuracy and precision while reading TAI
     @Test
     public void should_get_maximum_precision_supported_by_system_in_tai() {
-        assertFalse(TestUtil.formatWithPrecision(timeService.taiTime(), testProperties.precision()).endsWith("000"));
+        assertFalse(TestUtil.formatWithPrecision(timeService.taiTime().value(), testProperties.precision()).endsWith("000"));
     }
 
     //DEOPSCSW-541: PTP accuracy and precision while reading remote location time
     @Test
     public void should_get_maximum_precision_while_reading_remote_location_tai_time() {
         TAITime taiTime = timeService.taiTime();
-        TAITime taiHawaiiTime = taiTime.atHawaii();
-        TAITime taiLocalTime = taiTime.atLocal();
 
-        assertFalse(TestUtil.formatWithPrecision(taiTime, testProperties.precision()).endsWith("000"));
-        assertFalse(TestUtil.formatWithPrecision(taiHawaiiTime, testProperties.precision()).endsWith("000"));
-        assertFalse(TestUtil.formatWithPrecision(taiLocalTime, testProperties.precision()).endsWith("000"));
+        assertFalse(TestUtil.formatWithPrecision(taiTime.value(), testProperties.precision()).endsWith("000"));
     }
 
     //------------------------------Scheduling-------------------------------
