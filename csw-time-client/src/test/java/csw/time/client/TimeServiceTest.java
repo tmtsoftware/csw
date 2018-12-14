@@ -9,7 +9,7 @@ import akka.testkit.TestProbe;
 import csw.time.api.models.Cancellable;
 import csw.time.api.models.TMTTime.TAITime;
 import csw.time.api.models.TMTTime.UTCTime;
-import csw.time.api.scaladsl.TimeService;
+import csw.time.api.TimeService;
 import org.junit.Rule;
 import org.junit.Test;
 import org.scalatest.junit.JUnitSuite;

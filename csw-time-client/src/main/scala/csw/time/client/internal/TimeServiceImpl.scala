@@ -4,9 +4,9 @@ import java.time.Duration
 import java.util.concurrent.TimeUnit.NANOSECONDS
 
 import akka.actor.ActorSystem
+import csw.time.api.TimeService
 import csw.time.api.models.Cancellable
 import csw.time.api.models.TMTTime.{TAITime, UTCTime}
-import csw.time.api.scaladsl.TimeService
 import csw.time.client.internal.extensions.RichCancellableExt.RichCancellable
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
@@ -14,9 +14,11 @@ import scala.concurrent.duration.{DurationInt, FiniteDuration}
 class TimeServiceImpl(clock: TMTClock)(implicit actorSystem: ActorSystem) extends TimeService {
   import actorSystem.dispatcher
 
-  override def utcTime(): UTCTime = clock.utcTime()
-
-  override def taiTime(): TAITime = clock.taiTime()
+  override def utcTime(): UTCTime                            = clock.utcTime()
+  override def taiTime(): TAITime                            = clock.taiTime()
+  override def toUTC(taiInstant: TAITime): UTCTime           = clock.toUTC(taiInstant)
+  override def toTAI(utcInstant: UTCTime): TAITime           = clock.toTAI(utcInstant)
+  private[time] override def setTaiOffset(offset: Int): Unit = clock.setTaiOffset(offset)
 
   override def scheduleOnce(startTime: TAITime)(task: Runnable): Cancellable =
     actorSystem.scheduler
@@ -32,12 +34,6 @@ class TimeServiceImpl(clock: TMTClock)(implicit actorSystem: ActorSystem) extend
     actorSystem.scheduler
       .schedule(delayFrom(startTime), FiniteDuration(interval.toNanos, NANOSECONDS))(task.run())
       .toTsCancellable
-
-  override def toUTC(taiInstant: TAITime): UTCTime = UTCTime(taiInstant.value.minusSeconds(clock.offset))
-
-  override def toTAI(utcInstant: UTCTime): TAITime = TAITime(utcInstant.value.plusSeconds(clock.offset))
-
-  private[time] def setTaiOffset(offset: Int): Unit = clock.setOffset(offset)
 
   private def delayFrom(time: TAITime): FiniteDuration = {
     val now      = taiTime().value
