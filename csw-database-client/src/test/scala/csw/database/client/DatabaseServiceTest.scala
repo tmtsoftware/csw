@@ -131,13 +131,13 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
         dsl.query("INSERT INTO films(name) VALUES ('movie_4')"),
         dsl.query("INSERT INTO films(name) VALUES ('movie_2')"),
         dsl.query("""
-            |CREATE TABLE budget (
-            |               id SERIAL PRIMARY KEY,
-            |               movie_id INTEGER,
-            |               movie_name VARCHAR(10),
-            |               amount NUMERIC,
-            |               FOREIGN KEY (movie_id) REFERENCES films(id) ON DELETE CASCADE
-            |               )
+                    |CREATE TABLE budget (
+                    |               id SERIAL PRIMARY KEY,
+                    |               movie_id INTEGER,
+                    |               movie_name VARCHAR(10),
+                    |               amount INTEGER,
+                    |               FOREIGN KEY (movie_id) REFERENCES films(id) ON DELETE CASCADE
+                    |               )
           """.stripMargin),
         dsl.query("INSERT INTO budget(movie_id, movie_name, amount) VALUES (1, 'movie_1', 5000)"),
         dsl.query("INSERT INTO budget(movie_id, movie_name, amount) VALUES (2, 'movie_4', 6000)"),
@@ -162,8 +162,8 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
 
     resultSet.toSet shouldBe Set(("movie_1", 5000), ("movie_2", 10000), ("movie_4", 6000))
 
+    dsl.query("DROP TABLE budget").executeAsyncScala().futureValue
     dsl.query("DROP TABLE films").executeAsyncScala().futureValue
-    dsl.query("DROP TABLE box_office").executeAsyncScala().futureValue
   }
 
   //DEOPSCSW-611: Examples of updating records
