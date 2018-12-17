@@ -1,7 +1,7 @@
 package csw.time.client.scheduling_spikes;
 
-import csw.time.client.internal.TimeLibrary;
-import csw.time.client.internal.native_models.TimeSpec;
+import csw.time.api.TimeLibrary;
+import csw.time.api.native_models.TimeSpec;
 
 import java.util.LinkedList;
 import java.util.Timer;

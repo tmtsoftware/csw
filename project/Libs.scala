@@ -39,16 +39,12 @@ object Libs {
   val `HdrHistogram`             = "org.hdrhistogram"     % "HdrHistogram"              % "2.1.10"
   val `testng`                   = "org.testng"           % "testng"                    % "6.14.3"
 
-  val `scala-csv`             = "com.github.tototoshi" %% "scala-csv"            % "1.3.5"
-  val `json-schema-validator` = "com.github.fge"       % "json-schema-validator" % "2.2.6" //LGPL/ASL
-
-  val `scalajs-java-time` = dep("org.scala-js" %%% "scalajs-java-time" % "0.2.5")
-
+  val `scala-csv`                = "com.github.tototoshi" %% "scala-csv" % "1.3.5"
+  val `scalajs-java-time`        = dep("org.scala-js" %%% "scalajs-java-time" % "0.2.5")
+  val `json-schema-validator`    = "com.github.fge" % "json-schema-validator" % "2.2.6" //LGPL/ASL
   val `play-json-derived-codecs` = dep("org.julienrf" %%% "play-json-derived-codecs" % "4.0.1")
 
-  val `time4j`         = "net.time4j"       % "time4j-core"    % "4.38"
-  val `threeten-extra` = "org.threeten"     % "threeten-extra" % "1.4"
-  val `jna`            = "net.java.dev.jna" % "jna"            % "5.1.0"
+  val `jna` = "net.java.dev.jna" % "jna" % "5.1.0"
 
   val `postgresql`          = "org.postgresql"            % "postgresql"          % "42.2.5"
   val `postgresql-embedded` = "ru.yandex.qatools.embed"   % "postgresql-embedded" % "2.10"

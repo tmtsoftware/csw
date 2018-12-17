@@ -1,8 +1,8 @@
-package csw.time.client.internal.native_models
+package csw.time.api.models.internal
 
 /**
  * Clock Id argument is the identifier of the particular clock on which to act.
- * It is used by [[csw.time.client.internal.TimeLibrary.clock_gettime()]] native call.
+ * It is used by [[csw.time.api.TimeLibrary.clock_gettime()]] native call.
  *
  * Following are the possible ids in a linux system:
  * CLOCK_REALTIME                  0
@@ -18,7 +18,7 @@ package csw.time.client.internal.native_models
  * CLOCK_SGI_CYCLE                10      // In linux/time.h only.
  * CLOCK_TAI                      11      // In linux/time.h only.
  */
-object ClockId {
+private[time] object ClockId {
   val ClockRealtime = 0  // system-wide realtime clock. Its time represents seconds and nanoseconds since the Epoch
   val ClockTAI      = 11 // It is basically defined as CLOCK_REALTIME(UTC) + tai_offset.
 }

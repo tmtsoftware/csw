@@ -6,13 +6,6 @@ import csw.time.client.internal.TimeServiceImpl
 
 object TimeServiceFactory {
 
-  def make()(implicit actorSystem: ActorSystem): TimeService = new TimeServiceImpl(TMTClock.instance())
+  def make()(implicit actorSystem: ActorSystem): TimeService = new TimeServiceImpl()
 
-  //todo: make this private. Currently its not accessible from java file with package private
-  /** for testing */
-  def make(offset: Int)(implicit actorSystem: ActorSystem): TimeService = {
-    val timeService: TimeService = new TimeServiceImpl(TMTClock.instance(offset))
-    timeService.setTaiOffset(offset)
-    timeService
-  }
 }

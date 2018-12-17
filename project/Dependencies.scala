@@ -265,18 +265,16 @@ object Dependencies {
 
   val TimeApi = Def.setting(
     Seq(
-      Libs.`scalatest`.value % Test
+      Libs.`jna`,
+      Libs.`scalatest`.value % Test,
+      Libs.`junit-interface` % Test
     )
   )
 
   val TimeClient = Def.setting(
     Seq(
-      Libs.`time4j`,
-      Libs.`threeten-extra`,
-      Libs.`jna`,
       Akka.`akka-actor`,
       Akka.`akka-actor-typed`,
-      Libs.`scala-java8-compat`,
       Libs.`junit-interface`          % Test,
       Libs.`scalatest`.value          % Test,
       Akka.`akka-actor-testkit-typed` % Test,

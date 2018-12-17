@@ -1,12 +1,10 @@
-package csw.time.client
-
-import csw.time.client.internal.OSType
+package csw.time.api.utils
 
 trait TestProperties {
   def precision: Int
 }
 
-object TestProperties {
+object JTestProperties {
   class LinuxProperties extends TestProperties {
     override val precision: Int = 9
   }
@@ -19,5 +17,4 @@ object TestProperties {
     case OSType.Linux => new LinuxProperties
     case OSType.Other => new NonLinuxProperties
   }
-
 }

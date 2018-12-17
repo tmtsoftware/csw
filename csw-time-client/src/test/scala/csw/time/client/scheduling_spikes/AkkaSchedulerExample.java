@@ -3,8 +3,8 @@ package csw.time.client.scheduling_spikes;
 import akka.actor.ActorSystem;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import csw.time.client.internal.TimeLibrary;
-import csw.time.client.internal.native_models.TimeSpec;
+import csw.time.api.TimeLibrary;
+import csw.time.api.native_models.TimeSpec;
 
 import java.time.Duration;
 import java.util.ArrayList;

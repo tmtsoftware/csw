@@ -1,7 +1,5 @@
 package csw.time.client.scheduling_spikes;
 
-import csw.time.client.internal.TimeLibrary;
-
 import java.util.ArrayList;
 import java.util.concurrent.locks.LockSupport;
 
