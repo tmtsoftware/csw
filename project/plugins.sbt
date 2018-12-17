@@ -24,7 +24,7 @@ addSbtPlugin("org.scala-js"                      % "sbt-scalajs"                
 resolvers += "Jenkins repo" at "http://repo.jenkins-ci.org/public/"
 addSbtPlugin("ohnosequences" % "sbt-github-release" % "0.7.0")
 
-addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.1.0-M8")
+addSbtCoursier
 classpathTypes += "maven-plugin"
 
 libraryDependencies += "com.thesamet.scalapb" %% "compilerplugin" % "0.8.2"
