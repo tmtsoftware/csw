@@ -2,7 +2,7 @@ package csw.time.client
 
 import akka.actor.ActorSystem
 import csw.time.api.TimeService
-import csw.time.client.internal.{TMTClock, TimeServiceImpl}
+import csw.time.client.internal.TimeServiceImpl
 
 object TimeServiceFactory {
 

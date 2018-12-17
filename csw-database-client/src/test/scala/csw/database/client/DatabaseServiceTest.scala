@@ -2,7 +2,6 @@ package csw.database.client
 
 import akka.actor.ActorSystem
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
-import com.typesafe.config.Config
 import csw.database.client.scaladsl.JooqExtentions.{RichQueries, RichQuery, RichResultQuery}
 import org.jooq.DSLContext
 import org.scalatest.concurrent.PatienceConfiguration.Interval
@@ -18,9 +17,8 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
 
   private val system: ActorSystem           = ActorSystem("test")
   private implicit val ec: ExecutionContext = system.dispatcher
-  private val postgres: EmbeddedPostgres    = DatabaseServiceTestContext.postgres()
-  private val config: Config                = DatabaseServiceTestContext.config(system, postgres.getPort)
-  private val dsl: DSLContext               = new DatabaseService(config).createDsl("postgres")
+  private val postgres: EmbeddedPostgres    = DBTestHelper.postgres()
+  private val dsl: DSLContext               = DBTestHelper.dslContext(system, postgres.getPort)
 
   override def afterAll(): Unit = {
     postgres.close()

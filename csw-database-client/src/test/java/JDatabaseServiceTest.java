@@ -1,7 +1,8 @@
 import akka.actor.ActorSystem;
+import akka.actor.typed.javadsl.Adapter;
 import com.opentable.db.postgres.embedded.EmbeddedPostgres;
 import com.typesafe.config.Config;
-import csw.database.client.DatabaseServiceTestContext;
+import csw.database.client.DBTestHelper;
 import csw.database.client.javadsl.JooqHelper;
 import csw.database.client.DatabaseService;
 import org.jooq.DSLContext;
@@ -34,9 +35,8 @@ public class JDatabaseServiceTest extends JUnitSuite {
     @BeforeClass
     public static void setup() {
         system = ActorSystem.apply("test");
-        postgres = DatabaseServiceTestContext.postgres();
-        Config config = DatabaseServiceTestContext.config(system, postgres.getPort());
-        dsl = new DatabaseService(config).createDsl("postgres");
+        postgres = DBTestHelper.postgres();
+        dsl = DBTestHelper.dslContext(system, postgres.getPort());
 
     }
 
