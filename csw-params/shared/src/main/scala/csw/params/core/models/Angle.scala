@@ -71,7 +71,7 @@ case class Angle(uas: Long) extends AnyVal with Serializable with Ordered[Angle]
     new Angle(uas2)
   }
 
-  override def toString:String = "Angle(" + toDegree + " degree)"
+  override def toString: String = "Angle(" + toDegree + " degree)"
 
   /** Returns sequence of angles with given max value and increment */
   def to(maxVal: Angle, increment: Angle): Seq[Angle] = (uas to (maxVal.uas, increment.uas)).map(Angle(_))
@@ -82,7 +82,7 @@ case class Angle(uas: Long) extends AnyVal with Serializable with Ordered[Angle]
 
 object Angle {
 
-  protected[models] val CIRCLE: Long = 360L*60L*60L*1000L*1000L
+  protected[models] val CIRCLE: Long = 360L * 60L * 60L * 1000L * 1000L
 
   // Added for Play-Json support
   implicit val format: Format[Angle] = new Format[Angle] {
@@ -122,10 +122,10 @@ object Angle {
   def randomDe(): Angle = new Angle((CIRCLE / 2 * math.random - CIRCLE / 4).asInstanceOf[Int])
 
   /** returns maximal angle from two options */
-  def max(a1: Angle, a2: Angle):Angle = if (a1 > a2) a1 else a2
+  def max(a1: Angle, a2: Angle): Angle = if (a1 > a2) a1 else a2
 
   /** returns minimal angle from two options */
-  def min(a1: Angle, a2: Angle):Angle = if (a1 < a2) a1 else a2
+  def min(a1: Angle, a2: Angle): Angle = if (a1 < a2) a1 else a2
 
   /**
    * Parse Declination from four values. It uses BigDecimal, so there are no rounding errors
@@ -382,105 +382,105 @@ object Angle {
   }
 
   /** multiply to convert degrees to radians */
-  val D2R:Double = math.Pi / 180d
+  val D2R: Double = math.Pi / 180d
 
   /** multiply to convert radians to degrees */
-  val R2D:Double = 1d / D2R
+  val R2D: Double = 1d / D2R
 
   /** multiply to convert degrees to arc hours */
-  val D2H:Double = 1d / 15d
+  val D2H: Double = 1d / 15d
 
   /** multiply to convert arc hour to degrees */
-  val H2D:Double = 1d / D2H
+  val H2D: Double = 1d / D2H
 
   /** multiply to convert degrees to arc minute */
-  val D2M:Int = 60
+  val D2M: Int = 60
 
   /** multiply to convert arc minute  to toDegree */
-  val M2D:Double = 1d / D2M
+  val M2D: Double = 1d / D2M
 
   /** multiply to convert degrees to arc second */
-  val D2S:Int = 3600
+  val D2S: Int = 3600
 
   /** multiply to convert arc second to toDegree */
-  val S2D:Double = 1d / D2S
+  val S2D: Double = 1d / D2S
 
   /** multiply to convert hours to radians */
-  val H2R:Double = Angle.H2D * Angle.D2R
+  val H2R: Double = Angle.H2D * Angle.D2R
 
   /** multiply to convert radians to hours */
-  val R2H:Double = 1d / H2R
+  val R2H: Double = 1d / H2R
 
   /** multiply to convert radians to minutes */
-  val R2M:Double = R2D * D2M
+  val R2M: Double = R2D * D2M
 
   /** multiply to convert minutes to radians */
-  val M2R:Double = 1d / R2M
+  val M2R: Double = 1d / R2M
 
   /** multiply to convert milli arc seconds to radians */
-  val Mas2R:Double = D2R / 3600000d
+  val Mas2R: Double = D2R / 3600000d
 
   /** multiply to convert micro arc seconds to radians */
-  val Uas2R:Double = D2R / 3600000000d
+  val Uas2R: Double = D2R / 3600000000d
 
   /** multiply to convert radians to mili arc seconds */
-  val R2Mas:Double = 1d / Mas2R
+  val R2Mas: Double = 1d / Mas2R
 
   /** multiply to convert radians to micro arc seconds */
-  val R2Uas:Double = 1d / Uas2R
+  val R2Uas: Double = 1d / Uas2R
 
   /** multiply to convert hours to mili arc seconds */
-  val H2Mas:Int = 15 * 60 * 60 * 1000
+  val H2Mas: Int = 15 * 60 * 60 * 1000
 
   /** multiply to convert time minutes to mili arc seconds */
-  val HMin2Mas:Int = 15 * 60 * 1000
+  val HMin2Mas: Int = 15 * 60 * 1000
 
   /** multiply to convert time seconds to mili arc seconds */
-  val HSec2Mas:Int = 15 * 1000
+  val HSec2Mas: Int = 15 * 1000
 
   /** multiply to convert hours to micro arc seconds */
-  val H2Uas:Long = 15L*60L*60L*1000L*1000L
+  val H2Uas: Long = 15L * 60L * 60L * 1000L * 1000L
 
   /** multiply to convert time minutes to micro arc seconds */
-  val HMin2Uas:Long = 15L*60L*1000L*1000L
+  val HMin2Uas: Long = 15L * 60L * 1000L * 1000L
 
   /** multiply to convert time seconds to micro arc seconds */
-  val HSec2Uas:Long = 15L*1000L*1000L
+  val HSec2Uas: Long = 15L * 1000L * 1000L
 
   /** multiply to convert degrees to mili arc seconds */
-  val D2Mas:Int = 60 * 60 * 1000
+  val D2Mas: Int = 60 * 60 * 1000
 
   /** multiply to convert minutes to mili arc seconds */
-  val M2Mas:Int = 60 * 1000
+  val M2Mas: Int = 60 * 1000
 
   /** multiply to convert Seconds to mili arc seconds */
-  val S2Mas:Int = 1000
+  val S2Mas: Int = 1000
 
   /** multiply to convert degrees to micro arc seconds */
-  val D2Uas:Long = 60L*60L*1000L*1000L
+  val D2Uas: Long = 60L * 60L * 1000L * 1000L
 
   /** multiply to convert minutes to micro arc seconds */
-  val M2Uas:Long = 60L*1000L*1000L
+  val M2Uas: Long = 60L * 1000L * 1000L
 
   /** multiply to convert Seconds to micro arc seconds */
-  val S2Uas:Long = 1000L*1000L
+  val S2Uas: Long = 1000L * 1000L
 
   /** multiply to convert UAS to degrees  */
-  val Uas2D:Double = 1d / D2Uas
+  val Uas2D: Double = 1d / D2Uas
 
   /** multiply to convert UAS to minutes  */
-  val Uas2M:Double = 1d / M2Uas
+  val Uas2M: Double = 1d / M2Uas
 
   /** multiply to convert UAS to Seconds  */
-  val Uas2S:Double = 1d / S2Uas
+  val Uas2S: Double = 1d / S2Uas
 
   /** multiply to convert  arc seconds to radians */
-  val S2R:Double = D2R / 3600d
+  val S2R: Double = D2R / 3600d
 
   /** multiply to convert radians to  arc seconds */
-  val R2S:Double = 1d / S2R
+  val R2S: Double = 1d / S2R
 
   /** round circle which marks degrees */
-  val DEGREE_SIGN:Char = '\u00B0'
+  val DEGREE_SIGN: Char = '\u00B0'
 
 }

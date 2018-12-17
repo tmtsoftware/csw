@@ -4,40 +4,48 @@ import org.scalatest.{FunSpec, Matchers}
 
 class ObsId2Tests extends FunSpec with Matchers {
 
-  val obsID1 = "2022A-Q-P012-O123"     // without file
-  val obsID2 = "2022A-Q-P012-O123-X0234" // with file
+  val obsID1 = "2022A-Q-P012-O123"       // without file
+  val obsID2 = "2022A-C-P014-O123-I0234" // with file
 
-  describe("RegEx") {
-    //YYYY(A|B|E)-(Q|C)-PXXX-OXXX-XXXX
-//    val reg = """(\d{4})(A|B)-(C|Q|P|E)-P(\d{1,3})-O(\d{1,3})(?:-)?(\d+)?""".r
-    val reg = raw"(\d{4})(A|B|E)".r
 
-    "2022A" match {
-      case reg(year, sem) =>
-        println(s"Year: $year $sem")
-      case a =>
-        println("Its: " + a)
+  describe("Basic ObsID Test") {
+    it("Should create obsId with no file") {
+      val oid = ObsId3(obsID1)
+      oid.isValid shouldBe true
+      oid.semester shouldBe "2022A"
+      oid.year shouldBe "2022"
+      oid.whichSemester shouldBe 'A'
+      oid.programType shouldBe 'Q'
+      oid.program shouldBe "P012"
+      oid.observation shouldBe "O123"
+      oid.hasFile shouldBe false
+      oid.file shouldBe ""
+      oid.detector shouldBe ' '
     }
 
-    "2022A-Q-P012-O123" match {
-      case reg(year, sem, kind, prog, obs, null) =>
-        println(s"Its: $year $sem with $kind and prog $prog, obs $obs")
-        println("Kind: " + kind.getClass)
-
-      case reg(year, sem, kind, prog, obs, file) => println(s"Its: $year $sem with $kind and prog $prog, obs $obs, file $file")
-      case _                                     => println("Fail")
+    it("Should create obsId with file") {
+      val oid = ObsId3(obsID2)
+      oid.isValid shouldBe true
+      oid.semester shouldBe "2022A"
+      oid.year shouldBe "2022"
+      oid.whichSemester shouldBe 'A'
+      oid.programType shouldBe 'C'
+      oid.program shouldBe "P014"
+      oid.observation shouldBe "O123"
+      oid.hasFile shouldBe true
+      oid.file shouldBe "I0234"
+      oid.detector shouldBe 'I'
     }
-    "2022A-Q-P012-O123-234" match {
-      case reg(year, sem, kind, prog, obs, null) => println(s"Its: $year $sem with $kind and prog $prog, obs $obs")
-      case reg(year, sem, kind, prog, obs, file) => println(s"Its: $year $sem with $kind and prog $prog, obs $obs, file $file")
-      case _                                     => println("Fail")
+    it("Should obsId fail with det and no file") {
+      ObsID2.create("2022A-Q-P012-O123-A") shouldBe ObsID2.BAD_OBSID
     }
-  }
 
-  describe("Basdic ObsID Test") {
+    it("Should create obsId with det and file") {
+      ObsID2.create("2022A-Q-P012-O123-A001") shouldBe ObsID2("2022", "A", "Q", "012", "123", Some("A001"))
+    }
 
-    val ob1: ObsID2 = obsID1
-
-    println("OB1: " + ob1)
+    it("Should allow obsId with file but no det") {
+      ObsID2.create("2022A-Q-P012-O123-001") shouldBe ObsID2("2022", "A", "Q", "012", "123", Some("001"))
+    }
   }
 }
