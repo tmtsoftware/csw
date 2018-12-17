@@ -20,7 +20,7 @@ import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-class DatabaseService(actorSystem: ActorSystem[_]) {
+class DatabaseServiceFactory(actorSystem: ActorSystem[_]) {
 
   private val ReadUsernameHolder = "dbReadUsername"
   private val ReadPasswordHolder = "dbReadPassword"
@@ -30,11 +30,11 @@ class DatabaseService(actorSystem: ActorSystem[_]) {
   private implicit val ec: ExecutionContext = actorSystem.executionContext
 
   // create connection with default read access, throws DatabaseException
-  def createDsl(locationService: LocationService, dbName: String): Future[DSLContext] =
-    createDsl(locationService, dbName, ReadUsernameHolder, ReadPasswordHolder)
+  def makeDsl(locationService: LocationService, dbName: String): Future[DSLContext] =
+    makeDsl(locationService, dbName, ReadUsernameHolder, ReadPasswordHolder)
 
   // create connection with credentials picked up from env variables, throws DatabaseException
-  def createDsl(
+  def makeDsl(
       locationService: LocationService,
       dbName: String,
       usernameHolder: String,
@@ -54,23 +54,23 @@ class DatabaseService(actorSystem: ActorSystem[_]) {
   }
 
   // throws DatabaseException
-  def jCreateDsl(locationService: ILocationService, dbName: String): CompletableFuture[DSLContext] =
-    createDsl(locationService.asScala, dbName).toJava.toCompletableFuture
+  def jMakeDsl(locationService: ILocationService, dbName: String): CompletableFuture[DSLContext] =
+    makeDsl(locationService.asScala, dbName).toJava.toCompletableFuture
 
   // throws DatabaseException
-  def jCreateDsl(
+  def jMakeDsl(
       locationService: ILocationService,
       dbName: String,
       usernameHolder: String,
       passwordHolder: String
   ): CompletableFuture[DSLContext] =
-    createDsl(locationService.asScala, dbName, usernameHolder, passwordHolder).toJava.toCompletableFuture
+    makeDsl(locationService.asScala, dbName, usernameHolder, passwordHolder).toJava.toCompletableFuture
 
   // for dev/testing use picks details from config, throws DatabaseException
-  def createDsl(): Future[DSLContext]             = Future(createDslInternal())
-  def jCreateDsl(): CompletableFuture[DSLContext] = createDsl().toJava.toCompletableFuture
+  def makeDsl(): Future[DSLContext]             = Future(createDslInternal())
+  def jMakeDsl(): CompletableFuture[DSLContext] = makeDsl().toJava.toCompletableFuture
 
-  private[database] def createDsl(port: Int): Future[DSLContext] = {
+  private[database] def makeDsl(port: Int): Future[DSLContext] = {
     val config = ConfigFactory.parseString(s"dataSource.portNumber = $port")
     Future(createDslInternal(Some(config)))
   }

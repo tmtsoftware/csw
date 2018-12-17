@@ -1,10 +1,7 @@
 import akka.actor.ActorSystem;
-import akka.actor.typed.javadsl.Adapter;
 import com.opentable.db.postgres.embedded.EmbeddedPostgres;
-import com.typesafe.config.Config;
 import csw.database.client.DBTestHelper;
 import csw.database.client.javadsl.JooqHelper;
-import csw.database.client.DatabaseService;
 import org.jooq.DSLContext;
 import org.jooq.Queries;
 import org.jooq.Record;

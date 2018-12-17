@@ -18,5 +18,5 @@ object DBTestHelper {
       .start
 
   def dslContext(system: ActorSystem, port: Int): DSLContext =
-    new DatabaseService(system.toTyped).createDsl(port).futureValue(Interval(Span(5, Seconds)))
+    new DatabaseServiceFactory(system.toTyped).makeDsl(port).futureValue(Interval(Span(5, Seconds)))
 }

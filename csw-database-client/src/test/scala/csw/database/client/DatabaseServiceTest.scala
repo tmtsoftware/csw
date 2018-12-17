@@ -122,11 +122,10 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
   //DEOPSCSW-609: Examples of Record creation
   //DEOPSCSW-613: Examples of querying records
   //DEOPSCSW-610: Examples of Reading Records
-  test("should be able to create, join and group records") { databaseService: DatabaseService =>
+  test("should be able to create, join and group records") {
     // create tables films and budget and insert records
     dsl
       .queries(
-        dsl.query("CREATE TABLE films (id SERIAL PRIMARY KEY, name VARCHAR (10) UNIQUE NOT NULL)"),
         dsl.query("CREATE TABLE films (id SERIAL PRIMARY KEY, name VARCHAR (10) UNIQUE NOT NULL)"),
         dsl.query("INSERT INTO films(name) VALUES ('movie_1')"),
         dsl.query("INSERT INTO films(name) VALUES ('movie_4')"),
@@ -157,11 +156,11 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
                     |    INNER JOIN budget
                     |    ON films.id = budget.movie_id
                     |    GROUP BY  films.name
-            """)
+            """.stripMargin)
         .fetchAsyncScala[(String, Int)]
         .futureValue
 
-    resultSet.toSet shouldEqual Set(("movie_1", 5000), ("movie_4", 6000), ("movie_2", 10000))
+    resultSet.toSet shouldBe Set(("movie_1", 5000), ("movie_2", 10000), ("movie_4", 6000))
 
     dsl.query("DROP TABLE films").executeAsyncScala().futureValue
     dsl.query("DROP TABLE box_office").executeAsyncScala().futureValue
@@ -169,7 +168,7 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
 
   //DEOPSCSW-611: Examples of updating records
   //DEOPSCSW-619: Create a method to send an update sql string to a database
-  test("should be able to update record") { databaseService: DatabaseService =>
+  test("should be able to update record") {
     // create films and insert record
     val movie_2 = "movie_2"
     dsl
