@@ -14,6 +14,7 @@ import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -46,18 +47,29 @@ public class JDatabaseServiceTest extends JUnitSuite {
     //DEOPSCSW-608: Examples of database creation
     @Test
     public void shouldBeAbleToCreateANewDatabase() throws InterruptedException, ExecutionException, TimeoutException {
-        // create box_office database
-        dsl.query("CREATE DATABASE box_office").executeAsync().toCompletableFuture().get(5, SECONDS);
         String getDatabases = "SELECT datname FROM pg_database WHERE datistemplate = false";
         List<String> resultSet = JooqHelper.fetchAsync(dsl.resultQuery(getDatabases), String.class).get(5, SECONDS);
 
         // assert creation of database
-        assertTrue(resultSet.contains("box_office"));
+        if (resultSet.contains("box_office")) {
+            // drop box_office database
+            dsl.query("DROP DATABASE box_office").executeAsync().toCompletableFuture().get(5, SECONDS);
+            List<String> resultSet2 = JooqHelper.fetchAsync(dsl.resultQuery(getDatabases), String.class).get(5, SECONDS);
+            assertFalse(resultSet2.contains("box_office"));
+        }
+
+
+        // create box_office database
+        dsl.query("CREATE DATABASE box_office").executeAsync().toCompletableFuture().get(5, SECONDS);
+        List<String> resultSet3 = JooqHelper.fetchAsync(dsl.resultQuery(getDatabases), String.class).get(5, SECONDS);
+
+        // assert creation of database
+        assertTrue(resultSet3.contains("box_office"));
 
         // drop box_office database
         dsl.query("DROP DATABASE box_office").executeAsync().toCompletableFuture().get(5, SECONDS);
-        List<String> resultSet2 = JooqHelper.fetchAsync(dsl.resultQuery(getDatabases), String.class).get(5, SECONDS);
-        assertFalse(resultSet2.contains("box_office"));
+        List<String> resultSet4 = JooqHelper.fetchAsync(dsl.resultQuery(getDatabases), String.class).get(5, SECONDS);
+        assertFalse(resultSet4.contains("box_office"));
     }
 
     //DEOPSCSW-622: Modify a table using update sql string
@@ -97,12 +109,14 @@ public class JDatabaseServiceTest extends JUnitSuite {
     public void shouldBeAbleToQueryRecordsFromTheTable() throws InterruptedException, ExecutionException, TimeoutException {
         // create films and insert movie_1
         String movieName = "movie_1";
+        String movieName2 = "movie_2";
         dsl.query("CREATE TABLE films (id SERIAL PRIMARY KEY, name VARCHAR (10) UNIQUE NOT NULL)").executeAsync().toCompletableFuture().get(5, SECONDS);
         dsl.query("INSERT INTO films(name) VALUES (?)", movieName).executeAsync().toCompletableFuture().get(5, SECONDS);
+        dsl.query("INSERT INTO films(name) VALUES (?)", movieName2).executeAsync().toCompletableFuture().get(5, SECONDS);
 
         // query the table and assert on data received
         List<Film> resultSet = JooqHelper.fetchAsync(dsl.resultQuery("SELECT * FROM films where name = ?", movieName), Film.class).get(5, SECONDS);
-        assertTrue(resultSet.contains(new Film(1, movieName)));
+        assertEquals(resultSet, Collections.singletonList(new Film(1, movieName)));
 
         dsl.query("DROP TABLE films").executeAsync().toCompletableFuture().get(5, SECONDS);
     }
@@ -189,12 +203,16 @@ public class JDatabaseServiceTest extends JUnitSuite {
 
         JooqHelper.executeBatch(queries).get(5, SECONDS);
 
+        // assert the entry of record
+        List<String> resultSet = JooqHelper.fetchAsync(dsl.resultQuery("SELECT name from films where name=?", movie4), String.class).get(5, SECONDS);
+        assertEquals(resultSet, Collections.singletonList(movie4));
+
         // delete movie_4
         dsl.query("DELETE from films WHERE name = ?", movie4).executeAsync().toCompletableFuture().get(5, SECONDS);
 
         // assert the removal of record
-        List<Integer> resultSet = JooqHelper.fetchAsync(dsl.resultQuery("SELECT count(*) AS rowCount from films"), Integer.class).get(5, SECONDS);
-        assertEquals(Integer.valueOf(2), resultSet.get(0));
+        List<String> resultSet2 = JooqHelper.fetchAsync(dsl.resultQuery("SELECT name from films where name=?", movie4), String.class).get(5, SECONDS);
+        assertEquals(resultSet2, Collections.emptyList());
 
         dsl.query("DROP TABLE films").executeAsync().toCompletableFuture().get(5, SECONDS);
     }

@@ -27,6 +27,19 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
 
   //DEOPSCSW-608: Examples of database creation
   test("should be able to create a new Database") {
+    // ensure database isn't already present
+    val getDatabaseQuery = dsl.resultQuery("SELECT datname FROM pg_database WHERE datistemplate = false")
+
+    val resultSet = getDatabaseQuery.fetchAsyncScala[String].futureValue(Interval(Span(5, Seconds)))
+
+    if (resultSet contains "box_office") {
+      // drop box_office database
+      dsl
+        .query("DROP DATABASE box_office")
+        .executeAsyncScala()
+        .futureValue(Interval(Span(5, Seconds)))
+    }
+
     // create box_office database
     dsl
       .query("CREATE DATABASE box_office")
@@ -34,11 +47,9 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
       .futureValue(Interval(Span(5, Seconds)))
 
     // assert creation of database
-    val getDatabaseQuery = dsl.resultQuery("SELECT datname FROM pg_database WHERE datistemplate = false")
+    val resultSet2 = getDatabaseQuery.fetchAsyncScala[String].futureValue(Interval(Span(5, Seconds)))
 
-    val resultSet = getDatabaseQuery.fetchAsyncScala[String].futureValue(Interval(Span(5, Seconds)))
-
-    resultSet should contain("box_office")
+    resultSet2 should contain("box_office")
 
     // drop box_office database
     dsl
@@ -47,8 +58,8 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
       .futureValue(Interval(Span(5, Seconds)))
 
     // assert removal of database
-    val resultSet2 = getDatabaseQuery.fetchAsyncScala[String].futureValue
-    resultSet2 should not contain "box_office"
+    val resultSet3 = getDatabaseQuery.fetchAsyncScala[String].futureValue
+    resultSet3 should not contain "box_office"
   }
 
   //DEOPSCSW-622: Modify a table using update sql string
@@ -98,13 +109,15 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
   //DEOPSCSW-609: Examples of Record creation
   test("should be able to query records from the table") {
     // create films and insert movie_1
-    val movieName = "movie_1"
+    val movieName  = "movie_1"
+    val movieName2 = "movie_2"
     dsl
       .query("CREATE TABLE films (id SERIAL PRIMARY KEY, name VARCHAR (10) UNIQUE NOT NULL)")
       .executeAsyncScala()
       .futureValue
 
     dsl.query("INSERT INTO films(name) VALUES (?)", movieName).executeAsyncScala().futureValue
+    dsl.query("INSERT INTO films(name) VALUES (?)", movieName2).executeAsyncScala().futureValue
 
     // query the table and assert on data received
     val resultSet: Seq[(Int, String)] =
@@ -113,7 +126,7 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
         .fetchAsyncScala[(Int, String)]
         .futureValue
 
-    resultSet.headOption shouldEqual Some((1, "movie_1"))
+    resultSet shouldEqual Seq((1, "movie_1"))
 
     dsl.query("DROP TABLE films").executeAsyncScala().futureValue
   }
@@ -208,13 +221,17 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
       .executeBatchAsync()
       .futureValue
 
+    val resultSet =
+      dsl.resultQuery("SELECT name from films where name=?", movie4).fetchAsyncScala[String].futureValue
+    resultSet shouldBe Seq(movie4)
+
     // delete movie_4
     dsl.query("DELETE from films WHERE name = ?", movie4).executeAsyncScala().futureValue
 
     // assert the removal of record
-    val resultSet =
-      dsl.resultQuery("SELECT count(*) AS rowCount from films").fetchAsyncScala[Int].futureValue
-    resultSet.headOption shouldBe Some(2)
+    val resultSet2 =
+      dsl.resultQuery("SELECT name from films where name=?", movie4).fetchAsyncScala[String].futureValue
+    resultSet2 shouldBe Seq.empty
 
     dsl.query("DROP TABLE films").executeAsyncScala().futureValue
   }
