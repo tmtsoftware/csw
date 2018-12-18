@@ -14,12 +14,12 @@ import org.scalatest.FunSuiteLike
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.duration.DurationInt
 
-class TimeServiceTest extends ScalaTestWithActorTestKit(ManualTime.config) with FunSuiteLike {
+class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.config) with FunSuiteLike {
 
   private implicit val untypedSystem: ActorSystem = system.toUntyped
   private val manualTime                          = ManualTime()
 
-  private val timeService = TimeServiceFactory.make()
+  private val timeService = TimeServiceSchedulerFactory.make()
 
   // DEOPSCSW-542: Schedule a task to execute in future
   test("should schedule task at start time") {

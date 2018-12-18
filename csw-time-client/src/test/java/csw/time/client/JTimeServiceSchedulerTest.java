@@ -8,28 +8,21 @@ import akka.actor.typed.internal.adapter.ActorSystemAdapter;
 import akka.testkit.TestProbe;
 import akka.testkit.javadsl.TestKit;
 import csw.time.api.TAITime;
-import csw.time.api.TimeService;
-import csw.time.api.UTCTime;
+import csw.time.api.TimeServiceScheduler;
 import csw.time.api.models.Cancellable;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.scalatest.junit.JUnitSuite;
-import scala.collection.Seq;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.time.Duration;
-import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 
-public class JTimeServiceTest extends JUnitSuite {
+public class JTimeServiceSchedulerTest extends JUnitSuite {
 
     @Rule
     public TestKitJunitResource testKit = new TestKitJunitResource(ManualTime.config());
@@ -37,7 +30,7 @@ public class JTimeServiceTest extends JUnitSuite {
     private ActorSystem untypedSystem = ActorSystemAdapter.toUntyped(testKit.system());
     private ManualTime manualTime = ManualTime.get(testKit.system());
 
-    private TimeService timeService = TimeServiceFactory.make(untypedSystem);
+    private TimeServiceScheduler timeServiceScheduler = TimeServiceSchedulerFactory.make(untypedSystem);
     private TestKit untypedTestKit = new TestKit(untypedSystem);
 
     //------------------------------Scheduling-------------------------------
@@ -52,7 +45,7 @@ public class JTimeServiceTest extends JUnitSuite {
 
         Runnable task = () -> testProbe.ref().tell(probeMsg, ActorRef.noSender());
 
-        Cancellable cancellable = timeService.scheduleOnce(idealScheduleTime, task);
+        Cancellable cancellable = timeServiceScheduler.scheduleOnce(idealScheduleTime, task);
 
         manualTime.timePasses(Duration.ofSeconds(1));
         testProbe.expectMsg(probeMsg);
@@ -67,7 +60,7 @@ public class JTimeServiceTest extends JUnitSuite {
 
         TAITime idealScheduleTime = new TAITime(TAITime.now().value().plusSeconds(1));
 
-        Cancellable cancellable = timeService.scheduleOnce(idealScheduleTime, testProbe.ref(), probeMsg);
+        Cancellable cancellable = timeServiceScheduler.scheduleOnce(idealScheduleTime, testProbe.ref(), probeMsg);
 
         manualTime.timePasses(Duration.ofSeconds(1));
         testProbe.expectMsg(probeMsg);
@@ -80,7 +73,7 @@ public class JTimeServiceTest extends JUnitSuite {
     public void should_schedule_a_task_periodically_at_given_interval() {
         List<String> list = new ArrayList<>();
 
-        Cancellable cancellable = timeService.schedulePeriodically(Duration.ofMillis(100), () -> list.add("x"));
+        Cancellable cancellable = timeServiceScheduler.schedulePeriodically(Duration.ofMillis(100), () -> list.add("x"));
 
         manualTime.timePasses(Duration.ofMillis(500));
         cancellable.cancel();
@@ -91,7 +84,7 @@ public class JTimeServiceTest extends JUnitSuite {
     // DEOPSCSW-546: Notification on Scheduled Periodic timer expiry
     @Test
     public void should_schedule_a_message_periodically_at_given_interval() {
-        Cancellable cancellable = timeService.schedulePeriodically(Duration.ofMillis(100), untypedTestKit.getRef(), "echo");
+        Cancellable cancellable = timeServiceScheduler.schedulePeriodically(Duration.ofMillis(100), untypedTestKit.getRef(), "echo");
 
         manualTime.timePasses(Duration.ofMillis(500));
         cancellable.cancel();
@@ -109,7 +102,7 @@ public class JTimeServiceTest extends JUnitSuite {
 
         TAITime startTime = new TAITime(TAITime.now().value().plusSeconds(1));
 
-        Cancellable cancellable = timeService.schedulePeriodically(startTime, Duration.ofMillis(100), () -> list.add("x"));
+        Cancellable cancellable = timeServiceScheduler.schedulePeriodically(startTime, Duration.ofMillis(100), () -> list.add("x"));
 
         manualTime.timePasses(Duration.ofSeconds(1));
         assertEquals(list.size(), 1);
@@ -124,7 +117,7 @@ public class JTimeServiceTest extends JUnitSuite {
     public void should_schedule_a_message_periodically_at_given_interval_after_start_time() {
         TAITime startTime = new TAITime(TAITime.now().value().plusSeconds(1));
 
-        Cancellable cancellable = timeService.schedulePeriodically(startTime, Duration.ofMillis(100), untypedTestKit.getRef(), "echo");
+        Cancellable cancellable = timeServiceScheduler.schedulePeriodically(startTime, Duration.ofMillis(100), untypedTestKit.getRef(), "echo");
 
         manualTime.timePasses(Duration.ofSeconds(1));
         untypedTestKit.expectMsg("echo");
@@ -144,7 +137,7 @@ public class JTimeServiceTest extends JUnitSuite {
 
         Runnable task = () -> testProbe.ref().tell(probeMsg, ActorRef.noSender());
 
-        Cancellable cancellable = timeService.scheduleOnce(idealScheduleTime, task);
+        Cancellable cancellable = timeServiceScheduler.scheduleOnce(idealScheduleTime, task);
         cancellable.cancel();
         testProbe.expectNoMessage(FiniteDuration.apply(500, TimeUnit.MILLISECONDS));
     }

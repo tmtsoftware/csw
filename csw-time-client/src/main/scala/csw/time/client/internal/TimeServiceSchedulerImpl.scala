@@ -5,12 +5,12 @@ import java.util.concurrent.TimeUnit.NANOSECONDS
 
 import akka.actor.{ActorRef, ActorSystem, Scheduler}
 import csw.time.api.models.Cancellable
-import csw.time.api.{TAITime, TimeService}
+import csw.time.api.{TAITime, TimeServiceScheduler}
 import csw.time.client.internal.extensions.RichCancellableExt.RichCancellable
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
-class TimeServiceImpl(implicit actorSystem: ActorSystem) extends TimeService {
+class TimeServiceSchedulerImpl(implicit actorSystem: ActorSystem) extends TimeServiceScheduler {
   import actorSystem.dispatcher
 
   private val scheduler: Scheduler = actorSystem.scheduler

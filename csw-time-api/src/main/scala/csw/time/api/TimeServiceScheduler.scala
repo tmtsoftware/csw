@@ -4,7 +4,7 @@ import java.time.Duration
 import akka.actor.ActorRef
 import csw.time.api.models.Cancellable
 
-trait TimeService {
+trait TimeServiceScheduler {
   def scheduleOnce(startTime: TAITime)(f: ⇒ Unit): Cancellable
   def scheduleOnce(startTime: TAITime, runnable: Runnable): Cancellable
   def scheduleOnce(startTime: TAITime, receiver: ActorRef, message: Any): Cancellable
