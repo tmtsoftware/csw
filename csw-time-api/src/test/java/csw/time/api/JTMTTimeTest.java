@@ -80,6 +80,11 @@ public class JTMTTimeTest extends JUnitSuite {
         assertEquals(expectedMillis, taiTime.value().toEpochMilli(), 5);
     }
 
+    @Test
+    public void should_get_tai_offset() {
+        assertEquals(TaiOffset, TAITime.offset());
+    }
+
     //DEOPSCSW-537: Scala and Java API for conversion between TAI and UTC
     //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
     @Test

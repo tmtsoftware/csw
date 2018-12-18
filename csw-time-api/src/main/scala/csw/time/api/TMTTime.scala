@@ -4,7 +4,7 @@ import java.time.{Instant, ZoneId, ZonedDateTime}
 
 import csw.time.api.models.internal.TMTClock.clock
 
-sealed trait TMTTime {
+sealed trait TMTTime extends Product with Serializable {
   def value: Instant
 }
 
@@ -26,6 +26,7 @@ case class TAITime(value: Instant) extends TMTTime {
 
 object TAITime {
   def now(): TAITime = TAITime(clock.taiInstant)
+  def offset: Int    = clock.offset
 
   // fixme: only for testing and making it private[api] does not work from java test
   def setOffset(offset: Int): Unit = clock.setTaiOffset(offset)

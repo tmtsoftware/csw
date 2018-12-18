@@ -10,6 +10,7 @@ import akka.testkit.javadsl.TestKit;
 import csw.time.api.TAITime;
 import csw.time.api.TimeServiceScheduler;
 import csw.time.api.models.Cancellable;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.scalatest.junit.JUnitSuite;
@@ -32,6 +33,11 @@ public class JTimeServiceSchedulerTest extends JUnitSuite {
 
     private TimeServiceScheduler timeServiceScheduler = TimeServiceSchedulerFactory.make(untypedSystem);
     private TestKit untypedTestKit = new TestKit(untypedSystem);
+
+    @BeforeClass
+    public static void setup(){
+        TAITime.setOffset(37);
+    }
 
     //------------------------------Scheduling-------------------------------
 

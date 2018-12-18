@@ -7,38 +7,45 @@ import akka.actor.ActorSystem
 import akka.actor.testkit.typed.scaladsl.{ManualTime, ScalaTestWithActorTestKit}
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.testkit.TestProbe
-import csw.time.api.TAITime
+import csw.time.api.{TAITime, UTCTime}
 import csw.time.api.models.Cancellable
-import org.scalatest.FunSuiteLike
+import org.scalatest.{BeforeAndAfterAll, FunSuiteLike}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.duration.DurationInt
 
-class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.config) with FunSuiteLike {
+class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.config) with FunSuiteLike with BeforeAndAfterAll {
 
   private implicit val untypedSystem: ActorSystem = system.toUntyped
   private val manualTime                          = ManualTime()
 
   private val timeService = TimeServiceSchedulerFactory.make()
 
-  // DEOPSCSW-542: Schedule a task to execute in future
-  test("should schedule task at start time") {
-    val testProbe         = TestProbe()
-    val probeMsg          = "echo"
-    val idealScheduleTime = TAITime(TAITime.now().value.plusSeconds(1))
+  override protected def beforeAll(): Unit = TAITime.setOffset(37)
 
-    val cancellable = timeService.scheduleOnce(idealScheduleTime)(testProbe.ref ! probeMsg)
-    manualTime.timePasses(500.millis)
-    // check immediately after 5 millis, there should be no message
-    testProbe.expectNoMessage(0.millis)
-    manualTime.timePasses(500.millis)
-    testProbe.expectMsg(probeMsg)
-    cancellable.cancel()
+  // DEOPSCSW-542: Schedule a task to execute in future
+  List(
+    ("TAITime", () ⇒ TAITime(TAITime.now().value.plusSeconds(1))), // lazily evaluate time when tests are executed
+    ("UTCTime", () ⇒ UTCTime(UTCTime.now().value.plusSeconds(1)))
+  ).foreach {
+    case (name, idealScheduleTime) ⇒
+      test(s"[$name] should schedule task at start time") {
+        val testProbe = TestProbe()
+        val probeMsg  = "echo"
+
+        val cancellable = timeService.scheduleOnce(idealScheduleTime())(testProbe.ref ! probeMsg)
+        manualTime.timePasses(500.millis)
+        // check immediately after 5 millis, there should be no message
+        testProbe.expectNoMessage(0.millis)
+        manualTime.timePasses(500.millis)
+        testProbe.expectMsg(probeMsg)
+        cancellable.cancel()
+      }
   }
 
   // DEOPSCSW-544: Schedule a task to be executed repeatedly
   // DEOPSCSW-547: Cancel scheduled timers for periodic tasks
-  test("should schedule a task periodically at given interval") {
+  test("[TAITime] should schedule a task periodically at given interval") {
     val buffer: ArrayBuffer[Int] = ArrayBuffer.empty
     val atomicInt                = new AtomicInteger(0)
     val cancellable: Cancellable = timeService.schedulePeriodically(Duration.ofMillis(100)) {
@@ -51,7 +58,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
 
   // DEOPSCSW-544: Start a repeating task with initial offset
   // DEOPSCSW-547: Cancel scheduled timers for periodic tasks
-  test("should schedule a task periodically at given interval after start time") {
+  test("[TAITime] should schedule a task periodically at given interval after start time") {
     val buffer: ArrayBuffer[Int] = ArrayBuffer.empty
     val atomicInt                = new AtomicInteger(0)
     val startTime: TAITime       = new TAITime(TAITime.now().value.plusSeconds(1))
