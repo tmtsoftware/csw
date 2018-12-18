@@ -266,6 +266,7 @@ object Dependencies {
   val TimeApi = Def.setting(
     Seq(
       Libs.`jna`,
+      Akka.`akka-actor`,
       Libs.`scalatest`.value % Test,
       Libs.`junit-interface` % Test
     )

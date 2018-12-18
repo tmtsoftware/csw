@@ -6,14 +6,17 @@ import akka.actor.testkit.typed.javadsl.ManualTime;
 import akka.actor.testkit.typed.javadsl.TestKitJunitResource;
 import akka.actor.typed.internal.adapter.ActorSystemAdapter;
 import akka.testkit.TestProbe;
+import akka.testkit.javadsl.TestKit;
 import csw.time.api.TAITime;
 import csw.time.api.TimeService;
 import csw.time.api.UTCTime;
 import csw.time.api.models.Cancellable;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.scalatest.junit.JUnitSuite;
+import scala.collection.Seq;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.time.Duration;
@@ -35,10 +38,11 @@ public class JTimeServiceTest extends JUnitSuite {
     private ManualTime manualTime = ManualTime.get(testKit.system());
 
     private TimeService timeService = TimeServiceFactory.make(untypedSystem);
+    private TestKit untypedTestKit = new TestKit(untypedSystem);
 
     //------------------------------Scheduling-------------------------------
 
-    //DEOPSCSW-542: Schedule a task to execute in future
+    // DEOPSCSW-542: Schedule a task to execute in future
     @Test
     public void should_schedule_task_at_start_time() {
         TestProbe testProbe = new TestProbe(untypedSystem);
@@ -48,14 +52,30 @@ public class JTimeServiceTest extends JUnitSuite {
 
         Runnable task = () -> testProbe.ref().tell(probeMsg, ActorRef.noSender());
 
-        timeService.scheduleOnce(idealScheduleTime, task);
+        Cancellable cancellable = timeService.scheduleOnce(idealScheduleTime, task);
 
         manualTime.timePasses(Duration.ofSeconds(1));
         testProbe.expectMsg(probeMsg);
+        cancellable.cancel();
     }
 
-    //DEOPSCSW-544: Schedule a task to be executed repeatedly
-    //DEOPSCSW-547: Cancel scheduled timers for periodic tasks
+    // DEOPSCSW-543: Notification on Scheduled timer expiry
+    @Test
+    public void should_schedule_message_at_start_time() {
+        TestProbe testProbe = new TestProbe(untypedSystem);
+        String probeMsg = "some message";
+
+        TAITime idealScheduleTime = new TAITime(TAITime.now().value().plusSeconds(1));
+
+        Cancellable cancellable = timeService.scheduleOnce(idealScheduleTime, testProbe.ref(), probeMsg);
+
+        manualTime.timePasses(Duration.ofSeconds(1));
+        testProbe.expectMsg(probeMsg);
+        cancellable.cancel();
+    }
+
+    // DEOPSCSW-544: Schedule a task to be executed repeatedly
+    // DEOPSCSW-547: Cancel scheduled timers for periodic tasks
     @Test
     public void should_schedule_a_task_periodically_at_given_interval() {
         List<String> list = new ArrayList<>();
@@ -66,6 +86,19 @@ public class JTimeServiceTest extends JUnitSuite {
         cancellable.cancel();
 
         assertEquals(list.size(), 6);
+    }
+
+    // DEOPSCSW-546: Notification on Scheduled Periodic timer expiry
+    @Test
+    public void should_schedule_a_message_periodically_at_given_interval() {
+        Cancellable cancellable = timeService.schedulePeriodically(Duration.ofMillis(100), untypedTestKit.getRef(), "echo");
+
+        manualTime.timePasses(Duration.ofMillis(500));
+        cancellable.cancel();
+
+        // total 6 msg's expected, more than this will fail test
+        List<String> allMsgs = untypedTestKit.expectMsgAllOf("echo", "echo", "echo", "echo", "echo", "echo");
+        assertEquals(allMsgs.size(), 6);
     }
 
     //DEOPSCSW-544: Start a repeating task with initial offset
@@ -86,6 +119,22 @@ public class JTimeServiceTest extends JUnitSuite {
         assertEquals(list.size(), 6);
     }
 
+    // DEOPSCSW-546: Notification on Scheduled Periodic timer expiry
+    @Test
+    public void should_schedule_a_message_periodically_at_given_interval_after_start_time() {
+        TAITime startTime = new TAITime(TAITime.now().value().plusSeconds(1));
+
+        Cancellable cancellable = timeService.schedulePeriodically(startTime, Duration.ofMillis(100), untypedTestKit.getRef(), "echo");
+
+        manualTime.timePasses(Duration.ofSeconds(1));
+        untypedTestKit.expectMsg("echo");
+
+        manualTime.timePasses(Duration.ofMillis(500));
+        cancellable.cancel();
+        List<String> allMsgs = untypedTestKit.expectMsgAllOf("echo", "echo", "echo", "echo", "echo");
+        assertEquals(allMsgs.size(), 5);
+    }
+
     //DEOPSCSW-547: Cancel scheduled timers for single scheduled tasks
     @Test
     public void should_cancel_single_scheduled_task(){
@@ -99,5 +148,4 @@ public class JTimeServiceTest extends JUnitSuite {
         cancellable.cancel();
         testProbe.expectNoMessage(FiniteDuration.apply(500, TimeUnit.MILLISECONDS));
     }
-
 }
