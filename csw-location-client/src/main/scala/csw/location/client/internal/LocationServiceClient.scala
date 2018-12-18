@@ -145,7 +145,9 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(impl
     track(connection).to(Sink.foreach(callback)).run()
 
   private def throwExOnInvalidResponse[T](request: HttpRequest, response: HttpResponse): Future[T] =
-    Unmarshal(response.entity).to[String].flatMap { body ⇒
-      Future.failed(new IOException(s"The response status is ${response.status} [${request.uri}] and response body is $body"))
-    }
+    Future.failed(
+      new IOException(s"""Request failed with response status: [${response.status}]
+           |Requested URI: [${request.uri}] and 
+           |Response body: ${response.entity}""".stripMargin)
+    )
 }
