@@ -41,19 +41,4 @@ class TMTTimeTest extends FunSuite with Matchers {
     zonedDateTime.getSecond shouldBe 30
   }
 
-  // DEOPSCSW-539: Ability to read local time that is synchronized with PTP time, at remote observing sites
-  test("should get hawaii/local date time as well as date time at provided zone id from UTCTime") {
-    val hawaiiZone = ZoneId.of("US/Hawaii")
-
-    val instant   = ZonedDateTime.of(2007, 12, 3, 10, 15, 30, 11, ZoneOffset.UTC).toInstant
-    val hawaiiZDT = instant.atZone(hawaiiZone)
-    val localZDT  = instant.atZone(ZoneId.systemDefault())
-
-    // Using TimeService you can get this utcInstant, which is synchronized with PTP
-    // and then you can use atHawaii, atLocal and atZone helpers defined on CswInstant
-    val utcTime = UTCTime(instant)
-
-    utcTime.atLocal shouldBe localZDT
-    utcTime.atHawaii shouldBe hawaiiZDT
-  }
 }

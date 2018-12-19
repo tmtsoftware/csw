@@ -3,13 +3,12 @@ package csw.time.api;
 import csw.time.api.utils.JTestProperties;
 import csw.time.api.utils.TestProperties;
 import csw.time.api.utils.TestUtil;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.scalatest.junit.JUnitSuite;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.ZonedDateTime;
+import java.time.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -109,4 +108,30 @@ public class JTMTTimeTest extends JUnitSuite {
         assertFalse(TestUtil.formatWithPrecision(taiTime.value(), testProperties.precision()).endsWith("000"));
     }
 
+    // DEOPSCSW-539: Ability to read local time that is synchronized with PTP time, at remote observing sites
+    @Test
+    public void should_get_hawaii_local_date_time_and_date_time_at_provided_zone_id_from_utctime() {
+        ZoneId hawaiiZone = ZoneId.of("US/Hawaii");
+
+        Instant instant   = ZonedDateTime.of(
+                2007,
+                12,
+                3,
+                10,
+                15,
+                30,
+                11,
+                ZoneOffset.UTC
+        ).toInstant();
+
+        ZonedDateTime hawaiiZDT = instant.atZone(hawaiiZone);
+        ZonedDateTime localZDT  = instant.atZone(ZoneId.systemDefault());
+
+        // Using TimeService you can get this utcInstant, which is synchronized with PTP
+        // and then you can use atHawaii, atLocal and atZone helpers defined on CswInstant
+        UTCTime utcTime = new UTCTime(instant);
+
+        Assert.assertEquals(localZDT, utcTime.atLocal());
+        Assert.assertEquals(hawaiiZDT, utcTime.atHawaii());
+    }
 }

@@ -100,7 +100,7 @@ public class JTimeServiceSchedulerTest extends JUnitSuite {
         assertEquals(allMsgs.size(), 6);
     }
 
-    //DEOPSCSW-544: Start a repeating task with initial offset
+    //DEOPSCSW-545: Start a repeating task with initial offset
     //DEOPSCSW-547: Cancel scheduled timers for periodic tasks
     @Test
     public void should_schedule_a_task_periodically_at_given_interval_after_start_time() {
