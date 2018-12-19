@@ -20,16 +20,21 @@ import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-class DatabaseServiceFactory(actorSystem: ActorSystem[_]) {
+object DatabaseServiceFactory {
+  val ReadUsernameHolder = "dbReadUsername"
+  val ReadPasswordHolder = "dbReadPassword"
+}
+class DatabaseServiceFactory private[database] (actorSystem: ActorSystem[_], values: Map[String, String]) {
 
-  private val ReadUsernameHolder = "dbReadUsername"
-  private val ReadPasswordHolder = "dbReadPassword"
-  private val log: Logger        = DatabaseLogger.getLogger
-  private val config             = actorSystem.settings.config
+  def this(actorSystem: ActorSystem[_]) = this(actorSystem, Map.empty)
+
+  private val log: Logger = DatabaseLogger.getLogger
+  private val config      = actorSystem.settings.config
 
   private implicit val ec: ExecutionContext = actorSystem.executionContext
 
   // create connection with default read access, throws DatabaseException
+  import DatabaseServiceFactory._
   def makeDsl(locationService: LocationService, dbName: String): Future[DSLContext] =
     makeDsl(locationService, dbName, ReadUsernameHolder, ReadPasswordHolder)
 
@@ -42,12 +47,13 @@ class DatabaseServiceFactory(actorSystem: ActorSystem[_]) {
   ): Future[DSLContext] = async {
     val resolver = new DatabaseServiceLocationResolver(locationService)
     val uri      = await(resolver.uri())
+    val envVars  = sys.env ++ values
     val dataSource: Map[String, Any] = Map(
       "dataSource.serverName"   → uri.getHost,
       "dataSource.portNumber"   → uri.getPort,
       "dataSource.databaseName" → dbName,
-      "dataSource.user"         → sys.env(usernameHolder), //NoSuchElementFoundException can be thrown if no env variable is set
-      "dataSource.password"     → sys.env(passwordHolder) //NoSuchElementFoundException can be thrown if no env variable is set
+      "dataSource.user"         → envVars(usernameHolder), //NoSuchElementFoundException can be thrown if no env variable is set
+      "dataSource.password"     → envVars(passwordHolder) //NoSuchElementFoundException can be thrown if no env variable is set
     )
     val dataSourceConfig = ConfigFactory.parseMap(dataSource.asJava)
     createDslInternal(Some(dataSourceConfig))

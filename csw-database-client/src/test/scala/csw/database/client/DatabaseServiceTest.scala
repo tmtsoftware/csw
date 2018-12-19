@@ -3,6 +3,7 @@ package csw.database.client
 import akka.actor.ActorSystem
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import csw.database.client.scaladsl.JooqExtentions.{RichQueries, RichQuery, RichResultQuery}
+import csw.database.commons.DBTestHelper
 import org.jooq.DSLContext
 import org.scalatest.concurrent.PatienceConfiguration.Interval
 import org.scalatest.concurrent.ScalaFutures
