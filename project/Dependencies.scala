@@ -276,11 +276,9 @@ object Dependencies {
   val TimeClient = Def.setting(
     Seq(
       Akka.`akka-actor`,
-      Akka.`akka-actor-typed`,
       Libs.`junit-interface`          % Test,
       Libs.`scalatest`.value          % Test,
-      Akka.`akka-actor-testkit-typed` % Test,
-      Libs.`mockito-core`             % Test
+      Akka.`akka-actor-testkit-typed` % Test
     )
   )
 
