@@ -46,14 +46,13 @@ object Libs {
 
   val `jna` = "net.java.dev.jna" % "jna" % "5.1.0"
 
-  val `postgresql`          = "org.postgresql"            % "postgresql"          % "42.2.5"
-  val `postgresql-embedded` = "ru.yandex.qatools.embed"   % "postgresql-embedded" % "2.10"
-  val `hikaricp`            = "com.zaxxer"                % "HikariCP"            % "3.2.0" //Apache License 2.0
-  val `otj-pg-embedded`     = "com.opentable.components"  % "otj-pg-embedded"     % "0.12.5"
-  val httpclient            = "org.apache.httpcomponents" % "httpclient"          % "4.5.6"
-  val `jboss-logging`       = "org.jboss.logging"         % "jboss-logging"       % "3.3.2.Final"
-  val `config`              = "com.typesafe"              % "config"              % "1.3.3"
-  val `os-lib`              = "com.lihaoyi"               %% "os-lib"             % "0.2.5"
+  val `postgresql`      = "org.postgresql"            % "postgresql"      % "42.2.5"
+  val `hikaricp`        = "com.zaxxer"                % "HikariCP"        % "3.2.0" //Apache License 2.0
+  val `otj-pg-embedded` = "com.opentable.components"  % "otj-pg-embedded" % "0.12.5"
+  val httpclient        = "org.apache.httpcomponents" % "httpclient"      % "4.5.6"
+  val `jboss-logging`   = "org.jboss.logging"         % "jboss-logging"   % "3.3.2.Final"
+  val `config`          = "com.typesafe"              % "config"          % "1.3.3"
+  val `os-lib`          = "com.lihaoyi"               %% "os-lib"         % "0.2.5"
 }
 
 object Typelevel {

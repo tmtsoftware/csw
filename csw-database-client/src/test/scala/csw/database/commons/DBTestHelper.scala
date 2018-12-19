@@ -15,9 +15,10 @@ import org.scalatest.time.{Seconds, Span}
 object DBTestHelper {
   def postgres(): EmbeddedPostgres =
     EmbeddedPostgres.builder
+      .setServerConfig("listen_addresses", "*")
+      .setServerConfig("hba_file", "src/test/resources/pg_hba.conf")
       .setDataDirectory(Paths.get("/tmp/postgresDataDir"))
       .setCleanDataDirectory(true)
-//      .setPgBinaryResolver(new PostgresBinaryResolver())
       .start
 
   def dbServiceFactory(system: ActorSystem) =
