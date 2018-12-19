@@ -267,6 +267,7 @@ object Dependencies {
     Seq(
       Libs.`jna`,
       Akka.`akka-actor`,
+      Libs.`play-json-derived-codecs`.value,
       Libs.`scalatest`.value % Test,
       Libs.`junit-interface` % Test
     )
