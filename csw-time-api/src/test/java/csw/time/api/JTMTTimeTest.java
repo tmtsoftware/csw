@@ -101,15 +101,7 @@ public class JTMTTimeTest extends JUnitSuite {
     public void should_get_maximum_precision_supported_by_system_in_tai() {
         assertFalse(TestUtil.formatWithPrecision(TAITime.now().value(), testProperties.precision()).endsWith("000"));
     }
-
-    //DEOPSCSW-541: PTP accuracy and precision while reading remote location time
-    @Test
-    public void should_get_maximum_precision_while_reading_remote_location_tai_time() {
-        TAITime taiTime = TAITime.now();
-
-        assertFalse(TestUtil.formatWithPrecision(taiTime.value(), testProperties.precision()).endsWith("000"));
-    }
-
+    
     // DEOPSCSW-539: Ability to read local time that is synchronized with PTP time, at remote observing sites
     @Test
     public void should_get_hawaii_local_date_time_and_date_time_at_provided_zone_id_from_utctime() {
