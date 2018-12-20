@@ -25,7 +25,9 @@ public class JTMTTimeTest extends JUnitSuite {
 
     //------------------------------UTC-------------------------------
 
-    //DEOPSCSW-533: Access parts of UTC date.time in Java and Scala
+    //DEOPSCSW-532: Access parts of UTC date.time in Java and Scala
+    // This test is sufficient to show code works in both Scala and Java
+    // since UTCTime.now is used in both languages.
     @Test
     public void should_get_utc_time() {
         UTCTime utcTime = UTCTime.now();
