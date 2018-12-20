@@ -33,6 +33,7 @@ object Dependencies {
       Akka.`akka-remote`,
       Akka.`akka-cluster-tools`,
       Akka.`akka-cluster-typed`,
+      AkkaHttp.`akka-http-cors`,
       Libs.`scala-java8-compat`,
       Libs.`scala-async`,
       Libs.`scopt`,
