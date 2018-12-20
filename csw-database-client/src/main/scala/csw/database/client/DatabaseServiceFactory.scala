@@ -28,8 +28,8 @@ class DatabaseServiceFactory private[database] (actorSystem: ActorSystem[_], val
 
   def this(actorSystem: ActorSystem[_]) = this(actorSystem, Map.empty)
 
-  private val log: Logger = DatabaseLogger.getLogger
-  private val config      = actorSystem.settings.config
+  private val log: Logger    = DatabaseLogger.getLogger
+  private val config: Config = actorSystem.settings.config
 
   private implicit val ec: ExecutionContext = actorSystem.executionContext
 

@@ -13,12 +13,13 @@ import org.scalatest.concurrent.ScalaFutures.convertScalaFuture
 import org.scalatest.time.{Seconds, Span}
 
 object DBTestHelper {
-  def postgres(): EmbeddedPostgres =
+  def postgres(port: Int): EmbeddedPostgres =
     EmbeddedPostgres.builder
       .setServerConfig("listen_addresses", "*")
       .setServerConfig("hba_file", "src/test/resources/pg_hba.conf")
       .setDataDirectory(Paths.get("/tmp/postgresDataDir"))
       .setCleanDataDirectory(true)
+      .setPort(port)
       .start
 
   def dbServiceFactory(system: ActorSystem) =

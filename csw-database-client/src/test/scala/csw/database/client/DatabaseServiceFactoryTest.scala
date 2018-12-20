@@ -18,21 +18,23 @@ import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.ExecutionContext
 
+//DEOPSCSW-620: Session Creation to access data
+//DEOPSCSW-621: Session creation to access data with single connection
+//DEOPSCSW-615: DB service accessible to CSW component developers
 class DatabaseServiceFactoryTest extends FunSuite with Matchers with BeforeAndAfterAll with HTTPLocationService {
-
   private implicit val system: ActorSystem  = ActorSystem("test")
   private implicit val ec: ExecutionContext = system.dispatcher
   private implicit val mat: Materializer    = ActorMaterializer()
 
-  private val locationService: LocationService  = HttpLocationServiceFactory.makeLocalClient
-  private val postgres: EmbeddedPostgres        = DBTestHelper.postgres()
-  private val port: Int                         = postgres.getPort
   private val dbName: String                    = "postgres"
+  private val port: Int                         = 5432
+  private val locationService: LocationService  = HttpLocationServiceFactory.makeLocalClient
+  private val postgres: EmbeddedPostgres        = DBTestHelper.postgres(port)
   private val dbFactory: DatabaseServiceFactory = DBTestHelper.dbServiceFactory(system)
 
   // create a database
   private val testDsl: DSLContext = DBTestHelper.dslContext(system, port)
-  testDsl.query("CREATE DATABASE box_office").executeAsyncScala().futureValue(Interval(Span(5, Seconds)))
+  testDsl.query("CREATE TABLE box_office(id SERIAL PRIMARY KEY)").executeAsyncScala().futureValue(Interval(Span(5, Seconds)))
 
   override def beforeAll(): Unit = {
     super.beforeAll()
@@ -43,31 +45,74 @@ class DatabaseServiceFactoryTest extends FunSuite with Matchers with BeforeAndAf
 
   override def afterAll(): Unit = {
     super.afterAll()
-    testDsl.query("DROP DATABASE box_office").executeAsyncScala().futureValue(Interval(Span(5, Seconds)))
+    testDsl.query("DROP TABLE box_office").executeAsyncScala().futureValue(Interval(Span(5, Seconds)))
     postgres.close()
     system.terminate().futureValue
   }
 
+  //DEOPSCSW-618: Integration with Location Service
+  //DEOPSCSW-606: Examples for storing and using authentication information
   test("should create DSLContext using location service and dbName") {
     val dsl: DSLContext = dbFactory.makeDsl(locationService, dbName).futureValue(Interval(Span(5, Seconds)))
 
     val resultSet = dsl
-      .resultQuery("SELECT datname FROM pg_database WHERE datistemplate = false")
+      .resultQuery("select table_name from information_schema.tables")
       .fetchAsyncScala[String]
       .futureValue(Interval(Span(5, Seconds)))
 
     resultSet should contain("box_office")
   }
 
+  //DEOPSCSW-618: Integration with Location Service
+  //DEOPSCSW-606: Examples for storing and using authentication information
   test("should create DSLContext using location service, dbName, usernameHolder and passwordHolder") {
     val dsl =
       dbFactory.makeDsl(locationService, dbName, ReadUsernameHolder, ReadPasswordHolder).futureValue(Interval(Span(5, Seconds)))
 
     val resultSet = dsl
-      .resultQuery("SELECT datname FROM pg_database WHERE datistemplate = false")
+      .resultQuery("select table_name from information_schema.tables")
       .fetchAsyncScala[String]
       .futureValue(Interval(Span(5, Seconds)))
 
     resultSet should contain("box_office")
+  }
+
+  test("should create DSLContext using config") {
+    val dsl = dbFactory.makeDsl().futureValue(Interval(Span(5, Seconds)))
+
+    val resultSet = dsl
+      .resultQuery("select table_name from information_schema.tables")
+      .fetchAsyncScala[String]
+      .futureValue(Interval(Span(5, Seconds)))
+
+    resultSet should contain("box_office")
+  }
+
+  //DEOPSCSW-605: Examples for multiple database support
+  test("should be able to connect to other database") {
+    // create a new database
+    testDsl.query("CREATE DATABASE postgres2").executeAsyncScala().futureValue(Interval(Span(5, Seconds)))
+
+    // make connection to the new database
+    val dsl =
+      dbFactory.makeDsl(locationService, "postgres2").futureValue(Interval(Span(5, Seconds)))
+
+    // assert that box_office table is not present in newly created db
+    val resultSet = dsl
+      .resultQuery("select table_name from information_schema.tables")
+      .fetchAsyncScala[String]
+      .futureValue(Interval(Span(5, Seconds)))
+    resultSet should not contain "box_office"
+
+    // create a new table box_office in newly created db
+    dsl.query("CREATE TABLE box_office(id SERIAL PRIMARY KEY)").executeAsyncScala().futureValue(Interval(Span(5, Seconds)))
+
+    // assert the creation of table
+    val resultSet2 = dsl
+      .resultQuery("select table_name from information_schema.tables")
+      .fetchAsyncScala[String]
+      .futureValue(Interval(Span(5, Seconds)))
+
+    resultSet2 should contain("box_office")
   }
 }

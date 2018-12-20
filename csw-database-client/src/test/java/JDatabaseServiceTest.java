@@ -25,7 +25,6 @@ import static org.junit.Assert.*;
 //DEOPSCSW-601: Create Database API
 //DEOPSCSW-616: Create a method to send a query (select) sql string to a database
 public class JDatabaseServiceTest extends JUnitSuite {
-
     private static ActorSystem system;
     private static EmbeddedPostgres postgres;
     private static DSLContext dsl;
@@ -33,7 +32,7 @@ public class JDatabaseServiceTest extends JUnitSuite {
     @BeforeClass
     public static void setup() {
         system = ActorSystem.apply("test");
-        postgres = DBTestHelper.postgres();
+        postgres = DBTestHelper.postgres(0); // 0 is random port
         dsl = DBTestHelper.dslContext(system, postgres.getPort());
 
     }

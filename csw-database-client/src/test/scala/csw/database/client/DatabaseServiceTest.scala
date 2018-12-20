@@ -15,10 +15,9 @@ import scala.concurrent.ExecutionContext
 //DEOPSCSW-601: Create Database API
 //DEOPSCSW-616: Create a method to send a query (select) sql string to a database
 class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with BeforeAndAfterAll {
-
   private val system: ActorSystem           = ActorSystem("test")
   private implicit val ec: ExecutionContext = system.dispatcher
-  private val postgres: EmbeddedPostgres    = DBTestHelper.postgres()
+  private val postgres: EmbeddedPostgres    = DBTestHelper.postgres(0) // 0 is random port
   private val dsl: DSLContext               = DBTestHelper.dslContext(system, postgres.getPort)
 
   override def afterAll(): Unit = {
