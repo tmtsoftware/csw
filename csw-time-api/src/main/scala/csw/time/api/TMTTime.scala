@@ -1,6 +1,6 @@
 package csw.time.api
 
-import java.time.{Instant, ZoneId, ZonedDateTime}
+import java.time.{Instant, ZoneId, ZoneOffset, ZonedDateTime}
 
 import csw.time.api.models.internal.TMTClock.clock
 import julienrf.json.derived
@@ -20,6 +20,7 @@ final case class UTCTime(value: Instant) extends TMTTime {
   def at(zoneId: ZoneId): ZonedDateTime = value.atZone(zoneId)
   def atLocal: ZonedDateTime            = at(ZoneId.systemDefault())
   def atHawaii: ZonedDateTime           = at(ZoneId.of("US/Hawaii"))
+  def toZonedDateTime: ZonedDateTime    = at(ZoneOffset.UTC)
 }
 
 object UTCTime {
