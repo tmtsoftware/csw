@@ -44,8 +44,8 @@ object Main {
           Await.result(httpService.registeredLazyBinding, 15.seconds) // then start the config server and register it with location service
           httpService
         } catch {
-          case _: SVNException ⇒
-            shutdownAndLog(new RuntimeException(s"Could not open repository located at : ${settings.svnUrl}"))
+          case ex: SVNException ⇒
+            shutdownAndLog(new RuntimeException(s"Could not open repository located at : ${settings.svnUrl}", ex))
           case ex: AASResolutionFailed ⇒ shutdownAndLog(ex)
         }
     }
