@@ -228,6 +228,19 @@ public class JDatabaseServiceTest extends JUnitSuite {
         exception.expectCause(isA(DataAccessException.class));
         dsl.query("create1 table tableName (id SERIAL PRIMARY KEY)").executeAsync().toCompletableFuture().get();
     }
+
+    @Test
+    public void shouldBeAbleToCreateAFunctionAndQueryIt() throws InterruptedException, ExecutionException, TimeoutException {
+        dsl.query("CREATE FUNCTION inc(val integer) RETURNS integer AS $$\n" +
+                "BEGIN\n" +
+                "RETURN val + 1;\n" +
+                "END; $$\n" +
+                "LANGUAGE PLPGSQL;").executeAsync().toCompletableFuture().get(5, SECONDS);
+
+        List<Integer> resultSet = JooqHelper.fetchAsync(dsl.resultQuery("select inc(20)"), Integer.class).get(5, SECONDS);
+
+        assertEquals(Collections.singletonList(21), resultSet);
+    }
 }
 
 class Film {

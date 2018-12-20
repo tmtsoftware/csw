@@ -244,4 +244,22 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
       Await.result(dsl.query("create1 table tableName (id SERIAL PRIMARY KEY)").executeAsyncScala(), 5.seconds)
     }
   }
+
+  test("should be able to create a function and query it") {
+    dsl
+      .query(
+        """
+        |CREATE FUNCTION inc(val integer) RETURNS integer AS $$
+        |BEGIN
+        |RETURN val + 1;
+        |END; $$
+        |LANGUAGE PLPGSQL;
+        """.stripMargin
+      )
+      .executeAsyncScala()
+      .futureValue
+
+    val resultSet = dsl.resultQuery("SELECT inc(20)").fetchAsyncScala[Int].futureValue
+    resultSet shouldBe List(21)
+  }
 }
