@@ -22,16 +22,19 @@ class TokenVerifier private[aas] (keycloakTokenVerifier: KeycloakTokenVerifier, 
   private val keycloakDeployment = authConfig.getDeployment
 
   private def verify(token: String)(implicit ec: ExecutionContext): EitherT[Future, TokenVerificationFailure, KAccessToken] =
-    keycloakTokenVerifier
-      .verifyToken(token, keycloakDeployment)
-      .leftMap {
-        case _: TokenNotActiveException =>
-          warn(s"token is expired")
-          TokenExpired
-        case ex: VerificationException =>
-          error("token verification failed", ex = ex)
-          InvalidToken(ex.getMessage)
-      }
+    EitherT {
+      keycloakTokenVerifier
+        .verifyToken(token, keycloakDeployment)
+        .map(Right(_))
+        .recover {
+          case _: TokenNotActiveException =>
+            warn(s"token is expired")
+            Left(TokenExpired)
+          case ex: VerificationException =>
+            error("token verification failed", ex = ex)
+            Left(InvalidToken(ex.getMessage))
+        }
+    }
 
   private def decode(token: String): Either[TokenVerificationFailure, AccessToken] =
     JwtJson

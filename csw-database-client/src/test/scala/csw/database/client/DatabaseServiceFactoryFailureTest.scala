@@ -5,7 +5,6 @@ import csw.database.commons.DBTestHelper
 import org.scalatest.concurrent.ScalaFutures.convertScalaFuture
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
-import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 

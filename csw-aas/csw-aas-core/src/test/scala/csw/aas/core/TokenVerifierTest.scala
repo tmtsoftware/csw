@@ -1,7 +1,5 @@
 package csw.aas.core
 
-import cats.data.EitherT
-import cats.implicits._
 import csw.aas.core.TokenVerificationFailure.{InvalidToken, TokenExpired}
 import csw.aas.core.deployment.AuthConfig
 import csw.aas.core.token.AccessToken
@@ -29,23 +27,21 @@ class TokenVerifierTest extends FunSuite with MockitoSugar with Matchers with Ei
   private val tmtTokenVerifier: TokenVerifier          = new TokenVerifier(keycloakTokenVerifier, authConfig)
 
   test("should throw exception while verifyAndDecode token") {
-    val token                          = "test-token"
-    val validationExceptionMsg         = "invalid token"
-    val validationException: Throwable = new TokenSignatureInvalidException(keycloakAccessToken, validationExceptionMsg)
+    val token                  = "test-token"
+    val validationExceptionMsg = "invalid token"
+    val validationException    = new TokenSignatureInvalidException(keycloakAccessToken, validationExceptionMsg)
 
-    when(keycloakTokenVerifier.verifyToken(token, deployment))
-      .thenReturn(EitherT.leftT[Future, KeycloakAccessToken](validationException))
+    when(keycloakTokenVerifier.verifyToken(token, deployment)).thenReturn(Future.failed(validationException))
 
     tmtTokenVerifier.verifyAndDecode(token).block().left.value shouldBe InvalidToken(validationExceptionMsg)
   }
 
   test("should throw TokenExpired exception while verifying token") {
-    val token                            = "test-token"
-    val tokenExpiredExceptionMsg         = "Token expired"
-    val tokenExpiredException: Throwable = new TokenNotActiveException(keycloakAccessToken, tokenExpiredExceptionMsg)
+    val token                    = "test-token"
+    val tokenExpiredExceptionMsg = "Token expired"
+    val tokenExpiredException    = new TokenNotActiveException(keycloakAccessToken, tokenExpiredExceptionMsg)
 
-    when(keycloakTokenVerifier.verifyToken(token, deployment))
-      .thenReturn(EitherT.leftT[Future, KeycloakAccessToken](tokenExpiredException))
+    when(keycloakTokenVerifier.verifyToken(token, deployment)).thenReturn(Future.failed(tokenExpiredException))
 
     tmtTokenVerifier.verifyAndDecode(token).block().left.value shouldBe TokenExpired
   }
@@ -71,19 +67,15 @@ class TokenVerifierTest extends FunSuite with MockitoSugar with Matchers with Ei
       authorization = Authorization.empty
     )
 
-    when(keycloakTokenVerifier.verifyToken(token, deployment)).thenReturn(EitherT.rightT[Future, Throwable](keycloakAccessToken))
-
+    when(keycloakTokenVerifier.verifyToken(token, deployment)).thenReturn(Future.successful(keycloakAccessToken))
     tmtTokenVerifier.verifyAndDecode(token).block().right.value shouldBe expectedToken
   }
 
   test("should throw exception while decoding token") {
-    val invalidJsonToken =
-      "ey.wer.erwe.werw"
+    val invalidJsonToken     = "ey.wer.erwe.werw"
     val expectedExceptionMsg = "Expected token [ey.wer.erwe.werw] to be composed of 2 or 3 parts separated by dots."
 
-    when(keycloakTokenVerifier.verifyToken(invalidJsonToken, deployment))
-      .thenReturn(EitherT.rightT[Future, Throwable](keycloakAccessToken))
-
+    when(keycloakTokenVerifier.verifyToken(invalidJsonToken, deployment)).thenReturn(Future.successful(keycloakAccessToken))
     tmtTokenVerifier.verifyAndDecode(invalidJsonToken).block().left.value shouldBe InvalidToken(expectedExceptionMsg)
   }
 }
