@@ -3,6 +3,7 @@ package csw.config.server.http
 import java.time.Instant
 
 import akka.http.scaladsl.model._
+import akka.http.scaladsl.model.headers.Authorization
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import csw.commons.http.ErrorResponse
@@ -14,6 +15,8 @@ import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+
+import scala.collection.mutable.ArrayBuffer
 
 // DEOPSCSW-80: HTTP based access for configuration file
 // DEOPSCSW-576: Auth token for Configuration service
@@ -698,5 +701,21 @@ class ConfigServiceRouteTest
     Delete("/config/test.conf?comment=deleting").addHeader(roleMissingTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Forbidden
     }
+  }
+
+  // DEOPSCSW-629: Token masking in logs
+  test("should mask authorization token while logging") {
+    val requests = ArrayBuffer.empty[HttpRequest]
+
+    import serverWiring._
+    val csRoute: ConfigServiceRoute =
+      new ConfigServiceRoute(configServiceFactory, actorRuntime, configHandlers, serverWiring.securityDirectives) {
+        override val logRequest: HttpRequest ⇒ Unit = maskedReq ⇒ requests += maskedReq
+      }
+
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> csRoute.route ~> check {
+      status shouldEqual StatusCodes.Created
+    }
+    requests.head.header[Authorization].get.credentials.token() should fullyMatch regex "\\*.*"
   }
 }

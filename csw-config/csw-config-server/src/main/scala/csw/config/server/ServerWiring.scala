@@ -2,9 +2,7 @@ package csw.config.server
 
 import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
-import csw.aas.core.deployment.AuthConfig
-import csw.aas.core.token.TokenFactory
-import csw.aas.http.{Authentication, SecurityDirectives}
+import csw.aas.http.SecurityDirectives
 import csw.config.server.files._
 import csw.config.server.http.{ConfigHandlers, ConfigServiceRoute, HttpService}
 import csw.config.server.svn.{SvnConfigServiceFactory, SvnRepo}
