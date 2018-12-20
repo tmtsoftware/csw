@@ -13,7 +13,7 @@ import csw.location.api.models._
 import csw.logging.scaladsl.Logger
 
 import scala.collection.immutable.Seq
-import scala.concurrent.duration.DurationDouble
+import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.concurrent.{Await, Future}
 import scala.sys.process._
 import scala.util.control.NonFatal
@@ -24,6 +24,7 @@ import scala.util.control.NonFatal
 class LocationAgent(names: List[String], command: Command, wiring: Wiring) {
   private val log: Logger = LocationAgentLogger.getLogger
 
+  private val timeout: FiniteDuration = 10.seconds
   import wiring._
   import actorRuntime._
 
@@ -41,8 +42,8 @@ class LocationAgent(names: List[String], command: Command, wiring: Wiring) {
 
       //Register all connections as Http or Tcp
       val results = command.httpPath match {
-        case Some(path) ⇒ Await.result(Future.traverse(names)(name ⇒ registerHttpName(name, path)), 10.seconds)
-        case None       ⇒ Await.result(Future.traverse(names)(registerTcpName), 10.seconds)
+        case Some(path) ⇒ Await.result(Future.traverse(names)(registerHttpName(_, path)), timeout)
+        case None       ⇒ Await.result(Future.traverse(names)(registerTcpName), timeout)
       }
 
       unregisterOnTermination(results)
@@ -89,6 +90,6 @@ class LocationAgent(names: List[String], command: Command, wiring: Wiring) {
 
   private def shutdown(reason: Reason) = Await.result(
     Http().shutdownAllConnectionPools().flatMap(_ => coordinatedShutdown.run(reason)),
-    10.seconds
+    timeout
   )
 }

@@ -6,7 +6,7 @@ import csw.location.api.models._
 import csw.location.api.scaladsl.LocationService
 
 import scala.async.Async.{async, _}
-import scala.concurrent.duration.DurationDouble
+import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
@@ -29,12 +29,12 @@ class AuthServiceLocation(locationService: LocationService) {
    *
    * @return A future that completes with Location representing keycloak server location
    */
-  def resolve(implicit executionContext: ExecutionContext): Future[HttpLocation] = async {
+  def resolve(within: FiniteDuration = 5.seconds)(implicit executionContext: ExecutionContext): Future[HttpLocation] = async {
     debug("resolving aas via location service")
-    val location = await(locationService.resolve(httpConnection, 5.seconds)).getOrElse(
+    val location = await(locationService.resolve(httpConnection, within)).getOrElse(
       {
         error(s"auth service connection=${httpConnection.name} could not be resolved")
-        throw new RuntimeException(s"auth service connection=${httpConnection.name} could not be resolved")
+        throw AASResolutionFailed(s"auth service connection=${httpConnection.name} could not be resolved")
       }
     )
     debug(s"aas resolved to ${location.uri.toString}")

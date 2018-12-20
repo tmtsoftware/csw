@@ -51,7 +51,7 @@ object NativeAppAuthAdapterFactory {
   private def make(locationService: LocationService, secretStore: Option[AuthStore])(
       implicit executionContext: ExecutionContext
   ): NativeAppAuthAdapter = {
-    val authServiceLocation = Await.result(AuthServiceLocation(locationService).resolve, 5.seconds)
+    val authServiceLocation = Await.result(AuthServiceLocation(locationService).resolve(5.seconds), 10.seconds)
     val authConfig          = AuthConfig.loadFromAppConfig(Some(authServiceLocation))
     val tokenVerifier       = TokenVerifier(authConfig)
     new NativeAppAuthAdapterImpl(new KeycloakInstalled(authConfig.getDeployment), tokenVerifier, secretStore)

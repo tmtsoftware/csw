@@ -70,7 +70,7 @@ object SecurityDirectives {
 
   def apply(locationService: LocationService)(implicit ec: ExecutionContext): SecurityDirectives = {
     //todo: see if its possible to remove blocking here
-    val authLocation: HttpLocation             = Await.result(AuthServiceLocation(locationService).resolve, 5.seconds)
+    val authLocation: HttpLocation             = Await.result(AuthServiceLocation(locationService).resolve(5.seconds), 10.seconds)
     val authConfig                             = AuthConfig.loadFromAppConfig(Some(authLocation))
     val keycloakDeployment: KeycloakDeployment = authConfig.getDeployment
     val tokenVerifier                          = TokenVerifier(authConfig)

@@ -1,5 +1,6 @@
 package csw.config.server
 
+import csw.aas.core.deployment.AASResolutionFailed
 import csw.config.server.cli.{ArgsParser, Options}
 import csw.config.server.commons.ConfigServerLogger
 import csw.config.server.commons.CoordinatedShutdownReasons.FailureReason
@@ -29,6 +30,12 @@ object Main {
         val wiring = ServerWiring.make(maybePort)
         import wiring._
 
+        def shutdownAndLog(ex: Exception) = {
+          Await.result(actorRuntime.shutdown(FailureReason(ex)), 10.seconds)
+          log.error(ex.getMessage, ex = ex)
+          throw ex
+        }
+
         if (startLogging) actorRuntime.startLogging(name)
         if (init) svnRepo.initSvnRepo()
 
@@ -37,12 +44,10 @@ object Main {
           Await.result(httpService.registeredLazyBinding, 15.seconds) // then start the config server and register it with location service
           httpService
         } catch {
-          case ex: SVNException ⇒
-            Await.result(actorRuntime.shutdown(FailureReason(ex)), 10.seconds) // actorRuntime.shutdown will gracefully quit the self node from cluster
-            val runtimeException =
-              new RuntimeException(s"Could not open repository located at : ${settings.svnUrl}", ex)
-            log.error(runtimeException.getMessage, ex = runtimeException)
-            throw runtimeException
+          case _: SVNException ⇒
+            shutdownAndLog(new RuntimeException(s"Could not open repository located at : ${settings.svnUrl}"))
+          case ex: AASResolutionFailed ⇒ shutdownAndLog(ex)
         }
     }
+
 }
