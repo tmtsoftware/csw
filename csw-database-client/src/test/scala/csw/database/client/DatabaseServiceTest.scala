@@ -1,5 +1,7 @@
 package csw.database.client
 
+import java.util.concurrent.CompletionException
+
 import akka.actor.ActorSystem
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import csw.database.client.scaladsl.JooqExtentions.{RichQueries, RichQuery, RichResultQuery}
@@ -10,7 +12,8 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Seconds, Span}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.duration.DurationDouble
+import scala.concurrent.{Await, ExecutionContext}
 
 //DEOPSCSW-601: Create Database API
 //DEOPSCSW-616: Create a method to send a query (select) sql string to a database
@@ -234,5 +237,11 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
     resultSet2 shouldBe Seq.empty
 
     dsl.query("DROP TABLE films").executeAsyncScala().futureValue
+  }
+
+  test("should be throwing exception in case of syntax error") {
+    a[CompletionException] shouldBe thrownBy {
+      Await.result(dsl.query("create1 table tableName (id SERIAL PRIMARY KEY)").executeAsyncScala(), 5.seconds)
+    }
   }
 }

@@ -6,9 +6,12 @@ import org.jooq.DSLContext;
 import org.jooq.Queries;
 import org.jooq.Record;
 import org.jooq.ResultQuery;
+import org.jooq.exception.DataAccessException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.scalatest.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
@@ -20,6 +23,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.hamcrest.CoreMatchers.isA;
 import static org.junit.Assert.*;
 
 //DEOPSCSW-601: Create Database API
@@ -214,6 +218,15 @@ public class JDatabaseServiceTest extends JUnitSuite {
         assertEquals(resultSet2, Collections.emptyList());
 
         dsl.query("DROP TABLE films").executeAsync().toCompletableFuture().get(5, SECONDS);
+    }
+
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
+
+    @Test
+    public void shouldBeThrowingExceptionInCaseOfSyntaxError() throws InterruptedException, ExecutionException {
+        exception.expectCause(isA(DataAccessException.class));
+        dsl.query("create1 table tableName (id SERIAL PRIMARY KEY)").executeAsync().toCompletableFuture().get();
     }
 }
 

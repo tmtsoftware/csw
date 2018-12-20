@@ -26,11 +26,4 @@ class DatabaseServiceFactoryFailureTest extends FunSuite with Matchers with Befo
       Await.result(dbFactory.makeDsl(), 5.seconds)
     }
   }
-
-  test("should throw DatabaseConnection while connecting with incorrect port in Java") {
-    intercept[DatabaseException] {
-      // postgres starts on random port but while connecting it tries to look at 5432
-      Await.result(dbFactory.jMakeDsl().toScala, 5.seconds)
-    }
-  }
 }
