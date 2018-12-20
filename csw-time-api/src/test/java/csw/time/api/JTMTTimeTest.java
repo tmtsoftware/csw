@@ -25,7 +25,7 @@ public class JTMTTimeTest extends JUnitSuite {
 
     //------------------------------UTC-------------------------------
 
-    //DEOPSCSW-532: Access parts of UTC date.time in Java and Scala
+    //DEOPSCSW-532: Synchronize activities with other comp. using UTC
     // This test is sufficient to show code works in both Scala and Java
     // since UTCTime.now is used in both languages.
     @Test
@@ -69,7 +69,7 @@ public class JTMTTimeTest extends JUnitSuite {
 
     //------------------------------TAI-------------------------------
 
-    //DEOPSCSW-536: Access parts of TAI date/time in Java and Scala
+    //DEOPSCSW-535: Synchronize activities with other comp, using TAI
     //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
     @Test
     public void should_get_tai_time() {
