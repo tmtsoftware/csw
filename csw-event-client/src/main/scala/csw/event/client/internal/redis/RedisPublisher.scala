@@ -31,17 +31,14 @@ class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(impli
   // inorder to preserve the order of publishing events, the parallelism level is maintained to 1
   private val parallelism        = 1
   private val eventPublisherUtil = new EventPublisherUtil()
-
-  private val romaineFactory = new RomaineFactory(redisClient)
+  private val romaineFactory     = new RomaineFactory(redisClient)
   import EventRomaineCodecs._
 
   private val asyncApi: RedisAsyncApi[String, Event] = romaineFactory.redisAsyncApi(redisURI)
 
   private val streamTermination: Future[Done] = eventPublisherUtil.streamTermination(publishInternal)
 
-  override def publish(event: Event): Future[Done] = {
-    eventPublisherUtil.publish(event, streamTermination.isCompleted)
-  }
+  override def publish(event: Event): Future[Done] = eventPublisherUtil.publish(event, streamTermination.isCompleted)
 
   private def publishInternal(event: Event): Future[Done] =
     async {

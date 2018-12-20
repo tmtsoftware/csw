@@ -58,9 +58,7 @@ class EventPublisherUtil(implicit ec: ExecutionContext, mat: Materializer) {
         Done
     }
 
-  def logError(failure: PublishFailure): Unit = {
-    logger.error(failure.getMessage, ex = failure)
-  }
+  def logError(failure: PublishFailure): Unit = logger.error(failure.getMessage, ex = failure)
 
   def publish(event: Event, isStreamTerminated: Boolean): Future[Done] = {
     val p = Promise[Done]
@@ -69,9 +67,7 @@ class EventPublisherUtil(implicit ec: ExecutionContext, mat: Materializer) {
     p.future
   }
 
-  def shutdown(): Unit = {
-    actorRef ! PoisonPill
-  }
+  def shutdown(): Unit = actorRef ! PoisonPill
 
   // log error for any exception from provided eventGenerator
   private def withErrorLogging(eventGenerator: => Future[Event]): Future[Event] =

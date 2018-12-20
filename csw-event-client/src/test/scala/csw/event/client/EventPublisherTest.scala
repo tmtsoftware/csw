@@ -183,8 +183,6 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     publisher.publish(event4)
     publisher.publish(event5)
 
-    Thread.sleep(1000)
-
     testProbe.expectMessage(Event.invalidEvent(eventKey))
     testProbe.expectMessage(event1)
     testProbe.expectMessage(event2)
