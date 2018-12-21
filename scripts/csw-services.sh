@@ -35,6 +35,7 @@ sentinel_port=26379
 event_master_port=6379
 alarm_master_port=7379
 AAS_port=8081
+db_port=5432
 initSvnRepo="--initRepo"
 AAS_admin_user="admin"
 AAS_admin_password="admin"
@@ -45,6 +46,7 @@ shouldStartConfig=false
 shouldStartEvent=false
 shouldStartAlarm=false
 shouldStartAAS=false
+shouldStartDatabase=false
 
 script_name=$0
 
@@ -78,9 +80,14 @@ AASLogFile=${logDir}/AAS.log
 AASPidFile=${logDir}/AAS.pid
 AASPortFile=${logDir}/AAS.port
 
+DBLogFile=${logDir}/DB.log
+DBPidFile=${logDir}/DB.pid
+DBPortFile=${logDir}/DB.port
+
 sentinelConf="../conf/redis_sentinel/sentinel.conf"
 eventMasterConf="../conf/event_service/master.conf"
 alarmMasterConf="../conf/alarm_service/master.conf"
+dbPgHbaConf="../conf/database_service/pg_hba.conf"
 keycloakScript="keycloak-4.6.0.Final/bin"
 
 sortVersion="sort -V"
@@ -162,6 +169,19 @@ function start_config {
     fi
 }
 
+function start_db() {
+    if [ -x "$location_agent_script" ]; then
+        echo "[DATABASE] Starting Database Service on port; [$db_port] ..."
+        echo "[DATABASE] Make sure to set PGDATA env variable to postgres data directory where postgres is installed e.g. for mac: /usr/local/var/postgres"
+        nohup ./csw-location-agent --name "DatabaseServer" --command "postgres --hba_file=$dbPgHbaConf -i -p $db_port" --port "$db_port"> ${DBLogFile} 2>&1 &
+        echo $! > ${DBPidFile}
+        echo ${db_port} > ${DBPortFile}
+    else
+        echo "[ERROR] $location_agent_script script does not exist, please make sure that $location_agent_script resides in same directory as $script_name"
+        exit 1
+    fi
+}
+
 function start_sentinel() {
     if [ -x "$location_agent_script" ]; then
         if checkIfRedisIsInstalled ; then
@@ -230,6 +250,7 @@ function enableAllServicesForRunning {
     shouldStartEvent=true
     shouldStartAlarm=true
     shouldStartAAS=true
+    shouldStartDatabase=true
 }
 
 function is_AAS_running {
@@ -259,11 +280,13 @@ function start_services {
     if [[ "$shouldStartEvent" = true ]]; then start_event; fi
     if [[ "$shouldStartAlarm" = true ]]; then start_alarm; fi
     if [[ ("$shouldStartEvent" = true) || ("$shouldStartAlarm" = true) ]]; then start_sentinel; fi
+    if [[ "$shouldStartDatabase" = true ]]; then start_db; fi
 }
 
 function usage {
     echo
-    echo -e "usage: $script_name COMMAND [--seed <port>] [--interfaceName | -i <name>] [--config <port>] [--initRepo] [--event | -es <port>]\n"
+    echo -e "usage: $script_name COMMAND [--seed <port>] [--interfaceName | -i <name>] [--config <port>] [--initRepo]
+    [--event | -es <port>] [--alarm | -as <port>] [--auth | -aas <port> -u <username> -p <password>] [--database | -db <port> -d <dataDirectory>]\n"
 
     echo "Options:"
     echo "  --seed <seedPort>               start seed on provided port, default: 5552"
@@ -272,7 +295,9 @@ function usage {
     echo "  --initRepo                      create new svn repo, default: use existing svn repo"
     echo "  --event | -es <esPort>          start event service on provided port, default: 6379"
     echo "  --alarm | -as <asPort>          start alarm service on provided port, default: 7379"
-    echo "  --auth | -aas <aasPort> [-u <username> | -p <password>]     start auth server on provided port, default: 8081, with username and password, default username and password: admin"
+    echo "  --auth | -aas <aasPort> -u <username> -p <password>     start auth server on provided port, default: 8081, with username and password, default username and password: admin"
+    echo "  --database | -db <dbPort>       start database service on provided port and provided data directory, default port: 5432, set 'PGDATA' env variable to postgres data directory
+                                  where postgres is installed e.g. for mac: /usr/local/var/postgres"
     echo
     echo "Commands:"
     echo "  start      Starts all csw services if no options provided"
@@ -333,6 +358,10 @@ function parse_cmd_args {
                              if [[ $2 == "-p" ]]; then AAS_admin_password=$3; shift; shift; fi
                            fi
                            ;;
+                        --database | -db)
+                           shouldStartDatabase=true
+                           if isPortProvided $2; then db_port="$2"; shift; fi
+                            ;;
                         --help)
                             usage
                             ;;
@@ -372,9 +401,10 @@ function parse_cmd_args {
             ;;
         stop)
             # Stop Redis
-            stop "Redis Sentinel" ${sentinelPidFile} ${sentinelPortFile}
-            stop "Event Server" ${eventMasterPidFile} ${eventMasterPortFile}
-            stop "Alarm Server" ${alarmMasterPidFile} ${alarmMasterPortFile}
+            stopRedisSpecificProcesses "Redis Sentinel" ${sentinelPidFile} ${sentinelPortFile}
+            stopRedisSpecificProcesses "Event Server" ${eventMasterPidFile} ${eventMasterPortFile}
+            stopRedisSpecificProcesses "Alarm Server" ${alarmMasterPidFile} ${alarmMasterPortFile}
+            stopPostgres "Database Server" ${DBPidFile} ${DBPortFile}
 
             # Stop Cluster Seed application
             if [ ! -f ${locationPidFile} ]; then
@@ -418,7 +448,7 @@ function parse_cmd_args {
     esac
 }
 
-function stop() {
+function stopRedisSpecificProcesses() {
  local serviceName=$1
  local pidFile=$2
  local portFile=$3
@@ -429,6 +459,26 @@ function stop() {
         local port=$(cat ${portFile})
         echo "Stopping $serviceName..."
         ${redisClient} -p ${port} shutdown
+        while(test -x /proc/${pid})
+        do
+            echo "Waiting for $serviceName to shutdown ..."
+            sleep 1
+        done
+        echo "$serviceName stopped."
+        rm -f ${portFile} ${pidFile}
+    fi
+}
+
+function stopPostgres() {
+ local serviceName=$1
+ local pidFile=$2
+ local portFile=$3
+    if [ ! -f ${pidFile} ]; then
+        echo "$serviceName $pidFile does not exist, process is not running."
+    else
+        local pid=$(cat ${pidFile})
+        echo "Stopping $serviceName..."
+        pg_ctl stop
         while(test -x /proc/${pid})
         do
             echo "Waiting for $serviceName to shutdown ..."
