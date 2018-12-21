@@ -72,4 +72,27 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
     cancellable.cancel()
     buffer shouldBe ArrayBuffer(0, 1, 2, 3, 4, 5)
   }
+
+  // DEOPSCSW-542: Schedule a task to execute in future
+  test("should schedule multiple tasks at same start time") {
+    // we do not want manual config in this test to compare start time with task execution time
+    // hence separate instance of actor system is created here which does not use ManualConfig
+    val system      = ActorSystem()
+    val timeService = TimeServiceSchedulerFactory.make()(system)
+    val testProbe   = TestProbe()(system)
+
+    val startTime    = UTCTime(UTCTime.now().value.plusSeconds(1))
+    val cancellable  = timeService.scheduleOnce(startTime)(testProbe.ref ! UTCTime.now())
+    val cancellable2 = timeService.scheduleOnce(startTime)(testProbe.ref ! UTCTime.now())
+
+    val utcTime1 = testProbe.expectMsgType[UTCTime]
+    val utcTime2 = testProbe.expectMsgType[UTCTime]
+
+    val expectedTimeSpread = startTime.value.toEpochMilli +- 20
+    utcTime1.value.toEpochMilli shouldBe expectedTimeSpread
+    utcTime2.value.toEpochMilli shouldBe expectedTimeSpread
+
+    cancellable.cancel()
+    cancellable2.cancel()
+  }
 }
