@@ -340,7 +340,9 @@ object Dependencies {
       Libs.`mockito-core`,
       //Libs.`play-json`,
       Libs.`play-json-derived-codecs`.value % Test,
-      Libs.`akka-http-play-json`            % Test
+      Libs.`akka-http-play-json`            % Test,
+      Libs.`embedded-keycloak`              % Test,
+      Akka.`akka-multi-node-testkit`        % Test
     )
   )
 

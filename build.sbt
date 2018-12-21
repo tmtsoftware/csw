@@ -458,7 +458,10 @@ lazy val `csw-aas-core` = project
 
 lazy val `csw-aas-http` = project
   .in(file("csw-aas/csw-aas-http"))
-  .dependsOn(`csw-aas-core`)
+  .dependsOn(
+    `csw-aas-core`,
+    `csw-location-server` % "multi-jvm->multi-jvm")
+  .enablePlugins(AutoMultiJvm)
   .settings(
     libraryDependencies ++= Dependencies.AuthAkkaHttpAdapter.value
   )
