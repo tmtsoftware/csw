@@ -401,10 +401,10 @@ function parse_cmd_args {
             ;;
         stop)
             # Stop Redis
-            stopRedisSpecificProcesses "Redis Sentinel" ${sentinelPidFile} ${sentinelPortFile}
-            stopRedisSpecificProcesses "Event Server" ${eventMasterPidFile} ${eventMasterPortFile}
-            stopRedisSpecificProcesses "Alarm Server" ${alarmMasterPidFile} ${alarmMasterPortFile}
-            stopPostgres "Database Server" ${DBPidFile} ${DBPortFile}
+            stop "Redis Sentinel" ${sentinelPidFile} ${sentinelPortFile} ${sentinelLogFile} " ${redisClient} -p $(cat ${sentinelPortFile}) shutdown"
+            stop "Event Server" ${eventMasterPidFile} ${eventMasterPortFile} ${eventMasterLogFile} " ${redisClient} -p $(cat ${eventMasterPortFile}) shutdown"
+            stop "Alarm Server" ${alarmMasterPidFile} ${alarmMasterPortFile} ${alarmMasterLogFile} " ${redisClient} -p $(cat ${alarmMasterPortFile}) shutdown"
+            stop "Database Server" ${DBPidFile} ${DBPortFile} ${DBLogFile} "pg_ctl stop"
 
             # Stop Cluster Seed application
             if [ ! -f ${locationPidFile} ]; then
@@ -448,44 +448,25 @@ function parse_cmd_args {
     esac
 }
 
-function stopRedisSpecificProcesses() {
+function stop() {
  local serviceName=$1
  local pidFile=$2
  local portFile=$3
+ local logFile=$4
+ local command=$5
     if [ ! -f ${pidFile} ]; then
         echo "$serviceName $pidFile does not exist, process is not running."
     else
         local pid=$(cat ${pidFile})
-        local port=$(cat ${portFile})
         echo "Stopping $serviceName..."
-        ${redisClient} -p ${port} shutdown
+        ${command}
         while(test -x /proc/${pid})
         do
             echo "Waiting for $serviceName to shutdown ..."
             sleep 1
         done
         echo "$serviceName stopped."
-        rm -f ${portFile} ${pidFile}
-    fi
-}
-
-function stopPostgres() {
- local serviceName=$1
- local pidFile=$2
- local portFile=$3
-    if [ ! -f ${pidFile} ]; then
-        echo "$serviceName $pidFile does not exist, process is not running."
-    else
-        local pid=$(cat ${pidFile})
-        echo "Stopping $serviceName..."
-        pg_ctl stop
-        while(test -x /proc/${pid})
-        do
-            echo "Waiting for $serviceName to shutdown ..."
-            sleep 1
-        done
-        echo "$serviceName stopped."
-        rm -f ${portFile} ${pidFile}
+        rm -f ${portFile} ${pidFile} ${logFile}
     fi
 }
 
