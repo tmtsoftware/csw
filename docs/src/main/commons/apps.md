@@ -40,11 +40,13 @@ This shell script will start `csw-location-server` as the first step regardless 
 @@@
 
 The execution of the script is such that it starts `csw-location-server`, then checks whether to start configuration service from provided
+`--auth` option, if provided, it starts authentication service. Next, it checks whether to start configuration service from provided
 `--config` option, if provided, then starts configuration service. Next, it checks whether to start event service from provided 
 `--event` option, if provided, it starts event service. Next, it checks whether to start alarm service from provided 
-`--alarm` option, if provided, it starts alarm service.
+`--alarm` option, if provided, it starts alarm service. Next, it checks whether to start database service from provided
+`--database` option, if provided, it starts database service.
 
-With this, the component code is now ready to connect to configuration service and event service started via `csw-services.sh`.   
+With this, the component code is now ready to connect to provided services via `csw-services.sh`.   
 
 
   
