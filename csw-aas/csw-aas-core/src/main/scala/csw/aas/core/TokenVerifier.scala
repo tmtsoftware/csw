@@ -44,7 +44,7 @@ class TokenVerifier private[aas] (keycloakTokenVerifier: KeycloakTokenVerifier, 
       .left
       .map {
         case NonFatal(e) =>
-          error("token verification failed", Map("error" -> e))
+          error("token verification failed", ex = e)
           InvalidToken(e.getMessage)
       }
 

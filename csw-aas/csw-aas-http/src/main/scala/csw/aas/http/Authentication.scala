@@ -14,18 +14,16 @@ private[csw] class Authentication(tokenFactory: TokenFactory)(implicit ec: Execu
   import logger._
 
   def authenticator: AsyncAuthenticator[AccessToken] = {
-    case Provided(token) ⇒ {
+    case Provided(token) ⇒
       val result = tokenFactory.makeToken(token)
       result.map { at =>
         error(s"authentication successful for ${at.userOrClientName}")
         at
       }
       result.toOption.value
-    }
 
-    case _ ⇒ {
+    case _ ⇒
       debug("authorization information is missing from request. authentication failed")
       Future.successful(None)
-    }
   }
 }

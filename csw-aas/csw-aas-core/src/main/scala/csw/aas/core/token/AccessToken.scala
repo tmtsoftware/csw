@@ -33,7 +33,7 @@ case class AccessToken(
   import logger._
 
   def hasPermission(scope: String, resource: String = "Default Resource"): Boolean = {
-    val result = authorization.permissions.exists(p ⇒ p.rsname == resource && p.scopes.contains(scope))
+    val result = this.authorization.permissions.exists(p ⇒ p.rsname == resource && p.scopes.contains(scope))
     if (!result) debug(s"'$userOrClientName' doesn't have permission '$scope' for resource '$resource'")
     else debug(s"authorization granted for user '$userOrClientName' via permission '$scope' and resource '$resource'")
     result
@@ -53,12 +53,12 @@ case class AccessToken(
     result
   }
 
-  private val unknownUser = "Unknown"
+  private val UnknownUser = "Unknown"
 
   def userOrClientName: String = (preferred_username, clientId) match {
     case (Some(u), _)    ⇒ u
     case (None, Some(c)) ⇒ c
-    case _               ⇒ unknownUser
+    case _               ⇒ UnknownUser
   }
 }
 

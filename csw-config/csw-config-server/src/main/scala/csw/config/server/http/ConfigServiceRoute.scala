@@ -26,11 +26,10 @@ class ConfigServiceRoute(
   import actorRuntime._
   import securityDirectives._
 
-  private val unknownUser = "Unknown"
+  private val UnknownUser = "Unknown"
+  private val AdminRole   = "admin"
 
-  private def configService(userName: String = unknownUser): ConfigService = configServiceFactory.make(userName)
-
-  private val AdminRole = "admin"
+  private def configService(userName: String = UnknownUser): ConfigService = configServiceFactory.make(userName)
 
   def route: Route = routeLogger {
     handleExceptions(configHandlers.jsonExceptionHandler) {

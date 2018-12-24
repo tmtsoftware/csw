@@ -19,8 +19,8 @@ class AuthServiceLocation(locationService: LocationService) {
   import logger._
 
   /**
-   * Use the resolve api of location service to resolve keycloak server and wait for maximum 5 seconds. If the resolving exceeds
-   * 5 seconds, the returning future completes with a RuntimeException that has appropriate message.
+   * Use the resolve api of location service to resolve keycloak server and wait for provided duration. If the resolving exceeds
+   * provided duration, then returning future completes with a RuntimeException that has appropriate message.
    *
    * @return A future that completes with Location representing keycloak server location
    */
@@ -38,7 +38,7 @@ class AuthServiceLocation(locationService: LocationService) {
 
   private[csw] def register(authServicePort: Int): Future[RegistrationResult] = {
     val authServicePath = "auth"
-    debug("registering aas with location service")
+    debug(s"registering aas with location service on port: $authServicePort and at path: $authServicePath")
     val httpRegistration   = HttpRegistration(AASConnection.value, authServicePort, authServicePath)
     val registrationResult = locationService.register(httpRegistration)
     debug("aas registered with location service")

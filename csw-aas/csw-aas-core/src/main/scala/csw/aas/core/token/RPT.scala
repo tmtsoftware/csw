@@ -20,7 +20,7 @@ private[aas] class RPT(authzClient: AuthzClient)(implicit ec: ExecutionContext) 
     val rptStringF = getAuthorizationResponse(token)
 
     rptStringF.onComplete {
-      case Success(_) => debug(s"fetched RPT string from keycloak")
+      case Success(_) => debug("fetched RPT string from keycloak")
       case Failure(e) => error("error while fetching RPT string from keycloak", ex = e)
     }
 
@@ -30,25 +30,20 @@ private[aas] class RPT(authzClient: AuthzClient)(implicit ec: ExecutionContext) 
   private def decodeRPT(rptString: String): Either[TokenVerificationFailure, AccessToken] =
     JwtJson
       .decodeJson(rptString, JwtOptions(signature = false, expiration = false, notBefore = false))
-      .toEither
-      .left
-      .map {
-        case NonFatal(e) =>
-          error("error while decoding RPT")
-          InvalidToken(e)
+      .toLeftMappedEither("error while decoding RPT")
+      .flatMap { js =>
+        Try { js.as[AccessToken] }.toLeftMappedEither("error while mapping RPT json to access token")
       }
-      .flatMap(
-        js =>
-          Try { js.as[AccessToken] }.toEither.left.map {
-            case NonFatal(e) =>
-              error("error while mapping RPT json to access token")
-              InvalidToken(e)
-        }
-      )
-      .map(at => {
+      .map { at =>
         debug(s"successfully fetched RPT from keycloak for ${at.userOrClientName}")
         at
-      })
+      }
+
+  implicit private class TryOps[T](tryValue: Try[T]) {
+    def toLeftMappedEither(logMsg: String): Either[InvalidToken, T] = tryValue.toEither.left.map {
+      case NonFatal(e) => logger.error(logMsg, ex = e); InvalidToken(e)
+    }
+  }
 
   private def getAuthorizationResponse(token: String): Future[String] = Future {
     blocking { authzClient.authorization(token).authorize().getToken }

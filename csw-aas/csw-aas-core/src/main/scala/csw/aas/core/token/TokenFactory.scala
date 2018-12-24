@@ -15,7 +15,6 @@ class TokenFactory(keycloakDeployment: KeycloakDeployment, tokenVerifier: TokenV
 
   private lazy val rpt: RPT = RPT(authzClient)
 
-  private[aas] def makeToken(token: String): EitherT[Future, TokenVerificationFailure, AccessToken] = {
+  private[aas] def makeToken(token: String): EitherT[Future, TokenVerificationFailure, AccessToken] =
     if (enablePermissions) rpt.create(token) else tokenVerifier.verifyAndDecode(token)
-  }
 }

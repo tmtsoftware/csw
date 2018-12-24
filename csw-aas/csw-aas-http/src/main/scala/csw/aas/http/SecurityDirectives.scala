@@ -1,7 +1,8 @@
 package csw.aas.http
 
-import akka.http.scaladsl.model.{HttpMethod, HttpMethods}
-import akka.http.scaladsl.server.Directives.{authorize => keycloakAuthorize, _}
+import akka.http.scaladsl.model.HttpMethod
+import akka.http.scaladsl.model.HttpMethods._
+import akka.http.scaladsl.server.Directives.{authorize ⇒ keycloakAuthorize, _}
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.directives.AuthenticationDirective
 import csw.aas.core.TokenVerifier
@@ -11,7 +12,6 @@ import csw.aas.core.token.{AccessToken, TokenFactory}
 import csw.aas.http.AuthorizationPolicy.{EmptyPolicy, _}
 import csw.location.api.models.HttpLocation
 import csw.location.api.scaladsl.LocationService
-import org.keycloak.adapters.KeycloakDeployment
 
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, ExecutionContext}
@@ -45,39 +45,28 @@ class SecurityDirectives private[csw] (authentication: Authentication, realm: St
   private def sMethod(httpMethod: HttpMethod, authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] =
     method(httpMethod) & authenticate.flatMap(token => authorize(authorizationPolicy, token) & provide(token))
 
-  def sPost(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = sMethod(HttpMethods.POST, authorizationPolicy)
-
-  def sGet(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = sMethod(HttpMethods.GET, authorizationPolicy)
-
-  def sPut(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = sMethod(HttpMethods.PUT, authorizationPolicy)
-
-  def sDelete(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] =
-    sMethod(HttpMethods.DELETE, authorizationPolicy)
-
-  def sPatch(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = sMethod(HttpMethods.PATCH, authorizationPolicy)
-
-  def sHead(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = sMethod(HttpMethods.HEAD, authorizationPolicy)
-
-  def sConnect(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] =
-    sMethod(HttpMethods.CONNECT, authorizationPolicy)
+  def sPost(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken]    = sMethod(POST, authorizationPolicy)
+  def sGet(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken]     = sMethod(GET, authorizationPolicy)
+  def sPut(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken]     = sMethod(PUT, authorizationPolicy)
+  def sDelete(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken]  = sMethod(DELETE, authorizationPolicy)
+  def sPatch(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken]   = sMethod(PATCH, authorizationPolicy)
+  def sHead(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken]    = sMethod(HEAD, authorizationPolicy)
+  def sConnect(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = sMethod(CONNECT, authorizationPolicy)
 }
 
 object SecurityDirectives {
-  def apply(implicit ec: ExecutionContext): SecurityDirectives = {
-    val authConfig                             = AuthConfig.loadFromAppConfig()
-    val keycloakDeployment: KeycloakDeployment = authConfig.getDeployment
-    val tokenVerifier                          = TokenVerifier(authConfig)
-    val authentication                         = new Authentication(new TokenFactory(keycloakDeployment, tokenVerifier, authConfig.permissionsEnabled))
-    new SecurityDirectives(authentication, keycloakDeployment.getRealm, keycloakDeployment.getResourceName)
-  }
+  def apply(implicit ec: ExecutionContext): SecurityDirectives = from(AuthConfig.loadFromAppConfig())
 
   def apply(locationService: LocationService)(implicit ec: ExecutionContext): SecurityDirectives = {
     //todo: see if its possible to remove blocking here
-    val authLocation: HttpLocation             = Await.result(AuthServiceLocation(locationService).resolve(5.seconds), 10.seconds)
-    val authConfig                             = AuthConfig.loadFromAppConfig(Some(authLocation))
-    val keycloakDeployment: KeycloakDeployment = authConfig.getDeployment
-    val tokenVerifier                          = TokenVerifier(authConfig)
-    val authentication                         = new Authentication(new TokenFactory(keycloakDeployment, tokenVerifier, authConfig.permissionsEnabled))
+    val authLocation: HttpLocation = Await.result(AuthServiceLocation(locationService).resolve(5.seconds), 10.seconds)
+    from(AuthConfig.loadFromAppConfig(Some(authLocation)))
+  }
+
+  private def from(authConfig: AuthConfig)(implicit ec: ExecutionContext): SecurityDirectives = {
+    val keycloakDeployment = authConfig.getDeployment
+    val tokenVerifier      = TokenVerifier(authConfig)
+    val authentication     = new Authentication(new TokenFactory(keycloakDeployment, tokenVerifier, authConfig.permissionsEnabled))
     new SecurityDirectives(authentication, keycloakDeployment.getRealm, keycloakDeployment.getResourceName)
   }
 }
