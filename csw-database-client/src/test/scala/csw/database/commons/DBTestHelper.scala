@@ -16,7 +16,7 @@ object DBTestHelper {
   def postgres(port: Int): EmbeddedPostgres =
     EmbeddedPostgres.builder
       .setServerConfig("listen_addresses", "*")
-      .setServerConfig("hba_file", "src/test/resources/pg_hba.conf")
+      .setServerConfig("hba_file", getClass.getClassLoader.getResource("pg_hba.conf").getPath)
       .setDataDirectory(Paths.get("/tmp/postgresDataDir"))
       .setCleanDataDirectory(true)
       .setPort(port)
