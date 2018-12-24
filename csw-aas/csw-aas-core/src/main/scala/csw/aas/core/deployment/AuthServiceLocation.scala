@@ -1,7 +1,6 @@
 package csw.aas.core.deployment
 
-import csw.aas.core.commons.AuthLogger
-import csw.location.api.models.Connection.HttpConnection
+import csw.aas.core.commons.{AASConnection, AuthLogger}
 import csw.location.api.models._
 import csw.location.api.scaladsl.LocationService
 
@@ -19,10 +18,6 @@ class AuthServiceLocation(locationService: LocationService) {
   private val logger = AuthLogger.getLogger
   import logger._
 
-  private val registrationName = "AAS"
-  private val componentId      = ComponentId(registrationName, ComponentType.Service)
-  private val httpConnection   = HttpConnection(componentId)
-
   /**
    * Use the resolve api of location service to resolve keycloak server and wait for maximum 5 seconds. If the resolving exceeds
    * 5 seconds, the returning future completes with a RuntimeException that has appropriate message.
@@ -31,10 +26,10 @@ class AuthServiceLocation(locationService: LocationService) {
    */
   def resolve(within: FiniteDuration = 5.seconds)(implicit executionContext: ExecutionContext): Future[HttpLocation] = async {
     debug("resolving aas via location service")
-    val location = await(locationService.resolve(httpConnection, within)).getOrElse(
+    val location = await(locationService.resolve(AASConnection.value, within)).getOrElse(
       {
-        error(s"auth service connection=${httpConnection.name} could not be resolved")
-        throw AASResolutionFailed(s"auth service connection=${httpConnection.name} could not be resolved")
+        error(s"auth service connection=${AASConnection.value.name} could not be resolved")
+        throw AASResolutionFailed(s"auth service connection=${AASConnection.value.name} could not be resolved")
       }
     )
     debug(s"aas resolved to ${location.uri.toString}")
@@ -44,7 +39,7 @@ class AuthServiceLocation(locationService: LocationService) {
   private[csw] def register(authServicePort: Int): Future[RegistrationResult] = {
     val authServicePath = "auth"
     debug("registering aas with location service")
-    val httpRegistration   = HttpRegistration(httpConnection, authServicePort, authServicePath)
+    val httpRegistration   = HttpRegistration(AASConnection.value, authServicePort, authServicePath)
     val registrationResult = locationService.register(httpRegistration)
     debug("aas registered with location service")
     registrationResult

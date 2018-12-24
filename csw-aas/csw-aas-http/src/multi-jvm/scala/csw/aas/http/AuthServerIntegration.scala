@@ -1,8 +1,7 @@
 package csw.aas.http
 
+import csw.aas.core.commons.AASConnection
 import csw.aas.core.deployment.AuthServiceLocation
-import csw.location.api.models.Connection.HttpConnection
-import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.helpers.LSNodeSpec
 import csw.location.server.http.MultiNodeHTTPLocationService
 import org.scalatest.BeforeAndAfterEach
@@ -12,7 +11,7 @@ import tech.bilal.embedded_keycloak.{EmbeddedKeycloak, KeycloakData, Settings}
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits._
-import scala.concurrent.duration.DurationInt
+import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
 class AuthIntegrationTestMultiJvmNode1 extends AuthIntegrationTest
 class AuthIntegrationTestMultiJvmNode2 extends AuthIntegrationTest
@@ -29,17 +28,15 @@ class AuthIntegrationTest
   val testServerPort = 3001
   val keycloakPort   = 8081
 
+  private val defaultTimeout: FiniteDuration = 10.seconds
+  private val serverTimeout: FiniteDuration  = 30.minutes
+
   test("it should return 401 for unauthenticated request") {
 
     runOn(keycloak) {
       val embeddedKeycloak = new EmbeddedKeycloak(KeycloakData.empty)
-      val stopHandle =
-        Await.result(embeddedKeycloak.startServerInBackground(), 30.minutes)
-      Await.result(
-        new AuthServiceLocation(locationService)
-          .register(Settings.default.port),
-        10.seconds
-      )
+      val stopHandle       = Await.result(embeddedKeycloak.startServerInBackground(), serverTimeout)
+      Await.result(new AuthServiceLocation(locationService).register(Settings.default.port), defaultTimeout)
       enterBarrier("keycloak started")
       enterBarrier("test-server started")
       enterBarrier("test finished")
@@ -48,13 +45,8 @@ class AuthIntegrationTest
 
     runOn(exampleServer) {
       enterBarrier("keycloak started")
-      locationService
-        .resolve(
-          HttpConnection(ComponentId("AAS", ComponentType.Service)),
-          10.seconds
-        )
-        .await
-      val stopHandle = Await.result(new TestServer(locationService).start(testServerPort), 10.seconds)
+      locationService.resolve(AASConnection.value, defaultTimeout).await
+      val stopHandle = Await.result(new TestServer(locationService).start(testServerPort), defaultTimeout)
       enterBarrier("test-server started")
       enterBarrier("test finished")
       stopHandle.unbind()
@@ -89,14 +81,8 @@ class AuthIntegrationTest
           )
         )
       )
-
-      val stopHandle =
-        Await.result(embeddedKeycloak.startServerInBackground(), 30.minutes)
-      Await.result(
-        new AuthServiceLocation(locationService)
-          .register(Settings.default.port),
-        10.seconds
-      )
+      val stopHandle = Await.result(embeddedKeycloak.startServerInBackground(), serverTimeout)
+      Await.result(new AuthServiceLocation(locationService).register(Settings.default.port), defaultTimeout)
       enterBarrier("keycloak started")
       enterBarrier("test-server started")
       enterBarrier("test finished")
@@ -105,13 +91,8 @@ class AuthIntegrationTest
 
     runOn(exampleServer) {
       enterBarrier("keycloak started")
-      locationService
-        .resolve(
-          HttpConnection(ComponentId("AAS", ComponentType.Service)),
-          10.seconds
-        )
-        .await
-      val stopHandle = Await.result(new TestServer(locationService).start(testServerPort), 10.seconds)
+      locationService.resolve(AASConnection.value, defaultTimeout).await
+      val stopHandle = Await.result(new TestServer(locationService).start(testServerPort), defaultTimeout)
       enterBarrier("test-server started")
       enterBarrier("test finished")
       stopHandle.unbind()
@@ -121,12 +102,14 @@ class AuthIntegrationTest
       enterBarrier("keycloak started")
       enterBarrier("test-server started")
 
-      val token = BearerToken.getBearerToken(keycloakPort,
-                                             "john",
-                                             "secret",
-                                             "example",
-                                             "my-app",
-                                             host = Await.result(testConductor.getAddressFor(keycloak), 10.seconds).host.get)
+      val token = BearerToken.getBearerToken(
+        keycloakPort,
+        "john",
+        "secret",
+        "example",
+        "my-app",
+        host = Await.result(testConductor.getAddressFor(keycloak), defaultTimeout).host.get
+      )
 
       requests
         .post(url = s"http://localhost:$testServerPort", auth = token)
@@ -153,14 +136,8 @@ class AuthIntegrationTest
           )
         )
       )
-
-      val stopHandle =
-        Await.result(embeddedKeycloak.startServerInBackground(), 30.minutes)
-      Await.result(
-        new AuthServiceLocation(locationService)
-          .register(Settings.default.port),
-        10.seconds
-      )
+      val stopHandle = Await.result(embeddedKeycloak.startServerInBackground(), serverTimeout)
+      Await.result(new AuthServiceLocation(locationService).register(Settings.default.port), defaultTimeout)
       enterBarrier("keycloak started")
       enterBarrier("test-server started")
       enterBarrier("test finished")
@@ -169,13 +146,8 @@ class AuthIntegrationTest
 
     runOn(exampleServer) {
       enterBarrier("keycloak started")
-      locationService
-        .resolve(
-          HttpConnection(ComponentId("AAS", ComponentType.Service)),
-          10.seconds
-        )
-        .await
-      val stopHandle = Await.result(new TestServer(locationService).start(testServerPort), 10.seconds)
+      locationService.resolve(AASConnection.value, defaultTimeout).await
+      val stopHandle = Await.result(new TestServer(locationService).start(testServerPort), defaultTimeout)
       enterBarrier("test-server started")
       enterBarrier("test finished")
       stopHandle.unbind()
@@ -185,12 +157,14 @@ class AuthIntegrationTest
       enterBarrier("keycloak started")
       enterBarrier("test-server started")
 
-      val token = BearerToken.getBearerToken(keycloakPort,
-                                             "john",
-                                             "secret",
-                                             "example",
-                                             "my-app",
-                                             host = Await.result(testConductor.getAddressFor(keycloak), 10.seconds).host.get)
+      val token = BearerToken.getBearerToken(
+        keycloakPort,
+        "john",
+        "secret",
+        "example",
+        "my-app",
+        host = Await.result(testConductor.getAddressFor(keycloak), defaultTimeout).host.get
+      )
 
       requests
         .post(url = s"http://localhost:$testServerPort", auth = token)

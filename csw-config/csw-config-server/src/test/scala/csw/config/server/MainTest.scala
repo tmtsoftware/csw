@@ -7,10 +7,10 @@ import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes, Uri}
 import akka.stream.{ActorMaterializer, Materializer}
 import com.typesafe.config.ConfigFactory
+import csw.aas.core.commons.AASConnection
 import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.config.server.commons.{ConfigServiceConnection, TestFileUtils}
-import csw.location.api.models.Connection.HttpConnection
-import csw.location.api.models.{ComponentId, ComponentType, HttpRegistration}
+import csw.location.api.models.HttpRegistration
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.http.HTTPLocationService
@@ -32,7 +32,7 @@ class MainTest extends HTTPLocationService {
     super.beforeAll()
     testFileUtils.deleteServerFiles()
     //register AAS with location service
-    locationService.register(HttpRegistration(HttpConnection(ComponentId("AAS", ComponentType.Service)), AASPort, "auth"))
+    locationService.register(HttpRegistration(AASConnection.value, AASPort, "auth"))
   }
 
   override def afterEach(): Unit = testFileUtils.deleteServerFiles()

@@ -3,12 +3,12 @@ package csw.config.server.http
 import akka.actor.ActorSystem
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.stream.{ActorMaterializer, BindFailedException}
+import csw.aas.core.commons.AASConnection
 import csw.config.server.ServerWiring
 import csw.config.server.commons.ConfigServiceConnection
 import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.location.api.exceptions.OtherLocationIsRegistered
-import csw.location.api.models.Connection.HttpConnection
-import csw.location.api.models.{ComponentId, ComponentType, HttpRegistration}
+import csw.location.api.models.HttpRegistration
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.http.HTTPLocationService
 import csw.network.utils.Networks
@@ -23,7 +23,7 @@ class HttpServiceTest extends HTTPLocationService {
 
   //register AAS with location service
   private val AASPort = 8080
-  testLocationService.register(HttpRegistration(HttpConnection(ComponentId("AAS", ComponentType.Service)), AASPort, "auth"))
+  testLocationService.register(HttpRegistration(AASConnection.value, AASPort, "auth"))
 
   override def afterAll(): Unit = {
     system.terminate().await
