@@ -392,6 +392,7 @@ lazy val examples = project
     `csw-aas-http`,
     `csw-logging`,
     `csw-params-jvm`,
+    `csw-database-client`,
     `csw-framework`,
     `csw-testkit`       % "test->compile",
     `csw-config-server` % "test->test"

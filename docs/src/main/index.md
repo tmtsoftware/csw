@@ -154,7 +154,7 @@ when activities have occurred such as closing the shutter at the conclusion of a
 observation. The TCS Pointing Assembly sends pointing demand events to mechanisms
 throughout the software system.
 
-The Event Service is bsed on the publish/subscribe messaging paradigm.
+The Event Service is based on the publish/subscribe messaging paradigm.
 One component publishes an event and all components that have subscribed receive the event.
 The advantage of this type of message system is that publishers and subscribers are decoupled.
 Publishers can publish regardless of whether there are subscribers, and subscribers can
@@ -182,6 +182,8 @@ However, **alarms are not a suitable or approved approach to hazard control as p
 TMT safety system**. Alarms should provide additional information to operators and staff about
 systems monitored by the OSS and can provide early warning of future hazardous conditions,
 but should not be a sole, primary hazard control.
+
+### @ref:[Database Service](services/database.md)
 
 ### @ref:[Framework](commons/framework.md)
 The framework provides templates for @ref:[creating](./commons/create-component.md) and running the kind of software components 

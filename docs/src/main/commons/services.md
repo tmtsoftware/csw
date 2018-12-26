@@ -8,4 +8,5 @@
 * [Logging service](../services/logging.md)
 * [Event service](../services/event.md)
 * [Alarm service](../services/alarm.md)
+* [Database service](../services/database.md)
 @@@
