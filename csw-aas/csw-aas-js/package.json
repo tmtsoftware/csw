@@ -14,7 +14,6 @@
   },
   "scripts": {
     "test": "jest",
-    "test:watch": "react-scripts test --env=jsdom",
     "build": "rollup -c",
     "start": "rollup -c -w",
     "prepare": "npm run build",
