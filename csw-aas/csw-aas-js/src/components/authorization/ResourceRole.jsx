@@ -20,7 +20,7 @@ class ResourceRole extends React.Component {
 
 ResourceRole.propTypes = {
   role: PropTypes.string.isRequired,
-  resource: PropTypes.string.optional,
+  resource: PropTypes.string,
   children: PropTypes.node
 };
 

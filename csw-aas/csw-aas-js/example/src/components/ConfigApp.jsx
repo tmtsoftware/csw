@@ -1,7 +1,7 @@
 import React from 'react'
 import {BrowserRouter, Route} from 'react-router-dom'
 
-import {TMTAuthContext, Login, Logout, CheckLogin, RealmRole} from 'csw-aas-js'
+import {TMTAuthContext, Login, Logout, CheckLogin, RealmRole, ResourceRole} from 'csw-aas-js'
 import NavComponent from './NavComponent'
 import {AppConfig} from '../config/AppConfig'
 import WriteConfig from './WriteConfig'
@@ -38,9 +38,19 @@ class ConfigApp extends React.Component {
         </RealmRole>
 
         <RealmRole role='invalid-role'>
-          <div>Hello you authenticated for example-admin-role</div>
+          <div>Hello you authenticated for invalid-role</div>
           <WriteConfig />
         </RealmRole>
+
+        <ResourceRole role='person-role' resource='example-server'>
+          <div>Hello you authenticated for person-role of example-server</div>
+          <WriteConfig />
+        </ResourceRole>
+
+        <ResourceRole role='invalid-role'>
+          <div>Hello you authenticated for invalid-role</div>
+          <WriteConfig />
+        </ResourceRole>
 
       </TMTAuthContext.Provider>
     </div>
