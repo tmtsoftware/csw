@@ -1,0 +1,8 @@
+{
+  "short_name": "csw.auth",
+  "name": "csw.auth",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}

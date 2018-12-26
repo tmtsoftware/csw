@@ -23,6 +23,9 @@ test-output/
 
 examples/src/main/scala/csw/auth/react/app/node_modules/*
 
+csw-aas/csw-aas-js/node_modules/*
+csw-aas/csw-aas-js/example/node_modules/*
+
 # hidden cross project folders
 shared/.js
 shared/.jvm
