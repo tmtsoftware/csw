@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {TMTAuthContext} from './TMTAuthContext.jsx'
+import {TMTAuthContext} from '../TMTAuthContext.jsx'
 
 class CheckLogin extends React.Component {
   render() {

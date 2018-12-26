@@ -1,7 +1,7 @@
 import React from 'react'
 import Enzyme, {mount} from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
-import CheckLogin from '../../components/CheckLogin'
+import CheckLogin from '../../../components/authentication/CheckLogin'
 
 describe('<CheckLogin />', () => {
   Enzyme.configure({ adapter: new Adapter() });
@@ -12,8 +12,8 @@ describe('<CheckLogin />', () => {
 
   it('should render children elements if authentication is true', () => {
     const getCheckLoginWithMockContext = () => {
-      jest.mock('../../components/TMTAuthContext.jsx');
-      return require('../../components/CheckLogin.jsx').default
+      jest.mock('../../../components/TMTAuthContext.jsx');
+      return require('../../../components/authentication/CheckLogin.jsx').default
     };
 
     const props = {
