@@ -20,12 +20,31 @@ import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-object DatabaseServiceFactory {
+private[database] object DatabaseServiceFactory {
   val ReadUsernameHolder = "dbReadUsername"
   val ReadPasswordHolder = "dbReadPassword"
 }
+
+/**
+ * DatabaseServiceFactory provides a mechanism to connect to the database server and get the handle of Jooq's DSLContext.
+ * To know in detail about Jooq please refer [[https://www.jooq.org/learn/]].
+ *
+ * @param actorSystem component's actor system, used for
+ *                    1) reading the database configurations and
+ *                    2) schedule the task of database connection
+ * @param values used for testing purposes, to manually set the values for credentials instead of reading from env vars
+ */
 class DatabaseServiceFactory private[database] (actorSystem: ActorSystem[_], values: Map[String, String]) {
 
+  /**
+   * Creates the DatabaseServiceFactory. It is not injected in [[csw.framework.models.CswContext]] like other csw services.
+   * Instead developers are expected to create an instance of DatabaseServiceFactory and then use it.
+   *
+   * @param actorSystem component's actor system, used for
+   *                    1) reading the database configurations and
+   *                    2) schedule the task of database connection
+   * @return DatabaseServiceFactory
+   */
   def this(actorSystem: ActorSystem[_]) = this(actorSystem, Map.empty)
 
   private val log: Logger    = DatabaseLogger.getLogger
@@ -33,12 +52,36 @@ class DatabaseServiceFactory private[database] (actorSystem: ActorSystem[_], val
 
   private implicit val ec: ExecutionContext = actorSystem.executionContext
 
-  // create connection with default read access, throws DatabaseException
   import DatabaseServiceFactory._
+
+  /**
+   * Creates connection to database with default read access. The username and password for read access is picked from
+   * environment variables set on individual's machine i.e. `dbReadUsername` and `dbReadPassword`. It is expected that
+   * developers set these variables before calling this method.
+   *
+   * @param locationService used to locate the database server
+   * @param dbName used to connect to the database
+   * @return a Future that completes with Jooq's `DSLContext` or fails with [[csw.database.client.exceptions.DatabaseException]].
+   *         DSLContext provide methods like `fetchAsync`, `executeAsync`, `executeBatch`, etc. Moreover, see
+   *         [[csw.database.client.javadsl.JooqHelper]] for java and [[csw.database.client.scaladsl.JooqExtentions]] for
+   *         scala which provides wrapper methods on Jooq's `DSLContext`.
+   */
   def makeDsl(locationService: LocationService, dbName: String): Future[DSLContext] =
     makeDsl(locationService, dbName, ReadUsernameHolder, ReadPasswordHolder)
 
-  // create connection with credentials picked up from env variables, throws DatabaseException
+  /**
+   * Creates connection to database with credentials picked from environment variables. Names of these environment variables
+   * is expected as method parameters and developers are expected to set these variables before calling this method.
+   *
+   * @param locationService used to locate the database server
+   * @param dbName used to connect to the database
+   * @param usernameHolder name of env variable from which the username will be read
+   * @param passwordHolder name of env variable from which the password will be read
+   * @return a Future that completes with Jooq's `DSLContext` or fails with [[csw.database.client.exceptions.DatabaseException]].
+   *         DSLContext provide methods like `fetchAsync`, `executeAsync`, `executeBatch`, etc. Moreover, see
+   *         [[csw.database.client.javadsl.JooqHelper]] for java and [[csw.database.client.scaladsl.JooqExtentions]] for
+   *         scala which provides wrapper methods on Jooq's `DSLContext`.
+   */
   def makeDsl(
       locationService: LocationService,
       dbName: String,
@@ -59,11 +102,35 @@ class DatabaseServiceFactory private[database] (actorSystem: ActorSystem[_], val
     createDslInternal(Some(dataSourceConfig))
   }
 
-  // throws DatabaseException
+  /**
+   * A java method to create connection to database with default read access. The username and password for read access
+   * is picked from environment variables set on individual's machine i.e. `dbReadUsername` and `dbReadPassword`. It is
+   * expected that developers set these variables before calling this method.
+   *
+   * @param locationService used to locate the database server
+   * @param dbName used to connect to the database
+   * @return a CompletableFuture that completes with Jooq's `DSLContext` or fails with [[csw.database.client.exceptions.DatabaseException]].
+   *         DSLContext provide methods like `fetchAsync`, `executeAsync`, `executeBatch`, etc. Moreover, see
+   *         [[csw.database.client.javadsl.JooqHelper]] for java and [[csw.database.client.scaladsl.JooqExtentions]] for
+   *         scala which provides wrapper methods on Jooq's `DSLContext`.
+   */
   def jMakeDsl(locationService: ILocationService, dbName: String): CompletableFuture[DSLContext] =
     makeDsl(locationService.asScala, dbName).toJava.toCompletableFuture
 
-  // throws DatabaseException
+  /**
+   * A java method to create the connection to database with credentials picked from environment variables. Names of these
+   * environment variables is expected as method parameters and developers are expected to set these variables before
+   * calling this method.
+   *
+   * @param locationService used to locate the database server
+   * @param dbName used to connect to the database
+   * @param usernameHolder name of env variable from which the username will be read
+   * @param passwordHolder name of env variable from which the password will be read
+   * @return a CompletableFuture that completes with Jooq's `DSLContext` or fails with [[csw.database.client.exceptions.DatabaseException]].
+   *         DSLContext provide methods like `fetchAsync`, `executeAsync`, `executeBatch`, etc. Moreover, see
+   *         [[csw.database.client.javadsl.JooqHelper]] for java and [[csw.database.client.scaladsl.JooqExtentions]] for
+   *         scala which provides wrapper methods on Jooq's `DSLContext`.
+   */
   def jMakeDsl(
       locationService: ILocationService,
       dbName: String,
@@ -72,8 +139,28 @@ class DatabaseServiceFactory private[database] (actorSystem: ActorSystem[_], val
   ): CompletableFuture[DSLContext] =
     makeDsl(locationService.asScala, dbName, usernameHolder, passwordHolder).toJava.toCompletableFuture
 
-  // for dev/testing use picks details from config, throws DatabaseException
-  def makeDsl(): Future[DSLContext]             = Future(createDslInternal())
+  /**
+   * Creates a connection to database using the configuration read from application.conf. Refer the reference.conf/database
+   * documentation to know how to provide database connection properties.
+   *
+   * @note This method is strongly recommended to use for testing purposes only
+   * @return a Future that completes with Jooq's `DSLContext` or fails with [[csw.database.client.exceptions.DatabaseException]].
+   *         DSLContext provide methods like `fetchAsync`, `executeAsync`, `executeBatch`, etc. Moreover, see
+   *         [[csw.database.client.javadsl.JooqHelper]] for java and [[csw.database.client.scaladsl.JooqExtentions]] for
+   *         scala which provides wrapper methods on Jooq's `DSLContext`.
+   */
+  def makeDsl(): Future[DSLContext] = Future(createDslInternal())
+
+  /**
+   * A java method to Creates a connection to database using the configuration read from application.conf. Refer the
+   * reference.conf/database documentation to know how to provide database connection properties.
+   *
+   * @note This method is strongly recommended to use for testing purposes only
+   * @return a CompletableFuture that completes with Jooq's `DSLContext` or fails with [[csw.database.client.exceptions.DatabaseException]].
+   *         DSLContext provide methods like `fetchAsync`, `executeAsync`, `executeBatch`, etc. Moreover, see
+   *         [[csw.database.client.javadsl.JooqHelper]] for java and [[csw.database.client.scaladsl.JooqExtentions]] for
+   *         scala which provides wrapper methods on Jooq's `DSLContext`.
+   */
   def jMakeDsl(): CompletableFuture[DSLContext] = makeDsl().toJava.toCompletableFuture
 
   private[database] def makeDsl(port: Int): Future[DSLContext] = {

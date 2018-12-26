@@ -11,7 +11,7 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
  * Provides the connection information of `Database Service` by resolving the location through `Database Service`
  */
-class DatabaseServiceLocationResolver(locationService: LocationService)(implicit ec: ExecutionContext) {
+private[database] class DatabaseServiceLocationResolver(locationService: LocationService)(implicit ec: ExecutionContext) {
 
   def uri(): Future[URI] = async {
     val location = await(locationService.resolve(DatabaseServiceConnection.value, 5.seconds)).getOrElse(
