@@ -18,6 +18,8 @@ class TMTAuthStore {
     this.resourceAccess = keycloak.resourceAccess;
     this.loadUserInfo = keycloak.loadUserInfo;
     this.isAuthenticated = keycloak.authenticated;
+    this.hasRealmRole = keycloak.hasRealmRole;
+    this.hasResourceRole = keycloak.hasResourceRole;
     return this
   };
 
