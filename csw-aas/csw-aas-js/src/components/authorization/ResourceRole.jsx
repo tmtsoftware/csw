@@ -9,7 +9,7 @@ class ResourceRole extends React.Component {
         {context => {
           return (
             <div className='card-content'>
-              {(context.isAuthenticated && context.tmtAuth.hasResourceRole(this.props.role, this.props.resource)) ? this.props.children : null}
+              {(context.isAuthenticated && context.tmtAuth.hasResourceRole(this.props.resourceRole, this.props.resource)) ? this.props.children : null}
             </div>
           )
         }}
@@ -19,7 +19,7 @@ class ResourceRole extends React.Component {
 }
 
 ResourceRole.propTypes = {
-  role: PropTypes.string.isRequired,
+  resourceRole: PropTypes.string.isRequired,
   resource: PropTypes.string,
   children: PropTypes.node
 };

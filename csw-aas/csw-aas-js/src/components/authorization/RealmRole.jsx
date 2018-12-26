@@ -9,7 +9,7 @@ class RealmRole extends React.Component {
         {context => {
           return (
             <div className='card-content'>
-              {(context.isAuthenticated && context.tmtAuth.hasRealmRole(this.props.role)) ? this.props.children : null}
+              {(context.isAuthenticated && context.tmtAuth.hasRealmRole(this.props.realmRole)) ? this.props.children : null}
             </div>
           )
         }}
@@ -19,7 +19,7 @@ class RealmRole extends React.Component {
 }
 
 RealmRole.propTypes = {
-  role: PropTypes.string.isRequired,
+  realmRole: PropTypes.string.isRequired,
   children: PropTypes.node
 };
 

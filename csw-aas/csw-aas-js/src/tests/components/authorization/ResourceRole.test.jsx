@@ -17,7 +17,7 @@ describe('<RealmRole />', () => {
     };
 
     const props = {
-      role: 'person-role',
+      resourceRole: 'person-role',
       resource: 'example-server',
       children: <div className='resource-role'>Authorization successful</div>
     };
@@ -30,7 +30,7 @@ describe('<RealmRole />', () => {
 
   it('should not render children elements if un-authenticated', () => {
     const props = {
-      role: 'some-role',
+      resourceRole: 'some-role',
       resource: 'some-server',
       children: <div className='resource-role'>Authorization successful</div>
     };

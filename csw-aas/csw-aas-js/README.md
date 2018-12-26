@@ -7,7 +7,7 @@
 ## Install
 
 ```bash
-npm install --save csw.auth
+npm install
 ```
 
 ## Usage

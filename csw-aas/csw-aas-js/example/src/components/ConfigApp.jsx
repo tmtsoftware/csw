@@ -32,22 +32,22 @@ class ConfigApp extends React.Component {
           </div>
         </BrowserRouter>
 
-        <RealmRole role='example-admin-role'>
+        <RealmRole realmRole='example-admin-role'>
           <div>Hello you authenticated for example-admin-role</div>
           <WriteConfig />
         </RealmRole>
 
-        <RealmRole role='invalid-role'>
+        <RealmRole realmRole='invalid-role'>
           <div>Hello you authenticated for invalid-role</div>
           <WriteConfig />
         </RealmRole>
 
-        <ResourceRole role='person-role' resource='example-server'>
+        <ResourceRole resourceRole='person-role' resource='example-server'>
           <div>Hello you authenticated for person-role of example-server</div>
           <WriteConfig />
         </ResourceRole>
 
-        <ResourceRole role='invalid-role'>
+        <ResourceRole resourceRole='invalid-role'>
           <div>Hello you authenticated for invalid-role</div>
           <WriteConfig />
         </ResourceRole>
