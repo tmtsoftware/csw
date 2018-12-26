@@ -51,6 +51,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
       locationService,
       eventService,
       alarmService,
+      frameworkTestMocks().timeServiceScheduler,
       frameworkTestMocks().loggerFactory,
       frameworkTestMocks().configClientService,
       mock[CurrentStatePublisher],

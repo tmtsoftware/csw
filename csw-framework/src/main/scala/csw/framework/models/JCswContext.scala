@@ -7,6 +7,7 @@ import csw.config.api.javadsl.IConfigClientService
 import csw.event.api.javadsl.IEventService
 import csw.location.api.javadsl.ILocationService
 import csw.logging.javadsl.JLoggerFactory
+import csw.time.api.TimeServiceScheduler
 
 /**
  * Bundles all the services provided by csw, supporting java api
@@ -24,6 +25,7 @@ case class JCswContext(
     locationService: ILocationService,
     eventService: IEventService,
     alarmService: IAlarmService,
+    timeServiceScheduler: TimeServiceScheduler,
     loggerFactory: JLoggerFactory,
     configClientService: IConfigClientService,
     commandResponseManager: CommandResponseManager,
@@ -38,6 +40,7 @@ case class JCswContext(
     locationService.asScala,
     eventService.asScala,
     alarmService.asScala,
+    timeServiceScheduler,
     loggerFactory.asScala,
     configClientService.asScala,
     currentStatePublisher,

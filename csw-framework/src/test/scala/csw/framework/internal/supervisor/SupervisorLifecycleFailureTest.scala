@@ -222,6 +222,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
         cswCtx.locationService,
         cswCtx.eventService,
         cswCtx.alarmService,
+        cswCtx.timeServiceScheduler,
         new LoggerFactory(hcdInfo.name),
         cswCtx.configClientService,
         currentStatePublisher,

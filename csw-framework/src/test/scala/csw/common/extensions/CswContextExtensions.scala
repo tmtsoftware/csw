@@ -9,6 +9,7 @@ object CswContextExtensions {
         cswCtx.locationService,
         cswCtx.eventService,
         cswCtx.alarmService,
+        cswCtx.timeServiceScheduler,
         cswCtx.loggerFactory,
         cswCtx.configClientService,
         cswCtx.currentStatePublisher,

@@ -26,6 +26,7 @@ abstract class JComponentBehaviorFactory extends ComponentBehaviorFactory() {
         locationService.asJava,
         EventServiceAdapter.asJava(eventService),
         new JAlarmServiceImpl(alarmService),
+        timeServiceScheduler,
         loggerFactory.asJava,
         JConfigClientFactory.clientApi(ctx.system.toUntyped, locationService.asJava),
         commandResponseManager,

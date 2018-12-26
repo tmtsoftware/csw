@@ -23,6 +23,7 @@ import csw.logging.scaladsl.{Logger, LoggerFactory}
 import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.core.models.Prefix
 import csw.params.core.states.CurrentState
+import csw.time.api.TimeServiceScheduler
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{when, _}
 import org.scalatest.mockito.MockitoSugar
@@ -32,14 +33,15 @@ import scala.concurrent.Future
 class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: ActorSystem[Nothing]) extends MockitoSugar {
 
   ///////////////////////////////////////////////
-  val testActor: ActorRef[Any]                 = testkit.TestProbe("test-probe").testActor
-  val akkaRegistration                         = AkkaRegistration(mock[AkkaConnection], Prefix("nfiraos.ncc.trombone"), testActor)
-  val locationService: LocationService         = mock[LocationService]
-  val eventServiceFactory: EventServiceFactory = mock[EventServiceFactory]
-  val eventService: EventService               = mock[EventService]
-  val alarmService: AlarmService               = mock[AlarmService]
-  val registrationResult: RegistrationResult   = mock[RegistrationResult]
-  val registrationFactory: RegistrationFactory = mock[RegistrationFactory]
+  val testActor: ActorRef[Any]                   = testkit.TestProbe("test-probe").testActor
+  val akkaRegistration                           = AkkaRegistration(mock[AkkaConnection], Prefix("nfiraos.ncc.trombone"), testActor)
+  val locationService: LocationService           = mock[LocationService]
+  val eventServiceFactory: EventServiceFactory   = mock[EventServiceFactory]
+  val eventService: EventService                 = mock[EventService]
+  val alarmService: AlarmService                 = mock[AlarmService]
+  val timeServiceScheduler: TimeServiceScheduler = mock[TimeServiceScheduler]
+  val registrationResult: RegistrationResult     = mock[RegistrationResult]
+  val registrationFactory: RegistrationFactory   = mock[RegistrationFactory]
 
   when(registrationFactory.akkaTyped(any[AkkaConnection], any[Prefix], any[ActorRef[_]]))
     .thenReturn(akkaRegistration)
@@ -79,6 +81,7 @@ class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: Acto
       locationService,
       eventService,
       alarmService,
+      timeServiceScheduler,
       loggerFactory,
       configClientService,
       currentStatePublisher,

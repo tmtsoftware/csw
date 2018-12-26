@@ -15,6 +15,8 @@ import csw.config.client.scaladsl.ConfigClientFactory
 import csw.event.client.EventServiceFactory
 import csw.event.api.scaladsl.EventService
 import csw.logging.scaladsl.LoggerFactory
+import csw.time.api.TimeServiceScheduler
+import csw.time.client.TimeServiceSchedulerFactory
 
 import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContextExecutor, Future}
@@ -35,6 +37,7 @@ class CswContext(
     val locationService: LocationService,
     val eventService: EventService,
     val alarmService: AlarmService,
+    val timeServiceScheduler: TimeServiceScheduler,
     val loggerFactory: LoggerFactory,
     val configClientService: ConfigClientService,
     val currentStatePublisher: CurrentStatePublisher,
@@ -57,8 +60,10 @@ object CswContext {
     implicit val system: ActorSystem          = richSystem.system
     implicit val ec: ExecutionContextExecutor = system.dispatcher
 
-    val eventService        = eventServiceFactory.make(locationService)
-    val alarmService        = alarmServiceFactory.makeClientApi(locationService)
+    val eventService         = eventServiceFactory.make(locationService)
+    val alarmService         = alarmServiceFactory.makeClientApi(locationService)
+    val timeServiceScheduler = TimeServiceSchedulerFactory.make()
+
     val loggerFactory       = new LoggerFactory(componentInfo.name)
     val configClientService = ConfigClientFactory.clientApi(system, locationService)
     async {
@@ -80,6 +85,7 @@ object CswContext {
         locationService,
         eventService,
         alarmService,
+        timeServiceScheduler,
         loggerFactory,
         configClientService,
         currentStatePublisher,

@@ -12,6 +12,7 @@ import csw.command.client.messages.{CommandResponseManagerMessage, FromComponent
 import csw.alarm.api.scaladsl.AlarmService
 import csw.command.client.CommandResponseManager
 import csw.event.api.scaladsl.EventService
+import csw.time.api.TimeServiceScheduler
 import org.mockito.Mockito._
 import org.scalatest.Matchers
 import org.scalatest.mockito.MockitoSugar
@@ -29,13 +30,16 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar with Ma
 
     val commandResponseManager: CommandResponseManager = mock[CommandResponseManager]
     when(commandResponseManager.commandResponseManagerActor).thenReturn(TestProbe[CommandResponseManagerMessage].ref)
-    val locationService: LocationService = mock[LocationService]
-    val eventService: EventService       = mock[EventService]
-    val alarmService: AlarmService       = mock[AlarmService]
+    val locationService: LocationService           = mock[LocationService]
+    val eventService: EventService                 = mock[EventService]
+    val alarmService: AlarmService                 = mock[AlarmService]
+    val timeServiceScheduler: TimeServiceScheduler = mock[TimeServiceScheduler]
+
     val cswCtx: CswContext = new CswContext(
       locationService,
       eventService,
       alarmService,
+      frameworkTestMocks().timeServiceScheduler,
       frameworkTestMocks().loggerFactory,
       frameworkTestMocks().configClientService,
       mock[CurrentStatePublisher],
