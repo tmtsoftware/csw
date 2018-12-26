@@ -2,17 +2,13 @@ package csw.framework.internal.component
 
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import akka.actor.typed.Behavior
+import csw.command.client.CommandResponseManager
+import csw.command.client.messages.FromComponentLifecycleMessage.Running
+import csw.command.client.messages.TopLevelActorIdleMessage.Initialize
+import csw.command.client.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{ComponentInfos, CurrentStatePublisher, FrameworkTestSuite}
-import csw.command.client.messages.FromComponentLifecycleMessage.Running
-import csw.command.client.messages.TopLevelActorIdleMessage.Initialize
-import csw.location.api.scaladsl.LocationService
-import csw.command.client.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
-import csw.alarm.api.scaladsl.AlarmService
-import csw.command.client.CommandResponseManager
-import csw.event.api.scaladsl.EventService
-import csw.time.api.TimeServiceScheduler
 import org.mockito.Mockito._
 import org.scalatest.Matchers
 import org.scalatest.mockito.MockitoSugar
@@ -30,15 +26,11 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar with Ma
 
     val commandResponseManager: CommandResponseManager = mock[CommandResponseManager]
     when(commandResponseManager.commandResponseManagerActor).thenReturn(TestProbe[CommandResponseManagerMessage].ref)
-    val locationService: LocationService           = mock[LocationService]
-    val eventService: EventService                 = mock[EventService]
-    val alarmService: AlarmService                 = mock[AlarmService]
-    val timeServiceScheduler: TimeServiceScheduler = mock[TimeServiceScheduler]
 
     val cswCtx: CswContext = new CswContext(
-      locationService,
-      eventService,
-      alarmService,
+      frameworkTestMocks().locationService,
+      frameworkTestMocks().eventService,
+      frameworkTestMocks().alarmService,
       frameworkTestMocks().timeServiceScheduler,
       frameworkTestMocks().loggerFactory,
       frameworkTestMocks().configClientService,

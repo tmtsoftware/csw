@@ -2,24 +2,21 @@ package csw.framework.internal.component
 
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import akka.actor.typed.{Behavior, PostStop}
-import csw.framework.models.CswContext
-import csw.framework.scaladsl.ComponentHandlers
-import csw.framework.{ComponentInfos, CurrentStatePublisher, FrameworkTestSuite}
+import csw.command.client.CommandResponseManager
 import csw.command.client.messages.CommandMessage.{Oneway, Submit}
 import csw.command.client.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.TopLevelActorIdleMessage.Initialize
+import csw.command.client.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
+import csw.command.client.models.framework.ToComponentLifecycleMessages._
+import csw.framework.models.CswContext
+import csw.framework.scaladsl.ComponentHandlers
+import csw.framework.{ComponentInfos, CurrentStatePublisher, FrameworkTestSuite}
+import csw.params.commands.CommandIssue.OtherIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, Observe, Setup}
-import csw.command.client.models.framework.ToComponentLifecycleMessages._
-import csw.location.api.scaladsl.LocationService
 import csw.params.core.generics.KeyType
 import csw.params.core.models.{ObsId, Prefix}
-import csw.command.client.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
-import csw.alarm.api.scaladsl.AlarmService
-import csw.command.client.CommandResponseManager
-import csw.event.api.scaladsl.EventService
-import csw.params.commands.CommandIssue.OtherIssue
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
@@ -36,9 +33,6 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
       commandStatusServiceProbe: TestProbe[CommandResponseManagerMessage]
   ) {
 
-    val locationService: LocationService               = mock[LocationService]
-    val eventService: EventService                     = mock[EventService]
-    val alarmService: AlarmService                     = mock[AlarmService]
     val commandResponseManager: CommandResponseManager = mock[CommandResponseManager]
     when(commandResponseManager.commandResponseManagerActor).thenReturn(commandStatusServiceProbe.ref)
 
@@ -48,9 +42,9 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     val factory = new TestComponentBehaviorFactory(sampleHcdHandler)
 
     val cswCtx: CswContext = new CswContext(
-      locationService,
-      eventService,
-      alarmService,
+      frameworkTestMocks().locationService,
+      frameworkTestMocks().eventService,
+      frameworkTestMocks().alarmService,
       frameworkTestMocks().timeServiceScheduler,
       frameworkTestMocks().loggerFactory,
       frameworkTestMocks().configClientService,

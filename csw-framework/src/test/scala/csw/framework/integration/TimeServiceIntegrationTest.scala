@@ -27,10 +27,6 @@ class TimeServiceIntegrationTest extends FrameworkIntegrationSuite {
   private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
   private val wiring                   = FrameworkWiring.make(testActorSystem)
 
-  override protected def beforeAll(): Unit = {
-    super.beforeAll()
-  }
-
   override def afterAll(): Unit = {
     Http(testActorSystem).shutdownAllConnectionPools().await
     super.afterAll()
@@ -52,8 +48,7 @@ class TimeServiceIntegrationTest extends FrameworkIntegrationSuite {
     implicit val timeout: Timeout = Timeout(100.millis)
     assemblyCommandService.submit(commands.Setup(prefix, CommandName("time.service.scheduler.success"), None))
     Thread.sleep(1000)
-    val states = assemblyProbe.receiveAll()
 
-    states should contain(CurrentState(prefix, timeServiceSchedulerState))
+    assemblyProbe.receiveAll() should contain(CurrentState(prefix, timeServiceSchedulerState))
   }
 }
