@@ -1,18 +1,19 @@
 package csw.common.components.framework
 
 import akka.actor.typed.scaladsl.ActorContext
+import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.command.client.messages.TopLevelActorMessage
+import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.location.api.models.{LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.logging.scaladsl.Logger
 import csw.params.commands.CommandIssue.OtherIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
-import csw.params.events.{Event, EventName, SystemEvent}
-import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.location.api.models.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.params.core.models.Prefix
 import csw.params.core.states.{CurrentState, StateName}
-import csw.logging.scaladsl.Logger
+import csw.params.events.{Event, EventName, SystemEvent}
+import csw.time.api.UTCTime
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -77,6 +78,11 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
 
       case Setup(_, somePrefix, CommandName("subscribe.event.success"), _, _) ⇒
         eventService.defaultSubscriber.subscribeCallback(Set(event.eventKey), processEvent(somePrefix))
+
+      case Setup(_, _, CommandName("time.service.scheduler.success"), _, _) =>
+        timeServiceScheduler.scheduleOnce(UTCTime.now()) {
+          currentStatePublisher.publish(CurrentState(prefix, timeServiceSchedulerState))
+        }
 
       case Setup(_, somePrefix, _, _, _) ⇒
         currentStatePublisher.publish(

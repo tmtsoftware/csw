@@ -9,6 +9,7 @@ import csw.params.core.models.Subsystem.NFIRAOS
 import csw.params.core.models.{Choice, Choices, Prefix}
 import csw.alarm.api.models.AlarmSeverity.Warning
 import csw.alarm.api.models.Key.AlarmKey
+import csw.params.core.states.StateName
 
 object SampleComponentState {
   val restartChoice             = Choice("Restart")
@@ -61,4 +62,7 @@ object SampleComponentState {
   val choiceKey: GChoiceKey          = ChoiceKey.make("choiceKey", choices)
   val httpConnection: HttpConnection = HttpConnection(ComponentId("exampleHTTPService", ComponentType.Service))
   val tcpConnection: TcpConnection   = TcpConnection(ComponentId("exampleTcpService", ComponentType.Service))
+
+  // States
+  val timeServiceSchedulerState = StateName("timeServiceSchedulerState")
 }

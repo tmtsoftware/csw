@@ -44,7 +44,7 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
     super.afterAll()
   }
 
-  test("should start multiple components withing a single container and able to accept lifecycle messages") {
+  test("should start multiple components within a single container and able to accept lifecycle messages") {
 
     val wiring = FrameworkWiring.make(testActorSystem, mock[RedisClient])
     // start a container and verify it moves to running lifecycle state
