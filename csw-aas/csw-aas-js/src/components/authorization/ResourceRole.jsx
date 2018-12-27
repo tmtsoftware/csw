@@ -22,8 +22,8 @@ ResourceRole.propTypes = {
   resourceRole: PropTypes.string.isRequired,
   resource: PropTypes.string,
   children: PropTypes.node
-};
+}
 
-ResourceRole.contextType = TMTAuthContext;
+ResourceRole.contextType = TMTAuthContext
 
 export default ResourceRole

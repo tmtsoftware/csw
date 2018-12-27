@@ -20,8 +20,8 @@ class CheckLogin extends React.Component {
 
 CheckLogin.propTypes = {
   children: PropTypes.node
-};
+}
 
-CheckLogin.contextType = TMTAuthContext;
+CheckLogin.contextType = TMTAuthContext
 
 export default CheckLogin

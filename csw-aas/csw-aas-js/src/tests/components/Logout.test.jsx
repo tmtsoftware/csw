@@ -4,7 +4,7 @@ import Enzyme, {shallow} from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 
 describe('<Logout />', () => {
-  Enzyme.configure({ adapter: new Adapter() });
+  Enzyme.configure({ adapter: new Adapter() })
 
   it('should call logout', () => {
     const props = {
@@ -15,11 +15,11 @@ describe('<Logout />', () => {
       history: {
         push: jest.fn()
       }
-    };
-    shallow(<Logout {...props} />);
+    }
+    shallow(<Logout {...props} />)
 
-    expect(props.history.push).toHaveBeenCalledWith('/');
-    expect(props.tmtAuth.logout).toHaveBeenCalled();
+    expect(props.history.push).toHaveBeenCalledWith('/')
+    expect(props.tmtAuth.logout).toHaveBeenCalled()
     expect(props.onLogout).toHaveBeenCalled()
   })
-});
+})

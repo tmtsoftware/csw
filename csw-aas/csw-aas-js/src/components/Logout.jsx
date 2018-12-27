@@ -8,8 +8,8 @@ export class Logout extends React.Component {
   }
 
   componentWillMount = () => {
-    this.props.history.push('/');
-    this.props.tmtAuth.logout();
+    this.props.history.push('/')
+    this.props.tmtAuth.logout()
     this.props.onLogout()
   }
 }
@@ -20,6 +20,6 @@ Logout.propTypes = {
   }).isRequired,
   tmtAuth: PropTypes.object,
   onLogout: PropTypes.func
-};
+}
 
 export default withRouter(Logout)

@@ -21,8 +21,8 @@ class RealmRole extends React.Component {
 RealmRole.propTypes = {
   realmRole: PropTypes.string.isRequired,
   children: PropTypes.node
-};
+}
 
-RealmRole.contextType = TMTAuthContext;
+RealmRole.contextType = TMTAuthContext
 
 export default RealmRole
