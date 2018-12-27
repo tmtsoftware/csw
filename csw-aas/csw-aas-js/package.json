@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "description": "This library is a javascript adpater for csw-aas. This is a wrapper over keycloak.js. It provides react components which can be used by UI applications to incarporate authorization and authentication using configured auth server url",
   "author": "TMT Software",
-  "license": "Apache License, Version 2.0",
-  "repository": "tmtsoftware/csw",
+  "license": "Apache License 2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tmtsoftware/csw.git"
+  },
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "jsnext:main": "dist/index.es.js",

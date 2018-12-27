@@ -1,8 +1,8 @@
-# csw.auth
+# csw-aas-js
 
 > This library provides React components to integrate authentication and authorization while building UI applications
 
-[![NPM](https://img.shields.io/npm/v/csw.auth.svg)](https://www.npmjs.com/package/csw.auth) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+[![NPM](https://img.shields.io/npm/v/csw-aas-js.svg)](https://www.npmjs.com/package/csw-aas-js) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 ## Install
 
@@ -15,7 +15,7 @@ npm install
 ```jsx
 import React, { Component } from 'react'
 
-import MyComponent from 'csw.auth'
+import MyComponent from 'csw-aas-js'
 
 class Example extends Component {
   render () {
@@ -28,4 +28,4 @@ class Example extends Component {
 
 ## License
 
-MIT © [Poorva17](https://github.com/Poorva17)
+Apache Licence Version 2.0 © [Poorva17](https://github.com/Poorva17)
