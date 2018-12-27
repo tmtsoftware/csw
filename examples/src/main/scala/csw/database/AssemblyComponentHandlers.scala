@@ -51,7 +51,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
 
     val queries = dsl.queries(
       dsl.query("INSERT INTO films(name) VALUES (?)", "movie_1"),
-      dsl.query("INSERT INTO films(id, name) VALUES (?, ?)", 2, movie_2)
+      dsl.query("INSERT INTO films(id, name) VALUES (?, ?)", "2", movie_2)
     )
 
     import csw.database.client.scaladsl.JooqExtentions.RichQueries
@@ -60,7 +60,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
     //#dsl-batch
 
     //#dsl-fetch
-    val selectQuery = dsl.resultQuery("SELECT name FROM films WHERE id = ?", 1)
+    val selectQuery = dsl.resultQuery("SELECT name FROM films WHERE id = ?", "1")
 
     import csw.database.client.scaladsl.JooqExtentions.RichResultQuery
     val selectResultF: Future[List[String]] = selectQuery.fetchAsyncScala[String]
