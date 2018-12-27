@@ -23,7 +23,7 @@ class TMTAuthStore {
     return this
   };
 
-  authenticate = async (config, url) => {
+  authenticate = (config, url) => {
     console.info('instantiating AAS')
     const keycloakConfig = {...AASConfig, ...config, ...url}
     const keycloak = KeyCloak(keycloakConfig)

@@ -1,4 +1,8 @@
+/* eslint-disable import/first */
 import {TMTAuth} from '../../components/TMTAuth'
+jest.mock('keycloak-js')
+
+import KeyCloak from 'keycloak-js'
 
 describe('<TMTAuth />', () => {
   it('should create TMTAuth instance', () => {
@@ -23,5 +27,31 @@ describe('<TMTAuth />', () => {
     expect(tmtAuth.isAuthenticated).toBe(mockKeycloak.authenticated)
     expect(tmtAuth.hasRealmRole).toBe(mockKeycloak.hasRealmRole)
     expect(tmtAuth.hasResourceRole).toBe(mockKeycloak.hasResourceRole)
+  })
+
+  it('should authenticate', () => {
+    const mockKeycloak = {
+      init: jest.fn().mockImplementation(() => {
+        return Promise.resolve(true)
+      }),
+      onTokenExpired: jest.fn(),
+      updateToken: jest.fn().mockImplementation(() => {
+        return Promise.resolve(true)
+      })
+    }
+
+    const initMock = jest.spyOn(mockKeycloak, 'init')
+
+    KeyCloak.mockReturnValue(mockKeycloak)
+
+    const {keycloak, authenticated} = TMTAuth.authenticate({
+      'realm': 'example',
+      'clientId': 'example-app'
+    }, 'http://somehost:someport')
+
+    expect(initMock).toHaveBeenCalledWith({onLoad: 'login-required', flow: 'hybrid'})
+    expect(keycloak).toBe(mockKeycloak)
+    expect(authenticated).toEqual(Promise.resolve(true))
+    initMock.mockRestore()
   })
 })
