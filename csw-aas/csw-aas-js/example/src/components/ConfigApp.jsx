@@ -9,21 +9,21 @@ import ReadConfig from './ReadConfig'
 
 class ConfigApp extends React.Component {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {authContext: {tmtAuth: null, isAuthenticated: false}}
   }
 
   render() {
-    const config = {...AppConfig};
-    return <div>
+    const config = {...AppConfig}
+    return <div className='row card col s12 m7'>
       <TMTAuthContext.Provider value={this.state.authContext}>
         <BrowserRouter>
-          <div style={{'textAlign': 'center'}} className=' row card blue-grey darken-1 col s12 m7'>
+          <div>
             <NavComponent />
             <Route path='/login' render={(_) => (<Login config={config} onAuthentication={this.setAuthContext} />)} />
             <Route path='/logout' render={(_) => (<Logout tmtAuth={this.state.authContext.tmtAuth} onLogout={this.resetAuthContext} />)} />
 
-            <Route exact path='/write'render={(_) => (<CheckLogin>
+            <Route exact path='/secured'render={(_) => (<CheckLogin>
               <WriteConfig />
             </CheckLogin>)} />
 
@@ -33,23 +33,19 @@ class ConfigApp extends React.Component {
         </BrowserRouter>
 
         <RealmRole realmRole='example-admin-role'>
-          <div>Hello you authenticated for example-admin-role</div>
-          <WriteConfig />
+          <div>Example admin role specific functionality</div>
         </RealmRole>
 
         <RealmRole realmRole='invalid-role'>
           <div>Hello you authenticated for invalid-role</div>
-          <WriteConfig />
         </RealmRole>
 
         <ResourceRole resourceRole='person-role' resource='example-server'>
-          <div>Hello you authenticated for person-role of example-server</div>
-          <WriteConfig />
+          <div>Person role specific functionality</div>
         </ResourceRole>
 
         <ResourceRole resourceRole='invalid-role'>
           <div>Hello you authenticated for invalid-role</div>
-          <WriteConfig />
         </ResourceRole>
 
       </TMTAuthContext.Provider>

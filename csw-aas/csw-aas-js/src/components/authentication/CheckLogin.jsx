@@ -8,7 +8,7 @@ class CheckLogin extends React.Component {
       <TMTAuthContext.Consumer>
         {context => {
           return (
-            <div className='card-content white-text'>
+            <div>
               {context.isAuthenticated ? this.props.children : null}
             </div>
           )
