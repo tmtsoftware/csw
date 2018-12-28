@@ -2,6 +2,7 @@ package csw.time.api
 
 import java.time.{Instant, ZoneId, ZoneOffset, ZonedDateTime}
 
+import csw.time.api.internal.TimeLibrary
 import csw.time.api.models.internal.TMTClock.clock
 import julienrf.json.derived
 import play.api.libs.json._
