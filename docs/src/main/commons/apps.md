@@ -44,7 +44,8 @@ The execution of the script is such that it starts `csw-location-server`, then c
 `--config` option, if provided, then starts configuration service. Next, it checks whether to start event service from provided 
 `--event` option, if provided, it starts event service. Next, it checks whether to start alarm service from provided 
 `--alarm` option, if provided, it starts alarm service. Next, it checks whether to start database service from provided
-`--database` option, if provided, it starts database service.
+`--database` option, if provided, it starts database service. It is important to set `PGDATA` env var to start the postgres server.
+                                                              See `--help` for more details 
 
 With this, the component code is now ready to connect to provided services via `csw-services.sh`.   
 

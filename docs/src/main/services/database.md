@@ -2,8 +2,8 @@
 
 The Database Service provides API to manage database connections and access data in the TMT software system. The service expects
 `Postgres` as database server. It uses `Jooq` library underneath to manage database access, connection pooling, etc.
-To describe `JOOQ` briefly, it is a java library that provides api for accessing data i.e. DDL support, DML support, fetch,
-batch execution, prepared statements, etc. safety against sql injection connection pooling, etc. To know more about JOOQ and
+To describe `Jooq` briefly, it is a java library that provides api for accessing data i.e. DDL support, DML support, fetch,
+batch execution, prepared statements, etc. safety against sql injection, connection pooling, etc. To know more about Jooq and
 it's features please refer this [link](https://www.jooq.org/learn/).
 
 <!-- introduction to the service -->
@@ -18,7 +18,20 @@ sbt
     libraryDependencies += "com.github.tmtsoftware.csw" %% "csw-database-client" % "$version$"
     ```
     @@@
-    
+
+## Accessing Database Service
+
+Database service is different from any other csw services in a way that it is not passed in through `CswContext/JCswContext`
+in ComponentHandlers. So, to access database service, it is expected from developers to create `DatabaseServiceFactory`.
+DatabaseServiceFactory can be created from anywhere using an `ActorSystem` and it's creation is explained in next section. 
+
+@@@ note
+   
+Creating a new DatabaseServiceFactory does not mean a new connection will be created to postgres server. Hence, creating
+multiple DatabaseServiceFactory per component can be considered pretty cheap and harmless.
+
+@@@
+
 ## Database Service Factory
 
 Database service requires `postgres` server to be running on the machine. To start the postgres server for development and testing
@@ -42,7 +55,7 @@ database by the provided `dbName`. It picks username and password for read acces
 i.e. it looks at `dbReadUsername` for username and `dbReadPassword` for password, hence it is expected from developers
 to set these environment variables prior to using `DatabaseServiceFactory`. 
 
-`makeDsl`/`jMakeDsl` returns a `JOOQ` type `DSLContext`. DSLContext provides mechanism to access the data stored in postgres
+`makeDsl`/`jMakeDsl` returns a `Jooq` type `DSLContext`. DSLContext provides mechanism to access the data stored in postgres
 using JDBC driver underneath. The usage of DSLContext in component development will be explained in later sections.  
 
 @@@note 
@@ -63,14 +76,14 @@ Java
 :   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/database/JAssemblyComponentHandlers.java) { #dbFactory-write-access }
 
 Here the username is picked from `dbWriteUsername` and password is picked from `dbWritePassword` environment variables. Hence, it is
-expected from developers to set environment variables prior to using these method. 
+expected from developers to set environment variables prior to using this method. 
  
 ### Connect for development or testing
 
 For development and testing purposes, all database connection properties can be provided from `application.conf` including
-username and password. This will not require to set environment variables for credentials as described in previous section.
+username and password. This will not require to set environment variables for credentials as described in previous sections.
 In order to do so, use the `DatabaseServiceFactory` as shown below:
-
+ 
 Scala
 :   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/database/AssemblyComponentHandlers.scala) { #dbFactory-test-access }
 
@@ -107,7 +120,7 @@ please refer this [link](http://brettwooldridge.github.io/HikariCP/).
 Once the DSLContext is returned from `makeDsl/jMakeDsl`, it can be used to provide plain SQL to database service and 
 get it executed on postgres server. 
 
-### CREATE
+### Create
 
 To create a table, use the DSLContext as follows:
 
@@ -117,7 +130,7 @@ Scala
 Java
 :   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/database/JAssemblyComponentHandlers.java) { #dsl-create }
 
-### INSERT
+### Insert
 
 To insert data in batch, use the DSLContext as follows:
 
@@ -129,16 +142,16 @@ Java
 
 @@@note
 
-* The insert statements above gets mapped to prepared statements underneath at jdbc layer and values like `movie_1`,
+* The insert statements above gets mapped to prepared statements underneath at JDBC layer and values like `movie_1`,
  `movie_2` and `2` from the example are bound to the dynamic parameters of these generated prepared statements.
 * As prepared statements provide safety against SQL injection, it is recommended to use prepared statements instead of static
  SQL statements whenever there is a need to dynamically bind values.
 * In the above example, two insert statements are batched together and sent to postgres server in a single call. 
- `executeBatchAsync/executeBatch` maps to batch statements underneath at jdbc layer.
+ `executeBatchAsync/executeBatch` maps to batch statements underneath at JDBC layer.
 
 @@@
 
-### SELECT
+### Select
 
 To select data from table, use the DSLContext as follows:
 
@@ -148,7 +161,7 @@ Scala
 Java
 :   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/database/JAssemblyComponentHandlers.java) { #dsl-fetch }
 
-### STORED FUNCTION
+### Stored Function
 
 To create a stored function, use the DSLContext as follows:
 
@@ -162,9 +175,9 @@ Similarly, any SQL queries can be written with the help of DSLContext including 
 
 @@@note
 
-* If there is a syntax error in SQL queries the `Future/CompletableFuture` returned will fail with `CompletionException` and 
- `CompletionStage` will fail with `ExecutionException`. But both `CompletionException` and `ExecutionException` will have 
- Jooq's `DataAccessException` underneath as cause. 
+If there is a syntax error in SQL queries the `Future/CompletableFuture` returned will fail with `CompletionException` and 
+`CompletionStage` will fail with `ExecutionException`. But both `CompletionException` and `ExecutionException` will have 
+Jooq's `DataAccessException` underneath as cause. 
 
 @@@
 

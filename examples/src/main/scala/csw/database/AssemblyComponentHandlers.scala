@@ -24,15 +24,21 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
     //#dbFactory-access
     val dbFactory = new DatabaseServiceFactory(ctx.system)
 
-    dsl = await(dbFactory.makeDsl(locationService, "postgres"))
+    dbFactory
+      .makeDsl(locationService, "postgres") // postgres is dbName
+      .foreach((dsl: DSLContext) ⇒ this.dsl = dsl)
     //#dbFactory-access
 
     //#dbFactory-write-access
-    dsl = await(dbFactory.makeDsl(locationService, "postgres", "dbWriteUsername", "dbWritePassword"))
+    dbFactory
+      .makeDsl(locationService, "postgres", "dbWriteUsername", "dbWritePassword")
+      .foreach((dsl: DSLContext) ⇒ this.dsl = dsl)
     //#dbFactory-write-access
 
     //#dbFactory-test-access
-    dsl = await(dbFactory.makeDsl())
+    dbFactory
+      .makeDsl()
+      .foreach((dsl: DSLContext) ⇒ this.dsl = dsl)
     //#dbFactory-test-access
   }
 

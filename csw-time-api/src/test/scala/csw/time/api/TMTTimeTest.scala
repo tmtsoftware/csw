@@ -49,7 +49,7 @@ class TMTTimeTest extends FunSuite with Matchers {
   // This test is sufficient to show code works in both Scala and Java
   // since UTCTime.at is used in both languages.
   test("should access parts of a remote time") {
-    val instant       = ZonedDateTime.of(2007, 12, 3, 10, 15, 30, 11, ZoneId.of("Asia/Kolkata")).toInstant
+    val instant = ZonedDateTime.of(2007, 12, 3, 10, 15, 30, 11, ZoneId.of("Asia/Kolkata")).toInstant
 
     val zonedDateTime = UTCTime(instant).at(ZoneId.of("Asia/Kolkata"))
 
