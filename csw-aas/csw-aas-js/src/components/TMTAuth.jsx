@@ -1,5 +1,6 @@
-import {AASConfig} from '../config/configs'
+import {AASConfig, Config} from '../config/configs'
 import KeyCloak from 'keycloak-js'
+import fetch from 'isomorphic-fetch'
 
 class TMTAuthStore {
   constructor() {
@@ -21,7 +22,7 @@ class TMTAuthStore {
     this.hasRealmRole = keycloak.hasRealmRole
     this.hasResourceRole = keycloak.hasResourceRole
     return this
-  };
+  }
 
   authenticate = (config, url) => {
     console.info('instantiating AAS')
@@ -38,6 +39,16 @@ class TMTAuthStore {
     }
     const authenticated = keycloak.init({onLoad: 'login-required', flow: 'hybrid'})
     return {keycloak, authenticated}
+  }
+
+  resolveAAS = async function () {
+    const response = await fetch(`${Config['location-server-url']}/location/resolve/${Config['AAS-server-name']}?within=5seconds`)
+    let url = Config['AAS-server-url']
+    if (response.status === 200) {
+      const a = await response.json()
+      url = a.uri
+    }
+    return url
   }
 }
 

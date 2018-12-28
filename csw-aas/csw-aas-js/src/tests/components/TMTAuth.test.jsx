@@ -1,8 +1,10 @@
-/* eslint-disable import/first */
 import {TMTAuth} from '../../components/TMTAuth'
-jest.mock('keycloak-js')
-
 import KeyCloak from 'keycloak-js'
+import fetch from 'isomorphic-fetch'
+
+jest.mock('isomorphic-fetch')
+
+jest.mock('keycloak-js')
 
 describe('<TMTAuth />', () => {
   it('should create TMTAuth instance', () => {
@@ -53,5 +55,19 @@ describe('<TMTAuth />', () => {
     expect(keycloak).toBe(mockKeycloak)
     expect(authenticated).toEqual(Promise.resolve(true))
     initMock.mockRestore()
+  })
+
+  it('should resolveAAS', async () => {
+    const mockResponse = {
+      status: 200,
+      json: jest.fn().mockImplementation(() => {
+        return {uri: 'http://somehost:someport'}
+      })
+    }
+    fetch.mockReturnValue(Promise.resolve(mockResponse))
+
+    const url = await TMTAuth.resolveAAS()
+
+    expect(url).toBe('http://somehost:someport')
   })
 })
