@@ -256,3 +256,19 @@ Scala
 
 Java
 :   @@snip [JEventServiceCreationExamples.java](../../../../examples/src/main/java/csw/event/JEventServiceCreationExamples.java) { #redis-event-service }
+
+
+## Source code for examples of creation
+
+* @github[Scala Example](/examples/src/main/scala/csw/event/EventServiceCreationExamples.scala)
+* @github[Java Example](/examples/src/main/java/csw/event/JEventServiceCreationExamples.java)
+
+## Source code for examples of publishing
+
+* @github[Scala Example](/examples/src/main/scala/csw/event/EventPublishExamples.scala)
+* @github[Java Example](/examples/src/main/java/csw/event/JEventPublishExamples.java)
+
+## Source code for examples of subscribing
+
+* @github[Scala Example](/examples/src/main/scala/csw/event/EventSubscribeExamples.scala)
+* @github[Java Example](/examples/src/main/java/csw/event/JEventSubscribeExamples.java)
