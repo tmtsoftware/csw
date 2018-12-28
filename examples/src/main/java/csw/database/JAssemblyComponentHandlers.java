@@ -93,8 +93,15 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         //#dsl-batch
 
         //#dsl-fetch
-        ResultQuery<Record> selectQuery = dsl.resultQuery("SELECT name FROM films WHERE id = ?", 1);
-        CompletableFuture<List<String>> selectResultF = JooqHelper.fetchAsync(selectQuery, String.class);
+        // domain model
+        class Films {
+            private Integer id;  // variable name (id) and type (Integer) should be same as column's name and type in database
+            private String name; // variable name (name) and type (String) should be same as column's name and type in database
+        };
+
+        // fetch data from table and map it to Films class
+        ResultQuery<Record> selectQuery = dsl.resultQuery("SELECT id, name FROM films WHERE id = ?", 1);
+        CompletableFuture<List<Films>> selectResultF = JooqHelper.fetchAsync(selectQuery, Films.class);
         selectResultF.thenAccept(names -> System.out.println("Fetched names of films " + names));
         //#dsl-fetch
 

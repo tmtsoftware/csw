@@ -161,6 +161,15 @@ Scala
 Java
 :   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/database/JAssemblyComponentHandlers.java) { #dsl-fetch }
 
+
+@@@note
+
+Make sure that variable name and type of Films class is same as column's name and type in database. This is necessary for 
+successful mapping of table fields to domain model class.
+
+@@@
+
+
 ### Stored Function
 
 To create a stored function, use the DSLContext as follows:

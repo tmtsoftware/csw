@@ -66,10 +66,14 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
     //#dsl-batch
 
     //#dsl-fetch
-    val selectQuery = dsl.resultQuery("SELECT name FROM films WHERE id = ?", "1")
+    // domain model
+    case class Films(id: Int, name: String) // variable name and type should be same as column's name and type in database
+
+    // fetch data from table and map it to Films class
+    val selectQuery = dsl.resultQuery("SELECT id, name FROM films WHERE id = ?", "1")
 
     import csw.database.client.scaladsl.JooqExtentions.RichResultQuery
-    val selectResultF: Future[List[String]] = selectQuery.fetchAsyncScala[String]
+    val selectResultF: Future[List[Films]] = selectQuery.fetchAsyncScala[Films]
     selectResultF.foreach(names ⇒ s"Fetched names of films $names")
     //#dsl-fetch
 
