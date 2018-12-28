@@ -88,6 +88,7 @@ sentinelConf="../conf/redis_sentinel/sentinel.conf"
 eventMasterConf="../conf/event_service/master.conf"
 alarmMasterConf="../conf/alarm_service/master.conf"
 dbPgHbaConf="../conf/database_service/pg_hba.conf"
+dbUnixSocketDirs="/tmp"
 keycloakScript="keycloak-4.6.0.Final/bin"
 
 sortVersion="sort -V"
@@ -173,7 +174,7 @@ function start_db() {
     if [ -x "$location_agent_script" ]; then
         echo "[DATABASE] Starting Database Service on port; [$db_port] ..."
         echo "[DATABASE] Make sure to set PGDATA env variable to postgres data directory where postgres is installed e.g. for mac: /usr/local/var/postgres"
-        nohup ./csw-location-agent --name "DatabaseServer" --command "postgres --hba_file=$dbPgHbaConf -i -p $db_port" --port "$db_port"> ${DBLogFile} 2>&1 &
+        nohup ./csw-location-agent --name "DatabaseServer" --command "postgres --hba_file=$dbPgHbaConf --unix_socket_directories=$dbUnixSocketDirs -i -p $db_port" --port "$db_port"> ${DBLogFile} 2>&1 &
         echo $! > ${DBPidFile}
         echo ${db_port} > ${DBPortFile}
     else

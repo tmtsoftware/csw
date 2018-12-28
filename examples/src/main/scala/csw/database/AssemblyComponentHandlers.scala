@@ -9,7 +9,7 @@ import csw.params.commands.CommandResponse.Completed
 import csw.params.commands.{CommandResponse, ControlCommand}
 import org.jooq.{DSLContext, Query}
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 //DEOPSCSW-615: DB service accessible to CSW component developers
