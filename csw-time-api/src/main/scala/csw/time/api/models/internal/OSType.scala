@@ -1,4 +1,4 @@
-package csw.time.api.utils
+package csw.time.api.models.internal
 
 import java.util.Locale
 

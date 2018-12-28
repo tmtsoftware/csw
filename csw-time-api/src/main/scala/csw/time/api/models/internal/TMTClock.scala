@@ -7,7 +7,6 @@ import com.sun.jna.NativeLong
 import csw.time.api.TimeLibrary
 import csw.time.api.models.internal.ClockId.{ClockRealtime, ClockTAI}
 import csw.time.api.native_models.{NTPTimeVal, TimeSpec, Timex}
-import csw.time.api.utils.OSType
 
 import scala.util.Try
 import scala.util.control.NonFatal
