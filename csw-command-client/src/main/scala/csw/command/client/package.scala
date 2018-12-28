@@ -41,7 +41,7 @@ package csw.command
  * Using CommandDistributor utility you can send all these commands in one go and get aggregated response.
  *
  * Complete guide of usage of different API's provided by CommandService is available at:
- * https://tmtsoftware.github.io/csw/command.html
+ * [[https://tmtsoftware.github.io/csw/command.html]]
  *
  */
 package object client {}

@@ -70,7 +70,7 @@ package csw.event
  *
  *
  * Complete guide of usage of different API's provided by EventService is available at:
- * https://tmtsoftware.github.io/csw/services/event.html
+ * [[https://tmtsoftware.github.io/csw/services/event.html]]
  *
  */
 package object client {}
