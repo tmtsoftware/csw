@@ -1,5 +1,5 @@
 import React from 'react'
-import Enzyme, {mount} from 'enzyme'
+import Enzyme, {shallow} from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import CheckLogin from '../../../components/authentication/CheckLogin'
 
@@ -11,27 +11,23 @@ describe('<CheckLogin />', () => {
   })
 
   it('should render children elements if authentication is true', () => {
-    const getCheckLoginWithMockContext = () => {
-      jest.mock('../../../components/TMTAuthContext.jsx')
-      return require('../../../components/authentication/CheckLogin.jsx').default
-    }
-
     const props = {
-      children: <div className='auth'>Authentication successful</div>
+      children: <div className='auth'>Authentication successful</div>,
+      context: {tmtAuth: {}, isAuthenticated: true}
     }
 
-    const CheckLoginComponent = getCheckLoginWithMockContext()
-    const wrapper = mount(<CheckLoginComponent {...props} />)
+    const wrapper = shallow(<CheckLogin {...props} />)
 
     expect(wrapper.find('div.auth').length).toBe(1)
   })
 
   it('should not render children elements if authentication is false', () => {
     const props = {
-      children: <div className='auth'>Authentication successful</div>
+      children: <div className='auth'>Authentication successful</div>,
+      context: {tmtAuth: null, isAuthenticated: false}
     }
 
-    const wrapper = mount(<CheckLogin {...props} />)
+    const wrapper = shallow(<CheckLogin {...props} />)
 
     expect(wrapper.find('div.auth').length).toBe(0)
   })

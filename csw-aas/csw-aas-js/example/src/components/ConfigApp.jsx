@@ -1,11 +1,12 @@
 import React from 'react'
 import {BrowserRouter, Route} from 'react-router-dom'
 
-import {TMTAuthContext, Login, Logout, CheckLogin, RealmRole, ResourceRole} from 'csw-aas-js'
+import {Login, Logout, CheckLogin, RealmRole, ResourceRole} from 'csw-aas-js'
 import NavComponent from './NavComponent'
 import {AppConfig} from '../config/AppConfig'
 import WriteConfig from './WriteConfig'
 import ReadConfig from './ReadConfig'
+import {TMTAuthContext} from './TMTAuthContext'
 
 class ConfigApp extends React.Component {
   constructor(props) {
@@ -23,7 +24,7 @@ class ConfigApp extends React.Component {
             <Route path='/login' render={(_) => (<Login config={config} onAuthentication={this.setAuthContext} />)} />
             <Route path='/logout' render={(_) => (<Logout tmtAuth={this.state.authContext.tmtAuth} onLogout={this.resetAuthContext} />)} />
 
-            <Route exact path='/secured'render={(_) => (<CheckLogin>
+            <Route exact path='/secured'render={(_) => (<CheckLogin context={this.state.authContext}>
               <WriteConfig />
             </CheckLogin>)} />
 
@@ -32,19 +33,19 @@ class ConfigApp extends React.Component {
           </div>
         </BrowserRouter>
 
-        <RealmRole realmRole='example-admin-role'>
+        <RealmRole realmRole='example-admin-role' context={this.state.authContext}>
           <div>Example admin role specific functionality</div>
         </RealmRole>
 
-        <RealmRole realmRole='invalid-role'>
+        <RealmRole realmRole='invalid-role' context={this.state.authContext}>
           <div>Hello you authenticated for invalid-role</div>
         </RealmRole>
 
-        <ResourceRole resourceRole='person-role' resource='example-server'>
+        <ResourceRole resourceRole='person-role' resource='example-server' context={this.state.authContext}>
           <div>Person role specific functionality</div>
         </ResourceRole>
 
-        <ResourceRole resourceRole='invalid-role'>
+        <ResourceRole resourceRole='invalid-role' context={this.state.authContext}>
           <div>Hello you authenticated for invalid-role</div>
         </ResourceRole>
 

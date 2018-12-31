@@ -1,5 +1,5 @@
 import React from 'react'
-import {TMTAuthContext} from 'csw-aas-js'
+import {TMTAuthContext} from './TMTAuthContext'
 
 class WriteConfig extends React.Component {
   constructor(props) {

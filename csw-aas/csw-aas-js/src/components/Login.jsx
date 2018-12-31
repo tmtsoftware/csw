@@ -25,7 +25,7 @@ class Login extends React.Component {
 
 Login.propTypes = {
   config: PropTypes.object,
-  onAuthentication: PropTypes.func
+  onAuthentication: PropTypes.func.isRequired
 }
 
 export default Login

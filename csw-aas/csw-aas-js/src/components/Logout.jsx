@@ -19,7 +19,7 @@ Logout.propTypes = {
     push: PropTypes.func.isRequired
   }).isRequired,
   tmtAuth: PropTypes.object,
-  onLogout: PropTypes.func
+  onLogout: PropTypes.func.isRequired
 }
 
 export default withRouter(Logout)

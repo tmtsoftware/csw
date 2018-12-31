@@ -1,27 +1,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {TMTAuthContext} from '../TMTAuthContext.jsx'
 
 class CheckLogin extends React.Component {
   render() {
     return (
-      <TMTAuthContext.Consumer>
-        {context => {
-          return (
-            <div>
-              {context.isAuthenticated ? this.props.children : null}
-            </div>
-          )
-        }}
-      </TMTAuthContext.Consumer>
+      <div>
+        {this.props.context.isAuthenticated ? this.props.children : null}
+      </div>
     )
   }
 }
 
 CheckLogin.propTypes = {
-  children: PropTypes.node
+  children: PropTypes.node,
+  context: PropTypes.object
 }
-
-CheckLogin.contextType = TMTAuthContext
 
 export default CheckLogin
