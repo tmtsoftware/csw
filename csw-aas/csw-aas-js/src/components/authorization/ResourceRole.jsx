@@ -14,7 +14,7 @@ ResourceRole.propTypes = {
   resourceRole: PropTypes.string.isRequired,
   resource: PropTypes.string,
   children: PropTypes.node,
-  context: PropTypes.object
+  context: PropTypes.object.isRequired
 }
 
 export default ResourceRole

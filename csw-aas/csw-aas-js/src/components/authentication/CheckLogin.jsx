@@ -13,7 +13,7 @@ class CheckLogin extends React.Component {
 
 CheckLogin.propTypes = {
   children: PropTypes.node,
-  context: PropTypes.object
+  context: PropTypes.object.isRequired
 }
 
 export default CheckLogin
