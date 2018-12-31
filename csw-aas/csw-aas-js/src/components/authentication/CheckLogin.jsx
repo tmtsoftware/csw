@@ -5,7 +5,7 @@ class CheckLogin extends React.Component {
   render() {
     return (
       <div>
-        {this.props.context.isAuthenticated ? this.props.children : null}
+        {this.props.context.isAuthenticated ? this.props.children : this.props.error}
       </div>
     )
   }
@@ -13,7 +13,8 @@ class CheckLogin extends React.Component {
 
 CheckLogin.propTypes = {
   children: PropTypes.node,
-  context: PropTypes.object.isRequired
+  context: PropTypes.object.isRequired,
+  error: PropTypes.node
 }
 
 export default CheckLogin

@@ -7,6 +7,7 @@ import {AppConfig} from '../config/AppConfig'
 import WriteConfig from './WriteConfig'
 import ReadConfig from './ReadConfig'
 import {TMTAuthContext} from './TMTAuthContext'
+import ConfigError from './ConfigError'
 
 class ConfigApp extends React.Component {
   constructor(props) {
@@ -33,7 +34,7 @@ class ConfigApp extends React.Component {
           </div>
         </BrowserRouter>
 
-        <RealmRole realmRole='example-admin-role' context={this.state.authContext}>
+        <RealmRole realmRole='example-admin-role' context={this.state.authContext} error={<ConfigError />}>
           <div>Example admin role specific functionality</div>
         </RealmRole>
 
@@ -41,7 +42,7 @@ class ConfigApp extends React.Component {
           <div>Hello you authenticated for invalid-role</div>
         </RealmRole>
 
-        <ResourceRole resourceRole='person-role' resource='example-server' context={this.state.authContext}>
+        <ResourceRole resourceRole='person-role' resource='example-server' context={this.state.authContext} error={<ConfigError />}>
           <div>Person role specific functionality</div>
         </ResourceRole>
 

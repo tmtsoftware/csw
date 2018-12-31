@@ -6,7 +6,7 @@ class RealmRole extends React.Component {
     const { realmRole, children, context } = this.props
     return (
       <div className='card-content'>
-        {(context.isAuthenticated && context.tmtAuth.hasRealmRole(realmRole)) ? children : null}
+        {(context.isAuthenticated && context.tmtAuth.hasRealmRole(realmRole)) ? children : this.props.error}
       </div>
     )
   }
@@ -15,7 +15,8 @@ class RealmRole extends React.Component {
 RealmRole.propTypes = {
   realmRole: PropTypes.string.isRequired,
   children: PropTypes.node,
-  context: PropTypes.object.isRequired
+  context: PropTypes.object.isRequired,
+  error: PropTypes.node
 }
 
 export default RealmRole
