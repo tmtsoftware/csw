@@ -5,7 +5,9 @@ class CheckLogin extends React.Component {
   render() {
     return (
       <div>
-        {this.props.context.isAuthenticated ? this.props.children : this.props.error}
+        {this.props.context.isAuthenticated
+          ? this.props.children
+          : this.props.error}
       </div>
     )
   }

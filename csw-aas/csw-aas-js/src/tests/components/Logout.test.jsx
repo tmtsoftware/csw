@@ -1,6 +1,6 @@
 import React from 'react'
 import { Logout } from '../../components/Logout'
-import Enzyme, {shallow} from 'enzyme'
+import Enzyme, { shallow } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 
 describe('<Logout />', () => {

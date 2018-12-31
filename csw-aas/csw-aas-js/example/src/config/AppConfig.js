@@ -1,4 +1,4 @@
 export const AppConfig = {
-  'realm': 'example',
-  'clientId': 'example-app'
+  realm: 'example',
+  clientId: 'example-app'
 }

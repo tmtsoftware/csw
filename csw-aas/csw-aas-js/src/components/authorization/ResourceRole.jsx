@@ -4,9 +4,14 @@ import PropTypes from 'prop-types'
 class ResourceRole extends React.Component {
   render() {
     const { resourceRole, resource, children, context } = this.props
-    return (<div className='card-content'>
-      {(context.isAuthenticated && context.tmtAuth.hasResourceRole(resourceRole, resource)) ? children : this.props.error}
-    </div>)
+    return (
+      <div className='card-content'>
+        {context.isAuthenticated &&
+        context.tmtAuth.hasResourceRole(resourceRole, resource)
+          ? children
+          : this.props.error}
+      </div>
+    )
   }
 }
 

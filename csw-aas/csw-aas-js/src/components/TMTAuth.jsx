@@ -1,4 +1,4 @@
-import {AASConfig, Config} from '../config/configs'
+import { AASConfig, Config } from '../config/configs'
 import KeyCloak from 'keycloak-js'
 import fetch from 'isomorphic-fetch'
 
@@ -11,7 +11,7 @@ class TMTAuthStore {
     this.isAuthenticated = false
   }
 
-  from = (keycloak) => {
+  from = keycloak => {
     this.logout = keycloak.logout
     this.token = keycloak.token
     this.tokenParsed = keycloak.tokenParsed
@@ -26,23 +26,33 @@ class TMTAuthStore {
 
   authenticate = (config, url) => {
     console.info('instantiating AAS')
-    const keycloakConfig = {...AASConfig, ...config, ...url}
+    const keycloakConfig = { ...AASConfig, ...config, ...url }
     const keycloak = KeyCloak(keycloakConfig)
     keycloak.onTokenExpired = () => {
-      keycloak.updateToken(0)
-        .success(function () {
+      keycloak
+        .updateToken(0)
+        .success(function() {
           console.info('token refreshed successfully')
         })
         .error(function() {
-          console.error('Failed to refresh the token, or the session has expired')
+          console.error(
+            'Failed to refresh the token, or the session has expired'
+          )
         })
     }
-    const authenticated = keycloak.init({onLoad: 'login-required', flow: 'hybrid'})
-    return {keycloak, authenticated}
+    const authenticated = keycloak.init({
+      onLoad: 'login-required',
+      flow: 'hybrid'
+    })
+    return { keycloak, authenticated }
   }
 
-  resolveAAS = async function () {
-    const response = await fetch(`${Config['location-server-url']}/location/resolve/${Config['AAS-server-name']}?within=5seconds`)
+  resolveAAS = async function() {
+    const response = await fetch(
+      `${Config['location-server-url']}/location/resolve/${
+        Config['AAS-server-name']
+      }?within=5seconds`
+    )
     let url = Config['AAS-server-url']
     if (response.status === 200) {
       const a = await response.json()

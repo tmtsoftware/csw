@@ -1,5 +1,5 @@
 import React from 'react'
-import Enzyme, {shallow} from 'enzyme'
+import Enzyme, { shallow } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import RealmRole from '../../../components/authorization/RealmRole'
 
@@ -14,9 +14,14 @@ describe('<RealmRole />', () => {
     const props = {
       realmRole: 'example-admin-role',
       children: <div className='realm-role'>Authorization successful</div>,
-      context: {tmtAuth: {hasRealmRole: jest.fn().mockImplementation(
-        () => { return true })},
-      isAuthenticated: true}
+      context: {
+        tmtAuth: {
+          hasRealmRole: jest.fn().mockImplementation(() => {
+            return true
+          })
+        },
+        isAuthenticated: true
+      }
     }
 
     const wrapper = shallow(<RealmRole {...props} />)
@@ -28,8 +33,7 @@ describe('<RealmRole />', () => {
     const props = {
       realmRole: 'invalid-realm-role',
       children: <div className='realm-role'>Authorization successful</div>,
-      context: {tmtAuth: null,
-        isAuthenticated: false}
+      context: { tmtAuth: null, isAuthenticated: false }
     }
 
     const wrapper = shallow(<RealmRole {...props} />)
@@ -41,9 +45,14 @@ describe('<RealmRole />', () => {
     const props = {
       realmRole: 'invalid-realm-role',
       children: <div className='realm-role'>Authorization successful</div>,
-      context: {tmtAuth: {hasRealmRole: jest.fn().mockImplementation(
-        () => { return false })},
-      isAuthenticated: true}
+      context: {
+        tmtAuth: {
+          hasRealmRole: jest.fn().mockImplementation(() => {
+            return false
+          })
+        },
+        isAuthenticated: true
+      }
     }
 
     const wrapper = shallow(<RealmRole {...props} />)

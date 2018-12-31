@@ -1,4 +1,4 @@
-import {TMTAuth} from '../../components/TMTAuth'
+import { TMTAuth } from '../../components/TMTAuth'
 import KeyCloak from 'keycloak-js'
 import fetch from 'isomorphic-fetch'
 
@@ -11,7 +11,7 @@ describe('<TMTAuth />', () => {
     const mockKeycloak = {
       logout: jest.fn(),
       token: 'token string',
-      tokenParsed: {name: 'test'},
+      tokenParsed: { name: 'test' },
       realmAccess: { roles: ['test-realm-roles'] },
       resourceAccess: ['test-resource-roles'],
       loadUserInfo: jest.fn(),
@@ -46,12 +46,18 @@ describe('<TMTAuth />', () => {
 
     KeyCloak.mockReturnValue(mockKeycloak)
 
-    const {keycloak, authenticated} = TMTAuth.authenticate({
-      'realm': 'example',
-      'clientId': 'example-app'
-    }, 'http://somehost:someport')
+    const { keycloak, authenticated } = TMTAuth.authenticate(
+      {
+        realm: 'example',
+        clientId: 'example-app'
+      },
+      'http://somehost:someport'
+    )
 
-    expect(initMock).toHaveBeenCalledWith({onLoad: 'login-required', flow: 'hybrid'})
+    expect(initMock).toHaveBeenCalledWith({
+      onLoad: 'login-required',
+      flow: 'hybrid'
+    })
     expect(keycloak).toBe(mockKeycloak)
     expect(authenticated).toEqual(Promise.resolve(true))
     initMock.mockRestore()
@@ -61,7 +67,7 @@ describe('<TMTAuth />', () => {
     const mockResponse = {
       status: 200,
       json: jest.fn().mockImplementation(() => {
-        return {uri: 'http://somehost:someport'}
+        return { uri: 'http://somehost:someport' }
       })
     }
     fetch.mockReturnValue(Promise.resolve(mockResponse))

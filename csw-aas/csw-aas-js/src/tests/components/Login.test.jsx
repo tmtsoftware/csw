@@ -1,8 +1,8 @@
 import React from 'react'
-import Enzyme, {mount} from 'enzyme'
+import Enzyme, { mount } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import Login from '../../components/Login'
-import {TMTAuth} from '../../components/TMTAuth.jsx'
+import { TMTAuth } from '../../components/TMTAuth.jsx'
 
 jest.mock('../../components/TMTAuth.jsx')
 
@@ -12,8 +12,8 @@ describe('<Login />', () => {
   it('should call logout', async () => {
     const props = {
       config: {
-        'realm': 'example',
-        'clientId': 'example-app'
+        realm: 'example',
+        clientId: 'example-app'
       },
       onAuthentication: jest.fn()
     }
@@ -24,6 +24,8 @@ describe('<Login />', () => {
     await mount(<Login {...props} />)
 
     expect(resolveAASMock).toHaveBeenCalled()
-    expect(authenticateMock).toHaveBeenCalledWith(props.config, {url: 'http://mockhost:mockport'})
+    expect(authenticateMock).toHaveBeenCalledWith(props.config, {
+      url: 'http://mockhost:mockport'
+    })
   })
 })

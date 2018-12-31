@@ -5,4 +5,4 @@ import CheckLogin from './components/authentication/CheckLogin.jsx'
 import RealmRole from './components/authorization/RealmRole.jsx'
 import ResourceRole from './components/authorization/ResourceRole.jsx'
 
-export {Logout, Login, CheckLogin, RealmRole, ResourceRole, Error}
+export { Logout, Login, CheckLogin, RealmRole, ResourceRole, Error }

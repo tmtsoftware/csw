@@ -3,11 +3,7 @@ import PropTypes from 'prop-types'
 
 class Error extends React.Component {
   render() {
-    return (
-      <div>
-        {this.props.children ? this.props.children : null}
-      </div>
-    )
+    return <div>{this.props.children ? this.props.children : null}</div>
   }
 }
 
