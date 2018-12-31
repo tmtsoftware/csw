@@ -1,10 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-class Error extends React.Component {
-  render() {
-    return <div>{this.props.children ? this.props.children : null}</div>
-  }
+const Error = props => {
+  return <div>{props.children ? props.children : null}</div>
 }
 
 Error.propTypes = {

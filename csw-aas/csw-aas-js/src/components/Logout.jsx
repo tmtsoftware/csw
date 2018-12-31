@@ -3,14 +3,14 @@ import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 
 export class Logout extends React.Component {
-  render() {
-    return null
-  }
-
   componentWillMount = () => {
     this.props.history.push('/')
     this.props.tmtAuth.logout()
     this.props.onLogout()
+  }
+
+  render() {
+    return null
   }
 }
 

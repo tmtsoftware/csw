@@ -35,7 +35,10 @@ export default {
       plugins: ['external-helpers']
     }),
     json(),
-    resolve({ browser: true }),
+    resolve({
+      browser: true,
+      extensions: ['.js', '.jsx']
+    }),
     commonjs()
   ]
 }

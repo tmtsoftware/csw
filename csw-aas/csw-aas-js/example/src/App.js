@@ -1,13 +1,11 @@
-import React, { Component } from 'react'
+import React from 'react'
 
 import ConfigApp from './components/ConfigApp'
 
-export default class App extends Component {
-  render() {
-    return (
-      <div>
-        <ConfigApp text='Modern React component module' />
-      </div>
-    )
-  }
+export default () => {
+  return (
+    <div>
+      <ConfigApp text='Modern React component module' />
+    </div>
+  )
 }

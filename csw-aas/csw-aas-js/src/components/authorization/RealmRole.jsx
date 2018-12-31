@@ -1,17 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-class RealmRole extends React.Component {
-  render() {
-    const { realmRole, children, context } = this.props
-    return (
-      <div className='card-content'>
-        {context.isAuthenticated && context.tmtAuth.hasRealmRole(realmRole)
-          ? children
-          : this.props.error}
-      </div>
-    )
-  }
+const RealmRole = props => {
+  const { realmRole, children, context, error } = props
+  return (
+    <div className='card-content'>
+      {context.isAuthenticated && context.tmtAuth.hasRealmRole(realmRole)
+        ? children
+        : error}
+    </div>
+  )
 }
 
 RealmRole.propTypes = {

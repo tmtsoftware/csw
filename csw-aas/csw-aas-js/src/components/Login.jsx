@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { TMTAuth } from './TMTAuth.jsx'
+import { TMTAuth } from './TMTAuth'
 
 class Login extends React.Component {
   instantiateAAS = async url => {
