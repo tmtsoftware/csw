@@ -126,4 +126,36 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
       times(i).value.toEpochMilli shouldBe (startTime.value.toEpochMilli + offset*i) +- 10
     }
   }
+
+  // DEOPSCSW-544: Schedule a task to execute in future with actual times
+  // DEOPSCSW-545: Start a repeating task with an initial offset
+  test("repeating task that also saves time but with an offset") {
+    // we do not want manual config in this test to compare start time with task execution time
+    // hence separate instance of actor system is created here which does not use ManualConfig
+    val system      = ActorSystem()
+    val timeService = TimeServiceSchedulerFactory.make()(system)
+    val testProbe   = TestProbe()(system)
+
+    val buffer: ArrayBuffer[Int] = ArrayBuffer.empty
+
+    val atomicInt                = new AtomicInteger(0)
+    val startTime                = UTCTime(UTCTime.now().value.plusSeconds(1L))
+    val offset:Long              = 100l // milliseconds
+    val cancellable: Cancellable = timeService.schedulePeriodically(startTime, Duration.ofMillis(offset)) {
+      buffer += atomicInt.getAndIncrement()
+      testProbe.ref ! UTCTime.now()
+    }
+
+    val times = testProbe.receiveN(6, 1500.milli).map { case t: UTCTime => t}
+
+    cancellable.cancel()
+
+    // Verify correct number and values
+    buffer shouldBe ArrayBuffer(0, 1, 2, 3, 4, 5)
+
+    times.size shouldBe 6
+    buffer.foreach { i =>
+      times(i).value.toEpochMilli shouldBe (startTime.value.toEpochMilli + offset*i) +- 10
+    }
+  }
 }
