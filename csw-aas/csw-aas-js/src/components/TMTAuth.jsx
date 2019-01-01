@@ -36,13 +36,13 @@ class TMTAuthStore {
         })
         .error(function() {
           console.error(
-            'Failed to refresh the token, or the session has expired'
+            'Failed to refresh the token, or the session has expired',
           )
         })
     }
     const authenticated = keycloak.init({
       onLoad: 'login-required',
-      flow: 'hybrid'
+      flow: 'hybrid',
     })
     return { keycloak, authenticated }
   }
@@ -51,7 +51,7 @@ class TMTAuthStore {
     const response = await fetch(
       `${Config['location-server-url']}/location/resolve/${
         Config['AAS-server-name']
-      }?within=5seconds`
+      }?within=5seconds`,
     )
     let url = Config['AAS-server-url']
     if (response.status === 200) {

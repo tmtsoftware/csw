@@ -6,14 +6,14 @@ class Login extends React.Component {
   instantiateAAS = async url => {
     const { keycloak, authenticated } = await TMTAuth.authenticate(
       this.props.config,
-      url
+      url,
     )
     authenticated
       .success(() => {
         const tmtAuth = TMTAuth.from(keycloak)
         this.props.onAuthentication({
           tmtAuth: tmtAuth,
-          isAuthenticated: tmtAuth.isAuthenticated
+          isAuthenticated: tmtAuth.isAuthenticated,
         })
       })
       .error(() => {
@@ -33,7 +33,7 @@ class Login extends React.Component {
 
 Login.propTypes = {
   config: PropTypes.object,
-  onAuthentication: PropTypes.func.isRequired
+  onAuthentication: PropTypes.func.isRequired,
 }
 
 export default Login

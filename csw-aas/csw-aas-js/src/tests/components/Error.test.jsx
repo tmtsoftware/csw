@@ -12,7 +12,7 @@ describe('<Error />', () => {
 
   it('should render children elements is passed as prop', () => {
     const props = {
-      children: <div className='error'>Please login</div>
+      children: <div className="error">Please login</div>,
     }
 
     const wrapper = shallow(<Error {...props} />)
@@ -28,7 +28,7 @@ describe('<Error />', () => {
 
   it('should not render children elements if wrong prop is passed', () => {
     const props = {
-      some: <div className='error'>Please login</div>
+      some: <div className="error">Please login</div>,
     }
 
     const wrapper = shallow(<Error {...props} />)

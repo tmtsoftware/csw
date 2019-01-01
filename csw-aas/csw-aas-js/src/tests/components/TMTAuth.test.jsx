@@ -15,7 +15,7 @@ describe('<TMTAuth />', () => {
       realmAccess: { roles: ['test-realm-roles'] },
       resourceAccess: ['test-resource-roles'],
       loadUserInfo: jest.fn(),
-      authenticated: false
+      authenticated: false,
     }
 
     const tmtAuth = TMTAuth.from(mockKeycloak)
@@ -39,7 +39,7 @@ describe('<TMTAuth />', () => {
       onTokenExpired: jest.fn(),
       updateToken: jest.fn().mockImplementation(() => {
         return Promise.resolve(true)
-      })
+      }),
     }
 
     const initMock = jest.spyOn(mockKeycloak, 'init')
@@ -49,14 +49,14 @@ describe('<TMTAuth />', () => {
     const { keycloak, authenticated } = TMTAuth.authenticate(
       {
         realm: 'example',
-        clientId: 'example-app'
+        clientId: 'example-app',
       },
-      'http://somehost:someport'
+      'http://somehost:someport',
     )
 
     expect(initMock).toHaveBeenCalledWith({
       onLoad: 'login-required',
-      flow: 'hybrid'
+      flow: 'hybrid',
     })
     expect(keycloak).toBe(mockKeycloak)
     expect(authenticated).toEqual(Promise.resolve(true))
@@ -68,7 +68,7 @@ describe('<TMTAuth />', () => {
       status: 200,
       json: jest.fn().mockImplementation(() => {
         return { uri: 'http://somehost:someport' }
-      })
+      }),
     }
     fetch.mockReturnValue(Promise.resolve(mockResponse))
 

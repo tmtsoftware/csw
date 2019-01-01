@@ -10,7 +10,8 @@
     "sourceType": "module"
   },
   "rules": {
-    "space-before-function-paren": 0,
+    "comma-dangle": "off",
+    "space-before-function-paren": "off",
     "react/jsx-boolean-value": 0
   }
 }

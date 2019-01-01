@@ -18,10 +18,8 @@ import React, { Component } from 'react'
 import MyComponent from 'csw-aas-js'
 
 class Example extends Component {
-  render () {
-    return (
-      <MyComponent />
-    )
+  render() {
+    return <MyComponent />
   }
 }
 ```

@@ -16,10 +16,10 @@ export class Logout extends React.Component {
 
 Logout.propTypes = {
   history: PropTypes.shape({
-    push: PropTypes.func.isRequired
+    push: PropTypes.func.isRequired,
   }).isRequired,
   tmtAuth: PropTypes.object,
-  onLogout: PropTypes.func.isRequired
+  onLogout: PropTypes.func.isRequired,
 }
 
 export default withRouter(Logout)

@@ -13,9 +13,9 @@ describe('<Login />', () => {
     const props = {
       config: {
         realm: 'example',
-        clientId: 'example-app'
+        clientId: 'example-app',
       },
-      onAuthentication: jest.fn()
+      onAuthentication: jest.fn(),
     }
 
     const resolveAASMock = jest.spyOn(TMTAuth, 'resolveAAS')
@@ -25,7 +25,7 @@ describe('<Login />', () => {
 
     expect(resolveAASMock).toHaveBeenCalled()
     expect(authenticateMock).toHaveBeenCalledWith(props.config, {
-      url: 'http://mockhost:mockport'
+      url: 'http://mockhost:mockport',
     })
   })
 })

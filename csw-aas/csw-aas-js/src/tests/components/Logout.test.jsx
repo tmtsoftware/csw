@@ -9,12 +9,12 @@ describe('<Logout />', () => {
   it('should call logout', () => {
     const props = {
       tmtAuth: {
-        logout: jest.fn()
+        logout: jest.fn(),
       },
       onLogout: jest.fn(),
       history: {
-        push: jest.fn()
-      }
+        push: jest.fn(),
+      },
     }
     shallow(<Logout {...props} />)
 
