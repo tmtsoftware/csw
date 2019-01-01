@@ -1,17 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const ResourceRole = props => {
-  const { resourceRole, resource, children, context, error } = props
-  return (
-    <div className='card-content'>
-      {context.isAuthenticated &&
-      context.tmtAuth.hasResourceRole(resourceRole, resource)
-        ? children
-        : error}
-    </div>
-  )
-}
+const ResourceRole = ({ resourceRole, resource, children, context, error }) => (
+  <div className='card-content'>
+    {context.isAuthenticated &&
+    context.tmtAuth.hasResourceRole(resourceRole, resource)
+      ? children
+      : error}
+  </div>
+)
 
 ResourceRole.propTypes = {
   resourceRole: PropTypes.string.isRequired,

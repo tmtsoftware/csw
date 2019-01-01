@@ -47,7 +47,7 @@ class TMTAuthStore {
     return { keycloak, authenticated }
   }
 
-  resolveAAS = async function() {
+  resolveAAS = async () => {
     const response = await fetch(
       `${Config['location-server-url']}/location/resolve/${
         Config['AAS-server-name']

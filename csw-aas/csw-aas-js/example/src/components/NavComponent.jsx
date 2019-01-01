@@ -3,7 +3,6 @@ import React from 'react'
 import { TMTAuthContext } from './TMTAuthContext'
 
 class NavComponent extends React.Component {
-  // fixme: Is it required, if not then convert to functional stateless comp?
   static contextType = TMTAuthContext
 
   render() {

@@ -2,10 +2,7 @@ import React from 'react'
 import { TMTAuthContext } from './TMTAuthContext'
 
 class WriteConfig extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = { user: null }
-  }
+  state = { user: null }
 
   componentWillMount = async () => {
     if (this.context.tmtAuth) {

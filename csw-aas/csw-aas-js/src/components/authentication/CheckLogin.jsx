@@ -1,11 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const CheckLogin = props => {
-  return (
-    <div>{props.context.isAuthenticated ? props.children : props.error}</div>
-  )
-}
+const CheckLogin = ({ context, children, error }) => (
+  <div>{context.isAuthenticated ? children : error}</div>
+)
 
 CheckLogin.propTypes = {
   children: PropTypes.node,

@@ -10,20 +10,15 @@ import { TMTAuthContext } from './TMTAuthContext'
 import ConfigError from './ConfigError'
 
 class ConfigApp extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      authContext: {
-        tmtAuth: null,
-        isAuthenticated: false
-      }
+  state = {
+    authContext: {
+      tmtAuth: null,
+      isAuthenticated: false
     }
   }
 
   render() {
-    const config = {
-      ...AppConfig
-    }
+    const config = { ...AppConfig }
     return (
       <div className='row card col s12 m7'>
         <TMTAuthContext.Provider value={this.state.authContext}>
@@ -66,8 +61,7 @@ class ConfigApp extends React.Component {
           <RealmRole
             realmRole='example-admin-role'
             context={this.state.authContext}
-            error={<ConfigError />}
-          >
+            error={<ConfigError />}>
             <div>Example admin role specific functionality</div>
           </RealmRole>
 
@@ -79,15 +73,13 @@ class ConfigApp extends React.Component {
             resourceRole='person-role'
             resource='example-server'
             context={this.state.authContext}
-            error={<ConfigError />}
-          >
+            error={<ConfigError />}>
             <div>Person role specific functionality</div>
           </ResourceRole>
 
           <ResourceRole
             resourceRole='invalid-role'
-            context={this.state.authContext}
-          >
+            context={this.state.authContext}>
             <div>Hello you authenticated for invalid-role</div>
           </ResourceRole>
         </TMTAuthContext.Provider>
@@ -95,23 +87,11 @@ class ConfigApp extends React.Component {
     )
   }
 
-  setAuthContext = ({ tmtAuth, isAuthenticated }) => {
-    this.setState({
-      authContext: {
-        tmtAuth,
-        isAuthenticated: isAuthenticated
-      }
-    })
-  }
+  setAuthContext = ({ tmtAuth, isAuthenticated }) =>
+    this.setState({ authContext: { tmtAuth, isAuthenticated } })
 
-  resetAuthContext = () => {
-    this.setState({
-      authContext: {
-        tmtAuth: null,
-        isAuthenticated: false
-      }
-    })
-  }
+  resetAuthContext = () =>
+    this.setState({ authContext: { tmtAuth: null, isAuthenticated: false } })
 }
 
 export default ConfigApp
