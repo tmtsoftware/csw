@@ -4,9 +4,9 @@ import java.time.Instant
 import java.util.concurrent.atomic.AtomicInteger
 
 import com.sun.jna.NativeLong
-import csw.clock.TimeLibrary
 import csw.clock.models.ClockId.{ClockRealtime, ClockTAI}
-import csw.clock.native_models.{NTPTimeVal, TimeSpec, Timex}
+import csw.clock.natives.TimeLibrary
+import csw.clock.natives.models.{NTPTimeVal, TimeSpec, Timex}
 
 import scala.util.Try
 import scala.util.control.NonFatal

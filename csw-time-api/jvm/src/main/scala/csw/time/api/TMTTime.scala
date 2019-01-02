@@ -2,8 +2,8 @@ package csw.time.api
 
 import java.time.{Instant, ZoneId, ZoneOffset, ZonedDateTime}
 
-import csw.clock.TimeLibrary
 import csw.clock.models.TMTClock.clock
+import csw.clock.natives.TimeLibrary
 import julienrf.json.derived
 import play.api.libs.json._
 

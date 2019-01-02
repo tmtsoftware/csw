@@ -2,7 +2,7 @@ package csw.clock.models
 
 /**
  * Clock Id argument is the identifier of the particular clock on which to act.
- * It is used by [[csw.clock.TimeLibrary.clock_gettime()]] native call.
+ * It is used by [[csw.clock.natives.TimeLibrary.clock_gettime()]] native call.
  *
  * Following are the possible ids in a linux system:
  * CLOCK_REALTIME                  0

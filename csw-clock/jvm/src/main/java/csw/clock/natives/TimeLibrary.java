@@ -1,9 +1,9 @@
-package csw.clock;
+package csw.clock.natives;
 
 import com.sun.jna.Native;
-import csw.clock.native_models.NTPTimeVal;
-import csw.clock.native_models.TimeSpec;
-import csw.clock.native_models.Timex;
+import csw.clock.natives.models.NTPTimeVal;
+import csw.clock.natives.models.TimeSpec;
+import csw.clock.natives.models.Timex;
 
 // TimeLibrary is responsible for making native calls for time
 public class TimeLibrary {
