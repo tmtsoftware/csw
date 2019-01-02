@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 const RealmRole = ({ realmRole, children, context, error }) => (
-  <div className='card-content'>
+  <div>
     {context.isAuthenticated && context.tmtAuth.hasRealmRole(realmRole)
       ? children
       : error}

@@ -34,10 +34,8 @@
     "isomorphic-fetch": "^2.2.1",
     "keycloak-js": "4.6.0",
     "react": "^16.6.3",
-    "react-scripts": "^2.1.2",
     "react-dom": "^16.6.3",
-    "react-router-dom": "^4.3.1",
-    "superagent": "^4.0.0"
+    "react-router-dom": "^4.3.1"
   },
   "devDependencies": {
     "@svgr/rollup": "^2.4.1",
@@ -61,7 +59,6 @@
     "gh-pages": "^1.2.0",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
-    "react-scripts": "^2.1.2",
     "rollup": "^0.64.1",
     "rollup-plugin-babel": "^3.0.7",
     "rollup-plugin-commonjs": "^9.1.3",

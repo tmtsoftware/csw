@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 const ResourceRole = ({ resourceRole, resource, children, context, error }) => (
-  <div className='card-content'>
+  <div>
     {context.isAuthenticated &&
     context.tmtAuth.hasResourceRole(resourceRole, resource)
       ? children
