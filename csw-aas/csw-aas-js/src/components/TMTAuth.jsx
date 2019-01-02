@@ -1,6 +1,5 @@
 import { AASConfig, Config } from '../config/configs'
 import KeyCloak from 'keycloak-js'
-import fetch from 'isomorphic-fetch'
 import { resolveAAS } from './AASResolver'
 
 class TMTAuthStore {

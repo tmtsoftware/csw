@@ -1,7 +1,7 @@
 import fetch from 'isomorphic-fetch'
 import { Config } from '../config/configs'
 
-export const resolveAAS = async () => {
+export const resolveAAS = async function() {
   const response = await fetch(
     `${Config['location-server-url']}/location/resolve/${
       Config['AAS-server-name']

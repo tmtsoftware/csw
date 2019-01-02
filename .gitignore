@@ -20,6 +20,7 @@ dist
 integration/project/build.properties
 test-output/
 .java-version
+build
 
 examples/src/main/scala/csw/auth/react/app/node_modules/*
 
