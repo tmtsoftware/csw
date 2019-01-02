@@ -1,4 +1,5 @@
 package csw.time.api.utils
+import csw.clock.models.OSType
 
 trait TestProperties {
   def precision: Int

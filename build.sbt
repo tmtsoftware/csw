@@ -24,7 +24,10 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-alarm-client`,
   `csw-alarm-cli`,
   `csw-aas`,
-  `csw-time-api`,
+  `csw-clock-jvm`,
+  `csw-clock-js`,
+  `csw-time-api-jvm`,
+  `csw-time-api-js`,
   `csw-time-client`,
   `csw-database-client`,
   `csw-network-utils`,
@@ -44,7 +47,7 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-config-cli`,
   `csw-event-cli`,
   `csw-alarm-cli`,
-  `csw-time-api`,
+  `csw-time-api-js`,
   `csw-time-client`,
   `csw-logging-macros`,
   `csw-params-js`,
@@ -345,14 +348,22 @@ lazy val `csw-clock-js` = `csw-clock`.js
 lazy val `csw-clock-jvm` = `csw-clock`.jvm
   .settings(libraryDependencies ++= Dependencies.ClockJvm.value)
 
-lazy val `csw-time-api` = project
-  .dependsOn(`csw-clock-jvm`)
-  .settings(libraryDependencies ++= Dependencies.TimeApi.value)
+lazy val `csw-time-api` =  crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Full)
+  .dependsOn(`csw-clock`)
+  .enablePlugins(PublishBintray, GenJavadocPlugin)
+  .settings(fork := false)
+
+lazy val `csw-time-api-js` = `csw-time-api`.js
+  .settings(libraryDependencies += Libs.`scalajs-java-time`.value)
+
+lazy val `csw-time-api-jvm` = `csw-time-api`.jvm
+  .settings(libraryDependencies ++= Dependencies.TimeApiJvm.value)
 
 lazy val `csw-time-client` = project
   .dependsOn(
-    `csw-time-api`,
-    `csw-logging`,
+    `csw-time-api-jvm`,
+    `csw-logging`
   )
   .settings(libraryDependencies ++= Dependencies.TimeClient.value)
 

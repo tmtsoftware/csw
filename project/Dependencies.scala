@@ -273,7 +273,7 @@ object Dependencies {
     )
   )
 
-  val TimeApi = Def.setting(
+  val TimeApiJvm = Def.setting(
     Seq(
       Akka.`akka-actor`,
       Libs.`play-json-derived-codecs`.value,

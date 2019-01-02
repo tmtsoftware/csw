@@ -4,12 +4,6 @@ import akka.actor.testkit.typed.Effect.Spawned
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestInbox, TestProbe}
 import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
 import akka.actor.typed.{ActorRef, Terminated}
-import csw.common.components.framework.SampleComponentBehaviorFactory
-import csw.common.extensions.CswContextExtensions.RichCswContext
-import csw.framework.ComponentInfos._
-import csw.framework.exceptions.{FailureStop, InitializationFailed}
-import csw.framework.scaladsl.ComponentHandlers
-import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.command.client.messages.CommandResponseManagerMessage.Query
 import csw.command.client.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.command.client.messages.FromComponentLifecycleMessage.Running
@@ -17,13 +11,19 @@ import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.Restart
 import csw.command.client.messages.SupervisorIdleMessage.InitializeTimeout
 import csw.command.client.messages.SupervisorInternalRunningMessage.{RegistrationNotRequired, RegistrationSuccess}
+import csw.command.client.messages.{CommandResponseManagerMessage, ContainerIdleMessage, SupervisorMessage, TopLevelActorMessage}
 import csw.command.client.models.framework.LocationServiceUsage.DoNotRegister
 import csw.command.client.models.framework.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.command.client.models.framework.ToComponentLifecycleMessages._
 import csw.command.client.models.framework.{ComponentInfo, LifecycleStateChanged, PubSub, SupervisorLifecycleState}
-import csw.params.core.models.Id
-import csw.command.client.messages.{CommandResponseManagerMessage, ContainerIdleMessage, SupervisorMessage, TopLevelActorMessage}
+import csw.common.components.framework.SampleComponentBehaviorFactory
+import csw.common.extensions.CswContextExtensions.RichCswContext
+import csw.framework.ComponentInfos._
+import csw.framework.exceptions.InitializationFailed
+import csw.framework.scaladsl.ComponentHandlers
+import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.params.commands.CommandResponse.QueryResponse
+import csw.params.core.models.Id
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 
