@@ -77,6 +77,8 @@ object UTCTime {
    * @return current time in UTC scale
    */
   def now(): UTCTime = UTCTime(clock.utcInstant)
+
+  implicit val format: OFormat[UTCTime] = TMTTime.format.asInstanceOf[OFormat[UTCTime]]
 }
 
 /**

@@ -214,6 +214,7 @@ lazy val `csw-logging` = project
 /* ================= Params ================ */
 lazy val `csw-params` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
+  .dependsOn(`csw-time-api`)
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(
     libraryDependencies ++= Dependencies.Params.value,

@@ -4,6 +4,7 @@ import java.time.Instant
 
 import csw.params.core.generics.{Parameter, ParameterSetType}
 import csw.params.core.models.{Id, Prefix, Subsystem}
+import csw.time.api.UTCTime
 
 /**
  * Common trait representing events in TMT like [[csw.params.events.SystemEvent]] and [[csw.params.events.ObserveEvent]]
@@ -65,10 +66,12 @@ sealed trait Event { self: ParameterSetType[_] ⇒
   override def toString: String =
     s"$typeName(eventId=$eventId, source=$source, eventName=$eventName, eventTime=$eventTime, paramSet=$paramSet)"
 
-  def isInvalid: Boolean = eventTime == EventTime(Instant.ofEpochMilli(-1))
+  def isInvalid: Boolean = eventTime == Event.invalidEventTime
 }
 
 object Event {
+
+  private val invalidEventTime = EventTime(UTCTime(Instant.ofEpochMilli(-1)))
 
   /**
    * A helper method to create an event which is provided to subscriber when there is no event available at the
@@ -77,8 +80,7 @@ object Event {
    * @return an event with the same key as provided but with id and timestamp denoting an invalid event
    */
   def invalidEvent(eventKey: EventKey): SystemEvent =
-    SystemEvent(eventKey.source, eventKey.eventName)
-      .copy(eventId = Id("-1"), eventTime = EventTime(Instant.ofEpochMilli(-1)))
+    SystemEvent(eventKey.source, eventKey.eventName).copy(eventId = Id("-1"), eventTime = invalidEventTime)
 
   /**
    * A helper method to create an event which is provided to subscriber when the received bytes could not be

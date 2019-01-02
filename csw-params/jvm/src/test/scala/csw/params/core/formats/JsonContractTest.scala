@@ -9,6 +9,7 @@ import csw.params.core.generics.KeyType.{LongMatrixKey, StructKey}
 import csw.params.core.models.Units.{encoder, meter, second, NoUnits}
 import csw.params.core.models._
 import csw.params.core.states.{CurrentState, DemandState, StateName}
+import csw.time.api.UTCTime
 import org.scalatest.{FunSpec, Matchers}
 import play.api.libs.json.Json
 
@@ -26,7 +27,7 @@ class JsonContractTest extends FunSpec with Matchers {
   private val obsId: ObsId         = ObsId("Obs001")
   private val instantStr: String   = "2017-08-09T06:40:00.898Z"
   private val eventId: Id          = Id("7a4cd6ab-6077-476d-a035-6f83be1de42c")
-  private val eventTime: EventTime = EventTime(Instant.parse(instantStr))
+  private val eventTime: EventTime = EventTime(UTCTime(Instant.parse(instantStr)))
   private val eventName: EventName = EventName("filter wheel")
 
   describe("Test Sequence Commands") {

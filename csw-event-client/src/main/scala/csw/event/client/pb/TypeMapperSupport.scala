@@ -1,12 +1,13 @@
 package csw.event.client.pb
 
 import com.google.protobuf.timestamp.Timestamp
+import csw.event.client.pb.Implicits.instantMapper
 import csw.params.events._
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.ObsId.empty
 import csw.params.core.models._
-import csw.event.client.pb.Implicits.instantMapper
 import csw.event.client.pb.TypeMapperFactory.make
+import csw.time.api.UTCTime
 import csw_protobuf.events.PbEvent
 import csw_protobuf.events.PbEvent.PbEventType
 import csw_protobuf.keytype.PbKeyType
@@ -91,9 +92,9 @@ object TypeMapperSupport {
 
   private implicit val eventTimeTypeMapper: TypeMapper[Timestamp, EventTime] =
     TypeMapper[Timestamp, EventTime] { x ⇒
-      EventTime(instantMapper.toCustom(x))
+      EventTime(UTCTime(instantMapper.toCustom(x)))
     } { x ⇒
-      instantMapper.toBase(x.time)
+      instantMapper.toBase(x.time.value)
     }
 
   implicit val structTypeMapper: TypeMapper[PbStruct, Struct] = TypeMapper[PbStruct, Struct] { s =>
