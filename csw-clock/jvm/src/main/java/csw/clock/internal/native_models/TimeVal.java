@@ -1,4 +1,4 @@
-package csw.time.api.internal.native_models;
+package csw.clock.internal.native_models;
 
 import com.sun.jna.NativeLong;
 import com.sun.jna.Structure;
@@ -6,12 +6,12 @@ import com.sun.jna.Structure;
 import java.util.Arrays;
 import java.util.List;
 
-public class TimeSpec extends Structure {
+public class TimeVal extends Structure {
     public NativeLong seconds;
-    public NativeLong nanoseconds;
+    public NativeLong microseconds;
 
     @Override
     protected List<String> getFieldOrder() {
-        return Arrays.asList("seconds", "nanoseconds");
+        return Arrays.asList("seconds", "microseconds");
     }
 }

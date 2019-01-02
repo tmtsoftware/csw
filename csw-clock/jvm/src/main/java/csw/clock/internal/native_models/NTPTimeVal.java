@@ -1,4 +1,4 @@
-package csw.time.api.internal.native_models;
+package csw.clock.internal.native_models;
 
 import com.sun.jna.NativeLong;
 import com.sun.jna.Structure;

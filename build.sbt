@@ -334,11 +334,19 @@ lazy val `csw-alarm-cli` = project
 
 /* ================= Time Service ============== */
 
+lazy val `csw-clock` = project
+  .settings(libraryDependencies ++= Dependencies.Clock.value)
+
 lazy val `csw-time-api` = project
+  .dependsOn(`csw-clock`)
   .settings(libraryDependencies ++= Dependencies.TimeApi.value)
 
 lazy val `csw-time-client` = project
-  .dependsOn(`csw-time-api`, `csw-logging`)
+  .dependsOn(
+    `csw-time-api`,
+    `csw-logging`,
+    `csw-clock` % "test->compile"
+  )
   .settings(libraryDependencies ++= Dependencies.TimeClient.value)
 
 lazy val `csw-testkit` = project

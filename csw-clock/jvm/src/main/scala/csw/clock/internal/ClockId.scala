@@ -1,6 +1,4 @@
-package csw.time.api.models.internal
-
-import csw.time.api.internal.TimeLibrary
+package csw.clock.internal
 
 /**
  * Clock Id argument is the identifier of the particular clock on which to act.
@@ -20,7 +18,7 @@ import csw.time.api.internal.TimeLibrary
  * CLOCK_SGI_CYCLE                10      // In linux/time.h only.
  * CLOCK_TAI                      11      // In linux/time.h only.
  */
-private[time] object ClockId {
+private[clock] object ClockId {
   val ClockRealtime = 0  // system-wide realtime clock. Its time represents seconds and nanoseconds since the Epoch
   val ClockTAI      = 11 // It is basically defined as CLOCK_REALTIME(UTC) + tai_offset.
 }
