@@ -13,8 +13,8 @@ class ConfigApp extends React.Component {
   state = {
     authContext: {
       tmtAuth: null,
-      isAuthenticated: false
-    }
+      isAuthenticated: false,
+    },
   }
 
   render() {

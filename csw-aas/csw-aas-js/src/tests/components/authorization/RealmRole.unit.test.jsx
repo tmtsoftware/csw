@@ -18,10 +18,10 @@ describe('<RealmRole />', () => {
         tmtAuth: {
           hasRealmRole: jest.fn().mockImplementation(() => {
             return true
-          })
+          }),
         },
-        isAuthenticated: true
-      }
+        isAuthenticated: true,
+      },
     }
 
     const wrapper = shallow(<RealmRole {...props} />)
@@ -33,7 +33,7 @@ describe('<RealmRole />', () => {
     const props = {
       realmRole: 'invalid-realm-role',
       children: <div className='realm-role'>Authorization successful</div>,
-      context: { tmtAuth: null, isAuthenticated: false }
+      context: { tmtAuth: null, isAuthenticated: false },
     }
 
     const wrapper = shallow(<RealmRole {...props} />)
@@ -49,10 +49,10 @@ describe('<RealmRole />', () => {
         tmtAuth: {
           hasRealmRole: jest.fn().mockImplementation(() => {
             return false
-          })
+          }),
         },
-        isAuthenticated: true
-      }
+        isAuthenticated: true,
+      },
     }
 
     const wrapper = shallow(<RealmRole {...props} />)

@@ -8,7 +8,7 @@ const CheckLogin = ({ context, children, error }) => (
 CheckLogin.propTypes = {
   children: PropTypes.node,
   context: PropTypes.object.isRequired,
-  error: PropTypes.node
+  error: PropTypes.node,
 }
 
 export default CheckLogin

@@ -1,5 +1,5 @@
 export const mockTMTAuth = {
-  token: 'some token'
+  token: 'some token',
 }
 
 export const mockKeycloak = mockTMTAuth
@@ -14,5 +14,5 @@ export const TMTAuth = {
   }),
   authenticate: jest.fn().mockImplementation(() => {
     return { mockKeycloak, authenticated }
-  })
+  }),
 }

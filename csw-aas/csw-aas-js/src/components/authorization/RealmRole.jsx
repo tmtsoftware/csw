@@ -13,7 +13,7 @@ RealmRole.propTypes = {
   realmRole: PropTypes.string.isRequired,
   children: PropTypes.node,
   context: PropTypes.object.isRequired,
-  error: PropTypes.node
+  error: PropTypes.node,
 }
 
 export default RealmRole

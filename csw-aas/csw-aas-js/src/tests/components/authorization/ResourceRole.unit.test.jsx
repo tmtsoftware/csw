@@ -19,10 +19,10 @@ describe('<RealmRole />', () => {
         tmtAuth: {
           hasResourceRole: jest.fn().mockImplementation(() => {
             return true
-          })
+          }),
         },
-        isAuthenticated: true
-      }
+        isAuthenticated: true,
+      },
     }
 
     const wrapper = shallow(<ResourceRole {...props} />)
@@ -35,7 +35,7 @@ describe('<RealmRole />', () => {
       resourceRole: 'some-role',
       resource: 'some-server',
       children: <div className='resource-role'>Authorization successful</div>,
-      context: { tmtAuth: null, isAuthenticated: false }
+      context: { tmtAuth: null, isAuthenticated: false },
     }
 
     const wrapper = shallow(<ResourceRole {...props} />)
@@ -52,10 +52,10 @@ describe('<RealmRole />', () => {
         tmtAuth: {
           hasResourceRole: jest.fn().mockImplementation(() => {
             return false
-          })
+          }),
         },
-        isAuthenticated: true
-      }
+        isAuthenticated: true,
+      },
     }
 
     const wrapper = shallow(<ResourceRole {...props} />)

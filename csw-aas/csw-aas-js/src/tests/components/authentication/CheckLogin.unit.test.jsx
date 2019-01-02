@@ -13,7 +13,7 @@ describe('<CheckLogin />', () => {
   it('should render children elements if authentication is true', () => {
     const props = {
       children: <div className='auth'>Authentication successful</div>,
-      context: { tmtAuth: {}, isAuthenticated: true }
+      context: { tmtAuth: {}, isAuthenticated: true },
     }
 
     const wrapper = shallow(<CheckLogin {...props} />)
@@ -24,7 +24,7 @@ describe('<CheckLogin />', () => {
   it('should not render children elements if authentication is false', () => {
     const props = {
       children: <div className='auth'>Authentication successful</div>,
-      context: { tmtAuth: null, isAuthenticated: false }
+      context: { tmtAuth: null, isAuthenticated: false },
     }
 
     const wrapper = shallow(<CheckLogin {...props} />)
