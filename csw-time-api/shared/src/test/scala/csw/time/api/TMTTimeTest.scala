@@ -2,6 +2,7 @@ package csw.time.api
 
 import java.time._
 
+import csw.time.api.models.{TAITime, UTCTime}
 import org.scalatest.{FunSuite, Matchers}
 
 class TMTTimeTest extends FunSuite with Matchers {

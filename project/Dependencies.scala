@@ -273,10 +273,13 @@ object Dependencies {
     )
   )
 
+  val TimeApi = Def.setting(
+    Seq(Libs.`play-json-derived-codecs`.value)
+  )
+
   val TimeApiJvm = Def.setting(
     Seq(
       Akka.`akka-actor`,
-      Libs.`play-json-derived-codecs`.value,
       Libs.`scalatest`.value % Test,
       Libs.`junit-interface` % Test
     )

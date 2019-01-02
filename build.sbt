@@ -353,7 +353,10 @@ lazy val `csw-time-api` =  crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .dependsOn(`csw-clock`)
   .enablePlugins(PublishBintray, GenJavadocPlugin)
-  .settings(fork := false)
+  .settings(
+    libraryDependencies ++= Dependencies.TimeApi.value,
+    fork := false
+  )
 
 lazy val `csw-time-api-js` = `csw-time-api`.js
   .settings(libraryDependencies += Libs.`scalajs-java-time`.value)

@@ -2,7 +2,7 @@ package csw.time.api
 import java.time.Duration
 
 import akka.actor.ActorRef
-import csw.time.api.models.Cancellable
+import csw.time.api.models.{TAITime, TMTTime, UTCTime}
 
 /**
  * Scheduler for scheduling periodic/non-periodic tasks at a specified time and/or interval.

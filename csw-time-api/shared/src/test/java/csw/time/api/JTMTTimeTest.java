@@ -1,5 +1,7 @@
 package csw.time.api;
 
+import csw.time.api.models.TAITime;
+import csw.time.api.models.UTCTime;
 import csw.time.api.utils.JTestProperties;
 import csw.time.api.utils.TestProperties;
 import csw.time.api.utils.TestUtil;

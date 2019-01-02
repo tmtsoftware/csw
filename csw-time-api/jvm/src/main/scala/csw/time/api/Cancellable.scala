@@ -1,4 +1,4 @@
-package csw.time.api.models
+package csw.time.api
 
 /**
  * Signifies something that can be cancelled.

@@ -4,8 +4,8 @@ import java.time.Duration
 import java.util.concurrent.TimeUnit.NANOSECONDS
 
 import akka.actor.{ActorRef, ActorSystem, Scheduler}
-import csw.time.api.models.Cancellable
-import csw.time.api.{TAITime, TMTTime, TimeServiceScheduler, UTCTime}
+import csw.time.api.models.{TAITime, TMTTime, UTCTime}
+import csw.time.api.{TimeServiceScheduler, _}
 import csw.time.client.internal.extensions.RichCancellableExt.RichCancellable
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}

@@ -28,7 +28,7 @@ class Monitor(tickDuration: FiniteDuration, reportingDuration: FiniteDuration) {
     var tickInterval: Interval = Interval.zero
 
     event =>
-      val eventTime   = event.eventTime.time.toEpochMilli
+      val eventTime   = event.eventTime.time.value.toEpochMilli
       val currentTime = System.currentTimeMillis
       val latency     = currentTime - eventTime
       val accTime     = currentTime - startTime

@@ -1,9 +1,8 @@
-package csw.time.api
+package csw.time.api.models
 
 import java.time.{Instant, ZoneId, ZoneOffset, ZonedDateTime}
 
 import csw.clock.models.TMTClock.clock
-import csw.clock.natives.TimeLibrary
 import julienrf.json.derived
 import play.api.libs.json._
 
@@ -31,7 +30,7 @@ final case class UTCTime(value: Instant) extends TMTTime {
 
   /**
    * Converts the [[UTCTime]] to [[TAITime]] by adding the UTC-TAI offset.
-   * UTC-TAI offset is fetched by doing a native call to [[TimeLibrary.ntp_gettimex()]]. It ensures to get the latest offset as updated by the PTP Grandmaster.
+   * UTC-TAI offset is fetched by doing a native call to [[csw.clock.natives.TimeLibrary.ntp_gettimex()]]. It ensures to get the latest offset as updated by the PTP Grandmaster.
    *
    * @return TAI time at the given UTC time
    */
@@ -71,7 +70,7 @@ object UTCTime {
 
   /**
    * Obtains the PTP (Precision Time Protocol) synchronized current UTC time.
-   * In case of a Linux machine, this will make a native call [[TimeLibrary.clock_gettime()]] inorder to get time from the system clock with nanosecond precision.
+   * In case of a Linux machine, this will make a native call [[csw.clock.natives.TimeLibrary.clock_gettime()]] inorder to get time from the system clock with nanosecond precision.
    * In case of all the other operating systems, nanosecond precision is not supported, hence no native call is made.
    *
    * @return current time in UTC scale
@@ -90,7 +89,7 @@ final case class TAITime(value: Instant) extends TMTTime {
 
   /**
    * Converts the [[TAITime]] to [[UTCTime]] by subtracting the UTC-TAI offset.
-   * UTC-TAI offset is fetched by doing a native call to [[TimeLibrary.ntp_gettimex()]]. It ensures to get the latest offset as updated by the PTP Grandmaster.
+   * UTC-TAI offset is fetched by doing a native call to [[csw.clock.natives.TimeLibrary.ntp_gettimex()]]. It ensures to get the latest offset as updated by the PTP Grandmaster.
    *
    * @return UTC time at the given TAI time
    */
@@ -101,7 +100,7 @@ object TAITime {
 
   /**
    * Obtains the PTP (Precision Time Protocol) synchronized current time in TAI timescale.
-   * In case of a Linux machine, this will make a native call [[TimeLibrary.clock_gettime()]] inorder to get time from the system clock with nanosecond precision
+   * In case of a Linux machine, this will make a native call [[csw.clock.natives.TimeLibrary.clock_gettime()]] inorder to get time from the system clock with nanosecond precision
    * In case of all the other operating systems, nanosecond precision is not supported, hence no native call is made.
    *
    * @return current time in TAI scale
@@ -109,7 +108,7 @@ object TAITime {
   def now(): TAITime = TAITime(clock.taiInstant)
 
   /**
-   * Fetches UTC to TAI offset by doing a native call to [[TimeLibrary.ntp_gettimex()]] in case of a Linux machine.
+   * Fetches UTC to TAI offset by doing a native call to [[csw.clock.natives.TimeLibrary.ntp_gettimex()]] in case of a Linux machine.
    * It ensures to get the latest offset as updated by the PTP Grandmaster.
    *
    * @return offset of UTC to TAI in seconds

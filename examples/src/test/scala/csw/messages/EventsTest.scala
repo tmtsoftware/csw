@@ -9,6 +9,7 @@ import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.Units.arcmin
 import csw.params.core.models._
 import csw.event.client.pb.PbConverter
+import csw.time.api.models.UTCTime
 import csw_protobuf.events.PbEvent
 import org.scalatest.{FunSpec, Matchers}
 
@@ -21,20 +22,20 @@ class EventsTest extends FunSpec with Matchers {
       val now: EventTime = EventTime()
 
       //using constructor
-      val anHourAgo: EventTime = EventTime(Instant.now().minusSeconds(3600))
+      val anHourAgo: EventTime = EventTime(UTCTime(Instant.now().minusSeconds(3600)))
 
       //current event time using utility function
       val currentTime: EventTime = EventTime()
 
       //some past time using utility function
-      val aDayAgo = EventTime(Instant.now.minusSeconds(86400))
+      val aDayAgo = EventTime(UTCTime(Instant.now.minusSeconds(86400)))
 
       //#eventtime
 
       //validations
-      assert(now.time.isAfter(anHourAgo.time))
-      assert(anHourAgo.time.isAfter(aDayAgo.time))
-      assert(currentTime.time.isAfter(anHourAgo.time))
+      assert(now.time.value.isAfter(anHourAgo.time.value))
+      assert(anHourAgo.time.value.isAfter(aDayAgo.time.value))
+      assert(currentTime.time.value.isAfter(anHourAgo.time.value))
     }
   }
 

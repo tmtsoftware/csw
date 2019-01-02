@@ -9,7 +9,6 @@ import csw.location.api.scaladsl.LocationService
 import csw.logging.scaladsl.LoggingSystemFactory
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.language.implicitConversions
 
 class TestServer(locationService: LocationService)(implicit ec: ExecutionContext) {
   val securityDirectives = SecurityDirectives(locationService)
