@@ -22,7 +22,7 @@
     "build": "rollup -c",
     "start": "rollup -c -w",
     "example": "cd example && npm install && npm run build",
-    "prepublishOnly": "npm clean-install-test && npm run test:it && npm run build && npm run example"
+    "prepublishOnly": "npm clean-install-test && npm run build && npm run example"
   },
   "peerDependencies": {
     "prop-types": "^15.6.2",
