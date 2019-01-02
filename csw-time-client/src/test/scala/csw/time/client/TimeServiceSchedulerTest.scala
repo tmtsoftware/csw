@@ -106,15 +106,15 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
 
     val buffer: ArrayBuffer[Int] = ArrayBuffer.empty
 
-    val atomicInt                = new AtomicInteger(0)
-    val startTime                = UTCTime.now()
-    val offset:Long              = 100l // milliseconds
+    val atomicInt    = new AtomicInteger(0)
+    val startTime    = UTCTime.now()
+    val offset: Long = 100l // milliseconds
     val cancellable: Cancellable = timeService.schedulePeriodically(Duration.ofMillis(offset)) {
       buffer += atomicInt.getAndIncrement()
       testProbe.ref ! UTCTime.now()
     }
 
-    val times = testProbe.receiveN(6, 500.milli).map { case t: UTCTime => t}
+    val times = testProbe.receiveN(6, 510.milli).map { case t: UTCTime => t }
 
     cancellable.cancel()
 
@@ -123,7 +123,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
 
     times.size shouldBe 6
     buffer.foreach { i =>
-      times(i).value.toEpochMilli shouldBe (startTime.value.toEpochMilli + offset*i) +- 10
+      times(i).value.toEpochMilli shouldBe (startTime.value.toEpochMilli + offset * i) +- 10
     }
   }
 
@@ -138,15 +138,15 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
 
     val buffer: ArrayBuffer[Int] = ArrayBuffer.empty
 
-    val atomicInt                = new AtomicInteger(0)
-    val startTime                = UTCTime(UTCTime.now().value.plusSeconds(1L))
-    val offset:Long              = 100l // milliseconds
+    val atomicInt    = new AtomicInteger(0)
+    val startTime    = UTCTime(UTCTime.now().value.plusSeconds(1L))
+    val offset: Long = 100l // milliseconds
     val cancellable: Cancellable = timeService.schedulePeriodically(startTime, Duration.ofMillis(offset)) {
       buffer += atomicInt.getAndIncrement()
       testProbe.ref ! UTCTime.now()
     }
 
-    val times = testProbe.receiveN(6, 1500.milli).map { case t: UTCTime => t}
+    val times = testProbe.receiveN(6, 1510.milli).map { case t: UTCTime => t }
 
     cancellable.cancel()
 
@@ -155,7 +155,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
 
     times.size shouldBe 6
     buffer.foreach { i =>
-      times(i).value.toEpochMilli shouldBe (startTime.value.toEpochMilli + offset*i) +- 10
+      times(i).value.toEpochMilli shouldBe (startTime.value.toEpochMilli + offset * i) +- 10
     }
   }
 }
