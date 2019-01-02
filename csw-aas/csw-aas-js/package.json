@@ -17,11 +17,15 @@
   },
   "scripts": {
     "test": "jest --coverage",
+    "test:it": "jest --testPathPattern='\\.integration.test\\.jsx'",
     "build": "rollup -c",
     "start": "rollup -c -w",
     "prepare": "npm run build",
     "predeploy": "cd example && npm install && npm run build",
     "deploy": "gh-pages -d example/build"
+  },
+  "jest": {
+    "testRegex": "\\.test\\.jsx"
   },
   "peerDependencies": {
     "prop-types": "^15.6.2",

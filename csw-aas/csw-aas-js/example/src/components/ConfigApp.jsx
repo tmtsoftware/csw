@@ -48,8 +48,7 @@ class ConfigApp extends React.Component {
                 path='/secured'
                 render={_ => (
                   <CheckLogin context={this.state.authContext}>
-                    {' '}
-                    <WriteConfig />{' '}
+                    <WriteConfig />
                   </CheckLogin>
                 )}
               />

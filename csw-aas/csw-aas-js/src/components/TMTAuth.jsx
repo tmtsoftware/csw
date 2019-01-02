@@ -1,6 +1,7 @@
 import { AASConfig, Config } from '../config/configs'
 import KeyCloak from 'keycloak-js'
 import fetch from 'isomorphic-fetch'
+import { resolveAAS } from './AASResolver'
 
 class TMTAuthStore {
   constructor() {
@@ -47,18 +48,9 @@ class TMTAuthStore {
     return { keycloak, authenticated }
   }
 
-  resolveAAS = async () => {
-    const response = await fetch(
-      `${Config['location-server-url']}/location/resolve/${
-        Config['AAS-server-name']
-      }?within=5seconds`,
-    )
-    let url = Config['AAS-server-url']
-    if (response.status === 200) {
-      const a = await response.json()
-      url = a.uri
-    }
-    return url
+  getAASUrl = async () => {
+    let url = await resolveAAS()
+    return url || Config['AAS-server-url']
   }
 }
 

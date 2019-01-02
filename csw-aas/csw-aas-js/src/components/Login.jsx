@@ -22,7 +22,7 @@ class Login extends React.Component {
   }
 
   componentWillMount = async () => {
-    const url = await TMTAuth.resolveAAS()
+    const url = await TMTAuth.getAASUrl()
     await this.instantiateAAS({ url: url })
   }
 

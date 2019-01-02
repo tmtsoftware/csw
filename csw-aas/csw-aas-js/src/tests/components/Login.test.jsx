@@ -18,7 +18,7 @@ describe('<Login />', () => {
       onAuthentication: jest.fn(),
     }
 
-    const resolveAASMock = jest.spyOn(TMTAuth, 'resolveAAS')
+    const resolveAASMock = jest.spyOn(TMTAuth, 'getAASUrl')
     const authenticateMock = jest.spyOn(TMTAuth, 'authenticate')
 
     await mount(<Login {...props} />)

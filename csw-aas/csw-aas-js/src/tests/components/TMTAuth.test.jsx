@@ -1,12 +1,18 @@
 import { TMTAuth } from '../../components/TMTAuth'
 import KeyCloak from 'keycloak-js'
-import fetch from 'isomorphic-fetch'
+import { resolveAAS } from '../../components/AASResolver'
 
 jest.mock('isomorphic-fetch')
 
 jest.mock('keycloak-js')
 
+jest.mock('../../components/AASResolver')
+
 describe('<TMTAuth />', () => {
+  beforeEach(() => {
+    resolveAAS.mockClear()
+  })
+
   it('should create TMTAuth instance', () => {
     const mockKeycloak = {
       logout: jest.fn(),
@@ -63,17 +69,21 @@ describe('<TMTAuth />', () => {
     initMock.mockRestore()
   })
 
-  it('should resolveAAS', async () => {
-    const mockResponse = {
-      status: 200,
-      json: jest.fn().mockImplementation(() => {
-        return { uri: 'http://somehost:someport' }
-      }),
-    }
-    fetch.mockReturnValue(Promise.resolve(mockResponse))
+  it('should getAASUrl from location service', async () => {
+    resolveAAS.mockReturnValue(Promise.resolve('http://AAS_IP:AAS_Port/auth'))
 
-    const url = await TMTAuth.resolveAAS()
+    const url = await TMTAuth.getAASUrl()
 
-    expect(url).toBe('http://somehost:someport')
+    expect(resolveAAS).toHaveBeenCalledTimes(1)
+    expect(url).toBe('http://AAS_IP:AAS_Port/auth')
+  })
+
+  it('should getAASUrl from config', async () => {
+    resolveAAS.mockReturnValue(Promise.resolve(null))
+
+    const url = await TMTAuth.getAASUrl()
+
+    expect(resolveAAS).toHaveBeenCalledTimes(1)
+    expect(url).toBe('http://localhost:8081/auth')
   })
 })
