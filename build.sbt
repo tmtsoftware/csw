@@ -357,6 +357,7 @@ lazy val `csw-database-client` = project
     `csw-location-api`,
     `csw-location-server` % "test->compile;test->test"
   )
+  .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.DatabaseClient.value)
 
 /* =============== Common Utilities ============ */
