@@ -334,18 +334,25 @@ lazy val `csw-alarm-cli` = project
 
 /* ================= Time Service ============== */
 
-lazy val `csw-clock` = project
-  .settings(libraryDependencies ++= Dependencies.Clock.value)
+lazy val `csw-clock` = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Full)
+  .enablePlugins(PublishBintray, GenJavadocPlugin)
+  .settings(fork := false)
+
+lazy val `csw-clock-js` = `csw-clock`.js
+  .settings(libraryDependencies += Libs.`scalajs-java-time`.value)
+
+lazy val `csw-clock-jvm` = `csw-clock`.jvm
+  .settings(libraryDependencies ++= Dependencies.ClockJvm.value)
 
 lazy val `csw-time-api` = project
-  .dependsOn(`csw-clock`)
+  .dependsOn(`csw-clock-jvm`)
   .settings(libraryDependencies ++= Dependencies.TimeApi.value)
 
 lazy val `csw-time-client` = project
   .dependsOn(
     `csw-time-api`,
     `csw-logging`,
-    `csw-clock` % "test->compile"
   )
   .settings(libraryDependencies ++= Dependencies.TimeClient.value)
 
