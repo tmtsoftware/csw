@@ -1,2 +1,4 @@
-dist/
-coverage/
+dist
+coverage
+node_modules
+build

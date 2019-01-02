@@ -23,9 +23,8 @@
     "test:it": "jest int --coverage",
     "build": "rollup -c",
     "start": "rollup -c -w",
-    "prepare": "npm run build",
-    "predeploy": "cd example && npm install && npm run build",
-    "deploy": "gh-pages -d example/build"
+    "example": "cd example && npm install && npm run build",
+    "prepare": "npm test && npm run test:it && npm run build && npm run example"
   },
   "peerDependencies": {
     "prop-types": "^15.6.2",
