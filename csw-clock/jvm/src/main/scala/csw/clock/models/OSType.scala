@@ -12,5 +12,4 @@ object OSType {
     val OS = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH)
     if (OS.indexOf("nux") >= 0) Linux else Other
   }
-
 }

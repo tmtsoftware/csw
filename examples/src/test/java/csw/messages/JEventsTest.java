@@ -13,6 +13,7 @@ import csw.params.core.models.MatrixData;
 import csw.params.core.models.Prefix;
 import csw.params.core.models.RaDec;
 import csw.event.client.pb.PbConverter;
+import csw.time.api.models.UTCTime;
 import csw_protobuf.events.PbEvent;
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,20 +35,20 @@ public class JEventsTest extends JUnitSuite {
         EventTime now = EventTime.apply();
 
         //using constructor
-        EventTime anHourAgo = new EventTime(Instant.now().minusSeconds(3600));
+        EventTime anHourAgo = new EventTime(new UTCTime(Instant.now().minusSeconds(3600)));
 
         //return current time in UTC
         EventTime currentTime = EventTime.apply();
 
         //some past time using utility function
-        EventTime aDayAgo = EventTime.apply(Instant.now().minusSeconds(86400));
+        EventTime aDayAgo = EventTime.apply(new UTCTime(Instant.now().minusSeconds(86400)));
 
         //#eventtime
 
         //validations
-        Assert.assertTrue(now.time().isAfter(anHourAgo.time()));
-        Assert.assertTrue(anHourAgo.time().isAfter(aDayAgo.time()));
-        Assert.assertTrue(currentTime.time().isAfter(anHourAgo.time()));
+        Assert.assertTrue(now.time().value().isAfter(anHourAgo.time().value()));
+        Assert.assertTrue(anHourAgo.time().value().isAfter(aDayAgo.time().value()));
+        Assert.assertTrue(currentTime.time().value().isAfter(anHourAgo.time().value()));
     }
 
     @Test
