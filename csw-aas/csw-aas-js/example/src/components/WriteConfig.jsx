@@ -1,16 +1,21 @@
 import React from 'react'
-import { TMTAuthContext } from './TMTAuthContext'
+import { Consumer } from 'csw-aas-js'
 
 class WriteConfig extends React.Component {
   state = { user: null }
 
   componentWillMount = async () => {
-    if (this.context.tmtAuth) {
-      let loadUserInfo = await this.context.tmtAuth.loadUserInfo()
-      loadUserInfo.success(user => {
-        this.setState({ user })
-      })
-    }
+    return <Consumer>
+      { async ({ tmtAuth }) => {
+        if (tmtAuth) {
+          let loadUserInfo = await tmtAuth.loadUserInfo()
+          loadUserInfo.success(user => {
+            this.setState({ user })
+          })
+        }
+      }
+      }
+    </Consumer>
   }
 
   render() {
@@ -23,7 +28,5 @@ class WriteConfig extends React.Component {
     )
   }
 }
-
-WriteConfig.contextType = TMTAuthContext
 
 export default WriteConfig

@@ -1,14 +1,18 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { Consumer } from '../context/TMTAuthContextConsumer'
 
-const CheckLogin = ({ context, children, error }) => (
-  <div>{context.isAuthenticated ? children : error}</div>
+const CheckLogin = ({ children, error }) => (
+  <Consumer>
+    { ({isAuthenticated}) => (
+      isAuthenticated ? children : error)
+    }
+  </Consumer>
 )
 
 CheckLogin.propTypes = {
   children: PropTypes.node,
-  context: PropTypes.object.isRequired,
-  error: PropTypes.node,
+  error: PropTypes.node
 }
 
 export default CheckLogin

@@ -1,39 +1,12 @@
 import React from 'react'
-import PropTypes from 'prop-types'
-import { TMTAuth } from './TMTAuth'
+import { Consumer } from './context/TMTAuthContextConsumer'
 
-class Login extends React.Component {
-  instantiateAAS = async url => {
-    const { keycloak, authenticated } = await TMTAuth.authenticate(
-      this.props.config,
-      url,
-    )
-    authenticated
-      .success(() => {
-        const tmtAuth = TMTAuth.from(keycloak)
-        this.props.onAuthentication({
-          tmtAuth: tmtAuth,
-          isAuthenticated: tmtAuth.isAuthenticated,
-        })
-      })
-      .error(() => {
-        this.props.onAuthentication({ tmtAuth: null, isAuthenticated: false })
-      })
-  }
-
-  componentWillMount = async () => {
-    const url = await TMTAuth.getAASUrl()
-    await this.instantiateAAS({ url: url })
-  }
-
-  render() {
-    return null
-  }
-}
-
-Login.propTypes = {
-  config: PropTypes.object,
-  onAuthentication: PropTypes.func.isRequired,
-}
+const Login = () => (
+  <Consumer>
+    { ({ login, isAuthenticated }) => (
+      isAuthenticated ? null : <button onClick={login}>Login</button>
+    )}
+  </Consumer>
+)
 
 export default Login
