@@ -1,11 +1,11 @@
 ===============================================================================================================
-EventKey: wfos.prog.cloudcover.move | Timestamp: 2018-07-02T09:23:26.477Z | Id: 3186979f-6cde-43a5-a42a-1ae37bfed669
+EventKey: wfos.prog.cloudcover.move | Timestamp: UTCTime(2018-07-02T09:23:26.477Z) | Id: 3186979f-6cde-43a5-a42a-1ae37bfed669
 
 epoch = 1950.0 [NoUnits]
 struct-1/dec = "32:33:34.4" [NoUnits]
 struct-1/ra = "12:13:14.1" [NoUnits]
 ===============================================================================================================
-EventKey: wfos.prog.filter.stop | Timestamp: 2018-07-02T09:23:26.477Z | Id: 3186979f-6cde-43a5-a42a-1ae37bfed669
+EventKey: wfos.prog.filter.stop | Timestamp: UTCTime(2018-07-02T09:23:26.477Z) | Id: 3186979f-6cde-43a5-a42a-1ae37bfed669
 
 struct-2/dec = "32:33:34.4" [NoUnits]
 struct-2/ra = "12:13:14.1" [NoUnits]
