@@ -264,7 +264,7 @@ object Dependencies {
     )
   )
 
-  val ClockJvm = Def.setting(
+  val TimeClockJvm = Def.setting(
     Seq(
       Libs.`jna`,
       Libs.`play-json-derived-codecs`.value,
