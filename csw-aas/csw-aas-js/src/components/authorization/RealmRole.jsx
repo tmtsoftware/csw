@@ -1,19 +1,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { Consumer } from '../context/TMTAuthContextConsumer'
 
-const RealmRole = ({ realmRole, children, context, error }) => (
-  <div>
-    {context.isAuthenticated && context.tmtAuth.hasRealmRole(realmRole)
-      ? children
-      : error}
-  </div>
+const RealmRole = ({ realmRole, children, error }) => (
+  <Consumer>
+    { ({tmtAuth, isAuthenticated}) => (
+      isAuthenticated && tmtAuth.hasRealmRole(realmRole) ? children : error)
+    }
+  </Consumer>
 )
 
 RealmRole.propTypes = {
   realmRole: PropTypes.string.isRequired,
   children: PropTypes.node,
-  context: PropTypes.object.isRequired,
-  error: PropTypes.node,
+  error: PropTypes.node
 }
 
 export default RealmRole
