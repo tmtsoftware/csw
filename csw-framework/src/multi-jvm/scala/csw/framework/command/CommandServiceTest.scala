@@ -221,6 +221,7 @@ class CommandServiceTest(ignore: Int)
       Await.result(longRunningQueryResultF, timeout.duration) shouldBe Some(20)
       // #queryLongRunning
 
+      // This test shows DEOPSCSW-623 because submit is issued without future and queryFinal works
       // #queryFinal
       val longRunningSetup3 = longRunningSetup1.cloneCommand
       val queryFinalF = async {
