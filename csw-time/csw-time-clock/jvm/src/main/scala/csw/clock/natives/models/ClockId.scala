@@ -1,4 +1,4 @@
-package csw.clock.models
+package csw.clock.natives.models
 
 /**
  * Clock Id argument is the identifier of the particular clock on which to act.

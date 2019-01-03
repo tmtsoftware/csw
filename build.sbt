@@ -44,6 +44,7 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-event-cli`,
   `csw-alarm-cli`,
   `csw-time-api-js`,
+  `csw-time-clock-js`,
   `csw-time-client`,
   `csw-logging-macros`,
   `csw-params-js`,
@@ -348,13 +349,12 @@ lazy val `csw-time-clock` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Dummy)
   .in(file("csw-time/csw-time-clock"))
   .enablePlugins(PublishBintray, GenJavadocPlugin)
+  .jvmSettings(libraryDependencies ++= Dependencies.TimeClockJvm.value)
+  .jsSettings(libraryDependencies += Libs.`scalajs-java-time`.value)
   .settings(fork := false)
 
 lazy val `csw-time-clock-js` = `csw-time-clock`.js
-  .settings(libraryDependencies += Libs.`scalajs-java-time`.value)
-
 lazy val `csw-time-clock-jvm` = `csw-time-clock`.jvm
-  .settings(libraryDependencies ++= Dependencies.TimeClockJvm.value)
 
 lazy val `csw-time-api` =  crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)

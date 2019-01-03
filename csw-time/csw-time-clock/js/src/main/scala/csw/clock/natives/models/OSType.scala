@@ -1,4 +1,4 @@
-package csw.clock.models
+package csw.clock.natives.models
 
 sealed trait OSType
 

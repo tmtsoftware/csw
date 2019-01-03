@@ -2,7 +2,7 @@ package csw.time.api.models
 
 import java.time.Instant
 
-import csw.clock.models.TMTClock.clock
+import csw.clock.natives.models.TMTClock.clock
 import julienrf.json.derived
 import play.api.libs.json._
 

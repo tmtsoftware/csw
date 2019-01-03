@@ -1,11 +1,11 @@
-package csw.clock.models
+package csw.clock.natives.models
 
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicInteger
 
 import com.sun.jna.NativeLong
-import csw.clock.TimeLibrary
-import csw.clock.models.ClockId.{ClockRealtime, ClockTAI}
+import csw.clock.natives.TimeLibrary
+import csw.clock.natives.models.ClockId.{ClockRealtime, ClockTAI}
 
 import scala.util.Try
 import scala.util.control.NonFatal
