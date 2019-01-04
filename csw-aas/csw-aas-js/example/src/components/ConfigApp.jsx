@@ -1,6 +1,6 @@
 import React from 'react'
 import { BrowserRouter, Route } from 'react-router-dom'
-import { CheckLogin, TMTAuthContextProvider, Consumer, Login, Logout, RealmRole, ResourceRole } from 'csw-aas-js'
+import { CheckLogin, TMTAuthContextProvider, Login, Logout, RealmRole, ResourceRole } from 'csw-aas-js'
 import NavComponent from './NavComponent'
 import { AppConfig } from '../config/AppConfig'
 import WriteConfig from './WriteConfig'
@@ -23,11 +23,13 @@ class ConfigApp extends React.Component {
           <BrowserRouter>
             <div>
               <NavComponent />
+              <Route path='/login' component={Login} />
+              <Route path='/logout' component={Logout} />
               <Route
                 exact
                 path='/secured'
                 render={_ => (
-                  <CheckLogin context={this.state.authContext}>
+                  <CheckLogin>
                     <WriteConfig />
                   </CheckLogin>
                 )}
@@ -36,9 +38,6 @@ class ConfigApp extends React.Component {
               <Route exact path='/public' component={ReadConfig} />
             </div>
           </BrowserRouter>
-          <Logout />
-          <Login />
-
           <RealmRole
             realmRole='example-admin-role'
             error={<ConfigError />}>

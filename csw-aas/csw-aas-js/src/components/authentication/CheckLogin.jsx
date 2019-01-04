@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Consumer } from '../context/TMTAuthContextConsumer'
+import { Consumer } from '../context/TMTAuthContext'
 
 const CheckLogin = ({ children, error }) => (
   <Consumer>
