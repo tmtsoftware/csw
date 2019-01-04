@@ -22,10 +22,9 @@ public class JTMTTimeHelperTest extends JUnitSuite {
     @Test
     public void should_get_maximum_precision_while_reading_remote_location_utc_time() {
         UTCTime utcTime = UTCTime.now();
-        TMTTimeHelper tmtTimeHelper = new TMTTimeHelper(utcTime);
 
-        ZonedDateTime utcHawaiiTime = tmtTimeHelper.atHawaii();
-        ZonedDateTime utcLocalTime = tmtTimeHelper.atLocal();
+        ZonedDateTime utcHawaiiTime = TMTTimeHelper.atHawaii(utcTime);
+        ZonedDateTime utcLocalTime = TMTTimeHelper.atLocal(utcTime);
 
         assertFalse(TestUtil.formatWithPrecision(utcTime.value(), testProperties.precision()).endsWith("000"));
         assertFalse(TestUtil.formatWithPrecision(utcHawaiiTime.toInstant(), testProperties.precision()).endsWith("000"));
@@ -54,9 +53,8 @@ public class JTMTTimeHelperTest extends JUnitSuite {
         // Using TimeService you can get this utcInstant, which is synchronized with PTP
         // and then you can use atHawaii, atLocal and atZone helpers defined on CswInstant
         UTCTime utcTime = new UTCTime(instant);
-        TMTTimeHelper tmtTimeHelper = new TMTTimeHelper(utcTime);
 
-        Assert.assertEquals(localZDT, tmtTimeHelper.atLocal());
-        Assert.assertEquals(hawaiiZDT, tmtTimeHelper.atHawaii());
+        Assert.assertEquals(localZDT, TMTTimeHelper.atLocal(utcTime));
+        Assert.assertEquals(hawaiiZDT, TMTTimeHelper.atHawaii(utcTime));
     }
 }

@@ -19,8 +19,7 @@ class TMTTimeHelperTest extends FunSuite with Matchers {
 
   test("should access parts of UTC time") {
     val utcTime       = UTCTime(instant)
-    val tmtTimeHelper = new TMTTimeHelper(utcTime)
-    val zonedDateTime = tmtTimeHelper.toZonedDateTime
+    val zonedDateTime = TMTTimeHelper.toZonedDateTime(utcTime)
 
     zonedDateTime.getYear shouldBe 2007
     zonedDateTime.getMonth.getValue shouldBe 12
@@ -36,8 +35,7 @@ class TMTTimeHelperTest extends FunSuite with Matchers {
 
   test("should access parts of TAI time") {
     val taiTime       = TAITime(instant)
-    val tmtTimeHelper = new TMTTimeHelper(taiTime)
-    val zonedDateTime = tmtTimeHelper.atZone(ZoneOffset.UTC)
+    val zonedDateTime = TMTTimeHelper.atZone(taiTime, ZoneOffset.UTC)
 
     zonedDateTime.getYear shouldBe 2007
     zonedDateTime.getMonth.getValue shouldBe 12
@@ -51,8 +49,8 @@ class TMTTimeHelperTest extends FunSuite with Matchers {
   // This test is sufficient to show code works in both Scala and Java
   // since UTCTime.atZone is used in both languages.
   test("should access parts of a remote time") {
-    val tmtTimeHelper = new TMTTimeHelper(UTCTime(instant))
-    val zonedDateTime = tmtTimeHelper.atZone(ZoneId.of("Asia/Kolkata"))
+    val utcTime       = UTCTime(instant)
+    val zonedDateTime = TMTTimeHelper.atZone(utcTime, ZoneId.of("Asia/Kolkata"))
 
     zonedDateTime.getYear shouldBe 2007
     zonedDateTime.getMonth.getValue shouldBe 12
@@ -61,5 +59,4 @@ class TMTTimeHelperTest extends FunSuite with Matchers {
     zonedDateTime.getMinute shouldBe 15 + 30 //with zone offset
     zonedDateTime.getSecond shouldBe 30
   }
-
 }
