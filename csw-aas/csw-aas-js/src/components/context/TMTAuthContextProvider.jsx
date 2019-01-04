@@ -25,7 +25,6 @@ class TMTAuthContextProvider extends React.Component {
     authenticated
       .success(() => {
         const tmtAuth = TMTAuth.from(keycloak)
-        console.log('**********instantiateAAS*********')
         this.setState({tmtAuth: tmtAuth, isAuthenticated: tmtAuth.isAuthenticated})
       })
       .error(() => {
@@ -34,14 +33,17 @@ class TMTAuthContextProvider extends React.Component {
   }
 
   login = async () => {
-    console.log('logging in')
+    console.log('login')
     const url = await TMTAuth.getAASUrl()
     await this.instantiateAAS({ url: url })
   }
 
-  logout = () => {
-    this.state.tmtAuth.logout()
-    this.setState({tmtAuth: null, isAuthenticated: false})
+  logout = async () => {
+    console.log('logout111')
+    const logoutPromise = await this.state.tmtAuth.logout()
+    logoutPromise.success(() => {
+      this.setState({tmtAuth: null, isAuthenticated: false})
+    })
   }
 }
 

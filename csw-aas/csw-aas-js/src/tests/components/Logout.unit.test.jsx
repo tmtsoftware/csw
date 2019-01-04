@@ -1,25 +1,30 @@
 import React from 'react'
 import { Logout } from '../../components/Logout'
-import Enzyme, { shallow } from 'enzyme'
+import Enzyme, { mount } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 
 describe('<Logout />', () => {
   Enzyme.configure({ adapter: new Adapter() })
 
-  it('should call logout', () => {
+  it('should call logout', async () => {
     const props = {
-      tmtAuth: {
-        logout: jest.fn(),
-      },
-      onLogout: jest.fn(),
-      history: {
-        push: jest.fn(),
-      },
+      isAuthenticated: true,
+      logout: jest.fn(),
     }
-    shallow(<Logout {...props} />)
 
-    expect(props.history.push).toHaveBeenCalledWith('/')
-    expect(props.tmtAuth.logout).toHaveBeenCalled()
-    expect(props.onLogout).toHaveBeenCalled()
+    const wrapper = await mount(<Logout {...props} />)
+
+    expect(wrapper.props().logout).toHaveBeenCalled()
+  })
+
+  it('should not call logout if un-authenticated', async () => {
+    const props = {
+      isAuthenticated: false,
+      logout: jest.fn(),
+    }
+
+    const wrapper = await mount(<Logout {...props} />)
+
+    expect(wrapper.props().logout).not.toHaveBeenCalled()
   })
 })

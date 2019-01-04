@@ -10,3 +10,13 @@ const defaultState = {
 const { Provider, Consumer } = React.createContext(defaultState)
 
 export { Provider, Consumer, defaultState }
+
+export const withContext = (Component) => {
+  return (props) => {
+    return <Consumer>
+      {({isAuthenticated, login, logout}) => {
+        return <Component {...props} isAuthenticated={isAuthenticated} login={login} logout={logout} />
+      }}
+    </Consumer>
+  }
+}

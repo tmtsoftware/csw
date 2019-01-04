@@ -1,12 +1,19 @@
 import React from 'react'
-import { Consumer } from './context/TMTAuthContextConsumer'
+import { withContext } from './context/TMTAuthContext'
+import PropTypes from 'prop-types'
 
-const Login = () => (
-  <Consumer>
-    { ({ login, isAuthenticated }) => (
-      isAuthenticated ? null : <button onClick={login}>Login</button>
-    )}
-  </Consumer>
-)
+export class Login extends React.Component {
+  componentWillMount = async () => {
+    await this.props.login()
+  }
 
-export default Login
+  render() {
+    return null
+  }
+}
+
+Login.propTypes = {
+  login: PropTypes.func,
+}
+
+export default withContext(Login)
