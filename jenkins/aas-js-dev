@@ -16,7 +16,7 @@ pipeline {
 
         stage('install') {
             steps {
-                sh "cd csw-aas/csw-aas-js && npm clean-install"
+                sh "cd csw-aas/csw-aas-js && npm install"
             }
         }
 
