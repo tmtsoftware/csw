@@ -17,7 +17,7 @@ pipeline {
 
         stage('publish') {
             steps {
-                sh "cd csw-aas/csw-aas-js-dev && npm publish"
+                sh "cd csw-aas/csw-aas-js && npm publish"
             }
         }
     }
@@ -56,5 +56,5 @@ def sendNotification(String buildStatus = 'STARTED') {
         )
     }
 
-    slackSend(channel: "#csw-build", color: colorCode, message: summary)
+    slackSend(channel: "#csw-prod-release", color: colorCode, message: summary)
 }
