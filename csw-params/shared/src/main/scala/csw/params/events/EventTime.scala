@@ -1,6 +1,6 @@
 package csw.params.events
 
-import csw.time.api.models.UTCTime
+import csw.time.api.models.{TMTTime, UTCTime}
 import play.api.libs.json._
 
 /**
@@ -22,6 +22,6 @@ object EventTime {
    */
   def apply(): EventTime = new EventTime(UTCTime.now())
 
-  implicit val reads: Reads[EventTime]   = implicitly[Reads[UTCTime]].map(EventTime.apply)
+  implicit val reads: Reads[EventTime]   = implicitly[Reads[TMTTime]].map(tmtTime => EventTime(tmtTime.asInstanceOf[UTCTime]))
   implicit val writes: Writes[EventTime] = Writes[EventTime](x ⇒ implicitly[Writes[UTCTime]].writes(x.time))
 }
