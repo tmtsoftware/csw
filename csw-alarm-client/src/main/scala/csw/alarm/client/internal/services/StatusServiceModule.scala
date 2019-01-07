@@ -75,7 +75,6 @@ trait StatusServiceModule extends StatusService {
   }
 
   private[alarm] def shelve(alarmKey: AlarmKey, shelveTimeout: String): Future[Done] = {
-    // Use the UTC timezone for the time-being. Once the time service is in place, it can query time service.
     val clock = Clock.systemUTC()
 
     val shelveTTLInSeconds = clock.untilNext(shelveTimeout).toScala.toSeconds

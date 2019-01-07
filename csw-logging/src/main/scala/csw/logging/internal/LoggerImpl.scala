@@ -28,7 +28,7 @@ private[csw] class LoggerImpl(maybeComponentName: Option[String], actorName: Opt
       ex: Throwable,
       sourceLocation: SourceLocation
   ): Unit = {
-    val time = Instant.now().toEpochMilli // The current time being written in logs. In future it has to be fetched from time service
+    val time = Instant.now().toEpochMilli
     MessageHandler.sendMsg(Log(maybeComponentName, level, id, time, actorName, msg, map, sourceLocation, ex))
   }
 

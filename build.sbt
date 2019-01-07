@@ -305,7 +305,7 @@ lazy val `csw-event-cli` = project
 
 /* ================= Alarm Service ============== */
 lazy val `csw-alarm-api` = project
-  .dependsOn(`csw-params-jvm`)
+  .dependsOn(`csw-params-jvm`, `csw-time-api-jvm`)
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(libraryDependencies ++= Dependencies.AlarmApi.value)
 
