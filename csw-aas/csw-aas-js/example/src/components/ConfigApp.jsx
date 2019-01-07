@@ -42,9 +42,6 @@ class ConfigApp extends React.Component {
             realmRole='example-admin-role'
             error={<ConfigError />}>
             <div>Example admin role specific functionality</div>
-            <div>Example admin role specific functionality</div>
-            <div>Example admin role specific functionality</div>
-            <div>Example admin role specific functionality</div>
           </RealmRole>
 
           <RealmRole realmRole='invalid-role'>
