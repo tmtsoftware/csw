@@ -40,7 +40,7 @@ pipeline {
 
         stage('example') {
             steps {
-                sh "cd csw-aas/csw-aas-js/example && npm clean-install && npm run build"
+                sh "cd csw-aas/csw-aas-js/example && npm install && npm run build"
             }
         }
     }
