@@ -33,13 +33,11 @@ class TMTAuthContextProvider extends React.Component {
   }
 
   login = async () => {
-    console.log('login')
     const url = await TMTAuth.getAASUrl()
     await this.instantiateAAS({ url: url })
   }
 
   logout = async () => {
-    console.log('logout111')
     const logoutPromise = await this.state.tmtAuth.logout()
     logoutPromise.success(() => {
       this.setState({tmtAuth: null, isAuthenticated: false})

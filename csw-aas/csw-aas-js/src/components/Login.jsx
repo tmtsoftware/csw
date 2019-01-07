@@ -3,7 +3,7 @@ import { withContext } from './context/TMTAuthContext'
 import PropTypes from 'prop-types'
 
 export class Login extends React.Component {
-  componentWillMount = async () => {
+  componentDidMount = async () => {
     await this.props.login()
   }
 
