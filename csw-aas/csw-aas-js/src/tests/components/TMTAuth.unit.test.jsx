@@ -2,8 +2,6 @@ import { TMTAuth } from '../../components/TMTAuth'
 import KeyCloak from 'keycloak-js'
 import { resolveAAS } from '../../components/AASResolver'
 
-jest.mock('isomorphic-fetch')
-
 jest.mock('keycloak-js')
 
 jest.mock('../../components/AASResolver')
