@@ -7,6 +7,7 @@ import csw.time.api.utils.TestProperties;
 import csw.time.api.utils.TestUtil;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.scalatest.junit.JUnitSuite;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -14,7 +15,7 @@ import java.time.Instant;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-public class JTMTTimeTest {
+public class JTMTTimeTest extends JUnitSuite {
 
     private static int TaiOffset = 37;
     private TestProperties testProperties = JTestProperties.instance();

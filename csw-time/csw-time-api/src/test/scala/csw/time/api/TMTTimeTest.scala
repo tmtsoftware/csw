@@ -2,9 +2,9 @@ package csw.time.api
 
 import java.time.{Duration, Instant}
 
-import csw.time.api.models.{TAITime, TMTTime, UTCTime}
-import org.scalatest.{BeforeAndAfterAll, FunSuite}
+import csw.time.api.models.{TAITime, UTCTime}
 import org.scalatest.Matchers._
+import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
 class TMTTimeTest extends FunSuite with BeforeAndAfterAll {
   private val TaiOffset = 37
