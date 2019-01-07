@@ -3,8 +3,6 @@ import { resolveAAS } from '../../components/AASResolver'
 
 jest.mock('isomorphic-fetch')
 
-jest.mock('keycloak-js')
-
 describe('<AASResolver />', () => {
   it('should resolveAAS', async () => {
     const mockResponse = {
