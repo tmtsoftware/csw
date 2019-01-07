@@ -1,6 +1,7 @@
 package csw.clock.natives.models
 
 import java.time.Instant
+import java.util.concurrent.atomic.AtomicInteger
 
 sealed trait TMTClock {
   def utcInstant: Instant
@@ -9,13 +10,15 @@ sealed trait TMTClock {
   def setTaiOffset(offset: Int): Unit
 }
 object TMTClock {
-  val clock: TMTClock = new DummyClock()
+  val clock: TMTClock = new NonLinuxClock()
 }
 
-class DummyClock extends TMTClock {
+class NonLinuxClock extends TMTClock {
+  private val internal_offset: AtomicInteger = new AtomicInteger(0)
 
-  override def offset: Int                      = 0
-  override def utcInstant: Instant              = Instant.now()
-  override def taiInstant: Instant              = Instant.now().plusSeconds(offset)
-  override def setTaiOffset(_offset: Int): Unit = ()
+  override def offset: Int         = internal_offset.get()
+  override def utcInstant: Instant = Instant.now()
+  override def taiInstant: Instant = Instant.now().plusSeconds(offset)
+  // This api is only for testing purpose and might not set offset value in one attempt in concurrent environment
+  override def setTaiOffset(_offset: Int): Unit = internal_offset.compareAndSet(offset, _offset)
 }

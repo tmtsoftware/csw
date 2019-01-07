@@ -372,7 +372,7 @@ lazy val `csw-time-api-jvm` = `csw-time-api`.jvm
 lazy val `csw-time-client` = project
   .in(file("csw-time/csw-time-client"))
   .dependsOn(
-    `csw-time-api-jvm`,
+    `csw-time-api-jvm` % "compile->compile;test->test",
     `csw-logging`
   )
   .settings(libraryDependencies ++= Dependencies.TimeClient.value)
