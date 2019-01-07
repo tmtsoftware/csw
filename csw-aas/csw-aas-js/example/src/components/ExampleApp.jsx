@@ -3,11 +3,11 @@ import { BrowserRouter, Route } from 'react-router-dom'
 import { CheckLogin, TMTAuthContextProvider, Login, Logout, RealmRole, ResourceRole } from 'csw-aas-js'
 import NavComponent from './NavComponent'
 import { AppConfig } from '../config/AppConfig'
-import WriteConfig from './WriteConfig'
-import ReadConfig from './ReadConfig'
-import ConfigError from './ConfigError'
+import Write from './Write'
+import Read from './Read'
+import ExampleError from './ExampleError'
 
-class ConfigApp extends React.Component {
+class ExampleApp extends React.Component {
   state = {
     authContext: {
       tmtAuth: null,
@@ -30,17 +30,17 @@ class ConfigApp extends React.Component {
                 path='/secured'
                 render={_ => (
                   <CheckLogin>
-                    <WriteConfig />
+                    <Write />
                   </CheckLogin>
                 )}
               />
 
-              <Route exact path='/public' component={ReadConfig} />
+              <Route exact path='/public' component={Read} />
             </div>
           </BrowserRouter>
           <RealmRole
             realmRole='example-admin-role'
-            error={<ConfigError />}>
+            error={<ExampleError />}>
             <div>Example admin role specific functionality</div>
           </RealmRole>
 
@@ -51,7 +51,7 @@ class ConfigApp extends React.Component {
           <ResourceRole
             resourceRole='person-role'
             resource='example-server'
-            error={<ConfigError />}>
+            error={<ExampleError />}>
             <div>Person role specific functionality</div>
           </ResourceRole>
 
@@ -65,4 +65,4 @@ class ConfigApp extends React.Component {
   }
 }
 
-export default ConfigApp
+export default ExampleApp

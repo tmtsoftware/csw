@@ -1,9 +1,9 @@
 import React from 'react'
 
-import ConfigApp from './components/ConfigApp'
+import ExampleApp from './components/ExampleApp'
 
 export default () => (
   <div>
-    <ConfigApp text='Modern React component module' />
+    <ExampleApp text='Modern React component module' />
   </div>
 )

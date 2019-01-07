@@ -1,6 +1,6 @@
 import React from 'react'
 
-class WriteConfig extends React.Component {
+class Write extends React.Component {
   state = { user: null }
 
   render() {
@@ -12,4 +12,4 @@ class WriteConfig extends React.Component {
   }
 }
 
-export default WriteConfig
+export default Write
