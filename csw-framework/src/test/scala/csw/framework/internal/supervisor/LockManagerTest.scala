@@ -12,8 +12,7 @@ import csw.params.core.models.{ObsId, Prefix}
 import csw.command.client.messages.CommandMessage.Submit
 import csw.logging.scaladsl.{Logger, LoggerFactory}
 import csw.params.commands.CommandResponse.SubmitResponse
-import org.mockito.Mockito.when
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
 // DEOPSCSW-222: Locking a component for a specific duration

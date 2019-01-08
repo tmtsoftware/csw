@@ -28,7 +28,7 @@ import csw.params.core.generics.Parameter
 import csw.params.core.models.{Id, ObsId, Prefix}
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import io.lettuce.core.RedisClient
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.MockitoSugar
 
 import scala.async.Async._
 import scala.concurrent.duration.DurationDouble

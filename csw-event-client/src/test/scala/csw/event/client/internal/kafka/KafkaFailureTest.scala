@@ -6,7 +6,7 @@ import csw.event.api.exceptions.PublishFailure
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.helpers.Utils
 import org.apache.kafka.common.errors.RecordTooLargeException
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.Future

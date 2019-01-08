@@ -7,7 +7,7 @@ import csw.command.client.messages.CommandResponseManagerMessage
 import csw.command.client.messages.CommandResponseManagerMessage._
 import csw.params.commands.CommandResponse.Completed
 import csw.params.core.models.Id
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationInt

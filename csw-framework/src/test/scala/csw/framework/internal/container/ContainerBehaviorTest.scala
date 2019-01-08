@@ -7,31 +7,26 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.{actor, Done}
-import csw.framework.ComponentInfos._
-import csw.framework.FrameworkTestMocks
-import csw.framework.internal.supervisor.SupervisorInfoFactory
+import csw.alarm.client.AlarmServiceFactory
 import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.command.client.messages.ContainerIdleMessage.SupervisorsCreated
 import csw.command.client.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.Restart
+import csw.command.client.messages.{ComponentMessage, ContainerActorMessage, ContainerIdleMessage}
 import csw.command.client.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.command.client.models.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState, _}
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.scaladsl.LocationService
-import csw.params.core.models.Prefix
-import csw.command.client.messages.{ComponentMessage, ContainerActorMessage, ContainerIdleMessage}
-import csw.alarm.client.AlarmServiceFactory
 import csw.event.client.EventServiceFactory
+import csw.framework.ComponentInfos._
+import csw.framework.FrameworkTestMocks
+import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.scaladsl.RegistrationFactory
-import csw.location.api.models.AkkaRegistration
-import csw.location.api.models.RegistrationResult
+import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{AkkaRegistration, RegistrationResult}
+import csw.location.api.scaladsl.LocationService
 import csw.location.client.ActorSystemFactory
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito._
-import org.mockito.invocation.InvocationOnMock
-import org.mockito.stubbing.Answer
-import org.scalatest.mockito.MockitoSugar
+import csw.params.core.models.Prefix
+import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.{Future, Promise}
@@ -39,7 +34,7 @@ import scala.util.Success
 
 //DEOPSCSW-182-Control Life Cycle of Components
 //DEOPSCSW-216-Locate and connect components to send AKKA commands
-class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
+class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar with ArgumentMatchersSugar {
   implicit val untypedSystem: actor.ActorSystem  = ActorSystemFactory.remote()
   implicit val typedSystem: ActorSystem[Nothing] = untypedSystem.toTyped
   implicit val settings: TestKitSettings         = TestKitSettings(typedSystem)
@@ -56,23 +51,13 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     var componentProbes: Set[TestProbe[ComponentMessage]] = Set.empty
     val supervisorInfoFactory: SupervisorInfoFactory      = mock[SupervisorInfoFactory]
 
-    private lazy val answer = new Answer[Future[Option[SupervisorInfo]]] {
+    private def answer(ci: ComponentInfo): Future[Some[SupervisorInfo]] = {
+      val componentProbe: TestProbe[ComponentMessage] = TestProbe(ci.name)
+      val supervisorInfo                              = SupervisorInfo(untypedSystem, Component(componentProbe.ref, ci))
 
-      override def answer(invocation: InvocationOnMock): Future[Option[SupervisorInfo]] = {
-        val componentInfo = invocation.getArgument[ComponentInfo](1)
-
-        val componentProbe: TestProbe[ComponentMessage] = TestProbe(componentInfo.name)
-        val supervisorInfo = SupervisorInfo(
-          untypedSystem,
-          Component(
-            componentProbe.ref,
-            componentInfo
-          )
-        )
-        supervisorInfos += supervisorInfo
-        componentProbes += componentProbe
-        Future.successful(Some(supervisorInfo))
-      }
+      supervisorInfos += SupervisorInfo(untypedSystem, Component(componentProbe.ref, ci))
+      componentProbes += componentProbe
+      Future.successful(Some(supervisorInfo))
     }
 
     when(
@@ -85,7 +70,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
           any[AlarmServiceFactory],
           any[RegistrationFactory]
         )
-    ).thenAnswer(answer)
+    ).thenAnswer((_: ActorRef[ContainerIdleMessage], ci: ComponentInfo) => answer(ci))
 
     private val registrationFactory: RegistrationFactory = mock[RegistrationFactory]
     when(registrationFactory.akkaTyped(any[AkkaConnection], any[Prefix], any[ActorRef[_]]))

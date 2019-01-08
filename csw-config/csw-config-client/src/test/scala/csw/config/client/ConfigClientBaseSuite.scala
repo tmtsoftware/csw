@@ -4,7 +4,7 @@ import akka.actor.CoordinatedShutdown.UnknownReason
 import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.config.server.mocks.MockedAuthentication
 import csw.location.server.internal.ServerWiring
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.MockitoSugar
 import org.scalatest._
 
 trait ConfigClientBaseSuite

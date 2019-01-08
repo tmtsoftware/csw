@@ -20,7 +20,7 @@ object Dependencies {
       Libs.`scala-java8-compat`,
       Enumeratum.`enumeratum`.value,
       Libs.`scalatest`.value % Test,
-      Libs.`mockito-core`    % Test
+      Libs.`mockito-scala`   % Test
     )
   )
 
@@ -45,7 +45,7 @@ object Dependencies {
       Libs.`scalatest`.value         % Test,
       Libs.`junit`                   % Test,
       Libs.`junit-interface`         % Test,
-      Libs.`mockito-core`            % Test,
+      Libs.`mockito-scala`           % Test,
       Akka.`akka-stream-testkit`     % Test,
       Akka.`akka-multi-node-testkit` % Test
     )
@@ -99,7 +99,7 @@ object Dependencies {
       Libs.`scalatest`.value         % Test,
       Libs.`junit`                   % Test,
       Libs.`junit-interface`         % Test,
-      Libs.`mockito-core`            % Test,
+      Libs.`mockito-scala`           % Test,
       Akka.`akka-multi-node-testkit` % Test,
       Akka.`akka-stream-testkit`     % Test
     )
@@ -160,7 +160,7 @@ object Dependencies {
       Libs.`scalatest`.value          % Test,
       Libs.`junit`                    % Test,
       Libs.`junit-interface`          % Test,
-      Libs.`mockito-core`             % Test
+      Libs.`mockito-scala`            % Test
     )
   )
 
@@ -174,7 +174,7 @@ object Dependencies {
       Libs.`scalatest`.value          % Test,
       Libs.`junit`                    % Test,
       Libs.`junit-interface`          % Test,
-      Libs.`mockito-core`             % Test
+      Libs.`mockito-scala`            % Test
     )
   )
 
@@ -197,7 +197,7 @@ object Dependencies {
       Libs.`scalatest`.value          % Test,
       Libs.`junit`                    % Test,
       Libs.`junit-interface`          % Test,
-      Libs.`mockito-core`             % Test,
+      Libs.`mockito-scala`            % Test,
       Libs.`embedded-redis`           % Test,
       Libs.`scalatest-embedded-kafka` % Test,
       Akka.`akka-multi-node-testkit`  % Test,
@@ -240,7 +240,7 @@ object Dependencies {
       Libs.`junit`           % Test,
       Libs.`junit-interface` % Test,
       Libs.`scalatest`.value % Test,
-      Libs.`mockito-core`    % Test
+      Libs.`mockito-scala`   % Test
     )
   )
 
@@ -260,7 +260,7 @@ object Dependencies {
       Libs.`embedded-redis`,
       Libs.`junit`,
       Libs.`junit-interface`,
-      Libs.`mockito-core`
+      Libs.`mockito-scala`
     )
   )
 
@@ -316,7 +316,7 @@ object Dependencies {
       Libs.`jboss-logging`,
       Libs.httpclient,
       Libs.`scalatest`.value % Test,
-      Libs.`mockito-core`    % Test
+      Libs.`mockito-scala`   % Test,
     )
   )
 
@@ -334,7 +334,7 @@ object Dependencies {
       Libs.`jboss-logging`,
       Libs.httpclient,
       Libs.`scalatest`.value % Test,
-      Libs.`mockito-core`    % Test
+      Libs.`mockito-scala`   % Test,
     )
   )
 
@@ -344,7 +344,7 @@ object Dependencies {
       Akka.`akka-stream`,
       Libs.`scalatest`.value       % Test,
       AkkaHttp.`akka-http-testkit` % Test,
-      Libs.`mockito-core`,
+      Libs.`mockito-scala`         % Test,
       //Libs.`play-json`,
       Libs.`play-json-derived-codecs`.value % Test,
       Libs.`akka-http-play-json`            % Test,
@@ -366,7 +366,7 @@ object Dependencies {
   val NetworkUtils = Def.setting(
     Seq(
       Libs.`scalatest`.value % Test,
-      Libs.`mockito-core`    % Test
+      Libs.`mockito-scala`   % Test
     )
   )
 

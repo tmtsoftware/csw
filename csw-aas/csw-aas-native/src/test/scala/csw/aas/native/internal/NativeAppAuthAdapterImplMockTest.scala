@@ -8,13 +8,12 @@ import csw.aas.native.scaladsl.FileAuthStore
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.adapters.installed.KeycloakInstalled
 import org.keycloak.representations.AccessTokenResponse
-import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
-import scala.concurrent.duration.DurationInt
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.concurrent.duration.DurationInt
 import scala.language.implicitConversions
 
 //DEOPSCSW-575: Client Library for AAS to be accessed by CSW cli apps
@@ -117,7 +116,7 @@ class NativeAppAuthAdapterImplMockTest extends FunSuite with MockitoSugar with M
     import mocks._
 
     when(tokenVerifier.verifyAndDecode(accessTokenStr)).thenReturn(Left(TokenExpired))
-    when(store.getAccessTokenString).thenReturn(Some(accessTokenStr)).thenReturn(Some(refreshedAccessTokenStr))
+    when(store.getAccessTokenString).thenReturn(Some(accessTokenStr)).andThen(Some(refreshedAccessTokenStr))
 
     authService.getAccessToken() shouldBe Some(refreshedAccessToken)
 
@@ -136,7 +135,7 @@ class NativeAppAuthAdapterImplMockTest extends FunSuite with MockitoSugar with M
     val tokenExp          = (System.currentTimeMillis() / 1000) + maxTokenValidity
 
     when(tokenVerifier.verifyAndDecode(accessTokenStr)).thenReturn(Right(AccessToken(exp = Some(tokenExp))))
-    when(store.getAccessTokenString).thenReturn(Some(accessTokenStr)).thenReturn(Some(refreshedAccessTokenStr))
+    when(store.getAccessTokenString).thenReturn(Some(accessTokenStr)).andThen(Some(refreshedAccessTokenStr))
 
     authService.getAccessToken(minValidityNeeded.seconds) shouldBe Some(refreshedAccessToken)
 

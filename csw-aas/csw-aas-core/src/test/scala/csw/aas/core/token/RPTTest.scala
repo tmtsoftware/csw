@@ -4,16 +4,15 @@ import csw.aas.core.token.claims.{Access, Audience, Authorization, Permission}
 import org.keycloak.authorization.client.resource.AuthorizationResource
 import org.keycloak.authorization.client.{AuthorizationDeniedException, AuthzClient}
 import org.keycloak.representations.idm.authorization.AuthorizationResponse
-import org.mockito.Mockito.when
+import org.mockito.MockitoSugar
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
 import org.scalatest.time.{Seconds, Span}
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Await
-import scala.concurrent.duration.DurationDouble
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.DurationDouble
 
 // DEOPSCSW-578: Programming Interface for accessing userinfo
 class RPTTest extends FunSuite with MockitoSugar with Matchers with ScalaFutures {

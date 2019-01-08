@@ -103,7 +103,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
     supervisorBehaviorKit.run(Running(childRef))
 
-    verify(locationService, never()).register(akkaRegistration)
+    verify(locationService, never).register(akkaRegistration)
     verify(timerScheduler).cancel(SupervisorBehavior.InitializeTimerKey)
     supervisorBehaviorKit.run(RegistrationNotRequired(childRef))
 

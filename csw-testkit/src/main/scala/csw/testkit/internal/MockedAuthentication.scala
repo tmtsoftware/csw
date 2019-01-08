@@ -7,8 +7,7 @@ import csw.aas.core.token.AccessToken
 import csw.aas.http.{Authentication, SecurityDirectives}
 import csw.config.api.TokenFactory
 import org.keycloak.adapters.KeycloakDeployment
-import org.mockito.Mockito.when
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.MockitoSugar
 
 import scala.concurrent.Future
 

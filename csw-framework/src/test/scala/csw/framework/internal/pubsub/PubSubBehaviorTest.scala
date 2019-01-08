@@ -13,7 +13,7 @@ import csw.location.client.ActorSystemFactory
 import csw.logging.scaladsl.Logger
 import csw.params.core.models.Prefix
 import csw.params.core.states.{CurrentState, StateName}
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.Await

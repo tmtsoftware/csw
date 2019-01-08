@@ -8,8 +8,7 @@ import csw.aas.core.utils.Conversions.RichEitherTFuture
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.exceptions.{TokenNotActiveException, TokenSignatureInvalidException}
 import org.keycloak.representations.{AccessToken ⇒ KeycloakAccessToken}
-import org.mockito.Mockito.when
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.MockitoSugar
 import org.scalatest.{EitherValues, FunSuite, Matchers}
 
 import scala.concurrent.ExecutionContext.Implicits.global

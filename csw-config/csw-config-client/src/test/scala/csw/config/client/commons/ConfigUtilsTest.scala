@@ -8,8 +8,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import csw.config.api.exceptions.{LocalFileNotFound, UnableToParseOptions}
 import csw.config.api.models.ConfigData
 import csw.config.api.scaladsl.ConfigClientService
-import org.mockito.Mockito.when
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationDouble

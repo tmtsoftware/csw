@@ -11,8 +11,7 @@ import csw.common.extensions.CswContextExtensions.RichCswContext
 import csw.framework.ComponentInfos._
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import org.mockito.ArgumentMatchers
-import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.MockitoSugar
 
 import scala.collection.immutable
 import scala.concurrent.duration.FiniteDuration
@@ -25,7 +24,7 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
   val containerIdleMessageProbe: TestProbe[ContainerIdleMessage] = TestProbe[ContainerIdleMessage]
   private val timerScheduler                                     = mock[TimerScheduler[SupervisorMessage]]
 
-  doNothing()
+  doNothing
     .when(timerScheduler)
     .startSingleTimer(
       ArgumentMatchers.eq(SupervisorBehavior.InitializeTimerKey),
@@ -33,7 +32,7 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
       ArgumentMatchers.any[FiniteDuration]
     )
 
-  doNothing().when(timerScheduler).cancel(eq(SupervisorBehavior.InitializeTimerKey))
+  doNothing.when(timerScheduler).cancel(eq(SupervisorBehavior.InitializeTimerKey))
 
   val supervisorBehavior: Behavior[ComponentMessage] = createBehavior(timerScheduler)
   val componentTLAName                               = s"${hcdInfo.name}-${SupervisorBehavior.ComponentActorNameSuffix}"

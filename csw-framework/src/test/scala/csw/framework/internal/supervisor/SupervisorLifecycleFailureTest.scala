@@ -33,8 +33,6 @@ import csw.logging.internal.LoggingLevels.ERROR
 import csw.logging.internal.LoggingSystem
 import csw.logging.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse.SubmitResponse
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito._
 import org.mockito.stubbing.Answer
 import org.scalatest.BeforeAndAfterEach
 
@@ -121,7 +119,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
     // On receiving Restart message the supervisor first unregisters itself. But in the case of initialization failures
     // it never registers itself and thus never unregisters as well on receiving Restart message.
-    verify(registrationResult, never()).unregister()
+    verify(registrationResult, never).unregister()
   }
 
   test("handle TLA failure with FailureRestart exception in initialize") {
@@ -241,13 +239,13 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     createAnswers(compStateProbe)
 
     val componentHandlers = mock[ComponentHandlers]
-    when(componentHandlers.initialize()).thenAnswer(initializeAnswer)
-    when(componentHandlers.onShutdown()).thenAnswer(shutdownAnswer)
+    when(componentHandlers.initialize()).thenAnswer(initializeAnswer.answer(_))
+    when(componentHandlers.onShutdown()).thenAnswer(shutdownAnswer.answer(_))
     componentHandlers
   }
 
   private def createAnswers(compStateProbe: TestProbe[CurrentState]): Unit = {
-    initializeAnswer = (_) ⇒
+    initializeAnswer = _ ⇒
       Future {
         // small sleep is required in order for test probe to subscribe for component state and lifecycle state
         // before component actually gets initialized
@@ -255,7 +253,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
         compStateProbe.ref ! CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice)))
     }
 
-    shutdownAnswer = (_) ⇒
+    shutdownAnswer = _ ⇒
       Future.successful(compStateProbe.ref ! CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
   }
 }

@@ -25,8 +25,6 @@ import csw.command.client.messages.ContainerIdleMessage
 import csw.command.client.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.Restart
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.prop.Tables.Table
@@ -52,7 +50,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
   test("onInitialized and onRun hooks of comp handlers should be invoked when supervisor creates comp") {
 
-    forAll(testData) { (info: ComponentInfo) =>
+    forAll(testData) { info: ComponentInfo =>
       {
         val mocks = frameworkTestMocks()
         import mocks._
@@ -168,7 +166,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-293: Sanitise handlers in Component Handlers
   // DEOPSCSW-306: Include runId in Command response
   test("onOneway hook should be invoked and command validation should be successful on receiving Observe config") {
-    forAll(testData) { (info: ComponentInfo) =>
+    forAll(testData) { info: ComponentInfo =>
       {
         val mocks = frameworkTestMocks()
         import mocks._
@@ -241,7 +239,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-206: Sender to know that Submit configuration command's validation failed
   // DEOPSCSW-214: Sender to know that oneway configuration command's validation failed
   test("component handler should be able to validate a Setup or Observe command as failure during validation") {
-    forAll(testData) { (info: ComponentInfo) ⇒
+    forAll(testData) { info: ComponentInfo ⇒
       {
         val mocks                                          = frameworkTestMocks()
         val submitResponseProbe: TestProbe[SubmitResponse] = TestProbe[SubmitResponse]
@@ -270,7 +268,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   }
 
   test("onGoOffline and goOnline hooks of comp handlers should be invoked when supervisor receives Lifecycle messages") {
-    forAll(testData) { (info: ComponentInfo) =>
+    forAll(testData) { info: ComponentInfo =>
       {
         val mocks = frameworkTestMocks()
         import mocks._
@@ -298,7 +296,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   }
 
   test("should invoke onShutdown hook when supervisor restarts component using Restart external message") {
-    forAll(testData) { (info: ComponentInfo) =>
+    forAll(testData) { info: ComponentInfo =>
       {
         val mocks = frameworkTestMocks()
         import mocks._
@@ -327,7 +325,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   }
 
   test("running component should ignore RunOnline lifecycle message when it is already online") {
-    forAll(testData) { (info: ComponentInfo) =>
+    forAll(testData) { info: ComponentInfo =>
       {
         val mocks = frameworkTestMocks()
         import mocks._
@@ -346,7 +344,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   }
 
   test("running component should ignore RunOffline lifecycle message when it is already offline") {
-    forAll(testData) { (info: ComponentInfo) =>
+    forAll(testData) { info: ComponentInfo =>
       {
         val mocks = frameworkTestMocks()
         import mocks._
@@ -380,7 +378,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
       jHcdInfoWithInitializeTimeout
     )
 
-    forAll(testData) { (info: ComponentInfo) =>
+    forAll(testData) { info: ComponentInfo =>
       {
         val mocks = frameworkTestMocks()
         import mocks._
@@ -394,7 +392,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
         supervisorRef ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
         supervisorLifecycleStateProbe.expectMessage(SupervisorLifecycleState.Idle)
-        verify(locationService, never()).register(akkaRegistration)
+        verify(locationService, never).register(akkaRegistration)
       }
     }
   }

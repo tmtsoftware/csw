@@ -9,9 +9,8 @@ import csw.command.client.messages.{CommandResponseManagerMessage, FromComponent
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{ComponentInfos, CurrentStatePublisher, FrameworkTestSuite}
-import org.mockito.Mockito._
+import org.mockito.MockitoSugar
 import org.scalatest.Matchers
-import org.scalatest.mockito.MockitoSugar
 
 import scala.concurrent.Future
 

@@ -8,8 +8,7 @@ import akka.http.scaladsl.server.{Directives, Route}
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import csw.aas.core.token.AccessToken
 import csw.aas.http.AuthorizationPolicy.{CustomPolicy, PermissionPolicy, RealmRolePolicy, ResourceRolePolicy}
-import org.mockito.Mockito.when
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.Future

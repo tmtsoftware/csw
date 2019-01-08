@@ -22,7 +22,7 @@ import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, StateName}
 import io.lettuce.core.RedisClient
 import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.MockitoSugar
 
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, ExecutionContextExecutor, Future}

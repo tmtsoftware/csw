@@ -16,7 +16,7 @@ import csw.alarm.client.internal.redis.RedisConnectionsFactory
 import csw.commons.redis.EmbeddedRedis
 import csw.network.utils.SocketUtils.getFreePort
 import io.lettuce.core.RedisClient
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 import romaine.RomaineFactory
 import romaine.async.RedisAsyncApi

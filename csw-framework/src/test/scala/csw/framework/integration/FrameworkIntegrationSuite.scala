@@ -5,7 +5,7 @@ import csw.framework.FrameworkTestWiring
 import csw.location.server.internal.ServerWiring
 import org.scalatest._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.MockitoSugar
 
 trait FrameworkIntegrationSuite
     extends FunSuite

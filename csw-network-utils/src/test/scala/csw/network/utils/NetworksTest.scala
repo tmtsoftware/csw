@@ -4,8 +4,7 @@ import java.net.{InetAddress, NetworkInterface}
 
 import csw.network.utils.exceptions.NetworkInterfaceNotFound
 import csw.network.utils.internal.NetworkInterfaceProvider
-import org.mockito.Mockito.when
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.collection.JavaConverters.enumerationAsScalaIteratorConverter

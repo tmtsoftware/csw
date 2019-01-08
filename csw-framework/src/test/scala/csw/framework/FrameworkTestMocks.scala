@@ -24,13 +24,13 @@ import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.core.models.Prefix
 import csw.params.core.states.CurrentState
 import csw.time.api.TimeServiceScheduler
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{when, _}
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import scala.concurrent.Future
 
-class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: ActorSystem[Nothing]) extends MockitoSugar {
+class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: ActorSystem[Nothing])
+    extends MockitoSugar
+    with ArgumentMatchersSugar {
 
   ///////////////////////////////////////////////
   val testActor: ActorRef[Any]                   = testkit.TestProbe("test-probe").testActor
@@ -47,7 +47,7 @@ class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: Acto
     .thenReturn(akkaRegistration)
   when(locationService.register(akkaRegistration)).thenReturn(Future.successful(registrationResult))
   when(locationService.unregister(any[AkkaConnection])).thenReturn(Future.successful(Done))
-  when(eventServiceFactory.make(any[LocationService]())(any[actor.ActorSystem]())).thenReturn(eventService)
+  when(eventServiceFactory.make(any[LocationService])(any[actor.ActorSystem])).thenReturn(eventService)
   when(eventService.executionContext).thenReturn(untypedSystem.dispatcher)
   ///////////////////////////////////////////////
 
@@ -55,7 +55,7 @@ class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: Acto
   val commandResponseManager: CommandResponseManager                        = mock[CommandResponseManager]
 
   when(commandResponseManager.commandResponseManagerActor).thenReturn(commandResponseManagerActor.ref)
-  doNothing().when(commandResponseManager).addOrUpdateCommand(any[SubmitResponse])
+  doNothing.when(commandResponseManager).addOrUpdateCommand(any[SubmitResponse])
 
   val lifecycleStateProbe: TestProbe[LifecycleStateChanged] = TestProbe[LifecycleStateChanged]
   val compStateProbe: TestProbe[CurrentState]               = TestProbe[CurrentState]

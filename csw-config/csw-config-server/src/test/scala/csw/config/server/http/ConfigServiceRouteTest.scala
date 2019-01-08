@@ -12,8 +12,7 @@ import csw.config.server.ServerWiring
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.mocks.MockedAuthentication
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
-import org.mockito.Mockito.when
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.collection.mutable.ArrayBuffer
@@ -322,11 +321,11 @@ class ConfigServiceRouteTest
 
     when(validToken.preferred_username)
       .thenReturn(Some(bilal))
-      .thenReturn(Some(poorva))
+      .andThen(Some(poorva))
 
     when(validToken.userOrClientName)
       .thenReturn(bilal)
-      .thenReturn(poorva)
+      .andThen(poorva)
 
     // consumes 2 revisions, one for actual file one for active file
     // first request will use username=bilal
@@ -542,13 +541,13 @@ class ConfigServiceRouteTest
 
     when(validToken.preferred_username)
       .thenReturn(Some(bilal))
-      .thenReturn(Some(poorva))
-      .thenReturn(Some(shubham))
+      .andThen(Some(poorva))
+      .andThen(Some(shubham))
 
     when(validToken.userOrClientName)
       .thenReturn(bilal)
-      .thenReturn(poorva)
-      .thenReturn(shubham)
+      .andThen(poorva)
+      .andThen(shubham)
 
     //consumes 2 revisions, one for actual file one for active file
     // first request will use username=bilal

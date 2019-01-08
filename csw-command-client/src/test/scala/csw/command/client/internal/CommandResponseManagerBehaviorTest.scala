@@ -12,16 +12,14 @@ import csw.command.client.messages.CommandResponseManagerMessage._
 import csw.logging.scaladsl.{Logger, LoggerFactory}
 import csw.params.commands.CommandResponse._
 import csw.params.core.models.Id
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationDouble
 
 // DEOPSCSW-207: Report on Configuration Command Completion
 // DEOPSCSW-208: Report failure on Configuration Completion command
-class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
+class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with MockitoSugar with ArgumentMatchersSugar {
 
   private val actorSystem                        = ActorSystem("test-command-status-service-system")
   implicit val typedSystem: typed.ActorSystem[_] = actorSystem.toTyped
