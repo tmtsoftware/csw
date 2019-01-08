@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        label 'master'
+        label 'JenkinsNode1'
     }
 
     options {
@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('checkout') {
             steps {
-                git 'git@github.com:tmtsoftware/csw.git'
+                git 'https://github.com/tmtsoftware/csw.git'
             }
         }
 

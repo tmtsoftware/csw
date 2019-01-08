@@ -4,15 +4,13 @@ import { Consumer } from '../context/TMTAuthContext'
 
 const CheckLogin = ({ children, error }) => (
   <Consumer>
-    { ({isAuthenticated}) => (
-      isAuthenticated ? children : error)
-    }
+    {({ isAuthenticated }) => (isAuthenticated ? children : error)}
   </Consumer>
 )
 
 CheckLogin.propTypes = {
   children: PropTypes.node,
-  error: PropTypes.node
+  error: PropTypes.node,
 }
 
 export default CheckLogin

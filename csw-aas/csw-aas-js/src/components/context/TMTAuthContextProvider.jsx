@@ -10,11 +10,7 @@ class TMTAuthContextProvider extends React.Component {
   }
 
   render() {
-    return (
-      <Provider value={this.state}>
-        { this.props.children }
-      </Provider>
-    )
+    return <Provider value={this.state}>{this.props.children}</Provider>
   }
 
   instantiateAAS = async url => {
@@ -25,10 +21,13 @@ class TMTAuthContextProvider extends React.Component {
     authenticated
       .success(() => {
         const tmtAuth = TMTAuth.from(keycloak)
-        this.setState({tmtAuth: tmtAuth, isAuthenticated: tmtAuth.isAuthenticated})
+        this.setState({
+          tmtAuth: tmtAuth,
+          isAuthenticated: tmtAuth.isAuthenticated,
+        })
       })
       .error(() => {
-        this.setState({tmtAuth: null, isAuthenticated: false})
+        this.setState({ tmtAuth: null, isAuthenticated: false })
       })
   }
 
@@ -40,14 +39,14 @@ class TMTAuthContextProvider extends React.Component {
   logout = async () => {
     const logoutPromise = await this.state.tmtAuth.logout()
     logoutPromise.success(() => {
-      this.setState({tmtAuth: null, isAuthenticated: false})
+      this.setState({ tmtAuth: null, isAuthenticated: false })
     })
   }
 }
 
 TMTAuthContextProvider.propTypes = {
   config: PropTypes.object,
-  children: PropTypes.node
+  children: PropTypes.node,
 }
 
 export default TMTAuthContextProvider

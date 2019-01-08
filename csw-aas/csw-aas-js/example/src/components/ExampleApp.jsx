@@ -1,6 +1,13 @@
 import React from 'react'
 import { BrowserRouter, Route } from 'react-router-dom'
-import { CheckLogin, TMTAuthContextProvider, Login, Logout, RealmRole, ResourceRole } from 'csw-aas-js'
+import {
+  CheckLogin,
+  TMTAuthContextProvider,
+  Login,
+  Logout,
+  RealmRole,
+  ResourceRole,
+} from 'csw-aas-js'
 import NavComponent from './NavComponent'
 import { AppConfig } from '../config/AppConfig'
 import Write from './Write'
@@ -38,9 +45,7 @@ class ExampleApp extends React.Component {
               <Route exact path='/public' component={Read} />
             </div>
           </BrowserRouter>
-          <RealmRole
-            realmRole='example-admin-role'
-            error={<ExampleError />}>
+          <RealmRole realmRole='example-admin-role' error={<ExampleError />}>
             <div>Example admin role specific functionality</div>
           </RealmRole>
 
@@ -55,8 +60,7 @@ class ExampleApp extends React.Component {
             <div>Person role specific functionality</div>
           </ResourceRole>
 
-          <ResourceRole
-            resourceRole='invalid-role'>
+          <ResourceRole resourceRole='invalid-role'>
             <div>Hello you authenticated for invalid-role</div>
           </ResourceRole>
         </TMTAuthContextProvider>

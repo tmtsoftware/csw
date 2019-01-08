@@ -4,11 +4,7 @@ class Write extends React.Component {
   state = { user: null }
 
   render() {
-    return (
-      <div>
-        Secured functionality - Writing Config
-      </div>
-    )
+    return <div>Secured functionality - Writing Config</div>
   }
 }
 

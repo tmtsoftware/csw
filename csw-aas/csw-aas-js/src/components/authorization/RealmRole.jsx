@@ -4,8 +4,8 @@ import { Consumer } from '../context/TMTAuthContext'
 
 const RealmRole = ({ realmRole, children, error }) => (
   <Consumer>
-    { ({tmtAuth, isAuthenticated}) => (
-      isAuthenticated && tmtAuth.hasRealmRole(realmRole) ? children : error)
+    {({ tmtAuth, isAuthenticated }) =>
+      isAuthenticated && tmtAuth.hasRealmRole(realmRole) ? children : error
     }
   </Consumer>
 )
@@ -13,7 +13,7 @@ const RealmRole = ({ realmRole, children, error }) => (
 RealmRole.propTypes = {
   realmRole: PropTypes.string.isRequired,
   children: PropTypes.node,
-  error: PropTypes.node
+  error: PropTypes.node,
 }
 
 export default RealmRole

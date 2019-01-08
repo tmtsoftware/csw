@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('checkout') {
             steps {
-                git 'git@github.com:tmtsoftware/csw.git'
+                git 'https://github.com/tmtsoftware/csw.git'
             }
         }
 
