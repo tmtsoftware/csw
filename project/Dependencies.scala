@@ -84,6 +84,7 @@ object Dependencies {
   val ConfigServer = Def.setting(
     Seq(
       AkkaHttp.`akka-http`,
+      AkkaHttp.`akka-http-cors`,
       Libs.svnkit,
       Libs.`scopt`,
       Libs.`scalatest`.value       % Test,

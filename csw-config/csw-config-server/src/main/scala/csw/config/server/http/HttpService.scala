@@ -62,7 +62,7 @@ class HttpService(
 
   private def bind() = Http().bindAndHandle(
     handler = configServiceRoute.route,
-    interface = Networks().hostname,
+    interface = "0.0.0.0",
     port = settings.`service-port`
   )
 

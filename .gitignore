@@ -28,6 +28,7 @@ csw-aas/csw-aas-js/node_modules/*
 csw-aas/csw-aas-js/example/node_modules/*
 csw-aas/csw-aas-js/example/build/*
 csw-aas/csw-aas-js/coverage/*
+csw-aas/csw-aas-js/config/node_modules/*
 .package-lock.json
 
 # hidden cross project folders
