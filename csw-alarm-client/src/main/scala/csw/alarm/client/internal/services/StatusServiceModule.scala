@@ -17,6 +17,7 @@ import csw.alarm.client.internal.commons.Settings
 import csw.alarm.client.internal.extensions.TimeExtensions.RichClock
 import csw.alarm.client.internal.models.Alarm
 import csw.alarm.client.internal.redis.RedisConnectionsFactory
+import csw.time.api.models.UTCTime
 
 import scala.async.Async.{async, await}
 import scala.compat.java8.DurationConverters.DurationOps
@@ -37,7 +38,7 @@ trait StatusServiceModule extends StatusService {
     val ackStatusF: Future[Option[AcknowledgementStatus]]   = ackStatusApi.get(alarmKey)
     val latchedSeverityF: Future[Option[FullAlarmSeverity]] = latchedSeverityApi.get(alarmKey)
     val shelveStatusF: Future[ShelveStatus]                 = getShelveStatus(alarmKey)
-    val alarmTimeF: Future[Option[AlarmTime]]               = alarmTimeApi.get(alarmKey)
+    val alarmTimeF: Future[Option[UTCTime]]                 = alarmTimeApi.get(alarmKey)
 
     val defaultAlarmStatus = AlarmStatus()
     AlarmStatus(
@@ -132,7 +133,7 @@ trait StatusServiceModule extends StatusService {
        * @return updated AlarmStatus
        */
       def updateTime(): AlarmStatus =
-        if (originalHeartbeatSeverity != severity) targetAlarmStatus.copy(alarmTime = AlarmTime())
+        if (originalHeartbeatSeverity != severity) targetAlarmStatus.copy(alarmTime = UTCTime.now())
         else targetAlarmStatus
 
       /**

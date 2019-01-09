@@ -3,6 +3,7 @@ package csw.alarm.client.internal.redis
 import csw.alarm.api.internal._
 import csw.alarm.api.models._
 import csw.alarm.client.internal.commons.serviceresolver.AlarmServiceResolver
+import csw.time.api.models.UTCTime
 import io.lettuce.core.RedisURI
 import romaine.RomaineFactory
 import romaine.async.RedisAsyncApi
@@ -20,7 +21,7 @@ class RedisConnectionsFactory(alarmServiceResolver: AlarmServiceResolver, master
   lazy val metadataApi: RedisAsyncApi[MetadataKey, AlarmMetadata]                   = asyncApi
   lazy val severityApi: RedisAsyncApi[SeverityKey, FullAlarmSeverity]               = asyncApi
   lazy val latchedSeverityApi: RedisAsyncApi[LatchedSeverityKey, FullAlarmSeverity] = asyncApi
-  lazy val alarmTimeApi: RedisAsyncApi[AlarmTimeKey, AlarmTime]                     = asyncApi
+  lazy val alarmTimeApi: RedisAsyncApi[AlarmTimeKey, UTCTime]                       = asyncApi
   lazy val ackStatusApi: RedisAsyncApi[AckStatusKey, AcknowledgementStatus]         = asyncApi
   lazy val shelveStatusApi: RedisAsyncApi[ShelveStatusKey, ShelveStatus]            = asyncApi
 

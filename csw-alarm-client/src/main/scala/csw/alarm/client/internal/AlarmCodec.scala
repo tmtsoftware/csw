@@ -2,6 +2,7 @@ package csw.alarm.client.internal
 
 import csw.alarm.api.internal._
 import csw.alarm.api.models._
+import csw.time.api.models.UTCTime
 import play.api.libs.json.{Format, Json}
 import romaine.codec.RomaineStringCodec
 
@@ -24,7 +25,7 @@ object AlarmCodec extends AlarmJsonSupport {
   //value codecs
   implicit val metadataRomaineCodec: RomaineStringCodec[AlarmMetadata]     = viaJsonCodec
   implicit val severityRomaineCodec: RomaineStringCodec[FullAlarmSeverity] = viaJsonCodec
-  implicit val alarmTimeRomaineCodec: RomaineStringCodec[AlarmTime]        = viaJsonCodec
+  implicit val alarmTimeRomaineCodec: RomaineStringCodec[UTCTime]          = viaJsonCodec
   implicit val shelveStatusRomaineCodec: RomaineStringCodec[ShelveStatus]  = viaJsonCodec
   implicit val ackStatusCodec: RomaineStringCodec[AcknowledgementStatus]   = viaJsonCodec
 }

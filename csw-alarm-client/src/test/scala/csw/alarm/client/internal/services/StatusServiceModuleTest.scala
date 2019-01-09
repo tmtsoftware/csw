@@ -46,7 +46,7 @@ class StatusServiceModuleTest
     // reset the alarm and verify that time does not change
     reset(tromboneAxisLowLimitAlarmKey).await
     val statusAfterReset = getStatus(tromboneAxisLowLimitAlarmKey).await
-    statusAfterReset.alarmTime.time shouldEqual status.alarmTime.time
+    statusAfterReset.alarmTime.value shouldEqual status.alarmTime.value
   }
 
   // DEOPSCSW-447: Reset api for alarm

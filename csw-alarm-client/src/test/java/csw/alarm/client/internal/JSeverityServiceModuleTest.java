@@ -9,6 +9,7 @@ import csw.alarm.api.javadsl.JAlarmSeverity;
 import csw.alarm.api.models.*;
 import csw.alarm.api.scaladsl.AlarmAdminService;
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup;
+import csw.time.api.models.UTCTime;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Rule;
@@ -117,13 +118,13 @@ public class JSeverityServiceModuleTest extends JUnitSuite {
         assertEquals(AcknowledgementStatus.Unacknowledged$.MODULE$, status1.acknowledgementStatus());
         assertEquals(JAlarmSeverity.Major, status1.latchedSeverity());
         // current severity is changed, hence updated alarm time should be > old time
-        assertTrue(status1.alarmTime().time().isAfter(status.alarmTime().time()));
+        assertTrue(status1.alarmTime().value().isAfter(status.alarmTime().value()));
 
         AlarmStatus status2 = setSeverityAndGetStatus(tromboneAxisHighLimitAlarm, JAlarmSeverity.Warning);
         assertEquals(AcknowledgementStatus.Unacknowledged$.MODULE$, status2.acknowledgementStatus());
         assertEquals(JAlarmSeverity.Major, status2.latchedSeverity());
         // current severity is not changed, hence new alarm time == old time
-        assertEquals(status2.alarmTime().time(), status1.alarmTime().time());
+        assertEquals(status2.alarmTime().value(), status1.alarmTime().value());
     }
 
     @Test
@@ -148,14 +149,14 @@ public class JSeverityServiceModuleTest extends JUnitSuite {
     public void setSeverity_shouldNotUpdateAlarmTimeWhenSeverityDoesNotChange() throws Exception {
         // latchable alarm
         AlarmKey highLimitAlarmKey = new AlarmKey(JSubsystem.NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm");
-        AlarmTime defaultAlarmTime = getStatus(highLimitAlarmKey).alarmTime();
+        UTCTime defaultAlarmTime = getStatus(highLimitAlarmKey).alarmTime();
 
         // latch it to major
         AlarmStatus status = setSeverityAndGetStatus(highLimitAlarmKey, JAlarmSeverity.Major);
-        assertTrue(status.alarmTime().time().isAfter(defaultAlarmTime.time()));
+        assertTrue(status.alarmTime().value().isAfter(defaultAlarmTime.value()));
 
         // set the severity again to mimic alarm refreshing
         AlarmStatus status1 = setSeverityAndGetStatus(highLimitAlarmKey, JAlarmSeverity.Major);
-        assertEquals(status.alarmTime().time(), status1.alarmTime().time());
+        assertEquals(status.alarmTime().value(), status1.alarmTime().value());
     }
 }

@@ -81,7 +81,7 @@ class SeverityServiceModuleTest
 
     val status1                     = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
     val expectedRecordedTimeSpread1 = Instant.now.toEpochMilli +- 100
-    status1.alarmTime.time.toEpochMilli shouldBe expectedRecordedTimeSpread1
+    status1.alarmTime.value.toEpochMilli shouldBe expectedRecordedTimeSpread1
 
     status1.acknowledgementStatus shouldBe Unacknowledged
     status1.latchedSeverity shouldBe Major
@@ -93,16 +93,16 @@ class SeverityServiceModuleTest
     status2.latchedSeverity shouldBe Major
     // current severity is changed, hence updated alarm time should be > old time
     val expectedRecordedTimeSpread2 = Instant.now.toEpochMilli +- 100
-    status2.alarmTime.time.toEpochMilli shouldBe expectedRecordedTimeSpread2
-    status2.alarmTime.time should be > status1.alarmTime.time
+    status2.alarmTime.value.toEpochMilli shouldBe expectedRecordedTimeSpread2
+    status2.alarmTime.value should be > status1.alarmTime.value
 
     Thread.sleep(200)
     val status3 = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Warning)
     status3.acknowledgementStatus shouldBe Unacknowledged
     status3.latchedSeverity shouldBe Major
     // current severity is not changed, hence new alarm time == old time
-    status3.alarmTime.time shouldEqual status2.alarmTime.time
-    status3.alarmTime.time.toEpochMilli shouldBe expectedRecordedTimeSpread2
+    status3.alarmTime.value shouldEqual status2.alarmTime.value
+    status3.alarmTime.value.toEpochMilli shouldBe expectedRecordedTimeSpread2
   }
 
   // DEOPSCSW-444: Set severity api for component
@@ -126,16 +126,16 @@ class SeverityServiceModuleTest
 
     // latch it to major
     val status1 = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
-    status1.alarmTime.time should be > defaultAlarmTime.time
+    status1.alarmTime.value should be > defaultAlarmTime.value
     val expectedRecordedTimeSpread1 = Instant.now.toEpochMilli +- 100
-    status1.alarmTime.time.toEpochMilli shouldBe expectedRecordedTimeSpread1
+    status1.alarmTime.value.toEpochMilli shouldBe expectedRecordedTimeSpread1
 
     Thread.sleep(200)
 
     // set the severity again to mimic alarm refreshing
     val status2 = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
-    status1.alarmTime.time shouldEqual status2.alarmTime.time
-    status2.alarmTime.time.toEpochMilli shouldBe expectedRecordedTimeSpread1
+    status1.alarmTime.value shouldEqual status2.alarmTime.value
+    status2.alarmTime.value.toEpochMilli shouldBe expectedRecordedTimeSpread1
   }
 
   // DEOPSCSW-457: Fetch current alarm severity

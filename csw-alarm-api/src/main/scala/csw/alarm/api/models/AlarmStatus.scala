@@ -2,6 +2,7 @@ package csw.alarm.api.models
 import csw.alarm.api.models.AcknowledgementStatus.Acknowledged
 import csw.alarm.api.models.FullAlarmSeverity.Disconnected
 import csw.alarm.api.models.ShelveStatus.Unshelved
+import csw.time.api.models.UTCTime
 
 /**
  * Represents occasionally changing properties of the alarm e.g current acknowledgement status, latched severity, etc.
@@ -12,7 +13,7 @@ case class AlarmStatus private[alarm] (
     acknowledgementStatus: AcknowledgementStatus,
     latchedSeverity: FullAlarmSeverity,
     shelveStatus: ShelveStatus,
-    alarmTime: AlarmTime
+    alarmTime: UTCTime
 )
 
 object AlarmStatus {
@@ -23,6 +24,6 @@ object AlarmStatus {
     acknowledgementStatus = Acknowledged,
     latchedSeverity = Disconnected,
     shelveStatus = Unshelved,
-    alarmTime = AlarmTime()
+    alarmTime = UTCTime.now()
   )
 }
