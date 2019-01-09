@@ -46,29 +46,24 @@ private[csw] class LoggingSystem(name: String, version: String, host: String, va
   @volatile var appenderBuilders: List[LogAppenderBuilder] = defaultAppenderBuilders
 
   private[this] val levels = loggingConfig.getString("logLevel")
-  private[this] val defaultLevel: Level = if (Level.hasLevel(levels)) {
-    Level(levels)
-  } else {
-    throw new Exception(s"Bad value $levels for csw-logging.logLevel")
-  }
+  private[this] val defaultLevel: Level =
+    if (Level.hasLevel(levels)) Level(levels)
+    else throw new Exception(s"Bad value $levels for csw-logging.logLevel")
+
   LoggingState.logLevel = defaultLevel
 
   private[this] val akkaLogLevelS = loggingConfig.getString("akkaLogLevel")
   private[this] val defaultAkkaLogLevel: Level =
-    if (Level.hasLevel(akkaLogLevelS)) {
-      Level(akkaLogLevelS)
-    } else {
-      throw new Exception(s"Bad value $akkaLogLevelS for csw-logging.akkaLogLevel")
-    }
+    if (Level.hasLevel(akkaLogLevelS)) Level(akkaLogLevelS)
+    else throw new Exception(s"Bad value $akkaLogLevelS for csw-logging.akkaLogLevel")
+
   LoggingState.akkaLogLevel = defaultAkkaLogLevel
 
   private[this] val slf4jLogLevelS = loggingConfig.getString("slf4jLogLevel")
   private[this] val defaultSlf4jLogLevel: Level =
-    if (Level.hasLevel(slf4jLogLevelS)) {
-      Level(slf4jLogLevelS)
-    } else {
-      throw new Exception(s"Bad value $slf4jLogLevelS for csw-logging.slf4jLogLevel")
-    }
+    if (Level.hasLevel(slf4jLogLevelS)) Level(slf4jLogLevelS)
+    else throw new Exception(s"Bad value $slf4jLogLevelS for csw-logging.slf4jLogLevel")
+
   LoggingState.slf4jLogLevel = defaultSlf4jLogLevel
 
   private[this] val gc   = loggingConfig.getBoolean("gc")
@@ -102,11 +97,9 @@ private[csw] class LoggingSystem(name: String, version: String, host: String, va
   )
   LoggingState.maybeLogActor = Some(logActor)
 
-  private[logging] val gcLogger: Option[GcLogger] = if (gc) {
-    Some(new GcLogger)
-  } else {
-    None
-  }
+  private[logging] val gcLogger: Option[GcLogger] =
+    if (gc) Some(new GcLogger)
+    else None
 
   if (time) {
     // Start timing actor
@@ -238,25 +231,21 @@ private[csw] class LoggingSystem(name: String, version: String, host: String, va
       done.future
     }
 
-    def finishAppenders(): Future[Unit] =
-      Future.sequence(appenders map (_.finish())).map(x => ())
-
-    def stopAppenders(): Future[Unit] =
-      Future.sequence(appenders map (_.stop())).map(x => ())
+    def finishAppenders(): Future[Unit] = Future.sequence(appenders map (_.finish())).map(_ => ())
+    def stopAppenders(): Future[Unit]   = Future.sequence(appenders map (_.stop())).map(_ => ())
 
     //Stop gc logger
-    gcLogger foreach (_.stop())
+    gcLogger.foreach(_.stop())
 
     // Stop Slf4j
-    val loggerContext =
-      LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
+    val loggerContext = LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
     loggerContext.stop()
 
     for {
-      akkaTimeDone  <- stopAkka() zip stopTimeActor()
-      logActorDone  <- finishAppenders()
-      logActorDone  <- stopLogger()
-      appendersDone <- stopAppenders()
+      _ <- stopAkka() zip stopTimeActor()
+      _ <- finishAppenders()
+      _ <- stopLogger()
+      _ <- stopAppenders()
     } yield Done
   }
 

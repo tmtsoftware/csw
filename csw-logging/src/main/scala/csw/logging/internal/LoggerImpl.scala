@@ -44,9 +44,8 @@ private[csw] class LoggerImpl(maybeComponentName: Option[String], actorName: Opt
 
   // implicit factory makes `file`, `line` and `class` to appear in log statements
   // it uses scala macros to capture these details
-  def trace(msg: ⇒ String, map: ⇒ Map[String, Any], ex: Throwable, id: AnyId)(implicit factory: SourceFactory): Unit = {
+  def trace(msg: ⇒ String, map: ⇒ Map[String, Any], ex: Throwable, id: AnyId)(implicit factory: SourceFactory): Unit =
     if (componentLoggingState.doTrace || has(id, TRACE)) all(TRACE, id, msg, map, ex, factory.get())
-  }
 
   def debug(msg: ⇒ String, map: ⇒ Map[String, Any], ex: Throwable, id: AnyId)(implicit factory: SourceFactory): Unit =
     if (componentLoggingState.doDebug || has(id, DEBUG)) all(DEBUG, id, msg, map, ex, factory.get())

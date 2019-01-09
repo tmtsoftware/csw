@@ -42,11 +42,8 @@ private[logging] object MessageHandler {
 
   // Route akka messages to common log actor
   private[logging] def sendAkkaMsg(logAkka: LogAkka): Unit =
-    if (logAkka.msg == "DIE") {
-      akkaStopPromise.trySuccess(())
-    } else {
-      sendMsg(logAkka)
-    }
+    if (logAkka.msg == "DIE") akkaStopPromise.trySuccess(())
+    else sendMsg(logAkka)
 
   // Route time start messages to time actor
   private[logging] def timeStart(id: RequestId, name: String, uid: String): Unit =

@@ -29,9 +29,8 @@ object JLoggingSystemFactory {
    * @note it is recommended to use this method for only testing
    * @return the instance of LoggingSystem
    */
-  private[csw] def start(): LoggingSystem = {
+  private[csw] def start(): LoggingSystem =
     new LoggingSystem("foo-name", "foo-version", InetAddress.getLocalHost.getHostName, ActorSystem("logging"))
-  }
 
   /**
    * The factory used to create the LoggingSystem. `LoggingSystem` should be started once in an app.

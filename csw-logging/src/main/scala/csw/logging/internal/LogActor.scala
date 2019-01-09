@@ -59,37 +59,27 @@ private[logging] class LogActor(
     case SetSlf4jLevel(level1)        => slf4jLogLevel = level1
     case SetAkkaLevel(level1)         => akkaLogLevel = level1
     case SetAppenders(_appenders)     => appenders = _appenders
-    case LastAkkaMessage =>
-      akka.event.Logging(context.system, this).error("DIE")
+    case LastAkkaMessage              => akka.event.Logging(context.system, this).error("DIE")
     case StopLogging =>
       context.stop(self)
       done.success(())
-    case msg: Any =>
-      println("Unrecognized LogActor message:" + msg + DefaultSourceLocation)
+    case msg: Any => println("Unrecognized LogActor message:" + msg + DefaultSourceLocation)
   }
 
   private def exToJson(ex: Throwable): JsObject = {
     val name = ex.getClass.toString
     ex match {
-      case ex: RichException =>
-        Json.obj(LoggingKeys.EX -> name, LoggingKeys.MESSAGE -> ex.richMsg.asJson)
-      case ex: RuntimeException =>
-        //TODO: Replace with play-json parse exception
-//        Json.obj(LoggingKeys.KIND -> ex.kind, "info" -> ex.info)
-        Json.obj(LoggingKeys.EX -> name, LoggingKeys.MESSAGE -> ex.getMessage)
-      case ex: Throwable =>
-        Json.obj(LoggingKeys.EX -> name, LoggingKeys.MESSAGE -> ex.getMessage)
+      case ex: RichException => Json.obj(LoggingKeys.EX -> name, LoggingKeys.MESSAGE -> ex.richMsg.asJson)
+      case ex: Throwable     => Json.obj(LoggingKeys.EX -> name, LoggingKeys.MESSAGE -> ex.getMessage)
     }
   }
 
   // Convert exception stack trace to JSON
   private def getStack(ex: Throwable): Seq[JsObject] = {
     val stack = ex.getStackTrace map { trace =>
-      val j0 = if (trace.getLineNumber > 0) {
-        Json.obj(LoggingKeys.LINE -> trace.getLineNumber)
-      } else {
-        Json.obj()
-      }
+      val j0 =
+        if (trace.getLineNumber > 0) Json.obj(LoggingKeys.LINE -> trace.getLineNumber)
+        else Json.obj()
       val j1 = Json.obj(
         LoggingKeys.CLASS  -> trace.getClassName,
         LoggingKeys.FILE   -> trace.getFileName,
@@ -104,11 +94,9 @@ private[logging] class LogActor(
   private def exceptionJson(ex: Throwable): JsObject = {
     val stack = getStack(ex)
     val j1 = ex match {
-      case r: RichException if r.cause != NoLogException =>
-        Json.obj(LoggingKeys.CAUSE -> exceptionJson(r.cause))
-      case ex1: Throwable if ex.getCause != null =>
-        Json.obj(LoggingKeys.CAUSE -> exceptionJson(ex.getCause))
-      case _ => Json.obj()
+      case r: RichException if r.cause != NoLogException => Json.obj(LoggingKeys.CAUSE -> exceptionJson(r.cause))
+      case ex1: Throwable if ex.getCause != null         => Json.obj(LoggingKeys.CAUSE -> exceptionJson(ex.getCause))
+      case _                                             => Json.obj()
     }
 
     Json.obj(
@@ -142,12 +130,9 @@ private[logging] class LogActor(
     // This lime adds the user map objects as additional JsonObjects if the map is not empty
     jsonObject = jsonObject ++ log.map
 
-    if (!log.sourceLocation.fileName.isEmpty) {
-      jsonObject = jsonObject ++ Json.obj(LoggingKeys.FILE -> log.sourceLocation.fileName)
-    }
+    if (!log.sourceLocation.fileName.isEmpty) jsonObject = jsonObject ++ Json.obj(LoggingKeys.FILE -> log.sourceLocation.fileName)
 
-    if (log.sourceLocation.line > 0)
-      jsonObject = jsonObject ++ Json.obj(LoggingKeys.LINE -> log.sourceLocation.line)
+    if (log.sourceLocation.line > 0) jsonObject = jsonObject ++ Json.obj(LoggingKeys.LINE -> log.sourceLocation.line)
 
     jsonObject = (log.sourceLocation.packageName, log.sourceLocation.className) match {
       case ("", "") ⇒ jsonObject
@@ -155,32 +140,31 @@ private[logging] class LogActor(
       case (p, c)   ⇒ jsonObject ++ Json.obj(LoggingKeys.CLASS -> s"$p.$c")
     }
 
-    if (log.actorName.isDefined)
-      jsonObject = jsonObject ++ Json.obj(LoggingKeys.ACTOR -> log.actorName.get)
+    if (log.actorName.isDefined) jsonObject = jsonObject ++ Json.obj(LoggingKeys.ACTOR -> log.actorName.get)
 
-    if (log.componentName.isDefined)
-      jsonObject = jsonObject ++ Json.obj(LoggingKeys.COMPONENT_NAME -> log.componentName.get)
+    if (log.componentName.isDefined) jsonObject = jsonObject ++ Json.obj(LoggingKeys.COMPONENT_NAME -> log.componentName.get)
 
     if (log.ex != NoLogException) jsonObject = jsonObject ++ exceptionJson(log.ex)
+
     jsonObject = log.id match {
-      case RequestId(trackingId, spanId, _) ⇒
-        jsonObject ++ Json.obj(LoggingKeys.TRACE_ID -> Seq(trackingId, spanId))
-      case _ ⇒ jsonObject
+      case RequestId(trackingId, spanId, _) ⇒ jsonObject ++ Json.obj(LoggingKeys.TRACE_ID -> Seq(trackingId, spanId))
+      case _                                ⇒ jsonObject
     }
-    if (!log.kind.isEmpty)
-      jsonObject = jsonObject ++ Json.obj(LoggingKeys.KIND -> log.kind)
+
+    if (!log.kind.isEmpty) jsonObject = jsonObject ++ Json.obj(LoggingKeys.KIND -> log.kind)
+
     append(jsonObject, Category.Common.name, log.level)
   }
 
   private def receiveAltMessage(logAltMessage: LogAltMessage): Unit = {
     var jsonObject = logAltMessage.jsonObject
-    if (logAltMessage.ex != NoLogException)
-      jsonObject = jsonObject ++ exceptionJson(logAltMessage.ex)
+    if (logAltMessage.ex != NoLogException) jsonObject = jsonObject ++ exceptionJson(logAltMessage.ex)
+
     jsonObject = logAltMessage.id match {
-      case RequestId(trackingId, spanId, _) =>
-        jsonObject ++ Json.obj(LoggingKeys.TRACE_ID -> Seq(trackingId, spanId))
-      case _ => jsonObject
+      case RequestId(trackingId, spanId, _) => jsonObject ++ Json.obj(LoggingKeys.TRACE_ID -> Seq(trackingId, spanId))
+      case _                                => jsonObject
     }
+
     jsonObject = jsonObject ++ Json.obj(LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(logAltMessage.time))
     append(jsonObject, logAltMessage.category, LoggingLevels.INFO)
   }
@@ -196,10 +180,8 @@ private[logging] class LogActor(
         LoggingKeys.KIND      -> "slf4j",
         LoggingKeys.CATEGORY  -> Category.Common.name
       )
-      if (logSlf4j.line > 0)
-        jsonObject = jsonObject ++ Json.obj(LoggingKeys.LINE -> logSlf4j.line)
-      if (logSlf4j.ex != NoLogException)
-        jsonObject = jsonObject ++ exceptionJson(logSlf4j.ex)
+      if (logSlf4j.line > 0) jsonObject = jsonObject ++ Json.obj(LoggingKeys.LINE -> logSlf4j.line)
+      if (logSlf4j.ex != NoLogException) jsonObject = jsonObject ++ exceptionJson(logSlf4j.ex)
       append(jsonObject, Category.Common.name, logSlf4j.level)
     }
 
@@ -216,8 +198,7 @@ private[logging] class LogActor(
         LoggingKeys.CATEGORY  -> Category.Common.name
       )
 
-      if (logAkka.cause.isDefined)
-        jsonObject = jsonObject ++ exceptionJson(logAkka.cause.get)
+      if (logAkka.cause.isDefined) jsonObject = jsonObject ++ exceptionJson(logAkka.cause.get)
       append(jsonObject, Category.Common.name, logAkka.level)
     }
 }

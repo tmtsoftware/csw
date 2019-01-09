@@ -16,9 +16,7 @@ object TMTDateTimeFormatter {
    * @param time the time needed to format and write in logs
    * @return a string representation of time provided in long
    */
-  def format(time: Long): String = {
-    ISOLogFormatter.format(Instant.ofEpochMilli(time))
-  }
+  def format(time: Long): String = ISOLogFormatter.format(Instant.ofEpochMilli(time))
 
   /**
    * Use `DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.UTC)` to parse the provided time
@@ -26,8 +24,6 @@ object TMTDateTimeFormatter {
    * @param dateStr the time in string format that need to parse
    * @return a ZonedDateTime created out of provided time
    */
-  def parse(dateStr: String): ZonedDateTime = {
-    ZonedDateTime.parse(dateStr, ISOLogFormatter)
-  }
+  def parse(dateStr: String): ZonedDateTime = ZonedDateTime.parse(dateStr, ISOLogFormatter)
 
 }

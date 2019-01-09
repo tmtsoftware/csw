@@ -1,5 +1,6 @@
 package csw.logging.compat
 
+import ch.qos.logback.classic.spi.ThrowableProxy
 import ch.qos.logback.core.spi.AppenderAttachable
 import ch.qos.logback.core.{Appender, UnsynchronizedAppenderBase}
 import csw.logging.internal.LogActorMessages.LogSlf4j
@@ -34,8 +35,7 @@ private[logging] class Slf4jAppender[E]() extends UnsynchronizedAppenderBase[E] 
 
   def iteratorForAppenders(): java.util.Iterator[ch.qos.logback.core.Appender[E]] = null
 
-  def addAppender(a: Appender[E]): Unit =
-    appenders.add(a)
+  def addAppender(a: Appender[E]): Unit = appenders.add(a)
 
   def append(event: E): Unit =
     event match {
@@ -43,8 +43,7 @@ private[logging] class Slf4jAppender[E]() extends UnsynchronizedAppenderBase[E] 
         val frame = e.getCallerData()(0)
         val level = Level(e.getLevel.toString)
         val ex = try {
-          val x = e.getThrowableProxy.asInstanceOf[ch.qos.logback.classic.spi.ThrowableProxy]
-          x.getThrowable
+          e.getThrowableProxy.asInstanceOf[ThrowableProxy].getThrowable
         } catch {
           case ex: Any => NoLogException
         }

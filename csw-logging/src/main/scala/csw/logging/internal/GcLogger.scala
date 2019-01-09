@@ -28,13 +28,10 @@ private[logging] class GcLogger {
           val info     = GarbageCollectionNotificationInfo.from(notification.getUserData.asInstanceOf[CompositeData])
           val duration = info.getGcInfo.getDuration // microseconds
           val gcaction = info.getGcAction
-          val gctype = if ("end of minor GC".equals(gcaction)) {
-            "minor"
-          } else if ("end of major GC".equals(gcaction)) {
-            "major"
-          } else {
-            "unknown"
-          }
+          val gctype =
+            if ("end of minor GC".equals(gcaction)) "minor"
+            else if ("end of major GC".equals(gcaction)) "major"
+            else "unknown"
           def getMem(mem: Map[String, MemoryUsage]): List[Map[String, Any]] = {
             val m = mem map {
               case (name, usage) =>

@@ -76,25 +76,18 @@ private[logging] class TimeActor(tdone: Promise[Unit]) extends Actor {
   }
 
   def closeAll(): Unit =
-    for ((key, steps) <- items) {
+    for ((key, _) <- items) {
       val parts = key.split("\t")
-      if (parts.size == 2) {
-        end(RequestId(parts(0), parts(1)))
-      }
+      if (parts.size == 2) end(RequestId(parts(0), parts(1)))
     }
 
   def receive: Receive = {
-    case TimeStart(id, name, uid, time) =>
-      logStart(id, name, uid, time)
-
-    case TimeEnd(id, name, uid, time) =>
-      logEnd(id, name, uid, time)
-
+    case TimeStart(id, name, uid, time) => logStart(id, name, uid, time)
+    case TimeEnd(id, name, uid, time)   => logEnd(id, name, uid, time)
     case TimeDone =>
       closeAll()
       tdone.success(())
       context.stop(self)
-
     case _ =>
   }
 
