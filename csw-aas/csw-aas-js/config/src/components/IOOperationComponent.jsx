@@ -41,7 +41,7 @@ class IOOperationComponent extends React.Component {
     }
 
     handleClick = (event) => {
-      this.props.api(this.state.input)
+      this.props.api(this.state.input, this.props.token)
     }
 }
 
@@ -49,7 +49,8 @@ IOOperationComponent.propTypes = {
   componentNameProp: PropTypes.string,
   operation: PropTypes.string,
   output: PropTypes.string,
-  api: PropTypes.func
+  api: PropTypes.func,
+  token: PropTypes.string
 }
 
 export default IOOperationComponent

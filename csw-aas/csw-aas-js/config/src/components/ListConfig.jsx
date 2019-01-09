@@ -10,7 +10,7 @@ class ListConfig extends React.Component {
   }
 
   listConfig = async () => {
-    const response = await fetch(`http://localhost:4000/list`)
+    const response = await fetch(`http://localhost:5000/list`)
     if (response.status === 200) {
       const a = await response.json()
       this.setState({response: JSON.stringify(a)})

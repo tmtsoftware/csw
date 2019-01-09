@@ -10,8 +10,8 @@ class CreateConfig extends React.Component {
     this.setState({response: res})
   }
 
-  createConfig = (input) => {
-    sPost(`http://localhost:5000/config/${input}?comment="Sample commit message"`, this.callBack, this.state.token)
+  createConfig = (input, token) => {
+    sPost(`http://localhost:5000/config/${input}?comment="Sample commit message"`, this.callBack, token)
   }
 
   render() {
@@ -19,8 +19,7 @@ class CreateConfig extends React.Component {
       <Consumer>
         {
           ({tmtAuth}) => {
-            this.setState({token: tmtAuth.token})
-            return <IOOperationComponent componentNameProp='Create Config' operation='Create Config' output={this.state.response} api={this.createConfig} />
+            return <IOOperationComponent token={tmtAuth.token} componentNameProp='Create Config' operation='Create Config' output={this.state.response} api={this.createConfig} />
           }
         }
       </Consumer>
