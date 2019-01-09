@@ -84,7 +84,7 @@ class PerfSubscriber(
 
   private def report(event: Event): Unit = {
     val currentTime          = getNanos(Instant.now()).toLong
-    val eventOriginationTime = getNanos(event.eventTime.time.value).toLong
+    val eventOriginationTime = getNanos(event.eventTime.value).toLong
     val latency              = currentTime - eventOriginationTime
     aggregatedLatency += latency
 

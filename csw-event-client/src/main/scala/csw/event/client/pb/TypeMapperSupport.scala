@@ -60,7 +60,7 @@ object TypeMapperSupport {
 
   private[csw] implicit def eventTypeMapper[T <: Event]: TypeMapper[PbEvent, T] = new TypeMapper[PbEvent, T] {
     override def toCustom(base: PbEvent): T = {
-      val factory: (Id, Prefix, EventName, EventTime, Set[Parameter[_]]) ⇒ Any = base.eventType match {
+      val factory: (Id, Prefix, EventName, UTCTime, Set[Parameter[_]]) ⇒ Any = base.eventType match {
         case PbEventType.SystemEvent     ⇒ SystemEvent.apply
         case PbEventType.ObserveEvent    ⇒ ObserveEvent.apply
         case PbEventType.Unrecognized(x) ⇒ throw new RuntimeException(s"unknown event type=[${base.eventType.toString} :$x]")
@@ -90,11 +90,11 @@ object TypeMapperSupport {
     }
   }
 
-  private implicit val eventTimeTypeMapper: TypeMapper[Timestamp, EventTime] =
-    TypeMapper[Timestamp, EventTime] { x ⇒
-      EventTime(UTCTime(instantMapper.toCustom(x)))
+  private implicit val eventTimeTypeMapper: TypeMapper[Timestamp, UTCTime] =
+    TypeMapper[Timestamp, UTCTime] { x ⇒
+      UTCTime(instantMapper.toCustom(x))
     } { x ⇒
-      instantMapper.toBase(x.time.value)
+      instantMapper.toBase(x.value)
     }
 
   implicit val structTypeMapper: TypeMapper[PbStruct, Struct] = TypeMapper[PbStruct, Struct] { s =>

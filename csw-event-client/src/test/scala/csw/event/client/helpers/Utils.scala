@@ -3,7 +3,7 @@ package csw.event.client.helpers
 import csw.params.core.generics.KeyType.{IntKey, LongKey}
 import csw.params.core.generics.{Key, Parameter}
 import csw.params.core.models.{Id, Prefix}
-import csw.params.events.{Event, EventName, EventTime, SystemEvent}
+import csw.params.events.{Event, EventName, SystemEvent}
 import csw.params.javadsl.JKeyType
 import csw.time.api.models.UTCTime
 
@@ -18,7 +18,7 @@ object Utils {
 
   def makeEvent(id: Int): Event = event.copy(
     eventId = Id(id.toString),
-    eventTime = EventTime(UTCTime.now()),
+    eventTime = UTCTime.now(),
     paramSet = Set(timeNanosKey.set(System.nanoTime()))
   )
 
@@ -30,7 +30,7 @@ object Utils {
   def makeEventWithPrefix(id: Int, prefix: Prefix): Event = event.copy(
     eventId = Id(id.toString),
     source = prefix,
-    eventTime = EventTime(UTCTime.now()),
+    eventTime = UTCTime.now(),
     paramSet = Set(timeNanosKey.set(System.nanoTime()))
   )
 

@@ -9,6 +9,7 @@ import csw.params.core.models.{Id, Prefix}
 import csw.event.api.exceptions.PublishFailure
 import csw.event.api.scaladsl.EventService
 import csw.logging.scaladsl.Logger
+import csw.time.api.models.UTCTime
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
@@ -50,8 +51,8 @@ class EventPublishExamples(eventService: EventService, log: Logger) {
 
       // this holds the logic for event generation, could be based on some computation or current state of HCD
       def eventGenerator(): Event = baseEvent match {
-        case e: SystemEvent  ⇒ e.copy(eventId = Id(), eventTime = EventTime())
-        case e: ObserveEvent ⇒ e.copy(eventId = Id(), eventTime = EventTime())
+        case e: SystemEvent  ⇒ e.copy(eventId = Id(), eventTime = UTCTime.now())
+        case e: ObserveEvent ⇒ e.copy(eventId = Id(), eventTime = UTCTime.now())
       }
 
       publisher.publish(eventGenerator(), interval)

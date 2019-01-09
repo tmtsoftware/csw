@@ -36,7 +36,7 @@ sealed trait Event { self: ParameterSetType[_] ⇒
   /**
    * The time of event creation
    */
-  val eventTime: EventTime
+  val eventTime: UTCTime
 
   /**
    * An optional initial set of parameters (keys with values)
@@ -71,7 +71,7 @@ sealed trait Event { self: ParameterSetType[_] ⇒
 
 object Event {
 
-  private val invalidEventTime = EventTime(UTCTime(Instant.ofEpochMilli(-1)))
+  private val invalidEventTime = UTCTime(Instant.ofEpochMilli(-1))
 
   /**
    * A helper method to create an event which is provided to subscriber when there is no event available at the
@@ -97,7 +97,7 @@ case class SystemEvent private (
     eventId: Id,
     source: Prefix,
     eventName: EventName,
-    eventTime: EventTime,
+    eventTime: UTCTime,
     paramSet: Set[Parameter[_]]
 ) extends ParameterSetType[SystemEvent]
     with Event {
@@ -105,7 +105,7 @@ case class SystemEvent private (
   /**
    * A java helper to construct SystemEvent
    */
-  def this(source: Prefix, eventName: EventName) = this(Id(), source, eventName, EventTime(), Set.empty)
+  def this(source: Prefix, eventName: EventName) = this(Id(), source, eventName, UTCTime.now(), Set.empty)
 
   /**
    * Create a new SystemEvent instance when a parameter is added or removed
@@ -114,7 +114,7 @@ case class SystemEvent private (
    * @return a new instance of SystemEvent with new eventId, eventTime and provided data
    */
   override protected def create(data: Set[Parameter[_]]): SystemEvent =
-    copy(eventId = Id(), eventTime = EventTime(), paramSet = data)
+    copy(eventId = Id(), eventTime = UTCTime.now(), paramSet = data)
 }
 
 object SystemEvent {
@@ -124,7 +124,7 @@ object SystemEvent {
       eventId: Id,
       source: Prefix,
       eventName: EventName,
-      eventTime: EventTime,
+      eventTime: UTCTime,
       paramSet: Set[Parameter[_]]
   ) = new SystemEvent(eventId, source, eventName, eventTime, paramSet)
 
@@ -135,7 +135,7 @@ object SystemEvent {
    * @param eventName the name of event
    * @return a new instance of SystemEvent with auto-generated eventId, eventTime and empty paramSet
    */
-  def apply(source: Prefix, eventName: EventName): SystemEvent = apply(Id(), source, eventName, EventTime(), Set.empty)
+  def apply(source: Prefix, eventName: EventName): SystemEvent = apply(Id(), source, eventName, UTCTime.now(), Set.empty)
 
   /**
    * The apply method is used to create SystemEvent command by end-user. eventId is not accepted and will be created internally to guarantee unique value.
@@ -156,7 +156,7 @@ case class ObserveEvent private (
     eventId: Id,
     source: Prefix,
     eventName: EventName,
-    eventTime: EventTime,
+    eventTime: UTCTime,
     paramSet: Set[Parameter[_]]
 ) extends ParameterSetType[ObserveEvent]
     with Event {
@@ -164,7 +164,7 @@ case class ObserveEvent private (
   /**
    * A java helper to construct ObserveEvent
    */
-  def this(source: Prefix, eventName: EventName) = this(Id(), source, eventName, EventTime(), Set.empty)
+  def this(source: Prefix, eventName: EventName) = this(Id(), source, eventName, UTCTime.now(), Set.empty)
 
   /**
    * Create a new ObserveEvent instance when a parameter is added or removed
@@ -173,7 +173,7 @@ case class ObserveEvent private (
    * @return a new instance of ObserveEvent with new eventId, eventTime and provided data
    */
   override protected def create(data: Set[Parameter[_]]): ObserveEvent =
-    copy(eventId = Id(), eventTime = EventTime(), paramSet = data)
+    copy(eventId = Id(), eventTime = UTCTime.now(), paramSet = data)
 }
 
 object ObserveEvent {
@@ -183,7 +183,7 @@ object ObserveEvent {
       eventId: Id,
       source: Prefix,
       eventName: EventName,
-      eventTime: EventTime,
+      eventTime: UTCTime,
       paramSet: Set[Parameter[_]]
   ) = new ObserveEvent(eventId, source, eventName, eventTime, paramSet)
 
@@ -194,7 +194,7 @@ object ObserveEvent {
    * @param eventName the name of event
    * @return a new instance of ObserveEvent with auto-generated eventId, eventTime and empty paramSet
    */
-  def apply(source: Prefix, eventName: EventName): ObserveEvent = apply(Id(), source, eventName, EventTime(), Set.empty)
+  def apply(source: Prefix, eventName: EventName): ObserveEvent = apply(Id(), source, eventName, UTCTime.now(), Set.empty)
 
   /**
    * The apply method is used to create ObserveEvent command by end-user. eventId is not accepted and will be created internally to guarantee unique value.

@@ -31,7 +31,7 @@ case class OnelineFormatter(options: Options) {
   private def formatTerseOutput(lines: List[Oneline]) = lines.map(_.terse).mkString("\n")
 
   def header(event: Event): String = {
-    val timestamp = if (options.printTimestamp) s"Timestamp: ${event.eventTime.time.toString}" else ""
+    val timestamp = if (options.printTimestamp) s"Timestamp: ${event.eventTime.toString}" else ""
     val id        = if (options.printId) s"Id: ${event.eventId.id}" else ""
     val key       = s"EventKey: ${event.eventKey.key}"
 

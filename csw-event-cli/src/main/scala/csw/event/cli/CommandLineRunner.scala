@@ -15,6 +15,7 @@ import csw.event.api.scaladsl.{EventService, EventSubscription}
 import csw.event.cli.args.Options
 import csw.event.cli.utils.{EventJsonTransformer, EventOnelineTransformer, Formatter}
 import csw.event.cli.wiring.ActorRuntime
+import csw.time.api.models.UTCTime
 import play.api.libs.json.{JsObject, JsValue, Json}
 
 import scala.async.Async.{async, await}
@@ -106,7 +107,7 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
   private def updateEventMetadata(json: JsValue, eventKey: EventKey) =
     json.as[JsObject] ++ Json.obj(
       ("eventId", Id().id),
-      ("eventTime", EventTime().time),
+      ("eventTime", UTCTime.now()),
       ("source", eventKey.source.prefix),
       ("eventName", eventKey.eventName.name)
     )
@@ -117,8 +118,8 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
   }
 
   private def eventGenerator(initialEvent: Event): Event = initialEvent match {
-    case event: SystemEvent  ⇒ event.copy(eventId = Id(), eventTime = EventTime())
-    case event: ObserveEvent ⇒ event.copy(eventId = Id(), eventTime = EventTime())
+    case event: SystemEvent  ⇒ event.copy(eventId = Id(), eventTime = UTCTime.now())
+    case event: ObserveEvent ⇒ event.copy(eventId = Id(), eventTime = UTCTime.now())
   }
 
   private def publishEvent(event: Event): Future[Done] = {

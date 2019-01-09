@@ -1,7 +1,6 @@
 package csw.messages;
 
 import csw.params.events.EventName;
-import csw.params.events.EventTime;
 import csw.params.events.ObserveEvent;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JUnits;
@@ -32,23 +31,23 @@ public class JEventsTest extends JUnitSuite {
         //#eventtime
 
         //apply returns current time in UTC
-        EventTime now = EventTime.apply();
+        UTCTime now = UTCTime.now();
 
         //using constructor
-        EventTime anHourAgo = new EventTime(new UTCTime(Instant.now().minusSeconds(3600)));
+        UTCTime anHourAgo = new UTCTime(Instant.now().minusSeconds(3600));
 
         //return current time in UTC
-        EventTime currentTime = EventTime.apply();
+        UTCTime currentTime = UTCTime.now();
 
         //some past time using utility function
-        EventTime aDayAgo = EventTime.apply(new UTCTime(Instant.now().minusSeconds(86400)));
+        UTCTime aDayAgo = new UTCTime(Instant.now().minusSeconds(86400));
 
         //#eventtime
 
         //validations
-        Assert.assertTrue(now.time().value().isAfter(anHourAgo.time().value()));
-        Assert.assertTrue(anHourAgo.time().value().isAfter(aDayAgo.time().value()));
-        Assert.assertTrue(currentTime.time().value().isAfter(anHourAgo.time().value()));
+        Assert.assertTrue(now.value().isAfter(anHourAgo.value()));
+        Assert.assertTrue(anHourAgo.value().isAfter(aDayAgo.value()));
+        Assert.assertTrue(currentTime.value().isAfter(anHourAgo.value()));
     }
 
     @Test

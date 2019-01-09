@@ -24,7 +24,7 @@ import csw.command.client.models.framework._
 import csw.commons.tagobjects.FileSystemSensitive
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandIssue, _}
-import csw.params.events.{EventName, EventTime, ObserveEvent, SystemEvent}
+import csw.params.events.{EventName, ObserveEvent, SystemEvent}
 import csw.params.core.generics.KeyType.{ByteArrayKey, ChoiceKey, DoubleMatrixKey, IntKey, StructKey}
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.Units.{arcmin, coulomb, encoder, joule, lightyear, meter, pascal, NoUnits}
@@ -32,6 +32,7 @@ import csw.params.core.models._
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.location.api.models.ComponentType.HCD
 import csw.location.api.models.Connection
+import csw.time.api.models.UTCTime
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.prop.Tables.Table
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
@@ -111,7 +112,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
 
       val param = choiceKey.set(jupiter, pluto).withUnits(arcmin)
 
-      val observeEvent: ObserveEvent = ObserveEvent(Id(), prefix, EventName("filter wheel"), EventTime(), Set.empty).add(param)
+      val observeEvent: ObserveEvent = ObserveEvent(Id(), prefix, EventName("filter wheel"), UTCTime.now(), Set.empty).add(param)
       val observeEventSerializer     = serialization.findSerializerFor(observeEvent)
 
       observeEventSerializer.getClass shouldBe classOf[AkkaSerializer]
@@ -130,7 +131,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
 
       val param = structKey.set(struct).withUnits(joule)
 
-      val systemEvent: SystemEvent = SystemEvent(Id(), prefix, EventName("filter wheel"), EventTime(), Set.empty).add(param)
+      val systemEvent: SystemEvent = SystemEvent(Id(), prefix, EventName("filter wheel"), UTCTime.now(), Set.empty).add(param)
       val systemEventSerializer    = serialization.findSerializerFor(systemEvent)
 
       systemEventSerializer.getClass shouldBe classOf[AkkaSerializer]
