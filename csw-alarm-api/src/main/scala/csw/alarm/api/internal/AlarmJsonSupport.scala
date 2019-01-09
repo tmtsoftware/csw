@@ -7,7 +7,6 @@ import csw.params.extensions.Formats.MappableFormat
 import play.api.libs.json.{Format, Json}
 
 private[alarm] trait AlarmJsonSupport {
-//  implicit lazy val alarmTimeFormat: Format[UTCTime] = Formats.of[String].bimap(_.stringify, UTCTime.apply)
   implicit lazy val alarmMetadataFormat: Format[AlarmMetadata] =
     Json
       .format[AlarmMetadata]

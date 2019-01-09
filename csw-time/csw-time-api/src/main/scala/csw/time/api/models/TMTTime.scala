@@ -23,7 +23,8 @@ object TMTTime {
     override def writes(instant: Instant): JsValue       = JsString(instant.toString)
   }
 
-  implicit val tmtTimeFormat: OFormat[TMTTime] = derived.flat.oformat((__ \ "type").format[String])
+  implicit val tmtTimeFormat: OFormat[TMTTime]      = derived.flat.oformat((__ \ "type").format[String])
+  implicit def utcTimeReads[T <: TMTTime]: Reads[T] = tmtTimeFormat.map(_.asInstanceOf[T])
 
 }
 
