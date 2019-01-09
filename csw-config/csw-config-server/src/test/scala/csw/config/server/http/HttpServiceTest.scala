@@ -1,8 +1,10 @@
 package csw.config.server.http
 
+import java.net.BindException
+
 import akka.actor.ActorSystem
 import akka.actor.CoordinatedShutdown.UnknownReason
-import akka.stream.{ActorMaterializer, BindFailedException}
+import akka.stream.ActorMaterializer
 import csw.aas.core.commons.AASConnection
 import csw.config.server.ServerWiring
 import csw.config.server.commons.ConfigServiceConnection
@@ -37,8 +39,9 @@ class HttpServiceTest extends HTTPLocationService {
     val (binding, registrationResult) = httpService.registeredLazyBinding.await
     locationService.find(ConfigServiceConnection.value).await.get.connection shouldBe ConfigServiceConnection.value
 
-    binding.localAddress.getAddress.getHostAddress shouldBe Networks().hostname
-    registrationResult.location.connection shouldBe ConfigServiceConnection.value
+    val location = registrationResult.location
+    location.uri.getHost shouldBe Networks().hostname
+    location.connection shouldBe ConfigServiceConnection.value
     actorRuntime.shutdown(UnknownReason).await
   }
 
@@ -48,7 +51,7 @@ class HttpServiceTest extends HTTPLocationService {
 
     import serverWiring._
 
-    a[BindFailedException] shouldBe thrownBy(httpService.registeredLazyBinding.await)
+    a[BindException] shouldBe thrownBy(httpService.registeredLazyBinding.await)
     testLocationService.find(ConfigServiceConnection.value).await shouldBe None
   }
 

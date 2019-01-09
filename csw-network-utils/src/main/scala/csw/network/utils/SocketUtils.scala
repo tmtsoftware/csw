@@ -11,13 +11,13 @@ import scala.util.{Failure, Success, Try}
 
 object SocketUtils {
 
-  final def serverUp(host: String = "localhost", port: Int): Boolean = Try(new Socket(host, port)) match {
+  final def isAddressInUse(host: String = "localhost", port: Int): Boolean = Try(new Socket(host, port)) match {
     case Success(socket) => socket.close(); true
     case Failure(_)      => false
   }
 
   final def requireServerUp(host: String = "localhost", port: Int, within: Duration = 5.seconds, msg: String): Unit =
-    require(poll(SocketUtils.serverUp(host, port)), msg)
+    require(poll(SocketUtils.isAddressInUse(host, port)), msg)
 
   @tailrec
   final def getFreePort: Int = Try(new ServerSocket(0)) match {

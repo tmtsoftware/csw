@@ -1,5 +1,7 @@
 package csw.config.server.http
 
+import java.net.BindException
+
 import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
@@ -11,7 +13,7 @@ import csw.config.server.{ActorRuntime, Settings}
 import csw.location.api.models.{HttpRegistration, RegistrationResult}
 import csw.location.api.scaladsl.LocationService
 import csw.logging.scaladsl.Logger
-import csw.network.utils.Networks
+import csw.network.utils.{Networks, SocketUtils}
 
 import scala.async.Async._
 import scala.concurrent.Future
@@ -60,11 +62,24 @@ class HttpService(
 
   def shutdown(reason: Reason): Future[Done] = actorRuntime.shutdown(reason)
 
-  private def bind() = Http().bindAndHandle(
-    handler = configServiceRoute.route,
-    interface = "0.0.0.0",
-    port = settings.`service-port`
-  )
+  private def bind() = {
+    val _host = Networks().hostname
+    val _port = settings.`service-port`
+
+    /*
+      Explicitly check _host:_port is free as we register Networks().hostname with location service
+      But we bind server to all interfaces so that it can be accessible from any server via localhost
+      and it can happen that server gets bind to some of the interfaces and not to Networks().hostname
+     */
+    if (SocketUtils.isAddressInUse(_host, _port))
+      throw new BindException(s"Bind failed for TCP channel on endpoint [${_host}:${_port}]. Address already in use.")
+
+    Http().bindAndHandle(
+      handler = configServiceRoute.route,
+      interface = "0.0.0.0",
+      port = _port
+    )
+  }
 
   private def register(binding: ServerBinding): Future[RegistrationResult] = {
     val registration = HttpRegistration(

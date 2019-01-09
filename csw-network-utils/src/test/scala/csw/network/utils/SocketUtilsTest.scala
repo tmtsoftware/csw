@@ -10,7 +10,7 @@ class SocketUtilsTest extends FunSuite with BeforeAndAfterAll with Matchers {
   override protected def afterAll(): Unit = serverSocket.close()
 
   test("should return true when server is running on given host and port") {
-    SocketUtils.serverUp("localhost", 7654) shouldBe true
+    SocketUtils.isAddressInUse("localhost", 7654) shouldBe true
   }
 
   test("should throw exception when server is not running on given host and port") {
