@@ -16,7 +16,7 @@ export const post = (url, callback, input = '') => {
 export const sPost = (url, callback, token, input = '') => {
   request
     .post(url)
-    .set('Content-Type', 'application/json')
+    .set('Content-Type', 'text/plain')
     .set('Authorization', `Bearer ${token}`)
     .send(input)
     .then(res => {
