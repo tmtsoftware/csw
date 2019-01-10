@@ -51,7 +51,7 @@ class JsonUtilBenchmark {
     jacksonObjectMapper = new ObjectMapper()
   }
 
-  // Benchmark for extracting value of key using persist-json's jgetString method
+  // Benchmark for extracting value of key using play-json method
   @Benchmark
   @BenchmarkMode(Array(Mode.Throughput))
   @OutputTimeUnit(TimeUnit.SECONDS)

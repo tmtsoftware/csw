@@ -22,7 +22,6 @@ object Libs {
   val `akka-management-cluster-http` = "com.lightbend.akka"   %% "akka-management-cluster-http" % "0.6"        //N/A at the moment
   val `svnkit`                       = "org.tmatesoft.svnkit" % "svnkit"                        % "1.9.3"      //TMate Open Source License
   val `commons-codec`                = "commons-codec"        % "commons-codec"                 % "1.10"       //Apache 2.0
-  val `persist-json`                 = "com.persist"          %% "persist-json"                 % "1.2.1"      //Apache 2.0
   val `joda-time`                    = "joda-time"            % "joda-time"                     % "2.10.1"     //Apache 2.0
   val `scala-reflect`                = "org.scala-lang"       % "scala-reflect"                 % ScalaVersion //BSD-3
   val `gson`                         = "com.google.code.gson" % "gson"                          % "2.8.5"      //Apache 2.0
