@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 currentDir=$(pwd)
-keycloakDir=${currentDir}
+keycloakDir=~
 keycloakVersion=4.6.0
 keycloakBinaryUnzipped=keycloak-${keycloakVersion}.Final
 keycloakBinaryZipped=${keycloakBinaryUnzipped}.tar.gz
