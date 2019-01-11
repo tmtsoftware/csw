@@ -287,6 +287,7 @@ object Dependencies {
       Akka.`akka-actor`,
       Libs.`junit-interface`          % Test,
       Libs.`scalatest`.value          % Test,
+      Libs.HdrHistogram               % Test,
       Akka.`akka-actor-testkit-typed` % Test
     )
   )
