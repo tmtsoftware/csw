@@ -715,6 +715,8 @@ class ConfigServiceRouteTest
     Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> csRoute.route ~> check {
       status shouldEqual StatusCodes.Created
     }
-    requests.head.header[Authorization].get.credentials.token() should fullyMatch regex "\\*.*"
+
+    // the replacement text must match what is used in maskedToken in TokenMaskSupport.scala
+    requests.head.header[Authorization].get.credentials.token() shouldBe "**********"
   }
 }
