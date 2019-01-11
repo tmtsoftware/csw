@@ -1,15 +1,16 @@
 package csw.location.client.scaladsl
+
 import akka.actor.ActorSystem
 import akka.stream.Materializer
 import csw.location.api.scaladsl.LocationService
-import csw.location.client.internal.LocationServiceClient
+import csw.location.client.internal.{LocationServiceClient, Settings}
 
 /**
  * The factory is used to create LocationService instance.
  */
 object HttpLocationServiceFactory {
 
-  private val httpServerPort = 7654
+  private val httpServerPort = Settings().serverPort
 
   /**
    * Use this factory method to create http location client when location server is running locally.
