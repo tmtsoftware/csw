@@ -445,6 +445,7 @@ lazy val `csw-benchmark` = project
     `csw-logging`,
     `csw-params-jvm`,
     `csw-command-client`,
+    `csw-time-client`,
     `csw-location-server` % "compile->test",
     `csw-framework`       % "compile->compile;test->test"
   )
