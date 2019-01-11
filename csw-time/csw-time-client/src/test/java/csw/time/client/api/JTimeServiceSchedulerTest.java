@@ -1,4 +1,4 @@
-package csw.time.client;
+package csw.time.client.api;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
@@ -8,6 +8,9 @@ import akka.actor.typed.internal.adapter.ActorSystemAdapter;
 import akka.testkit.TestProbe;
 import akka.testkit.javadsl.TestKit;
 import csw.time.api.models.TAITime;
+import csw.time.client.TimeServiceSchedulerFactory;
+import csw.time.client.api.Cancellable;
+import csw.time.client.api.TimeServiceScheduler;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;

@@ -15,7 +15,8 @@ import csw.config.client.scaladsl.ConfigClientFactory
 import csw.event.client.EventServiceFactory
 import csw.event.api.scaladsl.EventService
 import csw.logging.scaladsl.LoggerFactory
-import csw.time.client.{TimeServiceScheduler, TimeServiceSchedulerFactory}
+import csw.time.client.TimeServiceSchedulerFactory
+import csw.time.client.api.TimeServiceScheduler
 
 import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContextExecutor, Future}

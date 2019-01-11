@@ -1,4 +1,4 @@
-package csw.time.client
+package csw.time.client.api
 
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicInteger
@@ -8,6 +8,7 @@ import akka.actor.testkit.typed.scaladsl.{ManualTime, ScalaTestWithActorTestKit}
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.testkit.TestProbe
 import csw.time.api.models.{TAITime, UTCTime}
+import csw.time.client.TimeServiceSchedulerFactory
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike}
 
 import scala.collection.mutable.ArrayBuffer

@@ -1,4 +1,4 @@
-package csw.time.client
+package csw.time.client.api
 
 import java.time.Duration
 
