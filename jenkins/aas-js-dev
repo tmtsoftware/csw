@@ -26,11 +26,11 @@ pipeline {
             }
         }
 
-        // stage('test:it') {
-        //     steps {
-        //         sh "cd csw-aas/csw-aas-js && npm run test:it"
-        //     }
-        // }
+        stage('test:it') {
+            steps {
+                sh "cd csw-aas/csw-aas-js && npm run test:it"
+            }
+        }
 
         stage('build') {
             steps {
