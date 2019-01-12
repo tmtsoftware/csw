@@ -19,7 +19,7 @@ class TimeServiceMultipleSchedulersTest extends ScalaTestWithActorTestKit() with
 
   for (scenario <- TestSettings.all) {
     import scenario._
-    test(s"Offset:$offset Schedulers:$nSchedulers Warmup:$warmup Tasks:$nTasks") {
+    ignore(s"Offset:$offset Schedulers:$nSchedulers Warmup:$warmup Tasks:$nTasks") {
       val xs: List[(TestProbe, Cancellable)] = (1 to nSchedulers).map { _ =>
         val testProbe = TestProbe()(sys)
         val startTime = UTCTime(UTCTime.now().value.plusSeconds(1L))
