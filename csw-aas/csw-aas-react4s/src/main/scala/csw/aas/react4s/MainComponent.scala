@@ -49,4 +49,4 @@ object AAS extends js.Object {
   val Consumer: js.Dynamic               = js.native
 }
 
-object Error extends JsComponent(AAS.Login)
+object Error extends JsComponent(AAS.Error)
