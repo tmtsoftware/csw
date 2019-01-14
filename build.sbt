@@ -577,15 +577,18 @@ lazy val `csw-aas-react4s` = project
     fork := false,
     resolvers += Resolver.sonatypeRepo("snapshots"),
     npmDependencies in Compile ++= Seq(
-      "react"     -> "16.4.1",
-      "react-dom" -> "16.4.1",
+      "react"     -> "16.7.0",
+      "react-dom" -> "16.7.0",
       "csw-aas-js" → "0.1.0-RC1",
-      "@babel/polyfill" → "6.26.0"
+      "babel-core" → "6.26.3",
+      "babel-polyfill" → "6.26.0",
+      "babel-preset-stage-0"→ "6.24.1"
     ),
     scalacOptions += "-P:scalajs:sjsDefinedByDefault",
     libraryDependencies ++= Dependencies.AASReact4s.value,
-    version in webpack := "4.8.1",
-    version in startWebpackDevServer := "3.1.4",
+    version in webpack := "4.28.4",
+    version in startWebpackDevServer := "3.1.14",
+    webpackConfigFile in fastOptJS := Some(baseDirectory.value / "aas.webpack.config.js"),
     webpackResources := webpackResources.value +++ PathFinder(Seq(baseDirectory.value / "index.html")) ** "*.*",
     webpackDevServerExtraArgs in fastOptJS ++= Seq(
       "--content-base",
