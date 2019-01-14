@@ -43,7 +43,7 @@ trait TimeServiceScheduler {
   def scheduleOnce(startTime: TMTTime, receiver: ActorRef, message: Any): Cancellable
 
   /**
-   * Schedules a task to execute periodically at the given interval. The task is executed once immediately without any initial delay.
+   * Schedules a task to execute periodically at the given interval. The task is executed once immediately without any initial delay followed by periodic executions.
    * In case you do not want to start scheduling immediately, you can use the overloaded method for [[schedulePeriodically()]] with startTime.
    *
    * @param interval the time interval between the execution of tasks

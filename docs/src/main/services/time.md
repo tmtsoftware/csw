@@ -39,10 +39,10 @@ If you are not using csw-framework, you can create @scaladoc[TimeServiceSchedule
 using @scaladoc[TimeServiceSchedulerFactory](csw/time/client/TimeServiceSchedulerFactory) as follows.
 
 Scala
-:   @@snip [TimeSchedulerExamples.scala](../../../../examples/src/main/scala/csw/time/TimeSchedulerExamples.scala) { #create-scheduler }
+:   @@snip [TimeSchedulerExamples.scala](../../../../examples/src/main/scala/csw/time/SchedulerExamples.scala) { #create-scheduler }
 
 Java
-:   @@snip [JTimeSchedulerExamples.java](../../../../examples/src/main/java/csw/time/JTimeSchedulerExamples.java) { #create-scheduler }
+:   @@snip [JTimeSchedulerExamples.java](../../../../examples/src/main/java/csw/time/JSchedulerExamples.java) { #create-scheduler }
 
 ## TMTTime API
 
@@ -51,7 +51,7 @@ It supports two timescales
  * Coordinated Universal Time @scaladoc[UTCTime](csw/time/api/models/UTCTime)
  * International Atomic Time @scaladoc[TAITime](csw/time/api/models/TAITime)
  
-### Get current UTC time
+### Get Current UTC Time
 Gets the current UTC time with nanosecond precision 
 
 Scala
@@ -60,7 +60,7 @@ Scala
 Java
 :   @@snip [JTMTTimeExamples.java](../../../../examples/src/main/java/csw/time/JTMTTimeExamples.java) { #utc-time }
 
-### Get current TAI time
+### Get Current TAI Time
 Gets the current TAI time with nanosecond precision 
 
 Scala
@@ -69,7 +69,7 @@ Scala
 Java
 :   @@snip [JTMTTimeExamples.java](../../../../examples/src/main/java/csw/time/JTMTTimeExamples.java) { #tai-time }
 
-### Conversion from UTC to TAI time
+### Conversion from UTC to TAI Time
 Converts the given UTC time to TAI time.
 
 Scala
@@ -78,7 +78,7 @@ Scala
 Java
 :   @@snip [JTMTTimeExamples.java](../../../../examples/src/main/java/csw/time/JTMTTimeExamples.java) { #utc-to-tai }
 
-### Conversion from TAI to UTC time
+### Conversion from TAI to UTC Time
 Converts the given @scaladoc[TAITime](csw/time/api/models/TAITime) to @scaladoc[UTCTime](csw/time/api/models/UTCTime).
 
 Scala
@@ -92,7 +92,7 @@ Java
 
 This API provides additional Zone related functionality on top of TMTTime. It allows users to get a Zoned representation of TMTTime. 
 
-### At local timezone
+### At local Timezone
 Gets the given TMTTime at Local timezone. The local timezone is fetched from the System's default timezone.
 
 Scala
@@ -101,7 +101,7 @@ Scala
 Java
 :   @@snip [JTMTTimeExamples.java](../../../../examples/src/main/java/csw/time/JTMTTimeExamples.java) { #at-local }
 
-### At Hawaii (HST) timezone
+### At Hawaii (HST) Timezone
 Gets the given TMTTime at Hawaii timezone.
 
 Scala
@@ -110,7 +110,7 @@ Scala
 Java
 :   @@snip [JTMTTimeExamples.java](../../../../examples/src/main/java/csw/time/JTMTTimeExamples.java) { #at-hawaii }
 
-### At Custom timezone
+### At Custom Timezone
 Gets the given TMTTime at the specified timezone.
 
 Scala
@@ -118,3 +118,41 @@ Scala
 
 Java
 :   @@snip [JTMTTimeExamples.java](../../../../examples/src/main/java/csw/time/JTMTTimeExamples.java) { #at-zone }
+
+## Scheduler API
+This API provides various methods to schedule periodic or non-periodic tasks in future. An instance of @scaladoc[Cancellable](csw/time/client/api/Cancellable) is returned which can be used to cancel the execution of the future tasks.
+
+### Schedule Once
+Schedules a task to execute once at the given start time. The `startTime` can be either UTC time or TAI time.
+
+Scala
+:   @@snip [SchedulerExamples.scala](../../../../examples/src/main/scala/csw/time/SchedulerExamples.scala) { #schedule-once}
+
+Java
+:   @@snip [JSchedulerExamples.java](../../../../examples/src/main/java/csw/time/JSchedulerExamples.java) { #schedule-once }
+
+### Schedule Once With ActorRef
+Schedules sending of the given message to the provided `actorRef` at the given start time. The `startTime` can be either UTC time or TAI time.
+
+Scala
+:   @@snip [SchedulerExamples.scala](../../../../examples/src/main/scala/csw/time/SchedulerExamples.scala) { #schedule-once-with-actorRef }
+
+Java
+:   @@snip [JSchedulerExamples.java](../../../../examples/src/main/java/csw/time/JSchedulerExamples.java) { #schedule-once-with-actorRef }
+
+### Schedule Periodically
+Schedules a task to execute periodically at the given interval. The task is executed once immediately without any initial delay followed by periodic executions. In case you do not want to start scheduling immediately, you can use the overloaded method  for `schedulePeriodically()` with `startTime` as shown in following examples.
+
+Scala
+:   @@snip [SchedulerExamples.scala](../../../../examples/src/main/scala/csw/time/SchedulerExamples.scala) { #schedule-periodically }
+
+Java
+:   @@snip [JSchedulerExamples.java](../../../../examples/src/main/java/csw/time/JSchedulerExamples.java) { #schedule-periodically }
+
+
+
+Scala
+:   @@snip [SchedulerExamples.scala](../../../../examples/src/main/scala/csw/time/SchedulerExamples.scala) { #schedule-periodically-with-startTime }
+
+Java
+:   @@snip [JSchedulerExamples.java](../../../../examples/src/main/java/csw/time/JSchedulerExamples.java) { #schedule-periodically-with-startTime }
