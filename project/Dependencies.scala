@@ -35,7 +35,7 @@ object Dependencies {
       Akka.`akka-cluster-typed`,
       AkkaHttp.`akka-http-cors`,
       Libs.`scala-java8-compat`,
-      Libs.`scala-async`,
+      Libs.`scala-async`.value,
       Libs.`scopt`,
       Enumeratum.`enumeratum`.value,
       Libs.`akka-management-cluster-http`,
@@ -55,7 +55,7 @@ object Dependencies {
     Seq(
       AkkaHttp.`akka-http`,
       Akka.`akka-remote`,
-      Libs.`scala-async`,
+      Libs.`scala-async`.value,
       Libs.`play-json`.value,
       Libs.`akka-http-play-json`,
       Libs.`scalatest`.value % Test
@@ -96,7 +96,7 @@ object Dependencies {
   val ConfigClient = Def.setting(
     Seq(
       AkkaHttp.`akka-http`,
-      Libs.`scala-async`,
+      Libs.`scala-async`.value,
       Libs.`scalatest`.value         % Test,
       Libs.`junit`                   % Test,
       Libs.`junit-interface`         % Test,
@@ -152,7 +152,7 @@ object Dependencies {
 
   val Framework = Def.setting(
     Seq(
-      Libs.`scala-async`,
+      Libs.`scala-async`.value,
       Libs.`play-json`.value,
       Enumeratum.`enumeratum-play`,
       Akka.`akka-actor-typed`,
@@ -168,7 +168,7 @@ object Dependencies {
 
   val CommandClient = Def.setting(
     Seq(
-      Libs.`scala-async`,
+      Libs.`scala-async`.value,
       Akka.`akka-actor-typed`,
       Chill.`chill-akka`,
       Libs.`caffeine`,
@@ -190,7 +190,7 @@ object Dependencies {
 
   val EventClient = Def.setting(
     Seq(
-      Libs.`scala-async`,
+      Libs.`scala-async`.value,
       Akka.`akka-stream`,
       Libs.`akka-stream-kafka`,
       Libs.`lettuce`,
@@ -235,7 +235,7 @@ object Dependencies {
   val AlarmClient = Def.setting(
     Seq(
       Libs.`lettuce`,
-      Libs.`scala-async`,
+      Libs.`scala-async`.value,
       Libs.`json-schema-validator`,
       Libs.`scala-java8-compat`,
       Akka.`akka-actor-typed`,
@@ -298,7 +298,7 @@ object Dependencies {
     Seq(
       Libs.`postgresql`,
       Libs.`scala-java8-compat`,
-      Libs.`scala-async`,
+      Libs.`scala-async`.value,
       Libs.`hikaricp`,
       Jooq.`jooq`,
       Jooq.`jooq-meta`,
@@ -320,7 +320,7 @@ object Dependencies {
       Libs.`jboss-logging`,
       Libs.httpclient,
       Libs.`scalatest`.value % Test,
-      Libs.`mockito-scala`   % Test,
+      Libs.`mockito-scala`   % Test
     )
   )
 
@@ -332,13 +332,13 @@ object Dependencies {
       Keycloak.`keycloak-adapter-core`,
       Keycloak.`keycloak-authz`,
       AkkaHttp.`akka-http`,
-      Libs.`scala-async`,
+      Libs.`scala-async`.value,
       Typelevel.`cats-effects`,
       //(legacy dependencies) required*
       Libs.`jboss-logging`,
       Libs.httpclient,
       Libs.`scalatest`.value % Test,
-      Libs.`mockito-scala`   % Test,
+      Libs.`mockito-scala`   % Test
     )
   )
 
@@ -354,6 +354,15 @@ object Dependencies {
       Libs.`akka-http-play-json`            % Test,
       Libs.`embedded-keycloak`              % Test,
       Akka.`akka-multi-node-testkit`        % Test
+    )
+  )
+
+  val AASReact4s = Def.setting(
+    Seq(
+      Libs.`scalatest`.value % Test,
+      React4s.`react4s`.value,
+      React4s.`router4s`.value,
+      Libs.`scala-async`.value
     )
   )
 
@@ -378,7 +387,7 @@ object Dependencies {
     Seq(
       Libs.`lettuce`,
       Enumeratum.`enumeratum`.value,
-      Libs.`scala-async`,
+      Libs.`scala-async`.value,
       Libs.`scala-java8-compat`,
       Akka.`akka-stream`,
       Libs.`scalatest`.value % Test

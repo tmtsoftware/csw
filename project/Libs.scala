@@ -10,12 +10,12 @@ object Libs {
   val `scalatest` = dep("org.scalatest" %%% "scalatest" % "3.0.5") //Apache License 2.0
 
   val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0" //BSD 3-clause "New" or "Revised" License
-  val `scala-async`        = "org.scala-lang.modules" %% "scala-async"        % "0.9.7" //BSD 3-clause "New" or "Revised" License
-  val `scopt`              = "com.github.scopt"       %% "scopt"              % "3.7.1" //MIT License
-  val `acyclic`            = "com.lihaoyi"            %% "acyclic"            % AcyclicVersion % Provided //MIT License
-  val `junit`              = "junit"                  % "junit"               % "4.12" //Eclipse Public License 1.0
-  val `junit-interface`    = "com.novocode"           % "junit-interface"     % "0.11" //BSD 2-clause "Simplified" License
-  val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.0.9"
+  val `scala-async`        = dep("org.scala-lang.modules" %% "scala-async" % "0.9.7") //BSD 3-clause "New" or "Revised" License
+  val `scopt`              = "com.github.scopt" %% "scopt" % "3.7.1" //MIT License
+  val `acyclic`            = "com.lihaoyi" %% "acyclic" % AcyclicVersion % Provided //MIT License
+  val `junit`              = "junit" % "junit" % "4.12" //Eclipse Public License 1.0
+  val `junit-interface`    = "com.novocode" % "junit-interface" % "0.11" //BSD 2-clause "Simplified" License
+  val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.0.9"
   //MIT License
   val `embedded-keycloak`            = "tech.bilal"           %% "embedded-keycloak"            % "0.0.7-beta" //Apache 2.0
   val `logback-classic`              = "ch.qos.logback"       % "logback-classic"               % "1.2.3"      //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
@@ -119,4 +119,9 @@ object Jooq {
   val `jooq`         = "org.jooq" % "jooq" % Version
   val `jooq-meta`    = "org.jooq" % "jooq-meta" % Version
   val `jooq-codegen` = "org.jooq" % "jooq-codegen" % Version
+}
+
+object React4s {
+  val `react4s`  = dep("com.github.ahnfelt" %%% "react4s"  % "0.9.15-SNAPSHOT")
+  val `router4s` = dep("com.github.werk"    %%% "router4s" % "0.1.0-SNAPSHOT")
 }

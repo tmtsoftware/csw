@@ -1,4 +1,4 @@
-import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
+import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
 
 val enableCoverage         = sys.props.get("enableCoverage").contains("true")
 val MaybeCoverage: Plugins = if (enableCoverage) Coverage else Plugins.empty
@@ -566,4 +566,40 @@ lazy val `csw-aas-http` = project
   .dependsOn(`csw-aas-core`, `csw-location-client` % "test->compile")
   .settings(
     libraryDependencies ++= Dependencies.AuthNativeClientAdapter.value
+  )
+
+lazy val `csw-aas-react4s` = project
+  .in(file("csw-aas/csw-aas-react4s"))
+  .enablePlugins(ScalaJSBundlerPlugin)
+  .dependsOn(`csw-aas-react4s-facade`)
+  .settings(
+    webpackBundlingMode := BundlingMode.LibraryOnly(),
+    fork := false,
+    resolvers += Resolver.sonatypeRepo("snapshots"),
+    npmDependencies in Compile ++= Seq(
+      "react"     -> "16.4.1",
+      "react-dom" -> "16.4.1"
+    ),
+    scalacOptions += "-P:scalajs:sjsDefinedByDefault",
+    libraryDependencies ++= Dependencies.AASReact4s.value,
+    version in webpack := "4.8.1",
+    version in startWebpackDevServer := "3.1.4",
+    webpackResources := webpackResources.value +++ PathFinder(Seq(baseDirectory.value / "index.html")) ** "*.*",
+    webpackDevServerExtraArgs in fastOptJS ++= Seq(
+      "--content-base",
+      baseDirectory.value.getAbsolutePath
+    )
+  )
+
+lazy val `csw-aas-react4s-facade` = project
+  .in(file("csw-aas/csw-aas-react4s-facade"))
+  .enablePlugins(ScalaJSPlugin)
+  .settings(
+    fork := false,
+    scalacOptions += "-P:scalajs:sjsDefinedByDefault",
+    resolvers += Resolver.sonatypeRepo("snapshots"),
+    libraryDependencies ++= Seq(
+      Libs.`scalatest`.value % Test,
+      React4s.`react4s`.value,
+    )
   )
