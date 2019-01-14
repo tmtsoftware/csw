@@ -64,7 +64,7 @@ Scala
 Java
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/java/csw/alarm/JAlarmServiceClientExampleApp.java) { #create-java-api }
 
-## Rules and checkes
+## Rules and checks
 * When representing a unique alarm, the alarm name or component name must not have `* [ ] ^ -` or `any whitespace characters`
 
 ## Model Classes
