@@ -107,7 +107,7 @@ function usage {
 function addAdminUser {
     cd ${keycloakDir}/${keycloakBinaryUnzipped}/bin
     echo "[INFO] Adding user"
-    sh add-user-keycloak.sh --user ${userName} -p ${password}
+    ./add-user-keycloak.sh --user ${userName} -p ${password}
 }
 
 function is_AAS_running {
@@ -133,24 +133,24 @@ function addTestUsers {
     cd ${keycloakDir}/${keycloakBinaryUnzipped}/bin
     echo "[INFO] Adding test users"
     if ${exampleDemo} ; then
-        sh add-user-keycloak.sh -u test-user -p abcd -r example
+        ./add-user-keycloak.sh -u test-user -p abcd -r example
     else
-        sh add-user-keycloak.sh -u kevin -p abcd -r TMT
-        sh add-user-keycloak.sh -u frank -p abcd -r TMT
+        ./add-user-keycloak.sh -u kevin -p abcd -r TMT
+        ./add-user-keycloak.sh -u frank -p abcd -r TMT
     fi
 }
 
 function associateRoleToTestUsers {
     wait_till_AAS_starts
     cd ${keycloakDir}/${keycloakBinaryUnzipped}/bin
-        sh kcadm.sh config credentials --server http://${host}:${port}/auth --realm master --user ${userName} --password ${password}
+        ./kcadm.sh config credentials --server http://${host}:${port}/auth --realm master --user ${userName} --password ${password}
     if ${exampleDemo} ; then
         echo "[INFO] Associate roles to example users"
-        sh kcadm.sh add-roles --uusername test-user --rolename person-role --cclientid example-server -r example
-        sh kcadm.sh add-roles --uusername test-user --rolename example-admin-role -r example
+        ./kcadm.sh add-roles --uusername test-user --rolename person-role --cclientid example-server -r example
+        ./kcadm.sh add-roles --uusername test-user --rolename example-admin-role -r example
     else
         echo "[INFO] Associate roles to test users"
-        sh kcadm.sh add-roles --uusername kevin --rolename admin --cclientid csw-config-server -r TMT
+        ./kcadm.sh add-roles --uusername kevin --rolename admin --cclientid csw-config-server -r TMT
     fi
 }
 
@@ -161,7 +161,7 @@ function startAndRegister {
     if $exampleDemo; then
         path=${currentDir}/${exampleImportJsonPath}
     fi
-    sh csw-location-agent --name AAS --http "auth" -c "sh ${keycloakDir}/${keycloakBinaryUnzipped}/bin/standalone.sh -Djboss.bind.address=${host} -Djboss.http.port=${port} -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=$path" -p "$port"
+    ./csw-location-agent --name AAS --http "auth" -c "${keycloakDir}/${keycloakBinaryUnzipped}/bin/standalone.sh -Djboss.bind.address=${host} -Djboss.http.port=${port} -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=$path" -p "$port"
 }
 
 function start {
