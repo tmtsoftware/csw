@@ -573,12 +573,14 @@ lazy val `csw-aas-react4s` = project
   .enablePlugins(ScalaJSBundlerPlugin)
   .dependsOn(`csw-aas-react4s-facade`)
   .settings(
-    webpackBundlingMode := BundlingMode.LibraryOnly(),
+    scalaJSUseMainModuleInitializer := true,
     fork := false,
     resolvers += Resolver.sonatypeRepo("snapshots"),
     npmDependencies in Compile ++= Seq(
       "react"     -> "16.4.1",
-      "react-dom" -> "16.4.1"
+      "react-dom" -> "16.4.1",
+      "csw-aas-js" → "0.1.0-RC1",
+      "@babel/polyfill" → "6.26.0"
     ),
     scalacOptions += "-P:scalajs:sjsDefinedByDefault",
     libraryDependencies ++= Dependencies.AASReact4s.value,
