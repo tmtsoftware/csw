@@ -5,8 +5,8 @@ import akka.actor.typed.ActorRef
 import csw.command.client.internal.{CommandCorrelation, CommandResponseState, CommandSubscribersState}
 import csw.command.client.models.framework.PubSub.SubscriberMessage
 import csw.command.client.models.framework._
-import csw.logging.internal.LoggingLevels.Level
-import csw.logging.models.LogMetadata
+import csw.logging.core.internal.LoggingLevels.Level
+import csw.logging.core.models.LogMetadata
 import csw.params.commands.ControlCommand
 import csw.params.core.models.{Id, Prefix}
 import csw.params.core.states.CurrentState

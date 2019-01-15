@@ -2,7 +2,7 @@ package csw.network.utils.internal
 
 import java.net.{InetAddress, NetworkInterface}
 
-import csw.logging.scaladsl.Logger
+import csw.logging.core.scaladsl.Logger
 import csw.network.utils.commons.NetworksLogger
 import csw.network.utils.exceptions.NetworkInterfaceNotFound
 

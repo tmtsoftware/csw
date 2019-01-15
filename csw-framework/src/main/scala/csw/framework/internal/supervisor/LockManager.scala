@@ -5,7 +5,7 @@ import csw.command.client.messages.CommandMessage
 import csw.command.client.models.framework.LockingResponse
 import csw.command.client.models.framework.LockingResponses._
 import csw.params.core.models.Prefix
-import csw.logging.scaladsl.{Logger, LoggerFactory}
+import csw.logging.core.scaladsl.{Logger, LoggerFactory}
 
 private[framework] class LockManager(val lockPrefix: Option[Prefix], loggerFactory: LoggerFactory) {
   private val log: Logger = loggerFactory.getLogger

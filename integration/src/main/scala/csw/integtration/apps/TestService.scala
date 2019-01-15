@@ -5,7 +5,7 @@ import csw.location.api.models.Connection.HttpConnection
 import csw.location.api.models.{ComponentId, ComponentType, HttpRegistration, RegistrationResult}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.internal.ServerWiring
-import csw.logging.scaladsl.LoggingSystemFactory
+import csw.logging.core.scaladsl.LoggingSystemFactory
 
 object TestService {
   val componentId = ComponentId("redisservice", ComponentType.Service)

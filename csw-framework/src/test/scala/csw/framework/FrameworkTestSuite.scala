@@ -13,7 +13,7 @@ import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.command.client.models.framework.ComponentInfo
 import csw.command.client.messages.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
 import csw.location.client.ActorSystemFactory
-import csw.logging.scaladsl.LoggerFactory
+import csw.logging.core.scaladsl.LoggerFactory
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.Await

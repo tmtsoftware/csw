@@ -10,7 +10,7 @@ import csw.command.client.models.framework.LockingResponses._
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.{ObsId, Prefix}
 import csw.command.client.messages.CommandMessage.Submit
-import csw.logging.scaladsl.{Logger, LoggerFactory}
+import csw.logging.core.scaladsl.{Logger, LoggerFactory}
 import csw.params.commands.CommandResponse.SubmitResponse
 import org.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}

@@ -1,5 +1,5 @@
 package csw.network.utils.commons
-import csw.logging.scaladsl.LoggerFactory
+import csw.logging.core.scaladsl.LoggerFactory
 
 /**
  * All the logs generated from networks util will have a fixed componentName, which is "networks-util".

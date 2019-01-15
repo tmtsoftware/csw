@@ -4,7 +4,7 @@ import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext}
 import akka.actor.typed.{ActorRef, Behavior, Signal, Terminated}
 import csw.command.client.models.framework.PubSub
 import csw.command.client.models.framework.PubSub._
-import csw.logging.scaladsl.{Logger, LoggerFactory}
+import csw.logging.core.scaladsl.{Logger, LoggerFactory}
 import csw.params.commands.Nameable
 import csw.params.core.states.StateName
 

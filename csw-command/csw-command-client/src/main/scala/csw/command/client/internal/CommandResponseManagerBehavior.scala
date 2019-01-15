@@ -5,7 +5,7 @@ import akka.actor.typed.{ActorRef, Behavior}
 import csw.command.client.Store
 import csw.command.client.messages.CommandResponseManagerMessage
 import csw.command.client.messages.CommandResponseManagerMessage._
-import csw.logging.scaladsl.{Logger, LoggerFactory}
+import csw.logging.core.scaladsl.{Logger, LoggerFactory}
 import csw.params.commands.CommandResponse
 import csw.params.commands.CommandResponse.{QueryResponse, SubmitResponse}
 import csw.params.core.models.Id
@@ -34,8 +34,8 @@ import csw.params.core.models.Id
  * from two HCD's when these sub commands completes, using subscribe API. And once Assembly receives final command response
  * from both the HCD's then it can update Top level command with final [[csw.params.commands.CommandResponse]]
  *
- * @param ctx             The Actor Context under which the actor instance of this behavior is created
- * @param loggerFactory   The factory for creating [[csw.logging.scaladsl.Logger]] instance
+ * @param ctx           The Actor Context under which the actor instance of this behavior is created
+ * @param loggerFactory The factory for creating [[csw.logging.core.scaladsl.Logger]] instance
  */
 private[internal] class CommandResponseManagerBehavior(
     ctx: ActorContext[CommandResponseManagerMessage],

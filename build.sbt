@@ -8,7 +8,6 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-location`,
   `csw-config`,
   `csw-logging`,
-  `csw-logging-macros`,
   `csw-params-jvm`,
   `csw-params-js`,
   `csw-framework`,
@@ -96,7 +95,7 @@ lazy val `csw-location` = project
 lazy val `csw-location-api` = project
   .in(file("csw-location/csw-location-api"))
   .dependsOn(
-    `csw-logging`,
+    `csw-logging-core`,
     `csw-params-jvm`
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
@@ -108,7 +107,7 @@ lazy val `csw-location-server` = project
   .in(file("csw-location/csw-location-server"))
   .dependsOn(
     `csw-location-api`,
-    `csw-logging`,
+    `csw-logging-core`,
     `csw-network-utils`,
     `csw-location-client` % "test->compile;multi-jvm->compile",
     `csw-commons`         % "compile->compile;test->test"
@@ -203,12 +202,21 @@ lazy val `csw-config-cli` = project
 
 /* ============ Logging service ============ */
 
+lazy val `csw-logging` = project
+  .in(file("csw-logging"))
+  .aggregate(
+    `csw-logging-core`,
+    `csw-logging-macros`,
+  )
+
 lazy val `csw-logging-macros` = project
+  .in(file("csw-logging/csw-logging-macros"))
   .settings(
     libraryDependencies += Libs.`scala-reflect`
   )
 
-lazy val `csw-logging` = project
+lazy val `csw-logging-core` = project
+  .in(file("csw-logging/csw-logging-core"))
   .dependsOn(`csw-logging-macros`)
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(
@@ -242,7 +250,7 @@ lazy val `csw-framework` = project
   .dependsOn(
     `csw-params-jvm`,
     `csw-config-client`,
-    `csw-logging`,
+    `csw-logging-core`,
     `csw-command-client`,
     `csw-event-client`,
     `csw-alarm-client`,
@@ -279,7 +287,7 @@ lazy val `csw-command-client` = project
   .in(file("csw-command/csw-command-client"))
   .dependsOn(
     `csw-command-api`,
-    `csw-logging`,
+    `csw-logging-core`,
     `csw-commons` % "test->test"
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm, MaybeCoverage)
@@ -305,7 +313,7 @@ lazy val `csw-event-client` = project
   .in(file("csw-event/csw-event-client"))
   .dependsOn(
     `csw-event-api`,
-    `csw-logging`,
+    `csw-logging-core`,
     `romaine`,
     `csw-location-api`,
     `csw-location-server` % "test->test;multi-jvm->multi-jvm",
@@ -353,9 +361,9 @@ lazy val `csw-alarm-client` = project
   .dependsOn(
     `csw-alarm-api`,
     `csw-location-api`,
-    `csw-logging`,
+    `csw-logging-core`,
     `romaine`,
-    `csw-logging`         % "test->test",
+    `csw-logging-core`         % "test->test",
     `csw-commons`         % "test->test",
     `csw-location-server` % "test->compile;test->test"
   )
@@ -414,7 +422,7 @@ lazy val `csw-time-client` = project
   .in(file("csw-time/csw-time-client"))
   .dependsOn(
     `csw-time-api-jvm` % "compile->compile;test->test",
-    `csw-logging`
+    `csw-logging-core`
   )
   .settings(libraryDependencies ++= Dependencies.TimeClient.value)
 
@@ -439,7 +447,7 @@ lazy val `csw-database-client` = project
 
 /* =============== Common Utilities ============ */
 lazy val `csw-network-utils` = project
-  .dependsOn(`csw-logging`)
+  .dependsOn(`csw-logging-core`)
   .enablePlugins(PublishBintray)
   .settings(
     libraryDependencies ++= Dependencies.NetworkUtils.value
@@ -468,7 +476,7 @@ lazy val examples = project
     `csw-location-server`,
     `csw-config-client`,
     `csw-aas-http`,
-    `csw-logging`,
+    `csw-logging-core`,
     `csw-params-jvm`,
     `csw-database-client`,
     `csw-framework`,
@@ -483,7 +491,7 @@ lazy val examples = project
 /* ================ Jmh Benchmarks ============== */
 lazy val `csw-benchmark` = project
   .dependsOn(
-    `csw-logging`,
+    `csw-logging-core`,
     `csw-params-jvm`,
     `csw-command-client`,
     `csw-time-client`,
@@ -531,7 +539,7 @@ lazy val `csw-aas` = project
 
 lazy val `csw-aas-core` = project
   .in(file("csw-aas/csw-aas-core"))
-  .dependsOn(`csw-logging`, `csw-location-api`)
+  .dependsOn(`csw-logging-core`, `csw-location-api`)
   .settings(
     libraryDependencies ++= Dependencies.CswAasCore.value
   )

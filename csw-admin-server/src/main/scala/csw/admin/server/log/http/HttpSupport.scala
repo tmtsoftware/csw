@@ -5,9 +5,9 @@ import akka.http.scaladsl.server.directives.{DebuggingDirectives, LoggingMagnet}
 import akka.http.scaladsl.server.{Directive0, Directive1, Directives, MalformedQueryParamRejection}
 import csw.admin.server.commons.AdminLogger
 import csw.admin.server.log.JsonSupport
-import csw.logging.internal.LoggingLevels
-import csw.logging.internal.LoggingLevels.Level
-import csw.logging.scaladsl.Logger
+import csw.logging.core.internal.LoggingLevels
+import csw.logging.core.internal.LoggingLevels.Level
+import csw.logging.core.scaladsl.Logger
 
 trait HttpSupport extends Directives with JsonSupport {
 

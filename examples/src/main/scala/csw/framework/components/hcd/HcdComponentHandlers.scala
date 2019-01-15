@@ -17,7 +17,7 @@ import csw.params.commands.CommandResponse.{Accepted, Completed, SubmitResponse,
 import csw.params.commands.{ControlCommand, Observe, Setup}
 import csw.location.api.models.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.config.api.models.ConfigData
-import csw.logging.scaladsl.Logger
+import csw.logging.core.scaladsl.Logger
 
 import scala.async.Async.{async, await}
 import scala.concurrent.duration.DurationLong

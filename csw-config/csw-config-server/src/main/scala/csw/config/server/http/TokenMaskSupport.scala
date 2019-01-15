@@ -2,7 +2,7 @@ package csw.config.server.http
 import akka.http.scaladsl.model.HttpRequest
 import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
 import csw.config.server.commons.ConfigServerLogger
-import csw.logging.scaladsl.Logger
+import csw.logging.core.scaladsl.Logger
 
 trait TokenMaskSupport {
   private val log: Logger      = ConfigServerLogger.getLogger

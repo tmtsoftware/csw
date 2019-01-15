@@ -25,7 +25,7 @@ import csw.framework.scaladsl.RegistrationFactory
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaRegistration, ComponentId, ComponentType}
 import csw.location.api.scaladsl.LocationService
-import csw.logging.scaladsl.{Logger, LoggerFactory}
+import csw.logging.core.scaladsl.{Logger, LoggerFactory}
 import csw.params.core.models.Prefix
 import csw.params.core.models.Subsystem.Container
 

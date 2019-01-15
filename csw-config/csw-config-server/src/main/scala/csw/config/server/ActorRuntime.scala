@@ -8,8 +8,8 @@ import akka.actor.{ActorSystem, CoordinatedShutdown}
 import akka.dispatch.MessageDispatcher
 import akka.stream.{ActorMaterializer, Materializer}
 import csw.services.BuildInfo
-import csw.logging.internal.LoggingSystem
-import csw.logging.scaladsl.LoggingSystemFactory
+import csw.logging.core.internal.LoggingSystem
+import csw.logging.core.scaladsl.LoggingSystemFactory
 import csw.network.utils.Networks
 
 import scala.compat.java8.FutureConverters.FutureOps

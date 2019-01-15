@@ -10,7 +10,7 @@ import csw.command.client.models.framework.PubSub.{Publish, Subscribe, Subscribe
 import csw.command.client.models.framework.{LifecycleStateChanged, PubSub, SupervisorLifecycleState}
 import csw.framework.FrameworkTestMocks
 import csw.location.client.ActorSystemFactory
-import csw.logging.scaladsl.Logger
+import csw.logging.core.scaladsl.Logger
 import csw.params.core.models.Prefix
 import csw.params.core.states.{CurrentState, StateName}
 import org.mockito.MockitoSugar

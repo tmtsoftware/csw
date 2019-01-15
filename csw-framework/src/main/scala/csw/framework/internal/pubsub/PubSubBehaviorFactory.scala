@@ -4,7 +4,7 @@ import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
 import csw.params.commands.Nameable
 import csw.command.client.models.framework.PubSub
-import csw.logging.scaladsl.LoggerFactory
+import csw.logging.core.scaladsl.LoggerFactory
 
 /**
  * Factory for creating [[akka.actor.typed.scaladsl.AbstractBehavior]] of a pub sub actor

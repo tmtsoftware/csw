@@ -10,7 +10,7 @@ import csw.database.client.commons.{DatabaseLogger, DatabaseServiceLocationResol
 import csw.database.client.exceptions.DatabaseException
 import csw.location.api.javadsl.ILocationService
 import csw.location.api.scaladsl.LocationService
-import csw.logging.scaladsl.Logger
+import csw.logging.core.scaladsl.Logger
 import org.jooq.impl.DSL
 import org.jooq.{DSLContext, SQLDialect}
 

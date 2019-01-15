@@ -14,8 +14,8 @@ import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.client.ActorSystemFactory
 import csw.location.server.internal.ServerWiring
-import csw.logging.appenders.StdOutAppender
-import csw.logging.scaladsl.{LoggerFactory, LoggingSystemFactory}
+import csw.logging.core.appenders.StdOutAppender
+import csw.logging.core.scaladsl.{LoggerFactory, LoggingSystemFactory}
 import csw.network.utils.Networks
 import csw.params.commands.CommandResponse.OnewayResponse
 import csw.params.commands.{CommandName, Setup}

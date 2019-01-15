@@ -14,7 +14,7 @@ import csw.config.api.scaladsl.ConfigClientService
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.event.client.EventServiceFactory
 import csw.event.api.scaladsl.EventService
-import csw.logging.scaladsl.LoggerFactory
+import csw.logging.core.scaladsl.LoggerFactory
 import csw.time.client.TimeServiceSchedulerFactory
 import csw.time.client.api.TimeServiceScheduler
 

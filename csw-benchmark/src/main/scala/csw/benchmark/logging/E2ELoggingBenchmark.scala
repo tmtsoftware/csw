@@ -4,10 +4,10 @@ import java.net.InetAddress
 import java.util.concurrent.TimeUnit
 
 import akka.actor.ActorSystem
-import csw.logging.appenders.FileAppender
-import csw.logging.internal.LoggingLevels.INFO
-import csw.logging.internal.{LoggerImpl, LoggingSystem}
-import csw.logging.scaladsl.Logger
+import csw.logging.core.appenders.FileAppender
+import csw.logging.core.internal.LoggingLevels.INFO
+import csw.logging.core.internal.{LoggerImpl, LoggingSystem}
+import csw.logging.core.scaladsl.Logger
 import org.openjdk.jmh.annotations._
 
 import scala.concurrent.Await

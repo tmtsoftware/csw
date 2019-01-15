@@ -6,7 +6,7 @@ import csw.config.server.commons.ConfigServerLogger
 import csw.config.server.commons.CoordinatedShutdownReasons.FailureReason
 import csw.config.server.http.HttpService
 import csw.location.client.utils.LocationServerStatus
-import csw.logging.scaladsl.Logger
+import csw.logging.core.scaladsl.Logger
 import csw.services.BuildInfo
 import org.tmatesoft.svn.core.SVNException
 

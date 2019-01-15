@@ -6,7 +6,7 @@ import akka.stream.scaladsl.{FileIO, Keep}
 import csw.config.api.models.ConfigData
 import csw.config.server.commons.ConfigServerLogger
 import csw.config.server.{ActorRuntime, Settings}
-import csw.logging.scaladsl.Logger
+import csw.logging.core.scaladsl.Logger
 
 import scala.async.Async._
 import scala.concurrent.Future

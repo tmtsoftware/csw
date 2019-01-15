@@ -1,6 +1,6 @@
 package csw.location.api.commons
 
-import csw.logging.scaladsl.LoggerFactory
+import csw.logging.core.scaladsl.LoggerFactory
 
 /**
  * All the logs generated from location service will have a fixed componentName, which is the value of [[Constants.LocationService]].

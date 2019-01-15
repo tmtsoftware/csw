@@ -6,7 +6,7 @@ import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import csw.aas.http.AuthorizationPolicy.RealmRolePolicy
 import csw.location.api.scaladsl.LocationService
-import csw.logging.scaladsl.LoggingSystemFactory
+import csw.logging.core.scaladsl.LoggingSystemFactory
 
 import scala.concurrent.{ExecutionContext, Future}
 

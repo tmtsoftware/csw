@@ -9,7 +9,7 @@ import csw.aas.http.AuthorizationPolicy._
 import csw.aas.http.SecurityDirectives
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.client.utils.LocationServerStatus
-import csw.logging.scaladsl.LoggingSystemFactory
+import csw.logging.core.scaladsl.LoggingSystemFactory
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 
 import scala.concurrent.duration.DurationInt

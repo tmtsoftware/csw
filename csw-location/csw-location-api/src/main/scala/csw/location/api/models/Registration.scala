@@ -9,7 +9,7 @@ import akka.serialization.Serialization
 import csw.location.api.commons.LocationServiceLogger
 import csw.location.api.exceptions.LocalAkkaActorRegistrationNotAllowed
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.logging.scaladsl.Logger
+import csw.logging.core.scaladsl.Logger
 import csw.params.core.models.Prefix
 
 /**

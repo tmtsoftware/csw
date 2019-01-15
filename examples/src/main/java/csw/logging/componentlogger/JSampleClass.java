@@ -2,9 +2,9 @@ package csw.logging.componentlogger;
 
 import akka.actor.typed.javadsl.ActorContext;
 import csw.command.client.messages.ComponentMessage;
-import csw.logging.javadsl.ILogger;
-import csw.logging.javadsl.JLoggerFactory;
-import csw.logging.scaladsl.LoggerFactory;
+import csw.logging.core.javadsl.ILogger;
+import csw.logging.core.javadsl.JLoggerFactory;
+import csw.logging.core.scaladsl.LoggerFactory;
 
 //#component-logger-class
 public class JSampleClass {

@@ -1,7 +1,7 @@
 package csw.admin.server.log
 
 import akka.actor.ActorRefFactory
-import csw.logging.appenders.{LogAppenderBuilder, StdOutAppender}
+import csw.logging.core.appenders.{LogAppenderBuilder, StdOutAppender}
 import play.api.libs.json.JsObject
 
 class TestAppender(callback: Any ⇒ Unit) extends LogAppenderBuilder {

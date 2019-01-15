@@ -9,7 +9,7 @@ import akka.actor.{typed, ActorSystem}
 import csw.command.client.internal
 import csw.command.client.messages.CommandResponseManagerMessage
 import csw.command.client.messages.CommandResponseManagerMessage._
-import csw.logging.scaladsl.{Logger, LoggerFactory}
+import csw.logging.core.scaladsl.{Logger, LoggerFactory}
 import csw.params.commands.CommandResponse._
 import csw.params.core.models.Id
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}

@@ -23,11 +23,11 @@ import csw.location.api.models.ComponentId
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.client.ActorSystemFactory
-import csw.logging.internal.JsonExtensions.RichJsObject
-import csw.logging.internal.LoggingLevels.{ERROR, Level, WARN}
-import csw.logging.internal._
-import csw.logging.models.LogMetadata
-import csw.logging.scaladsl.LoggingSystemFactory
+import csw.logging.core.internal.JsonExtensions.RichJsObject
+import csw.logging.core.internal.LoggingLevels.{ERROR, Level, WARN}
+import csw.logging.core.internal._
+import csw.logging.core.models.LogMetadata
+import csw.logging.core.scaladsl.LoggingSystemFactory
 import csw.network.utils.Networks
 import csw.params.commands.CommandResponse.OnewayResponse
 import csw.params.commands.{CommandName, Setup}

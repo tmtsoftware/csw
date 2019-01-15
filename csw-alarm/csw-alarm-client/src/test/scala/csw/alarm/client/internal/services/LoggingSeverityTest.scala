@@ -3,9 +3,9 @@ import com.typesafe.config.ConfigFactory
 import csw.alarm.api.models.AlarmSeverity
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
-import csw.logging.internal.JsonExtensions.RichJsObject
-import csw.logging.internal.{LoggingLevels, LoggingSystem}
-import csw.logging.utils.TestAppender
+import csw.logging.core.internal.JsonExtensions.RichJsObject
+import csw.logging.core.internal.{LoggingLevels, LoggingSystem}
+import csw.logging.core.utils.TestAppender
 import play.api.libs.json.{JsObject, Json}
 
 import scala.collection.mutable

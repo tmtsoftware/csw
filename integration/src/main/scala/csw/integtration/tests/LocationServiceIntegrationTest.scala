@@ -16,7 +16,7 @@ import csw.location.api.models._
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.logging.scaladsl.LoggingSystemFactory
+import csw.logging.core.scaladsl.LoggingSystemFactory
 import csw.network.utils.Networks
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.models.Prefix

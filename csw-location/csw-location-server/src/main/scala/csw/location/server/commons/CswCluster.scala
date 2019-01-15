@@ -12,7 +12,7 @@ import akka.util.Timeout
 import csw.location.api.exceptions.{CouldNotEnsureDataReplication, CouldNotJoinCluster}
 import csw.location.server.commons.ClusterConfirmationActor.HasJoinedCluster
 import csw.location.server.commons.CoordinatedShutdownReasons.FailureReason
-import csw.logging.scaladsl.Logger
+import csw.logging.core.scaladsl.Logger
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext, Future}

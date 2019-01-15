@@ -5,7 +5,7 @@ import akka.http.scaladsl.Http.ServerBinding
 import csw.admin.server.commons.AdminLogger
 import csw.admin.server.commons.CoordinatedShutdownReasons.FailureReason
 import csw.admin.server.wiring.{ActorRuntime, Settings}
-import csw.logging.scaladsl.Logger
+import csw.logging.core.scaladsl.Logger
 import csw.network.utils.Networks
 
 import scala.async.Async._

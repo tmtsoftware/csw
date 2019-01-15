@@ -5,7 +5,7 @@ import akka.http.scaladsl.server.{Directives, ExceptionHandler}
 import csw.commons.http.{JsonRejectionHandler, JsonSupport}
 import csw.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidInput}
 import csw.config.server.commons.ConfigServerLogger
-import csw.logging.scaladsl.Logger
+import csw.logging.core.scaladsl.Logger
 
 import scala.util.control.NonFatal
 

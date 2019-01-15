@@ -61,7 +61,7 @@ The library provides `StdOutAppender` as default logging appender. To use `FileA
  
 ```
 
-appenders = ["csw.logging.appenders.FileAppender$", "csw.logging.appenders.StdOutAppender$"]
+appenders = ["csw.logging.core.appenders.FileAppender$", "csw.logging.core.appenders.StdOutAppender$"]
 
 ```
 

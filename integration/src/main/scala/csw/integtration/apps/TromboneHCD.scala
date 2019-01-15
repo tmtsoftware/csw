@@ -8,7 +8,7 @@ import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaRegistration, ComponentId, ComponentType, RegistrationResult}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.internal.ServerWiring
-import csw.logging.scaladsl.LoggingSystemFactory
+import csw.logging.core.scaladsl.LoggingSystemFactory
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.models.Prefix
 

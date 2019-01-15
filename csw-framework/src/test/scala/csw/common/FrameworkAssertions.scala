@@ -6,8 +6,8 @@ import csw.command.client.messages.ComponentCommonMessage.GetSupervisorLifecycle
 import csw.command.client.messages.ContainerCommonMessage.GetContainerLifecycleState
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.command.client.models.framework.{ContainerLifecycleState, SupervisorLifecycleState}
-import csw.logging.internal.JsonExtensions.RichJsObject
-import csw.logging.internal.LoggingLevels.Level
+import csw.logging.core.internal.JsonExtensions.RichJsObject
+import csw.logging.core.internal.LoggingLevels.Level
 import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
 import play.api.libs.json.{JsObject, JsString}

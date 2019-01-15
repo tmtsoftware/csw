@@ -22,7 +22,7 @@ import csw.framework.models.JCswContext;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.JComponentType;
 import csw.location.api.models.*;
-import csw.logging.javadsl.ILogger;
+import csw.logging.core.javadsl.ILogger;
 import csw.params.commands.*;
 import csw.params.core.generics.Key;
 import csw.params.core.models.Prefix;
@@ -33,7 +33,6 @@ import scala.concurrent.duration.FiniteDuration;
 
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.time.temporal.TemporalUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;

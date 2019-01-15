@@ -17,7 +17,7 @@ import csw.config.api.internal.JsonSupport
 import csw.config.api.models._
 import csw.config.api.scaladsl.ConfigService
 import csw.config.client.commons.ConfigClientLogger
-import csw.logging.scaladsl.Logger
+import csw.logging.core.scaladsl.Logger
 
 import scala.async.Async._
 import scala.concurrent.Future

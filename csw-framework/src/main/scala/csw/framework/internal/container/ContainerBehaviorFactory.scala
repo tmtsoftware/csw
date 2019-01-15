@@ -9,7 +9,7 @@ import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models.ContainerInfo
 import csw.framework.scaladsl.RegistrationFactory
 import csw.location.api.scaladsl.LocationService
-import csw.logging.scaladsl.LoggerFactory
+import csw.logging.core.scaladsl.LoggerFactory
 
 /**
  * Factory for creating [[akka.actor.typed.scaladsl.AbstractBehavior]] of a container component

@@ -7,7 +7,7 @@ import csw.command.client.messages.TopLevelActorMessage
 import csw.params.commands.CommandResponse.{Accepted, Completed, SubmitResponse, ValidateCommandResponse}
 import csw.params.commands.ControlCommand
 import csw.location.api.models.TrackingEvent
-import csw.logging.scaladsl.Logger
+import csw.logging.core.scaladsl.Logger
 
 import scala.concurrent.Future
 

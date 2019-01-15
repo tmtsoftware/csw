@@ -20,8 +20,8 @@ import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.api.models.ComponentType.HCD
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.logging.internal.LoggingLevels.INFO
-import csw.logging.internal.LoggingSystem
+import csw.logging.core.internal.LoggingLevels.INFO
+import csw.logging.core.internal.LoggingSystem
 import csw.params.core.states.{CurrentState, StateName}
 import io.lettuce.core.RedisClient
 import play.api.libs.json.{JsObject, Json}

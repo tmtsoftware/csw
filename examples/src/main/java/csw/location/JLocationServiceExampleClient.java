@@ -27,11 +27,11 @@ import csw.command.client.extensions.AkkaLocationExt;
 import csw.location.api.models.AkkaRegistration;
 import csw.location.api.models.HttpRegistration;
 import csw.location.server.scaladsl.RegistrationFactory;
-import csw.logging.internal.LoggingSystem;
-import csw.logging.javadsl.ILogger;
-import csw.logging.javadsl.JKeys;
-import csw.logging.javadsl.JLoggerFactory;
-import csw.logging.javadsl.JLoggingSystemFactory;
+import csw.logging.core.internal.LoggingSystem;
+import csw.logging.core.javadsl.ILogger;
+import csw.logging.core.javadsl.JKeys;
+import csw.logging.core.javadsl.JLoggerFactory;
+import csw.logging.core.javadsl.JLoggingSystemFactory;
 import scala.concurrent.Await;
 import scala.concurrent.duration.FiniteDuration;
 

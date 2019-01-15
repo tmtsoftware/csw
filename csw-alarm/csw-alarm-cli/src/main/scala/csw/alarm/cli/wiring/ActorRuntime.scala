@@ -4,8 +4,8 @@ import akka.Done
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.{ActorSystem, CoordinatedShutdown}
 import akka.stream.{ActorMaterializer, Materializer}
-import csw.logging.internal.LoggingSystem
-import csw.logging.scaladsl.LoggingSystemFactory
+import csw.logging.core.internal.LoggingSystem
+import csw.logging.core.scaladsl.LoggingSystemFactory
 import csw.network.utils.Networks
 import csw.services.BuildInfo
 

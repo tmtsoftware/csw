@@ -1,11 +1,11 @@
 package csw.benchmark.logging.mock
 
-import csw.logging.appenders.LogAppender
-import csw.logging.commons.{Category, LoggingKeys, TMTDateTimeFormatter}
-import csw.logging.internal.LogActorMessages.Log
-import csw.logging.internal.LoggingLevels
+import csw.logging.core.appenders.LogAppender
+import csw.logging.core.commons.{Category, LoggingKeys, TMTDateTimeFormatter}
+import csw.logging.core.internal.LogActorMessages.Log
+import csw.logging.core.internal.LoggingLevels
 import csw.logging.macros.SourceLocation
-import csw.logging.scaladsl.noId
+import csw.logging.core.scaladsl.noId
 import play.api.libs.json.{JsObject, Json}
 
 object LogActorMock {

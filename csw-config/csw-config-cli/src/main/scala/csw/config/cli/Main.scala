@@ -5,7 +5,7 @@ import csw.config.cli.args.{ArgsParser, Options}
 import csw.config.cli.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
 import csw.config.cli.wiring.Wiring
 import csw.location.client.utils.LocationServerStatus
-import csw.logging.scaladsl.LoggingSystemFactory
+import csw.logging.core.scaladsl.LoggingSystemFactory
 import csw.network.utils.Networks
 import csw.services.BuildInfo
 
