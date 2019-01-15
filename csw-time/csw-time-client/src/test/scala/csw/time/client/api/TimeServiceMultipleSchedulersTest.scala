@@ -52,8 +52,8 @@ class TimeServiceMultipleSchedulersTest extends ScalaTestWithActorTestKit() with
 
           }
           println("===================================Jitter in Percentile===================================")
-          println("50 %tile: " + histogram.getValueAtPercentile(98.5))
-          println("65 %tile: " + histogram.getValueAtPercentile(98.5))
+          println("50 %tile: " + histogram.getValueAtPercentile(50))
+          println("65 %tile: " + histogram.getValueAtPercentile(65))
           println("98.5 %tile: " + histogram.getValueAtPercentile(98.5))
           cancellable.cancel()
       }
