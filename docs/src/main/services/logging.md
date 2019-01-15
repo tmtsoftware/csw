@@ -16,7 +16,7 @@ To use the Logging Service without using the framework, add this to your `build.
 sbt
 :   @@@vars
     ```scala
-    libraryDependencies += "com.github.tmtsoftware.csw" %% "csw-logging" % "$version$"
+    libraryDependencies += "com.github.tmtsoftware.csw" %% "csw-logging-core" % "$version$"
     ```
     @@@
     
@@ -26,7 +26,7 @@ sbt
 These are the relevant default configuration values for logging
 
 logging.conf
-:   @@snip [logging.conf](../../../../csw-logging/src/main/resources/logging.conf) { #default-logging-conf }
+:   @@snip [logging.conf](../../../../csw-logging/csw-logging-core/src/main/resources/logging.conf) { #default-logging-conf }
 
 @@@ note { title="IMPORTANT !!!"}
 
@@ -68,7 +68,7 @@ appenders = ["csw.logging.core.appenders.FileAppender$", "csw.logging.core.appen
 @@@ note
 
 Make sure to provide full path of the appender since it will be spawned using java reflection. In csw code base, a working example of custom appender can be found at:
-@github[Custom Appender](/csw-logging/src/test/scala/csw/logging/appenders/CustomAppenderTest.scala)
+@github[Custom Appender](/csw-logging/csw-logging-core/src/test/scala/csw/logging/core/appenders/CustomAppenderTest.scala)
 
 @@@
 
@@ -163,24 +163,24 @@ Component developers will have an instance of `LoggerFactory` available from `cs
 appear in log statements against `@componentName` tag. Next, to get the `Logger` from `LoggerFactory` use one of the following ways:  
 
 Scala Class
-:   @@snip [SampleClass](../../../../examples/src/main/scala/csw/logging/componentlogger/loggers.scala) { #component-logger-class }
+:   @@snip [SampleClass](../../../../examples/src/main/scala/csw/logging/core/componentlogger/loggers.scala) { #component-logger-class }
 
 Java Class
-:   @@snip [JSampleClass](../../../../examples/src/main/java/csw/logging/componentlogger/JSampleClass.java) { #component-logger-class }
+:   @@snip [JSampleClass](../../../../examples/src/main/java/csw/logging/core/componentlogger/JSampleClass.java) { #component-logger-class }
 
 
 Scala Actor
-:   @@snip [SampleActor](../../../../examples/src/main/scala/csw/logging/componentlogger/loggers.scala) { #component-logger-actor }
+:   @@snip [SampleActor](../../../../examples/src/main/scala/csw/logging/core/componentlogger/loggers.scala) { #component-logger-actor }
 
 Java Actor
-:   @@snip [JSampleActor](../../../../examples/src/main/java/csw/logging/componentlogger/JSampleClass.java) { #component-logger-actor }
+:   @@snip [JSampleActor](../../../../examples/src/main/java/csw/logging/core/componentlogger/JSampleClass.java) { #component-logger-actor }
 
 
 Scala Typed Actor
-:   @@snip [SampleTypedActor](../../../../examples/src/main/scala/csw/logging/componentlogger/loggers.scala) { #component-logger-typed-actor }
+:   @@snip [SampleTypedActor](../../../../examples/src/main/scala/csw/logging/core/componentlogger/loggers.scala) { #component-logger-typed-actor }
 
 Java Typed Actor
-:   @@snip [JSampleTypedActor](../../../../examples/src/main/java/csw/logging/componentlogger/JSampleClass.java) { #component-logger-typed-actor }
+:   @@snip [JSampleTypedActor](../../../../examples/src/main/java/csw/logging/core/componentlogger/JSampleClass.java) { #component-logger-typed-actor }
 
 @@@ note
 
@@ -193,24 +193,24 @@ In case there is a need to log statements without `@componentName` tag, which ca
 as follows:
 
 Scala Class
-:   @@snip [GenericClass](../../../../examples/src/main/scala/csw/logging/genericlogger/loggers.scala) { #generic-logger-class }
+:   @@snip [GenericClass](../../../../examples/src/main/scala/csw/logging/core/genericlogger/loggers.scala) { #generic-logger-class }
 
 Java Class
-:   @@snip [JGenericClass](../../../../examples/src/main/java/csw/logging/genericlogger/JGenericClass.java) { #generic-logger-class }
+:   @@snip [JGenericClass](../../../../examples/src/main/java/csw/logging/core/genericlogger/JGenericClass.java) { #generic-logger-class }
 
 
 Scala Actor
-:   @@snip [GenericActor](../../../../examples/src/main/scala/csw/logging/genericlogger/loggers.scala) { #generic-logger-actor }
+:   @@snip [GenericActor](../../../../examples/src/main/scala/csw/logging/core/genericlogger/loggers.scala) { #generic-logger-actor }
 
 Java Actor
-:   @@snip [JGenericActor](../../../../examples/src/main/java/csw/logging/genericlogger/JGenericClass.java) { #generic-logger-actor }
+:   @@snip [JGenericActor](../../../../examples/src/main/java/csw/logging/core/genericlogger/JGenericClass.java) { #generic-logger-actor }
 
 
 Scala Typed Actor
-:   @@snip [GenericTypedActor](../../../../examples/src/main/scala/csw/logging/genericlogger/loggers.scala) { #generic-logger-typed-actor }
+:   @@snip [GenericTypedActor](../../../../examples/src/main/scala/csw/logging/core/genericlogger/loggers.scala) { #generic-logger-typed-actor }
 
 Java Typed Actor
-:   @@snip [JGenericTypedActor](../../../../examples/src/main/java/csw/logging/genericlogger/JGenericClass.java) { #generic-logger-typed-actor }
+:   @@snip [JGenericTypedActor](../../../../examples/src/main/java/csw/logging/core/genericlogger/JGenericClass.java) { #generic-logger-typed-actor }
 
 `log` variable is now available in scala and java classes to write log statements as explained in next segment.
 
@@ -382,10 +382,10 @@ This functionality is included in the framework code and users should not have t
 In order to create a LoggerFactory with a custom componentName refer the following code:
  
 Scala
-:   @@snip [Sample](../../../../examples/src/main/scala/csw/logging/componentlogger/loggers.scala) { #logger-factory-creation }
+:   @@snip [Sample](../../../../examples/src/main/scala/csw/logging/core/componentlogger/loggers.scala) { #logger-factory-creation }
 
 Java
-:   @@snip [JSample](../../../../examples/src/main/java/csw/logging/componentlogger/JSampleClass.java) { #logger-factory-creation }
+:   @@snip [JSample](../../../../examples/src/main/java/csw/logging/core/componentlogger/JSampleClass.java) { #logger-factory-creation }
 
  
 ## Create LoggingSystem 
