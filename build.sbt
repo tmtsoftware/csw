@@ -5,24 +5,16 @@ val MaybeCoverage: Plugins = if (enableCoverage) Coverage else Plugins.empty
 
 lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-admin-server`,
-  `csw-location-api`,
-  `csw-location-server`,
-  `csw-location-client`,
-  `csw-location-agent`,
+  `csw-location`,
   `csw-config`,
   `csw-logging`,
   `csw-logging-macros`,
   `csw-params-jvm`,
   `csw-params-js`,
   `csw-framework`,
-  `csw-command-api`,
-  `csw-command-client`,
-  `csw-event-api`,
-  `csw-event-client`,
-  `csw-event-cli`,
-  `csw-alarm-api`,
-  `csw-alarm-client`,
-  `csw-alarm-cli`,
+  `csw-command`,
+  `csw-event`,
+  `csw-alarm`,
   `csw-aas`,
   `csw-time`,
   `csw-database-client`,
@@ -91,7 +83,18 @@ lazy val `csw-admin-server` = project
   )
 
 /* ================= Location Service ============== */
+
+lazy val `csw-location` = project
+  .in(file("csw-location"))
+  .aggregate(
+    `csw-location-api`,
+    `csw-location-server`,
+    `csw-location-client`,
+    `csw-location-agent`
+  )
+
 lazy val `csw-location-api` = project
+  .in(file("csw-location/csw-location-api"))
   .dependsOn(
     `csw-logging`,
     `csw-params-jvm`
@@ -102,6 +105,7 @@ lazy val `csw-location-api` = project
   )
 
 lazy val `csw-location-server` = project
+  .in(file("csw-location/csw-location-server"))
   .dependsOn(
     `csw-location-api`,
     `csw-logging`,
@@ -115,6 +119,7 @@ lazy val `csw-location-server` = project
   )
 
 lazy val `csw-location-client` = project
+  .in(file("csw-location/csw-location-client"))
   .dependsOn(
     `csw-location-api`,
     `csw-network-utils`
@@ -125,6 +130,7 @@ lazy val `csw-location-client` = project
   )
 
 lazy val `csw-location-agent` = project
+  .in(file("csw-location/csw-location-agent"))
   .dependsOn(
     `csw-location-client`,
     `csw-commons` % "test->test",
@@ -196,6 +202,7 @@ lazy val `csw-config-cli` = project
   )
 
 /* ============ Logging service ============ */
+
 lazy val `csw-logging-macros` = project
   .settings(
     libraryDependencies += Libs.`scala-reflect`
@@ -252,7 +259,16 @@ lazy val `csw-framework` = project
   )
 
 /* ================= Command Service ============== */
+lazy val `csw-command` = project
+  .in(file("csw-command"))
+  .aggregate(
+    `csw-command-api`,
+    `csw-command-client`,
+  )
+
+
 lazy val `csw-command-api` = project
+  .in(file("csw-command/csw-command-api"))
   .dependsOn(
     `csw-params-jvm`,
     `csw-location-api`
@@ -260,6 +276,7 @@ lazy val `csw-command-api` = project
   .enablePlugins(PublishBintray, GenJavadocPlugin)
 
 lazy val `csw-command-client` = project
+  .in(file("csw-command/csw-command-client"))
   .dependsOn(
     `csw-command-api`,
     `csw-logging`,
@@ -269,12 +286,23 @@ lazy val `csw-command-client` = project
   .settings(libraryDependencies ++= Dependencies.CommandClient.value)
 
 /* ================= Event Service ============== */
+
+lazy val `csw-event` = project
+  .in(file("csw-event"))
+  .aggregate(
+    `csw-event-api`,
+    `csw-event-client`,
+    `csw-event-cli`
+  )
+
 lazy val `csw-event-api` = project
+  .in(file("csw-event/csw-event-api"))
   .dependsOn(`csw-params-jvm`)
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(libraryDependencies ++= Dependencies.EventApi.value)
 
 lazy val `csw-event-client` = project
+  .in(file("csw-event/csw-event-client"))
   .dependsOn(
     `csw-event-api`,
     `csw-logging`,
@@ -294,6 +322,7 @@ lazy val `csw-event-client` = project
   )
 
 lazy val `csw-event-cli` = project
+  .in(file("csw-event/csw-event-cli"))
   .dependsOn(
     `csw-location-client`,
     `csw-event-client`  % "compile->compile;test->test;test->multi-jvm",
@@ -304,12 +333,23 @@ lazy val `csw-event-cli` = project
   .settings(libraryDependencies ++= Dependencies.EventCli.value)
 
 /* ================= Alarm Service ============== */
+lazy val `csw-alarm` = project
+  .in(file("csw-alarm"))
+  .aggregate(
+    `csw-alarm-api`,
+    `csw-alarm-client`,
+    `csw-alarm-cli`
+  )
+
+
 lazy val `csw-alarm-api` = project
+  .in(file("csw-alarm/csw-alarm-api"))
   .dependsOn(`csw-params-jvm`, `csw-time-api-jvm`)
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(libraryDependencies ++= Dependencies.AlarmApi.value)
 
 lazy val `csw-alarm-client` = project
+  .in(file("csw-alarm/csw-alarm-client"))
   .dependsOn(
     `csw-alarm-api`,
     `csw-location-api`,
@@ -323,6 +363,7 @@ lazy val `csw-alarm-client` = project
   .settings(libraryDependencies ++= Dependencies.AlarmClient.value)
 
 lazy val `csw-alarm-cli` = project
+  .in(file("csw-alarm/csw-alarm-cli"))
   .dependsOn(
     `csw-alarm-client`,
     `csw-config-client`,
