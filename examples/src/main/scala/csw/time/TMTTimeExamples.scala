@@ -6,23 +6,23 @@ import csw.time.api.models.{TAITime, UTCTime}
 import csw.time.client.TMTTimeHelper
 
 object TMTTimeExamples {
-  //#utc-time
+  //#current-time
   // get current UTC time
   val utcTime: UTCTime = UTCTime.now()
-  //#utc-time
 
-  //#tai-time
   // get current TAI time
   val taiTime: TAITime = TAITime.now()
-  //#tai-time
+  //#current-time
 
-  //#utc-to-tai
-  val taiTime1: TAITime = utcTime.toTAI
-  //#utc-to-tai
+  def conversion(): Unit = {
+    //#conversion
+    // UTC to TAI
+    val taiTime: TAITime = utcTime.toTAI
 
-  //#tai-to-utc
-  val utcTime1: UTCTime = taiTime.toUTC
-  //#tai-to-utc
+    // TAI to UTC
+    val utcTime0: UTCTime = taiTime.toUTC
+    //#conversion
+  }
 
   //#at-local
   // Get UTCTime at local timezone

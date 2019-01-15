@@ -51,42 +51,22 @@ It supports two timescales
  * Coordinated Universal Time @scaladoc[UTCTime](csw/time/api/models/UTCTime)
  * International Atomic Time @scaladoc[TAITime](csw/time/api/models/TAITime)
  
-### Get Current UTC Time
-Gets the current UTC time with nanosecond precision 
+### Get Current Time
+Gets the current UTC/TAI time with nanosecond precision. 
 
 Scala
-:   @@snip [TMTTimeExamples.scala](../../../../examples/src/main/scala/csw/time/TMTTimeExamples.scala) { #utc-time }
+:   @@snip [TMTTimeExamples.scala](../../../../examples/src/main/scala/csw/time/TMTTimeExamples.scala) { #current-time }
 
 Java
-:   @@snip [JTMTTimeExamples.java](../../../../examples/src/main/java/csw/time/JTMTTimeExamples.java) { #utc-time }
+:   @@snip [JTMTTimeExamples.java](../../../../examples/src/main/java/csw/time/JTMTTimeExamples.java) { #current-time }
 
-### Get Current TAI Time
-Gets the current TAI time with nanosecond precision 
+### Conversion from UTC to TAI Time and Vice-versa
 
 Scala
-:   @@snip [TMTTimeExamples.scala](../../../../examples/src/main/scala/csw/time/TMTTimeExamples.scala) { #tai-time }
+:   @@snip [TMTTimeExamples.scala](../../../../examples/src/main/scala/csw/time/TMTTimeExamples.scala) { #conversion }
 
 Java
-:   @@snip [JTMTTimeExamples.java](../../../../examples/src/main/java/csw/time/JTMTTimeExamples.java) { #tai-time }
-
-### Conversion from UTC to TAI Time
-Converts the given UTC time to TAI time.
-
-Scala
-:   @@snip [TMTTimeExamples.scala](../../../../examples/src/main/scala/csw/time/TMTTimeExamples.scala) { #utc-to-tai }
-
-Java
-:   @@snip [JTMTTimeExamples.java](../../../../examples/src/main/java/csw/time/JTMTTimeExamples.java) { #utc-to-tai }
-
-### Conversion from TAI to UTC Time
-Converts the given @scaladoc[TAITime](csw/time/api/models/TAITime) to @scaladoc[UTCTime](csw/time/api/models/UTCTime).
-
-Scala
-:   @@snip [TMTTimeExamples.scala](../../../../examples/src/main/scala/csw/time/TMTTimeExamples.scala) { #tai-to-utc }
-
-Java
-:   @@snip [JTMTTimeExamples.java](../../../../examples/src/main/java/csw/time/JTMTTimeExamples.java) { #tai-to-utc }
-
+:   @@snip [JTMTTimeExamples.java](../../../../examples/src/main/java/csw/time/JTMTTimeExamples.java) { #conversion }
 
 ## TMTTimeHelper API
 
@@ -132,7 +112,7 @@ Java
 :   @@snip [JSchedulerExamples.java](../../../../examples/src/main/java/csw/time/JSchedulerExamples.java) { #schedule-once }
 
 ### Schedule Once With ActorRef
-Schedules sending of the given message to the provided `actorRef` at the given start time. The `startTime` can be either UTC time or TAI time.
+Schedules sending of the message to the provided `actorRef` at the given start time. The `startTime` can be either UTC time or TAI time.
 
 Scala
 :   @@snip [SchedulerExamples.scala](../../../../examples/src/main/scala/csw/time/SchedulerExamples.scala) { #schedule-once-with-actorRef }
@@ -141,7 +121,7 @@ Java
 :   @@snip [JSchedulerExamples.java](../../../../examples/src/main/java/csw/time/JSchedulerExamples.java) { #schedule-once-with-actorRef }
 
 ### Schedule Periodically
-Schedules a task to execute periodically at the given interval. The task is executed once immediately without any initial delay followed by periodic executions. In case you do not want to start scheduling immediately, you can use the overloaded method  for `schedulePeriodically()` with `startTime` as shown in following examples.
+Schedules a task to execute periodically at the given interval. The task is executed once immediately without any initial delay followed by periodic executions. In case you do not want to start scheduling immediately, you can use the overloaded method  for `schedulePeriodically()` with `startTime` as shown in the next example.
 
 Scala
 :   @@snip [SchedulerExamples.scala](../../../../examples/src/main/scala/csw/time/SchedulerExamples.scala) { #schedule-periodically }
@@ -150,6 +130,8 @@ Java
 :   @@snip [JSchedulerExamples.java](../../../../examples/src/main/java/csw/time/JSchedulerExamples.java) { #schedule-periodically }
 
 
+### Schedule Periodically with Start Time
+Schedules a task to execute periodically at the given interval. The task is executed once at the given start time followed by execution of task at each interval. The `startTime` can be either UTC time or TAI time.
 
 Scala
 :   @@snip [SchedulerExamples.scala](../../../../examples/src/main/scala/csw/time/SchedulerExamples.scala) { #schedule-periodically-with-startTime }

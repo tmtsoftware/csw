@@ -8,23 +8,23 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 class JTMTTimeExamples {
-  //#utc-time
-  // get current UTC time
-  UTCTime utcTime = UTCTime.now();
-  //#utc-time
+    //#current-time
+    // get current UTC time
+    private UTCTime utcTime = UTCTime.now();
 
-  //#tai-time
-  // get current TAI time
-  TAITime taiTime = TAITime.now();
-  //#tai-time
+    // get current TAI time
+    private TAITime taiTime = TAITime.now();
+    //#current-time
 
-    //#utc-to-tai
-    TAITime taiTime1 = utcTime.toTAI();
-    //#utc-to-tai
+    void conversion() {
+        //#conversion
+        // UTC to TAI
+        TAITime taiTime = utcTime.toTAI();
 
-    //#tai-to-utc
-    UTCTime utcTime1 = taiTime.toUTC();
-    //#tai-to-utc
+        // TAI to UTC
+        UTCTime utcTime = taiTime.toUTC();
+        //#conversion
+    }
 
     //#at-local
     // Get UTCTime at local timezone
