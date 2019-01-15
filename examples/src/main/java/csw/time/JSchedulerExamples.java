@@ -8,7 +8,6 @@ import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.Adapter;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
-import csw.params.events.Event;
 import csw.time.api.models.UTCTime;
 import csw.time.client.api.TimeServiceScheduler;
 import csw.time.client.TimeServiceSchedulerFactory;

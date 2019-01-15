@@ -1,9 +1,9 @@
 package csw.time.client;
 
 import csw.time.api.models.UTCTime;
-import csw.time.api.utils.JTestProperties;
-import csw.time.api.utils.TestProperties;
-import csw.time.api.utils.TestUtil;
+import csw.time.api.models.utils.JTestProperties;
+import csw.time.api.models.utils.TestProperties;
+import csw.time.api.models.utils.TestUtil;
 import org.junit.Assert;
 import org.junit.Test;
 import org.scalatest.junit.JUnitSuite;

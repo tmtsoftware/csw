@@ -1,4 +1,5 @@
-package csw.time.api.utils
+package csw.time.api.models.utils
+
 import java.time.Instant
 
 object TestUtil {

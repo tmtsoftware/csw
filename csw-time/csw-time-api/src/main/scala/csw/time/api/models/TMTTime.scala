@@ -2,7 +2,7 @@ package csw.time.api.models
 
 import java.time.Instant
 
-import csw.clock.natives.models.TMTClock.clock
+import csw.time.clock.natives.models.TMTClock.clock
 import julienrf.json.derived
 import play.api.libs.json._
 
@@ -91,7 +91,4 @@ object TAITime {
    * @return offset of UTC to TAI in seconds
    */
   def offset: Int = clock.offset
-
-  // fixme: only for testing and making it private[api] does not work from java test
-  def setOffset(offset: Int): Unit = clock.setTaiOffset(offset)
 }

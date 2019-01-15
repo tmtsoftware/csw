@@ -9,8 +9,7 @@ import akka.testkit.TestProbe;
 import akka.testkit.javadsl.TestKit;
 import csw.time.api.models.TAITime;
 import csw.time.client.TimeServiceSchedulerFactory;
-import csw.time.client.api.Cancellable;
-import csw.time.client.api.TimeServiceScheduler;
+import csw.time.clock.natives.models.TMTClock$;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,7 +36,7 @@ public class JTimeServiceSchedulerTest extends JUnitSuite {
 
     @BeforeClass
     public static void setup(){
-        TAITime.setOffset(37);
+        TMTClock$.MODULE$.clock().setTaiOffset(37);
     }
 
     //------------------------------Scheduling-------------------------------

@@ -1,15 +1,15 @@
-package csw.time.api
+package csw.time.api.models
 
 import java.time.{Duration, Instant}
 
-import csw.time.api.models.{TAITime, UTCTime}
+import csw.time.clock.natives.models.TMTClock
 import org.scalatest.Matchers._
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
 class TMTTimeTest extends FunSuite with BeforeAndAfterAll {
   private val TaiOffset = 37
 
-  override protected def beforeAll(): Unit = TAITime.setOffset(TaiOffset)
+  override protected def beforeAll(): Unit = TMTClock.clock.setTaiOffset(TaiOffset)
 
   test("should get utc time") {
     val utcTime        = UTCTime.now()

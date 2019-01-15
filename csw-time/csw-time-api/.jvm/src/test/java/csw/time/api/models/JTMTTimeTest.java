@@ -1,10 +1,13 @@
-package csw.time.api;
+package csw.time.api.models;
 
 import csw.time.api.models.TAITime;
 import csw.time.api.models.UTCTime;
-import csw.time.api.utils.JTestProperties;
-import csw.time.api.utils.TestProperties;
-import csw.time.api.utils.TestUtil;
+import csw.time.api.models.utils.JTestProperties;
+import csw.time.api.models.utils.JTestProperties;
+import csw.time.api.models.utils.TestProperties;
+import csw.time.api.models.utils.TestUtil;
+import csw.time.clock.natives.models.TMTClock;
+import csw.time.clock.natives.models.TMTClock$;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.scalatest.junit.JUnitSuite;
@@ -22,7 +25,7 @@ public class JTMTTimeTest extends JUnitSuite {
 
     @BeforeClass
     public static void setup() {
-        TAITime.setOffset(TaiOffset);
+        TMTClock$.MODULE$.clock().setTaiOffset(TaiOffset);
     }
 
     //------------------------------UTC-------------------------------

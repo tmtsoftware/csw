@@ -1,19 +1,20 @@
-package csw.clock.natives.models
+package csw.time.clock.natives.models
 
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicInteger
 
-sealed trait TMTClock {
+private[time] sealed trait TMTClock {
   def utcInstant: Instant
   def taiInstant: Instant
   def offset: Int
   def setTaiOffset(offset: Int): Unit
 }
-object TMTClock {
+
+private[time] object TMTClock {
   val clock: TMTClock = new NonLinuxClock()
 }
 
-class NonLinuxClock extends TMTClock {
+private[time] class NonLinuxClock extends TMTClock {
   private val internal_offset: AtomicInteger = new AtomicInteger(0)
 
   override def offset: Int         = internal_offset.get()

@@ -10,8 +10,6 @@ import csw.time.api.models.UTCTime
 import csw.time.client.TimeServiceSchedulerFactory
 import csw.time.client.api.TimeServiceScheduler
 
-import scala.concurrent.duration.DurationInt
-
 class SchedulerExamples(ctx: ActorContext[String]) {
   implicit val actorSystem: ActorSystem = ctx.system.toUntyped
 

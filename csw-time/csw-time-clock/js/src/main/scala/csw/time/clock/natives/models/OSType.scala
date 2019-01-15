@@ -1,8 +1,8 @@
-package csw.clock.natives.models
+package csw.time.clock.natives.models
 
-sealed trait OSType
+private[time] sealed trait OSType
 
-object OSType {
+private[time] object OSType {
   case object Linux extends OSType
   case object Other extends OSType
 

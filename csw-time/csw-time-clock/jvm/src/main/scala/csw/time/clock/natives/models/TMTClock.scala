@@ -1,29 +1,29 @@
-package csw.clock.natives.models
+package csw.time.clock.natives.models
 
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicInteger
 
 import com.sun.jna.NativeLong
-import csw.clock.natives.TimeLibrary
-import csw.clock.natives.models.ClockId.{ClockRealtime, ClockTAI}
+import csw.time.clock.natives.TimeLibrary
+import ClockId.{ClockRealtime, ClockTAI}
 
 import scala.util.Try
 import scala.util.control.NonFatal
 
-sealed trait TMTClock {
+private[time] sealed trait TMTClock {
   def utcInstant: Instant
   def taiInstant: Instant
   def offset: Int
   def setTaiOffset(offset: Int): Unit
 }
-object TMTClock {
+private[time] object TMTClock {
   val clock: TMTClock = OSType.value match {
     case OSType.Linux => new LinuxClock()
     case OSType.Other => new NonLinuxClock()
   }
 }
 
-class LinuxClock extends TMTClock {
+private[time] class LinuxClock extends TMTClock {
 
   override def utcInstant: Instant = now(ClockRealtime)
   override def taiInstant: Instant = now(ClockTAI)
@@ -53,7 +53,7 @@ class LinuxClock extends TMTClock {
   }
 }
 
-class NonLinuxClock extends TMTClock {
+private[time] class NonLinuxClock extends TMTClock {
   private val internal_offset: AtomicInteger = new AtomicInteger(0)
 
   override def offset: Int         = internal_offset.get()

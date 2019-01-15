@@ -10,6 +10,7 @@ import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.testkit.TestProbe
 import csw.time.api.models.{TAITime, UTCTime}
 import csw.time.client.TimeServiceSchedulerFactory
+import csw.time.clock.natives.models.TMTClock
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike}
 
 import scala.collection.mutable.ArrayBuffer
@@ -22,7 +23,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
 
   private val timeService = TimeServiceSchedulerFactory.make()
 
-  override protected def beforeAll(): Unit = TAITime.setOffset(37)
+  override protected def beforeAll(): Unit = TMTClock.clock.setTaiOffset(37)
 
   // DEOPSCSW-542: Schedule a task to execute in future
   List(
@@ -170,7 +171,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
     val testProbe   = TestProbe()(system)
     val testProbe1  = TestProbe()(system)
 
-    // Warm up scheduler call. Not sure this has an effect, but it seems to stabalize initial
+    // Warm up scheduler call. Not sure this has an effect, but it seems to stabilize initial
     val period = Duration.ofMillis(50)
     timeService.schedulePeriodically(period) {
       testProbe1.ref ! UTCTime.now()
@@ -178,38 +179,38 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
     testProbe1.expectMsgType[UTCTime]
 
     // Now do the actual test
-    val actualStart = UTCTime.now()
+    val actualStart    = UTCTime.now()
     val initialSeconds = 1
-    val startTime   = UTCTime(actualStart.value.plusSeconds(initialSeconds))
-    val samples     = 100
+    val startTime      = UTCTime(actualStart.value.plusSeconds(initialSeconds))
+    val samples        = 100
 
     // Figure out how long it is necessary to wait for the start time and the samples in millis
     val receiveDelay: Int = initialSeconds + (samples * (period.toMillis) / 1000 + 1).toInt
     //println(s"Start: $actualStart $startTime  -- receiveDelay: $receiveDelay seconds")
 
     // Run with
-    val cancellable: Cancellable = timeService.schedulePeriodically(startTime, period) (testProbe.ref ! UTCTime.now())
+    val cancellable: Cancellable = timeService.schedulePeriodically(startTime, period)(testProbe.ref ! UTCTime.now())
 
     // Wait for the messages, saving times
-    val times             = testProbe.receiveN(samples, receiveDelay.seconds).map { case t: UTCTime => t }
+    val times = testProbe.receiveN(samples, receiveDelay.seconds).map { case t: UTCTime => t }
 
     cancellable.cancel()
 
     // Everything following is tests
     // Check that first is same as start time
-    Duration.between(times(0).value, startTime.value).toMillis shouldEqual -0l+-3l
+    Duration.between(times(0).value, startTime.value).toMillis shouldEqual -0l +- 3l
 
     var last = times(0) // Save the previous value to check consistency of callback
     Range(1, samples).foreach { i =>
-      val time  = times(i)
+      val time        = times(i)
       val timeBetween = Duration.between(last.value, time.value).toMillis
       last = time
       // Check that time between callbacks is reliable
-      timeBetween shouldBe period.toMillis +- 3  // ms
+      timeBetween shouldBe period.toMillis +- 3 // ms
 
       // Allowable error is time between actual time of callback and predicted time of callback
       val allowableError = Duration.ofNanos(4000000l).toNanos
-      val diff:Long = Duration.between(startTime.value.plus(i * period.toMillis, ChronoUnit.MILLIS), time.value).toNanos
+      val diff: Long     = Duration.between(startTime.value.plus(i * period.toMillis, ChronoUnit.MILLIS), time.value).toNanos
       diff shouldBe 0l +- allowableError
     }
   }
