@@ -3,19 +3,12 @@ import { withContext } from './context/TMTAuthContext'
 import PropTypes from 'prop-types'
 
 export class Logout extends React.Component {
-  componentDidMount = async () => {
-    if (this.props.isAuthenticated) {
-      await this.props.logout()
-    }
-  }
-
   render() {
-    return null
+    return <button onClick={async() => { await this.props.logout() }}>Logout</button>
   }
 }
 
 Logout.propTypes = {
-  isAuthenticated: PropTypes.bool,
   logout: PropTypes.func,
 }
 

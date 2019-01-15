@@ -2,7 +2,7 @@ import React from 'react'
 
 const defaultState = {
   tmtAuth: null,
-  isAuthenticated: false,
+  isAuthenticated: () =>  false,
   login: () => true,
   logout: () => true
 }

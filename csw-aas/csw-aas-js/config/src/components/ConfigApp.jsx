@@ -1,8 +1,8 @@
 import React from 'react'
-import { BrowserRouter, Route } from 'react-router-dom'
-import { Login, Logout, ResourceRole, TMTAuthContextProvider } from 'csw-aas-js'
+import {BrowserRouter} from 'react-router-dom'
+import {ResourceRole, TMTAuthContextProvider} from 'csw-aas-js'
 import NavComponent from './NavComponent'
-import { AppConfig } from '../config/AppConfig'
+import {AppConfig} from '../config/AppConfig'
 import WriteConfig from './CreateConfig'
 import ConfigError from './ConfigError'
 import ListConfig from './ListConfig'
@@ -24,8 +24,6 @@ class ConfigApp extends React.Component {
           <BrowserRouter>
             <div>
               <NavComponent />
-              <Route path='/login' component={Login} />
-              <Route path='/logout' component={Logout} />
             </div>
           </BrowserRouter>
           <ListConfig />

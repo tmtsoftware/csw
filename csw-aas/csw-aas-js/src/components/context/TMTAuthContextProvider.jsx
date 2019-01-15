@@ -1,22 +1,24 @@
 import React from 'react'
-import { defaultState, Provider } from './TMTAuthContext'
+import {defaultState, Provider} from './TMTAuthContext'
 import PropTypes from 'prop-types'
-import { TMTAuth } from '../TMTAuth'
+import {TMTAuth} from '../TMTAuth'
 
 class TMTAuthContextProvider extends React.Component {
   constructor() {
     super()
     this.state = { ...defaultState, login: this.login, logout: this.logout }
+    this.loginWithoutRedirect()
   }
 
   render() {
     return <Provider value={this.state}>{this.props.children}</Provider>
   }
 
-  instantiateAAS = async url => {
+  instantiateAAS = async (url, redirect) => {
     const { keycloak, authenticated } = await TMTAuth.authenticate(
       this.props.config,
       url,
+      redirect
     )
     authenticated
       .success(() => {
@@ -27,19 +29,24 @@ class TMTAuthContextProvider extends React.Component {
         })
       })
       .error(() => {
-        this.setState({ tmtAuth: null, isAuthenticated: false })
+        this.setState({ tmtAuth: null, isAuthenticated: () => false })
       })
+  }
+
+  loginWithoutRedirect = async () => {
+    const url = await TMTAuth.getAASUrl()
+    await this.instantiateAAS({ url: url }, false)
   }
 
   login = async () => {
     const url = await TMTAuth.getAASUrl()
-    await this.instantiateAAS({ url: url })
+    await this.instantiateAAS({ url: url }, true)
   }
 
   logout = async () => {
     const logoutPromise = await this.state.tmtAuth.logout()
     logoutPromise.success(() => {
-      this.setState({ tmtAuth: null, isAuthenticated: false })
+      this.setState({ tmtAuth: null, isAuthenticated: () => false })
     })
   }
 }

@@ -4,7 +4,7 @@ import { Consumer } from '../context/TMTAuthContext'
 
 const CheckLogin = ({ children, error }) => (
   <Consumer>
-    {({ isAuthenticated }) => (isAuthenticated ? children : error)}
+    {({ isAuthenticated }) => (isAuthenticated() ? children : error)}
   </Consumer>
 )
 

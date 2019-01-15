@@ -5,7 +5,7 @@ import { Consumer } from '../context/TMTAuthContext'
 const ResourceRole = ({ resourceRole, resource, children, error }) => (
   <Consumer>
     { ({tmtAuth, isAuthenticated}) => (
-      isAuthenticated && tmtAuth.hasResourceRole(resourceRole, resource) ? children : error)
+      isAuthenticated() && tmtAuth.hasResourceRole(resourceRole, resource) ? children : error)
     }
   </Consumer>
 )

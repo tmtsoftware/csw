@@ -1,12 +1,12 @@
-import { Link } from 'react-router-dom'
 import React from 'react'
-import { Consumer } from 'csw-aas-js'
+import {Consumer, Login, Logout} from 'csw-aas-js'
 
 class NavComponent extends React.Component {
   render() {
     return (
       <Consumer>
-        { ({isAuthenticated}) => {
+
+        { ({login, logout, tmtAuth, isAuthenticated}) => {
           return <nav className='indigo'>
             <div className='nav-wrapper'>
               <a href='https://www.tmt.org/' className='brand-logo'>
@@ -14,10 +14,10 @@ class NavComponent extends React.Component {
               </a>
               <ul className='hide-on-med-and-down right'>
                 <li>
-                  { isAuthenticated ? (
-                    <Link to='/logout'> Logout </Link>
+                  { isAuthenticated() ? (
+                    <Logout />
                   ) : (
-                    <Link to='/login'> Login </Link>
+                    <Login />
                   )}
                 </li>
               </ul>

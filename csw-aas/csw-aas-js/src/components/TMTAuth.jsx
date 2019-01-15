@@ -18,30 +18,33 @@ class TMTAuthStore {
     this.realmAccess = keycloak.realmAccess
     this.resourceAccess = keycloak.resourceAccess
     this.loadUserInfo = keycloak.loadUserInfo
-    this.isAuthenticated = keycloak.authenticated
+    this.isAuthenticated = () => { return keycloak.authenticated }
     this.hasRealmRole = keycloak.hasRealmRole
     this.hasResourceRole = keycloak.hasResourceRole
     return this
   }
 
-  authenticate = (config, url) => {
+  authenticate = (config, url, redirect) => {
     console.info('instantiating AAS')
     const keycloakConfig = { ...AASConfig, ...config, ...url }
     const keycloak = KeyCloak(keycloakConfig)
-    keycloak.onTokenExpired = () => {
-      keycloak
-        .updateToken(0)
-        .success(function() {
-          console.info('token refreshed successfully')
-        })
-        .error(function() {
-          console.error(
-            'Failed to refresh the token, or the session has expired',
-          )
-        })
+    if (redirect) {
+      keycloak.onTokenExpired = () => {
+        keycloak
+          .updateToken(0)
+          .success(function() {
+            console.info('token refreshed successfully')
+          })
+          .error(function() {
+            console.error(
+              'Failed to refresh the token, or the session has expired',
+            )
+          })
+      }
     }
+
     const authenticated = keycloak.init({
-      onLoad: 'login-required',
+      onLoad: redirect ? 'login-required' : 'check-sso',
       flow: 'hybrid',
     })
     return { keycloak, authenticated }
