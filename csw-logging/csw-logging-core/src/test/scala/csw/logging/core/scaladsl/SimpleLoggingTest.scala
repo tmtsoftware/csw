@@ -44,7 +44,7 @@ class SimpleLoggingTest extends LoggingTestSuite {
       log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "tromboneHcd"
       log.getString(LoggingKeys.FILE) shouldBe "TromboneHcd.scala"
       log(LoggingKeys.LINE).as[Int] shouldBe logMsgLineNumber
-      log.getString(LoggingKeys.CLASS) shouldBe "csw.logging.components.TromboneHcd"
+      log.getString(LoggingKeys.CLASS) shouldBe "csw.logging.core.components.TromboneHcd"
       logMsgLineNumber += 1
     }
   }
@@ -66,7 +66,7 @@ class SimpleLoggingTest extends LoggingTestSuite {
       log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "InnerSourceComponent"
       log.getString(LoggingKeys.FILE) shouldBe "InnerSourceComponent.scala"
       log(LoggingKeys.LINE).as[Int] shouldBe logMsgLineNumber
-      log.getString(LoggingKeys.CLASS) shouldBe "csw.logging.components.InnerSourceComponent$InnerSource"
+      log.getString(LoggingKeys.CLASS) shouldBe "csw.logging.core.components.InnerSourceComponent$InnerSource"
       logMsgLineNumber += 1
     }
   }
@@ -89,7 +89,7 @@ class SimpleLoggingTest extends LoggingTestSuite {
       log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "SingletonComponent"
       log.getString(LoggingKeys.FILE) shouldBe "SingletonComponent.scala"
       log(LoggingKeys.LINE).as[Int] shouldBe logMsgLineNumber
-      log.getString(LoggingKeys.CLASS) shouldBe "csw.logging.components.SingletonComponent"
+      log.getString(LoggingKeys.CLASS) shouldBe "csw.logging.core.components.SingletonComponent"
       logMsgLineNumber += 1
     }
   }
@@ -116,7 +116,7 @@ class SimpleLoggingTest extends LoggingTestSuite {
       log.getString("@componentName") shouldBe "SingletonComponent"
       log.getString("file") shouldBe "SingletonComponent.scala"
       log("line").as[Int] shouldBe logMsgLineNumber
-      log.getString("class") shouldBe "csw.logging.components.SingletonComponent"
+      log.getString("class") shouldBe "csw.logging.core.components.SingletonComponent"
       //  This verifies that the user keys are present and the value is correct
       //  Also make sure all user messages and values are present
       userMsgMap.foreach { m =>

@@ -37,7 +37,7 @@ object IRIS {
   val ANY_LINE_NO   = TRACE_LINE_NO + 6
 
   val COMPONENT_NAME = "IRIS"
-  val CLASS_NAME     = "csw.logging.components.IRIS"
+  val CLASS_NAME     = "csw.logging.core.components.IRIS"
   val FILE_NAME      = "IRIS.scala"
 
   case object LogTrace
