@@ -9,6 +9,7 @@ import akka.actor.typed.javadsl.Adapter;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
 import csw.time.api.models.UTCTime;
+import csw.time.client.api.Cancellable;
 import csw.time.client.api.TimeServiceScheduler;
 import csw.time.client.TimeServiceSchedulerFactory;
 
@@ -16,7 +17,7 @@ import java.time.Duration;
 
 public class JSchedulerExamples {
 
-    private ActorContext<String> ctx;
+    private ActorContext<UTCTime> ctx;
     private UTCTime utcTime = UTCTime.now();
     TimeServiceScheduler scheduler;
 
@@ -30,7 +31,7 @@ public class JSchedulerExamples {
     }
 
 
-    void scheduleOnce(){
+    void scheduleOnce() {
         UTCTime utcTime = UTCTime.now();
 
         // #schedule-once
@@ -40,23 +41,23 @@ public class JSchedulerExamples {
     }
 
     // #schedule-once-with-actorRef
-    void schedule(){
-         Behavior<String> behavior = Behaviors.setup(ctx -> new SchedulingHandler());
-         ActorRef actorRef         =  Adapter.toUntyped(ctx.asJava().spawnAnonymous(behavior));
-
-        scheduler.scheduleOnce(utcTime, actorRef, "some message");
-    }
-
-    class SchedulingHandler extends AbstractBehavior<String> {
+    class SchedulingHandler extends AbstractBehavior<UTCTime> {
         @Override
-        public Receive<String> createReceive() {
+        public Receive<UTCTime> createReceive() {
             // handle the message to execute the task on scheduled time
             return null;
         }
     }
+
+    Cancellable schedule() {
+        Behavior<UTCTime> behavior = Behaviors.setup(ctx -> new SchedulingHandler());
+        ActorRef actorRef = Adapter.toUntyped(ctx.asJava().spawnAnonymous(behavior));
+
+        return scheduler.scheduleOnce(utcTime, actorRef, UTCTime.now());
+    }
     // #schedule-once-with-actorRef
 
-    void schedulePeriodically(){
+    void schedulePeriodically() {
         // #schedule-periodically
         // #schedule-periodically-with-startTime
         Runnable task = () -> {/* do something*/};

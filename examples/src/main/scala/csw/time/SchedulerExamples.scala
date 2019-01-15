@@ -2,7 +2,7 @@ package csw.time
 
 import java.time.Duration
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorRef, ActorSystem}
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter.{TypedActorRefOps, TypedActorSystemOps}
 import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
@@ -10,7 +10,7 @@ import csw.time.api.models.UTCTime
 import csw.time.client.TimeServiceSchedulerFactory
 import csw.time.client.api.TimeServiceScheduler
 
-class SchedulerExamples(ctx: ActorContext[String]) {
+class SchedulerExamples(ctx: ActorContext[UTCTime]) {
   implicit val actorSystem: ActorSystem = ctx.system.toUntyped
 
   //#create-scheduler
@@ -27,17 +27,18 @@ class SchedulerExamples(ctx: ActorContext[String]) {
   // #schedule-once
 
   // #schedule-once-with-actorRef
-  private val behavior: Behavior[String] = Behaviors.setup(ctx ⇒ new SchedulingHandler(ctx))
-  private val actorRef                   = ctx.spawnAnonymous(behavior).toUntyped
-
-  scheduler.scheduleOnce(utcTime, actorRef, "some message")
-
-  class SchedulingHandler(ctx: ActorContext[String]) extends AbstractBehavior[String] {
-    override def onMessage(msg: String): Behavior[String] = {
+  class SchedulingHandler(ctx: ActorContext[UTCTime]) extends AbstractBehavior[UTCTime] {
+    override def onMessage(msg: UTCTime): Behavior[UTCTime] = {
       // handle the message to execute the task on scheduled time
       Behaviors.same
     }
   }
+
+  private val behavior: Behavior[UTCTime] = Behaviors.setup(ctx ⇒ new SchedulingHandler(ctx))
+  private val actorRef: ActorRef          = ctx.spawnAnonymous(behavior).toUntyped
+
+  scheduler.scheduleOnce(utcTime, actorRef, UTCTime.now())
+
   // #schedule-once-with-actorRef
 
   // #schedule-periodically
