@@ -7,11 +7,12 @@ import java.util.Arrays;
 import java.util.List;
 
 public class NTPTimeVal extends Structure {
-    public TimeVal time;          /* Current time */
-    public NativeLong maxerror;   /* Maximum error */
-    public NativeLong esterror;
-    public int tai;
+    public TimeVal time;          /* Current time (ro) */
+    public NativeLong maxerror;   /* Maximum error (us) (ro) */
+    public NativeLong esterror;   /* estimated error (us) (ro) */
+    public int tai;               /* TAI offset (ro) */
 
+    // Reserved fields used in glibc
     public NativeLong unused1;
     public NativeLong unused2;
     public NativeLong unused3;

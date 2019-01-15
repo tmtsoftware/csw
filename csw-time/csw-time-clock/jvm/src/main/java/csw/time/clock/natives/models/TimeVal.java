@@ -7,8 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class TimeVal extends Structure {
-    public NativeLong seconds;
-    public NativeLong microseconds;
+    public NativeLong seconds; /* seconds since the Epoch */
+    public NativeLong microseconds; /* microseconds */
 
     @Override
     protected List<String> getFieldOrder() {
