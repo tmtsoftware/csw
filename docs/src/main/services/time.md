@@ -1,12 +1,13 @@
 # Time Service
 
-The Time Service provides various APIs to access time in Coordinated Universal Time (UTC) and International Atomic Time (TAI) time scales. 
-It also provides APIs for scheduling periodic and non-periodic tasks in future which are optimised for scheduling at 1KHz frequency.
+The Time Service provides various APIs to access time in Coordinated Universal Time (UTC) and International Atomic Time (TAI) time scales with nano second precision. 
+It also provides APIs for scheduling periodic and non-periodic tasks in future which are optimised for scheduling at upto 1KHz frequency.
 
+TMT has standardised on the use of [Precision Time Protocol (PTP)](https://en.wikipedia.org/wiki/Precision_Time_Protocol) as the basis of observatory time to achieve sub-microsecond accuracy and precision. The Time Service provides access to time synchronized by PTP. 
+The Global Positioning System (GPS) provides the absolute time base called Observatory Time. The PTP grand master clock (a hardware device) is synchronized to Observatory Time. Each computer system participating in the PTP system synchronizes to Observatory Time using the PTP protocol. For higher accuracy in time measurements hardware time stamping is recommended and the systems should be fitted with PTP capable Network Interface Cards (NIC).
 
-TMT has standardised on the use of Precision Time Protocol (PTP) as the basis of observatory time to achieve sub-microsecond accuracy and precision.
-The time service reads time from the system clock which will be synchronized by [Precision Time Protocol (PTP)](https://en.wikipedia.org/wiki/Precision_Time_Protocol) across all the components within the TMT architecture.
-For hardware time-stamping offered by PTP for sub-microsecond accuracy, the systems should be fitted with PTP capable Network Interface Cards (NIC). 
+In order to read the time with high precision, the Time Service relies on making native calls to the Linux Kernel libraries, since java 8 supports only millisecond precision. [Java Native Access (JNA)](https://github.com/java-native-acc ess/jna) is used internally in time service to make native calls.
+The implementation of time service scheduler is based on the [Akka Scheduler](https://doc.akka.io/docs/akka/current/scheduler.html) which is designed for high-throughput tasks rather than long-term scheduling.
 
 <!-- introduction to the service -->
 
