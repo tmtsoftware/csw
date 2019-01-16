@@ -50,7 +50,7 @@ IOOperationComponent.propTypes = {
   operation: PropTypes.string,
   output: PropTypes.string,
   api: PropTypes.func,
-  token: PropTypes.string
+  token: PropTypes.func
 }
 
 export default IOOperationComponent

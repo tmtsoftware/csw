@@ -17,12 +17,12 @@ export const sPost = (url, callback, token, input = '') => {
   request
     .post(url)
     .set('Content-Type', 'text/plain')
-    .set('Authorization', `Bearer ${token}`)
+    .set('Authorization', `Bearer ${token()}`)
     .send(input)
     .then(res => {
       callback(res.text)
     }, err => {
-      callback(err.response)
+      callback(err.toString())
     }
     )
 }
