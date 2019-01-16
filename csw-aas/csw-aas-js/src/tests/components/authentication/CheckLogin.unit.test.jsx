@@ -12,8 +12,9 @@ describe('<CheckLogin />', () => {
   it('should render children elements if authentication is true', () => {
     const getCheckLoginWithMockContext = () => {
       const mockContext = {
-        tmtAuth: null,
-        isAuthenticated: true,
+        tmtAuth: {
+          isAuthenticated: jest.fn().mockImplementation(() => { return true })
+        },
         login: () => true,
         logout: () => true
       }
@@ -46,8 +47,9 @@ describe('<CheckLogin />', () => {
   it('should not render children elements if authentication is true', () => {
     const getCheckLoginWithMockContext = () => {
       const mockContext = {
-        tmtAuth: null,
-        isAuthenticated: false,
+        tmtAuth: {
+          isAuthenticated: jest.fn().mockImplementation(() => { return false })
+        },
         login: () => true,
         logout: () => true
       }

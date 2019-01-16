@@ -13,6 +13,10 @@ describe('<Login />', () => {
 
     const wrapper = await mount(<Login {...props} />)
 
+    wrapper.find('button').simulate('click');
+
     expect(wrapper.props().login).toHaveBeenCalled()
+
+    wrapper.unmount();
   })
 })

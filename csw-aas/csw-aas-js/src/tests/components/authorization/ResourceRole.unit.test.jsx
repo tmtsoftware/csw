@@ -13,9 +13,9 @@ describe('<ResourceRole />', () => {
     const getResourceRoleWithMockContext = () => {
       const mockContext = {
         tmtAuth: {
-          hasResourceRole: jest.fn().mockImplementation(() => { return true })
+          hasResourceRole: jest.fn().mockImplementation(() => { return true }),
+          isAuthenticated: jest.fn().mockImplementation(() => { return true })
         },
-        isAuthenticated: true,
         login: () => true,
         logout: () => true
       }
@@ -51,9 +51,9 @@ describe('<ResourceRole />', () => {
     const getResourceRoleWithMockContext = () => {
       const mockContext = {
         tmtAuth: {
-          hasResourceRole: jest.fn().mockImplementation(() => { return false })
+          hasResourceRole: jest.fn().mockImplementation(() => { return false }),
+          isAuthenticated: jest.fn().mockImplementation(() => { return true })
         },
-        isAuthenticated: true,
         login: () => true,
         logout: () => true
       }
@@ -89,9 +89,9 @@ describe('<ResourceRole />', () => {
     const getResourceRoleWithMockContext = () => {
       const mockContext = {
         tmtAuth: {
-          hasResourceRole: jest.fn().mockImplementation(() => { return true })
+          hasResourceRole: jest.fn().mockImplementation(() => { return true }),
+          isAuthenticated: jest.fn().mockImplementation(() => { return false })
         },
-        isAuthenticated: false,
         login: () => true,
         logout: () => true
       }

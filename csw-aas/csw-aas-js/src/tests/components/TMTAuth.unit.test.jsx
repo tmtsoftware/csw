@@ -30,7 +30,7 @@ describe('<TMTAuth />', () => {
     expect(tmtAuth.realmAccess).toBe(mockKeycloak.realmAccess)
     expect(tmtAuth.resourceAccess).toBe(mockKeycloak.resourceAccess)
     expect(tmtAuth.loadUserInfo).toBe(mockKeycloak.loadUserInfo)
-    expect(tmtAuth.isAuthenticated).toBe(mockKeycloak.authenticated)
+    expect(tmtAuth.isAuthenticated()).toBe(false)
     expect(tmtAuth.hasRealmRole).toBe(mockKeycloak.hasRealmRole)
     expect(tmtAuth.hasResourceRole).toBe(mockKeycloak.hasResourceRole)
   })
@@ -56,6 +56,7 @@ describe('<TMTAuth />', () => {
         clientId: 'example-app',
       },
       'http://somehost:someport',
+      true
     )
 
     expect(initMock).toHaveBeenCalledWith({

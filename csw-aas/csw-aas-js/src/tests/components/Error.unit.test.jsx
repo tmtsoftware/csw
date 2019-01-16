@@ -33,6 +33,6 @@ describe('<Error />', () => {
 
     const wrapper = shallow(<Error {...props} />)
 
-    expect(wrapper.find('div.realm-role').length).toBe(0)
+    expect(wrapper.find('div.error').length).toBe(0)
   })
 })

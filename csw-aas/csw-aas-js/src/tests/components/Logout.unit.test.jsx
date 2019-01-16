@@ -8,23 +8,15 @@ describe('<Logout />', () => {
 
   it('should call logout', async () => {
     const props = {
-      isAuthenticated: true,
       logout: jest.fn(),
     }
 
     const wrapper = await mount(<Logout {...props} />)
+
+    wrapper.find('button').simulate('click');
 
     expect(wrapper.props().logout).toHaveBeenCalled()
-  })
 
-  it('should not call logout if un-authenticated', async () => {
-    const props = {
-      isAuthenticated: false,
-      logout: jest.fn(),
-    }
-
-    const wrapper = await mount(<Logout {...props} />)
-
-    expect(wrapper.props().logout).not.toHaveBeenCalled()
+    wrapper.unmount();
   })
 })

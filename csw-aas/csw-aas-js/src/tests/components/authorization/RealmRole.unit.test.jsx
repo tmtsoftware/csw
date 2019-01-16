@@ -13,9 +13,9 @@ describe('<RealmRole />', () => {
     const getRealmRoleWithMockContext = () => {
       const mockContext = {
         tmtAuth: {
-          hasRealmRole: jest.fn().mockImplementation(() => { return true })
+          hasRealmRole: jest.fn().mockImplementation(() => { return true }),
+          isAuthenticated: jest.fn().mockImplementation(() => { return true })
         },
-        isAuthenticated: true,
         login: () => true,
         logout: () => true
       }
@@ -50,9 +50,9 @@ describe('<RealmRole />', () => {
     const getRealmRoleWithMockContext = () => {
       const mockContext = {
         tmtAuth: {
-          hasRealmRole: jest.fn().mockImplementation(() => { return false })
+          hasRealmRole: jest.fn().mockImplementation(() => { return false }),
+          isAuthenticated: jest.fn().mockImplementation(() => { return true })
         },
-        isAuthenticated: true,
         login: () => true,
         logout: () => true
       }
@@ -87,9 +87,9 @@ describe('<RealmRole />', () => {
     const getRealmRoleWithMockContext = () => {
       const mockContext = {
         tmtAuth: {
-          hasRealmRole: jest.fn().mockImplementation(() => { return true })
+          hasRealmRole: jest.fn().mockImplementation(() => { return true }),
+          isAuthenticated: jest.fn().mockImplementation(() => { return false })
         },
-        isAuthenticated: false,
         login: () => true,
         logout: () => true
       }
