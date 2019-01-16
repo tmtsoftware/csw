@@ -19,7 +19,6 @@ object ConfigClientFactory {
    * @param tokenFactory factory to get access tokens
    * @return an instance of ConfigService
    */
-  // Fixme: token factory should be mandatory for admin api, hence delete above admin api where tokenFactory is optional
   def adminApi(
       actorSystem: ActorSystem,
       locationService: LocationService,

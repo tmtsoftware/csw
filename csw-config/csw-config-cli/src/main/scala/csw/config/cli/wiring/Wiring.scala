@@ -25,9 +25,8 @@ private[config] class Wiring {
   lazy val actorRuntime   = new ActorRuntime(actorSystem)
   import actorRuntime._
 
-  lazy val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
-  lazy val authStore                        = new FileAuthStore(settings.authStorePath)
-  //todo: pass location service reference to NativeAppAuthAdapterFactory.make after dev deployment story is done
+  lazy val locationService: LocationService        = HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
+  lazy val authStore                               = new FileAuthStore(settings.authStorePath)
   lazy val nativeAuthAdapter: NativeAppAuthAdapter = NativeAppAuthAdapterFactory.make(locationService, authStore)
   lazy val tokenFactory: TokenFactory              = new CliTokenFactory(nativeAuthAdapter)
   lazy val configService: ConfigService            = ConfigClientFactory.adminApi(actorRuntime.actorSystem, locationService, tokenFactory)
@@ -43,6 +42,11 @@ private[config] object Wiring {
       HttpLocationServiceFactory.make(locationHost)(actorSystem, actorRuntime.mat)
   }
 
+  def noPrinting(): Wiring =
+    new Wiring {
+      override lazy val printLine: Any ⇒ Unit = _ ⇒ ()
+    }
+
   def noPrinting(_locationService: LocationService, _tokenFactory: TokenFactory): Wiring =
     new Wiring {
       override lazy val locationService: LocationService = _locationService
@@ -50,7 +54,7 @@ private[config] object Wiring {
       override lazy val printLine: Any ⇒ Unit            = _ ⇒ ()
     }
 
-  private[config] def noPrinting(
+  def noPrinting(
       _locationService: LocationService,
       _tokenFactory: TokenFactory,
       _nativeAuthAdapter: NativeAppAuthAdapter

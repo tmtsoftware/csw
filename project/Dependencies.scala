@@ -111,7 +111,8 @@ object Dependencies {
       Akka.`akka-actor`,
       Libs.`scopt`,
       Libs.`scalatest`.value         % Test,
-      Akka.`akka-multi-node-testkit` % Test
+      Akka.`akka-multi-node-testkit` % Test,
+      Libs.`embedded-keycloak`       % Test
     )
   )
 
