@@ -31,7 +31,7 @@ class TMTAuthContextProvider extends React.Component {
         })
       })
       .error(() => {
-        this.setState({ tmtAuth: null, isAuthenticated: () => false })
+        this.setState({ tmtAuth: null })
       })
   }
 
@@ -48,7 +48,7 @@ class TMTAuthContextProvider extends React.Component {
   logout = async () => {
     const logoutPromise = await this.state.tmtAuth.logout()
     logoutPromise.success(() => {
-      this.setState({ tmtAuth: null, isAuthenticated: () => false })
+      this.setState({ tmtAuth: null })
     })
   }
 }

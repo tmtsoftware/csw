@@ -1,6 +1,6 @@
 import React from 'react'
-import { withContext } from './context/TMTAuthContext'
 import PropTypes from 'prop-types'
+import WithContext from './context/WithContext'
 
 export class Logout extends React.Component {
   render() {
@@ -19,4 +19,4 @@ Logout.propTypes = {
   logout: PropTypes.func,
 }
 
-export default withContext(Logout)
+export default WithContext(Logout)

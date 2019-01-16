@@ -1,6 +1,6 @@
 import React from 'react'
-import { withContext } from './context/TMTAuthContext'
 import PropTypes from 'prop-types'
+import WithContext from './context/WithContext'
 
 export class Login extends React.Component {
   render() {
@@ -12,4 +12,4 @@ Login.propTypes = {
   login: PropTypes.func,
 }
 
-export default withContext(Login)
+export default WithContext(Login)
