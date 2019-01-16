@@ -2,8 +2,8 @@ package csw.database;
 
 import akka.actor.typed.javadsl.ActorContext;
 import csw.command.client.messages.TopLevelActorMessage;
-import csw.database.client.DatabaseServiceFactory;
-import csw.database.client.javadsl.JooqHelper;
+import csw.database.DatabaseServiceFactory;
+import csw.database.javadsl.JooqHelper;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
 import csw.location.api.models.TrackingEvent;

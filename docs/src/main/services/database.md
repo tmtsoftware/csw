@@ -15,7 +15,7 @@ To use the Database service, add this to your `build.sbt` file:
 sbt
 :   @@@vars
     ```scala
-    libraryDependencies += "com.github.tmtsoftware.csw" %% "csw-database-client" % "$version$"
+    libraryDependencies += "com.github.tmtsoftware.csw" %% "csw-database" % "$version$"
     ```
     @@@
 
@@ -93,7 +93,7 @@ Java
 The reference for providing database properties is shown below:
 
 reference.conf
-:   @@snip [reference.conf](../../../../csw-database-client/src/main/resources/reference.conf)
+:   @@snip [reference.conf](../../../../csw-database/src/main/resources/reference.conf)
 
 In order to override any property shown above, it needs to be defined in `application.conf` for e.g. a sample application.conf
 can look as follows:

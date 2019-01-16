@@ -16,7 +16,7 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-alarm`,
   `csw-aas`,
   `csw-time`,
-  `csw-database-client`,
+  `csw-database`,
   `csw-network-utils`,
   `csw-commons`,
   `csw-testkit`,
@@ -437,7 +437,7 @@ lazy val `csw-testkit` = project
 
 /* ================= Database Service ============== */
 
-lazy val `csw-database-client` = project
+lazy val `csw-database` = project
   .dependsOn(
     `csw-location-api`,
     `csw-location-server` % "test->compile;test->test"
@@ -478,7 +478,7 @@ lazy val examples = project
     `csw-aas-http`,
     `csw-logging-core`,
     `csw-params-jvm`,
-    `csw-database-client`,
+    `csw-database`,
     `csw-framework`,
     `csw-testkit`       % "test->compile",
     `csw-config-server` % "test->test"

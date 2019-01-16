@@ -1,7 +1,6 @@
 package csw.database
 import akka.actor.typed.scaladsl.ActorContext
 import csw.command.client.messages.TopLevelActorMessage
-import csw.database.client.DatabaseServiceFactory
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.TrackingEvent
@@ -47,7 +46,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
     //#dsl-create
     val createQuery: Query = dsl.query("CREATE TABLE films (id SERIAL PRIMARY KEY, Name VARCHAR (10) NOT NULL)")
 
-    import csw.database.client.scaladsl.JooqExtentions.RichQuery
+    import csw.database.scaladsl.JooqExtentions.RichQuery
     val createResultF: Future[Integer] = createQuery.executeAsyncScala()
     createResultF.foreach(result ⇒ println(s"Films table created with $result"))
     //#dsl-create
@@ -60,7 +59,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
       dsl.query("INSERT INTO films(id, name) VALUES (?, ?)", "2", movie_2)
     )
 
-    import csw.database.client.scaladsl.JooqExtentions.RichQueries
+    import csw.database.scaladsl.JooqExtentions.RichQueries
     val batchResultF: Future[List[Int]] = queries.executeBatchAsync()
     batchResultF.foreach(results ⇒ println(s"executed queries [$queries] with results [$results]"))
     //#dsl-batch
@@ -72,7 +71,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
     // fetch data from table and map it to Films class
     val selectQuery = dsl.resultQuery("SELECT id, name FROM films WHERE id = ?", "1")
 
-    import csw.database.client.scaladsl.JooqExtentions.RichResultQuery
+    import csw.database.scaladsl.JooqExtentions.RichResultQuery
     val selectResultF: Future[List[Films]] = selectQuery.fetchAsyncScala[Films]
     selectResultF.foreach(names ⇒ s"Fetched names of films $names")
     //#dsl-fetch
