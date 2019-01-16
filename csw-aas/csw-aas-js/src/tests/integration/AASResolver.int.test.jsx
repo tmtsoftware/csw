@@ -1,6 +1,7 @@
 import { resolveAAS } from '../../components/AASResolver'
 import { Config } from '../config/configs'
 
+// DEOPSCSW-630 - Javascript adapter for AAS
 describe('<AASResolver />', () => {
   it('should getAASUrl', async () => {
     const testURL = `${Config['location-server-url']}/location/resolve/${

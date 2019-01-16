@@ -4,6 +4,8 @@ import Adapter from 'enzyme-adapter-react-16'
 import { Login } from '../../components/Login'
 import renderer from 'react-test-renderer'
 
+// DEOPSCSW-630 - Javascript adapter for AAS
+// DEOPSCSW-631 - React layer for javascript adapter for AAS
 describe('<Login />', () => {
   Enzyme.configure({ adapter: new Adapter() })
 

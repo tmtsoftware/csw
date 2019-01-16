@@ -3,6 +3,8 @@ import Enzyme, { mount } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import renderer from 'react-test-renderer'
 
+// DEOPSCSW-630 - Javascript adapter for AAS
+// DEOPSCSW-636 - JS adapter support  for Authorization
 describe('<RealmRole />', () => {
   Enzyme.configure({ adapter: new Adapter() })
 

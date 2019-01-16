@@ -3,6 +3,8 @@ import Enzyme, { mount } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import renderer from 'react-test-renderer'
 
+// DEOPSCSW-630 - Javascript adapter for AAS
+// DEOPSCSW-631 - React layer for javascript adapter for AAS
 describe('<CheckLogin />', () => {
   Enzyme.configure({ adapter: new Adapter() })
 

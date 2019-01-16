@@ -6,6 +6,7 @@ jest.mock('keycloak-js')
 
 jest.mock('../../components/AASResolver')
 
+// DEOPSCSW-630 - Javascript adapter for AAS
 describe('<TMTAuth />', () => {
   beforeEach(() => {
     resolveAAS.mockClear()
