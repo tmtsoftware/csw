@@ -4,10 +4,13 @@ import PropTypes from 'prop-types'
 import {TMTAuth} from '../TMTAuth'
 
 class TMTAuthContextProvider extends React.Component {
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
     this.state = { ...defaultState, login: this.login, logout: this.logout }
-    this.loginWithoutRedirect()
+  }
+
+  async componentDidMount() {
+    await this.loginWithoutRedirect()
   }
 
   render() {
@@ -24,8 +27,7 @@ class TMTAuthContextProvider extends React.Component {
       .success(() => {
         const tmtAuth = TMTAuth.from(keycloak)
         this.setState({
-          tmtAuth: tmtAuth,
-          isAuthenticated: tmtAuth.isAuthenticated,
+          tmtAuth: tmtAuth
         })
       })
       .error(() => {

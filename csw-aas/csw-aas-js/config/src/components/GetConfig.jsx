@@ -4,10 +4,6 @@ import IOOperationComponent from './IOOperationComponent'
 class GetConfig extends React.Component {
   state = { response: null }
 
-  callBack = (res) => {
-    this.setState({response: res})
-  }
-
   downloadURI = (uri) => {
     let link = document.createElement('a')
     link.href = uri

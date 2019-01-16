@@ -5,8 +5,7 @@ class NavComponent extends React.Component {
   render() {
     return (
       <Consumer>
-
-        { ({login, logout, tmtAuth, isAuthenticated}) => {
+        { ({tmtAuth}) => {
           return <nav className='indigo'>
             <div className='nav-wrapper'>
               <a href='https://www.tmt.org/' className='brand-logo'>
@@ -14,7 +13,8 @@ class NavComponent extends React.Component {
               </a>
               <ul className='hide-on-med-and-down right'>
                 <li>
-                  { isAuthenticated() ? (
+                  { (tmtAuth == null || tmtAuth === undefined) ? <span>Loading...</span> :
+                    tmtAuth.isAuthenticated() ? (
                     <Logout />
                   ) : (
                     <Login />

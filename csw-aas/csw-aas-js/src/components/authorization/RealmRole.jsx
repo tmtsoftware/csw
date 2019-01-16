@@ -4,8 +4,8 @@ import { Consumer } from '../context/TMTAuthContext'
 
 const RealmRole = ({ realmRole, children, error }) => (
   <Consumer>
-    {({ tmtAuth, isAuthenticated }) =>
-      isAuthenticated() && tmtAuth.hasRealmRole(realmRole) ? children : error
+    {({ tmtAuth }) =>
+      tmtAuth.isAuthenticated() && tmtAuth.hasRealmRole(realmRole) ? children : error
     }
   </Consumer>
 )
