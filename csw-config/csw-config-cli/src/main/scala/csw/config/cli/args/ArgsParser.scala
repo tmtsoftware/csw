@@ -17,7 +17,11 @@ class ArgsParser(name: String) {
     //login operation
     cmd("login") action { (_, c) =>
       c.copy(op = "login")
-    } text "login to access admin API's"
+    } text "login to access admin API's" children (
+      opt[Unit]("consoleLogin") action { (_, c) =>
+        c.copy(console = true)
+      } text "optional:: add this option to login from command line instead of browser"
+    )
 
     //logout operation
     cmd("logout") action { (_, c) =>
@@ -36,7 +40,7 @@ class ArgsParser(name: String) {
       } text "input file path",
       opt[Unit]("annex") action { (_, c) =>
         c.copy(annex = true)
-      } text "optional add this option for large/binary files",
+      } text "optional: add this option for large/binary files",
       opt[String]('c', "comment") required () action { (x, c) =>
         c.copy(comment = Some(x))
       } text "create comment"
@@ -69,10 +73,10 @@ class ArgsParser(name: String) {
       } text "output file path",
       opt[String]("id") action { (x, c) =>
         c.copy(id = Some(x))
-      } text "optional. if specified this id will be matched",
+      } text "optional:. if specified this id will be matched",
       opt[String]("date") action { (x, c) =>
         c.copy(date = Some(Instant.parse(x)))
-      } text "optional. if specified will get the file matching this date. Format: 2017-04-16T16:15:23.503Z"
+      } text "optional:. if specified will get the file matching this date. Format: 2017-04-16T16:15:23.503Z"
     )
 
     //delete operation
@@ -93,13 +97,13 @@ class ArgsParser(name: String) {
     } text "lists the files in the repository" children (
       opt[Unit]("annex") action { (_, c) =>
         c.copy(annex = true)
-      } text "optional add this option to list only large/binary files",
+      } text "optional: add this option to list only large/binary files",
       opt[Unit]("normal") action { (_, c) =>
         c.copy(normal = true)
-      } text "optional add this option to list only non-binary/large files",
+      } text "optional: add this option to list only non-binary/large files",
       opt[String]("pattern") action { (x, c) =>
         c.copy(pattern = Some(x))
-      } text "optional list all files whose path matches the given pattern"
+      } text "optional: list all files whose path matches the given pattern"
     )
 
     //history operation
@@ -111,13 +115,13 @@ class ArgsParser(name: String) {
       } text "file path in the repository",
       opt[String]("from") action { (x, c) =>
         c.copy(fromDate = Instant.parse(x))
-      } text "optional date parameter for start date ex. 2017-04-16T16:15:23.503Z",
+      } text "optional: date parameter for start date ex. 2017-04-16T16:15:23.503Z",
       opt[String]("to") action { (x, c) =>
         c.copy(toDate = Instant.parse(x))
-      } text "optional date parameter for upto date ex. 2017-04-16T16:15:23.503Z",
+      } text "optional: date parameter for upto date ex. 2017-04-16T16:15:23.503Z",
       opt[Int]("max") action { (x, c) =>
         c.copy(maxFileVersions = x)
-      } text "optional maximum entries of file versions"
+      } text "optional: maximum entries of file versions"
     )
 
     //setActiveVersion operation
@@ -165,7 +169,7 @@ class ArgsParser(name: String) {
       } text "file path in the repository",
       opt[String]("date") required () action { (x, c) =>
         c.copy(date = Some(Instant.parse(x)))
-      } text "optional. if specified will get the active file matching this date. Format: 2017-04-16T16:15:23.503Z",
+      } text "optional:. if specified will get the active file matching this date. Format: 2017-04-16T16:15:23.503Z",
       opt[String]('o', "out") required () valueName "<outputFile>" action { (x, c) =>
         c.copy(outputFilePath = Some(Paths.get(x)))
       } text "output file path"
@@ -180,13 +184,13 @@ class ArgsParser(name: String) {
       } text "file path in the repository",
       opt[String]("from") action { (x, c) =>
         c.copy(fromDate = Instant.parse(x))
-      } text "optional date parameter for start date ex. 2017-04-16T16:15:23.503Z",
+      } text "optional: date parameter for start date ex. 2017-04-16T16:15:23.503Z",
       opt[String]("to") action { (x, c) =>
         c.copy(toDate = Instant.parse(x))
-      } text "optional date parameter for upto date ex. 2017-04-16T16:15:23.503Z",
+      } text "optional: date parameter for upto date ex. 2017-04-16T16:15:23.503Z",
       opt[Int]("max") action { (x, c) =>
         c.copy(maxFileVersions = x)
-      } text "optional maximum entries of file versions"
+      } text "optional: maximum entries of file versions"
     )
 
     //getMetadata operation

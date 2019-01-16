@@ -270,7 +270,8 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
   // DEOPSCSW-69: Use authorization token to get identity of user creating/updating a configuration file
   // DEOPSCSW-65: Support name or role of configuration file creator/updater
   test("login") {
-    commandLineRunner.login()
+    val loginParams = argsParser.parse(Array("login"))
+    commandLineRunner.login(loginParams.get)
     verify(nativeAuthAdapter).login()
   }
 
