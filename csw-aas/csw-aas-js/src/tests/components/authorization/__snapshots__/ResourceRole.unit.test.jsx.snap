@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ResourceRole /> should not render ResourceRole if authentication is false  1`] = `
+<div
+  className="error"
+>
+  Authentication unsuccessful
+</div>
+`;
+
+exports[`<ResourceRole /> should not render ResourceRole if authentication is true but invalid Resource role 1`] = `
+<div
+  className="error"
+>
+  Authentication unsuccessful
+</div>
+`;
+
+exports[`<ResourceRole /> should render ResourceRole if authentication is true and with valid Resource role 1`] = `
+<div
+  className="resource-role"
+>
+  Authentication successful
+</div>
+`;
+
+exports[`<ResourceRole /> should render nothing if authentication is false and error component is not provided 1`] = `null`;

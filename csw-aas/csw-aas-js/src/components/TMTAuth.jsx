@@ -3,15 +3,16 @@ import KeyCloak from 'keycloak-js'
 import { resolveAAS } from './AASResolver'
 
 class TMTAuthStore {
-
   from = keycloak => {
     this.logout = keycloak.logout
     this.token = keycloak.token
     this.tokenParsed = keycloak.tokenParsed
-    this.realmAccess = keycloak.realmAccess //todo: should this be called realmRoles?
-    this.resourceAccess = keycloak.resourceAccess  //todo: should this be called resourceRoles?
+    this.realmAccess = keycloak.realmAccess // todo: should this be called realmRoles?
+    this.resourceAccess = keycloak.resourceAccess // todo: should this be called resourceRoles?
     this.loadUserInfo = keycloak.loadUserInfo
-    this.isAuthenticated = () => { return keycloak.authenticated }
+    this.isAuthenticated = () => {
+      return keycloak.authenticated
+    }
     this.hasRealmRole = keycloak.hasRealmRole
     this.hasResourceRole = keycloak.hasResourceRole
     return this

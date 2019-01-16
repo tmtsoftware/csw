@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<RealmRole /> should not render RealmRoleComponent elements if authentication is false  1`] = `
+<div
+  className="error"
+>
+  Authentication unsuccessful
+</div>
+`;
+
+exports[`<RealmRole /> should not render RealmRoleComponent if authentication is true but invalid realm role 1`] = `
+<div
+  className="error"
+>
+  Authentication unsuccessful
+</div>
+`;
+
+exports[`<RealmRole /> should render RealmRoleComponent if authentication is true and with valid realm role 1`] = `
+<div
+  className="realm-role"
+>
+  Authentication successful
+</div>
+`;
+
+exports[`<RealmRole /> should render nothing if authentication is false and no error component is provided  1`] = `null`;

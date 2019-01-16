@@ -4,7 +4,14 @@ import PropTypes from 'prop-types'
 
 export class Logout extends React.Component {
   render() {
-    return <button onClick={async() => { await this.props.logout() }}>Logout</button>
+    return (
+      <button
+        onClick={async () => {
+          await this.props.logout()
+        }}>
+        Logout
+      </button>
+    )
   }
 }
 

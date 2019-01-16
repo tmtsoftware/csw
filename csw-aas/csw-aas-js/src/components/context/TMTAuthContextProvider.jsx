@@ -1,7 +1,7 @@
 import React from 'react'
-import {defaultState, Provider} from './TMTAuthContext'
+import { defaultState, Provider } from './TMTAuthContext'
 import PropTypes from 'prop-types'
-import {TMTAuth} from '../TMTAuth'
+import { TMTAuth } from '../TMTAuth'
 
 class TMTAuthContextProvider extends React.Component {
   constructor(props) {
@@ -21,13 +21,13 @@ class TMTAuthContextProvider extends React.Component {
     const { keycloak, authenticated } = await TMTAuth.authenticate(
       this.props.config,
       url,
-      redirect
+      redirect,
     )
     authenticated
       .success(() => {
         const tmtAuth = TMTAuth.from(keycloak)
         this.setState({
-          tmtAuth: tmtAuth
+          tmtAuth: tmtAuth,
         })
       })
       .error(() => {

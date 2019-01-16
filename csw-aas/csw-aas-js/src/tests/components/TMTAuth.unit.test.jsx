@@ -56,7 +56,7 @@ describe('<TMTAuth />', () => {
         clientId: 'example-app',
       },
       'http://somehost:someport',
-      true
+      true,
     )
 
     expect(initMock).toHaveBeenCalledWith({
