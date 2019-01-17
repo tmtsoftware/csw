@@ -17,7 +17,7 @@ object Libs {
   val `junit-interface`    = "com.novocode"           % "junit-interface"     % "0.11" //BSD 2-clause "Simplified" License
   val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.0.8"
   //MIT License
-  val `embedded-keycloak`            = "tech.bilal"           %% "embedded-keycloak"            % "0.0.5-beta" //Apache 2.0
+  val `embedded-keycloak`            = "tech.bilal"           %% "embedded-keycloak"            % "0.0.6-beta" //Apache 2.0
   val `logback-classic`              = "ch.qos.logback"       % "logback-classic"               % "1.2.3"      //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `akka-management-cluster-http` = "com.lightbend.akka"   %% "akka-management-cluster-http" % "0.6"        //N/A at the moment
   val `svnkit`                       = "org.tmatesoft.svnkit" % "svnkit"                        % "1.9.3"      //TMate Open Source License

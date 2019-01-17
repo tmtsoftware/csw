@@ -17,13 +17,13 @@ private[csw] class Authentication(tokenFactory: TokenFactory)(implicit ec: Execu
     case Provided(token) ⇒
       val result = tokenFactory.makeToken(token)
       result.map { at =>
-        error(s"authentication successful for ${at.userOrClientName}")
+        info(s"authentication successful for ${at.userOrClientName}")
         at
       }
       result.toOption.value
 
     case _ ⇒
-      debug("authorization information is missing from request. authentication failed")
+      error("authorization information is missing from request. authentication failed")
       Future.successful(None)
   }
 }

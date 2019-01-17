@@ -1,5 +1,6 @@
 package csw.config
 
+import java.io.ByteArrayInputStream
 import java.nio.file.Paths
 
 import akka.remote.testconductor.RoleName
@@ -45,6 +46,7 @@ class ConfigCliAuthTest(ignore: Int)
 
   private val defaultTimeout: FiniteDuration = 10.seconds
   private val serverTimeout: FiniteDuration  = 30.minutes
+
   override def afterAll(): Unit = {
     super.afterAll()
     testFileUtils.deleteServerFiles()
@@ -62,7 +64,7 @@ class ConfigCliAuthTest(ignore: Int)
         resourceRoles = Set(configAdmin)
       )
 
-      val `csw-config-cli` = Client("csw-config-cli", "public", passwordGrantEnabled = true, authorizationEnabled = false)
+      val `csw-config-cli` = Client("csw-config-cli", "public", passwordGrantEnabled = false, authorizationEnabled = false)
 
       val embeddedKeycloak = new EmbeddedKeycloak(
         KeycloakData(
@@ -81,7 +83,7 @@ class ConfigCliAuthTest(ignore: Int)
           )
         )
       )
-      val stopHandle = Await.result(embeddedKeycloak.startServerInBackground(), serverTimeout)
+      val stopHandle = Await.result(embeddedKeycloak.startServer(), serverTimeout)
       Await.result(new AuthServiceLocation(locationService).register(KeycloakSettings.default.port), defaultTimeout)
       enterBarrier("keycloak started")
       enterBarrier("config-server-started")
@@ -91,12 +93,11 @@ class ConfigCliAuthTest(ignore: Int)
 
     runOn(configServer) {
       enterBarrier("keycloak started")
-      val serverWiring = new ServerWiring()
+      val serverWiring = ServerWiring.make(ConfigFactory.parseString("auth-config.resource = csw-config-server"))
       serverWiring.svnRepo.initSvnRepo()
       serverWiring.httpService.registeredLazyBinding.await
       enterBarrier("config-server-started")
       enterBarrier("test-finished")
-
     }
 
     runOn(client) {
@@ -108,9 +109,19 @@ class ConfigCliAuthTest(ignore: Int)
       enterBarrier("keycloak started")
       enterBarrier("config-server-started")
 
-      val runner = Wiring.noPrinting().commandLineRunner
+      val wiring = Wiring.noPrinting(ConfigFactory.parseString("auth-config.resource = csw-config-cli"))
+      val runner = wiring.commandLineRunner
 
-      runner.login(Options(console = true))
+      val stream = new ByteArrayInputStream(s"$adminUser\n$adminPassword".getBytes())
+
+      val stdIn = System.in
+      try {
+        System.setIn(stream)
+        runner.login(Options(console = true))
+      } finally {
+        System.setIn(stdIn)
+      }
+
       runner.create(Options(relativeRepoPath = Some(repoPath1), inputFilePath = Some(filePath), comment = Some("test")))
 
       val configService     = ConfigClientFactory.clientApi(system, locationService)

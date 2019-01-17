@@ -35,7 +35,7 @@ class AuthIntegrationTest
 
     runOn(keycloak) {
       val embeddedKeycloak = new EmbeddedKeycloak(KeycloakData.empty)
-      val stopHandle       = Await.result(embeddedKeycloak.startServerInBackground(), serverTimeout)
+      val stopHandle       = Await.result(embeddedKeycloak.startServer(), serverTimeout)
       Await.result(new AuthServiceLocation(locationService).register(Settings.default.port), defaultTimeout)
       enterBarrier("keycloak started")
       enterBarrier("test-server started")
@@ -81,7 +81,7 @@ class AuthIntegrationTest
           )
         )
       )
-      val stopHandle = Await.result(embeddedKeycloak.startServerInBackground(), serverTimeout)
+      val stopHandle = Await.result(embeddedKeycloak.startServer(), serverTimeout)
       Await.result(new AuthServiceLocation(locationService).register(Settings.default.port), defaultTimeout)
       enterBarrier("keycloak started")
       enterBarrier("test-server started")
@@ -102,7 +102,7 @@ class AuthIntegrationTest
       enterBarrier("keycloak started")
       enterBarrier("test-server started")
 
-      val token = BearerToken.getBearerToken(
+      val token = BearerToken.fromServer(
         keycloakPort,
         "john",
         "secret",
@@ -136,7 +136,7 @@ class AuthIntegrationTest
           )
         )
       )
-      val stopHandle = Await.result(embeddedKeycloak.startServerInBackground(), serverTimeout)
+      val stopHandle = Await.result(embeddedKeycloak.startServer(), serverTimeout)
       Await.result(new AuthServiceLocation(locationService).register(Settings.default.port), defaultTimeout)
       enterBarrier("keycloak started")
       enterBarrier("test-server started")
@@ -157,7 +157,7 @@ class AuthIntegrationTest
       enterBarrier("keycloak started")
       enterBarrier("test-server started")
 
-      val token = BearerToken.getBearerToken(
+      val token = BearerToken.fromServer(
         keycloakPort,
         "john",
         "secret",

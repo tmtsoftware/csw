@@ -5,12 +5,12 @@ import akka.http.scaladsl.model.HttpMethods._
 import akka.http.scaladsl.server.Directives.{authorize ⇒ keycloakAuthorize, _}
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.directives.AuthenticationDirective
+import com.typesafe.config.Config
 import csw.aas.core.TokenVerifier
 import csw.aas.core.commons.AuthLogger
 import csw.aas.core.deployment.{AuthConfig, AuthServiceLocation}
 import csw.aas.core.token.{AccessToken, TokenFactory}
 import csw.aas.http.AuthorizationPolicy.{EmptyPolicy, _}
-import csw.location.api.models.HttpLocation
 import csw.location.api.scaladsl.LocationService
 
 import scala.concurrent.duration.DurationDouble
@@ -55,13 +55,17 @@ class SecurityDirectives private[csw] (authentication: Authentication, realm: St
 }
 
 object SecurityDirectives {
-  def apply(implicit ec: ExecutionContext): SecurityDirectives = from(AuthConfig.loadFromAppConfig())
+  def apply(implicit ec: ExecutionContext): SecurityDirectives = from(AuthConfig.create())
 
-  def apply(locationService: LocationService)(implicit ec: ExecutionContext): SecurityDirectives = {
-    //todo: see if its possible to remove blocking here
-    val authLocation: HttpLocation = Await.result(AuthServiceLocation(locationService).resolve(5.seconds), 10.seconds)
-    from(AuthConfig.loadFromAppConfig(Some(authLocation)))
-  }
+  def apply(locationService: LocationService)(implicit ec: ExecutionContext): SecurityDirectives =
+    from(AuthConfig.create(authServerLocation = Some(authLocation(locationService))))
+
+  def apply(config: Config, locationService: LocationService)(implicit ec: ExecutionContext): SecurityDirectives =
+    from(AuthConfig.create(config, Some(authLocation(locationService))))
+
+  //todo: see if its possible to remove blocking here
+  private def authLocation(locationService: LocationService)(implicit ec: ExecutionContext) =
+    Await.result(AuthServiceLocation(locationService).resolve(5.seconds), 10.seconds)
 
   private def from(authConfig: AuthConfig)(implicit ec: ExecutionContext): SecurityDirectives = {
     val keycloakDeployment = authConfig.getDeployment

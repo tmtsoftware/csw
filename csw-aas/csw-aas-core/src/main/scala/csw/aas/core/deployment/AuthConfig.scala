@@ -53,10 +53,12 @@ object AuthConfig {
   private val logger = AuthLogger.getLogger
   import logger._
 
-  def loadFromAppConfig(authServerLocation: Option[HttpLocation] = None): AuthConfig = {
+  def create(
+      config: Config = ConfigFactory.load(),
+      authServerLocation: Option[HttpLocation] = None
+  ): AuthConfig = {
     debug("loading auth config")
-    val config = ConfigFactory.load().getConfig("auth-config")
-    new AuthConfig(config, authServerLocation)
+    new AuthConfig(config.getConfig("auth-config"), authServerLocation)
   }
 
   private[aas] implicit def deploymentToConfig(deployment: KeycloakDeployment): Configuration =

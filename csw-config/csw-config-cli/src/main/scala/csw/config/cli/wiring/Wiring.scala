@@ -42,9 +42,10 @@ private[config] object Wiring {
       HttpLocationServiceFactory.make(locationHost)(actorSystem, actorRuntime.mat)
   }
 
-  def noPrinting(): Wiring =
+  def noPrinting(_config: Config): Wiring =
     new Wiring {
       override lazy val printLine: Any ⇒ Unit = _ ⇒ ()
+      override lazy val config: Config        = _config.withFallback(ConfigFactory.load())
     }
 
   def noPrinting(_locationService: LocationService, _tokenFactory: TokenFactory): Wiring =

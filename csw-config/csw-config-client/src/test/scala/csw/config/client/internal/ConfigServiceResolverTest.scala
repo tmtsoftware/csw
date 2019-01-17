@@ -10,7 +10,6 @@ import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.location.api.models.HttpLocation
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import org.mockito.Mockito._
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
