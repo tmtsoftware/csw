@@ -16,9 +16,10 @@ import csw.alarm.api.models._
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.alarm.client.internal.helpers.{AlarmServiceTestSetup, TestDataFeeder}
 import csw.alarm.client.internal.services.SeverityTestScenarios._
-import csw.logging.core.internal.JsonExtensions.RichJsObject
-import csw.logging.core.internal.{LoggingLevels, LoggingSystem}
-import csw.logging.core.utils.TestAppender
+import csw.logging.api.models.LoggingLevels
+import csw.logging.client.internal.JsonExtensions.RichJsObject
+import csw.logging.client.internal.LoggingSystem
+import csw.logging.client.utils.TestAppender
 import csw.params.core.models.Subsystem.{BAD, LGSF, NFIRAOS, TCS}
 import play.api.libs.json.{JsObject, Json}
 

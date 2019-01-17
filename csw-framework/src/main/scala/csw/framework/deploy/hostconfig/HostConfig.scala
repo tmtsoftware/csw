@@ -10,7 +10,8 @@ import csw.framework.models.ConfigFileLocation.{Local, Remote}
 import csw.framework.models.ContainerMode.{Container, Standalone}
 import csw.framework.models.{ContainerBootstrapInfo, HostBootstrapInfo}
 import csw.location.client.utils.LocationServerStatus
-import csw.logging.core.scaladsl.{Logger, LoggerFactory}
+import csw.logging.api.scaladsl.Logger
+import csw.logging.client.scaladsl.LoggerFactory
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble

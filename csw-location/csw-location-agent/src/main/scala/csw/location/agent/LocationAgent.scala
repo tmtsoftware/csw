@@ -10,7 +10,7 @@ import csw.location.agent.models.Command
 import csw.location.agent.wiring.Wiring
 import csw.location.api.models.Connection.{HttpConnection, TcpConnection}
 import csw.location.api.models._
-import csw.logging.core.scaladsl.Logger
+import csw.logging.api.scaladsl.Logger
 
 import scala.collection.immutable.Seq
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}

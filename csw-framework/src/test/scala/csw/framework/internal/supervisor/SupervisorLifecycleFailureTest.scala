@@ -27,9 +27,9 @@ import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, StateName}
 import csw.command.client.messages.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
-import csw.logging.core.internal.LoggingLevels.ERROR
-import csw.logging.core.internal.LoggingSystem
-import csw.logging.core.scaladsl.LoggerFactory
+import csw.logging.api.models.LoggingLevels.ERROR
+import csw.logging.client.internal.LoggingSystem
+import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse.SubmitResponse
 import org.mockito.stubbing.Answer
 import org.scalatest.BeforeAndAfterEach

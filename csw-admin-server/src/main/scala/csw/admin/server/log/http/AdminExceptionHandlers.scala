@@ -5,7 +5,7 @@ import akka.http.scaladsl.server.{Directive, Directives, ExceptionHandler}
 import csw.admin.server.commons.AdminLogger
 import csw.admin.server.log.exceptions.{UnresolvedAkkaLocationException, UnsupportedConnectionException}
 import csw.commons.http.{JsonRejectionHandler, JsonSupport}
-import csw.logging.core.scaladsl.Logger
+import csw.logging.api.scaladsl.Logger
 import play.api.libs.json.{Json, OFormat}
 
 import scala.util.control.NonFatal

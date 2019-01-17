@@ -5,7 +5,7 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
 import csw.command.client.CommandResponseManager
 import csw.command.client.messages.CommandResponseManagerMessage
-import csw.logging.core.scaladsl.LoggerFactory
+import csw.logging.client.scaladsl.LoggerFactory
 
 /**
  * The factory for creating [[csw.command.client.internal.CommandResponseManagerBehavior]]

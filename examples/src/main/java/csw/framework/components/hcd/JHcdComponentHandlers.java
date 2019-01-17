@@ -21,7 +21,7 @@ import csw.config.api.javadsl.IConfigClientService;
 import csw.config.api.models.ConfigData;
 import csw.event.api.javadsl.IEventService;
 import csw.location.api.javadsl.ILocationService;
-import csw.logging.core.javadsl.ILogger;
+import csw.logging.api.javadsl.ILogger;
 
 import java.nio.file.Paths;
 import java.time.Duration;

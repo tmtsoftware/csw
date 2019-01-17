@@ -10,7 +10,8 @@ import csw.framework.deploy.containercmd.cli.{ArgsParser, Options}
 import csw.framework.exceptions.UnableToParseOptions
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.location.client.utils.LocationServerStatus
-import csw.logging.core.scaladsl.{Logger, LoggerFactory}
+import csw.logging.api.scaladsl.Logger
+import csw.logging.client.scaladsl.LoggerFactory
 
 import scala.async.Async.{async, await}
 import scala.concurrent.duration.DurationDouble

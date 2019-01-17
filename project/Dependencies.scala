@@ -115,7 +115,7 @@ object Dependencies {
     )
   )
 
-  val Logging = Def.setting(
+  val LoggingClient = Def.setting(
     Seq(
       Libs.`logback-classic`,
       Libs.`play-json`.value,

@@ -14,7 +14,7 @@ import csw.command.client.models.framework.ToComponentLifecycleMessage
 import csw.command.client.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.logging.core.scaladsl.Logger
+import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandResponse._
 
 import scala.async.Async.{async, await}

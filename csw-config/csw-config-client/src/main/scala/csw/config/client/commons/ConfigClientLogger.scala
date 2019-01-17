@@ -1,6 +1,6 @@
 package csw.config.client.commons
 
-import csw.logging.core.scaladsl.LoggerFactory
+import csw.logging.client.scaladsl.LoggerFactory
 
 /**
  * All the logs generated from config client will have a fixed componentName, which is `ConfigClient`. The componentName

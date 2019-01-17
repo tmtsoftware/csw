@@ -10,7 +10,7 @@ import csw.config.api.scaladsl.ConfigService
 import csw.config.server.commons.ConfigServerLogger
 import csw.config.server.files.AnnexFileService
 import csw.config.server.{ActorRuntime, Settings}
-import csw.logging.core.scaladsl.Logger
+import csw.logging.api.scaladsl.Logger
 import org.tmatesoft.svn.core.wc.SVNRevision
 
 import scala.async.Async._

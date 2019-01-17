@@ -7,7 +7,7 @@ import csw.location.api.models.{AkkaLocation, Location}
 import csw.location.api.scaladsl.LocationService
 import csw.location.server.commons.{CswCluster, LocationServiceLogger}
 import csw.location.server.internal.Registry.AllServices
-import csw.logging.core.scaladsl.Logger
+import csw.logging.api.scaladsl.Logger
 
 /**
  * DeathWatchActor tracks the health of all components registered with LocationService.

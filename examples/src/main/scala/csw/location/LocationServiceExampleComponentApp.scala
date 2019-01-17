@@ -10,7 +10,8 @@ import csw.location.api.models.{AkkaRegistration, ComponentId, ComponentType, Re
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.logging.core.scaladsl.{Logger, LoggerFactory, LoggingSystemFactory}
+import csw.logging.api.scaladsl.Logger
+import csw.logging.client.scaladsl.{LoggerFactory, LoggingSystemFactory}
 import csw.params.core.models.Prefix
 
 import scala.concurrent.duration._

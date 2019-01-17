@@ -37,8 +37,8 @@ import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, RegistrationFactory}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaRegistration, ComponentId}
-import csw.logging.core.internal.LogAdminUtil
-import csw.logging.core.scaladsl.Logger
+import csw.logging.client.internal.LogAdminUtil
+import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandResponse.Locked
 import csw.params.core.models.Prefix
 

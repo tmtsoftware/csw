@@ -11,7 +11,8 @@ import csw.framework.models.CswContext
 import csw.framework.scaladsl.RegistrationFactory
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.ActorSystemFactory
-import csw.logging.core.scaladsl.{Logger, LoggerFactory}
+import csw.logging.api.scaladsl.Logger
+import csw.logging.client.scaladsl.LoggerFactory
 
 import scala.async.Async._
 import scala.concurrent.{ExecutionContextExecutor, Future}

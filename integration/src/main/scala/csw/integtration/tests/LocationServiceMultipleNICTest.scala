@@ -7,7 +7,7 @@ import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.commons.ClusterAwareSettings
 import csw.location.server.internal.ServerWiring
-import csw.logging.core.scaladsl.LoggingSystemFactory
+import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.network.utils.Networks
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.time.Span

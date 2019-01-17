@@ -16,8 +16,8 @@ import csw.config.server.mocks.MockedAuthentication
 import csw.config.server.{ServerWiring, Settings}
 import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.models.{ComponentId, ComponentType}
-import csw.logging.core.internal._
-import csw.logging.core.scaladsl.LoggingSystemFactory
+import csw.logging.client.internal._
+import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.network.utils.Networks
 
 import scala.concurrent.Await

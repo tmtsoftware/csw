@@ -3,7 +3,7 @@ package csw.location.client
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
 import csw.location.api.commons.{Constants, LocationServiceLogger}
-import csw.logging.core.scaladsl.Logger
+import csw.logging.api.scaladsl.Logger
 import csw.network.utils.Networks
 
 /**

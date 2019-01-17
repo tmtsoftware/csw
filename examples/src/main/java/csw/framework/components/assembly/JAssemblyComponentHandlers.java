@@ -22,7 +22,7 @@ import csw.framework.models.JCswContext;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.JComponentType;
 import csw.location.api.models.*;
-import csw.logging.core.javadsl.ILogger;
+import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.*;
 import csw.params.core.generics.Key;
 import csw.params.core.models.Prefix;

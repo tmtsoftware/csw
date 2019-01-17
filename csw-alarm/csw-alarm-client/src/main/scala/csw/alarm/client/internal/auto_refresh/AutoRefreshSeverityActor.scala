@@ -4,7 +4,7 @@ import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
 import csw.alarm.client.internal.AlarmServiceLogger
 import csw.alarm.client.internal.auto_refresh.AutoRefreshSeverityMessage._
-import csw.logging.core.scaladsl.Logger
+import csw.logging.api.scaladsl.Logger
 
 import scala.concurrent.duration.FiniteDuration
 

@@ -1,12 +1,12 @@
 package csw.benchmark.logging;
 
 import akka.actor.ActorSystem;
-import csw.logging.core.internal.LoggingLevels;
-import csw.logging.core.internal.LoggingSystem;
-import csw.logging.core.javadsl.ILogger;
-import csw.logging.core.javadsl.JGenericLoggerFactory;
-import csw.logging.core.javadsl.JLogAppenderBuilders;
-import csw.logging.core.javadsl.JLoggingSystemFactory;
+import csw.logging.api.models.LoggingLevels;
+import csw.logging.client.internal.LoggingSystem;
+import csw.logging.api.javadsl.ILogger;
+import csw.logging.client.javadsl.JGenericLoggerFactory;
+import csw.logging.client.javadsl.JLogAppenderBuilders;
+import csw.logging.client.javadsl.JLoggingSystemFactory;
 import org.openjdk.jmh.annotations.*;
 import org.scalatest.junit.JUnitSuite;
 import scala.concurrent.Await;

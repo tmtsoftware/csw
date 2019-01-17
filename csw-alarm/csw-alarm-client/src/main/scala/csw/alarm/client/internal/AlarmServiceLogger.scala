@@ -1,5 +1,6 @@
 package csw.alarm.client.internal
-import csw.logging.core.scaladsl.LoggerFactory
+
+import csw.logging.client.scaladsl.LoggerFactory
 
 /**
  * All the logs generated from location service will have a fixed componentName.

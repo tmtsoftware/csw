@@ -6,7 +6,7 @@ import csw.command.client.CommandResponseManager
 import csw.config.api.javadsl.IConfigClientService
 import csw.event.api.javadsl.IEventService
 import csw.location.api.javadsl.ILocationService
-import csw.logging.core.javadsl.JLoggerFactory
+import csw.logging.client.javadsl.JLoggerFactory
 import csw.time.client.api.TimeServiceScheduler
 
 /**

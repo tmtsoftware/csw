@@ -9,7 +9,7 @@ import csw.location.api.models.{AkkaRegistration, ComponentId, ComponentType, Re
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.commons.ClusterAwareSettings
 import csw.location.server.internal.ServerWiring
-import csw.logging.core.scaladsl.LoggingSystemFactory
+import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.params.core.models.Prefix
 
 object AssemblyApp {

@@ -3,8 +3,8 @@ package csw.benchmark.logging
 import java.time.ZonedDateTime
 import java.util.concurrent.TimeUnit
 
-import csw.logging.core.commons.{LoggingKeys, TMTDateTimeFormatter}
-import csw.logging.core.internal.JsonExtensions.RichJsObject
+import csw.logging.client.commons.{LoggingKeys, TMTDateTimeFormatter}
+import csw.logging.client.internal.JsonExtensions.RichJsObject
 import org.openjdk.jmh.annotations._
 import play.api.libs.json.{JsObject, Json}
 
@@ -30,7 +30,7 @@ class TMTDateTimeFormatterBenchmark {
                                  |  "${LoggingKeys.NAME}": "test-service",
                                  |  "${LoggingKeys.SEVERITY}": "ERROR",
                                  |  "${LoggingKeys.TIMESTAMP}": "2017-06-19T16:10:19.397Z",
-                                 |  "${LoggingKeys.CLASS}": "csw.logging.core.appenders.FileAppenderTest",
+                                 |  "${LoggingKeys.CLASS}": "csw.logging.client.appenders.FileAppenderTest",
                                  |  "${LoggingKeys.FILE}": "FileAppenderTest.scala",
                                  |  "${LoggingKeys.LINE}": 25,
                                  |  "${LoggingKeys.MESSAGE}": "This is at ERROR level"

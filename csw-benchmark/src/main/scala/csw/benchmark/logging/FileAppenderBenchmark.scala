@@ -5,8 +5,8 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor.ActorSystem
 import csw.benchmark.logging.mock.LogActorMock
-import csw.logging.core.appenders.FileAppender
-import csw.logging.core.internal.LoggingSystem
+import csw.logging.client.appenders.FileAppender
+import csw.logging.client.internal.LoggingSystem
 import org.openjdk.jmh.annotations._
 
 import scala.concurrent.Await

@@ -21,7 +21,7 @@ import csw.params.core.generics.Parameter;
 import csw.params.core.states.CurrentState;
 import csw.params.core.states.StateName;
 import csw.command.client.CommandResponseManager;
-import csw.logging.core.javadsl.ILogger;
+import csw.logging.api.javadsl.ILogger;
 
 import java.time.Duration;
 import java.util.concurrent.*;

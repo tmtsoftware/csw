@@ -12,7 +12,7 @@ import csw.framework.exceptions.{FailureRestart, FailureStop}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models._
-import csw.logging.core.scaladsl.Logger
+import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandResponse.{Accepted, Completed, SubmitResponse, ValidateCommandResponse}
 import csw.params.commands._
 
