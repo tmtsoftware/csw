@@ -3,6 +3,14 @@ import { defaultState, Provider } from './TMTAuthContext'
 import PropTypes from 'prop-types'
 import { TMTAuth } from '../TMTAuth'
 
+/**
+ * React component which is wrapper over provider of react context api.
+ * Responsible for instantiating keycloak and provide context value to consumers
+ * props -
+ * config json specific to UI application e.g. realm and clientId
+ * children - react component or html element which can have consumer to access
+ * context provided
+ */
 class TMTAuthContextProvider extends React.Component {
   constructor(props) {
     super(props)
@@ -17,6 +25,10 @@ class TMTAuthContextProvider extends React.Component {
     return <Provider value={this.state}>{this.props.children}</Provider>
   }
 
+  /**
+   * Instantiate keycloak and sets TMTAuthStore instance in state. This state can be provided
+   * as a context
+   */
   instantiateAAS = async (url, redirect) => {
     const { keycloak, authenticated } = await TMTAuth.authenticate(
       this.props.config,
@@ -35,11 +47,17 @@ class TMTAuthContextProvider extends React.Component {
       })
   }
 
+  /**
+   * Resolves AAS server and instantiate keycloak in check-sso mode
+   */
   loginWithoutRedirect = async () => {
     const url = await TMTAuth.getAASUrl()
     await this.instantiateAAS({ url: url }, false)
   }
 
+  /**
+   * Resolves AAS server and instantiate keycloak in login-required mode
+   */
   login = async () => {
     const url = await TMTAuth.getAASUrl()
     await this.instantiateAAS({ url: url }, true)
