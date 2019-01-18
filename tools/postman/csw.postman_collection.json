@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "8dee7bb6-4d14-61c4-ebe9-f9320c8e90e9",
-		"name": "csw-prod",
+		"_postman_id": "b4d72a1f-0488-426e-b0d5-6ac70afc1368",
+		"name": "csw",
 		"description": "Common Software is the package of services and infrastructure software that integrates the TMT software systems.\n\nhttp://www.tmt.org\n\nThis collection of routes consists of http end points exposed by TMT common software.\n\nComplete codebase is available at https://github.com/tmtsoftware/csw-prod",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -78,7 +78,6 @@
 							],
 							"port": "{{port}}",
 							"path": [
-								"secure",
 								"config",
 								"{{path}}"
 							],
@@ -286,7 +285,6 @@
 							],
 							"port": "{{port}}",
 							"path": [
-								"secure",
 								"config",
 								"{{path}}"
 							],
@@ -342,7 +340,6 @@
 							],
 							"port": "{{port}}",
 							"path": [
-								"secure",
 								"config",
 								"{{path}}"
 							],
@@ -564,7 +561,6 @@
 							],
 							"port": "{{port}}",
 							"path": [
-								"secure",
 								"active-version",
 								"{{path}}"
 							],
@@ -630,7 +626,6 @@
 							],
 							"port": "{{port}}",
 							"path": [
-								"secure",
 								"active-version",
 								"{{path}}"
 							],
@@ -1406,16 +1401,16 @@
 							"raw": "[\n  {\n    \"resource_id\": \"e1718e9c-285d-4661-9c89-829c7dc62b87\",\n    \"resource_scopes\": [\n      \"read\"\n    ]\n  }\n]"
 						},
 						"url": {
-							"raw": "http://localhost:8080/auth/realms/master/authz/protection/permission",
+							"raw": "http://{{hostname}}:{{keycloak_port}}/auth/realms/TMT/authz/protection/permission",
 							"protocol": "http",
 							"host": [
-								"localhost"
+								"{{hostname}}"
 							],
-							"port": "8080",
+							"port": "{{keycloak_port}}",
 							"path": [
 								"auth",
 								"realms",
-								"master",
+								"TMT",
 								"authz",
 								"protection",
 								"permission"
@@ -1454,16 +1449,16 @@
 							]
 						},
 						"url": {
-							"raw": "http://localhost:8080/auth/realms/master/protocol/openid-connect/token",
+							"raw": "http://{{hostname}}:{{keycloak_port}}/auth/realms/TMT/protocol/openid-connect/token",
 							"protocol": "http",
 							"host": [
-								"localhost"
+								"{{hostname}}"
 							],
-							"port": "8080",
+							"port": "{{keycloak_port}}",
 							"path": [
 								"auth",
 								"realms",
-								"master",
+								"TMT",
 								"protocol",
 								"openid-connect",
 								"token"
@@ -1515,37 +1510,32 @@
 								},
 								{
 									"key": "client_id",
-									"value": "csw-config-cli",
-									"type": "text"
-								},
-								{
-									"key": "client_secret",
-									"value": "eeba75d7-a191-4aba-8275-7a6e8c6ad6c9",
+									"value": "{{client_id}}",
 									"type": "text"
 								},
 								{
 									"key": "username",
-									"value": "admin",
+									"value": "kevin",
 									"type": "text"
 								},
 								{
 									"key": "password",
-									"value": "admin",
+									"value": "abcd",
 									"type": "text"
 								}
 							]
 						},
 						"url": {
-							"raw": "http://localhost:8080/auth/realms/master/protocol/openid-connect/token",
+							"raw": "http://{{hostname}}:{{keycloak_port}}/auth/realms/TMT/protocol/openid-connect/token",
 							"protocol": "http",
 							"host": [
-								"localhost"
+								"{{hostname}}"
 							],
-							"port": "8080",
+							"port": "{{keycloak_port}}",
 							"path": [
 								"auth",
 								"realms",
-								"master",
+								"TMT",
 								"protocol",
 								"openid-connect",
 								"token"
