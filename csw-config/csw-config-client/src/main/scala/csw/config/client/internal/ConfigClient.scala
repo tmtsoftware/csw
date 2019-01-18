@@ -1,6 +1,6 @@
 package csw.config.client.internal
 
-import java.nio.{file ⇒ jnio}
+import java.nio.{file => jnio}
 import java.time.Instant
 
 import akka.http.scaladsl.Http

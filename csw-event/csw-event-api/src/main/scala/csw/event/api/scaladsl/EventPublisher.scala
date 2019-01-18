@@ -3,8 +3,8 @@ package csw.event.api.scaladsl
 import akka.Done
 import akka.actor.Cancellable
 import akka.stream.scaladsl.Source
-import csw.params.events.Event
 import csw.event.api.exceptions.PublishFailure
+import csw.params.events.Event
 
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration

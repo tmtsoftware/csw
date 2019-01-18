@@ -1,6 +1,6 @@
 package csw.alarm.client.internal.helpers
-import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.{Duration, DurationDouble}
+import scala.concurrent.{Await, Future}
 
 object TestFutureExt {
   implicit class RichFuture[T](f: Future[T]) {

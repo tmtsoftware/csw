@@ -1,7 +1,7 @@
 package csw.alarm.api.javadsl;
 
-import csw.alarm.api.models.FullAlarmSeverity;
 import csw.alarm.api.models.AlarmSeverity;
+import csw.alarm.api.models.FullAlarmSeverity;
 
 /**
  * Helper class for java to get the handle of `AlarmSeverity` which is fundamental to alarm service

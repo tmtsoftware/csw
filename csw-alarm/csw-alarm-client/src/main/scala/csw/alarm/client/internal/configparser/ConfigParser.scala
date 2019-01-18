@@ -2,8 +2,8 @@ package csw.alarm.client.internal.configparser
 
 import com.typesafe.config.{Config, ConfigFactory, ConfigRenderOptions}
 import csw.alarm.api.exceptions.ConfigParseException
-import csw.alarm.api.internal.{AlarmJsonSupport, AlarmMetadataSet}
 import csw.alarm.api.internal.ValidationResult.{Failure, Success}
+import csw.alarm.api.internal.{AlarmJsonSupport, AlarmMetadataSet}
 import play.api.libs.json.{Format, JsValue, Json}
 
 /**

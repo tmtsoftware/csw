@@ -1,5 +1,4 @@
 package csw.alarm.client.internal.helpers
-import csw.params.core.models.Subsystem.AOESW
 import csw.alarm.api.models.AcknowledgementStatus.Acknowledged
 import csw.alarm.api.models.ActivationStatus.Active
 import csw.alarm.api.models.AlarmSeverity._
@@ -7,6 +6,7 @@ import csw.alarm.api.models.Key.AlarmKey
 import csw.alarm.api.models._
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.alarm.client.internal.services.{MetadataServiceModule, SeverityServiceModule, StatusServiceModule}
+import csw.params.core.models.Subsystem.AOESW
 
 trait TestDataFeeder {
   self: SeverityServiceModule with MetadataServiceModule with StatusServiceModule ⇒

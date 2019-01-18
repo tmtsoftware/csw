@@ -3,8 +3,6 @@ package csw.alarm.client.internal.services
 import java.time.{Clock, LocalDateTime}
 
 import com.typesafe.config.ConfigFactory
-import csw.params.core.models.Subsystem
-import csw.params.core.models.Subsystem.BAD
 import csw.alarm.api.exceptions.KeyNotFoundException
 import csw.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.alarm.api.models.AlarmSeverity._
@@ -15,6 +13,8 @@ import csw.alarm.api.models.{AlarmSeverity, AlarmStatus}
 import csw.alarm.client.internal.extensions.TimeExtensions
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
+import csw.params.core.models.Subsystem
+import csw.params.core.models.Subsystem.BAD
 
 class StatusServiceModuleTest
     extends AlarmServiceTestSetup

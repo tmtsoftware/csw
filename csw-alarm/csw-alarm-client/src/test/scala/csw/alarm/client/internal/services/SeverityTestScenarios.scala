@@ -1,10 +1,10 @@
 package csw.alarm.client.internal.services
-import csw.params.core.models.Subsystem.AOESW
 import csw.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.alarm.api.models.AlarmSeverity.{Critical, Major, Okay, Warning}
 import csw.alarm.api.models.FullAlarmSeverity.Disconnected
 import csw.alarm.api.models.Key.AlarmKey
 import csw.alarm.client.internal.helpers.{SetSeverityAckStatusTestCase, SetSeverityTestCase}
+import csw.params.core.models.Subsystem.AOESW
 
 object SeverityTestScenarios {
 

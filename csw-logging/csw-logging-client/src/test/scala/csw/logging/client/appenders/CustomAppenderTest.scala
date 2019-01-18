@@ -4,8 +4,8 @@ import java.net.InetAddress
 
 import akka.actor.{ActorContext, ActorRefFactory, ActorSystem}
 import com.typesafe.config.ConfigFactory
-import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.api.scaladsl._
+import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.scaladsl.{LoggerFactory, LoggingSystemFactory}
 import org.scalatest.{FunSuite, Matchers}
 import play.api.libs.json.{JsObject, Json}

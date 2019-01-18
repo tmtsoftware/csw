@@ -1,9 +1,9 @@
 package csw.logging.client.appenders
 
 import akka.actor.{ActorContext, ActorRefFactory, ActorSystem}
+import csw.logging.api.models.LoggingLevels.Level
 import csw.logging.client.commons.{Category, LoggingKeys}
 import csw.logging.client.internal.JsonExtensions.RichJsObject
-import csw.logging.api.models.LoggingLevels.Level
 import play.api.libs.json.{JsObject, Json}
 
 import scala.concurrent.Future

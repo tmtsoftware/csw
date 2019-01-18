@@ -1,8 +1,8 @@
 package csw.event.cli.args
 
+import csw.event.cli.args.Separators.KEY_SEP
 import csw.params.core.models.Units
 import csw.params.core.models.Units.NoUnits
-import csw.event.cli.args.Separators.KEY_SEP
 
 case class KeyArg private (keyName: String, keyType: Char, units: Units)
 

@@ -1,8 +1,8 @@
 package csw.logging.client.appenders
 
-import csw.logging.client.commons.LoggingKeys
 import csw.logging.api.models.LoggingLevels
 import csw.logging.api.models.LoggingLevels.Level
+import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.utils.LoggingTestSuite
 import org.slf4j.LoggerFactory
 

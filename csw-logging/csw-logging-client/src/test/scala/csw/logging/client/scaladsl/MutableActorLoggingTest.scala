@@ -2,12 +2,12 @@ package csw.logging.client.scaladsl
 
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
-import csw.logging.client.LogCommand
-import csw.logging.client.LogCommand._
-import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.api.models.LoggingLevels
 import csw.logging.api.models.LoggingLevels.Level
 import csw.logging.api.scaladsl.Logger
+import csw.logging.client.LogCommand
+import csw.logging.client.LogCommand._
+import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.LoggingTestSuite
 
 object TromboneMutableActor {

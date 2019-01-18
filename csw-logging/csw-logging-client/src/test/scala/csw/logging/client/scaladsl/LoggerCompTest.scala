@@ -1,11 +1,11 @@
 package csw.logging.client.scaladsl
 
 import akka.actor.ActorRef
+import csw.logging.api.models.LoggingLevels._
 import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.components.IRIS._
 import csw.logging.client.components._
 import csw.logging.client.internal.JsonExtensions.RichJsObject
-import csw.logging.api.models.LoggingLevels._
 import csw.logging.client.utils.LoggingTestSuite
 import play.api.libs.json.JsObject
 

@@ -6,15 +6,15 @@ import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{KillSwitches, Materializer}
-import csw.params.events._
-import csw.params.core.formats.JsonSupport
-import csw.params.core.generics.Parameter
-import csw.params.core.models.Id
 import csw.event.api.scaladsl.SubscriptionModes.RateAdapterMode
 import csw.event.api.scaladsl.{EventService, EventSubscription}
 import csw.event.cli.args.Options
 import csw.event.cli.utils.{EventJsonTransformer, EventOnelineTransformer, Formatter}
 import csw.event.cli.wiring.ActorRuntime
+import csw.params.core.formats.JsonSupport
+import csw.params.core.generics.Parameter
+import csw.params.core.models.Id
+import csw.params.events._
 import csw.time.api.models.UTCTime
 import play.api.libs.json.{JsObject, JsValue, Json}
 

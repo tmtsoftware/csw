@@ -1,10 +1,10 @@
 package csw.alarm.cli.utils
 
+import csw.alarm.api.internal.Separators.KeySeparator
 import csw.alarm.api.models.Key._
 import csw.alarm.api.models._
 import csw.alarm.cli.args.Options
 import csw.alarm.client.internal.models.Alarm
-import csw.alarm.api.internal.Separators.KeySeparator
 
 object Formatter {
 

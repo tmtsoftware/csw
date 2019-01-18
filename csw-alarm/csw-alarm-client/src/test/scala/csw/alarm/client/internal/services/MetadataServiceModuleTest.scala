@@ -1,18 +1,18 @@
 package csw.alarm.client.internal.services
 
 import com.typesafe.config.{Config, ConfigFactory}
-import csw.params.core.models.Subsystem
-import csw.params.core.models.Subsystem.NFIRAOS
 import csw.alarm.api.exceptions.KeyNotFoundException
 import csw.alarm.api.internal.MetadataKey
 import csw.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.alarm.api.models.AlarmHealth.Bad
-import csw.alarm.api.models.FullAlarmSeverity.Disconnected
 import csw.alarm.api.models.AlarmSeverity._
-import csw.alarm.api.models.{ActivationStatus, AlarmStatus}
+import csw.alarm.api.models.FullAlarmSeverity.Disconnected
 import csw.alarm.api.models.Key.{AlarmKey, ComponentKey, GlobalKey, SubsystemKey}
+import csw.alarm.api.models.{ActivationStatus, AlarmStatus}
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
+import csw.params.core.models.Subsystem
+import csw.params.core.models.Subsystem.NFIRAOS
 
 // DEOPSCSW-486: Provide API to load alarm metadata in Alarm store from file
 class MetadataServiceModuleTest

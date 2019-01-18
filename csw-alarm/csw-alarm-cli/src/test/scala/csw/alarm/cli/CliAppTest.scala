@@ -3,7 +3,6 @@ package csw.alarm.cli
 import java.nio.file.Paths
 
 import com.typesafe.config.ConfigFactory
-import csw.params.core.models.Subsystem.{LGSF, NFIRAOS, TCS}
 import csw.alarm.api.exceptions.KeyNotFoundException
 import csw.alarm.api.internal.Separators.KeySeparator
 import csw.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
@@ -24,6 +23,7 @@ import csw.config.client.scaladsl.ConfigClientFactory
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.mocks.MockedAuthentication
 import csw.config.server.{ServerWiring, Settings}
+import csw.params.core.models.Subsystem.{LGSF, NFIRAOS, TCS}
 
 @FileSystemSensitive
 class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {

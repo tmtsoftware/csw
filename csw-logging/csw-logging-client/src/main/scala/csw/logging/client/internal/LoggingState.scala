@@ -1,8 +1,8 @@
 package csw.logging.client.internal
 
 import akka.actor._
-import csw.logging.client.commons.Constants
 import csw.logging.api.models.LoggingLevels.Level
+import csw.logging.client.commons.Constants
 import csw.logging.client.models.ComponentLoggingState
 
 import scala.collection.mutable

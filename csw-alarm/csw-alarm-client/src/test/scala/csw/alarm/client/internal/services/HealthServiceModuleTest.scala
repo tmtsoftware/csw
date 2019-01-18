@@ -3,7 +3,6 @@ package csw.alarm.client.internal.services
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import com.typesafe.config.ConfigFactory
-import csw.params.core.models.Subsystem.{BAD, LGSF, NFIRAOS, TCS}
 import csw.alarm.api.exceptions.{InactiveAlarmException, KeyNotFoundException}
 import csw.alarm.api.models.AlarmHealth
 import csw.alarm.api.models.AlarmHealth.{Bad, Good, Ill}
@@ -13,6 +12,7 @@ import csw.alarm.api.models.Key.{ComponentKey, GlobalKey, SubsystemKey}
 import csw.alarm.api.models.ShelveStatus.Shelved
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
+import csw.params.core.models.Subsystem.{BAD, LGSF, NFIRAOS, TCS}
 
 import scala.concurrent.duration.DurationLong
 

@@ -2,9 +2,9 @@ package csw.aas.http
 
 import akka.http.scaladsl.server.Directives.AsyncAuthenticator
 import akka.http.scaladsl.server.directives.Credentials.Provided
-import csw.aas.core.token.{AccessToken, TokenFactory}
 import cats.implicits._
 import csw.aas.core.commons.AuthLogger
+import csw.aas.core.token.{AccessToken, TokenFactory}
 
 import scala.concurrent.{ExecutionContext, Future}
 

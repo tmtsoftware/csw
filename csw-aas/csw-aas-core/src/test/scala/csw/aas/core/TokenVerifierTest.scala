@@ -7,7 +7,7 @@ import csw.aas.core.token.claims.{Access, Audience, Authorization}
 import csw.aas.core.utils.Conversions.RichEitherTFuture
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.exceptions.{TokenNotActiveException, TokenSignatureInvalidException}
-import org.keycloak.representations.{AccessToken ⇒ KeycloakAccessToken}
+import org.keycloak.representations.{AccessToken => KeycloakAccessToken}
 import org.mockito.MockitoSugar
 import org.scalatest.{EitherValues, FunSuite, Matchers}
 

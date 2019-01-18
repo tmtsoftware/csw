@@ -1,6 +1,7 @@
 package csw.aas.core.utils
 
 import cats.data.EitherT
+
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 

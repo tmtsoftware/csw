@@ -1,14 +1,14 @@
 package csw.benchmark.command.component
 
 import akka.actor.typed.scaladsl.ActorContext
+import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.command.client.messages.TopLevelActorMessage
-import csw.params.commands._
 import csw.location.api.models.TrackingEvent
-import csw.params.core.models.Id
 import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandResponse.{Accepted, SubmitResponse, ValidateCommandResponse}
+import csw.params.commands._
+import csw.params.core.models.Id
 
 import scala.concurrent.Future
 

@@ -7,8 +7,8 @@ import java.util.function.{Consumer, Supplier}
 import akka.Done
 import akka.actor.Cancellable
 import akka.stream.javadsl.Source
-import csw.params.events.Event
 import csw.event.api.exceptions.PublishFailure
+import csw.params.events.Event
 
 /**
  * An EventPublisher interface to publish events. The published events are published on a key determined by [[csw.params.events.EventKey]]

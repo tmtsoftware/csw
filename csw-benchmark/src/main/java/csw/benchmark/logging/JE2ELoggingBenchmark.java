@@ -1,9 +1,9 @@
 package csw.benchmark.logging;
 
 import akka.actor.ActorSystem;
+import csw.logging.api.javadsl.ILogger;
 import csw.logging.api.models.LoggingLevels;
 import csw.logging.client.internal.LoggingSystem;
-import csw.logging.api.javadsl.ILogger;
 import csw.logging.client.javadsl.JGenericLoggerFactory;
 import csw.logging.client.javadsl.JLogAppenderBuilders;
 import csw.logging.client.javadsl.JLoggingSystemFactory;

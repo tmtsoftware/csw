@@ -3,12 +3,12 @@ package csw.logging.client.compat
 import ch.qos.logback.classic.spi.ThrowableProxy
 import ch.qos.logback.core.spi.AppenderAttachable
 import ch.qos.logback.core.{Appender, UnsynchronizedAppenderBase}
-import csw.logging.client.internal.LogActorMessages.LogSlf4j
-import csw.logging.client.internal.MessageHandler
-import csw.logging.macros.DefaultSourceLocation
 import csw.logging.api.NoLogException
 import csw.logging.api.scaladsl.Logger
+import csw.logging.client.internal.LogActorMessages.LogSlf4j
+import csw.logging.client.internal.MessageHandler
 import csw.logging.client.scaladsl.GenericLoggerFactory
+import csw.logging.macros.DefaultSourceLocation
 
 import scala.collection.mutable
 

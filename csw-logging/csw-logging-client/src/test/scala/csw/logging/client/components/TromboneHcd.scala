@@ -1,9 +1,8 @@
 package csw.logging.client.components
 
-import csw.logging.client.commons.LoggingKeys
 import csw.logging.api.scaladsl.Logger
-import csw.logging.client.scaladsl.RichException
-import csw.logging.client.scaladsl.LoggerFactory
+import csw.logging.client.commons.LoggingKeys
+import csw.logging.client.scaladsl.{LoggerFactory, RichException}
 
 object TromboneHcdLogger extends LoggerFactory(TromboneHcd.COMPONENT_NAME)
 
@@ -42,7 +41,7 @@ class TromboneHcd() {
 }
 
 object TromboneHcd {
-  val TRACE_LINE_NO = 20
+  val TRACE_LINE_NO = 19
   val DEBUG_LINE_NO = TRACE_LINE_NO + 1
   val INFO_LINE_NO  = TRACE_LINE_NO + 2
   val WARN_LINE_NO  = TRACE_LINE_NO + 3

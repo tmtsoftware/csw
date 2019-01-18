@@ -12,9 +12,9 @@ import csw.logging.client.commons.{Constants, LoggingKeys}
 import csw.logging.client.exceptions.AppenderNotFoundException
 import csw.logging.client.internal.LogActorMessages._
 import csw.logging.client.internal.TimeActorMessages.TimeDone
-import csw.logging.macros.DefaultSourceLocation
 import csw.logging.client.models.LogMetadata
 import csw.logging.client.scaladsl.GenericLoggerFactory
+import csw.logging.macros.DefaultSourceLocation
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsObject, Json}
 

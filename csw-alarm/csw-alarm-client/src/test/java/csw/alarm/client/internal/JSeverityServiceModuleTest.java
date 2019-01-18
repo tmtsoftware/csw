@@ -2,13 +2,13 @@ package csw.alarm.client.internal;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import csw.params.javadsl.JSubsystem;
 import csw.alarm.api.exceptions.InvalidSeverityException;
 import csw.alarm.api.javadsl.IAlarmService;
 import csw.alarm.api.javadsl.JAlarmSeverity;
 import csw.alarm.api.models.*;
 import csw.alarm.api.scaladsl.AlarmAdminService;
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup;
+import csw.params.javadsl.JSubsystem;
 import csw.time.api.models.UTCTime;
 import org.junit.AfterClass;
 import org.junit.Before;

@@ -2,8 +2,8 @@ package csw.alarm.cli.args
 
 import java.nio.file.Paths
 
-import csw.params.core.models.Subsystem
 import csw.alarm.api.models.AlarmSeverity
+import csw.params.core.models.Subsystem
 import scopt.{OptionDef, OptionParser}
 
 trait Arguments { self: OptionParser[Options] =>

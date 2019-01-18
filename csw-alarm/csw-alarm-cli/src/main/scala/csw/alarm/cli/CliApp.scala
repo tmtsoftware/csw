@@ -1,8 +1,8 @@
 package csw.alarm.cli
 import csw.alarm.cli.args.Options
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
 class CliApp(alarmAdminClient: CommandLineRunner) {
   def execute(options: Options): Unit =

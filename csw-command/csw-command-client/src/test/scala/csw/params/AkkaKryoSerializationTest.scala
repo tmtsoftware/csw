@@ -22,16 +22,16 @@ import csw.command.client.models.framework.PubSub.Subscribe
 import csw.command.client.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.command.client.models.framework._
 import csw.commons.tagobjects.FileSystemSensitive
+import csw.location.api.models.ComponentType.HCD
+import csw.location.api.models.Connection
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandIssue, _}
-import csw.params.events.{EventName, ObserveEvent, SystemEvent}
 import csw.params.core.generics.KeyType.{ByteArrayKey, ChoiceKey, DoubleMatrixKey, IntKey, StructKey}
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.Units.{arcmin, coulomb, encoder, joule, lightyear, meter, pascal, NoUnits}
 import csw.params.core.models._
 import csw.params.core.states.{CurrentState, DemandState, StateName}
-import csw.location.api.models.ComponentType.HCD
-import csw.location.api.models.Connection
+import csw.params.events.{EventName, ObserveEvent, SystemEvent}
 import csw.time.api.models.UTCTime
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.prop.Tables.Table

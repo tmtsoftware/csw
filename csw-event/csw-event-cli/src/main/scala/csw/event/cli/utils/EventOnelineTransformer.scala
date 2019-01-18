@@ -1,10 +1,10 @@
 package csw.event.cli.utils
 
-import csw.params.events.Event
+import csw.event.cli.args.Options
 import csw.params.core.generics.KeyType.StructKey
 import csw.params.core.generics.Parameter
 import csw.params.core.models.Struct
-import csw.event.cli.args.Options
+import csw.params.events.Event
 
 class EventOnelineTransformer(options: Options) {
 

@@ -4,9 +4,9 @@ import java.util
 import java.util.function.Supplier
 
 import csw.logging.api.javadsl.ILogger
-import csw.logging.macros.SourceFactory
 import csw.logging.api.models.{noId, AnyId}
 import csw.logging.api.scaladsl.Logger
+import csw.logging.macros.SourceFactory
 
 import scala.collection.JavaConverters.mapAsScalaMapConverter
 

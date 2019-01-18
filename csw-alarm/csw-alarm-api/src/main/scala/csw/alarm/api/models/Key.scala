@@ -1,9 +1,9 @@
 package csw.alarm.api.models
 import java.util.regex.Pattern
 
-import csw.params.core.models.Subsystem
 import csw.alarm.api.internal.RichStringExtentions.RichString
 import csw.alarm.api.internal.Separators.KeySeparator
+import csw.params.core.models.Subsystem
 
 /**
  * A wrapper class representing the key for an alarm/component/subsystem/system

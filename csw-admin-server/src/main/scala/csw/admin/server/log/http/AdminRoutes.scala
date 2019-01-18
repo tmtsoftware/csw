@@ -2,8 +2,8 @@ package csw.admin.server.log.http
 
 import akka.Done
 import akka.http.scaladsl.server.Route
-import csw.admin.server.wiring.ActorRuntime
 import csw.admin.server.log.LogAdmin
+import csw.admin.server.wiring.ActorRuntime
 
 /**
  * Routes supported by Admin server

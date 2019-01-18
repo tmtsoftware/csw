@@ -5,12 +5,12 @@ import java.time.{ZoneId, ZoneOffset, ZonedDateTime}
 
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
+import csw.logging.api.models.RequestId
 import csw.logging.client.appenders.FileAppender
 import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.components.IRIS
 import csw.logging.client.components.IRIS._
 import csw.logging.client.internal.JsonExtensions.RichJsObject
-import csw.logging.api.models.RequestId
 import csw.logging.client.utils.{FileUtils, LoggingTestSuite}
 import play.api.libs.json.{JsObject, Json}
 

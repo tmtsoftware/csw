@@ -2,7 +2,7 @@ package csw.aas.http
 
 import akka.http.scaladsl.model.HttpMethod
 import akka.http.scaladsl.model.HttpMethods._
-import akka.http.scaladsl.server.Directives.{authorize ⇒ keycloakAuthorize, _}
+import akka.http.scaladsl.server.Directives.{authorize => keycloakAuthorize, _}
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.directives.AuthenticationDirective
 import com.typesafe.config.Config

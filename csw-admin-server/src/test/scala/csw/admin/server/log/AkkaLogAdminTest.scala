@@ -24,8 +24,8 @@ import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.client.ActorSystemFactory
 import csw.logging.api.models.LoggingLevels
-import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.api.models.LoggingLevels.{ERROR, Level, WARN}
+import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.internal._
 import csw.logging.client.models.LogMetadata
 import csw.logging.client.scaladsl.LoggingSystemFactory

@@ -1,9 +1,9 @@
 package csw.benchmark.time
 
 import java.util.concurrent.TimeUnit
-import org.openjdk.jmh.annotations.Mode
+
+import org.openjdk.jmh.annotations.{Mode, _}
 import org.openjdk.jmh.infra.Blackhole
-import org.openjdk.jmh.annotations._
 
 @Warmup(iterations = 4)
 @Measurement(iterations = 10)

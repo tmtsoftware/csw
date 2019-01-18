@@ -4,9 +4,9 @@ import java.net.InetAddress
 
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
+import csw.logging.api.models.LoggingLevels.Level
 import csw.logging.client.appenders.{FileAppender, StdOutAppender}
 import csw.logging.client.exceptions.AppenderNotFoundException
-import csw.logging.api.models.LoggingLevels.Level
 import csw.logging.client.internal.LoggingSystem
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 

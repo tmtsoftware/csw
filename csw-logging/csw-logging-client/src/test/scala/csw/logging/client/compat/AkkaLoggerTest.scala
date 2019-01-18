@@ -1,10 +1,10 @@
 package csw.logging.client.compat
 
 import akka.actor.{Actor, ActorLogging, Props}
-import csw.logging.client.commons.LoggingKeys
-import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.api.models.LoggingLevels
 import csw.logging.api.models.LoggingLevels.Level
+import csw.logging.client.commons.LoggingKeys
+import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.LoggingTestSuite
 import org.scalatest.{FunSuiteLike, Matchers}
 

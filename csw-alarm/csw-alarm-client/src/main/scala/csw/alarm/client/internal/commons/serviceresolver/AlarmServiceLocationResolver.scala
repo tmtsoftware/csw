@@ -2,8 +2,8 @@ package csw.alarm.client.internal.commons.serviceresolver
 
 import java.net.URI
 
-import csw.location.api.scaladsl.LocationService
 import csw.alarm.client.internal.commons.AlarmServiceConnection
+import csw.location.api.scaladsl.LocationService
 
 import scala.async.Async._
 import scala.concurrent.duration.DurationDouble

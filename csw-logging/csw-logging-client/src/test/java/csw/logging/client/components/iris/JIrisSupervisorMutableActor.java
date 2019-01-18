@@ -2,8 +2,8 @@ package csw.logging.client.components.iris;
 
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.*;
-import csw.logging.client.LogCommand;
 import csw.logging.api.javadsl.ILogger;
+import csw.logging.client.LogCommand;
 import csw.logging.client.javadsl.JLoggerFactory;
 
 public class JIrisSupervisorMutableActor extends AbstractBehavior<LogCommand> {

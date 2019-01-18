@@ -1,9 +1,9 @@
 package csw.event.cli.utils
 
-import csw.params.events.{Event, EventKey}
+import csw.event.cli.args.Options
 import csw.params.core.generics.KeyType.StringKey
 import csw.params.core.generics.Parameter
-import csw.event.cli.args.Options
+import csw.params.events.{Event, EventKey}
 
 object Formatter {
   val EventSeparator =

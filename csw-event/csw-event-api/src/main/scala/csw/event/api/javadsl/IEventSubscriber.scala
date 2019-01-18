@@ -7,9 +7,9 @@ import java.util.function.Consumer
 
 import akka.actor.typed.ActorRef
 import akka.stream.javadsl.Source
-import csw.params.events.{Event, EventKey}
-import csw.params.core.models.Subsystem
 import csw.event.api.scaladsl.SubscriptionMode
+import csw.params.core.models.Subsystem
+import csw.params.events.{Event, EventKey}
 
 /**
  * An EventSubscriber interface to subscribe events. The events can be subscribed on [[csw.params.events.EventKey]]. All events

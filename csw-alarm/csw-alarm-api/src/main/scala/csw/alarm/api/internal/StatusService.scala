@@ -1,7 +1,7 @@
 package csw.alarm.api.internal
 import akka.Done
-import csw.alarm.api.models.{AlarmSeverity, AlarmStatus}
 import csw.alarm.api.models.Key.AlarmKey
+import csw.alarm.api.models.{AlarmSeverity, AlarmStatus}
 
 import scala.concurrent.Future
 

@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.gson.Gson
 import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.internal.JsonExtensions.RichJsObject
-import csw.logging.client.commons.LoggingKeys
 import org.openjdk.jmh.annotations._
 import play.api.libs.json.{JsObject, Json}
 

@@ -5,12 +5,12 @@ import akka.actor.typed.javadsl.Behaviors;
 import csw.params.commands.Observe;
 import csw.params.commands.Setup;
 import csw.params.commands.Wait;
-import csw.params.events.EventName;
-import csw.params.events.SystemEvent;
-import csw.params.javadsl.JKeyType;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.Prefix;
+import csw.params.events.EventName;
+import csw.params.events.SystemEvent;
+import csw.params.javadsl.JKeyType;
 
 import java.util.Set;
 

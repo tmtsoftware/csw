@@ -4,7 +4,6 @@ import akka.actor.CoordinatedShutdown
 import akka.actor.typed.ActorRef
 import akka.stream.scaladsl.{Keep, Sink}
 import com.typesafe.config.ConfigFactory
-import csw.location.api.scaladsl.LocationService
 import csw.alarm.api.models.AlarmSeverity
 import csw.alarm.api.models.Key.AlarmKey
 import csw.alarm.api.scaladsl.AlarmSubscription
@@ -18,6 +17,7 @@ import csw.alarm.client.internal.auto_refresh.AutoRefreshSeverityMessage.AutoRef
 import csw.alarm.client.internal.auto_refresh.{AutoRefreshSeverityActorFactory, AutoRefreshSeverityMessage}
 import csw.alarm.client.internal.commons.Settings
 import csw.config.client.commons.ConfigUtils
+import csw.location.api.scaladsl.LocationService
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future

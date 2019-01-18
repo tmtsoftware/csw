@@ -1,7 +1,7 @@
 package csw.logging.client.internal
 
-import csw.logging.client.commons.Constants
 import csw.logging.api.models.LoggingLevels.Level
+import csw.logging.client.commons.Constants
 import csw.logging.client.models.LogMetadata
 
 // Helper methods to get/set the log level of components

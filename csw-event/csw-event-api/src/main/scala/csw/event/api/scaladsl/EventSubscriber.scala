@@ -2,8 +2,8 @@ package csw.event.api.scaladsl
 
 import akka.actor.typed.ActorRef
 import akka.stream.scaladsl.Source
-import csw.params.events.{Event, EventKey}
 import csw.params.core.models.Subsystem
+import csw.params.events.{Event, EventKey}
 
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration

@@ -1,9 +1,9 @@
 package csw.logging.client.internal
 
+import csw.logging.api.models.RequestId
 import csw.logging.client.internal.LogActorMessages.LogAkka
 import csw.logging.client.internal.LoggingState._
 import csw.logging.client.internal.TimeActorMessages.{TimeEnd, TimeStart}
-import csw.logging.api.models.RequestId
 
 /**
  * Acts as a single point of entry for messages from various loggers and redirects them to the log actor

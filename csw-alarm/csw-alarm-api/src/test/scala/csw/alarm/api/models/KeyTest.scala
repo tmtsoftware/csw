@@ -1,8 +1,8 @@
 package csw.alarm.api.models
+import csw.alarm.api.internal.Separators.KeySeparator
+import csw.alarm.api.models.Key.{AlarmKey, ComponentKey, GlobalKey, SubsystemKey}
 import csw.params.core.models.Subsystem
 import csw.params.core.models.Subsystem.NFIRAOS
-import csw.alarm.api.models.Key.{AlarmKey, ComponentKey, GlobalKey, SubsystemKey}
-import csw.alarm.api.internal.Separators.KeySeparator
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.{FunSuite, Matchers}
 
