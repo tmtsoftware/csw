@@ -10,10 +10,19 @@ import scala.concurrent.{blocking, ExecutionContext, Future}
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
+/**
+ * Represents an Access token which contains permissions
+ */
 private[aas] class RPT(authzClient: AuthzClient)(implicit ec: ExecutionContext) {
   private val logger = AuthLogger.getLogger
   import logger._
 
+  /**
+   * Uses access token to fetch RPT (Requesting party token) from keycloak.
+   * Difference between access token and RPT is RPT has permissions and Access token does not
+   * @param token Access token in string format
+   * @return Access Token with permissions
+   */
   def create(token: String): EitherT[Future, TokenVerificationFailure, AccessToken] = {
     debug("fetching RPT from keycloak")
 
@@ -27,6 +36,10 @@ private[aas] class RPT(authzClient: AuthzClient)(implicit ec: ExecutionContext) 
     EitherT(rptStringF.map(decodeRPT))
   }
 
+  /**
+   * Decodes the RPT string into [[csw.aas.core.token.AccessToken]]
+   * @param rptString RPT string
+   */
   private def decodeRPT(rptString: String): Either[TokenVerificationFailure, AccessToken] =
     JwtJson
       .decodeJson(rptString, JwtOptions(signature = false, expiration = false, notBefore = false))
@@ -45,6 +58,10 @@ private[aas] class RPT(authzClient: AuthzClient)(implicit ec: ExecutionContext) 
     }
   }
 
+  /**
+   * Uses access token string to make a call to keycloak to get a new access token with permissions(RPT)
+   * @param token access token string
+   */
   private def getAuthorizationResponse(token: String): Future[String] = Future {
     blocking { authzClient.authorization(token).authorize().getToken }
   }

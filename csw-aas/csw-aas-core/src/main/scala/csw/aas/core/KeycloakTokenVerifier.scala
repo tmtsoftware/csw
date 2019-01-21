@@ -6,6 +6,12 @@ import org.keycloak.representations.{AccessToken => KeycloakAccessToken}
 import scala.concurrent.{blocking, ExecutionContext, Future}
 
 private[aas] class KeycloakTokenVerifier {
+
+  /**
+   * Verifies given access token string using keycloak library.
+   * @param token access token string
+   * @return Verified keycloak access token
+   */
   def verifyToken(
       token: String,
       keycloakDeployment: KeycloakDeployment

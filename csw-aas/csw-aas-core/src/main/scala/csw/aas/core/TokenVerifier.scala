@@ -14,6 +14,9 @@ import pdi.jwt.{JwtJson, JwtOptions}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
+/**
+ * Verifies & decodes the access token into [[csw.aas.core.token.AccessToken]]
+ */
 class TokenVerifier private[aas] (keycloakTokenVerifier: KeycloakTokenVerifier, authConfig: AuthConfig) {
 
   private val logger = AuthLogger.getLogger
@@ -48,6 +51,11 @@ class TokenVerifier private[aas] (keycloakTokenVerifier: KeycloakTokenVerifier, 
           InvalidToken(e.getMessage)
       }
 
+  /**
+   * Verifies the access token string for signature and expiry date
+   * and then decodes it into [[csw.aas.core.token.AccessToken]]
+   * @param token access token string
+   */
   def verifyAndDecode(token: String)(implicit ec: ExecutionContext): EitherT[Future, TokenVerificationFailure, AccessToken] =
     for {
       _  ← verify(token)

@@ -1,5 +1,8 @@
 package csw.aas.core
 
+/**
+ * Indicates token verification or decoding attempt was failed
+ */
 sealed trait TokenVerificationFailure extends Product with Serializable
 
 object TokenVerificationFailure {

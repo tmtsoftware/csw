@@ -22,6 +22,8 @@ class SecurityDirectives private[csw] (authentication: Authentication, realm: St
   private val logger = AuthLogger.getLogger
   import logger._
 
+  implicit def toRoute[T](route: Route): T => Route = _ => route
+
   private[aas] def authenticate: AuthenticationDirective[AccessToken] =
     authenticateOAuth2Async(realm, authentication.authenticator)
 
