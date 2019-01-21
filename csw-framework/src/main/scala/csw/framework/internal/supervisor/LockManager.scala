@@ -4,11 +4,13 @@ import akka.actor.typed.ActorRef
 import csw.command.client.messages.CommandMessage
 import csw.command.client.models.framework.LockingResponse
 import csw.command.client.models.framework.LockingResponses._
-import csw.params.core.models.Prefix
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
+import csw.params.core.models.Prefix
 
-private[framework] class LockManager(val lockPrefix: Option[Prefix], loggerFactory: LoggerFactory) {
+private[framework] class LockManager(val lockPrefix: Option[Prefix],
+                                     adminPrefix: => Option[Prefix],
+                                     loggerFactory: LoggerFactory) {
   private val log: Logger = loggerFactory.getLogger
 
   def lockComponent(source: Prefix, replyTo: ActorRef[LockingResponse])(startTimer: ⇒ Unit): LockManager = lockPrefix match {
@@ -17,13 +19,16 @@ private[framework] class LockManager(val lockPrefix: Option[Prefix], loggerFacto
     case Some(currentPrefix) ⇒ onAcquiringFailed(replyTo, source, currentPrefix)
   }
 
-  def unlockComponent(source: Prefix, replyTo: ActorRef[LockingResponse])(stopTimer: ⇒ Unit): LockManager = lockPrefix match {
-    case Some(`source`)      ⇒ onLockReleased(source, replyTo, stopTimer)
-    case Some(currentPrefix) ⇒ onLockReleaseFailed(replyTo, source, currentPrefix)
-    case None                ⇒ onLockAlreadyReleased(source, replyTo)
+  def unlockComponent(source: Prefix, replyTo: ActorRef[LockingResponse])(stopTimer: ⇒ Unit): LockManager = {
+    lockPrefix match {
+      case Some(`source`)                                            ⇒ onLockReleased(source, replyTo, stopTimer)
+      case _ if adminPrefix.isDefined && (source == adminPrefix.get) ⇒ onLockReleased(source, replyTo, stopTimer)
+      case Some(currentPrefix)                                       ⇒ onLockReleaseFailed(replyTo, source, currentPrefix)
+      case None                                                      ⇒ onLockAlreadyReleased(source, replyTo)
+    }
   }
 
-  def releaseLockOnTimeout(): LockManager = new LockManager(None, loggerFactory)
+  def releaseLockOnTimeout(): LockManager = new LockManager(None, adminPrefix, loggerFactory)
 
   // Checks to see if component is locked, and if so, does the incoming prefix match the locked prefix
   def allowCommand(msg: CommandMessage): Boolean = lockPrefix match {
@@ -47,7 +52,7 @@ private[framework] class LockManager(val lockPrefix: Option[Prefix], loggerFacto
     log.info(s"The lock is successfully acquired by component: $source")
     replyTo ! LockAcquired
     startTimer
-    new LockManager(Some(source), loggerFactory)
+    new LockManager(Some(source), adminPrefix, loggerFactory)
   }
 
   private def onReAcquiringLock(source: Prefix, replyTo: ActorRef[LockingResponse], startTimer: ⇒ Unit): LockManager = {
@@ -69,7 +74,7 @@ private[framework] class LockManager(val lockPrefix: Option[Prefix], loggerFacto
     log.info(s"The lock is successfully released by component: ${source.prefix}")
     replyTo ! LockReleased
     stopTimer
-    new LockManager(None, loggerFactory)
+    new LockManager(None, adminPrefix, loggerFactory)
   }
 
   private def onLockReleaseFailed(replyTo: ActorRef[LockingResponse], source: Prefix, currentPrefix: Prefix) = {

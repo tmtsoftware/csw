@@ -37,8 +37,8 @@ import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, RegistrationFactory}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaRegistration, ComponentId}
-import csw.logging.client.internal.LogAdminUtil
 import csw.logging.api.scaladsl.Logger
+import csw.logging.client.internal.LogAdminUtil
 import csw.params.commands.CommandResponse.Locked
 import csw.params.core.models.Prefix
 
@@ -86,12 +86,14 @@ private[framework] final class SupervisorBehavior(
   private val akkaRegistration: AkkaRegistration           = registrationFactory.akkaTyped(akkaConnection, prefix, ctx.self)
   private val isStandalone: Boolean                        = maybeContainerRef.isEmpty
   private[framework] val initializeTimeout: FiniteDuration = componentInfo.initializeTimeout
+  private val AdminKey                                     = "CSW_ADMIN_PREFIX"
+  private def adminPrefix: Option[Prefix]                  = (sys.env ++ sys.props).get(AdminKey).map(Prefix(_))
 
   private val pubSubBehaviorFactory: PubSubBehaviorFactory                        = new PubSubBehaviorFactory
   private[framework] val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] = makePubSubLifecycle()
 
   private var runningComponent: Option[ActorRef[RunningMessage]]  = None
-  private var lockManager: LockManager                            = new LockManager(None, loggerFactory)
+  private var lockManager: LockManager                            = new LockManager(None, adminPrefix, loggerFactory)
   private[framework] var lifecycleState: SupervisorLifecycleState = SupervisorLifecycleState.Idle
   private[framework] var component: Option[ActorRef[Nothing]]     = None
 
