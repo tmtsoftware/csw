@@ -22,8 +22,6 @@ class SecurityDirectives private[csw] (authentication: Authentication, realm: St
   private val logger = AuthLogger.getLogger
   import logger._
 
-  implicit def toRoute[T](route: Route): T => Route = _ => route
-
   private[aas] def authenticate: AuthenticationDirective[AccessToken] =
     authenticateOAuth2Async(realm, authentication.authenticator)
 
@@ -45,21 +43,87 @@ class SecurityDirectives private[csw] (authentication: Authentication, realm: St
   private def sMethod(httpMethod: HttpMethod, authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] =
     method(httpMethod) & authenticate.flatMap(token => authorize(authorizationPolicy, token) & provide(token))
 
-  def sPost(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken]    = sMethod(POST, authorizationPolicy)
-  def sGet(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken]     = sMethod(GET, authorizationPolicy)
-  def sPut(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken]     = sMethod(PUT, authorizationPolicy)
-  def sDelete(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken]  = sMethod(DELETE, authorizationPolicy)
-  def sPatch(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken]   = sMethod(PATCH, authorizationPolicy)
-  def sHead(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken]    = sMethod(HEAD, authorizationPolicy)
+  /**
+   * Rejects all un-authorized and non-POST requests
+   *
+   * @param authorizationPolicy Authorization policy to use for filtering requests.
+   *                            There are different types of authorization policies. See [[csw.aas.http.AuthorizationPolicy]]
+   */
+  def sPost(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = sMethod(POST, authorizationPolicy)
+
+  /**
+   * Rejects all un-authorized and non-GET requests
+   *
+   * @param authorizationPolicy Authorization policy to use for filtering requests.
+   *                            There are different types of authorization policies. See [[csw.aas.http.AuthorizationPolicy]]
+   */
+  def sGet(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = sMethod(GET, authorizationPolicy)
+
+  /**
+   * Rejects all un-authorized and non-GET requests
+   * @param authorizationPolicy Authorization policy to use for filtering requests.
+   *                            There are different types of authorization policies. See [[csw.aas.http.AuthorizationPolicy]]
+   */
+  def sPut(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = sMethod(PUT, authorizationPolicy)
+
+  /**
+   * Rejects all un-authorized and non-PUT requests
+   * @param authorizationPolicy Authorization policy to use for filtering requests.
+   *                            There are different types of authorization policies. See [[csw.aas.http.AuthorizationPolicy]]
+   */
+  def sDelete(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = sMethod(DELETE, authorizationPolicy)
+
+  /**
+   * Rejects all un-authorized and non-PATCH requests
+   * @param authorizationPolicy Authorization policy to use for filtering requests.
+   *                            There are different types of authorization policies. See [[csw.aas.http.AuthorizationPolicy]]
+   */
+  def sPatch(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = sMethod(PATCH, authorizationPolicy)
+
+  /**
+   * Rejects all un-authorized and non-HEAD requests
+   * @param authorizationPolicy Authorization policy to use for filtering requests.
+   *                            There are different types of authorization policies. See [[csw.aas.http.AuthorizationPolicy]]
+   */
+  def sHead(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = sMethod(HEAD, authorizationPolicy)
+
+  /**
+   * Rejects all un-authorized and non-CONNECT requests
+   * @param authorizationPolicy Authorization policy to use for filtering requests.
+   *                            There are different types of authorization policies. See [[csw.aas.http.AuthorizationPolicy]]
+   */
   def sConnect(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = sMethod(CONNECT, authorizationPolicy)
 }
 
+/**
+ * Factory for [[csw.aas.http.SecurityDirectives]] instances
+ */
 object SecurityDirectives {
+
+  /**
+   * Creates instance of [[csw.aas.http.SecurityDirectives]] using configurations
+   * from application and reference.conf.
+   *
+   * Expects auth-server-url to be present in config.
+   * @return
+   */
   def apply(implicit ec: ExecutionContext): SecurityDirectives = from(AuthConfig.create())
 
+  /**
+   * Creates instance of [[csw.aas.http.SecurityDirectives]] using configurations
+   * from application and reference.conf.
+   *
+   * Resolves auth server url using location service (blocking call)
+   */
   def apply(locationService: LocationService)(implicit ec: ExecutionContext): SecurityDirectives =
     from(AuthConfig.create(authServerLocation = Some(authLocation(locationService))))
 
+  /**
+   * Creates instance of [[csw.aas.http.SecurityDirectives]] using configurations
+   * from application and reference.conf.
+   *
+   * Resolves auth server url using location service (blocking call)
+   */
   def apply(config: Config, locationService: LocationService)(implicit ec: ExecutionContext): SecurityDirectives =
     from(AuthConfig.create(config, Some(authLocation(locationService))))
 
