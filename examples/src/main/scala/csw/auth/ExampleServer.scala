@@ -31,7 +31,7 @@ object ExampleServer extends HttpApp with App with GenericUnmarshallers with Pla
   private val directives = SecurityDirectives(locationService)
 
   import directives._
-  private val HOST = "localhost"
+  private val HOST = "0.0.0.0"
   private val PORT = 9003
 
   override protected def routes: Route = cors() {
@@ -50,6 +50,9 @@ object ExampleServer extends HttpApp with App with GenericUnmarshallers with Pla
       } ~
       sHead(CustomPolicy(at ⇒ at.given_name.contains("test-user"))) { _ ⇒
         complete("Custom policy OK")
+      } ~
+      sDelete(PermissionPolicy("delete", "person")) { _ ⇒
+        complete("Permission policy OK")
       }
     }
   }

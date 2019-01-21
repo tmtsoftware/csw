@@ -12,9 +12,10 @@ import { Consumer } from '../context/TMTAuthContext'
  */
 const CheckLogin = ({ children, error }) => (
   <Consumer>
-    {({ tmtAuth }) =>
-      tmtAuth && tmtAuth.isAuthenticated() ? children : error || null
-    }
+    {({ tmtAuth }) => {
+      if (!tmtAuth) return error
+      return tmtAuth.isAuthenticated() ? children : error || null
+    }}
   </Consumer>
 )
 

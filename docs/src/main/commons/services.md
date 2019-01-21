@@ -10,4 +10,5 @@
 * [Alarm service](../services/alarm.md)
 * [Time service](../services/time.md)
 * [Database service](../services/database.md)
+* [Authentication and authorization service](../services/aas.md)
 @@@

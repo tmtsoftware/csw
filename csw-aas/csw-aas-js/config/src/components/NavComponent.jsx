@@ -13,12 +13,9 @@ class NavComponent extends React.Component {
               </a>
               <ul className='hide-on-med-and-down right'>
                 <li>
-                  { (tmtAuth == null || tmtAuth === undefined) ? <span>Loading...</span> :
-                    tmtAuth.isAuthenticated() ? (
-                    <Logout />
-                  ) : (
-                    <Login />
-                  )}
+                  { (tmtAuth == null || tmtAuth === undefined) ? <span>Loading...</span>
+                    : (tmtAuth.isAuthenticated() ? <Logout /> : <Login />)
+                  }
                 </li>
               </ul>
             </div>
