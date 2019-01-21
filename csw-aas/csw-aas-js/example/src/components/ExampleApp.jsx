@@ -1,6 +1,8 @@
 import React from 'react'
 import { BrowserRouter, Route } from 'react-router-dom'
+// #import-components-example
 import { CheckLogin, RealmRole, ResourceRole, TMTAuthContextProvider } from 'csw-aas-js'
+// #import-components-example
 import NavComponent from './NavComponent'
 import { AppConfig } from '../config/AppConfig'
 import Write from './Write'
@@ -27,25 +29,34 @@ class ExampleApp extends React.Component {
                 exact
                 path='/secured'
                 render={_ => (
-                  <CheckLogin>
+                  // #checkLogin-component-usage
+                  <CheckLogin error={<ExampleError />}>
                     <Write />
                   </CheckLogin>
+                  // #checkLogin-component-usage
                 )}
               />
               <Route exact path='/public' component={Read} />
             </div>
           </BrowserRouter>
 
-          <RealmRole realmRole='example-admin-role' error={<ExampleError />}>
-            <div>Example admin role specific functionality</div>
-          </RealmRole>
-
-          <ResourceRole
-            resourceRole='person-role'
-            resource='example-server'
-            error={<ExampleError />}>
-            <div>Person role specific functionality</div>
-          </ResourceRole>
+          {
+            // #realmRole-component-usage
+            <RealmRole realmRole='example-admin-role' error={<ExampleError />}>
+              <div>Example admin role specific functionality</div>
+            </RealmRole>
+            // #realmRole-component-usage
+          }
+          {
+            // #resourceRole-component-usage
+            <ResourceRole
+              resourceRole='person-role'
+              resource='example-server'
+              error={<ExampleError />}>
+              <div>Person role specific functionality</div>
+            </ResourceRole>
+            // #resourceRole-component-usage
+          }
 
         </TMTAuthContextProvider>
       </div>

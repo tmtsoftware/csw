@@ -6,6 +6,7 @@ import ResourceRole from './components/authorization/ResourceRole'
 import TMTAuthContextProvider from './components/context/TMTAuthContextProvider'
 import { Consumer } from './components/context/TMTAuthContext'
 
+// #export-components
 export {
   Logout,
   Login,
@@ -15,3 +16,4 @@ export {
   TMTAuthContextProvider,
   Consumer,
 }
+// #export-components

@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import React from 'react'
+// #import-components
 import { Consumer, Logout, Login } from 'csw-aas-js'
+// #import-components
 
 class NavComponent extends React.Component {
   render() {
@@ -21,7 +23,18 @@ class NavComponent extends React.Component {
                 </li>
                 <li>
                   { (tmtAuth == null || tmtAuth === undefined) ? <span>Loading...</span>
-                    : (tmtAuth.isAuthenticated() ? <Logout /> : <Login />)
+                    : (tmtAuth.isAuthenticated()
+                      ? (
+                        // #logout-component-usage
+                        <Logout />
+                        // #logout-component-usage
+                      )
+                      : (
+                        // #login-component-usage
+                        <Login />
+                        // #login-component-usage
+                      )
+                    )
                   }
                 </li>
               </ul>
