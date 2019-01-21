@@ -59,7 +59,7 @@ After login tmtAuth in context is updated with appropriate values e.g. token, re
 Javascript
 :   @@snip [Login.jsx](../../../../../csw-aas/csw-aas-js/example/src/components/NavComponent.jsx) { #login-component-usage }
 
-## Source code for Login component
+### Source code for Login component
 
 * @github[Login Component](/csw-aas/csw-aas-js/src/components/Login.jsx)
 
@@ -70,7 +70,7 @@ Logout component logs out user from AAS server. It clears tmtAuth stored in cont
 Javascript
 :   @@snip [Logout.jsx](../../../../../csw-aas/csw-aas-js/example/src/components/NavComponent.jsx) { #logout-component-usage }
 
-## Source code for Logout component
+### Source code for Logout component
 
 * @github[Logout Component](/csw-aas/csw-aas-js/src/components/Logout.jsx)
 
@@ -84,7 +84,7 @@ e.g - ExampleError Component in following snippet
 Javascript
 :   @@snip [CheckLogin.jsx](../../../../../csw-aas/csw-aas-js/example/src/components/ExampleApp.jsx) { #checkLogin-component-usage }
 
-## Source code for CheckLogin component
+### Source code for CheckLogin component
 
 * @github[CheckLogin Component](/csw-aas/csw-aas-js/src/components/authentication/CheckLogin.jsx)
 
@@ -98,7 +98,7 @@ error prop e.g - ExampleError Component in following snippet.
 Javascript
 :   @@snip [RealmRole.jsx](../../../../../csw-aas/csw-aas-js/example/src/components/ExampleApp.jsx) { #realmRole-component-usage }
 
-## Source code for RealmRole component
+### Source code for RealmRole component
 
 * @github[RealmRole Component](/csw-aas/csw-aas-js/src/components/authorization/RealmRole.jsx)
 
@@ -113,6 +113,6 @@ e.g - ExampleError Component in following snippet.
 Javascript
 :   @@snip [ResourceRole.jsx](../../../../../csw-aas/csw-aas-js/example/src/components/ExampleApp.jsx) { #resourceRole-component-usage }
 
-## Source code for RealmRole component
+### Source code for RealmRole component
 
 * @github[RealmRole Component](/csw-aas/csw-aas-js/src/components/authorization/RealmRole.jsx)
