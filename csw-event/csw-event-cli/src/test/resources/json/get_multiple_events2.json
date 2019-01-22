@@ -2,8 +2,8 @@
   "type": "ObserveEvent",
   "eventId": "3186979f-6cde-43a5-a42a-1ae37bfed669",
   "source": "wfos.prog.filter",
-  "eventName" : "stop",
-  "eventTime": {"value":"2018-07-02T09:23:26.477Z"},
+  "eventName": "stop",
+  "eventTime": "2018-07-02T09:23:26.477Z",
   "paramSet": [{
     "keyName": "struct-2",
     "keyType": "StructKey",

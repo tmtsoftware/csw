@@ -47,7 +47,10 @@ final case class UTCTime(value: Instant) extends TMTTime {
 
 object UTCTime {
 
-  implicit val utcTimeFormat: OFormat[UTCTime] = Json.format[UTCTime]
+  implicit def utcTimeFormat(implicit instantFormat: Format[Instant]): Format[UTCTime] = new Format[UTCTime] {
+    override def writes(time: UTCTime): JsValue          = instantFormat.writes(time.value)
+    override def reads(json: JsValue): JsResult[UTCTime] = instantFormat.reads(json).map(UTCTime(_))
+  }
 
   /**
    * Obtains the PTP (Precision Time Protocol) synchronized current UTC time.

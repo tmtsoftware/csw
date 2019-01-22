@@ -2,8 +2,8 @@
   "type": "SystemEvent",
   "eventId": "7a4cd6ab-6077-476d-a035-6f83be1de42c",
   "source": "wfos.blue.filter",
-  "eventName" : "filter wheel",
-  "eventTime": {"value":"2017-08-09T06:40:00.898Z"},
+  "eventName": "filter wheel",
+  "eventTime": "2017-08-09T06:40:00.898Z",
   "paramSet": [
     {
       "keyName": "arrayDataKey",
