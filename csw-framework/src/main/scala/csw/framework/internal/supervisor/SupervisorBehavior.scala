@@ -64,6 +64,7 @@ private[framework] object SupervisorBehavior {
  * @param maybeContainerRef        the container ref of the container under which this supervisor is started if
  *                                 it's not running in standalone mode
  * @param componentBehaviorFactory the factory for creating the component supervised by this Supervisor
+ * @note                           unlocking locked components is supported by admins only if `cswAdminPrefix` environment variable is set
  */
 private[framework] final class SupervisorBehavior(
     ctx: ActorContext[SupervisorMessage],
@@ -86,7 +87,7 @@ private[framework] final class SupervisorBehavior(
   private val akkaRegistration: AkkaRegistration           = registrationFactory.akkaTyped(akkaConnection, prefix, ctx.self)
   private val isStandalone: Boolean                        = maybeContainerRef.isEmpty
   private[framework] val initializeTimeout: FiniteDuration = componentInfo.initializeTimeout
-  private val AdminKey                                     = "CSW_ADMIN_PREFIX"
+  private val AdminKey                                     = "cswAdminPrefix"
   private def adminPrefix: Option[Prefix]                  = (sys.env ++ sys.props).get(AdminKey).map(Prefix(_))
 
   private val pubSubBehaviorFactory: PubSubBehaviorFactory                        = new PubSubBehaviorFactory

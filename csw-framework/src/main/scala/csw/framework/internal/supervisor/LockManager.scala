@@ -20,11 +20,10 @@ private[framework] class LockManager(val lockPrefix: Option[Prefix],
   }
 
   def unlockComponent(source: Prefix, replyTo: ActorRef[LockingResponse])(stopTimer: ⇒ Unit): LockManager = {
-    lockPrefix match {
-      case Some(`source`)                                            ⇒ onLockReleased(source, replyTo, stopTimer)
-      case _ if adminPrefix.isDefined && (source == adminPrefix.get) ⇒ onLockReleased(source, replyTo, stopTimer)
-      case Some(currentPrefix)                                       ⇒ onLockReleaseFailed(replyTo, source, currentPrefix)
-      case None                                                      ⇒ onLockAlreadyReleased(source, replyTo)
+    (lockPrefix, adminPrefix) match {
+      case (Some(`source`), _) | (_, Some(`source`)) ⇒ onLockReleased(source, replyTo, stopTimer)
+      case (Some(currentPrefix), _)                  ⇒ onLockReleaseFailed(replyTo, source, currentPrefix)
+      case (None, _)                                 ⇒ onLockAlreadyReleased(source, replyTo)
     }
   }
 

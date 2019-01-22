@@ -31,8 +31,7 @@ class LockManagerTest extends FunSuite with MockitoSugar with Matchers {
   private val intParam: Parameter[Int]    = KeyType.IntKey.make("intKey").set(1, 2, 3)
   private val setup: Setup                = Setup(prefix, CommandName("move"), Some(ObsId("obs1001")), Set(intParam))
   private val invalidSetup: Setup         = Setup(invalidPrefix, CommandName("move"), Some(ObsId("obs1001")), Set(intParam))
-  private val AdminKey                    = "CSW_ADMIN_PREFIX"
-  private def adminPrefix: Option[Prefix] = (sys.env ++ sys.props).get(AdminKey).map(Prefix(_))
+  private def adminPrefix: Option[Prefix] = None
   private val mockedLoggerFactory         = mock[LoggerFactory]
   private val mockedLogger                = mock[Logger]
   when(mockedLoggerFactory.getLogger).thenReturn(mockedLogger)
@@ -147,8 +146,7 @@ class LockManagerTest extends FunSuite with MockitoSugar with Matchers {
   test("should allow unlocking any locked component by admin") {
     val commandResponseProbe = TestProbe[SubmitResponse]
 
-    System.setProperty(AdminKey, "Admin")
-    val lockManager = new LockManager(Some(prefix), adminPrefix, mockedLoggerFactory)
+    val lockManager = new LockManager(Some(prefix), adminPrefix = Some(Prefix("Admin")), mockedLoggerFactory)
     lockManager.isLocked shouldBe true
 
     val adminSetup: Setup = Setup(Prefix("admin123"), CommandName("move"), Some(ObsId("obs1001")), Set(intParam))
