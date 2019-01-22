@@ -14,10 +14,12 @@ object NativeAppAuthAdapterFactory {
 
   /**
    * Creates an instance of NativeAppAuthAdapter. Resolves authentication service using location service and ignores `auth-server-url` config parameter
-   * @param locationService
-   * @param secretStore The store where all tokens will be stored. If you don't provide this a default file auth store will be used
-   * @param executionContext
-   * @return
+   *
+   * @param locationService   handle to [[LocationService]] used to resolve location of aas
+   * @param secretStore       store where all tokens will be stored. This library provides implementation for [[csw.aas.native.scaladsl.FileAuthStore]]
+   *                          but one can choose to implement their own [[AuthStore]] and plug it in here.
+   * @param executionContext  require for execution of asynchronous task
+   * @return handle to [[NativeAppAuthAdapter]] with which you can login, logout and get access tokens
    */
   def make(locationService: LocationService, secretStore: AuthStore)(
       implicit executionContext: ExecutionContext
@@ -25,10 +27,11 @@ object NativeAppAuthAdapterFactory {
 
   /**
    * Creates an instance of NativeAppAuthAdapter. Resolves authentication service using location service and ignores `auth-server-url` config parameter.
-   * Uses the default file auth store for storing all tokens
-   * @param locationService
-   * @param executionContext
-   * @return
+   * Uses the default in memory auth store for storing all tokens
+   *
+   * @param locationService   handle to [[LocationService]] used to resolve location of aas
+   * @param executionContext  require for execution of asynchronous task
+   * @return handle to [[NativeAppAuthAdapter]] with which you can login, logout and get access tokens
    */
   def make(locationService: LocationService)(implicit executionContext: ExecutionContext): NativeAppAuthAdapter =
     make(locationService, None)
@@ -36,18 +39,25 @@ object NativeAppAuthAdapterFactory {
   /**
    * Creates an instance of NativeAppAuthAdapter. Does not resolve authentication service using location service. Instead it uses "auth-config.auth-server-url"
    * config parameter to resolve authentication service
-   * @param secretStore The store where all tokens will be stored. If you don't provide this a default file auth store will be used
-   * @return
+   *
+   * @param secretStore store where all tokens will be stored.
+   *                    This library provides implementation for [[csw.aas.native.scaladsl.FileAuthStore]]
+   *                    but one can choose to implement their own [[AuthStore]] and plug it in here.
+   * @return handle to [[NativeAppAuthAdapter]] with which you can login, logout and get access tokens
    */
   def make(secretStore: AuthStore)(implicit executionContext: ExecutionContext): NativeAppAuthAdapter = make(Some(secretStore))
 
   /**
    * Creates an instance of NativeAppAuthAdapter. Does not resolve authentication service using location service. Instead it uses "auth-config.auth-server-url"
-   * config parameter to resolve authentication service. Uses the default file auth store for storing all tokens
-   * @return
+   * config parameter to resolve authentication service. Uses the default in memory [[AuthStore]] for storing all tokens
+   *
+   * @return handle to [[NativeAppAuthAdapter]] with which you can login, logout and get access tokens
    */
   def make(implicit executionContext: ExecutionContext): NativeAppAuthAdapter = make(None)
 
+  /******************
+   *  INTERNAL APIs
+   ******************/
   private def make(locationService: LocationService, secretStore: Option[AuthStore])(
       implicit executionContext: ExecutionContext
   ): NativeAppAuthAdapter = {
