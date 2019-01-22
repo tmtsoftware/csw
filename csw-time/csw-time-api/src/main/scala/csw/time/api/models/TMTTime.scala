@@ -47,6 +47,8 @@ final case class UTCTime(value: Instant) extends TMTTime {
 
 object UTCTime {
 
+  implicit val utcTimeFormat: OFormat[UTCTime] = Json.format[UTCTime]
+
   /**
    * Obtains the PTP (Precision Time Protocol) synchronized current UTC time.
    * In case of a Linux machine, this will make a native call `clock_gettime` inorder to get time from the system clock with nanosecond precision.
