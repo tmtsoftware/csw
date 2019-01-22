@@ -3,6 +3,7 @@ package csw.location.agent.models
 import java.io.File
 import java.nio.file.Paths
 
+import csw.commons.tagobjects.FileSystemSensitive
 import csw.location.agent.args.Options
 import org.scalatest.{FunSuite, Matchers}
 
@@ -28,7 +29,7 @@ class CommandTest extends FunSuite with Matchers {
     c.noExit shouldBe true
   }
 
-  test("testParse with config file should honour config options") {
+  test("testParse with config file should honour config options", FileSystemSensitive) {
     val url            = getClass.getResource("/redisTest.conf")
     val configFilePath = Paths.get(url.toURI).toFile.getAbsolutePath
     val configFile     = new File(configFilePath)
@@ -41,7 +42,7 @@ class CommandTest extends FunSuite with Matchers {
     c.noExit shouldBe false
   }
 
-  test("testParse with config file but undefined value") {
+  test("testParse with config file but undefined value", FileSystemSensitive) {
     val url            = getClass.getResource("/redisTest.conf")
     val configFilePath = Paths.get(url.toURI).toFile.getAbsolutePath
     val configFile     = new File(configFilePath)
@@ -52,7 +53,7 @@ class CommandTest extends FunSuite with Matchers {
     c.commandText shouldBe "false"
   }
 
-  test("testParse with config file port, command parameters are overridable from command line") {
+  test("testParse with config file port, command parameters are overridable from command line", FileSystemSensitive) {
     val url            = getClass.getResource("/redisTest.conf")
     val configFilePath = Paths.get(url.toURI).toFile.getAbsolutePath
     val configFile     = new File(configFilePath)

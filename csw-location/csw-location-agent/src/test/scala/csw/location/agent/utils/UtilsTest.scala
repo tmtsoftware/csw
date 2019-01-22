@@ -4,11 +4,12 @@ import java.io.File
 import java.nio.file.Paths
 
 import com.typesafe.config.Config
+import csw.commons.tagobjects.FileSystemSensitive
 import org.scalatest.{FunSuite, Matchers}
 
 class UtilsTest extends FunSuite with Matchers {
 
-  test("testGetAppConfig") {
+  test("testGetAppConfig", FileSystemSensitive) {
     val url            = getClass.getResource("/redisTest.conf")
     val configFilePath = Paths.get(url.toURI).toFile.getAbsolutePath
     val configFile     = new File(configFilePath)
