@@ -21,44 +21,47 @@ class ExampleApp extends React.Component {
     const config = { ...AppConfig }
     return (
       <div className='row card col s12 m7'>
-        <TMTAuthContextProvider config={config}>
-          <BrowserRouter>
-            <div>
-              <NavComponent />
-              <Route
-                exact
-                path='/secured'
-                render={_ => (
+        {// #TMTAuthContextProvider-component-usage
+          <TMTAuthContextProvider config={config}>
+            <BrowserRouter>
+              <div>
+                <NavComponent />
+                <Route
+                  exact
+                  path='/secured'
+                  render={_ => (
                   // #checkLogin-component-usage
-                  <CheckLogin error={<ExampleError />}>
-                    <Write />
-                  </CheckLogin>
+                    <CheckLogin error={<ExampleError />}>
+                      <Write />
+                    </CheckLogin>
                   // #checkLogin-component-usage
-                )}
-              />
-              <Route exact path='/public' component={Read} />
-            </div>
-          </BrowserRouter>
+                  )}
+                />
+                <Route exact path='/public' component={Read} />
+              </div>
+            </BrowserRouter>
 
-          {
+            {
             // #realmRole-component-usage
-            <RealmRole realmRole='example-admin-role' error={<ExampleError />}>
-              <div>Example admin role specific functionality</div>
-            </RealmRole>
+              <RealmRole realmRole='example-admin-role' error={<ExampleError />}>
+                <div>Example admin role specific functionality</div>
+              </RealmRole>
             // #realmRole-component-usage
-          }
-          {
+            }
+            {
             // #resourceRole-component-usage
-            <ResourceRole
-              resourceRole='person-role'
-              resource='example-server'
-              error={<ExampleError />}>
-              <div>Person role specific functionality</div>
-            </ResourceRole>
+              <ResourceRole
+                resourceRole='person-role'
+                resource='example-server'
+                error={<ExampleError />}>
+                <div>Person role specific functionality</div>
+              </ResourceRole>
             // #resourceRole-component-usage
-          }
+            }
 
-        </TMTAuthContextProvider>
+          </TMTAuthContextProvider>
+        // #TMTAuthContextProvider-component-usage
+        }
       </div>
     )
   }

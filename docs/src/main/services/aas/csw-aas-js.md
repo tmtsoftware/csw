@@ -41,15 +41,42 @@ Javascript
 
 csw-aas-js exposes following react components: 
 
+ - [TMTAuthContextProvider](#TMTAuthContextProvider)
+ - [Consumer](#consumer)
  - [Login](#login)
  - [Logout](#logout)
  - [CheckLogin](#checklogin)
  - [RealmRole](#realmrole)
  - [ResourceRole](#resourcerole)
- - [TMTAuthContextProvider]
- - [Consumer]
 
+## TMTAuthContextProvider
 
+TMTAuthContextProvider is wrapper over provider from react context API. It expects config json to be passed. This config 
+json is UI application specific AAS server configuration e.g. clientId, realm. When user loges in AAS Server is instantiated 
+by merging UI application specific config and predefined configuration. UI application can choose to override predefined 
+json configuration. Once AAS sever is instantiated, tmtAuth object is updated with needed attributes and apis. This tmtAuth
+is available to all react componets . tmtAuth Context is designed to share data that can be considered “global” for a 
+tree of React components and is available via Consumer. All consumers that are descendants of a Provider will re-render 
+whenever the TMTAuthContextProvider’s state changes i.e tmtAuth. Recommended way is use TMTAuthContextProvider to wrap entire 
+application so that data can be shared anywhere in application via Consumer. 
+
+Javascript
+:   @@snip [TMTAuthContextProvider.jsx](../../../../../csw-aas/csw-aas-js/example/src/components/ExampleApp.jsx) { #TMTAuthContextProvider-component-usage }
+
+### Source code for RealmRole component
+
+* @github[TMTAuthContextProvider Component](/csw-aas/csw-aas-js/src/components/context/TMTAuthContextProvider.jsx)
+
+## Consumer
+
+Consumer is similar to consumer from react context api. tmtAuth can be accessed using Consumer component 
+
+Javascript
+:   @@snip [Consumer.jsx](../../../../../csw-aas/csw-aas-js/example/src/components/Write.jsx) { #Consumer-component-usage }
+
+### Source code for RealmRole component
+
+* @github[Consumer Component](/csw-aas/csw-aas-js/src/components/context/TMTAuthContext.jsx)
 
 ## Login
 

@@ -15,8 +15,7 @@ const RealmRole = ({ realmRole, children, error }) => (
   <Consumer>
     {({ tmtAuth }) => {
       if (!tmtAuth) return error
-      return tmtAuth.isAuthenticated() &&
-      tmtAuth.hasRealmRole(realmRole)
+      return tmtAuth.isAuthenticated() && tmtAuth.hasRealmRole(realmRole)
         ? children
         : error || null
     }}
