@@ -115,16 +115,18 @@ object SecurityDirectives {
    * Creates instance of [[csw.aas.http.SecurityDirectives]] using configurations
    * from application and reference.conf.
    *
+   * @param locationService LocationService instance used to resolve auth server url (blocking call)
    * Resolves auth server url using location service (blocking call)
    */
   def apply(locationService: LocationService)(implicit ec: ExecutionContext): SecurityDirectives =
     from(AuthConfig.create(authServerLocation = Some(authLocation(locationService))))
 
   /**
-   * Creates instance of [[csw.aas.http.SecurityDirectives]] using configurations
-   * from application and reference.conf.
+   * Creates instance of [[csw.aas.http.SecurityDirectives]] using provided configurations
+   * and auth server url using location service
    *
-   * Resolves auth server url using location service (blocking call)
+   * @param config Config object provided
+   * @param locationService LocationService instance used to resolve auth server url (blocking call)
    */
   def apply(config: Config, locationService: LocationService)(implicit ec: ExecutionContext): SecurityDirectives =
     from(AuthConfig.create(config, Some(authLocation(locationService))))

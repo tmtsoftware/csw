@@ -28,10 +28,10 @@ object AuthorizationPolicy {
 
   /**
    * This policy filters requests based on permissions.
-   * @param name Name of permissions
-   * @param resource Name of client for which permissions is applicable.
+   * @param scope Name of scope
+   * @param resource Name of resource for which permissions is applicable.
    */
-  final case class PermissionPolicy(name: String, resource: String = "Default Resource") extends AuthorizationPolicy
+  final case class PermissionPolicy(scope: String, resource: String = "Default Resource") extends AuthorizationPolicy
 
   /**
    * Allows custom request filtering based on access token properties.

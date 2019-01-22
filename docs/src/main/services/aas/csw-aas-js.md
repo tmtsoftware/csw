@@ -72,7 +72,7 @@ Javascript
 Consumer is similar to consumer from react context api. tmtAuth can be accessed using Consumer component 
 
 Javascript
-:   @@snip [Consumer.jsx](../../../../../csw-aas/csw-aas-js/example/src/components/Write.jsx) { #Consumer-component-usage }
+:   @@snip [Consumer.jsx](../../../../../csw-aas/csw-aas-js/example/src/components/Read.jsx) { #Consumer-component-usage }
 
 ### Source code for RealmRole component
 

@@ -16,7 +16,7 @@ class TokenFactory(keycloakDeployment: KeycloakDeployment, tokenVerifier: TokenV
   private lazy val rpt: RPT = RPT(authzClient)
 
   /**
-   * If "enable-permissions" is set to true, it will fetch a new token from keycloak.
+   * If "enable-permissions" is set to true, it will fetch a new token from AAS server.
    * This token will contain all the token information along with permissions. If "enable-permissions" is set to false,
    * it will validate the token string for signature and expiry and then decode it into
    * [[csw.aas.core.token.AccessToken]]
