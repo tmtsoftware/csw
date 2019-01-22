@@ -8,11 +8,18 @@ import csw.aas.core.token.{AccessToken, TokenFactory}
 
 import scala.concurrent.{ExecutionContext, Future}
 
+/**
+ * Provides authentication to csw-aas-http security directives
+ */
 private[csw] class Authentication(tokenFactory: TokenFactory)(implicit ec: ExecutionContext) {
 
   private val logger = AuthLogger.getLogger
   import logger._
 
+  /**
+   * Returns an instance of AsyncAuthenticator
+   * This is used to create AuthenticationDirective (akka-http)
+   */
   def authenticator: AsyncAuthenticator[AccessToken] = {
     case Provided(token) ⇒
       val result = tokenFactory.makeToken(token)
