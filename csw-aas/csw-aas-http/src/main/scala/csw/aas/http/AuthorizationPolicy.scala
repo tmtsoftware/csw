@@ -1,16 +1,51 @@
 package csw.aas.http
 
 import csw.aas.core.token.AccessToken
+import csw.aas.http.AuthorizationPolicy.PolicyExpression
+import csw.aas.http.AuthorizationPolicy.PolicyExpression.{And, Or, PolicyOperator}
+
+import scala.concurrent.Future
 
 /**
- * An authorization policy is a way to provide filter incoming HTTP requests based on standard rules.
+ * An authorization policy is a way to filter incoming HTTP requests based on rules
  */
-sealed trait AuthorizationPolicy
+sealed trait AuthorizationPolicy {
+
+  /**
+   * Applies a new authorization policy in combination with previous policy.
+   * Passing of both policies is requried for authorization to succeed.
+   * @param authorizationPolicy new Authorization policy
+   * @return combined authorization policy
+   */
+  def &(authorizationPolicy: AuthorizationPolicy): AuthorizationPolicy = {
+    //todo: can't we copy 'this'? right now it's not immutable
+    PolicyExpression(this, And, authorizationPolicy)
+  }
+
+  /**
+   * Applies a new authorization policy if the orevious policy fails.
+   * Authorization will succeed if any of the provided policy passes.
+   * @param authorizationPolicy new Authorization policy
+   * @return combined authorization policy
+   */
+  def |(authorizationPolicy: AuthorizationPolicy): AuthorizationPolicy = {
+    PolicyExpression(this, Or, authorizationPolicy)
+  }
+}
 
 /**
  * An authorization policy is a way to provide filter incoming HTTP requests based on standard rules.
  */
 object AuthorizationPolicy {
+
+  private[aas] final case class PolicyExpression(left: AuthorizationPolicy, operator: PolicyOperator, right: AuthorizationPolicy)
+      extends AuthorizationPolicy
+
+  private[aas] object PolicyExpression {
+    trait PolicyOperator
+    case object Or  extends PolicyOperator
+    case object And extends PolicyOperator
+  }
 
   /**
    * This policy filters requests based on Resource Role. A Resource Role is a client specific role.
@@ -38,6 +73,12 @@ object AuthorizationPolicy {
    * @param predicate Filter
    */
   final case class CustomPolicy(predicate: AccessToken => Boolean) extends AuthorizationPolicy
+
+  /**
+   * Allows custom request filtering based on access token properties.
+   * @param predicate Async filter
+   */
+  final case class CustomPolicyAsync(predicate: AccessToken => Future[Boolean]) extends AuthorizationPolicy
 
   /**
    * Use this when you only need authentication but not authorization

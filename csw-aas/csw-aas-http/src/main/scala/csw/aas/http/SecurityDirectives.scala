@@ -2,7 +2,7 @@ package csw.aas.http
 
 import akka.http.scaladsl.model.HttpMethod
 import akka.http.scaladsl.model.HttpMethods._
-import akka.http.scaladsl.server.Directives.{authorize => keycloakAuthorize, _}
+import akka.http.scaladsl.server.Directives.{authorize => keycloakAuthorize, authorizeAsync => keycloakAuthorizeAsync, _}
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.directives.AuthenticationDirective
 import com.typesafe.config.Config
@@ -10,19 +10,25 @@ import csw.aas.core.TokenVerifier
 import csw.aas.core.commons.AuthLogger
 import csw.aas.core.deployment.{AuthConfig, AuthServiceLocation}
 import csw.aas.core.token.{AccessToken, TokenFactory}
+import csw.aas.http.AuthorizationPolicy.PolicyExpression.{And, Or}
 import csw.aas.http.AuthorizationPolicy.{EmptyPolicy, _}
 import csw.location.api.scaladsl.LocationService
 
 import scala.concurrent.duration.DurationDouble
-import scala.concurrent.{Await, ExecutionContext}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.implicitConversions
+import scala.util.{Failure, Success}
 
-class SecurityDirectives private[csw] (authentication: Authentication, realm: String, resourceName: String) {
+class SecurityDirectives private[csw] (authentication: Authentication, realm: String, resourceName: String)(
+    implicit ec: ExecutionContext
+) {
 
   private val logger = AuthLogger.getLogger
   import logger._
 
-  implicit def toRoute[T](route: Route): T => Route = _ => route
+  implicit def toRouteFunction(route: Route): AccessToken => Route                            = _ => route
+  implicit def toBooleanFunction(bool: Boolean): AccessToken => Boolean                       = _ => bool
+  implicit def toBooleanFutureFunction(bool: Future[Boolean]): AccessToken => Future[Boolean] = _ => bool
 
   private[aas] def authenticate: AuthenticationDirective[AccessToken] =
     authenticateOAuth2Async(realm, authentication.authenticator)
@@ -39,7 +45,27 @@ class SecurityDirectives private[csw] (authentication: Authentication, realm: St
           else debug(s"authorization succeeded for '${accessToken.userOrClientName}' via a custom policy")
           result
         }
+      case CustomPolicyAsync(predicate) =>
+        keycloakAuthorizeAsync {
+          val result = predicate(accessToken)
+          result.onComplete {
+            case Success(authorized) =>
+              if (authorized) {
+                debug(s"authorization succeeded for '${accessToken.userOrClientName}' via a custom policy")
+              } else {
+                warn(s"'${accessToken.userOrClientName}' failed custom policy authorization")
+              }
+            case Failure(exception) =>
+              error(s"error while executing async custom policy for ${accessToken.userOrClientName}", ex = exception)
+          }
+          result
+        }
       case EmptyPolicy => Directive.Empty
+      case PolicyExpression(left, op, right) =>
+        op match {
+          case And => authorize(left, accessToken) & authorize(right, accessToken)
+          case Or  => authorize(left, accessToken) | authorize(right, accessToken)
+        }
     }
 
   private def sMethod(httpMethod: HttpMethod, authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] =
