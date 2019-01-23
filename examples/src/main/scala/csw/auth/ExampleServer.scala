@@ -37,6 +37,7 @@ object ExampleServer extends HttpApp with App with GenericUnmarshallers with Pla
   private val HOST = "0.0.0.0"
   private val PORT = 9003
 
+  // #example-routes
   override protected def routes: Route = cors() {
     pathPrefix("person") {
       get {
@@ -84,6 +85,7 @@ object ExampleServer extends HttpApp with App with GenericUnmarshallers with Pla
       }
     }
   }
+  // #example-routes
   startServer(HOST, PORT)
 }
 

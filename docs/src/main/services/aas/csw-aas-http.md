@@ -128,10 +128,30 @@ is authorized to hit this POST route.
 Scala
 :   @@snip [Secure Route](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #secure-route-example }
 
+Following example shows akka http routes with some secure and open routes
+
+Scala
+:   @@snip [Routes](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #example-routes }
+ 
  
 ## Example HTTP Server
 
+Points to remember while writing http server with secure routes
 
+* Instantiate SecurityDirectives with appropriate config. SecurityDirectives exposes factory to instantiate SecurityDirectives
+based on config or using location service. 
 
+Following example shows one way of instantiating SecurityDirectives
+
+Scala
+:   @@snip [SecurityDirectives](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #security-directive-usage }
+
+Please refer API documentation for more information regarding SecurityDirectives.
+
+This enables usage of secure HTTP verbs while writing routes
+
+## Source code for example http server
+
+* @github[Example http server Example](/examples/src/main/scala/csw/auth/ExampleServer.scala)
 
 
