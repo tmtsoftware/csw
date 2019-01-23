@@ -3,14 +3,14 @@ import PropTypes from 'prop-types'
 import WithContext from './context/WithContext'
 
 /**
- * React component which renders Logout button. WithContext utility provides logout method as a prop.
- * Call to this.props.logout method is responsible for logging out.
+ * React component which renders Logout button.
  */
 export class Logout extends React.Component {
   render() {
     return (
       <button
         onClick={async () => {
+          //Call to this.props.logout method is responsible for logging out.
           await this.props.logout()
         }}>
         Logout
@@ -20,6 +20,7 @@ export class Logout extends React.Component {
 }
 
 Logout.propTypes = {
+  //WithContext utility provides logout method as a prop.
   logout: PropTypes.func,
 }
 

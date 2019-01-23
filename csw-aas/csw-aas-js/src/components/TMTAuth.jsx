@@ -3,15 +3,13 @@ import KeyCloak from 'keycloak-js'
 import { resolveAAS } from './AASResolver'
 
 /**
- * Utility class which talks to keycloak-js adapter and hides keycloak-js from other parts of code.
+ * Adapter for authentication and authorization service
  */
 class TMTAuthStore {
   /**
-   * Create instance of TMTAuthStore from keycloak. TMTAuthStore exposes only needed attributes and methods
-   * from keycloak instance
+   * Create instance of TMTAuthStore from keycloak.
    *
-   * @param keycloak keycloak instance created after instantiating keycloak using keyclok-js
-   * @return TMTAuthStore instance which is created using only needed attributes and methods from keycloak instance
+   * @param keycloak keycloak instance instantiated using keyclok-js
    */
   from = keycloak => {
     this.logout = keycloak.logout
@@ -33,11 +31,11 @@ class TMTAuthStore {
    * token is expired which silently refresh token resulting seamless user experience once logged in
    *
    * @param config json object which is UI application specific keycloak configuration e.g. realm and clientID.
-   * @param url json object which contais AAS url
-   * @param redirect boolean which desides instantiation mode for keycloak. e.g. login-required or check-sso.
-   * login-required mode redirects user to login screen if not logged in alredy. check-sso only checks if already
+   * @param url json object which contains AAS url
+   * @param redirect boolean which decides instantiation mode for keycloak. e.g. login-required or check-sso.
+   * login-required mode redirects user to login screen if not logged in already. check-sso only checks if already
    * logged in without redirecting to login screen if not logged in.
-   * @return { keycloak, authenticated } json which contains keyclok instance and authenticated which is promise after
+   * @return { keycloak, authenticated } json which contains keycloak instance and authenticated which is promise after
    * initializing keycloak
    */
   authenticate = (config, url, redirect) => {
@@ -49,6 +47,7 @@ class TMTAuthStore {
       keycloak
         .updateToken(0)
         .success(function() {
+          //todo: remove console.info
           console.info('token refreshed successfully')
         })
         .error(function() {
