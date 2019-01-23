@@ -152,6 +152,6 @@ This enables usage of secure HTTP verbs while writing routes
 
 ## Source code for example http server
 
-* @github[Example http server Example](/examples/src/main/scala/csw/auth/ExampleServer.scala)
+* @github[Example http server](/examples/src/main/scala/csw/auth/ExampleServer.scala)
 
 
