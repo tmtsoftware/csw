@@ -11,11 +11,11 @@ import csw.time.client.TimeServiceSchedulerFactory
 import csw.time.client.api.TimeServiceScheduler
 
 class SchedulerExamples(ctx: ActorContext[UTCTime]) {
-  implicit val actorSystem: ActorSystem = ctx.system.toUntyped
 
   //#create-scheduler
   // create time service scheduler using the factory method
-  private val scheduler: TimeServiceScheduler = TimeServiceSchedulerFactory.make()
+  implicit val actorSystem: ActorSystem       = ctx.system.toUntyped
+  private val scheduler: TimeServiceScheduler = TimeServiceSchedulerFactory.make()(actorSystem)
   //#create-scheduler
 
   private val utcTime = UTCTime.now()
