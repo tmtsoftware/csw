@@ -26,4 +26,4 @@ class Example extends Component {
 
 ## License
 
-Apache Licence Version 2.0 © [Poorva17](https://github.com/Poorva17)
+Apache Licence Version 2.0 © [TMT Software](https://github.com/tmtsoftware/csw)

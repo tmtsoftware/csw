@@ -25,12 +25,15 @@ object ExampleServer extends HttpApp with App with GenericUnmarshallers with Pla
   //ensure location service is up
   LocationServerStatus.requireUpLocally(5.seconds)
 
+  // #security-directive-usage
   //create location client
   private val locationService = HttpLocationServiceFactory.makeLocalClient
 
   private val directives = SecurityDirectives(locationService)
 
   import directives._
+  // #security-directive-usage
+
   private val HOST = "0.0.0.0"
   private val PORT = 9003
 
@@ -39,20 +42,45 @@ object ExampleServer extends HttpApp with App with GenericUnmarshallers with Pla
       get {
         complete("OK")
       } ~
-      sPost(RealmRolePolicy("example-admin-role")) { _ ⇒
+      // #secure-route-example
+      sPost(
+        // #realm-role-policy
+        RealmRolePolicy("example-admin-role")
+        // #realm-role-policy
+      ) { _ ⇒
         complete("Person created OK")
       } ~
-      sPut(ResourceRolePolicy("person-role")) { _ ⇒
+      // #secure-route-example
+      sPut(
+        // #resource-role-policy
+        ResourceRolePolicy("person-role")
+        // #resource-role-policy
+      ) { _ ⇒
         complete("Person updated OK")
       } ~
       sPatch(ResourceRolePolicy("some-role")) { _ ⇒
         complete("Person updated OK")
       } ~
-      sHead(CustomPolicy(at ⇒ at.given_name.contains("test-user"))) { _ ⇒
+      sHead(
+        // #custom-policy
+        CustomPolicy(at ⇒ at.given_name.contains("test-user"))
+        // #custom-policy
+      ) { _ ⇒
         complete("Custom policy OK")
       } ~
-      sDelete(PermissionPolicy("delete", "person")) { _ ⇒
+      sDelete(
+        // #permission-policy
+        PermissionPolicy("delete", "person")
+        // #permission-policy
+      ) { _ ⇒
         complete("Permission policy OK")
+      } ~
+      sGet(
+        // #empty-policy
+        EmptyPolicy
+        // #empty-policy
+      ) { _ ⇒
+        complete("Empty policy OK")
       }
     }
   }
