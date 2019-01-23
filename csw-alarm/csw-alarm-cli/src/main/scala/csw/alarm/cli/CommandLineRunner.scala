@@ -48,10 +48,15 @@ class CommandLineRunner(
 
   def refreshSeverity(options: Options): ActorRef[AutoRefreshSeverityMessage] = {
     val refreshInterval = new Settings(ConfigFactory.load()).refreshInterval
-    def refreshable(key: AlarmKey, severity: AlarmSeverity): Unit =
-      alarmService.setCurrentSeverity(key, severity).map(_ => printLine(Formatter.formatRefreshSeverity(key, severity)))
+    def refreshSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Done] =
+      alarmService
+        .setCurrentSeverity(key, severity)
+        .map { _ =>
+          printLine(Formatter.formatRefreshSeverity(key, severity))
+          Done
+        }
 
-    val refreshActor = new AutoRefreshSeverityActorFactory().make(refreshable, refreshInterval)
+    val refreshActor = new AutoRefreshSeverityActorFactory().make(refreshSeverity, refreshInterval)
     refreshActor ! AutoRefreshSeverity(options.alarmKey, options.severity.get)
     refreshActor
   }

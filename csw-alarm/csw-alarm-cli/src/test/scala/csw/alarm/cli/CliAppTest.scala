@@ -444,6 +444,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   }
 
   // DEOPSCSW-491: Auto-refresh an alarm through alarm service cli
+  // DEOPSCSW-507: Auto-refresh utility for component developers
   test("should refresh severity of alarm") {
     val cmd = Options(
       cmd = "severity",

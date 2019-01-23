@@ -14,7 +14,7 @@ addSbtPlugin("com.typesafe.sbt"                  % "sbt-multi-jvm"              
 addSbtPlugin("com.eed3si9n"                      % "sbt-buildinfo"              % "0.9.0")
 addSbtPlugin("pl.project13.scala"                % "sbt-jmh"                    % "0.3.4")
 addSbtPlugin("com.orrsella"                      % "sbt-stats"                  % "1.0.7")
-addSbtPlugin("io.github.jonas"                   % "sbt-paradox-material-theme" % "0.4.0")
+addSbtPlugin("io.github.jonas"                   % "sbt-paradox-material-theme" % "0.6.0")
 addSbtPlugin("de.johoop"                         % "sbt-testng-plugin"          % "3.1.1")
 addSbtPlugin("io.spray"                          % "sbt-revolver"               % "0.9.1")
 addSbtPlugin("com.typesafe.sbt"                  % "sbt-git"                    % "1.0.0")

@@ -20,10 +20,13 @@ object Main extends App {
     val wiring = Wiring.make(options.locationHost)
     import wiring._
     import actorRuntime._
-    startLogging(name)
 
-    try cliApp.execute(options)
-    finally Http().shutdownAllConnectionPools().onComplete(_ ⇒ shutdown(ApplicationFinishedReason))
+    try {
+      startLogging(name)
+      cliApp.execute(options)
+    } finally {
+      Http().shutdownAllConnectionPools().onComplete(_ ⇒ shutdown(ApplicationFinishedReason))
+    }
   }
 
 }

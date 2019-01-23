@@ -1,6 +1,8 @@
 package csw.alarm.client.internal.auto_refresh
 
+import akka.Done
 import akka.actor.testkit.typed.scaladsl.{ManualTime, ScalaTestWithActorTestKit, TestProbe}
+import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.actor.typed.scaladsl.Behaviors
 import csw.alarm.api.models.AlarmSeverity.Major
 import csw.alarm.api.models.Key.AlarmKey
@@ -10,9 +12,11 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers}
 
 import scala.collection.mutable
+import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
 
 // DEOPSCSW-491: Auto-refresh an alarm through alarm service cli
+// DEOPSCSW-507: Auto-refresh utility for component developers
 class AutoRefreshSeverityActorTest
     extends ScalaTestWithActorTestKit(ManualTime.config)
     with FunSuiteLike
@@ -20,15 +24,20 @@ class AutoRefreshSeverityActorTest
     with Matchers
     with BeforeAndAfterAll {
 
+  implicit val actorSystem: ActorSystem[Nothing] = system
+  import actorSystem.executionContext
+
   val tromboneAxisHighLimitAlarmKey = AlarmKey(NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm")
   val tcsAxisHighLimitAlarmKey      = AlarmKey(NFIRAOS, "tcs", "tromboneAxisHighLimitAlarm")
   private val manualTime            = ManualTime()
+
+  private def send[T](msg: T, to: ActorRef[T]): Future[Done] = Future { to ! msg; Done }
 
   test("should refresh severity") {
     val probe = TestProbe[String]()
     val actor = spawn(
       Behaviors.withTimers[AutoRefreshSeverityMessage](
-        t ⇒ AutoRefreshSeverityActor.behavior(t, (_, _) ⇒ probe.ref.tell("severity set"), 5.seconds)
+        t ⇒ AutoRefreshSeverityActor.behavior(t, (_, _) ⇒ send("severity set", probe.ref), 5.seconds)
       )
     )
     actor ! SetSeverity(tcsAxisHighLimitAlarmKey, Major)
@@ -39,7 +48,7 @@ class AutoRefreshSeverityActorTest
     val probe = TestProbe[String]()
     val actor = spawn(
       Behaviors.withTimers[AutoRefreshSeverityMessage](
-        t ⇒ AutoRefreshSeverityActor.behavior(t, (_, _) ⇒ probe.ref.tell("severity refreshed"), 5.seconds)
+        t ⇒ AutoRefreshSeverityActor.behavior(t, (_, _) ⇒ send("severity refreshed", probe.ref), 5.seconds)
       )
     )
 
@@ -54,7 +63,7 @@ class AutoRefreshSeverityActorTest
     val probe = TestProbe[String]()
     val actor = spawn(
       Behaviors.withTimers[AutoRefreshSeverityMessage](
-        t ⇒ AutoRefreshSeverityActor.behavior(t, (_, _) ⇒ probe.ref.tell("severity refreshed"), 5.seconds)
+        t ⇒ AutoRefreshSeverityActor.behavior(t, (_, _) ⇒ send("severity refreshed", probe.ref), 5.seconds)
       )
     )
 
@@ -73,7 +82,7 @@ class AutoRefreshSeverityActorTest
 
     val actor = spawn(
       Behaviors.withTimers[AutoRefreshSeverityMessage](
-        t ⇒ AutoRefreshSeverityActor.behavior(t, (key, _) ⇒ queue.enqueue(key), 5.seconds)
+        t ⇒ AutoRefreshSeverityActor.behavior(t, (key, _) ⇒ Future { queue.enqueue(key); Done }, 5.seconds)
       )
     )
 
