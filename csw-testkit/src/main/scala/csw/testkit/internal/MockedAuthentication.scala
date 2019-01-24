@@ -33,7 +33,7 @@ private[testkit] trait MockedAuthentication extends MockitoSugar {
     case _                         ⇒ Future.successful(None)
   }
 
-  when(validToken.hasResourceRole("admin", "test")).thenReturn(true)
+  when(validToken.hasClientRole("admin", "test")).thenReturn(true)
   when(validToken.preferred_username).thenReturn(Some("test"))
   when(validToken.userOrClientName).thenReturn("test")
   when(authentication.authenticator).thenReturn(authenticator)

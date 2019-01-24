@@ -8,7 +8,7 @@ import akka.http.scaladsl.server.{Directives, Route}
 import akka.http.scaladsl.testkit._
 import csw.aas.core.token.AccessToken
 import csw.aas.http.AuthorizationPolicy.PolicyExpression.{And, ExpressionOperator, Or}
-import csw.aas.http.AuthorizationPolicy.{CustomPolicy, RealmRolePolicy, ResourceRolePolicy}
+import csw.aas.http.AuthorizationPolicy.{ClientRolePolicy, CustomPolicy, RealmRolePolicy}
 import org.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
@@ -87,7 +87,7 @@ class PolicyExpressionTest extends FunSuite with MockitoSugar with Directives wi
 
     val route: Route = securityDirectives.authenticate { implicit at ⇒
       get {
-        securityDirectives.authorize(RealmRolePolicy("admin") | ResourceRolePolicy("admin"), at) {
+        securityDirectives.authorize(RealmRolePolicy("admin") | ClientRolePolicy("admin"), at) {
           complete("OK")
         }
       }
@@ -159,7 +159,7 @@ class PolicyExpressionTest extends FunSuite with MockitoSugar with Directives wi
     when(token.hasRealmRole("admin"))
       .thenReturn(true)
 
-    when(token.hasResourceRole("admin", "test")).thenReturn(false)
+    when(token.hasClientRole("admin", "test")).thenReturn(false)
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
       case Provided(`tokenStr`) ⇒ Future.successful(Some(token))
@@ -170,7 +170,7 @@ class PolicyExpressionTest extends FunSuite with MockitoSugar with Directives wi
 
     val route: Route = securityDirectives.authenticate { implicit at ⇒
       get {
-        securityDirectives.authorize(ResourceRolePolicy("admin") | RealmRolePolicy("admin"), at) {
+        securityDirectives.authorize(ClientRolePolicy("admin") | RealmRolePolicy("admin"), at) {
           complete("OK")
         }
       }

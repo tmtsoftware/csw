@@ -49,20 +49,20 @@ for performing action will get 403 forbidden error code.
 An authorization policy is a way to provide filter incoming HTTP requests based on standard rules. Following policies can
 be applied to protect routes.
 
- - [ResourceRolePolicy](#resourcerolepolicy)
+ - [ClientRolePolicy](#clientrolepolicy)
  - [ReamRolePolicy](#realmrolepolicy)
  - [PermissionPolicy](#permissionpolicy)
  - [CustomPolicy](#custompolicy)
  - [EmptyPolicy](#emptypolicy)
 
-## ResourceRolePolicy
+## ClientRolePolicy
 
-This policy filters requests based on Resource Role. A Resource Role is a client specific role.
+This policy filters requests based on Client Role. A Client Role is a client specific role.
 
 In the following example policy will authorize request if user has assigned `person-role` for clientId specified in configurations
 
 Scala
-:   @@snip [Resource Role Policy](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #resource-role-policy }
+:   @@snip [Client Role Policy](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #client-role-policy }
  
 
 ## RealmRolePolicy

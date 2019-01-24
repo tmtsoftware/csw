@@ -53,10 +53,10 @@ object AuthorizationPolicy {
   }
 
   /**
-   * This policy filters requests based on Resource Role. A Resource Role is a client specific role.
+   * This policy filters requests based on client specific roles
    * @param name Name of role
    */
-  final case class ResourceRolePolicy(name: String) extends AuthorizationPolicy
+  final case class ClientRolePolicy(name: String) extends AuthorizationPolicy
 
   /**
    * This policy filters requests based on Realm Role.

@@ -7,16 +7,16 @@ import akka.http.scaladsl.server.directives.Credentials.Provided
 import akka.http.scaladsl.server.{Directives, Route}
 import akka.http.scaladsl.testkit._
 import csw.aas.core.token.AccessToken
-import csw.aas.http.AuthorizationPolicy.ResourceRolePolicy
+import csw.aas.http.AuthorizationPolicy.ClientRolePolicy
 import org.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.Future
 
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
-class ResourceRolePolicyTest extends FunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
+class ClientRolePolicyTest extends FunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
-  test("resourceRole policy should return AuthenticationFailedRejection when token is invalid") {
+  test("clientRole policy should return AuthenticationFailedRejection when token is invalid") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
 
@@ -32,7 +32,7 @@ class ResourceRolePolicyTest extends FunSuite with MockitoSugar with Directives 
 
     val route: Route = securityDirectives.authenticate { implicit at ⇒
       get {
-        securityDirectives.authorize(ResourceRolePolicy("admin"), at) {
+        securityDirectives.authorize(ClientRolePolicy("admin"), at) {
           complete("OK")
         }
       }
@@ -43,7 +43,7 @@ class ResourceRolePolicyTest extends FunSuite with MockitoSugar with Directives 
     }
   }
 
-  test("resourceRole policy should return AuthenticationFailedRejection when token is not present") {
+  test("clientRole policy should return AuthenticationFailedRejection when token is not present") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
 
@@ -53,7 +53,7 @@ class ResourceRolePolicyTest extends FunSuite with MockitoSugar with Directives 
 
     val route: Route = securityDirectives.authenticate { implicit at ⇒
       get {
-        securityDirectives.authorize(ResourceRolePolicy("admin"), at) {
+        securityDirectives.authorize(ClientRolePolicy("admin"), at) {
           complete("OK")
         }
       }
@@ -64,65 +64,65 @@ class ResourceRolePolicyTest extends FunSuite with MockitoSugar with Directives 
     }
   }
 
-  test("resourceRole policy should return AuthorizationFailedRejection when token does not have resourceRole") {
+  test("clientRole policy should return AuthorizationFailedRejection when token does not have clientRole") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
 
-    val validTokenWithoutResourceRoleStr = "validTokenWithoutResourceRoleStr"
+    val validTokenWithoutClientRoleStr = "validTokenWithoutClientRoleStr"
 
-    val validTokenWithoutResourceRole = mock[AccessToken]
+    val validTokenWithoutClientRole = mock[AccessToken]
 
-    val validTokenWithoutResourceRoleHeader = Authorization(OAuth2BearerToken(validTokenWithoutResourceRoleStr))
+    val validTokenWithoutClientRoleHeader = Authorization(OAuth2BearerToken(validTokenWithoutClientRoleStr))
 
-    when(validTokenWithoutResourceRole.hasResourceRole("admin", "test"))
+    when(validTokenWithoutClientRole.hasClientRole("admin", "test"))
       .thenReturn(false)
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
-      case Provided(`validTokenWithoutResourceRoleStr`) ⇒ Future.successful(Some(validTokenWithoutResourceRole))
-      case _                                            ⇒ Future.successful(None)
+      case Provided(`validTokenWithoutClientRoleStr`) ⇒ Future.successful(Some(validTokenWithoutClientRole))
+      case _                                          ⇒ Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
 
     val route: Route = securityDirectives.authenticate { implicit at ⇒
       get {
-        securityDirectives.authorize(ResourceRolePolicy("admin"), at) {
+        securityDirectives.authorize(ClientRolePolicy("admin"), at) {
           complete("OK")
         }
       }
     }
 
-    Get("/").addHeader(validTokenWithoutResourceRoleHeader) ~> route ~> check {
+    Get("/").addHeader(validTokenWithoutClientRoleHeader) ~> route ~> check {
       rejection shouldBe a[AuthorizationFailedRejection]
     }
   }
 
-  test("resourceRole policy should return 200 OK when token is valid & has resourceRole") {
+  test("clientRole policy should return 200 OK when token is valid & has clientRole") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
 
-    val validTokenWithResourceRoleStr    = "validTokenWithResourceRoleStr"
-    val validTokenWithResourceRole       = mock[AccessToken]
-    val validTokenWithResourceRoleHeader = Authorization(OAuth2BearerToken(validTokenWithResourceRoleStr))
-    when(validTokenWithResourceRole.hasResourceRole("admin", "test"))
+    val validTokenWithClientRoleStr    = "validTokenWithClientRoleStr"
+    val validTokenWithClientRole       = mock[AccessToken]
+    val validTokenWithClientRoleHeader = Authorization(OAuth2BearerToken(validTokenWithClientRoleStr))
+    when(validTokenWithClientRole.hasClientRole("admin", "test"))
       .thenReturn(true)
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
-      case Provided(`validTokenWithResourceRoleStr`) ⇒ Future.successful(Some(validTokenWithResourceRole))
-      case _                                         ⇒ Future.successful(None)
+      case Provided(`validTokenWithClientRoleStr`) ⇒ Future.successful(Some(validTokenWithClientRole))
+      case _                                       ⇒ Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
 
     val route: Route = securityDirectives.authenticate { implicit at ⇒
       get {
-        securityDirectives.authorize(ResourceRolePolicy("admin"), at) {
+        securityDirectives.authorize(ClientRolePolicy("admin"), at) {
           complete("OK")
         }
       }
     }
 
-    Get("/").addHeader(validTokenWithResourceRoleHeader) ~> route ~> check {
+    Get("/").addHeader(validTokenWithClientRoleHeader) ~> route ~> check {
       status shouldBe StatusCodes.OK
     }
   }

@@ -3,7 +3,7 @@ package csw.config.server.http
 import akka.Done
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
-import csw.aas.http.AuthorizationPolicy.ResourceRolePolicy
+import csw.aas.http.AuthorizationPolicy.ClientRolePolicy
 import csw.aas.http.SecurityDirectives
 import csw.config.api.scaladsl.ConfigService
 import csw.config.server.ActorRuntime
@@ -54,19 +54,19 @@ class ConfigServiceRoute(
                 }
               }
             } ~
-            sPost(ResourceRolePolicy(AdminRole)) { token =>
+            sPost(ClientRolePolicy(AdminRole)) { token =>
               (configDataEntity & annexParam & commentParam) { (configData, annex, comment) ⇒
                 complete(
                   StatusCodes.Created -> configService(token.userOrClientName).create(filePath, configData, annex, comment)
                 )
               }
             } ~
-            sPut(ResourceRolePolicy(AdminRole)) { token =>
+            sPut(ClientRolePolicy(AdminRole)) { token =>
               (configDataEntity & commentParam) { (configData, comment) ⇒
                 complete(configService(token.userOrClientName).update(filePath, configData, comment))
               }
             } ~
-            sDelete(ResourceRolePolicy(AdminRole)) { token =>
+            sDelete(ClientRolePolicy(AdminRole)) { token =>
               commentParam { comment ⇒
                 complete(configService(token.userOrClientName).delete(filePath, comment).map(_ ⇒ Done))
               }
@@ -83,7 +83,7 @@ class ConfigServiceRoute(
             (get & rejectEmptyResponse) { // fetch the active version - http://{{hostname}}:{{port}}/active-version/{{path}}
               complete(configService().getActiveVersion(filePath))
             } ~
-            sPut(ResourceRolePolicy(AdminRole)) { token =>
+            sPut(ClientRolePolicy(AdminRole)) { token =>
               (idParam & commentParam) {
                 case (Some(configId), comment) ⇒
                   complete(configService(token.userOrClientName).setActiveVersion(filePath, configId, comment).map(_ ⇒ Done))

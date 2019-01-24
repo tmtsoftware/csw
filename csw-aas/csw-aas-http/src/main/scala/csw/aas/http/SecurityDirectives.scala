@@ -35,7 +35,7 @@ class SecurityDirectives private[csw] (authentication: Authentication, realm: St
 
   private[aas] def authorize(authorizationPolicy: AuthorizationPolicy, accessToken: AccessToken): Directive0 =
     authorizationPolicy match {
-      case ResourceRolePolicy(name)         => keycloakAuthorize(accessToken.hasResourceRole(name, resourceName))
+      case ClientRolePolicy(name)           => keycloakAuthorize(accessToken.hasClientRole(name, resourceName))
       case RealmRolePolicy(name)            => keycloakAuthorize(accessToken.hasRealmRole(name))
       case PermissionPolicy(name, resource) => keycloakAuthorize(accessToken.hasPermission(name, resource))
       case CustomPolicy(predicate) =>

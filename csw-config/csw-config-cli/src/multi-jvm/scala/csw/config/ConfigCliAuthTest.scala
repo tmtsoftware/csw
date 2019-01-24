@@ -15,7 +15,7 @@ import csw.config.server.{ServerWiring, Settings}
 import csw.location.helpers.{LSNodeSpec, NMembersAndSeed}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import org.scalatest.FunSuiteLike
-import tech.bilal.embedded_keycloak.KeycloakData.{ApplicationUser, Client, Realm, ResourceRole}
+import tech.bilal.embedded_keycloak.KeycloakData.{ApplicationUser, Client, ClientRole, Realm}
 import tech.bilal.embedded_keycloak.{EmbeddedKeycloak, KeycloakData, Settings ⇒ KeycloakSettings}
 
 import scala.concurrent.Await
@@ -61,7 +61,7 @@ class ConfigCliAuthTest(ignore: Int)
         "bearer-only",
         passwordGrantEnabled = false,
         authorizationEnabled = true,
-        resourceRoles = Set(configAdmin)
+        clientRoles = Set(configAdmin)
       )
 
       val `csw-config-cli` = Client("csw-config-cli", "public", passwordGrantEnabled = false, authorizationEnabled = false)
@@ -76,7 +76,7 @@ class ConfigCliAuthTest(ignore: Int)
                 ApplicationUser(
                   adminUser,
                   adminPassword,
-                  resourceRoles = Set(ResourceRole(`csw-config-server`.name, configAdmin))
+                  clientRoles = Set(ClientRole(`csw-config-server`.name, configAdmin))
                 )
               )
             )

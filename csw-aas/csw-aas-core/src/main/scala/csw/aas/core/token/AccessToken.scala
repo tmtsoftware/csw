@@ -20,7 +20,7 @@ import play.api.libs.json._
  * @param email email address of user
  * @param scope scope specify what access privileges are being requested for Access Tokens
  * @param realm_access Realm roles
- * @param resource_access Resource roles
+ * @param resource_access Client roles
  * @param authorization Permissions
  * @param clientId Id of client.
  *                 This is present only when request is on behalf of a client and not user
@@ -70,14 +70,14 @@ case class AccessToken(
   }
 
   /**
-   * Checks whether this access token has resource role (client specific role) or not
+   * Checks whether this access token has client role (client specific role) or not
    * @param role role name
-   * @param resourceName resource name (client name)
+   * @param clientName client name
    */
-  def hasResourceRole(role: String, resourceName: String): Boolean = {
-    val result = this.resource_access.get(resourceName).exists(_.roles.contains(role))
-    if (!result) debug(s"'$userOrClientName' doesn't have resource role '$role' for client '$resourceName'")
-    else debug(s"authorization granted for user '$userOrClientName' via resource role '$role' and resource '$resourceName'")
+  def hasClientRole(role: String, clientName: String): Boolean = {
+    val result = this.resource_access.get(clientName).exists(_.roles.contains(role))
+    if (!result) debug(s"'$userOrClientName' doesn't have client role '$role' for client '$clientName'")
+    else debug(s"authorization granted for user '$userOrClientName' via client role '$role' and client '$clientName'")
     result
   }
 

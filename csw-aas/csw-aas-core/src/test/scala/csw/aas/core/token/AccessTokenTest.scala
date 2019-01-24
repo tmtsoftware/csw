@@ -50,24 +50,24 @@ class AccessTokenTest extends FunSuite with Matchers {
     accessToken.hasRealmRole("invalid-realm-role") shouldEqual false
   }
 
-  test("should able to check resource role for access token") {
-    val resourceAccess: Map[String, Access] = Map("test-resource" -> Access(Set("test-resource-role")))
+  test("should able to check client role for access token") {
+    val resourceAccess: Map[String, Access] = Map("test-resource" -> Access(Set("test-client-role")))
     val accessToken                         = token.AccessToken(resource_access = resourceAccess)
 
-    accessToken.hasResourceRole("test-resource-role", "test-resource") shouldEqual true
+    accessToken.hasClientRole("test-client-role", "test-resource") shouldEqual true
   }
 
-  test("should fail check for resource role if role is present for other resource") {
-    val resourceAccess: Map[String, Access] = Map("other-resource" -> Access(Set("test-resource-role")))
+  test("should fail check for client role if role is present for other resource") {
+    val resourceAccess: Map[String, Access] = Map("other-resource" -> Access(Set("test-client-role")))
     val accessToken                         = token.AccessToken(resource_access = resourceAccess)
 
-    accessToken.hasResourceRole("test-resource-role", "test-resource") shouldEqual false
+    accessToken.hasClientRole("test-client-role", "test-resource") shouldEqual false
   }
 
-  test("should fail check for resource role") {
-    val resourceAccess: Map[String, Access] = Map("test-resource" -> Access(Set("test-resource-role")))
+  test("should fail check for client role") {
+    val resourceAccess: Map[String, Access] = Map("test-resource" -> Access(Set("test-client-role")))
     val accessToken                         = token.AccessToken(resource_access = resourceAccess)
 
-    accessToken.hasResourceRole("invalid-resource-role", "test-resource") shouldEqual false
+    accessToken.hasClientRole("invalid-client-role", "test-resource") shouldEqual false
   }
 }

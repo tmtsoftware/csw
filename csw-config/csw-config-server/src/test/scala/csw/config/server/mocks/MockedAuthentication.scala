@@ -42,8 +42,8 @@ trait MockedAuthentication extends MockitoSugar {
     case Provided(`validTokenStr`)       ⇒ Future.successful(Some(validToken))
     case _                               ⇒ Future.successful(None)
   }
-  when(roleMissingToken.hasResourceRole("admin", "test")).thenReturn(false)
-  when(validToken.hasResourceRole("admin", "test")).thenReturn(true)
+  when(roleMissingToken.hasClientRole("admin", "test")).thenReturn(false)
+  when(validToken.hasClientRole("admin", "test")).thenReturn(true)
   when(validToken.preferred_username).thenReturn(Some(preferredUserName))
   when(validToken.userOrClientName).thenReturn(preferredUserName)
   when(authentication.authenticator).thenReturn(authenticator)

@@ -53,13 +53,13 @@ object ExampleServer extends HttpApp with App with GenericUnmarshallers with Pla
       } ~
       // #secure-route-example
       sPut(
-        // #resource-role-policy
-        ResourceRolePolicy("person-role")
-        // #resource-role-policy
+        // #client-role-policy
+        ClientRolePolicy("person-role")
+        // #client-role-policy
       ) { _ ⇒
         complete("Person updated OK")
       } ~
-      sPatch(ResourceRolePolicy("some-role")) { _ ⇒
+      sPatch(ClientRolePolicy("some-role")) { _ ⇒
         complete("Person updated OK")
       } ~
       sHead(
