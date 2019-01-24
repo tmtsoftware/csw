@@ -15,7 +15,7 @@ object Libs {
   val `acyclic`            = "com.lihaoyi"            %% "acyclic"            % AcyclicVersion % Provided //MIT License
   val `junit`              = "junit"                  % "junit"               % "4.12" //Eclipse Public License 1.0
   val `junit-interface`    = "com.novocode"           % "junit-interface"     % "0.11" //BSD 2-clause "Simplified" License
-  val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.0.8"
+  val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.0.9"
   //MIT License
   val `embedded-keycloak`            = "tech.bilal"           %% "embedded-keycloak"            % "0.0.6-beta" //Apache 2.0
   val `logback-classic`              = "ch.qos.logback"       % "logback-classic"               % "1.2.3"      //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
@@ -37,7 +37,7 @@ object Libs {
   val `scalatest-embedded-kafka` = "net.manub"            %% "scalatest-embedded-kafka" % "1.1.0"
   val `embedded-redis`           = "com.github.kstyrc"    % "embedded-redis"            % "0.6"
   val `scala-compiler`           = "org.scala-lang"       % "scala-compiler"            % ScalaVersion
-  val `HdrHistogram`             = "org.hdrhistogram"     % "HdrHistogram"              % "2.1.10"
+  val `HdrHistogram`             = "org.hdrhistogram"     % "HdrHistogram"              % "2.1.11"
   val `testng`                   = "org.testng"           % "testng"                    % "6.14.3"
 
   val `scala-csv`                = "com.github.tototoshi" %% "scala-csv" % "1.3.5"
@@ -56,7 +56,7 @@ object Libs {
 }
 
 object Typelevel {
-  val Version        = "1.1.0"
+  val Version        = "1.2.0"
   val `cats-effects` = "org.typelevel" %% "cats-effect" % Version
 }
 
@@ -100,11 +100,11 @@ object AkkaHttp {
   val Version             = "10.1.7"
   val `akka-http`         = "com.typesafe.akka" %% "akka-http" % Version //ApacheV2
   val `akka-http-testkit` = "com.typesafe.akka" %% "akka-http-testkit" % Version //ApacheV2
-  val `akka-http-cors`    = "ch.megard" %% "akka-http-cors" % "0.3.3"
+  val `akka-http-cors`    = "ch.megard" %% "akka-http-cors" % "0.3.4"
 }
 
 object Keycloak {
-  val Version                 = "4.8.2.Final"
+  val Version                 = "4.8.3.Final"
   val `keycloak-adapter-core` = "org.keycloak" % "keycloak-adapter-core" % Version
   val `keycloak-core`         = "org.keycloak" % "keycloak-core" % Version
   val `keycloak-installed`    = "org.keycloak" % "keycloak-installed-adapter" % Version
