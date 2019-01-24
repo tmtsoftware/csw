@@ -39,7 +39,7 @@ Scala
 For this server one bearer only client needs to be created in Keyclok. For more details regarding realm and resource please refer 
 this [link](https://www.keycloak.org/documentation.html)
 realm - Realm being used
-resource - clientId in Keycloak 
+client-id - clientId in Keycloak 
 enable-permissions - if permission policy is being used in http routes then this flag needs to be enabled. Default value 
 for this is false (disabled). If permission policy is used and this flag is not enabled then even user has specified permissions
 for performing action will get 403 forbidden error code.

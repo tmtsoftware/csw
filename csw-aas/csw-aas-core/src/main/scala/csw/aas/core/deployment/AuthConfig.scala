@@ -44,7 +44,11 @@ class AuthConfig private (config: Config, authServiceLocation: Option[HttpLocati
     }
 
   private def convertToDeployment(config: Config): KeycloakDeployment = {
-    val safeConfig = config.withoutPath("enable-permissions")
+    val clientId = config.getString("client-id")
+    val safeConfig = config
+      .withoutPath("enable-permissions")
+      .withoutPath("client-id")
+      .withValue("resource", ConfigValueFactory.fromAnyRef(clientId))
 
     debug("converting auth config to json")
 

@@ -93,7 +93,7 @@ class ConfigCliAuthTest(ignore: Int)
 
     runOn(configServer) {
       enterBarrier("keycloak started")
-      val serverWiring = ServerWiring.make(ConfigFactory.parseString("auth-config.resource = csw-config-server"))
+      val serverWiring = ServerWiring.make(ConfigFactory.parseString("auth-config.`client-id` = csw-config-server"))
       serverWiring.svnRepo.initSvnRepo()
       serverWiring.httpService.registeredLazyBinding.await
       enterBarrier("config-server-started")
@@ -109,7 +109,7 @@ class ConfigCliAuthTest(ignore: Int)
       enterBarrier("keycloak started")
       enterBarrier("config-server-started")
 
-      val wiring = Wiring.noPrinting(ConfigFactory.parseString("auth-config.resource = csw-config-cli"))
+      val wiring = Wiring.noPrinting(ConfigFactory.parseString("auth-config.`client-id` = csw-config-cli"))
       val runner = wiring.commandLineRunner
 
       val stream = new ByteArrayInputStream(s"$adminUser\n$adminPassword".getBytes())
