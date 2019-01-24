@@ -2,7 +2,7 @@ package csw.aas.http
 
 import csw.aas.core.token.AccessToken
 import csw.aas.http.AuthorizationPolicy.PolicyExpression
-import csw.aas.http.AuthorizationPolicy.PolicyExpression.{And, Or, PolicyOperator}
+import csw.aas.http.AuthorizationPolicy.PolicyExpression.{And, ExpressionOperator, Or}
 
 import scala.concurrent.Future
 
@@ -18,12 +18,11 @@ sealed trait AuthorizationPolicy {
    * @return combined authorization policy
    */
   def &(authorizationPolicy: AuthorizationPolicy): AuthorizationPolicy = {
-    //todo: can't we copy 'this'? right now it's not immutable
     PolicyExpression(this, And, authorizationPolicy)
   }
 
   /**
-   * Applies a new authorization policy if the orevious policy fails.
+   * Applies a new authorization policy if the previous policy fails.
    * Authorization will succeed if any of the provided policy passes.
    * @param authorizationPolicy new Authorization policy
    * @return combined authorization policy
@@ -38,13 +37,19 @@ sealed trait AuthorizationPolicy {
  */
 object AuthorizationPolicy {
 
-  private[aas] final case class PolicyExpression(left: AuthorizationPolicy, operator: PolicyOperator, right: AuthorizationPolicy)
+  private[aas] final case class PolicyExpression(left: AuthorizationPolicy,
+                                                 operator: ExpressionOperator,
+                                                 right: AuthorizationPolicy)
       extends AuthorizationPolicy
 
   private[aas] object PolicyExpression {
-    trait PolicyOperator
-    case object Or  extends PolicyOperator
-    case object And extends PolicyOperator
+    trait ExpressionOperator
+    case object Or extends ExpressionOperator {
+      override def toString: String = "|"
+    }
+    case object And extends ExpressionOperator {
+      override def toString: String = "&"
+    }
   }
 
   /**
