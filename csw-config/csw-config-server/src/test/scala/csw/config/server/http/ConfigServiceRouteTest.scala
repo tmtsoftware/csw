@@ -20,6 +20,7 @@ import scala.collection.mutable.ArrayBuffer
 // DEOPSCSW-80: HTTP based access for configuration file
 // DEOPSCSW-576: Auth token for Configuration service
 // DEOPSCSW-69: Use authorization token to get identity of user creating/updating a configuration file
+// DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
 class ConfigServiceRouteTest
     extends FunSuite
     with ScalatestRouteTest
