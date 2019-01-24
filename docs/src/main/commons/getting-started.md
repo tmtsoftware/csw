@@ -31,7 +31,6 @@ Supported Operating Systems are: CentOS and MacOS
 
 1.  `cd`  to an empty folder.
 2.  Run the following command  `sbt new tmtsoftware/csw.g8`. This pulls the ‘csw’ template from GitHub.
-    If above command fails to pull template, then try running with full path `sbt new https://github.com/tmtsoftware/csw.g8`
 3.  Provide input details when prompted. Follow the template [readme.md](https://github.com/tmtsoftware/csw.g8/blob/master/README.md) for detailed information about input parameters.
 
 
