@@ -2,7 +2,6 @@ package csw.command.client.internal
 
 import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext}
 import akka.actor.typed.{ActorRef, Behavior}
-import com.github.benmanes.caffeine.cache.{Cache, Caffeine}
 import csw.command.client.Store
 import csw.command.client.messages.CommandResponseManagerMessage
 import csw.command.client.messages.CommandResponseManagerMessage._
@@ -11,8 +10,6 @@ import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse
 import csw.params.commands.CommandResponse.{QueryResponse, SubmitResponse}
 import csw.params.core.models.Id
-
-import scala.collection.JavaConverters.mapAsScalaMapConverter
 
 /**
  * The Behavior of a Command Response Manager is represented as a mutable behavior. This behavior will be created as an actor.
@@ -48,16 +45,10 @@ private[internal] class CommandResponseManagerBehavior(
 ) extends AbstractBehavior[CommandResponseManagerMessage] {
   private val log: Logger = loggerFactory.getLogger(ctx)
 
-  private val cmdToCmdResponse: Cache[Id, SubmitResponse] = Caffeine
-    .newBuilder()
-    .maximumSize(crmCacheProperties.maxSize)
-    .expireAfterWrite(crmCacheProperties.expiry)
-    .build()
-
-  private[command] var commandResponseState: CommandResponseState              = new CommandResponseState(cmdToCmdResponse)
-  private[command] var commandCoRelation: CommandCorrelation                   = CommandCorrelation(Map.empty, Map.empty)
-  private[command] var commandSubscribers: Store[Id, ActorRef[SubmitResponse]] = Store(Map.empty)
-  private[command] var querySubscribers: Store[Id, ActorRef[QueryResponse]]    = Store(Map.empty)
+  private val commandResponseState: CommandResponseState              = new CommandResponseState(crmCacheProperties)
+  private var commandCoRelation: CommandCorrelation                   = CommandCorrelation(Map.empty, Map.empty)
+  private var commandSubscribers: Store[Id, ActorRef[SubmitResponse]] = Store(Map.empty)
+  private var querySubscribers: Store[Id, ActorRef[QueryResponse]]    = Store(Map.empty)
 
   import CommandResponse._
 
@@ -72,9 +63,8 @@ private[internal] class CommandResponseManagerBehavior(
       case SubscriberTerminated(subscriber)       ⇒ commandSubscribers = commandSubscribers.remove(subscriber)
       case QuerySubscriberTerminated(subscriber)  ⇒ querySubscribers = querySubscribers.remove(subscriber)
       case GetCommandCorrelation(replyTo)         ⇒ replyTo ! commandCoRelation
-      case GetCommandResponseState(replyTo) ⇒
-        replyTo ! CommandResponseReadOnlyState(commandResponseState.cmdToCmdResponse.asMap().asScala.toMap)
-      case GetCommandSubscribersState(replyTo) ⇒ replyTo ! CommandSubscribersState(commandSubscribers)
+      case GetCommandResponseState(replyTo)       ⇒ replyTo ! commandResponseState
+      case GetCommandSubscribersState(replyTo)    ⇒ replyTo ! CommandSubscribersState(commandSubscribers)
     }
     this
   }

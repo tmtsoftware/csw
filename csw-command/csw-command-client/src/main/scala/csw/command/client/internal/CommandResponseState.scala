@@ -1,14 +1,22 @@
 package csw.command.client.internal
-import com.github.benmanes.caffeine.cache.Cache
+import com.github.benmanes.caffeine.cache.{Cache, Caffeine}
 import csw.params.commands.CommandResponse.{CommandNotAvailable, QueryResponse, SubmitResponse}
 import csw.params.core.models.Id
+
+import scala.collection.JavaConverters.mapAsScalaConcurrentMapConverter
 
 /**
  * Manages state of a given command identified by a RunId
  *
- * @param cmdToCmdResponse a cache having runIds mapped to their CommandState
+ * @param crmCacheProperties CRM cache properties
  */
-private[command] class CommandResponseState(private[command] val cmdToCmdResponse: Cache[Id, SubmitResponse]) {
+private[command] class CommandResponseState(crmCacheProperties: CRMCacheProperties) {
+
+  private val cmdToCmdResponse: Cache[Id, SubmitResponse] = Caffeine
+    .newBuilder()
+    .maximumSize(crmCacheProperties.maxSize)
+    .expireAfterWrite(crmCacheProperties.expiry)
+    .build()
 
   /**
    * Add the command with some initial response
@@ -39,6 +47,6 @@ private[command] class CommandResponseState(private[command] val cmdToCmdRespons
       case null ⇒
       case _    ⇒ cmdToCmdResponse.put(commandResponse.runId, commandResponse)
     }
-}
 
-private[command] case class CommandResponseReadOnlyState(cmdToCmdResponse: Map[Id, SubmitResponse])
+  def state: Map[Id, SubmitResponse] = cmdToCmdResponse.asMap().asScala.toMap
+}
