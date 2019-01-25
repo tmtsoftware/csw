@@ -41,4 +41,4 @@ private[command] class CommandResponseState(private[command] val cmdToCmdRespons
     }
 }
 
-case class CommandResponseReadOnlyState(cmdToCmdResponse: Map[Id, SubmitResponse])
+private[command] case class CommandResponseReadOnlyState(cmdToCmdResponse: Map[Id, SubmitResponse])

@@ -327,6 +327,44 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     commandResponseProbe.expectMessage(Completed(runId))
   }
 
+  test("should evict older command states from CRM") {
+    val behaviorTestKit      = createBehaviorTestKit()
+    val commandResponseProbe = TestProbe[QueryResponse]
+
+    val runId = Id()
+
+    behaviorTestKit.run(AddOrUpdateCommand(Started(runId)))
+
+    behaviorTestKit.run(Query(runId, commandResponseProbe.ref))
+    commandResponseProbe.expectMessage(Started(runId))
+
+    Thread.sleep(200)
+
+    //This query doesn't return a response since CommandResponseState's cache expiry is set to 200ms in test
+    behaviorTestKit.run(Query(runId, commandResponseProbe.ref))
+    commandResponseProbe.expectNoMessage()
+  }
+
+  test("should not store more than max command states in CRM") {
+    val behaviorTestKit      = createBehaviorTestKit()
+    val commandResponseProbe = TestProbe[QueryResponse]
+
+    val runId  = Id()
+    val runId2 = Id()
+
+    behaviorTestKit.run(AddOrUpdateCommand(Started(runId)))
+    behaviorTestKit.run(Query(runId, commandResponseProbe.ref))
+    commandResponseProbe.expectMessage(Started(runId))
+
+    behaviorTestKit.run(AddOrUpdateCommand(Started(runId2)))
+    behaviorTestKit.run(Query(runId2, commandResponseProbe.ref))
+    commandResponseProbe.expectMessage(Started(runId2))
+
+    // This query doesn't return a response, because the first command's state is pruned, as Max cache size is configured as 1 in test
+    behaviorTestKit.run(Query(runId, commandResponseProbe.ref))
+    commandResponseProbe.expectNoMessage()
+  }
+
   private def getMockedLogger: LoggerFactory = {
     val loggerFactory: LoggerFactory = mock[LoggerFactory]
     val logger: Logger               = mock[Logger]

@@ -1,8 +1,5 @@
 package csw.command.client.internal
 
-import java.time.Duration
-import java.util.concurrent.TimeUnit
-
 import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext}
 import akka.actor.typed.{ActorRef, Behavior}
 import com.github.benmanes.caffeine.cache.{Cache, Caffeine}
