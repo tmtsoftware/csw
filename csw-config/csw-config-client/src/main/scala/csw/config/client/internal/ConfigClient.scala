@@ -27,6 +27,7 @@ import scala.concurrent.Future
  *
  * @param configServiceResolver ConfigServiceResolver to get the uri of Configuration Service
  * @param actorRuntime ActorRuntime instance for actor system, execution context and dispatcher
+ * @param tokenFactory factory to get token which is required to access admin API
  */
 private[config] class ConfigClient(
     configServiceResolver: ConfigServiceResolver,
