@@ -2,7 +2,7 @@
 
 currentDir=$(pwd)
 keycloakDir=~
-keycloakVersion=4.6.0
+keycloakVersion=4.8.3
 keycloakBinaryUnzipped=keycloak-${keycloakVersion}.Final
 keycloakBinaryZipped=${keycloakBinaryUnzipped}.tar.gz
 script_name=$0
