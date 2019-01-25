@@ -1,10 +1,12 @@
 package csw.command.client.internal
 
 import java.time.Duration
+import java.util.concurrent.TimeUnit
 
 import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext}
 import akka.actor.typed.{ActorRef, Behavior}
 import com.github.benmanes.caffeine.cache.{Cache, Caffeine}
+import com.typesafe.config.ConfigFactory
 import csw.command.client.Store
 import csw.command.client.messages.CommandResponseManagerMessage
 import csw.command.client.messages.CommandResponseManagerMessage._
@@ -49,10 +51,14 @@ private[internal] class CommandResponseManagerBehavior(
 ) extends AbstractBehavior[CommandResponseManagerMessage] {
   private val log: Logger = loggerFactory.getLogger(ctx)
 
+  private val config  = ConfigFactory.load().getConfig("csw-command-client.command-response-state")
+  private val MaxSize = config.getInt("maximum-size")
+  private val Expiry  = config.getDuration("expiry")
+
   private val cmdToCmdResponse: Cache[Id, SubmitResponse] = Caffeine
     .newBuilder()
-    .maximumSize(10000)
-    .expireAfterAccess(Duration.ofMinutes(30))
+    .maximumSize(MaxSize)
+    .expireAfterWrite(Expiry)
     .build()
 
   private[command] var commandResponseState: CommandResponseState              = new CommandResponseState(cmdToCmdResponse)
