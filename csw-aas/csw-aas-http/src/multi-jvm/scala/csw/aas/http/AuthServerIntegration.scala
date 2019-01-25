@@ -34,7 +34,7 @@ class AuthIntegrationTest
   test("it should return 401 for unauthenticated request") {
 
     runOn(keycloak) {
-      val embeddedKeycloak = new EmbeddedKeycloak(KeycloakData.empty)
+      val embeddedKeycloak = new EmbeddedKeycloak(KeycloakData.empty, settings = Settings(version = "4.8.3"))
       val stopHandle       = Await.result(embeddedKeycloak.startServer(), serverTimeout)
       Await.result(new AuthServiceLocation(locationService).register(Settings.default.port), defaultTimeout)
       enterBarrier("keycloak started")
