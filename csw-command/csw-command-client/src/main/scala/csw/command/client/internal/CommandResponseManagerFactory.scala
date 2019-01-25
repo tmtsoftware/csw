@@ -18,6 +18,8 @@ class CommandResponseManagerFactory {
     new CommandResponseManager(commandResponseManagerActor)
 
   def makeBehavior(loggerFactory: LoggerFactory): Behavior[CommandResponseManagerMessage] =
-    Behaviors.setup[CommandResponseManagerMessage](ctx ⇒ new CommandResponseManagerBehavior(ctx, loggerFactory))
+    Behaviors.setup[CommandResponseManagerMessage](
+      ctx ⇒ new CommandResponseManagerBehavior(ctx, CRMCacheProperties(), loggerFactory)
+    )
 
 }

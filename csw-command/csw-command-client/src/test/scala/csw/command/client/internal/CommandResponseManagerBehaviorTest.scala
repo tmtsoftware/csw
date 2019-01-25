@@ -1,5 +1,7 @@
 package csw.command.client.internal
 
+import java.time.Duration
+
 import akka.actor
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
@@ -26,9 +28,10 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
   implicit val typedSystem: typed.ActorSystem[_] = actorSystem.toTyped
   implicit val testKitSettings: TestKitSettings  = TestKitSettings(typedSystem)
 
-  def createBehaviorTestKit(): BehaviorTestKit[CommandResponseManagerMessage] = BehaviorTestKit(
-    Behaviors.setup[CommandResponseManagerMessage](ctx ⇒ new CommandResponseManagerBehavior(ctx, getMockedLogger))
-  )
+  def createBehaviorTestKit(props: CRMCacheProperties = CRMCacheProperties()): BehaviorTestKit[CommandResponseManagerMessage] =
+    BehaviorTestKit(
+      Behaviors.setup[CommandResponseManagerMessage](ctx ⇒ new CommandResponseManagerBehavior(ctx, props, getMockedLogger))
+    )
 
   test("should be able to add command entry in Command Response Manager") {
     val behaviorTestKit         = createBehaviorTestKit()
@@ -328,7 +331,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
   }
 
   test("should evict older command states from CRM") {
-    val behaviorTestKit      = createBehaviorTestKit()
+    val behaviorTestKit      = createBehaviorTestKit(CRMCacheProperties().copy(expiry = Duration.ofMillis(100)))
     val commandResponseProbe = TestProbe[QueryResponse]
 
     val runId = Id()
@@ -346,7 +349,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
   }
 
   test("should not store more than max command states in CRM") {
-    val behaviorTestKit      = createBehaviorTestKit()
+    val behaviorTestKit      = createBehaviorTestKit(CRMCacheProperties().copy(maxSize = 1))
     val commandResponseProbe = TestProbe[QueryResponse]
 
     val runId  = Id()

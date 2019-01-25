@@ -3,7 +3,6 @@ package csw.command.client.internal
 import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext}
 import akka.actor.typed.{ActorRef, Behavior}
 import com.github.benmanes.caffeine.cache.{Cache, Caffeine}
-import com.typesafe.config.ConfigFactory
 import csw.command.client.Store
 import csw.command.client.messages.CommandResponseManagerMessage
 import csw.command.client.messages.CommandResponseManagerMessage._
@@ -44,18 +43,15 @@ import scala.collection.JavaConverters.mapAsScalaMapConverter
  */
 private[internal] class CommandResponseManagerBehavior(
     ctx: ActorContext[CommandResponseManagerMessage],
+    crmCacheProperties: CRMCacheProperties,
     loggerFactory: LoggerFactory
 ) extends AbstractBehavior[CommandResponseManagerMessage] {
   private val log: Logger = loggerFactory.getLogger(ctx)
 
-  private val config  = ConfigFactory.load().getConfig("csw-command-client.command-response-state")
-  private val MaxSize = config.getInt("maximum-size")
-  private val Expiry  = config.getDuration("expiry")
-
   private val cmdToCmdResponse: Cache[Id, SubmitResponse] = Caffeine
     .newBuilder()
-    .maximumSize(MaxSize)
-    .expireAfterWrite(Expiry)
+    .maximumSize(crmCacheProperties.maxSize)
+    .expireAfterWrite(crmCacheProperties.expiry)
     .build()
 
   private[command] var commandResponseState: CommandResponseState              = new CommandResponseState(cmdToCmdResponse)
