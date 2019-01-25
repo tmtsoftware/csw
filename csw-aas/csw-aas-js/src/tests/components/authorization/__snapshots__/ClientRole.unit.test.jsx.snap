@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ClientRole /> should not render ClientRole if authentication is false  1`] = `
+<div
+  className="error"
+>
+  Authentication unsuccessful
+</div>
+`;
+
+exports[`<ClientRole /> should not render ClientRole if authentication is true but invalid Client role 1`] = `
+<div
+  className="error"
+>
+  Authentication unsuccessful
+</div>
+`;
+
+exports[`<ClientRole /> should render ClientRole if authentication is true and with valid Client role 1`] = `
+<div
+  className="client-role"
+>
+  Authentication successful
+</div>
+`;
+
+exports[`<ClientRole /> should render nothing if authentication is false and error component is not provided 1`] = `null`;

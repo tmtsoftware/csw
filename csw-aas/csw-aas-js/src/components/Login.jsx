@@ -10,7 +10,7 @@ export class Login extends React.Component {
     return (
       <button
         onClick={async () => {
-          //Call to this.props.login method is responsible for resolving and instantiating AAS server
+          // Call to this.props.login method is responsible for resolving and instantiating AAS server
           await this.props.login()
         }}>
         Login
@@ -20,7 +20,7 @@ export class Login extends React.Component {
 }
 
 Login.propTypes = {
-  //WithContext utility provides login method as a prop.
+  // WithContext utility provides login method as a prop.
   login: PropTypes.func,
 }
 

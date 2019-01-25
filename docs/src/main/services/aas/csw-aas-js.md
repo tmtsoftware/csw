@@ -47,7 +47,7 @@ csw-aas-js exposes following react components:
  - [Logout](#logout)
  - [CheckLogin](#checklogin)
  - [RealmRole](#realmrole)
- - [ResourceRole](#resourcerole)
+ - [ClientRole](#clientrole)
 
 ## TMTAuthContextProvider
 
@@ -81,7 +81,7 @@ Javascript
 ## Login
 
 Login component instantiate AAS server with configurations provided. It redirects to AAS server login page for user to login.
-After login tmtAuth in context is updated with appropriate values e.g. token, realm & resource roles etc.
+After login tmtAuth in context is updated with appropriate values e.g. token, realm & client roles etc.
 
 Javascript
 :   @@snip [Login.jsx](../../../../../csw-aas/csw-aas-js/example/src/components/NavComponent.jsx) { #login-component-usage }
@@ -129,17 +129,17 @@ Javascript
 
 * @github[RealmRole Component](/csw-aas/csw-aas-js/src/components/authorization/RealmRole.jsx)
 
-## ResourceRole
+## ClientRole
 
-ResourceRole components provides ability to show something only if user is logged in and has specified resource role for 
-specified resource. In the following code snippet div is shown only if user is logged in and has resource role specified 
-in resourceRole prop for resource specified in resource prop.
+ClientRole components provides ability to show something only if user is logged in and has specified client role for 
+specified client. In the following code snippet div is shown only if user is logged in and has client role specified 
+in clientRole prop for client specified in client prop.
 Behaviour is user is not logged in can be optionally defined by html element or react component and that can be passed to error prop
 e.g - ExampleError Component in following snippet.
 
 Javascript
-:   @@snip [ResourceRole.jsx](../../../../../csw-aas/csw-aas-js/example/src/components/ExampleApp.jsx) { #resourceRole-component-usage }
+:   @@snip [ClientRole.jsx](../../../../../csw-aas/csw-aas-js/example/src/components/ExampleApp.jsx) { #clientRole-component-usage }
 
-### Source code for RealmRole component
+### Source code for ClientRole component
 
-* @github[RealmRole Component](/csw-aas/csw-aas-js/src/components/authorization/RealmRole.jsx)
+* @github[ClientRole Component](/csw-aas/csw-aas-js/src/components/authorization/ClientRole.jsx)

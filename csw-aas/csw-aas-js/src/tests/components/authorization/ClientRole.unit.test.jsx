@@ -5,15 +5,15 @@ import renderer from 'react-test-renderer'
 
 // DEOPSCSW-630 - Javascript adapter for AAS
 // DEOPSCSW-636 - JS adapter support  for Authorization
-describe('<ResourceRole />', () => {
+describe('<ClientRole />', () => {
   Enzyme.configure({ adapter: new Adapter() })
 
   beforeEach(() => {
     jest.resetModules()
   })
 
-  it('should render children elements if authentication is true and with valid Resource role', () => {
-    const getResourceRoleWithMockContext = () => {
+  it('should render children elements if authentication is true and with valid Client role', () => {
+    const getClientRoleWithMockContext = () => {
       const mockContext = {
         tmtAuth: {
           hasResourceRole: jest.fn().mockImplementation(() => {
@@ -33,26 +33,26 @@ describe('<ResourceRole />', () => {
           }),
         }
       })
-      return require('../../../components/authorization/ResourceRole').default
+      return require('../../../components/authorization/ClientRole').default
     }
 
-    const ResourceRoleComponent = getResourceRoleWithMockContext()
+    const ClientRoleComponent = getClientRoleWithMockContext()
 
     const props = {
-      children: <div className='resource-role'>Authentication successful</div>,
+      children: <div className='client-role'>Authentication successful</div>,
       error: <div className='error'>Authentication unsuccessful</div>,
-      resourceRole: 'test-Resource-role',
-      resource: 'test-resource',
+      clientRole: 'test-client-role',
+      client: 'test-client',
     }
 
-    const wrapper = mount(<ResourceRoleComponent {...props} />)
+    const wrapper = mount(<ClientRoleComponent {...props} />)
 
-    expect(wrapper.find('div.resource-role').length).toBe(1)
+    expect(wrapper.find('div.client-role').length).toBe(1)
     expect(wrapper.find('div.error').length).toBe(0)
   })
 
-  it('should not render children elements if authentication is true but invalid Resource role', () => {
-    const getResourceRoleWithMockContext = () => {
+  it('should not render children elements if authentication is true but invalid Client role', () => {
+    const getClientRoleWithMockContext = () => {
       const mockContext = {
         tmtAuth: {
           hasResourceRole: jest.fn().mockImplementation(() => {
@@ -72,26 +72,26 @@ describe('<ResourceRole />', () => {
           }),
         }
       })
-      return require('../../../components/authorization/ResourceRole').default
+      return require('../../../components/authorization/ClientRole').default
     }
 
-    const ResourceRoleComponent = getResourceRoleWithMockContext()
+    const ClientRoleComponent = getClientRoleWithMockContext()
 
     const props = {
-      children: <div className='resource-role'>Authentication successful</div>,
+      children: <div className='client-role'>Authentication successful</div>,
       error: <div className='error'>Authentication unsuccessful</div>,
-      resourceRole: 'invalid-Resource-role',
-      resource: 'invalid-resource',
+      clientRole: 'invalid-client-role',
+      client: 'invalid-client',
     }
 
-    const wrapper = mount(<ResourceRoleComponent {...props} />)
+    const wrapper = mount(<ClientRoleComponent {...props} />)
 
-    expect(wrapper.find('div.resource-role').length).toBe(0)
+    expect(wrapper.find('div.client-role').length).toBe(0)
     expect(wrapper.find('div.error').length).toBe(1)
   })
 
   it('should not render children elements if authentication is false ', () => {
-    const getResourceRoleWithMockContext = () => {
+    const getClientRoleWithMockContext = () => {
       const mockContext = {
         tmtAuth: {
           hasResourceRole: jest.fn().mockImplementation(() => {
@@ -111,26 +111,26 @@ describe('<ResourceRole />', () => {
           }),
         }
       })
-      return require('../../../components/authorization/ResourceRole').default
+      return require('../../../components/authorization/ClientRole').default
     }
 
-    const ResourceRoleComponent = getResourceRoleWithMockContext()
+    const CLientRoleComponent = getClientRoleWithMockContext()
 
     const props = {
-      children: <div className='Resource-role'>Authentication successful</div>,
+      children: <div className='client-role'>Authentication successful</div>,
       error: <div className='error'>Authentication unsuccessful</div>,
-      resourceRole: 'invalid-Resource-role',
-      resource: 'invalid-resource',
+      clientRole: 'invalid-client-role',
+      client: 'invalid-client',
     }
 
-    const wrapper = mount(<ResourceRoleComponent {...props} />)
+    const wrapper = mount(<CLientRoleComponent {...props} />)
 
-    expect(wrapper.find('div.Resource-role').length).toBe(0)
+    expect(wrapper.find('div.client-role').length).toBe(0)
     expect(wrapper.find('div.error').length).toBe(1)
   })
 
-  it('should render ResourceRole if authentication is true and with valid Resource role', () => {
-    const getResourceRoleWithMockContext = () => {
+  it('should render ClientRole if authentication is true and with valid Client role', () => {
+    const getClientRoleWithMockContext = () => {
       const mockContext = {
         tmtAuth: {
           hasResourceRole: jest.fn().mockImplementation(() => {
@@ -150,26 +150,26 @@ describe('<ResourceRole />', () => {
           }),
         }
       })
-      return require('../../../components/authorization/ResourceRole').default
+      return require('../../../components/authorization/ClientRole').default
     }
 
-    const ResourceRoleComponent = getResourceRoleWithMockContext()
+    const ClientRoleComponent = getClientRoleWithMockContext()
 
     const props = {
-      children: <div className='resource-role'>Authentication successful</div>,
+      children: <div className='client-role'>Authentication successful</div>,
       error: <div className='error'>Authentication unsuccessful</div>,
-      resourceRole: 'test-Resource-role',
-      resource: 'test-resource',
+      clientRole: 'test-client-role',
+      client: 'test-client',
     }
 
     const component = renderer
-      .create(<ResourceRoleComponent {...props} />)
+      .create(<ClientRoleComponent {...props} />)
       .toJSON()
     expect(component).toMatchSnapshot()
   })
 
-  it('should not render ResourceRole if authentication is true but invalid Resource role', () => {
-    const getResourceRoleWithMockContext = () => {
+  it('should not render ClientRole if authentication is true but invalid Client role', () => {
+    const getClientRoleWithMockContext = () => {
       const mockContext = {
         tmtAuth: {
           hasResourceRole: jest.fn().mockImplementation(() => {
@@ -189,26 +189,26 @@ describe('<ResourceRole />', () => {
           }),
         }
       })
-      return require('../../../components/authorization/ResourceRole').default
+      return require('../../../components/authorization/ClientRole').default
     }
 
-    const ResourceRoleComponent = getResourceRoleWithMockContext()
+    const ClientRoleComponent = getClientRoleWithMockContext()
 
     const props = {
-      children: <div className='resource-role'>Authentication successful</div>,
+      children: <div className='client-role'>Authentication successful</div>,
       error: <div className='error'>Authentication unsuccessful</div>,
-      resourceRole: 'invalid-Resource-role',
-      resource: 'invalid-resource',
+      clientRole: 'invalid-client-role',
+      client: 'invalid-client',
     }
 
     const component = renderer
-      .create(<ResourceRoleComponent {...props} />)
+      .create(<ClientRoleComponent {...props} />)
       .toJSON()
     expect(component).toMatchSnapshot()
   })
 
-  it('should not render ResourceRole if authentication is false ', () => {
-    const getResourceRoleWithMockContext = () => {
+  it('should not render ClientRole if authentication is false ', () => {
+    const getCleintRoleWithMockContext = () => {
       const mockContext = {
         tmtAuth: {
           hasResourceRole: jest.fn().mockImplementation(() => {
@@ -228,26 +228,26 @@ describe('<ResourceRole />', () => {
           }),
         }
       })
-      return require('../../../components/authorization/ResourceRole').default
+      return require('../../../components/authorization/ClientRole').default
     }
 
-    const ResourceRoleComponent = getResourceRoleWithMockContext()
+    const ClientRoleComponent = getCleintRoleWithMockContext()
 
     const props = {
-      children: <div className='Resource-role'>Authentication successful</div>,
+      children: <div className='client-role'>Authentication successful</div>,
       error: <div className='error'>Authentication unsuccessful</div>,
-      resourceRole: 'invalid-Resource-role',
-      resource: 'invalid-resource',
+      clientRole: 'invalid-client-role',
+      client: 'invalid-client',
     }
 
     const component = renderer
-      .create(<ResourceRoleComponent {...props} />)
+      .create(<ClientRoleComponent {...props} />)
       .toJSON()
     expect(component).toMatchSnapshot()
   })
 
   it('should render nothing if authentication is false and error component is not provided', () => {
-    const getResourceRoleWithMockContext = () => {
+    const getClientRoleWithMockContext = () => {
       const mockContext = {
         tmtAuth: {
           hasResourceRole: jest.fn().mockImplementation(() => {
@@ -267,19 +267,19 @@ describe('<ResourceRole />', () => {
           }),
         }
       })
-      return require('../../../components/authorization/ResourceRole').default
+      return require('../../../components/authorization/ClientRole').default
     }
 
-    const ResourceRoleComponent = getResourceRoleWithMockContext()
+    const ClientRoleComponent = getClientRoleWithMockContext()
 
     const props = {
-      children: <div className='Resource-role'>Authentication successful</div>,
-      resourceRole: 'invalid-Resource-role',
-      resource: 'invalid-resource',
+      children: <div className='client-role'>Authentication successful</div>,
+      clientRole: 'invalid-client-role',
+      client: 'invalid-client',
     }
 
     const component = renderer
-      .create(<ResourceRoleComponent {...props} />)
+      .create(<ClientRoleComponent {...props} />)
       .toJSON()
     expect(component).toMatchSnapshot()
   })

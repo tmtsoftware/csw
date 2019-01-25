@@ -1,6 +1,6 @@
 import React from 'react'
 import {BrowserRouter} from 'react-router-dom'
-import {ResourceRole, TMTAuthContextProvider} from 'csw-aas-js'
+import {ClientRole, TMTAuthContextProvider} from 'csw-aas-js'
 import NavComponent from './NavComponent'
 import {AppConfig} from '../config/AppConfig'
 import WriteConfig from './CreateConfig'
@@ -19,12 +19,12 @@ const ConfigApp = () => {
         </BrowserRouter>
         <ListConfig />
         <GetConfig />
-        <ResourceRole
-          resourceRole='admin'
-          resource='csw-config-server'
+        <ClientRole
+          clientRole='admin'
+          client='csw-config-server'
           error={<ConfigError />}>
           <WriteConfig />
-        </ResourceRole>
+        </ClientRole>
       </TMTAuthContextProvider>
     </div>
   )

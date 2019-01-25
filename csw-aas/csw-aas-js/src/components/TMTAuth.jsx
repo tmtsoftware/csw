@@ -47,7 +47,7 @@ class TMTAuthStore {
       keycloak
         .updateToken(0)
         .success(function() {
-          //todo: remove console.info
+          // todo: remove console.info
           console.info('token refreshed successfully')
         })
         .error(function() {

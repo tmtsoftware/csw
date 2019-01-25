@@ -2,7 +2,7 @@ import Logout from './components/Logout'
 import Login from './components/Login'
 import CheckLogin from './components/authentication/CheckLogin'
 import RealmRole from './components/authorization/RealmRole'
-import ResourceRole from './components/authorization/ResourceRole'
+import ClientRole from './components/authorization/ClientRole'
 import TMTAuthContextProvider from './components/context/TMTAuthContextProvider'
 import { Consumer } from './components/context/TMTAuthContext'
 
@@ -12,7 +12,7 @@ export {
   Login,
   CheckLogin,
   RealmRole,
-  ResourceRole,
+  ClientRole,
   TMTAuthContextProvider,
   Consumer,
 }

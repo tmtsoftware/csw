@@ -1,7 +1,7 @@
 import React from 'react'
 import { BrowserRouter, Route } from 'react-router-dom'
 // #import-components-example
-import { CheckLogin, RealmRole, ResourceRole, TMTAuthContextProvider } from 'csw-aas-js'
+import { CheckLogin, RealmRole, ClientRole, TMTAuthContextProvider } from 'csw-aas-js'
 // #import-components-example
 import NavComponent from './NavComponent'
 import { AppConfig } from '../config/AppConfig'
@@ -49,14 +49,14 @@ class ExampleApp extends React.Component {
             // #realmRole-component-usage
             }
             {
-            // #resourceRole-component-usage
-              <ResourceRole
-                resourceRole='person-role'
-                resource='example-server'
+            // #clientRole-component-usage
+              <ClientRole
+                clientRole='person-role'
+                client='example-server'
                 error={<ExampleError />}>
                 <div>Person role specific functionality</div>
-              </ResourceRole>
-            // #resourceRole-component-usage
+              </ClientRole>
+            // #clientRole-component-usage
             }
 
           </TMTAuthContextProvider>
