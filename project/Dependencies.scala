@@ -171,6 +171,7 @@ object Dependencies {
       Libs.`scala-async`,
       Akka.`akka-actor-typed`,
       Chill.`chill-akka`,
+      Libs.`caffeine`,
       Akka.`akka-actor-testkit-typed` % Test,
       Akka.`akka-stream-testkit`      % Test,
       Libs.`scalatest`.value          % Test,

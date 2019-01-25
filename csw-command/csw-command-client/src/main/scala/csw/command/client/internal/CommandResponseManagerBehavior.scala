@@ -1,7 +1,10 @@
 package csw.command.client.internal
 
+import java.time.Duration
+
 import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext}
 import akka.actor.typed.{ActorRef, Behavior}
+import com.github.benmanes.caffeine.cache.{Cache, Caffeine}
 import csw.command.client.Store
 import csw.command.client.messages.CommandResponseManagerMessage
 import csw.command.client.messages.CommandResponseManagerMessage._
@@ -10,6 +13,8 @@ import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse
 import csw.params.commands.CommandResponse.{QueryResponse, SubmitResponse}
 import csw.params.core.models.Id
+
+import scala.collection.JavaConverters.mapAsScalaMapConverter
 
 /**
  * The Behavior of a Command Response Manager is represented as a mutable behavior. This behavior will be created as an actor.
@@ -44,7 +49,13 @@ private[internal] class CommandResponseManagerBehavior(
 ) extends AbstractBehavior[CommandResponseManagerMessage] {
   private val log: Logger = loggerFactory.getLogger(ctx)
 
-  private[command] var commandResponseState: CommandResponseState              = CommandResponseState(Map.empty)
+  private val cmdToCmdResponse: Cache[Id, SubmitResponse] = Caffeine
+    .newBuilder()
+    .maximumSize(10000)
+    .expireAfterAccess(Duration.ofMinutes(30))
+    .build()
+
+  private[command] var commandResponseState: CommandResponseState              = new CommandResponseState(cmdToCmdResponse)
   private[command] var commandCoRelation: CommandCorrelation                   = CommandCorrelation(Map.empty, Map.empty)
   private[command] var commandSubscribers: Store[Id, ActorRef[SubmitResponse]] = Store(Map.empty)
   private[command] var querySubscribers: Store[Id, ActorRef[QueryResponse]]    = Store(Map.empty)
@@ -62,8 +73,9 @@ private[internal] class CommandResponseManagerBehavior(
       case SubscriberTerminated(subscriber)       ⇒ commandSubscribers = commandSubscribers.remove(subscriber)
       case QuerySubscriberTerminated(subscriber)  ⇒ querySubscribers = querySubscribers.remove(subscriber)
       case GetCommandCorrelation(replyTo)         ⇒ replyTo ! commandCoRelation
-      case GetCommandResponseState(replyTo)       ⇒ replyTo ! commandResponseState
-      case GetCommandSubscribersState(replyTo)    ⇒ replyTo ! CommandSubscribersState(commandSubscribers)
+      case GetCommandResponseState(replyTo) ⇒
+        replyTo ! CommandResponseReadOnlyState(commandResponseState.cmdToCmdResponse.asMap().asScala.toMap)
+      case GetCommandSubscribersState(replyTo) ⇒ replyTo ! CommandSubscribersState(commandSubscribers)
     }
     this
   }
@@ -72,7 +84,7 @@ private[internal] class CommandResponseManagerBehavior(
   private def addOrUpdateCommand(commandResponse: SubmitResponse): Unit =
     commandResponseState.get(commandResponse.runId) match {
       case _: CommandNotAvailable ⇒
-        commandResponseState = commandResponseState.add(commandResponse.runId, commandResponse)
+        commandResponseState.add(commandResponse.runId, commandResponse)
         querySubscribers.get(commandResponse.runId).foreach(_ ! commandResponse)
       case _ ⇒ updateCommand(commandResponse.runId, commandResponse)
     }
@@ -82,7 +94,7 @@ private[internal] class CommandResponseManagerBehavior(
     // Also makes sure that once it is final, it is final and can't be set back to Started
     // Also fixes a potential race condition where someone sets to final status before return from onSubmit returning Started
     if (isIntermediate(currentResponse) && isFinal(updateResponse)) {
-      commandResponseState = commandResponseState.updateCommandStatus(updateResponse)
+      commandResponseState.updateCommandStatus(updateResponse)
       doPublish(updateResponse, commandSubscribers.get(updateResponse.runId))
     }
   }

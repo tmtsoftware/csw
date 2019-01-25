@@ -153,7 +153,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     val behaviorTestKit           = createBehaviorTestKit()
     val commandResponseProbe1     = TestProbe[SubmitResponse]
     val commandResponseProbe2     = TestProbe[SubmitResponse]
-    val commandResponseStateProbe = TestProbe[CommandResponseState]
+    val commandResponseStateProbe = TestProbe[CommandResponseReadOnlyState]
 
     val runId = Id()
 
@@ -164,8 +164,8 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     behaviorTestKit.run(AddOrUpdateCommand(Completed(runId)))
 
     behaviorTestKit.run(GetCommandResponseState(commandResponseStateProbe.ref))
-    val commandResponseState = commandResponseStateProbe.expectMessageType[CommandResponseState]
-    commandResponseState.get(runId) shouldBe Completed(runId)
+    val commandResponseState = commandResponseStateProbe.expectMessageType[CommandResponseReadOnlyState]
+    commandResponseState.cmdToCmdResponse.get(runId) shouldBe Some(Completed(runId))
 
     commandResponseProbe1.expectMessage(Completed(runId))
     commandResponseProbe2.expectMessage(Completed(runId))
@@ -306,7 +306,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
   test("should be able subscribe before submitting command and gets added to CRM ") {
     val behaviorTestKit              = createBehaviorTestKit()
     val commandResponseProbe         = TestProbe[SubmitResponse]
-    val commandResponseStateProbe    = TestProbe[CommandResponseState]
+    val commandResponseStateProbe    = TestProbe[CommandResponseReadOnlyState]
     val commandSubscribersStateProbe = TestProbe[CommandSubscribersState]
 
     val runId = Id()
@@ -321,8 +321,8 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     behaviorTestKit.run(AddOrUpdateCommand(Completed(runId)))
 
     behaviorTestKit.run(GetCommandResponseState(commandResponseStateProbe.ref))
-    val commandResponseState = commandResponseStateProbe.expectMessageType[CommandResponseState]
-    commandResponseState.get(runId) shouldBe Completed(runId)
+    val commandResponseState = commandResponseStateProbe.expectMessageType[CommandResponseReadOnlyState]
+    commandResponseState.cmdToCmdResponse.get(runId) shouldBe Some(Completed(runId))
 
     commandResponseProbe.expectMessage(Completed(runId))
   }

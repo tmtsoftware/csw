@@ -7,7 +7,7 @@ import akka.http.scaladsl.server.directives.Credentials.Provided
 import akka.http.scaladsl.server.{Directives, Route}
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import csw.aas.core.token.AccessToken
-import csw.aas.http.AuthorizationPolicy.{CustomPolicy, CustomPolicyAsync}
+import csw.aas.http.AuthorizationPolicy.CustomPolicyAsync
 import org.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 

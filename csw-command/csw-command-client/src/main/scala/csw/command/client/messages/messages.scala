@@ -2,7 +2,12 @@ package csw.command.client.messages
 
 import acyclic.skipped
 import akka.actor.typed.ActorRef
-import csw.command.client.internal.{CommandCorrelation, CommandResponseState, CommandSubscribersState}
+import csw.command.client.internal.{
+  CommandCorrelation,
+  CommandResponseReadOnlyState,
+  CommandResponseState,
+  CommandSubscribersState
+}
 import csw.command.client.models.framework.PubSub.SubscriberMessage
 import csw.command.client.models.framework._
 import csw.location.api.models.TrackingEvent
@@ -261,14 +266,14 @@ private[csw] object FromSupervisorMessage {
 
 sealed trait CommandResponseManagerMessage
 object CommandResponseManagerMessage {
-  case class AddOrUpdateCommand(commandResponse: SubmitResponse)                    extends CommandResponseManagerMessage
-  case class AddSubCommand(runId: Id, subCommandId: Id)                             extends CommandResponseManagerMessage
-  case class UpdateSubCommand(commandResponse: SubmitResponse)                      extends CommandResponseManagerMessage
-  case class GetCommandCorrelation(replyTo: ActorRef[CommandCorrelation])           extends CommandResponseManagerMessage
-  case class GetCommandResponseState(replyTo: ActorRef[CommandResponseState])       extends CommandResponseManagerMessage
-  case class SubscriberTerminated(terminated: ActorRef[SubmitResponse])             extends CommandResponseManagerMessage
-  case class QuerySubscriberTerminated(terminated: ActorRef[QueryResponse])         extends CommandResponseManagerMessage
-  case class GetCommandSubscribersState(replyTo: ActorRef[CommandSubscribersState]) extends CommandResponseManagerMessage
+  case class AddOrUpdateCommand(commandResponse: SubmitResponse)                      extends CommandResponseManagerMessage
+  case class AddSubCommand(runId: Id, subCommandId: Id)                               extends CommandResponseManagerMessage
+  case class UpdateSubCommand(commandResponse: SubmitResponse)                        extends CommandResponseManagerMessage
+  case class GetCommandCorrelation(replyTo: ActorRef[CommandCorrelation])             extends CommandResponseManagerMessage
+  case class GetCommandResponseState(replyTo: ActorRef[CommandResponseReadOnlyState]) extends CommandResponseManagerMessage
+  case class SubscriberTerminated(terminated: ActorRef[SubmitResponse])               extends CommandResponseManagerMessage
+  case class QuerySubscriberTerminated(terminated: ActorRef[QueryResponse])           extends CommandResponseManagerMessage
+  case class GetCommandSubscribersState(replyTo: ActorRef[CommandSubscribersState])   extends CommandResponseManagerMessage
 
   /**
    * Represents a message to query the command status of a command running on some component
