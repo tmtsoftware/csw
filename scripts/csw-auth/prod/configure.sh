@@ -36,7 +36,12 @@ function checkIfKeycloakIsInstalled {
     else
       echo "Installing $keycloakBinaryUnzipped"
       test -d ${keycloakDir} || mkdir -p ${keycloakDir}
-      curl https://downloads.jboss.org/keycloak/${keycloakVersion}.Final/${keycloakBinaryUnzipped}.tar.gz --output ${keycloakDir}/${keycloakBinaryZipped}
+      curl https://downloads.jboss.org/keycloak/${keycloakVersion}.Final/${keycloakBinaryUnzipped}.tar.gz --output ${keycloakDir}/${keycloakBinaryZipped}.incomplete
+      if [[ $? != 0 ]]; then
+         echo "[ERROR] Failed to download keycloak"
+         exit 1
+      fi
+      mv ${keycloakDir}/${keycloakBinaryZipped}.incomplete ${keycloakDir}/${keycloakBinaryZipped}
       cd ${keycloakDir}
       unzipTar
     fi
