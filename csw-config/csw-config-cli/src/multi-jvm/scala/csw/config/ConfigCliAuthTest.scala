@@ -61,7 +61,7 @@ class ConfigCliAuthTest(ignore: Int)
         "bearer-only",
         passwordGrantEnabled = false,
         authorizationEnabled = true,
-        resourceRoles = Set(configAdmin)
+        clientRoles = Set(configAdmin)
       )
 
       val `csw-config-cli` = Client("csw-config-cli", "public", passwordGrantEnabled = false, authorizationEnabled = false)
@@ -76,7 +76,7 @@ class ConfigCliAuthTest(ignore: Int)
                 ApplicationUser(
                   adminUser,
                   adminPassword,
-                  resourceRoles = Set(ResourceRole(`csw-config-server`.name, configAdmin))
+                  clientRoles = Set(ClientRole(`csw-config-server`.name, configAdmin))
                 )
               )
             )
