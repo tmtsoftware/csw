@@ -32,9 +32,9 @@ private[command] class CommandResponseState(crmCacheProperties: CRMCacheProperti
    * @param runId command identifier
    * @return current command response
    */
-  def get(runId: Id): QueryResponse = cmdToCmdResponse.getIfPresent(runId) match {
-    case null        => CommandNotAvailable(runId)
-    case cmdResponse => cmdResponse
+  def get(runId: Id): QueryResponse = cachedResponse(runId) match {
+    case Some(cmdResponse) => cmdResponse
+    case None              => CommandNotAvailable(runId)
   }
 
   /**
@@ -43,10 +43,12 @@ private[command] class CommandResponseState(crmCacheProperties: CRMCacheProperti
    * @param commandResponse the command response to be updated for this command
    */
   def updateCommandStatus(commandResponse: SubmitResponse): Unit =
-    cmdToCmdResponse.getIfPresent(commandResponse.runId) match {
-      case null ⇒
-      case _    ⇒ cmdToCmdResponse.put(commandResponse.runId, commandResponse)
+    cachedResponse(commandResponse.runId) match {
+      case Some(_) ⇒ cmdToCmdResponse.put(commandResponse.runId, commandResponse)
+      case None    ⇒
     }
 
-  def state: Map[Id, SubmitResponse] = cmdToCmdResponse.asMap().asScala.toMap
+  def asMap: Map[Id, SubmitResponse] = cmdToCmdResponse.asMap().asScala.toMap
+
+  private def cachedResponse(id: Id) = Option(cmdToCmdResponse.getIfPresent(id))
 }

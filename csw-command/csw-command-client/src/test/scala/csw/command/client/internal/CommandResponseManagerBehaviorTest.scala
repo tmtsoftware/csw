@@ -168,7 +168,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
     behaviorTestKit.run(GetCommandResponseState(commandResponseStateProbe.ref))
     val commandResponseState = commandResponseStateProbe.expectMessageType[CommandResponseState]
-    commandResponseState.state.get(runId) shouldBe Some(Completed(runId))
+    commandResponseState.asMap.get(runId) shouldBe Some(Completed(runId))
 
     commandResponseProbe1.expectMessage(Completed(runId))
     commandResponseProbe2.expectMessage(Completed(runId))
@@ -325,7 +325,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
     behaviorTestKit.run(GetCommandResponseState(commandResponseStateProbe.ref))
     val commandResponseState = commandResponseStateProbe.expectMessageType[CommandResponseState]
-    commandResponseState.state.get(runId) shouldBe Some(Completed(runId))
+    commandResponseState.asMap.get(runId) shouldBe Some(Completed(runId))
 
     commandResponseProbe.expectMessage(Completed(runId))
   }
