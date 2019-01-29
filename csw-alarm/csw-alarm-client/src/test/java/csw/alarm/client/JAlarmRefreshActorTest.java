@@ -5,9 +5,10 @@ import akka.actor.ActorSystem;
 import akka.actor.testkit.typed.javadsl.TestProbe;
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.Adapter;
+import csw.alarm.api.models.AutoRefreshSeverityMessage;
 import csw.alarm.api.models.Key.AlarmKey;
-import csw.alarm.client.AutoRefreshSeverityMessage.AutoRefreshSeverity;
-import csw.alarm.client.AutoRefreshSeverityMessage.CancelAutoRefresh;
+import csw.alarm.api.models.AutoRefreshSeverityMessage.AutoRefreshSeverity;
+import csw.alarm.api.models.AutoRefreshSeverityMessage.CancelAutoRefresh;
 import org.junit.Test;
 import org.scalatest.junit.JUnitSuite;
 

@@ -10,13 +10,13 @@ import csw.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.alarm.api.models.AlarmHealth
 import csw.alarm.api.models.AlarmHealth.{Bad, Good, Ill}
 import csw.alarm.api.models.AlarmSeverity._
+import csw.alarm.api.models.AutoRefreshSeverityMessage.CancelAutoRefresh
 import csw.alarm.api.models.FullAlarmSeverity.Disconnected
 import csw.alarm.api.models.Key.{AlarmKey, GlobalKey}
 import csw.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
 import csw.alarm.cli.args.Options
 import csw.alarm.cli.utils.IterableExtensions.RichStringIterable
 import csw.alarm.cli.utils.TestFutureExt.RichFuture
-import csw.alarm.client.AutoRefreshSeverityMessage.CancelAutoRefresh
 import csw.commons.tags.FileSystemSensitive
 import csw.config.api.models.ConfigData
 import csw.config.client.scaladsl.ConfigClientFactory

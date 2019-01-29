@@ -5,9 +5,9 @@ import akka.actor.testkit.typed.scaladsl.{ManualTime, ScalaTestWithActorTestKit,
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem}
 import csw.alarm.api.models.AlarmSeverity.Major
+import csw.alarm.api.models.AutoRefreshSeverityMessage
+import csw.alarm.api.models.AutoRefreshSeverityMessage.{AutoRefreshSeverity, CancelAutoRefresh, SetSeverity}
 import csw.alarm.api.models.Key.AlarmKey
-import csw.alarm.client.AutoRefreshSeverityMessage
-import csw.alarm.client.AutoRefreshSeverityMessage.{AutoRefreshSeverity, CancelAutoRefresh, SetSeverity}
 import csw.params.core.models.Subsystem.NFIRAOS
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers}

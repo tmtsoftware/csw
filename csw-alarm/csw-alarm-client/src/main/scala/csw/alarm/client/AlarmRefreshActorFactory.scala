@@ -10,7 +10,7 @@ import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.alarm.api.javadsl.IAlarmService
-import csw.alarm.api.models.AlarmSeverity
+import csw.alarm.api.models.{AlarmSeverity, AutoRefreshSeverityMessage}
 import csw.alarm.api.models.Key.AlarmKey
 import csw.alarm.api.scaladsl.AlarmService
 import csw.alarm.client.internal.auto_refresh.AlarmRefreshActor
