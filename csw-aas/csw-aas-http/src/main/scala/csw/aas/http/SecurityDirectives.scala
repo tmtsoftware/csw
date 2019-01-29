@@ -135,7 +135,7 @@ object SecurityDirectives {
    * Expects auth-server-url to be present in config.
    * @return
    */
-  def apply(implicit ec: ExecutionContext): SecurityDirectives = from(AuthConfig.create())
+  def apply()(implicit ec: ExecutionContext): SecurityDirectives = from(AuthConfig.create())
 
   /**
    * Creates instance of [[csw.aas.http.SecurityDirectives]] using configurations
