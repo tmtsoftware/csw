@@ -387,8 +387,12 @@ object Dependencies {
 
   val Examples = Def.setting(
     Seq(
+      Akka.`akka-actor`,
       AkkaHttp.`akka-http`,
       AkkaHttp.`akka-http-cors`,
+      "com.lihaoyi"          %% "requests" % "0.1.4",
+      "org.backuity.clist"   %% "clist-core" % "3.4.0",
+      "org.backuity.clist"   %% "clist-macros" % "3.4.0" % "provided",
       Libs.`scalatest`.value % Test,
       Libs.`junit`           % Test,
       Libs.`junit-interface` % Test
