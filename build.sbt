@@ -60,7 +60,7 @@ lazy val githubReleases: Seq[ProjectReference] = Seq(
 /* ================= Root Project ============== */
 lazy val `csw` = project
   .in(file("."))
-  .enablePlugins(NoPublish, UnidocSite, GithubPublishDocs, GitBranchPrompt, GithubRelease, GithubReleaseWithCoursier)
+  .enablePlugins(NoPublish, UnidocSite, GithubPublishDocs, GitBranchPrompt, GithubRelease)
   .disablePlugins(BintrayPlugin)
   .aggregate(aggregatedProjects: _*)
   .settings(Settings.mergeSiteWith(docs))
