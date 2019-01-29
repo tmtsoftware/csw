@@ -16,7 +16,7 @@ import csw.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
 import csw.alarm.cli.args.Options
 import csw.alarm.cli.utils.IterableExtensions.RichStringIterable
 import csw.alarm.cli.utils.TestFutureExt.RichFuture
-import csw.alarm.client.internal.auto_refresh.AutoRefreshSeverityMessage.CancelAutoRefresh
+import csw.alarm.client.AutoRefreshSeverityMessage.CancelAutoRefresh
 import csw.commons.tags.FileSystemSensitive
 import csw.config.api.models.ConfigData
 import csw.config.client.scaladsl.ConfigClientFactory

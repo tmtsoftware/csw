@@ -11,11 +11,10 @@ import csw.alarm.cli.args.Options
 import csw.alarm.cli.extensions.RichFutureExt.RichFuture
 import csw.alarm.cli.utils.Formatter
 import csw.alarm.cli.wiring.ActorRuntime
-import csw.alarm.client.AlarmServiceFactory
+import csw.alarm.client.AutoRefreshSeverityMessage.AutoRefreshSeverity
 import csw.alarm.client.internal.AlarmServiceImpl
-import csw.alarm.client.internal.auto_refresh.AutoRefreshSeverityMessage.AutoRefreshSeverity
-import csw.alarm.client.internal.auto_refresh.{AutoRefreshSeverityActorFactory, AutoRefreshSeverityMessage}
 import csw.alarm.client.internal.commons.Settings
+import csw.alarm.client.{AlarmRefreshActorFactory, AlarmServiceFactory, AutoRefreshSeverityMessage}
 import csw.config.client.commons.ConfigUtils
 import csw.location.api.scaladsl.LocationService
 
@@ -56,7 +55,7 @@ class CommandLineRunner(
           Done
         }
 
-    val refreshActor = new AutoRefreshSeverityActorFactory().make(refreshSeverity, refreshInterval)
+    val refreshActor = AlarmRefreshActorFactory.make(refreshSeverity, refreshInterval)
     refreshActor ! AutoRefreshSeverity(options.alarmKey, options.severity.get)
     refreshActor
   }
