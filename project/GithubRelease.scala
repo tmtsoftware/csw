@@ -8,7 +8,6 @@ import ohnosequences.sbt.SbtGithubReleasePlugin
 import sbt.Keys._
 import sbt.io.{IO, Path}
 import sbt.{AutoPlugin, Def, Plugins, ProjectReference, Setting, Task, taskKey, _}
-import sbtdynver.DynVerPlugin.autoImport._
 
 import scala.language.postfixOps
 import scala.sys.process._
@@ -30,9 +29,7 @@ object GithubRelease extends AutoPlugin {
     // this creates scoverage report zip file and required for GithubRelease task, it assumes that scoverage-report is already generated
     // and is available inside target folder (if it is not present, empty zip will be created)
     coverageReportZipKey := coverageReportZipTask.value,
-    testReportsKey := testReportsTask.value,
-    coursierBootstrapArchiveKey := zipCoursierArtifactsTask.value,
-    runCoursierBootstrapKey := coursierArtifactsGenTask.value
+    testReportsKey := testReportsTask.value
   )
 
   private def coverageReportZipTask = Def.task {
@@ -101,28 +98,21 @@ object GithubRelease extends AutoPlugin {
     appsZip
   }
 
-  private def getVersionForCoursierArtifacts: Def.Initialize[Task[String]] = Def.task {
-    dynverGitDescribeOutput.value
-      .map { output =>
-        if (output.commitSuffix.distance > 0) output.commitSuffix.sha
-        else if (output.ref.isTag) output.ref.dropV.value
-        else version.value
-      }
-      .getOrElse(version.value)
+  private def coursierArtifactsGenTask(projects: Seq[ProjectReference]): Def.Initialize[Task[Unit]] = Def.task {
+    projects
+      .map(p ⇒ publishLocal in p)
+      .join
+      .value
+    val dir = baseDirectory.value / "scripts"
+    s"sh $dir/csw-bootstrap.sh ${version.value} ${baseDirectory.value}" !
   }
 
-  private def coursierArtifactsGenTask: Def.Initialize[Task[Unit]] = Def.task {
-    val versionForCoursier = getVersionForCoursierArtifacts.value
-    val dir                = baseDirectory.value / "scripts"
-    s"sh $dir/csw-bootstrap.sh $versionForCoursier ${baseDirectory.value}" !
-  }
-
-  private def zipCoursierArtifactsTask: Def.Initialize[Task[File]] = Def.task {
+  private def zipCoursierArtifactsTask(projects: Seq[ProjectReference]): Def.Initialize[Task[File]] = Def.task {
     val ghrleaseDir  = target.value / "ghrelease"
-    val zipFileName  = s"csw-bootstrap-apps-${getVersionForCoursierArtifacts.value}"
+    val zipFileName  = s"csw-bootstrap-apps-${version.value}"
     lazy val appsZip = new File(ghrleaseDir, s"$zipFileName.zip")
 
-    coursierArtifactsGenTask.value
+    coursierArtifactsGenTask(projects).value
 
     val tuples = Path.allSubpaths(target.value / "coursier/stage")
     val mapping = tuples
@@ -140,7 +130,7 @@ object GithubRelease extends AutoPlugin {
       Seq(
         stageAndZipTask(projects).value,
         coverageReportZipKey.value,
-        zipCoursierArtifactsTask.value,
+        zipCoursierArtifactsTask(projects).value,
         testReportZip,
         testReportHtml
       )
