@@ -21,20 +21,16 @@ case class SampleComponent() extends Component[NoEmit] {
 case class MainComponent() extends Component[NoEmit] {
 
   override def render(get: Get): Node = {
-
-    val childrenProp: Node            = E.div(Text("Error"))
-    val error: JsComponentConstructor = Error(J("children", childrenProp))
-    val realmName                     = "realm"
-    val realmVal                      = "TMT"
-    val config                        = new Config()
-    config.realm = "TMT"
+    val config = new Config()
+    config.realm = "example"
     config.clientId = "example-app"
     val TMTProvider = TMTAuthContextProvider(J("config", JSON.parse(JSON.stringify(config))))
     E.div(
       TMTAuthContextProvider(
+        J("config", JSON.parse(JSON.stringify(config))),
         E.div(Text("************text*************")),
-        Component(SampleComponent)
-//        error
+        Component(SampleComponent),
+        Login()
       )
     )
   }
