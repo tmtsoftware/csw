@@ -24,13 +24,15 @@ case class MainComponent() extends Component[NoEmit] {
     val config = new Config()
     config.realm = "example"
     config.clientId = "example-app"
-    val TMTProvider = TMTAuthContextProvider(J("config", JSON.parse(JSON.stringify(config))))
     E.div(
       TMTAuthContextProvider(
         J("config", JSON.parse(JSON.stringify(config))),
         E.div(Text("************text*************")),
         Component(SampleComponent),
-        Login()
+        CheckLogin(
+          J("error", Login()),
+          E.div(Logout())
+        )
       )
     )
   }
@@ -51,3 +53,6 @@ object AAS extends js.Object {
 object Error                  extends JsComponent(AAS.Error)
 object TMTAuthContextProvider extends JsComponent(AAS.TMTAuthContextProvider)
 object Login                  extends JsComponent(AAS.Login)
+object Logout                 extends JsComponent(AAS.Logout)
+object CheckLogin             extends JsComponent(AAS.CheckLogin)
+object RealmRole              extends JsComponent(AAS.RealmRole)
