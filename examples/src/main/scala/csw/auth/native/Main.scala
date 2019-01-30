@@ -4,7 +4,6 @@ import akka.actor.ActorSystem
 import csw.aas.native.api.NativeAppAuthAdapter
 import csw.auth.native.commands._
 import csw.location.client.utils.LocationServerStatus
-import org.backuity.clist._
 
 // #main-app
 object Main extends App {
@@ -14,18 +13,10 @@ object Main extends App {
   implicit val actorSystem: ActorSystem = ActorSystem()
   val adapter: NativeAppAuthAdapter     = AdapterFactory.makeAdapter
 
-  val command: Option[AppCommand] = Cli
-    .parse(args)
-    .withProgramName("demo-cli")
-    .withCommands(
-      new LoginCommand(adapter),
-      new LogoutCommand(adapter),
-      new ReadCommand,
-      new WriteCommand(adapter)
-    )
+  val command = CommandFactory.make(adapter, args)
 
   try {
-    command.foreach(_.run())
+    command.run()
   } finally {
     actorSystem.terminate()
   }

@@ -32,44 +32,21 @@ Scala
 :   @@snip [Routes](../../../../../examples/src/main/scala/csw/auth/native/SampleRoutes.scala) { #sample-routes }
 
 
-Note: To know more about how to create secure web apis, 
-please go through @ref:[Akka HTTP Adapter - csw-aas-http](csw-aas-http.md)
+@@@ note
+To know more about how to create secure web apis, please go through 
+@ref:[Akka HTTP Adapter - csw-aas-http](csw-aas-http.md)
+@@@
 
-We want to create a CLI app that has following commands/options:
+We will create a CLI application that has following commands:
 
-```bash
-Usage
+| command         | description                  |
+| :-------------- | :--------------------------- |
+| login           | performs user authentication |
+| logout          | logs user out                |
+| read            | reads data from server       |
+| write {content} | writes data to server        |
 
- demo-cli [options] command [command options]
-
-Commands
-
-   login [command options] : performs user authentication
-      --console : instead of using browser, prompts credentials on console
-
-   logout : logs user out
-
-   read : reads data from server
-
-   write <content> : writes data to server
-```
-
-Although this example uses a library called [clist](https://github.com/backuity/clist) for 
-argument parsing and command invocation, you can chose to use any other library for this purpose. 
-
-First, thing will do is create an instance of NativeAppAuthAdapter. There is a factory already available to create the 
-required instance. We will create a small factory on top of it.
-
-Scala
-:   @@snip [Adapter-Factory](../../../../../examples/src/main/scala/csw/auth/native/AdapterFactory.scala) { #adapter-factory }
-
-Note the the internal factory overload we have used, requires two parameters, i.e. location service & authStore.
-It needs location service to resolve keycloak. FileAuthStore is just a storage for tokens for it to 
-save access tokens & refresh tokens. In this case we have configured it to store all tokens in 
-"/tmp/demo-cli/auth" directory but ideally you want this location to be somewhere in user's home directory.
-This will ensure that different users don't have access to each other's tokens.
-
-Here's how the Main.scala looks like:
+Let's begin with `Main.scala`
 
 Scala
 :   @@snip [Main](../../../../../examples/src/main/scala/csw/auth/native/Main.scala) { #main-app }
@@ -78,5 +55,121 @@ The statement `LocationServerStatus.requireUpLocally()` ensures that location se
 before proceeding further. If location service is not running, it will throw an exception and exit the 
 application.
 
+Next, we will instantiate `NativeAppAuthAdapter`. There is a factory already available to create the 
+required instance. We will creat a small factory on top this factory to keep our Main.scala clean.
+
+Scala
+:   @@snip [Adapter-Factory](../../../../../examples/src/main/scala/csw/auth/native/AdapterFactory.scala) { #adapter-factory }
+
+Note the the internal factory overload we have used, requires two parameters, i.e. location service & authStore.
+It needs location service to resolve keycloak server. FileAuthStore is just a storage for tokens for it to 
+save access tokens & refresh tokens in file system. 
+
+@@@ warning { title='Warning' }
+In this case we have configured it to store all tokens in "/tmp/demo-cli/auth" 
+directory but ideally you want this location to be somewhere in user's home directory.
+This will ensure that different users don't have access to each other's tokens.
+@@@
+
+Coming back to Main.scala, next statement is `val command = CommandFactory.make(adapter, args)`
+
+It's a small utility to parse command line arguments and create an instance of command based on 
+user input. 
+
+Scala
+:   @@snip [Command-Factory](../../../../../examples/src/main/scala/csw/auth/native/commands/CommandFactory.scala) { #command-factory }
+ 
+All of these commands extend from a simple trait - `AppCommand`
+
+Scala
+:   @@snip [AppCommand](../../../../../examples/src/main/scala/csw/auth/native/commands/AppCommand.scala) { #app-command }
+
+@@@
+We could have used a command line parser library here to parse the command names and options/arguments, but since 
+our requirements are simple and this is a demonstration, we will keep things simple. However, we 
+strongly recommend that you do use one the existing libraries. CSW makes extensive use of 
+[scopt](https://github.com/scopt/scopt). There are other libraries which are equally good and easy to use
+
+@@@
+
+Let's go through each command one by one   
+
+### Login
+
+Scala
+:   @@snip [LoginCommand](../../../../../examples/src/main/scala/csw/auth/native/commands/LoginCommand.scala) { #login-command }
+
+Here the constructor takes NativeAppAuthAdapter as a parameter and in the run method, 
+it calls `nativeAppAuthAdapter.login()`. This method, opens a browser and redirects user
+to TMT login screen (served by keycloak). In the background it also starts a http server
+on a random port. Once the user submits correct credentials on the login screen, keycloak
+redirects user to `http://localhost:[RandomPort]` with the access and refresh tokens in 
+query string. The NativeAppAuthAdapter will then save these token in file system using 
+FileAuthStore. After this, NativeAppAuthAdapter will shut down the local server since it's
+purpose is served. Now, user can close the browser.
+
+If you want to develop an CLI app that is not dependent on browser, you can call
+`loginCommandLine()` method instead of `login()`. This will prompt credentials in CLI 
+instead of opening a browser.
+
+@@@ note 
+It may be tempting to use the `loginCommandLine()` method, however a browser is generally more
+user-friendly since it can store cookies & remember passwords.
+@@@
+
+### Logout
+
+Scala
+:   @@snip [LogoutCommand](../../../../../examples/src/main/scala/csw/auth/native/commands/LogoutCommand.scala) { #logout-command }
+
+The structure here is very similar to login command. `nativeAppAuthAdapter.logout()` 
+clears all the tokens from file system via `FileAuthStore`.
+
+### Read
+
+Scala
+:   @@snip [ReadCommand](../../../../../examples/src/main/scala/csw/auth/native/commands/ReadCommand.scala) { #read-command }
+
+Since in the akka-http routes, the get route is not protected by any authentication or
+authorization, read command simply sends a get request and print the response
+
+### Write
+
+Scala
+:   @@snip [WriteCommand](../../../../../examples/src/main/scala/csw/auth/native/commands/WriteCommand.scala) { #write-command }
+
+Write command constructor takes NativeAppAuthAdapter & a string value. This string value is expected
+from the CLI input. Since in the akka-http routes, the post route is protected by a realm role policy, we need to pass
+bearer token in the request header. 
+
+`nativeAppAuthAdapter.getAccessTokenString()` returns `Option[String]` if it is None, it means 
+that user has not logged in and so we display an error message stating the same.
+
+If it returns a token string, we pass it in the header. Note that header key is `Authorization` 
+and header value is prefixed with `Bearer `. This is required as per OAuth standards.
+
+If the response is 200, it means authentication and authorization were successful. In this case
+authorization required that the user had `admin` role. 
+
+If the response is 401, it indicates that there was something wrong with the token. 
+It could indicate that token is expired or does not have valid signature. 
+`NativeAppAuthAdapter` ensures that you don't send a request with an expired token.
+If the access token is expired, it refreshes the access token with the help of a `refresh` token.
+If the refresh token is also expired, it returns `None` which means that user has to log in again.
+
+
+If the response is 403, it indicates that token was valid but the token is not authorized to 
+perform certain action. In this case if the token belonged to a user who does not have `admin`
+role, server will return 403.
+
+
+
+--------------------------------
+
+//todo: fix the getting started section
+//todo: detailed documentation
+//todo: replace requests with akka http client
 //todo: keycloak setup
 //todo: application.conf
+//todo: expression in akka http adapter
+//todo: async custom policy in akka http adapter
