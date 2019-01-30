@@ -1,35 +1,31 @@
 #!/usr/bin/env bash
 
+fetch_artifacts(){
+VERSION="$1"
+BASE_PATH="$2"
+SCRIPTS_PATH="$BASE_PATH"/scripts
+TARGET_PATH="$BASE_PATH"/target/coursier/stage/bin
+
+mkdir -p "$TARGET_PATH"
+cp "$BASE_PATH"/scripts/coursier "$TARGET_PATH"
+
+"$SCRIPTS_PATH"/coursier bootstrap -r jitpack com.github.tmtsoftware.csw::csw-location-server:"$1" -M csw.location.server.Main -o "$TARGET_PATH"/csw-location-server
+"$SCRIPTS_PATH"/coursier bootstrap -r jitpack com.github.tmtsoftware.csw::csw-location-agent:"$1" -M csw.location.agent.Main -o "$TARGET_PATH"/csw-location-agent
+"$SCRIPTS_PATH"/coursier bootstrap -r jitpack com.github.tmtsoftware.csw::csw-config-server:"$1" -M csw.config.server.Main -o "$TARGET_PATH"/csw-config-server
+
+cp -r "$SCRIPTS_PATH"/conf "$BASE_PATH"/target/coursier/stage
+cp "$SCRIPTS_PATH"/csw-auth/prod/configure.sh "$TARGET_PATH"
+cp "$SCRIPTS_PATH"/csw-services.sh "$TARGET_PATH"
+cp "$SCRIPTS_PATH"/redis-sentinel-prod.sh "$TARGET_PATH"
+echo "Artifacts successfully generated"
+}
+
 if [ "$#" == 1 ]
 then
-mkdir -p ../target/coursier/stage/bin
-cp coursier ../target/coursier/stage/bin
-
-./coursier bootstrap -r jitpack com.github.tmtsoftware.csw::csw-location-server:"$1" -M csw.location.server.Main -o ../target/coursier/stage/bin/csw-location-server
-./coursier bootstrap -r jitpack com.github.tmtsoftware.csw::csw-location-agent:"$1" -M csw.location.agent.Main -o ../target/coursier/stage/bin/csw-location-agent
-./coursier bootstrap -r jitpack com.github.tmtsoftware.csw::csw-config-server:"$1" -M csw.config.server.Main -o ../target/coursier/stage/bin/csw-config-server
-
-cp -r ./conf ../target/coursier/stage
-cp ./csw-auth/prod/configure.sh ../target/coursier/stage/bin
-cp ./csw-services.sh ../target/coursier/stage/bin
-cp ./redis-sentinel-prod.sh ../target/coursier/stage/bin
-echo "Artifacts successfully generated"
-
+fetch_artifacts "$1" ".."
 elif [ "$#" -gt 1 ]
 then
-mkdir -p "$2"/target/coursier/stage/bin
-cp "$2"/scripts/coursier "$2"/target/coursier/stage/bin
-
-"$2"/scripts/coursier bootstrap -r jitpack com.github.tmtsoftware.csw::csw-location-server:"$1" -M csw.location.server.Main -o "$2"/target/coursier/stage/bin/csw-location-server
-"$2"/scripts/coursier bootstrap -r jitpack com.github.tmtsoftware.csw::csw-location-agent:"$1" -M csw.location.agent.Main -o "$2"/target/coursier/stage/bin/csw-location-agent
-"$2"/scripts/coursier bootstrap -r jitpack com.github.tmtsoftware.csw::csw-config-server:"$1" -M csw.config.server.Main -o "$2"/target/coursier/stage/bin/csw-config-server
-
-cp -r "$2"/scripts/conf "$2"/target/coursier/stage
-cp "$2"/scripts/csw-auth/prod/configure.sh "$2"/target/coursier/stage/bin
-cp "$2"/scripts/csw-services.sh "$2"/target/coursier/stage/bin
-cp "$2"/scripts/redis-sentinel-prod.sh "$2"/target/coursier/stage/bin
-echo "Artifacts successfully generated"
-
+fetch_artifacts "$1" "$2"
 else
 echo "[ERROR] Please provide CSW version ID as 1st argument"
 echo "[ERROR] Please provide CSW base directory path as 2nd argument"
