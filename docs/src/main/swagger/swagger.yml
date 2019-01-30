@@ -1,39 +1,39 @@
-swagger: '2.0'
+openapi: 3.0.0
 info:
   version: '1.0'
   title: TMT Common Software REST Endpoints
-  description: |-
-    Common Software is the package of services and infrastructure software that integrates the TMT software systems.
+  description: >-
+    Common Software is the package of services and infrastructure software that
+    integrates the TMT software systems.
 
     Visit [TMT Website](http://www.tmt.org) for more information.
 
     Complete codebase is available on [Github](https://github.com/tmtsoftware/csw).
 
     Collection of routes listed on this page are http end points exposed by TMT common software.
-
   x-logo:
-    url: 'tmt.png'
+    url: tmt.png
   license:
     name: Apache 2.0
-    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
-host: localhost:4000
-basePath: /
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
 tags:
   - name: Log Admin
-    description: Log admin is the http server started on cluster seed application which exposes end points to get the current logging configuration for particular component as well as it allows administrator to change the log level of running component dynamically.
+    description:
+      Log admin is the http server started on cluster seed application which
+      exposes end points to get the current logging configuration for particular
+      component as well as it allows administrator to change the log level of
+      running component dynamically.
   - name: Configuration Service
-    description: Configuration service application start Http server which exposes end points to manage configuration files by storing them in a repository (by default, using Subversion).
-schemes:
-  - http
-consumes:
-  - application/json
-produces:
-  - application/json
+    description:
+      Configuration service application start Http server which exposes end
+      points to manage configuration files by storing them in a repository (by
+      default, using Subversion).
 paths:
   '/admin/logging/{componentName}/level':
     get:
-      description: |-
-        Returns the current log level details for particular component. Response contains below details :
+      description: >-
+        Returns the current log level details for particular component. Response
+        contains below details :
         1. DefaultLogLevel
         2. AkkaLogLevel
         3. Slf4jLogLevel
@@ -42,19 +42,20 @@ paths:
       tags:
         - Log Admin
       operationId: get log metadata
-      produces:
-        - application/json
       parameters:
         - name: componentName
           in: path
           required: true
-          type: string
-          description: 'Name of the component'
+          description: Name of the component
+          schema:
+            type: string
       responses:
         '200':
           description: OK
-          schema:
-           $ref: '#/definitions/LogMetadata'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogMetadata'
         '404':
           description: Not Found
     post:
@@ -63,55 +64,60 @@ paths:
       tags:
         - Log Admin
       operationId: set log level
-      produces:
-        - application/json
       parameters:
         - name: value
           in: query
           required: true
-          type: string
-          enum:
-            - TRACE
-            - DEBUG
-            - INFO
-            - WARN
-            - ERROR
-            - FATAL
-          description: 'Updated log level of component.'
+          description: Updated log level of component.
+          schema:
+            type: string
+            enum:
+              - TRACE
+              - DEBUG
+              - INFO
+              - WARN
+              - ERROR
+              - FATAL
         - name: componentName
           in: path
           required: true
-          type: string
-          description: 'Name of the component (This is connection name registered with location service. Ex. trombone-hcd-akka).'
+          description:
+            Name of the component (This is connection name registered with
+            location service. Ex. trombone-hcd-akka).
+          schema:
+            type: string
       responses:
         '200':
           description: OK
   '/config/{path}':
     get:
-      description: Fetches the latest version of requested configuration file from the repository either from normal/annex store.
+      description:
+        Fetches the latest version of requested configuration file from the
+        repository either from normal/annex store.
       summary: Get Config
       tags:
         - Configuration Service
       operationId: get
-      produces:
-        - application/json
       parameters:
         - name: path
           in: path
           required: true
-          type: string
-          description: 'Store file at provided file path in repository.'
+          description: Store file at provided file path in repository.
+          schema:
+            type: string
         - name: id
           in: query
           required: false
-          type: string
-          description: 'Revision number of configuration file.'
+          description: Revision number of configuration file.
+          schema:
+            type: string
         - name: date
           in: query
           required: false
-          type: string
-          format: date-time
-          description: 'Latest version of file on provided timestamp will be retrieved.'
+          description: Latest version of file on provided timestamp will be retrieved.
+          schema:
+            type: string
+            format: date-time
       responses:
         '200':
           description: OK
@@ -120,115 +126,147 @@ paths:
     put:
       description: Modifies the content of existing file with the updated content.
       summary: Update Config
+      security:
+        - Bearer: []
       tags:
         - Configuration Service
       operationId: update
-      produces:
-        - application/json
+      requestBody:
+        description: configuration content to be updated in configuration service
+        required: true
+        content:
+          text/plain:
+            schema:
+              type: string
       parameters:
-        - name: Content-Type
-          in: header
-          required: true
-          type: application/octet-stream
-          description: 'Arbitrary binary data'
         - name: comment
           in: query
           required: true
-          type: string
-          description: 'Commit message.'
+          description: Commit message.
+          schema:
+            type: string
         - name: path
           in: path
           required: true
-          type: string
-          description: 'Update file at provided file path in repository.'
+          description: Update file at provided file path in repository.
+          schema:
+            type: string
       responses:
         '200':
           description: OK
-          schema:
-            $ref: '#/definitions/ConfigId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigId'
+        '401':
+          description: The supplied authentication is invalid
+        '403':
+          description: The supplied authentication is not authorized to access this resource
         '404':
           description: Not Found
     post:
-      description: |-
+      description: >-
         Uploads configuration file in the repository.
+
         Configuraion file is stored in annex store if one of the below condition statisfies else stored in normal store :
+
         1. Annex flag is true
+
         2. File size exceeds the maximum size configured in Configuration service.
       summary: Create Config
+      security:
+        - Bearer: []
       tags:
         - Configuration Service
       operationId: create
-      produces:
-        - application/json
+      requestBody:
+        description: configuration content to be stored in configuration service
+        required: true
+        content:
+          text/plain:
+            schema:
+              type: string
       parameters:
-        - name: Content-Type
-          in: header
-          required: true
-          type: application/octet-stream
-          description: 'Arbitrary binary data'
         - name: comment
           in: query
           required: true
-          type: string
-          description: 'Commit message.'
+          description: Commit message.
+          schema:
+            type: string
         - name: path
           in: path
           required: true
-          type: string
-          description: 'Store file at provided file path in repository.'
+          description: Store file at provided file path in repository.
+          schema:
+            type: string
         - name: annex
           in: query
           required: false
-          type: boolean
-          description: 'Flag to upload file in Annex store.'
+          description: Flag to upload file in Annex store.
+          schema:
+            type: boolean
       responses:
         '201':
           description: Created
-          schema:
-            $ref: '#/definitions/ConfigId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigId'
         '400':
           description: Bad Request
+        '401':
+          description: The supplied authentication is invalid
+        '403':
+          description: The supplied authentication is not authorized to access this resource
         '409':
           description: Conflict
     delete:
       description: Removes the configuration file from repository.
       summary: Delete Config
+      security:
+        - Bearer: []
       tags:
         - Configuration Service
       operationId: delete
-      produces:
-        - application/json
       parameters:
         - name: comment
           in: query
           required: true
-          type: string
-          description: 'Commit message.'
+          description: Commit message.
+          schema:
+            type: string
         - name: path
           in: path
           required: true
-          type: string
-          description: 'Delete file at provided file path from repository.'
+          description: Delete file at provided file path from repository.
+          schema:
+            type: string
       responses:
         '200':
           description: OK
+        '401':
+          description: The supplied authentication is invalid
+        '403':
+          description: The supplied authentication is not authorized to access this resource
         '404':
           description: Not Found
   '/active-config/{path}':
     get:
-      description: Retrieves the current active configuration file. If date query parameter is provided, active configuration file on provided timestamp is retrieved.
+      description:
+        Retrieves the current active configuration file. If date query parameter
+        is provided, active configuration file on provided timestamp is
+        retrieved.
       summary: Get Active Config
       tags:
         - Configuration Service
       operationId: get active
-      produces:
-        - application/json
       parameters:
         - name: path
           in: path
           required: true
-          type: string
-          description: 'Fetch active file at provided file path from repository.'
+          description: Fetch active file at provided file path from repository.
+          schema:
+            type: string
       responses:
         '200':
           description: OK
@@ -241,145 +279,171 @@ paths:
       tags:
         - Configuration Service
       operationId: get active version
-      produces:
-        - application/json
       parameters:
         - name: path
           in: path
           required: true
-          type: string
-          description: 'Get active version of file at provided path from repository.'
+          description: Get active version of file at provided path from repository.
+          schema:
+            type: string
       responses:
         '200':
           description: OK
-          schema:
-           $ref: '#/definitions/ConfigId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigId'
         '404':
           description: Not Found
     put:
-      description: Sets the current active version of file to the master (latest version of file).
+      description:
+        Sets the current active version of file to the master (latest version of
+        file).
       summary: Reset Active Version Of Config
+      security:
+        - Bearer: []
       tags:
         - Configuration Service
       operationId: reset active version
-      produces:
-        - application/json
       parameters:
         - name: comment
           in: query
           required: true
-          type: string
-          description: 'Commit message.'
+          description: Commit message.
+          schema:
+            type: string
         - name: path
           in: path
           required: true
-          type: string
-          description: 'Reset the active version of file at provided file path from repository to master.'
+          description:
+            Reset the active version of file at provided file path from
+            repository to master.
+          schema:
+            type: string
       responses:
         '200':
           description: OK
+        '401':
+          description: The supplied authentication is invalid
+        '403':
+          description: The supplied authentication is not authorized to access this resource
         '404':
           description: Not Found
   /list:
     get:
-      description: Returns the path of all the configuration files available in annex/normal store.
+      description: Returns the path of all the configuration files available in
+        annex/normal store.
       summary: List Configs
       tags:
         - Configuration Service
       operationId: list
-      produces:
-        - application/json
       parameters:
         - name: fileType
           in: query
           required: false
-          type: string
-          enum:
-            - annex
-            - normal
-          description: 'One of annex/normal File type.'
+          description: One of annex/normal File type.
+          schema:
+            type: string
+            enum:
+              - annex
+              - normal
         - name: pattern
           in: query
           required: false
-          type: string
-          description: 'Regular expression to filter list of files.'
+          description: Regular expression to filter list of files.
+          schema:
+            type: string
       responses:
         '200':
           description: OK
-          schema:
-            $ref: '#/definitions/ConfigFileInfo'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigFileInfo'
   '/history/{path}':
     get:
-      description: Retrieves id, comment and timestamp of all the revisons of configuration files.
+      description:
+        Retrieves id, comment and timestamp of all the revisons of configuration
+        files.
       summary: Get Config History
       tags:
         - Configuration Service
       operationId: history
-      produces:
-        - application/json
       parameters:
         - name: path
           in: path
           required: true
-          type: string
-          description: 'Repository file path.'
+          description: Repository file path.
+          schema:
+            type: string
         - name: maxResults
           in: query
           required: false
-          type: number
-          description: 'Maximum number of results to be fetched.'
+          description: Maximum number of results to be fetched.
+          schema:
+            type: number
         - name: from
           in: query
           required: false
-          type: string
-          description: 'Retrieves active revisions history from provided timestamp onwards.'
+          description: Retrieves active revisions history from provided timestamp onwards.
+          schema:
+            type: string
         - name: to
           in: query
           required: false
-          type: string
-          description: 'Retrieves active revisions history till the provided timestamp.'
+          description: Retrieves active revisions history till the provided timestamp.
+          schema:
+            type: string
       responses:
         '200':
-          description: 'OK'
-          schema:
-            $ref: '#/definitions/ConfigFileRevision'
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigFileRevision'
         '404':
           description: Not Found
   '/history-active/{path}':
     get:
-      description: Retrieves id, comment and timestamp of only active revisons of configuration files.
+      description:
+        Retrieves id, comment and timestamp of only active revisons of
+        configuration files.
       summary: Get Active Config History
       tags:
         - Configuration Service
       operationId: history-active
-      produces:
-        - application/json
       parameters:
         - name: path
           in: path
           required: true
-          type: string
-          description: 'Repository file path for which history is returned.'
+          description: Repository file path for which history is returned.
+          schema:
+            type: string
         - name: maxResults
           in: query
           required: false
-          type: number
-          description: 'Maximum number of results to be fetched.'
+          description: Maximum number of results to be fetched.
+          schema:
+            type: number
         - name: from
           in: query
           required: false
-          type: string
-          description: 'Retrieves active revisions history from provided timestamp onwards.'
+          description: Retrieves active revisions history from provided timestamp onwards.
+          schema:
+            type: string
         - name: to
           in: query
           required: false
-          type: string
-          description: 'Retrieves active revisions history till the provided timestamp.'
+          description: Retrieves active revisions history till the provided timestamp.
+          schema:
+            type: string
       responses:
         '200':
           description: OK
-          schema:
-            $ref: '#/definitions/ConfigFileRevision'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigFileRevision'
         '404':
           description: Not Found
   /metadata:
@@ -394,97 +458,116 @@ paths:
       tags:
         - Configuration Service
       operationId: get metadata
-      produces:
-        - application/json
-      parameters: []
       responses:
         '200':
           description: OK
-          schema:
-            $ref: '#/definitions/ConfigMetaData'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigMetaData'
         '500':
           description: Internal Server Error
-definitions:
-  ConfigId:
-    type: object
-    properties:
-      id:
-        description: Revision number of configuration file.
-        type: string
-        example: "1"
-  ConfigFileRevision:
-    type: object
-    properties:
-      id:
-        allOf:
-          - $ref: '#/definitions/ConfigId'
-      comment:
-        description: Commit message.
-        type: string
-        example: This is sample commit message.
-      time:
-        description: 'File updation timestamp.'
-        type: string
-        example: '2017-05-06T07:10:38.385Z'
-  ConfigFileInfo:
-    type: object
-    properties:
-      path:
-        description: 'Repository file path'
-        type: string
-        example: '/hcd/trombone.conf'
-      id:
+servers:
+  - url: http://localhost:4000/
+components:
+  securitySchemes:
+    Bearer:
+      description:
+        Represents Access token that applications use to make API requests on behalf of a user.
+        The access token represents the authorization of a specific application to access specific parts of a user’s data.
+        Config service admin API requires you to provide this access token in header.
+        To know more on how to authenticate and authorize yourself and get access token, refer this http://tmtsoftware.github.io/csw/services/aas.html
+      type: apiKey
+      name: Authorization
+      in: header
+  schemas:
+    ConfigIdFlat:
+      description: Revision number of configuration file.
+      type: string
+      example: '1'
+    ConfigId:
+      type: object
+      properties:
+        id:
           allOf:
-            - $ref: '#/definitions/ConfigId'
-      comment:
-        description: Commit message.
-        type: string
-        example: This is sample commit message.
-  ConfigMetaData:
-    type: object
-    properties:
-      repoPath:
-        description: "Repository file path."
-        type: string
-        example: "/tmp/csw-config-svn"
-      annexPath:
-        description: "Annex repository file path."
-        type: string
-        example: "/tmp/csw-config-annex-files"
-      annexMinFileSize:
-        description: "Minimum file size limit, above which file will be uploaded in annex store."
-        type: string
-        example: "10 MiB"
-      maxConfigFileSize:
-        description: "Maximum allowed size for configuration file to be uploaded in repository."
-        type: string
-        example: "50 MiB"
-  Level:
-    type: string
-    enum:
-      - TRACE
-      - DEBUG
-      - INFO
-      - WARN
-      - ERROR
-      - FATAL
-    example: INFO
-  LogMetadata:
-    type: object
-    properties:
-      defaultLevel:
-        description: "Default log level."
-        allOf:
-          - $ref: '#/definitions/Level'
-      akkaLevel:
-        description: "Akka log level."
-        allOf:
-          - $ref: '#/definitions/Level'
-      slf4jLevel:
-        description: "Slf4j log level."
-        allOf:
-          - $ref: '#/definitions/Level'
-      componentLevel:
-        description: "Component specific log level."
-        allOf:
-          - $ref: '#/definitions/Level'
+            - $ref: '#/components/schemas/ConfigIdFlat'
+    ConfigFileRevision:
+      type: object
+      properties:
+        id:
+          allOf:
+            - $ref: '#/components/schemas/ConfigIdFlat'
+        comment:
+          description: Commit message.
+          type: string
+          example: This is sample commit message.
+        time:
+          description: File updation timestamp.
+          type: string
+          example: 2017-05-06T07:10:38.385Z
+    ConfigFileInfo:
+      type: object
+      properties:
+        path:
+          description: Repository file path
+          type: string
+          example: /hcd/trombone.conf
+        id:
+          allOf:
+            - $ref: '#/components/schemas/ConfigIdFlat'
+        comment:
+          description: Commit message.
+          type: string
+          example: This is sample commit message.
+    ConfigMetaData:
+      type: object
+      properties:
+        repoPath:
+          description: Repository file path.
+          type: string
+          example: /tmp/csw-config-svn
+        annexPath:
+          description: Annex repository file path.
+          type: string
+          example: /tmp/csw-config-annex-files
+        annexMinFileSize:
+          description:
+            Minimum file size limit, above which file will be uploaded in annex
+            store.
+          type: string
+          example: 10 MiB
+        maxConfigFileSize:
+          description:
+            Maximum allowed size for configuration file to be uploaded in
+            repository.
+          type: string
+          example: 50 MiB
+    Level:
+      type: string
+      enum:
+        - TRACE
+        - DEBUG
+        - INFO
+        - WARN
+        - ERROR
+        - FATAL
+      example: INFO
+    LogMetadata:
+      type: object
+      properties:
+        defaultLevel:
+          description: Default log level.
+          allOf:
+            - $ref: '#/components/schemas/Level'
+        akkaLevel:
+          description: Akka log level.
+          allOf:
+            - $ref: '#/components/schemas/Level'
+        slf4jLevel:
+          description: Slf4j log level.
+          allOf:
+            - $ref: '#/components/schemas/Level'
+        componentLevel:
+          description: Component specific log level.
+          allOf:
+            - $ref: '#/components/schemas/Level'
