@@ -14,4 +14,12 @@ object React extends js.Object {
       props: js.Dictionary[js.Any] = null,
       children: js.Any = null
   ): js.Dynamic = js.native
+
+  def createContext(defaultValue: Any): ReactContext = js.native
+
+  @js.native
+  trait ReactContext extends js.Object {
+    val Provider: js.Any
+    val Consumer: js.Any
+  }
 }
