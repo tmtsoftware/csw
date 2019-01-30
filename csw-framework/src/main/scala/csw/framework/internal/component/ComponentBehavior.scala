@@ -179,6 +179,7 @@ private[framework] final class ComponentBehavior(
   private def handleOneway(commandMessage: CommandMessage, replyTo: ActorRef[OnewayResponse]): Unit = {
     log.info(s"Invoking lifecycle handler's validateCommand hook with msg :[$commandMessage]")
     val validationResponse = lifecycleHandlers.validateCommand(commandMessage.command)
+    replyTo ! validationResponse.asInstanceOf[OnewayResponse]
 
     validationResponse match {
       case Accepted(_) ⇒
@@ -187,8 +188,6 @@ private[framework] final class ComponentBehavior(
       case invalid: Invalid ⇒
         log.debug(s"Command not forwarded to TLA post validation. ValidationResponse was [$invalid]")
     }
-
-    replyTo ! validationResponse.asInstanceOf[OnewayResponse]
   }
 
   private def handleSubmit(commandMessage: CommandMessage, replyTo: ActorRef[SubmitResponse]): Unit = {
