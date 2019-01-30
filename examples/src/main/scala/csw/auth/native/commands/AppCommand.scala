@@ -1,7 +1,7 @@
 package csw.auth.native.commands
 
-import org.backuity.clist._
-
-trait AppCommand { this: Command =>
+// #app-command
+trait AppCommand {
   def run(): Unit
 }
+// #app-command

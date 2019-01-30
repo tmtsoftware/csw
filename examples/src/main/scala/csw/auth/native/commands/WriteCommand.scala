@@ -1,18 +1,27 @@
 package csw.auth.native.commands
 
 import csw.aas.native.api.NativeAppAuthAdapter
-import org.backuity.clist._
 import requests._
 
-class WriteCommand(val nativeAppAuthAdapter: NativeAppAuthAdapter)
-    extends Command(name = "write", description = "writes data to server")
-    with AppCommand {
-
-  var content: String = arg[String]()
-
+// #write-command
+class WriteCommand(val nativeAppAuthAdapter: NativeAppAuthAdapter, value: String) extends AppCommand {
   override def run(): Unit = {
-    nativeAppAuthAdapter.getAccessTokenString().map { token =>
-      post(url = "http://localhost:7000/data", headers = Map("Authorization" -> s"Bearer $token"))
+    nativeAppAuthAdapter.getAccessTokenString() match {
+      case Some(token) =>
+        val response =
+          post(url = s"http://localhost:7000/data?value=$value", headers = Map("Authorization" -> s"Bearer $token"))
+
+        response.statusCode match {
+          case 200  => println("Success")
+          case 401  => println("Authentication failed")
+          case 403  => println("Permission denied")
+          case code => println(s"Unrecognised error: http status code = $code")
+        }
+
+      case None =>
+        println("you need to login before executing this command")
+        System.exit(1)
     }
   }
 }
+// #write-command
