@@ -1,42 +1,9 @@
-package csw.aas.react4s
-
-import com.github.ahnfelt.react4s._
+package csw.aas.react4s.facade
+import com.github.ahnfelt.react4s.JsComponent
 
 import scala.scalajs.js
-import scala.scalajs.js.JSON
 import scala.scalajs.js.annotation.JSImport
 
-class Config extends js.Object {
-  var realm: String    = _
-  var clientId: String = _
-}
-
-case class SampleComponent() extends Component[NoEmit] {
-
-  override def render(get: Get): Node = {
-    E.div(Text("SampleComponent"))
-  }
-}
-
-case class MainComponent() extends Component[NoEmit] {
-
-  override def render(get: Get): Node = {
-    val config = new Config()
-    config.realm = "example"
-    config.clientId = "example-app"
-    E.div(
-      TMTAuthContextProvider(
-        J("config", JSON.parse(JSON.stringify(config))),
-        E.div(Text("************text*************")),
-        Component(SampleComponent),
-        CheckLogin(
-          J("error", Login()),
-          E.div(Logout())
-        )
-      )
-    )
-  }
-}
 @js.native
 @JSImport("csw-aas-js1", JSImport.Namespace)
 object AAS extends js.Object {
