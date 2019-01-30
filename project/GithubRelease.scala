@@ -8,7 +8,9 @@ import ohnosequences.sbt.SbtGithubReleasePlugin
 import sbt.Keys._
 import sbt.io.{IO, Path}
 import sbt.{AutoPlugin, Def, Plugins, ProjectReference, Setting, Task, taskKey, _}
+import sbtdynver.DynVerPlugin.autoImport._
 
+import scala.language.postfixOps
 import scala.sys.process._
 
 object GithubRelease extends AutoPlugin {
@@ -99,17 +101,28 @@ object GithubRelease extends AutoPlugin {
     appsZip
   }
 
+  private def getVersionForCoursierArtifacts: Def.Initialize[Task[String]] = Def.task {
+    dynverGitDescribeOutput.value
+      .map { output =>
+        if (output.commitSuffix.distance > 0) output.commitSuffix.sha
+        else if (output.ref.isTag) output.ref.dropV.value
+        else version.value
+      }
+      .getOrElse(version.value)
+  }
+
   private def coursierArtifactsGenTask: Def.Initialize[Task[Unit]] = Def.task {
-    val dir = baseDirectory.value / "scripts"
-    s"sh $dir/csw-bootstrap.sh ${version.value} ${baseDirectory.value}" !
+    val versionForCoursier = getVersionForCoursierArtifacts.value
+    val dir                = baseDirectory.value / "scripts"
+    s"sh $dir/csw-bootstrap.sh $versionForCoursier ${baseDirectory.value}" !
   }
 
   private def zipCoursierArtifactsTask: Def.Initialize[Task[File]] = Def.task {
     val ghrleaseDir  = target.value / "ghrelease"
-    val zipFileName  = s"csw-bootstrap-apps-${version.value}"
+    val zipFileName  = s"csw-bootstrap-apps-${getVersionForCoursierArtifacts.value}"
     lazy val appsZip = new File(ghrleaseDir, s"$zipFileName.zip")
 
-    val generateArtifacts: Unit = coursierArtifactsGenTask.value
+    coursierArtifactsGenTask.value
 
     val tuples = Path.allSubpaths(target.value / "coursier/stage")
     val mapping = tuples
