@@ -3,14 +3,14 @@
 The Configuration Service provides a centralized persistent store for any configuration file used in the TMT Software System. 
 All versions of configuration files are retained, providing a historical record of each configuration file.
 
-Note that in order to use the APIs described here, the [Location Service](../services/location.html)
-([csw-location-server](../apps/cswlocationserver.html))
-and [Configuration Service Server](../apps/cswonfigserverapp.html) needs to be running somewhere in the local network
+Note that in order to use the APIs described here, the @ref:[Location Service](../services/location.md)
+(@ref:[csw-location-server](../apps/cswlocationserver.md))
+and @ref:[Configuration Service Server](../apps/cswonfigserverapp.md) needs to be running somewhere in the local network
 and the necessary configuration, environment variables or system properties should be defined to point to the 
 correct host and port number(s) for the Location Service nodes.
 
 This service will be part of the observatory cluster and exposes Rest endpoints that can be accessed over HTTP.
-Component developers can use the csw-config-client library in their code.
+Component developers can use the `csw-config-client` library in their code.
 The library wraps the low level communication with Configuration Service Server and exposes simple to use methods to access and
 manage configuration files.
 
@@ -41,7 +41,7 @@ sbt
  
 ## API Flavors
 
-The Configuration Service is used to provide the runtime settings for components.  When a component is started, it will 
+The Configuration Service is used to provide the runtime settings for components. When a component is started, it will 
 use a limited "clientAPI" to obtain the "active" configuration from the Configuration Service, and use those settings 
 for its execution.
 
@@ -75,6 +75,14 @@ Scala
 
 Java
 :   @@snip [JConfigClientExampleTest.java](../../../../examples/src/test/java/csw/config/JConfigClientExampleTest.java) { #create-api }
+
+
+@@@ note
+
+Creating `adminAPI` requires instance of `TokenFactory`. `TokenFactory` has `getToken` method which returns raw access token string which is used by config client to insert it into auth header of http request before sending to config server. 
+For more details, refer bottom section on @ref:[Admin Protected Routes](./config.md#admin-protected-routes)
+
+@@@
 
 ## exists
 
@@ -148,7 +156,6 @@ Scala
 Java
 :   @@snip [JConfigClientExampleTest.java](../../../../examples/src/test/java/csw/config/JConfigClientExampleTest.java) { #getLatest }
 
-
 ## getByTime
 
 Gets the file at the given path as it existed at a given time-instance. Note:    
@@ -214,6 +221,25 @@ Scala
 
 Java
 :   @@snip [JConfigClientExampleTest.java](../../../../examples/src/test/java/csw/config/JConfigClientExampleTest.java) { #getMetadata }
+
+## Admin Protected Routes
+Following config server routes are `Admin Protected`. To use these routes, you need to get yourself authenticated and authorized.
+
+* create
+* update
+* delete
+* setActiveVersion
+* resetActiveVersion
+
+`csw-config-client` provides factory to create admin config service which allows you to access these protected routes.
+This requires you to implement @github[TokenFactory](/csw-config/csw-config-api/src/main/scala/csw/config/api/TokenFactory.scala) interface. Currently `csw-config-cli` is the only user of config service admin api. 
+You can refer @github[CliTokenFactory](/csw-config/csw-config-cli/src/main/scala/csw/config/cli/CliTokenFactory.scala) which implements `TokenFactory` interface.
+
+@@@ note
+
+Refer @ref:[csw-aas](../services/aas.md) docs to know more about how you can authenticate and authorize with auth server and get access token.
+
+@@@
 
 ## Source code for examples
 

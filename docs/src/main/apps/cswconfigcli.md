@@ -3,7 +3,8 @@
 A command line application that facilitates interaction with Configuration Service. It accepts various commands to store, retrieve, list and manage configuration files.
 
 ## Supported Commands
-
+* login
+* logout
 * create 
 * update 
 * get 
@@ -17,6 +18,35 @@ A command line application that facilitates interaction with Configuration Servi
 * getMetadata 
 * exists 
 * getActive
+
+## login
+`create, update, delete, setActiveVersion & resetActiveVersion` commands are admin protected. In order to use those, you need to login first.
+You need to have valid user name and password to login which has admin role assigned to it.
+
+### Examples
+1. 
+```
+csw-config-cli login"
+``` 
+This opens up default browser on your machine and asks to provide username and password. 
+Once you provide valid credentials, auth server will respond with access token, refresh token etc. which gets stored in local filesystem.
+So next time when you use any of the above admin protected commands, this access token gets retrieved from local filesystem and implicitly passed in a request sent to 
+config server.
+
+2. 
+```
+csw-config-cli login --consoleLogin"
+``` 
+Instead of opening default browser on your machine, this will prompt for username and password on the console. (You do not need to leave console in this case.)
+
+## logout
+Use this command to logout if you are already logged in or you want to re-login with different credentials.
+
+### Example
+```
+csw-config-cli logout"
+```
+This command will delete all the tokens stored in local filesystem.
 
 ## Admin API
 The commands listed below will be used by administrators and maintainers of Configuration Service.
