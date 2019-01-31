@@ -21,10 +21,9 @@ public class JSchedulerExamples {
     private UTCTime utcTime = UTCTime.now();
     TimeServiceScheduler scheduler;
 
-    public JSchedulerExamples() {
+    public JSchedulerExamples(ActorSystem actorSystem) {
         //#create-scheduler
         // create time service scheduler using the factory method
-        ActorSystem actorSystem = Adapter.toUntyped(ctx.asJava().getSystem());
         TimeServiceScheduler scheduler = TimeServiceSchedulerFactory.make(actorSystem);
         //#create-scheduler
 
