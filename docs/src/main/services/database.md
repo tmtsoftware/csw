@@ -1,16 +1,29 @@
 # Database Service
 
-The Database Service provides API to manage database connections and access data in the TMT software system. The service expects
-`Postgres` as database server. It uses `Jooq` library underneath to manage database access, connection pooling, etc.
-To describe `Jooq` briefly, it is a java library that provides api for accessing data i.e. DDL support, DML support, fetch,
-batch execution, prepared statements, etc. safety against sql injection, connection pooling, etc. To know more about Jooq and
-it's features please refer this [link](https://www.jooq.org/learn/).
+The Database Service is included in TMT Common Software for use by components that need the features of a relational database.
+CSW Database Service provides a TMT-standard relational database and connection library. Databases created by Database Service
+will be stored reliably at the site during operations.
+
+The Database Service provides an API to manage database connections and access data in the TMT Software System. The service provides
+`PostgreSQL` as the underlying database server. It uses the `Jooq` library underneath to manage database access, connection pooling, etc.
+
+@@@ note
+`Jooq` is a Java library that provides a higher level API for accessing data i.e. DDL support, DML support, fetch,
+batch execution, prepared statements, safety against sql injection, connection pooling, etc. To know more about Jooq and
+its features, please refer to this [link](https://www.jooq.org/learn/).
+@@@
+
+Database Service requires `PostgreSQL` server to be running on a machine. To start the PostgreSQL server for development 
+and testing purposes, refer to @ref:[Starting Apps for Development](../commons/apps.md#starting-apps-for-development).
+
+Once the PostgreSQL is up and running, Database Service can be used to connect and access data. It is assumed that there
+will be more than one user types registered with postgres i.e. for read access, for write access, for admin access, etc.
 
 <!-- introduction to the service -->
 
 ## Dependencies
 
-To use the Database service, add this to your `build.sbt` file:
+To include the Database Service in a component, add this to your `build.sbt` file:
 
 sbt
 :   @@@vars
@@ -20,28 +33,25 @@ sbt
     @@@
 
 ## Accessing Database Service
-
-Database service is different from any other csw services in a way that it is not passed in through `CswContext/JCswContext`
-in ComponentHandlers. So, to access database service, it is expected from developers to create `DatabaseServiceFactory`.
-DatabaseServiceFactory can be created from anywhere using an `ActorSystem` and it's creation is explained in next section. 
+Database Service is accessed differently than other CSW services in that it is not passed to a component through 
+`CswContext/JCswContext` in the component's ComponentHandlers. To access Database Service, developers create a 
+`DatabaseServiceFactory`. DatabaseServiceFactory can be created anywhere in the code using
+an `ActorSystem` and its creation is explained in next section. 
 
 @@@ note
    
-Creating a new DatabaseServiceFactory does not mean a new connection will be created to postgres server. Hence, creating
+Creating a new DatabaseServiceFactory does not mean a new connection to PostgreSQL server will be created. Hence, creating
 multiple DatabaseServiceFactory per component can be considered pretty cheap and harmless.
 
 @@@
 
-## Database Service Factory
+#### Connect for Read Access
 
-Database service requires `postgres` server to be running on the machine. To start the postgres server for development and testing
-purposes, refer @ref:[Starting apps for development](../commons/apps.md#starting-apps-for-development).
+Our access approach is that all components can read any Database Service database and clients that only
+need read access use the following factory method. But a writer will need a special username/password with write access as shown below.
 
-Once the postgres is up and running, database service can be used to connect and access the data. It is assumed that there
-will be more than one user types registered with postgres i.e. for read access, for write access, for admin access, etc.
-
-By default while connecting to postgres, database service will provide read access for data. To achieve that, create an 
-instance of `DatabaseServiceFactory` and use it as shown below:
+By default while connecting to PostgreSQL, Database Service will provide read access for data. 
+To achieve that, create an instance of `DatabaseServiceFactory` and use it as shown below:
 
 Scala
 :   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/database/AssemblyComponentHandlers.scala) { #dbFactory-access }
@@ -49,25 +59,31 @@ Scala
 Java
 :   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/database/JAssemblyComponentHandlers.java) { #dbFactory-access }
  
- 
-`makeDsl`/`jMakeDsl` takes `locationService` to locate the postgres server running and connect to it. It connects to the
-database by the provided `dbName`. It picks username and password for read access profile from environment variables 
-i.e. it looks at `dbReadUsername` for username and `dbReadPassword` for password, hence it is expected from developers
-to set these environment variables prior to using `DatabaseServiceFactory`. 
+The underlying database server is registered with the Location Service.
+`makeDsl`/`jMakeDsl` takes `locationService` to locate the PostgreSQL server running and connect to it. It connects to the
+database by the provided `dbName`. It picks the database username and password for read access profile from 
+TMT-standard environment variables called `dbReadUsername` for username and `dbReadPassword` for password, hence it is expected that developers
+will set these environment variables prior to using `DatabaseServiceFactory`. PostgreSQL should also be initialized with a read-only
+user and password that agrees with the values in the environment variables. This approach is used to keep from putting
+database login information in the source code. 
 
-`makeDsl`/`jMakeDsl` returns a `Jooq` type `DSLContext`. DSLContext provides mechanism to access the data stored in postgres
-using JDBC driver underneath. The usage of DSLContext in component development will be explained in later sections.  
+@@@ note
+Eventually, all TMT user logins will all have these environment variables set with the agreed upon read-only user and password.    
+@@@
 
-@@@note 
+`makeDsl`/`jMakeDsl` returns a `Jooq` type `DSLContext`. DSLContext provides the mechanism to access the data stored in PostgreSQL
+using the selected JDBC driver underneath. The usage of DSLContext in component development will be explained in later sections.  
+
+@@@ note { title=Hint }
 
 * Any exception encountered while connecting to postgres server will be wrapped in `DatabaseException`.
 
 @@@
 
-### Connect for write access
+#### Connect for Write Access
 
-In order to connect to postgres for write access (or any other access other than read), use the `DatabaseServiceFactory`
-as shown below: 
+In order to connect to PostgreSQL for write access (or any other access other than read), use the `DatabaseServiceFactory`
+as shown below with different environment variables: 
 
 Scala
 :   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/database/AssemblyComponentHandlers.scala) { #dbFactory-write-access }
@@ -76,12 +92,13 @@ Java
 :   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/database/JAssemblyComponentHandlers.java) { #dbFactory-write-access }
 
 Here the username is picked from `dbWriteUsername` and password is picked from `dbWritePassword` environment variables. Hence, it is
-expected from developers to set environment variables prior to using this method. 
+expected from developers to set environment variables prior to using this method with the user name and password to use for
+write access. 
  
-### Connect for development or testing
+#### Connect for Development or Testing
 
 For development and testing purposes, all database connection properties can be provided from `application.conf` including
-username and password. This will not require to set environment variables for credentials as described in previous sections.
+username and password. This will not require setting any environment variables for credentials as described in previous sections.
 In order to do so, use the `DatabaseServiceFactory` as shown below:
  
 Scala
@@ -110,15 +127,17 @@ csw-database.hikari-datasource.dataSource {
 
 @@@note
 
-By default csw configures `HikariCP` connection pool for managing connections with postgres server. To know more about `HikariCP`
+By default csw configures `HikariCP` connection pool for managing connections with PostgreSQL server. To know more about `HikariCP`
 please refer this [link](http://brettwooldridge.github.io/HikariCP/). 
 
 @@@  
 
 ## Using DSLContext
 
-Once the DSLContext is returned from `makeDsl/jMakeDsl`, it can be used to provide plain SQL to database service and 
-get it executed on postgres server. 
+Once the DSLContext is returned from `makeDsl/jMakeDsl`, it can be used to provide plain SQL to Database Service and 
+get it executed on the PostgreSQL server.
+
+The following sections show examples of most typical SQL use cases.
 
 ### Create
 
@@ -189,6 +208,8 @@ If there is a syntax error in SQL queries the `Future/CompletableFuture` returne
 Jooq's `DataAccessException` underneath as cause. 
 
 @@@
+
+These examples are just a start. Any SQL statements can be created and executed using the DSLContext.
 
 ## Source code for examples
 

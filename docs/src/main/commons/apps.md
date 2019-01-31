@@ -13,7 +13,7 @@
 * [csw-host-config](../apps/hostconfig.md): Framework for creating host configuration applications, used to start multiple containers on a machine.
 @@@
 
-## Starting apps for development
+## Starting Apps for Development
 
 In order to run a component it is required to run `csw-location-server`. Moreover, even to start event service or configuration service,
 `csw-location-server` should be running.
