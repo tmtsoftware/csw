@@ -11,9 +11,10 @@ object Main extends App {
   LocationServerStatus.requireUpLocally()
 
   implicit val actorSystem: ActorSystem = ActorSystem()
-  val adapter: NativeAppAuthAdapter     = AdapterFactory.makeAdapter
 
-  val command = CommandFactory.make(adapter, args)
+  val adapter: NativeAppAuthAdapter = AdapterFactory.makeAdapter
+
+  val command = CommandFactory.makeCommand(adapter, args)
 
   try {
     command.run()

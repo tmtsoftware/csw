@@ -55,8 +55,13 @@ The statement `LocationServerStatus.requireUpLocally()` ensures that location se
 before proceeding further. If location service is not running, it will throw an exception and exit the 
 application.
 
+@@@ note
+In a real application, you would ideally want to use `LocationServerStatus.requireUp` which takes
+`locationHost: String` parameter instead of looking for location service on localhost. 
+@@@
+
 Next, we will instantiate `NativeAppAuthAdapter`. There is a factory already available to create the 
-required instance. We will creat a small factory on top this factory to keep our Main.scala clean.
+required instance. We will create a small factory on top this factory to keep our Main.scala clean.
 
 Scala
 :   @@snip [Adapter-Factory](../../../../../examples/src/main/scala/csw/auth/native/AdapterFactory.scala) { #adapter-factory }
@@ -71,10 +76,8 @@ directory but ideally you want this location to be somewhere in user's home dire
 This will ensure that different users don't have access to each other's tokens.
 @@@
 
-Coming back to Main.scala, next statement is `val command = CommandFactory.make(adapter, args)`
-
-It's a small utility to parse command line arguments and create an instance of command based on 
-user input. 
+Coming back to Main.scala, now we need to find out which command user wants to execute. To parse 
+user input arguments, we will create a small utility.
 
 Scala
 :   @@snip [Command-Factory](../../../../../examples/src/main/scala/csw/auth/native/commands/CommandFactory.scala) { #command-factory }
@@ -84,10 +87,10 @@ All of these commands extend from a simple trait - `AppCommand`
 Scala
 :   @@snip [AppCommand](../../../../../examples/src/main/scala/csw/auth/native/commands/AppCommand.scala) { #app-command }
 
-@@@
+@@@ note
 We could have used a command line parser library here to parse the command names and options/arguments, but since 
 our requirements are simple and this is a demonstration, we will keep things simple. However, we 
-strongly recommend that you do use one the existing libraries. CSW makes extensive use of 
+strongly recommend that you use one of the existing libraries. CSW makes extensive use of 
 [scopt](https://github.com/scopt/scopt). There are other libraries which are equally good and easy to use
 
 @@@
@@ -101,7 +104,7 @@ Scala
 
 Here the constructor takes NativeAppAuthAdapter as a parameter and in the run method, 
 it calls `nativeAppAuthAdapter.login()`. This method, opens a browser and redirects user
-to TMT login screen (served by keycloak). In the background it also starts a http server
+to TMT login screen (served by keycloak). In the background, it starts an http server
 on a random port. Once the user submits correct credentials on the login screen, keycloak
 redirects user to `http://localhost:[RandomPort]` with the access and refresh tokens in 
 query string. The NativeAppAuthAdapter will then save these token in file system using 
@@ -131,7 +134,7 @@ Scala
 :   @@snip [ReadCommand](../../../../../examples/src/main/scala/csw/auth/native/commands/ReadCommand.scala) { #read-command }
 
 Since in the akka-http routes, the get route is not protected by any authentication or
-authorization, read command simply sends a get request and print the response
+authorization, read command simply sends a get request and prints the response.
 
 ### Write
 
@@ -143,12 +146,10 @@ from the CLI input. Since in the akka-http routes, the post route is protected b
 bearer token in the request header. 
 
 `nativeAppAuthAdapter.getAccessTokenString()` returns `Option[String]` if it is None, it means 
-that user has not logged in and so we display an error message stating the same.
+that user has not logged in and so we display an error message stating the same. If it returns a token string, 
+we pass it in the header.
 
-If it returns a token string, we pass it in the header. Note that header key is `Authorization` 
-and header value is prefixed with `Bearer `. This is required as per OAuth standards.
-
-If the response is 200, it means authentication and authorization were successful. In this case
+If the response status code is 200, it means authentication and authorization were successful. In this case
 authorization required that the user had `admin` role. 
 
 If the response is 401, it indicates that there was something wrong with the token. 
@@ -157,19 +158,18 @@ It could indicate that token is expired or does not have valid signature.
 If the access token is expired, it refreshes the access token with the help of a `refresh` token.
 If the refresh token is also expired, it returns `None` which means that user has to log in again.
 
-
 If the response is 403, it indicates that token was valid but the token is not authorized to 
 perform certain action. In this case if the token belonged to a user who does not have `admin`
 role, server will return 403.
 
-
-
---------------------------------
+-------------------------------------------------------
 
 //todo: fix the getting started section
 //todo: detailed documentation
-//todo: replace requests with akka http client
 //todo: keycloak setup
 //todo: application.conf
-//todo: expression in akka http adapter
+//todo: policy expressions in akka http adapter
 //todo: async custom policy in akka http adapter
+
+//DONE: replace requests with akka http client
+
