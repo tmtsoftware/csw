@@ -412,7 +412,6 @@ object Dependencies {
       Akka.`akka-actor`,
       AkkaHttp.`akka-http`,
       AkkaHttp.`akka-http-cors`,
-      "com.lihaoyi"          %% "requests" % "0.1.4",
       Libs.`scalatest`.value % Test,
       Libs.`junit`           % Test,
       Libs.`junit-interface` % Test
