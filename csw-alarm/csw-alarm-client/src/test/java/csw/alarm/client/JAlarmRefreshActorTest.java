@@ -32,15 +32,15 @@ public class JAlarmRefreshActorTest extends JUnitSuite {
         ActorRef<AutoRefreshSeverityMessage> ref = AlarmRefreshActorFactory.jMake((key, severity) -> CompletableFuture.supplyAsync(() -> {
             probe.ref().tell(refreshMsg);
             return Done.done();
-        }), Duration.ofMillis(100), system);
+        }), Duration.ofMillis(200), system);
 
         ref.tell(new AutoRefreshSeverity(alarmKey, Major));
         probe.expectMessage(refreshMsg);
-        probe.expectNoMessage(Duration.ofMillis(90));
+        probe.expectNoMessage(Duration.ofMillis(190));
         probe.expectMessage(Duration.ofMillis(50), refreshMsg);
 
         ref.tell(new CancelAutoRefresh(alarmKey));
-        probe.expectNoMessage(Duration.ofMillis(150));
+        probe.expectNoMessage(Duration.ofMillis(210));
     }
 
 }
