@@ -5,7 +5,7 @@ import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl._
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
+import akka.actor.typed._
 import csw.command.client.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
 import csw.command.client.messages.ComponentCommonMessage.{
   ComponentStateSubscription,
@@ -43,7 +43,7 @@ import csw.params.commands.CommandResponse.Locked
 import csw.params.core.models.Prefix
 
 import scala.concurrent.Future
-import scala.concurrent.duration.{Duration, DurationDouble, FiniteDuration}
+import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.util.{Failure, Success}
 
 private[framework] object SupervisorBehavior {
