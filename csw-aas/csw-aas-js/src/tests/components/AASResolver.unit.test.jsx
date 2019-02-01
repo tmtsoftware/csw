@@ -5,6 +5,7 @@ jest.mock('isomorphic-fetch')
 
 // DEOPSCSW-630 - Javascript adapter for AAS
 // DEOPSCSW-631 - React layer for javascript adapter for AAS
+// DEOPSCSW-590 - Set up AAS for Prod
 describe('<AASResolver />', () => {
   it('should resolveAAS', async () => {
     const mockResponse = {
