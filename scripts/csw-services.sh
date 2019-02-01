@@ -30,15 +30,16 @@ cd "$( dirname "${BASH_SOURCE[0]}" )"
 
 # Setting default values
 seed_port=5552
+location_http_port=7654
 config_port=5000
 sentinel_port=26379
 event_master_port=6379
 alarm_master_port=7379
-AAS_port=8081
+aas_port=8081
 db_port=5432
 initSvnRepo="--initRepo"
-AAS_admin_user="admin"
-AAS_admin_password="admin"
+aas_admin_user="admin"
+aas_admin_password="admin"
 
 # Always start cluster seed application
 shouldStartSeed=true
@@ -147,9 +148,9 @@ function random_unused_port {
 function start_seed {
     local location_script="csw-location-server"
 
-    if [ -x "$location_script" ]; then
+    if [[ -x "$location_script" ]]; then
         echo "[LOCATION] Starting cluster seed on port: [$seed_port] ..."
-        nohup ./csw-location-server --clusterPort ${seed_port} --testMode &> ${locationLogFile} &
+        nohup ./csw-location-server --clusterPort ${seed_port} --testMode -Dcsw-location-server.http-port=${location_http_port} &> ${locationLogFile} &
         echo $! > ${locationPidFile}
     else
         echo "[ERROR] $location_script script does not exist, please make sure that $location_script resides in same directory as $script_name"
@@ -160,9 +161,9 @@ function start_seed {
 function start_config {
     local config_script="csw-config-server"
 
-    if [ -x "$config_script" ]; then
+    if [[ -x "$config_script" ]]; then
         echo "[CONFIG] Starting config service on port: [$config_port] ..."
-        nohup ./csw-config-server --port ${config_port} ${initSvnRepo} &> ${configLogFile} &
+        nohup ./csw-config-server --port ${config_port} ${initSvnRepo} -Dcsw-location-client.server-http-port=${location_http_port} &> ${configLogFile}  &
         echo $! > ${configPidFile}
     else
         echo "[ERROR] $config_script script does not exist, please make sure that $config_script resides in same directory as $script_name"
@@ -171,10 +172,10 @@ function start_config {
 }
 
 function start_db() {
-    if [ -x "$location_agent_script" ]; then
+    if [[ -x "$location_agent_script" ]]; then
         echo "[DATABASE] Starting Database Service on port; [$db_port] ..."
         echo "[DATABASE] Make sure to set PGDATA env variable to postgres data directory where postgres is installed e.g. for mac: /usr/local/var/postgres"
-        nohup ./csw-location-agent --name "DatabaseServer" --command "postgres --hba_file=$dbPgHbaConf --unix_socket_directories=$dbUnixSocketDirs -i -p $db_port" --port "$db_port"> ${DBLogFile} 2>&1 &
+        nohup ./csw-location-agent --name "DatabaseServer" --command "postgres --hba_file=$dbPgHbaConf --unix_socket_directories=$dbUnixSocketDirs -i -p $db_port" --port "$db_port" -Dcsw-location-client.server-http-port=${location_http_port}> ${DBLogFile} 2>&1 &
         echo $! > ${DBPidFile}
         echo ${db_port} > ${DBPortFile}
     else
@@ -184,12 +185,12 @@ function start_db() {
 }
 
 function start_sentinel() {
-    if [ -x "$location_agent_script" ]; then
+    if [[ -x "$location_agent_script" ]]; then
         if checkIfRedisIsInstalled ; then
             echo "Starting Redis Sentinel..."
             sed -i- -e "s/eventServer 127.0.0.1/eventServer ${IP}/g" ${sentinelConf}
             sed -i- -e "s/alarmServer 127.0.0.1/alarmServer ${IP}/g" ${sentinelConf}
-            nohup ./csw-location-agent --name "EventServer,AlarmServer" --command "$redisSentinel ${sentinelConf} --port ${sentinel_port}" --port "${sentinel_port}"> ${sentinelLogFile} 2>&1 &
+            nohup ./csw-location-agent --name "EventServer,AlarmServer" --command "$redisSentinel ${sentinelConf} --port ${sentinel_port}" --port "${sentinel_port}" -Dcsw-location-client.server-http-port=${location_http_port}> ${sentinelLogFile} 2>&1 &
             echo $! > ${sentinelPidFile}
             echo ${sentinel_port} > ${sentinelPortFile}
         else
@@ -202,11 +203,11 @@ function start_sentinel() {
 }
 
 function start_AAS() {
-    if [ -x "$location_agent_script" ]; then
+    if [[ -x "$location_agent_script" ]]; then
         echo "[AAS] Starting Auth server..."
-        nohup ./configure.sh -p $AAS_port -u $AAS_admin_user --password $AAS_admin_password --testMode &> ${AASLogFile} &
+        nohup ./configure.sh -p ${aas_port} -u ${aas_admin_user} --password ${aas_admin_password} --locationHttpPort ${location_http_port} --testMode &> ${AASLogFile} &
         echo $! > ${AASPidFile}
-        echo ${AAS_port} > ${AASPortFile}
+        echo ${aas_port} > ${AASPortFile}
     else
         echo "[ERROR] $location_agent_script script does not exist, please make sure that $location_agent_script resides in same directory as $script_name"
         exit 1
@@ -231,7 +232,7 @@ function start_redis() {
     local port=$4
     local portFile=$5
 
-    if [ -x "$location_agent_script" ]; then
+    if [[ -x "$location_agent_script" ]]; then
         if checkIfRedisIsInstalled ; then
             nohup redis-server ${conf} > ${logFile} 2>&1 &
             echo $! > ${pidFile}
@@ -255,8 +256,8 @@ function enableAllServicesForRunning {
 }
 
 function is_AAS_running {
-    local http_code=$(curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:${AAS_port}/auth/admin/realms)
-    if [[ $http_code -eq 401 ]]; then
+    local http_code=$(curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:${aas_port}/auth/admin/realms)
+    if [[ ${http_code} -eq 401 ]]; then
         return 0
     else
         return 1
@@ -273,15 +274,15 @@ function wait_till_AAS_starts {
 
 function start_services {
     if [[ "$shouldStartSeed" = true ]]; then start_seed ; fi
-    if [[ ("$shouldStartAAS" = true) ]]; then start_AAS; fi
-    if [[ "$shouldStartConfig" = true ]]; then
-        wait_till_AAS_starts
-        start_config
-    fi
     if [[ "$shouldStartEvent" = true ]]; then start_event; fi
     if [[ "$shouldStartAlarm" = true ]]; then start_alarm; fi
     if [[ ("$shouldStartEvent" = true) || ("$shouldStartAlarm" = true) ]]; then start_sentinel; fi
     if [[ "$shouldStartDatabase" = true ]]; then start_db; fi
+    if [[ ("$shouldStartAAS" = true) ]]; then
+        start_AAS
+        wait_till_AAS_starts
+    fi
+    if [[ "$shouldStartConfig" = true ]]; then start_config; fi
 }
 
 function usage {
@@ -330,6 +331,9 @@ function parse_cmd_args {
                             shouldStartSeed=true
                             if isPortProvided $2; then seed_port="$2"; shift; fi
                             ;;
+                        --locationHttpPort)
+                            if isPortProvided $2; then location_http_port="$2"; shift; fi
+                            ;;
                         --interfaceName | -i)
                             interfaceName="$2"
                             shift
@@ -353,10 +357,10 @@ function parse_cmd_args {
                             ;;
                         --auth | -aas )
                            shouldStartAAS=true
-                           if isPortProvided $2; then AAS_port="$2"; shift; fi
+                           if isPortProvided $2; then aas_port="$2"; shift; fi
                            if [[ $# -gt 4 ]]; then
-                             if [[ $2 == "-u" ]]; then AAS_admin_user=$3; shift; shift; fi
-                             if [[ $2 == "-p" ]]; then AAS_admin_password=$3; shift; shift; fi
+                             if [[ $2 == "-u" ]]; then aas_admin_user=$3; shift; shift; fi
+                             if [[ $2 == "-p" ]]; then aas_admin_password=$3; shift; shift; fi
                            fi
                            ;;
                         --database | -db)
@@ -408,7 +412,7 @@ function parse_cmd_args {
             stop "Database Server" ${DBPidFile} ${DBPortFile} ${DBLogFile} "pg_ctl stop"
 
             # Stop Cluster Seed application
-            if [ ! -f ${locationPidFile} ]; then
+            if [[ ! -f ${locationPidFile} ]]; then
                 echo "[LOCATION] Cluster seed $locationPidFile does not exist, process is not running."
             else
                 local PID=$(cat ${locationPidFile})
@@ -419,7 +423,7 @@ function parse_cmd_args {
             fi
 
             # Stop Config Service
-            if [ ! -f ${configPidFile} ]; then
+            if [[ ! -f ${configPidFile} ]]; then
                 echo "[CONFIG] Config Service $configPidFile does not exist, process is not running."
             else
                 local PID=$(cat ${configPidFile})
@@ -430,14 +434,13 @@ function parse_cmd_args {
             fi
 
              # Stop auth Server
-            if [ ! -f ${AASPidFile} ]; then
+            if [[ ! -f ${AASPidFile} ]]; then
                 echo "[AAS] Auth Server $AASPidFile does not exist, process is not running."
             else
                 local PID=$(cat ${AASPidFile})
-                local OTHER_PID=$(pgrep -f ${AAS_port})
                 echo "[AAS] Stopping Auth Server..."
                 kill ${PID} &> /dev/null
-                kill ${OTHER_PID} &> /dev/null
+                pkill -f $(cat ${AASPortFile})
                 rm -f ${AASPidFile} ${AASLogFile} ${AASPortFile}
                 echo "[AAS] Auth Server stopped"
             fi
@@ -455,7 +458,7 @@ function stop() {
  local portFile=$3
  local logFile=$4
  local command=$5
-    if [ ! -f ${pidFile} ]; then
+    if [[ ! -f ${pidFile} ]]; then
         echo "$serviceName $pidFile does not exist, process is not running."
     else
         local pid=$(cat ${pidFile})

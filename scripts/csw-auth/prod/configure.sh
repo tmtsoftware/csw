@@ -7,6 +7,7 @@ keycloakBinaryUnzipped=keycloak-${keycloakVersion}.Final
 keycloakBinaryZipped=${keycloakBinaryUnzipped}.tar.gz
 script_name=$0
 
+location_http_port=7654
 port=8081
 host="0.0.0.0"
 userName=""
@@ -67,6 +68,9 @@ function parse_cmd_args {
                     ;;
                 --password)
                     password=$2
+                    ;;
+                --locationHttpPort)
+                    location_http_port=$2
                     ;;
                 --testMode)
                     testMode=true
@@ -163,10 +167,10 @@ function startAndRegister {
     cd ${currentDir}
     echo "[INFO] starting server at $host:$port"
     path=${currentDir}/${configImportJsonPath}
-    if $exampleDemo; then
+    if ${exampleDemo}; then
         path=${currentDir}/${exampleImportJsonPath}
     fi
-    ./csw-location-agent --name AAS --http "auth" -c "${keycloakDir}/${keycloakBinaryUnzipped}/bin/standalone.sh -Djboss.bind.address=${host} -Djboss.http.port=${port} -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=$path" -p "$port"
+    ./csw-location-agent --name AAS --http "auth" -c "${keycloakDir}/${keycloakBinaryUnzipped}/bin/standalone.sh -Djboss.bind.address=${host} -Djboss.http.port=${port} -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=$path" -p "$port" -Dcsw-location-client.server-http-port=${location_http_port}
 }
 
 function start {
