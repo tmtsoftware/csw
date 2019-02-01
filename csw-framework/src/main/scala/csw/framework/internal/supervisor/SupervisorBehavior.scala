@@ -43,7 +43,7 @@ import csw.params.commands.CommandResponse.Locked
 import csw.params.core.models.Prefix
 
 import scala.concurrent.Future
-import scala.concurrent.duration.{Duration, FiniteDuration}
+import scala.concurrent.duration.{Duration, DurationDouble, FiniteDuration}
 import scala.util.{Failure, Success}
 
 private[framework] object SupervisorBehavior {
@@ -313,7 +313,9 @@ private[framework] final class SupervisorBehavior(
   private def createTLA(): ActorRef[Nothing] = {
     val behavior = Behaviors
       .supervise[Nothing](componentBehaviorFactory.make(ctx.self, cswCtx))
-      .onFailure[FailureRestart](SupervisorStrategy.restartWithLimit(3, Duration.Zero).withLoggingEnabled(true))
+      .onFailure[FailureRestart](
+        SupervisorStrategy.restart.withLimit(3, 5.seconds).withLoggingEnabled(true)
+      )
 
     ctx.spawn[Nothing](behavior, componentActorName)
   }

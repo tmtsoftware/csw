@@ -2,12 +2,12 @@ package csw.time;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import akka.actor.typed.ActorContext;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.Adapter;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
+import akka.actor.typed.scaladsl.ActorContext;
 import csw.time.api.models.UTCTime;
 import csw.time.client.api.Cancellable;
 import csw.time.client.api.TimeServiceScheduler;
