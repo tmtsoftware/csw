@@ -25,19 +25,19 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
 
     dbFactory
       .makeDsl(locationService, "postgres") // postgres is dbName
-      .foreach((dsl: DSLContext) ⇒ this.dsl = dsl)
+      .foreach((dsl: DSLContext) ⇒ this.dsl = dsl)   // save returned dsl to a local variable
     //#dbFactory-access
 
     //#dbFactory-write-access
     dbFactory
       .makeDsl(locationService, "postgres", "dbWriteUsername", "dbWritePassword")
-      .foreach((dsl: DSLContext) ⇒ this.dsl = dsl)
+      .foreach((dsl: DSLContext) ⇒ this.dsl = dsl)   // save returned dsl to a local variable
     //#dbFactory-write-access
 
     //#dbFactory-test-access
     dbFactory
       .makeDsl()
-      .foreach((dsl: DSLContext) ⇒ this.dsl = dsl)
+      .foreach((dsl: DSLContext) ⇒ this.dsl = dsl)   // save returned dsl to a local variable
     //#dbFactory-test-access
   }
 

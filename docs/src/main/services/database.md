@@ -17,7 +17,7 @@ Database Service requires `PostgreSQL` server to be running on a machine. To sta
 and testing purposes, refer to @ref:[Starting Apps for Development](../commons/apps.md#starting-apps-for-development).
 
 Once the PostgreSQL is up and running, Database Service can be used to connect and access data. It is assumed that there
-will be more than one user types registered with postgres i.e. for read access, for write access, for admin access, etc.
+will be more than one user types registered with PostgreSQL i.e. for read access, for write access, for admin access, etc.
 
 <!-- introduction to the service -->
 
@@ -40,12 +40,14 @@ an `ActorSystem` and its creation is explained in next section.
 
 @@@ note
    
-Creating a new DatabaseServiceFactory does not mean a new connection to PostgreSQL server will be created. Hence, creating
-multiple DatabaseServiceFactory per component can be considered pretty cheap and harmless.
+Creating a new DatabaseServiceFactory does not mean a new connection to PostgreSQL server will be created. Database
+connections are managed in a pool by the underlying Database Service implementation. Hence, creating
+multiple DatabaseServiceFactory per component can be considered pretty cheap and harmless. But it is also possible
+to save what is returned by DatabaseServiceFactory and pass it around your component.
 
 @@@
 
-#### Connect for Read Access
+#### Connect with Read Access
 
 Our access approach is that all components can read any Database Service database and clients that only
 need read access use the following factory method. But a writer will need a special username/password with write access as shown below.
@@ -68,6 +70,10 @@ user and password that agrees with the values in the environment variables. This
 database login information in the source code. 
 
 @@@ note
+See the [PostgreSQL docs](https://www.postgresql.org/docs/8.0/sql-createuser.html) or
+[this site](https://www.a2hosting.com/kb/developer-corner/postgresql/managing-postgresql-databases-and-users-from-the-command-line) 
+for help with creating users, passwords, and roles in PostgreSQL.  
+
 Eventually, all TMT user logins will all have these environment variables set with the agreed upon read-only user and password.    
 @@@
 
@@ -76,11 +82,11 @@ using the selected JDBC driver underneath. The usage of DSLContext in component 
 
 @@@ note { title=Hint }
 
-* Any exception encountered while connecting to postgres server will be wrapped in `DatabaseException`.
+* Any exception encountered while connecting to PostgreSQL server will be wrapped in `DatabaseException`.
 
 @@@
 
-#### Connect for Write Access
+#### Connect with Write Access
 
 In order to connect to PostgreSQL for write access (or any other access other than read), use the `DatabaseServiceFactory`
 as shown below with different environment variables: 
@@ -127,7 +133,7 @@ csw-database.hikari-datasource.dataSource {
 
 @@@note
 
-By default csw configures `HikariCP` connection pool for managing connections with PostgreSQL server. To know more about `HikariCP`
+By default CSW configures `HikariCP` connection pool for managing connections with PostgreSQL server. To know more about `HikariCP`
 please refer this [link](http://brettwooldridge.github.io/HikariCP/). 
 
 @@@  
@@ -139,7 +145,7 @@ get it executed on the PostgreSQL server.
 
 The following sections show examples of most typical SQL use cases.
 
-### Create
+#### Create
 
 To create a table, use the DSLContext as follows:
 
@@ -149,7 +155,7 @@ Scala
 Java
 :   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/database/JAssemblyComponentHandlers.java) { #dsl-create }
 
-### Insert
+#### Insert
 
 To insert data in batch, use the DSLContext as follows:
 
@@ -165,12 +171,12 @@ Java
  `movie_2` and `2` from the example are bound to the dynamic parameters of these generated prepared statements.
 * As prepared statements provide safety against SQL injection, it is recommended to use prepared statements instead of static
  SQL statements whenever there is a need to dynamically bind values.
-* In the above example, two insert statements are batched together and sent to postgres server in a single call. 
+* In the above example, two insert statements are batched together and sent to PostgreSQL server in a single call. 
  `executeBatchAsync/executeBatch` maps to batch statements underneath at JDBC layer.
 
 @@@
 
-### Select
+#### Select
 
 To select data from table, use the DSLContext as follows:
 
@@ -189,7 +195,7 @@ successful mapping of table fields to domain model class.
 @@@
 
 
-### Stored Function
+#### Stored Function
 
 To create a stored function, use the DSLContext as follows:
 
@@ -209,7 +215,7 @@ Jooq's `DataAccessException` underneath as cause.
 
 @@@
 
-These examples are just a start. Any SQL statements can be created and executed using the DSLContext.
+These examples are just a start. Any SQL statement can be created and executed using the DSLContext.
 
 ## Source code for examples
 

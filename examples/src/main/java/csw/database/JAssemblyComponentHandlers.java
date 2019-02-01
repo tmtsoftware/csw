@@ -38,19 +38,19 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
         dbFactory
                 .jMakeDsl(cswCtx.locationService(), "postgres") // postgres is dbName
-                .thenAccept((DSLContext dsl) -> this.dsl = dsl);
+                .thenAccept((DSLContext dsl) -> this.dsl = dsl);        // save the returned dsl to a local variable
         //#dbFactory-access
 
         //#dbFactory-write-access
         dbFactory
                 .jMakeDsl(cswCtx.locationService(), "postgres", "dbWriteUsername", "dbWritePassword")
-                .thenAccept((DSLContext dsl) -> this.dsl = dsl);
+                .thenAccept((DSLContext dsl) -> this.dsl = dsl);        // save the returned dsl to a local variable
         //#dbFactory-write-access
 
         //#dbFactory-test-access
         dbFactory
                 .jMakeDsl()
-                .thenAccept((DSLContext dsl) -> this.dsl = dsl);
+                .thenAccept((DSLContext dsl) -> this.dsl = dsl);        // save the returned dsl to a local variable
         //#dbFactory-test-access
         return null;
     }
