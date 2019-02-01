@@ -1,6 +1,6 @@
 {
-  "name": "csw-aas-js1",
-  "version": "0.1.0-test",
+  "name": "csw-aas-js",
+  "version": "0.1.0-RC2",
   "description": "This library is a javascript adpater for csw-aas. This is a wrapper over keycloak.js. It provides react components which can be used by UI applications to incarporate authorization and authentication using configured auth server url",
   "author": "TMT Software",
   "license": "Apache License 2.0",
