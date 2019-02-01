@@ -14,9 +14,21 @@ pipeline {
             }
         }
 
+        stage('stage') {
+            steps {
+                sh "sbt stage"
+            }
+        }
+
         stage('install') {
             steps {
                 sh "cd csw-aas/csw-aas-js && npm install"
+            }
+        }
+
+        stage('start AAS') {
+            steps {
+                sh "cd target/universal/stage/bin && ./csw-services.sh start -i ens3 --seed --locationHttpPort 7655 --auth 8082"
             }
         }
 
@@ -26,11 +38,11 @@ pipeline {
             }
         }
 
-        /*stage('test:it') {
+        stage('test:it') {
             steps {
                 sh "cd csw-aas/csw-aas-js && npm run test:it"
             }
-        }*/
+        }
 
         stage('build') {
             steps {
@@ -47,6 +59,7 @@ pipeline {
     post {
         always {
             script {
+                sh "cd target/universal/stage/bin && ./csw-services.sh stop"
                 sendNotification(currentBuild.result)
             }
         }
