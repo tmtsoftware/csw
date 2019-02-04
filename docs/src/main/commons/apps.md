@@ -47,6 +47,17 @@ The execution of the script is such that it starts `csw-location-server`, then c
 `--database` option, if provided, it starts database service. It is important to set `PGDATA` env var to start the postgres server.
                                                               See `--help` for more details 
 
+@@@ note
+
+While starting database service, make sure that
+ 
+ * `PGDATA` environment variable is set to postgres data directory where postgres is installed e.g. for mac: "/usr/local/var/postgres" and
+ * there is a password set for the valid Postgres user. If not, go to postgres shell via `psql` and run `ALTER USER <username> WITH PASSWORD '<mypassword>';`.
+If there is any problem entering postgres shell, go to `conf` folder -> `database_service` -> `pg_hba.conf` and change `password` to `trust`. Try entering
+postgres shell again and set the password. Once set successfully, revert `trust` to `password` in `pg_hba.conf` and run database service via `csw-services.sh`.   
+
+@@@
+
 With this, the component code is now ready to connect to provided services via `csw-services.sh`.   
 
 
