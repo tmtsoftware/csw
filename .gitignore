@@ -22,6 +22,8 @@ test-output/
 .java-version
 build
 
+.vscode
+
 examples/src/main/scala/csw/auth/react/app/node_modules/*
 
 csw-aas/csw-aas-js/node_modules/*

@@ -567,7 +567,7 @@ lazy val `csw-aas-http` = project
     libraryDependencies ++= Dependencies.AuthNativeClientAdapter.value
   )
 
-lazy val `csw-aas-react4s` = project
+lazy val `csw-aas-react4s-example` = project
   .in(file("csw-aas/csw-aas-react4s"))
   .enablePlugins(ScalaJSBundlerPlugin)
   .dependsOn(`csw-aas-react4s-facade`)
