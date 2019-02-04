@@ -154,7 +154,6 @@ object Dependencies {
     Seq(
       Libs.`scala-async`.value,
       Libs.`play-json`.value,
-      Enumeratum.`enumeratum-play`,
       Akka.`akka-actor-typed`,
       Libs.`scopt`,
       Akka.`akka-actor-testkit-typed` % Test,
@@ -168,7 +167,6 @@ object Dependencies {
 
   val CommandClient = Def.setting(
     Seq(
-      Libs.`scala-async`.value,
       Akka.`akka-actor-typed`,
       Chill.`chill-akka`,
       Libs.`caffeine`,
@@ -212,8 +210,6 @@ object Dependencies {
   val EventCli = Def.setting(
     Seq(
       Libs.`play-json`.value,
-      Libs.`play-json-derived-codecs`.value,
-      AkkaHttp.`akka-http`,
       Libs.`scopt`,
       Libs.`scala-csv`,
       Libs.`scalatest`.value % Test,
@@ -250,7 +246,6 @@ object Dependencies {
   val AlarmCli = Def.setting(
     Seq(
       Libs.`scopt`,
-      Libs.`scala-csv`,
       Libs.`scalatest`.value % Test,
       Libs.`embedded-redis`  % Test
     )
@@ -262,7 +257,6 @@ object Dependencies {
       Libs.`scalatest`.value,
       Libs.`embedded-redis`,
       Libs.`junit`,
-      Libs.`junit-interface`,
       Libs.`mockito-scala`
     )
   )
@@ -314,7 +308,6 @@ object Dependencies {
   val AuthNativeClientAdapter = Def.setting(
     Seq(
       Keycloak.`keycloak-installed`,
-      Enumeratum.`enumeratum`.value,
       Libs.`os-lib`,
       //(legacy dependencies) required*
       Libs.`jboss-logging`,
@@ -345,7 +338,6 @@ object Dependencies {
   val AuthAkkaHttpAdapter = Def.setting(
     Seq(
       AkkaHttp.`akka-http`,
-      Akka.`akka-stream`,
       Libs.`scalatest`.value       % Test,
       AkkaHttp.`akka-http-testkit` % Test,
       Libs.`mockito-scala`         % Test,
@@ -429,7 +421,6 @@ object Dependencies {
   val Integration = Def.setting(
     Seq(
       Libs.`scalatest`.value,
-      Akka.`akka-stream-testkit`
     )
   )
 
