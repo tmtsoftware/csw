@@ -25,7 +25,26 @@ http server, we need
 * protected http server running
 
 All of these can be running on different machines. To start location service & keycloak 
-server on local machine, you make make use of csw-services.sh script.
+server on a local machine, you make make use of csw-services.sh script.
+
+## Application Configurations
+
+All auth related configurations go inside `auth-config` block. There are two configurations 
+applicable for a public cli client application i.e. `realm` & `client-id`.
+
+`realm` has a
+default value of `TMT` if not specified. Ideally all apps in TMT should not have to override
+this, however it might be useful to override this while testing your app.
+
+`client-id` is a mandatory configuration which specifies the client id of the app as per registration
+in keycloak.
+
+```hocon
+auth-config {
+  realm = TMT # DEFAULT
+  client-id = demo-cli # REQUIRED
+}
+```
 
 ## Building a CLI Application
 
@@ -168,23 +187,6 @@ If the response is 403, it indicates that token was valid but the token is not a
 perform certain action. In this case if the token belonged to a user who does not have `admin`
 role, server will return 403.
 
-## Application Configurations
-
-All auth related configurations go inside `auth-config` block. There are two configurations 
-required for a public cli client application i.e. `realm` & `client-id`. `realm` has a
-default value of `TMT` if not specified. Ideally all apps in TMT should not have to override
-this, however it might be useful to override this while testing your app.
-
-`client-id` is a mandatory configuration which specifies the client id of the app as per registration
-in keycloak.
-
-```hocon
-auth-config {
-  realm = TMT # DEFAULT
-  client-id = demo-cli # REQUIRED
-}
-```
-
 ## Source code for above examples
 
 @github[XXX](/examples/src/main/scala/csw/auth/native)
@@ -193,6 +195,8 @@ auth-config {
 
 ## Native
 //keycloak setup
+//access token handle
+//custom policy example
 
 ## Akka-HTTP
 //todo: policy expressions in akka http adapter

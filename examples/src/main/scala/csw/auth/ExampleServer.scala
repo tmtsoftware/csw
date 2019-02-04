@@ -2,40 +2,34 @@ package csw.auth
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.server._
-import akka.http.scaladsl.unmarshalling.GenericUnmarshallers
 import akka.stream.ActorMaterializer
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import csw.aas.http.AuthorizationPolicy._
 import csw.aas.http.SecurityDirectives
+import csw.auth.AsyncSupport.actorSystem
+import csw.auth.ExampleServer.{complete, get, pathPrefix, startServer}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.client.utils.LocationServerStatus
 import csw.logging.client.scaladsl.LoggingSystemFactory
-import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.implicitConversions
 
-object ExampleServer extends HttpApp with App with GenericUnmarshallers with PlayJsonSupport {
+object ExampleServer extends HttpApp with App {
 
-  import Async._
-
-  LoggingSystemFactory.start("example-server", "", "", Async.actorSystem)
-
-  //ensure location service is up
-  LocationServerStatus.requireUpLocally(5.seconds)
+  import AsyncSupport._
 
   // #security-directive-usage
-  //create location client
-  private val locationService = HttpLocationServiceFactory.makeLocalClient
+  val locationService = HttpLocationServiceFactory.makeLocalClient
 
-  private val directives = SecurityDirectives(locationService)
+  val directives = SecurityDirectives(locationService)
 
   import directives._
   // #security-directive-usage
 
-  private val HOST = "0.0.0.0"
-  private val PORT = 9003
+  val HOST = "0.0.0.0"
+  val PORT = 9003
 
   // #example-routes
   override protected def routes: Route = cors() {
@@ -43,11 +37,9 @@ object ExampleServer extends HttpApp with App with GenericUnmarshallers with Pla
       get {
         complete("SUCCESS")
       } ~
-      // #secure-route-example
       sPost(RealmRolePolicy("example-admin-role")) {
         complete("SUCCESS")
       } ~
-      // #secure-route-example
       sPut(ClientRolePolicy("person-role")) {
         complete("SUCCESS")
       } ~
@@ -69,34 +61,77 @@ object ExampleServer extends HttpApp with App with GenericUnmarshallers with Pla
   startServer(HOST, PORT)
 }
 
-private object Async {
+object LoggingSupport {
+  //start logging
+  LoggingSystemFactory.start("example-server", "", "", actorSystem)
+}
+
+object AsyncSupport {
   implicit val actorSystem: ActorSystem = ActorSystem()
   implicit val ec: ExecutionContext     = ExecutionContext.global
   implicit val mat: ActorMaterializer   = ActorMaterializer()
-
-  implicit def resolveFuture[T](future: Future[T]): T = {
-    Await.result(future, 5.seconds)
-  }
 }
 
-object ImplicitsDemo {}
+object LocationServiceSupport {
+  //ensure location service is up
+  LocationServerStatus.requireUpLocally(5.seconds)
+}
 
-object Policies {
+object Documentation {
+
+  import AsyncSupport._
+
+  private val locationService = HttpLocationServiceFactory.makeLocalClient
+
+  private val directives = SecurityDirectives(locationService)
+
+  import directives._
+
+  // #secure-route-example
+  val secureRoute: Route = sPost(RealmRolePolicy("example-admin-role")) {
+    complete("SUCCESS")
+  }
+  // #secure-route-example
+
   val list = List(
     // #realm-role-policy
-    RealmRolePolicy("example-admin-role"),
+    RealmRolePolicy("admin"),
     // #realm-role-policy
     // #client-role-policy
-    ClientRolePolicy("person-role"),
+    ClientRolePolicy("accounts-admin"),
     // #client-role-policy
     // #custom-policy
     CustomPolicy(at ⇒ at.given_name.contains("test-user")),
     // #custom-policy
     // #permission-policy
-    PermissionPolicy("delete", "person"),
+    PermissionPolicy("delete", "account"),
     // #permission-policy
     // #empty-policy
     EmptyPolicy
     // #empty-policy
   )
 }
+
+// #sample-http-app
+object SampleHttpApp extends HttpApp with App {
+
+  implicit val actorSystem: ActorSystem = ActorSystem()
+  implicit val ec: ExecutionContext     = ExecutionContext.global
+  implicit val mat: ActorMaterializer   = ActorMaterializer()
+
+  val locationService = HttpLocationServiceFactory.makeLocalClient
+  val directives      = SecurityDirectives(locationService)
+  import directives._
+
+  override protected def routes: Route = pathPrefix("api") {
+    get {
+      complete("SUCCESS")
+    } ~
+    sPost(RealmRolePolicy("admin")) {
+      complete("SUCCESS")
+    }
+  }
+
+  startServer("0.0.0.0", 9003)
+}
+// #sample-http-app
