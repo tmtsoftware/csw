@@ -39,12 +39,15 @@ This shell script will start `csw-location-server` as the first step regardless 
 
 @@@
 
-The execution of the script is such that it starts `csw-location-server`, then checks whether to start configuration service from provided
-`--auth` option, if provided, it starts authentication service. Next, it checks whether to start configuration service from provided
-`--config` option, if provided, then starts configuration service. Next, it checks whether to start event service from provided 
-`--event` option, if provided, it starts event service. Next, it checks whether to start alarm service from provided 
-`--alarm` option, if provided, it starts alarm service. Next, it checks whether to start database service from provided
-`--database` option, if provided, it starts database service. It is important to set `PGDATA` env var to start the postgres server.
+The execution of the script is such that it starts `csw-location-server`, then checks whether to start configuration service from provided options.
+
+Possible options to start services are explained below:
+
+`--auth` if provided, starts authentication service.
+`--config` if provided, starts configuration service.
+`--event` if provided, starts event service. 
+`--alarm` if provided, starts alarm service.
+`--database` if provided, starts database service. It is important to set `PGDATA` env var to start the postgres server.
                                                               See `--help` for more details 
 
 @@@ note
