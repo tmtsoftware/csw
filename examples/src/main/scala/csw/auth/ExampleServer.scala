@@ -41,47 +41,27 @@ object ExampleServer extends HttpApp with App with GenericUnmarshallers with Pla
   override protected def routes: Route = cors() {
     pathPrefix("person") {
       get {
-        complete("OK")
+        complete("SUCCESS")
       } ~
       // #secure-route-example
-      sPost(
-        // #realm-role-policy
-        RealmRolePolicy("example-admin-role")
-        // #realm-role-policy
-      ) { _ ⇒
-        complete("Person created OK")
+      sPost(RealmRolePolicy("example-admin-role")) {
+        complete("SUCCESS")
       } ~
       // #secure-route-example
-      sPut(
-        // #client-role-policy
-        ClientRolePolicy("person-role")
-        // #client-role-policy
-      ) { _ ⇒
-        complete("Person updated OK")
+      sPut(ClientRolePolicy("person-role")) {
+        complete("SUCCESS")
       } ~
-      sPatch(ClientRolePolicy("some-role")) { _ ⇒
-        complete("Person updated OK")
+      sPatch(ClientRolePolicy("some-role")) {
+        complete("SUCCESS")
       } ~
-      sHead(
-        // #custom-policy
-        CustomPolicy(at ⇒ at.given_name.contains("test-user"))
-        // #custom-policy
-      ) { _ ⇒
-        complete("Custom policy OK")
+      sHead(CustomPolicy(at ⇒ at.given_name.contains("test-user"))) {
+        complete("SUCCESS")
       } ~
-      sDelete(
-        // #permission-policy
-        PermissionPolicy("delete", "person")
-        // #permission-policy
-      ) { _ ⇒
-        complete("Permission policy OK")
+      sDelete(PermissionPolicy("delete", "person")) {
+        complete("SUCCESS")
       } ~
-      sGet(
-        // #empty-policy
-        EmptyPolicy
-        // #empty-policy
-      ) { _ ⇒
-        complete("Empty policy OK")
+      sGet(EmptyPolicy) {
+        complete("SUCCESS")
       }
     }
   }
@@ -97,4 +77,26 @@ private object Async {
   implicit def resolveFuture[T](future: Future[T]): T = {
     Await.result(future, 5.seconds)
   }
+}
+
+object ImplicitsDemo {}
+
+object Policies {
+  val list = List(
+    // #realm-role-policy
+    RealmRolePolicy("example-admin-role"),
+    // #realm-role-policy
+    // #client-role-policy
+    ClientRolePolicy("person-role"),
+    // #client-role-policy
+    // #custom-policy
+    CustomPolicy(at ⇒ at.given_name.contains("test-user")),
+    // #custom-policy
+    // #permission-policy
+    PermissionPolicy("delete", "person"),
+    // #permission-policy
+    // #empty-policy
+    EmptyPolicy
+    // #empty-policy
+  )
 }

@@ -55,7 +55,7 @@ be applied to protect routes.
  - [CustomPolicy](#custompolicy)
  - [EmptyPolicy](#emptypolicy)
 
-## ClientRolePolicy
+### ClientRolePolicy
 
 This policy filters requests based on Client Role. A Client Role is a client specific role.
 
@@ -65,7 +65,7 @@ Scala
 :   @@snip [Client Role Policy](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #client-role-policy }
  
 
-## RealmRolePolicy
+### RealmRolePolicy
 
 This policy filters requests based on Realm Role. A Realm Role is global role within a realm and is applicable for all clients 
 within realm.
@@ -76,7 +76,7 @@ Scala
 :   @@snip [Realm Role Policy](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #realm-role-policy }
  
 
-## PermissionPolicy
+### PermissionPolicy
 
 This policy filters requests based on permissions. It expects name of scope and name of resource on which permission is created 
 in keycloak server.
@@ -88,7 +88,7 @@ Scala
 :   @@snip [Permission Policy](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #permission-policy }
  
 
-## CustomPolicy
+### CustomPolicy
 
 This policy allows custom request filtering based on access token properties. It expects filter condition
 
@@ -98,7 +98,7 @@ Scala
 :   @@snip [Custom Policy](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #custom-policy }
  
 
-## EmptyPolicy
+### EmptyPolicy
 
 This policy is used this when only authentication is needed but not authorization.
 
@@ -119,6 +119,12 @@ sDelete     - Rejects all un-authorized and non-DELETE requests
 sHead       - Rejects all un-authorized and non-HEAD requests
 sConnect    - Rejects all un-authorized and non-CONNECT requests
 
+These security directives are instance methods of class `SecurityDirectives`. To use these directives, recommended approach is
+to first create an instance of `SecurityDirectives` and import everything from it. Here's an example:
+
+Scala
+:   @@snip [SecurityDirectives](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #security-directive-usage }
+
 These secure HTTP verbs expect authorization policy to use for filtering requests. These secure HTTP verbs and authorization
 policies explained above can be used to achieve securing route.
 
@@ -133,24 +139,8 @@ Following example shows akka http routes with some secure and open routes
 Scala
 :   @@snip [Routes](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #example-routes }
  
- 
-## Example HTTP Server
 
-Points to remember while writing http server with secure routes
-
-* Instantiate SecurityDirectives with appropriate config. SecurityDirectives exposes factory to instantiate SecurityDirectives
-based on config or using location service. 
-
-Following example shows one way of instantiating SecurityDirectives
-
-Scala
-:   @@snip [SecurityDirectives](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #security-directive-usage }
-
-Please refer API documentation for more information regarding SecurityDirectives.
-
-This enables usage of secure HTTP verbs while writing routes
-
-## Source code for example http server
+## Source code for above examples
 
 * @github[Example http server](/examples/src/main/scala/csw/auth/ExampleServer.scala)
 
