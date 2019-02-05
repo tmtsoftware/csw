@@ -5,7 +5,7 @@ import akka.http.scaladsl.server._
 import akka.stream.ActorMaterializer
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import csw.aas.http.AuthorizationPolicy._
-import csw.aas.http.{AuthorizationPolicy, SecurityDirectives}
+import csw.aas.http.SecurityDirectives
 import csw.auth.AsyncSupport.actorSystem
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.client.utils.LocationServerStatus
@@ -113,30 +113,50 @@ object Documentation extends HttpApp {
   }
   // #access-token-handle-demo
 
-  // #custom-policy-async
-  //GET http://[host]:[port]/files?fileId=[fileId]
-  val routes: Route =
-    path("files" / LongNumber) { fileId =>
-      sGet(CustomPolicyAsync(token => Database.doesUserOwnFile(token.preferred_username, fileId))) {
-        complete(Database.getFileContents(fileId))
+  object Policies {
+    // #custom-policy-async
+    //GET http://[host]:[port]/files?fileId=[fileId]
+    val route: Route =
+      path("files" / LongNumber) { fileId =>
+        sGet(CustomPolicyAsync(token => Database.doesUserOwnFile(token.preferred_username, fileId))) {
+          complete(Database.getFileContents(fileId))
+        }
       }
-    }
-  // #custom-policy-async
+    // #custom-policy-async
 
-  // #empty-policy-usage
-  val authenticationOnlyRoute: Route = // GET http://[host]:[post]/api
-    path("api") {
-      sGet(EmptyPolicy) {
-        complete("OK")
+    // #empty-policy-usage
+    val authenticationOnlyRoute: Route = // GET http://[host]:[post]/api
+      path("api") {
+        sGet(EmptyPolicy) {
+          complete("OK")
+        }
       }
-    }
-  // #empty-policy-usage
+    // #empty-policy-usage
 
-  // #secure-route-example
-  val secureRoute: Route = sPost(RealmRolePolicy("example-admin-role")) {
-    complete("SUCCESS")
+    //#realm-role-policy-usage
+    val routeWithRealmRolePolicy: Route = sGet(RealmRolePolicy("admin")) {
+      complete("OK")
+    }
+    //#realm-role-policy-usage
+
+    //#client-role-policy-usage
+    val routeWithClientRolePolicy: Route = sGet(ClientRolePolicy("accounts-admin")) {
+      complete("OK")
+    }
+    //#client-role-policy-usage
+
+    // #custom-policy-usage
+    val routeWithCustomPolicy: Route = sPost(CustomPolicy(token ⇒ token.given_name.contains("test-user"))) {
+      complete("OK")
+    }
+    // #custom-policy-usage
+
+    // #permission-policy
+    val routeWithPermissions = sDelete(PermissionPolicy("delete", "account")) {
+      complete("OK")
+    }
+    // #permission-policy
   }
-  // #secure-route-example
 
   object PolicyExpressions {
     // #policy-expressions
@@ -150,23 +170,7 @@ object Documentation extends HttpApp {
     // #policy-expressions
   }
 
-  val list = List(
-    // #realm-role-policy
-    RealmRolePolicy("admin"),
-    // #realm-role-policy
-    // #client-role-policy
-    ClientRolePolicy("accounts-admin"),
-    // #client-role-policy
-    // #custom-policy
-    CustomPolicy(token ⇒ token.given_name.contains("test-user")),
-    // #custom-policy
-    // #permission-policy
-    PermissionPolicy("delete", "account"),
-    // #permission-policy
-    // #empty-policy
-    EmptyPolicy
-    // #empty-policy
-  )
+  val routes: Route = ???
 }
 
 // #sample-http-app

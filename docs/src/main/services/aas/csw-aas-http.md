@@ -109,7 +109,7 @@ within realm.
 In the following example policy will authorize request if user has assigned `admin`
 
 Scala
-:   @@snip [Realm Role Policy](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #realm-role-policy }
+:   @@snip [Realm Role Policy](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #realm-role-policy-usage }
  
 ### ClientRolePolicy
 
@@ -119,13 +119,13 @@ This policy filters requests based on Client Role. In the following example poli
 request if user has assigned `accounts-admin` for clientId specified in configurations
 
 Scala
-:   @@snip [Client Role Policy](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #client-role-policy }
+:   @@snip [Client Role Policy](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #client-role-policy-usage }
  
 
 ### PermissionPolicy
 
 This policy filters requests based on permissions. It expects name of scope and name of resource on which permission is created 
-in keycloak server. Scope and Resource forms a "Permission". For example, "scope: Sell; resource: Vehicle" combined
+in keycloak. Scope and Resource forms a "Permission". For example, "scope: Sell; resource: Vehicle" combined
 specifies that the user with this scope and resource combination can "sell vehicles".
 
 In the following example policy will authorize request if user has appropriate permission associated in keycloak which specifies
@@ -142,7 +142,7 @@ accepts an access token and returns a boolean. If the predicate returns true, it
 In the following example policy will authorize request if user's given name contains `test-user`
 
 Scala
-:   @@snip [Custom Policy](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #custom-policy } 
+:   @@snip [Custom Policy](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #custom-policy-usage } 
 
 ### CustomPolicyAsync
 
@@ -213,5 +213,12 @@ val policy = policy1 | (policy2 & (policy3 | policy4)) | policy5
 * @github[Example http server](/examples/src/main/scala/csw/auth/ExampleServer.scala)
 
 # TODO
-* permissions - setup - keycloak setup
+## keycloak setup
+* keycloak realms
+* keycloak roles
+* keycloak users
+* keycloak clients
+* keycloak client roles
+* keycloak permissions
+
 
