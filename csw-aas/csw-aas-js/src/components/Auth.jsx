@@ -17,10 +17,8 @@ class AuthStore {
     tokenParsed: () => keycloak.tokenParsed,
     realmAccess: () => keycloak.realmAccess, // todo: should this be called realmRoles?
     resourceAccess: () => keycloak.resourceAccess, // todo: should this be called resourceRoles?
-    loadUserInfo: keycloak.loadUserInfo,
-    isAuthenticated: () => {
-      return keycloak.authenticated
-    },
+    loadUserInfo: keycloak.loadUserInfo, // todo: should this be exposed, keycloak doc says private?
+    isAuthenticated: () => keycloak.authenticated,
     hasRealmRole: keycloak.hasRealmRole,
     hasResourceRole: keycloak.hasResourceRole,
   })

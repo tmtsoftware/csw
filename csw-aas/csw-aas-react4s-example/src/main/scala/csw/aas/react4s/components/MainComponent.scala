@@ -8,7 +8,7 @@ case class MainComponent() extends Component[NoEmit] {
 
   override def render(get: Get): Node = {
     E.div(
-      TMTAuthContextProvider(
+      AuthContextProvider(
         J("config", Config),
         E.h1(Text("TMT Scala.js Application")),
         E.h3(Text("CheckLogin Component:")),
@@ -16,11 +16,28 @@ case class MainComponent() extends Component[NoEmit] {
           error = Login(),
           children = Logout()
         ),
-        E.h3(Text("RealmRole Component:")),
         RealmRole(
           realmRole = "example-admin-role",
           error = Component(ErrorComponent),
-          children = Component(DummyComponent)
+          children = AuthContext.consume(ctx ⇒ {
+            println("*" * 80)
+            println("hasRealmRole: " + ctx.auth.hasRealmRole("example-admin-role"))
+            println(ctx.auth.token())
+            println("realmAccess: " + ctx.auth.realmAccess().roles)
+            println("resourceAccess: " + ctx.auth.resourceAccess().values)
+            println("hasResourceRole: " + ctx.auth.hasResourceRole("example-admin-role", None))
+            val token = ctx.auth.tokenParsed()
+            println("exp: " + token.exp)
+            println("iat: " + token.iat)
+            println("nonce: " + token.nonce)
+            println("sub: " + token.sub)
+            println("state: " + token.session_state)
+            println("roles: " + token.realm_access.roles)
+            println("resource_access: " + token.resource_access.values)
+            println("*" * 80)
+
+            Component(DummyComponent)
+          }),
         ),
       )
     )
