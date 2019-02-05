@@ -1,7 +1,7 @@
 import React from 'react'
-import { defaultState, Provider } from './TMTAuthContext'
+import { AuthContextDefaultState, Provider } from './AuthContext'
 import PropTypes from 'prop-types'
-import { TMTAuth } from '../TMTAuth'
+import { Auth } from '../Auth'
 
 /**
  * React component which is wrapper over provider of react context api.
@@ -11,10 +11,10 @@ import { TMTAuth } from '../TMTAuth'
  * children - react component or html element which can have consumer to access
  * context provided
  */
-class TMTAuthContextProvider extends React.Component {
+class AuthContextProvider extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { ...defaultState, login: this.login, logout: this.logout }
+    this.state = { ...AuthContextDefaultState, login: this.login, logout: this.logout }
   }
 
   async componentDidMount() {
@@ -30,20 +30,20 @@ class TMTAuthContextProvider extends React.Component {
    * as a context
    */
   instantiateAAS = async (url, redirect) => {
-    const { keycloak, authenticated } = await TMTAuth.authenticate(
+    const { keycloak, authenticated } = await Auth.authenticate(
       this.props.config,
       url,
       redirect,
     )
     authenticated
       .success(() => {
-        const tmtAuth = TMTAuth.from(keycloak)
+        const auth = Auth.from(keycloak)
         this.setState({
-          tmtAuth: tmtAuth,
+          auth: auth,
         })
       })
       .error(() => {
-        this.setState({ tmtAuth: null })
+        this.setState({ auth: null })
       })
   }
 
@@ -51,7 +51,7 @@ class TMTAuthContextProvider extends React.Component {
    * Resolves AAS server and instantiate keycloak in check-sso mode
    */
   loginWithoutRedirect = async () => {
-    const url = await TMTAuth.getAASUrl()
+    const url = await Auth.getAASUrl()
     await this.instantiateAAS({ url: url }, false)
   }
 
@@ -59,21 +59,21 @@ class TMTAuthContextProvider extends React.Component {
    * Resolves AAS server and instantiate keycloak in login-required mode
    */
   login = async () => {
-    const url = await TMTAuth.getAASUrl()
+    const url = await Auth.getAASUrl()
     await this.instantiateAAS({ url: url }, true)
   }
 
   logout = async () => {
-    const logoutPromise = await this.state.tmtAuth.logout()
+    const logoutPromise = await this.state.auth.logout()
     logoutPromise.success(() => {
-      this.setState({ tmtAuth: null })
+      this.setState({ auth: null })
     })
   }
 }
 
-TMTAuthContextProvider.propTypes = {
+AuthContextProvider.propTypes = {
   config: PropTypes.object,
   children: PropTypes.node,
 }
 
-export default TMTAuthContextProvider
+export default AuthContextProvider

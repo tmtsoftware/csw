@@ -12,7 +12,7 @@ describe('<WithContext />', () => {
   it('should render component with additional props', async () => {
     const getWithContextWithMockConsumer = () => {
       const mockContext = {
-        tmtAuth: {
+        auth: {
           isAuthenticated: jest.fn().mockImplementation(() => {
             return true
           }),
@@ -21,7 +21,7 @@ describe('<WithContext />', () => {
         logout: () => true,
       }
 
-      jest.mock('../../../components/context/TMTAuthContext', () => {
+      jest.mock('../../../components/context/AuthContext', () => {
         return {
           Consumer: jest.fn().mockImplementation(props => {
             return props.children(mockContext)
@@ -47,6 +47,6 @@ describe('<WithContext />', () => {
 
     expect(props['login']()).toBe(true)
     expect(props['logout']()).toBe(true)
-    expect(props['tmtAuth'].isAuthenticated()).toBe(true)
+    expect(props['auth'].isAuthenticated()).toBe(true)
   })
 })

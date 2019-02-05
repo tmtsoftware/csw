@@ -1,6 +1,6 @@
 import React from 'react'
 import {BrowserRouter} from 'react-router-dom'
-import {ClientRole, TMTAuthContextProvider} from 'csw-aas-js'
+import {ClientRole, AuthContextProvider} from 'csw-aas-js'
 import NavComponent from './NavComponent'
 import {AppConfig} from '../config/AppConfig'
 import WriteConfig from './CreateConfig'
@@ -11,7 +11,7 @@ import GetConfig from './GetConfig'
 const ConfigApp = () => {
   return (
     <div className='row card col s12 m7'>
-      <TMTAuthContextProvider config={AppConfig}>
+      <AuthContextProvider config={AppConfig}>
         <BrowserRouter>
           <div>
             <NavComponent />
@@ -25,7 +25,7 @@ const ConfigApp = () => {
           error={<ConfigError />}>
           <WriteConfig />
         </ClientRole>
-      </TMTAuthContextProvider>
+      </AuthContextProvider>
     </div>
   )
 }

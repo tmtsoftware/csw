@@ -28,10 +28,10 @@ class CreateConfig extends React.Component {
     return (
       <Consumer>
         {
-          ({tmtAuth}) => {
+          ({auth}) => {
             return (
               <div className='card-panel hoverable'>
-                <IOOperationComponent token={tmtAuth.token} componentNameProp='Create Config' operation='Create Config' output={this.state.response} api={this.createConfig} />
+                <IOOperationComponent token={auth.token} componentNameProp='Create Config' operation='Create Config' output={this.state.response} api={this.createConfig} />
                 <div className='card-panel hoverable'>
                   File Content
                   <span>

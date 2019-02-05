@@ -15,7 +15,7 @@ describe('<RealmRole />', () => {
   it('should render children elements if authentication is true and with valid realm role', () => {
     const getRealmRoleWithMockContext = () => {
       const mockContext = {
-        tmtAuth: {
+        auth: {
           hasRealmRole: jest.fn().mockImplementation(() => {
             return true
           }),
@@ -26,7 +26,7 @@ describe('<RealmRole />', () => {
         login: () => true,
         logout: () => true,
       }
-      jest.mock('../../../components/context/TMTAuthContext', () => {
+      jest.mock('../../../components/context/AuthContext', () => {
         return {
           Consumer: jest.fn().mockImplementation(props => {
             return props.children(mockContext)
@@ -53,7 +53,7 @@ describe('<RealmRole />', () => {
   it('should not render children elements if authentication is true but invalid realm role', () => {
     const getRealmRoleWithMockContext = () => {
       const mockContext = {
-        tmtAuth: {
+        auth: {
           hasRealmRole: jest.fn().mockImplementation(() => {
             return false
           }),
@@ -64,7 +64,7 @@ describe('<RealmRole />', () => {
         login: () => true,
         logout: () => true,
       }
-      jest.mock('../../../components/context/TMTAuthContext', () => {
+      jest.mock('../../../components/context/AuthContext', () => {
         return {
           Consumer: jest.fn().mockImplementation(props => {
             return props.children(mockContext)
@@ -91,7 +91,7 @@ describe('<RealmRole />', () => {
   it('should not render children elements if authentication is false ', () => {
     const getRealmRoleWithMockContext = () => {
       const mockContext = {
-        tmtAuth: {
+        auth: {
           hasRealmRole: jest.fn().mockImplementation(() => {
             return true
           }),
@@ -102,7 +102,7 @@ describe('<RealmRole />', () => {
         login: () => true,
         logout: () => true,
       }
-      jest.mock('../../../components/context/TMTAuthContext', () => {
+      jest.mock('../../../components/context/AuthContext', () => {
         return {
           Consumer: jest.fn().mockImplementation(props => {
             return props.children(mockContext)
@@ -129,7 +129,7 @@ describe('<RealmRole />', () => {
   it('should render RealmRoleComponent if authentication is true and with valid realm role', () => {
     const getRealmRoleWithMockContext = () => {
       const mockContext = {
-        tmtAuth: {
+        auth: {
           hasRealmRole: jest.fn().mockImplementation(() => {
             return true
           }),
@@ -140,7 +140,7 @@ describe('<RealmRole />', () => {
         login: () => true,
         logout: () => true,
       }
-      jest.mock('../../../components/context/TMTAuthContext', () => {
+      jest.mock('../../../components/context/AuthContext', () => {
         return {
           Consumer: jest.fn().mockImplementation(props => {
             return props.children(mockContext)
@@ -167,7 +167,7 @@ describe('<RealmRole />', () => {
   it('should not render RealmRoleComponent if authentication is true but invalid realm role', () => {
     const getRealmRoleWithMockContext = () => {
       const mockContext = {
-        tmtAuth: {
+        auth: {
           hasRealmRole: jest.fn().mockImplementation(() => {
             return false
           }),
@@ -178,7 +178,7 @@ describe('<RealmRole />', () => {
         login: () => true,
         logout: () => true,
       }
-      jest.mock('../../../components/context/TMTAuthContext', () => {
+      jest.mock('../../../components/context/AuthContext', () => {
         return {
           Consumer: jest.fn().mockImplementation(props => {
             return props.children(mockContext)
@@ -205,7 +205,7 @@ describe('<RealmRole />', () => {
   it('should not render RealmRoleComponent elements if authentication is false ', () => {
     const getRealmRoleWithMockContext = () => {
       const mockContext = {
-        tmtAuth: {
+        auth: {
           hasRealmRole: jest.fn().mockImplementation(() => {
             return true
           }),
@@ -216,7 +216,7 @@ describe('<RealmRole />', () => {
         login: () => true,
         logout: () => true,
       }
-      jest.mock('../../../components/context/TMTAuthContext', () => {
+      jest.mock('../../../components/context/AuthContext', () => {
         return {
           Consumer: jest.fn().mockImplementation(props => {
             return props.children(mockContext)
@@ -243,7 +243,7 @@ describe('<RealmRole />', () => {
   it('should render nothing if authentication is false and no error component is provided ', () => {
     const getRealmRoleWithMockContext = () => {
       const mockContext = {
-        tmtAuth: {
+        auth: {
           hasRealmRole: jest.fn().mockImplementation(() => {
             return true
           }),
@@ -254,7 +254,7 @@ describe('<RealmRole />', () => {
         login: () => true,
         logout: () => true,
       }
-      jest.mock('../../../components/context/TMTAuthContext', () => {
+      jest.mock('../../../components/context/AuthContext', () => {
         return {
           Consumer: jest.fn().mockImplementation(props => {
             return props.children(mockContext)

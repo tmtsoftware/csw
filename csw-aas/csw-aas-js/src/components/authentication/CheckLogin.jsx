@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Consumer } from '../context/TMTAuthContext'
+import { Consumer } from '../context/AuthContext'
 
 /**
  * React component which renders children if authenticated and error if unauthenticated
@@ -11,9 +11,9 @@ import { Consumer } from '../context/TMTAuthContext'
  */
 const CheckLogin = ({ children, error }) => (
   <Consumer>
-    {({ tmtAuth }) => {
-      if (!tmtAuth) return error
-      return tmtAuth.isAuthenticated() ? children : error || null
+    {({ auth }) => {
+      if (!auth) return error
+      return auth.isAuthenticated() ? children : error || null
     }}
   </Consumer>
 )

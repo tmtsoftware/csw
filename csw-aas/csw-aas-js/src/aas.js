@@ -3,8 +3,8 @@ import Login from './components/Login'
 import CheckLogin from './components/authentication/CheckLogin'
 import RealmRole from './components/authorization/RealmRole'
 import ClientRole from './components/authorization/ClientRole'
-import TMTAuthContextProvider from './components/context/TMTAuthContextProvider'
-import { Consumer } from './components/context/TMTAuthContext'
+import AuthContextProvider from './components/context/AuthContextProvider'
+import { Consumer, AuthContext } from './components/context/AuthContext'
 
 // #export-components
 export {
@@ -13,7 +13,8 @@ export {
   CheckLogin,
   RealmRole,
   ClientRole,
-  TMTAuthContextProvider,
+  AuthContextProvider,
   Consumer,
+  AuthContext
 }
 // #export-components

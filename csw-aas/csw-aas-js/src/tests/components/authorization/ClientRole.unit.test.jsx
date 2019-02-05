@@ -15,7 +15,7 @@ describe('<ClientRole />', () => {
   it('should render children elements if authentication is true and with valid Client role', () => {
     const getClientRoleWithMockContext = () => {
       const mockContext = {
-        tmtAuth: {
+        auth: {
           hasResourceRole: jest.fn().mockImplementation(() => {
             return true
           }),
@@ -26,7 +26,7 @@ describe('<ClientRole />', () => {
         login: () => true,
         logout: () => true,
       }
-      jest.mock('../../../components/context/TMTAuthContext', () => {
+      jest.mock('../../../components/context/AuthContext', () => {
         return {
           Consumer: jest.fn().mockImplementation(props => {
             return props.children(mockContext)
@@ -54,7 +54,7 @@ describe('<ClientRole />', () => {
   it('should not render children elements if authentication is true but invalid Client role', () => {
     const getClientRoleWithMockContext = () => {
       const mockContext = {
-        tmtAuth: {
+        auth: {
           hasResourceRole: jest.fn().mockImplementation(() => {
             return false
           }),
@@ -65,7 +65,7 @@ describe('<ClientRole />', () => {
         login: () => true,
         logout: () => true,
       }
-      jest.mock('../../../components/context/TMTAuthContext', () => {
+      jest.mock('../../../components/context/AuthContext', () => {
         return {
           Consumer: jest.fn().mockImplementation(props => {
             return props.children(mockContext)
@@ -93,7 +93,7 @@ describe('<ClientRole />', () => {
   it('should not render children elements if authentication is false ', () => {
     const getClientRoleWithMockContext = () => {
       const mockContext = {
-        tmtAuth: {
+        auth: {
           hasResourceRole: jest.fn().mockImplementation(() => {
             return true
           }),
@@ -104,7 +104,7 @@ describe('<ClientRole />', () => {
         login: () => true,
         logout: () => true,
       }
-      jest.mock('../../../components/context/TMTAuthContext', () => {
+      jest.mock('../../../components/context/AuthContext', () => {
         return {
           Consumer: jest.fn().mockImplementation(props => {
             return props.children(mockContext)
@@ -132,7 +132,7 @@ describe('<ClientRole />', () => {
   it('should render ClientRole if authentication is true and with valid Client role', () => {
     const getClientRoleWithMockContext = () => {
       const mockContext = {
-        tmtAuth: {
+        auth: {
           hasResourceRole: jest.fn().mockImplementation(() => {
             return true
           }),
@@ -143,7 +143,7 @@ describe('<ClientRole />', () => {
         login: () => true,
         logout: () => true,
       }
-      jest.mock('../../../components/context/TMTAuthContext', () => {
+      jest.mock('../../../components/context/AuthContext', () => {
         return {
           Consumer: jest.fn().mockImplementation(props => {
             return props.children(mockContext)
@@ -171,7 +171,7 @@ describe('<ClientRole />', () => {
   it('should not render ClientRole if authentication is true but invalid Client role', () => {
     const getClientRoleWithMockContext = () => {
       const mockContext = {
-        tmtAuth: {
+        auth: {
           hasResourceRole: jest.fn().mockImplementation(() => {
             return false
           }),
@@ -182,7 +182,7 @@ describe('<ClientRole />', () => {
         login: () => true,
         logout: () => true,
       }
-      jest.mock('../../../components/context/TMTAuthContext', () => {
+      jest.mock('../../../components/context/AuthContext', () => {
         return {
           Consumer: jest.fn().mockImplementation(props => {
             return props.children(mockContext)
@@ -210,7 +210,7 @@ describe('<ClientRole />', () => {
   it('should not render ClientRole if authentication is false ', () => {
     const getCleintRoleWithMockContext = () => {
       const mockContext = {
-        tmtAuth: {
+        auth: {
           hasResourceRole: jest.fn().mockImplementation(() => {
             return true
           }),
@@ -221,7 +221,7 @@ describe('<ClientRole />', () => {
         login: () => true,
         logout: () => true,
       }
-      jest.mock('../../../components/context/TMTAuthContext', () => {
+      jest.mock('../../../components/context/AuthContext', () => {
         return {
           Consumer: jest.fn().mockImplementation(props => {
             return props.children(mockContext)
@@ -249,7 +249,7 @@ describe('<ClientRole />', () => {
   it('should render nothing if authentication is false and error component is not provided', () => {
     const getClientRoleWithMockContext = () => {
       const mockContext = {
-        tmtAuth: {
+        auth: {
           hasResourceRole: jest.fn().mockImplementation(() => {
             return true
           }),
@@ -260,7 +260,7 @@ describe('<ClientRole />', () => {
         login: () => true,
         logout: () => true,
       }
-      jest.mock('../../../components/context/TMTAuthContext', () => {
+      jest.mock('../../../components/context/AuthContext', () => {
         return {
           Consumer: jest.fn().mockImplementation(props => {
             return props.children(mockContext)

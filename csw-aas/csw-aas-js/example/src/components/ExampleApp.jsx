@@ -1,7 +1,7 @@
 import React from 'react'
 import { BrowserRouter, Route } from 'react-router-dom'
 // #import-components-example
-import { CheckLogin, RealmRole, ClientRole, TMTAuthContextProvider } from 'csw-aas-js'
+import { CheckLogin, RealmRole, ClientRole, AuthContextProvider } from 'csw-aas-js'
 // #import-components-example
 import NavComponent from './NavComponent'
 import { AppConfig } from '../config/AppConfig'
@@ -12,7 +12,7 @@ import ExampleError from './ExampleError'
 class ExampleApp extends React.Component {
   state = {
     authContext: {
-      tmtAuth: null,
+      auth: null,
       isAuthenticated: false,
     },
   }
@@ -21,8 +21,8 @@ class ExampleApp extends React.Component {
     const config = { ...AppConfig }
     return (
       <div className='row card col s12 m7'>
-        {// #TMTAuthContextProvider-component-usage
-          <TMTAuthContextProvider config={config}>
+        {// #AuthContextProvider-component-usage
+          <AuthContextProvider config={config}>
             <BrowserRouter>
               <div>
                 <NavComponent />
@@ -59,8 +59,8 @@ class ExampleApp extends React.Component {
             // #clientRole-component-usage
             }
 
-          </TMTAuthContextProvider>
-        // #TMTAuthContextProvider-component-usage
+          </AuthContextProvider>
+        // #AuthContextProvider-component-usage
         }
       </div>
     )

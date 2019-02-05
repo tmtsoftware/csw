@@ -1,4 +1,4 @@
-import { TMTAuth } from '../../components/TMTAuth'
+import { Auth } from '../../components/Auth'
 import KeyCloak from 'keycloak-js'
 import { resolveAAS } from '../../components/AASResolver'
 
@@ -7,12 +7,12 @@ jest.mock('keycloak-js')
 jest.mock('../../components/AASResolver')
 
 // DEOPSCSW-630 - Javascript adapter for AAS
-describe('<TMTAuth />', () => {
+describe('<Auth />', () => {
   beforeEach(() => {
     resolveAAS.mockClear()
   })
 
-  it('should create TMTAuth instance', () => {
+  it('should create Auth instance', () => {
     const mockKeycloak = {
       logout: jest.fn(),
       token: 'token string',
@@ -23,17 +23,17 @@ describe('<TMTAuth />', () => {
       authenticated: false,
     }
 
-    const tmtAuth = TMTAuth.from(mockKeycloak)
+    const auth = Auth.from(mockKeycloak)
 
-    expect(tmtAuth.logout).toBe(mockKeycloak.logout)
-    expect(tmtAuth.token()).toBe(mockKeycloak.token)
-    expect(tmtAuth.tokenParsed()).toBe(mockKeycloak.tokenParsed)
-    expect(tmtAuth.realmAccess()).toBe(mockKeycloak.realmAccess)
-    expect(tmtAuth.resourceAccess()).toBe(mockKeycloak.resourceAccess)
-    expect(tmtAuth.loadUserInfo).toBe(mockKeycloak.loadUserInfo)
-    expect(tmtAuth.isAuthenticated()).toBe(false)
-    expect(tmtAuth.hasRealmRole).toBe(mockKeycloak.hasRealmRole)
-    expect(tmtAuth.hasResourceRole).toBe(mockKeycloak.hasResourceRole)
+    expect(auth.logout).toBe(mockKeycloak.logout)
+    expect(auth.token()).toBe(mockKeycloak.token)
+    expect(auth.tokenParsed()).toBe(mockKeycloak.tokenParsed)
+    expect(auth.realmAccess()).toBe(mockKeycloak.realmAccess)
+    expect(auth.resourceAccess()).toBe(mockKeycloak.resourceAccess)
+    expect(auth.loadUserInfo).toBe(mockKeycloak.loadUserInfo)
+    expect(auth.isAuthenticated()).toBe(false)
+    expect(auth.hasRealmRole).toBe(mockKeycloak.hasRealmRole)
+    expect(auth.hasResourceRole).toBe(mockKeycloak.hasResourceRole)
   })
 
   it('should authenticate', () => {
@@ -51,7 +51,7 @@ describe('<TMTAuth />', () => {
 
     KeyCloak.mockReturnValue(mockKeycloak)
 
-    const { keycloak, authenticated } = TMTAuth.authenticate(
+    const { keycloak, authenticated } = Auth.authenticate(
       {
         realm: 'example',
         clientId: 'example-app',
@@ -72,7 +72,7 @@ describe('<TMTAuth />', () => {
   it('should getAASUrl from location service', async () => {
     resolveAAS.mockReturnValue(Promise.resolve('http://AAS_IP:AAS_Port/auth'))
 
-    const url = await TMTAuth.getAASUrl()
+    const url = await Auth.getAASUrl()
 
     expect(resolveAAS).toHaveBeenCalledTimes(1)
     expect(url).toBe('http://AAS_IP:AAS_Port/auth')
@@ -81,7 +81,7 @@ describe('<TMTAuth />', () => {
   it('should getAASUrl from config', async () => {
     resolveAAS.mockReturnValue(Promise.resolve(null))
 
-    const url = await TMTAuth.getAASUrl()
+    const url = await Auth.getAASUrl()
 
     expect(resolveAAS).toHaveBeenCalledTimes(1)
     expect(url).toBe('http://localhost:8081/auth')

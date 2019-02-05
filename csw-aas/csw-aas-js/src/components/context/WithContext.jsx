@@ -1,8 +1,8 @@
 import React from 'react'
-import { Consumer } from './TMTAuthContext'
+import { Consumer } from './AuthContext'
 
 /**
- * Higher order function which returns Component with additional props e.g tmtAuth
+ * Higher order function which returns Component with additional props e.g auth
  * login and logout used through Consumer of context
  * @param Component react component with some props
  */
@@ -10,11 +10,11 @@ const WithContext = Component => {
   return props => {
     return (
       <Consumer>
-        {({ tmtAuth, login, logout }) => {
+        {({ auth, login, logout }) => {
           return (
             <Component
               {...props}
-              tmtAuth={tmtAuth}
+              auth={auth}
               login={login}
               logout={logout}
             />

@@ -15,7 +15,7 @@ describe('<CheckLogin />', () => {
   it('should render children elements if authentication is true', () => {
     const getCheckLoginWithMockContext = () => {
       const mockContext = {
-        tmtAuth: {
+        auth: {
           isAuthenticated: jest.fn().mockImplementation(() => {
             return true
           }),
@@ -23,7 +23,7 @@ describe('<CheckLogin />', () => {
         login: () => true,
         logout: () => true,
       }
-      jest.mock('../../../components/context/TMTAuthContext', () => {
+      jest.mock('../../../components/context/AuthContext', () => {
         return {
           Consumer: jest.fn().mockImplementation(props => {
             return props.children(mockContext)
@@ -49,7 +49,7 @@ describe('<CheckLogin />', () => {
   it('should not render children elements if authentication is true', () => {
     const getCheckLoginWithMockContext = () => {
       const mockContext = {
-        tmtAuth: {
+        auth: {
           isAuthenticated: jest.fn().mockImplementation(() => {
             return false
           }),
@@ -57,7 +57,7 @@ describe('<CheckLogin />', () => {
         login: () => true,
         logout: () => true,
       }
-      jest.mock('../../../components/context/TMTAuthContext', () => {
+      jest.mock('../../../components/context/AuthContext', () => {
         return {
           Consumer: jest.fn().mockImplementation(props => {
             return props.children(mockContext)
@@ -83,7 +83,7 @@ describe('<CheckLogin />', () => {
   it('should render CheckLogin if authentication is true', () => {
     const getCheckLoginWithMockContext = () => {
       const mockContext = {
-        tmtAuth: {
+        auth: {
           isAuthenticated: jest.fn().mockImplementation(() => {
             return true
           }),
@@ -91,7 +91,7 @@ describe('<CheckLogin />', () => {
         login: () => true,
         logout: () => true,
       }
-      jest.mock('../../../components/context/TMTAuthContext', () => {
+      jest.mock('../../../components/context/AuthContext', () => {
         return {
           Consumer: jest.fn().mockImplementation(props => {
             return props.children(mockContext)
@@ -117,7 +117,7 @@ describe('<CheckLogin />', () => {
   it('should not render CheckLogin if authentication is false', () => {
     const getCheckLoginWithMockContext = () => {
       const mockContext = {
-        tmtAuth: {
+        auth: {
           isAuthenticated: jest.fn().mockImplementation(() => {
             return false
           }),
@@ -125,7 +125,7 @@ describe('<CheckLogin />', () => {
         login: () => true,
         logout: () => true,
       }
-      jest.mock('../../../components/context/TMTAuthContext', () => {
+      jest.mock('../../../components/context/AuthContext', () => {
         return {
           Consumer: jest.fn().mockImplementation(props => {
             return props.children(mockContext)
@@ -151,7 +151,7 @@ describe('<CheckLogin />', () => {
   it('should render nothing if CheckLogin if authentication is false and error component is not provided', () => {
     const getCheckLoginWithMockContext = () => {
       const mockContext = {
-        tmtAuth: {
+        auth: {
           isAuthenticated: jest.fn().mockImplementation(() => {
             return false
           }),
@@ -159,7 +159,7 @@ describe('<CheckLogin />', () => {
         login: () => true,
         logout: () => true,
       }
-      jest.mock('../../../components/context/TMTAuthContext', () => {
+      jest.mock('../../../components/context/AuthContext', () => {
         return {
           Consumer: jest.fn().mockImplementation(props => {
             return props.children(mockContext)

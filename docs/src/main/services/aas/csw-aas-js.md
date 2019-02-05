@@ -41,7 +41,7 @@ Javascript
 
 csw-aas-js exposes following react components: 
 
- - [TMTAuthContextProvider](#TMTAuthContextProvider)
+ - [AuthContextProvider](#AuthContextProvider)
  - [Consumer](#consumer)
  - [Login](#login)
  - [Logout](#logout)
@@ -49,39 +49,39 @@ csw-aas-js exposes following react components:
  - [RealmRole](#realmrole)
  - [ClientRole](#clientrole)
 
-## TMTAuthContextProvider
+## AuthContextProvider
 
-TMTAuthContextProvider is wrapper over provider from react context API. It expects config json to be passed. This config 
+AuthContextProvider is wrapper over provider from react context API. It expects config json to be passed. This config 
 json is UI application specific AAS server configuration e.g. clientId, realm. When user loges in AAS Server is instantiated 
 by merging UI application specific config and predefined configuration. UI application can choose to override predefined 
-json configuration. Once AAS sever is instantiated, tmtAuth object is updated with needed attributes and apis. This tmtAuth
-is available to all react componets . tmtAuth Context is designed to share data that can be considered “global” for a 
+json configuration. Once AAS sever is instantiated, auth object is updated with needed attributes and apis. This auth
+is available to all react components. Auth Context is designed to share data that can be considered “global” for a 
 tree of React components and is available via Consumer. All consumers that are descendants of a Provider will re-render 
-whenever the TMTAuthContextProvider’s state changes i.e tmtAuth. Recommended way is use TMTAuthContextProvider to wrap entire 
+whenever the AuthContextProvider’s state changes i.e auth. Recommended way is use AuthContextProvider to wrap entire 
 application so that data can be shared anywhere in application via Consumer. 
 
 Javascript
-:   @@snip [TMTAuthContextProvider.jsx](../../../../../csw-aas/csw-aas-js/example/src/components/ExampleApp.jsx) { #TMTAuthContextProvider-component-usage }
+:   @@snip [AuthContextProvider.jsx](../../../../../csw-aas/csw-aas-js/example/src/components/ExampleApp.jsx) { #AuthContextProvider-component-usage }
 
 ### Source code for RealmRole component
 
-* @github[TMTAuthContextProvider Component](/csw-aas/csw-aas-js/src/components/context/TMTAuthContextProvider.jsx)
+* @github[AuthContextProvider Component](/csw-aas/csw-aas-js/src/components/context/AuthContextProvider.jsx)
 
 ## Consumer
 
-Consumer is similar to consumer from react context api. tmtAuth can be accessed using Consumer component 
+Consumer is similar to consumer from react context api. auth can be accessed using Consumer component 
 
 Javascript
 :   @@snip [Consumer.jsx](../../../../../csw-aas/csw-aas-js/example/src/components/Read.jsx) { #Consumer-component-usage }
 
 ### Source code for RealmRole component
 
-* @github[Consumer Component](/csw-aas/csw-aas-js/src/components/context/TMTAuthContext.jsx)
+* @github[Consumer Component](/csw-aas/csw-aas-js/src/components/context/AuthContext.jsx)
 
 ## Login
 
 Login component instantiate AAS server with configurations provided. It redirects to AAS server login page for user to login.
-After login tmtAuth in context is updated with appropriate values e.g. token, realm & client roles etc.
+After login auth in context is updated with appropriate values e.g. token, realm & client roles etc.
 
 Javascript
 :   @@snip [Login.jsx](../../../../../csw-aas/csw-aas-js/example/src/components/NavComponent.jsx) { #login-component-usage }
@@ -92,7 +92,7 @@ Javascript
 
 ## Logout
 
-Logout component logs out user from AAS server. It clears tmtAuth stored in context.
+Logout component logs out user from AAS server. It clears auth stored in context.
 
 Javascript
 :   @@snip [Logout.jsx](../../../../../csw-aas/csw-aas-js/example/src/components/NavComponent.jsx) { #logout-component-usage }

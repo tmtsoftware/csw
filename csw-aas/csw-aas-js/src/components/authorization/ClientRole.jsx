@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Consumer } from '../context/TMTAuthContext'
+import { Consumer } from '../context/AuthContext'
 
 /**
  * React component which renders if user is authenticated and has specified client role
@@ -14,10 +14,10 @@ import { Consumer } from '../context/TMTAuthContext'
  */
 const ClientRole = ({ clientRole, client, children, error }) => (
   <Consumer>
-    {({ tmtAuth }) => {
-      if (!tmtAuth) return error
-      return tmtAuth.isAuthenticated() &&
-        tmtAuth.hasResourceRole(clientRole, client)
+    {({ auth }) => {
+      if (!auth) return error
+      return auth.isAuthenticated() &&
+        auth.hasResourceRole(clientRole, client)
         ? children
         : error || null
     }}

@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Consumer } from '../context/TMTAuthContext'
+import { Consumer } from '../context/AuthContext'
 
 /**
  * React component which renders if user is authenticated and has specified realm role
@@ -13,9 +13,9 @@ import { Consumer } from '../context/TMTAuthContext'
  */
 const RealmRole = ({ realmRole, children, error }) => (
   <Consumer>
-    {({ tmtAuth }) => {
-      if (!tmtAuth) return error
-      return tmtAuth.isAuthenticated() && tmtAuth.hasRealmRole(realmRole)
+    {({ auth }) => {
+      if (!auth) return error
+      return auth.isAuthenticated() && auth.hasRealmRole(realmRole)
         ? children
         : error || null
     }}

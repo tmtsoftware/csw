@@ -5,26 +5,25 @@ import { resolveAAS } from './AASResolver'
 /**
  * Adapter for authentication and authorization service
  */
-class TMTAuthStore {
+class AuthStore {
   /**
-   * Create instance of TMTAuthStore from keycloak.
+   * Create instance of AuthStore from keycloak.
    *
    * @param keycloak keycloak instance instantiated using keyclok-js
    */
-  from = keycloak => {
-    this.logout = keycloak.logout
-    this.token = () => keycloak.token
-    this.tokenParsed = () => keycloak.tokenParsed
-    this.realmAccess = () => keycloak.realmAccess // todo: should this be called realmRoles?
-    this.resourceAccess = () => keycloak.resourceAccess // todo: should this be called resourceRoles?
-    this.loadUserInfo = keycloak.loadUserInfo
-    this.isAuthenticated = () => {
+  from = keycloak => ({
+    logout: keycloak.logout,
+    token: () => keycloak.token,
+    tokenParsed: () => keycloak.tokenParsed,
+    realmAccess: () => keycloak.realmAccess, // todo: should this be called realmRoles?
+    resourceAccess: () => keycloak.resourceAccess, // todo: should this be called resourceRoles?
+    loadUserInfo: keycloak.loadUserInfo,
+    isAuthenticated: () => {
       return keycloak.authenticated
-    }
-    this.hasRealmRole = keycloak.hasRealmRole
-    this.hasResourceRole = keycloak.hasResourceRole
-    return this
-  }
+    },
+    hasRealmRole: keycloak.hasRealmRole,
+    hasResourceRole: keycloak.hasResourceRole,
+  })
 
   /**
    * Responsible for instantiating keycloak using provided config and authentication. It also creates hooks for refreshing token when
@@ -35,7 +34,7 @@ class TMTAuthStore {
    * @param redirect boolean which decides instantiation mode for keycloak. e.g. login-required or check-sso.
    * login-required mode redirects user to login screen if not logged in already. check-sso only checks if already
    * logged in without redirecting to login screen if not logged in.
-   * @return { keycloak, authenticated } json which contains keycloak instance and authenticated which is promise after
+   * @return {{ keycloak, authenticated }} json which contains keycloak instance and authenticated which is promise after
    * initializing keycloak
    */
   authenticate = (config, url, redirect) => {
@@ -76,4 +75,4 @@ class TMTAuthStore {
   }
 }
 
-export const TMTAuth = new TMTAuthStore()
+export const Auth = new AuthStore()

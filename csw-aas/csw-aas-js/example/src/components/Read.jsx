@@ -4,9 +4,9 @@ import { Consumer } from 'csw-aas-js'
 const Read = () => (
   // #Consumer-component-usage
   <Consumer>
-    { ({tmtAuth}) => {
+    { ({auth}) => {
       return <div className='nav-wrapper'>
-        { (tmtAuth && tmtAuth.isAuthenticated()) ? <div>
+        { (auth && auth.isAuthenticated()) ? <div>
             Hello, you are logged in
           <div>Open functionality</div>
         </div>
