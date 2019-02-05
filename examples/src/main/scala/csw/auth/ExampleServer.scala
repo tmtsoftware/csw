@@ -5,15 +5,14 @@ import akka.http.scaladsl.server._
 import akka.stream.ActorMaterializer
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import csw.aas.http.AuthorizationPolicy._
-import csw.aas.http.SecurityDirectives
+import csw.aas.http.{AuthorizationPolicy, SecurityDirectives}
 import csw.auth.AsyncSupport.actorSystem
-import csw.auth.ExampleServer.{complete, get, pathPrefix, startServer}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.client.utils.LocationServerStatus
 import csw.logging.client.scaladsl.LoggingSystemFactory
 
-import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
+import scala.concurrent.{ExecutionContext, Future}
 import scala.language.implicitConversions
 
 object ExampleServer extends HttpApp with App {
@@ -77,7 +76,7 @@ object LocationServiceSupport {
   LocationServerStatus.requireUpLocally(5.seconds)
 }
 
-object Documentation {
+object Documentation extends HttpApp {
 
   import AsyncSupport._
 
@@ -87,11 +86,71 @@ object Documentation {
 
   import directives._
 
+  object Database {
+    def doesUserOwnFile(userId: Option[String], fileId: Long): Future[Boolean] = ???
+
+    def getFileContents(fileId: Long): String = ???
+  }
+
+  object ThirdPartyService {
+    def deleteEntity(entityId: Long, username: Option[String]) = ???
+    def deleteEntity(entityId: Long)                           = ???
+  }
+
+  // #access-token-handle-demo
+  val routeExampleWithToken: Route = sDelete(EmptyPolicy) { token =>
+    parameter("entityId".as[Long]) { entityId =>
+      ThirdPartyService.deleteEntity(entityId, token.preferred_username)
+      complete(s"user ${token.given_name} ${token.family_name} deleted entity $entityId")
+    }
+  }
+
+  val routeExampleWithoutToken: Route = sDelete(EmptyPolicy) {
+    parameter("entityId".as[Long]) { entityId =>
+      ThirdPartyService.deleteEntity(entityId)
+      complete(s"entity $entityId deleted")
+    }
+  }
+  // #access-token-handle-demo
+
+  // #custom-policy-async
+  //GET http://[host]:[port]/files?fileId=[fileId]
+  val routes: Route =
+    path("files") {
+      parameter("fileId".as[Long]) { fileId =>
+        sGet(CustomPolicyAsync(token => Database.doesUserOwnFile(token.preferred_username, fileId))) {
+          complete(Database.getFileContents(fileId))
+        }
+      }
+    }
+  // #custom-policy-async
+
+  // #empty-policy-usage
+  val authenticationOnlyRoute: Route = // GET http://[host]:[post]/api
+    path("api") {
+      sGet(EmptyPolicy) {
+        complete("OK")
+      }
+    }
+  // #empty-policy-usage
+
   // #secure-route-example
   val secureRoute: Route = sPost(RealmRolePolicy("example-admin-role")) {
     complete("SUCCESS")
   }
   // #secure-route-example
+
+  object PolicyExpressions {
+    // #policy-expressions
+    val routes: Route =
+    sGet(RealmRolePolicy("admin") | CustomPolicy(_.email.contains("super-admin@tmt.org"))) {
+      complete("OK")
+    } ~
+    sPost(ClientRolePolicy("finance_user") & PermissionPolicy("edit")) {
+      complete("OK")
+    }
+    // #policy-expressions
+  }
 
   val list = List(
     // #realm-role-policy
@@ -101,7 +160,7 @@ object Documentation {
     ClientRolePolicy("accounts-admin"),
     // #client-role-policy
     // #custom-policy
-    CustomPolicy(at ⇒ at.given_name.contains("test-user")),
+    CustomPolicy(token ⇒ token.given_name.contains("test-user")),
     // #custom-policy
     // #permission-policy
     PermissionPolicy("delete", "account"),

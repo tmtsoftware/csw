@@ -95,15 +95,15 @@ An authorization policy is a way to provide filter incoming HTTP requests based 
 be applied to protect routes.
 
  - [ReamRolePolicy](#realmrolepolicy)
-    Realm-level roles are a global namespace to define roles.
  - [ClientRolePolicy](#clientrolepolicy)
  - [PermissionPolicy](#permissionpolicy)
  - [CustomPolicy](#custompolicy)
+ - [CustomPolicyAsync](#custompolicyasync)
  - [EmptyPolicy](#emptypolicy)
 
 ### RealmRolePolicy
 
-This policy filters requests based on Realm Role. A Realm Role is global role within a realm and is applicable for all clients 
+This policy filters requests based on Realm Role. A Realm Role is global and is applicable for all clients 
 within realm.
 
 In the following example policy will authorize request if user has assigned `admin`
@@ -144,58 +144,74 @@ In the following example policy will authorize request if user's given name cont
 Scala
 :   @@snip [Custom Policy](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #custom-policy } 
 
+### CustomPolicyAsync
+
+This policy is similar to CustomPolicy with only difference that it expects a predicate which returns
+a Future of Boolean instead of a Boolean. This could be very useful for custom validations which need
+to make an IO call. For example,
+
+Scala
+:   @@snip [Custom Policy](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #custom-policy-async } 
+
+This forms a an http route for a secure GET request for path `/files` and expects a query string parameter
+named `fileId` of type `Long`. The async custom policy makes an async database call to check whether the
+file being requested belongs to the user who made http request.
+
 ### EmptyPolicy
 
 This policy is used this when only authentication is needed but not authorization.
-
-In the following example policy will pass if user is authenticated
+EmptyPolicy is an object and not a class like other policies and it does not need any parameters.
 
 Scala
-:   @@snip [Empty Policy](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #empty-policy }
+:   @@snip [Empty Policy](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #empty-policy-usage }
  
 
----------------- REVIEWED -------------------
-
-## Writing Secure Routes
+## Security Directives
 
 csw-aas-http adapter supports following secure HTTP verbs:
 
-sGet        - Rejects all un-authorized and non-GET requests
-sPost       - Rejects all un-authorized and non-POST requests
-sPut        - Rejects all un-authorized and non-PUT requests
-sDelete     - Rejects all un-authorized and non-DELETE requests
-sHead       - Rejects all un-authorized and non-HEAD requests
-sConnect    - Rejects all un-authorized and non-CONNECT requests
+| Name | Description |
+|--- |--- |
+|sGet |Rejects all un-authorized and non-GET requests |
+|sPost |Rejects all un-authorized and non-POST requests |
+|sPut |Rejects all un-authorized and non-PUT requests |
+|sDelete |Rejects all un-authorized and non-DELETE requests |
+|sHead |Rejects all un-authorized and non-HEAD requests |
+|sConnect |Rejects all un-authorized and non-CONNECT requests |
 
-These security directives are instance methods of class `SecurityDirectives`. To use these directives, recommended approach is
-to first create an instance of `SecurityDirectives` and import everything from it. Here's an example:
+## Using Access Token
 
-Scala
-:   @@snip [SecurityDirectives](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #security-directive-usage }
+A handle of access token is given to to all secure routes. It is optional to define parameter for it.
 
-These secure HTTP verbs expect authorization policy to use for filtering requests. These secure HTTP verbs and authorization
-policies explained above can be used to achieve securing route.
-
-Following example shows secure POST request which filters requests based on RealmRole policy. User having `example-admin-role`
-is authorized to hit this POST route. 
+For example:
 
 Scala
-:   @@snip [Secure Route](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #secure-route-example }
+:   @@snip [Empty Policy](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #access-token-handle-demo }
 
-Following example shows akka http routes with some secure and open routes
+Both of the above approaches compile and are valid. Access token holds basic information about the user 
+or the client who has made request.
+
+Please go through api documentation to know more about Access Token.
+
+## Policy Expressions
+
+So far, we have seen that security directives can accept an authorization policy. It can however accept an expression of 
+multiple authorization policies too. This could be useful to express complex authorization logic. For example:
 
 Scala
-:   @@snip [Routes](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #example-routes }
- 
+:   @@snip [Empty Policy](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #policy-expressions }
+
+Note the `|` , `&` operators which helps compose an expression. A Policy expression could be more complex than this
+and can contain braces to group more expressions. For example:
+
+```scala
+val policy = policy1 | (policy2 & (policy3 | policy4)) | policy5
+```
 
 ## Source code for above examples
 
 * @github[Example http server](/examples/src/main/scala/csw/auth/ExampleServer.scala)
 
-
 # TODO
-
 * permissions - setup - keycloak setup
-* access token handle
-* custom policy execution example
-* expressions
+
