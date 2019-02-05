@@ -153,8 +153,8 @@ to make an IO call. For example,
 Scala
 :   @@snip [Custom Policy](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #custom-policy-async } 
 
-This forms a an http route for a secure GET request for path `/files` and expects a query string parameter
-named `fileId` of type `Long`. The async custom policy makes an async database call to check whether the
+This forms a an http route for a secure GET request for path `/files/[fileId]` and expects a path parameter
+of type `Long`. The async custom policy makes an async database call to check whether the
 file being requested belongs to the user who made http request.
 
 ### EmptyPolicy
