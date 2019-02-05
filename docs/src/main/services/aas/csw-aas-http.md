@@ -208,6 +208,29 @@ and can contain braces to group more expressions. For example:
 val policy = policy1 | (policy2 & (policy3 | policy4)) | policy5
 ```
 
+## Directive Composition
+
+Since security directives extend from `akka.http.scaladsl.server.Directive` they give you all the
+benefits of a usual directive. These benefits include being able to label & [compose higher level
+directives](https://doc.akka.io/docs/akka-http/current/routing-dsl/directives/custom-directives.html#custom-directives).
+
+With the help of directive labeling you could write a route like below:
+
+Scala
+:   @@snip [Empty Policy](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #directive-composition-anti-pattern }
+
+The same can be achieved via @ref:[Policy Expressions](#policy-expressions) as shown below
+
+Scala
+:   @@snip [Empty Policy](../../../../../examples/src/main/scala/csw/auth/ExampleServer.scala) { #policy-expressions-right-way } 
+
+If you want to combine two directives ***and both of them are csw security directives***,
+we strongly recommend that you use @ref:[Policy Expressions](#policy-expressions). The reason 
+for this is that, when you combine two csw security directives authentication check happens twice (or multiple
+times based on how many csw security directives are combined) which was meant to happen only once thus causing 
+performance slowdown. You can however combine csw security directives with other directives freely without worrying
+about performance.
+
 ## Source code for above examples
 
 * @github[Example http server](/examples/src/main/scala/csw/auth/ExampleServer.scala)

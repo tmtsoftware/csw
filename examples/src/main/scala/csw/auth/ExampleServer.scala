@@ -170,6 +170,16 @@ object Documentation extends HttpApp {
     // #policy-expressions
   }
 
+  object DirectiveComposition {
+    // #policy-expressions-right-way
+    sGet(RealmRolePolicy("admin") & ClientRolePolicy("sales_admin"))
+    // #policy-expressions-right-way
+
+    // #directive-composition-anti-pattern
+    sGet(RealmRolePolicy("admin")) & sGet(ClientRolePolicy("sales_admin"))
+    // #directive-composition-anti-pattern
+  }
+
   val routes: Route = ???
 }
 
