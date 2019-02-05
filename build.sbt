@@ -568,7 +568,7 @@ lazy val `csw-aas-http` = project
   )
 
 lazy val `csw-aas-react4s-example` = project
-  .in(file("csw-aas/csw-aas-react4s"))
+  .in(file("csw-aas/csw-aas-react4s-example"))
   .enablePlugins(ScalaJSBundlerPlugin)
   .dependsOn(`csw-aas-react4s-facade`)
   .settings(

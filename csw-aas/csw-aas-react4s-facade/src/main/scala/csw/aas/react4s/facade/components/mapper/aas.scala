@@ -3,7 +3,7 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation.JSImport
 
 @js.native
-@JSImport("csw-aas-js1", JSImport.Namespace)
+@JSImport("csw-aas-js", JSImport.Namespace)
 private[facade] object aas extends js.Object {
   val Login: js.Dynamic                  = js.native
   val Logout: js.Dynamic                 = js.native
