@@ -192,24 +192,5 @@ role, server will return 403.
 @github[XXX](/examples/src/main/scala/csw/auth/native)
 
 # TODO
-
-## Native
 //keycloak setup
-//access token handle
-//custom policy example
 
-## Akka-HTTP
-//todo: policy expressions in akka http adapter
-//todo: async custom policy in akka http adapter
-
-## Done
-//DONE: replace requests with akka http client
-//CANCELLED: detailed documentation
-//DONE: application.conf
-//NOTED: ## - right side table of contents
-//DONE: introduce aas 
-//DONE: source code links at bottom
-//CANCELLED: fix the getting started section
-//DONE: fix syntax of example routes
-//DONE: implicits
-//DONE: csw-services apps.mds review

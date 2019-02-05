@@ -116,11 +116,9 @@ object Documentation extends HttpApp {
   // #custom-policy-async
   //GET http://[host]:[port]/files?fileId=[fileId]
   val routes: Route =
-    path("files") {
-      parameter("fileId".as[Long]) { fileId =>
-        sGet(CustomPolicyAsync(token => Database.doesUserOwnFile(token.preferred_username, fileId))) {
-          complete(Database.getFileContents(fileId))
-        }
+    path("files" / LongNumber) { fileId =>
+      sGet(CustomPolicyAsync(token => Database.doesUserOwnFile(token.preferred_username, fileId))) {
+        complete(Database.getFileContents(fileId))
       }
     }
   // #custom-policy-async
