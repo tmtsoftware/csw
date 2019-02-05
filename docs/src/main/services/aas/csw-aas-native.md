@@ -191,6 +191,3 @@ role, server will return 403.
 
 @github[XXX](/examples/src/main/scala/csw/auth/native)
 
-# TODO
-//keycloak setup
-
