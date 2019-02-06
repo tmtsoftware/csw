@@ -32,6 +32,8 @@ object Libs {
   val `scalapb-runtime`          = "com.thesamet.scalapb" %% "scalapb-runtime"          % scalapbVersion % "protobuf"
   val `scalapb-json4s`           = "com.thesamet.scalapb" %% "scalapb-json4s"           % scalapbVersion
   val `lettuce`                  = "io.lettuce"           % "lettuce-core"              % "5.0.5.RELEASE"
+  val `reactor-core`             = "io.projectreactor"    % "reactor-core"              % "3.1.6.RELEASE"
+  val `reactive-streams`         = "org.reactivestreams"  % "reactive-streams"          % "1.0.2"
   val `akka-stream-kafka`        = "com.typesafe.akka"    %% "akka-stream-kafka"        % "0.22"
   val `scalatest-embedded-kafka` = "net.manub"            %% "scalatest-embedded-kafka" % "1.1.0"
   val `embedded-redis`           = "com.github.kstyrc"    % "embedded-redis"            % "0.6"
@@ -93,6 +95,7 @@ object Akka {
   val `akka-distributed-data`    = "com.typesafe.akka" %% "akka-distributed-data" % Version
   val `akka-multi-node-testkit`  = "com.typesafe.akka" %% "akka-multi-node-testkit" % Version
   val `akka-cluster-tools`       = "com.typesafe.akka" %% "akka-cluster-tools" % Version
+  val `akka-cluster`             = "com.typesafe.akka" %% "akka-cluster" % Version
   val `akka-cluster-typed`       = "com.typesafe.akka" %% "akka-cluster-typed" % Version
   val `akka-slf4j`               = "com.typesafe.akka" %% "akka-slf4j" % Version
 }

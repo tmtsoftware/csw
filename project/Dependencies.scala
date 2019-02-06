@@ -4,7 +4,13 @@ object Dependencies {
 
   val AdminServer = Def.setting(
     Seq(
+      Libs.`config`,
+      Akka.`akka-actor`,
+      Akka.`akka-stream`,
+      Akka.`akka-actor-typed`,
       AkkaHttp.`akka-http`,
+      Libs.`scala-async`.value,
+      Libs.`play-json`.value,
       Libs.`akka-http-play-json`,
       Libs.`scopt`,
       Libs.`scalatest`.value % Test
@@ -13,6 +19,7 @@ object Dependencies {
 
   val LocationApi = Def.setting(
     Seq(
+      Akka.`akka-actor`,
       Akka.`akka-actor-typed`,
       Akka.`akka-stream`,
       Libs.`play-json`.value,
@@ -25,10 +32,12 @@ object Dependencies {
 
   val LocationServer = Def.setting(
     Seq(
+      Libs.`config`,
+      Akka.`akka-actor`,
       Akka.`akka-actor-typed`,
-      Akka.`akka-actor-testkit-typed`,
       Akka.`akka-stream`,
       Akka.`akka-distributed-data`,
+      Akka.`akka-cluster`,
       Akka.`akka-cluster-typed`,
       AkkaHttp.`akka-http-cors`,
       Libs.`scala-async`.value,
@@ -37,18 +46,23 @@ object Dependencies {
       Libs.`akka-management-cluster-http`,
       AkkaHttp.`akka-http`,
       Libs.`akka-http-play-json`,
+      Libs.`play-json`.value,
       Chill.`chill-akka`,
-      Libs.`scalatest`.value         % Test,
-      Libs.`junit`                   % Test,
-      Libs.`junit-interface`         % Test,
-      Libs.`mockito-scala`           % Test,
-      Akka.`akka-stream-testkit`     % Test,
-      Akka.`akka-multi-node-testkit` % Test
+      Akka.`akka-actor-testkit-typed` % Test,
+      Libs.`scalatest`.value          % Test,
+      Libs.`junit`                    % Test,
+      Libs.`junit-interface`          % Test,
+      Libs.`mockito-scala`            % Test,
+      Akka.`akka-stream-testkit`      % Test,
+      Akka.`akka-multi-node-testkit`  % Test
     )
   )
 
   val LocationClient = Def.setting(
     Seq(
+      Libs.`config`,
+      Akka.`akka-actor`,
+      Akka.`akka-stream`,
       AkkaHttp.`akka-http`,
       Akka.`akka-remote`,
       Libs.`scala-async`.value,
@@ -61,7 +75,10 @@ object Dependencies {
 
   val LocationAgent = Def.setting(
     Seq(
+      Libs.`config`,
+      AkkaHttp.`akka-http`,
       Akka.`akka-actor`,
+      Akka.`akka-stream`,
       Libs.`scopt`,
       Libs.`scalatest`.value % Test
     )
@@ -70,9 +87,12 @@ object Dependencies {
   val ConfigApi = Def.setting(
     Seq(
       Enumeratum.`enumeratum`.value,
+      Akka.`akka-actor`,
       Akka.`akka-stream`,
       Libs.`akka-http-play-json`,
+      Libs.`config`,
       Libs.`play-json`.value,
+      Libs.`scala-java8-compat`,
       Libs.`scalatest`.value     % Test,
       Akka.`akka-stream-testkit` % Test
     )
@@ -80,6 +100,14 @@ object Dependencies {
 
   val ConfigServer = Def.setting(
     Seq(
+      Enumeratum.`enumeratum`.value,
+      Akka.`akka-stream`,
+      Akka.`akka-actor`,
+      Libs.`play-json`.value,
+      Libs.`akka-http-play-json`,
+      Libs.`scala-async`.value,
+      Libs.`scala-java8-compat`,
+      Libs.`config`,
       AkkaHttp.`akka-http`,
       AkkaHttp.`akka-http-cors`,
       Libs.svnkit,
@@ -92,8 +120,14 @@ object Dependencies {
 
   val ConfigClient = Def.setting(
     Seq(
+      Libs.`config`,
+      Libs.`play-json`.value,
+      Akka.`akka-actor`,
+      Akka.`akka-stream`,
+      Libs.`akka-http-play-json`,
       AkkaHttp.`akka-http`,
       Libs.`scala-async`.value,
+      Libs.`scala-java8-compat`,
       Libs.`scalatest`.value         % Test,
       Libs.`junit`                   % Test,
       Libs.`junit-interface`         % Test,
@@ -105,7 +139,10 @@ object Dependencies {
 
   val ConfigCli = Def.setting(
     Seq(
+      Libs.`config`,
+      AkkaHttp.`akka-http`,
       Akka.`akka-actor`,
+      Akka.`akka-stream`,
       Libs.`scopt`,
       Libs.`scalatest`.value         % Test,
       Akka.`akka-multi-node-testkit` % Test,
@@ -115,8 +152,10 @@ object Dependencies {
 
   val LoggingClient = Def.setting(
     Seq(
+      Libs.`config`,
       Libs.`logback-classic`,
       Libs.`play-json`.value,
+      Libs.`scala-java8-compat`,
       Enumeratum.`enumeratum`.value,
       Akka.`akka-actor`,
       Akka.`akka-actor-typed`,
@@ -147,7 +186,12 @@ object Dependencies {
 
   val Framework = Def.setting(
     Seq(
+      Enumeratum.`enumeratum`.value,
+      Libs.`config`,
+      Akka.`akka-actor`,
+      Akka.`akka-stream`,
       Libs.`scala-async`.value,
+      Libs.`scala-java8-compat`,
       Libs.`play-json`.value,
       Akka.`akka-actor-typed`,
       Libs.`scopt`,
@@ -162,6 +206,12 @@ object Dependencies {
 
   val CommandClient = Def.setting(
     Seq(
+      Enumeratum.`enumeratum`.value,
+      Libs.`config`,
+      Libs.`play-json`.value,
+      Libs.`scala-java8-compat`,
+      Akka.`akka-stream`,
+      Akka.`akka-actor`,
       Akka.`akka-actor-typed`,
       Chill.`chill-akka`,
       Libs.`caffeine`,
@@ -174,19 +224,34 @@ object Dependencies {
     )
   )
 
+  val CommandApi = Def.setting(
+    Seq(
+      Akka.`akka-actor`
+    )
+  )
+
   val EventApi = Def.setting(
     Seq(
+      Akka.`akka-actor`,
       Akka.`akka-stream`,
-      Akka.`akka-actor-typed`
+      Akka.`akka-actor-typed`,
+      Libs.`scala-java8-compat`
     )
   )
 
   val EventClient = Def.setting(
     Seq(
+      Enumeratum.`enumeratum`.value,
+      Libs.`config`,
+      Libs.`play-json`.value,
       Libs.`scala-async`.value,
+      Libs.`scala-java8-compat`,
       Akka.`akka-stream`,
+      Akka.`akka-actor`,
+      Akka.`akka-actor-typed`,
       Libs.`akka-stream-kafka`,
       Libs.`lettuce`,
+      Libs.`reactor-core`,
       Libs.`scalapb-runtime`,
       Akka.`akka-actor-testkit-typed` % Test,
       Akka.`akka-stream-testkit`      % Test,
@@ -204,9 +269,14 @@ object Dependencies {
 
   val EventCli = Def.setting(
     Seq(
+      Enumeratum.`enumeratum`.value,
+      AkkaHttp.`akka-http`,
+      Akka.`akka-stream`,
+      Akka.`akka-actor`,
       Libs.`play-json`.value,
       Libs.`scopt`,
       Libs.`scala-csv`,
+      Libs.`scala-async`.value,
       Libs.`scalatest`.value % Test,
       Libs.`embedded-redis`  % Test
     )
@@ -215,7 +285,9 @@ object Dependencies {
   val AlarmApi = Def.setting(
     Seq(
       Enumeratum.`enumeratum`.value,
+      Libs.`config`,
       Libs.`play-json`.value,
+      Akka.`akka-actor`,
       Akka.`akka-actor-typed`,
       Akka.`akka-stream`,
       Libs.`scalatest`.value % Test
@@ -225,9 +297,13 @@ object Dependencies {
   val AlarmClient = Def.setting(
     Seq(
       Libs.`lettuce`,
+      Libs.`reactor-core`,
+      Libs.`config`,
+      Libs.`play-json`.value,
       Libs.`scala-async`.value,
       Libs.`json-schema-validator`,
       Libs.`scala-java8-compat`,
+      Akka.`akka-actor`,
       Akka.`akka-actor-typed`,
       Akka.`akka-stream`,
       Libs.`junit`           % Test,
@@ -239,6 +315,13 @@ object Dependencies {
 
   val AlarmCli = Def.setting(
     Seq(
+      Enumeratum.`enumeratum`.value,
+      Libs.`config`,
+      Akka.`akka-actor`,
+      Akka.`akka-actor-typed`,
+      Akka.`akka-stream`,
+      Libs.`scala-async`.value,
+      AkkaHttp.`akka-http`,
       Libs.`scopt`,
       Libs.`scalatest`.value % Test,
       Libs.`embedded-redis`  % Test
@@ -247,6 +330,14 @@ object Dependencies {
 
   val Testkit = Def.setting(
     Seq(
+      Libs.`config`,
+      Akka.`akka-actor`,
+      Akka.`akka-stream`,
+      Akka.`akka-actor-typed`,
+      AkkaHttp.`akka-http`,
+      Libs.`scala-reflect`,
+      Libs.`scala-java8-compat`,
+      Keycloak.`keycloak-adapter-core`,
       //TODO: make this as provided deps
       Libs.`scalatest`.value,
       Libs.`embedded-redis`,
@@ -265,6 +356,7 @@ object Dependencies {
 
   val TimeApi = Def.setting(
     Seq(
+      Libs.`play-json`.value,
       Libs.`play-json-derived-codecs`.value,
       Libs.`scalatest`.value % Test,
       Libs.`junit-interface` % Test
@@ -283,6 +375,8 @@ object Dependencies {
 
   val DatabaseClient = Def.setting(
     Seq(
+      Akka.`akka-actor-typed`,
+      Libs.`config`,
       Libs.`postgresql`,
       Libs.`scala-java8-compat`,
       Libs.`scala-async`.value,
@@ -300,6 +394,8 @@ object Dependencies {
 
   val AuthNativeClientAdapter = Def.setting(
     Seq(
+      Libs.`config`,
+      Typelevel.`cats-core`,
       Keycloak.`keycloak-installed`,
       Libs.`os-lib`,
       //(legacy dependencies) required*
@@ -311,6 +407,7 @@ object Dependencies {
   val CswAasCore = Def.setting(
     Seq(
       Libs.`jwt-play-json`,
+      Libs.`play-json`.value,
       Libs.`config`,
       Keycloak.`keycloak-core`,
       Keycloak.`keycloak-adapter-core`,
@@ -328,7 +425,9 @@ object Dependencies {
 
   val AuthAkkaHttpAdapter = Def.setting(
     Seq(
+      Libs.`config`,
       AkkaHttp.`akka-http`,
+      Typelevel.`cats-core`,
       Libs.`scalatest`.value       % Test,
       AkkaHttp.`akka-http-testkit` % Test,
       Libs.`mockito-scala`         % Test,
@@ -364,6 +463,7 @@ object Dependencies {
 
   val Commons = Def.setting(
     Seq(
+      Akka.`akka-actor`,
       AkkaHttp.`akka-http`,
       Libs.`play-json`.value,
       Libs.`scalatest`.value % Test,
@@ -382,6 +482,8 @@ object Dependencies {
     Seq(
       Libs.`lettuce`,
       Enumeratum.`enumeratum`.value,
+      Libs.`reactor-core`,
+      Libs.`reactive-streams`,
       Libs.`scala-async`.value,
       Libs.`scala-java8-compat`,
       Akka.`akka-stream`,
@@ -392,9 +494,17 @@ object Dependencies {
 
   val Examples = Def.setting(
     Seq(
+      Enumeratum.`enumeratum`.value,
+      Libs.`config`,
+      Libs.`lettuce`,
+      Jooq.`jooq`,
+      Libs.`scala-async`.value,
       Akka.`akka-actor`,
+      Akka.`akka-stream`,
+      Akka.`akka-actor-typed`,
       AkkaHttp.`akka-http`,
       AkkaHttp.`akka-http-cors`,
+      Akka.`akka-actor-testkit-typed`,
       Libs.`scalatest`.value % Test,
       Libs.`junit`           % Test,
       Libs.`junit-interface` % Test
@@ -403,14 +513,27 @@ object Dependencies {
 
   val Benchmark = Def.setting(
     Seq(
+      Libs.`config`,
+      Akka.`akka-actor`,
+      Akka.`akka-stream`,
+      Akka.`akka-actor-typed`,
+      AkkaHttp.`akka-http`,
+      Libs.`play-json`.value,
       Libs.`gson`,
       Jackson.`jackson-core`,
-      Jackson.`jackson-databind`
+      Jackson.`jackson-databind`,
+      Akka.`akka-actor-testkit-typed`,
+      Libs.`scalatest`.value % Test
     )
   )
 
   val Integration = Def.setting(
     Seq(
+      Akka.`akka-actor`,
+      Akka.`akka-stream`,
+      Akka.`akka-actor-typed`,
+      AkkaHttp.`akka-http`,
+      Akka.`akka-actor-testkit-typed`,
       Libs.`scalatest`.value,
     )
   )

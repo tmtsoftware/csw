@@ -288,6 +288,7 @@ lazy val `csw-command-api` = project
     `csw-location-api`
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin)
+  .settings(libraryDependencies ++= Dependencies.CommandApi.value)
 
 lazy val `csw-command-client` = project
   .in(file("csw-command/csw-command-client"))
