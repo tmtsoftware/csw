@@ -5,44 +5,50 @@ import csw.aas.react4s.facade.components.mapper.aas
 
 import scala.scalajs.js
 
-trait AuthContext extends js.Object {
-  val auth: Auth
-  val login: js.Function0[Boolean]  // fixme: refer AuthContext.jsx
-  val logout: js.Function0[Boolean] // fixme: refer AuthContext.jsx
-}
-
 object AuthContext extends JsContext[AuthContext](aas.AuthContext)
 
+@js.native
+trait AuthContext extends js.Object {
+  val auth: Auth        = js.native
+  def login(): Boolean  = js.native // fixme: refer AuthContext.jsx
+  def logout(): Boolean = js.native // fixme: refer AuthContext.jsx
+}
+
+@js.native
 trait Auth extends js.Object {
-  val logout: js.Function0[AuthPromise[Unit, Unit]]
-  val token: js.Function0[js.UndefOr[String]]
-  val tokenParsed: js.Function0[js.UndefOr[ParsedToken]]
-  val realmAccess: js.Function0[Roles]
-  val resourceAccess: js.Function0[ResourceAccess]
-  val loadUserProfile: js.Function0[AuthPromise[UserProfile, Unit]]
-  val isAuthenticated: js.Function0[Boolean]
-  val hasRealmRole: js.Function1[String, Boolean]
-  val hasResourceRole: js.Function2[String, Option[String], Boolean]
+  def logout(): AuthPromise[Unit, Unit]                                = js.native
+  def token(): js.UndefOr[String]                                      = js.native
+  def tokenParsed(): js.UndefOr[ParsedToken]                           = js.native
+  def realmAccess(): Roles                                             = js.native
+  def resourceAccess(): ResourceAccess                                 = js.native
+  def loadUserProfile(): AuthPromise[UserProfile, Unit]                = js.native
+  def isAuthenticated(): Boolean                                       = js.native
+  def hasRealmRole(role: String): Boolean                              = js.native
+  def hasResourceRole(role: String, resource: Option[String]): Boolean = js.native
 }
 
+@js.native
 trait ParsedToken extends js.Object {
-  val exp: js.UndefOr[Double] // todo: can this be instant?
-  val iat: js.UndefOr[Double] // todo: can this be instant?
-  val nonce: js.UndefOr[String]
-  val sub: js.UndefOr[String]
-  val session_state: js.UndefOr[String]
-  val realm_access: Roles
-  val resource_access: ResourceAccess
+  val exp: js.UndefOr[Double]           = js.native // todo: can this be instant?
+  val iat: js.UndefOr[Double]           = js.native // todo: can this be instant?
+  val nonce: js.UndefOr[String]         = js.native
+  val sub: js.UndefOr[String]           = js.native
+  val session_state: js.UndefOr[String] = js.native
+  val realm_access: Roles               = js.native
+  val resource_access: ResourceAccess   = js.native
 }
 
+@js.native
 trait ResourceAccess extends js.Object {
-  val values: js.Dictionary[Roles]
+  val values: js.Dictionary[Roles] = js.native
 }
 
+@js.native
 trait Roles extends js.Object {
-  val roles: js.Array[String]
+  val roles: js.Array[String] = js.native
 }
 
+@js.native
 trait AuthPromise[Success, Error] extends js.Object {
 
   type Callback[T] = js.Function1[T, Unit]
@@ -50,22 +56,23 @@ trait AuthPromise[Success, Error] extends js.Object {
   /**
    * Function to call if the promised action succeeds.
    */
-  val success: js.Function1[Callback[Success], AuthPromise[Success, Error]]
+  def success(callback: Callback[Success]): AuthPromise[Success, Error] = js.native
 
   /**
    * Function to call if the promised action throws an error.
    */
-  val error: js.Function1[Callback[Error], AuthPromise[Success, Error]]
+  def error(callback: Callback[Error]): AuthPromise[Success, Error] = js.native
 }
 
+@js.native
 trait UserProfile extends js.Object {
-  val id: js.UndefOr[String]
-  val username: js.UndefOr[String]
-  val email: js.UndefOr[String]
-  val firstName: js.UndefOr[String]
-  val lastName: js.UndefOr[String]
-  val enabled: js.UndefOr[Boolean]
-  val emailVerified: js.UndefOr[Boolean]
-  val totp: js.UndefOr[Boolean]
-  val createdTimestamp: js.UndefOr[Double]
+  val id: js.UndefOr[String]               = js.native
+  val username: js.UndefOr[String]         = js.native
+  val email: js.UndefOr[String]            = js.native
+  val firstName: js.UndefOr[String]        = js.native
+  val lastName: js.UndefOr[String]         = js.native
+  val enabled: js.UndefOr[Boolean]         = js.native
+  val emailVerified: js.UndefOr[Boolean]   = js.native
+  val totp: js.UndefOr[Boolean]            = js.native
+  val createdTimestamp: js.UndefOr[Double] = js.native
 }
