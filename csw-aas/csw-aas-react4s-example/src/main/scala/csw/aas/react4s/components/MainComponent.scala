@@ -1,15 +1,15 @@
 package csw.aas.react4s.components
 
 import com.github.ahnfelt.react4s._
+import csw.aas.react4s.Config
 import csw.aas.react4s.facade.components._
-import csw.aas.react4s.facade.config.Config
 
 case class MainComponent() extends Component[NoEmit] {
 
   override def render(get: Get): Node = {
     E.div(
       AuthContextProvider(
-        J("config", Config),
+        Config,
         E.h1(Text("TMT Scala.js Application")),
         E.h3(Text("CheckLogin Component:")),
         CheckLogin(
@@ -19,10 +19,10 @@ case class MainComponent() extends Component[NoEmit] {
         RealmRole(
           realmRole = "example-admin-role",
           error = Component(ErrorComponent),
-          children = AuthContext.consume(ctx ⇒ {
+          children = AuthContext.consume { ctx ⇒
             printAuthContext(ctx)
             Component(DummyComponent)
-          }),
+          },
         ),
       )
     )
