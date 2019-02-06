@@ -24,7 +24,7 @@ object FileUtils {
     val fileSource = scala.io.Source.fromFile(filePath)
     val logBuffer  = mutable.Buffer.empty[JsObject]
 
-    fileSource.mkString.lines.foreach { line ⇒
+    fileSource.mkString.linesIterator.foreach { line ⇒
       logBuffer += Json.parse(line).as[JsObject]
     }
     fileSource.close()
