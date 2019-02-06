@@ -19,7 +19,7 @@ describe('<Auth />', () => {
       tokenParsed: { name: 'test' },
       realmAccess: { roles: ['test-realm-roles'] },
       resourceAccess: ['test-resource-roles'],
-      loadUserInfo: jest.fn(),
+      loadUserProfile: jest.fn(),
       authenticated: false,
     }
 
@@ -30,7 +30,7 @@ describe('<Auth />', () => {
     expect(auth.tokenParsed()).toBe(mockKeycloak.tokenParsed)
     expect(auth.realmAccess()).toBe(mockKeycloak.realmAccess)
     expect(auth.resourceAccess()).toBe(mockKeycloak.resourceAccess)
-    expect(auth.loadUserInfo).toBe(mockKeycloak.loadUserInfo)
+    expect(auth.loadUserProfile).toBe(mockKeycloak.loadUserProfile)
     expect(auth.isAuthenticated()).toBe(false)
     expect(auth.hasRealmRole).toBe(mockKeycloak.hasRealmRole)
     expect(auth.hasResourceRole).toBe(mockKeycloak.hasResourceRole)

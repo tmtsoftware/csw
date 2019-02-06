@@ -15,22 +15,22 @@ object AuthContext extends JsContext[AuthContext](aas.AuthContext)
 
 trait Auth extends js.Object {
   val logout: js.Function0[AuthPromise[Unit, Unit]]
-  val token: js.Function0[String]
-  val tokenParsed: js.Function0[ParsedToken]
+  val token: js.Function0[js.UndefOr[String]]
+  val tokenParsed: js.Function0[js.UndefOr[ParsedToken]]
   val realmAccess: js.Function0[Roles]
   val resourceAccess: js.Function0[ResourceAccess]
-  val loadUserInfo: js.Function0[AuthPromise[UserInfo, Unit]]
+  val loadUserProfile: js.Function0[AuthPromise[UserProfile, Unit]]
   val isAuthenticated: js.Function0[Boolean]
   val hasRealmRole: js.Function1[String, Boolean]
   val hasResourceRole: js.Function2[String, Option[String], Boolean]
 }
 
 trait ParsedToken extends js.Object {
-  val exp: Double // todo: can this be instant?
-  val iat: Double // todo: can this be instant?
-  val nonce: String
-  val sub: String
-  val session_state: String
+  val exp: js.UndefOr[Double] // todo: can this be instant?
+  val iat: js.UndefOr[Double] // todo: can this be instant?
+  val nonce: js.UndefOr[String]
+  val sub: js.UndefOr[String]
+  val session_state: js.UndefOr[String]
   val realm_access: Roles
   val resource_access: ResourceAccess
 }
@@ -58,13 +58,14 @@ trait AuthPromise[Success, Error] extends js.Object {
   val error: js.Function1[Callback[Error], AuthPromise[Success, Error]]
 }
 
-trait UserInfo extends js.Object {
-  val sub: js.UndefOr[String]
-  val iss: js.UndefOr[String]
-  val aud: js.UndefOr[js.Array[String]]
-  val given_name: js.UndefOr[String]
-  val family_name: js.UndefOr[String]
-  val name: js.UndefOr[String]
-  val preferred_username: js.UndefOr[String]
+trait UserProfile extends js.Object {
+  val id: js.UndefOr[String]
+  val username: js.UndefOr[String]
   val email: js.UndefOr[String]
+  val firstName: js.UndefOr[String]
+  val lastName: js.UndefOr[String]
+  val enabled: js.UndefOr[Boolean]
+  val emailVerified: js.UndefOr[Boolean]
+  val totp: js.UndefOr[Boolean]
+  val createdTimestamp: js.UndefOr[Double]
 }
