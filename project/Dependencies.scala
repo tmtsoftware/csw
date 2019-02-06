@@ -409,6 +409,7 @@ object Dependencies {
 
   val Examples = Def.setting(
     Seq(
+      Akka.`akka-actor`,
       AkkaHttp.`akka-http`,
       AkkaHttp.`akka-http-cors`,
       Libs.`scalatest`.value % Test,
