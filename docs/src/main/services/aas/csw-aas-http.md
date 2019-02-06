@@ -235,13 +235,3 @@ about performance.
 
 * @github[Example http server](/examples/src/main/scala/csw/auth/ExampleServer.scala)
 
-# TODO
-## keycloak setup
-* keycloak realms
-* keycloak roles
-* keycloak users
-* keycloak clients
-* keycloak client roles
-* keycloak permissions
-
-
