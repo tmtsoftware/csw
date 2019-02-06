@@ -1,7 +1,7 @@
 package csw.time.client.api
 
 /**
- * Signifies something that can be cancelled.
+ * API for a scheduled periodic task, that allows it to be cancelled.
  */
 trait Cancellable {
 

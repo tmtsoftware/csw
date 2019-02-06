@@ -7,7 +7,7 @@ import csw.time.api.models.TMTTime
 
 /**
  * Scheduler for scheduling periodic/non-periodic tasks at a specified time and/or interval.
- * It supports scheduling on both [[csw.time.api.models.UTCTime]] and [[csw.time.api.models.TAITime]].
+ * It supports scheduling on both [[csw.time.api.models.UTCTime UTCTime]] and [[csw.time.api.models.TAITime TAITime]].
  * Each API returns a [[Cancellable]] which allows users to cancel the execution of tasks.
  * Please note that implementation of Scheduler is optimised for high-throughput
  * and high-frequency events. It is not to be confused with long-term schedulers such as Quartz.
@@ -44,7 +44,7 @@ trait TimeServiceScheduler {
 
   /**
    * Schedules a task to execute periodically at the given interval. The task is executed once immediately without any initial delay followed by periodic executions.
-   * In case you do not want to start scheduling immediately, you can use the overloaded method for [[schedulePeriodically()]] with startTime.
+   * In case you do not want to start scheduling immediately, you can use the overloaded method for [[schedulePeriodically]] with startTime.
    *
    * @param interval the time interval between the execution of tasks
    * @param task the task to execute at each interval
@@ -54,7 +54,7 @@ trait TimeServiceScheduler {
 
   /**
    * Schedules a task to execute periodically at the given interval. The task is executed once immediately without any initial delay.
-   * In case you do not want to start scheduling immediately, you can use the overloaded method for [[schedulePeriodically()]] with startTime.
+   * In case you do not want to start scheduling immediately, you can use the overloaded method for [[schedulePeriodically]] with startTime.
    *
    * @param interval the time interval between the execution of tasks
    * @param task the task to execute at each interval
@@ -64,7 +64,7 @@ trait TimeServiceScheduler {
 
   /**
    * Sends message to the given actor periodically at the given interval. The first message is sent immediately without any initial delay.
-   * In case you do not want to start sending immediately, you can use the overloaded method for [[schedulePeriodically()]] with startTime.
+   * In case you do not want to start sending immediately, you can use the overloaded method for [[schedulePeriodically]] with startTime.
    *
    * @param interval the time interval between messages sent to the actor
    * @param receiver the actorRef to notify at each interval
