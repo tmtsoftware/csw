@@ -36,6 +36,20 @@ case class MainComponent() extends Component[NoEmit] {
             println("resource_access: " + token.resource_access.values)
             println("*" * 80)
 
+            ctx.auth
+              .loadUserInfo()
+              .success { info ⇒
+                println("sub: " + info.sub)
+                println("iss" + info.iss)
+                println("aud" + info.aud)
+                println("given_name" + info.given_name)
+                println("family_name" + info.family_name)
+                println("name" + info.name)
+                println("preferred_username: " + info.preferred_username)
+                println("email" + info.email)
+              }
+
+            println("*" * 80)
             Component(DummyComponent)
           }),
         ),
