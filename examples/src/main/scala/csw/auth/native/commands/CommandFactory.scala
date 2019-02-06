@@ -4,16 +4,15 @@ import csw.aas.native.api.NativeAppAuthAdapter
 
 // #command-factory
 object CommandFactory {
-  def makeCommand(adapter: NativeAppAuthAdapter, args: Array[String])(implicit actorSystem: ActorSystem): AppCommand = {
+  def makeCommand(adapter: NativeAppAuthAdapter, args: Array[String])(implicit actorSystem: ActorSystem): Option[AppCommand] = {
     args match {
-      case Array("login")          => new LoginCommand(adapter)
-      case Array("logout")         => new LogoutCommand(adapter)
-      case Array("read")           => new ReadCommand
-      case Array("write", content) => new WriteCommand(adapter, content)
+      case Array("login")          => Some(new LoginCommand(adapter))
+      case Array("logout")         => Some(new LogoutCommand(adapter))
+      case Array("read")           => Some(new ReadCommand)
+      case Array("write", content) => Some(new WriteCommand(adapter, content))
       case _ =>
         println("invalid or no command\nvalid commands are: login, logout, read & write")
-        System.exit(1)
-        null
+        None
     }
   }
 }

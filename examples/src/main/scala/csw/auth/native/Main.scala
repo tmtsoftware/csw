@@ -14,10 +14,10 @@ object Main extends App {
 
   val adapter: NativeAppAuthAdapter = AdapterFactory.makeAdapter
 
-  val command = CommandFactory.makeCommand(adapter, args)
+  val command: Option[AppCommand] = CommandFactory.makeCommand(adapter, args)
 
   try {
-    command.run()
+    command.foreach(_.run())
   } finally {
     actorSystem.terminate()
   }
