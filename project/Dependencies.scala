@@ -17,7 +17,6 @@ object Dependencies {
       Akka.`akka-stream`,
       Libs.`play-json`.value,
       Libs.`play-json-derived-codecs`.value,
-      Libs.`scala-java8-compat`,
       Enumeratum.`enumeratum`.value,
       Libs.`scalatest`.value % Test,
       Libs.`mockito-scala`   % Test
@@ -30,11 +29,8 @@ object Dependencies {
       Akka.`akka-actor-testkit-typed`,
       Akka.`akka-stream`,
       Akka.`akka-distributed-data`,
-      Akka.`akka-remote`,
-      Akka.`akka-cluster-tools`,
       Akka.`akka-cluster-typed`,
       AkkaHttp.`akka-http-cors`,
-      Libs.`scala-java8-compat`,
       Libs.`scala-async`.value,
       Libs.`scopt`,
       Enumeratum.`enumeratum`.value,
@@ -56,6 +52,7 @@ object Dependencies {
       AkkaHttp.`akka-http`,
       Akka.`akka-remote`,
       Libs.`scala-async`.value,
+      Libs.`scala-java8-compat`,
       Libs.`play-json`.value,
       Libs.`akka-http-play-json`,
       Libs.`scalatest`.value % Test
@@ -120,10 +117,8 @@ object Dependencies {
     Seq(
       Libs.`logback-classic`,
       Libs.`play-json`.value,
-      Libs.`joda-time`,
       Enumeratum.`enumeratum`.value,
       Akka.`akka-actor`,
-      Akka.`akka-slf4j`,
       Akka.`akka-actor-typed`,
       Libs.`scalatest`.value % Test,
       Libs.`junit`           % Test,
@@ -221,7 +216,6 @@ object Dependencies {
     Seq(
       Enumeratum.`enumeratum`.value,
       Libs.`play-json`.value,
-      Libs.`play-json-derived-codecs`.value,
       Akka.`akka-actor-typed`,
       Akka.`akka-stream`,
       Libs.`scalatest`.value % Test
@@ -264,7 +258,6 @@ object Dependencies {
   val TimeClockJvm = Def.setting(
     Seq(
       Libs.`jna`,
-      Libs.`play-json-derived-codecs`.value,
       Libs.`scalatest`.value % Test,
       Libs.`junit-interface` % Test
     )
@@ -310,8 +303,6 @@ object Dependencies {
       Keycloak.`keycloak-installed`,
       Libs.`os-lib`,
       //(legacy dependencies) required*
-      Libs.`jboss-logging`,
-      Libs.httpclient,
       Libs.`scalatest`.value % Test,
       Libs.`mockito-scala`   % Test
     )
@@ -326,7 +317,7 @@ object Dependencies {
       Keycloak.`keycloak-authz`,
       AkkaHttp.`akka-http`,
       Libs.`scala-async`.value,
-      Typelevel.`cats-effects`,
+      Typelevel.`cats-core`,
       //(legacy dependencies) required*
       Libs.`jboss-logging`,
       Libs.httpclient,
@@ -373,7 +364,6 @@ object Dependencies {
 
   val Commons = Def.setting(
     Seq(
-      Akka.`akka-stream`,
       AkkaHttp.`akka-http`,
       Libs.`play-json`.value,
       Libs.`scalatest`.value % Test,
@@ -395,6 +385,7 @@ object Dependencies {
       Libs.`scala-async`.value,
       Libs.`scala-java8-compat`,
       Akka.`akka-stream`,
+      Akka.`akka-actor`,
       Libs.`scalatest`.value % Test
     )
   )
