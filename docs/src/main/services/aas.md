@@ -10,6 +10,8 @@ don't have to download & install it manually.
 @@ toc { .main depth=1 }
 
 @@@ index
+ - [Core concepts & terms](aas/core-concepts-and-terms.md)
+
  - [Akka HTTP Adapter - csw-aas-http](aas/csw-aas-http.md)
     
  - [Javascript Adapter - csw-aas-js](aas/csw-aas-js.md)

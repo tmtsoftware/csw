@@ -19,18 +19,15 @@ object ExampleServer extends HttpApp with App {
 
   import AsyncSupport._
 
-  // #security-directive-usage
   val locationService = HttpLocationServiceFactory.makeLocalClient
 
   val directives = SecurityDirectives(locationService)
 
   import directives._
-  // #security-directive-usage
 
   val HOST = "0.0.0.0"
   val PORT = 9003
 
-  // #example-routes
   override protected def routes: Route = cors() {
     pathPrefix("person") {
       get {
@@ -56,7 +53,6 @@ object ExampleServer extends HttpApp with App {
       }
     }
   }
-  // #example-routes
   startServer(HOST, PORT)
 }
 
@@ -94,7 +90,8 @@ object Documentation extends HttpApp {
 
   object ThirdPartyService {
     def deleteEntity(entityId: Long, username: Option[String]) = ???
-    def deleteEntity(entityId: Long)                           = ???
+
+    def deleteEntity(entityId: Long) = ???
   }
 
   // #access-token-handle-demo
