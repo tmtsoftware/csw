@@ -16,10 +16,10 @@ application expects a configuration file describing a container component and wi
 components as described in the file.
 
 Scala
-:   @@snip [ContainerCmdApp.scala](../../../../examples/src/main/scala/csw/framework/ContainerCmdApp.scala) { #container-app }
+:   @@snip [ContainerCmdApp.scala](../../../../examples/src/main/scala/example/framework/ContainerCmdApp.scala) { #container-app }
 
 Java
-:   @@snip [JContainerCmdApp](../../../../examples/src/main/java/csw/framework/JContainerCmdApp.java) { #container-app }
+:   @@snip [JContainerCmdApp](../../../../examples/src/main/java/example/framework/JContainerCmdApp.java) { #container-app }
 
 @@@ note
 

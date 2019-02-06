@@ -4,16 +4,16 @@ An Assembly or HCD is implemented by extending the `ComponentHandlers` base clas
 defined in the framework which handles the lifecycle and supervision of this component.
 
 Assembly/Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentHandlers.scala) { #component-handlers-class }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/assembly/AssemblyComponentHandlers.scala) { #component-handlers-class }
 
 Assembly/Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JAssemblyComponentHandlers.java) { #jcomponent-handlers-class }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/assembly/JAssemblyComponentHandlers.java) { #jcomponent-handlers-class }
 
 Hcd/Scala
-:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/hcd/HcdComponentHandlers.scala) { #component-handlers-class }
+:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/hcd/HcdComponentHandlers.scala) { #component-handlers-class }
 
 Hcd/Java
-:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JHcdComponentHandlers.java) { #jcomponent-handlers-class }
+:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/hcd/JHcdComponentHandlers.java) { #jcomponent-handlers-class }
 
 @@@ note { title=Note }
 
@@ -32,13 +32,13 @@ methods in Java which can be used by adding the following import:
 A component can be created by a factory which extends `ComponentBehaviorFactory` base class and provides a definition of `handlers` method to return the appropriate implementation of `ComponentHandlers`.
 
 Assembly/Scala
-:   @@snip [AssemblyComponentBehaviorFactory.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentBehaviorFactory.scala) { #component-factory }
+:   @@snip [AssemblyComponentBehaviorFactory.scala](../../../../examples/src/main/scala/example/framework/components/assembly/AssemblyComponentBehaviorFactory.scala) { #component-factory }
 
 Assembly/Java
-:   @@snip [JAssemblyComponentBehaviorFactory.java](../../../../examples/src/main/java/csw/framework/components/assembly/JAssemblyComponentBehaviorFactory.java) { #jcomponent-factory }
+:   @@snip [JAssemblyComponentBehaviorFactory.java](../../../../examples/src/main/java/example/framework/components/assembly/JAssemblyComponentBehaviorFactory.java) { #jcomponent-factory }
 
 Hcd/Scala
-:   @@snip [HcdComponentBehaviorFactory.scala](../../../../examples/src/main/scala/csw/framework/components/hcd/HcdComponentBehaviorFactory.scala) { #component-factory }
+:   @@snip [HcdComponentBehaviorFactory.scala](../../../../examples/src/main/scala/example/framework/components/hcd/HcdComponentBehaviorFactory.scala) { #component-factory }
 
 Hcd/Java
-:   @@snip [JHcdComponentBehaviorFactory.java](../../../../examples/src/main/java/csw/framework/components/hcd/JHcdComponentBehaviorFactory.java) { #jcomponent-factory }
+:   @@snip [JHcdComponentBehaviorFactory.java](../../../../examples/src/main/java/example/framework/components/hcd/JHcdComponentBehaviorFactory.java) { #jcomponent-factory }

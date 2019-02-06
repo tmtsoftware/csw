@@ -163,24 +163,24 @@ Component developers will have an instance of `LoggerFactory` available from `cs
 appear in log statements against `@componentName` tag. Next, to get the `Logger` from `LoggerFactory` use one of the following ways:  
 
 Scala Class
-:   @@snip [SampleClass](../../../../examples/src/main/scala/csw/logging/client/componentlogger/loggers.scala) { #component-logger-class }
+:   @@snip [SampleClass](../../../../examples/src/main/scala/example/logging/client/componentlogger/loggers.scala) { #component-logger-class }
 
 Java Class
-:   @@snip [JSampleClass](../../../../examples/src/main/java/csw/logging/client/componentlogger/JSampleClass.java) { #component-logger-class }
+:   @@snip [JSampleClass](../../../../examples/src/main/java/example/logging/client/componentlogger/JSampleClass.java) { #component-logger-class }
 
 
 Scala Actor
-:   @@snip [SampleActor](../../../../examples/src/main/scala/csw/logging/client/componentlogger/loggers.scala) { #component-logger-actor }
+:   @@snip [SampleActor](../../../../examples/src/main/scala/example/logging/client/componentlogger/loggers.scala) { #component-logger-actor }
 
 Java Actor
-:   @@snip [JSampleActor](../../../../examples/src/main/java/csw/logging/client/componentlogger/JSampleClass.java) { #component-logger-actor }
+:   @@snip [JSampleActor](../../../../examples/src/main/java/example/logging/client/componentlogger/JSampleClass.java) { #component-logger-actor }
 
 
 Scala Typed Actor
-:   @@snip [SampleTypedActor](../../../../examples/src/main/scala/csw/logging/client/componentlogger/loggers.scala) { #component-logger-typed-actor }
+:   @@snip [SampleTypedActor](../../../../examples/src/main/scala/example/logging/client/componentlogger/loggers.scala) { #component-logger-typed-actor }
 
 Java Typed Actor
-:   @@snip [JSampleTypedActor](../../../../examples/src/main/java/csw/logging/client/componentlogger/JSampleClass.java) { #component-logger-typed-actor }
+:   @@snip [JSampleTypedActor](../../../../examples/src/main/java/example/logging/client/componentlogger/JSampleClass.java) { #component-logger-typed-actor }
 
 @@@ note
 
@@ -193,24 +193,24 @@ In case there is a need to log statements without `@componentName` tag, which ca
 as follows:
 
 Scala Class
-:   @@snip [GenericClass](../../../../examples/src/main/scala/csw/logging/client/genericlogger/loggers.scala) { #generic-logger-class }
+:   @@snip [GenericClass](../../../../examples/src/main/scala/example/logging/client/genericlogger/loggers.scala) { #generic-logger-class }
 
 Java Class
-:   @@snip [JGenericClass](../../../../examples/src/main/java/csw/logging/client/genericlogger/JGenericClass.java) { #generic-logger-class }
+:   @@snip [JGenericClass](../../../../examples/src/main/java/example/logging/client/genericlogger/JGenericClass.java) { #generic-logger-class }
 
 
 Scala Actor
-:   @@snip [GenericActor](../../../../examples/src/main/scala/csw/logging/client/genericlogger/loggers.scala) { #generic-logger-actor }
+:   @@snip [GenericActor](../../../../examples/src/main/scala/example/logging/client/genericlogger/loggers.scala) { #generic-logger-actor }
 
 Java Actor
-:   @@snip [JGenericActor](../../../../examples/src/main/java/csw/logging/client/genericlogger/JGenericClass.java) { #generic-logger-actor }
+:   @@snip [JGenericActor](../../../../examples/src/main/java/example/logging/client/genericlogger/JGenericClass.java) { #generic-logger-actor }
 
 
 Scala Typed Actor
-:   @@snip [GenericTypedActor](../../../../examples/src/main/scala/csw/logging/client/genericlogger/loggers.scala) { #generic-logger-typed-actor }
+:   @@snip [GenericTypedActor](../../../../examples/src/main/scala/example/logging/client/genericlogger/loggers.scala) { #generic-logger-typed-actor }
 
 Java Typed Actor
-:   @@snip [JGenericTypedActor](../../../../examples/src/main/java/csw/logging/client/genericlogger/JGenericClass.java) { #generic-logger-typed-actor }
+:   @@snip [JGenericTypedActor](../../../../examples/src/main/java/example/logging/client/genericlogger/JGenericClass.java) { #generic-logger-typed-actor }
 
 `log` variable is now available in scala and java classes to write log statements as explained in next segment.
 
@@ -221,13 +221,13 @@ Logging statements are used very much like existing logging services such as log
 A basic info statement can be written as follows:
 
 Scala
-:   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala) { #log-info }
+:   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/example/location/LocationServiceExampleClientApp.scala) { #log-info }
 
 Java
-:   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #log-info }
+:   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/example/location/JLocationServiceExampleClient.java) { #log-info }
 
 Java (Supplier)
-:   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #log-info-supplier }
+:   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/example/location/JLocationServiceExampleClient.java) { #log-info-supplier }
 
 The output of log statement will be:
 
@@ -287,13 +287,13 @@ Java (Supplier)
 The library allows usage of `Map` in message as follows:
 
 Scala
- :   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala) { #log-info-map }
+ :   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/example/location/LocationServiceExampleClientApp.scala) { #log-info-map }
  
 Java
- :   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #log-info-map }
+ :   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/example/location/JLocationServiceExampleClient.java) { #log-info-map }
 
 Java (Supplier)
- :   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #log-info-map-supplier }
+ :   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/example/location/JLocationServiceExampleClient.java) { #log-info-map-supplier }
 
 The output of log statement will be: 
 
@@ -363,13 +363,13 @@ Java (Supplier)
 The library allows you to log an error with its full stacktrace as follows:
  
 Scala
-  :   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala) { #log-error }
+  :   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/example/location/LocationServiceExampleClientApp.scala) { #log-error }
  
 Java
- :   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #log-info-error }
+ :   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/example/location/JLocationServiceExampleClient.java) { #log-info-error }
  
 Java (Supplier)
- :   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #log-info-error-supplier }
+ :   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/example/location/JLocationServiceExampleClient.java) { #log-info-error-supplier }
  
 
 ## Create LoggerFactory
@@ -382,10 +382,10 @@ This functionality is included in the framework code and users should not have t
 In order to create a LoggerFactory with a custom componentName refer the following code:
  
 Scala
-:   @@snip [Sample](../../../../examples/src/main/scala/csw/logging/client/componentlogger/loggers.scala) { #logger-factory-creation }
+:   @@snip [Sample](../../../../examples/src/main/scala/example/logging/client/componentlogger/loggers.scala) { #logger-factory-creation }
 
 Java
-:   @@snip [JSample](../../../../examples/src/main/java/csw/logging/client/componentlogger/JSampleClass.java) { #logger-factory-creation }
+:   @@snip [JSample](../../../../examples/src/main/java/example/logging/client/componentlogger/JSampleClass.java) { #logger-factory-creation }
 
  
 ## Create LoggingSystem 
@@ -400,10 +400,10 @@ For logging statements to appear in the program, start `LoggingSystem` at an ear
 the folder and dump all logging files.
 
 Scala
-:   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala) { #create-logging-system }
+:   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/example/location/LocationServiceExampleClientApp.scala) { #create-logging-system }
 
 Java
-:   @@snip [JLocationServiceExampleClientApp](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #create-logging-system }
+:   @@snip [JLocationServiceExampleClientApp](../../../../examples/src/main/java/example/location/JLocationServiceExampleClient.java) { #create-logging-system }
 
 @@@ note
 
@@ -421,15 +421,15 @@ This functionality is included in the framework code and users should not have t
 Please ensure to stop `LoggingSystem` before application exits.
 
 Scala
-:   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala) { #stop-logging-system }
+:   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/example/location/LocationServiceExampleClientApp.scala) { #stop-logging-system }
 
 Java
-:   @@snip [JLocationServiceExampleClientApp](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #stop-logging-system }
+:   @@snip [JLocationServiceExampleClientApp](../../../../examples/src/main/java/example/location/JLocationServiceExampleClient.java) { #stop-logging-system }
  
 ## Source code for examples
 
-* @github[Scala Example](/examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala)
-* @github[Java Example](/examples/src/main/java/csw/location/JLocationServiceExampleClient.java)
+* @github[Scala Example](/examples/src/main/scala/example/location/LocationServiceExampleClientApp.scala)
+* @github[Java Example](/examples/src/main/java/example/location/JLocationServiceExampleClient.java)
   
 
 ## Performance

@@ -76,10 +76,10 @@ fail immediately with a @scaladoc[PublishFailure](csw/event/api/exceptions/Publi
 publish the event.
 
 Scala
-:   @@snip [EventPublishExamples.scala](../../../../examples/src/main/scala/csw/event/EventPublishExamples.scala) { #single-event }
+:   @@snip [EventPublishExamples.scala](../../../../examples/src/main/scala/example/event/EventPublishExamples.scala) { #single-event }
 
 Java
-:   @@snip [JEventPublishExamples.java](../../../../examples/src/main/java/csw/event/JEventPublishExamples.java) { #single-event }
+:   @@snip [JEventPublishExamples.java](../../../../examples/src/main/java/example/event/JEventPublishExamples.java) { #single-event }
 
 ### With Generator
 
@@ -89,10 +89,10 @@ at each `interval`. `eventGenerator` is a function responsible for generating ev
 of generating new events based on certain conditions.
 
 Scala
-:   @@snip [EventPublishExamples.scala](../../../../examples/src/main/scala/csw/event/EventPublishExamples.scala) { #event-generator }
+:   @@snip [EventPublishExamples.scala](../../../../examples/src/main/scala/example/event/EventPublishExamples.scala) { #event-generator }
 
 Java
-:   @@snip [JEventPublishExamples.java](../../../../examples/src/main/java/csw/event/JEventPublishExamples.java) { #event-generator }
+:   @@snip [JEventPublishExamples.java](../../../../examples/src/main/java/example/event/JEventPublishExamples.java) { #event-generator }
 
 ### With Event Stream
 
@@ -102,10 +102,10 @@ If an infinite stream is provided, shutdown of the stream needs to be taken care
 See [Akka stream documentation.](https://doc.akka.io/docs/akka/current/stream/index.html?language=scala))
 
 Scala
-:   @@snip [EventPublishExamples.scala](../../../../examples/src/main/scala/csw/event/EventPublishExamples.scala) { #with-source }
+:   @@snip [EventPublishExamples.scala](../../../../examples/src/main/scala/example/event/EventPublishExamples.scala) { #with-source }
 
 Java
-:   @@snip [JEventPublishExamples.java](../../../../examples/src/main/java/csw/event/JEventPublishExamples.java) { #with-source }
+:   @@snip [JEventPublishExamples.java](../../../../examples/src/main/java/example/event/JEventPublishExamples.java) { #with-source }
 
 This API also demonstrates the usage of onError callback which can be used to be alerted to and handle events that failed while being published. 
 The `eventGenerator` API showed just above also demonstrates the use of the `onError` callback.
@@ -128,10 +128,10 @@ event received by the event stream. This is the simplest and most commonly used 
 function, but that is not necessary. 
 
 Scala
-:   @@snip [EventSubscribeExamples.scala](../../../../examples/src/main/scala/csw/event/EventSubscribeExamples.scala) { #with-callback }
+:   @@snip [EventSubscribeExamples.scala](../../../../examples/src/main/scala/example/event/EventSubscribeExamples.scala) { #with-callback }
 
 Java
-:   @@snip [JEventSubscribeExamples.java](../../../../examples/src/main/java/csw/event/JEventSubscribeExamples.java) { #with-callback }
+:   @@snip [JEventSubscribeExamples.java](../../../../examples/src/main/java/example/event/JEventSubscribeExamples.java) { #with-callback }
 
 ### With Asynchronous Callback
 
@@ -140,10 +140,10 @@ To avoid that use the following API which will give the guarantee of ordered exe
 In this case, no further processing occurs until the Future completes.
 
 Scala
-:   @@snip [EventSubscribeExamples.scala](../../../../examples/src/main/scala/csw/event/EventSubscribeExamples.scala) { #with-async-callback }
+:   @@snip [EventSubscribeExamples.scala](../../../../examples/src/main/scala/example/event/EventSubscribeExamples.scala) { #with-async-callback }
 
 Java
-:   @@snip [JEventSubscribeExamples.java](../../../../examples/src/main/java/csw/event/JEventSubscribeExamples.java) { #with-async-callback }
+:   @@snip [JEventSubscribeExamples.java](../../../../examples/src/main/java/example/event/JEventSubscribeExamples.java) { #with-async-callback }
 
 ### With ActorRef
 
@@ -152,10 +152,10 @@ To use this API, you have to create an actor which takes event and then you can 
 In the example shown below, `eventHandler` is the actorRef which accepts events. 
 
 Scala
-:   @@snip [EventSubscribeExamples.scala](../../../../examples/src/main/scala/csw/event/EventSubscribeExamples.scala) { #with-actor-ref }
+:   @@snip [EventSubscribeExamples.scala](../../../../examples/src/main/scala/example/event/EventSubscribeExamples.scala) { #with-actor-ref }
 
 Java
-:   @@snip [JEventSubscribeExamples.java](../../../../examples/src/main/java/csw/event/JEventSubscribeExamples.java) { #with-actor-ref }
+:   @@snip [JEventSubscribeExamples.java](../../../../examples/src/main/java/example/event/JEventSubscribeExamples.java) { #with-actor-ref }
 
 
 ### Receive Event Stream
@@ -165,10 +165,10 @@ Source of events (see [Akka stream documentation](https://doc.akka.io/docs/akka/
 This API gives more control to the user to customize behavior of an event stream.
 
 Scala
-:   @@snip [EventSubscribeExamples.scala](../../../../examples/src/main/scala/csw/event/EventSubscribeExamples.scala) { #with-source }
+:   @@snip [EventSubscribeExamples.scala](../../../../examples/src/main/scala/example/event/EventSubscribeExamples.scala) { #with-source }
 
 Java
-:   @@snip [JEventSubscribeExamples.java](../../../../examples/src/main/java/csw/event/JEventSubscribeExamples.java) { #with-source }
+:   @@snip [JEventSubscribeExamples.java](../../../../examples/src/main/java/example/event/JEventSubscribeExamples.java) { #with-source }
 
 ### Controlling Subscription Rate
 
@@ -181,10 +181,10 @@ All the APIs in EventSubscriber can be provided with `interval` and `Subscriptio
 to control the subscription rate. Following example demonstrates this with the subscribeCallback API. 
 
 Scala
-:   @@snip [EventSubscribeExamples.scala](../../../../examples/src/main/scala/csw/event/EventSubscribeExamples.scala) { #with-subscription-mode }
+:   @@snip [EventSubscribeExamples.scala](../../../../examples/src/main/scala/example/event/EventSubscribeExamples.scala) { #with-subscription-mode }
 
 Java
-:   @@snip [JEventSubscribeExamples.java](../../../../examples/src/main/java/csw/event/JEventSubscribeExamples.java) { #with-subscription-mode }
+:   @@snip [JEventSubscribeExamples.java](../../../../examples/src/main/java/example/event/JEventSubscribeExamples.java) { #with-subscription-mode }
  
 
 There are two types of Subscription modes:
@@ -202,10 +202,10 @@ and belong to the given subsystem are received by the subscriber.
 The callback function provided is called on each event received.
 
 Scala
-:   @@snip [EventSubscribeExamples.scala](../../../../examples/src/main/scala/csw/event/EventSubscribeExamples.scala) { #psubscribe }
+:   @@snip [EventSubscribeExamples.scala](../../../../examples/src/main/scala/example/event/EventSubscribeExamples.scala) { #psubscribe }
 
 Java
-:   @@snip [JEventSubscribeExamples.java](../../../../examples/src/main/java/csw/event/JEventSubscribeExamples.java) { #psubscribe }
+:   @@snip [JEventSubscribeExamples.java](../../../../examples/src/main/java/example/event/JEventSubscribeExamples.java) { #psubscribe }
 
 
 @@@ warning
@@ -237,10 +237,10 @@ If you are not using csw-framework, you can create @scaladoc[EventService](csw/e
 using @scaladoc[EventServiceFactory](csw/event/EventServiceFactory).
 
 Scala
-:   @@snip [EventServiceCreationExamples.scala](../../../../examples/src/main/scala/csw/event/EventServiceCreationExamples.scala) { #default-event-service }
+:   @@snip [EventServiceCreationExamples.scala](../../../../examples/src/main/scala/example/event/EventServiceCreationExamples.scala) { #default-event-service }
 
 Java
-:   @@snip [JEventServiceCreationExamples.java](../../../../examples/src/main/java/csw/event/JEventServiceCreationExamples.java) { #default-event-service }
+:   @@snip [JEventServiceCreationExamples.java](../../../../examples/src/main/java/example/event/JEventServiceCreationExamples.java) { #default-event-service }
 
 The provided implementation of Event Service is backed up by Redis. The above example demonstrates creation of Event Service 
 with default Redis client options. 
@@ -252,23 +252,23 @@ RedisClient is an expensive resource. Reuse this instance as much as possible.
 Note that it is the responsibility of consumer of this API to shutdown Redis Client when it is no longer in use.
 
 Scala
-:   @@snip [EventServiceCreationExamples.scala](../../../../examples/src/main/scala/csw/event/EventServiceCreationExamples.scala) { #redis-event-service }
+:   @@snip [EventServiceCreationExamples.scala](../../../../examples/src/main/scala/example/event/EventServiceCreationExamples.scala) { #redis-event-service }
 
 Java
-:   @@snip [JEventServiceCreationExamples.java](../../../../examples/src/main/java/csw/event/JEventServiceCreationExamples.java) { #redis-event-service }
+:   @@snip [JEventServiceCreationExamples.java](../../../../examples/src/main/java/example/event/JEventServiceCreationExamples.java) { #redis-event-service }
 
 
 ## Source code for examples of creation
 
-* @github[Scala Example](/examples/src/main/scala/csw/event/EventServiceCreationExamples.scala)
-* @github[Java Example](/examples/src/main/java/csw/event/JEventServiceCreationExamples.java)
+* @github[Scala Example](/examples/src/main/scala/example/event/EventServiceCreationExamples.scala)
+* @github[Java Example](/examples/src/main/java/example/event/JEventServiceCreationExamples.java)
 
 ## Source code for examples of publishing
 
-* @github[Scala Example](/examples/src/main/scala/csw/event/EventPublishExamples.scala)
-* @github[Java Example](/examples/src/main/java/csw/event/JEventPublishExamples.java)
+* @github[Scala Example](/examples/src/main/scala/example/event/EventPublishExamples.scala)
+* @github[Java Example](/examples/src/main/java/example/event/JEventPublishExamples.java)
 
 ## Source code for examples of subscribing
 
-* @github[Scala Example](/examples/src/main/scala/csw/event/EventSubscribeExamples.scala)
-* @github[Java Example](/examples/src/main/java/csw/event/JEventSubscribeExamples.java)
+* @github[Scala Example](/examples/src/main/scala/example/event/EventSubscribeExamples.scala)
+* @github[Java Example](/examples/src/main/java/example/event/JEventSubscribeExamples.java)

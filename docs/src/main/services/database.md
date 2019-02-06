@@ -56,10 +56,10 @@ By default while connecting to PostgreSQL, Database Service will provide read ac
 To achieve that, create an instance of `DatabaseServiceFactory` and use it as shown below:
 
 Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/database/AssemblyComponentHandlers.scala) { #dbFactory-access }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/database/AssemblyComponentHandlers.scala) { #dbFactory-access }
 
 Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/database/JAssemblyComponentHandlers.java) { #dbFactory-access }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/database/JAssemblyComponentHandlers.java) { #dbFactory-access }
  
 The underlying database server is registered with the Location Service.
 `makeDsl`/`jMakeDsl` takes `locationService` to locate the PostgreSQL server running and connect to it. It connects to the
@@ -96,10 +96,10 @@ In order to connect to PostgreSQL for write access (or any other access other th
 as shown below with different environment variables: 
 
 Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/database/AssemblyComponentHandlers.scala) { #dbFactory-write-access }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/database/AssemblyComponentHandlers.scala) { #dbFactory-write-access }
 
 Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/database/JAssemblyComponentHandlers.java) { #dbFactory-write-access }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/database/JAssemblyComponentHandlers.java) { #dbFactory-write-access }
 
 Here the username is picked from `dbWriteUsername` and password is picked from `dbWritePassword` environment variables. Hence, it is
 expected from developers to set environment variables prior to using this method with the user name and password to use for
@@ -112,10 +112,10 @@ username and password. This will not require setting any environment variables f
 In order to do so, use the `DatabaseServiceFactory` as shown below:
  
 Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/database/AssemblyComponentHandlers.scala) { #dbFactory-test-access }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/database/AssemblyComponentHandlers.scala) { #dbFactory-test-access }
 
 Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/database/JAssemblyComponentHandlers.java) { #dbFactory-test-access }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/database/JAssemblyComponentHandlers.java) { #dbFactory-test-access }
   
 The reference for providing database properties is shown below:
 
@@ -154,20 +154,20 @@ The following sections show examples of most typical SQL use cases.
 To create a table, use the DSLContext as follows:
 
 Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/database/AssemblyComponentHandlers.scala) { #dsl-create }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/database/AssemblyComponentHandlers.scala) { #dsl-create }
 
 Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/database/JAssemblyComponentHandlers.java) { #dsl-create }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/database/JAssemblyComponentHandlers.java) { #dsl-create }
 
 #### Insert
 
 To insert data in batch, use the DSLContext as follows:
 
 Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/database/AssemblyComponentHandlers.scala) { #dsl-batch }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/database/AssemblyComponentHandlers.scala) { #dsl-batch }
 
 Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/database/JAssemblyComponentHandlers.java) { #dsl-batch }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/database/JAssemblyComponentHandlers.java) { #dsl-batch }
 
 @@@note
 
@@ -185,10 +185,10 @@ Java
 To select data from table, use the DSLContext as follows:
 
 Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/database/AssemblyComponentHandlers.scala) { #dsl-fetch }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/database/AssemblyComponentHandlers.scala) { #dsl-fetch }
 
 Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/database/JAssemblyComponentHandlers.java) { #dsl-fetch }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/database/JAssemblyComponentHandlers.java) { #dsl-fetch }
 
 
 @@@note
@@ -204,10 +204,10 @@ successful mapping of table fields to domain model class.
 To create a stored function, use the DSLContext as follows:
 
 Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/database/AssemblyComponentHandlers.scala) { #dsl-function }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/database/AssemblyComponentHandlers.scala) { #dsl-function }
 
 Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/database/JAssemblyComponentHandlers.java) { #dsl-function }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/database/JAssemblyComponentHandlers.java) { #dsl-function }
 
 Similarly, any SQL queries can be written with the help of DSLContext including stored procedures.
 
@@ -223,6 +223,6 @@ These examples are just a start. Any SQL statement can be created and executed u
 
 ## Source code for examples
 
-* @github[Scala Example](/examples/src/main/scala/csw/database/AssemblyComponentHandlers.scala)
-* @github[Java Example](/examples/src/main/java/csw/database/JAssemblyComponentHandlers.java)
+* @github[Scala Example](/examples/src/main/scala/example/database/AssemblyComponentHandlers.scala)
+* @github[Java Example](/examples/src/main/java/example/database/JAssemblyComponentHandlers.java)
 

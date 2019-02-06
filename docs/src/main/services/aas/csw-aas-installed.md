@@ -54,8 +54,7 @@ some protected routes and we want to build a CLI client which accesses these rou
 This is what the routes look like:
 
 Scala
-:   @@snip [Routes](../../../../../examples/src/main/scala/csw/auth/installed/SampleRoutes.scala) { #sample-routes }
-
+:   @@snip [Routes](../../../../../examples/src/main/scala/example/auth/installed/SampleRoutes.scala) { #sample-routes }
 
 @@@ note
 To know more about how to create secure web apis, please go through 
@@ -74,7 +73,7 @@ We will create a CLI application that has following commands:
 Let's begin with `Main.scala`
 
 Scala
-:   @@snip [Main](../../../../../examples/src/main/scala/csw/auth/installed/Main.scala) { #main-app }
+:   @@snip [Main](../../../../../examples/src/main/scala/example/auth/installed/Main.scala) { #main-app }
 
 The statement `LocationServerStatus.requireUpLocally()` ensures that location service is up and running
 before proceeding further. If location service is not running, it will throw an exception and exit the 
@@ -89,7 +88,7 @@ Next, we will instantiate `InstalledAppAuthAdapter`. There is a factory already 
 required instance. We will create a small factory on top this factory to keep our Main.scala clean.
 
 Scala
-:   @@snip [Adapter-Factory](../../../../../examples/src/main/scala/csw/auth/installed/AdapterFactory.scala) { #adapter-factory }
+:   @@snip [Adapter-Factory](../../../../../examples/src/main/scala/example/auth/installed/AdapterFactory.scala) { #adapter-factory }
 
 Note the the internal factory overload we have used, requires two parameters, i.e. location service & authStore.
 It needs location service to resolve keycloak server. FileAuthStore is just a storage for tokens for it to 
@@ -105,12 +104,12 @@ Coming back to Main.scala, now we need to find out which command user wants to e
 user input arguments, we will create a small utility.
 
 Scala
-:   @@snip [Command-Factory](../../../../../examples/src/main/scala/csw/auth/installed/commands/CommandFactory.scala) { #command-factory }
+:   @@snip [Command-Factory](../../../../../examples/src/main/scala/example/auth/installed/commands/CommandFactory.scala) { #command-factory }
  
 All of these commands extend from a simple trait - `AppCommand`
 
 Scala
-:   @@snip [AppCommand](../../../../../examples/src/main/scala/csw/auth/installed/commands/AppCommand.scala) { #app-command }
+:   @@snip [AppCommand](../../../../../examples/src/main/scala/example/auth/installed/commands/AppCommand.scala) { #app-command }
 
 @@@ note
 We could have used a command line parser library here to parse the command names and options/arguments, but since 
@@ -125,7 +124,7 @@ Let's go through each command one by one
 ### Login
 
 Scala
-:   @@snip [LoginCommand](../../../../../examples/src/main/scala/csw/auth/installed/commands/LoginCommand.scala) { #login-command }
+:   @@snip [LoginCommand](../../../../../examples/src/main/scala/example/auth/installed/commands/LoginCommand.scala) { #login-command }
 
 Here the constructor takes InstalledAppAuthAdapter as a parameter and in the run method, 
 it calls `installedAppAuthAdapter.login()`. This method, opens a browser and redirects user
@@ -148,7 +147,7 @@ user-friendly since it can store cookies & remember passwords.
 ### Logout
 
 Scala
-:   @@snip [LogoutCommand](../../../../../examples/src/main/scala/csw/auth/installed/commands/LogoutCommand.scala) { #logout-command }
+:   @@snip [LogoutCommand](../../../../../examples/src/main/scala/example/auth/installed/commands/LogoutCommand.scala) { #logout-command }
 
 The structure here is very similar to login command. `installedAppAuthAdapter.logout()` 
 clears all the tokens from file system via `FileAuthStore`.
@@ -156,7 +155,7 @@ clears all the tokens from file system via `FileAuthStore`.
 ### Read
 
 Scala
-:   @@snip [ReadCommand](../../../../../examples/src/main/scala/csw/auth/installed/commands/ReadCommand.scala) { #read-command }
+:   @@snip [ReadCommand](../../../../../examples/src/main/scala/example/auth/installed/commands/ReadCommand.scala) { #read-command }
 
 Since in the akka-http routes, the get route is not protected by any authentication or
 authorization, read command simply sends a get request and prints the response.
@@ -164,7 +163,7 @@ authorization, read command simply sends a get request and prints the response.
 ### Write
 
 Scala
-:   @@snip [WriteCommand](../../../../../examples/src/main/scala/csw/auth/installed/commands/WriteCommand.scala) { #write-command }
+:   @@snip [WriteCommand](../../../../../examples/src/main/scala/example/auth/installed/commands/WriteCommand.scala) { #write-command }
 
 Write command constructor takes InstalledAppAuthAdapter & a string value. This string value is expected
 from the CLI input. Since in the akka-http routes, the post route is protected by a realm role policy, we need to pass
@@ -189,5 +188,5 @@ role, server will return 403.
 
 ## Source code for above examples
 
-@github[XXX](/examples/src/main/scala/csw/auth/installed)
+@github[XXX](/examples/src/main/scala/example/auth/installed)
 

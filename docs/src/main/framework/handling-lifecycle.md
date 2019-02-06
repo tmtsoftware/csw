@@ -38,16 +38,16 @@ asynchronous operations. The component can initialize state such as configuratio
 location of components or services to be fetched from Location Service etc. These vary from component to component.
 
 Assembly/Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentHandlers.scala) { #initialize-handler }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/assembly/AssemblyComponentHandlers.scala) { #initialize-handler }
 
 Assembly/Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JAssemblyComponentHandlers.java) { #jInitialize-handler }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/assembly/JAssemblyComponentHandlers.java) { #jInitialize-handler }
 
 Hcd/Scala
-:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/hcd/HcdComponentHandlers.scala) { #initialize-handler }
+:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/hcd/HcdComponentHandlers.scala) { #initialize-handler }
 
 Hcd/Java
-:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JHcdComponentHandlers.java) { #jInitialize-handler }
+:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/hcd/JHcdComponentHandlers.java) { #jInitialize-handler }
 
 
 ####Creation Timeout
@@ -81,16 +81,16 @@ Supervisor deletes the component. The `doShutdown` timeout cannot be changed.
 The `onShutdown` handler can be used for carrying out the tasks which will allow the component to shutdown gracefully. 
 
 Assembly/Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentHandlers.scala) { #onShutdown-handler }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/assembly/AssemblyComponentHandlers.scala) { #onShutdown-handler }
 
 Assembly/Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JAssemblyComponentHandlers.java) { #onShutdown-handler }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/assembly/JAssemblyComponentHandlers.java) { #onShutdown-handler }
 
 Hcd/Scala
-:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/hcd/HcdComponentHandlers.scala) { #onShutdown-handler }
+:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/hcd/HcdComponentHandlers.scala) { #onShutdown-handler }
 
 Hcd/Java
-:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JHcdComponentHandlers.java) { #onShutdown-handler }
+:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/hcd/JHcdComponentHandlers.java) { #onShutdown-handler }
 
 ### Restarting
 A component may be restarted by an external administrative program whether it is deployed in a container or standalone.
@@ -122,32 +122,32 @@ A component has access to the `isOnline` boolean flag, which can be used to dete
 A component can be notified to run in offline mode in case it is not in use. The component can change its behavior if needed as a part of this handler.
 
 Assembly/Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentHandlers.scala) { #onGoOffline-handler }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/assembly/AssemblyComponentHandlers.scala) { #onGoOffline-handler }
 
 Assembly/Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JAssemblyComponentHandlers.java) { #onGoOffline-handler }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/assembly/JAssemblyComponentHandlers.java) { #onGoOffline-handler }
 
 Hcd/Scala
-:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/hcd/HcdComponentHandlers.scala) { #onGoOffline-handler }
+:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/hcd/HcdComponentHandlers.scala) { #onGoOffline-handler }
 
 Hcd/Java
-:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JHcdComponentHandlers.java) { #onGoOffline-handler }
+:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/hcd/JHcdComponentHandlers.java) { #onGoOffline-handler }
 
 ### onGoOnline
 
 A component can be notified to run in online mode again in case it was put to run in offline mode. The component can change its behavior if needed as a part of this handler.
 
 Assembly/Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentHandlers.scala) { #onGoOnline-handler }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/assembly/AssemblyComponentHandlers.scala) { #onGoOnline-handler }
 
 Assembly/Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JAssemblyComponentHandlers.java) { #onGoOnline-handler }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/assembly/JAssemblyComponentHandlers.java) { #onGoOnline-handler }
 
 Hcd/Scala
-:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/hcd/HcdComponentHandlers.scala) { #onGoOnline-handler }
+:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/hcd/HcdComponentHandlers.scala) { #onGoOnline-handler }
 
 Hcd/Java
-:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JHcdComponentHandlers.java) { #onGoOnline-handler }
+:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/hcd/JHcdComponentHandlers.java) { #onGoOnline-handler }
 
 
 ## Handling commands
@@ -171,16 +171,16 @@ returns `Started` indicating to the framework that there are long-running action
 More information about sending commands using `CommandService` is @ref:[here](../commons/command.md)
 
 Assembly/Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentHandlers.scala) { #validateCommand-handler }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/assembly/AssemblyComponentHandlers.scala) { #validateCommand-handler }
 
 Assembly/Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JAssemblyComponentHandlers.java) { #validateCommand-handler }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/assembly/JAssemblyComponentHandlers.java) { #validateCommand-handler }
 
 Hcd/Scala
-:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/hcd/HcdComponentHandlers.scala) { #validateCommand-handler }
+:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/hcd/HcdComponentHandlers.scala) { #validateCommand-handler }
 
 Hcd/Java
-:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JHcdComponentHandlers.java) { #validateCommand-handler }
+:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/hcd/JHcdComponentHandlers.java) { #validateCommand-handler }
  
 If a response can be provided immediately, a final `CommandResponse` such as `CommandCompleted` or `Error` can be sent from this handler.
 
@@ -191,10 +191,10 @@ The `onSubmit` handler returns a `SubmitResponse` indicating if the command is c
 The example shows one way to process `Setup` and `Observe` commands separately.
 
 Assembly/Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentHandlers.scala) { #onSubmit-handler }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/assembly/AssemblyComponentHandlers.scala) { #onSubmit-handler }
 
 Assembly/Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JAssemblyComponentHandlers.java) { #onSubmit-handler }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/assembly/JAssemblyComponentHandlers.java) { #onSubmit-handler }
 
 ### onOneway
 
@@ -202,9 +202,9 @@ On receiving a command as `oneway`, the `onOneway` handler is invoked for a comp
 The `onOneway` handler does not return a value and a command submitted with the `oneway` does not track completion of actions. 
 
 Assembly/Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentHandlers.scala) { #onOneway-handler }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/assembly/AssemblyComponentHandlers.scala) { #onOneway-handler }
 
 Assembly/Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JAssemblyComponentHandlers.java) { #onOneway-handler }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/assembly/JAssemblyComponentHandlers.java) { #onOneway-handler }
 
 More information on handling commands is provided @ref:[here](../commons/command.md).

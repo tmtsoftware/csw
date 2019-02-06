@@ -33,7 +33,7 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
  * @param host host name (to log).
  * @param system an ActorSystem used to create log actors
  */
-private[csw] class LoggingSystem(name: String, version: String, host: String, val system: ActorSystem) {
+class LoggingSystem private[csw] (name: String, version: String, host: String, val system: ActorSystem) {
 
   import csw.logging.api.models.LoggingLevels._
 

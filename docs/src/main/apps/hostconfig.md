@@ -10,10 +10,10 @@ This application will start multiple containers on a given host machine and each
 
 ## How to create
 Scala
-:   @@snip [HostConfigApp.scala](../../../../examples/src/main/scala/csw/framework/HostConfigApp.scala) { #host-config-app }
+:   @@snip [HostConfigApp.scala](../../../../examples/src/main/scala/example/framework/HostConfigApp.scala) { #host-config-app }
 
 Java
-:   @@snip [JHostConfigApp.java](../../../../examples/src/main/java/csw/framework/JHostConfigApp.java) { #jhost-config-app }
+:   @@snip [JHostConfigApp.java](../../../../examples/src/main/java/example/framework/JHostConfigApp.java) { #jhost-config-app }
 
 @@@ note
 

@@ -6,16 +6,16 @@ A component should create exceptions belonging to following two types:
     thrown to let the framework restart the component. The component's state will be cleared/reinitialized. The `onInitialize` handler will be invoked again.
     
     Scala
-    :   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentHandlers.scala) { #failureRestart-Exception }
+    :   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/assembly/AssemblyComponentHandlers.scala) { #failureRestart-Exception }
         
     Java
-    :   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JAssemblyComponentHandlers.java) { #failureRestart-Exception }
+    :   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/assembly/JAssemblyComponentHandlers.java) { #failureRestart-Exception }
         
 2. **FailureStop** : As a part of any handler, an exception can be thrown of type `FailureStop` which will result in terminating the component. The `onShutdown` 
     handler will be invoked to facilitate graceful shutdown.
     
     Scala
-    :   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentHandlers.scala) { #failureStop-Exception }
+    :   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/assembly/AssemblyComponentHandlers.scala) { #failureStop-Exception }
     
     Java
-    :   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JAssemblyComponentHandlers.java) { #failureStop-Exception }
+    :   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/assembly/JAssemblyComponentHandlers.java) { #failureStop-Exception }

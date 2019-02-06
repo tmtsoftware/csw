@@ -8,13 +8,13 @@ The `onLocationTrackingEvent` handler can be used to take action on the `Trackin
 `ComponentInfo` tracked automatically or for the connections tracked explicitly using `trackConnection` method.
 
 Assembly/Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentHandlers.scala) { #onLocationTrackingEvent-handler }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/assembly/AssemblyComponentHandlers.scala) { #onLocationTrackingEvent-handler }
 
 Assembly/Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JAssemblyComponentHandlers.java) { #onLocationTrackingEvent-handler }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/assembly/JAssemblyComponentHandlers.java) { #onLocationTrackingEvent-handler }
 
 Hcd/Scala
-:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/hcd/HcdComponentHandlers.scala) { #onLocationTrackingEvent-handler }
+:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/hcd/HcdComponentHandlers.scala) { #onLocationTrackingEvent-handler }
 
 Hcd/Java
-:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JHcdComponentHandlers.java) { #onLocationTrackingEvent-handler }
+:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/hcd/JHcdComponentHandlers.java) { #onLocationTrackingEvent-handler }
