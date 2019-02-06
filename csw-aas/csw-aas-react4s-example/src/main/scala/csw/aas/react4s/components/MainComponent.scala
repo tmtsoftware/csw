@@ -3,6 +3,7 @@ package csw.aas.react4s.components
 import com.github.ahnfelt.react4s._
 import csw.aas.react4s.Config
 import csw.aas.react4s.facade.components._
+import csw.aas.react4s.facade.context.{AuthContext, AuthContextProvider}
 
 case class MainComponent() extends Component[NoEmit] {
 
