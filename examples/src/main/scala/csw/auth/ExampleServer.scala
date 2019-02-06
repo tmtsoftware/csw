@@ -89,9 +89,9 @@ object Documentation extends HttpApp {
   }
 
   object ThirdPartyService {
-    def deleteEntity(entityId: Long, username: Option[String]) = ???
+    def deleteEntity(entityId: Long, username: Option[String]): Nothing = ???
 
-    def deleteEntity(entityId: Long) = ???
+    def deleteEntity(entityId: Long): Nothing = ???
   }
 
   // #access-token-handle-demo
@@ -200,6 +200,9 @@ object SampleHttpApp extends HttpApp with App {
     }
   }
 
-  startServer("0.0.0.0", 9003)
+  private val host = "0.0.0.0"
+  private val port = 9003
+
+  startServer(host, port)
 }
 // #sample-http-app
