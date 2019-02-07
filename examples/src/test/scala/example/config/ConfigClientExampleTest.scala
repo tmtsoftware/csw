@@ -1,9 +1,10 @@
-package csw.config
+package example.config
 
 import java.io.InputStream
 import java.nio.file.{Path, Paths}
 import java.time.Instant
 
+import csw.config.api.models.FileType.{Annex, Normal}
 import csw.config.api.models.{ConfigData, ConfigId, ConfigMetadata, FileType}
 import csw.config.api.scaladsl.{ConfigClientService, ConfigService}
 import csw.config.client.scaladsl.ConfigClientFactory
@@ -26,7 +27,7 @@ class ConfigClientExampleTest
     with MockedAuthentication {
 
   private val configTestKit = frameworkTestKit.configTestKit
-  import configTestKit.configWiring.actorRuntime._
+  import configTestKit._
   private val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient
 
   //#create-api
@@ -36,7 +37,7 @@ class ConfigClientExampleTest
   val adminApi: ConfigService = ConfigClientFactory.adminApi(actorSystem, locationService, factory)
   //#create-api
 
-  override def beforeEach(): Unit = configTestKit.configWiring.svnRepo.initSvnRepo()
+  override def beforeEach(): Unit = configTestKit.initSvnRepo()
   override def afterEach(): Unit  = configTestKit.deleteServerFiles()
 
   //#declare_string_config
@@ -102,15 +103,15 @@ class ConfigClientExampleTest
 
         //store the config, at a specified path as normal text file
         val id1: ConfigId =
-          await(adminApi.create(Paths.get("/hcd/trombone/overnight.conf"), config1, false, "review done"))
+          await(adminApi.create(Paths.get("/hcd/trombone/overnight.conf"), config1, annex = false, "review done"))
 
         //store the config, at a specified path as a binary file in annex store
         val id2: ConfigId =
-          await(adminApi.create(Paths.get("/hcd/trombone/firmware.bin"), config2, true, "smoke test done"))
+          await(adminApi.create(Paths.get("/hcd/trombone/firmware.bin"), config2, annex = true, "smoke test done"))
 
         //store the config, at a specified path as a binary file in annex store
         val id3: ConfigId =
-          await(adminApi.create(Paths.get("/hcd/trombone/debug.bin"), config3, true, "new file from vendor"))
+          await(adminApi.create(Paths.get("/hcd/trombone/debug.bin"), config3, annex = true, "new file from vendor"))
 
         //CAUTION: for demo example setup these IDs are returned. Don't assume them in production setup.
         id1 shouldEqual ConfigId(1)
@@ -207,11 +208,11 @@ class ConfigClientExampleTest
     //#list
     //Here's a list of tuples containing FilePath and FileTyepe(Annex / Normal)
     val paths: List[(Path, FileType)] = List[(Path, FileType)](
-      (Paths.get("a/c/trombone.conf"), FileType.Annex),
-      (Paths.get("a/b/c/hcd/hcd.conf"), FileType.Normal),
-      (Paths.get("a/b/assembly/assembly1.fits"), FileType.Annex),
-      (Paths.get("a/b/c/assembly/assembly2.fits"), FileType.Normal),
-      (Paths.get("testing/test.conf"), FileType.Normal)
+      (Paths.get("a/c/trombone.conf"), Annex),
+      (Paths.get("a/b/c/hcd/hcd.conf"), Normal),
+      (Paths.get("a/b/assembly/assembly1.fits"), Annex),
+      (Paths.get("a/b/c/assembly/assembly2.fits"), Normal),
+      (Paths.get("testing/test.conf"), Normal)
     )
 
     //create config files at those paths
@@ -219,7 +220,7 @@ class ConfigClientExampleTest
       case (path, fileType) ⇒
         val createF = async {
           await(
-            adminApi.create(path, ConfigData.fromString(defaultStrConf), FileType.Annex == fileType, "initial commit")
+            adminApi.create(path, ConfigData.fromString(defaultStrConf), Annex == fileType, "initial commit")
           )
         }
         Await.result(createF, 2.seconds)
@@ -232,11 +233,11 @@ class ConfigClientExampleTest
       }.toSet
 
       //retrieve list of files based on type; for demonstration purpose validate return values
-      await(adminApi.list(Some(FileType.Annex))).map(info ⇒ info.path).toSet shouldBe paths.collect {
-        case (path, fileType) if (fileType == FileType.Annex) ⇒ path
+      await(adminApi.list(Some(Annex))).map(info ⇒ info.path).toSet shouldBe paths.collect {
+        case (path, fileType) if fileType == Annex ⇒ path
       }.toSet
       await(adminApi.list(Some(FileType.Normal))).map(info ⇒ info.path).toSet shouldBe paths.collect {
-        case (path, fileType) if (fileType == FileType.Normal) ⇒ path
+        case (path, fileType) if fileType == FileType.Normal ⇒ path
       }.toSet
 
       //retrieve list using pattern; for demonstration purpose validate return values
@@ -248,7 +249,7 @@ class ConfigClientExampleTest
       //retrieve list using pattern and file type; for demonstration purpose validate return values
       await(adminApi.list(Some(FileType.Normal), Some(".*.conf"))).map(info ⇒ info.path.toString).toSet shouldBe
       Set("a/b/c/hcd/hcd.conf", "testing/test.conf")
-      await(adminApi.list(Some(FileType.Annex), Some("a/c.*"))).map(info ⇒ info.path.toString).toSet shouldBe
+      await(adminApi.list(Some(Annex), Some("a/c.*"))).map(info ⇒ info.path.toString).toSet shouldBe
       Set("a/c/trombone.conf")
       await(adminApi.list(Some(FileType.Normal), Some("test.*"))).map(info ⇒ info.path.toString).toSet shouldBe
       Set("testing/test.conf")

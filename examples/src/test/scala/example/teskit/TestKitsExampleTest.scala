@@ -1,4 +1,5 @@
-package csw.teskit
+package example.teskit
+
 import com.typesafe.config.ConfigFactory
 import csw.location.api.models.ComponentId
 import csw.location.api.models.ComponentType.Assembly

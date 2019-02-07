@@ -9,19 +9,19 @@ Creating a Result Requires:
  * **[Set[Parameter]](keys-parameters.html)**
 
 Scala
-:   @@snip [ResultTest.scala](../../../../examples/src/test/scala/csw/messages/ResultTest.scala) { #result }
+:   @@snip [ResultTest.scala](../../../../examples/src/test/scala/example/messages/ResultTest.scala) { #result }
 
 Java
-:   @@snip [JResultTest.java](../../../../examples/src/test/java/csw/messages/JResultTest.java) { #result }
+:   @@snip [JResultTest.java](../../../../examples/src/test/java/example/messages/JResultTest.java) { #result }
 
 ## JSON serialization
 State variables can be serialized to JSON. The library has provided **JsonSupport** helper class and methods to serialize DemandState and CurrentState.
 
 Scala
-:   @@snip [ResultTest.scala](../../../../examples/src/test/scala/csw/messages/ResultTest.scala) { #json-serialization }
+:   @@snip [ResultTest.scala](../../../../examples/src/test/scala/example/messages/ResultTest.scala) { #json-serialization }
 
 Java
-:   @@snip [JResultTest.java](../../../../examples/src/test/java/csw/messages/JResultTest.java) { #json-serialization }
+:   @@snip [JResultTest.java](../../../../examples/src/test/java/example/messages/JResultTest.java) { #json-serialization }
 
 ## Unique Key Constraint
 
@@ -36,12 +36,12 @@ Parameters are stored in a Set, which is an unordered collection of items. Hence
 Here are some examples that illustrate this point:
 
 Scala
-:   @@snip [ResultTest.scala](../../../../examples/src/test/scala/csw/messages/ResultTest.scala) { #unique-key }
+:   @@snip [ResultTest.scala](../../../../examples/src/test/scala/example/messages/ResultTest.scala) { #unique-key }
 
 Java
-:   @@snip [JResultTest.java](../../../../examples/src/test/java/csw/messages/JResultTest.java) { #unique-key }
+:   @@snip [JResultTest.java](../../../../examples/src/test/java/example/messages/JResultTest.java) { #unique-key }
 
 ## Source Code for Examples
 
-* @github[Scala Example](/examples/src/test/scala/csw/messages/ResultTest.scala)
-* @github[Java Example](/examples/src/test/java/csw/messages/JResultTest.java)
+* @github[Scala Example](/examples/src/test/scala/example/messages/ResultTest.scala)
+* @github[Java Example](/examples/src/test/java/example/messages/JResultTest.java)

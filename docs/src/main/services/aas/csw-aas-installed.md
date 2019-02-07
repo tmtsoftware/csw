@@ -188,5 +188,4 @@ role, server will return 403.
 
 ## Source code for above examples
 
-@github[XXX](/examples/src/main/scala/example/auth/installed)
-
+@github[Example](/examples/src/main/scala/example/auth/installed)

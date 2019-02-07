@@ -1,4 +1,4 @@
-package csw.config;
+package example.config;
 
 import akka.actor.ActorSystem;
 import akka.stream.Materializer;

@@ -1,4 +1,4 @@
-package csw.teskit
+package example.teskit
 
 //#scalatest-testkit
 import com.typesafe.config.ConfigFactory

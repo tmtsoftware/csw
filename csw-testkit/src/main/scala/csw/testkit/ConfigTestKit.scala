@@ -70,8 +70,14 @@ final class ConfigTestKit private (system: ActorSystem, serverConfig: Option[Con
     val (server, _) = TestKitUtils.await(configWiring.httpService.registeredLazyBinding, timeout)
     configServer = Some(server)
     deleteServerFiles()
-    configWiring.svnRepo.initSvnRepo()
+    initSvnRepo()
   }
+
+  /**
+   * WARNING: use this method only when you are sure that config server is up and running
+   * For example: When you start config server using ScalaTestFrameworkTestKit(ConfigServer), you might want to init svn repo explicitly
+   */
+  def initSvnRepo(): Unit = configWiring.svnRepo.initSvnRepo()
 
   /** useful for deleting entire svn repo when test has finished */
   def deleteServerFiles(): Unit = {

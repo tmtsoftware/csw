@@ -1,4 +1,4 @@
-package csw.messages
+package example.messages
 
 import java.time.Instant
 

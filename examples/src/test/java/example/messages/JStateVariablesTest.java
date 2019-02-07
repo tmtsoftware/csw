@@ -1,4 +1,4 @@
-package csw.messages;
+package example.messages;
 
 import csw.params.core.formats.JavaJsonSupport;
 import csw.params.core.generics.Key;
@@ -56,7 +56,7 @@ public class JStateVariablesTest extends JUnitSuite {
         DemandState ds3 = new DemandState(prefix, new StateName("testStateName")).add(timestamp);
 
         //access keys
-        Boolean charKeyExists = ds1.exists(charKey); //true
+        boolean charKeyExists = ds1.exists(charKey); //true
 
         //access Parameters
         Optional<Parameter<Integer>> p1 = ds1.jGet(intKey);
@@ -79,11 +79,11 @@ public class JStateVariablesTest extends JUnitSuite {
 
         //validations
         Assert.assertTrue(charKeyExists);
-        Assert.assertTrue(p1.get() == intParam);
+        Assert.assertSame(p1.get(), intParam);
         Assert.assertEquals(new HashSet<>(Arrays.asList('A', 'B', 'C')), new HashSet<>(v1));
         Assert.assertEquals(new HashSet<>(Arrays.asList(true, false)), new HashSet<>(v2));
-        Assert.assertTrue(4 == missingKeys.size());
-        Assert.assertTrue(false == ds4.exists(timestampKey));
+        Assert.assertEquals(4, missingKeys.size());
+        Assert.assertFalse(ds4.exists(timestampKey));
         Assert.assertTrue(ds5.jGet(timestampKey).get().head().isBefore(ds3.jGet(timestampKey).get().head()));
     }
 
@@ -118,7 +118,7 @@ public class JStateVariablesTest extends JUnitSuite {
         CurrentState cs3 = new CurrentState(prefix, new StateName("testStateName")).add(timestamp);
 
         //access keys
-        Boolean charKeyExists = cs1.exists(charKey); //true
+        boolean charKeyExists = cs1.exists(charKey); //true
 
         //access Parameters
         Optional<Parameter<Integer>> p1 = cs1.jGet(intKey);
@@ -141,11 +141,11 @@ public class JStateVariablesTest extends JUnitSuite {
 
         //validations
         Assert.assertTrue(charKeyExists);
-        Assert.assertTrue(p1.get() == intParam);
+        Assert.assertSame(p1.get(), intParam);
         Assert.assertEquals(new HashSet<>(Arrays.asList('A', 'B', 'C')), new HashSet<>(v1));
         Assert.assertEquals(new HashSet<>(Arrays.asList(true, false)), new HashSet<>(v2));
-        Assert.assertTrue(4 == missingKeys.size());
-        Assert.assertTrue(false == cs4.exists(timestampKey));
+        Assert.assertEquals(4, missingKeys.size());
+        Assert.assertFalse(cs4.exists(timestampKey));
         Assert.assertTrue(cs5.jGet(timestampKey).get().head().isBefore(cs3.jGet(timestampKey).get().head()));
     }
 
@@ -182,9 +182,9 @@ public class JStateVariablesTest extends JUnitSuite {
         //#json-serialization
 
         //validations
-        Assert.assertTrue(ds.equals(ds1));
-        Assert.assertTrue(cs.equals(cs1));
-        Assert.assertTrue(dsFromPrettyStr.equals(ds1));
+        Assert.assertEquals(ds, ds1);
+        Assert.assertEquals(cs, cs1);
+        Assert.assertEquals(dsFromPrettyStr, ds1);
     }
 
     @Test

@@ -35,10 +35,10 @@ When you really want a granular level access to testkits then only you would wan
 You can create instance of `FrameworkTestKit` as shown below:
 
 Scala
-:   @@snip [TestKitsExampleTest.scala](../../../../examples/src/test/scala/csw/teskit/TestKitsExampleTest.scala) { #framework-testkit }
+:   @@snip [TestKitsExampleTest.scala](../../../../examples/src/test/scala/example/teskit/TestKitsExampleTest.scala) { #framework-testkit }
 
 Java
-:   @@snip [TestKitsExampleTest.scala](../../../../examples/src/test/java/csw/testkit/JTestKitsExampleTest.java) { #framework-testkit }
+:   @@snip [TestKitsExampleTest.scala](../../../../examples/src/test/java/example/testkit/JTestKitsExampleTest.java) { #framework-testkit }
 
 @@@ note
 
@@ -54,15 +54,15 @@ Use `spawnContainer` method provided by `FrameworkTestKit` to start components i
 Below example show how to spawn container or component in standalone mode using framework testkit.
 
 Scala
-:   @@snip [TestKitsExampleTest.scala](../../../../examples/src/test/scala/csw/teskit/TestKitsExampleTest.scala) { #spawn-using-testkit }
+:   @@snip [TestKitsExampleTest.scala](../../../../examples/src/test/scala/example/teskit/TestKitsExampleTest.scala) { #spawn-using-testkit }
 
 Java
-:   @@snip [TestKitsExampleTest.scala](../../../../examples/src/test/java/csw/testkit/JTestKitsExampleTest.java) { #spawn-using-testkit }
+:   @@snip [TestKitsExampleTest.scala](../../../../examples/src/test/java/example/testkit/JTestKitsExampleTest.java) { #spawn-using-testkit }
 
 Full source at GitHub
 
-* @github[Scala](/examples/src/test/scala/csw/teskit/TestKitsExampleTest.scala)
-* @github[Java](/examples/src/test/java/csw/testkit/JTestKitsExampleTest.java)
+* @github[Scala](/examples/src/test/scala/example/teskit/TestKitsExampleTest.scala)
+* @github[Java](/examples/src/test/java/example/testkit/JTestKitsExampleTest.java)
 
 ## Test framework integration
 
@@ -85,10 +85,10 @@ If you are using JUnit then you can use `csw.testkit.javadsl.FrameworkTestKitJun
 Below example show's the usage of `ScalaTestFrameworkTestKit` and `FrameworkTestKitJunitResource` and how you can start above mentioned services as per your need.
 
 Scala
-:   @@snip [ScalaTestExampleIntegrationTest.scala](../../../../examples/src/test/scala/csw/teskit/ScalaTestIntegrationExampleTest.scala) { #scalatest-testkit }
+:   @@snip [ScalaTestExampleIntegrationTest.scala](../../../../examples/src/test/scala/example/teskit/ScalaTestIntegrationExampleTest.scala) { #scalatest-testkit }
 
 Java
-:   @@snip [JUnitIntegrationExampleTest.scala](../../../../examples/src/test/java/csw/testkit/JUnitIntegrationExampleTest.java) { #junit-testkit }
+:   @@snip [JUnitIntegrationExampleTest.scala](../../../../examples/src/test/java/example/testkit/JUnitIntegrationExampleTest.java) { #junit-testkit }
 
 @@@ note
 

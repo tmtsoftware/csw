@@ -1,4 +1,4 @@
-package csw.messages;
+package example.messages;
 
 import csw.params.events.EventName;
 import csw.params.events.ObserveEvent;
@@ -78,7 +78,7 @@ public class JEventsTest extends JUnitSuite {
         SystemEvent se3 = new SystemEvent(prefix2, name2).add(p1).add(p2).add(p3);
 
         //access keys
-        Boolean k1Exists = se1.exists(k1); //true
+        boolean k1Exists = se1.exists(k1); //true
 
         //access Parameters
         Optional<Parameter<Integer>> p4 = se1.jGet(k1);
@@ -94,10 +94,10 @@ public class JEventsTest extends JUnitSuite {
         //#systemevent
 
         Assert.assertTrue(k1Exists);
-        Assert.assertTrue(p4.get() == p1);
-        Assert.assertEquals(new HashSet<>(Arrays.asList(22)), new HashSet<>(v1));
-        Assert.assertEquals(new HashSet<>(Arrays.asList(44)), new HashSet<>(v2));
-        Assert.assertEquals(new HashSet<>(Arrays.asList(missingKeys)), new HashSet<>(Arrays.asList(missingKeys)));
+        Assert.assertSame(p4.get(), p1);
+        Assert.assertEquals(new HashSet<>(Collections.singletonList(22)), new HashSet<>(v1));
+        Assert.assertEquals(new HashSet<>(Collections.singletonList(44)), new HashSet<>(v2));
+        Assert.assertEquals(new HashSet<>(Collections.singletonList(missingKeys)), new HashSet<>(Collections.singletonList(missingKeys)));
         Assert.assertNotEquals(se3.eventId(), se4.eventId()); //Test unique id when parameters are removed
     }
 
@@ -129,7 +129,7 @@ public class JEventsTest extends JUnitSuite {
         ObserveEvent oc3 = new ObserveEvent(prefix2, name2).add(p1).add(p2).add(p3);
 
         //access keys
-        Boolean k1Exists = oc1.exists(k1); //true
+        boolean k1Exists = oc1.exists(k1); //true
 
         //access Parameters
         Optional<Parameter<Integer>> p4 = oc1.jGet(k1);
@@ -145,10 +145,10 @@ public class JEventsTest extends JUnitSuite {
         //#observeevent
 
         Assert.assertTrue(k1Exists);
-        Assert.assertTrue(p4.get() == p1);
-        Assert.assertEquals(new HashSet<>(Arrays.asList(4)), new HashSet<>(v1));
-        Assert.assertEquals(new HashSet<>(Arrays.asList(2)), new HashSet<>(v2));
-        Assert.assertEquals(new HashSet<>(Arrays.asList(missingKeys)), new HashSet<>(Arrays.asList(missingKeys)));
+        Assert.assertSame(p4.get(), p1);
+        Assert.assertEquals(new HashSet<>(Collections.singletonList(4)), new HashSet<>(v1));
+        Assert.assertEquals(new HashSet<>(Collections.singletonList(2)), new HashSet<>(v2));
+        Assert.assertEquals(new HashSet<>(Collections.singletonList(missingKeys)), new HashSet<>(Collections.singletonList(missingKeys)));
         Assert.assertNotEquals(oc3.eventId(), oc4.eventId()); //Test unique id when parameters are removed
     }
 
@@ -190,9 +190,9 @@ public class JEventsTest extends JUnitSuite {
         //#json-serialization
 
         //validations
-        Assert.assertTrue(systemEvent.equals(statusFromPrettyStr));
-        Assert.assertTrue(observeEvent.equals(observeEvent1));
-        Assert.assertTrue(systemEvent.equals(systemEvent1));
+        Assert.assertEquals(systemEvent, statusFromPrettyStr);
+        Assert.assertEquals(observeEvent, observeEvent1);
+        Assert.assertEquals(systemEvent, systemEvent1);
     }
 
     @Test

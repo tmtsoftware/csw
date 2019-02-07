@@ -1,4 +1,4 @@
-package csw.messages;
+package example.messages;
 
 import csw.params.commands.CommandName;
 import csw.params.commands.Observe;
@@ -47,9 +47,9 @@ public class JCommandsTest extends JUnitSuite {
         //#prefix
 
         //validations
-        Assert.assertTrue(prefix1.subsystem() == JSubsystem.NFIRAOS);
-        Assert.assertTrue(prefix2.subsystem() == JSubsystem.TCS);
-        Assert.assertTrue(badPrefix.subsystem() == JSubsystem.BAD);
+        Assert.assertSame(prefix1.subsystem(), JSubsystem.NFIRAOS);
+        Assert.assertSame(prefix2.subsystem(), JSubsystem.TCS);
+        Assert.assertSame(badPrefix.subsystem(), JSubsystem.BAD);
     }
 
     @Test
@@ -73,7 +73,7 @@ public class JCommandsTest extends JUnitSuite {
         Setup sc1 = new Setup(new Prefix(prefixName), new CommandName("move"), Optional.of(obsId)).add(i1).add(i2);
 
         //access keys
-        Boolean k1Exists = sc1.exists(k1); //true
+        boolean k1Exists = sc1.exists(k1); //true
 
         //access parameters
         Optional<Parameter<Integer>> optParam1 = sc1.jGet(k1); //present
@@ -104,11 +104,11 @@ public class JCommandsTest extends JUnitSuite {
         //validations
         Assert.assertTrue(k1Exists);
         Assert.assertTrue(optParam1.isPresent());
-        Assert.assertTrue(!optK2Bad.isPresent());
-        Assert.assertTrue(paramSize == 4);
-        Assert.assertTrue(sc3.size() == 2);
-        Assert.assertTrue(sc4.size() == 1);
-        Assert.assertTrue(allKeys.size() == 1);
+        Assert.assertFalse(optK2Bad.isPresent());
+        Assert.assertEquals(4, paramSize);
+        Assert.assertEquals(2, sc3.size());
+        Assert.assertEquals(1, sc4.size());
+        Assert.assertEquals(1, allKeys.size());
     }
 
     @Test
@@ -156,11 +156,11 @@ public class JCommandsTest extends JUnitSuite {
 
         //validations
         Assert.assertTrue(k1Param.isPresent());
-        Assert.assertTrue(!k2BadParam.isPresent());
-        Assert.assertTrue(paramSize == 4);
+        Assert.assertFalse(k2BadParam.isPresent());
+        Assert.assertEquals(4, paramSize);
         Assert.assertArrayEquals(boolArray, values.toArray());
         Assert.assertArrayEquals(intArray, (Integer[]) oc3.jGet(k2).get().values());
-        Assert.assertTrue(oc4.size() == 3);
+        Assert.assertEquals(3, oc4.size());
     }
 
     @Test
@@ -208,11 +208,11 @@ public class JCommandsTest extends JUnitSuite {
 
         //validations
         Assert.assertTrue(k1Param.isPresent());
-        Assert.assertTrue(!k2BadParam.isPresent());
-        Assert.assertTrue(paramSize == 4);
+        Assert.assertFalse(k2BadParam.isPresent());
+        Assert.assertEquals(4, paramSize);
         Assert.assertArrayEquals(boolArray, values.toArray());
         Assert.assertArrayEquals(intArray, (Integer[]) wc3.jGet(k2).get().values());
-        Assert.assertTrue(wc4.size() == 3);
+        Assert.assertEquals(3, wc4.size());
     }
 
     @Test

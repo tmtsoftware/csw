@@ -1,4 +1,4 @@
-package csw.messages;
+package example.messages;
 
 import csw.params.commands.Result;
 import csw.params.core.formats.JavaJsonSupport;
@@ -51,7 +51,7 @@ public class JResultTest extends JUnitSuite {
         Result r3 = new Result(prefix).madd(p1, p2).add(p3);
 
         //access keys
-        Boolean k1Exists = r1.exists(k1); //true
+        boolean k1Exists = r1.exists(k1); //true
 
         //access Parameters
         Optional<Parameter<Integer>> p4 = r1.jGet(k1);
@@ -68,11 +68,11 @@ public class JResultTest extends JUnitSuite {
         //#result
 
         Assert.assertTrue(k1Exists);
-        Assert.assertTrue(p4.get() == p1);
+        Assert.assertSame(p4.get(), p1);
         Assert.assertEquals(new HashSet<>(v1), new HashSet<>(p1.jValues()));
         Assert.assertEquals(new HashSet<>(v2), new HashSet<>(p2.jValues()));
         Assert.assertEquals(new HashSet<>(missingKeys), new HashSet<>(Collections.singletonList(k4.keyName())));
-        Assert.assertTrue(r2.equals(r4));
+        Assert.assertEquals(r2, r4);
     }
 
     @Test
@@ -107,7 +107,7 @@ public class JResultTest extends JUnitSuite {
         Result result1 = JavaJsonSupport.readResult(Json.parse(str));
         //#json-serialization
 
-        Assert.assertTrue(result.equals(result1));
+        Assert.assertEquals(result, result1);
     }
 
     @Test

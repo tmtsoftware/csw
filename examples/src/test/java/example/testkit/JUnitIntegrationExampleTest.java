@@ -1,4 +1,4 @@
-package csw.testkit;
+package example.testkit;
 
 //#junit-testkit
 import com.typesafe.config.ConfigFactory;

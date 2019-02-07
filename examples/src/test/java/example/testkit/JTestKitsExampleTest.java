@@ -1,4 +1,4 @@
-package csw.testkit;
+package example.testkit;
 
 import akka.actor.ActorSystem;
 import akka.stream.ActorMaterializer;
@@ -8,6 +8,7 @@ import csw.location.api.models.AkkaLocation;
 import csw.location.api.models.ComponentId;
 import csw.location.api.models.Connection.AkkaConnection;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
+import csw.testkit.FrameworkTestKit;
 import csw.testkit.javadsl.JCSWService;
 import org.junit.AfterClass;
 import org.junit.Assert;

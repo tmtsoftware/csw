@@ -19,10 +19,10 @@ Each event includes its time of creation in UTC format.
 To create an event instance at the current time use the default constructor. For other utility functions, see below examples:
 
 Scala
-:   @@snip [EventsTest.scala](../../../../examples/src/test/scala/csw/messages/EventsTest.scala) { #eventtime }
+:   @@snip [EventsTest.scala](../../../../examples/src/test/scala/example/messages/EventsTest.scala) { #eventtime }
 
 Java
-:   @@snip [JEventsTest.java](../../../../examples/src/test/java/csw/messages/JEventsTest.java) { #eventtime }
+:   @@snip [JEventsTest.java](../../../../examples/src/test/java/example/messages/JEventsTest.java) { #eventtime }
    
 ## System Event
 
@@ -31,10 +31,10 @@ the output of an algorithm in one component that is used as an input to another.
 to publish internal state or status values of a component that may be of interest to other components in the system.
 
 Scala
-:   @@snip [EventsTest.scala](../../../../examples/src/test/scala/csw/messages/EventsTest.scala) { #systemevent }
+:   @@snip [EventsTest.scala](../../../../examples/src/test/scala/example/messages/EventsTest.scala) { #systemevent }
 
 Java
-:   @@snip [JEventsTest.java](../../../../examples/src/test/java/csw/messages/JEventsTest.java) { #systemevent }
+:   @@snip [JEventsTest.java](../../../../examples/src/test/java/example/messages/JEventsTest.java) { #systemevent }
 
 ## Observe Event
 
@@ -51,10 +51,10 @@ can be used to create standard ObserveEvents.
 @@@
 
 Scala
-:   @@snip [EventsTest.scala](../../../../examples/src/test/scala/csw/messages/EventsTest.scala) { #observeevent }
+:   @@snip [EventsTest.scala](../../../../examples/src/test/scala/example/messages/EventsTest.scala) { #observeevent }
 
 Java
-:   @@snip [JEventsTest.java](../../../../examples/src/test/java/csw/messages/JEventsTest.java) { #observeevent }
+:   @@snip [JEventsTest.java](../../../../examples/src/test/java/example/messages/JEventsTest.java) { #observeevent }
 
 
 
@@ -62,10 +62,10 @@ Java
 Events can be serialized to JSON. The library has provided **JsonSupport** helper class and methods to serialize Status, Observe and System events.
 
 Scala
-:   @@snip [CommandsTest.scala](../../../../examples/src/test/scala/csw/messages/EventsTest.scala) { #json-serialization }
+:   @@snip [CommandsTest.scala](../../../../examples/src/test/scala/example/messages/EventsTest.scala) { #json-serialization }
 
 Java
-:   @@snip [JEventsTest.java](../../../../examples/src/test/java/csw/messages/JEventsTest.java) { #json-serialization }
+:   @@snip [JEventsTest.java](../../../../examples/src/test/java/example/messages/JEventsTest.java) { #json-serialization }
 
 ## Unique Key Constraint
 
@@ -83,10 +83,10 @@ parameters based on key.
 Here are some examples that illustrate this point:
 
 Scala
-:   @@snip [CommandsTest.scala](../../../../examples/src/test/scala/csw/messages/EventsTest.scala) { #unique-key }
+:   @@snip [CommandsTest.scala](../../../../examples/src/test/scala/example/messages/EventsTest.scala) { #unique-key }
 
 Java
-:   @@snip [JEventsTest.java](../../../../examples/src/test/java/csw/messages/JEventsTest.java) { #unique-key }
+:   @@snip [JEventsTest.java](../../../../examples/src/test/java/example/messages/JEventsTest.java) { #unique-key }
 
 ## Protobuf
 
@@ -105,12 +105,12 @@ The protobuf schema is defined in @github[csw_protobuf](/csw-messages/src/main/p
 Here are some examples:
 
 Scala
-:   @@snip [CommandsTest.scala](../../../../examples/src/test/scala/csw/messages/EventsTest.scala) { #protobuf }
+:   @@snip [CommandsTest.scala](../../../../examples/src/test/scala/example/messages/EventsTest.scala) { #protobuf }
 
 Java
-:   @@snip [JEventsTest.java](../../../../examples/src/test/java/csw/messages/JEventsTest.java) { #protobuf }
+:   @@snip [JEventsTest.java](../../../../examples/src/test/java/example/messages/JEventsTest.java) { #protobuf }
 
 # Source Code for Examples
 
-* @github[Scala Example](/examples/src/test/scala/csw/messages/EventsTest.scala)
-* @github[Java Example](/examples/src/test/java/csw/messages/JEventsTest.java)
+* @github[Scala Example](/examples/src/test/scala/example/messages/EventsTest.scala)
+* @github[Java Example](/examples/src/test/java/example/messages/JEventsTest.java)

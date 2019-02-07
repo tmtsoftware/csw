@@ -1,4 +1,4 @@
-package csw.messages;
+package example.messages;
 
 import csw.params.javadsl.JUnits;
 import csw.params.core.generics.GChoiceKey;
@@ -59,7 +59,7 @@ public class JKeysAndParametersTest extends JUnitSuite {
         Assert.assertEquals(JUnits.day, paramWithUnits1.units());
         Assert.assertEquals(JUnits.day, paramWithUnits2.units());
         Assert.assertEquals(JUnits.meter, paramWithUnits3.units());
-        Assert.assertTrue(1 == head);
+        Assert.assertEquals(1, (short) head);
     }
 
     @Test
@@ -92,7 +92,7 @@ public class JKeysAndParametersTest extends JUnitSuite {
         Assert.assertEquals(JUnits.NoUnits, p1.units());
         Assert.assertEquals(JUnits.liter, p2.units());
         Assert.assertEquals(JUnits.count, p1AsCount.units());
-        Assert.assertEquals(true, bDefaultUnit);
+        Assert.assertTrue(bDefaultUnit);
         Assert.assertEquals(2, listOfArrayData.size());
         Assert.assertArrayEquals(arr1, (Double[]) listOfArrayData.get(0).values());
         Assert.assertArrayEquals(arr2, (Double[]) listOfArrayData.get(1).values());
@@ -135,7 +135,7 @@ public class JKeysAndParametersTest extends JUnitSuite {
         Assert.assertEquals(JUnits.NoUnits, p1.units());
         Assert.assertEquals(JUnits.liter, p2.units());
         Assert.assertEquals(JUnits.liter, p1AsLiter.units());
-        Assert.assertEquals(true, bDefaultUnit);
+        Assert.assertTrue(bDefaultUnit);
         Assert.assertEquals(2, matrixData1.size());
         Assert.assertArrayEquals(m1, (Byte[][]) matrixData1.get(0).values());
         Assert.assertArrayEquals(m2, (Byte[][]) matrixData2.get(0).values());
@@ -176,7 +176,7 @@ public class JKeysAndParametersTest extends JUnitSuite {
         Assert.assertEquals(JUnits.foot, p1.units());
         Assert.assertEquals(JUnits.NoUnits, p2.units());
         Assert.assertEquals(JUnits.foot, paramWithFoot.units());
-        Assert.assertEquals(true, bDefaultUnit);
+        Assert.assertTrue(bDefaultUnit);
         Assert.assertEquals("A", head.name());
         Assert.assertEquals(values, Arrays.asList(new Choice("c")));
     }
@@ -210,7 +210,7 @@ public class JKeysAndParametersTest extends JUnitSuite {
         Assert.assertEquals(JUnits.NoUnits, p1.units());
         Assert.assertEquals(JUnits.degree, p2.units());
         Assert.assertEquals(JUnits.degree, paramWithDegree.units());
-        Assert.assertEquals(true, bDefaultUnit);
+        Assert.assertTrue(bDefaultUnit);
         Assert.assertEquals(raDec1, head);
         Assert.assertEquals(values, Arrays.asList(raDec1, raDec2));
     }
@@ -273,8 +273,8 @@ public class JKeysAndParametersTest extends JUnitSuite {
         Assert.assertEquals(struct1.parameter(dec), secondKey.get());
         Assert.assertEquals(struct1.parameter(epoch), thirdKey.get());
         Assert.assertEquals(new HashSet<>(expectedMissingKeys), missingKeySet);
-        Assert.assertTrue(!mutated1.exists(ra));
-        Assert.assertTrue(!mutated2.exists(ra));
+        Assert.assertFalse(mutated1.exists(ra));
+        Assert.assertFalse(mutated2.exists(ra));
     }
 
     @Test
@@ -290,7 +290,7 @@ public class JKeysAndParametersTest extends JUnitSuite {
 
         //storing a single value, default unit is NoUnits
         Parameter<Boolean> bParam = k1.set(true);
-        Boolean bDefaultUnitSet = bParam.units() == JUnits.NoUnits; //true
+        boolean bDefaultUnitSet = bParam.units() == JUnits.NoUnits; //true
 
         //default unit for TimestampKey
         Parameter<Instant> tParam = JKeyType
@@ -320,9 +320,9 @@ public class JKeysAndParametersTest extends JUnitSuite {
 
         //validations
         Assert.assertTrue(bDefaultUnitSet);
-        Assert.assertTrue(defaultTimeUnit == JUnits.second);
-        Assert.assertTrue(paramWithUnits1.units() == JUnits.day);
-        Assert.assertTrue(paramWithUnits2.units() == JUnits.day);
-        Assert.assertTrue(paramWithUnits3.units() == JUnits.meter);
+        Assert.assertSame(defaultTimeUnit, JUnits.second);
+        Assert.assertSame(paramWithUnits1.units(), JUnits.day);
+        Assert.assertSame(paramWithUnits2.units(), JUnits.day);
+        Assert.assertSame(paramWithUnits3.units(), JUnits.meter);
     }
 }
