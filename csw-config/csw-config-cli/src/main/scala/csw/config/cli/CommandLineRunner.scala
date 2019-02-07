@@ -2,7 +2,7 @@ package csw.config.cli
 
 import java.nio.file.{Files, Path}
 
-import csw.aas.native.api.NativeAppAuthAdapter
+import csw.aas.installed.api.InstalledAppAuthAdapter
 import csw.config.api.exceptions.FileNotFound
 import csw.config.api.models._
 import csw.config.api.scaladsl.ConfigService
@@ -16,7 +16,7 @@ class CommandLineRunner(
     configService: ConfigService,
     actorRuntime: ActorRuntime,
     printLine: Any ⇒ Unit,
-    nativeAuthAdapter: NativeAppAuthAdapter
+    nativeAuthAdapter: InstalledAppAuthAdapter
 ) {
 
   import actorRuntime._

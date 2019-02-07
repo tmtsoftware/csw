@@ -16,5 +16,5 @@ don't have to download & install it manually.
     
  - [Javascript Adapter - csw-aas-js](aas/csw-aas-js.md)
     
- - [Native Auth Adapter - csw-aas-native](aas/csw-aas-native.md)
+ - [Installed Auth Adapter - csw-aas-installed](aas/csw-aas-installed.md)
 @@@

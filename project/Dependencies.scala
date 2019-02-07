@@ -392,7 +392,7 @@ object Dependencies {
     )
   )
 
-  val AuthNativeClientAdapter = Def.setting(
+  val CswInstalledAdapter = Def.setting(
     Seq(
       Libs.`config`,
       Typelevel.`cats-core`,

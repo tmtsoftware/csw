@@ -2,9 +2,9 @@ package csw.config.cli.wiring
 
 import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
-import csw.aas.native.NativeAppAuthAdapterFactory
-import csw.aas.native.api.NativeAppAuthAdapter
-import csw.aas.native.scaladsl.FileAuthStore
+import csw.aas.installed.InstalledAppAuthAdapterFactory
+import csw.aas.installed.api.InstalledAppAuthAdapter
+import csw.aas.installed.scaladsl.FileAuthStore
 import csw.config.api.TokenFactory
 import csw.config.api.scaladsl.ConfigService
 import csw.config.cli.{CliApp, CliTokenFactory, CommandLineRunner}
@@ -25,14 +25,14 @@ private[config] class Wiring {
   lazy val actorRuntime   = new ActorRuntime(actorSystem)
   import actorRuntime._
 
-  lazy val locationService: LocationService        = HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
-  lazy val authStore                               = new FileAuthStore(settings.authStorePath)
-  lazy val nativeAuthAdapter: NativeAppAuthAdapter = NativeAppAuthAdapterFactory.make(locationService, authStore)
-  lazy val tokenFactory: TokenFactory              = new CliTokenFactory(nativeAuthAdapter)
-  lazy val configService: ConfigService            = ConfigClientFactory.adminApi(actorRuntime.actorSystem, locationService, tokenFactory)
-  lazy val printLine: Any ⇒ Unit                   = println
-  lazy val commandLineRunner                       = new CommandLineRunner(configService, actorRuntime, printLine, nativeAuthAdapter)
-  lazy val cliApp                                  = new CliApp(commandLineRunner)
+  lazy val locationService: LocationService           = HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
+  lazy val authStore                                  = new FileAuthStore(settings.authStorePath)
+  lazy val nativeAuthAdapter: InstalledAppAuthAdapter = InstalledAppAuthAdapterFactory.make(locationService, authStore)
+  lazy val tokenFactory: TokenFactory                 = new CliTokenFactory(nativeAuthAdapter)
+  lazy val configService: ConfigService               = ConfigClientFactory.adminApi(actorRuntime.actorSystem, locationService, tokenFactory)
+  lazy val printLine: Any ⇒ Unit                      = println
+  lazy val commandLineRunner                          = new CommandLineRunner(configService, actorRuntime, printLine, nativeAuthAdapter)
+  lazy val cliApp                                     = new CliApp(commandLineRunner)
 }
 
 private[config] object Wiring {
@@ -58,12 +58,12 @@ private[config] object Wiring {
   def noPrinting(
       _locationService: LocationService,
       _tokenFactory: TokenFactory,
-      _nativeAuthAdapter: NativeAppAuthAdapter
+      _nativeAuthAdapter: InstalledAppAuthAdapter
   ): Wiring =
     new Wiring {
-      override lazy val nativeAuthAdapter: NativeAppAuthAdapter = _nativeAuthAdapter
-      override lazy val locationService: LocationService        = _locationService
-      override lazy val tokenFactory: TokenFactory              = _tokenFactory
-      override lazy val printLine: Any ⇒ Unit                   = _ ⇒ ()
+      override lazy val nativeAuthAdapter: InstalledAppAuthAdapter = _nativeAuthAdapter
+      override lazy val locationService: LocationService           = _locationService
+      override lazy val tokenFactory: TokenFactory                 = _tokenFactory
+      override lazy val printLine: Any ⇒ Unit                      = _ ⇒ ()
     }
 }

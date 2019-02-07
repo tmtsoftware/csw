@@ -5,7 +5,7 @@ import java.nio.file.{Files, Paths}
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
-import csw.aas.native.api.NativeAppAuthAdapter
+import csw.aas.installed.api.InstalledAppAuthAdapter
 import csw.config.api.models.ConfigData
 import csw.config.cli.wiring.Wiring
 import csw.config.client.internal.ActorRuntime
@@ -34,7 +34,7 @@ class ConfigCliAppTest(ignore: Int)
 
   private val testFileUtils = new TestFileUtils(new Settings(ConfigFactory.load()))
 
-  val nativeAuthAdapter: NativeAppAuthAdapter = mock[NativeAppAuthAdapter]
+  val nativeAuthAdapter: InstalledAppAuthAdapter = mock[InstalledAppAuthAdapter]
 
   override def afterAll(): Unit = {
     super.afterAll()

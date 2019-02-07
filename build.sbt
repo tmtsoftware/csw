@@ -189,7 +189,7 @@ lazy val `csw-config-cli` = project
   .dependsOn(
     `csw-config-client`,
     `csw-location-client`,
-    `csw-aas-native`,
+    `csw-aas-installed`,
     `csw-location-server` % "multi-jvm->multi-jvm",
     `csw-config-server`   % "test->test;multi-jvm->test",
     `csw-commons`         % "test->test"
@@ -487,7 +487,7 @@ lazy val examples = project
     `csw-params-jvm`,
     `csw-database`,
     `csw-framework`,
-    `csw-aas-native`,
+    `csw-aas-installed`,
     `csw-location-client`,
     `csw-testkit`       % "test->compile",
     `csw-config-server` % "test->test"
@@ -543,7 +543,7 @@ lazy val `csw-aas` = project
   .aggregate(
     `csw-aas-core`,
     `csw-aas-http`,
-    `csw-aas-native`
+    `csw-aas-installed`
   )
 
 lazy val `csw-aas-core` = project
@@ -563,11 +563,11 @@ lazy val `csw-aas-http` = project
     libraryDependencies ++= Dependencies.AuthAkkaHttpAdapter.value
   )
 
- lazy val `csw-aas-native` = project
-  .in(file("csw-aas/csw-aas-native"))
+ lazy val `csw-aas-installed` = project
+  .in(file("csw-aas/csw-aas-installed"))
   .dependsOn(`csw-aas-core`, `csw-location-client` % "test->compile")
   .settings(
-    libraryDependencies ++= Dependencies.AuthNativeClientAdapter.value
+    libraryDependencies ++= Dependencies.CswInstalledAdapter.value
   )
 
 lazy val `csw-aas-react4s-example` = project

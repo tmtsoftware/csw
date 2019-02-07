@@ -1,17 +1,17 @@
 package csw.config.cli
 
-import csw.aas.native.api.NativeAppAuthAdapter
+import csw.aas.installed.api.InstalledAppAuthAdapter
 import csw.config.api.TokenFactory
 
 /**
- * Provides implementation for [[TokenFactory]] and uses [[NativeAppAuthAdapter]] underneath provided by `csw-aas-native`
+ * Provides implementation for [[TokenFactory]] and uses [[InstalledAppAuthAdapter]] underneath provided by `csw-aas-installed`
  *
- * @param nativeAuthAdapter adapter which support login, storing and fetching tokens from [[csw.aas.native.api.AuthStore]]
+ * @param installedAuthAdapter adapter which support login, storing and fetching tokens from [[csw.aas.installed.api.AuthStore]]
  */
-class CliTokenFactory(nativeAuthAdapter: NativeAppAuthAdapter) extends TokenFactory {
+class CliTokenFactory(installedAuthAdapter: InstalledAppAuthAdapter) extends TokenFactory {
 
   override def getToken: String =
-    nativeAuthAdapter
+    installedAuthAdapter
       .getAccessTokenString()
       .getOrElse(throw new RuntimeException("Missing access token, You must login before executing this command."))
 
