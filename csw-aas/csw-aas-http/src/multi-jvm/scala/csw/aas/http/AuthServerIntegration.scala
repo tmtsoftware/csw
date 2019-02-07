@@ -5,9 +5,9 @@ import csw.aas.core.deployment.AuthServiceLocation
 import csw.location.helpers.LSNodeSpec
 import csw.location.server.http.MultiNodeHTTPLocationService
 import org.scalatest.BeforeAndAfterEach
-import tech.bilal.embedded_keycloak.KeycloakData.{ApplicationUser, Client, Realm}
-import tech.bilal.embedded_keycloak.utils.{BearerToken, Ports}
-import tech.bilal.embedded_keycloak.{EmbeddedKeycloak, KeycloakData, Settings}
+import org.tmt.embedded_keycloak.KeycloakData.{ApplicationUser, Client, Realm}
+import org.tmt.embedded_keycloak.utils.{BearerToken, Ports}
+import org.tmt.embedded_keycloak.{EmbeddedKeycloak, KeycloakData, Settings}
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits._
