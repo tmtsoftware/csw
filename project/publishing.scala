@@ -36,7 +36,7 @@ object GithubPublishDocs extends AutoPlugin {
   override def projectSettings: Seq[Setting[_]] = Seq(
     ghpagesBranch := "master",
     includeFilter in ghpagesCleanSite := new FileFilter {
-      override def accept(pathname: File): Boolean = pathname.getAbsolutePath.contains(s"/${version.value}")
+      override def accept(pathname: File): Boolean = pathname.getAbsolutePath.contains(s"csw/${version.value}")
     },
     GitKeys.gitRemoteRepo := "git@github.com:tmtsoftware/tmtsoftware.github.io.git"
   )
