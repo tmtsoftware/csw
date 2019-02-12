@@ -48,6 +48,7 @@ object Dependencies {
       Libs.`akka-http-play-json`,
       Libs.`play-json`.value,
       Chill.`chill-akka`,
+      Libs.`dns4s`,
       Akka.`akka-actor-testkit-typed` % Test,
       Libs.`scalatest`.value          % Test,
       Libs.`junit`                    % Test,

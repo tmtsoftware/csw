@@ -46,16 +46,16 @@ object Libs {
   val `json-schema-validator`    = "com.github.fge" % "json-schema-validator" % "2.2.6" //LGPL/ASL
   val `play-json-derived-codecs` = dep("org.julienrf" %%% "play-json-derived-codecs" % "4.0.1")
 
-  val `jna`             = "net.java.dev.jna"          % "jna"             % "5.2.0"
-  val `postgresql`      = "org.postgresql"            % "postgresql"      % "42.2.5"
-  val `hikaricp`        = "com.zaxxer"                % "HikariCP"        % "3.3.0" //Apache License 2.0
-  val `otj-pg-embedded` = "com.opentable.components"  % "otj-pg-embedded" % "0.13.0"
-  val httpclient        = "org.apache.httpcomponents" % "httpclient"      % "4.5.6"
-  val `jboss-logging`   = "org.jboss.logging"         % "jboss-logging"   % "3.3.2.Final"
-  val `config`          = "com.typesafe"              % "config"          % "1.3.3"
-  val `os-lib`          = "com.lihaoyi"               %% "os-lib"         % "0.2.6"
-
-  val `caffeine` = "com.github.ben-manes.caffeine" % "caffeine" % "2.6.2"
+  val `jna`             = "net.java.dev.jna"              % "jna"             % "5.2.0"
+  val `postgresql`      = "org.postgresql"                % "postgresql"      % "42.2.5"
+  val `hikaricp`        = "com.zaxxer"                    % "HikariCP"        % "3.3.0" //Apache License 2.0
+  val `otj-pg-embedded` = "com.opentable.components"      % "otj-pg-embedded" % "0.13.0"
+  val httpclient        = "org.apache.httpcomponents"     % "httpclient"      % "4.5.6"
+  val `jboss-logging`   = "org.jboss.logging"             % "jboss-logging"   % "3.3.2.Final"
+  val `config`          = "com.typesafe"                  % "config"          % "1.3.3"
+  val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.2.6"
+  val `dns4s`           = "com.github.mkroli"             %% "dns4s-akka"     % "0.11"
+  val `caffeine`        = "com.github.ben-manes.caffeine" % "caffeine"        % "2.6.2"
 }
 
 object Typelevel {

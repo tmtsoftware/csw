@@ -19,6 +19,7 @@ object Common extends AutoPlugin {
     concurrentRestrictions in Global += Tags.limit(Tags.All, 1),
     homepage := Some(url("https://github.com/tmtsoftware/csw")),
     resolvers += "jitpack" at "https://jitpack.io",
+    resolvers += "bintray" at "http://jcenter.bintray.com",
     scmInfo := Some(
       ScmInfo(url("https://github.com/tmtsoftware/csw"), "git@github.com:tmtsoftware/csw.git")
     ),
