@@ -49,14 +49,21 @@ object ParadoxSite extends AutoPlugin {
           .withRepository(new URI("https://github.com/tmtsoftware/csw"))
       },
       paradoxProperties in Paradox ++= Map(
-        "version"                -> version.value,
-        "scala.binaryVersion"    -> scalaBinaryVersion.value,
-        "scaladoc.base_url"      -> s"https://tmtsoftware.github.io/$docsParentDir/${version.value}/api/scala",
-        "javadoc.base_url"       -> s"https://tmtsoftware.github.io/$docsParentDir/${version.value}/api/java",
-        "extref.manual.base_url" -> s"https://tmtsoftware.github.io/$docsParentDir/${version.value}/manual/index.html",
-        "github.base_url"        -> githubBaseUrl(version.value)
+        "version"                → version.value,
+        "scala.binaryVersion"    → scalaBinaryVersion.value,
+        "scaladoc.base_url"      → s"https://tmtsoftware.github.io/$docsParentDir/${version.value}/api/scala",
+        "javadoc.base_url"       → s"https://tmtsoftware.github.io/$docsParentDir/${version.value}/api/java",
+        "extref.csw_js.base_url" → s"https://tmtsoftware.github.io/csw-js/$cswJsVersion",
+        "github.base_url"        → githubBaseUrl(version.value)
       )
     )
+
+  // export CSW_JS_VERSION env variable which is compatible with csw
+  // this represents version number of javascript docs maintained at https://github.com/tmtsoftware/csw-js
+  private def cswJsVersion: String = (sys.env ++ sys.props).get("CSW_JS_VERSION") match {
+    case Some(v) ⇒ v
+    case None    ⇒ "0.1-SNAPSHOT"
+  }
 
   private def githubBaseUrl(version: String) = {
     val baseRepoUrl = "https://github.com/tmtsoftware/csw/tree"

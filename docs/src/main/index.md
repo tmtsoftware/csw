@@ -197,4 +197,6 @@ for running multiple components on a host machine.
 
 The framework also contains the structures that are common to components, such as commands and event structures.
 
-####HTTP-based services API documentation can be found [here](swagger/index.html).
+#### HTTP-based services API documentation can be found [here](swagger/index.html).
+
+#### CSW Javascript adapters documentation can be found @extref[here](csw_js:)
