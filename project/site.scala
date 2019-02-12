@@ -35,6 +35,8 @@ object ParadoxSite extends AutoPlugin {
   import ParadoxMaterialThemePlugin.autoImport._
   import com.lightbend.paradox.sbt.ParadoxPlugin.autoImport._
 
+  val docsParentDir = "csw"
+
   override def requires: Plugins = ParadoxSitePlugin && ParadoxMaterialThemePlugin
 
   override def projectSettings: Seq[Setting[_]] =
@@ -49,9 +51,9 @@ object ParadoxSite extends AutoPlugin {
       paradoxProperties in Paradox ++= Map(
         "version"                -> version.value,
         "scala.binaryVersion"    -> scalaBinaryVersion.value,
-        "scaladoc.base_url"      -> s"https://tmtsoftware.github.io/csw/${version.value}/api/scala",
-        "javadoc.base_url"       -> s"https://tmtsoftware.github.io/csw/${version.value}/api/java",
-        "extref.manual.base_url" -> s"https://tmtsoftware.github.io/csw/${version.value}/manual/index.html",
+        "scaladoc.base_url"      -> s"https://tmtsoftware.github.io/$docsParentDir/${version.value}/api/scala",
+        "javadoc.base_url"       -> s"https://tmtsoftware.github.io/$docsParentDir/${version.value}/api/java",
+        "extref.manual.base_url" -> s"https://tmtsoftware.github.io/$docsParentDir/${version.value}/manual/index.html",
         "github.base_url"        -> githubBaseUrl(version.value)
       )
     )

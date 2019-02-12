@@ -1,3 +1,4 @@
+import ParadoxSite.docsParentDir
 import com.typesafe.sbt.site.SitePlugin.autoImport._
 import sbt.Keys._
 import sbt._
@@ -11,8 +12,8 @@ object Settings {
       val cswVersion   = version.value
       val siteMappings = (mappings in makeSite).value ++ (mappings in makeSite in p).value
 
-      val siteMappingsWithoutVersion = siteMappings.map { case (file, output) => (file, "/csw/" + output) }
-      val siteMappingsWithVersion    = siteMappings.map { case (file, output) => (file, "/csw/" + cswVersion + output) }
+      val siteMappingsWithoutVersion = siteMappings.map { case (file, output) => (file, s"/$docsParentDir/" + output) }
+      val siteMappingsWithVersion    = siteMappings.map { case (file, output) => (file, s"/$docsParentDir/" + cswVersion + output) }
 
       // keep documentation for SNAPSHOT versions in SNAPSHOT directory. (Don't copy SNAPSHOT docs to top level)
       // If not SNAPSHOT version, then copy latest version of documentation to top level as well as inside corresponding version directory
