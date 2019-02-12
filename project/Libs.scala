@@ -122,8 +122,3 @@ object Jooq {
   val `jooq-meta`    = "org.jooq" % "jooq-meta" % Version
   val `jooq-codegen` = "org.jooq" % "jooq-codegen" % Version
 }
-
-object React4s {
-  val `react4s`  = dep("com.github.ahnfelt" %%% "react4s"  % "0.9.24-SNAPSHOT")
-  val `router4s` = dep("com.github.werk"    %%% "router4s" % "0.1.0-SNAPSHOT")
-}

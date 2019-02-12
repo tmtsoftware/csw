@@ -53,7 +53,7 @@ object ParadoxSite extends AutoPlugin {
         "scala.binaryVersion"    → scalaBinaryVersion.value,
         "scaladoc.base_url"      → s"https://tmtsoftware.github.io/$docsParentDir/${version.value}/api/scala",
         "javadoc.base_url"       → s"https://tmtsoftware.github.io/$docsParentDir/${version.value}/api/java",
-        "extref.csw_js.base_url" → s"https://tmtsoftware.github.io/csw-js/$cswJsVersion",
+        "extref.csw_js.base_url" → s"https://tmtsoftware.github.io/csw-js/$cswJsVersion/%s",
         "github.base_url"        → githubBaseUrl(version.value)
       )
     )

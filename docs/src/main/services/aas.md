@@ -14,7 +14,7 @@ don't have to download & install it manually.
 
  - [Akka HTTP Adapter - csw-aas-http](aas/csw-aas-http.md)
     
- - [Javascript Adapter - csw-aas-js](aas/csw-aas-js.md)
-    
  - [Installed Auth Adapter - csw-aas-installed](aas/csw-aas-installed.md)
 @@@
+
+* @extref[Javascript Adapter - csw-aas-js](csw_js:aas/csw-aas-js)
