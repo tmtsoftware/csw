@@ -1,6 +1,6 @@
 # Core concepts and terms
 
-These are some commons terms used in AAS. More information is available on 
+These are some common terms used in AAS. More information is available on 
 keycloak [documentation](https://www.keycloak.org/docs/latest/server_admin/index.html#core-concepts-and-terms)
 
 ### Users

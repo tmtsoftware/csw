@@ -1,6 +1,6 @@
 # Installed Auth Adapter (csw-aas-installed)
 
-csw-aas-installed is the adapter you will use if you want to build an that executes on user's 
+`csw-aas-installed` is the adapter you will use if you want to build an application that executes on user's 
 machine & talks to auth-protected web service application. Examples of such applications 
 could be a CLI app that is installed on end users machine.
 
@@ -25,7 +25,7 @@ http server, we need
 * protected http server running
 
 All of these can be running on different machines. To start location service & keycloak 
-server on a local machine, you make make use of csw-services.sh script.
+server on a local machine, you can make use of `csw-services.sh` script.
 
 ## Application Configurations
 

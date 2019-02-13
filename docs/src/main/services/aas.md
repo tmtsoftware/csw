@@ -1,6 +1,6 @@
 # Authentication and Authorization Service (AAS)
 
-Authentication and Authorization Service (AAS) is a suite of libraries (aka adapters) provided CSW to help build 
+Authentication and Authorization Service (AAS) is a suite of libraries (aka adapters) provided by CSW to help build 
 ecosystem of client & server side applications that enforce authentication & authorization policies.
 
 The backbone of AAS is [keycloak](https://www.keycloak.org/). It is where all the client and server

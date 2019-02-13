@@ -149,7 +149,7 @@ object Documentation extends HttpApp {
     // #custom-policy-usage
 
     // #permission-policy
-    val routeWithPermissions = sDelete(PermissionPolicy("delete", "account")) {
+    val routeWithPermissions: Route = sDelete(PermissionPolicy("delete", "account")) {
       complete("OK")
     }
     // #permission-policy
@@ -184,7 +184,7 @@ object Documentation extends HttpApp {
 object SampleHttpApp extends HttpApp with App {
 
   implicit val actorSystem: ActorSystem = ActorSystem()
-  implicit val ec: ExecutionContext     = ExecutionContext.global
+  implicit val ec: ExecutionContext     = actorSystem.dispatcher
   implicit val mat: ActorMaterializer   = ActorMaterializer()
 
   val locationService = HttpLocationServiceFactory.makeLocalClient

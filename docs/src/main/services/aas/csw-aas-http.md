@@ -1,13 +1,13 @@
 # Akka HTTP Adapter (csw-aas-http)
 
-This library is a security adapter for akka-http server applications. csw-aas uses 
+This library is a security adapter for akka-http server applications. `csw-aas` uses 
 [OpenId Connect](https://openid.net/connect/) for authentication and authorization.
 The authentication server used by aas is [keycloak](https://www.keycloak.org/).
 we recommend that you get familiar with keycloak's documentation and configurations to
 fully leverage this adapters features.
 
 
-This adapter provides authentication via security directives such as sGet, sPost, sPut, etc.
+This adapter provides authentication via security directives such as `sGet`, `sPost`, `sPut`, etc.
 For authorization, these secure directives accept a wide range of policy expressions.
 
 ## Dependencies
@@ -21,8 +21,6 @@ sbt
     ```
     @@@
     
-    
-    
 ## Prerequisites
 
 To run an akka-http server app, which uses this adapter, we need
@@ -35,14 +33,14 @@ server on a local machine, you make make use of csw-services.sh script.
 
 ## Application Configurations
 
-All auth related configurations go inside `auth-config` block. There are tree configurations 
+All auth related configurations go inside `auth-config` block. There are three configurations 
 applicable for a akka-http server application i.e. `realm`, `client-id` & `enable-permissions`. 
 
 `realm` has a default value of `TMT` if not specified. Ideally all apps in TMT should not have to override
 this, however it might be useful to override this while testing your app.
 
-`enable-permissions` is optional config with a default value of false. If your akka-http server application
-uses permission based authorization policies, this config needs to set to true.
+`enable-permissions` is optional config with a default value of `false`. If your akka-http server application
+uses permission based authorization policies, this config needs to be set to true.
 
 `client-id` is a mandatory configuration which specifies the client id of the app as per registration
 in keycloak.
@@ -54,7 +52,6 @@ auth-config {
   client-id = demo-cli # REQUIRED
 } 
 ```
- 
 
 ## Building a Secure Akka-HTTP server application
 
@@ -67,11 +64,12 @@ Scala
 Importing everything from security directives is recommended as it imports some implicit 
 methods along with all security directives.
 
-In the above example, `GET http://localhost:9003/api` does not use any security directive and hence 
-is accessible to all. `POST http://localhost:9003/api` uses `sPost` which is secure directive. This directive
-takes care of authentication (access token signature & expiration validation).
-For authorization it needs an [authorization policy](#authorization-policies). Authorizing policy specifies 
-one or more conditions for request validation. 
+In the above example, 
+
+* `GET http://localhost:9003/api` does not use any security directive and hence is accessible to all. 
+
+* `POST http://localhost:9003/api` uses `sPost` which is secure directive. This directive takes care of authentication (access token signature & expiration validation).
+For authorization it needs an [authorization policy](#authorization-policies). Authorizing policy specifies one or more conditions for request validation. 
 
 In this instance, `sPost` directive has been given `RealmRolePolicy` policy with parameter value `admin`.
 
@@ -83,7 +81,7 @@ This results into following sequence of actions when a request arrives for a sec
 1. After all the above checks/validations pass, execute the route logic 
 
 If any of the validations fails, an appropriate http status code is returned to the requester.
-For authentication failure 401 is sent and for authorization failure 403 is sent.
+For authentication failure `401` is sent and for authorization failure `403` is sent.
 
 @@@ note
 To know more about realm roles, check out [keycloak documentation](https://www.keycloak.org/docs/latest/server_admin/index.html#realm-roles)
@@ -168,7 +166,7 @@ Scala
 
 ## Security Directives
 
-csw-aas-http adapter supports following secure HTTP verbs:
+`csw-aas-http` adapter supports following secure HTTP verbs:
 
 | Name | Description |
 |--- |--- |
