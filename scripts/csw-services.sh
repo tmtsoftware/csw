@@ -387,7 +387,8 @@ function parse_cmd_args {
                 exit 1
             else
                 # Get the ip address of local machine and store it in variable: my_ip
-                IP=$(getIP)
+#                IP=$(getIP)
+                IP="10.131.125.106"
 
                 if [[ ${IP} == "" ]]; then
                     echo "[ERROR] Interface: [$interfaceName] not found, please provide valid interface name."
