@@ -65,7 +65,7 @@ lazy val `csw` = project
   .settings(Settings.mergeSiteWith(docs))
   .settings(Settings.docExclusions(unidocExclusions))
   .settings(GithubRelease.githubReleases(githubReleases))
-  .settings(GithubRelease.coursierArtifacts(githubReleases))
+  .settings(CoursierArtifactGenerator.generateArtifacts(githubReleases))
 
 /* ================= Admin Project ============== */
 lazy val `csw-admin-server` = project
