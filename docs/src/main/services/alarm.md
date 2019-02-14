@@ -266,6 +266,8 @@ which will receive a message of aggregated severity on every change.
 Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/example/alarm/AlarmServiceClientExampleApp.scala) { #subscribeAggregatedHealthActorRef}
 
+## Technical Description
+See @ref:[Alarm Service Technical Description](../technical/alarm/alarm.md).
 
 ## Source code for examples
 

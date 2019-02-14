@@ -257,6 +257,8 @@ Scala
 Java
 :   @@snip [JEventServiceCreationExamples.java](../../../../examples/src/main/java/example/event/JEventServiceCreationExamples.java) { #redis-event-service }
 
+## Technical Description
+See @ref:[Event Service Technical Description](../technical/event/event.md).
 
 ## Source code for examples of creation
 

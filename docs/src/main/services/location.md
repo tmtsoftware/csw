@@ -315,6 +315,8 @@ Scala
 Java
 :   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/example/location/JLocationServiceExampleClient.java) { #unregister }
 
+## Technical Description
+See @ref:[Location Service Technical Description](../technical/location/location.md).
 
 ## Source code for examples
 

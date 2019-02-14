@@ -14,6 +14,7 @@
  - [Testing](commons/testing.md)
  - [sbt tasks](commons/sbt-tasks.md)
  - [Manuals](commons/manuals.md)
+ - [Technical Documentation](technical/technical.md)
 @@@
 
 Common Software is the package of services and infrastructure software that integrates the TMT software systems.

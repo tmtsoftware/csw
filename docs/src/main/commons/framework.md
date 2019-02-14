@@ -24,6 +24,9 @@ sbt
 * [Deployment](../framework/deploying-components.md)
 @@@
 
+## Technical Description
+See @ref:[CSW Framework Technical Description](../technical/framework/framework.md).
+
 ## Source code for examples
 
 * @github[Assembly Scala Example](/examples/src/main/scala/example/framework/components/assembly/AssemblyComponentHandlers.scala)

@@ -18,3 +18,6 @@ don't have to download & install it manually.
 @@@
 
 * @extref[Javascript Adapter - csw-aas-js](csw_js:aas/csw-aas-js)
+
+## Technical Description
+See @ref:[Authorization and Authentication Service Technical Description](../technical/aas/aas.md).

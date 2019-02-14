@@ -221,6 +221,9 @@ Jooq's `DataAccessException` underneath as cause.
 
 These examples are just a start. Any SQL statement can be created and executed using the DSLContext.
 
+## Technical Description
+See @ref:[Database Service Technical Description](../technical/database/database.md).
+
 ## Source code for examples
 
 * @github[Scala Example](/examples/src/main/scala/example/database/AssemblyComponentHandlers.scala)

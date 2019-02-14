@@ -241,6 +241,9 @@ Refer @ref:[csw-aas](../services/aas.md) docs to know more about how you can aut
 
 @@@
 
+## Technical Description
+See @ref:[Configuration Service Technical Description](../technical/configuration/configuration.md).
+
 ## Source code for examples
 
 * @github[Scala Example](/examples/src/test/scala/example/config/ConfigClientExampleTest.scala)

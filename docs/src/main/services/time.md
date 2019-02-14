@@ -176,6 +176,9 @@ Java
 
 As with the schedule once API, there is also a periodic schedule API that takes a message and ActorRef.
 
+## Technical Description
+See @ref:[Time Service Technical Description](../technical/time/time.md).
+
 ## Source code for TMTTime examples
 
 * @github[Scala Example](../../../../examples/src/main/scala/example/time/TMTTimeExamples.scala)
