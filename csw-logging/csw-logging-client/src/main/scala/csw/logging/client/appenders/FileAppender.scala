@@ -114,6 +114,8 @@ private[logging] class FilesAppender(path: String, category: String) {
  */
 object FileAppender extends LogAppenderBuilder {
 
+  private[logging] val BaseLogPath = "/tmp/tmt/logs"
+
   /**
    * Constructor for a file appender.
    *
@@ -153,7 +155,7 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: JsObject) extends LogAp
   private[this] val config =
     system.settings.config.getConfig("csw-logging.appender-config.file")
   private[this] val fullHeaders   = config.getBoolean("fullHeaders")
-  private[this] val logPath       = config.getString("logPath")
+  private[this] val logPath       = s"${FileAppender.BaseLogPath}/${config.getString("logPath")}"
   private[this] val logLevelLimit = Level(config.getString("logLevelLimit"))
   private[this] val rotateFlag    = config.getBoolean("rotate")
   private[this] val fileAppenders =

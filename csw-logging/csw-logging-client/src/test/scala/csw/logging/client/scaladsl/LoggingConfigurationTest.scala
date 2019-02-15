@@ -25,15 +25,16 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-123: Allow local component logs to be output to a file
 // DEOPSCSW-126: Configurability of logging characteristics for component / log instance
 // DEOPSCSW-142: Flexibility of logging approaches
+// DEOPSCSW-649: Fixed directory configuration for multi JVM scenario
 class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
 
-  val log: Logger = GenericLoggerFactory.getLogger
-
-  private val logFileDir                     = Paths.get("/tmp/csw-test-logs").toFile
+  val log: Logger                            = GenericLoggerFactory.getLogger
+  private val baseDir                        = Paths.get(FileAppender.BaseLogPath).toFile
+  private val logFileDir                     = Paths.get("/csw-test-logs").toFile
   private val sampleLogMessage               = "Sample log message"
   private val fileTimestamp                  = FileAppender.decideTimestampForFile(ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC)))
   private val loggingSystemName              = "Test"
-  private val testLogFilePathWithServiceName = logFileDir + "/" + loggingSystemName + s"/common.$fileTimestamp.log"
+  private val testLogFilePathWithServiceName = baseDir + "/" + logFileDir + "/" + loggingSystemName + s"/common.$fileTimestamp.log"
 
   private val hostname  = "localhost"
   private val version   = "SNAPSHOT-1.0"
@@ -44,13 +45,13 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
   private val stdOutLogBuffer = mutable.Buffer.empty[JsObject]
 
   override protected def beforeAll(): Unit = {
-    FileUtils.deleteRecursively(logFileDir)
+    FileUtils.deleteRecursively(baseDir)
   }
 
   override protected def afterEach(): Unit = {
     stdOutLogBuffer.clear()
     outStream.reset()
-    FileUtils.deleteRecursively(logFileDir)
+    FileUtils.deleteRecursively(baseDir)
   }
 
   override protected def afterAll(): Unit = outStream.close()
