@@ -12,7 +12,7 @@ import csw.params.core.models.MatrixData;
 import csw.params.core.models.Prefix;
 import csw.params.core.models.RaDec;
 import csw.event.client.pb.PbConverter;
-import csw.time.api.models.UTCTime;
+import csw.time.core.models.UTCTime;
 import csw_protobuf.events.PbEvent;
 import org.junit.Assert;
 import org.junit.Test;

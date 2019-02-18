@@ -13,7 +13,7 @@ import csw.params.commands._
 import csw.params.core.models.Prefix
 import csw.params.core.states.{CurrentState, StateName}
 import csw.params.events.{Event, EventName, SystemEvent}
-import csw.time.api.models.UTCTime
+import csw.time.core.models.UTCTime
 
 import scala.concurrent.{ExecutionContext, Future}
 

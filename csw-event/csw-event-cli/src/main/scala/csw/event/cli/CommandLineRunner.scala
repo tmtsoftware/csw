@@ -15,7 +15,7 @@ import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.Parameter
 import csw.params.core.models.Id
 import csw.params.events._
-import csw.time.api.models.UTCTime
+import csw.time.core.models.UTCTime
 import play.api.libs.json.{JsObject, JsValue, Json}
 
 import scala.async.Async.{async, await}

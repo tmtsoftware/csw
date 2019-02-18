@@ -7,7 +7,7 @@ import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.ObsId.empty
 import csw.params.core.models._
 import csw.event.client.pb.TypeMapperFactory.make
-import csw.time.api.models.UTCTime
+import csw.time.core.models.UTCTime
 import csw_protobuf.events.PbEvent
 import csw_protobuf.events.PbEvent.PbEventType
 import csw_protobuf.keytype.PbKeyType

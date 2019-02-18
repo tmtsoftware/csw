@@ -8,10 +8,10 @@ import akka.actor.typed.javadsl.Adapter;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
 import akka.actor.typed.scaladsl.ActorContext;
-import csw.time.api.models.UTCTime;
-import csw.time.client.api.Cancellable;
-import csw.time.client.api.TimeServiceScheduler;
-import csw.time.client.TimeServiceSchedulerFactory;
+import csw.time.core.models.UTCTime;
+import csw.time.scheduler.api.Cancellable;
+import csw.time.scheduler.api.TimeServiceScheduler;
+import csw.time.scheduler.TimeServiceSchedulerFactory;
 
 import java.time.Duration;
 

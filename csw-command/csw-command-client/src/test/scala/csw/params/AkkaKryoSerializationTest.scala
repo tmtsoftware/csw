@@ -32,7 +32,7 @@ import csw.params.core.models.Units.{arcmin, coulomb, encoder, joule, lightyear,
 import csw.params.core.models._
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.params.events.{EventName, ObserveEvent, SystemEvent}
-import csw.time.api.models.UTCTime
+import csw.time.core.models.UTCTime
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.prop.Tables.Table
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}

@@ -4,8 +4,8 @@ import java.time.Duration
 import java.util.concurrent.{CountDownLatch, TimeUnit}
 
 import akka.actor.ActorSystem
-import csw.time.client.TimeServiceSchedulerFactory
-import csw.time.client.api.TimeServiceScheduler
+import csw.time.scheduler.TimeServiceSchedulerFactory
+import csw.time.scheduler.api.TimeServiceScheduler
 import org.openjdk.jmh.annotations.{OperationsPerInvocation, _}
 
 import scala.concurrent.Await

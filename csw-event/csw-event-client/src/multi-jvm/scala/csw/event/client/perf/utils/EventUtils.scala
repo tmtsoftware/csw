@@ -6,7 +6,7 @@ import csw.params.events.{EventKey, EventName, SystemEvent}
 import csw.params.core.generics.Key
 import csw.params.core.generics.KeyType.{ByteKey, DoubleKey, LongKey}
 import csw.params.core.models.{Id, Prefix}
-import csw.time.api.models.UTCTime
+import csw.time.core.models.UTCTime
 
 object EventUtils {
   private val prefix = Prefix("dummy")

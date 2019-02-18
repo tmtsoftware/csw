@@ -9,7 +9,7 @@ import csw.params.core.generics.KeyType.{LongMatrixKey, StructKey}
 import csw.params.core.models.Units.{encoder, meter, second, NoUnits}
 import csw.params.core.models._
 import csw.params.core.states.{CurrentState, DemandState, StateName}
-import csw.time.api.models.UTCTime
+import csw.time.core.models.UTCTime
 import org.scalatest.{FunSpec, Matchers}
 import play.api.libs.json.Json
 

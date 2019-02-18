@@ -29,7 +29,7 @@ The Time Service comes bundled with the Framework, no additional dependency need
 sbt
 :   @@@vars
     ```scala
-    libraryDependencies += "com.github.tmtsoftware.csw" %% "csw-time-client" % "$version$"
+    libraryDependencies += "com.github.tmtsoftware.csw" %% "csw-time-scheduler" % "$version$"
     ```
     @@@
 
@@ -110,11 +110,11 @@ Java
 
 This API provides various methods to schedule periodic or non-periodic, one-shot tasks in the future. 
 
-For component developers, the scheduler API is provided as a @scaladoc[TimeServiceScheduler](csw/time/api/TimeServiceScheduler) 
+For component developers, the scheduler API is provided as a @scaladoc[TimeServiceScheduler](csw/time/scheduler/api/TimeServiceScheduler) 
 object in the `CswContext` object injected into the ComponentHandlers class provided by the framework.  
 
-If you are not using csw-framework, you can create @scaladoc[TimeServiceScheduler](csw/time/api/TimeServiceScheduler)
-using @scaladoc[TimeServiceSchedulerFactory](csw/time/client/TimeServiceSchedulerFactory) as follows.
+If you are not using csw-framework, you can create @scaladoc[TimeServiceScheduler](csw/time/scheduler/api/TimeServiceScheduler)
+using @scaladoc[TimeServiceSchedulerFactory](csw/time/scheduler/TimeServiceSchedulerFactory) as follows.
 
 Scala
 :   @@snip [TimeSchedulerExamples.scala](../../../../examples/src/main/scala/example/time/SchedulerExamples.scala) { #create-scheduler }
@@ -122,7 +122,7 @@ Scala
 Java
 :   @@snip [JTimeSchedulerExamples.java](../../../../examples/src/main/java/example/time/JSchedulerExamples.java) { #create-scheduler }
 
-For all scheduler calls, an instance of @scaladoc[Cancellable](csw/time/client/api/Cancellable) is returned which can be used 
+For all scheduler calls, an instance of @scaladoc[Cancellable](csw/time/scheduler/api/Cancellable) is returned which can be used 
 to cancel the execution of the future tasks.
 
 #### Schedule Once

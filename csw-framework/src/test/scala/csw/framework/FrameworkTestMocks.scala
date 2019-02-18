@@ -24,7 +24,7 @@ import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.core.models.Prefix
 import csw.params.core.states.CurrentState
-import csw.time.client.api.TimeServiceScheduler
+import csw.time.scheduler.api.TimeServiceScheduler
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import scala.concurrent.Future

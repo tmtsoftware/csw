@@ -6,9 +6,9 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter.{TypedActorRefOps, TypedActorSystemOps}
 import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
-import csw.time.api.models.UTCTime
-import csw.time.client.TimeServiceSchedulerFactory
-import csw.time.client.api.TimeServiceScheduler
+import csw.time.scheduler.TimeServiceSchedulerFactory
+import csw.time.scheduler.api.TimeServiceScheduler
+import csw.time.core.models.UTCTime
 
 class SchedulerExamples(ctx: ActorContext[UTCTime]) {
 

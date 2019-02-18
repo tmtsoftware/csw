@@ -7,7 +7,7 @@ import csw.config.api.javadsl.IConfigClientService
 import csw.event.api.javadsl.IEventService
 import csw.location.api.javadsl.ILocationService
 import csw.logging.client.javadsl.JLoggerFactory
-import csw.time.client.api.TimeServiceScheduler
+import csw.time.scheduler.api.TimeServiceScheduler
 
 /**
  * Bundles all the services provided by csw, supporting java api

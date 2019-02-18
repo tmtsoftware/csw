@@ -9,7 +9,7 @@ import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.Units.arcmin
 import csw.params.core.models._
 import csw.event.client.pb.PbConverter
-import csw.time.api.models.UTCTime
+import csw.time.core.models.UTCTime
 import csw_protobuf.events.PbEvent
 import org.scalatest.{FunSpec, Matchers}
 

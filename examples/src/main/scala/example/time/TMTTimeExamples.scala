@@ -2,8 +2,8 @@ package example.time
 
 import java.time.{ZoneId, ZonedDateTime}
 
-import csw.time.api.models.{TAITime, UTCTime}
-import csw.time.client.TMTTimeHelper
+import csw.time.scheduler.TMTTimeHelper
+import csw.time.core.models.{TAITime, UTCTime}
 
 object TMTTimeExamples {
   //#current-time

@@ -2,7 +2,7 @@ package csw.alarm.api.models
 import csw.alarm.api.models.AcknowledgementStatus.Acknowledged
 import csw.alarm.api.models.FullAlarmSeverity.Disconnected
 import csw.alarm.api.models.ShelveStatus.Unshelved
-import csw.time.api.models.UTCTime
+import csw.time.core.models.UTCTime
 
 /**
  * Represents occasionally changing properties of the alarm e.g current acknowledgement status, latched severity, etc.

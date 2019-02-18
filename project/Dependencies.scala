@@ -354,7 +354,7 @@ object Dependencies {
     )
   )
 
-  val TimeApi = Def.setting(
+  val TimeCore = Def.setting(
     Seq(
       Libs.`play-json`.value,
       Libs.`play-json-derived-codecs`.value,
@@ -363,7 +363,7 @@ object Dependencies {
     )
   )
 
-  val TimeClient = Def.setting(
+  val TimeScheduler = Def.setting(
     Seq(
       Akka.`akka-actor`,
       Libs.`junit-interface`          % Test,

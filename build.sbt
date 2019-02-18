@@ -34,7 +34,7 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-config-cli`,
   `csw-event-cli`,
   `csw-alarm-cli`,
-  `csw-time-api-js`,
+  `csw-time-core-js`,
   `csw-time-clock-jvm`,
   `csw-time-clock-js`,
   `csw-logging-macros`,
@@ -234,7 +234,7 @@ lazy val `csw-logging-client` = project
 /* ================= Params ================ */
 lazy val `csw-params` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
-  .dependsOn(`csw-time-api`)
+  .dependsOn(`csw-time-core`)
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(
     libraryDependencies ++= Dependencies.Params.value,
@@ -262,7 +262,7 @@ lazy val `csw-framework` = project
     `csw-command-client`,
     `csw-event-client`,
     `csw-alarm-client`,
-    `csw-time-client`,
+    `csw-time-scheduler`,
     `csw-location-client`,
     `csw-event-client`    % "test->test",
     `csw-location-server` % "test->test;multi-jvm->multi-jvm",
@@ -361,7 +361,7 @@ lazy val `csw-alarm` = project
 
 lazy val `csw-alarm-api` = project
   .in(file("csw-alarm/csw-alarm-api"))
-  .dependsOn(`csw-params-jvm`, `csw-time-api-jvm`)
+  .dependsOn(`csw-params-jvm`, `csw-time-core-jvm`)
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(libraryDependencies ++= Dependencies.AlarmApi.value)
 
@@ -398,9 +398,9 @@ lazy val `csw-time` = project
   .aggregate(
     `csw-time-clock-jvm`,
     `csw-time-clock-js`,
-    `csw-time-api-jvm`,
-    `csw-time-api-js`,
-    `csw-time-client`
+    `csw-time-core-jvm`,
+    `csw-time-core-js`,
+    `csw-time-scheduler`
   )
 
 lazy val `csw-time-clock` = crossProject(JSPlatform, JVMPlatform)
@@ -414,26 +414,26 @@ lazy val `csw-time-clock` = crossProject(JSPlatform, JVMPlatform)
 lazy val `csw-time-clock-js` = `csw-time-clock`.js
 lazy val `csw-time-clock-jvm` = `csw-time-clock`.jvm
 
-lazy val `csw-time-api` =  crossProject(JSPlatform, JVMPlatform)
+lazy val `csw-time-core` =  crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
-  .in(file("csw-time/csw-time-api"))
+  .in(file("csw-time/csw-time-core"))
   .dependsOn(`csw-time-clock`)
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(
-    libraryDependencies ++= Dependencies.TimeApi.value,
+    libraryDependencies ++= Dependencies.TimeCore.value,
     fork := false
   )
 
-lazy val `csw-time-api-js` = `csw-time-api`.js
-lazy val `csw-time-api-jvm` = `csw-time-api`.jvm
+lazy val `csw-time-core-js` = `csw-time-core`.js
+lazy val `csw-time-core-jvm` = `csw-time-core`.jvm
 
-lazy val `csw-time-client` = project
-  .in(file("csw-time/csw-time-client"))
+lazy val `csw-time-scheduler` = project
+  .in(file("csw-time/csw-time-scheduler"))
   .dependsOn(
-    `csw-time-api-jvm` % "compile->compile;test->test",
+    `csw-time-core-jvm` % "compile->compile;test->test",
     `csw-logging-client`
   )
-  .settings(libraryDependencies ++= Dependencies.TimeClient.value)
+  .settings(libraryDependencies ++= Dependencies.TimeScheduler.value)
 
 lazy val `csw-testkit` = project
   .dependsOn(
@@ -505,7 +505,7 @@ lazy val `csw-benchmark` = project
     `csw-logging-client`,
     `csw-params-jvm`,
     `csw-command-client`,
-    `csw-time-client`,
+    `csw-time-scheduler`,
     `csw-location-server` % "compile->test",
     `csw-framework`       % "compile->compile;test->test"
   )

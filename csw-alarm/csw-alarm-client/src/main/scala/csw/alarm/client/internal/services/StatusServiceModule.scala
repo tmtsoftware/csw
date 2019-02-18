@@ -17,7 +17,7 @@ import csw.alarm.client.internal.commons.Settings
 import csw.alarm.client.internal.extensions.TimeExtensions.RichClock
 import csw.alarm.client.internal.models.Alarm
 import csw.alarm.client.internal.redis.RedisConnectionsFactory
-import csw.time.api.models.UTCTime
+import csw.time.core.models.UTCTime
 
 import scala.async.Async.{async, await}
 import scala.compat.java8.DurationConverters.DurationOps
