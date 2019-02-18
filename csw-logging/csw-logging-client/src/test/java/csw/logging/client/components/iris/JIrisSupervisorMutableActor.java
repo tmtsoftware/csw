@@ -26,7 +26,7 @@ public class JIrisSupervisorMutableActor extends AbstractBehavior<LogCommand> {
     @Override
     public Receive<LogCommand> createReceive() {
 
-        ReceiveBuilder<LogCommand> builder = receiveBuilder()
+        ReceiveBuilder<LogCommand> builder = newReceiveBuilder()
                 .onMessage(LogCommand.class,
                         command -> command == LogCommand.LogTrace$.MODULE$,
                         command -> {

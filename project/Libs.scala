@@ -15,9 +15,9 @@ object Libs {
   val `acyclic`            = "com.lihaoyi" %% "acyclic" % AcyclicVersion % Provided //MIT License
   val `junit`              = "junit" % "junit" % "4.12" //Eclipse Public License 1.0
   val `junit-interface`    = "com.novocode" % "junit-interface" % "0.11" //BSD 2-clause "Simplified" License
-  val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.0.9"
+  val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.1.4"
   //MIT License
-  val `embedded-keycloak`            = "com.github.tmtsoftware" % "embedded-keycloak"             % "v0.0.10-beta" //Apache 2.0
+  val `embedded-keycloak`            = "com.github.tmtsoftware" % "embedded-keycloak"             % "v0.0.10" //Apache 2.0
   val `logback-classic`              = "ch.qos.logback"         % "logback-classic"               % "1.2.3"        //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `akka-management-cluster-http` = "com.lightbend.akka"     %% "akka-management-cluster-http" % "0.6"          //N/A at the moment
   val `svnkit`                       = "org.tmatesoft.svnkit"   % "svnkit"                        % "1.9.3"        //TMate Open Source License
@@ -43,22 +43,22 @@ object Libs {
 
   val `scala-csv`                = "com.github.tototoshi" %% "scala-csv" % "1.3.5"
   val `scalajs-java-time`        = dep("org.scala-js" %%% "scalajs-java-time" % "0.2.5")
-  val `json-schema-validator`    = "com.github.fge" % "json-schema-validator" % "2.2.6" //LGPL/ASL
+  val `json-schema-validator`    = "com.github.fge" % "json-schema-validator" % "2.2.8" //LGPL/ASL
   val `play-json-derived-codecs` = dep("org.julienrf" %%% "play-json-derived-codecs" % "4.0.1")
 
   val `jna`             = "net.java.dev.jna"              % "jna"             % "5.2.0"
   val `postgresql`      = "org.postgresql"                % "postgresql"      % "42.2.5"
-  val `hikaricp`        = "com.zaxxer"                    % "HikariCP"        % "3.3.0" //Apache License 2.0
-  val `otj-pg-embedded` = "com.opentable.components"      % "otj-pg-embedded" % "0.13.0"
-  val httpclient        = "org.apache.httpcomponents"     % "httpclient"      % "4.5.6"
+  val `hikaricp`        = "com.zaxxer"                    % "HikariCP"        % "3.3.1" //Apache License 2.0
+  val `otj-pg-embedded` = "com.opentable.components"      % "otj-pg-embedded" % "0.13.1"
+  val httpclient        = "org.apache.httpcomponents"     % "httpclient"      % "4.5.7"
   val `jboss-logging`   = "org.jboss.logging"             % "jboss-logging"   % "3.3.2.Final"
   val `config`          = "com.typesafe"                  % "config"          % "1.3.3"
-  val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.2.6"
+  val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.2.7"
   val `caffeine`        = "com.github.ben-manes.caffeine" % "caffeine"        % "2.6.2"
 }
 
 object Typelevel {
-  val Version     = "1.5.0"
+  val Version     = "1.6.0"
   val `cats-core` = "org.typelevel" %% "cats-core" % Version
 }
 
@@ -72,8 +72,6 @@ object Jackson {
 object Enumeratum {
   val `enumeratum`           = dep("com.beachape" %%% "enumeratum"           % "1.5.13") //MIT License
   val `enumeratum-play-json` = dep("com.beachape" %%% "enumeratum-play-json" % "1.5.14") //MIT License
-
-  val `enumeratum-play` = "com.beachape" %% "enumeratum-play" % "1.5.14" //MIT License
 }
 
 object Chill {
@@ -83,7 +81,7 @@ object Chill {
 }
 
 object Akka {
-  val Version                    = "2.5.20" //all akka is Apache License 2.0
+  val Version                    = "2.5.21" //all akka is Apache License 2.0
   val `akka-stream`              = "com.typesafe.akka" %% "akka-stream" % Version
   val `akka-stream-typed`        = "com.typesafe.akka" %% "akka-stream-typed" % Version
   val `akka-remote`              = "com.typesafe.akka" %% "akka-remote" % Version
