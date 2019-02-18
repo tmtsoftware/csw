@@ -343,7 +343,7 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
     }
     loggingSystem.getAppenders shouldBe List(StdOutAppender)
 
-    val expectedOneLineLog = " INFO   (LoggingConfigurationTest.scala 93) - Sample log message"
+    val expectedOneLineLog = " INFO   (LoggingConfigurationTest.scala 94) - Sample log message"
 
     val (timestamp, message) = os.toString.trim.splitAt(24)
 
