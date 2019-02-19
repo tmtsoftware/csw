@@ -114,7 +114,7 @@ private[logging] class FilesAppender(path: String, category: String) {
  */
 object FileAppender extends LogAppenderBuilder {
 
-  private[logging] val BaseLogPath = sys.env.getOrElse("HOME", "/tmp") + "/tmt/logs"
+  private[logging] val BaseLogPath = sys.env.getOrElse("TMT_LOG_HOME", "/tmp") + "/tmt/logs"
 
   /**
    * Constructor for a file appender.
