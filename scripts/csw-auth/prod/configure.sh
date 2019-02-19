@@ -112,6 +112,13 @@ function usage {
     exit 1
 }
 
+function setJvmOpts {
+    JAVA_VER=$(java -version 2>&1 | awk -F '"' '/version/ {print $2}')
+    if [[ ${JAVA_VER} == *"11.0"* ]]; then export JAVA_OPTS="--add-modules=java.se"; fi
+    echo "JAVA_OPTS set as \"${JAVA_OPTS}\" for Java version ${JAVA_VER}"
+}
+
+
 
 function addAdminUser {
     cd ${keycloakDir}/${keycloakBinaryUnzipped}/bin
@@ -176,6 +183,7 @@ function startAndRegister {
 function start {
     parse_cmd_args "$@"
     checkIfKeycloakIsInstalled
+    setJvmOpts
     addAdminUser
     if [[ ${testMode} || ${exampleDemo} ]] ; then addTestUsers ; fi
     if [[ ${testMode} || ${exampleDemo} ]] ; then
