@@ -1,9 +1,10 @@
 package csw.location.server.internal
 
 import akka.Done
+import akka.actor.typed.scaladsl.AskPattern._
 import akka.cluster.ddata.Replicator._
 import akka.cluster.ddata._
-import akka.pattern.ask
+import akka.cluster.ddata.typed.scaladsl.Replicator
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{KillSwitch, OverflowStrategy}
 import akka.util.Timeout
@@ -197,12 +198,18 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     log.debug(s"Tracking connection: [${connection.name}]")
     //Create a message handler for this connection
     val service = new Registry.Service(connection)
+
     //Get a stream that emits messages sent to the actor generated after materialization
-    val source = Source.actorRef[Any](256, OverflowStrategy.dropHead).mapMaterializedValue {
-      //Subscribe materialized actorRef to the changes in connection so that above stream starts emitting messages
-      actorRef ⇒
-        replicator ! Subscribe(service.Key, actorRef)
-    }
+    val source = akka.stream.typed.scaladsl.ActorSource
+      .actorRef[Any](completionMatcher = PartialFunction.empty,
+                     failureMatcher = PartialFunction.empty,
+                     256,
+                     OverflowStrategy.dropHead)
+      .mapMaterializedValue {
+        //Subscribe materialized actorRef to the changes in connection so that above stream starts emitting messages
+        actorRef ⇒
+          replicator ! Replicator.Subscribe(service.Key, actorRef)
+      }
 
     //Collect only the Changed events for this connection and transform it to location events.
     // If the changed event contains a Location, send LocationUpdated event.

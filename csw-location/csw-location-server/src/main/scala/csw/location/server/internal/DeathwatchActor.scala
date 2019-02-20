@@ -2,7 +2,8 @@ package csw.location.server.internal
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior, Terminated}
-import akka.cluster.ddata.Replicator.{Changed, Subscribe}
+import akka.cluster.ddata.Replicator.Changed
+import akka.cluster.ddata.typed.scaladsl.Replicator
 import csw.location.api.models.{AkkaLocation, Location}
 import csw.location.api.scaladsl.LocationService
 import csw.location.server.commons.{CswCluster, LocationServiceLogger}
@@ -87,7 +88,7 @@ private[location] object DeathwatchActor {
     )
 
     //Subscribed to replicator to get events for locations registered with LocationService
-    cswCluster.replicator ! Subscribe(AllServices.Key, actorRef.toUntyped)
+    cswCluster.replicator ! Replicator.Subscribe(AllServices.Key, actorRef)
     actorRef
   }
 }

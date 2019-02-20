@@ -1,8 +1,11 @@
 package csw.location.server.internal
 
+import akka.actor.typed.ActorRef
 import akka.cluster.Cluster
 import akka.cluster.ddata.Replicator._
 import akka.cluster.ddata._
+import akka.cluster.ddata.typed.scaladsl
+import akka.cluster.ddata.typed.scaladsl.Replicator
 import csw.location.api.commons.Constants
 import csw.location.api.models.{Connection, Location}
 
@@ -26,15 +29,16 @@ private[location] class Registry[K <: Key[V], V <: ReplicatedData](val Key: K, v
    * @see [[akka.cluster.ddata.Replicator.Update]]
    * @param f a callback function which is passed to Replicator.Update
    */
-  private[location] def update(f: V ⇒ V, initialValue: V = EmptyValue): Update[V] =
-    Update(Key, initialValue, WriteMajority(5.seconds))(f)
+  private[location] def update(f: V ⇒ V,
+                               initialValue: V = EmptyValue): ActorRef[Replicator.UpdateResponse[V]] => Replicator.Update[V] =
+    Replicator.Update(Key, initialValue, WriteMajority(5.seconds))(f)
 
   /**
    * Creates a get message for replicator. Unlike for update, it will read from the local cache of the node
    *
    * @see [[akka.cluster.ddata.Replicator.Get]]
    */
-  private[location] def get: Get[V] = Get(Key, ReadLocal)
+  private[location] def get: ActorRef[Replicator.GetResponse[V]] => Replicator.Get[V] = Replicator.Get(Key, ReadLocal)
 
   /**
    * Creates a get message for replicator and it ensures that data is read and merged from a majority of replicas,
@@ -42,7 +46,8 @@ private[location] class Registry[K <: Key[V], V <: ReplicatedData](val Key: K, v
    *
    * @see [[akka.cluster.ddata.Replicator.Get]]
    */
-  private[location] def getByMajority: Get[V] = Get(Key, ReadMajority(5.seconds))
+  private[location] def getByMajority: ActorRef[Replicator.GetResponse[V]] => Replicator.Get[V] =
+    Replicator.Get(Key, ReadMajority(5.seconds))
 }
 
 private[location] object Registry {

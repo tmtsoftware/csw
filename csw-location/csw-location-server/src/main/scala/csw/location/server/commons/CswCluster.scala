@@ -1,14 +1,19 @@
 package csw.location.server.commons
 
-import akka.Done
 import akka.actor.CoordinatedShutdown.Reason
-import akka.actor.{ActorRef, ActorSystem, CoordinatedShutdown, PoisonPill}
-import akka.cluster.ddata.DistributedData
-import akka.cluster.ddata.Replicator.{GetReplicaCount, ReplicaCount}
+import akka.actor.typed.ActorRef
+import akka.actor.typed.scaladsl.AskPattern._
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.{ActorSystem, CoordinatedShutdown, PoisonPill, Scheduler}
+import akka.cluster.ddata.typed.scaladsl
+import akka.cluster.ddata.typed.scaladsl.Replicator
+import akka.cluster.ddata.typed.scaladsl.Replicator.{GetReplicaCount, ReplicaCount}
 import akka.cluster.http.management.ClusterHttpManagement
-import akka.cluster.{Cluster, MemberStatus}
+import akka.cluster.typed.Join
+import akka.cluster.{typed, Cluster, MemberStatus}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
+import akka.{actor, Done}
 import csw.location.api.exceptions.{CouldNotEnsureDataReplication, CouldNotJoinCluster}
 import csw.location.server.commons.ClusterConfirmationActor.HasJoinedCluster
 import csw.location.server.commons.CoordinatedShutdownReasons.FailureReason
@@ -33,15 +38,18 @@ class CswCluster private (_actorSystem: ActorSystem) {
    */
   val hostname: String = _actorSystem.settings.config.getString("akka.remote.netty.tcp.hostname")
 
-  implicit val actorSystem: ActorSystem = _actorSystem
-  implicit val ec: ExecutionContext     = actorSystem.dispatcher
-  implicit val mat: Materializer        = makeMat()
-  implicit val cluster: Cluster         = Cluster(actorSystem)
+  implicit val actorSystem: ActorSystem                = _actorSystem
+  implicit val typedSystem: actor.typed.ActorSystem[_] = _actorSystem.toTyped
+  implicit val scheduler: Scheduler                    = typedSystem.scheduler
+  implicit val ec: ExecutionContext                    = actorSystem.dispatcher
+  implicit val mat: Materializer                       = makeMat()
+  implicit val cluster: Cluster                        = Cluster(actorSystem)
+  implicit val typedCluster: typed.Cluster             = typed.Cluster(typedSystem)
 
   /**
    * Gives the replicator for the current ActorSystem
    */
-  private[location] val replicator: ActorRef = DistributedData(actorSystem).replicator
+  private[location] val replicator: ActorRef[Replicator.Command] = scaladsl.DistributedData(typedSystem).replicator
 
   /**
    * Gives handle to CoordinatedShutdown extension
@@ -63,7 +71,7 @@ class CswCluster private (_actorSystem: ActorSystem) {
   private def startClusterManagement(): Unit = {
     val startManagement = actorSystem.settings.config.getBoolean("startManagement")
     if (startManagement) {
-      val clusterHttpManagement = ClusterHttpManagement(cluster)
+      val clusterHttpManagement = ClusterHttpManagement(Cluster(actorSystem))
       Await.result(clusterHttpManagement.start(), 10.seconds)
     }
   }
@@ -75,7 +83,7 @@ class CswCluster private (_actorSystem: ActorSystem) {
     val emptySeeds = actorSystem.settings.config.getStringList("akka.cluster.seed-nodes").isEmpty
     if (emptySeeds) {
       // If no seeds are provided (which happens only during testing), then create a single node cluster by joining to self
-      cluster.join(cluster.selfAddress)
+      typedCluster.manager ! Join(cluster.selfMember.address)
     }
 
     val confirmationActor         = actorSystem.actorOf(ClusterConfirmationActor.props())
@@ -96,12 +104,11 @@ class CswCluster private (_actorSystem: ActorSystem) {
    * Ensures that data replication is started in Location service cluster by matching replica count with Up members.
    */
   private def ensureReplication(): Unit = {
-    implicit val timeout: Timeout = Timeout(5.seconds)
-    import akka.pattern.ask
-    def replicaCountF = (replicator ? GetReplicaCount).mapTo[ReplicaCount]
-    def replicaCount  = Await.result(replicaCountF, 5.seconds).n
-    def upMembers     = cluster.state.members.count(_.status == MemberStatus.Up)
-    val success       = BlockingUtils.poll(replicaCount >= upMembers, 10.seconds)
+    implicit val timeout: Timeout           = Timeout(5.seconds)
+    def replicaCountF: Future[ReplicaCount] = (replicator ? GetReplicaCount()).mapTo[ReplicaCount]
+    def replicaCount: Int                   = Await.result(replicaCountF, 5.seconds).n
+    def upMembers: Int                      = cluster.state.members.count(_.status == MemberStatus.Up)
+    val success: Boolean                    = BlockingUtils.poll(replicaCount >= upMembers, 10.seconds)
     if (!success) {
       log.error(CouldNotEnsureDataReplication.getMessage, ex = CouldNotEnsureDataReplication)
       throw CouldNotEnsureDataReplication
