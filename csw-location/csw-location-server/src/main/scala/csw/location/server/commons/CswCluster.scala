@@ -7,12 +7,12 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.{ActorSystem, CoordinatedShutdown, PoisonPill, Scheduler}
 import akka.cluster.ddata.SelfUniqueAddress
 import akka.cluster.ddata.typed.scaladsl
-import akka.cluster.ddata.typed.scaladsl.{DistributedData, Replicator}
 import akka.cluster.ddata.typed.scaladsl.Replicator.{GetReplicaCount, ReplicaCount}
+import akka.cluster.ddata.typed.scaladsl.{DistributedData, Replicator}
 import akka.cluster.http.management.ClusterHttpManagement
-import akka.cluster.typed.Join
-import akka.cluster.{typed, Cluster, MemberStatus}
-import akka.stream.{ActorMaterializer, Materializer}
+import akka.cluster.typed.{Cluster, Join}
+import akka.cluster.MemberStatus
+import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.util.Timeout
 import akka.{actor, Done}
 import csw.location.api.exceptions.{CouldNotEnsureDataReplication, CouldNotJoinCluster}
@@ -43,8 +43,8 @@ class CswCluster private (_actorSystem: ActorSystem) {
   implicit val typedSystem: actor.typed.ActorSystem[_] = _actorSystem.toTyped
   implicit val scheduler: Scheduler                    = typedSystem.scheduler
   implicit val ec: ExecutionContext                    = actorSystem.dispatcher
-  implicit val mat: Materializer                       = makeMat()
-  implicit val cluster: typed.Cluster                  = typed.Cluster(typedSystem)
+  implicit val mat: ActorMaterializer                  = makeMat()
+  implicit val cluster: Cluster                        = Cluster(typedSystem)
   private val distributedData: DistributedData         = scaladsl.DistributedData(typedSystem)
   implicit val node: SelfUniqueAddress                 = distributedData.selfUniqueAddress
 
@@ -61,7 +61,7 @@ class CswCluster private (_actorSystem: ActorSystem) {
   /**
    * Creates an ActorMaterializer for current ActorSystem
    */
-  private def makeMat(): Materializer = ActorMaterializer()
+  private def makeMat(): ActorMaterializer = ActorMaterializer()
 
   /**
    * If `startManagement` flag is set to true (which is true only when a managementPort is defined in ClusterSettings)
@@ -73,7 +73,7 @@ class CswCluster private (_actorSystem: ActorSystem) {
   private def startClusterManagement(): Unit = {
     val startManagement = actorSystem.settings.config.getBoolean("startManagement")
     if (startManagement) {
-      val clusterHttpManagement = ClusterHttpManagement(Cluster(actorSystem))
+      val clusterHttpManagement = ClusterHttpManagement(akka.cluster.Cluster(actorSystem))
       Await.result(clusterHttpManagement.start(), 10.seconds)
     }
   }

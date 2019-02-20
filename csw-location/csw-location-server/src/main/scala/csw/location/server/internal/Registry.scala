@@ -27,8 +27,10 @@ private[location] class Registry[K <: Key[V], V <: ReplicatedData](val Key: K, v
    * @see [[akka.cluster.ddata.Replicator.Update]]
    * @param f a callback function which is passed to Replicator.Update
    */
-  private[location] def update(f: V ⇒ V,
-                               initialValue: V = EmptyValue): ActorRef[Replicator.UpdateResponse[V]] => Replicator.Update[V] =
+  private[location] def update(
+      f: V ⇒ V,
+      initialValue: V = EmptyValue
+  ): ActorRef[Replicator.UpdateResponse[V]] => Replicator.Update[V] =
     Replicator.Update(Key, initialValue, WriteMajority(5.seconds))(f)
 
   /**

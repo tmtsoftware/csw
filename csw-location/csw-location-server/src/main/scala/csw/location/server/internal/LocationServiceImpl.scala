@@ -6,6 +6,7 @@ import akka.cluster.ddata.Replicator._
 import akka.cluster.ddata._
 import akka.cluster.ddata.typed.scaladsl.Replicator
 import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.typed.scaladsl.ActorSource
 import akka.stream.{KillSwitch, OverflowStrategy}
 import akka.util.Timeout
 import csw.location.api.exceptions.{
@@ -200,11 +201,13 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     val service = new Registry.Service(connection)
 
     //Get a stream that emits messages sent to the actor generated after materialization
-    val source = akka.stream.typed.scaladsl.ActorSource
-      .actorRef[Any](completionMatcher = PartialFunction.empty,
-                     failureMatcher = PartialFunction.empty,
-                     256,
-                     OverflowStrategy.dropHead)
+    val source = ActorSource
+      .actorRef[Any](
+        completionMatcher = PartialFunction.empty,
+        failureMatcher = PartialFunction.empty,
+        256,
+        OverflowStrategy.dropHead
+      )
       .mapMaterializedValue {
         //Subscribe materialized actorRef to the changes in connection so that above stream starts emitting messages
         actorRef ⇒
