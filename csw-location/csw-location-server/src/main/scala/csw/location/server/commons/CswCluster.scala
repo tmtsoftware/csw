@@ -5,8 +5,9 @@ import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.{ActorSystem, CoordinatedShutdown, PoisonPill, Scheduler}
+import akka.cluster.ddata.SelfUniqueAddress
 import akka.cluster.ddata.typed.scaladsl
-import akka.cluster.ddata.typed.scaladsl.Replicator
+import akka.cluster.ddata.typed.scaladsl.{DistributedData, Replicator}
 import akka.cluster.ddata.typed.scaladsl.Replicator.{GetReplicaCount, ReplicaCount}
 import akka.cluster.http.management.ClusterHttpManagement
 import akka.cluster.typed.Join
@@ -43,13 +44,14 @@ class CswCluster private (_actorSystem: ActorSystem) {
   implicit val scheduler: Scheduler                    = typedSystem.scheduler
   implicit val ec: ExecutionContext                    = actorSystem.dispatcher
   implicit val mat: Materializer                       = makeMat()
-  implicit val cluster: Cluster                        = Cluster(actorSystem)
-  implicit val typedCluster: typed.Cluster             = typed.Cluster(typedSystem)
+  implicit val cluster: typed.Cluster                  = typed.Cluster(typedSystem)
+  private val distributedData: DistributedData         = scaladsl.DistributedData(typedSystem)
+  implicit val node: SelfUniqueAddress                 = distributedData.selfUniqueAddress
 
   /**
    * Gives the replicator for the current ActorSystem
    */
-  private[location] val replicator: ActorRef[Replicator.Command] = scaladsl.DistributedData(typedSystem).replicator
+  private[location] val replicator: ActorRef[Replicator.Command] = distributedData.replicator
 
   /**
    * Gives handle to CoordinatedShutdown extension
@@ -83,7 +85,7 @@ class CswCluster private (_actorSystem: ActorSystem) {
     val emptySeeds = actorSystem.settings.config.getStringList("akka.cluster.seed-nodes").isEmpty
     if (emptySeeds) {
       // If no seeds are provided (which happens only during testing), then create a single node cluster by joining to self
-      typedCluster.manager ! Join(cluster.selfMember.address)
+      cluster.manager ! Join(cluster.selfMember.address)
     }
 
     val confirmationActor         = actorSystem.actorOf(ClusterConfirmationActor.props())

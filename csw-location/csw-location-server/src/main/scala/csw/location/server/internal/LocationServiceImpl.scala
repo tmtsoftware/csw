@@ -57,7 +57,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     //it will be handled below by ModifyFailure.
     val updateValue = service.update(
       {
-        case r @ LWWRegister(Some(`location`) | None) ⇒ r.withValue(Some(location))
+        case r @ LWWRegister(Some(`location`) | None) ⇒ r.withValueOf(Some(location))
         case LWWRegister(Some(otherLocation)) ⇒
           val locationIsRegistered = new OtherLocationIsRegistered(location, otherLocation)
           throw locationIsRegistered
@@ -66,7 +66,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     )
 
     //Create a message to update connection -> location map in CRDT
-    val updateRegistry = AllServices.update(_ + (registration.connection → location))
+    val updateRegistry = AllServices.update(_ :+ (registration.connection → location))
 
     //Send the update message for connection key to replicator. On success, send another message to update connection -> location
     //map. If that is successful then return a registrationResult for this Location. In case of any failure throw an exception.
@@ -104,9 +104,9 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
 
     //Send an update message to replicator to update the connection key with None. On success send another message to remove the
     //corresponding connection -> location entry from map. In case of any failure throw an exception otherwise return Done.
-    (replicator ? service.update(_.withValue(None))).flatMap {
+    (replicator ? service.update(_.withValueOf(None))).flatMap {
       case x: UpdateSuccess[_] ⇒
-        (replicator ? AllServices.update(_ - connection)).map {
+        (replicator ? AllServices.update(_.remove(node, connection))).map {
           case _: UpdateSuccess[_] ⇒ Done
           case _ ⇒
             val unregistrationFailed = UnregistrationFailed(connection)
