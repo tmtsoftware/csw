@@ -5,6 +5,8 @@ VERSION="$1"
 BASE_PATH="$2"
 SCRIPTS_PATH="$BASE_PATH"/scripts
 TARGET_PATH="$BASE_PATH"/target/coursier/stage/bin
+SENTINEL_CONF="$BASE_PATH"/target/coursier/stage/conf/redis_sentinel/sentinel.conf
+SENTINEL_TEMPLATE_CONF="$BASE_PATH"/target/coursier/stage/conf/redis_sentinel/sentinel-template.conf
 
 mkdir -p "$TARGET_PATH"
 cp "$BASE_PATH"/scripts/coursier "$TARGET_PATH"
@@ -18,6 +20,7 @@ cp "$BASE_PATH"/scripts/coursier "$TARGET_PATH"
 "$SCRIPTS_PATH"/coursier bootstrap -r jitpack com.github.tmtsoftware.csw::csw-alarm-cli:"$1" -M csw.alarm.cli.Main -o "$TARGET_PATH"/csw-alarm-cli
 
 cp -r "$SCRIPTS_PATH"/conf "$BASE_PATH"/target/coursier/stage
+mv "$SENTINEL_CONF" "$SENTINEL_TEMPLATE_CONF"
 cp "$SCRIPTS_PATH"/csw-auth/prod/configure.sh "$TARGET_PATH"
 cp "$SCRIPTS_PATH"/csw-services.sh "$TARGET_PATH"
 cp "$SCRIPTS_PATH"/redis-sentinel-prod.sh "$TARGET_PATH"

@@ -60,16 +60,20 @@ object DeployApp extends AutoPlugin {
 
   private def scriptsAndConfsMapping = Def.task {
     val scriptsDir       = file(".") / "scripts"
+    val sentinelConf     = scriptsDir / "conf" / "redis_sentinel" / "sentinel.conf"
     val authServerDir    = scriptsDir / "csw-auth" / "prod"
     val serviceScript    = scriptsDir / "csw-services.sh"
     val prodScript       = scriptsDir / "redis-sentinel-prod.sh"
     val authServerScript = authServerDir / "configure.sh"
-    val confs            = Path.directory(new File(scriptsDir, "conf"))
+    val confs = Path
+      .directory(new File(scriptsDir, "conf"))
+      .filterNot { case (f, s) => s.equals("conf/redis_sentinel/sentinel.conf") }
 
     confs :+
     ((serviceScript, s"bin/${serviceScript.getName}")) :+
     ((prodScript, s"bin/${prodScript.getName}")) :+
-    ((authServerScript, s"bin/${authServerScript.getName}"))
+    ((authServerScript, s"bin/${authServerScript.getName}")) :+
+    ((sentinelConf, s"conf/redis_sentinel/sentinel-template.conf"))
   }
 }
 
