@@ -60,13 +60,15 @@ lazy val githubReleases: Seq[ProjectReference] = Seq(
 /* ================= Root Project ============== */
 lazy val `csw` = project
   .in(file("."))
-  .enablePlugins(NoPublish, UnidocSite, GithubPublishDocs, GitBranchPrompt, GithubRelease)
+  .enablePlugins(NoPublish, UnidocSite, GithubPublishDocs, GitBranchPrompt, GithubRelease, CoursierPlugin)
   .disablePlugins(BintrayPlugin)
   .aggregate(aggregatedProjects: _*)
   .settings(Settings.mergeSiteWith(docs))
   .settings(Settings.docExclusions(unidocExclusions))
   .settings(GithubRelease.githubReleases(githubReleases))
-  .settings(CoursierArtifactGenerator.generateArtifacts(githubReleases))
+  .settings(
+    bootstrap in Coursier := CoursierPlugin.bootstrapTask(githubReleases).value
+  )
 
 /* ================= Admin Project ============== */
 lazy val `csw-admin-server` = project

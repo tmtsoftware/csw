@@ -1,7 +1,6 @@
 import java.io.File
 import java.nio.file.Files
 
-import CoursierArtifactGenerator._
 import com.typesafe.sbt.packager.universal.UniversalPlugin.autoImport._
 import com.typesafe.sbt.packager.universal.ZipHelper
 import ohnosequences.sbt.GithubRelease.keys.{ghreleaseAssets, ghreleaseRepoName, ghreleaseRepoOrg, githubRelease}
@@ -43,8 +42,8 @@ object GithubRelease extends AutoPlugin {
     val log = sLog.value
 
     lazy val testReportZip = target.value / "ghrelease" / "test-reports.zip"
-    val testReportHtml = target.value / "ghrelease" / "test-reports.html"
-    val xmlFiles = target.all(aggregateFilter).value.flatMap(targetPath ⇒ Path.allSubpaths(targetPath / "test-reports"))
+    val testReportHtml     = target.value / "ghrelease" / "test-reports.html"
+    val xmlFiles           = target.all(aggregateFilter).value.flatMap(targetPath ⇒ Path.allSubpaths(targetPath / "test-reports"))
 
     // 1. include all xml files in single zip
     IO.zip(xmlFiles, testReportZip)
@@ -55,7 +54,7 @@ object GithubRelease extends AutoPlugin {
       xmlFiles.foreach { case (file, fileName) ⇒ Files.copy(file.toPath, (dir / fileName).toPath) }
 
       // 2.1 create single xml file by merging all xml's
-      val xmlFilesDir = dir.getAbsolutePath
+      val xmlFilesDir     = dir.getAbsolutePath
       val mergedXmlReport = s"$xmlFilesDir/test-report.xml"
       log.info(s"Merging all xml files from dir: $xmlFilesDir using junit-merge command.")
       junitMergeCmd(xmlFilesDir, mergedXmlReport)
@@ -74,7 +73,7 @@ object GithubRelease extends AutoPlugin {
 
   private def stageAndZipTask(projects: Seq[ProjectReference]): Def.Initialize[Task[File]] = Def.task {
     val ghrleaseDir = target.value / "ghrelease"
-    val log = sLog.value
+    val log         = sLog.value
     val zipFileName = s"csw-apps-${version.value}"
 
     lazy val appsZip = new File(ghrleaseDir, s"$zipFileName.zip")
@@ -107,7 +106,6 @@ object GithubRelease extends AutoPlugin {
       Seq(
         stageAndZipTask(projects).value,
         coverageReportZipKey.value,
-        zipCoursierArtifactsTask(projects).value,
         testReportZip,
         testReportHtml
       )
