@@ -177,7 +177,7 @@ function startAndRegister {
     if ${exampleDemo}; then
         path=${currentDir}/${exampleImportJsonPath}
     fi
-    ./csw-location-agent --name AAS --http "auth" -c "${keycloakDir}/${keycloakBinaryUnzipped}/bin/standalone.sh -Djboss.bind.address=${host} -Djboss.http.port=${port} -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=$path" -p "$port" -Dcsw-location-client.server-http-port=${location_http_port}
+    ./csw-location-agent --name AAS --http "auth" -c "${keycloakDir}/${keycloakBinaryUnzipped}/bin/standalone.sh -Djboss.bind.address=${host} -Djboss.http.port=${port} -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=$path" -p "$port" -J-Dcsw-location-client.server-http-port=${location_http_port}
 }
 
 function start {
