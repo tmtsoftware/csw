@@ -1,30 +1,35 @@
 package csw.location.server.commons
 
 import akka.Done
-import akka.actor.{Actor, Props}
-import akka.cluster.Cluster
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ActorRef, Behavior}
 import akka.cluster.ClusterEvent._
-import csw.location.server.commons.ClusterConfirmationActor.HasJoinedCluster
+import akka.cluster.typed.{Cluster, Subscribe, Unsubscribe}
+import csw.location.server.commons.ClusterConfirmationMessages.{HasJoinedCluster, Shutdown}
 
-private[location] class ClusterConfirmationActor extends Actor {
+private[location] object ClusterConfirmationActor {
 
-  private val cluster = Cluster(context.system)
+  def behavior(): Behavior[Any] = Behaviors.setup { ctx ⇒
+    val cluster: Cluster = Cluster(ctx.system)
+    cluster.subscriptions ! Subscribe(ctx.self, classOf[MemberEvent])
 
-  override def preStart(): Unit = cluster.subscribe(self, InitialStateAsEvents, classOf[MemberEvent])
-  override def postStop(): Unit = cluster.unsubscribe(self)
+    def shutdownBehavior: Behavior[Any] = Behaviors.receiveMessage { _ ⇒
+      cluster.subscriptions ! Unsubscribe(ctx.self); Behaviors.empty
+    }
 
-  var done: Option[Done] = None
-
-  override def receive: Receive = {
-    case MemberUp(member) if member.address == cluster.selfAddress       ⇒ done = Some(Done)
-    case MemberWeaklyUp(member) if member.address == cluster.selfAddress ⇒ done = Some(Done)
-    case HasJoinedCluster                                                ⇒ sender() ! done
+    def receiveBehavior(state: Option[Done] = None): Behaviors.Receive[Any] = Behaviors.receiveMessage[Any] {
+      case MemberUp(member) if member.address == cluster.selfMember.address       ⇒ receiveBehavior(Some(Done))
+      case MemberWeaklyUp(member) if member.address == cluster.selfMember.address ⇒ receiveBehavior(Some(Done))
+      case HasJoinedCluster(ref)                                                  ⇒ ref ! state; Behaviors.same
+      case Shutdown                                                               ⇒ Behaviors.stopped(shutdownBehavior)
+      case _                                                                      ⇒ Behaviors.same
+    }
+    receiveBehavior()
   }
 
 }
 
-private[location] object ClusterConfirmationActor {
-  def props(): Props = Props(new ClusterConfirmationActor)
-
-  case object HasJoinedCluster
+object ClusterConfirmationMessages {
+  case class HasJoinedCluster(ref: ActorRef[Option[Done]])
+  case object Shutdown
 }

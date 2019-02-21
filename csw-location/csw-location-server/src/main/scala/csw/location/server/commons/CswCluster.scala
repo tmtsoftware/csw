@@ -4,19 +4,17 @@ import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.{ActorSystem, CoordinatedShutdown, PoisonPill, Scheduler}
+import akka.actor.{ActorSystem, CoordinatedShutdown, Scheduler}
 import akka.cluster.ddata.SelfUniqueAddress
 import akka.cluster.ddata.typed.scaladsl
-import akka.cluster.ddata.typed.scaladsl.Replicator.{GetReplicaCount, ReplicaCount}
 import akka.cluster.ddata.typed.scaladsl.{DistributedData, Replicator}
 import akka.cluster.http.management.ClusterHttpManagement
 import akka.cluster.typed.{Cluster, Join}
-import akka.cluster.MemberStatus
 import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.util.Timeout
 import akka.{actor, Done}
-import csw.location.api.exceptions.{CouldNotEnsureDataReplication, CouldNotJoinCluster}
-import csw.location.server.commons.ClusterConfirmationActor.HasJoinedCluster
+import csw.location.api.exceptions.CouldNotJoinCluster
+import csw.location.server.commons.ClusterConfirmationMessages.{HasJoinedCluster, Shutdown}
 import csw.location.server.commons.CoordinatedShutdownReasons.FailureReason
 import csw.logging.api.scaladsl.Logger
 
@@ -88,33 +86,17 @@ class CswCluster private (_actorSystem: ActorSystem) {
       cluster.manager ! Join(cluster.selfMember.address)
     }
 
-    val confirmationActor         = actorSystem.actorOf(ClusterConfirmationActor.props())
-    implicit val timeout: Timeout = Timeout(5.seconds)
-    import akka.pattern.ask
-    def statusF = (confirmationActor ? HasJoinedCluster).mapTo[Option[Done]]
-    def status  = Await.result(statusF, 5.seconds)
-    val success = BlockingUtils.poll(status.isDefined, 20.seconds)
+    val confirmationActorF: ActorRef[Any] = actorSystem.spawn(ClusterConfirmationActor.behavior(), "ClusterConfirmationActor")
+    implicit val timeout: Timeout         = Timeout(5.seconds)
+    def statusF: Future[Option[Done]]     = confirmationActorF ? HasJoinedCluster
+    def status: Option[Done]              = Await.result(statusF, 5.seconds)
+    val success                           = BlockingUtils.poll(status.isDefined, 20.seconds)
     if (!success) {
       log.error(CouldNotJoinCluster.getMessage, ex = CouldNotJoinCluster)
       throw CouldNotJoinCluster
     }
-    confirmationActor ! PoisonPill
+    confirmationActorF ! Shutdown
     Done
-  }
-
-  /**
-   * Ensures that data replication is started in Location service cluster by matching replica count with Up members.
-   */
-  private def ensureReplication(): Unit = {
-    implicit val timeout: Timeout           = Timeout(5.seconds)
-    def replicaCountF: Future[ReplicaCount] = (replicator ? GetReplicaCount()).mapTo[ReplicaCount]
-    def replicaCount: Int                   = Await.result(replicaCountF, 5.seconds).n
-    def upMembers: Int                      = cluster.state.members.count(_.status == MemberStatus.Up)
-    val success: Boolean                    = BlockingUtils.poll(replicaCount >= upMembers, 10.seconds)
-    if (!success) {
-      log.error(CouldNotEnsureDataReplication.getMessage, ex = CouldNotEnsureDataReplication)
-      throw CouldNotEnsureDataReplication
-    }
   }
 
   /**
@@ -157,7 +139,6 @@ object CswCluster {
     try {
       cswCluster.startClusterManagement()
       cswCluster.joinCluster()
-      cswCluster.ensureReplication()
       cswCluster
     } catch {
       case NonFatal(ex) ⇒
