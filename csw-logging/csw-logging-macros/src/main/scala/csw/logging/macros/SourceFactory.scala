@@ -30,7 +30,7 @@ object SourceFactory {
     val owners = allOwners(c.internal.enclosingOwner)
 
     val className = owners
-      .filter(s => s.toString.startsWith("class") || s.toString.startsWith("object"))
+      .filter(s => s.toString.startsWith("class") || s.toString.startsWith("object") || s.toString.startsWith("trait"))
       .map(s => s.asClass.name.toString)
       .reverse
       .mkString("$")
