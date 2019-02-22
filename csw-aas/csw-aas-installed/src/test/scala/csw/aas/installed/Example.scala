@@ -3,7 +3,7 @@ package csw.aas.installed
 import java.nio.file.Paths
 
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
+import akka.stream.{ActorMaterializer, Materializer}
 import csw.aas.installed.scaladsl.FileAuthStore
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
@@ -12,8 +12,8 @@ import scala.concurrent.duration.DurationLong
 
 object Example extends App {
 
-  private implicit val actorSystem: ActorSystem             = ActorSystem()
-  private implicit val actorMaterializer: ActorMaterializer = ActorMaterializer()
+  private implicit val actorSystem: ActorSystem        = ActorSystem()
+  private implicit val actorMaterializer: Materializer = ActorMaterializer()
   import actorSystem._
 
   val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient
