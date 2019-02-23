@@ -5,6 +5,7 @@ import akka.actor.Cancellable
 import akka.stream.scaladsl.Source
 import csw.event.api.exceptions.PublishFailure
 import csw.params.events.Event
+import csw.time.core.models.TMTTime
 
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
@@ -73,6 +74,21 @@ trait EventPublisher {
   def publish(eventGenerator: => Event, every: FiniteDuration): Cancellable
 
   /**
+   * Publish [[csw.params.events.Event]] from an `eventGenerator` function, which will be started at the specified `startTime` and will be executed at `every` frequency.
+   * `Cancellable` can be used to cancel the execution of `eventGenerator` function.
+   *
+   * At the time of invocation, in case the underlying server is not available, [[csw.event.api.exceptions.EventServerNotAvailable]] exception is thrown and the stream is
+   * stopped after logging appropriately. In all other cases of exception, the stream receives a [[csw.event.api.exceptions.PublishFailure]] exception
+   * which wraps the underlying exception. The generator resumes to publish remaining elements in case of this exception.
+   *
+   * @param eventGenerator a function which can generate an event to be published at `every` frequency
+   * @param startTime the time at which the `eventGenerator` should start generating events
+   * @param every frequency with which the events are to be published
+   * @return a handle to cancel the event generation through `eventGenerator`
+   */
+  def publish(eventGenerator: => Event, startTime: TMTTime, every: FiniteDuration): Cancellable
+
+  /**
    * Publish [[csw.params.events.Event]] from an `eventGenerator` function, which will be executed at `every` frequency. Also, provide `onError` callback
    * for each event for which publishing failed.
    *
@@ -81,8 +97,8 @@ trait EventPublisher {
    * which wraps the underlying exception and also provides the handle to the event which was failed to be published.
    * The provided callback is executed on the failed element and the generator resumes to publish remaining elements.
    *
-   * @note any exception thrown from `eventGenerator` or `onError` callback is expected
-   * to be handled by component developers.
+   * @note any exception thrown from `onError` callback is expected to be handled by component developers.
+   *
    * @param eventGenerator a function which can generate an event to be published at `every` frequency
    * @param every frequency with which the events are to be published
    * @param onError a callback to execute for each event for which publishing failed
@@ -91,6 +107,25 @@ trait EventPublisher {
   def publish(eventGenerator: ⇒ Event, every: FiniteDuration, onError: PublishFailure ⇒ Unit): Cancellable
 
   /**
+   * Publish [[csw.params.events.Event]] from an `eventGenerator` function, which will be started at the specified `startTime` and will be executed at `every` frequency.
+   * Also, provide `onError` callback for each event for which publishing failed.
+   *
+   * At the time of invocation, in case the underlying server is not available, [[csw.event.api.exceptions.EventServerNotAvailable]] exception is thrown and the stream is
+   * stopped after logging appropriately. In all other cases of exception, the stream receives a [[csw.event.api.exceptions.PublishFailure]] exception
+   * which wraps the underlying exception and also provides the handle to the event which was failed to be published.
+   * The provided callback is executed on the failed element and the generator resumes to publish remaining elements.
+   *
+   * @note any exception thrown from `onError` callback is expected to be handled by component developers.
+   *
+   * @param eventGenerator a function which can generate an event to be published at `every` frequency
+   * @param startTime the time at which the `eventGenerator` should start generating events
+   * @param every frequency with which the events are to be published
+   * @param onError a callback to execute for each event for which publishing failed
+   * @return a handle to cancel the event generation through `eventGenerator`
+   */
+  def publish(eventGenerator: ⇒ Event, startTime: TMTTime, every: FiniteDuration, onError: PublishFailure ⇒ Unit): Cancellable
+
+  /**
    * Publish [[csw.params.events.Event]] from an `eventGenerator` function, which will be executed at `every` frequency. Also, provide `onError` callback
    * for each event for which publishing failed. Prefer this version if eventGenerator closes over mutable state. This method allows caller to prepare future on it's own
    * execution context to make it thread safe.
@@ -98,16 +133,28 @@ trait EventPublisher {
    * At the time of invocation, in case the underlying server is not available, [[csw.event.api.exceptions.EventServerNotAvailable]] exception is thrown and the stream is
    * stopped after logging appropriately. In all other cases of exception, the stream receives a [[csw.event.api.exceptions.PublishFailure]] exception
    * which wraps the underlying exception and also provides the handle to the event which was failed to be published.
-   * The provided callback is executed on the failed element and the generator resumes to publish remaining elements.
    *
-   * @note any exception thrown from `eventGenerator` or `onError` callback is expected
-   * to be handled by component developers.
    * @param eventGenerator a function which can generate a Future of event to be published at `every` frequency
    * @param every frequency with which the events are to be published
-   * @param onError a callback to execute for each event for which publishing failed
    * @return a handle to cancel the event generation through `eventGenerator`
    */
   def publishAsync(eventGenerator: => Future[Event], every: FiniteDuration): Cancellable
+
+  /**
+   * Publish [[csw.params.events.Event]] from an `eventGenerator` function, which will be started at the specified `startTime` and will be executed at `every` frequency.
+   * Also, provide `onError` callback for each event for which publishing failed. Prefer this version if eventGenerator closes over mutable state.
+   * This method allows caller to prepare future on it's own execution context to make it thread safe.
+   *
+   * At the time of invocation, in case the underlying server is not available, [[csw.event.api.exceptions.EventServerNotAvailable]] exception is thrown and the stream is
+   * stopped after logging appropriately. In all other cases of exception, the stream receives a [[csw.event.api.exceptions.PublishFailure]] exception
+   * which wraps the underlying exception and also provides the handle to the event which was failed to be published.
+   *
+   * @param eventGenerator a function which can generate a Future of event to be published at `every` frequency
+   * @param startTime the time at which the `eventGenerator` should start generating events
+   * @param every frequency with which the events are to be published
+   * @return a handle to cancel the event generation through `eventGenerator`
+   */
+  def publishAsync(eventGenerator: => Future[Event], startTime: TMTTime, every: FiniteDuration): Cancellable
 
   /**
    * Publish [[csw.params.events.Event]] from an `eventGenerator` function, which will be executed at `every` frequency. Also, provide `onError` callback
@@ -119,14 +166,39 @@ trait EventPublisher {
    * which wraps the underlying exception and also provides the handle to the event which was failed to be published.
    * The provided callback is executed on the failed element and the generator resumes to publish remaining elements.
    *
-   * @note any exception thrown from `eventGenerator` or `onError` callback is expected
-   * to be handled by component developers.
+   * @note any exception thrown from or `onError` callback is expected to be handled by component developers.
+   *
    * @param eventGenerator a function which can generate a Future of event to be published at `every` frequency
    * @param every frequency with which the events are to be published
    * @param onError a callback to execute for each event for which publishing failed
    * @return a handle to cancel the event generation through `eventGenerator`
    */
   def publishAsync(eventGenerator: ⇒ Future[Event], every: FiniteDuration, onError: PublishFailure ⇒ Unit): Cancellable
+
+  /**
+   * Publish [[csw.params.events.Event]] from an `eventGenerator` function, which will be started at the specified `startTime` and will be executed at `every` frequency.
+   * Also, provide `onError` callback for each event for which publishing failed. Prefer this version if eventGenerator closes over mutable state.
+   * This method allows caller to prepare future on it's own execution context to make it thread safe.
+   *
+   * At the time of invocation, in case the underlying server is not available, [[csw.event.api.exceptions.EventServerNotAvailable]] exception is thrown and the stream is
+   * stopped after logging appropriately. In all other cases of exception, the stream receives a [[csw.event.api.exceptions.PublishFailure]] exception
+   * which wraps the underlying exception and also provides the handle to the event which was failed to be published.
+   * The provided callback is executed on the failed element and the generator resumes to publish remaining elements.
+   *
+   * @note any exception thrown from `onError` callback is expected to be handled by component developers.
+   *
+   * @param eventGenerator a function which can generate a Future of event to be published at `every` frequency
+   * @param startTime the time at which the `eventGenerator` should start generating events
+   * @param every frequency with which the events are to be published
+   * @param onError a callback to execute for each event for which publishing failed
+   * @return a handle to cancel the event generation through `eventGenerator`
+   */
+  def publishAsync(
+      eventGenerator: ⇒ Future[Event],
+      startTime: TMTTime,
+      every: FiniteDuration,
+      onError: PublishFailure ⇒ Unit
+  ): Cancellable
 
   /**
    * Shuts down the connection for this publisher. Using any api of publisher after shutdown should give exceptions.

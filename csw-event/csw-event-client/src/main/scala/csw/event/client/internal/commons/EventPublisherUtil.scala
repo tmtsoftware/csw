@@ -7,7 +7,7 @@ import akka.stream.{Materializer, OverflowStrategy}
 import csw.event.api.exceptions.PublishFailure
 import csw.params.events.Event
 
-import scala.concurrent.duration.{DurationDouble, FiniteDuration}
+import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.control.NonFatal
 
@@ -31,12 +31,12 @@ class EventPublisherUtil(implicit ec: ExecutionContext, mat: Materializer) {
       .runForeach(_ => ())
 
   // create an akka stream source out of eventGenerator function
-  def eventSource(eventGenerator: => Event, every: FiniteDuration): Source[Event, Cancellable] =
-    eventSourceAsync(Future.successful(eventGenerator), every)
-
-  // create an akka stream source out of eventGenerator function
-  def eventSourceAsync(eventGenerator: => Future[Event], every: FiniteDuration): Source[Event, Cancellable] =
-    Source.tick(0.millis, every, ()).mapAsync(1)(x => withErrorLogging(eventGenerator))
+  def getEventSource(
+      eventGenerator: => Future[Event],
+      initialDelay: FiniteDuration,
+      every: FiniteDuration
+  ): Source[Event, Cancellable] =
+    Source.tick(initialDelay, every, ()).mapAsync(1)(x => withErrorLogging(eventGenerator))
 
   def publishFromSource[Mat](
       source: Source[Event, Mat],
