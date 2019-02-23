@@ -9,6 +9,7 @@ import csw.event.client.helpers.Utils
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.params.events.Event
+import org.junit.Ignore
 import org.scalatest.FunSuite
 
 import scala.concurrent.ExecutionContextExecutor
@@ -26,7 +27,7 @@ class PerfTest extends FunSuite {
   val subscriber: EventSubscriber = factory.defaultSubscriber
   val publisher: EventPublisher   = factory.defaultPublisher
 
-  test("asd") {
+  ignore("asd") {
     publisher.publish(Utils.makeEvent(10)).await
 
     val subscription = subscriber.subscribeCallback(Set(event.eventKey), report)
