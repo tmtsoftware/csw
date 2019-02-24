@@ -25,10 +25,10 @@ object Libs {
   val `scala-reflect`                = "org.scala-lang"         % "scala-reflect"                 % ScalaVersion //BSD-3
   val `gson`                         = "com.google.code.gson"   % "gson"                          % "2.8.5"      //Apache 2.0
 
-  val `play-json` = dep("com.typesafe.play" %%% "play-json" % "2.6.13") //Apache 2.0
+  val `play-json` = dep("com.typesafe.play" %%% "play-json" % "2.7.1") //Apache 2.0
 
-  val `akka-http-play-json`      = "de.heikoseeberger"    %% "akka-http-play-json"      % "1.23.0" //Apache 2.0
-  val `jwt-play-json`            = "com.pauldijou"        %% "jwt-play-json"            % "1.1.0"
+  val `akka-http-play-json`      = "de.heikoseeberger"    %% "akka-http-play-json"      % "1.25.2" //Apache 2.0
+  val `jwt-play-json`            = "com.pauldijou"        %% "jwt-play-json"            % "2.1.0"
   val `scalapb-runtime`          = "com.thesamet.scalapb" %% "scalapb-runtime"          % scalapbVersion % "protobuf"
   val `scalapb-json4s`           = "com.thesamet.scalapb" %% "scalapb-json4s"           % scalapbVersion
   val `lettuce`                  = "io.lettuce"           % "lettuce-core"              % "5.0.5.RELEASE"
@@ -44,7 +44,7 @@ object Libs {
   val `scala-csv`                = "com.github.tototoshi" %% "scala-csv" % "1.3.5"
   val `scalajs-java-time`        = dep("org.scala-js" %%% "scalajs-java-time" % "0.2.5")
   val `json-schema-validator`    = "com.github.fge" % "json-schema-validator" % "2.2.8" //LGPL/ASL
-  val `play-json-derived-codecs` = dep("org.julienrf" %%% "play-json-derived-codecs" % "4.0.1")
+  val `play-json-derived-codecs` = dep("org.julienrf" %%% "play-json-derived-codecs" % "5.0.0")
 
   val `jna`             = "net.java.dev.jna"              % "jna"             % "5.2.0"
   val `postgresql`      = "org.postgresql"                % "postgresql"      % "42.2.5"
@@ -71,7 +71,7 @@ object Jackson {
 
 object Enumeratum {
   val `enumeratum`           = dep("com.beachape" %%% "enumeratum"           % "1.5.13") //MIT License
-  val `enumeratum-play-json` = dep("com.beachape" %%% "enumeratum-play-json" % "1.5.14") //MIT License
+  val `enumeratum-play-json` = dep("com.beachape" %%% "enumeratum-play-json" % "1.5.16") //MIT License
 }
 
 object Chill {
