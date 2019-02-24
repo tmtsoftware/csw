@@ -9,7 +9,6 @@ import csw.event.api.scaladsl.EventPublisher
 import csw.event.client.internal.commons.EventPublisherUtil
 import csw.params.events.Event
 import csw.time.core.models.TMTTime
-import csw.time.core.util.TMTTimeUtil
 import csw.time.core.util.TMTTimeUtil.delayFrom
 import io.lettuce.core.{RedisClient, RedisURI}
 import romaine.RomaineFactory

@@ -9,7 +9,6 @@ import sbt.Keys._
 import sbt.io.{IO, Path}
 import sbt.{AutoPlugin, Def, Plugins, ProjectReference, Setting, Task, taskKey, _}
 
-import scala.language.postfixOps
 import scala.sys.process._
 
 object GithubRelease extends AutoPlugin {

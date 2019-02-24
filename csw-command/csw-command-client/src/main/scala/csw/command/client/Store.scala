@@ -1,4 +1,5 @@
 package csw.command.client
+import scala.language.implicitConversions
 
 /**
  * Store represents the storage of a set of values against a given key

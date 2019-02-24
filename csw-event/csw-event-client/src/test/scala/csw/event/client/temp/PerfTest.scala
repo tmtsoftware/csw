@@ -9,20 +9,16 @@ import csw.event.client.helpers.Utils
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.params.events.Event
-import org.junit.Ignore
 import org.scalatest.FunSuite
-
-import scala.concurrent.ExecutionContextExecutor
 
 class PerfTest extends FunSuite {
 
-  private implicit val system: ActorSystem          = ActorSystem()
-  private implicit val ec: ExecutionContextExecutor = system.dispatcher
-  private implicit val mat: ActorMaterializer       = ActorMaterializer()
-  private val ls: LocationService                   = HttpLocationServiceFactory.makeLocalClient
-  private val factory                               = new EventServiceFactory().make(ls)
-  private var id                                    = 0
-  private val event                                 = Utils.makeEvent(id)
+  private implicit val system: ActorSystem    = ActorSystem()
+  private implicit val mat: ActorMaterializer = ActorMaterializer()
+  private val ls: LocationService             = HttpLocationServiceFactory.makeLocalClient
+  private val factory                         = new EventServiceFactory().make(ls)
+  private val id                              = 0
+  private val event                           = Utils.makeEvent(id)
 
   val subscriber: EventSubscriber = factory.defaultSubscriber
   val publisher: EventPublisher   = factory.defaultPublisher
@@ -30,7 +26,7 @@ class PerfTest extends FunSuite {
   ignore("asd") {
     publisher.publish(Utils.makeEvent(10)).await
 
-    val subscription = subscriber.subscribeCallback(Set(event.eventKey), report)
+    subscriber.subscribeCallback(Set(event.eventKey), report)
 
     while (true) {
       publisher.publish(Utils.makeEvent(id))
@@ -43,10 +39,5 @@ class PerfTest extends FunSuite {
     val origTime    = event.eventTime.value.toEpochMilli
 
     println(currentTime - origTime)
-  }
-
-  private def eventGenerator() = {
-    id += 1
-    Utils.makeEvent(id)
   }
 }
