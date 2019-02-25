@@ -86,7 +86,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
 
     val event = Utils.makeEvent(1)
 
-    publisher.publish(event, 20.millis, failure ⇒ testProbe.ref ! failure)
+    publisher.publish(Some(event), 20.millis, failure ⇒ testProbe.ref ! failure)
 
     val failure = testProbe.expectMessageType[PublishFailure]
     failure.event shouldBe event
@@ -121,7 +121,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
 
     val event = Utils.makeEvent(1)
 
-    publisher.publishAsync(Future.successful(event), 20.millis, failure ⇒ testProbe.ref ! failure)
+    publisher.publishAsync(Future.successful(Some(event)), 20.millis, failure ⇒ testProbe.ref ! failure)
 
     val failure = testProbe.expectMessageType[PublishFailure]
     failure.event shouldBe event

@@ -103,10 +103,10 @@ public class JSampleHcdHandlers extends JComponentHandlers {
 
     //#publish
     private int counter = 0;
-    private Event incrementCounterEvent() {
+    private Optional<Event> incrementCounterEvent() {
         counter += 1;
         Parameter<Integer> param = JKeyType.IntKey().make("counter").set(counter);
-        return new SystemEvent(cswCtx.componentInfo().prefix(), new EventName("HcdCounter")).add(param);
+        return Optional.of(new SystemEvent(cswCtx.componentInfo().prefix(), new EventName("HcdCounter")).add(param));
     }
 
     private Cancellable publishCounter() {

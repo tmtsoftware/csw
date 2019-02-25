@@ -57,7 +57,7 @@ class KafkaFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     val testProbe   = TestProbe[PublishFailure]()(typedActorSystem)
     val failedEvent = Utils.makeEvent(1)
 
-    publisher.publish(failedEvent, 20.millis, failure ⇒ testProbe.ref ! failure)
+    publisher.publish(Some(failedEvent), 20.millis, failure ⇒ testProbe.ref ! failure)
 
     val failure = testProbe.expectMessageType[PublishFailure]
 
@@ -70,7 +70,7 @@ class KafkaFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     val testProbe   = TestProbe[PublishFailure]()(typedActorSystem)
     val failedEvent = Utils.makeEvent(1)
 
-    publisher.publishAsync(Future.successful(failedEvent), 20.millis, failure ⇒ testProbe.ref ! failure)
+    publisher.publishAsync(Future.successful(Some(failedEvent)), 20.millis, failure ⇒ testProbe.ref ! failure)
 
     val failure = testProbe.expectMessageType[PublishFailure]
 

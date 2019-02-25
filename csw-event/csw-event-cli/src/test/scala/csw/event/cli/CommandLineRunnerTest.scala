@@ -26,7 +26,7 @@ class CommandLineRunnerTest extends SeedData with Eventually {
     var publishedEvents: mutable.Queue[Event] = mutable.Queue.empty
     val eventsGroup: immutable.Seq[Event]     = events(eventName)
 
-    def generate: Event = {
+    def generate: Option[Event] = Option {
       val event = eventsGroup(counter)
       counter += 1
       publishedEvents.enqueue(event)

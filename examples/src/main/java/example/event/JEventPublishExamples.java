@@ -13,6 +13,7 @@ import csw.params.core.models.Prefix;
 import csw.event.client.internal.commons.javawrappers.JEventService;
 
 import java.time.Duration;
+import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 
 public class JEventPublishExamples {
@@ -56,9 +57,9 @@ public class JEventPublishExamples {
     }
 
     // this holds the logic for event generation, could be based on some computation or current state of HCD
-    private Event eventGenerator(Event baseEvent) {
+    private Optional<Event> eventGenerator(Event baseEvent) {
         // add logic here to create a new event and return the same
-        return baseEvent;
+        return Optional.ofNullable(baseEvent);
     }
     //#event-generator
 }

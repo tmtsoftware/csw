@@ -107,7 +107,7 @@ public class JEventPublisherTest extends TestNGSuite {
         counter = -1;
         cancellable = publisher.publish(() -> {
             counter += 1;
-            return events.get(counter);
+            return Optional.ofNullable(events.get(counter));
         }, Duration.ofMillis(10));
 
         Thread.sleep(1000);
@@ -164,7 +164,7 @@ public class JEventPublisherTest extends TestNGSuite {
         counter = -1;
         cancellable = publisher.publishAsync(() -> {
             counter += 1;
-            return CompletableFuture.completedFuture(events.get(counter));
+            return CompletableFuture.completedFuture(Optional.ofNullable(events.get(counter)));
         }, Duration.ofMillis(10));
 
         Thread.sleep(1000);

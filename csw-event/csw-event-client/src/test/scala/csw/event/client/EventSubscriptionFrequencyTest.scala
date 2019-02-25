@@ -56,7 +56,7 @@ class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Even
     var publishedEvents: mutable.Queue[Event] = mutable.Queue.empty
     val eventsGroup: immutable.Seq[Event]     = events(eventName)
 
-    def generator: Event = {
+    def generator: Option[Event] = Option {
       counter += 1
       val event = eventsGroup(counter)
       publishedEvents.enqueue(event)

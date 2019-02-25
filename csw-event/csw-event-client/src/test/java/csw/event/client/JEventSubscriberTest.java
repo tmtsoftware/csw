@@ -56,8 +56,8 @@ public class JEventSubscriberTest extends TestNGSuite {
     private int counter = 0;
     private List<Event> events = getEvents();
 
-    private Supplier<Event> eventGenerator() {
-        return () -> events.get(counter++);
+    private Supplier<Optional<Event>> eventGenerator() {
+        return () -> Optional.ofNullable(events.get(counter++));
     }
 
     @AfterSuite

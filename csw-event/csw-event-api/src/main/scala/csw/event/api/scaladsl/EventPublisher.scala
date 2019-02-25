@@ -71,7 +71,7 @@ trait EventPublisher {
    * @param every frequency with which the events are to be published
    * @return a handle to cancel the event generation through `eventGenerator`
    */
-  def publish(eventGenerator: => Event, every: FiniteDuration): Cancellable
+  def publish(eventGenerator: => Option[Event], every: FiniteDuration): Cancellable
 
   /**
    * Publish [[csw.params.events.Event]] from an `eventGenerator` function, which will be started at the specified `startTime` and will be executed at `every` frequency.
@@ -86,7 +86,7 @@ trait EventPublisher {
    * @param every frequency with which the events are to be published
    * @return a handle to cancel the event generation through `eventGenerator`
    */
-  def publish(eventGenerator: => Event, startTime: TMTTime, every: FiniteDuration): Cancellable
+  def publish(eventGenerator: => Option[Event], startTime: TMTTime, every: FiniteDuration): Cancellable
 
   /**
    * Publish [[csw.params.events.Event]] from an `eventGenerator` function, which will be executed at `every` frequency. Also, provide `onError` callback
@@ -104,7 +104,7 @@ trait EventPublisher {
    * @param onError a callback to execute for each event for which publishing failed
    * @return a handle to cancel the event generation through `eventGenerator`
    */
-  def publish(eventGenerator: ⇒ Event, every: FiniteDuration, onError: PublishFailure ⇒ Unit): Cancellable
+  def publish(eventGenerator: => Option[Event], every: FiniteDuration, onError: PublishFailure ⇒ Unit): Cancellable
 
   /**
    * Publish [[csw.params.events.Event]] from an `eventGenerator` function, which will be started at the specified `startTime` and will be executed at `every` frequency.
@@ -123,7 +123,10 @@ trait EventPublisher {
    * @param onError a callback to execute for each event for which publishing failed
    * @return a handle to cancel the event generation through `eventGenerator`
    */
-  def publish(eventGenerator: ⇒ Event, startTime: TMTTime, every: FiniteDuration, onError: PublishFailure ⇒ Unit): Cancellable
+  def publish(eventGenerator: => Option[Event],
+              startTime: TMTTime,
+              every: FiniteDuration,
+              onError: PublishFailure ⇒ Unit): Cancellable
 
   /**
    * Publish [[csw.params.events.Event]] from an `eventGenerator` function, which will be executed at `every` frequency. Also, provide `onError` callback
@@ -138,7 +141,7 @@ trait EventPublisher {
    * @param every frequency with which the events are to be published
    * @return a handle to cancel the event generation through `eventGenerator`
    */
-  def publishAsync(eventGenerator: => Future[Event], every: FiniteDuration): Cancellable
+  def publishAsync(eventGenerator: => Future[Option[Event]], every: FiniteDuration): Cancellable
 
   /**
    * Publish [[csw.params.events.Event]] from an `eventGenerator` function, which will be started at the specified `startTime` and will be executed at `every` frequency.
@@ -154,7 +157,7 @@ trait EventPublisher {
    * @param every frequency with which the events are to be published
    * @return a handle to cancel the event generation through `eventGenerator`
    */
-  def publishAsync(eventGenerator: => Future[Event], startTime: TMTTime, every: FiniteDuration): Cancellable
+  def publishAsync(eventGenerator: => Future[Option[Event]], startTime: TMTTime, every: FiniteDuration): Cancellable
 
   /**
    * Publish [[csw.params.events.Event]] from an `eventGenerator` function, which will be executed at `every` frequency. Also, provide `onError` callback
@@ -173,7 +176,7 @@ trait EventPublisher {
    * @param onError a callback to execute for each event for which publishing failed
    * @return a handle to cancel the event generation through `eventGenerator`
    */
-  def publishAsync(eventGenerator: ⇒ Future[Event], every: FiniteDuration, onError: PublishFailure ⇒ Unit): Cancellable
+  def publishAsync(eventGenerator: => Future[Option[Event]], every: FiniteDuration, onError: PublishFailure ⇒ Unit): Cancellable
 
   /**
    * Publish [[csw.params.events.Event]] from an `eventGenerator` function, which will be started at the specified `startTime` and will be executed at `every` frequency.
@@ -194,10 +197,10 @@ trait EventPublisher {
    * @return a handle to cancel the event generation through `eventGenerator`
    */
   def publishAsync(
-      eventGenerator: ⇒ Future[Event],
+      eventGenerator: => Future[Option[Event]],
       startTime: TMTTime,
       every: FiniteDuration,
-      onError: PublishFailure ⇒ Unit
+      onError: PublishFailure => Unit
   ): Cancellable
 
   /**

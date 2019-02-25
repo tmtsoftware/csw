@@ -24,6 +24,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -69,11 +70,11 @@ public class JEventSubscriptionFrequencyTest extends TestNGSuite {
             this.eventsGroup = getEventsWithName(eventName);
         }
 
-        Supplier<Event> generator() {
+        Supplier<Optional<Event>> generator() {
                 return () -> {
                     Event event = eventsGroup.get(counter++);
                     publishedEvents.add(event);
-                    return event;
+                    return Optional.ofNullable(event);
                 };
         }
     }

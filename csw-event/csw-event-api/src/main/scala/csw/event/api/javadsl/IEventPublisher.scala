@@ -1,6 +1,7 @@
 package csw.event.api.javadsl
 
 import java.time.Duration
+import java.util.Optional
 import java.util.concurrent.CompletableFuture
 import java.util.function.{Consumer, Supplier}
 
@@ -71,7 +72,7 @@ trait IEventPublisher {
    * @param every frequency with which the events are to be published
    * @return a handle to cancel the event generation through `eventGenerator`
    */
-  def publish(eventGenerator: Supplier[Event], every: Duration): Cancellable
+  def publish(eventGenerator: Supplier[Optional[Event]], every: Duration): Cancellable
 
   /**
    * Publish [[csw.params.events.Event]] from an `eventGenerator` supplier, which will be started at the specified `startTime` and will be executed at `every` frequency.
@@ -86,7 +87,7 @@ trait IEventPublisher {
    * @param every frequency with which the events are to be published
    * @return a handle to cancel the event generation through `eventGenerator`
    */
-  def publish(eventGenerator: Supplier[Event], startTime: TMTTime, every: Duration): Cancellable
+  def publish(eventGenerator: Supplier[Optional[Event]], startTime: TMTTime, every: Duration): Cancellable
 
   /**
    * Publish [[csw.params.events.Event]] from an `eventGenerator` supplier, which will be executed at `every` frequency. Also, provide `onError` consumer to
@@ -104,7 +105,7 @@ trait IEventPublisher {
    * @param onError a consumer which defines an operation for each event for which publishing failed
    * @return a handle to cancel the event generation through `eventGenerator`
    */
-  def publish(eventGenerator: Supplier[Event], every: Duration, onError: Consumer[PublishFailure]): Cancellable
+  def publish(eventGenerator: Supplier[Optional[Event]], every: Duration, onError: Consumer[PublishFailure]): Cancellable
 
   /**
    * Publish [[csw.params.events.Event]] from an `eventGenerator` supplier, which will be started at the specified `startTime` and will be executed at `every` frequency.
@@ -124,7 +125,7 @@ trait IEventPublisher {
    * @return a handle to cancel the event generation through `eventGenerator`
    */
   def publish(
-      eventGenerator: Supplier[Event],
+      eventGenerator: Supplier[Optional[Event]],
       startTime: TMTTime,
       every: Duration,
       onError: Consumer[PublishFailure]
@@ -143,7 +144,7 @@ trait IEventPublisher {
    * @param every frequency with which the events are to be published
    * @return a handle to cancel the event generation through `eventGenerator`
    */
-  def publishAsync(eventGenerator: Supplier[CompletableFuture[Event]], every: Duration): Cancellable
+  def publishAsync(eventGenerator: Supplier[CompletableFuture[Optional[Event]]], every: Duration): Cancellable
 
   /**
    * Publish [[csw.params.events.Event]] from an `eventGenerator` supplier, which will be started at the specified `startTime` and will be executed at `every` frequency.
@@ -159,7 +160,7 @@ trait IEventPublisher {
    * @param every frequency with which the events are to be published
    * @return a handle to cancel the event generation through `eventGenerator`
    */
-  def publishAsync(eventGenerator: Supplier[CompletableFuture[Event]], startTime: TMTTime, every: Duration): Cancellable
+  def publishAsync(eventGenerator: Supplier[CompletableFuture[Optional[Event]]], startTime: TMTTime, every: Duration): Cancellable
 
   /**
    * Publish [[csw.params.events.Event]] from an `eventGenerator` supplier, which will be executed at `every` frequency. Also, provide `onError` consumer to
@@ -179,7 +180,7 @@ trait IEventPublisher {
    * @return a handle to cancel the event generation through `eventGenerator`
    */
   def publishAsync(
-      eventGenerator: Supplier[CompletableFuture[Event]],
+      eventGenerator: Supplier[CompletableFuture[Optional[Event]]],
       every: Duration,
       onError: Consumer[PublishFailure]
   ): Cancellable
@@ -203,7 +204,7 @@ trait IEventPublisher {
    * @return a handle to cancel the event generation through `eventGenerator`
    */
   def publishAsync(
-      eventGenerator: Supplier[CompletableFuture[Event]],
+      eventGenerator: Supplier[CompletableFuture[Optional[Event]]],
       startTime: TMTTime,
       every: Duration,
       onError: Consumer[PublishFailure]

@@ -55,38 +55,38 @@ class KafkaPublisher(producerSettings: Future[ProducerSettings[String, Array[Byt
   override def publish[Mat](source: Source[Event, Mat], onError: PublishFailure ⇒ Unit): Mat =
     eventPublisherUtil.publishFromSource(source, parallelism, publishInternal, Some(onError))
 
-  override def publish(eventGenerator: ⇒ Event, every: FiniteDuration): Cancellable =
+  override def publish(eventGenerator: ⇒ Option[Event], every: FiniteDuration): Cancellable =
     publish(eventPublisherUtil.getEventSource(Future.successful(eventGenerator), defaultInitialDelay, every))
 
-  override def publish(eventGenerator: => Event, startTime: TMTTime, every: FiniteDuration): Cancellable =
+  override def publish(eventGenerator: => Option[Event], startTime: TMTTime, every: FiniteDuration): Cancellable =
     publish(eventPublisherUtil.getEventSource(Future.successful(eventGenerator), delayFrom(startTime), every))
 
-  override def publish(eventGenerator: ⇒ Event, every: FiniteDuration, onError: PublishFailure ⇒ Unit): Cancellable =
+  override def publish(eventGenerator: ⇒ Option[Event], every: FiniteDuration, onError: PublishFailure ⇒ Unit): Cancellable =
     publish(eventPublisherUtil.getEventSource(Future.successful(eventGenerator), defaultInitialDelay, every), onError)
 
   override def publish(
-      eventGenerator: => Event,
+      eventGenerator: => Option[Event],
       startTime: TMTTime,
       every: FiniteDuration,
       onError: PublishFailure => Unit
   ): Cancellable =
     publish(eventPublisherUtil.getEventSource(Future.successful(eventGenerator), delayFrom(startTime), every), onError)
 
-  override def publishAsync(eventGenerator: => Future[Event], every: FiniteDuration): Cancellable =
+  override def publishAsync(eventGenerator: => Future[Option[Event]], every: FiniteDuration): Cancellable =
     publish(eventPublisherUtil.getEventSource(eventGenerator, defaultInitialDelay, every))
 
-  override def publishAsync(eventGenerator: => Future[Event], startTime: TMTTime, every: FiniteDuration): Cancellable =
+  override def publishAsync(eventGenerator: => Future[Option[Event]], startTime: TMTTime, every: FiniteDuration): Cancellable =
     publish(eventPublisherUtil.getEventSource(eventGenerator, delayFrom(startTime), every))
 
   override def publishAsync(
-      eventGenerator: => Future[Event],
+      eventGenerator: => Future[Option[Event]],
       every: FiniteDuration,
       onError: PublishFailure => Unit
   ): Cancellable =
     publish(eventPublisherUtil.getEventSource(eventGenerator, defaultInitialDelay, every), onError)
 
   override def publishAsync(
-      eventGenerator: => Future[Event],
+      eventGenerator: => Future[Option[Event]],
       startTime: TMTTime,
       every: FiniteDuration,
       onError: PublishFailure => Unit

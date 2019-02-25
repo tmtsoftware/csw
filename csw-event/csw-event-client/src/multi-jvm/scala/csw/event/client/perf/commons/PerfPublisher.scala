@@ -3,11 +3,11 @@ package csw.event.client.perf.commons
 import akka.Done
 import akka.actor.Cancellable
 import akka.stream.scaladsl.{Keep, Source}
-import csw.params.events.{Event, EventName, SystemEvent}
-import csw.params.core.models.Prefix
+import csw.event.api.scaladsl.EventPublisher
 import csw.event.client.perf.utils.EventUtils._
 import csw.event.client.perf.wiring.{TestConfigs, TestWiring}
-import csw.event.api.scaladsl.EventPublisher
+import csw.params.core.models.Prefix
+import csw.params.events.{EventName, SystemEvent}
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
@@ -38,7 +38,7 @@ class PerfPublisher(
   private var cancellable: Cancellable = _
   private var remaining: Long          = totalMessages
 
-  private def eventGenerator(): Event = {
+  private def eventGenerator(): Option[SystemEvent] = Option {
     eventId += 1
     // send extra two end events in case one goes missing
     // subscriber stops listening on receiving first end event, hence not affected by publisher publishing multiple end events

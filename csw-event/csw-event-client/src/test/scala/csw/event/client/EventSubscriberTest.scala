@@ -75,7 +75,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   }
 
   var eventId = 0
-  def eventGenerator(): Event = {
+  def eventGenerator(): Option[Event] = Option {
     eventId += 1
     events(eventId)
   }

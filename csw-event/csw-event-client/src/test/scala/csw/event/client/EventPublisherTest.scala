@@ -86,7 +86,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     var counter                      = -1
     val events: immutable.Seq[Event] = for (i ← 1 to 10) yield makeEvent(i)
 
-    def eventGenerator(): Event = {
+    def eventGenerator(): Option[Event] = Option {
       counter += 1
       events(counter)
     }
@@ -135,9 +135,9 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     var counter                      = -1
     val events: immutable.Seq[Event] = for (i ← 31 to 41) yield makeEventWithPrefix(i, Prefix("test"))
 
-    def eventGenerator(): Future[Event] = Future {
+    def eventGenerator(): Future[Option[Event]] = Future {
       counter += 1
-      events(counter)
+      Some(events(counter))
     }
 
     val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
@@ -199,9 +199,9 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     var counter                      = -1
     val events: immutable.Seq[Event] = for (i ← 31 to 41) yield makeEventWithPrefix(i, Prefix("test2"))
 
-    def eventGenerator(): Future[Event] = Future {
+    def eventGenerator(): Future[Option[Event]] = Future {
       counter += 1
-      events(counter)
+      Some(events(counter))
     }
 
     val queue: mutable.Queue[Event] = new mutable.Queue[Event]()

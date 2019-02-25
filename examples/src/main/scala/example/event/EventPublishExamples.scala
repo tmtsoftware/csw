@@ -50,9 +50,9 @@ class EventPublishExamples(eventService: EventService, log: Logger) {
       val interval         = 100.millis
 
       // this holds the logic for event generation, could be based on some computation or current state of HCD
-      def eventGenerator(): Event = baseEvent match {
-        case e: SystemEvent  ⇒ e.copy(eventId = Id(), eventTime = UTCTime.now())
-        case e: ObserveEvent ⇒ e.copy(eventId = Id(), eventTime = UTCTime.now())
+      def eventGenerator(): Option[Event] = baseEvent match {
+        case e: SystemEvent  ⇒ Some(e.copy(eventId = Id(), eventTime = UTCTime.now()))
+        case e: ObserveEvent ⇒ Some(e.copy(eventId = Id(), eventTime = UTCTime.now()))
       }
 
       publisher.publish(eventGenerator(), interval)

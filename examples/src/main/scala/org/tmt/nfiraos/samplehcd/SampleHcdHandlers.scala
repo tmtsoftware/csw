@@ -71,7 +71,7 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   import scala.concurrent.duration._
   private def publishCounter(): Cancellable = {
     var counter = 0
-    def incrementCounterEvent() = {
+    def incrementCounterEvent() = Option {
       counter += 1
       val param: Parameter[Int] = KeyType.IntKey.make("counter").set(counter)
       SystemEvent(componentInfo.prefix, EventName("HcdCounter")).add(param)

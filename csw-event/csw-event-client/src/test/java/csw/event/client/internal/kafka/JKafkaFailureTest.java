@@ -15,6 +15,7 @@ import org.scalatest.junit.JUnitSuite;
 
 import java.time.Duration;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -70,7 +71,7 @@ public class JKafkaFailureTest extends JUnitSuite {
         TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.actorSystem()));
         Event event = Utils.makeEvent(1);
 
-        publisher.publish(() -> event, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
+        publisher.publish(() -> Optional.ofNullable(event), Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
 
         PublishFailure failure = testProbe.expectMessageClass(PublishFailure.class);
         Assert.assertEquals(failure.event(), event);
@@ -82,7 +83,7 @@ public class JKafkaFailureTest extends JUnitSuite {
         TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.actorSystem()));
         Event event = Utils.makeEvent(1);
 
-        publisher.publishAsync(() -> CompletableFuture.completedFuture(event), Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
+        publisher.publishAsync(() -> CompletableFuture.completedFuture(Optional.ofNullable(event)), Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
 
         PublishFailure failure = testProbe.expectMessageClass(PublishFailure.class);
         Assert.assertEquals(failure.event(), event);

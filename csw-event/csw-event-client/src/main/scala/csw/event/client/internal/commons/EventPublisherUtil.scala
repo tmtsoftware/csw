@@ -32,7 +32,7 @@ class EventPublisherUtil(implicit ec: ExecutionContext, mat: Materializer) {
 
   // create an akka stream source out of eventGenerator function
   def getEventSource(
-      eventGenerator: => Future[Event],
+      eventGenerator: => Future[Option[Event]],
       initialDelay: FiniteDuration,
       every: FiniteDuration
   ): Source[Event, Cancellable] =
@@ -70,11 +70,13 @@ class EventPublisherUtil(implicit ec: ExecutionContext, mat: Materializer) {
   def shutdown(): Unit = actorRef ! PoisonPill
 
   // log error for any exception from provided eventGenerator
-  private def withErrorLogging(eventGenerator: => Future[Event]): Future[Event] =
-    eventGenerator.recover {
-      case NonFatal(ex) ⇒
-        logger.error(ex.getMessage, ex = ex)
-        throw ex
-    }
+  private def withErrorLogging(eventGenerator: => Future[Option[Event]]): Future[Event] =
+    eventGenerator
+      .collect { case Some(event) => event }
+      .recover {
+        case NonFatal(ex) ⇒
+          logger.error(ex.getMessage, ex = ex)
+          throw ex
+      }
 
 }
