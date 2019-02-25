@@ -31,12 +31,13 @@ class EventPublisherUtil(implicit ec: ExecutionContext, mat: Materializer) {
       .runForeach(_ => ())
 
   // create an akka stream source out of eventGenerator function
-  def getEventSource(
+  def eventSource(
       eventGenerator: => Future[Option[Event]],
+      parallelism: Int,
       initialDelay: FiniteDuration,
       every: FiniteDuration
   ): Source[Event, Cancellable] =
-    Source.tick(initialDelay, every, ()).mapAsync(1)(x => withErrorLogging(eventGenerator))
+    Source.tick(initialDelay, every, ()).mapAsync(parallelism)(_ => withErrorLogging(eventGenerator))
 
   def publishFromSource[Mat](
       source: Source[Event, Mat],
