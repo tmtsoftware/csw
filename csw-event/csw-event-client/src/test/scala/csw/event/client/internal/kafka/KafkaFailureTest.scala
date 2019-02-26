@@ -5,6 +5,9 @@ import akka.stream.scaladsl.Source
 import csw.event.api.exceptions.PublishFailure
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.helpers.Utils
+import csw.params.events.Event
+import csw.time.core.models.UTCTime
+import io.lettuce.core.RedisException
 import org.apache.kafka.common.errors.RecordTooLargeException
 import org.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -77,4 +80,21 @@ class KafkaFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     failure.event shouldBe failedEvent
     failure.getCause shouldBe a[RecordTooLargeException]
   }
+
+  test("should invoke onError callback on publish failure [eventGenerator API] with start time and future of event generator") {
+    val testProbe   = TestProbe[PublishFailure]()(typedActorSystem)
+    val failedEvent = Utils.makeEvent(1)
+
+    def eventGenerator(): Future[Option[Event]] = Future.successful(Some(failedEvent))
+
+    val startTime = UTCTime(UTCTime.now().value.plusMillis(500))
+
+    publisher.publishAsync(eventGenerator(), startTime, 20.millis, failure ⇒ testProbe.ref ! failure)
+
+    val failure = testProbe.expectMessageType[PublishFailure]
+
+    failure.event shouldBe failedEvent
+    failure.getCause shouldBe a[RecordTooLargeException]
+  }
+
 }

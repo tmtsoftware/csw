@@ -5,13 +5,18 @@ import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.event.api.exceptions.{EventServerNotAvailable, PublishFailure}
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.helpers.Utils
-import csw.event.client.helpers.Utils.makeDistinctEvent
-import csw.params.events.EventKey
+import csw.event.client.helpers.Utils.{makeDistinctEvent, makeEventWithPrefix}
+import csw.event.client.internal.wiring.BaseProperties
+import csw.params.core.models.Prefix
+import csw.params.events.{Event, EventKey}
+import csw.time.core.models.UTCTime
 import io.lettuce.core.ClientOptions.DisconnectedBehavior
 import io.lettuce.core.{ClientOptions, RedisException}
 import org.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import org.testng.annotations.Test
 
+import scala.collection.{immutable, mutable}
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 import scala.util.Random
@@ -122,6 +127,27 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     val event = Utils.makeEvent(1)
 
     publisher.publishAsync(Future.successful(Some(event)), 20.millis, failure ⇒ testProbe.ref ! failure)
+
+    val failure = testProbe.expectMessageType[PublishFailure]
+    failure.event shouldBe event
+    failure.getCause shouldBe a[RedisException]
+  }
+
+  test("should invoke onError callback on publish failure [eventGenerator API] with start time and future of event generator") {
+    import redisTestProps._
+    val publisher = eventService.makeNewPublisher()
+    val testProbe = TestProbe[PublishFailure]()(typedActorSystem)
+    val event     = Utils.makeEvent(1)
+
+    publisher.publish(event).await
+
+    publisher.shutdown().await
+
+    def eventGenerator(): Future[Option[Event]] = Future.successful(Some(event))
+
+    val startTime = UTCTime(UTCTime.now().value.plusMillis(500))
+
+    publisher.publishAsync(eventGenerator(), startTime, 20.millis, failure ⇒ testProbe.ref ! failure)
 
     val failure = testProbe.expectMessageType[PublishFailure]
     failure.event shouldBe event
