@@ -27,6 +27,8 @@ import scala.util.Random
 //DEOPSCSW-337: Subscribe to an event based on prefix
 //DEOPSCSW-349: Event Service API creation
 //DEOPSCSW-395: Provide EventService handle to component developers
+//DEOPSCSW-515: Include Start Time in API
+//DEOPSCSW-516: Optionally Publish - API Change
 class EventPublisherTest extends TestNGSuite with Matchers with Eventually with EmbeddedKafka {
 
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
@@ -192,6 +194,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     testProbe.expectMessage(event5)
   }
 
+  //DEOPSCSW-515: Include Start Time in API
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_publish_event_via_event_generator_with_start_time(baseProperties: BaseProperties): Unit = {
     import baseProperties._

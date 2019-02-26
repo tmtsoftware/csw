@@ -133,6 +133,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     failure.getCause shouldBe a[RedisException]
   }
 
+  //DEOPSCSW-515: Include Start Time in API
   test("should invoke onError callback on publish failure [eventGenerator API] with start time and future of event generator") {
     import redisTestProps._
     val publisher = eventService.makeNewPublisher()

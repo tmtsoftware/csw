@@ -81,6 +81,7 @@ class KafkaFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     failure.getCause shouldBe a[RecordTooLargeException]
   }
 
+  //DEOPSCSW-515: Include Start Time in API
   test("should invoke onError callback on publish failure [eventGenerator API] with start time and future of event generator") {
     val testProbe   = TestProbe[PublishFailure]()(typedActorSystem)
     val failedEvent = Utils.makeEvent(1)
