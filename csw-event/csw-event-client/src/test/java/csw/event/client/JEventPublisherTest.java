@@ -16,6 +16,7 @@ import csw.params.core.models.Prefix;
 import csw.params.events.Event;
 import csw.params.events.Event$;
 import csw.params.events.EventKey;
+import csw.time.core.models.UTCTime;
 import org.scalatest.testng.TestNGSuite;
 import org.testng.Assert;
 import org.testng.annotations.AfterSuite;
@@ -213,5 +214,38 @@ public class JEventPublisherTest extends TestNGSuite {
         testProbe.expectMessage(event3);
         testProbe.expectMessage(event4);
         testProbe.expectMessage(event5);
+    }
+
+    //DEOPSCSW-515: Include Start Time in API
+    @Test(dataProvider = "event-service-provider")
+    public void should_be_able_to_publish_event_via_event_generator_with_start_time(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
+
+        List<Event> events = new ArrayList<>();
+        for(int i = 31; i < 41; i++){
+            events.add(Utils.makeEventWithPrefix(i, new Prefix("start.time.test")));
+        }
+
+        EventKey eventKey = events.get(0).eventKey();
+
+        List<Event> queue = new ArrayList<>();
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(Collections.singleton(eventKey)).toMat(Sink.foreach(queue::add), Keep.left()).run(baseProperties.resumingMat());
+        subscription.ready().get(10, TimeUnit.SECONDS);
+        Thread.sleep(500); // Needed for getting the latest event
+
+        IEventPublisher publisher = baseProperties.jPublisher();
+        counter = -1;
+        cancellable = publisher.publishAsync(() -> {
+            counter += 1;
+            return CompletableFuture.completedFuture(Optional.ofNullable(events.get(counter)));
+        },new UTCTime(UTCTime.now().value().plusSeconds(1)), Duration.ofMillis(300));
+
+
+        Thread.sleep(2000);
+        cancellable.cancel();
+
+        Assert.assertEquals(queue.size(), 5);
+
+        events.add(0, Event$.MODULE$.invalidEvent(eventKey));
+        Assert.assertTrue(queue.containsAll(events.subList(0,5)));
     }
 }
