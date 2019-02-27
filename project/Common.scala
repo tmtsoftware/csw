@@ -39,6 +39,11 @@ object Common extends AutoPlugin {
       if (cycleCheckEnabled && detectCycles.value) "-P:acyclic:force" else ""
     ),
     javacOptions in (Compile, doc) ++= Seq("-Xdoclint:none"),
+    javacOptions in doc ++= (
+      if (System.getProperty("java.version").startsWith("1."))
+        Seq()
+      else Seq("--ignore-source-errors")
+    ),
     testOptions in Test ++= Seq(
       // show full stack traces and test case durations
       Tests.Argument("-oDF")

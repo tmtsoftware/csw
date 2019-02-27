@@ -420,7 +420,7 @@ lazy val `csw-time-core` =  crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .in(file("csw-time/csw-time-core"))
   .dependsOn(`csw-time-clock`)
-  .enablePlugins(PublishBintray, GenJavadocPlugin)
+  .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.TimeCore.value,
     fork := false
@@ -435,6 +435,7 @@ lazy val `csw-time-scheduler` = project
     `csw-time-core-jvm` % "compile->compile;test->test",
     `csw-logging-client`
   )
+  .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.TimeScheduler.value)
 
 lazy val `csw-testkit` = project
@@ -567,7 +568,7 @@ lazy val `csw-aas-http` = project
     libraryDependencies ++= Dependencies.AuthAkkaHttpAdapter.value
   )
 
- lazy val `csw-aas-installed` = project
+lazy val `csw-aas-installed` = project
   .in(file("csw-aas/csw-aas-installed"))
   .dependsOn(`csw-aas-core`, `csw-location-client` % "test->compile")
   .settings(
