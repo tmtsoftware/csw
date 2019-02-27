@@ -22,22 +22,25 @@ trait EventSubscriber {
    * and the stream is stopped after logging appropriately. In all other cases of exception, as per the default behavior, the stream will stop.
    * To avoid that, user should provide a resuming materializer while running the stream.
    *
-   *@note All the other APIs of [[EventSubscriber]] that do not return a [[akka.stream.scaladsl.Source]], internally use the resuming materializer which will ignore the failed event and resume receiving further events.
+   *@note All the other APIs of [[EventSubscriber]] that do not return a [[akka.stream.scaladsl.Source]],
+   *       internally use the resuming materializer which will ignore the failed event and resume receiving further events.
    * @param eventKeys a set of [[csw.params.events.EventKey]] to subscribe to
-   * @return a [[akka.stream.scaladsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides an [[csw.event.api.scaladsl.EventSubscription]]
-   *         which can be used to unsubscribe from all the Event Keys which were subscribed to
+   * @return a [[akka.stream.scaladsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides
+   *         an [[csw.event.api.scaladsl.EventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
   def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription]
 
   /**
-   * Subscribe to multiple eventKeys and receive events at `every` frequency according to the specified `mode` (RateAdapter or RateLimiter). The latest events available for the given
-   * Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
+   * Subscribe to multiple eventKeys and receive events at `every` frequency according to the specified `mode` (RateAdapter or RateLimiter).
+   * The latest events available for the given Event Keys will be received first.
+   * If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
    *
    * At the time of invocation, in case the underlying server is not available, [[csw.event.api.exceptions.EventServerNotAvailable]] exception is thrown
    * and the stream is stopped after logging appropriately. In all other cases of exception, as per the default behavior, the stream will stop.
    * To avoid that, user should provide a resuming materializer while running the stream.
    *
-   * @note All the other APIs of [[EventSubscriber]] that do not return a [[akka.stream.scaladsl.Source]], internally use the resuming materializer which will ignore the failed event and resume receiving further events.
+   * @note All the other APIs of [[EventSubscriber]] that do not return a [[akka.stream.scaladsl.Source]],
+   *       internally use the resuming materializer which will ignore the failed event and resume receiving further events.
    * @param eventKeys a set of [[csw.params.events.EventKey]] to subscribe to
    * @param every the duration which determines the frequency with which events are received
    * @param mode an appropriate [[csw.event.api.scaladsl.SubscriptionMode]] to control the behavior of rate of events w.r.t. the given frequency.
@@ -48,9 +51,11 @@ trait EventSubscriber {
   def subscribe(eventKeys: Set[EventKey], every: FiniteDuration, mode: SubscriptionMode): Source[Event, EventSubscription]
 
   /**
-   * Subscribes an asynchronous callback function to events from multiple eventKeys. The callback is of event => future
-   * type, so that blocking operation within callback can be placed in the future (separate thread than main thread). The latest events available for the given
-   * Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
+   * Subscribes an asynchronous callback function to events from multiple eventKeys. The callback is of type event => future
+   * and it ensures that the event callbacks are called sequentially in such a way that the subsequent execution will
+   * start only after the prior one completes. This API gives the guarantee of ordered execution of the asynchronous callbacks.
+   * The latest events available for the given Event Keys will be received first.
+   * If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
    *
    * At the time of invocation, in case the underlying server is not available, [[csw.event.api.exceptions.EventServerNotAvailable]] exception is thrown
    * and the subscription is stopped after logging appropriately. [[csw.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine
@@ -100,8 +105,9 @@ trait EventSubscriber {
   def subscribeCallback(eventKeys: Set[EventKey], callback: Event => Unit): EventSubscription
 
   /**
-   * Overload for above `subscribeCallback` for receiving event at a `every` frequency according to the specified `mode`. The latest events available for the given
-   * Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
+   * Overload for above `subscribeCallback` for receiving event at a `every` frequency according to the specified `mode`.
+   * The latest events available for the given Event Keys will be received first.
+   * If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
    *
    * At the time of invocation, in case the underlying server is not available, [[csw.event.api.exceptions.EventServerNotAvailable]] exception is thrown
    * and the subscription is stopped after logging appropriately. [[csw.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine this
@@ -136,8 +142,9 @@ trait EventSubscriber {
   def subscribeActorRef(eventKeys: Set[EventKey], actorRef: ActorRef[Event]): EventSubscription
 
   /**
-   * Overload for above `subscribeActorRef` for receiving event at a `every` frequency according to the specified `mode`. The latest events available for the given
-   * Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
+   * Overload for above `subscribeActorRef` for receiving event at a `every` frequency according to the specified `mode`.
+   * The latest events available for the given Event Keys will be received first.
+   * If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
    *
    * At the time of invocation, in case the underlying server is not available, [[csw.event.api.exceptions.EventServerNotAvailable]] exception is thrown
    * and the subscription is stopped after logging appropriately. [[csw.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine this
@@ -171,14 +178,15 @@ trait EventSubscriber {
    *                  - h*llo subscribes to hllo and heeeello
    *                  - h[ae]llo subscribes to hello and hallo, but not hillo
    *                  Use \ to escape special characters if you want to match them verbatim.
-   * @return a [[akka.stream.scaladsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides an [[csw.event.api.scaladsl.EventSubscription]]
-   *         which can be used to unsubscribe from all the Event Keys which were subscribed to
+   * @return a [[akka.stream.scaladsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides
+   *         an [[csw.event.api.scaladsl.EventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
   def pSubscribe(subsystem: Subsystem, pattern: String): Source[Event, EventSubscription]
 
   /**
-   * Subscribes a callback to events from Event Keys specified using a subsystem and a pattern to match the remaining Event Key. The latest events available for the given
-   * Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
+   * Subscribes a callback to events from Event Keys specified using a subsystem and a pattern to match the remaining Event Key.
+   * The latest events available for the given Event Keys will be received first.
+   * If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
    *
    * At the time of invocation, in case the underlying server is not available, [[csw.event.api.exceptions.EventServerNotAvailable]] exception is thrown
    * and the subscription is stopped after logging appropriately. [[csw.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine this

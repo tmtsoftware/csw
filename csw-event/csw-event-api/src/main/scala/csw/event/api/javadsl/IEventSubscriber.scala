@@ -48,9 +48,12 @@ trait IEventSubscriber {
   def subscribe(eventKeys: util.Set[EventKey], every: Duration, mode: SubscriptionMode): Source[Event, IEventSubscription]
 
   /**
-   * Subscribes an asynchronous callback function to events from multiple eventKeys. The callback is of event => completable future
-   * type, so that blocking operation within callback can be placed in the completable future (separate thread than main thread). The latest events available
-   * for the given Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
+   *
+   * Subscribes an asynchronous callback function to events from multiple eventKeys. The callback is of type event => future
+   * and it ensures that the event callbacks are called sequentially in such a way that the subsequent execution will
+   * start only after the prior one completes. This API gives the guarantee of ordered execution of the asynchronous callbacks.
+   * The latest events available for the given Event Keys will be received first.
+   * If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
    *
    * At the time of invocation, in case the underlying server is not available, [[csw.event.api.exceptions.EventServerNotAvailable]] exception is thrown
    * and the subscription is stopped after logging appropriately. [[csw.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine

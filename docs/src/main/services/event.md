@@ -135,9 +135,8 @@ Java
 
 ### With Asynchronous Callback
 
-The above example will run into concurrency issues if the callback has an shared state or asynchronous behavior. 
-To avoid that use the following API which will give the guarantee of ordered execution of these asynchronous callbacks.
-In this case, no further processing occurs until the Future completes.
+This API is useful when you want to subscribe to events with a callback that has an asynchronous behavior. The callback is of type event => future and it ensures that the event callbacks are called sequentially in such a way that the subsequent execution will start only after the prior one finishes. 
+This API gives the guarantee of ordered execution of the asynchronous callbacks.
 
 Scala
 :   @@snip [EventSubscribeExamples.scala](../../../../examples/src/main/scala/example/event/EventSubscribeExamples.scala) { #with-async-callback }

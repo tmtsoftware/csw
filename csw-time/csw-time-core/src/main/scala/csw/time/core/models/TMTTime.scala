@@ -30,7 +30,7 @@ object TMTTime {
 
 /**
  * Represents an instantaneous point in time in the UTC scale.
- * Does not contain zone information. To represent this instance in various zones, use [[csw.time.client.TMTTimeHelper TMTTimeHelper]].
+ * Does not contain zone information. To represent this instance in various zones, use [[csw.time.scheduler.TMTTimeHelper]].
  *
  * @param value the underlying [[java.time.Instant]]
  */

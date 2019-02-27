@@ -127,7 +127,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     val events: immutable.Seq[Event] = for (i ← 101 to 110) yield makeDistinctEvent(i)
 
     val subscription = subscriber.subscribe(events.map(_.eventKey).toSet).to(Sink.foreach(queue.enqueue(_))).run()
-    subscription.ready.await
+    subscription.ready().await
 
     publisher.publish(Source.fromIterator(() ⇒ events.toIterator))
 
@@ -217,7 +217,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     }
 
     val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
-    val eventKey: EventKey          = events(0).eventKey
+    val eventKey: EventKey          = events.head.eventKey
 
     val subscription = subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](queue.enqueue(_))).run()
     subscription.ready().await
