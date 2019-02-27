@@ -6,9 +6,9 @@ import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.helpers.Utils.{makeDistinctEvent, makeEvent, makeEventWithPrefix}
 import csw.event.client.internal.kafka.KafkaTestProps
-import csw.event.client.internal.redis.RedisTestProps
+import csw.event.client.internal.redis.{InitializationEvent, RedisTestProps}
 import csw.event.client.internal.wiring._
-import csw.params.core.models.Prefix
+import csw.params.core.models.{Prefix, Subsystem}
 import csw.params.events.{Event, EventKey}
 import csw.time.core.models.UTCTime
 import net.manub.embeddedkafka.EmbeddedKafka
@@ -55,6 +55,15 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     Array(redisTestProps),
     Array(kafkaTestProps)
   )
+
+  //DEOPSCSW-659: Investigate initial latency in event service pub sub API for single publish
+  @Test
+  def should_publish_initialization_event_on_publisher_creation(): Unit = {
+    redisTestProps.publisher // access lazy publisher so that it gets evaulated
+    val initEventKey = EventKey(s"${Subsystem.TEST}.init")
+    val initEvent    = redisTestProps.subscriber.get(initEventKey).await
+    initEvent.paramSet shouldBe InitializationEvent.value.paramSet
+  }
 
   //DEOPSCSW-345: Publish events irrespective of subscriber existence
   @Test(dataProvider = "event-service-provider")

@@ -5,18 +5,14 @@ import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.event.api.exceptions.{EventServerNotAvailable, PublishFailure}
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.helpers.Utils
-import csw.event.client.helpers.Utils.{makeDistinctEvent, makeEventWithPrefix}
-import csw.event.client.internal.wiring.BaseProperties
-import csw.params.core.models.Prefix
+import csw.event.client.helpers.Utils.makeDistinctEvent
 import csw.params.events.{Event, EventKey}
 import csw.time.core.models.UTCTime
 import io.lettuce.core.ClientOptions.DisconnectedBehavior
 import io.lettuce.core.{ClientOptions, RedisException}
 import org.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
-import org.testng.annotations.Test
 
-import scala.collection.{immutable, mutable}
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 import scala.util.Random
