@@ -35,8 +35,8 @@
       "units": "NoUnits"
     },
     {
-      "keyName": "timestampKey",
-      "keyType": "TimestampKey",
+      "keyName": "utcTimeKey",
+      "keyType": "UTCTimeKey",
       "values": [
         "1970-01-01T00:00:00Z",
         "2017-09-04T16:28:00.123456789Z"

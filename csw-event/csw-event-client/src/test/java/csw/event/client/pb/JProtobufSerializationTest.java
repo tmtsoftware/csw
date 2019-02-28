@@ -8,6 +8,7 @@ import csw.params.core.generics.Parameter;
 import csw.params.core.models.*;
 import csw.event.client.pb.PbConverter;
 import csw.event.client.pb.TypeMapperSupport;
+import csw.time.core.models.UTCTime;
 import csw_protobuf.events.PbEvent;
 import csw_protobuf.parameter.PbParameter;
 import org.junit.Assert;
@@ -60,7 +61,7 @@ public class JProtobufSerializationTest extends JUnitSuite {
                 {"JRaDecKey", JKeyType.RaDecKey().make("raDecKey").set(new RaDec(10, 20))},
                 {"JStructKey", JKeyType.StructKey().make("structKey").set(new Struct().add(JKeyType.RaDecKey().make("raDecKey").set(new RaDec(10, 20))))},
                 {"JStringKey", JKeyType.StringKey().make("stringKey").set("str1", "str2")},
-                {"JTimestampKey", JKeyType.TimestampKey().make("timestampKey").set(Instant.now())},
+                {"JTimestampKey", JKeyType.UTCTimeKey().make("UTCTimeKey").set(UTCTime.now())},
                 {"JBooleanKey", JKeyType.BooleanKey().make("booleanKey").set(true)},
                 {"JCharKey", JKeyType.CharKey().make("charKey").set('A', 'B')},
                 {"JByteKey", JKeyType.ByteKey().make("byteKey").set(byteData)},

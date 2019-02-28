@@ -111,8 +111,8 @@
     } ],
     "units" : "NoUnits"
   }, {
-    "keyName" : "TimestampKey",
-    "keyType" : "TimestampKey",
+    "keyName" : "UTCTimeKey",
+    "keyType" : "UTCTimeKey",
     "values" : [ "1970-01-01T00:00:00Z", "2017-09-04T19:00:00.123456789Z" ],
     "units" : "second"
   }, {

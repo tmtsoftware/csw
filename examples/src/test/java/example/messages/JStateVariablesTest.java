@@ -10,6 +10,7 @@ import csw.params.core.states.CurrentState;
 import csw.params.core.states.DemandState;
 import csw.params.core.states.StateName;
 import csw.params.javadsl.JKeyType;
+import csw.time.core.models.UTCTime;
 import org.junit.Assert;
 import org.junit.Test;
 import org.scalatest.junit.JUnitSuite;
@@ -35,7 +36,7 @@ public class JStateVariablesTest extends JUnitSuite {
         Key<Character> charKey = JKeyType.CharKey().make("charKey");
         Key<Integer> intKey = JKeyType.IntKey().make("intKey");
         Key<Boolean> booleanKey = JKeyType.BooleanKey().make("booleanKey");
-        Key<Instant> timestampKey = JKeyType.TimestampKey().make("timestampKey");
+        Key<UTCTime> utcTimeKey = JKeyType.UTCTimeKey().make("utcTimeKey");
         Key<String> notUsedKey = JKeyType.StringKey().make("notUsed");
 
 
@@ -46,7 +47,7 @@ public class JStateVariablesTest extends JUnitSuite {
         Parameter<Character> charParam = charKey.set('A', 'B', 'C').withUnits(NoUnits);
         Parameter<Integer> intParam = intKey.set(1, 2, 3).withUnits(meter);
         Parameter<Boolean> booleanParam = booleanKey.set(true, false);
-        Parameter<Instant> timestamp = timestampKey.set(Instant.now());
+        Parameter<UTCTime> timestamp = utcTimeKey.set(UTCTime.now());
 
         //create DemandState and use sequential add
         DemandState ds1 = new DemandState(prefix, new StateName("testStateName")).add(charParam).add(intParam);
@@ -67,14 +68,14 @@ public class JStateVariablesTest extends JUnitSuite {
         Set<String> missingKeys = ds3.jMissingKeys(charKey,
                 intKey,
                 booleanKey,
-                timestampKey,
+                utcTimeKey,
                 notUsedKey);
 
         //remove keys
-        DemandState ds4 = ds3.remove(timestampKey);
+        DemandState ds4 = ds3.remove(utcTimeKey);
 
         //update existing keys - set it back by an hour
-        DemandState ds5 = ds3.add(timestampKey.set(Instant.now().minusSeconds(3600)));
+        DemandState ds5 = ds3.add(utcTimeKey.set(new UTCTime(UTCTime.now().value().minusSeconds(3600))));
         //#demandstate
 
         //validations
@@ -83,8 +84,8 @@ public class JStateVariablesTest extends JUnitSuite {
         Assert.assertEquals(new HashSet<>(Arrays.asList('A', 'B', 'C')), new HashSet<>(v1));
         Assert.assertEquals(new HashSet<>(Arrays.asList(true, false)), new HashSet<>(v2));
         Assert.assertEquals(4, missingKeys.size());
-        Assert.assertFalse(ds4.exists(timestampKey));
-        Assert.assertTrue(ds5.jGet(timestampKey).get().head().isBefore(ds3.jGet(timestampKey).get().head()));
+        Assert.assertFalse(ds4.exists(utcTimeKey));
+        Assert.assertTrue(ds5.jGet(utcTimeKey).get().head().value().isBefore(ds3.jGet(utcTimeKey).get().head().value()));
     }
 
     @Test
@@ -97,7 +98,7 @@ public class JStateVariablesTest extends JUnitSuite {
         Key<Character> charKey = JKeyType.CharKey().make("charKey");
         Key<Integer> intKey = JKeyType.IntKey().make("intKey");
         Key<Boolean> booleanKey = JKeyType.BooleanKey().make("booleanKey");
-        Key<Instant> timestampKey = JKeyType.TimestampKey().make("timestampKey");
+        Key<UTCTime> timestampKey = JKeyType.UTCTimeKey().make("timestampKey");
         Key<String> notUsedKey = JKeyType.StringKey().make("notUsed");
 
 
@@ -108,7 +109,7 @@ public class JStateVariablesTest extends JUnitSuite {
         Parameter<Character> charParam = charKey.set('A', 'B', 'C').withUnits(NoUnits);
         Parameter<Integer> intParam = intKey.set(1, 2, 3).withUnits(meter);
         Parameter<Boolean> booleanParam = booleanKey.set(true, false);
-        Parameter<Instant> timestamp = timestampKey.set(Instant.now());
+        Parameter<UTCTime> timestamp = timestampKey.set(UTCTime.now());
 
         //create CurrentState and use sequential add
         CurrentState cs1 = new CurrentState(prefix, new StateName("testStateName")).add(charParam).add(intParam);
@@ -136,7 +137,7 @@ public class JStateVariablesTest extends JUnitSuite {
         CurrentState cs4 = cs3.remove(timestampKey);
 
         //update existing keys - set it back by an hour
-        CurrentState cs5 = cs3.add(timestampKey.set(Instant.now().minusSeconds(3600)));
+        CurrentState cs5 = cs3.add(timestampKey.set(new UTCTime(UTCTime.now().value().minusSeconds(3600))));
         //#currentstate
 
         //validations
@@ -146,7 +147,7 @@ public class JStateVariablesTest extends JUnitSuite {
         Assert.assertEquals(new HashSet<>(Arrays.asList(true, false)), new HashSet<>(v2));
         Assert.assertEquals(4, missingKeys.size());
         Assert.assertFalse(cs4.exists(timestampKey));
-        Assert.assertTrue(cs5.jGet(timestampKey).get().head().isBefore(cs3.jGet(timestampKey).get().head()));
+        Assert.assertTrue(cs5.jGet(timestampKey).get().head().value().isBefore(cs3.jGet(timestampKey).get().head().value()));
     }
 
     @Test

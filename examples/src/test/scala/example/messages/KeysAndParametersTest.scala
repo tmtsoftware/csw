@@ -5,6 +5,7 @@ import java.time.Instant
 import csw.params.core.generics.KeyType.{ChoiceKey, StructKey}
 import csw.params.core.generics.{GChoiceKey, Key, KeyType, Parameter}
 import csw.params.core.models._
+import csw.time.core.models.UTCTime
 import org.scalatest.{FunSpec, Matchers}
 
 class KeysAndParametersTest extends FunSpec with Matchers {
@@ -256,8 +257,8 @@ class KeysAndParametersTest extends FunSpec with Matchers {
       val bParam: Parameter[Boolean] = k1.set(true)
       val bDefaultUnitSet: Boolean   = bParam.units === Units.NoUnits //true
 
-      //default unit for TimestampKey
-      val tParam: Parameter[Instant] = KeyType.TimestampKey.make("now").set(Instant.now())
+      //default unit for UTCTimeKey
+      val tParam: Parameter[UTCTime] = KeyType.UTCTimeKey.make("now").set(UTCTime.now())
       val defaultTimeUnit: Units     = tParam.units //is second
 
       //storing multiple values

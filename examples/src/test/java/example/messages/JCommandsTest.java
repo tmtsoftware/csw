@@ -14,6 +14,7 @@ import csw.params.core.models.ArrayData;
 import csw.params.core.models.MatrixData;
 import csw.params.core.models.ObsId;
 import csw.params.core.models.Prefix;
+import csw.time.core.models.UTCTime;
 import org.junit.Assert;
 import org.junit.Test;
 import org.scalatest.junit.JUnitSuite;
@@ -119,7 +120,7 @@ public class JCommandsTest extends JUnitSuite {
         Key<Integer> k2 = JKeyType.IntKey().make("expTime");
         Key<Integer> k2bad = JKeyType.IntKey().make("missingKey");
         Key<Integer> k3 = JKeyType.IntKey().make("filter");
-        Key<Instant> k4 = JKeyType.TimestampKey().make("creation-time");
+        Key<UTCTime> k4 = JKeyType.UTCTimeKey().make("creation-time");
 
         //prefix
         String prefixName = "wfos.red.detector";
@@ -140,7 +141,7 @@ public class JCommandsTest extends JUnitSuite {
         Optional<Parameter<ArrayData<Float>>> k2BadParam = oc1.jGet(k2bad.keyName(), JKeyType.FloatArrayKey());
 
         //add more than one parameters, using madd
-        Observe oc2 = oc1.madd(k3.set(1, 2, 3, 4).withUnits(JUnits.day), k4.set(Instant.now()));
+        Observe oc2 = oc1.madd(k3.set(1, 2, 3, 4).withUnits(JUnits.day), k4.set(UTCTime.now()));
         int paramSize = oc2.size();
 
         //update existing key with set
@@ -171,7 +172,7 @@ public class JCommandsTest extends JUnitSuite {
         Key<Integer> k2 = JKeyType.IntKey().make("expTime");
         Key<Integer> k2bad = JKeyType.IntKey().make("missingKey");
         Key<Integer> k3 = JKeyType.IntKey().make("filter");
-        Key<Instant> k4 = JKeyType.TimestampKey().make("creation-time");
+        Key<UTCTime> k4 = JKeyType.UTCTimeKey().make("creation-time");
 
         //prefix
         String prefixName = "wfos.red.detector";
@@ -192,7 +193,7 @@ public class JCommandsTest extends JUnitSuite {
         Optional<Parameter<ArrayData<Float>>> k2BadParam = wc1.jGet("absentKeyHere", JKeyType.FloatArrayKey());
 
         //add more than one parameters, using madd
-        Wait wc2 = wc1.madd(k3.set(1, 2, 3, 4).withUnits(JUnits.day), k4.set(Instant.now()));
+        Wait wc2 = wc1.madd(k3.set(1, 2, 3, 4).withUnits(JUnits.day), k4.set(UTCTime.now()));
         int paramSize = wc2.size();
 
         //update existing key with set

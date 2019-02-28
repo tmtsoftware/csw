@@ -1,15 +1,14 @@
 package csw.event.client.pb
 
-import java.time.Instant
-
-import csw.params.javadsl.JKeyType
-import csw.params.core.generics.KeyType.IntMatrixKey
 import csw.params.core.generics.KeyType
+import csw.params.core.generics.KeyType.IntMatrixKey
 import csw.params.core.models._
+import csw.params.javadsl.JKeyType
+import csw.time.core.models.UTCTime
 import csw_protobuf.ParameterTypes
+import csw_protobuf.models._
 import csw_protobuf.parameter.PbParameter
 import csw_protobuf.parameter_types._
-import csw_protobuf.radec.PbRaDec
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
@@ -50,29 +49,29 @@ class PbParameterTest extends FunSuite with Matchers {
   }
 
   test("should able to create PbParameter with Timestamp items") {
-    val now = Instant.now
+    val now = UTCTime.now()
     val parameter = PbParameter()
       .withName("encoder")
       .withUnits(Units.second)
-      .withKeyType(KeyType.TimestampKey)
-      .withInstantItems(InstantItems(Seq(now)))
+      .withKeyType(KeyType.UTCTimeKey)
+      .withUtcTimeItems(UTCTimeItems(Seq(now)))
 
     parameter.name shouldBe "encoder"
     parameter.units shouldBe Units.second
-    parameter.keyType shouldBe KeyType.TimestampKey
-    parameter.getInstantItems.values shouldBe List(now)
+    parameter.keyType shouldBe KeyType.UTCTimeKey
+    parameter.getUtcTimeItems.values shouldBe List(now)
   }
 
   test("should able to create PbParameter with Byte items") {
     val parameter = PbParameter()
       .withName("encoder")
       .withUnits(Units.second)
-      .withKeyType(KeyType.TimestampKey)
+      .withKeyType(KeyType.UTCTimeKey)
       .withByteItems(ByteItems(Seq(1, 2, 3, 4)))
 
     parameter.name shouldBe "encoder"
     parameter.units shouldBe Units.second
-    parameter.keyType shouldBe KeyType.TimestampKey
+    parameter.keyType shouldBe KeyType.UTCTimeKey
     parameter.getByteItems.values shouldBe Seq(1, 2, 3, 4)
   }
 
@@ -81,12 +80,12 @@ class PbParameterTest extends FunSuite with Matchers {
     val parameter = PbParameter()
       .withName("encoder")
       .withUnits(Units.second)
-      .withKeyType(KeyType.TimestampKey)
+      .withKeyType(KeyType.UTCTimeKey)
       .withChoiceItems(choices)
 
     parameter.name shouldBe "encoder"
     parameter.units shouldBe Units.second
-    parameter.keyType shouldBe KeyType.TimestampKey
+    parameter.keyType shouldBe KeyType.UTCTimeKey
   }
 
   test("should able to create PbParameter with int items only when KeyType is Int") {

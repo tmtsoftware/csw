@@ -8,6 +8,7 @@ import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.Units.{meter, NoUnits}
 import csw.params.core.models.{MatrixData, Prefix}
 import csw.params.core.states.{CurrentState, DemandState, StateName}
+import csw.time.core.models.UTCTime
 import org.scalatest.{FunSpec, Matchers}
 
 class StateVariablesTest extends FunSpec with Matchers {
@@ -20,24 +21,24 @@ class StateVariablesTest extends FunSpec with Matchers {
       val prefix = Prefix("wfos.prog.cloudcover")
 
       //key
-      val charKey: Key[Char]         = KeyType.CharKey.make("charKey")
-      val intKey: Key[Int]           = KeyType.IntKey.make("intKey")
-      val booleanKey: Key[Boolean]   = KeyType.BooleanKey.make("booleanKey")
-      val timestampKey: Key[Instant] = KeyType.TimestampKey.make("timestampKey")
-      val notUsedKey: Key[String]    = KeyType.StringKey.make("notUsed")
+      val charKey: Key[Char]       = KeyType.CharKey.make("charKey")
+      val intKey: Key[Int]         = KeyType.IntKey.make("intKey")
+      val booleanKey: Key[Boolean] = KeyType.BooleanKey.make("booleanKey")
+      val utcTimeKey: Key[UTCTime] = KeyType.UTCTimeKey.make("utcTimeKey")
+      val notUsedKey: Key[String]  = KeyType.StringKey.make("notUsed")
 
       //parameters
       val charParam: Parameter[Char]       = charKey.set('A', 'B', 'C').withUnits(NoUnits)
       val intParam: Parameter[Int]         = intKey.set(1, 2, 3).withUnits(meter)
       val booleanParam: Parameter[Boolean] = booleanKey.set(true, false)
-      val timestamp: Parameter[Instant]    = timestampKey.set(Instant.now)
+      val utcTime: Parameter[UTCTime]      = utcTimeKey.set(UTCTime.now())
 
       //create DemandState and use sequential add
       val ds1: DemandState = DemandState(prefix, StateName("testStateName")).add(charParam).add(intParam)
       //create DemandState and add more than one Parameters using madd
       val ds2: DemandState = DemandState(prefix, StateName("testStateName")).madd(intParam, booleanParam)
       //create DemandState using apply
-      val ds3: DemandState = DemandState(prefix, StateName("testStateName"), Set(timestamp))
+      val ds3: DemandState = DemandState(prefix, StateName("testStateName"), Set(utcTime))
 
       //access keys
       val charKeyExists: Boolean = ds1.exists(charKey) //true
@@ -52,15 +53,15 @@ class StateVariablesTest extends FunSpec with Matchers {
         charKey,
         intKey,
         booleanKey,
-        timestampKey,
+        utcTimeKey,
         notUsedKey
       )
 
       //remove keys
-      val ds4: DemandState = ds3.remove(timestampKey)
+      val ds4: DemandState = ds3.remove(utcTimeKey)
 
       //update existing keys - set it back by an hour
-      val ds5: DemandState = ds3.add(timestampKey.set(Instant.now().minusSeconds(3600)))
+      val ds5: DemandState = ds3.add(utcTimeKey.set(UTCTime(UTCTime.now().value.minusSeconds(3600))))
 
       //#demandstate
       //validations
@@ -69,8 +70,8 @@ class StateVariablesTest extends FunSpec with Matchers {
       assert(v1 === Array('A', 'B', 'C'))
       assert(v2 === Array(true, false))
       assert(missingKeys.size === 4)
-      assert(ds4.exists(timestampKey) === false)
-      assert(ds5(timestampKey).head.isBefore(ds3(timestampKey).head))
+      assert(ds4.exists(utcTimeKey) === false)
+      assert(ds5(utcTimeKey).head.value.isBefore(ds3(utcTimeKey).head.value))
     }
 
     it("should show usages of CurrentState") {
@@ -81,24 +82,24 @@ class StateVariablesTest extends FunSpec with Matchers {
       val prefix = Prefix("wfos.prog.cloudcover")
 
       //key
-      val charKey      = KeyType.CharKey.make("charKey")
-      val intKey       = KeyType.IntKey.make("intKey")
-      val booleanKey   = KeyType.BooleanKey.make("booleanKey")
-      val timestampKey = KeyType.TimestampKey.make("timestampKey")
-      val notUsedKey   = KeyType.StringKey.make("notUsed")
+      val charKey    = KeyType.CharKey.make("charKey")
+      val intKey     = KeyType.IntKey.make("intKey")
+      val booleanKey = KeyType.BooleanKey.make("booleanKey")
+      val utcTimeKey = KeyType.UTCTimeKey.make("utcTimeKey")
+      val notUsedKey = KeyType.StringKey.make("notUsed")
 
       //parameters
       val charParam    = charKey.set('A', 'B', 'C').withUnits(NoUnits)
       val intParam     = intKey.set(1, 2, 3).withUnits(meter)
       val booleanParam = booleanKey.set(true, false)
-      val timestamp    = timestampKey.set(Instant.now)
+      val utcTime      = utcTimeKey.set(UTCTime.now)
 
       //create CurrentState and use sequential add
       val cs1 = CurrentState(prefix, StateName("testStateName")).add(charParam).add(intParam)
       //create CurrentState and add more than one Parameters using madd
       val cs2 = CurrentState(prefix, StateName("testStateName")).madd(intParam, booleanParam)
       //create CurrentState using apply
-      val cs3 = CurrentState(prefix, StateName("testStateName"), Set(timestamp))
+      val cs3 = CurrentState(prefix, StateName("testStateName"), Set(utcTime))
 
       //access keys
       val charKeyExists = cs1.exists(charKey) //true
@@ -113,15 +114,15 @@ class StateVariablesTest extends FunSpec with Matchers {
         charKey,
         intKey,
         booleanKey,
-        timestampKey,
+        utcTimeKey,
         notUsedKey
       )
 
       //remove keys
-      val cs4 = cs3.remove(timestampKey)
+      val cs4 = cs3.remove(utcTimeKey)
 
       //update existing keys - set it back by an hour
-      val cs5 = cs3.add(timestampKey.set(Instant.now().minusSeconds(3600)))
+      val cs5 = cs3.add(utcTimeKey.set(UTCTime(UTCTime.now().value.minusSeconds(3600))))
 
       //#currentstate
 
@@ -131,8 +132,8 @@ class StateVariablesTest extends FunSpec with Matchers {
       assert(v1 === Array('A', 'B', 'C'))
       assert(v2 === Array(true, false))
       assert(missingKeys.size === 4)
-      assert(cs4.exists(timestampKey) === false)
-      assert(cs5(timestampKey).head.isBefore(cs3(timestampKey).head))
+      assert(cs4.exists(utcTimeKey) === false)
+      assert(cs5(utcTimeKey).head.value.isBefore(cs3(utcTimeKey).head.value))
     }
   }
 

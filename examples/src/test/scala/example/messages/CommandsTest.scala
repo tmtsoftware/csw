@@ -8,6 +8,7 @@ import csw.params.core.generics.KeyType.{ByteKey, DoubleMatrixKey}
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.Units.degree
 import csw.params.core.models._
+import csw.time.core.models.UTCTime
 import org.scalatest.{FunSpec, Matchers}
 
 import scala.util.Try
@@ -112,7 +113,7 @@ class CommandsTest extends FunSpec with Matchers {
       val k2: Key[Int]     = KeyType.IntKey.make("expTime")
       val k2bad: Key[Int]  = KeyType.IntKey.make("missingKey")
       val k3: Key[Int]     = KeyType.IntKey.make("filter")
-      val k4: Key[Instant] = KeyType.TimestampKey.make("creation-time")
+      val k4: Key[UTCTime] = KeyType.UTCTimeKey.make("creation-time")
 
       //prefix
       val prefix: Prefix = Prefix("wfos.red.detector")
@@ -133,7 +134,7 @@ class CommandsTest extends FunSpec with Matchers {
       val tryk2Bad: Try[Parameter[Int]]      = Try(oc1(k2bad)) //failure
 
       //add more than one parameters, using madd
-      val oc2: Observe   = oc1.madd(k3.set(1, 2, 3, 4).withUnits(Units.day), k4.set(Instant.now()))
+      val oc2: Observe   = oc1.madd(k3.set(1, 2, 3, 4).withUnits(Units.day), k4.set(UTCTime.now()))
       val paramSize: Int = oc2.size
 
       //update existing key with set
@@ -160,7 +161,7 @@ class CommandsTest extends FunSpec with Matchers {
       val k2: Key[Int]     = KeyType.IntKey.make("expTime")
       val k2bad: Key[Int]  = KeyType.IntKey.make("missingKey")
       val k3: Key[Int]     = KeyType.IntKey.make("filter")
-      val k4: Key[Instant] = KeyType.TimestampKey.make("creation-time")
+      val k4: Key[UTCTime] = KeyType.UTCTimeKey.make("creation-time")
 
       //parameters
       val i1: Parameter[Boolean] = k1.set(true, false, true, false)
@@ -181,7 +182,7 @@ class CommandsTest extends FunSpec with Matchers {
       val tryk2Bad: Try[Parameter[Int]]      = Try(wc1(k2bad)) //failure
 
       //add more than one parameters, using madd
-      val wc2: Wait      = wc1.madd(k3.set(1, 2, 3, 4).withUnits(Units.day), k4.set(Instant.now()))
+      val wc2: Wait      = wc1.madd(k3.set(1, 2, 3, 4).withUnits(Units.day), k4.set(UTCTime.now()))
       val paramSize: Int = wc2.size
 
       //update existing key with set

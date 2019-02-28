@@ -6,6 +6,7 @@ import csw.params.javadsl.JKeyType;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.*;
+import csw.time.core.models.UTCTime;
 import org.junit.Assert;
 import org.junit.Test;
 import org.scalatest.junit.JUnitSuite;
@@ -293,10 +294,10 @@ public class JKeysAndParametersTest extends JUnitSuite {
         boolean bDefaultUnitSet = bParam.units() == JUnits.NoUnits; //true
 
         //default unit for TimestampKey
-        Parameter<Instant> tParam = JKeyType
-                .TimestampKey()
+        Parameter<UTCTime> tParam = JKeyType
+                .UTCTimeKey()
                 .make("now")
-                .set(Instant.now());
+                .set(UTCTime.now());
         Units defaultTimeUnit = tParam.units(); //is second
 
         //storing multiple values
