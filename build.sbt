@@ -420,7 +420,7 @@ lazy val `csw-time-core` =  crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .in(file("csw-time/csw-time-core"))
   .dependsOn(`csw-time-clock`)
-  .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
+  .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(
     libraryDependencies ++= Dependencies.TimeCore.value,
     fork := false

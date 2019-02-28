@@ -1,10 +1,13 @@
 package csw.time.core.models
 
-import java.time.Instant
+import java.time.{Duration, Instant}
+import java.util.concurrent.TimeUnit.NANOSECONDS
 
 import csw.time.clock.natives.models.TMTClock.clock
 import julienrf.json.derived
 import play.api.libs.json._
+
+import scala.concurrent.duration.FiniteDuration
 
 /**
  * Represents an instantaneous point in time. Its a wrapper around [[java.time.Instant]] and provides nanosecond precision.
@@ -14,6 +17,16 @@ import play.api.libs.json._
  */
 sealed trait TMTTime extends Product with Serializable {
   def value: Instant
+
+  def durationFromNow: FiniteDuration = {
+    val duration = Duration.between(currentInstant, this.value)
+    FiniteDuration(duration.toNanos, NANOSECONDS)
+  }
+
+  private def currentInstant: Instant = this match {
+    case _: UTCTime ⇒ UTCTime.now().value
+    case _: TAITime ⇒ TAITime.now().value
+  }
 }
 
 object TMTTime {

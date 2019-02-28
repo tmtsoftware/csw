@@ -11,7 +11,6 @@ import csw.event.client.internal.commons.EventPublisherUtil
 import csw.event.client.pb.TypeMapperSupport
 import csw.params.events.Event
 import csw.time.core.models.TMTTime
-import csw.time.core.util.TMTTimeUtil.delayFrom
 import org.apache.kafka.clients.producer.{Callback, ProducerRecord}
 
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
@@ -59,7 +58,7 @@ class KafkaPublisher(producerSettings: Future[ProducerSettings[String, Array[Byt
     publish(eventPublisherUtil.eventSource(Future.successful(eventGenerator), parallelism, defaultInitialDelay, every))
 
   override def publish(eventGenerator: => Option[Event], startTime: TMTTime, every: FiniteDuration): Cancellable =
-    publish(eventPublisherUtil.eventSource(Future.successful(eventGenerator), parallelism, delayFrom(startTime), every))
+    publish(eventPublisherUtil.eventSource(Future.successful(eventGenerator), parallelism, startTime.durationFromNow, every))
 
   override def publish(eventGenerator: ⇒ Option[Event], every: FiniteDuration, onError: PublishFailure ⇒ Unit): Cancellable =
     publish(eventPublisherUtil.eventSource(Future.successful(eventGenerator), parallelism, defaultInitialDelay, every), onError)
@@ -70,13 +69,14 @@ class KafkaPublisher(producerSettings: Future[ProducerSettings[String, Array[Byt
       every: FiniteDuration,
       onError: PublishFailure => Unit
   ): Cancellable =
-    publish(eventPublisherUtil.eventSource(Future.successful(eventGenerator), parallelism, delayFrom(startTime), every), onError)
+    publish(eventPublisherUtil.eventSource(Future.successful(eventGenerator), parallelism, startTime.durationFromNow, every),
+            onError)
 
   override def publishAsync(eventGenerator: => Future[Option[Event]], every: FiniteDuration): Cancellable =
     publish(eventPublisherUtil.eventSource(eventGenerator, parallelism, defaultInitialDelay, every))
 
   override def publishAsync(eventGenerator: => Future[Option[Event]], startTime: TMTTime, every: FiniteDuration): Cancellable =
-    publish(eventPublisherUtil.eventSource(eventGenerator, parallelism, delayFrom(startTime), every))
+    publish(eventPublisherUtil.eventSource(eventGenerator, parallelism, startTime.durationFromNow, every))
 
   override def publishAsync(
       eventGenerator: => Future[Option[Event]],
@@ -91,7 +91,7 @@ class KafkaPublisher(producerSettings: Future[ProducerSettings[String, Array[Byt
       every: FiniteDuration,
       onError: PublishFailure => Unit
   ): Cancellable =
-    publish(eventPublisherUtil.eventSource(eventGenerator, parallelism, delayFrom(startTime), every), onError)
+    publish(eventPublisherUtil.eventSource(eventGenerator, parallelism, startTime.durationFromNow, every), onError)
 
   override def shutdown(): Future[Done] = kafkaProducer.map { x =>
     eventPublisherUtil.shutdown()
