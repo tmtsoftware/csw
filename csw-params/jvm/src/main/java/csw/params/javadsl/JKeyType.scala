@@ -59,11 +59,12 @@ object JSimpleKeyType {
  * KeyTypes defined for consumption in Java code
  */
 object JKeyType {
-  val ChoiceKey    = KeyType.ChoiceKey
-  val RaDecKey     = KeyType.RaDecKey
-  val StringKey    = KeyType.StringKey
-  val StructKey    = KeyType.StructKey
-  val TimestampKey = KeyType.TimestampKey
+  val ChoiceKey  = KeyType.ChoiceKey
+  val RaDecKey   = KeyType.RaDecKey
+  val StringKey  = KeyType.StringKey
+  val StructKey  = KeyType.StructKey
+  val UTCTimeKey = KeyType.UTCTimeKey
+  val TAITimeKey = KeyType.TAITimeKey
 
   val BooleanKey = JSimpleKeyType.BooleanKey
   val CharKey    = JSimpleKeyType.CharKey

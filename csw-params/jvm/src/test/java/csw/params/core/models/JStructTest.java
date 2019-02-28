@@ -3,6 +3,7 @@ package csw.params.core.models;
 import csw.params.javadsl.JKeyType;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
+import csw.time.core.models.UTCTime;
 import org.junit.Assert;
 import org.junit.Test;
 import org.scalatest.junit.JUnitSuite;
@@ -22,11 +23,11 @@ public class JStructTest extends JUnitSuite {
     private final Key<String> ra = JKeyType.StringKey().make("ra");
     private final Key<String> dec = JKeyType.StringKey().make("dec");
     private final Key<Double> epoch = JKeyType.DoubleKey().make("epoch");
-    private final Key<Instant> ts = JKeyType.TimestampKey().make("now");
+    private final Key<UTCTime> utcTime = JKeyType.UTCTimeKey().make("now");
     private final Parameter<String> raParameter = ra.set("12:13:14.1");
     private final Parameter<String> decParameter = dec.set("32:33:34.4");
     private final Parameter<Double> epochParameter = epoch.set(1950.0);
-    private final Parameter<Instant> currentTimeParameter = ts.set(Instant.now());
+    private final Parameter<UTCTime> currentTimeParameter = utcTime.set(UTCTime.now());
 
     @Test
     public void shouldAbleToCreateWithVarArgs() {

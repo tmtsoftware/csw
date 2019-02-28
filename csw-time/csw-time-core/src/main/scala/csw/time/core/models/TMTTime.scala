@@ -93,6 +93,11 @@ final case class TAITime(value: Instant) extends TMTTime {
 
 object TAITime {
 
+  implicit def taiTimeFormat(implicit instantFormat: Format[Instant]): Format[TAITime] = new Format[TAITime] {
+    override def writes(time: TAITime): JsValue          = instantFormat.writes(time.value)
+    override def reads(json: JsValue): JsResult[TAITime] = instantFormat.reads(json).map(TAITime(_))
+  }
+
   /**
    * Obtains the PTP (Precision Time Protocol) synchronized current time in TAI timescale.
    * In case of a Linux machine, this will make a native call `clock_gettime` inorder to get time from the system clock with nanosecond precision

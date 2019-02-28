@@ -15,39 +15,40 @@ option (scalapb.options) = {
 };
 
 message PbParameter {
-    string name = 1;
-    PbUnits units = 2;
-    PbKeyType keyType = 3;
+    string name                             = 1;
+    PbUnits units                           = 2;
+    PbKeyType keyType                       = 3;
     oneof items {
-        ChoiceItems choiceItems = 50;
-        RaDecItems raDecItems = 51;
-        StructItems structItems = 52;
-        InstantItems instantItems = 53;
+        ChoiceItems choiceItems             = 50;
+        RaDecItems raDecItems               = 51;
+        StructItems structItems             = 52;
+        UTCTimeItems utcTimeItems           = 53;
+        TAITimeItems taiTimeItems           = 54;
 
-        StringItems stringItems = 54;
-        BooleanItems booleanItems = 55;
-        CharItems charItems = 56;
+        StringItems stringItems             = 55;
+        BooleanItems booleanItems           = 56;
+        CharItems charItems                 = 57;
 
-        ByteItems byteItems = 57;
-        ShortItems shortItems = 58;
-        IntItems intItems = 59;
-        LongItems longItems = 60;
-        DoubleItems doubleItems = 61;
-        FloatItems floatItems = 62;
+        ByteItems byteItems                 = 58;
+        ShortItems shortItems               = 59;
+        IntItems intItems                   = 60;
+        LongItems longItems                 = 61;
+        DoubleItems doubleItems             = 62;
+        FloatItems floatItems               = 63;
 
-        ByteArrayItems byteArrayItems = 63;
-        ShortArrayItems shortArrayItems = 64;
-        IntArrayItems intArrayItems = 65;
-        LongArrayItems longArrayItems = 66;
-        FloatArrayItems floatArrayItems = 67;
-        DoubleArrayItems doubleArrayItems = 68;
+        ByteArrayItems byteArrayItems       = 64;
+        ShortArrayItems shortArrayItems     = 65;
+        IntArrayItems intArrayItems         = 66;
+        LongArrayItems longArrayItems       = 67;
+        FloatArrayItems floatArrayItems     = 68;
+        DoubleArrayItems doubleArrayItems   = 69;
 
-        ByteMatrixItems byteMatrixItems = 69;
-        ShortMatrixItems shortMatrixItems = 70;
-        IntMatrixItems intMatrixItems = 71;
-        LongMatrixItems longMatrixItems = 72;
-        FloatMatrixItems floatMatrixItems = 73;
-        DoubleMatrixItems doubleMatrixItems = 74;
+        ByteMatrixItems byteMatrixItems     = 70;
+        ShortMatrixItems shortMatrixItems   = 71;
+        IntMatrixItems intMatrixItems       = 72;
+        LongMatrixItems longMatrixItems     = 73;
+        FloatMatrixItems floatMatrixItems   = 74;
+        DoubleMatrixItems doubleMatrixItems = 75;
     }
 }
 

@@ -124,15 +124,20 @@ class JsonContractTest extends FunSpec with Matchers {
       val intArrayKey    = KeyType.IntArrayKey.make("intArrayKey")
       val a1: Array[Int] = Array(1, 2, 3, 4, 5)
       val a2: Array[Int] = Array(10, 20, 30, 40, 50)
-      val timestampKey   = KeyType.TimestampKey.make("timestampKey")
+      val utcTimeKey     = KeyType.UTCTimeKey.make("utcTimeKey")
       val stateName      = StateName("testStateName")
 
       val charParam     = charKey.set('A', 'B', 'C').withUnits(encoder)
       val intArrayParam = intArrayKey.set(a1, a2).withUnits(meter)
-      val timestampParam =
-        timestampKey.set(Instant.ofEpochMilli(0), Instant.parse("2017-09-04T16:28:00.123456789Z")).withUnits(second)
+      val utcTimeParam =
+        utcTimeKey
+          .set(
+            UTCTime(Instant.ofEpochMilli(0)),
+            UTCTime(Instant.parse("2017-09-04T16:28:00.123456789Z"))
+          )
+          .withUnits(second)
 
-      val currentState       = CurrentState(prefix, stateName).madd(charParam, intArrayParam, timestampParam)
+      val currentState       = CurrentState(prefix, stateName).madd(charParam, intArrayParam, utcTimeParam)
       val currentStateToJson = JsonSupport.writeStateVariable(currentState)
 
       val expectedCurrentStateJson =
@@ -141,18 +146,22 @@ class JsonContractTest extends FunSpec with Matchers {
     }
 
     it("should adhere to specified standard DemandState json format") {
-      val charKey      = KeyType.CharKey.make("charKey")
-      val intKey       = KeyType.IntKey.make("intKey")
-      val booleanKey   = KeyType.BooleanKey.make("booleanKey")
-      val timestampKey = KeyType.TimestampKey.make("timestampKey")
-      val stateName    = StateName("testStateName")
+      val charKey    = KeyType.CharKey.make("charKey")
+      val intKey     = KeyType.IntKey.make("intKey")
+      val booleanKey = KeyType.BooleanKey.make("booleanKey")
+      val utcTimeKey = KeyType.UTCTimeKey.make("utcTimeKey")
+      val stateName  = StateName("testStateName")
 
-      val charParam      = charKey.set('A', 'B', 'C').withUnits(NoUnits)
-      val intParam       = intKey.set(1, 2, 3).withUnits(meter)
-      val booleanParam   = booleanKey.set(true, false)
-      val timestampParam = timestampKey.set(Instant.ofEpochMilli(0), Instant.parse("2017-09-04T16:28:00.123456789Z"))
+      val charParam    = charKey.set('A', 'B', 'C').withUnits(NoUnits)
+      val intParam     = intKey.set(1, 2, 3).withUnits(meter)
+      val booleanParam = booleanKey.set(true, false)
+      val utcTimeParam =
+        utcTimeKey.set(
+          UTCTime(Instant.ofEpochMilli(0)),
+          UTCTime(Instant.parse("2017-09-04T16:28:00.123456789Z"))
+        )
 
-      val demandState       = DemandState(prefix, stateName).madd(charParam, intParam, booleanParam, timestampParam)
+      val demandState       = DemandState(prefix, stateName).madd(charParam, intParam, booleanParam, utcTimeParam)
       val demandStateToJson = JsonSupport.writeStateVariable(demandState)
 
       val expectedDemandStateJson = Json.parse(Source.fromResource("json/demand_state.json").mkString)
@@ -172,7 +181,9 @@ class JsonContractTest extends FunSpec with Matchers {
     val p7 = FloatKey.make("FloatKey").set(Array[Float](90, 100))
     val p8 = DoubleKey.make("DoubleKey").set(Array[Double](110, 120))
     val p9 =
-      TimestampKey.make("TimestampKey").set(Instant.ofEpochMilli(0), Instant.parse("2017-09-04T19:00:00.123456789Z"))
+      UTCTimeKey
+        .make("UTCTimeKey")
+        .set(UTCTime(Instant.ofEpochMilli(0)), UTCTime(Instant.parse("2017-09-04T19:00:00.123456789Z")))
 
     // ArrayData Key's
     val p10 = ByteArrayKey.make("ByteArrayKey").set(ArrayData.fromArray(Array[Byte](1, 2)))

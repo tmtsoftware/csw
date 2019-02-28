@@ -3,6 +3,7 @@ package csw.params.core.generics;
 import csw.params.javadsl.JKeyType;
 import csw.params.core.models.RaDec;
 import csw.params.core.models.Struct;
+import csw.time.core.models.UTCTime;
 import org.junit.Assert;
 import org.junit.Test;
 import org.scalatest.junit.JUnitSuite;
@@ -253,16 +254,16 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
     //DEOPSCSW-282: Add a timestamp Key and Parameter
     @Test
     public void testTimestampKeyParameter() {
-        String keyName = "TimestampKey";
-        Key<Instant> key = JKeyType.TimestampKey().make(keyName);
-        Instant[] paramData = {Instant.now(), Instant.ofEpochSecond(3600)};
+        String keyName = "UTCTimeKey";
+        Key<UTCTime> key = JKeyType.UTCTimeKey().make(keyName);
+        UTCTime[] paramData = {UTCTime.now(), new UTCTime(Instant.ofEpochSecond(3600))};
         Assert.assertEquals(keyName, key.keyName());
-        Assert.assertEquals(JKeyType.TimestampKey(),key.keyType());
+        Assert.assertEquals(JKeyType.UTCTimeKey(),key.keyType());
 
         // key.set without Units
-        Parameter<Instant> parameterWithoutUnits = key.set(paramData);
+        Parameter<UTCTime> parameterWithoutUnits = key.set(paramData);
 
-        Assert.assertArrayEquals(paramData, (Instant[])parameterWithoutUnits.values());
+        Assert.assertArrayEquals(paramData, (UTCTime[])parameterWithoutUnits.values());
 
         Assert.assertEquals(paramData[0], parameterWithoutUnits.get(0).get());
         Assert.assertEquals(paramData[1], parameterWithoutUnits.value(1));
@@ -270,10 +271,10 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
         // key.set with Units
-        Parameter<Instant> parameterWithUnits = key.set(paramData, millisecond);
+        Parameter<UTCTime> parameterWithUnits = key.set(paramData, millisecond);
         Assert.assertEquals(millisecond, parameterWithUnits.units());
 
-        Assert.assertArrayEquals(paramData, (Instant[])parameterWithUnits.values());
+        Assert.assertArrayEquals(paramData, (UTCTime[])parameterWithUnits.values());
         Assert.assertEquals(paramData[0], parameterWithoutUnits.get(0).get());
         Assert.assertEquals(paramData[1], parameterWithoutUnits.value(1));
         Assert.assertEquals(paramData[0], parameterWithoutUnits.head());

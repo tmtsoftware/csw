@@ -1,19 +1,19 @@
 package csw.event.client.pb
 
 import com.google.protobuf.timestamp.Timestamp
-import csw.event.client.pb.Implicits.instantMapper
+import csw.event.client.pb.Implicits._
 import csw.params.events._
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.ObsId.empty
 import csw.params.core.models._
 import csw.event.client.pb.TypeMapperFactory.make
-import csw.time.core.models.UTCTime
+import csw.time.core.models.{TAITime, UTCTime}
 import csw_protobuf.events.PbEvent
 import csw_protobuf.events.PbEvent.PbEventType
 import csw_protobuf.keytype.PbKeyType
+import csw_protobuf.models.{PbRaDec, PbTAITime, PbUTCTime}
 import csw_protobuf.parameter.PbParameter.Items
 import csw_protobuf.parameter.{PbParameter, PbStruct}
-import csw_protobuf.radec.PbRaDec
 import csw_protobuf.units.PbUnits
 import play.api.libs.json.Format
 import scalapb.TypeMapper
@@ -115,6 +115,18 @@ object TypeMapperSupport {
 
   implicit val raDecTypeMapper: TypeMapper[PbRaDec, RaDec] =
     TypeMapper[PbRaDec, RaDec](x ⇒ RaDec(x.ra, x.dec))(x ⇒ PbRaDec().withRa(x.ra).withDec(x.dec))
+
+  implicit val utcTimeTypeMapper: TypeMapper[PbUTCTime, UTCTime] = TypeMapper[PbUTCTime, UTCTime](
+    x ⇒ UTCTime(instantMapper.toCustom(x.getValue))
+  )(
+    x ⇒ PbUTCTime().withValue(instantMapper.toBase(x.value))
+  )
+
+  implicit val taiTimeTypeMapper: TypeMapper[PbTAITime, TAITime] = TypeMapper[PbTAITime, TAITime](
+    x ⇒ TAITime(instantMapper.toCustom(x.getValue))
+  )(
+    x ⇒ PbTAITime().withValue(instantMapper.toBase(x.value))
+  )
 
   implicit val keyTypeTypeMapper: TypeMapper[PbKeyType, KeyType[_]] =
     TypeMapper[PbKeyType, KeyType[_]](x ⇒ KeyType.withName(x.toString()))(x ⇒ PbKeyType.fromName(x.toString).get)

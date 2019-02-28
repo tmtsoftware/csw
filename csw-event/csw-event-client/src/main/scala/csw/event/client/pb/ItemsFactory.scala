@@ -1,8 +1,7 @@
 package csw.event.client.pb
 
-import java.time.Instant
-
 import csw.params.core.models._
+import csw.time.core.models.{TAITime, UTCTime}
 import csw_protobuf.parameter.PbParameter.Items
 
 abstract class ItemsFactory[T] {
@@ -28,7 +27,8 @@ object ItemsFactory {
   implicit val ChoiceItemsFactory: ItemsFactory[Choice]   = ItemsFactory(Items.ChoiceItems)
   implicit val RaDecItemsFactory: ItemsFactory[RaDec]     = ItemsFactory(Items.RaDecItems)
   implicit val StructItemsFactory: ItemsFactory[Struct]   = ItemsFactory(Items.StructItems)
-  implicit val InstantItemsFactory: ItemsFactory[Instant] = ItemsFactory(Items.InstantItems)
+  implicit val UTCTimeItemsFactory: ItemsFactory[UTCTime] = ItemsFactory(Items.UtcTimeItems)
+  implicit val TAITimeItemsFactory: ItemsFactory[TAITime] = ItemsFactory(Items.TaiTimeItems)
 
   implicit val CharItemsFactory: ItemsFactory[Char]       = ItemsFactory(Items.CharItems)
   implicit val StringItemsFactory: ItemsFactory[String]   = ItemsFactory(Items.StringItems)

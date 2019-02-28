@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package csw_protobuf;
 
-import "csw_protobuf/radec.proto";
+import "csw_protobuf/models.proto";
 import "scalapb/scalapb.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -11,6 +11,7 @@ option (scalapb.options) = {
     import: "csw.event.client.pb.TypeMapperSupport._"
     import: "csw.event.client.pb.Implicits._"
     import: "csw.params.core.models._"
+    import: "csw.time.core.models._"
     single_file: true
 };
 
@@ -44,10 +45,16 @@ message CharItems {
     string values = 1 [(scalapb.field).type = "Seq[Char]"];
 }
 
-message InstantItems {
-    option (scalapb.message).extends = "ItemType[java.time.Instant]";
-    option (scalapb.message).companion_extends = "ItemTypeCompanion[InstantItems]";
-    repeated google.protobuf.Timestamp values = 1 [(scalapb.field).type = "java.time.Instant"];
+message UTCTimeItems {
+    option (scalapb.message).extends = "ItemType[UTCTime]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[UTCTimeItems]";
+    repeated google.protobuf.Timestamp values = 1 [(scalapb.field).type = "UTCTime"];
+}
+
+message TAITimeItems {
+    option (scalapb.message).extends = "ItemType[TAITime]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[TAITimeItems]";
+    repeated google.protobuf.Timestamp values = 1 [(scalapb.field).type = "TAITime"];
 }
 
 ////////////////////////////////////////////////////

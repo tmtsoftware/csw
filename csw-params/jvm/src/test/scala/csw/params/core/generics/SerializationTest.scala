@@ -1,13 +1,12 @@
 package csw.params.core.generics
 
-import java.time.Instant
-
 import com.twitter.chill.KryoInjection
 import csw.params.commands._
-import csw.params.events.{Event, EventName, SystemEvent}
 import csw.params.core.generics.KeyType.ChoiceKey
 import csw.params.core.models.{Choice, ObsId, Prefix}
 import csw.params.core.states.{CurrentState, CurrentStates, StateName}
+import csw.params.events.{Event, EventName, SystemEvent}
+import csw.time.core.models.UTCTime
 import org.scalatest.FunSuite
 
 // DEOPSCSW-183: Configure attributes and values
@@ -28,14 +27,14 @@ class SerializationTest extends FunSuite {
   val dec: Key[String]          = KeyType.StringKey.make("dec")
   val epoch: Key[Double]        = KeyType.DoubleKey.make("epoch")
   val test: Key[Int]            = KeyType.IntKey.make("test")
-  val timestamp: Key[Instant]   = KeyType.TimestampKey.make("ts")
+  val utcTime: Key[UTCTime]     = KeyType.UTCTimeKey.make("utcTime")
 
   val sc1: Setup = Setup(Prefix("tcs.pos"), CommandName("move"), Some(obsId)).madd(
     ra.set("12:32:11"),
     dec.set("30:22:22"),
     epoch.set(1950.0),
     test.set(1),
-    timestamp.set(Instant.now)
+    utcTime.set(UTCTime.now())
   ) //.second
 
   val cs1: CurrentState = CurrentState(Prefix("tcs.pos"), StateName("testStateName")).madd(
@@ -43,7 +42,7 @@ class SerializationTest extends FunSuite {
     dec.set("30:22:22"),
     epoch.set(1950.0),
     test.set(1),
-    timestamp.set(Instant.now)
+    utcTime.set(UTCTime.now())
   ) //.second
 
   val cs2: CurrentState = CurrentState(Prefix("tcs.pos"), StateName("testStateName2")).madd(
@@ -51,7 +50,7 @@ class SerializationTest extends FunSuite {
     dec.set("30:22:22"),
     epoch.set(1950.0),
     test.set(1),
-    timestamp.set(Instant.now)
+    utcTime.set(UTCTime.now())
   )
 
   val submitCommandChoice   = Choice("SubmitCommand")

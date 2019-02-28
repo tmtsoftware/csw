@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-package csw_protobuf;
-
-message PbRaDec {
-    double ra = 1;
-    double dec = 2;
-}

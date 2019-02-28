@@ -1,7 +1,5 @@
 package csw.params.core.generics
 
-import java.time.Instant
-
 import csw.params.core.generics.KeyType.{
   ByteMatrixKey,
   ChoiceKey,
@@ -14,6 +12,7 @@ import csw.params.core.generics.KeyType.{
 }
 import csw.params.core.models.Units.{degree, meter, second, NoUnits}
 import csw.params.core.models._
+import csw.time.core.models.UTCTime
 import org.scalatest.{FunSpec, Matchers}
 
 // DEOPSCSW-183: Configure attributes and values
@@ -932,29 +931,33 @@ class KeyParameterTest extends FunSpec with Matchers {
 
   //DEOPSCSW-282: Add a timestamp Key and Parameter
   describe("test TimestampItem") {
-    val tsval: Instant      = Instant.now()
-    val tskey: Key[Instant] = KeyType.TimestampKey.make(s1)
+    val utcTimeValue: UTCTime    = UTCTime.now()
+    val utcTimeKey: Key[UTCTime] = KeyType.UTCTimeKey.make(s1)
 
     it("should allow create a Timestamp parameter from a timestamp key") {
-      val li: Parameter[Instant] = tskey.set(tsval)
-      li.values should be(Array(tsval))
-      li.head should be(tsval)
-      li.get(0).get should equal(tsval)
+      val li: Parameter[UTCTime] = utcTimeKey.set(utcTimeValue)
+      li.values should be(Array(utcTimeValue))
+      li.head should be(utcTimeValue)
+      li.get(0).get should equal(utcTimeValue)
     }
 
     it("and second must be default Unit") {
-      val li1: Parameter[Instant] = tskey.set(tsval)
+      val li1: Parameter[UTCTime] = utcTimeKey.set(utcTimeValue)
       li1.units should be(second)
 
       //must respect overriding also
-      val li2: Parameter[Instant] = tskey.set(tsval).withUnits(NoUnits)
+      val li2: Parameter[UTCTime] = utcTimeKey.set(utcTimeValue).withUnits(NoUnits)
       li2.units should be(NoUnits)
     }
 
-    val listIn = Array[Instant](Instant.now().minusSeconds(3600), Instant.now(), Instant.now().plusMillis(3600000))
+    val listIn = Array[UTCTime](
+      UTCTime(UTCTime.now().value.minusSeconds(3600)),
+      UTCTime.now(),
+      UTCTime(UTCTime.now().value.plusMillis(3600000))
+    )
 
     it("should work with list, withUnits") {
-      val li = tskey.set(listIn).withUnits(second)
+      val li = utcTimeKey.set(listIn).withUnits(second)
       li.units should be(second)
       li.value(0) should equal(listIn(0))
       li.value(1) should equal(listIn(1))
@@ -963,7 +966,7 @@ class KeyParameterTest extends FunSpec with Matchers {
     }
 
     it("should work with list, units") {
-      val li: Parameter[Instant] = tskey.set(listIn, second)
+      val li: Parameter[UTCTime] = utcTimeKey.set(listIn, second)
       li.units should be(second)
       li.value(0) should equal(listIn(0))
       li.value(1) should equal(listIn(1))

@@ -1,10 +1,9 @@
 package csw.event.client.pb
 
-import java.time.Instant
-
 import csw.params.core.formats.MiscJsonFormats
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models._
+import csw.time.core.models.{TAITime, UTCTime}
 import csw_protobuf.parameter.PbParameter
 import play.api.libs.json.Format
 import scalapb.TypeMapper
@@ -18,7 +17,8 @@ object TypeMapperFactory extends MiscJsonFormats {
     case KeyType.RaDecKey        ⇒ typeMapper[RaDec]
     case KeyType.StringKey       ⇒ typeMapper[String]
     case KeyType.StructKey       ⇒ typeMapper[Struct]
-    case KeyType.TimestampKey    ⇒ typeMapper[Instant]
+    case KeyType.UTCTimeKey      ⇒ typeMapper[UTCTime]
+    case KeyType.TAITimeKey      ⇒ typeMapper[TAITime]
     case KeyType.BooleanKey      ⇒ typeMapper[Boolean]
     case KeyType.CharKey         ⇒ typeMapper[Char]
     case KeyType.ByteKey         ⇒ typeMapper[Byte]

@@ -162,17 +162,17 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
     }
 
     it("should serialize DemandState") {
-      val charKey      = KeyType.CharKey.make("charKey")
-      val intKey       = KeyType.IntKey.make("intKey")
-      val booleanKey   = KeyType.BooleanKey.make("booleanKey")
-      val timestampKey = KeyType.TimestampKey.make("timestampKey")
+      val charKey    = KeyType.CharKey.make("charKey")
+      val intKey     = KeyType.IntKey.make("intKey")
+      val booleanKey = KeyType.BooleanKey.make("booleanKey")
+      val utcTimeKey = KeyType.UTCTimeKey.make("utcTimeKey")
 
       val charParam    = charKey.set('A', 'B', 'C').withUnits(NoUnits)
       val intParam     = intKey.set(1, 2, 3).withUnits(meter)
       val booleanParam = booleanKey.set(true, false)
-      val timestamp    = timestampKey.set(Instant.now)
+      val utcTime      = utcTimeKey.set(UTCTime.now())
 
-      val demandState           = DemandState(prefix, StateName("testStateName")).madd(charParam, intParam, booleanParam, timestamp)
+      val demandState           = DemandState(prefix, StateName("testStateName")).madd(charParam, intParam, booleanParam, utcTime)
       val demandStateSerializer = serialization.findSerializerFor(demandState)
 
       demandStateSerializer.getClass shouldBe classOf[AkkaSerializer]

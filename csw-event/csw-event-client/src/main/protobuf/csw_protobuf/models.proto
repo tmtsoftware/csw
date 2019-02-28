@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package csw_protobuf;
+
+import "google/protobuf/timestamp.proto";
+
+message PbRaDec {
+    double ra = 1;
+    double dec = 2;
+}
+
+message PbUTCTime {
+    google.protobuf.Timestamp value = 1;
+}
+
+message PbTAITime {
+    google.protobuf.Timestamp value = 1;
+}

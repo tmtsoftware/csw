@@ -20,19 +20,19 @@ enum PbKeyType {
     IntKey          = 9;
     FloatKey        = 10;
     DoubleKey       = 11;
-    TimestampKey    = 12;
+    UTCTimeKey      = 12;
+    TAITimeKey      = 13;
 
-    ByteArrayKey    = 13;
-    ShortArrayKey   = 14;
-    LongArrayKey    = 15;
-    IntArrayKey     = 16;
-    FloatArrayKey   = 17;
-    DoubleArrayKey  = 18;
-
-    ByteMatrixKey   = 19;
-    ShortMatrixKey  = 20;
-    LongMatrixKey   = 21;
-    IntMatrixKey    = 22;
-    FloatMatrixKey  = 23;
-    DoubleMatrixKey = 24;
+    ByteArrayKey    = 14;
+    ShortArrayKey   = 15;
+    LongArrayKey    = 16;
+    IntArrayKey     = 17;
+    FloatArrayKey   = 18;
+    DoubleArrayKey  = 19;
+    ByteMatrixKey   = 20;
+    ShortMatrixKey  = 21;
+    LongMatrixKey   = 22;
+    IntMatrixKey    = 23;
+    FloatMatrixKey  = 24;
+    DoubleMatrixKey = 25;
 }

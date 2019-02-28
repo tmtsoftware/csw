@@ -1,10 +1,9 @@
 package csw.params.core.generics
 
-import java.time.Instant
-
 import csw.params.core.formats.JsonSupport
 import csw.params.core.models.Units.second
 import csw.params.core.models.{Units, _}
+import csw.time.core.models.{TAITime, UTCTime}
 import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
 import play.api.libs.json._
 
@@ -85,10 +84,11 @@ object KeyType extends Enum[KeyType[_]] with PlayJsonEnum[KeyType[_]] {
       new GChoiceKey(name, this, Choices(restChoices.toSet + firstChoice))
   }
 
-  case object RaDecKey     extends SimpleKeyType[RaDec]
-  case object StringKey    extends SimpleKeyType[String]
-  case object StructKey    extends SimpleKeyType[Struct]
-  case object TimestampKey extends SimpleKeyTypeWithUnits[Instant](second)
+  case object RaDecKey   extends SimpleKeyType[RaDec]
+  case object StringKey  extends SimpleKeyType[String]
+  case object StructKey  extends SimpleKeyType[Struct]
+  case object UTCTimeKey extends SimpleKeyTypeWithUnits[UTCTime](second)
+  case object TAITimeKey extends SimpleKeyTypeWithUnits[TAITime](second)
 
   //scala
   case object BooleanKey extends SimpleKeyType[Boolean]
