@@ -176,12 +176,12 @@ class AuthIntegrationTest
   }
 
   override def beforeEach(): Unit = {
-    new Ports().stop(keycloakPort)
+    Ports.stop(keycloakPort)
     super.beforeEach()
   }
 
   override def afterEach(): Unit = {
     super.afterEach()
-    new Ports().stop(keycloakPort)
+    Ports.stop(keycloakPort)
   }
 }

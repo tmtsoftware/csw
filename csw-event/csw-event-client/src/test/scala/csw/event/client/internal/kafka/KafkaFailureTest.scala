@@ -7,7 +7,6 @@ import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.helpers.Utils
 import csw.params.events.Event
 import csw.time.core.models.UTCTime
-import io.lettuce.core.RedisException
 import org.apache.kafka.common.errors.RecordTooLargeException
 import org.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
