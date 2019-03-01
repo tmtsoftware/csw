@@ -1,7 +1,5 @@
 package example.messages
 
-import java.time.Instant
-
 import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.KeyType.DoubleMatrixKey
 import csw.params.core.generics.{Key, KeyType, Parameter}

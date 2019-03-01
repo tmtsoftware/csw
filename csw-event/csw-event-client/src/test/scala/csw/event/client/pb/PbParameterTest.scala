@@ -4,7 +4,7 @@ import csw.params.core.generics.KeyType
 import csw.params.core.generics.KeyType.IntMatrixKey
 import csw.params.core.models._
 import csw.params.javadsl.JKeyType
-import csw.time.core.models.UTCTime
+import csw.time.core.models.{TAITime, UTCTime}
 import csw_protobuf.ParameterTypes
 import csw_protobuf.models._
 import csw_protobuf.parameter.PbParameter
@@ -48,7 +48,8 @@ class PbParameterTest extends FunSuite with Matchers {
     booleanItems.getValuesList.asScala.toSeq shouldBe parsedBooleanItems.values
   }
 
-  test("should able to create PbParameter with Timestamp items") {
+  // DEOPSCSW-661: Create UTCTimeKey and TAITimeKey replacing TimestampKey in Protobuf parameters
+  test("should able to create PbParameter with UTCTime items") {
     val now = UTCTime.now()
     val parameter = PbParameter()
       .withName("encoder")
@@ -60,6 +61,21 @@ class PbParameterTest extends FunSuite with Matchers {
     parameter.units shouldBe Units.second
     parameter.keyType shouldBe KeyType.UTCTimeKey
     parameter.getUtcTimeItems.values shouldBe List(now)
+  }
+
+  // DEOPSCSW-661: Create UTCTimeKey and TAITimeKey replacing TimestampKey in Protobuf parameters
+  test("should able to create PbParameter with TAITime items") {
+    val now = TAITime.now()
+    val parameter = PbParameter()
+      .withName("encoder")
+      .withUnits(Units.second)
+      .withKeyType(KeyType.TAITimeKey)
+      .withTaiTimeItems(TAITimeItems(Seq(now)))
+
+    parameter.name shouldBe "encoder"
+    parameter.units shouldBe Units.second
+    parameter.keyType shouldBe KeyType.TAITimeKey
+    parameter.getTaiTimeItems.values shouldBe List(now)
   }
 
   test("should able to create PbParameter with Byte items") {
@@ -155,6 +171,26 @@ class PbParameterTest extends FunSuite with Matchers {
     val key         = KeyType.IntKey.make("encoder")
     val param       = key.set(1, 2, 3, 4)
     val mapper      = TypeMapperSupport.parameterTypeMapper[Int]
+    val mappedParam = mapper.toCustom(mapper.toBase(param))
+
+    param shouldEqual mappedParam
+  }
+
+  // DEOPSCSW-661: Create UTCTimeKey and TAITimeKey replacing TimestampKey in Protobuf parameters
+  test("should able to change the type from/to PbParameter to/from Parameter for UTCTimeKey") {
+    val mapper      = TypeMapperSupport.parameterTypeMapper2
+    val key         = KeyType.UTCTimeKey.make("utcTimeKey")
+    val param       = key.set(UTCTime.now())
+    val mappedParam = mapper.toCustom(mapper.toBase(param))
+
+    param shouldEqual mappedParam
+  }
+
+  // DEOPSCSW-661: Create UTCTimeKey and TAITimeKey replacing TimestampKey in Protobuf parameters
+  test("should able to change the type from/to PbParameter to/from Parameter for TAITimeKey") {
+    val mapper      = TypeMapperSupport.parameterTypeMapper2
+    val key         = KeyType.TAITimeKey.make("taiTimeKey")
+    val param       = key.set(TAITime.now())
     val mappedParam = mapper.toCustom(mapper.toBase(param))
 
     param shouldEqual mappedParam

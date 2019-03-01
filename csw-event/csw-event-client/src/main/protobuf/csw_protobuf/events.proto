@@ -4,6 +4,7 @@ package csw_protobuf;
 
 import "csw_protobuf/parameter.proto";
 import "google/protobuf/timestamp.proto";
+import "csw_protobuf/models.proto";
 
 message PbEvent {
     enum PbEventType {
@@ -13,7 +14,7 @@ message PbEvent {
     string eventId = 10;
     string source = 11;
     string name = 12;
-    google.protobuf.Timestamp eventTime = 13;
+    PbUTCTime eventTime = 13;
     repeated PbParameter paramSet = 14;
     PbEventType eventType = 15;
 }

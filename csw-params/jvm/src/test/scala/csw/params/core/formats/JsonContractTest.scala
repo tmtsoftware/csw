@@ -3,13 +3,13 @@ package csw.params.core.formats
 import java.time.Instant
 
 import csw.params.commands.{CommandName, Observe, Setup, Wait}
-import csw.params.events._
 import csw.params.core.generics.KeyType
 import csw.params.core.generics.KeyType.{LongMatrixKey, StructKey}
 import csw.params.core.models.Units.{encoder, meter, second, NoUnits}
 import csw.params.core.models._
 import csw.params.core.states.{CurrentState, DemandState, StateName}
-import csw.time.core.models.UTCTime
+import csw.params.events._
+import csw.time.core.models.{TAITime, UTCTime}
 import org.scalatest.{FunSpec, Matchers}
 import play.api.libs.json.Json
 
@@ -169,6 +169,7 @@ class JsonContractTest extends FunSpec with Matchers {
     }
   }
 
+  // DEOPSCSW-661: Create UTCTimeKey and TAITimeKey replacing TimestampKey in Protobuf parameters
   describe("Exercise all types of keys") {
     import KeyType._
     // Simple Key's
@@ -185,29 +186,34 @@ class JsonContractTest extends FunSpec with Matchers {
         .make("UTCTimeKey")
         .set(UTCTime(Instant.ofEpochMilli(0)), UTCTime(Instant.parse("2017-09-04T19:00:00.123456789Z")))
 
+    val p10 =
+      TAITimeKey
+        .make("TAITimeKey")
+        .set(TAITime(Instant.ofEpochMilli(0)), TAITime(Instant.parse("2017-09-04T19:00:00.123456789Z")))
+
     // ArrayData Key's
-    val p10 = ByteArrayKey.make("ByteArrayKey").set(ArrayData.fromArray(Array[Byte](1, 2)))
-    val p11 = ShortArrayKey.make("ShortArrayKey").set(ArrayData.fromArray(Array[Short](3, 4)))
-    val p12 = LongArrayKey.make("LongArrayKey").set(ArrayData.fromArray(Array[Long](5, 6)))
-    val p13 = IntArrayKey.make("IntArrayKey").set(ArrayData.fromArray(Array(7, 8)))
-    val p14 = FloatArrayKey.make("FloatArrayKey").set(ArrayData.fromArray(Array[Float](9, 10)))
-    val p15 = DoubleArrayKey.make("DoubleArrayKey").set(ArrayData.fromArray(Array[Double](11, 12)))
+    val p11 = ByteArrayKey.make("ByteArrayKey").set(ArrayData.fromArray(Array[Byte](1, 2)))
+    val p12 = ShortArrayKey.make("ShortArrayKey").set(ArrayData.fromArray(Array[Short](3, 4)))
+    val p13 = LongArrayKey.make("LongArrayKey").set(ArrayData.fromArray(Array[Long](5, 6)))
+    val p14 = IntArrayKey.make("IntArrayKey").set(ArrayData.fromArray(Array(7, 8)))
+    val p15 = FloatArrayKey.make("FloatArrayKey").set(ArrayData.fromArray(Array[Float](9, 10)))
+    val p16 = DoubleArrayKey.make("DoubleArrayKey").set(ArrayData.fromArray(Array[Double](11, 12)))
     // MatrixData Key's
-    val p16 = ByteMatrixKey.make("ByteMatrix").set(MatrixData.fromArrays(Array[Byte](1, 2), Array[Byte](3, 4)))
-    val p17 = ShortMatrixKey.make("ShortMatrix").set(MatrixData.fromArrays(Array[Short](4, 5), Array[Short](6, 7)))
-    val p18 = LongMatrixKey.make("LongMatrix").set(MatrixData.fromArrays(Array[Long](8, 9), Array[Long](10, 11)))
-    val p19 = IntMatrixKey.make("IntMatrix").set(MatrixData.fromArrays(Array(12, 13), Array(14, 15)))
-    val p20 =
-      FloatMatrixKey.make("FloatMatrix").set(MatrixData.fromArrays(Array[Float](16, 17), Array[Float](18, 19)))
+    val p17 = ByteMatrixKey.make("ByteMatrix").set(MatrixData.fromArrays(Array[Byte](1, 2), Array[Byte](3, 4)))
+    val p18 = ShortMatrixKey.make("ShortMatrix").set(MatrixData.fromArrays(Array[Short](4, 5), Array[Short](6, 7)))
+    val p19 = LongMatrixKey.make("LongMatrix").set(MatrixData.fromArrays(Array[Long](8, 9), Array[Long](10, 11)))
+    val p20 = IntMatrixKey.make("IntMatrix").set(MatrixData.fromArrays(Array(12, 13), Array(14, 15)))
     val p21 =
+      FloatMatrixKey.make("FloatMatrix").set(MatrixData.fromArrays(Array[Float](16, 17), Array[Float](18, 19)))
+    val p22 =
       DoubleMatrixKey.make("DoubleMatrix").set(MatrixData.fromArrays(Array[Double](20, 21), Array[Double](22, 23)))
     // RaDec Key
-    val p22 = RaDecKey.make("RaDecKey").set(RaDec(7.3, 12.1))
+    val p23 = RaDecKey.make("RaDecKey").set(RaDec(7.3, 12.1))
     // Choice Key
-    val p23 = ChoiceKey.make("ChoiceKey", Choices.from("First", "Second")).set("First", "Second")
+    val p24 = ChoiceKey.make("ChoiceKey", Choices.from("First", "Second")).set("First", "Second")
     // Struct Key
-    val p24 = StructKey.make("StructKey").set(Struct(Set(p1, p2)))
-    val p25 = StringKey.make("StringKey").set("Str1", "Str2")
+    val p25 = StructKey.make("StructKey").set(Struct(Set(p1, p2)))
+    val p26 = StringKey.make("StringKey").set("Str1", "Str2")
 
     it("should able to serialize and deserialize Setup command with all keys to and from json") {
       val setup = Setup(prefix, CommandName("move"), Some(obsId)).madd(
@@ -235,7 +241,8 @@ class JsonContractTest extends FunSpec with Matchers {
         p22,
         p23,
         p24,
-        p25
+        p25,
+        p26
       )
 
       val setupToJson = JsonSupport.writeSequenceCommand(setup)

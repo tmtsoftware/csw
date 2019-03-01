@@ -4,7 +4,7 @@ import java.time.Instant
 
 import com.google.protobuf.ByteString
 import com.google.protobuf.timestamp.Timestamp
-import csw.time.core.models.{TAITime, UTCTime}
+import csw.time.core.models.{TAITime, TMTTime, UTCTime}
 import scalapb.TypeMapper
 
 /**
@@ -22,18 +22,15 @@ object Implicits {
       Timestamp().withSeconds(x.getEpochSecond).withNanos(x.getNano)
     }
 
-  implicit val utcMapper: TypeMapper[Timestamp, UTCTime] =
-    TypeMapper[Timestamp, UTCTime] { x =>
-      UTCTime(Instant.ofEpochSecond(x.seconds, x.nanos))
-    } { x =>
-      Timestamp().withSeconds(x.value.getEpochSecond).withNanos(x.value.getNano)
-    }
+  implicit val utcMapper: TypeMapper[Timestamp, UTCTime] = tmtTimeMapper(UTCTime(_))
 
-  implicit val taiMapper: TypeMapper[Timestamp, TAITime] =
-    TypeMapper[Timestamp, TAITime] { x =>
-      TAITime(Instant.ofEpochSecond(x.seconds, x.nanos))
+  implicit val taiMapper: TypeMapper[Timestamp, TAITime] = tmtTimeMapper(TAITime(_))
+
+  private def tmtTimeMapper[T <: TMTTime](factory: Instant ⇒ T): TypeMapper[Timestamp, T] =
+    TypeMapper[Timestamp, T] { x ⇒
+      factory(instantMapper.toCustom(x))
     } { x =>
-      Timestamp().withSeconds(x.value.getEpochSecond).withNanos(x.value.getNano)
+      instantMapper.toBase(x.value)
     }
 
   /**

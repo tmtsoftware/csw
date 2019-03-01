@@ -252,6 +252,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
     }
 
     //DEOPSCSW-282: Add a timestamp Key and Parameter
+    //DEOPSCSW-661: Create UTCTimeKey and TAITimeKey replacing TimestampKey in Protobuf parameters
     @Test
     public void testTimestampKeyParameter() {
         String keyName = "UTCTimeKey";

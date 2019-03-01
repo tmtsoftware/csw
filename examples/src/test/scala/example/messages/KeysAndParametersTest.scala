@@ -1,7 +1,5 @@
 package example.messages
 
-import java.time.Instant
-
 import csw.params.core.generics.KeyType.{ChoiceKey, StructKey}
 import csw.params.core.generics.{GChoiceKey, Key, KeyType, Parameter}
 import csw.params.core.models._

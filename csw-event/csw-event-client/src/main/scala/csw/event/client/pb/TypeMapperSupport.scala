@@ -1,12 +1,11 @@
 package csw.event.client.pb
 
-import com.google.protobuf.timestamp.Timestamp
 import csw.event.client.pb.Implicits._
-import csw.params.events._
+import csw.event.client.pb.TypeMapperFactory.make
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.ObsId.empty
 import csw.params.core.models._
-import csw.event.client.pb.TypeMapperFactory.make
+import csw.params.events._
 import csw.time.core.models.{TAITime, UTCTime}
 import csw_protobuf.events.PbEvent
 import csw_protobuf.events.PbEvent.PbEventType
@@ -70,7 +69,7 @@ object TypeMapperSupport {
         Id(base.eventId),
         Prefix(base.source),
         EventName(base.name),
-        base.eventTime.map(eventTimeTypeMapper.toCustom).get,
+        base.eventTime.map(utcTimeTypeMapper.toCustom).get,
         ParameterSetMapper.toCustom(base.paramSet)
       ).asInstanceOf[T]
     }
@@ -84,18 +83,11 @@ object TypeMapperSupport {
         .withEventId(custom.eventId.id)
         .withSource(custom.source.prefix)
         .withName(custom.eventName.name)
-        .withEventTime(eventTimeTypeMapper.toBase(custom.eventTime))
+        .withEventTime(utcTimeTypeMapper.toBase(custom.eventTime))
         .withParamSet(ParameterSetMapper.toBase(custom.paramSet))
         .withEventType(pbEventType)
     }
   }
-
-  private implicit val eventTimeTypeMapper: TypeMapper[Timestamp, UTCTime] =
-    TypeMapper[Timestamp, UTCTime] { x ⇒
-      UTCTime(instantMapper.toCustom(x))
-    } { x ⇒
-      instantMapper.toBase(x.value)
-    }
 
   implicit val structTypeMapper: TypeMapper[PbStruct, Struct] = TypeMapper[PbStruct, Struct] { s =>
     Struct(s.paramSet.map(parameterTypeMapper2.toCustom).toSet)

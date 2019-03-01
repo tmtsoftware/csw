@@ -64,8 +64,8 @@
       "units": "NoUnits"
     },
     {
-      "keyName": "timestamp",
-      "keyType": "TimestampKey",
+      "keyName": "utcTime",
+      "keyType": "UTCTimeKey",
       "values": [
         "2018-07-09T09:02:18.682Z"
       ],

@@ -12,5 +12,5 @@ struct-2/ra = StringKey[NoUnits]
 struct-2/struct-1/dec = StringKey[NoUnits]
 struct-2/struct-1/ra = StringKey[NoUnits]
 temperature = StringKey[kelvin]
-timestamp = TimestampKey[second]
+utcTime = UTCTimeKey[second]
 ===============================================================================================================

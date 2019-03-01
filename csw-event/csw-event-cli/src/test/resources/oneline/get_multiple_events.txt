@@ -12,5 +12,5 @@ struct-2/ra = "12:13:14.1" [NoUnits]
 struct-2/struct-1/dec = "32:33:34.4" [NoUnits]
 struct-2/struct-1/ra = "12:13:14.1" [NoUnits]
 temperature = "1k", "2k" [kelvin]
-timestamp = 2018-07-09T09:02:18.682Z [second]
+utcTime = UTCTime(2018-07-09T09:02:18.682Z) [second]
 ===============================================================================================================
