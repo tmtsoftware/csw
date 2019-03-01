@@ -53,6 +53,8 @@ trait EventPublisher {
    * which wraps the underlying exception and also provides the handle to the event which was failed to be published.
    * The provided callback is executed on the failed element and the stream resumes to publish remaining elements.
    *
+   * @note Callbacks like `onError` are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
+   *
    * @param source  a [[akka.stream.scaladsl.Source]] of events to be published.
    *                Any resource cleanup or exception handling of the provided source is to be managed by the source provider
    * @param onError a callback to execute for each event for which publishing failed
@@ -70,6 +72,8 @@ trait EventPublisher {
    * In all other cases of exception, the stream receives a [[csw.event.api.exceptions.PublishFailure]] exception
    * which wraps the underlying exception. The generator resumes to publish remaining elements in case of this exception.
    *
+   * @note Callbacks like `eventGenerator` are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
+   *
    * @param eventGenerator a function which can generate an event to be published at `every` frequency
    * @param every frequency with which the events are to be published
    * @return a handle to cancel the event generation through `eventGenerator`
@@ -86,6 +90,8 @@ trait EventPublisher {
    * In all other cases of exception, the stream receives a [[csw.event.api.exceptions.PublishFailure]] exception
    * which wraps the underlying exception. The generator resumes to publish remaining elements in case of this exception.
    *
+   * @note Callbacks like `eventGenerator` are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
+
    * @param eventGenerator a function which can generate an event to be published at `every` frequency
    * @param startTime the time at which the `eventGenerator` should start generating events
    * @param every frequency with which the events are to be published
@@ -103,7 +109,8 @@ trait EventPublisher {
    * which wraps the underlying exception and also provides the handle to the event which was failed to be published.
    * The provided callback is executed on the failed element and the generator resumes to publish remaining elements.
    *
-   * @note any exception thrown from `onError` callback is expected to be handled by component developers.
+   * @note Callbacks like `eventGenerator` and `onError` are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
+   * Also note that any exception thrown from `onError` callback is expected to be handled by component developers.
    *
    * @param eventGenerator a function which can generate an event to be published at `every` frequency
    * @param every frequency with which the events are to be published
@@ -123,7 +130,8 @@ trait EventPublisher {
    * which wraps the underlying exception and also provides the handle to the event which was failed to be published.
    * The provided callback is executed on the failed element and the generator resumes to publish remaining elements.
    *
-   * @note any exception thrown from `onError` callback is expected to be handled by component developers.
+   * @note Callbacks like `eventGenerator` and `onError` are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
+   * Also note that any exception thrown from `onError` callback is expected to be handled by component developers.
    *
    * @param eventGenerator a function which can generate an event to be published at `every` frequency
    * @param startTime the time at which the `eventGenerator` should start generating events
@@ -131,10 +139,12 @@ trait EventPublisher {
    * @param onError a callback to execute for each event for which publishing failed
    * @return a handle to cancel the event generation through `eventGenerator`
    */
-  def publish(eventGenerator: => Option[Event],
-              startTime: TMTTime,
-              every: FiniteDuration,
-              onError: PublishFailure ⇒ Unit): Cancellable
+  def publish(
+      eventGenerator: => Option[Event],
+      startTime: TMTTime,
+      every: FiniteDuration,
+      onError: PublishFailure ⇒ Unit
+  ): Cancellable
 
   /**
    * Publish [[csw.params.events.Event]] from an asynchronous `eventGenerator` function, which will be executed at `every` frequency.
@@ -144,6 +154,8 @@ trait EventPublisher {
    * and the stream is stopped after logging appropriately.
    * In all other cases of exception, the stream receives a [[csw.event.api.exceptions.PublishFailure]] exception
    * which wraps the underlying exception and also provides the handle to the event which was failed to be published.
+   *
+   * @note Callbacks like `eventGenerator` are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
    *
    * @param eventGenerator a function which can generate a Future of event to be published at `every` frequency
    * @param every frequency with which the events are to be published
@@ -160,6 +172,8 @@ trait EventPublisher {
    * and the stream is stopped after logging appropriately.
    * In all other cases of exception, the stream receives a [[csw.event.api.exceptions.PublishFailure]] exception
    * which wraps the underlying exception and also provides the handle to the event which was failed to be published.
+   *
+   * @note Callbacks like `eventGenerator` are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
    *
    * @param eventGenerator a function which can generate a Future of event to be published at `every` frequency
    * @param startTime the time at which the `eventGenerator` should start generating events
@@ -179,7 +193,8 @@ trait EventPublisher {
    * which wraps the underlying exception and also provides the handle to the event which was failed to be published.
    * The provided callback is executed on the failed element and the generator resumes to publish remaining elements.
    *
-   * @note any exception thrown from or `onError` callback is expected to be handled by component developers.
+   * @note Callbacks like `eventGenerator` and `onError` are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
+   * Also note that any exception thrown from `onError` callback is expected to be handled by component developers.
    *
    * @param eventGenerator a function which can generate a Future of event to be published at `every` frequency
    * @param every frequency with which the events are to be published
@@ -200,7 +215,8 @@ trait EventPublisher {
    * which wraps the underlying exception and also provides the handle to the event which was failed to be published.
    * The provided callback is executed on the failed element and the generator resumes to publish remaining elements.
    *
-   * @note any exception thrown from `onError` callback is expected to be handled by component developers.
+   * @note Callbacks like `eventGenerator` and `onError` are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
+   * Also note that any exception thrown from `onError` callback is expected to be handled by component developers.
    *
    * @param eventGenerator a function which can generate a Future of event to be published at `every` frequency
    * @param startTime the time at which the `eventGenerator` should start generating events

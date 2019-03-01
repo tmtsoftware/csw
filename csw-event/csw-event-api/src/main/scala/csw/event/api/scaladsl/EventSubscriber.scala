@@ -54,6 +54,9 @@ trait EventSubscriber {
    * Subscribes an asynchronous callback function to events from multiple eventKeys. The callback is of type event => future
    * and it ensures that the event callbacks are called sequentially in such a way that the subsequent execution will
    * start only after the prior one completes. This API gives the guarantee of ordered execution of the asynchronous callbacks.
+   *
+   * @note Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
+   *
    * The latest events available for the given Event Keys will be received first.
    * If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
    *
@@ -90,8 +93,12 @@ trait EventSubscriber {
   ): EventSubscription
 
   /**
-   * Subscribes a callback function to events from multiple event keys. Note that any exception thrown from `callback` is expected to be handled by
-   * component developers. The latest events available for the given Event Keys will be received first. If event is not published for one or more event keys,
+   * Subscribes a callback function to events from multiple event keys.
+   *
+   * @note Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
+   * Also note that any exception thrown from `callback` is expected to be handled by the component developers.
+   *
+   * The latest events available for the given Event Keys will be received first. If event is not published for one or more event keys,
    * `invalid event` will be received for those Event Keys.
    *
    * At the time of invocation, in case the underlying server is not available, [[csw.event.api.exceptions.EventServerNotAvailable]] exception is thrown
