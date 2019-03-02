@@ -1,0 +1,39 @@
+{
+    "logging": {
+      "version": 1,
+      "disable_existing_loggers": true,
+      "formatters": {
+        "single-line": {
+          "class": "logging.Formatter",
+          "datefmt": "%I:%M:%S",
+          "format": "%(levelname)-8s; %(asctime)s; %(name)-15s; %(module)s:%(funcName)s;%(lineno)d: %(message)s"
+        },
+        "verbose": {
+          "class": "logging.Formatter",
+          "datefmt": "%Y-%m-%dT%H:%M:%SZ",
+          "format": "{\"name\":\"%(name)s\", \"severity\":\"%(levelname)s\", \"message\": \"%(message)s\", \"file\": \"%(filename)s\", \"line\": \"%(lineno)d\", \"process\": \"%(processName)s\", \"class\": \"%(pathname)s\", \"timestamp\": \"%(asctime)s\"}"
+        }
+      },
+      "handlers": {
+        "console":{
+          "level": "DEBUG",
+          "class": "logging.StreamHandler",
+          "formatter": "single-line",
+          "stream" : "ext://sys.stdout"
+        },
+        "file_handler": {
+          "level": "INFO",
+          "class": "logging.handlers.WatchedFileHandler",
+          "formatter": "verbose",
+          "filename": "/tmp/file_handler.log",
+          "mode": "a",
+          "encoding": "utf-8"
+        }
+      },
+      "loggers": { },
+      "root": {
+        "handlers": ["console", "file_handler"],
+        "level": "DEBUG"
+      }
+    }
+  }
