@@ -1,11 +1,12 @@
+package csw.database;
+
 import akka.actor.ActorSystem;
 import akka.stream.ActorMaterializer;
 import akka.stream.Materializer;
 import com.opentable.db.postgres.embedded.EmbeddedPostgres;
-import csw.database.DatabaseServiceFactory;
+import csw.database.commons.DBTestHelper;
 import csw.database.commons.DatabaseServiceConnection;
 import csw.database.javadsl.JooqHelper;
-import csw.database.commons.DBTestHelper;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.models.TcpRegistration;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;

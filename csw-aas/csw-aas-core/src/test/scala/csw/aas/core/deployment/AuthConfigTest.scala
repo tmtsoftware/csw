@@ -10,7 +10,7 @@ import scala.collection.JavaConverters._
 
 class AuthConfigTest extends FunSuite with Matchers {
   test("should create KeycloakDeployment from config") {
-    val config     = ConfigFactory.load("auth-config")
+    val config     = ConfigFactory.load()
     val authConfig = AuthConfig.create()
 
     val deployment = authConfig.getDeployment
@@ -21,7 +21,7 @@ class AuthConfigTest extends FunSuite with Matchers {
   }
 
   test("should create KeycloakDeployment from config and auth server url from location service") {
-    val config        = ConfigFactory.load("auth-config")
+    val config        = ConfigFactory.load()
     val authServerUrl = "http://somehost:someport"
     val httpLocation  = HttpLocation(HttpConnection(ComponentId("testComponent", ComponentType.Service)), new URI(authServerUrl))
     val authConfig    = AuthConfig.create(authServerLocation = Some(httpLocation))

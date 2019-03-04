@@ -1,3 +1,5 @@
+package csw.database;
+
 import akka.actor.ActorSystem;
 import com.opentable.db.postgres.embedded.EmbeddedPostgres;
 import csw.database.javadsl.JooqHelper;
