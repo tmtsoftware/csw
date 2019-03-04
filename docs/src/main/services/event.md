@@ -95,7 +95,7 @@ Java
 :   @@snip [JEventPublishExamples.java](../../../../examples/src/main/java/example/event/JEventPublishExamples.java) { #event-generator }
 
 @@@ note
-Callbacks like `eventGenerator` are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor. Here is an @github[example](/examples/src/main/scala/example/event/EventPublisherConcurrencyExample.scala) of how it can be done.
+Callbacks like `eventGenerator` are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor. Here is an @github[example](/examples/src/main/scala/example/event/ConcurrencyInCallbacksExample.scala) of how it can be done.
 @@@
 
 
@@ -138,7 +138,7 @@ Java
 
 
 @@@ note
-Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor. Here is an @github[example](/examples/src/main/scala/example/event/EventPublisherConcurrencyExample.scala) of how it can be done. The example shown here is with the publish API, similar approach could be taken for subscribe APIs as well.
+Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor. Here is an @github[example](/examples/src/main/scala/example/event/ConcurrencyInCallbacksExample.scala) of how it can be done. The example shown here is with the publish API, similar approach could be taken for subscribe APIs as well.
 @@@
 
 
