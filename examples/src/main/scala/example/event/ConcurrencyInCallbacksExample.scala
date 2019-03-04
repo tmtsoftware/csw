@@ -15,6 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ConcurrencyInCallbacksExample(publisher: EventPublisher)(implicit actorSystem: ActorSystem) {
 
+  // currentTemperature is the mutable state which needs to be mutated from anywhere from the program
   def behavior(currentTemperature: Temperature): Behavior[TemperatureMessage] = Behaviors.setup { ctx ⇒
     implicit val timeout: Timeout     = Timeout(5.seconds)
     implicit val scheduler: Scheduler = actorSystem.scheduler

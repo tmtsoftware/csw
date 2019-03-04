@@ -82,6 +82,8 @@ trait CommandService {
   /**
    * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
    *
+   * @note Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
+   *
    * @param callback the action to be applied on the CurrentState element received as a result of subscription
    * @return a CurrentStateSubscription to stop the subscription
    */
@@ -89,6 +91,8 @@ trait CommandService {
 
   /**
    * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
+   *
+   * @note Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
    *
    * @param names subscribe to only those states which have any of the the provided value for name
    * @param callback the action to be applied on the CurrentState element received as a result of subscription

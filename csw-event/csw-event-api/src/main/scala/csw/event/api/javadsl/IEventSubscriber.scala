@@ -52,12 +52,15 @@ trait IEventSubscriber {
    * Subscribes an asynchronous callback function to events from multiple eventKeys. The callback is of type event => future
    * and it ensures that the event callbacks are called sequentially in such a way that the subsequent execution will
    * start only after the prior one completes. This API gives the guarantee of ordered execution of the asynchronous callbacks.
+   *
    * The latest events available for the given Event Keys will be received first.
    * If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
    *
    * At the time of invocation, in case the underlying server is not available, [[csw.event.api.exceptions.EventServerNotAvailable]] exception is thrown
    * and the subscription is stopped after logging appropriately. [[csw.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine
    * this state. In all other cases of exception, the subscription resumes to receive remaining elements.
+   *
+   * @note Callbacks are not thread-safe on the JVM. If you need to do side effects/mutations, prefer using [[subscribeActorRef]] API.
    *
    * @param eventKeys a set of [[csw.params.events.EventKey]] to subscribe to
    * @param callback a function to execute asynchronously on each received event
@@ -88,13 +91,15 @@ trait IEventSubscriber {
   ): IEventSubscription
 
   /**
-   * Subscribes a callback function to events from multiple event keys. Note that any exception thrown from `callback` is expected to be handled by
-   * component developers. The latest events available for the given Event Keys will be received first. If event is not published for one or more event keys,
-   * `invalid event` will be received for those Event Keys.
+   * Subscribes a callback function to events from multiple event keys. The latest events available for the given Event Keys will be received first.
+   * If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
    *
    * At the time of invocation, in case the underlying server is not available, [[csw.event.api.exceptions.EventServerNotAvailable]] exception is thrown
    * and the subscription is stopped after logging appropriately. [[csw.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine this
    * state. In all other cases of exception, the subscription resumes to receive remaining elements.
+   *
+   * @note Callbacks are not thread-safe on the JVM. If you need to do side effects/mutations, prefer using [[subscribeActorRef]] API.
+   * Also note that any exception thrown from `callback` is expected to be handled by component developers.
    *
    * @param eventKeys a set of [[csw.params.events.EventKey]] to subscribe to
    * @param callback a consumer which defines an operation to execute on each received event
@@ -186,6 +191,8 @@ trait IEventSubscriber {
    * At the time of invocation, in case the underlying server is not available, [[csw.event.api.exceptions.EventServerNotAvailable]] exception is thrown
    * and the subscription is stopped after logging appropriately. [[csw.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine this
    * state. In all other cases of exception, the subscription resumes to receive remaining elements.
+   *
+   * @note Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
    *
    * @param subsystem a valid [[csw.params.core.models.Subsystem]] which represents the source of the events
    * @param pattern   Subscribes the client to the given patterns. Supported glob-style patterns:

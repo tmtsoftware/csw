@@ -32,6 +32,8 @@ private[alarm] trait SeverityService extends AlarmService {
    * Calculates the aggregated severity for the given alarm/component/subsystem/system and executes the callback each time the
    * aggregation changes
    *
+   * @note Callbacks are not thread-safe on the JVM. If you need to do side effects/mutations, prefer using [[subscribeAggregatedSeverityActorRef]] API.
+   *
    * @note aggregated severity is worst amongst all active alarms for given key
    * @param key represents an alarm, component, subsystem or system
    * @param callback executed with the latest worst severity
