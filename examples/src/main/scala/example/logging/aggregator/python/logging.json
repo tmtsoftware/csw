@@ -9,7 +9,7 @@
           "format": "%(levelname)-8s; %(asctime)s; %(name)-15s; %(module)s:%(funcName)s;%(lineno)d: %(message)s"
         },
         "verbose": {
-          "class": "logging.Formatter",
+          "class": "tmt_formatter.UTCFormatter",
           "datefmt": "%Y-%m-%dT%H:%M:%SZ",
           "format": "{\"name\":\"%(name)s\", \"severity\":\"%(levelname)s\", \"message\": \"%(message)s\", \"file\": \"%(filename)s\", \"line\": \"%(lineno)d\", \"process\": \"%(processName)s\", \"class\": \"%(pathname)s\", \"timestamp\": \"%(asctime)s\"}"
         }
@@ -23,7 +23,7 @@
         },
         "file_handler": {
           "level": "INFO",
-          "class": "logging.handlers.WatchedFileHandler",
+          "class": "logging.handlers.RotatingFileHandler",
           "formatter": "verbose",
           "filename": "/tmp/file_handler.log",
           "mode": "a",
