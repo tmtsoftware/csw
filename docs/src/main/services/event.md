@@ -94,6 +94,11 @@ Scala
 Java
 :   @@snip [JEventPublishExamples.java](../../../../examples/src/main/java/example/event/JEventPublishExamples.java) { #event-generator }
 
+@@@ note
+Callbacks like `eventGenerator` are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor. Here is an @github[example](/examples/src/main/scala/example/event/EventPublisherConcurrencyExample.scala) of how it can be done.
+@@@
+
+
 ### With Event Stream
 
 In order to publish a continuous stream of events, this stream-based API can also be used. 
@@ -108,8 +113,6 @@ Java
 :   @@snip [JEventPublishExamples.java](../../../../examples/src/main/java/example/event/JEventPublishExamples.java) { #with-source }
 
 This API also demonstrates the usage of onError callback which can be used to be alerted to and handle events that failed while being published. 
-The `eventGenerator` API showed just above also demonstrates the use of the `onError` callback.
-
 
 You can find complete list of APIs supported by `EventPublisher` and `IEventPublisher` with detailed description of each API here: 
 
@@ -132,6 +135,12 @@ Scala
 
 Java
 :   @@snip [JEventSubscribeExamples.java](../../../../examples/src/main/java/example/event/JEventSubscribeExamples.java) { #with-callback }
+
+
+@@@ note
+Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor. Here is an @github[example](/examples/src/main/scala/example/event/EventPublisherConcurrencyExample.scala) of how it can be done. The example shown here is with the publish API, similar approach could be taken for subscribe APIs as well.
+@@@
+
 
 ### With Asynchronous Callback
 
