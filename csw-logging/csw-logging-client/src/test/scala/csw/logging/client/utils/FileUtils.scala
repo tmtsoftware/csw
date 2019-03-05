@@ -11,8 +11,8 @@ object FileUtils {
   def deleteRecursively(file: File): Unit = {
     // just to be safe, don't delete anything other than tmt folder
     val p = file.getPath
-    if (!p.contains("/tmt/"))
-      throw new RuntimeException(s"Refusing to delete $file other than \'tmt\'")
+    if (!p.contains("/tmp"))
+      throw new RuntimeException(s"Refusing to delete $file other than \'tmp\'")
 
     if (file.isDirectory)
       file.listFiles.foreach(deleteRecursively)

@@ -7,6 +7,7 @@ import java.time.{LocalDateTime, ZoneId, ZoneOffset, ZonedDateTime}
 import akka.actor._
 import csw.logging.api.models.LoggingLevels.Level
 import csw.logging.api.scaladsl.Logger
+import csw.logging.client.appenders.FileAppender.TMT_LOG_HOME
 import csw.logging.client.commons.{Category, Constants, LoggingKeys, TMTDateTimeFormatter}
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.internal.LoggerImpl
@@ -113,8 +114,7 @@ private[logging] class FilesAppender(path: String, category: String) {
  * Companion object for FileAppender class.
  */
 object FileAppender extends LogAppenderBuilder {
-
-  private[logging] val BaseLogPath = sys.env.getOrElse("TMT_LOG_HOME", "/tmp") + "/tmt/logs"
+  private val TMT_LOG_HOME = "TMT_LOG_HOME"
 
   /**
    * Constructor for a file appender.
@@ -147,6 +147,14 @@ object FileAppender extends LogAppenderBuilder {
  * @param stdHeaders the headers that are fixes for this service.
  */
 class FileAppender(factory: ActorRefFactory, stdHeaders: JsObject) extends LogAppender {
+  // System properties are used for test purpose
+  private val allValues = sys.env ++ sys.props
+  require(
+    allValues.get(TMT_LOG_HOME).isDefined,
+    s"Environment variable $TMT_LOG_HOME is not defined. Please define <$TMT_LOG_HOME> to the directory where log files should be stored."
+  )
+
+  private[logging] val baseLogPath = allValues(TMT_LOG_HOME) + "/tmt/logs"
   private[this] val system = factory match {
     case context: ActorContext => context.system
     case s: ActorSystem        => s
@@ -155,7 +163,7 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: JsObject) extends LogAp
   private[this] val config =
     system.settings.config.getConfig("csw-logging.appender-config.file")
   private[this] val fullHeaders   = config.getBoolean("fullHeaders")
-  private[this] val logPath       = s"${FileAppender.BaseLogPath}/${config.getString("logPath")}"
+  private[this] val logPath       = s"$baseLogPath/${config.getString("logPath")}"
   private[this] val logLevelLimit = Level(config.getString("logLevelLimit"))
   private[this] val rotateFlag    = config.getBoolean("rotate")
   private[this] val fileAppenders =

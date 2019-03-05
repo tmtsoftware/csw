@@ -3,7 +3,6 @@ package csw.logging.client.appenders
 import java.nio.file.Paths
 
 import akka.actor.ActorSystem
-import com.typesafe.config.ConfigFactory
 import csw.logging.client.commons.{Category, LoggingKeys, TMTDateTimeFormatter}
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.FileUtils
@@ -16,12 +15,9 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-123: Allow local component logs to be output to a file
 // DEOPSCSW-649: Fixed directory configuration for multi JVM scenario
 class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
-  private val baseDir    = Paths.get(FileAppender.BaseLogPath).toFile
-  private val logFileDir = Paths.get("/csw-test-logs/").toFile
-  private val config = ConfigFactory
-    .parseString(s"csw-logging.appender-config.file.logPath=${logFileDir.getAbsolutePath}")
-    .withFallback(ConfigFactory.load())
-  private val actorSystem               = ActorSystem("test-1", config)
+  System.setProperty("TMT_LOG_HOME", "/tmp/")
+  private val logFileDir                = Paths.get("/tmp/tmt/logs/csw-test-logs/").toFile
+  private val actorSystem               = ActorSystem("test-1")
   private val standardHeaders: JsObject = Json.obj(LoggingKeys.HOST -> "localhost", LoggingKeys.NAME -> "test-service")
 
   private val fileAppender = new FileAppender(actorSystem, standardHeaders)
@@ -77,23 +73,32 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
 
   private val date1            = expectedLogMsgJson1.getString(LoggingKeys.TIMESTAMP)
   private val localDateTime1   = FileAppender.decideTimestampForFile(TMTDateTimeFormatter.parse(date1))
-  private val logFileFullPath1 = baseDir + "/" + logFileDir.getAbsolutePath ++ s"/test-service/alternative.$localDateTime1.log"
+  private val logFileFullPath1 = logFileDir.getAbsolutePath ++ s"/test-service/alternative.$localDateTime1.log"
 
   private val date2            = expectedLogMsgJson2.getString(LoggingKeys.TIMESTAMP)
   private val localDateTime2   = FileAppender.decideTimestampForFile(TMTDateTimeFormatter.parse(date2))
-  private val logFileFullPath2 = baseDir + "/" + logFileDir.getAbsolutePath ++ s"/test-service/common.$localDateTime2.log"
+  private val logFileFullPath2 = logFileDir.getAbsolutePath ++ s"/test-service/common.$localDateTime2.log"
 
   private val date3            = expectedLogMsgJson3.getString(LoggingKeys.TIMESTAMP)
   private val localDateTime3   = FileAppender.decideTimestampForFile(TMTDateTimeFormatter.parse(date3))
-  private val logFileFullPath3 = baseDir + "/" + logFileDir.getAbsolutePath ++ s"/test-service/common.$localDateTime3.log"
+  private val logFileFullPath3 = logFileDir.getAbsolutePath ++ s"/test-service/common.$localDateTime3.log"
 
   override protected def beforeAll(): Unit = {
-    FileUtils.deleteRecursively(baseDir)
+    FileUtils.deleteRecursively(logFileDir)
   }
 
   override protected def afterAll(): Unit = {
-    FileUtils.deleteRecursively(baseDir)
+    FileUtils.deleteRecursively(logFileDir)
     Await.result(actorSystem.terminate(), 5.seconds)
+  }
+
+  // DEOPSCSW-649: Fixed directory configuration for multi JVM scenario
+  test("should throw illegal argument exception if TMT_LOG_HOME is not defined") {
+    System.clearProperty("TMT_LOG_HOME")
+    intercept[IllegalArgumentException] {
+      new FileAppender(actorSystem, standardHeaders)
+    }
+    System.setProperty("TMT_LOG_HOME", "/tmp/")
   }
 
   //DEOPSCSW-151 : Manage log file size

@@ -16,11 +16,10 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-281 Rolling File Configuration
 // DEOPSCSW-649: Fixed directory configuration for multi JVM scenario
 class NonFileRotationTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
-  private val baseDir    = Paths.get(FileAppender.BaseLogPath).toFile
-  private val logFileDir = Paths.get("/csw-test-logs/").toFile
+  System.setProperty("TMT_LOG_HOME", "/tmp/")
+  private val logFileDir = Paths.get("/tmp/tmt/logs/csw-test-logs/").toFile
   private val map: Map[String, Any] = Map(
-    "csw-logging.appender-config.file.logPath" → logFileDir.getAbsolutePath,
-    "csw-logging.appender-config.file.rotate"  → false
+    "csw-logging.appender-config.file.rotate" → false
   )
   private val config                    = ConfigFactory.parseMap(map.asJava).withFallback(ConfigFactory.load())
   private val actorSystem               = ActorSystem("test-1", config)
@@ -77,15 +76,15 @@ class NonFileRotationTest extends FunSuite with Matchers with BeforeAndAfterEach
   val expectedLogMsgJson2: JsObject = Json.parse(logMsgString2).as[JsObject]
   val expectedLogMsgJson3: JsObject = Json.parse(logMsgString3).as[JsObject]
 
-  private val logFileFullPath1 = baseDir + "/" + logFileDir.getAbsolutePath ++ s"/test-service/alternative.log"
-  private val logFileFullPath2 = baseDir + "/" + logFileDir.getAbsolutePath ++ s"/test-service/common.log"
+  private val logFileFullPath1 = logFileDir.getAbsolutePath ++ s"/test-service/alternative.log"
+  private val logFileFullPath2 = logFileDir.getAbsolutePath ++ s"/test-service/common.log"
 
   override protected def beforeAll(): Unit = {
-    FileUtils.deleteRecursively(baseDir)
+    FileUtils.deleteRecursively(logFileDir)
   }
 
   override protected def afterAll(): Unit = {
-    FileUtils.deleteRecursively(baseDir)
+    FileUtils.deleteRecursively(logFileDir)
     Await.result(actorSystem.terminate(), 5.seconds)
   }
 

@@ -4,7 +4,6 @@ import java.nio.file.Paths
 import java.time.{ZoneId, ZoneOffset, ZonedDateTime}
 
 import akka.actor.ActorSystem
-import com.typesafe.config.ConfigFactory
 import csw.logging.api.models.RequestId
 import csw.logging.client.appenders.FileAppender
 import csw.logging.client.commons.LoggingKeys
@@ -18,15 +17,10 @@ import scala.collection.mutable
 
 // DEOPSCSW-649: Fixed directory configuration for multi JVM scenario
 class TimingTest extends LoggingTestSuite with Timing {
-
-  private val baseDir    = Paths.get(FileAppender.BaseLogPath).toFile
-  private val logFileDir = Paths.get("/csw-test-logs/").toFile
-  private val config = ConfigFactory
-    .parseString(s"csw-logging.appender-config.file.logPath=${logFileDir.getAbsolutePath}")
-    .withFallback(ConfigFactory.load())
-
+  private val logFileDir        = Paths.get("/tmp/tmt/logs/csw-test-logs/").toFile
   private val loggingSystemName = "TimingTest"
-  override lazy val actorSystem = ActorSystem("timing-test-system", config)
+
+  override lazy val actorSystem = ActorSystem("timing-test-system")
   override lazy val loggingSystem =
     new LoggingSystem(loggingSystemName, "version", "localhost", actorSystem)
 
@@ -34,19 +28,19 @@ class TimingTest extends LoggingTestSuite with Timing {
     actorSystem.actorOf(IRIS.props(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
 
   private val fileTimestamp   = FileAppender.decideTimestampForFile(ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC)))
-  private val fullLogFileDir  = FileAppender.BaseLogPath + "/" + logFileDir + "/" + loggingSystemName
+  private val fullLogFileDir  = logFileDir + "/" + loggingSystemName
   private val timeLogFilePath = fullLogFileDir + s"/time.$fileTimestamp.log"
   private val testLogFilePath = fullLogFileDir + s"/common.$fileTimestamp.log"
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
-    FileUtils.deleteRecursively(baseDir)
+    FileUtils.deleteRecursively(logFileDir)
     loggingSystem.setAppenders(List(testAppender, FileAppender))
   }
 
   override protected def afterEach(): Unit = {
     super.afterEach()
-    FileUtils.deleteRecursively(baseDir)
+    FileUtils.deleteRecursively(logFileDir)
   }
 
   def sendLogMsgToIRISActor(): Unit = {

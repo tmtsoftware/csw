@@ -14,7 +14,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
 class LoggingSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
-
+  System.setProperty("TMT_LOG_HOME", "/tmp/")
   // This will load default configuration in application.conf file if provided
   private var loggingSystem: LoggingSystem = _
   private val config                       = ConfigFactory.load().getConfig("csw-logging")
