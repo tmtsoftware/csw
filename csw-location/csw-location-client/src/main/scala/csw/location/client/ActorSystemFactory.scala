@@ -29,7 +29,7 @@ object ActorSystemFactory {
    */
   def remote(componentName: String): ActorSystem = {
     val config = ConfigFactory
-      .parseString(s"akka.remote.netty.tcp.hostname = ${Networks().hostname}")
+      .parseString(s"akka.remote.artery.canonical.hostname = ${Networks().hostname}")
       .withFallback(ConfigFactory.load().getConfig(Constants.RemoteActorSystemName))
       .withFallback(ConfigFactory.defaultApplication().resolve())
 

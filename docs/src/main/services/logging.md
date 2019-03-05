@@ -97,7 +97,7 @@ pretty=true
      "@severity":"INFO",
      "@version":"0.1",
      "actor":
-       "akka.tcp://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a",
+       "akka://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a",
      "class":"csw.location.LocationServiceExampleClient",
      "file":"LocationServiceExampleClientApp.scala",
      "line":149,
@@ -110,7 +110,7 @@ pretty=true
 pretty=false
 :   @@@vars
     ```
-    {"@componentName":"my-component-name","@host":"INsaloni.local","@name":"LocationServiceExampleClient","@severity":"INFO","@version":"0.1","actor":"akka.tcp://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a","class":"csw.location.LocationServiceExampleClient","file":"LocationServiceExampleClientApp.scala","line":149,"message":"Result of the find call: None","timestamp":"2017-11-24T04:16:42.108Z"}
+    {"@componentName":"my-component-name","@host":"INsaloni.local","@name":"LocationServiceExampleClient","@severity":"INFO","@version":"0.1","actor":"akka://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a","class":"csw.location.LocationServiceExampleClient","file":"LocationServiceExampleClientApp.scala","line":149,"message":"Result of the find call: None","timestamp":"2017-11-24T04:16:42.108Z"}
     ```
     @@@
     
@@ -252,7 +252,7 @@ Scala
  "@severity":"INFO",
  "@version":"0.1",
  "actor":
-   "akka.tcp://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a",
+   "akka://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a",
  "class":"csw.location.LocationServiceExampleClient",
  "file":"LocationServiceExampleClientApp.scala",
  "line":149,
@@ -271,7 +271,7 @@ Java
  "@severity":"INFO",
  "@version":"0.1",
  "actor":
-   "akka.tcp://csw-examples-locationServiceClient@10.131.23.195:53625/user/LocationServiceExampleClient",
+   "akka://csw-examples-locationServiceClient@10.131.23.195:53625/user/LocationServiceExampleClient",
  "class":"csw.location.JLocationServiceExampleClient",
  "message":"Result of the find call : None",
  "timestamp":"2017-11-30T11:02:54.691Z"
@@ -287,7 +287,7 @@ Java (Supplier)
  "@name":"JLocationServiceExampleClient",
  "@severity":"INFO",
  "actor":
-   "akka.tcp://csw-examples-locationServiceClient@10.131.23.195:53625/user/LocationServiceExampleClient",
+   "akka://csw-examples-locationServiceClient@10.131.23.195:53625/user/LocationServiceExampleClient",
  "class":"csw.location.JLocationServiceExampleClient",
  "message":
    "Resolve result: LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType",
@@ -318,7 +318,7 @@ Scala
  "@severity":"INFO",
  "@version":"0.1",
  "actor":
-   "akka.tcp://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a",
+   "akka://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a",
  "class":"csw.location.LocationServiceExampleClient",
  "exampleConnection":"LocationServiceExampleComponent-assembly-akka",
  "file":"LocationServiceExampleClientApp.scala",
@@ -340,7 +340,7 @@ Java
  "@severity":"INFO",
  "@version":"0.1",
  "actor":
-   "akka.tcp://csw-examples-locationServiceClient@10.131.23.195:53625/user/LocationServiceExampleClient",
+   "akka://csw-examples-locationServiceClient@10.131.23.195:53625/user/LocationServiceExampleClient",
  "class":"csw.location.JLocationServiceExampleClient",
  "exampleConnection":"LocationServiceExampleComponent-assembly-akka",
  "message":
@@ -360,7 +360,7 @@ Java (Supplier)
  "@severity":"INFO",
  "@version":"0.1",
  "actor":
-   "akka.tcp://csw-examples-locationServiceClient@10.131.23.195:53625/user/LocationServiceExampleClient",
+   "akka://csw-examples-locationServiceClient@10.131.23.195:53625/user/LocationServiceExampleClient",
  "class":"csw.location.JLocationServiceExampleClient",
  "exampleConnection":"LocationServiceExampleComponent-assembly-akka",
  "message":

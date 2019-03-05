@@ -27,8 +27,8 @@ class ClusterSettingsTest extends FunSuite with Matchers with BeforeAndAfterAll 
     val config          = clusterSettings.config
 
     clusterSettings.clusterName shouldBe Constants.ClusterName
-    config.getString("akka.remote.netty.tcp.hostname") shouldBe Networks().hostname
-    config.getInt("akka.remote.netty.tcp.port") shouldBe 0
+    config.getString("akka.remote.artery.canonical.hostname") shouldBe Networks().hostname
+    config.getInt("akka.remote.artery.canonical.port") shouldBe 0
     config.getList("akka.cluster.seed-nodes").size shouldBe 0
   }
 
@@ -40,7 +40,7 @@ class ClusterSettingsTest extends FunSuite with Matchers with BeforeAndAfterAll 
     clusterSettings.interfaceName shouldBe "en0"
     clusterSettings.port shouldBe port
     clusterSettings.seedNodes shouldBe List("10.10.10.10", "10.10.10.11").map { hostname =>
-      s"akka.tcp://${clusterSettings.clusterName}@$hostname"
+      s"akka://${clusterSettings.clusterName}@$hostname"
     }
   }
 
@@ -53,7 +53,7 @@ class ClusterSettingsTest extends FunSuite with Matchers with BeforeAndAfterAll 
 
     clusterSettings.port shouldBe port
     clusterSettings.seedNodes shouldBe portList.map { port =>
-      s"akka.tcp://${clusterSettings.clusterName}@$hostname:$port"
+      s"akka://${clusterSettings.clusterName}@$hostname:$port"
     }
   }
 
@@ -66,7 +66,7 @@ class ClusterSettingsTest extends FunSuite with Matchers with BeforeAndAfterAll 
     clusterSettings.interfaceName shouldBe "en0"
     clusterSettings.port shouldBe port
     clusterSettings.seedNodes shouldBe ipList.map { hostname =>
-      s"akka.tcp://${clusterSettings.clusterName}@$hostname"
+      s"akka://${clusterSettings.clusterName}@$hostname"
     }
   }
 
@@ -84,7 +84,7 @@ class ClusterSettingsTest extends FunSuite with Matchers with BeforeAndAfterAll 
     clusterSettings.port shouldBe systemPort
     clusterSettings.interfaceName shouldBe systemInterfacename
     clusterSettings.seedNodes shouldBe List("10.10.10.12", "10.10.10.13").map { hostname =>
-      s"akka.tcp://${clusterSettings.clusterName}@$hostname"
+      s"akka://${clusterSettings.clusterName}@$hostname"
     }
   }
 }

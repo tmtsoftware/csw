@@ -14,9 +14,9 @@ import scala.collection.JavaConverters._
  * four parameters of an `ActorSystem`, namely :
  *
  *  - name (Name is defaulted to a constant value so that ActorSystem joins the cluster while booting)
- *  - akka.remote.netty.tcp.hostname (The hostname to boot an ActorSystem on)
- *  - akka.remote.netty.tcp.port     (The port to boot an ActorSystem on)
- *  - akka.cluster.seed-nodes        (Seed Nodes of the cluster)
+ *  - akka.remote.artery.canonical.hostname (The hostname to boot an ActorSystem on)
+ *  - akka.remote.artery.canonical.port     (The port to boot an ActorSystem on)
+ *  - akka.cluster.seed-nodes               (Seed Nodes of the cluster)
  *
  * ClusterSettings require three values namely :
  *  - interfaceName (The network interface where cluster is formed.)
@@ -24,13 +24,13 @@ import scala.collection.JavaConverters._
  *  - clusterPort (Specify port on which to start this service)
  *
  * The config values of the `ActorSystem` will be evaluated based on the above three settings as follows :
- *  - `akka.remote.netty.tcp.hostname` will be ipV4 address based on `interfaceName` from [[Networks]]
- *  - `akka.remote.netty.tcp.port` will be a random port or if `clusterPort` is specified that value will be picked
+ *  - `akka.remote.artery.canonical.hostname` will be ipV4 address based on `interfaceName` from [[Networks]]
+ *  - `akka.remote.artery.canonical.port` will be a random port or if `clusterPort` is specified that value will be picked
  *  - `akka.cluster.seed-nodes` will pick values of `clusterSeeds`
  *
  * If none of the settings are provided then defaults will be picked as follows :
- *  - `akka.remote.netty.tcp.hostname` will be ipV4 address from [[Networks]]
- *  - `akka.remote.netty.tcp.port` will be a random port
+ *  - `akka.remote.artery.canonical.hostname` will be ipV4 address from [[Networks]]
+ *  - `akka.remote.artery.canonical.port` will be a random port
  *  - `akka.cluster.seed-nodes` will be empty
  * and an `ActorSystem` will be created and a cluster will be formed with no Seed Nodes. It will self join the cluster.
  *
@@ -108,13 +108,13 @@ private[location] case class ClusterSettings(clusterName: String = Constants.Clu
   private[location] def seeds = allValues.get(ClusterSeedsKey).toList.flatMap(_.toString.split(",")).map(_.trim)
 
   //Prepare a list of seedNodes
-  def seedNodes: List[String] = seeds.map(seed ⇒ s"akka.tcp://$clusterName@$seed")
+  def seedNodes: List[String] = seeds.map(seed ⇒ s"akka://$clusterName@$seed")
 
   //Prepare config for ActorSystem to join csw-cluster
   private[location] def config: Config = {
     val computedValues: Map[String, Any] = Map(
-      "akka.remote.netty.tcp.hostname"        → hostname,
-      "akka.remote.netty.tcp.port"            → port,
+      "akka.remote.artery.canonical.hostname" → hostname,
+      "akka.remote.artery.canonical.port"     → port,
       "akka.cluster.seed-nodes"               → seedNodes.asJava,
       "akka.cluster.http.management.hostname" → hostname,
       "akka.cluster.http.management.port"     → managementPort.getOrElse(19999), //management port will never start at 19999

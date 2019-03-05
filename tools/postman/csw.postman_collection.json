@@ -1091,7 +1091,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"$type\": \"csw.services.location.models.TcpRegistration\",\n  \"connection\": {\n    \"$type\": \"csw.messages.location.Connection.TcpConnection\",\n    \"componentId\": {\n      \"name\": \"EventServer\",\n      \"componentType\": {\n        \"$type\": \"csw.messages.location.ComponentType.Service\"\n      }\n    }\n  },\n  \"port\": 26379,\n  \"logAdminActorRef\": \"akka.tcp://test@192.168.0.103:58420/user/$a#-2084221527\"\n}"
+							"raw": "{\n  \"$type\": \"csw.services.location.models.TcpRegistration\",\n  \"connection\": {\n    \"$type\": \"csw.messages.location.Connection.TcpConnection\",\n    \"componentId\": {\n      \"name\": \"EventServer\",\n      \"componentType\": {\n        \"$type\": \"csw.messages.location.ComponentType.Service\"\n      }\n    }\n  },\n  \"port\": 26379,\n  \"logAdminActorRef\": \"akka://test@192.168.0.103:58420/user/$a#-2084221527\"\n}"
 						},
 						"url": {
 							"raw": "http://localhost:{{location-port}}/location/register",
@@ -1131,7 +1131,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"AkkaRegistration\":{\n\t\t\"connection\":\"assembly2-assembly-akka\",\n\t\t\"prefix\":\"nfiraos.ncc.tromboneAssembly2\",\n\t\t\"actorRef\":\"akka.tcp://test@192.168.0.104:49592/user/$c#612197610\",\n\t\t\"logAdminActorRef\":\"akka.tcp://test@192.168.0.104:49592/user/$a#163534290\"\n\t}\n}"
+							"raw": "{\n\t\"AkkaRegistration\":{\n\t\t\"connection\":\"assembly2-assembly-akka\",\n\t\t\"prefix\":\"nfiraos.ncc.tromboneAssembly2\",\n\t\t\"actorRef\":\"akka://test@192.168.0.104:49592/user/$c#612197610\",\n\t\t\"logAdminActorRef\":\"akka://test@192.168.0.104:49592/user/$a#163534290\"\n\t}\n}"
 						},
 						"url": {
 							"raw": "http://localhost:{{location-port}}/location/register",
