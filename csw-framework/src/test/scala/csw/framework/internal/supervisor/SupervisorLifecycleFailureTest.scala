@@ -53,6 +53,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
   implicit val ec: ExecutionContext = typedSystem.executionContext
 
   // all log messages will be captured in log buffer
+  System.setProperty("TMT_LOG_HOME", "/tmp/")
   private val logBuffer                    = mutable.Buffer.empty[JsObject]
   private val testAppender                 = new TestAppender(x ⇒ logBuffer += Json.parse(x.toString).as[JsObject])
   private var loggingSystem: LoggingSystem = _
