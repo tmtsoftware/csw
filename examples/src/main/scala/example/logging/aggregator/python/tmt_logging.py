@@ -18,8 +18,8 @@ config_file = "/Volumes/Personal/python/logging.json"
 with codecs.open(config_file, "r", encoding="utf-8") as fd:
     config = json.load(fd)
 
-    
-dirPath = os.environ.get("TMT_LOG_HOME", "/tmp") + "/tmt/logs"
+
+dirPath = os.environ.get("TMT_LOG_HOME") + "/tmt/logs"
 pathlib.Path(dirPath).mkdir(parents=True, exist_ok=True)
 logPath = dirPath + "/app.log"
 config["logging"]["handlers"]["file_handler"]["filename"]=logPath
