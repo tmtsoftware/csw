@@ -330,6 +330,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     commandResponseProbe.expectMessage(Completed(runId))
   }
 
+  //DEOPSCSW-318: Clear command data from CommandResponseManager for completed commands
   test("should evict older command states from CRM") {
     val behaviorTestKit      = createBehaviorTestKit(CRMCacheProperties().copy(expiry = Duration.ofMillis(100)))
     val commandResponseProbe = TestProbe[QueryResponse]
@@ -348,6 +349,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     commandResponseProbe.expectNoMessage()
   }
 
+  //DEOPSCSW-318: Clear command data from CommandResponseManager for completed commands
   test("should not store more than max command states in CRM") {
     val behaviorTestKit      = createBehaviorTestKit(CRMCacheProperties().copy(maxSize = 1))
     val commandResponseProbe = TestProbe[QueryResponse]
