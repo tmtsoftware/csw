@@ -1,6 +1,7 @@
 ignore
 .vagrant
 logs
+*.log
 project/project/target
 project/target
 target
