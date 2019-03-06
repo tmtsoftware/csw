@@ -26,6 +26,8 @@ import scala.concurrent.duration.Duration;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static csw.logging.client.utils.Eventually.eventually;
+
 // DEOPSCSW-316: Improve Logger accessibility for component developers
 public class ILoggerTest extends JUnitSuite {
     private static ActorSystem actorSystem = ActorSystem.create("base-system");
@@ -35,15 +37,14 @@ public class ILoggerTest extends JUnitSuite {
 
     private static JsonObject parse(String json) {
         Gson gson = new Gson();
-        JsonObject jsonObject = gson.fromJson(json, JsonElement.class).getAsJsonObject();
-        return jsonObject;
+        return gson.fromJson(json, JsonElement.class).getAsJsonObject();
     }
 
     private static TestAppender testAppender     = new TestAppender(x -> {
         logBuffer.add(parse(x.toString()));
         return null;
     });
-    private static List<LogAppenderBuilder> appenderBuilders = Arrays.asList(testAppender);
+    private static List<LogAppenderBuilder> appenderBuilders = Collections.singletonList(testAppender);
 
     private static Map<String, List<JsonObject>> componentLogBuffer = new HashMap<>();
     private static List<JsonObject> genericLogBuffer = new ArrayList<>();
@@ -120,9 +121,8 @@ public class ILoggerTest extends JUnitSuite {
         String tromboneHcdClassName = jTromboneHCD.getClass().getName();
 
         jTromboneHCD.startLogging();
-        Thread.sleep(300);
+        eventually(java.time.Duration.ofSeconds(10), () -> Assert.assertEquals(5, logBuffer.size()));
 
-        Assert.assertEquals(5, logBuffer.size());
         logBuffer.forEach(log -> {
             Assert.assertEquals("tromboneHcd", log.get(LoggingKeys$.MODULE$.COMPONENT_NAME()).getAsString());
 
@@ -144,7 +144,7 @@ public class ILoggerTest extends JUnitSuite {
     public void testLogLevelOfMultipleComponentsInSingleContainer() throws InterruptedException {
 
         allComponentsStartLogging();
-        Thread.sleep(200);
+        eventually(java.time.Duration.ofSeconds(10), () -> Assert.assertEquals(20, logBuffer.size()));
 
         splitAndGroupLogs();
 
@@ -164,7 +164,7 @@ public class ILoggerTest extends JUnitSuite {
         loggingSystem.setComponentLogLevel("jIRIS", LoggingLevels.FATAL$.MODULE$);
 
         allComponentsStartLogging();
-        Thread.sleep(200);
+        eventually(java.time.Duration.ofSeconds(10), () -> Assert.assertEquals(18, logBuffer.size()));
 
         splitAndGroupLogs();
 

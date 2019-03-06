@@ -19,9 +19,11 @@ import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import static csw.logging.client.utils.Eventually.eventually;
 
 // DEOPSCSW-280 SPIKE: Introduce Akkatyped in logging
 public class ILoggerMutableActorTest extends JUnitSuite {
@@ -32,16 +34,14 @@ public class ILoggerMutableActorTest extends JUnitSuite {
 
     protected static JsonObject parse(String json) {
         Gson gson = new Gson();
-        JsonObject jsonObject = gson.fromJson(json, JsonElement.class).getAsJsonObject();
-        return jsonObject;
+        return gson.fromJson(json, JsonElement.class).getAsJsonObject();
     }
 
     protected static TestAppender testAppender     = new TestAppender(x -> {
         logBuffer.add(parse(x.toString()));
         return null;
     });
-    protected static List<LogAppenderBuilder> appenderBuilders = Arrays.asList(testAppender);
-
+    private static List<LogAppenderBuilder> appenderBuilders = Collections.singletonList(testAppender);
 
     @BeforeClass
     public static void setup() {
@@ -59,7 +59,7 @@ public class ILoggerMutableActorTest extends JUnitSuite {
         Await.result(actorSystem.terminate(), Duration.create(10, TimeUnit.SECONDS));
     }
     @Test
-    public void testDefaultLogConfigurationForActor() throws InterruptedException {
+    public void testDefaultLogConfigurationForActor() {
 
         ActorRef<LogCommand> irisTyped = Adapter.spawn(actorSystem, JIrisSupervisorMutableActor.irisBeh("jIRISTyped"), "irisTyped");
 
@@ -68,9 +68,8 @@ public class ILoggerMutableActorTest extends JUnitSuite {
 
         sendLogMsgToTypedActorInBulk(irisTyped);
 
-        Thread.sleep(300);
+        eventually(java.time.Duration.ofSeconds(10), () -> Assert.assertEquals(4, logBuffer.size()));
 
-        Assert.assertEquals(4, logBuffer.size());
         logBuffer.forEach(log -> {
             Assert.assertEquals("jIRISTyped", log.get(LoggingKeys$.MODULE$.COMPONENT_NAME()).getAsString());
             Assert.assertEquals(actorPath, log.get(LoggingKeys$.MODULE$.ACTOR()).getAsString());

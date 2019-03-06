@@ -4,15 +4,12 @@ import akka.actor.ActorSystem;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import csw.logging.api.javadsl.ILogger;
+import csw.logging.api.models.LoggingLevels;
+import csw.logging.api.models.RequestId;
 import csw.logging.client.appenders.LogAppenderBuilder;
 import csw.logging.client.commons.LoggingKeys$;
-import csw.logging.api.models.LoggingLevels;
 import csw.logging.client.internal.LoggingSystem;
-import csw.logging.api.javadsl.ILogger;
-import csw.logging.client.javadsl.JGenericLoggerFactory;
-import csw.logging.client.javadsl.JLoggingSystemFactory;
-import csw.logging.client.javadsl.JRequestId;
-import csw.logging.api.models.RequestId;
 import csw.logging.client.utils.TestAppender;
 import org.junit.*;
 import org.scalatest.junit.JUnitSuite;
@@ -22,6 +19,8 @@ import scala.concurrent.duration.Duration;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static csw.logging.client.utils.Eventually.eventually;
+
 // DEOPSCSW-115: Format and control logging content
 // DEOPSCSW-271: API change
 // DEOPSCSW-278: Create Java API without arguments as suppliers
@@ -29,11 +28,13 @@ public class JLoggerImplAPITest extends JUnitSuite {
 
     private ILogger logger = JGenericLoggerFactory.getLogger(getClass());
 
+    private java.time.Duration duration = java.time.Duration.ofSeconds(10);
+
     private String message = "Sample log message";
     private String exceptionMessage = "Sample exception message";
     private RuntimeException runtimeException = new RuntimeException(exceptionMessage);
     private RequestId requestId = JRequestId.id();
-    private Map<String, Object> data = new HashMap<String, Object>() {
+    private Map<String, Object> data = new HashMap<>() {
         {
             put(JKeys.OBS_ID, "foo_obs_id");
             put("key1", "value1");
@@ -45,24 +46,28 @@ public class JLoggerImplAPITest extends JUnitSuite {
     private static ActorSystem actorSystem = ActorSystem.create("base-system");
     private static LoggingSystem loggingSystem;
 
-    private static List<JsonObject> logBuffer = new ArrayList<>();
+    private static List<JsonObject> logBuffer = new Vector<>();
 
     private static JsonObject parse(String json) {
         Gson gson = new Gson();
-        JsonObject jsonObject = gson.fromJson(json, JsonElement.class).getAsJsonObject();
-        return jsonObject;
+        return gson.fromJson(json, JsonElement.class).getAsJsonObject();
     }
 
-    private static TestAppender testAppender     = new TestAppender(x -> {
+    private static TestAppender testAppender = new TestAppender(x -> {
         logBuffer.add(parse(x.toString()));
         return null;
     });
-    private static List<LogAppenderBuilder> appenderBuilders = Arrays.asList(testAppender);
+    private static List<LogAppenderBuilder> appenderBuilders = Collections.singletonList(testAppender);
 
     @BeforeClass
     public static void setup() {
         loggingSystem = JLoggingSystemFactory.start("Logger-Test", "SNAPSHOT-1.0", "localhost", actorSystem, appenderBuilders);
         loggingSystem.setAppenders(scala.collection.JavaConverters.iterableAsScalaIterable(appenderBuilders).toList());
+    }
+
+    @Before
+    public void beforeEach() {
+        logBuffer.clear();
     }
 
     @After
@@ -137,7 +142,7 @@ public class JLoggerImplAPITest extends JUnitSuite {
     }
 
     @Test
-    public void testOverloadedTraceLogLevel() throws InterruptedException {
+    public void testOverloadedTraceLogLevel() {
         // test trace overloads with supplier
         logger.trace(() -> message);
         logger.trace(() -> message, runtimeException);
@@ -157,14 +162,16 @@ public class JLoggerImplAPITest extends JUnitSuite {
         logger.trace(message, data, runtimeException);
         logger.trace(message, data, runtimeException, requestId);
 
-        Thread.sleep(200);
+        eventually(duration, () -> Assert.assertEquals(16, logBuffer.size()));
 
         testCommonProperties(LoggingLevels.TRACE$.MODULE$);
         testAllOverloads();
     }
 
+
+
     @Test
-    public void testOverloadedDebugLogLevel() throws InterruptedException {
+    public void testOverloadedDebugLogLevel() {
         // test debug overloads with supplier
         logger.debug(() -> message);
         logger.debug(() -> message, runtimeException);
@@ -184,14 +191,14 @@ public class JLoggerImplAPITest extends JUnitSuite {
         logger.debug(message, data, runtimeException);
         logger.debug(message, data, runtimeException, requestId);
 
-        Thread.sleep(200);
+        eventually(duration, () -> Assert.assertEquals(16, logBuffer.size()));
 
         testCommonProperties(LoggingLevels.DEBUG$.MODULE$);
         testAllOverloads();
     }
 
     @Test
-    public void testOverloadedInfoLogLevel() throws InterruptedException {
+    public void testOverloadedInfoLogLevel() {
         // test info overloads with supplier
         logger.info(() -> message);
         logger.info(() -> message, runtimeException);
@@ -211,14 +218,14 @@ public class JLoggerImplAPITest extends JUnitSuite {
         logger.info(message, data, runtimeException);
         logger.info(message, data, runtimeException, requestId);
 
-        Thread.sleep(200);
+        eventually(duration, () -> Assert.assertEquals(16, logBuffer.size()));
 
         testCommonProperties(LoggingLevels.INFO$.MODULE$);
         testAllOverloads();
     }
 
     @Test
-    public void testOverloadedWarnLogLevel() throws InterruptedException {
+    public void testOverloadedWarnLogLevel() {
         // test warn overloads with supplier
         logger.warn(() -> message);
         logger.warn(() -> message, runtimeException);
@@ -238,14 +245,14 @@ public class JLoggerImplAPITest extends JUnitSuite {
         logger.warn(message, data, runtimeException);
         logger.warn(message, data, runtimeException, requestId);
 
-        Thread.sleep(200);
+        eventually(duration, () -> Assert.assertEquals(16, logBuffer.size()));
 
         testCommonProperties(LoggingLevels.WARN$.MODULE$);
         testAllOverloads();
     }
 
     @Test
-    public void testOverloadedErrorLogLevel() throws InterruptedException {
+    public void testOverloadedErrorLogLevel() {
         // test error overloads with supplier
         logger.error(() -> message);
         logger.error(() -> message, runtimeException);
@@ -265,14 +272,15 @@ public class JLoggerImplAPITest extends JUnitSuite {
         logger.error(message, data, runtimeException);
         logger.error(message, data, runtimeException, requestId);
 
-        Thread.sleep(200);
+        eventually(duration, () -> Assert.assertEquals(16, logBuffer.size()));
 
         testCommonProperties(LoggingLevels.ERROR$.MODULE$);
         testAllOverloads();
     }
 
     @Test
-    public void testOverloadedFatalLogLevel() throws InterruptedException {
+    public void testOverloadedFatalLogLevel() {
+
         // test fatal overloads with supplier
         logger.fatal(() -> message);
         logger.fatal(() -> message, runtimeException);
@@ -292,7 +300,7 @@ public class JLoggerImplAPITest extends JUnitSuite {
         logger.fatal(message, data, runtimeException);
         logger.fatal(message, data, runtimeException, requestId);
 
-        Thread.sleep(300);
+        eventually(duration, () -> Assert.assertEquals(16, logBuffer.size()));
 
         testCommonProperties(LoggingLevels.FATAL$.MODULE$);
         testAllOverloads();

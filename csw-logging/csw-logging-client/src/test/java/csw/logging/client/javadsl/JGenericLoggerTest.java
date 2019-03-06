@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static csw.logging.client.utils.Eventually.eventually;
+
 public class JGenericLoggerTest extends JUnitSuite {
     private static ActorSystem actorSystem = ActorSystem.create("base-system");
     private static LoggingSystem loggingSystem;
@@ -71,9 +73,9 @@ public class JGenericLoggerTest extends JUnitSuite {
     public void testGenericLoggerWithoutComponentName() throws InterruptedException {
         String className = JGenericLoggerTest.JGenericLoggerUtil.class.getName();
         new JGenericLoggerTest.JGenericLoggerUtil().start();
-        Thread.sleep(300);
 
-        Assert.assertEquals(6, logBuffer.size());
+        eventually(java.time.Duration.ofSeconds(10), () -> Assert.assertEquals(6, logBuffer.size()));
+
         logBuffer.forEach(log -> {
             Assert.assertTrue(log.has(LoggingKeys$.MODULE$.SEVERITY()));
             String severity = log.get(LoggingKeys$.MODULE$.SEVERITY()).getAsString().toLowerCase();
@@ -92,9 +94,8 @@ public class JGenericLoggerTest extends JUnitSuite {
         String className = JGenericActor.class.getName();
 
         JLogUtil.sendLogMsgToActorInBulk(utilActor);
-        Thread.sleep(200);
 
-        Assert.assertEquals(6, logBuffer.size());
+        eventually(java.time.Duration.ofSeconds(10), () -> Assert.assertEquals(6, logBuffer.size()));
         logBuffer.forEach(log -> {
             Assert.assertEquals(actorPath, log.get(LoggingKeys$.MODULE$.ACTOR()).getAsString());
 
