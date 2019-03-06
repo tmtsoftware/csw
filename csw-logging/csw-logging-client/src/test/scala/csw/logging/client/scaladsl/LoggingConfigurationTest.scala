@@ -27,9 +27,8 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-142: Flexibility of logging approaches
 // DEOPSCSW-649: Fixed directory configuration for multi JVM scenario
 class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
-  System.setProperty("TMT_LOG_HOME", "/tmp/")
   val log: Logger                            = GenericLoggerFactory.getLogger
-  private val logFileDir                     = Paths.get("/tmp/tmt/logs/csw-test-logs").toFile
+  private val logFileDir                     = Paths.get("/tmp/csw-test-logs").toFile
   private val sampleLogMessage               = "Sample log message"
   private val fileTimestamp                  = FileAppender.decideTimestampForFile(ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC)))
   private val loggingSystemName              = "Test"
@@ -339,7 +338,7 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
     }
     loggingSystem.getAppenders shouldBe List(StdOutAppender)
 
-    val expectedOneLineLog = " INFO   (LoggingConfigurationTest.scala 93) - Sample log message"
+    val expectedOneLineLog = " INFO   (LoggingConfigurationTest.scala 92) - Sample log message"
 
     val (timestamp, message) = os.toString.trim.splitAt(24)
 

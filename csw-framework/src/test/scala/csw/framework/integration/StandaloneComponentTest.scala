@@ -36,7 +36,6 @@ import scala.concurrent.duration.DurationLong
 @LoggingSystemSensitive
 class StandaloneComponentTest extends FrameworkIntegrationSuite {
   import testWiring._
-  System.setProperty("TMT_LOG_HOME", "/tmp/")
   // all log messages will be captured in log buffer
   private val logBuffer                    = mutable.Buffer.empty[JsObject]
   private val testAppender                 = new TestAppender(x ⇒ logBuffer += Json.parse(x.toString).as[JsObject])

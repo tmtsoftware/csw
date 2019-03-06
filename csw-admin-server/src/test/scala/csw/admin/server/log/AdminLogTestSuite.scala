@@ -9,7 +9,6 @@ import play.api.libs.json.{JsObject, Json}
 import scala.collection.mutable
 
 trait AdminLogTestSuite extends FunSuite with Matchers with HTTPLocationService {
-  System.setProperty("TMT_LOG_HOME", "/tmp/")
   protected val logBuffer: mutable.Buffer[JsObject] = mutable.Buffer.empty[JsObject]
   protected val testAppender                        = new TestAppender(x ⇒ logBuffer += Json.parse(x.toString).as[JsObject])
 

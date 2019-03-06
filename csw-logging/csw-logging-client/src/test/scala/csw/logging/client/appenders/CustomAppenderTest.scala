@@ -82,7 +82,7 @@ class CustomAppenderTest extends FunSuite with Matchers {
         |}
       """.stripMargin)
 
-    val actorSystem   = ActorSystem("test", config)
+    val actorSystem   = ActorSystem("test", config.resolve())
     val loggingSystem = LoggingSystemFactory.start("foo-name", "foo-version", hostName, actorSystem)
     loggingSystem.setAppenders(List(CustomAppenderBuilderObject))
 
@@ -110,7 +110,7 @@ class CustomAppenderTest extends FunSuite with Matchers {
         |}
       """.stripMargin)
 
-    val actorSystem    = ActorSystem("test", config)
+    val actorSystem    = ActorSystem("test", config.resolve())
     val loggingSystem  = LoggingSystemFactory.start("foo-name", "foo-version", hostName, actorSystem)
     val customAppender = new CustomAppenderBuilderClass
     loggingSystem.setAppenders(List(customAppender))
@@ -142,7 +142,7 @@ class CustomAppenderTest extends FunSuite with Matchers {
                                              |}
                                            """.stripMargin)
 
-    val actorSystem    = ActorSystem("test", config)
+    val actorSystem    = ActorSystem("test", config.resolve())
     val loggingSystem  = LoggingSystemFactory.start("foo-name", "foo-version", hostName, actorSystem)
     val customAppender = new CustomAppenderBuilderClass
     loggingSystem.setAppenders(List(customAppender))

@@ -17,7 +17,7 @@ import scala.collection.mutable
 
 // DEOPSCSW-649: Fixed directory configuration for multi JVM scenario
 class TimingTest extends LoggingTestSuite with Timing {
-  private val logFileDir        = Paths.get("/tmp/tmt/logs/csw-test-logs/").toFile
+  private val logFileDir        = Paths.get("/tmp/csw-test-logs/").toFile
   private val loggingSystemName = "TimingTest"
 
   override lazy val actorSystem = ActorSystem("timing-test-system")

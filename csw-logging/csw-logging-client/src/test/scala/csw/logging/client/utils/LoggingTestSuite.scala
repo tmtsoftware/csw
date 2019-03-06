@@ -37,10 +37,8 @@ abstract class LoggingTestSuite() extends FunSuite with Matchers with BeforeAndA
     "user2" -> "user2 message"
   )
 
-  override protected def beforeAll(): Unit = {
-    System.setProperty("TMT_LOG_HOME", "/tmp/")
+  override protected def beforeAll(): Unit =
     loggingSystem.setAppenders(List(testAppender))
-  }
 
   override protected def afterEach(): Unit = logBuffer.clear()
 

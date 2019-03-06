@@ -16,8 +16,7 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-281 Rolling File Configuration
 // DEOPSCSW-649: Fixed directory configuration for multi JVM scenario
 class NonFileRotationTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
-  System.setProperty("TMT_LOG_HOME", "/tmp/")
-  private val logFileDir = Paths.get("/tmp/tmt/logs/csw-test-logs/").toFile
+  private val logFileDir = Paths.get("/tmp/csw-test-logs/").toFile
   private val map: Map[String, Any] = Map(
     "csw-logging.appender-config.file.rotate" → false
   )
