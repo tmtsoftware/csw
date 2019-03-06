@@ -1,5 +1,4 @@
 package csw.aas.core.token
-import cats.data.EitherT
 import csw.aas.core.TokenVerificationFailure
 import csw.aas.core.TokenVerificationFailure.InvalidToken
 import csw.aas.core.commons.AuthLogger
@@ -23,7 +22,7 @@ private[aas] class RPT(authzClient: AuthzClient)(implicit ec: ExecutionContext) 
    * @param token Access token in string format
    * @return Access Token with permissions
    */
-  def create(token: String): EitherT[Future, TokenVerificationFailure, AccessToken] = {
+  def create(token: String): Future[Either[TokenVerificationFailure, AccessToken]] = {
     debug("fetching RPT from keycloak")
 
     val rptStringF = getAuthorizationResponse(token)
@@ -33,7 +32,7 @@ private[aas] class RPT(authzClient: AuthzClient)(implicit ec: ExecutionContext) 
       case Failure(e) => error("error while fetching RPT string from keycloak", ex = e)
     }
 
-    EitherT(rptStringF.map(decodeRPT))
+    rptStringF.map(decodeRPT)
   }
 
   /**

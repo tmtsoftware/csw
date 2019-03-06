@@ -413,7 +413,6 @@ object Dependencies {
   val CswInstalledAdapter = Def.setting(
     Seq(
       Libs.`config`,
-      Typelevel.`cats-core`,
       Keycloak.`keycloak-installed`,
       Libs.`os-lib`,
       //(legacy dependencies) required*
@@ -432,7 +431,6 @@ object Dependencies {
       Keycloak.`keycloak-authz`,
       AkkaHttp.`akka-http`,
       Libs.`scala-async`.value,
-      Typelevel.`cats-core`,
       //(legacy dependencies) required*
       Libs.`jboss-logging`,
       Libs.httpclient,
@@ -445,7 +443,6 @@ object Dependencies {
     Seq(
       Libs.`config`,
       AkkaHttp.`akka-http`,
-      Typelevel.`cats-core`,
       Libs.`scalatest`.value       % Test,
       AkkaHttp.`akka-http-testkit` % Test,
       Libs.`mockito-scala`         % Test,

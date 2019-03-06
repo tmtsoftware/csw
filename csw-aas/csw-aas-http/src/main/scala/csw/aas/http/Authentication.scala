@@ -2,7 +2,6 @@ package csw.aas.http
 
 import akka.http.scaladsl.server.Directives.AsyncAuthenticator
 import akka.http.scaladsl.server.directives.Credentials.Provided
-import cats.implicits._
 import csw.aas.core.commons.AuthLogger
 import csw.aas.core.token.{AccessToken, TokenFactory}
 
@@ -22,12 +21,10 @@ private[csw] class Authentication(tokenFactory: TokenFactory)(implicit ec: Execu
    */
   def authenticator: AsyncAuthenticator[AccessToken] = {
     case Provided(token) ⇒
-      val result = tokenFactory.makeToken(token)
-      result.map { at =>
-        debug(s"authentication successful for ${at.userOrClientName}")
-        at
+      tokenFactory.makeToken(token).map { eitherAT =>
+        eitherAT.foreach(at => debug(s"authentication successful for ${at.userOrClientName}"))
+        eitherAT.toOption
       }
-      result.toOption.value
 
     case _ ⇒
       warn("authorization information is missing from request. authentication failed")

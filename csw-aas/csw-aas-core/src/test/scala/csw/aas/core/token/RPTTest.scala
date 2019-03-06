@@ -10,7 +10,7 @@ import org.scalatest.time.{Seconds, Span}
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.collection.mutable.ArrayBuffer
-import scala.concurrent.Await
+import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationDouble
 
@@ -48,7 +48,7 @@ class RPTTest extends FunSuite with MockitoSugar with Matchers with ScalaFutures
     when(authorizationResource.authorize()).thenReturn(authorizationResponse)
     when(authorizationResponse.getToken).thenReturn(token)
 
-    rpt.create(token).value.futureValue shouldEqual Right(expectedToken)
+    rpt.create(token).futureValue shouldEqual Right(expectedToken)
   }
 
   test("should create RPTn") {
@@ -90,7 +90,7 @@ class RPTTest extends FunSuite with MockitoSugar with Matchers with ScalaFutures
     when(authorizationResource.authorize()).thenReturn(authorizationResponse)
     when(authorizationResponse.getToken).thenReturn(rptStr)
 
-    rpt.create(tokenStr).value.futureValue shouldEqual Right(expectedPRT)
+    rpt.create(tokenStr).futureValue shouldEqual Right(expectedPRT)
   }
 
   test("should fail for creating accessToken") {
@@ -103,6 +103,6 @@ class RPTTest extends FunSuite with MockitoSugar with Matchers with ScalaFutures
     when(authorizationResource.authorize())
       .thenThrow(new AuthorizationDeniedException("token is invalid", new RuntimeException))
 
-    a[AuthorizationDeniedException] shouldBe thrownBy(Await.result(rpt.create(token).value, 5.seconds))
+    a[AuthorizationDeniedException] shouldBe thrownBy(Await.result(rpt.create(token), 5.seconds))
   }
 }

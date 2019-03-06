@@ -1,7 +1,5 @@
 package csw.aas.core
 
-import cats.data._
-import cats.implicits._
 import csw.aas.core.TokenVerificationFailure.{InvalidToken, TokenExpired}
 import csw.aas.core.commons.AuthLogger
 import csw.aas.core.deployment.AuthConfig
@@ -24,20 +22,18 @@ class TokenVerifier private[aas] (keycloakTokenVerifier: KeycloakTokenVerifier, 
 
   private val keycloakDeployment = authConfig.getDeployment
 
-  private def verify(token: String)(implicit ec: ExecutionContext): EitherT[Future, TokenVerificationFailure, KAccessToken] =
-    EitherT {
-      keycloakTokenVerifier
-        .verifyToken(token, keycloakDeployment)
-        .map(Right(_))
-        .recover {
-          case _: TokenNotActiveException =>
-            warn(s"token is expired")
-            Left(TokenExpired)
-          case ex: VerificationException =>
-            error("token verification failed", ex = ex)
-            Left(InvalidToken(ex.getMessage))
-        }
-    }
+  private def verify(token: String)(implicit ec: ExecutionContext): Future[Either[TokenVerificationFailure, KAccessToken]] =
+    keycloakTokenVerifier
+      .verifyToken(token, keycloakDeployment)
+      .map(Right(_))
+      .recover {
+        case _: TokenNotActiveException =>
+          warn(s"token is expired")
+          Left(TokenExpired)
+        case ex: VerificationException =>
+          error("token verification failed", ex = ex)
+          Left(InvalidToken(ex.getMessage))
+      }
 
   private def decode(token: String): Either[TokenVerificationFailure, AccessToken] =
     JwtJson
@@ -54,15 +50,15 @@ class TokenVerifier private[aas] (keycloakTokenVerifier: KeycloakTokenVerifier, 
   /**
    * Verifies the access token string for signature and expiry date
    * and then decodes it into [[csw.aas.core.token.AccessToken]]
+   *
    * @param token access token string
    */
-  def verifyAndDecode(token: String)(implicit ec: ExecutionContext): EitherT[Future, TokenVerificationFailure, AccessToken] =
-    for {
-      _  ← verify(token)
-      at ← EitherT.fromEither[Future](decode(token))
-    } yield at
+  def verifyAndDecode(token: String)(implicit ec: ExecutionContext): Future[Either[TokenVerificationFailure, AccessToken]] = {
+    verify(token).map(eVer => {
+      eVer.flatMap(_ => decode(token))
+    })
+  }
 }
-
 object TokenVerifier {
   def apply(authConfig: AuthConfig): TokenVerifier = new TokenVerifier(new KeycloakTokenVerifier, authConfig)
 }

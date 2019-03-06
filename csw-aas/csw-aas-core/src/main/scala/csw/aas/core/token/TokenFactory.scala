@@ -1,6 +1,5 @@
 package csw.aas.core.token
 
-import cats.data.EitherT
 import csw.aas.core.deployment.AuthConfig._
 import csw.aas.core.{TokenVerificationFailure, TokenVerifier}
 import org.keycloak.adapters.KeycloakDeployment
@@ -22,6 +21,6 @@ class TokenFactory(keycloakDeployment: KeycloakDeployment, tokenVerifier: TokenV
    * [[csw.aas.core.token.AccessToken]]
    * @param token Access token string
    */
-  private[aas] def makeToken(token: String): EitherT[Future, TokenVerificationFailure, AccessToken] =
+  private[aas] def makeToken(token: String): Future[Either[TokenVerificationFailure, AccessToken]] =
     if (enablePermissions) rpt.create(token) else tokenVerifier.verifyAndDecode(token)
 }

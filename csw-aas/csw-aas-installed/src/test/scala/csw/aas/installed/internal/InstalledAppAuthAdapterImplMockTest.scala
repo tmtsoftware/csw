@@ -1,6 +1,5 @@
 package csw.aas.installed.internal
 
-import cats.data.EitherT
 import csw.aas.core.TokenVerificationFailure.TokenExpired
 import csw.aas.core.TokenVerifier
 import csw.aas.core.token.AccessToken
@@ -18,8 +17,6 @@ import scala.language.implicitConversions
 
 //DEOPSCSW-575: Client Library for AAS to be accessed by CSW cli apps
 class InstalledAppAuthAdapterImplMockTest extends FunSuite with MockitoSugar with Matchers {
-
-  implicit def wrapEither[A, B](either: Either[A, B]): EitherT[Future, A, B] = EitherT[Future, A, B](Future.successful(either))
 
   class AuthMocks {
     val keycloakInstalled: KeycloakInstalled     = mock[KeycloakInstalled]
@@ -50,8 +47,8 @@ class InstalledAppAuthAdapterImplMockTest extends FunSuite with MockitoSugar wit
     when(store.getRefreshTokenString).thenReturn(Some(refreshTokenStr))
 
     // mock token verifier's calls
-    when(tokenVerifier.verifyAndDecode(accessTokenStr)).thenReturn(Right(accessToken))
-    when(tokenVerifier.verifyAndDecode(refreshedAccessTokenStr)).thenReturn(Right(refreshedAccessToken))
+    when(tokenVerifier.verifyAndDecode(accessTokenStr)).thenReturn(Future.successful(Right(accessToken)))
+    when(tokenVerifier.verifyAndDecode(refreshedAccessTokenStr)).thenReturn(Future.successful(Right(refreshedAccessToken)))
 
     val authService = new InstalledAppAuthAdapterImpl(keycloakInstalled, tokenVerifier, Some(store))
   }
@@ -103,7 +100,7 @@ class InstalledAppAuthAdapterImplMockTest extends FunSuite with MockitoSugar wit
     val tokenExp         = (System.currentTimeMillis() / 1000) + maxTokenValidity
     val token            = AccessToken(exp = Some(tokenExp))
 
-    when(tokenVerifier.verifyAndDecode(accessTokenStr)).thenReturn(Right(token))
+    when(tokenVerifier.verifyAndDecode(accessTokenStr)).thenReturn(Future.successful(Right(token)))
 
     authService.getAccessToken() shouldBe Some(token)
 
@@ -115,7 +112,7 @@ class InstalledAppAuthAdapterImplMockTest extends FunSuite with MockitoSugar wit
     val mocks = new AuthMocks
     import mocks._
 
-    when(tokenVerifier.verifyAndDecode(accessTokenStr)).thenReturn(Left(TokenExpired))
+    when(tokenVerifier.verifyAndDecode(accessTokenStr)).thenReturn(Future.successful(Left(TokenExpired)))
     when(store.getAccessTokenString).thenReturn(Some(accessTokenStr)).andThen(Some(refreshedAccessTokenStr))
 
     authService.getAccessToken() shouldBe Some(refreshedAccessToken)
@@ -134,7 +131,7 @@ class InstalledAppAuthAdapterImplMockTest extends FunSuite with MockitoSugar wit
     val minValidityNeeded = 10
     val tokenExp          = (System.currentTimeMillis() / 1000) + maxTokenValidity
 
-    when(tokenVerifier.verifyAndDecode(accessTokenStr)).thenReturn(Right(AccessToken(exp = Some(tokenExp))))
+    when(tokenVerifier.verifyAndDecode(accessTokenStr)).thenReturn(Future.successful(Right(AccessToken(exp = Some(tokenExp)))))
     when(store.getAccessTokenString).thenReturn(Some(accessTokenStr)).andThen(Some(refreshedAccessTokenStr))
 
     authService.getAccessToken(minValidityNeeded.seconds) shouldBe Some(refreshedAccessToken)
@@ -153,7 +150,7 @@ class InstalledAppAuthAdapterImplMockTest extends FunSuite with MockitoSugar wit
     val currentSeconds = (System.currentTimeMillis() / 1000) + tokenValidity
     val validToken     = AccessToken(exp = Some(currentSeconds))
 
-    when(tokenVerifier.verifyAndDecode(accessTokenStr)).thenReturn(Right(validToken))
+    when(tokenVerifier.verifyAndDecode(accessTokenStr)).thenReturn(Future.successful(Right(validToken)))
 
     authService.getAccessTokenString() shouldBe Some(accessTokenStr)
 

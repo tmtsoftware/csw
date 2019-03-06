@@ -57,11 +57,6 @@ object Libs {
   val `caffeine`        = "com.github.ben-manes.caffeine" % "caffeine"        % "2.6.2"
 }
 
-object Typelevel {
-  val Version     = "1.6.0"
-  val `cats-core` = "org.typelevel" %% "cats-core" % Version
-}
-
 object Jackson {
   val Version                = "2.9.8"
   val `jackson-core`         = "com.fasterxml.jackson.core" % "jackson-core" % Version
