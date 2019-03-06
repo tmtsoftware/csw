@@ -292,7 +292,7 @@ public class JLoggerImplAPITest extends JUnitSuite {
         logger.fatal(message, data, runtimeException);
         logger.fatal(message, data, runtimeException, requestId);
 
-        Thread.sleep(200);
+        Thread.sleep(300);
 
         testCommonProperties(LoggingLevels.FATAL$.MODULE$);
         testAllOverloads();
