@@ -254,12 +254,12 @@ It's alright to track connections that will be registered in future.
 
 A `track` API returns two values:     
 * A **source** that will emit a stream of `TrackingEvents` for the connection.  
-* A **Killswitch** to turn off the stream when no longer needed.  
+* A **KillSwitch** to turn off the stream when no longer needed.  
 
 The Akka stream API provides many building blocks to process this stream, such as Flow and Sink. 
 In the example below, `Sink.actorRef` is used to forward any location messages received to the current actor (self).
 
-A consumer can shut down the stream using the Killswitch.
+A consumer can shut down the stream using the KillSwitch.
 
 
 The `subscribe` API allows the caller to track a connection and receive the TrackingEvent notifications via a callback. 
@@ -267,8 +267,12 @@ The `subscribe` API allows the caller to track a connection and receive the Trac
 The API expects following parameters :    
 * An existing connection or a connection to be registered in the future.  
 * A callback that implements `Consumer`, receives the TrackEvent as a parameter.  
- 
-In return it gives a Killswitch that can be used to turn off the event notifications and release the supplied callback, if required.
+
+@@@ note
+Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor. Here is an @github[example](/examples/src/main/scala/example/event/ConcurrencyInCallbacksExample.scala) of how it can be done.
+@@@
+
+This API returns a KillSwitch that can be used to turn off the event notifications and release the supplied callback, if required.
  
 
 Scala

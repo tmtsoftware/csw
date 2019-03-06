@@ -287,7 +287,13 @@ In this case, the returned list is of length 2 rather than 3.
 This method provided by `CommandService` can be used to subscribe to 
 the @ref:[CurrentState](../messages/states.md) of a component by providing a callback that
 is called with the arrival of every `CurrentState` item.
- `SubscribeCurrentState` returns a handle of `CurrentStateSubscription` which should be used 
+
+@@@ note
+Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor. Here is an @github[example](/examples/src/main/scala/example/event/ConcurrencyInCallbacksExample.scala) of how it can be done.
+@@@
+
+
+`SubscribeCurrentState` returns a handle of `CurrentStateSubscription` which should be used 
 to unsubscribe the subscription.
 
 The following example code shows an Assembly that subscribes to all `CurrentState` of an HCD.
