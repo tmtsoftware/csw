@@ -26,7 +26,7 @@ object JLoggingSystemFactory {
   /**
    * The factory used to create the LoggingSystem. `LoggingSystem` should be started once in an app.
    *
-   * @note it is recommended to use this method for only testing
+   * Note that it is recommended to use this method only for testing
    * @return the instance of LoggingSystem
    */
   private[csw] def start(): LoggingSystem =
@@ -35,13 +35,14 @@ object JLoggingSystemFactory {
   /**
    * The factory used to create the LoggingSystem. `LoggingSystem` should be started once in an app.
    *
+   * Note that it is recommended to use this method only for testing
+   *
    * @param name The name of the logging system. If there is a file appender configured, then a file with this name is
    *             created on local machine.
    * @param version the version of the csw which will be a part of log statements
    * @param hostName the host address which will be a part of log statements
    * @param actorSystem the ActorSystem used to create LogActor from LoggingSystem
    * @param appenders the list of appenders given programmatically
-   * @note it is recommended to use this method for only testing
    * @return the instance of LoggingSystem
    */
   def start(

@@ -29,7 +29,7 @@ trait ILocationService {
   /**
    * Unregisters the connection
    *
-   *  @note this method is idempotent, which means multiple call to unregister the same connection will be no-op once successfully
+   * Note that this method is idempotent, which means multiple calls to unregister the same connection will be no-op once successfully
    *       unregistered from location service
    * @param connection an already registered connection
    * @return a CompletableFuture which completes after un-registration happens successfully and fails otherwise with
@@ -40,7 +40,7 @@ trait ILocationService {
   /**
    * Unregisters all connections registered
    *
-   * @note it is highly recommended to use this method for testing purpose only
+   * Note that it is highly recommended to use this method for testing purpose only
    * @return a CompletableFuture which completes after all connections are unregistered successfully or fails otherwise
    *         with [[csw.location.api.exceptions.RegistrationListingFailed]]
    */
@@ -104,7 +104,7 @@ trait ILocationService {
   /**
    * Filters all locations registered based on a prefix.
    *
-   * @note all locations having subsystem prefix that starts with the given prefix
+   * Note that all locations having subsystem prefix that starts with the given prefix
    *       value will be listed
    * @param prefix list components by this `prefix`
    * @return a CompletableFuture which completes with filtered locations or can fail with
@@ -125,6 +125,8 @@ trait ILocationService {
    * Subscribe to tracking events for a connection by providing a consumer
    * For each event accept method of consumer interface is invoked.
    * Use this method if you do not want to handle materialization and happy with a side-effecting callback instead
+   *
+   * Note that callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
    *
    * @param connection the `connection` that is to be tracked
    * @param consumer the `Consumer` function that consumes `TrakingEvent`

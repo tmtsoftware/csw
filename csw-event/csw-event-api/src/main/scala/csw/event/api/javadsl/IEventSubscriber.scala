@@ -60,7 +60,7 @@ trait IEventSubscriber {
    * and the subscription is stopped after logging appropriately. [[csw.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine
    * this state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
-   * @note Callbacks are not thread-safe on the JVM. If you need to do side effects/mutations, prefer using [[subscribeActorRef]] API.
+   * Note that callbacks are not thread-safe on the JVM. If you need to do side effects/mutations, prefer using [[subscribeActorRef]] API.
    *
    * @param eventKeys a set of [[csw.params.events.EventKey]] to subscribe to
    * @param callback a function to execute asynchronously on each received event
@@ -98,7 +98,7 @@ trait IEventSubscriber {
    * and the subscription is stopped after logging appropriately. [[csw.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine this
    * state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
-   * @note Callbacks are not thread-safe on the JVM. If you need to do side effects/mutations, prefer using [[subscribeActorRef]] API.
+   * Note that callbacks are not thread-safe on the JVM. If you need to do side effects/mutations, prefer using [[subscribeActorRef]] API.
    * Also note that any exception thrown from `callback` is expected to be handled by component developers.
    *
    * @param eventKeys a set of [[csw.params.events.EventKey]] to subscribe to
@@ -192,7 +192,7 @@ trait IEventSubscriber {
    * and the subscription is stopped after logging appropriately. [[csw.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine this
    * state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
-   * @note Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
+   * Note that callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
    *
    * @param subsystem a valid [[csw.params.core.models.Subsystem]] which represents the source of the events
    * @param pattern   Subscribes the client to the given patterns. Supported glob-style patterns:

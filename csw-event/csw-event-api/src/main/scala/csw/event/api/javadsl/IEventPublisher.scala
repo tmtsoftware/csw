@@ -98,7 +98,7 @@ trait IEventPublisher {
    * which wraps the underlying exception and also provides the handle to the event which was failed to be published.
    * The provided callback is executed on the failed element and the generator resumes to publish remaining elements.
    *
-   * @note any exception thrown from `onError` consumer is expected to be handled by component developers.
+   * Note that any exception thrown from `onError` consumer is expected to be handled by component developers.
    *
    * @param eventGenerator a function which can generate an event to be published at `every` frequency
    * @param every frequency with which the events are to be published
@@ -116,7 +116,7 @@ trait IEventPublisher {
    * which wraps the underlying exception and also provides the handle to the event which was failed to be published.
    * The provided callback is executed on the failed element and the generator resumes to publish remaining elements.
    *
-   * @note any exception thrown from `onError` consumer is expected to be handled by component developers.
+   * Note that any exception thrown from `onError` consumer is expected to be handled by component developers.
    *
    * @param eventGenerator a supplier which can generate an event to be published at `every` frequency
    * @param startTime the time at which the `eventGenerator` should start generating events
@@ -172,7 +172,7 @@ trait IEventPublisher {
    * which wraps the underlying exception and also provides the handle to the event which was failed to be published.
    * The provided callback is executed on the failed element and the generator resumes to publish remaining elements.
    *
-   * @note any exception thrown from `onError` callback is expected to be handled by component developers.
+   * Note that any exception thrown from `onError` callback is expected to be handled by component developers.
    *
    * @param eventGenerator a function which can generate Future of event to be published at `every` frequency
    * @param every frequency with which the events are to be published
@@ -195,7 +195,7 @@ trait IEventPublisher {
    * which wraps the underlying exception and also provides the handle to the event which was failed to be published.
    * The provided callback is executed on the failed element and the generator resumes to publish remaining elements.
    *
-   * @note any exception thrown from `onError` consumer is expected to be handled by component developers.
+   * Note that any exception thrown from `onError` consumer is expected to be handled by component developers.
    *
    * @param eventGenerator a supplier which can generate a Future of event to be published at `every` frequency
    * @param startTime the time at which the `eventGenerator` should start generating events
