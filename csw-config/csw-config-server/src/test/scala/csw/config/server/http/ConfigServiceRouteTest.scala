@@ -7,7 +7,8 @@ import akka.http.scaladsl.model.headers.Authorization
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import csw.commons.http.ErrorResponse
-import csw.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId, _}
+import csw.config.api.commons.Constants
+import csw.config.api.models.{ConfigData, ConfigFileRevision, ConfigId, _}
 import csw.config.server.ServerWiring
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.mocks.MockedAuthentication
@@ -21,6 +22,7 @@ import scala.collection.mutable.ArrayBuffer
 // DEOPSCSW-576: Auth token for Configuration service
 // DEOPSCSW-69: Use authorization token to get identity of user creating/updating a configuration file
 // DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
+// DEOPSCSW-626: Get route of config server with path for empty config file
 class ConfigServiceRouteTest
     extends FunSuite
     with ScalatestRouteTest
@@ -48,6 +50,9 @@ class ConfigServiceRouteTest
 
   private val configValue2 = "name = NFIRAOS Trombone Assembly"
   private val configFile2  = ConfigData.fromString(configValue2)
+
+  private val emptyString     = ""
+  private val emptyConfigFile = ConfigData.fromString(emptyString)
 
   override protected def beforeAll(): Unit = testFileUtils.deleteServerFiles()
 
@@ -162,6 +167,22 @@ class ConfigServiceRouteTest
       status shouldBe StatusCodes.NotFound
     }
 
+  }
+
+  //DEOPSCSW-626: Get route of config server with path for empty config file
+  test("get - success status code for empty file") {
+    Post("/config/test.conf?annex=true&comment=commit1", emptyConfigFile).addHeader(validTokenHeader) ~> route ~> check {
+      status shouldEqual StatusCodes.Created
+    }
+    Get("/config/test.conf") ~> Route.seal(route) ~> check {
+      status shouldBe StatusCodes.OK
+      responseAs[String] shouldEqual Constants.EmptySourceContent
+    }
+
+    Get("/config/test.conf?id=1") ~> Route.seal(route) ~> check {
+      status shouldBe StatusCodes.OK
+      responseAs[String] shouldEqual Constants.EmptySourceContent
+    }
   }
 
   test("get by date - success status code") {

@@ -8,6 +8,7 @@ import akka.stream.Materializer
 import akka.stream.scaladsl.{FileIO, Keep, Source, StreamConverters}
 import akka.util.ByteString
 import com.typesafe.config.{Config, ConfigFactory}
+import csw.config.api.commons.Constants
 
 import scala.compat.java8.FutureConverters._
 import scala.concurrent.Future
@@ -130,6 +131,9 @@ object ConfigData {
    * @param length the length representing number of bytes
    * @return the ConfigData instance created out of provided dataBytes and length
    */
-  private[config] def from(dataBytes: Source[ByteString, Any], length: Long): ConfigData =
-    new ConfigData(dataBytes, length)
+  private[config] def from(dataBytes: Source[ByteString, Any], length: Long): ConfigData = {
+    if (length == 0L) ConfigData.fromString(Constants.EmptySourceContent)
+    else new ConfigData(dataBytes, length)
+  }
+
 }
