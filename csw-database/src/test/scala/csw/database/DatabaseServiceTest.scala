@@ -20,8 +20,13 @@ import scala.concurrent.{Await, ExecutionContext}
 class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with BeforeAndAfterAll {
   private val system: ActorSystem           = ActorSystem("test")
   private implicit val ec: ExecutionContext = system.dispatcher
-  private val postgres: EmbeddedPostgres    = DBTestHelper.postgres(0) // 0 is random port
-  private val dsl: DSLContext               = DBTestHelper.dslContext(system, postgres.getPort)
+  private var postgres: EmbeddedPostgres    = _
+  private var dsl: DSLContext               = _
+
+  override def beforeAll: Unit = {
+    postgres = DBTestHelper.postgres(0) // 0 is random port
+    dsl = DBTestHelper.dslContext(system, postgres.getPort)
+  }
 
   override def afterAll(): Unit = {
     postgres.close()

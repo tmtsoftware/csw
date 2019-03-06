@@ -28,14 +28,17 @@ class DatabaseServiceFactoryTest extends FunSuite with Matchers with BeforeAndAf
   private val dbName: String                    = "postgres"
   private val port: Int                         = 5432
   private val locationService: LocationService  = HttpLocationServiceFactory.makeLocalClient
-  private val postgres: EmbeddedPostgres        = DBTestHelper.postgres(port)
-  private val dbFactory: DatabaseServiceFactory = DBTestHelper.dbServiceFactory(system)
-
-  // create a database
-  private val testDsl: DSLContext = DBTestHelper.dslContext(system, port)
-  testDsl.query("CREATE TABLE box_office(id SERIAL PRIMARY KEY)").executeAsyncScala().futureValue(Interval(Span(5, Seconds)))
+  private var postgres: EmbeddedPostgres        = _
+  private var dbFactory: DatabaseServiceFactory = _
+  private var testDsl: DSLContext               = _
 
   override def beforeAll(): Unit = {
+    postgres = DBTestHelper.postgres(port)
+    dbFactory = DBTestHelper.dbServiceFactory(system)
+    testDsl = DBTestHelper.dslContext(system, port)
+    // create a database
+    testDsl.query("CREATE TABLE box_office(id SERIAL PRIMARY KEY)").executeAsyncScala().futureValue(Interval(Span(5, Seconds)))
+
     super.beforeAll()
     locationService
       .register(TcpRegistration(DatabaseServiceConnection.value, port))
