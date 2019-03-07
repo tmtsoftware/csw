@@ -19,7 +19,7 @@ with codecs.open(config_file, "r", encoding="utf-8") as fd:
     config = json.load(fd)
 
 
-dirPath = os.environ.get("TMT_LOG_HOME") + "/tmt/logs"
+dirPath = os.environ.get("TMT_LOG_HOME")
 pathlib.Path(dirPath).mkdir(parents=True, exist_ok=True)
 logPath = dirPath + "/app.log"
 config["logging"]["handlers"]["file_handler"]["filename"]=logPath

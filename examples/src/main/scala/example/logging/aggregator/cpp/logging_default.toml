@@ -1,0 +1,16 @@
+
+# Various sinks can be created in the following way. More information can be found at https://github.com/guangie88/spdlog_setup#toml-configuration-example
+[[sink]]
+name = "basic_logger"
+type = "basic_file_sink_st"
+# Tagged based configuration. Programmatically determine path for {xxx}.
+filename = "{TMT_LOG_HOME}/spdlog_setup.log"
+create_parent_dir = true
+
+# Various loggers can be created
+[[logger]]
+name = "root"
+sinks = ["basic_logger"]
+level = "critical"
+
+# More examples of configuration files can be found at https://github.com/guangie88/spdlog_setup/tree/v0.3.0-alpha.2/config
