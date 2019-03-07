@@ -16,7 +16,7 @@ class HostConfigTest extends FunSuite with MockitoSugar with Matchers {
 
   mockedProcesses.foreach(p ⇒ when(p.exitValue()).thenReturn(0))
 
-  test("asd") {
+  test("should parse host configuration file and invoke container cmd app with valid arguments") {
     var actualScripts: List[(String, List[String])] = Nil
 
     var counter = 0
