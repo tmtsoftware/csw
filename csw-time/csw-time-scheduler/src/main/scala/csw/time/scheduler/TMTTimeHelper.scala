@@ -13,7 +13,7 @@ object TMTTimeHelper {
    * Combines the [[csw.time.core.models.TMTTime]] with the given timezone to get a [[java.time.ZonedDateTime]]
    *
    * @param zoneId id of the required zone
-   * @return time atZone the given zone
+   * @return time at the given zone
    */
   def atZone(tmtTime: TMTTime, zoneId: ZoneId): ZonedDateTime = tmtTime.value.atZone(zoneId)
 
@@ -21,14 +21,14 @@ object TMTTimeHelper {
    * Combines the [[csw.time.core.models.TMTTime]] with the Local timezone to get a [[java.time.ZonedDateTime]].
    * Local timezone is the system's default timezone.
    *
-   * @return time atZone the Local zone
+   * @return time at the Local zone
    */
   def atLocal(tmtTime: TMTTime): ZonedDateTime = atZone(tmtTime, ZoneId.systemDefault())
 
   /**
    * Combines the [[csw.time.core.models.TMTTime]] with the Hawaii timezone to get a [[java.time.ZonedDateTime]].
    *
-   * @return time atZone the Hawaii-Aleutian Standard Time (HST) zone
+   * @return time at the Hawaii-Aleutian Standard Time (HST) zone
    */
   def atHawaii(tmtTime: TMTTime): ZonedDateTime = atZone(tmtTime, ZoneId.of("US/Hawaii"))
 

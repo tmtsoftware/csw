@@ -30,7 +30,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
     ("UTCTime", () ⇒ UTCTime(UTCTime.now().value.plusSeconds(1)))
   ).foreach {
     case (name, idealScheduleTime) ⇒
-      test(s"[$name] should schedule task atZone start time") {
+      test(s"[$name] should schedule task at start time") {
         val testProbe = TestProbe()
         val probeMsg  = "echo"
 
@@ -46,7 +46,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
 
   // DEOPSCSW-544: Schedule a task to be executed repeatedly
   // DEOPSCSW-547: Cancel scheduled timers for periodic tasks
-  test("[TAITime] should schedule a task periodically atZone given interval") {
+  test("[TAITime] should schedule a task periodically at given interval") {
     val buffer: ArrayBuffer[Int] = ArrayBuffer.empty
     val atomicInt                = new AtomicInteger(0)
     val cancellable: Cancellable = timeService.schedulePeriodically(Duration.ofMillis(100)) {
@@ -59,7 +59,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
 
   // DEOPSCSW-545: Start a repeating task with initial offset
   // DEOPSCSW-547: Cancel scheduled timers for periodic tasks
-  test("[TAITime] should schedule a task periodically atZone given interval after start time") {
+  test("[TAITime] should schedule a task periodically at given interval after start time") {
     val buffer: ArrayBuffer[Int] = ArrayBuffer.empty
     val atomicInt                = new AtomicInteger(0)
     val startTime: TAITime       = new TAITime(TAITime.now().value.plusSeconds(1))
@@ -75,7 +75,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
   }
 
   // DEOPSCSW-542: Schedule a task to execute in future
-  test("should schedule multiple tasks atZone same start time") {
+  test("should schedule multiple tasks at same start time") {
     // we do not want manual config in this test to compare start time with task execution time
     // hence separate instance of actor system is created here which does not use ManualConfig
     val system      = ActorSystem()
@@ -124,7 +124,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
 
     times.size shouldBe 6
     buffer.foreach { i =>
-      times(i).value.toEpochMilli shouldBe (startTime.value.toEpochMilli + offset * i) +- 10
+      times(i).value.toEpochMilli shouldBe (startTime.value.toEpochMilli + offset * i) +- 20
     }
   }
 
@@ -156,7 +156,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
 
     times.size shouldBe 6
     buffer.foreach { i =>
-      times(i).value.toEpochMilli shouldBe (startTime.value.toEpochMilli + offset * i) +- 10
+      times(i).value.toEpochMilli shouldBe (startTime.value.toEpochMilli + offset * i) +- 20
     }
   }
 }
