@@ -21,6 +21,8 @@ object AlarmCodec extends AlarmJsonSupport {
   implicit val latchedSeverityKeyRomaineCodec: RomaineStringCodec[LatchedSeverityKey] =
     RomaineStringCodec.codec(_.value, LatchedSeverityKey.apply)
   implicit val severityKeyRomaineCodec: RomaineStringCodec[SeverityKey] = RomaineStringCodec.codec(_.value, SeverityKey.apply)
+  implicit val initializingKeyCodec: RomaineStringCodec[InitializingKey] =
+    RomaineStringCodec.codec(_.value, InitializingKey.apply)
 
   //value codecs
   implicit val metadataRomaineCodec: RomaineStringCodec[AlarmMetadata]     = viaJsonCodec
@@ -28,4 +30,5 @@ object AlarmCodec extends AlarmJsonSupport {
   implicit val alarmTimeRomaineCodec: RomaineStringCodec[UTCTime]          = viaJsonCodec
   implicit val shelveStatusRomaineCodec: RomaineStringCodec[ShelveStatus]  = viaJsonCodec
   implicit val ackStatusCodec: RomaineStringCodec[AcknowledgementStatus]   = viaJsonCodec
+  implicit val initializingCodec: RomaineStringCodec[Boolean]              = viaJsonCodec
 }

@@ -10,28 +10,36 @@ object SeverityTestScenarios {
 
   val SeverityTestCases = List(
     SetSeverityTestCase(
-      alarmKey = AlarmKey(AOESW, "test_component", "IsHigher_WasNotDisconnected"),
+      alarmKey = AlarmKey(AOESW, "test_component", "IsHigher_WasInitializing"),
       oldLatchedSeverity = Warning,
       newSeverity = Critical,
-      expectedLatchedSeverity = Critical
+      expectedLatchedSeverity = Critical,
+      initializing = true,
+      expectedInitializing = false
     ),
     SetSeverityTestCase(
-      alarmKey = AlarmKey(AOESW, "test_component", "IsHigher_WasDisconnected"),
+      alarmKey = AlarmKey(AOESW, "test_component", "IsHigher_WasNotInitializing"),
       oldLatchedSeverity = Disconnected,
       newSeverity = Critical,
-      expectedLatchedSeverity = Critical
+      expectedLatchedSeverity = Critical,
+      initializing = false,
+      expectedInitializing = false
     ),
     SetSeverityTestCase(
-      alarmKey = AlarmKey(AOESW, "test_component", "IsNotHigher_WasNotDisconnected"),
-      oldLatchedSeverity = Major,
-      newSeverity = Okay,
-      expectedLatchedSeverity = Major
-    ),
-    SetSeverityTestCase(
-      alarmKey = AlarmKey(AOESW, "test_component", "IsNotHigher_WasDisconnected"),
+      alarmKey = AlarmKey(AOESW, "test_component", "IsLower_WasInitializing"),
       oldLatchedSeverity = Disconnected,
       newSeverity = Okay,
-      expectedLatchedSeverity = Okay
+      expectedLatchedSeverity = Okay,
+      initializing = true,
+      expectedInitializing = false
+    ),
+    SetSeverityTestCase(
+      alarmKey = AlarmKey(AOESW, "test_component", "IsLower_WasNotInitializing"),
+      oldLatchedSeverity = Major,
+      newSeverity = Warning,
+      expectedLatchedSeverity = Major,
+      initializing = false,
+      expectedInitializing = false
     )
   )
 
