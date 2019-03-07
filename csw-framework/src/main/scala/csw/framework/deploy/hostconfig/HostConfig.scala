@@ -1,5 +1,7 @@
 package csw.framework.deploy.hostconfig
 
+import java.nio.file.Path
+
 import akka.actor.CoordinatedShutdown.Reason
 import csw.framework.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
 import csw.framework.deploy.hostconfig.cli.{ArgsParser, Options}
@@ -24,6 +26,7 @@ object HostConfig {
 
   /**
    * Utility for starting multiple Containers on a single host machine
+   *
    * @param name              The name to be used for the main app which uses this utility
    * @param args              The command line args accepted in the main app which uses this utility
    */
@@ -41,27 +44,30 @@ private[hostconfig] class HostConfig(name: String, startLogging: Boolean = false
     new ArgsParser(name).parse(args) match {
       case Some(Options(isLocal, hostConfigPath, Some(containerScript))) =>
         LocationServerStatus.requireUpLocally()
+        run(isLocal, hostConfigPath, containerScript)
 
-        try {
-          if (startLogging) wiring.actorRuntime.startLogging(name)
-
-          val hostConfig    = Await.result(wiring.configUtils.getConfig(isLocal, hostConfigPath, None), 10.seconds)
-          val bootstrapInfo = ConfigParser.parseHost(hostConfig)
-          log.info(s"Bootstrapping containers: [${bootstrapInfo.containers}]")
-          processes = bootstrapContainers(containerScript, bootstrapInfo)
-        } catch {
-          case NonFatal(ex) ⇒
-            log.error(s"${ex.getMessage}", ex = ex)
-            throw ex
-        } finally {
-          // once all the processes are started for each container,
-          // host applications actor system is no longer needed,
-          // otherwise it will keep taking part of cluster decisions
-          shutdown(ApplicationFinishedReason)
-          waitForProcessTermination(processes)
-          log.warn("Exiting HostConfigApp as all the processes start by this app are terminated")
-        }
       case _ ⇒ throw UnableToParseOptions
+    }
+
+  def run(isLocal: Boolean, hostConfigPath: Option[Path], containerScript: String): Unit =
+    try {
+      if (startLogging) wiring.actorRuntime.startLogging(name)
+
+      val hostConfig    = Await.result(wiring.configUtils.getConfig(isLocal, hostConfigPath, None), 10.seconds)
+      val bootstrapInfo = ConfigParser.parseHost(hostConfig)
+      log.info(s"Bootstrapping containers: [${bootstrapInfo.containers}]")
+      processes = bootstrapContainers(containerScript, bootstrapInfo)
+    } catch {
+      case NonFatal(ex) ⇒
+        log.error(s"${ex.getMessage}", ex = ex)
+        throw ex
+    } finally {
+      // once all the processes are started for each container,
+      // host applications actor system is no longer needed,
+      // otherwise it will keep taking part of cluster decisions
+      shutdown(ApplicationFinishedReason)
+      waitForProcessTermination(processes)
+      log.warn("Exiting HostConfigApp as all the processes start by this app are terminated")
     }
 
   private def bootstrapContainers(containerScript: String, bootstrapInfo: HostBootstrapInfo): Set[process.Process] =
@@ -70,16 +76,16 @@ private[hostconfig] class HostConfig(name: String, startLogging: Boolean = false
         case ContainerBootstrapInfo(Container, configPath, Remote) ⇒
           executeScript(containerScript, configPath)
         case ContainerBootstrapInfo(Container, configPath, Local) ⇒
-          executeScript(containerScript, s"$configPath --local")
+          executeScript(containerScript, s"$configPath", "--local")
         case ContainerBootstrapInfo(Standalone, configPath, Remote) ⇒
-          executeScript(containerScript, s"$configPath --standalone")
+          executeScript(containerScript, s"$configPath", "--standalone")
         case ContainerBootstrapInfo(Standalone, configPath, Local) ⇒
-          executeScript(containerScript, s"$configPath --local --standalone")
+          executeScript(containerScript, s"$configPath", "--local", "--standalone")
       }
 
   // spawn a child process and start a container
-  private def executeScript(containerScript: String, args: String): process.Process = {
-    val command = s"$containerScript $args"
+  def executeScript(containerScript: String, args: String*): process.Process = {
+    val command = s"$containerScript ${args.mkString(" ")}"
     log.info(s"Executing command : $command")
     command.run()
   }
