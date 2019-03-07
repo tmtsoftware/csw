@@ -18,7 +18,6 @@ import org.scalatest.{FunSuite, Matchers}
 
 // DEOPSCSW-222: Locking a component for a specific duration
 // DEOPSCSW-301: Support UnLocking
-// DEOPSCSW-302: Support Unlocking by Admin
 class LockManagerTest extends FunSuite with MockitoSugar with Matchers {
 
   private val prefix        = Prefix("tcs.mobie.blue.filter")
@@ -143,19 +142,22 @@ class LockManagerTest extends FunSuite with MockitoSugar with Matchers {
 
   }
 
+  // DEOPSCSW-302: Support Unlocking by Admin
   test("should allow unlocking any locked component by admin") {
-    val commandResponseProbe = TestProbe[SubmitResponse]
+    val replyTo        = TestProbe[SubmitResponse].ref
+    val adminPrefix    = Prefix("Admin")
+    val nonAdminPrefix = Prefix("NonAdmin")
 
-    val lockManager = new LockManager(Some(prefix), adminPrefix = Some(Prefix("Admin")), mockedLoggerFactory)
+    val lockManager = new LockManager(lockPrefix = Some(prefix), adminPrefix = Some(adminPrefix), mockedLoggerFactory)
     lockManager.isLocked shouldBe true
 
-    val adminSetup: Setup = Setup(Prefix("admin123"), CommandName("move"), Some(ObsId("obs1001")), Set(intParam))
-    lockManager.allowCommand(Submit(adminSetup, commandResponseProbe.ref)) shouldBe false
+    val nonAdminCmd: Setup = Setup(nonAdminPrefix, CommandName("move"), Some(ObsId("obs1001")), Set(intParam))
+    lockManager.allowCommand(Submit(nonAdminCmd, replyTo)) shouldBe false
 
     val probe               = TestProbe[LockingResponse]
-    val unlockedLockManager = lockManager.unlockComponent(Prefix("Admin"), probe.ref) {}
+    val unlockedLockManager = lockManager.unlockComponent(adminPrefix, probe.ref) {}
+    probe.expectMessage(LockReleased)
 
-    unlockedLockManager.allowCommand(Submit(adminSetup, commandResponseProbe.ref)) shouldBe true
-
+    unlockedLockManager.allowCommand(Submit(nonAdminCmd, replyTo)) shouldBe true
   }
 }

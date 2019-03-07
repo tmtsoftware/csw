@@ -8,9 +8,11 @@ import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.core.models.Prefix
 
-private[framework] class LockManager(val lockPrefix: Option[Prefix],
-                                     adminPrefix: => Option[Prefix],
-                                     loggerFactory: LoggerFactory) {
+private[framework] class LockManager(
+    val lockPrefix: Option[Prefix],
+    adminPrefix: => Option[Prefix],
+    loggerFactory: LoggerFactory
+) {
   private val log: Logger = loggerFactory.getLogger
 
   def lockComponent(source: Prefix, replyTo: ActorRef[LockingResponse])(startTimer: ⇒ Unit): LockManager = lockPrefix match {

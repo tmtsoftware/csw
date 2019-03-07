@@ -52,8 +52,9 @@ private[framework] object SupervisorBehavior {
   val InitializeTimerKey              = "initialize-timer"
   val ComponentActorNameSuffix        = "component-actor"
   val CommandResponseManagerActorName = "command-response-manager"
-  val lockNotificationKey             = "lockNotification"
-  val lockExpirationKey               = "lockExpiration"
+  val LockNotificationKey             = "lockNotification"
+  val LockExpirationKey               = "lockExpiration"
+  val AdminKey                        = "cswAdminPrefix"
 }
 
 /**
@@ -64,7 +65,7 @@ private[framework] object SupervisorBehavior {
  * @param maybeContainerRef        the container ref of the container under which this supervisor is started if
  *                                 it's not running in standalone mode
  * @param componentBehaviorFactory the factory for creating the component supervised by this Supervisor
- * @note                           unlocking locked components is supported by admins only if `cswAdminPrefix` environment variable is set
+ * @note                           unlocking locked components is supported by admin only if `cswAdminPrefix` environment variable is set
  */
 private[framework] final class SupervisorBehavior(
     ctx: ActorContext[SupervisorMessage],
@@ -87,8 +88,9 @@ private[framework] final class SupervisorBehavior(
   private val akkaRegistration: AkkaRegistration           = registrationFactory.akkaTyped(akkaConnection, prefix, ctx.self)
   private val isStandalone: Boolean                        = maybeContainerRef.isEmpty
   private[framework] val initializeTimeout: FiniteDuration = componentInfo.initializeTimeout
-  private val AdminKey                                     = "cswAdminPrefix"
-  private def adminPrefix: Option[Prefix]                  = (sys.env ++ sys.props).get(AdminKey).map(Prefix(_))
+
+  // read from env variable every time the component is asked to unlock
+  private def adminPrefix: Option[Prefix] = sys.env.get(AdminKey).map(Prefix(_))
 
   private val pubSubBehaviorFactory: PubSubBehaviorFactory                        = new PubSubBehaviorFactory
   private[framework] val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] = makePubSubLifecycle()
@@ -216,16 +218,16 @@ private[framework] final class SupervisorBehavior(
 
   private def lockComponent(source: Prefix, replyTo: ActorRef[LockingResponse], leaseDuration: FiniteDuration): Unit = {
     lockManager = lockManager.lockComponent(source, replyTo) {
-      timerScheduler.startSingleTimer(lockNotificationKey, LockAboutToTimeout(replyTo), leaseDuration - (leaseDuration / 10))
-      timerScheduler.startSingleTimer(lockExpirationKey, LockTimedout(replyTo), leaseDuration)
+      timerScheduler.startSingleTimer(LockNotificationKey, LockAboutToTimeout(replyTo), leaseDuration - (leaseDuration / 10))
+      timerScheduler.startSingleTimer(LockExpirationKey, LockTimedout(replyTo), leaseDuration)
     }
     if (lockManager.isLocked) updateLifecycleState(SupervisorLifecycleState.Lock)
   }
 
   private def unlockComponent(source: Prefix, replyTo: ActorRef[LockingResponse]): Unit = {
     lockManager = lockManager.unlockComponent(source, replyTo) {
-      timerScheduler.cancel(lockNotificationKey)
-      timerScheduler.cancel(lockExpirationKey)
+      timerScheduler.cancel(LockNotificationKey)
+      timerScheduler.cancel(LockExpirationKey)
     }
     if (lockManager.isUnLocked) updateLifecycleState(SupervisorLifecycleState.Running)
   }
