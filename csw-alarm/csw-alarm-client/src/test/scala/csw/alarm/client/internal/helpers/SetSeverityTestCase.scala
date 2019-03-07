@@ -7,7 +7,9 @@ case class SetSeverityTestCase(
     alarmKey: AlarmKey,
     oldLatchedSeverity: FullAlarmSeverity,
     newSeverity: AlarmSeverity,
-    expectedLatchedSeverity: FullAlarmSeverity
+    expectedLatchedSeverity: FullAlarmSeverity,
+    initializing: Boolean,
+    expectedInitializing: Boolean
 ) {
   def name: String = alarmKey.name
 }

@@ -14,7 +14,8 @@ trait TestDataFeeder {
   def feedTestData(testCase: SetSeverityTestCase): Unit =
     feedTestData(
       alarmKey = testCase.alarmKey,
-      oldLatchedSeverity = testCase.oldLatchedSeverity
+      oldLatchedSeverity = testCase.oldLatchedSeverity,
+      initializing = testCase.initializing
     )
 
   def feedTestData(testCase: SetSeverityAckStatusTestCase): Unit =
@@ -29,7 +30,8 @@ trait TestDataFeeder {
       alarmKey: AlarmKey,
       oldLatchedSeverity: FullAlarmSeverity,
       isAutoAck: Boolean = false,
-      oldAckStatus: AcknowledgementStatus = Acknowledged
+      oldAckStatus: AcknowledgementStatus = Acknowledged,
+      initializing: Boolean = true
   ): Unit = {
     // Adding metadata for corresponding test in alarm store
     setMetadata(
@@ -51,7 +53,10 @@ trait TestDataFeeder {
     ).await
 
     // Adding status for corresponding test in alarm store
-    setStatus(alarmKey, AlarmStatus().copy(acknowledgementStatus = oldAckStatus, latchedSeverity = oldLatchedSeverity)).await
+    setStatus(
+      alarmKey,
+      AlarmStatus().copy(initializing = initializing, acknowledgementStatus = oldAckStatus, latchedSeverity = oldLatchedSeverity)
+    ).await
   }
 
 }

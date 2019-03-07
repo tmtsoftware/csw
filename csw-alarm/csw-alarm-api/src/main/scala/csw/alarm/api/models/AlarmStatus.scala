@@ -13,7 +13,8 @@ case class AlarmStatus private[alarm] (
     acknowledgementStatus: AcknowledgementStatus,
     latchedSeverity: FullAlarmSeverity,
     shelveStatus: ShelveStatus,
-    alarmTime: UTCTime
+    alarmTime: UTCTime,
+    initializing: Boolean
 )
 
 object AlarmStatus {
@@ -24,6 +25,7 @@ object AlarmStatus {
     acknowledgementStatus = Acknowledged,
     latchedSeverity = Disconnected,
     shelveStatus = Unshelved,
-    alarmTime = UTCTime.now()
+    alarmTime = UTCTime.now(),
+    initializing = true
   )
 }

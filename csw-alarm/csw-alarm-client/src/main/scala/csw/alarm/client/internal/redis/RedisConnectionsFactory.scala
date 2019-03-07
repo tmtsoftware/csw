@@ -24,6 +24,7 @@ class RedisConnectionsFactory(alarmServiceResolver: AlarmServiceResolver, master
   lazy val alarmTimeApi: RedisAsyncApi[AlarmTimeKey, UTCTime]                       = asyncApi
   lazy val ackStatusApi: RedisAsyncApi[AckStatusKey, AcknowledgementStatus]         = asyncApi
   lazy val shelveStatusApi: RedisAsyncApi[ShelveStatusKey, ShelveStatus]            = asyncApi
+  lazy val initializingApi: RedisAsyncApi[InitializingKey, Boolean]                 = asyncApi
 
   def asyncApi[K: RomaineStringCodec, V: RomaineStringCodec]: RedisAsyncApi[K, V] = romaineFactory.redisAsyncApi[K, V](redisURI)
 

@@ -18,6 +18,13 @@ private[alarm] object ShelveStatusKey {
     ShelveStatusKey(s"shelvestatus$KeySeparator" + alarmKey.value)
 }
 
+private[alarm] case class InitializingKey(value: String)
+
+private[alarm] object InitializingKey {
+  implicit def fromAlarmKey(alarmKey: Key): InitializingKey =
+    InitializingKey(s"initializing$KeySeparator" + alarmKey.value)
+}
+
 private[alarm] case class AlarmTimeKey(value: String)
 
 private[alarm] object AlarmTimeKey {

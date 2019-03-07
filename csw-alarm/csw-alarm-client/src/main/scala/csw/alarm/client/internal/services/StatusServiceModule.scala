@@ -39,13 +39,15 @@ trait StatusServiceModule extends StatusService {
     val latchedSeverityF: Future[Option[FullAlarmSeverity]] = latchedSeverityApi.get(alarmKey)
     val shelveStatusF: Future[ShelveStatus]                 = getShelveStatus(alarmKey)
     val alarmTimeF: Future[Option[UTCTime]]                 = alarmTimeApi.get(alarmKey)
+    val initializingF: Future[Option[Boolean]]              = initializingApi.get(alarmKey)
 
     val defaultAlarmStatus = AlarmStatus()
     AlarmStatus(
       await(ackStatusF).getOrElse(defaultAlarmStatus.acknowledgementStatus),
       await(latchedSeverityF).getOrElse(defaultAlarmStatus.latchedSeverity),
       await(shelveStatusF),
-      await(alarmTimeF).getOrElse(defaultAlarmStatus.alarmTime)
+      await(alarmTimeF).getOrElse(defaultAlarmStatus.alarmTime),
+      await(initializingF).getOrElse(defaultAlarmStatus.initializing)
     )
   }
 
@@ -89,10 +91,12 @@ trait StatusServiceModule extends StatusService {
     shelveStatusApi.set(alarmKey, Unshelved)
   }
 
+  final override def latchToDisconnected(alarmKey: AlarmKey): Future[Done] = updateStatusForSeverity(alarmKey, Disconnected)
+
   private[alarm] final override def unacknowledge(alarmKey: AlarmKey): Future[Done] =
     setAcknowledgementStatus(alarmKey, Unacknowledged)
 
-  private[alarm] def updateStatusForSeverity(alarmKey: AlarmKey, severity: AlarmSeverity): Future[Done] = async {
+  private[alarm] def updateStatusForSeverity(alarmKey: AlarmKey, severity: FullAlarmSeverity): Future[Done] = async {
 
     val metadata                  = await(getMetadata(alarmKey))
     val originalStatus            = await(getStatus(alarmKey))
@@ -104,12 +108,12 @@ trait StatusServiceModule extends StatusService {
     implicit class RichAndFluentAlarmStatus(targetAlarmStatus: AlarmStatus) {
 
       /**
-       * Updates latched severity of the alarm if it's is greater than original or if original latched severity is Disconnected
+       * Updates latched severity of the alarm if it's is greater than original or if component is initializing (component has not sent any heartbeat yet)
        * This will be a no op if latched severity does not need to change
        * @return updated AlarmStatus
        */
       def updateLatchedSeverity(): AlarmStatus = {
-        if (severity > targetAlarmStatus.latchedSeverity | originalStatus.latchedSeverity == Disconnected)
+        if (severity > targetAlarmStatus.latchedSeverity | originalStatus.initializing)
           targetAlarmStatus.copy(latchedSeverity = severity)
         else targetAlarmStatus
       }
@@ -137,6 +141,12 @@ trait StatusServiceModule extends StatusService {
         else targetAlarmStatus
 
       /**
+       * Sets the initializing flag to false.
+       * @return updated AlarmStatus
+       */
+      def removeInitializingFlag(): AlarmStatus = targetAlarmStatus.copy(initializing = false)
+
+      /**
        * Persists the given alarm status to redis if there are any changes, otherwise it's a no op
        */
       def persistChanges(): Future[Done] =
@@ -151,6 +161,7 @@ trait StatusServiceModule extends StatusService {
         .updateLatchedSeverity()
         .updateAckStatus()
         .updateTime()
+        .removeInitializingFlag()
         .persistChanges()
     )
   }
@@ -163,7 +174,8 @@ trait StatusServiceModule extends StatusService {
           ackStatusApi.set(alarmKey, alarmStatus.acknowledgementStatus),
           shelveStatusApi.set(alarmKey, alarmStatus.shelveStatus),
           alarmTimeApi.set(alarmKey, alarmStatus.alarmTime),
-          latchedSeverityApi.set(alarmKey, alarmStatus.latchedSeverity)
+          latchedSeverityApi.set(alarmKey, alarmStatus.latchedSeverity),
+          initializingApi.set(alarmKey, alarmStatus.initializing)
         )
       )
       .map(_ ⇒ Done)
@@ -181,7 +193,8 @@ trait StatusServiceModule extends StatusService {
           alarmTimeApi.pdel(GlobalKey),
           shelveStatusApi.pdel(GlobalKey),
           ackStatusApi.pdel(GlobalKey),
-          latchedSeverityApi.pdel(GlobalKey)
+          latchedSeverityApi.pdel(GlobalKey),
+          initializingApi.pdel(GlobalKey)
         )
       )
       .map(_ ⇒ Done)
