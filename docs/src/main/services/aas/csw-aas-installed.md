@@ -1,6 +1,6 @@
 # Installed Auth Adapter (csw-aas-installed)
 
-`csw-aas-installed` is the adapter you will use if you want to build an application that executes on user's 
+`csw-aas-installed` is the adapter you will use if you want to build an application that executes on a user's 
 machine and talks to an AAS-protected web service application. Examples of such applications 
 could be a CLI app that is installed on end users machine.  The Configuration Service client makes use of this
 library.
@@ -19,13 +19,13 @@ sbt
 ## Prerequisites
 
 To run a client app that is installed on user's machine, which needs to talk to a protected 
-http server, we need
+HTTP server, we need
 
-* location service running
-* Keycloak instance running and registered with location service
+* CSW Location Service running
+* Keycloak instance running and registered with Location Service
 * protected HTTP server running
 
-All of these can be running on different machines. To start location service & keycloak 
+All of these can be running on different machines. To start Location Service and Keycloak 
 server on a local machine, you can make use of `csw-services.sh` script.
 
 ## Application Configurations
@@ -127,11 +127,11 @@ Scala
 
 Here the constructor takes InstalledAppAuthAdapter as a parameter and in the run method, 
 it calls `installedAppAuthAdapter.login()`. This method, opens a browser and redirects user
-to TMT login screen (served by keycloak). In the background, it starts an http server
+to TMT login screen (served by keycloak). In the background, it starts an HTTP server
 on a random port. Once the user submits correct credentials on the login screen, keycloak
-redirects user to `http://localhost:[RandomPort]` with the access and refresh tokens in 
+redirects user to `http://localhost:[SomePort]` with the access and refresh tokens in 
 query string. The InstalledAppAuthAdapter will then save these token in file system using 
-FileAuthStore. After this, InstalledAppAuthAdapter will shut down the local server since it's
+FileAuthStore. After this, InstalledAppAuthAdapter will shut down the local server since its
 purpose is served. Now, user can close the browser.
 
 If you want to develop an CLI app that is not dependent on browser, you can call
@@ -139,8 +139,8 @@ If you want to develop an CLI app that is not dependent on browser, you can call
 instead of opening a browser.
 
 @@@ note 
-It may be tempting to use the `loginCommandLine()` method, however a browser is generally more
-user-friendly since it can store cookies & remember passwords.
+While the `loginCommandLine()` method is available, a browser is generally more
+user-friendly since it can store cookies and remember passwords.
 @@@
 
 ### Logout
@@ -156,30 +156,30 @@ clears all the tokens from file system via `FileAuthStore`.
 Scala
 :   @@snip [ReadCommand](../../../../../examples/src/main/scala/example/auth/installed/commands/ReadCommand.scala) { #read-command }
 
-Since in the akka-http routes, the get route is not protected by any authentication or
-authorization, read command simply sends a get request and prints the response.
+Since the get route is not protected by any authentication or
+authorization in the our example server, read command simply sends a get request and prints the response.
 
 ### Write
 
 Scala
 :   @@snip [WriteCommand](../../../../../examples/src/main/scala/example/auth/installed/commands/WriteCommand.scala) { #write-command }
 
-Write command constructor takes InstalledAppAuthAdapter & a string value. This string value is expected
-from the CLI input. Since in the akka-http routes, the post route is protected by a realm role policy, we need to pass
+The WriteCommand constructor takes InstalledAppAuthAdapter and a string value. This string value is expected
+from the CLI input. Since the post route is protected by a realm role policy in our example server, we need to pass
 bearer token in the request header. 
 
-`installedAppAuthAdapter.getAccessTokenString()` returns `Option[String]` if it is None, it means 
-that user has not logged in and so we display an error message stating the same. If it returns a token string, 
+`installedAppAuthAdapter.getAccessTokenString()` returns an `Option[String]`.  If it is `None`, it means 
+that user has not logged in and so we display an error message stating so. If it returns a token string, 
 we pass it in the header.
 
 If the response status code is 200, it means authentication and authorization were successful. In this case
 authorization required that the user had `admin` role. 
 
 If the response is 401, it indicates that there was something wrong with the token. 
-It could indicate that token is expired or does not have valid signature. 
+It could indicate that token has expired or does not have valid signature. 
 `InstalledAppAuthAdapter` ensures that you don't send a request with an expired token.
 If the access token is expired, it refreshes the access token with the help of a `refresh` token.
-If the refresh token is also expired, it returns `None` which means that user has to log in again.
+If the refresh token has also expired, it returns `None` which means that user has to log in again.
 
 If the response is 403, it indicates that token was valid but the token is not authorized to 
 perform certain action. In this case if the token belonged to a user who does not have `admin`

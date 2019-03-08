@@ -1,7 +1,7 @@
 # Core concepts and terms
 
-These are some common terms used in AAS. More information is available on 
-keycloak [documentation](https://www.keycloak.org/docs/latest/server_admin/index.html#core-concepts-and-terms)
+These are some common terms used in AAS. More information is available in the
+Keycloak [documentation](https://www.keycloak.org/docs/latest/server_admin/index.html#core-concepts-and-terms)
 
 ### Users
 
@@ -28,8 +28,8 @@ Realms are isolated from one another and can only manage and authenticate the us
 
 ### Clients
 
-Clients are entities that can request Keycloak to authenticate a user. Most often, clients are applications 
-and services that want to use Keycloak to secure themselves and provide a single sign-on solution. 
+Clients are entities that can request AAS authenticate a user. Most often, clients are applications 
+and services that want to use AAS to secure themselves and provide a single sign-on solution. 
 Clients can also be entities that just want to request identity information or an access token so that they 
 can securely invoke other services on the network that are secured by Keycloak.
 
