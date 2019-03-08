@@ -7,7 +7,7 @@ import csw.params.core.generics.ParameterSetType;
 import csw.params.core.models.Prefix;
 import org.junit.Assert;
 import org.junit.Test;
-import org.scalatest.junit.JUnitSuite;
+import org.scalatestplus.junit.JUnitSuite;
 
 import java.util.*;
 import java.util.stream.Collectors;

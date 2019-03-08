@@ -13,7 +13,7 @@ import net.manub.embeddedkafka.EmbeddedKafka$;
 import org.apache.kafka.common.errors.RecordTooLargeException;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
-import org.scalatest.junit.JUnitSuite;
+import org.scalatestplus.junit.JUnitSuite;
 
 import java.time.Duration;
 import java.util.Collections;

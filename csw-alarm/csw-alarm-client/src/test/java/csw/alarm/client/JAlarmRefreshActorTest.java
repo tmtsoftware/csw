@@ -10,7 +10,7 @@ import csw.alarm.api.models.Key.AlarmKey;
 import csw.alarm.api.models.AutoRefreshSeverityMessage.AutoRefreshSeverity;
 import csw.alarm.api.models.AutoRefreshSeverityMessage.CancelAutoRefresh;
 import org.junit.Test;
-import org.scalatest.junit.JUnitSuite;
+import org.scalatestplus.junit.JUnitSuite;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;

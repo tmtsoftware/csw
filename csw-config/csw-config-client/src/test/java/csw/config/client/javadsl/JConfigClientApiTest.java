@@ -7,7 +7,7 @@ import csw.config.api.models.ConfigData;
 import csw.config.api.models.ConfigId;
 import csw.config.client.JConfigClientBaseSuite;
 import org.junit.*;
-import org.scalatest.junit.JUnitSuite;
+import org.scalatestplus.junit.JUnitSuite;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

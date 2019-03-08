@@ -1,13 +1,11 @@
 package csw.event.client.pb;
 
+import csw.params.core.generics.Parameter;
+import csw.params.core.models.*;
 import csw.params.events.Event;
 import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
-import csw.params.core.generics.Parameter;
-import csw.params.core.models.*;
-import csw.event.client.pb.PbConverter;
-import csw.event.client.pb.TypeMapperSupport;
 import csw.time.core.models.UTCTime;
 import csw_protobuf.events.PbEvent;
 import csw_protobuf.parameter.PbParameter;
@@ -15,9 +13,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.scalatest.junit.JUnitSuite;
+import org.scalatestplus.junit.JUnitSuite;
 
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 

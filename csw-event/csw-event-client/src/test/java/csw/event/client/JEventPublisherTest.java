@@ -17,7 +17,7 @@ import csw.params.events.Event;
 import csw.params.events.Event$;
 import csw.params.events.EventKey;
 import csw.time.core.models.UTCTime;
-import org.scalatest.testng.TestNGSuite;
+import org.scalatestplus.testng.TestNGSuite;
 import org.testng.Assert;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;

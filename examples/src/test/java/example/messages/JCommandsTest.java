@@ -17,7 +17,7 @@ import csw.params.core.models.Prefix;
 import csw.time.core.models.UTCTime;
 import org.junit.Assert;
 import org.junit.Test;
-import org.scalatest.junit.JUnitSuite;
+import org.scalatestplus.junit.JUnitSuite;
 import play.api.libs.json.JsValue;
 import play.api.libs.json.Json;
 

@@ -6,7 +6,7 @@ import csw.params.core.generics.Parameter;
 import csw.time.core.models.UTCTime;
 import org.junit.Assert;
 import org.junit.Test;
-import org.scalatest.junit.JUnitSuite;
+import org.scalatestplus.junit.JUnitSuite;
 
 import java.time.Instant;
 import java.util.Arrays;

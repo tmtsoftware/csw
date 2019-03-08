@@ -13,7 +13,7 @@ import io.lettuce.core.ClientOptions;
 import io.lettuce.core.RedisException;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
-import org.scalatest.junit.JUnitSuite;
+import org.scalatestplus.junit.JUnitSuite;
 
 import java.time.Duration;
 import java.util.Optional;

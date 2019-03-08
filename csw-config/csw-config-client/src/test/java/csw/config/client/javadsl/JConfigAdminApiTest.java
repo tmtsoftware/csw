@@ -9,7 +9,7 @@ import csw.config.api.models.*;
 import csw.config.client.JConfigClientBaseSuite;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
-import org.scalatest.junit.JUnitSuite;
+import org.scalatestplus.junit.JUnitSuite;
 import scala.Some;
 
 import java.nio.file.Path;

@@ -8,7 +8,7 @@ import csw.logging.client.javadsl.JGenericLoggerFactory;
 import csw.logging.client.javadsl.JLogAppenderBuilders;
 import csw.logging.client.javadsl.JLoggingSystemFactory;
 import org.openjdk.jmh.annotations.*;
-import org.scalatest.junit.JUnitSuite;
+import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 

@@ -6,7 +6,7 @@ import csw.time.core.models.utils.TestUtil;
 import csw.time.clock.natives.models.TMTClock$;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.scalatest.junit.JUnitSuite;
+import org.scalatestplus.junit.JUnitSuite;
 
 import java.time.Duration;
 import java.time.Instant;

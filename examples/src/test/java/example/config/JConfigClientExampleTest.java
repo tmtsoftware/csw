@@ -15,7 +15,7 @@ import csw.testkit.javadsl.FrameworkTestKitJunitResource;
 import csw.testkit.javadsl.JCSWService;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
-import org.scalatest.junit.JUnitSuite;
+import org.scalatestplus.junit.JUnitSuite;
 
 import java.io.IOException;
 import java.net.URI;

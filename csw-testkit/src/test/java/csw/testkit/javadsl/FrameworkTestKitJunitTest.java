@@ -9,7 +9,7 @@ import csw.location.api.models.TcpLocation;
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.scalatest.junit.JUnitSuite;
+import org.scalatestplus.junit.JUnitSuite;
 
 import java.util.Arrays;
 import java.util.Optional;

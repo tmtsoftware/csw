@@ -7,7 +7,7 @@ import akka.util.Timeout;
 import csw.command.client.messages.CommandResponseManagerMessage;
 import csw.params.core.models.Id;
 import org.junit.Test;
-import org.scalatest.junit.JUnitSuite;
+import org.scalatestplus.junit.JUnitSuite;
 
 import java.util.concurrent.TimeUnit;
 

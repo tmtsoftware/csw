@@ -5,7 +5,7 @@ import csw_protobuf.Keytype;
 import csw_protobuf.Parameter;
 import csw_protobuf.ParameterTypes;
 import org.junit.Test;
-import org.scalatest.junit.JUnitSuite;
+import org.scalatestplus.junit.JUnitSuite;
 
 import java.util.Arrays;
 import java.util.List;

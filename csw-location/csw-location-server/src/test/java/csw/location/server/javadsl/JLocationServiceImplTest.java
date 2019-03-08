@@ -26,7 +26,7 @@ import csw.logging.client.javadsl.JLoggerFactory;
 import csw.network.utils.Networks;
 import csw.params.core.models.Prefix;
 import org.junit.*;
-import org.scalatest.junit.JUnitSuite;
+import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.FiniteDuration;
 

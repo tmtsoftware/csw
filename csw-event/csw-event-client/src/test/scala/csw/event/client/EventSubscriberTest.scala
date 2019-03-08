@@ -12,7 +12,7 @@ import csw.params.core.models.{Prefix, Subsystem}
 import csw.params.events.{Event, EventKey, EventName, SystemEvent}
 import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
-import org.scalatest.testng.TestNGSuite
+import org.scalatestplus.testng.TestNGSuite
 import org.testng.annotations._
 
 import scala.collection.mutable.ArrayBuffer

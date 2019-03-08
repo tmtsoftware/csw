@@ -19,7 +19,7 @@ import csw.logging.client.utils.JGenericSimple;
 import csw.logging.client.utils.JLogUtil;
 import csw.logging.client.utils.TestAppender;
 import org.junit.*;
-import org.scalatest.junit.JUnitSuite;
+import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 

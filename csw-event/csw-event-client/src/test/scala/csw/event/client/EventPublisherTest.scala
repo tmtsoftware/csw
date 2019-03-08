@@ -14,7 +14,7 @@ import csw.time.core.models.UTCTime
 import net.manub.embeddedkafka.EmbeddedKafka
 import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
-import org.scalatest.testng.TestNGSuite
+import org.scalatestplus.testng.TestNGSuite
 import org.testng.annotations._
 
 import scala.collection.{immutable, mutable}

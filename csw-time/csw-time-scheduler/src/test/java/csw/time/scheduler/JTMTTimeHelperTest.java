@@ -6,7 +6,7 @@ import csw.time.core.models.utils.TestProperties;
 import csw.time.core.models.utils.TestUtil;
 import org.junit.Assert;
 import org.junit.Test;
-import org.scalatest.junit.JUnitSuite;
+import org.scalatestplus.junit.JUnitSuite;
 
 import java.time.Instant;
 import java.time.ZoneId;
