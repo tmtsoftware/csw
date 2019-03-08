@@ -7,6 +7,8 @@ import csw.params.events.Event;
 import csw.event.api.exceptions.PublishFailure;
 import csw.event.api.javadsl.IEventPublisher;
 import csw.event.client.helpers.Utils;
+import csw.time.core.models.TMTTime;
+import csw.time.core.models.UTCTime;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.RedisException;
 import org.junit.*;
@@ -107,6 +109,48 @@ public class JRedisFailureTest extends JUnitSuite {
         Event event = Utils.makeEvent(1);
 
         publisher.publishAsync(() -> CompletableFuture.completedFuture(Optional.ofNullable(event)), Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
+
+        PublishFailure failure = testProbe.expectMessageClass(PublishFailure.class);
+        Assert.assertEquals(failure.event(), event);
+        Assert.assertEquals(failure.getCause().getClass(), RedisException.class);
+    }
+
+    @Test
+    public void handleFailedPublishEventWithAnEventGeneratorGeneratingEventAtSpecificTimeAndACallback() throws InterruptedException, ExecutionException, TimeoutException {
+        IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
+        TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.typedActorSystem());
+        publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
+
+        publisher.shutdown().get(10, TimeUnit.SECONDS);
+
+        Thread.sleep(1000); // wait till the publisher is shutdown successfully
+
+        Event event = Utils.makeEvent(1);
+
+        TMTTime startTime = new UTCTime(UTCTime.now().value().plusMillis(500));
+
+        publisher.publish(() -> Optional.ofNullable(event), startTime, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
+
+        PublishFailure failure = testProbe.expectMessageClass(PublishFailure.class);
+        Assert.assertEquals(failure.event(), event);
+        Assert.assertEquals(failure.getCause().getClass(), RedisException.class);
+    }
+
+    @Test
+    public void handleFailedPublishEventWithAnEventGeneratorGeneratingFutureOfEventAtSpecificTimeAndACallback() throws InterruptedException, ExecutionException, TimeoutException {
+        IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
+        TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.typedActorSystem());
+        publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
+
+        publisher.shutdown().get(10, TimeUnit.SECONDS);
+
+        Thread.sleep(1000); // wait till the publisher is shutdown successfully
+
+        Event event = Utils.makeEvent(1);
+
+        TMTTime startTime = new UTCTime(UTCTime.now().value().plusMillis(500));
+
+        publisher.publishAsync(() -> CompletableFuture.completedFuture(Optional.ofNullable(event)), startTime, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
 
         PublishFailure failure = testProbe.expectMessageClass(PublishFailure.class);
         Assert.assertEquals(failure.event(), event);

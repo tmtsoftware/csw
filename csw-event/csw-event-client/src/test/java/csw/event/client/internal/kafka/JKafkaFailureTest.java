@@ -7,6 +7,8 @@ import csw.params.events.Event;
 import csw.event.api.exceptions.PublishFailure;
 import csw.event.api.javadsl.IEventPublisher;
 import csw.event.client.helpers.Utils;
+import csw.time.core.models.TMTTime;
+import csw.time.core.models.UTCTime;
 import net.manub.embeddedkafka.EmbeddedKafka$;
 import org.apache.kafka.common.errors.RecordTooLargeException;
 import org.junit.*;
@@ -89,4 +91,33 @@ public class JKafkaFailureTest extends JUnitSuite {
         Assert.assertEquals(failure.event(), event);
         Assert.assertEquals(failure.getCause().getClass(), RecordTooLargeException.class);
     }
+
+    @Test
+    public void handleFailedPublishEventWithAnEventGeneratorGeneratingEventAtSpecificStartTimeAndACallback() {
+        TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.actorSystem()));
+        Event event = Utils.makeEvent(1);
+
+        TMTTime startTime = new UTCTime(UTCTime.now().value().plusMillis(500));
+
+        publisher.publish(() -> Optional.ofNullable(event),startTime, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
+
+        PublishFailure failure = testProbe.expectMessageClass(PublishFailure.class);
+        Assert.assertEquals(failure.event(), event);
+        Assert.assertEquals(failure.getCause().getClass(), RecordTooLargeException.class);
+    }
+
+    @Test
+    public void handleFailedPublishEventWithAnEventGeneratorGeneratingFutureOfEventAtSpecificStartTimeAndACallback() {
+        TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.actorSystem()));
+        Event event = Utils.makeEvent(1);
+
+        TMTTime startTime = new UTCTime(UTCTime.now().value().plusMillis(500));
+
+        publisher.publishAsync(() -> CompletableFuture.completedFuture(Optional.ofNullable(event)), startTime, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
+
+        PublishFailure failure = testProbe.expectMessageClass(PublishFailure.class);
+        Assert.assertEquals(failure.event(), event);
+        Assert.assertEquals(failure.getCause().getClass(), RecordTooLargeException.class);
+    }
+
 }
