@@ -16,9 +16,7 @@ import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
 
 import scala.concurrent.Await
-import scala.concurrent.duration.DurationDouble
-import scala.sys.process
-import scala.sys.process.stringToProcess
+import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.util.control.NonFatal
 
 // $COVERAGE-OFF$
@@ -35,10 +33,10 @@ object HostConfig {
 }
 
 private[hostconfig] class HostConfig(name: String, startLogging: Boolean = false) {
-  private val log: Logger = new LoggerFactory(name).getLogger
+  private val log: Logger             = new LoggerFactory(name).getLogger
+  private val timeout: FiniteDuration = 10.seconds
 
-  private lazy val wiring: FrameworkWiring    = new FrameworkWiring
-  private var processes: Set[process.Process] = _
+  private lazy val wiring: FrameworkWiring = new FrameworkWiring
 
   def start(args: Array[String]): Unit =
     new ArgsParser(name).parse(args) match {
@@ -53,24 +51,24 @@ private[hostconfig] class HostConfig(name: String, startLogging: Boolean = false
     try {
       if (startLogging) wiring.actorRuntime.startLogging(name)
 
-      val hostConfig    = Await.result(wiring.configUtils.getConfig(isLocal, hostConfigPath, None), 10.seconds)
+      val hostConfig    = Await.result(wiring.configUtils.getConfig(isLocal, hostConfigPath, None), timeout)
       val bootstrapInfo = ConfigParser.parseHost(hostConfig)
       log.info(s"Bootstrapping containers: [${bootstrapInfo.containers}]")
-      processes = bootstrapContainers(containerScript, bootstrapInfo)
+      val processes = bootstrapContainers(containerScript, bootstrapInfo)
+      val pids      = processes.map(_.pid())
+      log.info(s"Started processes with following PID's: ${pids.mkString("[", ", ", "]")}")
     } catch {
       case NonFatal(ex) ⇒
         log.error(s"${ex.getMessage}", ex = ex)
         throw ex
     } finally {
+      log.info("Exiting host config application.")
       // once all the processes are started for each container,
-      // host applications actor system is no longer needed,
-      // otherwise it will keep taking part of cluster decisions
+      // host applications actor system is no longer needed
       shutdown(ApplicationFinishedReason)
-      waitForProcessTermination(processes)
-      log.warn("Exiting HostConfigApp as all the processes start by this app are terminated")
     }
 
-  private def bootstrapContainers(containerScript: String, bootstrapInfo: HostBootstrapInfo): Set[process.Process] =
+  private def bootstrapContainers(containerScript: String, bootstrapInfo: HostBootstrapInfo): Set[Process] =
     bootstrapInfo.containers
       .map {
         case ContainerBootstrapInfo(Container, configPath, Remote) ⇒
@@ -84,17 +82,12 @@ private[hostconfig] class HostConfig(name: String, startLogging: Boolean = false
       }
 
   // spawn a child process and start a container
-  def executeScript(containerScript: String, args: String*): process.Process = {
-    val command = s"$containerScript ${args.mkString(" ")}"
-    log.info(s"Executing command : $command")
-    command.run()
+  def executeScript(containerScript: String, args: String*): Process = {
+    val cmd = containerScript +: args
+    log.info(s"Executing command : ${cmd.mkString(" ")}")
+    new ProcessBuilder(cmd: _*).start()
   }
 
-  private def waitForProcessTermination(processes: Set[process.Process]): Unit = processes.foreach { process ⇒
-    val exitCode = process.exitValue()
-    log.warn(s"Container exited with code: [$exitCode]")
-  }
-
-  private def shutdown(reason: Reason) = Await.result(wiring.actorRuntime.shutdown(reason), 10.seconds)
+  private def shutdown(reason: Reason) = Await.result(wiring.actorRuntime.shutdown(reason), timeout)
 }
 // $COVERAGE-ON$
