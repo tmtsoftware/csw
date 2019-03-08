@@ -7,7 +7,7 @@ object Libs {
   val ScalaVersion   = "2.12.8"
   val AcyclicVersion = "0.1.8"
 
-  val `scalatest` = dep("org.scalatest" %%% "scalatest" % "3.0.5") //Apache License 2.0
+  val `scalatest` = dep("org.scalatest" %%% "scalatest" % "3.0.6") //Apache License 2.0
 
   val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0" //BSD 3-clause "New" or "Revised" License
   val `scala-async`        = dep("org.scala-lang.modules" %% "scala-async" % "0.9.7") //BSD 3-clause "New" or "Revised" License
@@ -15,7 +15,7 @@ object Libs {
   val `acyclic`            = "com.lihaoyi" %% "acyclic" % AcyclicVersion % Provided //MIT License
   val `junit`              = "junit" % "junit" % "4.12" //Eclipse Public License 1.0
   val `junit-interface`    = "com.novocode" % "junit-interface" % "0.11" //BSD 2-clause "Simplified" License
-  val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.1.4"
+  val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.2.0"
   //MIT License
   val `embedded-keycloak`            = "com.github.tmtsoftware" % "embedded-keycloak"             % "dfa0076dff6c" //Apache 2.0
   val `logback-classic`              = "ch.qos.logback"         % "logback-classic"               % "1.2.3"        //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
@@ -53,7 +53,7 @@ object Libs {
   val httpclient        = "org.apache.httpcomponents"     % "httpclient"      % "4.5.7"
   val `jboss-logging`   = "org.jboss.logging"             % "jboss-logging"   % "3.3.2.Final"
   val `config`          = "com.typesafe"                  % "config"          % "1.3.3"
-  val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.2.7"
+  val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.2.8"
   val `caffeine`        = "com.github.ben-manes.caffeine" % "caffeine"        % "2.7.0"
 }
 
@@ -100,7 +100,7 @@ object AkkaHttp {
 }
 
 object Keycloak {
-  val Version                 = "4.8.3.Final"
+  val Version                 = "5.0.0"
   val `keycloak-adapter-core` = "org.keycloak" % "keycloak-adapter-core" % Version
   val `keycloak-core`         = "org.keycloak" % "keycloak-core" % Version
   val `keycloak-installed`    = "org.keycloak" % "keycloak-installed-adapter" % Version
@@ -109,7 +109,7 @@ object Keycloak {
 }
 
 object Jooq {
-  val Version        = "3.11.9"
+  val Version        = "3.11.10"
   val `jooq`         = "org.jooq" % "jooq" % Version
   val `jooq-meta`    = "org.jooq" % "jooq-meta" % Version
   val `jooq-codegen` = "org.jooq" % "jooq-codegen" % Version
