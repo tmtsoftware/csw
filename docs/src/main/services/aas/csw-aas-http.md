@@ -2,10 +2,9 @@
 
 This library is a security adapter for akka-http server applications. `csw-aas` uses 
 [OpenId Connect](https://openid.net/connect/) for authentication and authorization.
-The authentication server used by AAS is [keycloak](https://www.keycloak.org/).
-We recommend that you get familiar with keycloak's documentation and configurations to
+The authentication server used by AAS is [Keycloak](https://www.keycloak.org/).
+We recommended that you get familiar with Keycloak's documentation and configurations to
 fully leverage this adapter's features.
-
 
 This adapter provides authentication via security directives such as `sGet`, `sPost`, `sPut`, etc.
 These directives are used in routing and replace the default `get`, `post`, `put`, etc. directives
@@ -28,10 +27,10 @@ sbt
 
 To run an akka-http server app, which uses this adapter, we need
 
-* location service running
-* Keycloak instance running and registered with location service
+* Location Service running
+* Keycloak instance running and registered with Location Service
 
-Location service and keycloak can be running on different machines. To start location service & keycloak 
+Location Service and Keycloak can be running on different machines. To start Location Service and Keycloak 
 server on a local machine, you make make use of csw-services.sh script.
 
 ## Application Configurations
@@ -84,11 +83,11 @@ This results into following sequence of actions when a request arrives for a sec
 1. Check the token for roles and validate that it has `admin` [realm role](https://www.keycloak.org/docs/latest/server_admin/index.html#realm-roles)
 1. After all the above checks/validations pass, execute the route logic 
 
-If any of the validations fails, an appropriate http status code is returned to the requester.
+If any of the validations fails, an appropriate HTTP status code is returned to the requester.
 For authentication failure `401` is sent and for authorization failure `403` is sent.
 
 @@@ note
-To know more about realm roles, check out the [keycloak documentation](https://www.keycloak.org/docs/latest/server_admin/index.html#realm-roles)
+To know more about realm roles, check out the [Keycloak documentation](https://www.keycloak.org/docs/latest/server_admin/index.html#realm-roles)
 @@@
 
 ## Authorization Policies 
@@ -182,7 +181,7 @@ Scala
 
 ## Using Access Token
 
-A handle of access token is given to to all secure routes. It is optional to define parameter for it.
+A handle of access token type is given to to all secure routes. It is optional to define parameter for it.
 
 For example:
 
@@ -192,7 +191,7 @@ Scala
 Both of the above approaches compile and are valid. Access token holds basic information about the user 
 or the client who has made request.
 
-Please go through api documentation to know more about Access Token.
+Please go through API documentation to know more about Access Token.
 
 ## Policy Expressions
 

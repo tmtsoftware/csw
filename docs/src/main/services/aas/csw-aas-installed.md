@@ -1,6 +1,6 @@
 # Installed Auth Adapter (csw-aas-installed)
 
-`csw-aas-installed` is the adapter you will use if you want to build an application that executes on user's 
+`csw-aas-installed` is the adapter you will use if you want to build an application that executes on a user's 
 machine & talks to auth-protected web service application. Examples of such applications 
 could be a CLI app that is installed on end users machine.
 
@@ -18,13 +18,13 @@ sbt
 ## Prerequisites
 
 To run a client app that is installed on user's machine, which needs to talk to a protected 
-http server, we need
+HTTP server, we need
 
-* location service running
-* Keycloak instance running and registered with location service
-* protected http server running
+* CSW Location Service running
+* Keycloak instance running and registered with Location Service
+* protected HTTP server running
 
-All of these can be running on different machines. To start location service & keycloak 
+All of these can be running on different machines. To start Location Service and Keycloak 
 server on a local machine, you can make use of `csw-services.sh` script.
 
 ## Application Configurations
@@ -128,7 +128,7 @@ Scala
 
 Here the constructor takes InstalledAppAuthAdapter as a parameter and in the run method, 
 it calls `installedAppAuthAdapter.login()`. This method, opens a browser and redirects user
-to TMT login screen (served by keycloak). In the background, it starts an http server
+to TMT login screen (served by keycloak). In the background, it starts an HTTP server
 on a random port. Once the user submits correct credentials on the login screen, keycloak
 redirects user to `http://localhost:[RandomPort]` with the access and refresh tokens in 
 query string. The InstalledAppAuthAdapter will then save these token in file system using 
