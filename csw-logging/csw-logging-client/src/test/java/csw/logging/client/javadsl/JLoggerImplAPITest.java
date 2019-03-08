@@ -34,13 +34,11 @@ public class JLoggerImplAPITest extends JUnitSuite {
     private String exceptionMessage = "Sample exception message";
     private RuntimeException runtimeException = new RuntimeException(exceptionMessage);
     private RequestId requestId = JRequestId.id();
-    private Map<String, Object> data = new HashMap<>() {
-        {
-            put(JKeys.OBS_ID, "foo_obs_id");
-            put("key1", "value1");
-            put("key2", "value2");
-        }
-    };
+    private Map<String, Object> data = Map.of(
+        JKeys.OBS_ID, "foo_obs_id",
+        "key1", "value1",
+        "key2", "value2"
+    );
     private String className = getClass().getName();
 
     private static ActorSystem actorSystem = ActorSystem.create("base-system");

@@ -1,10 +1,10 @@
 package csw.params.events;
 
-import csw.params.javadsl.JKeyType;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.generics.ParameterSetType;
 import csw.params.core.models.Prefix;
+import csw.params.javadsl.JKeyType;
 import org.junit.Assert;
 import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
@@ -61,26 +61,24 @@ public class JEventsTest extends JUnitSuite {
         Assert.assertEquals(2, event.size());
 
         // jParamSet
-        HashSet<Parameter<?>> expectedParamSet = new HashSet<>(Arrays.asList(encoderParam, epochStringParam));
+        var expectedParamSet = Set.of(encoderParam, epochStringParam);
         Assert.assertEquals(expectedParamSet, event.jParamSet());
 
         // parameter
         Assert.assertEquals(epochStringParam, event.parameter(epochStringKey));
 
         // jMissingKeys
-        HashSet<String> expectedMissingKeys = new HashSet<>(Collections.singletonList(notUsedKey.keyName()));
+        var expectedMissingKeys = Set.of(notUsedKey.keyName());
         Set<String> jMissingKeys = event.jMissingKeys(encoderIntKey, epochStringKey, notUsedKey);
         Assert.assertEquals(expectedMissingKeys, jMissingKeys);
 
         // getStringMap
         List<String> encoderStringParam = encoderParam.jValues().stream().map(Object::toString)
                 .collect(Collectors.toList());
-        Map<String, String> expectedParamMap = new LinkedHashMap<String, String>() {
-            {
-                put(encoderParam.keyName(), String.join(",", encoderStringParam));
-                put(epochStringParam.keyName(), String.join(",", epochStringParam.jValues()));
-            }
-        };
+        Map<String, String> expectedParamMap = Map.of(
+            encoderParam.keyName(), String.join(",", encoderStringParam),
+            epochStringParam.keyName(), String.join(",", epochStringParam.jValues())
+        );
         Assert.assertEquals(expectedParamMap, event.jGetStringMap());
     }
 

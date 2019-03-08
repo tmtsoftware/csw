@@ -22,10 +22,7 @@ import play.api.libs.json.JsValue;
 import play.api.libs.json.Json;
 
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class JCommandsTest extends JUnitSuite {
@@ -300,9 +297,9 @@ public class JCommandsTest extends JUnitSuite {
         //#unique-key
 
         //validations
-        Assert.assertEquals(new HashSet<>(uniqueKeys1), new HashSet<>(Arrays.asList(encoderKey.keyName(), filterKey.keyName())));
-        Assert.assertEquals(new HashSet<>(uniqueKeys2), new HashSet<>(Arrays.asList(encoderKey.keyName(), filterKey.keyName())));
-        Assert.assertEquals(new HashSet<>(uniqueKeys3), new HashSet<>(Arrays.asList(encoderKey.keyName(), filterKey.keyName(), miscKey.keyName())));
+        Assert.assertEquals(Set.of(uniqueKeys1), Set.of(encoderKey.keyName(), filterKey.keyName()));
+        Assert.assertEquals(Set.of(uniqueKeys2), Set.of(encoderKey.keyName(), filterKey.keyName()));
+        Assert.assertEquals(Set.of(uniqueKeys3), Set.of(encoderKey.keyName(), filterKey.keyName(), miscKey.keyName()));
     }
 
     @Test

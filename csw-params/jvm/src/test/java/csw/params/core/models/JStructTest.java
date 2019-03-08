@@ -1,16 +1,15 @@
 package csw.params.core.models;
 
-import csw.params.javadsl.JKeyType;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
+import csw.params.javadsl.JKeyType;
 import csw.time.core.models.UTCTime;
 import org.junit.Assert;
 import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
 
-import java.time.Instant;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Set;
 
 import static csw.params.javadsl.JUnits.NoUnits;
 
@@ -42,10 +41,10 @@ public class JStructTest extends JUnitSuite {
     @Test
     public void shouldAbleToCreateWithSetOfParams() {
 
-        HashSet<Parameter<?>> parameterHashSet1 = new HashSet<>(Arrays.asList(raParameter, decParameter, epochParameter));
-        HashSet<Parameter<?>> parameterHashSet2 = new HashSet<>(Arrays.asList(decParameter, epochParameter, currentTimeParameter));
-        Struct struct1 = JStruct.create(parameterHashSet1);
-        Struct struct2 = JStruct.create(parameterHashSet2);
+        Set<Parameter<?>> parameterSet1 = Set.of(raParameter, decParameter, epochParameter);
+        Set<Parameter<?>> parameterSet2 = Set.of(decParameter, epochParameter, currentTimeParameter);
+        Struct struct1 = JStruct.create(parameterSet1);
+        Struct struct2 = JStruct.create(parameterSet2);
 
         Parameter<Struct> structParameter = key.set(new Struct[]{struct1, struct2}, NoUnits);
 

@@ -11,10 +11,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-185: Easy to Use Syntax/Api
@@ -42,7 +39,7 @@ public class JStateVariableTest extends JUnitSuite {
         Assert.assertFalse(currentState.exists(epochIntKey));
 
         // jParamSet
-        HashSet<Parameter<?>> expectedParamSet = new HashSet<>(Arrays.asList(encoderParam, epochStringParam));
+        Set<Parameter<?>> expectedParamSet = Set.of(encoderParam, epochStringParam);
         Assert.assertEquals(expectedParamSet, currentState.jParamSet());
     }
 
@@ -61,7 +58,7 @@ public class JStateVariableTest extends JUnitSuite {
         Assert.assertFalse(currentState.exists(epochIntKey));
 
         // jParamSet
-        HashSet<Parameter<?>> expectedParamSet = new HashSet<>(Arrays.asList(encoderParam, epochStringParam));
+        Set<Parameter<?>> expectedParamSet = Set.of(encoderParam, epochStringParam);
         Assert.assertEquals(expectedParamSet, currentState.jParamSet());
     }
 
@@ -78,7 +75,7 @@ public class JStateVariableTest extends JUnitSuite {
         Assert.assertFalse(demandState.exists(epochIntKey));
 
         // jParamSet
-        HashSet<Parameter<?>> expectedParamSet = new HashSet<>(Arrays.asList(encoderParam, epochStringParam));
+        Set<Parameter<?>> expectedParamSet = Set.of(encoderParam, epochStringParam);
         Assert.assertEquals(expectedParamSet, demandState.jParamSet());
     }
 
@@ -97,7 +94,7 @@ public class JStateVariableTest extends JUnitSuite {
         Assert.assertFalse(demandState.exists(epochIntKey));
 
         // jParamSet
-        HashSet<Parameter<?>> expectedParamSet = new HashSet<>(Arrays.asList(encoderParam, epochStringParam));
+        Set<Parameter<?>> expectedParamSet = Set.of(encoderParam, epochStringParam);
         Assert.assertEquals(expectedParamSet, demandState.jParamSet());
     }
 

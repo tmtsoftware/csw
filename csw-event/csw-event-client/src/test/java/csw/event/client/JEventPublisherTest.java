@@ -72,8 +72,7 @@ public class JEventPublisherTest extends TestNGSuite {
 
         TestProbe probe = TestProbe.create(baseProperties.typedActorSystem());
 
-        Set<EventKey> set = new HashSet<>();
-        set.add(eventKey);
+        Set<EventKey> set = Set.of(eventKey);
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
         Thread.sleep(500); // Needed for redis set which is fire and forget operation
@@ -143,7 +142,7 @@ public class JEventPublisherTest extends TestNGSuite {
 
         List<Event> expectedEvents = events.stream().map(event -> Event$.MODULE$.invalidEvent(event.eventKey())).collect(Collectors.toList());
         expectedEvents.addAll(events);
-        Assert.assertEquals(new HashSet<>(expectedEvents), queue);
+        Assert.assertEquals(Set.copyOf(expectedEvents), queue);
     }
 
     //DEOPSCSW-000: Publish events with block generating futre of event

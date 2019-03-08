@@ -95,9 +95,8 @@ public class JEventsTest extends JUnitSuite {
 
         Assert.assertTrue(k1Exists);
         Assert.assertSame(p4.get(), p1);
-        Assert.assertEquals(new HashSet<>(Collections.singletonList(22)), new HashSet<>(v1));
-        Assert.assertEquals(new HashSet<>(Collections.singletonList(44)), new HashSet<>(v2));
-        Assert.assertEquals(new HashSet<>(Collections.singletonList(missingKeys)), new HashSet<>(Collections.singletonList(missingKeys)));
+        Assert.assertEquals(Set.of(22), Set.of(v1));
+        Assert.assertEquals(Set.of(44), Set.of(v2));
         Assert.assertNotEquals(se3.eventId(), se4.eventId()); //Test unique id when parameters are removed
     }
 
@@ -146,9 +145,8 @@ public class JEventsTest extends JUnitSuite {
 
         Assert.assertTrue(k1Exists);
         Assert.assertSame(p4.get(), p1);
-        Assert.assertEquals(new HashSet<>(Collections.singletonList(4)), new HashSet<>(v1));
-        Assert.assertEquals(new HashSet<>(Collections.singletonList(2)), new HashSet<>(v2));
-        Assert.assertEquals(new HashSet<>(Collections.singletonList(missingKeys)), new HashSet<>(Collections.singletonList(missingKeys)));
+        Assert.assertEquals(Set.of(4), Set.of(v1));
+        Assert.assertEquals(Set.of(2), Set.of(v2));
         Assert.assertNotEquals(oc3.eventId(), oc4.eventId()); //Test unique id when parameters are removed
     }
 
@@ -241,9 +239,9 @@ public class JEventsTest extends JUnitSuite {
         //#unique-key
 
         //validations
-        Assert.assertEquals(new HashSet<>(uniqueKeys1), new HashSet<>(Arrays.asList(encoderKey.keyName(), filterKey.keyName())));
-        Assert.assertEquals(new HashSet<>(uniqueKeys2), new HashSet<>(Arrays.asList(encoderKey.keyName(), filterKey.keyName())));
-        Assert.assertEquals(new HashSet<>(uniqueKeys3), new HashSet<>(Arrays.asList(encoderKey.keyName(), filterKey.keyName(), miscKey.keyName())));
+        Assert.assertEquals(Set.of(uniqueKeys1), Set.of(encoderKey.keyName(), filterKey.keyName()));
+        Assert.assertEquals(Set.of(uniqueKeys2), Set.of(encoderKey.keyName(), filterKey.keyName()));
+        Assert.assertEquals(Set.of(uniqueKeys3), Set.of(encoderKey.keyName(), filterKey.keyName(), miscKey.keyName()));
     }
 
     @Test

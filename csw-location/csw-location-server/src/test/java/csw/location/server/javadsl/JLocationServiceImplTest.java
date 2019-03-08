@@ -169,12 +169,13 @@ public class JLocationServiceImplTest extends JUnitSuite {
         TcpRegistration tcpServiceRegistration = new TcpRegistration(tcpServiceConnection, 80);
         locationService.register(tcpServiceRegistration).get();
 
-        Set<Location> locations = new HashSet<>();
-        locations.add(httpRegistration.location(Networks.apply().hostname()));
-        locations.add(akkaHcdRegistration.location(Networks.apply().hostname()));
-        locations.add(tcpServiceRegistration.location(Networks.apply().hostname()));
+        Set<Location> locations = Set.of(
+            httpRegistration.location(Networks.apply().hostname()),
+            akkaHcdRegistration.location(Networks.apply().hostname()),
+            tcpServiceRegistration.location(Networks.apply().hostname())
+        );
 
-        Set<Location> actualSetOfLocations = new HashSet<>(locationService.list().get());
+        Set<Location> actualSetOfLocations = Set.copyOf(locationService.list().get());
         Assert.assertEquals(locations, actualSetOfLocations);
     }
 
@@ -225,10 +226,11 @@ public class JLocationServiceImplTest extends JUnitSuite {
         Assert.assertEquals(containerLocations, locationService.list(JComponentType.Container).get());
 
         //  Filter by Service type
-        Set<Location> serviceLocations = new HashSet<>();
-        serviceLocations.add(tcpServiceRegistration.location(Networks.apply().hostname()));
-        serviceLocations.add(httpServiceRegistration.location(Networks.apply().hostname()));
-        Set<Location> actualSetOfLocations = new HashSet<>(locationService.list(JComponentType.Service).get());
+        Set<Location> serviceLocations = Set.of(
+            tcpServiceRegistration.location(Networks.apply().hostname()),
+            httpServiceRegistration.location(Networks.apply().hostname())
+        );
+        Set<Location> actualSetOfLocations = Set.copyOf(locationService.list(JComponentType.Service).get());
         Assert.assertEquals(serviceLocations, actualSetOfLocations);
     }
 
@@ -242,11 +244,12 @@ public class JLocationServiceImplTest extends JUnitSuite {
         AkkaRegistration akkaRegistration = new RegistrationFactory().akkaTyped(akkaHcdConnection, prefix, actorRef);
         locationService.register(akkaRegistration).get();
 
-        Set<Location> locations = new HashSet<>();
-        locations.add(tcpRegistration.location(Networks.apply().hostname()));
-        locations.add(akkaRegistration.location(Networks.apply().hostname()));
+        Set<Location> locations = Set.of(
+            tcpRegistration.location(Networks.apply().hostname()),
+            akkaRegistration.location(Networks.apply().hostname())
+        );
 
-        Set<Location> actualSetOfLocations = new HashSet<>(locationService.list(Networks.apply().hostname()).get());
+        Set<Location> actualSetOfLocations = Set.copyOf(locationService.list(Networks.apply().hostname()).get());
         Assert.assertEquals(locations, actualSetOfLocations);
     }
 

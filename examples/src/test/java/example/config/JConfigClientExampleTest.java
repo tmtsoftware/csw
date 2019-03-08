@@ -194,24 +194,24 @@ public class JConfigClientExampleTest extends JUnitSuite {
         ConfigId testId = adminApi.create(testConfPath, ConfigData.fromString(defaultStrConf), true, comment).get();
 
         //retrieve full list; for demonstration purpose validate return values
-        Assert.assertEquals(new HashSet<ConfigId>(Arrays.asList(tromboneId, hcdId, fits1Id, fits2Id, testId)),
+        Assert.assertEquals(Set.of(tromboneId, hcdId, fits1Id, fits2Id, testId),
             adminApi.list().get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
 
         //retrieve list of files based on type; for demonstration purpose validate return values
-        Assert.assertEquals(new HashSet<>(Arrays.asList(tromboneId, fits1Id, testId)),
+        Assert.assertEquals(Set.of(tromboneId, fits1Id, testId),
             adminApi.list(JFileType.Annex).get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
-        Assert.assertEquals(new HashSet<>(Arrays.asList(hcdId, fits2Id)),
+        Assert.assertEquals(Set.of(hcdId, fits2Id),
             adminApi.list(JFileType.Normal).get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
 
         //retrieve list using pattern; for demonstration purpose validate return values
-        Assert.assertEquals(new HashSet<>(Arrays.asList(tromboneId, hcdId, testId)),
+        Assert.assertEquals(Set.of(tromboneId, hcdId, testId),
             adminApi.list(".*.conf").get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
         //retrieve list using pattern and file type; for demonstration purpose validate return values
-        Assert.assertEquals(new HashSet<>(Arrays.asList(tromboneId, testId)),
+        Assert.assertEquals(Set.of(tromboneId, testId),
             adminApi.list(JFileType.Annex, ".*.conf").get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
-        Assert.assertEquals(new HashSet<>(Arrays.asList(tromboneId)),
+        Assert.assertEquals(Set.of(tromboneId),
             adminApi.list(JFileType.Annex, "a/c.*").get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
-        Assert.assertEquals(new HashSet<>(Arrays.asList(testId)),
+        Assert.assertEquals(Set.of(testId),
             adminApi.list(JFileType.Annex, "test.*").get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
         //#list
     }

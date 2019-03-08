@@ -81,8 +81,8 @@ public class JStateVariablesTest extends JUnitSuite {
         //validations
         Assert.assertTrue(charKeyExists);
         Assert.assertSame(p1.get(), intParam);
-        Assert.assertEquals(new HashSet<>(Arrays.asList('A', 'B', 'C')), new HashSet<>(v1));
-        Assert.assertEquals(new HashSet<>(Arrays.asList(true, false)), new HashSet<>(v2));
+        Assert.assertEquals(Set.of('A', 'B', 'C'), Set.of(v1));
+        Assert.assertEquals(Set.of(true, false), Set.of(v2));
         Assert.assertEquals(4, missingKeys.size());
         Assert.assertFalse(ds4.exists(utcTimeKey));
         Assert.assertTrue(ds5.jGet(utcTimeKey).get().head().value().isBefore(ds3.jGet(utcTimeKey).get().head().value()));
@@ -143,8 +143,8 @@ public class JStateVariablesTest extends JUnitSuite {
         //validations
         Assert.assertTrue(charKeyExists);
         Assert.assertSame(p1.get(), intParam);
-        Assert.assertEquals(new HashSet<>(Arrays.asList('A', 'B', 'C')), new HashSet<>(v1));
-        Assert.assertEquals(new HashSet<>(Arrays.asList(true, false)), new HashSet<>(v2));
+        Assert.assertEquals(Set.of('A', 'B', 'C'), Set.of(v1));
+        Assert.assertEquals(Set.of(true, false), Set.of(v2));
         Assert.assertEquals(4, missingKeys.size());
         Assert.assertFalse(cs4.exists(timestampKey));
         Assert.assertTrue(cs5.jGet(timestampKey).get().head().value().isBefore(cs3.jGet(timestampKey).get().head().value()));
@@ -233,8 +233,8 @@ public class JStateVariablesTest extends JUnitSuite {
         //#unique-key
 
         //validations
-        Assert.assertEquals(new HashSet<>(uniqueKeys1), new HashSet<>(Arrays.asList(encoderKey.keyName(), filterKey.keyName())));
-        Assert.assertEquals(new HashSet<>(uniqueKeys2), new HashSet<>(Arrays.asList(encoderKey.keyName(), filterKey.keyName())));
-        Assert.assertEquals(new HashSet<>(uniqueKeys3), new HashSet<>(Arrays.asList(encoderKey.keyName(), filterKey.keyName(), miscKey.keyName())));
+        Assert.assertEquals(Set.of(uniqueKeys1), Set.of(encoderKey.keyName(), filterKey.keyName()));
+        Assert.assertEquals(Set.of(uniqueKeys2), Set.of(encoderKey.keyName(), filterKey.keyName()));
+        Assert.assertEquals(Set.of(uniqueKeys3), Set.of(encoderKey.keyName(), filterKey.keyName(), miscKey.keyName()));
     }
 }

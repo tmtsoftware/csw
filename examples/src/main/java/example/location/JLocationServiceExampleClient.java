@@ -11,41 +11,38 @@ import akka.stream.KillSwitch;
 import akka.stream.Materializer;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
+import csw.command.client.extensions.AkkaLocationExt;
+import csw.command.client.messages.ComponentMessage;
+import csw.command.client.messages.ContainerMessage;
 import csw.framework.commons.CoordinatedShutdownReasons;
+import csw.location.api.javadsl.ILocationService;
+import csw.location.api.javadsl.IRegistrationResult;
 import csw.location.api.javadsl.JComponentType;
 import csw.location.api.javadsl.JConnectionType;
 import csw.location.api.models.*;
-import csw.location.api.javadsl.ILocationService;
-import csw.location.api.javadsl.IRegistrationResult;
 import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import csw.location.server.internal.ServerWiring;
-import csw.params.core.models.Prefix;
-import csw.command.client.messages.ComponentMessage;
-import csw.command.client.messages.ContainerMessage;
-import csw.command.client.extensions.AkkaLocationExt;
-import csw.location.api.models.AkkaRegistration;
-import csw.location.api.models.HttpRegistration;
 import csw.location.server.scaladsl.RegistrationFactory;
-import csw.logging.client.internal.LoggingSystem;
 import csw.logging.api.javadsl.ILogger;
+import csw.logging.client.internal.LoggingSystem;
 import csw.logging.client.javadsl.JKeys;
 import csw.logging.client.javadsl.JLoggerFactory;
 import csw.logging.client.javadsl.JLoggingSystemFactory;
-import example.location.LocationServiceExampleComponent;
+import csw.params.core.models.Prefix;
 import scala.concurrent.Await;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.net.InetAddress;
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import static csw.location.api.models.Connection.*;
+import static csw.location.api.models.Connection.AkkaConnection;
+import static csw.location.api.models.Connection.HttpConnection;
 
 /**
  * An example location service client application.
@@ -144,10 +141,10 @@ public class JLocationServiceExampleClient extends AbstractActor {
 
         //#log-info-map
         log.info("Attempting to find " + exampleConnection,
-                new HashMap<String, Object>() {{
-                    put(JKeys.OBS_ID, "foo_obs_id");
-                    put("exampleConnection", exampleConnection.name());
-                }});
+                Map.of(
+                    JKeys.OBS_ID, "foo_obs_id",
+                    "exampleConnection", exampleConnection.name()
+                ));
         //#log-info-map
 
         Optional<AkkaLocation> findResult = locationService.find(exampleConnection).get();
@@ -175,12 +172,10 @@ public class JLocationServiceExampleClient extends AbstractActor {
         Duration waitForResolveLimit = Duration.ofSeconds(30);
 
         //#log-info-map-supplier
-        log.info(() -> "Attempting to resolve " + exampleConnection + " with a wait of " + waitForResolveLimit + "...", () -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put(JKeys.OBS_ID, "foo_obs_id");
-            map.put("exampleConnection", exampleConnection.name());
-            return map;
-        });
+        log.info(() -> "Attempting to resolve " + exampleConnection + " with a wait of " + waitForResolveLimit + "...", () -> Map.of(
+            JKeys.OBS_ID, "foo_obs_id",
+            "exampleConnection", exampleConnection.name()
+        ));
         //#log-info-map-supplier
 
         Optional<AkkaLocation> resolveResult = locationService.resolve(exampleConnection, waitForResolveLimit).get();

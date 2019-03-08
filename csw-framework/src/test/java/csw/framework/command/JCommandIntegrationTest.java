@@ -49,7 +49,6 @@ import scala.concurrent.ExecutionContext;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -287,7 +286,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
 
         CompletableFuture<List<CommandResponse.SubmitResponse>> submitAllF = hcdCmdService
                 .submitAll(
-                        Arrays.asList(submitAllSetup1, submitAllSetup2, submitAllSetup3),
+                        List.of(submitAllSetup1, submitAllSetup2, submitAllSetup3),
                         timeout
                 );
 
@@ -301,7 +300,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         //#submitAllInvalid
         CompletableFuture<List<CommandResponse.SubmitResponse>> submitAllF2 = hcdCmdService
                 .submitAll(
-                        Arrays.asList(submitAllSetup1, submitAllSetup3, submitAllSetup2),
+                        List.of(submitAllSetup1, submitAllSetup3, submitAllSetup2),
                         timeout
                 );
 
@@ -456,12 +455,12 @@ public class JCommandIntegrationTest extends JUnitSuite {
 
         CompletableFuture<List<CommandResponse.SubmitResponse>> finalCommandResponse = hcdCmdService
                 .submitAll(
-                        Arrays.asList(setupHcd1, setupHcd2),
+                        List.of(setupHcd1, setupHcd2),
                         timeout
                 );
 
         List<CommandResponse.SubmitResponse> actualSubmitResponses = finalCommandResponse.get();
-        List<CommandResponse.Completed> expectedResponses = Arrays.asList(new CommandResponse.Completed(setupHcd1.runId()), new CommandResponse.Completed(setupHcd2.runId()));
+        List<CommandResponse.Completed> expectedResponses = List.of(new CommandResponse.Completed(setupHcd1.runId()), new CommandResponse.Completed(setupHcd2.runId()));
         Assert.assertEquals(expectedResponses, actualSubmitResponses);
     }
 
@@ -543,10 +542,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
     }
 
     @Test
-    public void testCRMUsageForSubComands() throws Exception {
-        Setup parentSetup = new Setup(prefix(), crmParentCommandCmd(), Optional.empty());
-
-
+    public void testCRMUsageForSubCommands() throws Exception {
         Setup crmAddSetup = new Setup(prefix(), crmAddOrUpdateCmd(), Optional.empty());
         CompletableFuture<CommandResponse.SubmitResponse> addOrUpdateCommandF =
                 hcdCmdService.submit(crmAddSetup, timeout);

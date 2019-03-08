@@ -273,7 +273,7 @@ public class JKeysAndParametersTest extends JUnitSuite {
         Assert.assertEquals(JUnits.lightyear, paramWithLightYear.units());
         Assert.assertEquals(struct1.parameter(dec), secondKey.get());
         Assert.assertEquals(struct1.parameter(epoch), thirdKey.get());
-        Assert.assertEquals(new HashSet<>(expectedMissingKeys), missingKeySet);
+        Assert.assertEquals(Set.of(expectedMissingKeys), missingKeySet);
         Assert.assertFalse(mutated1.exists(ra));
         Assert.assertFalse(mutated2.exists(ra));
     }

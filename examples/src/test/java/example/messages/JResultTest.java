@@ -69,9 +69,9 @@ public class JResultTest extends JUnitSuite {
 
         Assert.assertTrue(k1Exists);
         Assert.assertSame(p4.get(), p1);
-        Assert.assertEquals(new HashSet<>(v1), new HashSet<>(p1.jValues()));
-        Assert.assertEquals(new HashSet<>(v2), new HashSet<>(p2.jValues()));
-        Assert.assertEquals(new HashSet<>(missingKeys), new HashSet<>(Collections.singletonList(k4.keyName())));
+        Assert.assertEquals(Set.of(v1), Set.of(p1.jValues()));
+        Assert.assertEquals(Set.of(v2), Set.of(p2.jValues()));
+        Assert.assertEquals(Set.of(missingKeys), Set.of(k4.keyName()));
         Assert.assertEquals(r2, r4);
     }
 
@@ -151,8 +151,8 @@ public class JResultTest extends JUnitSuite {
         List<String> uniqueKeys3 = finalResult.jParamSet().stream().map(Parameter::keyName).collect(Collectors.toList());
         //#unique-key
 
-        Assert.assertEquals(new HashSet<>(uniqueKeys1), new HashSet<>(Arrays.asList(encoderKey.keyName(), filterKey.keyName())));
-        Assert.assertEquals(new HashSet<>(uniqueKeys2), new HashSet<>(Arrays.asList(encoderKey.keyName(), filterKey.keyName())));
-        Assert.assertEquals(new HashSet<>(uniqueKeys3), new HashSet<>(Arrays.asList(encoderKey.keyName(), filterKey.keyName(), miscKey.keyName())));
+        Assert.assertEquals(Set.of(uniqueKeys1), Set.of(encoderKey.keyName(), filterKey.keyName()));
+        Assert.assertEquals(Set.of(uniqueKeys2), Set.of(encoderKey.keyName(), filterKey.keyName()));
+        Assert.assertEquals(Set.of(uniqueKeys3), Set.of(encoderKey.keyName(), filterKey.keyName(), miscKey.keyName()));
     }
 }

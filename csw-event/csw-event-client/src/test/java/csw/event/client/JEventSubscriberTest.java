@@ -85,8 +85,7 @@ public class JEventSubscriberTest extends TestNGSuite {
 
         TestProbe probe = TestProbe.create(baseProperties.typedActorSystem());
 
-        java.util.Set<EventKey> set = new HashSet<>();
-        set.add(eventKey);
+        java.util.Set<EventKey> set = Set.of(eventKey);
 
         IEventSubscription subscription =
                 baseProperties.jSubscriber().subscribe(set)
@@ -348,17 +347,13 @@ public class JEventSubscriberTest extends TestNGSuite {
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
         baseProperties.jPublisher().publish(event2).get(10, TimeUnit.SECONDS);
 
-        Set<Event> expectedEvents = new HashSet<>();
-        expectedEvents.add(Event$.MODULE$.invalidEvent(event1.eventKey()));
-        expectedEvents.add(event1);
+        Set<Event> expectedEvents = Set.of(Event$.MODULE$.invalidEvent(event1.eventKey()), event1);
 
-        Set<Event> expectedEvents2 = new HashSet<>();
-        expectedEvents2.add(Event$.MODULE$.invalidEvent(event2.eventKey()));
-        expectedEvents2.add(event2);
+        Set<Event> expectedEvents2 = Set.of(Event$.MODULE$.invalidEvent(event2.eventKey()), event2);
 
-        Assert.assertEquals(expectedEvents, new HashSet<>(pair.second().toCompletableFuture().get(10, TimeUnit.SECONDS)));
+        Assert.assertEquals(expectedEvents, Set.copyOf(pair.second().toCompletableFuture().get(10, TimeUnit.SECONDS)));
 
-        Assert.assertEquals(expectedEvents2, new HashSet<>(pair2.second().toCompletableFuture().get(10, TimeUnit.SECONDS)));
+        Assert.assertEquals(expectedEvents2, Set.copyOf(pair2.second().toCompletableFuture().get(10, TimeUnit.SECONDS)));
     }
 
     //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
@@ -408,17 +403,13 @@ public class JEventSubscriberTest extends TestNGSuite {
         baseProperties.jPublisher().publish(distinctEvent1).get(10, TimeUnit.SECONDS);
         Thread.sleep(500);
 
-        Set<EventKey> eventKeys = new HashSet<>();
-        eventKeys.add(eventKey1);
-        eventKeys.add(eventKey2);
+        Set<EventKey> eventKeys = Set.of(eventKey1, eventKey2);
 
         Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(eventKeys).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
 
-        Set<Event> actualEvents = new HashSet<>(pair.second().toCompletableFuture().get(10, TimeUnit.SECONDS));
+        Set<Event> actualEvents = Set.copyOf(pair.second().toCompletableFuture().get(10, TimeUnit.SECONDS));
 
-        HashSet<Event> expectedEvents = new HashSet<>();
-        expectedEvents.add(Event$.MODULE$.invalidEvent(distinctEvent2.eventKey()));
-        expectedEvents.add(distinctEvent1);
+        Set<Event> expectedEvents = Set.of(Event$.MODULE$.invalidEvent(distinctEvent2.eventKey()), distinctEvent1);
 
         Assert.assertEquals(expectedEvents, actualEvents);
     }
@@ -442,7 +433,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         EventKey eventKey = EventKey.apply(Prefix.apply("test"), EventName.apply("test"));
         Event event = baseProperties.jSubscriber().get(eventKey).get(10, TimeUnit.SECONDS);
 
-        Assert.assertTrue(((SystemEvent) event).isInvalid());
+        Assert.assertTrue(event.isInvalid());
         Assert.assertEquals(Event$.MODULE$.invalidEvent(eventKey), event);
     }
 
@@ -457,15 +448,11 @@ public class JEventSubscriberTest extends TestNGSuite {
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
         Thread.sleep(500); // Needed for redis set which is fire and forget operation
-        HashSet<EventKey> keys = new HashSet<>();
-        keys.add(eventKey1);
-        keys.add(eventKey2);
+        Set<EventKey> keys = Set.of(eventKey1, eventKey2);
 
         CompletableFuture<Set<Event>> eventsF = baseProperties.jSubscriber().get(keys);
 
-        HashSet<Event> expectedEvents = new HashSet<>();
-        expectedEvents.add(Event$.MODULE$.invalidEvent(eventKey2));
-        expectedEvents.add(event1);
+        Set<Event> expectedEvents = Set.of(Event$.MODULE$.invalidEvent(eventKey2), event1);
 
         Assert.assertEquals(expectedEvents, eventsF.get(10, TimeUnit.SECONDS));
     }

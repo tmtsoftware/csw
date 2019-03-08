@@ -1,16 +1,19 @@
 package csw.params.commands;
 
-import csw.params.javadsl.JKeyType;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.generics.ParameterSetType;
 import csw.params.core.models.ObsId;
 import csw.params.core.models.Prefix;
+import csw.params.javadsl.JKeyType;
 import org.junit.Assert;
 import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static csw.params.javadsl.JSubsystem.WFOS;
@@ -54,26 +57,24 @@ public class JCommandsTest extends JUnitSuite {
         Assert.assertEquals(2, command.size());
 
         // jParamSet
-        HashSet<Parameter<?>> expectedParamSet = new HashSet<>(Arrays.asList(encoderParam, epochStringParam));
+        Set<Parameter<?>> expectedParamSet = Set.of(encoderParam, epochStringParam);
         Assert.assertEquals(expectedParamSet, command.jParamSet());
 
         // parameter
         Assert.assertEquals(epochStringParam, command.parameter(epochStringKey));
 
         // jMissingKeys
-        HashSet<String> expectedMissingKeys = new HashSet<>(Collections.singletonList(notUsedKey.keyName()));
+        Set<String> expectedMissingKeys = Set.of(notUsedKey.keyName());
         Set<String> jMissingKeys = command.jMissingKeys(encoderIntKey, epochStringKey, notUsedKey);
         Assert.assertEquals(expectedMissingKeys, jMissingKeys);
 
         // getStringMap
         List<String> encoderStringParam = encoderParam.jValues().stream().map(Object::toString)
                 .collect(Collectors.toList());
-        Map<String, String> expectedParamMap = new LinkedHashMap<String, String>() {
-            {
-                put(encoderParam.keyName(),  String.join(",", encoderStringParam));
-                put(epochStringParam.keyName(),  String.join(",", epochStringParam.jValues()));
-            }
-        };
+        Map<String, String> expectedParamMap = Map.of(
+            encoderParam.keyName(),  String.join(",", encoderStringParam),
+            epochStringParam.keyName(),  String.join(",", epochStringParam.jValues())
+        );
         Assert.assertEquals(expectedParamMap, command.jGetStringMap());
     }
 

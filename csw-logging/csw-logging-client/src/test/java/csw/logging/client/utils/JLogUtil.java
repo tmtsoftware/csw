@@ -3,22 +3,18 @@ package csw.logging.client.utils;
 import akka.actor.ActorRef;
 import csw.logging.api.javadsl.ILogger;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class JLogUtil {
 
-    public static Map<String, String> logMsgMap = new HashMap<String, String>()
-    {
-        {
-            put("trace", "logging at trace level");
-            put("debug", "logging at debug level");
-            put("info" , "logging at info level");
-            put("warn" , "logging at warn level");
-            put("error", "logging at error level");
-            put("fatal", "logging at fatal level");
-        }
-    };
+    public static Map<String, String> logMsgMap = Map.of(
+        "trace", "logging at trace level",
+        "debug", "logging at debug level",
+        "info" , "logging at info level",
+        "warn" , "logging at warn level",
+        "error", "logging at error level",
+        "fatal", "logging at fatal level"
+    );
 
     public static void logInBulk(ILogger logger) {
         logger.trace(() -> logMsgMap.get("trace"));
