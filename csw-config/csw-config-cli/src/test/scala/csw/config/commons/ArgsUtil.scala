@@ -41,8 +41,7 @@ class ArgsUtil {
   val logoutArgs         = Array("logout")
 
   private def createTempFile(fileName: String, fileContent: String): Path =
-    Files.write(Files.createTempFile(fileName, ".conf"), fileContent.getBytes)
+    Files.writeString(Files.createTempFile(fileName, ".conf"), fileContent)
 
-  def readFile(filePath: String): String =
-    new String(Files.readAllBytes(Paths.get(filePath)))
+  def readFile(filePath: String): String = Files.readString(Paths.get(filePath))
 }

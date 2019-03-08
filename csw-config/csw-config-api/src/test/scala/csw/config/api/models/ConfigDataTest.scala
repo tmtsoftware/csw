@@ -42,7 +42,7 @@ class ConfigDataTest extends TestKit(ActorSystem("test-system")) with FunSuiteLi
     val configData     = ConfigData.fromString(expectedStringConfigData)
     val tempOutputFile = Files.createTempFile("temp-config", ".conf")
     configData.toPath(tempOutputFile).await
-    new String(Files.readAllBytes(tempOutputFile)) shouldBe expectedStringConfigData
+    Files.readString(tempOutputFile) shouldBe expectedStringConfigData
     Files.delete(tempOutputFile)
   }
 

@@ -140,7 +140,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
 
   //DEOPSCSW-000: Publish events with block generating future of event
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_publish_an_event_with_block_genrating_future_of_event(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_publish_an_event_with_block_generating_future_of_event(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
     var counter                      = -1

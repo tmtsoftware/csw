@@ -87,7 +87,7 @@ class ConfigCliAppTest(ignore: Int)
       enterBarrier("client2-create")
       val tempOutputFile = Files.createTempFile("output", ".conf").toString
       cliApp().start("csw-config-cli", Array("get", repoPath2, "-o", tempOutputFile))
-      new String(Files.readAllBytes(Paths.get(tempOutputFile))) shouldEqual inputFileContents
+      Files.readString(Paths.get(tempOutputFile)) shouldEqual inputFileContents
 
     }
 
