@@ -24,6 +24,7 @@ import java.util.concurrent.TimeoutException;
 
 import static org.hamcrest.CoreMatchers.isA;
 
+//DEOPSCSW-398: Propagate failure for publish api (eventGenerator)
 public class JRedisFailureTest extends JUnitSuite {
 
     private static RedisTestProps redisTestProps;
@@ -57,6 +58,7 @@ public class JRedisFailureTest extends JUnitSuite {
         publisher.publish(Utils.makeEvent(2)).get(10, TimeUnit.SECONDS);
     }
 
+    //DEOPSCSW-334: Publish an event
     @Test
     public void handleFailedPublishEventWithACallback() throws InterruptedException, ExecutionException, TimeoutException {
         IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
@@ -77,6 +79,7 @@ public class JRedisFailureTest extends JUnitSuite {
         Assert.assertEquals(failure.getCause().getClass(), RedisException.class);
     }
 
+    //DEOPSCSW-334: Publish an event
     @Test
     public void handleFailedPublishEventWithAnEventGeneratorAndACallback() throws InterruptedException, ExecutionException, TimeoutException {
         IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
@@ -96,6 +99,7 @@ public class JRedisFailureTest extends JUnitSuite {
         Assert.assertEquals(failure.getCause().getClass(), RedisException.class);
     }
 
+    //DEOPSCSW-000: Publish events with block generating futre of event
     @Test
     public void handleFailedPublishEventWithAnEventGeneratorGeneratingFutureOfEventAndACallback() throws InterruptedException, ExecutionException, TimeoutException {
         IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
@@ -115,6 +119,7 @@ public class JRedisFailureTest extends JUnitSuite {
         Assert.assertEquals(failure.getCause().getClass(), RedisException.class);
     }
 
+    //DEOPSCSW-515: Include Start Time in API
     @Test
     public void handleFailedPublishEventWithAnEventGeneratorGeneratingEventAtSpecificTimeAndACallback() throws InterruptedException, ExecutionException, TimeoutException {
         IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
@@ -136,6 +141,7 @@ public class JRedisFailureTest extends JUnitSuite {
         Assert.assertEquals(failure.getCause().getClass(), RedisException.class);
     }
 
+    //DEOPSCSW-515: Include Start Time in API
     @Test
     public void handleFailedPublishEventWithAnEventGeneratorGeneratingFutureOfEventAtSpecificTimeAndACallback() throws InterruptedException, ExecutionException, TimeoutException {
         IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();

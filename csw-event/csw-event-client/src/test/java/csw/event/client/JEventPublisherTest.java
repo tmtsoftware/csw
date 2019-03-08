@@ -218,7 +218,6 @@ public class JEventPublisherTest extends TestNGSuite {
     //DEOPSCSW-515: Include Start Time in API
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_publish_event_via_event_generator_with_start_time(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
-
         List<Event> events = new ArrayList<>();
         for(int i = 31; i < 41; i++){
             events.add(Utils.makeEventWithPrefix(i, new Prefix("start.time.test.publish")));
@@ -242,16 +241,14 @@ public class JEventPublisherTest extends TestNGSuite {
         Thread.sleep(2000);
         cancellable.cancel();
 
-        Assert.assertEquals(queue.size(), 5);
-
         events.add(0, Event$.MODULE$.invalidEvent(eventKey));
+        Assert.assertEquals(queue.size(), 5);
         Assert.assertTrue(queue.containsAll(events.subList(0,5)));
     }
 
     //DEOPSCSW-515: Include Start Time in API
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_publish_event_via_asynchrnous_event_generator_with_start_time(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
-
         List<Event> events = new ArrayList<>();
         for(int i = 31; i < 41; i++){
             events.add(Utils.makeEventWithPrefix(i, new Prefix("start.time.test.publishAsync")));
@@ -275,9 +272,9 @@ public class JEventPublisherTest extends TestNGSuite {
         Thread.sleep(2000);
         cancellable.cancel();
 
-        Assert.assertEquals(queue.size(), 5);
-
         events.add(0, Event$.MODULE$.invalidEvent(eventKey));
+
+        Assert.assertEquals(queue.size(), 5);
         Assert.assertTrue(queue.containsAll(events.subList(0,5)));
     }
 }

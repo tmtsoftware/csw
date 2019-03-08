@@ -25,6 +25,7 @@ import java.util.concurrent.TimeoutException;
 
 import static org.hamcrest.CoreMatchers.isA;
 
+//DEOPSCSW-398: Propagate failure for publish api (eventGenerator)
 public class JKafkaFailureTest extends JUnitSuite {
 
     private static KafkaTestProps kafkaTestProps;
@@ -53,6 +54,7 @@ public class JKafkaFailureTest extends JUnitSuite {
         publisher.publish(Utils.makeEvent(2)).get(10, TimeUnit.SECONDS);
     }
 
+    //DEOPSCSW-334: Publish an event
     @Test
     public void handleFailedPublishEventWithACallback() {
 
@@ -68,6 +70,7 @@ public class JKafkaFailureTest extends JUnitSuite {
         Assert.assertEquals(failure.getCause().getClass(), RecordTooLargeException.class);
     }
 
+    //DEOPSCSW-334: Publish an event
     @Test
     public void handleFailedPublishEventWithAnEventGeneratorAndACallback() {
         TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.actorSystem()));
@@ -80,6 +83,7 @@ public class JKafkaFailureTest extends JUnitSuite {
         Assert.assertEquals(failure.getCause().getClass(), RecordTooLargeException.class);
     }
 
+    //DEOPSCSW-000: Publish events with block generating futre of event
     @Test
     public void handleFailedPublishEventWithAnEventGeneratorGeneratingFutureOfEventAndACallback() {
         TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.actorSystem()));
@@ -92,6 +96,7 @@ public class JKafkaFailureTest extends JUnitSuite {
         Assert.assertEquals(failure.getCause().getClass(), RecordTooLargeException.class);
     }
 
+    //DEOPSCSW-515: Include Start Time in API
     @Test
     public void handleFailedPublishEventWithAnEventGeneratorGeneratingEventAtSpecificStartTimeAndACallback() {
         TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.actorSystem()));
@@ -106,6 +111,7 @@ public class JKafkaFailureTest extends JUnitSuite {
         Assert.assertEquals(failure.getCause().getClass(), RecordTooLargeException.class);
     }
 
+    //DEOPSCSW-515: Include Start Time in API
     @Test
     public void handleFailedPublishEventWithAnEventGeneratorGeneratingFutureOfEventAtSpecificStartTimeAndACallback() {
         TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.actorSystem()));
