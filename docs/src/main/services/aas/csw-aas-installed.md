@@ -1,8 +1,9 @@
 # Installed Auth Adapter (csw-aas-installed)
 
 `csw-aas-installed` is the adapter you will use if you want to build an application that executes on user's 
-machine & talks to auth-protected web service application. Examples of such applications 
-could be a CLI app that is installed on end users machine.
+machine and talks to an AAS-protected web service application. Examples of such applications 
+could be a CLI app that is installed on end users machine.  The Configuration Service client makes use of this
+library.
 
 ## Dependencies
 
@@ -22,22 +23,22 @@ http server, we need
 
 * location service running
 * Keycloak instance running and registered with location service
-* protected http server running
+* protected HTTP server running
 
 All of these can be running on different machines. To start location service & keycloak 
 server on a local machine, you can make use of `csw-services.sh` script.
 
 ## Application Configurations
 
-All auth related configurations go inside `auth-config` block. There are two configurations 
-applicable for a public cli client application i.e. `realm` & `client-id`.
+All AAS related configurations go inside `auth-config` block. There are two configurations 
+applicable for a public CLI client application: `realm` and `client-id`.
 
 `realm` has a
-default value of `TMT` if not specified. Ideally all apps in TMT should not have to override
+default value of `TMT` if not specified. Normally, all apps in TMT should not have to override
 this, however it might be useful to override this while testing your app.
 
-`client-id` is a mandatory configuration which specifies the client id of the app as per registration
-in keycloak.
+`client-id` is a mandatory configuration which specifies the client ID of the app as per its registration
+in Keycloak.
 
 ```hocon
 auth-config {
@@ -49,15 +50,13 @@ auth-config {
 ## Building a CLI Application
 
 Let's say that we have an existing akka-http application which has some open and 
-some protected routes and we want to build a CLI client which accesses these routes.
-
-This is what the routes look like:
+some protected routes, and we want to build a CLI client which accesses these routes.
 
 Scala
 :   @@snip [Routes](../../../../../examples/src/main/scala/example/auth/installed/SampleRoutes.scala) { #sample-routes }
 
 @@@ note
-To know more about how to create secure web apis, please go through 
+To know more about how to create secure web APIs, please go through 
 @ref:[Akka HTTP Adapter - csw-aas-http](csw-aas-http.md)
 @@@
 
