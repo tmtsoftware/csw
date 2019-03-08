@@ -2,13 +2,16 @@
 
 This library is a security adapter for akka-http server applications. `csw-aas` uses 
 [OpenId Connect](https://openid.net/connect/) for authentication and authorization.
-The authentication server used by aas is [keycloak](https://www.keycloak.org/).
-we recommend that you get familiar with keycloak's documentation and configurations to
-fully leverage this adapters features.
+The authentication server used by AAS is [keycloak](https://www.keycloak.org/).
+We recommend that you get familiar with keycloak's documentation and configurations to
+fully leverage this adapter's features.
 
 
 This adapter provides authentication via security directives such as `sGet`, `sPost`, `sPut`, etc.
-For authorization, these secure directives accept a wide range of policy expressions.
+These directives are used in routing and replace the default `get`, `post`, `put`, etc. directives
+from Akka HTTP.  This allows custom policies to be enforced at the routing level. 
+For authorization, these secure directives accept a wide range of policy expressions.  The usage of these 
+directives are described below.
 
 ## Dependencies
 
@@ -33,13 +36,14 @@ server on a local machine, you make make use of csw-services.sh script.
 
 ## Application Configurations
 
-All auth related configurations go inside `auth-config` block. There are three configurations 
+All auth related configurations go inside an `auth-config` block. There are three configurations 
 applicable for a akka-http server application i.e. `realm`, `client-id` & `enable-permissions`. 
 
 `realm` has a default value of `TMT` if not specified. Ideally all apps in TMT should not have to override
 this, however it might be useful to override this while testing your app.
 
-`enable-permissions` is optional config with a default value of `false`. If your akka-http server application
+`enable-permissions` is optional config with a default value of `false`. Typically, roles are used for
+authorization and specific permissions is not needed.  However, if your akka-http server application
 uses permission based authorization policies, this config needs to be set to true.
 
 `client-id` is a mandatory configuration which specifies the client id of the app as per registration
@@ -68,15 +72,15 @@ In the above example,
 
 * `GET http://localhost:9003/api` does not use any security directive and hence is accessible to all. 
 
-* `POST http://localhost:9003/api` uses `sPost` which is secure directive. This directive takes care of authentication (access token signature & expiration validation).
-For authorization it needs an [authorization policy](#authorization-policies). Authorizing policy specifies one or more conditions for request validation. 
+* `POST http://localhost:9003/api` uses `sPost` which is secure directive. This directive takes care of authentication (access token signature and expiration validation).
+For authorization, it needs an [authorization policy](#authorization-policies). Authorizing policy specifies one or more conditions for request validation. 
 
 In this instance, `sPost` directive has been given `RealmRolePolicy` policy with parameter value `admin`.
 
 This results into following sequence of actions when a request arrives for a secure directive route
 
-1. Secure directive will check request header to look for an access token
-1. Validate token signature and expiry
+1. Check request header to look for an access token
+1. Validate the token signature and expiry
 1. Check the token for roles and validate that it has `admin` [realm role](https://www.keycloak.org/docs/latest/server_admin/index.html#realm-roles)
 1. After all the above checks/validations pass, execute the route logic 
 
@@ -84,7 +88,7 @@ If any of the validations fails, an appropriate http status code is returned to 
 For authentication failure `401` is sent and for authorization failure `403` is sent.
 
 @@@ note
-To know more about realm roles, check out [keycloak documentation](https://www.keycloak.org/docs/latest/server_admin/index.html#realm-roles)
+To know more about realm roles, check out the [keycloak documentation](https://www.keycloak.org/docs/latest/server_admin/index.html#realm-roles)
 @@@
 
 ## Authorization Policies 
@@ -123,8 +127,7 @@ Scala
 ### PermissionPolicy
 
 This policy filters requests based on permissions. It expects name of scope and name of resource on which permission is created 
-in keycloak. Scope and Resource forms a "Permission". For example, "scope: Sell; resource: Vehicle" combined
-specifies that the user with this scope and resource combination can "sell vehicles".
+in keycloak. 
 
 In the following example policy will authorize request if user has appropriate permission associated in keycloak which specifies
 `delete` scope for `account` resource.
@@ -209,7 +212,7 @@ val policy = policy1 | (policy2 & (policy3 | policy4)) | policy5
 ## Directive Composition
 
 Since security directives extend from `akka.http.scaladsl.server.Directive` they give you all the
-benefits of a usual directive. These benefits include being able to label & [compose higher level
+benefits of a usual directive. These benefits include being able to label and [compose higher level
 directives](https://doc.akka.io/docs/akka-http/current/routing-dsl/directives/custom-directives.html#custom-directives).
 
 With the help of directive labeling you could write a route like below:
@@ -222,11 +225,11 @@ The same can be achieved via @ref:[Policy Expressions](#policy-expressions) as s
 Scala
 :   @@snip [Empty Policy](../../../../../examples/src/main/scala/example/auth/ExampleServer.scala) { #policy-expressions-right-way } 
 
-If you want to combine two directives ***and both of them are csw security directives***,
+If you want to combine two directives ***and both of them are CSW security directives***,
 we strongly recommend that you use @ref:[Policy Expressions](#policy-expressions). The reason 
-for this is that, when you combine two csw security directives authentication check happens twice (or multiple
-times based on how many csw security directives are combined) which was meant to happen only once thus causing 
-performance slowdown. You can however combine csw security directives with other directives freely without worrying
+for this is that, when you combine two CSW security directives, the authentication check happens twice (or multiple
+times based on how many CSW security directives are combined).  Since this was meant to happen only once, it causes 
+performance slowdown. You can however combine CSW security directives with other directives freely without worrying
 about performance.
 
 ## Source code for above examples

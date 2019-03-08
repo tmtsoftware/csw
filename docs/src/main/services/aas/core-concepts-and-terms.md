@@ -6,14 +6,20 @@ keycloak [documentation](https://www.keycloak.org/docs/latest/server_admin/index
 ### Users
 
 Users are entities that are able to log into your system. 
-They can have attributes associated with themselves like email, username, address, phone number, and birth day. 
+They can have attributes associated with themselves like email, username, address, phone number, and birthday. 
 They can be assigned group membership and have specific roles assigned to them.
 
 ### Roles
 
 Roles identify a type or category of user. Admin, user, manager, and employee are all typical roles that 
-may exist in an organization. Applications often assign access and permissions to specific roles rather 
+may exist in an organization. Applications often assign access to specific roles rather 
 than individual users as dealing with users can be too fine grained and hard to manage.
+
+### Permissions
+
+Permissions are another way of specifying access in the form of a Scope and a Resource.
+For example, "scope: Sell; resource: Vehicle" combined
+specifies that the user with this scope and resource combination can "sell vehicles".
 
 ### Realms
 
