@@ -73,7 +73,7 @@ private[internal] class CommandResponseManagerBehavior(
   private def addOrUpdateCommand(commandResponse: SubmitResponse): Unit =
     commandResponseState.get(commandResponse.runId) match {
       case _: CommandNotAvailable ⇒
-        commandResponseState.add(commandResponse.runId, commandResponse)
+        commandResponseState.add(commandResponse)
         querySubscribers.get(commandResponse.runId).foreach(_ ! commandResponse)
       case _ ⇒ updateCommand(commandResponse.runId, commandResponse)
     }
@@ -83,7 +83,7 @@ private[internal] class CommandResponseManagerBehavior(
     // Also makes sure that once it is final, it is final and can't be set back to Started
     // Also fixes a potential race condition where someone sets to final status before return from onSubmit returning Started
     if (isIntermediate(currentResponse) && isFinal(updateResponse)) {
-      commandResponseState.updateCommandStatus(updateResponse)
+      commandResponseState.update(updateResponse)
       doPublish(updateResponse, commandSubscribers.get(updateResponse.runId))
     }
   }
