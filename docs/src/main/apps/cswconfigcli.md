@@ -26,7 +26,7 @@ You need to have valid user name and password to login which has admin role assi
 ### Examples
 1. 
 ```
-csw-config-cli login"
+csw-config-cli login
 ``` 
 This opens up default browser on your machine and asks to provide username and password. 
 Once you provide valid credentials, auth server will respond with access token, refresh token etc. which gets stored in local filesystem.
@@ -35,7 +35,7 @@ config server.
 
 2. 
 ```
-csw-config-cli login --consoleLogin"
+csw-config-cli login --consoleLogin
 ``` 
 Instead of opening default browser on your machine, this will prompt for username and password on the console. (You do not need to leave console in this case.)
 
@@ -44,7 +44,7 @@ Use this command to logout if you are already logged in or you want to re-login 
 
 ### Example
 ```
-csw-config-cli logout"
+csw-config-cli logout
 ```
 This command will delete all the tokens stored in local filesystem.
 
