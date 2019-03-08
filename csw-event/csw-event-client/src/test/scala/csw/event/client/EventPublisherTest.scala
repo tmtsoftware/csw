@@ -138,7 +138,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     queue should contain theSameElementsAs events.map(x ⇒ Event.invalidEvent(x.eventKey)) ++ events
   }
 
-  //DEOPSCSW-000: Publish events with block generating futre of event
+  //DEOPSCSW-000: Publish events with block generating future of event
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_publish_an_event_with_block_genrating_future_of_event(baseProperties: BaseProperties): Unit = {
     import baseProperties._
@@ -209,7 +209,40 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     import baseProperties._
 
     var counter                      = -1
-    val events: immutable.Seq[Event] = for (i ← 31 to 41) yield makeEventWithPrefix(i, Prefix("test2"))
+    val events: immutable.Seq[Event] = for (i ← 31 to 41) yield makeEventWithPrefix(i, Prefix("test.publish"))
+
+    def eventGenerator(): Option[Event] = {
+      counter += 1
+      Some(events(counter))
+    }
+
+    val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
+    val eventKey: EventKey          = events.head.eventKey
+
+    val subscription = subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](queue.enqueue(_))).run()
+    subscription.ready().await
+    Thread.sleep(500) // Needed for getting the latest event
+
+    val cancellable = publisher.publish(
+      eventGenerator(),
+      UTCTime(UTCTime.now().value.plusSeconds(1)),
+      300.millis
+    )
+    Thread.sleep(2000)
+    cancellable.cancel()
+
+    // subscriber will receive an invalid event first as subscription happened before publishing started.
+    // The 4 published events will follow
+    queue should (have length 5 and contain allElementsOf Seq(Event.invalidEvent(eventKey)) ++ events.take(4))
+  }
+
+  //DEOPSCSW-515: Include Start Time in API
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_publish_event_via_asynchronous_event_generator_with_start_time(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
+
+    var counter                      = -1
+    val events: immutable.Seq[Event] = for (i ← 31 to 41) yield makeEventWithPrefix(i, Prefix("test.publishAsync"))
 
     def eventGenerator(): Future[Option[Event]] = Future {
       counter += 1
