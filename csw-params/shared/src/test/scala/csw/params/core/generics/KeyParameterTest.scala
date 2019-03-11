@@ -12,7 +12,7 @@ import csw.params.core.generics.KeyType.{
 }
 import csw.params.core.models.Units.{degree, meter, second, NoUnits}
 import csw.params.core.models._
-import csw.time.core.models.UTCTime
+import csw.time.core.models.{TAITime, UTCTime}
 import org.scalatest.{FunSpec, Matchers}
 
 // DEOPSCSW-183: Configure attributes and values
@@ -930,7 +930,8 @@ class KeyParameterTest extends FunSpec with Matchers {
   }
 
   //DEOPSCSW-282: Add a timestamp Key and Parameter
-  describe("test TimestampItem") {
+  //DEOPSCSW-661: Create UTCTimeKey and TAITimeKey replacing TimestampKey in Protobuf parameters
+  describe("test UTCTimeItems") {
     val utcTimeValue: UTCTime    = UTCTime.now()
     val utcTimeKey: Key[UTCTime] = KeyType.UTCTimeKey.make(s1)
 
@@ -967,6 +968,52 @@ class KeyParameterTest extends FunSpec with Matchers {
 
     it("should work with list, units") {
       val li: Parameter[UTCTime] = utcTimeKey.set(listIn, second)
+      li.units should be(second)
+      li.value(0) should equal(listIn(0))
+      li.value(1) should equal(listIn(1))
+      li.value(2) should equal(listIn(2))
+      li.values should equal(listIn)
+    }
+  }
+
+  //DEOPSCSW-661: Create UTCTimeKey and TAITimeKey replacing TimestampKey in Protobuf parameters
+  describe("test TAITimeItems") {
+    val taiTimeValue: TAITime    = TAITime.now()
+    val taiTimeKey: Key[TAITime] = KeyType.TAITimeKey.make(s1)
+
+    it("should allow create a Timestamp parameter from a timestamp key") {
+      val li: Parameter[TAITime] = taiTimeKey.set(taiTimeValue)
+      li.values should be(Array(taiTimeValue))
+      li.head should be(taiTimeValue)
+      li.get(0).get should equal(taiTimeValue)
+    }
+
+    it("and second must be default Unit") {
+      val li1: Parameter[TAITime] = taiTimeKey.set(taiTimeValue)
+      li1.units should be(second)
+
+      //must respect overriding also
+      val li2: Parameter[TAITime] = taiTimeKey.set(taiTimeValue).withUnits(NoUnits)
+      li2.units should be(NoUnits)
+    }
+
+    val listIn = Array[TAITime](
+      TAITime(TAITime.now().value.minusSeconds(3600)),
+      TAITime.now(),
+      TAITime(TAITime.now().value.plusMillis(3600000))
+    )
+
+    it("should work with list, withUnits") {
+      val li = taiTimeKey.set(listIn).withUnits(second)
+      li.units should be(second)
+      li.value(0) should equal(listIn(0))
+      li.value(1) should equal(listIn(1))
+      li.value(2) should equal(listIn(2))
+      li.values should equal(listIn)
+    }
+
+    it("should work with list, units") {
+      val li: Parameter[TAITime] = taiTimeKey.set(listIn, second)
       li.units should be(second)
       li.value(0) should equal(listIn(0))
       li.value(1) should equal(listIn(1))

@@ -3,6 +3,7 @@ package csw.params.core.generics;
 import csw.params.javadsl.JKeyType;
 import csw.params.core.models.RaDec;
 import csw.params.core.models.Struct;
+import csw.time.core.models.TAITime;
 import csw.time.core.models.UTCTime;
 import org.junit.Assert;
 import org.junit.Test;
@@ -254,7 +255,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
     //DEOPSCSW-282: Add a timestamp Key and Parameter
     //DEOPSCSW-661: Create UTCTimeKey and TAITimeKey replacing TimestampKey in Protobuf parameters
     @Test
-    public void testTimestampKeyParameter() {
+    public void testUTCTimeKeyParameter() {
         String keyName = "UTCTimeKey";
         Key<UTCTime> key = JKeyType.UTCTimeKey().make(keyName);
         UTCTime[] paramData = {UTCTime.now(), new UTCTime(Instant.ofEpochSecond(3600))};
@@ -276,6 +277,36 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(millisecond, parameterWithUnits.units());
 
         Assert.assertArrayEquals(paramData, (UTCTime[])parameterWithUnits.values());
+        Assert.assertEquals(paramData[0], parameterWithoutUnits.get(0).get());
+        Assert.assertEquals(paramData[1], parameterWithoutUnits.value(1));
+        Assert.assertEquals(paramData[0], parameterWithoutUnits.head());
+        Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
+    }
+
+    //DEOPSCSW-661: Create UTCTimeKey and TAITimeKey replacing TimestampKey in Protobuf parameters
+    @Test
+    public void testTAITimeKeyParameter() {
+        String keyName = "TAITimeKey";
+        Key<TAITime> key = JKeyType.TAITimeKey().make(keyName);
+        TAITime[] paramData = {TAITime.now(), new TAITime(Instant.ofEpochSecond(3600))};
+        Assert.assertEquals(keyName, key.keyName());
+        Assert.assertEquals(JKeyType.TAITimeKey(),key.keyType());
+
+        // key.set without Units
+        Parameter<TAITime> parameterWithoutUnits = key.set(paramData);
+
+        Assert.assertArrayEquals(paramData, (TAITime[])parameterWithoutUnits.values());
+
+        Assert.assertEquals(paramData[0], parameterWithoutUnits.get(0).get());
+        Assert.assertEquals(paramData[1], parameterWithoutUnits.value(1));
+        Assert.assertEquals(paramData[0], parameterWithoutUnits.head());
+        Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
+
+        // key.set with Units
+        Parameter<TAITime> parameterWithUnits = key.set(paramData, millisecond);
+        Assert.assertEquals(millisecond, parameterWithUnits.units());
+
+        Assert.assertArrayEquals(paramData, (TAITime[])parameterWithUnits.values());
         Assert.assertEquals(paramData[0], parameterWithoutUnits.get(0).get());
         Assert.assertEquals(paramData[1], parameterWithoutUnits.value(1));
         Assert.assertEquals(paramData[0], parameterWithoutUnits.head());
