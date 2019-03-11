@@ -41,10 +41,10 @@ trait SeverityServiceModule extends SeverityService {
   final override def getAggregatedSeverity(key: Key): Future[FullAlarmSeverity] = async {
     log.debug(s"Get aggregated severity for alarm [${key.value}]")
 
-    val activeAlarms   = await(getActiveAlarmKeys(key))
-    val severityKeys   = activeAlarms.map(SeverityKey.fromMetadataKey)
-    val severityValues = await(severityApi.mget(severityKeys))
-    val severityList   = severityValues.map(_.value)
+    val activeAlarms: List[MetadataKey] = await(getActiveAlarmKeys(key))
+    val severityKeys: List[SeverityKey] = activeAlarms.map(a => SeverityKey.fromAlarmKey(a))
+    val severityValues                  = await(severityApi.mget(severityKeys))
+    val severityList                    = severityValues.map(_.value)
     aggregratorByMax(severityList)
   }
 
@@ -93,9 +93,9 @@ trait SeverityServiceModule extends SeverityService {
     val keySpaceApi = redisKeySpaceApi(severityApi)
 
     val severitySourceF = async {
-      val metadataKeys       = await(getActiveAlarmKeys(key))
-      val activeSeverityKeys = metadataKeys.map(SeverityKey.fromMetadataKey)
-      val currentSeverities  = await(severityApi.mget(activeSeverityKeys)).map(result ⇒ result.key → result.value).toMap
+      val metadataKeys                          = await(getActiveAlarmKeys(key))
+      val activeSeverityKeys: List[SeverityKey] = metadataKeys.map(a => SeverityKey.fromAlarmKey(a))
+      val currentSeverities                     = await(severityApi.mget(activeSeverityKeys)).map(result ⇒ result.key → result.value).toMap
 
       keySpaceApi
         .watchKeyspaceValue(activeSeverityKeys, OverflowStrategy.LATEST)
