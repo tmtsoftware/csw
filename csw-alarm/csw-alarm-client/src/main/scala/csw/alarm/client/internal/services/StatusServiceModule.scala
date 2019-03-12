@@ -92,16 +92,20 @@ trait StatusServiceModule extends StatusService {
   }
 
   // this method is expected to be called from alarm server when it receives removed event for any alarm
-  final override def latchToDisconnected(alarmKey: AlarmKey): Future[Done] = updateStatusForSeverity(alarmKey, Disconnected)
+  final override def latchToDisconnected(alarmKey: AlarmKey, currentHeartbeatSeverity: FullAlarmSeverity): Future[Done] =
+    updateStatusForSeverity(alarmKey, currentHeartbeatSeverity, Disconnected)
 
   private[alarm] final override def unacknowledge(alarmKey: AlarmKey): Future[Done] =
     setAcknowledgementStatus(alarmKey, Unacknowledged)
 
-  private[alarm] def updateStatusForSeverity(alarmKey: AlarmKey, severity: FullAlarmSeverity): Future[Done] = async {
+  private[alarm] def updateStatusForSeverity(
+      alarmKey: AlarmKey,
+      currentHeartbeatSeverity: FullAlarmSeverity,
+      newHeartbeatSeverity: FullAlarmSeverity
+  ): Future[Done] = async {
 
-    val metadata                  = await(getMetadata(alarmKey))
-    val originalStatus            = await(getStatus(alarmKey))
-    val originalHeartbeatSeverity = await(getCurrentSeverity(alarmKey))
+    val metadata       = await(getMetadata(alarmKey))
+    val originalStatus = await(getStatus(alarmKey))
 
     // This class is not exposed outside `updateStatusForSeverity` function because
     // it's logic is strictly internal to this function.
@@ -114,19 +118,19 @@ trait StatusServiceModule extends StatusService {
        * @return updated AlarmStatus
        */
       def updateLatchedSeverity(): AlarmStatus = {
-        if (severity > targetAlarmStatus.latchedSeverity | originalStatus.initializing)
-          targetAlarmStatus.copy(latchedSeverity = severity)
+        if (newHeartbeatSeverity > targetAlarmStatus.latchedSeverity | originalStatus.initializing)
+          targetAlarmStatus.copy(latchedSeverity = newHeartbeatSeverity)
         else targetAlarmStatus
       }
 
       /**
        * Updates AcknowledgementStatus of alarm if severity is changed to anything but Okay
        * This will be a no op if AcknowledgementStatus does not need to change
-       * @return
+       * @return updated AlarmStatus
        */
       def updateAckStatus(): AlarmStatus = {
-        def isAutoAckAndOkay            = metadata.isAutoAcknowledgeable && severity == Okay
-        def isSeverityChangedAndNotOkay = severity != originalHeartbeatSeverity && severity != Okay
+        def isAutoAckAndOkay            = metadata.isAutoAcknowledgeable && newHeartbeatSeverity == Okay
+        def isSeverityChangedAndNotOkay = newHeartbeatSeverity != currentHeartbeatSeverity && newHeartbeatSeverity != Okay
 
         if (isAutoAckAndOkay) targetAlarmStatus.copy(acknowledgementStatus = Acknowledged)
         else if (isSeverityChangedAndNotOkay) targetAlarmStatus.copy(acknowledgementStatus = Unacknowledged)
@@ -134,11 +138,11 @@ trait StatusServiceModule extends StatusService {
       }
 
       /**
-       * Updates time of alarm if latchedSeverity has changed, otherwise it's a no op
+       * Updates time of alarm if current severity has changed, otherwise it's a no op
        * @return updated AlarmStatus
        */
       def updateTime(): AlarmStatus =
-        if (originalHeartbeatSeverity != severity) targetAlarmStatus.copy(alarmTime = UTCTime.now())
+        if (currentHeartbeatSeverity != newHeartbeatSeverity) targetAlarmStatus.copy(alarmTime = UTCTime.now())
         else targetAlarmStatus
 
       /**

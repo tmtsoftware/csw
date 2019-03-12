@@ -55,14 +55,19 @@ private[alarm] trait StatusService {
    * Latches the severity to Disconnected.
    * Also updates the time to current time if alarm was not already latched to disconnected.
    * Also, updates the acknowledgement status if required.
-   * @param alarmKey Key of the alarm which needs to be latched to Disconnected status
+   *
+   * @param alarmKey        Key of the alarm which needs to be latched to Disconnected status
+   * @param currentSeverity current heartbeat severity of the alarm
    * @note This method is expected to be called from alarm server when it receives removed event for any alarm
    */
-  def latchToDisconnected(alarmKey: AlarmKey): Future[Done]
+  def latchToDisconnected(alarmKey: AlarmKey, currentSeverity: FullAlarmSeverity): Future[Done]
 
   private[alarm] def unacknowledge(key: AlarmKey): Future[Done]
   private[alarm] def setStatus(alarmKey: AlarmKey, alarmStatus: AlarmStatus): Future[Done]
   private[alarm] def setStatus(statusMap: Map[AlarmKey, AlarmStatus]): Future[Done]
   private[alarm] def clearAllStatus(): Future[Done]
-  private[alarm] def updateStatusForSeverity(key: AlarmKey, severity: FullAlarmSeverity): Future[Done]
+
+  private[alarm] def updateStatusForSeverity(key: AlarmKey,
+                                             currentSeverity: FullAlarmSeverity,
+                                             newSeverity: FullAlarmSeverity): Future[Done]
 }

@@ -17,8 +17,9 @@ import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.params.core.models.Subsystem
 import csw.params.core.models.Subsystem.BAD
+import org.scalatest.AppendedClues
 import reactor.core.publisher.FluxSink.OverflowStrategy
-import romaine.RedisResult
+import romaine.{RedisResult, RedisValueChange}
 import romaine.async.RedisAsyncApi
 import romaine.reactive.RedisSubscription
 
@@ -26,7 +27,8 @@ class StatusServiceModuleTest
     extends AlarmServiceTestSetup
     with StatusServiceModule
     with SeverityServiceModule
-    with MetadataServiceModule {
+    with MetadataServiceModule
+    with AppendedClues {
 
   override protected def beforeEach(): Unit = {
     val validAlarmsConfig = ConfigFactory.parseResources("test-alarms/valid-alarms.conf")
@@ -246,6 +248,10 @@ class StatusServiceModuleTest
   test("latchToDisconnected should latch the status to disconnected") {
     val redisSubscription = startAlarmWatcher()
 
+    //awaiting for stream to become ready is very important step.
+    //without this, we lose events
+    redisSubscription.ready().await
+
     // Initially latch and current are disconnected
     val defaultStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
     defaultStatus.latchedSeverity shouldEqual Disconnected
@@ -269,10 +275,9 @@ class StatusServiceModuleTest
     //the test stream that we have created, should have latched the alarm to Disconnected by now
     newStatus.latchedSeverity shouldEqual Disconnected
     newStatus.initializing shouldBe false
-    newStatus.acknowledgementStatus shouldBe Acknowledged
+    newStatus.acknowledgementStatus shouldBe Unacknowledged withClue ", alarm should become Unacknowledged"
     newStatus.shelveStatus shouldEqual Unshelved
-    //TODO: pass the below assert
-    //newStatus.alarmTime.value.isAfter(status.alarmTime.value) shouldBe true
+    newStatus.alarmTime.value.isAfter(status.alarmTime.value) shouldBe true withClue ", alarm time did not change"
 
     redisSubscription.unsubscribe().await
   }
@@ -293,10 +298,12 @@ class StatusServiceModuleTest
     //create keyspace api for severity and return RedisSubscription
     connsFactory
       .redisKeySpaceApi(severityApi)
-      .watchKeyspaceValue(severityKeys, overflowStrategy = OverflowStrategy.LATEST)
+      .watchKeyspaceValueChange(severityKeys, overflowStrategy = OverflowStrategy.LATEST)
       .to(Sink.foreach {
-        case RedisResult(k, None) => latchToDisconnected(k).await
-        case _                    =>
+        //None is this case indicates that redis key has expired
+        case RedisResult(k, RedisValueChange(oldSeverityMayBe, None)) =>
+          latchToDisconnected(k, oldSeverityMayBe.getOrElse(Disconnected)).await
+        case _ =>
       })
       .run()
   }

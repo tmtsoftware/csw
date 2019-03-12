@@ -34,7 +34,8 @@ trait SeverityServiceModule extends SeverityService {
   private implicit lazy val mat: Materializer = ActorMaterializer()
 
   final override def setSeverity(alarmKey: AlarmKey, severity: AlarmSeverity): Future[Done] = async {
-    await(updateStatusForSeverity(alarmKey, severity))
+    val currentSeverity = await(getCurrentSeverity(alarmKey))
+    await(updateStatusForSeverity(alarmKey, currentSeverity, severity))
     await(setCurrentSeverity(alarmKey, severity))
   }
 
