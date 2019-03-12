@@ -1,8 +1,8 @@
 package csw.params.core.generics;
 
-import csw.params.javadsl.JKeyType;
 import csw.params.core.models.MatrixData;
 import csw.params.core.models.Units;
+import csw.params.javadsl.JKeyType;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,7 +10,7 @@ import org.junit.runners.Parameterized;
 import org.scalatestplus.junit.JUnitSuite;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static csw.params.javadsl.JUnits.*;
@@ -75,7 +75,7 @@ public class JMatrixKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(matrixData, parameter.get(0).get());
         Assert.assertEquals(matrixData, parameter.value(0));
         Assert.assertEquals(paramValues, parameter.values());
-        Assert.assertEquals(Collections.singletonList(matrixData), parameter.jValues());
+        Assert.assertEquals(List.of(matrixData), parameter.jValues());
 
     }
 }

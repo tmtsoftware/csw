@@ -20,7 +20,7 @@ import csw.params.events.EventKey;
 import csw.params.events.EventName;
 
 import java.time.Duration;
-import java.util.Collections;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public class JEventSubscribeExamples {
@@ -41,7 +41,7 @@ public class JEventSubscribeExamples {
         IEventSubscriber subscriber = eventService.defaultSubscriber();
 
         EventKey filterWheelEventKey = new EventKey(hcdLocation.prefix(), new EventName("filter_wheel"));
-        return subscriber.subscribeCallback(Collections.singleton(filterWheelEventKey), event -> { /*do something*/ });
+        return subscriber.subscribeCallback(Set.of(filterWheelEventKey), event -> { /*do something*/ });
 
         //#with-callback
     }
@@ -51,7 +51,7 @@ public class JEventSubscribeExamples {
         IEventSubscriber subscriber = eventService.defaultSubscriber();
 
         EventKey filterWheelEventKey = new EventKey(hcdLocation.prefix(), new EventName("filter_wheel"));
-        return subscriber.subscribeAsync(Collections.singleton(filterWheelEventKey), this::callback);
+        return subscriber.subscribeAsync(Set.of(filterWheelEventKey), this::callback);
     }
 
     private CompletableFuture<String> callback(Event event) {
@@ -67,7 +67,7 @@ public class JEventSubscribeExamples {
         ActorRef<Event> eventHandler = ctx.spawnAnonymous(new JEventHandlerFactory().make());
 
         EventKey filterWheelEventKey = new EventKey(hcdLocation.prefix(), new EventName("filter_wheel"));
-        return subscriber.subscribeActorRef(Collections.singleton(filterWheelEventKey), eventHandler);
+        return subscriber.subscribeActorRef(Set.of(filterWheelEventKey), eventHandler);
     }
 
     public class JEventHandlerFactory {
@@ -98,7 +98,7 @@ public class JEventSubscribeExamples {
         IEventSubscriber subscriber = eventService.defaultSubscriber();
 
         EventKey filterWheelEventKey = new EventKey(hcdLocation.prefix(), new EventName("filter_wheel"));
-        return subscriber.subscribe(Collections.singleton(filterWheelEventKey)).to(Sink.foreach(event -> { /*do something*/ })).run(mat);
+        return subscriber.subscribe(Set.of(filterWheelEventKey)).to(Sink.foreach(event -> { /*do something*/ })).run(mat);
 
         //#with-source
     }
@@ -109,7 +109,7 @@ public class JEventSubscribeExamples {
         IEventSubscriber subscriber = eventService.defaultSubscriber();
 
         EventKey filterWheelEventKey = new EventKey(hcdLocation.prefix(), new EventName("filter_wheel"));
-        return subscriber.subscribeCallback(Collections.singleton(filterWheelEventKey), event -> { /* do something*/ }, Duration.ofMillis(1000), SubscriptionModes.jRateAdapterMode());
+        return subscriber.subscribeCallback(Set.of(filterWheelEventKey), event -> { /* do something*/ }, Duration.ofMillis(1000), SubscriptionModes.jRateAdapterMode());
 
         //#with-subscription-mode
     }

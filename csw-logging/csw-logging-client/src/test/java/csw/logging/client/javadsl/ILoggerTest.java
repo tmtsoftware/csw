@@ -44,7 +44,7 @@ public class ILoggerTest extends JUnitSuite {
         logBuffer.add(parse(x.toString()));
         return null;
     });
-    private static List<LogAppenderBuilder> appenderBuilders = Collections.singletonList(testAppender);
+    private static List<LogAppenderBuilder> appenderBuilders = List.of(testAppender);
 
     private static Map<String, List<JsonObject>> componentLogBuffer = new HashMap<>();
     private static List<JsonObject> genericLogBuffer = new ArrayList<>();

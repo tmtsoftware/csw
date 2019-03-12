@@ -28,8 +28,8 @@ import csw.params.javadsl.JKeyType;
 import csw.params.javadsl.JUnits;
 import csw.serializable.TMTSerializable;
 
-import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -205,7 +205,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
 
     private IEventSubscription subscribeToHcd() {
         log.info("Starting subscription.");
-        return cswCtx.eventService().defaultSubscriber().subscribeCallback(Collections.singleton(counterEventKey), this::processEvent);
+        return cswCtx.eventService().defaultSubscriber().subscribeCallback(Set.of(counterEventKey), this::processEvent);
     }
 
     private void unsubscribeHcd() {

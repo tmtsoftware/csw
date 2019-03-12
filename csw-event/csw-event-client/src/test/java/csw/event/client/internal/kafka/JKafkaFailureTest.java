@@ -3,10 +3,10 @@ package csw.event.client.internal.kafka;
 import akka.actor.testkit.typed.javadsl.TestProbe;
 import akka.actor.typed.javadsl.Adapter;
 import akka.stream.javadsl.Source;
-import csw.params.events.Event;
 import csw.event.api.exceptions.PublishFailure;
 import csw.event.api.javadsl.IEventPublisher;
 import csw.event.client.helpers.Utils;
+import csw.params.events.Event;
 import csw.time.core.models.TMTTime;
 import csw.time.core.models.UTCTime;
 import net.manub.embeddedkafka.EmbeddedKafka$;
@@ -16,7 +16,7 @@ import org.junit.rules.ExpectedException;
 import org.scalatestplus.junit.JUnitSuite;
 
 import java.time.Duration;
-import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -36,7 +36,7 @@ public class JKafkaFailureTest extends JUnitSuite {
 
     @BeforeClass
     public static void beforeClass() {
-        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties(Collections.singletonMap("message.max.bytes", "1"));
+        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties(Map.of("message.max.bytes", "1"));
         publisher = kafkaTestProps.jPublisher();
         EmbeddedKafka$.MODULE$.start(kafkaTestProps.config());
     }

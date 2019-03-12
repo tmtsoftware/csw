@@ -19,7 +19,6 @@ import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -40,7 +39,7 @@ public class ILoggerActorTest extends JUnitSuite {
         logBuffer.add(parse(x.toString()));
         return null;
     });
-    private static List<LogAppenderBuilder> appenderBuilders = Collections.singletonList(testAppender);
+    private static List<LogAppenderBuilder> appenderBuilders = List.of(testAppender);
 
     @BeforeClass
     public static void setup() {

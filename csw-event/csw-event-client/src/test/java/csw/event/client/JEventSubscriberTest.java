@@ -6,15 +6,15 @@ import akka.actor.testkit.typed.javadsl.TestProbe;
 import akka.japi.Pair;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
-import csw.params.events.*;
-import csw.params.javadsl.JSubsystem;
-import csw.params.core.models.Prefix;
+import csw.event.api.javadsl.IEventSubscription;
+import csw.event.api.scaladsl.SubscriptionModes;
 import csw.event.client.helpers.Utils;
 import csw.event.client.internal.kafka.KafkaTestProps;
 import csw.event.client.internal.redis.RedisTestProps;
 import csw.event.client.internal.wiring.BaseProperties;
-import csw.event.api.javadsl.IEventSubscription;
-import csw.event.api.scaladsl.SubscriptionModes;
+import csw.params.core.models.Prefix;
+import csw.params.events.*;
+import csw.params.javadsl.JSubsystem;
 import org.scalatestplus.testng.TestNGSuite;
 import org.testng.Assert;
 import org.testng.annotations.AfterSuite;
@@ -113,7 +113,7 @@ public class JEventSubscriberTest extends TestNGSuite {
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
         Thread.sleep(500); // Needed for redis set which is fire and forget operation
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribeAsync(Collections.singleton(event1.eventKey()), event -> {
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribeAsync(Set.of(event1.eventKey()), event -> {
             probe.ref().tell(event);
             return CompletableFuture.completedFuture(event);
         });
@@ -137,12 +137,12 @@ public class JEventSubscriberTest extends TestNGSuite {
         counter = 0;
         Cancellable cancellable = baseProperties.jPublisher().publish(eventGenerator(), Duration.ofMillis(1));
 
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribeAsync(Collections.singleton(event1.eventKey()), event -> {
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribeAsync(Set.of(event1.eventKey()), event -> {
             queue.add(event);
             return CompletableFuture.completedFuture(event);
         }, Duration.ofMillis(300), SubscriptionModes.jRateAdapterMode());
 
-        IEventSubscription subscription2 = baseProperties.jSubscriber().subscribeAsync(Collections.singleton(event1.eventKey()), event -> {
+        IEventSubscription subscription2 = baseProperties.jSubscriber().subscribeAsync(Set.of(event1.eventKey()), event -> {
             queue2.add(event);
             return CompletableFuture.completedFuture(event);
         }, Duration.ofMillis(400), SubscriptionModes.jRateAdapterMode());
@@ -170,7 +170,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         }
 
         Thread.sleep(500); // Needed for redis set which is fire and forget operation
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribeCallback(Collections.singleton(listOfPublishedEvents.get(0).eventKey()), event -> probe.ref().tell(event));
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribeCallback(Set.of(listOfPublishedEvents.get(0).eventKey()), event -> probe.ref().tell(event));
         probe.expectMessage(listOfPublishedEvents.get(4));
 
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
@@ -190,9 +190,9 @@ public class JEventSubscriberTest extends TestNGSuite {
         counter = 0;
         Cancellable cancellable = baseProperties.jPublisher().publish(eventGenerator(), Duration.ofMillis(1));
         Thread.sleep(500);
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribeCallback(Collections.singleton(event1.eventKey()), queue::add, Duration.ofMillis(300), SubscriptionModes.jRateAdapterMode());
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribeCallback(Set.of(event1.eventKey()), queue::add, Duration.ofMillis(300), SubscriptionModes.jRateAdapterMode());
 
-        IEventSubscription subscription2 = baseProperties.jSubscriber().subscribeCallback(Collections.singleton(event1.eventKey()), queue2::add, Duration.ofMillis(400), SubscriptionModes.jRateAdapterMode());
+        IEventSubscription subscription2 = baseProperties.jSubscriber().subscribeCallback(Set.of(event1.eventKey()), queue2::add, Duration.ofMillis(400), SubscriptionModes.jRateAdapterMode());
 
         Thread.sleep(1000);
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
@@ -212,7 +212,7 @@ public class JEventSubscriberTest extends TestNGSuite {
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
         Thread.sleep(500); // Needed for redis set which is fire and forget operation
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribeActorRef(Collections.singleton(event1.eventKey()), probe.ref());
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribeActorRef(Set.of(event1.eventKey()), probe.ref());
         probe.expectMessage(event1);
 
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
@@ -231,7 +231,7 @@ public class JEventSubscriberTest extends TestNGSuite {
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
         Thread.sleep(500); // Needed for redis set which is fire and forget operation
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribeActorRef(Collections.singleton(event1.eventKey()), inbox.getRef(), Duration.ofMillis(300), SubscriptionModes.jRateAdapterMode());
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribeActorRef(Set.of(event1.eventKey()), inbox.getRef(), Duration.ofMillis(300), SubscriptionModes.jRateAdapterMode());
         Thread.sleep(1000);
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
         Assert.assertEquals(inbox.getAllReceived().size(), 4);
@@ -337,10 +337,10 @@ public class JEventSubscriberTest extends TestNGSuite {
         Event event1 = new SystemEvent(prefix, eventName1);
         Event event2 = new SystemEvent(prefix, eventName2);
 
-        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Collections.singleton(event1.eventKey())).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
+        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Set.of(event1.eventKey())).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
         pair.first().ready().get(10, TimeUnit.SECONDS);
 
-        Pair<IEventSubscription, CompletionStage<List<Event>>> pair2 = baseProperties.jSubscriber().subscribe(Collections.singleton(event2.eventKey())).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
+        Pair<IEventSubscription, CompletionStage<List<Event>>> pair2 = baseProperties.jSubscriber().subscribe(Set.of(event2.eventKey())).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
         pair2.first().ready().get(10, TimeUnit.SECONDS);
         Thread.sleep(500);
 
@@ -368,14 +368,12 @@ public class JEventSubscriberTest extends TestNGSuite {
         baseProperties.jPublisher().publish(event2).get(10, TimeUnit.SECONDS); // latest event before subscribing
         Thread.sleep(500); // Needed for redis set which is fire and forget operation
 
-        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Collections.singleton(eventKey)).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
+        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
         pair.first().ready().get(10, TimeUnit.SECONDS);
         Thread.sleep(500);
 
         baseProperties.jPublisher().publish(event3).get(10, TimeUnit.SECONDS);
-        java.util.List<Event> expectedEvents = new ArrayList<>();
-        expectedEvents.add(event2);
-        expectedEvents.add(event3);
+        java.util.List<Event> expectedEvents = List.of(event2, event3);
 
         // assertion against a list ensures that the latest event before subscribing arrives earlier in the stream
         Assert.assertEquals(expectedEvents, pair.second().toCompletableFuture().get(10, TimeUnit.SECONDS));
@@ -386,9 +384,9 @@ public class JEventSubscriberTest extends TestNGSuite {
     public void should_be_able_to_retrieve_InvalidEvent(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         EventKey eventKey = EventKey.apply(Prefix.apply("test"), EventName.apply("test"));
 
-        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Collections.singleton(eventKey)).take(1).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
+        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).take(1).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
 
-        Assert.assertEquals(Collections.singletonList(Event$.MODULE$.invalidEvent(eventKey)), pair.second().toCompletableFuture().get(10, TimeUnit.SECONDS));
+        Assert.assertEquals(List.of(Event$.MODULE$.invalidEvent(eventKey)), pair.second().toCompletableFuture().get(10, TimeUnit.SECONDS));
     }
 
     //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
