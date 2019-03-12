@@ -18,7 +18,7 @@ import csw.params.core.states.StateName
  */
 private[framework] object PubSubBehavior {
 
-  def behavior[T: Nameable](loggerFactory: LoggerFactory): Behavior[PubSub[T]] = Behaviors.setup { ctx ⇒
+  def make[T: Nameable](loggerFactory: LoggerFactory): Behavior[PubSub[T]] = Behaviors.setup { ctx ⇒
     val log: Logger = loggerFactory.getLogger(ctx)
 
     val nameableData: Nameable[T] = implicitly[Nameable[T]]
@@ -26,14 +26,12 @@ private[framework] object PubSubBehavior {
     def receive(subscribers: Map[ActorRef[T], Set[StateName]]): Behavior[PubSub[T]] =
       Behaviors
         .receiveMessage[PubSub[T]] {
-          //todo: check if ctx.watch is idempotent
           case SubscribeOnly(ref, names) =>
             ctx.watchWith(ref, Unsubscribe(ref))
             receive(subscribers + (ref → names))
           case Subscribe(ref) =>
             ctx.watchWith(ref, Unsubscribe(ref))
             receive(subscribers + (ref → Set.empty))
-          //todo : should we be doing unwatch with unsubscribe
           case Unsubscribe(ref) =>
             ctx.unwatch(ref)
             receive(subscribers - ref)

@@ -13,7 +13,7 @@ import csw.config.api.scaladsl.ConfigClientService
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.event.api.scaladsl.EventService
 import csw.event.client.EventServiceFactory
-import csw.framework.internal.pubsub.PubSubBehaviorFactory
+import csw.framework.internal.pubsub.PubSubBehavior
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.RegistrationFactory
 import csw.location.api.models.Connection.AkkaConnection
@@ -71,7 +71,7 @@ class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: Acto
 
   ///////////////////////////////////////////////
   val pubSubComponentActor: ActorRef[PubSub[CurrentState]] =
-    untypedSystem.spawnAnonymous(new PubSubBehaviorFactory().make[CurrentState](loggerFactory))
+    untypedSystem.spawnAnonymous(PubSubBehavior.make[CurrentState](loggerFactory))
   val currentStatePublisher = new CurrentStatePublisher(pubSubComponentActor)
 
   ///////////////////////////////////////////////

@@ -3,9 +3,9 @@ package csw.framework.internal.supervisor
 import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
+import akka.actor.typed._
 import akka.actor.typed.scaladsl._
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.typed._
 import csw.command.client.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
 import csw.command.client.messages.ComponentCommonMessage.{
   ComponentStateSubscription,
@@ -32,7 +32,7 @@ import csw.command.client.models.framework.ToComponentLifecycleMessages.{GoOffli
 import csw.command.client.models.framework._
 import csw.framework.commons.CoordinatedShutdownReasons.ShutdownMessageReceivedReason
 import csw.framework.exceptions.{FailureRestart, InitializationFailed}
-import csw.framework.internal.pubsub.PubSubBehaviorFactory
+import csw.framework.internal.pubsub.PubSubBehavior
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, RegistrationFactory}
 import csw.location.api.models.Connection.AkkaConnection
@@ -91,7 +91,6 @@ private[framework] final class SupervisorBehavior(
   // read from env variable every time the component is asked to unlock
   private def adminPrefix: Option[Prefix] = sys.env.get(AdminKey).map(Prefix(_))
 
-  private val pubSubBehaviorFactory: PubSubBehaviorFactory                        = new PubSubBehaviorFactory
   private[framework] val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] = makePubSubLifecycle()
 
   private var runningComponent: Option[ActorRef[RunningMessage]]  = None
@@ -324,7 +323,7 @@ private[framework] final class SupervisorBehavior(
   private def coordinatedShutdown(reason: Reason): Future[Done] = CoordinatedShutdown(ctx.system.toUntyped).run(reason)
 
   private def makePubSubLifecycle(): ActorRef[PubSub[LifecycleStateChanged]] =
-    ctx.spawn(pubSubBehaviorFactory.make[LifecycleStateChanged](loggerFactory), SupervisorBehavior.PubSubLifecycleActor)
+    ctx.spawn(PubSubBehavior.make[LifecycleStateChanged](loggerFactory), SupervisorBehavior.PubSubLifecycleActor)
 
   private def ignore(message: SupervisorMessage): Unit =
     log.error(s"Unexpected message :[$message] received by supervisor in lifecycle state :[$lifecycleState]")
