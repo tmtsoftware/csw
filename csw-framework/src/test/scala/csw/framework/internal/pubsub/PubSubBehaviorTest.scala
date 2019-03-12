@@ -40,10 +40,10 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
   val currentState3              = CurrentState(prefix, StateName("testStateName3"))
 
   def createLifecycleStatePubSubBehavior(): BehaviorTestKit[PubSub[LifecycleStateChanged]] =
-    BehaviorTestKit(Behaviors.setup[PubSub[LifecycleStateChanged]](ctx ⇒ new PubSubBehavior(ctx, mocks.loggerFactory)))
+    BehaviorTestKit(PubSubBehavior.behavior(mocks.loggerFactory))
 
   def createCurrentStatePubSubBehavior(): BehaviorTestKit[PubSub[CurrentState]] =
-    BehaviorTestKit(Behaviors.setup[PubSub[CurrentState]](ctx ⇒ new PubSubBehavior(ctx, mocks.loggerFactory)))
+    BehaviorTestKit(PubSubBehavior.behavior(mocks.loggerFactory))
 
   override protected def afterAll(): Unit = Await.result(untypedSystem.terminate(), 5.seconds)
 

@@ -71,7 +71,7 @@ class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: Acto
 
   ///////////////////////////////////////////////
   val pubSubComponentActor: ActorRef[PubSub[CurrentState]] =
-    untypedSystem.spawnAnonymous(new PubSubBehaviorFactory().make[CurrentState]("pub-sub-component", loggerFactory))
+    untypedSystem.spawnAnonymous(new PubSubBehaviorFactory().make[CurrentState](loggerFactory))
   val currentStatePublisher = new CurrentStatePublisher(pubSubComponentActor)
 
   ///////////////////////////////////////////////

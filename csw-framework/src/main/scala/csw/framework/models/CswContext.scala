@@ -70,8 +70,7 @@ object CswContext {
 
       // create CurrentStatePublisher
       val pubSubComponentActor = await(
-        richSystem.spawnTyped(new PubSubBehaviorFactory().make[CurrentState](PubSubComponentActor, loggerFactory),
-                              PubSubComponentActor)
+        richSystem.spawnTyped(new PubSubBehaviorFactory().make[CurrentState](loggerFactory), PubSubComponentActor)
       )
       val currentStatePublisher = new CurrentStatePublisher(pubSubComponentActor)
 

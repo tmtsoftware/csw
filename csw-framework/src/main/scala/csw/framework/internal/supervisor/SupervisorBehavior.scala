@@ -47,7 +47,6 @@ import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.util.{Failure, Success}
 
 private[framework] object SupervisorBehavior {
-  val PubSubComponentActor            = "pub-sub-component"
   val PubSubLifecycleActor            = "pub-sub-lifecycle"
   val InitializeTimerKey              = "initialize-timer"
   val ComponentActorNameSuffix        = "component-actor"
@@ -325,8 +324,7 @@ private[framework] final class SupervisorBehavior(
   private def coordinatedShutdown(reason: Reason): Future[Done] = CoordinatedShutdown(ctx.system.toUntyped).run(reason)
 
   private def makePubSubLifecycle(): ActorRef[PubSub[LifecycleStateChanged]] =
-    ctx.spawn(pubSubBehaviorFactory.make[LifecycleStateChanged](PubSubComponentActor, loggerFactory),
-              SupervisorBehavior.PubSubLifecycleActor)
+    ctx.spawn(pubSubBehaviorFactory.make[LifecycleStateChanged](loggerFactory), SupervisorBehavior.PubSubLifecycleActor)
 
   private def ignore(message: SupervisorMessage): Unit =
     log.error(s"Unexpected message :[$message] received by supervisor in lifecycle state :[$lifecycleState]")
