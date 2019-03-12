@@ -138,21 +138,21 @@ public class JResultTest extends JUnitSuite {
         //Setup command with duplicate key via madd
         Result result = new Result(prefix).madd(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3);
         //four duplicate keys are removed; now contains one Encoder and one Filter key
-        List<String> uniqueKeys1 = result.jParamSet().stream().map(Parameter::keyName).collect(Collectors.toList());
+        Set<String> uniqueKeys1 = result.jParamSet().stream().map(Parameter::keyName).collect(Collectors.toUnmodifiableSet());
 
         //try adding duplicate keys via add + madd
         Result changedResult = result.add(encParam3).madd(filterParam1, filterParam2, filterParam3);
         //duplicate keys will not be added. Should contain one Encoder and one Filter key
-        List<String> uniqueKeys2 = changedResult.jParamSet().stream().map(Parameter::keyName).collect(Collectors.toList());
+        Set<String> uniqueKeys2 = changedResult.jParamSet().stream().map(Parameter::keyName).collect(Collectors.toUnmodifiableSet());
 
         //miscKey(unique) will be added; encoderKey(duplicate) will not be added
         Result finalResult = result.madd(miscParam1, encParam1);
         //now contains encoderKey, filterKey, miscKey
-        List<String> uniqueKeys3 = finalResult.jParamSet().stream().map(Parameter::keyName).collect(Collectors.toList());
+        Set<String> uniqueKeys3 = finalResult.jParamSet().stream().map(Parameter::keyName).collect(Collectors.toUnmodifiableSet());
         //#unique-key
 
-        Assert.assertEquals(Set.of(uniqueKeys1), Set.of(encoderKey.keyName(), filterKey.keyName()));
-        Assert.assertEquals(Set.of(uniqueKeys2), Set.of(encoderKey.keyName(), filterKey.keyName()));
-        Assert.assertEquals(Set.of(uniqueKeys3), Set.of(encoderKey.keyName(), filterKey.keyName(), miscKey.keyName()));
+        Assert.assertEquals(uniqueKeys1, Set.of(encoderKey.keyName(), filterKey.keyName()));
+        Assert.assertEquals(uniqueKeys2, Set.of(encoderKey.keyName(), filterKey.keyName()));
+        Assert.assertEquals(uniqueKeys3, Set.of(encoderKey.keyName(), filterKey.keyName(), miscKey.keyName()));
     }
 }

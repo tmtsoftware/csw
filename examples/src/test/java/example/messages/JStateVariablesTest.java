@@ -81,8 +81,8 @@ public class JStateVariablesTest extends JUnitSuite {
         //validations
         Assert.assertTrue(charKeyExists);
         Assert.assertSame(p1.get(), intParam);
-        Assert.assertEquals(Set.of('A', 'B', 'C'), Set.of(v1));
-        Assert.assertEquals(Set.of(true, false), Set.of(v2));
+        Assert.assertEquals(Set.of('A', 'B', 'C'), Set.copyOf(v1));
+        Assert.assertEquals(Set.of(true, false), Set.copyOf(v2));
         Assert.assertEquals(4, missingKeys.size());
         Assert.assertFalse(ds4.exists(utcTimeKey));
         Assert.assertTrue(ds5.jGet(utcTimeKey).get().head().value().isBefore(ds3.jGet(utcTimeKey).get().head().value()));
