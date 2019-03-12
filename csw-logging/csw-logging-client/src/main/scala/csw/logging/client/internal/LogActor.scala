@@ -2,8 +2,11 @@ package csw.logging.client.internal
 
 import java.io.{PrintWriter, StringWriter}
 
-import akka.actor.{Actor, Props}
+import akka.actor.typed.Behavior
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.dispatch.{BoundedMessageQueueSemantics, RequiresMessageQueue}
+import akka.event.LogSource
 import csw.logging.api._
 import csw.logging.api.models.LoggingLevels.Level
 import csw.logging.api.models.{LoggingLevels, RequestId}
@@ -22,52 +25,104 @@ import scala.concurrent.Promise
  * Logging messages from logging API, Java Slf4j and Akka loggers are sent to this actor.
  * Messages are then forwarded to one or more configured appenders.
  */
-private[logging] object LogActor {
+private[logging] object LogActor extends RequiresMessageQueue[BoundedMessageQueueSemantics] {
 
-  def props(
+  def behavior(
       done: Promise[Unit],
       standardHeaders: JsObject,
       appends: Seq[LogAppender],
       initLevel: Level,
       initSlf4jLevel: Level,
       initAkkaLevel: Level
-  ): Props =
-    Props(new LogActor(done, standardHeaders, appends, initLevel, initSlf4jLevel, initAkkaLevel))
+  ): Behavior[LogActorMessages] =
+    Behaviors.setup { ctx =>
+      import LogActorOperations._
 
+      implicit val logSource: LogSource[AnyRef] = new LogSource[AnyRef] {
+        def genString(o: AnyRef): String           = o.getClass.getName
+        override def getClazz(o: AnyRef): Class[_] = o.getClass
+      }
+
+      var level: Level                = initLevel
+      var akkaLogLevel: Level         = initAkkaLevel
+      var slf4jLogLevel: Level        = initSlf4jLevel
+      var appenders: Seq[LogAppender] = appends
+
+      // Send JSON log object for each appender configured for the logging system
+      def append(baseMsg: JsObject, category: String, level: Level): Unit =
+        for (appender <- appenders) appender.append(baseMsg, category)
+
+      def receiveAltMessage(logAltMessage: LogAltMessage): Unit = {
+        var jsonObject = logAltMessage.jsonObject
+        if (logAltMessage.ex != NoLogException) jsonObject = jsonObject ++ exceptionJson(logAltMessage.ex)
+
+        jsonObject = logAltMessage.id match {
+          case RequestId(trackingId, spanId, _) => jsonObject ++ Json.obj(LoggingKeys.TRACE_ID -> Seq(trackingId, spanId))
+          case _                                => jsonObject
+        }
+
+        jsonObject = jsonObject ++ Json.obj(LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(logAltMessage.time))
+        append(jsonObject, logAltMessage.category, LoggingLevels.INFO)
+      }
+
+      def receiveLogSlf4j(logSlf4j: LogSlf4j): Unit =
+        if (logSlf4j.level.pos >= slf4jLogLevel.pos) {
+          var jsonObject = Json.obj(
+            LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(logSlf4j.time),
+            LoggingKeys.MESSAGE   -> logSlf4j.msg,
+            LoggingKeys.FILE      -> logSlf4j.file,
+            LoggingKeys.SEVERITY  -> logSlf4j.level.name,
+            LoggingKeys.CLASS     -> logSlf4j.className,
+            LoggingKeys.KIND      -> "slf4j",
+            LoggingKeys.CATEGORY  -> Category.Common.name
+          )
+          if (logSlf4j.line > 0) jsonObject = jsonObject ++ Json.obj(LoggingKeys.LINE -> logSlf4j.line)
+          if (logSlf4j.ex != NoLogException) jsonObject = jsonObject ++ exceptionJson(logSlf4j.ex)
+          append(jsonObject, Category.Common.name, logSlf4j.level)
+        }
+
+      def receiveLogAkkaMessage(logAkka: LogAkka): Unit =
+        if (logAkka.level.pos >= akkaLogLevel.pos) {
+          val msg1 = if (logAkka.msg == null) "UNKNOWN" else logAkka.msg
+          var jsonObject = Json.obj(
+            LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(logAkka.time),
+            LoggingKeys.KIND      -> "akka",
+            LoggingKeys.MESSAGE   -> msg1.toString,
+            LoggingKeys.ACTOR     -> logAkka.source,
+            LoggingKeys.SEVERITY  -> logAkka.level.name,
+            LoggingKeys.CLASS     -> logAkka.clazz.getName,
+            LoggingKeys.CATEGORY  -> Category.Common.name
+          )
+
+          if (logAkka.cause.isDefined) jsonObject = jsonObject ++ exceptionJson(logAkka.cause.get)
+          append(jsonObject, Category.Common.name, logAkka.level)
+        }
+
+      def receiveLog(log: Log): Unit = append(createJsonFromLog(log), Category.Common.name, log.level)
+
+      Behaviors.receiveMessage[LogActorMessages] { message =>
+        message match {
+          case log: Log                     => receiveLog(log)
+          case logAltMessage: LogAltMessage => receiveAltMessage(logAltMessage)
+          case logSlf4J: LogSlf4j           => receiveLogSlf4j(logSlf4J)
+          case logAkka: LogAkka             => receiveLogAkkaMessage(logAkka)
+          case SetLevel(level1)             => level = level1
+          case SetSlf4jLevel(level1)        => slf4jLogLevel = level1
+          case SetAkkaLevel(level1)         => akkaLogLevel = level1
+          case SetAppenders(_appenders)     => appenders = _appenders
+          case LastAkkaMessage              => akka.event.Logging(ctx.system.toUntyped, this).error("DIE")
+          case StopLogging =>
+            ctx.stop(ctx.self)
+            done.success(())
+          case msg: Any => println("Unrecognized LogActor message:" + msg + DefaultSourceLocation)
+        }
+        Behaviors.same
+      }
+    }
 }
 
-private[logging] class LogActor(
-    done: Promise[Unit],
-    standardHeaders: JsObject,
-    initAppenders: Seq[LogAppender],
-    initLevel: Level,
-    initSlf4jLevel: Level,
-    initAkkaLevel: Level
-) extends Actor
-    with RequiresMessageQueue[BoundedMessageQueueSemantics] {
-
-  private[this] var level: Level                = initLevel
-  private[this] var akkaLogLevel: Level         = initAkkaLevel
-  private[this] var slf4jLogLevel: Level        = initSlf4jLevel
-  private[this] var appenders: Seq[LogAppender] = initAppenders
-
-  def receive: Receive = {
-    case log: Log                     => receiveLog(log)
-    case logAltMessage: LogAltMessage => receiveAltMessage(logAltMessage)
-    case logSlf4J: LogSlf4j           => receiveLogSlf4j(logSlf4J)
-    case logAkka: LogAkka             => receiveLogAkkaMessage(logAkka)
-    case SetLevel(level1)             => level = level1
-    case SetSlf4jLevel(level1)        => slf4jLogLevel = level1
-    case SetAkkaLevel(level1)         => akkaLogLevel = level1
-    case SetAppenders(_appenders)     => appenders = _appenders
-    case LastAkkaMessage              => akka.event.Logging(context.system, this).error("DIE")
-    case StopLogging =>
-      context.stop(self)
-      done.success(())
-    case msg: Any => println("Unrecognized LogActor message:" + msg + DefaultSourceLocation)
-  }
-
-  private def exToJson(ex: Throwable): JsObject = {
+private[logging] object LogActorOperations {
+  def exToJson(ex: Throwable): JsObject = {
     val name = ex.getClass.toString
     ex match {
       case ex: RichException => Json.obj(LoggingKeys.EX -> name, LoggingKeys.MESSAGE -> ex.richMsg.asJson)
@@ -76,7 +131,7 @@ private[logging] class LogActor(
   }
 
   // Convert exception stack trace to JSON
-  private def getStack(ex: Throwable): Seq[JsObject] = {
+  def getStack(ex: Throwable): Seq[JsObject] = {
     val stack = ex.getStackTrace map { trace =>
       val j0 =
         if (trace.getLineNumber > 0) Json.obj(LoggingKeys.LINE -> trace.getLineNumber)
@@ -92,7 +147,7 @@ private[logging] class LogActor(
   }
 
   // Convert exception to JSON
-  private def exceptionJson(ex: Throwable): JsObject = {
+  def exceptionJson(ex: Throwable): JsObject = {
     val stack = getStack(ex)
     val j1 = ex match {
       case r: RichException if r.cause != NoLogException => Json.obj(LoggingKeys.CAUSE -> exceptionJson(r.cause))
@@ -109,17 +164,13 @@ private[logging] class LogActor(
     ) ++ j1
   }
 
-  private def extractPlainStacktrace(ex: Throwable) = {
+  def extractPlainStacktrace(ex: Throwable): String = {
     val sw = new StringWriter()
     ex.printStackTrace(new PrintWriter(sw))
     sw.toString
   }
 
-  // Send JSON log object for each appender configured for the logging system
-  private def append(baseMsg: JsObject, category: String, level: Level): Unit =
-    for (appender <- appenders) appender.append(baseMsg, category)
-
-  private def receiveLog(log: Log): Unit = {
+  def createJsonFromLog(log: Log): JsObject = {
 
     var jsonObject = Json.obj(
       LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(log.time),
@@ -154,52 +205,6 @@ private[logging] class LogActor(
 
     if (!log.kind.isEmpty) jsonObject = jsonObject ++ Json.obj(LoggingKeys.KIND -> log.kind)
 
-    append(jsonObject, Category.Common.name, log.level)
+    jsonObject
   }
-
-  private def receiveAltMessage(logAltMessage: LogAltMessage): Unit = {
-    var jsonObject = logAltMessage.jsonObject
-    if (logAltMessage.ex != NoLogException) jsonObject = jsonObject ++ exceptionJson(logAltMessage.ex)
-
-    jsonObject = logAltMessage.id match {
-      case RequestId(trackingId, spanId, _) => jsonObject ++ Json.obj(LoggingKeys.TRACE_ID -> Seq(trackingId, spanId))
-      case _                                => jsonObject
-    }
-
-    jsonObject = jsonObject ++ Json.obj(LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(logAltMessage.time))
-    append(jsonObject, logAltMessage.category, LoggingLevels.INFO)
-  }
-
-  private def receiveLogSlf4j(logSlf4j: LogSlf4j): Unit =
-    if (logSlf4j.level.pos >= slf4jLogLevel.pos) {
-      var jsonObject = Json.obj(
-        LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(logSlf4j.time),
-        LoggingKeys.MESSAGE   -> logSlf4j.msg,
-        LoggingKeys.FILE      -> logSlf4j.file,
-        LoggingKeys.SEVERITY  -> logSlf4j.level.name,
-        LoggingKeys.CLASS     -> logSlf4j.className,
-        LoggingKeys.KIND      -> "slf4j",
-        LoggingKeys.CATEGORY  -> Category.Common.name
-      )
-      if (logSlf4j.line > 0) jsonObject = jsonObject ++ Json.obj(LoggingKeys.LINE -> logSlf4j.line)
-      if (logSlf4j.ex != NoLogException) jsonObject = jsonObject ++ exceptionJson(logSlf4j.ex)
-      append(jsonObject, Category.Common.name, logSlf4j.level)
-    }
-
-  private def receiveLogAkkaMessage(logAkka: LogAkka): Unit =
-    if (logAkka.level.pos >= akkaLogLevel.pos) {
-      val msg1 = if (logAkka.msg == null) "UNKNOWN" else logAkka.msg
-      var jsonObject = Json.obj(
-        LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(logAkka.time),
-        LoggingKeys.KIND      -> "akka",
-        LoggingKeys.MESSAGE   -> msg1.toString,
-        LoggingKeys.ACTOR     -> logAkka.source,
-        LoggingKeys.SEVERITY  -> logAkka.level.name,
-        LoggingKeys.CLASS     -> logAkka.clazz.getName,
-        LoggingKeys.CATEGORY  -> Category.Common.name
-      )
-
-      if (logAkka.cause.isDefined) jsonObject = jsonObject ++ exceptionJson(logAkka.cause.get)
-      append(jsonObject, Category.Common.name, logAkka.level)
-    }
 }

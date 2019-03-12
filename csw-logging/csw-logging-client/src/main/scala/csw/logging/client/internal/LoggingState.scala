@@ -1,6 +1,6 @@
 package csw.logging.client.internal
 
-import akka.actor._
+import akka.actor
 import csw.logging.api.models.LoggingLevels.Level
 import csw.logging.client.commons.Constants
 import csw.logging.client.models.ComponentLoggingState
@@ -24,11 +24,11 @@ private[logging] object LoggingState {
   private[logging] val msgs = new mutable.Queue[LogActorMessages]()
 
   // LogActor that gets instantiated when LoggingSystem starts
-  private[logging] var maybeLogActor: Option[ActorRef] = None
-  @volatile private[logging] var loggerStopping        = false
+  private[logging] var maybeLogActor: Option[actor.typed.ActorRef[LogActorMessages]] = None
+  @volatile private[logging] var loggerStopping                                      = false
 
-  private[logging] var doTime: Boolean                   = false
-  private[logging] var timeActorOption: Option[ActorRef] = None
+  private[logging] var doTime: Boolean                         = false
+  private[logging] var timeActorOption: Option[actor.ActorRef] = None
 
   // use to sync akka logging actor shutdown
   private[logging] val akkaStopPromise = Promise[Unit]

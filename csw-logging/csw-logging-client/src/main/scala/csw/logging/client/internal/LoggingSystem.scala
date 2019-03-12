@@ -4,6 +4,7 @@ import java.nio.ByteBuffer
 import java.util.concurrent.CompletableFuture
 
 import akka.Done
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.{ActorSystem, Props}
 import ch.qos.logback.classic.LoggerContext
 import csw.logging.api.scaladsl.Logger
@@ -92,8 +93,8 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
     _.apply(system, standardHeaders)
   }
 
-  private[this] val logActor = system.actorOf(
-    LogActor.props(done, standardHeaders, appenders, defaultLevel, defaultSlf4jLogLevel, defaultAkkaLogLevel),
+  private[this] val logActor = system.spawn(
+    LogActor.behavior(done, standardHeaders, appenders, defaultLevel, defaultSlf4jLogLevel, defaultAkkaLogLevel),
     name = "LoggingActor"
   )
   LoggingState.maybeLogActor = Some(logActor)
