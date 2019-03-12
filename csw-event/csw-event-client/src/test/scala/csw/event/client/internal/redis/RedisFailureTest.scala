@@ -173,4 +173,46 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     failure.getCause shouldBe a[RedisException]
   }
 
+  //DEOPSCSW-516: Optionally Publish - API Change
+  test("should not invoke onError callback on publish empty event [eventGenerator API] with start time and event generator") {
+    import redisTestProps._
+    val publisher = eventService.makeNewPublisher()
+    val testProbe = TestProbe[PublishFailure]()(typedActorSystem)
+    val event     = Utils.makeEvent(1)
+
+    publisher.publish(event).await
+
+    publisher.shutdown().await
+
+    def eventGenerator(): Option[Event] = None
+
+    val startTime = UTCTime(UTCTime.now().value.plusMillis(500))
+
+    publisher.publish(eventGenerator(), startTime, 20.millis, failure ⇒ testProbe.ref ! failure)
+
+    testProbe.expectNoMessage
+  }
+
+  //DEOPSCSW-516: Optionally Publish - API Change
+  test(
+    "should not invoke onError callback on publish empty event [eventGenerator API] with start time and future of event generator"
+  ) {
+    import redisTestProps._
+    val publisher = eventService.makeNewPublisher()
+    val testProbe = TestProbe[PublishFailure]()(typedActorSystem)
+    val event     = Utils.makeEvent(1)
+
+    publisher.publish(event).await
+
+    publisher.shutdown().await
+
+    def eventGenerator(): Future[Option[Event]] = Future.successful(None)
+
+    val startTime = UTCTime(UTCTime.now().value.plusMillis(500))
+
+    publisher.publishAsync(eventGenerator(), startTime, 20.millis, failure ⇒ testProbe.ref ! failure)
+
+    testProbe.expectNoMessage
+  }
+
 }

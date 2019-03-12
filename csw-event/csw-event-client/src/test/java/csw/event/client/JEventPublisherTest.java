@@ -37,6 +37,8 @@ import java.util.stream.Collectors;
 //DEOPSCSW-337: Subscribe to an event based on prefix
 //DEOPSCSW-349: Event Service API creation
 //DEOPSCSW-395: Provide EventService handle to component developers
+//DEOPSCSW-515: Include Start Time in API
+//DEOPSCSW-516: Optionally Publish - API Change
 public class JEventPublisherTest extends TestNGSuite {
 
     private RedisTestProps redisTestProps;
@@ -276,5 +278,73 @@ public class JEventPublisherTest extends TestNGSuite {
 
         Assert.assertEquals(queue.size(), 5);
         Assert.assertTrue(queue.containsAll(events.subList(0,5)));
+    }
+
+    //DEOPSCSW-516: Optionally Publish - API Change
+    @Test(dataProvider = "event-service-provider")
+    public void should_skip_publishing_missing_optional_event_via_event_generator_with_start_time(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
+        Event event = Utils.makeEventWithPrefix(31, new Prefix("start.time.test.publish.empty"));
+        EventKey eventKey = event.eventKey();
+
+        List<Event> queue = new ArrayList<>();
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(Collections.singleton(eventKey)).toMat(Sink.foreach(queue::add), Keep.left()).run(baseProperties.resumingMat());
+        subscription.ready().get(10, TimeUnit.SECONDS);
+        Thread.sleep(500); // Needed for getting the latest event
+
+        IEventPublisher publisher = baseProperties.jPublisher();
+        counter = -1;
+        cancellable = publisher.publish(() -> {
+            counter += 1;
+            if(counter == 0) {
+                return Optional.of(event);
+            } else {
+                return Optional.empty();
+            }
+        },new UTCTime(UTCTime.now().value().plusSeconds(1)), Duration.ofMillis(300));
+
+
+        Thread.sleep(2000);
+        cancellable.cancel();
+
+        List<Event> events = new ArrayList<>();
+        events.add(0, Event$.MODULE$.invalidEvent(eventKey));
+        events.add(1, event);
+
+        Assert.assertEquals(queue.size(), 2);
+        Assert.assertTrue(queue.containsAll(events));
+    }
+
+    //DEOPSCSW-516: Optionally Publish - API Change
+    @Test(dataProvider = "event-service-provider")
+    public void should_skip_publishing_missing_optional_event_via_asynchrnous_event_generator_with_start_time(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
+        Event event = Utils.makeEventWithPrefix(31, new Prefix("start.time.test.publishAsync.empty"));
+        EventKey eventKey = event.eventKey();
+
+        List<Event> queue = new ArrayList<>();
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(Collections.singleton(eventKey)).toMat(Sink.foreach(queue::add), Keep.left()).run(baseProperties.resumingMat());
+        subscription.ready().get(10, TimeUnit.SECONDS);
+        Thread.sleep(500); // Needed for getting the latest event
+
+        IEventPublisher publisher = baseProperties.jPublisher();
+        counter = -1;
+        cancellable = publisher.publishAsync(() -> {
+            counter += 1;
+            if(counter == 0) {
+                return CompletableFuture.completedFuture(Optional.of(event));
+            } else {
+                return CompletableFuture.completedFuture(Optional.empty());
+            }
+        },new UTCTime(UTCTime.now().value().plusSeconds(1)), Duration.ofMillis(300));
+
+
+        Thread.sleep(2000);
+        cancellable.cancel();
+
+        List<Event> events = new ArrayList<>();
+        events.add(0, Event$.MODULE$.invalidEvent(eventKey));
+        events.add(1, event);
+
+        Assert.assertEquals(queue.size(), 2);
+        Assert.assertTrue(queue.containsAll(events));
     }
 }

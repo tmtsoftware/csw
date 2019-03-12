@@ -114,4 +114,32 @@ class KafkaFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     failure.getCause shouldBe a[RecordTooLargeException]
   }
 
+  //DEOPSCSW-516: Optionally Publish - API Change
+  test("should not invoke onError callback on publish empty event [eventGenerator API] with start time and event generator") {
+    val testProbe = TestProbe[PublishFailure]()(typedActorSystem)
+
+    def eventGenerator(): Option[Event] = None
+
+    val startTime = UTCTime(UTCTime.now().value.plusMillis(500))
+
+    publisher.publish(eventGenerator(), startTime, 20.millis, failure ⇒ testProbe.ref ! failure)
+
+    testProbe.expectNoMessage()
+  }
+
+  //DEOPSCSW-516: Optionally Publish - API Change
+  test(
+    "should not invoke onError callback on publish empty event [eventGenerator API] with start time and future of event generator"
+  ) {
+    val testProbe = TestProbe[PublishFailure]()(typedActorSystem)
+
+    def eventGenerator(): Future[Option[Event]] = Future.successful(None)
+
+    val startTime = UTCTime(UTCTime.now().value.plusMillis(500))
+
+    publisher.publishAsync(eventGenerator(), startTime, 20.millis, failure ⇒ testProbe.ref ! failure)
+
+    testProbe.expectNoMessage()
+  }
+
 }

@@ -126,4 +126,28 @@ public class JKafkaFailureTest extends JUnitSuite {
         Assert.assertEquals(failure.getCause().getClass(), RecordTooLargeException.class);
     }
 
+    //DEOPSCSW-516: Optionally Publish - API Change
+    @Test
+    public void handleEmptyPublishEventWithAnEventGeneratorGeneratingEventAtSpecificStartTimeAndACallback() {
+        TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.actorSystem()));
+
+        TMTTime startTime = new UTCTime(UTCTime.now().value().plusMillis(500));
+
+        publisher.publish(Optional::empty,startTime, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
+
+        testProbe.expectNoMessage();
+    }
+
+    //DEOPSCSW-516: Optionally Publish - API Change
+    @Test
+    public void handleEmptyPublishEventWithAnEventGeneratorGeneratingFutureOfEventAtSpecificStartTimeAndACallback() {
+        TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.actorSystem()));
+
+        TMTTime startTime = new UTCTime(UTCTime.now().value().plusMillis(500));
+
+        publisher.publishAsync(() -> CompletableFuture.completedFuture(Optional.empty()), startTime, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
+
+        testProbe.expectNoMessage();
+    }
+
 }

@@ -162,4 +162,40 @@ public class JRedisFailureTest extends JUnitSuite {
         Assert.assertEquals(failure.event(), event);
         Assert.assertEquals(failure.getCause().getClass(), RedisException.class);
     }
+
+    //DEOPSCSW-516: Optionally Publish - API Change
+    @Test
+    public void handleEmptyPublishEventWithAnEventGeneratorGeneratingEventAtSpecificTimeAndACallback() throws InterruptedException, ExecutionException, TimeoutException {
+        IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
+        TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.typedActorSystem());
+        publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
+
+        publisher.shutdown().get(10, TimeUnit.SECONDS);
+
+        Thread.sleep(1000); // wait till the publisher is shutdown successfully
+
+        TMTTime startTime = new UTCTime(UTCTime.now().value().plusMillis(500));
+
+        publisher.publish(Optional::empty, startTime, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
+
+        testProbe.expectNoMessage();
+    }
+
+    //DEOPSCSW-516: Optionally Publish - API Change
+    @Test
+    public void handleEmptyPublishEventWithAnEventGeneratorGeneratingFutureOfEventAtSpecificTimeAndACallback() throws InterruptedException, ExecutionException, TimeoutException {
+        IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
+        TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.typedActorSystem());
+        publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
+
+        publisher.shutdown().get(10, TimeUnit.SECONDS);
+
+        Thread.sleep(1000); // wait till the publisher is shutdown successfully
+
+        TMTTime startTime = new UTCTime(UTCTime.now().value().plusMillis(500));
+
+        publisher.publishAsync(() -> CompletableFuture.completedFuture(Optional.empty()), startTime, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
+
+        testProbe.expectNoMessage();
+    }
 }
