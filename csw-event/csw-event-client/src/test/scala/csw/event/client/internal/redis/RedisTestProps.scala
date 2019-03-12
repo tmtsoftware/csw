@@ -18,6 +18,7 @@ import csw.location.server.http.HTTPLocationServiceOnPorts
 import csw.network.utils.SocketUtils.getFreePort
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.codec.StringCodec
+import io.lettuce.core.resource.DefaultClientResources
 import io.lettuce.core.{ClientOptions, RedisClient, RedisURI}
 import redis.embedded.{RedisSentinel, RedisServer}
 
@@ -70,6 +71,7 @@ class RedisTestProps(
   override def shutdown(): Unit = {
     publisher.shutdown().await
     redisClient.shutdown()
+    redisClient.getResources.shutdown()
     stopSentinel(redisSentinel, redisServer)
     Http(actorSystem).shutdownAllConnectionPools().await
     actorSystem.terminate().await
@@ -88,8 +90,9 @@ object RedisTestProps extends EmbeddedRedis {
 
     val locationServer = new HTTPLocationServiceOnPorts(clusterPort, httpLocationServicePort)
     locationServer.beforeAll()
-    val (locationService, system) = createInfra(sentinelPort, httpLocationServicePort)
-    val redisClient: RedisClient  = RedisClient.create()
+    val (locationService, system)                    = createInfra(sentinelPort, httpLocationServicePort)
+    val redisClientResources: DefaultClientResources = DefaultClientResources.create()
+    val redisClient: RedisClient                     = RedisClient.create(redisClientResources)
     redisClient.setOptions(clientOptions)
 
     new RedisTestProps("Redis", sentinelPort, serverPort, redisClient, locationService, locationServer)(system)
