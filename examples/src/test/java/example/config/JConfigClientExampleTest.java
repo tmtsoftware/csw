@@ -23,7 +23,9 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
@@ -31,7 +33,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
 
     // DEOPSCSW-592: Create csw testkit for component writers
     @ClassRule
-    public static final FrameworkTestKitJunitResource testKit = new FrameworkTestKitJunitResource(Collections.singletonList(JCSWService.ConfigServer));
+    public static final FrameworkTestKitJunitResource testKit = new FrameworkTestKitJunitResource(List.of(JCSWService.ConfigServer));
     private static JMockedAuthentication mocks = new JMockedAuthentication();
     private static ConfigTestKit configTestKit = testKit.frameworkTestKit().configTestKit();
     private static ServerWiring configWiring = configTestKit.configWiring();
@@ -125,9 +127,9 @@ public class JConfigClientExampleTest extends JUnitSuite {
     }
 
     @Test
-    public void testGetById() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
+    public void testGetById() throws ExecutionException, InterruptedException {
         //#getById
-        Path filePath = Paths.get("/tmt/trmobone/assembly/hcd.conf");
+        Path filePath = Paths.get("/tmt/trombone/assembly/hcd.conf");
         ConfigId id = adminApi.create(filePath, ConfigData.fromString(defaultStrConf), false, "First commit").get();
 
         //validate
@@ -137,11 +139,11 @@ public class JConfigClientExampleTest extends JUnitSuite {
     }
 
     @Test
-    public void testGetLatest() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
+    public void testGetLatest() throws ExecutionException, InterruptedException {
         //#getLatest
         //create a file
         Path filePath = Paths.get("/test.conf");
-        ConfigId id = adminApi.create(filePath, ConfigData.fromString(defaultStrConf), false, "initial configuration").get();
+        adminApi.create(filePath, ConfigData.fromString(defaultStrConf), false, "initial configuration").get();
 
         //override the contents
         String newContent = "I changed the contents!!!";
@@ -155,13 +157,13 @@ public class JConfigClientExampleTest extends JUnitSuite {
     }
 
     @Test
-    public void testGetByTime() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
+    public void testGetByTime() throws ExecutionException, InterruptedException {
         //#getByTime
         Instant tInitial = Instant.now();
 
         //create a file
         Path filePath = Paths.get("/test.conf");
-        ConfigId id = adminApi.create(filePath, ConfigData.fromString(defaultStrConf), false, "initial configuration").get();
+        adminApi.create(filePath, ConfigData.fromString(defaultStrConf), false, "initial configuration").get();
 
         //override the contents
         String newContent = "I changed the contents!!!";
@@ -176,7 +178,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
     }
 
     @Test
-    public void testList() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
+    public void testList() throws ExecutionException, InterruptedException {
         //#list
         Path trombonePath = Paths.get("a/c/trombone.conf");
         Path hcdPath = Paths.get("a/b/c/hcd/hcd.conf");
@@ -230,16 +232,16 @@ public class JConfigClientExampleTest extends JUnitSuite {
 
         //full file history
         List<ConfigFileRevision> fullHistory = adminApi.history(filePath).get();
-        Assert.assertEquals(new ArrayList<>(Arrays.asList(id2, id1, id0)),
+        Assert.assertEquals(List.of(id2, id1, id0),
             fullHistory.stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
-        Assert.assertEquals(new ArrayList<>(Arrays.asList("third commit", "second commit", "first commit")),
+        Assert.assertEquals(List.of("third commit", "second commit", "first commit"),
             fullHistory.stream().map(ConfigFileRevision::comment).collect(Collectors.toList()));
 
         //drop initial revision and take only update revisions
-        Assert.assertEquals(new ArrayList<>(Arrays.asList(id2, id1)),
+        Assert.assertEquals(List.of(id2, id1),
             adminApi.history(filePath, tBeginUpdate, tEndUpdate).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
         //take last two revisions
-        Assert.assertEquals(new ArrayList<>(Arrays.asList(id2, id1)),
+        Assert.assertEquals(List.of(id2, id1),
             adminApi.history(filePath, 2).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
         //#history
     }
@@ -252,7 +254,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
 
         //create will make the 1st revision active with a default comment
         ConfigId id1 = adminApi.create(filePath, ConfigData.fromString(defaultStrConf), false, "first commit").get();
-        Assert.assertEquals(new ArrayList<>(Arrays.asList(id1)),
+        Assert.assertEquals(List.of(id1),
             adminApi.historyActive(filePath).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
         //ensure active version is set
         Assert.assertEquals(id1, adminApi.getActiveVersion(filePath).get().get());
@@ -281,10 +283,10 @@ public class JConfigClientExampleTest extends JUnitSuite {
 
         //validate full history
         List<ConfigFileRevision> fullHistory = adminApi.historyActive(filePath).get();
-        Assert.assertEquals(new ArrayList<>(Arrays.asList(id1, id5, id4, id3, id1)),
+        Assert.assertEquals(List.of(id1, id5, id4, id3, id1),
                 fullHistory.stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
-        Assert.assertEquals(new ArrayList<>(Arrays.asList("id1 active", "latest active", "id4 active", "id3 active",
-                "initializing active file with the first version")),
+        Assert.assertEquals(List.of("id1 active", "latest active", "id4 active", "id3 active",
+                "initializing active file with the first version"),
                 fullHistory.stream().map(ConfigFileRevision::comment).collect(Collectors.toList()));
 
         //drop initial revision and take only update revisions
@@ -292,7 +294,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
         Assert.assertEquals(3, fragmentedHistory.size());
 
         //take last three revisions
-        Assert.assertEquals(new ArrayList<>(Arrays.asList(id1, id5, id4)),
+        Assert.assertEquals(List.of(id1, id5, id4),
                 adminApi.historyActive(filePath, 3).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
 
         //get contents of active version at a specified instance

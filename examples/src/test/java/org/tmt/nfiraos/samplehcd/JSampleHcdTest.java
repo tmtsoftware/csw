@@ -73,7 +73,7 @@ public class JSampleHcdTest extends JUnitSuite {
 
 
         ArrayList<Event> subscriptionEventList = new ArrayList<>();
-        subscriber.subscribeCallback(Collections.singleton(counterEventKey), subscriptionEventList::add);
+        subscriber.subscribeCallback(Set.of(counterEventKey), subscriptionEventList::add);
 
         // Sleep for 5 seconds, to allow HCD to publish events
         Thread.sleep(5000);

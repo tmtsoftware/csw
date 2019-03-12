@@ -12,7 +12,7 @@ import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 
-import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
@@ -42,7 +42,7 @@ public class JE2ELoggingBenchmark extends JUnitSuite {
     public void setup() {
         log = JGenericLoggerFactory.getLogger(getClass());
         actorSystem = ActorSystem.create("JE2E");
-        LoggingSystem loggingSystem = JLoggingSystemFactory.start("JE2E-Bench", "SNAPSHOT-1.0", "localhost", actorSystem, Collections.singletonList(JLogAppenderBuilders.FileAppender));
+        LoggingSystem loggingSystem = JLoggingSystemFactory.start("JE2E-Bench", "SNAPSHOT-1.0", "localhost", actorSystem, List.of(JLogAppenderBuilders.FileAppender));
         loggingSystem.setDefaultLogLevel(LoggingLevels.INFO$.MODULE$);
         person = JPerson.createDummy();
     }

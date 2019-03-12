@@ -15,7 +15,10 @@ import scala.Some;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -221,34 +224,34 @@ public class JConfigAdminApiTest extends JUnitSuite {
 
             Assert.assertEquals(historyByPath.size(), 3);
             Assert.assertEquals(historyByPath.stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
-                    new ArrayList<>(Arrays.asList(configId3, configId2, configId1)));
+                    List.of(configId3, configId2, configId1));
             Assert.assertEquals(historyByPath.stream().map(ConfigFileRevision::comment).collect(Collectors.toList()),
-                    new ArrayList<>(Arrays.asList(comment3, comment2, comment1)));
+                    List.of(comment3, comment2, comment1));
             Assert.assertEquals(historyByPath.stream().map(ConfigFileRevision::author).collect(Collectors.toList()),
-                    new ArrayList<>(Arrays.asList(thirdUser, secondUser, firstUser)));
+                    List.of(thirdUser, secondUser, firstUser));
 
             List<ConfigFileRevision> historyByPathAndSize = configService.history(path, 2).get();
 
             Assert.assertEquals(historyByPathAndSize.size(), 2);
             Assert.assertEquals(historyByPathAndSize.stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
-                    new ArrayList<>(Arrays.asList(configId3, configId2)));
+                    List.of(configId3, configId2));
             Assert.assertEquals(historyByPathAndSize.stream().map(ConfigFileRevision::comment).collect(Collectors.toList()),
-                    new ArrayList<>(Arrays.asList(comment3, comment2)));
+                    List.of(comment3, comment2));
 
             Assert.assertEquals(configService.history(path, createTS, updateTS).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
-                    new ArrayList<>(Arrays.asList(configId3, configId2)));
+                    List.of(configId3, configId2));
 
             Assert.assertEquals(configService.historyFrom(path, createTS).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
-                    new ArrayList<>(Arrays.asList(configId3, configId2)));
+                    List.of(configId3, configId2));
 
             Assert.assertEquals(configService.historyFrom(path, createTS, 1).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
-                    new ArrayList<>(Arrays.asList(configId3)));
+                    List.of(configId3));
 
             Assert.assertEquals(configService.historyUpTo(path, updateTS).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
-                    new ArrayList<>(Arrays.asList(configId3, configId2, configId1)));
+                    List.of(configId3, configId2, configId1));
 
             Assert.assertEquals(configService.historyUpTo(path, updateTS, 2).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
-                    new ArrayList<>(Arrays.asList(configId3, configId2)));
+                    List.of(configId3, configId2));
         }
     }
 
@@ -273,7 +276,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
         ConfigFileInfo tromboneConfigInfo = new ConfigFileInfo(tromboneConfig, tromboneConfigId, firstUser, tromboneConfigComment);
         ConfigFileInfo assemblyConfigInfo = new ConfigFileInfo(assemblyConfig, assemblyConfigId, secondUser, assemblyConfigComment);
 
-        Assert.assertEquals(configService.list().get(), new ArrayList<>(Arrays.asList(assemblyConfigInfo, tromboneConfigInfo)));
+        Assert.assertEquals(configService.list().get(), List.of(assemblyConfigInfo, tromboneConfigInfo));
     }
 
     // DEOPSCSW-74: Check config file existence by unique name
@@ -410,7 +413,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
         ConfigFileInfo tromboneConfigInfo = new ConfigFileInfo(tromboneConfig, tromboneConfigId, firstUser, tromboneConfigComment);
         ConfigFileInfo assemblyConfigInfo = new ConfigFileInfo(assemblyConfig, assemblyConfigId, secondUser, assemblyConfigComment);
 
-        Assert.assertEquals(configService.list().get(), new ArrayList<>(Arrays.asList(assemblyConfigInfo, tromboneConfigInfo)));
+        Assert.assertEquals(configService.list().get(), List.of(assemblyConfigInfo, tromboneConfigInfo));
     }
 
     // DEOPSCSW-74: Check config file existence by unique name
@@ -440,23 +443,23 @@ public class JConfigAdminApiTest extends JUnitSuite {
 
         Assert.assertEquals(configService.history(path).get().size(), 3);
         Assert.assertEquals(configService.history(path).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
-                new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1, configIdCreate)));
+                List.of(configIdUpdate2, configIdUpdate1, configIdCreate));
 
         Assert.assertEquals(configService.history(path, 2).get().size(), 2);
         Assert.assertEquals(configService.history(path, 2).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
-                new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1)));
+                List.of(configIdUpdate2, configIdUpdate1));
 
         Assert.assertEquals(configService.history(path, createTS, updateTS).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
-                new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1)));
+                List.of(configIdUpdate2, configIdUpdate1));
 
         Assert.assertEquals(configService.historyFrom(path, createTS).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
-                new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1)));
+                List.of(configIdUpdate2, configIdUpdate1));
 
         Assert.assertEquals(configService.historyUpTo(path, updateTS).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
-                new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1, configIdCreate)));
+                List.of(configIdUpdate2, configIdUpdate1, configIdCreate));
 
         Assert.assertEquals(configService.historyUpTo(path, updateTS, 2).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
-                new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1)));
+                List.of(configIdUpdate2, configIdUpdate1));
 
     }
 
@@ -545,7 +548,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
         Stream<Path> actualStream = configService.list("a/b/.*").get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(expected, actualStream.collect(Collectors.toSet()));
 
-        Set<Path> expected1 = Collections.singleton(hcdConfig);
+        Set<Path> expected1 = Set.of(hcdConfig);
         Stream<Path> actualStream1 = configService.list("a/b/c.*").get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(expected1, actualStream1.collect(Collectors.toSet()));
 

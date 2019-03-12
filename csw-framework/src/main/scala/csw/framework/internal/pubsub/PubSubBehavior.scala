@@ -1,7 +1,7 @@
 package csw.framework.internal.pubsub
 
-import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext}
-import akka.actor.typed.{ActorRef, Behavior, Signal, Terminated}
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ActorRef, Behavior}
 import csw.command.client.models.framework.PubSub
 import csw.command.client.models.framework.PubSub._
 import csw.logging.api.scaladsl.Logger
@@ -16,41 +16,33 @@ import csw.params.core.states.StateName
  * @param loggerFactory the LoggerFactory used for logging with component name
  * @tparam T the type of the data which will be published or subscribed to using this actor
  */
-private[framework] class PubSubBehavior[T: Nameable](ctx: ActorContext[PubSub[T]], loggerFactory: LoggerFactory)
-    extends AbstractBehavior[PubSub[T]] {
-  private val log: Logger = loggerFactory.getLogger(ctx)
+private[framework] object PubSubBehavior {
 
-  val nameableData: Nameable[T] = implicitly[Nameable[T]]
-  // list of subscribers who subscribe to the component using this pub-sub actor for the data of type [[T]]
-  var subscribers: Map[ActorRef[T], Option[Set[StateName]]] = Map.empty
+  def make[T: Nameable](loggerFactory: LoggerFactory): Behavior[PubSub[T]] = Behaviors.setup { ctx ⇒
+    val log: Logger = loggerFactory.getLogger(ctx)
 
-  override def onMessage(msg: PubSub[T]): Behavior[PubSub[T]] = {
-    msg match {
-      case SubscribeOnly(ref, names) => subscribe(ref, Some(names))
-      case Subscribe(ref)            => subscribe(ref, None)
-      case Unsubscribe(ref)          => unsubscribe(ref)
-      case Publish(data)             => notifySubscribers(data)
-    }
-    this
-  }
+    val nameableData: Nameable[T] = implicitly[Nameable[T]]
 
-  override def onSignal: PartialFunction[Signal, Behavior[PubSub[T]]] = {
-    case Terminated(ref) ⇒ unsubscribe(ref.unsafeUpcast); this
-  }
+    def receive(subscribers: Map[ActorRef[T], Set[StateName]]): Behavior[PubSub[T]] =
+      Behaviors
+        .receiveMessage[PubSub[T]] {
+          case SubscribeOnly(ref, names) =>
+            ctx.watchWith(ref, Unsubscribe(ref))
+            receive(subscribers + (ref → names))
+          case Subscribe(ref) =>
+            ctx.watchWith(ref, Unsubscribe(ref))
+            receive(subscribers + (ref → Set.empty))
+          case Unsubscribe(ref) =>
+            ctx.unwatch(ref)
+            receive(subscribers - ref)
+          case Publish(data) =>
+            log.debug(s"Notifying subscribers :[${subscribers.mkString(",")}] with data :[$data]")
+            subscribers.foreach {
+              case (actorRef, names) ⇒ if (names.isEmpty || names.contains(nameableData.name(data))) actorRef ! data
+            }
+            Behaviors.same
+        }
 
-  private def subscribe(actorRef: ActorRef[T], mayBeNames: Option[Set[StateName]]): Unit =
-    if (!subscribers.contains(actorRef)) {
-      subscribers += ((actorRef, mayBeNames))
-      ctx.watch(actorRef)
-    }
-
-  private def unsubscribe(actorRef: ActorRef[T]): Unit = subscribers -= actorRef
-
-  protected def notifySubscribers(data: T): Unit = {
-    log.debug(s"Notifying subscribers :[${subscribers.mkString(",")}] with data :[$data]")
-    subscribers.foreach {
-      case (actorRef, None)        ⇒ actorRef ! data
-      case (actorRef, Some(names)) ⇒ if (names.contains(nameableData.name(data))) actorRef ! data
-    }
+    receive(Map.empty)
   }
 }

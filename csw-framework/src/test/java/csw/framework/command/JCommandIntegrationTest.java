@@ -49,9 +49,9 @@ import scala.concurrent.ExecutionContext;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -512,7 +512,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         //#subscribeOnlyCurrentState
         // subscribe to the current state of an assembly component and use a callback which forwards each received
         // element to a test probe actor
-        CurrentStateSubscription subscription = hcdCmdService.subscribeCurrentState(Collections.singleton(StateName.apply("testStateSetup")), currentState -> inbox.getRef().tell(currentState));
+        CurrentStateSubscription subscription = hcdCmdService.subscribeCurrentState(Set.of(StateName.apply("testStateSetup")), currentState -> inbox.getRef().tell(currentState));
         //#subscribeOnlyCurrentState
 
         hcdCmdService.submit(setup, timeout);

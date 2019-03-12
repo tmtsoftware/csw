@@ -1,20 +1,20 @@
 package csw.framework.models
 import akka.actor.ActorSystem
-import csw.framework.CurrentStatePublisher
-import csw.framework.internal.pubsub.PubSubBehaviorFactory
-import csw.framework.internal.wiring.CswFrameworkSystem
-import csw.command.client.models.framework.ComponentInfo
-import csw.location.api.scaladsl.LocationService
-import csw.params.core.states.CurrentState
 import csw.alarm.api.scaladsl.AlarmService
 import csw.alarm.client.AlarmServiceFactory
 import csw.command.client.CommandResponseManager
 import csw.command.client.internal.CommandResponseManagerFactory
+import csw.command.client.models.framework.ComponentInfo
 import csw.config.api.scaladsl.ConfigClientService
 import csw.config.client.scaladsl.ConfigClientFactory
-import csw.event.client.EventServiceFactory
 import csw.event.api.scaladsl.EventService
+import csw.event.client.EventServiceFactory
+import csw.framework.CurrentStatePublisher
+import csw.framework.internal.pubsub.PubSubBehavior
+import csw.framework.internal.wiring.CswFrameworkSystem
+import csw.location.api.scaladsl.LocationService
 import csw.logging.client.scaladsl.LoggerFactory
+import csw.params.core.states.CurrentState
 import csw.time.scheduler.TimeServiceSchedulerFactory
 import csw.time.scheduler.api.TimeServiceScheduler
 
@@ -69,10 +69,8 @@ object CswContext {
     async {
 
       // create CurrentStatePublisher
-      val pubSubComponentActor = await(
-        richSystem.spawnTyped(new PubSubBehaviorFactory().make[CurrentState](PubSubComponentActor, loggerFactory),
-                              PubSubComponentActor)
-      )
+      val pubSubComponentActor =
+        await(richSystem.spawnTyped(PubSubBehavior.make[CurrentState](loggerFactory), PubSubComponentActor))
       val currentStatePublisher = new CurrentStatePublisher(pubSubComponentActor)
 
       // create CommandResponseManager

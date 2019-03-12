@@ -2,8 +2,8 @@ package csw.framework.internal.pubsub
 
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestInbox, TestProbe}
+import akka.actor.typed.scaladsl.AbstractBehavior
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.typed.scaladsl.{AbstractBehavior, Behaviors}
 import akka.actor.{typed, ActorSystem}
 import csw.command.client.messages.ComponentMessage
 import csw.command.client.models.framework.PubSub.{Publish, Subscribe, SubscribeOnly, Unsubscribe}
@@ -40,10 +40,10 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
   val currentState3              = CurrentState(prefix, StateName("testStateName3"))
 
   def createLifecycleStatePubSubBehavior(): BehaviorTestKit[PubSub[LifecycleStateChanged]] =
-    BehaviorTestKit(Behaviors.setup[PubSub[LifecycleStateChanged]](ctx ⇒ new PubSubBehavior(ctx, mocks.loggerFactory)))
+    BehaviorTestKit(PubSubBehavior.make(mocks.loggerFactory))
 
   def createCurrentStatePubSubBehavior(): BehaviorTestKit[PubSub[CurrentState]] =
-    BehaviorTestKit(Behaviors.setup[PubSub[CurrentState]](ctx ⇒ new PubSubBehavior(ctx, mocks.loggerFactory)))
+    BehaviorTestKit(PubSubBehavior.make(mocks.loggerFactory))
 
   override protected def afterAll(): Unit = Await.result(untypedSystem.terminate(), 5.seconds)
 

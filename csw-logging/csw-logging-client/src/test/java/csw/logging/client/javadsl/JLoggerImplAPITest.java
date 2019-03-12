@@ -16,7 +16,9 @@ import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
 import static csw.logging.client.utils.Eventually.eventually;
@@ -55,7 +57,7 @@ public class JLoggerImplAPITest extends JUnitSuite {
         logBuffer.add(parse(x.toString()));
         return null;
     });
-    private static List<LogAppenderBuilder> appenderBuilders = Collections.singletonList(testAppender);
+    private static List<LogAppenderBuilder> appenderBuilders = List.of(testAppender);
 
     @BeforeClass
     public static void setup() {

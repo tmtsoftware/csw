@@ -2,8 +2,8 @@ package csw.database;
 
 import akka.actor.ActorSystem;
 import com.opentable.db.postgres.embedded.EmbeddedPostgres;
-import csw.database.javadsl.JooqHelper;
 import csw.database.commons.DBTestHelper;
+import csw.database.javadsl.JooqHelper;
 import org.jooq.DSLContext;
 import org.jooq.Queries;
 import org.jooq.Record;
@@ -121,7 +121,7 @@ public class JDatabaseServiceTest extends JUnitSuite {
 
         // query the table and assert on data received
         List<Film> resultSet = JooqHelper.fetchAsync(dsl.resultQuery("SELECT * FROM films where name = ?", movieName), Film.class).get(5, SECONDS);
-        assertEquals(resultSet, Collections.singletonList(new Film(1, movieName)));
+        assertEquals(resultSet, List.of(new Film(1, movieName)));
 
         dsl.query("DROP TABLE films").executeAsync().toCompletableFuture().get(5, SECONDS);
     }
@@ -210,7 +210,7 @@ public class JDatabaseServiceTest extends JUnitSuite {
 
         // assert the entry of record
         List<String> resultSet = JooqHelper.fetchAsync(dsl.resultQuery("SELECT name from films where name=?", movie4), String.class).get(5, SECONDS);
-        assertEquals(resultSet, Collections.singletonList(movie4));
+        assertEquals(resultSet, List.of(movie4));
 
         // delete movie_4
         dsl.query("DELETE from films WHERE name = ?", movie4).executeAsync().toCompletableFuture().get(5, SECONDS);
@@ -241,7 +241,7 @@ public class JDatabaseServiceTest extends JUnitSuite {
 
         List<Integer> resultSet = JooqHelper.fetchAsync(dsl.resultQuery("select inc(20)"), Integer.class).get(5, SECONDS);
 
-        assertEquals(Collections.singletonList(21), resultSet);
+        assertEquals(List.of(21), resultSet);
     }
 }
 
