@@ -69,9 +69,9 @@ public class JResultTest extends JUnitSuite {
 
         Assert.assertTrue(k1Exists);
         Assert.assertSame(p4.get(), p1);
-        Assert.assertEquals(Set.of(v1), Set.of(p1.jValues()));
-        Assert.assertEquals(Set.of(v2), Set.of(p2.jValues()));
-        Assert.assertEquals(Set.of(missingKeys), Set.of(k4.keyName()));
+        Assert.assertEquals(Set.copyOf(v1), Set.copyOf(p1.jValues()));
+        Assert.assertEquals(Set.copyOf(v2), Set.copyOf(p2.jValues()));
+        Assert.assertEquals(missingKeys, Set.of(k4.keyName()));
         Assert.assertEquals(r2, r4);
     }
 

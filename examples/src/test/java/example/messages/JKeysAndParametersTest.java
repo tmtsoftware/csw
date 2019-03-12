@@ -264,7 +264,7 @@ public class JKeysAndParametersTest extends JUnitSuite {
 
         //find out missing keys
         Set<String> missingKeySet = mutated1.jMissingKeys(ra, dec, epoch, JKeyType.StringKey().make("someRandomKey"));
-        List<String> expectedMissingKeys = Arrays.asList("ra", "someRandomKey");
+        Set<String> expectedMissingKeys = Set.of("ra", "someRandomKey");
         //#struct
 
         //validations
@@ -273,7 +273,7 @@ public class JKeysAndParametersTest extends JUnitSuite {
         Assert.assertEquals(JUnits.lightyear, paramWithLightYear.units());
         Assert.assertEquals(struct1.parameter(dec), secondKey.get());
         Assert.assertEquals(struct1.parameter(epoch), thirdKey.get());
-        Assert.assertEquals(Set.of(expectedMissingKeys), missingKeySet);
+        Assert.assertEquals(expectedMissingKeys, missingKeySet);
         Assert.assertFalse(mutated1.exists(ra));
         Assert.assertFalse(mutated2.exists(ra));
     }

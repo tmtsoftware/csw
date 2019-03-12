@@ -143,8 +143,8 @@ public class JStateVariablesTest extends JUnitSuite {
         //validations
         Assert.assertTrue(charKeyExists);
         Assert.assertSame(p1.get(), intParam);
-        Assert.assertEquals(Set.of('A', 'B', 'C'), Set.of(v1));
-        Assert.assertEquals(Set.of(true, false), Set.of(v2));
+        Assert.assertEquals(Set.of('A', 'B', 'C'), Set.copyOf(v1));
+        Assert.assertEquals(Set.of(true, false), Set.copyOf(v2));
         Assert.assertEquals(4, missingKeys.size());
         Assert.assertFalse(cs4.exists(timestampKey));
         Assert.assertTrue(cs5.jGet(timestampKey).get().head().value().isBefore(cs3.jGet(timestampKey).get().head().value()));
@@ -219,22 +219,22 @@ public class JStateVariablesTest extends JUnitSuite {
                 filterParam2,
                 filterParam3);
         //four duplicate keys are removed; now contains one Encoder and one Filter key
-        List<String> uniqueKeys1 = state.jParamSet().stream().map(Parameter::keyName).collect(Collectors.toList());
+        Set<String> uniqueKeys1 = state.jParamSet().stream().map(Parameter::keyName).collect(Collectors.toUnmodifiableSet());
 
         //try adding duplicate keys via add + madd
         DemandState changedState = state.add(encParam3).madd(filterParam1, filterParam2, filterParam3);
         //duplicate keys will not be added. Should contain one Encoder and one Filter key
-        List<String> uniqueKeys2 = changedState.jParamSet().stream().map(Parameter::keyName).collect(Collectors.toList());
+        Set<String> uniqueKeys2 = changedState.jParamSet().stream().map(Parameter::keyName).collect(Collectors.toUnmodifiableSet());
 
         //miscKey(unique) will be added; encoderKey(duplicate) will not be added
         DemandState finalState = changedState.madd(miscParam1, encParam1);
         //now contains encoderKey, filterKey, miscKey
-        List<String> uniqueKeys3 = finalState.jParamSet().stream().map(Parameter::keyName).collect(Collectors.toList());
+        Set<String> uniqueKeys3 = finalState.jParamSet().stream().map(Parameter::keyName).collect(Collectors.toUnmodifiableSet());
         //#unique-key
 
         //validations
-        Assert.assertEquals(Set.of(uniqueKeys1), Set.of(encoderKey.keyName(), filterKey.keyName()));
-        Assert.assertEquals(Set.of(uniqueKeys2), Set.of(encoderKey.keyName(), filterKey.keyName()));
-        Assert.assertEquals(Set.of(uniqueKeys3), Set.of(encoderKey.keyName(), filterKey.keyName(), miscKey.keyName()));
+        Assert.assertEquals(uniqueKeys1, Set.of(encoderKey.keyName(), filterKey.keyName()));
+        Assert.assertEquals(uniqueKeys2, Set.of(encoderKey.keyName(), filterKey.keyName()));
+        Assert.assertEquals(uniqueKeys3, Set.of(encoderKey.keyName(), filterKey.keyName(), miscKey.keyName()));
     }
 }

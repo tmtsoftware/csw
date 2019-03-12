@@ -22,8 +22,6 @@ import romaine.RedisResult
 import romaine.async.RedisAsyncApi
 import romaine.reactive.RedisSubscription
 
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
-
 class StatusServiceModuleTest
     extends AlarmServiceTestSetup
     with StatusServiceModule

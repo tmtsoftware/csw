@@ -95,8 +95,8 @@ public class JEventsTest extends JUnitSuite {
 
         Assert.assertTrue(k1Exists);
         Assert.assertSame(p4.get(), p1);
-        Assert.assertEquals(Set.of(22), Set.of(v1));
-        Assert.assertEquals(Set.of(44), Set.of(v2));
+        Assert.assertEquals(Set.of(22), Set.copyOf(v1));
+        Assert.assertEquals(Set.of(44), Set.copyOf(v2));
         Assert.assertNotEquals(se3.eventId(), se4.eventId()); //Test unique id when parameters are removed
     }
 
@@ -145,8 +145,8 @@ public class JEventsTest extends JUnitSuite {
 
         Assert.assertTrue(k1Exists);
         Assert.assertSame(p4.get(), p1);
-        Assert.assertEquals(Set.of(4), Set.of(v1));
-        Assert.assertEquals(Set.of(2), Set.of(v2));
+        Assert.assertEquals(Set.of(4), Set.copyOf(v1));
+        Assert.assertEquals(Set.of(2), Set.copyOf(v2));
         Assert.assertNotEquals(oc3.eventId(), oc4.eventId()); //Test unique id when parameters are removed
     }
 
@@ -225,23 +225,23 @@ public class JEventsTest extends JUnitSuite {
                 filterParam2,
                 filterParam3);
         //four duplicate keys are removed; now contains one Encoder and one Filter key
-        List<String> uniqueKeys1 = event.jParamSet().stream().map(Parameter::keyName).collect(Collectors.toList());
+        Set<String> uniqueKeys1 = event.jParamSet().stream().map(Parameter::keyName).collect(Collectors.toUnmodifiableSet());
 
         //try adding duplicate keys via add + madd
         SystemEvent changedEvent = event.add(encParam3).madd(filterParam1, filterParam2, filterParam3);
         //duplicate keys will not be added. Should contain one Encoder and one Filter key
-        List<String> uniqueKeys2 = changedEvent.jParamSet().stream().map(Parameter::keyName).collect(Collectors.toList());
+        Set<String> uniqueKeys2 = changedEvent.jParamSet().stream().map(Parameter::keyName).collect(Collectors.toUnmodifiableSet());
 
         //miscKey(unique) will be added; encoderKey(duplicate) will not be added
         SystemEvent finalEvent = changedEvent.madd(miscParam1, encParam1);
         //now contains encoderKey, filterKey, miscKey
-        List<String> uniqueKeys3 = finalEvent.jParamSet().stream().map(Parameter::keyName).collect(Collectors.toList());
+        Set<String> uniqueKeys3 = finalEvent.jParamSet().stream().map(Parameter::keyName).collect(Collectors.toUnmodifiableSet());
         //#unique-key
 
         //validations
-        Assert.assertEquals(Set.of(uniqueKeys1), Set.of(encoderKey.keyName(), filterKey.keyName()));
-        Assert.assertEquals(Set.of(uniqueKeys2), Set.of(encoderKey.keyName(), filterKey.keyName()));
-        Assert.assertEquals(Set.of(uniqueKeys3), Set.of(encoderKey.keyName(), filterKey.keyName(), miscKey.keyName()));
+        Assert.assertEquals(uniqueKeys1, Set.of(encoderKey.keyName(), filterKey.keyName()));
+        Assert.assertEquals(uniqueKeys2, Set.of(encoderKey.keyName(), filterKey.keyName()));
+        Assert.assertEquals(uniqueKeys3, Set.of(encoderKey.keyName(), filterKey.keyName(), miscKey.keyName()));
     }
 
     @Test
