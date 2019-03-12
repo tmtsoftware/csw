@@ -242,7 +242,42 @@ class StatusServiceModuleTest
     a[KeyNotFoundException] shouldBe thrownBy(getStatus(invalidAlarm).await)
   }
 
-  private def startWatcher(): RedisSubscription = {
+  // DEOPSCSW-501: AlarmServer update time and latch severity
+  test("latchToDisconnected should latch the status to disconnected") {
+    val redisSubscription = startAlarmWatcher()
+
+    // Initially latch and current are disconnected
+    val defaultStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
+    defaultStatus.latchedSeverity shouldEqual Disconnected
+    defaultStatus.acknowledgementStatus shouldEqual Acknowledged
+    defaultStatus.initializing shouldEqual true
+    getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Disconnected
+
+    // Simulates initial component going to Okay and acknowledged status
+    val status = setSeverityAndGetStatus(tromboneAxisLowLimitAlarmKey, Okay)
+    status.latchedSeverity shouldBe Okay
+    status.initializing shouldEqual false
+    acknowledge(tromboneAxisLowLimitAlarmKey).await
+    getStatus(tromboneAxisLowLimitAlarmKey).await.acknowledgementStatus shouldBe Acknowledged
+
+    //wait for current severity to expire and get disconnected
+    Thread.sleep(1500)
+    getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Disconnected
+
+    val newStatus: AlarmStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
+
+    //the test stream that we have created, should have latched the alarm to Disconnected by now
+    newStatus.latchedSeverity shouldEqual Disconnected
+    newStatus.initializing shouldBe false
+    newStatus.acknowledgementStatus shouldBe Acknowledged
+    newStatus.shelveStatus shouldEqual Unshelved
+    //TODO: pass the below assert
+    //newStatus.alarmTime.value.isAfter(status.alarmTime.value) shouldBe true
+
+    redisSubscription.unsubscribe().await
+  }
+
+  private def startAlarmWatcher(): RedisSubscription = {
     //import codecs
     import csw.alarm.client.internal.AlarmCodec._
 
@@ -255,49 +290,15 @@ class StatusServiceModuleTest
     //get all severity keys
     val severityKeys = metadataApi.keys(Key.GlobalKey).await.map(m => SeverityKey.fromAlarmKey(m))
 
-    //create keyspace api for severity
-    val source = connsFactory
+    //create keyspace api for severity and return RedisSubscription
+    connsFactory
       .redisKeySpaceApi(severityApi)
       .watchKeyspaceValue(severityKeys, overflowStrategy = OverflowStrategy.LATEST)
       .to(Sink.foreach {
         case RedisResult(k, None) => latchToDisconnected(k).await
         case _                    =>
       })
-
-    val subscription = source.run()
-
-    subscription
-  }
-
-  // DEOPSCSW-501: AlarmServer update time and latch severity
-  test("latchToDisconnected should latch the status to disconnected") {
-    val redisSubscription = startWatcher()
-
-    // Initially latch and current are disconnected
-    val defaultStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
-    defaultStatus.latchedSeverity shouldEqual Disconnected
-    defaultStatus.acknowledgementStatus shouldEqual Acknowledged
-    defaultStatus.initializing shouldEqual true
-    getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Disconnected
-
-    // Simulates initial component going to Okay and acknowledged status
-    val status = setSeverityAndGetStatus(tromboneAxisLowLimitAlarmKey, Okay)
-    status.latchedSeverity shouldBe Okay
-    acknowledge(tromboneAxisLowLimitAlarmKey).await
-    getStatus(tromboneAxisLowLimitAlarmKey).await.acknowledgementStatus shouldBe Acknowledged
-
-    //wait for current severity to expire and get disconnected
-    Thread.sleep(1500)
-    getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Disconnected
-
-    val newStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
-
-    //the test stream that we have created, should have latched the alarm to Disconnected by now
-    newStatus.latchedSeverity shouldEqual Disconnected
-    //make sure the initializing flag is now set to false
-    newStatus.initializing shouldEqual false
-
-    redisSubscription.unsubscribe().await
+      .run()
   }
 
   private def setSeverityAndGetStatus(alarmKey: AlarmKey, alarmSeverity: AlarmSeverity): AlarmStatus = {

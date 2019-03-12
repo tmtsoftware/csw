@@ -91,6 +91,7 @@ trait StatusServiceModule extends StatusService {
     shelveStatusApi.set(alarmKey, Unshelved)
   }
 
+  // this method is expected to be called from alarm server when it receives removed event for any alarm
   final override def latchToDisconnected(alarmKey: AlarmKey): Future[Done] = updateStatusForSeverity(alarmKey, Disconnected)
 
   private[alarm] final override def unacknowledge(alarmKey: AlarmKey): Future[Done] =

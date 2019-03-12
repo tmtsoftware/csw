@@ -56,6 +56,7 @@ private[alarm] trait StatusService {
    * Also updates the time to current time if alarm was not already latched to disconnected.
    * Also, updates the acknowledgement status if required.
    * @param alarmKey Key of the alarm which needs to be latched to Disconnected status
+   * @note This method is expected to be called from alarm server when it receives removed event for any alarm
    */
   def latchToDisconnected(alarmKey: AlarmKey): Future[Done]
 
