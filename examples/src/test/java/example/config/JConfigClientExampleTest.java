@@ -127,9 +127,9 @@ public class JConfigClientExampleTest extends JUnitSuite {
     }
 
     @Test
-    public void testGetById() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
+    public void testGetById() throws ExecutionException, InterruptedException {
         //#getById
-        Path filePath = Paths.get("/tmt/trmobone/assembly/hcd.conf");
+        Path filePath = Paths.get("/tmt/trombone/assembly/hcd.conf");
         ConfigId id = adminApi.create(filePath, ConfigData.fromString(defaultStrConf), false, "First commit").get();
 
         //validate
@@ -143,6 +143,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
         //#getLatest
         //create a file
         Path filePath = Paths.get("/test.conf");
+        adminApi.create(filePath, ConfigData.fromString(defaultStrConf), false, "initial configuration").get();
 
         //override the contents
         String newContent = "I changed the contents!!!";
@@ -156,13 +157,13 @@ public class JConfigClientExampleTest extends JUnitSuite {
     }
 
     @Test
-    public void testGetByTime() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
+    public void testGetByTime() throws ExecutionException, InterruptedException {
         //#getByTime
         Instant tInitial = Instant.now();
 
         //create a file
         Path filePath = Paths.get("/test.conf");
-        ConfigId id = adminApi.create(filePath, ConfigData.fromString(defaultStrConf), false, "initial configuration").get();
+        adminApi.create(filePath, ConfigData.fromString(defaultStrConf), false, "initial configuration").get();
 
         //override the contents
         String newContent = "I changed the contents!!!";
