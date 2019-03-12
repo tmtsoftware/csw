@@ -2,7 +2,7 @@ package csw.logging.client.internal
 
 import java.io.{PrintWriter, StringWriter}
 
-import akka.actor.typed.Behavior
+import akka.actor.typed.{Behavior, PostStop}
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.dispatch.{BoundedMessageQueueSemantics, RequiresMessageQueue}
@@ -15,7 +15,6 @@ import csw.logging.client.commons.{Category, LoggingKeys, TMTDateTimeFormatter}
 import csw.logging.client.internal.JsonExtensions.AnyToJson
 import csw.logging.client.internal.LogActorMessages._
 import csw.logging.client.scaladsl.RichException
-import csw.logging.macros.DefaultSourceLocation
 import play.api.libs.json.{JsObject, Json}
 
 import scala.concurrent.Promise
@@ -100,24 +99,24 @@ private[logging] object LogActor extends RequiresMessageQueue[BoundedMessageQueu
 
       def receiveLog(log: Log): Unit = append(createJsonFromLog(log), Category.Common.name, log.level)
 
-      Behaviors.receiveMessage[LogActorMessages] { message =>
-        message match {
-          case log: Log                     => receiveLog(log)
-          case logAltMessage: LogAltMessage => receiveAltMessage(logAltMessage)
-          case logSlf4J: LogSlf4j           => receiveLogSlf4j(logSlf4J)
-          case logAkka: LogAkka             => receiveLogAkkaMessage(logAkka)
-          case SetLevel(level1)             => level = level1
-          case SetSlf4jLevel(level1)        => slf4jLogLevel = level1
-          case SetAkkaLevel(level1)         => akkaLogLevel = level1
-          case SetAppenders(_appenders)     => appenders = _appenders
-          case LastAkkaMessage              => akka.event.Logging(ctx.system.toUntyped, this).error("DIE")
-          case StopLogging =>
-            ctx.stop(ctx.self)
-            done.success(())
-          case msg: Any => println("Unrecognized LogActor message:" + msg + DefaultSourceLocation)
+      Behaviors
+        .receiveMessage[LogActorMessages] {
+          case log: Log                     => receiveLog(log); Behaviors.same
+          case logAltMessage: LogAltMessage => receiveAltMessage(logAltMessage); Behaviors.same
+          case logSlf4J: LogSlf4j           => receiveLogSlf4j(logSlf4J); Behaviors.same
+          case logAkka: LogAkka             => receiveLogAkkaMessage(logAkka); Behaviors.same
+          case SetLevel(level1)             => level = level1; Behaviors.same
+          case SetSlf4jLevel(level1)        => slf4jLogLevel = level1; Behaviors.same
+          case SetAkkaLevel(level1)         => akkaLogLevel = level1; Behaviors.same
+          case SetAppenders(_appenders)     => appenders = _appenders; Behaviors.same
+          case LastAkkaMessage              => akka.event.Logging(ctx.system.toUntyped, this).error("DIE"); Behaviors.same
+          case StopLogging                  => Behaviors.stopped
         }
-        Behaviors.same
-      }
+        .receiveSignal {
+          case (context, PostStop) =>
+            done.success(())
+            Behaviors.same
+        }
     }
 }
 
