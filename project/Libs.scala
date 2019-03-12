@@ -31,7 +31,7 @@ object Libs {
   val `jwt-play-json`            = "com.pauldijou"        %% "jwt-play-json"            % "2.1.0"
   val `scalapb-runtime`          = "com.thesamet.scalapb" %% "scalapb-runtime"          % scalapbVersion % "protobuf"
   val `scalapb-json4s`           = "com.thesamet.scalapb" %% "scalapb-json4s"           % scalapbVersion
-  val `lettuce`                  = "io.lettuce"           % "lettuce-core"              % "5.0.5.RELEASE"
+  val `lettuce`                  = "io.lettuce"           % "lettuce-core"              % "5.1.5.RELEASE"
   val `reactor-core`             = "io.projectreactor"    % "reactor-core"              % "3.2.6.RELEASE"
   val `reactive-streams`         = "org.reactivestreams"  % "reactive-streams"          % "1.0.2"
   val `akka-stream-kafka`        = "com.typesafe.akka"    %% "akka-stream-kafka"        % "0.22"
