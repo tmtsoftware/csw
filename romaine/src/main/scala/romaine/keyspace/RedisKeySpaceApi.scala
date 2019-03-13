@@ -77,6 +77,9 @@ class RedisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
             }
         })
         .distinctUntilChanged
+        .collect {
+          case r @ RedisResult(_, RedisValueChange(a, b)) if a != b => r
+        }
     })
 
     Source
