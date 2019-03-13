@@ -53,11 +53,9 @@ class RedisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
       keys: List[K],
       overflowStrategy: OverflowStrategy
   ): Source[RedisResult[K, RedisValueChange[Option[V]]], RedisSubscription] = {
+    val initialValuesF: Future[Map[K, Option[V]]] = redisAsyncApi.mget(keys).map(_.map(x => x.key -> x.value).toMap)
 
-    val initialValuesF = redisAsyncApi.mget(keys).map(l => l.map(x => x.key -> x.value).toMap)
-
-    val source = initialValuesF.map(initialValues => {
-
+    val sourceF = initialValuesF.map(initialValues => {
       watchKeyspaceValue(keys, overflowStrategy)
         .statefulMapConcat(() => {
           var digest = initialValues
@@ -67,22 +65,20 @@ class RedisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
                 redisResult.key,
                 RedisValueChange(digest.get(redisResult.key).flatten, redisResult.value)
               )
-              val r = List(change)
               digest += redisResult.key -> redisResult.value
-              r
+              List(change)
             }
         })
     })
 
     Source
-      .fromFutureSource(source)
-      .mapMaterializedValue(subscriptionF => {
-        val subscription: RedisSubscription = new RedisSubscription {
-          override def unsubscribe(): Future[Done] = subscriptionF.flatMap(_.unsubscribe())
-
-          override def ready(): Future[Done] = subscriptionF.flatMap(_.ready())
+      .fromFutureSource(sourceF)
+      .mapMaterializedValue(
+        subscriptionF =>
+          new RedisSubscription {
+            override def unsubscribe(): Future[Done] = subscriptionF.flatMap(_.unsubscribe())
+            override def ready(): Future[Done]       = subscriptionF.flatMap(_.ready())
         }
-        subscription
-      })
+      )
   }
 }
