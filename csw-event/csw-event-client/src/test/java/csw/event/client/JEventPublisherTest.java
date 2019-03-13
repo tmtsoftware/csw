@@ -91,6 +91,7 @@ public class JEventPublisherTest extends TestNGSuite {
     }
 
     //DEOPSCSW-345: Publish events irrespective of subscriber existence
+    //DEOPSCSW-516: Optionally Publish - API Change
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_publish_an_event_with_duration(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         List<Event> events = new ArrayList<>();
@@ -151,6 +152,7 @@ public class JEventPublisherTest extends TestNGSuite {
     }
 
     //DEOPSCSW-000: Publish events with block generating future of event
+    //DEOPSCSW-516: Optionally Publish - API Change
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_publish_an_event_with_block_generating_future_of_event_with_duration(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         List<Event> events = new ArrayList<>();
@@ -224,6 +226,7 @@ public class JEventPublisherTest extends TestNGSuite {
     }
 
     //DEOPSCSW-515: Include Start Time in API
+    //DEOPSCSW-516: Optionally Publish - API Change
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_publish_event_via_event_generator_with_start_time(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         List<Event> events = new ArrayList<>();
@@ -259,6 +262,7 @@ public class JEventPublisherTest extends TestNGSuite {
     }
 
     //DEOPSCSW-515: Include Start Time in API
+    //DEOPSCSW-516: Optionally Publish - API Change
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_publish_event_via_asynchronous_event_generator_with_start_time(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         List<Event> events = new ArrayList<>();

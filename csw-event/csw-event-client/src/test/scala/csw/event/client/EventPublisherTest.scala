@@ -89,6 +89,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
   }
 
   //DEOPSCSW-345: Publish events irrespective of subscriber existence
+  //DEOPSCSW-516: Optionally Publish - API Change
   var cancellable: Cancellable = _
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_publish_an_event_with_duration(baseProperties: BaseProperties): Unit = {
@@ -140,6 +141,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
   }
 
   //DEOPSCSW-000: Publish events with block generating future of event
+  //DEOPSCSW-516: Optionally Publish - API Change
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_publish_an_event_with_block_generating_future_of_event(baseProperties: BaseProperties): Unit = {
     import baseProperties._
@@ -206,6 +208,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
   }
 
   //DEOPSCSW-515: Include Start Time in API
+  //DEOPSCSW-516: Optionally Publish - API Change
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_publish_event_via_event_generator_with_start_time(baseProperties: BaseProperties): Unit = {
     import baseProperties._
@@ -237,6 +240,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
   }
 
   //DEOPSCSW-515: Include Start Time in API
+  //DEOPSCSW-516: Optionally Publish - API Change
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_publish_event_via_asynchronous_event_generator_with_start_time(baseProperties: BaseProperties): Unit = {
     import baseProperties._
