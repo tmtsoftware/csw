@@ -68,7 +68,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
         getConfig().thenAccept(config -> hcdConfig = config);
 
         // create a worker actor which is used by this hcd
-        worker = ctx.spawnAnonymous(WorkerActor.make(hcdConfig));
+        worker = ctx.spawnAnonymous(WorkerActor.behavior(hcdConfig));
 
         // initialise some state by using the worker actor created above
         CompletionStage<Integer> askCurrent = AskPattern.ask(worker, WorkerActorMsgs.JInitialState::new, Duration.ofSeconds(5), ctx.getSystem().scheduler());

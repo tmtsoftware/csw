@@ -43,7 +43,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
     val calculationConfig = await(getAssemblyConfig)
 
     // 2. create a worker actor which is used by this assembly
-    val worker: ActorRef[WorkerActorMsg] = ctx.spawnAnonymous(WorkerActor.make(calculationConfig))
+    val worker: ActorRef[WorkerActorMsg] = ctx.spawnAnonymous(WorkerActor.behavior(calculationConfig))
 
     // 3. find a Hcd connection from the connections provided in componentInfo
     val maybeConnection =

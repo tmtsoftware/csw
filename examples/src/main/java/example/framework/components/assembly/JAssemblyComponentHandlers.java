@@ -82,7 +82,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
         // create a worker actor which is used by this assembly
         CompletableFuture<ActorRef<WorkerActorMsg>> worker =
-                configDataCompletableFuture.thenApply(config -> ctx.spawnAnonymous(WorkerActor.make(config)));
+                configDataCompletableFuture.thenApply(config -> ctx.spawnAnonymous(WorkerActor.behavior(config)));
 
         // find a Hcd connection from the connections provided in componentInfo
         Optional<Connection> mayBeConnection = componentInfo.getConnections().stream()
