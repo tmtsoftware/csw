@@ -10,7 +10,11 @@ object SeverityTestScenarios {
 
   val SeverityTestCases = List(
     SetSeverityTestCase(
-      alarmKey = AlarmKey(AOESW, "test_component", "IsHigher_WasInitializing"),
+      alarmKey = AlarmKey(
+        AOESW,
+        "test_component",
+        "setSeverity, should increase latched severity, when new severity is higher than old and alarm is still initializing"
+      ),
       oldLatchedSeverity = Warning,
       newSeverity = Critical,
       expectedLatchedSeverity = Critical,
@@ -18,7 +22,11 @@ object SeverityTestScenarios {
       expectedInitializing = false
     ),
     SetSeverityTestCase(
-      alarmKey = AlarmKey(AOESW, "test_component", "IsHigher_WasNotInitializing"),
+      alarmKey = AlarmKey(
+        AOESW,
+        "test_component",
+        "setSeverity, should increase latched severity, when new severity is higher than old and alarm is done initializing"
+      ),
       oldLatchedSeverity = Disconnected,
       newSeverity = Critical,
       expectedLatchedSeverity = Critical,
@@ -26,7 +34,11 @@ object SeverityTestScenarios {
       expectedInitializing = false
     ),
     SetSeverityTestCase(
-      alarmKey = AlarmKey(AOESW, "test_component", "IsLower_WasInitializing"),
+      alarmKey = AlarmKey(
+        AOESW,
+        "test_component",
+        "setSeverity, should decrease latched severity, when new severity is lower than old but alarm is still initializing"
+      ),
       oldLatchedSeverity = Disconnected,
       newSeverity = Okay,
       expectedLatchedSeverity = Okay,
@@ -34,7 +46,11 @@ object SeverityTestScenarios {
       expectedInitializing = false
     ),
     SetSeverityTestCase(
-      alarmKey = AlarmKey(AOESW, "test_component", "IsLower_WasNotInitializing"),
+      alarmKey = AlarmKey(
+        AOESW,
+        "test_component",
+        "setSeverity, should not update latched severity, when new severity is lower than old and alarm is done initializing"
+      ),
       oldLatchedSeverity = Major,
       newSeverity = Warning,
       expectedLatchedSeverity = Major,

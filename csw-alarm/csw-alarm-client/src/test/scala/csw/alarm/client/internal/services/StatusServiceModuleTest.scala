@@ -246,6 +246,9 @@ class StatusServiceModuleTest
 
   // DEOPSCSW-501: AlarmServer update time and latch severity
   test("latchToDisconnected should latch the status to disconnected") {
+
+    //starts a "mini alarm server". This is a small alarm server impl created just for testing
+    //'latchToDisconnected' api
     val redisSubscription = startAlarmWatcher()
 
     //awaiting for stream to become ready is very important step.
@@ -282,6 +285,15 @@ class StatusServiceModuleTest
     redisSubscription.unsubscribe().await
   }
 
+  /**
+   * Starts a background task which continuously watches redis for all alarms severity keys.
+   * Once it's detected that an alarm key has expired, this task calls 'latchToDisconnected' api
+   * for that alarm key.
+   *
+   * In essence, this method acts like a simple version of alarm server.
+   *
+   * @return RedisSubscription - This subscription has a ready() and an unsubscribe() method.
+   */
   private def startAlarmWatcher(): RedisSubscription = {
     //import codecs
     import csw.alarm.client.internal.AlarmCodec._
@@ -300,7 +312,7 @@ class StatusServiceModuleTest
       .redisKeySpaceApi(severityApi)
       .watchKeyspaceValueChange(severityKeys, overflowStrategy = OverflowStrategy.LATEST)
       .to(Sink.foreach {
-        //None is this case indicates that redis key has expired
+        //'None' case indicates that redis key has expired
         case RedisResult(k, RedisValueChange(oldSeverityMayBe, None)) =>
           latchToDisconnected(k, oldSeverityMayBe.getOrElse(Disconnected)).await
         case _ =>
