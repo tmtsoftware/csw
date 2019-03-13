@@ -3,7 +3,7 @@ import akka.actor.ActorSystem
 import csw.alarm.api.scaladsl.AlarmService
 import csw.alarm.client.AlarmServiceFactory
 import csw.command.client.CommandResponseManager
-import csw.command.client.internal.CommandResponseManagerFactory
+import csw.command.client.internal.{CRMCacheProperties, CommandResponseManagerActor}
 import csw.command.client.models.framework.ComponentInfo
 import csw.config.api.scaladsl.ConfigClientService
 import csw.config.client.scaladsl.ConfigClientFactory
@@ -73,11 +73,10 @@ object CswContext {
         await(richSystem.spawnTyped(PubSubBehavior.make[CurrentState](loggerFactory), PubSubComponentActor))
       val currentStatePublisher = new CurrentStatePublisher(pubSubComponentActor)
 
-      // create CommandResponseManager
-      val commandResponseManagerFactory = new CommandResponseManagerFactory
-      val commandResponseManagerActor =
-        await(richSystem.spawnTyped(commandResponseManagerFactory.makeBehavior(loggerFactory), CommandResponseManagerActorName))
-      val commandResponseManager = commandResponseManagerFactory.make(commandResponseManagerActor)
+      // create CommandResponseManager (CRM)
+      val crmBehavior = new CommandResponseManagerActor(CRMCacheProperties(), loggerFactory).behavior
+      val crmActor    = await(richSystem.spawnTyped(crmBehavior, CommandResponseManagerActorName))
+      val crm         = new CommandResponseManager(crmActor)
 
       new CswContext(
         locationService,
@@ -87,7 +86,7 @@ object CswContext {
         loggerFactory,
         configClientService,
         currentStatePublisher,
-        commandResponseManager,
+        crm,
         componentInfo
       )
     }

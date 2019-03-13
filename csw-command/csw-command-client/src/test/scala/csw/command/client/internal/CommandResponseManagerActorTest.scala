@@ -22,7 +22,7 @@ import scala.concurrent.duration.DurationDouble
 
 // DEOPSCSW-207: Report on Configuration Command Completion
 // DEOPSCSW-208: Report failure on Configuration Completion command
-class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with MockitoSugar with ArgumentMatchersSugar {
+class CommandResponseManagerActorTest extends FunSuite with Matchers with MockitoSugar with ArgumentMatchersSugar {
 
   private val actorSystem                        = ActorSystem("test-command-status-service-system")
   implicit val typedSystem: typed.ActorSystem[_] = actorSystem.toTyped
@@ -30,7 +30,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
   def createBehaviorTestKit(props: CRMCacheProperties = CRMCacheProperties()): BehaviorTestKit[CommandResponseManagerMessage] =
     BehaviorTestKit(
-      Behaviors.setup[CommandResponseManagerMessage](ctx ⇒ new CommandResponseManagerBehavior(ctx, props, getMockedLogger))
+      Behaviors.setup[CommandResponseManagerMessage](ctx ⇒ new CommandResponseManagerActor(props, getMockedLogger).behavior)
     )
 
   test("should be able to add command entry in Command Response Manager") {

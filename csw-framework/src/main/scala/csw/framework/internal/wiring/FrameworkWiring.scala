@@ -3,7 +3,6 @@ package csw.framework.internal.wiring
 import akka.Done
 import akka.actor.{ActorSystem, CoordinatedShutdown}
 import csw.alarm.client.AlarmServiceFactory
-import csw.command.client.internal.CommandResponseManagerFactory
 import csw.config.api.scaladsl.ConfigClientService
 import csw.config.client.commons.ConfigUtils
 import csw.config.client.scaladsl.ConfigClientFactory
@@ -25,7 +24,6 @@ class FrameworkWiring {
   lazy val actorRuntime: ActorRuntime               = new ActorRuntime(actorSystem)
   lazy val locationService: LocationService         = HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
   lazy val registrationFactory                      = new RegistrationFactory
-  lazy val commandResponseManagerFactory            = new CommandResponseManagerFactory
   lazy val configClientService: ConfigClientService = ConfigClientFactory.clientApi(actorSystem, locationService)
   lazy val configUtils: ConfigUtils                 = new ConfigUtils(configClientService)(actorSystem, actorRuntime.mat)
   lazy val eventServiceFactory: EventServiceFactory = new EventServiceFactory(RedisStore(redisClient))
