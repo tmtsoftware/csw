@@ -23,24 +23,25 @@ private[framework] object PubSubBehavior {
 
     val nameableData: Nameable[T] = implicitly[Nameable[T]]
 
+    def subscribe(subscribers: Map[ActorRef[T], Set[StateName]], ref: ActorRef[T], names: Set[StateName]): Behavior[PubSub[T]] = {
+      ctx.watchWith(ref, Unsubscribe(ref))
+      receive(subscribers + (ref → names))
+    }
+
+    def notify(data: T, subscribers: Map[ActorRef[T], Set[StateName]]): Unit = {
+      log.debug(s"Notifying subscribers :[${subscribers.mkString(",")}] with data :[$data]")
+      subscribers.foreach {
+        case (actorRef, names) ⇒ if (names.isEmpty || names.contains(nameableData.name(data))) actorRef ! data
+      }
+    }
+
     def receive(subscribers: Map[ActorRef[T], Set[StateName]]): Behavior[PubSub[T]] =
       Behaviors
         .receiveMessage[PubSub[T]] {
-          case SubscribeOnly(ref, names) =>
-            ctx.watchWith(ref, Unsubscribe(ref))
-            receive(subscribers + (ref → names))
-          case Subscribe(ref) =>
-            ctx.watchWith(ref, Unsubscribe(ref))
-            receive(subscribers + (ref → Set.empty))
-          case Unsubscribe(ref) =>
-            ctx.unwatch(ref)
-            receive(subscribers - ref)
-          case Publish(data) =>
-            log.debug(s"Notifying subscribers :[${subscribers.mkString(",")}] with data :[$data]")
-            subscribers.foreach {
-              case (actorRef, names) ⇒ if (names.isEmpty || names.contains(nameableData.name(data))) actorRef ! data
-            }
-            Behaviors.same
+          case SubscribeOnly(ref, names) => subscribe(subscribers, ref, names)
+          case Subscribe(ref)            => subscribe(subscribers, ref, Set.empty)
+          case Unsubscribe(ref)          => ctx.unwatch(ref); receive(subscribers - ref)
+          case Publish(data)             => notify(data, subscribers); Behaviors.same
         }
 
     receive(Map.empty)
