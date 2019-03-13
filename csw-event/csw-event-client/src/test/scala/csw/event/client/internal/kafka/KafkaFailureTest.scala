@@ -46,7 +46,7 @@ class KafkaFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     val failedEvent = Utils.makeEvent(1)
     val eventStream = Source.single(failedEvent)
 
-    publisher.publish(eventStream, failure ⇒ testProbe.ref ! failure)
+    publisher.publish(eventStream, onError = testProbe.ref ! _)
 
     val failure = testProbe.expectMessageType[PublishFailure]
 
@@ -59,7 +59,7 @@ class KafkaFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     val testProbe   = TestProbe[PublishFailure]()(typedActorSystem)
     val failedEvent = Utils.makeEvent(1)
 
-    publisher.publish(Some(failedEvent), 20.millis, failure ⇒ testProbe.ref ! failure)
+    publisher.publish(Some(failedEvent), 20.millis, onError = testProbe.ref ! _)
 
     val failure = testProbe.expectMessageType[PublishFailure]
 
@@ -72,7 +72,7 @@ class KafkaFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     val testProbe   = TestProbe[PublishFailure]()(typedActorSystem)
     val failedEvent = Utils.makeEvent(1)
 
-    publisher.publishAsync(Future.successful(Some(failedEvent)), 20.millis, failure ⇒ testProbe.ref ! failure)
+    publisher.publishAsync(Future.successful(Some(failedEvent)), 20.millis, onError = testProbe.ref ! _)
 
     val failure = testProbe.expectMessageType[PublishFailure]
 
@@ -89,7 +89,7 @@ class KafkaFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
 
     val startTime = UTCTime(UTCTime.now().value.plusMillis(500))
 
-    publisher.publish(eventGenerator(), startTime, 20.millis, failure ⇒ testProbe.ref ! failure)
+    publisher.publish(eventGenerator(), startTime, 20.millis, onError = testProbe.ref ! _)
 
     val failure = testProbe.expectMessageType[PublishFailure]
 
@@ -106,7 +106,7 @@ class KafkaFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
 
     val startTime = UTCTime(UTCTime.now().value.plusMillis(500))
 
-    publisher.publishAsync(eventGenerator(), startTime, 20.millis, failure ⇒ testProbe.ref ! failure)
+    publisher.publishAsync(eventGenerator(), startTime, 20.millis, onError = testProbe.ref ! _)
 
     val failure = testProbe.expectMessageType[PublishFailure]
 
@@ -115,31 +115,29 @@ class KafkaFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
   }
 
   //DEOPSCSW-516: Optionally Publish - API Change
-  test("should not invoke onError callback on publish empty event [eventGenerator API] with start time and event generator") {
+  test("should not invoke onError on opting to not publish event with eventGenerator") {
     val testProbe = TestProbe[PublishFailure]()(typedActorSystem)
 
-    def eventGenerator(): Option[Event] = None
+    publisher.publish(None, 20.millis, onError = testProbe.ref ! _)
+    testProbe.expectNoMessage
 
-    val startTime = UTCTime(UTCTime.now().value.plusMillis(500))
-
-    publisher.publish(eventGenerator(), startTime, 20.millis, failure ⇒ testProbe.ref ! failure)
-
-    testProbe.expectNoMessage()
+    val startTime = UTCTime(UTCTime.now().value.plusMillis(200))
+    publisher.publish(None, startTime, 20.millis, onError = testProbe.ref ! _)
+    testProbe.expectNoMessage(500.millis)
   }
 
   //DEOPSCSW-516: Optionally Publish - API Change
-  test(
-    "should not invoke onError callback on publish empty event [eventGenerator API] with start time and future of event generator"
-  ) {
+  test("should not invoke onError on opting to not publish event with async eventGenerator") {
     val testProbe = TestProbe[PublishFailure]()(typedActorSystem)
 
     def eventGenerator(): Future[Option[Event]] = Future.successful(None)
 
-    val startTime = UTCTime(UTCTime.now().value.plusMillis(500))
+    publisher.publishAsync(eventGenerator(), 20.millis, onError = testProbe.ref ! _)
+    testProbe.expectNoMessage
 
-    publisher.publishAsync(eventGenerator(), startTime, 20.millis, failure ⇒ testProbe.ref ! failure)
-
-    testProbe.expectNoMessage()
+    val startTime = UTCTime(UTCTime.now().value.plusMillis(200))
+    publisher.publishAsync(eventGenerator(), startTime, 20.millis, onError = testProbe.ref ! _)
+    testProbe.expectNoMessage(500.millis)
   }
 
 }

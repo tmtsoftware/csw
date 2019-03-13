@@ -16,11 +16,13 @@ import org.junit.rules.ExpectedException;
 import org.scalatestplus.junit.JUnitSuite;
 
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 
 import static org.hamcrest.CoreMatchers.isA;
 
@@ -165,7 +167,7 @@ public class JRedisFailureTest extends JUnitSuite {
 
     //DEOPSCSW-516: Optionally Publish - API Change
     @Test
-    public void handleEmptyPublishEventWithAnEventGeneratorGeneratingEventAtSpecificTimeAndACallback() throws InterruptedException, ExecutionException, TimeoutException {
+    public void shouldNotInvokeOnErrorOnOptingToNotPublishEventWithEventGenerator() throws InterruptedException, ExecutionException, TimeoutException {
         IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
         TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.typedActorSystem());
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
@@ -174,16 +176,17 @@ public class JRedisFailureTest extends JUnitSuite {
 
         Thread.sleep(1000); // wait till the publisher is shutdown successfully
 
-        TMTTime startTime = new UTCTime(UTCTime.now().value().plusMillis(500));
-
-        publisher.publish(Optional::empty, startTime, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
-
+        publisher.publish(Optional::empty, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
         testProbe.expectNoMessage();
+
+        TMTTime startTime = new UTCTime(UTCTime.now().value().plusMillis(200));
+        publisher.publish(Optional::empty, startTime, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
+        testProbe.expectNoMessage(Duration.of(500, ChronoUnit.MILLIS));
     }
 
     //DEOPSCSW-516: Optionally Publish - API Change
     @Test
-    public void handleEmptyPublishEventWithAnEventGeneratorGeneratingFutureOfEventAtSpecificTimeAndACallback() throws InterruptedException, ExecutionException, TimeoutException {
+    public void shouldNotInvokeOnErrorOnOptingToNotPublishEventWithAsyncEventGenerator() throws InterruptedException, ExecutionException, TimeoutException {
         IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
         TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.typedActorSystem());
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
@@ -192,10 +195,13 @@ public class JRedisFailureTest extends JUnitSuite {
 
         Thread.sleep(1000); // wait till the publisher is shutdown successfully
 
-        TMTTime startTime = new UTCTime(UTCTime.now().value().plusMillis(500));
+        Supplier<CompletableFuture<Optional<Event>>> eventGenerator = () -> CompletableFuture.completedFuture(Optional.empty());
 
-        publisher.publishAsync(() -> CompletableFuture.completedFuture(Optional.empty()), startTime, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
-
+        publisher.publishAsync(eventGenerator, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
         testProbe.expectNoMessage();
+
+        TMTTime startTime = new UTCTime(UTCTime.now().value().plusMillis(200));
+        publisher.publishAsync(eventGenerator, startTime, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
+        testProbe.expectNoMessage(Duration.of(500, ChronoUnit.MILLIS));
     }
 }

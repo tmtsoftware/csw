@@ -107,20 +107,23 @@ public class JEventPublisherTest extends TestNGSuite {
 
         IEventPublisher publisher = baseProperties.jPublisher();
         counter = -1;
-        cancellable = publisher.publish(() -> {
-            counter += 1;
-            return Optional.ofNullable(events.get(counter));
-        }, Duration.ofMillis(10));
+        cancellable = publisher.publish(
+                () -> {
+                    counter += 1;
+                    if (counter > 1) return Optional.empty();
+                    else return Optional.ofNullable(events.get(counter));
+                },
+                Duration.ofMillis(300));
 
         Thread.sleep(1000);
         cancellable.cancel();
 
         // subscriber will receive an invalid event first as subscription happened before publishing started.
         // The 10 published events will follow
-        Assert.assertEquals(11, queue.size());
+        Assert.assertEquals(3, queue.size());
 
         events.add(0, Event$.MODULE$.invalidEvent(eventKey));
-        Assert.assertEquals(events, queue);
+        Assert.assertEquals(events.subList(0, 3), queue);
     }
 
     //DEOPSCSW-341: Allow to reuse single connection for subscribing to multiple EventKeys
@@ -164,34 +167,37 @@ public class JEventPublisherTest extends TestNGSuite {
 
         IEventPublisher publisher = baseProperties.jPublisher();
         counter = -1;
-        cancellable = publisher.publishAsync(() -> {
-            counter += 1;
-            return CompletableFuture.completedFuture(Optional.ofNullable(events.get(counter)));
-        }, Duration.ofMillis(10));
+        cancellable = publisher.publishAsync(
+                () -> {
+                    counter += 1;
+                    if (counter > 1) return CompletableFuture.completedFuture(Optional.empty());
+                    return CompletableFuture.completedFuture(Optional.ofNullable(events.get(counter)));
+                },
+                Duration.ofMillis(300));
 
         Thread.sleep(1000);
         cancellable.cancel();
 
         // subscriber will receive an invalid event first as subscription happened before publishing started.
         // The 10 published events will follow
-        Assert.assertEquals(11, queue.size());
+        Assert.assertEquals(3, queue.size());
 
         events.add(0, Event$.MODULE$.invalidEvent(eventKey));
-        Assert.assertEquals(events, queue);
+        Assert.assertEquals(events.subList(0, 3), queue);
     }
 
     //DEOPSCSW-595: Enforce ordering in publish
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_maintain_ordering_while_publish(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         Prefix prefix = Prefix.apply("ordering.test.prefix");
-        Event event1             = Utils.makeEventWithPrefix(6, prefix);
-        Event event2             = Utils.makeEventWithPrefix(7, prefix);
-        Event event3             = Utils.makeEventWithPrefix(8, prefix);
-        Event event4             = Utils.makeEventWithPrefix(9, prefix);
-        Event event5             = Utils.makeEventWithPrefix(10, prefix);
+        Event event1 = Utils.makeEventWithPrefix(6, prefix);
+        Event event2 = Utils.makeEventWithPrefix(7, prefix);
+        Event event3 = Utils.makeEventWithPrefix(8, prefix);
+        Event event4 = Utils.makeEventWithPrefix(9, prefix);
+        Event event5 = Utils.makeEventWithPrefix(10, prefix);
 
         EventKey eventKey = event1.eventKey();
-        TestProbe testProbe          = TestProbe.create(baseProperties.typedActorSystem());
+        TestProbe testProbe = TestProbe.create(baseProperties.typedActorSystem());
 
         IEventSubscription subscription = baseProperties.jSubscriber()
                 .subscribe(Set.of(eventKey))
@@ -221,7 +227,7 @@ public class JEventPublisherTest extends TestNGSuite {
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_publish_event_via_event_generator_with_start_time(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         List<Event> events = new ArrayList<>();
-        for(int i = 31; i < 41; i++){
+        for (int i = 31; i < 41; i++) {
             events.add(Utils.makeEventWithPrefix(i, new Prefix("start.time.test.publish")));
         }
 
@@ -234,25 +240,29 @@ public class JEventPublisherTest extends TestNGSuite {
 
         IEventPublisher publisher = baseProperties.jPublisher();
         counter = -1;
-        cancellable = publisher.publish(() -> {
-            counter += 1;
-            return Optional.ofNullable(events.get(counter));
-        },new UTCTime(UTCTime.now().value().plusSeconds(1)), Duration.ofMillis(300));
+        cancellable = publisher.publish(
+                () -> {
+                    counter += 1;
+                    if (counter > 1) return Optional.empty();
+                    else return Optional.ofNullable(events.get(counter));
+                },
+                new UTCTime(UTCTime.now().value().plusSeconds(1)),
+                Duration.ofMillis(300));
 
 
         Thread.sleep(2000);
         cancellable.cancel();
 
         events.add(0, Event$.MODULE$.invalidEvent(eventKey));
-        Assert.assertEquals(queue.size(), 5);
-        Assert.assertTrue(queue.containsAll(events.subList(0,5)));
+        Assert.assertEquals(queue.size(), 3);
+        Assert.assertTrue(queue.containsAll(events.subList(0, 3)));
     }
 
     //DEOPSCSW-515: Include Start Time in API
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_publish_event_via_asynchrnous_event_generator_with_start_time(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
+    public void should_be_able_to_publish_event_via_asynchronous_event_generator_with_start_time(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         List<Event> events = new ArrayList<>();
-        for(int i = 31; i < 41; i++){
+        for (int i = 31; i < 41; i++) {
             events.add(Utils.makeEventWithPrefix(i, new Prefix("start.time.test.publishAsync")));
         }
 
@@ -265,10 +275,14 @@ public class JEventPublisherTest extends TestNGSuite {
 
         IEventPublisher publisher = baseProperties.jPublisher();
         counter = -1;
-        cancellable = publisher.publishAsync(() -> {
-            counter += 1;
-            return CompletableFuture.completedFuture(Optional.ofNullable(events.get(counter)));
-        },new UTCTime(UTCTime.now().value().plusSeconds(1)), Duration.ofMillis(300));
+        cancellable = publisher.publishAsync(
+                () -> {
+                    counter += 1;
+                    if (counter > 1) return CompletableFuture.completedFuture(Optional.empty());
+                    else return CompletableFuture.completedFuture(Optional.ofNullable(events.get(counter)));
+                },
+                new UTCTime(UTCTime.now().value().plusSeconds(1)),
+                Duration.ofMillis(300));
 
 
         Thread.sleep(2000);
@@ -276,75 +290,7 @@ public class JEventPublisherTest extends TestNGSuite {
 
         events.add(0, Event$.MODULE$.invalidEvent(eventKey));
 
-        Assert.assertEquals(queue.size(), 5);
-        Assert.assertTrue(queue.containsAll(events.subList(0,5)));
-    }
-
-    //DEOPSCSW-516: Optionally Publish - API Change
-    @Test(dataProvider = "event-service-provider")
-    public void should_skip_publishing_missing_optional_event_via_event_generator_with_start_time(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
-        Event event = Utils.makeEventWithPrefix(31, new Prefix("start.time.test.publish.empty"));
-        EventKey eventKey = event.eventKey();
-
-        List<Event> queue = new ArrayList<>();
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(Collections.singleton(eventKey)).toMat(Sink.foreach(queue::add), Keep.left()).run(baseProperties.resumingMat());
-        subscription.ready().get(10, TimeUnit.SECONDS);
-        Thread.sleep(500); // Needed for getting the latest event
-
-        IEventPublisher publisher = baseProperties.jPublisher();
-        counter = -1;
-        cancellable = publisher.publish(() -> {
-            counter += 1;
-            if(counter == 0) {
-                return Optional.of(event);
-            } else {
-                return Optional.empty();
-            }
-        },new UTCTime(UTCTime.now().value().plusSeconds(1)), Duration.ofMillis(300));
-
-
-        Thread.sleep(2000);
-        cancellable.cancel();
-
-        List<Event> events = new ArrayList<>();
-        events.add(0, Event$.MODULE$.invalidEvent(eventKey));
-        events.add(1, event);
-
-        Assert.assertEquals(queue.size(), 2);
-        Assert.assertTrue(queue.containsAll(events));
-    }
-
-    //DEOPSCSW-516: Optionally Publish - API Change
-    @Test(dataProvider = "event-service-provider")
-    public void should_skip_publishing_missing_optional_event_via_asynchrnous_event_generator_with_start_time(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
-        Event event = Utils.makeEventWithPrefix(31, new Prefix("start.time.test.publishAsync.empty"));
-        EventKey eventKey = event.eventKey();
-
-        List<Event> queue = new ArrayList<>();
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(Collections.singleton(eventKey)).toMat(Sink.foreach(queue::add), Keep.left()).run(baseProperties.resumingMat());
-        subscription.ready().get(10, TimeUnit.SECONDS);
-        Thread.sleep(500); // Needed for getting the latest event
-
-        IEventPublisher publisher = baseProperties.jPublisher();
-        counter = -1;
-        cancellable = publisher.publishAsync(() -> {
-            counter += 1;
-            if(counter == 0) {
-                return CompletableFuture.completedFuture(Optional.of(event));
-            } else {
-                return CompletableFuture.completedFuture(Optional.empty());
-            }
-        },new UTCTime(UTCTime.now().value().plusSeconds(1)), Duration.ofMillis(300));
-
-
-        Thread.sleep(2000);
-        cancellable.cancel();
-
-        List<Event> events = new ArrayList<>();
-        events.add(0, Event$.MODULE$.invalidEvent(eventKey));
-        events.add(1, event);
-
-        Assert.assertEquals(queue.size(), 2);
-        Assert.assertTrue(queue.containsAll(events));
+        Assert.assertEquals(queue.size(), 3);
+        Assert.assertTrue(queue.containsAll(events.subList(0, 3)));
     }
 }

@@ -97,9 +97,10 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     var counter                      = -1
     val events: immutable.Seq[Event] = for (i ← 1 to 10) yield makeEvent(i)
 
-    def eventGenerator(): Option[Event] = Option {
+    def eventGenerator(): Option[Event] = {
       counter += 1
-      events(counter)
+      if (counter > 1) None
+      else Some(events(counter))
     }
 
     val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
@@ -115,7 +116,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
 
     // subscriber will receive an invalid event first as subscription happened before publishing started.
     // The 4 published events will follow
-    queue should (have length 5 and contain allElementsOf Seq(Event.invalidEvent(eventKey)) ++ events.take(4))
+    queue should (have length 3 and contain allElementsOf Seq(Event.invalidEvent(eventKey)) ++ events.take(2))
   }
 
   //DEOPSCSW-341: Allow to reuse single connection for subscribing to multiple EventKeys
@@ -148,11 +149,12 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
 
     def eventGenerator(): Future[Option[Event]] = Future {
       counter += 1
-      Some(events(counter))
+      if (counter > 1) None
+      else Some(events(counter))
     }
 
     val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
-    val eventKey: EventKey          = events(0).eventKey
+    val eventKey: EventKey          = events.head.eventKey
 
     val subscription = subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](queue.enqueue(_))).run()
     subscription.ready().await
@@ -164,7 +166,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
 
     // subscriber will receive an invalid event first as subscription happened before publishing started.
     // The 4 published events will follow
-    queue should (have length 5 and contain allElementsOf Seq(Event.invalidEvent(eventKey)) ++ events.take(4))
+    queue should (have length 3 and contain allElementsOf Seq(Event.invalidEvent(eventKey)) ++ events.take(2))
   }
 
   //DEOPSCSW-595: Enforce ordering in publish
@@ -213,7 +215,8 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
 
     def eventGenerator(): Option[Event] = {
       counter += 1
-      Some(events(counter))
+      if (counter > 1) None
+      else Some(events(counter))
     }
 
     val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
@@ -223,17 +226,14 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     subscription.ready().await
     Thread.sleep(500) // Needed for getting the latest event
 
-    val cancellable = publisher.publish(
-      eventGenerator(),
-      UTCTime(UTCTime.now().value.plusSeconds(1)),
-      300.millis
-    )
+    val cancellable = publisher.publish(eventGenerator(), UTCTime(UTCTime.now().value.plusSeconds(1)), 300.millis)
+
     Thread.sleep(2000)
     cancellable.cancel()
 
     // subscriber will receive an invalid event first as subscription happened before publishing started.
     // The 4 published events will follow
-    queue should (have length 5 and contain allElementsOf Seq(Event.invalidEvent(eventKey)) ++ events.take(4))
+    queue should (have length 3 and contain allElementsOf Seq(Event.invalidEvent(eventKey)) ++ events.take(2))
   }
 
   //DEOPSCSW-515: Include Start Time in API
@@ -246,7 +246,8 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
 
     def eventGenerator(): Future[Option[Event]] = Future {
       counter += 1
-      Some(events(counter))
+      if (counter > 1) None
+      else Some(events(counter))
     }
 
     val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
@@ -266,74 +267,6 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
 
     // subscriber will receive an invalid event first as subscription happened before publishing started.
     // The 4 published events will follow
-    queue should (have length 5 and contain allElementsOf Seq(Event.invalidEvent(eventKey)) ++ events.take(4))
-  }
-
-  //DEOPSCSW-516: Optionally Publish - API Change
-  @Test(dataProvider = "event-service-provider")
-  def should_skip_publishing_missing_optional_event_via_event_generator_with_start_time(baseProperties: BaseProperties): Unit = {
-    import baseProperties._
-
-    var counter      = -1
-    val event: Event = makeEventWithPrefix(id = 31, prefix = Prefix("test.publish.empty"))
-
-    def eventGenerator(): Option[Event] = {
-      counter += 1
-      if (counter == 0) Some(event) else None
-    }
-
-    val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
-    val eventKey: EventKey          = event.eventKey
-
-    val subscription = subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](queue.enqueue(_))).run()
-    subscription.ready().await
-    Thread.sleep(500) // Needed for getting the latest event
-
-    val cancellable = publisher.publish(
-      eventGenerator(),
-      UTCTime(UTCTime.now().value.plusSeconds(1)),
-      300.millis
-    )
-    Thread.sleep(2000)
-    cancellable.cancel()
-
-    // subscriber will receive an invalid event first as subscription happened before publishing started.
-    // The 4 published events will follow
-    queue should (have length 2 and contain allElementsOf Seq(Event.invalidEvent(eventKey)) :+ event)
-  }
-
-  //DEOPSCSW-516: Optionally Publish - API Change
-  @Test(dataProvider = "event-service-provider")
-  def should_skip_publishing_missing_optional_event_via_asynchronous_event_generator_with_start_time(
-      baseProperties: BaseProperties
-  ): Unit = {
-    import baseProperties._
-
-    var counter      = -1
-    val event: Event = makeEventWithPrefix(id = 32, prefix = Prefix("test.publishAsync.empty"))
-
-    def eventGenerator(): Future[Option[Event]] = Future {
-      counter += 1
-      if (counter == 0) Some(event) else None
-    }
-
-    val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
-    val eventKey: EventKey          = event.eventKey
-
-    val subscription = subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](queue.enqueue(_))).run()
-    subscription.ready().await
-    Thread.sleep(500) // Needed for getting the latest event
-
-    val cancellable = publisher.publishAsync(
-      eventGenerator(),
-      UTCTime(UTCTime.now().value.plusSeconds(1)),
-      300.millis
-    )
-    Thread.sleep(2000)
-    cancellable.cancel()
-
-    // subscriber will receive an invalid event first as subscription happened before publishing started.
-    // The 4 published events will follow
-    queue should (have length 2 and contain allElementsOf Seq(Event.invalidEvent(eventKey)) :+ event)
+    queue should (have length 3 and contain allElementsOf Seq(Event.invalidEvent(eventKey)) ++ events.take(2))
   }
 }
