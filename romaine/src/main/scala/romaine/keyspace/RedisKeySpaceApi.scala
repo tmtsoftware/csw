@@ -58,11 +58,7 @@ class RedisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
 
     val source = initialValuesF.map(initialValues => {
 
-      watchKeyspaceEvent(keys, overflowStrategy)
-        .collect {
-          case RedisResult(k, Updated(v)) ⇒ RedisResult(k, Some(v))
-          case RedisResult(k, Removed)    ⇒ RedisResult(k, None)
-        }
+      watchKeyspaceValue(keys, overflowStrategy)
         .statefulMapConcat(() => {
           var digest = initialValues
           redisResult =>
@@ -76,10 +72,6 @@ class RedisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
               r
             }
         })
-        .distinctUntilChanged
-        .collect {
-          case r @ RedisResult(_, RedisValueChange(a, b)) if a != b => r
-        }
     })
 
     Source
