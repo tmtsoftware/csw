@@ -50,12 +50,12 @@ class NetworksTest extends FunSuite with Matchers with BeforeAndAfterAll with Be
   }
 
   test("testGetIpv4Address throws NetworkInterfaceNotFound when provided interface name is not present") {
-    a[NetworkInterfaceNotFound] shouldBe thrownBy(Networks("test").ipv4Address)
+    a[NetworkInterfaceNotFound] shouldBe thrownBy(Networks(Some("test")).ipv4Address)
   }
 
   test("testGetIpv4Address returns inet address when provided a valid interface name") {
     val inetAddresses: List[InetAddress] =
-      NetworkInterface.getNetworkInterfaces.asScala.toList.map(iface ⇒ Networks(iface.getName).ipv4Address)
+      NetworkInterface.getNetworkInterfaces.asScala.toList.map(iface ⇒ Networks(Some(iface.getName)).ipv4Address)
     inetAddresses.contains(InetAddress.getLocalHost) shouldEqual true
   }
 }

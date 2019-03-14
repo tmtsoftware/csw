@@ -91,7 +91,7 @@ private[location] case class ClusterSettings(clusterName: String = Constants.Clu
   private lazy val allValues = sys.env ++ sys.props ++ values
 
   //If no interfaceName is provided then use empty value for it.
-  private[location] def interfaceName: String = allValues.getOrElse(InterfaceNameKey, "").toString
+  private[location] def interfaceName: Option[String] = allValues.get(InterfaceNameKey).map(_.toString)
 
   //Get the host address based on interfaceName provided.
   //If it is empty then get the default ipv4 address to start the current ActorSystem on.
