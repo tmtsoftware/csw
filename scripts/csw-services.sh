@@ -28,6 +28,8 @@
 # Run from the directory containing the script
 cd "$( dirname "${BASH_SOURCE[0]}" )"
 
+export TMT_LOG_HOME=/tmp/csw/logs
+
 # Setting default values
 seed_port=5552
 location_http_port=7654
@@ -59,21 +61,16 @@ minRedisVersion=4.0
 redisSentinel=redis-sentinel
 redisClient=`echo ${redisSentinel} | sed -e 's/-sentinel/-cli/'`
 
-locationLogFile=${logDir}/location.log
 locationPidFile=${logDir}/location.pid
 
-configLogFile=${logDir}/config.log
 configPidFile=${logDir}/config.pid
 
-sentinelLogFile=${logDir}/redis_sentinel.log
 sentinelPidFile=${logDir}/redis_sentinel.pid
 sentinelPortFile=${logDir}/redis_sentinel.port
 
-eventMasterLogFile=${logDir}/event_master.log
 eventMasterPidFile=${logDir}/event_master.pid
 eventMasterPortFile=${logDir}/event_master.port
 
-alarmMasterLogFile=${logDir}/alarm_master.log
 alarmMasterPidFile=${logDir}/alarm_master.pid
 alarmMasterPortFile=${logDir}/alarm_master.port
 
@@ -81,7 +78,6 @@ AASLogFile=${logDir}/AAS.log
 AASPidFile=${logDir}/AAS.pid
 AASPortFile=${logDir}/AAS.port
 
-DBLogFile=${logDir}/DB.log
 DBPidFile=${logDir}/DB.pid
 DBPortFile=${logDir}/DB.port
 
@@ -151,7 +147,7 @@ function start_seed {
 
     if [[ -x "$location_script" ]]; then
         echo "[LOCATION] Starting cluster seed on port: [$seed_port] ..."
-        nohup ./csw-location-server --clusterPort ${seed_port} --testMode -J-DclusterSeeds=${seeds} -J-Dcsw-location-server.http-port=${location_http_port} &> ${locationLogFile} &
+        nohup ./csw-location-server --clusterPort ${seed_port} --testMode -J-DclusterSeeds=${seeds} -J-Dcsw-location-server.http-port=${location_http_port} &
         echo $! > ${locationPidFile}
     else
         echo "[ERROR] $location_script script does not exist, please make sure that $location_script resides in same directory as $script_name"
@@ -164,7 +160,7 @@ function start_config {
 
     if [[ -x "$config_script" ]]; then
         echo "[CONFIG] Starting config service on port: [$config_port] ..."
-        nohup ./csw-config-server --port ${config_port} ${initSvnRepo} -J-Dcsw-location-client.server-http-port=${location_http_port} &> ${configLogFile}  &
+        nohup ./csw-config-server --port ${config_port} ${initSvnRepo} -J-Dcsw-location-client.server-http-port=${location_http_port} &
         echo $! > ${configPidFile}
     else
         echo "[ERROR] $config_script script does not exist, please make sure that $config_script resides in same directory as $script_name"
@@ -176,7 +172,7 @@ function start_db() {
     if [[ -x "$location_agent_script" ]]; then
         echo "[DATABASE] Starting Database Service on port; [$db_port] ..."
         echo "[DATABASE] Make sure to set PGDATA env variable to postgres data directory where postgres is installed e.g. for mac: /usr/local/var/postgres"
-        nohup ./csw-location-agent --name "DatabaseServer" --command "postgres --hba_file=$dbPgHbaConf --unix_socket_directories=$dbUnixSocketDirs -i -p $db_port" --port "$db_port" -J-Dcsw-location-client.server-http-port=${location_http_port}> ${DBLogFile} 2>&1 &
+        nohup ./csw-location-agent --name "DatabaseServer" --command "postgres --hba_file=$dbPgHbaConf --unix_socket_directories=$dbUnixSocketDirs -i -p $db_port" --port "$db_port" -J-Dcsw-location-client.server-http-port=${location_http_port} &
         echo $! > ${DBPidFile}
         echo ${db_port} > ${DBPortFile}
     else
@@ -192,7 +188,7 @@ function start_sentinel() {
             cp -f ${sentinelTemplateConf} ${sentinelConf}
             sed -i- -e "s/eventServer 127.0.0.1/eventServer ${IP}/g" ${sentinelConf}
             sed -i- -e "s/alarmServer 127.0.0.1/alarmServer ${IP}/g" ${sentinelConf}
-            nohup ./csw-location-agent --name "EventServer,AlarmServer" --command "$redisSentinel ${sentinelConf} --port ${sentinel_port}" --port "${sentinel_port}" -J-Dcsw-location-client.server-http-port=${location_http_port}> ${sentinelLogFile} 2>&1 &
+            nohup ./csw-location-agent --name "EventServer,AlarmServer" --command "$redisSentinel ${sentinelConf} --port ${sentinel_port}" --port "${sentinel_port}" -J-Dcsw-location-client.server-http-port=${location_http_port} &
             echo $! > ${sentinelPidFile}
             echo ${sentinel_port} > ${sentinelPortFile}
         else
@@ -219,24 +215,23 @@ function start_AAS() {
 
 function start_event() {
     echo "[EVENT] Starting Event Service..."
-    start_redis ${eventMasterConf} ${eventMasterLogFile} ${eventMasterPidFile} ${event_master_port} ${eventMasterPortFile}
+    start_redis ${eventMasterConf} ${eventMasterPidFile} ${event_master_port} ${eventMasterPortFile}
 }
 
 function start_alarm() {
     echo "[ALARM] Starting Alarm Service..."
-    start_redis ${alarmMasterConf} ${alarmMasterLogFile} ${alarmMasterPidFile} ${alarm_master_port} ${alarmMasterPortFile}
+    start_redis ${alarmMasterConf} ${alarmMasterPidFile} ${alarm_master_port} ${alarmMasterPortFile}
 }
 
 function start_redis() {
     local conf=$1
-    local logFile=$2
-    local pidFile=$3
-    local port=$4
-    local portFile=$5
+    local pidFile=$2
+    local port=$3
+    local portFile=$4
 
     if [[ -x "$location_agent_script" ]]; then
         if checkIfRedisIsInstalled ; then
-            nohup redis-server ${conf} > ${logFile} 2>&1 &
+            nohup redis-server ${conf} &
             echo $! > ${pidFile}
             echo ${port} > ${portFile}
         else
@@ -408,10 +403,10 @@ function parse_cmd_args {
             ;;
         stop)
             # Stop Redis
-            stop "Redis Sentinel" ${sentinelPidFile} ${sentinelPortFile} ${sentinelLogFile} " ${redisClient} -p $(cat ${sentinelPortFile}) shutdown"
-            stop "Event Server" ${eventMasterPidFile} ${eventMasterPortFile} ${eventMasterLogFile} " ${redisClient} -p $(cat ${eventMasterPortFile}) shutdown"
-            stop "Alarm Server" ${alarmMasterPidFile} ${alarmMasterPortFile} ${alarmMasterLogFile} " ${redisClient} -p $(cat ${alarmMasterPortFile}) shutdown"
-            stop "Database Server" ${DBPidFile} ${DBPortFile} ${DBLogFile} "pg_ctl stop"
+            stop "Redis Sentinel" ${sentinelPidFile} ${sentinelPortFile} " ${redisClient} -p $(cat ${sentinelPortFile}) shutdown"
+            stop "Event Server" ${eventMasterPidFile} ${eventMasterPortFile} " ${redisClient} -p $(cat ${eventMasterPortFile}) shutdown"
+            stop "Alarm Server" ${alarmMasterPidFile} ${alarmMasterPortFile} " ${redisClient} -p $(cat ${alarmMasterPortFile}) shutdown"
+            stop "Database Server" ${DBPidFile} ${DBPortFile} "pg_ctl stop"
 
             # Stop Cluster Seed application
             if [[ ! -f ${locationPidFile} ]]; then
@@ -420,7 +415,7 @@ function parse_cmd_args {
                 local PID=$(cat ${locationPidFile})
                 echo "[LOCATION] Stopping Cluster Seed application..."
                 kill ${PID} &> /dev/null
-                rm -f ${locationPidFile} ${locationLogFile}
+                rm -f ${locationPidFile}
                 echo "[LOCATION] Cluster Seed stopped."
             fi
 
@@ -431,7 +426,7 @@ function parse_cmd_args {
                 local PID=$(cat ${configPidFile})
                 echo "[CONFIG] Stopping Config Service..."
                 kill ${PID} &> /dev/null
-                rm -f ${configPidFile} ${configLogFile}
+                rm -f ${configPidFile}
                 echo "[CONFIG] Config Service stopped"
             fi
 
@@ -458,8 +453,7 @@ function stop() {
  local serviceName=$1
  local pidFile=$2
  local portFile=$3
- local logFile=$4
- local command=$5
+ local command=$4
     if [[ ! -f ${pidFile} ]]; then
         echo "$serviceName $pidFile does not exist, process is not running."
     else
@@ -472,7 +466,7 @@ function stop() {
             sleep 1
         done
         echo "$serviceName stopped."
-        rm -f ${portFile} ${pidFile} ${logFile}
+        rm -f ${portFile} ${pidFile}
     fi
 }
 
