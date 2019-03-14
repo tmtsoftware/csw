@@ -3,7 +3,7 @@ package csw.framework.deploy.hostconfig
 import java.nio.file.Paths
 
 import org.mockito.Mockito.{times, verify, when}
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
 // DEOPSCSW-314: End to End Automated Test for host-config-app

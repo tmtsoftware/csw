@@ -37,7 +37,8 @@ object Common extends AutoPlugin {
       "-Ywarn-dead-code",
       "-Xfuture",
 //      "-Xprint:typer"
-      if (cycleCheckEnabled && detectCycles.value) "-P:acyclic:force" else ""
+      if (cycleCheckEnabled && detectCycles.value) "-P:acyclic:force" else "",
+      if (suppressAnnotatedWarnings.value) s"-P:silencer:sourceRoots=${baseDirectory.value.getCanonicalPath}" else ""
     ),
     javacOptions in (Compile, doc) ++= Seq("-Xdoclint:none"),
     javacOptions in doc ++= (
@@ -59,8 +60,8 @@ object Common extends AutoPlugin {
     isSnapshot := !sys.props.get("prod.publish").contains("true"),
     fork := true,
     detectCycles := true,
-    libraryDependencies ++= Seq(`acyclic`, `silencer-lib`),
     suppressAnnotatedWarnings := true,
+    libraryDependencies ++= Seq(`acyclic`, `silencer-lib`),
     libraryDependencies ++= (if (suppressAnnotatedWarnings.value) Seq(compilerPlugin(`silencer-plugin`)) else Seq.empty),
     autoCompilerPlugins := true,
     cancelable in Global := true, // allow ongoing test(or any task) to cancel with ctrl + c and still remain inside sbt

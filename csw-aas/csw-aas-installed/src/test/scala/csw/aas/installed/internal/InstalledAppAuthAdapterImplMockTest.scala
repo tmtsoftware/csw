@@ -13,7 +13,6 @@ import org.scalatest.{FunSuite, Matchers}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
-import scala.language.implicitConversions
 
 //DEOPSCSW-575: Client Library for AAS to be accessed by CSW cli apps
 class InstalledAppAuthAdapterImplMockTest extends FunSuite with MockitoSugar with Matchers {

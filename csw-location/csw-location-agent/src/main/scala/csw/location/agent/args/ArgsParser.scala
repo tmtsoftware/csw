@@ -32,15 +32,15 @@ class ArgsParser(name: String) {
 
     opt[String]('c', "command") valueName "<name>" action { (x, c) =>
       c.copy(command = Some(x))
-    } text "The parameter is optional. The command that starts the target application. Use use %port to specify the port number. If parameter is not provided value $name.command from config file will be picked up. If value in config file is not found, the service names provided will be registered with Location Service."
+    } text s"The parameter is optional. The command that starts the target application. Use use %port to specify the port number. If parameter is not provided value $$name.command from config file will be picked up. If value in config file is not found, the service names provided will be registered with Location Service."
 
     opt[Int]('p', "port") valueName "<number>" action { (x, c) =>
       c.copy(port = Some(x))
-    } text "Optional port number the application listens on (default: use value of $name.port from config file, or use a random, free port.)"
+    } text s"Optional port number the application listens on (default: use value of $$name.port from config file, or use a random, free port.)"
 
     arg[File]("<app-config>") optional () maxOccurs 1 action { (x, c) =>
       c.copy(appConfigFile = Some(x))
-    } text "optional config file in HOCON format (Options specified as: $name.command, $name.port, etc.)"
+    } text s"optional config file in HOCON format (Options specified as: $$name.command, $$name.port, etc.)"
 
     opt[Int]("delay") action { (x, c) =>
       c.copy(delay = Some(x))

@@ -35,11 +35,11 @@ import scala.concurrent.duration.DurationInt
 @Measurement(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS, batchSize = 1)
 class CommandServiceBenchmark {
 
-  implicit var timeout: util.Timeout = _
-  implicit var scheduler: Scheduler  = _
-  var setupCommand: commands.Setup   = _
-  var componentRef: CommandService   = _
-  var adminWiring: ServerWiring      = _
+  implicit var timeout: util.Timeout    = _
+  implicit var scheduler: Scheduler     = _
+  var setupCommand: commands.Setup      = _
+  var componentRef: CommandService      = _
+  private var adminWiring: ServerWiring = _
 
   @Setup(Level.Trial)
   def setup(): Unit = {

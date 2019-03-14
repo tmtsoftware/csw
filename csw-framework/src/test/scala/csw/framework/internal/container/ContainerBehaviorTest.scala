@@ -47,7 +47,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar wit
     val eventService: EventServiceFactory                 = mock[EventServiceFactory]
     val alarmService: AlarmServiceFactory                 = mock[AlarmServiceFactory]
     val registrationResult: RegistrationResult            = mock[RegistrationResult]
-    var supervisorInfos: Set[SupervisorInfo]              = Set.empty
+    private var supervisorInfos: Set[SupervisorInfo]      = Set.empty
     var componentProbes: Set[TestProbe[ComponentMessage]] = Set.empty
     val supervisorInfoFactory: SupervisorInfoFactory      = mock[SupervisorInfoFactory]
 

@@ -499,7 +499,10 @@ lazy val examples = project
   )
   .enablePlugins(DeployApp)
   .settings(
-    libraryDependencies ++= Dependencies.Examples.value
+    libraryDependencies ++= Dependencies.Examples.value,
+    scalacOptions ++= Seq(
+      if(Common.suppressAnnotatedWarnings.value) "-P:silencer:pathFilters=.*" else ""
+    )
   )
 
 /* ================ Jmh Benchmarks ============== */
