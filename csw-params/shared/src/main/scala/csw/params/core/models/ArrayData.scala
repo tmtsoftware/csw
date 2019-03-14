@@ -2,6 +2,7 @@ package csw.params.core.models
 
 import java.util
 
+import com.github.ghik.silencer.silent
 import play.api.libs.json.{Format, Json}
 
 import scala.collection.JavaConverters._
@@ -70,5 +71,5 @@ object ArrayData {
    * @tparam B the destination type of data
    * @return a function of type ArrayData[A] ⇒ ArrayData[B]
    */
-  implicit def conversion[A, B](implicit conversion: A ⇒ B): ArrayData[A] ⇒ ArrayData[B] = _.asInstanceOf[ArrayData[B]]
+  implicit def conversion[A, B](implicit @silent conversion: A ⇒ B): ArrayData[A] ⇒ ArrayData[B] = _.asInstanceOf[ArrayData[B]]
 }

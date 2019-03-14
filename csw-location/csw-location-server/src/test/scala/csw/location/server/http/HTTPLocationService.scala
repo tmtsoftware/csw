@@ -15,8 +15,8 @@ trait HTTPLocationService
     with ScalaFutures
     with MockitoSugar {
 
-  private val locationPort                 = 3553
-  var locationWiring: Option[ServerWiring] = None
+  private val locationPort                         = 3553
+  private var locationWiring: Option[ServerWiring] = None
 
   def start(clusterPort: Option[Int] = Some(locationPort), httpPort: Option[Int] = None): Unit = {
     locationWiring = Some(ServerWiring.make(clusterPort, httpPort))

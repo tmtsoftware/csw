@@ -1,5 +1,6 @@
 package csw.event.client.pb
 
+import com.github.ghik.silencer.silent
 import csw.params.core.models._
 import csw.time.core.models.{TAITime, UTCTime}
 import csw_protobuf.parameter.PbParameter.Items
@@ -63,6 +64,6 @@ object ItemsFactory {
    * @tparam B the destination type of data
    * @return a function of type ArrayData[A] ⇒ ArrayData[B]
    */
-  implicit def genericItemsFactory[A: ItemsFactory, B](implicit conversion: A ⇒ B): ItemsFactory[B] =
+  implicit def genericItemsFactory[A: ItemsFactory, B](implicit @silent conversion: A ⇒ B): ItemsFactory[B] =
     ItemsFactory[A].asInstanceOf[ItemsFactory[B]]
 }

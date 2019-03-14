@@ -10,7 +10,8 @@ object Common extends AutoPlugin {
 
   override def requires: Plugins = JvmPlugin
 
-  val detectCycles: SettingKey[Boolean] = settingKey[Boolean]("is cyclic check enabled?")
+  val detectCycles: SettingKey[Boolean]              = settingKey[Boolean]("is cyclic check enabled?")
+  val suppressAnnotatedWarnings: SettingKey[Boolean] = settingKey[Boolean]("enable annotation based suppression of warnings")
 
   override lazy val projectSettings: Seq[Setting[_]] = Seq(
     organization := "com.github.tmtsoftware.csw",
@@ -58,7 +59,9 @@ object Common extends AutoPlugin {
     isSnapshot := !sys.props.get("prod.publish").contains("true"),
     fork := true,
     detectCycles := true,
-    libraryDependencies += `acyclic`,
+    libraryDependencies ++= Seq(`acyclic`, `silencer-lib`),
+    suppressAnnotatedWarnings := true,
+    libraryDependencies ++= (if (suppressAnnotatedWarnings.value) Seq(compilerPlugin(`silencer-plugin`)) else Seq.empty),
     autoCompilerPlugins := true,
     cancelable in Global := true, // allow ongoing test(or any task) to cancel with ctrl + c and still remain inside sbt
     if (formatOnCompile) scalafmtOnCompile := true else scalafmtOnCompile := false,

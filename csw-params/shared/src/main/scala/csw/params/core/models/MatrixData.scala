@@ -2,6 +2,7 @@ package csw.params.core.models
 
 import java.util
 
+import com.github.ghik.silencer.silent
 import play.api.libs.json.{Format, Json}
 
 import scala.collection.JavaConverters._
@@ -14,7 +15,7 @@ import scala.reflect.ClassTag
  *
  * @param data input array of array
  */
-case class MatrixData[T](data: mutable.WrappedArray[mutable.WrappedArray[T]])(implicit cTag: ClassTag[T]) {
+case class MatrixData[T: ClassTag](data: mutable.WrappedArray[mutable.WrappedArray[T]]) {
 
   /**
    * Returns a value stored at position represented by [row][col]
@@ -82,6 +83,6 @@ object MatrixData {
    * @tparam B the destination type of data
    * @return a function of type MatrixData[A] ⇒ MatrixData[B]
    */
-  implicit def conversion[A, B](implicit conversion: A ⇒ B): MatrixData[A] ⇒ MatrixData[B] =
+  implicit def conversion[A, B](implicit @silent conversion: A ⇒ B): MatrixData[A] ⇒ MatrixData[B] =
     _.asInstanceOf[MatrixData[B]]
 }

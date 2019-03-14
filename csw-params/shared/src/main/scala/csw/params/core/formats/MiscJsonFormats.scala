@@ -3,6 +3,7 @@ package csw.params.core.formats
 import java.lang
 import java.time.Instant
 
+import com.github.ghik.silencer.silent
 import play.api.libs.json._
 
 /**
@@ -11,7 +12,8 @@ import play.api.libs.json._
  */
 trait MiscJsonFormats {
 
-  private def formatFactory[S: Format, J](implicit conversion: S => J): Format[J] = implicitly[Format[S]].asInstanceOf[Format[J]]
+  private def formatFactory[S: Format, J](implicit @silent conversion: S => J): Format[J] =
+    implicitly[Format[S]].asInstanceOf[Format[J]]
 
   //scala
   implicit val charFormat: Format[Char] = new Format[Char] {

@@ -4,13 +4,14 @@ import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.{KeyType, SimpleKeyType}
 import csw.params.core.models.{ArrayData, MatrixData}
 import play.api.libs.json.Format
+import com.github.ghik.silencer.silent
 
 import scala.reflect.ClassTag
 
 /**
  * SimpleKeyType with a name for java Keys. Holds instances of primitives such as char, int, String etc.
  */
-sealed class JSimpleKeyType[S: Format: ClassTag, T](implicit conversion: T ⇒ S) extends SimpleKeyType[S]
+sealed class JSimpleKeyType[S: Format: ClassTag, T](implicit @silent conversion: T ⇒ S) extends SimpleKeyType[S]
 
 /**
  * A java KeyType that holds array
