@@ -2,13 +2,13 @@ package example.time
 
 import java.time.Duration
 
-import akka.actor.{ActorRef, ActorSystem}
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter.{TypedActorRefOps, TypedActorSystemOps}
-import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
+import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
+import akka.actor.{ActorRef, ActorSystem}
+import csw.time.core.models.UTCTime
 import csw.time.scheduler.TimeServiceSchedulerFactory
 import csw.time.scheduler.api.TimeServiceScheduler
-import csw.time.core.models.UTCTime
 
 class SchedulerExamples(ctx: ActorContext[UTCTime]) {
 
@@ -27,15 +27,18 @@ class SchedulerExamples(ctx: ActorContext[UTCTime]) {
   // #schedule-once
 
   // #schedule-once-with-actorRef
-  class SchedulingHandler(ctx: ActorContext[UTCTime]) extends AbstractBehavior[UTCTime] {
-    override def onMessage(msg: UTCTime): Behavior[UTCTime] = {
-      // handle the message to execute the task on scheduled time
-      Behaviors.same
+  object SchedulingHandler {
+    def behavior: Behavior[UTCTime] = Behaviors.setup { ctx ⇒
+      //setup required for the actor
+
+      Behaviors.receiveMessage {
+        case _ ⇒ // handle the message to execute the task on scheduled time and return new behavior
+          Behaviors.same
+      }
     }
   }
 
-  private val behavior: Behavior[UTCTime] = Behaviors.setup(ctx ⇒ new SchedulingHandler(ctx))
-  private val actorRef: ActorRef          = ctx.spawnAnonymous(behavior).toUntyped
+  private val actorRef: ActorRef = ctx.spawnAnonymous(SchedulingHandler.behavior).toUntyped
 
   scheduler.scheduleOnce(utcTime, actorRef, UTCTime.now())
 

@@ -57,8 +57,8 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
         resolveHcd().map {
           case Some(hcd) ⇒
             runningHcds = runningHcds.updated(maybeConnection.get, Some(CommandServiceFactory.make(hcd)(ctx.system)))
-            diagnosticsPublisher = ctx.spawnAnonymous(DiagnosticsPublisher.make(runningHcds(maybeConnection.get).get, worker))
-            commandHandler = ctx.spawnAnonymous(CommandHandler.make(calculationConfig, runningHcds(maybeConnection.get)))
+            diagnosticsPublisher = ctx.spawnAnonymous(DiagnosticsPublisher.behavior(runningHcds(maybeConnection.get).get, worker))
+            commandHandler = ctx.spawnAnonymous(CommandHandler.behavior(calculationConfig, runningHcds(maybeConnection.get)))
           case None ⇒ // do something
         }
       case None ⇒ Future.successful(Unit)

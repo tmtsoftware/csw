@@ -1,14 +1,14 @@
 package example.event
 
-import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
+import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, Behavior}
 import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
 import csw.command.client.messages.TopLevelActorMessage
-import csw.params.events.{Event, EventKey, EventName}
+import csw.event.api.scaladsl.{EventService, EventSubscription, SubscriptionModes}
 import csw.location.api.models.AkkaLocation
 import csw.params.core.models.Subsystem
-import csw.event.api.scaladsl.{EventService, EventSubscription, SubscriptionModes}
+import csw.params.events.{Event, EventKey, EventName}
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
@@ -42,19 +42,19 @@ class EventSubscribeExamples(eventService: EventService, hcd: AkkaLocation)(impl
   //#with-actor-ref
   def subscribe(ctx: ActorContext[TopLevelActorMessage]): EventSubscription = {
     val subscriber                    = eventService.defaultSubscriber
-    val eventHandler: ActorRef[Event] = ctx.spawnAnonymous(EventHandler.make())
+    val eventHandler: ActorRef[Event] = ctx.spawnAnonymous(EventHandler.behavior)
 
     subscriber.subscribeActorRef(Set(EventKey(hcd.prefix, EventName("filter_wheel"))), eventHandler)
   }
 
   object EventHandler {
-    def make(): Behavior[Event] = Behaviors.setup(ctx ⇒ new EventHandler(ctx))
-  }
+    val behavior: Behavior[Event] = Behaviors.setup { ctx ⇒
+      //setup required for the actor
 
-  class EventHandler(ctx: ActorContext[Event]) extends AbstractBehavior[Event] {
-    override def onMessage(msg: Event): Behavior[Event] = {
-      // handle messages
-      Behaviors.same
+      Behaviors.receiveMessage {
+        case _ ⇒ //handle messages and return new behavior with changed state
+          Behaviors.same
+      }
     }
   }
   //#with-actor-ref

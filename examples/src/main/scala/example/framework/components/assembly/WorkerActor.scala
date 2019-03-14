@@ -23,6 +23,5 @@ object WorkerActor {
     }
 
     receive(-1)
-
   }
 }

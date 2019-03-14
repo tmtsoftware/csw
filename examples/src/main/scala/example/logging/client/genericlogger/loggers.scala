@@ -1,6 +1,7 @@
 package example.logging.client.genericlogger
 
-import akka.actor.typed.scaladsl.ActorContext
+import akka.actor.typed.Behavior
+import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import csw.command.client.messages.ComponentMessage
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.GenericLoggerFactory
@@ -13,12 +14,17 @@ class GenericClass {
 //#generic-logger-class
 
 //#generic-logger-actor
-class GenericActor extends akka.actor.AbstractActor {
+object GenericActor {
 
-  //context is available from akka.actor.Actor
-  val log: Logger = GenericLoggerFactory.getLogger(context)
+  def behavior[T]: Behavior[T] = Behaviors.setup[T] { context ⇒
+    val log: Logger = GenericLoggerFactory.getLogger(context)
+    // actor setup
 
-  override def createReceive() = ???
+    Behaviors.receiveMessage {
+      case _ ⇒ // handle messages and return new behavior
+        Behaviors.same
+    }
+  }
 }
 //#generic-logger-actor
 
