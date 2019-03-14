@@ -41,15 +41,15 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar wit
   private val mocks                              = new FrameworkTestMocks()
 
   class IdleContainer() {
-    private val testActor: ActorRef[Any]                  = TestProbe("test-probe").ref
-    val akkaRegistration                                  = AkkaRegistration(mock[AkkaConnection], Prefix("nfiraos.ncc.trombone"), testActor)
-    val locationService: LocationService                  = mock[LocationService]
-    val eventService: EventServiceFactory                 = mock[EventServiceFactory]
-    val alarmService: AlarmServiceFactory                 = mock[AlarmServiceFactory]
-    val registrationResult: RegistrationResult            = mock[RegistrationResult]
-    private var supervisorInfos: Set[SupervisorInfo]      = Set.empty
-    var componentProbes: Set[TestProbe[ComponentMessage]] = Set.empty
-    val supervisorInfoFactory: SupervisorInfoFactory      = mock[SupervisorInfoFactory]
+    private val testActor: ActorRef[Any]                        = TestProbe("test-probe").ref
+    val akkaRegistration                                        = AkkaRegistration(mock[AkkaConnection], Prefix("nfiraos.ncc.trombone"), testActor)
+    val locationService: LocationService                        = mock[LocationService]
+    val eventService: EventServiceFactory                       = mock[EventServiceFactory]
+    val alarmService: AlarmServiceFactory                       = mock[AlarmServiceFactory]
+    val registrationResult: RegistrationResult                  = mock[RegistrationResult]
+    private[container] var supervisorInfos: Set[SupervisorInfo] = Set.empty
+    var componentProbes: Set[TestProbe[ComponentMessage]]       = Set.empty
+    val supervisorInfoFactory: SupervisorInfoFactory            = mock[SupervisorInfoFactory]
 
     private def answer(ci: ComponentInfo): Future[Some[SupervisorInfo]] = {
       val componentProbe: TestProbe[ComponentMessage] = TestProbe(ci.name)
