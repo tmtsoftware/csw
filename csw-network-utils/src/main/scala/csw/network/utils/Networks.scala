@@ -3,6 +3,9 @@ package csw.network.utils
 import java.net.{Inet6Address, InetAddress}
 
 import com.typesafe.config.ConfigFactory
+import csw.logging.api.scaladsl.Logger
+import csw.network.utils.commons.NetworksLogger
+import csw.network.utils.exceptions.{NetworkInterfaceNotFound, NetworkInterfaceNotProvided}
 import csw.network.utils.internal.NetworkInterfaceProvider
 
 /**
@@ -48,6 +51,8 @@ case class Networks(interfaceName: String, networkProvider: NetworkInterfaceProv
 
 object Networks {
 
+  private val log: Logger = NetworksLogger.getLogger
+
   /**
    * Picks an appropriate ipv4 address from the network interface provided.
    * If no specific network interface is provided, the first available interface will be taken to pick address
@@ -61,7 +66,11 @@ object Networks {
         (sys.env ++ sys.props).getOrElse(
           "interfaceName", {
             if (ConfigFactory.load().getBoolean("csw-networks.hostname.automatic")) ""
-            else throw new RuntimeException("interfaceName env variable is not set.")
+            else {
+              val networkInterfaceNotProvided = NetworkInterfaceNotProvided("interfaceName env variable is not set.")
+              log.error(networkInterfaceNotProvided.message, ex = networkInterfaceNotProvided)
+              throw networkInterfaceNotProvided
+            }
           }
         )
     }

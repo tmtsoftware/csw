@@ -37,7 +37,7 @@ class ClusterSettingsTest extends FunSuite with Matchers with BeforeAndAfterAll 
     val clusterSettings: ClusterSettings =
       ClusterSettings().withInterface("en0").onPort(port).joinSeeds("10.10.10.10, 10.10.10.11")
 
-    clusterSettings.interfaceName shouldBe "en0"
+    clusterSettings.interfaceName shouldBe Some("en0")
     clusterSettings.port shouldBe port
     clusterSettings.seedNodes shouldBe List("10.10.10.10", "10.10.10.11").map { hostname =>
       s"akka://${clusterSettings.clusterName}@$hostname"
@@ -63,7 +63,7 @@ class ClusterSettingsTest extends FunSuite with Matchers with BeforeAndAfterAll 
     val values                           = Map("interfaceName" -> "en0", "clusterSeeds" -> ipList.mkString(", "), "clusterPort" -> "9000")
     val clusterSettings: ClusterSettings = ClusterSettings(values = values).onPort(port)
 
-    clusterSettings.interfaceName shouldBe "en0"
+    clusterSettings.interfaceName shouldBe Some("en0")
     clusterSettings.port shouldBe port
     clusterSettings.seedNodes shouldBe ipList.map { hostname =>
       s"akka://${clusterSettings.clusterName}@$hostname"
@@ -82,7 +82,7 @@ class ClusterSettingsTest extends FunSuite with Matchers with BeforeAndAfterAll 
     val clusterSettings = ClusterSettings()
 
     clusterSettings.port shouldBe systemPort
-    clusterSettings.interfaceName shouldBe systemInterfacename
+    clusterSettings.interfaceName shouldBe Some(systemInterfacename)
     clusterSettings.seedNodes shouldBe List("10.10.10.12", "10.10.10.13").map { hostname =>
       s"akka://${clusterSettings.clusterName}@$hostname"
     }
