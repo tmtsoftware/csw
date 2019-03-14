@@ -311,6 +311,7 @@ function parse_cmd_args {
             shift
             if [[ $# -eq 2 && ($1 == "--interfaceName" || $1 == "-i") ]] ; then
                 interfaceName=$2
+                export interfaceName=${interfaceName}
                 # if only interfaceName argument provided with start, then start all services
                 enableAllServicesForRunning
             elif [[ $# -eq 1 && $1 == "--initRepo" ]] ; then
