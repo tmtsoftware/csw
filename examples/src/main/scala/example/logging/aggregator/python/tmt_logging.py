@@ -14,14 +14,14 @@ logging.basicConfig(level="INFO")
 logger = logging.getLogger()
 logger.info("This is the logger configured by `logging.basicConfig()`.")
 
-config_file = "/Volumes/Personal/python/logging.json"
+config_file = "logging.json"
 with codecs.open(config_file, "r", encoding="utf-8") as fd:
     config = json.load(fd)
 
 
 dirPath = os.environ.get("TMT_LOG_HOME")
 pathlib.Path(dirPath).mkdir(parents=True, exist_ok=True)
-logPath = dirPath + "/app.log"
+logPath = dirPath + "/python.log"
 config["logging"]["handlers"]["file_handler"]["filename"]=logPath
 logging.config.dictConfig(config["logging"])
 
