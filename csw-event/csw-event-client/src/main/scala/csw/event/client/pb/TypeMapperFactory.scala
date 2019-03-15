@@ -39,6 +39,7 @@ object TypeMapperFactory extends MiscJsonFormats {
     case KeyType.IntMatrixKey    ⇒ typeMapper[MatrixData[Int]]
     case KeyType.FloatMatrixKey  ⇒ typeMapper[MatrixData[Float]]
     case KeyType.DoubleMatrixKey ⇒ typeMapper[MatrixData[Double]]
+    case _                       => throw new RuntimeException("Invalid key type")
   }
 
   private def typeMapper[T: ClassTag: Format: ItemsFactory]: TypeMapper[PbParameter, Parameter[_]] = {
