@@ -21,7 +21,7 @@ import scala.concurrent.{ExecutionContextExecutor, Future, Promise}
  * @param path path where the log file will be created
  * @param category category of the log messages
  */
-private[logging] class FileAppenderHelper(path: String, category: String) {
+private[logging] class FileAppenderHelper(path: String, name: String, category: String) {
 
   private[this] var fileSpanTimestamp: Option[ZonedDateTime] = None
   private[this] var maybePrintWriter: Option[PrintWriter]    = None
@@ -74,17 +74,18 @@ private[logging] class FileAppenderHelper(path: String, category: String) {
 
   // Initialize writer for log file
   private def open(maybeTimestamp: Option[ZonedDateTime], rotateFlag: Boolean): Unit = {
-    val dir = s"$path"
+
+    def catSuffix = if (category.equalsIgnoreCase("common")) "" else s"_$category"
 
     val fileName = if (rotateFlag) {
       val fileTimestamp = FileAppender.decideTimestampForFile(maybeTimestamp.get)
       fileSpanTimestamp = Some(fileTimestamp.plusDays(1L))
-      s"$dir/$category.$fileTimestamp.log"
+      s"$path/${name}_$fileTimestamp$catSuffix.log"
     } else {
-      s"$dir/$category.log"
+      s"$path/${name}$catSuffix.log"
     }
 
-    new File(dir).mkdirs()
+    new File(path).mkdirs()
     val printWriter = new PrintWriter(new BufferedOutputStream(new FileOutputStream(fileName, true)))
     maybePrintWriter = Some(printWriter)
   }
@@ -96,9 +97,9 @@ private[logging] class FileAppenderHelper(path: String, category: String) {
  * @param path log file path
  * @param category log category
  */
-private[logging] class FilesAppender(path: String, category: String) {
+private[logging] class FilesAppender(path: String, name: String, category: String) {
 
-  private[this] val fileAppenderHelper = new FileAppenderHelper(path, category)
+  private[this] val fileAppenderHelper = new FileAppenderHelper(path, name, category)
 
   def add(maybeTimestamp: Option[ZonedDateTime], line: String, rotateFlag: Boolean): Unit =
     fileAppenderHelper.appendAdd(maybeTimestamp, line, rotateFlag)
@@ -185,7 +186,7 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: JsObject) extends LogAp
         case Some(appender) => appender
         case None           =>
           // Create a file appender with logging file directory as logging system name within the log file path
-          val filesAppender = new FilesAppender(logPath + "/" + loggingSystemName, category)
+          val filesAppender = new FilesAppender(logPath, loggingSystemName, category)
           fileAppenders += (fileAppenderKey -> filesAppender)
           filesAppender
       }

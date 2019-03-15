@@ -32,7 +32,7 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
   private val sampleLogMessage               = "Sample log message"
   private val fileTimestamp                  = FileAppender.decideTimestampForFile(ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC)))
   private val loggingSystemName              = "Test"
-  private val testLogFilePathWithServiceName = logFileDir + "/" + loggingSystemName + s"/common.$fileTimestamp.log"
+  private val testLogFilePathWithServiceName = logFileDir + "/" + s"${loggingSystemName}_$fileTimestamp.log"
 
   private val hostname  = "localhost"
   private val version   = "SNAPSHOT-1.0"

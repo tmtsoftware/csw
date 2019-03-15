@@ -28,9 +28,8 @@ class TimingTest extends LoggingTestSuite with Timing {
     actorSystem.actorOf(IRIS.props(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
 
   private val fileTimestamp   = FileAppender.decideTimestampForFile(ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC)))
-  private val fullLogFileDir  = logFileDir + "/" + loggingSystemName
-  private val timeLogFilePath = fullLogFileDir + s"/time.$fileTimestamp.log"
-  private val testLogFilePath = fullLogFileDir + s"/common.$fileTimestamp.log"
+  private val timeLogFilePath = logFileDir + s"/${loggingSystemName}_${fileTimestamp}_time.log"
+  private val testLogFilePath = logFileDir + s"/${loggingSystemName}_$fileTimestamp.log"
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()

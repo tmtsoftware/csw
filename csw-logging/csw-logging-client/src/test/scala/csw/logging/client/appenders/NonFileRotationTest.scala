@@ -75,15 +75,15 @@ class NonFileRotationTest extends FunSuite with Matchers with BeforeAndAfterEach
   val expectedLogMsgJson2: JsObject = Json.parse(logMsgString2).as[JsObject]
   val expectedLogMsgJson3: JsObject = Json.parse(logMsgString3).as[JsObject]
 
-  private val logFileFullPath1 = logFileDir.getAbsolutePath ++ s"/test-service/alternative.log"
-  private val logFileFullPath2 = logFileDir.getAbsolutePath ++ s"/test-service/common.log"
+  private val logFileFullPath1 = logFileDir.getAbsolutePath ++ s"/test-service_alternative.log"
+  private val logFileFullPath2 = logFileDir.getAbsolutePath ++ s"/test-service.log"
 
   override protected def beforeAll(): Unit = {
     FileUtils.deleteRecursively(logFileDir)
   }
 
   override protected def afterAll(): Unit = {
-    FileUtils.deleteRecursively(logFileDir)
+//    FileUtils.deleteRecursively(logFileDir)
     Await.result(actorSystem.terminate(), 5.seconds)
   }
 
