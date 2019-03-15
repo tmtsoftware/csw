@@ -38,6 +38,15 @@ private[csw] object ServerWiring {
       }
     }
 
+  def make(interfaceName: String, maybeClusterPort: Option[Int]): ServerWiring =
+    new ServerWiring {
+      override lazy val settings: Settings = new Settings(config) {
+        override val clusterPort: Int = maybeClusterPort.getOrElse(super.clusterPort)
+      }
+      override lazy val clusterSettings: ClusterSettings =
+        ClusterAwareSettings.onPort(settings.clusterPort).withInterface(interfaceName)
+    }
+
   def make(_clusterSettings: ClusterSettings): ServerWiring =
     new ServerWiring {
       override lazy val clusterSettings: ClusterSettings = _clusterSettings

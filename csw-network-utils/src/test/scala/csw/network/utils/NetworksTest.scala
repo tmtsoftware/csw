@@ -33,7 +33,7 @@ class NetworksTest extends FunSuite with Matchers with BeforeAndAfterAll with Be
                   2)
     )
     when(mockedNetworkProvider.getInterface("eth0")).thenReturn(Seq((1, List(inet6Address, inet4Address))))
-    val ipv4Address: InetAddress = new Networks("eth0", mockedNetworkProvider).ipv4Address
+    val ipv4Address: InetAddress = new Networks("eth0", mockedNetworkProvider).ipv4AddressWithInterfaceName._2
     ipv4Address shouldEqual inet4Address
 
   }
@@ -46,16 +46,19 @@ class NetworksTest extends FunSuite with Matchers with BeforeAndAfterAll with Be
     when(mockedNetworkProvider.allInterfaces)
       .thenReturn(Seq((1, List(inet4Address1)), (2, List(inet4Address2)), (3, List(inet4Address3))))
 
-    Networks("", mockedNetworkProvider).ipv4Address shouldBe inet4Address1
+    Networks("", mockedNetworkProvider).ipv4AddressWithInterfaceName._2 shouldBe inet4Address1
   }
 
   test("testGetIpv4Address throws NetworkInterfaceNotFound when provided interface name is not present") {
-    a[NetworkInterfaceNotFound] shouldBe thrownBy(Networks(Some("test")).ipv4Address)
+    a[NetworkInterfaceNotFound] shouldBe thrownBy(Networks(Some("test")))
   }
 
   test("testGetIpv4Address returns inet address when provided a valid interface name") {
-    val inetAddresses: List[InetAddress] =
-      NetworkInterface.getNetworkInterfaces.asScala.toList.map(iface ⇒ Networks(Some(iface.getName)).ipv4Address)
-    inetAddresses.contains(InetAddress.getLocalHost) shouldEqual true
+    val inetAddresses: List[(String, InetAddress)] =
+      NetworkInterface.getNetworkInterfaces.asScala.toList.map { iface ⇒
+        Networks(Some(iface.getName)).ipv4AddressWithInterfaceName
+      }
+
+    inetAddresses.contains(("LocalHost", InetAddress.getLocalHost)) shouldEqual true
   }
 }

@@ -1,11 +1,11 @@
 package csw.network.utils
 
-import java.net.{Inet6Address, InetAddress}
+import java.net.{Inet6Address, InetAddress, NetworkInterface}
 
 import com.typesafe.config.ConfigFactory
 import csw.logging.api.scaladsl.Logger
 import csw.network.utils.commons.NetworksLogger
-import csw.network.utils.exceptions.{NetworkInterfaceNotFound, NetworkInterfaceNotProvided}
+import csw.network.utils.exceptions.NetworkInterfaceNotProvided
 import csw.network.utils.internal.NetworkInterfaceProvider
 
 /**
@@ -15,21 +15,28 @@ import csw.network.utils.internal.NetworkInterfaceProvider
  */
 case class Networks(interfaceName: String, networkProvider: NetworkInterfaceProvider) {
 
+  private val (selectedInterfaceName, hostName) = ipv4AddressWithInterfaceName
+
   /**
    * Gives the ipv4 host address
    */
-  def hostname: String = ipv4Address.getHostAddress
+  def hostname: String = hostName.getHostAddress
+
+  /**
+   * Gives the name of selected network interface name
+   */
+  def getInterfaceName: String = selectedInterfaceName
 
   /**
    * Gives the non-loopback, ipv4 address for the given network interface. If no interface name is provided then the address mapped
    * to the first available interface is chosen.
    */
-  private[network] def ipv4Address: InetAddress =
+  private[network] def ipv4AddressWithInterfaceName: (String, InetAddress) =
     mappings
       .sortBy(_._1)
       .find(pair => isIpv4(pair._2))
-      .getOrElse((0, InetAddress.getLocalHost))
-      ._2
+      .map { case (index, ip) => (NetworkInterface.getByIndex(index).getName, ip) }
+      .getOrElse(("LocalHost", InetAddress.getLocalHost))
 
   // Check if the given InetAddress is not a loopback address and is a ipv4 address
   private def isIpv4(addr: InetAddress): Boolean =
@@ -77,4 +84,7 @@ object Networks {
 
     new Networks(ifaceName, new NetworkInterfaceProvider)
   }
+
+  private[csw] def defaultInterfaceName: String =
+    new Networks(interfaceName = "", networkProvider = new NetworkInterfaceProvider).getInterfaceName
 }

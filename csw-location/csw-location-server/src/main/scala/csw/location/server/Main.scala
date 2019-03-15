@@ -5,6 +5,7 @@ import akka.actor.CoordinatedShutdown
 import csw.location.server.cli.{ArgsParser, Options}
 import csw.location.server.commons.ClusterAwareSettings
 import csw.location.server.internal.ServerWiring
+import csw.network.utils.Networks
 import csw.services.BuildInfo
 
 import scala.concurrent.duration.DurationDouble
@@ -26,10 +27,13 @@ object Main extends App {
           "[ERROR] clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."
         )
       } else {
-        val wiring = ServerWiring.make(maybeClusterPort)
+        val wiring =
+          if (testMode) ServerWiring.make(Networks.defaultInterfaceName, maybeClusterPort)
+          else ServerWiring.make(maybeClusterPort)
+
         import wiring._
         import actorRuntime._
-        startLogging(name)
+        startLogging(name, wiring.clusterSettings.hostname)
 
         val locationBindingF = locationHttpService.start()
 
