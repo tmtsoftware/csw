@@ -2,10 +2,7 @@ package example.event;
 
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
-import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.ActorContext;
-import akka.actor.typed.javadsl.Behaviors;
-import akka.actor.typed.javadsl.Receive;
 import akka.stream.Materializer;
 import akka.stream.javadsl.Sink;
 import csw.command.client.messages.TopLevelActorMessage;
@@ -64,27 +61,15 @@ public class JEventSubscribeExamples {
     public IEventSubscription subscribe(ActorContext<TopLevelActorMessage> ctx) {
 
         IEventSubscriber subscriber = eventService.defaultSubscriber();
-        ActorRef<Event> eventHandler = ctx.spawnAnonymous(new JEventHandlerFactory().make());
+        ActorRef<Event> eventHandler = ctx.spawnAnonymous(JEventHandler.behavior());
 
         EventKey filterWheelEventKey = new EventKey(hcdLocation.prefix(), new EventName("filter_wheel"));
         return subscriber.subscribeActorRef(Set.of(filterWheelEventKey), eventHandler);
     }
 
-    public class JEventHandlerFactory {
-        public Behavior<Event> make() {
-            return Behaviors.setup(JEventHandler::new);
-        }
-    }
+    public static class JEventHandler {
 
-    public class JEventHandler extends AbstractBehavior<Event> {
-        private ActorContext<Event> ctx;
-
-        JEventHandler(ActorContext<Event> context) {
-            ctx = context;
-        }
-
-        @Override
-        public Receive<Event> createReceive() {
+        public static Behavior<Event> behavior() {
             // handle messages
             return null;
         }

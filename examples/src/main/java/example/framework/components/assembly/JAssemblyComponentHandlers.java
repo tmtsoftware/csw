@@ -99,7 +99,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                         runningHcds.put(connection, Optional.of(CommandServiceFactory.jMake(hcdLocation.get(), ctx.getSystem())));
                         //#event-subscriber
                     }
-                    diagnosticPublisher = ctx.spawnAnonymous(JDiagnosticsPublisherFactory.make(CommandServiceFactory.jMake(hcdLocation.get(), ctx.getSystem()), workerActor));
+                    diagnosticPublisher = ctx.spawnAnonymous(JDiagnosticsPublisher.behavior(CommandServiceFactory.jMake(hcdLocation.get(), ctx.getSystem()), workerActor));
                 })).get();
 
     }

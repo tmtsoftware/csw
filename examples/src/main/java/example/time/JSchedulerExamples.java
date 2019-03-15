@@ -3,15 +3,13 @@ package example.time;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.typed.Behavior;
-import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.Adapter;
-import akka.actor.typed.javadsl.Behaviors;
-import akka.actor.typed.javadsl.Receive;
 import akka.actor.typed.scaladsl.ActorContext;
+import akka.actor.typed.scaladsl.Behaviors;
 import csw.time.core.models.UTCTime;
+import csw.time.scheduler.TimeServiceSchedulerFactory;
 import csw.time.scheduler.api.Cancellable;
 import csw.time.scheduler.api.TimeServiceScheduler;
-import csw.time.scheduler.TimeServiceSchedulerFactory;
 
 import java.time.Duration;
 
@@ -41,17 +39,16 @@ public class JSchedulerExamples {
     }
 
     // #schedule-once-with-actorRef
-    class SchedulingHandler extends AbstractBehavior<UTCTime> {
-        @Override
-        public Receive<UTCTime> createReceive() {
+    static class SchedulingHandler {
+
+        public static Behavior<UTCTime> behavior() {
             // handle the message to execute the task on scheduled time
             return null;
         }
     }
 
     Cancellable schedule() {
-        Behavior<UTCTime> behavior = Behaviors.setup(ctx -> new SchedulingHandler());
-        ActorRef actorRef = Adapter.toUntyped(ctx.asJava().spawnAnonymous(behavior));
+        ActorRef actorRef = Adapter.toUntyped(ctx.asJava().spawnAnonymous(SchedulingHandler.behavior()));
 
         return scheduler.scheduleOnce(utcTime, actorRef, UTCTime.now());
     }
