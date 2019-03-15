@@ -84,9 +84,9 @@ object StateVariable {
  *
  * @param prefix identifies the target subsystem
  * @param stateName identifies the name of the state
- * @param paramSet an optional initial set of items (keys with values)
+ * @param paramSet initial set of items (keys with values)
  */
-case class DemandState private (prefix: Prefix, stateName: StateName, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
+case class DemandState private (prefix: Prefix, stateName: StateName, paramSet: Set[Parameter[_]])
     extends ParameterSetType[DemandState]
     with ParameterSetKeyData
     with StateVariable {
@@ -134,7 +134,7 @@ object DemandState {
 case class CurrentState private (
     prefix: Prefix,
     stateName: StateName,
-    paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]
+    paramSet: Set[Parameter[_]]
 ) extends ParameterSetType[CurrentState]
     with ParameterSetKeyData
     with StateVariable {
