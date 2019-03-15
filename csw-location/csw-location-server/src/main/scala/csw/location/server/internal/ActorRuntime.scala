@@ -6,7 +6,6 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.{ActorSystem, CoordinatedShutdown, Scheduler}
 import akka.stream.Materializer
 import akka.stream.typed.scaladsl.ActorMaterializer
-import csw.location.server.commons.ClusterAwareSettings
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.services.BuildInfo
