@@ -1,68 +1,62 @@
 package csw.logging.client.components.iris;
 
 import akka.actor.typed.Behavior;
-import akka.actor.typed.javadsl.*;
+import akka.actor.typed.javadsl.BehaviorBuilder;
+import akka.actor.typed.javadsl.Behaviors;
 import csw.logging.api.javadsl.ILogger;
 import csw.logging.client.LogCommand;
 import csw.logging.client.javadsl.JLoggerFactory;
 
-public class JIrisSupervisorMutableActor extends AbstractBehavior<LogCommand> {
+public class JIrisSupervisorMutableActor {
 
-    private ActorContext<LogCommand> actorContext;
-    private ILogger log;
-
-    private JIrisSupervisorMutableActor(ActorContext<LogCommand> actorContext, JLoggerFactory loggerFactory) {
-        this.actorContext = actorContext;
-        this.log = loggerFactory.getLogger(actorContext, getClass());
+    public static Behavior<LogCommand> irisBeh(String componentName) {
+        JLoggerFactory loggerFactory = new JLoggerFactory(componentName);
+        return new JIrisSupervisorMutableActor().behavior(loggerFactory);
     }
 
-    public static <LogCommand> Behavior<LogCommand> irisBeh(String componentName) {
-        return Behaviors.setup(ctx -> {
-            JLoggerFactory loggerFactory = new JLoggerFactory(componentName);
-            return (AbstractBehavior<LogCommand>) new JIrisSupervisorMutableActor((ActorContext<csw.logging.client.LogCommand>) ctx, loggerFactory);
-        });
-    }
+    public Behavior<LogCommand> behavior(JLoggerFactory loggerFactory){
 
-    @Override
-    public Receive<LogCommand> createReceive() {
+        return Behaviors.setup(actorContext -> {
+            ILogger log = loggerFactory.getLogger(actorContext, getClass());
 
-        ReceiveBuilder<LogCommand> builder = newReceiveBuilder()
-                .onMessage(LogCommand.class,
-                        command -> command == LogCommand.LogTrace$.MODULE$,
-                        command -> {
+            return BehaviorBuilder.<LogCommand>create()
+                    .onMessage(LogCommand.class,
+                            command -> command == LogCommand.LogTrace$.MODULE$,
+                            (ctx,command) -> {
                                 log.trace(command.toString());
                                 return Behaviors.same();
-                        })
-                .onMessage(LogCommand.class,
-                        command -> command == LogCommand.LogDebug$.MODULE$,
-                        command -> {
-                            log.debug(command.toString());
-                            return Behavior.same();
-                        })
-                .onMessage(LogCommand.class,
-                        command -> command == LogCommand.LogInfo$.MODULE$,
-                        command -> {
-                            log.info(command.toString());
-                            return Behavior.same();
-                        })
-                .onMessage(LogCommand.class,
-                        command -> command == LogCommand.LogWarn$.MODULE$,
-                        command -> {
-                            log.warn(command.toString());
-                            return Behavior.same();
-                        })
-                .onMessage(LogCommand.class,
-                        command -> command == LogCommand.LogError$.MODULE$,
-                        command -> {
-                            log.error(command.toString());
-                            return Behavior.same();
-                        })
-                .onMessage(LogCommand.class,
-                        command -> command == LogCommand.LogFatal$.MODULE$,
-                        command -> {
-                            log.fatal(command.toString());
-                            return Behavior.same();
-                        });
-        return builder.build();
+                            })
+                    .onMessage(LogCommand.class,
+                            command -> command == LogCommand.LogDebug$.MODULE$,
+                            (ctx,command) -> {
+                                log.debug(command.toString());
+                                return Behavior.same();
+                            })
+                    .onMessage(LogCommand.class,
+                            command -> command == LogCommand.LogInfo$.MODULE$,
+                            (ctx,command) -> {
+                                log.info(command.toString());
+                                return Behavior.same();
+                            })
+                    .onMessage(LogCommand.class,
+                            command -> command == LogCommand.LogWarn$.MODULE$,
+                            (ctx,command) -> {
+                                log.warn(command.toString());
+                                return Behavior.same();
+                            })
+                    .onMessage(LogCommand.class,
+                            command -> command == LogCommand.LogError$.MODULE$,
+                            (ctx,command) -> {
+                                log.error(command.toString());
+                                return Behavior.same();
+                            })
+                    .onMessage(LogCommand.class,
+                            command -> command == LogCommand.LogFatal$.MODULE$,
+                            (ctx,command) -> {
+                                log.fatal(command.toString());
+                                return Behavior.same();
+                            })
+                    .build();
+        });
     }
 }
