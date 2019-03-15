@@ -2,8 +2,8 @@ package csw.location.server.internal
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior, Terminated}
-import akka.cluster.ddata.Replicator.Changed
 import akka.cluster.ddata.typed.scaladsl.Replicator
+import akka.cluster.ddata.typed.scaladsl.Replicator.Changed
 import csw.location.api.models.{AkkaLocation, Location}
 import csw.location.api.scaladsl.LocationService
 import csw.location.server.commons.{CswCluster, LocationServiceLogger}

@@ -2,9 +2,10 @@ package csw.location.server.internal
 
 import akka.Done
 import akka.actor.typed.scaladsl.AskPattern._
-import akka.cluster.ddata.Replicator._
+import akka.cluster.ddata.Replicator.{ModifyFailure, NotFound, UpdateSuccess}
 import akka.cluster.ddata._
 import akka.cluster.ddata.typed.scaladsl.Replicator
+import akka.cluster.ddata.typed.scaladsl.Replicator.{Changed, GetSuccess}
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.typed.scaladsl.ActorSource
 import akka.stream.{KillSwitch, OverflowStrategy}
