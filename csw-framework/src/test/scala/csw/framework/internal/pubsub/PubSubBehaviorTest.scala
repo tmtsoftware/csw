@@ -2,7 +2,6 @@ package csw.framework.internal.pubsub
 
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestInbox, TestProbe}
-import akka.actor.typed.scaladsl.AbstractBehavior
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.{typed, ActorSystem}
 import csw.command.client.messages.ComponentMessage
@@ -21,7 +20,7 @@ import scala.concurrent.duration.DurationInt
 
 class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
-  trait MutableActorMock[T] { this: AbstractBehavior[T] ⇒
+  trait MutableActorMock[T] {
     protected lazy val log: Logger = MockitoSugar.mock[Logger]
   }
 

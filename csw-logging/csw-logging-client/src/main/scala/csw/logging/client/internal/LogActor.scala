@@ -28,7 +28,6 @@ private[logging] object LogActor extends RequiresMessageQueue[BoundedMessageQueu
 
   def behavior(
       done: Promise[Unit],
-      standardHeaders: JsObject,
       appends: Seq[LogAppender],
       initLevel: Level,
       initSlf4jLevel: Level,

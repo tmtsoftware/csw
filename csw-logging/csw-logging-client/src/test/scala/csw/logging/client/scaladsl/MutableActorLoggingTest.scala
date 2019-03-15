@@ -1,7 +1,6 @@
 package csw.logging.client.scaladsl
 
-import akka.actor.typed.Behavior
-import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
+import akka.actor.typed.scaladsl.Behaviors
 import csw.logging.api.models.LoggingLevels
 import csw.logging.api.models.LoggingLevels.Level
 import csw.logging.api.scaladsl.Logger
@@ -11,16 +10,7 @@ import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.LoggingTestSuite
 
 object TromboneMutableActor {
-  def beh(componentName: String): Behavior[LogCommand] =
-    Behaviors.setup[LogCommand](ctx ⇒ new TromboneMutableActor(ctx, new LoggerFactory(componentName)))
-}
-
-class TromboneMutableActor(
-    ctx: ActorContext[LogCommand],
-    loggerFactory: LoggerFactory
-) extends AbstractBehavior[LogCommand] {
-  override def onMessage(msg: LogCommand): Behavior[LogCommand] = {
-
+  def behavior(loggerFactory: LoggerFactory): Behaviors.Receive[LogCommand] = Behaviors.receive { (ctx, msg) ⇒
     val log: Logger = loggerFactory.getLogger(ctx)
 
     msg match {
@@ -32,7 +22,7 @@ class TromboneMutableActor(
       case LogFatal => log.fatal("Level is fatal")
       case Unknown  => log.error("Unexpected actor message", Map("message" -> Unknown))
     }
-    this
+    Behaviors.same
   }
 }
 
@@ -41,7 +31,7 @@ class MutableActorLoggingTest extends LoggingTestSuite {
   import akka.actor.typed.scaladsl.adapter._
 
   private val tromboneActorRef =
-    actorSystem.spawn(TromboneMutableActor.beh("tromboneMutableHcdActor"), "TromboneMutableActor")
+    actorSystem.spawn(TromboneMutableActor.behavior(new LoggerFactory("tromboneMutableHcdActor")), "TromboneMutableActor")
 
   def sendMessagesToActor(): Unit = {
     tromboneActorRef ! LogTrace
@@ -92,7 +82,5 @@ class MutableActorLoggingTest extends LoggingTestSuite {
       val currentLogLevel = log.getString("@severity").toLowerCase
       Level(currentLogLevel) >= LoggingLevels.ERROR shouldBe true
     }
-
   }
-
 }

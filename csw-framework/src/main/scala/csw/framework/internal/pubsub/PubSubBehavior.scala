@@ -11,13 +11,14 @@ import csw.params.core.states.StateName
 
 /**
  * The actor which can be used by a component to publish its data of a given type, to all the components who subscribe
- *
- * @param ctx the Actor Context under which the actor instance of this behavior is created
- * @param loggerFactory the LoggerFactory used for logging with component name
- * @tparam T the type of the data which will be published or subscribed to using this actor
  */
 private[framework] object PubSubBehavior {
 
+  /**
+   * @param loggerFactory the LoggerFactory used for logging with component name
+   * @tparam T the type of the data which will be published or subscribed to using this actor
+   * @return Behavior[ PubSub[T] ] of actor which can be used by a component to publish its data of a given type, to all the components who subscribe
+   */
   def make[T: Nameable](loggerFactory: LoggerFactory): Behavior[PubSub[T]] = Behaviors.setup { ctx ⇒
     val log: Logger = loggerFactory.getLogger(ctx)
 

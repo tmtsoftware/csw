@@ -94,7 +94,7 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
   }
 
   private[this] val logActor = system.spawn(
-    LogActor.behavior(done, standardHeaders, appenders, defaultLevel, defaultSlf4jLogLevel, defaultAkkaLogLevel),
+    LogActor.behavior(done, appenders, defaultLevel, defaultSlf4jLogLevel, defaultAkkaLogLevel),
     name = "LoggingActor"
   )
   LoggingState.maybeLogActor = Some(logActor)
