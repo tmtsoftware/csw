@@ -213,30 +213,48 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
   def should_be_able_to_publish_event_via_event_generator_with_start_time(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
-    var counter                      = -1
-    val events: immutable.Seq[Event] = for (i ← 31 to 41) yield makeEventWithPrefix(i, Prefix("test.publish"))
+    val eventKey: EventKey = EventKey("test.publish.system")
+    var counter            = 0
+    // Queue for events of event generator
+    val generatorEvents = mutable.Queue[Event]()
 
+    // Generator produces no event when counter remainder is 0, so publishes events: 1, 3, 5...
+    // Therefore every other event is optionally published
     def eventGenerator(): Option[Event] = {
       counter += 1
-      if (counter > 1) None
-      else Some(events(counter))
+      if (counter % 2 == 0) None
+      else {
+        val event: Event = makeEventWithPrefix(counter, Prefix("test.publish"))
+        // Save the events as they are created for later test
+        generatorEvents.enqueue(event)
+        Some(event)
+      }
     }
 
-    val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
-    val eventKey: EventKey          = events.head.eventKey
+    // Queue for events that are gathered by subscriber
+    val queue: mutable.Queue[Event] = mutable.Queue[Event]()
 
     val subscription = subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](queue.enqueue(_))).run()
     subscription.ready().await
-    Thread.sleep(500) // Needed for getting the latest event
+    Thread.sleep(500) // Needed for getting the initial invalid event
 
-    val cancellable = publisher.publish(eventGenerator(), UTCTime(UTCTime.now().value.plusSeconds(1)), 300.millis)
+    // Should have the invalid event at this point
+    queue.length shouldBe 1
 
-    Thread.sleep(2000)
+    // Save for later comparison
+    val startTime: UTCTime = UTCTime(UTCTime.now().value.plusSeconds((1)))
+    // Now start publishing after
+    val cancellable = publisher.publish(eventGenerator(), startTime, 200.millis)
+
+    // 1 second delay, 0=None, 1, 2=None, 3, 4=None, 5 -> total of ~2000 ms
+    Thread.sleep(2100)
     cancellable.cancel()
 
     // subscriber will receive an invalid event first as subscription happened before publishing started.
-    // The 4 published events will follow
-    queue should (have length 3 and contain allElementsOf Seq(Event.invalidEvent(eventKey)) ++ events.take(2))
+    // The 3 published events will follow invalid
+    queue should (have length 4 and contain allElementsOf Seq(Event.invalidEvent(eventKey)) ++ generatorEvents.take(3))
+    // Remove the invalid and verify that the events are later than start time
+    queue.tail.foreach(ev => ev.eventTime should be >= startTime)
   }
 
   //DEOPSCSW-515: Include Start Time in API
