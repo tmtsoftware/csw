@@ -17,6 +17,7 @@ exampleDemo=false
 
 configImportJsonPath="../conf/auth_service/tmt-realm-export.json"
 exampleImportJsonPath="../conf/auth_service/example-realm.json"
+standaloneXmlPath="../conf/auth_service/standalone.xml"
 
 # Run from the directory containing the script
 cd "$( dirname "${BASH_SOURCE[0]}" )"
@@ -176,6 +177,7 @@ function startAndRegister {
     if ${exampleDemo}; then
         path=${currentDir}/${exampleImportJsonPath}
     fi
+    cp ${standaloneXmlPath} ${keycloakDir}/${keycloakBinaryUnzipped}/standalone/configuration/standalone.xml
     ./csw-location-agent --name AAS --http "auth" -c "${keycloakDir}/${keycloakBinaryUnzipped}/bin/standalone.sh -Djboss.bind.address=${host} -Djboss.http.port=${port} -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=$path" -p "$port" -J-Dcsw-location-client.server-http-port=${location_http_port}
 }
 
