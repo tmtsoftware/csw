@@ -1,0 +1,20 @@
+filebeat:
+  inputs:
+    - type: log
+      enabled: true
+      paths:
+        - ${TMT_LOG_HOME:?Set TMT_LOG_HOME environment variable}/*.log
+      fields_under_root: true
+      fields:
+        json: true
+
+  modules:
+    - module: system
+      syslog:
+        var.convert_timezone: true
+      auth:
+        var.convert_timezone: true
+
+output:
+  logstash:
+    hosts: ["logstash:5044"]

@@ -1,0 +1,18 @@
+filebeat:
+  modules:
+    - module: postgresql
+      # Uncomment the below line if path of Postgresql logs are different than default. Add the path for fetching logs.
+      # var.paths: ["/usr/local/var/postgres/log/*.log*"]
+      
+      # Uncomment the below line if the machine hosting Postgresql is running on local time
+      # processors:
+      #   - add_locale: ~
+    - module: system
+      syslog:
+        var.convert_timezone: true
+      auth:
+        var.convert_timezone: true
+
+output:
+  logstash:
+    hosts: ["logstash:5044"]

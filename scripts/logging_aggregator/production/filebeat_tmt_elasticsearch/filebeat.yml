@@ -1,0 +1,13 @@
+filebeat:
+  modules:
+    - module: elasticsearch
+      # For more configuration option visit https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-elasticsearch.html
+    - module: system
+      syslog:
+        var.convert_timezone: true
+      auth:
+        var.convert_timezone: true
+          
+output:
+  logstash:
+    hosts: ["logstash:5044"]

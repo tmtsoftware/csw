@@ -1,0 +1,15 @@
+filebeat:
+  modules:
+    - module: redis
+      # Uncomment the below line if path of Postgresql logs are different than default. Add the path for fetching logs
+      # var.paths: [""]
+    - module: system
+      syslog:
+        var.convert_timezone: true
+      auth:
+        var.convert_timezone: true
+
+
+output:
+  logstash:
+    hosts: ["logstash:5044"]
