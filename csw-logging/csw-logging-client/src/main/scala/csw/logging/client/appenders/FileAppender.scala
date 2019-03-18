@@ -74,15 +74,13 @@ private[logging] class FileAppenderHelper(path: String, name: String, category: 
 
   // Initialize writer for log file
   private def open(maybeTimestamp: Option[ZonedDateTime], rotateFlag: Boolean): Unit = {
-
     def catSuffix = if (category.equalsIgnoreCase("common")) "" else s"_$category"
-
     val fileName = if (rotateFlag) {
       val fileTimestamp = FileAppender.decideTimestampForFile(maybeTimestamp.get)
       fileSpanTimestamp = Some(fileTimestamp.plusDays(1L))
       s"$path/${name}_$fileTimestamp$catSuffix.log"
     } else {
-      s"$path/${name}$catSuffix.log"
+      s"$path/$name$catSuffix.log"
     }
 
     new File(path).mkdirs()

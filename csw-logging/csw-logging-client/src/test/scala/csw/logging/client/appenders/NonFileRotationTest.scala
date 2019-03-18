@@ -83,7 +83,7 @@ class NonFileRotationTest extends FunSuite with Matchers with BeforeAndAfterEach
   }
 
   override protected def afterAll(): Unit = {
-//    FileUtils.deleteRecursively(logFileDir)
+    FileUtils.deleteRecursively(logFileDir)
     Await.result(actorSystem.terminate(), 5.seconds)
   }
 
