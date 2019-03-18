@@ -415,7 +415,7 @@ lazy val `csw-time-clock-js` = `csw-time-clock`.js
 lazy val `csw-time-clock-jvm` = `csw-time-clock`.jvm
 
 lazy val `csw-time-core` =  crossProject(JSPlatform, JVMPlatform)
-  .crossType(CrossType.Pure)
+  .crossType(CrossType.Full)
   .in(file("csw-time/csw-time-core"))
   .dependsOn(`csw-time-clock`)
   .enablePlugins(PublishBintray, GenJavadocPlugin)
