@@ -3,6 +3,7 @@ package csw.config.api.internal
 import java.nio.file.{Path, Paths}
 import java.time.Instant
 
+import com.github.ghik.silencer.silent
 import csw.config.api.models.{ConfigFileInfo, ConfigFileRevision, ConfigId, ConfigMetadata}
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 import play.api.libs.json._
@@ -33,7 +34,10 @@ private[config] trait JsonSupport extends PlayJsonSupport {
   implicit val configIdFormat: Format[ConfigId] = Json.format[ConfigId]
 
   implicit val configFileInfoFormat: OFormat[ConfigFileInfo] = {
-    implicit val configIdFormat: Format[ConfigId] = new Format[ConfigId] {
+
+    // The warnings on this variable are silenced because to avoid "local val configIdFormat is never used"
+    // It shows this warning because this variable is not directly being used but is consumed by a macro instead
+    @silent implicit val configIdFormat: Format[ConfigId] = new Format[ConfigId] {
       override def writes(o: ConfigId): JsValue = JsString(o.id)
       override def reads(json: JsValue): JsResult[ConfigId] = json match {
         case JsString(x) ⇒ JsSuccess(ConfigId(x))
@@ -44,7 +48,10 @@ private[config] trait JsonSupport extends PlayJsonSupport {
   }
 
   implicit val configFileHistoryFormat: OFormat[ConfigFileRevision] = {
-    implicit val configIdFormat: Format[ConfigId] = new Format[ConfigId] {
+
+    // The warnings on this variable are silenced because to avoid "local val configIdFormat is never used"
+    // It shows this warning because this variable is not directly being used but is consumed by a macro instead
+    @silent implicit val configIdFormat: Format[ConfigId] = new Format[ConfigId] {
       override def writes(o: ConfigId): JsValue = JsString(o.id)
       override def reads(json: JsValue): JsResult[ConfigId] = json match {
         case JsString(x) ⇒ JsSuccess(ConfigId(x))

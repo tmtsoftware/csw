@@ -1,6 +1,5 @@
 package csw.command.client.models.framework
 
-import acyclic.skipped
 import csw.serializable.TMTSerializable
 
 /**

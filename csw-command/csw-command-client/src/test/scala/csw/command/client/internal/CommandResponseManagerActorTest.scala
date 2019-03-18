@@ -28,7 +28,9 @@ class CommandResponseManagerActorTest extends FunSuite with Matchers with Mockit
   implicit val typedSystem: typed.ActorSystem[_] = actorSystem.toTyped
   implicit val testKitSettings: TestKitSettings  = TestKitSettings(typedSystem)
 
-  def createBehaviorTestKit(props: CRMCacheProperties = CRMCacheProperties()): BehaviorTestKit[CommandResponseManagerMessage] =
+  private[csw] def createBehaviorTestKit(
+      props: CRMCacheProperties = CRMCacheProperties()
+  ): BehaviorTestKit[CommandResponseManagerMessage] =
     BehaviorTestKit(
       Behaviors.setup[CommandResponseManagerMessage](ctx ⇒ new CommandResponseManagerActor(props, getMockedLogger).behavior)
     )

@@ -1,6 +1,5 @@
 package csw.logging.client.javadsl
 
-import acyclic.skipped
 import akka.actor
 import akka.actor.typed.javadsl.ActorContext
 import akka.actor.typed.scaladsl.adapter.TypedActorRefOps

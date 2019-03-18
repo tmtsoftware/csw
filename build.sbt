@@ -240,7 +240,6 @@ lazy val `csw-params` = crossProject(JSPlatform, JVMPlatform)
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(
     libraryDependencies ++= Dependencies.Params.value,
-    Common.detectCycles := false,
     fork := false
   )
 
@@ -333,7 +332,6 @@ lazy val `csw-event-client` = project
   .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.EventClient.value)
   .settings(
-    Common.detectCycles := false,
     PB.targets in Compile := Seq(
       PB.gens.java                        -> (sourceManaged in Compile).value,
       scalapb.gen(javaConversions = true) -> (sourceManaged in Compile).value

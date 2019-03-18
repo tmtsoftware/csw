@@ -10,7 +10,6 @@ object Common extends AutoPlugin {
 
   override def requires: Plugins = JvmPlugin
 
-  val detectCycles: SettingKey[Boolean]              = settingKey[Boolean]("is cyclic check enabled?")
   val suppressAnnotatedWarnings: SettingKey[Boolean] = settingKey[Boolean]("enable annotation based suppression of warnings")
 
   override lazy val projectSettings: Seq[Setting[_]] = Seq(
@@ -31,13 +30,12 @@ object Common extends AutoPlugin {
       "-feature",
       "-unchecked",
       "-deprecation",
-      //"-Xfatal-warnings",
-      "-Xlint",
+      "-Xfatal-warnings",
+      "-Xlint:_,-missing-interpolator",
       "-Yno-adapted-args",
       "-Ywarn-dead-code",
       "-Xfuture",
 //      "-Xprint:typer"
-      if (cycleCheckEnabled && detectCycles.value) "-P:acyclic:force" else "",
       if (suppressAnnotatedWarnings.value) s"-P:silencer:sourceRoots=${baseDirectory.value.getCanonicalPath}" else ""
     ),
     javacOptions in (Compile, doc) ++= Seq("-Xdoclint:none"),
@@ -59,22 +57,15 @@ object Common extends AutoPlugin {
     },
     isSnapshot := !sys.props.get("prod.publish").contains("true"),
     fork := true,
-    detectCycles := true,
     suppressAnnotatedWarnings := true,
-    libraryDependencies ++= Seq(`acyclic`, `silencer-lib`),
+    libraryDependencies ++= Seq(`silencer-lib`),
     libraryDependencies ++= (if (suppressAnnotatedWarnings.value) Seq(compilerPlugin(`silencer-plugin`)) else Seq.empty),
     autoCompilerPlugins := true,
     cancelable in Global := true, // allow ongoing test(or any task) to cancel with ctrl + c and still remain inside sbt
-    if (formatOnCompile) scalafmtOnCompile := true else scalafmtOnCompile := false,
-    addCompilerPlugin("com.lihaoyi" %% "acyclic" % Libs.AcyclicVersion)
+    if (formatOnCompile) scalafmtOnCompile := true else scalafmtOnCompile := false
   )
 
   private def formatOnCompile = sys.props.get("format.on.compile") match {
-    case Some("false") ⇒ false
-    case _             ⇒ true
-  }
-
-  private def cycleCheckEnabled = sys.props.get("check.cycles") match {
     case Some("false") ⇒ false
     case _             ⇒ true
   }
