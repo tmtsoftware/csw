@@ -43,10 +43,12 @@ private[csw] class CommandResponseManagerActor(crmCacheProperties: CRMCachePrope
   val behavior: Behavior[CommandResponseManagerMessage] = Behaviors.setup { ctx ⇒
     val log: Logger = loggerFactory.getLogger(ctx)
 
-    val commandResponseState: CommandResponseState              = new CommandResponseState(crmCacheProperties)
-    var commandCoRelation: CommandCorrelation                   = CommandCorrelation(Map.empty, Map.empty)
+    val commandResponseState: CommandResponseState = new CommandResponseState(crmCacheProperties)
+    var commandCoRelation: CommandCorrelation      = CommandCorrelation(Map.empty, Map.empty)
+    // components coming via queryFinal api will be removed from `commandSubscribers` after timeout
     var commandSubscribers: Store[Id, ActorRef[SubmitResponse]] = Store(Map.empty)
-    var querySubscribers: Store[Id, ActorRef[QueryResponse]]    = Store(Map.empty)
+    // components coming via query api will be removed from `querySubscribers` after timeout
+    var querySubscribers: Store[Id, ActorRef[QueryResponse]] = Store(Map.empty)
 
     import CommandResponse._
 

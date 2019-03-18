@@ -92,6 +92,7 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
     }
   }
 
+  // components coming via this api will be removed from  subscriber's list after timeout
   override def query(commandRunId: Id)(implicit timeout: Timeout): Future[QueryResponse] = {
     val eventualResponse: Future[QueryResponse] = component ? (CommandResponseManagerMessage.Query(commandRunId, _))
     eventualResponse recover {
@@ -99,6 +100,7 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
     }
   }
 
+  // components coming via this api will be removed from  subscriber's list after timeout
   override def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse] =
     component ? (CommandResponseManagerMessage.Subscribe(commandRunId, _))
 
