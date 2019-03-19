@@ -95,8 +95,10 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
 
   private[this] val logActor = system.spawn(
     LogActor.behavior(done, appenders, defaultLevel, defaultSlf4jLogLevel, defaultAkkaLogLevel),
-    name = "LoggingActor"
+    name = "LoggingActor",
+    akka.actor.typed.Props.empty.withDispatcherFromConfig("logging-dispatcher")
   )
+
   LoggingState.maybeLogActor = Some(logActor)
 
   private[logging] val gcLogger: Option[GcLogger] =
