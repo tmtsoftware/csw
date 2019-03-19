@@ -28,8 +28,8 @@ class TMTTimeTest extends FunSuite with BeforeAndAfterAll {
   }
 
   test("should give time duration between given timestamp and current time") {
-    val instant          = Instant.now().plusSeconds(1)
-    val expectedDuration = 1.second.toNanos +- 20.millis.toNanos
-    UTCTime(instant).durationFromNow.toNanos shouldBe expectedDuration
+    val expectedDuration = 1.second.toMillis +- 10.millis.toMillis
+    val futureTime       = UTCTime(Instant.now().plusSeconds(1))
+    futureTime.durationFromNow.toMillis shouldBe expectedDuration
   }
 }

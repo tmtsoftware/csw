@@ -89,7 +89,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
     val utcTime1 = testProbe.expectMsgType[UTCTime]
     val utcTime2 = testProbe.expectMsgType[UTCTime]
 
-    val expectedTimeSpread = startTime.value.toEpochMilli +- 20
+    val expectedTimeSpread = startTime.value.toEpochMilli +- 10
     utcTime1.value.toEpochMilli shouldBe expectedTimeSpread
     utcTime2.value.toEpochMilli shouldBe expectedTimeSpread
 
@@ -124,7 +124,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
 
     times.size shouldBe 6
     buffer.foreach { i =>
-      times(i).value.toEpochMilli shouldBe (startTime.value.toEpochMilli + offset * i) +- 20
+      times(i).value.toEpochMilli shouldBe (startTime.value.toEpochMilli + offset * i) +- 10
     }
   }
 
@@ -156,7 +156,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
 
     times.size shouldBe 6
     buffer.foreach { i =>
-      times(i).value.toEpochMilli shouldBe (startTime.value.toEpochMilli + offset * i) +- 20
+      times(i).value.toEpochMilli shouldBe (startTime.value.toEpochMilli + offset * i) +- 10
     }
   }
 }
