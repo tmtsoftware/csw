@@ -30,7 +30,7 @@ object Common extends AutoPlugin {
       "-feature",
       "-unchecked",
       "-deprecation",
-      "-Xfatal-warnings",
+//      "-Xfatal-warnings",
       "-Xlint:_,-missing-interpolator",
       "-Yno-adapted-args",
       "-Ywarn-dead-code",
