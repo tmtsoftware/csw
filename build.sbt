@@ -492,6 +492,8 @@ lazy val examples = project
     `csw-framework`,
     `csw-aas-installed`,
     `csw-location-client`,
+    `csw-time-scheduler`,
+    `csw-time-core-jvm`,
     `csw-testkit`       % "test->compile",
     `csw-config-server` % "test->test"
   )

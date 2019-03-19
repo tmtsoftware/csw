@@ -1,4 +1,4 @@
-package csw.time.scheduler
+package csw.time.core
 
 import java.time._
 

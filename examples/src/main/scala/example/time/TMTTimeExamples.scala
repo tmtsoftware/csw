@@ -2,7 +2,7 @@ package example.time
 
 import java.time.{ZoneId, ZonedDateTime}
 
-import csw.time.scheduler.TMTTimeHelper
+import csw.time.core.TMTTimeHelper
 import csw.time.core.models.{TAITime, UTCTime}
 
 object TMTTimeExamples {

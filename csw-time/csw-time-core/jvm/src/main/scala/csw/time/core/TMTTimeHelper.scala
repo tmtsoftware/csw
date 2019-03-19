@@ -1,4 +1,4 @@
-package csw.time.scheduler
+package csw.time.core
 import java.time.{ZoneId, ZoneOffset, ZonedDateTime}
 
 import csw.time.core.models.TMTTime

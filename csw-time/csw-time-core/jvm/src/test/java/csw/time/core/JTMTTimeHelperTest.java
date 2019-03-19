@@ -1,4 +1,4 @@
-package csw.time.scheduler;
+package csw.time.core;
 
 import csw.time.core.models.UTCTime;
 import csw.time.core.models.utils.JTestProperties;

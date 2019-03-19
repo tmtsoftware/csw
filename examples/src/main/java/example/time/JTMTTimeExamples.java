@@ -1,8 +1,8 @@
 package example.time;
 
+import csw.time.core.TMTTimeHelper;
 import csw.time.core.models.TAITime;
 import csw.time.core.models.UTCTime;
-import csw.time.scheduler.TMTTimeHelper;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
