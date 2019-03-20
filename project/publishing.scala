@@ -64,7 +64,7 @@ object DeployApp extends AutoPlugin {
     val authServerDir    = scriptsDir / "csw-auth" / "prod"
     val serviceScript    = scriptsDir / "csw-services.sh"
     val prodScript       = scriptsDir / "redis-sentinel-prod.sh"
-    val authServerScript = authServerDir / "configure.sh"
+    val authServerScript = authServerDir / "start-aas.sh"
     val confs = Path
       .directory(new File(scriptsDir, "conf"))
       .filterNot { case (f, s) => s.equals("conf/redis_sentinel/sentinel.conf") }

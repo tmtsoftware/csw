@@ -21,7 +21,7 @@ fetch_artifacts(){
 
     cp -r "$SCRIPTS_PATH"/conf "$BASE_PATH"/target/coursier/stage
     mv "$SENTINEL_CONF" "$SENTINEL_TEMPLATE_CONF"
-    cp "$SCRIPTS_PATH"/csw-auth/prod/configure.sh "$TARGET_PATH"
+    cp "$SCRIPTS_PATH"/csw-auth/prod/start-aas.sh "$TARGET_PATH"
     cp "$SCRIPTS_PATH"/csw-services.sh "$TARGET_PATH"
     cp "$SCRIPTS_PATH"/redis-sentinel-prod.sh "$TARGET_PATH"
     echo "Artifacts successfully generated"

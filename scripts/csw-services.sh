@@ -203,7 +203,7 @@ function start_sentinel() {
 function start_AAS() {
     if [[ -x "$location_agent_script" ]]; then
         echo "[AAS] Starting Auth server..."
-        nohup ./configure.sh -p ${aas_port} -u ${aas_admin_user} --password ${aas_admin_password} --locationHttpPort ${location_http_port} --testMode &> ${AASLogFile} &
+        nohup ./start-aas.sh -p ${aas_port} -u ${aas_admin_user} --password ${aas_admin_password} --locationHttpPort ${location_http_port} --testMode &> ${AASLogFile} &
         echo $! > ${AASPidFile}
         echo ${aas_port} > ${AASPortFile}
     else
