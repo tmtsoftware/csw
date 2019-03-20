@@ -29,6 +29,7 @@ import scala.util.control.NonFatal
  * @param supervisor the actor reference of the supervisor actor which created this component
  * @param lifecycleHandlers the implementation of handlers which defines the domain actions to be performed by this component
  */
+// scalastyle:off method.length
 private[framework] object ComponentBehavior {
 
   def make(
