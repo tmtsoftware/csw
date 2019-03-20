@@ -105,7 +105,7 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
       "IFS_Detector",
       "Invoking lifecycle handler's initialize hook",
       INFO,
-      classOf[ComponentBehavior].getName
+      ComponentBehavior.getClass.getName
     )
     // log message from Component handler
     assertThatMessageIsLogged(

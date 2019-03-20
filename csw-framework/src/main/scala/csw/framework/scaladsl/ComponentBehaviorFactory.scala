@@ -21,7 +21,7 @@ abstract class ComponentBehaviorFactory {
   protected def handlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext): ComponentHandlers
 
   /**
-   * Creates the [[akka.actor.typed.scaladsl.MutableBehavior]] of the component
+   * Creates the [[akka.actor.typed.Behavior]] of the component
    *
    * @param supervisor the actor reference of the supervisor actor which created this component for this component
    * @param cswCtx provides access to csw services e.g. location, event, alarm, etc
@@ -30,7 +30,7 @@ abstract class ComponentBehaviorFactory {
   private[framework] def make(supervisor: ActorRef[FromComponentLifecycleMessage], cswCtx: CswContext): Behavior[Nothing] =
     Behaviors
       .setup[TopLevelActorMessage] { ctx ⇒
-        new ComponentBehavior(ctx, supervisor, handlers(ctx, cswCtx), cswCtx)
+        ComponentBehavior.make(supervisor, handlers(ctx, cswCtx), cswCtx)
       }
       .narrow
 }

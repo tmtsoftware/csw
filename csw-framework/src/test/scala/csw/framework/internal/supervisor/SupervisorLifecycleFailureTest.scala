@@ -4,6 +4,15 @@ import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import csw.command.client.messages.CommandMessage.Submit
+import csw.command.client.messages.ComponentCommonMessage.{
+  ComponentStateSubscription,
+  GetSupervisorLifecycleState,
+  LifecycleStateSubscription
+}
+import csw.command.client.messages.SupervisorContainerCommonMessages.Restart
+import csw.command.client.messages.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
+import csw.command.client.models.framework.{LifecycleStateChanged, PubSub, SupervisorLifecycleState}
 import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentState._
 import csw.common.utils.TestAppender
@@ -14,23 +23,14 @@ import csw.framework.internal.component.ComponentBehavior
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
-import csw.command.client.messages.CommandMessage.Submit
-import csw.command.client.messages.ComponentCommonMessage.{
-  ComponentStateSubscription,
-  GetSupervisorLifecycleState,
-  LifecycleStateSubscription
-}
-import csw.command.client.messages.SupervisorContainerCommonMessages.Restart
-import csw.params.commands.{CommandName, ControlCommand, Setup}
-import csw.command.client.models.framework.{LifecycleStateChanged, PubSub, SupervisorLifecycleState}
-import csw.params.core.generics.{KeyType, Parameter}
-import csw.params.core.models.ObsId
-import csw.params.core.states.{CurrentState, StateName}
-import csw.command.client.messages.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
 import csw.logging.api.models.LoggingLevels.ERROR
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse.SubmitResponse
+import csw.params.commands.{CommandName, ControlCommand, Setup}
+import csw.params.core.generics.{KeyType, Parameter}
+import csw.params.core.models.ObsId
+import csw.params.core.states.{CurrentState, StateName}
 import org.mockito.stubbing.Answer
 import org.scalatest.BeforeAndAfterEach
 import play.api.libs.json.{JsObject, Json}
@@ -92,7 +92,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
       "SampleHcd",
       failureStopExMsg,
       ERROR,
-      classOf[ComponentBehavior].getName,
+      ComponentBehavior.getClass.getName,
       TestFailureStop.getClass.getName,
       failureStopExMsg
     )
@@ -150,7 +150,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
       "SampleHcd",
       failureRestartExMsg,
       ERROR,
-      classOf[ComponentBehavior].getName,
+      ComponentBehavior.getClass.getName,
       TestFailureRestart.getClass.getName,
       failureRestartExMsg
     )
