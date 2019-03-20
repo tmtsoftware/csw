@@ -33,6 +33,8 @@ There are three folders, as follows, in `csw-apps-<some-version>`
 All the shell scripts provided by `csw` reside in `bin` folder. The shell script referred in this segment is named as `csw-services.sh`.
 Go to the bin folder and hit `./csw-services.sh --help`. This will list all possible options applicable for the script.
 
+Environment variables which are needed to start csw services are documented in @ref[environment variables](./env-vars.md).
+
 @@@ note { title=Note }
 
 This shell script will start `csw-location-server` as the first step regardless of any options provided. 

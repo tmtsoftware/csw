@@ -3,6 +3,7 @@
 @@@ index
  - [Getting Started](commons/getting-started.md)
  - [Creating a Component](commons/create-component.md)
+ - [Environment variables](commons/env-vars.md)
  - [Working with Multiple Components](commons/multiple-components.md)
  - [Using Alarms](commons/using-alarms.md)
  - [Adding Unit Tests](commons/unit-tests.md)

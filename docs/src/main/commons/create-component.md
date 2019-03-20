@@ -409,7 +409,7 @@ Java
 
 ## Starting CSW Services
 
-Before we run our application, we must first start the Location Service and the Event Service.  A script has been provided to simplify
+Before we run our application, we must first start the Location Service and the Event Service. A script has been provided to simplify
 the starting and stopping of CSW services, and is included in the application bundle that comes with each release.  The
 application bundle is called 
 
@@ -427,6 +427,8 @@ command line arguments.  It is important to pass in a network interface name tha
 can be obtained using `ifconfig` on Linux and Mac computers.  `en0` typically works for most machines.
 
 To get information on the arguments for the tool, use `csw-services.sh --help`.
+
+List of environment variables which needs to be set before starting csw services is specified in @ref:[environment variable](./env-vars.md) document.  
 
 #### *Tutorial: Developing an HCD*
 
