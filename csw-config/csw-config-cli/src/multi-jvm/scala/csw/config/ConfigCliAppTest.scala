@@ -45,7 +45,7 @@ class ConfigCliAppTest(ignore: Int)
   val updatedInputFilePath     = getClass.getResource("/tromboneAssembly.conf").getPath
   val inputFileContents        = scala.io.Source.fromFile(inputFilePath).mkString
   val updatedInputFileContents = scala.io.Source.fromFile(updatedInputFilePath).mkString
-  val repoPath1                = "/client1/hcd/text/tromboneHCD.conf"
+  val repoPath1                = "/client1/hcd/text/tromboneHCDContainer.conf"
   val repoPath2                = "/client2/hcd/text/app.conf"
   val comment                  = "test comment"
 

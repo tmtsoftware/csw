@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+trap 'trap - SIGTERM && kill -- -$$' SIGINT SIGTERM EXIT
+
 currentDir=$(pwd)
 keycloakDir=~
 keycloakVersion=5.0.0

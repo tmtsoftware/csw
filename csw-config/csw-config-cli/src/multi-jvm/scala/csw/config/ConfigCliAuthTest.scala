@@ -104,7 +104,7 @@ class ConfigCliAuthTest(ignore: Int)
       implicit val mat: Materializer = ActorMaterializer()
       val filePath                   = Paths.get(getClass.getResource("/tromboneHCD.conf").getPath)
       val fileContents               = scala.io.Source.fromFile(filePath.toFile).mkString
-      val repoPath1                  = Paths.get("/client1/hcd/text/tromboneHCD.conf")
+      val repoPath1                  = Paths.get("/client1/hcd/text/tromboneHCDContainer.conf")
 
       enterBarrier("keycloak started")
       enterBarrier("config-server-started")
