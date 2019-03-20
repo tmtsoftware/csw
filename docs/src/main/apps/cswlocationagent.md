@@ -20,25 +20,25 @@ A utility application that starts a given external program, registers a comma se
 ```
 csw-location-agent --name "redis" --command "redis-server /usr/local/etc/redis.conf" --port 6379
 ```  
-Application will start redis server on port 6379(default redis port) and will register a TcpConnection for the same with Location Service 
+Application will start redis server on port 6379 (default redis port) and will register a TcpConnection for the same with Location Service 
 
 2. 
 ```
 csw-location-agent --name "foo" --command "sleep 30"
 ```
-Application will sleep for 30 seconds. Then, will register a service named foo on a random port with Location Service. Once sleep is over after 30 seconds, will unregister foo service.
+Application will sleep for 30 seconds. It will be registered as a service named foo on a random port with Location Service. Once sleep is over after 30 seconds, will unregister foo service.
 
 3. 
 ```
 csw-location-agent --name "myHttpServiceAsTcp" --command "python -m SimpleHTTPServer 8080" --port 8080
 ```  
-Application will start a simple HTTP service on port 8080. Then, will register myHttpServiceAsTcp as a TCP service with Location Service.
+Application will start a simple HTTP service on port 8080. This will register myHttpServiceAsTcp as a TCP service with Location Service.
 
 4. 
 ```
 csw-location-agent --name "myHttpServiceAsHttp" --command "python -m SimpleHTTPServer 8080" --port 8080 --http "path"
 ```  
-Application will start a simple HTTP service on port 8080. Then, will register myHttpServiceAsHttp as a Http service with provided path with Location Service.
+Application will start a simple HTTP service on port 8080. This will register myHttpServiceAsHttp as a Http service with provided path with Location Service.
 
 5. 
 ```
