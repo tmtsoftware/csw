@@ -1,8 +1,9 @@
 filebeat:
   modules:
     - module: postgresql
-      # Uncomment the below line if path of Postgresql logs are different than default. Add the path for fetching logs.
-      # var.paths: ["/usr/local/var/postgres/log/*.log*"]
+      log:
+        # Default path for filebeat to watch for postgres logs
+        var.paths: ["/usr/local/var/postgres/*.log*", "/usr/local/var/postgres/*/*.log*"]
     - module: system
       syslog:
         var.convert_timezone: true
