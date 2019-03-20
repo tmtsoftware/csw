@@ -6,7 +6,8 @@ import csw.logging.client.scaladsl.RichException
 import java.io.{PrintWriter, StringWriter}
 
 import csw.logging.api._
-import csw.logging.api.models.RequestId
+import csw.logging.api.models.LoggingLevels.Level
+import csw.logging.api.models.{LoggingLevels, RequestId}
 import csw.logging.client.commons.{Category, LoggingKeys, TMTDateTimeFormatter}
 import play.api.libs.json.{JsObject, Json}
 
@@ -18,6 +19,52 @@ private[logging] object LogActorOperations {
       case ex: Throwable     => Json.obj(LoggingKeys.EX -> name, LoggingKeys.MESSAGE -> ex.getMessage)
     }
   }
+
+  def generateAltMessageJson(logAltMessage: LogAltMessage): JsObject = {
+    var jsonObject = logAltMessage.jsonObject
+    if (logAltMessage.ex != NoLogException) jsonObject = jsonObject ++ exceptionJson(logAltMessage.ex)
+
+    jsonObject = logAltMessage.id match {
+      case RequestId(trackingId, spanId, _) => jsonObject ++ Json.obj(LoggingKeys.TRACE_ID -> Seq(trackingId, spanId))
+      case _                                => jsonObject
+    }
+
+    jsonObject ++ Json.obj(LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(logAltMessage.time))
+  }
+
+  def generateLogSlf4jJson(logSlf4j: LogSlf4j, slf4jLogLevel: Level): Option[JsObject] =
+    if (logSlf4j.level.pos >= slf4jLogLevel.pos) {
+      var jsonObject = Json.obj(
+        LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(logSlf4j.time),
+        LoggingKeys.MESSAGE   -> logSlf4j.msg,
+        LoggingKeys.FILE      -> logSlf4j.file,
+        LoggingKeys.SEVERITY  -> logSlf4j.level.name,
+        LoggingKeys.CLASS     -> logSlf4j.className,
+        LoggingKeys.KIND      -> "slf4j",
+        LoggingKeys.CATEGORY  -> Category.Common.name
+      )
+      if (logSlf4j.line > 0) jsonObject = jsonObject ++ Json.obj(LoggingKeys.LINE -> logSlf4j.line)
+      if (logSlf4j.ex != NoLogException) jsonObject = jsonObject ++ exceptionJson(logSlf4j.ex)
+
+      Some(jsonObject)
+    } else None
+
+  def generateLogAkkaJson(logAkka: LogAkka, akkaLogLevel: Level): Option[JsObject] =
+    if (logAkka.level.pos >= akkaLogLevel.pos) {
+      val msg1 = if (logAkka.msg == null) "UNKNOWN" else logAkka.msg
+      var jsonObject = Json.obj(
+        LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(logAkka.time),
+        LoggingKeys.KIND      -> "akka",
+        LoggingKeys.MESSAGE   -> msg1.toString,
+        LoggingKeys.ACTOR     -> logAkka.source,
+        LoggingKeys.SEVERITY  -> logAkka.level.name,
+        LoggingKeys.CLASS     -> logAkka.clazz.getName,
+        LoggingKeys.CATEGORY  -> Category.Common.name
+      )
+
+      if (logAkka.cause.isDefined) jsonObject = jsonObject ++ exceptionJson(logAkka.cause.get)
+      Some(jsonObject)
+    } else None
 
   // Convert exception stack trace to JSON
   def getStack(ex: Throwable): Seq[JsObject] = {

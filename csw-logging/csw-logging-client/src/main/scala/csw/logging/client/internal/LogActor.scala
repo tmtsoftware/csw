@@ -4,13 +4,12 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{Behavior, PostStop}
 import akka.event.LogSource
-import csw.logging.api._
+import csw.logging.api.models.LoggingLevels
 import csw.logging.api.models.LoggingLevels.Level
-import csw.logging.api.models.{LoggingLevels, RequestId}
 import csw.logging.client.appenders.LogAppender
-import csw.logging.client.commons.{Category, LoggingKeys, TMTDateTimeFormatter}
+import csw.logging.client.commons.Category
 import csw.logging.client.internal.LogActorMessages._
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.JsObject
 
 import scala.concurrent.Promise
 
@@ -46,50 +45,19 @@ private[logging] object LogActor {
         for (appender <- appenders) appender.append(baseMsg, category)
 
       def receiveAltMessage(logAltMessage: LogAltMessage): Unit = {
-        var jsonObject = logAltMessage.jsonObject
-        if (logAltMessage.ex != NoLogException) jsonObject = jsonObject ++ exceptionJson(logAltMessage.ex)
-
-        jsonObject = logAltMessage.id match {
-          case RequestId(trackingId, spanId, _) => jsonObject ++ Json.obj(LoggingKeys.TRACE_ID -> Seq(trackingId, spanId))
-          case _                                => jsonObject
-        }
-
-        jsonObject = jsonObject ++ Json.obj(LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(logAltMessage.time))
+        val jsonObject = generateAltMessageJson(logAltMessage)
         append(jsonObject, logAltMessage.category, LoggingLevels.INFO)
       }
 
-      def receiveLogSlf4j(logSlf4j: LogSlf4j): Unit =
-        if (logSlf4j.level.pos >= slf4jLogLevel.pos) {
-          var jsonObject = Json.obj(
-            LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(logSlf4j.time),
-            LoggingKeys.MESSAGE   -> logSlf4j.msg,
-            LoggingKeys.FILE      -> logSlf4j.file,
-            LoggingKeys.SEVERITY  -> logSlf4j.level.name,
-            LoggingKeys.CLASS     -> logSlf4j.className,
-            LoggingKeys.KIND      -> "slf4j",
-            LoggingKeys.CATEGORY  -> Category.Common.name
-          )
-          if (logSlf4j.line > 0) jsonObject = jsonObject ++ Json.obj(LoggingKeys.LINE -> logSlf4j.line)
-          if (logSlf4j.ex != NoLogException) jsonObject = jsonObject ++ exceptionJson(logSlf4j.ex)
-          append(jsonObject, Category.Common.name, logSlf4j.level)
-        }
+      def receiveLogSlf4j(logSlf4j: LogSlf4j): Unit = {
+        val jsonObject = generateLogSlf4jJson(logSlf4j, slf4jLogLevel)
+        jsonObject.foreach(json => append(json, Category.Common.name, logSlf4j.level))
+      }
 
-      def receiveLogAkkaMessage(logAkka: LogAkka): Unit =
-        if (logAkka.level.pos >= akkaLogLevel.pos) {
-          val msg1 = if (logAkka.msg == null) "UNKNOWN" else logAkka.msg
-          var jsonObject = Json.obj(
-            LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(logAkka.time),
-            LoggingKeys.KIND      -> "akka",
-            LoggingKeys.MESSAGE   -> msg1.toString,
-            LoggingKeys.ACTOR     -> logAkka.source,
-            LoggingKeys.SEVERITY  -> logAkka.level.name,
-            LoggingKeys.CLASS     -> logAkka.clazz.getName,
-            LoggingKeys.CATEGORY  -> Category.Common.name
-          )
-
-          if (logAkka.cause.isDefined) jsonObject = jsonObject ++ exceptionJson(logAkka.cause.get)
-          append(jsonObject, Category.Common.name, logAkka.level)
-        }
+      def receiveLogAkkaMessage(logAkka: LogAkka): Unit = {
+        val jsonObject = generateLogAkkaJson(logAkka, akkaLogLevel)
+        jsonObject.foreach(json => append(json, Category.Common.name, logAkka.level))
+      }
 
       def receiveLog(log: Log): Unit = append(createJsonFromLog(log), Category.Common.name, log.level)
 
