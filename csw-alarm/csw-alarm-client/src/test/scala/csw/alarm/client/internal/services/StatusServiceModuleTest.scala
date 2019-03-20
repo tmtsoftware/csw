@@ -256,16 +256,16 @@ class StatusServiceModuleTest
     redisSubscription.ready().await
 
     // Initially latch and current are disconnected
-    val defaultStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
-    defaultStatus.latchedSeverity shouldEqual Disconnected
-    defaultStatus.acknowledgementStatus shouldEqual Acknowledged
-    defaultStatus.initializing shouldEqual true
+    val status0 = getStatus(tromboneAxisLowLimitAlarmKey).await
+    status0.latchedSeverity shouldEqual Disconnected
+    status0.acknowledgementStatus shouldEqual Acknowledged
+    status0.initializing shouldEqual true
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Disconnected
 
     // Simulates initial component going to Okay and acknowledged status
-    val status = setSeverityAndGetStatus(tromboneAxisLowLimitAlarmKey, Okay)
-    status.latchedSeverity shouldBe Okay
-    status.initializing shouldEqual false
+    val status1 = setSeverityAndGetStatus(tromboneAxisLowLimitAlarmKey, Okay)
+    status1.latchedSeverity shouldBe Okay
+    status1.initializing shouldEqual false
     acknowledge(tromboneAxisLowLimitAlarmKey).await
     getStatus(tromboneAxisLowLimitAlarmKey).await.acknowledgementStatus shouldBe Acknowledged
 
@@ -273,15 +273,29 @@ class StatusServiceModuleTest
     Thread.sleep(1500)
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Disconnected
 
-    val newStatus: AlarmStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
+    val status2: AlarmStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
 
     //the test stream that we have created, should have latched the alarm to Disconnected by now
-    newStatus.latchedSeverity shouldEqual Disconnected
-    newStatus.initializing shouldBe false
-    newStatus.acknowledgementStatus shouldBe Unacknowledged withClue ", alarm should become Unacknowledged"
-    newStatus.shelveStatus shouldEqual Unshelved
-    newStatus.alarmTime.value.isAfter(status.alarmTime.value) shouldBe true withClue ", alarm time did not change"
+    status2.latchedSeverity shouldEqual Disconnected
+    status2.initializing shouldBe false
+    status2.acknowledgementStatus shouldBe Unacknowledged withClue ", alarm should become Unacknowledged"
+    status2.shelveStatus shouldEqual Unshelved
+    status2.alarmTime.value.isAfter(status1.alarmTime.value) shouldBe true withClue ", alarm time did not change"
 
+    //simulate component starts sending Okay heartbeat again
+    val status3 = setSeverityAndGetStatus(tromboneAxisLowLimitAlarmKey, Okay)
+
+    //confirm that current severity is okay
+    getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Okay
+
+    //test that latched severity is still Disconnected
+    status3.latchedSeverity shouldEqual Disconnected
+    status3.initializing shouldBe false
+    status3.acknowledgementStatus shouldBe Unacknowledged withClue ", alarm should be Unacknowledged"
+    status3.shelveStatus shouldEqual Unshelved
+    status3.alarmTime.value.isAfter(status1.alarmTime.value) shouldBe true withClue ", alarm time did not change"
+
+    //shut down the alarm watcher
     redisSubscription.unsubscribe().await
   }
 
