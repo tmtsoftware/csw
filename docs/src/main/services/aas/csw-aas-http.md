@@ -28,10 +28,10 @@ sbt
 To run an akka-http server app, which uses this adapter, we need
 
 * Location Service running
-* Keycloak instance running and registered with Location Service
+* AAS instance running and registered with Location Service
 
-Location Service and Keycloak can be running on different machines. To start Location Service and Keycloak 
-server on a local machine, you make make use of csw-services.sh script.
+Location Service and AAS can be running on different machines. To start Location Service and AAS 
+server on a local machine, you can make use of the csw-services.sh script.
 
 ## Application Configurations
 
@@ -46,7 +46,7 @@ authorization and specific permissions is not needed.  However, if your akka-htt
 uses permission based authorization policies, this config needs to be set to true.
 
 `client-id` is a mandatory configuration which specifies the client id of the app as per registration
-in keycloak.
+in AAS.
 
 ```hocon
 auth-config {
@@ -126,9 +126,9 @@ Scala
 ### PermissionPolicy
 
 This policy filters requests based on permissions. It expects name of scope and name of resource on which permission is created 
-in keycloak. 
+in AAS. 
 
-In the following example policy will authorize request if user has appropriate permission associated in keycloak which specifies
+In the following example policy will authorize request if user has appropriate permission associated in AAS which specifies
 `delete` scope for `account` resource.
 
 Scala
