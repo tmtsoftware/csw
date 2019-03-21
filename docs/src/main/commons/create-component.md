@@ -428,7 +428,7 @@ can be obtained using `ifconfig` on Linux and Mac computers.  `en0` typically wo
 
 To get information on the arguments for the tool, use `csw-services.sh --help`.
 
-List of environment variables which needs to be set before starting csw services is specified in @ref:[environment variable](./env-vars.md) document.  
+List of environment variables which needs to be set before starting csw services is specified in @ref:[environment variable](../deployment/env-vars.md) document.  
 
 #### *Tutorial: Developing an HCD*
 

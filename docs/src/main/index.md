@@ -3,7 +3,6 @@
 @@@ index
  - [Getting Started](commons/getting-started.md)
  - [Creating a Component](commons/create-component.md)
- - [Environment variables](commons/env-vars.md)
  - [Working with Multiple Components](commons/multiple-components.md)
  - [Using Alarms](commons/using-alarms.md)
  - [Adding Unit Tests](commons/unit-tests.md)
@@ -12,6 +11,7 @@
  - [Commands](commons/command.md)
  - [Services](commons/services.md)
  - [Applications](commons/apps.md)
+ - [Deployment](commons/deployment.md)
  - [Testing](commons/testing.md)
  - [sbt tasks](commons/sbt-tasks.md)
  - [Manuals](commons/manuals.md)
