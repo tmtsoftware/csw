@@ -7,9 +7,11 @@ We’ll use the [sbt](http://www.scala-sbt.org/1.x/docs/index.html) build tool w
 ## Installation
 Supported Operating Systems are: CentOS and MacOS
  
-1.  Make sure you have the Java 8 JDK (also known as 1.8)
-    -   Run  `javac -version`  in the command line and make sure you see  `javac 1.8.___`
-    -   If you don’t have version 1.8 or higher,  [install the JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+1.  Make sure you have the Java AdoptOpenJDK 11.
+    -   Run  `javac -version`  in the command line and make sure you see  `javac 11._._`
+    -   If you don’t have version 11 or higher, links given below will help you to reach there.
+        - [Mac](https://github.com/AdoptOpenJDK/homebrew-openjdk)
+        - [Linux](https://adoptopenjdk.net/installation.html?variant=openjdk11&jvmVariant=hotspot#x64_linux-jdk)                
 2.  Install sbt
     -   [Mac](http://www.scala-sbt.org/1.x/docs/Installing-sbt-on-Mac.html)
     -   [Linux](http://www.scala-sbt.org/1.x/docs/Installing-sbt-on-Linux.html)
