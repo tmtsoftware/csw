@@ -1,13 +1,28 @@
 filebeat:
   modules:
     - module: elasticsearch
-      # For more configuration option visit https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-elasticsearch.html
+      server:
+        enabled: true
+        var.paths: ["${TMT_LOG_HOME}/*.log", "${TMT_LOG_HOME}/*/*.log"]
+      gc:
+        enabled: false
+        var.paths: ["${TMT_LOG_HOME}/*.log", "${TMT_LOG_HOME}/*/*.log"]
+      audit:
+        enabled: false
+        var.paths: ["${TMT_LOG_HOME}/*.log", "${TMT_LOG_HOME}/*/*.log"]
+      slowlog:
+        enabled: false
+        var.paths: ["${TMT_LOG_HOME}/*.log", "${TMT_LOG_HOME}/*/*.log"]
+      deprecation:
+        enabled: false
+        var.paths: ["${TMT_LOG_HOME}/*.log", "${TMT_LOG_HOME}/*/*.log"]
     - module: system
       syslog:
         var.convert_timezone: true
       auth:
         var.convert_timezone: true
-          
+
+
 output:
   logstash:
     hosts: ["logstash:5044"]
