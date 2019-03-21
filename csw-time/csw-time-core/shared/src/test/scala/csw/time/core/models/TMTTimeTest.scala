@@ -18,7 +18,7 @@ class TMTTimeTest extends FunSuite with BeforeAndAfterAll {
     val fixedInstant   = Instant.now()
     val expectedMillis = fixedInstant.toEpochMilli
 
-    utcTime.value.toEpochMilli.toDouble shouldEqual expectedMillis.toDouble +- 5
+    utcTime.value.toEpochMilli.toDouble shouldEqual expectedMillis.toDouble +- 10
   }
 
   test("should convert utc to tai") {

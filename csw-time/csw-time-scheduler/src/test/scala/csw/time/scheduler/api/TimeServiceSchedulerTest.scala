@@ -115,7 +115,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
       testProbe.ref ! UTCTime.now()
     }
 
-    val times = testProbe.receiveN(6, 510.milli).map { case t: UTCTime => t }
+    val times = testProbe.receiveN(6, 590.milli).map { case t: UTCTime => t }
 
     cancellable.cancel()
 
@@ -147,7 +147,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
       testProbe.ref ! UTCTime.now()
     }
 
-    val times = testProbe.receiveN(6, 1510.milli).map { case t: UTCTime => t }
+    val times = testProbe.receiveN(6, 1590.milli).map { case t: UTCTime => t }
 
     cancellable.cancel()
 
