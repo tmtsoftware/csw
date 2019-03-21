@@ -1,9 +1,9 @@
 package csw.time.core.models;
 
+import csw.time.clock.natives.models.TMTClock$;
 import csw.time.core.models.utils.JTestProperties;
 import csw.time.core.models.utils.TestProperties;
 import csw.time.core.models.utils.TestUtil;
-import csw.time.clock.natives.models.TMTClock$;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
