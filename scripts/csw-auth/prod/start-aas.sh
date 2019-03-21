@@ -116,10 +116,8 @@ function usage {
 }
 
 function setJvmOpts {
-JAVA_VER=$(java -version 2>&1 | awk -F '"' '/version/ {print $2}' | awk -F '.' '{print $1}')
-    #checks if java version is higher than 8.
-    if [[ ${JAVA_VER} -gt 8 ]]; then export JAVA_OPTS="--add-modules=java.se"; fi
-    echo "JAVA_OPTS set as \"${JAVA_OPTS}\" for Java version ${JAVA_VER}"
+    # Required for jdk 9 and above
+    export JAVA_OPTS="--add-modules=java.se"
 }
 
 function addAdminUser {

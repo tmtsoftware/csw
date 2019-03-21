@@ -39,11 +39,7 @@ object Common extends AutoPlugin {
       if (suppressAnnotatedWarnings.value) s"-P:silencer:sourceRoots=${baseDirectory.value.getCanonicalPath}" else ""
     ),
     javacOptions in (Compile, doc) ++= Seq("-Xdoclint:none"),
-    javacOptions in doc ++= (
-      if (System.getProperty("java.version").startsWith("1."))
-        Seq()
-      else Seq("--ignore-source-errors")
-    ),
+    javacOptions in doc ++= Seq("--ignore-source-errors"),
     testOptions in Test ++= Seq(
       // show full stack traces and test case durations
       Tests.Argument("-oDF")
