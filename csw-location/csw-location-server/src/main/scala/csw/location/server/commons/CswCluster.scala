@@ -8,8 +8,8 @@ import akka.actor.{ActorSystem, CoordinatedShutdown, Scheduler}
 import akka.cluster.ddata.SelfUniqueAddress
 import akka.cluster.ddata.typed.scaladsl
 import akka.cluster.ddata.typed.scaladsl.{DistributedData, Replicator}
-import akka.cluster.http.management.ClusterHttpManagement
 import akka.cluster.typed.{Cluster, Join}
+import akka.management.scaladsl.AkkaManagement
 import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.util.Timeout
 import akka.{actor, Done}
@@ -71,8 +71,8 @@ class CswCluster private (_actorSystem: ActorSystem) {
   private def startClusterManagement(): Unit = {
     val startManagement = actorSystem.settings.config.getBoolean("startManagement")
     if (startManagement) {
-      val clusterHttpManagement = ClusterHttpManagement(akka.cluster.Cluster(actorSystem))
-      Await.result(clusterHttpManagement.start(), 10.seconds)
+      val akkaManagement = AkkaManagement(actorSystem)
+      Await.result(akkaManagement.start(), 10.seconds)
     }
   }
   // $COVERAGE-ON$

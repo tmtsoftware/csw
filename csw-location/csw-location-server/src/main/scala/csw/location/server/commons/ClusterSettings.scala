@@ -117,7 +117,7 @@ private[location] case class ClusterSettings(clusterName: String = Constants.Clu
       "akka.remote.artery.canonical.port"     → port,
       "akka.cluster.seed-nodes"               → seedNodes.asJava,
       "akka.cluster.http.management.hostname" → hostname,
-      "akka.cluster.http.management.port"     → managementPort.getOrElse(19999), //management port will never start at 19999
+      "akka.management.http.port"             → managementPort.getOrElse(19999), //management port will never start at 19999
       "startManagement"                       → managementPort.isDefined
     )
 
