@@ -1,0 +1,21 @@
+filebeat:
+  modules:
+    - module: system
+      syslog:
+        var.convert_timezone: true #This adds timezone variable info to the ingest pipeline
+      auth:
+        var.convert_timezone: true
+    - module: postgresql
+      log:
+          enabled: true
+          processors:
+            - add_locale: ~
+    - module: redis
+
+output:
+  elasticsearch:
+    hosts: ["elasticsearch:9200"]
+# setup.kibana:
+#   host: "kibana:5601"
+# setup.dashboards.enabled: true
+# setup.dashboards.retry.enabled: true

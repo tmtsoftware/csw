@@ -68,8 +68,11 @@ object DeployApp extends AutoPlugin {
     val confs = Path
       .directory(new File(scriptsDir, "conf"))
       .filterNot { case (f, s) => s.equals("conf/redis_sentinel/sentinel.conf") }
+    val loggingAggregator = Path
+      .directory(new File(scriptsDir, "logging_aggregator"))
+      .filterNot { case (_, s) ⇒ s.startsWith("logging_aggregator/prod") }
 
-    confs :+
+    confs ++ loggingAggregator :+
     ((serviceScript, s"bin/${serviceScript.getName}")) :+
     ((prodScript, s"bin/${prodScript.getName}")) :+
     ((authServerScript, s"bin/${authServerScript.getName}")) :+

@@ -1,0 +1,16 @@
+filebeat:
+  inputs:
+    - type: log
+      enabled: true
+      paths:
+        - /usr/share/filebeat/watch/*.log
+        - /usr/share/filebeat/watch/*/*.log
+      fields_under_root: true
+      fields:
+        json: true
+      exclude_files: ["AAS.log"]
+output:
+  logstash:
+    hosts: ["logstash:5044"]
+setup.kibana:
+  host: "kibana:5601"
