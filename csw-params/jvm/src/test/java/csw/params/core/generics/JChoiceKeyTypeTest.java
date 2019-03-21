@@ -46,8 +46,8 @@ public class JChoiceKeyTypeTest extends JUnitSuite {
         // set with varargs
         Parameter<Choice> choiceParameter = choiceKey.set(choice1, choice2);
         Assert.assertEquals(NoUnits, choiceParameter.units());
-        Assert.assertEquals(choice1, choiceParameter.jGet(0).get());
-        Assert.assertEquals(choice2, choiceParameter.jGet(1).get());
+        Assert.assertEquals(choice1, choiceParameter.jGet(0).orElseThrow());
+        Assert.assertEquals(choice2, choiceParameter.jGet(1).orElseThrow());
         Assert.assertEquals(choice1, choiceParameter.head());
         Assert.assertEquals(choice1, choiceParameter.value(0));
         Assert.assertEquals(choice2, choiceParameter.value(1));
@@ -65,8 +65,8 @@ public class JChoiceKeyTypeTest extends JUnitSuite {
         // set with Array and Units
         Parameter<Choice> choiceParameter = choiceKey.set(choicesArr, kilometer);
         Assert.assertEquals(kilometer, choiceParameter.units());
-        Assert.assertEquals(choice1, choiceParameter.jGet(0).get());
-        Assert.assertEquals(choice2, choiceParameter.jGet(1).get());
+        Assert.assertEquals(choice1, choiceParameter.jGet(0).orElseThrow());
+        Assert.assertEquals(choice2, choiceParameter.jGet(1).orElseThrow());
         Assert.assertEquals(choice1, choiceParameter.head());
         Assert.assertEquals(choice1, choiceParameter.value(0));
         Assert.assertEquals(choice2, choiceParameter.value(1));

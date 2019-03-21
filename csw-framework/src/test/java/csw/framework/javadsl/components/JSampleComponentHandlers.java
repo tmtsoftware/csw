@@ -155,7 +155,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     private void processCurrentStateOnewayCommand(Setup setup) {
         //#subscribeCurrentState
         Key<Integer> encoder = JKeyType.IntKey().make("encoder");
-        int expectedEncoderValue = setup.jGet(encoder).get().head();
+        int expectedEncoderValue = setup.jGet(encoder).orElseThrow().head();
 
         CurrentState currentState = new CurrentState(prefix(), new StateName("HCDState")).add(encoder().set(expectedEncoderValue));
         currentStatePublisher.publish(currentState);

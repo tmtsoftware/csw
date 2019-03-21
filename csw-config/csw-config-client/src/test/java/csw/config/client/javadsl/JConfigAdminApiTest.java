@@ -73,7 +73,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
         Path path = Paths.get("/tmt/trombone/assembly/conf/normalfiles/test/test.conf");
         configService.create(path, ConfigData.fromString(configValue1), false, "commit test file").get();
         Optional<ConfigData> configData = configService.getLatest(path).get();
-        Assert.assertEquals(configData.get().toJStringF(mat).get(), configValue1);
+        Assert.assertEquals(configData.orElseThrow().toJStringF(mat).get(), configValue1);
     }
 
     // DEOPSCSW-42: Storing text based component configuration
@@ -91,7 +91,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
         Path path = Paths.get("SomeAnnexFile.txt");
         configService.create(path, ConfigData.fromString(configValue1), true, "creating file for annex store").get();
         Optional<ConfigData> configData = configService.getLatest(path).get();
-        Assert.assertEquals(configData.get().toJStringF(mat).get(), configValue1);
+        Assert.assertEquals(configData.orElseThrow().toJStringF(mat).get(), configValue1);
     }
 
     // DEOPSCSW-49: Update an Existing File with a New Version
@@ -100,11 +100,11 @@ public class JConfigAdminApiTest extends JUnitSuite {
         Path path = Paths.get("/assembly.conf");
         configService.create(path, ConfigData.fromString(configValue1), false, "commit assembly conf").get();
         Optional<ConfigData> configData = configService.getLatest(path).get();
-        Assert.assertEquals(configData.get().toJStringF(mat).get(), configValue1);
+        Assert.assertEquals(configData.orElseThrow().toJStringF(mat).get(), configValue1);
 
         configService.update(path, ConfigData.fromString(configValue2), "commit updated assembly conf").get();
         Optional<ConfigData> configDataUpdated = configService.getLatest(path).get();
-        Assert.assertEquals(configDataUpdated.get().toJStringF(mat).get(), configValue2);
+        Assert.assertEquals(configDataUpdated.orElseThrow().toJStringF(mat).get(), configValue2);
     }
 
     // DEOPSCSW-49: Update an Existing File with a New Version
@@ -138,22 +138,22 @@ public class JConfigAdminApiTest extends JUnitSuite {
         ConfigId configId5 = configService.update(tromboneHcdConf, ConfigData.fromString(configValue5), "updating tromboneHCD.conf").get();
         ConfigId configId6 = configService.update(tromboneAssemblyConf, ConfigData.fromString(configValue2), "updating tromboneAssembly.conf").get();
 
-        ConfigData configData1 = configService.getById(tromboneHcdConf, configId1).get().get();
+        ConfigData configData1 = configService.getById(tromboneHcdConf, configId1).get().orElseThrow();
         Assert.assertEquals(configData1.toJStringF(mat).get(), configValue1);
 
-        ConfigData configData2 = configService.getById(tromboneAssemblyConf, configId2).get().get();
+        ConfigData configData2 = configService.getById(tromboneAssemblyConf, configId2).get().orElseThrow();
         Assert.assertEquals(configData2.toJStringF(mat).get(), configValue2);
 
-        ConfigData configData3 = configService.getById(redisConf, configId3).get().get();
+        ConfigData configData3 = configService.getById(redisConf, configId3).get().orElseThrow();
         Assert.assertEquals(configData3.toJStringF(mat).get(), configValue3);
 
-        ConfigData configData4 = configService.getById(tromboneContainerConf, configId4).get().get();
+        ConfigData configData4 = configService.getById(tromboneContainerConf, configId4).get().orElseThrow();
         Assert.assertEquals(configData4.toJStringF(mat).get(), configValue4);
 
-        ConfigData configData5 = configService.getById(tromboneHcdConf, configId5).get().get();
+        ConfigData configData5 = configService.getById(tromboneHcdConf, configId5).get().orElseThrow();
         Assert.assertEquals(configData5.toJStringF(mat).get(), configValue5);
 
-        ConfigData configData6 = configService.getById(tromboneAssemblyConf, configId6).get().get();
+        ConfigData configData6 = configService.getById(tromboneAssemblyConf, configId6).get().orElseThrow();
         Assert.assertEquals(configData6.toJStringF(mat).get(), configValue2);
     }
 
@@ -163,28 +163,28 @@ public class JConfigAdminApiTest extends JUnitSuite {
     public void testSpecificVersionRetrieval() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/a/b/csw.conf");
         configService.create(path, ConfigData.fromString(configValue1), false, "commit csw conf path").get();
-        Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
+        Assert.assertEquals(configService.getLatest(path).get().orElseThrow().toJStringF(mat).get(), configValue1);
 
         ConfigId configId = configService.update(path, ConfigData.fromString(configValue2), "commit updated conf path").get();
 
         configService.update(path, ConfigData.fromString(configValue3), "updated config to assembly").get();
-        Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue3);
+        Assert.assertEquals(configService.getLatest(path).get().orElseThrow().toJStringF(mat).get(), configValue3);
 
-        Assert.assertEquals(configService.getById(path, configId).get().get().toJStringF(mat).get(), configValue2);
+        Assert.assertEquals(configService.getById(path, configId).get().orElseThrow().toJStringF(mat).get(), configValue2);
     }
 
     @Test
     public void testRetrieveVersionBasedOnDate() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/test.conf");
         configService.create(path, ConfigData.fromString(configValue1), false, "commit initial configuration").get();
-        Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
+        Assert.assertEquals(configService.getLatest(path).get().orElseThrow().toJStringF(mat).get(), configValue1);
 
         configService.update(path, ConfigData.fromString(configValue2), "updated config to assembly").get();
         Instant instant = Instant.now();
         configService.update(path, ConfigData.fromString(configValue3), "updated config to assembly").get();
 
-        Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue3);
-        Assert.assertEquals(configService.getByTime(path, instant).get().get().toJStringF(mat).get(), configValue2);
+        Assert.assertEquals(configService.getLatest(path).get().orElseThrow().toJStringF(mat).get(), configValue3);
+        Assert.assertEquals(configService.getByTime(path, instant).get().orElseThrow().toJStringF(mat).get(), configValue2);
     }
 
     // DEOPSCSW-45: Saving version information for config. file
@@ -297,7 +297,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
         Path path = Paths.get("tromboneHCD.conf");
         configService.create(path, ConfigData.fromString(configValue1), false, "commit trombone config file").get();
 
-        Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
+        Assert.assertEquals(configService.getLatest(path).get().orElseThrow().toJStringF(mat).get(), configValue1);
 
         configService.delete(path, "no longer needed").get();
         Assert.assertEquals(configService.getLatest(path).get(), Optional.empty());
@@ -312,20 +312,20 @@ public class JConfigAdminApiTest extends JUnitSuite {
     public void testGetSetAndResetActiveConfigFile() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/text-files/trombone_hcd/application.conf");
         configService.create(path, ConfigData.fromString(configValue1), false, "hello world").get();
-        Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
+        Assert.assertEquals(configService.getLatest(path).get().orElseThrow().toJStringF(mat).get(), configValue1);
 
         ConfigId configIdUpdate1 = configService.update(path, ConfigData.fromString(configValue2), "Updated config to assembly").get();
         configService.update(path, ConfigData.fromString(configValue3), "Updated config to assembly").get();
-        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue1);
+        Assert.assertEquals(configService.getActive(path).get().orElseThrow().toJStringF(mat).get(), configValue1);
 
         configService.setActiveVersion(path, configIdUpdate1, "setting active version").get();
-        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue2);
+        Assert.assertEquals(configService.getActive(path).get().orElseThrow().toJStringF(mat).get(), configValue2);
 
         configService.resetActiveVersion(path, "resetting active version of file").get();
-        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
+        Assert.assertEquals(configService.getActive(path).get().orElseThrow().toJStringF(mat).get(), configValue3);
 
         configService.resetActiveVersion(path, "resetting active version").get();
-        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
+        Assert.assertEquals(configService.getActive(path).get().orElseThrow().toJStringF(mat).get(), configValue3);
     }
 
     //DEOPSCSW-86: Retrieve a version of a configuration file based on time range for being default version
@@ -353,7 +353,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
 
         // update file and check get active returns last active version and not the latest version
         configService.update(file, ConfigData.fromString(configValue5), "Update 3").get();
-        Assert.assertEquals(configService.getActiveVersion(file).get().get(), configId4);
+        Assert.assertEquals(configService.getActiveVersion(file).get().orElseThrow(), configId4);
 
         // verify complete active file history without any parameter
         List<ConfigFileRevision> completeHistory = configService.historyActive(file).get();
@@ -435,7 +435,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
         Path path = Paths.get("/tmt/binary-files/trombone_hcd/app.bin");
         ConfigId configIdCreate = configService.create(path, ConfigData.fromString(configValue1), true, "commit initial configuration").get();
         Instant createTS = Instant.now();
-        Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
+        Assert.assertEquals(configService.getLatest(path).get().orElseThrow().toJStringF(mat).get(), configValue1);
 
         ConfigId configIdUpdate1 = configService.update(path, ConfigData.fromString(configValue2), "updated config to assembly").get();
         ConfigId configIdUpdate2 = configService.update(path, ConfigData.fromString(configValue3), "updated config to assembly").get();
@@ -470,33 +470,33 @@ public class JConfigAdminApiTest extends JUnitSuite {
     public void testGetAndSetActiveConfigFileFromAnnexStore() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/binary-files/trombone_hcd/app.bin");
         configService.create(path, ConfigData.fromString(configValue1), true, "some comment").get();
-        Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
+        Assert.assertEquals(configService.getLatest(path).get().orElseThrow().toJStringF(mat).get(), configValue1);
 
         ConfigId configIdUpdate1 = configService.update(path, ConfigData.fromString(configValue2), "Updated config to assembly").get();
         configService.update(path, ConfigData.fromString(configValue3), "Updated config").get();
 
         // check that getActive call before any setActive call should return the file with id with which it was created
-        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue1);
+        Assert.assertEquals(configService.getActive(path).get().orElseThrow().toJStringF(mat).get(), configValue1);
 
         configService.setActiveVersion(path, configIdUpdate1, "setting active version").get();
-        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue2);
+        Assert.assertEquals(configService.getActive(path).get().orElseThrow().toJStringF(mat).get(), configValue2);
 
         configService.resetActiveVersion(path, "resetting active version").get();
-        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
+        Assert.assertEquals(configService.getActive(path).get().orElseThrow().toJStringF(mat).get(), configValue3);
     }
 
     @Test
     public void testRetrieveVersionBasedOnDateForFileInAnnexStore() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/test.conf");
         configService.create(path, ConfigData.fromString(configValue1), true, "commit initial configuration to annex store").get();
-        Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
+        Assert.assertEquals(configService.getLatest(path).get().orElseThrow().toJStringF(mat).get(), configValue1);
 
         configService.update(path, ConfigData.fromString(configValue2), "updated config to assembly").get();
         Instant instant = Instant.now();
         configService.update(path, ConfigData.fromString(configValue3), "updated config to assembly").get();
 
-        Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue3);
-        Assert.assertEquals(configService.getByTime(path, instant).get().get().toJStringF(mat).get(), configValue2);
+        Assert.assertEquals(configService.getLatest(path).get().orElseThrow().toJStringF(mat).get(), configValue3);
+        Assert.assertEquals(configService.getByTime(path, instant).get().orElseThrow().toJStringF(mat).get(), configValue2);
     }
 
     @Test
@@ -629,9 +629,9 @@ public class JConfigAdminApiTest extends JUnitSuite {
 
         configService.resetActiveVersion(file, "resetting active version").get();
 
-        Assert.assertEquals(configService.getActiveByTime(file, tHeadRevision).get().get().toJStringF(mat).get(), configValue1);
-        Assert.assertEquals(configService.getActiveByTime(file, tActiveRevision1).get().get().toJStringF(mat).get(), configValue2);
-        Assert.assertEquals(configService.getActiveByTime(file, Instant.now()).get().get().toJStringF(mat).get(), configValue3);
+        Assert.assertEquals(configService.getActiveByTime(file, tHeadRevision).get().orElseThrow().toJStringF(mat).get(), configValue1);
+        Assert.assertEquals(configService.getActiveByTime(file, tActiveRevision1).get().orElseThrow().toJStringF(mat).get(), configValue2);
+        Assert.assertEquals(configService.getActiveByTime(file, Instant.now()).get().orElseThrow().toJStringF(mat).get(), configValue3);
     }
 
     //DEOPSCSW-133: Provide meta config for normal and oversize repo

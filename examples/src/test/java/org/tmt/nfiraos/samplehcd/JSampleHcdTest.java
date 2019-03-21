@@ -53,7 +53,7 @@ public class JSampleHcdTest extends JUnitSuite {
     public void testHCDShouldBeLocatableUsingLocationService() throws ExecutionException, InterruptedException {
         Connection.AkkaConnection connection = new Connection.AkkaConnection(new ComponentId("JSampleHcd", JComponentType.HCD));
         ILocationService locationService = testKit.jLocationService();
-        AkkaLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().get();
+        AkkaLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().orElseThrow();
 
         Assert.assertEquals(connection, location.connection());
     }
@@ -120,7 +120,7 @@ public class JSampleHcdTest extends JUnitSuite {
 
         Connection.AkkaConnection connection = new Connection.AkkaConnection(new ComponentId("JSampleHcd", JComponentType.HCD));
         ILocationService locationService = testKit.jLocationService();
-        AkkaLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().get();
+        AkkaLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().orElseThrow();
 
         ICommandService hcd = CommandServiceFactory.jMake(location, typedActorSystem);
 
@@ -145,7 +145,7 @@ public class JSampleHcdTest extends JUnitSuite {
 
         Connection.AkkaConnection connection = new Connection.AkkaConnection(new ComponentId("JSampleHcd", JComponentType.HCD));
         ILocationService locationService = testKit.jLocationService();
-        AkkaLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().get();
+        AkkaLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().orElseThrow();
 
         ICommandService hcd = CommandServiceFactory.jMake(location, typedActorSystem);
 

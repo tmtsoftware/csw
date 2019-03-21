@@ -155,7 +155,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
 
         // values of parameters are arrays.  Get the first one (the only one in our case) using `head` method available as a convenience method on `Parameter`.
         if (sleepTimeParamOption.isPresent()) {
-            Parameter<Long> sleepTimeParam = sleepTimeParamOption.get();
+            Parameter<Long> sleepTimeParam = sleepTimeParamOption.orElseThrow();
             long sleepTimeInMillis = sleepTimeParam.head();
 
             log.info(() -> "command payload: " + sleepTimeParam.keyName() + " = " + sleepTimeInMillis);

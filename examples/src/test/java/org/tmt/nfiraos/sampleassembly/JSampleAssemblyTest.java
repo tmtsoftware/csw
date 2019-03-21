@@ -36,7 +36,7 @@ public class JSampleAssemblyTest extends JUnitSuite {
     public void testAssemblyShouldBeLocatableUsingLocationService() throws ExecutionException, InterruptedException {
         Connection.AkkaConnection connection = new Connection.AkkaConnection(new ComponentId("JSampleAssembly", JComponentType.Assembly));
         ILocationService locationService = testKit.jLocationService();
-        AkkaLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().get();
+        AkkaLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().orElseThrow();
 
         Assert.assertEquals(location.connection(), connection);
     }

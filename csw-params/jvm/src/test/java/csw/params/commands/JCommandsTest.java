@@ -44,13 +44,13 @@ public class JCommandsTest extends JUnitSuite {
         Assert.assertTrue(command.exists(epochStringKey));
 
         // jFind
-        Assert.assertEquals(epochStringParam, command.jFind(epochStringParam).get());
+        Assert.assertEquals(epochStringParam, command.jFind(epochStringParam).orElseThrow());
         Assert.assertEquals(Optional.empty(), command.jFind(epochIntParam));
 
         // jGet
-        Assert.assertEquals(epochStringParam, command.jGet(epochStringKey).get());
+        Assert.assertEquals(epochStringParam, command.jGet(epochStringKey).orElseThrow());
         Assert.assertEquals(Optional.empty(), command.jGet(epochIntKey));
-        Assert.assertEquals(epochStringParam, command.jGet(epochStringKey.keyName(), epochStringKey.keyType()).get());
+        Assert.assertEquals(epochStringParam, command.jGet(epochStringKey.keyName(), epochStringKey.keyType()).orElseThrow());
         Assert.assertEquals(Optional.empty(), command.jGet(epochIntKey.keyName(), epochIntKey.keyType()));
 
         // size
@@ -145,7 +145,7 @@ public class JCommandsTest extends JUnitSuite {
 
         // runId, obsId, prefix, subsystem
         Assert.assertNotNull(wait.runId());
-        Assert.assertEquals(obsId, wait.jMaybeObsId().get());
+        Assert.assertEquals(obsId, wait.jMaybeObsId().orElseThrow());
         Assert.assertEquals(prefix, wait.source().prefix());
         Assert.assertEquals(commandName, wait.commandName());
         Assert.assertEquals(WFOS, wait.source().subsystem());

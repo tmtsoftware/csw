@@ -105,7 +105,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Optional<AkkaLocation> maybeLocation = eventualLocation.get();
         Assert.assertTrue(maybeLocation.isPresent());
 
-        return maybeLocation.get();
+        return maybeLocation.orElseThrow();
     }
 
     @Test
@@ -173,7 +173,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
                             if (response instanceof CommandResponse.CompletedWithResult) {
                                 // This extracts and returns the the first value of parameter encoder
                                 Result result = ((CommandResponse.CompletedWithResult) response).result();
-                                Optional<Integer> rvalue = Optional.of(result.jGet(encoder).get().head());
+                                Optional<Integer> rvalue = Optional.of(result.jGet(encoder).orElseThrow().head());
                                 return CompletableFuture.completedFuture(rvalue);
                             } else {
                                 // For some other response, return empty
@@ -207,7 +207,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
             if (response instanceof CommandResponse.CompletedWithResult) {
                 // This extracts and returns the the first value of parameter encoder
                 Result result = ((CommandResponse.CompletedWithResult) response).result();
-                Optional<Integer> rvalue = Optional.of(result.jGet(encoder).get().head());
+                Optional<Integer> rvalue = Optional.of(result.jGet(encoder).orElseThrow().head());
                 return CompletableFuture.completedFuture(rvalue);
             } else {
                 // For some other response, return empty
@@ -226,7 +226,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
                     if (response instanceof CommandResponse.CompletedWithResult) {
                         // This extracts and returns the the first value of parameter encoder
                         Result result = ((CommandResponse.CompletedWithResult) response).result();
-                        Optional<Integer> rvalue = Optional.of(result.jGet(encoder).get().head());
+                        Optional<Integer> rvalue = Optional.of(result.jGet(encoder).orElseThrow().head());
                         return CompletableFuture.completedFuture(rvalue);
                     } else {
                         // For some other response, return empty
@@ -318,7 +318,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         final AtomicInteger cstate = new AtomicInteger((1));
         CurrentStateSubscription subscription = hcdCmdService.subscribeCurrentState(cs -> {
             // Example sets variable outside scope of closure
-            cstate.set(cs.jGet(encoder).get().head());
+            cstate.set(cs.jGet(encoder).orElseThrow().head());
         });
         // Send a oneway to the HCD that will cause a publish of a CurrentState with the encoder value
         // in the command parameter "encoder"
