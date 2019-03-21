@@ -25,8 +25,7 @@ pipeline {
         // Component tests cover the scenario of multiple components in single container
         stage('Unit and Component Tests') {
             steps {
-                sh "sbt -DenableCoverage=true test:testOnly * -- -l csw.time.core.tags.TimeTests"
-                sh "sbt -DenableCoverage=true test:testOnly * -- -n csw.time.core.tags.TimeTests"
+                sh "sbt -DenableCoverage=true test:test"
             }
             post {
                 always {
