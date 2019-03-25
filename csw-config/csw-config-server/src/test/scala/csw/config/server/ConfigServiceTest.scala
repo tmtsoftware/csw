@@ -89,7 +89,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   // DEOPSCSW-71: Retrieve any version of a configuration file using its unique id
   // DEOPSCSW-48: Store new configuration file in Config. service
   test("should able to upload and get component configurations from config service") {
-    val configFileNames            = Set("tromboneAssembly.conf", "tromboneContainer.conf", "tromboneHCD.conf")
+    val configFileNames            = Set("tromboneAssemblyTest.conf", "tromboneContainerTest.conf", "tromboneHCDTest.conf")
     val configIds                  = createConfigs(configFileNames)
     val configFilePaths: Set[Path] = configFileNames.map(name ⇒ Paths.get(name))
     val tuples                     = configIds zip configFilePaths
@@ -920,7 +920,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   // DEOPSCSW-131: Detect and handle oversize files
   test("should be able to store and retrieve text file from annex store when size is greater than configured size",
        FileSystemSensitive) {
-    val fileName              = "tromboneContainer.conf"
+    val fileName              = "tromboneContainerTest.conf"
     val path                  = Paths.get(getClass.getClassLoader.getResource(fileName).toURI)
     val configData            = ConfigData.fromPath(path)
     val config: Config        = ConfigFactory.parseString("csw-config-server.annex-min-file-size=1 KiB")
