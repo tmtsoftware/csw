@@ -1,2 +1,2 @@
 before_install:
-  - ./scripts/adopt-open-jdk-11-setup.sh
+  - ./adopt-open-jdk-11-setup.sh
