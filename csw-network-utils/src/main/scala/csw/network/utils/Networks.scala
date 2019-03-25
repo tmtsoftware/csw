@@ -71,10 +71,10 @@ object Networks {
       case Some(interface) ⇒ interface
       case None ⇒
         (sys.env ++ sys.props).getOrElse(
-          "interfaceName", {
+          "INTERFACE_NAME", {
             if (ConfigFactory.load().getBoolean("csw-networks.hostname.automatic")) ""
             else {
-              val networkInterfaceNotProvided = NetworkInterfaceNotProvided("interfaceName env variable is not set.")
+              val networkInterfaceNotProvided = NetworkInterfaceNotProvided("INTERFACE_NAME env variable is not set.")
               log.error(networkInterfaceNotProvided.message, ex = networkInterfaceNotProvided)
               throw networkInterfaceNotProvided
             }

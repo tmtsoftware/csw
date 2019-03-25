@@ -80,7 +80,7 @@ See [here](https://tmtsoftware.github.io/csw/0.6.0/) for a detailed documentatio
 
     - It is no longer necessary for components (HCDs, assemblies) and applications to join the
       location service cluster and no need to define any environment variables or system properties
-      before starting the components or applications (Previously `clusterSeeds` and `interfaceName` had to be defined). 
+      before starting the components or applications (Previously `clusterSeeds` and `INTERFACE_NAME` had to be defined). 
       
     - Location service access is now via an HTTP server running on each host 
     (The HTTP servers form a cluster).

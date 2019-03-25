@@ -11,7 +11,7 @@ package csw.location
  *
  * Before calling LocationServiceFactory.make() to get an handle of LocationService,
  * it is recommended to have below environment variables set to System global environments or system properties:
- *  - interfaceName (The network interface where akka cluster is formed.) Ex. interfaceName=eth0 if not set, first inet4 interface by priority will be picked
+ *  - INTERFACE_NAME (The network interface where akka cluster is formed.) Ex. INTERFACE_NAME=eth0 if not set, first inet4 interface by priority will be picked
  *  - clusterSeeds (The host address and port of the seedNodes of the cluster) Ex. clusterSeeds="192.168.121.10:3552, 192.168.121.11:3552"
  *  - clusterPort (Specify port on which to start this service) Ex. clusterPort=3552 if this property is not set, service will start on random port.
  *

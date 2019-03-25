@@ -13,7 +13,7 @@ Due to the way random port numbers are used for CSW components, firewalls should
 which are assumed to be in an internal network that is protected from outside access. 
 @@@
 
-In order to determine the correct IP address to use for the local host, it is necessary to set the *interfaceName* environment variable or property to the
+In order to determine the correct IP address to use for the local host, it is necessary to set the *INTERFACE_NAME* environment variable or property to the
 name of the network interface to use (There could be multiple NICs).
 The @github[ClusterSettings](/csw-location/csw-location-server/src/main/scala/csw/location/server/commons/ClusterSettings.scala) class uses that information,
 along with other settings when starting the cluster actor. 

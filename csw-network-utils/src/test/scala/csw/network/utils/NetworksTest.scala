@@ -38,7 +38,7 @@ class NetworksTest extends FunSuite with Matchers with BeforeAndAfterAll with Be
 
   }
 
-  test("Should get ip4 address of interface with lowest index when interfacename is not provided") {
+  test("Should get ip4 address of interface with lowest index when interface name is not provided") {
     val inet4Address1         = InetAddress.getByAddress(Array[Byte](192.toByte, 168.toByte, 1, 2))
     val inet4Address2         = InetAddress.getByAddress(Array[Byte](172.toByte, 17.toByte, 1, 2))
     val inet4Address3         = InetAddress.getByAddress(Array[Byte](10.toByte, 12.toByte, 2, 1))

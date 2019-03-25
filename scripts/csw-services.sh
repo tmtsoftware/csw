@@ -5,18 +5,18 @@
 #
 # Usage is:
 #   ###########################  IMPORTANT ###########################
-#    1. Before running this script, make sure that you have interfaceName environment variable is set.
+#    1. Before running this script, make sure that you have INTERFACE_NAME environment variable is set.
 #    2. If env variable is not set, then make sure you pass in --interfaceName or -i <name> to this script to pick the correct
 #      interface where location service gets bind.
 #   ##################################################################
 #
-#   If svn repo does not already exists on local machine and interfaceName env variable is set, then use below command to start all the services:
+#   If svn repo does not already exists on local machine and INTERFACE_NAME env variable is set, then use below command to start all the services:
 #    csw-services.sh start --initRepo     :to start event service, cluster seed application and register the config and event service
 #
-#   If svn repo already exists on local machine and interfaceName env variable is set, then use below command to start all the service:
+#   If svn repo already exists on local machine and INTERFACE_NAME env variable is set, then use below command to start all the service:
 #    csw-services.sh start    :to start event service, cluster seed application and register the config and event service
 #
-#   If svn repo already exists on local machine and interfaceName env variable is not set, then use below command to start all the service:
+#   If svn repo already exists on local machine and INTERFACE_NAME env variable is not set, then use below command to start all the service:
 #    csw-services.sh start --interfaceName eth0   :to start event service, cluster seed application and register the config and event service
 #
 #   In case you do not want to start all the services, then specify supported arguments to start
@@ -122,7 +122,7 @@ function getIP {
     if [[ `uname` == "Darwin" ]] ; then cmd="ifconfig"
     elif [[ `uname` == "Linux" ]] ; then cmd="ip addr show" ; fi
 
-    local IP=`${cmd} ${interfaceName} | grep 'inet ' | awk '{ print $2}' | cut -d'/' -f1`
+    local IP=`${cmd} ${INTERFACE_NAME} | grep 'inet ' | awk '{ print $2}' | cut -d'/' -f1`
     echo ${IP}
 }
 
@@ -311,7 +311,7 @@ function parse_cmd_args {
             shift
             if [[ $# -eq 2 && ($1 == "--interfaceName" || $1 == "-i") ]] ; then
                 interfaceName=$2
-                export interfaceName=${interfaceName}
+                export INTERFACE_NAME=${interfaceName}
                 # if only interfaceName argument provided with start, then start all services
                 enableAllServicesForRunning
             elif [[ $# -eq 1 && $1 == "--initRepo" ]] ; then
@@ -381,7 +381,7 @@ function parse_cmd_args {
             fi
 
             if [[ ${interfaceName} == "" ]] ; then
-                echo "[ERROR] interfaceName is not provided, please provide valid interface name via argument --interfaceName|-i or set interfaceName env variable."
+                echo "[ERROR] interfaceName is not provided, please provide valid interface name via argument --interfaceName|-i or set INTERFACE_NAME env variable."
                 exit 1
             else
                 # Get the ip address of local machine and store it in variable: my_ip

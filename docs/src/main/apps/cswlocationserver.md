@@ -47,7 +47,7 @@ Switch to application directory and run this command on **machine1 and machine2*
 
 In some cases it may be necessary to also specify the network interface to use, 
 for example, if the host has multiple network interfaces and the correct one is not used automatically.
-In this case, you can set the environment variable `interfaceName` to the name of the network interface to use 
+In this case, you can set the environment variable `INTERFACE_NAME` to the name of the network interface to use 
 or pass the `--interfaceName=...` command line option.
 Use `ifconfig -a` to see a list of the available network interfaces.
 

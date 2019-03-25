@@ -5,7 +5,7 @@ List of environment variables which needs to be set for using different Csw serv
 | Variable       | Dev       | Prod      | Needs to set before   | Description               |
 | :------------: |:--------: | :-------: | :------------------:  | :------------------------ |
 | clusterSeeds   | Mandatory | Mandatory | starting csw services | The Host and port of the seed nodes of cluster, Ex. clusterSeeds=“127.0.0.1:3552, 127.0.0.2:3552”. |
-| interfaceName  | Mandatory | Mandatory | starting csw services | Network interface in which AKKA cluster is formed, Ex. interfaceName=en0. |
+| INTERFACE_NAME  | Mandatory | Mandatory | starting csw services | Network interface in which AKKA cluster is formed, Ex. INTERFACE_NAME=en0. |
 | clusterPort    | Optional  | Mandatory | starting location service | Port on which location service will start. For dev default is random portPort. |
 | managementPort | Optional  | Optional  | starting location service |  Port on which Akka provided cluster management service will start (if not provided service won’t start) |
 | cswAdminPrefix | Optional  | Optional  | firing unlock command | Needed to give admin the capability of unlocking the locked components. (If not set, command will result in no-op) |
