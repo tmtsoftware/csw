@@ -1,0 +1,27 @@
+## CSW - TMT Common Software v0.-RC1
+
+This is release v0.7.0-RC1 of the TMT Common Software.
+
+See [CHANGELOG.md](CHANGELOG.md) for details of all releases.
+
+### Changes
+- Added new services
+    - Time Service
+    - Authentication and Authorization Service
+    - Database Service
+    - Logging Aggregator Service
+- Support Unlocking of a component by Admin
+- Added authentication and authorization to config service admin rest endpoints
+- Integration of time service with event service and alarm service.
+- Added new APIs to EventPublisher allowing to provide startTime in eventGenerator APIs 
+- Changed EventPublisher APIs with eventGenerator to allow optional publishing of events
+- Get route of config server with path for empty config file gives 404 instead of 200
+    
+### Version Upgrades
+- Migration to AdoptOpenJDK 11
+- Akka version upgrade to 2.5.21
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/0.7.0-RC1/
+- Scaladoc: https://tmtsoftware.github.io/csw/0.7.0-RC1/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/0.7.0-RC1/api/java/index.html
