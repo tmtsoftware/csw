@@ -56,7 +56,7 @@ private[location] case class ClusterSettings(clusterName: String = Constants.Clu
   private val InterfaceNameKey  = "INTERFACE_NAME"
   private val ClusterSeedsKey   = "CLUSTER_SEEDS"
   private val ClusterPortKey    = "CLUSTER_PORT"
-  private val ManagementPortKey = "managementPort"
+  private val ManagementPortKey = "MANAGEMENT_PORT"
 
   private def withEntry(key: String, value: Any): ClusterSettings = copy(values = values + (key → value))
 
