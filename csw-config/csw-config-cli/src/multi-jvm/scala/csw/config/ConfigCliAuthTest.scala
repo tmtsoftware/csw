@@ -10,13 +10,14 @@ import csw.aas.core.deployment.AuthServiceLocation
 import csw.config.cli.args.Options
 import csw.config.cli.wiring.Wiring
 import csw.config.client.scaladsl.ConfigClientFactory
+import csw.config.helpers.ResourceFileReader.read
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.{ServerWiring, Settings}
 import csw.location.helpers.{LSNodeSpec, NMembersAndSeed}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import org.scalatest.FunSuiteLike
 import org.tmt.embedded_keycloak.KeycloakData._
-import org.tmt.embedded_keycloak.{EmbeddedKeycloak, KeycloakData, Settings => KeycloakSettings}
+import org.tmt.embedded_keycloak.{EmbeddedKeycloak, KeycloakData, Settings ⇒ KeycloakSettings}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{DurationLong, FiniteDuration}
@@ -102,8 +103,7 @@ class ConfigCliAuthTest(ignore: Int)
 
     runOn(client) {
       implicit val mat: Materializer = ActorMaterializer()
-      val filePath                   = Paths.get(getClass.getResource("/tromboneHCDContainer.conf").getPath)
-      val fileContents               = scala.io.Source.fromFile(filePath.toFile).mkString
+      val (filePath, fileContents)   = read("/tromboneHCDContainer.conf")
       val repoPath1                  = Paths.get("/client1/hcd/text/tromboneHCDContainer.conf")
 
       enterBarrier("keycloak started")
@@ -122,7 +122,7 @@ class ConfigCliAuthTest(ignore: Int)
         System.setIn(stdIn)
       }
 
-      runner.create(Options(relativeRepoPath = Some(repoPath1), inputFilePath = Some(filePath), comment = Some("test")))
+      runner.create(Options(relativeRepoPath = Some(repoPath1), inputFilePath = Some(Paths.get(filePath)), comment = Some("test")))
 
       val configService     = ConfigClientFactory.clientApi(system, locationService)
       val actualConfigValue = configService.getActive(repoPath1).await.get.toStringF.await

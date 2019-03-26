@@ -10,6 +10,7 @@ import csw.config.api.models.ConfigData
 import csw.config.cli.wiring.Wiring
 import csw.config.client.internal.ActorRuntime
 import csw.config.client.scaladsl.ConfigClientFactory
+import csw.config.helpers.ResourceFileReader.read
 import csw.config.helpers.TwoClientsAndServer
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.mocks.MockedAuthentication
@@ -34,20 +35,19 @@ class ConfigCliAppTest(ignore: Int)
 
   private val testFileUtils = new TestFileUtils(new Settings(ConfigFactory.load()))
 
-  val nativeAuthAdapter: InstalledAppAuthAdapter = mock[InstalledAppAuthAdapter]
+  private val nativeAuthAdapter: InstalledAppAuthAdapter = mock[InstalledAppAuthAdapter]
+
+  private val (inputFilePath, inputFileContents)               = read("/tromboneHCDContainer.conf")
+  private val (updatedInputFilePath, updatedInputFileContents) = read("/tromboneAssembly.conf")
+
+  private val repoPath1 = "/client1/hcd/text/tromboneHCDContainer.conf"
+  private val repoPath2 = "/client2/hcd/text/app.conf"
+  private val comment   = "test comment"
 
   override def afterAll(): Unit = {
     super.afterAll()
     testFileUtils.deleteServerFiles()
   }
-
-  val inputFilePath            = getClass.getResource("/tromboneHCDContainer.conf").getPath
-  val updatedInputFilePath     = getClass.getResource("/tromboneAssembly.conf").getPath
-  val inputFileContents        = scala.io.Source.fromFile(inputFilePath).mkString
-  val updatedInputFileContents = scala.io.Source.fromFile(updatedInputFilePath).mkString
-  val repoPath1                = "/client1/hcd/text/tromboneHCDContainer.conf"
-  val repoPath2                = "/client2/hcd/text/app.conf"
-  val comment                  = "test comment"
 
   test("should upload, update, get and set active version of configuration files") {
     runOn(server) {
