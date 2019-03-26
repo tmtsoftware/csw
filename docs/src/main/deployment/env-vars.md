@@ -12,7 +12,7 @@ List of environment variables which needs to be set for using different Csw serv
 | TMT_LOG_HOME   | Optional  | Mandatory | starting any Csw service | Base path of directory to hold log files from TMT apps. (Log files will be generated only if file appender is activated) |
 | DB_READ_USERNAME & DB_READ_PASSWORD | Optional | Mandatory (for components using DB service) | starting DB service | Needed to create connection with Database service with read access. |
 | DB_WRITE_USERNAME & DB_WRITE_PASSWORD | Optional | Mandatory (for components using DB service) | starting DB service | Needed to create connection with Database service with write access. |
-| dbAdminUsername & dbAdminPassword | Optional | Mandatory (for components using DB service) | starting DB service | Needed to create connection with Database service with admin access. |
+| DB_ADMIN_USERNAME & DB_ADMIN_PASSWORD | Optional | Mandatory (for components using DB service) | starting DB service | Needed to create connection with Database service with admin access. |
 
 #### Terminologies
  
