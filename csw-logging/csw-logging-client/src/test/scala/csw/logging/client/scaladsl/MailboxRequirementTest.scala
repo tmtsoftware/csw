@@ -18,15 +18,10 @@ class MailboxRequirementTest extends FunSuite with Matchers with BeforeAndAfterE
 
   private val defaultCapacity = 10
   private val zeroCapacity    = 0
-  private val fourCapacity    = 4
 
   def configWithCapacity(capacity: Int): Config =
     ConfigFactory
-      .parseString(s"""bounded-mailbox {
-        |  mailbox-type = "akka.dispatch.BoundedMailbox"
-        |  mailbox-capacity = $capacity
-        |  mailbox-push-timeout-time = 0
-        |}""".stripMargin)
+      .parseString(s"""bounded-mailbox.mailbox-capacity = $capacity""")
       .withFallback(ConfigFactory.load("application.conf"))
 
   val logBuffer: mutable.Buffer[JsObject] = mutable.Buffer.empty[JsObject]
@@ -67,6 +62,7 @@ class MailboxRequirementTest extends FunSuite with Matchers with BeforeAndAfterE
     Await.result(actorSystem.terminate(), 5.seconds)
   }
 
+  // This shows that log actor is configured with the given capacity for Mailbox and it's a bounded Mailbox
   test("should get no messages if mailbox capacity is zero") {
     val actorSystem        = ActorSystem("test", configWithCapacity(capacity = zeroCapacity))
     lazy val loggingSystem = new LoggingSystem("logging", "version", hostName, actorSystem)
@@ -81,20 +77,4 @@ class MailboxRequirementTest extends FunSuite with Matchers with BeforeAndAfterE
 
     Await.result(actorSystem.terminate(), 5.seconds)
   }
-
-  test("should get limited messages if msg count is beyond the capacity defined for mailbox") {
-    val actorSystem        = ActorSystem("test", configWithCapacity(capacity = fourCapacity))
-    lazy val loggingSystem = new LoggingSystem("logging", "version", hostName, actorSystem)
-
-    loggingSystem.setAppenders(List(testAppender))
-
-    val irisActorRef: ActorRef = actorSystem.actorOf(IRIS.props(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
-
-    sendMessagesToActor(irisActorRef)
-
-    logBuffer.size shouldEqual 5
-
-    Await.result(actorSystem.terminate(), 5.seconds)
-  }
-
 }
