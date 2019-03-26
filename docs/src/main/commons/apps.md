@@ -25,9 +25,10 @@ event service and/or alarm service.
 Assuming that developer has downloaded `csw-apps-<some-version>.zip` from [csw releases](https://github.com/tmtsoftware/csw/releases)
 and unzipped it.
 
-There are three folders, as follows, in `csw-apps-<some-version>`
+There are four folders, as follows, in `csw-apps-<some-version>`
 * bin
 * lib
+* logging_aggregator
 * and conf.
 
 All the shell scripts provided by `csw` reside in `bin` folder. The shell script referred in this segment is named as `csw-services.sh`.
@@ -65,11 +66,62 @@ postgres shell again and set the password. Once set successfully, revert `trust`
 
 With this, the component code is now ready to connect to provided services via `csw-services.sh`.   
 
+## Starting ELK logging aggregator for Development
 
-  
+ELK stack ([Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html),
+           [Logstash](https://www.elastic.co/guide/en/logstash/current/index.html),
+           [Kibana](https://www.elastic.co/guide/en/kibana/current/index.html)) and 
+           [Filebeat](https://www.elastic.co/guide/en/beats/filebeat/current/index.html) is used to aggregate logs generated from TMT applications (Scala/Java/Python/C++/C) and
+csw services (mentioned in the previous section). For development purposes [Docker compose](https://docs.docker.com/compose/) is used. Hence, make sure that latest
+Docker setup is installed and running before starting the ELK stack. To know more about how ELK stack works please refer @ref[Logging Aggregator](../services/logging_aggregator.md).
 
+For host setup follow the below given steps:
 
- 
+* Install [Docker](https://www.docker.com/community-edition#/download) version **17.05+**
+* Install [Docker Compose](https://docs.docker.com/compose/install/) version **1.6.0+**
+
+On distributions which have SELinux enabled out-of-the-box you will need to either re-context the files or set SELinux
+into Permissive mode in order for docker-elk to start properly. For example on Redhat and CentOS, the following will
+apply the proper context:
+
+```console
+$ chcon -R system_u:object_r:admin_home_t:s0 docker-elk/
+```
+To know more about running docker for mac please refer this [link](https://docs.docker.com/v17.12/docker-for-mac/). For windows, ensure that the
+"Shared Drives" feature is enabled for the `C:` drive (Docker for Windows > Settings > Shared Drives).
+See [Configuring Docker for Windows Shared Drives](https://blogs.msdn.microsoft.com/stevelasker/2016/06/14/configuring-docker-for-windows-volumes/) (MSDN Blog).
+
+Assuming that developer has downloaded `csw-apps-<some-version>.zip` from [csw releases](https://github.com/tmtsoftware/csw/releases)
+and unzipped it.
+
+There are four folders, as follows, in `csw-apps-<some-version>`
+
+* bin
+* lib
+* logging_aggregator
+* and conf.
+
+Go to `logging_aggreator/dev` and run
+
+* `docker-compose build  --no-cache`
+* `docker-compose up  --force-recreate`
+
+This will start Filebeat, Elasticsearch, Logstash and Kibana in a docker container. Note that `csw-services.sh` will generate all log files under 
+`/tmp/csw/logs/` and Filebeat will watch from there.
+
+Once, the docker container is up, hit `http://localhost:5601/` for Kibana in browser. Go to:
+
+* `Management` -> `Kibana` ->  `Index Patterns` and create an index pattern as per the requirement.
+* `Discover` -> `Select the index pattern created` and explore
+
+To use a different Elastic Stack version than the one currently available in the repository, simply change the version in `logging_aggreator/dev/.env`
+file, and rebuild the stack with:
+
+* `docker-compose build  --no-cache`
+* `docker-compose up  --force-recreate`
+
+Always pay attention to the [upgrade instructions](https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-upgrade.html)
+for each individual component before performing a stack upgrade.
 
 
  

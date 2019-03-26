@@ -1,0 +1,11 @@
+filebeat:
+  modules:
+    - module: system
+      syslog:
+        var.convert_timezone: true
+      auth:
+        var.convert_timezone: true
+
+output:
+  logstash:
+    hosts: ["elasticsearch:9200"]

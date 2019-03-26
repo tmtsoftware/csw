@@ -22,6 +22,3 @@ int main(int argc, char **argv)
     zlog_fini();
     return 0;
 }
-
-//cc -c -o main.o main.c -I/usr/local/include
-//cc -o main main.o -L/usr/local/lib -lzlog

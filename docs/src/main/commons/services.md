@@ -6,6 +6,7 @@
 * [Location service](../services/location.md)
 * [Configuration service](../services/config.md)
 * [Logging service](../services/logging.md)
+* [Logging service](../services/logging_aggregator.md)
 * [Event service](../services/event.md)
 * [Alarm service](../services/alarm.md)
 * [Time service](../services/time.md)
