@@ -102,7 +102,7 @@ class ConfigCliAuthTest(ignore: Int)
 
     runOn(client) {
       implicit val mat: Materializer = ActorMaterializer()
-      val filePath                   = Paths.get(getClass.getResource("/tromboneHCDTest.conf").getPath)
+      val filePath                   = Paths.get(getClass.getResource("/tromboneHCDContainer.conf").getPath)
       val fileContents               = scala.io.Source.fromFile(filePath.toFile).mkString
       val repoPath1                  = Paths.get("/client1/hcd/text/tromboneHCDContainer.conf")
 
