@@ -53,7 +53,7 @@ function checkIfRedisIsInstalled {
 function start_sentinel() {
     if checkIfRedisIsInstalled ; then
         echo "Starting Redis Sentinel on port: [$sentinel_port] ..."
-        nohup ./csw-location-agent -DclusterSeeds=${clusterSeeds} --name "EventServer,AlarmServer" --command "$redisSentinel ${sentinelConf} --port ${sentinel_port}" --port "${sentinel_port}"> ${sentinelLogFile} 2>&1 &
+        nohup ./csw-location-agent -DCLUSTER_SEEDS=${clusterSeeds} --name "EventServer,AlarmServer" --command "$redisSentinel ${sentinelConf} --port ${sentinel_port}" --port "${sentinel_port}"> ${sentinelLogFile} 2>&1 &
         echo $! > ${sentinelPidFile}
         echo ${sentinel_port} > ${sentinelPortFile}
     else

@@ -24,7 +24,7 @@ object Main extends App {
     case Options(maybeClusterPort, testMode) =>
       if (!testMode && ClusterAwareSettings.seedNodes.isEmpty) {
         println(
-          "[ERROR] clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."
+          "[ERROR] CLUSTER_SEEDS setting is not specified either as env variable or system property. Please check online documentation for this set-up."
         )
       } else {
         val wiring =

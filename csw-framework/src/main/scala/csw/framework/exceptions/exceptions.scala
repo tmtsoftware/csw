@@ -23,12 +23,12 @@ private[framework] case object UnableToParseOptions
     extends RuntimeException("Could not parse command line options. See --help to know more.")
 
 /**
- * ClusterSeedsNotFound is thrown while starting the container or host app if clusterSeeds are not provided or set in
+ * ClusterSeedsNotFound is thrown while starting the container or host app if CLUSTER_SEEDS are not provided or set in
  * environment variable
  */
 private[framework] case object ClusterSeedsNotFound
     extends RuntimeException(
-      "clusterSeeds setting is not specified either as env variable or system property. " +
+      "CLUSTER_SEEDS setting is not specified either as env variable or system property. " +
       "Please check online documentation for this set-up."
     )
 

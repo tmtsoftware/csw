@@ -13,7 +13,7 @@ For example:
 
 ```bash
 export INTERFACE_NAME=enp0s31f6
-export clusterSeeds=192.168.178.66:7777
+export CLUSTER_SEEDS=192.168.178.66:7777
 
 csw-location-server --clusterPort 7777
 ```

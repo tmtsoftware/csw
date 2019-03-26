@@ -16,7 +16,7 @@ services:
       - ${LOCATION_SERVER_PORT}:${LOCATION_SERVER_PORT}
       - ${ADMIN_PORT}:${ADMIN_PORT}
     command:
-      - "-DclusterSeeds=${SEED_IP}:${CLUSTER_PORT}"
+      - "-DCLUSTER_SEEDS=${SEED_IP}:${CLUSTER_PORT}"
       - "--clusterPort=${CLUSTER_PORT}"
     networks:
       csw_net:
@@ -27,7 +27,7 @@ services:
     ports:
       - ${CONFIG_PORT}:${CONFIG_PORT}
     command:
-      - "-DclusterSeeds=${SEED_IP}:${CLUSTER_PORT}"
+      - "-DCLUSTER_SEEDS=${SEED_IP}:${CLUSTER_PORT}"
       - "--initRepo"
     networks:
       - csw_net
@@ -37,7 +37,7 @@ services:
   location-agent:
     image: csw-location-agent:${TAG_ID}
     command:
-      - "-DclusterSeeds=${SEED_IP}:${CLUSTER_PORT}"
+      - "-DCLUSTER_SEEDS=${SEED_IP}:${CLUSTER_PORT}"
       - "--name=EventServer,AlarmServer"
       - "--command=sleep 100000"
       - "--port=${SENTINEL_PORT}"

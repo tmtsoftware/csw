@@ -52,11 +52,11 @@ case object CouldNotEnsureDataReplication
 case object CouldNotJoinCluster extends RuntimeException("could not join cluster")
 
 /**
- * ClusterSeedsNotFound is thrown while creating location service remote http client if clusterSeeds are not provided or set in
+ * ClusterSeedsNotFound is thrown while creating location service remote http client if CLUSTER_SEEDS are not provided or set in
  * as environment variable
  */
 case object ClusterSeedsNotFound
     extends RuntimeException(
-      "clusterSeeds setting is not specified either as env variable or system property. " +
+      "CLUSTER_SEEDS setting is not specified either as env variable or system property. " +
       "Please check online documentation for this set-up."
     )

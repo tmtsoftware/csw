@@ -45,7 +45,7 @@ import scala.collection.JavaConverters._
  *  - and then from `ClusterSettings` api
  *
  * @note although `ClusterSettings` can be added through multiple ways, it is recommended that
- *  -`clusterSeeds` is provided via environment variable,
+ *  -`CLUSTER_SEEDS` is provided via environment variable,
  *  - `clusterPort` is provided via system properties,
  *  - `INTERFACE_NAME` is provide via environment variable and
  *  - the `ClusterSettings` api of providing values should be used for testing purpose only
@@ -54,7 +54,7 @@ import scala.collection.JavaConverters._
 private[location] case class ClusterSettings(clusterName: String = Constants.ClusterName, values: Map[String, Any] = Map.empty) {
   private val log: Logger       = LocationServiceLogger.getLogger
   private val InterfaceNameKey  = "INTERFACE_NAME"
-  private val ClusterSeedsKey   = "clusterSeeds"
+  private val ClusterSeedsKey   = "CLUSTER_SEEDS"
   private val ClusterPortKey    = "clusterPort"
   private val ManagementPortKey = "managementPort"
 
@@ -104,7 +104,7 @@ private[location] case class ClusterSettings(clusterName: String = Constants.Clu
   //Get the managementPort to start akka cluster management service.
   private[location] def managementPort: Option[Any] = allValues.get(ManagementPortKey)
 
-  //Extract seeds [hostname1:port1,hostname2:port2] from clusterSeeds environment variable
+  //Extract seeds [hostname1:port1,hostname2:port2] from CLUSTER_SEEDS environment variable
   private[location] def seeds = allValues.get(ClusterSeedsKey).toList.flatMap(_.toString.split(",")).map(_.trim)
 
   //Prepare a list of seedNodes

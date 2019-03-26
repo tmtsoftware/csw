@@ -13,7 +13,7 @@ class ClusterSettingsTest extends FunSuite with Matchers with BeforeAndAfterAll 
 
   override protected def afterAll(): Unit = {
     System.clearProperty("clusterPort")
-    System.clearProperty("clusterSeeds")
+    System.clearProperty("CLUSTER_SEEDS")
     System.clearProperty("INTERFACE_NAME")
   }
 
@@ -60,7 +60,7 @@ class ClusterSettingsTest extends FunSuite with Matchers with BeforeAndAfterAll 
   test("cluster settings with custom values") {
     val port                             = 9001
     val ipList                           = List("10.10.10.10", "10.10.10.11", "10.10.10.12")
-    val values                           = Map("INTERFACE_NAME" -> "en0", "clusterSeeds" -> ipList.mkString(", "), "clusterPort" -> "9000")
+    val values                           = Map("INTERFACE_NAME" -> "en0", "CLUSTER_SEEDS" -> ipList.mkString(", "), "clusterPort" -> "9000")
     val clusterSettings: ClusterSettings = ClusterSettings(values = values).onPort(port)
 
     clusterSettings.interfaceName shouldBe Some("en0")
@@ -76,7 +76,7 @@ class ClusterSettingsTest extends FunSuite with Matchers with BeforeAndAfterAll 
     val systemInterfacename = "eth0"
 
     System.setProperty("clusterPort", systemPort.toString)
-    System.setProperty("clusterSeeds", systemSeeds.toString)
+    System.setProperty("CLUSTER_SEEDS", systemSeeds.toString)
     System.setProperty("INTERFACE_NAME", systemInterfacename)
 
     val clusterSettings = ClusterSettings()

@@ -31,7 +31,7 @@ class LocationServiceIntegrationTest extends FunSuite with Matchers with BeforeA
   LoggingSystemFactory.start("Assembly", "1.0", Networks().hostname, actorSystem)
 
   implicit private val mat: ActorMaterializer          = ActorMaterializer()
-  val locationService: LocationService                 = HttpLocationServiceFactory.make((sys.env ++ sys.props)("clusterSeeds").split(":").head)
+  val locationService: LocationService                 = HttpLocationServiceFactory.make((sys.env ++ sys.props)("CLUSTER_SEEDS").split(":").head)
   implicit val typedSystem: typed.ActorSystem[Nothing] = actorSystem.toTyped
   implicit val sched: Scheduler                        = actorSystem.scheduler
   implicit val timeout: Timeout                        = Timeout(5.seconds)

@@ -19,24 +19,24 @@ docker pull ${sbtImg}
 printf "${YELLOW}----------- Starting HCD App -----------${NC}\n"
 docker run -d --name=HCD ${HOST_DIR_MAPPING} ${sbtImg} bash -c 'cd /source/csw && ./target/universal/stage/bin/trombone-hcd'
 
-#4. Store the ip address and port of first container (HCD App) into variable clusterSeeds
+#4. Store the ip address and port of first container (HCD App) into variable CLUSTER_SEEDS
 clusterSeeds="$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' HCD):3553"
 printf "${PURPLE}----------- Akka Seed Node is : ${clusterSeeds}-----------${NC}\n"
 sleep 5
 
 #5. Start second container and run TestService app
-# cmd line param :-DclusterSeeds=$clusterSeeds (Ip:Port combination of seed - refer #4)
+# cmd line param :-DCLUSTER_SEEDS=$clusterSeeds (Ip:Port combination of seed - refer #4)
 # with clusterSeeds parameters, this container will join the cluster created at step #3
 printf "${YELLOW}----------- Starting Reddis App -----------${NC}\n"
-docker run -d --name=Reddis --env clusterSeeds=${clusterSeeds} ${HOST_DIR_MAPPING} ${sbtImg} bash -c 'cd /source/csw && ./target/universal/stage/bin/test-service -DclusterSeeds=$clusterSeeds'
+docker run -d --name=Reddis --env CLUSTER_SEEDS=${clusterSeeds} ${HOST_DIR_MAPPING} ${sbtImg} bash -c 'cd /source/csw && ./target/universal/stage/bin/test-service -DCLUSTER_SEEDS=$clusterSeeds'
 
 sleep 5
 
 #6. Start second container and run Test app which executes LocationServiceIntegrationTest
-# cmd line param :-DclusterSeeds=$clusterSeeds (Ip:Port combination of seed - refer #4)
+# cmd line param :-DCLUSTER_SEEDS=$clusterSeeds (Ip:Port combination of seed - refer #4)
 # with clusterSeeds parameters, this container will join the cluster created at step #3
 printf "${YELLOW}------ Starting Test App ------${NC}\n"
-docker run --name=Test-App --env clusterSeeds=${clusterSeeds} ${HOST_DIR_MAPPING} ${sbtImg} bash -c 'cd /source/csw && ./target/universal/stage/bin/test-app -DclusterSeeds=$clusterSeeds'
+docker run --name=Test-App --env CLUSTER_SEEDS=${clusterSeeds} ${HOST_DIR_MAPPING} ${sbtImg} bash -c 'cd /source/csw && ./target/universal/stage/bin/test-app -DCLUSTER_SEEDS=$clusterSeeds'
 test_exit_code=$?
 
 printf "${PURPLE}---------- Stopping and Removing all docker containers ---------- ${NC}"

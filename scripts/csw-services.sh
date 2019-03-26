@@ -147,7 +147,7 @@ function start_seed {
 
     if [[ -x "$location_script" ]]; then
         echo "[LOCATION] Starting cluster seed on port: [$seed_port] ..."
-        nohup ./csw-location-server --clusterPort ${seed_port} -J-DclusterSeeds=${seeds} -J-Dcsw-location-server.http-port=${location_http_port} &
+        nohup ./csw-location-server --clusterPort ${seed_port} -J-DCLUSTER_SEEDS=${seeds} -J-Dcsw-location-server.http-port=${location_http_port} &
         echo $! > ${locationPidFile}
     else
         echo "[ERROR] $location_script script does not exist, please make sure that $location_script resides in same directory as $script_name"
@@ -392,7 +392,7 @@ function parse_cmd_args {
                     exit 1
                 else
                     seeds="${IP}:${seed_port}"
-                    echo "[INFO] Using clusterSeeds=$seeds"
+                    echo "[INFO] Using CLUSTER_SEEDS=$seeds"
 
                     start_services
 

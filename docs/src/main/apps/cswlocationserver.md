@@ -27,7 +27,7 @@ The steps below describe how to run location server on a single machine. This ca
 Find out the IP address and dedicated port for running the location server. Assume that IP is 192.168.1.21 and port is 3552.
 
 **Provisioning**:
-Make sure you have the environment variable clusterSeeds set to the IP address and port as in `192.168.1.21:3552`
+Make sure you have the environment variable CLUSTER_SEEDS set to the IP address and port as in `192.168.1.21:3552`
 
 **Running**: Switch to application directory and run this command - `./bin/csw-location-server --clusterPort=3552`
 
@@ -39,7 +39,7 @@ Identify machines which are running location server and whose IP and port are kn
 for machine2 is 192.168.1.22. Also, they will both have dedicated port 3552 to run the location server. 
 
 **Provisioning**:
-Make sure you have the environment variable clusterSeeds set to `192.168.1.21:3552,192.168.1.22:3552` on **machine1 and machine2**.
+Make sure you have the environment variable CLUSTER_SEEDS set to `192.168.1.21:3552,192.168.1.22:3552` on **machine1 and machine2**.
 
 Switch to application directory and run this command on **machine1 and machine2** - `./bin/csw-location-server --clusterPort=3552`
 
