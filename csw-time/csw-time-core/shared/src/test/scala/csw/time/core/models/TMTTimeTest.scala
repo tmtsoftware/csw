@@ -12,6 +12,7 @@ import scala.concurrent.duration.DurationDouble
 @TimeTests
 class TMTTimeTest extends FunSuite with BeforeAndAfterAll {
   private val TaiOffset = 37
+  private val jitter    = 10
 
   override protected def beforeAll(): Unit = TMTClock.clock.setTaiOffset(TaiOffset)
 
@@ -20,7 +21,7 @@ class TMTTimeTest extends FunSuite with BeforeAndAfterAll {
     val fixedInstant   = Instant.now()
     val expectedMillis = fixedInstant.toEpochMilli
 
-    utcTime.value.toEpochMilli.toDouble shouldEqual expectedMillis.toDouble +- 10
+    utcTime.value.toEpochMilli.toDouble shouldEqual expectedMillis.toDouble +- jitter
   }
 
   test("should convert utc to tai") {
@@ -30,7 +31,7 @@ class TMTTimeTest extends FunSuite with BeforeAndAfterAll {
   }
 
   test("should give time duration between given timestamp and current time") {
-    val expectedDuration = 1.second.toMillis +- 10.millis.toMillis
+    val expectedDuration = 1.second.toMillis +- jitter.millis.toMillis
     val futureTime       = UTCTime(Instant.now().plusSeconds(1))
     futureTime.durationFromNow.toMillis shouldBe expectedDuration
   }

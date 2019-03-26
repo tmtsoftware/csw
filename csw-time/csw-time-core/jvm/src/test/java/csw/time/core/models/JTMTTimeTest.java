@@ -17,6 +17,7 @@ import static org.junit.Assert.assertFalse;
 public class JTMTTimeTest extends JUnitSuite {
 
     private static int TaiOffset = 37;
+    private int jitter  = 10;
     private TestProperties testProperties = JTestProperties.instance();
 
     @BeforeClass
@@ -36,7 +37,7 @@ public class JTMTTimeTest extends JUnitSuite {
 
         long expectedMillis = fixedInstant.toEpochMilli();
 
-        assertEquals((double) expectedMillis, (double) utcTime.value().toEpochMilli(), 5);
+        assertEquals((double) expectedMillis, (double) utcTime.value().toEpochMilli(), jitter);
     }
 
     //DEOPSCSW-537: Scala and Java API for conversion between TAI and UTC
@@ -66,7 +67,7 @@ public class JTMTTimeTest extends JUnitSuite {
 
         long expectedMillis = expectedTaiInstant.toEpochMilli();
 
-        assertEquals(expectedMillis, taiTime.value().toEpochMilli(), 5);
+        assertEquals(expectedMillis, taiTime.value().toEpochMilli(), jitter);
     }
 
     @Test

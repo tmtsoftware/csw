@@ -21,6 +21,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
 
   private implicit val untypedSystem: ActorSystem = system.toUntyped
   private val manualTime                          = ManualTime()
+  private val jitter                              = 10
 
   private val timeService = TimeServiceSchedulerFactory.make()
 
@@ -91,7 +92,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
     val utcTime1 = testProbe.expectMsgType[UTCTime]
     val utcTime2 = testProbe.expectMsgType[UTCTime]
 
-    val expectedTimeSpread = startTime.value.toEpochMilli +- 10
+    val expectedTimeSpread = startTime.value.toEpochMilli +- jitter
     utcTime1.value.toEpochMilli shouldBe expectedTimeSpread
     utcTime2.value.toEpochMilli shouldBe expectedTimeSpread
 
@@ -126,7 +127,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
 
     times.size shouldBe 6
     buffer.foreach { i =>
-      times(i).value.toEpochMilli shouldBe (startTime.value.toEpochMilli + offset * i) +- 10
+      times(i).value.toEpochMilli shouldBe (startTime.value.toEpochMilli + offset * i) +- jitter
     }
   }
 
@@ -158,7 +159,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
 
     times.size shouldBe 6
     buffer.foreach { i =>
-      times(i).value.toEpochMilli shouldBe (startTime.value.toEpochMilli + offset * i) +- 10
+      times(i).value.toEpochMilli shouldBe (startTime.value.toEpochMilli + offset * i) +- jitter
     }
   }
 }
