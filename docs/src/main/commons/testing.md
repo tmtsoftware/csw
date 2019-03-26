@@ -170,7 +170,7 @@ Using the security token obtained from the Jenkins pipeline settings (available 
 ```
 curl -G 'http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/acceptance-dev/buildWithParameters'  \
     --data-urlencode token=$DEV_TOKEN \
-    --data-urlencode DEV_VERSION=0.1-SNAPSHOT \
+    --data-urlencode CSW_VERSION=0.1-SNAPSHOT \
     --data-urlencode BUILD_ENV=DEV
 ```
 
@@ -179,6 +179,6 @@ curl -G 'http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/acc
 ```
 curl -G '$REMOTE_JENKINS_URL/job/$JOB_NAME/buildWithParameters' \
     --data-urlencode token=$RELEASE_TOKEN \
-    --data-urlencode RELEASE_VERSION=$RELEASE_VERSION \
+    --data-urlencode CSW_VERSION=$CSW_VERSION \
     --data-urlencode BUILD_ENV=PROD
 ```
