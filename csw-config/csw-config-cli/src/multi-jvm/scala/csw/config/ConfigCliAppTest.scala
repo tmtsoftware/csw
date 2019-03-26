@@ -41,7 +41,7 @@ class ConfigCliAppTest(ignore: Int)
     testFileUtils.deleteServerFiles()
   }
 
-  val inputFilePath            = getClass.getResource("/tromboneHCD.conf").getPath
+  val inputFilePath            = getClass.getResource("/tromboneHCDTest.conf").getPath
   val updatedInputFilePath     = getClass.getResource("/tromboneAssembly.conf").getPath
   val inputFileContents        = scala.io.Source.fromFile(inputFilePath).mkString
   val updatedInputFileContents = scala.io.Source.fromFile(updatedInputFilePath).mkString
