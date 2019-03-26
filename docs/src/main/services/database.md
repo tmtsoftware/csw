@@ -64,7 +64,7 @@ Java
 The underlying database server is registered with the Location Service.
 `makeDsl`/`jMakeDsl` takes `locationService` to locate the PostgreSQL server running and connect to it. It connects to the
 database by the provided `dbName`. It picks the database username and password for read access profile from 
-TMT-standard environment variables called `dbReadUsername` for username and `dbReadPassword` for password, hence it is expected that developers
+TMT-standard environment variables called `DB_READ_USERNAME` for username and `DB_READ_PASSWORD` for password, hence it is expected that developers
 will set these environment variables prior to using `DatabaseServiceFactory`. PostgreSQL should also be initialized with a read-only
 user and password that agrees with the values in the environment variables. This approach is used to keep from putting
 database login information in the source code. 

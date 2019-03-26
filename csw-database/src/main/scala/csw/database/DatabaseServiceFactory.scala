@@ -21,8 +21,8 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
 private[database] object DatabaseServiceFactory {
-  val ReadUsernameHolder = "dbReadUsername"
-  val ReadPasswordHolder = "dbReadPassword"
+  val ReadUsernameHolder = "DB_READ_USERNAME"
+  val ReadPasswordHolder = "DB_READ_PASSWORD"
 }
 
 /**
@@ -56,7 +56,7 @@ class DatabaseServiceFactory private[database] (actorSystem: ActorSystem[_], val
 
   /**
    * Creates connection to database with default read access. The username and password for read access is picked from
-   * environment variables set on individual's machine i.e. `dbReadUsername` and `dbReadPassword`. It is expected that
+   * environment variables set on individual's machine i.e. `DB_READ_USERNAME` and `DB_READ_PASSWORD`. It is expected that
    * developers set these variables before calling this method.
    *
    * @param locationService used to locate the database server
@@ -104,7 +104,7 @@ class DatabaseServiceFactory private[database] (actorSystem: ActorSystem[_], val
 
   /**
    * A java method to create connection to database with default read access. The username and password for read access
-   * is picked from environment variables set on individual's machine i.e. `dbReadUsername` and `dbReadPassword`. It is
+   * is picked from environment variables set on individual's machine i.e. `DB_READ_USERNAME` and `DB_READ_PASSWORD`. It is
    * expected that developers set these variables before calling this method.
    *
    * @param locationService used to locate the database server
