@@ -53,7 +53,7 @@ private[framework] object SupervisorBehavior {
   val CommandResponseManagerActorName = "command-response-manager"
   val LockNotificationKey             = "lockNotification"
   val LockExpirationKey               = "lockExpiration"
-  val AdminKey                        = "cswAdminPrefix"
+  val AdminKey                        = "CSW_ADMIN_PREFIX"
 }
 
 /**
@@ -64,7 +64,7 @@ private[framework] object SupervisorBehavior {
  * @param maybeContainerRef        the container ref of the container under which this supervisor is started if
  *                                 it's not running in standalone mode
  * @param componentBehaviorFactory the factory for creating the component supervised by this Supervisor
- * @note                           unlocking locked components is supported by admin only if `cswAdminPrefix` environment variable is set
+ * @note                           unlocking locked components is supported by admin only if `CSW_ADMIN_PREFIX` environment variable is set
  */
 private[framework] final class SupervisorBehavior(
     ctx: ActorContext[SupervisorMessage],
