@@ -13,7 +13,7 @@ package csw.location
  * it is recommended to have below environment variables set to System global environments or system properties:
  *  - INTERFACE_NAME (The network interface where akka cluster is formed.) Ex. INTERFACE_NAME=eth0 if not set, first inet4 interface by priority will be picked
  *  - CLUSTER_SEEDS (The host address and port of the seedNodes of the cluster) Ex. CLUSTER_SEEDS="192.168.121.10:3552, 192.168.121.11:3552"
- *  - clusterPort (Specify port on which to start this service) Ex. clusterPort=3552 if this property is not set, service will start on random port.
+ *  - CLUSTER_PORT (Specify port on which to start this service) Ex. CLUSTER_PORT=3552 if this property is not set, service will start on random port.
  *
  * Location service make use of classes defined in `csw-messages` package, for example:
  * - [[csw.location.api.models.Location]] :

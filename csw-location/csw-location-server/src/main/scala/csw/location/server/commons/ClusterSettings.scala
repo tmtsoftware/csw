@@ -46,7 +46,7 @@ import scala.collection.JavaConverters._
  *
  * @note although `ClusterSettings` can be added through multiple ways, it is recommended that
  *  -`CLUSTER_SEEDS` is provided via environment variable,
- *  - `clusterPort` is provided via system properties,
+ *  - `CLUSTER_PORT` is provided via system properties,
  *  - `INTERFACE_NAME` is provide via environment variable and
  *  - the `ClusterSettings` api of providing values should be used for testing purpose only
  *
@@ -55,7 +55,7 @@ private[location] case class ClusterSettings(clusterName: String = Constants.Clu
   private val log: Logger       = LocationServiceLogger.getLogger
   private val InterfaceNameKey  = "INTERFACE_NAME"
   private val ClusterSeedsKey   = "CLUSTER_SEEDS"
-  private val ClusterPortKey    = "clusterPort"
+  private val ClusterPortKey    = "CLUSTER_PORT"
   private val ManagementPortKey = "managementPort"
 
   private def withEntry(key: String, value: Any): ClusterSettings = copy(values = values + (key → value))

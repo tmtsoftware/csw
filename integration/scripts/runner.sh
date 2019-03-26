@@ -15,7 +15,7 @@ sbtImg=twtmt/scala-sbt:8u141_2.12.4_1.1.1
 docker pull ${sbtImg}
 
 #3. Start first container and run TromboneHcdApp which acts as a seed
-# cmd line param : -DclusterPort=3552 => This will start app on port 3552 and create a cluster with a single node
+# cmd line param : -DCLUSTER_PORT=3552 => This will start app on port 3552 and create a cluster with a single node
 printf "${YELLOW}----------- Starting HCD App -----------${NC}\n"
 docker run -d --name=HCD ${HOST_DIR_MAPPING} ${sbtImg} bash -c 'cd /source/csw && ./target/universal/stage/bin/trombone-hcd'
 
