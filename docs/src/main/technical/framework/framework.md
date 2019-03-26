@@ -35,17 +35,19 @@ In a production environment, it is planned that components will be started at bo
 
 ## Component Creation
 
-Components can be created in *standalone* mode (one component per JVM) or
-*container* mode (multiple components running in a single JVM). 
+Components can be created in 
+@ref:[standalone or container](../../commons/multiple-components.md) mode. 
 When an HCD or assembly is
 @ref:[created](../../framework/creating-components.md), depending on the mode,
 either the
 @github[ContainerBehaviorFactory](/csw-framework/src/main/scala/csw/framework/internal/container/ContainerBehaviorFactory.scala) or the 
 @github[SupervisorBehaviorFactory](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehaviorFactory.scala)
 class is used to create the initial actor behavior. 
-In container mode, a supervisor behavior is created for each component.
+In container mode, a supervisor actor is created for each component and a single
+@github[container actor](/csw-framework/src/main/scala/csw/framework/internal/container/ContainerBehavior.scala) 
+accepts control messages for the container (subtypes of `ContainerActorMessage`).
 
-The supervisor then creates and watches the component and determines what to do when something goes wrong. 
+Each supervisor then creates and watches its component and determines what to do when something goes wrong. 
 It uses an instance of
 @github[ComponentBehaviorFactory](/csw-framework/src/main/scala/csw/framework/scaladsl/ComponentBehaviorFactory.scala) 
 that is created via reflection from an entry in the
@@ -53,11 +55,22 @@ that is created via reflection from an entry in the
  file to create the component.
 
 The top level actor (TLA) representing the 
-@github[component's behavior](/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala) uses instance of 
+@github[component's behavior](/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala) uses the instance of 
 @github[ComponentHandlers](/csw-framework/src/main/scala/csw/framework/scaladsl/ComponentHandlers.scala)
 returned from the supplied ComponentBehaviorFactory to handle incoming messages and commands for the component.
 
+## Component Initialization and Lifecycle
 
-
-
+The framework manages a component's 
+@ref:[lifecycle](../../framework/handling-lifecycle.md) 
+so that it only receives commands once it has signaled that it has completed the
+initialization process.
+This includes 
+@ref:[tracking any connections](../../framework/tracking-connections.md) 
+listed in the component info file.
+Once the component is in the running state, it can be discovered using the
+@ref:[Location Service](../location/location.md) and other components can start
+sending 
+@ref[command messages](../../commons/messages.md) 
+to it.
 
