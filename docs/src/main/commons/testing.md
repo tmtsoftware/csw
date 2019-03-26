@@ -147,12 +147,12 @@ Below are the two separate Jenkins pipelines to run `csw` acceptance tests:
     - Automatically triggered every night to get fast feedback and intended for developer's visibility.
     
 2. [Acceptance Release Pipeline](http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/acceptance-release/)
-    - Automatically triggered on completion of [csw-prod-release](http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/csw-prod-release/) pipeline.
+    - Automatically triggered on completion of [csw-prod](http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/csw-prod/) pipeline.
     - `csw-prod-release` pipeline published CSW artifacts to bintray, and must be manually triggered by an administrator.
 
 @@@ note { title=Note }
 
-[csw-prod-release](http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/csw-prod-release/) pipeline is responsible for following tasks:
+[csw-prod](http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/csw-prod/) pipeline is responsible for following tasks:
 
 - build and run `csw` tests
 - publish binaries to bintray
