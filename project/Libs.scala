@@ -16,7 +16,7 @@ object Libs {
   val `junit-interface`    = "com.novocode" % "junit-interface" % "0.11" //BSD 2-clause "Simplified" License
   val `silencer-plugin`    = compilerPlugin("com.github.ghik" %% "silencer-plugin" % silencerVersion)
   val `silencer-lib`       = "com.github.ghik" %% "silencer-lib" % silencerVersion % Compile
-  val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.2.0"
+  val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.2.1"
   //MIT License
   val `embedded-keycloak`            = "com.github.tmtsoftware"        % "embedded-keycloak"             % "dfa0076dff6c" //Apache 2.0
   val `logback-classic`              = "ch.qos.logback"                % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
@@ -26,7 +26,7 @@ object Libs {
   val `scala-reflect`                = "org.scala-lang"                % "scala-reflect"                 % ScalaVersion //BSD-3
   val `gson`                         = "com.google.code.gson"          % "gson"                          % "2.8.5" //Apache 2.0
 
-  val `play-json` = dep("com.typesafe.play" %%% "play-json" % "2.7.1") //Apache 2.0
+  val `play-json` = dep("com.typesafe.play" %%% "play-json" % "2.7.2") //Apache 2.0
 
   val `akka-http-play-json`      = "de.heikoseeberger"    %% "akka-http-play-json"      % "1.25.2" //Apache 2.0
   val `jwt-play-json`            = "com.pauldijou"        %% "jwt-play-json"            % "2.1.0"
@@ -94,7 +94,7 @@ object Akka {
 }
 
 object AkkaHttp {
-  val Version             = "10.1.7"
+  val Version             = "10.1.8"
   val `akka-http`         = "com.typesafe.akka" %% "akka-http" % Version //ApacheV2
   val `akka-http-testkit` = "com.typesafe.akka" %% "akka-http-testkit" % Version //ApacheV2
   val `akka-http-cors`    = "ch.megard" %% "akka-http-cors" % "0.4.0"
