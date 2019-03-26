@@ -7,8 +7,6 @@ import csw.location.agent.wiring.Wiring
 import csw.location.client.utils.LocationServerStatus
 import csw.services.BuildInfo
 
-import scala.sys.process.Process
-
 /**
  * Application object allowing program execution from command line, also facilitates an entry point for Component level testing.
  */

@@ -13,9 +13,9 @@ import csw.location.api.models._
 import csw.logging.api.scaladsl.Logger
 
 import scala.collection.immutable.Seq
+import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.concurrent.{Await, Future}
-import scala.sys.process._
 import scala.util.control.NonFatal
 
 /**
@@ -33,9 +33,9 @@ class LocationAgent(names: List[String], command: Command, wiring: Wiring) {
   def run(): Process =
     try {
       log.info(s"Executing specified command: ${command.commandText}")
-      val process = command.commandText.run()
+      val process = Runtime.getRuntime.exec(command.commandText)
       // shutdown location agent on termination of external program started using provided command
-      Future(process.exitValue()).onComplete(_ ⇒ shutdown(ProcessTerminated))
+      process.onExit().toScala.onComplete(_ ⇒ shutdown(ProcessTerminated))
 
       // delay the registration of component after executing the command
       Thread.sleep(command.delay)
