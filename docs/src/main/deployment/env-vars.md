@@ -11,7 +11,7 @@ List of environment variables which needs to be set for using different Csw serv
 | CSW_ADMIN_PREFIX | Optional  | Optional  | firing unlock command | Needed to give admin the capability of unlocking the locked components. (If not set, command will result in no-op) |
 | TMT_LOG_HOME   | Optional  | Mandatory | starting any Csw service | Base path of directory to hold log files from TMT apps. (Log files will be generated only if file appender is activated) |
 | DB_READ_USERNAME & DB_READ_PASSWORD | Optional | Mandatory (for components using DB service) | starting DB service | Needed to create connection with Database service with read access. |
-| dbWriteUsername & dbWritePassword | Optional | Mandatory (for components using DB service) | starting DB service | Needed to create connection with Database service with write access. |
+| DB_WRITE_USERNAME & DB_WRITE_PASSWORD | Optional | Mandatory (for components using DB service) | starting DB service | Needed to create connection with Database service with write access. |
 | dbAdminUsername & dbAdminPassword | Optional | Mandatory (for components using DB service) | starting DB service | Needed to create connection with Database service with admin access. |
 
 #### Terminologies

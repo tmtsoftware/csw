@@ -32,7 +32,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
 
     //#dbFactory-write-access
     dbFactory
-      .makeDsl(locationService, "postgres", "dbWriteUsername", "dbWritePassword")
+      .makeDsl(locationService, "postgres", "DB_WRITE_USERNAME", "DB_WRITE_PASSWORD")
       .foreach((dsl: DSLContext) ⇒ this.dsl = dsl) // save returned dsl to a local variable
     //#dbFactory-write-access
 

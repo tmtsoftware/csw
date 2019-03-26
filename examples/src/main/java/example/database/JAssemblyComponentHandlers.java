@@ -43,7 +43,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
         //#dbFactory-write-access
         dbFactory
-                .jMakeDsl(cswCtx.locationService(), "postgres", "dbWriteUsername", "dbWritePassword")
+                .jMakeDsl(cswCtx.locationService(), "postgres", "DB_WRITE_USERNAME", "DB_WRITE_PASSWORD")
                 .thenAccept((DSLContext dsl) -> this.dsl = dsl);        // save the returned dsl to a local variable
         //#dbFactory-write-access
 
