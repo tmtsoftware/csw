@@ -76,6 +76,7 @@ object AuthConfig {
    *                            otherwise it will rely on config for auth-service-url
    */
   def create(
+      // todo : is this right place to load config? or should it be passed from outside
       config: Config = ConfigFactory.load(),
       authServerLocation: Option[HttpLocation] = None
   ): AuthConfig = {

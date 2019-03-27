@@ -1,5 +1,6 @@
 package csw.aas.installed
 
+import com.typesafe.config.{Config, ConfigFactory}
 import csw.aas.core.TokenVerifier
 import csw.aas.core.deployment.{AuthConfig, AuthServiceLocation}
 import csw.aas.installed.api.{AuthStore, InstalledAppAuthAdapter}
@@ -11,6 +12,20 @@ import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext}
 
 object InstalledAppAuthAdapterFactory {
+
+  /**
+   *  Creates an instance of InstalledAppAuthAdapter. Resolves authentication service using location service and ignores `auth-server-url` config parameter
+   *
+   * @param config for InstalledAppAuthAdapter
+   * @param locationService handle to [[LocationService]] used to resolve location of aas
+   * @param secretStore store where all tokens will be stored. This library provides implementation for [[csw.aas.installed.scaladsl.FileAuthStore]]
+   *                    but one can choose to implement their own [[AuthStore]] and plug it in here.
+   * @param executionContext require for execution of asynchronous task
+   * @return handle to [[InstalledAppAuthAdapter]] with which you can login, logout and get access tokens
+   */
+  def make(config: Config, locationService: LocationService, secretStore: AuthStore)(
+      implicit executionContext: ExecutionContext
+  ): InstalledAppAuthAdapter = make(locationService, Some(secretStore), config)
 
   /**
    * Creates an instance of InstalledAppAuthAdapter. Resolves authentication service using location service and ignores `auth-server-url` config parameter
@@ -58,11 +73,11 @@ object InstalledAppAuthAdapterFactory {
   /******************
    *  INTERNAL APIs
    ******************/
-  private def make(locationService: LocationService, secretStore: Option[AuthStore])(
+  private def make(locationService: LocationService, secretStore: Option[AuthStore], config: Config = ConfigFactory.load())(
       implicit executionContext: ExecutionContext
   ): InstalledAppAuthAdapter = {
     val authServiceLocation = Await.result(AuthServiceLocation(locationService).resolve(5.seconds), 10.seconds)
-    val authConfig          = AuthConfig.create(authServerLocation = Some(authServiceLocation))
+    val authConfig          = AuthConfig.create(config = config, authServerLocation = Some(authServiceLocation))
     val tokenVerifier       = TokenVerifier(authConfig)
     new InstalledAppAuthAdapterImpl(new KeycloakInstalled(authConfig.getDeployment), tokenVerifier, secretStore)
   }

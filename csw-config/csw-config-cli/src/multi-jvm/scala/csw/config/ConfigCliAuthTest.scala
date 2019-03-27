@@ -122,7 +122,9 @@ class ConfigCliAuthTest(ignore: Int)
         System.setIn(stdIn)
       }
 
-      runner.create(Options(relativeRepoPath = Some(repoPath1), inputFilePath = Some(Paths.get(filePath)), comment = Some("test")))
+      runner.create(
+        Options(relativeRepoPath = Some(repoPath1), inputFilePath = Some(Paths.get(filePath)), comment = Some("test"))
+      )
 
       val configService     = ConfigClientFactory.clientApi(system, locationService)
       val actualConfigValue = configService.getActive(repoPath1).await.get.toStringF.await
