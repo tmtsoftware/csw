@@ -53,7 +53,6 @@ private[framework] object SupervisorBehavior {
   val CommandResponseManagerActorName = "command-response-manager"
   val LockNotificationKey             = "lockNotification"
   val LockExpirationKey               = "lockExpiration"
-  val AdminKey                        = "CSW_ADMIN_PREFIX"
 }
 
 /**
@@ -88,13 +87,10 @@ private[framework] final class SupervisorBehavior(
   private val isStandalone: Boolean                        = maybeContainerRef.isEmpty
   private[framework] val initializeTimeout: FiniteDuration = componentInfo.initializeTimeout
 
-  // read from env variable every time the component is asked to unlock
-  private def adminPrefix: Option[Prefix] = sys.env.get(AdminKey).map(Prefix(_))
-
   private[framework] val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] = makePubSubLifecycle()
 
   private var runningComponent: Option[ActorRef[RunningMessage]]  = None
-  private var lockManager: LockManager                            = new LockManager(None, adminPrefix, loggerFactory)
+  private var lockManager: LockManager                            = new LockManager(None, loggerFactory)
   private[framework] var lifecycleState: SupervisorLifecycleState = SupervisorLifecycleState.Idle
   private[framework] var component: Option[ActorRef[Nothing]]     = None
 
