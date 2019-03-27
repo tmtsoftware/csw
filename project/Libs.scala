@@ -18,7 +18,7 @@ object Libs {
   val `silencer-lib`       = "com.github.ghik" %% "silencer-lib" % silencerVersion % Compile
   val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.2.1"
   //MIT License
-  val `embedded-keycloak`            = "com.github.tmtsoftware"        % "embedded-keycloak"             % "dfa0076dff6c" //Apache 2.0
+  val `embedded-keycloak`            = "com.github.tmtsoftware"        % "embedded-keycloak"             % "0.1.0" //Apache 2.0
   val `logback-classic`              = "ch.qos.logback"                % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `akka-management-cluster-http` = "com.lightbend.akka.management" %% "akka-management-cluster-http" % "1.0.0"
   val `svnkit`                       = "org.tmatesoft.svnkit"          % "svnkit"                        % "1.9.3" //TMate Open Source License
