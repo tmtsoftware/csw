@@ -195,10 +195,12 @@ any cleanup of resources or logic that should be executed for graceful shutdown 
 When the Supervisor actor receives a `Lock` message, it transitions the component to the `Lock` state. Upon locking, the Supervisor will only accept the commands received from the component
 that locked the component and ignore all others.
 
-In the `Lock` state, messages like `Shutdown` and `Restart` will also be ignored.  A component must first be unlocked to accept these commands.
+In the `Lock` state, messages like `Shutdown` and `Restart` will also be ignored. A component must first be unlocked to accept these commands.
 
-`Lock` messages are constructed with a duration value specified.  When this duration expires, the component
-will automatically be unlocked.  A component can be manually unlocked by sending an `Unlock` message.
+`Lock` messages are constructed with a duration value specified. When this duration expires, the component will automatically be unlocked.
+There are two ways component can be unlocked:
+1. Sending `Unlock` message (Note: This message should be sent by same component who has already locked component)
+1. Sending `Unlock` message with admin Prefix i.e. `Prefix("csw.admin")`, this is treated as Admin Unlock command.
 
 ## CSW Services Injection
 To provide access to CSW Services, they are injected into the `ComponentHandlers` class in the constructor in a `CswContext` object.
