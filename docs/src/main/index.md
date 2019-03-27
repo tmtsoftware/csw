@@ -116,7 +116,7 @@ message as a package path in the software, and a formatted text message.
 The Logging Service provides the ability to log messages locally to a file or screen and optionally
 to a centralized logging aggregator.
 
-The central logging aggregator (not part of this release) provides the capability for all components to log diagnostic
+The central logging aggregator provides the capability for all components to log diagnostic
 information to a central and optionally persistent store. The logging information is then
 aggregated and ordered by timestamp. A coordinated, centralized log can be an extremely
 useful tool for diagnosing many types of distributed software problems. Structured logging will be
@@ -185,6 +185,15 @@ TMT safety system**. Alarms should provide additional information to operators a
 systems monitored by the OSS and can provide early warning of future hazardous conditions,
 but should not be a sole, primary hazard control.
 
+### @ref:[Time Service](services/time.md)
+TMT has standardized on the use of [Precision Time Protocol (PTP)](https://en.wikipedia.org/wiki/Precision_Time_Protocol) 
+as the basis of observatory time. The Time Service provides access to time based on the time provided by PTP. The Global
+Positioning System (GPS) provides the absolute time base called Observatory Time. The PTP
+grand master clock (a hardware device) is synchronized to Observatory Time. Each computer
+system participating in the PTP system synchronizes to Observatory Time using the PTP
+protocol. The time service also provides APIs for scheduling periodic and non-periodic tasks in the future, 
+which are optimised for scheduling at up to 1KHz frequency.
+
 ### @ref:[Database Service](services/database.md)
 The Database Service provides API to manage database connections and access data in the TMT software system. The service expects
 `Postgres` as database server. It uses `Jooq` library underneath to manage database access, connection pooling, etc.
@@ -199,6 +208,18 @@ for running multiple components on a host machine.
 
 The framework also contains the structures that are common to components, such as commands and event structures.
 
-#### HTTP-based services API documentation can be found [here](swagger/index.html).
+## CSW Roadmap
+The current release 0.7.0 is a crucial milestone towards the first major release 1.0.0 of Common Software (CSW).
+All the deliverable services of Common Software are a part of this release. New features or API changes could be expected before 
+1.0.0 release, but no new services would be added after 0.7.0 release.
 
-#### CSW Javascript adapters documentation can be found @extref[here](csw_js:)
+**What to expect from 1.0.0 release?**
+
+- Upgrade to Scala 2.13
+- Upgrade to Akka 2.6 
+
+## HTTP-based services API documentation
+**Documentation for HTTP based services could be found [here](swagger/index.html).**
+
+## CSW Javascript adapters documentation
+**Documentation for CSW JS adapters could be found @extref[here](csw_js:)**
