@@ -13,19 +13,14 @@ import csw.network.utils.internal.NetworkInterfaceProvider
  *
  * @param interfaceName provide the name of network interface where csw cluster is running
  */
-case class Networks(interfaceName: String, networkProvider: NetworkInterfaceProvider) {
+private[csw] case class Networks(private val interfaceName: String, networkProvider: NetworkInterfaceProvider) {
 
-  private val (selectedInterfaceName, hostName) = ipv4AddressWithInterfaceName
+  private val (_, hostName) = ipv4AddressWithInterfaceName
 
   /**
    * Gives the ipv4 host address
    */
   def hostname: String = hostName.getHostAddress
-
-  /**
-   * Gives the name of selected network interface name
-   */
-  def getInterfaceName: String = selectedInterfaceName
 
   /**
    * Gives the non-loopback, ipv4 address for the given network interface. If no interface name is provided then the address mapped
@@ -56,35 +51,36 @@ case class Networks(interfaceName: String, networkProvider: NetworkInterfaceProv
 
 }
 
-object Networks {
+private[csw] object Networks {
 
   private val log: Logger = NetworksLogger.getLogger
+
+  /* ======== Testing API ========
+   * config property `csw-networks.hostname.automatic` is enabled only in test scope to automatically detect appropriate hostname
+   * so that we do not need to set INTERFACE_NAME env variable in every test or globally on machine before running tests.
+   */
+  private def fallbackInterfaceName =
+    if (ConfigFactory.load().getBoolean("csw-networks.hostname.automatic")) ""
+    else {
+      val networkInterfaceNotProvided = NetworkInterfaceNotProvided("INTERFACE_NAME env variable is not set.")
+      log.error(networkInterfaceNotProvided.message, ex = networkInterfaceNotProvided)
+      throw networkInterfaceNotProvided
+    }
+
+  /**
+   * Creates instance of `Networks` by reading `INTERFACE_NAME` env variable
+   */
+  def apply(): Networks = apply(None)
 
   /**
    * Picks an appropriate ipv4 address from the network interface provided.
    * If no specific network interface is provided, the first available interface will be taken to pick address
    */
-  def apply(): Networks = apply(None)
-
   def apply(interfaceName: Option[String]): Networks = {
     val ifaceName = interfaceName match {
       case Some(interface) ⇒ interface
-      case None ⇒
-        (sys.env ++ sys.props).getOrElse(
-          "INTERFACE_NAME", {
-            if (ConfigFactory.load().getBoolean("csw-networks.hostname.automatic")) ""
-            else {
-              val networkInterfaceNotProvided = NetworkInterfaceNotProvided("INTERFACE_NAME env variable is not set.")
-              log.error(networkInterfaceNotProvided.message, ex = networkInterfaceNotProvided)
-              throw networkInterfaceNotProvided
-            }
-          }
-        )
+      case None            ⇒ (sys.env ++ sys.props).getOrElse("INTERFACE_NAME", fallbackInterfaceName)
     }
-
     new Networks(ifaceName, new NetworkInterfaceProvider)
   }
-
-  private[csw] def defaultInterfaceName: String =
-    new Networks(interfaceName = "", networkProvider = new NetworkInterfaceProvider).getInterfaceName
 }
