@@ -73,7 +73,7 @@ ELK stack ([Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/referen
            [Kibana](https://www.elastic.co/guide/en/kibana/current/index.html)) and 
            [Filebeat](https://www.elastic.co/guide/en/beats/filebeat/current/index.html) is used to aggregate logs generated from TMT applications (Scala/Java/Python/C++/C) and
 csw services (mentioned in the previous section). For development purposes [Docker compose](https://docs.docker.com/compose/) is used. Hence, make sure that latest
-Docker setup is installed and running before starting the ELK stack. To know more about how ELK stack works please refer @ref[Logging Aggregator](../services/logging_aggregator.md).
+Docker setup is installed and running before starting the ELK stack. To know more about how ELK stack works please refer @ref[Logging Aggregator](logging_aggregator.md).
 
 For host setup follow the below given steps:
 

@@ -12,7 +12,7 @@ license refer this [link](https://www.elastic.co/subscriptions).
 
 ## Architecture
 
-![logo](logging_architecture.png)
+![logo](../services/logging_architecture.png)
 
 As shown in above picture all machines in TMT can run Filebeat to watch log files. Filebeat is responsible for watching log files and shipping it
 to Logstash. It keeps the cursor to last read position in file, which means that application can write logs to the file independent of where Filebeat has
@@ -51,7 +51,7 @@ The upcoming sections will explain how each TMT app can generate log files at TM
 ### Scala/Java
 
 For Scala/Java applications to dump logs in a file, it is important that developers enable the `FileAppender` in application.conf. To know more about how
-to configure FileAppender please refer the (see @ref:[logging documentation](logging.md#configuration)). Once, the FileAppender is enabled, the log files
+to configure FileAppender please refer the (see @ref:[logging documentation](../services/logging.md#configuration)). Once, the FileAppender is enabled, the log files
 will be generated under `TMT_LOG_HOME`. If TMT_LOG_HOME is not set as an environment variable then `BaseLogPathNotDefined` exception will be thrown. 
 For tests, `baseLogPath` from logging configuration can be overridden in application.conf.
 
@@ -75,7 +75,7 @@ The source code for above code can be found [here](https://github.com/tmtsoftwar
 
 Things to keep in mind while writing C++/C/Python apps
 
- * The structure of json logs should adhere to @ref:[this](logging.md#log-structure) format
+ * The structure of json logs should adhere to @ref:[this](../services/logging.md#log-structure) format
  * log files should be generated at path set at TMT_LOG_HOME
  * time should be logged in UTC
  * recommended to use rotating files for logging
@@ -104,7 +104,7 @@ The source code for above code can be found [here](https://github.com/tmtsoftwar
 
 Things to keep in mind while writing C++/C/Python apps
 
- * The structure of json logs should adhere to @ref:[this](logging.md#log-structure) format
+ * The structure of json logs should adhere to @ref:[this](../services/logging.md#log-structure) format
  * log files should be generated at path set at TMT_LOG_HOME
  * time should be logged in UTC
  * recommended to use rotating files for logging
@@ -142,7 +142,7 @@ The use of `tmt_formatter.py` in `logging_default.json` to log in UTC timezone.
 
 Things to keep in mind while writing C++/C/Python apps
 
- * The structure of json logs should adhere to @ref:[this](logging.md#log-structure) format
+ * The structure of json logs should adhere to @ref:[this](../services/logging.md#log-structure) format
  * log files should be generated at path set at TMT_LOG_HOME
  * time should be logged in UTC
  * recommended to use rotating files for logging
@@ -304,4 +304,4 @@ Hence, make sure that latest Docker setup is installed and running before starti
 generated in `tmp/csw/logs`. Hence, developers writing Scala/Java/Python/C++/C applications need to generate log files under `/tmp/csw/logs`. 
 
 Also, note that csw apps started via `csw-services.sh` will generate log files under `/tmp/csw/logs` and thus, it will be aggregated by the ELK docker container.
-To know more about setting up docker and starting ELK please refer @ref:[Starting ELK logging aggregator for Development](../commons/apps.md#starting-elk-logging-aggregator-for-development). 
+To know more about setting up docker and starting ELK please refer @ref:[Starting ELK logging aggregator for Development](apps.md#starting-elk-logging-aggregator-for-development). 

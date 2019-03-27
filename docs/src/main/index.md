@@ -9,6 +9,7 @@
  - [Messages](commons/messages.md)
  - [Framework](commons/framework.md)
  - [Commands](commons/command.md)
+ - [Logging Aggregator](commons/logging_aggregator.md)
  - [Services](commons/services.md)
  - [Applications](commons/apps.md)
  - [Deployment](commons/deployment.md)
