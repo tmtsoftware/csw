@@ -16,7 +16,6 @@ import csw.alarm.client.internal.redis.RedisConnectionsFactory
 import csw.commons.redis.EmbeddedRedis
 import csw.network.utils.SocketUtils.getFreePort
 import io.lettuce.core.RedisClient
-import io.lettuce.core.resource.DefaultClientResources
 import org.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 import romaine.RomaineFactory
@@ -41,9 +40,7 @@ class AlarmServiceTestSetup
 
   private val resolver = new AlarmServiceHostPortResolver(hostname, sentinelPort)
 
-  //TODO Explicitly creating client resources fix for https://github.com/lettuce-io/lettuce-core/issues/998
-  private val redisResources = DefaultClientResources.create()
-  private val redisClient    = RedisClient.create(redisResources)
+  private val redisClient = RedisClient.create()
 
   implicit val actorSystem: ActorSystem               = ActorSystem("alarm-server")
   implicit val ec: ExecutionContext                   = actorSystem.dispatcher
@@ -62,8 +59,6 @@ class AlarmServiceTestSetup
 
   override protected def afterAll(): Unit = {
     redisClient.shutdown()
-    //TODO: Explicit shutdown of client resources fix for https://github.com/lettuce-io/lettuce-core/issues/998
-    redisResources.shutdown()
     stopSentinel(sentinel, server)
     actorSystem.terminate().await
   }
