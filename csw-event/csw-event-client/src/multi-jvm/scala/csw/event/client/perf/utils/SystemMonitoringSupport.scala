@@ -1,6 +1,7 @@
 package csw.event.client.perf.utils
 
 import java.io.{File, PrintWriter}
+import java.lang.ProcessBuilder.Redirect
 import java.time.Instant
 
 import akka.remote.testconductor.RoleName
@@ -8,8 +9,7 @@ import akka.remote.testkit.MultiNodeSpec
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
-import scala.sys.process
-import scala.sys.process.{stringToProcess, FileProcessLogger, ProcessLogger}
+import scala.io.Source
 import scala.util.Random
 
 trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
@@ -27,10 +27,10 @@ trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
   val jstatResultsPath       = s"$homeDir/perf/jstat/${myself.name}_jstat_${pid}_${Instant.now()}.log"
   val jstatPlotPath          = s"$homeDir/TMT/pritam/jstatplot/target/universal/stage/bin/jstatplot"
 
-  def plotCpuUsageGraph(): process.Process    = executeCmd(s"$perfScriptsDir/cpu_plot.sh $topResultsPath")
-  def plotMemoryUsageGraph(): process.Process = executeCmd(s"$perfScriptsDir/memory_plot.sh $topResultsPath")
-  def plotLatencyHistogram(inputFilesPath: String, publishFreq: String): process.Process =
-    executeCmd(s"$perfScriptsDir/hist_plot.sh $inputFilesPath $publishFreq")
+  def plotCpuUsageGraph(): Process    = executeCmd(s"$perfScriptsDir/cpu_plot.sh", topResultsPath)
+  def plotMemoryUsageGraph(): Process = executeCmd(s"$perfScriptsDir/memory_plot.sh", topResultsPath)
+  def plotLatencyHistogram(inputFilesPath: String, publishFreq: String): Process =
+    executeCmd(s"$perfScriptsDir/hist_plot.sh", inputFilesPath, publishFreq)
 
   /**
    * Make sure you have followed below steps before plotting:
@@ -39,7 +39,7 @@ trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
    *  3. update value of jstatPlotPath from SystemMontoringSupport class with the generated path
    *      ex. $HOME/jstatplot/target/universal/stage/bin/jstatplot
    */
-  def plotJstat(): Option[process.Process] = {
+  def plotJstat(): Option[Process] = {
     if (exist(jstatPlotPath)) {
       val originalFile = new File(jstatResultsPath)
       val tmpFile      = new File(s"$jstatResultsPath.tmp")
@@ -59,24 +59,29 @@ trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
     } else None
   }
 
-  def runTop(): Option[process.Process] = {
+  def runTop(): Option[Process] = {
     Thread.sleep(Random.nextInt(2) * 1000)
-    val process = executeCmd(s"$perfScriptsDir/top.sh $topResultsPath")
+    val process = executeCmd(s"$perfScriptsDir/top.sh", topResultsPath)
+
     Thread.sleep(1000)
-    if (process.isAlive()) Some(process)
+    if (process.isAlive) Some(process)
     else None
   }
 
-  def runJstat(): Option[FileProcessLogger] = {
+  def runJstat(): Unit = {
     val outFile: File = new File(jstatResultsPath)
     outFile.getParentFile.mkdirs()
     outFile.createNewFile()
 
     val cmd = s"jstat -gc $pid 1s"
     println(s"[Info] Executing command : [$cmd]")
-    val processLogger = ProcessLogger(outFile)
-    if (cmd.run(processLogger).isAlive()) Some(processLogger)
-    else None
+
+    val redirectFile = Redirect.to(outFile)
+
+    new ProcessBuilder("jstat", "-gc", pid.toString, "1s")
+      .redirectErrorStream(true)
+      .redirectOutput(redirectFile)
+      .start
   }
 
   /**
@@ -105,13 +110,20 @@ trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
     isIt
   }
 
-  private def executeCmd(cmd: String): process.Process = {
-    println(s"[Info] Executing command : [$cmd]")
-    cmd.run(new ProcessLogger {
-      override def buffer[T](f: ⇒ T): T   = f
-      override def out(s: ⇒ String): Unit = println(s"[Info @ ${myself.name}($pid)] " + s)
-      override def err(s: ⇒ String): Unit = println(s"[Error @ ${myself.name}($pid)] " + s)
-    })
+  private def executeCmd(cmd: String*): Process = {
+    println(s"[Info] Executing command : [${cmd.mkString(" ")}]")
+    val process = new ProcessBuilder(cmd: _*).start()
+    Source
+      .fromInputStream(process.getErrorStream)
+      .getLines()
+      .foreach(line => println(s"[Error @ ${myself.name}($pid)] " + line))
+
+    Source
+      .fromInputStream(process.getInputStream)
+      .getLines()
+      .foreach(line => println(s"[Info @ ${myself.name}($pid)] " + line))
+
+    process
   }
 
 }

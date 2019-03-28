@@ -9,7 +9,7 @@ import sbt.Keys._
 import sbt.io.{IO, Path}
 import sbt.{AutoPlugin, Def, Plugins, ProjectReference, Setting, Task, taskKey, _}
 
-import scala.sys.process._
+import scala.collection.JavaConverters._
 
 object GithubRelease extends AutoPlugin {
   val coverageReportZipKey        = taskKey[File]("Creates a distributable zip file containing the coverage report.")
@@ -46,7 +46,6 @@ object GithubRelease extends AutoPlugin {
 
     // 1. include all xml files in single zip
     IO.zip(xmlFiles, testReportZip)
-
     // 2. generate html report from xml files
     IO.withTemporaryDirectory { dir ⇒
       // copy xml files from all projects to single directory
@@ -66,9 +65,15 @@ object GithubRelease extends AutoPlugin {
     (testReportZip, testReportHtml)
   }
 
-  private def junitMergeCmd(inputPath: String, outputPath: String) = s"junit-merge -d $inputPath -o $outputPath".!
+  private def junitMergeCmd(inputPath: String, outputPath: String) = {
+    val commandWithArgs = List("junit-merge", "-d", inputPath, "-o", outputPath)
+    new ProcessBuilder(commandWithArgs.asJava).inheritIO.start.waitFor
+  }
 
-  private def junitViewerCmd(inputPath: String, outputPath: String) = s"junit-viewer --results=$inputPath  --save=$outputPath".!
+  private def junitViewerCmd(inputPath: String, outputPath: String) = {
+    val commandWithArgs = List("junit-viewer", s"--results=$inputPath", s"--save=$outputPath")
+    new ProcessBuilder(commandWithArgs.asJava).inheritIO.start.waitFor
+  }
 
   private def stageAndZipTask(projects: Seq[ProjectReference]): Def.Initialize[Task[File]] = Def.task {
     val ghrleaseDir = target.value / "ghrelease"

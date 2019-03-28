@@ -19,7 +19,6 @@ import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers}
 import scala.collection.immutable
 import scala.concurrent.duration.{Duration, DurationDouble, FiniteDuration}
 import scala.concurrent.{Await, Future}
-import scala.sys.process.{FileProcessLogger, Process}
 
 class BasePerfSuite(config: MultiNodeConfig)
     extends MultiNodeSpec(config)
@@ -41,10 +40,9 @@ class BasePerfSuite(config: MultiNodeConfig)
 
   var topProcess: Option[Process] = None
 
-  var throughputPlots: ThroughputPlots              = ThroughputPlots()
-  var latencyPlots: LatencyPlots                    = LatencyPlots()
-  var initialLatencyPlots: InitialLatencyPlots      = InitialLatencyPlots()
-  var jstatProcessLogger: Option[FileProcessLogger] = None
+  var throughputPlots: ThroughputPlots         = ThroughputPlots()
+  var latencyPlots: LatencyPlots               = LatencyPlots()
+  var initialLatencyPlots: InitialLatencyPlots = InitialLatencyPlots()
 
   val defaultTimeout: Duration   = 1.minute
   val maxTimeout: FiniteDuration = 1.hour
@@ -66,13 +64,9 @@ class BasePerfSuite(config: MultiNodeConfig)
     reporterExecutor.shutdown()
     if (testConfigs.systemMonitoring) {
       topProcess.foreach { top ⇒
-        top.destroy()
+        top.destroyForcibly().waitFor()
         plotCpuUsageGraph()
         plotMemoryUsageGraph()
-      }
-      jstatProcessLogger.foreach { p ⇒
-        p.flush()
-        p.close()
       }
       plotJstat().foreach(_.exitValue())
     }
@@ -80,7 +74,7 @@ class BasePerfSuite(config: MultiNodeConfig)
   }
 
   def startSystemMonitoring(): Unit = {
-    jstatProcessLogger = runJstat()
+    runJstat()
     runPerfFlames(roles: _*)(delay = 15.seconds, time = 60.seconds)
     topProcess = runTop()
   }
