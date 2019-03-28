@@ -11,6 +11,7 @@ import csw.config.server.commons.ConfigServiceConnection
 import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.location.api.exceptions.OtherLocationIsRegistered
 import csw.location.api.models.HttpRegistration
+import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.http.HTTPLocationService
 import csw.network.utils.Networks
@@ -19,13 +20,17 @@ import scala.util.control.NonFatal
 
 class HttpServiceTest extends HTTPLocationService {
 
-  implicit val system: ActorSystem    = ActorSystem("test")
-  implicit val mat: ActorMaterializer = ActorMaterializer()
-  private val testLocationService     = HttpLocationServiceFactory.makeLocalClient
+  implicit val system: ActorSystem                 = ActorSystem("test")
+  implicit val mat: ActorMaterializer              = ActorMaterializer()
+  private val testLocationService: LocationService = HttpLocationServiceFactory.makeLocalClient
 
   //register AAS with location service
   private val AASPort = 8080
-  testLocationService.register(HttpRegistration(AASConnection.value, AASPort, "auth"))
+
+  override def beforeAll(): Unit = {
+    super.beforeAll()
+    testLocationService.register(HttpRegistration(AASConnection.value, AASPort, "auth")).await
+  }
 
   override def afterAll(): Unit = {
     system.terminate().await
@@ -67,6 +72,8 @@ class HttpServiceTest extends HTTPLocationService {
 
     //TODO: Find a way to assert server is not bounded
     try actorRuntime.shutdown(UnknownReason).await
-    catch { case NonFatal(ex) ⇒ }
+    catch {
+      case NonFatal(ex) ⇒
+    }
   }
 }
