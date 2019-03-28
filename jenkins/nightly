@@ -37,11 +37,6 @@ pipeline {
             }
         }
 
-        stage('Multi-Container Docker') {
-            steps {
-                sh "./integration/scripts/runner.sh"
-            }
-        }
 
         stage('Multi-NICs Docker') {
             steps {
