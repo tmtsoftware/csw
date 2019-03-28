@@ -89,7 +89,7 @@ class ConfigCliAuthTest(ignore: Int)
             )
           )
         ),
-        settings = KeycloakSettings(port = keycloakPort)
+        KeycloakSettings(port = keycloakPort, keycloakDirectory = "/tmp/auth")
       )
       val stopHandle = Await.result(embeddedKeycloak.startServer(), serverTimeout)
       Await.result(new AuthServiceLocation(locationService).register(KeycloakSettings.default.port), defaultTimeout)
