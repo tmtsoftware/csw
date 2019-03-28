@@ -1,11 +1,11 @@
 package csw.location.agent
 
 import java.net.URI
-import java.nio.file.Paths
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
+import csw.commons.ResourceReader
 import csw.location.agent.common.TestFutureExtension.RichFuture
 import csw.location.api.models.Connection.{HttpConnection, TcpConnection}
 import csw.location.api.models.{ComponentId, ComponentType}
@@ -48,8 +48,7 @@ class MainTest extends ScalaTestFrameworkTestKit with FunSuiteLike {
 
   test("Test with config file") {
     val name       = "test2"
-    val url        = getClass.getResource("/test2.conf")
-    val configFile = Paths.get(url.toURI).toFile
+    val configFile = ResourceReader.copyToTmp("/test2.conf").toFile
     val config     = ConfigFactory.parseFile(configFile)
     val port       = config.getInt("test2.port")
 

@@ -7,10 +7,10 @@ import akka.remote.testconductor.RoleName
 import akka.stream.{ActorMaterializer, Materializer}
 import com.typesafe.config.ConfigFactory
 import csw.aas.core.deployment.AuthServiceLocation
+import csw.commons.ResourceReader
 import csw.config.cli.args.Options
 import csw.config.cli.wiring.Wiring
 import csw.config.client.scaladsl.ConfigClientFactory
-import csw.config.helpers.ResourceFileReader.read
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.{ServerWiring, Settings}
 import csw.location.helpers.{LSNodeSpec, NMembersAndSeed}
@@ -110,7 +110,7 @@ class ConfigCliAuthTest(ignore: Int)
 
     runOn(client) {
       implicit val mat: Materializer = ActorMaterializer()
-      val (filePath, fileContents)   = read("/tromboneHCDContainer.conf")
+      val (filePath, fileContents)   = ResourceReader.readAndCopyToTmp("/tromboneHCDContainer.conf")
       val repoPath1                  = Paths.get("/client1/hcd/text/tromboneHCDContainer.conf")
 
       enterBarrier("keycloak started")
@@ -130,7 +130,7 @@ class ConfigCliAuthTest(ignore: Int)
       }
 
       runner.create(
-        Options(relativeRepoPath = Some(repoPath1), inputFilePath = Some(Paths.get(filePath)), comment = Some("test"))
+        Options(relativeRepoPath = Some(repoPath1), inputFilePath = Some(filePath), comment = Some("test"))
       )
 
       val configService     = ConfigClientFactory.clientApi(system, locationService)

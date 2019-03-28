@@ -1,10 +1,9 @@
 package csw.config.client.scaladsl
 
-import java.nio.file.Paths
+import java.nio.file.{Files, Paths}
 
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.http.scaladsl.Http
-import csw.commons.tagobjects.FileSystemSensitive
 import csw.config.api.TokenFactory
 import csw.config.api.exceptions.{FileNotFound, InvalidInput, NotAllowed, Unauthorized}
 import csw.config.api.models.{ConfigData, FileType}
@@ -14,6 +13,7 @@ import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.config.server.files.Sha1
 import csw.config.server.{ConfigServiceTest, ServerWiring}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.commons.ResourceReader
 
 // DEOPSCSW-138: Split Config API into Admin API and Client API
 // DEOPSCSW-80: HTTP based access for configuration file
@@ -53,9 +53,9 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
   // DEOPSCSW-27: Storing binary component configurations
   // DEOPSCSW-81: Storing large files in the configuration service
   // DEOPSCSW-131: Detect and handle oversize files
-  test("should be able to store and retrieve binary file in annex dir", FileSystemSensitive) {
+  test("should be able to store and retrieve binary file in annex dir") {
     val fileName   = "smallBinary.bin"
-    val path       = Paths.get(getClass.getClassLoader.getResource(fileName).toURI)
+    val path       = ResourceReader.copyToTmp("/" + fileName, ".bin")
     val configData = ConfigData.fromPath(path)
     val repoPath   = Paths.get(fileName)
 
@@ -66,8 +66,7 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
       configService.create(repoPath, configData, annex = false, s"committing file: $fileName").await
 
     val expectedContent = configService.getById(repoPath, configId).await.get.toInputStream.toByteArray
-    val diskFile        = getClass.getClassLoader.getResourceAsStream(fileName)
-    expectedContent shouldBe diskFile.toByteArray
+    expectedContent shouldBe Files.readAllBytes(path)
 
     val list = configService.list(Some(FileType.Annex)).await
     list.map(_.path) shouldBe List(repoPath)

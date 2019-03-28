@@ -1,14 +1,14 @@
 package csw.framework.deploy.hostconfig
 
-import java.nio.file.Paths
-
+import csw.commons.ResourceReader
 import org.mockito.Mockito.{times, verify, when}
-import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
+import org.scalatestplus.mockito.MockitoSugar
 
 // DEOPSCSW-314: End to End Automated Test for host-config-app
 class HostConfigTest extends FunSuite with MockitoSugar with Matchers {
-  private val configPath            = Paths.get(getClass.getResource("/parsing_test_conf/hostconfig/valid_hostconfig.conf").getPath)
+
+  private val configPath            = ResourceReader.copyToTmp("/parsing_test_conf/hostconfig/valid_hostconfig.conf")
   private val containerCmdAppScript = "containerCmd.sh"
   private val mockedProcesses       = List(mock[Process], mock[Process])
 

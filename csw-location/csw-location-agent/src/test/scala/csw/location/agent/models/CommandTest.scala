@@ -1,9 +1,6 @@
 package csw.location.agent.models
 
-import java.io.File
-import java.nio.file.Paths
-
-import csw.commons.tagobjects.FileSystemSensitive
+import csw.commons.ResourceReader
 import csw.location.agent.args.Options
 import org.scalatest.{FunSuite, Matchers}
 
@@ -29,12 +26,10 @@ class CommandTest extends FunSuite with Matchers {
     c.noExit shouldBe true
   }
 
-  test("testParse with config file should honour config options", FileSystemSensitive) {
-    val url            = getClass.getResource("/redisTest.conf")
-    val configFilePath = Paths.get(url.toURI).toFile.getAbsolutePath
-    val configFile     = new File(configFilePath)
-    val opt            = Options(List("redisTest"), None, None, Option(configFile))
-    val c: Command     = Command.parse(opt)
+  test("testParse with config file should honour config options") {
+    val configFile = ResourceReader.copyToTmp("/redisTest.conf").toFile
+    val opt        = Options(List("redisTest"), None, None, Option(configFile))
+    val c: Command = Command.parse(opt)
 
     c.commandText shouldBe "redis-server --port 7777"
     c.port shouldBe 7777
@@ -42,23 +37,19 @@ class CommandTest extends FunSuite with Matchers {
     c.noExit shouldBe false
   }
 
-  test("testParse with config file but undefined value", FileSystemSensitive) {
-    val url            = getClass.getResource("/redisTest.conf")
-    val configFilePath = Paths.get(url.toURI).toFile.getAbsolutePath
-    val configFile     = new File(configFilePath)
-    val opt            = Options(List("redisTest-misSpelledKey"), None, None, Option(configFile))
-    val c: Command     = Command.parse(opt)
+  test("testParse with config file but undefined value") {
+    val configFile = ResourceReader.copyToTmp("/redisTest.conf").toFile
+    val opt        = Options(List("redisTest-misSpelledKey"), None, None, Option(configFile))
+    val c: Command = Command.parse(opt)
 
     //due to mis-spelled key, false command is returned. which upon execution does nothing.
     c.commandText shouldBe "false"
   }
 
-  test("testParse with config file port, command parameters are overridable from command line", FileSystemSensitive) {
-    val url            = getClass.getResource("/redisTest.conf")
-    val configFilePath = Paths.get(url.toURI).toFile.getAbsolutePath
-    val configFile     = new File(configFilePath)
-    val opt            = Options(List("redisTest"), Some("sleep"), Some(8888), Option(configFile))
-    val c: Command     = Command.parse(opt)
+  test("testParse with config file port, command parameters are overridable from command line") {
+    val configFile = ResourceReader.copyToTmp("/redisTest.conf").toFile
+    val opt        = Options(List("redisTest"), Some("sleep"), Some(8888), Option(configFile))
+    val c: Command = Command.parse(opt)
 
     c.commandText shouldBe "sleep"
     c.port shouldBe 8888

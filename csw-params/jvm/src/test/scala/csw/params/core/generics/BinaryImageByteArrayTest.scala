@@ -1,8 +1,8 @@
 package csw.params.core.generics
 
-import java.nio.file.{Files, Paths}
+import java.nio.file.Files
 
-import csw.commons.tagobjects.FileSystemSensitive
+import csw.commons.ResourceReader
 import csw.params.core.generics.KeyType.ByteArrayKey
 import csw.params.core.models.Units.encoder
 import csw.params.core.models._
@@ -13,11 +13,11 @@ class BinaryImageByteArrayTest extends FunSpec with Matchers {
   // DEOPSCSW-186: Binary value payload
   describe("test ByteArrayKey") {
     // DEOPSCSW-186: Binary value payload
-    it("should able to create parameter representing binary image", FileSystemSensitive) {
+    it("should able to create parameter representing binary image") {
       val keyName                        = "imageKey"
       val imageKey: Key[ArrayData[Byte]] = ByteArrayKey.make(keyName)
 
-      val imgPath  = Paths.get(getClass.getResource("/smallBinary.bin").getPath)
+      val imgPath  = ResourceReader.copyToTmp("/smallBinary.bin", ".bin")
       val imgBytes = Files.readAllBytes(imgPath)
 
       val binaryImgData: ArrayData[Byte]          = ArrayData.fromArray(imgBytes)

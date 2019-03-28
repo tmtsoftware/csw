@@ -1,6 +1,6 @@
 package csw.params
 
-import java.nio.file.{Files, Paths}
+import java.nio.file.Files
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
@@ -20,7 +20,6 @@ import csw.command.client.models.framework.LocationServiceUsage.DoNotRegister
 import csw.command.client.models.framework.PubSub.Subscribe
 import csw.command.client.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.command.client.models.framework._
-import csw.commons.tagobjects.FileSystemSensitive
 import csw.location.api.models.ComponentType.HCD
 import csw.location.api.models.Connection
 import csw.params.commands.CommandResponse._
@@ -35,6 +34,7 @@ import csw.time.core.models.UTCTime
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.prop.Tables.Table
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
+import csw.commons.ResourceReader
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
@@ -62,11 +62,11 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       setupSerializer.fromBinary(setupBytes) shouldBe setup
     }
 
-    it("should serialize Observe", FileSystemSensitive) {
+    it("should serialize Observe") {
       val keyName                        = "imageKey"
       val imageKey: Key[ArrayData[Byte]] = ByteArrayKey.make(keyName)
 
-      val imgPath  = Paths.get(getClass.getResource("/smallBinary.bin").getPath)
+      val imgPath  = ResourceReader.copyToTmp("/smallBinary.bin", ".bin")
       val imgBytes = Files.readAllBytes(imgPath)
 
       val binaryImgData: ArrayData[Byte]    = ArrayData.fromArray(imgBytes)

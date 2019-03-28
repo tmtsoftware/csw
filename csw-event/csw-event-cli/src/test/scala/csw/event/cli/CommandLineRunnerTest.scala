@@ -4,6 +4,7 @@ import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
 import csw.event.cli.IterableExtensions.RichStringIterable
 import csw.event.client.helpers.TestFutureExt.RichFuture
+import csw.commons.ResourceReader
 import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.KeyType.{IntKey, StringKey}
 import csw.params.core.models.Id
@@ -14,7 +15,6 @@ import org.scalatest.time.SpanSugar.convertDoubleToGrainOfTime
 import play.api.libs.json._
 
 import scala.collection.{immutable, mutable}
-import scala.io.Source
 
 class CommandLineRunnerTest extends SeedData with Eventually {
 
@@ -48,12 +48,12 @@ class CommandLineRunnerTest extends SeedData with Eventually {
   test("should able to get events in json format") {
 
     commandLineRunner.get(argsParser.parse(Seq("get", "-e", event1.eventKey.key, "-o", "json")).get).await
-    stringToEvent(logBuffer.head) shouldBe event1
+    stringToEvent[SystemEvent](logBuffer.head) shouldBe event1
 
     logBuffer.clear()
 
     commandLineRunner.get(argsParser.parse(Seq("get", "-e", s"${event1.eventKey},${event2.eventKey}", "--out", "json")).get).await
-    val events = logBuffer.map(stringToEvent).toSet
+    val events = logBuffer.map(stringToEvent[Event]).toSet
     events shouldEqual Set(event1, event2)
   }
 
@@ -84,11 +84,11 @@ class CommandLineRunnerTest extends SeedData with Eventually {
 
   // DEOPSCSW-432: [Event Cli] Publish command
   test("should able to publish event when event key and event json file provided") {
-    val path      = getClass.getResource("/publish/observe_event.json").getPath
-    val eventJson = Json.parse(Source.fromResource("publish/observe_event.json").mkString)
+    val (path, eventContent) = ResourceReader.readAndCopyToTmp("/publish/observe_event.json")
+    val eventJson            = Json.parse(eventContent)
 
     val eventKey = EventKey("wfos.blue.filter.wheel")
-    commandLineRunner.publish(argsParser.parse(Seq("publish", "-e", eventKey.key, "--data", path)).get).await
+    commandLineRunner.publish(argsParser.parse(Seq("publish", "-e", eventKey.key, "--data", path.toString)).get).await
 
     eventually(timeout = timeout(5.seconds), interval = interval(100.millis)) {
       commandLineRunner.get(argsParser.parse(Seq("get", "-e", eventKey.key, "-o", "json")).get).await
@@ -102,11 +102,11 @@ class CommandLineRunnerTest extends SeedData with Eventually {
 
   // DEOPSCSW-432: [Event Cli] Publish command
   test("should able to publish event with interval") {
-    val queue             = new mutable.Queue[JsObject]()
-    val eventKey          = EventKey("tcs.mobie.blue.filter")
-    val path              = getClass.getResource("/publish/observe_event.json").getPath
-    val eventJson         = Json.parse(Source.fromResource("publish/observe_event.json").mkString)
-    val expectedEventJson = removeDynamicKeys(addEventIdAndName(eventJson, eventKey))
+    val queue                = new mutable.Queue[JsObject]()
+    val eventKey             = EventKey("tcs.mobie.blue.filter")
+    val (path, eventContent) = ResourceReader.readAndCopyToTmp("/publish/observe_event.json")
+    val eventJson            = Json.parse(eventContent)
+    val expectedEventJson    = removeDynamicKeys(addEventIdAndName(eventJson, eventKey))
 
     val subscriber = eventService.defaultSubscriber
     subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](e ⇒ queue.enqueue(eventToSanitizedJson(e)))).run()
@@ -115,7 +115,7 @@ class CommandLineRunnerTest extends SeedData with Eventually {
 
     // publish same event every 300 millis for 2 seconds and starts with 0th sec, which results into publishing 7 events
     commandLineRunner
-      .publish(argsParser.parse(Seq("publish", "-e", eventKey.key, "--data", path, "-i", "300", "-p", "2")).get)
+      .publish(argsParser.parse(Seq("publish", "-e", eventKey.key, "--data", path.toString, "-i", "300", "-p", "2")).get)
       .await
 
     // invalid event + 7 events published in previous step
@@ -127,19 +127,19 @@ class CommandLineRunnerTest extends SeedData with Eventually {
 
   // DEOPSCSW-436: [Event Cli] Specialized Publish command (take params from command line)
   test("should able to publish event when params are provided") {
-    val filePath = "publish/observe_event.json"
-    val path     = getClass.getResource("/" + filePath).getPath
-    val eventKey = EventKey("wfos.test.move")
+    val filePath                    = "/publish/observe_event.json"
+    val (path, observeEventContent) = ResourceReader.readAndCopyToTmp(filePath)
+    val eventKey                    = EventKey("wfos.test.move")
 
     val cmdLineParams = "testKey:s=[test]|testKey2:i:meter=[1,2,3]"
     val strParam      = StringKey.make("testKey").set("test")
     val intParam      = IntKey.make("testKey2").set(1, 2, 3).withUnits(meter)
 
-    val expectedEvent     = fileToEvent[ObserveEvent](filePath).madd(strParam, intParam)
+    val expectedEvent     = stringToEvent[ObserveEvent](observeEventContent).madd(strParam, intParam)
     val expectedEventJson = JsonSupport.writeEvent[ObserveEvent](expectedEvent)
 
     // first publish event with default data from json file
-    commandLineRunner.publish(argsParser.parse(Seq("publish", "-e", eventKey.key, "--data", path)).get).await
+    commandLineRunner.publish(argsParser.parse(Seq("publish", "-e", eventKey.key, "--data", path.toString)).get).await
 
     Thread.sleep(500)
 
@@ -156,7 +156,7 @@ class CommandLineRunnerTest extends SeedData with Eventually {
     val updatedStrParam     = StringKey.make("testKey").set("test1", "test2")
     val updatedIntParam     = IntKey.make("testKey2").set(4).withUnits(meter)
 
-    val updatedExpectedEvent     = fileToEvent[ObserveEvent](filePath).madd(updatedStrParam, updatedIntParam)
+    val updatedExpectedEvent     = stringToEvent[ObserveEvent](observeEventContent).madd(updatedStrParam, updatedIntParam)
     val updatedExpectedEventJson = JsonSupport.writeEvent[ObserveEvent](updatedExpectedEvent)
 
     commandLineRunner
@@ -259,9 +259,7 @@ class CommandLineRunnerTest extends SeedData with Eventually {
     ("eventName", eventKey.eventName.name)
   )
 
-  private def eventToSanitizedJson(event: Event)        = removeDynamicKeys(JsonSupport.writeEvent(event))
-  private def stringToEvent(eventString: String)        = JsonSupport.readEvent[Event](Json.parse(eventString))
-  private def fileToEvent[T <: Event](filePath: String) = JsonSupport.readEvent[T](fileToEventJson(filePath))
-  private def fileToEventJson(filePath: String)         = Json.parse(Source.fromResource(filePath).mkString)
-  private def strToJsObject(js: String)                 = Json.parse(js).as[JsObject]
+  private def eventToSanitizedJson(event: Event)                = removeDynamicKeys(JsonSupport.writeEvent(event))
+  private def stringToEvent[T <: Event](eventString: String): T = JsonSupport.readEvent[T](Json.parse(eventString))
+  private def strToJsObject(js: String)                         = Json.parse(js).as[JsObject]
 }

@@ -6,11 +6,11 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import csw.aas.installed.api.InstalledAppAuthAdapter
+import csw.commons.ResourceReader
 import csw.config.api.models.ConfigData
 import csw.config.cli.wiring.Wiring
 import csw.config.client.internal.ActorRuntime
 import csw.config.client.scaladsl.ConfigClientFactory
-import csw.config.helpers.ResourceFileReader.read
 import csw.config.helpers.TwoClientsAndServer
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.mocks.MockedAuthentication
@@ -37,8 +37,8 @@ class ConfigCliAppTest(ignore: Int)
 
   private val nativeAuthAdapter: InstalledAppAuthAdapter = mock[InstalledAppAuthAdapter]
 
-  private val (inputFilePath, inputFileContents)               = read("/tromboneHCDContainer.conf")
-  private val (updatedInputFilePath, updatedInputFileContents) = read("/tromboneAssembly.conf")
+  private val (inputFilePath, inputFileContents)               = ResourceReader.readAndCopyToTmp("/tromboneHCDContainer.conf")
+  private val (updatedInputFilePath, updatedInputFileContents) = ResourceReader.readAndCopyToTmp("/tromboneAssembly.conf")
 
   private val repoPath1 = "/client1/hcd/text/tromboneHCDContainer.conf"
   private val repoPath2 = "/client2/hcd/text/app.conf"
@@ -72,11 +72,11 @@ class ConfigCliAppTest(ignore: Int)
 
       def cliApp() = Wiring.noPrinting(HttpLocationServiceFactory.makeLocalClient, factory, nativeAuthAdapter).cliApp
 
-      cliApp().start("csw-config-cli", Array("create", repoPath1, "-i", inputFilePath, "-c", comment))
+      cliApp().start("csw-config-cli", Array("create", repoPath1, "-i", inputFilePath.toString, "-c", comment))
       enterBarrier("client1-create")
       enterBarrier("client2-create-pass")
 
-      cliApp().start("csw-config-cli", Array("update", repoPath1, "-i", updatedInputFilePath, "-c", comment))
+      cliApp().start("csw-config-cli", Array("update", repoPath1, "-i", updatedInputFilePath.toString, "-c", comment))
       enterBarrier("client1-update")
       enterBarrier("client2-update-pass")
 

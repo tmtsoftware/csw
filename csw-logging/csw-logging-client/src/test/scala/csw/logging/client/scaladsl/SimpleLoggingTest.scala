@@ -11,10 +11,11 @@ import csw.logging.client.components.{InnerSourceComponent, SingletonComponent, 
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.internal.LoggingState
 import csw.logging.client.utils.LoggingTestSuite
+import org.scalatest.concurrent.Eventually
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import play.api.libs.json.JsObject
 
-class SimpleLoggingTest extends LoggingTestSuite {
+class SimpleLoggingTest extends LoggingTestSuite with Eventually {
 
   // DEOPSCSW-116: Make log messages identifiable with components
   // DEOPSCSW-118: Provide UTC time for each log message
@@ -30,7 +31,7 @@ class SimpleLoggingTest extends LoggingTestSuite {
 
     var logMsgLineNumber = TromboneHcd.DEBUG_LINE_NO
 
-    logBuffer.size shouldBe 5
+    eventually(logBuffer.size shouldBe 5)
     logBuffer.foreach { log ⇒
       // This assert's that, ISO_INSTANT parser should not throw exception while parsing timestamp from log message
       // If timestamp is in other than UTC(ISO_FORMAT) format, DateTimeFormatter.ISO_INSTANT will throw DateTimeParseException
@@ -62,7 +63,7 @@ class SimpleLoggingTest extends LoggingTestSuite {
 
     var logMsgLineNumber = InnerSourceComponent.TRACE_LINE_NO
 
-    logBuffer.size shouldBe 6
+    eventually(logBuffer.size shouldBe 6)
     logBuffer.foreach { log ⇒
       log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "InnerSourceComponent"
       log.getString(LoggingKeys.FILE) shouldBe "InnerSourceComponent.scala"
@@ -84,7 +85,7 @@ class SimpleLoggingTest extends LoggingTestSuite {
 
     var logMsgLineNumber = SingletonComponent.TRACE_LINE_NO
 
-    logBuffer.size shouldBe 6
+    eventually(logBuffer.size shouldBe 6)
     logBuffer.foreach { log ⇒
       log.contains(LoggingKeys.COMPONENT_NAME) shouldBe true
       log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "SingletonComponent"
@@ -109,7 +110,7 @@ class SimpleLoggingTest extends LoggingTestSuite {
 
     var logMsgLineNumber = SingletonComponent.USER_TRACE_LINE_NO
 
-    logBuffer.size shouldBe 6
+    eventually(logBuffer.size shouldBe 6)
     logBuffer.foreach { log ⇒
       //  Count the user messages for test at the end
       var userMsgCount = 0
@@ -142,7 +143,7 @@ class SimpleLoggingTest extends LoggingTestSuite {
 
     //  TromboneHcd component is logging 6 messages each of unique level
     //  As per the filter, hcd should log 5 message of all level except TRACE
-    logBuffer.size shouldBe 5
+    eventually(logBuffer.size shouldBe 5)
 
     val groupByComponentNamesLog = logBuffer.groupBy(json ⇒ json.getString(LoggingKeys.COMPONENT_NAME))
     val tromboneHcdLogs          = groupByComponentNamesLog("tromboneHcd")
@@ -170,7 +171,7 @@ class SimpleLoggingTest extends LoggingTestSuite {
 
     //  TromboneAssembly component is logging 6 messages each of unique level
     //  As per the default loglevel = trace, assembly should log all 6 message
-    logBuffer.size shouldBe 6
+    eventually(logBuffer.size shouldBe 6)
 
     val groupByComponentNamesLog = logBuffer.groupBy(json ⇒ json.getString(LoggingKeys.COMPONENT_NAME))
     val tromboneAssemblyLogs     = groupByComponentNamesLog("tromboneAssembly")

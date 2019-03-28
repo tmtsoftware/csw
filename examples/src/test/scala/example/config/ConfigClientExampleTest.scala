@@ -4,6 +4,7 @@ import java.io.InputStream
 import java.nio.file.{Path, Paths}
 import java.time.Instant
 
+import csw.commons.ResourceReader
 import csw.config.api.models.FileType.{Annex, Normal}
 import csw.config.api.models.{ConfigData, ConfigId, ConfigMetadata, FileType}
 import csw.config.api.scaladsl.{ConfigClientService, ConfigService}
@@ -93,8 +94,8 @@ class ConfigClientExampleTest
         val config1: ConfigData = ConfigData.fromString(configString)
 
         //construct ConfigData from a local file containing binary data
-        val srcFilePath         = getClass.getClassLoader.getResource("smallBinary.bin").toURI
-        val config2: ConfigData = ConfigData.fromPath(Paths.get(srcFilePath))
+        val srcFilePath         = ResourceReader.copyToTmp("/smallBinary.bin")
+        val config2: ConfigData = ConfigData.fromPath(srcFilePath)
 
         //construct ConfigData from Array[Byte] by reading a local file
         val stream: InputStream    = getClass.getClassLoader.getResourceAsStream("smallBinary.bin")
@@ -229,7 +230,7 @@ class ConfigClientExampleTest
     val assertionF = async {
       //retrieve list of all files; for demonstration purpose show validate return values
       await(adminApi.list()).map(info ⇒ info.path).toSet shouldBe paths.map {
-        case (path, fileType) ⇒ path
+        case (path, _) ⇒ path
       }.toSet
 
       //retrieve list of files based on type; for demonstration purpose validate return values

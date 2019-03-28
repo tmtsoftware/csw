@@ -1,19 +1,19 @@
 package csw.config.server
 
 import java.io.InputStream
-import java.nio.file.{Path, Paths}
+import java.nio.file.{Files, Path, Paths}
 import java.time.Instant
 
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.stream.scaladsl.StreamConverters
 import com.typesafe.config.{Config, ConfigFactory}
-import csw.commons.tagobjects.FileSystemSensitive
 import csw.config.api.exceptions.{FileAlreadyExists, FileNotFound}
 import csw.config.api.models._
 import csw.config.api.scaladsl.ConfigService
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.config.server.files.Sha1
+import csw.commons.ResourceReader
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
@@ -29,7 +29,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   private lazy val testFileUtils        = new TestFileUtils(wiring.settings)
 
   import wiring.actorRuntime._
-  protected lazy val serverConfigService = wiring.configServiceFactory.make()
+  protected lazy val serverConfigService: ConfigService = wiring.configServiceFactory.make()
 
   override protected def beforeEach(): Unit = serverWiring.svnRepo.initSvnRepo()
 
@@ -918,10 +918,9 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   // DEOPSCSW-27: Storing binary component configurations
   // DEOPSCSW-81: Storing large files in the configuration service
   // DEOPSCSW-131: Detect and handle oversize files
-  test("should be able to store and retrieve text file from annex store when size is greater than configured size",
-       FileSystemSensitive) {
-    val fileName              = "tromboneContainerTest.conf"
-    val path                  = Paths.get(getClass.getClassLoader.getResource(fileName).toURI)
+  test("should be able to store and retrieve text file from annex store when size is greater than configured size") {
+    val fileName              = "/tromboneContainerTest.conf"
+    val path                  = ResourceReader.copyToTmp(fileName)
     val configData            = ConfigData.fromPath(path)
     val config: Config        = ConfigFactory.parseString("csw-config-server.annex-min-file-size=1 KiB")
     val serverWiringAnnexTest = ServerWiring.make(config)
@@ -931,8 +930,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
     // This test verifies that the binary file has been stored properly in the configuration service
     val expectedContent = cs.getById(Paths.get(fileName), configId).await.get.toInputStream.toByteArray
-    val diskFile        = getClass.getClassLoader.getResourceAsStream(fileName)
-    expectedContent shouldBe diskFile.toByteArray
+    expectedContent shouldBe Files.readAllBytes(path)
 
     // This test verifies that the file was stored in the annex because the file with the sha1-suffix only exists if in the annex
     val svnConfigData = cs.getById(Paths.get(s"$fileName${serverWiring.settings.`sha1-suffix`}"), configId).await.get

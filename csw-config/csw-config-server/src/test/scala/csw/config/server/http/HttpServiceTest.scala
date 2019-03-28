@@ -41,7 +41,7 @@ class HttpServiceTest extends HTTPLocationService {
     val _servicePort = 4005
     val serverWiring = ServerWiring.make(Some(_servicePort))
     import serverWiring._
-    val (binding, registrationResult) = httpService.registeredLazyBinding.await
+    val (_, registrationResult) = httpService.registeredLazyBinding.await
     locationService.find(ConfigServiceConnection.value).await.get.connection shouldBe ConfigServiceConnection.value
 
     val location = registrationResult.location
@@ -73,7 +73,7 @@ class HttpServiceTest extends HTTPLocationService {
     //TODO: Find a way to assert server is not bounded
     try actorRuntime.shutdown(UnknownReason).await
     catch {
-      case NonFatal(ex) ⇒
+      case NonFatal(_) ⇒
     }
   }
 }

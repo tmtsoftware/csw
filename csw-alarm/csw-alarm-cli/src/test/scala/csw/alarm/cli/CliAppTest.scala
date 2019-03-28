@@ -17,15 +17,14 @@ import csw.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
 import csw.alarm.cli.args.Options
 import csw.alarm.cli.utils.IterableExtensions.RichStringIterable
 import csw.alarm.cli.utils.TestFutureExt.RichFuture
-import csw.commons.tags.FileSystemSensitive
 import csw.config.api.models.ConfigData
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.mocks.MockedAuthentication
 import csw.config.server.{ServerWiring, Settings}
 import csw.params.core.models.Subsystem.{LGSF, NFIRAOS, TCS}
+import csw.commons.ResourceReader
 
-@FileSystemSensitive
 class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
 
   import cliWiring._
@@ -56,7 +55,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
 
   override def beforeEach(): Unit = {
     // init alarm store
-    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
+    val filePath = ResourceReader.copyToTmp("/valid-alarms.conf")
     val initCmd  = Options(cmd = "init", filePath = Some(filePath), isLocal = true, reset = true)
     cliApp.execute(initCmd)
     logBuffer.clear()
@@ -70,7 +69,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
 
   // DEOPSCSW-470: CLI application to exercise and test the alarm API
   test("should initialize alarms in alarm store from local config") {
-    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
+    val filePath = ResourceReader.copyToTmp("/valid-alarms.conf")
     val cmd      = Options(cmd = "init", filePath = Some(filePath), isLocal = true, reset = true)
 
     clearAlarmStore().futureValue
@@ -90,7 +89,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
     serverWiring.svnRepo.initSvnRepo()
     val (binding, regResult) = serverWiring.httpService.registeredLazyBinding.futureValue
 
-    val configData    = ConfigData.fromPath(Paths.get(getClass.getResource("/valid-alarms.conf").getPath))
+    val configData    = ConfigData.fromPath(ResourceReader.copyToTmp("/valid-alarms.conf"))
     val configPath    = Paths.get("valid-alarms.conf")
     val configService = ConfigClientFactory.adminApi(actorRuntime.system, locationService, factory)
     configService.create(configPath, configData, comment = "commit test file").futureValue

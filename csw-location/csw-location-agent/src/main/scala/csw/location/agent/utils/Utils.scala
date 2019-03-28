@@ -10,5 +10,5 @@ object Utils {
    * Returns an `Option` of `Config` pointed by the file parameter, else None.
    */
   def getAppConfig(file: File): Option[Config] =
-    if (file.exists()) Some(ConfigFactory.parseFileAnySyntax(file).resolve(ConfigResolveOptions.noSystem())) else None
+    if (file.exists()) Some(ConfigFactory.parseFile(file).resolve(ConfigResolveOptions.noSystem())) else None
 }

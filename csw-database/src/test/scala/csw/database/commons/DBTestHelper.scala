@@ -7,6 +7,7 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import csw.database.DatabaseServiceFactory
 import csw.database.DatabaseServiceFactory.{ReadPasswordHolder, ReadUsernameHolder}
+import csw.commons.ResourceReader
 import org.jooq.DSLContext
 import org.scalatest.concurrent.PatienceConfiguration.Interval
 import org.scalatest.concurrent.ScalaFutures.convertScalaFuture
@@ -16,7 +17,7 @@ object DBTestHelper {
   def postgres(port: Int): EmbeddedPostgres =
     EmbeddedPostgres.builder
       .setServerConfig("listen_addresses", "*")
-      .setServerConfig("hba_file", getClass.getClassLoader.getResource("pg_hba.conf").getPath)
+      .setServerConfig("hba_file", ResourceReader.copyToTmp("/pg_hba.conf").toString)
       .setDataDirectory(Paths.get("/tmp/postgresDataDir"))
       .setCleanDataDirectory(true)
       .setPort(port)

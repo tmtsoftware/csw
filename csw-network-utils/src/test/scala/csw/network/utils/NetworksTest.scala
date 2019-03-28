@@ -48,7 +48,9 @@ class NetworksTest extends FunSuite with Matchers with BeforeAndAfterAll with Be
   }
 
   // this is testing internal Networks API bypassing INTERFACE_NAME env variable
-  test("Should get ip4 address of interface with lowest index when INTERFACE_NAME env variable is not set (simulates automatic interface detection)") {
+  test(
+    "Should get ip4 address of interface with lowest index when INTERFACE_NAME env variable is not set (simulates automatic interface detection)"
+  ) {
     val inet4Address1         = InetAddress.getByAddress(Array[Byte](192.toByte, 168.toByte, 1, 2))
     val inet4Address2         = InetAddress.getByAddress(Array[Byte](172.toByte, 17.toByte, 1, 2))
     val inet4Address3         = InetAddress.getByAddress(Array[Byte](10.toByte, 12.toByte, 2, 1))
