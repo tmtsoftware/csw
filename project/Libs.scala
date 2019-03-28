@@ -5,7 +5,7 @@ import scalapb.compiler.Version.scalapbVersion
 
 object Libs {
   val ScalaVersion    = "2.12.8"
-  val silencerVersion = "1.3.1"
+  val silencerVersion = "1.3.2"
 
   val `scalatest` = dep("org.scalatest" %%% "scalatest" % "3.0.6") //Apache License 2.0
 
@@ -33,7 +33,7 @@ object Libs {
   val `scalapb-runtime`          = "com.thesamet.scalapb" %% "scalapb-runtime"          % scalapbVersion % "protobuf"
   val `scalapb-json4s`           = "com.thesamet.scalapb" %% "scalapb-json4s"           % scalapbVersion
   val `lettuce`                  = "io.lettuce"           % "lettuce-core"              % "5.1.6.RELEASE"
-  val `reactor-core`             = "io.projectreactor"    % "reactor-core"              % "3.2.6.RELEASE"
+  val `reactor-core`             = "io.projectreactor"    % "reactor-core"              % "3.2.8.RELEASE"
   val `reactive-streams`         = "org.reactivestreams"  % "reactive-streams"          % "1.0.2"
   val `akka-stream-kafka`        = "com.typesafe.akka"    %% "akka-stream-kafka"        % "0.22"
   val `scalatest-embedded-kafka` = "net.manub"            %% "scalatest-embedded-kafka" % "1.1.0"

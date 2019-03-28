@@ -12,7 +12,7 @@ addSbtPlugin("org.scoverage"                     % "sbt-scoverage"              
 addSbtPlugin("com.typesafe.sbt"                  % "sbt-native-packager"        % "1.3.15")
 addSbtPlugin("com.typesafe.sbt"                  % "sbt-multi-jvm"              % "0.4.0")
 addSbtPlugin("com.eed3si9n"                      % "sbt-buildinfo"              % "0.9.0")
-addSbtPlugin("pl.project13.scala"                % "sbt-jmh"                    % "0.3.4")
+addSbtPlugin("pl.project13.scala"                % "sbt-jmh"                    % "0.3.5")
 addSbtPlugin("com.orrsella"                      % "sbt-stats"                  % "1.0.7")
 addSbtPlugin("io.github.jonas"                   % "sbt-paradox-material-theme" % "0.6.0")
 addSbtPlugin("de.johoop"                         % "sbt-testng-plugin"          % "3.1.1")
