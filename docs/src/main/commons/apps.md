@@ -66,14 +66,14 @@ postgres shell again and set the password. Once set successfully, revert `trust`
 
 With this, the component code is now ready to connect to provided services via `csw-services.sh`.   
 
-## Starting ELK logging aggregator for Development
+## Starting Elastic logging aggregator for Development
 
-ELK stack ([Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html),
+Elastic stack ([Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html),
            [Logstash](https://www.elastic.co/guide/en/logstash/current/index.html),
-           [Kibana](https://www.elastic.co/guide/en/kibana/current/index.html)) and 
-           [Filebeat](https://www.elastic.co/guide/en/beats/filebeat/current/index.html) is used to aggregate logs generated from TMT applications (Scala/Java/Python/C++/C) and
+           [Kibana](https://www.elastic.co/guide/en/kibana/current/index.html) and 
+           [Filebeat](https://www.elastic.co/guide/en/beats/filebeat/current/index.html)) is used to aggregate logs generated from TMT applications (Scala/Java/Python/C++/C) and
 csw services (mentioned in the previous section). For development purposes [Docker compose](https://docs.docker.com/compose/) is used. Hence, make sure that latest
-Docker setup is installed and running before starting the ELK stack. To know more about how ELK stack works please refer @ref[Logging Aggregator](logging_aggregator.md).
+Docker setup is installed and running before starting the Elastic stack. To know more about how Elastic stack works please refer @ref[Logging Aggregator](logging_aggregator.md).
 
 For host setup follow the below given steps:
 

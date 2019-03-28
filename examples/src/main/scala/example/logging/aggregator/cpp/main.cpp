@@ -53,4 +53,9 @@ int main()
     spdlog::drop_all();
 }
 
-//clang++ -std=c++17 main.cpp -o main
+/*
+    Run the following commands on terminal to execute `main.cpp`
+
+    $   clang++ -std=c++17 main.cpp -o main
+    $   ./main
+*/

@@ -6,7 +6,7 @@ int main(int argc, char **argv)
 
     int rc;
     zlog_category_t* cat;
-    rc = zlog_init("logging_default.conf"); // dzlog_init("test_default.conf", "my_cat");
+    rc = zlog_init("logging_default.conf");
 
     if (rc)
     {
@@ -22,3 +22,11 @@ int main(int argc, char **argv)
     zlog_fini();
     return 0;
 }
+
+/*
+    Run the following commands on terminal to execute `main.c`
+
+   $ cc -c -o main.o main.c -I/usr/local/include
+   $ cc -o main main.o -L/usr/local/lib -lzlog
+   $ ./main
+*/
