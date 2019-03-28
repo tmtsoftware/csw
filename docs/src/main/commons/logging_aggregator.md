@@ -34,9 +34,9 @@ for production is provided referring to DNS host name.
 It is strongly recommended to run the same version (v6.6.0 or higher) of elastic components so as to avoid any compatibility issues.
 
 By default, the elastic stack exposes the following ports and the configurations also rely on the same.
-   * 5044: Logstash TCP input.
-   * 9200: Elasticsearch HTTP port
-   * 5601: Kibana
+ * 5044: Logstash TCP input.
+ * 9200: Elasticsearch HTTP port
+ * 5601: Kibana
 
 @@@
 
@@ -301,7 +301,7 @@ Once Kibana is up and running hit `http://localhost:5601/` in browser and go to:
 
 For Modules like System, Postgres, Redis and Elasticsearch go to `Dashboard` and explore.
 
-## Running ELK for developer
+## Running Elastic stack for developer
 
 For development purposes [Docker compose](https://docs.docker.com/compose/) is used to start Elasticsearch, Logstash, Kibana and Filebeat in a container.
 Hence, make sure that latest Docker setup is installed and running before starting the ELK stack. Docker container is responsible to aggregate logs
