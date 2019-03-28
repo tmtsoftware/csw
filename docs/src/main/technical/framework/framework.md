@@ -63,8 +63,9 @@ returned from the supplied ComponentBehaviorFactory to handle incoming messages 
 
 The framework manages a component's 
 @ref:[lifecycle](../../framework/handling-lifecycle.md) 
-so that it only receives commands once it has signaled that it has completed the
-initialization process.
+so that it only receives 
+@ref:[commands](../../messages/commands.md) 
+once it has signaled that it has completed the initialization process.
 This includes 
 @ref:[tracking any connections](../../framework/tracking-connections.md) 
 listed in the component info file.
@@ -74,3 +75,18 @@ sending
 @ref[command messages](../../commons/messages.md) 
 to it.
 
+## Command Service Clients
+
+Although components are actually actors, it is convenient to be able to treat them as objects and call methods on them. The
+@github[CommandService](/csw-command/csw-command-api/src/main/scala/csw/command/api/scaladsl/CommandService.scala) 
+trait, and its implementation: 
+@github[CommandServiceImpl](/csw-command/csw-command-client/src/main/scala/csw/command/client/internal/CommandServiceImpl.scala)
+provide a wrapper that uses Akka `ask` to send a message to a component and return a `Future` with it's response.
+The 
+@github[CommandServiceFactory](/csw-command/csw-command-client/src/main/scala/csw/command/client/CommandServiceFactory.scala) class can be used to make a `CommandService` instance from a `location` received from the 
+@ref:[Location Service](../location/location.md).
+
+## Command Response Handling
+
+A @ref:[Command Response Manager](../../framework/managing-command-state.md) class
+is used to manage the responses to a commands sent to a component.
