@@ -1,11 +1,11 @@
-FROM openjdk:8u141
+FROM adoptopenjdk/openjdk11
 
 # Env variables
-ENV SCALA_VERSION 2.12.4
-ENV SBT_VERSION 1.1.1
+ENV SCALA_VERSION 2.12.8
+ENV SBT_VERSION 1.2.8
 
 # Scala expects this file
-RUN touch /usr/lib/jvm/java-8-openjdk-amd64/release
+#RUN touch /usr/lib/jvm/java-11-openjdk-amd64/release
 
 # Install Scala
 ## Piping curl directly in tar
@@ -25,3 +25,5 @@ RUN \
 
 # Define working directory
 WORKDIR /root
+
+RUN echo "hello"
