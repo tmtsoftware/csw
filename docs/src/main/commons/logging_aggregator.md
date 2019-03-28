@@ -170,10 +170,10 @@ In order to achieve this follow the below given steps:
 * Run LogStash using [logstash.conf](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/logstash/logstash.conf).
   Place `logstash.conf` in <<Logstash installation folder>>/config/ and execute `./bin/logstash -f config/logstash.conf` (on mac) or
   `bin/logstash -f config/logstash.conf` (on Linux).
-* Execute [filebeat-init.sh](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/filebeat/modules/system/filebeat-init.sh)
+* Place [filebeat.yml](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/filebeat/modules/system/filebeat.yml)
+  in <<Filebeat installation folder>> and execute [filebeat-init.sh](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/filebeat/modules/system/filebeat-init.sh)
   from <<Filebeat installation folder>>. This will make Elasticsearch aware of System module.
-* Run Filebeat using [filebeat.yml](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/filebeat/modules/system/filebeat.yml).
-  Place `filebeat.yml` in <<Filebeat installation folder>> and execute `./filebeat -e` (on Mac) or `filebeat -e` (on Linux).
+* Run Filebeat from <<Filebeat installation folder>> by executing `./filebeat -e` (on Mac) or `filebeat -e` (on Linux).
   This will enable system module for watching system logs from its default path i.e. /var/log/system.log as well as watching log files under TMT_LOG_HOME.
 * Run Kibana using [kibana.yml](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/kibana/kibana.yml). 
   Place `kibana.yml` in <<Kibana installation folder>>/config/ and execute `./bin/kibana` (on mac) or `bin/kibana` (on Linux). This will give GUI over
@@ -203,11 +203,10 @@ follow the below given steps:
 * Run LogStash using [logstash.conf](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/logstash/logstash.conf).
   Place `logstash.conf` in <<Logstash installation folder>>/config/ and execute `./bin/logstash -f config/logstash.conf` (on mac) or
   `bin/logstash -f config/logstash.conf` (on Linux).
-* Execute [filebeat-init.sh](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/filebeat/modules/redis/filebeat-init.sh)
+* Place [filebeat.yml](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/filebeat/modules/redis/filebeat.yml)
+  in <<Filebeat installation folder>> and execute [filebeat-init.sh](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/filebeat/modules/redis/filebeat-init.sh)
   from <<Filebeat installation folder>>. This will make Elasticsearch aware of Redis and System module.
-* Run Filebeat using [filebeat.yml](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/filebeat/modules/redis/filebeat.yml).
-  Place `filebeat.yml` in <<Filebeat installation folder>> and execute `./filebeat -e` (on Mac) or `filebeat -e` (on Linux).
-  This will enable redis and system module.
+* Run Filebeat from <<Filebeat installation folder>> by executing `./filebeat -e` (on Mac) or `filebeat -e` (on Linux).
 * Run Kibana using [kibana.yml](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/kibana/kibana.yml). 
   Place `kibana.yml` in <<Kibana installation folder>>/config/ and execute `./bin/kibana` (on mac) or `bin/kibana` (on Linux). This will give GUI over
   logs aggregated in Elasticsearch.
@@ -227,11 +226,10 @@ follow the below given steps:
 * Run LogStash using [logstash.conf](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/logstash/logstash.conf).
   Place `logstash.conf` in <<Logstash installation folder>>/config/ and execute `./bin/logstash -f config/logstash.conf` (on mac) or
   `bin/logstash -f config/logstash.conf` (on Linux).
-* Execute [filebeat-init.sh](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/filebeat/modules/postgresql/filebeat-init.sh)
+* Place [filebeat.yml](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/filebeat/modules/postgresql/filebeat.yml)
+  in <<Filebeat installation folder>> and execute [filebeat-init.sh](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/filebeat/modules/postgresql/filebeat-init.sh)
   from <<Filebeat installation folder>>. This will make Elasticsearch aware of Postgres and System module.
-* Run Filebeat using [filebeat.yml](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/filebeat/modules/postgresql/filebeat.yml).
-  Place `filebeat.yml` in <<Filebeat installation folder>> and execute `./filebeat -e` (on Mac) or `filebeat -e` (on Linux).
-  This will enable postgres and system module.
+* Run Filebeat from <<Filebeat installation folder>> by executing `./filebeat -e` (on Mac) or `filebeat -e` (on Linux).
 * Run Kibana using [kibana.yml](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/kibana/kibana.yml). 
   Place `kibana.yml` in <<Kibana installation folder>>/config/ and execute `./bin/kibana` (on mac) or `bin/kibana` (on Linux). This will give GUI over
   logs aggregated in Elasticsearch.
@@ -250,10 +248,10 @@ module follow the below given steps:
 * Run LogStash using [logstash.conf](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/logstash/logstash.conf).
   Place `logstash.conf` in <<Logstash installation folder>>/config/ and execute `./bin/logstash -f config/logstash.conf` (on mac) or
   `bin/logstash -f config/logstash.conf` (on Linux).
-* Execute [filebeat-init.sh](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/filebeat/modules/elasticsearch/filebeat-init.sh)
+* Place [filebeat.yml](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/filebeat/modules/elasticsearch/filebeat.yml)
+  in <<Filebeat installation folder>> and execute [filebeat-init.sh](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/filebeat/modules/elasticsearch/filebeat-init.sh)
   from <<Filebeat installation folder>>. This will make Elasticsearch aware of it's own module and System module.
-* Run Filebeat using [filebeat.yml](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/filebeat/modules/elasticsearch/filebeat.yml).
-  Place `filebeat.yml` in <<Filebeat installation folder>> and execute `./filebeat -e` (on Mac) or `filebeat -e` (on Linux).
+* Run Filebeat from <<Filebeat installation folder>> by executing `./filebeat -e` (on Mac) or `filebeat -e` (on Linux).
   This will enable elasticsearch and system module.
 * Run Kibana using [kibana.yml](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/kibana/kibana.yml). 
   Place `kibana.yml` in <<Kibana installation folder>>/config/ and execute `./bin/kibana` (on mac) or `bin/kibana` (on Linux). This will give GUI over
@@ -274,13 +272,12 @@ machines follow the below given steps:
 
 * Run Elasticsearch using [elasticsearch.yml](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/elasticsearch/elasticsearch.yml).
   Place `elasticsearch.yml` in <<Elasticsearch installation folder>>/config/ and execute `./bin/elasticsearch` (on Mac) or `bin/elasticsearch` (on Linux).
-* Go to <<Filebeat installation folder>> and execute [Logstash/filebeat-init.sh](https://github.com/tmtsoftware/csw/tree/master/scripts/logging_aggregator/prod/logstash/filebeat-init.sh) or
-  [Kibana/filebeat-init.sh](https://github.com/tmtsoftware/csw/tree/master/scripts/logging_aggregator/prod/kibana/filebeat-init.sh) from Logstash or Kibana
-  machines respectively. This will make Elasticsearch aware of System module.
-* Run Filebeat using [Logstash/filebeat.yml](https://github.com/tmtsoftware/csw/tree/master/scripts/logging_aggregator/prod/logstash/filebeat.yml) or
-  [Kibana/filebeat.yml](https://github.com/tmtsoftware/csw/tree/master/scripts/logging_aggregator/prod/kibana/filebeat.yml) from Logstash or Kibana
-  machines respectively. Place `filebeat.yml` in <<Filebeat installation folder>> and execute `./filebeat -e` (on Mac) or `filebeat -e` (on Linux).
-  This will enable system module.
+* Go to <<Filebeat installation folder>> place [Logstash/filebeat.yml](https://github.com/tmtsoftware/csw/tree/master/scripts/logging_aggregator/prod/logstash/filebeat.yml) 
+  and execute [Logstash/filebeat-init.sh](https://github.com/tmtsoftware/csw/tree/master/scripts/logging_aggregator/prod/logstash/filebeat-init.sh) or
+  place [Kibana/filebeat.yml](https://github.com/tmtsoftware/csw/tree/master/scripts/logging_aggregator/prod/kibana/filebeat.yml)
+  and execute [Kibana/filebeat-init.sh](https://github.com/tmtsoftware/csw/tree/master/scripts/logging_aggregator/prod/kibana/filebeat-init.sh) 
+  from Logstash or Kibana machines respectively. This will make Elasticsearch aware of System module.
+* Run Filebeat from <<Filebeat installation folder>> by executing `./filebeat -e` (on Mac) or `filebeat -e` (on Linux).
 * Run LogStash using [logstash.conf](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/logstash/logstash.conf).
   Place `logstash.conf` in <<Logstash installation folder>>/config/ and execute `./bin/logstash -f config/logstash.conf` (on mac) or
   `bin/logstash -f config/logstash.conf` (on Linux).
