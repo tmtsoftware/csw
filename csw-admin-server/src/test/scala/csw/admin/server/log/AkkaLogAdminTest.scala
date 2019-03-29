@@ -17,7 +17,6 @@ import csw.command.client.messages.ContainerCommonMessage.GetComponents
 import csw.command.client.messages.ContainerMessage
 import csw.command.client.models.framework.{Component, Components, ContainerLifecycleState}
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
-import csw.commons.tags.LoggingSystemSensitive
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.api.models.ComponentId
 import csw.location.api.models.ComponentType.{Assembly, HCD}
@@ -39,7 +38,6 @@ import scala.collection.JavaConverters.mapAsScalaMapConverter
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
-@LoggingSystemSensitive
 class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
 
   private val adminWiring: AdminWiring = AdminWiring.make(Some(7879))

@@ -13,7 +13,6 @@ import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentHandlers
 import csw.common.components.framework.SampleComponentState._
 import csw.common.utils.TestAppender
-import csw.commons.tags.LoggingSystemSensitive
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
@@ -33,7 +32,6 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-167: Creation and Deployment of Standalone Components
 // DEOPSCSW-177: Hooks for lifecycle management
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
-@LoggingSystemSensitive
 class StandaloneComponentTest extends FrameworkIntegrationSuite {
   import testWiring._
   // all log messages will be captured in log buffer

@@ -11,6 +11,7 @@ import akka.stream.javadsl.Keep;
 import akka.stream.testkit.TestSubscriber;
 import akka.stream.testkit.javadsl.TestSink;
 import akka.testkit.TestProbe;
+import com.typesafe.config.ConfigFactory;
 import csw.location.api.commons.Constants;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.IRegistrationResult;
@@ -42,11 +43,11 @@ import static csw.location.api.models.Connection.*;
 @SuppressWarnings("ConstantConditions")
 public class JLocationServiceImplTest extends JUnitSuite {
 
-    private static ServerWiring wiring = new ServerWiring();
+    private static ServerWiring wiring;
 
-    private static ActorSystem actorSystem =  ActorSystemFactory.remote();
-    private static Materializer mat = ActorMaterializer.create(actorSystem);
-    private static ILocationService locationService = JHttpLocationServiceFactory.makeLocalClient(actorSystem, mat);
+    private static ActorSystem actorSystem;
+    private static Materializer mat;
+    private static ILocationService locationService;
 
     private ComponentId akkaHcdComponentId = new ComponentId("hcd1", JComponentType.HCD);
     private AkkaConnection akkaHcdConnection = new AkkaConnection(akkaHcdComponentId);
@@ -54,8 +55,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
     private ComponentId tcpServiceComponentId = new ComponentId("exampleTcpService", JComponentType.Service);
     private TcpConnection tcpServiceConnection = new TcpConnection(tcpServiceComponentId);
 
-    private TestProbe actorTestProbe = new TestProbe(actorSystem, "test-actor");
-    private ActorRef<Object> actorRef = Adapter.toTyped(actorTestProbe.ref());
+    private static ActorRef<Object> actorRef;
 
     private ComponentId httpServiceComponentId = new ComponentId("exampleHTTPService", JComponentType.Service);
     private HttpConnection httpServiceConnection = new HttpConnection(httpServiceComponentId);
@@ -65,6 +65,12 @@ public class JLocationServiceImplTest extends JUnitSuite {
 
     @BeforeClass
     public static void setup() throws Exception {
+        wiring = new ServerWiring();
+        actorSystem = ActorSystemFactory.remote();
+        mat = ActorMaterializer.create(actorSystem);
+        TestProbe actorTestProbe = new TestProbe(actorSystem, "test-actor");
+        actorRef = Adapter.toTyped(actorTestProbe.ref());
+        locationService = JHttpLocationServiceFactory.makeLocalClient(actorSystem, mat);
         Await.result(wiring.locationHttpService().start(), FiniteDuration.create(5, TimeUnit.SECONDS));
     }
 
@@ -173,9 +179,9 @@ public class JLocationServiceImplTest extends JUnitSuite {
         locationService.register(tcpServiceRegistration).get();
 
         Set<Location> locations = Set.of(
-            httpRegistration.location(Networks.apply().hostname()),
-            akkaHcdRegistration.location(Networks.apply().hostname()),
-            tcpServiceRegistration.location(Networks.apply().hostname())
+                httpRegistration.location(Networks.apply().hostname()),
+                akkaHcdRegistration.location(Networks.apply().hostname()),
+                tcpServiceRegistration.location(Networks.apply().hostname())
         );
 
         Set<Location> actualSetOfLocations = Set.copyOf(locationService.list().get());
@@ -227,8 +233,8 @@ public class JLocationServiceImplTest extends JUnitSuite {
 
         //  Filter by Service type
         Set<Location> serviceLocations = Set.of(
-            tcpServiceRegistration.location(Networks.apply().hostname()),
-            httpServiceRegistration.location(Networks.apply().hostname())
+                tcpServiceRegistration.location(Networks.apply().hostname()),
+                httpServiceRegistration.location(Networks.apply().hostname())
         );
         Set<Location> actualSetOfLocations = Set.copyOf(locationService.list(JComponentType.Service).get());
         Assert.assertEquals(serviceLocations, actualSetOfLocations);
@@ -245,8 +251,8 @@ public class JLocationServiceImplTest extends JUnitSuite {
         locationService.register(akkaRegistration).get();
 
         Set<Location> locations = Set.of(
-            tcpRegistration.location(Networks.apply().hostname()),
-            akkaRegistration.location(Networks.apply().hostname())
+                tcpRegistration.location(Networks.apply().hostname()),
+                akkaRegistration.location(Networks.apply().hostname())
         );
 
         Set<Location> actualSetOfLocations = Set.copyOf(locationService.list(Networks.apply().hostname()).get());
@@ -287,7 +293,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
         AkkaConnection akkaHcdConnection2 = new AkkaConnection(new ComponentId("assembly2", JComponentType.HCD));
         AkkaConnection akkaHcdConnection3 = new AkkaConnection(new ComponentId("hcd3", JComponentType.HCD));
 
-       // Register Akka connection
+        // Register Akka connection
         AkkaRegistration akkaRegistration1 = new RegistrationFactory().akkaTyped(akkaHcdConnection1, new Prefix("nfiraos.ncc.tromboneHcd1"), actorRef);
         AkkaRegistration akkaRegistration2 = new RegistrationFactory().akkaTyped(akkaHcdConnection2, new Prefix("nfiraos.ncc.tromboneAssembly2"), actorRef);
         AkkaRegistration akkaRegistration3 = new RegistrationFactory().akkaTyped(akkaHcdConnection3, new Prefix("nfiraos.ncc.tromboneHcd3"), actorRef);
@@ -297,9 +303,9 @@ public class JLocationServiceImplTest extends JUnitSuite {
 
         // filter akka locations by prefix
         List<AkkaLocation> akkaLocations = List.of(
-            (AkkaLocation) akkaRegistration1.location(Networks.apply().hostname()),
-            (AkkaLocation) akkaRegistration2.location(Networks.apply().hostname()),
-            (AkkaLocation) akkaRegistration3.location(Networks.apply().hostname())
+                (AkkaLocation) akkaRegistration1.location(Networks.apply().hostname()),
+                (AkkaLocation) akkaRegistration2.location(Networks.apply().hostname()),
+                (AkkaLocation) akkaRegistration3.location(Networks.apply().hostname())
         );
         Assert.assertEquals(akkaLocations, locationService.listByPrefix("nfiraos.ncc.trombone").get());
     }
@@ -369,7 +375,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
         ComponentId componentId = new ComponentId("hcd1", JComponentType.HCD);
         AkkaConnection connection = new AkkaConnection(componentId);
 
-        ActorRef<Object> actorRef = Adapter.toTyped(actorSystem.actorOf(Props.create(AbstractActor.class, TestActor::new),"my-actor-to-die"));
+        ActorRef<Object> actorRef = Adapter.toTyped(actorSystem.actorOf(Props.create(AbstractActor.class, TestActor::new), "my-actor-to-die"));
 
         Assert.assertEquals(connection, locationService.register(new RegistrationFactory().akkaTyped(connection, prefix, actorRef)).get().location().connection());
 

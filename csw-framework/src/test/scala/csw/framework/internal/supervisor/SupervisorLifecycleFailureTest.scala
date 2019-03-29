@@ -16,7 +16,6 @@ import csw.command.client.models.framework.{LifecycleStateChanged, PubSub, Super
 import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentState._
 import csw.common.utils.TestAppender
-import csw.commons.tags.LoggingSystemSensitive
 import csw.framework.ComponentInfos._
 import csw.framework.exceptions.{FailureRestart, FailureStop}
 import csw.framework.internal.component.ComponentBehavior
@@ -40,7 +39,6 @@ import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContext, Future}
 
 // DEOPSCSW-178: Lifecycle success/failure notification
-@LoggingSystemSensitive
 class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
   val supervisorLifecycleStateProbe: TestProbe[SupervisorLifecycleState] = TestProbe[SupervisorLifecycleState]

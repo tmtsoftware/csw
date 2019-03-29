@@ -60,7 +60,7 @@ private[csw] object Networks {
    * so that we do not need to set INTERFACE_NAME env variable in every test or globally on machine before running tests.
    */
   private def fallbackInterfaceName =
-    if (ConfigFactory.load().getBoolean("csw-networks.hostname.automatic")) ""
+    if (automatic) ""
     else {
       val networkInterfaceNotProvided = NetworkInterfaceNotProvided("INTERFACE_NAME env variable is not set.")
       log.error(networkInterfaceNotProvided.message, ex = networkInterfaceNotProvided)
@@ -83,4 +83,7 @@ private[csw] object Networks {
     }
     new Networks(ifaceName, new NetworkInterfaceProvider)
   }
+
+  private def automatic: Boolean = ConfigFactory.load().getBoolean("csw-networks.hostname.automatic")
+
 }
