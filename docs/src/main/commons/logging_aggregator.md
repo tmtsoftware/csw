@@ -34,6 +34,7 @@ for production is provided referring to DNS host name.
 It is strongly recommended to run the same version (v6.6.0 or higher) of elastic components so as to avoid any compatibility issues.
 
 By default, the elastic stack exposes the following ports and the configurations also rely on the same.
+ 
  * 5044: Logstash TCP input.
  * 9200: Elasticsearch HTTP port
  * 5601: Kibana
@@ -304,8 +305,8 @@ For Modules like System, Postgres, Redis and Elasticsearch go to `Dashboard` and
 ## Running Elastic stack for developer
 
 For development purposes [Docker compose](https://docs.docker.com/compose/) is used to start Elasticsearch, Logstash, Kibana and Filebeat in a container.
-Hence, make sure that latest Docker setup is installed and running before starting the ELK stack. Docker container is responsible to aggregate logs
+Hence, make sure that latest Docker setup is installed and running before starting the Elastic stack. Docker container is responsible to aggregate logs
 generated in `tmp/csw/logs`. Hence, developers writing Scala/Java/Python/C++/C applications need to generate log files under `/tmp/csw/logs`. 
 
-Also, note that csw apps started via `csw-services.sh` will generate log files under `/tmp/csw/logs` and thus, it will be aggregated by the ELK docker container.
-To know more about setting up docker and starting ELK please refer @ref:[Starting ELK logging aggregator for Development](apps.md#starting-elk-logging-aggregator-for-development). 
+Also, note that csw apps started via `csw-services.sh` will generate log files under `/tmp/csw/logs` and thus, it will be aggregated by the Elastic docker container.
+To know more about setting up docker and starting Elastic please refer @ref:[Starting Elastic logging aggregator for Development](apps.md#starting-elk-logging-aggregator-for-development). 
