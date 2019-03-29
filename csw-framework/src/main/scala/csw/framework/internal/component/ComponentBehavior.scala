@@ -49,9 +49,8 @@ private[framework] object ComponentBehavior {
 
       ctx.self ! Initialize
 
-      /**
-       * Defines processing for a [[akka.actor.typed.Signal]] received by the actor instance
-       *
+      /*
+       * Defines processing for a akka.actor.typed.Signal received by the actor instance
        * @return the existing behavior
        */
       def onSignal: PartialFunction[(ActorContext[TopLevelActorMessage], Signal), Behavior[TopLevelActorMessage]] = {
@@ -66,9 +65,8 @@ private[framework] object ComponentBehavior {
           Behaviors.same
       }
 
-      /**
-       * Defines action for messages which can be received in any [[ComponentLifecycleState]] state
-       *
+      /*
+       * Defines action for messages which can be received in any ComponentLifecycleState state
        * @param commonMessage message representing a message received in any lifecycle state
        */
       def onCommon(commonMessage: TopLevelActorCommonMessage): Unit = commonMessage match {
@@ -79,9 +77,8 @@ private[framework] object ComponentBehavior {
           lifecycleHandlers.onLocationTrackingEvent(trackingEvent)
       }
 
-      /**
+      /*
        * Defines action for messages which can be received in [[ComponentLifecycleState.Idle]] state
-       *
        * @param idleMessage message representing a message received in [[ComponentLifecycleState.Idle]] state
        */
       def onIdle(idleMessage: TopLevelActorIdleMessage): Unit = idleMessage match {
@@ -107,7 +104,7 @@ private[framework] object ComponentBehavior {
           }.failed.foreach(throwable ⇒ ctx.self ! UnderlyingHookFailed(throwable))
       }
 
-      /**
+      /*
        * Defines action for messages which can be received in [[ComponentLifecycleState.Running]] state
        *
        * @param runningMessage message representing a message received in [[ComponentLifecycleState.Running]] state
@@ -118,7 +115,7 @@ private[framework] object ComponentBehavior {
         case msg                ⇒ log.error(s"Component TLA cannot handle message :[$msg]")
       }
 
-      /**
+      /*
        * Defines action for messages which alter the [[ComponentLifecycleState]] state
        *
        * @param toComponentLifecycleMessage message representing a lifecycle message sent by the supervisor to the component
@@ -143,7 +140,7 @@ private[framework] object ComponentBehavior {
             }
         }
 
-      /**
+      /*
        * Defines action for messages which represent a [[csw.params.commands.Command]]
        *
        * @param commandMessage message encapsulating a [[csw.params.commands.Command]]
@@ -193,7 +190,7 @@ private[framework] object ComponentBehavior {
         }
       }
 
-      /**
+      /*
        * Defines processing for a [[TopLevelActorMessage]] received by the actor instance.
        *
        * @param msg componentMessage received from supervisor

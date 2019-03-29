@@ -26,6 +26,7 @@ Assuming that developer has downloaded `csw-apps-<some-version>.zip` from [csw r
 and unzipped it.
 
 There are four folders, as follows, in `csw-apps-<some-version>`
+
 * bin
 * lib
 * logging_aggregator
