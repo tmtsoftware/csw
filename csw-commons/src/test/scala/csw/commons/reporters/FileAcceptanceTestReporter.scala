@@ -13,8 +13,9 @@ class FileAcceptanceTestReporter extends Reporter {
 
   private val filePath = s"target/acceptance/acceptance-test-report.txt"
   private val file     = new File(filePath)
+  if(file.exists()) file.delete()
   file.getParentFile.mkdirs
-  private val writer = new FileWriter(file, false)
+  private val writer = new FileWriter(file, true)
 
   override def apply(event: Event): Unit = event match {
     case _: RunStarting  => data.clear()
