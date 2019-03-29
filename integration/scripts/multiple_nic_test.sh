@@ -21,7 +21,10 @@ HOST_DIR_MAPPING="-v $(pwd):/source/csw"
 echo ${HOST_DIR_MAPPING}
 
 sbtImg=twtmt/scala-sbt
-docker build --tag=${sbtImg} .
+
+csw_root="$( cd "$(dirname "$0")" || exit ; pwd -P )"
+
+docker build --tag=${sbtImg} ${csw_root}
 
 printf "${YELLOW} Executing multiple nic's test... ${NC}\n"
 printf "${PURPLE} Creating docker subnet : tmt_net_1 ${NC}\n"
