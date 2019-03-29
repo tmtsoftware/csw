@@ -12,10 +12,18 @@ import scala.collection.JavaConverters._
 
 @main
 def entryPoint(version: String, projects: String*): Unit = {
-  val projectNames = if(projects.isEmpty) allProjects else projects.toList
-  projectNames.foreach { projectName =>
-    new TestModule(projectName, version).run()
-  }
+  val projectNames = if (projects.isEmpty) allProjects else projects.toList
+  val results = projectNames.map { projectName =>
+    projectName → new TestModule(projectName, version).run()
+  }.toMap
+
+  println("=" * 80)
+  val failedProjects = results.filterNot(_._2 == 0)
+  failedProjects.keySet.foreach(project ⇒ println(s"[error] Tests failed for project: [$project]"))
+  println("=" * 80)
+
+  if (failedProjects.nonEmpty) System.exit(1)
+  else System.exit(0)
 }
 
 lazy val allProjects = List(
