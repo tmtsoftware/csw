@@ -12,7 +12,6 @@ class ClusterSettingsTest extends FunSuite with Matchers with BeforeAndAfterAll 
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
   override protected def afterAll(): Unit = {
-    System.clearProperty("CLUSTER_PORT")
     System.clearProperty("CLUSTER_SEEDS")
     System.clearProperty("INTERFACE_NAME")
   }
@@ -75,11 +74,10 @@ class ClusterSettingsTest extends FunSuite with Matchers with BeforeAndAfterAll 
     val systemSeeds         = "10.10.10.12, 10.10.10.13"
     val systemInterfacename = "eth0"
 
-    System.setProperty("CLUSTER_PORT", systemPort.toString)
     System.setProperty("CLUSTER_SEEDS", systemSeeds.toString)
     System.setProperty("INTERFACE_NAME", systemInterfacename)
 
-    val clusterSettings = ClusterSettings()
+    val clusterSettings = ClusterSettings().onPort(systemPort)
 
     clusterSettings.port shouldBe systemPort
     clusterSettings.interfaceName shouldBe Some(systemInterfacename)

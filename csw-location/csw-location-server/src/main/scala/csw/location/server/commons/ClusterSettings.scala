@@ -46,7 +46,6 @@ import scala.collection.JavaConverters._
  *
  * @note although `ClusterSettings` can be added through multiple ways, it is recommended that
  *  -`CLUSTER_SEEDS` is provided via environment variable,
- *  - `CLUSTER_PORT` is provided via system properties,
  *  - `INTERFACE_NAME` is provide via environment variable and
  *  - the `ClusterSettings` api of providing values should be used for testing purpose only
  *
