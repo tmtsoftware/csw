@@ -27,6 +27,6 @@ class TestServer(locationService: LocationService)(implicit ec: ExecutionContext
 
     LoggingSystemFactory.start("test-server", "", "", system)
     implicit val materializer: ActorMaterializer = ActorMaterializer()
-    Http().bindAndHandle(routes, "localhost", testServerPort)
+    Http().bindAndHandle(routes, "0.0.0.0", testServerPort)
   }
 }

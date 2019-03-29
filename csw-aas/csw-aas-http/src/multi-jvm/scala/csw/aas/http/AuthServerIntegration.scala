@@ -2,6 +2,8 @@ package csw.aas.http
 
 import csw.aas.core.commons.AASConnection
 import csw.aas.core.deployment.AuthServiceLocation
+import csw.location.api.models.Connection.HttpConnection
+import csw.location.api.models.{ComponentId, ComponentType, HttpRegistration}
 import csw.location.helpers.LSNodeSpec
 import csw.location.server.http.MultiNodeHTTPLocationService
 import org.scalatest.BeforeAndAfterEach
@@ -34,9 +36,9 @@ class AuthIntegrationTest
   test("it should return 401 for unauthenticated request") {
 
     runOn(keycloak) {
-      val embeddedKeycloak = new EmbeddedKeycloak(KeycloakData.empty, settings = Settings(version = "4.8.3.Final"))
+      val embeddedKeycloak = new EmbeddedKeycloak(KeycloakData.empty)
       val stopHandle       = Await.result(embeddedKeycloak.startServer(), serverTimeout)
-      Await.result(new AuthServiceLocation(locationService).register(Settings.default.port), defaultTimeout)
+      new AuthServiceLocation(locationService).register(Settings.default.port).await
       enterBarrier("keycloak started")
       enterBarrier("test-server started")
       enterBarrier("test finished")
@@ -46,7 +48,11 @@ class AuthIntegrationTest
     runOn(exampleServer) {
       enterBarrier("keycloak started")
       locationService.resolve(AASConnection.value, defaultTimeout).await
-      val stopHandle = Await.result(new TestServer(locationService).start(testServerPort), defaultTimeout)
+
+      val stopHandle   = new TestServer(locationService).start(testServerPort).await
+      val registration = HttpRegistration(HttpConnection(ComponentId("TestServer", ComponentType.Service)), testServerPort, "")
+      locationService.register(registration).await
+
       enterBarrier("test-server started")
       enterBarrier("test finished")
       stopHandle.unbind()
@@ -55,8 +61,12 @@ class AuthIntegrationTest
     runOn(testClient) {
       enterBarrier("keycloak started")
       enterBarrier("test-server started")
+
+      val testServer =
+        locationService.resolve(HttpConnection(ComponentId("TestServer", ComponentType.Service)), defaultTimeout).await.get
+
       requests
-        .post(s"http://localhost:$testServerPort")
+        .post(testServer.uri.toString)
         .statusCode shouldBe 401
       enterBarrier("test finished")
     }
@@ -82,7 +92,7 @@ class AuthIntegrationTest
         )
       )
       val stopHandle = Await.result(embeddedKeycloak.startServer(), serverTimeout)
-      Await.result(new AuthServiceLocation(locationService).register(Settings.default.port), defaultTimeout)
+      new AuthServiceLocation(locationService).register(Settings.default.port).await
       enterBarrier("keycloak started")
       enterBarrier("test-server started")
       enterBarrier("test finished")
@@ -92,7 +102,11 @@ class AuthIntegrationTest
     runOn(exampleServer) {
       enterBarrier("keycloak started")
       locationService.resolve(AASConnection.value, defaultTimeout).await
-      val stopHandle = Await.result(new TestServer(locationService).start(testServerPort), defaultTimeout)
+
+      val stopHandle   = new TestServer(locationService).start(testServerPort).await
+      val registration = HttpRegistration(HttpConnection(ComponentId("TestServer", ComponentType.Service)), testServerPort, "")
+      locationService.register(registration).await
+
       enterBarrier("test-server started")
       enterBarrier("test finished")
       stopHandle.unbind()
@@ -108,11 +122,13 @@ class AuthIntegrationTest
         "secret",
         "example",
         "my-app",
-        host = Await.result(testConductor.getAddressFor(keycloak), defaultTimeout).host.get
+        host = testConductor.getAddressFor(keycloak).await.host.get
       )
 
+      val testServer =
+        locationService.resolve(HttpConnection(ComponentId("TestServer", ComponentType.Service)), defaultTimeout).await.get
       requests
-        .post(url = s"http://localhost:$testServerPort", auth = token)
+        .post(url = testServer.uri.toString, auth = token)
         .statusCode shouldBe 200
       enterBarrier("test finished")
     }
@@ -137,7 +153,7 @@ class AuthIntegrationTest
         )
       )
       val stopHandle = Await.result(embeddedKeycloak.startServer(), serverTimeout)
-      Await.result(new AuthServiceLocation(locationService).register(Settings.default.port), defaultTimeout)
+      new AuthServiceLocation(locationService).register(Settings.default.port).await
       enterBarrier("keycloak started")
       enterBarrier("test-server started")
       enterBarrier("test finished")
@@ -147,7 +163,11 @@ class AuthIntegrationTest
     runOn(exampleServer) {
       enterBarrier("keycloak started")
       locationService.resolve(AASConnection.value, defaultTimeout).await
-      val stopHandle = Await.result(new TestServer(locationService).start(testServerPort), defaultTimeout)
+
+      val stopHandle   = new TestServer(locationService).start(testServerPort).await
+      val registration = HttpRegistration(HttpConnection(ComponentId("TestServer", ComponentType.Service)), testServerPort, "")
+      locationService.register(registration).await
+
       enterBarrier("test-server started")
       enterBarrier("test finished")
       stopHandle.unbind()
@@ -163,11 +183,13 @@ class AuthIntegrationTest
         "secret",
         "example",
         "my-app",
-        host = Await.result(testConductor.getAddressFor(keycloak), defaultTimeout).host.get
+        host = testConductor.getAddressFor(keycloak).await.host.get
       )
 
+      val testServer =
+        locationService.resolve(HttpConnection(ComponentId("TestServer", ComponentType.Service)), defaultTimeout).await.get
       requests
-        .post(url = s"http://localhost:$testServerPort", auth = token)
+        .post(url = testServer.uri.toString, auth = token)
         .statusCode shouldBe 403
       enterBarrier("test finished")
     }
