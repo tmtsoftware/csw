@@ -101,7 +101,7 @@ Scala
 Java
 :   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/database/JAssemblyComponentHandlers.java) { #dbFactory-write-access }
 
-Here the username is picked from `DB_WRITE_USERNAME` and password is picked from `DB_WRITE_PASSWORD` environment variables. Hence, it is
+Here the username and password for write access is picked from environment variables. e.g. - `IRIS_DB_WRITE_USERNAME` & `IRIS_DB_WRITE_PASSWORD`. Hence, it is
 expected from developers to set environment variables prior to using this method with the user name and password to use for
 write access. 
  
