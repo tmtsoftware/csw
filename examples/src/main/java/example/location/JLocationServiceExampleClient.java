@@ -150,7 +150,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         Optional<AkkaLocation> findResult = locationService.find(exampleConnection).get();
         if (findResult.isPresent()) {
             //#log-info
-            log.info("Find result: " + connectionInfo(findResult.get().connection()));
+            log.info("Find result: " + connectionInfo(findResult.orElseThrow().connection()));
             //#log-info
         } else {
             log.info(() -> "Result of the find call : None");
@@ -181,7 +181,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         Optional<AkkaLocation> resolveResult = locationService.resolve(exampleConnection, waitForResolveLimit).get();
         if (resolveResult.isPresent()) {
             //#log-info-supplier
-            log.info(() -> "Resolve result: " + connectionInfo(resolveResult.get().connection()));
+            log.info(() -> "Resolve result: " + connectionInfo(resolveResult.orElseThrow().connection()));
             //#log-info-supplier
         } else {
             log.info(() -> "Timeout waiting for location " + exampleConnection + " to resolve.");
@@ -190,7 +190,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
 
         // example code showing how to get the actorRef for remote component and send it a message
         if (resolveResult.isPresent()) {
-            AkkaLocation loc = resolveResult.get();
+            AkkaLocation loc = resolveResult.orElseThrow();
             ActorRef actorRef = Adapter.toUntyped(loc.actorRef());
             actorRef.tell(LocationServiceExampleComponent.ClientMessage$.MODULE$, getSelf());
         }

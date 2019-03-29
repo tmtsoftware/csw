@@ -59,13 +59,13 @@ public class JConfigClientApiTest extends JUnitSuite {
 
         ConfigId configId1 = configService.update(path, ConfigData.fromString(configValue2), "second commit").get();
         configService.update(path, ConfigData.fromString(configValue3), "third commit").get();
-        Assert.assertEquals(configClientApi.getActive(path).get().get().toJStringF(mat).get(), configValue1);
+        Assert.assertEquals(configClientApi.getActive(path).get().orElseThrow().toJStringF(mat).get(), configValue1);
         Assert.assertTrue(configClientApi.exists(path, configId1).get());
 
         configService.setActiveVersion(path, configId1, "setting active version").get();
-        Assert.assertEquals(configClientApi.getActive(path).get().get().toJStringF(mat).get(), configValue2);
+        Assert.assertEquals(configClientApi.getActive(path).get().orElseThrow().toJStringF(mat).get(), configValue2);
 
         configService.resetActiveVersion(path, "resetting active version of file").get();
-        Assert.assertEquals(configClientApi.getActive(path).get().get().toJStringF(mat).get(), configValue3);
+        Assert.assertEquals(configClientApi.getActive(path).get().orElseThrow().toJStringF(mat).get(), configValue3);
     }
 }

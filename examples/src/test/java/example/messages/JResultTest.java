@@ -57,7 +57,7 @@ public class JResultTest extends JUnitSuite {
         Optional<Parameter<Integer>> p4 = r1.jGet(k1);
 
         //access values
-        List<Integer> v1 = r1.jGet(k1).get().jValues();
+        List<Integer> v1 = r1.jGet(k1).orElseThrow().jValues();
         List<Integer> v2 = r2.parameter(k2).jValues();
 
         //k4 is missing
@@ -68,7 +68,7 @@ public class JResultTest extends JUnitSuite {
         //#result
 
         Assert.assertTrue(k1Exists);
-        Assert.assertSame(p4.get(), p1);
+        Assert.assertSame(p4.orElseThrow(), p1);
         Assert.assertEquals(Set.copyOf(v1), Set.copyOf(p1.jValues()));
         Assert.assertEquals(Set.copyOf(v2), Set.copyOf(p2.jValues()));
         Assert.assertEquals(missingKeys, Set.of(k4.keyName()));

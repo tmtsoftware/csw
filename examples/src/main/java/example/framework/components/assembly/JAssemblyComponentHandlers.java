@@ -96,11 +96,11 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                     if (!hcdLocation.isPresent())
                         throw new HcdNotFoundException();
                     else {
-                        runningHcds.put(connection, Optional.of(CommandServiceFactory.jMake(hcdLocation.get(), ctx.getSystem())));
+                        runningHcds.put(connection, Optional.of(CommandServiceFactory.jMake(hcdLocation.orElseThrow(), ctx.getSystem())));
                         //#event-subscriber
                     }
-                    diagnosticPublisher = ctx.spawnAnonymous(JDiagnosticsPublisher.behavior(CommandServiceFactory.jMake(hcdLocation.get(), ctx.getSystem()), workerActor));
-                })).get();
+                    diagnosticPublisher = ctx.spawnAnonymous(JDiagnosticsPublisher.behavior(CommandServiceFactory.jMake(hcdLocation.orElseThrow(), ctx.getSystem()), workerActor));
+                })).orElseThrow();
 
     }
     //#jInitialize-handler
@@ -288,7 +288,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         // If an Hcd is found as a connection, resolve its location from location service and create other
         // required worker actors required by this assembly
         if (mayBeConnection.isPresent()) {
-            CompletableFuture<Optional<AkkaLocation>> resolve = locationService.resolve(mayBeConnection.get().<AkkaLocation>of(), Duration.ofSeconds(5));
+            CompletableFuture<Optional<AkkaLocation>> resolve = locationService.resolve(mayBeConnection.orElseThrow().<AkkaLocation>of(), Duration.ofSeconds(5));
             return resolve.thenCompose((Optional<AkkaLocation> resolvedHcd) -> {
                 if (resolvedHcd.isPresent())
                     return CompletableFuture.completedFuture(resolvedHcd);
@@ -323,14 +323,14 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
         TypedConnection<AkkaLocation> hcdConnection = componentInfo.getConnections().stream()
                 .filter(connection -> connection.componentId().componentType() == JComponentType.HCD)
-                .findFirst().get().<AkkaLocation>of();
+                .findFirst().orElseThrow().<AkkaLocation>of();
 
         // #resolve-hcd-and-create-commandservice
         CompletableFuture<Optional<AkkaLocation>> resolvedHcdLocation = locationService.resolve(hcdConnection, Duration.ofSeconds(5));
 
         CompletableFuture<ICommandService> eventualCommandService = resolvedHcdLocation.thenApply((Optional<AkkaLocation> hcdLocation) -> {
             if (hcdLocation.isPresent())
-                return CommandServiceFactory.jMake(hcdLocation.get(), ctx.getSystem());
+                return CommandServiceFactory.jMake(hcdLocation.orElseThrow(), ctx.getSystem());
             else
                 throw new HcdNotFoundException();
         });

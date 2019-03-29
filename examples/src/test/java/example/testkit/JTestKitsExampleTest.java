@@ -59,7 +59,7 @@ public class JTestKitsExampleTest extends JUnitSuite {
         Optional<AkkaLocation> akkaLocation = locationService.resolve(connection, Duration.ofSeconds(5)).get();
 
         Assert.assertTrue(akkaLocation.isPresent());
-        Assert.assertEquals(connection, akkaLocation.get().connection());
+        Assert.assertEquals(connection, akkaLocation.orElseThrow().connection());
     }
 
 }

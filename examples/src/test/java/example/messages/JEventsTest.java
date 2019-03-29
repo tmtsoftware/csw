@@ -84,7 +84,7 @@ public class JEventsTest extends JUnitSuite {
         Optional<Parameter<Integer>> p4 = se1.jGet(k1);
 
         //access values
-        List<Integer> v1 = se1.jGet(k1).get().jValues();
+        List<Integer> v1 = se1.jGet(k1).orElseThrow().jValues();
         List<Integer> v2 = se2.parameter(k2).jValues();
         //k4 is missing
         Set<String> missingKeys = se3.jMissingKeys(k1, k2, k3, k4);
@@ -94,7 +94,7 @@ public class JEventsTest extends JUnitSuite {
         //#systemevent
 
         Assert.assertTrue(k1Exists);
-        Assert.assertSame(p4.get(), p1);
+        Assert.assertSame(p4.orElseThrow(), p1);
         Assert.assertEquals(Set.of(22), Set.copyOf(v1));
         Assert.assertEquals(Set.of(44), Set.copyOf(v2));
         Assert.assertNotEquals(se3.eventId(), se4.eventId()); //Test unique id when parameters are removed
@@ -134,7 +134,7 @@ public class JEventsTest extends JUnitSuite {
         Optional<Parameter<Integer>> p4 = oc1.jGet(k1);
 
         //access values
-        List<Integer> v1 = oc1.jGet(k1).get().jValues();
+        List<Integer> v1 = oc1.jGet(k1).orElseThrow().jValues();
         List<Integer> v2 = oc2.parameter(k2).jValues();
         //k4 is missing
         Set<String> missingKeys = oc3.jMissingKeys(k1, k2, k3, k4);
@@ -144,7 +144,7 @@ public class JEventsTest extends JUnitSuite {
         //#observeevent
 
         Assert.assertTrue(k1Exists);
-        Assert.assertSame(p4.get(), p1);
+        Assert.assertSame(p4.orElseThrow(), p1);
         Assert.assertEquals(Set.of(4), Set.copyOf(v1));
         Assert.assertEquals(Set.of(2), Set.copyOf(v2));
         Assert.assertNotEquals(oc3.eventId(), oc4.eventId()); //Test unique id when parameters are removed

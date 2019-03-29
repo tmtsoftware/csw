@@ -260,7 +260,7 @@ public class JKeysAndParametersTest extends JUnitSuite {
 
         //remove a parameter and verify it doesn't exist
         Struct mutated1 = struct1.remove(ra); //using key
-        Struct mutated2 = struct1.remove(firstKey.get());
+        Struct mutated2 = struct1.remove(firstKey.orElseThrow());
 
         //find out missing keys
         Set<String> missingKeySet = mutated1.jMissingKeys(ra, dec, epoch, JKeyType.StringKey().make("someRandomKey"));
@@ -271,8 +271,8 @@ public class JKeysAndParametersTest extends JUnitSuite {
         Assert.assertTrue(bDefaultUnit);
         Assert.assertEquals(struct1, head);
         Assert.assertEquals(JUnits.lightyear, paramWithLightYear.units());
-        Assert.assertEquals(struct1.parameter(dec), secondKey.get());
-        Assert.assertEquals(struct1.parameter(epoch), thirdKey.get());
+        Assert.assertEquals(struct1.parameter(dec), secondKey.orElseThrow());
+        Assert.assertEquals(struct1.parameter(epoch), thirdKey.orElseThrow());
         Assert.assertEquals(expectedMissingKeys, missingKeySet);
         Assert.assertFalse(mutated1.exists(ra));
         Assert.assertFalse(mutated2.exists(ra));

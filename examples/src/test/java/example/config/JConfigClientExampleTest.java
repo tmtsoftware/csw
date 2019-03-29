@@ -87,7 +87,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
 
         adminApi.create(filePath, ConfigData.fromString(defaultStrConf), false, "First commit").get();
 
-        ConfigData activeFile = clientApi.getActive(filePath).get().get();
+        ConfigData activeFile = clientApi.getActive(filePath).get().orElseThrow();
         Assert.assertEquals(activeFile.toJConfigObject(mat).get().getString("foo.bar.baz"), "1234");
         //#getActive
     }
@@ -133,7 +133,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
         ConfigId id = adminApi.create(filePath, ConfigData.fromString(defaultStrConf), false, "First commit").get();
 
         //validate
-        ConfigData actualData = adminApi.getById(filePath, id).get().get();
+        ConfigData actualData = adminApi.getById(filePath, id).get().orElseThrow();
         Assert.assertEquals(defaultStrConf, actualData.toJStringF(mat).get());
         //#getById
     }
@@ -150,7 +150,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
         adminApi.update(filePath, ConfigData.fromString(newContent), "changed!!").get();
 
         //get the latest file
-        ConfigData newConfigData = adminApi.getLatest(filePath).get().get();
+        ConfigData newConfigData = adminApi.getLatest(filePath).get().orElseThrow();
         //validate
         Assert.assertEquals(newConfigData.toJStringF(mat).get(), newContent);
         //#getLatest
@@ -169,10 +169,10 @@ public class JConfigClientExampleTest extends JUnitSuite {
         String newContent = "I changed the contents!!!";
         adminApi.update(filePath, ConfigData.fromString(newContent), "changed!!").get();
 
-        ConfigData initialData = adminApi.getByTime(filePath, tInitial).get().get();
+        ConfigData initialData = adminApi.getByTime(filePath, tInitial).get().orElseThrow();
         Assert.assertEquals(defaultStrConf, initialData.toJStringF(mat).get());
 
-        ConfigData latestData = adminApi.getByTime(filePath, Instant.now()).get().get();
+        ConfigData latestData = adminApi.getByTime(filePath, Instant.now()).get().orElseThrow();
         Assert.assertEquals(newContent, latestData.toJStringF(mat).get());
         //#getByTime
     }
@@ -257,7 +257,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
         Assert.assertEquals(List.of(id1),
             adminApi.historyActive(filePath).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
         //ensure active version is set
-        Assert.assertEquals(id1, adminApi.getActiveVersion(filePath).get().get());
+        Assert.assertEquals(id1, adminApi.getActiveVersion(filePath).get().orElseThrow());
 
         //override the contents four times
         adminApi.update(filePath, ConfigData.fromString("changing contents"), "second").get();
@@ -266,20 +266,20 @@ public class JConfigClientExampleTest extends JUnitSuite {
         ConfigId id5 = adminApi.update(filePath, ConfigData.fromString("final final contents"), "fifth").get();
 
         //update doesn't change the active revision
-        Assert.assertEquals(id1, adminApi.getActiveVersion(filePath).get().get());
+        Assert.assertEquals(id1, adminApi.getActiveVersion(filePath).get().orElseThrow());
 
         //play with active version
         adminApi.setActiveVersion(filePath, id3, "id3 active").get();
         adminApi.setActiveVersion(filePath, id4, "id4 active").get();
-        Assert.assertEquals(id4, adminApi.getActiveVersion(filePath).get().get());
+        Assert.assertEquals(id4, adminApi.getActiveVersion(filePath).get().orElseThrow());
         Instant tEnd = Instant.now();
 
         //reset active version to latest
         adminApi.resetActiveVersion(filePath, "latest active").get();
-        Assert.assertEquals(id5, adminApi.getActiveVersion(filePath).get().get());
+        Assert.assertEquals(id5, adminApi.getActiveVersion(filePath).get().orElseThrow());
         //finally set initial version as active
         adminApi.setActiveVersion(filePath, id1, "id1 active").get();
-        Assert.assertEquals(id1, adminApi.getActiveVersion(filePath).get().get());
+        Assert.assertEquals(id1, adminApi.getActiveVersion(filePath).get().orElseThrow());
 
         //validate full history
         List<ConfigFileRevision> fullHistory = adminApi.historyActive(filePath).get();
@@ -298,7 +298,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
                 adminApi.historyActive(filePath, 3).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
 
         //get contents of active version at a specified instance
-        String initialContents = adminApi.getActiveByTime(filePath, tBegin).get().get().toJStringF(mat).get();
+        String initialContents = adminApi.getActiveByTime(filePath, tBegin).get().orElseThrow().toJStringF(mat).get();
         Assert.assertEquals(defaultStrConf, initialContents);
         //#active-file-mgmt
     }

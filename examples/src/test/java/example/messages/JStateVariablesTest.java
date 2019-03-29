@@ -63,7 +63,7 @@ public class JStateVariablesTest extends JUnitSuite {
         Optional<Parameter<Integer>> p1 = ds1.jGet(intKey);
 
         //access values
-        List<Character> v1 = ds1.jGet(charKey).get().jValues();
+        List<Character> v1 = ds1.jGet(charKey).orElseThrow().jValues();
         List<Boolean> v2 = ds2.parameter(booleanKey).jValues();
         Set<String> missingKeys = ds3.jMissingKeys(charKey,
                 intKey,
@@ -80,12 +80,12 @@ public class JStateVariablesTest extends JUnitSuite {
 
         //validations
         Assert.assertTrue(charKeyExists);
-        Assert.assertSame(p1.get(), intParam);
+        Assert.assertSame(p1.orElseThrow(), intParam);
         Assert.assertEquals(Set.of('A', 'B', 'C'), Set.copyOf(v1));
         Assert.assertEquals(Set.of(true, false), Set.copyOf(v2));
         Assert.assertEquals(4, missingKeys.size());
         Assert.assertFalse(ds4.exists(utcTimeKey));
-        Assert.assertTrue(ds5.jGet(utcTimeKey).get().head().value().isBefore(ds3.jGet(utcTimeKey).get().head().value()));
+        Assert.assertTrue(ds5.jGet(utcTimeKey).orElseThrow().head().value().isBefore(ds3.jGet(utcTimeKey).orElseThrow().head().value()));
     }
 
     @Test
@@ -125,7 +125,7 @@ public class JStateVariablesTest extends JUnitSuite {
         Optional<Parameter<Integer>> p1 = cs1.jGet(intKey);
 
         //access values
-        List<Character> v1 = cs1.jGet(charKey).get().jValues();
+        List<Character> v1 = cs1.jGet(charKey).orElseThrow().jValues();
         List<Boolean> v2 = cs2.parameter(booleanKey).jValues();
         Set<String> missingKeys = cs3.jMissingKeys(charKey,
                 intKey,
@@ -142,12 +142,12 @@ public class JStateVariablesTest extends JUnitSuite {
 
         //validations
         Assert.assertTrue(charKeyExists);
-        Assert.assertSame(p1.get(), intParam);
+        Assert.assertSame(p1.orElseThrow(), intParam);
         Assert.assertEquals(Set.of('A', 'B', 'C'), Set.copyOf(v1));
         Assert.assertEquals(Set.of(true, false), Set.copyOf(v2));
         Assert.assertEquals(4, missingKeys.size());
         Assert.assertFalse(cs4.exists(timestampKey));
-        Assert.assertTrue(cs5.jGet(timestampKey).get().head().value().isBefore(cs3.jGet(timestampKey).get().head().value()));
+        Assert.assertTrue(cs5.jGet(timestampKey).orElseThrow().head().value().isBefore(cs3.jGet(timestampKey).orElseThrow().head().value()));
     }
 
     @Test

@@ -11,6 +11,6 @@ object OptionConverters {
   }
 
   implicit class RichOptional[T](val underlying: Optional[T]) extends AnyVal {
-    def asScala: Option[T] = if (underlying.isPresent) Some(underlying.get) else None
+    def asScala: Option[T] = if (underlying.isPresent) Some(underlying.orElseThrow()) else None
   }
 }

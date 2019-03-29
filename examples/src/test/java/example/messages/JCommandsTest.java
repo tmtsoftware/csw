@@ -132,7 +132,7 @@ public class JCommandsTest extends JUnitSuite {
 
         //access parameters
         Optional<Parameter<Boolean>> k1Param = oc1.jGet(k1); //present
-        java.util.List<Boolean> values = k1Param.get().jValues();
+        java.util.List<Boolean> values = k1Param.orElseThrow().jValues();
 
         //access parameters
         Optional<Parameter<ArrayData<Float>>> k2BadParam = oc1.jGet(k2bad.keyName(), JKeyType.FloatArrayKey());
@@ -157,7 +157,7 @@ public class JCommandsTest extends JUnitSuite {
         Assert.assertFalse(k2BadParam.isPresent());
         Assert.assertEquals(4, paramSize);
         Assert.assertArrayEquals(boolArray, values.toArray());
-        Assert.assertArrayEquals(intArray, (Integer[]) oc3.jGet(k2).get().values());
+        Assert.assertArrayEquals(intArray, (Integer[]) oc3.jGet(k2).orElseThrow().values());
         Assert.assertEquals(3, oc4.size());
     }
 
@@ -184,7 +184,7 @@ public class JCommandsTest extends JUnitSuite {
 
         //access parameters using jGet
         Optional<Parameter<Boolean>> k1Param = wc1.jGet(k1); //present
-        java.util.List<Boolean> values = k1Param.get().jValues();
+        java.util.List<Boolean> values = k1Param.orElseThrow().jValues();
 
         //access parameters
         Optional<Parameter<ArrayData<Float>>> k2BadParam = wc1.jGet("absentKeyHere", JKeyType.FloatArrayKey());
@@ -209,7 +209,7 @@ public class JCommandsTest extends JUnitSuite {
         Assert.assertFalse(k2BadParam.isPresent());
         Assert.assertEquals(4, paramSize);
         Assert.assertArrayEquals(boolArray, values.toArray());
-        Assert.assertArrayEquals(intArray, (Integer[]) wc3.jGet(k2).get().values());
+        Assert.assertArrayEquals(intArray, (Integer[]) wc3.jGet(k2).orElseThrow().values());
         Assert.assertEquals(3, wc4.size());
     }
 

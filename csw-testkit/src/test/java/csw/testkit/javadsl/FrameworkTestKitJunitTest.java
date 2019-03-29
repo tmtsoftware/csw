@@ -28,11 +28,11 @@ public class FrameworkTestKitJunitTest extends JUnitSuite {
     public void shouldStartAllProvidedCSWServices() throws ExecutionException, InterruptedException {
         Optional<TcpLocation> alarmLocation = locationService.find(AlarmServiceConnection.value()).get();
         Assert.assertTrue(alarmLocation.isPresent());
-        Assert.assertEquals(alarmLocation.get().connection(),AlarmServiceConnection.value());
+        Assert.assertEquals(alarmLocation.orElseThrow().connection(),AlarmServiceConnection.value());
 
         Optional<HttpLocation> configLocation = locationService.find(ConfigServiceConnection.value()).get();
         Assert.assertTrue(configLocation.isPresent());
-        Assert.assertEquals(configLocation.get().connection(), ConfigServiceConnection.value());
+        Assert.assertEquals(configLocation.orElseThrow().connection(), ConfigServiceConnection.value());
 
         // EventServer is not provided in FrameworkTestKitJunitResource constructor, hence it should not be started
         Optional<TcpLocation> eventLocation = locationService.find(EventServiceConnection.value()).get();
