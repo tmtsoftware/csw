@@ -3,4 +3,4 @@ jdk:
 before_install:
   - ./scripts/adopt-open-jdk-11-setup.sh
 install:
-  sbt -Dsbt.log.noformat=true clean publishM2
+  sbt -Dsbt.log.noformat=true clean publishLocal
