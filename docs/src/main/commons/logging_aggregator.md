@@ -1,39 +1,42 @@
 # Logging Aggregator
 
-The logging aggregation provides aggregation of logs generated from TMT applications written in Scala, Java, Python, C, C++ and modules like System logs,
-Redis logs, Postgres logs, ElasticSearch logs, Keycloak logs using Elastic stack([Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html),
+The logging aggregator provides aggregation of logs generated from TMT applications written in Scala, Java, Python, C, C++, modules like System logs,
+Redis logs, Postgres logs, ElasticSearch logs, Keycloak logs using the Elastic stack([Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html),
 [Logstash](https://www.elastic.co/guide/en/logstash/current/index.html), [Kibana](https://www.elastic.co/guide/en/kibana/current/index.html))
 and [Filebeat](https://www.elastic.co/guide/en/beats/filebeat/current/index.html).
 
 ## Elastic license
 
-It is recommended to use the basic/elastic license of Elastic stack which is a free license. To know more about what features are available in basic
+It is recommended to use the basic/elastic license of Elastic stack, which is a free license. To know more about what features are available in basic
 license refer this [link](https://www.elastic.co/subscriptions).
 
 ## Architecture
 
 ![logo](../services/logging_architecture.png)
 
-As shown in above architecture diagram all machines in TMT can run Filebeat to watch log files. Filebeat is responsible for watching log files and shipping it
-to the centralised Logstash component. Filebeat maintains a marker in a registry for the last read position in a file. Therefore, applications can keep emitting logs to the file agnostic of the Filebeat's marker.
+As shown in above architecture diagram, all machines in TMT can run Filebeat to watch log files. Filebeat is responsible for watching log files and shipping it
+to the centralized Logstash component. Filebeat maintains a marker in a registry for the last read position in a file,
+so that it can resume where it left off should it need to be restarted. Applications can keep emitting logs to the file 
+agnostic to whether Filebeat is running or not.
 
-Logstash collects the Json logs in string format, parses it to a valid Json object and then feeds it to Elasticsearch. Elasticsearch is responsible for ingesting and indexing the json data.
-If logs are generated in non-Json format which will be the case for Redis, System, Postgres, Elasticsearch logs, then they will be parsed and indexed using the elastic 
+Logstash collects the JSON logs (e.g. from components) in string format, parses it to a valid JSON object and then feeds it to Elasticsearch.
+Elasticsearch is responsible for ingesting and indexing the JSON data.
+If logs are generated in non-JSON format, which will be the case for Redis, syslog, Postgres, and Elasticsearch logs, they will be parsed and indexed using the elastic 
 [modules](https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-modules-overview.html). 
 
-After the Json data is indexed in Elasticearch, Kibana provides powerful visualisation tools and dashboards that offer various interactive diagrams to visualize complex queries. 
+After the JSON data is indexed in Elasticearch, Kibana provides powerful visualization tools and dashboards that offer various interactive diagrams to visualize complex queries. 
 
 @@@ note
 
 All the files required for logging aggregator configuration can be found [here](https://github.com/tmtsoftware/csw/tree/master/scripts/logging_aggregator).
-How to use each of these files and it's significance will be explained further in the document.
+How to use each of these files and its significance will be explained further in the document.
 
-It is assumed that in production, Elasticsearch, Logstash and Kibana will be registered with TMT infra DNS setup. Hence, all the configuration files
-for production is provided referring to DNS host name. 
+It is assumed that in production, Elasticsearch, Logstash and Kibana will be registered with TMT intranet DNS setup. Hence, all the configuration files
+for production are provided by referring to DNS host name. 
 
 It is strongly recommended to run the same version (v6.6.0 or higher) of elastic components so as to avoid any compatibility issues.
 
-By default, the elastic stack exposes the following ports and the configurations also rely on the same.
+By default, the elastic stack exposes the following ports on which the configurations rely.
  
  * 5044: Logstash TCP input.
  * 9200: Elasticsearch HTTP port
@@ -44,28 +47,30 @@ By default, the elastic stack exposes the following ports and the configurations
 
 ## TMT Applications (Scala/Java/Python/C++/C)
 
-In order to aggregate logs generated from TMT apps, Filebeat will require to watch them. The recommended practice is for apps to generate log files
-at a common place so that Filebeat can watch it. The common place to generate log files and watch them is defined by an environment variable `TMT_LOG_HOME`
+In order to aggregate logs generated from TMT apps, the Filebeat application is used to watch them. The recommended practice is for apps to generate log files
+at a common place so that Filebeat can find them. This common place is defined by an environment variable `TMT_LOG_HOME`
 For e.g. TMT_LOG_HOME = /<<user-accessible-space>>/tmt/logs.
 
 @@@ note
 
-Make sure that in production TMT_LOG_HOME is not set to /tmp, otherwise on machine reboot all the logs will be lost.  
+For convenience during development, you may choose to use /tmp for `TMT_LOG_HOME`.  However, for production, this variable should 
+be set to something more permanent, since all the files in /tmp will be lost on machine reboot.
 
 @@@      
 
-The upcoming sections will explain how each TMT app can generate log files at TMT_LOG_HOME and how Filebeat can watch from the same TMT_LOG_HOME:
+The upcoming sections will explain how each TMT app can generate log files at TMT_LOG_HOME and how Filebeat can read them:
 
 ### Scala/Java
 
 For Scala/Java applications to dump logs in a file, it is important that developers enable the `FileAppender` in application.conf. To know more about how
 to configure FileAppender please refer the @ref:[logging documentation](../services/logging.md#configuration). Once, the FileAppender is enabled, the log files
-will be generated under `TMT_LOG_HOME`. If TMT_LOG_HOME is not set as an environment variable then `BaseLogPathNotDefined` exception will be thrown. 
-For tests, `baseLogPath` from logging configuration can be overridden in application.conf.
+will be generated under `TMT_LOG_HOME`. If `TMT_LOG_HOME` is not set as an environment variable then a `BaseLogPathNotDefined` exception will be thrown. 
+For tests, you can hard code a logging directory without setting the `TMT_LOG_HOME` environment variable by 
+overriding the `baseLogPath` configuration setting  in the logging configuration in your `application.conf` file.
 
 ### C++
 
-For C++ developers it is recommended to use the [spdlog](https://github.com/gabime/spdlog) library along with 
+For C++ developers, it is recommended to use the [spdlog](https://github.com/gabime/spdlog) library along with 
 [spdlog-setup](https://github.com/guangie88/spdlog_setup) add-on library for logging in files.
 
 The following code snippet will explain how to use `spdlog`:
@@ -83,20 +88,20 @@ The source code for above code can be found [here](https://github.com/tmtsoftwar
 
 Things to keep in mind while writing C++/C/Python apps
 
- * The structure of json logs should adhere to @ref:[this](../services/logging.md#log-structure) format
- * log files should be generated at path set at TMT_LOG_HOME
- * time should be logged in UTC
- * recommended to use rotating files for logging
- * configuration of log level should be in `.toml` file (or any config file for that matter e.g. `.conf` for C or `.json` for python) so that
+ * The structure of JSON logs should adhere to @ref:[this](../services/logging.md#log-structure) format
+ * Log files should be generated at path set at TMT_LOG_HOME
+ * Time should be logged in UTC
+ * It is recommended to use rotating files for logging
+ * Configuration of log levels should be in `.toml` file (or any config file for that matter e.g. `.conf` for C or `.json` for python) so that
    log level is changeable without re-compiling C/C++ code. 
 
-All the above points are already covered for Scala/Java apps in logging framework.
+All the above points are already included for Scala/Java apps using the CSW Logging framework.
 
 @@@
 
 ### C
 
-For C develoers it is recommended to use [zlog](https://github.com/HardySimpson/zlog) logging library. The following code snippet will explain how to
+For C developers, it is recommended to use [zlog](https://github.com/HardySimpson/zlog) logging library. The following code snippet will explain how to
 use `zlog`:
 
 main.c
@@ -110,16 +115,7 @@ The source code for above code can be found [here](https://github.com/tmtsoftwar
 
 @@@ note
 
-Things to keep in mind while writing C++/C/Python apps
-
- * The structure of json logs should adhere to @ref:[this](../services/logging.md#log-structure) format
- * log files should be generated at path set at TMT_LOG_HOME
- * time should be logged in UTC
- * recommended to use rotating files for logging
- * configuration of log level should be in `.toml` file (or any config file for that matter e.g. `.conf` for C or `.json` for python) so that
-   log level is changeable without re-compiling C/C++ code. 
-
-All the above points are already covered for Scala/Java apps in logging framework.
+Please refer to note above in the C++ section.
 
 @@@
 
@@ -142,22 +138,13 @@ The source code for above code can be found [here](https://github.com/tmtsoftwar
 
 @@@ note
 
-The use of `tmt_formatter.py` in `logging_default.json` to log in UTC timezone.
+The above example shows how `tmt_formatter.py` in `logging_default.json` is used to log with UTC timestamps.
 
 @@@
 
 @@@ note
 
-Things to keep in mind while writing C++/C/Python apps
-
- * The structure of json logs should adhere to @ref:[this](../services/logging.md#log-structure) format
- * log files should be generated at path set at TMT_LOG_HOME
- * time should be logged in UTC
- * recommended to use rotating files for logging
- * configuration of log level should be in `.toml` file (or any config file for that matter e.g. `.conf` for C or `.json` for python) so that
-   log level is changeable without re-compiling C/C++ code. 
-
-All the above points are already covered for Scala/Java apps in logging framework.
+Please refer to note above in the C++ section.
 
 @@@
    
@@ -167,7 +154,7 @@ Once TMT applications generate log files under TMT_LOG_HOME, Filebeat needs to s
 [filebeat.yml](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/filebeat/modules/system/filebeat.yml) should be used to
 start Filebeat.
 
-All machines running TMT application also need system generated logs to be watched by Filebeat so that it gets shipped to Logstash. This can be achieved
+All machines running TMT applications also need system generated logs to be watched by Filebeat so that it gets shipped to Logstash. This can be achieved
 by enabling [System module](https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-system.html) in Filebeat and making Elasticsearch aware of receiving
 system logs (text based logs) to parse and index them.
 
@@ -189,18 +176,18 @@ In order to achieve this follow the below given steps:
 
 @@@ note
  
-It is assumed that in production, Elasticsearch, Logstash and Kibana will be registered with TMT infra DNS setup. Hence, all the [configuration files]
+It is assumed that in production, Elasticsearch, Logstash and Kibana will be registered with TMT intranet DNS setup. Hence, all the [configuration files]
 (https://github.com/tmtsoftware/csw/tree/master/scripts/logging_aggregator/prod)
-for production is provided referring to dns name. 
+for production are provided by referring to DNS host name. 
  
 @@@
 
 ## Redis logs
 
-Redis will be started in sentinel mode, master mode and slave mode on different machines for Event and Alarm service. [Configuration files]
+In production, Redis will be started in sentinel mode, master mode and slave mode on different machines for Event and Alarm service. [Configuration files]
 (https://github.com/tmtsoftware/csw/tree/master/scripts/conf)
 are provided for Redis sentinel, master and slave to log in file `/usr/local/var/log/redis/redis-server.log`. Filebeat will also be watching this file
-once [Redis module](https://www.elastic.co/guide/en/beats/filebeat/6.7/filebeat-module-redis.html) is enabled.
+once the [Redis module](https://www.elastic.co/guide/en/beats/filebeat/6.7/filebeat-module-redis.html) is enabled.
 
 Note that system generated logs on Redis machines also needs to be watched by Filebeat and aggregated. In order to enable Redis and System module
 follow the below given steps: 
@@ -268,7 +255,7 @@ module follow the below given steps:
 ## Keycloak logs
 
 Logs generated from Keycloak needs to be watched by Filebeat and aggregated. Hence, use [standalone.xml](https://github.com/tmtsoftware/csw/blob/master/scripts/conf/auth_service/standalone.xml)
-to start JBoss server which will make JBoss server to  log in json format, enable keycloak logs and generate log files under `TMT_LOG_HOME`.
+to start JBoss server which will make JBoss server to log in JSON format, enable keycloak logs, and generate log files under `TMT_LOG_HOME`.
 
 Note that system generated logs on Keycloak machine also needs to be watched by Filebeat and aggregated. In order to watch Keycloak logs from 
 `TMT_LOG_HOME` and enable system module refer the steps from @ref:[here](logging_aggregator.md#filebeat-watching-tmt-app-logs-and-system-generated-logs).  
@@ -295,7 +282,7 @@ machines follow the below given steps:
 
 ## Explore Kibana
 
-Once Kibana is up and running hit `http://localhost:5601/` in browser and go to:
+Once Kibana is up and running, open `http://localhost:5601/` in a browser and go to:
                               
 * `Management` -> `Kibana` ->  `Index Patterns` and create an index pattern as per the requirement.
 * `Discover` -> `Select the index pattern created` and explore
@@ -305,7 +292,7 @@ For Modules like System, Postgres, Redis and Elasticsearch go to `Dashboard` and
 ## Running Elastic stack for developer
 
 For development purposes [Docker compose](https://docs.docker.com/compose/) is used to start Elasticsearch, Logstash, Kibana and Filebeat in a container.
-Hence, make sure that latest Docker setup is installed and running before starting the Elastic stack. Docker container is responsible to aggregate logs
+Hence, make sure that latest Docker setup is installed and running before starting the Elastic stack. The Docker container is responsible for aggregating logs
 generated in `tmp/csw/logs`. Hence, developers writing Scala/Java/Python/C++/C applications need to generate log files under `/tmp/csw/logs`. 
 
 Also, note that csw apps started via `csw-services.sh` will generate log files under `/tmp/csw/logs` and thus, it will be aggregated by the Elastic docker container.
