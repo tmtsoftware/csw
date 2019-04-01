@@ -41,7 +41,7 @@ pipeline {
                             reportFiles          : 'index.html',
                             reportName           : "Scoverage Report"
                     ])
-                    sh "rm -rf csw-params/js/target/*"
+                    sh "rm -rf csw-params/js/target csw-time/csw-time-core/js/target"
                 }
             }
         }
