@@ -88,7 +88,7 @@ class TestModule(projectName: String, version: String) {
   val testJarRunpath: String =
     files
       .map(_.toString)
-      .find(x ⇒ x.contains(projectName) && x.contains("tests.jar"))
+      .find(x ⇒ x.contains(projectName + "_") && x.contains("tests.jar"))
       .getOrElse("")
 
   val cmds = List(
