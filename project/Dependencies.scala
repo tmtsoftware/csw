@@ -54,7 +54,6 @@ object Dependencies {
       Akka.`akka-actor-testkit-typed` % Test,
       Libs.`scalatest`.value          % Test,
       Libs.`junit`                    % Test,
-      Libs.`junit-interface`          % Test,
       Libs.`mockito-scala`            % Test,
       Akka.`akka-stream-testkit`      % Test,
       Akka.`akka-multi-node-testkit`  % Test
@@ -138,7 +137,6 @@ object Dependencies {
       Libs.`scala-java8-compat`,
       Libs.`scalatest`.value         % Test,
       Libs.`junit`                   % Test,
-      Libs.`junit-interface`         % Test,
       Libs.`mockito-scala`           % Test,
       Akka.`akka-multi-node-testkit` % Test,
       Akka.`akka-stream-testkit`     % Test
@@ -170,7 +168,6 @@ object Dependencies {
       Akka.`akka-actor-typed`,
       Libs.`scalatest`.value % Test,
       Libs.`junit`           % Test,
-      Libs.`junit-interface` % Test,
       Libs.`gson`            % Test
     )
   )
@@ -188,8 +185,7 @@ object Dependencies {
   val ParamsJvm = Def.setting(
     Seq(
       Chill.`chill-bijection` % Test,
-      Libs.`junit`            % Test,
-      Libs.`junit-interface`  % Test
+      Libs.`junit`            % Test
     )
   )
 
@@ -209,7 +205,6 @@ object Dependencies {
       Akka.`akka-stream-testkit`      % Test,
       Libs.`scalatest`.value          % Test,
       Libs.`junit`                    % Test,
-      Libs.`junit-interface`          % Test,
       Libs.`mockito-scala`            % Test
     )
   )
@@ -230,7 +225,6 @@ object Dependencies {
       Akka.`akka-stream-testkit`      % Test,
       Libs.`scalatest`.value          % Test,
       Libs.`junit`                    % Test,
-      Libs.`junit-interface`          % Test,
       Libs.`mockito-scala`            % Test
     )
   )
@@ -270,7 +264,6 @@ object Dependencies {
       Akka.`akka-stream-testkit`      % Test,
       Libs.`scalatest`.value          % Test,
       Libs.`junit`                    % Test,
-      Libs.`junit-interface`          % Test,
       Libs.`mockito-scala`            % Test,
       Libs.`embedded-redis`           % Test,
       Libs.`scalatest-embedded-kafka` % Test,
@@ -323,7 +316,6 @@ object Dependencies {
       Akka.`akka-stream`,
       Akka.`akka-stream-typed`,
       Libs.`junit`           % Test,
-      Libs.`junit-interface` % Test,
       Libs.`scalatest`.value % Test,
       Libs.`mockito-scala`   % Test
     )
@@ -368,7 +360,7 @@ object Dependencies {
     Seq(
       Libs.`jna`,
       Libs.`scalatest`.value % Test,
-      Libs.`junit-interface` % Test
+      Libs.`junit`           % Test
     )
   )
 
@@ -377,14 +369,13 @@ object Dependencies {
       Libs.`play-json`.value,
       Libs.`play-json-derived-codecs`.value,
       Libs.`scalatest`.value % Test,
-      Libs.`junit-interface` % Test
+      Libs.`junit`           % Test
     )
   )
 
   val TimeScheduler = Def.setting(
     Seq(
       Akka.`akka-actor`,
-      Libs.`junit-interface`          % Test,
       Libs.`scalatest`.value          % Test,
       Libs.HdrHistogram               % Test,
       Akka.`akka-actor-testkit-typed` % Test
@@ -405,7 +396,6 @@ object Dependencies {
       Libs.`scalatest`.value % Test,
       Akka.`akka-actor`      % Test,
       Libs.`junit`           % Test,
-      Libs.`junit-interface` % Test,
       Libs.`otj-pg-embedded` % Test
     )
   )
@@ -501,8 +491,7 @@ object Dependencies {
       AkkaHttp.`akka-http-cors`,
       Akka.`akka-actor-testkit-typed`,
       Libs.`scalatest`.value % Test,
-      Libs.`junit`           % Test,
-      Libs.`junit-interface` % Test
+      Libs.`junit`           % Test
     )
   )
 
@@ -531,7 +520,7 @@ object Dependencies {
       Akka.`akka-actor-typed`,
       AkkaHttp.`akka-http`,
       Akka.`akka-actor-testkit-typed`,
-      Libs.`scalatest`.value,
+      Libs.`scalatest`.value
     )
   )
 

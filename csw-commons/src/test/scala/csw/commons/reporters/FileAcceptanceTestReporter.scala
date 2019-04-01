@@ -13,7 +13,7 @@ class FileAcceptanceTestReporter extends Reporter {
 
   private val filePath = s"target/acceptance/acceptance-test-report.txt"
   private val file     = new File(filePath)
-  if(file.exists()) file.delete()
+  if (file.exists()) file.delete()
   file.getParentFile.mkdirs
   private val writer = new FileWriter(file, true)
 

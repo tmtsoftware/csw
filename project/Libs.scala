@@ -13,7 +13,6 @@ object Libs {
   val `scala-async`        = dep("org.scala-lang.modules" %% "scala-async" % "0.9.7") //BSD 3-clause "New" or "Revised" License
   val `scopt`              = "com.github.scopt" %% "scopt" % "3.7.1" //MIT License
   val `junit`              = "junit" % "junit" % "4.12" //Eclipse Public License 1.0
-  val `junit-interface`    = "com.novocode" % "junit-interface" % "0.11" //BSD 2-clause "Simplified" License
   val `silencer-plugin`    = compilerPlugin("com.github.ghik" %% "silencer-plugin" % silencerVersion)
   val `silencer-lib`       = "com.github.ghik" %% "silencer-lib" % silencerVersion % Compile
   val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.2.1"
