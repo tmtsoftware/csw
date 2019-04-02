@@ -3,6 +3,7 @@ import org.scalafmt.sbt.ScalafmtPlugin.autoImport.scalafmtOnCompile
 import sbt.Keys.{testOptions, _}
 import sbt._
 import sbt.plugins.JvmPlugin
+import sbtunidoc.GenJavadocPlugin.autoImport.unidocGenjavadocVersion
 
 object Common extends AutoPlugin {
 
@@ -58,7 +59,8 @@ object Common extends AutoPlugin {
     libraryDependencies ++= (if (suppressAnnotatedWarnings.value) Seq(compilerPlugin(`silencer-plugin`)) else Seq.empty),
     autoCompilerPlugins := true,
     cancelable in Global := true, // allow ongoing test(or any task) to cancel with ctrl + c and still remain inside sbt
-    if (formatOnCompile) scalafmtOnCompile := true else scalafmtOnCompile := false
+    if (formatOnCompile) scalafmtOnCompile := true else scalafmtOnCompile := false,
+    unidocGenjavadocVersion := "0.13"
   )
 
   private def formatOnCompile = sys.props.get("format.on.compile") match {
