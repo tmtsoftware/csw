@@ -78,8 +78,8 @@ Docker setup is installed and running before starting the Elastic stack. To know
 
 For host setup follow the below given steps:
 
-* Install [Docker](https://www.docker.com/community-edition#/download) version **17.05+**
-* Install [Docker Compose](https://docs.docker.com/compose/install/) version **1.6.0+**
+* Install [Docker](https://www.docker.com/community-edition#/download) version **18.09+**
+* Install [Docker Compose](https://docs.docker.com/compose/install/) version **1.24.0+**
 
 On distributions which have SELinux enabled out-of-the-box you will need to either re-context the files or set SELinux
 into Permissive mode in order for docker-elk to start properly. For example on Redhat and CentOS, the following will
