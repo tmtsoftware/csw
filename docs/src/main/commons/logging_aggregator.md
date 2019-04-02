@@ -1,23 +1,20 @@
 # Logging Aggregator
 
 The logging aggregator provides aggregation of logs generated from TMT applications written in Scala, Java, Python, C, C++, modules like System logs,
-Redis logs, Postgres logs, ElasticSearch logs, Keycloak logs using the Elastic stack([Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html),
-[Logstash](https://www.elastic.co/guide/en/logstash/current/index.html), [Kibana](https://www.elastic.co/guide/en/kibana/current/index.html))
-and [Filebeat](https://www.elastic.co/guide/en/beats/filebeat/current/index.html).
+Redis logs, Postgres logs, ElasticSearch logs, Keycloak logs using the widely used Elastic [ELK stack](https://www.elastic.co/elk-stack) ([Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html),
+[Logstash](https://www.elastic.co/guide/en/logstash/current/index.html), [Kibana](https://www.elastic.co/guide/en/kibana/current/index.html)),
+and the [Filebeat](https://www.elastic.co/guide/en/beats/filebeat/current/index.html) utility.
 
-## Elastic license
+@@@ note
 
-It is recommended to use the basic/elastic license of Elastic stack, which is a free license. To know more about what features are available in basic
-license refer this [link](https://www.elastic.co/subscriptions).
+The basic/elastic license of Elastic stack, which is a free license, should be sufficient for TMT's purposes. To know 
+more about what features are available in the basic license refer this [link](https://www.elastic.co/subscriptions).
+
+@@@
 
 ## Architecture
 
 ![logo](../services/logging_architecture.png)
-
-As shown in above architecture diagram, all machines in TMT can run Filebeat to watch log files. Filebeat is responsible for watching log files and shipping it
-to the centralized Logstash component. Filebeat maintains a marker in a registry for the last read position in a file,
-so that it can resume where it left off should it need to be restarted. Applications can keep emitting logs to the file 
-agnostic to whether Filebeat is running or not.
 
 Logstash collects the JSON logs (e.g. from components) in string format, parses it to a valid JSON object and then feeds it to Elasticsearch.
 Elasticsearch is responsible for ingesting and indexing the JSON data.
@@ -26,13 +23,21 @@ If logs are generated in non-JSON format, which will be the case for Redis, sysl
 
 After the JSON data is indexed in Elasticearch, Kibana provides powerful visualization tools and dashboards that offer various interactive diagrams to visualize complex queries. 
 
+Filebeat is responsible for watching log files and shipping it to the centralized Logstash component.
+As shown in the above architecture diagram, all machines in TMT can run Filebeat to watch log files. 
+Filebeat maintains a marker in a registry for the last read position in a file,
+so that it can resume where it left off should it need to be restarted. Applications can keep emitting logs to the file 
+agnostic to whether Filebeat is running or not.
+
+
 @@@ note
 
 All the files required for logging aggregator configuration can be found [here](https://github.com/tmtsoftware/csw/tree/master/scripts/logging_aggregator).
-How to use each of these files and its significance will be explained further in the document.
+How to use each of these files and its significance will be explained further in the document.  For rapid use in a development environment, a Docker image
+has been created.  See @ref:[below](#running-elastic-stack-for-developers) for more information.
 
 It is assumed that in production, Elasticsearch, Logstash and Kibana will be registered with TMT intranet DNS setup. Hence, all the configuration files
-for production are provided by referring to DNS host name. 
+for production are provided by referring to the DNS host name. 
 
 It is strongly recommended to run the same version (v6.6.0 or higher) of elastic components so as to avoid any compatibility issues.
 
@@ -45,48 +50,48 @@ By default, the elastic stack exposes the following ports on which the configura
 @@@
 
 
-## TMT Applications (Scala/Java/Python/C++/C)
+## Logging from TMT Applications (Scala/Java/Python/C++/C)
 
 In order to aggregate logs generated from TMT apps, the Filebeat application is used to watch them. The recommended practice is for apps to generate log files
-at a common place so that Filebeat can find them. This common place is defined by an environment variable `TMT_LOG_HOME`
-For e.g. TMT_LOG_HOME = /<<user-accessible-space>>/tmt/logs.
+at a common place so that Filebeat can find them. This common place is defined by an environment variable `TMT_LOG_HOME`,
+ e.g. `TMT_LOG_HOME = /<<user-accessible-space>>/tmt/logs`.
 
 @@@ note
 
-For convenience during development, you may choose to use /tmp for `TMT_LOG_HOME`.  However, for production, this variable should 
-be set to something more permanent, since all the files in /tmp will be lost on machine reboot.
+For convenience during development, you may choose to use `/tmp` for `TMT_LOG_HOME`.  However, for production, this variable should 
+be set to something more permanent, since all the files in `/tmp` will be lost on machine reboot.
 
 @@@      
 
-The upcoming sections will explain how each TMT app can generate log files at TMT_LOG_HOME and how Filebeat can read them:
+The upcoming sections will explain how each TMT application can generate log files at `TMT_LOG_HOME` and how Filebeat can read them:
 
 @@@ note
 
 Things to keep in mind while writing C++/C/Python apps
 
  * The structure of JSON logs should adhere to @ref:[this](../services/logging.md#log-structure) format
- * Log files should be generated at the path set by TMT_LOG_HOME
+ * Log files should be generated at the path set by `TMT_LOG_HOME`
  * Time should be logged in UTC
  * It is recommended to use rotating files for logging
 
-Scala/Java apps using the CSW Logging framework follow these conventions out of the box.
+Scala/Java applications using the CSW Logging framework follow these conventions out of the box.
 
 @@@
 
 
 ### Scala/Java
 
-For Scala/Java applications to dump logs in a file, it is important that developers enable the `FileAppender` in application.conf. To know more about how
-to configure FileAppender please refer the @ref:[logging documentation](../services/logging.md#configuration). Once, the FileAppender is enabled, the log files
+For Scala/Java applications to dump logs in a file, it is important that developers enable the `FileAppender` in `application.conf`. To know more about how
+to configure `FileAppender` please refer the @ref:[logging documentation](../services/logging.md#configuration). Once, the `FileAppender` is enabled, the log files
 will be generated under `TMT_LOG_HOME`. If `TMT_LOG_HOME` is not set as an environment variable then a `BaseLogPathNotDefined` exception will be thrown. 
 For tests, you can hard code a logging directory without setting the `TMT_LOG_HOME` environment variable by 
-overriding the `baseLogPath` configuration setting  in the logging configuration in your `application.conf` file.
+overriding the `baseLogPath` configuration setting in the logging configuration in your `application.conf` file.
 
 ### C++
 
 For C++ developers, it is recommended to use the [spdlog](https://github.com/gabime/spdlog) library along with 
 [spdlog-setup](https://github.com/guangie88/spdlog_setup) add-on library for logging in files.  This add-on allows
-spdlog to be configured using a file instead of hardcoding it.
+`spdlog` to be configured using a file instead of hardcoding it.
 
 The following code snippet will explain how to use `spdlog`:
 
@@ -122,7 +127,7 @@ The source code for above code can be found [here](https://github.com/tmtsoftwar
 
 @@@ note
 
-zlog uses a custom DSL for its configuration.  See [this](https://hardysimpson.github.io/zlog/UsersGuide-EN.html#htoc14) for more information.
+`zlog` uses a custom DSL for its configuration.  See [this](https://hardysimpson.github.io/zlog/UsersGuide-EN.html#htoc14) for more information.
 
 @@@
 
@@ -156,17 +161,17 @@ See the [python documentation](https://docs.python.org/3/howto/logging.html#conf
 
 @@@
    
-### Filebeat watching TMT app logs and system generated logs
+## Setting up Filebeat to watch TMT app logs and system generated logs
 
 Once TMT applications generate log files under TMT_LOG_HOME, Filebeat needs to start watching them. In order for Filebeat to be aware of TMT_LOG_HOME,
 [filebeat.yml](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/filebeat/modules/system/filebeat.yml) should be used to
 start Filebeat.
 
 All machines running TMT applications also need system generated logs to be watched by Filebeat so that it gets shipped to Logstash. This can be achieved
-by enabling [System module](https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-system.html) in Filebeat and making Elasticsearch aware of receiving
+by enabling the [System module](https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-system.html) in Filebeat and making Elasticsearch aware of receiving
 system logs (text based logs) to parse and index them.
 
-In order to achieve this follow the below given steps:
+In order to achieve this, follow the steps given below:
 
 * Run Elasticsearch using [elasticsearch.yml](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/elasticsearch/elasticsearch.yml).
   Place `elasticsearch.yml` in <<Elasticsearch installation folder>>/config/ and execute `./bin/elasticsearch` (on Mac) or `bin/elasticsearch` (on Linux).
@@ -297,7 +302,7 @@ Once Kibana is up and running, open `http://localhost:5601/` in a browser and go
 
 For Modules like System, Postgres, Redis and Elasticsearch go to `Dashboard` and explore.
 
-## Running Elastic stack for developer
+## Running Elastic Stack for Developers
 
 For development purposes [Docker compose](https://docs.docker.com/compose/) is used to start Elasticsearch, Logstash, Kibana and Filebeat in a container.
 Hence, make sure that latest Docker setup is installed and running before starting the Elastic stack. The Docker container is responsible for aggregating logs

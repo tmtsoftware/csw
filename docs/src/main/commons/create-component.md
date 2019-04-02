@@ -426,11 +426,18 @@ and the script is named `csw-services.sh`.
 The `csw-services.sh` script has two basic commands: `start` and `stop`.  The start command can start specific services using
 passed in flags, or all services without any.  Services are started on default ports but those ports can be overridden using
 command line arguments.  It is important to pass in a network interface name that is appropriate for your system.  These
-can be obtained using `ifconfig` on Linux and Mac computers.  `en0` typically works for most machines.
+can be obtained using `ifconfig` on Linux and Mac computers.  `en0` typically works for most machines.  This can alternatively be set
+using the environment variable `INTERFACE_NAME`.  Setting the interface name at the command with this script also sets this 
+envrionment variable.
+
+@@@ note
+
+The environment variables used by CSW services are specified on the @ref:[environment variable](../deployment/env-vars.md) page.  
+
+@@@
 
 To get information on the arguments for the tool, use `csw-services.sh --help`.
 
-List of environment variables which needs to be set before starting csw services is specified in @ref:[environment variable](../deployment/env-vars.md) document.  
 
 #### *Tutorial: Developing an HCD*
 
