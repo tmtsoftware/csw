@@ -60,6 +60,20 @@ be set to something more permanent, since all the files in /tmp will be lost on 
 
 The upcoming sections will explain how each TMT app can generate log files at TMT_LOG_HOME and how Filebeat can read them:
 
+@@@ note
+
+Things to keep in mind while writing C++/C/Python apps
+
+ * The structure of JSON logs should adhere to @ref:[this](../services/logging.md#log-structure) format
+ * Log files should be generated at the path set by TMT_LOG_HOME
+ * Time should be logged in UTC
+ * It is recommended to use rotating files for logging
+
+Scala/Java apps using the CSW Logging framework follow these conventions out of the box.
+
+@@@
+
+
 ### Scala/Java
 
 For Scala/Java applications to dump logs in a file, it is important that developers enable the `FileAppender` in application.conf. To know more about how
@@ -71,7 +85,8 @@ overriding the `baseLogPath` configuration setting  in the logging configuration
 ### C++
 
 For C++ developers, it is recommended to use the [spdlog](https://github.com/gabime/spdlog) library along with 
-[spdlog-setup](https://github.com/guangie88/spdlog_setup) add-on library for logging in files.
+[spdlog-setup](https://github.com/guangie88/spdlog_setup) add-on library for logging in files.  This add-on allows
+spdlog to be configured using a file instead of hardcoding it.
 
 The following code snippet will explain how to use `spdlog`:
 
@@ -86,16 +101,8 @@ The source code for above code can be found [here](https://github.com/tmtsoftwar
 
 @@@ note
 
-Things to keep in mind while writing C++/C/Python apps
-
- * The structure of JSON logs should adhere to @ref:[this](../services/logging.md#log-structure) format
- * Log files should be generated at path set at TMT_LOG_HOME
- * Time should be logged in UTC
- * It is recommended to use rotating files for logging
- * Configuration of log levels should be in `.toml` file (or any config file for that matter e.g. `.conf` for C or `.json` for python) so that
-   log level is changeable without re-compiling C/C++ code. 
-
-All the above points are already included for Scala/Java apps using the CSW Logging framework.
+`spdlog-setup` uses the `.toml` file format for its configuration files.  Log levels could be specified in this configuration file so that
+they can be changed without re-compiling C/C++ code. 
 
 @@@
 
@@ -115,7 +122,7 @@ The source code for above code can be found [here](https://github.com/tmtsoftwar
 
 @@@ note
 
-Please refer to note above in the C++ section.
+zlog uses a custom DSL for its configuration.  See [this](https://hardysimpson.github.io/zlog/UsersGuide-EN.html#htoc14) for more information.
 
 @@@
 
@@ -144,7 +151,8 @@ The above example shows how `tmt_formatter.py` in `logging_default.json` is used
 
 @@@ note
 
-Please refer to note above in the C++ section.
+YAML can be used instead of JSON, as well as the simple INI format used in previous versions of python (although with less flexibility).
+See the [python documentation](https://docs.python.org/3/howto/logging.html#configuring-logging) for more information.
 
 @@@
    
@@ -297,3 +305,10 @@ generated in `tmp/csw/logs`. Hence, developers writing Scala/Java/Python/C++/C a
 
 Also, note that csw apps started via `csw-services.sh` will generate log files under `/tmp/csw/logs` and thus, it will be aggregated by the Elastic docker container.
 To know more about setting up docker and starting Elastic please refer @ref:[Starting Elastic logging aggregator for Development](apps.md#starting-elk-logging-aggregator-for-development). 
+
+@@@ note
+
+By default, Elasticsearch will run in a read-only mode if the disk it is using is more than 90% full.  This can be configured.
+See the [Elasticsearch reference documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/disk-allocator.html)
+
+@@@
