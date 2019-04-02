@@ -432,7 +432,7 @@ envrionment variable.
 
 @@@ note
 
-The environment variables used by CSW services are specified on the @ref:[environment variable](../deployment/env-vars.md) page.  
+The environment variables used by CSW services are specified @ref:[here](../deployment/env-vars.md).  
 
 @@@
 

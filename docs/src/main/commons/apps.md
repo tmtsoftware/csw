@@ -19,7 +19,7 @@ In order to run a component, it is required to run `csw-location-server`. Moreov
 `csw-location-server` should be running.
 
 A shell script has been provided to make the starting of services more convenient for developers.  This script will start the Location Service,
-and then a set of CSW Services that a developer may make use of.  All services are started by default, but specific services can be started
+and then a set of CSW services that a developer may make use of.  All services are started by default, but specific services can be started
 using the command line options (see below). 
 
 Assuming that developer has downloaded `csw-apps-<some-version>.zip` from [csw releases](https://github.com/tmtsoftware/csw/releases)
@@ -33,7 +33,7 @@ and unzipped it, there are four folders, as follows, in `csw-apps-<some-version>
 All the shell scripts provided by CSW reside in `bin` folder. The shell script referred in this segment is named as `csw-services.sh`.
 Go to the bin folder and type `./csw-services.sh --help`. This will list all possible options applicable for the script.
 
-Environment variables which are needed to start CSW Services are documented in @ref[environment variables](../deployment/env-vars.md).
+Environment variables which are needed to start CSW services are documented in @ref[environment variables](../deployment/env-vars.md).
 
 @@@ note { title=Note }
 
