@@ -310,8 +310,7 @@ function parse_cmd_args {
         start)
             shift
             if [[ $# -eq 2 && ($1 == "--interfaceName" || $1 == "-i") ]] ; then
-                interfaceName=$2
-                export INTERFACE_NAME=${interfaceName}
+                export INTERFACE_NAME=$2
                 # if only interfaceName argument provided with start, then start all services
                 enableAllServicesForRunning
             elif [[ $# -eq 1 && $1 == "--initRepo" ]] ; then
@@ -333,7 +332,7 @@ function parse_cmd_args {
                             if isPortProvided $2; then location_http_port="$2"; shift; fi
                             ;;
                         --interfaceName | -i)
-                            interfaceName="$2"
+                            export INTERFACE_NAME="$2"
                             shift
                             ;;
                         --config)
@@ -380,15 +379,15 @@ function parse_cmd_args {
                 enableAllServicesForRunning
             fi
 
-            if [[ ${interfaceName} == "" ]] ; then
-                echo "[ERROR] interfaceName is not provided, please provide valid interface name via argument --interfaceName|-i or set INTERFACE_NAME env variable."
+            if [[ ${INTERFACE_NAME} == "" ]] ; then
+                echo "[ERROR] INTERFACE_NAME is not provided, please provide valid interface name via argument --interfaceName|-i or set INTERFACE_NAME env variable."
                 exit 1
             else
                 # Get the ip address of local machine and store it in variable: my_ip
                 IP=$(getIP)
 
                 if [[ ${IP} == "" ]]; then
-                    echo "[ERROR] Interface: [$interfaceName] not found, please provide valid interface name."
+                    echo "[ERROR] Interface: [$INTERFACE_NAME] not found, please provide valid interface name."
                     exit 1
                 else
                     seeds="${IP}:${seed_port}"
