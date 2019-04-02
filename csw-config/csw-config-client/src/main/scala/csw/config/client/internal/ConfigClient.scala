@@ -1,6 +1,6 @@
 package csw.config.client.internal
 
-import java.nio.{file => jnio}
+import java.nio.{file ⇒ jnio}
 import java.time.Instant
 
 import akka.http.scaladsl.Http
@@ -10,7 +10,7 @@ import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import csw.commons.http.ErrorResponse
 import csw.config.api.TokenFactory
-import csw.config.api.commons.BinaryUtils
+import csw.config.api.commons.{BinaryUtils, TokenMaskSupport}
 import csw.config.api.exceptions._
 import csw.config.api.internal.ConfigStreamExts.RichSource
 import csw.config.api.internal.JsonSupport
@@ -33,9 +33,10 @@ private[config] class ConfigClient(
     configServiceResolver: ConfigServiceResolver,
     actorRuntime: ActorRuntime,
     tokenFactory: Option[TokenFactory] = None
-) extends ConfigService {
+) extends ConfigService
+    with TokenMaskSupport {
 
-  private val log: Logger = ConfigClientLogger.getLogger
+  override val logger: Logger = ConfigClientLogger.getLogger
 
   //Importing JsonSupport using an object to prevent JsonSupport methods appearing in ConfigClient scala documentation
   private object JsonSupport extends JsonSupport
@@ -55,8 +56,6 @@ private[config] class ConfigClient(
     await(configServiceResolver.uri).withPath(path)
   }
 
-  private def bearerTokenHeader = tokenFactory.map(_.getToken).map(token ⇒ Authorization(OAuth2BearerToken(token)))
-
   private implicit class HttpRequestExt(val httpRequest: HttpRequest) {
 
     def withBearerToken: HttpRequest = bearerTokenHeader match {
@@ -73,7 +72,7 @@ private[config] class ConfigClient(
     val entity                   = HttpEntity(ContentTypes.`application/octet-stream`, configData.length, stitchedSource)
 
     val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity).withBearerToken
-    log.info("Sending HTTP request", Map("request" → request.toString()))
+    maskTokenAndLog(request)
     val response = await(Http().singleRequest(request))
 
     await(
@@ -89,7 +88,7 @@ private[config] class ConfigClient(
     val uri    = await(configUri(path)).withQuery(Query("comment" → comment))
 
     val request = HttpRequest(HttpMethods.PUT, uri = uri, entity = entity).withBearerToken
-    log.info("Sending HTTP request", Map("request" → request.toString()))
+    maskTokenAndLog(request)
     val response = await(Http().singleRequest(request))
 
     await(
@@ -119,7 +118,7 @@ private[config] class ConfigClient(
     val uri = await(configUri(path)).withQuery(Query(id.map(configId ⇒ "id" → configId.id.toString).toMap))
 
     val request = HttpRequest(HttpMethods.HEAD, uri = uri)
-    log.info("Sending HTTP request", Map("request" → request.toString()))
+    maskTokenAndLog(request)
     val response = await(Http().singleRequest(request))
 
     await(
@@ -134,7 +133,7 @@ private[config] class ConfigClient(
     val uri = await(configUri(path)).withQuery(Query("comment" → comment))
 
     val request = HttpRequest(HttpMethods.DELETE, uri = uri).withBearerToken
-    log.info("Sending HTTP request", Map("request" → request.toString()))
+    maskTokenAndLog(request)
     val response = await(Http().singleRequest(request))
 
     await(
@@ -149,7 +148,7 @@ private[config] class ConfigClient(
       await(listUri).withQuery(Query(fileType.map("type" → _.entryName).toMap ++ pattern.map("pattern" → _).toMap))
 
     val request = HttpRequest(uri = uri)
-    log.info("Sending HTTP request", Map("request" → request.toString()))
+    maskTokenAndLog(request)
     val response = await(Http().singleRequest(request))
 
     await(
@@ -180,7 +179,7 @@ private[config] class ConfigClient(
     val uri = await(activeConfigVersion(path))
 
     val request = HttpRequest(uri = uri)
-    log.info("Sending HTTP request", Map("request" → request.toString()))
+    maskTokenAndLog(request)
     val response = await(Http().singleRequest(request))
 
     await(
@@ -193,7 +192,7 @@ private[config] class ConfigClient(
 
   override def getMetadata: Future[ConfigMetadata] = async {
     val request = HttpRequest(uri = await(metadataUri))
-    log.info("Sending HTTP request", Map("request" → request.toString()))
+    maskTokenAndLog(request)
     val response = await(Http().singleRequest(request))
 
     await(
@@ -207,7 +206,7 @@ private[config] class ConfigClient(
     val uri = await(activeConfigVersion(path)).withQuery(query)
 
     val request = HttpRequest(HttpMethods.PUT, uri = uri).withBearerToken
-    log.info("Sending HTTP request", Map("request" → request.toString()))
+    maskTokenAndLog(request)
     val response = await(Http().singleRequest(request))
 
     await(
@@ -219,7 +218,7 @@ private[config] class ConfigClient(
 
   private def get(uri: Uri): Future[Option[ConfigData]] = async {
     val request = HttpRequest(uri = uri)
-    log.info("Sending HTTP request", Map("request" → request.toString()))
+    maskTokenAndLog(request)
     val response = await(Http().singleRequest(request))
 
     val lengthOption = response.entity.contentLengthOption
@@ -231,7 +230,7 @@ private[config] class ConfigClient(
         case StatusCodes.OK ⇒
           //Not consuming the file content will block the connection.
           response.entity.discardBytes()
-          log.error(EmptyResponse.getMessage, ex = EmptyResponse)
+          logger.error(EmptyResponse.getMessage, ex = EmptyResponse)
           throw EmptyResponse
         case StatusCodes.NotFound ⇒ Future.successful(None)
       }
@@ -248,7 +247,7 @@ private[config] class ConfigClient(
       await(uri).withQuery(Query("maxResults" → maxResults.toString, "from" → from.toString, "to" → to.toString))
 
     val request = HttpRequest(uri = _uri)
-    log.info("Sending HTTP request", Map("request" → request.toString()))
+    maskTokenAndLog(request)
     val response = await(Http().singleRequest(request))
 
     await(
@@ -262,7 +261,7 @@ private[config] class ConfigClient(
     def contentF = Unmarshal(response).to[ErrorResponse]
 
     def logAndThrow(e: RuntimeException) = {
-      log.error(e.getMessage, ex = e)
+      logger.error(e.getMessage, ex = e)
       throw e
     }
 
@@ -277,4 +276,9 @@ private[config] class ConfigClient(
     val handler = pf.orElse(defaultHandler)
     handler(response.status)
   }
+
+  private def bearerTokenHeader = tokenFactory.map(_.getToken).map(token ⇒ Authorization(OAuth2BearerToken(token)))
+
+  private def maskTokenAndLog(httpRequest: HttpRequest): Unit =
+    logger.info(msg = "Sending HTTP request", map = Map("request" → maskRequest(httpRequest).toString()))
 }

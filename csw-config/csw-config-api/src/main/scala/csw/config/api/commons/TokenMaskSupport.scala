@@ -1,11 +1,10 @@
-package csw.config.server.http
+package csw.config.api.commons
 import akka.http.scaladsl.model.HttpRequest
 import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
-import csw.config.server.commons.ConfigServerLogger
 import csw.logging.api.scaladsl.Logger
 
 trait TokenMaskSupport {
-  private val log: Logger      = ConfigServerLogger.getLogger
+  private[config] val logger: Logger
   private val maskedToken      = "**********"
   private val maskedAuthHeader = Authorization(OAuth2BearerToken(maskedToken))
 
@@ -16,7 +15,7 @@ trait TokenMaskSupport {
   }
 
   val logRequest: HttpRequest ⇒ Unit = req ⇒
-    log.info(
+    logger.info(
       "HTTP request received",
       Map(
         "url"     → req.uri.toString(),

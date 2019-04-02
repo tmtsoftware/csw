@@ -156,6 +156,7 @@ lazy val `csw-config` = project
 lazy val `csw-config-api` = project
   .in(file("csw-config/csw-config-api"))
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
+  .dependsOn(`csw-logging-api`)
   .settings(
     libraryDependencies ++= Dependencies.ConfigApi.value
   )
