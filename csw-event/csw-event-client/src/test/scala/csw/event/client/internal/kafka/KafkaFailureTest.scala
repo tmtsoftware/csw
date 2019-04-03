@@ -72,7 +72,8 @@ class KafkaFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     val testProbe   = TestProbe[PublishFailure]()(kafkaTestProps.typedActorSystem)
     val failedEvent = Utils.makeEvent(1)
 
-    val cancellable = kafkaTestProps.publisher.publishAsync(Future.successful(Some(failedEvent)), 20.millis, onError = testProbe.ref ! _)
+    val cancellable =
+      kafkaTestProps.publisher.publishAsync(Future.successful(Some(failedEvent)), 20.millis, onError = testProbe.ref ! _)
 
     val failure = testProbe.expectMessageType[PublishFailure]
 
@@ -139,7 +140,7 @@ class KafkaFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     val cancellable1 = kafkaTestProps.publisher.publishAsync(eventGenerator(), 20.millis, onError = testProbe.ref ! _)
     testProbe.expectNoMessage
 
-    val startTime = UTCTime(UTCTime.now().value.plusMillis(200))
+    val startTime    = UTCTime(UTCTime.now().value.plusMillis(200))
     val cancellable2 = kafkaTestProps.publisher.publishAsync(eventGenerator(), startTime, 20.millis, onError = testProbe.ref ! _)
     testProbe.expectNoMessage(500.millis)
     cancellable1.cancel()
