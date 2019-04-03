@@ -54,11 +54,11 @@ trait InstalledAppAuthAdapter {
   def getAccessTokenString(minValidity: FiniteDuration = 0.seconds): Option[String]
 
   /**
-   * Get [[AccessToken]] converted from raw access token string fetched from [[AuthStore]]
+   * Get [[csw.aas.core.token.AccessToken]] converted from raw access token string fetched from [[AuthStore]]
    *
    * @param minValidity ensure that returned access token is valid at-least for given duration.
    *                    Will refresh the token if required.
-   * @return access token converted into [[AccessToken]] model if raw access token string is present in [[AuthStore]]
+   * @return access token converted into [[csw.aas.core.token.AccessToken]] model if raw access token string is present in [[AuthStore]]
    */
   def getAccessToken(minValidity: FiniteDuration = 0.seconds): Option[AccessToken]
 

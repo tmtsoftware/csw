@@ -7,7 +7,7 @@ import csw.aas.installed.api.AuthStore
 import scala.language.implicitConversions
 
 /**
- * File based implementation for [[AuthStore]]
+ * File based implementation for [[csw.aas.installed.api.AuthStore]]
  * Stores access token, id token and refresh token in local file system inside provided directory
  */
 class FileAuthStore(storePath: Path) extends AuthStore {
