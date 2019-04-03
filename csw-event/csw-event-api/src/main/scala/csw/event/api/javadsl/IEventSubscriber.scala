@@ -60,7 +60,7 @@ trait IEventSubscriber {
    * and the subscription is stopped after logging appropriately. [[csw.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine
    * this state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
-   * Note that callbacks are not thread-safe on the JVM. If you need to do side effects/mutations, prefer using [[subscribeActorRef]] API.
+   * Note that callbacks are not thread-safe on the JVM. If you need to do side effects/mutations, prefer using `subscribeActorRef` API.
    *
    * @param eventKeys a set of [[csw.params.events.EventKey]] to subscribe to
    * @param callback a function to execute asynchronously on each received event
@@ -98,7 +98,7 @@ trait IEventSubscriber {
    * and the subscription is stopped after logging appropriately. [[csw.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine this
    * state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
-   * Note that callbacks are not thread-safe on the JVM. If you need to do side effects/mutations, prefer using [[subscribeActorRef]] API.
+   * Note that callbacks are not thread-safe on the JVM. If you need to do side effects/mutations, prefer using `subscribeActorRef` API.
    * Also note that any exception thrown from `callback` is expected to be handled by component developers.
    *
    * @param eventKeys a set of [[csw.params.events.EventKey]] to subscribe to
