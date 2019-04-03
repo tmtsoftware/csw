@@ -10,7 +10,7 @@ import scala.compat.java8.OptionConverters._
 
 // $COVERAGE-OFF$
 /**
- * Helper instance for Java to start [[csw.framework.deploy.containercmd.ContainerCmd]] app
+ * Helper instance for Java to start `ContainerCmd` app
  */
 object JContainerCmd {
 

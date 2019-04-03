@@ -4,7 +4,7 @@ import csw.framework.deploy.hostconfig.HostConfig
 
 // $COVERAGE-OFF$
 /**
- * Helper instance for Java to start [[csw.framework.deploy.hostconfig.HostConfig]] app
+ * Helper instance for Java to start `HostConfig` app
  */
 object JHostConfig {
 
