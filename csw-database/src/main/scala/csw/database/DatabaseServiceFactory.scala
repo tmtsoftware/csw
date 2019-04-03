@@ -37,7 +37,7 @@ private[database] object DatabaseServiceFactory {
 class DatabaseServiceFactory private[database] (actorSystem: ActorSystem[_], values: Map[String, String]) {
 
   /**
-   * Creates the DatabaseServiceFactory. It is not injected in [[csw.framework.models.CswContext]] like other csw services.
+   * Creates the DatabaseServiceFactory. It is not injected in `CswContext` like other csw services.
    * Instead developers are expected to create an instance of DatabaseServiceFactory and then use it.
    *
    * @param actorSystem component's actor system, used for
@@ -61,9 +61,9 @@ class DatabaseServiceFactory private[database] (actorSystem: ActorSystem[_], val
    *
    * @param locationService used to locate the database server
    * @param dbName used to connect to the database
-   * @return a Future that completes with Jooq's `DSLContext` or fails with [[csw.database.client.exceptions.DatabaseException]].
+   * @return a Future that completes with Jooq's `DSLContext` or fails with [[csw.database.exceptions.DatabaseException]].
    *         DSLContext provide methods like `fetchAsync`, `executeAsync`, `executeBatch`, etc. Moreover, see
-   *         [[csw.database.client.javadsl.JooqHelper]] for java and [[csw.database.client.scaladsl.JooqExtentions]] for
+   *         [[csw.database.javadsl.JooqHelper]] for java and [[csw.database.scaladsl.JooqExtentions]] for
    *         scala which provides wrapper methods on Jooq's `DSLContext`.
    */
   def makeDsl(locationService: LocationService, dbName: String): Future[DSLContext] =
@@ -77,9 +77,9 @@ class DatabaseServiceFactory private[database] (actorSystem: ActorSystem[_], val
    * @param dbName used to connect to the database
    * @param usernameHolder name of env variable from which the username will be read
    * @param passwordHolder name of env variable from which the password will be read
-   * @return a Future that completes with Jooq's `DSLContext` or fails with [[csw.database.client.exceptions.DatabaseException]].
+   * @return a Future that completes with Jooq's `DSLContext` or fails with [[csw.database.exceptions.DatabaseException]].
    *         DSLContext provide methods like `fetchAsync`, `executeAsync`, `executeBatch`, etc. Moreover, see
-   *         [[csw.database.client.javadsl.JooqHelper]] for java and [[csw.database.client.scaladsl.JooqExtentions]] for
+   *         [[csw.database.javadsl.JooqHelper]] for java and [[csw.database.scaladsl.JooqExtentions]] for
    *         scala which provides wrapper methods on Jooq's `DSLContext`.
    */
   def makeDsl(
@@ -109,9 +109,9 @@ class DatabaseServiceFactory private[database] (actorSystem: ActorSystem[_], val
    *
    * @param locationService used to locate the database server
    * @param dbName used to connect to the database
-   * @return a CompletableFuture that completes with Jooq's `DSLContext` or fails with [[csw.database.client.exceptions.DatabaseException]].
+   * @return a CompletableFuture that completes with Jooq's `DSLContext` or fails with [[csw.database.exceptions.DatabaseException]].
    *         DSLContext provide methods like `fetchAsync`, `executeAsync`, `executeBatch`, etc. Moreover, see
-   *         [[csw.database.client.javadsl.JooqHelper]] for java and [[csw.database.client.scaladsl.JooqExtentions]] for
+   *         [[csw.database.javadsl.JooqHelper]] for java and [[csw.database.scaladsl.JooqExtentions]] for
    *         scala which provides wrapper methods on Jooq's `DSLContext`.
    */
   def jMakeDsl(locationService: ILocationService, dbName: String): CompletableFuture[DSLContext] =
@@ -126,9 +126,9 @@ class DatabaseServiceFactory private[database] (actorSystem: ActorSystem[_], val
    * @param dbName used to connect to the database
    * @param usernameHolder name of env variable from which the username will be read
    * @param passwordHolder name of env variable from which the password will be read
-   * @return a CompletableFuture that completes with Jooq's `DSLContext` or fails with [[csw.database.client.exceptions.DatabaseException]].
+   * @return a CompletableFuture that completes with Jooq's `DSLContext` or fails with [[csw.database.exceptions.DatabaseException]].
    *         DSLContext provide methods like `fetchAsync`, `executeAsync`, `executeBatch`, etc. Moreover, see
-   *         [[csw.database.client.javadsl.JooqHelper]] for java and [[csw.database.client.scaladsl.JooqExtentions]] for
+   *         [[csw.database.javadsl.JooqHelper]] for java and [[csw.database.scaladsl.JooqExtentions]] for
    *         scala which provides wrapper methods on Jooq's `DSLContext`.
    */
   def jMakeDsl(
