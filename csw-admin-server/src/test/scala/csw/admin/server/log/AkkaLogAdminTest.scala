@@ -152,7 +152,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
   // DEOPSCSW-168: Actors can receive and handle runtime update for logging characteristics
   test("should able to set log level of the component dynamically through http end point") {
     laserComponent.supervisor ! Oneway(Setup(prefix, startLoggingCmd, None), probe.ref)
-    Thread.sleep(100)
+    Thread.sleep(500)
 
     // default logging level for Laser component is info
     val groupByComponentNamesLog = logBuffer.groupBy { json ⇒
