@@ -44,7 +44,7 @@ trait TimeServiceScheduler {
 
   /**
    * Schedules a task to execute periodically at the given interval. The task is executed once immediately without any initial delay followed by periodic executions.
-   * In case you do not want to start scheduling immediately, you can use the overloaded method for [[schedulePeriodically]] with startTime.
+   * In case you do not want to start scheduling immediately, you can use the overloaded method for `schedulePeriodically` with startTime.
    *
    * @param interval the time interval between the execution of tasks
    * @param task the task to execute at each interval
@@ -54,7 +54,7 @@ trait TimeServiceScheduler {
 
   /**
    * Schedules a task to execute periodically at the given interval. The task is executed once immediately without any initial delay.
-   * In case you do not want to start scheduling immediately, you can use the overloaded method for [[schedulePeriodically]] with startTime.
+   * In case you do not want to start scheduling immediately, you can use the overloaded method for `schedulePeriodically` with startTime.
    *
    * @param interval the time interval between the execution of tasks
    * @param task the task to execute at each interval
@@ -64,7 +64,7 @@ trait TimeServiceScheduler {
 
   /**
    * Sends message to the given actor periodically at the given interval. The first message is sent immediately without any initial delay.
-   * In case you do not want to start sending immediately, you can use the overloaded method for [[schedulePeriodically]] with startTime.
+   * In case you do not want to start sending immediately, you can use the overloaded method for `schedulePeriodically` with startTime.
    *
    * @param interval the time interval between messages sent to the actor
    * @param receiver the actorRef to notify at each interval

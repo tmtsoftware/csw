@@ -10,7 +10,7 @@ import play.api.libs.json._
 import scala.concurrent.duration.FiniteDuration
 
 /**
- * Represents an instantaneous point in time. Its a wrapper around [[java.time.Instant]] and provides nanosecond precision.
+ * Represents an instantaneous point in time. Its a wrapper around `java.time.Instant`and provides nanosecond precision.
  * Supports 2 timescales:
  * - [[UTCTime]] for Coordinated Universal Time (UTC) and
  * - [[TAITime]] for International Atomic Time (TAI)
@@ -45,9 +45,9 @@ object TMTTime {
 
 /**
  * Represents an instantaneous point in time in the UTC scale.
- * Does not contain zone information. To represent this instance in various zones, use [[csw.time.scheduler.TMTTimeHelper]].
+ * Does not contain zone information. To represent this instance in various zones, use [[csw.time.core.TMTTimeHelper]].
  *
- * @param value the underlying [[java.time.Instant]]
+ * @param value the underlying `java.time.Instant`
  */
 final case class UTCTime(value: Instant) extends TMTTime {
 
@@ -80,7 +80,7 @@ object UTCTime {
 /**
  * Represents an instantaneous point in International Atomic Time (TAI).
  *
- * @param value the underlying [[java.time.Instant]]
+ * @param value the underlying `java.time.Instant`
  */
 final case class TAITime(value: Instant) extends TMTTime {
 

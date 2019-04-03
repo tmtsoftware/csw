@@ -13,8 +13,8 @@ package csw.time
  *     val scheduler: TimeServiceScheduler = TimeServiceSchedulerFactory.make()(actorSystem)
  * }}}
  *
- * In addition to the Scheduler API, this module also provides a [[csw.time.scheduler.TMTTimeHelper]] API which provides additional time zone related functionality
- * on top of [[csw.time.core.models.TMTTime]]. It allows users to get a [[java.time.ZonedDateTime]] representation of a TMTTime.
+ * In addition to the Scheduler API, this module also provides a `csw.time.core.TMTTimeHelper` API which provides additional time zone related functionality
+ * on top of [[csw.time.core.models.TMTTime]]. It allows users to get a `java.time.ZonedDateTime` representation of a TMTTime.
  *
  * Following is a small sample showing how to access utilities from TMTTimeHelper.
  *
