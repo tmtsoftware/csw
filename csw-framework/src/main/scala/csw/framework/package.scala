@@ -14,10 +14,10 @@ package csw
  * that intercepts common messages (ex. Shutdown, Restart) or lifecycle messages (ex. GoOffline or GoOnline)
  * sent from external entities to determine the state of the component.
  *
- * Components that are not in the [[csw.command.client.messages.FromComponentLifecycleMessage.Running]] state, do not receive `CommandMessage`.
+ * Components that are not in the `Running` state, do not receive `CommandMessage`.
  *
  * When Component is created using this framework, it guarantees that component (HCD/Assembly) is registered with
- * LocationService only when Component moves to [[csw.command.client.messages.FromComponentLifecycleMessage.Running]] state.
+ * LocationService only when Component moves to `Running` state.
  * That means, one component can resolve other component only when its in ``Running`` state and ready to accept `CommandMessage`.
  *
  * === Important Actors in Framework ===

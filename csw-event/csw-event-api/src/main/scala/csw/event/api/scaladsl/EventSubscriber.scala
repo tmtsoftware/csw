@@ -22,7 +22,7 @@ trait EventSubscriber {
    * and the stream is stopped after logging appropriately. In all other cases of exception, as per the default behavior, the stream will stop.
    * To avoid that, user should provide a resuming materializer while running the stream.
    *
-   *@note All the other APIs of [[EventSubscriber]] that do not return a [[akka.stream.scaladsl.Source]],
+   *@note All the other APIs of [[csw.event.api.scaladsl.EventSubscriber]] that do not return a [[akka.stream.scaladsl.Source]],
    *       internally use the resuming materializer which will ignore the failed event and resume receiving further events.
    * @param eventKeys a set of [[csw.params.events.EventKey]] to subscribe to
    * @return a [[akka.stream.scaladsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides
@@ -39,7 +39,7 @@ trait EventSubscriber {
    * and the stream is stopped after logging appropriately. In all other cases of exception, as per the default behavior, the stream will stop.
    * To avoid that, user should provide a resuming materializer while running the stream.
    *
-   * @note All the other APIs of [[EventSubscriber]] that do not return a [[akka.stream.scaladsl.Source]],
+   * @note All the other APIs of [[csw.event.api.scaladsl.EventSubscriber]] that do not return a [[akka.stream.scaladsl.Source]],
    *       internally use the resuming materializer which will ignore the failed event and resume receiving further events.
    * @param eventKeys a set of [[csw.params.events.EventKey]] to subscribe to
    * @param every the duration which determines the frequency with which events are received
