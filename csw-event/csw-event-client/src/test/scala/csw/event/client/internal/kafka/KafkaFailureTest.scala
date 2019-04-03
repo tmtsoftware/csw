@@ -58,12 +58,13 @@ class KafkaFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     val testProbe   = TestProbe[PublishFailure]()(kafkaTestProps.typedActorSystem)
     val failedEvent = Utils.makeEvent(1)
 
-    kafkaTestProps.publisher.publish(Some(failedEvent), 20.millis, onError = testProbe.ref ! _)
+    val cancellable = kafkaTestProps.publisher.publish(Some(failedEvent), 20.millis, onError = testProbe.ref ! _)
 
     val failure = testProbe.expectMessageType[PublishFailure]
 
     failure.event shouldBe failedEvent
     failure.getCause shouldBe a[RecordTooLargeException]
+    cancellable.cancel()
   }
 
   //DEOPSCSW-000: Publish events with block generating futre of event
@@ -71,12 +72,13 @@ class KafkaFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     val testProbe   = TestProbe[PublishFailure]()(kafkaTestProps.typedActorSystem)
     val failedEvent = Utils.makeEvent(1)
 
-    kafkaTestProps.publisher.publishAsync(Future.successful(Some(failedEvent)), 20.millis, onError = testProbe.ref ! _)
+    val cancellable = kafkaTestProps.publisher.publishAsync(Future.successful(Some(failedEvent)), 20.millis, onError = testProbe.ref ! _)
 
     val failure = testProbe.expectMessageType[PublishFailure]
 
     failure.event shouldBe failedEvent
     failure.getCause shouldBe a[RecordTooLargeException]
+    cancellable.cancel()
   }
 
   //DEOPSCSW-515: Include Start Time in API
@@ -88,12 +90,13 @@ class KafkaFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
 
     val startTime = UTCTime(UTCTime.now().value.plusMillis(500))
 
-    kafkaTestProps.publisher.publish(eventGenerator(), startTime, 20.millis, onError = testProbe.ref ! _)
+    val cancellable = kafkaTestProps.publisher.publish(eventGenerator(), startTime, 20.millis, onError = testProbe.ref ! _)
 
     val failure = testProbe.expectMessageType[PublishFailure]
 
     failure.event shouldBe failedEvent
     failure.getCause shouldBe a[RecordTooLargeException]
+    cancellable.cancel()
   }
 
   //DEOPSCSW-515: Include Start Time in API
@@ -105,24 +108,26 @@ class KafkaFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
 
     val startTime = UTCTime(UTCTime.now().value.plusMillis(500))
 
-    kafkaTestProps.publisher.publishAsync(eventGenerator(), startTime, 20.millis, onError = testProbe.ref ! _)
+    val cancellable = kafkaTestProps.publisher.publishAsync(eventGenerator(), startTime, 20.millis, onError = testProbe.ref ! _)
 
     val failure = testProbe.expectMessageType[PublishFailure]
 
     failure.event shouldBe failedEvent
     failure.getCause shouldBe a[RecordTooLargeException]
+    cancellable.cancel()
   }
 
   //DEOPSCSW-516: Optionally Publish - API Change
   test("should not invoke onError on opting to not publish event with eventGenerator") {
     val testProbe = TestProbe[PublishFailure]()(kafkaTestProps.typedActorSystem)
 
-    kafkaTestProps.publisher.publish(None, 20.millis, onError = testProbe.ref ! _)
+    val cancellable = kafkaTestProps.publisher.publish(None, 20.millis, onError = testProbe.ref ! _)
     testProbe.expectNoMessage
 
     val startTime = UTCTime(UTCTime.now().value.plusMillis(200))
     kafkaTestProps.publisher.publish(None, startTime, 20.millis, onError = testProbe.ref ! _)
     testProbe.expectNoMessage(500.millis)
+    cancellable.cancel()
   }
 
   //DEOPSCSW-516: Optionally Publish - API Change
@@ -131,12 +136,14 @@ class KafkaFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
 
     def eventGenerator(): Future[Option[Event]] = Future.successful(None)
 
-    kafkaTestProps.publisher.publishAsync(eventGenerator(), 20.millis, onError = testProbe.ref ! _)
+    val cancellable1 = kafkaTestProps.publisher.publishAsync(eventGenerator(), 20.millis, onError = testProbe.ref ! _)
     testProbe.expectNoMessage
 
     val startTime = UTCTime(UTCTime.now().value.plusMillis(200))
-    kafkaTestProps.publisher.publishAsync(eventGenerator(), startTime, 20.millis, onError = testProbe.ref ! _)
+    val cancellable2 = kafkaTestProps.publisher.publishAsync(eventGenerator(), startTime, 20.millis, onError = testProbe.ref ! _)
     testProbe.expectNoMessage(500.millis)
+    cancellable1.cancel()
+    cancellable2.cancel()
   }
 
 }

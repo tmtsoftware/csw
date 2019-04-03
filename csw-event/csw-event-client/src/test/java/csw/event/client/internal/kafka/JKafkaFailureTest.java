@@ -1,5 +1,6 @@
 package csw.event.client.internal.kafka;
 
+import akka.actor.Cancellable;
 import akka.actor.testkit.typed.javadsl.TestProbe;
 import akka.actor.typed.javadsl.Adapter;
 import akka.stream.javadsl.Source;
@@ -78,11 +79,12 @@ public class JKafkaFailureTest extends JUnitSuite {
         TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.actorSystem()));
         Event event = Utils.makeEvent(1);
 
-        publisher.publish(() -> Optional.ofNullable(event), Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
+        Cancellable cancellable = publisher.publish(() -> Optional.ofNullable(event), Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
 
         PublishFailure failure = testProbe.expectMessageClass(PublishFailure.class);
         Assert.assertEquals(failure.event(), event);
         Assert.assertEquals(failure.getCause().getClass(), RecordTooLargeException.class);
+        cancellable.cancel();
     }
 
     //DEOPSCSW-000: Publish events with block generating futre of event
@@ -91,11 +93,12 @@ public class JKafkaFailureTest extends JUnitSuite {
         TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.actorSystem()));
         Event event = Utils.makeEvent(1);
 
-        publisher.publishAsync(() -> CompletableFuture.completedFuture(Optional.ofNullable(event)), Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
+        Cancellable cancellable = publisher.publishAsync(() -> CompletableFuture.completedFuture(Optional.ofNullable(event)), Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
 
         PublishFailure failure = testProbe.expectMessageClass(PublishFailure.class);
         Assert.assertEquals(failure.event(), event);
         Assert.assertEquals(failure.getCause().getClass(), RecordTooLargeException.class);
+        cancellable.cancel();
     }
 
     //DEOPSCSW-515: Include Start Time in API
@@ -106,11 +109,12 @@ public class JKafkaFailureTest extends JUnitSuite {
 
         TMTTime startTime = new UTCTime(UTCTime.now().value().plusMillis(500));
 
-        publisher.publish(() -> Optional.ofNullable(event),startTime, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
+        Cancellable cancellable = publisher.publish(() -> Optional.ofNullable(event), startTime, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
 
         PublishFailure failure = testProbe.expectMessageClass(PublishFailure.class);
         Assert.assertEquals(failure.event(), event);
         Assert.assertEquals(failure.getCause().getClass(), RecordTooLargeException.class);
+        cancellable.cancel();
     }
 
     //DEOPSCSW-515: Include Start Time in API
@@ -121,11 +125,12 @@ public class JKafkaFailureTest extends JUnitSuite {
 
         TMTTime startTime = new UTCTime(UTCTime.now().value().plusMillis(500));
 
-        publisher.publishAsync(() -> CompletableFuture.completedFuture(Optional.ofNullable(event)), startTime, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
+        Cancellable cancellable = publisher.publishAsync(() -> CompletableFuture.completedFuture(Optional.ofNullable(event)), startTime, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
 
         PublishFailure failure = testProbe.expectMessageClass(PublishFailure.class);
         Assert.assertEquals(failure.event(), event);
         Assert.assertEquals(failure.getCause().getClass(), RecordTooLargeException.class);
+        cancellable.cancel();
     }
 
     //DEOPSCSW-516: Optionally Publish - API Change
@@ -133,12 +138,13 @@ public class JKafkaFailureTest extends JUnitSuite {
     public void shouldNotInvokeOnErrorOnOptingToNotPublishEventWithEventGenerator() {
         TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.actorSystem()));
 
-        publisher.publish(Optional::empty, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
+        Cancellable cancellable = publisher.publish(Optional::empty, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
         testProbe.expectNoMessage();
 
         TMTTime startTime = new UTCTime(UTCTime.now().value().plusMillis(200));
         publisher.publish(Optional::empty, startTime, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
         testProbe.expectNoMessage(Duration.of(500, ChronoUnit.MILLIS));
+        cancellable.cancel();
     }
 
     //DEOPSCSW-516: Optionally Publish - API Change
@@ -147,12 +153,14 @@ public class JKafkaFailureTest extends JUnitSuite {
         TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.actorSystem()));
         Supplier<CompletableFuture<Optional<Event>>> eventGenerator = () -> CompletableFuture.completedFuture(Optional.empty());
 
-        publisher.publishAsync(eventGenerator, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
+        Cancellable cancellable1 = publisher.publishAsync(eventGenerator, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
         testProbe.expectNoMessage();
 
         TMTTime startTime = new UTCTime(UTCTime.now().value().plusMillis(200));
-        publisher.publishAsync(eventGenerator, startTime, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
+        Cancellable cancellable2 = publisher.publishAsync(eventGenerator, startTime, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
         testProbe.expectNoMessage(Duration.of(500, ChronoUnit.MILLIS));
+        cancellable1.cancel();
+        cancellable2.cancel();
     }
 
 }
