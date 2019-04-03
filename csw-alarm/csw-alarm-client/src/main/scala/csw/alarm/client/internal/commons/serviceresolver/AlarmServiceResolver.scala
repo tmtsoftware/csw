@@ -7,6 +7,6 @@ import scala.concurrent.Future
 /**
  * Base trait for implementations providing connection information for Alarm Service
  */
-trait AlarmServiceResolver {
+private[client] trait AlarmServiceResolver {
   def uri(): Future[URI]
 }

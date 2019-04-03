@@ -4,7 +4,7 @@ import com.typesafe.config.Config
 import scala.compat.java8.DurationConverters.DurationOps
 import scala.concurrent.duration.FiniteDuration
 
-class Settings(config: Config) {
+private[alarm] class Settings(config: Config) {
 
   private val alarmConfig = config.getConfig("csw-alarm")
 

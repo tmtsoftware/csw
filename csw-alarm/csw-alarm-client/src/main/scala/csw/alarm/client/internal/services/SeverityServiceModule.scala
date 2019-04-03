@@ -21,7 +21,7 @@ import romaine.extensions.SourceExtensions.RichSource
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
 
-trait SeverityServiceModule extends SeverityService {
+private[client] trait SeverityServiceModule extends SeverityService {
   self: MetadataService with StatusService ⇒
 
   val redisConnectionsFactory: RedisConnectionsFactory

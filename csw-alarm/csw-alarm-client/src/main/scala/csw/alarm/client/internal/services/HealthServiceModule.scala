@@ -13,7 +13,7 @@ import romaine.extensions.SourceExtensions.RichSource
 
 import scala.concurrent.Future
 
-trait HealthServiceModule extends HealthService {
+private[client] trait HealthServiceModule extends HealthService {
   self: SeverityService ⇒
 
   val redisConnectionsFactory: RedisConnectionsFactory

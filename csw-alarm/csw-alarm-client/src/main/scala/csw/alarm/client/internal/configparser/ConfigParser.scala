@@ -9,7 +9,7 @@ import play.api.libs.json.{Format, JsValue, Json}
 /**
  * Parses the information represented in configuration files into respective models
  */
-object ConfigParser extends AlarmJsonSupport {
+private[client] object ConfigParser extends AlarmJsonSupport {
   val ALARMS_SCHEMA: Config = ConfigFactory.parseResources("alarms-schema.conf")
 
   def parseAlarmMetadataSet(config: Config): AlarmMetadataSet = parse[AlarmMetadataSet](config)

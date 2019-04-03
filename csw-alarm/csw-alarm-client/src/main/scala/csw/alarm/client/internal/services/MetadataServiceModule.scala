@@ -15,7 +15,7 @@ import romaine.RedisResult
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
 
-trait MetadataServiceModule extends MetadataService {
+private[client] trait MetadataServiceModule extends MetadataService {
   self: StatusService ⇒
 
   val redisConnectionsFactory: RedisConnectionsFactory

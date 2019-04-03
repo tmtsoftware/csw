@@ -18,7 +18,7 @@ import scala.collection.JavaConverters.{asScalaIteratorConverter, iterableAsScal
 /**
  * Uses json-schema to validate the Config File
  */
-object ConfigValidator {
+private[client] object ConfigValidator {
   private val loadingCfg        = LoadingConfiguration.newBuilder.addScheme("config", ConfigDownloader).freeze
   private val jsonSchemaFactory = JsonSchemaFactory.newBuilder.setLoadingConfiguration(loadingCfg).freeze
 

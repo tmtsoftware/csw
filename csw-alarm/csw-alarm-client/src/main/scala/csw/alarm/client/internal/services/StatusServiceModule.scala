@@ -23,7 +23,7 @@ import scala.async.Async.{async, await}
 import scala.compat.java8.DurationConverters.DurationOps
 import scala.concurrent.Future
 
-trait StatusServiceModule extends StatusService {
+private[client] trait StatusServiceModule extends StatusService {
   self: SeverityService with MetadataService ⇒
 
   implicit val actorSystem: ActorSystem

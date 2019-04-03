@@ -8,7 +8,7 @@ import csw.alarm.client.internal.services._
 
 import scala.concurrent.ExecutionContext
 
-class AlarmServiceImpl(
+private[alarm] class AlarmServiceImpl(
     override val redisConnectionsFactory: RedisConnectionsFactory,
     override val settings: Settings
 )(

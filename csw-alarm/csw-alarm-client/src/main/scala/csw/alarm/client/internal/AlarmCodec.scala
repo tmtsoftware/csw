@@ -6,7 +6,7 @@ import csw.time.core.models.UTCTime
 import play.api.libs.json.{Format, Json}
 import romaine.codec.RomaineStringCodec
 
-object AlarmCodec extends AlarmJsonSupport {
+private[client] object AlarmCodec extends AlarmJsonSupport {
   def viaJsonCodec[A: Format]: RomaineStringCodec[A] = RomaineStringCodec.codec(
     x => Json.toJson(x).toString(),
     x => Json.parse(x).as[A]

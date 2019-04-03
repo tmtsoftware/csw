@@ -12,7 +12,8 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
  * Provides the connection information of `Alarm Service` by resolving the location through `Location Service`
  */
-class AlarmServiceLocationResolver(locationService: LocationService)(implicit ec: ExecutionContext) extends AlarmServiceResolver {
+private[client] class AlarmServiceLocationResolver(locationService: LocationService)(implicit ec: ExecutionContext)
+    extends AlarmServiceResolver {
 
   def uri(): Future[URI] = async {
     val location = await(locationService.resolve(AlarmServiceConnection.value, 5.seconds)).getOrElse(

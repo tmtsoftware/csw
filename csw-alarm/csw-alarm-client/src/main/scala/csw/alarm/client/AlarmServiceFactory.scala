@@ -31,11 +31,11 @@ class AlarmServiceFactory(redisClient: RedisClient = RedisClient.create()) {
   def this() = this(RedisClient.create())
 
   /**
-   * Creates [[AlarmAdminService]] instance for admin users using [[LocationService]]
+   * Creates [[csw.alarm.api.scaladsl.AlarmAdminService]] instance for admin users using [[csw.location.api.scaladsl.LocationService]]
    *
    * @param locationService instance which will be used to resolve the location of alarm server
    * @param system an actor system required for underlying actors
-   * @return an instance of [[AlarmAdminService]]
+   * @return an instance of [[csw.alarm.api.scaladsl.AlarmAdminService]]
    */
   def makeAdminApi(locationService: LocationService)(implicit system: ActorSystem): AlarmAdminService = {
     implicit val ec: ExecutionContext = system.dispatcher
@@ -43,12 +43,12 @@ class AlarmServiceFactory(redisClient: RedisClient = RedisClient.create()) {
   }
 
   /**
-   * Creates [[AlarmAdminService]] instance for admin users using host port of alarm server
+   * Creates [[csw.alarm.api.scaladsl.AlarmAdminService]] instance for admin users using host port of alarm server
    *
    * @param host of the alarm server
    * @param port on which alarm server is running
    * @param system an actor system required for underlying actors
-   * @return an instance of [[AlarmAdminService]]
+   * @return an instance of [[csw.alarm.api.scaladsl.AlarmAdminService]]
    */
   def makeAdminApi(host: String, port: Int)(implicit system: ActorSystem): AlarmAdminService = {
     implicit val ec: ExecutionContext = system.dispatcher
@@ -56,42 +56,42 @@ class AlarmServiceFactory(redisClient: RedisClient = RedisClient.create()) {
   }
 
   /**
-   * Creates [[AlarmService]] instance for non admin users using [[LocationService]]
+   * Creates [[csw.alarm.api.scaladsl.AlarmService]] instance for non admin users using [[csw.location.api.scaladsl.LocationService]]
    *
    * @param locationService instance which will be used to resolve the location of alarm server
    * @param system an actor system required for underlying actors
-   * @return an instance of [[AlarmService]]
+   * @return an instance of [[csw.alarm.api.scaladsl.AlarmService]]
    */
   def makeClientApi(locationService: LocationService)(implicit system: ActorSystem): AlarmService =
     makeAdminApi(locationService)
 
   /**
-   * Creates [[AlarmService]] instance for non admin users using host and port of alarm server
+   * Creates [[csw.alarm.api.scaladsl.AlarmService]] instance for non admin users using host and port of alarm server
    *
    * @param host of the alarm server
    * @param port on which alarm server is running
    * @param system an actor system required for underlying actors
-   * @return an instance of [[AlarmService]]
+   * @return an instance of [[csw.alarm.api.scaladsl.AlarmService]]
    */
   def makeClientApi(host: String, port: Int)(implicit system: ActorSystem): AlarmService = makeAdminApi(host, port)
 
   /**
-   * Creates [[IAlarmService]] instance for non admin users using [[ILocationService]]
+   * Creates [[csw.alarm.api.javadsl.IAlarmService]] instance for non admin users using [[csw.location.api.javadsl.ILocationService]]
    *
    * @param locationService instance which will be used to resolve the location of alarm server
    * @param system an actor system required for underlying actors
-   * @return an instance of [[IAlarmService]]
+   * @return an instance of [[csw.alarm.api.javadsl.IAlarmService]]
    */
   def jMakeClientApi(locationService: ILocationService, system: ActorSystem): IAlarmService =
     new JAlarmServiceImpl(makeAdminApi(locationService.asScala)(system))
 
   /**
-   * Creates [[IAlarmService]] instance for non admin users using host and port of alarm server
+   * Creates [[csw.alarm.api.javadsl.IAlarmService]] instance for non admin users using host and port of alarm server
    *
    * @param host of the alarm server
    * @param port on which alarm server is running
    * @param system an actor system required for underlying actors
-   * @return an instance of [[IAlarmService]]
+   * @return an instance of [[csw.alarm.api.javadsl.IAlarmService]]
    */
   def jMakeClientApi(host: String, port: Int, system: ActorSystem): IAlarmService =
     new JAlarmServiceImpl(makeAdminApi(host, port)(system))

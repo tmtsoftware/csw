@@ -13,7 +13,9 @@ import romaine.reactive.RedisSubscriptionApi
 
 import scala.concurrent.ExecutionContext
 
-class RedisConnectionsFactory(alarmServiceResolver: AlarmServiceResolver, masterId: String, romaineFactory: RomaineFactory)(
+private[client] class RedisConnectionsFactory(alarmServiceResolver: AlarmServiceResolver,
+                                              masterId: String,
+                                              romaineFactory: RomaineFactory)(
     implicit val ec: ExecutionContext
 ) {
   import csw.alarm.client.internal.AlarmCodec._
