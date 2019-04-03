@@ -29,7 +29,7 @@ class CommandResponseManager private[csw] (
   /**
    * Add a new command or update an existing command with the provided status
    *
-   * @param cmdStatus status of command as [[csw.params.commands.CommandResponse]]
+   * @param cmdStatus status of command as [[csw.params.commands.CommandResponse.SubmitResponse]]
    */
   def addOrUpdateCommand(cmdStatus: SubmitResponse): Unit =
     commandResponseManagerActor ! AddOrUpdateCommand(cmdStatus)
@@ -46,7 +46,7 @@ class CommandResponseManager private[csw] (
   /**
    * Update the status of a sub-command which will infer the status of the parent command
    *
-   * @param cmdStatus status of command as [[csw.params.commands.CommandResponse]]
+   * @param cmdStatus status of command as [[csw.params.commands.CommandResponse.SubmitResponse]]
    */
   def updateSubCommand(cmdStatus: SubmitResponse): Unit =
     commandResponseManagerActor ! UpdateSubCommand(cmdStatus)

@@ -33,7 +33,7 @@ trait ICommandService {
   def submit(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[SubmitResponse]
 
   /**
-   * Submit multiple commands and get a Source of [[csw.params.commands.CommandResponse]] for all commands. The CommandResponse can be a response
+   * Submit multiple commands and get a Source of [[csw.params.commands.CommandResponse.SubmitResponse]] for all commands. The CommandResponse can be a response
    * of validation (Accepted, Invalid) or a final Response. In case of response as `Accepted`, final CommandResponse can be obtained by using `subscribe` API.
    *
    * @param submitCommands the set of [[csw.params.commands.ControlCommand]] payloads
@@ -45,7 +45,7 @@ trait ICommandService {
   ): CompletableFuture[java.util.List[SubmitResponse]]
 
   /**
-   * Send a command as a Oneway and get a [[csw.params.commands.CommandResponse]] as a Future. The CommandResponse can be a response
+   * Send a command as a Oneway and get a [[csw.params.commands.CommandResponse.OnewayResponse]] as a Future. The CommandResponse can be a response
    * of validation (Accepted, Invalid) or a final Response.
    *
    * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
@@ -54,7 +54,7 @@ trait ICommandService {
   def oneway(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[OnewayResponse]
 
   /**
-   * Submit a command and match the published state from the component using a [[StateMatcher]].
+   * Submit a command and match the published state from the component using a [[csw.command.api.StateMatcher]].
    * If the match is successful a `Completed` response is
    * provided as a future. In case of a failure or unmatched state, `Error` CommandResponse is provided as a Future.
    *
@@ -69,7 +69,7 @@ trait ICommandService {
   ): CompletableFuture[MatchingResponse]
 
   /**
-   * Query for the result of a long running command which was sent as Submit to get a [[csw.params.commands.CommandResponse]] as a Future
+   * Query for the result of a long running command which was sent as Submit to get a [[csw.params.commands.CommandResponse.QueryResponse]] as a Future
    *
    * @param commandRunId the runId of the command for which response is required
    * @return a CommandResponse as a Future value
@@ -77,7 +77,7 @@ trait ICommandService {
   def query(commandRunId: Id, timeout: Timeout): CompletableFuture[QueryResponse]
 
   /**
-   * Query for the final result of a long running command which was sent as Submit to get a [[csw.params.commands.CommandResponse]] as a Future
+   * Query for the final result of a long running command which was sent as Submit to get a [[csw.params.commands.CommandResponse.SubmitResponse]] as a Future
    *
    * @param commandRunId the runId of the command for which response is required
    * @return a CommandResponse as a Future value
