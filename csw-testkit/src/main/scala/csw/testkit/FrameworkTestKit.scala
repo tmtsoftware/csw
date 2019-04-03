@@ -17,7 +17,7 @@ import scala.annotation.varargs
 import scala.concurrent.ExecutionContext
 
 /**
- * FrameworkTestKit supports starting one or more services from [[CSWService]]
+ * FrameworkTestKit supports starting one or more services from [[csw.testkit.scaladsl.CSWService]]
  * It also provides helpers to spawn components in standalone or container mode
  *
  * Example:

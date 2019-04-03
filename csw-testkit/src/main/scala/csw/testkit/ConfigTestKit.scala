@@ -63,7 +63,7 @@ final class ConfigTestKit private (system: ActorSystem, serverConfig: Option[Con
    *
    * If your test's requires accessing/creating configurations from configuration service, then using this method you can start configuration service.
    * Configuration service can be accessed via [[csw.config.api.scaladsl.ConfigClientService]] or [[csw.config.api.scaladsl.ConfigService]]
-   * which can be created via [[csw.config.client.scaladsl.ConfigClientFactory]]
+   * which can be created via `ConfigClientFactory`
    *
    */
   def startConfigServer(): Unit = {

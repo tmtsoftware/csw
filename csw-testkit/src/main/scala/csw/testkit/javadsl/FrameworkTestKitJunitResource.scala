@@ -44,13 +44,13 @@ final class FrameworkTestKitJunitResource(val frameworkTestKit: FrameworkTestKit
   /** Initialize testkit with default configuration
    *
    * By default only Location server gets started, if your tests requires other services [ex. Config, Event, Alarm etc.] along with location,
-   * then use other override which accepts sequence of [[CSWService]] to create instance of testkit
+   * then use other override which accepts sequence of [[csw.testkit.scaladsl.CSWService]] to create instance of testkit
    * */
   def this() = this(FrameworkTestKit(), Collections.emptyList())
 
   /** Initialize testkit and start all the provided services.
    *
-   * @note Refer [[CSWService]] for supported services
+   * @note Refer [[csw.testkit.scaladsl.CSWService]] for supported services
    * */
   def this(services: java.util.List[CSWService]) = this(FrameworkTestKit(), services)
 
