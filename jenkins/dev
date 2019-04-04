@@ -26,7 +26,7 @@ pipeline {
         stage('Unit and Component Tests') {
             steps {
                 // Run all tests except csw-time tests
-                sh "sbt -DenableCoverage=true test:test -DdisableTimeTests"
+                sh "sbt -DenableCoverage=true -DdisableTimeTests test:test"
 
                 // Run csw-time module tests
                 sh "sbt -DenableCoverage=true csw-time/test:test"

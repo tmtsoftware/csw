@@ -404,7 +404,7 @@ lazy val `csw-time` = project
     `csw-time-scheduler`
   )
   .settings(
-    aggregate in test := sys.props.get("disableTimeTests").isEmpty
+    aggregate in test := !sys.props.contains("disableTimeTests")
   )
 
 
