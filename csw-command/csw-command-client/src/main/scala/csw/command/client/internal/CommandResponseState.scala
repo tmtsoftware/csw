@@ -1,5 +1,6 @@
 package csw.command.client.internal
 import com.github.benmanes.caffeine.cache.{Cache, Caffeine}
+import csw.command.client.CRMCacheProperties
 import csw.params.commands.CommandResponse.{CommandNotAvailable, QueryResponse, SubmitResponse}
 import csw.params.core.models.Id
 

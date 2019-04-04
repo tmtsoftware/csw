@@ -1,8 +1,8 @@
-package csw.command.client.internal
+package csw.command.client
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
-import csw.command.client.Store
+import csw.command.client.internal.{CommandCorrelation, CommandResponseState, CommandSubscribersState}
 import csw.command.client.messages.CommandResponseManagerMessage
 import csw.command.client.messages.CommandResponseManagerMessage._
 import csw.logging.api.scaladsl.Logger

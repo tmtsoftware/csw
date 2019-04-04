@@ -19,7 +19,7 @@ import scala.concurrent.{ExecutionContext, Future}
  *
  * @param actorSystem actor system for managing stream resources inside
  */
-class CommandResponseManager private[csw] (
+class CommandResponseManager(
     private[csw] val commandResponseManagerActor: ActorRef[CommandResponseManagerMessage]
 )(implicit val actorSystem: ActorSystem) {
 

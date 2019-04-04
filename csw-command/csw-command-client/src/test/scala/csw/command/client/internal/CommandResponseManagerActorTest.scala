@@ -8,7 +8,7 @@ import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.{typed, ActorSystem}
-import csw.command.client.internal
+import csw.command.client.{internal, CRMCacheProperties, CommandResponseManagerActor}
 import csw.command.client.messages.CommandResponseManagerMessage
 import csw.command.client.messages.CommandResponseManagerMessage._
 import csw.logging.api.scaladsl.Logger

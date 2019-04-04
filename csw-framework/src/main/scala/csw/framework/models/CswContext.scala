@@ -2,8 +2,7 @@ package csw.framework.models
 import akka.actor.ActorSystem
 import csw.alarm.api.scaladsl.AlarmService
 import csw.alarm.client.AlarmServiceFactory
-import csw.command.client.CommandResponseManager
-import csw.command.client.internal.{CRMCacheProperties, CommandResponseManagerActor}
+import csw.command.client.{CRMCacheProperties, CommandResponseManager, CommandResponseManagerActor}
 import csw.command.client.models.framework.ComponentInfo
 import csw.config.api.scaladsl.ConfigClientService
 import csw.config.client.scaladsl.ConfigClientFactory
