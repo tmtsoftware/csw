@@ -38,7 +38,7 @@ import csw.params.core.models.Id
  * @param crmCacheProperties Cache properties for CommandResponseState, for eg. expiry-time
  * @param loggerFactory The factory for creating [[csw.logging.api.scaladsl.Logger]] instance
  */
-private[csw] class CommandResponseManagerActor(crmCacheProperties: CRMCacheProperties, loggerFactory: LoggerFactory) {
+class CommandResponseManagerActor(crmCacheProperties: CRMCacheProperties, loggerFactory: LoggerFactory) {
 
   val behavior: Behavior[CommandResponseManagerMessage] = Behaviors.setup { ctx ⇒
     val log: Logger = loggerFactory.getLogger(ctx)
