@@ -25,8 +25,8 @@ pipeline {
         // Component tests cover the scenario of multiple components in single container
         stage('Unit and Component Tests') {
             steps {
-                // Run all tests except tests having TimeTests tag
-                sh "sbt -DenableCoverage=true \"test:testOnly * -- -l csw.time.core.tags.TimeTests\" "
+                // Run all tests except csw-time tests
+                sh "sbt -DenableCoverage=true test:test -DdisableTimeTests"
 
                 // Run csw-time module tests
                 sh "sbt -DenableCoverage=true csw-time/test:test"
