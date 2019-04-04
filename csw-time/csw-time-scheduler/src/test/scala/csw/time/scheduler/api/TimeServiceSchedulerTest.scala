@@ -7,16 +7,14 @@ import akka.actor.ActorSystem
 import akka.actor.testkit.typed.scaladsl.{ManualTime, ScalaTestWithActorTestKit}
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.testkit.TestProbe
-import csw.time.scheduler.TimeServiceSchedulerFactory
 import csw.time.clock.natives.models.TMTClock
 import csw.time.core.models.{TAITime, UTCTime}
-import csw.time.core.tags.TimeTests
+import csw.time.scheduler.TimeServiceSchedulerFactory
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.duration.DurationInt
 
-@TimeTests
 class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.config) with FunSuiteLike with BeforeAndAfterAll {
 
   private implicit val untypedSystem: ActorSystem = system.toUntyped

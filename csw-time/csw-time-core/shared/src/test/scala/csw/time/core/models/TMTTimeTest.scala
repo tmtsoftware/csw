@@ -3,13 +3,11 @@ package csw.time.core.models
 import java.time.{Duration, Instant}
 
 import csw.time.clock.natives.models.TMTClock
-import csw.time.core.tags.TimeTests
 import org.scalatest.Matchers._
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
 import scala.concurrent.duration.DurationDouble
 
-@TimeTests
 class TMTTimeTest extends FunSuite with BeforeAndAfterAll {
   private val TaiOffset = 37
   private val jitter    = 10
