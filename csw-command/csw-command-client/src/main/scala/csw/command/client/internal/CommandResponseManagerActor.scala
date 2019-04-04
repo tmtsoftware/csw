@@ -35,113 +35,117 @@ import csw.params.core.models.Id
  * from two HCD's when these sub commands completes, using subscribe API. And once Assembly receives final command response
  * from both the HCD's then it can update Top level command with final [[csw.params.commands.CommandResponse]]
  *
- * @param crmCacheProperties Cache properties for CommandResponseState, for eg. expiry-time
- * @param loggerFactory The factory for creating [[csw.logging.api.scaladsl.Logger]] instance
  */
-class CommandResponseManagerActor(crmCacheProperties: CRMCacheProperties, loggerFactory: LoggerFactory) {
+object CommandResponseManagerActor {
 
-  val behavior: Behavior[CommandResponseManagerMessage] = Behaviors.setup { ctx ⇒
-    val log: Logger = loggerFactory.getLogger(ctx)
+  /**
+   * @param crmCacheProperties Cache properties for CommandResponseState, for eg. expiry-time
+   * @param loggerFactory The factory for creating [[csw.logging.api.scaladsl.Logger]] instance
+   * @return behavior for CommandResponseManagerActor
+   */
+  def behavior(crmCacheProperties: CRMCacheProperties, loggerFactory: LoggerFactory): Behavior[CommandResponseManagerMessage] =
+    Behaviors.setup { ctx ⇒
+      val log: Logger = loggerFactory.getLogger(ctx)
 
-    val commandResponseState: CommandResponseState = new CommandResponseState(crmCacheProperties)
-    var commandCoRelation: CommandCorrelation      = CommandCorrelation(Map.empty, Map.empty)
-    // components coming via queryFinal api will be removed from `commandSubscribers` after timeout
-    var commandSubscribers: Store[Id, ActorRef[SubmitResponse]] = Store(Map.empty)
-    // components coming via query api will be removed from `querySubscribers` after timeout
-    var querySubscribers: Store[Id, ActorRef[QueryResponse]] = Store(Map.empty)
+      val commandResponseState: CommandResponseState = new CommandResponseState(crmCacheProperties)
+      var commandCoRelation: CommandCorrelation      = CommandCorrelation(Map.empty, Map.empty)
+      // components coming via queryFinal api will be removed from `commandSubscribers` after timeout
+      var commandSubscribers: Store[Id, ActorRef[SubmitResponse]] = Store(Map.empty)
+      // components coming via query api will be removed from `querySubscribers` after timeout
+      var querySubscribers: Store[Id, ActorRef[QueryResponse]] = Store(Map.empty)
 
-    import CommandResponse._
+      import CommandResponse._
 
-    // This is where the command is initially added. Note that every Submit is added as "Started"/Intermediate
-    def addOrUpdateCommand(commandResponse: SubmitResponse): Unit =
-      commandResponseState.get(commandResponse.runId) match {
-        case _: CommandNotAvailable ⇒
-          commandResponseState.add(commandResponse)
-          querySubscribers.get(commandResponse.runId).foreach(_ ! commandResponse)
-        case _ ⇒ updateCommand(commandResponse.runId, commandResponse)
-      }
-    def updateCommand(runId: Id, updateResponse: SubmitResponse): Unit = {
-      val currentResponse = commandResponseState.get(runId)
-      // Note that commands are added with state Started by ComponentBehavior
-      // Also makes sure that once it is final, it is final and can't be set back to Started
-      // Also fixes a potential race condition where someone sets to final status before return from onSubmit returning Started
-      if (isIntermediate(currentResponse) && isFinal(updateResponse)) {
-        commandResponseState.update(updateResponse)
-        doPublish(updateResponse, commandSubscribers.get(updateResponse.runId))
-      }
-    }
-
-    def updateSubCommand(commandResponse: SubmitResponse): Unit = {
-      // If the sub command has a parent command, fetch the current status of parent command from command status service
-      commandCoRelation
-        .getParent(commandResponse.runId)
-        .foreach(parentId ⇒ updateParent(parentId, commandResponse))
-    }
-
-    def updateParent(parentRunId: Id, childCommandResponse: SubmitResponse): Unit =
-      // Is the parent in the Started/Intermediate
-      if (isIntermediate(commandResponseState.get(parentRunId))) {
-        // If the child is positive, update parent
-        if (isPositive(childCommandResponse)) {
-          updateParentForChild(parentRunId, childCommandResponse)
-        } else if (isNegative(childCommandResponse)) {
-          // isNegative - update the parent and quit early
-          updateCommand(parentRunId, CommandResponse.withRunId(parentRunId, childCommandResponse))
+      // This is where the command is initially added. Note that every Submit is added as "Started"/Intermediate
+      def addOrUpdateCommand(commandResponse: SubmitResponse): Unit =
+        commandResponseState.get(commandResponse.runId) match {
+          case _: CommandNotAvailable ⇒
+            commandResponseState.add(commandResponse)
+            querySubscribers.get(commandResponse.runId).foreach(_ ! commandResponse)
+          case _ ⇒ updateCommand(commandResponse.runId, commandResponse)
         }
-      } else {
-        log.debug("Parent Command is already updated with a Final response. Ignoring this update.")
+      def updateCommand(runId: Id, updateResponse: SubmitResponse): Unit = {
+        val currentResponse = commandResponseState.get(runId)
+        // Note that commands are added with state Started by ComponentBehavior
+        // Also makes sure that once it is final, it is final and can't be set back to Started
+        // Also fixes a potential race condition where someone sets to final status before return from onSubmit returning Started
+        if (isIntermediate(currentResponse) && isFinal(updateResponse)) {
+          commandResponseState.update(updateResponse)
+          doPublish(updateResponse, commandSubscribers.get(updateResponse.runId))
+        }
       }
 
-    def updateParentForChild(parentRunId: Id, childCommandResponse: SubmitResponse): Unit =
-      if (isFinal(childCommandResponse)) {
-        commandCoRelation = commandCoRelation.remove(parentRunId, childCommandResponse.runId)
-        if (!commandCoRelation.hasChildren(parentRunId))
-          updateCommand(parentRunId, CommandResponse.withRunId(parentRunId, childCommandResponse))
-      } else {
-        log.debug("Validation response will not affect status of Parent command.")
+      def updateSubCommand(commandResponse: SubmitResponse): Unit = {
+        // If the sub command has a parent command, fetch the current status of parent command from command status service
+        commandCoRelation
+          .getParent(commandResponse.runId)
+          .foreach(parentId ⇒ updateParent(parentId, commandResponse))
       }
 
-    def subscribe(runId: Id, replyTo: ActorRef[SubmitResponse]): Unit = {
-      ctx.watchWith(replyTo, SubscriberTerminated(replyTo))
-      commandSubscribers = commandSubscribers.addOrUpdate(runId, replyTo)
-      commandResponseState.get(runId) match {
-        case sr: SubmitResponse => publishToSubscribers(sr, Set(replyTo))
-        case _                  => log.debug("Failed to find runId for subscribe.")
+      def updateParent(parentRunId: Id, childCommandResponse: SubmitResponse): Unit =
+        // Is the parent in the Started/Intermediate
+        if (isIntermediate(commandResponseState.get(parentRunId))) {
+          // If the child is positive, update parent
+          if (isPositive(childCommandResponse)) {
+            updateParentForChild(parentRunId, childCommandResponse)
+          } else if (isNegative(childCommandResponse)) {
+            // isNegative - update the parent and quit early
+            updateCommand(parentRunId, CommandResponse.withRunId(parentRunId, childCommandResponse))
+          }
+        } else {
+          log.debug("Parent Command is already updated with a Final response. Ignoring this update.")
+        }
+
+      def updateParentForChild(parentRunId: Id, childCommandResponse: SubmitResponse): Unit =
+        if (isFinal(childCommandResponse)) {
+          commandCoRelation = commandCoRelation.remove(parentRunId, childCommandResponse.runId)
+          if (!commandCoRelation.hasChildren(parentRunId))
+            updateCommand(parentRunId, CommandResponse.withRunId(parentRunId, childCommandResponse))
+        } else {
+          log.debug("Validation response will not affect status of Parent command.")
+        }
+
+      def subscribe(runId: Id, replyTo: ActorRef[SubmitResponse]): Unit = {
+        ctx.watchWith(replyTo, SubscriberTerminated(replyTo))
+        commandSubscribers = commandSubscribers.addOrUpdate(runId, replyTo)
+        commandResponseState.get(runId) match {
+          case sr: SubmitResponse => publishToSubscribers(sr, Set(replyTo))
+          case _                  => log.debug("Failed to find runId for subscribe.")
+        }
+      }
+
+      def query(runId: Id, replyTo: ActorRef[QueryResponse]): Unit = {
+        commandResponseState.get(runId) match {
+          case CommandNotAvailable(_) ⇒
+            querySubscribers = querySubscribers.addOrUpdate(runId, replyTo)
+            ctx.watchWith(replyTo, QuerySubscriberTerminated(replyTo))
+          case response ⇒ replyTo ! response
+        }
+      }
+
+      // This publish only publishes if the value is a final response
+      def publishToSubscribers(commandResponse: SubmitResponse, subscribers: Set[ActorRef[SubmitResponse]]): Unit =
+        if (isFinal(commandResponse)) doPublish(commandResponse, subscribers)
+
+      // This low level will publish no matter what
+      def doPublish(commandResponse: SubmitResponse, subscribers: Set[ActorRef[SubmitResponse]]): Unit =
+        subscribers.foreach(_ ! commandResponse)
+
+      Behaviors.receiveMessage { msg ⇒
+        msg match {
+          case AddOrUpdateCommand(cmdStatus)          ⇒ addOrUpdateCommand(cmdStatus)
+          case AddSubCommand(parentRunId, childRunId) ⇒ commandCoRelation = commandCoRelation.add(parentRunId, childRunId)
+          case UpdateSubCommand(cmdStatus)            ⇒ updateSubCommand(cmdStatus)
+          case Query(runId, replyTo)                  ⇒ query(runId, replyTo)
+          case Subscribe(runId, replyTo)              ⇒ subscribe(runId, replyTo)
+          case Unsubscribe(runId, subscriber)         ⇒ commandSubscribers = commandSubscribers.remove(runId, subscriber)
+          case SubscriberTerminated(subscriber)       ⇒ commandSubscribers = commandSubscribers.remove(subscriber)
+          case QuerySubscriberTerminated(subscriber)  ⇒ querySubscribers = querySubscribers.remove(subscriber)
+          case GetCommandCorrelation(replyTo)         ⇒ replyTo ! commandCoRelation
+          case GetCommandResponseState(replyTo)       ⇒ replyTo ! commandResponseState
+          case GetCommandSubscribersState(replyTo)    ⇒ replyTo ! CommandSubscribersState(commandSubscribers)
+        }
+        Behaviors.same
       }
     }
-
-    def query(runId: Id, replyTo: ActorRef[QueryResponse]): Unit = {
-      commandResponseState.get(runId) match {
-        case CommandNotAvailable(_) ⇒
-          querySubscribers = querySubscribers.addOrUpdate(runId, replyTo)
-          ctx.watchWith(replyTo, QuerySubscriberTerminated(replyTo))
-        case response ⇒ replyTo ! response
-      }
-    }
-
-    // This publish only publishes if the value is a final response
-    def publishToSubscribers(commandResponse: SubmitResponse, subscribers: Set[ActorRef[SubmitResponse]]): Unit =
-      if (isFinal(commandResponse)) doPublish(commandResponse, subscribers)
-
-    // This low level will publish no matter what
-    def doPublish(commandResponse: SubmitResponse, subscribers: Set[ActorRef[SubmitResponse]]): Unit =
-      subscribers.foreach(_ ! commandResponse)
-
-    Behaviors.receiveMessage { msg ⇒
-      msg match {
-        case AddOrUpdateCommand(cmdStatus)          ⇒ addOrUpdateCommand(cmdStatus)
-        case AddSubCommand(parentRunId, childRunId) ⇒ commandCoRelation = commandCoRelation.add(parentRunId, childRunId)
-        case UpdateSubCommand(cmdStatus)            ⇒ updateSubCommand(cmdStatus)
-        case Query(runId, replyTo)                  ⇒ query(runId, replyTo)
-        case Subscribe(runId, replyTo)              ⇒ subscribe(runId, replyTo)
-        case Unsubscribe(runId, subscriber)         ⇒ commandSubscribers = commandSubscribers.remove(runId, subscriber)
-        case SubscriberTerminated(subscriber)       ⇒ commandSubscribers = commandSubscribers.remove(subscriber)
-        case QuerySubscriberTerminated(subscriber)  ⇒ querySubscribers = querySubscribers.remove(subscriber)
-        case GetCommandCorrelation(replyTo)         ⇒ replyTo ! commandCoRelation
-        case GetCommandResponseState(replyTo)       ⇒ replyTo ! commandResponseState
-        case GetCommandSubscribersState(replyTo)    ⇒ replyTo ! CommandSubscribersState(commandSubscribers)
-      }
-      Behaviors.same
-    }
-  }
 }

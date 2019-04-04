@@ -30,10 +30,9 @@ class CommandResponseManagerActorTest extends FunSuite with Matchers with Mockit
 
   private[csw] def createBehaviorTestKit(
       props: CRMCacheProperties = CRMCacheProperties()
-  ): BehaviorTestKit[CommandResponseManagerMessage] =
-    BehaviorTestKit(
-      Behaviors.setup[CommandResponseManagerMessage](ctx ⇒ new CommandResponseManagerActor(props, getMockedLogger).behavior)
-    )
+  ): BehaviorTestKit[CommandResponseManagerMessage] = BehaviorTestKit(
+    Behaviors.setup[CommandResponseManagerMessage](_ ⇒ CommandResponseManagerActor.behavior(props, getMockedLogger))
+  )
 
   test("should be able to add command entry in Command Response Manager") {
     val behaviorTestKit         = createBehaviorTestKit()

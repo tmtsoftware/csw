@@ -74,7 +74,7 @@ object CswContext {
       val currentStatePublisher = new CurrentStatePublisher(pubSubComponentActor)
 
       // create CommandResponseManager (CRM)
-      val crmBehavior = new CommandResponseManagerActor(CRMCacheProperties(), loggerFactory).behavior
+      val crmBehavior = CommandResponseManagerActor.behavior(CRMCacheProperties(), loggerFactory)
       val crmActor    = await(richSystem.spawnTyped(crmBehavior, CommandResponseManagerActorName))
       val crm         = new CommandResponseManager(crmActor)
 
