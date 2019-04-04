@@ -36,6 +36,7 @@ import csw.params.core.models.Id
  * from both the HCD's then it can update Top level command with final [[csw.params.commands.CommandResponse]]
  *
  */
+// scalastyle:off method.length
 object CommandResponseManagerActor {
 
   /**
