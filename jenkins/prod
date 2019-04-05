@@ -19,8 +19,8 @@ pipeline {
         stage('Build') {
             steps {
                 sh "sbt scalafmtCheck"
+                sh "sbt doc"
                 sh "sbt -Dformat.on.compile=false clean scalastyle compile"
-                sh "sbt unidoc"
             }
         }
 
