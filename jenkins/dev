@@ -19,6 +19,7 @@ pipeline {
             steps {
                 sh "sbt scalafmtCheck"
                 sh "sbt -Dformat.on.compile=false clean scalastyle compile"
+                sh "sbt unidoc"
             }
         }
 
