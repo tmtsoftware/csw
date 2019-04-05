@@ -28,8 +28,7 @@ private[csw] abstract class FrameworkTestSuite extends FunSuite with Matchers wi
 
   override protected def afterAll(): Unit = {
     Await.result(untypedSystem.terminate(), 5.seconds)
-    typedSystem.terminate()
-    Await.result(typedSystem.whenTerminated, 5.seconds)
+    Await.result(typedSystem.terminate(), 5.seconds)
   }
 
   def getSampleHcdWiring(componentHandlers: ComponentHandlers): ComponentBehaviorFactory =

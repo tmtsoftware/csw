@@ -15,9 +15,9 @@ object Libs {
   val `junit`              = "junit" % "junit" % "4.12" //Eclipse Public License 1.0
   val `silencer-plugin`    = compilerPlugin("com.github.ghik" %% "silencer-plugin" % silencerVersion)
   val `silencer-lib`       = "com.github.ghik" %% "silencer-lib" % silencerVersion % Compile
-  val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.2.5"
+  val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.2.1"
   //MIT License
-  val `embedded-keycloak`            = "com.github.tmtsoftware"        % "embedded-keycloak"             % "0.1.2" //Apache 2.0
+  val `embedded-keycloak`            = "com.github.tmtsoftware"        % "embedded-keycloak"             % "0.1.1" //Apache 2.0
   val `logback-classic`              = "ch.qos.logback"                % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `akka-management-cluster-http` = "com.lightbend.akka.management" %% "akka-management-cluster-http" % "1.0.0"
   val `svnkit`                       = "org.tmatesoft.svnkit"          % "svnkit"                        % "1.9.3" //TMate Open Source License
@@ -50,10 +50,10 @@ object Libs {
   val `postgresql`      = "org.postgresql"                % "postgresql"      % "42.2.5"
   val `hikaricp`        = "com.zaxxer"                    % "HikariCP"        % "3.3.1" //Apache License 2.0
   val `otj-pg-embedded` = "com.opentable.components"      % "otj-pg-embedded" % "0.13.1"
-  val httpclient        = "org.apache.httpcomponents"     % "httpclient"      % "4.5.8"
+  val httpclient        = "org.apache.httpcomponents"     % "httpclient"      % "4.5.7"
   val `jboss-logging`   = "org.jboss.logging"             % "jboss-logging"   % "3.3.2.Final"
   val `config`          = "com.typesafe"                  % "config"          % "1.3.3"
-  val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.2.9"
+  val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.2.8"
   val `caffeine`        = "com.github.ben-manes.caffeine" % "caffeine"        % "2.7.0"
 }
 
@@ -76,7 +76,7 @@ object Chill {
 }
 
 object Akka {
-  val Version                    = "2.5.22" //all akka is Apache License 2.0
+  val Version                    = "2.5.21" //all akka is Apache License 2.0
   val `akka-stream`              = "com.typesafe.akka" %% "akka-stream" % Version
   val `akka-stream-typed`        = "com.typesafe.akka" %% "akka-stream-typed" % Version
   val `akka-remote`              = "com.typesafe.akka" %% "akka-remote" % Version
