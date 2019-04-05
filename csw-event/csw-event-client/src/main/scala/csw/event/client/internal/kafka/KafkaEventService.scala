@@ -18,7 +18,8 @@ import scala.concurrent.{ExecutionContext, Future}
  * @param actorSystem actor system to be used by Producer and Consumer API of akka-stream-kafka
  * @param mat the materializer to be used for materializing underlying streams
  */
-class KafkaEventService(eventServiceResolver: EventServiceResolver)(implicit actorSystem: ActorSystem, mat: Materializer)
+private[event] class KafkaEventService(eventServiceResolver: EventServiceResolver)(implicit actorSystem: ActorSystem,
+                                                                                   mat: Materializer)
     extends EventService {
 
   implicit val executionContext: ExecutionContext = actorSystem.dispatcher

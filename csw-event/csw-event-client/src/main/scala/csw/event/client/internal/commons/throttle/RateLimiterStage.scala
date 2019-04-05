@@ -12,7 +12,7 @@ import scala.concurrent.duration.FiniteDuration
  * It drops the elements in case the elements are received at a rate higher than delay.
  * @param delay the duration determining the frequency/rate of elements
  */
-class RateLimiterStage[A](delay: FiniteDuration) extends GraphStage[FlowShape[A, A]] {
+private[event] class RateLimiterStage[A](delay: FiniteDuration) extends GraphStage[FlowShape[A, A]] {
   final val in    = Inlet.create[A]("DroppingThrottle.in")
   final val out   = Outlet.create[A]("DroppingThrottle.out")
   final val shape = FlowShape.of(in, out)

@@ -29,7 +29,7 @@ import scala.util.control.NonFatal
  * @param ec                the execution context to be used for performing asynchronous operations
  * @param mat               the materializer to be used for materializing underlying streams
  */
-class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[String, Array[Byte]]])(
+private[event] class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[String, Array[Byte]]])(
     implicit ec: ExecutionContext,
     mat: Materializer
 ) extends EventSubscriber {

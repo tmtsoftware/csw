@@ -7,6 +7,6 @@ import scala.concurrent.Future
 /**
  * Base trait for implementations providing connection information for Event Service
  */
-trait EventServiceResolver {
+private[event] trait EventServiceResolver {
   def uri(): Future[URI]
 }

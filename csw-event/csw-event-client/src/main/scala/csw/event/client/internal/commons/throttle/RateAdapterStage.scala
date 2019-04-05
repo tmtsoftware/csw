@@ -12,7 +12,7 @@ import scala.concurrent.duration.FiniteDuration
  * It pushes the recent element the in case the elements are received at a rate slower than delay.
  * @param delay the duration determining the frequency/rate of elements
  */
-class RateAdapterStage[A](delay: FiniteDuration) extends GraphStage[FlowShape[A, A]] {
+private[event] class RateAdapterStage[A](delay: FiniteDuration) extends GraphStage[FlowShape[A, A]] {
   final val in    = Inlet.create[A]("DroppingThrottle.in")
   final val out   = Outlet.create[A]("DroppingThrottle.out")
   final val shape = FlowShape.of(in, out)

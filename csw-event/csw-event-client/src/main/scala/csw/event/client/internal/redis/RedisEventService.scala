@@ -17,7 +17,7 @@ import scala.concurrent.{ExecutionContext, Future}
  * @param executionContext the execution context to be used for performing asynchronous operations
  * @param mat the materializer to be used for materializing underlying streams
  */
-class RedisEventService(eventServiceResolver: EventServiceResolver, masterId: String, redisClient: RedisClient)(
+private[event] class RedisEventService(eventServiceResolver: EventServiceResolver, masterId: String, redisClient: RedisClient)(
     implicit val executionContext: ExecutionContext,
     mat: Materializer
 ) extends EventService {

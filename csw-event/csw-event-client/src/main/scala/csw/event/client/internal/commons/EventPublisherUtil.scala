@@ -14,7 +14,7 @@ import scala.util.control.NonFatal
 /**
  * Utility class to provided common functionalities to different implementations of EventPublisher
  */
-class EventPublisherUtil(implicit ec: ExecutionContext, mat: Materializer) {
+private[event] class EventPublisherUtil(implicit ec: ExecutionContext, mat: Materializer) {
 
   private val logger = EventServiceLogger.getLogger
 

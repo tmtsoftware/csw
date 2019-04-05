@@ -12,7 +12,7 @@ import scala.util.control.NonFatal
 /**
  * Encodes and decodes keys as EventKeys and values as ProtoBuf byte equivalent of Event
  */
-object EventRomaineCodecs {
+private[event] object EventRomaineCodecs {
 
   implicit object EventKeyRomaineCodec extends RomaineStringCodec[EventKey] {
     override def toString(eventKey: EventKey): String = eventKey.key

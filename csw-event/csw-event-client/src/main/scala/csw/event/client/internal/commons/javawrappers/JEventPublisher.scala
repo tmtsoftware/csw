@@ -22,7 +22,7 @@ import scala.compat.java8.FutureConverters.{CompletionStageOps, FutureOps}
 /**
  * Java API for [[csw.event.api.scaladsl.EventPublisher]]
  */
-class JEventPublisher(eventPublisher: EventPublisher) extends IEventPublisher {
+private[event] class JEventPublisher(eventPublisher: EventPublisher) extends IEventPublisher {
   override def publish(event: Event): CompletableFuture[Done] = eventPublisher.publish(event).toJava.toCompletableFuture
 
   override def publish[Mat](source: Source[Event, Mat]): Mat = eventPublisher.publish(source.asScala)

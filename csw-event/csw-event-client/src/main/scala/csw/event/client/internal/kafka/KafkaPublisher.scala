@@ -25,9 +25,10 @@ import scala.util.control.NonFatal
  * @param ec               the execution context to be used for performing asynchronous operations
  * @param mat              the materializer to be used for materializing underlying streams
  */
-class KafkaPublisher(producerSettings: Future[ProducerSettings[String, Array[Byte]]])(implicit ec: ExecutionContext,
-                                                                                      mat: Materializer)
-    extends EventPublisher {
+private[event] class KafkaPublisher(producerSettings: Future[ProducerSettings[String, Array[Byte]]])(
+    implicit ec: ExecutionContext,
+    mat: Materializer
+) extends EventPublisher {
 
   private val parallelism                         = 1
   private val defaultInitialDelay: FiniteDuration = 0.millis

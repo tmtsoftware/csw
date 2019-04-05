@@ -26,7 +26,8 @@ import scala.util.control.NonFatal
  * @param redisClient redis client available from lettuce
  * @param mat         the materializer to be used for materializing underlying streams
  */
-class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(implicit mat: Materializer, ec: ExecutionContext)
+private[event] class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(implicit mat: Materializer,
+                                                                                          ec: ExecutionContext)
     extends EventPublisher {
 
   // inorder to preserve the order of publishing events, the parallelism level is maintained to 1
