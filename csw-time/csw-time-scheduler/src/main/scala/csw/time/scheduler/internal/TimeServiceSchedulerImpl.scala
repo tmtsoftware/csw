@@ -10,7 +10,7 @@ import csw.time.scheduler.internal.extensions.RichCancellableExt.RichCancellable
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
-class TimeServiceSchedulerImpl(implicit actorSystem: ActorSystem) extends TimeServiceScheduler {
+private[time] class TimeServiceSchedulerImpl(implicit actorSystem: ActorSystem) extends TimeServiceScheduler {
   import actorSystem.dispatcher
 
   private val scheduler: Scheduler = actorSystem.scheduler
