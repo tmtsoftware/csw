@@ -31,9 +31,9 @@ import csw.params.core.models.Id
  * In this case, Assembly can register its interest in the final [[csw.params.commands.CommandResponse.SubmitResponse]]
  * from two HCD's when these sub commands completes, using subscribe API. And once Assembly receives final submit response
  * from both the HCD's then it can update Top level command with final [[csw.params.commands.CommandResponse.SubmitResponse]]
- * In this case, Assembly can register its interest in the final `CommandResponse`
+ * In this case, Assembly can register its interest in the final [[csw.params.commands.CommandResponse]]
  * from two HCD's when these sub commands completes, using subscribe API. And once Assembly receives final command response
- * from both the HCD's then it can update Top level command with final `CommandResponse`
+ * from both the HCD's then it can update Top level command with final [[csw.params.commands.CommandResponse]]
  *
  */
 // scalastyle:off method.length

@@ -19,7 +19,7 @@ object UnidocSite extends AutoPlugin {
     siteSubdirName in JavaUnidoc := "/api/java",
     filterNotSources(sources in (JavaUnidoc, unidoc), excludeJavadoc),
     addMappingsToSiteDir(mappings in (JavaUnidoc, packageDoc), siteSubdirName in JavaUnidoc),
-    scalacOptions in (ScalaUnidoc, unidoc) ++= Seq("-skip-packages", excludeScaladoc),
+    scalacOptions in (ScalaUnidoc, unidoc) ++= Seq("-skip-packages", excludeScaladoc, "-Xfatal-warnings"),
     autoAPIMappings := true
   )
 
