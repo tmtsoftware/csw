@@ -64,6 +64,7 @@ lazy val `csw` = project
   .disablePlugins(BintrayPlugin)
   .aggregate(aggregatedProjects: _*)
   .settings(Settings.mergeSiteWith(docs))
+  .settings(Settings.addBuildAllAlias)
   .settings(Settings.docExclusions(unidocExclusions))
   .settings(GithubRelease.githubReleases(githubReleases))
   .settings(

@@ -26,4 +26,7 @@ object Settings {
       unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(projects: _*),
       unidocProjectFilter in (JavaUnidoc, unidoc) := inAnyProject -- inProjects(projects: _*)
     )
+
+  def addBuildAllAlias: Seq[Setting[State => State]] =
+    addCommandAlias("buildAll", ";scalafmtCheck; clean; makeSite; test:compile; multi-jvm:compile")
 }
