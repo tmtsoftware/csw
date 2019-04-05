@@ -1,6 +1,7 @@
 package csw.location.client
 
 import akka.actor.ActorSystem
+import akka.actor.typed.{ActorSystem ⇒ TypedActorSystem, Behavior}
 import com.typesafe.config.ConfigFactory
 import csw.location.api.commons.{Constants, LocationServiceLogger}
 import csw.logging.api.scaladsl.Logger
@@ -16,6 +17,11 @@ object ActorSystemFactory {
 
   private val log: Logger = LocationServiceLogger.getLogger
 
+  private lazy val config = ConfigFactory
+    .parseString(s"akka.remote.artery.canonical.hostname = ${Networks().hostname}")
+    .withFallback(ConfigFactory.load().getConfig(Constants.RemoteActorSystemName))
+    .withFallback(ConfigFactory.defaultApplication().resolve())
+
   /**
    * Create an ActorSystem with `Constants.RemoteActorSystemName` as componentName
    */
@@ -28,12 +34,17 @@ object ActorSystemFactory {
    *       ignored, instead default remote configuration will be used while creating ActorSystem
    */
   def remote(componentName: String): ActorSystem = {
-    val config = ConfigFactory
-      .parseString(s"akka.remote.artery.canonical.hostname = ${Networks().hostname}")
-      .withFallback(ConfigFactory.load().getConfig(Constants.RemoteActorSystemName))
-      .withFallback(ConfigFactory.defaultApplication().resolve())
-
     log.info(s"Creating remote actor system with name $componentName")
     ActorSystem(componentName, config)
+  }
+
+  /**
+   * Create an Typed ActorSystem with the given guardian behaviour, name and remote properties
+   *
+   * @note even if the custom configuration is provided for the given name of ActorSystem, it will be simply
+   *       ignored, instead default remote configuration will be used while creating ActorSystem
+   */
+  def remote[T](behavior: Behavior[T], name: String): TypedActorSystem[T] = {
+    TypedActorSystem(behavior, name, config)
   }
 }
