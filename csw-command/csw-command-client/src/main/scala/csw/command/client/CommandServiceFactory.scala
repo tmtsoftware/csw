@@ -14,6 +14,7 @@ object CommandServiceFactory {
    * Make a CommandService instance for scala
    *
    * @param componentLocation the destination component location to which commands need to be sent
+   * @param actorSystem of the component used for executing commands to other components and wait for the responses
    * @return an instance of type CommandService
    */
   def make(componentLocation: AkkaLocation)(implicit actorSystem: ActorSystem[_]): CommandService =
@@ -23,6 +24,7 @@ object CommandServiceFactory {
    * Make a CommandService instance for java
    *
    * @param componentLocation the destination component location to which commands need to be sent
+   * @param actorSystem of the component used for executing commands to other components and wait for the responses
    * @return an instance of type ICommandService
    */
   def jMake(componentLocation: AkkaLocation, actorSystem: ActorSystem[_]): ICommandService =

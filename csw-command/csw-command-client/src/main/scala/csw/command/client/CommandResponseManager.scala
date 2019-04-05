@@ -17,6 +17,7 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
  * Wrapper API for interacting with Command Response Manager of a component
  *
+ * @param commandResponseManagerActor underlying actor managing command responses, completion of command, caching responses for command, etc.
  * @param actorSystem actor system for managing stream resources inside
  */
 class CommandResponseManager(

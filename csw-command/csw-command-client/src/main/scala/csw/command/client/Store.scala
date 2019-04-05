@@ -61,5 +61,14 @@ case class Store[K, V](map: Map[K, Set[V]]) {
 }
 
 object Store {
+
+  /**
+   * Create Store for Map of type key -> set of values
+   *
+   * @param map of type key -> set of values
+   * @tparam K key type
+   * @tparam V value type
+   * @return A Store for managing map of type key -> set of values
+   */
   implicit def fromMap[K, V](map: Map[K, Set[V]]): Store[K, V] = new Store(map)
 }
