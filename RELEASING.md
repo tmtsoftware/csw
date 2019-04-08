@@ -17,11 +17,16 @@
 2. Update top level `CHANGELOG.md`
 3. Update top level `README.md`
 4. Exclude projects from `build.sbt` which you do not want to release
-5. Run `csw-prod-release` pipeline by providing `VERSION` number. (This automatically triggers `acceptance-release` pipeline)
+5. Run `csw-prod` pipeline by providing `VERSION` number. (This automatically triggers `acceptance-release` pipeline)
 
 ### csw.g8
 1. Merge `dev` branch to master
 2. Run `giter8-release` pipeline by providing `VERSION` number
+
+### Release `csw-js` (if needed)
+- Release `csw-js` if keycloak version is updated in csw
+
+#### Note - `VERSION` tag is version number with 'v' as prefix. For eg. `v0.0.0`
 
 ### More detailed instructions
 
