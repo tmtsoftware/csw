@@ -17,7 +17,7 @@ object Common extends AutoPlugin {
     organization := "com.github.tmtsoftware.csw",
     organizationName := "TMT Org",
     scalaVersion := Libs.ScalaVersion,
-    concurrentRestrictions in Test += Tags.limit(Tags.All, 1),
+    concurrentRestrictions in Global += Tags.limit(Tags.All, 1),
     homepage := Some(url("https://github.com/tmtsoftware/csw")),
     resolvers += "jitpack" at "https://jitpack.io",
     resolvers += "bintray" at "http://jcenter.bintray.com",
