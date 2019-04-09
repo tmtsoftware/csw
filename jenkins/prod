@@ -20,7 +20,7 @@ pipeline {
             steps {
                 sh "sbt scalafmtCheck"
                 sh "sbt clean makeSite"
-                sh "sbt -Dformat.on.compile=false clean scalastyle compile"
+                sh "sbt ';set every Seq(enableFatalWarnings := true, scalafmtOnCompile := false); clean; scalastyle; compile'"
             }
         }
 
@@ -28,10 +28,10 @@ pipeline {
         stage('Unit and Component Tests') {
             steps {
                 // Run all tests except csw-time tests
-                sh "sbt -DenableCoverage=true -DdisableTimeTests test:test"
+                sh "sbt -DenableCoverage=true -DdisableTimeTests ';set every enableFatalWarnings := true; test:test'"
 
                 // Run csw-time module tests
-                sh "sbt -DenableCoverage=true csw-time/test:test"
+                sh "sbt -DenableCoverage=true ';set every enableFatalWarnings := true; csw-time/test:test'"
             }
             post {
                 always {
@@ -54,11 +54,11 @@ pipeline {
         // These tests cover the scenario of multiple components in multiple containers on same machine.
         stage('Multi-Jvm Test') {
             steps {
-                sh "sbt csw-aas-http/multi-jvm:test"
-                sh "sbt csw-location-server/multi-jvm:test"
-                sh "sbt csw-config-client/multi-jvm:test"
-                sh "sbt csw-config-cli/multi-jvm:test"
-                sh "sbt csw-framework/multi-jvm:test"
+                sh "sbt ';set every enableFatalWarnings := true; csw-aas-http/multi-jvm:test'"
+                sh "sbt ';set every enableFatalWarnings := true; csw-location-server/multi-jvm:test'"
+                sh "sbt ';set every enableFatalWarnings := true; csw-config-client/multi-jvm:test'"
+                sh "sbt ';set every enableFatalWarnings := true; csw-config-cli/multi-jvm:test'"
+                sh "sbt ';set every enableFatalWarnings := true; csw-framework/multi-jvm:test'"
             }
         }
 

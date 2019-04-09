@@ -27,6 +27,10 @@ object Settings {
       unidocProjectFilter in (JavaUnidoc, unidoc) := inAnyProject -- inProjects(projects: _*)
     )
 
-  def addBuildAllAlias: Seq[Setting[State => State]] =
-    addCommandAlias("buildAll", ";scalafmtCheck; clean; makeSite; test:compile; multi-jvm:compile")
+  def addBuildAllAlias: Seq[Setting[State => State]] = {
+    addCommandAlias(
+      "buildAll",
+      ";set every enableFatalWarnings := true; scalafmtCheck; scalastyle; test:compile; multi-jvm:compile; clean; makeSite;set every enableFatalWarnings := false"
+    )
+  }
 }

@@ -1,17 +1,22 @@
 import Libs._
 import org.scalafmt.sbt.ScalafmtPlugin.autoImport.scalafmtOnCompile
 import sbt.Keys.{testOptions, _}
-import sbt._
 import sbt.plugins.JvmPlugin
+import sbt.{settingKey, _}
 import sbtunidoc.GenJavadocPlugin.autoImport.unidocGenjavadocVersion
 
 object Common extends AutoPlugin {
+  object autoImport {
+    val suppressAnnotatedWarnings: SettingKey[Boolean] = settingKey[Boolean]("enable annotation based suppression of warnings")
+    val enableFatalWarnings: SettingKey[Boolean]       = settingKey[Boolean]("enable fatal warnings")
+  }
 
   override def trigger: PluginTrigger = allRequirements
 
   override def requires: Plugins = JvmPlugin
 
-  val suppressAnnotatedWarnings: SettingKey[Boolean] = settingKey[Boolean]("enable annotation based suppression of warnings")
+  val suppressAnnotatedWarnings = settingKey[Boolean]("enable annotation based suppression of warnings")
+  val enableFatalWarnings       = settingKey[Boolean]("enable fatal warnings")
 
   override lazy val projectSettings: Seq[Setting[_]] = Seq(
     organization := "com.github.tmtsoftware.csw",
@@ -31,7 +36,7 @@ object Common extends AutoPlugin {
       "-feature",
       "-unchecked",
       "-deprecation",
-//      "-Xfatal-warnings",
+      if (enableFatalWarnings.value) "-Xfatal-warnings" else "",
       "-Xlint:_,-missing-interpolator",
       "-Yno-adapted-args",
       "-Ywarn-dead-code",
@@ -55,16 +60,12 @@ object Common extends AutoPlugin {
     isSnapshot := !sys.props.get("prod.publish").contains("true"),
     fork := true,
     suppressAnnotatedWarnings := true,
+    enableFatalWarnings := false,
     libraryDependencies ++= Seq(`silencer-lib`),
     libraryDependencies ++= (if (suppressAnnotatedWarnings.value) Seq(compilerPlugin(`silencer-plugin`)) else Seq.empty),
     autoCompilerPlugins := true,
     cancelable in Global := true, // allow ongoing test(or any task) to cancel with ctrl + c and still remain inside sbt
-    if (formatOnCompile) scalafmtOnCompile := true else scalafmtOnCompile := false,
+    scalafmtOnCompile := true,
     unidocGenjavadocVersion := "0.13"
   )
-
-  private def formatOnCompile = sys.props.get("format.on.compile") match {
-    case Some("false") ⇒ false
-    case _             ⇒ true
-  }
 }
