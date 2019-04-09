@@ -53,8 +53,8 @@ class EventServiceIntegrationTest extends FrameworkIntegrationSuite {
     val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]("container-lifecycle-state-probe")
     assertThatContainerIsRunning(containerRef, containerLifecycleStateProbe, 5.seconds)
 
-    val filterAssemblyLocation = wiring.locationService.find(filterAssemblyConnection).await
-    val disperserHcdLocation   = wiring.locationService.find(disperserHcdConnection).await
+    val filterAssemblyLocation = testWiring.seedLocationService.find(filterAssemblyConnection).await
+    val disperserHcdLocation   = testWiring.seedLocationService.find(disperserHcdConnection).await
 
     val assemblyCommandService  = CommandServiceFactory.make(filterAssemblyLocation.get)
     val disperserCommandService = CommandServiceFactory.make(disperserHcdLocation.get)

@@ -54,8 +54,8 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
     assertThatContainerIsRunning(containerRef, containerLifecycleStateProbe, 5.seconds)
 
     // resolve all the components from container using location service
-    val filterAssemblyLocation = wiring.locationService.find(filterAssemblyConnection).await
-    val disperserHcdLocation   = wiring.locationService.find(disperserHcdConnection).await
+    val filterAssemblyLocation = seedLocationService.find(filterAssemblyConnection).await
+    val disperserHcdLocation   = seedLocationService.find(disperserHcdConnection).await
 
     val assemblyCommandService = CommandServiceFactory.make(filterAssemblyLocation.get)
 

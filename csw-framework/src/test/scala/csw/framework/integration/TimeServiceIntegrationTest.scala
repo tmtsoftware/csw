@@ -39,7 +39,7 @@ class TimeServiceIntegrationTest extends FrameworkIntegrationSuite {
     val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]("container-lifecycle-state-probe")
     assertThatContainerIsRunning(containerRef, containerLifecycleStateProbe, 5.seconds)
 
-    val filterAssemblyLocation = wiring.locationService.find(filterAssemblyConnection).await
+    val filterAssemblyLocation = testWiring.seedLocationService.find(filterAssemblyConnection).await
 
     val assemblyCommandService = CommandServiceFactory.make(filterAssemblyLocation.get)
 
