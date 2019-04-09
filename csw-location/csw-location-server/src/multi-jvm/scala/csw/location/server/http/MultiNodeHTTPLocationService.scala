@@ -1,7 +1,5 @@
 package csw.location.server.http
 
-import akka.actor.CoordinatedShutdown
-import akka.actor.CoordinatedShutdown.UnknownReason
 import csw.location.helpers.LSNodeSpec
 import csw.location.server.commons.TestFutureExtension.RichFuture
 import csw.location.server.internal.ServerWiring
@@ -17,7 +15,6 @@ trait MultiNodeHTTPLocationService {
   }
 
   override def afterAll(): Unit = {
-    CoordinatedShutdown(self.system).run(UnknownReason).await
     multiNodeSpecAfterAll()
   }
 
