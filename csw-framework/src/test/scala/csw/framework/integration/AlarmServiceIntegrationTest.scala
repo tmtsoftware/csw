@@ -1,7 +1,6 @@
 package csw.framework.integration
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.alarm.client.internal.commons.AlarmServiceConnection
@@ -29,7 +28,7 @@ class AlarmServiceIntegrationTest extends FrameworkIntegrationSuite {
   private var sentinel: RedisSentinel = _
   private var server: RedisServer     = _
 
-  private val wiring: FrameworkWiring = FrameworkWiring.make(testActorSystem)
+  private val wiring: FrameworkWiring = FrameworkWiring.make(seedActorSystem)
   private val adminAlarmService       = wiring.alarmServiceFactory.makeAdminApi(wiring.locationService)
 
   override def beforeAll(): Unit = {
@@ -43,7 +42,6 @@ class AlarmServiceIntegrationTest extends FrameworkIntegrationSuite {
   }
 
   override def afterAll(): Unit = {
-    Http(testActorSystem).shutdownAllConnectionPools().await
     stopSentinel(sentinel, server)
     super.afterAll()
   }

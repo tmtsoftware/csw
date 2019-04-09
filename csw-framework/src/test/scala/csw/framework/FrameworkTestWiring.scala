@@ -22,8 +22,6 @@ class FrameworkTestWiring(val seedPort: Int = SocketUtils.getFreePort) extends E
   implicit val mat: Materializer                  = ActorMaterializer()
   val seedLocationService: LocationService        = HttpLocationServiceFactory.makeLocalClient
 
-  val testActorSystem: actor.ActorSystem = ActorSystemFactory.remote()
-
   def startSentinelAndRegisterService(
       connection: TcpConnection,
       masterId: String
@@ -36,7 +34,6 @@ class FrameworkTestWiring(val seedPort: Int = SocketUtils.getFreePort) extends E
 
   def shutdown(): Terminated = {
     Http(seedActorSystem).shutdownAllConnectionPools().await
-    testActorSystem.terminate().await
     seedActorSystem.terminate().await
   }
 }

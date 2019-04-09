@@ -1,5 +1,6 @@
 package csw.framework.integration
 
+import akka.actor
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.http.scaladsl.Http
 import akka.stream.scaladsl.Keep
@@ -19,6 +20,7 @@ import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.api.models.ComponentType.HCD
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.location.client.ActorSystemFactory
 import csw.logging.api.models.LoggingLevels.INFO
 import csw.logging.client.internal.LoggingSystem
 import csw.params.core.states.{CurrentState, StateName}
@@ -38,6 +40,9 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
   private val logBuffer                    = mutable.Buffer.empty[JsObject]
   private val testAppender                 = new TestAppender(x ⇒ logBuffer += Json.parse(x.toString).as[JsObject])
   private var loggingSystem: LoggingSystem = _
+  // using standaloneActorSystem to start component instead of seedActorSystem,
+  // to assert shutdown of the component(which will also shutdown standaloneActorSystem)
+  private val standaloneComponentActorSystem: actor.ActorSystem = ActorSystemFactory.remote()
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
@@ -46,14 +51,13 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
   }
 
   override def afterAll(): Unit = {
-    Http(seedActorSystem).shutdownAllConnectionPools().await
+    standaloneComponentActorSystem.terminate().await
     super.afterAll()
   }
 
   test("should start a component in standalone mode and register with location service") {
-
     // start component in standalone mode
-    val wiring: FrameworkWiring = FrameworkWiring.make(testActorSystem, mock[RedisClient])
+    val wiring: FrameworkWiring = FrameworkWiring.make(standaloneComponentActorSystem, mock[RedisClient])
     Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring)
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")
@@ -77,7 +81,7 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
 
     // on shutdown, component unregisters from location service
     supervisorCommandService.subscribeCurrentState(supervisorStateProbe.ref ! _)
-    Http(testActorSystem).shutdownAllConnectionPools().await
+    Http(standaloneComponentActorSystem).shutdownAllConnectionPools().await
     supervisorRef ! Shutdown
 
     // this proves that ComponentBehaviors postStop signal gets invoked
@@ -90,7 +94,7 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
 
     // this proves that on shutdown message, supervisor's actor system gets terminated
     // if it does not get terminated in 5 seconds, future will fail which in turn fail this test
-    Await.result(testActorSystem.whenTerminated, 5.seconds)
+    Await.result(standaloneComponentActorSystem.whenTerminated, 5.seconds)
 
     /*
      * This assertion are here just to prove that LoggingSystem is integrated with framework and ComponentHandlers

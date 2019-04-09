@@ -1,7 +1,6 @@
 package csw.framework.integration
 
 import akka.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
-import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
@@ -25,10 +24,9 @@ class TimeServiceIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 
   private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
-  private val wiring                   = FrameworkWiring.make(testActorSystem)
+  private val wiring                   = FrameworkWiring.make(seedActorSystem)
 
   override def afterAll(): Unit = {
-    Http(testActorSystem).shutdownAllConnectionPools().await
     super.afterAll()
   }
 

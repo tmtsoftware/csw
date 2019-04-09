@@ -3,7 +3,7 @@ package csw.framework.integration
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.http.scaladsl.Http
 import akka.stream.scaladsl.{Keep, Sink}
-import akka.testkit
+import akka.{actor, testkit}
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
@@ -22,6 +22,7 @@ import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
+import csw.location.client.ActorSystemFactory
 import csw.params.core.states.{CurrentState, StateName}
 import io.lettuce.core.RedisClient
 
@@ -34,19 +35,20 @@ import scala.concurrent.duration.DurationLong
 class ContainerIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 
-  private val irisContainerConnection  = AkkaConnection(ComponentId("IRIS_Container", ComponentType.Container))
-  private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
-  private val instrumentHcdConnection  = AkkaConnection(ComponentId("Instrument_Filter", HCD))
-  private val disperserHcdConnection   = AkkaConnection(ComponentId("Disperser", HCD))
+  private val irisContainerConnection                 = AkkaConnection(ComponentId("IRIS_Container", ComponentType.Container))
+  private val filterAssemblyConnection                = AkkaConnection(ComponentId("Filter", Assembly))
+  private val instrumentHcdConnection                 = AkkaConnection(ComponentId("Instrument_Filter", HCD))
+  private val disperserHcdConnection                  = AkkaConnection(ComponentId("Disperser", HCD))
+  private val containerActorSystem: actor.ActorSystem = ActorSystemFactory.remote()
 
   override def afterAll(): Unit = {
-    Http(seedActorSystem).shutdownAllConnectionPools().await
+    containerActorSystem.terminate().await
     super.afterAll()
   }
 
   test("should start multiple components within a single container and able to accept lifecycle messages") {
 
-    val wiring = FrameworkWiring.make(testActorSystem, mock[RedisClient])
+    val wiring = FrameworkWiring.make(containerActorSystem, mock[RedisClient])
     // start a container and verify it moves to running lifecycle state
     val containerRef =
       Container.spawn(ConfigFactory.load("container.conf"), wiring).await
@@ -189,7 +191,7 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
       .run()
 
     // ********** Message: Shutdown **********
-    Http(testActorSystem).shutdownAllConnectionPools().await
+    Http(containerActorSystem).shutdownAllConnectionPools().await
     resolvedContainerRef ! Shutdown
 
     // this proves that ComponentBehaviors postStop signal gets invoked for all components
@@ -212,6 +214,6 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
 
     // this proves that on shutdown message, container's actor system gets terminated
     // if it does not get terminated in 5 seconds, future will fail which in turn fail this test
-    testActorSystem.whenTerminated.await
+    containerActorSystem.whenTerminated.await
   }
 }

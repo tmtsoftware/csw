@@ -1,7 +1,6 @@
 package csw.framework.integration
 
 import akka.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
-import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
@@ -31,7 +30,7 @@ class EventServiceIntegrationTest extends FrameworkIntegrationSuite {
 
   private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
   private val disperserHcdConnection   = AkkaConnection(ComponentId("Disperser", HCD))
-  private val wiring                   = FrameworkWiring.make(testActorSystem)
+  private val wiring                   = FrameworkWiring.make(seedActorSystem)
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
@@ -41,7 +40,6 @@ class EventServiceIntegrationTest extends FrameworkIntegrationSuite {
   }
 
   override def afterAll(): Unit = {
-    Http(testActorSystem).shutdownAllConnectionPools().await
     stopSentinel(sentinel, server)
     super.afterAll()
   }

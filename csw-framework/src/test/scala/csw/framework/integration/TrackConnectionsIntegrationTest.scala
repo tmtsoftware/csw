@@ -32,7 +32,6 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
   private val disperserHcdConnection   = AkkaConnection(ComponentId("Disperser", HCD))
 
   override def afterAll(): Unit = {
-    Http(testActorSystem).shutdownAllConnectionPools().await
     super.afterAll()
   }
 
