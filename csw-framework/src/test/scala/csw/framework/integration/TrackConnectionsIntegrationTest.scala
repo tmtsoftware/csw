@@ -1,6 +1,5 @@
 package csw.framework.integration
 
-import akka.actor
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.http.scaladsl.Http
 import akka.util.Timeout
@@ -39,8 +38,8 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
   // DEOPSCSW-220: Access and Monitor components for current values
   // DEOPSCSW-221: Avoid sending commands to non-executing components
   test("should track connections when locationServiceUsage is RegisterAndTrackServices") {
-    val actorSystem: actor.ActorSystem = ActorSystemFactory.remote("test1")
-    val wiring: FrameworkWiring        = FrameworkWiring.make(actorSystem, mock[RedisClient])
+    val containerActorSystem    = ActorSystemFactory.remote("test1")
+    val wiring: FrameworkWiring = FrameworkWiring.make(containerActorSystem, mock[RedisClient])
 
     // start a container and verify it moves to running lifecycle state
     val containerRef = Container.spawn(ConfigFactory.load("container_tracking_connections.conf"), wiring).await
@@ -86,7 +85,8 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
       disperserCommandService.submit(commands.Setup(prefix, CommandName("isAlive"), None)).await(200.millis)
     )
 
-    Http(actorSystem).shutdownAllConnectionPools().await
+    Http(containerActorSystem).shutdownAllConnectionPools().await
+    containerActorSystem.terminate().await
   }
 
   /**
@@ -96,8 +96,8 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
    * */
   //DEOPSCSW-219 Discover component connection using HTTP protocol
   test("component should be able to track http and tcp connections") {
-    val actorSystem: actor.ActorSystem = ActorSystemFactory.remote("test2")
-    val wiring: FrameworkWiring        = FrameworkWiring.make(actorSystem, mock[RedisClient])
+    val componentActorSystem    = ActorSystemFactory.remote("test2")
+    val wiring: FrameworkWiring = FrameworkWiring.make(componentActorSystem, mock[RedisClient])
     // start component in standalone mode
     val assemblySupervisor = Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring).await
 
@@ -143,7 +143,8 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
       CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(tcpLocationRemovedChoice)))
     )
 
-    Http(actorSystem).shutdownAllConnectionPools().await
+    Http(componentActorSystem).shutdownAllConnectionPools().await
+    componentActorSystem.terminate().await
   }
 
 }
