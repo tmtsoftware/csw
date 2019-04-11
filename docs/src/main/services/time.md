@@ -49,8 +49,8 @@ about the timescale of the instant.
 
 TMTTime supports two timescales:
 
-* Coordinated Universal Time ( @scaladoc[UTCTime](csw/time/api/models/UTCTime) )
-* International Atomic Time ( @scaladoc[TAITime](csw/time/api/models/TAITime) )
+* Coordinated Universal Time ( @scaladoc[UTCTime](csw/time/core/models/UTCTime) )
+* International Atomic Time ( @scaladoc[TAITime](csw/time/core/models/TAITime) )
  
 #### Get Current Time
 Gets the current UTC/TAI time with nanosecond precision. 

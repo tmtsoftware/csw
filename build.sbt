@@ -35,7 +35,6 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-event-cli`,
   `csw-alarm-cli`,
   `csw-time-core-js`,
-  `csw-time-clock-jvm`,
   `csw-time-clock-js`,
   `csw-logging-macros`,
   `csw-params-js`,
