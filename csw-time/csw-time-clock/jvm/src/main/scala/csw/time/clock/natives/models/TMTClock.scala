@@ -28,6 +28,7 @@ private[time] class LinuxClock extends TMTClock {
   override def utcInstant: Instant = now(ClockRealtime)
   override def taiInstant: Instant = now(ClockTAI)
 
+  //#native-calls
   private def now(clockId: Int): Instant = {
     val timeSpec = new TimeSpec()
     TimeLibrary.clock_gettime(clockId, timeSpec)
@@ -51,6 +52,7 @@ private[time] class LinuxClock extends TMTClock {
         throw new RuntimeException("Failed to set offset, make sure you have sudo access to perform this action.", e.getCause)
     }
   }
+  //#native-calls
 }
 
 private[time] class NonLinuxClock extends TMTClock {

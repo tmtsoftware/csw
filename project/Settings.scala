@@ -30,7 +30,7 @@ object Settings {
   def addBuildAllAlias: Seq[Setting[State => State]] = {
     addCommandAlias(
       "buildAll",
-      ";set every enableFatalWarnings := true; scalafmtCheck; scalastyle; test:compile; multi-jvm:compile; clean; makeSite;set every enableFatalWarnings := false"
+      ";set every enableFatalWarnings := true; scalafmtCheck; scalastyle; clean; makeSite; test:compile; multi-jvm:compile; set every enableFatalWarnings := false"
     )
   }
 }
