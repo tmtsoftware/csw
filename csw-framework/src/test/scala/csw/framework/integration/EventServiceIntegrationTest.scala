@@ -1,6 +1,7 @@
 package csw.framework.integration
 
 import akka.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
@@ -51,11 +52,11 @@ class EventServiceIntegrationTest extends FrameworkIntegrationSuite {
     val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]("container-lifecycle-state-probe")
     assertThatContainerIsRunning(containerRef, containerLifecycleStateProbe, 5.seconds)
 
-    val filterAssemblyLocation = testWiring.seedLocationService.find(filterAssemblyConnection).await
-    val disperserHcdLocation   = testWiring.seedLocationService.find(disperserHcdConnection).await
+    val filterAssemblyLocation = wiring.locationService.find(filterAssemblyConnection).await
+    val disperserHcdLocation   = wiring.locationService.find(disperserHcdConnection).await
 
-    val assemblyCommandService  = CommandServiceFactory.make(filterAssemblyLocation.get)
-    val disperserCommandService = CommandServiceFactory.make(disperserHcdLocation.get)
+    val assemblyCommandService  = CommandServiceFactory.make(filterAssemblyLocation.get)(wiring.actorSystem.toTyped)
+    val disperserCommandService = CommandServiceFactory.make(disperserHcdLocation.get)(wiring.actorSystem.toTyped)
 
     assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)
 

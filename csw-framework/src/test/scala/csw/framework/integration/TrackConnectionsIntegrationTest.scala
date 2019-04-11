@@ -1,6 +1,7 @@
 package csw.framework.integration
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
@@ -52,16 +53,16 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
     assertThatContainerIsRunning(containerRef, containerLifecycleStateProbe, 5.seconds)
 
     // resolve all the components from container using location service
-    val filterAssemblyLocation = seedLocationService.find(filterAssemblyConnection).await
-    val disperserHcdLocation   = seedLocationService.find(disperserHcdConnection).await
+    val filterAssemblyLocation = wiring.locationService.find(filterAssemblyConnection).await
+    val disperserHcdLocation   = wiring.locationService.find(disperserHcdConnection).await
 
-    val assemblyCommandService = CommandServiceFactory.make(filterAssemblyLocation.get)
+    val assemblyCommandService = CommandServiceFactory.make(filterAssemblyLocation.get)(containerActorSystem.toTyped)
 
     val disperserComponentRef   = disperserHcdLocation.get.componentRef
-    val disperserCommandService = CommandServiceFactory.make(disperserHcdLocation.get)
+    val disperserCommandService = CommandServiceFactory.make(disperserHcdLocation.get)(containerActorSystem.toTyped)
 
     // Subscribe to component's current state
-    assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)
+    val subscription = assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)
 
     // assembly is tracking two HCD's, hence assemblyProbe will receive LocationUpdated event from two HCD's
     assemblyProbe.expectMessage(
@@ -85,6 +86,7 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
       disperserCommandService.submit(commands.Setup(prefix, CommandName("isAlive"), None)).await(200.millis)
     )
 
+    subscription.unsubscribe()
     Http(containerActorSystem).shutdownAllConnectionPools().await
     containerActorSystem.terminate().await
   }
@@ -106,11 +108,11 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
 
     assertThatSupervisorIsRunning(assemblySupervisor, supervisorLifecycleStateProbe, 5.seconds)
 
-    val resolvedAkkaLocation = seedLocationService.resolve(akkaConnection, 5.seconds).await.value
+    val resolvedAkkaLocation = wiring.locationService.resolve(akkaConnection, 5.seconds).await.value
     resolvedAkkaLocation.connection shouldBe akkaConnection
 
     val assemblyProbe          = TestProbe[CurrentState]("assembly-state-probe")
-    val assemblyCommandService = CommandServiceFactory.make(resolvedAkkaLocation)
+    val assemblyCommandService = CommandServiceFactory.make(resolvedAkkaLocation)(componentActorSystem.toTyped)
     // Subscribe to component's current state
     assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)
 
