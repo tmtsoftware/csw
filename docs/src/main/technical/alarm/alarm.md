@@ -5,7 +5,7 @@
 Alarm service in TMT software is used by components to raise alarms. 
 Alarms could be of different severities such as Warning, Critical, etc. 
 The alarm system also provides mechanism to monitor the health of all components 
-and subsystems in TMT. 
+and subsystems in TMT.
 
 ## Technology
 
@@ -40,7 +40,7 @@ following heaths at a given time.
 - `Ill`
 - `Bad`
  
-Health is calculation based on severity. Figure shown below shows a mapping between health and 
+Health is calculated based on severity. Figure shown below shows a mapping between health and 
 severities.
 
 ![alarm-health](alarm-health.png)
@@ -50,8 +50,8 @@ severities.
 A severity can be associated with an alarm, a component or a sub-system.
 
 Unlike alarms, which has a direct association with severity, components 
-and sub-systems don't have a direct association with alarm-severities. 
-They have aggregated severities based on severities on their children.
+and sub-systems don't have a direct association with severities. 
+They have aggregated severities based on severities of their children.
 
 ![alarm-hierarchy](alarm-hierarchy.png)
 
@@ -59,7 +59,7 @@ A components aggregated severity is equal to severity of it's child alarm with "
 Similarly, a sub-system's aggregated severity is determined by it's child component with maximum severity.
 
 Health aggregation works on top of severity aggregation. A components aggregated health is calculated by first
-calculating it's aggregated severity and then mapping to health. Sub-System health aggregation works similarly.
+calculating it's aggregated severity and then mapping it to health. Sub-System health aggregation works in the same way.
 
 ## Redis Storage
 
@@ -68,12 +68,12 @@ calculating it's aggregated severity and then mapping to health. Sub-System heal
 ### Metadata
 
 Metadata of an alarm is static information about an alarm such as name, 
-description, subsystem, component, etc. This information is not supposed to change during runtime.
-Since the metadata is static, entire metadata of an alarm is stored against a single redis key in json format.
+description, subsystem, component, etc. This information is not changed during runtime.
+Since the metadata is static, entire metadata of an alarm is stored against a single redis key in json format for easy retrieval.
 The key name is formed with pattern: `metadata-[SUBSYSTEM_NAME]-[COMPONENT_NAME]-[ALARM_NAME]` 
 e.g. `metadata-nfiraos-trombone-tromboneaxislowlimitalarm`.
 
-This sample json below, shows structure of typical alarm metadata
+The sample json below, shows structure of typical alarm metadata
 
 ```json
 {
@@ -142,12 +142,12 @@ Possible values of this key are:
 Indicates shelve status of an alarm. The key name is formed with pattern 
 `shelvestatus-[SUBSYSTEM_NAME]-[COMPONENT_NAME]-[ALARM_NAME]`.  e.g. `shelvestatus-nfiraos-trombone-tromboneaxislowlimitalarm`
 
-This key could have one of the following values
+This key can have one of the following values
 
 - `shelved`
 - `unshelved`
 
-If now value is present, it is inferred as `unshelved`
+If no value is present, it is inferred as `unshelved`
 
 ### Alarm Time
 
@@ -158,7 +158,7 @@ The value is stored in the format: `2019-04-03T11:09:28.404143Z`
 
 ### Initializing
 
-Indicates whether is initializing or it's initialization is finished. It contains a boolean value either `true` or `false`
+Indicates whether alarm is initializing or it's initialization is finished. It contains a boolean value either `true` or `false`
 
 The key name is formed with pattern 
 `initializing-[SUBSYSTEM_NAME]-[COMPONENT_NAME]-[ALARM_NAME]`. e.g. `initializing-lgsf-tcspkinactive-cpuidlealarm`
@@ -175,7 +175,8 @@ the current severity will get deleted from redis. Absence of severity is inferre
 
 ![alarm-disconnection](alarm-disconnection.gif)
 
-So to avoid disconnection of an alarm, the component will need to ensure that a `SetSeverity` call (aka heartbeat) is made with appropriate severity at-least once in every 5 seconds.
+So to avoid disconnection of an alarm, the component will need to ensure that a `SetSeverity` call (aka heartbeat) is
+made with appropriate severity at-least once in every 5 seconds.
 
 ![alarm-heartbeat](alarm-heartbeat.gif)
 
@@ -194,19 +195,19 @@ without polling them at regular intervals.
 
 ## Severity Latching
 
-Alarm metadata json has an attribute called "isLatchable". This drives the latching behaviour of alarms. If an
-alarm is latchable, it's latched severity sticks to the last highest severity until the alarm is reset. 
-Reset operation is provided as an api in alarm service.
+[Alarm metadata](#metadata) json has a boolean attribute called "isLatchable". This determines the latching behaviour of an alarm. If an
+alarm is latchable, it's latched severity _sticks_ to the last highest severity until the alarm is reset. 
+Reset operation is provided the [admin api](#api-structure) of alarm service.
 
 ![latched-alarm-behaviour](alarm-latchable-behavior-with-reset.gif)
 
 For, alarms which are not latchable, latched severity will always be equal to severity.
 
 Setting severity and latched severity both is done by `SetSeverity` api. As described in previous sections,
-When a component dies, it can't call `SetSeverity` and the severity key in redis, expires.
-However the "Latched Severity" is still not updated which is a problem. To solve this problem, the alarm server
+when a component dies, it can't call `SetSeverity` and the severity key in redis, expires.
+However the "Latched Severity" is still not updated; which is a problem. To solve this problem, the alarm server
 subscribes to all severity changes (using akka stream api of alarm service) and whenever it detects a key has expired,
-it updates it's respective "latchedSeverity" value in redis.
+it updates it's respective "latchedSeverity" value in redis to `disconnected`.
 
 ## Shelving Alarms
 
@@ -221,14 +222,14 @@ shelve-timeout = "8:00:00 AM" // format -> h:m:s a
 When changing the shelve status to `shelved` it is set using `setex` operation of redis with an appropriate TTL
 so that it get's expired on next `shelve-timeout`. Once expired, it is inferred as `unshelved`.
 
-Alarms can also be un-shelved explicitly before next `shelve-timeout` occurs. `Unshelve` api sets `unshelved`
+Alarms can also be un-shelved explicitly before next `shelve-timeout` occurs. `unshelve` api sets `unshelved`
 value in redis explicitly without any TTL.
 
 ## Acknowledging Alarms
 
 Alarms can be in either `ackowldged` or `unackowldged` state. See [Acknowledgement Status](#acknowledgement-status) for more details. 
 The state can be changed by simply using `acknowledge` or `unacknowledge` api of alarm service. Apart from these apis,
-Setting severity can also change the Acknowledgement Status of an alarm.
+setting severity can also change the Acknowledgement Status of an alarm.
 
 Alarm can either be be auto-acknowledgeable or not auto-acknowledgeable. This behavior is driven from [alarm metadata](#metadata).
 When an alarm is not auto-acknowledgeable, whenever it's severity changes to anything except Okay, it's Acknowledgement Status becomes
@@ -247,6 +248,6 @@ If it changes to anything else, Acknowledgement Status remains same.
 
 @@@note
 
-At the time of writing this documentation, the alarm server does not exit. It will be developed in future.
+At the time of writing this documentation, the alarm server does not exist. It will be developed in future.
 
 @@@
