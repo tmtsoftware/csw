@@ -5,19 +5,19 @@ import scalapb.compiler.Version.scalapbVersion
 
 object Libs {
   val ScalaVersion    = "2.12.8"
-  val silencerVersion = "1.3.2"
+  val silencerVersion = "1.3.3"
 
   val `scalatest` = dep("org.scalatest" %%% "scalatest" % "3.0.6") //Apache License 2.0
 
   val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0" //BSD 3-clause "New" or "Revised" License
-  val `scala-async`        = dep("org.scala-lang.modules" %% "scala-async" % "0.9.7") //BSD 3-clause "New" or "Revised" License
+  val `scala-async`        = dep("org.scala-lang.modules" %% "scala-async" % "0.10.0") //BSD 3-clause "New" or "Revised" License
   val `scopt`              = "com.github.scopt" %% "scopt" % "3.7.1" //MIT License
   val `junit`              = "junit" % "junit" % "4.12" //Eclipse Public License 1.0
   val `silencer-plugin`    = compilerPlugin("com.github.ghik" %% "silencer-plugin" % silencerVersion)
   val `silencer-lib`       = "com.github.ghik" %% "silencer-lib" % silencerVersion % Compile
-  val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.2.1"
+  val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.3.1"
   //MIT License
-  val `embedded-keycloak`            = "com.github.tmtsoftware"        % "embedded-keycloak"             % "0.1.1" //Apache 2.0
+  val `embedded-keycloak`            = "com.github.tmtsoftware"        % "embedded-keycloak"             % "0.1.2" //Apache 2.0
   val `logback-classic`              = "ch.qos.logback"                % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `akka-management-cluster-http` = "com.lightbend.akka.management" %% "akka-management-cluster-http" % "1.0.0"
   val `svnkit`                       = "org.tmatesoft.svnkit"          % "svnkit"                        % "1.9.3" //TMate Open Source License
@@ -50,10 +50,10 @@ object Libs {
   val `postgresql`      = "org.postgresql"                % "postgresql"      % "42.2.5"
   val `hikaricp`        = "com.zaxxer"                    % "HikariCP"        % "3.3.1" //Apache License 2.0
   val `otj-pg-embedded` = "com.opentable.components"      % "otj-pg-embedded" % "0.13.1"
-  val httpclient        = "org.apache.httpcomponents"     % "httpclient"      % "4.5.7"
+  val httpclient        = "org.apache.httpcomponents"     % "httpclient"      % "4.5.8"
   val `jboss-logging`   = "org.jboss.logging"             % "jboss-logging"   % "3.3.2.Final"
   val `config`          = "com.typesafe"                  % "config"          % "1.3.3"
-  val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.2.8"
+  val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.2.9"
   val `caffeine`        = "com.github.ben-manes.caffeine" % "caffeine"        % "2.7.0"
 }
 
@@ -109,7 +109,7 @@ object Keycloak {
 }
 
 object Jooq {
-  val Version        = "3.11.10"
+  val Version        = "3.11.11"
   val `jooq`         = "org.jooq" % "jooq" % Version
   val `jooq-meta`    = "org.jooq" % "jooq-meta" % Version
   val `jooq-codegen` = "org.jooq" % "jooq-codegen" % Version
