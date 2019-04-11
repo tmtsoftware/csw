@@ -32,8 +32,7 @@ private[alarm] trait StatusService {
   def reset(alarmKey: AlarmKey): Future[Done]
 
   /**
-   * Sets the shelve status of the given alarm to shelved. Once alarm is shelved no response would be needed in terms of
-   * acknowledgement, reset, etc.
+   * Sets the shelve status of the given alarm to shelved
    *
    * @note alarms that are shelved will automatically be unshelved at a specific time (currently configured at 8 AM local time)
    *       if not done explicitly. This time is configurable e.g csw-alarm.shelve-timeout = h:m:s a .
