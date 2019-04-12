@@ -40,8 +40,8 @@ following heaths at a given time.
 - `Ill`
 - `Bad`
  
-Health is calculated based on severity. Figure shown below shows a mapping between health and 
-severities.
+Health is calculated based on severity. A mapping between health and 
+severities is shown in the figure below.
 
 ![alarm-health](alarm-health.png)
 
@@ -212,7 +212,7 @@ it updates it's respective "latchedSeverity" value in redis to `disconnected`.
 ## Shelving Alarms
 
 Alarms can be shelved and un-shelved using alarm service api. 
-An alarm can only be shelved until a predefined time. The time can be configured in alarm configuration.
+An alarm can only be shelved for a predefined time. The time can be configured in alarm configuration.
 For example: 
 
 ```hocon
