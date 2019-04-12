@@ -1,8 +1,10 @@
 package csw.logging.client.javadsl;
 
 import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
+import akka.actor.typed.ActorSystem;
 import akka.actor.Props;
+import akka.actor.typed.SpawnProtocol;
+import akka.actor.typed.javadsl.Adapter;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -26,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 import static csw.logging.client.utils.Eventually.eventually;
 
 public class JGenericLoggerTest extends JUnitSuite {
-    private static ActorSystem actorSystem = ActorSystem.create("base-system");
+    private static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.behavior(),"base-system");
     private static LoggingSystem loggingSystem;
 
     private static List<JsonObject> logBuffer = new ArrayList<>();
@@ -56,7 +58,8 @@ public class JGenericLoggerTest extends JUnitSuite {
     @AfterClass
     public static void teardown() throws Exception {
         loggingSystem.javaStop().get();
-        Await.result(actorSystem.terminate(), Duration.create(10, TimeUnit.SECONDS));
+        actorSystem.terminate();
+        Await.result(actorSystem.whenTerminated(), Duration.create(10, TimeUnit.SECONDS));
     }
 
     private class JGenericLoggerUtil {
@@ -88,7 +91,8 @@ public class JGenericLoggerTest extends JUnitSuite {
 
     @Test
     public void testGenericLoggerActorWithoutComponentName() throws InterruptedException {
-        ActorRef utilActor = actorSystem.actorOf(Props.create(JGenericActor.class), "JActorUtil");
+        //TODO convert untyped to typed actor
+        ActorRef utilActor = Adapter.toUntyped(actorSystem).actorOf(Props.create(JGenericActor.class), "JActorUtil");
         String actorPath = utilActor.path().toString();
         String className = JGenericActor.class.getName();
 

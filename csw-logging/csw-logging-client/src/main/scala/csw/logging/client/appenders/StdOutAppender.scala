@@ -1,6 +1,6 @@
 package csw.logging.client.appenders
 
-import akka.actor.{ActorContext, ActorRefFactory, ActorSystem}
+import akka.actor.typed.ActorSystem
 import csw.logging.api.models.LoggingLevels.Level
 import csw.logging.client.commons.{Category, LoggingKeys}
 import csw.logging.client.internal.JsonExtensions.RichJsObject
@@ -16,26 +16,22 @@ object StdOutAppender extends LogAppenderBuilder {
   /**
    * A constructor for the StdOutAppender class
    *
-   * @param factory an Akka factory
+   * @param system an Akka factory
    * @param stdHeaders the headers that are fixes for this service
    * @return the stdout appender
    */
-  def apply(factory: ActorRefFactory, stdHeaders: JsObject): StdOutAppender =
-    new StdOutAppender(factory, stdHeaders, println)
+  def apply(system: ActorSystem[_], stdHeaders: JsObject): StdOutAppender =
+    new StdOutAppender(system, stdHeaders, println)
 }
 
 /**
  * A log appender that writes common log messages to stdout. Stdout output can be printed as oneLine or pretty.
  * oneLine will print only the message of the log statement in single line and pretty will print all the information of log statement.
  *
- * @param factory an Akka factory
+ * @param system an Akka factory
  * @param stdHeaders the headers that are fixes for this service
  */
-class StdOutAppender(factory: ActorRefFactory, stdHeaders: JsObject, logPrinter: Any ⇒ Unit) extends LogAppender {
-  private[this] val system = factory match {
-    case context: ActorContext => context.system
-    case s: ActorSystem        => s
-  }
+class StdOutAppender(system: ActorSystem[_], stdHeaders: JsObject, logPrinter: Any ⇒ Unit) extends LogAppender {
   private[this] val config        = system.settings.config.getConfig("csw-logging.appender-config.stdout")
   private[this] val fullHeaders   = config.getBoolean("fullHeaders")
   private[this] val color         = config.getBoolean("color")

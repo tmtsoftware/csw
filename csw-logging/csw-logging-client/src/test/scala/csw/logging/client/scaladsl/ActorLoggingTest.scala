@@ -1,5 +1,6 @@
 package csw.logging.client.scaladsl
 
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import csw.logging.api.models.LoggingLevels
 import csw.logging.api.models.LoggingLevels.Level
 import csw.logging.client.commons.LoggingKeys
@@ -10,7 +11,7 @@ import csw.logging.client.utils.LoggingTestSuite
 
 class ActorLoggingTest extends LoggingTestSuite {
   private val irisActorRef =
-    actorSystem.actorOf(IRIS.props(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
+    actorSystem.toUntyped.actorOf(IRIS.props(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
 
   def sendMessagesToActor() = {
     irisActorRef ! LogTrace

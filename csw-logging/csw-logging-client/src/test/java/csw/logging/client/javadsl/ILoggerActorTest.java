@@ -1,8 +1,10 @@
 package csw.logging.client.javadsl;
 
 import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
+import akka.actor.typed.ActorSystem;
 import akka.actor.Props;
+import akka.actor.typed.SpawnProtocol;
+import akka.actor.typed.javadsl.Adapter;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -25,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 import static csw.logging.client.utils.Eventually.eventually;
 
 public class ILoggerActorTest extends JUnitSuite {
-    protected static ActorSystem actorSystem = ActorSystem.create("base-system");
+    protected static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.behavior(),"base-system");
     protected static LoggingSystem loggingSystem;
 
     protected static List<JsonObject> logBuffer = new ArrayList<>();
@@ -54,11 +56,12 @@ public class ILoggerActorTest extends JUnitSuite {
     @AfterClass
     public static void teardown() throws Exception {
         loggingSystem.javaStop().get();
-        Await.result(actorSystem.terminate(), Duration.create(10, TimeUnit.SECONDS));
+        actorSystem.terminate();
+        Await.result(actorSystem.whenTerminated(), Duration.create(10, TimeUnit.SECONDS));
     }
     @Test
     public void testDefaultLogConfigurationForActor() {
-        ActorRef tromboneActor = actorSystem.actorOf(Props.create(JTromboneHCDSupervisorActor.class, new JLoggerFactory("jTromboneHcdActor")), "JTromboneActor");
+        ActorRef tromboneActor = Adapter.toUntyped(actorSystem).actorOf(Props.create(JTromboneHCDSupervisorActor.class, new JLoggerFactory("jTromboneHcdActor")), "JTromboneActor");
         String actorPath = tromboneActor.path().toString();
         String className = JTromboneHCDSupervisorActor.class.getName();
 

@@ -2,7 +2,7 @@ package csw.logging.client.scaladsl
 
 import java.net.InetAddress
 
-import akka.actor.ActorSystem
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.logging.client.internal.LoggingSystem
 
 object LoggingSystemFactory {
@@ -14,7 +14,10 @@ object LoggingSystemFactory {
    * @return the instance of LoggingSystem
    */
   private[logging] def start(): LoggingSystem =
-    new LoggingSystem("foo-name", "foo-version", InetAddress.getLocalHost.getHostName, ActorSystem("logging"))
+    new LoggingSystem("foo-name",
+                      "foo-version",
+                      InetAddress.getLocalHost.getHostName,
+                      ActorSystem(SpawnProtocol.behavior, "logging"))
 
   /**
    * The factory used to create the LoggingSystem. `LoggingSystem` should be started once in an app.
@@ -26,6 +29,6 @@ object LoggingSystemFactory {
    * @param actorSystem the ActorSystem used to create LogActor from LoggingSystem
    * @return the instance of LoggingSystem
    */
-  def start(name: String, version: String, hostName: String, actorSystem: ActorSystem): LoggingSystem =
+  def start(name: String, version: String, hostName: String, actorSystem: ActorSystem[SpawnProtocol]): LoggingSystem =
     new LoggingSystem(name, version, hostName, actorSystem)
 }
