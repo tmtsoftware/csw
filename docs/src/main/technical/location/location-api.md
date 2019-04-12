@@ -1,4 +1,4 @@
-# CSW Location API
+# Location API
 
 The @github[csw-location-api](/csw-location/csw-location-api) project provides a
 @github[common API](/csw-location/csw-location-api/src/main/scala/csw/location/api/scaladsl/LocationService.scala) for the the `csw-location-server` and `csw-location-client` implementations.

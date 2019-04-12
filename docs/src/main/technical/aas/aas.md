@@ -1,3 +1,3 @@
-#Authentication and Authorization Service Technical Description
+# Authentication and Authorization Service
 
 Some AAS text

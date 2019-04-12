@@ -1,3 +1,3 @@
-# Logging Service Technical Description
+# Logging Service
 
 Start Here

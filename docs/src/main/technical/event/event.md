@@ -1,3 +1,3 @@
-#Event Service Technical Description
+# Event Service
 
 Some event text
