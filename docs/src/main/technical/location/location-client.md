@@ -1,4 +1,4 @@
-# CSW Location Client
+# Location Client
 
 The @github[csw-location-client](/csw-location/csw-location-client) project provides a convenient lightweight wrapper for accessing the CSW Location HTTP Server.
 

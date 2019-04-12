@@ -1,3 +1,3 @@
-# Configuration Service Technical Description
+# Configuration Service
 
 This describes Configuration Service

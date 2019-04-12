@@ -1,4 +1,4 @@
-# CSW Location Server
+# Location Server
 
 ## Introduction
 

@@ -1,4 +1,4 @@
-#Time Service Technical Description
+# Time Service
 
 ## Introduction
 The time service implementation provides API for managing time across

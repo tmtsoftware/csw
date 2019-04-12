@@ -1,4 +1,4 @@
-# Alarm Service Technical Description
+# Alarm Service
 
 ## Introduction
 

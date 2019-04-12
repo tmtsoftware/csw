@@ -1,4 +1,4 @@
-# Location Service Technical Description
+# Location Service
 
 ## Introduction
 
@@ -18,7 +18,7 @@ Core implementation of location service uses
 - [Conflict Free Replicated Data Types (CRDTs)](https://doc.akka.io/docs/akka/current/typed/distributed-data.html)
 - [Akka Http](https://doc.akka.io/docs/akka-http/current).
 
-You can find more details on CSW is using this in [csw-location-server](./location-server.md).
+You can find more details on CSW is using this in @ref:[csw-location-server](./location-server.md).
 
 @@@ note
 See [here](https://medium.com/@unmeshvjoshi/service-discovery-with-crdts-fb02bb48cfff) for some background on how the choice was made to use an Akka cluster with CRDTs.
