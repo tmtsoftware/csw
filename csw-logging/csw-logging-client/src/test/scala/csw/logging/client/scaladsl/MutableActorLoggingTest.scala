@@ -31,7 +31,7 @@ object TromboneMutableActor {
 class MutableActorLoggingTest extends LoggingTestSuite {
 
   private val tromboneActorRef =
-    actorSystem.userActorOf(TromboneMutableActor.behavior(new LoggerFactory("tromboneMutableHcdActor")), "TromboneMutableActor")
+    typedActorSystem.spawn(TromboneMutableActor.behavior(new LoggerFactory("tromboneMutableHcdActor")), "TromboneMutableActor")
 
   def sendMessagesToActor(): Unit = {
     tromboneActorRef ! LogTrace

@@ -18,7 +18,7 @@ import scala.collection.mutable.ArrayBuffer
 class LoggerCompTest extends LoggingTestSuite {
 
   //TODO convert Iris into typed actor
-  private val system: actor.ActorSystem = actorSystem.toUntyped
+  private val system: actor.ActorSystem = typedActorSystem.toUntyped
   private val irisSupervisorActorRef    = system.actorOf(IRIS.props(IRIS.COMPONENT_NAME))
   private val irisUtilActorRef          = system.actorOf(IrisActorUtil.props)
   private val irisTLA                   = new IrisTLA()

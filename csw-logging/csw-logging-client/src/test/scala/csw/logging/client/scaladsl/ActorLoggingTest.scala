@@ -11,7 +11,7 @@ import csw.logging.client.utils.LoggingTestSuite
 
 class ActorLoggingTest extends LoggingTestSuite {
   private val irisActorRef =
-    actorSystem.toUntyped.actorOf(IRIS.props(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
+    typedActorSystem.toUntyped.actorOf(IRIS.props(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
 
   def sendMessagesToActor() = {
     irisActorRef ! LogTrace

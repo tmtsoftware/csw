@@ -3,8 +3,8 @@ package csw.logging.client.internal
 import java.nio.file.Paths
 import java.time.{ZoneId, ZoneOffset, ZonedDateTime}
 
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import akka.actor.ActorSystem
+import akka.actor.typed.scaladsl.adapter.{TypedActorSystemOps, UntypedActorSystemOps}
 import csw.logging.api.models.RequestId
 import csw.logging.client.appenders.FileAppender
 import csw.logging.client.commons.LoggingKeys
@@ -21,13 +21,14 @@ class TimingTest extends LoggingTestSuite with Timing {
   private val logFileDir        = Paths.get("/tmp/csw-test-logs/").toFile
   private val loggingSystemName = "TimingTest"
 
-  override lazy val actorSystem = ActorSystem(SpawnProtocol.behavior, "timing-test-system")
+  lazy val untypedActorSystem        = ActorSystem("timing-test-system")
+  override lazy val typedActorSystem = untypedActorSystem.toTyped
   override lazy val loggingSystem =
-    new LoggingSystem(loggingSystemName, "version", "localhost", actorSystem)
+    new LoggingSystem(loggingSystemName, "version", "localhost", typedActorSystem)
 
   //TODO convert Iris into typed actor
   private val irisActorRef =
-    actorSystem.toUntyped.actorOf(IRIS.props(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
+    typedActorSystem.toUntyped.actorOf(IRIS.props(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
 
   private val fileTimestamp   = FileAppender.decideTimestampForFile(ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC)))
   private val timeLogFilePath = logFileDir + s"/${loggingSystemName}_${fileTimestamp}_time.log"

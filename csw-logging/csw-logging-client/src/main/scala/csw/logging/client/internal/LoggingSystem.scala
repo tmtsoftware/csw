@@ -36,7 +36,7 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
  * @param host host name (to log).
  * @param system an ActorSystem used to create log actors
  */
-class LoggingSystem private[csw] (name: String, version: String, host: String, val system: ActorSystem[SpawnProtocol]) {
+class LoggingSystem private[csw] (name: String, version: String, host: String, val system: ActorSystem[_]) {
 
   import csw.logging.api.models.LoggingLevels._
 
@@ -95,7 +95,7 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
     _.apply(system, standardHeaders)
   }
 
-  private[this] val logActor = system.userActorOf(
+  private[this] val logActor = system.spawn(
     LogActor.behavior(done, appenders, defaultLevel, defaultSlf4jLogLevel, defaultAkkaLogLevel),
     name = "LoggingActor",
     akka.actor.typed.Props.empty.withDispatcherFromConfig("logging-dispatcher")

@@ -3,7 +3,6 @@ package csw.logging.client.javadsl;
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.Props;
-import akka.actor.typed.SpawnProtocol;
 import akka.actor.typed.javadsl.Adapter;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -29,7 +28,8 @@ import static csw.logging.client.utils.Eventually.eventually;
 
 // DEOPSCSW-280 SPIKE: Introduce Akkatyped in logging
 public class ILoggerMutableActorTest extends JUnitSuite {
-    protected static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.behavior(),"base-system");
+    protected static akka.actor.ActorSystem actorSystem = akka.actor.ActorSystem.create("base-system");
+    protected static ActorSystem typedSystem = Adapter.toTyped(actorSystem);
     protected static LoggingSystem loggingSystem;
 
     protected static List<JsonObject> logBuffer = new ArrayList<>();
@@ -47,7 +47,7 @@ public class ILoggerMutableActorTest extends JUnitSuite {
 
     @BeforeClass
     public static void setup() {
-        loggingSystem = JLoggingSystemFactory.start("Logger-Test", "SNAPSHOT-1.0", "localhost", actorSystem, appenderBuilders);
+        loggingSystem = JLoggingSystemFactory.start("Logger-Test", "SNAPSHOT-1.0", "localhost", typedSystem, appenderBuilders);
     }
 
     @After
@@ -64,7 +64,14 @@ public class ILoggerMutableActorTest extends JUnitSuite {
     @Test
     public void testDefaultLogConfigurationForActor() {
 
-        ActorRef<LogCommand> irisTyped = AkkaTypedExtension.UserActorFactory(actorSystem).userActorOf(JIrisSupervisorMutableActor.irisBeh("jIRISTyped"), "irisTyped", Props.empty());
+        ActorRef<LogCommand> irisTyped =
+                AkkaTypedExtension
+                        .UserActorFactory(typedSystem)
+                        .spawn(
+                                JIrisSupervisorMutableActor.irisBeh("jIRISTyped"),
+                                "irisTyped",
+                                Props.empty()
+                        );
 
         String actorPath = irisTyped.path().toString();
         String className = JIrisSupervisorMutableActor.class.getName();

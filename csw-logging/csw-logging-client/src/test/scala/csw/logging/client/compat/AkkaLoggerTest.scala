@@ -31,7 +31,7 @@ object MyActor {
 class AkkaLoggerTest extends LoggingTestSuite with FunSuiteLike with Matchers {
 
   test("logging framework should capture akka log messages and log it") {
-    val actorRef  = actorSystem.userActorOf(MyActor.behavior, "my-actor")
+    val actorRef  = typedActorSystem.spawn(MyActor.behavior, "my-actor")
     val className = MyActor.getClass.getName
 
     actorRef ! "info"
