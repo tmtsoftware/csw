@@ -59,12 +59,12 @@ sealed class SimpleKeyTypeWithUnits[S: Format: ClassTag](defaultUnits: Units) ex
 /**
  * A KeyType that holds array
  */
-sealed class ArrayKeyType[S: Format: ClassTag] extends SimpleKeyType[ArrayData[S]]
+class ArrayKeyType[S: Format: ClassTag] extends SimpleKeyType[ArrayData[S]]
 
 /**
  * A KeyType that holds Matrix
  */
-sealed class MatrixKeyType[S: Format: ClassTag] extends SimpleKeyType[MatrixData[S]]
+class MatrixKeyType[S: Format: ClassTag] extends SimpleKeyType[MatrixData[S]]
 
 /**
  * KeyTypes defined for consumption in Scala code
