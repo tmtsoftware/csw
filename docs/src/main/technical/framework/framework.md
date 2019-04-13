@@ -1,4 +1,4 @@
-# CSW Framework
+# Framework
 
 The *CSW Framework* provides the APIs used to talk to components,
 such as HCDs and assemblies.
