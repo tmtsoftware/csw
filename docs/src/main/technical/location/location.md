@@ -6,9 +6,9 @@ The Location Service is used to register and find CSW services in the TMT networ
 
 For information on _using_ the Location Service, see these sections:
 
-- @ref:[CSW Location Service](../../services/location.md)
-- @ref:[CSW Location Server](../../apps/cswlocationserver.md)
-- @ref:[CSW Location Agent](../../apps/cswlocationagent.md)
+- @ref:[Location Service](../../services/location.md)
+- @ref:[Location Server](../../apps/cswlocationserver.md)
+- @ref:[Location Agent](../../apps/cswlocationagent.md)
 
 ## Location Service Implementation
 
@@ -18,7 +18,7 @@ Core implementation of location service uses
 - [Conflict Free Replicated Data Types (CRDTs)](https://doc.akka.io/docs/akka/current/typed/distributed-data.html)
 - [Akka Http](https://doc.akka.io/docs/akka-http/current).
 
-You can find more details on CSW is using this in @ref:[csw-location-server](./location-server.md).
+You can find more details on how CSW is using this in @ref:[csw-location-server](./location-server.md).
 
 @@@ note
 See [here](https://medium.com/@unmeshvjoshi/service-discovery-with-crdts-fb02bb48cfff) for some background on how the choice was made to use an Akka cluster with CRDTs.

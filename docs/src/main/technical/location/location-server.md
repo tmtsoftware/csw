@@ -31,11 +31,15 @@ Let's discuss different components of `Location Server` in following sections:
 
 ### Cluster Member
 
-Location service JVM (precisely Actor System) takes part in [Akka Cluster](https://doc.akka.io/docs/akka/current/index-cluster.html). By default, this actor system binds to port `3552`. Initially when there is no member in Akka cluster, node joins itself. Such a node is referred as seed node (introducer) and location of this node needs to be known so that other nodes can join to this known address and forms a larger cluster. After the joining process the seed nodes are not special and they participate in the cluster in exactly the same way as other nodes.
+Location service JVM (precisely Actor System) takes part in [Akka Cluster](https://doc.akka.io/docs/akka/current/index-cluster.html). 
+By default, this actor system binds to port `3552`. Initially when there is no member in Akka cluster, node joins itself. 
+Such a node is referred as seed node (introducer) and location of this node needs to be known so that other nodes can join to this known address and form a larger cluster. 
+After the joining process is complete, seed nodes are not special and they participate in the cluster in exactly the same way as other nodes.
 
 Akka Cluster provides cluster [membership](https://doc.akka.io/docs/akka/current/common/cluster.html#membership) service using [gossip](https://doc.akka.io/docs/akka/current/common/cluster.html#gossip) protocols and an automatic [failure detector](https://doc.akka.io/docs/akka/current/common/cluster.html#failure-detector).
 
-Death watch uses the cluster failure detector for nodes in the cluster, i.e. it detects network failures and JVM crashes, in addition to graceful termination of watched actor. Death watch generates the `Terminated` message to the watching actor when the unreachable cluster node has been downed and removed. Hence we have kept `auto-down-unreachable-after = 10s` so that in case of failure, interested parties get the death watch notification for the location in around 10s.
+Death watch uses the cluster failure detector for nodes in the cluster, i.e. it detects network failures and JVM crashes, in addition to graceful termination of watched actor. 
+Death watch generates the `Terminated` message to the watching actor when the unreachable cluster node has been downed and removed. Hence we have kept `auto-down-unreachable-after = 10s` so that in case of failure, interested parties get the death watch notification for the location in around 10s.
 
 ### Distributed Data (Replicator)
 
@@ -48,8 +52,9 @@ We store following data in this key-value store (distributed data):
 
 - `Service`:
   This uses [LWWRegister](https://doc.akka.io/docs/akka/current/distributed-data.html?language=scala#flags-and-registers) which holds location of CSW component against unique connection name.
-  `Location service` track API internally uses this key to register interest in change notifications by sending `Replicator.Subscribe` message to the Replicator.
-  It will send `Replicator.Changed` messages to the registered subscriber when the data for the subscribed key is updated.
+  
+`Location service` track API internally uses `Service` key to register interest in change notifications by sending `Replicator.Subscribe` message to the Replicator.
+It sends `Replicator.Changed` messages to the registered subscriber when the data for the subscribed key is updated.
 
 #### Consistency Gurantees
 
