@@ -1,57 +1,33 @@
 package csw.params.javadsl
 
 import csw.params.core.formats.JsonSupport
-import csw.params.core.generics.{KeyType, SimpleKeyType}
-import csw.params.core.models.{ArrayData, MatrixData}
-import play.api.libs.json.Format
-import com.github.ghik.silencer.silent
-
-import scala.reflect.ClassTag
-
-/**
- * SimpleKeyType with a name for java Keys. Holds instances of primitives such as char, int, String etc.
- */
-sealed class JSimpleKeyType[S: Format: ClassTag, T](implicit @silent conversion: T ⇒ S) extends SimpleKeyType[S]
-
-/**
- * A java KeyType that holds array
- */
-sealed class JArrayKeyType[S: Format: ClassTag, T](
-    implicit conversion: T ⇒ S
-) extends JSimpleKeyType[ArrayData[S], ArrayData[T]]
-
-/**
- * A java KeyType that holds matrix
- */
-sealed class JMatrixKeyType[S: Format: ClassTag, T](
-    implicit conversion: T ⇒ S
-) extends JSimpleKeyType[MatrixData[S], MatrixData[T]]
+import csw.params.core.generics.{ArrayKeyType, KeyType, MatrixKeyType, SimpleKeyType}
 
 object JSimpleKeyType {
   import JsonSupport._
-  case object BooleanKey extends JSimpleKeyType[java.lang.Boolean, Boolean]
-  case object CharKey    extends JSimpleKeyType[java.lang.Character, Char]
+  case object BooleanKey extends SimpleKeyType[java.lang.Boolean]
+  case object CharKey    extends SimpleKeyType[java.lang.Character]
 
-  case object ByteKey   extends JSimpleKeyType[java.lang.Byte, Byte]
-  case object ShortKey  extends JSimpleKeyType[java.lang.Short, Short]
-  case object LongKey   extends JSimpleKeyType[java.lang.Long, Long]
-  case object IntKey    extends JSimpleKeyType[java.lang.Integer, Int]
-  case object FloatKey  extends JSimpleKeyType[java.lang.Float, Float]
-  case object DoubleKey extends JSimpleKeyType[java.lang.Double, Double]
+  case object ByteKey   extends SimpleKeyType[java.lang.Byte]
+  case object ShortKey  extends SimpleKeyType[java.lang.Short]
+  case object LongKey   extends SimpleKeyType[java.lang.Long]
+  case object IntKey    extends SimpleKeyType[java.lang.Integer]
+  case object FloatKey  extends SimpleKeyType[java.lang.Float]
+  case object DoubleKey extends SimpleKeyType[java.lang.Double]
 
-  case object ByteArrayKey   extends JArrayKeyType[java.lang.Byte, Byte]
-  case object ShortArrayKey  extends JArrayKeyType[java.lang.Short, Short]
-  case object LongArrayKey   extends JArrayKeyType[java.lang.Long, Long]
-  case object IntArrayKey    extends JArrayKeyType[java.lang.Integer, Int]
-  case object FloatArrayKey  extends JArrayKeyType[java.lang.Float, Float]
-  case object DoubleArrayKey extends JArrayKeyType[java.lang.Double, Double]
+  case object ByteArrayKey   extends ArrayKeyType[java.lang.Byte]
+  case object ShortArrayKey  extends ArrayKeyType[java.lang.Short]
+  case object LongArrayKey   extends ArrayKeyType[java.lang.Long]
+  case object IntArrayKey    extends ArrayKeyType[java.lang.Integer]
+  case object FloatArrayKey  extends ArrayKeyType[java.lang.Float]
+  case object DoubleArrayKey extends ArrayKeyType[java.lang.Double]
 
-  case object ByteMatrixKey   extends JMatrixKeyType[java.lang.Byte, Byte]
-  case object ShortMatrixKey  extends JMatrixKeyType[java.lang.Short, Short]
-  case object LongMatrixKey   extends JMatrixKeyType[java.lang.Long, Long]
-  case object IntMatrixKey    extends JMatrixKeyType[java.lang.Integer, Int]
-  case object FloatMatrixKey  extends JMatrixKeyType[java.lang.Float, Float]
-  case object DoubleMatrixKey extends JMatrixKeyType[java.lang.Double, Double]
+  case object ByteMatrixKey   extends MatrixKeyType[java.lang.Byte]
+  case object ShortMatrixKey  extends MatrixKeyType[java.lang.Short]
+  case object LongMatrixKey   extends MatrixKeyType[java.lang.Long]
+  case object IntMatrixKey    extends MatrixKeyType[java.lang.Integer]
+  case object FloatMatrixKey  extends MatrixKeyType[java.lang.Float]
+  case object DoubleMatrixKey extends MatrixKeyType[java.lang.Double]
 }
 
 /////////////////////////////////////
