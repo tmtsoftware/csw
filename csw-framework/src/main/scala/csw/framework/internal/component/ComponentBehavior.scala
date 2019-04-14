@@ -22,16 +22,16 @@ import scala.concurrent.Await
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.util.control.NonFatal
 
-/**
- * The Behavior of a component actor, represented as a mutable behavior
- *
- * @param ctx the [[akka.actor.typed.scaladsl.ActorContext]] under which the actor instance of this behavior is created
- * @param supervisor the actor reference of the supervisor actor which created this component
- * @param lifecycleHandlers the implementation of handlers which defines the domain actions to be performed by this component
- */
 // scalastyle:off method.length
 private[framework] object ComponentBehavior {
 
+  /**
+   * The Behavior of a component actor, represented as a mutable behavior
+   *
+   * @param supervisor the actor reference of the supervisor actor which created this component
+   * @param lifecycleHandlers the implementation of handlers which defines the domain actions to be performed by this component
+   * @param cswCtx holds instances of all the csw services
+   */
   def make(
       supervisor: ActorRef[FromComponentLifecycleMessage],
       lifecycleHandlers: ComponentHandlers,
