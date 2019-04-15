@@ -12,14 +12,16 @@ using the PTP protocol. For higher accuracy in time measurements,
 hardware time stamping is recommended and the network entities should be
 fitted with PTP capable Network Interface Cards (NIC).
 
-The time service relies on making native calls (Linux kernel C methods
+The TMT time service relies on making native calls (Linux kernel C methods
 invocation) to get the nanosecond precise time overcoming the
 limitations of Scala and Java libraries which support only microsecond
 precision till date. These native calls are provided as wrapper over
 Java and Scala APIs for easy use by component developers familiar with
 Java/Scala. The TMT time service is responsible for primarily providing
 time in [Coordinated Universal Time (UTC)](#summary-of-relevant-time-metrics) and [International Atomic
-Time (TAI)](#summary-of-relevant-time-metrics) time scales.
+Time (TAI)](#summary-of-relevant-time-metrics) time scales. The handling of [leap second](#summary-of-relevant-time-metrics) event is taken care
+by the TMT time service automatically(without human intervention) as the PTP grandmaster distributes the accurate information 
+when received through GPS.
 
 The time service also allows for scheduling tasks either periodically or
 once using both UTC and TAI time. These schedulers are optimised for
