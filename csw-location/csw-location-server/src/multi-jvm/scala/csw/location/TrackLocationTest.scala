@@ -9,8 +9,6 @@ import csw.location.api.models._
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.params.core.models.Prefix
 
-import scala.concurrent.duration.DurationInt
-
 class TrackLocationTestMultiJvmNode1 extends TrackLocationTest(0, "cluster")
 class TrackLocationTestMultiJvmNode2 extends TrackLocationTest(0, "cluster")
 class TrackLocationTestMultiJvmNode3 extends TrackLocationTest(0, "cluster")
@@ -52,8 +50,8 @@ class TrackLocationTest(ignore: Int, mode: String) extends LSNodeSpec(config = n
       val akkaProbe              = TestProbe[TrackingEvent]("test-probe1")
       val tcpProbe               = TestProbe[TrackingEvent]("test-probe2")
 
-      val akkaSwitch = locationService.track(akkaConnection).toMat(Sink.foreach(akkaProbe.ref.tell(_)))(Keep.left).run()
-      val tcpSwitch  = locationService.track(tcpConnection).toMat(Sink.foreach(tcpProbe.ref.tell(_)))(Keep.left).run()
+      locationService.track(akkaConnection).toMat(Sink.foreach(akkaProbe.ref.tell(_)))(Keep.left).run()
+      locationService.track(tcpConnection).toMat(Sink.foreach(tcpProbe.ref.tell(_)))(Keep.left).run()
 
       val akkaEvent             = akkaProbe.expectMessageType[LocationUpdated]
       val trackedAkkaConnection = akkaEvent.asInstanceOf[LocationUpdated].connection
@@ -68,14 +66,12 @@ class TrackLocationTest(ignore: Int, mode: String) extends LSNodeSpec(config = n
       val akkaRemovedEvent: LocationRemoved = akkaProbe.expectMessageType[LocationRemoved]
       akkaRemovedEvent.connection shouldBe akkaConnection
 
-      akkaSwitch.shutdown()
-      tcpSwitch.shutdown()
-
       httpRegistrationResult.unregister().await
       enterBarrier("Http-unregister")
       enterBarrier("Tcp-unregister")
 
-      tcpProbe.expectNoMessage(200.millis)
+      val tcpRemovedEvent: LocationRemoved = tcpProbe.expectMessageType[LocationRemoved]
+      tcpRemovedEvent.connection shouldBe tcpConnection
     }
 
     runOn(member2) {
@@ -85,7 +81,7 @@ class TrackLocationTest(ignore: Int, mode: String) extends LSNodeSpec(config = n
 
       val httpProbe = TestProbe[TrackingEvent]("test-probe")
 
-      val httpSwitch = locationService.track(httpConnection).toMat(Sink.foreach(httpProbe.ref.tell(_)))(Keep.left).run()
+      locationService.track(httpConnection).toMat(Sink.foreach(httpProbe.ref.tell(_)))(Keep.left).run()
 
       val httpEvent: TrackingEvent = httpProbe.expectMessageType[LocationUpdated]
       httpEvent.connection shouldBe httpConnection
@@ -96,8 +92,6 @@ class TrackLocationTest(ignore: Int, mode: String) extends LSNodeSpec(config = n
 
       val httpRemovedEvent: TrackingEvent = httpProbe.expectMessageType[LocationRemoved]
       httpRemovedEvent.connection shouldBe httpConnection
-
-      httpSwitch.shutdown()
 
       tcpRegistrationResult.unregister().await
       enterBarrier("Tcp-unregister")
