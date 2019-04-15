@@ -9,7 +9,7 @@ class TestAppender(callback: Any ⇒ Unit) extends LogAppenderBuilder {
   /**
    * A constructor for the TestAppender class.
    *
-   * @param system    an Akka factory.
+   * @param system    typed Actor System.
    * @param stdHeaders the headers that are fixes for this service.
    * @return the stdout appender.
    */

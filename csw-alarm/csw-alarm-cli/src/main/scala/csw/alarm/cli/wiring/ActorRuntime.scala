@@ -3,7 +3,7 @@ package csw.alarm.cli.wiring
 import akka.Done
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.{ActorSystem, CoordinatedShutdown}
+import akka.actor.{typed, ActorSystem, CoordinatedShutdown}
 import akka.stream.Materializer
 import akka.stream.typed.scaladsl.ActorMaterializer
 import csw.logging.client.internal.LoggingSystem
@@ -14,14 +14,15 @@ import csw.services.BuildInfo
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 class ActorRuntime(_actorSystem: ActorSystem) {
-  implicit lazy val system: ActorSystem          = _actorSystem
-  implicit lazy val ec: ExecutionContextExecutor = system.dispatcher
-  implicit lazy val mat: Materializer            = ActorMaterializer()(system.toTyped)
+  implicit lazy val system: ActorSystem               = _actorSystem
+  implicit lazy val typedSystem: typed.ActorSystem[_] = _actorSystem.toTyped
+  implicit lazy val ec: ExecutionContextExecutor      = system.dispatcher
+  implicit lazy val mat: Materializer                 = ActorMaterializer()
 
   lazy val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(system)
 
   def startLogging(name: String): LoggingSystem =
-    LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, system)
+    LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, typedSystem)
 
   /**
    * Gracefully shutdown [[_actorSystem]]

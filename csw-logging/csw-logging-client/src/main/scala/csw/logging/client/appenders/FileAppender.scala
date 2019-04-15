@@ -119,7 +119,7 @@ object FileAppender extends LogAppenderBuilder {
   /**
    * Constructor for a file appender.
    *
-   * @param system an Akka factory.
+   * @param system typed Actor System.
    * @param stdHeaders the headers that are fixes for this service.
    */
   def apply(system: ActorSystem[_], stdHeaders: JsObject): FileAppender =
@@ -143,7 +143,7 @@ object FileAppender extends LogAppenderBuilder {
 /**
  * An appender that writes log messages to files.
  *
- * @param system ActorRefFactory
+ * @param system typed Actor System
  * @param stdHeaders the headers that are fixes for this service.
  */
 class FileAppender(system: ActorSystem[_], stdHeaders: JsObject) extends LogAppender {

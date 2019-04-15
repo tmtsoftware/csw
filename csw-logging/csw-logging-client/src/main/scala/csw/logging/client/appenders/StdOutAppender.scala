@@ -16,7 +16,7 @@ object StdOutAppender extends LogAppenderBuilder {
   /**
    * A constructor for the StdOutAppender class
    *
-   * @param system an Akka factory
+   * @param system typed Actor System
    * @param stdHeaders the headers that are fixes for this service
    * @return the stdout appender
    */
@@ -28,7 +28,7 @@ object StdOutAppender extends LogAppenderBuilder {
  * A log appender that writes common log messages to stdout. Stdout output can be printed as oneLine or pretty.
  * oneLine will print only the message of the log statement in single line and pretty will print all the information of log statement.
  *
- * @param system an Akka factory
+ * @param system typed Actor System
  * @param stdHeaders the headers that are fixes for this service
  */
 class StdOutAppender(system: ActorSystem[_], stdHeaders: JsObject, logPrinter: Any ⇒ Unit) extends LogAppender {

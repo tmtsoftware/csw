@@ -1,6 +1,5 @@
 package csw.logging.client.appenders
 
-import akka.actor.ActorRefFactory
 import akka.actor.typed.ActorSystem
 import play.api.libs.json.JsObject
 
@@ -14,7 +13,7 @@ trait LogAppenderBuilder {
   /**
    * Log appender constructor
    *
-   * @param system an Akka factory
+   * @param system typed Actor System
    * @param standardHeaders the headers that are fixes for this service
    * @return an appender
    */

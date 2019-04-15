@@ -3,6 +3,7 @@ package example.location
 import java.net.InetAddress
 
 import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.typed.{ActorRef, Behavior}
 import akka.actor.{ActorSystem, CoordinatedShutdown, Props}
 import akka.stream.scaladsl.{Keep, Sink}
@@ -49,7 +50,7 @@ object LocationServiceExampleClientApp extends App {
   //#create-logging-system
   private val host = InetAddress.getLocalHost.getHostName
   // Only call this once per application
-  val loggingSystem: LoggingSystem = LoggingSystemFactory.start("LocationServiceExampleClient", "0.1", host, actorSystem)
+  val loggingSystem: LoggingSystem = LoggingSystemFactory.start("LocationServiceExampleClient", "0.1", host, actorSystem.toTyped)
   //#create-logging-system
 
   actorSystem.actorOf(LocationServiceExampleClient.props(locationService, loggingSystem))

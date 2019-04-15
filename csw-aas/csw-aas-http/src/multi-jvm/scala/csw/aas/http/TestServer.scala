@@ -1,10 +1,11 @@
 package csw.aas.http
 
-import akka.actor.ActorSystem
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.{typed, ActorSystem}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import akka.stream.ActorMaterializer
+import akka.stream.typed.scaladsl.ActorMaterializer
 import csw.aas.http.AuthorizationPolicy.RealmRolePolicy
 import csw.location.api.scaladsl.LocationService
 import csw.logging.client.scaladsl.LoggingSystemFactory
@@ -23,9 +24,10 @@ class TestServer(locationService: LocationService)(implicit ec: ExecutionContext
 
   def start(testServerPort: Int): Future[Http.ServerBinding] = {
 
-    implicit val system: ActorSystem = ActorSystem()
+    implicit val system: ActorSystem                    = ActorSystem()
+    implicit val typedActorSystem: typed.ActorSystem[_] = ActorSystem().toTyped
 
-    LoggingSystemFactory.start("test-server", "", "", system)
+    LoggingSystemFactory.start("test-server", "", "", typedActorSystem)
     implicit val materializer: ActorMaterializer = ActorMaterializer()
     Http().bindAndHandle(routes, "0.0.0.0", testServerPort)
   }

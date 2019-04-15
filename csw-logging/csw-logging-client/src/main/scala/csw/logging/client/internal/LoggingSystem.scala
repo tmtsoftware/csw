@@ -5,8 +5,8 @@ import java.util.concurrent.CompletableFuture
 
 import akka.Done
 import akka.actor.Props
+import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import ch.qos.logback.classic.LoggerContext
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.appenders.LogAppenderBuilder
