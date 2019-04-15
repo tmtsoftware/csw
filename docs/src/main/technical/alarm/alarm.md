@@ -238,16 +238,43 @@ When an alarm is not auto-acknowledgeable, whenever it's severity changes to any
 When the alarm is auto-acknowledgeable, whenever it's severity changes to Okay, it's Acknowledgement Status becomes `ackowldged`.
 If it changes to anything else, Acknowledgement Status remains same.
 
-## Api Structure
+## API Structure
 
 ![api-structure](api-structure.png)
+
+The alarm service is divided into two parts. First one is called, well, @github[AlarmService](/csw-alarm/csw-alarm-api/src/main/scala/csw/alarm/api/scaladsl/AlarmService.scala) and it is meant
+for Components who need just one api i.e. `SetSeverity`
+
+The other one is @github[AlarmAdminService](/csw-alarm/csw-alarm-api/src/main/scala/csw/alarm/api/scaladsl/AlarmAdminService.scala). This api allows admins 
+operations such as shelving alarms, subscribing for severity changes, acknowledging alarms, etc. 
+This api is consumed from @github[alarm cli](/csw-alarm/csw-alarm-cli) and alarm server.
+
+The api doc for alarm service can be found @scaladoc[here](csw/alarm/api/scaladsl/AlarmService) and @scaladoc[here](csw/alarm/api/scaladsl/AlarmAdminService).
+
+Detailed documentation about how to use these apis is available @ref:[here](../../services/alarm.md). 
 
 ## Architecture
 
 ![architecture](alarm-architecture.png)
 
-@@@note
+@@@warning { title=Important }
 
-At the time of writing this documentation, the alarm server does not exist. It will be developed in future.
+At the time of writing this documentation, the alarm server does not exist. It will be developed in future. 
+It's description and scope of work is subjected to change
 
 @@@
+
+For alarms to function, it is necessary that redis instance is registered with location service.
+Redis here is configured similar to other services in CSW.
+There is a master redis instance and a slave redis instance. They are configured in "replication" mode.
+There a sentinel who's responsibility is to promote slave as master when master goes down. It is important to note that when master
+goes down, the "location" of alarm service remains same because location of alarm service is of sentinel and not of master or slave.
+The master and slave redis instances are dedicated for alarm, however sentinel is same across csw services.
+
+Once location is registered, components, alarm CLI & alarm server can resolve redis location and start 
+interacting with it using the alarm api & alarm admin api. While the interaction of components with redis is limited to just `setSeverity` api,
+Alarm CLI can perform all admin operations as discussed [above](#api-structure).
+
+Alarm server is not built yet. When built, it's functionality will be to watch all severity changes using the admin api
+and [latch](#severity-latching) appropriate alarms to disconnected severity. Apart from this, in future, it may also be
+responsible for providing an HTTP interface for various UI layer applications for alarm and health visualisations.
