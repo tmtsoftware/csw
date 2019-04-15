@@ -56,15 +56,17 @@ We store following data in this key-value store (distributed data):
 `Location service` track API internally uses `Service` key to register interest in change notifications by sending `Replicator.Subscribe` message to the Replicator.
 It sends `Replicator.Changed` messages to the registered subscriber when the data for the subscribed key is updated.
 
-#### Consistency Gurantees
+#### Consistency Guarantees
 
 - `WriteMajority`: All the write API's (register, unregister etc.) updates registry (distributed data) with consistency level of `WriteMajority` which means value will immediately be written to a majority of replicas, i.e. at least N/2 + 1 replicas, where N is the number of nodes in the cluster
-- `ReadLocal`: All the get API's (find, resolve, list etc.): retrives value from registry (distributed data) with consistency level of `ReadLocal` which means value will only be read from the local replica
+- `ReadLocal`: All the get API's (find, resolve, list etc.): retrieves value from registry (distributed data) with consistency level of `ReadLocal` which means value will only be read from the local replica
 
-In TMT enviornment, we do not want two components to be registered with same connection name.
-This is achieved by configuring consistency level of `WriteMajority` for `register` API. Register API gurantees that component is register with location service and it's entry is replicated to at least N/2 + 1 replicas.
+In TMT environment, we do not want two components to be registered with same connection name.
+This is achieved by configuring consistency level of `WriteMajority` for `register` API. 
+Register API guarantees that component is register with location service and it's entry is replicated to at least N/2 + 1 replicas.
 
-Based on above configuration, it is always guranteed that only one location of component will exist at any point in time in registry. Hence it is safe to read location just from local replica with consistency level of `ReadLocal` with the assumption that eventually location will get replicated on this replica if not present when queried.
+Based on above configuration, it is always guaranteed that only one location of component will exist at any point in time in registry. 
+Hence it is safe to read location just from local replica with consistency level of `ReadLocal` with the assumption that eventually location will get replicated on this replica if not present when queried.
 
 ### Death Watch Actor
 
