@@ -20,7 +20,7 @@ class LoggingSeverityTest
 
   private val logBuffer                    = mutable.Buffer.empty[JsObject]
   private val testAppender                 = new TestAppender(x ⇒ logBuffer += Json.parse(x.toString).as[JsObject])
-  private val loggingSystem: LoggingSystem = new LoggingSystem("logging", "version", "hostName", actorSystem)
+  private val loggingSystem: LoggingSystem = new LoggingSystem("logging", "version", "hostName", typedActorSystem)
 
   override protected def beforeEach(): Unit = {
     val validAlarmsConfig = ConfigFactory.parseResources("test-alarms/more-alarms.conf")

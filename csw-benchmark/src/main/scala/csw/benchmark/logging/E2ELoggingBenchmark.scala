@@ -4,6 +4,7 @@ import java.net.InetAddress
 import java.util.concurrent.TimeUnit
 
 import akka.actor.ActorSystem
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.logging.api.models.LoggingLevels.INFO
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.appenders.FileAppender
@@ -36,7 +37,7 @@ class E2ELoggingBenchmark {
   @Setup(Level.Trial)
   def setup(): Unit = {
     actorSystem = ActorSystem("logging")
-    val loggingSystem = new LoggingSystem("E2E", "SNAPSHOT-1.0", InetAddress.getLocalHost.getHostName, actorSystem)
+    val loggingSystem = new LoggingSystem("E2E", "SNAPSHOT-1.0", InetAddress.getLocalHost.getHostName, actorSystem.toTyped)
     loggingSystem.setAppenders(List(FileAppender))
     loggingSystem.setDefaultLogLevel(INFO)
     log = new LoggerImpl(None, None)

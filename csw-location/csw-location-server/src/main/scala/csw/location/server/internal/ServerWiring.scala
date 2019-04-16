@@ -1,6 +1,7 @@
 package csw.location.server.internal
 
-import akka.actor.ActorSystem
+import akka.actor.{typed, ActorSystem}
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.location.api.scaladsl.LocationService
 import csw.location.server.commons.{ClusterAwareSettings, ClusterSettings}
@@ -8,15 +9,16 @@ import csw.location.server.http.{LocationExceptionHandler, LocationHttpService, 
 
 // $COVERAGE-OFF$
 private[csw] class ServerWiring {
-  lazy val config: Config                   = ConfigFactory.load()
-  lazy val settings                         = new Settings(config)
-  lazy val clusterSettings: ClusterSettings = ClusterAwareSettings.onPort(settings.clusterPort)
-  lazy val actorSystem: ActorSystem         = clusterSettings.system
-  lazy val actorRuntime                     = new ActorRuntime(actorSystem)
-  lazy val locationService: LocationService = LocationServiceFactory.withSystem(actorSystem)
-  lazy val locationExceptionHandler         = new LocationExceptionHandler
-  lazy val locationRoutes                   = new LocationRoutes(locationService, locationExceptionHandler, actorRuntime)
-  lazy val locationHttpService              = new LocationHttpService(locationRoutes, actorRuntime, settings)
+  lazy val config: Config                         = ConfigFactory.load()
+  lazy val settings                               = new Settings(config)
+  lazy val clusterSettings: ClusterSettings       = ClusterAwareSettings.onPort(settings.clusterPort)
+  lazy val actorSystem: ActorSystem               = clusterSettings.system
+  lazy val typedActorSystem: typed.ActorSystem[_] = clusterSettings.system.toTyped
+  lazy val actorRuntime                           = new ActorRuntime(actorSystem)
+  lazy val locationService: LocationService       = LocationServiceFactory.withSystem(actorSystem)
+  lazy val locationExceptionHandler               = new LocationExceptionHandler
+  lazy val locationRoutes                         = new LocationRoutes(locationService, locationExceptionHandler, actorRuntime)
+  lazy val locationHttpService                    = new LocationHttpService(locationRoutes, actorRuntime, settings)
 }
 
 private[csw] object ServerWiring {

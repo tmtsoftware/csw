@@ -2,7 +2,7 @@ package csw.logging.client.scaladsl
 
 import java.net.InetAddress
 
-import akka.actor.ActorSystem
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.ConfigFactory
 import csw.logging.api.models.LoggingLevels.Level
 import csw.logging.client.appenders.{FileAppender, StdOutAppender}
@@ -20,7 +20,10 @@ class LoggingSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   override protected def beforeAll(): Unit = loggingSystem = LoggingSystemFactory.start()
 
-  override protected def afterAll(): Unit = Await.result(loggingSystem.system.terminate(), 20.seconds)
+  override protected def afterAll(): Unit = {
+    loggingSystem.system.terminate()
+    Await.result(loggingSystem.system.whenTerminated, 20.seconds)
+  }
 
   test("should load default log level provided in configuration file") {
     loggingSystem.getDefaultLogLevel.default.name shouldBe config
@@ -60,11 +63,12 @@ class LoggingSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
         | appenders = ["abcd"]
         |}
       """.stripMargin)
-    val actorSystem = ActorSystem("test", config)
+    val actorSystem = ActorSystem(SpawnProtocol.behavior, "test", config)
     val exception = intercept[AppenderNotFoundException] {
       LoggingSystemFactory.start("foo-name", "foo-version", InetAddress.getLocalHost.getHostName, actorSystem)
     }
     exception.appender shouldBe "abcd"
-    Await.result(actorSystem.terminate(), 10.seconds)
+    actorSystem.terminate()
+    Await.result(actorSystem.whenTerminated, 10.seconds)
   }
 }

@@ -2,6 +2,7 @@ package csw.logging.client.scaladsl
 import java.net.InetAddress
 
 import akka.actor.{ActorRef, ActorSystem}
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.logging.client.components.IRIS
 import csw.logging.client.components.IRIS._
@@ -49,7 +50,7 @@ class MailboxRequirementTest extends FunSuite with Matchers with BeforeAndAfterE
 
   test("should get all messages if msg count is under the capacity defined for mailbox") {
     val actorSystem        = ActorSystem("test", configWithCapacity(capacity = defaultCapacity))
-    lazy val loggingSystem = new LoggingSystem("logging", "version", hostName, actorSystem)
+    lazy val loggingSystem = new LoggingSystem("logging", "version", hostName, actorSystem.toTyped)
 
     loggingSystem.setAppenders(List(testAppender))
 
@@ -65,7 +66,7 @@ class MailboxRequirementTest extends FunSuite with Matchers with BeforeAndAfterE
   // This shows that log actor is configured with the given capacity for Mailbox and it's a bounded Mailbox
   test("should get no messages if mailbox capacity is zero") {
     val actorSystem        = ActorSystem("test", configWithCapacity(capacity = zeroCapacity))
-    lazy val loggingSystem = new LoggingSystem("logging", "version", hostName, actorSystem)
+    lazy val loggingSystem = new LoggingSystem("logging", "version", hostName, actorSystem.toTyped)
 
     loggingSystem.setAppenders(List(testAppender))
 

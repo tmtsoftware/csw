@@ -4,6 +4,7 @@ import java.net.InetAddress
 import java.util.concurrent.TimeUnit
 
 import akka.actor.ActorSystem
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.benchmark.logging.mock.LogActorMock
 import csw.logging.client.appenders.FileAppender
 import csw.logging.client.internal.LoggingSystem
@@ -33,8 +34,9 @@ class FileAppenderBenchmark {
   @Setup(Level.Trial)
   def setup(): Unit = {
     actorSystem = ActorSystem("logging")
-    new LoggingSystem("FileAppender", "SNAPSHOT-1.0", InetAddress.getLocalHost.getHostName, actorSystem)
-    fileAppender = new FileAppender(actorSystem, LogActorMock.standardHeaders)
+    val typedActorSystem = actorSystem.toTyped
+    new LoggingSystem("FileAppender", "SNAPSHOT-1.0", InetAddress.getLocalHost.getHostName, typedActorSystem)
+    fileAppender = new FileAppender(typedActorSystem, LogActorMock.standardHeaders)
   }
 
   @TearDown(Level.Trial)

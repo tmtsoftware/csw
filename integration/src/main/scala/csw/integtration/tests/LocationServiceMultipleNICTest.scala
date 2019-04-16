@@ -22,7 +22,7 @@ class LocationServiceMultipleNICTest() extends FunSuite with Matchers with Befor
     PatienceConfig(Span(5, org.scalatest.time.Seconds), Span(100, org.scalatest.time.Millis))
 
   val adminWiring: ServerWiring = ServerWiring.make(ClusterAwareSettings.onPort(3553).withInterface("eth1"))
-  LoggingSystemFactory.start("Assembly", "1.0", Networks().hostname, adminWiring.actorSystem)
+  LoggingSystemFactory.start("Assembly", "1.0", Networks().hostname, adminWiring.typedActorSystem)
 
   adminWiring.locationHttpService.start().futureValue
 
