@@ -327,7 +327,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
 
         //#create-logging-system
         String host = InetAddress.getLocalHost().getHostName();
-        loggingSystem = JLoggingSystemFactory.start("JLocationServiceExampleClient", "0.1", host, Adapter.toTyped(actorSystem));
+        loggingSystem = JLoggingSystemFactory.start("JLocationServiceExampleClient", "0.1", host, actorSystem);
         //#create-logging-system
 
         actorSystem.actorOf(Props.create(JLocationServiceExampleClient.class), "LocationServiceExampleClient");

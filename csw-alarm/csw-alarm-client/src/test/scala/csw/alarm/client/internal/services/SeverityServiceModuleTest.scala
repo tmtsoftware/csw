@@ -48,7 +48,7 @@ class SeverityServiceModuleTest
       "Setting severity [critical] for alarm [nfiraos-trombone-tromboneaxislowlimitalarm] with expire timeout [1] seconds"
     val expectedMessage2 = "Updating current severity [critical] in alarm store"
 
-    val loggingSystem = new LoggingSystem("logging", "version", hostName, typedActorSystem)
+    val loggingSystem = new LoggingSystem("logging", "version", hostName, actorSystem)
     loggingSystem.setAppenders(List(testAppender))
     loggingSystem.setDefaultLogLevel(LoggingLevels.DEBUG)
     setCurrentSeverity(tromboneAxisLowLimitAlarmKey, AlarmSeverity.Critical).await

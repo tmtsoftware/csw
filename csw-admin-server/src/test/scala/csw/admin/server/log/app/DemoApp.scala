@@ -61,7 +61,8 @@ object DemoApp extends App {
   private val prefix           = Prefix("iris.command")
 
   private def startSeed() = {
-    val loggingSystem = LoggingSystemFactory.start("logging", "version", Networks().hostname, typedSystem)
+    import adminWiring.actorRuntime._
+    val loggingSystem = LoggingSystemFactory.start("logging", "version", Networks().hostname, actorSystem)
     loggingSystem.setAppenders(List(StdOutAppender))
     Await.result(ServerWiring.make(Some(3552)).locationHttpService.start(), 5.seconds)
     Await.result(adminWiring.adminHttpService.registeredLazyBinding, 5.seconds)

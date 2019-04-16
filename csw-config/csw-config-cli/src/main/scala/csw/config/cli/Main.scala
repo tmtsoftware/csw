@@ -1,6 +1,5 @@
 package csw.config.cli
 
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.http.scaladsl.Http
 import csw.config.cli.args.{ArgsParser, Options}
 import csw.config.cli.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
@@ -21,7 +20,7 @@ object Main extends App {
 
     val wiring = Wiring.make(options.locationHost)
     import wiring._
-    LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, actorSystem.toTyped)
+    LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, actorSystem)
 
     try {
       cliApp.start(options)

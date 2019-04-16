@@ -1,13 +1,12 @@
 package example.auth
 
-import akka.actor.{typed, ActorSystem}
+import akka.actor.ActorSystem
 import akka.http.scaladsl.server._
-import akka.stream.typed.scaladsl.ActorMaterializer
+import akka.stream.ActorMaterializer
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import csw.aas.http.AuthorizationPolicy._
 import csw.aas.http.SecurityDirectives
-import AsyncSupport.typedActorSystem
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import AsyncSupport.actorSystem
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.client.utils.LocationServerStatus
 import csw.logging.client.scaladsl.LoggingSystemFactory
@@ -59,14 +58,13 @@ object ExampleServer extends HttpApp with App {
 
 object LoggingSupport {
   //start logging
-  LoggingSystemFactory.start("example-server", "", "", typedActorSystem)
+  LoggingSystemFactory.start("example-server", "", "", actorSystem)
 }
 
 object AsyncSupport {
-  implicit val actorSystem: ActorSystem               = ActorSystem()
-  implicit val typedActorSystem: typed.ActorSystem[_] = ActorSystem().toTyped
-  implicit val ec: ExecutionContext                   = ExecutionContext.global
-  implicit val mat: ActorMaterializer                 = ActorMaterializer()
+  implicit val actorSystem: ActorSystem = ActorSystem()
+  implicit val ec: ExecutionContext     = ExecutionContext.global
+  implicit val mat: ActorMaterializer   = ActorMaterializer()
 }
 
 object LocationServiceSupport {

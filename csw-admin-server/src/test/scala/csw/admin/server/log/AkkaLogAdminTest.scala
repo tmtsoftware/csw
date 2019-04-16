@@ -4,7 +4,8 @@ import akka.actor
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.ActorRef
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest, StatusCodes, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
@@ -42,7 +43,8 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
   private val adminWiring: AdminWiring = AdminWiring.make(Some(7879))
   import adminWiring.actorRuntime._
 
-  implicit val testKitSettings: TestKitSettings = TestKitSettings(typedSystem)
+  implicit val typedSystem: ActorSystem[Nothing] = actorSystem.toTyped
+  implicit val testKitSettings: TestKitSettings  = TestKitSettings(typedSystem)
 
   private val laserConnection            = AkkaConnection(ComponentId("Laser", Assembly))
   private val motionControllerConnection = AkkaConnection(ComponentId("Motion_Controller", HCD))
@@ -60,7 +62,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
 
   override def beforeAll(): Unit = {
     super.beforeAll()
-    loggingSystem = LoggingSystemFactory.start("logging", "version", hostName, typedSystem)
+    loggingSystem = LoggingSystemFactory.start("logging", "version", hostName, adminWiring.actorSystem)
     loggingSystem.setAppenders(List(testAppender))
 
     logBuffer.clear()

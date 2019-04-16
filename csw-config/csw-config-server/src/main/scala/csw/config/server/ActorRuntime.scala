@@ -5,7 +5,7 @@ import java.util.concurrent.CompletableFuture
 import akka.Done
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.{typed, ActorSystem, CoordinatedShutdown}
+import akka.actor.{ActorSystem, CoordinatedShutdown}
 import akka.dispatch.MessageDispatcher
 import akka.stream.Materializer
 import akka.stream.typed.scaladsl.ActorMaterializer
@@ -21,17 +21,16 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
  * A convenient class wrapping actor system and providing handles for execution context, materializer and clean up of actor system
  */
 private[config] class ActorRuntime(_actorSystem: ActorSystem, val settings: Settings) {
-  implicit val actorSystem: ActorSystem               = _actorSystem
-  implicit val typedActorSystem: typed.ActorSystem[_] = _actorSystem.toTyped
-  implicit val ec: ExecutionContextExecutor           = actorSystem.dispatcher
-  implicit val mat: Materializer                      = ActorMaterializer()
+  implicit val actorSystem: ActorSystem     = _actorSystem
+  implicit val ec: ExecutionContextExecutor = actorSystem.dispatcher
+  implicit val mat: Materializer            = ActorMaterializer()(actorSystem.toTyped)
 
   val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(actorSystem)
 
   val blockingIoDispatcher: MessageDispatcher = actorSystem.dispatchers.lookup(settings.`blocking-io-dispatcher`)
 
   def startLogging(name: String): LoggingSystem =
-    LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, typedActorSystem)
+    LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, actorSystem)
 
   def shutdown(reason: Reason): Future[Done] = coordinatedShutdown.run(reason)
 

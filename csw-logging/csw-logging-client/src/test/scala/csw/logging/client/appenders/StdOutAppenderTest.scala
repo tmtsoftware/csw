@@ -2,7 +2,7 @@ package csw.logging.client.appenders
 
 import java.io.ByteArrayOutputStream
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
 import csw.logging.client.commons.{Category, LoggingKeys}
 import csw.logging.client.internal.JsonExtensions.RichJsObject
@@ -15,7 +15,7 @@ import scala.concurrent.duration.DurationInt
 // DEOPSCSW-122: Allow local component logs to be output to STDOUT
 class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
 
-  private val actorSystem = ActorSystem(SpawnProtocol.behavior, "test-1")
+  private val actorSystem = ActorSystem("test-1")
 
   private val standardHeaders: JsObject = Json.obj(
     LoggingKeys.VERSION -> 1,
@@ -54,8 +54,7 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
 
   override protected def afterAll(): Unit = {
     outCapture.close()
-    actorSystem.terminate()
-    Await.result(actorSystem.whenTerminated, 5.seconds)
+    Await.result(actorSystem.terminate(), 5.seconds)
   }
 
   test("should print message to standard output stream if category is \'common\'") {
@@ -85,7 +84,7 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
       .parseString("csw-logging.appender-config.stdout.oneLine=true")
       .withFallback(ConfigFactory.load())
 
-    val actorSystemWithOneLineTrueConfig = ActorSystem(SpawnProtocol.behavior, "test-2", config)
+    val actorSystemWithOneLineTrueConfig = ActorSystem("test-2", config)
     val stdOutAppenderForOneLineMsg      = new StdOutAppender(actorSystemWithOneLineTrueConfig, standardHeaders, println)
 
     Console.withOut(outCapture) {
@@ -104,8 +103,7 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
 
     actualOneLineLogMsg shouldBe expectedOneLineLogMsg
 
-    actorSystemWithOneLineTrueConfig.terminate()
-    Await.result(actorSystemWithOneLineTrueConfig.whenTerminated, 5.seconds)
+    Await.result(actorSystemWithOneLineTrueConfig.terminate(), 5.seconds)
   }
 
 }

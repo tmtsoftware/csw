@@ -4,13 +4,11 @@ import java.nio.ByteBuffer
 import java.util.concurrent.CompletableFuture
 
 import akka.Done
-import akka.actor.Props
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.{ActorSystem, Props}
 import ch.qos.logback.classic.LoggerContext
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.appenders.LogAppenderBuilder
-import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.commons.{Constants, LoggingKeys}
 import csw.logging.client.exceptions.AppenderNotFoundException
 import csw.logging.client.internal.LogActorMessages._
@@ -36,7 +34,7 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
  * @param host host name (to log).
  * @param system an ActorSystem used to create log actors
  */
-class LoggingSystem private[csw] (name: String, version: String, host: String, val system: ActorSystem[_]) {
+class LoggingSystem private[csw] (name: String, version: String, host: String, val system: ActorSystem) {
 
   import csw.logging.api.models.LoggingLevels._
 
@@ -73,7 +71,7 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
   private[this] val gc   = loggingConfig.getBoolean("gc")
   private[this] val time = loggingConfig.getBoolean("time")
 
-  private[this] implicit val ec: ExecutionContext = system.executionContext
+  private[this] implicit val ec: ExecutionContext = system.dispatcher
   private[this] val done                          = Promise[Unit]
   private[this] val timeActorDonePromise          = Promise[Unit]
 
@@ -110,8 +108,7 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
   if (time) {
     // Start timing actor
     LoggingState.doTime = true
-    //TODO convert timeActor into typed actor
-    val timeActor = system.toUntyped.actorOf(Props(new TimeActor(timeActorDonePromise)), name = "TimingActor")
+    val timeActor = system.actorOf(Props(new TimeActor(timeActorDonePromise)), name = "TimingActor")
     LoggingState.timeActorOption = Some(timeActor)
   } else {
     timeActorDonePromise.success(())

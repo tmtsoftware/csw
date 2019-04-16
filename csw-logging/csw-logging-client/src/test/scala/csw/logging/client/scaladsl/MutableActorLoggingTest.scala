@@ -6,7 +6,6 @@ import csw.logging.api.models.LoggingLevels.Level
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.LogCommand
 import csw.logging.client.LogCommand._
-import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.LoggingTestSuite
 
@@ -29,9 +28,10 @@ object TromboneMutableActor {
 
 // DEOPSCSW-280 SPIKE: Introduce Akkatyped in logging
 class MutableActorLoggingTest extends LoggingTestSuite {
+  import akka.actor.typed.scaladsl.adapter._
 
   private val tromboneActorRef =
-    typedActorSystem.spawn(TromboneMutableActor.behavior(new LoggerFactory("tromboneMutableHcdActor")), "TromboneMutableActor")
+    actorSystem.spawn(TromboneMutableActor.behavior(new LoggerFactory("tromboneMutableHcdActor")), "TromboneMutableActor")
 
   def sendMessagesToActor(): Unit = {
     tromboneActorRef ! LogTrace

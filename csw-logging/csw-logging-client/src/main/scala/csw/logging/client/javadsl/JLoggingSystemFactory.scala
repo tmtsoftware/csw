@@ -2,9 +2,7 @@ package csw.logging.client.javadsl
 
 import java.net.InetAddress
 
-import akka.actor
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.javadsl.Adapter
+import akka.actor.ActorSystem
 import csw.logging.client.appenders.LogAppenderBuilder
 import csw.logging.client.internal.LoggingSystem
 
@@ -22,7 +20,7 @@ object JLoggingSystemFactory {
    * @param actorSystem the ActorSystem used to create LogActor from LoggingSystem
    * @return the instance of LoggingSystem
    */
-  def start(name: String, version: String, hostName: String, actorSystem: ActorSystem[_]): LoggingSystem =
+  def start(name: String, version: String, hostName: String, actorSystem: ActorSystem): LoggingSystem =
     new LoggingSystem(name, version, hostName, actorSystem)
 
   /**
@@ -32,10 +30,7 @@ object JLoggingSystemFactory {
    * @return the instance of LoggingSystem
    */
   private[csw] def start(): LoggingSystem =
-    new LoggingSystem("foo-name",
-                      "foo-version",
-                      InetAddress.getLocalHost.getHostName,
-                      Adapter.toTyped(actor.ActorSystem("logging")))
+    new LoggingSystem("foo-name", "foo-version", InetAddress.getLocalHost.getHostName, ActorSystem("logging"))
 
   /**
    * The factory used to create the LoggingSystem. `LoggingSystem` should be started once in an app.
@@ -54,7 +49,7 @@ object JLoggingSystemFactory {
       name: String,
       version: String,
       hostName: String,
-      actorSystem: ActorSystem[_],
+      actorSystem: ActorSystem,
       appenders: java.util.List[LogAppenderBuilder]
   ): LoggingSystem = {
     val loggingSystem = new LoggingSystem(name, version, hostName, actorSystem)

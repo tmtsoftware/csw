@@ -2,6 +2,8 @@ package csw.admin.server.log
 
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.TestKitSettings
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest, StatusCodes, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
@@ -26,7 +28,8 @@ class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpSupport with Moc
   private val adminWiring: AdminWiring = AdminWiring.make(Some(7888))
   import adminWiring.actorRuntime._
 
-  implicit val testKitSettings: TestKitSettings = TestKitSettings(typedSystem)
+  implicit val typedSystem: ActorSystem[Nothing] = actorSystem.toTyped
+  implicit val testKitSettings: TestKitSettings  = TestKitSettings(typedSystem)
 
   private val serverWiring  = ServerWiring.make(adminWiring.locationService, securityDirectives)
   private val testFileUtils = new TestFileUtils(new Settings(ConfigFactory.load()))
@@ -38,7 +41,7 @@ class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpSupport with Moc
     serverWiring.svnRepo.initSvnRepo()
     Await.result(serverWiring.httpService.registeredLazyBinding, 20.seconds)
 
-    loggingSystem = LoggingSystemFactory.start("logging", "version", hostName, typedSystem)
+    loggingSystem = LoggingSystemFactory.start("logging", "version", hostName, adminWiring.actorSystem)
     loggingSystem.setAppenders(List(testAppender))
 
     logBuffer.clear()

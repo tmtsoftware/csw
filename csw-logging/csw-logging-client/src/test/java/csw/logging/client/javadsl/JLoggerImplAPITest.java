@@ -1,7 +1,6 @@
 package csw.logging.client.javadsl;
 
-import akka.actor.typed.ActorSystem;
-import akka.actor.typed.SpawnProtocol;
+import akka.actor.ActorSystem;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -44,7 +43,7 @@ public class JLoggerImplAPITest extends JUnitSuite {
     );
     private String className = getClass().getName();
 
-    private static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.behavior(),"base-system");
+    private static ActorSystem actorSystem = ActorSystem.create("base-system");
     private static LoggingSystem loggingSystem;
 
     private static List<JsonObject> logBuffer = new Vector<>();
@@ -79,8 +78,7 @@ public class JLoggerImplAPITest extends JUnitSuite {
     @AfterClass
     public static void teardown() throws Exception {
         loggingSystem.javaStop().get();
-        actorSystem.terminate();
-        Await.result(actorSystem.whenTerminated(), Duration.create(10, TimeUnit.SECONDS));
+        Await.result(actorSystem.terminate(), Duration.create(10, TimeUnit.SECONDS));
     }
 
     private void testExceptionJsonObject(JsonObject jsonObject) {

@@ -1,7 +1,6 @@
 package csw.benchmark.logging;
 
 import akka.actor.ActorSystem;
-import akka.actor.typed.javadsl.Adapter;
 import csw.logging.api.javadsl.ILogger;
 import csw.logging.api.models.LoggingLevels;
 import csw.logging.client.internal.LoggingSystem;
@@ -43,7 +42,7 @@ public class JE2ELoggingBenchmark extends JUnitSuite {
     public void setup() {
         log = JGenericLoggerFactory.getLogger(getClass());
         actorSystem = ActorSystem.create("JE2E");
-        LoggingSystem loggingSystem = JLoggingSystemFactory.start("JE2E-Bench", "SNAPSHOT-1.0", "localhost", Adapter.toTyped(actorSystem), List.of(JLogAppenderBuilders.FileAppender));
+        LoggingSystem loggingSystem = JLoggingSystemFactory.start("JE2E-Bench", "SNAPSHOT-1.0", "localhost", actorSystem, List.of(JLogAppenderBuilders.FileAppender));
         loggingSystem.setDefaultLogLevel(LoggingLevels.INFO$.MODULE$);
         person = JPerson.createDummy();
     }

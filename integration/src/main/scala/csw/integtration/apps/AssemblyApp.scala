@@ -15,7 +15,7 @@ import csw.params.core.models.Prefix
 object AssemblyApp {
 
   val adminWiring: ServerWiring = ServerWiring.make(ClusterAwareSettings.onPort(3553).withInterface("eth1"))
-  LoggingSystemFactory.start("Assembly", "1.0", adminWiring.clusterSettings.hostname, adminWiring.typedActorSystem)
+  LoggingSystemFactory.start("Assembly", "1.0", adminWiring.clusterSettings.hostname, adminWiring.actorSystem)
   adminWiring.locationHttpService.start().await
 
   import adminWiring.actorRuntime._

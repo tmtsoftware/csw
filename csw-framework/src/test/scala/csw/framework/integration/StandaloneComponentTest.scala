@@ -46,7 +46,7 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
-    loggingSystem = new LoggingSystem("standalone", "1.0", "localhost", typedSystem)
+    loggingSystem = new LoggingSystem("standalone", "1.0", "localhost", seedActorSystem)
     loggingSystem.setAppenders(List(testAppender))
   }
 

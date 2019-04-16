@@ -27,7 +27,7 @@ object LocationServiceExampleComponentApp extends App {
 
   //#create-logging-system
   private val host = InetAddress.getLocalHost.getHostName
-  LoggingSystemFactory.start("LocationServiceExampleComponent", "0.1", host, system.toTyped)
+  LoggingSystemFactory.start("LocationServiceExampleComponent", "0.1", host, system)
   //#create-logging-system
 
   system.actorOf(LocationServiceExampleComponent.props(locationService))

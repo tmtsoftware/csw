@@ -56,7 +56,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
   private var loggingSystem: LoggingSystem = _
 
   override protected def beforeAll(): Unit = {
-    loggingSystem = new LoggingSystem("sup-failure", "1.0", "localhost", typedSystem)
+    loggingSystem = new LoggingSystem("sup-failure", "1.0", "localhost", untypedSystem)
     loggingSystem.setAppenders(List(testAppender))
   }
 

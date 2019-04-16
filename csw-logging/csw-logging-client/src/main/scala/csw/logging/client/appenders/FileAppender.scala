@@ -4,7 +4,7 @@ import java.io._
 import java.time.temporal.ChronoUnit
 import java.time.{LocalDateTime, ZoneId, ZoneOffset, ZonedDateTime}
 
-import akka.actor.typed.ActorSystem
+import akka.actor._
 import csw.logging.api.models.LoggingLevels.Level
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.{Category, Constants, LoggingKeys, TMTDateTimeFormatter}
@@ -119,11 +119,11 @@ object FileAppender extends LogAppenderBuilder {
   /**
    * Constructor for a file appender.
    *
-   * @param system typed Actor System.
+   * @param factory an Akka factory.
    * @param stdHeaders the headers that are fixes for this service.
    */
-  def apply(system: ActorSystem[_], stdHeaders: JsObject): FileAppender =
-    new FileAppender(system, stdHeaders)
+  def apply(factory: ActorRefFactory, stdHeaders: JsObject): FileAppender =
+    new FileAppender(factory, stdHeaders)
 
   def decideTimestampForFile(logDateTime: ZonedDateTime): ZonedDateTime = {
     val fileTimestamp =
@@ -143,12 +143,15 @@ object FileAppender extends LogAppenderBuilder {
 /**
  * An appender that writes log messages to files.
  *
- * @param system typed Actor System
+ * @param factory ActorRefFactory
  * @param stdHeaders the headers that are fixes for this service.
  */
-class FileAppender(system: ActorSystem[_], stdHeaders: JsObject) extends LogAppender {
-
-  private[this] implicit val executionContext: ExecutionContextExecutor = system.executionContext
+class FileAppender(factory: ActorRefFactory, stdHeaders: JsObject) extends LogAppender {
+  private[this] val system = factory match {
+    case context: ActorContext => context.system
+    case s: ActorSystem        => s
+  }
+  private[this] implicit val executionContext: ExecutionContextExecutor = factory.dispatcher
   private[this] val config =
     system.settings.config.getConfig("csw-logging.appender-config.file")
 
