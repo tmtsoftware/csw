@@ -5,13 +5,10 @@ import csw.params.core.generics.KeyType.IntMatrixKey
 import csw.params.core.models._
 import csw.params.javadsl.JKeyType
 import csw.time.core.models.{TAITime, UTCTime}
-import csw_protobuf.ParameterTypes
 import csw_protobuf.models._
 import csw_protobuf.parameter.PbParameter
 import csw_protobuf.parameter_types._
 import org.scalatest.{FunSuite, Matchers}
-
-import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 
 // DEOPSCSW-297: Merge protobuf branch in master
 class PbParameterTest extends FunSuite with Matchers {
@@ -40,12 +37,9 @@ class PbParameterTest extends FunSuite with Matchers {
   }
 
   test("should able to create Boolean Items") {
-    val booleanItems: ParameterTypes.BooleanItems =
-      ParameterTypes.BooleanItems.newBuilder().addValues(true).addValues(false).build()
-
-    val parsedBooleanItems = BooleanItems.parseFrom(booleanItems.toByteString.toByteArray)
-
-    booleanItems.getValuesList.asScala.toSeq shouldBe parsedBooleanItems.values
+    val booleanItems: BooleanItems = BooleanItems().addValues(true).addValues(false)
+    val parsedBooleanItems         = BooleanItems.parseFrom(booleanItems.toByteString.toByteArray)
+    booleanItems.values shouldBe parsedBooleanItems.values
   }
 
   // DEOPSCSW-661: Create UTCTimeKey and TAITimeKey replacing TimestampKey in Protobuf parameters

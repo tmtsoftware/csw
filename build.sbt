@@ -334,8 +334,7 @@ lazy val `csw-event-client` = project
   .settings(libraryDependencies ++= Dependencies.EventClient.value)
   .settings(
     PB.targets in Compile := Seq(
-      PB.gens.java                        -> (sourceManaged in Compile).value,
-      scalapb.gen(javaConversions = true) -> (sourceManaged in Compile).value
+      scalapb.gen() -> (sourceManaged in Compile).value
     )
   )
 
