@@ -13,11 +13,12 @@ import csw.services.BuildInfo
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
-private[admin] class ActorRuntime(_actorSystem: ActorSystem) {
-  implicit val actorSystem: ActorSystem     = _actorSystem
-  implicit val ec: ExecutionContextExecutor = actorSystem.dispatcher
-  implicit val mat: Materializer            = ActorMaterializer()(actorSystem.toTyped)
-  implicit val scheduler: Scheduler         = actorSystem.scheduler
+private[admin] class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol]) {
+  implicit val typedSystem                      = _typedSystem
+  implicit val untypedSystem: actor.ActorSystem = _typedSystem.toUntyped
+  implicit val ec: ExecutionContextExecutor     = untypedSystem.dispatcher
+  implicit val mat: Materializer                = ActorMaterializer()(typedSystem)
+  implicit val scheduler: Scheduler             = untypedSystem.scheduler
 
   private[admin] val coordinatedShutdown = CoordinatedShutdown(actorSystem)
 
