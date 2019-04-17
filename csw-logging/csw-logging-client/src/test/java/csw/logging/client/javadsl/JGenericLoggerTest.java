@@ -1,14 +1,15 @@
 package csw.logging.client.javadsl;
 
-import akka.actor.ActorSystem;
 import akka.actor.typed.ActorRef;
-import akka.actor.typed.javadsl.Adapter;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.SpawnProtocol;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import csw.logging.api.javadsl.ILogger;
 import csw.logging.api.models.LoggingLevels;
 import csw.logging.client.appenders.LogAppenderBuilder;
+import csw.logging.client.commons.AkkaTypedExtension;
 import csw.logging.client.commons.LoggingKeys$;
 import csw.logging.client.internal.LoggingSystem;
 import csw.logging.client.utils.JGenericActor;
@@ -26,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 import static csw.logging.client.utils.Eventually.eventually;
 
 public class JGenericLoggerTest extends JUnitSuite {
-    private static ActorSystem actorSystem = ActorSystem.create("base-system");
+    private static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.behavior(),"base-system");
     private static LoggingSystem loggingSystem;
 
     private static List<JsonObject> logBuffer = new ArrayList<>();
@@ -56,7 +57,8 @@ public class JGenericLoggerTest extends JUnitSuite {
     @AfterClass
     public static void teardown() throws Exception {
         loggingSystem.javaStop().get();
-        Await.result(actorSystem.terminate(), Duration.create(10, TimeUnit.SECONDS));
+        actorSystem.terminate();
+        Await.result(actorSystem.whenTerminated(), Duration.create(10, TimeUnit.SECONDS));
     }
 
     private class JGenericLoggerUtil {
@@ -88,7 +90,11 @@ public class JGenericLoggerTest extends JUnitSuite {
 
     @Test
     public void testGenericLoggerActorWithoutComponentName() throws InterruptedException {
-        ActorRef<String> utilActor = Adapter.spawn(actorSystem, JGenericActor.behavior,"JActorUtil");
+
+        AkkaTypedExtension.SpawnProtocolUserActorFactory userActorFactory = AkkaTypedExtension.SpawnProtocolUserActorFactory(actorSystem);
+
+        ActorRef<String> utilActor = userActorFactory.<String>userActorOf(JGenericActor.behavior, "JActorUtil", akka.actor.typed.Props.empty());
+
         String actorPath = utilActor.path().toString();
         String className = JGenericActor.class.getName();
 

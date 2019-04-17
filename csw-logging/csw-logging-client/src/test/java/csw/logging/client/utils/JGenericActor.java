@@ -1,9 +1,11 @@
 package csw.logging.client.utils;
 
+import akka.actor.AbstractActor;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.Behaviors;
 import csw.logging.api.javadsl.ILogger;
 import csw.logging.client.javadsl.JGenericLoggerFactory;
+import csw.logging.client.javadsl.JLoggerFactory;
 
 public class JGenericActor {
 
@@ -14,14 +16,28 @@ public class JGenericActor {
                 return Behaviors.receiveMessage(
                         msg -> {
                             switch (msg) {
-                                case "trace": log.trace(() -> msg); break;
-                                case "debug": log.debug(() -> msg); break;
-                                case "info": log.info(() -> msg); break;
-                                case "warn": log.warn(() -> msg); break;
-                                case "error": log.error(() -> msg); break;
-                                case "fatal": log.fatal(() -> msg); break;
+                                case "trace":
+                                    log.trace(() -> msg);
+                                    break;
+                                case "debug":
+                                    log.debug(() -> msg);
+                                    break;
+                                case "info":
+                                    log.info(() -> msg);
+                                    break;
+                                case "warn":
+                                    log.warn(() -> msg);
+                                    break;
+                                case "error":
+                                    log.error(() -> msg);
+                                    break;
+                                case "fatal":
+                                    log.fatal(() -> msg);
+                                    break;
+
                             }
                             return Behaviors.same();
                         });
             });
+
 }
