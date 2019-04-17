@@ -1,7 +1,6 @@
 package csw.framework.internal.supervisor
 
-import akka.actor.ActorSystem
-import akka.actor.typed.ActorRef
+import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import csw.alarm.client.AlarmServiceFactory
 import csw.command.client.messages.ContainerIdleMessage
 import csw.command.client.models.framework.{Component, ComponentInfo, SupervisorInfo}
@@ -32,8 +31,9 @@ private[framework] class SupervisorInfoFactory(containerName: String) {
       alarmServiceFactory: AlarmServiceFactory,
       registrationFactory: RegistrationFactory
   ): Future[Option[SupervisorInfo]] = {
-    implicit val system: ActorSystem          = ActorSystemFactory.remote(s"${componentInfo.name}-system")
-    implicit val ec: ExecutionContextExecutor = system.dispatcher
+    implicit val system: ActorSystem[SpawnProtocol] =
+      ActorSystemFactory.remote(SpawnProtocol.behavior, s"${componentInfo.name}-system")
+    implicit val ec: ExecutionContextExecutor = system.executionContext
     val richSystem                            = new CswFrameworkSystem(system)
 
     async {
@@ -47,7 +47,8 @@ private[framework] class SupervisorInfoFactory(containerName: String) {
         async {
           log.error(s"Exception :[${exception.getMessage}] occurred while spawning supervisor: [${componentInfo.name}]",
                     ex = exception)
-          await(system.terminate())
+          system.terminate()
+          await(system.whenTerminated)
           None
         }
     }

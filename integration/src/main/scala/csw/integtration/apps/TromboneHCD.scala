@@ -21,7 +21,7 @@ object TromboneHCD {
 
   import adminWiring.actorRuntime._
 
-  val tromboneHcdActorRef: ActorRef = actorSystem.actorOf(Props[TromboneHCD], "trombone-hcd")
+  val tromboneHcdActorRef: ActorRef = typedSystem.actorOf(Props[TromboneHCD], "trombone-hcd")
   val componentId                   = ComponentId("trombonehcd", ComponentType.HCD)
   val connection                    = AkkaConnection(componentId)
 

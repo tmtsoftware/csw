@@ -1,19 +1,19 @@
 package csw.location.server.http
 
 import akka.NotUsed
-import akka.actor.ActorSystem
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.http.scaladsl.marshalling.sse.EventStreamMarshalling._
 import akka.http.scaladsl.model.sse.ServerSentEvent
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.scaladsl.Source
+import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import csw.location.api.formats.LocationJsonSupport
 import csw.location.api.models.{Registration, _}
 import csw.location.api.scaladsl.LocationService
 import csw.location.server.internal.ActorRuntime
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 import play.api.libs.json.Json
-import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 
 import scala.concurrent.duration.{Duration, DurationLong, FiniteDuration}
 
@@ -26,7 +26,7 @@ private[csw] class LocationRoutes(
 
   import actorRuntime._
 
-  override implicit def actorSystem: ActorSystem = actorRuntime.actorSystem
+  override implicit def actorSystem: ActorSystem[SpawnProtocol] = actorRuntime.typedSystem
 
   val routes: Route = cors() {
     locationExceptionHandler.route {

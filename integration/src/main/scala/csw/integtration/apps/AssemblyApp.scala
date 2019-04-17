@@ -20,7 +20,7 @@ object AssemblyApp {
 
   import adminWiring.actorRuntime._
 
-  val assemblyActorRef: ActorRef = actorSystem.actorOf(Props[AssemblyApp], "assembly")
+  val assemblyActorRef: ActorRef = typedSystem.actorOf(Props[AssemblyApp], "assembly")
   val componentId                = ComponentId("assembly", ComponentType.Assembly)
   val connection                 = AkkaConnection(componentId)
 

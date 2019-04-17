@@ -1,23 +1,25 @@
 package csw.config.client.internal
 
-import akka.Done
+import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.{ActorSystem, CoordinatedShutdown}
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.stream.Materializer
 import akka.stream.typed.scaladsl.ActorMaterializer
+import akka.{actor, Done}
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 /**
  * A convenient class wrapping actor system and providing handles for execution context, materializer and clean up of actor system
  */
-private[csw] class ActorRuntime(_actorSystem: ActorSystem = ActorSystem()) {
-  implicit val actorSystem: ActorSystem     = _actorSystem
-  implicit val ec: ExecutionContextExecutor = actorSystem.dispatcher
-  implicit val mat: Materializer            = ActorMaterializer()(actorSystem.toTyped)
+private[csw] class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol] = ActorSystem(SpawnProtocol.behavior, "")) {
+  implicit val typedSystem: ActorSystem[SpawnProtocol] = _typedSystem
+  implicit val untypedSystem: actor.ActorSystem        = typedSystem.toUntyped
+  implicit val ec: ExecutionContextExecutor            = typedSystem.executionContext
+  implicit val mat: Materializer                       = ActorMaterializer()(typedSystem)
 
-  val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(actorSystem)
+  val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(untypedSystem)
 
   /**
    * The shutdown method helps self node to gracefully quit the akka cluster. It is used by `csw-config-cli`

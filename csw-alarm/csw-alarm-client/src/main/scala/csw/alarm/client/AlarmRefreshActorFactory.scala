@@ -31,7 +31,8 @@ object AlarmRefreshActorFactory {
       refreshInterval: FiniteDuration
   )(implicit actorSystem: ActorSystem[SpawnProtocol]): ActorRef[AutoRefreshSeverityMessage] =
     actorSystem.spawn(
-      Behaviors.withTimers[AutoRefreshSeverityMessage](AlarmRefreshActor.behavior(_, alarmService, refreshInterval))
+      Behaviors.withTimers[AutoRefreshSeverityMessage](AlarmRefreshActor.behavior(_, alarmService, refreshInterval)),
+      ""
     )
 
   /**

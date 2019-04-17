@@ -1,6 +1,6 @@
 package csw.config.client.scaladsl
 
-import akka.actor.ActorSystem
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.config.api.TokenFactory
 import csw.location.api.scaladsl.LocationService
 import csw.config.api.scaladsl.{ConfigClientService, ConfigService}
@@ -20,7 +20,7 @@ object ConfigClientFactory {
    * @return an instance of ConfigService
    */
   def adminApi(
-      actorSystem: ActorSystem,
+      actorSystem: ActorSystem[SpawnProtocol],
       locationService: LocationService,
       tokenFactory: TokenFactory
   ): ConfigService = make(new ActorRuntime(actorSystem), locationService, Some(tokenFactory))
@@ -32,7 +32,7 @@ object ConfigClientFactory {
    * @param locationService location service instance which will be used to resolve the location of config server
    * @return an instance of ConfigClientService
    */
-  def clientApi(actorSystem: ActorSystem, locationService: LocationService): ConfigClientService =
+  def clientApi(actorSystem: ActorSystem[SpawnProtocol], locationService: LocationService): ConfigClientService =
     make(new ActorRuntime(actorSystem), locationService)
 
   private[config] def make(

@@ -2,9 +2,11 @@ package csw.event.client.internal.wiring
 
 import java.net.URI
 
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer}
+import akka.actor.typed.scaladsl.adapter.{TypedActorSystemOps, UntypedActorSystemOps}
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import akka.stream.typed.scaladsl
+import akka.stream.typed.scaladsl.ActorMaterializer
+import akka.stream.{ActorMaterializerSettings, Materializer}
 import akka.{actor, Done}
 import csw.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.event.api.scaladsl.{EventPublisher, EventService, EventSubscriber}
@@ -35,7 +37,7 @@ trait BaseProperties {
   implicit lazy val ec: ExecutionContext        = actorSystem.dispatcher
   lazy val settings: ActorMaterializerSettings =
     ActorMaterializerSettings(actorSystem).withSupervisionStrategy(EventStreamSupervisionStrategy.decider)
-  implicit lazy val resumingMat: Materializer = ActorMaterializer(settings)
+  implicit lazy val resumingMat: Materializer = ActorMaterializer(Some(settings))
 
   def resolveEventService(locationService: LocationService): Future[URI] = async {
     val eventServiceResolver = new EventServiceLocationResolver(locationService)
@@ -46,13 +48,13 @@ trait BaseProperties {
 object BaseProperties {
   def createInfra(serverPort: Int, httpPort: Int): (LocationService, actor.ActorSystem) = {
 
-    implicit val system: actor.ActorSystem = actor.ActorSystem("event-server")
-    implicit val mat: ActorMaterializer    = ActorMaterializer()
+    implicit val typedSystem: ActorSystem[SpawnProtocol] = ActorSystem(SpawnProtocol.behavior, "event-server")
+    implicit val mat: Materializer                       = ActorMaterializer()
 
     val locationService = new LocationServiceClient("localhost", httpPort)
     val tcpRegistration = TcpRegistration(EventServiceConnection.value, serverPort)
 
     locationService.register(tcpRegistration).await
-    (locationService, system)
+    (locationService, typedSystem.toUntyped)
   }
 }

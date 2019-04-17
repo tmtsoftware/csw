@@ -1,9 +1,11 @@
 package csw.framework.models
-import akka.actor.ActorSystem
+import akka.actor.typed.SpawnProtocol
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.{typed, ActorSystem}
 import csw.alarm.api.scaladsl.AlarmService
 import csw.alarm.client.AlarmServiceFactory
-import csw.command.client.{CRMCacheProperties, CommandResponseManager, CommandResponseManagerActor}
 import csw.command.client.models.framework.ComponentInfo
+import csw.command.client.{CRMCacheProperties, CommandResponseManager, CommandResponseManagerActor}
 import csw.config.api.scaladsl.ConfigClientService
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.event.api.scaladsl.EventService
@@ -56,15 +58,16 @@ object CswContext {
       componentInfo: ComponentInfo
   )(implicit richSystem: CswFrameworkSystem): Future[CswContext] = {
 
-    implicit val system: ActorSystem          = richSystem.system
-    implicit val ec: ExecutionContextExecutor = system.dispatcher
+    implicit val typedSystem: typed.ActorSystem[SpawnProtocol] = richSystem.system
+    implicit val untypedSystem: ActorSystem                    = richSystem.system.toUntyped
+    implicit val ec: ExecutionContextExecutor                  = typedSystem.executionContext
 
     val eventService         = eventServiceFactory.make(locationService)
     val alarmService         = alarmServiceFactory.makeClientApi(locationService)
     val timeServiceScheduler = TimeServiceSchedulerFactory.make()
 
     val loggerFactory       = new LoggerFactory(componentInfo.name)
-    val configClientService = ConfigClientFactory.clientApi(system, locationService)
+    val configClientService = ConfigClientFactory.clientApi(typedSystem, locationService)
     async {
 
       // create CurrentStatePublisher

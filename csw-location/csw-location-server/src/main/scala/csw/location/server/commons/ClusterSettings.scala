@@ -1,6 +1,6 @@
 package csw.location.server.commons
 
-import akka.actor.ActorSystem
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.location.api.commons.Constants
 import csw.logging.api.scaladsl.Logger
@@ -129,7 +129,7 @@ private[location] case class ClusterSettings(clusterName: String = Constants.Clu
 
   }
 
-  def system: ActorSystem = ActorSystem(clusterName, config)
+  def system: ActorSystem[SpawnProtocol] = ActorSystem(SpawnProtocol.behavior, clusterName, config)
 }
 
 /**

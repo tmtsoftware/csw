@@ -1,7 +1,8 @@
 package csw.config.client;
 
-import akka.actor.ActorSystem;
 import akka.actor.CoordinatedShutdown;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.SpawnProtocol;
 import akka.http.javadsl.Http;
 import akka.stream.Materializer;
 import csw.config.api.javadsl.IConfigClientService;
@@ -25,11 +26,11 @@ public class JConfigClientBaseSuite extends JMockedAuthentication {
 
     private csw.location.server.internal.ServerWiring locationWiring = new csw.location.server.internal.ServerWiring();
 
-    private ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create());
-    private ILocationService clientLocationService = JHttpLocationServiceFactory.makeLocalClient(actorRuntime.actorSystem(), actorRuntime.mat());
+    private ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create(SpawnProtocol.behavior(), "Guardian"));
+    private ILocationService clientLocationService = JHttpLocationServiceFactory.makeLocalClient(actorRuntime.untypedSystem(), actorRuntime.mat());
 
-    public IConfigService configService = JConfigClientFactory.adminApi(actorRuntime.actorSystem(), clientLocationService, factory());
-    public IConfigClientService configClientApi = JConfigClientFactory.clientApi(actorRuntime.actorSystem(), clientLocationService);
+    public IConfigService configService = JConfigClientFactory.adminApi(actorRuntime.typedSystem(), clientLocationService, factory());
+    public IConfigClientService configClientApi = JConfigClientFactory.clientApi(actorRuntime.typedSystem(), clientLocationService);
 
     private ServerWiring serverWiring = ServerWiring$.MODULE$.make(securityDirectives());
     private HttpService httpService = serverWiring.httpService();
@@ -52,10 +53,10 @@ public class JConfigClientBaseSuite extends JMockedAuthentication {
     }
 
     public void cleanup() throws Exception {
-        Http.get(actorRuntime.actorSystem()).shutdownAllConnectionPools().toCompletableFuture().get(10, TimeUnit.SECONDS);
+        Http.get(actorRuntime.untypedSystem()).shutdownAllConnectionPools().toCompletableFuture().get(10, TimeUnit.SECONDS);
         Await.result(httpService.shutdown(CoordinatedShutdown.unknownReason()), timeout);
-        Await.result(actorRuntime.actorSystem().terminate(), timeout);
-        Await.result(serverWiring.actorSystem().terminate(), timeout);
+        Await.result(actorRuntime.untypedSystem().terminate(), timeout);
+        Await.result(serverWiring.actorRuntime().untypedSystem().terminate(), timeout);
         Await.result(locationWiring.actorRuntime().shutdown(CoordinatedShutdown.unknownReason()), timeout);
     }
 }

@@ -31,7 +31,7 @@ class TrackLocationTest(ignore: Int, mode: String) extends LSNodeSpec(config = n
     val prefix = Prefix("nfiraos.ncc.trombone")
 
     runOn(seed) {
-      val actorRef = cswCluster.actorSystem.spawn(Behavior.empty, "trombone-hcd")
+      val actorRef = cswCluster.untypedSystem.spawn(Behavior.empty, "trombone-hcd")
       locationService.register(AkkaRegistration(akkaConnection, prefix, actorRef)).await
       enterBarrier("Registration")
 

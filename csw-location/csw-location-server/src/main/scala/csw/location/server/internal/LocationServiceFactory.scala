@@ -1,6 +1,6 @@
 package csw.location.server.internal
 
-import akka.actor.ActorSystem
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.location.api.scaladsl.LocationService
 import csw.location.server.commons.{ClusterSettings, CswCluster}
 
@@ -29,7 +29,7 @@ private[location] object LocationServiceFactory {
    * @throws csw.location.api.exceptions.CouldNotJoinCluster
    * @return an instance of `LocationService`
    */
-  def withSystem(actorSystem: ActorSystem): LocationService =
+  def withSystem(actorSystem: ActorSystem[SpawnProtocol]): LocationService =
     withCluster(CswCluster.withSystem(actorSystem))
 
   /**
