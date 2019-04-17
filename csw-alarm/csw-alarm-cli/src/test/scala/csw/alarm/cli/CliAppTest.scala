@@ -91,7 +91,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
 
     val configData    = ConfigData.fromPath(ResourceReader.copyToTmp("/valid-alarms.conf"))
     val configPath    = Paths.get("valid-alarms.conf")
-    val configService = ConfigClientFactory.adminApi(actorRuntime.system, locationService, factory)
+    val configService = ConfigClientFactory.adminApi(actorRuntime.untypedSystem, locationService, factory)
     configService.create(configPath, configData, comment = "commit test file").futureValue
 
     val cmd = Options(cmd = "init", filePath = Some(configPath), reset = true)

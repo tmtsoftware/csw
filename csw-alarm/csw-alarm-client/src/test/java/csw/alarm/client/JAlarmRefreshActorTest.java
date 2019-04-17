@@ -1,14 +1,14 @@
 package csw.alarm.client;
 
 import akka.Done;
-import akka.actor.ActorSystem;
 import akka.actor.testkit.typed.javadsl.TestProbe;
 import akka.actor.typed.ActorRef;
-import akka.actor.typed.javadsl.Adapter;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.SpawnProtocol;
 import csw.alarm.api.models.AutoRefreshSeverityMessage;
-import csw.alarm.api.models.Key.AlarmKey;
 import csw.alarm.api.models.AutoRefreshSeverityMessage.AutoRefreshSeverity;
 import csw.alarm.api.models.AutoRefreshSeverityMessage.CancelAutoRefresh;
+import csw.alarm.api.models.Key.AlarmKey;
 import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
 
@@ -19,8 +19,7 @@ import static csw.alarm.api.javadsl.JAlarmSeverity.Major;
 import static csw.params.javadsl.JSubsystem.NFIRAOS;
 
 public class JAlarmRefreshActorTest extends JUnitSuite {
-    private ActorSystem system = ActorSystem.create();
-    private akka.actor.typed.ActorSystem<Void> typedSystem = Adapter.toTyped(system);
+    private ActorSystem<SpawnProtocol> typedSystem = ActorSystem.apply(SpawnProtocol.behavior(), "SpawnProtocolGuardian");
 
     // DEOPSCSW-507: Auto-refresh utility for component developers
     @Test
@@ -32,7 +31,7 @@ public class JAlarmRefreshActorTest extends JUnitSuite {
         ActorRef<AutoRefreshSeverityMessage> ref = AlarmRefreshActorFactory.jMake((key, severity) -> CompletableFuture.supplyAsync(() -> {
             probe.ref().tell(refreshMsg);
             return Done.done();
-        }), Duration.ofMillis(200), system);
+        }), Duration.ofMillis(200), typedSystem);
 
         ref.tell(new AutoRefreshSeverity(alarmKey, Major));
         probe.expectMessage(refreshMsg);
