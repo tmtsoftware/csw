@@ -48,6 +48,7 @@ object Dependencies {
       Enumeratum.`enumeratum`.value,
       Libs.`akka-management-cluster-http`,
       AkkaHttp.`akka-http`,
+      AkkaHttp.`akka-http2-support`,
       Libs.`akka-http-play-json`,
       Libs.`play-json`.value,
       Chill.`chill-akka`,
