@@ -31,14 +31,14 @@ Let's discuss different components of `Location Server` in following sections:
 
 ### Cluster Member
 
-Location service JVM (precisely Actor System) takes part in [Akka Cluster](https://doc.akka.io/docs/akka/current/index-cluster.html). 
-By default, this actor system binds to port `3552`. Initially when there is no member in Akka cluster, node joins itself. 
-Such a node is referred as seed node (introducer) and location of this node needs to be known so that other nodes can join to this known address and form a larger cluster. 
+Location service JVM (precisely Actor System) takes part in [Akka Cluster](https://doc.akka.io/docs/akka/current/index-cluster.html).
+By default, this actor system binds to port `3552`. Initially when there is no member in Akka cluster, node joins itself.
+Such a node is referred as seed node (introducer) and location of this node needs to be known so that other nodes can join to this known address and form a larger cluster.
 After the joining process is complete, seed nodes are not special and they participate in the cluster in exactly the same way as other nodes.
 
 Akka Cluster provides cluster [membership](https://doc.akka.io/docs/akka/current/common/cluster.html#membership) service using [gossip](https://doc.akka.io/docs/akka/current/common/cluster.html#gossip) protocols and an automatic [failure detector](https://doc.akka.io/docs/akka/current/common/cluster.html#failure-detector).
 
-Death watch uses the cluster failure detector for nodes in the cluster, i.e. it detects network failures and JVM crashes, in addition to graceful termination of watched actor. 
+Death watch uses the cluster failure detector for nodes in the cluster, i.e. it detects network failures and JVM crashes, in addition to graceful termination of watched actor.
 Death watch generates the `Terminated` message to the watching actor when the unreachable cluster node has been downed and removed. Hence we have kept `auto-down-unreachable-after = 10s` so that in case of failure, interested parties get the death watch notification for the location in around 10s.
 
 ### Distributed Data (Replicator)
@@ -52,9 +52,6 @@ We store following data in this key-value store (distributed data):
 
 - `Service`:
   This uses [LWWRegister](https://doc.akka.io/docs/akka/current/distributed-data.html?language=scala#flags-and-registers) which holds location of CSW component against unique connection name.
-  
-`Location service` track API internally uses `Service` key to register interest in change notifications by sending `Replicator.Subscribe` message to the Replicator.
-It sends `Replicator.Changed` messages to the registered subscriber when the data for the subscribed key is updated.
 
 #### Consistency Guarantees
 
@@ -62,10 +59,10 @@ It sends `Replicator.Changed` messages to the registered subscriber when the dat
 - `ReadLocal`: All the get API's (find, resolve, list etc.): retrieves value from registry (distributed data) with consistency level of `ReadLocal` which means value will only be read from the local replica
 
 In TMT environment, we do not want two components to be registered with same connection name.
-This is achieved by configuring consistency level of `WriteMajority` for `register` API. 
+This is achieved by configuring consistency level of `WriteMajority` for `register` API.
 Register API guarantees that component is register with location service and it's entry is replicated to at least N/2 + 1 replicas.
 
-Based on above configuration, it is always guaranteed that only one location of component will exist at any point in time in registry. 
+Based on above configuration, it is always guaranteed that only one location of component will exist at any point in time in registry.
 Hence it is safe to read location just from local replica with consistency level of `ReadLocal` with the assumption that eventually location will get replicated on this replica if not present when queried.
 
 ### Death Watch Actor
@@ -83,7 +80,52 @@ Death watch actor only supports akka locations and filters out `tcp` and `http` 
 Location service provides HTTP routes to get, register, unregister and track locations. Only one instance of location server is started on port `7654` on evey machine.
 Client from same machine running in different processes can connect to `localhost:7654` to access location service. In most of the cases, you will not directly talk to this address. You will always use loocation service client provided by CSW which internally connects to `localhost:7654` to access `Location Service`.
 
-Location service `/track` route is implemented using [SSE (Server Sent Event)](https://doc.akka.io/docs/akka-http/current/sse-support.html#server-sent-events-support) for pushing location change notifications to client. It keeps the connection alive by sending heartbeats every 2 seconds if location does not change for that period.
+### How location tracking works
+
+Below diagram illustrate `Assembly` tracking `HCD`. Use case shown in diagram is when `Assembly` starts tracking, before `HCD` is registered with location service.
+It also shows abrupt shutdown of `HCD` and how `Assembly` gets notification of that.
+
+![Location Track](../../images/locationservice/track.png)
+
+Let us go through each action step by step as shown in diagram:
+
+1. `Assembly` starts tracking `HCD` by sending `HTTP` track request using location client to location server.
+
+    1. On receiving track request, location server internally subscribes to the `replicator` using `Service` key as explained in previous section and generates stream of `TrackingEvent`
+
+    1. Server then maps this stream of `TrackingEvent` to [SSE (ServerSentEvent)](https://doc.akka.io/docs/akka-http/current/sse-support.html)
+
+    1. Server also keeps sending `ServerSentEvent.heartbeat` every `2 seconds` to keep connection alive
+
+1. `HCD` registers with location service by sending `register` request to location server.
+
+    1. On receiving register request, location server internally updates both `Service` and `AllServices` keys by sending `update` message to `replicator`
+
+1. Death watch actor is started with location service and it gets notification on every component registration.
+   In our flow, death watch actor receives notification of `HCD` getting registered with location service from previous step and it immediately start watching death of `HCD`.
+
+1. One of the task of `replicator` is to keep replicating `CRDT's` from one node to other.
+   In this case, location of `HCD` gets replicated from `Machine 1` to `Machine 2`
+
+1. As soon as `replicator` from `Machine 2` receives `HCD` location, it notifies all the interested parties.
+
+    1. Remember `Step 1` is interested and receives `Changed(key)` message from `replicator` which gets mapped to `TrackingEvent`
+
+1. Location server then maps it to `LocationUpdated` event and pushes it to `Assembly` via `SSE`
+
+1. Assume that after some time, `HCD` crashes/terminates/throws exception and shutdowns abruptly.
+
+1. As described in `Step 3`, Death watch actor is watching `HCD`.
+   On `HCD's` shutdown, death watch actor `unregisters` `HCD` from location service by sending update message by removing `HCD's` entry from `replicator`.
+
+1. Eventually this removal of `HCD` gets replicated to `replicator` running on `Machine 2`.
+
+1. On receiving removal of `HCD` location, same actions gets performed as described in `Step 5`.
+   In this case, `LocationRemoved` event gets pushed to `Assembly` via `SSE`
+
+@@@ note
+At any point in time, `Assembly` can choose to cancel tracking. On cancellation, this persistent connection will be released.
+@@@
 
 ## Internals
 
