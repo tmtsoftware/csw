@@ -111,7 +111,7 @@ Let us go through each action step by step as shown in diagram:
 
     1. Remember `Step 1` is interested and receives `Changed(key)` message from `replicator` which gets mapped to `TrackingEvent`
 
-1. Location server then maps it to `LocationUpdated` event and pushes it to `Assembly` via `SSE`
+    1. Location server then maps it to `LocationUpdated` event and pushes it to `Assembly` via `SSE`
 
 1. Assume that after some time, `HCD` crashes/terminates/throws exception and shutdowns abruptly.
 
