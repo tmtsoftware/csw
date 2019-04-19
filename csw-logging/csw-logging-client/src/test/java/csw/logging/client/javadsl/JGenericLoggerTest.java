@@ -1,8 +1,8 @@
 package csw.logging.client.javadsl;
 
-import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import akka.actor.Props;
+import akka.actor.typed.ActorRef;
+import akka.actor.typed.javadsl.Adapter;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -88,7 +88,7 @@ public class JGenericLoggerTest extends JUnitSuite {
 
     @Test
     public void testGenericLoggerActorWithoutComponentName() throws InterruptedException {
-        ActorRef utilActor = actorSystem.actorOf(Props.create(JGenericActor.class), "JActorUtil");
+        ActorRef<String> utilActor = Adapter.spawn(actorSystem, JGenericActor.behavior,"JActorUtil");
         String actorPath = utilActor.path().toString();
         String className = JGenericActor.class.getName();
 

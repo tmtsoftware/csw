@@ -4,8 +4,8 @@ import java.nio.ByteBuffer
 import java.util.concurrent.CompletableFuture
 
 import akka.Done
+import akka.actor.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.{ActorSystem, Props}
 import ch.qos.logback.classic.LoggerContext
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.appenders.LogAppenderBuilder
@@ -108,7 +108,7 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
   if (time) {
     // Start timing actor
     LoggingState.doTime = true
-    val timeActor = system.actorOf(Props(new TimeActor(timeActorDonePromise)), name = "TimingActor")
+    val timeActor = system.spawn(new TimeActor(timeActorDonePromise).behavior, name = "TimingActor")
     LoggingState.timeActorOption = Some(timeActor)
   } else {
     timeActorDonePromise.success(())

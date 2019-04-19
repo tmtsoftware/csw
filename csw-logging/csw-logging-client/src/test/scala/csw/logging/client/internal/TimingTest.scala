@@ -4,6 +4,7 @@ import java.nio.file.Paths
 import java.time.{ZoneId, ZoneOffset, ZonedDateTime}
 
 import akka.actor.ActorSystem
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.logging.api.models.RequestId
 import csw.logging.client.appenders.FileAppender
 import csw.logging.client.commons.LoggingKeys
@@ -24,8 +25,7 @@ class TimingTest extends LoggingTestSuite with Timing {
   override lazy val loggingSystem =
     new LoggingSystem(loggingSystemName, "version", "localhost", actorSystem)
 
-  private val irisActorRef =
-    actorSystem.actorOf(IRIS.props(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
+  private val irisActorRef = actorSystem.spawn(IRIS.behavior(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
 
   private val fileTimestamp   = FileAppender.decideTimestampForFile(ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC)))
   private val timeLogFilePath = logFileDir + s"/${loggingSystemName}_${fileTimestamp}_time.log"

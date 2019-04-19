@@ -1,6 +1,6 @@
 package csw.logging.client.utils;
 
-import akka.actor.ActorRef;
+import akka.actor.typed.ActorRef;
 import csw.logging.api.javadsl.ILogger;
 
 import java.util.Map;
@@ -25,13 +25,12 @@ public class JLogUtil {
         logger.fatal(() -> logMsgMap.get("fatal"));
     }
 
-    public static void sendLogMsgToActorInBulk(ActorRef actorRef) {
-        actorRef.tell("trace", ActorRef.noSender());
-        actorRef.tell("debug", ActorRef.noSender());
-        actorRef.tell("info", ActorRef.noSender());
-        actorRef.tell("warn", ActorRef.noSender());
-        actorRef.tell("error", ActorRef.noSender());
-        actorRef.tell("fatal", ActorRef.noSender());
+    public static void sendLogMsgToActorInBulk(ActorRef<String> actorRef) {
+        actorRef.tell("trace");
+        actorRef.tell("debug");
+        actorRef.tell("info");
+        actorRef.tell("warn");
+        actorRef.tell("error");
+        actorRef.tell("fatal");
     }
-
 }

@@ -1,8 +1,9 @@
 package csw.logging.client.javadsl;
 
-import akka.actor.ActorRef;
+import akka.actor.typed.ActorRef;
 import akka.actor.ActorSystem;
-import akka.actor.Props;
+import akka.actor.typed.Props;
+import akka.actor.typed.javadsl.Adapter;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -50,16 +51,14 @@ public class ILoggerTest extends JUnitSuite {
     private static List<JsonObject> genericLogBuffer = new ArrayList<>();
     private static List<JsonObject> irisLogBuffer = new ArrayList<>();
     private static List<JsonObject> tromboneHcdLogBuffer = new ArrayList<>();
-
-    private static ActorRef irisSupervisorActor = actorSystem.actorOf(Props.create(JIrisSupervisorActor.class), "JIRISActor");
-    private static ActorRef tromboneSupervisorActor = actorSystem.actorOf(Props.create(JTromboneHCDSupervisorActor.class, new JLoggerFactory("jTromboneHcdActor")), "JTromboneActor");
-    private static ActorRef genericActor = actorSystem.actorOf(Props.create(JGenericActor.class), "JGenericActor");
-
+    private static ActorRef<String> irisSupervisorActor = Adapter.spawn(actorSystem,JIrisSupervisorActor.behavior, "JIRISActor",Props.empty());
+    private static ActorRef<String> tromboneSupervisorActor = Adapter.spawn(actorSystem,JTromboneHCDSupervisorActor.behavior(new JLoggerFactory("jTromboneHcdActor")), "JTromboneActor", Props.empty());
+    private static ActorRef<String> genericActor = Adapter.spawn(actorSystem, JGenericActor.behavior, "JGenericActor", Props.empty());
 
     @BeforeClass
     public static void setup() {
         loggingSystem = JLoggingSystemFactory.start("Logger-Test", "SNAPSHOT-1.0", "localhost", actorSystem, appenderBuilders);
-//        loggingSystem.setAppenders(scala.collection.JavaConverters.iterableAsScalaIterable(appenderBuilders).toList());
+        loggingSystem.setAppenders(scala.collection.JavaConverters.iterableAsScalaIterable(appenderBuilders).toList());
     }
 
     @After
@@ -70,7 +69,8 @@ public class ILoggerTest extends JUnitSuite {
     @AfterClass
     public static void teardown() throws Exception {
         loggingSystem.javaStop().get();
-        Await.result(actorSystem.terminate(), Duration.create(10, TimeUnit.SECONDS));
+        actorSystem.terminate();
+        Await.result(actorSystem.whenTerminated(), Duration.create(10, TimeUnit.SECONDS));
     }
 
     private void allComponentsStartLogging() {

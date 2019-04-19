@@ -1,5 +1,6 @@
 package csw.logging.client.scaladsl
 
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.logging.api.models.LoggingLevels
 import csw.logging.api.models.LoggingLevels.Level
 import csw.logging.client.commons.LoggingKeys
@@ -10,7 +11,7 @@ import csw.logging.client.utils.LoggingTestSuite
 
 class ActorLoggingTest extends LoggingTestSuite {
   private val irisActorRef =
-    actorSystem.actorOf(IRIS.props(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
+    actorSystem.spawn(IRIS.behavior(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
 
   def sendMessagesToActor() = {
     irisActorRef ! LogTrace
@@ -19,7 +20,7 @@ class ActorLoggingTest extends LoggingTestSuite {
     irisActorRef ! LogWarn
     irisActorRef ! LogError
     irisActorRef ! LogFatal
-    irisActorRef ! "Unknown"
+    irisActorRef ! LogErrorWithMap("Unknown")
     Thread.sleep(300)
   }
 
@@ -48,13 +49,13 @@ class ActorLoggingTest extends LoggingTestSuite {
   // DEOPSCSW-115: Format and control logging content
   // DEOPSCSW-121: Define structured tags for log messages
   test("message logged with custom Map properties should get logged") {
-    irisActorRef ! "Unknown"
+    irisActorRef ! LogErrorWithMap("Unknown")
     Thread.sleep(300)
 
     val errorLevelLogMessages = logBuffer.groupBy(json ⇒ json.getString(LoggingKeys.SEVERITY))("ERROR")
     errorLevelLogMessages.size shouldEqual 1
 
-    val expectedMessage  = "Unknown message received"
+    val expectedMessage  = "Logging error with map"
     val expectedReason   = "Unknown"
     val expectedActorRef = irisActorRef.toString
     errorLevelLogMessages.head.getString("message") shouldBe expectedMessage

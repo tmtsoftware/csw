@@ -1,8 +1,8 @@
 package csw.logging.client.javadsl;
 
-import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import akka.actor.Props;
+import akka.actor.typed.ActorRef;
+import akka.actor.typed.javadsl.Adapter;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -58,7 +58,7 @@ public class ILoggerActorTest extends JUnitSuite {
     }
     @Test
     public void testDefaultLogConfigurationForActor() {
-        ActorRef tromboneActor = actorSystem.actorOf(Props.create(JTromboneHCDSupervisorActor.class, new JLoggerFactory("jTromboneHcdActor")), "JTromboneActor");
+        ActorRef<String> tromboneActor = Adapter.spawn(actorSystem, JTromboneHCDSupervisorActor.behavior(new JLoggerFactory("jTromboneHcdActor")),"JTromboneActor");
         String actorPath = tromboneActor.path().toString();
         String className = JTromboneHCDSupervisorActor.class.getName();
 

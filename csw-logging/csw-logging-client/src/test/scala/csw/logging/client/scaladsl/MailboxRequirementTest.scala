@@ -1,7 +1,9 @@
 package csw.logging.client.scaladsl
 import java.net.InetAddress
 
-import akka.actor.{ActorRef, ActorSystem}
+import akka.actor.ActorSystem
+import akka.actor.typed.ActorRef
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.logging.client.components.IRIS
 import csw.logging.client.components.IRIS._
@@ -31,7 +33,7 @@ class MailboxRequirementTest extends FunSuite with Matchers with BeforeAndAfterE
 
   override def afterEach(): Unit = logBuffer.clear()
 
-  def sendMessagesToActor(irisActorRef: ActorRef): Unit = {
+  def sendMessagesToActor(irisActorRef: ActorRef[IRISLogMessages]): Unit = {
     irisActorRef ! LogTrace
     irisActorRef ! LogDebug
     irisActorRef ! LogInfo
@@ -53,7 +55,8 @@ class MailboxRequirementTest extends FunSuite with Matchers with BeforeAndAfterE
 
     loggingSystem.setAppenders(List(testAppender))
 
-    val irisActorRef: ActorRef = actorSystem.actorOf(IRIS.props(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
+    val irisActorRef: ActorRef[IRISLogMessages] =
+      actorSystem.spawn(IRIS.behavior(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
 
     sendMessagesToActor(irisActorRef)
 
@@ -69,7 +72,8 @@ class MailboxRequirementTest extends FunSuite with Matchers with BeforeAndAfterE
 
     loggingSystem.setAppenders(List(testAppender))
 
-    val irisActorRef: ActorRef = actorSystem.actorOf(IRIS.props(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
+    val irisActorRef: ActorRef[IRISLogMessages] =
+      actorSystem.spawn(IRIS.behavior(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
 
     sendMessagesToActor(irisActorRef)
 

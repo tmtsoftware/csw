@@ -1,6 +1,7 @@
 package csw.logging.client.scaladsl
 
-import akka.actor.ActorRef
+import akka.actor.typed.ActorRef
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.logging.api.models.LoggingLevels._
 import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.components.IRIS._
@@ -15,8 +16,8 @@ import scala.collection.mutable.ArrayBuffer
 // DEOPSCSW-316: Improve Logger accessibility for component developers
 class LoggerCompTest extends LoggingTestSuite {
 
-  private val irisSupervisorActorRef = actorSystem.actorOf(IRIS.props(IRIS.COMPONENT_NAME))
-  private val irisUtilActorRef       = actorSystem.actorOf(IrisActorUtil.props)
+  private val irisSupervisorActorRef = actorSystem.spawn(IRIS.behavior(IRIS.COMPONENT_NAME), "IrisSupervisorActor")
+  private val irisUtilActorRef       = actorSystem.spawn(IrisActorUtil.behavior, "IrisUtilActor")
   private val irisTLA                = new IrisTLA()
   private val irisUtil               = new IrisUtil()
   private val tromboneHcd            = new TromboneHcd()
@@ -26,7 +27,7 @@ class LoggerCompTest extends LoggingTestSuite {
   private var irisLogBuffer                                                  = mutable.Buffer.empty[JsObject]
   private var tromboneHcdLogBuffer                                           = mutable.Buffer.empty[JsObject]
 
-  def sendMessagesToActor(actorRef: ActorRef): Unit = {
+  def sendMessagesToActor(actorRef: ActorRef[IRISLogMessages]): Unit = {
     actorRef ! LogTrace
     actorRef ! LogDebug
     actorRef ! LogInfo

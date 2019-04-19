@@ -1,21 +1,27 @@
 package csw.logging.client.utils;
 
-import akka.actor.AbstractActor;
+import akka.actor.typed.Behavior;
+import akka.actor.typed.javadsl.Behaviors;
 import csw.logging.api.javadsl.ILogger;
 import csw.logging.client.javadsl.JGenericLoggerFactory;
 
-public class JGenericActor extends AbstractActor {
-    private ILogger logger = JGenericLoggerFactory.getLogger(context(), getClass());
+public class JGenericActor {
 
-    @Override
-    public Receive createReceive() {
-        return receiveBuilder()
-                .match(String.class, msg -> msg.equals("trace"), msg -> logger.trace(() -> msg))
-                .match(String.class, msg -> msg.equals("debug"), msg -> logger.debug(() -> msg))
-                .match(String.class, msg -> msg.equals("info"), msg -> logger.info(() -> msg))
-                .match(String.class, msg -> msg.equals("warn"), msg -> logger.warn(() -> msg))
-                .match(String.class, msg -> msg.equals("error"), msg -> logger.error(() -> msg))
-                .match(String.class, msg -> msg.equals("fatal"), msg -> logger.fatal(() -> msg))
-                .build();
-    }
+    public static Behavior<String> behavior =
+            Behaviors.setup(context -> {
+                // DEOPSCSW-316: Improve Logger accessibility for component developers
+                final ILogger log = JGenericLoggerFactory.getLogger(context, JGenericActor.class);
+                return Behaviors.receiveMessage(
+                        msg -> {
+                            switch (msg) {
+                                case "trace": log.trace(() -> msg); break;
+                                case "debug": log.debug(() -> msg); break;
+                                case "info": log.info(() -> msg); break;
+                                case "warn": log.warn(() -> msg); break;
+                                case "error": log.error(() -> msg); break;
+                                case "fatal": log.fatal(() -> msg); break;
+                            }
+                            return Behaviors.same();
+                        });
+            });
 }
