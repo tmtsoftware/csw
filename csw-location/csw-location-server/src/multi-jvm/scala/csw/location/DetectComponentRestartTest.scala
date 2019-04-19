@@ -1,7 +1,7 @@
 package csw.location
 
-import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.{ActorSystem, Behavior, SpawnProtocol}
 import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.testkit.TestProbe
 import csw.location.api.models.Connection.AkkaConnection
@@ -42,15 +42,16 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
 
       Await.result(system.whenTerminated, 10.seconds)
 
-      val newSystem = startNewSystem()
+      val newSystem      = startNewSystem()
+      val newTypedSystem = newSystem.toTyped.asInstanceOf[ActorSystem[SpawnProtocol]]
 
       val freshLocationService = mode match {
         case "http" =>
-          Try(ServerWiring.make(typedSystem).locationHttpService.start().await) match {
+          Try(ServerWiring.make(newTypedSystem).locationHttpService.start().await) match {
             case _ => // ignore binding errors
           }
-          HttpLocationServiceFactory.makeLocalClient(typedSystem, ActorMaterializer()(typedSystem))
-        case "cluster" => LocationServiceFactory.withCluster(CswCluster.withSystem(typedSystem))
+          HttpLocationServiceFactory.makeLocalClient(newTypedSystem, ActorMaterializer()(newTypedSystem))
+        case "cluster" => LocationServiceFactory.withCluster(CswCluster.withSystem(newTypedSystem))
       }
 
       Thread.sleep(2000)
