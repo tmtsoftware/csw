@@ -2,7 +2,7 @@ package csw.location.server.scaladsl
 
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.scaladsl
-import akka.actor.typed.scaladsl.adapter.{TypedActorSystemOps, UntypedActorSystemOps}
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{Behavior, SpawnProtocol}
 import akka.actor.{typed, ActorSystem, CoordinatedShutdown, PoisonPill}
 import akka.stream.Materializer

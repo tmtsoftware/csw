@@ -2,8 +2,8 @@ package csw.location.client.internal
 
 import java.io.IOException
 
+import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.actor.{CoordinatedShutdown, Scheduler}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshalling.Marshal
@@ -25,7 +25,7 @@ import scala.async.Async.{async, await}
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
-private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(implicit val actorSystem: ActorSystem[SpawnProtocol],
+private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(implicit val actorSystem: ActorSystem[_],
                                                                             mat: Materializer)
     extends LocationService
     with PlayJsonSupport

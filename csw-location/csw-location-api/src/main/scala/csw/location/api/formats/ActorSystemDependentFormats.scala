@@ -3,7 +3,7 @@ package csw.location.api.formats
 import java.net.URI
 
 import akka.actor.typed.scaladsl.adapter._
-import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
+import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.serialization.{Serialization, SerializationExtension}
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.api.models.{Location, TrackingEvent}
@@ -13,7 +13,7 @@ import julienrf.json.derived
 import play.api.libs.json.{__, Format, Json, OFormat}
 
 private[csw] trait ActorSystemDependentFormats {
-  implicit def actorSystem: ActorSystem[SpawnProtocol]
+  implicit def actorSystem: ActorSystem[_]
 
   implicit val akkaConnectionFormat: Format[AkkaConnection] = Json.format[AkkaConnection]
   implicit val tcpConnectionFormat: Format[TcpConnection]   = Json.format[TcpConnection]

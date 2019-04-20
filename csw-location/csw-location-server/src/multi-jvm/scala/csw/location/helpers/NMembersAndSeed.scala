@@ -1,8 +1,6 @@
 package csw.location.helpers
 
 import akka.actor
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.remote.testconductor.RoleName
 import akka.remote.testkit.MultiNodeConfig
 import com.typesafe.config.{Config, ConfigFactory}
