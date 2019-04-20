@@ -1,11 +1,15 @@
 package csw.config.server
 
-import akka.actor.ActorSystem
+import akka.actor
 import akka.actor.CoordinatedShutdown.UnknownReason
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes, Uri}
-import akka.stream.{ActorMaterializer, Materializer}
+import akka.stream.Materializer
+import akka.stream.typed.scaladsl.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import csw.aas.core.commons.AASConnection
 import csw.config.server.commons.TestFutureExtension.RichFuture
@@ -20,8 +24,9 @@ import scala.concurrent.duration._
 
 // DEOPSCSW-130: Command line App for HTTP server
 class MainTest extends HTTPLocationService {
-  implicit val actorSystem: ActorSystem = ActorSystem("config-server")
-  implicit val mat: Materializer        = ActorMaterializer()
+  implicit val actorSystem: ActorSystem[_]      = ActorSystem(Behaviors.empty, "config-server")
+  implicit val untypedSystem: actor.ActorSystem = actorSystem.toUntyped
+  implicit val mat: Materializer                = ActorMaterializer()
 
   private val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient
 
@@ -38,7 +43,8 @@ class MainTest extends HTTPLocationService {
   override def afterEach(): Unit = testFileUtils.deleteServerFiles()
 
   override def afterAll(): Unit = {
-    actorSystem.terminate().await
+    actorSystem.terminate()
+    actorSystem.whenTerminated.await
     super.afterAll()
   }
 
