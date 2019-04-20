@@ -2,11 +2,12 @@ package csw.event.client.internal.wiring
 
 import java.net.URI
 
-import akka.actor.typed.scaladsl.adapter.{TypedActorSystemOps, UntypedActorSystemOps}
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import akka.Done
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.stream.{ActorMaterializerSettings, Materializer}
-import akka.{actor, Done}
 import csw.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.event.api.scaladsl.{EventPublisher, EventService, EventSubscriber}
 import csw.event.client.helpers.TestFutureExt.RichFuture
@@ -31,11 +32,10 @@ trait BaseProperties {
   def start(): Unit
   def shutdown(): Unit
 
-  implicit val actorSystem: actor.ActorSystem
-  implicit val typedActorSystem: ActorSystem[_] = actorSystem.toTyped
-  implicit lazy val ec: ExecutionContext        = actorSystem.dispatcher
+  implicit val actorSystem: ActorSystem[_]
+  implicit lazy val ec: ExecutionContext = actorSystem.executionContext
   lazy val settings: ActorMaterializerSettings =
-    ActorMaterializerSettings(actorSystem).withSupervisionStrategy(EventStreamSupervisionStrategy.decider)
+    ActorMaterializerSettings(actorSystem.toUntyped).withSupervisionStrategy(EventStreamSupervisionStrategy.decider)
   implicit lazy val resumingMat: Materializer = ActorMaterializer(Some(settings))
 
   def resolveEventService(locationService: LocationService): Future[URI] = async {
@@ -45,15 +45,15 @@ trait BaseProperties {
 }
 
 object BaseProperties {
-  def createInfra(serverPort: Int, httpPort: Int): (LocationService, actor.ActorSystem) = {
+  def createInfra(serverPort: Int, httpPort: Int): (LocationService, ActorSystem[_]) = {
 
-    implicit val typedSystem: ActorSystem[SpawnProtocol] = ActorSystem(SpawnProtocol.behavior, "event-server")
-    implicit val mat: Materializer                       = ActorMaterializer()
+    implicit val typedSystem: ActorSystem[_] = ActorSystem(Behaviors.empty, "event-server")
+    implicit val mat: Materializer           = ActorMaterializer()
 
     val locationService = new LocationServiceClient("localhost", httpPort)
     val tcpRegistration = TcpRegistration(EventServiceConnection.value, serverPort)
 
     locationService.register(tcpRegistration).await
-    (locationService, typedSystem.toUntyped)
+    (locationService, typedSystem)
   }
 }

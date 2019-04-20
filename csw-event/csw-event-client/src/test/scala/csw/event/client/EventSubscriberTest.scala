@@ -88,7 +88,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
     val event1             = makeDistinctEvent(Random.nextInt())
     val eventKey: EventKey = event1.eventKey
-    val testProbe          = TestProbe[Event]()(typedActorSystem)
+    val testProbe          = TestProbe[Event]()
     val subscription       = subscriber.subscribe(Set(eventKey)).toMat(Sink.foreach(testProbe.ref ! _))(Keep.left).run()
 
     subscription.ready().await
@@ -110,7 +110,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     import baseProperties._
 
     val event1    = makeEvent(1)
-    val testProbe = TestProbe[Event]()(typedActorSystem)
+    val testProbe = TestProbe[Event]()
 
     val callback: Event ⇒ Future[Event] = event ⇒ Future.successful(testProbe.ref ! event).map(_ ⇒ event)(ec)
 
@@ -160,7 +160,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
     val listOfPublishedEvents: ArrayBuffer[Event] = ArrayBuffer.empty
 
-    val testProbe              = TestProbe[Event]()(typedActorSystem)
+    val testProbe              = TestProbe[Event]()
     val callback: Event ⇒ Unit = testProbe.ref ! _
 
     // all events are published to same topic with different id's
@@ -213,7 +213,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
     val event1 = makeDistinctEvent(Random.nextInt())
 
-    val probe = TestProbe[Event]()(typedActorSystem)
+    val probe = TestProbe[Event]()
 
     publisher.publish(event1).await
     Thread.sleep(500) // Needed for redis set which is fire and forget operation
@@ -252,7 +252,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     val testEvent1 = makeEventWithPrefix(1, Prefix("test.prefix"))
     val testEvent2 = makeEventWithPrefix(2, Prefix("test.prefix"))
     val tcsEvent1  = makeEventWithPrefix(1, Prefix("tcs.prefix"))
-    val testProbe  = TestProbe[Event]()(typedActorSystem)
+    val testProbe  = TestProbe[Event]()
 
     // pattern is * for redis
     val subscription = subscriber.pSubscribeCallback(Subsystem.TEST, eventPattern, testProbe.ref ! _)

@@ -1,7 +1,8 @@
 package csw.event.client.internal.kafka
 
 import akka.Done
-import akka.actor.ActorSystem
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.http.scaladsl.Http
 import akka.kafka.ProducerSettings
 import csw.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
@@ -28,7 +29,7 @@ class KafkaTestProps(
     locationService: LocationService,
     locationServer: HTTPLocationServiceOnPorts,
     additionalBrokerProps: Map[String, String]
-)(implicit val actorSystem: ActorSystem)
+)(implicit val actorSystem: ActorSystem[_])
     extends BaseProperties {
   private val brokers          = s"PLAINTEXT://${Networks().hostname}:$kafkaPort"
   private val brokerProperties = Map("listeners" → brokers, "advertised.listeners" → brokers) ++ additionalBrokerProps
@@ -36,7 +37,7 @@ class KafkaTestProps(
 
   private val eventServiceFactory = new EventServiceFactory(KafkaStore)
   private lazy val producerSettings: ProducerSettings[String, String] =
-    ProducerSettings(actorSystem, new StringSerializer, new StringSerializer)
+    ProducerSettings(actorSystem.toUntyped, new StringSerializer, new StringSerializer)
       .withBootstrapServers(s"${Networks().hostname}:$kafkaPort")
 
   private lazy val kafkaProducer = producerSettings.createKafkaProducer()
@@ -60,8 +61,9 @@ class KafkaTestProps(
 
   override def shutdown(): Unit = {
     EmbeddedKafka.stop()
-    Http(actorSystem).shutdownAllConnectionPools().await
-    actorSystem.terminate().await
+    Http(actorSystem.toUntyped).shutdownAllConnectionPools().await
+    actorSystem.terminate()
+    actorSystem.whenTerminated.await
     locationServer.afterAll()
   }
 }
