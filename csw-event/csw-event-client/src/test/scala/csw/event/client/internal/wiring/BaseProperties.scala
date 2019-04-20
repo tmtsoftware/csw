@@ -4,7 +4,6 @@ import java.net.URI
 
 import akka.actor.typed.scaladsl.adapter.{TypedActorSystemOps, UntypedActorSystemOps}
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.stream.typed.scaladsl
 import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.stream.{ActorMaterializerSettings, Materializer}
 import akka.{actor, Done}
