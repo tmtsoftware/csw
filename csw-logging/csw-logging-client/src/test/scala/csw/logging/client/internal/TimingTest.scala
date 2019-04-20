@@ -21,9 +21,10 @@ class TimingTest extends LoggingTestSuite with Timing {
   private val logFileDir        = Paths.get("/tmp/csw-test-logs/").toFile
   private val loggingSystemName = "TimingTest"
 
-  override lazy val actorSystem = ActorSystem("timing-test-system")
+  lazy val untypedActorSystem        = ActorSystem("timing-test-system")
+  override lazy val typedActorSystem = untypedActorSystem.toTyped
   override lazy val loggingSystem =
-    new LoggingSystem(loggingSystemName, "version", "localhost", actorSystem)
+    new LoggingSystem(loggingSystemName, "version", "localhost", typedActorSystem)
 
   private val irisActorRef = actorSystem.spawn(IRIS.behavior(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
 

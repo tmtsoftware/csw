@@ -51,7 +51,7 @@ class MailboxRequirementTest extends FunSuite with Matchers with BeforeAndAfterE
 
   test("should get all messages if msg count is under the capacity defined for mailbox") {
     val actorSystem        = ActorSystem("test", configWithCapacity(capacity = defaultCapacity))
-    lazy val loggingSystem = new LoggingSystem("logging", "version", hostName, actorSystem)
+    lazy val loggingSystem = new LoggingSystem("logging", "version", hostName, actorSystem.toTyped)
 
     loggingSystem.setAppenders(List(testAppender))
 
@@ -68,7 +68,7 @@ class MailboxRequirementTest extends FunSuite with Matchers with BeforeAndAfterE
   // This shows that log actor is configured with the given capacity for Mailbox and it's a bounded Mailbox
   test("should get no messages if mailbox capacity is zero") {
     val actorSystem        = ActorSystem("test", configWithCapacity(capacity = zeroCapacity))
-    lazy val loggingSystem = new LoggingSystem("logging", "version", hostName, actorSystem)
+    lazy val loggingSystem = new LoggingSystem("logging", "version", hostName, actorSystem.toTyped)
 
     loggingSystem.setAppenders(List(testAppender))
 
