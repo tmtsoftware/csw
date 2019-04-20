@@ -11,7 +11,7 @@ import csw.config.api.scaladsl.ConfigClientService
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
 
-class ConfigUtils(configClientService: ConfigClientService)(implicit system: ActorSystem[SpawnProtocol], mat: Materializer) {
+class ConfigUtils(configClientService: ConfigClientService)(implicit system: ActorSystem[_], mat: Materializer) {
 
   import system.executionContext
 

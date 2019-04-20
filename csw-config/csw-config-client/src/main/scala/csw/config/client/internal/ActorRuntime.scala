@@ -13,11 +13,11 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 /**
  * A convenient class wrapping actor system and providing handles for execution context, materializer and clean up of actor system
  */
-private[csw] class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol] = ActorSystem(SpawnProtocol.behavior, "")) {
-  implicit val typedSystem: ActorSystem[SpawnProtocol] = _typedSystem
-  implicit val untypedSystem: actor.ActorSystem        = typedSystem.toUntyped
-  implicit val ec: ExecutionContextExecutor            = typedSystem.executionContext
-  implicit val mat: Materializer                       = ActorMaterializer()(typedSystem)
+private[csw] class ActorRuntime(_typedSystem: ActorSystem[_] = ActorSystem(SpawnProtocol.behavior, "")) {
+  implicit val typedSystem: ActorSystem[_]      = _typedSystem
+  implicit val untypedSystem: actor.ActorSystem = typedSystem.toUntyped
+  implicit val ec: ExecutionContextExecutor     = typedSystem.executionContext
+  implicit val mat: Materializer                = ActorMaterializer()(typedSystem)
 
   val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(untypedSystem)
 

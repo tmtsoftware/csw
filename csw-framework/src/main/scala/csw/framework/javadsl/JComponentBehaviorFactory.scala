@@ -1,7 +1,7 @@
 package csw.framework.javadsl
 
 import akka.actor.typed.javadsl.ActorContext
-import akka.actor.typed.{scaladsl, ActorSystem, SpawnProtocol}
+import akka.actor.typed.scaladsl
 import csw.alarm.client.internal.JAlarmServiceImpl
 import csw.command.client.messages.TopLevelActorMessage
 import csw.config.client.javadsl.JConfigClientFactory
@@ -27,7 +27,7 @@ abstract class JComponentBehaviorFactory extends ComponentBehaviorFactory() {
         new JAlarmServiceImpl(alarmService),
         timeServiceScheduler,
         loggerFactory.asJava,
-        JConfigClientFactory.clientApi(ctx.system.asInstanceOf[ActorSystem[SpawnProtocol]], locationService.asJava),
+        JConfigClientFactory.clientApi(ctx.system, locationService.asJava),
         commandResponseManager,
         currentStatePublisher,
         componentInfo

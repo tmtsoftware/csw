@@ -3,8 +3,8 @@ package csw.logging.client.javadsl
 import java.net.InetAddress
 
 import akka.actor
+import akka.actor.typed
 import akka.actor.typed.javadsl.Adapter
-import akka.actor.{typed, ActorSystem}
 import csw.logging.client.appenders.LogAppenderBuilder
 import csw.logging.client.internal.LoggingSystem
 
