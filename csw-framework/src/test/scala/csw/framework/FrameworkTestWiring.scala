@@ -1,10 +1,10 @@
 package csw.framework
-import akka.actor
-import akka.actor.Terminated
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.Done
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.http.scaladsl.Http
-import akka.stream.{ActorMaterializer, Materializer}
+import akka.stream.Materializer
+import akka.stream.typed.scaladsl.ActorMaterializer
 import csw.commons.redis.EmbeddedRedis
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.location.api.models.Connection.TcpConnection
@@ -17,10 +17,9 @@ import redis.embedded.{RedisSentinel, RedisServer}
 
 class FrameworkTestWiring(val seedPort: Int = SocketUtils.getFreePort) extends EmbeddedRedis {
 
-  implicit val seedActorSystem: actor.ActorSystem = ActorSystemFactory.remote()
-  implicit val typedSystem: ActorSystem[_]        = seedActorSystem.toTyped
-  implicit val mat: Materializer                  = ActorMaterializer()
-  val seedLocationService: LocationService        = HttpLocationServiceFactory.makeLocalClient
+  implicit val seedActorSystem: ActorSystem[SpawnProtocol] = ActorSystemFactory.remote(SpawnProtocol.behavior, "")
+  implicit val mat: Materializer                           = ActorMaterializer()
+  val seedLocationService: LocationService                 = HttpLocationServiceFactory.makeLocalClient
 
   def startSentinelAndRegisterService(
       connection: TcpConnection,
@@ -32,8 +31,9 @@ class FrameworkTestWiring(val seedPort: Int = SocketUtils.getFreePort) extends E
         .await
     }
 
-  def shutdown(): Terminated = {
-    Http(seedActorSystem).shutdownAllConnectionPools().await
-    seedActorSystem.terminate().await
+  def shutdown(): Done = {
+    Http(seedActorSystem.toUntyped).shutdownAllConnectionPools().await
+    seedActorSystem.terminate()
+    seedActorSystem.whenTerminated.await
   }
 }

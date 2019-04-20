@@ -21,7 +21,7 @@ import scala.concurrent.{ExecutionContext, Future}
  * Represents a class that lazily initializes necessary instances to run a component(s)
  */
 class FrameworkWiring {
-  lazy val actorSystem: ActorSystem[SpawnProtocol]  = ActorSystemFactory.remote(SpawnProtocol.behavior, "")
+  lazy val actorSystem: ActorSystem[SpawnProtocol]  = ActorSystemFactory.remote(SpawnProtocol.behavior, "framework-system")
   lazy val actorRuntime: ActorRuntime               = new ActorRuntime(actorSystem)
   lazy val locationService: LocationService         = HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
   lazy val registrationFactory                      = new RegistrationFactory

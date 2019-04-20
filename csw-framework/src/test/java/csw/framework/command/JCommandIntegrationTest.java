@@ -1,10 +1,11 @@
 package csw.framework.command;
 
-import akka.actor.ActorSystem;
 import akka.actor.testkit.typed.javadsl.TestInbox;
 import akka.actor.testkit.typed.javadsl.TestProbe;
-import akka.actor.typed.internal.adapter.ActorSystemAdapter;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.SpawnProtocol;
 import akka.stream.ActorMaterializer;
+import akka.stream.typed.javadsl.ActorMaterializerFactory;
 import akka.util.Timeout;
 import com.typesafe.config.ConfigFactory;
 import csw.command.api.CurrentStateSubscription;
@@ -69,9 +70,9 @@ import static csw.location.api.models.Connection.AkkaConnection;
 // DEOPSCSW-317: Use state values of HCD to determine command completion
 // DEOPSCSW-321: AkkaLocation provides wrapper for ActorRef[ComponentMessage]
 public class JCommandIntegrationTest extends JUnitSuite {
-    private static ActorSystem hcdActorSystem = ActorSystemFactory.remote();
-    private ExecutionContext ec = hcdActorSystem.dispatcher();
-    private static ActorMaterializer mat = ActorMaterializer.create(hcdActorSystem);
+    private static ActorSystem<SpawnProtocol> hcdActorSystem = ActorSystemFactory.remote(SpawnProtocol.behavior(), "");
+    private ExecutionContext ec = hcdActorSystem.executionContext();
+    private static ActorMaterializer mat = ActorMaterializerFactory.create(hcdActorSystem);
 
     private static JHTTPLocationService jHttpLocationService;
     private static ILocationService locationService;
@@ -86,12 +87,13 @@ public class JCommandIntegrationTest extends JUnitSuite {
 
         locationService = JHttpLocationServiceFactory.makeLocalClient(hcdActorSystem, mat);
         hcdLocation = getLocation();
-        hcdCmdService = CommandServiceFactory.jMake(hcdLocation, akka.actor.typed.ActorSystem.wrap(hcdActorSystem));
+        hcdCmdService = CommandServiceFactory.jMake(hcdLocation, hcdActorSystem);
     }
 
     @AfterClass
     public static void teardown() throws Exception {
-        Await.result(hcdActorSystem.terminate(), Duration.create(20, "seconds"));
+        hcdActorSystem.terminate();
+        Await.result(hcdActorSystem.whenTerminated(), Duration.create(20, "seconds"));
         jHttpLocationService.afterAll();
     }
 
@@ -394,8 +396,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
     @Test
     public void testSupervisorLock() throws ExecutionException, InterruptedException {
         // Lock scenarios
-        akka.actor.typed.ActorSystem<?> typedSystem = ActorSystemAdapter.apply(hcdActorSystem);
-        TestProbe<LockingResponse> probe = TestProbe.create(typedSystem);
+        TestProbe<LockingResponse> probe = TestProbe.create(hcdActorSystem);
         FiniteDuration duration = new FiniteDuration(5, TimeUnit.SECONDS);
 
         // Lock component
@@ -430,7 +431,6 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Key<Integer> intKey1 = JKeyType.IntKey().make("encoder");
         Parameter<Integer> intParameter1 = intKey1.set(22, 23);
         Setup failureResCommand1 = new Setup(prefix(), failureAfterValidationCmd(), Optional.empty()).add(intParameter1);
-        akka.actor.typed.ActorSystem<?> typedSystem = ActorSystemAdapter.apply(hcdActorSystem);
 
         //#submit
         CompletableFuture<CommandResponse.SubmitResponse> finalResponseCompletableFuture = hcdCmdService.submit(failureResCommand1, timeout);
@@ -470,8 +470,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Parameter<Integer> intParameter1 = intKey1.set(22, 23);
         Setup setup = new Setup(prefix(), acceptedCmd(), Optional.empty()).add(intParameter1);
 
-        akka.actor.typed.ActorSystem<?> typedSystem = ActorSystemAdapter.apply(hcdActorSystem);
-        TestProbe<CurrentState> probe = TestProbe.create(typedSystem);
+        TestProbe<CurrentState> probe = TestProbe.create(hcdActorSystem);
 
         // DEOPSCSW-372: Provide an API for PubSubActor that hides actor based interaction
         //#subscribeCurrentState

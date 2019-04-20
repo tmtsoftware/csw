@@ -1,7 +1,6 @@
 package csw.framework.integration
 
 import akka.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
@@ -55,8 +54,8 @@ class EventServiceIntegrationTest extends FrameworkIntegrationSuite {
     val filterAssemblyLocation = wiring.locationService.find(filterAssemblyConnection).await
     val disperserHcdLocation   = wiring.locationService.find(disperserHcdConnection).await
 
-    val assemblyCommandService  = CommandServiceFactory.make(filterAssemblyLocation.get)(wiring.actorSystem.toTyped)
-    val disperserCommandService = CommandServiceFactory.make(disperserHcdLocation.get)(wiring.actorSystem.toTyped)
+    val assemblyCommandService  = CommandServiceFactory.make(filterAssemblyLocation.get)(wiring.actorSystem)
+    val disperserCommandService = CommandServiceFactory.make(disperserHcdLocation.get)(wiring.actorSystem)
 
     assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)
 

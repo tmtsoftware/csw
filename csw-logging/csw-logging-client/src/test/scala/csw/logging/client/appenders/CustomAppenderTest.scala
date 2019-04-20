@@ -2,9 +2,8 @@ package csw.logging.client.appenders
 
 import java.net.InetAddress
 
-import akka.actor.ActorSystem
-import akka.actor._
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed
+import akka.actor.typed.SpawnProtocol
 import com.typesafe.config.ConfigFactory
 import csw.logging.api.scaladsl._
 import csw.logging.client.internal.JsonExtensions.RichJsObject
@@ -80,8 +79,8 @@ class CustomAppenderTest extends FunSuite with Matchers {
         |}
       """.stripMargin)
 
-    val actorSystem   = ActorSystem("test", config.resolve())
-    val loggingSystem = LoggingSystemFactory.start("foo-name", "foo-version", hostName, actorSystem.toTyped)
+    val actorSystem   = typed.ActorSystem(SpawnProtocol.behavior, "test", config.resolve())
+    val loggingSystem = LoggingSystemFactory.start("foo-name", "foo-version", hostName, actorSystem)
     loggingSystem.setAppenders(List(CustomAppenderBuilderObject))
 
     new MyFavComponent().startLogging()
@@ -91,7 +90,8 @@ class CustomAppenderTest extends FunSuite with Matchers {
     CustomAppenderBuilderObject.logBuffer.forall(log ⇒ log.contains("IpAddress")) shouldBe true
     CustomAppenderBuilderObject.logBuffer.forall(log ⇒ log.getString("IpAddress") == hostName) shouldBe true
 
-    Await.result(actorSystem.terminate(), 10.seconds)
+    actorSystem.terminate()
+    Await.result(actorSystem.whenTerminated, 10.seconds)
   }
 
   test("should be able to add and configure a custom appender using a class extending from CustomAppenderBuilder") {
@@ -108,8 +108,8 @@ class CustomAppenderTest extends FunSuite with Matchers {
         |}
       """.stripMargin)
 
-    val actorSystem    = ActorSystem("test", config.resolve())
-    val loggingSystem  = LoggingSystemFactory.start("foo-name", "foo-version", hostName, actorSystem.toTyped)
+    val actorSystem    = typed.ActorSystem(SpawnProtocol.behavior, "test", config.resolve())
+    val loggingSystem  = LoggingSystemFactory.start("foo-name", "foo-version", hostName, actorSystem)
     val customAppender = new CustomAppenderBuilderClass
     loggingSystem.setAppenders(List(customAppender))
 
@@ -120,7 +120,8 @@ class CustomAppenderTest extends FunSuite with Matchers {
     customAppender.logBuffer.forall(log ⇒ log.contains("IpAddress")) shouldBe true
     customAppender.logBuffer.forall(log ⇒ log.getString("IpAddress") == hostName) shouldBe true
 
-    Await.result(actorSystem.terminate(), 10.seconds)
+    actorSystem.terminate()
+    Await.result(actorSystem.whenTerminated, 10.seconds)
   }
 
   // Added this test to show that custom appender config file changes work
@@ -140,8 +141,8 @@ class CustomAppenderTest extends FunSuite with Matchers {
                                              |}
                                            """.stripMargin)
 
-    val actorSystem    = ActorSystem("test", config.resolve())
-    val loggingSystem  = LoggingSystemFactory.start("foo-name", "foo-version", hostName, actorSystem.toTyped)
+    val actorSystem    = typed.ActorSystem(SpawnProtocol.behavior, "test", config.resolve())
+    val loggingSystem  = LoggingSystemFactory.start("foo-name", "foo-version", hostName, actorSystem)
     val customAppender = new CustomAppenderBuilderClass
     loggingSystem.setAppenders(List(customAppender))
 
@@ -151,6 +152,7 @@ class CustomAppenderTest extends FunSuite with Matchers {
 
     customAppender.logBuffer.forall(log ⇒ log.contains("IpAddress")) shouldBe false
 
-    Await.result(actorSystem.terminate(), 10.seconds)
+    actorSystem.terminate()
+    Await.result(actorSystem.whenTerminated, 10.seconds)
   }
 }

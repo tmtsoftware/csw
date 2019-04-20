@@ -4,7 +4,7 @@ import java.nio.ByteBuffer
 import java.util.concurrent.CompletableFuture
 
 import akka.Done
-import akka.actor.typed.ActorSystem
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import ch.qos.logback.classic.LoggerContext
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.appenders.LogAppenderBuilder
@@ -34,7 +34,7 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
  * @param host host name (to log).
  * @param system an ActorSystem used to create log actors
  */
-class LoggingSystem private[csw] (name: String, version: String, host: String, val system: ActorSystem[_]) {
+class LoggingSystem private[csw] (name: String, version: String, host: String, val system: ActorSystem[SpawnProtocol]) {
 
   import csw.logging.api.models.LoggingLevels._
 

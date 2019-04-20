@@ -1,7 +1,8 @@
 package csw.framework.integration
 
-import akka.actor
 import akka.actor.testkit.typed.scaladsl.TestProbe
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.http.scaladsl.Http
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
@@ -42,7 +43,7 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
   private var loggingSystem: LoggingSystem = _
   // using standaloneActorSystem to start component instead of seedActorSystem,
   // to assert shutdown of the component(which will also shutdown standaloneActorSystem)
-  private val standaloneComponentActorSystem: actor.ActorSystem = ActorSystemFactory.remote()
+  private val standaloneComponentActorSystem: ActorSystem[SpawnProtocol] = ActorSystemFactory.remote(SpawnProtocol.behavior, "")
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
@@ -51,7 +52,8 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
   }
 
   override def afterAll(): Unit = {
-    standaloneComponentActorSystem.terminate().await
+    standaloneComponentActorSystem.terminate()
+    standaloneComponentActorSystem.whenTerminated.await
     super.afterAll()
   }
 
@@ -76,12 +78,13 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
 
     val supervisorCommandService = CommandServiceFactory.make(resolvedAkkaLocation)
 
-    val (_, akkaProbe) = seedLocationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
+    val (_, akkaProbe) =
+      seedLocationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent](seedActorSystem.toUntyped))(Keep.both).run()
     akkaProbe.requestNext() shouldBe a[LocationUpdated]
 
     // on shutdown, component unregisters from location service
     supervisorCommandService.subscribeCurrentState(supervisorStateProbe.ref ! _)
-    Http(standaloneComponentActorSystem).shutdownAllConnectionPools().await
+    Http(standaloneComponentActorSystem.toUntyped).shutdownAllConnectionPools().await
     supervisorRef ! Shutdown
 
     // this proves that ComponentBehaviors postStop signal gets invoked

@@ -1,7 +1,7 @@
 package csw.alarm.client.internal.helpers
 
 import akka.actor.typed
-import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.SpawnProtocol
 import akka.stream.ActorMaterializer
 import akka.stream.typed.scaladsl
 import com.typesafe.config.ConfigFactory
@@ -43,9 +43,9 @@ class AlarmServiceTestSetup
 
   private val redisClient = RedisClient.create()
 
-  implicit val actorSystem: typed.ActorSystem[Nothing] = typed.ActorSystem(Behaviors.empty, "alarm-server")
-  implicit val ec: ExecutionContext                    = actorSystem.executionContext
-  implicit val mat: ActorMaterializer                  = scaladsl.ActorMaterializer()
+  implicit val actorSystem: typed.ActorSystem[SpawnProtocol] = typed.ActorSystem(SpawnProtocol.behavior, "alarm-server")
+  implicit val ec: ExecutionContext                          = actorSystem.executionContext
+  implicit val mat: ActorMaterializer                        = scaladsl.ActorMaterializer()
 
   val alarmServiceFactory             = new AlarmServiceFactory(redisClient)
   val alarmService: AlarmAdminService = alarmServiceFactory.makeAdminApi(hostname, sentinelPort)

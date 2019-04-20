@@ -3,7 +3,7 @@ package csw.event.cli.wiring
 import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
-import akka.actor.typed.ActorSystem
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.stream.Materializer
 import akka.stream.typed.scaladsl.ActorMaterializer
@@ -14,10 +14,10 @@ import csw.services.BuildInfo
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
-class ActorRuntime(_typedSystem: ActorSystem[_]) {
-  implicit val typedSystem: ActorSystem[_]  = _typedSystem
-  implicit val ec: ExecutionContextExecutor = typedSystem.executionContext
-  implicit val mat: Materializer            = ActorMaterializer()(typedSystem)
+class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol]) {
+  implicit val typedSystem: ActorSystem[SpawnProtocol] = _typedSystem
+  implicit val ec: ExecutionContextExecutor            = typedSystem.executionContext
+  implicit val mat: Materializer                       = ActorMaterializer()(typedSystem)
 
   val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(typedSystem.toUntyped)
 

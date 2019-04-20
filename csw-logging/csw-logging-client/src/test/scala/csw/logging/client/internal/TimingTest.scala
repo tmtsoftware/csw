@@ -3,10 +3,10 @@ package csw.logging.client.internal
 import java.nio.file.Paths
 import java.time.{ZoneId, ZoneOffset, ZonedDateTime}
 
-import akka.actor.ActorSystem
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.logging.api.models.RequestId
 import csw.logging.client.appenders.FileAppender
+import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.components.IRIS
 import csw.logging.client.components.IRIS._
@@ -21,10 +21,9 @@ class TimingTest extends LoggingTestSuite with Timing {
   private val logFileDir        = Paths.get("/tmp/csw-test-logs/").toFile
   private val loggingSystemName = "TimingTest"
 
-  lazy val untypedActorSystem        = ActorSystem("timing-test-system")
-  override lazy val typedActorSystem = untypedActorSystem.toTyped
+  override lazy val actorSystem = ActorSystem(SpawnProtocol.behavior, "timing-test-system")
   override lazy val loggingSystem =
-    new LoggingSystem(loggingSystemName, "version", "localhost", typedActorSystem)
+    new LoggingSystem(loggingSystemName, "version", "localhost", actorSystem)
 
   private val irisActorRef = actorSystem.spawn(IRIS.behavior(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
 

@@ -2,8 +2,7 @@ package csw.logging.client.utils
 
 import java.net.InetAddress
 
-import akka.actor.ActorSystem
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.logging.client.internal.LoggingSystem
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 import play.api.libs.json.{JsObject, Json}
@@ -14,14 +13,13 @@ import scala.concurrent.duration.DurationLong
 
 abstract class LoggingTestSuite() extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
 
-  protected lazy val actorSystem                    = ActorSystem("test")
-  protected lazy val typedActorSystem               = actorSystem.toTyped
+  protected lazy val actorSystem                    = ActorSystem(SpawnProtocol.behavior, "test")
   protected val logBuffer: mutable.Buffer[JsObject] = mutable.Buffer.empty[JsObject]
   protected val testAppender                        = new TestAppender(x ⇒ logBuffer += Json.parse(x.toString).as[JsObject])
-  private val hostName                              = InetAddress.getLocalHost.getHostName
 
+  private val hostName = InetAddress.getLocalHost.getHostName
   protected lazy val loggingSystem =
-    new LoggingSystem("logging", "version", hostName, typedActorSystem)
+    new LoggingSystem("logging", "version", hostName, actorSystem)
 
   protected val logMsgMap = Map(
     "trace"       → "logging at trace level",
@@ -46,7 +44,8 @@ abstract class LoggingTestSuite() extends FunSuite with Matchers with BeforeAndA
 
   override protected def afterAll(): Unit = {
     Await.result(loggingSystem.stop, 10.seconds)
-    Await.result(actorSystem.terminate(), 5.seconds)
+    actorSystem.terminate()
+    Await.result(actorSystem.whenTerminated, 5.seconds)
   }
 
 }

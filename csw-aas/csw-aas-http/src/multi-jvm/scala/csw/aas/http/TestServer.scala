@@ -2,9 +2,8 @@ package csw.aas.http
 
 import akka.actor
 import akka.actor.typed
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
@@ -28,8 +27,8 @@ class TestServer(locationService: LocationService)(implicit ec: ExecutionContext
 
   def start(testServerPort: Int): Future[Http.ServerBinding] = {
 
-    implicit val system: typed.ActorSystem[_]     = ActorSystem(Behaviors.empty, "test")
-    implicit val untypedSystem: actor.ActorSystem = system.toUntyped
+    implicit val system: typed.ActorSystem[SpawnProtocol] = ActorSystem(SpawnProtocol.behavior, "test")
+    implicit val untypedSystem: actor.ActorSystem         = system.toUntyped
     LoggingSystemFactory.start("test-server", "", "", system)
     implicit val materializer: ActorMaterializer = scaladsl.ActorMaterializer()
     Http().bindAndHandle(routes, "0.0.0.0", testServerPort)
