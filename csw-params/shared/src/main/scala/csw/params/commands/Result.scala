@@ -1,5 +1,6 @@
 package csw.params.commands
 
+import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.{Parameter, ParameterSetKeyData, ParameterSetType}
 import csw.params.core.models.Prefix
 import play.api.libs.json.{Json, OFormat}
@@ -29,7 +30,7 @@ case class Result private (prefix: Prefix, paramSet: Set[Parameter[_]] = Set.emp
 
 }
 
-object Result {
+object Result extends JsonSupport {
 
   /**
    * A helper method to create Result instance

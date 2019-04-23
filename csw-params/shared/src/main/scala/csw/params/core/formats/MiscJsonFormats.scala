@@ -4,6 +4,7 @@ import java.lang
 import java.time.Instant
 
 import com.github.ghik.silencer.silent
+import csw.params.core.generics.{KeyType, Parameter}
 import play.api.libs.json._
 
 /**
@@ -11,6 +12,17 @@ import play.api.libs.json._
  * implementation is provided. All the java datatype formats are mapped onto their corresponding scala datatypes.
  */
 trait MiscJsonFormats {
+  implicit def parameterFormat2: Format[Parameter[_]] = new Format[Parameter[_]] {
+    override def writes(obj: Parameter[_]): JsValue = {
+      val format = obj.keyType.paramFormat.asInstanceOf[Format[Parameter[Any]]]
+      format.writes(obj.asInstanceOf[Parameter[Any]])
+    }
+
+    override def reads(json: JsValue): JsResult[Parameter[_]] = {
+      val value = (json \ "keyType").as[KeyType[_]]
+      value.paramFormat.reads(json)
+    }
+  }
 
   private def formatFactory[S: Format, J](implicit @silent conversion: S => J): Format[J] =
     implicitly[Format[S]].asInstanceOf[Format[J]]
