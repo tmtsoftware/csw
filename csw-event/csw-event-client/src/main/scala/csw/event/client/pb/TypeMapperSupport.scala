@@ -11,8 +11,7 @@ import csw_protobuf.events.PbEvent
 import csw_protobuf.events.PbEvent.PbEventType
 import csw_protobuf.keytype.PbKeyType
 import csw_protobuf.models.{PbRaDec, PbTAITime, PbUTCTime}
-import csw_protobuf.parameter.PbParameter.Items
-import csw_protobuf.parameter.{PbParameter, PbStruct}
+import csw_protobuf.parameter.{PbParamValues, PbParameter, PbStruct}
 import csw_protobuf.units.PbUnits
 import play.api.libs.json.Format
 import scalapb.TypeMapper
@@ -45,7 +44,7 @@ object TypeMapperSupport {
     )(p => make(p.keyType).toBase(p))
   }
 
-  private def cswItems[T: ClassTag](items: Items): mutable.WrappedArray[T] = items.value match {
+  private def cswItems[T: ClassTag](items: PbParamValues): mutable.WrappedArray[T] = items match {
     case x: ItemType[_] ⇒ x.asInstanceOf[ItemType[T]].values.toArray[T]
     case x              ⇒ throw new RuntimeException(s"unexpected type ${x.getClass} found, ItemType expected")
   }
