@@ -1,0 +1,3 @@
+[submodule "csw-event/protobuf"]
+	path = csw-event/protobuf
+	url = https://github.com/protocolbuffers/protobuf.git

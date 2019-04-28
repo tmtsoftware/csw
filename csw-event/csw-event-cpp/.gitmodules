@@ -1,0 +1,6 @@
+[submodule "src/gen/protobuf"]
+	path = src/gen/protobuf
+	url = https://github.com/protocolbuffers/protobuf.git
+[submodule "src/hiredis"]
+	path = src/hiredis
+	url = https://github.com/redis/hiredis.git
