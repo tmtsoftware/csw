@@ -1,3 +1,4 @@
+#TODO: generate .cpp files from .proto using protoc ensuring dependencies
 eventPublisher: main.o eventPublisher.o
 	g++ -std=c++17 main.o eventPublisher.o -o eventPublisher -ll hiredis/libhiredis.a  -ll /usr/local/lib/libprotobuf.a -ll /usr/local/lib/libev.a
 main.o: main.cc
