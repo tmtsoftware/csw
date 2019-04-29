@@ -16,6 +16,40 @@ class Scenarios(testConfigs: TestConfigs) {
     singlePublisher = false
   )
 
+  val gatewayScenarios: Scenario = Scenario(
+    "payload-1-to-1",
+    List(
+      TestSettings(
+        testName = "tcs.1-to-1-size-100",
+        totalTestMsgs = adjustedTotalMessages(2000),
+        payloadSize = 100,
+        publisherSubscriberPairs = 1,
+        singlePublisher = false
+      ),
+      TestSettings(
+        testName = "tcs.150-to-150-size-100",
+        totalTestMsgs = adjustedTotalMessages(1000),
+        payloadSize = 100,
+        publisherSubscriberPairs = 150,
+        singlePublisher = false
+      ),
+      TestSettings(
+        testName = "tcs.200-to-200-size-100",
+        totalTestMsgs = adjustedTotalMessages(1000),
+        payloadSize = 100,
+        publisherSubscriberPairs = 200,
+        singlePublisher = false
+      ),
+      TestSettings(
+        testName = "tcs.300-to-300-size-100",
+        totalTestMsgs = adjustedTotalMessages(1000),
+        payloadSize = 100,
+        publisherSubscriberPairs = 300,
+        singlePublisher = false
+      )
+    )
+  )
+
   val payloadOneToOne: Scenario = Scenario(
     "payload-1-to-1",
     List(

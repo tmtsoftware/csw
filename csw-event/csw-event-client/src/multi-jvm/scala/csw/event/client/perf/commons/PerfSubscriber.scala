@@ -4,13 +4,16 @@ import java.time.Instant
 import java.util.concurrent.TimeUnit.SECONDS
 
 import akka.Done
+import akka.actor.ActorSystem
+import akka.stream.UniqueKillSwitch
 import akka.stream.scaladsl.{Keep, Source}
-import csw.params.events.{Event, EventKey, EventName, SystemEvent}
-import csw.params.core.models.Prefix
+import csw.event.api.scaladsl.{EventSubscriber, EventSubscription}
+import csw.event.client.perf.ocs.gateway.client.GatewayClient
 import csw.event.client.perf.reporter.{ResultReporter, TestRateReporter}
 import csw.event.client.perf.utils.EventUtils._
 import csw.event.client.perf.wiring.{TestConfigs, TestWiring}
-import csw.event.api.scaladsl.{EventSubscriber, EventSubscription}
+import csw.params.core.models.Prefix
+import csw.params.events.{Event, EventKey, EventName, SystemEvent}
 import org.HdrHistogram.Histogram
 
 import scala.concurrent.Future
@@ -30,8 +33,12 @@ class PerfSubscriber(
   import testConfigs._
   import testWiring._
 
+  implicit val system: ActorSystem = actorSystem
+
   private val subscriber: EventSubscriber =
     if (testConfigs.shareConnection) sharedSubscriber else testWiring.subscriber
+
+  private lazy val ocsGatewayClient = new GatewayClient("localhost", 9090)
 
   val histogram: Histogram   = new Histogram(SECONDS.toNanos(10), 3)
   private val resultReporter = new ResultReporter(prefix.prefix, actorSystem)
@@ -60,6 +67,12 @@ class PerfSubscriber(
       timeBeforeSubscribe = getNanos(Instant.now()).toLong
       subscriber.subscribe(eventKeys)
     }
+
+  def subscribeToGateways: Source[Event, UniqueKillSwitch] = {
+    eventKeys = Set(EventKey(prefix, testEventName), EventKey(prefix, endEventName))
+    timeBeforeSubscribe = getNanos(Instant.now()).toLong
+    ocsGatewayClient.subscribe(eventKeys)
+  }
 
   def startSubscription(): Future[Done] =
     subscription
