@@ -6,8 +6,7 @@ import csw.params.core.models._
 import csw.params.javadsl.JKeyType
 import csw.time.core.models.{TAITime, UTCTime}
 import csw_protobuf.models._
-import csw_protobuf.parameter.PbParameter
-import csw_protobuf.parameter_types._
+import csw_protobuf.parameter._
 import org.scalatest.{FunSuite, Matchers}
 
 // DEOPSCSW-297: Merge protobuf branch in master
@@ -17,7 +16,7 @@ class PbParameterTest extends FunSuite with Matchers {
     val parameter: PbParameter = PbParameter()
       .withName("encoder")
       .withUnits(Units.centimeter)
-      .withIntItems(IntItems().addValues(1, 2))
+      .withItems(IntItems().addValues(1, 2))
 
     val pbParam: PbParameter       = PbParameter.parseFrom(parameter.toByteArray)
     val parsedPbParam: PbParameter = PbParameter.parseFrom(pbParam.toByteString.toByteArray)
@@ -28,7 +27,7 @@ class PbParameterTest extends FunSuite with Matchers {
   test("should able to parse PbParameter with sequence of values") {
     val parameter: PbParameter = PbParameter()
       .withName("encoder")
-      .withIntItems(IntItems().withValues(Seq(1, 2, 3, 4)))
+      .withItems(IntItems().withValues(Seq(1, 2, 3, 4)))
 
     val parameter1: PbParameter = PbParameter.parseFrom(parameter.toByteArray)
     val parsedParameter         = PbParameter.parseFrom(parameter1.toByteString.toByteArray)
@@ -44,45 +43,46 @@ class PbParameterTest extends FunSuite with Matchers {
 
   // DEOPSCSW-661: Create UTCTimeKey and TAITimeKey replacing TimestampKey in Protobuf parameters
   test("should able to create PbParameter with UTCTime items") {
-    val now = UTCTime.now()
+    val items = UTCTimeItems(Seq(UTCTime.now()))
     val parameter = PbParameter()
       .withName("encoder")
       .withUnits(Units.second)
       .withKeyType(KeyType.UTCTimeKey)
-      .withUtcTimeItems(UTCTimeItems(Seq(now)))
+      .withItems(items)
 
     parameter.name shouldBe "encoder"
     parameter.units shouldBe Units.second
     parameter.keyType shouldBe KeyType.UTCTimeKey
-    parameter.getUtcTimeItems.values shouldBe List(now)
+    parameter.items shouldBe items
   }
 
   // DEOPSCSW-661: Create UTCTimeKey and TAITimeKey replacing TimestampKey in Protobuf parameters
   test("should able to create PbParameter with TAITime items") {
-    val now = TAITime.now()
+    val items = TAITimeItems(Seq(TAITime.now()))
     val parameter = PbParameter()
       .withName("encoder")
       .withUnits(Units.second)
       .withKeyType(KeyType.TAITimeKey)
-      .withTaiTimeItems(TAITimeItems(Seq(now)))
+      .withItems(items)
 
     parameter.name shouldBe "encoder"
     parameter.units shouldBe Units.second
     parameter.keyType shouldBe KeyType.TAITimeKey
-    parameter.getTaiTimeItems.values shouldBe List(now)
+    parameter.items shouldBe items
   }
 
   test("should able to create PbParameter with Byte items") {
+    val items = ByteItems(Seq(1, 2, 3, 4))
     val parameter = PbParameter()
       .withName("encoder")
       .withUnits(Units.second)
       .withKeyType(KeyType.UTCTimeKey)
-      .withByteItems(ByteItems(Seq(1, 2, 3, 4)))
+      .withItems(items)
 
     parameter.name shouldBe "encoder"
     parameter.units shouldBe Units.second
     parameter.keyType shouldBe KeyType.UTCTimeKey
-    parameter.getByteItems.values shouldBe Seq(1, 2, 3, 4)
+    parameter.items shouldBe items
   }
 
   test("should able to create PbParameter with Choice items") {
@@ -91,7 +91,7 @@ class PbParameterTest extends FunSuite with Matchers {
       .withName("encoder")
       .withUnits(Units.second)
       .withKeyType(KeyType.UTCTimeKey)
-      .withChoiceItems(choices)
+      .withItems(choices)
 
     parameter.name shouldBe "encoder"
     parameter.units shouldBe Units.second
@@ -99,30 +99,30 @@ class PbParameterTest extends FunSuite with Matchers {
   }
 
   test("should able to create PbParameter with int items only when KeyType is Int") {
+    val intItems = IntItems().addValues(1)
     val parameter = PbParameter()
       .withName("encoder")
       .withUnits(Units.second)
       .withKeyType(KeyType.IntKey)
-      .withCharItems(CharItems().set(Seq('a', 'b')))
-      .withIntItems(IntItems().addValues(1))
+      .withItems(CharItems().set(Seq('a', 'b')))
+      .withItems(intItems)
 
     parameter.name shouldBe "encoder"
     parameter.units shouldBe Units.second
     parameter.keyType shouldBe KeyType.IntKey
-    parameter.getIntItems.values shouldBe List(1)
-    parameter.getCharItems.values shouldBe List.empty
+    parameter.items shouldBe intItems
   }
 
   test("should able to create PbParameter and compare with Parameter for Int and String Key") {
     val key   = KeyType.IntKey.make("encoder")
     val param = key.set(1, 2, 3, 4)
 
+    val items = IntItems().addValues(1, 2, 3, 4)
     val pbParam = PbParameter()
       .withName("encoder")
       .withUnits(Units.angstrom)
-      .withIntItems(IntItems().addValues(1, 2, 3, 4))
+      .withItems(items)
 
-    val items: IntItems = pbParam.items.value.asInstanceOf[IntItems]
     items.values shouldBe Seq(1, 2, 3, 4)
 
     val parsedPbParam = PbParameter.parseFrom(pbParam.toByteArray)
@@ -135,7 +135,7 @@ class PbParameterTest extends FunSuite with Matchers {
 
     val pbParam2 = PbParameter()
       .withName("encoder")
-      .withStringItems(StringItems().addValues("abc", "xyz"))
+      .withItems(StringItems().addValues("abc", "xyz"))
     val parsedPbParam2 = PbParameter.parseFrom(pbParam2.toByteArray)
 
     pbParam2 shouldEqual parsedPbParam2
@@ -145,13 +145,14 @@ class PbParameterTest extends FunSuite with Matchers {
   test("should able to create PbParameter with ArrayItems") {
     val array1 = Array(1000, 2000, 3000)
     val array2 = Array(-1, -2, -3)
+    val items  = IntArrayItems().addValues(array1, array2)
     val parameter: PbParameter = PbParameter()
       .withName("encoder")
-      .withIntArrayItems(IntArrayItems().addValues(array1, array2))
+      .withItems(items)
 
-    val values = parameter.getIntArrayItems.values
-    values.head shouldBe ArrayData.fromArray(array1)
-    values.tail.head shouldBe ArrayData.fromArray(array2)
+    val intArrayItems = parameter.items.asInstanceOf[IntArrayItems]
+    intArrayItems.values.head shouldBe ArrayData.fromArray(array1)
+    intArrayItems.values.tail.head shouldBe ArrayData.fromArray(array2)
   }
 
   test("should able to create PbParameter with MatrixItems") {
@@ -164,7 +165,7 @@ class PbParameterTest extends FunSuite with Matchers {
   test("should able to change the type from/to PbParameter to/from Parameter for IntKey") {
     val key         = KeyType.IntKey.make("encoder")
     val param       = key.set(1, 2, 3, 4)
-    val mapper      = TypeMapperSupport.parameterTypeMapper[Int]
+    val mapper      = TypeMapperSupport.parameterTypeMapper2
     val mappedParam = mapper.toCustom(mapper.toBase(param))
 
     param shouldEqual mappedParam
@@ -234,6 +235,6 @@ class PbParameterTest extends FunSuite with Matchers {
     param.keyName shouldBe pbParameter.name
     param.units shouldBe pbParameter.units
     param.keyType shouldBe pbParameter.keyType
-    param.items shouldBe pbParameter.getRaDecItems.values
+    param.items shouldBe pbParameter.items.asMessage.getRaDecItems.values
   }
 }

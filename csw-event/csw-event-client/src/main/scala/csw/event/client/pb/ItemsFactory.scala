@@ -1,9 +1,6 @@
 package csw.event.client.pb
 
-import com.github.ghik.silencer.silent
-import csw.params.core.models._
-import csw.time.core.models.{TAITime, UTCTime}
-import csw_protobuf.parameter.PbParameter.Items
+import csw_protobuf.parameter.PbParamValues
 
 abstract class ItemsFactory[T] {
 
@@ -13,57 +10,9 @@ abstract class ItemsFactory[T] {
    *
    * @return Items
    */
-  def make(xs: Seq[T]): Items
+  def make(xs: Seq[T]): PbParamValues
 }
 
 object ItemsFactory {
-
   def apply[T](implicit x: ItemsFactory[T]): ItemsFactory[T] = x
-
-  def apply[T, I <: ItemType[T]: ItemTypeCompanion](makeItems: I ⇒ Items): ItemsFactory[T] = { xs =>
-    makeItems(ItemTypeCompanion.make(xs))
-  }
-
-  //ItemsFactory for all ItemTypes defined in Protobuf.
-  implicit val ChoiceItemsFactory: ItemsFactory[Choice]   = ItemsFactory(Items.ChoiceItems)
-  implicit val RaDecItemsFactory: ItemsFactory[RaDec]     = ItemsFactory(Items.RaDecItems)
-  implicit val StructItemsFactory: ItemsFactory[Struct]   = ItemsFactory(Items.StructItems)
-  implicit val UTCTimeItemsFactory: ItemsFactory[UTCTime] = ItemsFactory(Items.UtcTimeItems)
-  implicit val TAITimeItemsFactory: ItemsFactory[TAITime] = ItemsFactory(Items.TaiTimeItems)
-
-  implicit val CharItemsFactory: ItemsFactory[Char]       = ItemsFactory(Items.CharItems)
-  implicit val StringItemsFactory: ItemsFactory[String]   = ItemsFactory(Items.StringItems)
-  implicit val BooleanItemsFactory: ItemsFactory[Boolean] = ItemsFactory(Items.BooleanItems)
-
-  implicit val ByteItemsFactory: ItemsFactory[Byte]     = ItemsFactory(Items.ByteItems)
-  implicit val ShortItemsFactory: ItemsFactory[Short]   = ItemsFactory(Items.ShortItems)
-  implicit val IntItemsFactory: ItemsFactory[Int]       = ItemsFactory(Items.IntItems)
-  implicit val LongItemsFactory: ItemsFactory[Long]     = ItemsFactory(Items.LongItems)
-  implicit val FloatItemsFactory: ItemsFactory[Float]   = ItemsFactory(Items.FloatItems)
-  implicit val DoubleItemsFactory: ItemsFactory[Double] = ItemsFactory(Items.DoubleItems)
-
-  implicit val ByteArrayItemsFactory: ItemsFactory[ArrayData[Byte]]     = ItemsFactory(Items.ByteArrayItems)
-  implicit val ShortArrayItemsFactory: ItemsFactory[ArrayData[Short]]   = ItemsFactory(Items.ShortArrayItems)
-  implicit val IntArrayItemsFactory: ItemsFactory[ArrayData[Int]]       = ItemsFactory(Items.IntArrayItems)
-  implicit val DoubleArrayItemsFactory: ItemsFactory[ArrayData[Double]] = ItemsFactory(Items.DoubleArrayItems)
-  implicit val FloatArrayItemsFactory: ItemsFactory[ArrayData[Float]]   = ItemsFactory(Items.FloatArrayItems)
-  implicit val LongArrayItemsFactory: ItemsFactory[ArrayData[Long]]     = ItemsFactory(Items.LongArrayItems)
-
-  implicit val ByteMatrixItemsFactory: ItemsFactory[MatrixData[Byte]]     = ItemsFactory(Items.ByteMatrixItems)
-  implicit val ShortMatrixItemsFactory: ItemsFactory[MatrixData[Short]]   = ItemsFactory(Items.ShortMatrixItems)
-  implicit val IntMatrixItemsFactory: ItemsFactory[MatrixData[Int]]       = ItemsFactory(Items.IntMatrixItems)
-  implicit val LongMatrixItemsFactory: ItemsFactory[MatrixData[Long]]     = ItemsFactory(Items.LongMatrixItems)
-  implicit val FloatMatrixItemsFactory: ItemsFactory[MatrixData[Float]]   = ItemsFactory(Items.FloatMatrixItems)
-  implicit val DoubleMatrixItemsFactory: ItemsFactory[MatrixData[Double]] = ItemsFactory(Items.DoubleMatrixItems)
-
-  /**
-   * Convert an ItemsFactory of data from one type to other
-   *
-   * @param conversion a function of type A => B
-   * @tparam A the source type of data
-   * @tparam B the destination type of data
-   * @return a function of type ArrayData[A] ⇒ ArrayData[B]
-   */
-  implicit def genericItemsFactory[A: ItemsFactory, B](implicit @silent conversion: A ⇒ B): ItemsFactory[B] =
-    ItemsFactory[A].asInstanceOf[ItemsFactory[B]]
 }

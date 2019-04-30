@@ -14,22 +14,13 @@ import scala.reflect.ClassTag
 
 object Parameter {
 
-  private[csw] def apply[S: Format: ClassTag](
+  private[csw] def apply[S](
       keyName: String,
       keyType: KeyType[S],
       items: mutable.WrappedArray[S],
       units: Units
   ): Parameter[S] =
     new Parameter(keyName, keyType, items, units)
-
-  implicit def parameterFormat2: Format[Parameter[_]] = new Format[Parameter[_]] {
-    override def writes(obj: Parameter[_]): JsValue = obj.toJson
-
-    override def reads(json: JsValue): JsResult[Parameter[_]] = {
-      val value = (json \ "keyType").as[KeyType[_]]
-      value.paramFormat.reads(json)
-    }
-  }
 
   private[params] implicit def parameterFormat[T: Format: ClassTag]: Format[Parameter[T]] =
     new Format[Parameter[T]] {
@@ -69,7 +60,7 @@ object Parameter {
  * @param units applicable units
  * @tparam S the type of items this parameter holds
  */
-case class Parameter[S: Format: ClassTag] private[params] (
+case class Parameter[S] private[params] (
     keyName: String,
     keyType: KeyType[S],
     items: mutable.WrappedArray[S],
@@ -150,9 +141,4 @@ case class Parameter[S: Format: ClassTag] private[params] (
    * Returns a formatted string representation with a KeyName
    */
   override def toString: String = s"$keyName($valuesToString$units)"
-
-  /**
-   * Returns a JSON representation of this parameter
-   */
-  def toJson: JsValue = Parameter[S].writes(this)
 }

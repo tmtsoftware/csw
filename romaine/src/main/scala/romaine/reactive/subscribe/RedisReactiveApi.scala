@@ -10,5 +10,5 @@ trait RedisReactiveApi[K, V] {
   def subscribe(keys: List[K]): Future[Done]
   def observe(overflowStrategy: OverflowStrategy): Source[RedisResult[K, V], NotUsed]
   def unsubscribe(keys: List[K]): Future[Done]
-  def quit(): Future[String]
+  def close(): Future[Unit]
 }

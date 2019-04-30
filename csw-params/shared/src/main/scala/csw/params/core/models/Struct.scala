@@ -1,5 +1,6 @@
 package csw.params.core.models
 
+import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.{Parameter, ParameterSetType}
 import play.api.libs.json.{Json, OFormat}
 
@@ -32,7 +33,7 @@ case class Struct private (paramSet: Set[Parameter[_]]) extends ParameterSetType
   override def toString: String = paramSet.mkString(", ")
 }
 
-object Struct {
+object Struct extends JsonSupport {
   //used by play-json
   implicit val format: OFormat[Struct] = Json.format[Struct]
 

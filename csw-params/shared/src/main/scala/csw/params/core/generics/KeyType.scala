@@ -19,7 +19,7 @@ sealed class KeyType[S: Format: ClassTag] extends EnumEntry with Serializable {
   override def hashCode: Int              = toString.hashCode
   override def equals(that: Any): Boolean = that.toString == this.toString
 
-  private[params] def paramFormat: Format[Parameter[S]] = Parameter[S]
+  private[params] def paramFormat: Format[Parameter[S]] = Parameter.parameterFormat[S]
 }
 
 /**
