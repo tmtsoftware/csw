@@ -28,7 +28,7 @@ addSbtPlugin("ohnosequences" % "sbt-github-release" % "0.7.0")
 addSbtCoursier
 classpathTypes += "maven-plugin"
 
-libraryDependencies += "com.thesamet.scalapb" %% "compilerplugin"  % "0.9.0-M3"
+libraryDependencies += "com.thesamet.scalapb" %% "compilerplugin"  % "0.9.0-RC1"
 libraryDependencies += "com.sun.activation"   % "javax.activation" % "1.2.0"
 
 scalacOptions ++= Seq(
