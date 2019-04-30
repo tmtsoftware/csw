@@ -1,13 +1,14 @@
 package csw.integtration.apps
 
-import akka.actor.typed.scaladsl.adapter._
-import akka.actor.{Actor, ActorRef, Props}
+import akka.actor.typed.ActorRef
+import akka.actor.typed.scaladsl.Behaviors
 import csw.command.client.messages.CommandMessage.Submit
 import csw.integtration.common.TestFutureExtension.RichFuture
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaRegistration, ComponentId, ComponentType, RegistrationResult}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.internal.ServerWiring
+import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.models.Prefix
@@ -21,9 +22,9 @@ object TromboneHCD {
 
   import adminWiring.actorRuntime._
 
-  val tromboneHcdActorRef: ActorRef = typedSystem.actorOf(Props[TromboneHCD], "trombone-hcd")
-  val componentId                   = ComponentId("trombonehcd", ComponentType.HCD)
-  val connection                    = AkkaConnection(componentId)
+  val tromboneHcdActorRef: ActorRef[Submit] = typedSystem.spawn(behavior, "trombone-hcd")
+  val componentId                           = ComponentId("trombonehcd", ComponentType.HCD)
+  val connection                            = AkkaConnection(componentId)
 
   val registration                           = AkkaRegistration(connection, Prefix("nfiraos.ncc.trombone"), tromboneHcdActorRef)
   private val locationService                = HttpLocationServiceFactory.makeLocalClient
@@ -32,12 +33,13 @@ object TromboneHCD {
   println("Trombone HCD registered")
 
   def main(args: Array[String]): Unit = {}
-}
 
-class TromboneHCD extends Actor {
-  import TromboneHCD._
-
-  override def receive: Receive = {
-    case Submit(Setup(_, _, CommandName("Unregister"), None, _), _) ⇒ registrationResult.unregister()
+  def behavior: Behaviors.Receive[Submit] = Behaviors.receiveMessage[Submit] {
+    case Submit(Setup(_, _, CommandName("Unregister"), None, _), _) ⇒
+      registrationResult.unregister()
+      Behaviors.same
+    case x ⇒
+      println(s"Trombone HCD received [$x]")
+      Behaviors.same
   }
 }

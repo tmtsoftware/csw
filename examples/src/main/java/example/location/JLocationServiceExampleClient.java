@@ -1,7 +1,9 @@
 package example.location;
 
 import akka.actor.*;
+import akka.actor.typed.ActorSystem;
 import akka.actor.typed.Behavior;
+import akka.actor.typed.SpawnProtocol;
 import akka.actor.typed.javadsl.Adapter;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.japi.Pair;
@@ -47,16 +49,15 @@ import static csw.location.api.models.Connection.HttpConnection;
 /**
  * An example location service client application.
  */
-//#actor-mixin
+//TODO: Change everything to typed
 public class JLocationServiceExampleClient extends AbstractActor {
 
     private ILogger log = new JLoggerFactory("my-component-name").getLogger(context(), getClass());
-    //#actor-mixin
 
     //#create-location-service
-    private ActorSystem system = context().system();
+    private akka.actor.ActorSystem system = context().system();
     private ActorMaterializer mat = ActorMaterializer.create(system);
-    private ILocationService locationService = JHttpLocationServiceFactory.makeLocalClient(system, mat);
+    private ILocationService locationService = JHttpLocationServiceFactory.makeLocalClient(Adapter.toTyped(system), mat);
     //#create-location-service
 
     private AkkaConnection exampleConnection = LocationServiceExampleComponent.connection();
@@ -279,7 +280,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         //#unregister
 
         try {
-            CoordinatedShutdown.get(system).runAll(CoordinatedShutdownReasons.actorTerminatedReason()).toCompletableFuture().get();
+            CoordinatedShutdown.get(context().system()).runAll(CoordinatedShutdownReasons.actorTerminatedReason()).toCompletableFuture().get();
             // #log-info-error
         } catch (InterruptedException | ExecutionException ex) {
             log.info(ex.getMessage(), ex);
@@ -322,14 +323,15 @@ public class JLocationServiceExampleClient extends AbstractActor {
         Await.result(locationWiring.locationHttpService().start(), new FiniteDuration(5, TimeUnit.SECONDS));
 
         //#create-actor-system
-        ActorSystem actorSystem = ActorSystemFactory.remote("csw-examples-locationServiceClient");
+        ActorSystem<SpawnProtocol> typedSystem = ActorSystemFactory.remote(SpawnProtocol.behavior(),"csw-examples-locationServiceClient");
         //#create-actor-system
 
         //#create-logging-system
         String host = InetAddress.getLocalHost().getHostName();
-        loggingSystem = JLoggingSystemFactory.start("JLocationServiceExampleClient", "0.1", host, actorSystem);
+        loggingSystem = JLoggingSystemFactory.start("JLocationServiceExampleClient", "0.1", host, typedSystem);
         //#create-logging-system
 
-        actorSystem.actorOf(Props.create(JLocationServiceExampleClient.class), "LocationServiceExampleClient");
+        akka.actor.ActorSystem untypedSystem = ActorSystemFactory.remote();
+        untypedSystem.actorOf(Props.create(JLocationServiceExampleClient.class), "LocationServiceExampleClient");
     }
 }

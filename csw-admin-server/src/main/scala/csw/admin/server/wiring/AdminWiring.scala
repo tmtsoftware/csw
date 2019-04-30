@@ -1,6 +1,7 @@
 package csw.admin.server.wiring
 
-import akka.actor.ActorSystem
+import akka.actor.typed
+import akka.actor.typed.SpawnProtocol
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.admin.server.log.LogAdmin
 import csw.admin.server.log.http.{AdminExceptionHandlers, AdminHttpService, AdminRoutes}
@@ -10,10 +11,10 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 
 // $COVERAGE-OFF$
 private[admin] class AdminWiring {
-  lazy val config: Config           = ConfigFactory.load()
-  lazy val settings                 = new Settings(config)
-  lazy val actorSystem: ActorSystem = ActorSystemFactory.remote("admin-server")
-  lazy val actorRuntime             = new ActorRuntime(actorSystem)
+  lazy val config: Config                                = ConfigFactory.load()
+  lazy val settings                                      = new Settings(config)
+  lazy val actorSystem: typed.ActorSystem[SpawnProtocol] = ActorSystemFactory.remote(SpawnProtocol.behavior, "admin-server")
+  lazy val actorRuntime                                  = new ActorRuntime(actorSystem)
 
   lazy val locationService: LocationService   = HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
   lazy val logAdmin: LogAdmin                 = new LogAdmin(locationService, actorRuntime)

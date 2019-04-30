@@ -2,15 +2,18 @@ package example.location
 
 import java.net.InetAddress
 
-import akka.actor._
-import akka.actor.typed.scaladsl.adapter._
+import akka.actor.typed
+import akka.actor.typed.SpawnProtocol
+import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.ActorMaterializer
+import akka.stream.typed.scaladsl
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaRegistration, ComponentId, ComponentType, RegistrationResult}
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.logging.api.scaladsl.Logger
+import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.{LoggerFactory, LoggingSystemFactory}
 import csw.params.core.models.Prefix
 
@@ -21,22 +24,19 @@ import scala.concurrent.{Await, Future}
  * An example that shows how to register a component actor with the location service.
  */
 object LocationServiceExampleComponentApp extends App {
-  implicit val system: ActorSystem    = ActorSystemFactory.remote()
-  implicit val mat: ActorMaterializer = ActorMaterializer()
-  private val locationService         = HttpLocationServiceFactory.makeLocalClient
+  implicit val system: typed.ActorSystem[SpawnProtocol] = ActorSystemFactory.remote(SpawnProtocol.behavior, "example-system")
+  implicit val mat: ActorMaterializer                   = scaladsl.ActorMaterializer()
+  private val locationService                           = HttpLocationServiceFactory.makeLocalClient
 
   //#create-logging-system
   private val host = InetAddress.getLocalHost.getHostName
   LoggingSystemFactory.start("LocationServiceExampleComponent", "0.1", host, system)
   //#create-logging-system
 
-  system.actorOf(LocationServiceExampleComponent.props(locationService))
+  system.spawn(LocationServiceExampleComponent.behaviour(locationService), LocationServiceExampleComponent.connection.name)
 }
 
 object LocationServiceExampleComponent {
-  // Creates the ith service
-  def props(locationService: LocationService): Props = Props(new LocationServiceExampleComponent(locationService))
-
   // Component ID of the service
   val componentId = ComponentId("LocationServiceExampleComponent", ComponentType.Assembly)
 
@@ -44,35 +44,24 @@ object LocationServiceExampleComponent {
   val connection = AkkaConnection(componentId)
 
   // Message sent from client once location has been resolved
-  case object ClientMessage
-}
+  case class ClientMessage(replyTo: typed.ActorRef[_])
 
-/**
- * A dummy akka test service that registers with the location service
- */
-class LocationServiceExampleComponent(locationService: LocationService) extends Actor {
-  val log: Logger = new LoggerFactory("my-component-name").getLogger(context)
+  def behaviour(locationService: LocationService): Behaviors.Receive[ClientMessage] =
+    Behaviors.receive[ClientMessage]((ctx, msg) ⇒ {
+      val log: Logger = new LoggerFactory("my-component-name").getLogger(ctx)
+      log.info("In actor LocationServiceExampleComponent")
+      // Register with the location service
+      val registrationResult: Future[RegistrationResult] =
+        locationService.register(
+          AkkaRegistration(LocationServiceExampleComponent.connection, Prefix("nfiraos.ncc.trombone"), ctx.self)
+        )
+      Await.result(registrationResult, 5.seconds)
 
-  log.info("In actor LocationServiceExampleComponent")
-  // Register with the location service
-  val registrationResult: Future[RegistrationResult] =
-    locationService.register(
-      AkkaRegistration(LocationServiceExampleComponent.connection, Prefix("nfiraos.ncc.trombone"), self)
-    )
-  Await.result(registrationResult, 5.seconds)
-
-  log.info("LocationServiceExampleComponent registered.")
-
-  override def receive: Receive = {
-    // This is the message that TestServiceClient sends when it discovers this service
-    case LocationServiceExampleComponent.ClientMessage =>
-      log.info(s"Received scala client message from: ${sender()}")
-
-    // This is the message that JTestServiceClient sends when it discovers this service
-    //    case m: JTestAkkaService.ClientMessage =>
-    //      log.info(s"Received java client message from: ${sender()}")
-
-    case x =>
-      log.error(s"Received unexpected message $x")
-  }
+      log.info("LocationServiceExampleComponent registered.")
+      msg match {
+        case ClientMessage(replyTo) ⇒
+          log.info(s"Received scala client message from: $replyTo")
+          Behaviors.same
+      }
+    })
 }

@@ -2,7 +2,9 @@ package csw.testkit
 
 import java.nio.file.Paths
 
-import akka.actor.ActorSystem
+import akka.actor.typed
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.http.scaladsl.Http
 import akka.stream.Materializer
 import akka.util.Timeout
@@ -31,21 +33,23 @@ import scala.concurrent.ExecutionContextExecutor
  * }}}
  *
  */
-final class ConfigTestKit private (system: ActorSystem, serverConfig: Option[Config], testKitSettings: TestKitSettings)
+final class ConfigTestKit private (system: ActorSystem[SpawnProtocol],
+                                   serverConfig: Option[Config],
+                                   testKitSettings: TestKitSettings)
     extends MockedAuthentication {
 
-  implicit lazy val actorSystem: ActorSystem = system
+  implicit lazy val actorSystem: ActorSystem[SpawnProtocol] = system
   private[csw] lazy val configWiring: ServerWiring = (serverConfig, testKitSettings.ConfigPort) match {
     case (Some(_config), _) ⇒
       new ServerWiring {
-        override lazy val config: Config                         = _config
-        override lazy val actorSystem: ActorSystem               = system
-        override lazy val securityDirectives: SecurityDirectives = _securityDirectives
+        override lazy val config: Config                          = _config
+        override lazy val actorSystem: ActorSystem[SpawnProtocol] = system
+        override lazy val securityDirectives: SecurityDirectives  = _securityDirectives
       }
     case (_, serverPort) ⇒
       new ServerWiring {
-        override lazy val actorSystem: ActorSystem               = system
-        override lazy val securityDirectives: SecurityDirectives = _securityDirectives
+        override lazy val actorSystem: ActorSystem[SpawnProtocol] = system
+        override lazy val securityDirectives: SecurityDirectives  = _securityDirectives
         override lazy val settings: Settings = new Settings(config) {
           override val `service-port`: Int = serverPort.getOrElse(super.`service-port`)
         }
@@ -96,7 +100,7 @@ final class ConfigTestKit private (system: ActorSystem, serverConfig: Option[Con
    */
   def shutdownConfigServer(): Unit = {
     deleteServerFiles()
-    TestKitUtils.await(Http(actorSystem).shutdownAllConnectionPools(), timeout)
+    TestKitUtils.await(Http(system.toUntyped).shutdownAllConnectionPools(), timeout)
     terminateServer()
     TestKitUtils.coordShutdown(configWiring.actorRuntime.shutdown, timeout)
   }
@@ -112,7 +116,7 @@ object ConfigTestKit {
    * with [[ConfigTestKit#shutdownConfigServer]].
    */
   def apply(
-      actorSystem: ActorSystem = ActorSystem("config-server"),
+      actorSystem: ActorSystem[SpawnProtocol] = typed.ActorSystem(SpawnProtocol.behavior, "config-server"),
       serverConfig: Option[Config] = None,
       testKitSettings: TestKitSettings = TestKitSettings(ConfigFactory.load())
   ): ConfigTestKit = new ConfigTestKit(system = actorSystem, serverConfig = serverConfig, testKitSettings = testKitSettings)
@@ -123,7 +127,7 @@ object ConfigTestKit {
    * @param actorSystem
    * @return handle to ConfigTestKit which can be used to start and stop config server
    */
-  def create(actorSystem: ActorSystem): ConfigTestKit = apply(actorSystem = actorSystem)
+  def create(actorSystem: ActorSystem[SpawnProtocol]): ConfigTestKit = apply(actorSystem = actorSystem)
 
   /**
    * Java API for creating ConfigTestKit

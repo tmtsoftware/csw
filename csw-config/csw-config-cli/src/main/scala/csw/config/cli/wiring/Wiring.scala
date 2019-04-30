@@ -1,6 +1,5 @@
 package csw.config.cli.wiring
 
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.aas.installed.InstalledAppAuthAdapterFactory

@@ -1,6 +1,7 @@
 package example.auth.installed.commands
 
-import akka.actor.ActorSystem
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.{typed, ActorSystem}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import csw.aas.installed.api.InstalledAppAuthAdapter
@@ -9,8 +10,9 @@ import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
 // #write-command
-class WriteCommand(val installedAppAuthAdapter: InstalledAppAuthAdapter, value: String)(implicit val actorSystem: ActorSystem)
-    extends AppCommand {
+class WriteCommand(val installedAppAuthAdapter: InstalledAppAuthAdapter, value: String)(
+    implicit val actorSystem: typed.ActorSystem[_]
+) extends AppCommand {
   override def run(): Unit = {
 
     installedAppAuthAdapter.getAccessTokenString() match {
@@ -19,7 +21,7 @@ class WriteCommand(val installedAppAuthAdapter: InstalledAppAuthAdapter, value: 
         val url         = s"http://localhost:7000/data?value=$value"
         val response =
           Await.result(
-            Http().singleRequest(
+            Http(actorSystem.toUntyped).singleRequest(
               HttpRequest(
                 method = HttpMethods.POST,
                 uri = Uri(url),

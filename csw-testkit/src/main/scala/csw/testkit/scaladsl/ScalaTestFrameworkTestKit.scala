@@ -1,7 +1,6 @@
 package csw.testkit.scaladsl
 
-import akka.actor.ActorSystem
-import akka.actor.typed.ActorRef
+import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import com.typesafe.config.Config
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.testkit._
@@ -30,7 +29,7 @@ abstract class ScalaTestFrameworkTestKit(val frameworkTestKit: FrameworkTestKit,
   def this(services: CSWService*) = this(FrameworkTestKit(), services: _*)
 
   /** Initialize testkit with provided actorSystem */
-  def this(actorSystem: ActorSystem) = this(FrameworkTestKit(actorSystem))
+  def this(actorSystem: ActorSystem[SpawnProtocol]) = this(FrameworkTestKit(actorSystem))
 
   /** Delegate to framework testkit */
   def spawnContainer(config: Config): ActorRef[ContainerMessage] = frameworkTestKit.spawnContainer(config)

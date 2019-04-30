@@ -3,7 +3,6 @@ package example.framework.components.assembly;
 import akka.actor.testkit.typed.javadsl.TestProbe;
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.ActorContext;
-import akka.actor.typed.javadsl.Adapter;
 import akka.util.Timeout;
 import csw.command.api.javadsl.ICommandService;
 import csw.command.client.CommandResponseManager;
@@ -65,7 +64,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         this.locationService = cswCtx.locationService();
         this.eventService = cswCtx.eventService();
         log = cswCtx.loggerFactory().getLogger(this.getClass());
-        configClient = JConfigClientFactory.clientApi(Adapter.toUntyped(ctx.getSystem()), locationService);
+        configClient = JConfigClientFactory.clientApi(ctx.getSystem(), locationService);
 
         runningHcds = new HashMap<>();
         commandResponseAdapter = TestProbe.<CommandResponse.SubmitResponse>create(ctx.getSystem()).ref();

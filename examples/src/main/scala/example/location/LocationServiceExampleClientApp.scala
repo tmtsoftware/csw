@@ -3,9 +3,11 @@ package example.location
 import java.net.InetAddress
 
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorRef, Behavior}
-import akka.actor.{ActorSystem, CoordinatedShutdown, Props}
+import akka.actor.typed.{ActorRef, Behavior, SpawnProtocol}
+import akka.actor.{typed, ActorSystem, CoordinatedShutdown, Props}
 import akka.stream.scaladsl.{Keep, Sink}
+import akka.stream.typed.scaladsl
+import akka.stream.typed.scaladsl.ActorSink
 import akka.stream.{ActorMaterializer, Materializer}
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
@@ -17,9 +19,13 @@ import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.wrapper.LocationServerWiring
 import csw.logging.api.scaladsl._
+import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.scaladsl.{Keys, LoggerFactory, LoggingSystemFactory}
 import csw.params.core.models.Prefix
+import example.location.ExampleMessages.{AllDone, CustomException, TrackingEventAdapter}
+import example.location.LocationServiceExampleClient.locationInfoToString
+import example.location.LocationServiceExampleClientApp.typedSystem
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -29,51 +35,73 @@ import scala.concurrent.{Await, Future}
 /**
  * An example location service client application.
  */
+//TODO: Change everything to typed
 object LocationServiceExampleClientApp extends App {
 
   // http location service client expect that location server is running on local machine
   // here we are starting location http server so that httpLocationClient uses can be illustrated
   private val wiring = new LocationServerWiring().wiring
   Await.result(wiring.locationHttpService.start(), 5.seconds)
-
+  val untypedSystem = ActorSystem("untyped-system")
   //#create-actor-system
-  implicit val actorSystem: ActorSystem = ActorSystemFactory.remote("csw-examples-locationServiceClient")
+  implicit val typedSystem: typed.ActorSystem[SpawnProtocol] =
+    ActorSystemFactory.remote(SpawnProtocol.behavior, "csw-examples-locationServiceClient")
   //#create-actor-system
 
-  implicit val mat: ActorMaterializer = ActorMaterializer()
+  implicit val mat: ActorMaterializer = scaladsl.ActorMaterializer()
 
   //#create-location-service
-  private val locationService = HttpLocationServiceFactory.makeLocalClient(actorSystem, mat)
+  private val locationService = HttpLocationServiceFactory.makeLocalClient(typedSystem, mat)
   //#create-location-service
 
   //#create-logging-system
   private val host = InetAddress.getLocalHost.getHostName
   // Only call this once per application
-  val loggingSystem: LoggingSystem = LoggingSystemFactory.start("LocationServiceExampleClient", "0.1", host, actorSystem)
+  val loggingSystem: LoggingSystem = LoggingSystemFactory.start("LocationServiceExampleClient", "0.1", host, typedSystem)
   //#create-logging-system
 
-  actorSystem.actorOf(LocationServiceExampleClient.props(locationService, loggingSystem))
+  untypedSystem.actorOf(LocationServiceExampleClient.props(locationService, loggingSystem))
+}
+
+sealed trait ExampleMessages
+object ExampleMessages {
+  case class TrackingEventAdapter(trackingEvent: TrackingEvent) extends ExampleMessages
+  case class CustomException(throwable: Throwable)              extends ExampleMessages
+  case class AllDone(exampleConnection: Connection)             extends ExampleMessages
 }
 
 object LocationServiceExampleClient {
 
-  // message sent when location stream ends (should not happen?)
-  case object AllDone
-
   def props(locationService: LocationService, loggingSystem: LoggingSystem)(implicit mat: Materializer): Props =
     Props(new LocationServiceExampleClient(locationService, loggingSystem))
+
+  def locationInfoToString(loc: Location): String = {
+    val connection = loc.connection
+    s"${connection.name}, component type=${connection.componentId.componentType}, connection type=${connection.connectionType}"
+  }
+
+  //#tracking
+  def sinkBehavior: Behaviors.Receive[ExampleMessages] = Behaviors.receive[ExampleMessages] { (ctx, msg) ⇒
+    {
+      val log: Logger = new LoggerFactory("my-component-name").getLogger(ctx)
+
+      msg match {
+        case TrackingEventAdapter(LocationUpdated(loc))  ⇒ log.info(s"Location updated ${locationInfoToString(loc)}")
+        case TrackingEventAdapter(LocationRemoved(conn)) ⇒ log.warn(s"Location removed $conn", Map("connection" → conn.toString))
+        case AllDone(exampleConnection)                  ⇒ log.info(s"Tracking of $exampleConnection complete.")
+        case CustomException(throwable)                  ⇒ log.error(throwable.getMessage, ex = throwable)
+      }
+      Behaviors.same
+    }
+  }
+  //#tracking
 }
 
 /**
  * A test client actor that uses the location service to resolve services
  */
-//#actor-mixin
-class LocationServiceExampleClient(locationService: LocationService, loggingSystem: LoggingSystem)(
-    implicit mat: Materializer
-) extends akka.actor.Actor
-    //#actor-mixin
-    {
-  import LocationServiceExampleClient._
+class LocationServiceExampleClient(locationService: LocationService, loggingSystem: LoggingSystem)(implicit mat: Materializer)
+    extends akka.actor.Actor {
 
   val log: Logger = new LoggerFactory("my-component-name").getLogger(context)
 
@@ -179,15 +207,6 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   }
   //#resolve
 
-  // example code showing how to get the actorRef for remote component and send it a message
-//  if (resolveResult.isDefined) {
-//    resolveResult.get match {
-//      case c: AkkaLocation =>
-//        c.component.value ! LocationServiceExampleComponent.ClientMessage
-//      case x => log.error(s"Received unexpected location type: $x")
-//    }
-//  }
-
   //#list
   // list connections in location service
   val connectionList: List[Location] = Await.result(locationService.list, timeout)
@@ -226,9 +245,11 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
     // Calls track method for example connection and forwards location messages to this actor
     //
     log.info(s"Starting to track $exampleConnection")
+    val sinfActorRef = typedSystem.spawn(LocationServiceExampleClient.sinkBehavior, "")
     locationService
       .track(exampleConnection)
-      .to(Sink.actorRef(self, AllDone))
+      .map(TrackingEventAdapter)
+      .to(ActorSink.actorRef[ExampleMessages](sinfActorRef, AllDone(exampleConnection), CustomException))
       .run()
     //track returns a Killswitch, that can be used to turn off notifications arbitarily
     //in this case track a connection for 5 seconds, after that schedule switching off the stream
@@ -256,11 +277,6 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   }
 
-  def locationInfoToString(loc: Location): String = {
-    val connection = loc.connection
-    s"${connection.name}, component type=${connection.componentId.componentType}, connection type=${connection.connectionType}"
-  }
-
   // Note: This method is never actually called in this example, since the actor does not shutdown
   // unless the application is killed. It is here to demonstrate how you might cleanly shutdown
   // tha application.
@@ -285,7 +301,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   }
 
   override def receive: Receive = {
-
+    case x =>
     // Receive a location from the location service and if it is an akka location, send it a message
     case LocationUpdated(loc) =>
       log.info(s"Location updated ${locationInfoToString(loc)}")
@@ -302,6 +318,6 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
       val runtimeException = new RuntimeException(s"Received unexpected message $x")
       log.error(runtimeException.getMessage, ex = runtimeException)
     //#log-error
-  }
 
+  }
 }

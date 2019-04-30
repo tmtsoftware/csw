@@ -1,6 +1,7 @@
 package example.config;
 
-import akka.actor.ActorSystem;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.SpawnProtocol;
 import akka.stream.Materializer;
 import csw.config.api.javadsl.IConfigClientService;
 import csw.config.api.javadsl.IConfigService;
@@ -37,7 +38,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
     private static JMockedAuthentication mocks = new JMockedAuthentication();
     private static ConfigTestKit configTestKit = testKit.frameworkTestKit().configTestKit();
     private static ServerWiring configWiring = configTestKit.configWiring();
-    private static ActorSystem actorSystem = configWiring.actorSystem();
+    private static ActorSystem<SpawnProtocol> actorSystem = configWiring.actorSystem();
     private static Materializer mat = configWiring.actorRuntime().mat();
 
     private static ILocationService clientLocationService = testKit.jLocationService();

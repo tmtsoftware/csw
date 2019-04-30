@@ -2,7 +2,7 @@ package csw.config.client.commons
 
 import java.nio.file.{Files, Path}
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import akka.actor.typed.ActorSystem
 import akka.stream.Materializer
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.config.api.exceptions.{FileNotFound, LocalFileNotFound, UnableToParseOptions}

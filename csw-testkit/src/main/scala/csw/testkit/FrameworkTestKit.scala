@@ -147,7 +147,7 @@ object FrameworkTestKit {
    * @param actorSystem actorSystem used for spawning components
    * @return handle to FrameworkTestKit which can be used to start and stop all services started
    */
-  def create(actorSystem: ActorSystem): FrameworkTestKit = apply(actorSystem = actorSystem)
+  def create(actorSystem: typed.ActorSystem[SpawnProtocol]): FrameworkTestKit = apply(actorSystem = actorSystem)
 
   /**
    * Java API for creating FrameworkTestKit
