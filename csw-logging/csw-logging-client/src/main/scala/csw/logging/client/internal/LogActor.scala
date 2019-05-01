@@ -75,7 +75,7 @@ private[logging] object LogActor {
           case StopLogging                  => Behaviors.stopped
         }
         .receiveSignal {
-          case (context, PostStop) =>
+          case (_, PostStop) =>
             done.success(())
             Behaviors.same
         }

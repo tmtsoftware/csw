@@ -37,11 +37,12 @@ import scala.concurrent.duration.DurationLong
 class ContainerIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 
-  private val irisContainerConnection                          = AkkaConnection(ComponentId("IRIS_Container", ComponentType.Container))
-  private val filterAssemblyConnection                         = AkkaConnection(ComponentId("Filter", Assembly))
-  private val instrumentHcdConnection                          = AkkaConnection(ComponentId("Instrument_Filter", HCD))
-  private val disperserHcdConnection                           = AkkaConnection(ComponentId("Disperser", HCD))
-  private val containerActorSystem: ActorSystem[SpawnProtocol] = ActorSystemFactory.remote(SpawnProtocol.behavior, "")
+  private val irisContainerConnection  = AkkaConnection(ComponentId("IRIS_Container", ComponentType.Container))
+  private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
+  private val instrumentHcdConnection  = AkkaConnection(ComponentId("Instrument_Filter", HCD))
+  private val disperserHcdConnection   = AkkaConnection(ComponentId("Disperser", HCD))
+  private val containerActorSystem: ActorSystem[SpawnProtocol] =
+    ActorSystemFactory.remote(SpawnProtocol.behavior, "container-system")
 
   override def afterAll(): Unit = {
     containerActorSystem.terminate()

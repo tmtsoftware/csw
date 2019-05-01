@@ -23,10 +23,10 @@ private[testkit] trait RedisStore extends EmbeddedRedis {
   implicit def timeout: Timeout
   protected def masterId: String
   protected def connection: TcpConnection
-  implicit val untypedSystem: ActorSystem = system.toUntyped
 
-  implicit lazy val mat: Materializer    = scaladsl.ActorMaterializer()
-  implicit lazy val ec: ExecutionContext = system.executionContext
+  implicit lazy val untypedSystem: ActorSystem = system.toUntyped
+  implicit lazy val mat: Materializer          = scaladsl.ActorMaterializer()
+  implicit lazy val ec: ExecutionContext       = system.executionContext
 
   private var redisSentinel: Option[RedisSentinel] = None
   private var redisServer: Option[RedisServer]     = None

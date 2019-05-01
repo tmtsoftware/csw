@@ -4,7 +4,7 @@ import java.nio.ByteBuffer
 import java.util.concurrent.CompletableFuture
 
 import akka.Done
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import akka.actor.typed.{ActorSystem, Props, SpawnProtocol}
 import ch.qos.logback.classic.LoggerContext
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.appenders.LogAppenderBuilder
@@ -96,9 +96,10 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
   private[this] val logActor = system.spawn(
     LogActor.behavior(done, appenders, defaultLevel, defaultSlf4jLogLevel, defaultAkkaLogLevel),
     name = "LoggingActor",
-    akka.actor.typed.Props.empty.withDispatcherFromConfig("logging-dispatcher")
+    Props.empty.withDispatcherFromConfig("logging-dispatcher")
   )
 
+  printf(logActor.toString)
   LoggingState.maybeLogActor = Some(logActor)
 
   private[logging] val gcLogger: Option[GcLogger] =
@@ -108,7 +109,6 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
   if (time) {
     // Start timing actor
     LoggingState.doTime = true
-    //TODO convert timeActor into typed actor
     val timeActor = system.spawn(new TimeActor(timeActorDonePromise).behavior, name = "TimingActor")
     LoggingState.timeActorOption = Some(timeActor)
   } else {

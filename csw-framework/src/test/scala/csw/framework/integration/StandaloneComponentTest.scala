@@ -43,7 +43,8 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
   private var loggingSystem: LoggingSystem = _
   // using standaloneActorSystem to start component instead of seedActorSystem,
   // to assert shutdown of the component(which will also shutdown standaloneActorSystem)
-  private val standaloneComponentActorSystem: ActorSystem[SpawnProtocol] = ActorSystemFactory.remote(SpawnProtocol.behavior, "")
+  private val standaloneComponentActorSystem: ActorSystem[SpawnProtocol] =
+    ActorSystemFactory.remote(SpawnProtocol.behavior, "test")
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
