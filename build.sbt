@@ -335,7 +335,8 @@ lazy val `csw-event-client` = project
   .settings(
     PB.targets in Compile := Seq(
       scalapb.gen() -> (sourceManaged in Compile).value
-    )
+    ),
+    PB.protocVersion := "-v371"
   )
 
 lazy val `csw-event-cli` = project
