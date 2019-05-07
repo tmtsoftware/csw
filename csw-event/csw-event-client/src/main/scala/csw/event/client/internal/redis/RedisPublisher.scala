@@ -26,9 +26,10 @@ import scala.util.control.NonFatal
  * @param redisClient redis client available from lettuce
  * @param mat         the materializer to be used for materializing underlying streams
  */
-private[event] class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(implicit mat: Materializer,
-                                                                                          ec: ExecutionContext)
-    extends EventPublisher {
+private[event] class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(
+    implicit mat: Materializer,
+    ec: ExecutionContext
+) extends EventPublisher {
 
   // inorder to preserve the order of publishing events, the parallelism level is maintained to 1
   private val parallelism                         = 1
@@ -81,8 +82,10 @@ private[event] class RedisPublisher(redisURI: Future[RedisURI], redisClient: Red
       every: FiniteDuration,
       onError: PublishFailure => Unit
   ): Cancellable =
-    publish(eventPublisherUtil.eventSource(Future.successful(eventGenerator), parallelism, startTime.durationFromNow, every),
-            onError)
+    publish(
+      eventPublisherUtil.eventSource(Future.successful(eventGenerator), parallelism, startTime.durationFromNow, every),
+      onError
+    )
 
   override def publishAsync(eventGenerator: ⇒ Future[Option[Event]], every: FiniteDuration): Cancellable =
     publish(eventPublisherUtil.eventSource(eventGenerator, parallelism, defaultInitialDelay, every))

@@ -321,11 +321,13 @@ class ConfigClientExampleTest
       //validate full history
       val fullHistory = await(adminApi.historyActive(filePath))
       fullHistory.map(_.id) shouldBe List(id1, id5, id4, id3, id1)
-      fullHistory.map(_.comment) shouldBe List(s"$id1 active",
-                                               "latest active",
-                                               s"$id4 active",
-                                               s"$id3 active",
-                                               "initializing active file with the first version")
+      fullHistory.map(_.comment) shouldBe List(
+        s"$id1 active",
+        "latest active",
+        s"$id4 active",
+        s"$id3 active",
+        "initializing active file with the first version"
+      )
 
       //drop initial revision and take only update revisions
       val fragmentedHistory = await(adminApi.historyActive(filePath, tBegin, tEnd))

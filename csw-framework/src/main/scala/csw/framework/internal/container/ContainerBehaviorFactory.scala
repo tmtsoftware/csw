@@ -35,7 +35,7 @@ private[framework] object ContainerBehaviorFactory {
           eventServiceFactory,
           alarmServiceFactory,
           loggerFactory
-      )
+        )
     )
   }
 }

@@ -93,7 +93,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar wit
             eventService,
             alarmService,
             mocks.loggerFactory
-        )
+          )
       )
     )
   }

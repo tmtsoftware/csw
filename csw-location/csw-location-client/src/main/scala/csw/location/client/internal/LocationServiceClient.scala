@@ -25,9 +25,10 @@ import scala.async.Async.{async, await}
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
-private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(implicit val actorSystem: ActorSystem[_],
-                                                                            mat: Materializer)
-    extends LocationService
+private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
+    implicit val actorSystem: ActorSystem,
+    mat: Materializer
+) extends LocationService
     with PlayJsonSupport
     with LocationJsonSupport { outer ⇒
 

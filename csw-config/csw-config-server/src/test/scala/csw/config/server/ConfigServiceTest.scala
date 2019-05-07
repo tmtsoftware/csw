@@ -616,15 +616,19 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
     // verify history of active file from given timestamp
     val historyFrom = configService.historyActive(file, createActiveTS).await
-    historyFrom.map(h ⇒ (h.id, h.comment)) shouldBe List((configId5, resetActiveComment2),
-                                                         (configId4, resetActiveComment1),
-                                                         (configId3, setActiveComment))
+    historyFrom.map(h ⇒ (h.id, h.comment)) shouldBe List(
+      (configId5, resetActiveComment2),
+      (configId4, resetActiveComment1),
+      (configId3, setActiveComment)
+    )
 
     // verify history of active file till given timestamp
     val historyTo = configService.historyActive(file, to = resetActiveTS1).await
-    historyTo.map(h ⇒ (h.id, h.comment)) shouldBe List((configId4, resetActiveComment1),
-                                                       (configId3, setActiveComment),
-                                                       (configId1, createActiveComment))
+    historyTo.map(h ⇒ (h.id, h.comment)) shouldBe List(
+      (configId4, resetActiveComment1),
+      (configId3, setActiveComment),
+      (configId1, createActiveComment)
+    )
 
     // verify history of active file within given timestamps
     val historyWithin = configService.historyActive(file, setActiveTS, resetActiveTS2).await
@@ -809,9 +813,11 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
     // verify history of active file till given timestamp
     val historyTo = configService.historyActive(file, to = resetActiveTS).await
-    historyTo.map(h ⇒ (h.id, h.comment)) shouldBe List((configId4, resetActiveComment),
-                                                       (configId3, setActiveComment),
-                                                       (configId1, createActiveComment))
+    historyTo.map(h ⇒ (h.id, h.comment)) shouldBe List(
+      (configId4, resetActiveComment),
+      (configId3, setActiveComment),
+      (configId1, createActiveComment)
+    )
 
     // verify history of active file within given timestamps
     val historyWithin = configService.historyActive(file, setActiveTS, resetActiveTS).await

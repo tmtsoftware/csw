@@ -9,7 +9,7 @@ object TestSettings {
     Scenario(1, 1, 60 * 1000, 60 * 1000),
     Scenario(1, 5, 60 * 1000, 60 * 1000),
     Scenario(1, 10, 60 * 1000, 60 * 1000),
-    Scenario(1, 20, 60 * 1000, 60 * 1000),
+    Scenario(1, 20, 60 * 1000, 60 * 1000)
   )
 
   // 50 Hz
@@ -17,7 +17,7 @@ object TestSettings {
     Scenario(20, 1, 3 * 1000, 3 * 1000),
     Scenario(20, 5, 3 * 1000, 3 * 1000),
     Scenario(20, 10, 3 * 1000, 3 * 1000),
-    Scenario(20, 20, 3 * 1000, 3 * 1000),
+    Scenario(20, 20, 3 * 1000, 3 * 1000)
   )
 
   // 20 Hz

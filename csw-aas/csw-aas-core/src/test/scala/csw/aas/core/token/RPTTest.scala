@@ -75,8 +75,10 @@ class RPTTest extends FunSuite with MockitoSugar with Matchers with ScalaFutures
       email = None,
       scope = Option("profile email"),
       realm_access = Access(Set("offline_access", "uma_authorization", "example-admin-role")),
-      resource_access = Map("account"        → Access(Set("manage-account", "manage-account-links", "view-profile")),
-                            "example-server" → Access(Set("person-role"))),
+      resource_access = Map(
+        "account"        → Access(Set("manage-account", "manage-account-links", "view-profile")),
+        "example-server" → Access(Set("person-role"))
+      ),
       authorization = Authorization(
         Set(
           Permission("f1d4514d-4bfb-48e2-9448-f92a94ffca4d", "person", Set("delete")),

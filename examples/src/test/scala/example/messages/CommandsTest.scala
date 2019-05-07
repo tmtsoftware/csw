@@ -277,10 +277,12 @@ class CommandsTest extends FunSpec with Matchers {
 
       //Setup command with duplicate key via constructor
       val setup: Setup =
-        Setup(prefix,
-              CommandName("move"),
-              Some(obsId),
-              Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
+        Setup(
+          prefix,
+          CommandName("move"),
+          Some(obsId),
+          Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3)
+        )
       //four duplicate keys are removed; now contains one Encoder and one Filter key
       val uniqueKeys1 = setup.paramSet.toList.map(_.keyName)
 

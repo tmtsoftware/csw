@@ -58,5 +58,5 @@ case object CouldNotJoinCluster extends RuntimeException("could not join cluster
 case object ClusterSeedsNotFound
     extends RuntimeException(
       "CLUSTER_SEEDS setting is not specified either as env variable or system property. " +
-      "Please check online documentation for this set-up."
+        "Please check online documentation for this set-up."
     )

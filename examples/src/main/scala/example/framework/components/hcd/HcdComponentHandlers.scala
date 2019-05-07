@@ -64,14 +64,14 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
 
   //#onSubmit-handler
   override def onSubmit(controlCommand: ControlCommand): SubmitResponse = controlCommand match {
-    case setup: Setup     ⇒ submitSetup(setup) // includes logic to handle Submit with Setup config command
+    case setup: Setup     ⇒ submitSetup(setup)     // includes logic to handle Submit with Setup config command
     case observe: Observe ⇒ submitObserve(observe) // includes logic to handle Submit with Observe config command
   }
   //#onSubmit-handler
 
   //#onOneway-handler
   override def onOneway(controlCommand: ControlCommand): Unit = controlCommand match {
-    case setup: Setup     ⇒ onewaySetup(setup) // includes logic to handle Oneway with Setup config command
+    case setup: Setup     ⇒ onewaySetup(setup)     // includes logic to handle Oneway with Setup config command
     case observe: Observe ⇒ onewayObserve(observe) // includes logic to handle Oneway with Setup config command
   }
   //#onOneway-handler

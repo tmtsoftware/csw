@@ -161,12 +161,12 @@ object Documentation extends HttpApp {
   object PolicyExpressions {
     // #policy-expressions
     val routes: Route =
-    sGet(RealmRolePolicy("admin") | CustomPolicy(_.email.contains("super-admin@tmt.org"))) {
-      complete("OK")
-    } ~
-    sPost(ClientRolePolicy("finance_user") & PermissionPolicy("edit")) {
-      complete("OK")
-    }
+      sGet(RealmRolePolicy("admin") | CustomPolicy(_.email.contains("super-admin@tmt.org"))) {
+        complete("OK")
+      } ~
+        sPost(ClientRolePolicy("finance_user") & PermissionPolicy("edit")) {
+          complete("OK")
+        }
     // #policy-expressions
   }
 

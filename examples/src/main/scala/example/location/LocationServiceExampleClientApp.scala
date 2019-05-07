@@ -173,8 +173,10 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   val exampleConnection: AkkaConnection = LocationServiceExampleComponent.connection
 
   //#log-info-map
-  log.info(s"Attempting to find $exampleConnection",
-           Map(Keys.OBS_ID → "foo_obs_id", "exampleConnection" → exampleConnection.name))
+  log.info(
+    s"Attempting to find $exampleConnection",
+    Map(Keys.OBS_ID → "foo_obs_id", "exampleConnection" → exampleConnection.name)
+  )
   //#log-info-map
   val findResult: Option[AkkaLocation] = Await.result(locationService.find(exampleConnection), timeout)
 

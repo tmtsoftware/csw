@@ -110,7 +110,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
 
     val atomicInt    = new AtomicInteger(0)
     val startTime    = UTCTime.now()
-    val offset: Long = 100l // milliseconds
+    val offset: Long = 100L // milliseconds
     val cancellable: Cancellable = timeService.schedulePeriodically(Duration.ofMillis(offset)) {
       buffer += atomicInt.getAndIncrement()
       testProbe.ref ! UTCTime.now()
@@ -142,7 +142,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
 
     val atomicInt    = new AtomicInteger(0)
     val startTime    = UTCTime(UTCTime.now().value.plusSeconds(1L))
-    val offset: Long = 100l // milliseconds
+    val offset: Long = 100L // milliseconds
     val cancellable: Cancellable = timeService.schedulePeriodically(startTime, Duration.ofMillis(offset)) {
       buffer += atomicInt.getAndIncrement()
       testProbe.ref ! UTCTime.now()

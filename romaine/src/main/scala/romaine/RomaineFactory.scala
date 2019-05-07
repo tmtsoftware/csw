@@ -33,7 +33,7 @@ class RomaineFactory(redisClient: RedisClient)(implicit val ec: ExecutionContext
             redisClient.connectPubSubAsync(new RomaineRedisCodec[K, V], redisURI).toScala
           }
           await(connectionF).reactive()
-      }
+        }
     )
 
   private def init[T](conn: () ⇒ Future[T]): Future[T] = Future.unit.flatMap(_ => conn()).recover {

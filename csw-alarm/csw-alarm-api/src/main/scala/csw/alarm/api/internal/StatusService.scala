@@ -66,7 +66,9 @@ private[alarm] trait StatusService {
   private[alarm] def setStatus(statusMap: Map[AlarmKey, AlarmStatus]): Future[Done]
   private[alarm] def clearAllStatus(): Future[Done]
 
-  private[alarm] def updateStatusForSeverity(key: AlarmKey,
-                                             currentSeverity: FullAlarmSeverity,
-                                             newSeverity: FullAlarmSeverity): Future[Done]
+  private[alarm] def updateStatusForSeverity(
+      key: AlarmKey,
+      currentSeverity: FullAlarmSeverity,
+      newSeverity: FullAlarmSeverity
+  ): Future[Done]
 }

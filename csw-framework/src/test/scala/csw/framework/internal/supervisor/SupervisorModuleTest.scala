@@ -45,7 +45,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   val testData = Table(
     "componentInfo",
     hcdInfo,
-    jHcdInfo,
+    jHcdInfo
   )
 
   test("onInitialized and onRun hooks of comp handlers should be invoked when supervisor creates comp") {

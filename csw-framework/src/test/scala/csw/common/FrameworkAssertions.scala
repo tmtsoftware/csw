@@ -97,7 +97,7 @@ object FrameworkAssertions extends Matchers with Eventually {
 
   def assertThatExceptionIsNotLogged(
       logBuffer: mutable.Buffer[JsObject],
-      message: String,
+      message: String
   ): Unit = {
     val maybeLogMsg = findLogMessageSubString(logBuffer, message)
     assert(maybeLogMsg.isEmpty, s"$message found in $logBuffer")
