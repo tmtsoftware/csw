@@ -31,7 +31,9 @@ private[event] class RateAdapterStage[A](delay: FiniteDuration) extends GraphSta
       override def onPush(): Unit = {
         val ele = grab(in)
         maybeElem = Some(ele)
-        if (firstTick) { push(out, ele); firstTick = false }
+        if (firstTick) {
+          push(out, ele); firstTick = false
+        }
         pull(in) //drop
       }
     })

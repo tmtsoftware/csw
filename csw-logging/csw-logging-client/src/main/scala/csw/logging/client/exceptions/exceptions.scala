@@ -17,5 +17,5 @@ case class AppenderNotFoundException(appender: String)
 case class BaseLogPathNotDefined(basePathHolder: String)
     extends RuntimeException(
       s"Base log path is not defined as environment variable. " +
-      s"Please set <$basePathHolder> to define base path to store log files from tmt applications."
+        s"Please set <$basePathHolder> to define base path to store log files from tmt applications."
     )

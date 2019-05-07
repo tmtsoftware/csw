@@ -29,7 +29,7 @@ class PolicyExpressionTest extends FunSuite with MockitoSugar with Directives wi
     TestCase(true, Or, true, true),
     TestCase(true, Or, false, true),
     TestCase(false, Or, true, true),
-    TestCase(false, Or, false, false),
+    TestCase(false, Or, false, false)
   )
 
   testCases.foreach(testCase => {

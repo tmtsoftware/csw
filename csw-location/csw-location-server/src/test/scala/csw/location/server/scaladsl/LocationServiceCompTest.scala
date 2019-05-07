@@ -371,8 +371,10 @@ class LocationServiceCompTest(mode: String)
     val assemblyHttpConnection = HttpConnection(ComponentId("assembly1", ComponentType.Assembly))
     locationService.register(HttpRegistration(assemblyHttpConnection, 1234, "path123")).await
 
-    locationService.list(ConnectionType.TcpType).await.map(_.connection).toSet shouldBe Set(redisTcpConnection,
-                                                                                            configTcpConnection)
+    locationService.list(ConnectionType.TcpType).await.map(_.connection).toSet shouldBe Set(
+      redisTcpConnection,
+      configTcpConnection
+    )
 
     val httpConnections = locationService.list(ConnectionType.HttpType).await
     httpConnections.map(_.connection).toSet shouldBe Set(assemblyHttpConnection)
@@ -396,9 +398,11 @@ class LocationServiceCompTest(mode: String)
 
     locationService.register(AkkaRegistration(akkaConnection, prefix, actorRef)).await
 
-    locationService.list(Networks().hostname).await.map(_.connection).toSet shouldBe Set(tcpConnection,
-                                                                                         httpConnection,
-                                                                                         akkaConnection)
+    locationService.list(Networks().hostname).await.map(_.connection).toSet shouldBe Set(
+      tcpConnection,
+      httpConnection,
+      akkaConnection
+    )
 
     locationService.list("Invalid_hostname").await shouldBe List.empty
   }
@@ -419,9 +423,11 @@ class LocationServiceCompTest(mode: String)
       .await
     locationService.register(AkkaRegistration(akkaConnection3, Prefix("nfiraos.ncc.tromboneHcd3"), actorRef3)).await
 
-    locationService.listByPrefix("nfiraos.ncc.trombone").await.map(_.connection).toSet shouldBe Set(akkaConnection1,
-                                                                                                    akkaConnection2,
-                                                                                                    akkaConnection3)
+    locationService.listByPrefix("nfiraos.ncc.trombone").await.map(_.connection).toSet shouldBe Set(
+      akkaConnection1,
+      akkaConnection2,
+      akkaConnection3
+    )
   }
 
   test("should able to unregister all components") {

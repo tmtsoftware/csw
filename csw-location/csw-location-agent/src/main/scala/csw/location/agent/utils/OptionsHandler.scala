@@ -10,14 +10,20 @@ import csw.network.utils.SocketUtils
 final case class OptionsHandler(options: Options, appConfig: Option[Config]) {
 
   def stringOpt(entry: String, arg: Option[String] = None): Option[String] = {
-    val value = if (arg.isDefined) { arg } else {
+    val value = if (arg.isDefined) {
+      arg
+    } else {
       appConfig.flatMap { c =>
         // XXX: Using only first name here
         val path = s"${options.names.head}.$entry"
         if (c.hasPath(path)) Some(c.getString(path)) else None
       }
     }
-    if (value.isDefined) { value } else { None }
+    if (value.isDefined) {
+      value
+    } else {
+      None
+    }
   }
 
   private def intOpt(str: String, arg: Option[Int]): Option[Int] =

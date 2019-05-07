@@ -36,9 +36,11 @@ private[event] class JEventPublisher(eventPublisher: EventPublisher) extends IEv
   override def publish(eventGenerator: Supplier[Optional[Event]], startTime: TMTTime, every: Duration): Cancellable =
     eventPublisher.publish(eventGenerator.get().asScala, startTime, every.toScala)
 
-  override def publish(eventGenerator: Supplier[Optional[Event]],
-                       every: Duration,
-                       onError: Consumer[PublishFailure]): Cancellable =
+  override def publish(
+      eventGenerator: Supplier[Optional[Event]],
+      every: Duration,
+      onError: Consumer[PublishFailure]
+  ): Cancellable =
     eventPublisher.publish(eventGenerator.get().asScala, every.toScala, onError.asScala)
 
   override def publish(
@@ -59,9 +61,11 @@ private[event] class JEventPublisher(eventPublisher: EventPublisher) extends IEv
   ): Cancellable =
     eventPublisher.publishAsync(eventGenerator.get().thenApply[Option[Event]](_.asScala).toScala, startTime, every.toScala)
 
-  override def publishAsync(eventGenerator: Supplier[CompletableFuture[Optional[Event]]],
-                            every: Duration,
-                            onError: Consumer[PublishFailure]): Cancellable =
+  override def publishAsync(
+      eventGenerator: Supplier[CompletableFuture[Optional[Event]]],
+      every: Duration,
+      onError: Consumer[PublishFailure]
+  ): Cancellable =
     eventPublisher.publishAsync(eventGenerator.get().thenApply[Option[Event]](_.asScala).toScala, every.toScala, onError.asScala)
 
   override def publishAsync(
@@ -70,10 +74,12 @@ private[event] class JEventPublisher(eventPublisher: EventPublisher) extends IEv
       every: Duration,
       onError: Consumer[PublishFailure]
   ): Cancellable =
-    eventPublisher.publishAsync(eventGenerator.get().thenApply[Option[Event]](_.asScala).toScala,
-                                startTime,
-                                every.toScala,
-                                onError.asScala)
+    eventPublisher.publishAsync(
+      eventGenerator.get().thenApply[Option[Event]](_.asScala).toScala,
+      startTime,
+      every.toScala,
+      onError.asScala
+    )
 
   override def shutdown(): CompletableFuture[Done] = eventPublisher.shutdown().toJava.toCompletableFuture
 

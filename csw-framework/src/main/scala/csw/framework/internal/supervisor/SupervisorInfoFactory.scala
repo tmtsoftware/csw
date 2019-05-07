@@ -45,8 +45,10 @@ private[framework] class SupervisorInfoFactory(containerName: String) {
     } recoverWith {
       case NonFatal(exception) ⇒
         async {
-          log.error(s"Exception :[${exception.getMessage}] occurred while spawning supervisor: [${componentInfo.name}]",
-                    ex = exception)
+          log.error(
+            s"Exception :[${exception.getMessage}] occurred while spawning supervisor: [${componentInfo.name}]",
+            ex = exception
+          )
           await(system.terminate())
           None
         }

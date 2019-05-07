@@ -26,7 +26,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
     val dbFactory = new DatabaseServiceFactory(ctx.system)
 
     dbFactory
-      .makeDsl(locationService, "postgres") // postgres is dbName
+      .makeDsl(locationService, "postgres")        // postgres is dbName
       .foreach((dsl: DSLContext) ⇒ this.dsl = dsl) // save returned dsl to a local variable
     //#dbFactory-access
 

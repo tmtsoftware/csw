@@ -37,10 +37,11 @@ sealed trait AuthorizationPolicy {
  */
 object AuthorizationPolicy {
 
-  private[aas] final case class PolicyExpression(left: AuthorizationPolicy,
-                                                 operator: ExpressionOperator,
-                                                 right: AuthorizationPolicy)
-      extends AuthorizationPolicy
+  private[aas] final case class PolicyExpression(
+      left: AuthorizationPolicy,
+      operator: ExpressionOperator,
+      right: AuthorizationPolicy
+  ) extends AuthorizationPolicy
 
   private[aas] object PolicyExpression {
     trait ExpressionOperator
