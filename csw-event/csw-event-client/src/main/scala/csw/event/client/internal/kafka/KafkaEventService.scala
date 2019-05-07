@@ -20,7 +20,7 @@ import scala.concurrent.{ExecutionContext, Future}
  * @param mat the materializer to be used for materializing underlying streams
  */
 private[event] class KafkaEventService(eventServiceResolver: EventServiceResolver)(
-    implicit actorSystem: ActorSystem,
+    implicit actorSystem: ActorSystem[_],
     mat: Materializer
 ) extends EventService {
 

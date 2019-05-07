@@ -99,7 +99,6 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
     Props.empty.withDispatcherFromConfig("logging-dispatcher")
   )
 
-  printf(logActor.toString)
   LoggingState.maybeLogActor = Some(logActor)
 
   private[logging] val gcLogger: Option[GcLogger] =

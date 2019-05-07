@@ -13,7 +13,7 @@ import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.http.scaladsl.unmarshalling.sse.EventStreamUnmarshalling._
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{KillSwitch, KillSwitches, Materializer}
-import akka.{actor, Done, NotUsed}
+import akka.{Done, NotUsed, actor}
 import csw.location.api.exceptions.{OtherLocationIsRegistered, RegistrationFailed}
 import csw.location.api.formats.LocationJsonSupport
 import csw.location.api.models.{Registration, RegistrationResult, _}
@@ -26,7 +26,7 @@ import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
 private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
-    implicit val actorSystem: ActorSystem,
+    implicit val actorSystem: ActorSystem[_],
     mat: Materializer
 ) extends LocationService
     with PlayJsonSupport

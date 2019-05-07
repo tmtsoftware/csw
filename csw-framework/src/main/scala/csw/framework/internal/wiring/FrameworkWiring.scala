@@ -78,9 +78,11 @@ object FrameworkWiring {
     override lazy val locationService: LocationService        = _locationService
   }
 
-  def make(_actorSystem: ActorSystem[SpawnProtocol],
-           _locationService: LocationService,
-           _redisClient: RedisClient): FrameworkWiring =
+  def make(
+      _actorSystem: ActorSystem[SpawnProtocol],
+      _locationService: LocationService,
+      _redisClient: RedisClient
+  ): FrameworkWiring =
     new FrameworkWiring {
       override lazy val actorSystem: ActorSystem[SpawnProtocol] = _actorSystem
       override lazy val locationService: LocationService        = _locationService

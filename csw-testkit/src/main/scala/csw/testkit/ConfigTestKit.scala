@@ -33,10 +33,11 @@ import scala.concurrent.ExecutionContextExecutor
  * }}}
  *
  */
-final class ConfigTestKit private (system: ActorSystem[SpawnProtocol],
-                                   serverConfig: Option[Config],
-                                   testKitSettings: TestKitSettings)
-    extends MockedAuthentication {
+final class ConfigTestKit private (
+    system: ActorSystem[SpawnProtocol],
+    serverConfig: Option[Config],
+    testKitSettings: TestKitSettings
+) extends MockedAuthentication {
 
   implicit lazy val actorSystem: ActorSystem[SpawnProtocol] = system
   private[csw] lazy val configWiring: ServerWiring = (serverConfig, testKitSettings.ConfigPort) match {

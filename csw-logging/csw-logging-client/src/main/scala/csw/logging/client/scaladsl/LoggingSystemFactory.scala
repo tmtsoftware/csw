@@ -14,10 +14,12 @@ object LoggingSystemFactory {
    * @return the instance of LoggingSystem
    */
   private[logging] def start(): LoggingSystem =
-    new LoggingSystem("foo-name",
-                      "foo-version",
-                      InetAddress.getLocalHost.getHostName,
-                      ActorSystem(SpawnProtocol.behavior, "logging"))
+    new LoggingSystem(
+      "foo-name",
+      "foo-version",
+      InetAddress.getLocalHost.getHostName,
+      ActorSystem(SpawnProtocol.behavior, "logging")
+    )
 
   /**
    * The factory used to create the LoggingSystem. `LoggingSystem` should be started once in an app.
