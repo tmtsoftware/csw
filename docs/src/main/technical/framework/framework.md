@@ -1,5 +1,35 @@
 # Framework
 
+## Introduction
+
+The common software framework is a library that provides set of APIs used for:
+- creation of components(Assemblies, HCDs) 
+- discovering other components
+- sending messages/commands to other components
+- receiving responses from components
+- deploying component in container or standalone mode 
+
+The CSW framework is implemented using [Akka typed actors](https://doc.akka.io/docs/akka/current/typed/index.html).
+  
+## Creation of component
+
+A component consists of couple of actors and classes created by framework on behalf of the component and some actors/classes that are expected to
+be created by component writers using the csw framework.
+
+### Framework actors/classes
+
+The csw framework creates a `Supervisor` actor as the first thing while creating any component. The Supervisor goes on to create `Top Level Actor`,
+`Pub-Sub Manager` actor and `Command Response Manager` actor.
+
+![anatomy](anatomy.gif)
+
+To know more about the responsibility of Supervisor and Top level actor please refer this @ref:[section](../../commons/create-component.md#anatomy-of-component).
+
+
+
+
+
+
 The *CSW Framework* provides the APIs used to talk to components,
 such as HCDs and assemblies.
 The framework, which is based on Akka [typed actors](https://doc.akka.io/docs/akka/current/typed/index.html), creates an actor for each component, along with a 
