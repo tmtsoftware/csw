@@ -10,6 +10,7 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.location.server.commons.CswCluster
 import csw.location.server.internal.{LocationServiceFactory, ServerWiring}
+import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.params.core.models.Prefix
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
@@ -34,7 +35,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
 
     runOn(member1) {
       locationService
-        .register(AkkaRegistration(akkaConnection, Prefix("nfiraos.ncc.trombone"), system.spawnAnonymous(Behavior.empty)))
+        .register(AkkaRegistration(akkaConnection, Prefix("nfiraos.ncc.trombone"), typedSystem.spawn(Behavior.empty, "empty")))
         .await
 
       enterBarrier("location-registered")
@@ -42,7 +43,8 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
 
       Await.result(system.whenTerminated, 10.seconds)
 
-      val newSystem      = startNewSystem()
+      startNewSystem()
+      val newSystem      = makeSystem(config.settings.joinLocal(3552).config)
       val newTypedSystem = newSystem.toTyped.asInstanceOf[ActorSystem[SpawnProtocol]]
 
       val freshLocationService = mode match {
@@ -61,7 +63,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
           AkkaRegistration(
             akkaConnection,
             Prefix("nfiraos.ncc.trombone"),
-            newSystem.spawnAnonymous(Behavior.empty)
+            newTypedSystem.spawn(Behavior.empty, "empty")
           )
         )
         .await

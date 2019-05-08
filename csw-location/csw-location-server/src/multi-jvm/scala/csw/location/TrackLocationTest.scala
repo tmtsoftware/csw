@@ -2,11 +2,11 @@ package csw.location
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.Behavior
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.scaladsl.{Keep, Sink}
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.api.models._
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
+import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.params.core.models.Prefix
 
 class TrackLocationTestMultiJvmNode1 extends TrackLocationTest(0, "cluster")
@@ -31,7 +31,7 @@ class TrackLocationTest(ignore: Int, mode: String) extends LSNodeSpec(config = n
     val prefix = Prefix("nfiraos.ncc.trombone")
 
     runOn(seed) {
-      val actorRef = cswCluster.untypedSystem.spawn(Behavior.empty, "trombone-hcd")
+      val actorRef = cswCluster.typedSystem.spawn(Behavior.empty, "trombone-hcd")
       locationService.register(AkkaRegistration(akkaConnection, prefix, actorRef)).await
       enterBarrier("Registration")
 

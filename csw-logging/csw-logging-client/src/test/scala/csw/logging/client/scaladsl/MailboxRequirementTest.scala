@@ -18,8 +18,8 @@ import scala.concurrent.duration.DurationLong
 
 class MailboxRequirementTest extends FunSuite with Matchers with BeforeAndAfterEach {
 
-  private val defaultCapacity = 10
-  private val zeroCapacity    = 0
+  private val defaultCapacity = 8
+  private val oneCapacity     = 1
 
   def configWithCapacity(capacity: Int): Config =
     ConfigFactory
@@ -34,10 +34,6 @@ class MailboxRequirementTest extends FunSuite with Matchers with BeforeAndAfterE
   override def afterEach(): Unit = logBuffer.clear()
 
   def sendMessagesToActor(irisActorRef: ActorRef[IRISLogMessages]): Unit = {
-    irisActorRef ! LogTrace
-    irisActorRef ! LogDebug
-    irisActorRef ! LogInfo
-    irisActorRef ! LogWarn
     irisActorRef ! LogError
     irisActorRef ! LogError
     irisActorRef ! LogError
@@ -67,8 +63,8 @@ class MailboxRequirementTest extends FunSuite with Matchers with BeforeAndAfterE
   }
 
   // This shows that log actor is configured with the given capacity for Mailbox and it's a bounded Mailbox
-  test("should get no messages if mailbox capacity is zero") {
-    val actorSystem        = typed.ActorSystem(SpawnProtocol.behavior, "test", configWithCapacity(capacity = zeroCapacity))
+  test("should get less than eight messages if mailbox capacity is one") {
+    val actorSystem        = typed.ActorSystem(SpawnProtocol.behavior, "test", configWithCapacity(capacity = oneCapacity))
     lazy val loggingSystem = new LoggingSystem("logging", "version", hostName, actorSystem)
 
     loggingSystem.setAppenders(List(testAppender))
@@ -78,7 +74,8 @@ class MailboxRequirementTest extends FunSuite with Matchers with BeforeAndAfterE
 
     sendMessagesToActor(irisActorRef)
 
-    logBuffer.size shouldEqual 0
+    logBuffer.foreach(println)
+    logBuffer.size < 8 shouldBe true
 
     actorSystem.terminate
     Await.result(actorSystem.whenTerminated, 5.seconds)

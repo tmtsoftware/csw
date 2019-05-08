@@ -1,6 +1,8 @@
 package csw.location.helpers
 
 import akka.actor
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.remote.testconductor.RoleName
 import akka.remote.testkit.MultiNodeConfig
 import com.typesafe.config.{Config, ConfigFactory}
@@ -14,8 +16,7 @@ class NMembersAndSeed(n: Int) extends MultiNodeConfig {
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
-//  def makeSystem(config: Config): actor.ActorSystem = ActorSystem(SpawnProtocol.behavior, settings.clusterName, config).toUntyped
-  def makeSystem(config: Config): actor.ActorSystem = actor.ActorSystem(settings.clusterName, config)
+  def makeSystem(config: Config): actor.ActorSystem = ActorSystem(SpawnProtocol.behavior, settings.clusterName, config).toUntyped
 
   val seed: RoleName = addRole("seed")(settings.onPort(3552))
 

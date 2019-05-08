@@ -15,7 +15,6 @@ import csw.location.client.extensions.LocationServiceExt.RichLocationService
  */
 abstract class JComponentBehaviorFactory extends ComponentBehaviorFactory() {
 
-  //TODO
   protected def handlers(ctx: scaladsl.ActorContext[TopLevelActorMessage], cswCtx: CswContext): ComponentHandlers = {
     import cswCtx._
     import ctx.executionContext
