@@ -43,6 +43,7 @@ case class ObsId3(obsId: String) {
   val isValid          = s.length >= 4
   val hasFile          = s.length == 5
 
+
   def semester: String    = if (isValid) s(0) else ""
   def year: String        = if (isValid) semester.substring(0, 4) else ""
   def whichSemester: Char = if (isValid) semester.last else ' '
@@ -51,6 +52,14 @@ case class ObsId3(obsId: String) {
   def observation: String = if (isValid) s(3) else ""
   def file: String        = if (hasFile) s(4) else ""
   def detector: Char      = if (hasFile) file.head else ' '
+
+  private def validPrint():String = {
+    if (isValid) {
+      s"$year$whichSemester-$programType-$program-$observation${if(hasFile) s"-$file"}"
+    } else obsId
+  }
+
+  override def toString = if(!isValid) obsId else validPrint
 }
 
 object ObsID2 {

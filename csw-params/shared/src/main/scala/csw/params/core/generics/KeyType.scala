@@ -1,7 +1,7 @@
 package csw.params.core.generics
 
 import csw.params.core.formats.JsonSupport
-import csw.params.core.models.Coords.EqCoord
+import csw.params.core.models.Coords.{Coord, EqCoord, MinorPlanetCoord, SolarSystemCoord}
 import csw.params.core.models.Units.second
 import csw.params.core.models.{Units, _}
 import csw.time.core.models.{TAITime, UTCTime}
@@ -93,6 +93,10 @@ object KeyType extends Enum[KeyType[_]] with PlayJsonEnum[KeyType[_]] {
 
   // New Coordinate Keys
   case object EqCoordKey extends SimpleKeyType[EqCoord]
+  case object SolarSystemCoordKey extends SimpleKeyType[SolarSystemCoord]
+  case object MinorPlanetCoordKey extends SimpleKeyType[MinorPlanetCoord]
+  case object CometCoordKey extends SimpleKeyType[MinorPlanetCoord]
+  case object CoordKey extends SimpleKeyType[Coord]
 
   //scala
   case object BooleanKey extends SimpleKeyType[Boolean]

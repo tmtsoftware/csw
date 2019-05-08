@@ -36,8 +36,17 @@ class ObsId2Tests extends FunSpec with Matchers {
       oid.file shouldBe "I0234"
       oid.detector shouldBe 'I'
     }
+
+    it("Shouldn't be a fail with a string") {
+      val oid = ObsId3("notvalid")
+      println("Oid: " + oid)
+
+      println(ObsId3("2022A-Q-P012-O123-A"))
+      println(ObsId3("2022A-Q-P012-O123-A001"))
+    }
+
     it("Should obsId fail with det and no file") {
-      ObsID2.create("2022A-Q-P012-O123-A") shouldBe ObsID2.BAD_OBSID
+      ObsId3("2022A-Q-P012-O123-A") shouldBe ObsID2.BAD_OBSID
     }
 
     it("Should create obsId with det and file") {
