@@ -14,7 +14,7 @@ class CoordsTests extends FunSpec with Matchers {
 
   private val src = Prefix("esw.ocs.seq")
 
-  describe("Basic Coordinate Tests") {
+  describe("Basic Eq Coordinate Tests") {
 
     def raToUas(h: Long, m: Long, s: Double): Long =
       h * 15L * 60L * 60L * 1000L * 1000L + m * 15L * 60L * 1000L * 1000L + (s * 1000).toLong * 15L * 1000L
@@ -27,6 +27,41 @@ class CoordsTests extends FunSpec with Matchers {
       val c1 = EqCoord("12:32:01.689", "+44:01:05.12") // Note special multiply to accomodate fraction
       c1.ra.uas shouldEqual raToUas(12L, 32L, 1.689)
       c1.dec.uas shouldEqual decToUas(44L, 1L, 5.12)
+    }
+
+    it("should allow creating with degrees - check ra dec") {
+      // Degrees
+      val c1 = EqCoord(185.0.degree, 32.0.degree)
+      Angle(185 * Angle.D2Uas) shouldEqual c1.ra
+      Angle(32 * Angle.D2Uas) shouldEqual c1.dec
+
+      // HMS/Deg, check all values here
+      val c2 = EqCoord(18.arcHour, -35.degree, ICRS, tag = OIWFS1, pmy = 2.0, catalogName = "NGC1234")
+      c2.ra.toDegree shouldEqual 18 * Angle.H2D
+      c2.dec.toDegree shouldEqual -35
+      c2.tag shouldBe OIWFS1
+      c2.pm shouldEqual ProperMotion(0.0, 2.0)
+      c2.catalogName shouldBe "NGC1234"
+
+      // Strings
+      val c3 = EqCoord("12:13:14.15", "-30:31:32.3")
+      c3.ra.uas shouldEqual (12 * Angle.H2Uas + 13 * Angle.HMin2Uas + 14.15 * Angle.HSec2Uas)
+      c3.dec.uas shouldEqual -1 * (30 * Angle.D2Uas + 31 * Angle.M2Uas + 32.3 * Angle.S2Uas)
+
+      // Both as String
+      val c4 = EqCoord.asBoth("10:12:45.3-45:17:50", FK5)
+      c4.ra.uas shouldEqual (10 * Angle.H2Uas + 12 * Angle.HMin2Uas + 45.3 * Angle.HSec2Uas)
+      c4.dec.uas shouldEqual -1 * (45 * Angle.D2Uas + 17 * Angle.M2Uas + 50 * Angle.S2Uas)
+    }
+
+    it ("check defaults") {
+      val c1 = EqCoord(18.arcHour, -1.degree)
+      c1.ra shouldEqual Angle(18 * Angle.H2Uas)
+      c1.dec shouldEqual Angle(-1 * Angle.D2Uas)
+      c1.catalogName shouldBe "none"
+      c1.tag shouldBe BASE
+      c1.frame shouldBe ICRS
+      c1.pm shouldEqual ProperMotion.DEFAULT_PROPERMOTION
     }
 
   }
@@ -95,7 +130,7 @@ class CoordsTests extends FunSpec with Matchers {
       println("Its: " + js2.as[Coord])
     }
 
-    it("should allow an EqCoord") {
+    it("should json an EqCoord") {
       // Check EqCoordinate
       val eq = EqCoord(ra = 180.0, frame = FK5, dec = 32.0, pmx = pm.pmx, pmy = pm.pmy)
 
@@ -123,21 +158,16 @@ class CoordsTests extends FunSpec with Matchers {
       val paramOut = Json.toJson(posParam)
       val paramIn  = paramOut.as[Parameter[EqCoord]]
 
-      println("ParamIn: " + paramIn)
+      println("Its: " + paramOut)
 
       val setup: Setup = Setup(src, CommandName("test"), None).add(posParam)
-
-      val setupOut = JsonSupport.writeSequenceCommand(setup)
-
-      println("sOut: " + setupOut)
-
-      val setupIn = JsonSupport.readSequenceCommand[Setup](setupOut)
-      println("SetupIN: " + setupIn)
+      val setupOut     = JsonSupport.writeSequenceCommand(setup)
+      val setupIn      = JsonSupport.readSequenceCommand[Setup](setupOut)
 
       setupIn shouldEqual setup
     }
 
-    it ("should allow as coord parameter") {
+    it("should allow as coord parameter") {
 
       // Check EqCoordinate
       val eq = EqCoord(ra = 180.0, frame = FK5, dec = 32.0, pmx = pm.pmx, pmy = pm.pmy)
@@ -147,183 +177,129 @@ class CoordsTests extends FunSpec with Matchers {
 
       val paramOut = Json.toJson(posParam)
       val paramIn  = paramOut.as[Parameter[Coord]]
-
-      println("ParamIn: " + paramIn)
+      paramIn shouldEqual posParam
 
       val setup: Setup = Setup(src, CommandName("test"), None).add(posParam)
 
       val setupOut = JsonSupport.writeSequenceCommand(setup)
-
-      println("sOut: " + setupOut)
-
-      val setupIn = JsonSupport.readSequenceCommand[Setup](setupOut)
-      println("SetupIN: " + setupIn)
+      val setupIn  = JsonSupport.readSequenceCommand[Setup](setupOut)
 
       setupIn shouldEqual setup
     }
-
   }
 
-  it("should allow creating with degrees - check ra dec") {
-    // Degrees
-    val c1 = EqCoord(185.0.degree, 32.0.degree)
-    Angle(185 * Angle.D2Uas) shouldEqual c1.ra
-    Angle(32 * Angle.D2Uas) shouldEqual c1.dec
-
-    // HMS/Deg, check all values here
-    val c2 = EqCoord(18.arcHour, -35.degree, ICRS, tag = OIWFS1, pmy = 2.0, catalogName = "NGC1234")
-    c2.ra.toDegree shouldEqual 18 * Angle.H2D
-    c2.dec.toDegree shouldEqual -35
-    c2.tag shouldBe OIWFS1
-    c2.pm shouldEqual ProperMotion(0.0, 2.0)
-    c2.catalogName shouldBe "NGC1234"
-
-    // Strings
-    val c3 = EqCoord("12:13:14.15", "-30:31:32.3")
-    c3.ra.uas shouldEqual (12 * Angle.H2Uas + 13 * Angle.HMin2Uas + 14.15 * Angle.HSec2Uas)
-    c3.dec.uas shouldEqual -1 * (30 * Angle.D2Uas + 31 * Angle.M2Uas + 32.3 * Angle.S2Uas)
-
-    // Both as String
-    val c4 = EqCoord.asBoth("10:12:45.3-45:17:50", FK5)
-    c4.ra.uas shouldEqual (10 * Angle.H2Uas + 12 * Angle.HMin2Uas + 45.3 * Angle.HSec2Uas)
-    c4.dec.uas shouldEqual -1 * (45 * Angle.D2Uas + 17 * Angle.M2Uas + 50 * Angle.S2Uas)
-  }
-
-  describe("Test defaults") {
-
-    it("check defaults") {
-      val c1 = EqCoord(18.arcHour, -1.degree)
-      c1.ra shouldEqual Angle(18 * Angle.H2Uas)
-      c1.dec shouldEqual Angle(-1 * Angle.D2Uas)
-      c1.catalogName shouldBe "none"
-      c1.tag shouldBe BASE
-      c1.frame shouldBe ICRS
-      c1.pm shouldEqual ProperMotion.DEFAULT_PROPERMOTION
-    }
-  }
-
-  describe("Setup as positions with all") {
+  describe("position alternatives") {
     val obsModeKey = StringKey.make("obsmode")
 
-    it("Create multiple positions in one parameter") {
-      // This example creates a key called positions with several positions.
-      // A simple search allows fetching a specific position
-      val eqKey    = EqCoordKey.make("positions")
-      val coordKey = CoordKey.make("positions2")
+    // Small functions to extract a specific tag
+    def findCoordTagInParameter(param: Parameter[Coord], tag: Tag): Option[Coord] = {
+      param.values.find(_.tag == tag)
+    }
 
-      val c0 = EqCoord("12:32:45", "+45:17:50", tag = BASE, frame = FK5, pmx = 0.9, pmy = -0.4)
-      val c1 = EqCoord(188.0070373.degree, 45.018088889.degree, tag = OIWFS1)
-      //val c2 = EqCoord("12:32:03.1", "45:15:02.22", tag = OIWFS2)
-      val c2 = SolarSystemCoord(tag = OIWFS2, Pluto)
+    def findTagInParameter(param: Parameter[EqCoord], tag: Tag): Option[EqCoord] = {
+      param.values.find(_.tag == tag)
+    }
 
-      val positions: Parameter[Coord] = coordKey.set(c0, c1, c2)
-      //val positions: Parameter[EqCoord] = eqKey.set(c0, c1, c2)
-
-      println("Positions: " + positions)
-
-      // Access second coordinate using param API
-      //val getc1 = positions.get(1)
-      //getc1 shouldEqual Some(c1)
-
-      // Small function to extract a specific position
-      def findTag(param: Parameter[Coord], tag: Tag): Option[Coord] = {
-        param.values.find(_.tag == tag)
+    // Small function to extract a specific position
+    def findTag(setup: Setup, tag: Tag): Option[EqCoord] = {
+      setup.get(EqCoordKey.make(tag.toString)) match {
+        case None => None
+        case Some(eqp) => eqp.get(0)
       }
-      findTag(positions, OIWFS1) shouldEqual Some(c1)
-
-      val obsMode = obsModeKey.set("IRIS LGS Mode 1")
-      val setup   = Setup(src, CommandName("slewAndFollow"), None).madd(obsMode, positions)
-
-      val j1 = JsonSupport.writeSequenceCommand(setup)
-
-      println("Setup: " + setup)
-
-      println("Setup Json: " + j1)
-
-      val s2 = JsonSupport.readSequenceCommand[Setup](j1)
-
-      println("S2: " + s2)
-
     }
 
     it("Create multiple positions in individual params with positions catalog") {
+      val obsModeKey = StringKey.make("obsmode")
 
       val c0 = EqCoord("12:32:45", "+45:17:50", tag = BASE, frame = FK5, pmx = 0.9, pmy = -0.4)
       val c1 = EqCoord("12:32:01.689", "45:01:05.12", tag = OIWFS1)
       val c2 = EqCoord("12:32:03.1", "45:15:02.22", tag = OIWFS2)
 
       val obsMode = obsModeKey.set("IRIS LGS Mode 1")
-      val setup = Setup(src, CommandName("slewAndFollow"), None).madd(obsMode,
-                                                                      EqCoordKey.make(c0.tag.toString).set(c0),
-                                                                      EqCoordKey.make(c1.tag.toString).set(c1),
-                                                                      EqCoordKey.make(c2.tag.toString).set(c2))
+      val setup = Setup(src, CommandName("slewAndFollow"), None).madd(
+        obsMode,
+        EqCoordKey.make(c0.tag.toString).set(c0),
+        EqCoordKey.make(c1.tag.toString).set(c1),
+        EqCoordKey.make(c2.tag.toString).set(c2)
+      )
       println("Setup: " + setup)
-
-      // Small function to extract a specific position
-      def findTag(setup: Setup, tag: Tag): Option[EqCoord] = {
-        setup.get(EqCoordKey.make(tag.toString)) match {
-          case None      => None
-          case Some(eqp) => eqp.get(0)
-        }
-      }
 
       // Access second coordinate using param API
       val getc1 = findTag(setup, OIWFS1)
       getc1 shouldEqual Some(c1)
     }
 
-    it("Should allow solar system coord") {
-      val c0 = SolarSystemCoord(BASE, Venus)
 
-      val js = Json.toJson(c0)
-      val c1 = js.as[SolarSystemCoord]
 
-      c0 shouldEqual c1
-    }
 
-    it("should allow alt az") {
-      val c0 = AltAzCoord(BASE, 301.degree, 42.5.degree)
+      it("Create multiple positions in one parameter") {
+        // This example creates a key called positions with several positions.
+        // A simple search allows fetching a specific position
+        val coordKey = CoordKey.make("positions2")
 
-      val js = Json.toJson(c0)
-      val c1 = js.as[AltAzCoord]
+        val c0 = EqCoord("12:32:45", "+45:17:50", tag = BASE, frame = FK5, pmx = 0.9, pmy = -0.4)
+        val c1 = EqCoord(188.0070373.degree, 45.018088889.degree, tag = OIWFS1)
+        //val c2 = EqCoord("12:32:03.1", "45:15:02.22", tag = OIWFS2)
+        val c2 = SolarSystemCoord(tag = OIWFS2, Pluto)
 
-      c0 shouldEqual c1
-    }
+        val positions: Parameter[Coord] = coordKey.set(c0, c1, c2)
+        //val positions: Parameter[EqCoord] = eqKey.set(c0, c1, c2)
+
+        println("Positions: " + positions)
+
+        // Access second coordinate using param API
+        //val getc1 = positions.get(1)
+        //getc1 shouldEqual Some(c1)
+
+        // Small function to extract a specific position
+        def findTag(param: Parameter[Coord], tag: Tag): Option[Coord] = {
+          param.values.find(_.tag == tag)
+        }
+
+        findTag(positions, OIWFS1) shouldEqual Some(c1)
+
+        val obsMode = obsModeKey.set("IRIS LGS Mode 1")
+        val setup = Setup(src, CommandName("slewAndFollow"), None).madd(obsMode, positions)
+
+        val j1 = JsonSupport.writeSequenceCommand(setup)
+
+        println("Setup: " + setup)
+
+        println("Setup Json: " + j1)
+
+        val s2 = JsonSupport.readSequenceCommand[Setup](j1)
+
+        println("S2: " + s2)
+
+      }
+
+
 
     it("Create multiple positions in individual params for each major type: base, oiwfs, guide") {
+      val obsModeKey = StringKey.make("obsmode")
 
-      val baseKey  = EqCoordKey.make("BasePosition")
+      val baseKey = EqCoordKey.make("BasePosition")
       val oiwfsKey = EqCoordKey.make("OIWFSPositions")
-      val guideKey = EqCoordKey.make("GuidePositions")
+      val odgwKey = EqCoordKey.make("ODGWPositions")
+      val guiderKey = EqCoordKey.make("GuiderPositions")
 
       val c0 = EqCoord("12:32:45", "+45:17:50", tag = BASE, frame = FK5, pmx = 0.9, pmy = -0.4)
       val c1 = EqCoord("12:32:01.689", "45:01:05.12", tag = OIWFS1)
       val c2 = EqCoord("12:32:03.1", "45:15:02.22", tag = OIWFS2)
       val c3 = EqCoord("12:33:03", "45:20:05", tag = GUIDER1)
       val c4 = EqCoord("12:32:03", "45:15:04", tag = GUIDER2)
+      val c5 = EqCoord("12:32:03.3+45:15:03", tag = ODGW1)
+      val c6 = EqCoord("12:32:00.1", "45:14:49.5", tag = ODGW2)
 
       val obsMode = obsModeKey.set("IRIS LGS Mode 1")
       val setup =
-        Setup(src, CommandName("slewAndFollow"), None).madd(obsMode, baseKey.set(c0), oiwfsKey.set(c1, c2), guideKey.set(c3, c4))
+        Setup(src, CommandName("slewAndFollow"), None).madd(obsMode,
+          baseKey.set(c0), oiwfsKey.set(c1, c2), guiderKey.set(c3, c4), odgwKey.set(c5, c6))
 
       println("Setup: " + setup)
-
-      // Small functions to extract a specific position
-      def findTag(param: Parameter[EqCoord], tag: Tag): Option[EqCoord] = {
-        param.values.find(_.tag == tag)
-      }
-
-      // Need one of these maybe for each tupe
-      def findOIWFS(setup: Setup, tag: Tag): Option[EqCoord] = {
-        setup.get(oiwfsKey) match {
-          case None      => None
-          case Some(eqp) => findTag(eqp, tag)
-        }
-      }
-
-      // Access second coordinate using param API
-      val getc1 = findOIWFS(setup, OIWFS1)
-      getc1 shouldEqual Some(c1)
+      // Small function to extract a specific position
     }
+
   }
+
 }
