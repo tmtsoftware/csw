@@ -10,15 +10,14 @@ for details.
 
 ###ID Token - 
 The ID Token is a JSON Web Token (JWT) that contains user profile information (such as the user's name and email) 
-which is represented in the form of claims. These claims are statements about the user, which can be trusted if the consumer of 
-the token can verify its signature.
+which is represented in the form of claims.
 
 ###Access Token - 
-An Access Token is a credential that can be used by an application to access an API. Access Tokens can be 
-is JSON web token digitally signed using JSON web signature (JWS). They inform the API that the bearer of the token has been 
-authorized to access the API and perform specific actions specified by the scope that has been granted.
-Access token contains all the information that ID token has. Additionally it has information related to realm and resource roles
-associated to user. This information is used for authorization based on clientRole and RealmRole policy.
+An Access Token is a credential that can be used by an application to access an API. Access Tokens is JSON web token digitally 
+signed using JSON web signature (JWS). They inform the API that the bearer of the token has been authorized to access the API and perform 
+specific actions specified by the scope that has been granted. Access token contains all the information that ID token has. 
+Additionally it has information related to realm and resource roles associated to user. This information is used for authorization 
+based on clientRole and RealmRole policy.
 
 ###Requesting Party Token - 
 A requesting party token (RPT) is a JSON web token (JWT) digitally signed using JSON web signature (JWS). 
@@ -31,18 +30,26 @@ authorization based on permission policy.
 
 When request comes to secure akka http server, it performs following steps.
 
-1. Authentication - 
+- Authentication 
 
-Authentication involves verifying and decoding token. Secure http endpoints expect access token to be provided in request header. 
-For verification it uses api provided by keycloak-adapter-core. For decoding we are using third party library.
+Authentication involves token verification and decoding. Secure http endpoints expect access token to be provided in request header. 
+For verification it uses api provided by keycloak-adapter-core. For decoding csw-aas-http uses third party library - [jwt-play-json](https://github.com/pauldijou/jwt-scala).
 If "enable-permissions" flag is enabled, it involves additional call to keycloak server for fetching RPT using access token provided
-in request header. RPT is then decoded using third party library. This completes authentication process. 
+in request header. RPT is then decoded using jwt-play-json. Authentication process verifies access token string and decode 
+it into `AccessToken` domain model. 
 
-2. Authorization -
+- Authorization
 
-Role based authorization involves checking access to secure api against roles information present in access token. Permission
-based authorization involves checking access to secure api against permissions present in RPT.
-
+Authorization involves applying specified `AuthorizationPolicy` against `AccessToken`. Foe example, role based authorization 
+involves checking access to secure api against roles information present in access token. Permission based authorization 
+involves checking access to secure api against permissions present in RPT.
+ 
 Following diagrams shows request flow for secure akka http server.
 
 ![aas-http-flow.png](akka-http-workflow.png) 
+
+## Asynchronous nature of Akka-HTTP Routing layer
+
+csw-aas-http uses `authenticateOAuth2Async` and `authorizeAsync` which are async variants of akka-http security directives. This allows 
+it to run without blocking routing layer of Akka HTTP, freeing it for other requests. Similarly to maintain asynchronous nature
+csw-aas-http also wraps blocking calls for keycloak adapter token verifier and call for fetching RPT from keycloak inside `Future`.
