@@ -1,28 +1,29 @@
 package csw.params.core.models
 import julienrf.json.derived
-import julienrf.json.derived.flat
-import play.api.libs.json.{Json, OFormat, __}
+import play.api.libs.json.{Json, OFormat}
 
 object Coords {
 
   /**
   * A tag is a label to indicate the use of the coordinate
-    * @param tag what is the role of this coordinate
+    * @param name what is the role of this coordinate
     */
-  case class Tag(tag: String) {
-    override def toString:String = tag.toString
+  case class Tag(name: String) {
+    override def toString:String = name
   }
-  val BASE   = Tag("base")
-  val OIWFS1 = Tag("oiwfs1")
-  val OIWFS2 = Tag("oiwfs2")
-  val OIWFS3 = Tag("oiwfs3")
-  val OIWFS4 = Tag("oiwfs4")
-  val ODGW1  = Tag("odgw1")
-  val ODGW2  = Tag("odgw2")
-  val ODGW3  = Tag("odgw3")
-  val ODGW4  = Tag("odgw4")
-  val GUIDER1 = Tag("quider1")
-  val GUIDER2 = Tag("quider2")
+  val BASE   = Tag("BASE")
+  val OIWFS1 = Tag("OIWFS1")
+  val OIWFS2 = Tag("OIWFS2")
+  val OIWFS3 = Tag("OIWFS3")
+  val OIWFS4 = Tag("OIWFS4")
+  val ODGW1  = Tag("ODGW1")
+  val ODGW2  = Tag("ODGW2")
+  val ODGW3  = Tag("ODGW3")
+  val ODGW4  = Tag("ODGW4")
+  val GUIDER1 = Tag("GUIDER1")
+  val GUIDER2 = Tag("GUIDER2")
+  val allTags = Set(BASE, OIWFS1, OIWFS2, OIWFS3, OIWFS4, ODGW1, ODGW2, ODGW3, ODGW4, GUIDER1, GUIDER2)
+  val allTagsNames = allTags.map(_.name)
 
   implicit val tagFormat: OFormat[Tag] = Json.format[Tag]
 

@@ -54,7 +54,7 @@ class CoordsTests extends FunSpec with Matchers {
       c4.dec.uas shouldEqual -1 * (45 * Angle.D2Uas + 17 * Angle.M2Uas + 50 * Angle.S2Uas)
     }
 
-    it ("check defaults") {
+    it("check defaults") {
       val c1 = EqCoord(18.arcHour, -1.degree)
       c1.ra shouldEqual Angle(18 * Angle.H2Uas)
       c1.dec shouldEqual Angle(-1 * Angle.D2Uas)
@@ -201,11 +201,19 @@ class CoordsTests extends FunSpec with Matchers {
     }
 
     // Small function to extract a specific position
-    def findTag(setup: Setup, tag: Tag): Option[EqCoord] = {
-      setup.get(EqCoordKey.make(tag.toString)) match {
-        case None => None
+    def findTag(setup: Setup, tag: Tag): Option[Coord] = {
+      setup.get(CoordKey.make(tag.name)) match {
+        case None      => None
         case Some(eqp) => eqp.get(0)
       }
+    }
+
+    def findAllTags(setup:Setup): Set[String] = {
+      val xx = allTags.map(fn => setup.get(CoordKey.make(fn.name)))
+println("XX: " + xx)
+      val yy = setup.paramSet.collect { case p: Parameter[_] if (allTagsNames.contains(p.keyName)) => p }
+      println("YY: " + yy)
+      allTags.flatMap(fn => setup.get(CoordKey.make(fn.name)).map(_.keyName))
     }
 
     it("Create multiple positions in individual params with positions catalog") {
@@ -218,69 +226,55 @@ class CoordsTests extends FunSpec with Matchers {
       val obsMode = obsModeKey.set("IRIS LGS Mode 1")
       val setup = Setup(src, CommandName("slewAndFollow"), None).madd(
         obsMode,
-        EqCoordKey.make(c0.tag.toString).set(c0),
-        EqCoordKey.make(c1.tag.toString).set(c1),
-        EqCoordKey.make(c2.tag.toString).set(c2)
+        CoordKey.make(c0.tag.name).set(c0),
+        CoordKey.make(c1.tag.name).set(c1),
+        CoordKey.make(c2.tag.name).set(c2)
       )
       println("Setup: " + setup)
+      println("All Tags: " + findAllTags(setup))
 
       // Access second coordinate using param API
       val getc1 = findTag(setup, OIWFS1)
       getc1 shouldEqual Some(c1)
+
     }
 
+    it("Create multiple positions in one parameter") {
+      // This example creates a key called positions with several positions.
+      // A simple search allows fetching a specific position
+      val coordKey = CoordKey.make("targets")
 
+      val c0 = EqCoord("12:32:45", "+45:17:50", tag = BASE, frame = FK5, pmx = 0.9, pmy = -0.4)
+      val c1 = EqCoord(188.0070373.degree, 45.018088889.degree, tag = OIWFS1)
+      val c2 = SolarSystemCoord(tag = OIWFS2, Pluto)
 
+      val positions: Parameter[Coord] = coordKey.set(c0, c1, c2)
 
-      it("Create multiple positions in one parameter") {
-        // This example creates a key called positions with several positions.
-        // A simple search allows fetching a specific position
-        val coordKey = CoordKey.make("positions2")
+      println("Positions: " + positions)
 
-        val c0 = EqCoord("12:32:45", "+45:17:50", tag = BASE, frame = FK5, pmx = 0.9, pmy = -0.4)
-        val c1 = EqCoord(188.0070373.degree, 45.018088889.degree, tag = OIWFS1)
-        //val c2 = EqCoord("12:32:03.1", "45:15:02.22", tag = OIWFS2)
-        val c2 = SolarSystemCoord(tag = OIWFS2, Pluto)
+      // Access second coordinate using param API
+      //val getc1 = positions.get(1)
+      //getc1 shouldEqual Some(c1)
 
-        val positions: Parameter[Coord] = coordKey.set(c0, c1, c2)
-        //val positions: Parameter[EqCoord] = eqKey.set(c0, c1, c2)
-
-        println("Positions: " + positions)
-
-        // Access second coordinate using param API
-        //val getc1 = positions.get(1)
-        //getc1 shouldEqual Some(c1)
-
-        // Small function to extract a specific position
-        def findTag(param: Parameter[Coord], tag: Tag): Option[Coord] = {
-          param.values.find(_.tag == tag)
-        }
-
-        findTag(positions, OIWFS1) shouldEqual Some(c1)
-
-        val obsMode = obsModeKey.set("IRIS LGS Mode 1")
-        val setup = Setup(src, CommandName("slewAndFollow"), None).madd(obsMode, positions)
-
-        val j1 = JsonSupport.writeSequenceCommand(setup)
-
-        println("Setup: " + setup)
-
-        println("Setup Json: " + j1)
-
-        val s2 = JsonSupport.readSequenceCommand[Setup](j1)
-
-        println("S2: " + s2)
-
+      // Small function to extract a specific position
+      def findtag(param: Parameter[Coord], tag: Tag): Option[Coord] = {
+        param.values.find(_.tag == tag)
       }
 
+      findTag(positions, OIWFS1) shouldEqual Some(c1)
 
+      val obsMode = obsModeKey.set("IRIS LGS Mode 1")
+      val setup   = Setup(src, CommandName("slewAndFollow"), None).madd(obsMode, positions)
+
+
+    }
 
     it("Create multiple positions in individual params for each major type: base, oiwfs, guide") {
       val obsModeKey = StringKey.make("obsmode")
 
-      val baseKey = EqCoordKey.make("BasePosition")
-      val oiwfsKey = EqCoordKey.make("OIWFSPositions")
-      val odgwKey = EqCoordKey.make("ODGWPositions")
+      val baseKey   = EqCoordKey.make("BasePosition")
+      val oiwfsKey  = EqCoordKey.make("OIWFSPositions")
+      val odgwKey   = EqCoordKey.make("ODGWPositions")
       val guiderKey = EqCoordKey.make("GuiderPositions")
 
       val c0 = EqCoord("12:32:45", "+45:17:50", tag = BASE, frame = FK5, pmx = 0.9, pmy = -0.4)
@@ -288,13 +282,18 @@ class CoordsTests extends FunSpec with Matchers {
       val c2 = EqCoord("12:32:03.1", "45:15:02.22", tag = OIWFS2)
       val c3 = EqCoord("12:33:03", "45:20:05", tag = GUIDER1)
       val c4 = EqCoord("12:32:03", "45:15:04", tag = GUIDER2)
-      val c5 = EqCoord("12:32:03.3+45:15:03", tag = ODGW1)
+      val c5 = EqCoord.asBoth("12:32:03.3 +45:15:03", tag = ODGW1)
       val c6 = EqCoord("12:32:00.1", "45:14:49.5", tag = ODGW2)
 
       val obsMode = obsModeKey.set("IRIS LGS Mode 1")
       val setup =
-        Setup(src, CommandName("slewAndFollow"), None).madd(obsMode,
-          baseKey.set(c0), oiwfsKey.set(c1, c2), guiderKey.set(c3, c4), odgwKey.set(c5, c6))
+        Setup(src, CommandName("slewAndFollow"), None).madd(
+          obsMode,
+          baseKey.set(c0),
+          oiwfsKey.set(c1, c2),
+          guiderKey.set(c3, c4),
+          odgwKey.set(c5, c6)
+        )
 
       println("Setup: " + setup)
       // Small function to extract a specific position
