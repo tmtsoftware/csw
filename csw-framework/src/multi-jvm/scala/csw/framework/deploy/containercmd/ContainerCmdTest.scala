@@ -39,6 +39,7 @@ import csw.params.core.states.{CurrentState, StateName}
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, ExecutionContextExecutor}
 import scala.io.Source
+import scala.util.control.NonFatal
 
 class ContainerCmdTestMultiJvm1 extends ContainerCmdTest(0)
 class ContainerCmdTestMultiJvm2 extends ContainerCmdTest(0)
@@ -72,7 +73,13 @@ class ContainerCmdTest(ignore: Int)
   }
 
   override def afterAll(): Unit = {
-    testFileUtils.deleteServerFiles()
+    runOn(seed) {
+      try {
+        testFileUtils.deleteServerFiles()
+      } catch {
+        case NonFatal(ex) ⇒ println(s"Exception in deleting server files - ${ex.printStackTrace()}")
+      }
+    }
     super.afterAll()
   }
 
