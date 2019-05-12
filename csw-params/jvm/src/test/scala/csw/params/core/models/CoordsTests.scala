@@ -191,22 +191,13 @@ class CoordsTests extends FunSpec with Matchers {
   describe("position alternatives") {
     val obsModeKey = StringKey.make("obsmode")
 
-    // Small functions to extract a specific tag
-    def findCoordTagInParameter(param: Parameter[Coord], tag: Tag): Option[Coord] = {
-      param.values.find(_.tag == tag)
-    }
+
 
     def findTagInParameter(param: Parameter[EqCoord], tag: Tag): Option[EqCoord] = {
       param.values.find(_.tag == tag)
     }
 
-    // Small function to extract a specific position
-    def findTag(setup: Setup, tag: Tag): Option[Coord] = {
-      setup.get(CoordKey.make(tag.name)) match {
-        case None      => None
-        case Some(eqp) => eqp.get(0)
-      }
-    }
+
 
     def findAllTags(setup:Setup): Set[String] = {
       val xx = allTags.map(fn => setup.get(CoordKey.make(fn.name)))
@@ -233,40 +224,52 @@ println("XX: " + xx)
       println("Setup: " + setup)
       println("All Tags: " + findAllTags(setup))
 
+      // Small function to extract a specific position
+      def findTag(setup: Setup, tag: Tag): Option[Coord] = {
+        setup.get(CoordKey.make(tag.name)) match {
+          case None      => None
+          case Some(eqp) => eqp.get(0)
+        }
+      }
+
       // Access second coordinate using param API
       val getc1 = findTag(setup, OIWFS1)
       getc1 shouldEqual Some(c1)
 
     }
 
-    it("Create multiple positions in one parameter") {
+    it ("Create multiple positions in one parameter") {
       // This example creates a key called positions with several positions.
-      // A simple search allows fetching a specific position
+      // Only one parameter needs to be located
+      // A simple search allows fetching a specific position by tag
       val coordKey = CoordKey.make("targets")
 
       val c0 = EqCoord("12:32:45", "+45:17:50", tag = BASE, frame = FK5, pmx = 0.9, pmy = -0.4)
       val c1 = EqCoord(188.0070373.degree, 45.018088889.degree, tag = OIWFS1)
       val c2 = SolarSystemCoord(tag = OIWFS2, Pluto)
 
-      val positions: Parameter[Coord] = coordKey.set(c0, c1, c2)
+      val targets: Parameter[Coord] = coordKey.set(c0, c1, c2)
 
-      println("Positions: " + positions)
+      println("Positions: " + targets)
 
       // Access second coordinate using param API
-      //val getc1 = positions.get(1)
-      //getc1 shouldEqual Some(c1)
+      val getc0 = targets.get(0)
+      getc0 shouldEqual Some(c0)
 
       // Small function to extract a specific position
-      def findtag(param: Parameter[Coord], tag: Tag): Option[Coord] = {
+      def findTag(param: Parameter[Coord], tag: Tag): Option[Coord] = {
         param.values.find(_.tag == tag)
       }
 
-      findTag(positions, OIWFS1) shouldEqual Some(c1)
+      findTag(targets, OIWFS1) shouldEqual Some(c1)
+      findTag(targets, BASE) shouldEqual Some(c0)
 
       val obsMode = obsModeKey.set("IRIS LGS Mode 1")
-      val setup   = Setup(src, CommandName("slewAndFollow"), None).madd(obsMode, positions)
+      val setup   = Setup(src, CommandName("slewAndFollow"), None).madd(obsMode, targets)
 
-
+      val setupTargets = setup.get(coordKey).get
+      findTag(setupTargets, OIWFS2) shouldEqual Some(c2)
+      findTag(setupTargets, BASE) shouldEqual Some(c0)
     }
 
     it("Create multiple positions in individual params for each major type: base, oiwfs, guide") {
