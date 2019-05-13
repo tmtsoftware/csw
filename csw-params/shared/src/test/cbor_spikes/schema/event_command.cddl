@@ -1,0 +1,152 @@
+root = event / command
+
+event = {
+    event-type => event-struct
+}
+
+event-type = "SystemEvent" / "ObserveEvent"
+
+event-struct = {
+    eventId: tstr
+    source: tstr
+    eventName: tstr
+    eventTime: timestamp
+    paramSet: [* parameter]
+}
+
+
+command = {
+    command-type => command-struct
+}
+
+command-type = "Setup" / "Observe" / "Wait"
+
+command-struct = {
+    runId: tstr
+    source: tstr
+    commandName: tstr
+    maybeObsId: [? tstr]
+    paramSet: [* parameter]
+}
+
+
+parameter = {
+    keyName: tstr
+    keyType: keytype-choices
+    items: items-type
+    units: unit-choices
+}
+
+struct = {
+    paramSet: [* parameter]
+}
+
+timestamp = {
+    seconds: int
+    nanos: int
+}
+
+radec = {
+    ra: float64
+    dec: float64
+}
+
+items-type = [* radec ] /
+             [* tstr ] /
+             [* struct ] /
+             [* timestamp ] /
+             [* bool ] /
+             bstr /
+             [* int ] /
+             [* float32 ] /
+             [* float64 ] /
+
+             [* bstr ] /
+             [* [* int ] ] /
+             [* [* float32 ] ] /
+             [* [* float64 ] ] /
+
+             [* [* bstr ] ] /
+             [* [* [* int ] ] ] /
+             [* [* [* float32 ] ] ] /
+             [* [* [* float64 ] ] ]
+
+
+
+unit-choices = "angstrom" /
+                "arcmin" /
+                "arcsec" /
+                "day" /
+                "degree" /
+                "elvolt" /
+                "gram" /
+                "hour" /
+                "hertz" /
+                "joule" /
+                "kelvin" /
+                "kilogram" /
+                "kilometer" /
+                "liter" /
+                "meter" /
+                "marcsec" /
+                "millimeter" /
+                "millisecond" /
+                "micron" /
+                "micrometer" /
+                "minute" /
+                "newton" /
+                "pascal" /
+                "radian" /
+                "second" /
+                "sday" /
+                "steradian" /
+                "microarcsec" /
+                "volt" /
+                "watt" /
+                "week" /
+                "year" /
+                "coulomb" /
+                "centimeter" /
+                "erg" /
+                "au" /
+                "jansky" /
+                "lightyear" /
+                "mag" /
+                "cal" /
+                "foot" /
+                "inch" /
+                "pound" /
+                "mile" /
+                "ounce" /
+                "yard" /
+                "NoUnits" /
+                "encoder" /
+                "count" /
+                "pix"
+
+keytype-choices = "ChoiceKey" /
+                  "RaDecKey" /
+                  "StringKey" /
+                  "StructKey" /
+                  "UTCTimeKey" /
+                  "TAITimeKey" /
+                  "BooleanKey" /
+                  "CharKey" /
+                  "ByteKey" /
+                  "ShortKey" /
+                  "LongKey" /
+                  "IntKey" /
+                  "FloatKey" /
+                  "DoubleKey" /
+                  "ByteArrayKey" /
+                  "ShortArrayKey" /
+                  "LongArrayKey" /
+                  "IntArrayKey" /
+                  "FloatArrayKey" /
+                  "DoubleArrayKey" /
+                  "ByteMatrixKey" /
+                  "ShortMatrixKey" /
+                  "LongMatrixKey" /
+                  "IntMatrixKey" /
+                  "FloatMatrixKey" /
+                  "DoubleMatrixKey"

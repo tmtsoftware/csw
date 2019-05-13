@@ -59,7 +59,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
   //DEOPSCSW-659: Investigate initial latency in event service pub sub API for single publish
   @Test
   def should_publish_initialization_event_on_publisher_creation(): Unit = {
-    redisTestProps.publisher // access lazy publisher so that it gets evaulated
+    redisTestProps.publisher // access lazy publisher so that it gets evaluated
     val initEventKey = EventKey(s"${Subsystem.TEST}.init")
     val initEvent    = redisTestProps.subscriber.get(initEventKey).await
     initEvent.paramSet shouldBe InitializationEvent.value.paramSet

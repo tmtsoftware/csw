@@ -1,3 +1,4 @@
+a.out
 ignore
 .vagrant
 logs
@@ -56,3 +57,4 @@ project/.bloop
 project/project/.bloop
 scripts/csw-auth/prod/keycloak-4.6.0.Final
 scripts/csw-auth/prod/keycloak-4.6.0.Final.tar.gz
+cmake-build-debug/
