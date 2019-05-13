@@ -93,7 +93,7 @@ object Event {
 /**
  * Defines a system event. Constructor is private to ensure eventId is created internally to guarantee unique value.
  */
-case class SystemEvent private (
+case class SystemEvent private[params] (
     eventId: Id,
     source: Prefix,
     eventName: EventName,
@@ -152,7 +152,7 @@ object SystemEvent {
 /**
  * Defines an observe event. Constructor is private to ensure eventId is created internally to guarantee unique value.
  */
-case class ObserveEvent private (
+case class ObserveEvent private[params] (
     eventId: Id,
     source: Prefix,
     eventName: EventName,

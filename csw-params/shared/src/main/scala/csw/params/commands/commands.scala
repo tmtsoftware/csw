@@ -82,7 +82,7 @@ sealed trait ControlCommand extends SequenceCommand { self: ParameterSetType[_] 
 /**
  * A parameter set for setting telescope and instrument parameters. Constructor is private to ensure RunId is created internally to guarantee unique value.
  */
-case class Setup private (
+case class Setup private[params] (
     runId: Id,
     source: Prefix,
     commandName: CommandName,
@@ -151,7 +151,7 @@ object Setup {
 /**
  * A parameter set for setting telescope and instrument parameters. Constructor is private to ensure RunId is created internally to guarantee unique value.
  */
-case class Observe private (
+case class Observe private[params] (
     runId: Id,
     source: Prefix,
     commandName: CommandName,
@@ -220,7 +220,7 @@ object Observe {
 /**
  * A parameter set for setting telescope and instrument parameters. Constructor is private to ensure RunId is created internally to guarantee unique value.
  */
-case class Wait private (
+case class Wait private[params] (
     runId: Id,
     source: Prefix,
     commandName: CommandName,

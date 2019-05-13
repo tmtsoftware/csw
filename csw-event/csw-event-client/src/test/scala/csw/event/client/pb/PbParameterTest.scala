@@ -18,10 +18,9 @@ class PbParameterTest extends FunSuite with Matchers {
       .withUnits(Units.centimeter)
       .withItems(IntItems().addValues(1, 2))
 
-    val pbParam: PbParameter       = PbParameter.parseFrom(parameter.toByteArray)
-    val parsedPbParam: PbParameter = PbParameter.parseFrom(pbParam.toByteString.toByteArray)
+    val parsedPbParam: PbParameter = PbParameter.parseFrom(parameter.toByteArray)
 
-    pbParam shouldBe parsedPbParam
+    parameter shouldBe parsedPbParam
   }
 
   test("should able to parse PbParameter with sequence of values") {
@@ -29,15 +28,14 @@ class PbParameterTest extends FunSuite with Matchers {
       .withName("encoder")
       .withItems(IntItems().withValues(Seq(1, 2, 3, 4)))
 
-    val parameter1: PbParameter = PbParameter.parseFrom(parameter.toByteArray)
-    val parsedParameter         = PbParameter.parseFrom(parameter1.toByteString.toByteArray)
+    val parsedParameter = PbParameter.parseFrom(parameter.toByteArray)
 
     parameter shouldEqual parsedParameter
   }
 
   test("should able to create Boolean Items") {
     val booleanItems: BooleanItems = BooleanItems().addValues(true).addValues(false)
-    val parsedBooleanItems         = BooleanItems.parseFrom(booleanItems.toByteString.toByteArray)
+    val parsedBooleanItems         = BooleanItems.parseFrom(booleanItems.toByteArray)
     booleanItems.values shouldBe parsedBooleanItems.values
   }
 

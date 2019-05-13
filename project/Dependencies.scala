@@ -178,6 +178,8 @@ object Dependencies {
       Enumeratum.`enumeratum-play-json`.value,
       Libs.`play-json`.value,
       Libs.`play-json-derived-codecs`.value,
+      Libs.`borer-core`.value,
+      Libs.`borer-derivation`.value,
       Libs.`scalatest`.value % Test
     )
   )

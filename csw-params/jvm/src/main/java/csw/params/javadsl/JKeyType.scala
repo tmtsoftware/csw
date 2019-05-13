@@ -5,6 +5,10 @@ import csw.params.core.generics.{ArrayKeyType, KeyType, MatrixKeyType, SimpleKey
 
 object JSimpleKeyType {
   import JsonSupport._
+
+  //required for Scala compatible and efficient ByteArray codecs
+  import csw.params.core.formats.CborSupport.{javaByteArrayDec, javaByteArrayEnc}
+
   case object BooleanKey extends SimpleKeyType[java.lang.Boolean]
   case object CharKey    extends SimpleKeyType[java.lang.Character]
 
