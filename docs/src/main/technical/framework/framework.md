@@ -117,7 +117,7 @@ The explanation about `Restart` state can be found @ref[here](../../commons/crea
 
 ### Shutdown
 
-The code base for shutdown can be found here @github[here](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala#L247).
+The code base for shutdown can be found @github[here](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala#L247).
 The explanation about `Shutdown` state can be found @ref[here](../../commons/create-component.md#shutdown).
 
 ![shutdown](media/shutdown.png)
@@ -129,9 +129,15 @@ the code base for the same can be found @github[here](/csw-framework/src/main/sc
 
 ### Lock
 
+The code base for Lock can be found @github[here](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala#L205).
+The explanation about `Lock` state can be found @ref[here](../../commons/create-component.md#lock).
+
+![lock](media/lock.png)
+
+## Sending commands
 
 
-
+### 
 The *CSW Framework* provides the APIs used to talk to components,
 such as HCDs and assemblies.
 The framework, which is based on Akka [typed actors](https://doc.akka.io/docs/akka/current/typed/index.html), creates an actor for each component, along with a 
