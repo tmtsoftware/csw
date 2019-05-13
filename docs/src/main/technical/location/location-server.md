@@ -12,7 +12,7 @@ Main building blocks of location service are captured below, we will go through 
 
 - [Akka Cluster](https://doc.akka.io/docs/akka/current/index-cluster.html)
 - [Conflict Free Replicated Data Types (CRDTs)](https://doc.akka.io/docs/akka/current/typed/distributed-data.html): Shares location information within the network.
-- [Akka Http](https://doc.akka.io/docs/akka-http/current)
+- [Akka HTTP](https://doc.akka.io/docs/akka-http/current)
 - DeathWatch Actor
 
 ![Location Service](../../images/locationservice/location-service.png)
