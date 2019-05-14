@@ -9,7 +9,6 @@ The common software framework is a library that provides set of APIs used for:
 - receiving messages from external world
 - sending messages/commands to other components
 - receiving responses from components
-- publishing and subscribing state
 - deploying component in container or standalone mode 
 
 The CSW framework is implemented using [Akka typed actors](https://doc.akka.io/docs/akka/current/typed/index.html).
@@ -190,98 +189,13 @@ receiver component should be watched. The receiver component can use @github[Cur
 to publish it's state from `CswContext` and the sender component can track state using @github[subscribeCurrentState](/csw-command/csw-command-client/src/main/scala/csw/command/client/internal/CommandServiceImpl.scala#L107)
 from `CommandService`.
 
+## Deploying component in container or standalone mode
+
+Component(s) can start within a @ref[container](../../framework/deploying-components.md#container-for-deployment) or a single component can start as a
+@ref[standalone](../../framework/deploying-components.md#standalone-components). The code base for @github[Container](/csw-framework/src/main/scala/csw/framework/internal/container/ContainerBehavior.scala) 
+and @github[Standalone](/csw-framework/src/main/scala/csw/framework/internal/wiring/Standalone.scala). 
+
+Since Akka Typed is used throughout the TMT framework, there are seperate messages understood by Container, Supervisor, Top level actor and other actors
+of framework. The architecture/relations of messages can be found @github[here](/csw-command/csw-command-client/src/main/scala/csw/command/client/messages/MessagesArchitecture.scala). 
 
 
-
-
-### 
-The *CSW Framework* provides the APIs used to talk to components,
-such as HCDs and assemblies.
-The framework, which is based on Akka [typed actors](https://doc.akka.io/docs/akka/current/typed/index.html), creates an actor for each component, along with a 
-@github[supervisor](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala) 
-and some related actors. 
-For simplicity, component developers only need to implement a set of 
-@ref:[handlers](../../framework/handling-lifecycle.md) 
-(the
-@github[ComponentHandlers](/csw-framework/src/main/scala/csw/framework/scaladsl/ComponentHandlers.scala) 
-trait for Scala, the
-@github[JComponentHandlers](/csw-framework/src/main/scala/csw/framework/javadsl/JComponentHandlers.scala)
-interface for Java) which define how a component will behave.
-
-See @ref:[here](../../commons/framework.md) for information on *using* the CSW framework to develop HCD and assembly components.
-
-The @scaladoc[framework packge documentation](csw.framework/index) also contains an overview 
-of the core classes that make up the CSW framework.
-
-## Entry Points
-
-In order to start an assembly or HCD component, you first need a 
-@ref:[descriptor file](../../framework/describing-components.md)
-(or object) called
-@github[ComponentInfo](/csw-command/csw-command-client/src/main/scala/csw/command/client/models/framework/ComponentInfo.scala).
-
-The name of the component info file can be passed as a command line argument to an application based on the 
-@github[ContainerCmd](/csw-framework/src/main/scala/csw/framework/deploy/containercmd/ContainerCmd.scala)
-class to
-@ref:[deploy](../../framework/deploying-components.md)
-the component.
-
-In a production environment, it is planned that components will be started at boot time using a @ref:[HostConfig](../../apps/hostconfig.md) based application. 
-
-## Component Creation
-
-Components can be created in 
-@ref:[standalone or container](../../commons/multiple-components.md) mode. 
-When an HCD or assembly is
-@ref:[created](../../framework/creating-components.md), depending on the mode,
-either the
-@github[ContainerBehaviorFactory](/csw-framework/src/main/scala/csw/framework/internal/container/ContainerBehaviorFactory.scala) or the 
-@github[SupervisorBehaviorFactory](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehaviorFactory.scala)
-class is used to create the initial actor behavior. 
-In container mode, a supervisor actor is created for each component and a single
-@github[container actor](/csw-framework/src/main/scala/csw/framework/internal/container/ContainerBehavior.scala) 
-accepts control messages for the container (subtypes of `ContainerActorMessage`).
-
-Each supervisor then creates and watches its component and determines what to do when something goes wrong. 
-It uses an instance of
-@github[ComponentBehaviorFactory](/csw-framework/src/main/scala/csw/framework/scaladsl/ComponentBehaviorFactory.scala) 
-that is created via reflection from an entry in the
- @ref:[component info file](../../framework/describing-components.md)
- file to create the component.
-
-The top level actor (TLA) representing the 
-@github[component's behavior](/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala) uses the instance of 
-@github[ComponentHandlers](/csw-framework/src/main/scala/csw/framework/scaladsl/ComponentHandlers.scala)
-returned from the supplied ComponentBehaviorFactory to handle incoming messages and commands for the component.
-
-## Component Initialization and Lifecycle
-
-The framework manages a component's 
-@ref:[lifecycle](../../framework/handling-lifecycle.md) 
-so that it only receives 
-@ref:[commands](../../messages/commands.md) 
-once it has signaled that it has completed the initialization process.
-This includes 
-@ref:[tracking any connections](../../framework/tracking-connections.md) 
-listed in the component info file.
-Once the component is in the running state, it can be discovered using the
-@ref:[Location Service](../location/location.md) and other components can start
-sending 
-@ref[command messages](../../commons/messages.md) 
-to it.
-
-## Command Service Clients
-
-Although components are actually actors, it is convenient to be able to treat them as objects and call methods on them. The
-@github[CommandService](/csw-command/csw-command-api/src/main/scala/csw/command/api/scaladsl/CommandService.scala) 
-trait, and its implementation: 
-@github[CommandServiceImpl](/csw-command/csw-command-client/src/main/scala/csw/command/client/internal/CommandServiceImpl.scala)
-provide a wrapper that uses Akka `ask` to send a message to a component and return a `Future` with it's response.
-The 
-@github[CommandServiceFactory](/csw-command/csw-command-client/src/main/scala/csw/command/client/CommandServiceFactory.scala) class can be used to make a `CommandService` instance from a `location` received from the 
-@ref:[Location Service](../location/location.md).
-
-## Command Response Handling
-
-A @ref:[Command Response Manager](../../framework/managing-command-state.md) class
-is used to manage the responses to a commands sent to a component.
