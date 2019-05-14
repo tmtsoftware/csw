@@ -197,7 +197,9 @@ that locked the component and ignore all others.
 
 In the `Lock` state, messages like `Shutdown` and `Restart` will also be ignored. A component must first be unlocked to accept these commands.
 
-`Lock` messages are constructed with a duration value specified. When this duration expires, the component will automatically be unlocked.
+`Lock` messages are constructed with a duration value specified. When this duration expires, the component will automatically be unlocked. In order to
+retain the Lock on the component, sender will have to resend the `Lock` message.
+ 
 There are two ways component can be unlocked:
 1. Sending `Unlock` message (Note: This message should be sent by same component who has already locked component)
 1. Sending `Unlock` message with admin Prefix i.e. `Prefix("csw.admin")`, this is treated as Admin Unlock command.

@@ -101,7 +101,7 @@ class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime
    * @return The tuple of file path where data is saved temporarily and the sha calculated out of that data
    */
   private def saveAndSha(configData: ConfigData): Future[(Path, String)] = async {
-    val path = await(fileRepo.createTempFile("config-service-overize-", ".tmp"))
+    val path = await(fileRepo.createTempFile("config-service-oversize-", ".tmp"))
     val (resultF, shaF) = configData.source
       .alsoToMat(FileIO.toPath(path))(Keep.right)
       .toMat(Sha1.sink)(Keep.both)
