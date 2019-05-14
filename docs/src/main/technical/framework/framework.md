@@ -136,6 +136,63 @@ The explanation about `Lock` state can be found @ref[here](../../commons/create-
 
 ## Sending commands
 
+The types of commands that can be sent and it's creation can be found @ref[here](../../commons/create-component.md#receiving-commands). In order to send
+commands to other components, a @github[CommandService](/csw-command/csw-command-api/src/main/scala/csw/command/api/scaladsl/CommandService.scala) helper
+is needed. `CommandService` helper is used to send commands to other components, in the form of method calling instead of sending messages to bare component
+supervisor actor. The creation of CommandService can be found @ref[here](../../commons/multiple-components.md#sending-commands).
+
+The operations allowed through `CommandService` helper are as follows:
+
+- @github[validate](/csw-command/csw-command-client/src/main/scala/csw/command/client/internal/CommandServiceImpl.scala#L38)
+- @github[submit](/csw-command/csw-command-client/src/main/scala/csw/command/client/internal/CommandServiceImpl.scala#L43)
+- @github[submitAll](/csw-command/csw-command-client/src/main/scala/csw/command/client/internal/CommandServiceImpl.scala#L51)
+- @github[oneway](/csw-command/csw-command-client/src/main/scala/csw/command/client/internal/CommandServiceImpl.scala#L74)
+- @github[onewayAndMatch](/csw-command/csw-command-client/src/main/scala/csw/command/client/internal/CommandServiceImpl.scala#L77)
+- @github[query](/csw-command/csw-command-client/src/main/scala/csw/command/client/internal/CommandServiceImpl.scala#L96)
+- @github[queryFinal](/csw-command/csw-command-client/src/main/scala/csw/command/client/internal/CommandServiceImpl.scala#L104)
+- @github[subscribeCurrentState](/csw-command/csw-command-client/src/main/scala/csw/command/client/internal/CommandServiceImpl.scala#L107)
+ 
+## Receiving responses from components
+
+### Submit
+
+To know the flow of Submit please refer this @ref[section](../../commons/command.md#the-submit-message). 
+
+![submit](media/submit.png)
+
+### Oneway
+
+To know the flow of Oneway please refer this @ref[section](../../commons/command.md#the-oneway-message).
+ 
+![oneway](media/oneway.png)
+
+### Validate
+
+To know the flow about Validate please refer this @ref[section](../../commons/command.md#the-validate-message) and the code base for the same can be
+referred @github[here](/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala#L154).
+
+### Command Response Manager
+
+Once a `Submit` command is received by a component for e.g. an assembly receives submit command, then the assembly can choose to send one or more
+commands to HCD(s) as part of the submit command's execution. Once, all the response(s) are received from downstream HCD(s), assembly need to complete
+the `Submit` as either `Completed` or `Error`. The @github[CommandResponseManager](/csw-command/csw-command-client/src/main/scala/csw/command/client/CommandResponseManagerActor.scala)
+provides different mechanisms to mark `Submit` command with final state.
+
+![crm](media/crm.png)
+
+The Assembly worker can communicate with `CommandResponseManagerActor` using @github[CommandResponseManager](csw-command/csw-command-client/src/main/scala/csw/command/client/CommandResponseManager.scala)
+coming via @github[CswContext](/csw-framework/src/main/scala/csw/framework/models/CswContext.scala#L43).
+
+### Current State Pub/Sub
+
+For `Oneway` commands it's responses are not sent back to sender as it is done for `Submit`. So, in order to track the status of oneway command `CurrentState` published by
+receiver component should be watched. The receiver component can use @github[CurrentStatePublisher](/csw-framework/src/main/scala/csw/framework/models/CswContext.scala#L42)
+to publish it's state from `CswContext` and the sender component can track state using @github[subscribeCurrentState](/csw-command/csw-command-client/src/main/scala/csw/command/client/internal/CommandServiceImpl.scala#L107)
+from `CommandService`.
+
+
+
+
 
 ### 
 The *CSW Framework* provides the APIs used to talk to components,
