@@ -7,6 +7,7 @@ import csw.event.client.pb.PbConverter
 import csw.params.events.{Event, EventKey}
 import csw_protobuf.events.PbEvent
 import io.bullet.borer.Cbor
+import io.bullet.borer.Cbor.DecodingConfig
 import romaine.codec.{RomaineByteCodec, RomaineStringCodec}
 
 import scala.util.control.NonFatal
@@ -52,9 +53,11 @@ private[event] object EventRomaineCodecs {
       try {
         val bytes = new Array[Byte](byteBuffer.remaining)
         byteBuffer.get(bytes)
-        Cbor.decode(bytes).to[Event].value
+        Cbor.decode(bytes).withConfig(DecodingConfig(readDoubleAlsoAsFloat = true)).to[Event].value
       } catch {
-        case NonFatal(_) ⇒ Event.badEvent()
+        case NonFatal(ex) ⇒
+          ex.printStackTrace()
+          Event.badEvent()
       }
     }
   }
