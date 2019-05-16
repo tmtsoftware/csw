@@ -32,6 +32,25 @@ We have created a scala library called "Romaine" to communicate to Redis.
 
 ![Event Dependencies](event-layers.png)
 
+## Romaine
+
+Romaine is a redis client library writen by us. It's a Scala library built over Java Redis client library called [Lettuce](https://lettuce.io/) which provides rich APIs over existing functionality offered by Lettuce. 
+
+Romaine offers various APIs:
+
+
+* **Async API:** Provides asynchronous API (`romaine.async.RedisAsyncApi`) for various redis commands like `get`, `set`, `publish` etc.  
+
+
+* **Reactive API:** Provides API for Subscription and Pattern-Subscription (`romaine.reactive.RedisSubscriptionApi`).
+On subscription, it returns an [Akka Stream](https://doc.akka.io/docs/akka/current/stream/index.html) of Events which on execution materializes to `RedisSubscription` instance which gives handle to unsubscribe to events.
+
+
+* **Keyspace API:** Provides APIs to watch [Keyspace Notifications](https://redis.io/topics/notifications) (`romaine.keyspace.RedisKeySpaceApi`).
+This is a rich API built on Akka Streams which provides not just the change events that happen on keys (for eg: Update, Removal etc.) but also the old and new values corresponding to those keys.  
+
+Event Service uses `Async API` for publishing and setting the latest event, and `Reactive API` for subscribing to events and patterns.
+`Keyspace API` is used in alarm service.
 
 ## Event Publishing
 
