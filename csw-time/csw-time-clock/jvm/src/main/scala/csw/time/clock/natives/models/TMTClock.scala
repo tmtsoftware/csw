@@ -41,7 +41,6 @@ private[time] class LinuxClock extends TMTClock {
     timeVal.tai
   }
 
-  // todo: without sudo or somehow handle it internally?
   // sets the tai offset on kernel (needed when ptp is not setup)
   override def setTaiOffset(offset: Int): Unit = {
     val timex = new Timex()

@@ -230,15 +230,15 @@ value in redis explicitly without any TTL.
 
 ## Acknowledging Alarms
 
-Alarms can be in either `ackowldged` or `unackowldged` state. See [Acknowledgement Status](#acknowledgement-status) for more details. 
-The state can be changed to `ackowldged` by simply using `acknowledge` api of alarm service. Apart from this api,
+Alarms can be in either `acknowledged` or `unacknowledged` state. See [Acknowledgement Status](#acknowledgement-status) for more details. 
+The state can be changed to `acknowledged` by simply using `acknowledge` api of alarm service. Apart from this api,
 setting severity can also change the Acknowledgement Status of an alarm.
 
 Alarm can either be auto-acknowledgeable or not auto-acknowledgeable. This behavior is driven from [alarm metadata](#metadata).
 When an alarm is not auto-acknowledgeable, whenever it's severity changes to anything except Okay, it's Acknowledgement Status becomes
-`unackowldged`. If it is changing from any severity to Okay, Acknowledgement Status remains same.
+`acknowledged`. If it is changing from any severity to Okay, Acknowledgement Status remains same.
 
-When the alarm is auto-acknowledgeable, whenever it's severity changes to Okay, it's Acknowledgement Status becomes `ackowldged`.
+When the alarm is auto-acknowledgeable, whenever it's severity changes to Okay, it's Acknowledgement Status becomes `acknowledged`.
 If it changes to anything else, Acknowledgement Status remains same.
 
 ## API Structure

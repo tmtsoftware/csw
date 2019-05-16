@@ -25,7 +25,7 @@ when received through GPS.
 
 The time service also allows for scheduling tasks either periodically or
 once using both UTC and TAI time. These schedulers are optimised for
-handling scheduled task at 1KHz frequency or 1 task every 1 millisecond.
+handling scheduled tasks at 1KHz frequency or 1 task every 1 millisecond.
 However, there can be jitters due to JVM garbage collection, CPU loads
 and concurrent task execution.
 
