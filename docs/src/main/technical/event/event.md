@@ -15,7 +15,8 @@ one or more other components. Demand events often consist of events that are pub
 
 There were two good candidates for the backend of Event Service - [Apache Kafka](https://kafka.apache.org/) and [Redis](https://redis.io/). 
 The Event Service API is implemented with both the backends and a performance testing was done to select one particular backend 
-which would cater to our low latency requirements.
+which would cater to our low latency requirements. Results of the performance tests could be found 
+[here](https://tmt-project.atlassian.net/wiki/spaces/DEOPSCSW/pages/191791210/Event+Service+Raw+Performance+Results+Results+May+Change).
 Redis seemed to be a good choice for the backend as it turned out to be better at providing low latency 
 unlike Kafka which is more suited for high throughput systems.
 Hence you can see 2 implementations of the API in the Event Service client. The code is structured in a way that it is easy to switch the implementations.
