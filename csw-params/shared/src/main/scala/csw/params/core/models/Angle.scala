@@ -148,9 +148,9 @@ object Angle {
 
     Angle(
       sign *
-      (deg.multiply(new BigDecimal(Angle.D2Uas)).longValueExact +
-      min.multiply(new BigDecimal(Angle.M2Uas)).longValueExact +
-      sec.multiply(new BigDecimal(Angle.S2Uas)).longValueExact)
+        (deg.multiply(new BigDecimal(Angle.D2Uas)).longValueExact +
+          min.multiply(new BigDecimal(Angle.M2Uas)).longValueExact +
+          sec.multiply(new BigDecimal(Angle.S2Uas)).longValueExact)
     )
   }
 
@@ -189,8 +189,8 @@ object Angle {
 
     Angle(
       raHour2.multiply(new BigDecimal(Angle.H2Uas)).longValueExact +
-      raMin2.multiply(new BigDecimal(Angle.HMin2Uas)).longValueExact +
-      raSec2.multiply(new BigDecimal(Angle.HSec2Uas)).longValueExact
+        raMin2.multiply(new BigDecimal(Angle.HMin2Uas)).longValueExact +
+        raSec2.multiply(new BigDecimal(Angle.HSec2Uas)).longValueExact
     )
   }
 

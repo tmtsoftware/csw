@@ -92,11 +92,11 @@ object KeyType extends Enum[KeyType[_]] with PlayJsonEnum[KeyType[_]] {
   case object TAITimeKey extends SimpleKeyTypeWithUnits[TAITime](second)
 
   // New Coordinate Keys
-  case object EqCoordKey extends SimpleKeyType[EqCoord]
+  case object EqCoordKey          extends SimpleKeyType[EqCoord]
   case object SolarSystemCoordKey extends SimpleKeyType[SolarSystemCoord]
   case object MinorPlanetCoordKey extends SimpleKeyType[MinorPlanetCoord]
-  case object CometCoordKey extends SimpleKeyType[MinorPlanetCoord]
-  case object CoordKey extends SimpleKeyType[Coord]
+  case object CometCoordKey       extends SimpleKeyType[MinorPlanetCoord]
+  case object CoordKey            extends SimpleKeyType[Coord]
 
   //scala
   case object BooleanKey extends SimpleKeyType[Boolean]
