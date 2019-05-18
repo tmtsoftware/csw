@@ -6,6 +6,7 @@ object Coords {
 
   /**
    * A tag is a label to indicate the use of the coordinate
+    *
    * @param name what is the role of this coordinate
    */
   case class Tag(name: String) {
@@ -22,8 +23,8 @@ object Coords {
   val ODGW4        = Tag("ODGW4")
   val GUIDER1      = Tag("GUIDER1")
   val GUIDER2      = Tag("GUIDER2")
-  val allTags      = Set(BASE, OIWFS1, OIWFS2, OIWFS3, OIWFS4, ODGW1, ODGW2, ODGW3, ODGW4, GUIDER1, GUIDER2)
-  val allTagsNames = allTags.map(_.name)
+  val allTags: Set[Tag] = Set(BASE, OIWFS1, OIWFS2, OIWFS3, OIWFS4, ODGW1, ODGW2, ODGW3, ODGW4, GUIDER1, GUIDER2)
+  val allTagsNames: Set[String] = allTags.map(_.name)
 
   implicit val tagFormat: OFormat[Tag] = Json.format[Tag]
 
@@ -32,19 +33,21 @@ object Coords {
   case object FK5  extends EQ_FRAME
 
   implicit val eqfFormat: OFormat[EQ_FRAME] = derived.oformat()
-  //implicit val eqfFormat: OFormat[EQ_FRAME]      = flat.oformat((__ \ "frame").format[String])
 
+  /**
+    * All coordinates are a Coord.
+    * A Coord has a tag.
+    */
   sealed trait Coord {
     val tag: Tag
   }
 
   object Coord {
     implicit val jsonFormat: OFormat[Coord] = derived.oformat()
-    //implicit val jsonFormat: OFormat[Coord]      = derived.flat.oformat((__ \ "type").format[String])
   }
 
   case class AltAzCoord(tag: Tag, alt: Angle, az: Angle) extends Coord {
-    override def toString: String = s"$tag ${alt.toDegree}  ${az.toDegree}"
+    override def toString: String = s"AltAzCoord($tag ${alt.toDegree}  ${az.toDegree})"
   }
   object AltAzCoord {
     implicit val coordFormat: OFormat[AltAzCoord] = Json.format[AltAzCoord]
@@ -83,20 +86,19 @@ object Coords {
   object MinorPlanetCoord {
     implicit val coordFormat: OFormat[MinorPlanetCoord] = Json.format[MinorPlanetCoord]
   }
-  /*
-  case class CometCoord(tag: Tag,
-                        epochOfPerihelion: Double,  // TT as a Modified Julian Date
-                        inclination: Angle, // degrees
-                        longAscendingNode: Angle, // degrees
-                        argOfPerihelion: Angle, // degrees
-                        perihelionDistance: Double, // AU
-                        eccentricity: Double
+
+  case class CometCoord(
+                         tag: Tag,
+                         epochOfPerihelion: Double, // TT as a Modified Julian Date
+                         inclination: Angle, // degrees
+                         longAscendingNode: Angle, // degrees
+                         argOfPerihelion: Angle, // degrees
+                         perihelionDistance: Double, // AU
+                         eccentricity: Double
                        ) extends Coord
   object CometCoord {
     implicit val coordFormat: OFormat[CometCoord] = Json.format[CometCoord]
   }
-
-   */
 
   case class EqCoord(tag: Tag, ra: Angle, dec: Angle, frame: EQ_FRAME, catalogName: String, pm: ProperMotion) extends Coord {
 
