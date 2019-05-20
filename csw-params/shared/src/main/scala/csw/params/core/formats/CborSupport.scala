@@ -42,6 +42,7 @@ object CborSupport {
   implicit lazy val solarSystemCoordCodec: Codec[SolarSystemCoord] = deriveCodec[SolarSystemCoord]
   implicit lazy val minorPlanetCoordCodec: Codec[MinorPlanetCoord] = deriveCodec[MinorPlanetCoord]
   implicit lazy val cometCoordCodec: Codec[CometCoord]             = deriveCodec[CometCoord]
+  implicit lazy val altAzCoordCodec: Codec[AltAzCoord]             = deriveCodec[AltAzCoord]
   implicit lazy val coordCodec: Codec[Coord]                       = deriveCodec[Coord]
 
   implicit lazy val tsCodec: Codec[Timestamp]    = deriveCodec[Timestamp]
