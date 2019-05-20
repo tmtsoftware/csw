@@ -6,38 +6,38 @@ object Coords {
 
   /**
    * A tag is a label to indicate the use of the coordinate
-    *
+   *
    * @param name what is the role of this coordinate
    */
   case class Tag(name: String) {
     override def toString: String = name
   }
-  val BASE         = Tag("BASE")
-  val OIWFS1       = Tag("OIWFS1")
-  val OIWFS2       = Tag("OIWFS2")
-  val OIWFS3       = Tag("OIWFS3")
-  val OIWFS4       = Tag("OIWFS4")
-  val ODGW1        = Tag("ODGW1")
-  val ODGW2        = Tag("ODGW2")
-  val ODGW3        = Tag("ODGW3")
-  val ODGW4        = Tag("ODGW4")
-  val GUIDER1      = Tag("GUIDER1")
-  val GUIDER2      = Tag("GUIDER2")
-  val allTags: Set[Tag] = Set(BASE, OIWFS1, OIWFS2, OIWFS3, OIWFS4, ODGW1, ODGW2, ODGW3, ODGW4, GUIDER1, GUIDER2)
+  val BASE                      = Tag("BASE")
+  val OIWFS1                    = Tag("OIWFS1")
+  val OIWFS2                    = Tag("OIWFS2")
+  val OIWFS3                    = Tag("OIWFS3")
+  val OIWFS4                    = Tag("OIWFS4")
+  val ODGW1                     = Tag("ODGW1")
+  val ODGW2                     = Tag("ODGW2")
+  val ODGW3                     = Tag("ODGW3")
+  val ODGW4                     = Tag("ODGW4")
+  val GUIDER1                   = Tag("GUIDER1")
+  val GUIDER2                   = Tag("GUIDER2")
+  val allTags: Set[Tag]         = Set(BASE, OIWFS1, OIWFS2, OIWFS3, OIWFS4, ODGW1, ODGW2, ODGW3, ODGW4, GUIDER1, GUIDER2)
   val allTagsNames: Set[String] = allTags.map(_.name)
 
   implicit val tagFormat: OFormat[Tag] = Json.format[Tag]
 
-  sealed trait EQ_FRAME
-  case object ICRS extends EQ_FRAME
-  case object FK5  extends EQ_FRAME
+  sealed trait EqFrame
+  case object ICRS extends EqFrame
+  case object FK5  extends EqFrame
 
-  implicit val eqfFormat: OFormat[EQ_FRAME] = derived.oformat()
+  implicit val eqfFormat: OFormat[EqFrame] = derived.oformat()
 
   /**
-    * All coordinates are a Coord.
-    * A Coord has a tag.
-    */
+   * All coordinates are a Coord.
+   * A Coord has a tag.
+   */
   sealed trait Coord {
     val tag: Tag
   }
@@ -88,19 +88,19 @@ object Coords {
   }
 
   case class CometCoord(
-                         tag: Tag,
-                         epochOfPerihelion: Double, // TT as a Modified Julian Date
-                         inclination: Angle, // degrees
-                         longAscendingNode: Angle, // degrees
-                         argOfPerihelion: Angle, // degrees
-                         perihelionDistance: Double, // AU
-                         eccentricity: Double
-                       ) extends Coord
+      tag: Tag,
+      epochOfPerihelion: Double,  // TT as a Modified Julian Date
+      inclination: Angle,         // degrees
+      longAscendingNode: Angle,   // degrees
+      argOfPerihelion: Angle,     // degrees
+      perihelionDistance: Double, // AU
+      eccentricity: Double
+  ) extends Coord
   object CometCoord {
     implicit val coordFormat: OFormat[CometCoord] = Json.format[CometCoord]
   }
 
-  case class EqCoord(tag: Tag, ra: Angle, dec: Angle, frame: EQ_FRAME, catalogName: String, pm: ProperMotion) extends Coord {
+  case class EqCoord(tag: Tag, ra: Angle, dec: Angle, frame: EqFrame, catalogName: String, pm: ProperMotion) extends Coord {
 
     def withPM(pmx: Double, pmy: Double): EqCoord = this.copy(pm = ProperMotion(pmx, pmy))
 
@@ -111,7 +111,7 @@ object Coords {
   }
 
   object EqCoord {
-    val DEFAULT_FRAME: EQ_FRAME = ICRS
+    val DEFAULT_FRAME: EqFrame  = ICRS
     val DEFAULT_TAG: Tag        = BASE
     val DEFAULT_PMX: Double     = ProperMotion.DEFAULT_PROPERMOTION.pmx
     val DEFAULT_PMY: Double     = ProperMotion.DEFAULT_PROPERMOTION.pmy
@@ -120,7 +120,7 @@ object Coords {
     def apply(
         ra: Any = 0.0,
         dec: Any = 0.0,
-        frame: EQ_FRAME = DEFAULT_FRAME,
+        frame: EqFrame = DEFAULT_FRAME,
         tag: Tag = DEFAULT_TAG,
         catalogName: String = DEFAULT_CATNAME,
         pmx: Double = DEFAULT_PMX,
@@ -153,7 +153,7 @@ object Coords {
      */
     def asBoth(
         radec: String,
-        frame: EQ_FRAME = DEFAULT_FRAME,
+        frame: EqFrame = DEFAULT_FRAME,
         tag: Tag = DEFAULT_TAG,
         catalogName: String = DEFAULT_CATNAME,
         pmx: Double = DEFAULT_PMX,

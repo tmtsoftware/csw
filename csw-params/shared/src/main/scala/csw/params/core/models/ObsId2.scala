@@ -23,7 +23,7 @@ case class ObsId2(year: String, sem: String, kind: String, prog: String, obs: St
   private val ClassicalKindLetter          = 'C'
   private val PreProgrammedQueueKindLetter = 'P'
   private val conditionsBasedQueueLetter   = 'Q'
-*/
+   */
   //def isQueue = sem.charAt(PROG_KIND_INDEX) == PreProgrammedQueueKindLetter
 
   //def isClassical = obsId.charAt(PROG_KIND_INDEX) == ClassicalKindLetter
@@ -52,23 +52,23 @@ object ObsId2 {
 }
 
 /**
-  * This ObsId tries to accept whatever is handed in so current uses of ObsId still work.
-  * Needs real types.
-  *
-  * @param obsId String that could be an obsId
-  */
+ * This ObsId tries to accept whatever is handed in so current uses of ObsId still work.
+ * Needs real types.
+ *
+ * @param obsId String that could be an obsId
+ */
 case class ObsId3(obsId: String) {
   //YYYY(A|B)-(Q|C|E)-PXXX-OXXX-[D]XXXX
-  private val s: Array[String] = obsId.split("-")
-  private val VALID_LENGTH = 4 // Must have this many parts to be valid
-  private val FILE_INDEX = 4 // If it has a file it is at this index
+  private val s: Array[String]   = obsId.split("-")
+  private val VALID_LENGTH       = 4 // Must have this many parts to be valid
+  private val FILE_INDEX         = 4 // If it has a file it is at this index
   private val FILE_WITH_DETECTOR = 5 // Length of last part if has detector
-  val isValid: Boolean = s.length >= VALID_LENGTH
-  val hasFile: Boolean = s.length == FILE_WITH_DETECTOR && s(FILE_INDEX).length >= VALID_LENGTH
-  val hasDetector: Boolean = hasFile && s(FILE_INDEX).length == FILE_WITH_DETECTOR
+  val isValid: Boolean           = s.length >= VALID_LENGTH
+  val hasFile: Boolean           = s.length == FILE_WITH_DETECTOR && s(FILE_INDEX).length >= VALID_LENGTH
+  val hasDetector: Boolean       = hasFile && s(FILE_INDEX).length == FILE_WITH_DETECTOR
 
-  def semester: String    = if (isValid) s(0) else ""
-  def year: String        = if (isValid) semester.substring(0, 4) else ""
+  def semester: String = if (isValid) s(0) else ""
+  def year: String     = if (isValid) semester.substring(0, 4) else ""
 
   def whichSemester: String = if (isValid) semester.last.toString else ""
 
@@ -82,11 +82,9 @@ case class ObsId3(obsId: String) {
 
   private def obsIdPrint(): String = {
     if (isValid) {
-      s"$year$whichSemester-$programType-$program-$observation${if (hasFile) s"-$detector$file" else "" }"
+      s"$year$whichSemester-$programType-$program-$observation${if (hasFile) s"-$detector$file" else ""}"
     } else obsId
   }
 
   override def toString: String = obsIdPrint()
 }
-
-

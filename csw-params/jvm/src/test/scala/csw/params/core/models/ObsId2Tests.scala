@@ -7,7 +7,6 @@ class ObsId2Tests extends FunSpec with Matchers {
   val obsID1 = "2022A-Q-P012-O123"       // without file
   val obsID2 = "2022A-C-P014-O123-I0234" // with file
 
-
   describe("Basic ObsID Test") {
     it("Should create obsId with no file") {
       val oid = ObsId3(obsID1)

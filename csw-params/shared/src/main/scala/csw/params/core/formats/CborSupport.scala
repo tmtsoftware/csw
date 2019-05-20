@@ -5,6 +5,7 @@ import java.time.Instant
 
 import csw.params.commands._
 import csw.params.core.generics.{KeyType, Parameter}
+import csw.params.core.models.Coords._
 import csw.params.core.models._
 import csw.params.events.{Event, EventName, ObserveEvent, SystemEvent}
 import csw.time.core.models.{TAITime, UTCTime}
@@ -30,6 +31,18 @@ object CborSupport {
   //Ensure that Codec.forCaseClass is used ONLY for unary case classes see https://github.com/sirthias/borer/issues/26
   implicit lazy val choiceCodec: Codec[Choice] = Codec.forCaseClass[Choice]
   implicit lazy val raDecCodec: Codec[RaDec]   = deriveCodec[RaDec]
+
+  implicit lazy val tagCodec: Codec[Coords.Tag]                      = deriveCodec[Coords.Tag]
+  implicit lazy val angleCodec: Codec[Angle]                         = deriveCodec[Angle]
+  implicit lazy val properMotionCodec: Codec[ProperMotion]           = deriveCodec[ProperMotion]
+  implicit lazy val eqFrameCodec: Codec[EqFrame]                     = deriveCodec[EqFrame]
+  implicit lazy val solarSystemObjectCodec: Codec[SolarSystemObject] = deriveCodec[SolarSystemObject]
+
+  implicit lazy val eqCoordCodec: Codec[EqCoord]                   = deriveCodec[EqCoord]
+  implicit lazy val solarSystemCoordCodec: Codec[SolarSystemCoord] = deriveCodec[SolarSystemCoord]
+  implicit lazy val minorPlanetCoordCodec: Codec[MinorPlanetCoord] = deriveCodec[MinorPlanetCoord]
+  implicit lazy val cometCoordCodec: Codec[CometCoord]             = deriveCodec[CometCoord]
+  implicit lazy val coordCodec: Codec[Coord]                       = deriveCodec[Coord]
 
   implicit lazy val tsCodec: Codec[Timestamp]    = deriveCodec[Timestamp]
   implicit lazy val instantCodec: Codec[Instant] = bimap[Timestamp, Instant](_.toInstant, Timestamp.fromInstant)

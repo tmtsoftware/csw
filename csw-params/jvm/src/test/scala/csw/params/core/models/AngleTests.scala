@@ -47,11 +47,12 @@ class AngleTests extends FunSpec with Matchers {
     }
 
     it("should allow parsing to microsarcsecs -2") {
-      Angle.parseRa("1h2m3s")
+      Angle
+        .parseRa("1h2m3s")
         .uas shouldEqual 1L * 15L * 60L * 60L * 1000L * 1000L + 2L * 15L * 60L * 1000L * 1000L + 3L * 15L * 1000L * 1000L
       Angle.parseRa("02 51.2").uas shouldEqual 2L * 15L * 60L * 60L * 1000L * 1000L + 512L * 15L * 60L * 1000L * 100L
-      Angle.parseDe("+1d2'3\"").uas shouldEqual 1L * 60L * 60L * 1000L * 1000L + 2l * 60L * 1000L * 1000L + 3L * 1000L * 1000L
-      Angle.parseDe("-1d2'3\"").uas shouldEqual -(1L * 60L * 60L * 1000L * 1000l + 2L * 60L * 1000L * 1000L + 3L * 1000L * 1000L)
+      Angle.parseDe("+1d2'3\"").uas shouldEqual 1L * 60L * 60L * 1000L * 1000L + 2L * 60L * 1000L * 1000L + 3L * 1000L * 1000L
+      Angle.parseDe("-1d2'3\"").uas shouldEqual -(1L * 60L * 60L * 1000L * 1000L + 2L * 60L * 1000L * 1000L + 3L * 1000L * 1000L)
       Angle.parseDe("+13 12").uas shouldEqual 13L * 60L * 60L * 1000L * 1000L + 12L * 60L * 1000L * 1000L
     }
   }

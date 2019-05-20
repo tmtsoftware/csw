@@ -81,7 +81,7 @@ class CoordsTests extends FunSpec with Matchers {
     it("should convert frame to/from JSON") {
       val f1 = ICRS
       val j1 = Json.toJson(f1)
-      j1.as[EQ_FRAME] shouldEqual ICRS
+      j1.as[EqFrame] shouldEqual ICRS
     }
 
     it("should JSON an alt az") {
@@ -123,7 +123,7 @@ class CoordsTests extends FunSpec with Matchers {
       // Check EqCoordinate
       val eq = EqCoord(ra = 180.0, frame = FK5, dec = 32.0, pmx = pm.pmx, pmy = pm.pmy)
 
-      val js = Json.toJson(eq)
+      val js   = Json.toJson(eq)
       val eqIn = js.as[EqCoord]
       eqIn shouldBe eq
     }
@@ -173,7 +173,7 @@ class CoordsTests extends FunSpec with Matchers {
 
     it("create multiple positions as individual params with positions catalog") {
       val obsModeKey = StringKey.make("obsmode")
-      val tagsKey = StringKey.make(name = "tags")
+      val tagsKey    = StringKey.make(name = "tags")
 
       val c0 = EqCoord("12:32:45", "+45:17:50", tag = BASE, frame = FK5, pmx = 0.9, pmy = -0.4)
       val c1 = EqCoord("12:32:01.689", "45:01:05.12", tag = OIWFS1)
@@ -247,9 +247,9 @@ class CoordsTests extends FunSpec with Matchers {
     it("Create multiple positions in individual params for each major type: base, oiwfs, guide") {
       val obsModeKey = StringKey.make("obsmode")
 
-      val baseKey = CoordKey.make("BasePosition")
-      val oiwfsKey = CoordKey.make("OIWFSPositions")
-      val odgwKey = CoordKey.make("ODGWPositions")
+      val baseKey   = CoordKey.make("BasePosition")
+      val oiwfsKey  = CoordKey.make("OIWFSPositions")
+      val odgwKey   = CoordKey.make("ODGWPositions")
       val guiderKey = CoordKey.make("GuiderPositions")
 
       val c0 = EqCoord("12:32:45", "+45:17:50", tag = BASE, frame = FK5, pmx = 0.9, pmy = -0.4)
