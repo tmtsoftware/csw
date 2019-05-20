@@ -1,6 +1,6 @@
 package csw.params.core.models
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json._
 
 /**
  * Holds Ra(Right Ascension) and Dec(Declination) values

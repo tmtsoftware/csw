@@ -2,14 +2,14 @@
 
 ## Introduction
 
-Alarm service in TMT software is used by components to raise alarms. 
+Alarm Service in TMT software is used by components to raise alarms. 
 Alarms could be of different severities such as Warning, Critical, etc. 
-The alarm system also provides mechanism to monitor the health of all components 
+The alarm system also provides mechanisms to monitor the health of all components 
 and subsystems in TMT.
 
 ## Technology
 
-Alarm service uses [Redis](https://redis.io/) for persistence. Redis provides 
+Alarm Service uses [Redis](https://redis.io/) for persistence. Redis provides 
 [Keyspace Notifications](https://redis.io/topics/notifications) which allows clients to subscribe to Pub/Sub channels 
 in order to receive events affecting the Redis data set in some way.
 
@@ -33,8 +33,8 @@ An alarm can have one of the following severities at a given time
 
 ## Health
 
-Health is a higher level abstraction created on top of severities. An alarm can have one of the 
-following heaths at a given time.
+Health is a higher level abstraction created on top of severities. One or more alarms can be combined to calculate
+one of the following healths at a given time.
 
 - `Good`
 - `Ill`
@@ -55,11 +55,11 @@ They have aggregated severities based on severities of their children.
 
 ![alarm-hierarchy](alarm-hierarchy.png)
 
-A components aggregated severity is equal to severity of it's child alarm with "maximum" severity.
-Similarly, a sub-system's aggregated severity is determined by it's child component with maximum severity.
+A components aggregated severity is equal to severity of its child alarm with "maximum" severity.
+Similarly, a sub-system's aggregated severity is determined by its child component with maximum severity.
 
 Health aggregation works on top of severity aggregation. A components aggregated health is calculated by first
-calculating it's aggregated severity and then mapping it to health. Sub-System health aggregation works in the same way.
+calculating its aggregated severity and then mapping it to health. Sub-System health aggregation works in the same way.
 
 ## Redis Storage
 
@@ -69,11 +69,13 @@ calculating it's aggregated severity and then mapping it to health. Sub-System h
 
 Metadata of an alarm is static information about an alarm such as name, 
 description, subsystem, component, etc. This information is not changed during runtime.
-Since the metadata is static, entire metadata of an alarm is stored against a single redis key in json format for easy retrieval.
+Since the metadata is static, entire metadata of an alarm is stored against a single redis key in json 
+format for easy retrieval. The static information is contained in a configuration file and loaded when Alarm Service 
+starts up.
 The key name is formed with pattern: `metadata-[SUBSYSTEM_NAME]-[COMPONENT_NAME]-[ALARM_NAME]` 
 e.g. `metadata-nfiraos-trombone-tromboneaxislowlimitalarm`.
 
-The sample json below, shows structure of typical alarm metadata
+The sample JSON below, shows structure of typical alarm metadata from the configuration file
 
 ```json
 {
@@ -139,7 +141,7 @@ Possible values of this key are:
 
 ### Shelve Status
 
-Indicates shelve status of an alarm. The key name is formed with pattern 
+Indicates shelved status of an alarm. The key name is formed with pattern 
 `shelvestatus-[SUBSYSTEM_NAME]-[COMPONENT_NAME]-[ALARM_NAME]`.  e.g. `shelvestatus-nfiraos-trombone-tromboneaxislowlimitalarm`
 
 This key can have one of the following values
@@ -151,14 +153,14 @@ If no value is present, it is inferred as `unshelved`
 
 ### Alarm Time
 
-Indicates the time since last severity change of an alarm. The key name is formed with pattern 
+Indicates the time of the last severity change of an alarm. The key name is formed with pattern 
 `alarmtime-[SUBSYSTEM_NAME]-[COMPONENT_NAME]-[ALARM_NAME]`. e.g. `alarmtime-nfiraos-beamsplitter-splitterlimitalarm`
 
 The value is stored in the format: `2019-04-03T11:09:28.404143Z`
 
 ### Initializing
 
-Indicates whether alarm is initializing or it's initialization is finished. It contains a boolean value either `true` or `false`
+Indicates whether alarm is initializing or its initialization is finished. It contains a boolean value either `true` or `false`
 
 The key name is formed with pattern 
 `initializing-[SUBSYSTEM_NAME]-[COMPONENT_NAME]-[ALARM_NAME]`. e.g. `initializing-lgsf-tcspkinactive-cpuidlealarm`
@@ -166,8 +168,8 @@ The key name is formed with pattern
 ## Alarm Disconnection
 
 All the severities except `Disconnected`, need to be set explicitly. `Disconnected` is a special severity in the sense that it
-can never be set by a component explicitly and is always inferred when there is no severity. Alarm service uses
-[Heartbeat pattern][1].
+can never be set by a component explicitly and is always inferred when there is no severity value has been set. 
+Alarm service uses [Heartbeat pattern][1].
 
 Whenever a component calls `SetSeverity`, severity get stored in redis for that alarm with certain _TTL_. This TTL is configurable. 
 For our example, let's assume it is 5 seconds. A TTL of 5 second means that if another call to `SetSeverity` is not made **within** 5 seconds, 
@@ -195,8 +197,8 @@ without polling them at regular intervals.
 
 ## Severity Latching
 
-[Alarm metadata](#metadata) json has a boolean attribute called "isLatchable". This determines the latching behaviour of an alarm. If an
-alarm is latchable, it's latched severity _sticks_ to the last highest severity until the alarm is reset. 
+[Alarm metadata](#metadata) JSON has a boolean attribute called "isLatchable". This determines the latching behaviour of an alarm. If an
+alarm is latchable, its latched severity _sticks_ to the last highest severity reached until the alarm is reset. 
 Reset operation is provided the [admin api](#api-structure) of alarm service.
 
 ![latched-alarm-behaviour](alarm-latchable-behavior-with-reset.gif)
@@ -205,14 +207,15 @@ For, alarms which are not latchable, latched severity will always be equal to se
 
 Setting severity and latched severity both is done by `SetSeverity` api. As described in previous sections,
 when a component dies, it can't call `SetSeverity` and the severity key in redis, expires.
-However the "Latched Severity" is still not updated; which is a problem. To solve this problem, the alarm server
+However the "Latched Severity" is still not updated; which is a problem. To solve this problem, the future Alarm Server
 subscribes to all severity changes (using akka stream api of alarm service) and whenever it detects a key has expired,
-it updates it's respective "latchedSeverity" value in redis to `disconnected`.
+it updates its respective "latchedSeverity" value in Redis to `disconnected`.
 
 ## Shelving Alarms
 
-Alarms can be shelved and un-shelved using alarm service api. 
-An alarm can only be shelved for a predefined time. The time can be configured in alarm configuration.
+Alarms can be shelved and un-shelved using the Alarm Service API. A shelved alarm will contribute to a subsystem's
+aggregate severity and health.
+An alarm can only be shelved for a predefined time. The time can be configured in Alarm Service configuration.
 For example: 
 
 ```hocon
@@ -220,38 +223,39 @@ shelve-timeout = "8:00:00 AM" // format -> h:m:s a
 ```
 
 When changing the shelve status to `shelved` it is set using `setex` operation of redis with an appropriate TTL
-so that it get's expired on next `shelve-timeout`. Once expired, it is inferred as `unshelved`.
+so that it gets expired on next `shelve-timeout`. Once expired, it is inferred as `unshelved`.
 
 Alarms can also be un-shelved explicitly before next `shelve-timeout` occurs. `unshelve` api sets `unshelved`
 value in redis explicitly without any TTL.
 
 ## Acknowledging Alarms
 
-Alarms can be in either `ackowldged` or `unackowldged` state. See [Acknowledgement Status](#acknowledgement-status) for more details. 
-The state can be changed to `ackowldged` by simply using `acknowledge` api of alarm service. Apart from this api,
+Alarms can be in either `acknowledged` or `unacknowledged` state. See [Acknowledgement Status](#acknowledgement-status) for more details. 
+The state can be changed to `acknowledged` by simply using `acknowledge` api of alarm service. Apart from this api,
 setting severity can also change the Acknowledgement Status of an alarm.
 
 Alarm can either be auto-acknowledgeable or not auto-acknowledgeable. This behavior is driven from [alarm metadata](#metadata).
 When an alarm is not auto-acknowledgeable, whenever it's severity changes to anything except Okay, it's Acknowledgement Status becomes
-`unackowldged`. If it is changing from any severity to Okay, Acknowledgement Status remains same.
+`acknowledged`. If it is changing from any severity to Okay, Acknowledgement Status remains same.
 
-When the alarm is auto-acknowledgeable, whenever it's severity changes to Okay, it's Acknowledgement Status becomes `ackowldged`.
+When the alarm is auto-acknowledgeable, whenever it's severity changes to Okay, it's Acknowledgement Status becomes `acknowledged`.
 If it changes to anything else, Acknowledgement Status remains same.
 
 ## API Structure
 
 ![api-structure](api-structure.png)
 
-The alarm service is divided into two parts. First one is called, well, @github[AlarmService](/csw-alarm/csw-alarm-api/src/main/scala/csw/alarm/api/scaladsl/AlarmService.scala) and it is meant
-for Components who need just one api i.e. `SetSeverity`
+The Alarm Service is divided into two parts. First one is called, well, @github[AlarmService](/csw-alarm/csw-alarm-api/src/main/scala/csw/alarm/api/scaladsl/AlarmService.scala) and it is meant
+for Components that are provided with one API i.e. `SetSeverity`
 
-The other one is @github[AlarmAdminService](/csw-alarm/csw-alarm-api/src/main/scala/csw/alarm/api/scaladsl/AlarmAdminService.scala). This api allows admins 
+The other API is @github[AlarmAdminService](/csw-alarm/csw-alarm-api/src/main/scala/csw/alarm/api/scaladsl/AlarmAdminService.scala). This API allows administrative 
 operations such as shelving alarms, subscribing for severity changes, acknowledging alarms, etc. 
-This api is consumed from @github[alarm cli](/csw-alarm/csw-alarm-cli) and alarm server.
+This API is consumed from @github[alarm cli](/csw-alarm/csw-alarm-cli) and Alarm Server. This API is also used by
+administrative clients such as engineering user interfaces to set the active versions of files.
 
-The api doc for alarm service can be found @scaladoc[here](csw/alarm/api/scaladsl/AlarmService) and @scaladoc[here](csw/alarm/api/scaladsl/AlarmAdminService).
+The API doc for Alarm Service can be found @scaladoc[here](csw/alarm/api/scaladsl/AlarmService) and @scaladoc[here](csw/alarm/api/scaladsl/AlarmAdminService).
 
-Detailed documentation about how to use these apis is available @ref:[here](../../services/alarm.md). 
+Detailed documentation about how to use these APIs is available @ref:[here](../../services/alarm.md). 
 
 ## Architecture
 
@@ -259,22 +263,24 @@ Detailed documentation about how to use these apis is available @ref:[here](../.
 
 @@@warning { title=Important }
 
-At the time of writing this documentation, the alarm server does not exist. It will be developed in future. 
-It's description and scope of work is subjected to change
+At the time of writing this documentation, the Alarm Server does not exist. It will be developed in future as part of
+ESW.HCMS. Its description and scope of work is subjected to change
 
 @@@
 
-For alarms to function, it is necessary that redis instance is registered with location service.
+For alarms to function, it is necessary that Redis instance is registered with Location Service.
 Redis here is configured similar to other services in CSW.
-There is a master redis instance and a slave redis instance. They are configured in "replication" mode.
-There a sentinel who's responsibility is to promote slave as master when master goes down. It is important to note that when master
-goes down, the "location" of alarm service remains same because location of alarm service is of sentinel and not of master or slave.
-The master and slave redis instances are dedicated for alarm, however sentinel is same across csw services.
+There is a master Redis instance and a slave Redis instance. They are configured in "replication" mode.
+There is a Sentinel instance who's responsibility it is to promote the slave as master when master goes down. It is important to note that when master
+goes down, the "location" of Alarm Service remains the same because the location of Alarm Service is the location of Sentinel and not of master or slave.
+The master and slave Redis instances are dedicated for alarm, however Sentinel is shared across CSW Redis-based services.
 
-Once location is registered, components, alarm CLI & alarm server can resolve redis location and start 
-interacting with it using the alarm api & alarm admin api. While the interaction of components with redis is limited to just `setSeverity` api,
+Once location is registered, components, alarm CLI & Alarm Server can resolve Redis location and start 
+interacting with it using the component alarm API & alarm admin API. While the interaction of components with Alarm Service is limited to the `setSeverity` API,
 Alarm CLI can perform all admin operations as discussed [above](#api-structure).
 
-Alarm server is not built yet. When built, it's functionality will be to watch all severity changes using the admin api
-and [latch](#severity-latching) appropriate alarms to disconnected severity. Apart from this, in future, it may also be
-responsible for providing an HTTP interface for various UI layer applications for alarm and health visualisations.
+Alarm Server is part of ESW.HCMS and is not yet built. When built, its functionality will be to watch 
+all severity changes using the admin API and [latch](#severity-latching) appropriate alarms to disconnected severity. 
+Apart from this, it will also be responsible for logging alarms and generating alarm events for 
+archiving in DMS.ENG. It provides an HTTP interface for various UI layer ESW.HCMS applications for 
+alarm and health visualisations.
