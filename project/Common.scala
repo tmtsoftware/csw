@@ -1,8 +1,9 @@
 import Libs._
 import org.scalafmt.sbt.ScalafmtPlugin.autoImport.scalafmtOnCompile
-import sbt.Keys.{testOptions, _}
+import sbt.Keys._
 import sbt.plugins.JvmPlugin
-import sbt.{settingKey, _}
+import sbt._
+import sbt.nio.Keys._
 import sbtunidoc.GenJavadocPlugin.autoImport.unidocGenjavadocVersion
 
 object Common extends AutoPlugin {
@@ -65,6 +66,7 @@ object Common extends AutoPlugin {
     autoCompilerPlugins := true,
     cancelable in Global := true, // allow ongoing test(or any task) to cancel with ctrl + c and still remain inside sbt
     scalafmtOnCompile := true,
-    unidocGenjavadocVersion := "0.13"
+    unidocGenjavadocVersion := "0.13",
+    Global / onChangedBuildSource := ReloadOnSourceChanges
   )
 }
