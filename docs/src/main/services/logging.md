@@ -4,8 +4,7 @@ The Logging Service library provides an advanced logging facility for csw compon
 
 @@@note
 
-With this release of CSW, only the local logging is provided.  A future release will provide
-the centralized logging facility.
+This page explains local logging only. To understand centralized logging facility refer to @ref:[this page](../commons/logging_aggregator.md).
 
 @@@
     
