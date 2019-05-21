@@ -56,6 +56,16 @@ lazy val githubReleases: Seq[ProjectReference] = Seq(
   `csw-alarm-cli`
 )
 
+lazy val multiJvmProjects: Seq[ProjectReference] = Seq(
+  `csw-location-server`,
+  `csw-aas-http`,
+  `csw-event-client`,
+  `csw-command-client`,
+  `csw-framework`,
+  `csw-config-cli`,
+  `csw-config-client`,
+)
+
 /* ================= Root Project ============== */
 lazy val `csw` = project
   .in(file("."))
@@ -63,8 +73,9 @@ lazy val `csw` = project
   .disablePlugins(BintrayPlugin)
   .aggregate(aggregatedProjects: _*)
   .settings(Settings.mergeSiteWith(docs))
-  .settings(Settings.addBuildAllAlias)
+  .settings(Settings.addAliases)
   .settings(Settings.docExclusions(unidocExclusions))
+  .settings(Settings.multiJvmTestTask(multiJvmProjects))
   .settings(GithubRelease.githubReleases(githubReleases))
   .settings(
     bootstrap in Coursier := CoursierPlugin.bootstrapTask(githubReleases).value
