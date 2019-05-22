@@ -20,13 +20,14 @@ import scala.language.implicitConversions
  * Usage examples:
  * <code>
  * //import provides implicit conversions for numbers
- * import org.asterope.util._
+ * import Angle._
  * //use implicit conversions to construct angle from number
  * val angle = 10.degree + 0.5.arcSec
  * //convert value to radian an print it
  * println(11.toRadian)
  * </code>
  */
+//noinspection ScalaStyle
 case class Angle(uas: Long) extends AnyVal with Serializable with Ordered[Angle] {
 
   //require(uas> - Angle.CIRCLE && uas < Angle.CIRCLE, "out of range, possible overflow ");
@@ -44,9 +45,9 @@ case class Angle(uas: Long) extends AnyVal with Serializable with Ordered[Angle]
 
   def /(a2: Int): Angle = new Angle(uas / a2)
 
-  def unary_+ = this
+  def unary_+ : Angle = this
 
-  def unary_- = Angle(-uas)
+  def unary_- : Angle = Angle(-uas)
 
   override def compare(that: Angle): Int = uas.compare(that.uas)
 
@@ -91,7 +92,7 @@ object Angle {
   }
 
   /** used in implicit conversion to support `1.degree`, `1.arcMinute` etc */
-  protected class AngleWrapperDouble(value: Double) {
+  class AngleWrapperDouble(value: Double) {
     def degree: Angle = Angle((value * Angle.D2Uas).toLong)
 
     def arcMinute: Angle = Angle((value * Angle.M2Uas).toLong)
@@ -106,11 +107,11 @@ object Angle {
   }
 
   //implicit conversions
-  implicit protected[models] def long2angle(d: Long): AngleWrapperDouble = new AngleWrapperDouble(d)
+  implicit def long2angle(d: Long): AngleWrapperDouble = new AngleWrapperDouble(d)
 
-  implicit protected[models] def int2angle(d: Int): AngleWrapperDouble = new AngleWrapperDouble(d)
+  implicit def int2angle(d: Int): AngleWrapperDouble = new AngleWrapperDouble(d)
 
-  implicit protected[models] def double2angle(d: Double): AngleWrapperDouble = new AngleWrapperDouble(d)
+  implicit def double2angle(d: Double): AngleWrapperDouble = new AngleWrapperDouble(d)
 
   //def radian2angle(rad: Double) = new Angle((Angle.R2Uas * rad).toLong)
   //def degree2angle(deg: Double) = new Angle((Angle.D2Uas * deg).toLong)
@@ -206,7 +207,7 @@ object Angle {
     ra match {
       case r1(h, m, s) => parseRa(h, m, s)
       case r2(h, m)    => parseRa(h, m, null)
-      case r3(d, m, s) => d.toDouble.degree + m.toDouble.arcMinute + m.toDouble.arcSec
+      case r3(d, m, s) => d.toDouble.degree + m.toDouble.arcMinute + s.toDouble.arcSec
       case _           => throw new IllegalArgumentException("Could not parse RA: " + ra)
     }
   }
