@@ -45,10 +45,10 @@ trait BaseProperties {
 }
 
 object BaseProperties {
-  def createInfra(serverPort: Int, httpPort: Int): (LocationService, ActorSystem[_]) = {
+  def createInfra(serverPort: Int, httpPort: Int): (LocationService, ActorSystem[Nothing]) = {
 
-    implicit val typedSystem: ActorSystem[_] = ActorSystem(Behaviors.empty, "event-server")
-    implicit val mat: Materializer           = ActorMaterializer()
+    implicit val typedSystem: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "event-server")
+    implicit val mat: Materializer                 = ActorMaterializer()
 
     val locationService = new LocationServiceClient("localhost", httpPort)
     val tcpRegistration = TcpRegistration(EventServiceConnection.value, serverPort)

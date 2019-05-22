@@ -21,7 +21,6 @@ import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.codec.StringCodec
 import io.lettuce.core.{ClientOptions, RedisClient, RedisURI}
 import redis.embedded.{RedisSentinel, RedisServer}
-import scala.language.existentials
 
 import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.concurrent.Future
