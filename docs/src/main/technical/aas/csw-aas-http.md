@@ -48,6 +48,19 @@ Following diagrams shows request flow for secure akka http server.
 
 ![aas-http-flow.png](akka-http-workflow.png) 
 
+
+
+The core of this adapter is the `SecurityDirectives` class. Following diagram shows request flow through different core classes
+of this adapter. `SecurityDirecives` provided by this adapter are used while writing akka http server. For detailing following
+diagram shows akka http server and security directives as separate. Diagram depicts happy flow of POST request secured using realm 
+role based authorization policy where server returns 200 OK code. When authentication and authorization is successful, application logic
+is executed and 200 OK is returned by server. e.g. create config file if user is authenticated and have admin role. 
+In case of errors, server return 401 (unauthorized) or 403 (forbidden) e.g. - If token verification fails for invalid or 
+expired token, `TokenVerifier` returns appropriate `TokenVerificationFailure` and akka http server returns 401. 
+If authorization policy check fails then `AccessToken` returns false and then akka http server return 403.
+
+![aas-http-sequence-diagram](aas-http-sequence-diagram.png)
+
 ## Asynchronous nature of Akka-HTTP Routing layer
 
 csw-aas-http uses `authenticateOAuth2Async` and `authorizeAsync` which are async variants of akka-http security directives. This allows 
