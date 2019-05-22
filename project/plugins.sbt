@@ -25,6 +25,8 @@ addSbtPlugin("com.github.cb372"                  % "sbt-explicit-dependencies"  
 resolvers += "Jenkins repo" at "http://repo.jenkins-ci.org/public/"
 addSbtPlugin("ohnosequences" % "sbt-github-release" % "0.7.0")
 
+addSbtCoursier
+
 classpathTypes += "maven-plugin"
 
 libraryDependencies += "com.thesamet.scalapb" %% "compilerplugin"  % "0.8.4"
