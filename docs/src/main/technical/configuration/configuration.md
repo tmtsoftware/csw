@@ -90,3 +90,22 @@ Whenever new annex file has to be created, there are following three files gets 
 - actual large file which user has requested with provided content in annex store
 - while creating large file, it's sha gets calculated based on file content and new file `{name}.$sha1` with this sha gets created in svn repo
 - `{name}.$active` file which keeps track of current active version of file
+
+
+## Internals
+
+Important classes involved in configuration service are:
+
+- @github[ConfigServiceRoute](/csw-config/csw-config-server/src/main/scala/csw/config/server/http/ConfigServiceRoute.scala): contains all the read and write http routes 
+
+- @github[SvnConfigService](/csw-config/csw-config-server/src/main/scala/csw/config/server/svn/SvnConfigService.scala): responsible for all the interactions with SvnRepo and AnnexFileService to perform CRUD operations 
+
+- @github[SvnRepo](/csw-config/csw-config-server/src/main/scala/csw/config/server/svn/SvnRepo.scala): responsible for all the CRUD operations on svn repository using [SVNKit](https://wiki.svnkit.com)
+
+- @github[AnnexFileService](/csw-config/csw-config-server/src/main/scala/csw/config/server/files/AnnexFileService.scala): responsible for calculating SHA1 based on file content and interacting with AnnexFileRepo to perform CRUD operations
+
+- @github[AnnexFileRepo](/csw-config/csw-config-server/src/main/scala/csw/config/server/files/AnnexFileRepo.scala): represents file based repository for large/binary/annex files
+        
+Below sequence diagram indicates how these classes are involved in creation of annex file: 
+
+![Config Sequence](config_sequence_diagram.png)
