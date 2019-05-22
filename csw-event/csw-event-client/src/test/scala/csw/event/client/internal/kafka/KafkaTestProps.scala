@@ -23,6 +23,7 @@ import org.apache.kafka.common.serialization.StringSerializer
 
 import scala.collection.JavaConverters.mapAsScalaMapConverter
 import scala.concurrent.Future
+import scala.language.existentials
 
 class KafkaTestProps(
     kafkaPort: Int,
