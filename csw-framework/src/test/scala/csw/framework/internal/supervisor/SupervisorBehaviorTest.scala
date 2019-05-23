@@ -5,15 +5,17 @@ import akka.actor.testkit.typed.Effect.{Spawned, Watched}
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
-import csw.command.client.messages.{ComponentMessage, ContainerIdleMessage, SupervisorMessage}
+import csw.command.client.messages._
 import csw.common.components.framework.SampleComponentBehaviorFactory
 import csw.common.extensions.CswContextExtensions.RichCswContext
 import csw.framework.ComponentInfos._
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
-import org.mockito.ArgumentMatchers
-import org.mockito.MockitoSugar
+import csw.logging.api.models.LoggingLevels.WARN
+import csw.logging.client.models.LogMetadata
+import org.mockito.{ArgumentMatchers, MockitoSugar}
 
 import scala.collection.immutable
+import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
@@ -61,6 +63,28 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
 
     supervisorBehaviorTestKit.retrieveAllEffects() should contain(Watched(componentActor))
     supervisorBehaviorTestKit.retrieveAllEffects() should not contain Watched(pubSubLifecycleActor)
+  }
+
+  test("Supervisor should support concurrent updates to log-levels of components") {
+    val supervisorBehaviorTestKit = BehaviorTestKit(supervisorBehavior)
+    val logMetadataProbe          = TestProbe[LogMetadata]("log")
+    import typedSystem.executionContext
+
+    Future {
+      supervisorBehaviorTestKit.run(SetComponentLogLevel("DummyHcd", WARN))
+      supervisorBehaviorTestKit.run(GetComponentLogMetadata("DummyHcd", logMetadataProbe.ref))
+    }
+    Future {
+      supervisorBehaviorTestKit.run(SetComponentLogLevel("SampleHcd", WARN))
+      supervisorBehaviorTestKit.run(GetComponentLogMetadata("SampleHcd", logMetadataProbe.ref))
+    }
+
+    val logMetadata1 = logMetadataProbe.expectMessageType[LogMetadata]
+    val logMetadata2 = logMetadataProbe.expectMessageType[LogMetadata]
+
+    logMetadata1.componentLevel shouldBe WARN
+    logMetadata2.componentLevel shouldBe WARN
+
   }
 
   private def createBehavior(timerScheduler: TimerScheduler[SupervisorMessage]): Behavior[ComponentMessage] = {

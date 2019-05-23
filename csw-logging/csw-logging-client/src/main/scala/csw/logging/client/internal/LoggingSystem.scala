@@ -77,7 +77,7 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
 
   private[this] val initialComponentsLoggingState = ComponentLoggingStateManager.from(loggingConfig)
 
-  LoggingState.componentsLoggingState = LoggingState.componentsLoggingState ++ initialComponentsLoggingState
+  LoggingState.componentsLoggingState.putAll(initialComponentsLoggingState)
 
   /**
    * Standard headers.
@@ -128,17 +128,19 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
 
   /**
    * Get logging levels.
+   *
    * @return the current and default logging levels.
    */
   def getDefaultLogLevel: Levels = Levels(LoggingState.logLevel, defaultLevel)
 
   /**
    * Changes the logger API logging level.
+   *
    * @param level the new logging level for the logger API.
    */
   def setDefaultLogLevel(level: Level): Unit = {
     LoggingState.logLevel = level
-    LoggingState.componentsLoggingState(Constants.DEFAULT_KEY).setLevel(level)
+    LoggingState.componentsLoggingState.get(Constants.DEFAULT_KEY).setLevel(level)
   }
 
   /**
@@ -150,6 +152,7 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
 
   /**
    * Changes the Akka logger logging level.
+   *
    * @param level the new logging level for the Akka logger.
    */
   def setAkkaLevel(level: Level): Unit = {
@@ -208,7 +211,7 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
       getAkkaLevel.current,
       getSlf4jLevel.current,
       LoggingState.componentsLoggingState
-        .getOrElse(componentName, LoggingState.componentsLoggingState(Constants.DEFAULT_KEY))
+        .getOrDefault(componentName, LoggingState.componentsLoggingState.get(Constants.DEFAULT_KEY))
         .componentLogLevel
     )
 
