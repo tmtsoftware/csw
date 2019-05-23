@@ -41,12 +41,18 @@ Below is the sequence diagram of the event service. It captures the flow from cr
 
 ![Sequence Diagram](sequence-diagram.png) 
 
-`EventServiceFactory` allows creation of `EventService` using host and port of the EventStore or using `LocationService` to resolve location 
-of the EventStore. `EventService` provides APIs to create 
+`EventServiceFactory` provides overloads of `make` method which allow creation of `EventService` using host-port 
+as well as using `LocationService` to resolve the EventStore. `EventService` provides APIs to create 
 @scaladoc[EventPublisher](csw.event.api.scaladsl.EventPublisher) and
-@scaladoc[EventSubscriber](csw.event.api.scaladsl.EventSubscriber).
-Refer to [this section](../../services/event.md#accessing-event-service) of event service doc to read about APIs 
-provided by this entity.
+@scaladoc[EventSubscriber](csw.event.api.scaladsl.EventSubscriber) which allow users to publish/subscribe to events.
+It provides both APIs 
+
+* to make new instances of publisher/subscriber
+ 
+* to use a default instance of publisher/subscriber
+ 
+When to use which API is documented in 
+@ref[this section](../../services/event.md#accessing-event-service) of the event service doc.
 
  
 Event Service uses [Redis' PubSub](https://redis.io/topics/pubsub) for publishing and subscribing to events.
