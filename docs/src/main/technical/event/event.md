@@ -11,7 +11,7 @@ The end-to-end latency of events assured by Event service is 5 milliseconds. It 
 In the TMT control system, events may be created as the output of a calculation by one component for the input to a calculation in 
 one or more other components. Demand events often consist of events that are published at a specific rate.
 
-## Technology
+## Technology Choices
 
 There were two good candidates for the backend of Event Service - [Apache Kafka](https://kafka.apache.org/) and [Redis](https://redis.io/). 
 The Event Service API is implemented with both the backends and a performance testing was done to select one particular backend 
@@ -21,10 +21,33 @@ Redis seemed to be a good choice for the backend as it turned out to be better a
 unlike Kafka which is more suited for high throughput systems.
 Hence you can see 2 implementations of the API in the Event Service client. The code is structured in a way that it is easy to switch the implementations.
 
-@scaladoc[EventServiceFactory](csw.event.client.EventServiceFactory) in event-client which provides APIs to make new 
-@scaladoc[EventService](csw.event.api.scaladsl.EventService) or @scaladoc[IEventService](csw.event.api.javadsl.IEventService)
-takes an @scaladoc[EventStore](csw.event.client.models.EventStore) which could be either @scaladoc[RedisStore](csw.event.client.models.EventStores.RedisStore) or
-@scaladoc[KafkaStore](csw.event.client.models.EventStores.KafkaStore). The default value is set to RedisStore.
+## Implementation Details
+
+@scaladoc[EventServiceFactory](csw.event.client.EventServiceFactory) in `csw-event-client` is the entry point in the event service. 
+It provides APIs to make new 
+@scaladoc[EventService](csw.event.api.scaladsl.EventService) for scala 
+and @scaladoc[IEventService](csw.event.api.javadsl.IEventService) for java.
+It takes an @scaladoc[EventStore](csw.event.client.models.EventStore) which could be either
+@scaladoc[RedisStore](csw.event.client.models.EventStores.RedisStore) or
+@scaladoc[KafkaStore](csw.event.client.models.EventStores.KafkaStore).
+
+
+Depending on which store is provided to the `EventServiceFactory`, an implementation of `EventService` is returned
+ which could be either `KafkaEventService` or `RedisEventService`. The default store is set to `RedisStore`. Hence the service returned by default 
+ is `RedisEventService`.
+ 
+Below is the sequence diagram of the event service. It captures the flow from creation of `EventService` via 
+`EventServiceFactory` till the publishing/subscription of events to Redis.
+
+![Sequence Diagram](sequence-diagram.png) 
+
+`EventServiceFactory` allows creation of `EventService` using host and port of the EventStore or using `LocationService` to resolve location 
+of the EventStore. `EventService` provides APIs to create 
+@scaladoc[EventPublisher](csw.event.api.scaladsl.EventPublisher) and
+@scaladoc[EventSubscriber](csw.event.api.scaladsl.EventSubscriber).
+Refer to [this section](../../services/event.md#accessing-event-service) of event service doc to read about APIs 
+provided by this entity.
+
  
 Event Service uses [Redis' PubSub](https://redis.io/topics/pubsub) for publishing and subscribing to events.
 And to cater a specific feature of fetching the latest event on subscription, [set operation](https://redis.io/commands/set) of Redis DB is used.
