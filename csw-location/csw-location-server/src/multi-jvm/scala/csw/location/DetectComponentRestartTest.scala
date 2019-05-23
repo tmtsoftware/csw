@@ -44,7 +44,12 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
       Await.result(system.whenTerminated, 10.seconds)
 
       startNewSystem()
-      val newSystem      = makeSystem(config.settings.joinLocal(3552).config)
+
+      val newConfig = if(sys.env.get("clusterSeeds").isEmpty)
+        config.settings.joinLocal(3552).config
+      else config.settings.config
+
+      val newSystem      = makeSystem(newConfig)
       val newTypedSystem = newSystem.toTyped.asInstanceOf[ActorSystem[SpawnProtocol]]
 
       val freshLocationService = mode match {
