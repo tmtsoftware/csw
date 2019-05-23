@@ -54,7 +54,7 @@ to decide whether it needs to be logged or not depending on the new loglevel.
 External loggers like AkkaLogger and Slf4jAppender are wired up such that any logs from those libraries
 (akka and others that implement Slf4j like log4j, logback, tinylog etc) will go through our facade of AkkaLogger
 and Slf4jAppender respectively. For AkkaLogger, there is a configuration `akka.loggers` specified in `logging.conf` which does
-this wiring and for Slf4jAppender `logback.xml` is configured. 
+this wiring and for Slf4jAppender `logback.xml` is configured. AkkaLogger and Slf4jAppender then forward these logs to the `LogActor`.
 
 ### Hierarchy of LoggerFactories 
 
