@@ -45,7 +45,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
 
       startNewSystem()
 
-      val newConfig = if(sys.env.get("clusterSeeds").isEmpty)
+      val newConfig = if(sys.env.get("CLUSTER_SEEDS").isEmpty)
         config.settings.joinLocal(3552).config
       else config.settings.config
 
