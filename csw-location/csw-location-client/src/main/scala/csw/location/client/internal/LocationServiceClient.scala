@@ -2,7 +2,9 @@ package csw.location.client.internal
 
 import java.io.IOException
 
-import akka.actor.{ActorSystem, CoordinatedShutdown, Scheduler}
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.{CoordinatedShutdown, Scheduler}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshalling.Marshal
 import akka.http.scaladsl.model._
@@ -11,7 +13,7 @@ import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.http.scaladsl.unmarshalling.sse.EventStreamUnmarshalling._
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{KillSwitch, KillSwitches, Materializer}
-import akka.{Done, NotUsed}
+import akka.{Done, NotUsed, actor}
 import csw.location.api.exceptions.{OtherLocationIsRegistered, RegistrationFailed}
 import csw.location.api.formats.LocationJsonSupport
 import csw.location.api.models.{Registration, RegistrationResult, _}
@@ -23,14 +25,16 @@ import scala.async.Async.{async, await}
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
-private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(implicit val actorSystem: ActorSystem,
-                                                                            mat: Materializer)
-    extends LocationService
+private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
+    implicit val actorSystem: ActorSystem[_],
+    mat: Materializer
+) extends LocationService
     with PlayJsonSupport
     with LocationJsonSupport { outer ⇒
 
-  import actorSystem.dispatcher
-  implicit val scheduler: Scheduler = actorSystem.scheduler
+  import actorSystem.executionContext
+  implicit val untypedSystem: actor.ActorSystem = actorSystem.toUntyped
+  implicit val scheduler: Scheduler             = actorSystem.scheduler
 
   private val baseUri = s"http://$serverIp:$serverPort/location"
 
@@ -43,7 +47,7 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(impl
     response.status match {
       case StatusCodes.OK ⇒
         val location0 = await(Unmarshal(response.entity).to[Location])
-        CoordinatedShutdown(actorSystem).addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "unregister")(
+        CoordinatedShutdown(untypedSystem).addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "unregister")(
           () ⇒ unregister(location0.connection)
         )
         new RegistrationResult {

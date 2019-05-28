@@ -1,6 +1,7 @@
 package org.tmt.nfiraos.samplehcd;
 
 import akka.actor.typed.ActorSystem;
+import akka.actor.typed.SpawnProtocol;
 import akka.util.Timeout;
 import csw.command.api.javadsl.ICommandService;
 import csw.command.client.CommandServiceFactory;
@@ -106,7 +107,7 @@ public class JSampleHcdTest extends JUnitSuite {
     //#subscribe
 
     //#submit
-    private ActorSystem<Void> typedActorSystem = akka.actor.typed.javadsl.Adapter.toTyped(testKit.actorSystem());
+    private ActorSystem<SpawnProtocol> typedActorSystem = testKit.actorSystem();
     @Test
     public void testShouldBeAbleToSendSleepCommandToHCD() throws ExecutionException, InterruptedException {
 

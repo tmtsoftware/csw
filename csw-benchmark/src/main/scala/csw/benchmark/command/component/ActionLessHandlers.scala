@@ -6,9 +6,8 @@ import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.TrackingEvent
 import csw.logging.api.scaladsl.Logger
-import csw.params.commands.CommandResponse.{Accepted, SubmitResponse, ValidateCommandResponse}
+import csw.params.commands.CommandResponse.{Accepted, Completed, SubmitResponse, ValidateCommandResponse}
 import csw.params.commands._
-import csw.params.core.models.Id
 
 import scala.concurrent.Future
 
@@ -16,13 +15,13 @@ class ActionLessHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCon
 
   val log: Logger = cswCtx.loggerFactory.getLogger(ctx)
 
-  override def initialize(): Future[Unit] = Future.successful(Unit)
+  override def initialize(): Future[Unit] = Future.unit
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
 
-  override def validateCommand(controlCommand: ControlCommand): ValidateCommandResponse = Accepted(Id())
+  override def validateCommand(controlCommand: ControlCommand): ValidateCommandResponse = Accepted(controlCommand.runId)
 
-  override def onSubmit(controlCommand: ControlCommand): SubmitResponse = ???
+  override def onSubmit(controlCommand: ControlCommand): SubmitResponse = Completed(controlCommand.runId)
 
   override def onOneway(controlCommand: ControlCommand): Unit = ???
 

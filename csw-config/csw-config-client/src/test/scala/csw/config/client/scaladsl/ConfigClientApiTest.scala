@@ -25,8 +25,8 @@ class ConfigClientApiTest extends ConfigClientBaseSuite {
   private val testFileUtils         = new TestFileUtils(serverWiring.settings)
 
   //Why 2 instances of ConfigService? adminAPI is used to set configurations; clientAPI is used for validation/testing
-  val configClientService: ConfigClientService = ConfigClientFactory.clientApi(actorSystem, clientLocationService)
-  val configAdminService: ConfigService        = ConfigClientFactory.adminApi(actorSystem, clientLocationService, factory)
+  val configClientService: ConfigClientService = ConfigClientFactory.clientApi(typedSystem, clientLocationService)
+  val configAdminService: ConfigService        = ConfigClientFactory.adminApi(typedSystem, clientLocationService, factory)
 
   override def beforeEach(): Unit = serverWiring.svnRepo.initSvnRepo()
 

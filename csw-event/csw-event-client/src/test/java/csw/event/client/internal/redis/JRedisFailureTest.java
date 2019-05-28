@@ -64,7 +64,7 @@ public class JRedisFailureTest extends JUnitSuite {
     @Test
     public void handleFailedPublishEventWithACallback() throws InterruptedException, ExecutionException, TimeoutException {
         IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
-        TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.typedActorSystem());
+        TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.actorSystem());
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
 
         publisher.shutdown().get(10, TimeUnit.SECONDS);
@@ -85,7 +85,7 @@ public class JRedisFailureTest extends JUnitSuite {
     @Test
     public void handleFailedPublishEventWithAnEventGeneratorAndACallback() throws InterruptedException, ExecutionException, TimeoutException {
         IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
-        TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.typedActorSystem());
+        TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.actorSystem());
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
 
         publisher.shutdown().get(10, TimeUnit.SECONDS);
@@ -105,7 +105,7 @@ public class JRedisFailureTest extends JUnitSuite {
     @Test
     public void handleFailedPublishEventWithAnEventGeneratorGeneratingFutureOfEventAndACallback() throws InterruptedException, ExecutionException, TimeoutException {
         IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
-        TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.typedActorSystem());
+        TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.actorSystem());
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
 
         publisher.shutdown().get(10, TimeUnit.SECONDS);
@@ -125,7 +125,7 @@ public class JRedisFailureTest extends JUnitSuite {
     @Test
     public void handleFailedPublishEventWithAnEventGeneratorGeneratingEventAtSpecificTimeAndACallback() throws InterruptedException, ExecutionException, TimeoutException {
         IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
-        TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.typedActorSystem());
+        TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.actorSystem());
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
 
         publisher.shutdown().get(10, TimeUnit.SECONDS);
@@ -147,7 +147,7 @@ public class JRedisFailureTest extends JUnitSuite {
     @Test
     public void handleFailedPublishEventWithAnEventGeneratorGeneratingFutureOfEventAtSpecificTimeAndACallback() throws InterruptedException, ExecutionException, TimeoutException {
         IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
-        TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.typedActorSystem());
+        TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.actorSystem());
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
 
         publisher.shutdown().get(10, TimeUnit.SECONDS);
@@ -169,7 +169,7 @@ public class JRedisFailureTest extends JUnitSuite {
     @Test
     public void shouldNotInvokeOnErrorOnOptingToNotPublishEventWithEventGenerator() throws InterruptedException, ExecutionException, TimeoutException {
         IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
-        TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.typedActorSystem());
+        TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.actorSystem());
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
 
         publisher.shutdown().get(10, TimeUnit.SECONDS);
@@ -188,7 +188,7 @@ public class JRedisFailureTest extends JUnitSuite {
     @Test
     public void shouldNotInvokeOnErrorOnOptingToNotPublishEventWithAsyncEventGenerator() throws InterruptedException, ExecutionException, TimeoutException {
         IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
-        TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.typedActorSystem());
+        TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.actorSystem());
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
 
         publisher.shutdown().get(10, TimeUnit.SECONDS);

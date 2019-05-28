@@ -1,14 +1,16 @@
 package csw.logging.client.javadsl;
 
 import akka.actor.typed.ActorRef;
-import akka.actor.ActorSystem;
+import akka.actor.typed.ActorSystem;
 import akka.actor.typed.Props;
-import akka.actor.typed.javadsl.Adapter;
+import akka.actor.typed.SpawnProtocol;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import csw.logging.api.models.LoggingLevels;
 import csw.logging.client.appenders.LogAppenderBuilder;
+import csw.logging.client.commons.AkkaTypedExtension;
+import csw.logging.client.commons.AkkaTypedExtension.SpawnProtocolUserActorFactory;
 import csw.logging.client.commons.LoggingKeys$;
 import csw.logging.client.components.iris.JIrisSupervisorActor;
 import csw.logging.client.components.iris.JIrisTLA;
@@ -31,7 +33,7 @@ import static csw.logging.client.utils.Eventually.eventually;
 
 // DEOPSCSW-316: Improve Logger accessibility for component developers
 public class ILoggerTest extends JUnitSuite {
-    private static ActorSystem actorSystem = ActorSystem.create("base-system");
+    private static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.behavior(),"base-system");
     private static LoggingSystem loggingSystem;
 
     private static List<JsonObject> logBuffer = new ArrayList<>();
@@ -51,9 +53,12 @@ public class ILoggerTest extends JUnitSuite {
     private static List<JsonObject> genericLogBuffer = new ArrayList<>();
     private static List<JsonObject> irisLogBuffer = new ArrayList<>();
     private static List<JsonObject> tromboneHcdLogBuffer = new ArrayList<>();
-    private static ActorRef<String> irisSupervisorActor = Adapter.spawn(actorSystem,JIrisSupervisorActor.behavior, "JIRISActor",Props.empty());
-    private static ActorRef<String> tromboneSupervisorActor = Adapter.spawn(actorSystem,JTromboneHCDSupervisorActor.behavior(new JLoggerFactory("jTromboneHcdActor")), "JTromboneActor", Props.empty());
-    private static ActorRef<String> genericActor = Adapter.spawn(actorSystem, JGenericActor.behavior, "JGenericActor", Props.empty());
+
+    private static SpawnProtocolUserActorFactory userActorFactory = AkkaTypedExtension.SpawnProtocolUserActorFactory(actorSystem);
+
+    private static ActorRef<String> irisSupervisorActor = userActorFactory.<String>userActorOf(JIrisSupervisorActor.behavior, "JIRISActor", Props.empty());
+    private static ActorRef<String> tromboneSupervisorActor = userActorFactory.<String>userActorOf(JTromboneHCDSupervisorActor.behavior(new JLoggerFactory("jTromboneHcdActor")), "JTromboneActor", Props.empty());
+    private static ActorRef<String> genericActor = userActorFactory.<String>userActorOf(JGenericActor.behavior, "JGenericActor", Props.empty());
 
     @BeforeClass
     public static void setup() {

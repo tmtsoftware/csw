@@ -1,7 +1,8 @@
 package csw.testkit
 
-import akka.actor.ActorSystem
-import akka.actor.typed.ActorRef
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.{ActorRef, SpawnProtocol}
+import akka.actor.{typed, ActorSystem}
 import akka.http.scaladsl.Http
 import akka.stream.Materializer
 import akka.util.Timeout
@@ -37,14 +38,14 @@ import scala.concurrent.ExecutionContext
  *
  */
 final class FrameworkTestKit private (
-    val actorSystem: ActorSystem,
+    val actorSystem: typed.ActorSystem[SpawnProtocol],
     val locationTestKit: LocationTestKit,
     val configTestKit: ConfigTestKit,
     val eventTestKit: EventTestKit,
     val alarmTestKit: AlarmTestKit
 ) {
 
-  implicit lazy val system: ActorSystem     = actorSystem
+  implicit lazy val system: ActorSystem     = actorSystem.toUntyped
   lazy val frameworkWiring: FrameworkWiring = FrameworkWiring.make(actorSystem)
   implicit lazy val ec: ExecutionContext    = frameworkWiring.actorRuntime.ec
   implicit lazy val mat: Materializer       = frameworkWiring.actorRuntime.mat
@@ -123,7 +124,7 @@ object FrameworkTestKit {
    * @return handle to FrameworkTestKit which can be used to start and stop all services started
    */
   def apply(
-      actorSystem: ActorSystem = ActorSystemFactory.remote("framework-testkit"),
+      actorSystem: typed.ActorSystem[SpawnProtocol] = ActorSystemFactory.remote(SpawnProtocol.behavior, "framework-testkit"),
       testKitSettings: TestKitSettings = TestKitSettings(ConfigFactory.load())
   ): FrameworkTestKit = new FrameworkTestKit(
     actorSystem,
@@ -146,7 +147,7 @@ object FrameworkTestKit {
    * @param actorSystem actorSystem used for spawning components
    * @return handle to FrameworkTestKit which can be used to start and stop all services started
    */
-  def create(actorSystem: ActorSystem): FrameworkTestKit = apply(actorSystem = actorSystem)
+  def create(actorSystem: typed.ActorSystem[SpawnProtocol]): FrameworkTestKit = apply(actorSystem)
 
   /**
    * Java API for creating FrameworkTestKit

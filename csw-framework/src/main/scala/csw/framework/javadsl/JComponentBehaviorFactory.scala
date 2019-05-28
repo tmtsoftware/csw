@@ -2,13 +2,12 @@ package csw.framework.javadsl
 
 import akka.actor.typed.javadsl.ActorContext
 import akka.actor.typed.scaladsl
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import csw.command.client.messages.TopLevelActorMessage
-import csw.framework.models.{CswContext, JCswContext}
-import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.alarm.client.internal.JAlarmServiceImpl
+import csw.command.client.messages.TopLevelActorMessage
 import csw.config.client.javadsl.JConfigClientFactory
 import csw.event.client.internal.commons.EventServiceAdapter
+import csw.framework.models.{CswContext, JCswContext}
+import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.location.client.extensions.LocationServiceExt.RichLocationService
 
 /**
@@ -16,7 +15,6 @@ import csw.location.client.extensions.LocationServiceExt.RichLocationService
  */
 abstract class JComponentBehaviorFactory extends ComponentBehaviorFactory() {
 
-  //TODO
   protected def handlers(ctx: scaladsl.ActorContext[TopLevelActorMessage], cswCtx: CswContext): ComponentHandlers = {
     import cswCtx._
     import ctx.executionContext
@@ -28,7 +26,7 @@ abstract class JComponentBehaviorFactory extends ComponentBehaviorFactory() {
         new JAlarmServiceImpl(alarmService),
         timeServiceScheduler,
         loggerFactory.asJava,
-        JConfigClientFactory.clientApi(ctx.system.toUntyped, locationService.asJava),
+        JConfigClientFactory.clientApi(ctx.system, locationService.asJava),
         commandResponseManager,
         currentStatePublisher,
         componentInfo

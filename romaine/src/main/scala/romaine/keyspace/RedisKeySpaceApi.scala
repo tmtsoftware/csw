@@ -59,15 +59,14 @@ class RedisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
       watchKeyspaceValue(keys, overflowStrategy)
         .statefulMapConcat(() => {
           var digest = initialValues
-          redisResult =>
-            {
-              val change = RedisResult(
-                redisResult.key,
-                RedisValueChange(digest.get(redisResult.key).flatten, redisResult.value)
-              )
-              digest += redisResult.key -> redisResult.value
-              List(change)
-            }
+          redisResult => {
+            val change = RedisResult(
+              redisResult.key,
+              RedisValueChange(digest.get(redisResult.key).flatten, redisResult.value)
+            )
+            digest += redisResult.key -> redisResult.value
+            List(change)
+          }
         })
     })
 
@@ -78,7 +77,7 @@ class RedisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
           new RedisSubscription {
             override def unsubscribe(): Future[Done] = subscriptionF.flatMap(_.unsubscribe())
             override def ready(): Future[Done]       = subscriptionF.flatMap(_.ready())
-        }
+          }
       )
   }
 }

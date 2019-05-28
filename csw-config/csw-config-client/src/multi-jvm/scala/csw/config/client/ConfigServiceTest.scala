@@ -2,7 +2,7 @@ package csw.config.client
 
 import java.nio.file.Paths
 
-import akka.actor.ActorSystem
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.ConfigFactory
 import csw.config.api.models.ConfigData
 import csw.config.client.helpers.OneClientAndServer
@@ -43,9 +43,9 @@ class ConfigServiceTest(ignore: Int)
 
     runOn(client) {
       enterBarrier("server-started")
-      val actorRuntime = new ActorRuntime(ActorSystem())
+      val actorRuntime = new ActorRuntime(ActorSystem(SpawnProtocol.behavior, "Guardian"))
       import actorRuntime._
-      val configService = ConfigClientFactory.adminApi(actorSystem, locationService, factory)
+      val configService = ConfigClientFactory.adminApi(actorRuntime.typedSystem, locationService, factory)
 
       val configValue: String =
         """

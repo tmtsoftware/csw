@@ -13,7 +13,7 @@ import csw.alarm.api.models.{FullAlarmSeverity, Key}
 case class InvalidSeverityException(key: Key, supportedSeverities: Set[FullAlarmSeverity], invalidSeverity: FullAlarmSeverity)
     extends RuntimeException(
       s"Attempt to set invalid severity [${invalidSeverity.name}] for alarm [${key.value}]. " +
-      s"Supported severities for this alarm are [${supportedSeverities.mkString(",")}]"
+        s"Supported severities for this alarm are [${supportedSeverities.mkString(",")}]"
     )
 
 /**

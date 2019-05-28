@@ -56,7 +56,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
   private var loggingSystem: LoggingSystem = _
 
   override protected def beforeAll(): Unit = {
-    loggingSystem = new LoggingSystem("sup-failure", "1.0", "localhost", untypedSystem)
+    loggingSystem = new LoggingSystem("sup-failure", "1.0", "localhost", typedSystem)
     loggingSystem.setAppenders(List(testAppender))
   }
 
@@ -248,7 +248,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
         // before component actually gets initialized
         Thread.sleep(200)
         compStateProbe.ref ! CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice)))
-    }
+      }
 
     shutdownAnswer = _ ⇒
       Future.successful(compStateProbe.ref ! CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))

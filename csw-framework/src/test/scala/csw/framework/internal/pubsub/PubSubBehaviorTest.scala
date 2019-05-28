@@ -2,7 +2,8 @@ package csw.framework.internal.pubsub
 
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestInbox, TestProbe}
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.SpawnProtocol
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.{typed, ActorSystem}
 import csw.command.client.messages.ComponentMessage
 import csw.command.client.models.framework.PubSub.{Publish, Subscribe, SubscribeOnly, Unsubscribe}
@@ -24,11 +25,11 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
     protected lazy val log: Logger = MockitoSugar.mock[Logger]
   }
 
-  implicit val untypedSystem: ActorSystem       = ActorSystemFactory.remote("test-1")
-  implicit val system: typed.ActorSystem[_]     = untypedSystem.toTyped
-  implicit val testKitSettings: TestKitSettings = TestKitSettings(system)
-  private val mocks                             = new FrameworkTestMocks()
-  private val prefix                            = Prefix("wfos.red.detector")
+  implicit val system: typed.ActorSystem[SpawnProtocol] = ActorSystemFactory.remote(SpawnProtocol.behavior, "test-1")
+  implicit val untypedSystem: ActorSystem               = system.toUntyped
+  implicit val testKitSettings: TestKitSettings         = TestKitSettings(system)
+  private val mocks                                     = new FrameworkTestMocks()
+  private val prefix                                    = Prefix("wfos.red.detector")
 
   private val lifecycleProbe1    = TestProbe[LifecycleStateChanged]
   private val lifecycleProbe2    = TestProbe[LifecycleStateChanged]

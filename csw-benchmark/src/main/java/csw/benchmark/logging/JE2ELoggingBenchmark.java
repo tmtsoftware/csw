@@ -1,6 +1,7 @@
 package csw.benchmark.logging;
 
-import akka.actor.ActorSystem;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.SpawnProtocol;
 import csw.logging.api.javadsl.ILogger;
 import csw.logging.api.models.LoggingLevels;
 import csw.logging.client.internal.LoggingSystem;
@@ -35,13 +36,13 @@ import java.util.concurrent.TimeUnit;
 @Fork(value = 1)
 public class JE2ELoggingBenchmark extends JUnitSuite {
     private ILogger log;
-    private static ActorSystem actorSystem;
+    private static ActorSystem<SpawnProtocol> actorSystem;
     private JPerson person;
 
     @Setup
     public void setup() {
         log = JGenericLoggerFactory.getLogger(getClass());
-        actorSystem = ActorSystem.create("JE2E");
+        actorSystem = akka.actor.typed.ActorSystem.create(SpawnProtocol.behavior(),"JE2E");
         LoggingSystem loggingSystem = JLoggingSystemFactory.start("JE2E-Bench", "SNAPSHOT-1.0", "localhost", actorSystem, List.of(JLogAppenderBuilders.FileAppender));
         loggingSystem.setDefaultLogLevel(LoggingLevels.INFO$.MODULE$);
         person = JPerson.createDummy();
@@ -49,7 +50,8 @@ public class JE2ELoggingBenchmark extends JUnitSuite {
 
     @TearDown
     public void teardown() throws Exception {
-        Await.result(actorSystem.terminate(), Duration.create(5, TimeUnit.SECONDS));
+        actorSystem.terminate();
+        Await.result(actorSystem.whenTerminated(), Duration.create(5, TimeUnit.SECONDS));
     }
 
     /**

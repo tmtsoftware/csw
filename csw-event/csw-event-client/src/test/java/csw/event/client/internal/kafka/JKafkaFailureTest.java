@@ -61,7 +61,7 @@ public class JKafkaFailureTest extends JUnitSuite {
     @Test
     public void handleFailedPublishEventWithACallback() {
 
-        TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.actorSystem()));
+        TestProbe<PublishFailure> testProbe = TestProbe.create(kafkaTestProps.actorSystem());
         Event event = Utils.makeEvent(1);
         Event eventSent = event;
         Source eventStream = Source.single(eventSent);
@@ -76,7 +76,7 @@ public class JKafkaFailureTest extends JUnitSuite {
     //DEOPSCSW-334: Publish an event
     @Test
     public void handleFailedPublishEventWithAnEventGeneratorAndACallback() {
-        TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.actorSystem()));
+        TestProbe<PublishFailure> testProbe = TestProbe.create(kafkaTestProps.actorSystem());
         Event event = Utils.makeEvent(1);
 
         Cancellable cancellable = publisher.publish(() -> Optional.ofNullable(event), Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
@@ -90,7 +90,7 @@ public class JKafkaFailureTest extends JUnitSuite {
     //DEOPSCSW-000: Publish events with block generating futre of event
     @Test
     public void handleFailedPublishEventWithAnEventGeneratorGeneratingFutureOfEventAndACallback() {
-        TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.actorSystem()));
+        TestProbe<PublishFailure> testProbe = TestProbe.create(kafkaTestProps.actorSystem());
         Event event = Utils.makeEvent(1);
 
         Cancellable cancellable = publisher.publishAsync(() -> CompletableFuture.completedFuture(Optional.ofNullable(event)), Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
@@ -104,7 +104,7 @@ public class JKafkaFailureTest extends JUnitSuite {
     //DEOPSCSW-515: Include Start Time in API
     @Test
     public void handleFailedPublishEventWithAnEventGeneratorGeneratingEventAtSpecificStartTimeAndACallback() {
-        TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.actorSystem()));
+        TestProbe<PublishFailure> testProbe = TestProbe.create(kafkaTestProps.actorSystem());
         Event event = Utils.makeEvent(1);
 
         TMTTime startTime = new UTCTime(UTCTime.now().value().plusMillis(500));
@@ -120,7 +120,7 @@ public class JKafkaFailureTest extends JUnitSuite {
     //DEOPSCSW-515: Include Start Time in API
     @Test
     public void handleFailedPublishEventWithAnEventGeneratorGeneratingFutureOfEventAtSpecificStartTimeAndACallback() {
-        TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.actorSystem()));
+        TestProbe<PublishFailure> testProbe = TestProbe.create(kafkaTestProps.actorSystem());
         Event event = Utils.makeEvent(1);
 
         TMTTime startTime = new UTCTime(UTCTime.now().value().plusMillis(500));
@@ -136,7 +136,7 @@ public class JKafkaFailureTest extends JUnitSuite {
     //DEOPSCSW-516: Optionally Publish - API Change
     @Test
     public void shouldNotInvokeOnErrorOnOptingToNotPublishEventWithEventGenerator() {
-        TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.actorSystem()));
+        TestProbe<PublishFailure> testProbe = TestProbe.create(kafkaTestProps.actorSystem());
 
         Cancellable cancellable = publisher.publish(Optional::empty, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
         testProbe.expectNoMessage();
@@ -150,7 +150,7 @@ public class JKafkaFailureTest extends JUnitSuite {
     //DEOPSCSW-516: Optionally Publish - API Change
     @Test
     public void shouldNotInvokeOnErrorOnOptingToNotPublishEventWithAsyncEventGenerator() {
-        TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.actorSystem()));
+        TestProbe<PublishFailure> testProbe = TestProbe.create(kafkaTestProps.actorSystem());
         Supplier<CompletableFuture<Optional<Event>>> eventGenerator = () -> CompletableFuture.completedFuture(Optional.empty());
 
         Cancellable cancellable1 = publisher.publishAsync(eventGenerator, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));

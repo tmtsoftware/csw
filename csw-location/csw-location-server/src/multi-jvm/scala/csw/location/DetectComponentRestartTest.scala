@@ -1,8 +1,8 @@
 package csw.location
 
-import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.stream.ActorMaterializer
+import akka.actor.typed.{ActorSystem, Behavior, SpawnProtocol}
+import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.testkit.TestProbe
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models._
@@ -10,6 +10,7 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.location.server.commons.CswCluster
 import csw.location.server.internal.{LocationServiceFactory, ServerWiring}
+import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.params.core.models.Prefix
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
@@ -34,7 +35,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
 
     runOn(member1) {
       locationService
-        .register(AkkaRegistration(akkaConnection, Prefix("nfiraos.ncc.trombone"), system.spawnAnonymous(Behavior.empty)))
+        .register(AkkaRegistration(akkaConnection, Prefix("nfiraos.ncc.trombone"), typedSystem.spawn(Behavior.empty, "empty")))
         .await
 
       enterBarrier("location-registered")
@@ -42,15 +43,22 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
 
       Await.result(system.whenTerminated, 10.seconds)
 
-      val newSystem = startNewSystem()
+      startNewSystem()
+
+      val newConfig = if(sys.env.get("CLUSTER_SEEDS").isEmpty)
+        config.settings.joinLocal(3552).config
+      else config.settings.config
+
+      val newSystem      = makeSystem(newConfig)
+      val newTypedSystem = newSystem.toTyped.asInstanceOf[ActorSystem[SpawnProtocol]]
 
       val freshLocationService = mode match {
         case "http" =>
-          Try(ServerWiring.make(newSystem).locationHttpService.start().await) match {
+          Try(ServerWiring.make(newTypedSystem).locationHttpService.start().await) match {
             case _ => // ignore binding errors
           }
-          HttpLocationServiceFactory.makeLocalClient(newSystem, ActorMaterializer()(newSystem))
-        case "cluster" => LocationServiceFactory.withCluster(CswCluster.withSystem(newSystem))
+          HttpLocationServiceFactory.makeLocalClient(newTypedSystem, ActorMaterializer()(newTypedSystem))
+        case "cluster" => LocationServiceFactory.withCluster(CswCluster.withSystem(newTypedSystem))
       }
 
       Thread.sleep(2000)
@@ -60,7 +68,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
           AkkaRegistration(
             akkaConnection,
             Prefix("nfiraos.ncc.trombone"),
-            newSystem.spawnAnonymous(Behavior.empty)
+            newTypedSystem.spawn(Behavior.empty, "empty")
           )
         )
         .await

@@ -3,9 +3,11 @@ package csw.config.cli
 import java.nio.file.{Files, Paths}
 import java.time.Instant
 
-import akka.actor.ActorSystem
 import akka.actor.CoordinatedShutdown.UnknownReason
-import akka.stream.ActorMaterializer
+import akka.actor.typed
+import akka.actor.typed.scaladsl.Behaviors
+import akka.stream.Materializer
+import akka.stream.typed.scaladsl.ActorMaterializer
 import csw.aas.installed.api.InstalledAppAuthAdapter
 import csw.config.api.models.ConfigId
 import csw.config.cli.args.{ArgsParser, Options}
@@ -23,8 +25,8 @@ import org.scalatest.{BeforeAndAfterEach, Matchers}
 // DEOPSCSW-576: Auth token for Configuration service
 class CommandLineRunnerTest extends HTTPLocationService with Matchers with BeforeAndAfterEach with MockedAuthentication {
 
-  private val clientSystem: ActorSystem                  = ActorSystem("config-cli")
-  private val clientMat: ActorMaterializer               = ActorMaterializer()(clientSystem)
+  private val clientSystem: typed.ActorSystem[_]         = typed.ActorSystem(Behaviors.empty, "config-cli")
+  private val clientMat: Materializer                    = ActorMaterializer()(clientSystem)
   private val locationService                            = HttpLocationServiceFactory.makeLocalClient(clientSystem, clientMat)
   private val nativeAuthAdapter: InstalledAppAuthAdapter = mock[InstalledAppAuthAdapter]
   private val clientWiring                               = Wiring.noPrinting(locationService, factory, nativeAuthAdapter)

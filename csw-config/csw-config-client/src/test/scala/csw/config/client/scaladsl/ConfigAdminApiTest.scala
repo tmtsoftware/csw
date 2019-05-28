@@ -26,7 +26,7 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
   private val httpService           = serverWiring.httpService
   private val clientLocationService = HttpLocationServiceFactory.makeLocalClient
 
-  override val configService: ConfigService = ConfigClientFactory.adminApi(actorSystem, clientLocationService, factory)
+  override val configService: ConfigService = ConfigClientFactory.adminApi(typedSystem, clientLocationService, factory)
 
   override def beforeAll(): Unit = {
     super[ConfigClientBaseSuite].beforeAll()
@@ -94,7 +94,7 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
     when(invalidTFactory.getToken).thenReturn("")
 
     val configServiceNotLoggedIn: ConfigService =
-      ConfigClientFactory.adminApi(actorSystem, clientLocationService, invalidTFactory)
+      ConfigClientFactory.adminApi(typedSystem, clientLocationService, invalidTFactory)
 
     val filePath = Paths.get("/test/sample")
 
@@ -110,7 +110,7 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
     when(invalidTFactory.getToken).thenReturn(roleMissingTokenStr)
 
     val configServiceIncorrectRole: ConfigService =
-      ConfigClientFactory.adminApi(actorSystem, clientLocationService, invalidTFactory)
+      ConfigClientFactory.adminApi(typedSystem, clientLocationService, invalidTFactory)
 
     val filePath = Paths.get("/test/sample")
 

@@ -3,6 +3,7 @@ package csw.config
 import java.nio.file.{Files, Paths}
 
 import akka.actor.ActorSystem
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import csw.aas.installed.api.InstalledAppAuthAdapter
@@ -94,9 +95,9 @@ class ConfigCliAppTest(ignore: Int)
     // config client admin api is exercised on client2
     runOn(client2) {
       enterBarrier("server-started")
-      val actorRuntime = new ActorRuntime(system)
+      val actorRuntime = new ActorRuntime(system.toTyped)
       import actorRuntime._
-      val configService = ConfigClientFactory.adminApi(system, locationService, factory)
+      val configService = ConfigClientFactory.adminApi(system.toTyped, locationService, factory)
 
       enterBarrier("client1-create")
       val actualConfigValue = configService.getLatest(Paths.get(repoPath1)).await.get.toStringF.await

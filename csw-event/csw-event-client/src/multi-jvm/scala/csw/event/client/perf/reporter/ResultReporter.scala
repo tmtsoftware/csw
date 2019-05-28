@@ -1,10 +1,10 @@
 package csw.event.client.perf.reporter
 
-import akka.actor.ActorSystem
+import akka.actor.typed.ActorSystem
 import csw.event.client.perf.utils.EventUtils._
 import org.HdrHistogram.Histogram
 
-class ResultReporter(test: String, actorSystem: ActorSystem) {
+class ResultReporter(test: String, actorSystem: ActorSystem[_]) {
 
   val reporter = BenchmarkFileReporter(test, actorSystem, logSettings = false)
 

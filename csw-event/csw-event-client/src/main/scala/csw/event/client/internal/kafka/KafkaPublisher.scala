@@ -70,8 +70,10 @@ private[event] class KafkaPublisher(producerSettings: Future[ProducerSettings[St
       every: FiniteDuration,
       onError: PublishFailure => Unit
   ): Cancellable =
-    publish(eventPublisherUtil.eventSource(Future.successful(eventGenerator), parallelism, startTime.durationFromNow, every),
-            onError)
+    publish(
+      eventPublisherUtil.eventSource(Future.successful(eventGenerator), parallelism, startTime.durationFromNow, every),
+      onError
+    )
 
   override def publishAsync(eventGenerator: => Future[Option[Event]], every: FiniteDuration): Cancellable =
     publish(eventPublisherUtil.eventSource(eventGenerator, parallelism, defaultInitialDelay, every))

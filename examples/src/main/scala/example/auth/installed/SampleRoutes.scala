@@ -30,12 +30,12 @@ object SampleRoutes {
 
   val routes: Route =
     pathPrefix("data") {
-      get { // un-protected route for reading data
+      get {                    // un-protected route for reading data
         pathEndOrSingleSlash { // e.g HTTP GET http://localhost:7000/data
           complete(data)
         }
       } ~ sPost(RealmRolePolicy("admin")) { // only users with 'admin' role is allowed for this route
-        parameter("value") { value => // e.g POST GET localhost:7000/data?value=abc
+        parameter("value") { value =>       // e.g POST GET localhost:7000/data?value=abc
           data = data + value
           complete(StatusCodes.OK)
         }

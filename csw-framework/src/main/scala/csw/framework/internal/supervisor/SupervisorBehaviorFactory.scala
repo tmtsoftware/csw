@@ -48,8 +48,8 @@ private[framework] object SupervisorBehaviorFactory {
                   componentBehaviorFactory,
                   registrationFactory,
                   cswCtx
-              )
-          )
+                )
+            )
       )
       .narrow
   }

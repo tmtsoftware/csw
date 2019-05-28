@@ -2,7 +2,7 @@ package csw.framework.command
 
 import akka.actor.Scheduler
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.ActorSystem
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
@@ -37,16 +37,16 @@ class CancellableCommandTest(ignore: Int)
     with MockitoSugar {
   import config._
 
-  implicit val actorSystem: ActorSystem[_] = system.toTyped
-  implicit val mat: Materializer           = ActorMaterializer()
-  implicit val ec: ExecutionContext        = actorSystem.executionContext
-  implicit val timeout: Timeout            = 5.seconds
-  implicit val scheduler: Scheduler        = actorSystem.scheduler
+  implicit val actorSystem: ActorSystem[SpawnProtocol] = system.toTyped.asInstanceOf[ActorSystem[SpawnProtocol]]
+  implicit val mat: Materializer                       = ActorMaterializer()
+  implicit val ec: ExecutionContext                    = actorSystem.executionContext
+  implicit val timeout: Timeout                        = 5.seconds
+  implicit val scheduler: Scheduler                    = actorSystem.scheduler
 
   test("a long running command should be cancellable") {
     runOn(seed) {
       // spawn container having assembly and hcd running in jvm-1
-      val wiring       = FrameworkWiring.make(system, locationService, mock[RedisClient])
+      val wiring       = FrameworkWiring.make(actorSystem, locationService, mock[RedisClient])
       val assemblyConf = ConfigFactory.load("command/commanding_assembly.conf")
       Await.result(Standalone.spawn(assemblyConf, wiring), 5.seconds)
       enterBarrier("spawned")

@@ -1,11 +1,9 @@
 package csw.admin.server.log
 
-import akka.actor
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.typed.{ActorRef, ActorSystem}
+import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest, StatusCodes, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
@@ -43,14 +41,13 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
   private val adminWiring: AdminWiring = AdminWiring.make(Some(7879))
   import adminWiring.actorRuntime._
 
-  implicit val typedSystem: ActorSystem[Nothing] = actorSystem.toTyped
-  implicit val testKitSettings: TestKitSettings  = TestKitSettings(typedSystem)
+  implicit val testKitSettings: TestKitSettings = TestKitSettings(typedSystem)
 
   private val laserConnection            = AkkaConnection(ComponentId("Laser", Assembly))
   private val motionControllerConnection = AkkaConnection(ComponentId("Motion_Controller", HCD))
   private val galilConnection            = AkkaConnection(ComponentId("Galil", Assembly))
 
-  private var containerActorSystem: actor.ActorSystem = _
+  private var containerActorSystem: ActorSystem[SpawnProtocol] = _
 
   private var laserComponent: Component = _
   private var galilComponent: Component = _
@@ -71,7 +68,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
     // this will start seed on port 3652 and log admin server on 7879
     adminWiring.locationService
 
-    containerActorSystem = ActorSystemFactory.remote()
+    containerActorSystem = ActorSystemFactory.remote(SpawnProtocol.behavior, "container-system")
 
     // this will start container on random port and join seed and form a cluster
     val containerRef = startContainerAndWaitForRunning()
@@ -82,7 +79,8 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
 
   override def afterAll(): Unit = {
     Await.result(adminWiring.actorRuntime.shutdown(UnknownReason), 10.seconds)
-    Await.result(containerActorSystem.terminate(), 5.seconds)
+    containerActorSystem.terminate()
+    Await.result(containerActorSystem.whenTerminated, 5.seconds)
     super.afterAll()
   }
 

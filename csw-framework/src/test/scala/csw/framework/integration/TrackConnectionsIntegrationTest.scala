@@ -1,7 +1,8 @@
 package csw.framework.integration
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.SpawnProtocol
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
@@ -39,7 +40,7 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
   // DEOPSCSW-220: Access and Monitor components for current values
   // DEOPSCSW-221: Avoid sending commands to non-executing components
   test("should track connections when locationServiceUsage is RegisterAndTrackServices") {
-    val containerActorSystem    = ActorSystemFactory.remote("test1")
+    val containerActorSystem    = ActorSystemFactory.remote(SpawnProtocol.behavior, "test1")
     val wiring: FrameworkWiring = FrameworkWiring.make(containerActorSystem, mock[RedisClient])
 
     // start a container and verify it moves to running lifecycle state
@@ -56,10 +57,10 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
     val filterAssemblyLocation = wiring.locationService.find(filterAssemblyConnection).await
     val disperserHcdLocation   = wiring.locationService.find(disperserHcdConnection).await
 
-    val assemblyCommandService = CommandServiceFactory.make(filterAssemblyLocation.get)(containerActorSystem.toTyped)
+    val assemblyCommandService = CommandServiceFactory.make(filterAssemblyLocation.get)(containerActorSystem)
 
     val disperserComponentRef   = disperserHcdLocation.get.componentRef
-    val disperserCommandService = CommandServiceFactory.make(disperserHcdLocation.get)(containerActorSystem.toTyped)
+    val disperserCommandService = CommandServiceFactory.make(disperserHcdLocation.get)(containerActorSystem)
 
     // Subscribe to component's current state
     val subscription = assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)
@@ -87,8 +88,9 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
     )
 
     subscription.unsubscribe()
-    Http(containerActorSystem).shutdownAllConnectionPools().await
-    containerActorSystem.terminate().await
+    Http(containerActorSystem.toUntyped).shutdownAllConnectionPools().await
+    containerActorSystem.terminate()
+    containerActorSystem.whenTerminated.await
   }
 
   /**
@@ -98,7 +100,7 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
    * */
   //DEOPSCSW-219 Discover component connection using HTTP protocol
   test("component should be able to track http and tcp connections") {
-    val componentActorSystem    = ActorSystemFactory.remote("test2")
+    val componentActorSystem    = ActorSystemFactory.remote(SpawnProtocol.behavior, "test2")
     val wiring: FrameworkWiring = FrameworkWiring.make(componentActorSystem, mock[RedisClient])
     // start component in standalone mode
     val assemblySupervisor = Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring).await
@@ -112,7 +114,7 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
     resolvedAkkaLocation.connection shouldBe akkaConnection
 
     val assemblyProbe          = TestProbe[CurrentState]("assembly-state-probe")
-    val assemblyCommandService = CommandServiceFactory.make(resolvedAkkaLocation)(componentActorSystem.toTyped)
+    val assemblyCommandService = CommandServiceFactory.make(resolvedAkkaLocation)(componentActorSystem)
     // Subscribe to component's current state
     assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)
 
@@ -145,8 +147,9 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
       CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(tcpLocationRemovedChoice)))
     )
 
-    Http(componentActorSystem).shutdownAllConnectionPools().await
-    componentActorSystem.terminate().await
+    Http(componentActorSystem.toUntyped).shutdownAllConnectionPools().await
+    componentActorSystem.terminate()
+    componentActorSystem.whenTerminated.await
   }
 
 }

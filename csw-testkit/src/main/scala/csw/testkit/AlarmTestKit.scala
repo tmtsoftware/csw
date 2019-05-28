@@ -2,7 +2,8 @@ package csw.testkit
 
 import java.util.Optional
 
-import akka.actor.ActorSystem
+import akka.actor.typed
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.alarm.client.internal.commons.AlarmServiceConnection
@@ -29,12 +30,12 @@ import csw.testkit.redis.RedisStore
  * }}}
  *
  */
-final class AlarmTestKit private (_system: ActorSystem, testKitSettings: TestKitSettings) extends RedisStore {
+final class AlarmTestKit private (_system: ActorSystem[SpawnProtocol], testKitSettings: TestKitSettings) extends RedisStore {
 
-  override implicit val system: ActorSystem             = _system
-  override implicit lazy val timeout: Timeout           = testKitSettings.DefaultTimeout
-  override protected lazy val masterId: String          = system.settings.config.getString("csw-alarm.redis.masterId")
-  override protected lazy val connection: TcpConnection = AlarmServiceConnection.value
+  override implicit val system: ActorSystem[SpawnProtocol] = _system
+  override implicit lazy val timeout: Timeout              = testKitSettings.DefaultTimeout
+  override protected lazy val masterId: String             = system.settings.config.getString("csw-alarm.redis.masterId")
+  override protected lazy val connection: TcpConnection    = AlarmServiceConnection.value
 
   private def getSentinelPort: Int = testKitSettings.AlarmSentinelPort.getOrElse(getFreePort)
   private def getMasterPort: Int   = testKitSettings.AlarmMasterPort.getOrElse(getFreePort)
@@ -77,7 +78,7 @@ object AlarmTestKit {
    * @return handle to AlarmTestKit which can be used to start and stop alarm service
    */
   def apply(
-      actorSystem: ActorSystem = ActorSystem("alarm-testkit"),
+      actorSystem: ActorSystem[SpawnProtocol] = typed.ActorSystem(SpawnProtocol.behavior, "alarm-testkit"),
       testKitSettings: TestKitSettings = TestKitSettings(ConfigFactory.load())
   ): AlarmTestKit = new AlarmTestKit(actorSystem, testKitSettings)
 
@@ -87,7 +88,7 @@ object AlarmTestKit {
    * @param actorSystem
    * @return handle to EventTestKit which can be used to start and stop event service
    */
-  def create(actorSystem: ActorSystem): AlarmTestKit = apply(actorSystem)
+  def create(actorSystem: ActorSystem[SpawnProtocol]): AlarmTestKit = apply(actorSystem)
 
   /**
    * Java API to create a AlarmTestKit

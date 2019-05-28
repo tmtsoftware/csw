@@ -3,7 +3,8 @@ package csw.alarm.client.internal.services
 import java.time.Clock
 
 import akka.Done
-import akka.actor.ActorSystem
+import akka.actor.typed
+import akka.actor.typed._
 import csw.alarm.api.exceptions.KeyNotFoundException
 import csw.alarm.api.internal._
 import csw.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
@@ -26,7 +27,7 @@ import scala.concurrent.Future
 private[client] trait StatusServiceModule extends StatusService {
   self: SeverityService with MetadataService ⇒
 
-  implicit val actorSystem: ActorSystem
+  implicit val actorSystem: typed.ActorSystem[_]
   def settings: Settings
   val redisConnectionsFactory: RedisConnectionsFactory
   import redisConnectionsFactory._

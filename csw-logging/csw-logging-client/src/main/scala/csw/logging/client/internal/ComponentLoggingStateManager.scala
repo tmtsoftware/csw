@@ -1,5 +1,7 @@
 package csw.logging.client.internal
 
+import java.util.concurrent.ConcurrentHashMap
+
 import com.typesafe.config.Config
 import csw.logging.api.models.LoggingLevels.Level
 import csw.logging.client.models.ComponentLoggingState
@@ -16,8 +18,8 @@ private[logging] object ComponentLoggingStateManager {
    * @param loggingConfig the logging configuration object
    * @return set of Filters
    */
-  def from(loggingConfig: Config): Map[String, ComponentLoggingState] =
-    Try {
+  def from(loggingConfig: Config): ConcurrentHashMap[String, ComponentLoggingState] = {
+    new ConcurrentHashMap[String, ComponentLoggingState](Try {
       loggingConfig
         .getObject("component-log-levels")
         .unwrapped()
@@ -26,7 +28,8 @@ private[logging] object ComponentLoggingStateManager {
           case (name, componentLogLevel) ⇒ (name, ComponentLoggingState(Level(componentLogLevel.toString)))
         }
         .toMap
-    }.getOrElse(Map.empty)
+    }.getOrElse(Map.empty).asJava)
+  }
 
   /**
    * Add the component logging state for a component in map componentName -> ComponentLoggingState
@@ -36,6 +39,6 @@ private[logging] object ComponentLoggingStateManager {
    */
   def add(componentName: String, level: Level): Unit = {
     import csw.logging.client.internal.LoggingState._
-    componentsLoggingState = componentsLoggingState ++ Map(componentName → ComponentLoggingState(level))
+    componentsLoggingState.put(componentName, ComponentLoggingState(level))
   }
 }

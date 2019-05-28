@@ -2,8 +2,10 @@ package csw.location.agent
 
 import java.net.URI
 
-import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
+import akka.actor.typed
+import akka.actor.typed.scaladsl.Behaviors
+import akka.stream.Materializer
+import akka.stream.typed.scaladsl.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import csw.commons.ResourceReader
 import csw.location.agent.common.TestFutureExtension.RichFuture
@@ -19,14 +21,15 @@ import scala.concurrent.duration._
 // DEOPSCSW-592: Create csw testkit for component writers
 class MainTest extends ScalaTestFrameworkTestKit with FunSuiteLike {
 
-  implicit private val system: ActorSystem    = ActorSystem()
-  implicit private val mat: ActorMaterializer = ActorMaterializer()
-  private val locationService                 = HttpLocationServiceFactory.makeLocalClient
+  implicit private val system: typed.ActorSystem[_] = typed.ActorSystem(Behaviors.empty, "test-system")
+  implicit private val mat: Materializer            = ActorMaterializer()
+  private val locationService                       = HttpLocationServiceFactory.makeLocalClient
 
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 100.millis)
 
   override def afterAll(): Unit = {
-    system.terminate().await
+    system.terminate()
+    system.whenTerminated.await
     super.afterAll()
   }
 

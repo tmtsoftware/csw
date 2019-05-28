@@ -57,7 +57,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
   test("should invoke onError callback on publish failure [stream API]") {
     import redisTestProps._
     val publisher = eventService.makeNewPublisher()
-    val testProbe = TestProbe[PublishFailure]()(typedActorSystem)
+    val testProbe = TestProbe[PublishFailure]()(actorSystem)
     publisher.publish(Utils.makeEvent(1)).await
 
     publisher.shutdown().await
@@ -78,7 +78,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
   test("should invoke onError callback on publish failure [eventGenerator API]") {
     import redisTestProps._
     val publisher = eventService.makeNewPublisher()
-    val testProbe = TestProbe[PublishFailure]()(typedActorSystem)
+    val testProbe = TestProbe[PublishFailure]()(actorSystem)
     publisher.publish(Utils.makeEvent(1)).await
 
     publisher.shutdown().await
@@ -113,7 +113,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
   test("should invoke onError callback on publish failure [eventGenerator API] with future of event generator") {
     import redisTestProps._
     val publisher = eventService.makeNewPublisher()
-    val testProbe = TestProbe[PublishFailure]()(typedActorSystem)
+    val testProbe = TestProbe[PublishFailure]()(actorSystem)
     publisher.publish(Utils.makeEvent(1)).await
 
     publisher.shutdown().await
@@ -133,7 +133,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
   test("should invoke onError callback on publish failure [eventGenerator API] with start time and event generator") {
     import redisTestProps._
     val publisher = eventService.makeNewPublisher()
-    val testProbe = TestProbe[PublishFailure]()(typedActorSystem)
+    val testProbe = TestProbe[PublishFailure]()(actorSystem)
     val event     = Utils.makeEvent(1)
 
     publisher.publish(event).await
@@ -155,7 +155,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
   test("should invoke onError callback on publish failure [eventGenerator API] with start time and future of event generator") {
     import redisTestProps._
     val publisher = eventService.makeNewPublisher()
-    val testProbe = TestProbe[PublishFailure]()(typedActorSystem)
+    val testProbe = TestProbe[PublishFailure]()(actorSystem)
     val event     = Utils.makeEvent(1)
 
     publisher.publish(event).await
@@ -177,7 +177,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
   test("should not invoke onError on opting to not publish event with eventGenerator") {
     import redisTestProps._
     val publisher = eventService.makeNewPublisher()
-    val testProbe = TestProbe[PublishFailure]()(typedActorSystem)
+    val testProbe = TestProbe[PublishFailure]()(actorSystem)
     val event     = Utils.makeEvent(1)
 
     publisher.publish(event).await
@@ -198,7 +198,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
   ) {
     import redisTestProps._
     val publisher = eventService.makeNewPublisher()
-    val testProbe = TestProbe[PublishFailure]()(typedActorSystem)
+    val testProbe = TestProbe[PublishFailure]()(actorSystem)
     val event     = Utils.makeEvent(1)
 
     publisher.publish(event).await

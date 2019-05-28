@@ -1,4 +1,3 @@
-import sbt.Keys._
 import sbt._
 
 object AutoMultiJvm extends AutoPlugin {
@@ -8,10 +7,6 @@ object AutoMultiJvm extends AutoPlugin {
   import sbtassembly.MergeStrategy
 
   override def projectSettings: Seq[Setting[_]] = SbtMultiJvm.multiJvmSettings ++ Seq(
-    test := {
-      (test in Test).value
-      (test in MultiJvm).value
-    },
     multiNodeHosts in MultiJvm := multiNodeHostNames,
     assemblyMergeStrategy in assembly in MultiJvm := {
       case "application.conf"                     => MergeStrategy.concat

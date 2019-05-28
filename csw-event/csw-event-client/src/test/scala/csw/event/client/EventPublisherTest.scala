@@ -72,7 +72,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
 
     val event1             = makeDistinctEvent(Random.nextInt())
     val eventKey: EventKey = event1.eventKey
-    val testProbe          = TestProbe[Event]()(typedActorSystem)
+    val testProbe          = TestProbe[Event]()
 
     publisher.publish(event1).await
     Thread.sleep(500) // Needed for redis set which is fire and forget operation
@@ -183,7 +183,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     val event4             = makeEventWithPrefix(4, prefix)
     val event5             = makeEventWithPrefix(5, prefix)
     val eventKey: EventKey = event1.eventKey
-    val testProbe          = TestProbe[Event]()(typedActorSystem)
+    val testProbe          = TestProbe[Event]()
 
     val subscription = subscriber
       .subscribe(Set(eventKey))

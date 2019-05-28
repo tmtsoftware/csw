@@ -43,7 +43,7 @@ class SvnRepo(userName: String, settings: Settings, blockingIoDispatcher: Messag
       SVNRepositoryFactory.createLocalRepository(settings.repositoryFile, false, false)
       log.info(s"New Repository created at ${settings.svnUrl}")
     } catch {
-      // If the repo already exists, print stracktrace and continue to boot
+      // If the repo already exists, print stacktrace and continue to boot
       case ex: SVNException if ex.getErrorMessage.getErrorCode == SVNErrorCode.IO_ERROR ⇒
         log.error(s"Repository already exists at ${settings.svnUrl}", ex = ex)
     }

@@ -1,12 +1,11 @@
 package csw.framework.internal.container
 
+import akka.Done
 import akka.actor.testkit.typed.Effect.Watched
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.typed.{ActorRef, ActorSystem}
-import akka.{actor, Done}
+import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import csw.alarm.client.AlarmServiceFactory
 import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.command.client.messages.ContainerIdleMessage.SupervisorsCreated
@@ -35,10 +34,9 @@ import scala.util.Success
 //DEOPSCSW-182-Control Life Cycle of Components
 //DEOPSCSW-216-Locate and connect components to send AKKA commands
 class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar with ArgumentMatchersSugar {
-  implicit val untypedSystem: actor.ActorSystem  = ActorSystemFactory.remote()
-  implicit val typedSystem: ActorSystem[Nothing] = untypedSystem.toTyped
-  implicit val settings: TestKitSettings         = TestKitSettings(typedSystem)
-  private val mocks                              = new FrameworkTestMocks()
+  implicit val typedSystem: ActorSystem[SpawnProtocol] = ActorSystemFactory.remote(SpawnProtocol.behavior, "test")
+  implicit val settings: TestKitSettings               = TestKitSettings(typedSystem)
+  private val mocks                                    = new FrameworkTestMocks()
 
   class IdleContainer() {
     private val testActor: ActorRef[Any]                        = TestProbe("test-probe").ref
@@ -53,9 +51,9 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar wit
 
     private def answer(ci: ComponentInfo): Future[Some[SupervisorInfo]] = {
       val componentProbe: TestProbe[ComponentMessage] = TestProbe(ci.name)
-      val supervisorInfo                              = SupervisorInfo(untypedSystem, Component(componentProbe.ref, ci))
+      val supervisorInfo                              = SupervisorInfo(typedSystem, Component(componentProbe.ref, ci))
 
-      supervisorInfos += SupervisorInfo(untypedSystem, Component(componentProbe.ref, ci))
+      supervisorInfos += SupervisorInfo(typedSystem, Component(componentProbe.ref, ci))
       componentProbes += componentProbe
       Future.successful(Some(supervisorInfo))
     }
@@ -95,7 +93,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar wit
             eventService,
             alarmService,
             mocks.loggerFactory
-        )
+          )
       )
     )
   }

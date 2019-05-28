@@ -27,7 +27,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     Thread.sleep(300)
 
     // Verify log level for tromboneHcd is at debug level in config
-    LoggingState.componentsLoggingState(TromboneHcd.COMPONENT_NAME).componentLogLevel shouldBe LoggingLevels.DEBUG
+    LoggingState.componentsLoggingState.get(TromboneHcd.COMPONENT_NAME).componentLogLevel shouldBe LoggingLevels.DEBUG
 
     var logMsgLineNumber = TromboneHcd.DEBUG_LINE_NO
 
@@ -59,7 +59,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     Thread.sleep(100)
 
     //   Verify that default level is TRACE in config
-    LoggingState.componentsLoggingState(Constants.DEFAULT_KEY).componentLogLevel shouldBe LoggingLevels.TRACE
+    LoggingState.componentsLoggingState.get(Constants.DEFAULT_KEY).componentLogLevel shouldBe LoggingLevels.TRACE
 
     var logMsgLineNumber = InnerSourceComponent.TRACE_LINE_NO
 
@@ -81,7 +81,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     Thread.sleep(100)
 
     //   Verify that default level is TRACE in config
-    LoggingState.componentsLoggingState(Constants.DEFAULT_KEY).componentLogLevel shouldBe LoggingLevels.TRACE
+    LoggingState.componentsLoggingState.get(Constants.DEFAULT_KEY).componentLogLevel shouldBe LoggingLevels.TRACE
 
     var logMsgLineNumber = SingletonComponent.TRACE_LINE_NO
 
@@ -106,7 +106,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     Thread.sleep(100)
 
     //   Verify that default level is TRACE in config
-    LoggingState.componentsLoggingState("default").componentLogLevel shouldBe LoggingLevels.TRACE
+    LoggingState.componentsLoggingState.get("default").componentLogLevel shouldBe LoggingLevels.TRACE
 
     var logMsgLineNumber = SingletonComponent.USER_TRACE_LINE_NO
 
@@ -139,7 +139,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     Thread.sleep(200)
 
     //  Verify that level is DEBUG
-    LoggingState.componentsLoggingState(TromboneHcd.COMPONENT_NAME).componentLogLevel shouldBe LoggingLevels.DEBUG
+    LoggingState.componentsLoggingState.get(TromboneHcd.COMPONENT_NAME).componentLogLevel shouldBe LoggingLevels.DEBUG
 
     //  TromboneHcd component is logging 6 messages each of unique level
     //  As per the filter, hcd should log 5 message of all level except TRACE
@@ -167,7 +167,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     Thread.sleep(300)
 
     //   Verify that default level is TRACE in config
-    LoggingState.componentsLoggingState(Constants.DEFAULT_KEY).componentLogLevel shouldBe LoggingLevels.TRACE
+    LoggingState.componentsLoggingState.get(Constants.DEFAULT_KEY).componentLogLevel shouldBe LoggingLevels.TRACE
 
     //  TromboneAssembly component is logging 6 messages each of unique level
     //  As per the default loglevel = trace, assembly should log all 6 message

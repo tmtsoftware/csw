@@ -15,7 +15,7 @@ object Libs {
   val `junit`              = "junit" % "junit" % "4.12" //Eclipse Public License 1.0
   val `silencer-plugin`    = compilerPlugin("com.github.ghik" %% "silencer-plugin" % silencerVersion)
   val `silencer-lib`       = "com.github.ghik" %% "silencer-lib" % silencerVersion % Compile
-  val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.3.1"
+  val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.4.3"
   //MIT License
   val `embedded-keycloak`            = "com.github.tmtsoftware"        % "embedded-keycloak"             % "0.1.2" //Apache 2.0
   val `logback-classic`              = "ch.qos.logback"                % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
@@ -25,14 +25,14 @@ object Libs {
   val `scala-reflect`                = "org.scala-lang"                % "scala-reflect"                 % ScalaVersion //BSD-3
   val `gson`                         = "com.google.code.gson"          % "gson"                          % "2.8.5" //Apache 2.0
 
-  val `play-json` = dep("com.typesafe.play" %%% "play-json" % "2.7.2") //Apache 2.0
+  val `play-json` = dep("com.typesafe.play" %%% "play-json" % "2.7.3") //Apache 2.0
 
   val `akka-http-play-json`      = "de.heikoseeberger"    %% "akka-http-play-json"      % "1.25.2" //Apache 2.0
   val `jwt-play-json`            = "com.pauldijou"        %% "jwt-play-json"            % "2.1.0"
   val `scalapb-runtime`          = "com.thesamet.scalapb" %% "scalapb-runtime"          % scalapbVersion % "protobuf"
   val `scalapb-json4s`           = "com.thesamet.scalapb" %% "scalapb-json4s"           % scalapbVersion
   val `lettuce`                  = "io.lettuce"           % "lettuce-core"              % "5.1.6.RELEASE"
-  val `reactor-core`             = "io.projectreactor"    % "reactor-core"              % "3.2.8.RELEASE"
+  val `reactor-core`             = "io.projectreactor"    % "reactor-core"              % "3.2.9.RELEASE"
   val `reactive-streams`         = "org.reactivestreams"  % "reactive-streams"          % "1.0.2"
   val `akka-stream-kafka`        = "com.typesafe.akka"    %% "akka-stream-kafka"        % "0.22"
   val `scalatest-embedded-kafka` = "net.manub"            %% "scalatest-embedded-kafka" % "1.1.0"
@@ -46,19 +46,19 @@ object Libs {
   val `json-schema-validator`    = "com.github.fge" % "json-schema-validator" % "2.2.8" //LGPL/ASL
   val `play-json-derived-codecs` = dep("org.julienrf" %%% "play-json-derived-codecs" % "5.0.0")
 
-  val `jna`             = "net.java.dev.jna"              % "jna"             % "5.2.0"
+  val `jna`             = "net.java.dev.jna"              % "jna"             % "5.3.1"
   val `postgresql`      = "org.postgresql"                % "postgresql"      % "42.2.5"
   val `hikaricp`        = "com.zaxxer"                    % "HikariCP"        % "3.3.1" //Apache License 2.0
   val `otj-pg-embedded` = "com.opentable.components"      % "otj-pg-embedded" % "0.13.1"
   val httpclient        = "org.apache.httpcomponents"     % "httpclient"      % "4.5.8"
-  val `jboss-logging`   = "org.jboss.logging"             % "jboss-logging"   % "3.3.2.Final"
-  val `config`          = "com.typesafe"                  % "config"          % "1.3.3"
+  val `jboss-logging`   = "org.jboss.logging"             % "jboss-logging"   % "3.4.0.Final"
+  val `config`          = "com.typesafe"                  % "config"          % "1.3.4"
   val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.2.9"
   val `caffeine`        = "com.github.ben-manes.caffeine" % "caffeine"        % "2.7.0"
 }
 
 object Jackson {
-  val Version                = "2.9.8"
+  val Version                = "2.9.9"
   val `jackson-core`         = "com.fasterxml.jackson.core" % "jackson-core" % Version
   val `jackson-databind`     = "com.fasterxml.jackson.core" % "jackson-databind" % Version
   val `jackson-module-scala` = "com.fasterxml.jackson.module" %% "jackson-module-scala" % Version
@@ -76,7 +76,7 @@ object Chill {
 }
 
 object Akka {
-  val Version                    = "2.5.22" //all akka is Apache License 2.0
+  val Version                    = "2.5.23" //all akka is Apache License 2.0
   val `akka-stream`              = "com.typesafe.akka" %% "akka-stream" % Version
   val `akka-stream-typed`        = "com.typesafe.akka" %% "akka-stream-typed" % Version
   val `akka-remote`              = "com.typesafe.akka" %% "akka-remote" % Version
@@ -100,7 +100,7 @@ object AkkaHttp {
 }
 
 object Keycloak {
-  val Version                 = "5.0.0"
+  val Version                 = "6.0.1"
   val `keycloak-adapter-core` = "org.keycloak" % "keycloak-adapter-core" % Version
   val `keycloak-core`         = "org.keycloak" % "keycloak-core" % Version
   val `keycloak-installed`    = "org.keycloak" % "keycloak-installed-adapter" % Version

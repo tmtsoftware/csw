@@ -2,8 +2,7 @@ package csw.admin.server.log.app
 
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.scaladsl.adapter._
-import akka.actor.typed.{ActorRef, ActorSystem}
+import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import com.typesafe.config.ConfigFactory
 import csw.admin.server.wiring.AdminWiring
 import csw.command.client.messages.CommandMessage.Oneway
@@ -50,19 +49,18 @@ object DemoApp extends App {
 
   val adminWiring: AdminWiring = new AdminWiring()
 
-  val frameworkSystem = ActorSystemFactory.remote("framework")
+  val frameworkSystem = ActorSystemFactory.remote(SpawnProtocol.behavior, "framework")
   val frameworkWiring = FrameworkWiring.make(frameworkSystem)
 
-  implicit val typedSystem: ActorSystem[Nothing] = frameworkWiring.actorSystem.toTyped
-  implicit val testKitSettings: TestKitSettings  = TestKitSettings(typedSystem)
+  implicit val typedSystem: ActorSystem[SpawnProtocol] = frameworkWiring.actorSystem
+  implicit val testKitSettings: TestKitSettings        = TestKitSettings(typedSystem)
 
   private val cmdResponseProbe = TestProbe[OnewayResponse]
   private val startLoggingCmd  = CommandName("StartLogging")
   private val prefix           = Prefix("iris.command")
 
   private def startSeed() = {
-    import adminWiring.actorRuntime._
-    val loggingSystem = LoggingSystemFactory.start("logging", "version", Networks().hostname, actorSystem)
+    val loggingSystem = LoggingSystemFactory.start("logging", "version", Networks().hostname, typedSystem)
     loggingSystem.setAppenders(List(StdOutAppender))
     Await.result(ServerWiring.make(Some(3552)).locationHttpService.start(), 5.seconds)
     Await.result(adminWiring.adminHttpService.registeredLazyBinding, 5.seconds)

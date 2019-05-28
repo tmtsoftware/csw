@@ -2,7 +2,8 @@ package csw.logging.client.appenders
 
 import java.nio.file.Paths
 
-import akka.actor.ActorSystem
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.SpawnProtocol
 import com.typesafe.config.ConfigFactory
 import csw.logging.client.commons.{Category, LoggingKeys, TMTDateTimeFormatter}
 import csw.logging.client.exceptions.BaseLogPathNotDefined
@@ -18,7 +19,7 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-649: Fixed directory configuration for multi JVM scenario
 class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
   private val logFileDir                = Paths.get("/tmp/csw-test-logs/").toFile
-  private val actorSystem               = ActorSystem("test-1")
+  private val actorSystem               = ActorSystem(SpawnProtocol.behavior, "test-1")
   private val standardHeaders: JsObject = Json.obj(LoggingKeys.HOST -> "localhost", LoggingKeys.NAME -> "test-service")
 
   private val fileAppender = new FileAppender(actorSystem, standardHeaders)
@@ -90,7 +91,8 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
 
   override protected def afterAll(): Unit = {
     FileUtils.deleteRecursively(logFileDir)
-    Await.result(actorSystem.terminate(), 5.seconds)
+    actorSystem.terminate()
+    Await.result(actorSystem.whenTerminated, 5.seconds)
   }
 
   // DEOPSCSW-649: Fixed directory configuration for multi JVM scenario
@@ -108,7 +110,7 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
                                            """.stripMargin)
 
     intercept[BaseLogPathNotDefined] {
-      new FileAppender(ActorSystem("test-2", config.resolve()), standardHeaders)
+      new FileAppender(ActorSystem(SpawnProtocol.behavior, "test-2", config.resolve()), standardHeaders)
     }
   }
 

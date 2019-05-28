@@ -2,7 +2,8 @@ package csw.testkit
 
 import java.util.Optional
 
-import akka.actor.ActorSystem
+import akka.actor.typed
+import akka.actor.typed.scaladsl.Behaviors
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.event.client.internal.commons.EventServiceConnection
@@ -29,9 +30,9 @@ import csw.testkit.redis.RedisStore
  * }}}
  *
  */
-final class EventTestKit private (_system: ActorSystem, testKitSettings: TestKitSettings) extends RedisStore {
+final class EventTestKit private (_system: typed.ActorSystem[_], testKitSettings: TestKitSettings) extends RedisStore {
 
-  override implicit val system: ActorSystem             = _system
+  override implicit val system: typed.ActorSystem[_]    = _system
   override implicit lazy val timeout: Timeout           = testKitSettings.DefaultTimeout
   override protected lazy val masterId: String          = system.settings.config.getString("csw-event.redis.masterId")
   override protected lazy val connection: TcpConnection = EventServiceConnection.value
@@ -78,7 +79,7 @@ object EventTestKit {
    * @return handle to EventTestKit which can be used to start and stop event service
    */
   def apply(
-      actorSystem: ActorSystem = ActorSystem("alarm-testkit"),
+      actorSystem: typed.ActorSystem[_] = typed.ActorSystem(Behaviors.empty, "alarm-testkit"),
       testKitSettings: TestKitSettings = TestKitSettings(ConfigFactory.load())
   ): EventTestKit = new EventTestKit(actorSystem, testKitSettings)
 
@@ -88,7 +89,7 @@ object EventTestKit {
    * @param actorSystem
    * @return handle to EventTestKit which can be used to start and stop event service
    */
-  def create(actorSystem: ActorSystem): EventTestKit = apply(actorSystem)
+  def create(actorSystem: typed.ActorSystem[_]): EventTestKit = apply(actorSystem)
 
   /**
    * Java API to create a EventTestKit

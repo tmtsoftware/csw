@@ -1,11 +1,15 @@
 package csw.database
 
-import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, Materializer}
+import akka.actor
+import akka.actor.typed
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import akka.stream.Materializer
+import akka.stream.typed.scaladsl.ActorMaterializer
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import csw.database.DatabaseServiceFactory.{ReadPasswordHolder, ReadUsernameHolder}
-import csw.database.scaladsl.JooqExtentions.{RichQuery, RichResultQuery}
 import csw.database.commons.{DBTestHelper, DatabaseServiceConnection}
+import csw.database.scaladsl.JooqExtentions.{RichQuery, RichResultQuery}
 import csw.location.api.models.TcpRegistration
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
@@ -21,9 +25,10 @@ import scala.concurrent.ExecutionContext
 //DEOPSCSW-621: Session creation to access data with single connection
 //DEOPSCSW-615: DB service accessible to CSW component developers
 class DatabaseServiceFactoryTest extends FunSuite with Matchers with BeforeAndAfterAll with HTTPLocationService {
-  private implicit val system: ActorSystem  = ActorSystem("test")
-  private implicit val ec: ExecutionContext = system.dispatcher
-  private implicit val mat: Materializer    = ActorMaterializer()
+  private implicit val typedSystem: ActorSystem[SpawnProtocol] = typed.ActorSystem(SpawnProtocol.behavior, "test")
+  implicit val untypedSystem: actor.ActorSystem                = typedSystem.toUntyped
+  private implicit val ec: ExecutionContext                    = typedSystem.executionContext
+  private implicit val mat: Materializer                       = ActorMaterializer()
 
   private val dbName: String                    = "postgres"
   private val port: Int                         = 5432
@@ -34,8 +39,8 @@ class DatabaseServiceFactoryTest extends FunSuite with Matchers with BeforeAndAf
 
   override def beforeAll(): Unit = {
     postgres = DBTestHelper.postgres(port)
-    dbFactory = DBTestHelper.dbServiceFactory(system)
-    testDsl = DBTestHelper.dslContext(system, port)
+    dbFactory = DBTestHelper.dbServiceFactory(untypedSystem)
+    testDsl = DBTestHelper.dslContext(untypedSystem, port)
     // create a database
     testDsl.query("CREATE TABLE box_office(id SERIAL PRIMARY KEY)").executeAsyncScala().futureValue(Interval(Span(5, Seconds)))
 
@@ -49,7 +54,7 @@ class DatabaseServiceFactoryTest extends FunSuite with Matchers with BeforeAndAf
     super.afterAll()
     testDsl.query("DROP TABLE box_office").executeAsyncScala().futureValue(Interval(Span(5, Seconds)))
     postgres.close()
-    system.terminate().futureValue
+    untypedSystem.terminate().futureValue
   }
 
   //DEOPSCSW-618: Integration with Location Service

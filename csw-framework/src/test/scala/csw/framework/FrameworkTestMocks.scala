@@ -2,9 +2,8 @@ package csw.framework
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.scaladsl.ActorContext
-import akka.actor.typed.scaladsl.adapter._
-import akka.actor.typed.{ActorRef, ActorSystem}
-import akka.{actor, testkit, Done}
+import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
+import akka.{actor, Done}
 import csw.alarm.api.scaladsl.AlarmService
 import csw.command.client.CommandResponseManager
 import csw.command.client.messages.CommandResponseManagerMessage
@@ -20,6 +19,7 @@ import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaRegistration, RegistrationResult}
 import csw.location.api.scaladsl.LocationService
 import csw.logging.api.scaladsl.Logger
+import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.core.models.Prefix
@@ -29,12 +29,10 @@ import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import scala.concurrent.Future
 
-class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: ActorSystem[Nothing])
-    extends MockitoSugar
-    with ArgumentMatchersSugar {
+class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol]) extends MockitoSugar with ArgumentMatchersSugar {
 
   ///////////////////////////////////////////////
-  val testActor: ActorRef[Any]                   = testkit.TestProbe("test-probe").testActor
+  val testActor: ActorRef[Any]                   = TestProbe("test-probe").ref
   val akkaRegistration                           = AkkaRegistration(mock[AkkaConnection], Prefix("nfiraos.ncc.trombone"), testActor)
   val locationService: LocationService           = mock[LocationService]
   val eventServiceFactory: EventServiceFactory   = mock[EventServiceFactory]
@@ -48,8 +46,8 @@ class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: Acto
     .thenReturn(akkaRegistration)
   when(locationService.register(akkaRegistration)).thenReturn(Future.successful(registrationResult))
   when(locationService.unregister(any[AkkaConnection])).thenReturn(Future.successful(Done))
-  when(eventServiceFactory.make(any[LocationService])(any[actor.ActorSystem])).thenReturn(eventService)
-  when(eventService.executionContext).thenReturn(untypedSystem.dispatcher)
+  when(eventServiceFactory.make(any[LocationService])(any[ActorSystem[_]])).thenReturn(eventService)
+  when(eventService.executionContext).thenReturn(system.executionContext)
   ///////////////////////////////////////////////
 
   val commandResponseManagerActor: TestProbe[CommandResponseManagerMessage] = TestProbe[CommandResponseManagerMessage]
@@ -71,11 +69,11 @@ class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: Acto
 
   ///////////////////////////////////////////////
   val pubSubComponentActor: ActorRef[PubSub[CurrentState]] =
-    untypedSystem.spawnAnonymous(PubSubBehavior.make[CurrentState](loggerFactory))
+    system.spawn(PubSubBehavior.make[CurrentState](loggerFactory), "pub-sub")
   val currentStatePublisher = new CurrentStatePublisher(pubSubComponentActor)
 
   ///////////////////////////////////////////////
-  val configClientService: ConfigClientService = ConfigClientFactory.clientApi(untypedSystem, locationService)
+  val configClientService: ConfigClientService = ConfigClientFactory.clientApi(system, locationService)
 
   val cswCtx: CswContext =
     new CswContext(

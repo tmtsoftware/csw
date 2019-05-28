@@ -1,12 +1,13 @@
 package example.auth.installed.commands
 
-import akka.actor.ActorSystem
+import akka.actor.typed
 import csw.aas.installed.api.InstalledAppAuthAdapter
 
 // #command-factory
 object CommandFactory {
-  def makeCommand(adapter: InstalledAppAuthAdapter,
-                  args: Array[String])(implicit actorSystem: ActorSystem): Option[AppCommand] = {
+  def makeCommand(adapter: InstalledAppAuthAdapter, args: Array[String])(
+      implicit actorSystem: typed.ActorSystem[_]
+  ): Option[AppCommand] = {
 
     // ============ NOTE ============
     // We are doing hand parsing of command line arguments here for the demonstration purpose to keep things simple.

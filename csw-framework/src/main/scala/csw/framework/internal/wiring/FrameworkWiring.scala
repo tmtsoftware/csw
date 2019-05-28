@@ -1,7 +1,8 @@
 package csw.framework.internal.wiring
 
 import akka.Done
-import akka.actor.{ActorSystem, CoordinatedShutdown}
+import akka.actor.CoordinatedShutdown
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.alarm.client.AlarmServiceFactory
 import csw.config.api.scaladsl.ConfigClientService
 import csw.config.client.commons.ConfigUtils
@@ -20,7 +21,7 @@ import scala.concurrent.{ExecutionContext, Future}
  * Represents a class that lazily initializes necessary instances to run a component(s)
  */
 class FrameworkWiring {
-  lazy val actorSystem: ActorSystem                 = ActorSystemFactory.remote()
+  lazy val actorSystem: ActorSystem[SpawnProtocol]  = ActorSystemFactory.remote(SpawnProtocol.behavior, "framework-system")
   lazy val actorRuntime: ActorRuntime               = new ActorRuntime(actorSystem)
   lazy val locationService: LocationService         = HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
   lazy val registrationFactory                      = new RegistrationFactory
@@ -36,7 +37,7 @@ class FrameworkWiring {
   }
 
   private def shutdownRedisOnTermination(client: RedisClient): Unit = {
-    implicit val ec: ExecutionContext = actorSystem.dispatcher
+    implicit val ec: ExecutionContext = actorSystem.executionContext
 
     actorRuntime.coordinatedShutdown.addTask(
       CoordinatedShutdown.PhaseBeforeServiceUnbind,
@@ -56,13 +57,13 @@ object FrameworkWiring {
    * @param _actorSystem used to initialize other necessary instances like locationService
    * @return a FrameworkWiring containing instances to run a component(s)
    */
-  def make(_actorSystem: ActorSystem): FrameworkWiring = new FrameworkWiring {
-    override lazy val actorSystem: ActorSystem = _actorSystem
+  def make(_actorSystem: ActorSystem[SpawnProtocol]): FrameworkWiring = new FrameworkWiring {
+    override lazy val actorSystem: ActorSystem[SpawnProtocol] = _actorSystem
   }
 
-  def make(_actorSystem: ActorSystem, _redisClient: RedisClient): FrameworkWiring = new FrameworkWiring {
-    override lazy val actorSystem: ActorSystem = _actorSystem
-    override lazy val redisClient: RedisClient = _redisClient
+  def make(_actorSystem: ActorSystem[SpawnProtocol], _redisClient: RedisClient): FrameworkWiring = new FrameworkWiring {
+    override lazy val actorSystem: ActorSystem[SpawnProtocol] = _actorSystem
+    override lazy val redisClient: RedisClient                = _redisClient
   }
 
   /**
@@ -72,15 +73,19 @@ object FrameworkWiring {
    * @param _locationService used to initialize other necessary instances like configuration service client
    * @return a FrameworkWiring containing instances to run a component(s)
    */
-  def make(_actorSystem: ActorSystem, _locationService: LocationService): FrameworkWiring = new FrameworkWiring {
-    override lazy val actorSystem: ActorSystem         = _actorSystem
-    override lazy val locationService: LocationService = _locationService
+  def make(_actorSystem: ActorSystem[SpawnProtocol], _locationService: LocationService): FrameworkWiring = new FrameworkWiring {
+    override lazy val actorSystem: ActorSystem[SpawnProtocol] = _actorSystem
+    override lazy val locationService: LocationService        = _locationService
   }
 
-  def make(_actorSystem: ActorSystem, _locationService: LocationService, _redisClient: RedisClient): FrameworkWiring =
+  def make(
+      _actorSystem: ActorSystem[SpawnProtocol],
+      _locationService: LocationService,
+      _redisClient: RedisClient
+  ): FrameworkWiring =
     new FrameworkWiring {
-      override lazy val actorSystem: ActorSystem         = _actorSystem
-      override lazy val locationService: LocationService = _locationService
-      override lazy val redisClient: RedisClient         = _redisClient
+      override lazy val actorSystem: ActorSystem[SpawnProtocol] = _actorSystem
+      override lazy val locationService: LocationService        = _locationService
+      override lazy val redisClient: RedisClient                = _redisClient
     }
 }

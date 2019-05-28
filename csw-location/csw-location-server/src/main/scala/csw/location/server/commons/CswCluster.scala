@@ -1,10 +1,10 @@
 package csw.location.server.commons
 
 import akka.actor.CoordinatedShutdown.Reason
-import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.AskPattern._
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.{ActorSystem, CoordinatedShutdown, Scheduler}
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
+import akka.actor.{CoordinatedShutdown, Scheduler}
 import akka.cluster.ddata.SelfUniqueAddress
 import akka.cluster.ddata.typed.scaladsl
 import akka.cluster.ddata.typed.scaladsl.{DistributedData, Replicator}
@@ -17,6 +17,7 @@ import csw.location.api.exceptions.CouldNotJoinCluster
 import csw.location.server.commons.ClusterConfirmationMessages.{HasJoinedCluster, Shutdown}
 import csw.location.server.commons.CoordinatedShutdownReasons.FailureReason
 import csw.logging.api.scaladsl.Logger
+import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -28,19 +29,19 @@ import scala.util.control.NonFatal
  *
  * @note it is highly recommended that explicit creation of CswCluster should be for advanced usages or testing purposes only
  */
-class CswCluster private (_actorSystem: ActorSystem) {
+class CswCluster private (_typedSystem: ActorSystem[SpawnProtocol]) {
 
   private val log: Logger = LocationServiceLogger.getLogger
 
   /**
    * Identifies the hostname where ActorSystem is running
    */
-  val hostname: String = _actorSystem.settings.config.getString("akka.remote.artery.canonical.hostname")
+  val hostname: String = _typedSystem.settings.config.getString("akka.remote.artery.canonical.hostname")
 
-  implicit val actorSystem: ActorSystem                = _actorSystem
-  implicit val typedSystem: actor.typed.ActorSystem[_] = _actorSystem.toTyped
+  implicit val typedSystem: ActorSystem[SpawnProtocol] = _typedSystem
+  implicit val untypedSystem: actor.ActorSystem        = _typedSystem.toUntyped
   implicit val scheduler: Scheduler                    = typedSystem.scheduler
-  implicit val ec: ExecutionContext                    = actorSystem.dispatcher
+  implicit val ec: ExecutionContext                    = typedSystem.executionContext
   implicit val mat: ActorMaterializer                  = makeMat()
   implicit val cluster: Cluster                        = Cluster(typedSystem)
   private val distributedData: DistributedData         = scaladsl.DistributedData(typedSystem)
@@ -54,12 +55,12 @@ class CswCluster private (_actorSystem: ActorSystem) {
   /**
    * Gives handle to CoordinatedShutdown extension
    */
-  val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(actorSystem)
+  val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(untypedSystem)
 
   /**
    * Creates an ActorMaterializer for current ActorSystem
    */
-  private def makeMat(): ActorMaterializer = ActorMaterializer()
+  private def makeMat(): ActorMaterializer = ActorMaterializer()(typedSystem)
 
   /**
    * If `startManagement` flag is set to true (which is true only when a managementPort is defined in ClusterSettings)
@@ -69,9 +70,9 @@ class CswCluster private (_actorSystem: ActorSystem) {
    */
   // $COVERAGE-OFF$
   private def startClusterManagement(): Unit = {
-    val startManagement = actorSystem.settings.config.getBoolean("startManagement")
+    val startManagement = typedSystem.settings.config.getBoolean("startManagement")
     if (startManagement) {
-      val akkaManagement = AkkaManagement(actorSystem)
+      val akkaManagement = AkkaManagement(untypedSystem)
       Await.result(akkaManagement.start(), 10.seconds)
     }
   }
@@ -80,13 +81,13 @@ class CswCluster private (_actorSystem: ActorSystem) {
   // When new member tries to join the cluster, location service makes sure that member is weakly up or up before returning handle to location service
   private def joinCluster(): Done = {
     // Check if seed nodes are provided to join csw-cluster
-    val emptySeeds = actorSystem.settings.config.getStringList("akka.cluster.seed-nodes").isEmpty
+    val emptySeeds = typedSystem.settings.config.getStringList("akka.cluster.seed-nodes").isEmpty
     if (emptySeeds) {
       // If no seeds are provided (which happens only during testing), then create a single node cluster by joining to self
       cluster.manager ! Join(cluster.selfMember.address)
     }
 
-    val confirmationActorF: ActorRef[Any] = actorSystem.spawn(ClusterConfirmationActor.behavior(), "ClusterConfirmationActor")
+    val confirmationActorF: ActorRef[Any] = typedSystem.spawn(ClusterConfirmationActor.behavior(), "ClusterConfirmationActor")
     implicit val timeout: Timeout         = Timeout(5.seconds)
     def statusF: Future[Option[Done]]     = confirmationActorF ? HasJoinedCluster
     def status: Option[Done]              = Await.result(statusF, 5.seconds)
@@ -134,7 +135,7 @@ object CswCluster {
    *
    * @return an instance of CswCluster
    */
-  def withSystem(actorSystem: ActorSystem): CswCluster = {
+  def withSystem(actorSystem: ActorSystem[SpawnProtocol]): CswCluster = {
     val cswCluster = new CswCluster(actorSystem)
     try {
       cswCluster.startClusterManagement()

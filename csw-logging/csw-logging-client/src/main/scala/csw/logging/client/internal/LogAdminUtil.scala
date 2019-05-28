@@ -13,7 +13,7 @@ private[csw] object LogAdminUtil {
       LoggingState.akkaLogLevel,
       LoggingState.slf4jLogLevel,
       LoggingState.componentsLoggingState
-        .getOrElse(componentName, LoggingState.componentsLoggingState(Constants.DEFAULT_KEY))
+        .getOrDefault(componentName, LoggingState.componentsLoggingState.get(Constants.DEFAULT_KEY))
         .componentLogLevel
     )
 

@@ -83,7 +83,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         Event event1 = Utils.makeDistinctJavaEvent(new Random().nextInt());
         EventKey eventKey = event1.eventKey();
 
-        TestProbe probe = TestProbe.create(baseProperties.typedActorSystem());
+        TestProbe probe = TestProbe.create(baseProperties.actorSystem());
 
         java.util.Set<EventKey> set = Set.of(eventKey);
 
@@ -109,7 +109,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     public void should_be_able_to_subscribe_with_async_callback(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         Event event1 = Utils.makeDistinctJavaEvent(new Random().nextInt());
 
-        TestProbe probe = TestProbe.create(baseProperties.typedActorSystem());
+        TestProbe probe = TestProbe.create(baseProperties.actorSystem());
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
         Thread.sleep(500); // Needed for redis set which is fire and forget operation
@@ -160,7 +160,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_subscribe_with_callback(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
 
-        TestProbe probe = TestProbe.create(baseProperties.typedActorSystem());
+        TestProbe probe = TestProbe.create(baseProperties.actorSystem());
 
         List<Event> listOfPublishedEvents = new ArrayList<>(5);
         for (int i = 1; i <= 5; i++) {
@@ -208,7 +208,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     public void should_be_able_to_subscribe_with_an_ActorRef(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         Event event1 = Utils.makeDistinctJavaEvent(new Random().nextInt());
 
-        TestProbe probe = TestProbe.create(baseProperties.typedActorSystem());
+        TestProbe probe = TestProbe.create(baseProperties.actorSystem());
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
         Thread.sleep(500); // Needed for redis set which is fire and forget operation
@@ -245,7 +245,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         Event testEvent2 = Utils.makeEventWithPrefix(2, new Prefix("test.prefix"));
         Event tcsEvent1 = Utils.makeEventWithPrefix(1, new Prefix("tcs.prefix"));
 
-        TestProbe<Event> probe = TestProbe.create(baseProperties.typedActorSystem());
+        TestProbe<Event> probe = TestProbe.create(baseProperties.actorSystem());
 
         // pattern is * for redis
         IEventSubscription subscription = baseProperties.jSubscriber().pSubscribeCallback(JSubsystem.TEST, baseProperties.eventPattern(), event -> probe.ref().tell(event));

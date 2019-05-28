@@ -1,6 +1,6 @@
 package csw.location.server.commons
 
-import akka.actor.ActorSystem
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.location.api.commons.Constants
 import csw.logging.api.scaladsl.Logger
@@ -10,7 +10,7 @@ import scala.annotation.varargs
 import scala.collection.JavaConverters._
 
 /**
- * ClusterSettings manages [[com.typesafe.config.Config]] values required by an [[akka.actor.ActorSystem]] to boot. It configures mainly
+ * ClusterSettings manages [[com.typesafe.config.Config]] values required by an [[akka.actor.typed.ActorSystem]] to boot. It configures mainly
  * four parameters of an `ActorSystem`, namely :
  *
  *  - name (Name is defaulted to a constant value so that ActorSystem joins the cluster while booting)
@@ -129,7 +129,7 @@ private[location] case class ClusterSettings(clusterName: String = Constants.Clu
 
   }
 
-  def system: ActorSystem = ActorSystem(clusterName, config)
+  def system: ActorSystem[SpawnProtocol] = ActorSystem(SpawnProtocol.behavior, clusterName, config)
 }
 
 /**

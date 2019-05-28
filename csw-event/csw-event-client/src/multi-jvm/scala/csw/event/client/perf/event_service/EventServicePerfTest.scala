@@ -85,6 +85,7 @@ class EventServicePerfTest extends BasePerfSuite(EventServiceMultiNodeConfig) {
       val rep             = reporter(testName)
       val completionProbe = scaladsl.TestProbe[AggregatedResult]()(system.toTyped)
 
+      implicit val typedSystem = actorSystem
       runOn(activeSubscriberNodes.head) {
         val resultAggregator =
           new ResultAggregator(scenarioName, testName, subscriber, activeSubscriberNodes.size, completionProbe.ref)

@@ -14,12 +14,25 @@ public class JIrisSupervisorActor {
                 return Behaviors.receiveMessage(
                         msg -> {
                             switch (msg) {
-                                case "trace": log.trace(() -> msg); break;
-                                case "debug": log.debug(() -> msg); break;
-                                case "info": log.info(() -> msg); break;
-                                case "warn": log.warn(() -> msg); break;
-                                case "error": log.error(() -> msg); break;
-                                case "fatal": log.fatal(() -> msg); break;
+                                case "trace":
+                                    log.trace(() -> msg);
+                                    break;
+                                case "debug":
+                                    log.debug(() -> msg);
+                                    break;
+                                case "info":
+                                    log.info(() -> msg);
+                                    break;
+                                case "warn":
+                                    log.warn(() -> msg);
+                                    break;
+                                case "error":
+                                    log.error(() -> msg);
+                                    break;
+                                case "fatal":
+                                    log.fatal(() -> msg);
+                                    break;
+
                             }
                             return Behaviors.same();
                         });

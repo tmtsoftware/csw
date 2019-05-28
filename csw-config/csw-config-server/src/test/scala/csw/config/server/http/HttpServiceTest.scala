@@ -2,9 +2,10 @@ package csw.config.server.http
 
 import java.net.BindException
 
-import akka.actor.ActorSystem
 import akka.actor.CoordinatedShutdown.UnknownReason
-import akka.stream.ActorMaterializer
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
+import akka.stream.typed.scaladsl.ActorMaterializer
 import csw.aas.core.commons.AASConnection
 import csw.config.server.ServerWiring
 import csw.config.server.commons.ConfigServiceConnection
@@ -20,7 +21,7 @@ import scala.util.control.NonFatal
 
 class HttpServiceTest extends HTTPLocationService {
 
-  implicit val system: ActorSystem                 = ActorSystem("test")
+  implicit val system: ActorSystem[_]              = ActorSystem(Behaviors.empty, "test")
   implicit val mat: ActorMaterializer              = ActorMaterializer()
   private val testLocationService: LocationService = HttpLocationServiceFactory.makeLocalClient
 
@@ -33,7 +34,8 @@ class HttpServiceTest extends HTTPLocationService {
   }
 
   override def afterAll(): Unit = {
-    system.terminate().await
+    system.terminate()
+    system.whenTerminated.await
     super.afterAll()
   }
 

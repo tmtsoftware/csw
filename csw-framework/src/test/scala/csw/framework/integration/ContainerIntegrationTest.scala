@@ -1,9 +1,11 @@
 package csw.framework.integration
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.http.scaladsl.Http
 import akka.stream.scaladsl.{Keep, Sink}
-import akka.{actor, testkit}
+import akka.testkit
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
@@ -35,14 +37,16 @@ import scala.concurrent.duration.DurationLong
 class ContainerIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 
-  private val irisContainerConnection                 = AkkaConnection(ComponentId("IRIS_Container", ComponentType.Container))
-  private val filterAssemblyConnection                = AkkaConnection(ComponentId("Filter", Assembly))
-  private val instrumentHcdConnection                 = AkkaConnection(ComponentId("Instrument_Filter", HCD))
-  private val disperserHcdConnection                  = AkkaConnection(ComponentId("Disperser", HCD))
-  private val containerActorSystem: actor.ActorSystem = ActorSystemFactory.remote()
+  private val irisContainerConnection  = AkkaConnection(ComponentId("IRIS_Container", ComponentType.Container))
+  private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
+  private val instrumentHcdConnection  = AkkaConnection(ComponentId("Instrument_Filter", HCD))
+  private val disperserHcdConnection   = AkkaConnection(ComponentId("Disperser", HCD))
+  private val containerActorSystem: ActorSystem[SpawnProtocol] =
+    ActorSystemFactory.remote(SpawnProtocol.behavior, "container-system")
 
   override def afterAll(): Unit = {
-    containerActorSystem.terminate().await
+    containerActorSystem.terminate()
+    containerActorSystem.whenTerminated.await
     super.afterAll()
   }
 
@@ -164,10 +168,10 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
 
     assertThatContainerIsRunning(resolvedContainerRef, containerLifecycleStateProbe, 2.seconds)
 
-    val containerTracker      = testkit.TestProbe()
-    val filterAssemblyTracker = testkit.TestProbe()
-    val instrumentHcdTracker  = testkit.TestProbe()
-    val disperserHcdTracker   = testkit.TestProbe()
+    val containerTracker      = testkit.TestProbe()(seedActorSystem.toUntyped)
+    val filterAssemblyTracker = testkit.TestProbe()(seedActorSystem.toUntyped)
+    val instrumentHcdTracker  = testkit.TestProbe()(seedActorSystem.toUntyped)
+    val disperserHcdTracker   = testkit.TestProbe()(seedActorSystem.toUntyped)
 
     // start tracking container and all the components, so that on Shutdown message, all the trackers gets LocationRemoved event
     seedLocationService
@@ -191,7 +195,7 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
       .run()
 
     // ********** Message: Shutdown **********
-    Http(containerActorSystem).shutdownAllConnectionPools().await
+    Http(containerActorSystem.toUntyped).shutdownAllConnectionPools().await
     resolvedContainerRef ! Shutdown
 
     // this proves that ComponentBehaviors postStop signal gets invoked for all components

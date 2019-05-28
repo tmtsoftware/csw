@@ -2,10 +2,11 @@ package csw.config.server
 
 import java.util.concurrent.CompletableFuture
 
-import akka.Done
+import akka.{actor, Done}
+import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.{ActorSystem, CoordinatedShutdown}
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.dispatch.MessageDispatcher
 import akka.stream.Materializer
 import akka.stream.typed.scaladsl.ActorMaterializer
@@ -20,17 +21,18 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 /**
  * A convenient class wrapping actor system and providing handles for execution context, materializer and clean up of actor system
  */
-private[config] class ActorRuntime(_actorSystem: ActorSystem, val settings: Settings) {
-  implicit val actorSystem: ActorSystem     = _actorSystem
-  implicit val ec: ExecutionContextExecutor = actorSystem.dispatcher
-  implicit val mat: Materializer            = ActorMaterializer()(actorSystem.toTyped)
+private[config] class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol], val settings: Settings) {
+  implicit val typedSystem: ActorSystem[SpawnProtocol] = _typedSystem
+  implicit val untypedSystem: actor.ActorSystem        = _typedSystem.toUntyped
+  implicit val ec: ExecutionContextExecutor            = typedSystem.executionContext
+  implicit val mat: Materializer                       = ActorMaterializer()
 
-  val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(actorSystem)
+  val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(untypedSystem)
 
-  val blockingIoDispatcher: MessageDispatcher = actorSystem.dispatchers.lookup(settings.`blocking-io-dispatcher`)
+  val blockingIoDispatcher: MessageDispatcher = untypedSystem.dispatchers.lookup(settings.`blocking-io-dispatcher`)
 
   def startLogging(name: String): LoggingSystem =
-    LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, actorSystem)
+    LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, typedSystem)
 
   def shutdown(reason: Reason): Future[Done] = coordinatedShutdown.run(reason)
 

@@ -1,7 +1,8 @@
 package example.alarm;
 
 import akka.Done;
-import akka.actor.ActorSystem;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.SpawnProtocol;
 import csw.alarm.api.javadsl.IAlarmService;
 import csw.alarm.client.AlarmServiceFactory;
 import csw.location.api.javadsl.ILocationService;
@@ -15,10 +16,10 @@ import static csw.params.javadsl.JSubsystem.NFIRAOS;
 
 public class JAlarmServiceClientExampleApp {
 
-    private ActorSystem actorSystem;
+    private ActorSystem<SpawnProtocol> actorSystem;
     private ILocationService jLocationService;
 
-    public JAlarmServiceClientExampleApp(ActorSystem actorSystem,ILocationService locationService) throws ExecutionException, InterruptedException {
+    public JAlarmServiceClientExampleApp(akka.actor.typed.ActorSystem<SpawnProtocol> actorSystem, ILocationService locationService) throws ExecutionException, InterruptedException {
         this.actorSystem = actorSystem;
         this.jLocationService = locationService;
 

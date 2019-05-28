@@ -1,8 +1,8 @@
 package csw.logging.client.scaladsl
 
 import akka.actor.typed.ActorRef
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.logging.api.models.LoggingLevels._
+import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.components.IRIS._
 import csw.logging.client.components._
@@ -81,11 +81,13 @@ class LoggerCompTest extends LoggingTestSuite {
     // extract component and non-component logs and group them
     splitAndGroupLogs()
 
-    def testLogBuffer(logBuffer: mutable.Buffer[JsObject],
-                      configuredLogLevel: Level,
-                      expectedLogsMap: Map[String, String] = Map.empty,
-                      expectedFileName: String = "",
-                      expectedCompName: String = ""): Unit = {
+    def testLogBuffer(
+        logBuffer: mutable.Buffer[JsObject],
+        configuredLogLevel: Level,
+        expectedLogsMap: Map[String, String] = Map.empty,
+        expectedFileName: String = "",
+        expectedCompName: String = ""
+    ): Unit = {
       logBuffer.foreach { log ⇒
         val currentLogLevel = log.getString(LoggingKeys.SEVERITY).toLowerCase
         Level(currentLogLevel) >= configuredLogLevel shouldBe true

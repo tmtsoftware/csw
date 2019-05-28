@@ -69,7 +69,7 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
       _ ⇒
         currentStatePublisher.publish(
           CurrentState(prefix, StateName("testStateName"), controlCommand.paramSet + choiceKey.set(eventReceivedChoice))
-      )
+        )
 
     controlCommand match {
       case Setup(_, _, `setSeverityCommand`, _, _) ⇒ alarmService.setSeverity(testAlarmKey, testSeverity)

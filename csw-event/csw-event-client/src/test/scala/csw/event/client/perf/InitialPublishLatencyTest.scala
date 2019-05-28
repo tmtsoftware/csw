@@ -1,7 +1,9 @@
 package csw.event.client.perf
 
-import akka.actor.ActorSystem
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.{typed, ActorSystem}
 import akka.stream.ActorMaterializer
+import akka.stream.typed.scaladsl
 import csw.event.client.EventServiceFactory
 import csw.event.client.helpers.Utils
 import csw.location.api.scaladsl.LocationService
@@ -11,10 +13,11 @@ import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
 class InitialPublishLatencyTest extends FunSuite with BeforeAndAfterAll {
 
-  private implicit val system: ActorSystem    = ActorSystem()
-  private implicit val mat: ActorMaterializer = ActorMaterializer()
-  private val ls: LocationService             = HttpLocationServiceFactory.makeLocalClient
-  private val eventServiceFactory             = new EventServiceFactory().make(ls)
+  private implicit val system: ActorSystem               = ActorSystem()
+  private implicit val typedSystem: typed.ActorSystem[_] = system.toTyped
+  private implicit val mat: ActorMaterializer            = scaladsl.ActorMaterializer()
+  private val ls: LocationService                        = HttpLocationServiceFactory.makeLocalClient
+  private val eventServiceFactory                        = new EventServiceFactory().make(ls)
   import eventServiceFactory._
 
   ignore("should not incurr high latencies for initially published events") {

@@ -19,7 +19,7 @@ private[csw] class LoggerImpl(maybeComponentName: Option[String], actorName: Opt
 
   // default log level will be applied if component specific log level is not provided in logging configuration inside component-log-levels block
   private[this] def componentLoggingState: ComponentLoggingState =
-    componentsLoggingState.getOrElse(componentName, componentsLoggingState(Constants.DEFAULT_KEY))
+    componentsLoggingState.getOrDefault(componentName, componentsLoggingState.get(Constants.DEFAULT_KEY))
 
   private def all(
       level: Level,

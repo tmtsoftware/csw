@@ -1,10 +1,11 @@
 package csw.alarm.client.internal.services
 
 import akka.Done
-import akka.actor.ActorSystem
-import akka.actor.typed.ActorRef
+import akka.actor.typed
+import akka.actor.typed.{ActorRef, _}
+import akka.stream.Materializer
 import akka.stream.scaladsl.{Sink, Source}
-import akka.stream.{ActorMaterializer, Materializer}
+import akka.stream.typed.scaladsl
 import csw.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
 import csw.alarm.api.internal._
 import csw.alarm.api.models.FullAlarmSeverity.Disconnected
@@ -26,12 +27,12 @@ private[client] trait SeverityServiceModule extends SeverityService {
 
   val redisConnectionsFactory: RedisConnectionsFactory
   def settings: Settings
-  implicit val actorSystem: ActorSystem
+  implicit val actorSystem: typed.ActorSystem[_]
   import redisConnectionsFactory._
 
   private val log = AlarmServiceLogger.getLogger
 
-  private implicit lazy val mat: Materializer = ActorMaterializer()
+  private implicit lazy val mat: Materializer = scaladsl.ActorMaterializer()
 
   final override def setSeverity(alarmKey: AlarmKey, severity: AlarmSeverity): Future[Done] = async {
     val currentSeverity = await(getCurrentSeverity(alarmKey))

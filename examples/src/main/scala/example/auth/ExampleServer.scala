@@ -1,15 +1,18 @@
 package example.auth
 
-import akka.actor.ActorSystem
+import akka.actor.typed
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.http.scaladsl.server._
-import akka.stream.ActorMaterializer
+import akka.stream.Materializer
+import akka.stream.typed.scaladsl
+import akka.stream.typed.scaladsl.ActorMaterializer
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import csw.aas.http.AuthorizationPolicy._
 import csw.aas.http.SecurityDirectives
-import AsyncSupport.actorSystem
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.client.utils.LocationServerStatus
 import csw.logging.client.scaladsl.LoggingSystemFactory
+import example.auth.AsyncSupport.actorSystem
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
@@ -62,9 +65,9 @@ object LoggingSupport {
 }
 
 object AsyncSupport {
-  implicit val actorSystem: ActorSystem = ActorSystem()
-  implicit val ec: ExecutionContext     = ExecutionContext.global
-  implicit val mat: ActorMaterializer   = ActorMaterializer()
+  implicit val actorSystem: typed.ActorSystem[SpawnProtocol] = typed.ActorSystem(SpawnProtocol.behavior, "")
+  implicit val ec: ExecutionContext                          = ExecutionContext.global
+  implicit val mat: Materializer                             = ActorMaterializer()
 }
 
 object LocationServiceSupport {
@@ -158,12 +161,12 @@ object Documentation extends HttpApp {
   object PolicyExpressions {
     // #policy-expressions
     val routes: Route =
-    sGet(RealmRolePolicy("admin") | CustomPolicy(_.email.contains("super-admin@tmt.org"))) {
-      complete("OK")
-    } ~
-    sPost(ClientRolePolicy("finance_user") & PermissionPolicy("edit")) {
-      complete("OK")
-    }
+      sGet(RealmRolePolicy("admin") | CustomPolicy(_.email.contains("super-admin@tmt.org"))) {
+        complete("OK")
+      } ~
+        sPost(ClientRolePolicy("finance_user") & PermissionPolicy("edit")) {
+          complete("OK")
+        }
     // #policy-expressions
   }
 
@@ -183,9 +186,9 @@ object Documentation extends HttpApp {
 // #sample-http-app
 object SampleHttpApp extends HttpApp with App {
 
-  implicit val actorSystem: ActorSystem = ActorSystem()
-  implicit val ec: ExecutionContext     = actorSystem.dispatcher
-  implicit val mat: ActorMaterializer   = ActorMaterializer()
+  implicit val actorSystem: ActorSystem[SpawnProtocol] = typed.ActorSystem(SpawnProtocol.behavior, "sample-http-app")
+  implicit val ec: ExecutionContext                    = actorSystem.executionContext
+  implicit val mat: Materializer                       = scaladsl.ActorMaterializer()
 
   val locationService = HttpLocationServiceFactory.makeLocalClient
   val directives      = SecurityDirectives(locationService)

@@ -74,8 +74,7 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
   //#subscribe
 
   //#submit
-  import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-  implicit val typedActorSystem: ActorSystem[_] = actorSystem.toTyped
+  implicit val typedActorSystem: ActorSystem[_] = actorSystem
   test("should be able to send sleep command to HCD") {
     import scala.concurrent.duration._
     implicit val sleepCommandTimeout: Timeout = Timeout(10000.millis)

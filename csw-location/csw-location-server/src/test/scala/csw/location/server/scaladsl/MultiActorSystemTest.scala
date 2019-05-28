@@ -21,13 +21,17 @@ class MultiActorSystemTest extends FunSuite with Matchers with BeforeAndAfterAll
 
   val tcpRegistration: TcpRegistration = TcpRegistration(connection, 1234)
 
-  override protected def afterAll(): Unit = system2.terminate().await
+  override protected def afterAll(): Unit = {
+    system2.terminate()
+    system2.whenTerminated.await
+  }
 
   test("ensure that location service works across two actorSystems within the same JVM") {
     locationService.register(tcpRegistration).await
     locationService2.resolve(connection, 5.seconds).await.get.connection shouldBe tcpRegistration.connection
 
-    system1.terminate().await
+    system1.terminate()
+    system1.whenTerminated.await
     locationService2.resolve(connection, 5.seconds).await.get.connection shouldBe tcpRegistration.connection
   }
 }

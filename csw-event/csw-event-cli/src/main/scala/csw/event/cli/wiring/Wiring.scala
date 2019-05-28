@@ -1,6 +1,6 @@
 package csw.event.cli.wiring
 
-import akka.actor.ActorSystem
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.event.api.scaladsl.EventService
 import csw.event.cli.{CliApp, CommandLineRunner}
 import csw.event.client.EventServiceFactory
@@ -8,7 +8,7 @@ import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 
 private[event] class Wiring {
-  lazy val actorSystem  = ActorSystem("event-cli")
+  lazy val actorSystem  = ActorSystem(SpawnProtocol.behavior, "event-cli")
   lazy val actorRuntime = new ActorRuntime(actorSystem)
   import actorRuntime._
   lazy val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient

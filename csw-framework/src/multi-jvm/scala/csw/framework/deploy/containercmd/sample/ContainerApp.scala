@@ -2,9 +2,7 @@ package csw.framework.deploy.containercmd.sample
 
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed
-import akka.actor.typed.ActorRef
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.command.client.messages.ContainerCommonMessage.GetContainerLifecycleState
 import csw.command.client.messages.ContainerMessage
@@ -17,7 +15,7 @@ import scala.concurrent.duration.DurationLong
 
 object ContainerApp extends App {
   private val wiring                              = new FrameworkWiring()
-  implicit val system: typed.ActorSystem[Nothing] = wiring.actorSystem.toTyped
+  implicit val system: ActorSystem[SpawnProtocol] = wiring.actorSystem
   implicit val testkit: TestKitSettings           = TestKitSettings(system)
   private val config: Config                      = ConfigFactory.load("laser_container.conf")
   private val ref: ActorRef[ContainerMessage] =

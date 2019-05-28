@@ -3,9 +3,8 @@ package csw.framework.command
 import akka.actor.Scheduler
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.stream.{ActorMaterializer, Materializer}
+import akka.stream.Materializer
+import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
@@ -21,8 +20,8 @@ import csw.params.commands.Setup
 import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, StateName}
 import io.lettuce.core.RedisClient
-import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
 import org.mockito.MockitoSugar
+import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
 
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, ExecutionContextExecutor, Future}
@@ -42,12 +41,11 @@ class LongRunningCommandTest(ignore: Int)
     with MockitoSugar {
   import config._
 
-  implicit val actorSystem: ActorSystem[_]  = system.toTyped
   implicit val mat: Materializer            = ActorMaterializer()
-  implicit val ec: ExecutionContextExecutor = actorSystem.executionContext
+  implicit val ec: ExecutionContextExecutor = typedSystem.executionContext
   implicit val timeout: Timeout             = 20.seconds
-  implicit val scheduler: Scheduler         = actorSystem.scheduler
-  implicit val testkit: TestKitSettings     = TestKitSettings(actorSystem)
+  implicit val scheduler: Scheduler         = typedSystem.scheduler
+  implicit val testkit: TestKitSettings     = TestKitSettings(typedSystem)
 
   test("should be able to send long running commands asynchronously and get the response") {
     runOn(seed) {
@@ -165,7 +163,7 @@ class LongRunningCommandTest(ignore: Int)
 
     runOn(member1) {
       // spawn single assembly running in Standalone mode in jvm-2
-      val wiring       = FrameworkWiring.make(system, locationService, mock[RedisClient])
+      val wiring       = FrameworkWiring.make(typedSystem, locationService, mock[RedisClient])
       val assemblyConf = ConfigFactory.load("command/mcs_assembly.conf")
       Await.result(Standalone.spawn(assemblyConf, wiring), 5.seconds)
       enterBarrier("spawned")
@@ -176,7 +174,7 @@ class LongRunningCommandTest(ignore: Int)
 
     runOn(member2) {
       // spawn single hcd running in Standalone mode in jvm-3
-      val wiring  = FrameworkWiring.make(system, locationService, mock[RedisClient])
+      val wiring  = FrameworkWiring.make(typedSystem, locationService, mock[RedisClient])
       val hcdConf = ConfigFactory.load("command/mcs_hcd.conf")
       Await.result(Standalone.spawn(hcdConf, wiring), 5.seconds)
       enterBarrier("spawned")

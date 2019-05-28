@@ -12,7 +12,7 @@ trait TokenMaskSupport {
     req.header[Authorization] match {
       case Some(_) ⇒ req.removeHeader(Authorization.name).addHeader(maskedAuthHeader)
       case None    ⇒ req
-  }
+    }
 
   val logRequest: HttpRequest ⇒ Unit = req ⇒
     logger.info(
@@ -22,5 +22,5 @@ trait TokenMaskSupport {
         "method"  → req.method.value.toString,
         "headers" → req.headers.mkString(",")
       )
-  )
+    )
 }

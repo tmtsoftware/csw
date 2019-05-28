@@ -6,7 +6,8 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.time.{ZoneId, ZoneOffset, ZonedDateTime}
 
-import akka.actor.ActorSystem
+import akka.actor.typed
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.ConfigFactory
 import csw.logging.api.models.LoggingLevels.{DEBUG, INFO, TRACE}
 import csw.logging.api.scaladsl.Logger
@@ -110,7 +111,7 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
                       """.stripMargin)
         .withFallback(ConfigFactory.load())
 
-    val actorSystem   = ActorSystem("test", config)
+    val actorSystem   = ActorSystem(SpawnProtocol.behavior, "test", config)
     val loggingSystem = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
 
     loggingSystem.getAppenders shouldBe List(FileAppender)
@@ -127,7 +128,8 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
 
     // clean up
     Await.result(loggingSystem.stop, 5.seconds)
-    Await.result(actorSystem.terminate, 5.seconds)
+    actorSystem.terminate()
+    Await.result(actorSystem.whenTerminated, 5.seconds)
   }
 
   test("should log messages in the file without standard headers based on the log level configured in the config") {
@@ -146,7 +148,7 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
                       """.stripMargin)
         .withFallback(ConfigFactory.load())
 
-    val actorSystem   = ActorSystem("test", config)
+    val actorSystem   = typed.ActorSystem(SpawnProtocol.behavior, "test", config)
     val loggingSystem = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
 
     loggingSystem.getAppenders shouldBe List(FileAppender)
@@ -162,7 +164,8 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
 
     // clean up
     Await.result(loggingSystem.stop, 5.seconds)
-    Await.result(actorSystem.terminate, 5.seconds)
+    actorSystem.terminate()
+    Await.result(actorSystem.whenTerminated, 5.seconds)
   }
 
   test(
@@ -186,7 +189,7 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
                       """.stripMargin)
         .withFallback(ConfigFactory.load())
 
-    lazy val actorSystem   = ActorSystem("test", config)
+    lazy val actorSystem   = typed.ActorSystem(SpawnProtocol.behavior, "test", config)
     lazy val loggingSystem = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
 
     // default log level is trace but file appender is filtering logs at debug level, hence trace level log should not be written to file
@@ -212,6 +215,7 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
     //*************************** End Testing File Logs *********************************************
 
     //*************************** Start Testing StdOut Logs *****************************************
+    println(outStream.toString)
     parse(outStream.toString)
     stdOutLogBuffer.size shouldBe 2
 
@@ -231,7 +235,8 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
     // clean up
     stdOutLogBuffer.clear()
     Await.result(loggingSystem.stop, 5.seconds)
-    Await.result(actorSystem.terminate, 5.seconds)
+    actorSystem.terminate()
+    Await.result(actorSystem.whenTerminated, 5.seconds)
   }
 
   // DEOPSCSW-118: Provide UTC time for each log message
@@ -239,19 +244,19 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
     val config =
       ConfigFactory
         .parseString("""
-                        |csw-logging {
-                        | appenders = ["csw.logging.client.appenders.StdOutAppender$"]
-                        | appender-config {
-                        |   stdout {
-                        |     fullHeaders = true
-                        |     logLevelLimit = info
-                        |   }
-                        | }
-                        |}
-                      """.stripMargin)
+                       |csw-logging {
+                       | appenders = ["csw.logging.client.appenders.StdOutAppender$"]
+                       | appender-config {
+                       |   stdout {
+                       |     fullHeaders = true
+                       |     logLevelLimit = info
+                       |   }
+                       | }
+                       |}
+                     """.stripMargin)
         .withFallback(ConfigFactory.load())
 
-    lazy val actorSystem                 = ActorSystem("test", config)
+    lazy val actorSystem                 = typed.ActorSystem(SpawnProtocol.behavior, "test", config)
     lazy val loggingSystem               = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
     var expectedTimestamp: ZonedDateTime = null
 
@@ -268,7 +273,8 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
 
     // clean up
     Await.result(loggingSystem.stop, 5.seconds)
-    Await.result(actorSystem.terminate, 5.seconds)
+    actorSystem.terminate()
+    Await.result(actorSystem.whenTerminated, 5.seconds)
   }
 
   test("should log messages on the console without standard headers") {
@@ -287,7 +293,7 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
                      """.stripMargin)
         .withFallback(ConfigFactory.load())
 
-    lazy val actorSystem                 = ActorSystem("test", config)
+    lazy val actorSystem                 = typed.ActorSystem(SpawnProtocol.behavior, "test", config)
     lazy val loggingSystem               = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
     var expectedTimestamp: ZonedDateTime = null
 
@@ -306,7 +312,8 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
     // clean up
     stdOutLogBuffer.clear()
     Await.result(loggingSystem.stop, 5.seconds)
-    Await.result(actorSystem.terminate, 5.seconds)
+    actorSystem.terminate()
+    Await.result(actorSystem.whenTerminated, 5.seconds)
   }
 
   test("should log messages on the console in one line") {
@@ -326,8 +333,8 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
                      """.stripMargin)
         .withFallback(ConfigFactory.load())
 
+    lazy val actorSystem                 = typed.ActorSystem(SpawnProtocol.behavior, "test", config)
     lazy val loggingSystem               = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
-    lazy val actorSystem                 = ActorSystem("test", config)
     var expectedTimestamp: ZonedDateTime = null
 
     Console.withOut(os) {
@@ -338,7 +345,7 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
     }
     loggingSystem.getAppenders shouldBe List(StdOutAppender)
 
-    val expectedOneLineLog = " INFO   (LoggingConfigurationTest.scala 92) - Sample log message"
+    val expectedOneLineLog = " INFO   (LoggingConfigurationTest.scala 93) - Sample log message"
 
     val (timestamp, message) = os.toString.trim.splitAt(24)
 
@@ -354,6 +361,7 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
     os.flush()
     os.close()
     Await.result(loggingSystem.stop, 5.seconds)
-    Await.result(actorSystem.terminate, 5.seconds)
+    actorSystem.terminate()
+    Await.result(actorSystem.whenTerminated, 5.seconds)
   }
 }

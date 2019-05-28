@@ -3,6 +3,7 @@ package csw.event.client.perf.model_obs
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.remote.testkit.MultiNodeConfig
 import akka.actor.testkit.typed.scaladsl
+import akka.actor.typed.ActorSystem
 import com.typesafe.config.ConfigFactory
 import csw.event.client.perf.BasePerfSuite
 import csw.event.client.perf.commons.{EventsSetting, PerfPublisher, PerfSubscriber}
@@ -69,7 +70,7 @@ class ModelObsPerfTest extends BasePerfSuite(ModelObsMultiNodeConfig) {
     val nodeId = myself.name.split("-").tail.head.toInt
 
     runOn(roles: _*) {
-      val jvmSetting = testSettings.jvmSettings(nodeId - 1)
+      val jvmSetting: JvmSetting = testSettings.jvmSettings(nodeId - 1)
       import jvmSetting._
 
       val rep = reporter(s"ModelObsTest-$nodeId")
@@ -92,8 +93,9 @@ class ModelObsPerfTest extends BasePerfSuite(ModelObsMultiNodeConfig) {
         }
       }
 
-      val completionProbe = scaladsl.TestProbe[AggregatedResult]()(system.toTyped)
+      implicit val typedSystem: ActorSystem[Nothing] = system.toTyped
 
+      val completionProbe = scaladsl.TestProbe[AggregatedResult]()(typedSystem)
       runOn(roles.last) {
         val resultAggregator =
           new ResultAggregator(scenarioName, "ModelObsPerfTest", testWiring.subscriber, roles.size, completionProbe.ref)
