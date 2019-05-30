@@ -3,13 +3,12 @@ package csw.event.client.perf.reporter
 import java.io.PrintStream
 import java.util.concurrent.TimeUnit.SECONDS
 
-import akka.actor.ActorSystem
-import akka.actor.typed.ActorRef
+import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.util.ByteString
-import csw.params.events.{Event, SystemEvent}
+import csw.event.api.scaladsl.{EventSubscriber, EventSubscription}
 import csw.event.client.perf.utils.EventUtils
 import csw.event.client.perf.utils.EventUtils._
-import csw.event.api.scaladsl.{EventSubscriber, EventSubscription}
+import csw.params.events.{Event, SystemEvent}
 import org.HdrHistogram.Histogram
 
 class ResultAggregator(
@@ -18,7 +17,7 @@ class ResultAggregator(
     subscriber: EventSubscriber,
     expPerfEventCount: Int,
     actorRef: ActorRef[AggregatedResult]
-)(implicit val system: ActorSystem) {
+)(implicit val system: ActorSystem[_]) {
 
   private val histogram               = new Histogram(SECONDS.toNanos(10), 3)
   private val initialLatencyHistogram = new Histogram(SECONDS.toNanos(10), 3)

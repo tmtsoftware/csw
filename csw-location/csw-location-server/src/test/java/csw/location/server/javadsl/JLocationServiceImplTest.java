@@ -1,17 +1,19 @@
 package csw.location.server.javadsl;
 
-import akka.actor.*;
-import akka.actor.typed.ActorRef;
+import akka.actor.CoordinatedShutdown;
+import akka.actor.PoisonPill;
+import akka.actor.testkit.typed.javadsl.TestProbe;
+import akka.actor.typed.*;
 import akka.actor.typed.javadsl.Adapter;
+import akka.actor.typed.javadsl.Behaviors;
 import akka.japi.Pair;
-import akka.stream.ActorMaterializer;
 import akka.stream.KillSwitch;
 import akka.stream.Materializer;
 import akka.stream.javadsl.Keep;
+import akka.stream.javadsl.Sink;
 import akka.stream.testkit.TestSubscriber;
-import akka.stream.testkit.javadsl.TestSink;
-import akka.testkit.TestProbe;
-import com.typesafe.config.ConfigFactory;
+import akka.stream.testkit.scaladsl.TestSink;
+import akka.stream.typed.javadsl.ActorMaterializerFactory;
 import csw.location.api.commons.Constants;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.IRegistrationResult;
@@ -23,6 +25,7 @@ import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import csw.location.server.internal.ServerWiring;
 import csw.location.server.scaladsl.RegistrationFactory;
 import csw.logging.api.javadsl.ILogger;
+import csw.logging.client.commons.AkkaTypedExtension;
 import csw.logging.client.javadsl.JLoggerFactory;
 import csw.network.utils.Networks;
 import csw.params.core.models.Prefix;
@@ -31,6 +34,8 @@ import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.FiniteDuration;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,7 +50,8 @@ public class JLocationServiceImplTest extends JUnitSuite {
 
     private static ServerWiring wiring;
 
-    private static ActorSystem actorSystem;
+    private static akka.actor.ActorSystem untypedSystem;
+    private static ActorSystem<SpawnProtocol> typedSystem;
     private static Materializer mat;
     private static ILocationService locationService;
 
@@ -66,11 +72,12 @@ public class JLocationServiceImplTest extends JUnitSuite {
     @BeforeClass
     public static void setup() throws Exception {
         wiring = new ServerWiring();
-        actorSystem = ActorSystemFactory.remote();
-        mat = ActorMaterializer.create(actorSystem);
-        TestProbe actorTestProbe = new TestProbe(actorSystem, "test-actor");
-        actorRef = Adapter.toTyped(actorTestProbe.ref());
-        locationService = JHttpLocationServiceFactory.makeLocalClient(actorSystem, mat);
+        typedSystem = ActorSystemFactory.remote(SpawnProtocol.behavior(), "test");
+        untypedSystem = Adapter.toUntyped(typedSystem);
+        mat = ActorMaterializerFactory.create(typedSystem);
+        TestProbe<Object> actorTestProbe = TestProbe.create("test-actor", typedSystem);
+        actorRef = actorTestProbe.ref();
+        locationService = JHttpLocationServiceFactory.makeLocalClient(typedSystem, mat);
         Await.result(wiring.locationHttpService().start(), FiniteDuration.create(5, TimeUnit.SECONDS));
     }
 
@@ -81,7 +88,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
 
     @AfterClass
     public static void shutdown() throws Exception {
-        Await.result(CoordinatedShutdown.get(actorSystem).run(CoordinatedShutdown.unknownReason()), FiniteDuration.create(5, TimeUnit.SECONDS));
+        Await.result(CoordinatedShutdown.get(untypedSystem).run(CoordinatedShutdown.unknownReason()), FiniteDuration.create(5, TimeUnit.SECONDS));
         Await.result(wiring.actorRuntime().shutdown(CoordinatedShutdown.UnknownReason$.MODULE$), FiniteDuration.create(5, TimeUnit.SECONDS));
     }
 
@@ -319,7 +326,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
         TcpConnection redis2Connection = new TcpConnection(new ComponentId("redis2", JComponentType.Service));
         TcpRegistration redis2registration = new TcpRegistration(redis2Connection, Port);
 
-        Pair<KillSwitch, TestSubscriber.Probe<TrackingEvent>> source = locationService.track(redis1Connection).toMat(TestSink.probe(actorSystem), Keep.both()).run(mat);
+        Pair<KillSwitch, TestSubscriber.Probe<TrackingEvent>> source = locationService.track(redis1Connection).toMat(TestSink.probe(untypedSystem), Keep.both()).run(mat);
 
         IRegistrationResult result = locationService.register(redis1Registration).get();
         IRegistrationResult result2 = locationService.register(redis2registration).get();
@@ -344,29 +351,28 @@ public class JLocationServiceImplTest extends JUnitSuite {
         TcpRegistration redis1Registration = new TcpRegistration(redis1Connection, Port);
 
         //Test probe actor to receive the TrackingEvent notifications
-        TestProbe probe = new TestProbe(actorSystem);
+        TestProbe probe = TestProbe.create(typedSystem);
 
-        KillSwitch killSwitch = locationService.subscribe(redis1Connection, trackingEvent -> probe.ref().tell(trackingEvent, akka.actor.ActorRef.noSender()));
+        KillSwitch killSwitch = locationService.subscribe(redis1Connection, trackingEvent -> probe.ref().tell(trackingEvent));
 
         locationService.register(redis1Registration).toCompletableFuture().get();
-        probe.expectMsg(new LocationUpdated(redis1Registration.location(Networks.apply().hostname())));
+        probe.expectMessage(new LocationUpdated(redis1Registration.location(Networks.apply().hostname())));
 
         locationService.unregister(redis1Connection).toCompletableFuture().get();
-        probe.expectMsg(new LocationRemoved(redis1Registration.connection()));
+        probe.expectMessage(new LocationRemoved(redis1Registration.connection()));
 
         //shutdown the notification stream, should no longer receive any notifications
         killSwitch.shutdown();
-        probe.expectNoMessage(new FiniteDuration(200, TimeUnit.MILLISECONDS));
+        probe.expectNoMessage(Duration.of(200, ChronoUnit.MILLIS));
     }
 
-    class TestActor extends AbstractActor {
-
-        private ILogger log = new JLoggerFactory(Constants.LocationService()).getLogger(context(), getClass());
-
-        @Override
-        public AbstractActor.Receive createReceive() {
-            log.info(() -> "in the test actor");
-            return receiveBuilder().build();
+    class TestActor {
+        public Behavior<Object> behavior() {
+            return Behaviors.setup(ctx -> {
+                ILogger log = new JLoggerFactory(Constants.LocationService()).getLogger(ctx, TestActor.class);
+                log.info(() -> "in the test actor");
+                return Behaviors.same();
+            });
         }
     }
 
@@ -375,7 +381,8 @@ public class JLocationServiceImplTest extends JUnitSuite {
         ComponentId componentId = new ComponentId("hcd1", JComponentType.HCD);
         AkkaConnection connection = new AkkaConnection(componentId);
 
-        ActorRef<Object> actorRef = Adapter.toTyped(actorSystem.actorOf(Props.create(AbstractActor.class, TestActor::new), "my-actor-to-die"));
+        ActorRef<Object> actorRef =
+                AkkaTypedExtension.UserActorFactory(typedSystem).spawn(new TestActor().behavior(), "my-actor-to-die", Props.empty());
 
         Assert.assertEquals(connection, locationService.register(new RegistrationFactory().akkaTyped(connection, prefix, actorRef)).get().location().connection());
 

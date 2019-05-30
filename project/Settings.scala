@@ -1,4 +1,5 @@
 import ParadoxSite.docsParentDir
+import com.typesafe.sbt.MultiJvmPlugin.MultiJvmKeys.MultiJvm
 import com.typesafe.sbt.site.SitePlugin.autoImport._
 import sbt.Keys._
 import sbt._
@@ -27,10 +28,23 @@ object Settings {
       unidocProjectFilter in (JavaUnidoc, unidoc) := inAnyProject -- inProjects(projects: _*)
     )
 
-  def addBuildAllAlias: Seq[Setting[State => State]] = {
+  def addAliases: Seq[Setting[_]] = {
+    addCommandAlias(
+      "testAll",
+      "test; multi-jvm:test"
+    ) ++
     addCommandAlias(
       "buildAll",
       ";set every enableFatalWarnings := true; scalafmtCheck; scalastyle; clean; makeSite; test:compile; multi-jvm:compile; set every enableFatalWarnings := false"
+    )
+  }
+
+  def multiJvmTestTask(multiJvmProjects: Seq[ProjectReference]): Seq[Setting[_]] = {
+    val tasks: Seq[Def.Initialize[Task[Unit]]] = multiJvmProjects.map(p => p / MultiJvm / test)
+
+    Seq(
+      MultiJvm / test / aggregate := false,
+      MultiJvm / test := Def.sequential(tasks.init, tasks.last).value
     )
   }
 }

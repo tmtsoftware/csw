@@ -1,6 +1,7 @@
 package example.event;
 
-import akka.actor.ActorSystem;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.SpawnProtocol;
 import csw.event.api.javadsl.IEventService;
 import csw.event.client.EventServiceFactory;
 import csw.event.client.models.EventStores;
@@ -10,10 +11,10 @@ import io.lettuce.core.RedisClient;
 
 public class JEventServiceCreationExamples {
 
-    private ActorSystem actorSystem;
+    private ActorSystem<SpawnProtocol> actorSystem;
     private ILocationService locationService;
 
-    public JEventServiceCreationExamples(ActorSystem actorSystem, ILocationService locationService) {
+    public JEventServiceCreationExamples(akka.actor.typed.ActorSystem<SpawnProtocol> actorSystem, ILocationService locationService) {
         this.actorSystem = actorSystem;
         this.locationService = locationService;
     }

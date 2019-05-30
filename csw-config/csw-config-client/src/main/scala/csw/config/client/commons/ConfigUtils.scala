@@ -2,7 +2,7 @@ package csw.config.client.commons
 
 import java.nio.file.{Files, Path}
 
-import akka.actor.ActorSystem
+import akka.actor.typed.ActorSystem
 import akka.stream.Materializer
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.config.api.exceptions.{FileNotFound, LocalFileNotFound, UnableToParseOptions}
@@ -11,9 +11,9 @@ import csw.config.api.scaladsl.ConfigClientService
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
 
-class ConfigUtils(configClientService: ConfigClientService)(implicit system: ActorSystem, mat: Materializer) {
+class ConfigUtils(configClientService: ConfigClientService)(implicit system: ActorSystem[_], mat: Materializer) {
 
-  import system.dispatcher
+  import system.executionContext
 
   // fetch config file either from config server or local disk
   private[csw] def getConfig(isLocal: Boolean, inputFilePath: Option[Path], defaultConfig: Option[Config]): Future[Config] =

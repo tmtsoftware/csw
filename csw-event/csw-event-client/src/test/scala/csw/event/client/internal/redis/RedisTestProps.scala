@@ -1,7 +1,8 @@
 package csw.event.client.internal.redis
 
 import akka.Done
-import akka.actor.ActorSystem
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.http.scaladsl.Http
 import com.typesafe.config.ConfigFactory
 import csw.commons.redis.EmbeddedRedis
@@ -31,7 +32,7 @@ class RedisTestProps(
     val redisClient: RedisClient,
     locationService: LocationService,
     locationServer: HTTPLocationServiceOnPorts
-)(implicit val actorSystem: ActorSystem)
+)(implicit val actorSystem: ActorSystem[_])
     extends BaseProperties
     with EmbeddedRedis {
 
@@ -71,8 +72,9 @@ class RedisTestProps(
     publisher.shutdown().await
     redisClient.shutdown()
     stopSentinel(redisSentinel, redisServer)
-    Http(actorSystem).shutdownAllConnectionPools().await
-    actorSystem.terminate().await
+    Http(actorSystem.toUntyped).shutdownAllConnectionPools().await
+    actorSystem.terminate()
+    actorSystem.whenTerminated.await
     locationServer.afterAll()
   }
 }

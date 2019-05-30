@@ -4,7 +4,7 @@ import java.time.Instant
 import java.util.concurrent.TimeUnit.SECONDS
 
 import akka.Done
-import akka.actor.ActorSystem
+import akka.actor.typed
 import akka.stream.UniqueKillSwitch
 import akka.stream.scaladsl.{Keep, Source}
 import csw.event.api.scaladsl.{EventSubscriber, EventSubscription}
@@ -33,7 +33,7 @@ class PerfSubscriber(
   import testConfigs._
   import testWiring._
 
-  implicit val system: ActorSystem = actorSystem
+  implicit val system: typed.ActorSystem[_] = actorSystem
 
   private val subscriber: EventSubscriber =
     if (testConfigs.shareConnection) sharedSubscriber else testWiring.subscriber

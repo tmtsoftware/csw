@@ -35,7 +35,10 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
   override protected def afterEach(): Unit = testFileUtils.deleteServerFiles()
 
-  override protected def afterAll(): Unit = actorSystem.terminate().await
+  override protected def afterAll(): Unit = {
+    typedSystem.terminate()
+    typedSystem.whenTerminated.await
+  }
 
   private val rootUsername = "root"
 

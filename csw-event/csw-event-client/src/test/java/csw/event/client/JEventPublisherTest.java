@@ -72,7 +72,7 @@ public class JEventPublisherTest extends TestNGSuite {
         Event event1 = Utils.makeDistinctJavaEvent(new Random().nextInt());
         EventKey eventKey = event1.eventKey();
 
-        TestProbe probe = TestProbe.create(baseProperties.typedActorSystem());
+        TestProbe probe = TestProbe.create(baseProperties.actorSystem());
 
         Set<EventKey> set = Set.of(eventKey);
 
@@ -199,7 +199,7 @@ public class JEventPublisherTest extends TestNGSuite {
         Event event5 = Utils.makeEventWithPrefix(10, prefix);
 
         EventKey eventKey = event1.eventKey();
-        TestProbe testProbe = TestProbe.create(baseProperties.typedActorSystem());
+        TestProbe testProbe = TestProbe.create(baseProperties.actorSystem());
 
         IEventSubscription subscription = baseProperties.jSubscriber()
                 .subscribe(Set.of(eventKey))

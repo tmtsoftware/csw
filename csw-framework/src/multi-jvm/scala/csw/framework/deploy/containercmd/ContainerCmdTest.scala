@@ -5,8 +5,7 @@ import java.nio.file.{Files, Path, Paths}
 
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.typed.{ActorRef, ActorSystem}
+import akka.actor.typed.ActorRef
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
@@ -60,9 +59,8 @@ class ContainerCmdTest(ignore: Int)
 
   import config._
 
-  implicit val actorSystem: ActorSystem[_]  = system.toTyped
-  implicit val ec: ExecutionContextExecutor = actorSystem.executionContext
-  implicit val testKit: TestKitSettings     = TestKitSettings(actorSystem)
+  implicit val ec: ExecutionContextExecutor = typedSystem.executionContext
+  implicit val testKit: TestKitSettings     = TestKitSettings(typedSystem)
   implicit val timeout: Timeout             = 5.seconds
 
   private val testFileUtils = new TestFileUtils(new Settings(ConfigFactory.load()))
@@ -100,7 +98,7 @@ class ContainerCmdTest(ignore: Int)
       serverWiring.svnRepo.initSvnRepo()
       serverWiring.httpService.registeredLazyBinding.await
 
-      val configService       = ConfigClientFactory.adminApi(system, locationService, factory)
+      val configService       = ConfigClientFactory.adminApi(typedSystem, locationService, factory)
       val containerConfigData = ConfigData.fromString(Source.fromResource("laser_container.conf").mkString)
 
       Await.result(

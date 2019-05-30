@@ -3,7 +3,8 @@ package csw.benchmark.logging
 import java.net.InetAddress
 import java.util.concurrent.TimeUnit
 
-import akka.actor.ActorSystem
+import akka.actor.typed
+import akka.actor.typed.SpawnProtocol
 import csw.logging.api.models.LoggingLevels.INFO
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.appenders.FileAppender
@@ -28,14 +29,14 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-279: Test logging performance
 @State(Scope.Benchmark)
 class E2ELoggingBenchmark {
-  var actorSystem: ActorSystem   = _
-  var log: Logger                = _
-  var fileAppender: FileAppender = _
-  var person: Person             = _
+  var actorSystem: typed.ActorSystem[SpawnProtocol] = _
+  var log: Logger                                   = _
+  var fileAppender: FileAppender                    = _
+  var person: Person                                = _
 
   @Setup(Level.Trial)
   def setup(): Unit = {
-    actorSystem = ActorSystem("logging")
+    actorSystem = typed.ActorSystem(SpawnProtocol.behavior, "logging")
     val loggingSystem = new LoggingSystem("E2E", "SNAPSHOT-1.0", InetAddress.getLocalHost.getHostName, actorSystem)
     loggingSystem.setAppenders(List(FileAppender))
     loggingSystem.setDefaultLogLevel(INFO)
@@ -45,7 +46,8 @@ class E2ELoggingBenchmark {
 
   @TearDown(Level.Trial)
   def teardown(): Unit = {
-    Await.result(actorSystem.terminate(), 5.seconds)
+    actorSystem.terminate()
+    Await.result(actorSystem.whenTerminated, 5.seconds)
   }
 
   @Benchmark

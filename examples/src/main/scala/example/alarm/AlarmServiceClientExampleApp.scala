@@ -1,9 +1,11 @@
 package example.alarm
 
 import akka.Done
+import akka.actor.typed
+import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.{typed, ActorSystem}
-import akka.stream.ActorMaterializer
+import akka.stream.Materializer
+import akka.stream.typed.scaladsl.ActorMaterializer
 import com.typesafe.config._
 import csw.alarm.api.models.AlarmSeverity.Okay
 import csw.alarm.api.models.Key.{AlarmKey, ComponentKey, SubsystemKey}
@@ -18,10 +20,10 @@ import scala.util.{Failure, Success}
 
 object AlarmServiceClientExampleApp {
 
-  implicit val actorSystem: ActorSystem = ActorSystem()
-  implicit val ec: ExecutionContext     = actorSystem.dispatcher
-  implicit val mat: ActorMaterializer   = ActorMaterializer()
-  private val locationService           = HttpLocationServiceFactory.makeLocalClient
+  implicit val actorSystem: ActorSystem[_] = typed.ActorSystem(Behaviors.empty, "")
+  implicit val ec: ExecutionContext        = actorSystem.executionContext
+  implicit val mat: Materializer           = ActorMaterializer()
+  private val locationService              = HttpLocationServiceFactory.makeLocalClient
 
   private def behaviour[T]: Behaviors.Receive[T] = Behaviors.receive { (ctx, msg) ⇒
     println(msg)

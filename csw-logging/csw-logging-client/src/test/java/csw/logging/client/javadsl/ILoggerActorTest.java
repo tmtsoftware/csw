@@ -1,13 +1,14 @@
 package csw.logging.client.javadsl;
 
-import akka.actor.ActorSystem;
 import akka.actor.typed.ActorRef;
-import akka.actor.typed.javadsl.Adapter;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.SpawnProtocol;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import csw.logging.api.models.LoggingLevels;
 import csw.logging.client.appenders.LogAppenderBuilder;
+import csw.logging.client.commons.AkkaTypedExtension;
 import csw.logging.client.commons.LoggingKeys$;
 import csw.logging.client.components.trombone.JTromboneHCDSupervisorActor;
 import csw.logging.client.internal.LoggingSystem;
@@ -25,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 import static csw.logging.client.utils.Eventually.eventually;
 
 public class ILoggerActorTest extends JUnitSuite {
-    protected static ActorSystem actorSystem = ActorSystem.create("base-system");
+    protected static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.behavior(),"base-system");
     protected static LoggingSystem loggingSystem;
 
     protected static List<JsonObject> logBuffer = new ArrayList<>();
@@ -54,11 +55,16 @@ public class ILoggerActorTest extends JUnitSuite {
     @AfterClass
     public static void teardown() throws Exception {
         loggingSystem.javaStop().get();
-        Await.result(actorSystem.terminate(), Duration.create(10, TimeUnit.SECONDS));
+        actorSystem.terminate();
+        Await.result(actorSystem.whenTerminated(), Duration.create(10, TimeUnit.SECONDS));
     }
     @Test
     public void testDefaultLogConfigurationForActor() {
-        ActorRef<String> tromboneActor = Adapter.spawn(actorSystem, JTromboneHCDSupervisorActor.behavior(new JLoggerFactory("jTromboneHcdActor")),"JTromboneActor");
+
+        AkkaTypedExtension.SpawnProtocolUserActorFactory userActorFactory = AkkaTypedExtension.SpawnProtocolUserActorFactory(actorSystem);
+
+        ActorRef<String> tromboneActor = userActorFactory.<String>userActorOf(JTromboneHCDSupervisorActor.behavior(new JLoggerFactory("jTromboneHcdActor")), "JTromboneActor", akka.actor.typed.Props.empty());
+
         String actorPath = tromboneActor.path().toString();
         String className = JTromboneHCDSupervisorActor.class.getName();
 

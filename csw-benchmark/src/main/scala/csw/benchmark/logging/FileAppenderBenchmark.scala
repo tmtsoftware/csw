@@ -3,7 +3,8 @@ package csw.benchmark.logging
 import java.net.InetAddress
 import java.util.concurrent.TimeUnit
 
-import akka.actor.ActorSystem
+import akka.actor.typed
+import akka.actor.typed.SpawnProtocol
 import csw.benchmark.logging.mock.LogActorMock
 import csw.logging.client.appenders.FileAppender
 import csw.logging.client.internal.LoggingSystem
@@ -27,19 +28,20 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-279: Test logging performance
 @State(Scope.Benchmark)
 class FileAppenderBenchmark {
-  var actorSystem: ActorSystem   = _
-  var fileAppender: FileAppender = _
+  var actorSystem: typed.ActorSystem[SpawnProtocol] = _
+  var fileAppender: FileAppender                    = _
 
   @Setup(Level.Trial)
   def setup(): Unit = {
-    actorSystem = ActorSystem("logging")
+    actorSystem = typed.ActorSystem(SpawnProtocol.behavior, "logging")
     new LoggingSystem("FileAppender", "SNAPSHOT-1.0", InetAddress.getLocalHost.getHostName, actorSystem)
     fileAppender = new FileAppender(actorSystem, LogActorMock.standardHeaders)
   }
 
   @TearDown(Level.Trial)
   def teardown(): Unit = {
-    Await.result(actorSystem.terminate(), 5.seconds)
+    actorSystem.terminate()
+    Await.result(actorSystem.whenTerminated, 5.seconds)
   }
 
   // This benchmark is for file appender. The result of this benchmark will be the number of messages

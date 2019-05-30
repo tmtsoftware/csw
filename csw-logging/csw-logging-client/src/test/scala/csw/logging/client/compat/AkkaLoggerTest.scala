@@ -1,6 +1,6 @@
 package csw.logging.client.compat
 
-import akka.actor.{Actor, ActorLogging, Props}
+import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
 import csw.logging.api.models.LoggingLevels
 import csw.logging.api.models.LoggingLevels.Level
 import csw.logging.client.commons.LoggingKeys
@@ -22,7 +22,7 @@ class MyActor extends Actor with ActorLogging {
 class AkkaLoggerTest extends LoggingTestSuite with FunSuiteLike with Matchers {
 
   test("logging framework should capture akka log messages and log it") {
-    val actorRef  = actorSystem.actorOf(Props(new MyActor()), "my-actor")
+    val actorRef  = ActorSystem("test1").actorOf(Props(new MyActor()), "my-actor")
     val className = classOf[MyActor].getName
 
     actorRef ! "info"

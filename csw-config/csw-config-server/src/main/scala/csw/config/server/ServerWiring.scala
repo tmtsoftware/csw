@@ -1,6 +1,6 @@
 package csw.config.server
 
-import akka.actor.ActorSystem
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.aas.http.SecurityDirectives
 import csw.config.server.files._
@@ -16,7 +16,7 @@ private[csw] class ServerWiring {
   lazy val config: Config = ConfigFactory.load()
   lazy val settings       = new Settings(config)
 
-  lazy val actorSystem  = ActorSystem("config-server")
+  lazy val actorSystem  = ActorSystem(SpawnProtocol.behavior, "config-server")
   lazy val actorRuntime = new ActorRuntime(actorSystem, settings)
   import actorRuntime._
 
@@ -26,7 +26,8 @@ private[csw] class ServerWiring {
   lazy val svnRepo              = new SvnRepo(settings.`svn-user-name`, settings, actorRuntime.blockingIoDispatcher)
   lazy val configServiceFactory = new SvnConfigServiceFactory(actorRuntime, annexFileService)
 
-  lazy val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
+  lazy val locationService: LocationService =
+    HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
 
   lazy val configHandlers     = new ConfigHandlers
   lazy val securityDirectives = SecurityDirectives(config, locationService)

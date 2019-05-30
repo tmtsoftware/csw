@@ -3,8 +3,6 @@ package csw.framework.command
 import akka.actor.Scheduler
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
@@ -88,12 +86,12 @@ class CommandServiceTest(ignore: Int)
   import config._
   import csw.common.components.command.ComponentStateForCommand._
 
-  implicit val actorSystem: ActorSystem[_] = system.toTyped
-  implicit val mat: Materializer           = ActorMaterializer()
-  implicit val ec: ExecutionContext        = actorSystem.executionContext
-  implicit val timeout: Timeout            = 5.seconds
-  implicit val scheduler: Scheduler        = actorSystem.scheduler
-  implicit val testkit: TestKitSettings    = TestKitSettings(actorSystem)
+//  implicit val actorSystem: ActorSystem[_] = system.toTyped
+  implicit val mat: Materializer        = ActorMaterializer()
+  implicit val ec: ExecutionContext     = typedSystem.executionContext
+  implicit val timeout: Timeout         = 5.seconds
+  implicit val scheduler: Scheduler     = typedSystem.scheduler
+  implicit val testkit: TestKitSettings = TestKitSettings(typedSystem)
 
   test("sender of command should receive appropriate responses") {
 
@@ -127,7 +125,7 @@ class CommandServiceTest(ignore: Int)
       val obsId = Some(ObsId("Obs001"))
 
       // spawn single assembly running in Standalone mode in jvm-2
-      val wiring        = FrameworkWiring.make(system, locationService, mock[RedisClient])
+      val wiring        = FrameworkWiring.make(typedSystem, locationService, mock[RedisClient])
       val sequencerConf = ConfigFactory.load("command/commanding_assembly.conf")
       Await.result(Standalone.spawn(sequencerConf, wiring), 5.seconds)
       enterBarrier("spawned")
@@ -483,7 +481,7 @@ class CommandServiceTest(ignore: Int)
 
     runOn(member2) {
       // spawn container having assembly and hcd running in jvm-3
-      val wiring        = FrameworkWiring.make(system, locationService, mock[RedisClient])
+      val wiring        = FrameworkWiring.make(typedSystem, locationService, mock[RedisClient])
       val containerConf = ConfigFactory.load("command/container.conf")
       Await.result(Container.spawn(containerConf, wiring), 5.seconds)
       enterBarrier("spawned")

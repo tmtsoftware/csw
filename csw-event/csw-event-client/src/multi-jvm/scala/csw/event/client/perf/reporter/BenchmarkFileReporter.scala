@@ -3,7 +3,7 @@ package csw.event.client.perf.reporter
 import java.io.{File, OutputStream}
 import java.nio.file.{Files, StandardOpenOption}
 
-import akka.actor.ActorSystem
+import akka.actor.typed.ActorSystem
 import com.typesafe.config.Config
 
 /**
@@ -25,7 +25,7 @@ object BenchmarkFileReporter {
   }
   val dir = "csw-event-client/target/benchmark-results"
 
-  def apply(test: String, system: ActorSystem, logSettings: Boolean = true): BenchmarkFileReporter =
+  def apply(test: String, system: ActorSystem[_], logSettings: Boolean = true): BenchmarkFileReporter =
     new BenchmarkFileReporter {
       override val testName: String = test
 

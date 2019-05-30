@@ -4,7 +4,6 @@ import java.net.InetAddress
 import java.time.Instant
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import com.typesafe.config.ConfigFactory
 import csw.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
 import csw.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
@@ -285,7 +284,7 @@ class SeverityServiceModuleTest
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldBe Disconnected
 
     // alarm subscription - nfiraos.trombone
-    val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
+    val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem)
     val alarmSubscription = subscribeAggregatedSeverityCallback(tromboneAxisLowLimitAlarmKey, testProbe.ref ! _)
     alarmSubscription.ready().await
     testProbe.expectMessage(Disconnected) // on subscription, current aggregated severity will be calculated
@@ -312,7 +311,7 @@ class SeverityServiceModuleTest
     getCurrentSeverity(outOfRangeOffloadAlarmKey).await shouldBe Disconnected
 
     // subsystem subscription - tcs
-    val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
+    val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem)
     val alarmSubscription = subscribeAggregatedSeverityCallback(SubsystemKey(TCS), testProbe.ref ! _)
     alarmSubscription.ready().await
     testProbe.expectMessage(Disconnected) // on subscription, current aggregated severity will be calculated
@@ -336,13 +335,13 @@ class SeverityServiceModuleTest
     getCurrentSeverity(splitterLimitAlarmKey).await shouldBe Disconnected
 
     // component subscription - nfiraos.trombone
-    val testProbe1         = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
+    val testProbe1         = TestProbe[FullAlarmSeverity]()(actorSystem)
     val alarmSubscription1 = subscribeAggregatedSeverityCallback(ComponentKey(NFIRAOS, "trombone"), testProbe1.ref ! _)
     alarmSubscription1.ready().await
     testProbe1.expectMessage(Disconnected) // on subscription, current aggregated severity will be calculated
 
     // global subscription
-    val testProbe2         = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
+    val testProbe2         = TestProbe[FullAlarmSeverity]()(actorSystem)
     val alarmSubscription2 = subscribeAggregatedSeverityCallback(GlobalKey, testProbe2.ref ! _)
     alarmSubscription2.ready().await
     testProbe2.expectMessage(Disconnected) // on subscription, current aggregated severity will be calculated
@@ -377,7 +376,7 @@ class SeverityServiceModuleTest
     getCurrentSeverity(enclosureTempHighAlarmKey).await shouldBe Disconnected
     getCurrentSeverity(enclosureTempLowAlarmKey).await shouldBe Disconnected
 
-    val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
+    val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem)
     val alarmSubscription = subscribeAggregatedSeverityCallback(ComponentKey(NFIRAOS, "enclosure"), testProbe.ref ! _)
     alarmSubscription.ready().await
     testProbe.expectMessage(Disconnected) // on subscription, current aggregated severity will be calculated
@@ -419,7 +418,7 @@ class SeverityServiceModuleTest
     getCurrentSeverity(cpuExceededAlarmKey).await shouldBe Disconnected
 
     // subsystem subscription - tcs
-    val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
+    val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem)
     val alarmSubscription = subscribeAggregatedSeverityActorRef(SubsystemKey(TCS), testProbe.ref)
     alarmSubscription.ready().await
     testProbe.expectMessage(Disconnected) // on subscription, current aggregated severity will be calculated
@@ -441,7 +440,7 @@ class SeverityServiceModuleTest
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldBe Disconnected
     getCurrentSeverity(enclosureTempLowAlarmKey).await shouldBe Disconnected
 
-    val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
+    val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem)
     val alarmSubscription = subscribeAggregatedSeverityActorRef(SubsystemKey(NFIRAOS), testProbe.ref)
     alarmSubscription.ready().await
     testProbe.expectMessage(Disconnected) // on subscription, current aggregated severity will be calculated
@@ -459,7 +458,7 @@ class SeverityServiceModuleTest
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
   test("shelved alarms should be considered while subscribing aggregated severity") {
-    val testProbe = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
+    val testProbe = TestProbe[FullAlarmSeverity]()(actorSystem)
     // there is only one alarm in TCS.tcsPk component
     val componentKey = ComponentKey(cpuExceededAlarmKey.subsystem, cpuExceededAlarmKey.component)
 

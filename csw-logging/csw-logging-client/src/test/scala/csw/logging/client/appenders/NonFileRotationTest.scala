@@ -2,7 +2,7 @@ package csw.logging.client.appenders
 
 import java.nio.file.Paths
 
-import akka.actor.ActorSystem
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.ConfigFactory
 import csw.logging.client.commons.{Category, LoggingKeys}
 import csw.logging.client.utils.FileUtils
@@ -21,7 +21,7 @@ class NonFileRotationTest extends FunSuite with Matchers with BeforeAndAfterEach
     "csw-logging.appender-config.file.rotate" → false
   )
   private val config                    = ConfigFactory.parseMap(map.asJava).withFallback(ConfigFactory.load())
-  private val actorSystem               = ActorSystem("test-1", config)
+  private val actorSystem               = ActorSystem(SpawnProtocol.behavior, "test-1", config)
   private val standardHeaders: JsObject = Json.obj(LoggingKeys.HOST -> "localhost", LoggingKeys.NAME -> "test-service")
 
   private val fileAppender = new FileAppender(actorSystem, standardHeaders)
@@ -84,7 +84,8 @@ class NonFileRotationTest extends FunSuite with Matchers with BeforeAndAfterEach
 
   override protected def afterAll(): Unit = {
     FileUtils.deleteRecursively(logFileDir)
-    Await.result(actorSystem.terminate(), 5.seconds)
+    actorSystem.terminate()
+    Await.result(actorSystem.whenTerminated, 5.seconds)
   }
 
   // DEOPSCSW-281 Rolling File Configuration

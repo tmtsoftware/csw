@@ -1,13 +1,16 @@
 package csw.event.client.perf.ocs.gateway.client
 import akka.NotUsed
-import akka.actor.{ActorSystem, Scheduler}
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.{typed, ActorSystem, Scheduler}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.sse.ServerSentEvent
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.http.scaladsl.unmarshalling.sse.EventStreamUnmarshalling._
 import akka.stream.scaladsl.{Keep, Source}
-import akka.stream.{ActorMaterializer, KillSwitches, Materializer, UniqueKillSwitch}
+import akka.stream.typed.scaladsl.ActorMaterializer
+import akka.stream.{KillSwitches, Materializer, UniqueKillSwitch}
 import csw.event.api.scaladsl.EventService
 import csw.event.client.EventServiceFactory
 import csw.event.client.perf.utils.EventUtils
@@ -20,11 +23,12 @@ import play.api.libs.json.Json
 
 import scala.async.Async._
 
-class GatewayClient(serverIp: String, port: Int)(implicit val actorSystem: ActorSystem, mat: Materializer)
+class GatewayClient(serverIp: String, port: Int)(implicit val actorSystem: typed.ActorSystem[_], mat: Materializer)
     extends PlayJsonSupport
     with JsonSupport {
 
-  import actorSystem.dispatcher
+  implicit val untypedsystem: ActorSystem = actorSystem.toUntyped
+  import actorSystem.executionContext
   implicit val scheduler: Scheduler = actorSystem.scheduler
 
   private val baseUri = s"http://$serverIp:$port/events"
@@ -53,8 +57,8 @@ class GatewayClient(serverIp: String, port: Int)(implicit val actorSystem: Actor
 
 object Main extends App {
 
-  private implicit val system: ActorSystem    = ActorSystemFactory.remote()
-  private implicit val mat: ActorMaterializer = ActorMaterializer()
+  private implicit val system: typed.ActorSystem[_] = ActorSystemFactory.remote(Behaviors.empty, "event-client-system")
+  private implicit val mat: Materializer            = ActorMaterializer()
 
   private val client = new GatewayClient("localhost", 9090)
 

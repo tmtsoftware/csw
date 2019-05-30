@@ -3,6 +3,7 @@ package csw.config
 import java.io.ByteArrayInputStream
 import java.nio.file.Paths
 
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.remote.testconductor.RoleName
 import akka.stream.{ActorMaterializer, Materializer}
 import com.typesafe.config.ConfigFactory
@@ -18,7 +19,7 @@ import csw.location.server.http.MultiNodeHTTPLocationService
 import org.scalatest.FunSuiteLike
 import org.tmt.embedded_keycloak.KeycloakData._
 import org.tmt.embedded_keycloak.utils.Ports
-import org.tmt.embedded_keycloak.{EmbeddedKeycloak, KeycloakData, Settings => KeycloakSettings}
+import org.tmt.embedded_keycloak.{EmbeddedKeycloak, KeycloakData, Settings ⇒ KeycloakSettings}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{DurationLong, FiniteDuration}
@@ -132,7 +133,7 @@ class ConfigCliAuthTest(ignore: Int)
         Options(relativeRepoPath = Some(repoPath1), inputFilePath = Some(filePath), comment = Some("test"))
       )
 
-      val configService     = ConfigClientFactory.clientApi(system, locationService)
+      val configService     = ConfigClientFactory.clientApi(system.toTyped, locationService)
       val actualConfigValue = configService.getActive(repoPath1).await.get.toStringF.await
       actualConfigValue shouldBe fileContents
       enterBarrier("test-finished")

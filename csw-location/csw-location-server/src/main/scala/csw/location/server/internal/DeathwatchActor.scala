@@ -9,6 +9,7 @@ import csw.location.api.scaladsl.LocationService
 import csw.location.server.commons.{CswCluster, LocationServiceLogger}
 import csw.location.server.internal.Registry.AllServices
 import csw.logging.api.scaladsl.Logger
+import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 
 /**
  * DeathWatchActor tracks the health of all components registered with LocationService.
@@ -69,8 +70,6 @@ private[location] class DeathwatchActor(locationService: LocationService) {
 private[location] object DeathwatchActor {
 
   private val log: Logger = LocationServiceLogger.getLogger
-
-  import akka.actor.typed.scaladsl.adapter._
   //message type handled by the for the typed deathwatch actor
   type Msg = Changed[AllServices.Value]
 
@@ -81,7 +80,7 @@ private[location] object DeathwatchActor {
    */
   def start(cswCluster: CswCluster, locationService: LocationService): ActorRef[Msg] = {
     log.debug("Starting Deathwatch actor")
-    val actorRef = cswCluster.actorSystem.spawn(
+    val actorRef = cswCluster.typedSystem.spawn(
       //span the actor with empty set of watched locations
       new DeathwatchActor(locationService).behavior(Set.empty),
       name = "location-service-death-watch-actor"

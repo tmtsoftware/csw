@@ -17,13 +17,13 @@ import csw.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
 import csw.alarm.cli.args.Options
 import csw.alarm.cli.utils.IterableExtensions.RichStringIterable
 import csw.alarm.cli.utils.TestFutureExt.RichFuture
+import csw.commons.ResourceReader
 import csw.config.api.models.ConfigData
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.mocks.MockedAuthentication
 import csw.config.server.{ServerWiring, Settings}
 import csw.params.core.models.Subsystem.{LGSF, NFIRAOS, TCS}
-import csw.commons.ResourceReader
 
 class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
 
@@ -91,7 +91,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
 
     val configData    = ConfigData.fromPath(ResourceReader.copyToTmp("/valid-alarms.conf"))
     val configPath    = Paths.get("valid-alarms.conf")
-    val configService = ConfigClientFactory.adminApi(actorRuntime.system, locationService, factory)
+    val configService = ConfigClientFactory.adminApi(actorRuntime.typedSystem, locationService, factory)
     configService.create(configPath, configData, comment = "commit test file").futureValue
 
     val cmd = Options(cmd = "init", filePath = Some(configPath), reset = true)

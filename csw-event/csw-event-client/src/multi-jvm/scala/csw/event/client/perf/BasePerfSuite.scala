@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.{ExecutorService, Executors}
 
 import akka.Done
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec, MultiNodeSpecCallbacks}
 import akka.testkit.ImplicitSender
 import csw.event.api.scaladsl.{EventPublisher, EventSubscriber}
@@ -30,7 +31,7 @@ class BasePerfSuite(config: MultiNodeConfig)
     with BeforeAndAfterAll {
 
   val testConfigs = new TestConfigs(system.settings.config)
-  val testWiring  = new TestWiring(system)
+  val testWiring  = new TestWiring(system.toTyped)
 
   import testWiring._
 

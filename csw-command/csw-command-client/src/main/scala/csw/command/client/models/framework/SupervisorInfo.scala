@@ -1,6 +1,6 @@
 package csw.command.client.models.framework
 
-import akka.actor.ActorSystem
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 
 /**
  * SupervisorInfo is used by container while spawning multiple components
@@ -10,4 +10,4 @@ import akka.actor.ActorSystem
  *               received by a container.
  * @param component represents a supervisor actor reference and componentInfo
  */
-private[csw] case class SupervisorInfo(system: ActorSystem, component: Component)
+private[csw] case class SupervisorInfo(system: ActorSystem[SpawnProtocol], component: Component)

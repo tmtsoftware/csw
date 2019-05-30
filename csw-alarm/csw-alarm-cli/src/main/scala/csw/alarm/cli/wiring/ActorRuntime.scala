@@ -1,9 +1,10 @@
 package csw.alarm.cli.wiring
 
-import akka.Done
+import akka.{actor, Done}
+import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.{ActorSystem, CoordinatedShutdown}
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.stream.Materializer
 import akka.stream.typed.scaladsl.ActorMaterializer
 import csw.logging.client.internal.LoggingSystem
@@ -13,18 +14,19 @@ import csw.services.BuildInfo
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
-class ActorRuntime(_actorSystem: ActorSystem) {
-  implicit lazy val system: ActorSystem          = _actorSystem
-  implicit lazy val ec: ExecutionContextExecutor = system.dispatcher
-  implicit lazy val mat: Materializer            = ActorMaterializer()(system.toTyped)
+class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol]) {
+  implicit lazy val typedSystem: ActorSystem[SpawnProtocol] = _typedSystem
+  implicit lazy val untypedSystem: actor.ActorSystem        = _typedSystem.toUntyped
+  implicit lazy val ec: ExecutionContextExecutor            = untypedSystem.dispatcher
+  implicit lazy val mat: Materializer                       = ActorMaterializer()(typedSystem)
 
-  lazy val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(system)
+  lazy val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(untypedSystem)
 
   def startLogging(name: String): LoggingSystem =
-    LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, system)
+    LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, typedSystem)
 
   /**
-   * Gracefully shutdown [[_actorSystem]]
+   * Gracefully shutdown [[_typedSystem]]
    *
    * @param reason the reason for shutdown
    * @return a future that completes when shutdown is successful
