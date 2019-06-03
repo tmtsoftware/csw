@@ -3,7 +3,9 @@ package csw.benchmark.params
 import java.nio.file.{Files, Paths}
 import java.util.concurrent.TimeUnit
 
-import akka.actor.ActorSystem
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.serialization.{Serialization, SerializationExtension}
 import csw.params.commands.{CommandName, Observe}
 import csw.params.core.generics.KeyType.ByteArrayKey
@@ -30,7 +32,7 @@ import scala.concurrent.duration.DurationDouble
 // DEOPSCSW-187: Efficient serialization to/from binary
 @State(Scope.Benchmark)
 class ImageDeSerializationBenchmark {
-  private final var system: ActorSystem          = _
+  private final var system: ActorSystem[_]       = _
   private final var serialization: Serialization = _
   private final var prefixStr: String            = _
   private final var obsId: ObsId                 = _
@@ -41,8 +43,8 @@ class ImageDeSerializationBenchmark {
 
   @Setup(Level.Trial)
   def setup(): Unit = {
-    system = ActorSystem("example")
-    serialization = SerializationExtension(system)
+    system = ActorSystem(Behaviors.empty, "example")
+    serialization = SerializationExtension(system.toUntyped)
     prefixStr = "wfos.prog.cloudcover"
     obsId = ObsId("Obs001")
 
@@ -53,7 +55,8 @@ class ImageDeSerializationBenchmark {
 
   @TearDown(Level.Trial)
   def teardown(): Unit = {
-    Await.result(system.terminate(), 5.seconds)
+    system.terminate()
+    Await.result(system.whenTerminated, 5.seconds)
   }
 
   def serializeImage(file: String): (Array[Byte], Observe) = {

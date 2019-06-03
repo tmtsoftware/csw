@@ -1,6 +1,7 @@
 package csw.time.scheduler.scheduling_spikes;
 
-import akka.actor.ActorSystem;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.Behavior;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import csw.time.clock.natives.TimeLibrary;
@@ -13,9 +14,9 @@ public class AkkaSchedulerExample {
 
     public static void main(String[] args) {
         Config config = ConfigFactory.parseString("akka.scheduler.tick-duration=1ms").withFallback(ConfigFactory.load());
-        ActorSystem system = ActorSystem.create("AkkaSchedulerExample", config);
+        ActorSystem system = ActorSystem.create(Behavior.empty(), "AkkaSchedulerExample", config);
 
-        system.scheduler().schedule(Duration.ofMillis(0), Duration.ofMillis(1), new MyTask1(), system.dispatcher());
+        system.scheduler().schedule(Duration.ofMillis(0), Duration.ofMillis(1), new MyTask1(), system.executionContext());
     }
 
 }
@@ -32,11 +33,11 @@ class MyTask1 implements Runnable {
 
             TimeLibrary.clock_gettime(0, timeSpec);
             long s = timeSpec.seconds.longValue();
-            String n = String.format("%09d",timeSpec.nanoseconds.longValue());
-            buf.add(s+""+n);
+            String n = String.format("%09d", timeSpec.nanoseconds.longValue());
+            buf.add(s + "" + n);
             numWarningBeeps -= 1;
         } else {
-            for(int i =0; i< 1000; i++){
+            for (int i = 0; i < 1000; i++) {
                 System.out.println(buf.get(i));
             }
 

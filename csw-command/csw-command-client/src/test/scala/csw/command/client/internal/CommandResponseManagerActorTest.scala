@@ -5,12 +5,11 @@ import java.time.Duration
 import akka.actor
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
-import akka.actor.{typed, ActorSystem}
-import csw.command.client.{internal, CRMCacheProperties, CommandResponseManagerActor}
 import csw.command.client.messages.CommandResponseManagerMessage
 import csw.command.client.messages.CommandResponseManagerMessage._
+import csw.command.client.{CRMCacheProperties, CommandResponseManagerActor, internal}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse._
@@ -24,9 +23,8 @@ import scala.concurrent.duration.DurationDouble
 // DEOPSCSW-208: Report failure on Configuration Completion command
 class CommandResponseManagerActorTest extends FunSuite with Matchers with MockitoSugar with ArgumentMatchersSugar {
 
-  private val actorSystem                        = ActorSystem("test-command-status-service-system")
-  implicit val typedSystem: typed.ActorSystem[_] = actorSystem.toTyped
-  implicit val testKitSettings: TestKitSettings  = TestKitSettings(typedSystem)
+  private implicit val actorSystem: ActorSystem[_] = ActorSystem(Behaviors.empty, "test-command-status-service-system")
+  implicit val testKitSettings: TestKitSettings    = TestKitSettings(actorSystem)
 
   private[csw] def createBehaviorTestKit(
       props: CRMCacheProperties = CRMCacheProperties()

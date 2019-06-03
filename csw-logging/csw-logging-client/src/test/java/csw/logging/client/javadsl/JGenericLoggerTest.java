@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 import static csw.logging.client.utils.Eventually.eventually;
 
 public class JGenericLoggerTest extends JUnitSuite {
-    private static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.behavior(),"base-system");
+    private static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.behavior(), "base-system");
     private static LoggingSystem loggingSystem;
 
     private static List<JsonObject> logBuffer = new ArrayList<>();
@@ -37,7 +37,7 @@ public class JGenericLoggerTest extends JUnitSuite {
         return gson.fromJson(json, JsonElement.class).getAsJsonObject();
     }
 
-    private static TestAppender testAppender     = new TestAppender(x -> {
+    private static TestAppender testAppender = new TestAppender(x -> {
         logBuffer.add(parse(x.toString()));
         return null;
     });
@@ -64,9 +64,9 @@ public class JGenericLoggerTest extends JUnitSuite {
     private class JGenericLoggerUtil {
         private ILogger logger = JGenericLoggerFactory.getLogger(getClass());
 
-       public void start() {
-           JLogUtil.logInBulk(logger);
-       }
+        public void start() {
+            JLogUtil.logInBulk(logger);
+        }
     }
 
     // DEOPSCSW-277: Java nested class name is not logged correctly in log messages.
@@ -91,9 +91,9 @@ public class JGenericLoggerTest extends JUnitSuite {
     @Test
     public void testGenericLoggerActorWithoutComponentName() throws InterruptedException {
 
-        AkkaTypedExtension.SpawnProtocolUserActorFactory userActorFactory = AkkaTypedExtension.SpawnProtocolUserActorFactory(actorSystem);
+        AkkaTypedExtension.UserActorFactory userActorFactory = AkkaTypedExtension.UserActorFactory(actorSystem);
 
-        ActorRef<String> utilActor = userActorFactory.<String>userActorOf(JGenericActor.behavior, "JActorUtil", akka.actor.typed.Props.empty());
+        ActorRef<String> utilActor = userActorFactory.<String>spawn(JGenericActor.behavior, "JActorUtil", akka.actor.typed.Props.empty());
 
         String actorPath = utilActor.path().toString();
         String className = JGenericActor.class.getName();

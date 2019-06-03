@@ -1,10 +1,8 @@
 package csw.database;
 
-import akka.actor.ActorSystem;
 import akka.actor.typed.SpawnProtocol;
-import akka.actor.typed.javadsl.Adapter;
-import akka.stream.ActorMaterializer;
 import akka.stream.Materializer;
+import akka.stream.typed.javadsl.ActorMaterializerFactory;
 import com.opentable.db.postgres.embedded.EmbeddedPostgres;
 import csw.database.commons.DBTestHelper;
 import csw.database.commons.DatabaseServiceConnection;
@@ -38,7 +36,6 @@ public class JDatabaseServiceFactoryTest extends JUnitSuite {
 
     private static Integer port = 5432;
     private static JHTTPLocationService jHttpLocationService;
-    private static ActorSystem untypedSystem;
     private static akka.actor.typed.ActorSystem<SpawnProtocol> typedSystem;
     private static EmbeddedPostgres postgres;
     private static DatabaseServiceFactory dbFactory;
@@ -50,10 +47,10 @@ public class JDatabaseServiceFactoryTest extends JUnitSuite {
     @BeforeClass
     public static void setup() throws ExecutionException, InterruptedException, TimeoutException {
         typedSystem = akka.actor.typed.ActorSystem.apply(SpawnProtocol.behavior(), "test");
-        untypedSystem = Adapter.toUntyped(typedSystem);
-        Materializer mat = ActorMaterializer.create(untypedSystem);
+//        untypedSystem = Adapter.toUntyped(typedSystem);
+        Materializer mat = ActorMaterializerFactory.create(typedSystem);
 
-        dbFactory = DBTestHelper.dbServiceFactory(untypedSystem);
+        dbFactory = DBTestHelper.dbServiceFactory(typedSystem);
         postgres = DBTestHelper.postgres(port); // 0 is random port
 
         jHttpLocationService = new JHTTPLocationService();
@@ -63,7 +60,7 @@ public class JDatabaseServiceFactoryTest extends JUnitSuite {
         locationService.register(new TcpRegistration(DatabaseServiceConnection.value(), port)).get();
 
         // create database box_office
-        testDsl = DBTestHelper.dslContext(untypedSystem, port);
+        testDsl = DBTestHelper.dslContext(typedSystem, port);
         testDsl.query("CREATE TABLE box_office(id SERIAL PRIMARY KEY)").executeAsync().toCompletableFuture().get(5, SECONDS);
     }
 
@@ -71,7 +68,8 @@ public class JDatabaseServiceFactoryTest extends JUnitSuite {
     public static void afterAll() throws Exception {
         testDsl.query("DROP TABLE box_office").executeAsync().toCompletableFuture().get(5, SECONDS);
         postgres.close();
-        Await.result(untypedSystem.terminate(), Duration.apply(5, SECONDS));
+        typedSystem.terminate();
+        Await.result(typedSystem.whenTerminated(), Duration.apply(5, SECONDS));
         jHttpLocationService.afterAll();
     }
 

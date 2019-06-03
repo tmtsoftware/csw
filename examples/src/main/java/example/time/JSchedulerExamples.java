@@ -1,11 +1,10 @@
 package example.time;
 
 import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
+import akka.actor.typed.ActorSystem;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.Adapter;
 import akka.actor.typed.scaladsl.ActorContext;
-import akka.actor.typed.scaladsl.Behaviors;
 import csw.time.core.models.UTCTime;
 import csw.time.scheduler.TimeServiceSchedulerFactory;
 import csw.time.scheduler.api.Cancellable;
@@ -19,7 +18,7 @@ public class JSchedulerExamples {
     private UTCTime utcTime = UTCTime.now();
     TimeServiceScheduler scheduler;
 
-    public JSchedulerExamples(ActorSystem actorSystem) {
+    public JSchedulerExamples(ActorSystem<Object> actorSystem) {
         //#create-scheduler
         // create time service scheduler using the factory method
         TimeServiceScheduler scheduler = TimeServiceSchedulerFactory.make(actorSystem);

@@ -1,6 +1,6 @@
 package csw.time.scheduler
 
-import akka.actor.ActorSystem
+import akka.actor.typed.ActorSystem
 import csw.time.scheduler.api.TimeServiceScheduler
 import csw.time.scheduler.internal.TimeServiceSchedulerImpl
 
@@ -15,6 +15,6 @@ object TimeServiceSchedulerFactory {
    * @param actorSystem an actorSystem required for scheduling tasks
    * @return an instance of [[csw.time.scheduler.api.TimeServiceScheduler]] which can be used to schedule one-time/periodic tasks
    */
-  def make()(implicit actorSystem: ActorSystem): TimeServiceScheduler = new TimeServiceSchedulerImpl()
+  def make()(implicit actorSystem: ActorSystem[_]): TimeServiceScheduler = new TimeServiceSchedulerImpl()
 
 }

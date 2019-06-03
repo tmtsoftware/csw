@@ -1,6 +1,7 @@
 package csw.database;
 
-import akka.actor.ActorSystem;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.Behavior;
 import com.opentable.db.postgres.embedded.EmbeddedPostgres;
 import csw.database.commons.DBTestHelper;
 import csw.database.exceptions.DatabaseException;
@@ -27,7 +28,7 @@ public class JDatabaseServiceFactoryFailureTest extends JUnitSuite {
 
     @BeforeClass
     public static void setup() {
-        system = ActorSystem.apply("test");
+        system = ActorSystem.apply(Behavior.empty(), "test");
         dbFactory = DBTestHelper.dbServiceFactory(system);
         postgres = DBTestHelper.postgres(0); // 0 is random port
     }
@@ -35,7 +36,8 @@ public class JDatabaseServiceFactoryFailureTest extends JUnitSuite {
     @AfterClass
     public static void afterAll() throws Exception {
         postgres.close();
-        Await.result(system.terminate(), Duration.apply(5, SECONDS));
+        system.terminate();
+        Await.result(system.whenTerminated(), Duration.apply(5, SECONDS));
     }
 
     @Rule

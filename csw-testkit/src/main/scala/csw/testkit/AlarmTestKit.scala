@@ -85,7 +85,6 @@ object AlarmTestKit {
   /**
    * Java API to create a EventTestKit
    *
-   * @param actorSystem
    * @return handle to EventTestKit which can be used to start and stop event service
    */
   def create(actorSystem: ActorSystem[SpawnProtocol]): AlarmTestKit = apply(actorSystem)

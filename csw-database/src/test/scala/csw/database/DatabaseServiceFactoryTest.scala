@@ -1,8 +1,6 @@
 package csw.database
 
-import akka.actor
 import akka.actor.typed
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.stream.Materializer
 import akka.stream.typed.scaladsl.ActorMaterializer
@@ -26,7 +24,6 @@ import scala.concurrent.ExecutionContext
 //DEOPSCSW-615: DB service accessible to CSW component developers
 class DatabaseServiceFactoryTest extends FunSuite with Matchers with BeforeAndAfterAll with HTTPLocationService {
   private implicit val typedSystem: ActorSystem[SpawnProtocol] = typed.ActorSystem(SpawnProtocol.behavior, "test")
-  implicit val untypedSystem: actor.ActorSystem                = typedSystem.toUntyped
   private implicit val ec: ExecutionContext                    = typedSystem.executionContext
   private implicit val mat: Materializer                       = ActorMaterializer()
 
@@ -39,8 +36,8 @@ class DatabaseServiceFactoryTest extends FunSuite with Matchers with BeforeAndAf
 
   override def beforeAll(): Unit = {
     postgres = DBTestHelper.postgres(port)
-    dbFactory = DBTestHelper.dbServiceFactory(untypedSystem)
-    testDsl = DBTestHelper.dslContext(untypedSystem, port)
+    dbFactory = DBTestHelper.dbServiceFactory(typedSystem)
+    testDsl = DBTestHelper.dslContext(typedSystem, port)
     // create a database
     testDsl.query("CREATE TABLE box_office(id SERIAL PRIMARY KEY)").executeAsyncScala().futureValue(Interval(Span(5, Seconds)))
 
@@ -54,7 +51,8 @@ class DatabaseServiceFactoryTest extends FunSuite with Matchers with BeforeAndAf
     super.afterAll()
     testDsl.query("DROP TABLE box_office").executeAsyncScala().futureValue(Interval(Span(5, Seconds)))
     postgres.close()
-    untypedSystem.terminate().futureValue
+    typedSystem.terminate()
+    typedSystem.whenTerminated.futureValue
   }
 
   //DEOPSCSW-618: Integration with Location Service

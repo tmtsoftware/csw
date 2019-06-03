@@ -3,11 +3,12 @@ package csw.time.scheduler.api
 import java.time.temporal.ChronoUnit
 import java.time.{Duration, Instant}
 
-import akka.actor.ActorSystem
-import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
-import akka.testkit.TestProbe
-import csw.time.scheduler.TimeServiceSchedulerFactory
+import akka.actor.testkit.typed.scaladsl
+import akka.actor.testkit.typed.scaladsl.{ScalaTestWithActorTestKit, TestProbe}
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
 import csw.time.core.models.UTCTime
+import csw.time.scheduler.TimeServiceSchedulerFactory
 import org.HdrHistogram.Histogram
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike}
 
@@ -15,14 +16,14 @@ import scala.concurrent.duration.DurationInt
 
 class TimeServiceSchedulerPerfTest extends ScalaTestWithActorTestKit with FunSuiteLike with BeforeAndAfterAll {
 
-  private val sys         = ActorSystem()
+  private val sys         = ActorSystem(Behaviors.empty, "test")
   private val timeService = TimeServiceSchedulerFactory.make()(sys)
 
   for (scenario <- TestSettings.all) {
     import scenario._
     ignore(s"Offset:$offset Schedulers:$nSchedulers Warmup:$warmup Tasks:$nTasks") {
-      val xs: List[(TestProbe, Cancellable)] = (1 to nSchedulers).map { _ =>
-        val testProbe = TestProbe()(sys)
+      val xs: List[(TestProbe[UTCTime], Cancellable)] = (1 to nSchedulers).map { _ =>
+        val testProbe = scaladsl.TestProbe[UTCTime]()(sys)
         val startTime = UTCTime(UTCTime.now().value.plusSeconds(1L))
         val cancellable: Cancellable = timeService.schedulePeriodically(startTime, Duration.ofMillis(offset)) {
           testProbe.ref ! UTCTime.now()
@@ -32,9 +33,11 @@ class TimeServiceSchedulerPerfTest extends ScalaTestWithActorTestKit with FunSui
 
       xs.foreach {
         case (probe, cancellable) =>
-          probe.receiveN(warmup, 100.hours) //Do not record warmup tasks
+          probe.receiveMessages(warmup, 100.hours) //Do not record warmup tasks
 
-          val times                   = probe.receiveN(nTasks, 1.hour).map { case t: UTCTime => t }
+          val times = probe.receiveMessages(nTasks, 1.hour).map { t: UTCTime =>
+            t
+          }
           val histogram               = new Histogram(3)
           val histogramForConsistency = new Histogram(3)
 
