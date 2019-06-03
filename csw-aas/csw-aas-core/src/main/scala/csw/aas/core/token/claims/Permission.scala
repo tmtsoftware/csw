@@ -4,6 +4,7 @@ import play.api.libs.json.{Json, OFormat}
 
 /**
  * Contains permissions of the subject
+ *
  * @param rsid resource id
  * @param rsname resource name
  * @param scopes permission name

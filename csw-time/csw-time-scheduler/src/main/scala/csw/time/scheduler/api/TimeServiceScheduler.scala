@@ -69,7 +69,6 @@ trait TimeServiceScheduler {
    * @param interval the time interval between messages sent to the actor
    * @param receiver the actorRef to notify at each interval
    * @param message the message to send to the actor
-
    * @return a handle to cancel sending further messages
    */
   def schedulePeriodically(interval: Duration, receiver: ActorRef, message: Any): Cancellable
@@ -101,7 +100,6 @@ trait TimeServiceScheduler {
    * @param interval the time interval between messages sent to the actor
    * @param receiver the actorRef to notify at each interval
    * @param message the message to send to the actor
-
    * @return a handle to cancel sending further messages
    */
   def schedulePeriodically(startTime: TMTTime, interval: Duration, receiver: ActorRef, message: Any): Cancellable

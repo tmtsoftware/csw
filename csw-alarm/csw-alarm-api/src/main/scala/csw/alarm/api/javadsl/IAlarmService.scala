@@ -19,6 +19,7 @@ trait IAlarmService {
    *
    * Note that by default all alarms are loaded in alarm store as `Disconnected`. Once the component is up and working,
    *       it will be it's responsibility to update all it's alarms with appropriate severity and keep refreshing it.
+   *
    * @param alarmKey represents a unique alarm in alarm store e.g nfiraos.trombone.tromboneaxislowlimitalarm
    * @param severity represents the severity to be set for the alarm e.g. Okay, Warning, Major, Critical, etc
    * @return a CompletableFuture which completes when the severity is successfully set in alarm store or fails with

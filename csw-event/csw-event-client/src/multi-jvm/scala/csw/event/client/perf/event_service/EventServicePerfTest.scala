@@ -61,9 +61,11 @@ class EventServicePerfTest extends BasePerfSuite(EventServiceMultiNodeConfig) {
       _ ⇒
         scenarios.foreach(
           s ⇒
-            plotLatencyHistogram(s"${BenchmarkFileReporter.targetDirectory.getAbsolutePath}/${s.name}/Aggregated-*",
-                                 s"[${testConfigs.frequency}Hz]")
-      )
+            plotLatencyHistogram(
+              s"${BenchmarkFileReporter.targetDirectory.getAbsolutePath}/${s.name}/Aggregated-*",
+              s"[${testConfigs.frequency}Hz]"
+            )
+        )
     )
     super.afterAll()
   }
@@ -128,8 +130,8 @@ class EventServicePerfTest extends BasePerfSuite(EventServiceMultiNodeConfig) {
       )
       println(
         s"[$testName]: Starting benchmark with ${if (singlePublisher) 1 else publisherSubscriberPairs} publishers & $publisherSubscriberPairs subscribers $totalTestMsgs messages with " +
-        s"throttling of $frequency msgs/s " +
-        s"and payload size $payloadSize bytes"
+          s"throttling of $frequency msgs/s " +
+          s"and payload size $payloadSize bytes"
       )
       println(
         "========================================================================================================================================="

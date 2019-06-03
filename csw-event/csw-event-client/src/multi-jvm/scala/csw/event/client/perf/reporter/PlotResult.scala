@@ -54,7 +54,7 @@ final case class LatencyPlots(
 final case class InitialLatencyPlots(
     plot50: PlotResult = PlotResult(),
     plot90: PlotResult = PlotResult(),
-    plot99: PlotResult = PlotResult(),
+    plot99: PlotResult = PlotResult()
 ) {
   def printTable(): Unit = {
     println("================================= First Event Latency in µs ================================================")

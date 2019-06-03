@@ -44,6 +44,7 @@ private[csw] object LoggingLevels {
 
     /**
      * Compares levels
+     *
      * @param that the other level
      * @return `x` where:
      *         - `x < 0` when `this < that`
