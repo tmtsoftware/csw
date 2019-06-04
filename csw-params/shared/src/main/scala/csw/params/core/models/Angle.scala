@@ -113,9 +113,6 @@ object Angle {
 
   implicit def double2angle(d: Double): AngleWrapperDouble = new AngleWrapperDouble(d)
 
-  //def radian2angle(rad: Double) = new Angle((Angle.R2Uas * rad).toLong)
-  //def degree2angle(deg: Double) = new Angle((Angle.D2Uas * deg).toLong)
-
   /** returns random angle with value between 0 and 2*PI */
   def randomRa(): Angle = new Angle((CIRCLE * math.random).asInstanceOf[Int])
 
@@ -277,8 +274,16 @@ object Angle {
     math.abs(x % d) < tolerance || math.abs(x % d - d) < tolerance
   }
 
-  private val oneZeroFormat = new DecimalFormat("##.#")
-  private val twoZeroFormat = new DecimalFormat("##.##")
+  private def formatSecs(sec: Double): String = {
+    if (isNear(sec, 1))
+      s"${math.round(sec)}"
+    else if (isNear(sec, 0.1))
+      f"$sec%2.1f"
+    else if (isNear(sec, 0.01))
+      f"$sec%2.2f"
+    else
+      s"$sec"
+  }
 
   /**
    * convert RA to string in format '1h 2m'
@@ -290,30 +295,17 @@ object Angle {
   def raToString(ra: Double): String = {
     if (isNear(ra, H2R)) {
       val hour = math.round(ra * R2H).toInt
-
-      "" + hour + "h"
-
+      s"${hour}h"
     } else if (isNear(ra, H2R / 60)) {
       val hour = (ra * R2H).toInt
       val min  = Math.round((ra - H2R * hour) * R2H * 60).toInt
-
-      "" + hour + "h " + min + "m"
-
+      s"${hour}h ${min}m"
     } else {
       val hour = (ra * R2H).toInt
       val min  = ((ra - H2R * hour) * R2H * 60).toInt
       val sec  = (ra - H2R * hour - min * H2R / 60) * R2H * 3600
-      var s    = ""
-      if (isNear(sec, 1))
-        s = "" + math.round(sec)
-      else if (isNear(sec, 0.1))
-        s = oneZeroFormat.format(sec)
-      else if (isNear(sec, 0.01))
-        s = twoZeroFormat.format(sec)
-      else
-        s = "" + sec
-
-      "" + hour + "h " + min + "m " + s + "s"
+      val s    = formatSecs(sec)
+      s"${hour}h ${min}m${s}s"
     }
   }
 
@@ -325,41 +317,22 @@ object Angle {
    * @return de in string form
    */
   def deToString(de2: Double): String = {
-    var de   = de2
-    var sign = ""
-    if (de < 0) {
-      de = -de
-      sign = "-"
-    }
+    val (de, sign) = if (de2 < 0) (-de2, "-") else (de2, "")
 
     if (isNear(de, D2R)) {
       val deg = math.round(de * R2D).toInt
-
       sign + deg + DEGREE_SIGN
-
     } else if (isNear(de, M2R)) {
       val deg = (de * R2D).toInt
       val min = ((de - D2R * deg) * R2M).toInt
-
       sign + deg + DEGREE_SIGN + min + "'"
-
     } else {
       val deg = (de * R2D).toInt
       val min = ((de - D2R * deg) * R2D * 60).toInt
       val sec = (de - D2R * deg - min * D2R / 60) * R2D * 3600
-      var s   = ""
-      if (isNear(sec, 1))
-        s = "" + math.round(sec)
-      else if (isNear(sec, 0.1))
-        s = oneZeroFormat.format(sec)
-      else if (isNear(sec, 0.01))
-        s = twoZeroFormat.format(sec)
-      else
-        s = "" + sec
-
+      val s   = formatSecs(sec)
       sign + deg + DEGREE_SIGN + min + "'" + s + "\""
     }
-
   }
 
   /**
