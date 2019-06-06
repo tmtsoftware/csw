@@ -245,17 +245,59 @@ If it changes to anything else, Acknowledgement Status remains same.
 
 ![api-structure](api-structure.png)
 
-The Alarm Service is divided into two parts. First one is called, well, @github[AlarmService](/csw-alarm/csw-alarm-api/src/main/scala/csw/alarm/api/scaladsl/AlarmService.scala) and it is meant
-for Components that are provided with one API i.e. `SetSeverity`
+The alarm functionality divided into two services @github[AlarmService](/csw-alarm/csw-alarm-api/src/main/scala/csw/alarm/api/scaladsl/AlarmService.scala)
+and @github[AlarmAdminService](/csw-alarm/csw-alarm-api/src/main/scala/csw/alarm/api/scaladsl/AlarmAdminService.scala)
 
-The other API is @github[AlarmAdminService](/csw-alarm/csw-alarm-api/src/main/scala/csw/alarm/api/scaladsl/AlarmAdminService.scala). This API allows administrative 
-operations such as shelving alarms, subscribing for severity changes, acknowledging alarms, etc. 
-This API is consumed from @github[alarm cli](/csw-alarm/csw-alarm-cli) and Alarm Server. This API is also used by
-administrative clients such as engineering user interfaces to set the active versions of files.
+@github[AlarmService](/csw-alarm/csw-alarm-api/src/main/scala/csw/alarm/api/scaladsl/AlarmService.scala) is meant for "Components" who only get to set their current alarm severity and hence this service 
+only exposes one api i.e. `setSeverity`
+
+@github[AlarmAdminService](/csw-alarm/csw-alarm-api/src/main/scala/csw/alarm/api/scaladsl/AlarmAdminService.scala) is meant for admin 
+operations and is further divided into four internal modules.
+
+**1. @github[SeverityServiceModule](/csw-alarm/csw-alarm-client/src/main/scala/csw/alarm/client/internal/services/SeverityServiceModule.scala)**
+
+`SeverityServiceModule` allows reading, subscribing and modifying severity of alarms and subsystems
+
+**2. @github[MetadataServiceModule](/csw-alarm/csw-alarm-client/src/main/scala/csw/alarm/client/internal/services/MetadataServiceModule.scala)**
+
+`MetadataServiceModule` allows read-only access to alarm metadata. Initialisation of alarms is also performed using this module
+
+**3. @github[StatusServiceModule](/csw-alarm/csw-alarm-client/src/main/scala/csw/alarm/client/internal/services/StatusServiceModule.scala)**
+
+`StatusServiceModule` allows read-write access to alarm status via operations such as getStatus, shelveAlarm,
+reset, acknowledge, unshelve, etc.
+
+AlarmStatus is a logical entity which contains:
+
+  - `acknowledgementStatus`
+  - `latchedSeverity`
+  - `shelveStatus`
+  - `alarmTime`
+  - `initializing`
+
+**4. @github[HealthServiceModule](/csw-alarm/csw-alarm-client/src/main/scala/csw/alarm/client/internal/services/HealthServiceModule.scala)**
+
+`HealthServiceModule` allows reading and subscribing to alarm and subsystem healths
+
+@@@note 
+
+These modules are interdependent on each other and use [self-type](https://docs.scala-lang.org/tour/self-types.html) feature of scala
+
+@@@
+
+![class-diagram](class-diagram.png)
+
+`AlarmAdminService` is consumed from @github[alarm cli](/csw-alarm/csw-alarm-cli) and Alarm Server. This API is also used by administrative
+clients such as engineering user interfaces to set the active versions of files.
 
 The API doc for Alarm Service can be found @scaladoc[here](csw/alarm/api/scaladsl/AlarmService) and @scaladoc[here](csw/alarm/api/scaladsl/AlarmAdminService).
 
-Detailed documentation about how to use these APIs is available @ref:[here](../../services/alarm.md). 
+Detailed documentation about how to use these APIs is available @ref:[here](../../services/alarm.md).
+
+### Setting severity execution workflow
+The following diagram show execution sequence triggered when a component calls `setSeverityApi`
+
+![setSeverity-sequence](setSeverity-sequence.png)
 
 ## Architecture
 
