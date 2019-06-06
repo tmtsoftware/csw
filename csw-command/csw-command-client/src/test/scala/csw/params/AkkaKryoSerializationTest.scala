@@ -3,9 +3,9 @@ package csw.params
 import java.nio.file.Files
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
+import akka.actor.typed
 import akka.actor.typed.Behavior
-import akka.actor.typed.scaladsl.adapter.{TypedActorSystemOps, UntypedActorSystemOps}
-import akka.actor.{ActorSystem, typed}
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.serialization.SerializationExtension
 import com.twitter.chill.akka.AkkaSerializer
 import csw.command.client.messages.ComponentCommonMessage.{
@@ -21,6 +21,7 @@ import csw.command.client.models.framework.LocationServiceUsage.DoNotRegister
 import csw.command.client.models.framework.PubSub.Subscribe
 import csw.command.client.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.command.client.models.framework._
+import csw.commons.ResourceReader
 import csw.location.api.models.ComponentType.HCD
 import csw.location.api.models.Connection
 import csw.params.commands.CommandResponse._
@@ -35,7 +36,6 @@ import csw.time.core.models.UTCTime
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.prop.Tables.Table
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
-import csw.commons.ResourceReader
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble

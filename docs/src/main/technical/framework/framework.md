@@ -23,7 +23,6 @@ completion. This will make sure the mutation of state happens in order of one by
 
 @@@
   
-  
 ## Creation of component
 
 A component consists of couple of actors and classes created by framework on behalf of the component and some actors/classes that are expected to
@@ -84,6 +83,15 @@ a @ref[sample file](../../commons/multiple-components.md#component-configuration
 The name of the configuration file needs to be passed to @ref[Container/Standalone app](../../framework/deploying-components.md) at the time of startup.
 The config file is either fetched from `Configuration Service` or taken from local path on the machine to parse it to a @github[ComponentInfo](/csw-command/csw-command-client/src/main/scala/csw/command/client/models/framework/ComponentInfo.scala)
 object. The `ComponentInfo` object is then passed to `Handlers` in `CswContext`.
+
+Components can be created in @ref:[standalone or container](../../commons/multiple-components.md) mode. 
+When an HCD or assembly is @ref:[created](../../framework/creating-components.md), depending on the mode,
+either the @github[ContainerBehaviorFactory](/csw-framework/src/main/scala/csw/framework/internal/container/ContainerBehaviorFactory.scala) or the 
+@github[SupervisorBehaviorFactory](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehaviorFactory.scala) class is used to
+create the initial actor behavior. 
+
+In container mode, a supervisor actor is created for each component and a single @github[container actor](/csw-framework/src/main/scala/csw/framework/internal/container/ContainerBehavior.scala)
+accepts control messages for the container (subtypes of `ContainerActorMessage`).
 
 ### ActorSystem for component
 
@@ -194,6 +202,13 @@ from `CommandService`.
 Component(s) can start within a @ref[container](../../framework/deploying-components.md#container-for-deployment) or a single component can start as a
 @ref[standalone](../../framework/deploying-components.md#standalone-components). The code base for @github[Container](/csw-framework/src/main/scala/csw/framework/internal/container/ContainerBehavior.scala) 
 and @github[Standalone](/csw-framework/src/main/scala/csw/framework/internal/wiring/Standalone.scala). 
+
+The name of the component info file can be passed as a command line argument to an application based on the 
+@github[ContainerCmd](/csw-framework/src/main/scala/csw/framework/deploy/containercmd/ContainerCmd.scala)
+class to @ref:[deploy](../../framework/deploying-components.md) the component.
+
+In a production environment, it is planned that components will be started at boot time using a @ref:[HostConfig](../../apps/hostconfig.md) based
+application.
 
 Since Akka Typed is used throughout the TMT framework, there are seperate messages understood by Container, Supervisor, Top level actor and other actors
 of framework. The architecture/relations of messages can be found @github[here](/csw-command/csw-command-client/src/main/scala/csw/command/client/messages/MessagesArchitecture.scala). 
