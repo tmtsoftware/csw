@@ -2,7 +2,6 @@ package csw.framework.internal.supervisor
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import csw.command.client.messages.CommandMessage.Submit
-import csw.command.client.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, Query, Unsubscribe}
 import csw.command.client.messages.ComponentCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.messages.{CommandResponseManagerMessage => CRM}
@@ -156,14 +155,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     // Client 1 sends submit command with tokenId in parameter set
     val setup = Setup(sourcePrefix, commandName, Some(obsId))
     supervisorRef ! Submit(setup, queryResponseProbe.ref)
-    queryResponseProbe.expectMessageType[Completed]
-    // Note there is a Started from ComponentBehavior as well as Completed
-    commandResponseManagerActor.expectMessage(AddOrUpdateCommand(Started(setup.runId)))
-    commandResponseManagerActor.expectMessage(AddOrUpdateCommand(Completed(setup.runId)))
-
-    // Ensure Query can be sent to component even in locked state
-    supervisorRef ! Query(setup.runId, queryResponseProbe.ref)
-    commandResponseManagerActor.expectMessage(Query(setup.runId, queryResponseProbe.ref))
+    val response: Completed = queryResponseProbe.expectMessageType[Completed]
 
     // Ensure Subscribe can be sent to component even in locked state
     supervisorRef ! CRM.Subscribe(setup.runId, queryResponseProbe.ref)

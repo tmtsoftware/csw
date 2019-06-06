@@ -29,7 +29,7 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
 
   //#worker-actor
   sealed trait WorkerCommand
-  case class Sleep(runId: Id, timeInMillis: Long) extends WorkerCommand
+  case class Sleep(controlCommand: Setup, runId: Id, timeInMillis: Long) extends WorkerCommand
 
   private val workerActor =
     ctx.spawn(
@@ -39,7 +39,7 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
             log.trace(s"WorkerActor received sleep command with time of ${sleep.timeInMillis} ms")
             // simulate long running command
             Thread.sleep(sleep.timeInMillis)
-            commandResponseManager.addOrUpdateCommand(CommandResponse.Completed(sleep.runId))
+            commandUpdatePublisher.update(CommandResponse.Completed(sleep.controlCommand.commandName, sleep.runId))
           case _ => log.error("Unsupported message type")
         }
         Behaviors.same
@@ -87,27 +87,27 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   //#publish
 
   //#validate
-  override def validateCommand(controlCommand: ControlCommand): ValidateCommandResponse = {
+  override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse = {
     log.info(s"Validating command: ${controlCommand.commandName.name}")
     controlCommand.commandName.name match {
-      case "sleep" => Accepted(controlCommand.runId)
-      case x       => Invalid(controlCommand.runId, CommandIssue.UnsupportedCommandIssue(s"Command $x. not supported."))
+      case "sleep" => Accepted(controlCommand.commandName, runId)
+      case x       => Invalid(controlCommand.commandName, runId, CommandIssue.UnsupportedCommandIssue(s"Command $x. not supported."))
     }
   }
   //#validate
 
   //#onSetup
-  override def onSubmit(controlCommand: ControlCommand): SubmitResponse = {
+  override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse = {
     log.info(s"Handling command: ${controlCommand.commandName}")
 
     controlCommand match {
-      case setupCommand: Setup => onSetup(setupCommand)
+      case setupCommand: Setup => onSetup(runId, setupCommand)
       case observeCommand: Observe => // implement (or not)
-        Error(controlCommand.runId, "Observe not supported")
+        Error(controlCommand.commandName, runId, "Observe not supported")
     }
   }
 
-  def onSetup(setup: Setup): SubmitResponse = {
+  def onSetup(runId: Id, setup: Setup): SubmitResponse = {
     val sleepTimeKey: Key[Long] = KeyType.LongKey.make("SleepTime")
 
     // get param from the Parameter Set in the Setup
@@ -118,13 +118,13 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
 
     log.info(s"command payload: ${sleepTimeParam.keyName} = $sleepTimeInMillis")
 
-    workerActor ! Sleep(setup.runId, sleepTimeInMillis)
+    workerActor ! Sleep(setup, runId, sleepTimeInMillis)
 
-    Started(setup.runId)
+    Started(setup.commandName, runId)
   }
   //#onSetup
 
-  override def onOneway(controlCommand: ControlCommand): Unit = {}
+  override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
 
   override def onGoOffline(): Unit = {}
 

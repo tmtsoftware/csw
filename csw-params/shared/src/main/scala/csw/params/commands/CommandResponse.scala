@@ -1,6 +1,7 @@
 package csw.params.commands
 
 import csw.params.core.models.Id
+import csw.params.core.states.StateName
 import csw.serializable.CommandSerializable
 
 sealed trait CommandResponse extends CommandSerializable {
@@ -11,6 +12,7 @@ sealed trait CommandResponse extends CommandSerializable {
    * @return the runId of command for which this response is created
    */
   def runId: Id
+  def commandName: CommandName
 }
 
 /**
@@ -42,7 +44,9 @@ object CommandResponse {
    * SubmitResponse is returned by Submit message which calls the onSubmit handler
    * Responses returned can be Invalid, Started, Completed, CompletedWithResult, Error, Cancelled, Locked
    */
-  sealed trait SubmitResponse extends QueryResponse
+  sealed trait SubmitResponse extends QueryResponse {
+    def stateName: StateName = StateName(getClass.getName)
+  }
 
   /**
    * QueryResponse is returned by CommandService query
@@ -61,14 +65,14 @@ object CommandResponse {
    *
    * @param runId the runId of command for which this response is created
    */
-  case class Accepted(runId: Id) extends ValidateCommandResponse with ValidateResponse with OnewayResponse
+  case class Accepted(commandName: CommandName, runId: Id) extends ValidateCommandResponse with ValidateResponse with OnewayResponse
 
   /**
    * Represents an intermediate response stating a long running command has been started
    *
    * @param runId of command for which this response is created
    */
-  case class Started(runId: Id) extends SubmitResponse
+  case class Started(commandName: CommandName, runId: Id) extends SubmitResponse
 
   /**
    * Represents a positive response stating completion of command
@@ -76,14 +80,14 @@ object CommandResponse {
    * @param runId of command for which this response is created
    * @param result describing the result of completion
    */
-  case class CompletedWithResult(runId: Id, result: Result) extends SubmitResponse
+  case class CompletedWithResult(commandName: CommandName, runId: Id, result: Result) extends SubmitResponse
 
   /**
    * Represents a positive response stating completion of command
    *
    * @param runId of command for which this response is created
    */
-  case class Completed(runId: Id) extends SubmitResponse with MatchingResponse
+  case class Completed(commandName, CommandName, runId: Id) extends SubmitResponse with MatchingResponse
 
   /**
    * Represents a negative response invalidating a command received
@@ -91,7 +95,7 @@ object CommandResponse {
    * @param runId of command for which this response is created
    * @param issue describing the cause of invalidation
    */
-  case class Invalid(runId: Id, issue: CommandIssue)
+  case class Invalid(commandName: CommandName, runId: Id, issue: CommandIssue)
       extends ValidateCommandResponse
       with ValidateResponse
       with OnewayResponse
@@ -104,28 +108,34 @@ object CommandResponse {
    * @param runId of command for which this response is created
    * @param message describing the reason or cause or action item of the error encountered while executing the command
    */
-  case class Error(runId: Id, message: String) extends SubmitResponse with MatchingResponse
+  case class Error(commandName: CommandName, runId: Id, message: String)
+      extends SubmitResponse
+      with MatchingResponse
 
   /**
    * Represents a negative response that describes the cancellation of command
    *
    * @param runId of command for which this response is created
    */
-  case class Cancelled(runId: Id) extends SubmitResponse
+  case class Cancelled(commandName: CommandName, runId: Id) extends SubmitResponse
 
   /**
    * Represents a negative response stating that a component is Locked and command was not validated or executed
    *
    * @param runId of command for which this response is created
    */
-  case class Locked(runId: Id) extends ValidateResponse with OnewayResponse with SubmitResponse with MatchingResponse
+  case class Locked(commandName: CommandName, runId: Id)
+      extends ValidateResponse
+      with OnewayResponse
+      with SubmitResponse
+      with MatchingResponse
 
   /**
    * A negative response stating that a command with given runId is not available or cannot be located
    *
    * @param runId of command for which this response is created
    */
-  case class CommandNotAvailable(runId: Id) extends QueryResponse
+  case class CommandNotAvailable(commandName: CommandName, runId: Id) extends QueryResponse
 
   /**
    * Transform a given CommandResponse to a response with the provided Id
@@ -151,8 +161,8 @@ object CommandResponse {
    * @return true if it is final
    */
   def isFinal(qr: QueryResponse): Boolean = qr match {
-    case Started(_) => false
-    case _          => true
+    case Started(_, _) => false
+    case _             => true
   }
 
   /**
@@ -162,8 +172,8 @@ object CommandResponse {
    * @return true if it is positive
    */
   def isPositive(qr: QueryResponse): Boolean = qr match {
-    case Completed(_) | CompletedWithResult(_, _) => true
-    case _                                        => false
+    case Completed(_, _) | CompletedWithResult(_, _, _) => true
+    case _                                              => false
   }
 
   /**
@@ -173,8 +183,8 @@ object CommandResponse {
    * @return true if positive, false otherwise
    */
   def isPositive(or: OnewayResponse): Boolean = or match {
-    case Accepted(runId) => true
-    case _               => false
+    case Accepted(_, _) => true
+    case _              => false
   }
 
   /**
@@ -192,8 +202,13 @@ object CommandResponse {
    * @return returns true if it is intermediate
    */
   def isIntermediate(qr: QueryResponse): Boolean = qr match {
-    case Started(_) => true
-    case _          => false
+    case Started(_, _) => true
+    case _             => false
   }
 
+  object SubmitResponse {
+    implicit object NameableSubmitResponse extends Nameable[SubmitResponse] {
+      override def name(state: SubmitResponse): StateName = state.stateName
+    }
+  }
 }

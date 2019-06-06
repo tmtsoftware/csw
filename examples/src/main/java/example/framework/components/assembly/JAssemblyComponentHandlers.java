@@ -5,7 +5,6 @@ import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.util.Timeout;
 import csw.command.api.javadsl.ICommandService;
-import csw.command.client.CommandResponseManager;
 import csw.command.client.CommandServiceFactory;
 import csw.command.client.messages.TopLevelActorMessage;
 import csw.command.client.models.framework.ComponentInfo;
@@ -24,6 +23,7 @@ import csw.location.models.*;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.*;
 import csw.params.core.generics.Key;
+import csw.params.core.models.Id;
 import csw.params.core.models.Prefix;
 import csw.params.core.states.CurrentState;
 import csw.params.core.states.StateName;
@@ -45,7 +45,6 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
     private final ActorContext<TopLevelActorMessage> ctx;
     private final ComponentInfo componentInfo;
-    private final CommandResponseManager commandResponseManager;
     private final CurrentStatePublisher currentStatePublisher;
     private final ILocationService locationService;
     private final IEventService eventService;
@@ -59,7 +58,8 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         super(ctx, cswCtx);
         this.ctx = ctx;
         this.componentInfo = cswCtx.componentInfo();
-        this.commandResponseManager = cswCtx.commandResponseManager();
+        //this.commandResponseManager = cswCtx.commandResponseManager();
+
         this.currentStatePublisher = cswCtx.currentStatePublisher();
         this.locationService = cswCtx.locationService();
         this.eventService = cswCtx.eventService();
@@ -106,38 +106,39 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
     //#validateCommand-handler
     @Override
-    public CommandResponse.ValidateCommandResponse validateCommand(ControlCommand controlCommand) {
+    public CommandResponse.ValidateCommandResponse validateCommand(Id runId, ControlCommand controlCommand) {
         if (controlCommand instanceof Setup) {
             // validation for setup goes here
-            return new CommandResponse.Accepted(controlCommand.runId());
+            return new CommandResponse.Accepted(controlCommand.commandName(), runId);
         } else if (controlCommand instanceof Observe) {
             // validation for observe goes here
-            return new CommandResponse.Accepted(controlCommand.runId());
+            return new CommandResponse.Accepted(controlCommand.commandName(), runId);
         } else {
-            return new CommandResponse.Invalid(controlCommand.runId(), new CommandIssue.AssemblyBusyIssue("Command not supported"));
+            return new CommandResponse.Invalid(controlCommand.commandName(), runId, new CommandIssue.AssemblyBusyIssue("Command not supported"));
         }
     }
     //#validateCommand-handler
 
     //#onSubmit-handler
     @Override
-    public CommandResponse.SubmitResponse onSubmit(ControlCommand controlCommand) {
+    public CommandResponse.SubmitResponse onSubmit(Id runId, ControlCommand controlCommand) {
         if (controlCommand instanceof Setup)
-            return submitSetup((Setup) controlCommand); // includes logic to handle Submit with Setup config command
+            return submitSetup(runId, (Setup) controlCommand); // includes logic to handle Submit with Setup config command
         else if (controlCommand instanceof Observe)
-            return submitObserve((Observe) controlCommand); // includes logic to handle Submit with Observe config command
+            return submitObserve(runId, (Observe) controlCommand); // includes logic to handle Submit with Observe config command
         else
-            return new CommandResponse.Error(controlCommand.runId(), "Submitted command not supported: " + controlCommand.commandName().name());
+            return new CommandResponse.Error(controlCommand.commandName(),
+                    runId, "Submitted command not supported: " + controlCommand.commandName().name());
     }
     //#onSubmit-handler
 
     //#onOneway-handler
     @Override
-    public void onOneway(ControlCommand controlCommand) {
+    public void onOneway(Id runId, ControlCommand controlCommand) {
         if (controlCommand instanceof Setup)
-            onewaySetup((Setup) controlCommand); // includes logic to handle Oneway with Setup config command
+            onewaySetup(runId, (Setup) controlCommand); // includes logic to handle Oneway with Setup config command
         else if (controlCommand instanceof Observe)
-            onewayObserve((Observe) controlCommand); // includes logic to handle Oneway with Observe config command
+            onewayObserve(runId, (Observe) controlCommand); // includes logic to handle Oneway with Observe config command
     }
     //#onOneway-handler
 
@@ -174,22 +175,23 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     }
     //#onLocationTrackingEvent-handler
 
-    private CommandResponse.SubmitResponse processSetup(Setup sc) {
+    private CommandResponse.SubmitResponse processSetup(Id runId, Setup sc) {
         switch (sc.commandName().name()) {
             case "forwardToWorker":
                 //#addSubCommand
                 Prefix prefix1 = new Prefix("wfos.red.detector");
                 Setup subCommand1 = new Setup(prefix1, new CommandName("sub-command-1"), sc.jMaybeObsId());
-                commandResponseManager.addSubCommand(sc.runId(), subCommand1.runId());
+                //commandResponseManager.addSubCommand(sc.runId, subCommand1.runId());              //TODO Don't know how to solve subcommands!!!
 
                 Prefix prefix2 = new Prefix("wfos.blue.detector");
                 Setup subCommand2 = new Setup(prefix2, new CommandName("sub-command-2"), sc.jMaybeObsId());
-                commandResponseManager.addSubCommand(sc.runId(), subCommand2.runId());
+                //commandResponseManager.addSubCommand(sc.runId(), subCommand2.runId());
                 //#addSubCommand
 
                 //#subscribe-to-command-response-manager
                 // subscribe to the status of original command received and publish the state when its status changes to
                 // Completed
+                /*
                 CommandResponse.SubmitResponse submitResponse = commandResponseManager
                         .jQueryFinal(subCommand1.runId(), Timeout.create(Duration.ofSeconds(10)))
                         .join();
@@ -201,6 +203,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                 } else {
                     // do something
                 }
+                */
                 //#subscribe-to-command-response-manager
 
                 //#updateSubCommand
@@ -211,7 +214,8 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                         .thenAccept(commandResponse -> {
                             if (commandResponse instanceof CommandResponse.Completed) {
                                 // As the commands get completed, the results are updated in the commandResponseManager
-                                commandResponseManager.updateSubCommand(commandResponse);
+                                // TODO: FIX ME
+                               // commandResponseManager.updateSubCommand(commandResponse);
                             } else {
                                 // do something
                             }
@@ -220,6 +224,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
                 //#query-command-response-manager
                 // query CommandResponseManager to get the current status of Command, for example: Accepted/Completed/Invalid etc.
+                /*
                 commandResponseManager
                         .jQuery(subCommand1.runId(), Timeout.durationToTimeout(FiniteDuration.apply(5, "seconds")))
                         .thenAccept(commandResponse -> {
@@ -228,42 +233,42 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
                 //#query-command-response-manager
                 return new CommandResponse.Completed(sc.runId());
-
+*/
             default:
                 log.error("Invalid command [" + sc + "] received.");
-                return new CommandResponse.Invalid(sc.runId(), new CommandIssue.UnsupportedCommandIssue(sc.commandName().toString()));
+                return new CommandResponse.Invalid(sc.commandName(), runId, new CommandIssue.UnsupportedCommandIssue(sc.commandName().toString()));   //TODO Guessed
         }
     }
 
-    private CommandResponse.SubmitResponse processObserve(Observe oc) {
+    private CommandResponse.SubmitResponse processObserve(Id runId, Observe oc) {
         switch (oc.commandName().name()) {
             case "point":
             case "acquire":
             default:
                 log.error("Invalid command [" + oc + "] received.");
         }
-        return new CommandResponse.Completed(oc.runId());
+        return new CommandResponse.Completed(oc.commandName(), runId);
     }
 
     /**
      * in case of submit command, component writer is required to update commandResponseManager with the result
      */
-    private CommandResponse.SubmitResponse submitSetup(Setup setup) {
-        processSetup(setup);
-        return new CommandResponse.Started(setup.runId());
+    private CommandResponse.SubmitResponse submitSetup(Id runId, Setup setup) {
+        processSetup(runId, setup);
+        return new CommandResponse.Started(setup.commandName(), runId);
     }
 
-    private CommandResponse.SubmitResponse submitObserve(Observe observe) {
-        processObserve(observe);
-        return new CommandResponse.Completed(observe.runId());
+    private CommandResponse.SubmitResponse submitObserve(Id runId, Observe observe) {
+        processObserve(runId, observe);
+        return new CommandResponse.Completed(observe.commandName(), runId);
     }
 
-    private void onewaySetup(Setup setup) {
-        processSetup(setup);
+    private void onewaySetup(Id runId, Setup setup) {
+        processSetup(runId, setup);
     }
 
-    private void onewayObserve(Observe observe) {
-        processObserve(observe);
+    private void onewayObserve(Id runId, Observe observe) {
+        processObserve(runId, observe);
     }
 
     /**

@@ -299,7 +299,7 @@ public class JCommandsTest extends JUnitSuite {
         Assert.assertEquals(uniqueKeys2, Set.of(encoderKey.keyName(), filterKey.keyName()));
         Assert.assertEquals(uniqueKeys3, Set.of(encoderKey.keyName(), filterKey.keyName(), miscKey.keyName()));
     }
-
+/*
     @Test
     public void showCloneCommandExample() {
         String prefix = "wfos.blue.filter";
@@ -336,4 +336,5 @@ public class JCommandsTest extends JUnitSuite {
         Assert.assertEquals(wait.jParamSet(), wait2.jParamSet());
         Assert.assertEquals(wait.source(), wait2.source());
     }
+ */
 }

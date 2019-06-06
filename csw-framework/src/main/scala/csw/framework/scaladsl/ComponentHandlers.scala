@@ -7,6 +7,7 @@ import csw.framework.models.CswContext
 import csw.location.models.{Connection, TrackingEvent}
 import csw.params.commands.CommandResponse.{SubmitResponse, ValidateCommandResponse}
 import csw.params.commands.ControlCommand
+import csw.params.core.models.Id
 
 import scala.concurrent.Future
 
@@ -49,7 +50,7 @@ abstract class ComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx
    * @param controlCommand represents a command received e.g. Setup, Observe or wait
    * @return a CommandResponse after validation
    */
-  def validateCommand(controlCommand: ControlCommand): ValidateCommandResponse
+  def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse
 
   /**
    * On receiving a command as Submit, the onSubmit handler is invoked for a component only if the validateCommand handler
@@ -58,7 +59,7 @@ abstract class ComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx
    *
    * @param controlCommand represents a command received e.g. Setup, Observe or wait
    */
-  def onSubmit(controlCommand: ControlCommand): SubmitResponse
+  def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse
 
   /**
    * On receiving a command as Oneway, the onOneway handler is invoked for a component only if the validateCommand handler
@@ -66,7 +67,7 @@ abstract class ComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx
    *
    * @param controlCommand represents a command received e.g. Setup, Observe or wait
    */
-  def onOneway(controlCommand: ControlCommand): Unit
+  def onOneway(runId: Id, controlCommand: ControlCommand): Unit
 
   /**
    * The onShutdown handler can be used for carrying out the tasks which will allow the component to shutdown gracefully

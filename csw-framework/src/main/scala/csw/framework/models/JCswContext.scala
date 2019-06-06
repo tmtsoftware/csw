@@ -1,8 +1,7 @@
 package csw.framework.models
-import csw.framework.CurrentStatePublisher
+import csw.framework.{CommandUpdatePublisher, CurrentStatePublisher}
 import csw.command.client.models.framework.ComponentInfo
 import csw.alarm.api.javadsl.IAlarmService
-import csw.command.client.CommandResponseManager
 import csw.config.api.javadsl.IConfigClientService
 import csw.event.api.javadsl.IEventService
 import csw.location.api.javadsl.ILocationService
@@ -17,7 +16,7 @@ import csw.time.scheduler.api.TimeServiceScheduler
  * @param alarmService the single instance of alarm service that allows setting severity for an alarm
  * @param loggerFactory factory to create suitable logger instance
  * @param currentStatePublisher the pub sub actor to publish state represented by [[csw.params.core.states.CurrentState]] for this component
- * @param commandResponseManager manages state of a received Submit command
+ * @param commandUpdatePublisher allows returning result of long-running commands
  * @param componentInfo component related information as described in the configuration file
  *
  */
@@ -28,8 +27,8 @@ case class JCswContext(
     timeServiceScheduler: TimeServiceScheduler,
     loggerFactory: JLoggerFactory,
     configClientService: IConfigClientService,
-    commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher,
+    commandUpdatePublisher: CommandUpdatePublisher,
     componentInfo: ComponentInfo
 ) {
 
@@ -44,7 +43,7 @@ case class JCswContext(
     loggerFactory.asScala,
     configClientService.asScala,
     currentStatePublisher,
-    commandResponseManager,
+    commandUpdatePublisher,
     componentInfo: ComponentInfo
   )
 }

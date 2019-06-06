@@ -25,7 +25,8 @@ trait ICommandService {
   def validate(controlCommand: ControlCommand): CompletableFuture[ValidateResponse]
 
   /**
-   * Submit given command and returns [[csw.params.commands.CommandResponse.SubmitResponse]] as a Future
+   * Submit a command and return after first phase. If it returns as `Started` get a
+   * final [[csw.params.commands.CommandResponse.SubmitResponse]] as a Future with queryFinal.
    *
    * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
    * @return a CommandResponse as a Future value
@@ -33,7 +34,7 @@ trait ICommandService {
   def submit(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[SubmitResponse]
 
   /**
-   * Submit a command and Subscribe for the result if it was successfully validated as `Started` to get a
+   * Submit a command and wait for the final result if it was successfully validated as `Started` to get a
    * final [[csw.params.commands.CommandResponse.SubmitResponse]] as a Future
    *
    * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
@@ -55,7 +56,7 @@ trait ICommandService {
 
   /**
    * Send a command as a Oneway and get a [[csw.params.commands.CommandResponse.OnewayResponse]] as a Future. The CommandResponse can be a response
-   * of validation (Accepted, Invalid) or a final Response.
+   * of validation (Accepted, Invalid) or a Locked response.
    *
    * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
    * @return a CommandResponse as a Future value

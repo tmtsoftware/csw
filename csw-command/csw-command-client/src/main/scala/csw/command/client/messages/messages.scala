@@ -206,6 +206,15 @@ object ComponentCommonMessage {
       with RemoteMsg
 
   /**
+   * Represents a message to subscribe to changes of a started command
+   *
+   * @param subscriberMessage tells the component to subscribe to or unsubscribe from CurrentState notifications
+   */
+  case class StartedCommandSubscription(subscriberMessage: SubscriberMessage[SubmitResponse])
+      extends ComponentCommonMessage
+      with RemoteMsg
+
+  /**
    * Represents a message to get current lifecycle state of a component
    *
    * @param replyTo an ActorRef that will receive SupervisorLifecycleState
@@ -268,52 +277,6 @@ private[csw] object FromSupervisorMessage {
 }
 
 ////////////////
-
-sealed trait CommandResponseManagerMessage
-object CommandResponseManagerMessage {
-  case class AddOrUpdateCommand(commandResponse: SubmitResponse)                    extends CommandResponseManagerMessage
-  case class AddSubCommand(runId: Id, subCommandId: Id)                             extends CommandResponseManagerMessage
-  case class UpdateSubCommand(commandResponse: SubmitResponse)                      extends CommandResponseManagerMessage
-  case class GetCommandCorrelation(replyTo: ActorRef[CommandCorrelation])           extends CommandResponseManagerMessage
-  case class GetCommandResponseState(replyTo: ActorRef[CommandResponseState])       extends CommandResponseManagerMessage
-  case class SubscriberTerminated(terminated: ActorRef[SubmitResponse])             extends CommandResponseManagerMessage
-  case class QuerySubscriberTerminated(terminated: ActorRef[QueryResponse])         extends CommandResponseManagerMessage
-  case class GetCommandSubscribersState(replyTo: ActorRef[CommandSubscribersState]) extends CommandResponseManagerMessage
-  private[command] case object CleanUpCache                                         extends CommandResponseManagerMessage
-
-  /**
-   * Represents a message to query the command status of a command running on some component
-   *
-   * @param runId represents an unique identifier of command
-   * @param replyTo represents the actor that will receive the command status
-   */
-  case class Query(runId: Id, replyTo: ActorRef[QueryResponse])
-      extends CommandResponseManagerMessage
-      with SupervisorLockMessage
-      with RemoteMsg
-
-  /**
-   * Represents a message to subscribe to change in command status of a command running on some component
-   *
-   * @param runId represents an unique identifier of command
-   * @param replyTo represents the actor that will receive the notification of change in command status
-   */
-  case class Subscribe(runId: Id, replyTo: ActorRef[SubmitResponse])
-      extends CommandResponseManagerMessage
-      with SupervisorLockMessage
-      with RemoteMsg
-
-  /**
-   * Represents a message to un-subscribe to change in command status of a command running on some component
-   *
-   * @param runId represents an unique identifier of command
-   * @param replyTo represents the actor that will be stop receiving notification of change in command status
-   */
-  case class Unsubscribe(runId: Id, replyTo: ActorRef[SubmitResponse])
-      extends CommandResponseManagerMessage
-      with SupervisorLockMessage
-      with RemoteMsg
-}
 
 // Parent trait for Messages which will be send to components for interacting with its logging system
 sealed trait LogControlMessages extends ComponentMessage with CommandSerializable

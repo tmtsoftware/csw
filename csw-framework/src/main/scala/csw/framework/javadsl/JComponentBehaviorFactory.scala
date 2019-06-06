@@ -27,8 +27,8 @@ abstract class JComponentBehaviorFactory extends ComponentBehaviorFactory() {
         timeServiceScheduler,
         loggerFactory.asJava,
         JConfigClientFactory.clientApi(ctx.system, locationService.asJava),
-        commandResponseManager,
         currentStatePublisher,
+        commandUpdatePublisher,
         componentInfo
       )
     )

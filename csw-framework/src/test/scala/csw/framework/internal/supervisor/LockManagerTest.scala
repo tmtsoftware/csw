@@ -20,8 +20,8 @@ import org.scalatest.{FunSuite, Matchers}
 // DEOPSCSW-301: Support UnLocking
 class LockManagerTest extends FunSuite with MockitoSugar with Matchers {
 
-  private val prefix        = Prefix("tcs.mobie.blue.filter")
-  private val invalidPrefix = Prefix("tcs.mobie.blue.filter.invalid")
+  private val prefix        = Prefix("wfos.blue.filter")
+  private val invalidPrefix = Prefix("wfos.blue.filter.invalid")
 
   implicit val system: ActorSystem                     = ActorSystem()
   implicit val typedSystem: typed.ActorSystem[Nothing] = system.toTyped
@@ -138,7 +138,6 @@ class LockManagerTest extends FunSuite with MockitoSugar with Matchers {
     lockManager.isLocked shouldBe true
 
     lockManager.allowCommand(Submit(invalidSetup, commandResponseProbe.ref)) shouldBe false
-
   }
 
   // DEOPSCSW-302: Support Unlocking by Admin

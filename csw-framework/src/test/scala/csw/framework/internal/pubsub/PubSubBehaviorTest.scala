@@ -4,14 +4,16 @@ import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestInbox, TestProbe}
 import akka.actor.typed.SpawnProtocol
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.{typed, ActorSystem}
+import akka.actor.{ActorSystem, typed}
 import csw.command.client.messages.ComponentMessage
 import csw.command.client.models.framework.PubSub.{Publish, Subscribe, SubscribeOnly, Unsubscribe}
 import csw.command.client.models.framework.{LifecycleStateChanged, PubSub, SupervisorLifecycleState}
 import csw.framework.FrameworkTestMocks
 import csw.location.client.ActorSystemFactory
 import csw.logging.api.scaladsl.Logger
-import csw.params.core.models.Prefix
+import csw.params.commands.CommandName
+import csw.params.commands.CommandResponse.{Completed, SubmitResponse}
+import csw.params.core.models.{Id, Prefix}
 import csw.params.core.states.{CurrentState, StateName}
 import org.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -35,14 +37,23 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
   private val lifecycleProbe2    = TestProbe[LifecycleStateChanged]
   private val currentStateProbe1 = TestInbox[CurrentState]()
   private val currentStateProbe2 = TestInbox[CurrentState]()
+  private val commandStateProbe1 = TestInbox[SubmitResponse]()
+  private val commandStateProbe2 = TestInbox[SubmitResponse]()
   val currentState1              = CurrentState(prefix, StateName("testStateName1"))
   val currentState2              = CurrentState(prefix, StateName("testStateName2"))
   val currentState3              = CurrentState(prefix, StateName("testStateName3"))
+
+  val commandState1 = Completed(CommandName("test1"), Id())
+  val commandState2 = Completed(CommandName("test2"), Id())
+  val commandState3 = Completed(CommandName("test3"), Id())
 
   def createLifecycleStatePubSubBehavior(): BehaviorTestKit[PubSub[LifecycleStateChanged]] =
     BehaviorTestKit(PubSubBehavior.make(mocks.loggerFactory))
 
   def createCurrentStatePubSubBehavior(): BehaviorTestKit[PubSub[CurrentState]] =
+    BehaviorTestKit(PubSubBehavior.make(mocks.loggerFactory))
+
+  def createCommandStatePubSubBehavior(): BehaviorTestKit[PubSub[SubmitResponse]] =
     BehaviorTestKit(PubSubBehavior.make(mocks.loggerFactory))
 
   override protected def afterAll(): Unit = Await.result(untypedSystem.terminate(), 5.seconds)
@@ -93,5 +104,22 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
     lifecycleProbe2.expectMessage(LifecycleStateChanged(supervisorProbe.ref, SupervisorLifecycleState.Running))
     lifecycleProbe1.expectNoMessage(50.millis)
+  }
+
+  test("CommandState should be published to the subscribers depending on names") {
+    val pubSubBehavior: BehaviorTestKit[PubSub[SubmitResponse]] = createCommandStatePubSubBehavior()
+
+    pubSubBehavior.run(Subscribe(commandStateProbe1.ref))
+    pubSubBehavior.run(SubscribeOnly(commandStateProbe2.ref, Set(commandState2.stateName, commandState3.stateName)))
+
+    pubSubBehavior.run(Publish(commandState1))
+    pubSubBehavior.run(Publish(commandState2))
+    pubSubBehavior.run(Publish(commandState3))
+
+    val currentStates  = commandStateProbe1.receiveAll()
+    val currentStates2 = commandStateProbe2.receiveAll()
+
+    currentStates shouldEqual Seq(commandState1, commandState2, commandState3)
+    currentStates2 shouldEqual Seq(commandState2, commandState3)
   }
 }

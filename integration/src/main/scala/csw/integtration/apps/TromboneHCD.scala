@@ -38,7 +38,7 @@ object TromboneHCD {
   def main(args: Array[String]): Unit = {}
 
   def behavior: Behaviors.Receive[Submit] = Behaviors.receiveMessage[Submit] {
-    case Submit(Setup(_, _, CommandName("Unregister"), None, _), _) =>
+    case Submit(Setup(_, CommandName("Unregister"), None, _), _) =>
       registrationResult.unregister()
       Behaviors.same
     case x =>

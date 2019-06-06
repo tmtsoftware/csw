@@ -4,16 +4,16 @@ import akka.actor.typed.SpawnProtocol
 import csw.alarm.api.scaladsl.AlarmService
 import csw.alarm.client.AlarmServiceFactory
 import csw.command.client.models.framework.ComponentInfo
-import csw.command.client.{CRMCacheProperties, CommandResponseManager, CommandResponseManagerActor}
 import csw.config.api.scaladsl.ConfigClientService
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.event.api.scaladsl.EventService
 import csw.event.client.EventServiceFactory
-import csw.framework.CurrentStatePublisher
+import csw.framework.{CommandUpdatePublisher, CurrentStatePublisher}
 import csw.framework.internal.pubsub.PubSubBehavior
 import csw.framework.internal.wiring.CswFrameworkSystem
 import csw.location.api.scaladsl.LocationService
 import csw.logging.client.scaladsl.LoggerFactory
+import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.core.states.CurrentState
 import csw.time.scheduler.TimeServiceSchedulerFactory
 import csw.time.scheduler.api.TimeServiceScheduler
@@ -24,13 +24,13 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 /**
  * Bundles all the services provided by csw
  *
- * @param locationService the single instance of location service
- * @param eventService the single instance of event service with default publishers and subscribers as well as the capability to create new ones
- * @param alarmService the single instance of alarm service that allows setting severity for an alarm
- * @param loggerFactory factory to create suitable logger instance
+ * @param locationService       the single instance of location service
+ * @param eventService          the single instance of event service with default publishers and subscribers as well as the capability to create new ones
+ * @param alarmService          the single instance of alarm service that allows setting severity for an alarm
+ * @param loggerFactory         factory to create suitable logger instance
  * @param currentStatePublisher the pub sub actor to publish state represented by [[csw.params.core.states.CurrentState]] for this component
- * @param commandResponseManager manages state of a received Submit command
- * @param componentInfo component related information as described in the configuration file
+ * @param commandUpdatePublisher a pub sub actor to publish SubmitResponse updates for long-running commands [[csw.params.commands.CommandResponse.SubmitResponse]] for this component
+ * @param componentInfo         component related information as described in the configuration file
  *
  */
 class CswContext(
@@ -41,14 +41,14 @@ class CswContext(
     val loggerFactory: LoggerFactory,
     val configClientService: ConfigClientService,
     val currentStatePublisher: CurrentStatePublisher,
-    val commandResponseManager: CommandResponseManager,
+    val commandUpdatePublisher: CommandUpdatePublisher,
     val componentInfo: ComponentInfo
 )
 
 object CswContext {
 
-  private val PubSubComponentActor            = "pub-sub-component"
-  private val CommandResponseManagerActorName = "command-response-manager"
+  private val PubSubComponentActor = "pub-sub-component"
+  private val PubSubCommandActor   = "pub-sub-command"
 
   private[framework] def make(
       locationService: LocationService,
@@ -72,11 +72,10 @@ object CswContext {
       val pubSubComponentActor =
         await(richSystem.spawnTyped(PubSubBehavior.make[CurrentState](loggerFactory), PubSubComponentActor))
       val currentStatePublisher = new CurrentStatePublisher(pubSubComponentActor)
-
-      // create CommandResponseManager (CRM)
-      val crmBehavior = CommandResponseManagerActor.behavior(CRMCacheProperties(), loggerFactory)
-      val crmActor    = await(richSystem.spawnTyped(crmBehavior, CommandResponseManagerActorName))
-      val crm         = new CommandResponseManager(crmActor)
+      // create CommandEventUpdatePublisher
+      val pubSubCommandEventActor =
+        await(richSystem.spawnTyped(PubSubBehavior.make[SubmitResponse](loggerFactory), PubSubCommandActor))
+      val commandEventPublisher = new CommandUpdatePublisher(pubSubCommandEventActor)
 
       new CswContext(
         locationService,
@@ -86,7 +85,7 @@ object CswContext {
         loggerFactory,
         configClientService,
         currentStatePublisher,
-        crm,
+        commandEventPublisher,
         componentInfo
       )
     }

@@ -11,15 +11,14 @@ import csw.command.client.CommandServiceFactory
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.CommandMessage.Submit
 import csw.command.client.models.framework.LockingResponse
-import csw.command.client.models.framework.LockingResponse.LockAcquired
+import csw.command.client.models.framework.LockingResponses.LockAcquired
 import csw.command.client.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.command.client.models.matchers.{DemandMatcher, Matcher, MatcherResponse}
 import csw.common.utils.LockCommandFactory
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
+import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.location.models
-import csw.location.models.Connection.AkkaConnection
-import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
@@ -132,47 +131,32 @@ class CommandServiceTest(ignore: Int)
       enterBarrier("spawned")
 
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
-      val assemblyLocF =
-        locationService.resolve(AkkaConnection(ComponentId("Assembly", ComponentType.Assembly)), 5.seconds)
+      val assemblyLocF                   = locationService.resolve(AkkaConnection(ComponentId("Assembly", ComponentType.Assembly)), 5.seconds)
       val assemblyLocation: AkkaLocation = Await.result(assemblyLocF, 10.seconds).get
       val assemblyCmdService             = CommandServiceFactory.make(assemblyLocation)
 
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
-      val hcdLocF                   = locationService.resolve(AkkaConnection(models.ComponentId("HCD", ComponentType.HCD)), 5.seconds)
+      val hcdLocF                   = locationService.resolve(AkkaConnection(ComponentId("HCD", ComponentType.HCD)), 5.seconds)
       val hcdLocation: AkkaLocation = Await.result(hcdLocF, 10.seconds).get
       val hcdCmdService             = CommandServiceFactory.make(hcdLocation)
 
-      //#invalidSubmitCmd
-      val invalidSubmitSetup    = Setup(prefix, invalidCmd, obsId)
-      val invalidSubmitCommandF = assemblyCmdService.submit(invalidSubmitSetup)
+      //#invalidCmd
+      println("1")
+      val invalidSetup = Setup(prefix, invalidCmd, obsId)
+      val invalidCommandF = assemblyCmdService.submitAndWait(invalidSetup)
       async {
-        await(invalidSubmitCommandF) match {
-          case Started(runId) =>
-          // Do Completed thing
-          case Invalid(runId, issue) =>
-            issue shouldBe a[Invalid]
-          case other =>
-            // Unexpected result
-            log.error(s"Some other response: $other")
+          await(invalidCommandF) match {
+            case Completed(invalidSetup.commandName, runId) =>
+              // Do Completed thing
+            case Invalid(invalidSetup.commandName, runId, issue) =>
+              //issue shouldBe a[Invalid]
+            case other =>
+              // Unexpected result
+              log.error(s"Some other response: $other")
         }
       }
-      //#invalidSubmitCmd
-
-      // #submitAndQuery
-      val longRunningSetup4 = Setup(prefix, longRunningCmd, obsId)
-
-      async {
-        assemblyCmdService.submit(longRunningSetup4)
-
-        await(assemblyCmdService.query(longRunningSetup4.runId)) match {
-          case Started(runId) =>
-          // happy case - no action needed
-          // Do some other work
-          case a =>
-          // log.error. This indicates that the command probably failed to start.
-        }
-      }
-      // #submitAndQuery
+      Await.result(invalidCommandF, 5.seconds) shouldBe a[Invalid]
+      //#invalidCmd
 
       // DEOPSCSW-233: Hide implementation by having a CCS API
       // short running command
@@ -180,39 +164,25 @@ class CommandServiceTest(ignore: Int)
       val immediateSetup = Setup(prefix, immediateCmd, obsId)
       val immediateCommandF = async {
         await(assemblyCmdService.submitAndWait(immediateSetup)) match {
-          case response: Completed =>
+          case response: Completed ⇒
             //do something with completed result
             response
-          case otherResponse =>
+          case otherResponse ⇒
             // do something with other response which is not expected
             otherResponse
         }
       }
       //#immediate-response
-      Await.result(immediateCommandF, timeout.duration) shouldBe Completed(immediateSetup.runId)
+      Await.result(immediateCommandF, timeout.duration) shouldBe a[Completed]
+      print("3")
 
-      //#invalidCmd
-      val invalidSetup    = Setup(prefix, invalidCmd, obsId)
-      val invalidCommandF = assemblyCmdService.submitAndWait(invalidSetup)
-      async {
-        await(invalidCommandF) match {
-          case Completed(runId) =>
-          // Do Completed thing
-          case Invalid(runId, issue) =>
-            issue shouldBe a[Invalid]
-          case other =>
-            // Unexpected result
-            log.error(s"Some other response: $other")
-        }
-      }
-      //#invalidCmd
 
       // #longRunning
-      val longRunningSetup1 = Setup(prefix, longRunningCmd, obsId)
+      val longRunningSetup = Setup(prefix, longRunningCmd, obsId)
 
       val longRunningResultF = async {
-        await(assemblyCmdService.submitAndWait(longRunningSetup1)) match {
-          case CompletedWithResult(_, result) =>
+        await(assemblyCmdService.submitAndWait(longRunningSetup)) match {
+          case CompletedWithResult(longRunningSetup.commandName, _, result) =>
             Some(result(encoder).head)
 
           case otherResponse =>
@@ -224,25 +194,37 @@ class CommandServiceTest(ignore: Int)
       val longRunningResult = Await.result(longRunningResultF, timeout.duration)
       longRunningResult shouldBe Some(20)
 
+      println(s"4: $longRunningResult")
+
       // DEOPSCSW-233: Hide implementation by having a CCS API
       // long running command which does not use matcher
       // #queryLongRunning
-      val longRunningSetup2 = longRunningSetup1.cloneCommand
+
+      println("5")
+
+      var longRunningRunId:Id = Id("blah")  // Is updated below for use in later test
       val longRunningQueryResultF = async {
         // The following val is set so we can do query and work and complete later
-        val longRunningF = assemblyCmdService.submitAndWait(longRunningSetup2)
+        val longRunningF = assemblyCmdService.submit(longRunningSetup)
+        val runId = await(longRunningF).runId
+        longRunningRunId = runId
 
-        await(assemblyCmdService.query(longRunningSetup2.runId)) match {
-          case Started(runId) =>
+        println("5 - " + runId)
+
+
+        await(assemblyCmdService.query(runId)) match {
+          case Started(longRunningSetup.commandName, runId) =>
+            println("5 - Yes started")
           // happy case - no action needed
           // Do some other work
           case a =>
+            println("Log error: " + a)
           // log.error. This indicates that the command probably failed to start.
         }
 
         // Now wait for completion and result
-        await(longRunningF) match {
-          case CompletedWithResult(_, result) =>
+        await(assemblyCmdService.queryFinal(runId)) match {
+          case CompletedWithResult(_, _, result) =>
             Some(result(encoder).head)
 
           case otherResponse =>
@@ -250,20 +232,20 @@ class CommandServiceTest(ignore: Int)
             None
         }
       }
-      // #queryLongRunning
       Await.result(longRunningQueryResultF, timeout.duration) shouldBe Some(20)
 
+      // #queryLongRunning
+      println(">>>>>>>>>>6")
+
       // This test shows DEOPSCSW-623 because submit is issued without future and queryFinal works
-
-      val longRunningSetup3 = longRunningSetup1.cloneCommand
-      assemblyCmdService.submit(longRunningSetup3)
-
       // #queryFinal
       val queryFinalF = async {
-        // longRunningSetup3 has already been submitted
+        // The following submit is made without saving the Future!
+        val runId = await(assemblyCmdService.submit(longRunningSetup)).runId
+
         // Use queryFinal and runId to wait for completion and result
-        await(assemblyCmdService.queryFinal(longRunningSetup3.runId)) match {
-          case CompletedWithResult(_, result) =>
+        await(assemblyCmdService.queryFinal(runId)) match {
+          case CompletedWithResult(_, runId, result) =>
             Some(result(encoder).head)
 
           case otherResponse =>
@@ -274,26 +256,29 @@ class CommandServiceTest(ignore: Int)
       Await.result(queryFinalF, timeout.duration) shouldBe Some(20)
       // #queryFinal
 
+      println(">>>>>>>>>>>>7")
+
       //#oneway
       // `onewayCmd` is a sample to demonstrate oneway without any actions
       val onewaySetup = Setup(prefix, onewayCmd, obsId)
       // Don't care about the futures from async
       val oneWayF = async {
         await(assemblyCmdService.oneway(onewaySetup)) match {
-          case invalid: Invalid =>
+          case invalid: Invalid ⇒
           // Log an error here
-          case _ =>
-          // Ignore anything other than invalid
+          case _ ⇒
+            // Ignore anything other than invalid
         }
       }
       Await.ready(oneWayF, timeout.duration)
+      println("8")
       //#oneway
 
       //#validate
       val validateCommandF = async {
         await(assemblyCmdService.validate(immediateSetup)) match {
-          case response: Accepted => true
-          case Invalid(_, issue)  =>
+          case response: Accepted ⇒ true
+          case Invalid(_, _, issue)  ⇒
             // do something with other response which is not expected
             log.error(s"Command failed to validate with issue: $issue")
             false
@@ -303,14 +288,20 @@ class CommandServiceTest(ignore: Int)
       Await.result(validateCommandF, timeout.duration) shouldBe true
       //#validate
 
+      println(">9<")
+
       // test CommandNotAvailable after timeout of 1 seconds
-      Await.result(assemblyCmdService.query(Id("blah"))(1.seconds), 2.seconds) shouldEqual CommandNotAvailable(Id("blah"))
+      Await.result(assemblyCmdService.query(Id("blah"))(1.seconds), 2.seconds) shouldEqual CommandNotAvailable(CommandName("CommandNotAvailable"), Id("blah"))
+
+      println("10")
 
       //#query
       // Check on a command that was completed in the past
-      val queryValue = Await.result(assemblyCmdService.query(longRunningSetup2.runId), timeout.duration)
+      val queryValue = Await.result(assemblyCmdService.query(longRunningRunId), timeout.duration)
       queryValue shouldBe a[CompletedWithResult]
       //#query
+
+      println("11")
 
       val submitAllSetup1       = Setup(prefix, immediateCmd, obsId)
       val submitAllSetup2       = Setup(prefix, longRunningCmd, obsId)
@@ -318,7 +309,7 @@ class CommandServiceTest(ignore: Int)
 
       //#submitAll
       val submitAllF = async {
-        await(assemblyCmdService.submitAllAndWait(List(submitAllSetup1, submitAllSetup2, submitAllinvalidSetup)))
+        await(assemblyCmdService.submitAll(List(submitAllSetup1, submitAllSetup2, submitAllinvalidSetup)))
       }
       val submitAllResponse = Await.result(submitAllF, timeout.duration)
       submitAllResponse.length shouldBe 3
@@ -326,16 +317,18 @@ class CommandServiceTest(ignore: Int)
       submitAllResponse(1) shouldBe a[CompletedWithResult]
       submitAllResponse(2) shouldBe a[Invalid]
       //#submitAll
+      println("12")
 
       //#submitAllInvalid
       val submitAllF2 = async {
-        await(assemblyCmdService.submitAllAndWait(List(submitAllSetup1, submitAllinvalidSetup, submitAllSetup2)))
+        await(assemblyCmdService.submitAll(List(submitAllSetup1, submitAllinvalidSetup, submitAllSetup2)))
       }
       val submitAllResponse2 = Await.result(submitAllF2, timeout.duration)
       submitAllResponse2.length shouldBe 2
       submitAllResponse2(0) shouldBe a[Completed]
       submitAllResponse2(1) shouldBe a[Invalid]
       //#submitAllInvalid
+      println("13")
 
       //#subscribeCurrentState
       // Subscriber code
@@ -349,13 +342,14 @@ class CommandServiceTest(ignore: Int)
       hcdCmdService.oneway(currStateSetup)
 
       // Wait for a bit for callback
-      Thread.sleep(500)
+      Thread.sleep(100)
       // Test to see if value was received
       cstate(encoder).head shouldBe expectedEncoderValue
 
       // Unsubscribe to CurrentState
       subscription.unsubscribe()
       //#subscribeCurrentState
+      println("14")
 
       // DEOPSCSW-229: Provide matchers infrastructure for comparison
       // DEOPSCSW-317: Use state values of HCD to determine command completion
@@ -379,17 +373,17 @@ class CommandServiceTest(ignore: Int)
       val matchResponseF: Future[MatchingResponse] = async {
         val onewayResponse: OnewayResponse = await(assemblyCmdService.oneway(setupWithMatcher))
         onewayResponse match {
-          case Accepted(runId) =>
-            val matcherResponse = await(matcherResponseF)
+          case Accepted(_, runId) ⇒
+            val matcherResponse: MatcherResponse = await(matcherResponseF)
             // create appropriate response if demand state was matched from among the published state or otherwise
             // this would allow the response to be used to complete a command received by the Assembly
             matcherResponse match {
               case MatchCompleted =>
-                Completed(setupWithMatcher.runId)
+                Completed(setupWithMatcher.commandName, onewayResponse.runId)
               case mf: MatchFailed =>
-                Error(setupWithMatcher.runId, mf.throwable.getMessage)
+                Error(setupWithMatcher.commandName, onewayResponse.runId, mf.throwable.getMessage)
             }
-          case invalid: Invalid =>
+          case invalid: Invalid ⇒
             matcher.stop()
             invalid
           case locked: Locked =>
@@ -399,8 +393,9 @@ class CommandServiceTest(ignore: Int)
       }
 
       val commandResponse = Await.result(matchResponseF, timeout.duration)
-      commandResponse shouldBe Completed(setupWithMatcher.runId)
+      commandResponse shouldBe a[Completed]
       //#matcher
+      println(">>>>>>>>> 15")
 
       //#onewayAndMatch
       val onewayMatchF = async {
@@ -423,8 +418,9 @@ class CommandServiceTest(ignore: Int)
             l
         }
       }
-      Await.result(onewayMatchF, timeout.duration) shouldBe Completed(setupWithMatcher.runId)
+      Await.result(onewayMatchF, timeout.duration) shouldBe a[Completed]
       //#onewayAndMatch
+println("16<<<<<<")
 
       // Test failed matching
       //#onewayMatchFail
@@ -436,14 +432,14 @@ class CommandServiceTest(ignore: Int)
       val eventualCommandResponse2: Future[MatchingResponse] = async {
         val initialResponse = await(assemblyCmdService.oneway(setupWithFailedMatcher))
         initialResponse match {
-          case _: Accepted =>
+          case _: Accepted ⇒
             val matcherResponse = await(failedMatcherResponseF)
             // create appropriate response if demand state was matched from among the published state or otherwise
             matcherResponse match {
-              case MatchCompleted  => Completed(setupWithFailedMatcher.runId)
-              case MatchFailed(ex) => Error(setupWithFailedMatcher.runId, ex.getMessage)
+              case MatchCompleted ⇒ Completed(setupWithFailedMatcher.commandName, initialResponse.runId)
+              case MatchFailed(ex) ⇒ Error(setupWithFailedMatcher.commandName, initialResponse.runId, ex.getMessage)
             }
-          case invalid: Invalid =>
+          case invalid: Invalid ⇒
             matcher.stop()
             invalid
           case locked: Locked =>
@@ -454,7 +450,8 @@ class CommandServiceTest(ignore: Int)
 
       val commandResponse2 = Await.result(eventualCommandResponse2, timeout.duration.+(1.second))
       commandResponse2 shouldBe an[Error]
-      commandResponse2.runId shouldBe setupWithFailedMatcher.runId
+      //commandResponse2.runId shouldBe setupWithFailedMatcher.runId
+      println("17")
 
       // DEOPSCSW-233: Hide implementation by having a CCS API
       // DEOPSCSW-317: Use state values of HCD to determine command completion
@@ -473,14 +470,14 @@ class CommandServiceTest(ignore: Int)
       val eventualCommandResponse1: Future[MatchingResponse] = async {
         val initialResponse = await(assemblyCmdService.oneway(setupWithTimeoutMatcher))
         initialResponse match {
-          case _: Accepted =>
+          case _: Accepted ⇒
             val matcherResponse = await(matcherResponseF1)
             matcherResponse match {
-              case MatchCompleted                                       => Completed(setupWithMatcher.runId)
-              case MatchFailed(ex) if ex.isInstanceOf[TimeoutException] => Error(setupWithMatcher.runId, timeoutExMsg)
-              case MatchFailed(ex)                                      => Error(setupWithMatcher.runId, ex.getMessage)
+              case MatchCompleted ⇒ Completed(setupWithTimeoutMatcher.commandName, initialResponse.runId)
+              case MatchFailed(ex) if ex.isInstanceOf[TimeoutException] ⇒ Error(setupWithTimeoutMatcher.commandName, initialResponse.runId, timeoutExMsg)
+              case MatchFailed(ex) ⇒ Error(setupWithTimeoutMatcher.commandName, initialResponse.runId, ex.getMessage)
             }
-          case other @ (Invalid(_, _) | Locked(_)) =>
+          case other @ (Invalid(_, _, _) | Locked(_, _)) =>
             matcher.stop()
             other.asInstanceOf[MatchingResponse]
         }
@@ -489,13 +486,13 @@ class CommandServiceTest(ignore: Int)
       val commandResponseOnTimeout: MatchingResponse = Await.result(eventualCommandResponse1, timeout.duration)
       commandResponseOnTimeout shouldBe a[Error]
       commandResponseOnTimeout.asInstanceOf[Error].message shouldBe timeoutExMsg
-
+println("20")
       enterBarrier("short-long-commands")
 
       // acquire lock on assembly
       val lockResponseProbe = TestProbe[LockingResponse]
       assemblyLocation.componentRef ! LockCommandFactory.make(prefix, lockResponseProbe.ref)
-      lockResponseProbe.expectMessage(LockAcquired)
+        lockResponseProbe.expectMessage(LockAcquired)
 
       enterBarrier("assembly-locked")
 
@@ -504,13 +501,13 @@ class CommandServiceTest(ignore: Int)
       // send command with lock token and expect command processing response
       val assemblySetup = Setup(prefix, immediateCmd, obsId)
       assemblyLocation.componentRef ! Submit(assemblySetup, submitResponseProbe.ref)
-      submitResponseProbe.expectMessage(5.seconds, Completed(assemblySetup.runId))
+      submitResponseProbe.expectMessageType[Completed](5.seconds)
 
       // send command with lock token and expect command processing response with result
       val assemblySetup2 = Setup(prefix, immediateResCmd, obsId)
       assemblyLocation.componentRef ! Submit(assemblySetup2, submitResponseProbe.ref)
       submitResponseProbe.expectMessageType[CompletedWithResult](5.seconds)
-
+println("Did the locking stuff")
       enterBarrier("command-when-locked")
     }
 

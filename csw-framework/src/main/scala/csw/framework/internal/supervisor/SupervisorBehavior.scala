@@ -6,11 +6,11 @@ import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed._
 import akka.actor.typed.scaladsl._
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import csw.command.client.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
 import csw.command.client.messages.ComponentCommonMessage.{
   ComponentStateSubscription,
   GetSupervisorLifecycleState,
-  LifecycleStateSubscription
+  LifecycleStateSubscription,
+  StartedCommandSubscription
 }
 import csw.command.client.messages.FromComponentLifecycleMessage.Running
 import csw.command.client.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
@@ -40,7 +40,7 @@ import csw.location.models.Connection.AkkaConnection
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.internal.LogAdminUtil
 import csw.params.commands.CommandResponse.Locked
-import csw.params.core.models.Prefix
+import csw.params.core.models.{Id, Prefix}
 
 import scala.concurrent.Future
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
@@ -154,6 +154,7 @@ private[framework] final class SupervisorBehavior(
   private def onCommon(commonMessage: ComponentCommonMessage): Unit = commonMessage match {
     case LifecycleStateSubscription(subscriberMessage) => pubSubLifecycle ! subscriberMessage
     case ComponentStateSubscription(subscriberMessage) => currentStatePublisher.publisherActor.unsafeUpcast ! subscriberMessage
+    case StartedCommandSubscription(subscriberMessage) => commandUpdatePublisher.publisherActor.unsafeUpcast ! subscriberMessage
     case GetSupervisorLifecycleState(replyTo)          => replyTo ! lifecycleState
     case Restart                                       => onRestart()
     case Shutdown                                      => onShutdown()
@@ -200,13 +201,11 @@ private[framework] final class SupervisorBehavior(
    * @param runningMessage message representing a message received in [[SupervisorLifecycleState.Running]] state
    */
   private def onRunning(runningMessage: SupervisorRunningMessage): Unit = runningMessage match {
-    case Query(runId, replyTo)                => commandResponseManager.commandResponseManagerActor ! Query(runId, replyTo)
-    case Subscribe(runId, replyTo)            => commandResponseManager.commandResponseManagerActor ! Subscribe(runId, replyTo)
-    case Unsubscribe(runId, replyTo)          => commandResponseManager.commandResponseManagerActor ! Unsubscribe(runId, replyTo)
     case Lock(source, replyTo, leaseDuration) => lockComponent(source, replyTo, leaseDuration)
     case Unlock(source, replyTo)              => unlockComponent(source, replyTo)
     case cmdMsg: CommandMessage =>
-      if (lockManager.allowCommand(cmdMsg)) runningComponent.get ! cmdMsg else cmdMsg.replyTo ! Locked(cmdMsg.command.runId)
+      if (lockManager.allowCommand(cmdMsg)) runningComponent.get ! cmdMsg
+      else cmdMsg.replyTo ! Locked(cmdMsg.command.commandName, Id()) /// NOTE: Here creating new ID which is different than old
     case runningMessage: RunningMessage => handleRunningMessage(runningMessage)
     case msg @ Running(_)               => log.info(s"Ignoring [$msg] message received from TLA as Supervisor already in Running state")
   }

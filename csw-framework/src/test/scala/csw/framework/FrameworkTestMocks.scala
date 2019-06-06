@@ -5,8 +5,6 @@ import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import akka.{Done, actor}
 import csw.alarm.api.scaladsl.AlarmService
-import csw.command.client.CommandResponseManager
-import csw.command.client.messages.CommandResponseManagerMessage
 import csw.command.client.models.framework.{LifecycleStateChanged, PubSub}
 import csw.config.api.scaladsl.ConfigClientService
 import csw.config.client.scaladsl.ConfigClientFactory
@@ -52,12 +50,6 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol]) extends Mo
   when(eventService.executionContext).thenReturn(system.executionContext)
   ///////////////////////////////////////////////
 
-  val commandResponseManagerActor: TestProbe[CommandResponseManagerMessage] = TestProbe[CommandResponseManagerMessage]
-  val commandResponseManager: CommandResponseManager                        = mock[CommandResponseManager]
-
-  when(commandResponseManager.commandResponseManagerActor).thenReturn(commandResponseManagerActor.ref)
-  doNothing.when(commandResponseManager).addOrUpdateCommand(any[SubmitResponse])
-
   val lifecycleStateProbe: TestProbe[LifecycleStateChanged] = TestProbe[LifecycleStateChanged]
   val compStateProbe: TestProbe[CurrentState]               = TestProbe[CurrentState]
 
@@ -74,6 +66,10 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol]) extends Mo
     system.spawn(PubSubBehavior.make[CurrentState](loggerFactory), "pub-sub")
   val currentStatePublisher = new CurrentStatePublisher(pubSubComponentActor)
 
+  val pubSubCommandEventActor: ActorRef[PubSub[SubmitResponse]] =
+    system.spawn(PubSubBehavior.make[SubmitResponse](loggerFactory), name = "pub-sub-update")
+  val commandEventPublisher = new CommandUpdatePublisher(pubSubCommandEventActor)
+
   ///////////////////////////////////////////////
   val configClientService: ConfigClientService = ConfigClientFactory.clientApi(system, locationService)
 
@@ -86,7 +82,7 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol]) extends Mo
       loggerFactory,
       configClientService,
       currentStatePublisher,
-      commandResponseManager,
+      commandEventPublisher,
       ComponentInfos.dummyInfo
     )
 }

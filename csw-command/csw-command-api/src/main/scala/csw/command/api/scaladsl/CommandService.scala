@@ -41,6 +41,15 @@ trait CommandService {
   def submitAndWait(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse]
 
   /**
+   * Submit a command and Subscribe for the result if it was successfully validated as `Started` to get a
+   * final [[csw.params.commands.CommandResponse.SubmitResponse]] as a Future
+   *
+   * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
+   * @return a CommandResponse as a Future value
+   */
+  def submitAndWait(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse]
+
+  /**
    * Submit multiple commands and get a List of [[csw.params.commands.CommandResponse.SubmitResponse]] for all commands. The CommandResponse can be a response
    * of validation (Accepted, Invalid) or a final Response. In case of response as `Accepted`, final CommandResponse can be obtained by using `subscribe` API.
    *
@@ -50,8 +59,10 @@ trait CommandService {
   def submitAllAndWait(submitCommands: List[ControlCommand])(implicit timeout: Timeout): Future[List[SubmitResponse]]
 
   /**
-   * Send a command as a Oneway and get a [[csw.params.commands.CommandResponse.OnewayResponse]] as a Future. The CommandResponse can be a response
-   * of validation (Accepted, Invalid) or a final Response.
+   * Send a command as a Oneway and get a [[csw.params.commands.CommandResponse.OnewayResponse]] as a Future.
+   * The OnewayResponse can be a response of validation (Accepted, Invalid) or Locked.
+   * The use of oneway is the highest performance command interaction. It is used when completion, if needed at all,
+   * is provided through CurrentState or status values and Event Service.  See also [[onewayAndMatch]]
    *
    * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
    * @return a CommandResponse as a Future value
@@ -74,11 +85,14 @@ trait CommandService {
 
   /**
    * Query for the result of a long running command which was sent as Submit to get a [[csw.params.commands.CommandResponse.QueryResponse]] as a Future
+   * Query allows checking to see if a long-running command is completed without waiting as with [[queryFinal()]].
    *
    * @param commandRunId the runId of the command for which response is required
-   * @return a CommandResponse as a Future value
+   * @return an SubmitResponse as a Future value as an Option. If there is no command with the runId, None is returned
    */
   def query(commandRunId: Id)(implicit timeout: Timeout): Future[QueryResponse]
+
+  def query2(commandRunId: Id)(implicit timeout: Timeout): Future[Option[SubmitResponse]]
 
   /**
    * Query for the final result of a long running command which was sent as Submit to get a [[csw.params.commands.CommandResponse.SubmitResponse]] as a Future

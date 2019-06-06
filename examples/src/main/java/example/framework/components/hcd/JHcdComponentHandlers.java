@@ -3,7 +3,6 @@ package example.framework.components.hcd;
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.AskPattern;
-import csw.command.client.CommandResponseManager;
 import csw.command.client.messages.TopLevelActorMessage;
 import csw.command.client.models.framework.ComponentInfo;
 import csw.config.api.javadsl.IConfigClientService;
@@ -18,6 +17,7 @@ import csw.location.models.LocationUpdated;
 import csw.location.models.TrackingEvent;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.*;
+import csw.params.core.models.Id;
 import example.framework.components.ConfigNotAvailableException;
 import example.framework.components.assembly.WorkerActor;
 import example.framework.components.assembly.WorkerActorMsg;
@@ -33,7 +33,6 @@ public class JHcdComponentHandlers extends JComponentHandlers {
 
     private final ActorContext<TopLevelActorMessage> ctx;
     private final ComponentInfo componentInfo;
-    private final CommandResponseManager commandResponseManager;
     private final CurrentStatePublisher currentStatePublisher;
     private final ILocationService locationService;
     private final IEventService eventService;
@@ -51,7 +50,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
         super(ctx, cswCtx);
         this.ctx = ctx;
         this.componentInfo = cswCtx.componentInfo();
-        this.commandResponseManager = cswCtx.commandResponseManager();
+        //this.commandResponseManager = cswCtx.commandResponseManager();
         this.currentStatePublisher = cswCtx.currentStatePublisher();
         this.locationService = cswCtx.locationService();
         this.eventService = cswCtx.eventService();
@@ -83,38 +82,38 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     //#jInitialize-handler
     //#validateCommand-handler
     @Override
-    public CommandResponse.ValidateCommandResponse validateCommand(ControlCommand controlCommand) {
+    public CommandResponse.ValidateCommandResponse validateCommand(Id runId, ControlCommand controlCommand) {
         if (controlCommand instanceof Setup) {
             // validation for setup goes here
-            return new CommandResponse.Accepted(controlCommand.runId());
+            return new CommandResponse.Accepted(controlCommand.commandName(), runId);
         } else if (controlCommand instanceof Observe) {
             // validation for observe goes here
-            return new CommandResponse.Accepted(controlCommand.runId());
+            return new CommandResponse.Accepted(controlCommand.commandName(), runId);
         } else {
-            return new CommandResponse.Invalid(controlCommand.runId(), new CommandIssue.UnsupportedCommandIssue(controlCommand.commandName().name()));
+            return new CommandResponse.Invalid(controlCommand.commandName(), runId, new CommandIssue.UnsupportedCommandIssue(controlCommand.commandName().name()));
         }
     }
     //#validateCommand-handler
 
     //#onSubmit-handler
     @Override
-    public CommandResponse.SubmitResponse onSubmit(ControlCommand controlCommand) {
+    public CommandResponse.SubmitResponse onSubmit(Id runId, ControlCommand controlCommand) {
         if (controlCommand instanceof Setup)
-            return submitSetup((Setup) controlCommand); // includes logic to handle Submit with Setup config command
+            return submitSetup(runId, (Setup) controlCommand); // includes logic to handle Submit with Setup config command
         else if (controlCommand instanceof Observe)
-            return submitObserve((Observe) controlCommand); // includes logic to handle Submit with Observe config command"
+            return submitObserve(runId, (Observe) controlCommand); // includes logic to handle Submit with Observe config command"
         else
-            return new CommandResponse.Error(controlCommand.runId(), "Unknown command: " + controlCommand.commandName().name());
+            return new CommandResponse.Error(controlCommand.commandName(), runId, "Unknown command: " + controlCommand.commandName().name());
     }
     //#onSubmit-handler
 
     //#onOneway-handler
     @Override
-    public void onOneway(ControlCommand controlCommand) {
+    public void onOneway(Id runId, ControlCommand controlCommand) {
         if (controlCommand instanceof Setup)
-            onewaySetup((Setup) controlCommand); // includes logic to handle Oneway with Setup config command
+            onewaySetup(runId, (Setup) controlCommand); // includes logic to handle Oneway with Setup config command
         else if (controlCommand instanceof Observe)
-            onewayObserve((Observe) controlCommand); // includes logic to handle Oneway with Observe config command
+            onewayObserve(runId, (Observe) controlCommand); // includes logic to handle Oneway with Observe config command
     }
     //#onOneway-handler
 
@@ -152,7 +151,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     }
     //#onLocationTrackingEvent-handler
 
-    private CommandResponse.SubmitResponse processSetup(Setup sc) {
+    private CommandResponse.SubmitResponse processSetup(Id runId, Setup sc) {
         switch (sc.commandName().name()) {
             case "axisMove":
             case "axisDatum":
@@ -161,36 +160,36 @@ public class JHcdComponentHandlers extends JComponentHandlers {
             default:
                 log.error("Invalid command [" + sc + "] received.");
         }
-        return new CommandResponse.Completed(sc.runId());
+        return new CommandResponse.Completed(sc.commandName(), runId);
     }
 
-    private CommandResponse.SubmitResponse processObserve(Observe oc) {
+    private CommandResponse.SubmitResponse processObserve(Id runId, Observe oc) {
         switch (oc.commandName().name()) {
             case "point":
             case "acquire":
             default:
                 log.error("Invalid command [" + oc + "] received.");
         }
-        return new CommandResponse.Completed(oc.runId());
+        return new CommandResponse.Completed(oc.commandName(), runId);
     }
 
     /**
      * in case of submit command, component writer is required to update commandResponseManager with the result
      */
-    private CommandResponse.SubmitResponse submitSetup(Setup setup) {
-        return processSetup(setup);
+    private CommandResponse.SubmitResponse submitSetup(Id runId, Setup setup) {
+        return processSetup(runId, setup);
     }
 
-    private CommandResponse.SubmitResponse submitObserve(Observe observe) {
-        return processObserve(observe);
+    private CommandResponse.SubmitResponse submitObserve(Id runId, Observe observe) {
+        return processObserve(runId, observe);
     }
 
-    private void onewaySetup(Setup setup) {
-        processSetup(setup);
+    private void onewaySetup(Id runId, Setup setup) {
+        processSetup(runId, setup);
     }
 
-    private void onewayObserve(Observe observe) {
-        processObserve(observe);
+    private void onewayObserve(Id runId, Observe observe) {
+        processObserve(runId, observe);
     }
 
     private CompletableFuture<ConfigData> getConfig() {

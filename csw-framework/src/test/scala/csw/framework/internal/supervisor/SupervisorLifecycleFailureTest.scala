@@ -28,7 +28,7 @@ import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.commands.{CommandName, ControlCommand, Setup}
 import csw.params.core.generics.{KeyType, Parameter}
-import csw.params.core.models.ObsId
+import csw.params.core.models.{Id, ObsId}
 import csw.params.core.states.{CurrentState, StateName}
 import org.mockito.stubbing.Answer
 import org.scalatest.BeforeAndAfterEach
@@ -173,7 +173,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
     doThrow(TestFailureRestart(failureRestartExMsg))
       .when(componentHandlers)
-      .validateCommand(any[ControlCommand])
+      .validateCommand(any[Id], any[ControlCommand])
 
     createSupervisorAndStartTLA(testMocks, componentHandlers)
 
@@ -221,7 +221,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
         new LoggerFactory(hcdInfo.name),
         cswCtx.configClientService,
         currentStatePublisher,
-        commandResponseManager,
+        commandEventPublisher,
         hcdInfo
       )
     )
