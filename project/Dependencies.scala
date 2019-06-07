@@ -46,6 +46,8 @@ object Dependencies {
       Libs.`scala-async`.value,
       Libs.`scopt`,
       Enumeratum.`enumeratum`.value,
+      Akka.`cluster-sharding`,
+      Akka.`akka-persistence`,
       Libs.`akka-management-cluster-http`,
       AkkaHttp.`akka-http`,
       Libs.`akka-http-play-json`,

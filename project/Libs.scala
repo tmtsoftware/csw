@@ -19,7 +19,7 @@ object Libs {
   //MIT License
   val `embedded-keycloak`            = "com.github.tmtsoftware"        % "embedded-keycloak"             % "0.1.2" //Apache 2.0
   val `logback-classic`              = "ch.qos.logback"                % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
-  val `akka-management-cluster-http` = "com.lightbend.akka.management" %% "akka-management-cluster-http" % "1.0.0"
+  val `akka-management-cluster-http` = "com.lightbend.akka.management" %% "akka-management-cluster-http" % "1.0.1"
   val `svnkit`                       = "org.tmatesoft.svnkit"          % "svnkit"                        % "1.9.3" //TMate Open Source License
   val `commons-codec`                = "commons-codec"                 % "commons-codec"                 % "1.10" //Apache 2.0
   val `scala-reflect`                = "org.scala-lang"                % "scala-reflect"                 % ScalaVersion //BSD-3
@@ -90,6 +90,8 @@ object Akka {
   val `akka-cluster`             = "com.typesafe.akka" %% "akka-cluster" % Version
   val `akka-cluster-typed`       = "com.typesafe.akka" %% "akka-cluster-typed" % Version
   val `akka-slf4j`               = "com.typesafe.akka" %% "akka-slf4j" % Version
+  val `cluster-sharding`         = "com.typesafe.akka" %% "akka-cluster-sharding" % Version
+  val `akka-persistence`         = "com.typesafe.akka" %% "akka-persistence" % Version
 }
 
 object AkkaHttp {
