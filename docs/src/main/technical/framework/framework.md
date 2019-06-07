@@ -15,10 +15,11 @@ The CSW framework is implemented using [Akka typed actors](https://doc.akka.io/d
 
 @@@ note {title="IMPORTANT!!!"}
 
-Actors provide a single control of execution by processing messages received one by one. If a future is spawned inside an actor then on
-completion of that future, it is a common mistake to mutate actor state. It causes critical problems of state corruption because some other message
-might be in process of execution and accessing the state. The ideal way to handle futures inside actors is by sending message to self on future
-completion. This will make sure the mutation of state happens in order of one by one via messages. The example code can be seen 
+Actors provide a single control of execution by processing messages received one by one, but it is still necessary to be careful
+with actor state. If a Future is spawned inside an actor then on
+completion of that Future, it is a common mistake to mutate actor state. It can cause critical problems of state corruption because some other message
+might be in the process of execution and accessing the actor state. The ideal way to handle Futures inside actors is by sending message to self on Future
+completion. This will make sure the mutation of state happens in order of one by one via messages. Example code can be seen 
 @github[here](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala#L279).
 
 @@@
@@ -26,26 +27,30 @@ completion. This will make sure the mutation of state happens in order of one by
 ## Creation of component
 
 A component consists of couple of actors and classes created by framework on behalf of the component and some actors/classes that are expected to
-be created by component writers using the csw framework.
+be created by component writers using the CSW framework.
 
 ### Framework actors/classes
 
-The csw framework creates a @github[Supervisor](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala) actor as the
-first thing while creating any component. The Supervisor goes on to create @github[Top Level Actor](/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala),
+During component creation the CSW framework creates a @github[Supervisor](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala) actor as the
+first thing when creating any component. Each component has its own Supervisor. That Supervisor then goes on to create the 
+@github[Top Level Actor](/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala) using the component's unique `Handlers`,
 @github[Pub-Sub Manager](/csw-framework/src/main/scala/csw/framework/internal/pubsub/PubSubBehavior.scala) actor and 
 @github[Command Response Manager](/csw-command/csw-command-client/src/main/scala/csw/command/client/CommandResponseManagerActor.scala) actor as part of
-TMT framework.
+the TMT framework supporting a component.
 
 ![anatomy](media/anatomy.gif)
 
 @@@ note
 
-- The actors shown in blue are created by framework and actors/classes shown in green is expected to be written by component developer. 
+- The actors shown in blue are created by CSW framework and actors/classes shown in green are expected to be written by the component developer. 
 - The `Handlers` shown above is implemented by extending @github[ComponentHandlers](/csw-framework/src/main/scala/csw/framework/scaladsl/ComponentHandlers.scala)/
 @github[JComponentHandlers](/csw-framework/src/main/scala/csw/framework/javadsl/JComponentHandlers.scala) framework class. So, the TLA decides when to call a
 specific handler method or `hooks` and implementation of `ComponentHandlers/JComponentHandlers` decides what to do when it is called, for e.g. TLA
 decides when to call @github[intialize](/examples/src/main/scala/org/tmt/nfiraos/sampleassembly/SampleAssemblyHandlers.scala#L128) handler and handler
 provides implementation of how to initialize a component, may be by putting the hardware in default position, etc.
+- From the framework's viewpoint, the TLA is created with an instance of 
+@github[ComponentBehavior](/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior) and the `Handlers` created by the developer.
+The ComponentBehavior actor has the framework behavior such as lifecycle.  It also calls the `Handlers` when appropriate.   
 
 @@@
 
