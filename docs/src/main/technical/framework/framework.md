@@ -24,12 +24,12 @@ completion. This will make sure the mutation of state happens in order of one by
 
 @@@
   
-## Creation of component
+## Creation of A Component
 
 A component consists of couple of actors and classes created by framework on behalf of the component and some actors/classes that are expected to
 be created by component writers using the CSW framework.
 
-### Framework actors/classes
+### Framework Actors/Classes
 
 During component creation the CSW framework creates a @github[Supervisor](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala) actor as the
 first thing when creating any component. Each component has its own Supervisor. That Supervisor then goes on to create the 
@@ -50,108 +50,115 @@ decides when to call @github[intialize](/examples/src/main/scala/org/tmt/nfiraos
 provides implementation of how to initialize a component, may be by putting the hardware in default position, etc.
 - From the framework's viewpoint, the TLA is created with an instance of 
 @github[ComponentBehavior](/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior) and the `Handlers` created by the developer.
-The ComponentBehavior actor has the framework behavior such as lifecycle.  It also calls the `Handlers` when appropriate.   
+The ComponentBehavior actor has the framework behavior such as lifecycle.  It manages incoming messages and calls the `Handlers` when appropriate.   
 
 @@@
 
-To know more about the responsibility of Supervisor and Top level actor please refer this @ref:[section](../../commons/create-component.md#anatomy-of-component).
+To know more about the responsibility of Supervisor and Top Level Actor please refer this @ref:[section](../../commons/create-component.md#anatomy-of-component).
 
-The interaction between supervisor and top level actor for creating component is shown below:
+The interaction between supervisor and Top Level Actor when creating the component is shown below:
 
 ![creation](media/creation.png) 
 
-The code base for creation of Top level actor and watching it, from Supervisor can be found @github[here](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala#L301)
-and code base for calling `intialize` handler from top level actor can be found @github[here](/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala#L84).
-The explanation about `Idle` state can be found @ref[here](../../commons/create-component.md#idle). 
+The code base that implements the creation of Top Level Actor and watching it from its Supervisor can be found @github[here](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala#L301).
+The code that implements the startup lifecycle and the calling of the `intialize` handler of Top Level Actor can be found @github[here](/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala#L84).
+An explanation of the `Idle` state can be found @ref[here](../../commons/create-component.md#idle). 
  
 @@@ note
 
-If there is any exception thrown while executing `initialize` handler then the exception is bubbled up till Supervisor and it restarts Top level
-actor which in turn calls `initialize` handler again hoping the error fixes on restart. For this, Supervisor uses restart strategy with maximum of 3
-restarts possible and to be done within 5 seconds. To know more about akka supervision failure strategy please refer [Akka Fault Tolerance](https://doc.akka.io/docs/akka/current/typed/fault-tolerance.html)
+If there is any exception thrown while executing `initialize` handler then the exception is bubbled up to Supervisor, and it restarts Top Level
+Actor which in turn calls `initialize` handler again hoping the error fixes on restart. For this, Supervisor uses a restart strategy with maximum of 3
+restarts possible that must be finished within 5 seconds. To know more about the Akka supervision failure strategy please refer to the [Akka Fault Tolerance](https://doc.akka.io/docs/akka/current/typed/fault-tolerance.html)
 document. The Supervisor code base wiring restart strategy can be found @github[here](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala#L309). 
 
 @@@
 
-Once the handler is spawned it receives `ActorContext` and @github[CswContext](/csw-framework/src/main/scala/csw/framework/models/CswContext.scala) in it's
+Once the handler is spawned it receives an `ActorContext` and @github[CswContext](/csw-framework/src/main/scala/csw/framework/models/CswContext.scala) in its
 constructor. The `ActorContext` is used to get the `ActorSystem` of the component and maybe spawn other actors i.e worker actors for maintaining state.
-The `CswContext` can be used to get the handle of all the services provided by CSW. To know more about these services please refer this
+The `CswContext` can be used to get the handle of all the services provided by CSW. To know more about these services please refer to this
 @ref[section](../../commons/create-component.md#csw-services-injection).
 
 
-### Configuration file for component startup
+### Component Info File for Component Startup
 
-Every component needs to provide a startup config file that contains the details like name, type, handler class name, tracking details, etc.
-To know more about what is it and how to write the config file please refer this @ref[section](../../framework/describing-components.md) and 
+Every component needs to provide a startup config file called the Component Info File that contains component details such as name, type, handler class name, tracking details, etc.
+The contents of this file is used by Supervisor to create and setup the component as well as some customization.
+To know more about what is it and how to write the Component Info File please refer this @ref[section](../../framework/describing-components.md) and 
 a @ref[sample file](../../commons/multiple-components.md#component-configuration-componentinfo). 
 
-The name of the configuration file needs to be passed to @ref[Container/Standalone app](../../framework/deploying-components.md) at the time of startup.
-The config file is either fetched from `Configuration Service` or taken from local path on the machine to parse it to a @github[ComponentInfo](/csw-command/csw-command-client/src/main/scala/csw/command/client/models/framework/ComponentInfo.scala)
+The name of the Component Info File needs to be passed to @ref[Container/Standalone app](../../framework/deploying-components.md) at the time of startup.
+The file is either fetched from `Configuration Service` or taken from local path on the machine to parse to a @github[ComponentInfo](/csw-command/csw-command-client/src/main/scala/csw/command/client/models/framework/ComponentInfo.scala)
 object. The `ComponentInfo` object is then passed to `Handlers` in `CswContext`.
 
-Components can be created in @ref:[standalone or container](../../commons/multiple-components.md) mode. 
-When an HCD or assembly is @ref:[created](../../framework/creating-components.md), depending on the mode,
+A component may be created in @ref:[standalone or container](../../commons/multiple-components.md) mode. In standlone mode, the component
+is created in its own JVM process. In container mode, multiple components may be started together within the same JVM process. 
+When an HCD or Assembly is @ref:[created](../../framework/creating-components.md), depending on the mode,
 either the @github[ContainerBehaviorFactory](/csw-framework/src/main/scala/csw/framework/internal/container/ContainerBehaviorFactory.scala) or the 
 @github[SupervisorBehaviorFactory](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehaviorFactory.scala) class is used to
-create the initial actor behavior. 
+create the initial TLA behavior. 
 
-In container mode, a supervisor actor is created for each component and a single @github[container actor](/csw-framework/src/main/scala/csw/framework/internal/container/ContainerBehavior.scala)
-accepts control messages for the container (subtypes of `ContainerActorMessage`).
+In container mode, a Supervisor actor is created for each component and a single @github[container actor](/csw-framework/src/main/scala/csw/framework/internal/container/ContainerBehavior.scala)
+accepts control messages for the container (subtypes of `ContainerActorMessage`). These container messages can be used to manage the lifecycle of the
+components in the container. 
 
-### ActorSystem for component
+### ActorSystem for the Component
 
-While creating a component, a new ActorSystem is spawned, which means if there are more than one components running in single jvm process there will
-be more than one ActorSystems created in single jvm. Having different ActorSystems in an application is not recommended by [akka](https://doc.akka.io/docs/akka/current/general/actor-systems.html)
-but it is still kept multiple per jvm so that any delay in executing a component does not affect execution of other components running in same
-jvm. The code base for creating an ActorSystem for each component is written in @github[SupervisorInfoFactory](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorInfoFactory.scala#L35).
+While creating a component a new ActorSystem is spawned, which means if there are more than one components running in single JVM process there will
+be more than one ActorSystem created in the single JVM. Having different ActorSystems in an application is not recommended by [akka](https://doc.akka.io/docs/akka/current/general/actor-systems.html)
+but it is still kept multiple per JVM so that any delay in executing in one component does not affect the execution of other components running in the same
+JVM. The code base for creating an ActorSystem for each component is written in @github[SupervisorInfoFactory](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorInfoFactory.scala#L35).
 
-## Discovering other components
+## Discovering Other Components
 
-For discovering other components, there are two ways:
+Sometimes one component needs to discover other components. For discovering other components, there are two ways:
 
- - provide tracking information in configuration file as explained @ref[here](../../commons/multiple-components.md#tracking-dependencies). Whenever
+ - provide tracking information in the Component Info File as explained @ref[here](../../commons/multiple-components.md#tracking-dependencies). Whenever
  there is location update of tracked components @ref[onLocationTrackingEvent](../../commons/multiple-components.md#onlocationtrackingevent-handler) handler
- is called. 
+ is called in the TLA. 
 
-- track using @ref[trackConnection](../../commons/multiple-components.md#trackconnection) handler. 
+- track using @ref[trackConnection](../../commons/multiple-components.md#trackconnection) method that is available in the TLA. This allows tracking to start
+at runtime based on activities of the component.
 
-## Receiving messages from external world
+## Receiving Messages from Outside the Component
 
-Messages aimed for component is first received by Supervisor and it decides which messages to be passed to downstream actors( i.e. Top level actor, 
-Command Response manager actor or Pub-Sub manager actor)
+Messages sent to the component are first received and handled by Supervisor. It decides which messages should be passed to downstream actors (i.e. Top Level Actor, 
+Command Response Manager actor or Pub-Sub Manager actor).
 
 ### Restart
 
-The code base for restart can be found @github[here](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala#L242).
-The explanation about `Restart` state can be found @ref[here](../../commons/create-component.md#restart).
+An external administrative message to the Supervisor can cause the component to restart.
+An explanation of the `Restart` state and subsequent actions can be found @ref[here](../../commons/create-component.md#restart).
+The code base that implements restart can be found @github[here](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala#L242).
 
 ![restart](media/restart.png)
 
 ### Shutdown
 
-The code base for shutdown can be found @github[here](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala#L247).
-The explanation about `Shutdown` state can be found @ref[here](../../commons/create-component.md#shutdown).
+An external administrative command to the Supervisor can cause the component to shutdown and exit.
+The explanation about `Shutdown` state and subsequent actions can be found @ref[here](../../commons/create-component.md#shutdown).
+The code base that implements shutdown can be found @github[here](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala#L247).
 
 ![shutdown](media/shutdown.png)
 
 ### Changing log level
 
-Messages to change log level (via `SetComponentLogLevel`) or get log metadata for a component (via `GetComponentLogMetadata`) gets handled by Supervisor.
-the code base for the same can be found @github[here](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala#L118). 
+An external messages to change the component's log level (via `SetComponentLogLevel`) or get log metadata for a component (via `GetComponentLogMetadata`) gets handled by Supervisor.
+The code base implements this message can be found @github[here](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala#L118). 
 
 ### Lock
 
-The code base for Lock can be found @github[here](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala#L205).
-The explanation about `Lock` state can be found @ref[here](../../commons/create-component.md#lock).
+An external client component can restrict messages and allow only messages from itself using the `lock` command. 
+An explanation of the `Lock` state can be found @ref[here](../../commons/create-component.md#lock). 
+The code base that implements Lock can be found @github[here](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala#L205).
 
 ![lock](media/lock.png)
 
-## Sending commands
+## Sending Commands from the Component
 
-The types of commands that can be sent and it's creation can be found @ref[here](../../commons/create-component.md#receiving-commands). In order to send
+The types of commands that can be sent by a component are discussed @ref[here](../../commons/create-component.md#receiving-commands). In order to send
 commands to other components, a @github[CommandService](/csw-command/csw-command-api/src/main/scala/csw/command/api/scaladsl/CommandService.scala) helper
-is needed. `CommandService` helper is used to send commands to other components, in the form of method calling instead of sending messages to bare component
-supervisor actor. The creation of CommandService can be found @ref[here](../../commons/multiple-components.md#sending-commands).
+is needed. `CommandService` helper is used to send commands to a component in the form of methods instead of sending messages directly to a component's
+Supervisor actor. The creation of a CommandService instance can be found @ref[here](../../commons/multiple-components.md#sending-commands).
 
 The operations allowed through `CommandService` helper are as follows:
 
@@ -164,58 +171,62 @@ The operations allowed through `CommandService` helper are as follows:
 - @github[queryFinal](/csw-command/csw-command-client/src/main/scala/csw/command/client/internal/CommandServiceImpl.scala#L104)
 - @github[subscribeCurrentState](/csw-command/csw-command-client/src/main/scala/csw/command/client/internal/CommandServiceImpl.scala#L107)
  
-## Receiving responses from components
+## Receiving Responses from Components
 
 ### Submit
 
-To know the flow of Submit please refer this @ref[section](../../commons/command.md#the-submit-message). 
+To understand the flow of the Submit command please refer to this @ref[section](../../commons/command.md#the-submit-message). 
 
 ![submit](media/submit.png)
 
 ### Oneway
 
-To know the flow of Oneway please refer this @ref[section](../../commons/command.md#the-oneway-message).
+To understand the flow of Oneway please refer to this @ref[section](../../commons/command.md#the-oneway-message).
  
 ![oneway](media/oneway.png)
 
 ### Validate
 
-To know the flow about Validate please refer this @ref[section](../../commons/command.md#the-validate-message) and the code base for the same can be
-referred @github[here](/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala#L154).
+To understand the flow of the Validate command please refer to this @ref[section](../../commons/command.md#the-validate-message) and the code base for the implementation can be
+found @github[here](/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala#L154).
 
 ### Command Response Manager
 
-Once a `Submit` command is received by a component for e.g. an assembly receives submit command, then the assembly can choose to send one or more
-commands to HCD(s) as part of the submit command's execution. Once, all the response(s) are received from downstream HCD(s), assembly need to complete
+Upon receiving a `Submit` command by a component (for example an Assembly receives a Submit command), the component can choose to send one or more
+commands to HCD(s) as part of the Submit command's execution. Once, all the response(s) are received from downstream HCD(s), the Assembly needs to complete
 the `Submit` as either `Completed` or `Error`. The @github[CommandResponseManager](/csw-command/csw-command-client/src/main/scala/csw/command/client/CommandResponseManagerActor.scala)
-provides different mechanisms to mark `Submit` command with final state.
+provides different mechanisms to assist in generating the original `Submit` command's final state.
 
 ![crm](media/crm.png)
 
 The Assembly worker can communicate with `CommandResponseManagerActor` using @github[CommandResponseManager](csw-command/csw-command-client/src/main/scala/csw/command/client/CommandResponseManager.scala)
 coming via @github[CswContext](/csw-framework/src/main/scala/csw/framework/models/CswContext.scala#L43).
 
-### Current State Pub/Sub
+### Current State Pub/Sub Functionality
 
-For `Oneway` commands it's responses are not sent back to sender as it is done for `Submit`. So, in order to track the status of oneway command `CurrentState` published by
-receiver component should be watched. The receiver component can use @github[CurrentStatePublisher](/csw-framework/src/main/scala/csw/framework/models/CswContext.scala#L42)
-to publish it's state from `CswContext` and the sender component can track state using @github[subscribeCurrentState](/csw-command/csw-command-client/src/main/scala/csw/command/client/internal/CommandServiceImpl.scala#L107)
+The framework provides a way, based only on Akka, for one component to subscribe to `CurrentState` events provided in another component.
+This can be used by an HCD to keep an Assembly up to date on its internal state asynchronously outside of commands. This can also be coupled with the use of 
+`Oneway` commands that do not provide completion responses to the sender as is done for `Submit`. 
+The provider of CurrentState can use @github[CurrentStatePublisher](/csw-framework/src/main/scala/csw/framework/models/CswContext.scala#L42)
+to publish its state from `CswContext` and the sender component can receive state using @github[subscribeCurrentState](/csw-command/csw-command-client/src/main/scala/csw/command/client/internal/CommandServiceImpl.scala#L107)
 from `CommandService`.
 
-## Deploying component in container or standalone mode
+The Current State Pub/Sub is implemented in @github[PubSubBehavior](/csw-framework/src/main/scala/csw/framework/internal/pubsub/PubSubBehavior.scala)
+
+## Deploying Component in Container or Standalone Mode
 
 Component(s) can start within a @ref[container](../../framework/deploying-components.md#container-for-deployment) or a single component can start as a
-@ref[standalone](../../framework/deploying-components.md#standalone-components). The code base for @github[Container](/csw-framework/src/main/scala/csw/framework/internal/container/ContainerBehavior.scala) 
-and @github[Standalone](/csw-framework/src/main/scala/csw/framework/internal/wiring/Standalone.scala). 
+@ref[standalone](../../framework/deploying-components.md#standalone-components). The code implementing deployment for Container is @github[here](/csw-framework/src/main/scala/csw/framework/internal/container/ContainerBehavior.scala) 
+and for Standalone @github[here](/csw-framework/src/main/scala/csw/framework/internal/wiring/Standalone.scala). 
 
-The name of the component info file can be passed as a command line argument to an application based on the 
+The name of the Component Information File can be passed as a command line argument to an application using the 
 @github[ContainerCmd](/csw-framework/src/main/scala/csw/framework/deploy/containercmd/ContainerCmd.scala)
 class to @ref:[deploy](../../framework/deploying-components.md) the component.
 
 In a production environment, it is planned that components will be started at boot time using a @ref:[HostConfig](../../apps/hostconfig.md) based
 application.
 
-Since Akka Typed is used throughout the TMT framework, there are seperate messages understood by Container, Supervisor, Top level actor and other actors
-of framework. The architecture/relations of messages can be found @github[here](/csw-command/csw-command-client/src/main/scala/csw/command/client/messages/MessagesArchitecture.scala). 
+Since Akka Typed is used throughout the TMT framework, there are seperate messages understood by Container, Supervisor, Top level Actor and other actors
+of the CSW framework. The architecture/relations of and between messages can be found @github[here](/csw-command/csw-command-client/src/main/scala/csw/command/client/messages/MessagesArchitecture.scala). 
 
 

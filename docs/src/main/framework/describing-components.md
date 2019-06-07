@@ -1,7 +1,7 @@
 # ComponentInfo
 
-`ComponentInfo` model describes a component by specifying following details
-It is usually described as a configuration file but can also be created programmatically.
+The `ComponentInfo` model describes a component by specifying several details
+It is usually described as a configuration file called the Component Info File but can also be created programmatically.
 
 AssemblyInfo
 :   @@@vars

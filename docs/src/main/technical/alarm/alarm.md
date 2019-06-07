@@ -2,10 +2,10 @@
 
 ## Introduction
 
-Alarm Service in TMT software is used by components to raise alarms. 
-Alarms could be of different severities such as Warning, Critical, etc. 
-The alarm system also provides mechanisms to monitor the health of all components 
-and subsystems in TMT.
+Alarm Service in TMT software is used by components to raise alarms. Alarms are used exclusively to notify the
+operator of conditions that require operator intervention.
+Each alarms includes a severity that must be one of the supported severities such as Warning, Critical, etc. 
+The Alarm Service also provides mechanisms to monitor the health of all components and subsystems in TMT.
 
 ## Technology
 
@@ -31,6 +31,8 @@ An alarm can have one of the following severities at a given time
 | `Disconnected`  | 4  |
 | `Critical`  |  5 |
 
+Severity can be for a single alarm or aggregated for a component or subsystem.
+
 ## Health
 
 Health is a higher level abstraction created on top of severities. One or more alarms can be combined to calculate
@@ -40,8 +42,9 @@ one of the following healths at a given time.
 - `Ill`
 - `Bad`
  
-Health is calculated based on severity. A mapping between health and 
-severities is shown in the figure below.
+Health is calculated based on severity. The current mapping between health and 
+severities is shown in the figure below. Health can be for aggregated for a component, subsystem, or the
+entire TMT system.
 
 ![alarm-health](alarm-health.png)
 
@@ -241,26 +244,28 @@ When an alarm is not auto-acknowledgeable, whenever it's severity changes to any
 When the alarm is auto-acknowledgeable, whenever it's severity changes to Okay, it's Acknowledgement Status becomes `acknowledged`.
 If it changes to anything else, Acknowledgement Status remains same.
 
-## API Structure
+## API and Implementation Structure
 
 ![api-structure](api-structure.png)
 
 The alarm functionality divided into two services @github[AlarmService](/csw-alarm/csw-alarm-api/src/main/scala/csw/alarm/api/scaladsl/AlarmService.scala)
 and @github[AlarmAdminService](/csw-alarm/csw-alarm-api/src/main/scala/csw/alarm/api/scaladsl/AlarmAdminService.scala)
 
-@github[AlarmService](/csw-alarm/csw-alarm-api/src/main/scala/csw/alarm/api/scaladsl/AlarmService.scala) is meant for "Components" who only get to set their current alarm severity and hence this service 
-only exposes one api i.e. `setSeverity`
+@github[AlarmService](/csw-alarm/csw-alarm-api/src/main/scala/csw/alarm/api/scaladsl/AlarmService.scala) is meant for "Components" that can only 
+set their current alarm severity and hence for components, Alarm Service only exposes one api i.e. `setSeverity`
 
 @github[AlarmAdminService](/csw-alarm/csw-alarm-api/src/main/scala/csw/alarm/api/scaladsl/AlarmAdminService.scala) is meant for admin 
-operations and is further divided into four internal modules.
+operations. 
+
+The Alarm Service implementation is further divided into four internal modules.
 
 **1. @github[SeverityServiceModule](/csw-alarm/csw-alarm-client/src/main/scala/csw/alarm/client/internal/services/SeverityServiceModule.scala)**
 
-`SeverityServiceModule` allows reading, subscribing and modifying severity of alarms and subsystems
+`SeverityServiceModule` allows reading, subscribing and modifying severity of alarms and subsystems.
 
 **2. @github[MetadataServiceModule](/csw-alarm/csw-alarm-client/src/main/scala/csw/alarm/client/internal/services/MetadataServiceModule.scala)**
 
-`MetadataServiceModule` allows read-only access to alarm metadata. Initialisation of alarms is also performed using this module
+`MetadataServiceModule` allows read-only access to alarm metadata. Initialisation of alarms is also performed using this module.
 
 **3. @github[StatusServiceModule](/csw-alarm/csw-alarm-client/src/main/scala/csw/alarm/client/internal/services/StatusServiceModule.scala)**
 
@@ -277,7 +282,7 @@ AlarmStatus is a logical entity which contains:
 
 **4. @github[HealthServiceModule](/csw-alarm/csw-alarm-client/src/main/scala/csw/alarm/client/internal/services/HealthServiceModule.scala)**
 
-`HealthServiceModule` allows reading and subscribing to alarm and subsystem healths
+`HealthServiceModule` allows reading and subscribing to alarm and subsystem healths.
 
 @@@note 
 
@@ -288,7 +293,7 @@ These modules are interdependent on each other and use [self-type](https://docs.
 ![class-diagram](class-diagram.png)
 
 `AlarmAdminService` is consumed from @github[alarm cli](/csw-alarm/csw-alarm-cli) and Alarm Server. This API is also used by administrative
-clients such as engineering user interfaces to set the active versions of files.
+clients such as the future Alarm Server.
 
 The API doc for Alarm Service can be found @scaladoc[here](csw/alarm/api/scaladsl/AlarmService) and @scaladoc[here](csw/alarm/api/scaladsl/AlarmAdminService).
 
@@ -310,7 +315,7 @@ ESW.HCMS. Its description and scope of work is subjected to change
 
 @@@
 
-For alarms to function, it is necessary that Redis instance is registered with Location Service.
+For alarms to function, it is necessary that the Alarm Service's Redis instance be registered with Location Service.
 Redis here is configured similar to other services in CSW.
 There is a master Redis instance and a slave Redis instance. They are configured in "replication" mode.
 There is a Sentinel instance who's responsibility it is to promote the slave as master when master goes down. It is important to note that when master
