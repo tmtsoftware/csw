@@ -7,10 +7,8 @@ All events have **EventInfo** and **ParameterSet**.
 
 @@@ note
 
-`csw-messages` library offers out of the box support to serialize Events using **Protobuf**, so that events can be produced and 
+`csw-params` library offers out of the box support to serialize Events using **Protobuf**, so that events can be produced and 
 consumed by JVM(Java virtual machine) as well as Non-JVM applications.
-
-For more on this [Protobuf support](events.html#protobuf) section below.
 
 @@@
 
@@ -87,30 +85,3 @@ Scala
 
 Java
 :   @@snip [JEventsTest.java](../../../../examples/src/test/java/example/messages/JEventsTest.java) { #unique-key }
-
-## Protobuf
-
-Protobuf aka Protocol buffers, are a language-neutral, platform-neutral extensible mechanism for serializing structured data. For more, visit [Protobuf home page](https://developers.google.com/protocol-buffers/)
-
-In TMT observatory, subsystems and components could be running on JVM(Java virtual machine) and Non-JVM platform. This leads to solving a non-trivial problem of a **Non-JVM component** wanting to consume an Event produced by a **JVM component**. Amongst the available options for **data over the wire**, Protobuf was chosen for its performance, data compression and official/unofficial support many mainstream languages.      
-
-`csw-messages` library enhances the Protobuf support, by providing out of the box helper methods, to convert events from/to protobuf binary data.
-
-@@@ note { title="Protobuf Code generation for Non-JVM languages" }
-
-The protobuf schema is defined in @github[csw_protobuf](/csw-messages/src/main/protobuf/csw_protobuf/) directory. The contained **.proto** files can be fed to a protoc compiler in the language of your choice and it will do the required code generation. 
-
-@@@
-
-Here are some examples:
-
-Scala
-:   @@snip [CommandsTest.scala](../../../../examples/src/test/scala/example/messages/EventsTest.scala) { #protobuf }
-
-Java
-:   @@snip [JEventsTest.java](../../../../examples/src/test/java/example/messages/JEventsTest.java) { #protobuf }
-
-# Source Code for Examples
-
-* @github[Scala Example](/examples/src/test/scala/example/messages/EventsTest.scala)
-* @github[Java Example](/examples/src/test/java/example/messages/JEventsTest.java)

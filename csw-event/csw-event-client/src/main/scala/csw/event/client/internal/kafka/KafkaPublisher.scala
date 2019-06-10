@@ -5,11 +5,9 @@ import akka.actor.Cancellable
 import akka.kafka.ProducerSettings
 import akka.stream.Materializer
 import akka.stream.scaladsl.Source
-import com.typesafe.config.ConfigFactory
 import csw.event.api.exceptions.PublishFailure
 import csw.event.api.scaladsl.EventPublisher
 import csw.event.client.internal.commons.EventPublisherUtil
-import csw.event.client.pb.TypeMapperSupport
 import csw.params.core.formats.EventCbor
 import csw.params.events.Event
 import csw.time.core.models.TMTTime
@@ -36,7 +34,6 @@ private[event] class KafkaPublisher(producerSettings: Future[ProducerSettings[St
   private val defaultInitialDelay: FiniteDuration = 0.millis
   private val kafkaProducer                       = producerSettings.map(_.createKafkaProducer())
   private val eventPublisherUtil                  = new EventPublisherUtil()
-  private val isProtobufOn                        = ConfigFactory.load().getBoolean("csw-event.protobuf-serialization")
 
   private val streamTermination: Future[Done] = eventPublisherUtil.streamTermination(publishInternal)
 
@@ -105,11 +102,8 @@ private[event] class KafkaPublisher(producerSettings: Future[ProducerSettings[St
     Done
   }
 
-  private def eventToProducerRecord(event: Event): ProducerRecord[String, Array[Byte]] = {
-    val bytes = if (isProtobufOn) TypeMapperSupport.eventTypeMapper.toBase(event).toByteArray else EventCbor.encode(event)
-    new ProducerRecord(event.eventKey.key, bytes)
-
-  }
+  private def eventToProducerRecord(event: Event): ProducerRecord[String, Array[Byte]] =
+    new ProducerRecord(event.eventKey.key, EventCbor.encode(event))
 
   // callback to be complete the future operation for publishing when the record has been acknowledged by the server
   private def completePromise(event: Event, promisedDone: Promise[Done]): Callback = {

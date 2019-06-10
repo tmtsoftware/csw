@@ -1,19 +1,15 @@
 package example.messages;
 
-import csw.params.events.EventName;
-import csw.params.events.ObserveEvent;
-import csw.params.events.SystemEvent;
-import csw.params.javadsl.JUnits;
 import csw.params.core.formats.JavaJsonSupport;
-import csw.params.javadsl.JKeyType;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.MatrixData;
 import csw.params.core.models.Prefix;
-import csw.params.core.models.RaDec;
-import csw.event.client.pb.PbConverter;
+import csw.params.events.EventName;
+import csw.params.events.ObserveEvent;
+import csw.params.events.SystemEvent;
+import csw.params.javadsl.JKeyType;
 import csw.time.core.models.UTCTime;
-import csw_protobuf.events.PbEvent;
 import org.junit.Assert;
 import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
@@ -21,7 +17,9 @@ import play.api.libs.json.JsValue;
 import play.api.libs.json.Json;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class JEventsTest extends JUnitSuite {
@@ -242,47 +240,5 @@ public class JEventsTest extends JUnitSuite {
         Assert.assertEquals(uniqueKeys1, Set.of(encoderKey.keyName(), filterKey.keyName()));
         Assert.assertEquals(uniqueKeys2, Set.of(encoderKey.keyName(), filterKey.keyName()));
         Assert.assertEquals(uniqueKeys3, Set.of(encoderKey.keyName(), filterKey.keyName(), miscKey.keyName()));
-    }
-
-    @Test
-    public void showUsageOfProtobuf() {
-        //#protobuf
-
-        //prefixes
-        Prefix prefix1 = new Prefix("tcs.pk");
-        EventName name1 = new EventName("targetCoords");
-        Prefix prefix2 = new Prefix("tcs.cm");
-        EventName name2 = new EventName("guiderCoords");
-
-        //Key
-        Key<RaDec> raDecKey = JKeyType.RaDecKey().make("raDecKey");
-
-        //values
-        RaDec raDec1 = new RaDec(10.20, 40.20);
-        RaDec raDec2 = new RaDec(11.20, 50.20);
-
-        //parameters
-        Parameter<RaDec> param = raDecKey.set(raDec1, raDec2).withUnits(JUnits.arcmin);
-
-        //events
-        ObserveEvent observeEvent = new ObserveEvent(prefix1, name1).add(param);
-        SystemEvent systemEvent1 = new SystemEvent(prefix1, name1).add(param);
-        SystemEvent systemEvent2 = new SystemEvent(prefix2, name2).add(param);
-
-        //convert events to protobuf bytestring
-        PbEvent byteArray2 = PbConverter.toPbEvent(observeEvent);
-        PbEvent byteArray3 = PbConverter.toPbEvent(systemEvent1);
-        PbEvent byteArray4 = PbConverter.toPbEvent(systemEvent2);
-
-        //convert protobuf bytestring to events
-        ObserveEvent pbObserveEvent = PbConverter.fromPbEvent(byteArray2);
-        SystemEvent pbSystemEvent1 =  PbConverter.fromPbEvent(byteArray3);
-        SystemEvent pbSystemEvent2 =  PbConverter.fromPbEvent(byteArray4);
-        //#protobuf
-
-        //validations
-        Assert.assertEquals(pbObserveEvent, observeEvent);
-        Assert.assertEquals(pbSystemEvent1, systemEvent1);
-        Assert.assertEquals(pbSystemEvent2, systemEvent2);
     }
 }

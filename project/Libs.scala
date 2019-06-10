@@ -29,8 +29,6 @@ object Libs {
 
   val `akka-http-play-json`      = "de.heikoseeberger"    %% "akka-http-play-json"      % "1.25.2" //Apache 2.0
   val `jwt-play-json`            = "com.pauldijou"        %% "jwt-play-json"            % "2.1.0"
-  val `scalapb-runtime`          = "com.thesamet.scalapb" %% "scalapb-runtime"          % scalapbVersion % "protobuf"
-  val `scalapb-json4s`           = "com.thesamet.scalapb" %% "scalapb-json4s"           % scalapbVersion
   val `lettuce`                  = "io.lettuce"           % "lettuce-core"              % "5.1.6.RELEASE"
   val `reactor-core`             = "io.projectreactor"    % "reactor-core"              % "3.2.9.RELEASE"
   val `reactive-streams`         = "org.reactivestreams"  % "reactive-streams"          % "1.0.2"

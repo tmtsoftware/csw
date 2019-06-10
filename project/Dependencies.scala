@@ -263,7 +263,6 @@ object Dependencies {
       Libs.`akka-stream-kafka`,
       Libs.`lettuce`,
       Libs.`reactor-core`,
-      Libs.`scalapb-runtime`,
       Akka.`akka-actor-testkit-typed` % Test,
       Akka.`akka-stream-testkit`      % Test,
       Libs.`scalatest`.value          % Test,

@@ -1,4 +1,3 @@
-addSbtPlugin("com.thesamet"                      % "sbt-protoc"                 % "0.99.20")
 addSbtPlugin("org.scalastyle"                    %% "scalastyle-sbt-plugin"     % "1.0.0")
 addSbtPlugin("org.scalameta"                     % "sbt-scalafmt"               % "2.0.0")
 addSbtPlugin("com.dwijnand"                      % "sbt-dynver"                 % "3.3.0")
