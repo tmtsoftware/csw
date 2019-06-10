@@ -55,9 +55,7 @@ private[event] object EventRomaineCodecs {
         byteBuffer.get(bytes)
         Cbor.decode(bytes).withConfig(DecodingConfig(readDoubleAlsoAsFloat = true)).to[Event].value
       } catch {
-        case NonFatal(ex) ⇒
-          ex.printStackTrace()
-          Event.badEvent()
+        case NonFatal(_) ⇒ Event.badEvent()
       }
     }
   }
