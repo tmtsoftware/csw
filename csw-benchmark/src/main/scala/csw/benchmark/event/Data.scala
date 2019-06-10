@@ -2,8 +2,8 @@ package csw.benchmark.event
 
 import java.time.Instant
 
-import csw.params.core.generics.{Key, KeyType, Parameter}
-import csw.params.core.models.{ArrayData, Choice, Choices, MatrixData, Prefix, RaDec, Struct}
+import csw.params.core.generics.{KeyType, Parameter}
+import csw.params.core.models._
 import csw.params.events.{EventName, SystemEvent}
 import csw.time.core.models.TAITime
 
