@@ -4,6 +4,7 @@ import play.api.libs.json.{Json, OFormat}
 
 /**
  * Contains
+ *
  * @param permissions
  */
 case class Authorization(permissions: Set[Permission] = Set.empty)

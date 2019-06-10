@@ -2,12 +2,11 @@ package csw.database.commons
 
 import java.nio.file.Paths
 
-import akka.actor.ActorSystem
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.ActorSystem
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
+import csw.commons.ResourceReader
 import csw.database.DatabaseServiceFactory
 import csw.database.DatabaseServiceFactory.{ReadPasswordHolder, ReadUsernameHolder}
-import csw.commons.ResourceReader
 import org.jooq.DSLContext
 import org.scalatest.concurrent.PatienceConfiguration.Interval
 import org.scalatest.concurrent.ScalaFutures.convertScalaFuture
@@ -23,10 +22,10 @@ object DBTestHelper {
       .setPort(port)
       .start
 
-  def dbServiceFactory(system: ActorSystem) =
-    new DatabaseServiceFactory(system.toTyped, Map(ReadUsernameHolder → "postgres", ReadPasswordHolder → "postgres"))
+  def dbServiceFactory(system: ActorSystem[_]) =
+    new DatabaseServiceFactory(system, Map(ReadUsernameHolder → "postgres", ReadPasswordHolder → "postgres"))
 
-  def dslContext(system: ActorSystem, port: Int): DSLContext =
+  def dslContext(system: ActorSystem[_], port: Int): DSLContext =
     dbServiceFactory(system)
       .makeDsl(port)
       .futureValue(Interval(Span(5, Seconds)))

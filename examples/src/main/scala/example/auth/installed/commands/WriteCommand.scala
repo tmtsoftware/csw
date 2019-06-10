@@ -1,7 +1,7 @@
 package example.auth.installed.commands
 
+import akka.actor.typed
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.{typed, ActorSystem}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import csw.aas.installed.api.InstalledAppAuthAdapter

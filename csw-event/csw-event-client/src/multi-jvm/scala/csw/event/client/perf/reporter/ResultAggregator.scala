@@ -84,6 +84,8 @@ class ResultAggregator(
 
 }
 
-case class AggregatedResult(latencyPlots: LatencyPlots,
-                            throughputPlots: ThroughputPlots,
-                            initialLatencyPlots: InitialLatencyPlots)
+case class AggregatedResult(
+    latencyPlots: LatencyPlots,
+    throughputPlots: ThroughputPlots,
+    initialLatencyPlots: InitialLatencyPlots
+)

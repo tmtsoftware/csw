@@ -3,15 +3,15 @@ package csw.time.scheduler.internal
 import java.time.Duration
 import java.util.concurrent.TimeUnit.NANOSECONDS
 
-import akka.actor.{ActorRef, ActorSystem, Scheduler}
+import akka.actor.{ActorRef, Scheduler, typed}
 import csw.time.core.models.TMTTime
 import csw.time.scheduler.api.{Cancellable, TimeServiceScheduler}
 import csw.time.scheduler.internal.extensions.RichCancellableExt.RichCancellable
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
-private[time] class TimeServiceSchedulerImpl(implicit actorSystem: ActorSystem) extends TimeServiceScheduler {
-  import actorSystem.dispatcher
+private[time] class TimeServiceSchedulerImpl(implicit actorSystem: typed.ActorSystem[_]) extends TimeServiceScheduler {
+  import actorSystem.executionContext
 
   private val scheduler: Scheduler = actorSystem.scheduler
 

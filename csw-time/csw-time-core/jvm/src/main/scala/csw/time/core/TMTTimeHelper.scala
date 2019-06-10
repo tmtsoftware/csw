@@ -14,7 +14,7 @@ object TMTTimeHelper {
    *
    * @param zoneId id of the required zone
    * @return time at the given zone
-   */
+   **/
   def atZone(tmtTime: TMTTime, zoneId: ZoneId): ZonedDateTime = tmtTime.value.atZone(zoneId)
 
   /**

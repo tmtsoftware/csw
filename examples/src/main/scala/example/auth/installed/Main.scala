@@ -1,7 +1,7 @@
 package example.auth.installed
 
+import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.{typed, ActorSystem}
 import csw.aas.installed.api.InstalledAppAuthAdapter
 import csw.location.client.utils.LocationServerStatus
 import example.auth.installed.commands.{AppCommand, CommandFactory}
@@ -11,7 +11,7 @@ object Main extends App {
 
   LocationServerStatus.requireUpLocally()
 
-  implicit val actorSystem: typed.ActorSystem[_] = typed.ActorSystem(Behaviors.empty, "example-system")
+  implicit val actorSystem: ActorSystem[_] = ActorSystem(Behaviors.empty, "example-system")
 
   val adapter: InstalledAppAuthAdapter = AdapterFactory.makeAdapter
 

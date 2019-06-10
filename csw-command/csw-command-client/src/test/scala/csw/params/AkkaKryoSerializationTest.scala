@@ -3,8 +3,9 @@ package csw.params
 import java.nio.file.Files
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.{typed, ActorSystem}
+import akka.actor.typed
+import akka.actor.typed.Behavior
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.serialization.SerializationExtension
 import com.twitter.chill.akka.AkkaSerializer
 import csw.command.client.messages.ComponentCommonMessage.{
@@ -20,13 +21,14 @@ import csw.command.client.models.framework.LocationServiceUsage.DoNotRegister
 import csw.command.client.models.framework.PubSub.Subscribe
 import csw.command.client.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.command.client.models.framework._
+import csw.commons.ResourceReader
 import csw.location.api.models.ComponentType.HCD
 import csw.location.api.models.Connection
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandIssue, _}
 import csw.params.core.generics.KeyType.{ByteArrayKey, ChoiceKey, DoubleMatrixKey, IntKey, StructKey}
 import csw.params.core.generics.{Key, KeyType, Parameter}
-import csw.params.core.models.Units.{arcmin, coulomb, encoder, joule, lightyear, meter, pascal, NoUnits}
+import csw.params.core.models.Units.{NoUnits, arcmin, coulomb, encoder, joule, lightyear, meter, pascal}
 import csw.params.core.models._
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.params.events.{EventName, ObserveEvent, SystemEvent}
@@ -34,18 +36,20 @@ import csw.time.core.models.UTCTime
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.prop.Tables.Table
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
-import csw.commons.ResourceReader
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
 // DEOPSCSW-187: Efficient serialization to/from binary
 class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfterAll {
-  private final val system        = ActorSystem("example")
-  private final val serialization = SerializationExtension(system)
+  private final val system        = typed.ActorSystem(Behavior.empty, "example")
+  private final val serialization = SerializationExtension(system.toUntyped)
   private final val prefix        = Prefix("wfos.prog.cloudcover")
 
-  override protected def afterAll(): Unit = Await.result(system.terminate(), 2.seconds)
+  override protected def afterAll(): Unit = {
+    system.terminate()
+    Await.result(system.whenTerminated, 2.seconds)
+  }
 
   describe("Test akka serialization of Commands") {
 
@@ -182,7 +186,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
   }
 
   describe("csw messages") {
-    implicit val typedSystem: typed.ActorSystem[Nothing] = system.toTyped
+    implicit val typedSystem: typed.ActorSystem[_] = system
 
     it("should serialize ToComponentLifecycle messages") {
       serialization.findSerializerFor(GoOffline).getClass shouldBe classOf[AkkaSerializer]

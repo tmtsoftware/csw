@@ -28,14 +28,15 @@ public class JTimeServiceSchedulerTest extends JUnitSuite {
     @Rule
     public TestKitJunitResource testKit = new TestKitJunitResource(ManualTime.config());
 
-    private ActorSystem untypedSystem = ActorSystemAdapter.toUntyped(testKit.system());
     private ManualTime manualTime = ManualTime.get(testKit.system());
 
-    private TimeServiceScheduler timeServiceScheduler = TimeServiceSchedulerFactory.make(untypedSystem);
+    private TimeServiceScheduler timeServiceScheduler = TimeServiceSchedulerFactory.make(testKit.system());
+
+    private ActorSystem untypedSystem = ActorSystemAdapter.toUntyped(testKit.system());
     private TestKit untypedTestKit = new TestKit(untypedSystem);
 
     @BeforeClass
-    public static void setup(){
+    public static void setup() {
         TMTClock$.MODULE$.clock().setTaiOffset(37);
     }
 
@@ -136,7 +137,7 @@ public class JTimeServiceSchedulerTest extends JUnitSuite {
 
     //DEOPSCSW-547: Cancel scheduled timers for single scheduled tasks
     @Test
-    public void should_cancel_single_scheduled_task(){
+    public void should_cancel_single_scheduled_task() {
         TestProbe testProbe = new TestProbe(untypedSystem);
         String probeMsg = "some message";
         TAITime idealScheduleTime = new TAITime(TAITime.now().value().plusSeconds(1));

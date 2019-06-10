@@ -7,6 +7,7 @@ import play.api.libs.json._
 /**
  * Represents JSON Web Token (JWT) for TMT.
  * JWTs part of OpenID Connect specification
+ *
  * @param sub Subject (whom the token refers to)
  * @param iat Issued at (Seconds since UNIX epoch)
  * @param exp Expiration Time (Seconds since UNIX epoch)
@@ -59,6 +60,7 @@ case class AccessToken(
 
   /**
    * Checks whether this access token has given permission or not
+   *
    * @param scope scope name
    * @param resource resource name
    */
@@ -71,6 +73,7 @@ case class AccessToken(
 
   /**
    * Checks whether this access token has client role (client specific role) or not
+   *
    * @param role role name
    * @param clientName client name
    */
@@ -83,6 +86,7 @@ case class AccessToken(
 
   /**
    * Checks whether this access token has realm role or not
+   *
    * @param role role name
    */
   def hasRealmRole(role: String): Boolean = {

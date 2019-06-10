@@ -343,12 +343,6 @@ lazy val `csw-event-client` = project
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.EventClient.value)
-  .settings(
-    PB.targets in Compile := Seq(
-      scalapb.gen() -> (sourceManaged in Compile).value
-    ),
-    PB.protocVersion := "-v371"
-  )
 
 lazy val `csw-event-cli` = project
   .in(file("csw-event/csw-event-cli"))

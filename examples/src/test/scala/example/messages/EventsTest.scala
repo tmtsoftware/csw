@@ -2,15 +2,12 @@ package example.messages
 
 import java.time.Instant
 
-import csw.params.events._
 import csw.params.core.formats.JsonSupport
-import csw.params.core.generics.KeyType.{DoubleMatrixKey, RaDecKey}
+import csw.params.core.generics.KeyType.DoubleMatrixKey
 import csw.params.core.generics.{Key, KeyType, Parameter}
-import csw.params.core.models.Units.arcmin
 import csw.params.core.models._
-import csw.event.client.pb.PbConverter
+import csw.params.events._
 import csw.time.core.models.UTCTime
-import csw_protobuf.events.PbEvent
 import org.scalatest.{FunSpec, Matchers}
 
 class EventsTest extends FunSpec with Matchers {
@@ -254,45 +251,6 @@ class EventsTest extends FunSpec with Matchers {
       uniqueKeys1 should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
       uniqueKeys2 should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
       uniqueKeys3 should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName, miscKey.keyName)
-    }
-  }
-
-  describe("Examples of protobuf") {
-    it("should show usage of converting events to/from protobuf") {
-      //#protobuf
-      //Key
-      val raDecKey = RaDecKey.make("raDecKey")
-
-      //values
-      val raDec1 = RaDec(10.20, 40.20)
-      val raDec2 = RaDec(11.20, 50.20)
-
-      //parameters
-      val param = raDecKey.set(raDec1, raDec2).withUnits(arcmin)
-
-      val prefix = Prefix("tcs.pk")
-      val name   = EventName("targetCoords")
-      //events
-      val observeEvent: ObserveEvent = ObserveEvent(prefix, name).add(param)
-      val systemEvent1: SystemEvent  = SystemEvent(prefix, name).add(param)
-      val systemEvent2: SystemEvent =
-        SystemEvent(prefix, name).add(param)
-
-      //convert events to protobuf bytestring
-      val byteArray2: PbEvent = PbConverter.toPbEvent(observeEvent)
-      val byteArray3: PbEvent = PbConverter.toPbEvent(systemEvent1)
-      val byteArray4: PbEvent = PbConverter.toPbEvent(systemEvent2)
-
-      //convert protobuf bytestring to events
-      val pbObserveEvent: ObserveEvent = PbConverter.fromPbEvent(byteArray2)
-      val pbSystemEvent1: SystemEvent  = PbConverter.fromPbEvent(byteArray3)
-      val pbSystemEvent2: SystemEvent  = PbConverter.fromPbEvent(byteArray4)
-      //#protobuf
-
-      //validations
-      assert(pbObserveEvent === observeEvent)
-      assert(pbSystemEvent1 === systemEvent1)
-      assert(pbSystemEvent2 === systemEvent2)
     }
   }
 }

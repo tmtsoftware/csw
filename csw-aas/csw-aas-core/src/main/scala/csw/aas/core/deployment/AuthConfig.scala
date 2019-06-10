@@ -12,6 +12,7 @@ import scala.util.Try
 
 /**
  * Represents Authorization configuration
+ *
  * @param config application config
  * @param authServiceLocation if authServiceLocation is provided, it will use it,
  *                            otherwise it will rely on config for auth-service-url
@@ -30,6 +31,7 @@ class AuthConfig private (config: Config, authServiceLocation: Option[HttpLocati
    * Creates an instance of KeycloakDeployment using app config.
    * If authServiceLocation has a value, it will use it,
    * otherwise it will rely on config for auth-service-url
+   *
    * @return
    */
   private[csw] def getDeployment: KeycloakDeployment =
@@ -71,6 +73,7 @@ object AuthConfig {
 
   /**
    * Creates an instance of [[csw.aas.core.deployment.AuthConfig]]
+   *
    * @param config application config. If not provided, it will load the config automatically
    * @param authServerLocation if authServerLocation is provided, it will use it,
    *                            otherwise it will rely on config for auth-service-url

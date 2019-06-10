@@ -1,7 +1,7 @@
 # Creating an Assembly or Hcd Component
 
-An Assembly or HCD is implemented by extending the `ComponentHandlers` base class. These handlers are executed by an Akka Actor (Top Level Actor or TLA)
-defined in the framework which handles the lifecycle and supervision of this component.
+An Assembly or HCD is implemented by extending the `ComponentHandlers` abstract class. These handlers are executed by an Akka Actor (Top Level Actor or TLA)
+defined in the framework which handles the lifecycle and supervision of each component.
 
 Assembly/Scala
 :   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/assembly/AssemblyComponentHandlers.scala) { #component-handlers-class }

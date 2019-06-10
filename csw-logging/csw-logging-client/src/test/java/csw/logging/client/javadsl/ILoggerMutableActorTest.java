@@ -1,9 +1,9 @@
 package csw.logging.client.javadsl;
 
-import akka.actor.typed.ActorSystem;
 import akka.actor.typed.ActorRef;
+import akka.actor.typed.ActorSystem;
 import akka.actor.typed.Props;
-import akka.actor.typed.javadsl.Adapter;
+import akka.actor.typed.SpawnProtocol;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -28,8 +28,7 @@ import static csw.logging.client.utils.Eventually.eventually;
 
 // DEOPSCSW-280 SPIKE: Introduce Akkatyped in logging
 public class ILoggerMutableActorTest extends JUnitSuite {
-    protected static akka.actor.ActorSystem actorSystem = akka.actor.ActorSystem.create("base-system");
-    protected static ActorSystem typedSystem = Adapter.toTyped(actorSystem);
+    protected static ActorSystem<SpawnProtocol> actorSystem = ActorSystem.create(SpawnProtocol.behavior(), "base-system");
     protected static LoggingSystem loggingSystem;
 
     protected static List<JsonObject> logBuffer = new ArrayList<>();
@@ -39,7 +38,7 @@ public class ILoggerMutableActorTest extends JUnitSuite {
         return gson.fromJson(json, JsonElement.class).getAsJsonObject();
     }
 
-    protected static TestAppender testAppender     = new TestAppender(x -> {
+    protected static TestAppender testAppender = new TestAppender(x -> {
         logBuffer.add(parse(x.toString()));
         return null;
     });
@@ -47,7 +46,7 @@ public class ILoggerMutableActorTest extends JUnitSuite {
 
     @BeforeClass
     public static void setup() {
-        loggingSystem = JLoggingSystemFactory.start("Logger-Test", "SNAPSHOT-1.0", "localhost", typedSystem, appenderBuilders);
+        loggingSystem = JLoggingSystemFactory.start("Logger-Test", "SNAPSHOT-1.0", "localhost", actorSystem, appenderBuilders);
     }
 
     @After
@@ -61,12 +60,13 @@ public class ILoggerMutableActorTest extends JUnitSuite {
         actorSystem.terminate();
         Await.result(actorSystem.whenTerminated(), Duration.create(10, TimeUnit.SECONDS));
     }
+
     @Test
     public void testDefaultLogConfigurationForActor() {
 
         ActorRef<LogCommand> irisTyped =
                 AkkaTypedExtension
-                        .UserActorFactory(typedSystem)
+                        .UserActorFactory(actorSystem)
                         .spawn(
                                 JIrisSupervisorMutableActor.irisBeh("jIRISTyped"),
                                 "irisTyped",

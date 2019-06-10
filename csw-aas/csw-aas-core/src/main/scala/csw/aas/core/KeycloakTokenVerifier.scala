@@ -9,6 +9,7 @@ private[aas] class KeycloakTokenVerifier {
 
   /**
    * Verifies given access token string using keycloak library.
+   *
    * @param token access token string
    * @return Verified keycloak access token
    */

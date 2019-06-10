@@ -69,7 +69,7 @@ private[location] object Registry {
    *
    * @note service has key as LWWRegisterKey[Option[Location]] as it represents the type of value that LWWRegister will hold
    *       but the value of LWWRegisterKey will still be connection-name
-   */
+   **/
   class Service(connection: Connection)(implicit node: SelfUniqueAddress)
       extends Registry[LWWRegisterKey[Option[Location]], LWWRegister[Option[Location]]](
         Key = LWWRegisterKey(connection.name),

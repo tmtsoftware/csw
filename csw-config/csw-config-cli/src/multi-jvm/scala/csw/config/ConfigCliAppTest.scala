@@ -2,9 +2,8 @@ package csw.config
 
 import java.nio.file.{Files, Paths}
 
-import akka.actor.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.stream.ActorMaterializer
+import akka.stream.typed.scaladsl.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import csw.aas.installed.api.InstalledAppAuthAdapter
 import csw.commons.ResourceReader
@@ -68,7 +67,6 @@ class ConfigCliAppTest(ignore: Int)
     // config client command line app is exercised on client1
     runOn(client1) {
       enterBarrier("server-started")
-      implicit val system: ActorSystem    = ActorSystem()
       implicit val mat: ActorMaterializer = ActorMaterializer()
 
       def cliApp() = Wiring.noPrinting(HttpLocationServiceFactory.makeLocalClient, factory, nativeAuthAdapter).cliApp

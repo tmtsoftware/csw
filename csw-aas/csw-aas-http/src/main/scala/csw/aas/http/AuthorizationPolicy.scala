@@ -14,6 +14,7 @@ sealed trait AuthorizationPolicy {
   /**
    * Applies a new authorization policy in combination with previous policy.
    * Passing of both policies is requried for authorization to succeed.
+   *
    * @param authorizationPolicy new Authorization policy
    * @return combined authorization policy
    */
@@ -24,6 +25,7 @@ sealed trait AuthorizationPolicy {
   /**
    * Applies a new authorization policy if the previous policy fails.
    * Authorization will succeed if any of the provided policy passes.
+   *
    * @param authorizationPolicy new Authorization policy
    * @return combined authorization policy
    */
@@ -55,6 +57,7 @@ object AuthorizationPolicy {
 
   /**
    * This policy filters requests based on client specific roles
+   *
    * @param name Name of role
    */
   final case class ClientRolePolicy(name: String) extends AuthorizationPolicy
@@ -63,12 +66,14 @@ object AuthorizationPolicy {
    * This policy filters requests based on Realm Role.
    *
    * A Realm Role is global role within a realm and is applicable for all clients within realm.
+   *
    * @param name Name of role
    */
   final case class RealmRolePolicy(name: String) extends AuthorizationPolicy
 
   /**
    * This policy filters requests based on permissions.
+   *
    * @param scope Name of scope
    * @param resource Name of resource for which permissions is applicable.
    */
@@ -76,12 +81,14 @@ object AuthorizationPolicy {
 
   /**
    * Allows custom request filtering based on access token properties.
+   *
    * @param predicate Filter
    */
   final case class CustomPolicy(predicate: AccessToken => Boolean) extends AuthorizationPolicy
 
   /**
    * Allows custom request filtering based on access token properties.
+   *
    * @param predicate Async filter
    */
   final case class CustomPolicyAsync(predicate: AccessToken => Future[Boolean]) extends AuthorizationPolicy

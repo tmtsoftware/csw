@@ -3,7 +3,9 @@ package csw.benchmark.params
 import java.nio.file.{Files, Path, Paths}
 import java.util.concurrent.TimeUnit
 
-import akka.actor.ActorSystem
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.serialization.{Serialization, SerializationExtension}
 import csw.params.commands.{CommandName, Observe}
 import csw.params.core.generics.KeyType.ByteArrayKey
@@ -36,7 +38,7 @@ class ImageSerializationBenchmark {
   private var img_128k_Bytes: Array[Byte]        = _
   private var img_512k_Path: Path                = _
   private var img_512k_Bytes: Array[Byte]        = _
-  private final var system: ActorSystem          = _
+  private final var system: ActorSystem[_]       = _
   private final var serialization: Serialization = _
   private final var prefixStr: String            = _
   private final var obsId: ObsId                 = _
@@ -53,15 +55,16 @@ class ImageSerializationBenchmark {
     img_512k_Path = Paths.get(getClass.getResource("/images/512k_image.bin").getPath)
     img_512k_Bytes = Files.readAllBytes(img_512k_Path)
 
-    system = ActorSystem("example")
-    serialization = SerializationExtension(system)
+    system = ActorSystem(Behaviors.empty, "example")
+    serialization = SerializationExtension(system.toUntyped)
     prefixStr = "wfos.prog.cloudcover"
     obsId = ObsId("Obs001")
   }
 
   @TearDown(Level.Trial)
   def teardown(): Unit = {
-    Await.result(system.terminate(), 5.seconds)
+    system.terminate
+    Await.result(system.whenTerminated, 5.seconds)
   }
 
   @Benchmark

@@ -146,6 +146,7 @@ object CommandResponse {
 
   /**
    * Tests a response to determine if it is a final command state
+   *
    * @param qr response for testing
    * @return true if it is final
    */
@@ -156,6 +157,7 @@ object CommandResponse {
 
   /**
    * Test a QueryResponse to determine if it is a positive response
+   *
    * @param qr response for testing
    * @return true if it is positive
    */
@@ -166,6 +168,7 @@ object CommandResponse {
 
   /**
    * Test a OnewayResponse to determine if it is a positive response
+   *
    * @param or a OnewayResponse for testing
    * @return true if positive, false otherwise
    */
@@ -176,6 +179,7 @@ object CommandResponse {
 
   /**
    * Tests a response to determine if it is a negative response
+   *
    * @param qr response for testing
    * @return true if it is negative
    */
@@ -183,6 +187,7 @@ object CommandResponse {
 
   /**
    * Tests a response to determine if it is an intermediate response
+   *
    * @param qr response for testing
    * @return returns true if it is intermediate
    */

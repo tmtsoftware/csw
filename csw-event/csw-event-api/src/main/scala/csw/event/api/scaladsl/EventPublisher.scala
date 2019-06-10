@@ -54,7 +54,6 @@ trait EventPublisher {
    * The provided callback is executed on the failed element and the stream resumes to publish remaining elements.
    *
    * @note Callbacks like `onError` are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
-   *
    * @param source  a [[akka.stream.scaladsl.Source]] of events to be published.
    *                Any resource cleanup or exception handling of the provided source is to be managed by the source provider
    * @param onError a callback to execute for each event for which publishing failed
@@ -73,7 +72,6 @@ trait EventPublisher {
    * which wraps the underlying exception. The generator resumes to publish remaining elements in case of this exception.
    *
    * @note Callbacks like `eventGenerator` are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
-   *
    * @param eventGenerator a function which can generate an event to be published at `every` frequency
    * @param every frequency with which the events are to be published
    * @return a handle to cancel the event generation through `eventGenerator`
@@ -91,7 +89,6 @@ trait EventPublisher {
    * which wraps the underlying exception. The generator resumes to publish remaining elements in case of this exception.
    *
    * @note Callbacks like `eventGenerator` are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
-
    * @param eventGenerator a function which can generate an event to be published at `every` frequency
    * @param startTime the time at which the `eventGenerator` should start generating events
    * @param every frequency with which the events are to be published
@@ -111,7 +108,6 @@ trait EventPublisher {
    *
    * @note Callbacks like `eventGenerator` and `onError` are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
    * Also note that any exception thrown from `onError` callback is expected to be handled by component developers.
-   *
    * @param eventGenerator a function which can generate an event to be published at `every` frequency
    * @param every frequency with which the events are to be published
    * @param onError a callback to execute for each event for which publishing failed
@@ -132,7 +128,6 @@ trait EventPublisher {
    *
    * @note Callbacks like `eventGenerator` and `onError` are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
    * Also note that any exception thrown from `onError` callback is expected to be handled by component developers.
-   *
    * @param eventGenerator a function which can generate an event to be published at `every` frequency
    * @param startTime the time at which the `eventGenerator` should start generating events
    * @param every frequency with which the events are to be published
@@ -156,7 +151,6 @@ trait EventPublisher {
    * which wraps the underlying exception and also provides the handle to the event which was failed to be published.
    *
    * @note Callbacks like `eventGenerator` are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
-   *
    * @param eventGenerator a function which can generate a Future of event to be published at `every` frequency
    * @param every frequency with which the events are to be published
    * @return a handle to cancel the event generation through `eventGenerator`
@@ -174,7 +168,6 @@ trait EventPublisher {
    * which wraps the underlying exception and also provides the handle to the event which was failed to be published.
    *
    * @note Callbacks like `eventGenerator` are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
-   *
    * @param eventGenerator a function which can generate a Future of event to be published at `every` frequency
    * @param startTime the time at which the `eventGenerator` should start generating events
    * @param every frequency with which the events are to be published
@@ -195,7 +188,6 @@ trait EventPublisher {
    *
    * @note Callbacks like `eventGenerator` and `onError` are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
    * Also note that any exception thrown from `onError` callback is expected to be handled by component developers.
-   *
    * @param eventGenerator a function which can generate a Future of event to be published at `every` frequency
    * @param every frequency with which the events are to be published
    * @param onError a callback to execute for each event for which publishing failed
@@ -217,7 +209,6 @@ trait EventPublisher {
    *
    * @note Callbacks like `eventGenerator` and `onError` are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
    * Also note that any exception thrown from `onError` callback is expected to be handled by component developers.
-   *
    * @param eventGenerator a function which can generate a Future of event to be published at `every` frequency
    * @param startTime the time at which the `eventGenerator` should start generating events
    * @param every frequency with which the events are to be published

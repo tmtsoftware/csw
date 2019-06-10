@@ -3,7 +3,6 @@ package csw.framework.internal.supervisor
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.command.client.messages.CommandMessage.Submit
 import csw.command.client.messages.ComponentCommonMessage.{
   ComponentStateSubscription,
@@ -23,6 +22,7 @@ import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.logging.api.models.LoggingLevels.ERROR
+import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse.SubmitResponse
@@ -227,7 +227,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     )
 
     // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
-    supervisorRef = untypedSystem.spawnAnonymous(supervisorBehavior)
+    supervisorRef = typedSystem.spawn(supervisorBehavior, "")
   }
 
   private def createComponentHandlers(testMocks: FrameworkTestMocks) = {

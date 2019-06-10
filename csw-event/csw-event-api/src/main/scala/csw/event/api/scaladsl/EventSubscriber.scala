@@ -63,7 +63,6 @@ trait EventSubscriber {
    * this state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
    * @note Callbacks are not thread-safe on the JVM. If you need to do side effects/mutations, prefer using `subscribeActorRef` API.
-   *
    * @param eventKeys a set of [[csw.params.events.EventKey]] to subscribe to
    * @param callback a function to execute asynchronously on each received event
    * @return an [[csw.event.api.scaladsl.EventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
@@ -102,7 +101,6 @@ trait EventSubscriber {
    *
    * @note Callbacks are not thread-safe on the JVM. If you need to do side effects/mutations, prefer using `subscribeActorRef` API.
    * Also note that any exception thrown from `callback` is expected to be handled by the component developers.
-   *
    * @param eventKeys a set of [[csw.params.events.EventKey]] to subscribe to
    * @param callback a function to execute on each received event
    * @return an [[csw.event.api.scaladsl.EventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
@@ -199,7 +197,6 @@ trait EventSubscriber {
    * state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
    * @note Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
-   *
    * @param subsystem a valid [[csw.params.core.models.Subsystem]] which represents the source of the events
    * @param pattern   Subscribes the client to the given patterns. Supported glob-style patterns:
    *- h?llo subscribes to hello, hallo and hxllo

@@ -27,6 +27,7 @@ object JLoggingSystemFactory {
    * The factory used to create the LoggingSystem. `LoggingSystem` should be started once in an app.
    *
    * Note that it is recommended to use this method only for testing
+   *
    * @return the instance of LoggingSystem
    */
   private[csw] def start(): LoggingSystem =

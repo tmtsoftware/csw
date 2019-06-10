@@ -10,6 +10,7 @@ import scala.concurrent.duration.FiniteDuration
  * an element is available downstream to match the required frequency
  * It drops the elements in case the elements are received at a rate higher than delay.
  * It pushes the recent element the in case the elements are received at a rate slower than delay.
+ *
  * @param delay the duration determining the frequency/rate of elements
  */
 private[event] class RateAdapterStage[A](delay: FiniteDuration) extends GraphStage[FlowShape[A, A]] {

@@ -124,7 +124,6 @@ trait LocationService {
    * Use this method if you do not want to handle materialization and happy with a side-effecting callback instead.
    *
    * @note Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
-   *
    * @param connection the `connection` that is to be tracked
    * @param callback the callback function of type `TrackingEvent` => Unit which gets executed on receiving any `TrackingEvent`
    * @return a killswitch which can be shutdown to unsubscribe the consumer

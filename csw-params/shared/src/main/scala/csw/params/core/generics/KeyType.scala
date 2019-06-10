@@ -2,7 +2,6 @@ package csw.params.core.generics
 
 import csw.params.core.formats.CborSupport._
 import csw.params.core.formats.{CborSupport, JsonSupport}
-import csw.params.core.models.Coords.{AltAzCoord, CometCoord, Coord, EqCoord, MinorPlanetCoord, SolarSystemCoord}
 import csw.params.core.models.Units.second
 import csw.params.core.models._
 import csw.time.core.models.{TAITime, UTCTime}
