@@ -2,15 +2,17 @@ package csw.event.client.internal.kafka
 
 import akka.Done
 import akka.actor.typed.ActorRef
-import akka.kafka.{scaladsl, ConsumerSettings, Subscription, Subscriptions}
-import akka.stream.{Materializer, StreamDetachedException}
+import akka.kafka.{ConsumerSettings, Subscription, Subscriptions, scaladsl}
 import akka.stream.scaladsl.{Keep, Sink, Source}
-import csw.params.events._
-import csw.params.core.models.Subsystem
-import csw.event.client.pb.PbConverter
+import akka.stream.{Materializer, StreamDetachedException}
+import com.typesafe.config.ConfigFactory
 import csw.event.api.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import csw.event.client.internal.commons.EventSubscriberUtil
+import csw.event.client.pb.PbConverter
 import csw.event.client.utils.Utils
+import csw.params.core.formats.EventCbor
+import csw.params.core.models.Subsystem
+import csw.params.events._
 import csw_protobuf.events.PbEvent
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.common.TopicPartition
@@ -36,6 +38,7 @@ private[event] class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[S
 
   private val consumer: Future[Consumer[String, Array[Byte]]] = consumerSettings.map(_.createKafkaConsumer())
   private val eventSubscriberUtil                             = new EventSubscriberUtil()
+  private val isProtobufOn                                    = ConfigFactory.load().getBoolean("csw-event.protobuf-serialization")
 
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
     val offsetsF = getLatestOffsets(eventKeys)
@@ -129,8 +132,12 @@ private[event] class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[S
   private def getEventStream(subscription: Future[Subscription]): Source[Event, Future[scaladsl.Consumer.Control]] = {
     val future = subscription.flatMap(s => consumerSettings.map(c => scaladsl.Consumer.plainSource(c, s)))
     Source.fromFutureSource(future).map { record ⇒
-      try PbConverter.fromPbEvent(PbEvent.parseFrom(record.value()))
-      catch { case NonFatal(_) ⇒ Event.badEvent() }
+      try {
+        val bytes = record.value()
+        if (isProtobufOn) {
+          PbConverter.fromPbEvent[Event](PbEvent.parseFrom(bytes))
+        } else EventCbor.decode[Event](bytes)
+      } catch { case NonFatal(_) ⇒ Event.badEvent() }
     }
   }
 
