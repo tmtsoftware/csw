@@ -5,7 +5,7 @@ import scalapb.compiler.Version.scalapbVersion
 
 object Libs {
   val ScalaVersion    = "2.12.8"
-  val silencerVersion = "1.3.3"
+  val silencerVersion = "1.4.1"
 
   val `scalatest` = dep("org.scalatest" %%% "scalatest" % "3.0.6") //Apache License 2.0
 
@@ -15,7 +15,7 @@ object Libs {
   val `junit`              = "junit" % "junit" % "4.12" //Eclipse Public License 1.0
   val `silencer-plugin`    = compilerPlugin("com.github.ghik" %% "silencer-plugin" % silencerVersion)
   val `silencer-lib`       = "com.github.ghik" %% "silencer-lib" % silencerVersion % Compile
-  val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.4.3"
+  val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.5.7"
   //MIT License
   val `embedded-keycloak`            = "com.github.tmtsoftware"        % "embedded-keycloak"             % "0.1.2" //Apache 2.0
   val `logback-classic`              = "ch.qos.logback"                % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
@@ -27,9 +27,9 @@ object Libs {
 
   val `play-json` = dep("com.typesafe.play" %%% "play-json" % "2.7.3") //Apache 2.0
 
-  val `akka-http-play-json`      = "de.heikoseeberger"    %% "akka-http-play-json"      % "1.25.2" //Apache 2.0
-  val `jwt-play-json`            = "com.pauldijou"        %% "jwt-play-json"            % "2.1.0"
-  val `lettuce`                  = "io.lettuce"           % "lettuce-core"              % "5.1.6.RELEASE"
+  val `akka-http-play-json`      = "de.heikoseeberger"    %% "akka-http-play-json"      % "1.26.0" //Apache 2.0
+  val `jwt-play-json`            = "com.pauldijou"        %% "jwt-play-json"            % "3.0.0"
+  val `lettuce`                  = "io.lettuce"           % "lettuce-core"              % "5.1.7.RELEASE"
   val `reactor-core`             = "io.projectreactor"    % "reactor-core"              % "3.2.9.RELEASE"
   val `reactive-streams`         = "org.reactivestreams"  % "reactive-streams"          % "1.0.2"
   val `akka-stream-kafka`        = "com.typesafe.akka"    %% "akka-stream-kafka"        % "0.22"
@@ -51,7 +51,7 @@ object Libs {
   val httpclient        = "org.apache.httpcomponents"     % "httpclient"      % "4.5.8"
   val `jboss-logging`   = "org.jboss.logging"             % "jboss-logging"   % "3.4.0.Final"
   val `config`          = "com.typesafe"                  % "config"          % "1.3.4"
-  val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.2.9"
+  val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.3.0"
   val `caffeine`        = "com.github.ben-manes.caffeine" % "caffeine"        % "2.7.0"
 
   val `borer-core`       = dep("io.bullet" %%% "borer-core"       % "0.9.0")

@@ -1,4 +1,5 @@
 import Libs._
+import com.timushev.sbt.updates.UpdatesPlugin.autoImport.dependencyUpdatesFilter
 import org.scalafmt.sbt.ScalafmtPlugin.autoImport.scalafmtOnCompile
 import sbt.Keys._
 import sbt.plugins.JvmPlugin
@@ -66,5 +67,6 @@ object Common extends AutoPlugin {
     cancelable in Global := true, // allow ongoing test(or any task) to cancel with ctrl + c and still remain inside sbt
     scalafmtOnCompile := true,
     unidocGenjavadocVersion := "0.13",
+    dependencyUpdatesFilter := dependencyUpdatesFilter.value - moduleFilter(organization = "org.scala-lang")
   )
 }
