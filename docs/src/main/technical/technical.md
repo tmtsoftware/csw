@@ -12,5 +12,6 @@
 * [Time Service](time/time.md)
 * [Database Service](database/database.md)
 * [Authentication and Authorization Service](aas/aas.md)
+* [CSW params](params/params.md)
 
 @@@

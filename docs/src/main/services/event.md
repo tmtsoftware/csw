@@ -2,7 +2,7 @@
 
 The Event Service implements the [publish/subscribe messaging paradigm](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) where 
 one component publishes an event and all components that have subscribed receive the event. In CSW, the events published are
-described under the messages documentation @ref:[here](./../messages/events.md).
+described under the messages documentation @ref:[here](./../params/events.md).
 One advantage of this type of message system and Event Service also is that publishers and subscribers are decoupled. 
 This decoupling of publishers and subscribers can allow for greater scalability and a more dynamic network topology.
 Publishers can publish regardless of whether there are subscribers, and subscribers can subscribe even if there are no publishers. 

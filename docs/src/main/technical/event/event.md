@@ -3,7 +3,7 @@
 ## Introduction
 
 Event Service is a [PubSub](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) service which allows publishing of and subscription to 
-CSW @ref:[Events](./../../messages/events.md) based on an Event Key, which is a combination of a component's Prefix and Event Name. 
+CSW @ref:[Events](./../../params/events.md) based on an Event Key, which is a combination of a component's Prefix and Event Name. 
 Event Service is optimized for the high performance requirements of events as demands with varying rates, for ex. 100 Hz, 50 Hz etc., but
 can also be used with events that are published infrequently or when values change.
 The end-to-end latency of events assured by Event Service is 5 milliseconds in typical observatory conditions. 

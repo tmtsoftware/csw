@@ -261,7 +261,7 @@ Various kinds of commands are as follows:
              by the ESW for the ESW PDR.
 -   Wait: Sequencer only.  Instructs a sequencer to pause until told to continue.
 
-More details about creating commands can be found @ref:[here](../messages/commands.md#setup-command).
+More details about creating commands can be found @ref:[here](../params/commands.md#setup-command).
 
 Whenever a command is sent to a component it is wrapped inside a command wrapper. There are two kinds of command wrapper:
 
@@ -370,7 +370,7 @@ which will enable messages to serialize on wire.
 CSW `Events` have a similar structure to commands, in that along with a name and a prefix (used to represent the source of
 the event), they include data represented in the `Event` in a set of parameters.  
 
-More details about events can be found @ref:[here](../messages/events.md).
+More details about events can be found @ref:[here](../params/events.md).
 
 Access to the Event Service is in the `CswContext` object passed in to the handlers class in the constructor.  The Event Service provides a factory method
 to create a "default" publisher and subscriber, which can be accessed in various parts of your code to reuse a single

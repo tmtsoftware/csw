@@ -6,7 +6,7 @@
  - [Working with Multiple Components](commons/multiple-components.md)
  - [Using Alarms](commons/using-alarms.md)
  - [Adding Unit Tests](commons/unit-tests.md)
- - [Messages](commons/messages.md)
+ - [Params](commons/params.md)
  - [Framework](commons/framework.md)
  - [Commands](commons/command.md)
  - [Logging Aggregator](commons/logging_aggregator.md)
