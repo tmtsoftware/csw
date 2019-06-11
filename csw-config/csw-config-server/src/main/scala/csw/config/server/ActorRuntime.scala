@@ -13,7 +13,6 @@ import akka.stream.typed.scaladsl.ActorMaterializer
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.network.utils.Networks
-import csw.services.BuildInfo
 
 import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.{ExecutionContextExecutor, Future}

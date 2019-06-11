@@ -1,6 +1,6 @@
 package csw.admin.server.cli
 
-import csw.services.BuildInfo
+import csw.admin.server.BuildInfo
 import scopt.OptionParser
 
 /**

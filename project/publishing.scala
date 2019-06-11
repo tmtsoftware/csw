@@ -88,6 +88,8 @@ object CswBuildInfo extends AutoPlugin {
 
   override def projectSettings: Seq[Setting[_]] = Seq(
     buildInfoKeys := Seq[BuildInfoKey](name, version),
-    buildInfoPackage := "csw.services"
+    // module name(e.g. csw-alarm-cli) gets converted into package name(e.g. csw.alarm.cli) for buildInfo, so it does not have
+    // same package across all modules in the repo
+    buildInfoPackage := name.value.replace('-', '.')
   )
 }

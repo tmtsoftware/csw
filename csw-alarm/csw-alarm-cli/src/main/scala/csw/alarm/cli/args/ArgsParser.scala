@@ -1,5 +1,5 @@
 package csw.alarm.cli.args
-import csw.services.BuildInfo
+import csw.alarm.cli.BuildInfo
 import scopt.OptionParser
 
 class ArgsParser(name: String) {

@@ -6,7 +6,6 @@ import csw.event.cli.args.{ArgsParser, Options}
 import csw.event.cli.commons.ApplicationFinishedReason
 import csw.event.cli.wiring.Wiring
 import csw.location.client.utils.LocationServerStatus
-import csw.services.BuildInfo
 
 // $COVERAGE-OFF$
 object Main extends App {

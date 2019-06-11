@@ -9,7 +9,6 @@ import csw.alarm.client.internal.commons.AlarmServiceConnection
 import csw.commons.redis.EmbeddedRedis
 import csw.location.api.models.TcpRegistration
 import csw.location.server.http.HTTPLocationService
-import csw.services.BuildInfo
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.SpanSugar.convertFloatToGrainOfTime
 import redis.embedded.{RedisSentinel, RedisServer}

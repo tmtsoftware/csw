@@ -2,7 +2,7 @@ package csw.framework.deploy.hostconfig.cli
 
 import java.nio.file.Paths
 
-import csw.services.BuildInfo
+import csw.framework.BuildInfo
 import scopt.OptionParser
 
 /**

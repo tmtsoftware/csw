@@ -5,7 +5,6 @@ import csw.alarm.cli.args.{ArgsParser, Options}
 import csw.alarm.cli.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
 import csw.alarm.cli.wiring.Wiring
 import csw.location.client.utils.LocationServerStatus
-import csw.services.BuildInfo
 
 // $COVERAGE-OFF$
 object Main extends App {

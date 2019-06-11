@@ -6,7 +6,6 @@ import csw.location.server.cli.{ArgsParser, Options}
 import csw.location.server.commons.ClusterAwareSettings
 import csw.location.server.commons.CoordinatedShutdownReasons.FailureReason
 import csw.location.server.internal.ServerWiring
-import csw.services.BuildInfo
 
 import scala.concurrent.duration.DurationDouble
 import scala.util.control.NonFatal

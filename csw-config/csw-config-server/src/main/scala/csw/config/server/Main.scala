@@ -7,7 +7,6 @@ import csw.config.server.commons.CoordinatedShutdownReasons.FailureReason
 import csw.config.server.http.HttpService
 import csw.location.client.utils.LocationServerStatus
 import csw.logging.api.scaladsl.Logger
-import csw.services.BuildInfo
 import org.tmatesoft.svn.core.SVNException
 
 import scala.concurrent.Await

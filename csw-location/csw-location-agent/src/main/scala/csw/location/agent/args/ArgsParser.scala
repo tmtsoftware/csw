@@ -2,7 +2,7 @@ package csw.location.agent.args
 
 import java.io.File
 
-import csw.services.BuildInfo
+import csw.location.agent.BuildInfo
 import scopt.OptionParser
 
 /**

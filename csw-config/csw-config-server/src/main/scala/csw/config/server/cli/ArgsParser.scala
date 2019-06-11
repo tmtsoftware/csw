@@ -1,6 +1,6 @@
 package csw.config.server.cli
 
-import csw.services.BuildInfo
+import csw.config.server.BuildInfo
 
 /**
  * Parses the command line options using `scopt` library.
