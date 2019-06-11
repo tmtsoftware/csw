@@ -6,8 +6,6 @@ package csw.params.core.models
  *  it will be useful, but WITHOUT ANY WARRANTY.
  */
 
-import java.text.DecimalFormat
-
 import play.api.libs.json._
 
 import scala.language.implicitConversions
@@ -305,7 +303,7 @@ object Angle {
       val min  = ((ra - H2R * hour) * R2H * 60).toInt
       val sec  = (ra - H2R * hour - min * H2R / 60) * R2H * 3600
       val s    = formatSecs(sec)
-      s"${hour}h ${min}m${s}s"
+      s"${hour}h ${min}m ${s}s"
     }
   }
 
