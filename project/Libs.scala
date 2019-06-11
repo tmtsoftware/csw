@@ -7,7 +7,7 @@ object Libs {
   val ScalaVersion    = "2.12.8"
   val silencerVersion = "1.4.1"
 
-  val `scalatest` = dep("org.scalatest" %%% "scalatest" % "3.0.6") //Apache License 2.0
+  val `scalatest` = dep("org.scalatest" %%% "scalatest" % "3.0.8") //Apache License 2.0
 
   val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0" //BSD 3-clause "New" or "Revised" License
   val `scala-async`        = dep("org.scala-lang.modules" %% "scala-async" % "0.10.0") //BSD 3-clause "New" or "Revised" License
@@ -39,7 +39,7 @@ object Libs {
   val `HdrHistogram`             = "org.hdrhistogram"     % "HdrHistogram"              % "2.1.11"
   val `testng`                   = "org.testng"           % "testng"                    % "6.14.3"
 
-  val `scala-csv`                = "com.github.tototoshi" %% "scala-csv" % "1.3.5"
+  val `scala-csv`                = "com.github.tototoshi" %% "scala-csv" % "1.3.6"
   val `scalajs-java-time`        = dep("org.scala-js" %%% "scalajs-java-time" % "0.2.5")
   val `json-schema-validator`    = "com.github.fge" % "json-schema-validator" % "2.2.8" //LGPL/ASL
   val `play-json-derived-codecs` = dep("org.julienrf" %%% "play-json-derived-codecs" % "5.0.0")
