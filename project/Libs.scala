@@ -15,7 +15,7 @@ object Libs {
   val `junit`              = "junit" % "junit" % "4.12" //Eclipse Public License 1.0
   val `silencer-plugin`    = compilerPlugin("com.github.ghik" %% "silencer-plugin" % silencerVersion)
   val `silencer-lib`       = "com.github.ghik" %% "silencer-lib" % silencerVersion % Compile
-  val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.5.7"
+  val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.5.9"
   //MIT License
   val `embedded-keycloak`            = "com.github.tmtsoftware"        % "embedded-keycloak"             % "0.1.2" //Apache 2.0
   val `logback-classic`              = "ch.qos.logback"                % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
@@ -25,12 +25,12 @@ object Libs {
   val `scala-reflect`                = "org.scala-lang"                % "scala-reflect"                 % ScalaVersion //BSD-3
   val `gson`                         = "com.google.code.gson"          % "gson"                          % "2.8.5" //Apache 2.0
 
-  val `play-json` = dep("com.typesafe.play" %%% "play-json" % "2.7.3") //Apache 2.0
+  val `play-json` = dep("com.typesafe.play" %%% "play-json" % "2.7.4") //Apache 2.0
 
   val `akka-http-play-json`      = "de.heikoseeberger"    %% "akka-http-play-json"      % "1.26.0" //Apache 2.0
   val `jwt-play-json`            = "com.pauldijou"        %% "jwt-play-json"            % "3.0.0"
   val `lettuce`                  = "io.lettuce"           % "lettuce-core"              % "5.1.7.RELEASE"
-  val `reactor-core`             = "io.projectreactor"    % "reactor-core"              % "3.2.9.RELEASE"
+  val `reactor-core`             = "io.projectreactor"    % "reactor-core"              % "3.2.10.RELEASE"
   val `reactive-streams`         = "org.reactivestreams"  % "reactive-streams"          % "1.0.2"
   val `akka-stream-kafka`        = "com.typesafe.akka"    %% "akka-stream-kafka"        % "0.22"
   val `scalatest-embedded-kafka` = "net.manub"            %% "scalatest-embedded-kafka" % "1.1.0"
@@ -48,7 +48,7 @@ object Libs {
   val `postgresql`      = "org.postgresql"                % "postgresql"      % "42.2.5"
   val `hikaricp`        = "com.zaxxer"                    % "HikariCP"        % "3.3.1" //Apache License 2.0
   val `otj-pg-embedded` = "com.opentable.components"      % "otj-pg-embedded" % "0.13.1"
-  val httpclient        = "org.apache.httpcomponents"     % "httpclient"      % "4.5.8"
+  val httpclient        = "org.apache.httpcomponents"     % "httpclient"      % "4.5.9"
   val `jboss-logging`   = "org.jboss.logging"             % "jboss-logging"   % "3.4.0.Final"
   val `config`          = "com.typesafe"                  % "config"          % "1.3.4"
   val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.3.0"
