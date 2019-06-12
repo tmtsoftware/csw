@@ -364,6 +364,10 @@ class CommandResponseManagerActorTest extends FunSuite with Matchers with Mockit
     behaviorTestKit.run(Query(runId2, commandResponseProbe.ref))
     commandResponseProbe.expectMessage(Started(runId2))
 
+    // Since the Caffeine cache evicts entries asynchronously, this test might act flaky.
+    // Hence doing an explicit eviction.
+    behaviorTestKit.run(CleanUpCache)
+
     // This query doesn't return a response, because the first command's state is pruned, as Max cache size is configured as 1 in test
     behaviorTestKit.run(Query(runId, commandResponseProbe.ref))
     commandResponseProbe.expectNoMessage()

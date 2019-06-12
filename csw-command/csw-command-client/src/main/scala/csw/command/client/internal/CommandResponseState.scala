@@ -27,4 +27,6 @@ private[command] class CommandResponseState(crmCacheProperties: CRMCacheProperti
   def asMap: Map[Id, SubmitResponse] = cmdToCmdResponse.asMap().asScala.toMap
 
   private def cachedResponse(id: Id): Option[SubmitResponse] = Option(cmdToCmdResponse.getIfPresent(id))
+
+  private[command] def cleanUp(): Unit = cmdToCmdResponse.cleanUp()
 }
