@@ -1,4 +1,4 @@
-package example.messages;
+package example.params;
 
 import csw.params.core.formats.JavaJsonSupport;
 import csw.params.core.generics.Key;
@@ -17,7 +17,6 @@ import org.scalatestplus.junit.JUnitSuite;
 import play.api.libs.json.JsValue;
 import play.api.libs.json.Json;
 
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 

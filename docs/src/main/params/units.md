@@ -98,12 +98,12 @@ The default unit for `TimestampKey`(in Scala and Java both) is `second`. For all
 ## Usage Examples
 
 Scala
-:   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/messages/KeysAndParametersTest.scala) { #units }
+:   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersTest.scala) { #units }
 
 Java
-:   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/example/messages/JKeysAndParametersTest.java) { #units }
+:   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/example/params/JKeysAndParametersTest.java) { #units }
 
 ## Source Code for Examples
 
-* @github[Scala Example](/examples/src/test/scala/example/messages/KeysAndParametersTest.scala)
-* @github[Java Example](/examples/src/test/java/example/messages/JKeysAndParametersTest.java)
+* @github[Scala Example](/examples/src/test/scala/example/params/KeysAndParametersTest.scala)
+* @github[Java Example](/examples/src/test/java/example/params/JKeysAndParametersTest.java)

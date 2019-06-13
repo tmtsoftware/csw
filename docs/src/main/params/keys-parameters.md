@@ -35,10 +35,10 @@ A key is **unique** in a `ParameterSet` since it is a Set.
 | Timestamp       | KeyType.TimestampKey        | JKeyTypes.TimestampKey         |
 
 Scala
-:   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/messages/KeysAndParametersTest.scala) { #primitives }
+:   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersTest.scala) { #primitives }
 
 Java
-:   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/example/messages/JKeysAndParametersTest.java) { #primitives }
+:   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/example/params/JKeysAndParametersTest.java) { #primitives }
 
 ## Arrays
 
@@ -52,10 +52,10 @@ Java
 | DoubleArray     | KeyType.DoubleArrayKey      | JKeyTypes.DoubleArrayKey       |
 
 Scala
-:   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/messages/KeysAndParametersTest.scala) { #arrays }
+:   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersTest.scala) { #arrays }
 
 Java
-:   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/example/messages/JKeysAndParametersTest.java) { #arrays }
+:   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/example/params/JKeysAndParametersTest.java) { #arrays }
 
 ## Matrices
 
@@ -69,10 +69,10 @@ Java
 | DoubleMatrix    | KeyType.DoubleMatrixKey     | JKeyTypes.DoubleMatrixKey      |
 
 Scala
-:   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/messages/KeysAndParametersTest.scala) { #matrices }
+:   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersTest.scala) { #matrices }
 
 Java
-:   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/example/messages/JKeysAndParametersTest.java) { #matrices }
+:   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/example/params/JKeysAndParametersTest.java) { #matrices }
 
 
 ## Domain Specific Types
@@ -88,10 +88,10 @@ Java
 A key for a choice item similar to an enumeration.
 
 Scala
-:   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/messages/KeysAndParametersTest.scala) { #choice }
+:   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersTest.scala) { #choice }
 
 Java
-:   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/example/messages/JKeysAndParametersTest.java) { #choice }
+:   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/example/params/JKeysAndParametersTest.java) { #choice }
 
 
 ### RaDec
@@ -106,10 +106,10 @@ details of positions are better defined.
 @@@
 
 Scala
-:   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/messages/KeysAndParametersTest.scala) { #radec }
+:   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersTest.scala) { #radec }
 
 Java
-:   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/example/messages/JKeysAndParametersTest.java) { #radec }
+:   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/example/params/JKeysAndParametersTest.java) { #radec }
 
 
 ### Struct
@@ -117,12 +117,12 @@ Java
 Stores a set of Parameters for telescope and instrument control. Lot of utility functions available for store, add, remove, list Keys and Paramete
 
 Scala
-:   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/messages/KeysAndParametersTest.scala) { #struct }
+:   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersTest.scala) { #struct }
 
 Java
-:   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/example/messages/JKeysAndParametersTest.java) { #struct }
+:   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/example/params/JKeysAndParametersTest.java) { #struct }
 
 ## Source Code for Examples
 
-* @github[Scala Example](/examples/src/test/scala/example/messages/KeysAndParametersTest.scala)
-* @github[Java Example](/examples/src/test/java/example/messages/JKeysAndParametersTest.java)
+* @github[Scala Example](/examples/src/test/scala/example/params/KeysAndParametersTest.scala)
+* @github[Java Example](/examples/src/test/java/example/params/JKeysAndParametersTest.java)

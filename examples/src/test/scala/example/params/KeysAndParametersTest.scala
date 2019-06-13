@@ -1,4 +1,4 @@
-package example.messages
+package example.params
 
 import csw.params.core.generics.KeyType.{ChoiceKey, StructKey}
 import csw.params.core.generics.{GChoiceKey, Key, KeyType, Parameter}

@@ -1,4 +1,4 @@
-package example.messages;
+package example.params;
 
 import csw.params.javadsl.JUnits;
 import csw.params.core.generics.GChoiceKey;
@@ -11,7 +11,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
 
-import java.time.Instant;
 import java.util.*;
 
 public class JKeysAndParametersTest extends JUnitSuite {

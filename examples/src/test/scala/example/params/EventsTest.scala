@@ -1,10 +1,11 @@
-package example.messages
+package example.params
 
 import java.time.Instant
 
-import csw.params.core.formats.JsonSupport
-import csw.params.core.generics.KeyType.DoubleMatrixKey
+import csw.params.core.formats.{EventCbor, JsonSupport}
+import csw.params.core.generics.KeyType.{DoubleMatrixKey, RaDecKey}
 import csw.params.core.generics.{Key, KeyType, Parameter}
+import csw.params.core.models.Units.arcmin
 import csw.params.core.models._
 import csw.params.events._
 import csw.time.core.models.UTCTime
@@ -251,6 +252,44 @@ class EventsTest extends FunSpec with Matchers {
       uniqueKeys1 should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
       uniqueKeys2 should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
       uniqueKeys3 should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName, miscKey.keyName)
+    }
+  }
+
+  describe("Examples of Cbor") {
+    it("should show usage of converting events to/from cbor") {
+      //#cbor
+      //Key
+      val raDecKey = RaDecKey.make("raDecKey")
+
+      //values
+      val raDec1 = RaDec(10.20, 40.20)
+      val raDec2 = RaDec(11.20, 50.20)
+
+      //parameters
+      val param = raDecKey.set(raDec1, raDec2).withUnits(arcmin)
+
+      val prefix = Prefix("tcs.pk")
+      val name   = EventName("targetCoords")
+      //events
+      val observeEvent: ObserveEvent = ObserveEvent(prefix, name).add(param)
+      val systemEvent1: SystemEvent  = SystemEvent(prefix, name).add(param)
+      val systemEvent2: SystemEvent  = SystemEvent(prefix, name).add(param)
+
+      //convert events to cbor bytestring
+      val byteArray2 = EventCbor.encode(observeEvent)
+      val byteArray3 = EventCbor.encode(systemEvent1)
+      val byteArray4 = EventCbor.encode(systemEvent2)
+
+      //convert cbor bytestring to events
+      val pbObserveEvent: ObserveEvent = EventCbor.decode(byteArray2)
+      val pbSystemEvent1: SystemEvent  = EventCbor.decode(byteArray3)
+      val pbSystemEvent2: SystemEvent  = EventCbor.decode(byteArray4)
+      //#cbor
+
+      //validations
+      assert(pbObserveEvent === observeEvent)
+      assert(pbSystemEvent1 === systemEvent1)
+      assert(pbSystemEvent2 === systemEvent2)
     }
   }
 }

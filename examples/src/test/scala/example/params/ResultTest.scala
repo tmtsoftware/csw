@@ -1,4 +1,4 @@
-package example.messages
+package example.params
 
 import csw.params.commands.Result
 import csw.params.core.formats.JsonSupport

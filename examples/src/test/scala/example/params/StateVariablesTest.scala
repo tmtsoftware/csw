@@ -1,4 +1,4 @@
-package example.messages
+package example.params
 
 import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.KeyType.DoubleMatrixKey

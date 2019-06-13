@@ -1,4 +1,4 @@
-package example.messages
+package example.params
 
 import csw.params.commands.{CommandName, Observe, Setup, Wait}
 import csw.params.core.formats.JsonSupport

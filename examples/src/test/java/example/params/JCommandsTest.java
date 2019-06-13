@@ -1,19 +1,19 @@
-package example.messages;
+package example.params;
 
 import csw.params.commands.CommandName;
 import csw.params.commands.Observe;
 import csw.params.commands.Setup;
 import csw.params.commands.Wait;
-import csw.params.javadsl.JSubsystem;
-import csw.params.javadsl.JUnits;
 import csw.params.core.formats.JavaJsonSupport;
-import csw.params.javadsl.JKeyType;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.ArrayData;
 import csw.params.core.models.MatrixData;
 import csw.params.core.models.ObsId;
 import csw.params.core.models.Prefix;
+import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JSubsystem;
+import csw.params.javadsl.JUnits;
 import csw.time.core.models.UTCTime;
 import org.junit.Assert;
 import org.junit.Test;
@@ -21,8 +21,8 @@ import org.scalatestplus.junit.JUnitSuite;
 import play.api.libs.json.JsValue;
 import play.api.libs.json.Json;
 
-import java.time.Instant;
-import java.util.*;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class JCommandsTest extends JUnitSuite {

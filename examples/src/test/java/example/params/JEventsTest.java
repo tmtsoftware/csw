@@ -1,14 +1,17 @@
-package example.messages;
+package example.params;
 
+import csw.params.core.formats.EventCbor$;
 import csw.params.core.formats.JavaJsonSupport;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.MatrixData;
 import csw.params.core.models.Prefix;
+import csw.params.core.models.RaDec;
 import csw.params.events.EventName;
 import csw.params.events.ObserveEvent;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JUnits;
 import csw.time.core.models.UTCTime;
 import org.junit.Assert;
 import org.junit.Test;
@@ -240,5 +243,47 @@ public class JEventsTest extends JUnitSuite {
         Assert.assertEquals(uniqueKeys1, Set.of(encoderKey.keyName(), filterKey.keyName()));
         Assert.assertEquals(uniqueKeys2, Set.of(encoderKey.keyName(), filterKey.keyName()));
         Assert.assertEquals(uniqueKeys3, Set.of(encoderKey.keyName(), filterKey.keyName(), miscKey.keyName()));
+    }
+
+    @Test
+    public void showUsageOfCbor() {
+        //#cbor
+
+        //prefixes
+        Prefix prefix1 = new Prefix("tcs.pk");
+        EventName name1 = new EventName("targetCoords");
+        Prefix prefix2 = new Prefix("tcs.cm");
+        EventName name2 = new EventName("guiderCoords");
+
+        //Key
+        Key<RaDec> raDecKey = JKeyType.RaDecKey().make("raDecKey");
+
+        //values
+        RaDec raDec1 = new RaDec(10.20, 40.20);
+        RaDec raDec2 = new RaDec(11.20, 50.20);
+
+        //parameters
+        Parameter<RaDec> param = raDecKey.set(raDec1, raDec2).withUnits(JUnits.arcmin);
+
+        //events
+        ObserveEvent observeEvent = new ObserveEvent(prefix1, name1).add(param);
+        SystemEvent systemEvent1 = new SystemEvent(prefix1, name1).add(param);
+        SystemEvent systemEvent2 = new SystemEvent(prefix2, name2).add(param);
+
+        //convert events to cbor bytestring
+        byte[] byteArray2 = EventCbor$.MODULE$.encode(observeEvent);
+        byte[] byteArray3 = EventCbor$.MODULE$.encode(systemEvent1);
+        byte[] byteArray4 = EventCbor$.MODULE$.encode(systemEvent2);
+
+        //convert cbor bytestring to events
+        ObserveEvent pbObserveEvent = EventCbor$.MODULE$.decode(byteArray2);
+        SystemEvent pbSystemEvent1 = EventCbor$.MODULE$.decode(byteArray3);
+        SystemEvent pbSystemEvent2 = EventCbor$.MODULE$.decode(byteArray4);
+        //#cbor
+
+        //validations
+        Assert.assertEquals(pbObserveEvent, observeEvent);
+        Assert.assertEquals(pbSystemEvent1, systemEvent1);
+        Assert.assertEquals(pbSystemEvent2, systemEvent2);
     }
 }
