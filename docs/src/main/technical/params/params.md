@@ -1,6 +1,6 @@
 # Params
 
-This project contains models like Events, Commands, ParameterSet etc which are cross-compiled
+The `csw-params` project contains models like Events, Commands, ParameterSet etc which are cross-compiled
 to Scala and [Scala.js](https://www.scala-js.org/). 
 CSW Framework and CSW Services like Command Service, Event Service, Alarm Service etc
 rely on this project for these models.
