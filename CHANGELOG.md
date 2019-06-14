@@ -25,15 +25,16 @@ See [here](https://tmtsoftware.github.io/csw/0.7.0/) for a detailed documentatio
 - **Logging Aggregator Service:** Provides recommendation and configurations for aggregating logs from TMT applications
  written in Scala, java, Python, C, C++, system logs, Redis logs, Postgres logs, Elasticsearch logs, Keycloak logs 
  for developer and production setup.
+- Replaced Protobuf serialisation by CBOR
+- Added Technical documentation for all the services
 - Support Unlocking of a component by Admin
 - Added authentication and authorization to config service admin rest endpoints
 - Integration of time service with event service and alarm service.
 - Added new APIs to `EventPublisher` allowing to provide `startTime` in `eventGenerator` APIs 
 - Changed `EventPublisher` APIs with `eventGenerator` to allow optional publishing of events
-- Added Technical documentation for all the services
-- Replaced Protobuf serialisation by CBOR
 
 #### Version Upgrades
+- Migration to AdoptOpenJDK 11
 - Akka version upgrade to 2.5.23
 
 #### Bug Fixes
