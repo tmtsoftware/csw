@@ -21,6 +21,10 @@
 ### Release `csw-js` (if needed)
 - Release `csw-js` if keycloak version is updated in csw
 
+### Release csw-client
+1. Update the csw version in `build.sbt`
+2. Release `csw-client` with the latest `VERSION` of csw.
+
 #### Note - `VERSION` tag is version number with 'v' as prefix. For eg. `v0.0.0`
 
 ### More detailed instructions

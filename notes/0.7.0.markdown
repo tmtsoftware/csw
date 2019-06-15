@@ -10,9 +10,9 @@ See [CHANGELOG.md](CHANGELOG.md) for details of all releases.
     - Authentication and Authorization Service
     - Database Service
     - Logging Aggregator Service
-- Support Unlocking of a component by Admin
-- Added Technical documentation for all the services
 - Replaced Protobuf serialisation by CBOR
+- Added Technical documentation for all the services
+- Support Unlocking of a component by Admin
 - Added authentication and authorization to config service admin rest endpoints
 - Integration of time service with event service and alarm service.
 - Added new APIs to EventPublisher allowing to provide startTime in eventGenerator APIs 
@@ -20,7 +20,7 @@ See [CHANGELOG.md](CHANGELOG.md) for details of all releases.
 - Get route of config server with path for empty config file gives 404 instead of 200
     
 ### Version Upgrades
-- SBT version upgrade to 1.3.0-RC1
+- Migration to AdoptOpenJDK 11
 - Akka version upgrade to 2.5.23
 
 ### Documentation
