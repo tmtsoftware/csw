@@ -1,9 +1,9 @@
 {
-  "type": "Setup",
+  "type" : "Setup",
   "runId": "test-runId",
   "source": "wfos.blue.filter",
-  "commandName": "move",
-  "maybeObsId": "Obs001",
+  "commandName" : "move",
+  "maybeObsId" : "Obs001",
   "paramSet" : [ {
     "keyName" : "LongKey",
     "keyType" : "LongKey",
@@ -97,6 +97,69 @@
     "values" : [ 110, 120 ],
     "units" : "NoUnits"
   }, {
+    "keyName" : "CoordKey",
+    "keyType" : "CoordKey",
+    "values" : [ {
+      "EqCoord" : {
+        "pm" : {
+          "pmx" : 0.5,
+          "pmy" : 2.33
+        },
+        "tag" : {
+          "name" : "BASE"
+        },
+        "frame" : {
+          "ICRS" : { }
+        },
+        "catalogName" : "none",
+        "ra" : 659912250000,
+        "dec" : -109892300000
+      }
+    }, {
+      "SolarSystemCoord" : {
+        "tag" : {
+          "name" : "BASE"
+        },
+        "body" : {
+          "Venus" : { }
+        }
+      }
+    }, {
+      "MinorPlanetCoord" : {
+        "meanAnomaly" : 792000000000,
+        "longAscendingNode" : 7200000000,
+        "epoch" : 2000,
+        "tag" : {
+          "name" : "GUIDER1"
+        },
+        "inclination" : 324000000000,
+        "eccentricity" : 0.234,
+        "meanDistance" : 1.4,
+        "argOfPerihelion" : 360000000000
+      }
+    }, {
+      "CometCoord" : {
+        "longAscendingNode" : 7200000000,
+        "tag" : {
+          "name" : "BASE"
+        },
+        "epochOfPerihelion" : 2000,
+        "inclination" : 324000000000,
+        "eccentricity" : 0.234,
+        "perihelionDistance" : 1.4,
+        "argOfPerihelion" : 360000000000
+      }
+    }, {
+      "AltAzCoord" : {
+        "tag" : {
+          "name" : "BASE"
+        },
+        "alt" : 1083600000000,
+        "az" : 153000000000
+      }
+    } ],
+    "units" : "NoUnits"
+  }, {
     "keyName" : "DoubleArrayKey",
     "keyType" : "DoubleArrayKey",
     "values" : [ {
@@ -132,7 +195,7 @@
     "keyType" : "UTCTimeKey",
     "values" : [ "1970-01-01T00:00:00Z", "2017-09-04T19:00:00.123456789Z" ],
     "units" : "second"
-  },{
+  }, {
     "keyName" : "ChoiceKey",
     "keyType" : "ChoiceKey",
     "values" : [ {
