@@ -1,7 +1,8 @@
 package csw.location
 
+import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.typed.{ActorSystem, Behavior, SpawnProtocol}
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.testkit.TestProbe
 import csw.location.api.AkkaRegistrationFactory.make
@@ -37,7 +38,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
     runOn(member1) {
       locationService
         .register(
-          make(akkaConnection, Prefix("nfiraos.ncc.trombone"), typedSystem.spawn(Behavior.empty, "empty").toURI)
+          make(akkaConnection, Prefix("nfiraos.ncc.trombone"), typedSystem.spawn(Behaviors.empty, "empty").toURI)
         )
         .await
 
@@ -72,7 +73,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
           make(
             akkaConnection,
             Prefix("nfiraos.ncc.trombone"),
-            newTypedSystem.spawn(Behavior.empty, "empty").toURI
+            newTypedSystem.spawn(Behaviors.empty, "empty").toURI
           )
         )
         .await

@@ -1,8 +1,9 @@
 package example.event
+
 import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
-import akka.actor.{Cancellable, Scheduler}
+import akka.actor.typed.{ActorRef, ActorSystem, Behavior, Scheduler}
+import akka.actor.Cancellable
 import akka.util.Timeout
 import csw.event.api.scaladsl.EventPublisher
 import csw.params.core.generics.{Key, KeyType}

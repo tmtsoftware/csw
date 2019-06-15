@@ -12,7 +12,7 @@ import akka.cluster.typed.{Cluster, Join}
 import akka.management.scaladsl.AkkaManagement
 import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.util.Timeout
-import akka.{actor, Done}
+import akka.{Done, actor}
 import csw.location.api.exceptions.CouldNotJoinCluster
 import csw.location.server.commons.ClusterConfirmationMessages.{HasJoinedCluster, Shutdown}
 import csw.location.server.commons.CoordinatedShutdownReasons.FailureReason

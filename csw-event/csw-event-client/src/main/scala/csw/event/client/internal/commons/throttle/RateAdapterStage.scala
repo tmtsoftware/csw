@@ -24,7 +24,7 @@ private[event] class RateAdapterStage[A](delay: FiniteDuration) extends GraphSta
     private var maybeElem: Option[A] = None
 
     override def preStart(): Unit = {
-      schedulePeriodically(None, delay)
+      scheduleAtFixedRate(None, delay, delay)
       pull(in)
     }
 

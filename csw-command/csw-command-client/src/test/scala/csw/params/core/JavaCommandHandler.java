@@ -31,20 +31,20 @@ public abstract class JavaCommandHandler {
 
     public static Behavior<CommandMsg> behavior() {
         return Behaviors.receive(CommandMsg.class)
-                .onMessage(CommandMsg.class, msg -> msg.command().getClass().isAssignableFrom(Setup.class),(ctx, msg) -> {
+                .onMessage(CommandMsg.class, msg -> msg.command().getClass().isAssignableFrom(Setup.class),(msg) -> {
                     Set<Parameter<?>> jParamSet = ((Setup) msg.command()).jParamSet();
                     msg.ackTo().tell(jParamSet);
                     msg.replyTo().tell(systemEvent);
                     msg.obsIdAck().tell(msg.command().jMaybeObsId());
                     return Behaviors.same();
                 })
-                .onMessage(CommandMsg.class, msg -> msg.command().getClass().isAssignableFrom(Wait.class),(ctx, msg) -> {
+                .onMessage(CommandMsg.class, msg -> msg.command().getClass().isAssignableFrom(Wait.class),(msg) -> {
                     Set<Parameter<?>> jParamSet = ((Setup) msg.command()).jParamSet();
                     msg.ackTo().tell(jParamSet);
                     msg.obsIdAck().tell(msg.command().jMaybeObsId());
                     return Behaviors.same();
                 })
-                .onMessage(CommandMsg.class, msg -> msg.command().getClass().isAssignableFrom(Observe.class),(ctx, msg) -> {
+                .onMessage(CommandMsg.class, msg -> msg.command().getClass().isAssignableFrom(Observe.class),(msg) -> {
                     Set<Parameter<?>> jParamSet = ((Setup) msg.command()).jParamSet();
                     msg.ackTo().tell(jParamSet);
                     msg.obsIdAck().tell(msg.command().jMaybeObsId());
@@ -54,5 +54,3 @@ public abstract class JavaCommandHandler {
     }
 
 }
-
-

@@ -4,7 +4,8 @@ import java.util.Optional
 
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.params.commands.{Command, CommandName, Setup}
 import csw.params.core.generics.{KeyType, Parameter}
@@ -34,7 +35,7 @@ class InterOperabilityTest extends FunSuite with Matchers with BeforeAndAfterAll
   private val intParam     = intKey.set(22, 33)
   private val stringParam  = stringKey.set("First", "Second")
 
-  private implicit val system: ActorSystem[_] = ActorSystem(Behavior.empty, "test")
+  private implicit val system: ActorSystem[_] = ActorSystem(Behaviors.empty, "test")
   implicit val testKit: TestKitSettings       = TestKitSettings(system)
 
   private val scalaSetup = Setup(Prefix(prefixStr), CommandName(prefixStr), Some(obsId)).add(intParam).add(stringParam)

@@ -1,6 +1,6 @@
 package csw.common.components.command
 
-import akka.actor.Scheduler
+import akka.actor.typed.Scheduler
 import akka.actor.typed.scaladsl.ActorContext
 import akka.util.Timeout
 import csw.command.api.scaladsl.CommandService

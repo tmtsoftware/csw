@@ -1,9 +1,9 @@
 package csw.admin.server.wiring
 
 import akka.actor.CoordinatedShutdown.Reason
-import akka.actor.typed.SpawnProtocol
+import akka.actor.typed.{Scheduler, SpawnProtocol}
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.{CoordinatedShutdown, Scheduler, typed}
+import akka.actor.{CoordinatedShutdown, typed}
 import akka.stream.Materializer
 import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.{Done, actor}
@@ -19,7 +19,7 @@ private[admin] class ActorRuntime(_typedSystem: typed.ActorSystem[SpawnProtocol]
   implicit val untypedSystem: actor.ActorSystem              = _typedSystem.toUntyped
   implicit val ec: ExecutionContextExecutor                  = untypedSystem.dispatcher
   implicit val mat: Materializer                             = ActorMaterializer()(typedSystem)
-  implicit val scheduler: Scheduler                          = untypedSystem.scheduler
+  implicit val scheduler: Scheduler                          = typedSystem.scheduler
 
   private[admin] val coordinatedShutdown = CoordinatedShutdown(untypedSystem)
 

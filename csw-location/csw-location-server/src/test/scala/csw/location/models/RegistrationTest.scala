@@ -4,7 +4,7 @@ import java.net.URI
 
 import akka.actor.typed
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorSystem, Behavior, SpawnProtocol}
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.exceptions.LocalAkkaActorRegistrationNotAllowed
@@ -12,7 +12,6 @@ import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.client.ActorSystemFactory
 import csw.location.models
 import csw.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.location.models._
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.network.utils.Networks
 import csw.params.core.models.Prefix
@@ -23,7 +22,7 @@ import scala.concurrent.duration.DurationDouble
 
 class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
-  implicit val actorSystem: typed.ActorSystem[_] = ActorSystemFactory.remote(Behavior.empty, "my-actor-1")
+  implicit val actorSystem: typed.ActorSystem[_] = ActorSystemFactory.remote(Behaviors.empty, "my-actor-1")
 
   test("should able to create the AkkaRegistration which should internally create AkkaLocation") {
     val hostname = Networks().hostname

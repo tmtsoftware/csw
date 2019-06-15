@@ -70,7 +70,7 @@ object Jackson {
 }
 
 object Akka {
-  val Version                    = "2.5.25" //all akka is Apache License 2.0
+  val Version                    = "2.6.0-M4" //all akka is Apache License 2.0
   val `akka-stream`              = "com.typesafe.akka" %% "akka-stream" % Version
   val `akka-stream-typed`        = "com.typesafe.akka" %% "akka-stream-typed" % Version
   val `akka-remote`              = "com.typesafe.akka" %% "akka-remote" % Version

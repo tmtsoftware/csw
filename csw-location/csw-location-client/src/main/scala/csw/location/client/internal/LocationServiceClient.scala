@@ -2,9 +2,9 @@ package csw.location.client.internal
 
 import java.io.IOException
 
-import akka.actor.typed.ActorSystem
+import akka.actor.typed.{ActorSystem, Scheduler}
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.{CoordinatedShutdown, Scheduler}
+import akka.actor.CoordinatedShutdown
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshalling.Marshal
 import akka.http.scaladsl.model._

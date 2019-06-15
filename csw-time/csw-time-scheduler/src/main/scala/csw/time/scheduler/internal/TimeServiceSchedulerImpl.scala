@@ -15,34 +15,38 @@ private[time] class TimeServiceSchedulerImpl(implicit scheduler: Scheduler, ec: 
 
   // ========== scheduleOnce ==========
   override def scheduleOnce(startTime: TMTTime)(task: => Unit): Cancellable =
-    scheduler.scheduleOnce(startTime.durationFromNow)(task).toTsCancellable
+    scheduler.scheduleOnce(startTime.durationFromNow, () => task).toTsCancellable
 
   override def scheduleOnce(startTime: TMTTime, task: Runnable): Cancellable =
     scheduler.scheduleOnce(startTime.durationFromNow, task).toTsCancellable
 
   override def scheduleOnce(startTime: TMTTime, receiver: ActorRef, message: Any): Cancellable =
-    scheduler.scheduleOnce(startTime.durationFromNow, receiver, message).toTsCancellable
+    scheduler.scheduleOnce(startTime.durationFromNow, () => receiver ! message).toTsCancellable
 
   // ========== schedulePeriodically ==========
   override def schedulePeriodically(interval: Duration, task: Runnable): Cancellable =
-    scheduler.schedule(0.millis, FiniteDuration(interval.toNanos, NANOSECONDS), task).toTsCancellable
+    scheduler.scheduleAtFixedRate(0.millis, FiniteDuration(interval.toNanos, NANOSECONDS))(task).toTsCancellable
 
   override def schedulePeriodically(interval: Duration)(task: => Unit): Cancellable =
-    scheduler.schedule(0.millis, FiniteDuration(interval.toNanos, NANOSECONDS))(task).toTsCancellable
+    scheduler.scheduleAtFixedRate(0.millis, FiniteDuration(interval.toNanos, NANOSECONDS))(() => task).toTsCancellable
 
   override def schedulePeriodically(interval: Duration, receiver: ActorRef, message: Any): Cancellable =
-    scheduler.schedule(0.millis, FiniteDuration(interval.toNanos, NANOSECONDS), receiver, message).toTsCancellable
+    scheduler
+      .scheduleAtFixedRate(0.millis, FiniteDuration(interval.toNanos, NANOSECONDS))(() => receiver ! message)
+      .toTsCancellable
 
   // ========== schedulePeriodically with start time ==========
   override def schedulePeriodically(startTime: TMTTime, interval: Duration, task: Runnable): Cancellable =
-    scheduler.schedule(startTime.durationFromNow, FiniteDuration(interval.toNanos, NANOSECONDS), task).toTsCancellable
+    scheduler.scheduleAtFixedRate(startTime.durationFromNow, FiniteDuration(interval.toNanos, NANOSECONDS))(task).toTsCancellable
 
   override def schedulePeriodically(startTime: TMTTime, interval: Duration)(task: => Unit): Cancellable =
-    scheduler.schedule(startTime.durationFromNow, FiniteDuration(interval.toNanos, NANOSECONDS))(task).toTsCancellable
+    scheduler
+      .scheduleAtFixedRate(startTime.durationFromNow, FiniteDuration(interval.toNanos, NANOSECONDS))(() => task)
+      .toTsCancellable
 
   override def schedulePeriodically(startTime: TMTTime, interval: Duration, receiver: ActorRef, message: Any): Cancellable =
     scheduler
-      .schedule(startTime.durationFromNow, FiniteDuration(interval.toNanos, NANOSECONDS), receiver, message)
+      .scheduleAtFixedRate(startTime.durationFromNow, FiniteDuration(interval.toNanos, NANOSECONDS))(() => receiver ! message)
       .toTsCancellable
 
 }

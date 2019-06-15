@@ -76,10 +76,7 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
     source
       .toMat(FileIO.toPath(path))(Keep.right)
       .mapMaterializedValue { resultF =>
-        resultF.map { ioResult =>
-          ioResult.status.get
-          path
-        }
+        resultF.map(_ => path)
       }
       .run()
   }

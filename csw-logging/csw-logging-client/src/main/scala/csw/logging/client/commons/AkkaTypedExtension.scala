@@ -1,6 +1,6 @@
 package csw.logging.client.commons
 
-import akka.actor.Scheduler
+import akka.actor.typed.Scheduler
 import akka.actor.typed.SpawnProtocol.Spawn
 import akka.actor.typed._
 import akka.actor.typed.scaladsl.AskPattern._

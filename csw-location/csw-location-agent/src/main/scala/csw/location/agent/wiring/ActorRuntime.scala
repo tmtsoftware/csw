@@ -2,8 +2,8 @@ package csw.location.agent.wiring
 
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.adapter.{TypedActorSystemOps, UntypedActorSystemOps}
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.actor.{CoordinatedShutdown, Scheduler}
+import akka.actor.typed.{ActorSystem, Scheduler, SpawnProtocol}
+import akka.actor.CoordinatedShutdown
 import akka.stream.Materializer
 import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.{Done, actor}

@@ -158,8 +158,8 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
    * List all locations registered with CRDT
    */
   def list: Future[List[Location]] = (replicator ? AllServices.get).map {
-    case x @ GetSuccess(AllServices.Key, _) => x.get(AllServices.Key).entries.values.toList
-    case NotFound(AllServices.Key, _)       => List.empty
+    case x @ GetSuccess(_)            => x.get(AllServices.Key).entries.values.toList
+    case NotFound(AllServices.Key, _) => List.empty
     case _ =>
       val listingFailed = RegistrationListingFailed
       log.error(listingFailed.getMessage, ex = listingFailed)

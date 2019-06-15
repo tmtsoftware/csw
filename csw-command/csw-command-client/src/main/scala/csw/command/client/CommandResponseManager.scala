@@ -2,7 +2,7 @@ package csw.command.client
 
 import java.util.concurrent.{CompletableFuture, TimeoutException}
 
-import akka.actor.Scheduler
+import akka.actor.typed.Scheduler
 import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout

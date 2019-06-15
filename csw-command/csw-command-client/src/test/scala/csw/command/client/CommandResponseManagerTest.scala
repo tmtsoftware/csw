@@ -1,7 +1,9 @@
 package csw.command.client
+
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed
-import akka.actor.typed.{ActorSystem, Behavior}
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
 import akka.util.Timeout
 import csw.command.client.messages.CommandResponseManagerMessage
 import csw.command.client.messages.CommandResponseManagerMessage._
@@ -13,7 +15,7 @@ import org.scalatest.{FunSuite, Matchers}
 import scala.concurrent.duration.DurationInt
 
 class CommandResponseManagerTest extends FunSuite with Matchers with MockitoSugar {
-  implicit val actorSystem: typed.ActorSystem[_] = ActorSystem(Behavior.empty, "test-command-response-manager")
+  implicit val actorSystem: typed.ActorSystem[_] = ActorSystem(Behaviors.empty, "test-command-response-manager")
 
   test("should delegate to addOrUpdateCommand") {
     val commandResponseManagerProbe = TestProbe[CommandResponseManagerMessage]

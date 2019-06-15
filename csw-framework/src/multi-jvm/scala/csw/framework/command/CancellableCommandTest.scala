@@ -1,6 +1,6 @@
 package csw.framework.command
 
-import akka.actor.Scheduler
+import akka.actor.typed.Scheduler
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
