@@ -1,4 +1,5 @@
 package csw.params.core.models
+import csw.params.core.models.Coords.{EqFrame, SolarSystemObject}
 import julienrf.json.derived
 import play.api.libs.json.{Json, OFormat}
 
@@ -100,7 +101,58 @@ object Coords {
     implicit val coordFormat: OFormat[CometCoord] = Json.format[CometCoord]
   }
 
+  import EqCoord._
+
+  /**
+   * Equatorial coordinates.
+   *
+   * @param tag a Tag instance (name for the coordinates)
+   * @param ra right ascension, expressed as an Angle instance
+   * @param dec declination, expressed as an Angle instance
+   * @param frame the IAU celestial reference system
+   * @param catalogName  the name of the catalog from which the coordinates were taken (use "none" if unknown)
+   * @param pm proper motion
+   */
   case class EqCoord(tag: Tag, ra: Angle, dec: Angle, frame: EqFrame, catalogName: String, pm: ProperMotion) extends Coord {
+
+    /**
+     * Creates an EqCoord from the given arguments, which all have default values.
+     * The values for ra and dec may be an Angle instance, or a String that can be parsed by Angle.parseRa()
+     *
+     * @param ra may be an Angle instance, or a String (in hms) that can be parsed by Angle.parseRa() or a Double value in degrees (default: 0.0)
+     * @param dec may be an Angle instance, or a String that can be parsed by Angle.parseDe() or a Double value in degrees  (default: 0.0)
+     * @param frame the the IAU celestial reference system (default: ICRS)
+     * @param tag a Tag instance (name for the coordinates, default: "BASE")
+     * @param catalogName the name of the catalog from which the coordinates were taken (default: "none")
+     * @param pmx proper motion X coordinate (default: 0.0)
+     * @param pmy proper motion y coordinate (default: 0.0)
+     */
+    def this(
+        ra: Any = 0.0,
+        dec: Any = 0.0,
+        frame: EqFrame = DEFAULT_FRAME,
+        tag: Tag = DEFAULT_TAG,
+        catalogName: String = DEFAULT_CATNAME,
+        pmx: Double = DEFAULT_PMX,
+        pmy: Double = DEFAULT_PMY
+    ) {
+      this(
+        tag,
+        ra match {
+          case ras: String => Angle.parseRa(ras)
+          case rad: Double => Angle.double2angle(rad).degree
+          case raa: Angle  => raa
+        },
+        dec match {
+          case des: String => Angle.parseDe(des)
+          case ded: Double => Angle.double2angle(ded).degree
+          case dea: Angle  => dea
+        },
+        ICRS,
+        catalogName,
+        ProperMotion(pmx, pmy)
+      )
+    }
 
     def withPM(pmx: Double, pmy: Double): EqCoord = this.copy(pm = ProperMotion(pmx, pmy))
 
@@ -117,6 +169,10 @@ object Coords {
     val DEFAULT_PMY: Double     = ProperMotion.DEFAULT_PROPERMOTION.pmy
     val DEFAULT_CATNAME: String = "none"
 
+    /**
+     * Creates an EqCoord from the given arguments, which all have default values.
+     * See matching constructior for a description of the arguments.
+     */
     def apply(
         ra: Any = 0.0,
         dec: Any = 0.0,
@@ -125,19 +181,7 @@ object Coords {
         catalogName: String = DEFAULT_CATNAME,
         pmx: Double = DEFAULT_PMX,
         pmy: Double = DEFAULT_PMY
-    ): EqCoord = {
-      val raAngle: Angle = ra match {
-        case ras: String => Angle.parseRa(ras)
-        case rad: Double => Angle.double2angle(rad).degree
-        case raa: Angle  => raa
-      }
-      val decAngle: Angle = dec match {
-        case des: String => Angle.parseDe(des)
-        case ded: Double => Angle.double2angle(ded).degree
-        case dea: Angle  => dea
-      }
-      new EqCoord(tag, raAngle, decAngle, ICRS, catalogName, ProperMotion(pmx, pmy))
-    }
+    ): EqCoord = new EqCoord(ra, dec, frame, tag, catalogName, pmx, pmy)
 
     /**
      * This allows creation of an EqCoordinate from a string of ra and dec with formats:
@@ -166,4 +210,22 @@ object Coords {
     //used by play-json
     implicit val coordFormat: OFormat[EqCoord] = Json.format[EqCoord]
   }
+}
+
+/**
+ * For the Java API
+ */
+object JCoords {
+  val ICRS: EqFrame = Coords.ICRS
+  val FK5: EqFrame  = Coords.FK5
+
+  val Mercury: SolarSystemObject = Coords.Mercury
+  val Venus: SolarSystemObject   = Coords.Venus
+  val Moon: SolarSystemObject    = Coords.Moon
+  val Mars: SolarSystemObject    = Coords.Mars
+  val Jupiter: SolarSystemObject = Coords.Jupiter
+  val Saturn: SolarSystemObject  = Coords.Saturn
+  val Neptune: SolarSystemObject = Coords.Neptune
+  val Uranus: SolarSystemObject  = Coords.Uranus
+  val Pluto: SolarSystemObject   = Coords.Pluto
 }

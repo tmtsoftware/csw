@@ -90,13 +90,12 @@ object KeyType extends Enum[KeyType[_]] with PlayJsonEnum[KeyType[_]] {
       new GChoiceKey(name, this, Choices(restChoices.toSet + firstChoice))
   }
 
-  case object RaDecKey   extends SimpleKeyType[RaDec]
   case object StringKey  extends SimpleKeyType[String]
   case object StructKey  extends SimpleKeyType[Struct]
   case object UTCTimeKey extends SimpleKeyTypeWithUnits[UTCTime](second)
   case object TAITimeKey extends SimpleKeyTypeWithUnits[TAITime](second)
 
-  // New Coordinate Keys
+  case object RaDecKey            extends SimpleKeyType[RaDec]
   case object EqCoordKey          extends SimpleKeyType[EqCoord]
   case object SolarSystemCoordKey extends SimpleKeyType[SolarSystemCoord]
   case object MinorPlanetCoordKey extends SimpleKeyType[MinorPlanetCoord]

@@ -17,22 +17,22 @@ A key is **unique** in a `ParameterSet` since it is a Set.
  
  * choose an appropriate KeyType from the tables below for your language(Scala/Java).    
  * calling the `make` method on KeyType and supplying a String keyName will return a suitably typed Key instance.    
- * explore the overloaded `set` and `->` methods, which will allow you to store values of the based on chosen KeyType. e.g. `JKeyTypes.BooleanKey` will allow storing only `java.lang.Boolean` values.
+ * explore the overloaded `set` and `->` methods, which will allow you to store values of the based on chosen KeyType. e.g. `JKeyType.BooleanKey` will allow storing only `java.lang.Boolean` values.
  
 ## Primitive Datatypes
 
 | Primitive       | Scala KeyType               | Java KeyType                   |
 | :-------------: |:--------------------------: | :-----------------------------:| 
-| Boolean         | KeyType.BooleanKey          | JKeyTypes.BooleanKey           |
-| Character       | KeyType.CharKey             | JKeyTypes.JCharKey             |
-| Byte            | KeyType.ByteKey             | JKeyTypes.ByteKey              |
-| Short           | KeyType.ShortKey            | JKeyTypes.ShortKey             |
-| Long            | KeyType.LongKey             | JKeyTypes.LongKey              |
-| Int             | KeyType.IntKey              | JKeyTypes.IntKey               |
-| Float           | KeyType.FloatKey            | JKeyTypes.FloatKey             |
-| Double          | KeyType.DoubleKey           | JKeyTypes.DoubleKey            |
-| String          | KeyType.StringKey           | JKeyTypes.StringKey            |
-| Timestamp       | KeyType.TimestampKey        | JKeyTypes.TimestampKey         |
+| Boolean         | KeyType.BooleanKey          | JKeyType.BooleanKey           |
+| Character       | KeyType.CharKey             | JKeyType.JCharKey             |
+| Byte            | KeyType.ByteKey             | JKeyType.ByteKey              |
+| Short           | KeyType.ShortKey            | JKeyType.ShortKey             |
+| Long            | KeyType.LongKey             | JKeyType.LongKey              |
+| Int             | KeyType.IntKey              | JKeyType.IntKey               |
+| Float           | KeyType.FloatKey            | JKeyType.FloatKey             |
+| Double          | KeyType.DoubleKey           | JKeyType.DoubleKey            |
+| String          | KeyType.StringKey           | JKeyType.StringKey            |
+| Timestamp       | KeyType.TimestampKey        | JKeyType.TimestampKey         |
 
 Scala
 :   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersTest.scala) { #primitives }
@@ -44,12 +44,12 @@ Java
 
 | Primitive       | Scala KeyType               | Java KeyType                   |
 | :-------------: |:--------------------------: | :-----------------------------:| 
-| ByteArray       | KeyType.ByteArrayKey        | JKeyTypes.ByteArrayKey         |
-| ShortArray      | KeyType.ShortArrayKey       | JKeyTypes.ShortArrayKey        |
-| LongArray       | KeyType.LongArrayKey        | JKeyTypes.LongArrayKey         |
-| IntArray        | KeyType.IntArrayKey         | JKeyTypes.IntArrayKey          |
-| FloatArray      | KeyType.FloatArrayKey       | JKeyTypes.FloatArrayKey        |
-| DoubleArray     | KeyType.DoubleArrayKey      | JKeyTypes.DoubleArrayKey       |
+| ByteArray       | KeyType.ByteArrayKey        | JKeyType.ByteArrayKey         |
+| ShortArray      | KeyType.ShortArrayKey       | JKeyType.ShortArrayKey        |
+| LongArray       | KeyType.LongArrayKey        | JKeyType.LongArrayKey         |
+| IntArray        | KeyType.IntArrayKey         | JKeyType.IntArrayKey          |
+| FloatArray      | KeyType.FloatArrayKey       | JKeyType.FloatArrayKey        |
+| DoubleArray     | KeyType.DoubleArrayKey      | JKeyType.DoubleArrayKey       |
 
 Scala
 :   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersTest.scala) { #arrays }
@@ -61,12 +61,12 @@ Java
 
 | Primitive       | Scala KeyType               | Java KeyType                   |
 | :-------------: |:--------------------------: | :-----------------------------:| 
-| ByteMatrix      | KeyType.ByteMatrixKey       | JKeyTypes.ByteMatrixKey        |
-| ShortMatrix     | KeyType.ShortMatrixKey      | JKeyTypes.ShortMatrixKey       |
-| LongMatrix      | KeyType.LongMatrixKey       | JKeyTypes.LongMatrixKey        |
-| IntMatrix       | KeyType.IntMatrixKey        | JKeyTypes.IntMatrixKey         |
-| FloatMatrix     | KeyType.FloatMatrixKey      | JKeyTypes.FloatMatrixKey       |
-| DoubleMatrix    | KeyType.DoubleMatrixKey     | JKeyTypes.DoubleMatrixKey      |
+| ByteMatrix      | KeyType.ByteMatrixKey       | JKeyType.ByteMatrixKey        |
+| ShortMatrix     | KeyType.ShortMatrixKey      | JKeyType.ShortMatrixKey       |
+| LongMatrix      | KeyType.LongMatrixKey       | JKeyType.LongMatrixKey        |
+| IntMatrix       | KeyType.IntMatrixKey        | JKeyType.IntMatrixKey         |
+| FloatMatrix     | KeyType.FloatMatrixKey      | JKeyType.FloatMatrixKey       |
+| DoubleMatrix    | KeyType.DoubleMatrixKey     | JKeyType.DoubleMatrixKey      |
 
 Scala
 :   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersTest.scala) { #matrices }
@@ -79,9 +79,38 @@ Java
 
 | Primitive       | Scala KeyType               | Java KeyType                   | 
 | :-------------: |:--------------------------: | :-----------------------------:|  
-| Choice          | KeyType.ChoiceKey           | JKeyTypes.ChoiceKey            |
-| RaDec           | KeyType.RaDecKey            | JKeyTypes.RaDecKey             |
-| Struct          | KeyType.StructKey           | JKeyTypes.StructKey            |
+| Choice          | KeyType.ChoiceKey           | JKeyType.ChoiceKey            |
+| Struct          | KeyType.StructKey           | JKeyType.StructKey            |
+
+## Coordinate Types
+
+| Primitive       | Scala KeyType               | Java KeyType                   | 
+| :-------------: |:--------------------------: | :-----------------------------:|  
+| RaDec           | KeyType.RaDecKey            | JKeyType.RaDecKey             |
+| EqCoord         | KeyType.EqCoordKey          | JKeyType.EqCoordKey           |
+| SolarSystemCoord| KeyType.SolarSystemCoordKey | JKeyType.SolarSystemCoordKey  |
+| MinorPlanetCoord| KeyType.MinorPlanetCoordKey | JKeyType.MinorPlanetCoordKey  |
+| CometCoord      | KeyType.CometCoordKey       | JKeyType.CometCoordKey        |
+| AltAzCoord      | KeyType.AltAzCoordKey       | JKeyType.AltAzCoordKey        |
+| Coord  (*)      | KeyType.CoordKey            | JKeyType.CoordKey             |
+
+@@@ note
+
+Note that since `Coord` is the base trait of the other coordinate types, you can use it as
+the key for any of the coordinate types.
+
+@@@
+
+#### Coordinate Types Example
+
+The following example demonstrates the basic usage of the coordinate parameter types:
+
+Scala
+:   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersTest.scala) { #coords }
+
+Java
+:   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/example/params/JKeysAndParametersTest.java) { #coords }
+
 
 ### Choice
 
@@ -92,24 +121,6 @@ Scala
 
 Java
 :   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/example/params/JKeysAndParametersTest.java) { #choice }
-
-
-### RaDec
-
-Holds Ra(Right Ascension) and Dec(Declination) values
-
-@@@ note
-
-This version of the `radec` parameter is a placeholder for testing. A more complete version will be added once
-details of positions are better defined. 
-
-@@@
-
-Scala
-:   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersTest.scala) { #radec }
-
-Java
-:   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/example/params/JKeysAndParametersTest.java) { #radec }
 
 
 ### Struct

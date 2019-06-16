@@ -1,6 +1,6 @@
 package example.params
 
-import csw.params.core.generics.KeyType.{ChoiceKey, StructKey}
+import csw.params.core.generics.KeyType.{ChoiceKey, CoordKey, StructKey}
 import csw.params.core.generics.{GChoiceKey, Key, KeyType, Parameter}
 import csw.params.core.models._
 import csw.time.core.models.UTCTime
@@ -180,6 +180,33 @@ class KeysAndParametersTest extends FunSpec with Matchers {
       head should be(raDec1)
       values should be(Array(raDec1, raDec2))
       paramWithDegree.units should be(Units.degree)
+    }
+
+    it("should show usage of coordinate types") {
+      //#coords
+      import Angle._
+      import Coords._
+
+      // Coordinate types
+      val pm               = ProperMotion(0.5, 2.33)
+      val eqCoord          = EqCoord(ra = "12:13:14.15", dec = "-30:31:32.3", frame = FK5, pmx = pm.pmx, pmy = pm.pmy)
+      val solarSystemCoord = SolarSystemCoord(Tag("BASE"), Venus)
+      val minorPlanetCoord = MinorPlanetCoord(Tag("GUIDER1"), 2000, 90.degree, 2.degree, 100.degree, 1.4, 0.234, 220.degree)
+      val cometCoord       = CometCoord(Tag("BASE"), 2000.0, 90.degree, 2.degree, 100.degree, 1.4, 0.234)
+      val altAzCoord       = AltAzCoord(Tag("BASE"), 301.degree, 42.5.degree)
+
+      // Can use base trait CoordKey to store values for all types
+      val basePosKey = CoordKey.make("BasePosition")
+      val posParam   = basePosKey.set(eqCoord, solarSystemCoord, minorPlanetCoord, cometCoord, altAzCoord)
+
+      //retrieving values
+      assert(posParam.values.length == 5)
+      assert(posParam.values(0) == eqCoord)
+      assert(posParam.values(1) == solarSystemCoord)
+      assert(posParam.values(2) == minorPlanetCoord)
+      assert(posParam.values(3) == cometCoord)
+      assert(posParam.values(4) == altAzCoord)
+      //#coords
     }
 
     it("should show usage of struct") {
