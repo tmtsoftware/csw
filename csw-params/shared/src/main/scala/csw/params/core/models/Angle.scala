@@ -26,7 +26,9 @@ import scala.language.implicitConversions
  * </code>
  */
 //noinspection ScalaStyle
-case class Angle(uas: Long) extends AnyVal with Serializable with Ordered[Angle] {
+case class Angle(uas: Long) extends /*AnyVal with*/ Serializable with Ordered[Angle] {
+
+  // Note: extending AnyVal is an optimization, since the value 'uas' is inlined, but it makes Java interop confusing...
 
   //require(uas> - Angle.CIRCLE && uas < Angle.CIRCLE, "out of range, possible overflow ");
 
