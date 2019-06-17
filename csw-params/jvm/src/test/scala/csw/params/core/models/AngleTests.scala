@@ -17,9 +17,6 @@ class AngleTests extends FunSpec with Matchers {
       (Angle.parseRa("15h17m"), Angle.parseDe("-11d10m")) shouldEqual
       Angle.parseRaDe("15h17m-11d10m")
 
-      (Angle.parseRa("15h17m"), Angle.parseDe("-11d10m")) shouldEqual
-      Angle.parseRaDe("15h17-11d10")
-
       (Angle.parseRa("275d11m15.6954s"), Angle.parseDe("+17d59m59.876s")) shouldEqual
       Angle.parseRaDe("275d11m15.6954s+17d59m59.876s")
     }

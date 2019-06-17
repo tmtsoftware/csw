@@ -12,9 +12,11 @@ import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
 import csw.params.core.models.Coords.*;
 import static csw.params.core.models.JCoords.*;
+import static csw.params.core.models.Coords.*;
 
 import java.util.*;
 
+@SuppressWarnings({"unused", "RedundantCast", "unchecked", "ArraysAsListWithZeroOrOneArgument"})
 public class JKeysAndParametersTest extends JUnitSuite {
 
     @Test
@@ -223,22 +225,23 @@ public class JKeysAndParametersTest extends JUnitSuite {
 
         //import csw.params.core.models.Coords.*;
         //import static csw.params.core.models.JCoords.*;
+        //import static csw.params.core.models.Coords.*;
 
         // Coordinate types
         ProperMotion pm = new ProperMotion(0.5, 2.33);
 
-        EqCoord eqCoord = new EqCoord("12:13:14.15", "-30:31:32.3", FK5(), new Tag("BASE"),
-            "none", pm.pmx(), pm.pmy());
+        EqCoord eqCoord = new EqCoord("12:13:14.15", "-30:31:32.3", FK5(), BASE(),
+            DEFAULT_CATNAME(), pm.pmx(), pm.pmy());
 
-        SolarSystemCoord solarSystemCoord = new SolarSystemCoord(new Tag("BASE"), Venus());
+        SolarSystemCoord solarSystemCoord = new SolarSystemCoord(BASE(), Venus());
 
-        MinorPlanetCoord minorPlanetCoord = new MinorPlanetCoord(new Tag("GUIDER1"), 2000, JAngle.degree(90),
+        MinorPlanetCoord minorPlanetCoord = new MinorPlanetCoord(GUIDER1(), 2000, JAngle.degree(90),
             JAngle.degree(2), JAngle.degree(100), 1.4, 0.234, JAngle.degree(220));
 
-        CometCoord cometCoord = new CometCoord(new Tag("BASE"), 2000.0, JAngle.degree(90),
+        CometCoord cometCoord = new CometCoord(BASE(), 2000.0, JAngle.degree(90),
             JAngle.degree(2), JAngle.degree(100), 1.4, 0.234);
 
-        AltAzCoord altAzCoord = new AltAzCoord(new Tag("BASE"), JAngle.degree(301), JAngle.degree(42.5));
+        AltAzCoord altAzCoord = new AltAzCoord(BASE(), JAngle.degree(301), JAngle.degree(42.5));
 
         // Can use base trait CoordKey to store values for all types
         Key<Coord> basePosKey = JKeyType.CoordKey().make("BasePosition");

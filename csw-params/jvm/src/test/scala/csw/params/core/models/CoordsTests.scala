@@ -24,7 +24,7 @@ class CoordsTests extends FunSpec with Matchers {
 
     it("Should allow creating with strings - check ra dec") {
       // One hard test
-      val c1 = EqCoord("12:32:01.689", "+44:01:05.12") // Note special multiply to accomodate fraction
+      val c1 = EqCoord("12:32:01.689", "+44:01:05.12") // Note special multiply to accommodate fraction
       c1.ra.uas shouldEqual raToUas(12L, 32L, 1.689)
       c1.dec.uas shouldEqual decToUas(44L, 1L, 5.12)
     }

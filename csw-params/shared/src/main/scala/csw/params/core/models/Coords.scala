@@ -1,5 +1,5 @@
 package csw.params.core.models
-import csw.params.core.models.Coords.{EqFrame, SolarSystemObject}
+import csw.params.core.models.Coords.{BASE, EqCoord, EqFrame, ICRS, SolarSystemObject, Tag}
 import julienrf.json.derived
 import play.api.libs.json.{Json, OFormat}
 
@@ -219,6 +219,12 @@ object JCoords {
   val ICRS: EqFrame = Coords.ICRS
   val FK5: EqFrame  = Coords.FK5
 
+  val DEFAULT_FRAME: EqFrame  = ICRS
+  val DEFAULT_TAG: Tag        = BASE
+  val DEFAULT_PMX: Double     = ProperMotion.DEFAULT_PROPERMOTION.pmx
+  val DEFAULT_PMY: Double     = ProperMotion.DEFAULT_PROPERMOTION.pmy
+  val DEFAULT_CATNAME: String = "none"
+
   val Mercury: SolarSystemObject = Coords.Mercury
   val Venus: SolarSystemObject   = Coords.Venus
   val Moon: SolarSystemObject    = Coords.Moon
@@ -228,4 +234,11 @@ object JCoords {
   val Neptune: SolarSystemObject = Coords.Neptune
   val Uranus: SolarSystemObject  = Coords.Uranus
   val Pluto: SolarSystemObject   = Coords.Pluto
+}
+
+object JEqCoord {
+  def make(ra: Any, dec: Any): EqCoord = EqCoord(ra, dec)
+
+  def asBoth(radec: String, frame: EqFrame, tag: Tag, catalogName: String, pmx: Double, pmy: Double): EqCoord =
+    EqCoord.asBoth(radec, frame, tag, catalogName, pmx, pmy)
 }

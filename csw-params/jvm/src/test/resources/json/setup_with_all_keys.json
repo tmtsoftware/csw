@@ -1,7 +1,7 @@
 {
   "type" : "Setup",
   "runId": "test-runId",
-  "source": "wfos.blue.filter",
+  "source" : "wfos.blue.filter",
   "commandName" : "move",
   "maybeObsId" : "Obs001",
   "paramSet" : [ {
@@ -87,16 +87,6 @@
     } ],
     "units" : "NoUnits"
   }, {
-    "keyName" : "ByteKey",
-    "keyType" : "ByteKey",
-    "values" : [ 10, 20 ],
-    "units" : "NoUnits"
-  }, {
-    "keyName" : "DoubleKey",
-    "keyType" : "DoubleKey",
-    "values" : [ 110, 120 ],
-    "units" : "NoUnits"
-  }, {
     "keyName" : "CoordKey",
     "keyType" : "CoordKey",
     "values" : [ {
@@ -158,6 +148,16 @@
         "az" : 153000000000
       }
     } ],
+    "units" : "NoUnits"
+  }, {
+    "keyName" : "ByteKey",
+    "keyType" : "ByteKey",
+    "values" : [ 10, 20 ],
+    "units" : "NoUnits"
+  }, {
+    "keyName" : "DoubleKey",
+    "keyType" : "DoubleKey",
+    "values" : [ 110, 120 ],
     "units" : "NoUnits"
   }, {
     "keyName" : "DoubleArrayKey",
