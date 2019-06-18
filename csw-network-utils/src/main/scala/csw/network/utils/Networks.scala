@@ -51,7 +51,7 @@ private[csw] case class Networks(private val interfaceName: String, networkProvi
 
 }
 
-private[csw] object Networks {
+object Networks {
 
   private val log: Logger = NetworksLogger.getLogger
 
