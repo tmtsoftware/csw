@@ -1,5 +1,5 @@
 package csw.params.core.models
-import csw.params.core.models.Coords.{BASE, EqCoord, EqFrame, ICRS, SolarSystemObject, Tag}
+import csw.params.core.models.Coords.{BASE, EqCoord, EqFrame, SolarSystemObject, Tag}
 import julienrf.json.derived
 import play.api.libs.json.{Json, OFormat}
 
