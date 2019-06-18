@@ -13,7 +13,7 @@ import csw.network.utils.internal.NetworkInterfaceProvider
  *
  * @param interfaceName provide the name of network interface where csw cluster is running
  */
-private[csw] case class Networks(private val interfaceName: String, networkProvider: NetworkInterfaceProvider) {
+case class Networks(private val interfaceName: String, networkProvider: NetworkInterfaceProvider) {
 
   private val (_, hostName) = ipv4AddressWithInterfaceName
 
