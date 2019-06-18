@@ -53,7 +53,7 @@ public class Timex extends Structure {
     protected List<String> getFieldOrder() {
         return Arrays.asList(
                 "modes", "offset", "freq", "maxerror", "esterror", "status", "constant",
-                "precision", "tolerance", "tick", "ppsfreq", "jitter",
+                "precision", "tolerance", "timeval", "tick", "ppsfreq", "jitter",
                 "shift", "stabil", "jitcnt", "calcnt", "errcnt", "stbcnt", "tai"
         );
     }
