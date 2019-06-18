@@ -14,7 +14,7 @@ Cbor was finalized as it offers better performance and has much lesser overhead 
 ## Cbor
 
 We use scala [Borer](https://github.com/sirthias/borer) library for cbor. 
-@scaladoc[CborSupport](csw/params/core/formats/CborSupport) object in `csw-params` contains 
+@scaladoc[CborSupport](csw/params/core/formats/CborSupport$) object in `csw-params` contains 
 codecs (encoders and decoders) for all the models defined in this project that need to be serialized.
 
 `CborSupport` needs to be imported wherever you need to encode/decode a model. This makes 
@@ -37,8 +37,8 @@ The problem is described in detail in the issue [here](https://github.com/sirthi
 Going via `AdtCbor` ensures the Adt types(base as well concrete) are all encoded as **Base-type** containing
 type information.
 So if you are writing new types which are ADTs, make sure you add your own helper next to 
-@scaladoc[EventCbor](csw/params/core/formats/EventCbor) or 
-@scaladoc[CommandCbor](csw/params/core/formats/CommandCbor) to ensure proper encoding and 
+@scaladoc[EventCbor](csw/params/core/formats/EventCbor$) or 
+@scaladoc[CommandCbor](csw/params/core/formats/CommandCbor$) to ensure proper encoding and 
 decoding of ADTs.
 
  
@@ -68,7 +68,7 @@ For example:
 This will return the json representation of the given Cbor object.
  
 ```
-cbor2json.rb csw-params/shared/src/test/cbor_spikes/data/event.cbor
+cbor2json.rb csw-params/shared/src/test/cbor/data/event.cbor
 ```
 
 A lot of other similar utilities are present in the same package which you can play with.
@@ -81,7 +81,7 @@ and validate an object against it.
 [CDDL](https://rubygems.org/gems/cddl/versions/0.8.8) tool allows you to give a schema and a cbor/json object,
 and it will validate and tell you if the object adheres to the given schema.
 
-`cddl csw-params/shared/src/test/cbor_spikes/schema/event_command.cddl validate csw-params/shared/src/test/cbor_spikes/data/event.cbor`
+`cddl csw-params/shared/src/test/cbor/schema/event_command.cddl validate csw-params/shared/src/test/cbor/data/event.cbor`
 
 Cddl schema for events and commands has been defined
-[here](../../../../../csw-params/shared/src/test/cbor_spikes/schema/event_command.cddl.txt).
+@github[here](../../../../../csw-params/shared/src/test/cbor/schema/event_command.cddl.txt).
