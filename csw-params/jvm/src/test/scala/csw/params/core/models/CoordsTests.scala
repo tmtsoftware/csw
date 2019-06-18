@@ -71,7 +71,6 @@ class CoordsTests extends FunSpec with Matchers {
 
     it("should convert pm to/from JSON") {
       // Check proper motions
-      val pm   = ProperMotion(0.5, 2.33)
       val pmjs = Json.toJson(pm)
 
       val pmIn = pmjs.as[ProperMotion]
@@ -172,8 +171,7 @@ class CoordsTests extends FunSpec with Matchers {
     val obsModeKey = StringKey.make("obsmode")
 
     it("create multiple positions as individual params with positions catalog") {
-      val obsModeKey = StringKey.make("obsmode")
-      val tagsKey    = StringKey.make(name = "tags")
+      val tagsKey = StringKey.make(name = "tags")
 
       val c0 = EqCoord("12:32:45", "+45:17:50", tag = BASE, frame = FK5, pmx = 0.9, pmy = -0.4)
       val c1 = EqCoord("12:32:01.689", "45:01:05.12", tag = OIWFS1)

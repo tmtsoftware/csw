@@ -1,7 +1,22 @@
 package csw.params.core.models
-import csw.params.core.models.Coords.{BASE, EqCoord, EqFrame, SolarSystemObject, Tag}
+import java.util
+
+import csw.params.core.models.Coords.{
+  AltAzCoord,
+  BASE,
+  CometCoord,
+  Coord,
+  EqCoord,
+  EqFrame,
+  MinorPlanetCoord,
+  SolarSystemCoord,
+  SolarSystemObject,
+  Tag
+}
 import julienrf.json.derived
 import play.api.libs.json.{Json, OFormat}
+
+import scala.collection.JavaConverters._
 
 object Coords {
 
@@ -234,6 +249,9 @@ object JCoords {
   val Neptune: SolarSystemObject = Coords.Neptune
   val Uranus: SolarSystemObject  = Coords.Uranus
   val Pluto: SolarSystemObject   = Coords.Pluto
+
+  def allTags: util.Set[Tag]        = Coords.allTags.asJava
+  def allTagNames: util.Set[String] = Coords.allTagsNames.asJava
 }
 
 object JEqCoord {
@@ -241,4 +259,26 @@ object JEqCoord {
 
   def asBoth(radec: String, frame: EqFrame, tag: Tag, catalogName: String, pmx: Double, pmy: Double): EqCoord =
     EqCoord.asBoth(radec, frame, tag, catalogName, pmx, pmy)
+
+  def coordFormat: OFormat[EqCoord] = EqCoord.coordFormat
+}
+
+object JAltAzCoord {
+  def coordFormat: OFormat[AltAzCoord] = AltAzCoord.coordFormat
+}
+
+object JSolarSystemCoord {
+  def coordFormat: OFormat[SolarSystemCoord] = SolarSystemCoord.coordFormat
+}
+
+object JMinorPlanetCoord {
+  def coordFormat: OFormat[MinorPlanetCoord] = MinorPlanetCoord.coordFormat
+}
+
+object JCometCoord {
+  def coordFormat: OFormat[CometCoord] = CometCoord.coordFormat
+}
+
+object JCoord {
+  def jsonFormat: OFormat[Coord] = Coord.jsonFormat
 }

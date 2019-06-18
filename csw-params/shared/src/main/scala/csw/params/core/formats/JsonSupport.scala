@@ -8,7 +8,8 @@ import play.api.libs.json._
 
 object JsonSupport extends JsonSupport
 
-//TODO: Why is Java support required? Please delete this and corrosponding tests once confirmed
+// This is needed for Java support, since it is a top level object instead of a trait, making it
+// possible to call methods like writeSequenceCommand() on it from Java.
 object JavaJsonSupport extends JsonSupport
 
 /**
