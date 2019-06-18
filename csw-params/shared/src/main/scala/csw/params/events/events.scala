@@ -76,6 +76,7 @@ object Event {
   /**
    * A helper method to create an event which is provided to subscriber when there is no event available at the
    * time of subscription
+   *
    * @param eventKey the Event Key for which subscription was made
    * @return an event with the same key as provided but with id and timestamp denoting an invalid event
    */
@@ -85,6 +86,7 @@ object Event {
   /**
    * A helper method to create an event which is provided to subscriber when the received bytes could not be
    * decoded into a valid event
+   *
    * @return an invalid event with the key representing a bad key by using a BAD subsystem
    */
   def badEvent(): SystemEvent = Event.invalidEvent(EventKey(s"${Subsystem.BAD}.CouldNotParseEvent"))
@@ -93,7 +95,7 @@ object Event {
 /**
  * Defines a system event. Constructor is private to ensure eventId is created internally to guarantee unique value.
  */
-case class SystemEvent private (
+case class SystemEvent private[params] (
     eventId: Id,
     source: Prefix,
     eventName: EventName,
@@ -152,7 +154,7 @@ object SystemEvent {
 /**
  * Defines an observe event. Constructor is private to ensure eventId is created internally to guarantee unique value.
  */
-case class ObserveEvent private (
+case class ObserveEvent private[params] (
     eventId: Id,
     source: Prefix,
     eventName: EventName,

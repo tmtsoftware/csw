@@ -7,7 +7,6 @@ import csw.config.cli.wiring.Wiring
 import csw.location.client.utils.LocationServerStatus
 import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.network.utils.Networks
-import csw.services.BuildInfo
 
 // $COVERAGE-OFF$
 object Main extends App {

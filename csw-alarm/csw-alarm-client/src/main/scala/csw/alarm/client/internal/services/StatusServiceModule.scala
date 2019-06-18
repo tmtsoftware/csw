@@ -116,6 +116,7 @@ private[client] trait StatusServiceModule extends StatusService {
       /**
        * Updates latched severity of the alarm if it's is greater than original or if component is initializing (component has not sent any heartbeat yet)
        * This will be a no op if latched severity does not need to change
+       *
        * @return updated AlarmStatus
        */
       def updateLatchedSeverity(): AlarmStatus = {
@@ -127,6 +128,7 @@ private[client] trait StatusServiceModule extends StatusService {
       /**
        * Updates AcknowledgementStatus of alarm if severity is changed to anything but Okay
        * This will be a no op if AcknowledgementStatus does not need to change
+       *
        * @return updated AlarmStatus
        */
       def updateAckStatus(): AlarmStatus = {
@@ -140,6 +142,7 @@ private[client] trait StatusServiceModule extends StatusService {
 
       /**
        * Updates time of alarm if current severity has changed, otherwise it's a no op
+       *
        * @return updated AlarmStatus
        */
       def updateTime(): AlarmStatus =
@@ -148,6 +151,7 @@ private[client] trait StatusServiceModule extends StatusService {
 
       /**
        * Sets the initializing flag to false.
+       *
        * @return updated AlarmStatus
        */
       def removeInitializingFlag(): AlarmStatus = targetAlarmStatus.copy(initializing = false)

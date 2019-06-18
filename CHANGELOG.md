@@ -9,9 +9,40 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
+## [CSW v0.7.0] - 2019-06-14
+
+This is the release candidate 1 of the fourth release of the TMT Common Software for project stakeholders. 
+This release includes Time Service, Authentication and Authorization Service, Database Service and Logging Aggregator Service.
+See [here](https://tmtsoftware.github.io/csw/0.7.0/) for a detailed documentation of this version of the CSW software.
+
+#### New Features
+
+- **Time Service:** Provides APIs to access time in different timescales (UTC and TAI) with up to nano-second precision.
+ Also provides scheduling APIs. 
+- **Authentication and Authorization Service:** Suite of libraries/adapters provided to help build an ecosystem of
+ client & server side applications that enforce authentication & authorization policies for TMT
+- **Database Service:** Provides a TMT-standard relational database and connection library
+- **Logging Aggregator Service:** Provides recommendation and configurations for aggregating logs from TMT applications
+ written in Scala, java, Python, C, C++, system logs, Redis logs, Postgres logs, Elasticsearch logs, Keycloak logs 
+ for developer and production setup.
+- Replaced Protobuf serialisation by CBOR
+- Added Technical documentation for all the services
+- Support Unlocking of a component by Admin
+- Added authentication and authorization to config service admin rest endpoints
+- Integration of time service with event service and alarm service.
+- Added new APIs to `EventPublisher` allowing to provide `startTime` in `eventGenerator` APIs 
+- Changed `EventPublisher` APIs with `eventGenerator` to allow optional publishing of events
+
+#### Version Upgrades
+- Migration to AdoptOpenJDK 11
+- Akka version upgrade to 2.5.23
+
+#### Bug Fixes
+- Get route of config server with path for empty config file gives 404 instead of 200 (DEOPSCSW-626)
+
 ## [CSW v0.7.0-RC1] - 2019-03-25
 
-This is the release candidate 1 of the forth release of the TMT Common Software for project stakeholders. 
+This is the release candidate 1 of the fourth release of the TMT Common Software for project stakeholders. 
 This release includes Time Service, Authentication and Authorization Service, Database Service and Logging Aggregator Service.
 See [here](https://tmtsoftware.github.io/csw/0.7.0-RC1/) for a detailed documentation of this version of the CSW software.
 

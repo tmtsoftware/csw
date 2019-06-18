@@ -5,7 +5,6 @@ import csw.location.agent.commons.LocationAgentLogger
 import csw.location.agent.models.Command
 import csw.location.agent.wiring.Wiring
 import csw.location.client.utils.LocationServerStatus
-import csw.services.BuildInfo
 
 /**
  * Application object allowing program execution from command line, also facilitates an entry point for Component level testing.

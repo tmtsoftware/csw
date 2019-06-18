@@ -40,7 +40,7 @@ object TMTTime {
   implicit def utcTimeReads[T <: TMTTime]: Reads[T] = tmtTimeFormat.map(_.asInstanceOf[T])
 
   // Allows UTCTime and TAITime to be sorted
-  implicit def orderByInstant[A <: TMTTime]: Ordering[A] = Ordering.by((e => e.value))
+  implicit def orderByInstant[A <: TMTTime]: Ordering[A] = Ordering.by(e => e.value)
 }
 
 /**

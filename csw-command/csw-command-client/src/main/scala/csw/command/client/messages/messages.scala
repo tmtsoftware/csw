@@ -268,6 +268,7 @@ object CommandResponseManagerMessage {
   case class SubscriberTerminated(terminated: ActorRef[SubmitResponse])             extends CommandResponseManagerMessage
   case class QuerySubscriberTerminated(terminated: ActorRef[QueryResponse])         extends CommandResponseManagerMessage
   case class GetCommandSubscribersState(replyTo: ActorRef[CommandSubscribersState]) extends CommandResponseManagerMessage
+  private[command] case object CleanUpCache                                         extends CommandResponseManagerMessage
 
   /**
    * Represents a message to query the command status of a command running on some component

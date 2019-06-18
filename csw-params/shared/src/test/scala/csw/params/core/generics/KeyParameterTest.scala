@@ -3,6 +3,7 @@ package csw.params.core.generics
 import csw.params.core.generics.KeyType.{
   ByteMatrixKey,
   ChoiceKey,
+  CoordKey,
   DoubleMatrixKey,
   FloatMatrixKey,
   IntMatrixKey,
@@ -10,7 +11,7 @@ import csw.params.core.generics.KeyType.{
   ShortMatrixKey,
   StructKey
 }
-import csw.params.core.models.Units.{degree, meter, second, NoUnits}
+import csw.params.core.models.Units.{NoUnits, degree, meter, second}
 import csw.params.core.models._
 import csw.time.core.models.{TAITime, UTCTime}
 import org.scalatest.{FunSpec, Matchers}
@@ -1093,6 +1094,28 @@ class KeyParameterTest extends FunSpec with Matchers {
       ii.units should be(degree)
       ii.value(1) should equal(listIn(1))
       ii.values should equal(listIn)
+    }
+  }
+
+  describe("Test Coordinate Types") {
+    import Angle._
+    import Coords._
+    it("Should allow coordinate types") {
+      val basePosKey       = CoordKey.make("BasePosition")
+      val pm               = ProperMotion(0.5, 2.33)
+      val eqCoord          = EqCoord(ra = "12:13:14.15", dec = "-30:31:32.3", frame = FK5, pmx = pm.pmx, pmy = pm.pmy)
+      val solarSystemCoord = SolarSystemCoord(Tag("BASE"), Venus)
+      val minorPlanetCoord = MinorPlanetCoord(Tag("GUIDER1"), 2000, 90.degree, 2.degree, 100.degree, 1.4, 0.234, 220.degree)
+      val cometCoord       = CometCoord(Tag("BASE"), 2000.0, 90.degree, 2.degree, 100.degree, 1.4, 0.234)
+      val altAzCoord       = AltAzCoord(Tag("BASE"), 301.degree, 42.5.degree)
+      val posParam         = basePosKey.set(eqCoord, solarSystemCoord, minorPlanetCoord, cometCoord, altAzCoord)
+
+      assert(posParam.values.length == 5)
+      assert(posParam.values(0) == eqCoord)
+      assert(posParam.values(1) == solarSystemCoord)
+      assert(posParam.values(2) == minorPlanetCoord)
+      assert(posParam.values(3) == cometCoord)
+      assert(posParam.values(4) == altAzCoord)
     }
   }
 

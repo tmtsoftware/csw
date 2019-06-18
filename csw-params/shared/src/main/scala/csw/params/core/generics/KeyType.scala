@@ -1,13 +1,16 @@
 package csw.params.core.generics
 
-import csw.params.core.formats.JsonSupport
+import csw.params.core.formats.CborSupport._
+import csw.params.core.formats.{CborSupport, JsonSupport}
+import csw.params.core.models.Coords.{AltAzCoord, CometCoord, Coord, EqCoord, MinorPlanetCoord, SolarSystemCoord}
 import csw.params.core.models.Units.second
-import csw.params.core.models.{Units, _}
+import csw.params.core.models._
 import csw.time.core.models.{TAITime, UTCTime}
 import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
+import io.bullet.borer.{Decoder, Encoder}
 import play.api.libs.json._
 
-import scala.collection.immutable
+import scala.collection.{immutable, mutable}
 import scala.reflect.ClassTag
 
 /**
@@ -15,11 +18,14 @@ import scala.reflect.ClassTag
  *
  * @tparam S the type of values that will sit against the key in Parameter
  */
-sealed class KeyType[S: Format: ClassTag] extends EnumEntry with Serializable {
+sealed class KeyType[S: Format: ClassTag: ArrayEnc: ArrayDec] extends EnumEntry with Serializable {
   override def hashCode: Int              = toString.hashCode
   override def equals(that: Any): Boolean = that.toString == this.toString
 
-  private[params] def paramFormat: Format[Parameter[S]] = Parameter.parameterFormat[S]
+  private[params] lazy val paramFormat: Format[Parameter[S]] = Parameter.parameterFormat[S]
+
+  private[params] lazy val paramEncoder: Encoder[Parameter[S]]         = CborSupport.paramCodec[S].encoder
+  private[params] lazy val waDecoder: Decoder[mutable.WrappedArray[S]] = CborSupport.waCodec[S].decoder
 }
 
 /**
@@ -27,7 +33,7 @@ sealed class KeyType[S: Format: ClassTag] extends EnumEntry with Serializable {
  *
  * @tparam S the type of values that will sit against the key in Parameter
  */
-class SimpleKeyType[S: Format: ClassTag] extends KeyType[S] {
+class SimpleKeyType[S: Format: ClassTag: ArrayEnc: ArrayDec] extends KeyType[S] {
 
   /**
    * Make a Key from provided name
@@ -45,7 +51,7 @@ class SimpleKeyType[S: Format: ClassTag] extends KeyType[S] {
  * @param defaultUnits applicable units
  * @tparam S the type of values that will sit against the key in Parameter
  */
-sealed class SimpleKeyTypeWithUnits[S: Format: ClassTag](defaultUnits: Units) extends KeyType[S] {
+sealed class SimpleKeyTypeWithUnits[S: Format: ClassTag: ArrayEnc: ArrayDec](defaultUnits: Units) extends KeyType[S] {
 
   /**
    * Make a Key from provided name
@@ -59,12 +65,12 @@ sealed class SimpleKeyTypeWithUnits[S: Format: ClassTag](defaultUnits: Units) ex
 /**
  * A KeyType that holds array
  */
-class ArrayKeyType[S: Format: ClassTag] extends SimpleKeyType[ArrayData[S]]
+class ArrayKeyType[S: Format: ClassTag: ArrayEnc: ArrayDec] extends SimpleKeyType[ArrayData[S]]
 
 /**
  * A KeyType that holds Matrix
  */
-class MatrixKeyType[S: Format: ClassTag] extends SimpleKeyType[MatrixData[S]]
+class MatrixKeyType[S: Format: ClassTag: ArrayEnc: ArrayDec] extends SimpleKeyType[MatrixData[S]]
 
 /**
  * KeyTypes defined for consumption in Scala code
@@ -84,11 +90,18 @@ object KeyType extends Enum[KeyType[_]] with PlayJsonEnum[KeyType[_]] {
       new GChoiceKey(name, this, Choices(restChoices.toSet + firstChoice))
   }
 
-  case object RaDecKey   extends SimpleKeyType[RaDec]
   case object StringKey  extends SimpleKeyType[String]
   case object StructKey  extends SimpleKeyType[Struct]
   case object UTCTimeKey extends SimpleKeyTypeWithUnits[UTCTime](second)
   case object TAITimeKey extends SimpleKeyTypeWithUnits[TAITime](second)
+
+  case object RaDecKey            extends SimpleKeyType[RaDec]
+  case object EqCoordKey          extends SimpleKeyType[EqCoord]
+  case object SolarSystemCoordKey extends SimpleKeyType[SolarSystemCoord]
+  case object MinorPlanetCoordKey extends SimpleKeyType[MinorPlanetCoord]
+  case object CometCoordKey       extends SimpleKeyType[CometCoord]
+  case object AltAzCoordKey       extends SimpleKeyType[AltAzCoord]
+  case object CoordKey            extends SimpleKeyType[Coord]
 
   //scala
   case object BooleanKey extends SimpleKeyType[Boolean]

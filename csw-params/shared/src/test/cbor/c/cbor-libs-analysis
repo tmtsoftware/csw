@@ -1,0 +1,22 @@
+TinyCbor - Okay library for CBOR in C/C++ language. Very little documentation which is not helpful. No installation
+instructions. Compilation requires linking all the source code along with test code. Does correct decoding. Decoding in C++
+is not attempted as there is lack of example.
+
+libcbor - Excellent library for CBOR in C language. Very well documented and nice examples. https://github.com/PJK/libcbor
+Easy install commands for MacOS and Linux. Does encoding and decoding in short and compact code. This could decode out `input.cbor` file correctly. Not for C++.
+
+cbor-cpp - Okay library for CBOR in CPP language. No documentation and example. Requires building the project and modify
+CMakeLists.txt according to your need. This is not a feasible option in most cases. However, the library could decode the
+`input.cbor` correctly.
+
+cborg - Good library for CBOR in CPP language. No documentation and examples. No installation instructions. Compilation
+requires linking all the source code along with test code. Does correct decoding. Can only parse `const uint8_t*` types.
+The API for decoding is straightforward to use.
+
+cbor-lite - Unusable library for CBOR  in CPP language. Depends on Boost. Very less documentation and no examples. Not Easy
+to install as it needs to be built using CMakeLists.txt. Could not check decoding.
+
+GoldFish - Okay library for CBOR in CPP languages. No installation instructions. Good examples and some API documentation.
+Promises to decode CBOR files from various type of streams(files, vectors, string, binary). Could not be tested.
+
+

@@ -3,7 +3,7 @@ package csw.config.cli.args
 import java.nio.file.Paths
 import java.time.Instant
 
-import csw.services.BuildInfo
+import csw.config.cli.BuildInfo
 import scopt.OptionParser
 
 /**

@@ -19,6 +19,7 @@ class TokenFactory(keycloakDeployment: KeycloakDeployment, tokenVerifier: TokenV
    * This token will contain all the token information along with permissions. If "enable-permissions" is set to false,
    * it will validate the token string for signature and expiry and then decode it into
    * [[csw.aas.core.token.AccessToken]]
+   *
    * @param token Access token string
    */
   private[aas] def makeToken(token: String): Future[Either[TokenVerificationFailure, AccessToken]] =

@@ -145,6 +145,7 @@ object CommandResponseManagerActor {
           case GetCommandCorrelation(replyTo)         ⇒ replyTo ! commandCoRelation
           case GetCommandResponseState(replyTo)       ⇒ replyTo ! commandResponseState
           case GetCommandSubscribersState(replyTo)    ⇒ replyTo ! CommandSubscribersState(commandSubscribers)
+          case CleanUpCache                           ⇒ commandResponseState.cleanUp()
         }
         Behaviors.same
       }

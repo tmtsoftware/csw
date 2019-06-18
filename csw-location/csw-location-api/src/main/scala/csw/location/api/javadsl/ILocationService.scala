@@ -31,6 +31,7 @@ trait ILocationService {
    *
    * Note that this method is idempotent, which means multiple calls to unregister the same connection will be no-op once successfully
    *       unregistered from location service
+   *
    * @param connection an already registered connection
    * @return a CompletableFuture which completes after un-registration happens successfully and fails otherwise with
    *         [[csw.location.api.exceptions.UnregistrationFailed]]
@@ -41,6 +42,7 @@ trait ILocationService {
    * Unregisters all connections registered
    *
    * Note that it is highly recommended to use this method for testing purpose only
+   *
    * @return a CompletableFuture which completes after all connections are unregistered successfully or fails otherwise
    *         with [[csw.location.api.exceptions.RegistrationListingFailed]]
    */
@@ -106,6 +108,7 @@ trait ILocationService {
    *
    * Note that all locations having subsystem prefix that starts with the given prefix
    *       value will be listed
+   *
    * @param prefix list components by this `prefix`
    * @return a CompletableFuture which completes with filtered locations or can fail with
    *         [[csw.location.api.exceptions.RegistrationListingFailed]]

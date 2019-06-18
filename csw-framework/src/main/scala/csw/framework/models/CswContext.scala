@@ -1,7 +1,6 @@
 package csw.framework.models
+import akka.actor.typed
 import akka.actor.typed.SpawnProtocol
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.{typed, ActorSystem}
 import csw.alarm.api.scaladsl.AlarmService
 import csw.alarm.client.AlarmServiceFactory
 import csw.command.client.models.framework.ComponentInfo
@@ -59,7 +58,6 @@ object CswContext {
   )(implicit richSystem: CswFrameworkSystem): Future[CswContext] = {
 
     implicit val typedSystem: typed.ActorSystem[SpawnProtocol] = richSystem.system
-    implicit val untypedSystem: ActorSystem                    = richSystem.system.toUntyped
     implicit val ec: ExecutionContextExecutor                  = typedSystem.executionContext
 
     val eventService         = eventServiceFactory.make(locationService)

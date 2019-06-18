@@ -16,7 +16,7 @@ sbt
 
 ## Command-based Communication Between Components
 
-A component can send @ref:[Commands](../messages/commands.md) to other components. The commands can be sent as following 
+A component can send @ref:[Commands](../params/commands.md) to other components. The commands can be sent as following 
 with three types of messages: 
 
 * **submit** - A command is sent as Submit when the result of completion is desired.
@@ -61,7 +61,7 @@ Note that the developer code does not need to return `Locked`. If the component 
 Supervisor returns the `Locked` response to the caller and the `validateCommand` handler is not called.
 
 ### The Submit Message
-A `submit` message is sent with its @ref:[command](../messages/commands.md) to a component destination. 
+A `submit` message is sent with its @ref:[command](../params/commands.md) to a component destination. 
 A `SubmitResponse` is returned to the caller when the `submit` message is used.
 If the `validateCommand` handler returns `Accepted`, the framework calls the `onSubmit` handler of the Top Level
 Actor. The `onSubmit` handler always returns a `SubmitResponse`.
@@ -105,7 +105,7 @@ The following table summarizes all the possible values for `SubmitResponse`.
 | Locked | The component is locked by some other command sender. The validation could not occur. |
 
 ###The Oneway Message
-The other option for sending a @ref:[command](../messages/commands.md) to a component destination is the `oneway`
+The other option for sending a @ref:[command](../params/commands.md) to a component destination is the `oneway`
 message. The central difference between `submit` and `oneway` is that `oneway` does not track or allow reporting
 of completion information. It supports a *fire and forget* type of communication approach.
 
@@ -132,7 +132,7 @@ it is not getting out of range values.
 to determine completion. This is more complicated than `submit` but may be useful in some scenarios.
 
 ###The Validate Message
-The `validate` message is available when the sender wants to validate a @ref:[command](../messages/commands.md)
+The `validate` message is available when the sender wants to validate a @ref:[command](../params/commands.md)
 but does not want to execute any associated actions. `Validate` returns a `ValidateResponse`. If the
 component is not locked, the `validateCommand` handler of the Top Level Actor is called and the developer 
 code evaluates the command and returns a `ValidateResponse` as shown in the following table.  
@@ -233,7 +233,7 @@ Scala
 :   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #validate }
 
 Java
-:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #oneway }
+:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #validate }
 
 ### query
 At any time, the `query` call of `CommandService` can be used to check the current status of
@@ -285,7 +285,7 @@ In this case, the returned list is of length 2 rather than 3.
 
 ### subscribeCurrentState
 This method provided by `CommandService` can be used to subscribe to 
-the @ref:[CurrentState](../messages/states.md) of a component by providing a callback that
+the @ref:[CurrentState](../params/states.md) of a component by providing a callback that
 is called with the arrival of every `CurrentState` item.
 
 @@@ note

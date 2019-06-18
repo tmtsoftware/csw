@@ -3,14 +3,14 @@ package csw.admin.server.wiring
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.SpawnProtocol
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.{typed, CoordinatedShutdown, Scheduler}
+import akka.actor.{CoordinatedShutdown, Scheduler, typed}
 import akka.stream.Materializer
 import akka.stream.typed.scaladsl.ActorMaterializer
-import akka.{actor, Done}
+import akka.{Done, actor}
+import csw.admin.server.BuildInfo
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.network.utils.Networks
-import csw.services.BuildInfo
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 

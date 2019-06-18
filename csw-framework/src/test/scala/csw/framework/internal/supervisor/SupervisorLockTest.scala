@@ -1,22 +1,21 @@
 package csw.framework.internal.supervisor
 
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import csw.common.components.framework.SampleComponentState.{choiceKey, initChoice, prefix}
-import csw.common.utils.LockCommandFactory
-import csw.framework.ComponentInfos.assemblyInfo
-import csw.framework.FrameworkTestSuite
-import csw.params.commands.{CommandName, Setup}
-import csw.command.client.models.framework.LockingResponses._
-import csw.command.client.models.framework.{LifecycleStateChanged, LockingResponse, PubSub, SupervisorLifecycleState}
-import csw.params.core.models.{ObsId, Prefix}
-import csw.params.core.states.{CurrentState, StateName}
 import csw.command.client.messages.CommandMessage.Submit
 import csw.command.client.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, Query, Unsubscribe}
 import csw.command.client.messages.ComponentCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
-import csw.command.client.messages.{CommandResponseManagerMessage => CRM}
+import csw.command.client.messages.{CommandResponseManagerMessage ⇒ CRM}
+import csw.command.client.models.framework.LockingResponses._
+import csw.command.client.models.framework.{LifecycleStateChanged, LockingResponse, PubSub, SupervisorLifecycleState}
+import csw.common.components.framework.SampleComponentState.{choiceKey, initChoice, prefix}
+import csw.common.utils.LockCommandFactory
+import csw.framework.ComponentInfos.assemblyInfo
+import csw.framework.FrameworkTestSuite
 import csw.params.commands.CommandResponse._
+import csw.params.commands.{CommandName, Setup}
+import csw.params.core.models.{ObsId, Prefix}
+import csw.params.core.states.{CurrentState, StateName}
 import org.scalatest.BeforeAndAfterEach
 
 import scala.concurrent.duration.DurationDouble
@@ -132,7 +131,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-301: Support UnLocking
   test("should forward messages that are of type SupervisorLockMessage to TLA") {
     val lockingStateProbe  = TestProbe[LockingResponse]
-    val queryResponseProbe = TestProbe[QueryResponse]()(untypedSystem.toTyped)
+    val queryResponseProbe = TestProbe[QueryResponse]()(typedSystem)
 
     val sourcePrefix = Prefix("wfos.prog.cloudcover.source")
     val commandName  = CommandName("move.Client1.success")

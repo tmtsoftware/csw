@@ -26,6 +26,7 @@ class AlarmServiceFactory(redisClient: RedisClient = RedisClient.create()) {
 
   /**
    * A java helper to construct AlarmServiceFactory
+   *
    * @return
    */
   def this() = this(RedisClient.create())

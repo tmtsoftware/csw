@@ -6,11 +6,11 @@ import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.actor.{CoordinatedShutdown, Scheduler}
 import akka.stream.Materializer
 import akka.stream.typed.scaladsl.ActorMaterializer
-import akka.{actor, Done}
+import akka.{Done, actor}
+import csw.location.agent.BuildInfo
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.network.utils.Networks
-import csw.services.BuildInfo
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 

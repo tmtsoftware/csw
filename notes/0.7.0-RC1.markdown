@@ -1,4 +1,4 @@
-## CSW - TMT Common Software v0.-RC1
+## CSW - TMT Common Software v0.7.0-RC1
 
 This is release v0.7.0-RC1 of the TMT Common Software.
 

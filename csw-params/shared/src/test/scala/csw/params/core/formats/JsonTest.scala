@@ -6,6 +6,7 @@ import csw.params.core.formats.JsonSupport._
 import csw.params.core.generics.KeyType.{
   ByteMatrixKey,
   ChoiceKey,
+  CoordKey,
   DoubleKey,
   DoubleMatrixKey,
   IntMatrixKey,
@@ -15,7 +16,7 @@ import csw.params.core.generics.KeyType.{
   StructKey
 }
 import csw.params.core.generics._
-import csw.params.core.models.Units.{degree, encoder, meter, NoUnits}
+import csw.params.core.models.Units.{NoUnits, degree, encoder, meter}
 import csw.params.core.models._
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import org.scalatest.FunSpec
@@ -287,6 +288,41 @@ class JsonTest extends FunSpec {
       assert(sc1in.get(k1).get.values.size == 2)
       assert(sc1in.get(k1).get.values(0) == c1)
       assert(sc1in.get(k1).get.values(1) == c2)
+    }
+  }
+
+  describe("Test Coordinate Types") {
+    import Angle._
+    import Coords._
+    it("Should allow coordinate types") {
+      val basePosKey       = CoordKey.make("BasePosition")
+      val pm               = ProperMotion(0.5, 2.33)
+      val eqCoord          = EqCoord(ra = "12:13:14.15", dec = "-30:31:32.3", frame = FK5, pmx = pm.pmx, pmy = pm.pmy)
+      val solarSystemCoord = SolarSystemCoord(Tag("BASE"), Venus)
+      val minorPlanetCoord = MinorPlanetCoord(Tag("GUIDER1"), 2000, 90.degree, 2.degree, 100.degree, 1.4, 0.234, 220.degree)
+      val cometCoord       = CometCoord(Tag("BASE"), 2000.0, 90.degree, 2.degree, 100.degree, 1.4, 0.234)
+      val altAzCoord       = AltAzCoord(Tag("BASE"), 301.degree, 42.5.degree)
+      val posParam         = basePosKey.set(eqCoord, solarSystemCoord, minorPlanetCoord, cometCoord, altAzCoord)
+
+      val sc1 = Setup(ck, CommandName("move"), Some(obsId)).add(posParam)
+      assert(sc1.get(basePosKey).get.values.length == 5)
+      assert(sc1.get(basePosKey).get.values(0) == eqCoord)
+      assert(sc1.get(basePosKey).get.values(1) == solarSystemCoord)
+      assert(sc1.get(basePosKey).get.values(2) == minorPlanetCoord)
+      assert(sc1.get(basePosKey).get.values(3) == cometCoord)
+      assert(sc1.get(basePosKey).get.values(4) == altAzCoord)
+
+      val sc1out = JsonSupport.writeSequenceCommand(sc1)
+      //        info("sc1out: " + sc1out.prettyPrint)
+
+      val sc1in = JsonSupport.readSequenceCommand[Setup](sc1out)
+      assert(sc1.equals(sc1in))
+      assert(sc1.get(basePosKey).get.values.length == 5)
+      assert(sc1.get(basePosKey).get.values(0) == eqCoord)
+      assert(sc1.get(basePosKey).get.values(1) == solarSystemCoord)
+      assert(sc1.get(basePosKey).get.values(2) == minorPlanetCoord)
+      assert(sc1.get(basePosKey).get.values(3) == cometCoord)
+      assert(sc1.get(basePosKey).get.values(4) == altAzCoord)
     }
   }
 

@@ -89,6 +89,7 @@ class SecurityDirectives private[csw] (authentication: Authentication, realm: St
 
   /**
    * Rejects all un-authorized and non-GET requests
+   *
    * @param authorizationPolicy Authorization policy to use for filtering requests.
    *                            There are different types of authorization policies. See [[csw.aas.http.AuthorizationPolicy]]
    */
@@ -96,6 +97,7 @@ class SecurityDirectives private[csw] (authentication: Authentication, realm: St
 
   /**
    * Rejects all un-authorized and non-PUT requests
+   *
    * @param authorizationPolicy Authorization policy to use for filtering requests.
    *                            There are different types of authorization policies. See [[csw.aas.http.AuthorizationPolicy]]
    */
@@ -103,6 +105,7 @@ class SecurityDirectives private[csw] (authentication: Authentication, realm: St
 
   /**
    * Rejects all un-authorized and non-PATCH requests
+   *
    * @param authorizationPolicy Authorization policy to use for filtering requests.
    *                            There are different types of authorization policies. See [[csw.aas.http.AuthorizationPolicy]]
    */
@@ -110,6 +113,7 @@ class SecurityDirectives private[csw] (authentication: Authentication, realm: St
 
   /**
    * Rejects all un-authorized and non-HEAD requests
+   *
    * @param authorizationPolicy Authorization policy to use for filtering requests.
    *                            There are different types of authorization policies. See [[csw.aas.http.AuthorizationPolicy]]
    */
@@ -117,6 +121,7 @@ class SecurityDirectives private[csw] (authentication: Authentication, realm: St
 
   /**
    * Rejects all un-authorized and non-CONNECT requests
+   *
    * @param authorizationPolicy Authorization policy to use for filtering requests.
    *                            There are different types of authorization policies. See [[csw.aas.http.AuthorizationPolicy]]
    */
@@ -150,6 +155,7 @@ object SecurityDirectives {
    * Creates instance of [[csw.aas.http.SecurityDirectives]] using provided configurations
    *
    * Expects auth-server-url to be present in config.
+   *
    * @param config Config object provided
    */
   def apply(config: Config)(implicit ec: ExecutionContext): SecurityDirectives =

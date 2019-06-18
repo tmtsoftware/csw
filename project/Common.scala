@@ -1,11 +1,14 @@
 import Libs._
+import com.timushev.sbt.updates.UpdatesPlugin.autoImport.dependencyUpdatesFilter
 import org.scalafmt.sbt.ScalafmtPlugin.autoImport.scalafmtOnCompile
 import sbt.Keys._
-import sbt.plugins.JvmPlugin
 import sbt._
+import sbt.plugins.JvmPlugin
 import sbtunidoc.GenJavadocPlugin.autoImport.unidocGenjavadocVersion
 
 object Common extends AutoPlugin {
+
+  // enable these values to be accessible to get and set in sbt console
   object autoImport {
     val suppressAnnotatedWarnings: SettingKey[Boolean] = settingKey[Boolean]("enable annotation based suppression of warnings")
     val enableFatalWarnings: SettingKey[Boolean]       = settingKey[Boolean]("enable fatal warnings")
@@ -15,9 +18,7 @@ object Common extends AutoPlugin {
 
   override def requires: Plugins = JvmPlugin
 
-  val suppressAnnotatedWarnings = settingKey[Boolean]("enable annotation based suppression of warnings")
-  val enableFatalWarnings       = settingKey[Boolean]("enable fatal warnings")
-
+  import autoImport._
   override lazy val projectSettings: Seq[Setting[_]] = Seq(
     organization := "com.github.tmtsoftware.csw",
     organizationName := "TMT Org",
@@ -66,5 +67,6 @@ object Common extends AutoPlugin {
     cancelable in Global := true, // allow ongoing test(or any task) to cancel with ctrl + c and still remain inside sbt
     scalafmtOnCompile := true,
     unidocGenjavadocVersion := "0.13",
+    dependencyUpdatesFilter := dependencyUpdatesFilter.value - moduleFilter(organization = "org.scala-lang")
   )
 }

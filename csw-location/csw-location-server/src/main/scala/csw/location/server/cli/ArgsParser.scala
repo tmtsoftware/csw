@@ -1,6 +1,6 @@
 package csw.location.server.cli
 
-import csw.services.BuildInfo
+import csw.location.server.BuildInfo
 import scopt.OptionParser
 
 /**

@@ -46,6 +46,8 @@ object Dependencies {
       Libs.`scala-async`.value,
       Libs.`scopt`,
       Enumeratum.`enumeratum`.value,
+      Akka.`cluster-sharding`,
+      Akka.`akka-persistence`,
       Libs.`akka-management-cluster-http`,
       AkkaHttp.`akka-http`,
       Libs.`akka-http-play-json`,
@@ -178,6 +180,8 @@ object Dependencies {
       Enumeratum.`enumeratum-play-json`.value,
       Libs.`play-json`.value,
       Libs.`play-json-derived-codecs`.value,
+      Libs.`borer-core`.value,
+      Libs.`borer-derivation`.value,
       Libs.`scalatest`.value % Test
     )
   )
@@ -259,7 +263,6 @@ object Dependencies {
       Libs.`akka-stream-kafka`,
       Libs.`lettuce`,
       Libs.`reactor-core`,
-      Libs.`scalapb-runtime`,
       Akka.`akka-actor-testkit-typed` % Test,
       Akka.`akka-stream-testkit`      % Test,
       Libs.`scalatest`.value          % Test,

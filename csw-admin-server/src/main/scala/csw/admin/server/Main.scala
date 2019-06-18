@@ -5,7 +5,6 @@ import akka.actor.CoordinatedShutdown
 import csw.admin.server.cli.{ArgsParser, Options}
 import csw.admin.server.wiring.AdminWiring
 import csw.location.client.utils.LocationServerStatus
-import csw.services.BuildInfo
 
 import scala.concurrent.duration.DurationDouble
 

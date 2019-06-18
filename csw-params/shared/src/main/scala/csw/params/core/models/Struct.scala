@@ -12,7 +12,7 @@ import scala.collection.JavaConverters.iterableAsScalaIterableConverter
  *
  * @param paramSet a set of Parameters
  */
-case class Struct private (paramSet: Set[Parameter[_]]) extends ParameterSetType[Struct] {
+case class Struct private[params] (paramSet: Set[Parameter[_]]) extends ParameterSetType[Struct] {
 
   /**
    * A Java helper to create Struct with empty paramSet

@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 import static csw.logging.client.utils.Eventually.eventually;
 
 public class ILoggerActorTest extends JUnitSuite {
-    protected static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.behavior(),"base-system");
+    protected static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.behavior(), "base-system");
     protected static LoggingSystem loggingSystem;
 
     protected static List<JsonObject> logBuffer = new ArrayList<>();
@@ -36,7 +36,7 @@ public class ILoggerActorTest extends JUnitSuite {
         return gson.fromJson(json, JsonElement.class).getAsJsonObject();
     }
 
-    protected static TestAppender testAppender     = new TestAppender(x -> {
+    protected static TestAppender testAppender = new TestAppender(x -> {
         logBuffer.add(parse(x.toString()));
         return null;
     });
@@ -58,12 +58,13 @@ public class ILoggerActorTest extends JUnitSuite {
         actorSystem.terminate();
         Await.result(actorSystem.whenTerminated(), Duration.create(10, TimeUnit.SECONDS));
     }
+
     @Test
     public void testDefaultLogConfigurationForActor() {
 
-        AkkaTypedExtension.SpawnProtocolUserActorFactory userActorFactory = AkkaTypedExtension.SpawnProtocolUserActorFactory(actorSystem);
+        AkkaTypedExtension.UserActorFactory userActorFactory = AkkaTypedExtension.UserActorFactory(actorSystem);
 
-        ActorRef<String> tromboneActor = userActorFactory.<String>userActorOf(JTromboneHCDSupervisorActor.behavior(new JLoggerFactory("jTromboneHcdActor")), "JTromboneActor", akka.actor.typed.Props.empty());
+        ActorRef<String> tromboneActor = userActorFactory.<String>spawn(JTromboneHCDSupervisorActor.behavior(new JLoggerFactory("jTromboneHcdActor")), "JTromboneActor", akka.actor.typed.Props.empty());
 
         String actorPath = tromboneActor.path().toString();
         String className = JTromboneHCDSupervisorActor.class.getName();

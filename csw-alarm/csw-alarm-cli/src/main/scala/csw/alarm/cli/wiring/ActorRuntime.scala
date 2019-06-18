@@ -1,16 +1,16 @@
 package csw.alarm.cli.wiring
 
-import akka.{actor, Done}
 import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.stream.Materializer
 import akka.stream.typed.scaladsl.ActorMaterializer
+import akka.{Done, actor}
+import csw.alarm.cli.BuildInfo
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.network.utils.Networks
-import csw.services.BuildInfo
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 

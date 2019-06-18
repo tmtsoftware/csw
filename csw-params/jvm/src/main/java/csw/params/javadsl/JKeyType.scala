@@ -5,6 +5,10 @@ import csw.params.core.generics.{ArrayKeyType, KeyType, MatrixKeyType, SimpleKey
 
 object JSimpleKeyType {
   import JsonSupport._
+
+  //required for Scala compatible and efficient ByteArray codecs
+  import csw.params.core.formats.CborSupport.{javaByteArrayDec, javaByteArrayEnc}
+
   case object BooleanKey extends SimpleKeyType[java.lang.Boolean]
   case object CharKey    extends SimpleKeyType[java.lang.Character]
 
@@ -35,9 +39,18 @@ object JSimpleKeyType {
 /**
  * KeyTypes defined for consumption in Java code
  */
+//noinspection TypeAnnotation
 object JKeyType {
-  val ChoiceKey  = KeyType.ChoiceKey
-  val RaDecKey   = KeyType.RaDecKey
+  val ChoiceKey = KeyType.ChoiceKey
+
+  val RaDecKey            = KeyType.RaDecKey
+  val EqCoordKey          = KeyType.EqCoordKey
+  val SolarSystemCoordKey = KeyType.SolarSystemCoordKey
+  val MinorPlanetCoordKey = KeyType.MinorPlanetCoordKey
+  val CometCoordKey       = KeyType.CometCoordKey
+  val AltAzCoordKey       = KeyType.AltAzCoordKey
+  val CoordKey            = KeyType.CoordKey
+
   val StringKey  = KeyType.StringKey
   val StructKey  = KeyType.StructKey
   val UTCTimeKey = KeyType.UTCTimeKey

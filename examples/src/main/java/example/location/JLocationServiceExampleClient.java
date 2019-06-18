@@ -1,6 +1,9 @@
 package example.location;
 
-import akka.actor.*;
+import akka.actor.AbstractActor;
+import akka.actor.ActorRef;
+import akka.actor.CoordinatedShutdown;
+import akka.actor.Props;
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.SpawnProtocol;
@@ -49,7 +52,6 @@ import static csw.location.api.models.Connection.HttpConnection;
 /**
  * An example location service client application.
  */
-//TODO: Change everything to typed
 public class JLocationServiceExampleClient extends AbstractActor {
 
     private ILogger log = new JLoggerFactory("my-component-name").getLogger(context(), getClass());
@@ -143,8 +145,8 @@ public class JLocationServiceExampleClient extends AbstractActor {
         //#log-info-map
         log.info("Attempting to find " + exampleConnection,
                 Map.of(
-                    JKeys.OBS_ID, "foo_obs_id",
-                    "exampleConnection", exampleConnection.name()
+                        JKeys.OBS_ID, "foo_obs_id",
+                        "exampleConnection", exampleConnection.name()
                 ));
         //#log-info-map
 
@@ -174,8 +176,8 @@ public class JLocationServiceExampleClient extends AbstractActor {
 
         //#log-info-map-supplier
         log.info(() -> "Attempting to resolve " + exampleConnection + " with a wait of " + waitForResolveLimit + "...", () -> Map.of(
-            JKeys.OBS_ID, "foo_obs_id",
-            "exampleConnection", exampleConnection.name()
+                JKeys.OBS_ID, "foo_obs_id",
+                "exampleConnection", exampleConnection.name()
         ));
         //#log-info-map-supplier
 
@@ -310,7 +312,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
                 .matchAny((Object x) -> {
                     //#log-info-error-supplier
                     RuntimeException runtimeException = new RuntimeException("Received unexpected message " + x);
-                    log.info(() -> runtimeException.getMessage(), runtimeException);
+                    log.info(runtimeException::getMessage, runtimeException);
                     //#log-info-error-supplier
                 })
                 .build();
@@ -323,7 +325,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         Await.result(locationWiring.locationHttpService().start(), new FiniteDuration(5, TimeUnit.SECONDS));
 
         //#create-actor-system
-        ActorSystem<SpawnProtocol> typedSystem = ActorSystemFactory.remote(SpawnProtocol.behavior(),"csw-examples-locationServiceClient");
+        ActorSystem<SpawnProtocol> typedSystem = ActorSystemFactory.remote(SpawnProtocol.behavior(), "csw-examples-locationServiceClient");
         //#create-actor-system
 
         //#create-logging-system
@@ -331,7 +333,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         loggingSystem = JLoggingSystemFactory.start("JLocationServiceExampleClient", "0.1", host, typedSystem);
         //#create-logging-system
 
-        akka.actor.ActorSystem untypedSystem = ActorSystemFactory.remote();
+        akka.actor.ActorSystem untypedSystem = akka.actor.ActorSystem.create("test");
         untypedSystem.actorOf(Props.create(JLocationServiceExampleClient.class), "LocationServiceExampleClient");
     }
 }

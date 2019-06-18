@@ -10,7 +10,6 @@ import com.google.gson.JsonObject;
 import csw.logging.api.models.LoggingLevels;
 import csw.logging.client.appenders.LogAppenderBuilder;
 import csw.logging.client.commons.AkkaTypedExtension;
-import csw.logging.client.commons.AkkaTypedExtension.SpawnProtocolUserActorFactory;
 import csw.logging.client.commons.LoggingKeys$;
 import csw.logging.client.components.iris.JIrisSupervisorActor;
 import csw.logging.client.components.iris.JIrisTLA;
@@ -26,14 +25,17 @@ import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static csw.logging.client.utils.Eventually.eventually;
 
 // DEOPSCSW-316: Improve Logger accessibility for component developers
 public class ILoggerTest extends JUnitSuite {
-    private static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.behavior(),"base-system");
+    private static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.behavior(), "base-system");
     private static LoggingSystem loggingSystem;
 
     private static List<JsonObject> logBuffer = new ArrayList<>();
@@ -43,7 +45,7 @@ public class ILoggerTest extends JUnitSuite {
         return gson.fromJson(json, JsonElement.class).getAsJsonObject();
     }
 
-    private static TestAppender testAppender     = new TestAppender(x -> {
+    private static TestAppender testAppender = new TestAppender(x -> {
         logBuffer.add(parse(x.toString()));
         return null;
     });
@@ -54,11 +56,11 @@ public class ILoggerTest extends JUnitSuite {
     private static List<JsonObject> irisLogBuffer = new ArrayList<>();
     private static List<JsonObject> tromboneHcdLogBuffer = new ArrayList<>();
 
-    private static SpawnProtocolUserActorFactory userActorFactory = AkkaTypedExtension.SpawnProtocolUserActorFactory(actorSystem);
+    private static AkkaTypedExtension.UserActorFactory userActorFactory = AkkaTypedExtension.UserActorFactory(actorSystem);
 
-    private static ActorRef<String> irisSupervisorActor = userActorFactory.<String>userActorOf(JIrisSupervisorActor.behavior, "JIRISActor", Props.empty());
-    private static ActorRef<String> tromboneSupervisorActor = userActorFactory.<String>userActorOf(JTromboneHCDSupervisorActor.behavior(new JLoggerFactory("jTromboneHcdActor")), "JTromboneActor", Props.empty());
-    private static ActorRef<String> genericActor = userActorFactory.<String>userActorOf(JGenericActor.behavior, "JGenericActor", Props.empty());
+    private static ActorRef<String> irisSupervisorActor = userActorFactory.<String>spawn(JIrisSupervisorActor.behavior, "JIRISActor", Props.empty());
+    private static ActorRef<String> tromboneSupervisorActor = userActorFactory.<String>spawn(JTromboneHCDSupervisorActor.behavior(new JLoggerFactory("jTromboneHcdActor")), "JTromboneActor", Props.empty());
+    private static ActorRef<String> genericActor = userActorFactory.<String>spawn(JGenericActor.behavior, "JGenericActor", Props.empty());
 
     @BeforeClass
     public static void setup() {
@@ -114,7 +116,7 @@ public class ILoggerTest extends JUnitSuite {
     }
 
     private void testLogBuffer(List<JsonObject> logBuffer, LoggingLevels.Level configuredLogLevel) {
-        logBuffer.forEach( log -> {
+        logBuffer.forEach(log -> {
             String currentLogLevel = log.get(LoggingKeys$.MODULE$.SEVERITY()).getAsString().toLowerCase();
             Assert.assertTrue(LoggingLevels.Level$.MODULE$.apply(currentLogLevel).$greater$eq(configuredLogLevel));
         });

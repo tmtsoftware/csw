@@ -56,6 +56,7 @@ case class Choices(values: Set[Choice]) {
 
   /**
    * A Java helper to get all choices this instance holds
+   *
    * @return
    */
   def jValues(): util.List[Choice] = values.toList.asJava

@@ -1,8 +1,8 @@
 package example.event
 import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorRef, Behavior}
-import akka.actor.{ActorSystem, Cancellable, Scheduler}
+import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
+import akka.actor.{Cancellable, Scheduler}
 import akka.util.Timeout
 import csw.event.api.scaladsl.EventPublisher
 import csw.params.core.generics.{Key, KeyType}
@@ -13,12 +13,12 @@ import example.event.TemperatureMessage._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationDouble
 
-class ConcurrencyInCallbacksExample(publisher: EventPublisher)(implicit actorSystem: ActorSystem) {
+class ConcurrencyInCallbacksExample(publisher: EventPublisher)(implicit actorSystem: ActorSystem[_]) {
 
   def behavior(): Behavior[TemperatureMessage] = Behaviors.setup { ctx ⇒
     implicit val timeout: Timeout     = Timeout(5.seconds)
     implicit val scheduler: Scheduler = actorSystem.scheduler
-    implicit val ec: ExecutionContext = actorSystem.dispatcher
+    implicit val ec: ExecutionContext = actorSystem.executionContext
 
     // Mutable state which needs to be mutated from anywhere from the program
     var currentTemperature: Temperature = Temperature(0)

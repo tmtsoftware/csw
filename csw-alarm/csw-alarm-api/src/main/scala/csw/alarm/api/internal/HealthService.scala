@@ -23,7 +23,6 @@ private[alarm] trait HealthService {
    * aggregation changes
    *
    * @note Callbacks are not thread-safe on the JVM. If you need to do side effects/mutations, prefer using [[subscribeAggregatedHealthActorRef]] API.
-   *
    * @note aggregated health is worst amongst all active alarms for given key
    * @param key represents an alarm, component, subsystem or system
    * @param callback executed with the latest worst health

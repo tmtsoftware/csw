@@ -1,6 +1,6 @@
 package csw.event.cli.args
 
-import csw.services.BuildInfo
+import csw.event.cli.BuildInfo
 import scopt.OptionParser
 
 /**

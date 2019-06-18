@@ -470,5 +470,15 @@ function stop() {
     fi
 }
 
+# Print the CSW version (Gets the version from one of the csw jar files)
+function show_version {
+    cswVersion=`(cd ../lib; echo com.github.tmtsoftware.csw.csw-logging-api-*.jar | sed -E 's/[a-z\.\-]*([A-Z0-9\.\-]*)/\1/' | sed -e 's/.jar//')`
+    echo
+    echo "CSW services version $cswVersion"
+    echo
+}
+
+show_version
+
 # Parse command line arguments
 parse_cmd_args "$@"

@@ -5,9 +5,9 @@ import scalapb.compiler.Version.scalapbVersion
 
 object Libs {
   val ScalaVersion    = "2.12.8"
-  val silencerVersion = "1.3.3"
+  val silencerVersion = "1.4.1"
 
-  val `scalatest` = dep("org.scalatest" %%% "scalatest" % "3.0.6") //Apache License 2.0
+  val `scalatest` = dep("org.scalatest" %%% "scalatest" % "3.0.8") //Apache License 2.0
 
   val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0" //BSD 3-clause "New" or "Revised" License
   val `scala-async`        = dep("org.scala-lang.modules" %% "scala-async" % "0.10.0") //BSD 3-clause "New" or "Revised" License
@@ -15,24 +15,22 @@ object Libs {
   val `junit`              = "junit" % "junit" % "4.12" //Eclipse Public License 1.0
   val `silencer-plugin`    = compilerPlugin("com.github.ghik" %% "silencer-plugin" % silencerVersion)
   val `silencer-lib`       = "com.github.ghik" %% "silencer-lib" % silencerVersion % Compile
-  val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.4.3"
+  val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.5.9"
   //MIT License
   val `embedded-keycloak`            = "com.github.tmtsoftware"        % "embedded-keycloak"             % "0.1.2" //Apache 2.0
   val `logback-classic`              = "ch.qos.logback"                % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
-  val `akka-management-cluster-http` = "com.lightbend.akka.management" %% "akka-management-cluster-http" % "1.0.0"
+  val `akka-management-cluster-http` = "com.lightbend.akka.management" %% "akka-management-cluster-http" % "1.0.1"
   val `svnkit`                       = "org.tmatesoft.svnkit"          % "svnkit"                        % "1.9.3" //TMate Open Source License
   val `commons-codec`                = "commons-codec"                 % "commons-codec"                 % "1.10" //Apache 2.0
   val `scala-reflect`                = "org.scala-lang"                % "scala-reflect"                 % ScalaVersion //BSD-3
   val `gson`                         = "com.google.code.gson"          % "gson"                          % "2.8.5" //Apache 2.0
 
-  val `play-json` = dep("com.typesafe.play" %%% "play-json" % "2.7.3") //Apache 2.0
+  val `play-json` = dep("com.typesafe.play" %%% "play-json" % "2.7.4") //Apache 2.0
 
-  val `akka-http-play-json`      = "de.heikoseeberger"    %% "akka-http-play-json"      % "1.25.2" //Apache 2.0
-  val `jwt-play-json`            = "com.pauldijou"        %% "jwt-play-json"            % "2.1.0"
-  val `scalapb-runtime`          = "com.thesamet.scalapb" %% "scalapb-runtime"          % scalapbVersion % "protobuf"
-  val `scalapb-json4s`           = "com.thesamet.scalapb" %% "scalapb-json4s"           % scalapbVersion
-  val `lettuce`                  = "io.lettuce"           % "lettuce-core"              % "5.1.6.RELEASE"
-  val `reactor-core`             = "io.projectreactor"    % "reactor-core"              % "3.2.9.RELEASE"
+  val `akka-http-play-json`      = "de.heikoseeberger"    %% "akka-http-play-json"      % "1.26.0" //Apache 2.0
+  val `jwt-play-json`            = "com.pauldijou"        %% "jwt-play-json"            % "3.0.0"
+  val `lettuce`                  = "io.lettuce"           % "lettuce-core"              % "5.1.7.RELEASE"
+  val `reactor-core`             = "io.projectreactor"    % "reactor-core"              % "3.2.10.RELEASE"
   val `reactive-streams`         = "org.reactivestreams"  % "reactive-streams"          % "1.0.2"
   val `akka-stream-kafka`        = "com.typesafe.akka"    %% "akka-stream-kafka"        % "0.22"
   val `scalatest-embedded-kafka` = "net.manub"            %% "scalatest-embedded-kafka" % "1.1.0"
@@ -41,7 +39,7 @@ object Libs {
   val `HdrHistogram`             = "org.hdrhistogram"     % "HdrHistogram"              % "2.1.11"
   val `testng`                   = "org.testng"           % "testng"                    % "6.14.3"
 
-  val `scala-csv`                = "com.github.tototoshi" %% "scala-csv" % "1.3.5"
+  val `scala-csv`                = "com.github.tototoshi" %% "scala-csv" % "1.3.6"
   val `scalajs-java-time`        = dep("org.scala-js" %%% "scalajs-java-time" % "0.2.5")
   val `json-schema-validator`    = "com.github.fge" % "json-schema-validator" % "2.2.8" //LGPL/ASL
   val `play-json-derived-codecs` = dep("org.julienrf" %%% "play-json-derived-codecs" % "5.0.0")
@@ -50,11 +48,14 @@ object Libs {
   val `postgresql`      = "org.postgresql"                % "postgresql"      % "42.2.5"
   val `hikaricp`        = "com.zaxxer"                    % "HikariCP"        % "3.3.1" //Apache License 2.0
   val `otj-pg-embedded` = "com.opentable.components"      % "otj-pg-embedded" % "0.13.1"
-  val httpclient        = "org.apache.httpcomponents"     % "httpclient"      % "4.5.8"
+  val httpclient        = "org.apache.httpcomponents"     % "httpclient"      % "4.5.9"
   val `jboss-logging`   = "org.jboss.logging"             % "jboss-logging"   % "3.4.0.Final"
   val `config`          = "com.typesafe"                  % "config"          % "1.3.4"
-  val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.2.9"
+  val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.3.0"
   val `caffeine`        = "com.github.ben-manes.caffeine" % "caffeine"        % "2.7.0"
+
+  val `borer-core`       = dep("io.bullet" %%% "borer-core"       % "0.9.0")
+  val `borer-derivation` = dep("io.bullet" %%% "borer-derivation" % "0.9.0")
 }
 
 object Jackson {
@@ -90,6 +91,8 @@ object Akka {
   val `akka-cluster`             = "com.typesafe.akka" %% "akka-cluster" % Version
   val `akka-cluster-typed`       = "com.typesafe.akka" %% "akka-cluster-typed" % Version
   val `akka-slf4j`               = "com.typesafe.akka" %% "akka-slf4j" % Version
+  val `cluster-sharding`         = "com.typesafe.akka" %% "akka-cluster-sharding" % Version
+  val `akka-persistence`         = "com.typesafe.akka" %% "akka-persistence" % Version
 }
 
 object AkkaHttp {

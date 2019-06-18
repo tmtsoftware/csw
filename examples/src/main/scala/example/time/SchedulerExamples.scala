@@ -3,16 +3,16 @@ package example.time
 import java.time.Duration
 
 import akka.actor.typed.Behavior
-import akka.actor.typed.scaladsl.adapter.{TypedActorRefOps, TypedActorSystemOps}
+import akka.actor.typed.scaladsl.adapter.TypedActorRefOps
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
-import akka.actor.{ActorRef, ActorSystem}
+import akka.actor.{ActorRef, typed}
 import csw.time.core.models.UTCTime
 import csw.time.scheduler.TimeServiceSchedulerFactory
 import csw.time.scheduler.api.TimeServiceScheduler
 
 class SchedulerExamples(ctx: ActorContext[UTCTime]) {
 
-  implicit val actorSystem: ActorSystem = ctx.system.toUntyped
+  implicit val actorSystem: typed.ActorSystem[_] = ctx.system
   //#create-scheduler
   // create time service scheduler using the factory method
   private val scheduler: TimeServiceScheduler = TimeServiceSchedulerFactory.make()(actorSystem)

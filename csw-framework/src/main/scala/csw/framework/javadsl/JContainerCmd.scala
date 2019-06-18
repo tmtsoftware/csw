@@ -20,7 +20,7 @@ object JContainerCmd {
    * @param name the name to be used for the main app which uses this utility
    * @param args the command line args accepted in the main app which uses this utility
    * @param defaultConfig the default configuration which specifies the container or the component to be started
-                          alone without any container
+   *alone without any container
    * @return actor ref of the container or supervisor of the component started without container
    */
   def start(name: String, args: Array[String], defaultConfig: Optional[Config]): ActorRef[_] =

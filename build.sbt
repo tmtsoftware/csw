@@ -63,7 +63,7 @@ lazy val multiJvmProjects: Seq[ProjectReference] = Seq(
   `csw-command-client`,
   `csw-framework`,
   `csw-config-cli`,
-  `csw-config-client`,
+  `csw-config-client`
 )
 
 /* ================= Root Project ============== */
@@ -222,7 +222,7 @@ lazy val `csw-logging` = project
   .aggregate(
     `csw-logging-macros`,
     `csw-logging-api`,
-    `csw-logging-client`,
+    `csw-logging-client`
   )
 
 lazy val `csw-logging-macros` = project
@@ -243,7 +243,6 @@ lazy val `csw-logging-client` = project
   .settings(
     libraryDependencies ++= Dependencies.LoggingClient.value
   )
-
 
 /* ================= Params ================ */
 lazy val `csw-params` = crossProject(JSPlatform, JVMPlatform)
@@ -292,9 +291,8 @@ lazy val `csw-command` = project
   .in(file("csw-command"))
   .aggregate(
     `csw-command-api`,
-    `csw-command-client`,
+    `csw-command-client`
   )
-
 
 lazy val `csw-command-api` = project
   .in(file("csw-command/csw-command-api"))
@@ -343,12 +341,6 @@ lazy val `csw-event-client` = project
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.EventClient.value)
-  .settings(
-    PB.targets in Compile := Seq(
-      scalapb.gen() -> (sourceManaged in Compile).value
-    ),
-    PB.protocVersion := "-v371"
-  )
 
 lazy val `csw-event-cli` = project
   .in(file("csw-event/csw-event-cli"))
@@ -370,7 +362,6 @@ lazy val `csw-alarm` = project
     `csw-alarm-cli`
   )
 
-
 lazy val `csw-alarm-api` = project
   .in(file("csw-alarm/csw-alarm-api"))
   .dependsOn(`csw-params-jvm`, `csw-time-core-jvm`)
@@ -384,7 +375,7 @@ lazy val `csw-alarm-client` = project
     `csw-location-api`,
     `csw-logging-client`,
     `romaine`,
-    `csw-logging-client`         % "test->test",
+    `csw-logging-client`  % "test->test",
     `csw-commons`         % "test->test",
     `csw-location-server` % "test->compile;test->test"
   )
@@ -418,7 +409,6 @@ lazy val `csw-time` = project
     aggregate in test := !sys.props.contains("disableTimeTests")
   )
 
-
 lazy val `csw-time-clock` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Dummy)
   .in(file("csw-time/csw-time-clock"))
@@ -427,10 +417,10 @@ lazy val `csw-time-clock` = crossProject(JSPlatform, JVMPlatform)
   .jsSettings(libraryDependencies += Libs.`scalajs-java-time`.value)
   .settings(fork := false)
 
-lazy val `csw-time-clock-js` = `csw-time-clock`.js
+lazy val `csw-time-clock-js`  = `csw-time-clock`.js
 lazy val `csw-time-clock-jvm` = `csw-time-clock`.jvm
 
-lazy val `csw-time-core` =  crossProject(JSPlatform, JVMPlatform)
+lazy val `csw-time-core` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("csw-time/csw-time-core"))
   .dependsOn(`csw-time-clock`)
@@ -440,7 +430,7 @@ lazy val `csw-time-core` =  crossProject(JSPlatform, JVMPlatform)
     fork := false
   )
 
-lazy val `csw-time-core-js` = `csw-time-core`.js
+lazy val `csw-time-core-js`  = `csw-time-core`.js
 lazy val `csw-time-core-jvm` = `csw-time-core`.jvm
 
 lazy val `csw-time-scheduler` = project
@@ -517,7 +507,7 @@ lazy val examples = project
   .settings(
     libraryDependencies ++= Dependencies.Examples.value,
     scalacOptions ++= Seq(
-      if(Common.suppressAnnotatedWarnings.value) "-P:silencer:pathFilters=.*" else ""
+      if (Common.autoImport.suppressAnnotatedWarnings.value) "-P:silencer:pathFilters=.*" else ""
     )
   )
 
@@ -579,9 +569,7 @@ lazy val `csw-aas-core` = project
 
 lazy val `csw-aas-http` = project
   .in(file("csw-aas/csw-aas-http"))
-  .dependsOn(
-    `csw-aas-core`,
-    `csw-location-server` % "multi-jvm->multi-jvm")
+  .dependsOn(`csw-aas-core`, `csw-location-server` % "multi-jvm->multi-jvm")
   .enablePlugins(AutoMultiJvm)
   .settings(
     libraryDependencies ++= Dependencies.AuthAkkaHttpAdapter.value

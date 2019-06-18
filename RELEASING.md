@@ -5,11 +5,6 @@
 ### Git
 * Make sure git authentication works on jenkins agent by running cmd: `ssh -vT git@github.com`
 
-### Node
-* Node is installed
-* npm module `junit-merge` is installed (for merging multiple xml test reports into one)
-* npm module `junit-viewer` is installed (for generating html test report from merged xml)
-
 ## Steps to release
 
 ### csw
@@ -25,6 +20,10 @@
 
 ### Release `csw-js` (if needed)
 - Release `csw-js` if keycloak version is updated in csw
+
+### Release csw-client
+1. Update the csw version in `build.sbt`
+2. Release `csw-client` with the latest `VERSION` of csw.
 
 #### Note - `VERSION` tag is version number with 'v' as prefix. For eg. `v0.0.0`
 
