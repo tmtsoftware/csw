@@ -2,7 +2,7 @@ filebeat:
   modules:
     - module: redis
       # Uncomment the below line if path of Redis logs are different than default. Add the path for fetching logs
-       var.paths: ["/usr/local/var/log/redis/redis-server.log*", "/usr/local/var/log/redis/*/redis-server.log*"]
+       var.paths: ["/var/log/redis/*.log*", "/var/log/redis/*/*.log*"]
     - module: system
       syslog:
         var.convert_timezone: true

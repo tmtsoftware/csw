@@ -199,8 +199,9 @@ for production are provided by referring to DNS host name.
 
 In production, Redis will be started in sentinel mode, master mode and slave mode on different machines for Event and Alarm service. [Configuration files]
 (https://github.com/tmtsoftware/csw/tree/master/scripts/conf)
-are provided for Redis sentinel, master and slave to log in file `/usr/local/var/log/redis/redis-server.log`. Filebeat will also be watching this file
-once the [Redis module](https://www.elastic.co/guide/en/beats/filebeat/6.7/filebeat-module-redis.html) is enabled.
+are provided for Redis sentinel, master and slave to log in file `/var/log/redis/redis-server.log` (user needs to uncomment `logfile` path in conf files).
+Filebeat will also be watching this file once the [Redis module](https://www.elastic.co/guide/en/beats/filebeat/6.7/filebeat-module-redis.html) is
+enabled.
 
 Note that system generated logs on Redis machines also needs to be watched by Filebeat and aggregated. In order to enable Redis and System module
 follow the below given steps: 

@@ -3,7 +3,7 @@ filebeat:
     - module: postgresql
       log:
         # Default path for filebeat to watch for postgres logs
-        var.paths: ["/usr/local/var/postgres/*.log*", "/usr/local/var/postgres/*/*.log*"]
+        var.paths: ["/var/postgres/*.log*", "/var/postgres/*/*.log*"]
     - module: system
       syslog:
         var.convert_timezone: true

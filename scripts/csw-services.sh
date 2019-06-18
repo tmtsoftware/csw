@@ -70,9 +70,11 @@ sentinelPortFile=${logDir}/redis_sentinel.port
 
 eventMasterPidFile=${logDir}/event_master.pid
 eventMasterPortFile=${logDir}/event_master.port
+eventMasterlogFile=${logDir}/'event-master.log'
 
 alarmMasterPidFile=${logDir}/alarm_master.pid
 alarmMasterPortFile=${logDir}/alarm_master.port
+alarmMasterlogFile=${logDir}/'alarm-master.log'
 
 AASLogFile=${logDir}/AAS.log
 AASPidFile=${logDir}/AAS.pid
@@ -188,7 +190,7 @@ function start_sentinel() {
             cp -f ${sentinelTemplateConf} ${sentinelConf}
             sed -i- -e "s/eventServer 127.0.0.1/eventServer ${IP}/g" ${sentinelConf}
             sed -i- -e "s/alarmServer 127.0.0.1/alarmServer ${IP}/g" ${sentinelConf}
-            nohup ./csw-location-agent --name "EventServer,AlarmServer" --command "$redisSentinel ${sentinelConf} --port ${sentinel_port}" --port "${sentinel_port}" -J-Dcsw-location-client.server-http-port=${location_http_port} &
+            nohup ./csw-location-agent --name "EventServer,AlarmServer" --command "$redisSentinel ${sentinelConf} --port ${sentinel_port} --logfile ${TMT_LOG_HOME}/sentinel.log" --port "${sentinel_port}" -J-Dcsw-location-client.server-http-port=${location_http_port} &
             echo $! > ${sentinelPidFile}
             echo ${sentinel_port} > ${sentinelPortFile}
         else
@@ -215,12 +217,12 @@ function start_AAS() {
 
 function start_event() {
     echo "[EVENT] Starting Event Service..."
-    start_redis ${eventMasterConf} ${eventMasterPidFile} ${event_master_port} ${eventMasterPortFile}
+    start_redis ${eventMasterConf} ${eventMasterPidFile} ${event_master_port} ${eventMasterPortFile} ${eventMasterlogFile}
 }
 
 function start_alarm() {
     echo "[ALARM] Starting Alarm Service..."
-    start_redis ${alarmMasterConf} ${alarmMasterPidFile} ${alarm_master_port} ${alarmMasterPortFile}
+    start_redis ${alarmMasterConf} ${alarmMasterPidFile} ${alarm_master_port} ${alarmMasterPortFile} ${alarmMasterlogFile}
 }
 
 function start_redis() {
@@ -228,10 +230,11 @@ function start_redis() {
     local pidFile=$2
     local port=$3
     local portFile=$4
+    local logfile=$5
 
     if [[ -x "$location_agent_script" ]]; then
         if checkIfRedisIsInstalled ; then
-            nohup redis-server ${conf} &
+            nohup redis-server ${conf} --logfile ${logfile} &
             echo $! > ${pidFile}
             echo ${port} > ${portFile}
         else
