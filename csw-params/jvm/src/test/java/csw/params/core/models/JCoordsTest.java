@@ -3,10 +3,6 @@ package csw.params.core.models;
 import csw.params.commands.CommandName;
 import csw.params.commands.Setup;
 import csw.params.core.formats.JavaJsonSupport;
-import csw.params.core.formats.JsonSupport;
-import csw.params.core.generics.Key;
-import csw.params.core.generics.Parameter;
-import csw.params.javadsl.JKeyType;
 import org.junit.Test;
 import csw.params.core.models.Coords.*;
 import play.api.libs.json.Json;
@@ -135,7 +131,7 @@ public class JCoordsTest {
         var c1 = js.as(JCometCoord.coordFormat());
         assertEquals(c0, c1);
 
-        var js2 = Json.toJson((Coord) c0, JCoord.jsonFormat());
+        var js2 = Json.toJson(c0, JCoord.jsonFormat());
         assertEquals(js2.as(JCoord.jsonFormat()), c0);
     }
 
@@ -180,5 +176,4 @@ public class JCoordsTest {
 
         assertEquals(setupIn, setup);
     }
-
 }
