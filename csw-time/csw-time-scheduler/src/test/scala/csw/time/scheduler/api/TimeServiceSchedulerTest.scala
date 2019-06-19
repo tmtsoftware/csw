@@ -26,8 +26,6 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
 //  private implicit val system1: typed.ActorSystem[_] = typed.ActorSystem(Behavior.empty, "test")
   private val timeService = TimeServiceSchedulerFactory.make()
 
-  override protected def beforeAll(): Unit = TMTClock.clock.setTaiOffset(37)
-
   // DEOPSCSW-542: Schedule a task to execute in future
   List(
     ("TAITime", () ⇒ TAITime(TAITime.now().value.plusSeconds(1))), // lazily evaluate time when tests are executed

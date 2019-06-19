@@ -7,10 +7,8 @@ import akka.actor.testkit.typed.javadsl.TestKitJunitResource;
 import akka.actor.typed.internal.adapter.ActorSystemAdapter;
 import akka.testkit.TestProbe;
 import akka.testkit.javadsl.TestKit;
-import csw.time.clock.natives.models.TMTClock$;
 import csw.time.core.models.TAITime;
 import csw.time.scheduler.TimeServiceSchedulerFactory;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
@@ -34,11 +32,6 @@ public class JTimeServiceSchedulerTest extends JUnitSuite {
 
     private ActorSystem untypedSystem = ActorSystemAdapter.toUntyped(testKit.system());
     private TestKit untypedTestKit = new TestKit(untypedSystem);
-
-    @BeforeClass
-    public static void setup() {
-        TMTClock$.MODULE$.clock().setTaiOffset(37);
-    }
 
     //------------------------------Scheduling-------------------------------
 

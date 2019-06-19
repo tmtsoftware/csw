@@ -2,17 +2,14 @@ package csw.time.core.models
 
 import java.time.{Duration, Instant}
 
-import csw.time.clock.natives.models.TMTClock
+import csw.time.clock.natives.models.TimeConstants
 import org.scalatest.Matchers._
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
 import scala.concurrent.duration.DurationDouble
 
 class TMTTimeTest extends FunSuite with BeforeAndAfterAll {
-  private val TaiOffset = 37
-  private val jitter    = 10
-
-  override protected def beforeAll(): Unit = TMTClock.clock.setTaiOffset(TaiOffset)
+  private val jitter = 10
 
   test("should get utc time") {
     val utcTime        = UTCTime.now()
@@ -25,7 +22,7 @@ class TMTTimeTest extends FunSuite with BeforeAndAfterAll {
   test("should convert utc to tai") {
     val utcTime = UTCTime.now()
     val taiTime = utcTime.toTAI
-    Duration.between(utcTime.value, taiTime.value).getSeconds shouldEqual TaiOffset
+    Duration.between(utcTime.value, taiTime.value).getSeconds shouldEqual TimeConstants.taiOffset
   }
 
   test("should give time duration between given timestamp and current time") {
