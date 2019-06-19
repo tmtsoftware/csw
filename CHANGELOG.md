@@ -9,7 +9,7 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
-## [CSW v0.7.0] - 2019-06-14
+## [CSW v0.7.0] - 2019-06-19
 
 This is the release candidate 1 of the fourth release of the TMT Common Software for project stakeholders. 
 This release includes Time Service, Authentication and Authorization Service, Database Service and Logging Aggregator Service.
