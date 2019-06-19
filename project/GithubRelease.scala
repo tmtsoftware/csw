@@ -94,7 +94,7 @@ object GithubRelease extends AutoPlugin {
       .map(p ⇒ stage in Universal in p)
       .join
       .value
-      .flatMap(x ⇒ Path.allSubpaths(x))
+      .flatMap(x ⇒ Path.allSubpaths(x.getAbsoluteFile))
       .distinct
       .map {
         case (source, dest) ⇒ (source, s"$zipFileName/$dest")
