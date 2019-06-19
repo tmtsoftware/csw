@@ -33,6 +33,22 @@ sbt
     ```
     @@@
 
+@@@note
+
+**Applicable only to Linux Users.**
+
+If your machines are not PTP enabled/synced, you need to set the tai_offset kernel variable on your machine.
+This value is used in APIs like `TAITime.now()` or `TAITime.offset` and in scheduling APIs which take TAI time.
+
+To set the tai offset, run the following command.
+```
+sudo ntptime -T 37
+```
+
+Install `ntp`, `ntpdate` packages to get this command on your machine.
+
+@@@
+
 ## Time Service API Flavors
 
 There are total three APIs provided by the Time Service:  

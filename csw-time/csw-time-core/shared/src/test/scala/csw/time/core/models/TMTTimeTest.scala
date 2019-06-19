@@ -3,12 +3,12 @@ package csw.time.core.models
 import java.time.{Duration, Instant}
 
 import csw.time.clock.natives.models.TimeConstants
+import org.scalatest.FunSuite
 import org.scalatest.Matchers._
-import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
 import scala.concurrent.duration.DurationDouble
 
-class TMTTimeTest extends FunSuite with BeforeAndAfterAll {
+class TMTTimeTest extends FunSuite {
   private val jitter = 10
 
   test("should get utc time") {
