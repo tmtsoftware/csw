@@ -32,7 +32,7 @@ package csw.command.client.messages
  *                                                                    +------+---+----+                                             |            +-------------+------------+                                                                                    *      |
  *                                                                    |               |                                             |            |                          |                                                                                    *      |
  *                                                                    | CommonMessage |                                             |        +---+ SupervisorRunningMessage +-----+-------------------------------+                                              *      |
- *                                                                    |  (external)   |                                             |        |   |                          |     |                               |                                              *      |
+ *                                                                    |               |                                             |        |   |                          |     |                               |                                              *      |
  *                                                                    +---------------+                                             |        |   +--------------------------+     |                               |                                              *      |
  *                                                                                                                                  |        |                                    |                               |                                              *      |
  *                                                                                                                                  |        |                                    |                               |                                              *      |
@@ -50,7 +50,7 @@ package csw.command.client.messages
  *                                                                                                                                                                                      +--------+---+---+
  *                                                                                                                                                                                      |                |
  *                                                                                                                                                                                      | CommandMessage |
- *                                                                                                                                                                                      |   (external)   |
+ *                                                                                                                                                                                      |                |
  *                                                                                                                                                                                      +----------------+
  *
  */
