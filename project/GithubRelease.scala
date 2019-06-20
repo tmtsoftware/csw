@@ -49,7 +49,7 @@ object GithubRelease extends AutoPlugin {
     // 2. generate html report from xml files
     IO.withTemporaryDirectory { dir ⇒
       // copy xml files from all projects to single directory
-      xmlFiles.foreach { case (file, fileName) ⇒ Files.copy(file.toPath, (dir / fileName).toPath) }
+      xmlFiles.foreach { case (file, fileName) ⇒ if (fileName.nonEmpty) Files.copy(file.toPath, (dir / fileName).toPath) }
 
       // 2.1 create single xml file by merging all xml's
       val xmlFilesDir     = dir.getAbsolutePath
