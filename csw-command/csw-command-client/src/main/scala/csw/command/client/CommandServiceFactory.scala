@@ -8,7 +8,12 @@ import csw.location.api.models.AkkaLocation
 /**
  * The factory helps in creating CommandService api for scala and java both
  */
-object CommandServiceFactory {
+trait ICommandServiceFactory {
+  def make(componentLocation: AkkaLocation)(implicit actorSystem: ActorSystem[_]): CommandService
+  def jMake(componentLocation: AkkaLocation, actorSystem: ActorSystem[_]): ICommandService
+}
+
+object CommandServiceFactory extends ICommandServiceFactory {
 
   /**
    * Make a CommandService instance for scala
