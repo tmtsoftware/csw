@@ -19,6 +19,8 @@ sealed trait CommandResponse extends TMTSerializable {
  */
 object CommandResponse {
 
+  sealed trait RemoteMsg
+
   /**
    * ValidationResponse is returned by validateCommand handler.
    * Values can only be Invalid, Accepted
@@ -61,14 +63,14 @@ object CommandResponse {
    *
    * @param runId the runId of command for which this response is created
    */
-  case class Accepted(runId: Id) extends ValidateCommandResponse with ValidateResponse with OnewayResponse
+  case class Accepted(runId: Id) extends ValidateCommandResponse with ValidateResponse with OnewayResponse with RemoteMsg
 
   /**
    * Represents an intermediate response stating a long running command has been started
    *
    * @param runId of command for which this response is created
    */
-  case class Started(runId: Id) extends SubmitResponse
+  case class Started(runId: Id) extends SubmitResponse with RemoteMsg
 
   /**
    * Represents a positive response stating completion of command
@@ -76,14 +78,14 @@ object CommandResponse {
    * @param runId of command for which this response is created
    * @param result describing the result of completion
    */
-  case class CompletedWithResult(runId: Id, result: Result) extends SubmitResponse
+  case class CompletedWithResult(runId: Id, result: Result) extends SubmitResponse with RemoteMsg
 
   /**
    * Represents a positive response stating completion of command
    *
    * @param runId of command for which this response is created
    */
-  case class Completed(runId: Id) extends SubmitResponse with MatchingResponse
+  case class Completed(runId: Id) extends SubmitResponse with MatchingResponse with RemoteMsg
 
   /**
    * Represents a negative response invalidating a command received
@@ -97,6 +99,7 @@ object CommandResponse {
       with OnewayResponse
       with SubmitResponse
       with MatchingResponse
+      with RemoteMsg
 
   /**
    * Represents a negative response that describes an error in executing the command
@@ -104,28 +107,33 @@ object CommandResponse {
    * @param runId of command for which this response is created
    * @param message describing the reason or cause or action item of the error encountered while executing the command
    */
-  case class Error(runId: Id, message: String) extends SubmitResponse with MatchingResponse
+  case class Error(runId: Id, message: String) extends SubmitResponse with MatchingResponse with RemoteMsg
 
   /**
    * Represents a negative response that describes the cancellation of command
    *
    * @param runId of command for which this response is created
    */
-  case class Cancelled(runId: Id) extends SubmitResponse
+  case class Cancelled(runId: Id) extends SubmitResponse with RemoteMsg
 
   /**
    * Represents a negative response stating that a component is Locked and command was not validated or executed
    *
    * @param runId of command for which this response is created
    */
-  case class Locked(runId: Id) extends ValidateResponse with OnewayResponse with SubmitResponse with MatchingResponse
+  case class Locked(runId: Id)
+      extends ValidateResponse
+      with OnewayResponse
+      with SubmitResponse
+      with MatchingResponse
+      with RemoteMsg
 
   /**
    * A negative response stating that a command with given runId is not available or cannot be located
    *
    * @param runId of command for which this response is created
    */
-  case class CommandNotAvailable(runId: Id) extends QueryResponse
+  case class CommandNotAvailable(runId: Id) extends QueryResponse with RemoteMsg
 
   /**
    * Transform a given CommandResponse to a response with the provided Id

@@ -8,6 +8,7 @@ import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.serialization.SerializationExtension
 import com.twitter.chill.akka.AkkaSerializer
+import csw.command.client.CommandAkkaSerializer
 import csw.command.client.messages.ComponentCommonMessage.{
   ComponentStateSubscription,
   GetSupervisorLifecycleState,
@@ -22,6 +23,7 @@ import csw.command.client.models.framework.PubSub.Subscribe
 import csw.command.client.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.command.client.models.framework._
 import csw.commons.ResourceReader
+import csw.location.api.formats.cbor.LocationAkkaSerializer
 import csw.location.api.models.ComponentType.HCD
 import csw.location.api.models.Connection
 import csw.params.commands.CommandResponse._
@@ -245,10 +247,6 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       serialization.findSerializerFor(ContainerLifecycleState.Running).getClass shouldBe classOf[AkkaSerializer]
       serialization.findSerializerFor(component).getClass shouldBe classOf[AkkaSerializer]
       serialization.findSerializerFor(componentInfo).getClass shouldBe classOf[AkkaSerializer]
-      serialization.findSerializerFor(componentInfo.componentType).getClass shouldBe classOf[AkkaSerializer]
-      serialization.findSerializerFor(componentInfo.locationServiceUsage).getClass shouldBe classOf[AkkaSerializer]
-      serialization.findSerializerFor(componentInfo.connections.head).getClass shouldBe classOf[AkkaSerializer]
-      serialization.findSerializerFor(connection.componentId).getClass shouldBe classOf[AkkaSerializer]
     }
 
     it("should serialize CommandValidationResponse messages") {

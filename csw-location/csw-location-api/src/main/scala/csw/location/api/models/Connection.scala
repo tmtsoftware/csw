@@ -1,7 +1,7 @@
 package csw.location.api.models
 
+import csw.location.api.formats.LocationRemoteMsg
 import csw.location.api.models.ConnectionType.{AkkaType, HttpType, TcpType}
-import csw.serializable.TMTSerializable
 import play.api.libs.json._
 
 /**
@@ -9,7 +9,7 @@ import play.api.libs.json._
  *
  * @param connectionType represents a type of connection offered by the Component
  */
-sealed abstract class Connection(val connectionType: ConnectionType) extends TMTSerializable {
+sealed abstract class Connection(val connectionType: ConnectionType) extends LocationRemoteMsg {
   self: TypedConnection[_] ⇒
 
   /**

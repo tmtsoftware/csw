@@ -1,5 +1,4 @@
 package csw.location.api.models
-import csw.serializable.TMTSerializable
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
 
@@ -11,7 +10,7 @@ import scala.collection.immutable.IndexedSeq
  *
  * @param messageManifest represents the class name of message that a component will understand
  */
-sealed abstract class ComponentType(val messageManifest: String) extends EnumEntry with Lowercase with TMTSerializable {
+sealed abstract class ComponentType(val messageManifest: String) extends EnumEntry with Lowercase {
 
   /**
    * The name of ComponentType e.g. for HCD components, the name will be represented as `hcd`.

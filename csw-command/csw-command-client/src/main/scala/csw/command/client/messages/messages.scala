@@ -7,13 +7,18 @@ import csw.command.client.models.framework._
 import csw.location.api.models.TrackingEvent
 import csw.logging.api.models.LoggingLevels.Level
 import csw.logging.client.models.LogMetadata
-import csw.params.commands.CommandResponse._
+import csw.params.commands.CommandResponse.{RemoteMsg => _, _}
 import csw.params.commands.ControlCommand
 import csw.params.core.models.{Id, Prefix}
 import csw.params.core.states.CurrentState
 import csw.serializable.TMTSerializable
 
 import scala.concurrent.duration.FiniteDuration
+import CommandSerializationMarker._
+
+object CommandSerializationMarker {
+  sealed trait RemoteMsg
+}
 
 /**
  * Represents messages received by TopLevelActor e.g Lifecycle(GoOffline), Submit(Setup, replyTo), etc.
@@ -55,7 +60,7 @@ object CommandMessage {
    * @param command represents a command sent to other component
    * @param replyTo represents the actor that will receive the command response
    */
-  case class Submit(command: ControlCommand, replyTo: ActorRef[SubmitResponse]) extends CommandMessage
+  case class Submit(command: ControlCommand, replyTo: ActorRef[SubmitResponse]) extends CommandMessage with RemoteMsg
 
   /**
    * Represents a oneway kind of message that carries command to other component
@@ -63,7 +68,7 @@ object CommandMessage {
    * @param command represents a command sent to other component
    * @param replyTo represents the actor that will receive the command response
    */
-  case class Oneway(command: ControlCommand, replyTo: ActorRef[OnewayResponse]) extends CommandMessage
+  case class Oneway(command: ControlCommand, replyTo: ActorRef[OnewayResponse]) extends CommandMessage with RemoteMsg
 
   /**
    * Represents a validate only kind of message that carries command to other component
@@ -71,7 +76,7 @@ object CommandMessage {
    * @param command represents a command sent to other component
    * @param replyTo represents the actor that will receive the command response
    */
-  case class Validate(command: ControlCommand, replyTo: ActorRef[ValidateResponse]) extends CommandMessage
+  case class Validate(command: ControlCommand, replyTo: ActorRef[ValidateResponse]) extends CommandMessage with RemoteMsg
 }
 
 private[csw] case class LockTimedout(replyTo: ActorRef[LockingResponse])       extends SupervisorMessage
@@ -91,7 +96,9 @@ object SupervisorLockMessage {
    * @param replyTo represents the actor that will receive the command response
    * @param leaseDuration represents the lease duration of lock acquired
    */
-  case class Lock(source: Prefix, replyTo: ActorRef[LockingResponse], leaseDuration: FiniteDuration) extends SupervisorLockMessage
+  case class Lock(source: Prefix, replyTo: ActorRef[LockingResponse], leaseDuration: FiniteDuration)
+      extends SupervisorLockMessage
+      with RemoteMsg
 
   /**
    * Represents message to un-lock an already locked component
@@ -99,7 +106,7 @@ object SupervisorLockMessage {
    * @param source represents the prefix of component that is acquiring lock
    * @param replyTo represents the actor that will receive the command response
    */
-  case class Unlock(source: Prefix, replyTo: ActorRef[LockingResponse]) extends SupervisorLockMessage
+  case class Unlock(source: Prefix, replyTo: ActorRef[LockingResponse]) extends SupervisorLockMessage with RemoteMsg
 }
 
 /**
@@ -114,7 +121,7 @@ object RunningMessage {
    * @param message represents the command a component should honour and transit itself to a new lifecycle state
    *                e.g. GoOffline or GoOnline
    */
-  case class Lifecycle(message: ToComponentLifecycleMessage) extends RunningMessage with ContainerMessage
+  case class Lifecycle(message: ToComponentLifecycleMessage) extends RunningMessage with ContainerMessage with RemoteMsg
 }
 
 /**
@@ -129,12 +136,12 @@ object SupervisorContainerCommonMessages {
    * itself with location service. If the component is a container or run as a standalone process, then shutdown will also
    * kill the jvm process it is running in.
    */
-  case object Shutdown extends CommonMessage
+  case object Shutdown extends CommonMessage with RemoteMsg
 
   /**
    * Represents a restart message for a component
    */
-  case object Restart extends CommonMessage
+  case object Restart extends CommonMessage with RemoteMsg
 
   /**
    * A Java helper that represents a message for a component. When received, component takes necessary clean up action and unregisters
@@ -188,20 +195,25 @@ object ComponentCommonMessage {
    */
   case class LifecycleStateSubscription(subscriberMessage: SubscriberMessage[LifecycleStateChanged])
       extends ComponentCommonMessage
+      with RemoteMsg
 
   /**
    * Represents a message to create subscription for state changes of a component
    *
    * @param subscriberMessage tells the component to subscribe to or unsubscribe from CurrentState notifications
    */
-  case class ComponentStateSubscription(subscriberMessage: SubscriberMessage[CurrentState]) extends ComponentCommonMessage
+  case class ComponentStateSubscription(subscriberMessage: SubscriberMessage[CurrentState])
+      extends ComponentCommonMessage
+      with RemoteMsg
 
   /**
    * Represents a message to get current lifecycle state of a component
    *
    * @param replyTo an ActorRef that will receive SupervisorLifecycleState
    */
-  case class GetSupervisorLifecycleState(replyTo: ActorRef[SupervisorLifecycleState]) extends ComponentCommonMessage
+  case class GetSupervisorLifecycleState(replyTo: ActorRef[SupervisorLifecycleState])
+      extends ComponentCommonMessage
+      with RemoteMsg
 }
 
 private[csw] sealed trait SupervisorIdleMessage extends SupervisorMessage
@@ -240,7 +252,7 @@ object ContainerCommonMessage {
    *
    * @param replyTo represents the actor that will receive lifecycle state of a container
    */
-  case class GetContainerLifecycleState(replyTo: ActorRef[ContainerLifecycleState]) extends ContainerCommonMessage
+  case class GetContainerLifecycleState(replyTo: ActorRef[ContainerLifecycleState]) extends ContainerCommonMessage with RemoteMsg
 }
 
 private[csw] sealed trait ContainerIdleMessage extends ContainerActorMessage
@@ -258,7 +270,7 @@ private[csw] object FromSupervisorMessage {
 
 ////////////////
 
-sealed trait CommandResponseManagerMessage
+sealed trait CommandResponseManagerMessage extends TMTSerializable
 object CommandResponseManagerMessage {
   case class AddOrUpdateCommand(commandResponse: SubmitResponse)                    extends CommandResponseManagerMessage
   case class AddSubCommand(runId: Id, subCommandId: Id)                             extends CommandResponseManagerMessage
@@ -276,7 +288,10 @@ object CommandResponseManagerMessage {
    * @param runId represents an unique identifier of command
    * @param replyTo represents the actor that will receive the command status
    */
-  case class Query(runId: Id, replyTo: ActorRef[QueryResponse]) extends CommandResponseManagerMessage with SupervisorLockMessage
+  case class Query(runId: Id, replyTo: ActorRef[QueryResponse])
+      extends CommandResponseManagerMessage
+      with SupervisorLockMessage
+      with RemoteMsg
 
   /**
    * Represents a message to subscribe to change in command status of a command running on some component
@@ -287,6 +302,7 @@ object CommandResponseManagerMessage {
   case class Subscribe(runId: Id, replyTo: ActorRef[SubmitResponse])
       extends CommandResponseManagerMessage
       with SupervisorLockMessage
+      with RemoteMsg
 
   /**
    * Represents a message to un-subscribe to change in command status of a command running on some component
@@ -297,13 +313,16 @@ object CommandResponseManagerMessage {
   case class Unsubscribe(runId: Id, replyTo: ActorRef[SubmitResponse])
       extends CommandResponseManagerMessage
       with SupervisorLockMessage
+      with RemoteMsg
 }
 
 // Parent trait for Messages which will be send to components for interacting with its logging system
 sealed trait LogControlMessages extends ComponentMessage with TMTSerializable
 
 // Message to get Logging configuration metadata of the receiver
-case class GetComponentLogMetadata(componentName: String, replyTo: ActorRef[LogMetadata]) extends LogControlMessages
+case class GetComponentLogMetadata(componentName: String, replyTo: ActorRef[LogMetadata])
+    extends LogControlMessages
+    with RemoteMsg
 
 // Message to change the log level of any component
-case class SetComponentLogLevel(componentName: String, logLevel: Level) extends LogControlMessages
+case class SetComponentLogLevel(componentName: String, logLevel: Level) extends LogControlMessages with RemoteMsg

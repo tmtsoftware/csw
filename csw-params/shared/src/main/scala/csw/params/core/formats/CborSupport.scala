@@ -9,22 +9,17 @@ import csw.params.core.models.Coords._
 import csw.params.core.models._
 import csw.params.events.{Event, EventName, ObserveEvent, SystemEvent}
 import csw.time.core.models.{TAITime, UTCTime}
-import enumeratum._
 import io.bullet.borer._
 import io.bullet.borer.derivation.MapBasedCodecs._
 
 import scala.collection.mutable.{WrappedArray => WArray}
 import scala.reflect.ClassTag
 
-object CborSupport {
+object CborSupport extends CborCommonSupport {
+  import CborHelpers._
 
   type ArrayEnc[T] = Encoder[Array[T]]
   type ArrayDec[T] = Decoder[Array[T]]
-
-  private def bimap[From: Encoder: Decoder, To](to: From ⇒ To, from: To ⇒ From): Codec[To] = Codec(
-    implicitly[Encoder[From]].contramap(from),
-    implicitly[Decoder[From]].map(to)
-  )
 
   // ************************ Base Type Codecs ********************
 
@@ -60,8 +55,6 @@ object CborSupport {
     bimap[WArray[WArray[T]], MatrixData[T]](MatrixData(_), _.data)
 
   // ************************ Enum Codecs ********************
-
-  def enumCodec[T <: EnumEntry: Enum]: Codec[T] = bimap[String, T](implicitly[Enum[T]].withNameInsensitive, _.entryName)
 
   implicit lazy val unitsCodec: Codec[Units]                   = enumCodec[Units]
   implicit lazy val keyTypeCodecExistential: Codec[KeyType[_]] = enumCodec[KeyType[_]]
@@ -102,7 +95,6 @@ object CborSupport {
 
   //Codec.forCaseClass does not work for id due to https://github.com/sirthias/borer/issues/23
   implicit lazy val idCodec: Codec[Id]               = bimap[String, Id](Id(_), _.id)
-  implicit lazy val prefixCodec: Codec[Prefix]       = Codec.forCaseClass[Prefix]
   implicit lazy val eventNameCodec: Codec[EventName] = Codec.forCaseClass[EventName]
 
   implicit lazy val seCodec: Codec[SystemEvent]  = deriveCodec[SystemEvent]
@@ -121,6 +113,11 @@ object CborSupport {
   implicit lazy val controlCommandCodec: Codec[ControlCommand]   = deriveCodec[ControlCommand]
   implicit lazy val commandCodec: Codec[Command]                 = deriveCodec[Command]
 
+  // ************************ CommandResponse Codecs ********************
+
+  implicit lazy val resultCodec: Codec[Result]                                 = deriveCodec[Result]
+  implicit lazy val commandIssueCodec: Codec[CommandIssue]                     = deriveCodec[CommandIssue]
+  implicit val commandResponseRemoteMsgCodec: Codec[CommandResponse.RemoteMsg] = deriveCodec[CommandResponse.RemoteMsg]
 }
 
 case class Timestamp(seconds: Long, nanos: Long) {
