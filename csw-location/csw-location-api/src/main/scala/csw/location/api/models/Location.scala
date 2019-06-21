@@ -3,16 +3,16 @@ package csw.location.api.models
 import java.net.URI
 
 import akka.actor.typed.ActorRef
-import csw.params.core.models.Prefix
+import csw.location.api.formats.LocationRemoteMsg
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.serializable.TMTSerializable
+import csw.params.core.models.Prefix
 
 import scala.reflect.ClassTag
 
 /**
  * Location represents a live Connection along with its URI
  */
-sealed abstract class Location extends TMTSerializable {
+sealed abstract class Location extends LocationRemoteMsg {
 
   /**
    * Represents a connection based on a componentId and the type of connection offered by the component

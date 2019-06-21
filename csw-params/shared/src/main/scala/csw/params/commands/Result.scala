@@ -11,7 +11,7 @@ import play.api.libs.json.{Json, OFormat}
  * @param prefix   identifies the subsystem that received the command and created command response out of it
  * @param paramSet an optional initial set of parameters (keys with values)
  */
-case class Result private (prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
+case class Result(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
     extends ParameterSetType[Result]
     with ParameterSetKeyData {
 

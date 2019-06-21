@@ -1,9 +1,11 @@
 package csw.location.api.models
 
+import csw.location.api.formats.LocationRemoteMsg
+
 /**
  * TrackingEvent is used to represent location events while tracking the connection
  */
-sealed abstract class TrackingEvent {
+sealed abstract class TrackingEvent extends LocationRemoteMsg {
 
   /**
    * The connection for which this TrackingEvent is created
@@ -16,7 +18,7 @@ sealed abstract class TrackingEvent {
  *
  * @param location the updated location for the tracked connection
  */
-case class LocationUpdated private[location] (location: Location) extends TrackingEvent {
+case class LocationUpdated(location: Location) extends TrackingEvent {
 
   /**
    * The connection for which this TrackingEvent is created
@@ -29,4 +31,4 @@ case class LocationUpdated private[location] (location: Location) extends Tracki
  *
  * @param connection for which the location no longer exists
  */
-case class LocationRemoved private[location] (connection: Connection) extends TrackingEvent
+case class LocationRemoved(connection: Connection) extends TrackingEvent

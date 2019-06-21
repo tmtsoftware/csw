@@ -27,6 +27,8 @@ object Dependencies {
       Libs.`play-json`.value,
       Libs.`play-json-derived-codecs`.value,
       Enumeratum.`enumeratum`.value,
+      Libs.`borer-core`.value,
+      Libs.`borer-derivation`.value,
       Libs.`scalatest`.value % Test,
       Libs.`mockito-scala`   % Test
     )
