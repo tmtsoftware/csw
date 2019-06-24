@@ -18,7 +18,7 @@ trait LocationCborSupport extends CborCommonSupport {
   implicit lazy val connectionTypeCodec: Codec[ConnectionType] = CborHelpers.enumCodec[ConnectionType]
   implicit lazy val componentTypeCodec: Codec[ComponentType]   = CborHelpers.enumCodec[ComponentType]
   implicit lazy val componentIdCodec: Codec[ComponentId]       = deriveCodec[ComponentId]
-  implicit lazy val componentInfoCodec: Codec[ConnectionInfo]  = deriveCodec[ConnectionInfo]
+  implicit lazy val connectionInfoCodec: Codec[ConnectionInfo] = deriveCodec[ConnectionInfo]
 
   implicit lazy val connectionCodec: Codec[Connection] =
     CborHelpers.bimap[ConnectionInfo, Connection](Connection.from, _.connectionInfo)

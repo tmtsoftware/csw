@@ -6,14 +6,14 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.serialization.Serializer
 import csw.location.api.commons.LocationServiceLogger
 import csw.location.api.models.{Connection, Location, Registration, TrackingEvent}
+import csw.logging.api.scaladsl.Logger
 import io.bullet.borer.Cbor
 
 class LocationAkkaSerializer(_actorSystem: ExtendedActorSystem) extends Serializer with LocationCborSupport {
 
-  override val identifier: Int = 19924
-
+  override val identifier: Int                      = 19924
+  private val logger: Logger                        = LocationServiceLogger.getLogger
   override implicit def actorSystem: ActorSystem[_] = _actorSystem.toTyped
-  val logger = LocationServiceLogger.getLogger
 
   override def includeManifest: Boolean = true
 
