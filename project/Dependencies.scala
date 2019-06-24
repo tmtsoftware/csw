@@ -55,6 +55,7 @@ object Dependencies {
       Libs.`akka-http-play-json`,
       Libs.`play-json`.value,
       Chill.`chill-akka`,
+      Libs.`borer-compat-akka`.value,
       Akka.`akka-actor-testkit-typed` % Test,
       Libs.`scalatest`.value          % Test,
       Libs.`junit`                    % Test,
@@ -76,6 +77,7 @@ object Dependencies {
       Libs.`scala-java8-compat`,
       Libs.`play-json`.value,
       Libs.`akka-http-play-json`,
+      Libs.`borer-compat-akka`.value,
       Libs.`scalatest`.value % Test
     )
   )

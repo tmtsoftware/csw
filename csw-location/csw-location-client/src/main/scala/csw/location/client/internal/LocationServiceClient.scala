@@ -15,11 +15,11 @@ import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{KillSwitch, KillSwitches, Materializer}
 import akka.{Done, NotUsed, actor}
 import csw.location.api.exceptions.{OtherLocationIsRegistered, RegistrationFailed}
-import csw.location.api.formats.LocationJsonSupport
+import csw.location.api.formats.cbor.LocationCborSupport
 import csw.location.api.models.{Registration, RegistrationResult, _}
 import csw.location.api.scaladsl.LocationService
-import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
-import play.api.libs.json.Json
+import csw.location.client.HttpCodecSupport
+import io.bullet.borer.Json
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
@@ -29,8 +29,8 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
     implicit val actorSystem: ActorSystem[_],
     mat: Materializer
 ) extends LocationService
-    with PlayJsonSupport
-    with LocationJsonSupport { outer ⇒
+    with HttpCodecSupport
+    with LocationCborSupport { outer ⇒
 
   import actorSystem.executionContext
   implicit val untypedSystem: actor.ActorSystem = actorSystem.toUntyped
@@ -142,7 +142,11 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
       await(Unmarshal(response.entity).to[Source[ServerSentEvent, NotUsed]])
     }
     val sseStream = Source.fromFuture(sseStreamFuture).flatMapConcat(identity)
-    sseStream.map(x ⇒ Json.parse(x.data).as[TrackingEvent]).viaMat(KillSwitches.single)(Keep.right)
+    sseStream
+      .map { x =>
+        Json.decode(x.data.getBytes("utf8")).to[TrackingEvent].value
+      }
+      .viaMat(KillSwitches.single)(Keep.right)
   }
 
   override def subscribe(connection: Connection, callback: TrackingEvent ⇒ Unit): KillSwitch =
