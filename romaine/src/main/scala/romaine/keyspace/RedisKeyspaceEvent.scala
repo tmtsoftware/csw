@@ -1,7 +1,7 @@
 package romaine.keyspace
 
 import enumeratum.{Enum, EnumEntry}
-import romaine.codec.RomaineByteCodec
+import romaine.codec.RomaineCodec
 
 import scala.collection.immutable
 
@@ -13,8 +13,8 @@ object RedisKeyspaceEvent extends Enum[RedisKeyspaceEvent] {
 
   override def values: immutable.IndexedSeq[RedisKeyspaceEvent] = findValues
 
-  implicit val codec: RomaineByteCodec[RedisKeyspaceEvent] =
-    RomaineByteCodec.stringRomaineCodec.bimap(_.entryName, withNameInsensitiveOption(_).getOrElse(Unknown))
+  implicit val codec: RomaineCodec[RedisKeyspaceEvent] =
+    RomaineCodec.stringCodec.bimap(_.entryName, withNameInsensitiveOption(_).getOrElse(Unknown))
 
   case object Set     extends RedisKeyspaceEvent("set")
   case object Expired extends RedisKeyspaceEvent("expired")

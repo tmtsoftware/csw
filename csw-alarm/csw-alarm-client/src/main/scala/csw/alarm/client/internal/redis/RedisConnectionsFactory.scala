@@ -7,7 +7,7 @@ import csw.time.core.models.UTCTime
 import io.lettuce.core.RedisURI
 import romaine.RomaineFactory
 import romaine.async.RedisAsyncApi
-import romaine.codec.RomaineByteCodec
+import romaine.codec.RomaineCodec
 import romaine.keyspace.RedisKeySpaceApi
 import romaine.reactive.RedisSubscriptionApi
 
@@ -30,12 +30,12 @@ private[client] class RedisConnectionsFactory(
   lazy val shelveStatusApi: RedisAsyncApi[ShelveStatusKey, ShelveStatus]            = asyncApi
   lazy val initializingApi: RedisAsyncApi[InitializingKey, Boolean]                 = asyncApi
 
-  def asyncApi[K: RomaineByteCodec, V: RomaineByteCodec]: RedisAsyncApi[K, V] = romaineFactory.redisAsyncApi[K, V](redisURI)
+  def asyncApi[K: RomaineCodec, V: RomaineCodec]: RedisAsyncApi[K, V] = romaineFactory.redisAsyncApi[K, V](redisURI)
 
-  def subscriptionApi[K: RomaineByteCodec, V: RomaineByteCodec]: RedisSubscriptionApi[K, V] =
+  def subscriptionApi[K: RomaineCodec, V: RomaineCodec]: RedisSubscriptionApi[K, V] =
     romaineFactory.redisSubscriptionApi[K, V](redisURI)
 
-  def redisKeySpaceApi[K: RomaineByteCodec, V: RomaineByteCodec](asyncApi: RedisAsyncApi[K, V]): RedisKeySpaceApi[K, V] =
+  def redisKeySpaceApi[K: RomaineCodec, V: RomaineCodec](asyncApi: RedisAsyncApi[K, V]): RedisKeySpaceApi[K, V] =
     new RedisKeySpaceApi(subscriptionApi, asyncApi)
 
   private def redisURI = alarmServiceResolver.uri().map { uri ⇒
