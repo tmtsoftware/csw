@@ -1,6 +1,6 @@
 package csw.logging.client.models
 
-import csw.logging.api.models.LoggingLevels.Level
+import csw.logging.api.models.Level
 import csw.serializable.LoggingSerializable
 
 /**

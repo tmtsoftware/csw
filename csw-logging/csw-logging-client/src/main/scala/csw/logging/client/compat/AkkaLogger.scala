@@ -2,6 +2,7 @@ package csw.logging.client.compat
 
 import akka.actor.Actor
 import akka.event.Logging._
+import csw.logging.api.models.Level
 import csw.logging.client.internal.LogActorMessages.LogAkka
 import csw.logging.client.internal.MessageHandler
 
@@ -11,7 +12,7 @@ import csw.logging.client.internal.MessageHandler
  * and forward it to underlying logging code.
  */
 private[logging] class AkkaLogger extends Actor {
-  import csw.logging.api.models.LoggingLevels._
+  import csw.logging.api.models.Level._
 
   def receive: Receive = {
     case InitializeLogger(_) => sender ! LoggerInitialized

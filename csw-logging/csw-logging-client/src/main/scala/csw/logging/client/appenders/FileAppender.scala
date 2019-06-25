@@ -5,7 +5,7 @@ import java.time.temporal.ChronoUnit
 import java.time.{LocalDateTime, ZoneId, ZoneOffset, ZonedDateTime}
 
 import akka.actor.typed.ActorSystem
-import csw.logging.api.models.LoggingLevels.Level
+import csw.logging.api.models.Level
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.{Category, Constants, LoggingKeys, TMTDateTimeFormatter}
 import csw.logging.client.exceptions.BaseLogPathNotDefined

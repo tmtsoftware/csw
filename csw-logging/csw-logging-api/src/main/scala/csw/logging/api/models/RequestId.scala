@@ -21,7 +21,7 @@ sealed trait AnyId
 case class RequestId(
     trackingId: String = UUID.randomUUID().toString,
     spanId: String = "",
-    level: Option[LoggingLevels.Level] = None
+    level: Option[Level] = None
 ) extends AnyId
 
 /**

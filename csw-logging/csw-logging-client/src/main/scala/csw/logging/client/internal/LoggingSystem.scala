@@ -6,6 +6,7 @@ import java.util.concurrent.CompletableFuture
 import akka.Done
 import akka.actor.typed.{ActorSystem, Props, SpawnProtocol}
 import ch.qos.logback.classic.LoggerContext
+import csw.logging.api.models.{Level, Levels}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.appenders.LogAppenderBuilder
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
@@ -35,8 +36,6 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
  * @param system an ActorSystem used to create log actors
  */
 class LoggingSystem private[csw] (name: String, version: String, host: String, val system: ActorSystem[SpawnProtocol]) {
-
-  import csw.logging.api.models.LoggingLevels._
 
   private val log: Logger = GenericLoggerFactory.getLogger
 

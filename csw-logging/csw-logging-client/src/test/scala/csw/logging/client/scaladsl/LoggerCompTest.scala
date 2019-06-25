@@ -1,7 +1,8 @@
 package csw.logging.client.scaladsl
 
 import akka.actor.typed.ActorRef
-import csw.logging.api.models.LoggingLevels._
+import csw.logging.api.models.Level
+import csw.logging.api.models.Level._
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.components.IRIS._

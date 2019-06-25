@@ -3,7 +3,7 @@ package csw.logging.client.internal
 import java.util.concurrent.ConcurrentHashMap
 
 import com.typesafe.config.Config
-import csw.logging.api.models.LoggingLevels.Level
+import csw.logging.api.models.Level
 import csw.logging.client.models.ComponentLoggingState
 
 import scala.collection.JavaConverters._

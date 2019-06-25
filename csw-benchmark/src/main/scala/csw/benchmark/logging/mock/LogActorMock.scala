@@ -1,6 +1,7 @@
 package csw.benchmark.logging.mock
 
-import csw.logging.api.models.{noId, LoggingLevels}
+import csw.logging.api.models.Level.DEBUG
+import csw.logging.api.models.noId
 import csw.logging.client.appenders.LogAppender
 import csw.logging.client.commons.{Category, LoggingKeys, TMTDateTimeFormatter}
 import csw.logging.client.internal.LogActorMessages.Log
@@ -16,7 +17,7 @@ object LogActorMock {
   val sourceLocation = SourceLocation("hcd.scala", "iris", "tromboneHCD", 12)
   val log = Log(
     Some("tromboneHCD"),
-    LoggingLevels.DEBUG,
+    DEBUG,
     noId,
     System.currentTimeMillis(),
     Some("testActor"),

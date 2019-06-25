@@ -1,7 +1,7 @@
 package csw.logging.client.scaladsl
 
-import csw.logging.api.models.LoggingLevels
-import csw.logging.api.models.LoggingLevels.Level
+import csw.logging.api.models.Level
+import csw.logging.api.models.Level.ERROR
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.components.IRIS
@@ -79,7 +79,7 @@ class ActorLoggingTest extends LoggingTestSuite {
     irisLogs.toList.foreach { log ⇒
       log.contains(LoggingKeys.ACTOR) shouldBe true
       val currentLogLevel = log.getString(LoggingKeys.SEVERITY).toLowerCase
-      Level(currentLogLevel) >= LoggingLevels.ERROR shouldBe true
+      Level(currentLogLevel) >= ERROR shouldBe true
     }
 
   }

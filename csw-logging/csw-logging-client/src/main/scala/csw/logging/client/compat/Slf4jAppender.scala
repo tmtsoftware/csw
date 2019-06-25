@@ -4,6 +4,7 @@ import ch.qos.logback.classic.spi.ThrowableProxy
 import ch.qos.logback.core.spi.AppenderAttachable
 import ch.qos.logback.core.{Appender, UnsynchronizedAppenderBase}
 import csw.logging.api.NoLogException
+import csw.logging.api.models.Level
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.internal.LogActorMessages.LogSlf4j
 import csw.logging.client.internal.MessageHandler
@@ -18,7 +19,6 @@ import scala.collection.mutable
  * and forward it to underlying logging code.
  */
 private[logging] class Slf4jAppender[E]() extends UnsynchronizedAppenderBase[E] with AppenderAttachable[E] {
-  import csw.logging.api.models.LoggingLevels._
 
   private val log: Logger = GenericLoggerFactory.getLogger
 

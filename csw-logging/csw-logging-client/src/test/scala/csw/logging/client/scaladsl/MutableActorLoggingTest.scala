@@ -1,8 +1,8 @@
 package csw.logging.client.scaladsl
 
 import akka.actor.typed.scaladsl.Behaviors
-import csw.logging.api.models.LoggingLevels
-import csw.logging.api.models.LoggingLevels.Level
+import csw.logging.api.models.Level
+import csw.logging.api.models.Level.ERROR
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.LogCommand
 import csw.logging.client.LogCommand._
@@ -80,7 +80,7 @@ class MutableActorLoggingTest extends LoggingTestSuite {
     tromboneHcdLogs.toList.foreach { log ⇒
       log.contains("actor") shouldBe true
       val currentLogLevel = log.getString("@severity").toLowerCase
-      Level(currentLogLevel) >= LoggingLevels.ERROR shouldBe true
+      Level(currentLogLevel) >= ERROR shouldBe true
     }
   }
 }

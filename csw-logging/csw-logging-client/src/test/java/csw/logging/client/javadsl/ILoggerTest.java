@@ -7,7 +7,8 @@ import akka.actor.typed.SpawnProtocol;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import csw.logging.api.models.LoggingLevels;
+import csw.logging.api.models.Level;
+import csw.logging.api.models.Level$;
 import csw.logging.client.appenders.LogAppenderBuilder;
 import csw.logging.client.commons.AkkaTypedExtension;
 import csw.logging.client.commons.LoggingKeys$;
@@ -115,10 +116,10 @@ public class ILoggerTest extends JUnitSuite {
         logBuffer.clear();
     }
 
-    private void testLogBuffer(List<JsonObject> logBuffer, LoggingLevels.Level configuredLogLevel) {
+    private void testLogBuffer(List<JsonObject> logBuffer, Level configuredLogLevel) {
         logBuffer.forEach(log -> {
             String currentLogLevel = log.get(LoggingKeys$.MODULE$.SEVERITY()).getAsString().toLowerCase();
-            Assert.assertTrue(LoggingLevels.Level$.MODULE$.apply(currentLogLevel).$greater$eq(configuredLogLevel));
+            Assert.assertTrue(Level$.MODULE$.apply(currentLogLevel).$greater$eq(configuredLogLevel));
         });
     }
 
@@ -139,8 +140,8 @@ public class ILoggerTest extends JUnitSuite {
             Assert.assertEquals(JLogUtil.logMsgMap.get(severity), log.get(LoggingKeys$.MODULE$.MESSAGE()).getAsString());
             Assert.assertEquals(tromboneHcdClassName, log.get(LoggingKeys$.MODULE$.CLASS()).getAsString());
 
-            LoggingLevels.Level currentLogLevel = LoggingLevels.Level$.MODULE$.apply(severity);
-            Assert.assertTrue(currentLogLevel.$greater$eq(LoggingLevels.DEBUG$.MODULE$));
+            Level currentLogLevel = Level$.MODULE$.apply(severity);
+            Assert.assertTrue(currentLogLevel.$greater$eq(Level.DEBUG$.MODULE$));
         });
     }
 
@@ -157,18 +158,18 @@ public class ILoggerTest extends JUnitSuite {
 
         // Log level of IRIS component is ERROR in config file
         Assert.assertEquals(4, irisLogBuffer.size());
-        testLogBuffer(irisLogBuffer, LoggingLevels.ERROR$.MODULE$);
+        testLogBuffer(irisLogBuffer, Level.ERROR$.MODULE$);
 
         // Log level of jTromboneHcd component is ERROR in config file
         Assert.assertEquals(4, tromboneHcdLogBuffer.size());
-        testLogBuffer(tromboneHcdLogBuffer, LoggingLevels.INFO$.MODULE$);
+        testLogBuffer(tromboneHcdLogBuffer, Level.INFO$.MODULE$);
 
         // Default log level is TRACE
         Assert.assertEquals(12, genericLogBuffer.size());
-        testLogBuffer(genericLogBuffer, LoggingLevels.TRACE$.MODULE$);
+        testLogBuffer(genericLogBuffer, Level.TRACE$.MODULE$);
 
         // Set log level of IRIS component to FATAL
-        loggingSystem.setComponentLogLevel("jIRIS", LoggingLevels.FATAL$.MODULE$);
+        loggingSystem.setComponentLogLevel("jIRIS", Level.FATAL$.MODULE$);
 
         allComponentsStartLogging();
         eventually(java.time.Duration.ofSeconds(10), () -> Assert.assertEquals(18, logBuffer.size()));
@@ -177,14 +178,14 @@ public class ILoggerTest extends JUnitSuite {
 
         // Updated log level of IRIS is FATAL
         Assert.assertEquals(2, irisLogBuffer.size());
-        testLogBuffer(irisLogBuffer, LoggingLevels.FATAL$.MODULE$);
+        testLogBuffer(irisLogBuffer, Level.FATAL$.MODULE$);
 
         // Log level of jTromboneHcd component is unaffected
         Assert.assertEquals(4, tromboneHcdLogBuffer.size());
-        testLogBuffer(tromboneHcdLogBuffer, LoggingLevels.INFO$.MODULE$);
+        testLogBuffer(tromboneHcdLogBuffer, Level.INFO$.MODULE$);
 
         // Default log level is unaffected
         Assert.assertEquals(12, genericLogBuffer.size());
-        testLogBuffer(genericLogBuffer, LoggingLevels.TRACE$.MODULE$);
+        testLogBuffer(genericLogBuffer, Level.TRACE$.MODULE$);
     }
 }

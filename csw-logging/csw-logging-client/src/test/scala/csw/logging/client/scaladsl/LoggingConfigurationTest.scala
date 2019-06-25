@@ -9,7 +9,7 @@ import java.time.{ZoneId, ZoneOffset, ZonedDateTime}
 import akka.actor.typed
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.ConfigFactory
-import csw.logging.api.models.LoggingLevels.{DEBUG, INFO, TRACE}
+import csw.logging.api.models.Level.{DEBUG, INFO, TRACE}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.appenders.{FileAppender, StdOutAppender}
 import csw.logging.client.commons.{LoggingKeys, TMTDateTimeFormatter}

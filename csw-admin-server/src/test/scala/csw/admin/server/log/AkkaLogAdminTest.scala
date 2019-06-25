@@ -20,8 +20,8 @@ import csw.location.api.models.ComponentId
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.client.ActorSystemFactory
-import csw.logging.api.models.LoggingLevels
-import csw.logging.api.models.LoggingLevels.{ERROR, Level, WARN}
+import csw.logging.api.models.Level
+import csw.logging.api.models.Level.{ERROR, INFO, WARN}
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.internal._
 import csw.logging.client.models.LogMetadata
@@ -132,8 +132,8 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
     logMetadata1 shouldBe LogMetadata(logLevel, akkaLevel, slf4jLevel, componentLogLevel)
 
     // updating default and akka log level
-    loggingSystem.setDefaultLogLevel(LoggingLevels.ERROR)
-    loggingSystem.setAkkaLevel(LoggingLevels.WARN)
+    loggingSystem.setDefaultLogLevel(ERROR)
+    loggingSystem.setAkkaLevel(WARN)
 
     // verify getLogMetadata http request gives updated log levels in response
     val getLogMetadataResponse2 = Await.result(Http().singleRequest(getLogMetadataRequest), 5.seconds)
@@ -161,7 +161,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
     laserComponentLogs.exists(log ⇒ log.getString("@severity").toLowerCase.equalsIgnoreCase("info")) shouldBe true
     laserComponentLogs.foreach { log ⇒
       val currentLogLevel = log.getString("@severity").toLowerCase
-      Level(currentLogLevel) >= LoggingLevels.INFO shouldBe true
+      Level(currentLogLevel) >= INFO shouldBe true
     }
 
     // set log level of laser component to error through http endpoint
@@ -196,7 +196,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
     laserCompLogsAfterFilter.exists(log ⇒ log.getString("@severity").toLowerCase.equalsIgnoreCase("error")) shouldBe true
     laserCompLogsAfterFilter.foreach { log ⇒
       val currentLogLevel = log.getString("@severity").toLowerCase
-      Level(currentLogLevel) >= LoggingLevels.ERROR shouldBe true
+      Level(currentLogLevel) >= ERROR shouldBe true
     }
 
     // this makes sure that, changing log level of one component (laser component) from container does not affect other components (galil component) log level
@@ -204,7 +204,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
 
     galilCompLogsAfterFilter.foreach { log ⇒
       val currentLogLevel = log.getString("@severity").toLowerCase
-      Level(currentLogLevel) >= LoggingLevels.INFO shouldBe true
+      Level(currentLogLevel) >= INFO shouldBe true
     }
   }
 

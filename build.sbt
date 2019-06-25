@@ -234,6 +234,9 @@ lazy val `csw-logging-macros` = project
 lazy val `csw-logging-api` = project
   .in(file("csw-logging/csw-logging-api"))
   .dependsOn(`csw-logging-macros`)
+  .settings(
+    libraryDependencies += Enumeratum.`enumeratum`.value
+  )
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
 
 lazy val `csw-logging-client` = project

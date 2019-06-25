@@ -3,11 +3,9 @@ package csw.params.core.generics
 import java.util
 
 import csw.params.extensions.OptionConverters.RichOption
-import csw.serializable.TMTSerializable
 
 import scala.annotation.varargs
-import scala.collection.JavaConverters.setAsJavaSetConverter
-import scala.collection.JavaConverters.mapAsJavaMapConverter
+import scala.collection.JavaConverters.{mapAsJavaMapConverter, setAsJavaSetConverter}
 
 /**
  * The base trait for various parameter set types (commands or events)

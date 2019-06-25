@@ -1,138 +1,95 @@
 package csw.logging.api.models
 
 import csw.serializable.LoggingSerializable
+import enumeratum._
 
-private[csw] object LoggingLevels {
+import scala.collection.immutable.IndexedSeq
 
-  private[this] val levels         = Seq(TRACE, DEBUG, INFO, WARN, ERROR, FATAL)
-  private[this] val nameToLevelMap = levels.map(level => (level.name, level)).toMap
-
-  def stringify(): String = nameToLevelMap.keySet.mkString(",")
-
-  /**
-   * Companion object for the level trait.
-   */
-  object Level {
-
-    /**
-     * Level constructor.
-     *
-     * @param name a level name. Case is ignored.
-     * @return the corresponding Level if there is one for that name. Otherwise WARN.
-     */
-    def apply(name: String): Level = nameToLevelMap.getOrElse(name.toUpperCase(), WARN)
-
-    /**
-     * Checks if a level name exists.
-     *
-     * @param name the level name.
-     * @return true if a level with that name exists.
-     */
-    def hasLevel(name: String): Boolean = nameToLevelMap.get(name.toUpperCase).isDefined
-  }
+/**
+ * A logging level.
+ */
+sealed abstract class Level(override val entryName: String, val pos: Int)
+    extends EnumEntry
+    with LoggingSerializable
+    with Ordered[Level] {
 
   /**
-   * A logging level.
+   * A level name.
    */
-  sealed trait Level extends Ordered[Level] with LoggingSerializable {
-    private[logging] val pos: Int
+  def name: String = entryName
 
-    /**
-     * A level name.
-     */
-    val name: String
+  /**
+   * Compares levels
+   *
+   * @param that the other level
+   * @return `x` where:
+   *         - `x < 0` when `this < that`
+   *         - `x == 0` when `this == that`
+   *         - `x > 0` when  `this > that`
+   */
+  def compare(that: Level): Int = pos - that.pos
+}
 
-    /**
-     * Compares levels
-     *
-     * @param that the other level
-     * @return `x` where:
-     *         - `x < 0` when `this < that`
-     *         - `x == 0` when `this == that`
-     *         - `x > 0` when  `this > that`
-     */
-    def compare(that: Level): Int = pos - that.pos
-  }
+/**
+ * Companion object for the level trait.
+ */
+object Level extends Enum[Level] {
+
+  override def values: IndexedSeq[Level] = findValues
+
+  def stringify(): String = values.mkString(",")
+
+  /**
+   * Level constructor.
+   *
+   * @param name a level name. Case is ignored.
+   * @return the corresponding Level if there is one for that name. Otherwise WARN.
+   */
+  def apply(name: String): Level = Level.withNameInsensitiveOption(name).getOrElse(WARN)
+
+  /**
+   * Checks if a level name exists.
+   *
+   * @param name the level name.
+   * @return true if a level with that name exists.
+   */
+  def hasLevel(name: String): Boolean = namesToValuesMap.get(name.toUpperCase).isDefined
 
   /**
    * The TRACE logging level.
    */
-  case object TRACE extends Level {
-    private[logging] val pos = 0
-
-    /**
-     * Level name "TRACE".
-     */
-    val name = "TRACE"
-
-  }
+  case object TRACE extends Level("TRACE", 0)
 
   /**
    * The DEBUG logging level.
    */
-  case object DEBUG extends Level {
-    private[logging] val pos = 1
-
-    /**
-     * Level name "DEBUG".
-     */
-    val name = "DEBUG"
-  }
+  case object DEBUG extends Level("DEBUG", 1)
 
   /**
    * The INFO logging level.
    */
-  case object INFO extends Level {
-    private[logging] val pos = 2
-
-    /**
-     * Level name "INFO".
-     */
-    val name = "INFO"
-  }
+  case object INFO extends Level("INFO", 2)
 
   /**
    * The WARN logging level.
    */
-  case object WARN extends Level {
-    private[logging] val pos = 3
-
-    /**
-     * Level name "WARN".
-     */
-    val name = "WARN"
-  }
+  case object WARN extends Level("WARN", 3)
 
   /**
    * The ERROR logging level.
    */
-  case object ERROR extends Level {
-    private[logging] val pos = 4
-
-    /**
-     * Level name "Error"
-     */
-    val name = "ERROR"
-  }
+  case object ERROR extends Level("ERROR", 4)
 
   /**
    * The FATAL logging level.
    */
-  case object FATAL extends Level {
-    private[logging] val pos = 5
-
-    /**
-     * Level name "FATAL".
-     */
-    val name = "FATAL"
-  }
-
-  /**
-   * Current and default logging levels.
-   *
-   * @param current the current logging level.
-   * @param default the default logging level.
-   */
-  case class Levels(current: Level, default: Level)
-
+  case object FATAL extends Level("FATAL", 5)
 }
+
+/**
+ * Current and default logging levels.
+ *
+ * @param current the current logging level.
+ * @param default the default logging level.
+ */
+case class Levels(current: Level, default: Level)

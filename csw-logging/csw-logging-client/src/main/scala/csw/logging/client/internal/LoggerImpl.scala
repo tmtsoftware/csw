@@ -2,8 +2,8 @@ package csw.logging.client.internal
 
 import java.time.Instant
 
-import csw.logging.api.models.LoggingLevels._
-import csw.logging.api.models.{AnyId, RequestId}
+import csw.logging.api.models.Level._
+import csw.logging.api.models.{AnyId, Level, RequestId}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.{Constants, LoggingKeys}
 import csw.logging.client.internal.JsonExtensions.AnyMapToJson

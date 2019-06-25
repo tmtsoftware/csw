@@ -4,8 +4,8 @@ import java.time._
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
-import csw.logging.api.models.LoggingLevels
-import csw.logging.api.models.LoggingLevels._
+import csw.logging.api.models.Level
+import csw.logging.api.models.Level._
 import csw.logging.client.commons.{Constants, LoggingKeys, TMTDateTimeFormatter}
 import csw.logging.client.components.{InnerSourceComponent, SingletonComponent, TromboneAssembly, TromboneHcd}
 import csw.logging.client.internal.JsonExtensions.RichJsObject
@@ -27,7 +27,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     Thread.sleep(300)
 
     // Verify log level for tromboneHcd is at debug level in config
-    LoggingState.componentsLoggingState.get(TromboneHcd.COMPONENT_NAME).componentLogLevel shouldBe LoggingLevels.DEBUG
+    LoggingState.componentsLoggingState.get(TromboneHcd.COMPONENT_NAME).componentLogLevel shouldBe DEBUG
 
     var logMsgLineNumber = TromboneHcd.DEBUG_LINE_NO
 
@@ -59,7 +59,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     Thread.sleep(100)
 
     //   Verify that default level is TRACE in config
-    LoggingState.componentsLoggingState.get(Constants.DEFAULT_KEY).componentLogLevel shouldBe LoggingLevels.TRACE
+    LoggingState.componentsLoggingState.get(Constants.DEFAULT_KEY).componentLogLevel shouldBe TRACE
 
     var logMsgLineNumber = InnerSourceComponent.TRACE_LINE_NO
 
@@ -81,7 +81,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     Thread.sleep(100)
 
     //   Verify that default level is TRACE in config
-    LoggingState.componentsLoggingState.get(Constants.DEFAULT_KEY).componentLogLevel shouldBe LoggingLevels.TRACE
+    LoggingState.componentsLoggingState.get(Constants.DEFAULT_KEY).componentLogLevel shouldBe TRACE
 
     var logMsgLineNumber = SingletonComponent.TRACE_LINE_NO
 
@@ -106,7 +106,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     Thread.sleep(100)
 
     //   Verify that default level is TRACE in config
-    LoggingState.componentsLoggingState.get("default").componentLogLevel shouldBe LoggingLevels.TRACE
+    LoggingState.componentsLoggingState.get("default").componentLogLevel shouldBe TRACE
 
     var logMsgLineNumber = SingletonComponent.USER_TRACE_LINE_NO
 
@@ -139,7 +139,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     Thread.sleep(200)
 
     //  Verify that level is DEBUG
-    LoggingState.componentsLoggingState.get(TromboneHcd.COMPONENT_NAME).componentLogLevel shouldBe LoggingLevels.DEBUG
+    LoggingState.componentsLoggingState.get(TromboneHcd.COMPONENT_NAME).componentLogLevel shouldBe DEBUG
 
     //  TromboneHcd component is logging 6 messages each of unique level
     //  As per the filter, hcd should log 5 message of all level except TRACE
@@ -155,7 +155,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     tromboneHcdLogs.toList.foreach { log ⇒
       val currentLogLevel = log.getString(LoggingKeys.SEVERITY).toLowerCase
       val currentLogMsg   = log.getString(LoggingKeys.MESSAGE)
-      Level(currentLogLevel) >= LoggingLevels.DEBUG shouldBe true
+      Level(currentLogLevel) >= DEBUG shouldBe true
       currentLogMsg shouldBe logMsgMap(currentLogLevel)
     }
   }
@@ -167,7 +167,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     Thread.sleep(300)
 
     //   Verify that default level is TRACE in config
-    LoggingState.componentsLoggingState.get(Constants.DEFAULT_KEY).componentLogLevel shouldBe LoggingLevels.TRACE
+    LoggingState.componentsLoggingState.get(Constants.DEFAULT_KEY).componentLogLevel shouldBe TRACE
 
     //  TromboneAssembly component is logging 6 messages each of unique level
     //  As per the default loglevel = trace, assembly should log all 6 message
@@ -183,7 +183,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     tromboneAssemblyLogs.toList.foreach { log ⇒
       val currentLogLevel = log.getString(LoggingKeys.SEVERITY).toLowerCase
       val currentLogMsg   = log.getString(LoggingKeys.MESSAGE)
-      Level(currentLogLevel) >= LoggingLevels.TRACE shouldBe true
+      Level(currentLogLevel) >= TRACE shouldBe true
       currentLogMsg shouldBe logMsgMap(currentLogLevel)
     }
   }

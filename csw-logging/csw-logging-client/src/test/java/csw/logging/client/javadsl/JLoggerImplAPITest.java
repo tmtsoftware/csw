@@ -6,7 +6,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import csw.logging.api.javadsl.ILogger;
-import csw.logging.api.models.LoggingLevels;
+import csw.logging.api.models.Level;
+import csw.logging.api.models.Level$;
 import csw.logging.api.models.RequestId;
 import csw.logging.client.appenders.LogAppenderBuilder;
 import csw.logging.client.commons.LoggingKeys$;
@@ -99,10 +100,10 @@ public class JLoggerImplAPITest extends JUnitSuite {
         Assert.assertEquals(data.get("key2"), fifthLogJsonObject.get("key2").getAsString());
     }
 
-    private void testCommonProperties(LoggingLevels.Level level) {
+    private void testCommonProperties(Level level) {
         logBuffer.forEach(log -> {
             String currentLogLevel = log.get(LoggingKeys$.MODULE$.SEVERITY()).getAsString();
-            Assert.assertEquals(level, LoggingLevels.Level$.MODULE$.apply(currentLogLevel));
+            Assert.assertEquals(level, Level$.MODULE$.apply(currentLogLevel));
             Assert.assertTrue(log.has(LoggingKeys$.MODULE$.TIMESTAMP()));
 
             Assert.assertEquals(className, log.get(LoggingKeys$.MODULE$.CLASS()).getAsString());
@@ -166,7 +167,7 @@ public class JLoggerImplAPITest extends JUnitSuite {
 
         eventually(duration, () -> Assert.assertEquals(16, logBuffer.size()));
 
-        testCommonProperties(LoggingLevels.TRACE$.MODULE$);
+        testCommonProperties(Level.TRACE$.MODULE$);
         testAllOverloads();
     }
 
@@ -195,7 +196,7 @@ public class JLoggerImplAPITest extends JUnitSuite {
 
         eventually(duration, () -> Assert.assertEquals(16, logBuffer.size()));
 
-        testCommonProperties(LoggingLevels.DEBUG$.MODULE$);
+        testCommonProperties(Level.DEBUG$.MODULE$);
         testAllOverloads();
     }
 
@@ -222,7 +223,7 @@ public class JLoggerImplAPITest extends JUnitSuite {
 
         eventually(duration, () -> Assert.assertEquals(16, logBuffer.size()));
 
-        testCommonProperties(LoggingLevels.INFO$.MODULE$);
+        testCommonProperties(Level.INFO$.MODULE$);
         testAllOverloads();
     }
 
@@ -249,7 +250,7 @@ public class JLoggerImplAPITest extends JUnitSuite {
 
         eventually(duration, () -> Assert.assertEquals(16, logBuffer.size()));
 
-        testCommonProperties(LoggingLevels.WARN$.MODULE$);
+        testCommonProperties(Level.WARN$.MODULE$);
         testAllOverloads();
     }
 
@@ -276,7 +277,7 @@ public class JLoggerImplAPITest extends JUnitSuite {
 
         eventually(duration, () -> Assert.assertEquals(16, logBuffer.size()));
 
-        testCommonProperties(LoggingLevels.ERROR$.MODULE$);
+        testCommonProperties(Level.ERROR$.MODULE$);
         testAllOverloads();
     }
 
@@ -304,7 +305,7 @@ public class JLoggerImplAPITest extends JUnitSuite {
 
         eventually(duration, () -> Assert.assertEquals(16, logBuffer.size()));
 
-        testCommonProperties(LoggingLevels.FATAL$.MODULE$);
+        testCommonProperties(Level.FATAL$.MODULE$);
         testAllOverloads();
     }
 

@@ -4,7 +4,7 @@ import java.net.InetAddress
 
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.ConfigFactory
-import csw.logging.api.models.LoggingLevels.Level
+import csw.logging.api.models.Level
 import csw.logging.client.appenders.{FileAppender, StdOutAppender}
 import csw.logging.client.exceptions.AppenderNotFoundException
 import csw.logging.client.internal.LoggingSystem

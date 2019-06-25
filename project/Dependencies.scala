@@ -172,6 +172,8 @@ object Dependencies {
       Akka.`akka-actor-typed`,
       Libs.`scalatest`.value % Test,
       Libs.`junit`           % Test,
+      Libs.`borer-core`.value,
+      Libs.`borer-derivation`.value,
       Libs.`gson`            % Test
     )
   )

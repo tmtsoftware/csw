@@ -6,7 +6,8 @@ import akka.actor.typed.SpawnProtocol;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import csw.logging.api.models.LoggingLevels;
+import csw.logging.api.models.Level;
+import csw.logging.api.models.Level$;
 import csw.logging.client.appenders.LogAppenderBuilder;
 import csw.logging.client.commons.AkkaTypedExtension;
 import csw.logging.client.commons.LoggingKeys$;
@@ -83,8 +84,8 @@ public class ILoggerActorTest extends JUnitSuite {
             Assert.assertEquals(severity, log.get(LoggingKeys$.MODULE$.MESSAGE()).getAsString());
             Assert.assertEquals(className, log.get(LoggingKeys$.MODULE$.CLASS()).getAsString());
 
-            LoggingLevels.Level currentLogLevel = LoggingLevels.Level$.MODULE$.apply(severity);
-            Assert.assertTrue(currentLogLevel.$greater$eq(LoggingLevels.INFO$.MODULE$));
+            Level currentLogLevel = Level$.MODULE$.apply(severity);
+            Assert.assertTrue(currentLogLevel.$greater$eq(Level.INFO$.MODULE$));
         });
     }
 

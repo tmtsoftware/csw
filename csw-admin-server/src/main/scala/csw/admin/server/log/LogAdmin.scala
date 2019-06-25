@@ -10,7 +10,7 @@ import csw.command.client.messages.{GetComponentLogMetadata, SetComponentLogLeve
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.api.models.{AkkaLocation, Connection, Location}
 import csw.location.api.scaladsl.LocationService
-import csw.logging.api.models.LoggingLevels.Level
+import csw.logging.api.models.Level
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.models.LogMetadata
 

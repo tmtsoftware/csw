@@ -10,7 +10,7 @@ import csw.common.components.framework.SampleComponentBehaviorFactory
 import csw.common.extensions.CswContextExtensions.RichCswContext
 import csw.framework.ComponentInfos._
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
-import csw.logging.api.models.LoggingLevels.WARN
+import csw.logging.api.models.Level.WARN
 import csw.logging.client.models.LogMetadata
 import org.mockito.{ArgumentMatchers, MockitoSugar}
 

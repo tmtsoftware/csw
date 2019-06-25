@@ -1,6 +1,7 @@
 package csw.logging.client.models
 
-import csw.logging.api.models.LoggingLevels._
+import csw.logging.api.models.Level
+import csw.logging.api.models.Level._
 
 /**
  * A LoggingState maintained for each component

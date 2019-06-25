@@ -1,6 +1,6 @@
 package csw.logging.client.models
 
-import csw.logging.api.models.LoggingLevels.{DEBUG, ERROR}
+import csw.logging.api.models.Level.{DEBUG, ERROR}
 import org.scalatest.{FunSuite, Matchers}
 
 class ComponentLoggingStateTest extends FunSuite with Matchers {

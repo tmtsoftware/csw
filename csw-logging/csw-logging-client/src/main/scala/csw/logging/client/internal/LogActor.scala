@@ -4,8 +4,7 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{Behavior, PostStop}
 import akka.event.LogSource
-import csw.logging.api.models.LoggingLevels
-import csw.logging.api.models.LoggingLevels.Level
+import csw.logging.api.models.Level
 import csw.logging.client.appenders.LogAppender
 import csw.logging.client.commons.Category
 import csw.logging.client.internal.LogActorMessages._
@@ -46,7 +45,7 @@ private[logging] object LogActor {
 
       def receiveAltMessage(logAltMessage: LogAltMessage): Unit = {
         val jsonObject = generateAltMessageJson(logAltMessage)
-        append(jsonObject, logAltMessage.category, LoggingLevels.INFO)
+        append(jsonObject, logAltMessage.category, Level.INFO)
       }
 
       def receiveLogSlf4j(logSlf4j: LogSlf4j): Unit = {

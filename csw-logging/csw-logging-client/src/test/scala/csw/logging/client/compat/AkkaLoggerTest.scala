@@ -1,8 +1,8 @@
 package csw.logging.client.compat
 
 import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
-import csw.logging.api.models.LoggingLevels
-import csw.logging.api.models.LoggingLevels.Level
+import csw.logging.api.models.Level
+import csw.logging.api.models.Level.INFO
 import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.LoggingTestSuite
@@ -37,7 +37,7 @@ class AkkaLoggerTest extends LoggingTestSuite with FunSuiteLike with Matchers {
 
       log.contains(LoggingKeys.SEVERITY) shouldBe true
       val currentLogLevel = log.getString(LoggingKeys.SEVERITY).toLowerCase
-      Level(currentLogLevel) >= LoggingLevels.INFO shouldBe true
+      Level(currentLogLevel) >= INFO shouldBe true
 
       log.getString(LoggingKeys.MESSAGE) shouldBe currentLogLevel
       log.getString(LoggingKeys.ACTOR) shouldBe actorRef.path.toString
