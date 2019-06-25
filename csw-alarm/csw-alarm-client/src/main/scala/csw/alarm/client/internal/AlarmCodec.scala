@@ -25,10 +25,7 @@ private[client] object AlarmCodec extends AlarmJsonSupport {
     RomaineByteCodec.viaString(_.value, InitializingKey.apply)
 
   //value codecs
-  implicit val metadataRomaineCodec: RomaineByteCodec[AlarmMetadata]     = viaJsonCodec
-  implicit val severityRomaineCodec: RomaineByteCodec[FullAlarmSeverity] = viaJsonCodec
-  implicit val alarmTimeRomaineCodec: RomaineByteCodec[UTCTime]          = viaJsonCodec
-  implicit val shelveStatusRomaineCodec: RomaineByteCodec[ShelveStatus]  = viaJsonCodec
-  implicit val ackStatusCodec: RomaineByteCodec[AcknowledgementStatus]   = viaJsonCodec
-  implicit val initializingCodec: RomaineByteCodec[Boolean]              = viaJsonCodec
+  implicit val metadataRomaineCodec: RomaineByteCodec[AlarmMetadata] = viaJsonCodec
+  implicit val alarmTimeRomaineCodec: RomaineByteCodec[UTCTime]      = viaJsonCodec
+  implicit val initializingCodec: RomaineByteCodec[Boolean]          = viaJsonCodec
 }
