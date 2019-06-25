@@ -3,7 +3,7 @@ package romaine.codec
 import java.nio.ByteBuffer
 
 import io.lettuce.core.codec.RedisCodec
-import romaine.codec.RomaineByteCodec.{FromBytes, ToBytes}
+import romaine.codec.RomaineByteCodec.{FromBytes, ToBytesAndString}
 
 class RomaineRedisCodec[K: RomaineByteCodec, V: RomaineByteCodec] extends RedisCodec[K, V] {
   override def decodeKey(bytes: ByteBuffer): K   = bytes.as[K]

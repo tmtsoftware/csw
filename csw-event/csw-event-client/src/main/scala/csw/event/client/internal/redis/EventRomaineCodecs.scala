@@ -4,17 +4,14 @@ import java.nio.ByteBuffer
 
 import csw.event.client.internal.commons.EventConverter
 import csw.params.events.{Event, EventKey}
-import romaine.codec.{RomaineByteCodec, RomaineStringCodec}
+import romaine.codec.RomaineByteCodec
 
 /**
  * Encodes and decodes keys as EventKeys and values as ProtoBuf byte equivalent of Event
  */
 private[event] object EventRomaineCodecs {
 
-  implicit object EventKeyRomaineCodec extends RomaineStringCodec[EventKey] {
-    override def toString(eventKey: EventKey): String = eventKey.key
-    override def fromString(str: String): EventKey    = EventKey(str)
-  }
+  implicit val eventKeyRomaineCodec: RomaineByteCodec[EventKey] = RomaineByteCodec.viaString(_.key, EventKey.apply)
 
   implicit object EventRomaineCodec extends RomaineByteCodec[Event] {
     override def toBytes(event: Event): ByteBuffer        = EventConverter.toBytes[ByteBuffer](event)

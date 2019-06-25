@@ -4,31 +4,31 @@ import csw.alarm.api.internal._
 import csw.alarm.api.models._
 import csw.time.core.models.UTCTime
 import play.api.libs.json.{Format, Json}
-import romaine.codec.RomaineStringCodec
+import romaine.codec.RomaineByteCodec
 
 private[client] object AlarmCodec extends AlarmJsonSupport {
-  def viaJsonCodec[A: Format]: RomaineStringCodec[A] = RomaineStringCodec.codec(
+  def viaJsonCodec[A: Format]: RomaineByteCodec[A] = RomaineByteCodec.viaString(
     x => Json.toJson(x).toString(),
     x => Json.parse(x).as[A]
   )
 
   //Key Codecs
-  implicit val metadataKeyRomaineCodec: RomaineStringCodec[MetadataKey]   = RomaineStringCodec.codec(_.value, MetadataKey.apply)
-  implicit val ackStatusKeyRomaineCodec: RomaineStringCodec[AckStatusKey] = RomaineStringCodec.codec(_.value, AckStatusKey.apply)
-  implicit val alarmTimeKeyRomaineCodec: RomaineStringCodec[AlarmTimeKey] = RomaineStringCodec.codec(_.value, AlarmTimeKey.apply)
-  implicit val shelveStatusKeyRomaineCodec: RomaineStringCodec[ShelveStatusKey] =
-    RomaineStringCodec.codec(_.value, ShelveStatusKey.apply)
-  implicit val latchedSeverityKeyRomaineCodec: RomaineStringCodec[LatchedSeverityKey] =
-    RomaineStringCodec.codec(_.value, LatchedSeverityKey.apply)
-  implicit val severityKeyRomaineCodec: RomaineStringCodec[SeverityKey] = RomaineStringCodec.codec(_.value, SeverityKey.apply)
-  implicit val initializingKeyCodec: RomaineStringCodec[InitializingKey] =
-    RomaineStringCodec.codec(_.value, InitializingKey.apply)
+  implicit val metadataKeyRomaineCodec: RomaineByteCodec[MetadataKey]   = RomaineByteCodec.viaString(_.value, MetadataKey.apply)
+  implicit val ackStatusKeyRomaineCodec: RomaineByteCodec[AckStatusKey] = RomaineByteCodec.viaString(_.value, AckStatusKey.apply)
+  implicit val alarmTimeKeyRomaineCodec: RomaineByteCodec[AlarmTimeKey] = RomaineByteCodec.viaString(_.value, AlarmTimeKey.apply)
+  implicit val shelveStatusKeyRomaineCodec: RomaineByteCodec[ShelveStatusKey] =
+    RomaineByteCodec.viaString(_.value, ShelveStatusKey.apply)
+  implicit val latchedSeverityKeyRomaineCodec: RomaineByteCodec[LatchedSeverityKey] =
+    RomaineByteCodec.viaString(_.value, LatchedSeverityKey.apply)
+  implicit val severityKeyRomaineCodec: RomaineByteCodec[SeverityKey] = RomaineByteCodec.viaString(_.value, SeverityKey.apply)
+  implicit val initializingKeyCodec: RomaineByteCodec[InitializingKey] =
+    RomaineByteCodec.viaString(_.value, InitializingKey.apply)
 
   //value codecs
-  implicit val metadataRomaineCodec: RomaineStringCodec[AlarmMetadata]     = viaJsonCodec
-  implicit val severityRomaineCodec: RomaineStringCodec[FullAlarmSeverity] = viaJsonCodec
-  implicit val alarmTimeRomaineCodec: RomaineStringCodec[UTCTime]          = viaJsonCodec
-  implicit val shelveStatusRomaineCodec: RomaineStringCodec[ShelveStatus]  = viaJsonCodec
-  implicit val ackStatusCodec: RomaineStringCodec[AcknowledgementStatus]   = viaJsonCodec
-  implicit val initializingCodec: RomaineStringCodec[Boolean]              = viaJsonCodec
+  implicit val metadataRomaineCodec: RomaineByteCodec[AlarmMetadata]     = viaJsonCodec
+  implicit val severityRomaineCodec: RomaineByteCodec[FullAlarmSeverity] = viaJsonCodec
+  implicit val alarmTimeRomaineCodec: RomaineByteCodec[UTCTime]          = viaJsonCodec
+  implicit val shelveStatusRomaineCodec: RomaineByteCodec[ShelveStatus]  = viaJsonCodec
+  implicit val ackStatusCodec: RomaineByteCodec[AcknowledgementStatus]   = viaJsonCodec
+  implicit val initializingCodec: RomaineByteCodec[Boolean]              = viaJsonCodec
 }
