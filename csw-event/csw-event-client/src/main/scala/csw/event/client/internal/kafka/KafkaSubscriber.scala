@@ -8,7 +8,6 @@ import akka.stream.{Materializer, StreamDetachedException}
 import csw.event.api.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import csw.event.client.internal.commons.{EventConverter, EventSubscriberUtil}
 import csw.event.client.utils.Utils
-import csw.params.core.formats.EventCbor
 import csw.params.core.models.Subsystem
 import csw.params.events._
 import org.apache.kafka.clients.consumer.Consumer
