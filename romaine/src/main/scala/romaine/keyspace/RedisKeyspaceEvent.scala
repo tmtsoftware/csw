@@ -14,7 +14,7 @@ object RedisKeyspaceEvent extends Enum[RedisKeyspaceEvent] {
   override def values: immutable.IndexedSeq[RedisKeyspaceEvent] = findValues
 
   implicit val codec: RomaineByteCodec[RedisKeyspaceEvent] =
-    RomaineByteCodec.viaString(_.entryName, withNameInsensitiveOption(_).getOrElse(Unknown))
+    RomaineByteCodec.stringRomaineCodec.bimap(_.entryName, withNameInsensitiveOption(_).getOrElse(Unknown))
 
   case object Set     extends RedisKeyspaceEvent("set")
   case object Expired extends RedisKeyspaceEvent("expired")

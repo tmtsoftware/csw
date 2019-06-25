@@ -12,5 +12,5 @@ object KeyspaceKey {
     case _                => throw new RuntimeException(s"error in parsing keyspace-key=$string")
   }
 
-  implicit val codec: RomaineByteCodec[KeyspaceKey] = RomaineByteCodec.viaString(_.toString, parse)
+  implicit val codec: RomaineByteCodec[KeyspaceKey] = RomaineByteCodec.stringRomaineCodec.bimap(_.toString, parse)
 }

@@ -5,9 +5,14 @@ import java.nio.ByteBuffer
 import enumeratum.{Enum, EnumEntry}
 import io.lettuce.core.codec.Utf8StringCodec
 
-trait RomaineByteCodec[T] {
-  def toBytes(x: T): ByteBuffer
+trait RomaineByteCodec[T] { outer =>
+  def toBytes(value: T): ByteBuffer
   def fromBytes(byteBuffer: ByteBuffer): T
+
+  def bimap[S](from: S => T, to: T => S): RomaineByteCodec[S] = new RomaineByteCodec[S] {
+    override def toBytes(value: S): ByteBuffer        = outer.toBytes(from(value))
+    override def fromBytes(byteBuffer: ByteBuffer): S = to(outer.fromBytes(byteBuffer))
+  }
 }
 
 object RomaineByteCodec {
@@ -17,23 +22,24 @@ object RomaineByteCodec {
   }
 
   implicit class FromString(val string: String) extends AnyVal {
-    def as[A: RomaineByteCodec]: A = utf8StringCodec.encodeValue(string).as[A]
+    def as[A: RomaineByteCodec]: A = stringRomaineCodec.toBytes(string).as[A]
   }
 
   implicit class ToBytesAndString[A](val x: A) extends AnyVal {
     def asBytes(implicit c: RomaineByteCodec[A]): ByteBuffer = c.toBytes(x)
-    def asString(implicit c: RomaineByteCodec[A]): String    = utf8StringCodec.decodeValue(x.asBytes)
+    def asString(implicit c: RomaineByteCodec[A]): String    = stringRomaineCodec.fromBytes(x.asBytes)
   }
 
-  private lazy val utf8StringCodec = new Utf8StringCodec()
-
-  def viaString[T](encode: T ⇒ String, decode: String ⇒ T): RomaineByteCodec[T] = new RomaineByteCodec[T] {
-    override def toBytes(x: T): ByteBuffer            = utf8StringCodec.encodeValue(encode(x))
-    override def fromBytes(byteBuffer: ByteBuffer): T = decode(utf8StringCodec.decodeValue(byteBuffer))
+  implicit lazy val byteBufferRomaineCodec: RomaineByteCodec[ByteBuffer] = new RomaineByteCodec[ByteBuffer] {
+    override def toBytes(value: ByteBuffer): ByteBuffer        = value
+    override def fromBytes(byteBuffer: ByteBuffer): ByteBuffer = byteBuffer
   }
 
-  implicit val stringRomaineCodec: RomaineByteCodec[String] = viaString(identity, identity)
+  implicit lazy val stringRomaineCodec: RomaineByteCodec[String] = {
+    val utf8StringCodec = new Utf8StringCodec()
+    byteBufferRomaineCodec.bimap[String](utf8StringCodec.encodeValue, utf8StringCodec.decodeValue)
+  }
 
   implicit def enumRomainCodec[T <: EnumEntry: Enum]: RomaineByteCodec[T] =
-    viaString(_.entryName, implicitly[Enum[T]].withNameInsensitive)
+    stringRomaineCodec.bimap[T](_.entryName, implicitly[Enum[T]].withNameInsensitive)
 }

@@ -1,7 +1,5 @@
 package csw.event.client.internal.redis
 
-import java.nio.ByteBuffer
-
 import csw.event.client.internal.commons.EventConverter
 import csw.params.events.{Event, EventKey}
 import romaine.codec.RomaineByteCodec
@@ -11,10 +9,10 @@ import romaine.codec.RomaineByteCodec
  */
 private[event] object EventRomaineCodecs {
 
-  implicit val eventKeyRomaineCodec: RomaineByteCodec[EventKey] = RomaineByteCodec.viaString(_.key, EventKey.apply)
+  implicit val eventKeyRomaineCodec: RomaineByteCodec[EventKey] =
+    RomaineByteCodec.stringRomaineCodec.bimap(_.key, EventKey.apply)
 
-  implicit object EventRomaineCodec extends RomaineByteCodec[Event] {
-    override def toBytes(event: Event): ByteBuffer        = EventConverter.toBytes[ByteBuffer](event)
-    override def fromBytes(byteBuffer: ByteBuffer): Event = EventConverter.toEvent(byteBuffer)
-  }
+  implicit val eventRomaineCodec: RomaineByteCodec[Event] =
+    RomaineByteCodec.byteBufferRomaineCodec.bimap[Event](EventConverter.toBytes, EventConverter.toEvent)
+
 }
