@@ -8,7 +8,7 @@ import akka.actor.{ActorPath, Address}
 import akka.serialization.Serialization
 import csw.location.api.commons.LocationServiceLogger
 import csw.location.api.exceptions.LocalAkkaActorRegistrationNotAllowed
-import csw.location.api.formats.LocationRemoteMsg
+import csw.location.api.formats.LocationSerializable
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.logging.api.scaladsl.Logger
 import csw.params.core.models.Prefix
@@ -16,7 +16,7 @@ import csw.params.core.models.Prefix
 /**
  * Registration holds information about a connection and its live location. This model is used to register a connection with LocationService.
  */
-sealed abstract class Registration extends LocationRemoteMsg {
+sealed abstract class Registration extends LocationSerializable {
 
   /**
    * The `Connection` to register with `LocationService`

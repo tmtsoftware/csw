@@ -3,7 +3,7 @@ package csw.location.api.models
 import java.net.URI
 
 import akka.actor.typed.ActorRef
-import csw.location.api.formats.LocationRemoteMsg
+import csw.location.api.formats.LocationSerializable
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.params.core.models.Prefix
 
@@ -12,7 +12,7 @@ import scala.reflect.ClassTag
 /**
  * Location represents a live Connection along with its URI
  */
-sealed abstract class Location extends LocationRemoteMsg {
+sealed abstract class Location extends LocationSerializable {
 
   /**
    * Represents a connection based on a componentId and the type of connection offered by the component

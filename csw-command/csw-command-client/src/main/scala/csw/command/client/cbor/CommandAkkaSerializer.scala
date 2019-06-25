@@ -1,4 +1,4 @@
-package csw.command.client
+package csw.command.client.cbor
 
 import akka.serialization.Serializer
 import csw.command.client.messages.CommandSerializationMarker
@@ -6,6 +6,7 @@ import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.GenericLoggerFactory
 import csw.params.commands.CommandResponse
 import csw.params.core.formats.CborSupport
+import csw.params.core.states.StateVariable
 import io.bullet.borer.Cbor
 
 class CommandAkkaSerializer extends Serializer {
@@ -21,6 +22,7 @@ class CommandAkkaSerializer extends Serializer {
       case x: CommandSerializationMarker.RemoteMsg =>
 //        Cbor.encode(x).toByteArray
         throw new RuntimeException(s"does not support encoding of $o")
+      case x: StateVariable => Cbor.encode(x).toByteArray
       case _ =>
         val ex = new RuntimeException(s"does not support encoding of $o")
         logger.error(ex.getMessage, ex = ex)
@@ -36,6 +38,8 @@ class CommandAkkaSerializer extends Serializer {
     } else if (classOf[CommandSerializationMarker.RemoteMsg].isAssignableFrom(manifest.get)) {
 //      Cbor.decode(bytes).to[SerializationMarker.RemoteMsg].value
       throw new RuntimeException("end")
+    } else if (classOf[StateVariable].isAssignableFrom(manifest.get)) {
+      Cbor.decode(bytes).to[StateVariable].value
     } else {
       val ex = new RuntimeException(s"does not support decoding of ${manifest.get}")
       logger.error(ex.getMessage, ex = ex)

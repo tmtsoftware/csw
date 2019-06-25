@@ -1,11 +1,11 @@
 package csw.location.api.models
 
-import csw.location.api.formats.LocationRemoteMsg
+import csw.location.api.formats.LocationSerializable
 
 /**
  * TrackingEvent is used to represent location events while tracking the connection
  */
-sealed abstract class TrackingEvent extends LocationRemoteMsg {
+sealed abstract class TrackingEvent extends LocationSerializable {
 
   /**
    * The connection for which this TrackingEvent is created

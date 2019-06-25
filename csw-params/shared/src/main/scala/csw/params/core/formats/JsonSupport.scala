@@ -2,7 +2,7 @@ package csw.params.core.formats
 
 import csw.params.commands._
 import csw.params.events._
-import csw.params.core.states.StateVariable.StateVariable
+import csw.params.core.states.StateVariable
 import julienrf.json.derived
 import play.api.libs.json._
 

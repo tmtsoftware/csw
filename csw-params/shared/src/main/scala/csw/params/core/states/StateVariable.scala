@@ -3,47 +3,46 @@ package csw.params.core.states
 import csw.params.commands.{Nameable, Setup}
 import csw.params.core.generics.{Parameter, ParameterSetKeyData, ParameterSetType}
 import csw.params.core.models.Prefix
-import csw.params.core.states.StateVariable.StateVariable
+import csw.serializable.CommandSerializable
 
 import scala.annotation.varargs
 import scala.collection.JavaConverters._
 
-object StateVariable {
+/**
+ * Base trait for state variables
+ */
+sealed trait StateVariable extends CommandSerializable {
 
   /**
-   * Base trait for state variables
+   * identifies the target subsystem
    */
-  sealed trait StateVariable extends Serializable {
+  val prefix: Prefix
 
-    /**
-     * A name identifying the type of command, such as "setup", "observe".
-     * This is used in the JSON and toString output.
-     */
-    def typeName: String
+  /**
+   * an optional initial set of items (keys with values)
+   */
+  val paramSet: Set[Parameter[_]]
 
-    /**
-     * identifies the target subsystem
-     */
-    val prefix: Prefix
+  /**
+   * identifies the name of the state
+   */
+  val stateName: StateName
 
-    /**
-     * an optional initial set of items (keys with values)
-     */
-    val paramSet: Set[Parameter[_]]
+  /**
+   * A name identifying the type of command, such as "setup", "observe".
+   * This is used in the JSON and toString output.
+   */
+  def typeName: String
 
-    /**
-     * identifies the name of the state
-     */
-    val stateName: StateName
-
-    /**
-     * A common toString method for all concrete implementation
-     *
-     * @return the string representation of command
-     */
-    override def toString: String =
-      s"$typeName(source=$prefix, stateName=$stateName, paramSet=$paramSet)"
-  }
+  /**
+   * A common toString method for all concrete implementation
+   *
+   * @return the string representation of command
+   */
+  override def toString: String =
+    s"$typeName(source=$prefix, stateName=$stateName, paramSet=$paramSet)"
+}
+object StateVariable {
 
   /**
    * Type of a function that returns true if two state variables (demand and current)
@@ -86,18 +85,10 @@ object StateVariable {
  * @param stateName identifies the name of the state
  * @param paramSet initial set of items (keys with values)
  */
-case class DemandState private (prefix: Prefix, stateName: StateName, paramSet: Set[Parameter[_]])
+case class DemandState(prefix: Prefix, stateName: StateName, paramSet: Set[Parameter[_]])
     extends ParameterSetType[DemandState]
     with ParameterSetKeyData
     with StateVariable {
-
-  /**
-   * Create a new DemandState instance when a parameter is added or removed
-   *
-   * @param data set of parameters
-   * @return a new instance of DemandState with provided data
-   */
-  override protected def create(data: Set[Parameter[_]]): DemandState = copy(paramSet = data)
 
   /**
    * A Java helper method to construct with String
@@ -108,6 +99,14 @@ case class DemandState private (prefix: Prefix, stateName: StateName, paramSet: 
    * A Java helper method to create a DemandState from a Setup
    */
   def this(stateName: StateName, command: Setup) = this(command.source, stateName, command.paramSet)
+
+  /**
+   * Create a new DemandState instance when a parameter is added or removed
+   *
+   * @param data set of parameters
+   * @return a new instance of DemandState with provided data
+   */
+  override protected def create(data: Set[Parameter[_]]): DemandState = copy(paramSet = data)
 }
 
 object DemandState {
@@ -131,21 +130,13 @@ object DemandState {
  * @param stateName identifies the name of the state
  * @param paramSet     an optional initial set of items (keys with values)
  */
-case class CurrentState private (
+case class CurrentState(
     prefix: Prefix,
     stateName: StateName,
     paramSet: Set[Parameter[_]]
 ) extends ParameterSetType[CurrentState]
     with ParameterSetKeyData
     with StateVariable {
-
-  /**
-   * Create a new CurrentState instance when a parameter is added or removed
-   *
-   * @param data set of parameters
-   * @return a new instance of CurrentState with provided data
-   */
-  override protected def create(data: Set[Parameter[_]]): CurrentState = copy(paramSet = data)
 
   /**
    * A Java helper method to construct with String
@@ -156,6 +147,14 @@ case class CurrentState private (
    * A Java helper method to create a CurrentState from a Setup
    */
   def this(currentStateName: StateName, command: Setup) = this(command.source, currentStateName, command.paramSet)
+
+  /**
+   * Create a new CurrentState instance when a parameter is added or removed
+   *
+   * @param data set of parameters
+   * @return a new instance of CurrentState with provided data
+   */
+  override protected def create(data: Set[Parameter[_]]): CurrentState = copy(paramSet = data)
 }
 
 object CurrentState {

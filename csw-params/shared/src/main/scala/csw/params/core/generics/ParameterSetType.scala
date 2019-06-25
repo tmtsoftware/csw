@@ -14,7 +14,7 @@ import scala.collection.JavaConverters.mapAsJavaMapConverter
  *
  * @tparam T the subclass of ParameterSetType
  */
-abstract class ParameterSetType[T <: ParameterSetType[T]] extends TMTSerializable { self: T =>
+abstract class ParameterSetType[T <: ParameterSetType[T]] { self: T =>
 
   /**
    * A name identifying the type of parameter set, such as "setup", "observe".

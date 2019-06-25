@@ -9,6 +9,7 @@ import csw.params.commands._
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.Coords._
 import csw.params.core.models._
+import csw.params.core.states.{CurrentState, DemandState, StateName, StateVariable}
 import csw.params.events.{Event, EventName, ObserveEvent, SystemEvent}
 import csw.time.core.models.{TAITime, UTCTime}
 import io.bullet.borer._
@@ -161,6 +162,14 @@ object CborSupport extends CborCommonSupport {
     deriveCodec[RequiredSequencerUnavailableIssue]
   implicit lazy val otherIssueCodec: Codec[OtherIssue]     = deriveCodec[OtherIssue]
   implicit lazy val commandIssueCodec: Codec[CommandIssue] = deriveCodec[CommandIssue]
+
+  // ************************ StateVariable Codecs ********************
+
+  implicit lazy val stateNameCodec: Codec[StateName]         = deriveCodec[StateName]
+  implicit lazy val demandStateCodec: Codec[DemandState]     = deriveCodec[DemandState]
+  implicit lazy val currentStateCodec: Codec[CurrentState]   = deriveCodec[CurrentState]
+  implicit lazy val stateVariableCodec: Codec[StateVariable] = deriveCodec[StateVariable]
+
 }
 
 case class Timestamp(seconds: Long, nanos: Long) {

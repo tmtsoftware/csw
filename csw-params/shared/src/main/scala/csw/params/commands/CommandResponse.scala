@@ -1,9 +1,9 @@
 package csw.params.commands
 
 import csw.params.core.models.Id
-import csw.serializable.TMTSerializable
+import csw.serializable.CommandSerializable
 
-sealed trait CommandResponse extends TMTSerializable {
+sealed trait CommandResponse extends CommandSerializable {
 
   /**
    * A helper method to get the runId for this command response
