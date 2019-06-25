@@ -7,8 +7,7 @@ import akka.stream.Materializer
 import akka.stream.scaladsl.Source
 import csw.event.api.exceptions.PublishFailure
 import csw.event.api.scaladsl.EventPublisher
-import csw.event.client.internal.commons.EventPublisherUtil
-import csw.params.core.formats.EventCbor
+import csw.event.client.internal.commons.{EventConverter, EventPublisherUtil}
 import csw.params.events.Event
 import csw.time.core.models.TMTTime
 import org.apache.kafka.clients.producer.{Callback, ProducerRecord}
@@ -103,7 +102,7 @@ private[event] class KafkaPublisher(producerSettings: Future[ProducerSettings[St
   }
 
   private def eventToProducerRecord(event: Event): ProducerRecord[String, Array[Byte]] =
-    new ProducerRecord(event.eventKey.key, EventCbor.encode(event))
+    new ProducerRecord(event.eventKey.key, EventConverter.toBytes[Array[Byte]](event))
 
   // callback to be complete the future operation for publishing when the record has been acknowledged by the server
   private def completePromise(event: Event, promisedDone: Promise[Done]): Callback = {
