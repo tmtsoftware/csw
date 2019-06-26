@@ -1,6 +1,6 @@
 package csw.location.api.models
 
-import csw.location.api.formats.LocationSerializable
+import csw.location.api.codecs.LocationSerializable
 import csw.location.api.models.ConnectionType.{AkkaType, HttpType, TcpType}
 import play.api.libs.json._
 

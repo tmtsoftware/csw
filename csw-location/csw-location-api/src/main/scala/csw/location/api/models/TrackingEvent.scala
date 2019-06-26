@@ -1,6 +1,6 @@
 package csw.location.api.models
 
-import csw.location.api.formats.LocationSerializable
+import csw.location.api.codecs.LocationSerializable
 
 /**
  * TrackingEvent is used to represent location events while tracking the connection

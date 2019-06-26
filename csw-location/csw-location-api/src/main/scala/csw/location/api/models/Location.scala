@@ -3,7 +3,7 @@ package csw.location.api.models
 import java.net.URI
 
 import akka.actor.typed.ActorRef
-import csw.location.api.formats.LocationSerializable
+import csw.location.api.codecs.LocationSerializable
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.params.core.models.Prefix
 

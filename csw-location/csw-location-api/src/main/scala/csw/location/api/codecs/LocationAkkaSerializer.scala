@@ -1,4 +1,4 @@
-package csw.location.api.formats.cbor
+package csw.location.api.codecs
 
 import akka.actor.ExtendedActorSystem
 import akka.actor.typed.ActorSystem
