@@ -1,7 +1,6 @@
 package csw.command.client.cbor
 
 import akka.serialization.Serializer
-import csw.command.client.messages.CommandSerializationMarker
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.GenericLoggerFactory
 import csw.params.commands.CommandResponse
