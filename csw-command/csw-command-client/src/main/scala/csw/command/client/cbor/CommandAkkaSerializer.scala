@@ -18,11 +18,8 @@ class CommandAkkaSerializer extends Serializer {
 
   override def toBinary(o: AnyRef): Array[Byte] = {
     o match {
-      case x: CommandResponse.RemoteMsg            => Cbor.encode(x).toByteArray
-      case x: CommandSerializationMarker.RemoteMsg =>
-//        Cbor.encode(x).toByteArray
-        throw new RuntimeException(s"does not support encoding of $o")
-      case x: StateVariable => Cbor.encode(x).toByteArray
+      case x: CommandResponse.RemoteMsg => Cbor.encode(x).toByteArray
+      case x: StateVariable             => Cbor.encode(x).toByteArray
       case _ =>
         val ex = new RuntimeException(s"does not support encoding of $o")
         logger.error(ex.getMessage, ex = ex)
@@ -35,9 +32,6 @@ class CommandAkkaSerializer extends Serializer {
   override def fromBinary(bytes: Array[Byte], manifest: Option[Class[_]]): AnyRef = {
     if (classOf[CommandResponse.RemoteMsg].isAssignableFrom(manifest.get)) {
       Cbor.decode(bytes).to[CommandResponse.RemoteMsg].value
-    } else if (classOf[CommandSerializationMarker.RemoteMsg].isAssignableFrom(manifest.get)) {
-//      Cbor.decode(bytes).to[SerializationMarker.RemoteMsg].value
-      throw new RuntimeException("end")
     } else if (classOf[StateVariable].isAssignableFrom(manifest.get)) {
       Cbor.decode(bytes).to[StateVariable].value
     } else {

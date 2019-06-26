@@ -112,7 +112,7 @@ lazy val `csw-location-api` = project
     `csw-logging-client`,
     `csw-params-jvm`
   )
-  .enablePlugins(PublishBintray, GenJavadocPlugin)
+  .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.LocationApi.value
   )
@@ -313,7 +313,7 @@ lazy val `csw-command-client` = project
     `csw-logging-client`,
     `csw-commons` % "test->test"
   )
-  .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm)
+  .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.CommandClient.value)
 
 /* ================= Event Service ============== */

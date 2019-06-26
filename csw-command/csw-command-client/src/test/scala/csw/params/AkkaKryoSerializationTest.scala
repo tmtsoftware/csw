@@ -8,7 +8,6 @@ import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.serialization.SerializationExtension
 import com.twitter.chill.akka.AkkaSerializer
-import csw.command.client.cbor.CommandAkkaSerializer
 import csw.command.client.messages.ComponentCommonMessage.{
   ComponentStateSubscription,
   GetSupervisorLifecycleState,
@@ -25,8 +24,7 @@ import csw.command.client.models.framework._
 import csw.commons.ResourceReader
 import csw.location.api.models.ComponentType.HCD
 import csw.location.api.models.Connection
-import csw.params.commands.CommandResponse._
-import csw.params.commands.{CommandIssue, _}
+import csw.params.commands._
 import csw.params.core.generics.KeyType.{ByteArrayKey, ChoiceKey, DoubleMatrixKey, IntKey, StructKey}
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.Units.{NoUnits, arcmin, coulomb, encoder, joule, lightyear, meter, pascal}
@@ -34,8 +32,6 @@ import csw.params.core.models._
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.params.events.{EventName, ObserveEvent, SystemEvent}
 import csw.time.core.models.UTCTime
-import org.scalatest.prop.TableDrivenPropertyChecks._
-import org.scalatest.prop.Tables.Table
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 
 import scala.concurrent.Await
@@ -246,31 +242,6 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       serialization.findSerializerFor(ContainerLifecycleState.Running).getClass shouldBe classOf[AkkaSerializer]
       serialization.findSerializerFor(component).getClass shouldBe classOf[AkkaSerializer]
       serialization.findSerializerFor(componentInfo).getClass shouldBe classOf[AkkaSerializer]
-    }
-
-    it("should serialize CommandValidationResponse messages") {
-      serialization.findSerializerFor(CommandResponse.Accepted(Id())).getClass shouldBe classOf[CommandAkkaSerializer]
-      serialization
-        .findSerializerFor(Invalid(Id(), CommandIssue.OtherIssue("test issue")))
-        .getClass shouldBe classOf[CommandAkkaSerializer]
-    }
-
-    it("should serialize CommandExecutionResponse messages") {
-      val testData = Table(
-        "CommandExecutionResponse models",
-        CompletedWithResult(Id(), Result(prefix)),
-        //NoLongerValid(Id(), CommandIssue.OtherIssue("test issue")),
-        Completed(Id()),
-        Error(Id(), "test"),
-        Cancelled(Id())
-      )
-
-      forAll(testData) { commandResponse ⇒
-        serialization
-          .findSerializerFor(commandResponse)
-          .getClass shouldBe classOf[CommandAkkaSerializer]
-
-      }
     }
   }
 }
