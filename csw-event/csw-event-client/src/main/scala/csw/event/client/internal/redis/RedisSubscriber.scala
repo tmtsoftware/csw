@@ -13,7 +13,7 @@ import io.lettuce.core.{RedisClient, RedisURI}
 import reactor.core.publisher.FluxSink.OverflowStrategy
 import romaine.RomaineFactory
 import romaine.async.RedisAsyncApi
-import romaine.codec.RomaineStringCodec
+import romaine.codec.RomaineCodec
 import romaine.exceptions.RedisServerNotAvailable
 import romaine.reactive.{RedisSubscription, RedisSubscriptionApi}
 
@@ -44,7 +44,7 @@ private[event] class RedisSubscriber(redisURI: Future[RedisURI], redisClient: Re
 
   private val asyncApi: RedisAsyncApi[EventKey, Event] = romaineFactory.redisAsyncApi[EventKey, Event](redisURI)
 
-  private def subscriptionApi[T: RomaineStringCodec](): RedisSubscriptionApi[T, Event] =
+  private def subscriptionApi[T: RomaineCodec](): RedisSubscriptionApi[T, Event] =
     romaineFactory.redisSubscriptionApi[T, Event](redisURI)
 
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {

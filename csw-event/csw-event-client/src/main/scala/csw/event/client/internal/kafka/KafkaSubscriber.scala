@@ -6,9 +6,8 @@ import akka.kafka.{ConsumerSettings, Subscription, Subscriptions, scaladsl}
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{Materializer, StreamDetachedException}
 import csw.event.api.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
-import csw.event.client.internal.commons.EventSubscriberUtil
+import csw.event.client.internal.commons.{EventConverter, EventSubscriberUtil}
 import csw.event.client.utils.Utils
-import csw.params.core.formats.EventCbor
 import csw.params.core.models.Subsystem
 import csw.params.events._
 import org.apache.kafka.clients.consumer.Consumer
@@ -127,11 +126,7 @@ private[event] class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[S
 
   private def getEventStream(subscription: Future[Subscription]): Source[Event, Future[scaladsl.Consumer.Control]] = {
     val future = subscription.flatMap(s => consumerSettings.map(c => scaladsl.Consumer.plainSource(c, s)))
-    Source.fromFutureSource(future).map { record ⇒
-      try {
-        EventCbor.decode[Event](record.value())
-      } catch { case NonFatal(_) ⇒ Event.badEvent() }
-    }
+    Source.fromFutureSource(future).map(x => EventConverter.toEvent(x.value()))
   }
 
   //Get the last offset for the given partitions. The last offset of a partition is the offset of the upcoming

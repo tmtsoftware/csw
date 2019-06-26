@@ -2,7 +2,7 @@ package romaine
 
 import io.lettuce.core.{RedisClient, RedisURI}
 import romaine.async.RedisAsyncApi
-import romaine.codec.{RomaineByteCodec, RomaineRedisCodec}
+import romaine.codec.{RomaineCodec, RomaineRedisCodec}
 import romaine.exceptions.RedisServerNotAvailable
 import romaine.reactive.RedisSubscriptionApi
 
@@ -13,7 +13,7 @@ import scala.async.Async._
 import scala.util.control.NonFatal
 
 class RomaineFactory(redisClient: RedisClient)(implicit val ec: ExecutionContext) {
-  def redisAsyncApi[K: RomaineByteCodec, V: RomaineByteCodec](redisURIF: Future[RedisURI]): RedisAsyncApi[K, V] =
+  def redisAsyncApi[K: RomaineCodec, V: RomaineCodec](redisURIF: Future[RedisURI]): RedisAsyncApi[K, V] =
     new RedisAsyncApi(
       Async.async {
         val redisURI = await(redisURIF)
@@ -24,7 +24,7 @@ class RomaineFactory(redisClient: RedisClient)(implicit val ec: ExecutionContext
       }
     )
 
-  def redisSubscriptionApi[K: RomaineByteCodec, V: RomaineByteCodec](redisURIF: Future[RedisURI]): RedisSubscriptionApi[K, V] =
+  def redisSubscriptionApi[K: RomaineCodec, V: RomaineCodec](redisURIF: Future[RedisURI]): RedisSubscriptionApi[K, V] =
     new RedisSubscriptionApi(
       () =>
         Async.async {

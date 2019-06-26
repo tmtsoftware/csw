@@ -4,8 +4,8 @@ import akka.Done
 import akka.stream.scaladsl.Source
 import reactor.core.publisher.FluxSink.OverflowStrategy
 import romaine.async.RedisAsyncApi
-import romaine.codec.RomaineStringCodec
-import romaine.codec.RomaineStringCodec.{FromString, ToString}
+import romaine.codec.RomaineCodec
+import romaine.codec.RomaineCodec.{FromString, ToBytesAndString}
 import romaine.extensions.SourceExtensions.RichSource
 import romaine.keyspace.KeyspaceEvent.{Error, Removed, Updated}
 import romaine.keyspace.RedisKeyspaceEvent.{Delete, Expired, Unknown}
@@ -14,7 +14,7 @@ import romaine.{RedisResult, RedisValueChange}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class RedisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
+class RedisKeySpaceApi[K: RomaineCodec, V: RomaineCodec](
     redisSubscriptionApi: RedisSubscriptionApi[KeyspaceKey, RedisKeyspaceEvent],
     redisAsyncApi: RedisAsyncApi[K, V],
     keyspacePrefix: KeyspaceId = KeyspaceId._0

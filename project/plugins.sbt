@@ -1,7 +1,7 @@
 addSbtPlugin("com.typesafe.sbt"                  % "sbt-site"                   % "1.3.2")
 addSbtPlugin("io.github.jonas"                   % "sbt-paradox-material-theme" % "0.6.0")
 addSbtPlugin("org.scalastyle"                    %% "scalastyle-sbt-plugin"     % "1.0.0")
-addSbtPlugin("org.scalameta"                     % "sbt-scalafmt"               % "2.0.0")
+addSbtPlugin("org.scalameta"                     % "sbt-scalafmt"               % "2.0.1")
 addSbtPlugin("com.dwijnand"                      % "sbt-dynver"                 % "3.3.0")
 addSbtPlugin("com.eed3si9n"                      % "sbt-unidoc"                 % "0.4.2")
 addSbtPlugin("com.thoughtworks.sbt-api-mappings" % "sbt-api-mappings"           % "2.0.1")
