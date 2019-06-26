@@ -6,7 +6,6 @@ import akka.Done
 import akka.actor.typed.scaladsl.adapter.{TypedActorRefOps, TypedActorSystemOps, _}
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.serialization.{Serialization, SerializationExtension}
-import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.api.models._
 import csw.params.core.formats.{CommonCodecs, CborHelpers}
 import io.bullet.borer.Codec
