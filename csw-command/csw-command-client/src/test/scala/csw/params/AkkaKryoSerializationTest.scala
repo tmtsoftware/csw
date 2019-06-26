@@ -52,8 +52,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
     Await.result(system.whenTerminated, 2.seconds)
   }
 
-  //TODO: fix me
-  ignore("Test akka serialization of Commands") {
+  describe("Test akka serialization of Commands") {
 
     it("should serialize Setup") {
       val intKey = IntKey.make("intKey")
