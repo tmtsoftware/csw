@@ -7,7 +7,7 @@ import io.bullet.borer.{Cbor, Input, Output}
 import scala.util.control.NonFatal
 
 private[event] object EventConverter {
-  import csw.params.core.formats.CborSupport._
+  import csw.params.core.formats.ParamCodecs._
 
   def toEvent[Chunk: Input.Wrapper](bytes: Chunk): Event = {
     try {

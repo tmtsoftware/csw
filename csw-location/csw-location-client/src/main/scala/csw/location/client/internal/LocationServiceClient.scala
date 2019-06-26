@@ -15,7 +15,7 @@ import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{KillSwitch, KillSwitches, Materializer}
 import akka.{Done, NotUsed, actor}
 import csw.location.api.exceptions.{OtherLocationIsRegistered, RegistrationFailed}
-import csw.location.api.formats.cbor.LocationCborSupport
+import csw.location.api.formats.cbor.LocationCodecs
 import csw.location.api.models.{Registration, RegistrationResult, _}
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.HttpCodecSupport
@@ -30,7 +30,7 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
     mat: Materializer
 ) extends LocationService
     with HttpCodecSupport
-    with LocationCborSupport { outer ⇒
+    with LocationCodecs { outer ⇒
 
   import actorSystem.executionContext
   implicit val untypedSystem: actor.ActorSystem = actorSystem.toUntyped

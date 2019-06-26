@@ -8,11 +8,11 @@ import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.serialization.{Serialization, SerializationExtension}
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.api.models._
-import csw.params.core.formats.{CborCommonSupport, CborHelpers}
+import csw.params.core.formats.{CommonCodecs, CborHelpers}
 import io.bullet.borer.Codec
 import io.bullet.borer.derivation.MapBasedCodecs._
 
-trait LocationCborSupport extends CborCommonSupport {
+trait LocationCodecs extends CommonCodecs {
   implicit def actorSystem: ActorSystem[_]
 
   implicit lazy val connectionTypeCodec: Codec[ConnectionType] = CborHelpers.enumCodec[ConnectionType]

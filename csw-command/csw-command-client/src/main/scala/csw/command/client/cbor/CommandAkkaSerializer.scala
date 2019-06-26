@@ -5,12 +5,12 @@ import csw.command.client.messages.CommandSerializationMarker
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.GenericLoggerFactory
 import csw.params.commands.CommandResponse
-import csw.params.core.formats.CborSupport
+import csw.params.core.formats.ParamCodecs
 import csw.params.core.states.StateVariable
 import io.bullet.borer.Cbor
 
 class CommandAkkaSerializer extends Serializer {
-  import CborSupport._
+  import ParamCodecs._
 
   private val logger: Logger = GenericLoggerFactory.getLogger
 

@@ -9,7 +9,7 @@ import csw.location.api.models.{Connection, Location, Registration, TrackingEven
 import csw.logging.api.scaladsl.Logger
 import io.bullet.borer.Cbor
 
-class LocationAkkaSerializer(_actorSystem: ExtendedActorSystem) extends Serializer with LocationCborSupport {
+class LocationAkkaSerializer(_actorSystem: ExtendedActorSystem) extends Serializer with LocationCodecs {
 
   override val identifier: Int                      = 19924
   private val logger: Logger                        = LocationServiceLogger.getLogger

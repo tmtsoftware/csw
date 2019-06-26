@@ -10,7 +10,7 @@ import io.bullet.borer.compat.akka._
 
 import scala.collection.immutable.Seq
 
-trait HttpCodecSupport {
+trait HttpCodecs {
 
   lazy val mediaTypes: Seq[MediaType.WithFixedCharset]     = List(`application/json`)
   lazy val unmarshallerContentTypes: Seq[ContentTypeRange] = mediaTypes.map(ContentTypeRange.apply)

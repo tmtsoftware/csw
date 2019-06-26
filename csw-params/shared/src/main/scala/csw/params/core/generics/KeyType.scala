@@ -1,7 +1,7 @@
 package csw.params.core.generics
 
-import csw.params.core.formats.CborSupport._
-import csw.params.core.formats.{CborSupport, JsonSupport}
+import csw.params.core.formats.ParamCodecs._
+import csw.params.core.formats.{ParamCodecs, JsonSupport}
 import csw.params.core.models.Coords.{AltAzCoord, CometCoord, Coord, EqCoord, MinorPlanetCoord, SolarSystemCoord}
 import csw.params.core.models.Units.second
 import csw.params.core.models._
@@ -24,8 +24,8 @@ sealed class KeyType[S: Format: ClassTag: ArrayEnc: ArrayDec] extends EnumEntry 
 
   private[params] lazy val paramFormat: Format[Parameter[S]] = Parameter.parameterFormat[S]
 
-  private[params] lazy val paramEncoder: Encoder[Parameter[S]]         = CborSupport.paramCodec[S].encoder
-  private[params] lazy val waDecoder: Decoder[mutable.WrappedArray[S]] = CborSupport.waCodec[S].decoder
+  private[params] lazy val paramEncoder: Encoder[Parameter[S]]         = ParamCodecs.paramCodec[S].encoder
+  private[params] lazy val waDecoder: Decoder[mutable.WrappedArray[S]] = ParamCodecs.waCodec[S].decoder
 }
 
 /**
