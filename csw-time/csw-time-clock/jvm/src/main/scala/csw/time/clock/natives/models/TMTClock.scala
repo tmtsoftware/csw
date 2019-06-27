@@ -32,15 +32,23 @@ private[time] class LinuxClock extends TMTClock {
   override def offset: Int = {
     val timeVal = new NTPTimeVal()
     TimeLibrary.ntp_gettimex(timeVal)
-    if (timeVal.tai == 0) {
-        println("============================================================================================================================")
-        println("WARNING: Value of TAI OFFSET is 0. To set the TAI OFFSET on your machine,")
-        println("Please follow instructions in TimeService Documentation [https://tmtsoftware.github.io/csw/services/time.html#dependencies]")
-        println("============================================================================================================================")
-      }
+    if (timeVal.tai == 0) printWarning()
     timeVal.tai
   }
   //#native-calls
+
+  private def printWarning(): Unit = {
+    println(
+      "============================================================================================================================"
+    )
+    println("WARNING: Value of TAI OFFSET is 0. To set the TAI OFFSET on your machine,")
+    println(
+      "Please follow instructions in TimeService Documentation [https://tmtsoftware.github.io/csw/services/time.html#dependencies]"
+    )
+    println(
+      "============================================================================================================================"
+    )
+  }
 }
 
 private[time] class NonLinuxClock extends TMTClock {
