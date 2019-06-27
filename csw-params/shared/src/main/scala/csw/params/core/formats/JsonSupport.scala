@@ -1,10 +1,12 @@
 package csw.params.core.formats
 
+import java.nio.charset.StandardCharsets
+
 import csw.params.commands._
 import csw.params.core.states.StateVariable
 import csw.params.events._
 import io.bullet.borer.{Decoder, Encoder, Json}
-import play.api.libs.json.{Json => PJson, _}
+import play.api.libs.json.{Json ⇒ PJson, _}
 
 object JsonSupport extends JsonSupport
 
@@ -20,7 +22,7 @@ trait JsonSupport {
   import ParamCodecs._
 
   def writes[T: Encoder](x: T): JsValue = PJson.parse(Json.encode(x).toUtf8String)
-  def reads[T: Decoder](x: JsValue): T  = Json.decode(x.toString().getBytes("utf8")).to[T].value
+  def reads[T: Decoder](x: JsValue): T  = Json.decode(x.toString().getBytes(StandardCharsets.UTF_8)).to[T].value
 
   /**
    * Writes a SequenceParameterSet to JSON
