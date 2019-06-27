@@ -31,6 +31,7 @@ object ParamCodecs extends CommonCodecs {
   implicit lazy val raDecCodec: Codec[RaDec]   = deriveCodec[RaDec]
 
   implicit lazy val tagCodec: Codec[Coords.Tag]                      = deriveCodec[Coords.Tag]
+  implicit lazy val icrsCodec: Codec[Coords.ICRS.type]               = deriveCodec[Coords.ICRS.type]
   implicit lazy val angleCodec: Codec[Angle]                         = deriveCodec[Angle]
   implicit lazy val properMotionCodec: Codec[ProperMotion]           = deriveCodec[ProperMotion]
   implicit lazy val eqFrameCodec: Codec[EqFrame]                     = deriveCodec[EqFrame]
@@ -170,6 +171,8 @@ object ParamCodecs extends CommonCodecs {
   implicit lazy val currentStateCodec: Codec[CurrentState]   = deriveCodec[CurrentState]
   implicit lazy val stateVariableCodec: Codec[StateVariable] = deriveCodec[StateVariable]
 
+  // ************************ Subsystem Codecs ********************
+  implicit lazy val subSystemCodec: Codec[Subsystem] = enumCodec[Subsystem]
 }
 
 case class Timestamp(seconds: Long, nanos: Long) {

@@ -2,7 +2,6 @@ package csw.params.core.generics
 
 import csw.params.core.models.Units
 import csw.params.core.models.Units.NoUnits
-import play.api.libs.json.Format
 
 import scala.annotation.varargs
 import scala.reflect.ClassTag
@@ -16,7 +15,7 @@ import scala.runtime.ScalaRunTime._
  * @param keyType reference to an object of type KeyType[S]
  * @param units applicable units
  */
-case class Key[S: Format: ClassTag] private[generics] (keyName: String, keyType: KeyType[S], units: Units) {
+case class Key[S: ClassTag] private[generics] (keyName: String, keyType: KeyType[S], units: Units) {
 
   /**
    * An overloaded constructor to create Key with no units

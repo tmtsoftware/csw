@@ -3,14 +3,12 @@ package csw.params.core.generics
 import java.util
 import java.util.Optional
 
-import csw.params.extensions.OptionConverters.RichOption
 import csw.params.core.models.Units
+import csw.params.extensions.OptionConverters.RichOption
 import csw.serializable.TMTSerializable
-import play.api.libs.json._
 
 import scala.collection.JavaConverters.seqAsJavaListConverter
 import scala.collection.mutable
-import scala.reflect.ClassTag
 
 object Parameter {
 
@@ -19,35 +17,7 @@ object Parameter {
       keyType: KeyType[S],
       items: mutable.WrappedArray[S],
       units: Units
-  ): Parameter[S] =
-    new Parameter(keyName, keyType, items, units)
-
-  private[params] implicit def parameterFormat[T: Format: ClassTag]: Format[Parameter[T]] =
-    new Format[Parameter[T]] {
-      override def writes(obj: Parameter[T]): JsValue = {
-        JsObject(
-          Seq(
-            "keyName" -> JsString(obj.keyName),
-            "keyType" -> JsString(obj.keyType.entryName),
-            "values"  -> Json.toJson(obj.values),
-            "units"   -> JsString(obj.units.entryName)
-          )
-        )
-      }
-
-      override def reads(json: JsValue): JsResult[Parameter[T]] = {
-        JsSuccess(
-          Parameter(
-            (json \ "keyName").as[String],
-            (json \ "keyType").as[KeyType[T]],
-            (json \ "values").as[Array[T]],
-            (json \ "units").as[Units]
-          )
-        )
-      }
-    }
-
-  def apply[T](implicit x: Format[Parameter[T]]): Format[Parameter[T]] = x
+  ): Parameter[S] = new Parameter(keyName, keyType, items, units)
 }
 
 /**
@@ -133,12 +103,12 @@ case class Parameter[S] private[params] (
   def withUnits(unitsIn: Units): Parameter[S] = copy(units = unitsIn)
 
   /**
-   * A comma separated string representation of all values this parameter holds
-   */
-  def valuesToString: String = items.mkString("(", ",", ")")
-
-  /**
    * Returns a formatted string representation with a KeyName
    */
   override def toString: String = s"$keyName($valuesToString$units)"
+
+  /**
+   * A comma separated string representation of all values this parameter holds
+   */
+  def valuesToString: String = items.mkString("(", ",", ")")
 }

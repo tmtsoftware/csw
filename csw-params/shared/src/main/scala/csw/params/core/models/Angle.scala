@@ -85,12 +85,6 @@ object Angle {
 
   protected[models] val CIRCLE: Long = 360L * 60L * 60L * 1000L * 1000L
 
-  // Added for Play-Json support
-  implicit val format: Format[Angle] = new Format[Angle] {
-    override def writes(obj: Angle): JsValue           = JsNumber(obj.uas)
-    override def reads(json: JsValue): JsResult[Angle] = JsSuccess(Angle(json.as[Long]))
-  }
-
   /** used in implicit conversion to support `1.degree`, `1.arcMinute` etc */
   class AngleWrapperDouble(value: Double) {
     def degree: Angle = Angle((value * Angle.D2Uas).toLong)

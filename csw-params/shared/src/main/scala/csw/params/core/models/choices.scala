@@ -29,8 +29,6 @@ object Choice {
    * @return an instance of Choice
    */
   implicit def toChoice(name: String): Choice = new Choice(name)
-
-  implicit val choiceFormat: OFormat[Choice] = Json.format[Choice]
 }
 
 /**
@@ -84,6 +82,4 @@ object Choices {
    */
   @varargs
   def fromChoices(choices: Choice*): Choices = Choices(choices.toSet)
-
-  private[params] implicit val choicesFormat: OFormat[Choices] = Json.format[Choices]
 }

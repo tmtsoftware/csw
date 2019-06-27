@@ -1,10 +1,10 @@
 package csw.params.core.formats
 
 import csw.params.commands._
-import csw.params.events._
 import csw.params.core.states.StateVariable
-import julienrf.json.derived
-import play.api.libs.json._
+import csw.params.events._
+import io.bullet.borer.{Decoder, Encoder, Json}
+import play.api.libs.json.{Json => PJson, _}
 
 object JsonSupport extends JsonSupport
 
@@ -15,35 +15,20 @@ object JavaJsonSupport extends JsonSupport
 /**
  * Supports conversion of commands, state variables and events to/from JSON
  */
-trait JsonSupport extends MiscJsonFormats {
+trait JsonSupport {
 
-  def writes[T: Writes](x: T): JsValue = Json.toJson(x)
-  def reads[T: Reads](x: JsValue): T   = x.as[T]
+  import ParamCodecs._
 
-  implicit val commandFormat: OFormat[Command]             = derived.flat.oformat((__ \ "type").format[String])
-  implicit val stateVariableFormat: OFormat[StateVariable] = derived.flat.oformat((__ \ "type").format[String])
-  implicit val eventFormat: OFormat[Event]                 = derived.flat.oformat((__ \ "type").format[String])
-
-  implicit val sequenceCommandFormat: Reads[SequenceCommand] = {
-    commandFormat.collect(JsonValidationError("invalid sequence command")) {
-      case x: SequenceCommand ⇒ x
-    }
-  }
-
-  implicit val controlCommandFormat: Reads[ControlCommand] = {
-    commandFormat.collect(JsonValidationError("invalid control command")) {
-      case x: ControlCommand ⇒ x
-    }
-  }
+  def writes[T: Encoder](x: T): JsValue = PJson.parse(Json.encode(x).toUtf8String)
+  def reads[T: Decoder](x: JsValue): T  = Json.decode(x.toString().getBytes("utf8")).to[T].value
 
   /**
    * Writes a SequenceParameterSet to JSON
    *
    * @param result any instance of SequenceCommand
-   * @tparam A the type of the command (implied)
    * @return a JsValue object representing the SequenceCommand
    */
-  def writeSequenceCommand[A <: Command](result: A): JsValue = writes(result)
+  def writeSequenceCommand(result: Command): JsValue = writes(result)
 
   /**
    * Reads a SequenceCommand back from JSON
@@ -58,10 +43,9 @@ trait JsonSupport extends MiscJsonFormats {
    * Writes a state variable to JSON
    *
    * @param stateVariable any instance of StateVariable
-   * @tparam A the type of the StateVariable (implied)
    * @return a JsValue object representing the StateVariable
    */
-  def writeStateVariable[A <: StateVariable](stateVariable: A): JsValue = writes(stateVariable)
+  def writeStateVariable(stateVariable: StateVariable): JsValue = writes(stateVariable)
 
   /**
    * Reads a StateVariable back from JSON
@@ -76,10 +60,9 @@ trait JsonSupport extends MiscJsonFormats {
    * Writes an event to JSON
    *
    * @param event any instance of EventType
-   * @tparam A the type of the event (implied)
    * @return a JsValue object representing the event
    */
-  def writeEvent[A <: Event](event: A): JsValue = writes(event)
+  def writeEvent(event: Event): JsValue = writes(event)
 
   /**
    * Reads an event back from JSON

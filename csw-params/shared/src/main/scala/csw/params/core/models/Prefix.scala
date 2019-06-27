@@ -18,9 +18,4 @@ case class Prefix(prefix: String) extends TMTSerializable {
 
 object Prefix {
   private val SEPARATOR = "."
-
-  implicit val format: Format[Prefix] = new Format[Prefix] {
-    override def writes(obj: Prefix): JsValue           = JsString(obj.prefix)
-    override def reads(json: JsValue): JsResult[Prefix] = JsSuccess(Prefix(json.as[String]))
-  }
 }

@@ -1,19 +1,27 @@
 {
-  "type": "Setup",
-  "runId": "test-runId",
-  "source": "wfos.blue.filter",
-  "commandName": "move",
-  "maybeObsId": "Obs001",
-  "paramSet": [{
-    "keyName": "coords",
-    "keyType": "RaDecKey",
-    "values": [{
-      "ra": 7.3,
-      "dec": 12.1
-    }, {
-      "ra": 9.1,
-      "dec": 2.9
-    }],
-    "units": "NoUnits"
-  }]
+  "Setup": {
+    "runId": "test-runId",
+    "source": "wfos.blue.filter",
+    "commandName": "move",
+    "maybeObsId": [
+      "Obs001"
+    ],
+    "paramSet": [
+      {
+        "keyName": "coords",
+        "keyType": "RaDecKey",
+        "items": [
+          {
+            "ra": 7.3,
+            "dec": 12.1
+          },
+          {
+            "ra": 9.1,
+            "dec": 2.9
+          }
+        ],
+        "units": "NoUnits"
+      }
+    ]
+  }
 }

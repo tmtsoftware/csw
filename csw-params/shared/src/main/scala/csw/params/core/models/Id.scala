@@ -2,8 +2,6 @@ package csw.params.core.models
 
 import java.util.UUID
 
-import play.api.libs.json._
-
 /**
  * Implementation of unique id fulfilling TMT requirements (returned from a queue submit).
  *
@@ -19,9 +17,4 @@ object Id {
    * @return an instance of Id
    */
   def apply(): Id = new Id(UUID.randomUUID().toString)
-
-  implicit val format: Format[Id] = new Format[Id] {
-    override def writes(obj: Id): JsValue           = JsString(obj.id)
-    override def reads(json: JsValue): JsResult[Id] = JsSuccess(Id(json.as[String]))
-  }
 }

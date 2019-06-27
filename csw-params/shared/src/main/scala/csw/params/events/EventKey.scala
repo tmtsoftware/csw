@@ -22,6 +22,4 @@ object EventKey {
     val strings = eventKeyStr.splitAt(eventKeyStr.lastIndexOf(SEPARATOR))
     new EventKey(Prefix(strings._1), EventName(strings._2.tail))
   }
-
-  private[params] implicit val format: OFormat[EventKey] = Json.format[EventKey]
 }

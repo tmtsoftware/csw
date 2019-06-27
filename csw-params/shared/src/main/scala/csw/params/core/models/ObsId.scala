@@ -3,14 +3,8 @@ package csw.params.core.models
 import java.util.Optional
 
 import csw.serializable.TMTSerializable
-import play.api.libs.json._
 
 object ObsId {
-
-  implicit val format: Format[ObsId] = new Format[ObsId] {
-    override def writes(obj: ObsId): JsValue           = JsString(obj.obsId)
-    override def reads(json: JsValue): JsResult[ObsId] = JsSuccess(ObsId(json.as[String]))
-  }
 
   /**
    * Represents an empty ObsId

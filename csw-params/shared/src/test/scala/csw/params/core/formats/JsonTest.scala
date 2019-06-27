@@ -26,6 +26,8 @@ import play.api.libs.json.Json
 // DEOPSCSW-188: Efficient Serialization to/from JSON
 class JsonTest extends FunSpec {
 
+  import ParamCodecs._
+
   private val s1: String = "encoder"
   private val s2: String = "filter"
   private val s3: String = "detectorTemp"
@@ -39,8 +41,8 @@ class JsonTest extends FunSpec {
 
     it("should encode and decode properly") {
       val expectedJson = Json.parse("\"wfos\"")
-      val json         = Json.toJson(wfos)
-      val sub          = json.as[Subsystem]
+      val json         = JsonSupport.writes(wfos)
+      val sub          = JsonSupport.reads[Subsystem](json)
       assert(sub == wfos)
       assert(json.equals(expectedJson))
     }
@@ -51,8 +53,8 @@ class JsonTest extends FunSpec {
 
     it("should encode and decode properly") {
       val expectedJson = Json.parse("\"wfos.filter.wheel\"")
-      val json         = Json.toJson(prefix)
-      val sub          = json.as[Prefix]
+      val json         = JsonSupport.writes(prefix)
+      val sub          = JsonSupport.reads[Prefix](json)
       assert(sub == prefix)
       assert(json.equals(expectedJson))
     }
@@ -62,8 +64,8 @@ class JsonTest extends FunSpec {
     val encoderUnit: Units = encoder
 
     it("should encode and decode properly") {
-      val json                 = Json.toJson(encoderUnit)
-      val encoderUnitsFromJson = json.as[Units]
+      val json                 = JsonSupport.writes(encoderUnit)
+      val encoderUnitsFromJson = JsonSupport.reads[Units](json)
       assert(encoderUnit == encoderUnitsFromJson)
     }
   }
@@ -74,8 +76,8 @@ class JsonTest extends FunSpec {
       val k1 = KeyType.CharKey.make(s3)
       val i1 = k1.set('d').withUnits(NoUnits)
 
-      val j1  = Json.toJson(i1)
-      val in1 = j1.as[Parameter[Char]]
+      val j1  = JsonSupport.writes(i1)
+      val in1 = JsonSupport.reads[Parameter[Char]](j1)
       assert(in1 == i1)
       assert(in1.units == i1.units)
       assert(in1.units == NoUnits)
@@ -85,8 +87,8 @@ class JsonTest extends FunSpec {
       val k1 = KeyType.CharKey.make(s3)
       val i1 = k1.set('d').withUnits(encoder)
 
-      val j1  = Json.toJson(i1)
-      val in1 = j1.as[Parameter[Char]]
+      val j1  = JsonSupport.writes(i1)
+      val in1 = JsonSupport.reads[Parameter[Char]](j1)
       assert(in1 == i1)
       assert(in1.units == i1.units)
       assert(in1.units == encoder)
@@ -97,8 +99,8 @@ class JsonTest extends FunSpec {
       val s: Short = -1
       val i1       = k1.set(s).withUnits(NoUnits)
 
-      val j1  = Json.toJson(i1)
-      val in1 = j1.as[Parameter[Short]]
+      val j1  = JsonSupport.writes(i1)
+      val in1 = JsonSupport.reads[Parameter[Short]](j1)
       assert(in1 == i1)
     }
 
@@ -106,8 +108,8 @@ class JsonTest extends FunSpec {
       val k1 = KeyType.IntKey.make(s3)
       val i1 = k1.set(23).withUnits(NoUnits)
 
-      val j1  = Json.toJson(i1)
-      val in1 = j1.as[Parameter[Int]]
+      val j1  = JsonSupport.writes(i1)
+      val in1 = JsonSupport.reads[Parameter[Int]](j1)
       assert(in1 == i1)
     }
 
@@ -115,8 +117,8 @@ class JsonTest extends FunSpec {
       val k1 = KeyType.LongKey.make(s1)
       val i1 = k1.set(123456L).withUnits(NoUnits)
 
-      val j1  = Json.toJson(i1)
-      val in1 = j1.as[Parameter[Long]]
+      val j1  = JsonSupport.writes(i1)
+      val in1 = JsonSupport.reads[Parameter[Long]](j1)
       assert(in1 == i1)
     }
 
@@ -124,8 +126,8 @@ class JsonTest extends FunSpec {
       val k1 = KeyType.FloatKey.make(s1)
       val i1 = k1.set(123.456f).withUnits(NoUnits)
 
-      val j1  = Json.toJson(i1)
-      val in1 = j1.as[Parameter[Float]]
+      val j1  = JsonSupport.writes(i1)
+      val in1 = JsonSupport.reads[Parameter[Float]](j1)
       assert(in1 == i1)
     }
 
@@ -133,8 +135,8 @@ class JsonTest extends FunSpec {
       val k1 = KeyType.DoubleKey.make(s1)
       val i1 = k1.set(123.456).withUnits(NoUnits)
 
-      val j1  = Json.toJson(i1)
-      val in1 = j1.as[Parameter[Double]]
+      val j1  = JsonSupport.writes(i1)
+      val in1 = JsonSupport.reads[Parameter[Double]](j1)
       assert(in1 == i1)
     }
 
@@ -142,15 +144,15 @@ class JsonTest extends FunSpec {
       val k1 = KeyType.BooleanKey.make(s1)
       val i1 = k1.set(true, false).withUnits(NoUnits)
 
-      val j1 = Json.toJson(i1)
+      val j1 = JsonSupport.writes(i1)
       //      info("j1: " + j1)
-      val in1: Parameter[Boolean] = j1.as[Parameter[Boolean]]
+      val in1: Parameter[Boolean] = JsonSupport.reads[Parameter[Boolean]](j1)
       assert(in1 == i1)
 
       val i2 = k1.set(true)
 
-      val j2  = Json.toJson(i2)
-      val in2 = j2.as[Parameter[Boolean]]
+      val j2  = JsonSupport.writes(i2)
+      val in2 = JsonSupport.reads[Parameter[Boolean]](j2)
       assert(in2 == i2)
     }
 
@@ -158,8 +160,8 @@ class JsonTest extends FunSpec {
       val k1 = KeyType.StringKey.make(s2)
       val i1 = k1.set("Blue", "Green").withUnits(NoUnits)
 
-      val j1  = Json.toJson(i1)
-      val in1 = j1.as[Parameter[String]]
+      val j1  = JsonSupport.writes(i1)
+      val in1 = JsonSupport.reads[Parameter[String]](j1)
       assert(in1 == i1)
     }
   }

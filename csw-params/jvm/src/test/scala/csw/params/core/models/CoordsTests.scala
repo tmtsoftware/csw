@@ -4,13 +4,13 @@ import csw.params.commands.{CommandName, Setup}
 import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.{KeyType, Parameter}
 import org.scalatest.{FunSpec, Matchers}
-import play.api.libs.json.Json
 
 class CoordsTests extends FunSpec with Matchers {
 
   import Angle._
   import Coords._
   import KeyType._
+  import csw.params.core.formats.ParamCodecs._
 
   private val src = Prefix("esw.ocs.seq")
 
@@ -71,59 +71,59 @@ class CoordsTests extends FunSpec with Matchers {
 
     it("should convert pm to/from JSON") {
       // Check proper motions
-      val pmjs = Json.toJson(pm)
+      val pmjs = JsonSupport.writes(pm)
 
-      val pmIn = pmjs.as[ProperMotion]
+      val pmIn = JsonSupport.reads[ProperMotion](pmjs)
       pmIn shouldEqual pm
     }
 
     it("should convert frame to/from JSON") {
       val f1 = ICRS
-      val j1 = Json.toJson(f1)
-      j1.as[EqFrame] shouldEqual ICRS
+      val j1 = JsonSupport.writes(f1)
+      JsonSupport.reads[EqFrame](j1) shouldEqual ICRS
     }
 
     it("should JSON an alt az") {
       val c0 = AltAzCoord(BASE, 301.degree, 42.5.degree)
 
-      val js = Json.toJson(c0)
-      val c1 = js.as[AltAzCoord]
+      val js = JsonSupport.writes(c0)
+      val c1 = JsonSupport.reads[AltAzCoord](js)
       c0 shouldEqual c1
     }
 
     it("should JSON solar system coord") {
       val c0 = SolarSystemCoord(BASE, Venus)
 
-      val js = Json.toJson(c0)
-      val c1 = js.as[SolarSystemCoord]
+      val js = JsonSupport.writes(c0)
+      val c1 = JsonSupport.reads[SolarSystemCoord](js)
       c0 shouldEqual c1
     }
 
     it("should JSON minor planet coord") {
       val c0 = MinorPlanetCoord(GUIDER1, 2000.0d, 90.degree, 2.degree, 100.degree, 1.4d, 0.234d, 220.degree)
 
-      val js = Json.toJson(c0)
-      val c1 = js.as[MinorPlanetCoord]
+      val js = JsonSupport.writes(c0)
+      val c1 = JsonSupport.reads[MinorPlanetCoord](js)
       c0 shouldEqual c1
     }
 
     it("should JSON comet coord") {
       val c0 = CometCoord(BASE, 2000.0d, 90.degree, 2.degree, 100.degree, 1.4d, 0.234d)
 
-      val js = Json.toJson(c0)
-      val c1 = js.as[CometCoord]
+      val js = JsonSupport.writes(c0)
+      val c1 = JsonSupport.reads[CometCoord](js)
       c0 shouldEqual c1
 
-      val js2 = Json.toJson(c0.asInstanceOf[Coord])
-      js2.as[Coord] shouldEqual c0
+      val js2 = JsonSupport.writes(c0.asInstanceOf[Coord])
+      JsonSupport.reads[Coord](js2) shouldEqual c0
     }
 
     it("should JSON an EqCoord") {
       // Check EqCoordinate
       val eq = EqCoord(ra = 180.0, frame = FK5, dec = 32.0, pmx = pm.pmx, pmy = pm.pmy)
 
-      val js   = Json.toJson(eq)
-      val eqIn = js.as[EqCoord]
+      val js   = JsonSupport.writes(eq)
+      val eqIn = JsonSupport.reads[EqCoord](js)
       eqIn shouldBe eq
     }
 
@@ -135,8 +135,8 @@ class CoordsTests extends FunSpec with Matchers {
       val baseKey  = EqCoordKey.make("BasePosition")
       val posParam = baseKey.set(eq)
 
-      val paramOut = Json.toJson(posParam)
-      val paramIn  = paramOut.as[Parameter[EqCoord]]
+      val paramOut = JsonSupport.writes(posParam)
+      val paramIn  = JsonSupport.reads[Parameter[EqCoord]](paramOut)
       paramIn shouldEqual posParam
 
       val setup: Setup = Setup(src, CommandName("test"), None).add(posParam)
@@ -154,8 +154,8 @@ class CoordsTests extends FunSpec with Matchers {
       val baseKey  = CoordKey.make("BasePosition")
       val posParam = baseKey.set(eq)
 
-      val paramOut = Json.toJson(posParam)
-      val paramIn  = paramOut.as[Parameter[Coord]]
+      val paramOut = JsonSupport.writes(posParam)
+      val paramIn  = JsonSupport.reads[Parameter[Coord]](paramOut)
       paramIn shouldEqual posParam
 
       val setup: Setup = Setup(src, CommandName("test"), None).add(posParam)

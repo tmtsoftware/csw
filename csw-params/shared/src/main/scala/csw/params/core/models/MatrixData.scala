@@ -3,7 +3,6 @@ package csw.params.core.models
 import java.util
 
 import com.github.ghik.silencer.silent
-import play.api.libs.json.{Format, Json}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -41,9 +40,6 @@ case class MatrixData[T: ClassTag](data: mutable.WrappedArray[mutable.WrappedArr
 }
 
 object MatrixData {
-
-  //play-json formatter
-  implicit def format[T: Format: ClassTag]: Format[MatrixData[T]] = Json.format[MatrixData[T]]
 
   /**
    * Create a MatrixData from one or more arrays of Array[T]
