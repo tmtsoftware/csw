@@ -1,5 +1,8 @@
 package csw.command.api
 
+/**
+ * The handle to the subscription created for the current state published by components.
+ */
 trait CurrentStateSubscription {
 
   /**

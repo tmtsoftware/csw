@@ -5,15 +5,18 @@ import java.util.concurrent.TimeoutException
 import akka.actor.Scheduler
 import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.typed.{ActorRef, ActorSystem}
-import akka.stream.Materializer
+import akka.stream.{KillSwitches, Materializer, OverflowStrategy}
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.typed.scaladsl
+import akka.stream.typed.scaladsl.ActorSource
 import akka.util.Timeout
 import csw.command.api.scaladsl.CommandService
 import csw.command.api.{CurrentStateSubscription, StateMatcher}
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
+import csw.command.client.messages.ComponentCommonMessage.ComponentStateSubscription
 import csw.command.client.messages.{CommandResponseManagerMessage, ComponentMessage}
+import csw.command.client.models.framework.PubSub.{Subscribe, SubscribeOnly}
 import csw.command.client.models.matchers.Matcher
 import csw.command.client.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.location.api.models.AkkaLocation
@@ -104,10 +107,33 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
   override def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse] =
     component ? (CommandResponseManagerMessage.Subscribe(commandRunId, _))
 
+  override def subscribeCurrentState(names: Set[StateName] = Set.empty): Source[CurrentState, CurrentStateSubscription] = {
+    val bufferSize = 256
+
+    /*
+     * Creates a stream of current state change of a component. An actorRef plays the source of the stream.
+     * Whenever the stream will be materialized, the source actorRef will subscribe itself to CurrentState change of the target component.
+     * Any change in current state of the target component will push the current state to source actorRef which will
+     * then flow through the stream.
+     */
+    ActorSource
+      .actorRef[CurrentState](
+        completionMatcher = PartialFunction.empty,
+        failureMatcher = PartialFunction.empty,
+        bufferSize,
+        overflowStrategy = OverflowStrategy.dropHead
+      )
+      .mapMaterializedValue { ref ⇒
+        if (names.isEmpty) component ! ComponentStateSubscription(Subscribe(ref))
+        else component ! ComponentStateSubscription(SubscribeOnly(ref, names))
+      }
+      .viaMat(KillSwitches.single)(Keep.right)
+      .mapMaterializedValue(killSwitch => () => killSwitch.shutdown())
+  }
   override def subscribeCurrentState(callback: CurrentState ⇒ Unit): CurrentStateSubscription =
-    new CurrentStateSubscriptionImpl(component, None, callback)
+    subscribeCurrentState().map(callback).toMat(Sink.ignore)(Keep.left).run()
 
   override def subscribeCurrentState(names: Set[StateName], callback: CurrentState ⇒ Unit): CurrentStateSubscription =
-    new CurrentStateSubscriptionImpl(component, Some(names), callback)
+    subscribeCurrentState(names).map(callback).toMat(Sink.ignore)(Keep.left).run()
 
 }

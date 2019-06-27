@@ -1,4 +1,5 @@
 package csw.command.api.scaladsl
+import akka.stream.scaladsl.Source
 import akka.util.Timeout
 import csw.command.api.{CurrentStateSubscription, StateMatcher}
 import csw.params.commands.CommandResponse._
@@ -82,6 +83,15 @@ trait CommandService {
   /**
    * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
    *
+   * @param names subscribe to states which have any of the provided value for name.
+   *              If no states are provided, subscription in made to all the states.
+   * @return a CurrentStateSubscription to stop the subscription
+   */
+  def subscribeCurrentState(names: Set[StateName] = Set.empty): Source[CurrentState, CurrentStateSubscription]
+
+  /**
+   * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
+   *
    * @note Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
    * @param callback the action to be applied on the CurrentState element received as a result of subscription
    * @return a CurrentStateSubscription to stop the subscription
@@ -92,7 +102,7 @@ trait CommandService {
    * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
    *
    * @note Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
-   * @param names subscribe to only those states which have any of the the provided value for name
+   * @param names subscribe to only those states which have any of the provided value for name
    * @param callback the action to be applied on the CurrentState element received as a result of subscription
    * @return a CurrentStateSubscription to stop the subscription
    */
