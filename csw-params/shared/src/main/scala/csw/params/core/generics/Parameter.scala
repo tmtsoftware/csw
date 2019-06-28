@@ -9,16 +9,7 @@ import csw.serializable.TMTSerializable
 
 import scala.collection.JavaConverters.seqAsJavaListConverter
 import scala.collection.mutable
-
-object Parameter {
-
-  private[csw] def apply[S](
-      keyName: String,
-      keyType: KeyType[S],
-      items: mutable.WrappedArray[S],
-      units: Units
-  ): Parameter[S] = new Parameter(keyName, keyType, items, units)
-}
+import io.bullet.borer.derivation.key
 
 /**
  * Parameter represents a KeyName, KeyType, array of values and units applicable to values. Parameter sits as payload for
@@ -30,10 +21,10 @@ object Parameter {
  * @param units applicable units
  * @tparam S the type of items this parameter holds
  */
-case class Parameter[S] private[params] (
+case class Parameter[S](
     keyName: String,
     keyType: KeyType[S],
-    items: mutable.WrappedArray[S],
+    @key("values") items: mutable.WrappedArray[S],
     units: Units
 ) extends TMTSerializable {
 

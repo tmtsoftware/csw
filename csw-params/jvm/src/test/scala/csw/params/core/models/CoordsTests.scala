@@ -3,6 +3,8 @@ package csw.params.core.models
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.{KeyType, Parameter}
+import csw.params.core.models.Coords.EqFrame.{FK5, ICRS}
+import csw.params.core.models.Coords.SolarSystemObject.{Pluto, Venus}
 import org.scalatest.{FunSpec, Matchers}
 
 class CoordsTests extends FunSpec with Matchers {
@@ -78,8 +80,8 @@ class CoordsTests extends FunSpec with Matchers {
     }
 
     it("should convert frame to/from JSON") {
-      val f1 = ICRS
-      val j1 = JsonSupport.writes(f1)
+      val f1: EqFrame = ICRS
+      val j1          = JsonSupport.writes(f1)
       JsonSupport.reads[EqFrame](j1) shouldEqual ICRS
     }
 

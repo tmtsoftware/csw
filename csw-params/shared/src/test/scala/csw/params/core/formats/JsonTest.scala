@@ -2,7 +2,6 @@ package csw.params.core.formats
 
 import csw.params.commands._
 import csw.params.events.{EventName, ObserveEvent, SystemEvent}
-import csw.params.core.formats.JsonSupport._
 import csw.params.core.generics.KeyType.{
   ByteMatrixKey,
   ChoiceKey,
@@ -16,9 +15,13 @@ import csw.params.core.generics.KeyType.{
   StructKey
 }
 import csw.params.core.generics._
+import csw.params.core.models.Coords.EqFrame.FK5
+import csw.params.core.models.Coords.SolarSystemObject.Venus
 import csw.params.core.models.Units.{NoUnits, degree, encoder, meter}
 import csw.params.core.models._
 import csw.params.core.states.{CurrentState, DemandState, StateName}
+import io.bullet.borer
+import io.bullet.borer.Codec
 import org.scalatest.FunSpec
 import play.api.libs.json.Json
 

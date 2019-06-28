@@ -11,6 +11,8 @@ import csw.params.core.generics.KeyType.{
   ShortMatrixKey,
   StructKey
 }
+import csw.params.core.models.Coords.EqFrame.FK5
+import csw.params.core.models.Coords.SolarSystemObject.Venus
 import csw.params.core.models.Units.{NoUnits, degree, meter, second}
 import csw.params.core.models._
 import csw.time.core.models.{TAITime, UTCTime}

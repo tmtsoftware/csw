@@ -17,5 +17,6 @@ case class Prefix(prefix: String) extends TMTSerializable {
 }
 
 object Prefix {
-  private val SEPARATOR = "."
+  private val SEPARATOR               = "."
+  implicit val format: Format[Prefix] = Json.format[Prefix]
 }

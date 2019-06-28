@@ -30,12 +30,13 @@ object ParamCodecs extends CommonCodecs {
   implicit lazy val choiceCodec: Codec[Choice] = Codec.forCaseClass[Choice]
   implicit lazy val raDecCodec: Codec[RaDec]   = deriveCodec[RaDec]
 
-  implicit lazy val tagCodec: Codec[Coords.Tag]                      = deriveCodec[Coords.Tag]
-  implicit lazy val icrsCodec: Codec[Coords.ICRS.type]               = deriveCodec[Coords.ICRS.type]
-  implicit lazy val angleCodec: Codec[Angle]                         = deriveCodec[Angle]
-  implicit lazy val properMotionCodec: Codec[ProperMotion]           = deriveCodec[ProperMotion]
-  implicit lazy val eqFrameCodec: Codec[EqFrame]                     = deriveCodec[EqFrame]
-  implicit lazy val solarSystemObjectCodec: Codec[SolarSystemObject] = deriveCodec[SolarSystemObject]
+  implicit lazy val tagCodec: Codec[Coords.Tag]            = Codec.forCaseClass[Coords.Tag]
+  implicit lazy val angleCodec: Codec[Angle]               = Codec.forCaseClass[Angle]
+  implicit lazy val properMotionCodec: Codec[ProperMotion] = deriveCodec[ProperMotion]
+
+  implicit lazy val eqFrameCodec: Codec[EqFrame] = CborHelpers.enumCodec[EqFrame]
+
+  implicit lazy val solarSystemObjectCodec: Codec[SolarSystemObject] = CborHelpers.enumCodec[SolarSystemObject]
 
   implicit lazy val eqCoordCodec: Codec[EqCoord]                   = deriveCodec[EqCoord]
   implicit lazy val solarSystemCoordCodec: Codec[SolarSystemCoord] = deriveCodec[SolarSystemCoord]
@@ -44,8 +45,25 @@ object ParamCodecs extends CommonCodecs {
   implicit lazy val altAzCoordCodec: Codec[AltAzCoord]             = deriveCodec[AltAzCoord]
   implicit lazy val coordCodec: Codec[Coord]                       = deriveCodec[Coord]
 
-  implicit lazy val tsCodec: Codec[Timestamp]    = deriveCodec[Timestamp]
-  implicit lazy val instantCodec: Codec[Instant] = bimap[Timestamp, Instant](_.toInstant, Timestamp.fromInstant)
+  implicit lazy val tsCodec: Codec[Timestamp] = deriveCodec[Timestamp]
+
+  implicit lazy val instantEnc: Encoder[Instant] = Encoder { (w, value) ⇒
+    val enc: Encoder[Instant] = if (w.target == Cbor) {
+      tsCodec.encoder.contramap(Timestamp.fromInstant)
+    } else {
+      Encoder.forString.contramap(_.toString)
+    }
+    enc.write(w, value)
+  }
+
+  implicit lazy val instantDec: Decoder[Instant] = Decoder { r ⇒
+    val dec: Decoder[Instant] = if (r.target == Cbor) {
+      tsCodec.decoder.map(_.toInstant)
+    } else {
+      Decoder.forString.map(Instant.parse)
+    }
+    dec.read(r)
+  }
 
   implicit lazy val utcTimeCodec: Codec[UTCTime] = Codec.forCaseClass[UTCTime]
   implicit lazy val taiTimeCodec: Codec[TAITime] = Codec.forCaseClass[TAITime]
@@ -70,6 +88,7 @@ object ParamCodecs extends CommonCodecs {
   implicit lazy val javaByteArrayEnc: Encoder[Array[JByte]] = Encoder.forByteArray.contramap(_.map(x ⇒ x: Byte))
   implicit lazy val javaByteArrayDec: Decoder[Array[JByte]] = Decoder.forByteArray.map(_.map(x ⇒ x: JByte))
 
+  //Do not put the bytesEnc and bytesDec inside Codec, due to an issue with borer https://github.com/sirthias/borer/issues/24
   implicit lazy val bytesEnc: Encoder[Array[Byte]] = Encoder { (w, value) ⇒
     val enc = if (w.target == Cbor) Encoder.forByteArray else Encoder.forArray[Byte]
     enc.write(w, value)
@@ -94,7 +113,7 @@ object ParamCodecs extends CommonCodecs {
     val keyName = r.readString()
     r.tryReadString("keyType")
     val keyType = KeyType.withNameInsensitive(r.readString())
-    r.tryReadString("items")
+    r.tryReadString("values")
     val wa = keyType.waDecoder.read(r)
     r.tryReadString("units")
     val units = unitsCodec.decoder.read(r)

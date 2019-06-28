@@ -2,6 +2,8 @@ package example.params
 
 import csw.params.core.generics.KeyType.{ChoiceKey, CoordKey, StructKey}
 import csw.params.core.generics.{GChoiceKey, Key, KeyType, Parameter}
+import csw.params.core.models.Coords.EqFrame.FK5
+import csw.params.core.models.Coords.SolarSystemObject.Venus
 import csw.params.core.models._
 import csw.time.core.models.UTCTime
 import org.scalatest.{FunSpec, Matchers}

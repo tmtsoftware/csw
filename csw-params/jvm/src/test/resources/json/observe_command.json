@@ -3,12 +3,12 @@
     "runId": "test-runId",
     "source": "wfos.blue.filter",
     "commandName": "move",
-    "maybeObsId": ["Obs001"],
+    "maybeObsId": "Obs001",
     "paramSet": [
       {
         "keyName": "repeat",
         "keyType": "IntKey",
-        "items": [
+        "values": [
           22
         ],
         "units": "NoUnits"
@@ -16,7 +16,7 @@
       {
         "keyName": "expTime",
         "keyType": "StringKey",
-        "items": [
+        "values": [
           "11:10"
         ],
         "units": "NoUnits"

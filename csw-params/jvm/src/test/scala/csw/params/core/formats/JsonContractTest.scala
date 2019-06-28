@@ -33,7 +33,7 @@ class JsonContractTest extends FunSpec with Matchers {
 
   describe("Test Sequence Commands") {
 
-    it("ddd should adhere to specified standard Setup json format") {
+    it("should adhere to specified standard Setup json format") {
       val raDecKey   = KeyType.RaDecKey.make("coords")
       val raDec1     = RaDec(7.3, 12.1)
       val raDec2     = RaDec(9.1, 2.9)

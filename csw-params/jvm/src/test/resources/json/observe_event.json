@@ -8,13 +8,13 @@
       {
         "keyName": "myStruct",
         "keyType": "StructKey",
-        "items": [
+        "values": [
           {
             "paramSet": [
               {
                 "keyName": "ra",
                 "keyType": "StringKey",
-                "items": [
+                "values": [
                   "12:13:14.1"
                 ],
                 "units": "NoUnits"
@@ -22,7 +22,7 @@
               {
                 "keyName": "dec",
                 "keyType": "StringKey",
-                "items": [
+                "values": [
                   "32:33:34.4"
                 ],
                 "units": "NoUnits"
@@ -30,7 +30,7 @@
               {
                 "keyName": "epoch",
                 "keyType": "DoubleKey",
-                "items": [
+                "values": [
                   1950.0
                 ],
                 "units": "NoUnits"

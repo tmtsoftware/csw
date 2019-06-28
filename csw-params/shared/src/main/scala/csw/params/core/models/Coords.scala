@@ -1,22 +1,12 @@
 package csw.params.core.models
 import java.util
 
-import csw.params.core.models.Coords.{
-  AltAzCoord,
-  BASE,
-  CometCoord,
-  Coord,
-  EqCoord,
-  EqFrame,
-  MinorPlanetCoord,
-  SolarSystemCoord,
-  SolarSystemObject,
-  Tag
-}
-import julienrf.json.derived
-import play.api.libs.json.{Json, OFormat}
+import csw.params.core.models.Coords.EqFrame.ICRS
+import csw.params.core.models.Coords._
+import enumeratum._
 
 import scala.collection.JavaConverters._
+import scala.collection.immutable
 
 object Coords {
 
@@ -42,9 +32,12 @@ object Coords {
   val allTags: Set[Tag]         = Set(BASE, OIWFS1, OIWFS2, OIWFS3, OIWFS4, ODGW1, ODGW2, ODGW3, ODGW4, GUIDER1, GUIDER2)
   val allTagsNames: Set[String] = allTags.map(_.name)
 
-  sealed trait EqFrame
-  case object ICRS extends EqFrame
-  case object FK5  extends EqFrame
+  sealed trait EqFrame extends EnumEntry
+  object EqFrame extends Enum[EqFrame] {
+    override def values: immutable.IndexedSeq[EqFrame] = findValues
+    case object ICRS extends EqFrame
+    case object FK5  extends EqFrame
+  }
 
   /**
    * All coordinates are a Coord.
@@ -58,16 +51,21 @@ object Coords {
     override def toString: String = s"AltAzCoord($tag ${alt.toDegree}  ${az.toDegree})"
   }
 
-  sealed trait SolarSystemObject
-  case object Mercury extends SolarSystemObject
-  case object Venus   extends SolarSystemObject
-  case object Moon    extends SolarSystemObject
-  case object Mars    extends SolarSystemObject
-  case object Jupiter extends SolarSystemObject
-  case object Saturn  extends SolarSystemObject
-  case object Neptune extends SolarSystemObject
-  case object Uranus  extends SolarSystemObject
-  case object Pluto   extends SolarSystemObject
+  sealed trait SolarSystemObject extends EnumEntry
+  object SolarSystemObject extends Enum[SolarSystemObject] {
+
+    override def values: immutable.IndexedSeq[SolarSystemObject] = findValues
+
+    case object Mercury extends SolarSystemObject
+    case object Venus   extends SolarSystemObject
+    case object Moon    extends SolarSystemObject
+    case object Mars    extends SolarSystemObject
+    case object Jupiter extends SolarSystemObject
+    case object Saturn  extends SolarSystemObject
+    case object Neptune extends SolarSystemObject
+    case object Uranus  extends SolarSystemObject
+    case object Pluto   extends SolarSystemObject
+  }
 
   case class SolarSystemCoord(tag: Tag, body: SolarSystemObject) extends Coord
 
@@ -204,8 +202,8 @@ object Coords {
  * For the Java API
  */
 object JCoords {
-  val ICRS: EqFrame = Coords.ICRS
-  val FK5: EqFrame  = Coords.FK5
+  val ICRS: EqFrame = EqFrame.ICRS
+  val FK5: EqFrame  = EqFrame.FK5
 
   val DEFAULT_FRAME: EqFrame  = ICRS
   val DEFAULT_TAG: Tag        = BASE
@@ -213,15 +211,15 @@ object JCoords {
   val DEFAULT_PMY: Double     = ProperMotion.DEFAULT_PROPERMOTION.pmy
   val DEFAULT_CATNAME: String = "none"
 
-  val Mercury: SolarSystemObject = Coords.Mercury
-  val Venus: SolarSystemObject   = Coords.Venus
-  val Moon: SolarSystemObject    = Coords.Moon
-  val Mars: SolarSystemObject    = Coords.Mars
-  val Jupiter: SolarSystemObject = Coords.Jupiter
-  val Saturn: SolarSystemObject  = Coords.Saturn
-  val Neptune: SolarSystemObject = Coords.Neptune
-  val Uranus: SolarSystemObject  = Coords.Uranus
-  val Pluto: SolarSystemObject   = Coords.Pluto
+  val Mercury: SolarSystemObject = SolarSystemObject.Mercury
+  val Venus: SolarSystemObject   = SolarSystemObject.Venus
+  val Moon: SolarSystemObject    = SolarSystemObject.Moon
+  val Mars: SolarSystemObject    = SolarSystemObject.Mars
+  val Jupiter: SolarSystemObject = SolarSystemObject.Jupiter
+  val Saturn: SolarSystemObject  = SolarSystemObject.Saturn
+  val Neptune: SolarSystemObject = SolarSystemObject.Neptune
+  val Uranus: SolarSystemObject  = SolarSystemObject.Uranus
+  val Pluto: SolarSystemObject   = SolarSystemObject.Pluto
 
   def allTags: util.Set[Tag]        = Coords.allTags.asJava
   def allTagNames: util.Set[String] = Coords.allTagsNames.asJava

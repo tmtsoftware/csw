@@ -3,12 +3,12 @@
     "runId": "test-runId",
     "source": "wfos.blue.filter",
     "commandName": "move",
-    "maybeObsId": ["Obs001"],
+    "maybeObsId": "Obs001",
     "paramSet": [
       {
         "keyName": "LongKey",
         "keyType": "LongKey",
-        "items": [
+        "values": [
           50,
           60
         ],
@@ -17,7 +17,7 @@
       {
         "keyName": "RaDecKey",
         "keyType": "RaDecKey",
-        "items": [
+        "values": [
           {
             "ra": 7.3,
             "dec": 12.1
@@ -28,7 +28,7 @@
       {
         "keyName": "FloatKey",
         "keyType": "FloatKey",
-        "items": [
+        "values": [
           90,
           100
         ],
@@ -37,13 +37,13 @@
       {
         "keyName": "StructKey",
         "keyType": "StructKey",
-        "items": [
+        "values": [
           {
             "paramSet": [
               {
                 "keyName": "BooleanKey",
                 "keyType": "BooleanKey",
-                "items": [
+                "values": [
                   true,
                   false
                 ],
@@ -52,7 +52,7 @@
               {
                 "keyName": "ByteKey",
                 "keyType": "ByteKey",
-                "items": [
+                "values": [
                   10,
                   20
                 ],
@@ -66,52 +66,46 @@
       {
         "keyName": "IntArrayKey",
         "keyType": "IntArrayKey",
-        "items": [
-          {
-            "data": [
-              7,
-              8
-            ]
-          }
+        "values": [
+          [
+            7,
+            8
+          ]
         ],
         "units": "NoUnits"
       },
       {
         "keyName": "IntMatrix",
         "keyType": "IntMatrixKey",
-        "items": [
-          {
-            "data": [
-              [
-                12,
-                13
-              ],
-              [
-                14,
-                15
-              ]
+        "values": [
+          [
+            [
+              12,
+              13
+            ],
+            [
+              14,
+              15
             ]
-          }
+          ]
         ],
         "units": "NoUnits"
       },
       {
         "keyName": "LongArrayKey",
         "keyType": "LongArrayKey",
-        "items": [
-          {
-            "data": [
-              5,
-              6
-            ]
-          }
+        "values": [
+          [
+            5,
+            6
+          ]
         ],
         "units": "NoUnits"
       },
       {
         "keyName": "ShortKey",
         "keyType": "ShortKey",
-        "items": [
+        "values": [
           30,
           40
         ],
@@ -120,117 +114,97 @@
       {
         "keyName": "LongMatrix",
         "keyType": "LongMatrixKey",
-        "items": [
-          {
-            "data": [
-              [
-                8,
-                9
-              ],
-              [
-                10,
-                11
-              ]
+        "values": [
+          [
+            [
+              8,
+              9
+            ],
+            [
+              10,
+              11
             ]
-          }
+          ]
         ],
         "units": "NoUnits"
       },
       {
         "keyName": "ByteMatrix",
         "keyType": "ByteMatrixKey",
-        "items": [
-          {
-            "data": [
-              [
-                1,
-                2
-              ],
-              [
-                3,
-                4
-              ]
+        "values": [
+          [
+            [
+              1,
+              2
+            ],
+            [
+              3,
+              4
             ]
-          }
+          ]
         ],
         "units": "NoUnits"
       },
       {
         "keyName": "ShortArrayKey",
         "keyType": "ShortArrayKey",
-        "items": [
-          {
-            "data": [
-              3,
-              4
-            ]
-          }
+        "values": [
+          [
+            3,
+            4
+          ]
         ],
         "units": "NoUnits"
       },
       {
         "keyName": "CoordKey",
         "keyType": "CoordKey",
-        "items": [
+        "values": [
           {
             "EqCoord": {
+              "tag": "BASE",
+              "ra": 659912250000,
+              "dec": -109892300000,
+              "frame": "ICRS",
+              "catalogName": "none",
               "pm": {
                 "pmx": 0.5,
                 "pmy": 2.33
-              },
-              "tag": {
-                "name": "BASE"
-              },
-              "frame": {
-                "ICRS": {}
-              },
-              "catalogName": "none",
-              "ra": 659912250000,
-              "dec": -109892300000
-            }
-          },
-          {
-            "SolarSystemCoord": {
-              "tag": {
-                "name": "BASE"
-              },
-              "body": {
-                "Venus": {}
               }
             }
           },
           {
+            "SolarSystemCoord": {
+              "tag": "BASE",
+              "body": "Venus"
+            }
+          },
+          {
             "MinorPlanetCoord": {
-              "meanAnomaly": 792000000000,
-              "longAscendingNode": 7200000000,
+              "tag": "GUIDER1",
               "epoch": 2000,
-              "tag": {
-                "name": "GUIDER1"
-              },
               "inclination": 324000000000,
-              "eccentricity": 0.234,
+              "longAscendingNode": 7200000000,
+              "argOfPerihelion": 360000000000,
               "meanDistance": 1.4,
-              "argOfPerihelion": 360000000000
+              "eccentricity": 0.234,
+              "meanAnomaly": 792000000000
             }
           },
           {
             "CometCoord": {
-              "longAscendingNode": 7200000000,
-              "tag": {
-                "name": "BASE"
-              },
+              "tag": "BASE",
               "epochOfPerihelion": 2000,
               "inclination": 324000000000,
-              "eccentricity": 0.234,
+              "longAscendingNode": 7200000000,
+              "argOfPerihelion": 360000000000,
               "perihelionDistance": 1.4,
-              "argOfPerihelion": 360000000000
+              "eccentricity": 0.234
             }
           },
           {
             "AltAzCoord": {
-              "tag": {
-                "name": "BASE"
-              },
+              "tag": "BASE",
               "alt": 1083600000000,
               "az": 153000000000
             }
@@ -241,7 +215,7 @@
       {
         "keyName": "ByteKey",
         "keyType": "ByteKey",
-        "items": [
+        "values": [
           10,
           20
         ],
@@ -250,7 +224,7 @@
       {
         "keyName": "DoubleKey",
         "keyType": "DoubleKey",
-        "items": [
+        "values": [
           110,
           120
         ],
@@ -259,61 +233,55 @@
       {
         "keyName": "DoubleArrayKey",
         "keyType": "DoubleArrayKey",
-        "items": [
-          {
-            "data": [
-              11,
-              12
-            ]
-          }
+        "values": [
+          [
+            11,
+            12
+          ]
         ],
         "units": "NoUnits"
       },
       {
         "keyName": "DoubleMatrix",
         "keyType": "DoubleMatrixKey",
-        "items": [
-          {
-            "data": [
-              [
-                20,
-                21
-              ],
-              [
-                22,
-                23
-              ]
+        "values": [
+          [
+            [
+              20,
+              21
+            ],
+            [
+              22,
+              23
             ]
-          }
+          ]
         ],
         "units": "NoUnits"
       },
       {
         "keyName": "ByteArrayKey",
         "keyType": "ByteArrayKey",
-        "items": [
-          {
-            "data": [
-              1,
-              2
-            ]
-          }
+        "values": [
+          [
+            1,
+            2
+          ]
         ],
         "units": "NoUnits"
       },
       {
         "keyName": "CharKey",
         "keyType": "CharKey",
-        "items": [
-          "A",
-          "B"
+        "values": [
+          65,
+          66
         ],
         "units": "NoUnits"
       },
       {
         "keyName": "IntKey",
         "keyType": "IntKey",
-        "items": [
+        "values": [
           70,
           80
         ],
@@ -322,7 +290,7 @@
       {
         "keyName": "UTCTimeKey",
         "keyType": "UTCTimeKey",
-        "items": [
+        "values": [
           "1970-01-01T00:00:00Z",
           "2017-09-04T19:00:00.123456789Z"
         ],
@@ -331,33 +299,27 @@
       {
         "keyName": "ChoiceKey",
         "keyType": "ChoiceKey",
-        "items": [
-          {
-            "name": "First"
-          },
-          {
-            "name": "Second"
-          }
+        "values": [
+          "First",
+          "Second"
         ],
         "units": "NoUnits"
       },
       {
         "keyName": "FloatArrayKey",
         "keyType": "FloatArrayKey",
-        "items": [
-          {
-            "data": [
-              9,
-              10
-            ]
-          }
+        "values": [
+          [
+            9,
+            10
+          ]
         ],
         "units": "NoUnits"
       },
       {
         "keyName": "StringKey",
         "keyType": "StringKey",
-        "items": [
+        "values": [
           "Str1",
           "Str2"
         ],
@@ -366,7 +328,7 @@
       {
         "keyName": "BooleanKey",
         "keyType": "BooleanKey",
-        "items": [
+        "values": [
           true,
           false
         ],
@@ -375,7 +337,7 @@
       {
         "keyName": "TAITimeKey",
         "keyType": "TAITimeKey",
-        "items": [
+        "values": [
           "1970-01-01T00:00:00Z",
           "2017-09-04T19:00:00.123456789Z"
         ],
@@ -384,38 +346,34 @@
       {
         "keyName": "ShortMatrix",
         "keyType": "ShortMatrixKey",
-        "items": [
-          {
-            "data": [
-              [
-                4,
-                5
-              ],
-              [
-                6,
-                7
-              ]
+        "values": [
+          [
+            [
+              4,
+              5
+            ],
+            [
+              6,
+              7
             ]
-          }
+          ]
         ],
         "units": "NoUnits"
       },
       {
         "keyName": "FloatMatrix",
         "keyType": "FloatMatrixKey",
-        "items": [
-          {
-            "data": [
-              [
-                16,
-                17
-              ],
-              [
-                18,
-                19
-              ]
+        "values": [
+          [
+            [
+              16,
+              17
+            ],
+            [
+              18,
+              19
             ]
-          }
+          ]
         ],
         "units": "NoUnits"
       }

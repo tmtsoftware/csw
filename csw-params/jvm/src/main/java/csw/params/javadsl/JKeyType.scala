@@ -1,11 +1,8 @@
 package csw.params.javadsl
 
-import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.{ArrayKeyType, KeyType, MatrixKeyType, SimpleKeyType}
 
 object JSimpleKeyType {
-  import JsonSupport._
-
   //required for Scala compatible and efficient ByteArray codecs
   import csw.params.core.formats.ParamCodecs.{javaByteArrayDec, javaByteArrayEnc}
 

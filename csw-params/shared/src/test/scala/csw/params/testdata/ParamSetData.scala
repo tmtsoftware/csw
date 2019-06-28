@@ -4,7 +4,9 @@ import java.time.Instant
 
 import csw.params.core.generics.KeyType._
 import csw.params.core.generics.Parameter
-import csw.params.core.models.Coords.{AltAzCoord, CometCoord, EqCoord, FK5, MinorPlanetCoord, SolarSystemCoord, Tag, Venus}
+import csw.params.core.models.Coords.EqFrame.FK5
+import csw.params.core.models.Coords.SolarSystemObject.Venus
+import csw.params.core.models.Coords.{AltAzCoord, CometCoord, EqCoord, MinorPlanetCoord, SolarSystemCoord, Tag}
 import csw.params.core.models.{Angle, ArrayData, Choices, MatrixData, ProperMotion, RaDec, Struct}
 import csw.time.core.models.{TAITime, UTCTime}
 
