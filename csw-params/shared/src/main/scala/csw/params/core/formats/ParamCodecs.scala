@@ -19,8 +19,6 @@ import scala.collection.mutable.{WrappedArray => WArray}
 import scala.reflect.ClassTag
 
 object ParamCodecs extends CommonCodecs {
-  import CborHelpers._
-
   type ArrayEnc[T] = Encoder[Array[T]]
   type ArrayDec[T] = Decoder[Array[T]]
 
@@ -47,23 +45,15 @@ object ParamCodecs extends CommonCodecs {
 
   implicit lazy val tsCodec: Codec[Timestamp] = deriveCodec[Timestamp]
 
-  implicit lazy val instantEnc: Encoder[Instant] = Encoder { (w, value) ⇒
-    val enc: Encoder[Instant] = if (w.target == Cbor) {
-      tsCodec.encoder.contramap(Timestamp.fromInstant)
-    } else {
-      Encoder.forString.contramap(_.toString)
-    }
-    enc.write(w, value)
-  }
+  implicit lazy val instantEnc: Encoder[Instant] = CborHelpers.targetSpecificEnc(
+    cborEnc = tsCodec.encoder.contramap(Timestamp.fromInstant),
+    jsonEnc = Encoder.forString.contramap(_.toString)
+  )
 
-  implicit lazy val instantDec: Decoder[Instant] = Decoder { r ⇒
-    val dec: Decoder[Instant] = if (r.target == Cbor) {
-      tsCodec.decoder.map(_.toInstant)
-    } else {
-      Decoder.forString.map(Instant.parse)
-    }
-    dec.read(r)
-  }
+  implicit lazy val instantDec: Decoder[Instant] = CborHelpers.targetSpecificDec(
+    cborDec = tsCodec.decoder.map(_.toInstant),
+    jsonDec = Decoder.forString.map(Instant.parse)
+  )
 
   implicit lazy val utcTimeCodec: Codec[UTCTime] = Codec.forCaseClass[UTCTime]
   implicit lazy val taiTimeCodec: Codec[TAITime] = Codec.forCaseClass[TAITime]
@@ -71,15 +61,15 @@ object ParamCodecs extends CommonCodecs {
   // ************************ Composite Codecs ********************
 
   implicit def arrayDataCodec[T: ClassTag: ArrayEnc: ArrayDec]: Codec[ArrayData[T]] =
-    bimap[WArray[T], ArrayData[T]](ArrayData(_), _.data)
+    CborHelpers.bimap[WArray[T], ArrayData[T]](ArrayData(_), _.data)
 
   implicit def matrixDataCodec[T: ClassTag: ArrayEnc: ArrayDec]: Codec[MatrixData[T]] =
-    bimap[WArray[WArray[T]], MatrixData[T]](MatrixData(_), _.data)
+    CborHelpers.bimap[WArray[WArray[T]], MatrixData[T]](MatrixData(_), _.data)
 
   // ************************ Enum Codecs ********************
 
-  implicit lazy val unitsCodec: Codec[Units]                   = enumCodec[Units]
-  implicit lazy val keyTypeCodecExistential: Codec[KeyType[_]] = enumCodec[KeyType[_]]
+  implicit lazy val unitsCodec: Codec[Units]                   = CborHelpers.enumCodec[Units]
+  implicit lazy val keyTypeCodecExistential: Codec[KeyType[_]] = CborHelpers.enumCodec[KeyType[_]]
   implicit def keyTypeCodec[T]: Codec[KeyType[T]]              = keyTypeCodecExistential.asInstanceOf[Codec[KeyType[T]]]
 
   // ************************ Parameter Codecs ********************
@@ -89,17 +79,19 @@ object ParamCodecs extends CommonCodecs {
   implicit lazy val javaByteArrayDec: Decoder[Array[JByte]] = Decoder.forByteArray.map(_.map(x ⇒ x: JByte))
 
   //Do not put the bytesEnc and bytesDec inside Codec, due to an issue with borer https://github.com/sirthias/borer/issues/24
-  implicit lazy val bytesEnc: Encoder[Array[Byte]] = Encoder { (w, value) ⇒
-    val enc = if (w.target == Cbor) Encoder.forByteArray else Encoder.forArray[Byte]
-    enc.write(w, value)
-  }
+  implicit lazy val bytesEnc: Encoder[Array[Byte]] = CborHelpers.targetSpecificEnc(
+    cborEnc = Encoder.forByteArray,
+    jsonEnc = Encoder.forArray[Byte]
+  )
 
-  implicit lazy val bytesDec: Decoder[Array[Byte]] = Decoder { r ⇒
-    val dec = if (r.target == Cbor) Decoder.forByteArray else Decoder.forArray[Byte]
-    dec.read(r)
-  }
+  implicit lazy val bytesDec: Decoder[Array[Byte]] = CborHelpers.targetSpecificDec(
+    cborDec = Decoder.forByteArray,
+    jsonDec = Decoder.forArray[Byte]
+  )
 
-  implicit def waCodec[T: ClassTag: ArrayEnc: ArrayDec]: Codec[WArray[T]]       = bimap[Array[T], WArray[T]](x => x: WArray[T], _.array)
+  implicit def waCodec[T: ClassTag: ArrayEnc: ArrayDec]: Codec[WArray[T]] =
+    CborHelpers.bimap[Array[T], WArray[T]](x => x: WArray[T], _.array)
+
   implicit def paramCodec[T: ClassTag: ArrayEnc: ArrayDec]: Codec[Parameter[T]] = deriveCodec[Parameter[T]]
 
   implicit lazy val paramEncExistential: Encoder[Parameter[_]] = { (w: Writer, value: Parameter[_]) =>
@@ -130,7 +122,7 @@ object ParamCodecs extends CommonCodecs {
   // ************************ Event Codecs ********************
 
   //Codec.forCaseClass does not work for id due to https://github.com/sirthias/borer/issues/23
-  implicit lazy val idCodec: Codec[Id]               = bimap[String, Id](Id(_), _.id)
+  implicit lazy val idCodec: Codec[Id]               = CborHelpers.bimap[String, Id](Id(_), _.id)
   implicit lazy val eventNameCodec: Codec[EventName] = Codec.forCaseClass[EventName]
 
   implicit lazy val seCodec: Codec[SystemEvent]  = deriveCodec[SystemEvent]
@@ -204,7 +196,7 @@ object ParamCodecs extends CommonCodecs {
   implicit lazy val stateVariableCodec: Codec[StateVariable] = deriveCodec[StateVariable]
 
   // ************************ Subsystem Codecs ********************
-  implicit lazy val subSystemCodec: Codec[Subsystem] = enumCodec[Subsystem]
+  implicit lazy val subSystemCodec: Codec[Subsystem] = CborHelpers.enumCodec[Subsystem]
 }
 
 case class Timestamp(seconds: Long, nanos: Long) {
