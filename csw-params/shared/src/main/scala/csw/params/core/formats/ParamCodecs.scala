@@ -79,7 +79,7 @@ object ParamCodecs extends CommonCodecs {
   }
 
   implicit lazy val paramDecExistential: Decoder[Parameter[_]] = { r: Reader =>
-    r.tryReadMapHeader(4) || r.tryReadArrayHeader(4)
+    r.tryReadMapHeader(4) || r.tryReadMapStart() || r.tryReadArrayHeader(4) || r.tryReadArrayStart()
     r.tryReadString("keyName")
     val keyName = r.readString()
     r.tryReadString("keyType")
@@ -88,6 +88,9 @@ object ParamCodecs extends CommonCodecs {
     val wa = keyType.waDecoder.read(r)
     r.tryReadString("units")
     val units = unitsCodec.decoder.read(r)
+    if (r.target != Cbor) {
+      r.tryReadBreak()
+    }
     Parameter(keyName, keyType.asInstanceOf[KeyType[Any]], wa.asInstanceOf[WArray[Any]], units)
   }
 
