@@ -1,4 +1,4 @@
-package csw.location.api.codecs
+package csw.location.server.internal
 
 import java.net.URI
 
@@ -16,7 +16,7 @@ import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
-class LocationAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAfterAll {
+private[location] class LocationAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   // need to instantiate from remote factory to wire up serializer
   private final val system        = ActorSystem(Behavior.empty, "example")

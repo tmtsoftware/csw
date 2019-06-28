@@ -1,9 +1,10 @@
-package csw.location.api.codecs
+package csw.location.server.internal
 
 import akka.actor.ExtendedActorSystem
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.serialization.Serializer
+import csw.location.api.codecs.LocationCodecs
 import csw.location.api.commons.LocationServiceLogger
 import csw.location.api.models.{Connection, Location, Registration, TrackingEvent}
 import csw.logging.api.scaladsl.Logger
