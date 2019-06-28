@@ -1,6 +1,5 @@
 package csw.params.commands
 
-import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.{Parameter, ParameterSetKeyData, ParameterSetType}
 import csw.params.core.models.Prefix
 

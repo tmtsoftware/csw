@@ -1,7 +1,6 @@
 package csw.params.events
 
 import csw.params.core.models.Prefix
-import play.api.libs.json.{Json, OFormat}
 
 /**
  * A wrapper class representing the key for an event e.g. tcs.prog.cloudcover.oiwfsProbeDemands
