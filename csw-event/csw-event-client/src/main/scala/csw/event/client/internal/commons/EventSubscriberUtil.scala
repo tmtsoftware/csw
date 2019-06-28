@@ -15,7 +15,7 @@ import scala.concurrent.duration.FiniteDuration
 /**
  * Utility class to provided common functionalities to different implementations of EventSubscriber
  */
-private[event] class EventSubscriberUtil(implicit mat: Materializer) {
+class EventSubscriberUtil(implicit mat: Materializer) {
 
   def subscriptionModeStage(
       every: FiniteDuration,
@@ -23,6 +23,7 @@ private[event] class EventSubscriberUtil(implicit mat: Materializer) {
   ): GraphStage[FlowShape[Event, Event]] = mode match {
     case RateAdapterMode => new RateAdapterStage[Event](every)
     case RateLimiterMode => new RateLimiterStage[Event](every)
+
   }
 
   def subscribeAsync(eventSource: Source[Event, EventSubscription], callback: Event => Future[_]): EventSubscription =
