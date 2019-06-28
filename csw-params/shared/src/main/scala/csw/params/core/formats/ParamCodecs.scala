@@ -70,6 +70,16 @@ object ParamCodecs extends CommonCodecs {
   implicit lazy val javaByteArrayEnc: Encoder[Array[JByte]] = Encoder.forByteArray.contramap(_.map(x ⇒ x: Byte))
   implicit lazy val javaByteArrayDec: Decoder[Array[JByte]] = Decoder.forByteArray.map(_.map(x ⇒ x: JByte))
 
+  implicit lazy val bytesEnc: Encoder[Array[Byte]] = Encoder { (w, value) ⇒
+    val enc = if (w.target == Cbor) Encoder.forByteArray else Encoder.forArray[Byte]
+    enc.write(w, value)
+  }
+
+  implicit lazy val bytesDec: Decoder[Array[Byte]] = Decoder { r ⇒
+    val dec = if (r.target == Cbor) Decoder.forByteArray else Decoder.forArray[Byte]
+    dec.read(r)
+  }
+
   implicit def waCodec[T: ClassTag: ArrayEnc: ArrayDec]: Codec[WArray[T]]       = bimap[Array[T], WArray[T]](x => x: WArray[T], _.array)
   implicit def paramCodec[T: ClassTag: ArrayEnc: ArrayDec]: Codec[Parameter[T]] = deriveCodec[Parameter[T]]
 
