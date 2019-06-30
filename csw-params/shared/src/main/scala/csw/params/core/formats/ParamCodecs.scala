@@ -1,6 +1,6 @@
 package csw.params.core.formats
 
-import java.lang.{Byte => JByte}
+import java.lang.{Byte ⇒ JByte}
 import java.time.Instant
 
 import csw.params.commands.CommandIssue._
@@ -15,7 +15,7 @@ import csw.time.core.models.{TAITime, UTCTime}
 import io.bullet.borer._
 import io.bullet.borer.derivation.MapBasedCodecs._
 
-import scala.collection.mutable.{WrappedArray => WArray}
+import scala.collection.mutable.{WrappedArray ⇒ WArray}
 import scala.reflect.ClassTag
 
 object ParamCodecs extends CommonCodecs {
@@ -89,10 +89,10 @@ object ParamCodecs extends CommonCodecs {
     jsonDec = Decoder.forArray[Byte]
   )
 
-  implicit def waCodec[T: ClassTag: ArrayEnc: ArrayDec]: Codec[WArray[T]] =
+  implicit def waCodec[T: ArrayEnc: ArrayDec]: Codec[WArray[T]] =
     CborHelpers.bimap[Array[T], WArray[T]](x => x: WArray[T], _.array)
 
-  implicit def paramCodec[T: ClassTag: ArrayEnc: ArrayDec]: Codec[Parameter[T]] = deriveCodec[Parameter[T]]
+  implicit def paramCodec[T: ArrayEnc: ArrayDec]: Codec[Parameter[T]] = deriveCodec[Parameter[T]]
 
   implicit lazy val paramEncExistential: Encoder[Parameter[_]] = { (w: Writer, value: Parameter[_]) =>
     val encoder: Encoder[Parameter[Any]] = value.keyType.paramEncoder.asInstanceOf[Encoder[Parameter[Any]]]

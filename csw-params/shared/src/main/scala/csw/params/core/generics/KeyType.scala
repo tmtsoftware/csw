@@ -2,7 +2,7 @@ package csw.params.core.generics
 
 import csw.params.core.formats.ParamCodecs
 import csw.params.core.formats.ParamCodecs._
-import csw.params.core.models.Coords.{AltAzCoord, CometCoord, Coord, EqCoord, MinorPlanetCoord, SolarSystemCoord}
+import csw.params.core.models.Coords._
 import csw.params.core.models.Units.second
 import csw.params.core.models._
 import csw.time.core.models.{TAITime, UTCTime}
@@ -17,7 +17,7 @@ import scala.reflect.ClassTag
  *
  * @tparam S the type of values that will sit against the key in Parameter
  */
-sealed class KeyType[S: ClassTag: ArrayEnc: ArrayDec] extends EnumEntry with Serializable {
+sealed class KeyType[S: ArrayEnc: ArrayDec] extends EnumEntry with Serializable {
   override def hashCode: Int              = toString.hashCode
   override def equals(that: Any): Boolean = that.toString == this.toString
 
