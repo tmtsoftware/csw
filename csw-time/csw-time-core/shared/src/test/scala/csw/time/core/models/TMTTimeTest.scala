@@ -9,7 +9,7 @@ import org.scalatest.Matchers._
 import scala.concurrent.duration.DurationDouble
 
 class TMTTimeTest extends FunSuite {
-  private val jitter = 10
+  private val jitter = 100
 
   test("should get utc time") {
     val utcTime        = UTCTime.now()

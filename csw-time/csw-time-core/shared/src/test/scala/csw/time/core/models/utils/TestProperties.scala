@@ -12,7 +12,7 @@ object JTestProperties {
   }
 
   class NonLinuxProperties extends TestProperties {
-    override val precision: Int = 3
+    override val precision: Int = 6
   }
 
   val instance: TestProperties = OSType.value match {

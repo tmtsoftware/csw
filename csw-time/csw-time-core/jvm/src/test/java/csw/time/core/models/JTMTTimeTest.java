@@ -16,7 +16,7 @@ import static org.junit.Assert.assertFalse;
 public class JTMTTimeTest extends JUnitSuite {
 
     private static int TaiOffset = TimeConstants$.MODULE$.taiOffset();
-    private int jitter = 10;
+    private int jitter = 100;
     private TestProperties testProperties = JTestProperties.instance();
 
     //------------------------------UTC-------------------------------
