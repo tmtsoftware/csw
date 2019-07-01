@@ -3,6 +3,7 @@ package csw.command.client.internal
 import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
 
+import akka.stream.javadsl.Source
 import akka.util.Timeout
 import csw.command.api.javadsl.ICommandService
 import csw.command.api.scaladsl.CommandService
@@ -49,6 +50,12 @@ private[command] class JCommandServiceImpl(commandService: CommandService) exten
 
   override def queryFinal(commandRunId: Id, timeout: Timeout): CompletableFuture[SubmitResponse] =
     commandService.queryFinal(commandRunId)(timeout).toJava.toCompletableFuture
+
+  override def subscribeCurrentState(): Source[CurrentState, CurrentStateSubscription] =
+    commandService.subscribeCurrentState().asJava
+
+  override def subscribeCurrentState(names: java.util.Set[StateName]): Source[CurrentState, CurrentStateSubscription] =
+    commandService.subscribeCurrentState(names.asScala.toSet).asJava
 
   override def subscribeCurrentState(callback: Consumer[CurrentState]): CurrentStateSubscription =
     commandService.subscribeCurrentState(callback.asScala)

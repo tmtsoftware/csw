@@ -84,8 +84,8 @@ trait CommandService {
    * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
    *
    * @param names subscribe to states which have any of the provided value for name.
-   *              If no states are provided, subscription in made to all the states.
-   * @return a CurrentStateSubscription to stop the subscription
+   *              If no states are provided, all the current states will be received.
+   * @return a stream of current states with CurrentStateSubscription as the materialized value which can be used to stop the subscription
    */
   def subscribeCurrentState(names: Set[StateName] = Set.empty): Source[CurrentState, CurrentStateSubscription]
 

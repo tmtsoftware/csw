@@ -2,6 +2,7 @@ package csw.command.api.javadsl
 import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
 
+import akka.stream.javadsl.Source
 import akka.util.Timeout
 import csw.command.api.{CurrentStateSubscription, StateMatcher}
 import csw.params.commands.CommandResponse._
@@ -83,6 +84,22 @@ trait ICommandService {
    * @return a CommandResponse as a Future value
    */
   def queryFinal(commandRunId: Id, timeout: Timeout): CompletableFuture[SubmitResponse]
+
+  /**
+   * Subscribe to all the current states of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
+   *
+   * @return  a stream of current states with CurrentStateSubscription as the materialized value which can be used to stop the subscription
+   */
+  def subscribeCurrentState(): Source[CurrentState, CurrentStateSubscription]
+
+  /**
+   * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
+   *
+   * @param names subscribe to states which have any of the provided value for name.
+   *              If no states are provided, all the current states will be received.
+   * @return  a stream of current states with CurrentStateSubscription as the materialized value which can be used to stop the subscription
+   */
+  def subscribeCurrentState(names: java.util.Set[StateName]): Source[CurrentState, CurrentStateSubscription]
 
   /**
    * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
