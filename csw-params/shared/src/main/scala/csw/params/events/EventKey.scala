@@ -10,7 +10,7 @@ import play.api.libs.json.{Json, OFormat}
  * @param eventName represents the name of the event
  */
 case class EventKey(source: Prefix, eventName: EventName) {
-  val key                       = s"${source.prefix}.$eventName"
+  val key                       = s"${source.prefix}${EventKey.SEPARATOR}$eventName"
   override def toString: String = key
 }
 
