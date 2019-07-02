@@ -20,9 +20,11 @@ trait JsonSupport extends MiscJsonFormats {
   def writes[T: Writes](x: T): JsValue = Json.toJson(x)
   def reads[T: Reads](x: JsValue): T   = x.as[T]
 
-  implicit val commandFormat: OFormat[Command]             = derived.flat.oformat((__ \ "type").format[String])
-  implicit val stateVariableFormat: OFormat[StateVariable] = derived.flat.oformat((__ \ "type").format[String])
-  implicit val eventFormat: OFormat[Event]                 = derived.flat.oformat((__ \ "type").format[String])
+  implicit val commandFormat: OFormat[Command]                 = derived.flat.oformat((__ \ "type").format[String])
+  implicit val commandIssueFormat: OFormat[CommandIssue]       = derived.flat.oformat((__ \ "type").format[String])
+  implicit val commandResponseFormat: OFormat[CommandResponse] = derived.flat.oformat((__ \ "type").format[String])
+  implicit val stateVariableFormat: OFormat[StateVariable]     = derived.flat.oformat((__ \ "type").format[String])
+  implicit val eventFormat: OFormat[Event]                     = derived.flat.oformat((__ \ "type").format[String])
 
   implicit val sequenceCommandFormat: Reads[SequenceCommand] = {
     commandFormat.collect(JsonValidationError("invalid sequence command")) {
