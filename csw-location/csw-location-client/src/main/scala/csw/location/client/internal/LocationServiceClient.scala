@@ -54,6 +54,7 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
           override def unregister(): Future[Done] = outer.unregister(location0.connection)
           override def location: Location         = location0
         }
+      //fixme: status code 400 is wrongly mapped to OtherLocationIsRegistered
       case x @ StatusCodes.BadRequest          ⇒ throw OtherLocationIsRegistered(x.reason)
       case x @ StatusCodes.InternalServerError ⇒ throw RegistrationFailed(x.reason)
       case _                                   ⇒ await(throwExOnInvalidResponse[RegistrationResult](request, response))
@@ -155,7 +156,7 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
   private def throwExOnInvalidResponse[T](request: HttpRequest, response: HttpResponse): Future[T] =
     Future.failed(
       new IOException(s"""Request failed with response status: [${response.status}]
-           |Requested URI: [${request.uri}] and 
+           |Requested URI: [${request.uri}] and
            |Response body: ${response.entity}""".stripMargin)
     )
 }
