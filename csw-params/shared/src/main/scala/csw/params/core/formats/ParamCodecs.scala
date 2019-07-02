@@ -18,7 +18,8 @@ import io.bullet.borer.derivation.MapBasedCodecs._
 import scala.collection.mutable.{WrappedArray => WArray}
 import scala.reflect.ClassTag
 
-object ParamCodecs extends CommonCodecs {
+object ParamCodecs extends ParamCodecs
+trait ParamCodecs extends CommonCodecs {
   import CborHelpers._
 
   type ArrayEnc[T] = Encoder[Array[T]]

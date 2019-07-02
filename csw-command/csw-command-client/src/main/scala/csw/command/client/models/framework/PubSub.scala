@@ -9,7 +9,7 @@ import csw.serializable.TMTSerializable
  *
  * @tparam T represents the type of data that is published or subscribed
  */
-sealed trait PubSub[T] extends TMTSerializable
+sealed trait PubSub[T]
 object PubSub {
 
   /**

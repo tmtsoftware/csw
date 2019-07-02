@@ -3,7 +3,7 @@ package csw.logging.client.cbor
 import akka.serialization.Serializer
 import csw.logging.api.models.Level
 import csw.logging.api.scaladsl.Logger
-import csw.logging.client.cbor.LoggingCborSupport._
+import csw.logging.client.cbor.LoggingCodecs._
 import csw.logging.client.models.LogMetadata
 import csw.logging.client.scaladsl.GenericLoggerFactory
 import io.bullet.borer.Cbor

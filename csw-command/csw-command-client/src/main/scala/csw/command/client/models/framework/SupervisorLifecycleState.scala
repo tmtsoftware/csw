@@ -1,10 +1,9 @@
 package csw.command.client.models.framework
-import csw.serializable.TMTSerializable
 
 /**
  * Lifecycle state of a Supervisor actor
  */
-sealed trait SupervisorLifecycleState extends TMTSerializable
+sealed trait SupervisorLifecycleState
 
 object SupervisorLifecycleState {
 

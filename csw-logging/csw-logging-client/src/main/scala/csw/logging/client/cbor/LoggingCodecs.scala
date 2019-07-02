@@ -6,7 +6,8 @@ import enumeratum.{Enum, EnumEntry}
 import io.bullet.borer.{Codec, Decoder, Encoder}
 import io.bullet.borer.derivation.MapBasedCodecs._
 
-object LoggingCborSupport {
+object LoggingCodecs extends LoggingCodecs
+trait LoggingCodecs {
 
   def bimap[From: Encoder: Decoder, To](to: From ⇒ To, from: To ⇒ From): Codec[To] = Codec(
     implicitly[Encoder[From]].contramap(from),

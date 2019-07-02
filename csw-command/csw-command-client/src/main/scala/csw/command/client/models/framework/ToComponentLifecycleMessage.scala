@@ -4,7 +4,7 @@ import csw.serializable.TMTSerializable
 /**
  * Represents protocol or messages sent to underlying TLA component
  */
-sealed trait ToComponentLifecycleMessage extends TMTSerializable
+sealed trait ToComponentLifecycleMessage
 
 object ToComponentLifecycleMessages {
 
