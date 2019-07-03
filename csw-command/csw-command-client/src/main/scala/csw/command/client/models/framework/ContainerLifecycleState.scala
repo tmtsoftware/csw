@@ -1,10 +1,9 @@
 package csw.command.client.models.framework
-import csw.serializable.TMTSerializable
 
 /**
  * Lifecycle state of a container actor
  */
-sealed trait ContainerLifecycleState extends TMTSerializable
+sealed trait ContainerLifecycleState
 
 object ContainerLifecycleState {
 

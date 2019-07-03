@@ -1,5 +1,4 @@
 package csw.command.client.models.framework
-import csw.serializable.TMTSerializable
 
 /**
  * Represents protocol or messages sent to underlying TLA component
