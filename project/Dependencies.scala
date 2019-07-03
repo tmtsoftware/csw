@@ -241,7 +241,10 @@ object Dependencies {
 
   val CommandApi = Def.setting(
     Seq(
-      Akka.`akka-actor`
+      Akka.`akka-actor`,
+      Akka.`akka-actor-typed`,
+      AkkaHttp.`akka-http`,
+      Libs.`scala-async`.value
     )
   )
 
