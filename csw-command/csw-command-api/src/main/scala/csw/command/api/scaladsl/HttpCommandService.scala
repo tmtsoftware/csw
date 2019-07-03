@@ -5,7 +5,7 @@ import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.util.ByteString
 import csw.location.api.models.Connection.HttpConnection
-import csw.params.commands.CommandResponse.{Error, SubmitResponse}
+import csw.params.commands.CommandResponse.{Completed, Error, SubmitResponse}
 import csw.params.commands.Setup
 import io.bullet.borer.Cbor
 
@@ -13,6 +13,8 @@ import scala.async.Async._
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpMethods, HttpRequest, StatusCodes}
 import csw.location.api.scaladsl.LocationService
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import csw.params.core.formats.ParamCodecs._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -29,6 +31,10 @@ case class HttpCommandService(
     connection: HttpConnection
 ) {
 
+  implicit val sys: akka.actor.ActorSystem = system.toUntyped
+  implicit val mat: Materializer           = ActorMaterializer()(system)
+  implicit val ec: ExecutionContext        = system.executionContext
+
   /**
    * Posts a Setup command to the given HTTP connection and returns the response as a SubmitResponse.
    * It is assumed that the HTTP service accepts the Setup as CBOR encoded and responds with a
@@ -39,11 +45,6 @@ case class HttpCommandService(
    * @return the Submit response or an Error response, if something fails
    */
   def submit(setup: Setup): Future[SubmitResponse] = {
-    import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-    import csw.params.core.formats.ParamCodecs._
-    implicit val sys: akka.actor.ActorSystem = system.toUntyped
-    implicit val mat: Materializer           = ActorMaterializer()(system)
-    implicit val ec: ExecutionContext        = system.executionContext
 
     def concatByteStrings(source: Source[ByteString, _]): Future[ByteString] = {
       val sink = Sink.fold[ByteString, ByteString](ByteString()) {
@@ -70,6 +71,42 @@ case class HttpCommandService(
           if (response.status == StatusCodes.OK) {
             val bs = await(concatByteStrings(response.entity.dataBytes))
             Cbor.decode(bs.toArray).to[SubmitResponse].value
+          } else {
+            Error(setup.runId, s"Error response from ${connection.componentId.name}: $response")
+          }
+        case None =>
+          Error(setup.runId, s"Can't locate connection for ${connection.componentId.name}")
+      }
+    }
+  }
+
+  /**
+   * Posts a Setup command to the given HTTP connection without expecting a response.
+   * It is assumed that the HTTP service accepts the Setup as CBOR encoded.
+   * The pycsw project will provide support for creating such an HTTP server in Python.
+   * Note that the HTTP service must also be registered with the Location Service.
+   *
+   * @param setup the Setup command to send to the service
+   * @return a future SubmitResponse: Completed, if the command has been sent and the HTTP response (OK) received,
+   *         or Error, if the response was not OK or the service could not be located.
+   */
+  def oneway(setup: Setup): Future[SubmitResponse] = {
+    async {
+      val maybeLocation = await(locationService.find(connection))
+      maybeLocation match {
+        case Some(loc) =>
+          val uri = s"http://${loc.uri.getHost}:${loc.uri.getPort}/oneway"
+          val response = await(
+            Http(sys).singleRequest(
+              HttpRequest(
+                HttpMethods.POST,
+                uri,
+                entity = HttpEntity(ContentTypes.`application/octet-stream`, Cbor.encode(setup).toByteArray)
+              )
+            )
+          )
+          if (response.status == StatusCodes.OK) {
+            Completed(setup.runId)
           } else {
             Error(setup.runId, s"Error response from ${connection.componentId.name}: $response")
           }
