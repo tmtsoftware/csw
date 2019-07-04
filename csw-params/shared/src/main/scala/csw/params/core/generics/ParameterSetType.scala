@@ -3,7 +3,6 @@ package csw.params.core.generics
 import java.util
 
 import csw.params.extensions.OptionConverters.RichOption
-import csw.serializable.TMTSerializable
 
 import scala.annotation.varargs
 import scala.collection.JavaConverters.{mapAsJavaMapConverter, setAsJavaSetConverter}
@@ -13,7 +12,7 @@ import scala.collection.JavaConverters.{mapAsJavaMapConverter, setAsJavaSetConve
  *
  * @tparam T the subclass of ParameterSetType
  */
-abstract class ParameterSetType[T <: ParameterSetType[T]] extends TMTSerializable { self: T =>
+abstract class ParameterSetType[T <: ParameterSetType[T]] { self: T =>
 
   /**
    * A name identifying the type of parameter set, such as "setup", "observe".

@@ -17,7 +17,6 @@ import csw.params.events.Event;
 import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
-import csw.serializable.TMTSerializable;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -47,7 +46,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
     }
 
     //#worker-actor
-    private interface WorkerCommand extends TMTSerializable {
+    private interface WorkerCommand {
     }
 
     private static final class Sleep implements WorkerCommand {

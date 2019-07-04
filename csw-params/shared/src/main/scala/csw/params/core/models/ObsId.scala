@@ -2,7 +2,6 @@ package csw.params.core.models
 
 import java.util.Optional
 
-import csw.serializable.TMTSerializable
 import play.api.libs.json._
 
 object ObsId {
@@ -25,7 +24,7 @@ object ObsId {
  *
  * @param obsId the string representation of obsId
  */
-case class ObsId(obsId: String) extends TMTSerializable {
+case class ObsId(obsId: String) {
 
   /**
    * Returns the ObsId in form of Option

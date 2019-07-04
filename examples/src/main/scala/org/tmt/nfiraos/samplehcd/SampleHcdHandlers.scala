@@ -11,7 +11,6 @@ import csw.params.commands._
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.Id
 import csw.params.events.{EventName, SystemEvent}
-import csw.serializable.TMTSerializable
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
@@ -29,7 +28,7 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   private val log                           = loggerFactory.getLogger
 
   //#worker-actor
-  sealed trait WorkerCommand                      extends TMTSerializable
+  sealed trait WorkerCommand
   case class Sleep(runId: Id, timeInMillis: Long) extends WorkerCommand
 
   private val workerActor =

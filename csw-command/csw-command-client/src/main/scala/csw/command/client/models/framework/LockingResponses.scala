@@ -1,9 +1,11 @@
 package csw.command.client.models.framework
 
+import csw.serializable.CommandSerializable
+
 /**
  * LockingResponse represents valid responses when a component requests to lock some component
  */
-sealed trait LockingResponse
+sealed trait LockingResponse extends CommandSerializable
 
 object LockingResponses {
 

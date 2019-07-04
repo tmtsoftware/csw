@@ -1,9 +1,11 @@
 package csw.command.client.models.framework
 
+import csw.serializable.CommandSerializable
+
 /**
  * Lifecycle state of a container actor
  */
-sealed trait ContainerLifecycleState
+sealed trait ContainerLifecycleState extends CommandSerializable
 
 object ContainerLifecycleState {
 

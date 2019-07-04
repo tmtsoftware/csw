@@ -1,6 +1,5 @@
 package csw.params.core.models
 import csw.params.core.models.Prefix.SEPARATOR
-import csw.serializable.TMTSerializable
 import play.api.libs.json._
 
 /**
@@ -9,7 +8,7 @@ import play.api.libs.json._
  *
  * @param prefix    the subsystem's prefix
  */
-case class Prefix(prefix: String) extends TMTSerializable {
+case class Prefix(prefix: String) {
   val subsystem: Subsystem = {
     require(prefix != null)
     Subsystem.withNameOption(prefix.splitAt(prefix.indexOf(SEPARATOR))._1).getOrElse(Subsystem.BAD)

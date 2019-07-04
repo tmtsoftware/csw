@@ -2,7 +2,6 @@ package csw.command.client.models.framework
 
 import akka.actor.typed.ActorRef
 import csw.params.core.states.StateName
-import csw.serializable.TMTSerializable
 
 /**
  * Represents the protocol or messages about publishing data and subscribing it

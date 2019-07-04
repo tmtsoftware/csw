@@ -1,5 +1,4 @@
 package csw.command.client.models.framework
-import csw.serializable.TMTSerializable
 import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
 
 import scala.collection.immutable
@@ -8,7 +7,7 @@ import scala.collection.immutable
  * Describes what action to take for a component on its boot-up regarding its registration with location service. This information
  * is read from the config file for the component and used by `csw-framework` while spawning it.
  */
-sealed abstract class LocationServiceUsage extends EnumEntry with TMTSerializable
+sealed abstract class LocationServiceUsage extends EnumEntry
 
 object LocationServiceUsage extends Enum[LocationServiceUsage] with PlayJsonEnum[LocationServiceUsage] {
   override def values: immutable.IndexedSeq[LocationServiceUsage] = findValues

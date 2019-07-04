@@ -14,7 +14,6 @@ import csw.params.commands.{CommandName, CommandResponse, ControlCommand, Setup}
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.{ObsId, Prefix, Units}
 import csw.params.events._
-import csw.serializable.TMTSerializable
 
 import scala.async.Async._
 import scala.concurrent.{ExecutionContextExecutor, Future}
@@ -34,7 +33,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   private val log                           = loggerFactory.getLogger
 
   //#worker-actor
-  sealed trait WorkerCommand                  extends TMTSerializable
+  sealed trait WorkerCommand
   case class SendCommand(hcd: CommandService) extends WorkerCommand
 
   private val commandSender =

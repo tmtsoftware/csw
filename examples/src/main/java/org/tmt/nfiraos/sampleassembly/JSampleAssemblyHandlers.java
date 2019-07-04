@@ -26,7 +26,6 @@ import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
 import csw.params.javadsl.JUnits;
-import csw.serializable.TMTSerializable;
 
 import java.util.Optional;
 import java.util.Set;
@@ -57,7 +56,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     }
 
     //#worker-actor
-    private interface WorkerCommand extends TMTSerializable {
+    private interface WorkerCommand {
     }
 
     private static final class SendCommand implements WorkerCommand {

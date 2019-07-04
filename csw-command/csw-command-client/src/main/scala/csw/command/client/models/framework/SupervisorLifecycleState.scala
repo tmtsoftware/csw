@@ -1,9 +1,11 @@
 package csw.command.client.models.framework
 
+import csw.serializable.CommandSerializable
+
 /**
  * Lifecycle state of a Supervisor actor
  */
-sealed trait SupervisorLifecycleState
+sealed trait SupervisorLifecycleState extends CommandSerializable
 
 object SupervisorLifecycleState {
 

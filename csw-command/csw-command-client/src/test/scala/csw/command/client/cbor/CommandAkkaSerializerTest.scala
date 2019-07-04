@@ -1,13 +1,48 @@
 package csw.command.client.cbor
 
+import java.nio.file.Files
+
+import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed
-import akka.actor.typed.Behavior
+import akka.actor.typed.SpawnProtocol
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.serialization.SerializationExtension
+import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
+import csw.command.client.messages.CommandResponseManagerMessage.Query
+import csw.command.client.messages.ComponentCommonMessage.{
+  ComponentStateSubscription,
+  GetSupervisorLifecycleState,
+  LifecycleStateSubscription
+}
+import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.command.client.messages.RunningMessage.Lifecycle
+import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
+import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
+import csw.command.client.messages.{
+  CommandResponseManagerMessage,
+  ComponentMessage,
+  GetComponentLogMetadata,
+  SetComponentLogLevel
+}
+import csw.command.client.models.framework.LockingResponses._
+import csw.command.client.models.framework.PubSub.{Subscribe, SubscribeOnly, Unsubscribe}
+import csw.command.client.models.framework.SupervisorLifecycleState._
+import csw.command.client.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.command.client.models.framework._
+import csw.commons.ResourceReader
+import csw.location.api.models.ComponentType
+import csw.logging.api.models.Level
+import csw.logging.client.models.LogMetadata
+import csw.params.commands.CommandIssue._
 import csw.params.commands.CommandResponse._
-import csw.params.commands.{CommandIssue, Result}
-import csw.params.core.models.{Id, Prefix}
+import csw.params.commands._
+import csw.params.core.formats.CommandIssueCbor
+import csw.params.core.generics.KeyType.{ByteArrayKey, IntKey}
+import csw.params.core.generics.{Key, Parameter}
+import csw.params.core.models.Units.{coulomb, pascal}
+import csw.params.core.models.{ArrayData, Id, ObsId, Prefix}
 import csw.params.core.states.{CurrentState, DemandState, StateName}
+import io.bullet.borer.Cbor
 import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.prop.Tables.Table
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -17,9 +52,9 @@ import scala.concurrent.duration.DurationDouble
 
 class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
-  private final val system        = typed.ActorSystem(Behavior.empty, "example")
-  private final val serialization = SerializationExtension(system.toUntyped)
-  private final val prefix        = Prefix("wfos.prog.cloudcover")
+  private final implicit val system = typed.ActorSystem(SpawnProtocol.behavior, "example")
+  private final val serialization   = SerializationExtension(system.toUntyped)
+  private final val prefix          = Prefix("wfos.prog.cloudcover")
 
   override protected def afterAll(): Unit = {
     system.terminate()
@@ -30,11 +65,14 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
     val testData = Table(
       "CommandResponse models",
       Accepted(Id()),
+      Started(Id()),
       CompletedWithResult(Id(), Result(prefix)),
-      Invalid(Id(), CommandIssue.OtherIssue("test issue")),
       Completed(Id()),
+      Invalid(Id(), CommandIssue.OtherIssue("test issue")),
       Error(Id(), "test"),
-      Cancelled(Id())
+      Cancelled(Id()),
+      Locked(Id()),
+      CommandNotAvailable(Id()),
     )
 
     forAll(testData) { commandResponse ⇒
@@ -46,8 +84,7 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
     }
   }
 
-  //TODO: fix me
-  ignore("should use command serializer for StateVariable (de)serialization") {
+  test("should use command serializer for StateVariable (de)serialization") {
     val testData = Table(
       "StateVariable models",
       CurrentState(prefix, StateName("filterwheel")),
@@ -62,4 +99,181 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
       serializer.fromBinary(bytes, Some(stateVariable.getClass)) shouldEqual stateVariable
     }
   }
+
+  //TODO: LifecycleStateChanged, LockingResponse, SupervisorLifecycleState, Components, ContainerLifecycleState, LogMetadata, ComponentMessage
+
+  test("should use command serializer for messages (de)serialization") {
+    val prefix = Prefix("wfos.prog.cloudcover")
+
+    val intKey = IntKey.make("intKey")
+    val param  = intKey.set(1, 2, 3).withUnits(coulomb)
+    val setup  = Setup(prefix, CommandName("move"), Some(ObsId("Obs001"))).add(param)
+
+    val keyName                            = "imageKey"
+    val imageKey: Key[ArrayData[Byte]]     = ByteArrayKey.make(keyName)
+    val imgPath                            = ResourceReader.copyToTmp("/smallBinary.bin", ".bin")
+    val imgBytes                           = Files.readAllBytes(imgPath)
+    val binaryImgData: ArrayData[Byte]     = ArrayData.fromArray(imgBytes)
+    val param2: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData withUnits pascal
+    val observe                            = Observe(prefix, CommandName("move"), Some(ObsId("Obs001"))).add(param2)
+
+    val submitResponseProbe   = TestProbe[SubmitResponse]
+    val onewayResponseProbe   = TestProbe[OnewayResponse]
+    val validateResponseProbe = TestProbe[ValidateResponse]
+    val queryResponseProbe    = TestProbe[QueryResponse]
+    val lockingResponseProbe  = TestProbe[LockingResponse]
+
+    val lifecycleProbe                = TestProbe[LifecycleStateChanged]
+    val currentStateProbe             = TestProbe[CurrentState]
+    val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
+
+    val componentsProbe              = TestProbe[Components]
+    val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]
+
+    val logMetadataProbe = TestProbe[LogMetadata]
+
+    val testData = Table(
+      "Command models",
+      Submit(setup, submitResponseProbe.ref),
+      Oneway(observe, onewayResponseProbe.ref),
+      Validate(observe, validateResponseProbe.ref),
+      Lock(prefix, lockingResponseProbe.ref, 1.seconds),
+      Unlock(prefix, lockingResponseProbe.ref),
+      Lifecycle(GoOffline),
+      Lifecycle(GoOnline),
+      Shutdown,
+      Restart,
+      LifecycleStateSubscription(Subscribe(lifecycleProbe.ref)),
+      LifecycleStateSubscription(Unsubscribe(lifecycleProbe.ref)),
+      LifecycleStateSubscription(SubscribeOnly(lifecycleProbe.ref, Set(StateName("filterwheel")))),
+      ComponentStateSubscription(Subscribe(currentStateProbe.ref)),
+      GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref),
+      GetComponents(componentsProbe.ref),
+      GetContainerLifecycleState(containerLifecycleStateProbe.ref),
+      Query(Id(), queryResponseProbe.ref),
+      CommandResponseManagerMessage.Subscribe(Id(), submitResponseProbe.ref),
+      CommandResponseManagerMessage.Unsubscribe(Id(), submitResponseProbe.ref),
+      GetComponentLogMetadata("component-name", logMetadataProbe.ref),
+      SetComponentLogLevel("component-name", Level.WARN)
+    )
+
+    forAll(testData) { command ⇒
+      val serializer = serialization.findSerializerFor(command)
+      serializer.getClass shouldBe classOf[CommandAkkaSerializer]
+
+      val bytes = serializer.toBinary(command)
+      serializer.fromBinary(bytes, Some(command.getClass)) shouldEqual command
+    }
+  }
+
+  test("should (de)serialize CommandIssue") {
+    val testData = Table(
+      "CommandIssue models",
+      MissingKeyIssue(""),
+      WrongPrefixIssue(""),
+      WrongParameterTypeIssue(""),
+      WrongUnitsIssue(""),
+      WrongNumberOfParametersIssue(""),
+      AssemblyBusyIssue(""),
+      UnresolvedLocationsIssue(""),
+      ParameterValueOutOfRangeIssue(""),
+      WrongInternalStateIssue(""),
+      UnsupportedCommandIssue(""),
+      UnsupportedCommandInStateIssue(""),
+      RequiredServiceUnavailableIssue(""),
+      RequiredHCDUnavailableIssue(""),
+      RequiredAssemblyUnavailableIssue(""),
+      RequiredSequencerUnavailableIssue(""),
+      OtherIssue(""),
+    )
+
+    forAll(testData) { commandIssue ⇒
+      val bytes = CommandIssueCbor.encode(commandIssue)
+      CommandIssueCbor.decode[CommandIssue](bytes) shouldEqual commandIssue
+    }
+  }
+
+  test("should (de)serialize LockingResponse") {
+    val testData = Table(
+      "LockingResponse models",
+      LockAcquired,
+      AcquiringLockFailed(""),
+      LockReleased,
+      LockAlreadyReleased,
+      ReleasingLockFailed(""),
+      LockExpired,
+      LockExpiringShortly
+    )
+
+    forAll(testData) { lockingResponse ⇒
+      val serializer = serialization.findSerializerFor(lockingResponse)
+
+      val bytes = serializer.toBinary(lockingResponse)
+      serializer.fromBinary(bytes, Some(lockingResponse.getClass)) shouldEqual lockingResponse
+    }
+  }
+
+  test("should (de)serialize LifecycleStateChanged") {
+
+    val componentMessageProbe = TestProbe[ComponentMessage]
+
+    val testData = Table(
+      "LifecycleStateChanged models",
+      LifecycleStateChanged(componentMessageProbe.ref, Idle),
+      LifecycleStateChanged(componentMessageProbe.ref, Running),
+      LifecycleStateChanged(componentMessageProbe.ref, RunningOffline),
+      LifecycleStateChanged(componentMessageProbe.ref, SupervisorLifecycleState.Restart),
+      LifecycleStateChanged(componentMessageProbe.ref, SupervisorLifecycleState.Shutdown),
+      LifecycleStateChanged(componentMessageProbe.ref, SupervisorLifecycleState.Lock),
+    )
+
+    forAll(testData) { lifecycleStateChanged ⇒
+      val serializer = serialization.findSerializerFor(lifecycleStateChanged)
+
+      val bytes = serializer.toBinary(lifecycleStateChanged)
+      serializer.fromBinary(bytes, Some(lifecycleStateChanged.getClass)) shouldEqual lifecycleStateChanged
+    }
+  }
+
+  test("should (de)serialize SupervisorLifecycleState") {
+
+    val testData = Table(
+      "SupervisorLifecycleState models",
+      Idle,
+      Running,
+      RunningOffline,
+      SupervisorLifecycleState.Restart,
+      SupervisorLifecycleState.Shutdown,
+      SupervisorLifecycleState.Lock
+    )
+
+    forAll(testData) { supervisorLifecycleState ⇒
+      val serializer = serialization.findSerializerFor(supervisorLifecycleState)
+
+      val bytes = serializer.toBinary(supervisorLifecycleState)
+      serializer.fromBinary(bytes, Some(supervisorLifecycleState.getClass)) shouldEqual supervisorLifecycleState
+    }
+  }
+
+  test("should (de)serialize Components") {
+
+    val componentMessageProbe = TestProbe[ComponentMessage]
+
+    val testData = Table(
+      "Components models",
+      Components(
+        Set(Component(
+          componentMessageProbe.ref,
+          ComponentInfo("component-name", ComponentType.HCD, prefix, "behavior-class-name", LocationServiceUsage.DoNotRegister)))
+      )
+    )
+
+    forAll(testData) { supervisorLifecycleState ⇒
+      val serializer = serialization.findSerializerFor(supervisorLifecycleState)
+
+      val bytes = serializer.toBinary(supervisorLifecycleState)
+      serializer.fromBinary(bytes, Some(supervisorLifecycleState.getClass)) shouldEqual supervisorLifecycleState
+    }
+  }
+
 }

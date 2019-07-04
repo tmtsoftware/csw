@@ -4,7 +4,7 @@ import akka.actor.typed.ActorRef
 import csw.command.client.messages.ComponentMessage
 import csw.params.commands.Nameable
 import csw.params.core.states.StateName
-import csw.serializable.TMTSerializable
+import csw.serializable.CommandSerializable
 
 /**
  * LifecycleStateChanged represents a notification of state change in a component
@@ -13,6 +13,7 @@ import csw.serializable.TMTSerializable
  * @param state the new state the component went into
  */
 case class LifecycleStateChanged(publisher: ActorRef[ComponentMessage], state: SupervisorLifecycleState)
+    extends CommandSerializable
 
 object LifecycleStateChanged {
   implicit object NameableLifecycleStateChanged extends Nameable[LifecycleStateChanged] {

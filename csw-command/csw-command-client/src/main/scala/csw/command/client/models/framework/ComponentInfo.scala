@@ -1,7 +1,6 @@
 package csw.command.client.models.framework
 import csw.location.api.models.{ComponentType, Connection}
 import csw.params.core.models.Prefix
-import csw.serializable.TMTSerializable
 import play.api.libs.json._
 
 import scala.collection.JavaConverters._
@@ -30,7 +29,7 @@ final case class ComponentInfo(
     locationServiceUsage: LocationServiceUsage,
     connections: Set[Connection] = Set.empty,
     initializeTimeout: FiniteDuration = 10.seconds
-) extends TMTSerializable {
+) {
 
   /**
    * Java API to get the list of connections for the assembly

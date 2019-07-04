@@ -5,7 +5,6 @@ import java.util.Optional
 
 import csw.params.extensions.OptionConverters.RichOption
 import csw.params.core.models.Units
-import csw.serializable.TMTSerializable
 import play.api.libs.json._
 
 import scala.collection.JavaConverters.seqAsJavaListConverter
@@ -65,7 +64,7 @@ case class Parameter[S] private[params] (
     keyType: KeyType[S],
     items: mutable.WrappedArray[S],
     units: Units
-) extends TMTSerializable {
+) {
 
   /**
    * An Array of values this parameter holds

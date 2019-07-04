@@ -1,5 +1,4 @@
 package csw.params.core.models
-import csw.serializable.TMTSerializable
 import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
 
 import scala.collection.immutable
@@ -10,7 +9,7 @@ import scala.collection.immutable
  * @param name of the unit
  * @param description of the unit
  */
-sealed abstract class Units(name: String, description: String) extends EnumEntry with TMTSerializable {
+sealed abstract class Units(name: String, description: String) extends EnumEntry {
   // Should parameterize Units so concat can be created concat[A, B]
 //  override def toString: String = "[" + name + "]"
 

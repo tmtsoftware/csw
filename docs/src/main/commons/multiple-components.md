@@ -195,14 +195,6 @@ Scala
 Java
 :   @@snip [SampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/nfiraos/sampleassembly/JSampleAssemblyHandlers.java) { #worker-actor }
 
-@@@ note { title=Note }
-
-If the component developer creates new set of messages for worker actor then it is mandatory that those messages extend `TMTSerializable`
-which will enable messages to serialize on wire.
-
-@@@ 
-
-
 ## Matchers
 
 When a component sends a command as `Oneway` to another component, it may be interested in knowing the receiver component's `CurrentState` and match it against a desired state.

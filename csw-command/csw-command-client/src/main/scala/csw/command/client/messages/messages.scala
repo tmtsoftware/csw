@@ -2,6 +2,7 @@ package csw.command.client.messages
 
 import akka.actor.typed.ActorRef
 import csw.command.client.internal.{CommandCorrelation, CommandResponseState, CommandSubscribersState}
+import csw.command.client.messages.CommandSerializationMarker._
 import csw.command.client.models.framework.PubSub.SubscriberMessage
 import csw.command.client.models.framework._
 import csw.location.api.models.TrackingEvent
@@ -11,10 +12,9 @@ import csw.params.commands.CommandResponse.{RemoteMsg => _, _}
 import csw.params.commands.ControlCommand
 import csw.params.core.models.{Id, Prefix}
 import csw.params.core.states.CurrentState
-import csw.serializable.TMTSerializable
+import csw.serializable.CommandSerializable
 
 import scala.concurrent.duration.FiniteDuration
-import CommandSerializationMarker._
 
 object CommandSerializationMarker {
   sealed trait RemoteMsg
@@ -86,7 +86,7 @@ private[csw] case class LockAboutToTimeout(replyTo: ActorRef[LockingResponse]) e
  * Represents messages regarding locking and un-locking a component and messages that can be received when a component is
  * locked
  */
-sealed trait SupervisorLockMessage extends SupervisorRunningMessage
+sealed trait SupervisorLockMessage extends SupervisorRunningMessage with CommandSerializable
 object SupervisorLockMessage {
 
   /**
@@ -112,7 +112,7 @@ object SupervisorLockMessage {
 /**
  * Represents messages that a component will receive in running state
  */
-sealed trait RunningMessage extends TopLevelActorMessage with SupervisorRunningMessage
+sealed trait RunningMessage extends TopLevelActorMessage with SupervisorRunningMessage with CommandSerializable
 object RunningMessage {
 
   /**
@@ -162,7 +162,7 @@ private[csw] sealed trait SupervisorMessage
 /**
  * Represents messages that a component can receive in it's whole lifecycle
  */
-sealed trait ComponentMessage extends SupervisorMessage with TMTSerializable
+sealed trait ComponentMessage extends SupervisorMessage
 
 /**
  * Represents messages that a component can receive in running state
@@ -185,7 +185,7 @@ private[csw] object SupervisorRestartMessage {
 /**
  * Represents messages that a component can receive in any state
  */
-sealed trait ComponentCommonMessage extends ComponentMessage
+sealed trait ComponentCommonMessage extends ComponentMessage with CommandSerializable
 object ComponentCommonMessage {
 
   /**
@@ -232,12 +232,12 @@ private[csw] sealed trait ContainerActorMessage
 /**
  * Represents messages a container can receive in it's whole lifecycle
  */
-sealed trait ContainerMessage extends ContainerActorMessage with TMTSerializable
+sealed trait ContainerMessage extends ContainerActorMessage
 
 /**
  * Represents messages a container can receive in any state
  */
-sealed trait ContainerCommonMessage extends ContainerMessage
+sealed trait ContainerCommonMessage extends ContainerMessage with CommandSerializable
 object ContainerCommonMessage {
 
   /**
@@ -245,7 +245,7 @@ object ContainerCommonMessage {
    *
    * @param replyTo represents the actor that will receive a set of components
    */
-  case class GetComponents(replyTo: ActorRef[Components]) extends ContainerCommonMessage
+  case class GetComponents(replyTo: ActorRef[Components]) extends ContainerCommonMessage with RemoteMsg
 
   /**
    * Represents a message to get lifecycle state a container
@@ -270,7 +270,7 @@ private[csw] object FromSupervisorMessage {
 
 ////////////////
 
-sealed trait CommandResponseManagerMessage extends TMTSerializable
+sealed trait CommandResponseManagerMessage
 object CommandResponseManagerMessage {
   case class AddOrUpdateCommand(commandResponse: SubmitResponse)                    extends CommandResponseManagerMessage
   case class AddSubCommand(runId: Id, subCommandId: Id)                             extends CommandResponseManagerMessage
@@ -317,7 +317,7 @@ object CommandResponseManagerMessage {
 }
 
 // Parent trait for Messages which will be send to components for interacting with its logging system
-sealed trait LogControlMessages extends ComponentMessage with TMTSerializable
+sealed trait LogControlMessages extends ComponentMessage with CommandSerializable
 
 // Message to get Logging configuration metadata of the receiver
 case class GetComponentLogMetadata(componentName: String, replyTo: ActorRef[LogMetadata])
