@@ -5,7 +5,13 @@ import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.serialization.Serializer
 import csw.command.client.messages.CommandSerializationMarker
-import csw.command.client.models.framework.{Components, ContainerLifecycleState, LifecycleStateChanged, SupervisorLifecycleState}
+import csw.command.client.models.framework.{
+  Components,
+  ContainerLifecycleState,
+  LifecycleStateChanged,
+  LockingResponse,
+  SupervisorLifecycleState
+}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.GenericLoggerFactory
 import csw.params.commands.CommandResponse
@@ -28,6 +34,7 @@ class CommandAkkaSerializer(_actorSystem: ExtendedActorSystem) extends Serialize
     case x: ContainerLifecycleState              => Cbor.encode(x).toByteArray
     case x: LifecycleStateChanged                => Cbor.encode(x).toByteArray
     case x: Components                           => Cbor.encode(x).toByteArray
+    case x: LockingResponse                      => Cbor.encode(x).toByteArray
     case _ =>
       val ex = new RuntimeException(s"does not support encoding of $o")
       logger.error(ex.getMessage, ex = ex)
@@ -51,6 +58,8 @@ class CommandAkkaSerializer(_actorSystem: ExtendedActorSystem) extends Serialize
       Cbor.decode(bytes).to[LifecycleStateChanged].value
     } else if (classOf[Components].isAssignableFrom(manifest.get)) {
       Cbor.decode(bytes).to[Components].value
+    } else if (classOf[LockingResponse].isAssignableFrom(manifest.get)) {
+      Cbor.decode(bytes).to[LockingResponse].value
     } else {
       val ex = new RuntimeException(s"does not support decoding of ${manifest.get}")
       logger.error(ex.getMessage, ex = ex)

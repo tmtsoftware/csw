@@ -4,7 +4,7 @@ import java.nio.file.Files
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed
-import akka.actor.typed.SpawnProtocol
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.serialization.SerializationExtension
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
@@ -42,7 +42,6 @@ import csw.params.core.generics.{Key, Parameter}
 import csw.params.core.models.Units.{coulomb, pascal}
 import csw.params.core.models.{ArrayData, Id, ObsId, Prefix}
 import csw.params.core.states.{CurrentState, DemandState, StateName}
-import io.bullet.borer.Cbor
 import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.prop.Tables.Table
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -52,9 +51,9 @@ import scala.concurrent.duration.DurationDouble
 
 class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
-  private final implicit val system = typed.ActorSystem(SpawnProtocol.behavior, "example")
-  private final val serialization   = SerializationExtension(system.toUntyped)
-  private final val prefix          = Prefix("wfos.prog.cloudcover")
+  private final implicit val system: ActorSystem[SpawnProtocol] = typed.ActorSystem(SpawnProtocol.behavior, "example")
+  private final val serialization                               = SerializationExtension(system.toUntyped)
+  private final val prefix                                      = Prefix("wfos.prog.cloudcover")
 
   override protected def afterAll(): Unit = {
     system.terminate()
@@ -72,7 +71,7 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
       Error(Id(), "test"),
       Cancelled(Id()),
       Locked(Id()),
-      CommandNotAvailable(Id()),
+      CommandNotAvailable(Id())
     )
 
     forAll(testData) { commandResponse ⇒
@@ -184,7 +183,7 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
       RequiredHCDUnavailableIssue(""),
       RequiredAssemblyUnavailableIssue(""),
       RequiredSequencerUnavailableIssue(""),
-      OtherIssue(""),
+      OtherIssue("")
     )
 
     forAll(testData) { commandIssue ⇒
@@ -193,7 +192,7 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
     }
   }
 
-  test("should (de)serialize LockingResponse") {
+  test("should use command serializer for (de)serialize LockingResponse") {
     val testData = Table(
       "LockingResponse models",
       LockAcquired,
@@ -207,35 +206,25 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
 
     forAll(testData) { lockingResponse ⇒
       val serializer = serialization.findSerializerFor(lockingResponse)
+      serializer.getClass shouldBe classOf[CommandAkkaSerializer]
 
       val bytes = serializer.toBinary(lockingResponse)
       serializer.fromBinary(bytes, Some(lockingResponse.getClass)) shouldEqual lockingResponse
     }
   }
 
-  test("should (de)serialize LifecycleStateChanged") {
-
+  test("should use command serializer for (de)serialize LifecycleStateChanged") {
     val componentMessageProbe = TestProbe[ComponentMessage]
+    val lifecycleStateChanged = LifecycleStateChanged(componentMessageProbe.ref, Idle)
 
-    val testData = Table(
-      "LifecycleStateChanged models",
-      LifecycleStateChanged(componentMessageProbe.ref, Idle),
-      LifecycleStateChanged(componentMessageProbe.ref, Running),
-      LifecycleStateChanged(componentMessageProbe.ref, RunningOffline),
-      LifecycleStateChanged(componentMessageProbe.ref, SupervisorLifecycleState.Restart),
-      LifecycleStateChanged(componentMessageProbe.ref, SupervisorLifecycleState.Shutdown),
-      LifecycleStateChanged(componentMessageProbe.ref, SupervisorLifecycleState.Lock),
-    )
+    val serializer = serialization.findSerializerFor(lifecycleStateChanged)
+    serializer.getClass shouldBe classOf[CommandAkkaSerializer]
 
-    forAll(testData) { lifecycleStateChanged ⇒
-      val serializer = serialization.findSerializerFor(lifecycleStateChanged)
-
-      val bytes = serializer.toBinary(lifecycleStateChanged)
-      serializer.fromBinary(bytes, Some(lifecycleStateChanged.getClass)) shouldEqual lifecycleStateChanged
-    }
+    val bytes = serializer.toBinary(lifecycleStateChanged)
+    serializer.fromBinary(bytes, Some(lifecycleStateChanged.getClass)) shouldEqual lifecycleStateChanged
   }
 
-  test("should (de)serialize SupervisorLifecycleState") {
+  test("should use command serializer for (de)serialize SupervisorLifecycleState") {
 
     val testData = Table(
       "SupervisorLifecycleState models",
@@ -249,31 +238,31 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
 
     forAll(testData) { supervisorLifecycleState ⇒
       val serializer = serialization.findSerializerFor(supervisorLifecycleState)
+      serializer.getClass shouldBe classOf[CommandAkkaSerializer]
 
       val bytes = serializer.toBinary(supervisorLifecycleState)
       serializer.fromBinary(bytes, Some(supervisorLifecycleState.getClass)) shouldEqual supervisorLifecycleState
     }
   }
 
-  test("should (de)serialize Components") {
-
+  test("should use command serializer for (de)serialize Components") {
     val componentMessageProbe = TestProbe[ComponentMessage]
 
-    val testData = Table(
-      "Components models",
+    val components =
       Components(
-        Set(Component(
-          componentMessageProbe.ref,
-          ComponentInfo("component-name", ComponentType.HCD, prefix, "behavior-class-name", LocationServiceUsage.DoNotRegister)))
+        Set(
+          Component(
+            componentMessageProbe.ref,
+            ComponentInfo("component-name", ComponentType.HCD, prefix, "behavior-class-name", LocationServiceUsage.DoNotRegister)
+          )
+        )
       )
-    )
 
-    forAll(testData) { supervisorLifecycleState ⇒
-      val serializer = serialization.findSerializerFor(supervisorLifecycleState)
+    val serializer = serialization.findSerializerFor(components)
+    serializer.getClass shouldBe classOf[CommandAkkaSerializer]
 
-      val bytes = serializer.toBinary(supervisorLifecycleState)
-      serializer.fromBinary(bytes, Some(supervisorLifecycleState.getClass)) shouldEqual supervisorLifecycleState
-    }
+    val bytes = serializer.toBinary(components)
+    serializer.fromBinary(bytes, Some(components.getClass)) shouldEqual components
   }
 
 }

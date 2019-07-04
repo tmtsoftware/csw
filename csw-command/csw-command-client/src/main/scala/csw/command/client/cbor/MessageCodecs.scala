@@ -57,8 +57,8 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
   implicit lazy val lockExpiredCodec: Codec[LockExpired.type]                 = deriveCodec[LockExpired.type]
   implicit lazy val lockAlreadyReleasedCodec: Codec[LockAlreadyReleased.type] = deriveCodec[LockAlreadyReleased.type]
   implicit lazy val lockAcquiredCodec: Codec[LockAcquired.type]               = deriveCodec[LockAcquired.type]
-  implicit lazy val releasingLockFailedCodec: Codec[ReleasingLockFailed]      = deriveCodec[ReleasingLockFailed]
-  implicit lazy val acquiringLockFailedCodec: Codec[AcquiringLockFailed]      = deriveCodec[AcquiringLockFailed]
+  implicit lazy val releasingLockFailedCodec: Codec[ReleasingLockFailed]      = Codec.forCaseClass[ReleasingLockFailed]
+  implicit lazy val acquiringLockFailedCodec: Codec[AcquiringLockFailed]      = Codec.forCaseClass[AcquiringLockFailed]
   implicit lazy val lockingResponseCodec: Codec[LockingResponse]              = deriveCodec[LockingResponse]
 
   // ************************ SupervisorLifecycleState Codecs ********************
