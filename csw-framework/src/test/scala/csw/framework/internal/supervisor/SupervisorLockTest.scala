@@ -5,7 +5,7 @@ import csw.command.client.messages.CommandMessage.Submit
 import csw.command.client.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, Query, Unsubscribe}
 import csw.command.client.messages.ComponentCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
-import csw.command.client.messages.{CommandResponseManagerMessage ⇒ CRM}
+import csw.command.client.messages.{CommandResponseManagerMessage => CRM}
 import csw.command.client.models.framework.LockingResponses._
 import csw.command.client.models.framework.{LifecycleStateChanged, LockingResponse, PubSub, SupervisorLifecycleState}
 import csw.common.components.framework.SampleComponentState.{choiceKey, initChoice, prefix}
@@ -171,11 +171,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
     // Ensure Unsubscribe can be sent to component even in locked state
     supervisorRef ! Unsubscribe(setup.runId, queryResponseProbe.ref)
-    // to prove un-subscribe is handled, sending a same setup command with the same runId again
-    // now that we have un-subscribed, submitResponseProbe  is not expecting command completion result (validation ll be received)
-    supervisorRef ! Submit(setup, queryResponseProbe.ref)
-    queryResponseProbe.expectMessageType[Completed]
-    queryResponseProbe.expectNoMessage(200.millis)
+    commandResponseManagerActor.expectMessage(Unsubscribe(setup.runId, queryResponseProbe.ref))
   }
 
   // DEOPSCSW-223 Expiry of component Locking mode
