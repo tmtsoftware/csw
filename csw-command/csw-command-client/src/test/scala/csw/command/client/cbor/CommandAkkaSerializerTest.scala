@@ -4,8 +4,8 @@ import java.nio.file.Files
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.serialization.SerializationExtension
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
 import csw.command.client.messages.CommandResponseManagerMessage.Query
@@ -33,10 +33,8 @@ import csw.commons.ResourceReader
 import csw.location.api.models.ComponentType
 import csw.logging.api.models.Level
 import csw.logging.client.models.LogMetadata
-import csw.params.commands.CommandIssue._
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
-import csw.params.core.formats.CommandIssueCbor
 import csw.params.core.generics.KeyType.{ByteArrayKey, IntKey}
 import csw.params.core.generics.{Key, Parameter}
 import csw.params.core.models.Units.{coulomb, pascal}
@@ -162,33 +160,6 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
 
       val bytes = serializer.toBinary(command)
       serializer.fromBinary(bytes, Some(command.getClass)) shouldEqual command
-    }
-  }
-
-  test("should (de)serialize CommandIssue") {
-    val testData = Table(
-      "CommandIssue models",
-      MissingKeyIssue(""),
-      WrongPrefixIssue(""),
-      WrongParameterTypeIssue(""),
-      WrongUnitsIssue(""),
-      WrongNumberOfParametersIssue(""),
-      AssemblyBusyIssue(""),
-      UnresolvedLocationsIssue(""),
-      ParameterValueOutOfRangeIssue(""),
-      WrongInternalStateIssue(""),
-      UnsupportedCommandIssue(""),
-      UnsupportedCommandInStateIssue(""),
-      RequiredServiceUnavailableIssue(""),
-      RequiredHCDUnavailableIssue(""),
-      RequiredAssemblyUnavailableIssue(""),
-      RequiredSequencerUnavailableIssue(""),
-      OtherIssue("")
-    )
-
-    forAll(testData) { commandIssue ⇒
-      val bytes = CommandIssueCbor.encode(commandIssue)
-      CommandIssueCbor.decode[CommandIssue](bytes) shouldEqual commandIssue
     }
   }
 

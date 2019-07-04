@@ -1,9 +1,28 @@
 package csw.params.core.formats
 
+import csw.params.commands.CommandIssue.{
+  AssemblyBusyIssue,
+  MissingKeyIssue,
+  OtherIssue,
+  ParameterValueOutOfRangeIssue,
+  RequiredAssemblyUnavailableIssue,
+  RequiredHCDUnavailableIssue,
+  RequiredSequencerUnavailableIssue,
+  RequiredServiceUnavailableIssue,
+  UnresolvedLocationsIssue,
+  UnsupportedCommandInStateIssue,
+  UnsupportedCommandIssue,
+  WrongInternalStateIssue,
+  WrongNumberOfParametersIssue,
+  WrongParameterTypeIssue,
+  WrongPrefixIssue,
+  WrongUnitsIssue
+}
 import csw.params.commands._
 import csw.params.core.models._
 import csw.params.events.{Event, EventName, ObserveEvent, SystemEvent}
 import csw.params.testdata.ParamSetData
+import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.{FunSuite, Matchers}
 
 class CborTest extends FunSuite with Matchers {
@@ -81,5 +100,35 @@ class CborTest extends FunSuite with Matchers {
     val bytes         = CommandCbor.encode(command)
     val parsedCommand = CommandCbor.decode[Command](bytes)
     parsedCommand shouldEqual command
+  }
+
+  import org.scalatest.prop.TableDrivenPropertyChecks.forAll
+  import org.scalatest.prop.Tables.Table
+
+  test("should encode concrete-type CommandIssue and decode base-type") {
+    val testData = Table(
+      "CommandIssue models",
+      MissingKeyIssue(""),
+      WrongPrefixIssue(""),
+      WrongParameterTypeIssue(""),
+      WrongUnitsIssue(""),
+      WrongNumberOfParametersIssue(""),
+      AssemblyBusyIssue(""),
+      UnresolvedLocationsIssue(""),
+      ParameterValueOutOfRangeIssue(""),
+      WrongInternalStateIssue(""),
+      UnsupportedCommandIssue(""),
+      UnsupportedCommandInStateIssue(""),
+      RequiredServiceUnavailableIssue(""),
+      RequiredHCDUnavailableIssue(""),
+      RequiredAssemblyUnavailableIssue(""),
+      RequiredSequencerUnavailableIssue(""),
+      OtherIssue("")
+    )
+
+    forAll(testData) { commandIssue ⇒
+      val bytes = CommandIssueCbor.encode(commandIssue)
+      CommandIssueCbor.decode[CommandIssue](bytes) shouldEqual commandIssue
+    }
   }
 }
