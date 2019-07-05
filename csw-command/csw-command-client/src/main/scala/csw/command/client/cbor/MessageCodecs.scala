@@ -11,10 +11,8 @@ import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.messages.{GetComponentLogMetadata, LogControlMessages, SetComponentLogLevel}
-import csw.command.client.models.framework.ContainerLifecycleState.{Idle, Running}
-import csw.command.client.models.framework.LockingResponses._
+import csw.command.client.models.framework.LockingResponse._
 import csw.command.client.models.framework.PubSub.{Publish, PublisherMessage, SubscriberMessage}
-import csw.command.client.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.command.client.models.framework._
 import csw.location.api.codecs.LocationCodecs
 import csw.logging.client.cbor.LoggingCodecs
@@ -47,19 +45,6 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
   implicit lazy val acquiringLockFailedCodec: Codec[AcquiringLockFailed]      = Codec.forCaseClass[AcquiringLockFailed]
   implicit lazy val lockingResponseCodec: Codec[LockingResponse]              = deriveCodec[LockingResponse]
 
-  // ************************ SupervisorLifecycleState Codecs ********************
-  implicit lazy val idleSLSCodec: Codec[SupervisorLifecycleState.Idle.type] = deriveCodec[SupervisorLifecycleState.Idle.type]
-  implicit lazy val runningSLSCodec: Codec[SupervisorLifecycleState.Running.type] =
-    deriveCodec[SupervisorLifecycleState.Running.type]
-  implicit lazy val runningOfflineSLSCodec: Codec[SupervisorLifecycleState.RunningOffline.type] =
-    deriveCodec[SupervisorLifecycleState.RunningOffline.type]
-  implicit lazy val restartSLSCodec: Codec[SupervisorLifecycleState.Restart.type] =
-    deriveCodec[SupervisorLifecycleState.Restart.type]
-  implicit lazy val shutdownSLSCodec: Codec[SupervisorLifecycleState.Shutdown.type] =
-    deriveCodec[SupervisorLifecycleState.Shutdown.type]
-  implicit lazy val lockSLSCodec: Codec[SupervisorLifecycleState.Lock.type]        = deriveCodec[SupervisorLifecycleState.Lock.type]
-  implicit lazy val supervisorLifecycleStateCodec: Codec[SupervisorLifecycleState] = deriveCodec[SupervisorLifecycleState]
-
   // ************************ Components Codecs ********************
 
   implicit lazy val locationServiceUsageCodec: Codec[LocationServiceUsage] = enumCodec[LocationServiceUsage]
@@ -84,22 +69,15 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
   implicit lazy val lifecycleStateChangedCodec: Codec[LifecycleStateChanged]           = deriveCodec[LifecycleStateChanged]
   implicit lazy val lifecycleStateSubscriptionCodec: Codec[LifecycleStateSubscription] = deriveCodec[LifecycleStateSubscription]
 
-  implicit lazy val idleCodec: Codec[Idle.type]                                        = deriveCodec[Idle.type]
-  implicit lazy val runningCodec: Codec[Running.type]                                  = deriveCodec[Running.type]
-  implicit lazy val containerLifecycleStateCodec: Codec[ContainerLifecycleState]       = deriveCodec[ContainerLifecycleState]
-  implicit lazy val getContainerLifecycleStateCodec: Codec[GetContainerLifecycleState] = deriveCodec[GetContainerLifecycleState]
+  implicit lazy val containerLifecycleStateCodec: Codec[ContainerLifecycleState]          = enumCodec[ContainerLifecycleState]
+  implicit lazy val supervisorLifecycleStateCodec: Codec[SupervisorLifecycleState]        = enumCodec[SupervisorLifecycleState]
+  implicit lazy val toComponentLifecycleMessagesCodec: Codec[ToComponentLifecycleMessage] = enumCodec[ToComponentLifecycleMessage]
 
+  implicit lazy val getContainerLifecycleStateCodec: Codec[GetContainerLifecycleState] = deriveCodec[GetContainerLifecycleState]
   implicit lazy val setComponentLogLevelCodec: Codec[SetComponentLogLevel]             = deriveCodec[SetComponentLogLevel]
   implicit lazy val getComponentLogMetadataCodec: Codec[GetComponentLogMetadata]       = deriveCodec[GetComponentLogMetadata]
   implicit lazy val logControlMessagesCodec: Codec[LogControlMessages]                 = deriveCodec[LogControlMessages]
   implicit lazy val componentStateSubscriptionCodec: Codec[ComponentStateSubscription] = deriveCodec[ComponentStateSubscription]
   implicit lazy val messageRemoteMsgCodec: Codec[RemoteMsg]                            = deriveCodec[RemoteMsg]
-
-  // ************************ ToComponentLifecycleMessage Codecs ********************
-
-  implicit lazy val goOfflineCodec: Codec[GoOffline.type] = deriveCodec[GoOffline.type]
-  implicit lazy val goOnlineCodec: Codec[GoOnline.type]   = deriveCodec[GoOnline.type]
-  implicit lazy val toComponentLifecycleMessagesCodec: Codec[ToComponentLifecycleMessage] =
-    deriveCodec[ToComponentLifecycleMessage]
 
 }

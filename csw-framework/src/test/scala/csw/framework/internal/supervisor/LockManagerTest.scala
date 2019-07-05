@@ -6,7 +6,7 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.{typed, ActorSystem}
 import csw.command.client.messages.CommandMessage.Submit
 import csw.command.client.models.framework.LockingResponse
-import csw.command.client.models.framework.LockingResponses._
+import csw.command.client.models.framework.LockingResponse._
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse.SubmitResponse

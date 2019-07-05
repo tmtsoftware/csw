@@ -7,7 +7,7 @@ import csw.serializable.CommandSerializable
  */
 sealed trait LockingResponse extends CommandSerializable
 
-object LockingResponses {
+object LockingResponse {
 
   /**
    * Scala API: Lock successfully acquired acknowledgment

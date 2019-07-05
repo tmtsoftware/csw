@@ -8,7 +8,7 @@ import csw.params.commands.CommandResponse._
 import csw.params.commands._
 import csw.command.client.models.matchers.DemandMatcher
 import csw.command.client.models.framework.PubSub.Subscribe
-import csw.command.client.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.command.client.models.framework.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.command.client.models.framework.{ComponentInfo, LifecycleStateChanged, SupervisorLifecycleState}
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection

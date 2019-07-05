@@ -8,7 +8,7 @@ import csw.command.client.messages.CommandResponseManagerMessage.AddOrUpdateComm
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.TopLevelActorIdleMessage.Initialize
 import csw.command.client.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
-import csw.command.client.models.framework.ToComponentLifecycleMessages._
+import csw.command.client.models.framework.ToComponentLifecycleMessage._
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{ComponentInfos, CurrentStatePublisher, FrameworkTestSuite}

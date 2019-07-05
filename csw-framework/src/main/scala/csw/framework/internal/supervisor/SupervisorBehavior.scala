@@ -26,9 +26,9 @@ import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
 import csw.command.client.messages._
 import csw.command.client.models.framework.LocationServiceUsage.DoNotRegister
-import csw.command.client.models.framework.LockingResponses.{LockExpired, LockExpiringShortly}
+import csw.command.client.models.framework.LockingResponse.{LockExpired, LockExpiringShortly}
 import csw.command.client.models.framework.PubSub.Publish
-import csw.command.client.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.command.client.models.framework.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.command.client.models.framework._
 import csw.framework.commons.CoordinatedShutdownReasons.ShutdownMessageReceivedReason
 import csw.framework.exceptions.{FailureRestart, InitializationFailed}

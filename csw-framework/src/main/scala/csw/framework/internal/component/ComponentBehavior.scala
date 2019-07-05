@@ -11,7 +11,7 @@ import csw.command.client.messages.TopLevelActorIdleMessage.Initialize
 import csw.command.client.messages._
 import csw.command.client.models.framework.LocationServiceUsage.RegisterAndTrackServices
 import csw.command.client.models.framework.ToComponentLifecycleMessage
-import csw.command.client.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.command.client.models.framework.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.logging.api.scaladsl.Logger

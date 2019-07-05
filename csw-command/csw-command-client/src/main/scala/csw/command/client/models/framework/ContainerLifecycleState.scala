@@ -1,13 +1,18 @@
 package csw.command.client.models.framework
 
 import csw.serializable.CommandSerializable
+import enumeratum.{Enum, EnumEntry}
+
+import scala.collection.immutable
 
 /**
  * Lifecycle state of a container actor
  */
-sealed trait ContainerLifecycleState extends CommandSerializable
+sealed trait ContainerLifecycleState extends CommandSerializable with EnumEntry
 
-object ContainerLifecycleState {
+object ContainerLifecycleState extends Enum[ContainerLifecycleState] {
+
+  override def values: immutable.IndexedSeq[ContainerLifecycleState] = findValues
 
   /**
    * Represents an idle state of container where it is waiting for all components, that are suppose to run in it, to come up

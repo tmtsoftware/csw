@@ -11,7 +11,7 @@ import csw.command.client.CommandServiceFactory
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.CommandMessage.Submit
 import csw.command.client.models.framework.LockingResponse
-import csw.command.client.models.framework.LockingResponses.LockAcquired
+import csw.command.client.models.framework.LockingResponse.LockAcquired
 import csw.command.client.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.command.client.models.matchers.{DemandMatcher, Matcher, MatcherResponse}
 import csw.common.utils.LockCommandFactory

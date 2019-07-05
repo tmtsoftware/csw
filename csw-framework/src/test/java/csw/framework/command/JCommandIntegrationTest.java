@@ -15,7 +15,6 @@ import csw.command.client.CommandServiceFactory;
 import csw.command.client.extensions.AkkaLocationExt;
 import csw.command.client.messages.SupervisorLockMessage;
 import csw.command.client.models.framework.LockingResponse;
-import csw.command.client.models.framework.LockingResponses;
 import csw.command.client.models.matchers.DemandMatcher;
 import csw.command.client.models.matchers.Matcher;
 import csw.command.client.models.matchers.MatcherResponse;
@@ -401,7 +400,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
 
         // Lock component
         AkkaLocationExt.RichAkkaLocation(hcdLocation).componentRef().tell(new SupervisorLockMessage.Lock(prefix(), probe.ref(), duration));
-        probe.expectMessage(LockingResponses.lockAcquired());
+        probe.expectMessage(LockingResponse.lockAcquired());
 
         Key<Integer> intKey2 = JKeyType.IntKey().make("encoder");
         Parameter<Integer> intParameter2 = intKey2.set(22, 23);
@@ -417,7 +416,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
 
         // Unlock component
         AkkaLocationExt.RichAkkaLocation(hcdLocation).componentRef().tell(new SupervisorLockMessage.Unlock(prefix(), probe.ref()));
-        probe.expectMessage(LockingResponses.lockReleased());
+        probe.expectMessage(LockingResponse.lockReleased());
 
         CompletableFuture<CommandResponse.SubmitResponse> cmdAfterUnlockResCompletableFuture = hcdCmdService.submit(imdSetupCommand, timeout);
         CommandResponse.SubmitResponse actualCmdResponseAfterUnlock = cmdAfterUnlockResCompletableFuture.get();

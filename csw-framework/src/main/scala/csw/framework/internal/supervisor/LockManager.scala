@@ -3,7 +3,7 @@ package csw.framework.internal.supervisor
 import akka.actor.typed.ActorRef
 import csw.command.client.messages.CommandMessage
 import csw.command.client.models.framework.LockingResponse
-import csw.command.client.models.framework.LockingResponses._
+import csw.command.client.models.framework.LockingResponse._
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.core.models.Prefix

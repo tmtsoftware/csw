@@ -5,8 +5,8 @@ import csw.command.client.messages.CommandMessage.Submit
 import csw.command.client.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, Query, Unsubscribe}
 import csw.command.client.messages.ComponentCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
-import csw.command.client.messages.{CommandResponseManagerMessage => CRM}
-import csw.command.client.models.framework.LockingResponses._
+import csw.command.client.messages.{CommandResponseManagerMessage ⇒ CRM}
+import csw.command.client.models.framework.LockingResponse._
 import csw.command.client.models.framework.{LifecycleStateChanged, LockingResponse, PubSub, SupervisorLifecycleState}
 import csw.common.components.framework.SampleComponentState.{choiceKey, initChoice, prefix}
 import csw.common.utils.LockCommandFactory

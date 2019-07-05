@@ -14,7 +14,7 @@ import csw.command.client.messages.SupervisorInternalRunningMessage.{Registratio
 import csw.command.client.messages.{CommandResponseManagerMessage, ContainerIdleMessage, SupervisorMessage, TopLevelActorMessage}
 import csw.command.client.models.framework.LocationServiceUsage.DoNotRegister
 import csw.command.client.models.framework.PubSub.{Publish, Subscribe, Unsubscribe}
-import csw.command.client.models.framework.ToComponentLifecycleMessages._
+import csw.command.client.models.framework.ToComponentLifecycleMessage._
 import csw.command.client.models.framework.{ComponentInfo, LifecycleStateChanged, PubSub, SupervisorLifecycleState}
 import csw.common.components.framework.SampleComponentBehaviorFactory
 import csw.common.extensions.CswContextExtensions.RichCswContext

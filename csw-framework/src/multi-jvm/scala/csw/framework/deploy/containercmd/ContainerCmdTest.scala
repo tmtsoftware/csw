@@ -16,7 +16,7 @@ import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.command.client.models.framework.PubSub.Subscribe
-import csw.command.client.models.framework.ToComponentLifecycleMessages.GoOffline
+import csw.command.client.models.framework.ToComponentLifecycleMessage.GoOffline
 import csw.command.client.models.framework.{Components, ContainerLifecycleState, SupervisorLifecycleState}
 import csw.common.FrameworkAssertions._
 import csw.config.api.models.ConfigData

@@ -1,11 +1,17 @@
 package csw.command.client.models.framework
 
+import enumeratum.{Enum, EnumEntry}
+
+import scala.collection.immutable
+
 /**
  * Represents protocol or messages sent to underlying TLA component
  */
-sealed trait ToComponentLifecycleMessage
+sealed trait ToComponentLifecycleMessage extends EnumEntry
 
-object ToComponentLifecycleMessages {
+object ToComponentLifecycleMessage extends Enum[ToComponentLifecycleMessage] {
+
+  override def values: immutable.IndexedSeq[ToComponentLifecycleMessage] = findValues
 
   /**
    * Represents an action to go to offline mode

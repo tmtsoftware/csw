@@ -1,13 +1,18 @@
 package csw.command.client.models.framework
 
 import csw.serializable.CommandSerializable
+import enumeratum.{Enum, EnumEntry}
+
+import scala.collection.immutable
 
 /**
  * Lifecycle state of a Supervisor actor
  */
-sealed trait SupervisorLifecycleState extends CommandSerializable
+sealed trait SupervisorLifecycleState extends CommandSerializable with EnumEntry
 
-object SupervisorLifecycleState {
+object SupervisorLifecycleState extends Enum[SupervisorLifecycleState] {
+
+  override def values: immutable.IndexedSeq[SupervisorLifecycleState] = findValues
 
   /**
    * Represents an idle state of a component where it is waiting for TLA to initialize

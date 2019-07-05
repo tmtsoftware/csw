@@ -13,7 +13,7 @@ import csw.command.client.messages.FromSupervisorMessage.SupervisorLifecycleStat
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.Restart
 import csw.command.client.messages.{ComponentMessage, ContainerActorMessage, ContainerIdleMessage}
-import csw.command.client.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.command.client.models.framework.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.command.client.models.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState, _}
 import csw.event.client.EventServiceFactory
 import csw.framework.ComponentInfos._
