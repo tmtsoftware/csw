@@ -97,8 +97,6 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
     }
   }
 
-  //TODO: LifecycleStateChanged, LockingResponse, SupervisorLifecycleState, Components, ContainerLifecycleState, LogMetadata, ComponentMessage
-
   test("should use command serializer for messages (de)serialization") {
     val prefix = Prefix("wfos.prog.cloudcover")
 
@@ -213,6 +211,23 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
 
       val bytes = serializer.toBinary(supervisorLifecycleState)
       serializer.fromBinary(bytes, Some(supervisorLifecycleState.getClass)) shouldEqual supervisorLifecycleState
+    }
+  }
+
+  test("should use command serializer for (de)serialize ContainerLifecycleState") {
+
+    val testData = Table(
+      "ContainerLifecycleState models",
+      ContainerLifecycleState.Idle,
+      ContainerLifecycleState.Running
+    )
+
+    forAll(testData) { containerLifecycleState ⇒
+      val serializer = serialization.findSerializerFor(containerLifecycleState)
+      serializer.getClass shouldBe classOf[CommandAkkaSerializer]
+
+      val bytes = serializer.toBinary(containerLifecycleState)
+      serializer.fromBinary(bytes, Some(containerLifecycleState.getClass)) shouldEqual containerLifecycleState
     }
   }
 
