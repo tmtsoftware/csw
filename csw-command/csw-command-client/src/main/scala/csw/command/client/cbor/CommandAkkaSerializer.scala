@@ -5,21 +5,14 @@ import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.serialization.Serializer
 import csw.command.client.messages.CommandSerializationMarker
-import csw.command.client.models.framework.{
-  Components,
-  ContainerLifecycleState,
-  LifecycleStateChanged,
-  LockingResponse,
-  SupervisorLifecycleState
-}
+import csw.command.client.models.framework._
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.GenericLoggerFactory
 import csw.params.commands.CommandResponse
-import csw.params.core.formats.ParamCodecs
 import csw.params.core.states.StateVariable
 import io.bullet.borer.Cbor
 
-class CommandAkkaSerializer(_actorSystem: ExtendedActorSystem) extends Serializer with MessageCodecs with ParamCodecs {
+class CommandAkkaSerializer(_actorSystem: ExtendedActorSystem) extends Serializer with MessageCodecs {
 
   private val logger: Logger                        = GenericLoggerFactory.getLogger
   override implicit def actorSystem: ActorSystem[_] = _actorSystem.toTyped

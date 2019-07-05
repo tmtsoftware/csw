@@ -1,29 +1,11 @@
 package csw.params.core.formats
 
-import csw.params.commands.CommandIssue.{
-  AssemblyBusyIssue,
-  MissingKeyIssue,
-  OtherIssue,
-  ParameterValueOutOfRangeIssue,
-  RequiredAssemblyUnavailableIssue,
-  RequiredHCDUnavailableIssue,
-  RequiredSequencerUnavailableIssue,
-  RequiredServiceUnavailableIssue,
-  UnresolvedLocationsIssue,
-  UnsupportedCommandInStateIssue,
-  UnsupportedCommandIssue,
-  WrongInternalStateIssue,
-  WrongNumberOfParametersIssue,
-  WrongParameterTypeIssue,
-  WrongPrefixIssue,
-  WrongUnitsIssue
-}
+import csw.params.commands.CommandIssue._
 import csw.params.commands._
 import csw.params.core.models._
 import csw.params.events.{Event, EventName, ObserveEvent, SystemEvent}
 import csw.params.testdata.ParamSetData
 import io.bullet.borer.Cbor
-import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.{FunSuite, Matchers}
 
 class CborTest extends FunSuite with Matchers {

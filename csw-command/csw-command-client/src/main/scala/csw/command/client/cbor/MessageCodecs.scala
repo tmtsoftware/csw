@@ -2,9 +2,6 @@ package csw.command.client.cbor
 
 import java.util.concurrent.TimeUnit
 
-import akka.actor.typed.scaladsl.adapter.{TypedActorRefOps, TypedActorSystemOps, _}
-import akka.actor.typed.{ActorRef, ActorSystem}
-import akka.serialization.{Serialization, SerializationExtension}
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
 import csw.command.client.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
 import csw.command.client.messages.CommandSerializationMarker.RemoteMsg
@@ -21,24 +18,13 @@ import csw.command.client.models.framework.ToComponentLifecycleMessages.{GoOffli
 import csw.command.client.models.framework._
 import csw.location.api.codecs.LocationCodecs
 import csw.logging.client.cbor.LoggingCodecs
-import csw.params.core.formats.{CborHelpers, ParamCodecs}
+import csw.params.core.formats.ParamCodecs
 import io.bullet.borer.derivation.MapBasedCodecs._
 import io.bullet.borer.{Codec, Decoder, Encoder}
 
 import scala.concurrent.duration.FiniteDuration
 
 trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
-
-  implicit def actorSystem: ActorSystem[_]
-
-  implicit override def actorRefCodec[T]: Codec[ActorRef[T]] =
-    CborHelpers.bimap[String, ActorRef[T]](
-      path => {
-        val provider = SerializationExtension(actorSystem.toUntyped).system.provider
-        provider.resolveActorRef(path)
-      },
-      actorRef => Serialization.serializedActorPath(actorRef.toUntyped)
-    )
 
   implicit def subscriberMessageCodec[T: Encoder: Decoder]: Codec[SubscriberMessage[T]] = deriveCodec[SubscriberMessage[T]]
   implicit def publishCodec[T: Encoder: Decoder]: Codec[Publish[T]]                     = deriveCodec[Publish[T]]
