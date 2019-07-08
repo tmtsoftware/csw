@@ -1,21 +1,20 @@
-package csw.command.api.scaladsl
+package csw.command.client
 
+import akka.http.scaladsl.Http
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.http.scaladsl.model._
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.util.ByteString
 import csw.location.api.models.Connection.HttpConnection
+import csw.location.api.scaladsl.LocationService
 import csw.params.commands.CommandResponse.{Completed, Error, SubmitResponse}
+import csw.params.core.formats.ParamCodecs._
 import csw.params.commands.Setup
 import io.bullet.borer.Cbor
 
-import scala.async.Async._
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpMethods, HttpRequest, StatusCodes}
-import csw.location.api.scaladsl.LocationService
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import csw.params.core.formats.ParamCodecs._
-
+import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContext, Future}
 
 /**

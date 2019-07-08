@@ -227,6 +227,8 @@ object Dependencies {
       Akka.`akka-stream-typed`,
       Akka.`akka-actor`,
       Akka.`akka-actor-typed`,
+      AkkaHttp.`akka-http`,
+      Libs.`scala-async`.value,
       Libs.`caffeine`,
       Akka.`akka-actor-testkit-typed` % Test,
       Akka.`akka-stream-testkit`      % Test,
@@ -238,10 +240,7 @@ object Dependencies {
 
   val CommandApi = Def.setting(
     Seq(
-      Akka.`akka-actor`,
-      Akka.`akka-actor-typed`,
-      AkkaHttp.`akka-http`,
-      Libs.`scala-async`.value
+      Akka.`akka-actor`
     )
   )
 
