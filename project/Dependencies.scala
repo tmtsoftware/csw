@@ -54,7 +54,6 @@ object Dependencies {
       AkkaHttp.`akka-http`,
       Libs.`akka-http-play-json`,
       Libs.`play-json`.value,
-      Chill.`chill-akka`,
       Libs.`borer-compat-akka`.value,
       Akka.`akka-actor-testkit-typed` % Test,
       Libs.`scalatest`.value          % Test,
@@ -176,7 +175,7 @@ object Dependencies {
       Libs.`junit`           % Test,
       Libs.`borer-core`.value,
       Libs.`borer-derivation`.value,
-      Libs.`gson`            % Test
+      Libs.`gson` % Test
     )
   )
 
@@ -194,8 +193,7 @@ object Dependencies {
 
   val ParamsJvm = Def.setting(
     Seq(
-      Chill.`chill-bijection` % Test,
-      Libs.`junit`            % Test
+      Libs.`junit` % Test
     )
   )
 
@@ -229,7 +227,6 @@ object Dependencies {
       Akka.`akka-stream-typed`,
       Akka.`akka-actor`,
       Akka.`akka-actor-typed`,
-      Chill.`chill-akka`,
       Libs.`caffeine`,
       Akka.`akka-actor-testkit-typed` % Test,
       Akka.`akka-stream-testkit`      % Test,

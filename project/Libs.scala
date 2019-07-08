@@ -71,12 +71,6 @@ object Enumeratum {
   val `enumeratum-play-json` = dep("com.beachape" %%% "enumeratum-play-json" % "1.5.16") //MIT License
 }
 
-object Chill {
-  val Version           = "0.9.3"
-  val `chill-akka`      = "com.twitter" %% "chill-akka" % Version //Apache License 2.0
-  val `chill-bijection` = "com.twitter" %% "chill-bijection" % Version //Apache License 2.0
-}
-
 object Akka {
   val Version                    = "2.5.23" //all akka is Apache License 2.0
   val `akka-stream`              = "com.typesafe.akka" %% "akka-stream" % Version
