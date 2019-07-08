@@ -13,7 +13,7 @@ import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.messages.{GetComponentLogMetadata, LogControlMessages, SetComponentLogLevel}
 import csw.command.client.models.framework.LockingResponse._
 import csw.command.client.models.framework.PubSub.{Publish, PublisherMessage, SubscriberMessage}
-import csw.command.client.models.framework._
+import csw.command.client.models.framework.{PubSub, _}
 import csw.location.api.codecs.LocationCodecs
 import csw.logging.client.cbor.LoggingCodecs
 import csw.params.core.formats.ParamCodecs
@@ -24,10 +24,14 @@ import scala.concurrent.duration.FiniteDuration
 
 trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
 
-  implicit def subscriberMessageCodec[T: Encoder: Decoder]: Codec[SubscriberMessage[T]] = deriveCodec[SubscriberMessage[T]]
-  implicit def publishCodec[T: Encoder: Decoder]: Codec[Publish[T]]                     = deriveCodec[Publish[T]]
-  implicit def publisherMessageCodec[T: Encoder: Decoder]: Codec[PublisherMessage[T]]   = deriveCodec[PublisherMessage[T]]
-  implicit def pubSubCodec[T: Encoder: Decoder]: Codec[PubSub[T]]                       = deriveCodec[PubSub[T]]
+  implicit def subscribeMessageCodec[T: Encoder: Decoder]: Codec[PubSub.Subscribe[T]] = deriveCodec[PubSub.Subscribe[T]]
+  implicit def subscribeOnlyMessageCodec[T: Encoder: Decoder]: Codec[PubSub.SubscribeOnly[T]] =
+    deriveCodec[PubSub.SubscribeOnly[T]]
+  implicit def unsubscribeMessageCodec[T: Encoder: Decoder]: Codec[PubSub.Unsubscribe[T]] = deriveCodec[PubSub.Unsubscribe[T]]
+  implicit def subscriberMessageCodec[T: Encoder: Decoder]: Codec[SubscriberMessage[T]]   = deriveCodec[SubscriberMessage[T]]
+  implicit def publishCodec[T: Encoder: Decoder]: Codec[Publish[T]]                       = deriveCodec[Publish[T]]
+  implicit def publisherMessageCodec[T: Encoder: Decoder]: Codec[PublisherMessage[T]]     = deriveCodec[PublisherMessage[T]]
+  implicit def pubSubCodec[T: Encoder: Decoder]: Codec[PubSub[T]]                         = deriveCodec[PubSub[T]]
 
   implicit lazy val durationCodec: Codec[FiniteDuration] =
     bimap[(Long, String), FiniteDuration]({

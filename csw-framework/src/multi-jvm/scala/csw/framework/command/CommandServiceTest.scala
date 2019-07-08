@@ -314,7 +314,7 @@ class CommandServiceTest(ignore: Int)
       hcdCmdService.oneway(currStateSetup)
 
       // Wait for a bit for callback
-      Thread.sleep(100)
+      Thread.sleep(200)
       // Test to see if value was received
       cstate(encoder).head shouldBe expectedEncoderValue
 
