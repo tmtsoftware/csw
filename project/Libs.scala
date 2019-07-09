@@ -14,20 +14,20 @@ object Libs {
   val `junit`              = "junit" % "junit" % "4.12" //Eclipse Public License 1.0
   val `silencer-plugin`    = compilerPlugin("com.github.ghik" %% "silencer-plugin" % silencerVersion)
   val `silencer-lib`       = "com.github.ghik" %% "silencer-lib" % silencerVersion % Compile
-  val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.5.9"
+  val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.5.11"
   //MIT License
   val `embedded-keycloak`            = "com.github.tmtsoftware"        % "embedded-keycloak"             % "0.1.2" //Apache 2.0
   val `logback-classic`              = "ch.qos.logback"                % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `akka-management-cluster-http` = "com.lightbend.akka.management" %% "akka-management-cluster-http" % "1.0.1"
-  val `svnkit`                       = "org.tmatesoft.svnkit"          % "svnkit"                        % "1.9.3" //TMate Open Source License
+  val `svnkit`                       = "org.tmatesoft.svnkit"          % "svnkit"                        % "1.10.1" //TMate Open Source License
   val `commons-codec`                = "commons-codec"                 % "commons-codec"                 % "1.10" //Apache 2.0
   val `scala-reflect`                = "org.scala-lang"                % "scala-reflect"                 % ScalaVersion //BSD-3
   val `gson`                         = "com.google.code.gson"          % "gson"                          % "2.8.5" //Apache 2.0
 
   val `play-json` = dep("com.typesafe.play" %%% "play-json" % "2.7.4") //Apache 2.0
 
-  val `akka-http-play-json` = "de.heikoseeberger"       %% "akka-http-play-json" % "1.26.0" //Apache 2.0
-  val `jwt-play-json`       = "com.pauldijou"           %% "jwt-play-json"       % "3.0.0"
+  val `akka-http-play-json` = "de.heikoseeberger"       %% "akka-http-play-json" % "1.27.0" //Apache 2.0
+  val `jwt-play-json`       = "com.pauldijou"           %% "jwt-play-json"       % "3.1.0"
   val `lettuce`             = "io.lettuce"              % "lettuce-core"         % "5.1.7.RELEASE"
   val `reactor-core`        = "io.projectreactor"       % "reactor-core"         % "3.2.10.RELEASE"
   val `reactive-streams`    = "org.reactivestreams"     % "reactive-streams"     % "1.0.2"
@@ -41,10 +41,10 @@ object Libs {
   val `scala-csv`                = "com.github.tototoshi" %% "scala-csv" % "1.3.6"
   val `scalajs-java-time`        = dep("org.scala-js" %%% "scalajs-java-time" % "0.2.5")
   val `json-schema-validator`    = "com.github.fge" % "json-schema-validator" % "2.2.8" //LGPL/ASL
-  val `play-json-derived-codecs` = dep("org.julienrf" %%% "play-json-derived-codecs" % "5.0.0")
+  val `play-json-derived-codecs` = dep("org.julienrf" %%% "play-json-derived-codecs" % "6.0.0")
 
   val `jna`             = "net.java.dev.jna"              % "jna"             % "5.3.1"
-  val `postgresql`      = "org.postgresql"                % "postgresql"      % "42.2.5"
+  val `postgresql`      = "org.postgresql"                % "postgresql"      % "42.2.6"
   val `hikaricp`        = "com.zaxxer"                    % "HikariCP"        % "3.3.1" //Apache License 2.0
   val `otj-pg-embedded` = "com.opentable.components"      % "otj-pg-embedded" % "0.13.1"
   val httpclient        = "org.apache.httpcomponents"     % "httpclient"      % "4.5.9"
@@ -93,7 +93,7 @@ object AkkaHttp {
   val Version             = "10.1.8"
   val `akka-http`         = "com.typesafe.akka" %% "akka-http" % Version //ApacheV2
   val `akka-http-testkit` = "com.typesafe.akka" %% "akka-http-testkit" % Version //ApacheV2
-  val `akka-http-cors`    = "ch.megard" %% "akka-http-cors" % "0.4.0"
+  val `akka-http-cors`    = "ch.megard" %% "akka-http-cors" % "0.4.1"
 }
 
 object Keycloak {
