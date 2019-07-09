@@ -1,7 +1,6 @@
 import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 import sbt.Def.{setting ⇒ dep}
 import sbt._
-import scalapb.compiler.Version.scalapbVersion
 
 object Libs {
   val ScalaVersion    = "2.12.8"
