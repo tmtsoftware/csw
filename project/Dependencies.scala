@@ -27,8 +27,8 @@ object Dependencies {
       Libs.`play-json`.value,
       Libs.`play-json-derived-codecs`.value,
       Enumeratum.`enumeratum`.value,
-      Libs.`borer-core`.value,
-      Libs.`borer-derivation`.value,
+      Borer.`borer-core`.value,
+      Borer.`borer-derivation`.value,
       Libs.`scalatest`.value % Test,
       Libs.`mockito-scala`   % Test
     )
@@ -54,7 +54,7 @@ object Dependencies {
       AkkaHttp.`akka-http`,
       Libs.`akka-http-play-json`,
       Libs.`play-json`.value,
-      Libs.`borer-compat-akka`.value,
+      Borer.`borer-compat-akka`.value,
       Akka.`akka-actor-testkit-typed` % Test,
       Libs.`scalatest`.value          % Test,
       Libs.`junit`                    % Test,
@@ -76,7 +76,7 @@ object Dependencies {
       Libs.`scala-java8-compat`,
       Libs.`play-json`.value,
       Libs.`akka-http-play-json`,
-      Libs.`borer-compat-akka`.value,
+      Borer.`borer-compat-akka`.value,
       Libs.`scalatest`.value % Test
     )
   )
@@ -173,8 +173,8 @@ object Dependencies {
       Akka.`akka-actor-typed`,
       Libs.`scalatest`.value % Test,
       Libs.`junit`           % Test,
-      Libs.`borer-core`.value,
-      Libs.`borer-derivation`.value,
+      Borer.`borer-core`.value,
+      Borer.`borer-derivation`.value,
       Libs.`gson` % Test
     )
   )
@@ -185,8 +185,8 @@ object Dependencies {
       Enumeratum.`enumeratum-play-json`.value,
       Libs.`play-json`.value,
       Libs.`play-json-derived-codecs`.value,
-      Libs.`borer-core`.value,
-      Libs.`borer-derivation`.value,
+      Borer.`borer-core`.value,
+      Borer.`borer-derivation`.value,
       Libs.`scalatest`.value % Test
     )
   )

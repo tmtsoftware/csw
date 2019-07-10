@@ -3,6 +3,8 @@ package csw.params.core.models
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.{KeyType, Parameter}
+import csw.params.core.models.Coords.EqFrame.{FK5, ICRS}
+import csw.params.core.models.Coords.SolarSystemObject.{Pluto, Venus}
 import org.scalatest.{FunSpec, Matchers}
 import play.api.libs.json.Json
 

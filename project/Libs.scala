@@ -53,9 +53,15 @@ object Libs {
   val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.3.0"
   val `caffeine`        = "com.github.ben-manes.caffeine" % "caffeine"        % "2.7.0"
 
-  val `borer-core`        = dep("io.bullet" %%% "borer-core"        % "0.9.0")
-  val `borer-derivation`  = dep("io.bullet" %%% "borer-derivation"  % "0.9.0")
-  val `borer-compat-akka` = dep("io.bullet" %%% "borer-compat-akka" % "0.9.0")
+}
+
+object Borer {
+  val Version = "0.9.0"
+  val Org     = "io.bullet"
+
+  val `borer-core`        = dep(Org %%% "borer-core"        % Version)
+  val `borer-derivation`  = dep(Org %%% "borer-derivation"  % Version)
+  val `borer-compat-akka` = dep(Org %%% "borer-compat-akka" % Version)
 }
 
 object Jackson {

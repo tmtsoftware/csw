@@ -31,11 +31,11 @@ trait ParamCodecs extends CommonCodecs {
   implicit lazy val choiceCodec: Codec[Choice] = Codec.forCaseClass[Choice]
   implicit lazy val raDecCodec: Codec[RaDec]   = deriveCodec[RaDec]
 
-  implicit lazy val tagCodec: Codec[Coords.Tag]                      = deriveCodec[Coords.Tag]
-  implicit lazy val angleCodec: Codec[Angle]                         = deriveCodec[Angle]
+  implicit lazy val tagCodec: Codec[Coords.Tag]                      = Codec.forCaseClass[Coords.Tag]
+  implicit lazy val angleCodec: Codec[Angle]                         = Codec.forCaseClass[Angle]
   implicit lazy val properMotionCodec: Codec[ProperMotion]           = deriveCodec[ProperMotion]
-  implicit lazy val eqFrameCodec: Codec[EqFrame]                     = deriveCodec[EqFrame]
-  implicit lazy val solarSystemObjectCodec: Codec[SolarSystemObject] = deriveCodec[SolarSystemObject]
+  implicit lazy val eqFrameCodec: Codec[EqFrame]                     = CborHelpers.enumCodec[EqFrame]
+  implicit lazy val solarSystemObjectCodec: Codec[SolarSystemObject] = CborHelpers.enumCodec[SolarSystemObject]
 
   implicit lazy val eqCoordCodec: Codec[EqCoord]                   = deriveCodec[EqCoord]
   implicit lazy val solarSystemCoordCodec: Codec[SolarSystemCoord] = deriveCodec[SolarSystemCoord]

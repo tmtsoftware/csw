@@ -16,6 +16,8 @@ import csw.params.core.generics.KeyType.{
   StructKey
 }
 import csw.params.core.generics._
+import csw.params.core.models.Coords.EqFrame.FK5
+import csw.params.core.models.Coords.SolarSystemObject.Venus
 import csw.params.core.models.Units.{NoUnits, degree, encoder, meter}
 import csw.params.core.models._
 import csw.params.core.states.{CurrentState, DemandState, StateName}
