@@ -7,6 +7,7 @@ import akka.actor.typed.SpawnProtocol
 import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.ActorMaterializer
 import akka.stream.typed.scaladsl
+import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaRegistration, ComponentId, ComponentType, RegistrationResult}
 import csw.location.api.scaladsl.LocationService
@@ -53,7 +54,7 @@ object LocationServiceExampleComponent {
       // Register with the location service
       val registrationResult: Future[RegistrationResult] =
         locationService.register(
-          AkkaRegistration(LocationServiceExampleComponent.connection, Prefix("nfiraos.ncc.trombone"), ctx.self)
+          AkkaRegistration(LocationServiceExampleComponent.connection, Prefix("nfiraos.ncc.trombone"), ctx.self.toURI(ctx.system))
         )
       Await.result(registrationResult, 5.seconds)
 

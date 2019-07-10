@@ -4,6 +4,7 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.typed.{ActorSystem, Behavior, SpawnProtocol}
 import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.testkit.TestProbe
+import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models._
 import csw.location.client.scaladsl.HttpLocationServiceFactory
@@ -35,7 +36,9 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
 
     runOn(member1) {
       locationService
-        .register(AkkaRegistration(akkaConnection, Prefix("nfiraos.ncc.trombone"), typedSystem.spawn(Behavior.empty, "empty")))
+        .register(
+          AkkaRegistration(akkaConnection, Prefix("nfiraos.ncc.trombone"), typedSystem.spawn(Behavior.empty, "empty").toURI)
+        )
         .await
 
       enterBarrier("location-registered")
@@ -45,9 +48,10 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
 
       startNewSystem()
 
-      val newConfig = if(sys.env.get("CLUSTER_SEEDS").isEmpty)
-        config.settings.joinLocal(3552).config
-      else config.settings.config
+      val newConfig =
+        if (sys.env.get("CLUSTER_SEEDS").isEmpty)
+          config.settings.joinLocal(3552).config
+        else config.settings.config
 
       val newSystem      = makeSystem(newConfig)
       val newTypedSystem = newSystem.toTyped.asInstanceOf[ActorSystem[SpawnProtocol]]
@@ -68,7 +72,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
           AkkaRegistration(
             akkaConnection,
             Prefix("nfiraos.ncc.trombone"),
-            newTypedSystem.spawn(Behavior.empty, "empty")
+            newTypedSystem.spawn(Behavior.empty, "empty").toURI(newTypedSystem)
           )
         )
         .await

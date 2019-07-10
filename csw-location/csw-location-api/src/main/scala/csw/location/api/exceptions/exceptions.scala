@@ -1,6 +1,7 @@
 package csw.location.api.exceptions
 
-import akka.actor.typed.ActorRef
+import java.net.URI
+
 import csw.location.api.models.{Connection, Location}
 
 /**
@@ -30,10 +31,10 @@ case class OtherLocationIsRegistered(msg: String) extends RuntimeException(msg) 
 /**
  * An Exception representing failure in registering non remote actors
  *
- * @param actorRef the reference of the Actor that is expected to be remote but instead it is local
+ * @param actorRefURI the reference of the Actor that is expected to be remote but instead it is local
  */
-case class LocalAkkaActorRegistrationNotAllowed(actorRef: ActorRef[_])
-    extends RuntimeException(s"Registration of only remote actors is allowed. Instead local actor $actorRef received.")
+case class LocalAkkaActorRegistrationNotAllowed(actorRefURI: URI)
+    extends RuntimeException(s"Registration of only remote actors is allowed. Instead local actor $actorRefURI received.")
 
 /**
  * An Exception representing failure in listing locations

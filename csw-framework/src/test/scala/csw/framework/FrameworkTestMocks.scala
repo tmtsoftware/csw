@@ -3,7 +3,7 @@ package csw.framework
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
-import akka.{actor, Done}
+import akka.{Done, actor}
 import csw.alarm.api.scaladsl.AlarmService
 import csw.command.client.CommandResponseManager
 import csw.command.client.messages.CommandResponseManagerMessage
@@ -15,6 +15,7 @@ import csw.event.client.EventServiceFactory
 import csw.framework.internal.pubsub.PubSubBehavior
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.RegistrationFactory
+import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaRegistration, RegistrationResult}
 import csw.location.api.scaladsl.LocationService
@@ -33,7 +34,7 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol]) extends Mo
 
   ///////////////////////////////////////////////
   val testActor: ActorRef[Any]                   = TestProbe("test-probe").ref
-  val akkaRegistration                           = AkkaRegistration(mock[AkkaConnection], Prefix("nfiraos.ncc.trombone"), testActor)
+  val akkaRegistration                           = AkkaRegistration(mock[AkkaConnection], Prefix("nfiraos.ncc.trombone"), testActor.toURI)
   val locationService: LocationService           = mock[LocationService]
   val eventServiceFactory: EventServiceFactory   = mock[EventServiceFactory]
   val eventService: EventService                 = mock[EventService]
@@ -42,7 +43,7 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol]) extends Mo
   val registrationResult: RegistrationResult     = mock[RegistrationResult]
   val registrationFactory: RegistrationFactory   = mock[RegistrationFactory]
 
-  when(registrationFactory.akkaTyped(any[AkkaConnection], any[Prefix], any[ActorRef[_]]))
+  when(registrationFactory.akkaTyped(any[AkkaConnection], any[Prefix], any[ActorRef[_]])(any[ActorSystem[_]]))
     .thenReturn(akkaRegistration)
   when(locationService.register(akkaRegistration)).thenReturn(Future.successful(registrationResult))
   when(locationService.unregister(any[AkkaConnection])).thenReturn(Future.successful(Done))

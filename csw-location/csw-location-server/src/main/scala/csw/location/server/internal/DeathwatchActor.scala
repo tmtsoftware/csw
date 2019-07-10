@@ -1,9 +1,10 @@
 package csw.location.server.internal
 
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorRef, Behavior, Terminated}
+import akka.actor.typed.{ActorRef, ActorSystem, Behavior, Terminated}
 import akka.cluster.ddata.typed.scaladsl.Replicator
 import akka.cluster.ddata.typed.scaladsl.Replicator.Changed
+import csw.location.api.extensions.URIExtension.RichURI
 import csw.location.api.models.{AkkaLocation, Location}
 import csw.location.api.scaladsl.LocationService
 import csw.location.server.commons.{CswCluster, LocationServiceLogger}
@@ -16,7 +17,7 @@ import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
  *
  * @param locationService is used to unregister Actors that are no more alive
  */
-private[location] class DeathwatchActor(locationService: LocationService) {
+private[location] class DeathwatchActor(locationService: LocationService)(implicit actorSystem: ActorSystem[_]) {
   import DeathwatchActor.Msg
 
   /**
@@ -36,9 +37,9 @@ private[location] class DeathwatchActor(locationService: LocationService) {
 
       // Ignore HttpLocation or TcpLocation (Do not watch)
       unwatchedLocations.foreach {
-        case AkkaLocation(_, _, _, actorRef) ⇒
-          log.debug(s"Started watching actor: ${actorRef.toString}")
-          context.watch(actorRef)
+        case AkkaLocation(_, _, actorRefURI) ⇒
+          log.debug(s"Started watching actor: ${actorRefURI.toString}")
+          context.watch(actorRefURI.toActorRef)
         case _ ⇒ // ignore http and tcp location
       }
       //all locations are now watched
@@ -52,7 +53,7 @@ private[location] class DeathwatchActor(locationService: LocationService) {
         ctx.unwatch(deadActorRef)
         //Unregister the dead location and remove it from the list of watched locations
         val maybeLocation = watchedLocations.find {
-          case AkkaLocation(_, _, _, actorRef) ⇒ deadActorRef == actorRef
+          case AkkaLocation(_, _, actorRefUri) ⇒ deadActorRef == actorRefUri.toActorRef
           case _                               ⇒ false
         }
         maybeLocation match {
@@ -82,7 +83,7 @@ private[location] object DeathwatchActor {
     log.debug("Starting Deathwatch actor")
     val actorRef = cswCluster.typedSystem.spawn(
       //span the actor with empty set of watched locations
-      new DeathwatchActor(locationService).behavior(Set.empty),
+      new DeathwatchActor(locationService)(cswCluster.typedSystem).behavior(Set.empty),
       name = "location-service-death-watch-actor"
     )
 

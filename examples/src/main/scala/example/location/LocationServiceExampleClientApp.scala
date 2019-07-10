@@ -1,10 +1,11 @@
 package example.location
 
-import java.net.InetAddress
+import java.net.{InetAddress, URI}
 
+import akka.actor
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior, SpawnProtocol}
-import akka.actor.{typed, ActorSystem, CoordinatedShutdown, Props}
+import akka.actor.{Actor, ActorSystem, CoordinatedShutdown, Props, typed}
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.typed.scaladsl
 import akka.stream.typed.scaladsl.ActorSink
@@ -12,6 +13,7 @@ import akka.stream.{ActorMaterializer, Materializer}
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.framework.commons.CoordinatedShutdownReasons.ActorTerminatedReason
+import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
 import csw.location.api.models.{AkkaRegistration, HttpRegistration, _}
 import csw.location.api.scaladsl.LocationService
@@ -138,11 +140,14 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   val hcdRegistration: AkkaRegistration = AkkaRegistration(
     hcdConnection,
     Prefix("nfiraos.ncc.tromboneHcd"),
-    context.actorOf(Props(new akka.actor.Actor {
-      override def receive: Receive = {
-        case "print" => log.info("hello world")
-      }
-    }), name = "my-actor-1")
+    context
+      .actorOf(Props(new Actor {
+        override def receive: Receive = {
+          case "print" => log.info("hello world")
+        }
+      }), name = "my-actor-1")
+      .toTyped
+      .toURI(context.system.toTyped)
   )
 
   // Register UnTyped ActorRef with Location service. Import scaladsl adapter to implicitly convert
@@ -162,7 +167,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   // Register Typed ActorRef[String] with Location Service
   val assemblyRegistration: AkkaRegistration =
-    AkkaRegistration(assemblyConnection, Prefix("nfiraos.ncc.tromboneAssembly"), typedActorRef)
+    AkkaRegistration(assemblyConnection, Prefix("nfiraos.ncc.tromboneAssembly"), typedActorRef.toURI)
 
   val assemblyRegResult: RegistrationResult = Await.result(locationService.register(assemblyRegistration), 2.seconds)
   //#Components-Connections-Registrations

@@ -2,12 +2,9 @@ package csw.location.api.models
 
 import java.net.URI
 
-import akka.actor.typed.ActorRef
 import csw.location.api.codecs.LocationSerializable
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.params.core.models.Prefix
-
-import scala.reflect.ClassTag
 
 /**
  * Location represents a live Connection along with its URI
@@ -33,28 +30,9 @@ sealed abstract class Location extends LocationSerializable {
  *       to get the correctly typed actor reference.
  * @param connection represents a connection based on a componentId and the type of connection offered by the component
  * @param prefix prefix of the component
- * @param uri represents the URI of the component. URI is not significant for AkkaLocation as actorRef serves the purpose
- *            of exposed remote address of component.
- * @param actorRef gateway or router for a component that other components will resolve and talk to
+ * @param uri represents the actor URI of the component. Gateway or router for a component that other components will resolve and talk to.
  */
-final case class AkkaLocation(
-    connection: AkkaConnection,
-    prefix: Prefix,
-    uri: URI,
-    actorRef: ActorRef[Nothing]
-) extends Location {
-
-  // Akka typed actors currently don't save the type while sending ActorRef on wire.
-  // So, while resolving any ActorRef for component cast the untyped ActorRef to typed one
-  def typedRef[T: ClassTag]: ActorRef[T] = {
-    val typeManifest    = scala.reflect.classTag[T].runtimeClass.getSimpleName
-    val messageManifest = connection.componentId.componentType.messageManifest
-
-    require(typeManifest == messageManifest, s"actorRef for type $messageManifest can not handle messages of type $typeManifest")
-
-    actorRef.unsafeUpcast[T]
-  }
-}
+final case class AkkaLocation(connection: AkkaConnection, prefix: Prefix, uri: URI) extends Location
 
 /**
  * Represents a live Tcp connection

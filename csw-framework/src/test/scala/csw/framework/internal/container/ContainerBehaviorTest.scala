@@ -20,6 +20,7 @@ import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestMocks
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.scaladsl.RegistrationFactory
+import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaRegistration, RegistrationResult}
 import csw.location.api.scaladsl.LocationService
@@ -40,7 +41,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar wit
 
   class IdleContainer() {
     private val testActor: ActorRef[Any]                        = TestProbe("test-probe").ref
-    val akkaRegistration                                        = AkkaRegistration(mock[AkkaConnection], Prefix("nfiraos.ncc.trombone"), testActor)
+    val akkaRegistration                                        = AkkaRegistration(mock[AkkaConnection], Prefix("nfiraos.ncc.trombone"), testActor.toURI)
     val locationService: LocationService                        = mock[LocationService]
     val eventService: EventServiceFactory                       = mock[EventServiceFactory]
     val alarmService: AlarmServiceFactory                       = mock[AlarmServiceFactory]
@@ -71,7 +72,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar wit
     ).thenAnswer((_: ActorRef[ContainerIdleMessage], ci: ComponentInfo) => answer(ci))
 
     private val registrationFactory: RegistrationFactory = mock[RegistrationFactory]
-    when(registrationFactory.akkaTyped(any[AkkaConnection], any[Prefix], any[ActorRef[_]]))
+    when(registrationFactory.akkaTyped(any[AkkaConnection], any[Prefix], any[ActorRef[_]])(any[ActorSystem[_]]))
       .thenReturn(akkaRegistration)
 
     private val eventualRegistrationResult: Future[RegistrationResult] =

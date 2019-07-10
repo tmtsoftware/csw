@@ -20,6 +20,8 @@ import csw.command.client.extensions.AkkaLocationExt;
 import csw.command.client.messages.ComponentMessage;
 import csw.command.client.messages.ContainerMessage;
 import csw.framework.commons.CoordinatedShutdownReasons;
+import csw.location.api.extensions.ActorExtension;
+import csw.location.api.extensions.URIExtension;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.IRegistrationResult;
 import csw.location.api.javadsl.JComponentType;
@@ -39,6 +41,7 @@ import scala.concurrent.Await;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.net.InetAddress;
+import java.net.URI;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +58,7 @@ import static csw.location.api.models.Connection.HttpConnection;
 public class JLocationServiceExampleClient extends AbstractActor {
 
     private ILogger log = new JLoggerFactory("my-component-name").getLogger(context(), getClass());
-
+    private ActorSystem<Void> typedSystem = Adapter.toTyped(this.system);
     //#create-location-service
     private akka.actor.ActorSystem system = context().system();
     private ActorMaterializer mat = ActorMaterializer.create(system);
@@ -116,7 +119,9 @@ public class JLocationServiceExampleClient extends AbstractActor {
 
         // Register UnTyped ActorRef with Location service. Use javadsl Adapter to convert UnTyped ActorRefs
         // to Typed ActorRef[Nothing]
-        AkkaRegistration hcdRegistration = AkkaRegistration.apply(hcdConnection, new Prefix("nfiraos.ncc.tromboneHcd"), Adapter.toTyped(actorRef));
+
+        URI actorRefURI = ActorExtension.RichActor(Adapter.toTyped(actorRef)).toURI(typedSystem);
+        AkkaRegistration hcdRegistration = AkkaRegistration.apply(hcdConnection, new Prefix("nfiraos.ncc.tromboneHcd"), actorRefURI);
         hcdRegResult = locationService.register(hcdRegistration).get();
 
         // ************************************************************************************************************
@@ -129,7 +134,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         AkkaConnection assemblyConnection = new AkkaConnection(new ComponentId("assembly1", JComponentType.Assembly));
 
         // Register Typed ActorRef[String] with Location Service
-        AkkaRegistration assemblyRegistration = new RegistrationFactory().akkaTyped(assemblyConnection, new Prefix("nfiraos.ncc.tromboneAssembly"), typedActorRef);
+        AkkaRegistration assemblyRegistration = new RegistrationFactory().akkaTyped(assemblyConnection, new Prefix("nfiraos.ncc.tromboneAssembly"), typedActorRef, typedSystem);
 
 
         assemblyRegResult = locationService.register(assemblyRegistration).get();
@@ -163,10 +168,10 @@ public class JLocationServiceExampleClient extends AbstractActor {
         findResult.ifPresent(akkaLocation -> {
             //#typed-ref
             // If the component type is HCD or Assembly, use this to get the correct ActorRef
-            akka.actor.typed.ActorRef<ComponentMessage> typedComponentRef = AkkaLocationExt.RichAkkaLocation(akkaLocation).componentRef();
+            akka.actor.typed.ActorRef<ComponentMessage> typedComponentRef = AkkaLocationExt.RichAkkaLocation(akkaLocation).componentRef(typedSystem);
 
             // If the component type is Container, use this to get the correct ActorRef
-            akka.actor.typed.ActorRef<ContainerMessage> typedContainerRef = AkkaLocationExt.RichAkkaLocation(akkaLocation).containerRef();
+            akka.actor.typed.ActorRef<ContainerMessage> typedContainerRef = AkkaLocationExt.RichAkkaLocation(akkaLocation).containerRef(typedSystem);
             //#typed-ref
         });
         //#resolve
@@ -194,8 +199,8 @@ public class JLocationServiceExampleClient extends AbstractActor {
         // example code showing how to get the actorRef for remote component and send it a message
         if (resolveResult.isPresent()) {
             AkkaLocation loc = resolveResult.orElseThrow();
-            ActorRef actorRef = Adapter.toUntyped(loc.actorRef());
-            actorRef.tell(LocationServiceExampleComponent.ClientMessage$.MODULE$, getSelf());
+            ActorRef actorRef = Adapter.toUntyped(new URIExtension.RichURI(loc.uri()).toActorRef(typedSystem));
+//            actorRef.tell(LocationServiceExampleComponent.ClientMessage, getSelf());
         }
     }
 

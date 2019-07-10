@@ -2,13 +2,12 @@ package csw.location.models
 
 import java.net.URI
 
+import akka.actor.typed
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.scaladsl.adapter.TypedActorRefOps
 import akka.actor.typed.{ActorSystem, Behavior, SpawnProtocol}
-import akka.actor.{ActorPath, typed}
-import akka.serialization.Serialization
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.location.api.exceptions.LocalAkkaActorRegistrationNotAllowed
+import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.api.models._
 import csw.location.client.ActorSystemFactory
@@ -28,14 +27,11 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     val hostname = Networks().hostname
 
     val akkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
-    val actorRef       = actorSystem
-    val actorPath      = ActorPath.fromString(Serialization.serializedActorPath(actorRef.toUntyped))
-    val akkaUri        = new URI(actorPath.toString)
+    val actorRefUri    = actorSystem.toURI
     val prefix         = Prefix("nfiraos.ncc.trombone")
 
-    val akkaRegistration = AkkaRegistration(akkaConnection, prefix, actorRef)
-
-    val expectedAkkaLocation = AkkaLocation(akkaConnection, prefix, akkaUri, actorRef)
+    val akkaRegistration     = AkkaRegistration(akkaConnection, prefix, actorRefUri)
+    val expectedAkkaLocation = AkkaLocation(akkaConnection, prefix, actorRefUri)
 
     akkaRegistration.location(hostname) shouldBe expectedAkkaLocation
   }
@@ -71,12 +67,12 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
       """)
 
     implicit val actorSystem: ActorSystem[SpawnProtocol] = ActorSystem(SpawnProtocol.behavior, "local-actor-system", config)
-    val actorRef                                         = actorSystem.spawn(Behaviors.empty, "my-actor-2")
+    val actorRefURI                                      = actorSystem.spawn(Behaviors.empty, "my-actor-2").toURI
     val akkaConnection                                   = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
     val prefix                                           = Prefix("nfiraos.ncc.trombone")
 
     intercept[LocalAkkaActorRegistrationNotAllowed] {
-      AkkaRegistration(akkaConnection, prefix, actorRef)
+      AkkaRegistration(akkaConnection, prefix, actorRefURI)
     }
     actorSystem.terminate()
     Await.result(actorSystem.whenTerminated, 10.seconds)

@@ -1,25 +1,40 @@
 package csw.command.client.extensions
 
-import akka.actor.typed.ActorRef
+import akka.actor.typed.{ActorRef, ActorSystem}
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
+import csw.location.api.extensions.URIExtension.RichURI
 import csw.location.api.models.AkkaLocation
+
+import scala.reflect.ClassTag
 
 //TODO: Find a better way for Java Support
 object AkkaLocationExt {
   implicit class RichAkkaLocation(val akkaLocation: AkkaLocation) {
+
+    private def typedRef[T: ClassTag](implicit actorSystem: ActorSystem[_]): ActorRef[T] = {
+      val typeManifest    = scala.reflect.classTag[T].runtimeClass.getSimpleName
+      val messageManifest = akkaLocation.connection.componentId.componentType.messageManifest
+
+      require(
+        typeManifest == messageManifest,
+        s"actorRef for type $messageManifest can not handle messages of type $typeManifest"
+      )
+
+      akkaLocation.uri.toActorRef.unsafeUpcast[T]
+    }
 
     /**
      * If the component type is HCD or Assembly, use this to get the correct ActorRef
      *
      * @return a typed ActorRef that understands only ComponentMessage
      */
-    def componentRef: ActorRef[ComponentMessage] = akkaLocation.typedRef[ComponentMessage]
+    def componentRef(implicit actorSystem: ActorSystem[_]): ActorRef[ComponentMessage] = typedRef[ComponentMessage]
 
     /**
      * If the component type is Container, use this to get the correct ActorRef
      *
      * @return a typed ActorRef that understands only ContainerMessage
      */
-    def containerRef: ActorRef[ContainerMessage] = akkaLocation.typedRef[ContainerMessage]
+    def containerRef(implicit actorSystem: ActorSystem[_]): ActorRef[ContainerMessage] = typedRef[ContainerMessage]
   }
 }

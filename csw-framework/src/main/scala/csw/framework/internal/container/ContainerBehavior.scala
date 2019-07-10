@@ -57,10 +57,11 @@ private[framework] final class ContainerBehavior(
 ) extends AbstractBehavior[ContainerActorMessage] {
 
   import ctx.executionContext
-  private val log: Logger                        = loggerFactory.getLogger(ctx)
-  private val containerPrefix                    = Prefix(s"${Container.entryName}.${containerInfo.name}")
-  private val akkaConnection                     = AkkaConnection(ComponentId(containerInfo.name, ComponentType.Container))
-  private val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(akkaConnection, containerPrefix, ctx.self)
+  private val log: Logger     = loggerFactory.getLogger(ctx)
+  private val containerPrefix = Prefix(s"${Container.entryName}.${containerInfo.name}")
+  private val akkaConnection  = AkkaConnection(ComponentId(containerInfo.name, ComponentType.Container))
+  private val akkaRegistration: AkkaRegistration =
+    registrationFactory.akkaTyped(akkaConnection, containerPrefix, ctx.self)(ctx.system)
 
   // Set of successfully created supervisors for components
   var supervisors: Set[SupervisorInfo] = Set.empty
@@ -186,7 +187,7 @@ private[framework] final class ContainerBehavior(
 
   private def registerWithLocationService(): Unit = {
     log.debug(
-      s"Container with connection :[${akkaRegistration.connection.name}] is registering with location service with ref :[${akkaRegistration.actorRef}]"
+      s"Container with connection :[${akkaRegistration.connection.name}] is registering with location service with ref :[${akkaRegistration.actorRefURI}]"
     )
     locationService.register(akkaRegistration).onComplete {
       case Success(_)         ⇒ log.info(s"Container Registration successful with connection: [$akkaConnection]")

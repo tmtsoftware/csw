@@ -2,10 +2,6 @@ package csw.location.api.models
 
 import java.net.URI
 
-import akka.actor.typed.ActorRef
-import akka.actor.typed.scaladsl.adapter.TypedActorRefOps
-import akka.actor.{ActorPath, Address}
-import akka.serialization.Serialization
 import csw.location.api.codecs.LocationSerializable
 import csw.location.api.commons.LocationServiceLogger
 import csw.location.api.exceptions.LocalAkkaActorRegistrationNotAllowed
@@ -38,29 +34,20 @@ sealed abstract class Registration extends LocationSerializable {
  *
  * @param connection the `Connection` to register with `LocationService`
  * @param prefix prefix of the component
- * @param actorRef Provide a remote actor that is offering a connection. Local actors cannot be registered since they can't be
+ * @param actorRefURI Provide a remote actor that is offering a connection. Local actors cannot be registered since they can't be
  *                 communicated from components across the network
  */
 final case class AkkaRegistration(
     connection: AkkaConnection,
     prefix: Prefix,
-    actorRef: ActorRef[Nothing]
+    actorRefURI: URI
 ) extends Registration {
 
-  private val log: Logger = LocationServiceLogger.getLogger
-
-  // ActorPath represents the akka path of an Actor
-  private val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef.toUntyped))
-
-  // Prepare the URI from the ActorPath. Allow only the remote actor to be registered with LocationService
-  private val uri = {
-    actorPath.address match {
-      case Address(_, _, None, None) =>
-        val registrationNotAllowed = LocalAkkaActorRegistrationNotAllowed(actorRef)
-        log.error(registrationNotAllowed.getMessage, ex = registrationNotAllowed)
-        throw registrationNotAllowed
-      case _ => new URI(actorPath.toString)
-    }
+  if (actorRefURI.getPort == -1) {
+    val log: Logger            = LocationServiceLogger.getLogger
+    val registrationNotAllowed = LocalAkkaActorRegistrationNotAllowed(actorRefURI)
+    log.error(registrationNotAllowed.getMessage, ex = registrationNotAllowed)
+    throw registrationNotAllowed
   }
 
   /**
@@ -69,7 +56,7 @@ final case class AkkaRegistration(
    * @param hostname provide a hostname where the connection endpoint is available
    * @return an AkkaLocation location representing a live connection at provided hostname
    */
-  override def location(hostname: String): Location = AkkaLocation(connection, prefix, uri, actorRef)
+  override def location(hostname: String): Location = AkkaLocation(connection, prefix, actorRefURI)
 }
 
 /**

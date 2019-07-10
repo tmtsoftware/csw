@@ -3,6 +3,7 @@ package csw.integtration.apps
 import akka.actor.typed
 import akka.actor.typed.scaladsl.Behaviors
 import csw.integtration.common.TestFutureExtension.RichFuture
+import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaRegistration, ComponentId, ComponentType, RegistrationResult}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
@@ -24,7 +25,7 @@ object AssemblyApp {
   val componentId                              = ComponentId("assembly", ComponentType.Assembly)
   val connection                               = AkkaConnection(componentId)
 
-  val registration                           = AkkaRegistration(connection, Prefix("nfiraos.ncc.trombone"), assemblyActorRef)
+  val registration                           = AkkaRegistration(connection, Prefix("nfiraos.ncc.trombone"), assemblyActorRef.toURI)
   val registrationResult: RegistrationResult = HttpLocationServiceFactory.makeLocalClient.register(registration).await
 
   def main(args: Array[String]): Unit = {}
