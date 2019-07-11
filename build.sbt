@@ -402,7 +402,7 @@ lazy val `csw-alarm-cli` = project
 lazy val `csw-time` = project
   .in(file("csw-time"))
   .aggregate(
-    `csw-time-clock-jvm`,
+    `csw-time-clock`,
     `csw-time-clock-js`,
     `csw-time-core-jvm`,
     `csw-time-core-js`,
@@ -412,29 +412,31 @@ lazy val `csw-time` = project
     aggregate in test := !sys.props.contains("disableTimeTests")
   )
 
-lazy val `csw-time-clock` = crossProject(JSPlatform, JVMPlatform)
-  .crossType(CrossType.Dummy)
+lazy val `csw-time-clock` = project
   .in(file("csw-time/csw-time-clock"))
   .enablePlugins(PublishBintray, GenJavadocPlugin)
-  .jvmSettings(libraryDependencies ++= Dependencies.TimeClockJvm.value)
-  .jsSettings(libraryDependencies += Libs.`scalajs-java-time`.value)
-  .settings(fork := false)
+  .settings(
+    CrossProjectSettings.sourceDirsSettings(_ / "jvm"),
+    libraryDependencies ++= Dependencies.TimeClockJvm.value
+  )
 
-lazy val `csw-time-clock-js`  = `csw-time-clock`.js
-lazy val `csw-time-clock-jvm` = `csw-time-clock`.jvm
+lazy val `csw-time-clock-js` = project
+  .configure(CrossProjectSettings.jsProjectSetup(`csw-time-clock`))
+  .settings(
+    libraryDependencies += Libs.`scalajs-java-time`.value
+  )
 
 lazy val `csw-time-core` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("csw-time/csw-time-core"))
-  .dependsOn(`csw-time-clock`)
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(
     libraryDependencies ++= Dependencies.TimeCore.value,
     fork := false
   )
 
-lazy val `csw-time-core-js`  = `csw-time-core`.js
-lazy val `csw-time-core-jvm` = `csw-time-core`.jvm
+lazy val `csw-time-core-js`  = `csw-time-core`.js.dependsOn(`csw-time-clock-js`)
+lazy val `csw-time-core-jvm` = `csw-time-core`.jvm.dependsOn(`csw-time-clock`)
 
 lazy val `csw-time-scheduler` = project
   .in(file("csw-time/csw-time-scheduler"))
