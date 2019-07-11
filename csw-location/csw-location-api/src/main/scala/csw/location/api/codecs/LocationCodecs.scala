@@ -3,17 +3,13 @@ package csw.location.api.codecs
 import java.net.URI
 
 import akka.Done
-import akka.actor.typed.scaladsl.adapter.{TypedActorRefOps, TypedActorSystemOps, _}
-import akka.actor.typed.{ActorRef, ActorSystem}
-import akka.serialization.{Serialization, SerializationExtension}
 import csw.location.api.models._
-import csw.params.core.formats.{CommonCodecs, CborHelpers}
+import csw.params.core.formats.{CborHelpers, CommonCodecs}
 import io.bullet.borer.Codec
 import io.bullet.borer.derivation.MapBasedCodecs._
 
+object LocationCodecs extends LocationCodecs
 trait LocationCodecs extends CommonCodecs {
-  implicit def actorSystem: ActorSystem[_]
-
   implicit lazy val connectionTypeCodec: Codec[ConnectionType] = CborHelpers.enumCodec[ConnectionType]
   implicit lazy val componentTypeCodec: Codec[ComponentType]   = CborHelpers.enumCodec[ComponentType]
   implicit lazy val componentIdCodec: Codec[ComponentId]       = deriveCodec[ComponentId]
@@ -23,15 +19,6 @@ trait LocationCodecs extends CommonCodecs {
     CborHelpers.bimap[ConnectionInfo, C](x => Connection.from(x).asInstanceOf[C], _.connectionInfo)
 
   implicit lazy val uriCodec: Codec[URI] = CborHelpers.bimap[String, URI](new URI(_), _.toString)
-
-  implicit def actorRefCodec[T]: Codec[ActorRef[T]] =
-    CborHelpers.bimap[String, ActorRef[T]](
-      path => {
-        val provider = SerializationExtension(actorSystem.toUntyped).system.provider
-        provider.resolveActorRef(path)
-      },
-      actorRef => Serialization.serializedActorPath(actorRef.toUntyped)
-    )
 
   implicit lazy val locationCodec: Codec[Location]         = deriveCodec[Location]
   implicit lazy val akkaLocationCodec: Codec[AkkaLocation] = deriveCodec[AkkaLocation]

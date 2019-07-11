@@ -1,7 +1,6 @@
 package csw.location.server.http
 
 import akka.NotUsed
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.http.scaladsl.marshalling.sse.EventStreamMarshalling._
 import akka.http.scaladsl.model.sse.ServerSentEvent
 import akka.http.scaladsl.server.Directives._
@@ -24,8 +23,6 @@ private[csw] class LocationRoutes(
     with LocationCodecs {
 
   import actorRuntime._
-
-  override implicit def actorSystem: ActorSystem[SpawnProtocol] = actorRuntime.typedSystem
 
   val routes: Route = cors() {
     locationExceptionHandler.route {
