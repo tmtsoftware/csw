@@ -60,13 +60,13 @@ class CommandServiceBenchmark {
   @BenchmarkMode(Array(Mode.Throughput))
   @OutputTimeUnit(TimeUnit.SECONDS)
   def commandThroughput(): SubmitResponse = {
-    Await.result(componentRef.submit(setupCommand), 5.seconds)
+    Await.result(componentRef.submitAndWait(setupCommand), 5.seconds)
   }
 
   @Benchmark
   @BenchmarkMode(Array(Mode.AverageTime))
   @OutputTimeUnit(TimeUnit.MILLISECONDS)
   def commandLatency(): SubmitResponse = {
-    Await.result(componentRef.submit(setupCommand), 5.seconds)
+    Await.result(componentRef.submitAndWait(setupCommand), 5.seconds)
   }
 }

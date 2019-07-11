@@ -78,7 +78,7 @@ class LongRunningCommandTest(ignore: Int)
       // 2. shortSetup which takes 1 second to finish
       // 3. mediumSetup which takes 3 seconds to finish
       //#subscribe-for-result
-      val eventualCommandResponse = assemblyCommandService.submit(assemblyLongSetup).map {
+      val eventualCommandResponse = assemblyCommandService.submitAndWait(assemblyLongSetup).map {
         case Invalid(runId, _) ⇒ Error(runId, "")
         case x: SubmitResponse ⇒ x
       }
@@ -93,24 +93,40 @@ class LongRunningCommandTest(ignore: Int)
       probe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(longCmdCompleted))))
       probe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(longRunningCmdCompleted))))
 
+      //Test for submit
+
       //#submit
       val setupForSubscribe = Setup(prefix, longRunning, Some(obsId))
       val response          = assemblyCommandService.submit(setupForSubscribe)
       //#submit
 
-      Await.result(response, 20.seconds) shouldBe Completed(setupForSubscribe.runId)
+      // handler will immediately give Started as response for long running command
+      Await.result(response, 5.seconds) shouldBe Started(setupForSubscribe.runId)
+
+      val finalResponse = assemblyCommandService.queryFinal(setupForSubscribe.runId)
+      Await.result(finalResponse, 20.seconds) shouldBe Completed(setupForSubscribe.runId)
+
+      //Test for submitAndWait
+
+      //#submitAndWait
+      val setupForSubscribe1 = Setup(prefix, longRunning, Some(obsId))
+      val response1          = assemblyCommandService.submitAndWait(setupForSubscribe1)
+      //#submitAndWait
+
+      Await.result(response1, 20.seconds) shouldBe Completed(setupForSubscribe1.runId)
 
       //#query-response
-      val setupForQuery = Setup(prefix, longRunning, Some(obsId))
-      val finalResponse = assemblyCommandService.submit(setupForQuery)
+      val setupForQuery1 = Setup(prefix, longRunning, Some(obsId))
+      val finalResponse1 = assemblyCommandService.submitAndWait(setupForQuery1)
 
       //do some work before querying for the result of above command as needed
-      val eventualResponse: Future[QueryResponse] = assemblyCommandService.query(setupForQuery.runId)
+      val eventualResponse1: Future[QueryResponse] = assemblyCommandService.query(setupForQuery1.runId)
       //#query-response
-      eventualResponse.map(_ shouldBe Started(setupForQuery.runId))
+
+      eventualResponse1.map(_ shouldBe Started(setupForQuery1.runId))
 
       // Use the initial future to determine the when completed
-      finalResponse.map(_ shouldBe Completed(setupForQuery.runId))
+      finalResponse1.map(_ shouldBe Completed(setupForQuery1.runId))
 
       enterBarrier("long-commands")
 

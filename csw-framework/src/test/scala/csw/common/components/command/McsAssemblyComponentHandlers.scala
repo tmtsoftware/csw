@@ -64,6 +64,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
         // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
         //#addSubCommand
         // When receiving the command, onSubmit adds three subCommands
+        commandResponseManager.addOrUpdateCommand(Started(runId))
         shortSetup = Setup(prefix, shortRunning, controlCommand.maybeObsId)
         commandResponseManager.addSubCommand(runId, shortSetup.runId)
 
@@ -120,7 +121,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
 
   private def processCommand(controlCommand: ControlCommand) = {
     hcdComponent
-      .submit(controlCommand)
+      .submitAndWait(controlCommand)
       .map {
         // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
         //#updateSubCommand

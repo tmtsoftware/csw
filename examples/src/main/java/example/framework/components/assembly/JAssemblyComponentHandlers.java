@@ -207,7 +207,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                 // An original command is split into sub-commands and sent to a component.
                 // The result from submitting the sub-commands is used to update the CRM
                 ICommandService componentCommandService = runningHcds.get(componentInfo.getConnections().get(0)).orElseThrow();
-                componentCommandService.submit(subCommand2, Timeout.durationToTimeout(FiniteDuration.apply(5, TimeUnit.SECONDS)))
+                componentCommandService.submitAndWait(subCommand2, Timeout.durationToTimeout(FiniteDuration.apply(5, TimeUnit.SECONDS)))
                         .thenAccept(commandResponse -> {
                             if (commandResponse instanceof CommandResponse.Completed) {
                                 // As the commands get completed, the results are updated in the commandResponseManager

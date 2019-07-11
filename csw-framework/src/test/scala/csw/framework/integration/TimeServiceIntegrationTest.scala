@@ -44,7 +44,7 @@ class TimeServiceIntegrationTest extends FrameworkIntegrationSuite {
     assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)
 
     implicit val timeout: Timeout = Timeout(100.millis)
-    assemblyCommandService.submit(commands.Setup(prefix, CommandName("time.service.scheduler.success"), None))
+    assemblyCommandService.submitAndWait(commands.Setup(prefix, CommandName("time.service.scheduler.success"), None))
     Thread.sleep(1000)
 
     assemblyProbe.receiveAll() should contain(CurrentState(prefix, timeServiceSchedulerState))

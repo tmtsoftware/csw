@@ -30,6 +30,7 @@ import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import csw.location.server.http.JHTTPLocationService;
 import csw.params.commands.CommandIssue;
 import csw.params.commands.CommandResponse;
+import csw.params.commands.CommandResponse.*;
 import csw.params.commands.Result;
 import csw.params.commands.Setup;
 import csw.params.core.generics.Key;
@@ -117,18 +118,18 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Parameter<Integer> intParameter1 = intKey1.set(22, 23);
         Setup imdResCommand = new Setup(prefix(), immediateResCmd(), Optional.empty()).add(intParameter1);
 
-        CompletableFuture<CommandResponse.SubmitResponse> imdResCmdResponseCompletableFuture = hcdCmdService.submit(imdResCommand, timeout);
-        CommandResponse.SubmitResponse actualImdCmdResponse = imdResCmdResponseCompletableFuture.get();
-        Assert.assertTrue(actualImdCmdResponse instanceof CommandResponse.CompletedWithResult);
+        CompletableFuture<SubmitResponse> imdResCmdResponseCompletableFuture = hcdCmdService.submitAndWait(imdResCommand, timeout);
+        SubmitResponse actualImdCmdResponse = imdResCmdResponseCompletableFuture.get();
+        Assert.assertTrue(actualImdCmdResponse instanceof CompletedWithResult);
 
         Setup immediateCmd = new Setup(prefix(), immediateCmd(), Optional.empty()).add(intParameter1);
         //#immediate-response
-        CompletableFuture<CommandResponse.SubmitResponse> immediateCommandF =
+        CompletableFuture<SubmitResponse> immediateCommandF =
                 hcdCmdService
-                        .submit(immediateCmd, timeout)
+                        .submitAndWait(immediateCmd, timeout)
                         .thenApply(
                                 response -> {
-                                    if (response instanceof CommandResponse.Completed) {
+                                    if (response instanceof Completed) {
                                         //do something with completed result
                                     } else {
                                         // do something with unexpected response
@@ -137,43 +138,43 @@ public class JCommandIntegrationTest extends JUnitSuite {
                                 }
                         );
         //#immediate-response
-        Assert.assertTrue(immediateCommandF.get() instanceof CommandResponse.Completed);
+        Assert.assertTrue(immediateCommandF.get() instanceof Completed);
 
         Key<Integer> intKey2 = JKeyType.IntKey().make("encoder");
         Parameter<Integer> intParameter2 = intKey2.set(22, 23);
         //#invalidCmd
         Setup invalidSetup = new Setup(prefix(), invalidCmd(), Optional.empty()).add(intParameter2);
-        CompletableFuture<CommandResponse.SubmitResponse> invalidCommandF =
-                hcdCmdService.submit(invalidSetup, timeout).thenApply(
+        CompletableFuture<SubmitResponse> invalidCommandF =
+                hcdCmdService.submitAndWait(invalidSetup, timeout).thenApply(
                         response -> {
-                            if (response instanceof CommandResponse.Completed) {
+                            if (response instanceof Completed) {
                                 //do something with completed result
-                            } else if (response instanceof CommandResponse.Invalid) {
+                            } else if (response instanceof Invalid) {
                                 // Cast the response to get the issue
-                                CommandResponse.Invalid invalid = (CommandResponse.Invalid) response;
+                                Invalid invalid = (Invalid) response;
                                 assert (invalid.issue().reason().contains("failure"));
                             }
                             return response;
                         }
                 );
         //#invalidCmd
-        CommandResponse.Invalid expectedInvalidResponse = new CommandResponse.Invalid(invalidSetup.runId(), new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
+        Invalid expectedInvalidResponse = new Invalid(invalidSetup.runId(), new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
         Assert.assertEquals(expectedInvalidResponse, invalidCommandF.get());
 
-        CompletableFuture<CommandResponse.SubmitResponse> imdInvalidCmdResponseCompletableFuture = hcdCmdService.submit(invalidSetup, timeout);
-        CommandResponse.SubmitResponse actualImdInvalidCmdResponse = imdInvalidCmdResponseCompletableFuture.get();
-        Assert.assertTrue(actualImdInvalidCmdResponse instanceof CommandResponse.Invalid);
+        CompletableFuture<SubmitResponse> imdInvalidCmdResponseCompletableFuture = hcdCmdService.submitAndWait(invalidSetup, timeout);
+        SubmitResponse actualImdInvalidCmdResponse = imdInvalidCmdResponseCompletableFuture.get();
+        Assert.assertTrue(actualImdInvalidCmdResponse instanceof Invalid);
 
         // long running command which does not use matcher
         //#longRunning
         Setup longRunningSetup1 = new Setup(prefix(), longRunningCmd(), Optional.empty()).add(intParameter1);
         Key<Integer> encoder = JKeyType.IntKey().make("encoder");
         CompletableFuture<Optional<Integer>> longRunningResultF =
-                hcdCmdService.submit(longRunningSetup1, timeout)
+                hcdCmdService.submitAndWait(longRunningSetup1, timeout)
                         .thenCompose(response -> {
-                            if (response instanceof CommandResponse.CompletedWithResult) {
+                            if (response instanceof CompletedWithResult) {
                                 // This extracts and returns the the first value of parameter encoder
-                                Result result = ((CommandResponse.CompletedWithResult) response).result();
+                                Result result = ((CompletedWithResult) response).result();
                                 Optional<Integer> rvalue = Optional.of(result.jGet(encoder).orElseThrow().head());
                                 return CompletableFuture.completedFuture(rvalue);
                             } else {
@@ -187,15 +188,26 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Optional<Integer> actualCmdResponse = longRunningResultF.get();
         Assert.assertEquals(expectedCmdResponse, actualCmdResponse);
 
+        //#submit
+        Setup submitSetup = new Setup(prefix(), longRunningCmd(), Optional.empty()).add(intParameter1);
+        CompletableFuture<SubmitResponse> submitResponse = hcdCmdService.submit(submitSetup, timeout);
+        //#submit
+
+        SubmitResponse actualSubmitResponse = submitResponse.get();
+
+        Started expectedSubmitResponse = new Started(submitSetup.runId());
+        Assert.assertEquals(actualSubmitResponse, expectedSubmitResponse);
+        Assert.assertTrue(actualSubmitResponse instanceof Started);
+
         //#queryLongRunning
         Setup longRunningSetup2 = longRunningSetup1.cloneCommand();
-        CompletableFuture<CommandResponse.SubmitResponse> longRunningQueryResultF =
-                hcdCmdService.submit(longRunningSetup2, timeout);
+        CompletableFuture<SubmitResponse> longRunningQueryResultF =
+                hcdCmdService.submitAndWait(longRunningSetup2, timeout);
 
         // do some work before querying for the result of above command as needed
-        CompletableFuture<CommandResponse.QueryResponse> queryResponseF = hcdCmdService.query(longRunningSetup2.runId(), timeout);
+        CompletableFuture<QueryResponse> queryResponseF = hcdCmdService.query(longRunningSetup2.runId(), timeout);
         queryResponseF.thenAccept(r -> {
-            if (r instanceof CommandResponse.Started) {
+            if (r instanceof Started) {
                 // happy case - no action needed
                 // Do some other work
             } else {
@@ -205,28 +217,28 @@ public class JCommandIntegrationTest extends JUnitSuite {
 
         CompletableFuture<Optional<Integer>> intF =
                 longRunningQueryResultF.thenCompose(response -> {
-            if (response instanceof CommandResponse.CompletedWithResult) {
-                // This extracts and returns the the first value of parameter encoder
-                Result result = ((CommandResponse.CompletedWithResult) response).result();
-                Optional<Integer> rvalue = Optional.of(result.jGet(encoder).orElseThrow().head());
-                return CompletableFuture.completedFuture(rvalue);
-            } else {
-                // For some other response, return empty
-                return CompletableFuture.completedFuture(Optional.empty());
-            }
-        });
+                    if (response instanceof CompletedWithResult) {
+                        // This extracts and returns the the first value of parameter encoder
+                        Result result = ((CompletedWithResult) response).result();
+                        Optional<Integer> rvalue = Optional.of(result.jGet(encoder).orElseThrow().head());
+                        return CompletableFuture.completedFuture(rvalue);
+                    } else {
+                        // For some other response, return empty
+                        return CompletableFuture.completedFuture(Optional.empty());
+                    }
+                });
         Assert.assertEquals(Optional.of(20), intF.get());
         //#queryLongRunning
 
         //#queryFinal
         Setup longRunningSetup3 = longRunningSetup1.cloneCommand();
-        hcdCmdService.submit(longRunningSetup3, timeout);
+        hcdCmdService.submitAndWait(longRunningSetup3, timeout);
 
         CompletableFuture<Optional<Integer>> int3F =
                 hcdCmdService.queryFinal(longRunningSetup3.runId(), timeout).thenCompose(response -> {
-                    if (response instanceof CommandResponse.CompletedWithResult) {
+                    if (response instanceof CompletedWithResult) {
                         // This extracts and returns the the first value of parameter encoder
-                        Result result = ((CommandResponse.CompletedWithResult) response).result();
+                        Result result = ((CompletedWithResult) response).result();
                         Optional<Integer> rvalue = Optional.of(result.jGet(encoder).orElseThrow().head());
                         return CompletableFuture.completedFuture(rvalue);
                     } else {
@@ -242,7 +254,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         CompletableFuture onewayF = hcdCmdService
                 .oneway(onewaySetup, timeout)
                 .thenAccept(onewayResponse -> {
-                    if (onewayResponse instanceof CommandResponse.Invalid) {
+                    if (onewayResponse instanceof Invalid) {
                         // log an error here
                     } else {
                         // Ignore anything other than invalid
@@ -258,10 +270,10 @@ public class JCommandIntegrationTest extends JUnitSuite {
                         .validate(immediateCmd)
                         .thenApply(
                                 response -> {
-                                    if (response instanceof CommandResponse.Accepted) {
+                                    if (response instanceof Accepted) {
                                         //do something with completed result
                                         return true;
-                                    } else if (response instanceof CommandResponse.Invalid) {
+                                    } else if (response instanceof Invalid) {
                                         // do something with unexpected response
                                         return false;
                                     } else {
@@ -274,8 +286,8 @@ public class JCommandIntegrationTest extends JUnitSuite {
         //#validate
 
         //#query
-        CompletableFuture<CommandResponse.QueryResponse> queryResponseF2 = hcdCmdService.query(longRunningSetup2.runId(), timeout);
-        Assert.assertTrue(queryResponseF2.get() instanceof CommandResponse.CompletedWithResult);
+        CompletableFuture<QueryResponse> queryResponseF2 = hcdCmdService.query(longRunningSetup2.runId(), timeout);
+        Assert.assertTrue(queryResponseF2.get() instanceof CompletedWithResult);
         //#query
 
         Parameter<Integer> encoderParam = JKeyType.IntKey().make("encoder").set(22, 23);
@@ -285,30 +297,30 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Setup submitAllSetup2 = new Setup(prefix(), longRunningCmd(), Optional.empty()).add(encoderParam);
         Setup submitAllSetup3 = new Setup(prefix(), invalidCmd(), Optional.empty()).add(encoderParam);
 
-        CompletableFuture<List<CommandResponse.SubmitResponse>> submitAllF = hcdCmdService
+        CompletableFuture<List<SubmitResponse>> submitAllF = hcdCmdService
                 .submitAll(
                         List.of(submitAllSetup1, submitAllSetup2, submitAllSetup3),
                         timeout
                 );
 
-        List<CommandResponse.SubmitResponse> submitAllResponse = submitAllF.get();
+        List<SubmitResponse> submitAllResponse = submitAllF.get();
         Assert.assertEquals(submitAllResponse.size(), 3);
-        Assert.assertTrue(submitAllResponse.get(0) instanceof CommandResponse.Completed);
-        Assert.assertTrue(submitAllResponse.get(1) instanceof CommandResponse.CompletedWithResult);
-        Assert.assertTrue(submitAllResponse.get(2) instanceof CommandResponse.Invalid);
+        Assert.assertTrue(submitAllResponse.get(0) instanceof Completed);
+        Assert.assertTrue(submitAllResponse.get(1) instanceof CompletedWithResult);
+        Assert.assertTrue(submitAllResponse.get(2) instanceof Invalid);
         //#submitAll
 
         //#submitAllInvalid
-        CompletableFuture<List<CommandResponse.SubmitResponse>> submitAllF2 = hcdCmdService
+        CompletableFuture<List<SubmitResponse>> submitAllF2 = hcdCmdService
                 .submitAll(
                         List.of(submitAllSetup1, submitAllSetup3, submitAllSetup2),
                         timeout
                 );
 
-        List<CommandResponse.SubmitResponse> submitAllResponse2 = submitAllF2.get();
+        List<SubmitResponse> submitAllResponse2 = submitAllF2.get();
         Assert.assertEquals(submitAllResponse2.size(), 2);
-        Assert.assertTrue(submitAllResponse2.get(0) instanceof CommandResponse.Completed);
-        Assert.assertTrue(submitAllResponse2.get(1) instanceof CommandResponse.Invalid);
+        Assert.assertTrue(submitAllResponse2.get(0) instanceof Completed);
+        Assert.assertTrue(submitAllResponse2.get(1) instanceof Invalid);
         //#submitAllInvalid
 
         //#subscribeCurrentState
@@ -352,13 +364,13 @@ public class JCommandIntegrationTest extends JUnitSuite {
 
         // Submit command as a oneway and if the command is successfully validated,
         // check for matching of demand state against current state
-        CompletableFuture<CommandResponse.MatchingResponse> matchResponseF = hcdCmdService
+        CompletableFuture<MatchingResponse> matchResponseF = hcdCmdService
                 .oneway(setupWithMatcher, timeout)
                 .thenCompose(initialCommandResponse -> {
-                    if (initialCommandResponse instanceof CommandResponse.Accepted) {
+                    if (initialCommandResponse instanceof Accepted) {
                         return matcherResponseFuture.thenApply(matcherResponse -> {
                             if (matcherResponse.getClass().isAssignableFrom(MatcherResponses.jMatchCompleted().getClass()))
-                                return new CommandResponse.Completed(initialCommandResponse.runId());
+                                return new Completed(initialCommandResponse.runId());
                             else
                                 return new CommandResponse.Error(initialCommandResponse.runId(), "Match not completed");
                         });
@@ -369,8 +381,8 @@ public class JCommandIntegrationTest extends JUnitSuite {
                     }
                 });
 
-        CommandResponse.MatchingResponse actualResponse = matchResponseF.get();
-        CommandResponse.Completed expectedResponse = new CommandResponse.Completed(setupWithMatcher.runId());
+        MatchingResponse actualResponse = matchResponseF.get();
+        Completed expectedResponse = new Completed(setupWithMatcher.runId());
         Assert.assertEquals(expectedResponse, actualResponse);
         //#matcher
 
@@ -382,13 +394,13 @@ public class JCommandIntegrationTest extends JUnitSuite {
         //Matcher matcher1 = new Matcher(AkkaLocationExt.RichAkkaLocation(hcdLocation).componentRef().narrow(), demandMatcher, ec, mat);
 
         // start the matcher so that it is ready to receive state published by the source
-       // CompletableFuture<MatcherResponse> matcherResponse = matcher1.jStart();
+        // CompletableFuture<MatcherResponse> matcherResponse = matcher1.jStart();
 
-        CompletableFuture<CommandResponse.MatchingResponse> matchedCommandResponse =
+        CompletableFuture<MatchingResponse> matchedCommandResponse =
                 hcdCmdService.onewayAndMatch(setupWithMatcher, stateMatcher, timeout);
 
         //#onewayAndMatch
-        Assert.assertEquals(new CommandResponse.Completed(setupWithMatcher.runId()), matchedCommandResponse.get());
+        Assert.assertEquals(new Completed(setupWithMatcher.runId()), matchedCommandResponse.get());
         //Assert.assertEquals(MatcherResponses.MatchCompleted$.MODULE$, matcherResponse.get());
     }
 
@@ -407,20 +419,20 @@ public class JCommandIntegrationTest extends JUnitSuite {
 
         // Send command to locked component and verify that it is not allowed
         Setup imdSetupCommand = new Setup(invalidPrefix(), immediateCmd(), Optional.empty()).add(intParameter2);
-        CompletableFuture<CommandResponse.SubmitResponse> lockedCmdResCompletableFuture = hcdCmdService.submit(imdSetupCommand, timeout);
-        CommandResponse.SubmitResponse actualLockedCmdResponse = lockedCmdResCompletableFuture.get();
+        CompletableFuture<SubmitResponse> lockedCmdResCompletableFuture = hcdCmdService.submitAndWait(imdSetupCommand, timeout);
+        SubmitResponse actualLockedCmdResponse = lockedCmdResCompletableFuture.get();
 
         String reason = "This component is locked by component " + prefix();
-        CommandResponse.Locked expectedLockedCmdResponse = new CommandResponse.Locked(imdSetupCommand.runId());
+        Locked expectedLockedCmdResponse = new Locked(imdSetupCommand.runId());
         Assert.assertEquals(expectedLockedCmdResponse, actualLockedCmdResponse);
 
         // Unlock component
         AkkaLocationExt.RichAkkaLocation(hcdLocation).componentRef(hcdActorSystem).tell(new SupervisorLockMessage.Unlock(prefix(), probe.ref()));
         probe.expectMessage(LockingResponse.lockReleased());
 
-        CompletableFuture<CommandResponse.SubmitResponse> cmdAfterUnlockResCompletableFuture = hcdCmdService.submit(imdSetupCommand, timeout);
-        CommandResponse.SubmitResponse actualCmdResponseAfterUnlock = cmdAfterUnlockResCompletableFuture.get();
-        Assert.assertTrue(actualCmdResponseAfterUnlock instanceof CommandResponse.Completed);
+        CompletableFuture<SubmitResponse> cmdAfterUnlockResCompletableFuture = hcdCmdService.submitAndWait(imdSetupCommand, timeout);
+        SubmitResponse actualCmdResponseAfterUnlock = cmdAfterUnlockResCompletableFuture.get();
+        Assert.assertTrue(actualCmdResponseAfterUnlock instanceof Completed);
     }
 
     // DEOPSCSW-208: Report failure on Configuration Completion command
@@ -432,15 +444,15 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Setup failureResCommand1 = new Setup(prefix(), failureAfterValidationCmd(), Optional.empty()).add(intParameter1);
 
         //#submit
-        CompletableFuture<CommandResponse.SubmitResponse> finalResponseCompletableFuture = hcdCmdService.submit(failureResCommand1, timeout);
-        CommandResponse.SubmitResponse actualValidationResponse = finalResponseCompletableFuture.get();
+        CompletableFuture<SubmitResponse> finalResponseCompletableFuture = hcdCmdService.submitAndWait(failureResCommand1, timeout);
+        SubmitResponse actualValidationResponse = finalResponseCompletableFuture.get();
         //#submit
 
         Assert.assertTrue(actualValidationResponse instanceof CommandResponse.Error);
 
         // using separate submit and subscribe API
         Setup failureResCommand2 = new Setup(prefix(), failureAfterValidationCmd(), Optional.empty()).add(intParameter1);
-        CompletableFuture<CommandResponse.SubmitResponse> validationResponse = hcdCmdService.submit(failureResCommand2, timeout);
+        CompletableFuture<SubmitResponse> validationResponse = hcdCmdService.submitAndWait(failureResCommand2, timeout);
         Assert.assertTrue(validationResponse.get() instanceof CommandResponse.Error);  // This should fail but I guess not typed by compiler
     }
 
@@ -452,14 +464,14 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Setup setupHcd1 = new Setup(prefix(), shortRunning(), Optional.empty()).add(encoderParam);
         Setup setupHcd2 = new Setup(prefix(), mediumRunning(), Optional.empty()).add(encoderParam);
 
-        CompletableFuture<List<CommandResponse.SubmitResponse>> finalCommandResponse = hcdCmdService
+        CompletableFuture<List<SubmitResponse>> finalCommandResponse = hcdCmdService
                 .submitAll(
                         List.of(setupHcd1, setupHcd2),
                         timeout
                 );
 
-        List<CommandResponse.SubmitResponse> actualSubmitResponses = finalCommandResponse.get();
-        List<CommandResponse.Completed> expectedResponses = List.of(new CommandResponse.Completed(setupHcd1.runId()), new CommandResponse.Completed(setupHcd2.runId()));
+        List<SubmitResponse> actualSubmitResponses = finalCommandResponse.get();
+        List<Completed> expectedResponses = List.of(new Completed(setupHcd1.runId()), new Completed(setupHcd2.runId()));
         Assert.assertEquals(expectedResponses, actualSubmitResponses);
     }
 
@@ -478,7 +490,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         CurrentStateSubscription subscription = hcdCmdService.subscribeCurrentState(currentState -> probe.ref().tell(currentState));
         //#subscribeCurrentState
 
-        hcdCmdService.submit(setup, timeout);
+        hcdCmdService.submitAndWait(setup, timeout);
 
         CurrentState currentState = new CurrentState(SampleComponentState.prefix(), new StateName("testStateName"));
         CurrentState expectedValidationCurrentState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.commandValidationChoice()));
@@ -493,7 +505,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         subscription.unsubscribe();
         Thread.sleep(1000);
 
-        hcdCmdService.submit(setup, timeout);
+        hcdCmdService.submitAndWait(setup, timeout);
         probe.expectNoMessage(java.time.Duration.ofMillis(20));
     }
 
@@ -513,7 +525,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         CurrentStateSubscription subscription = hcdCmdService.subscribeCurrentState(Set.of(StateName.apply("testStateSetup")), currentState -> inbox.getRef().tell(currentState));
         //#subscribeOnlyCurrentState
 
-        hcdCmdService.submit(setup, timeout);
+        hcdCmdService.submitAndWait(setup, timeout);
 
         CurrentState currentState = new CurrentState(SampleComponentState.prefix(), new StateName("testStateName"));
         CurrentState expectedValidationCurrentState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.commandValidationChoice()));
@@ -533,18 +545,18 @@ public class JCommandIntegrationTest extends JUnitSuite {
     @Test
     public void testCRMUsageForCompletion() throws Exception {
         Setup crmAddSetup = new Setup(prefix(), crmAddOrUpdateCmd(), Optional.empty());
-        CompletableFuture<CommandResponse.SubmitResponse> addOrUpdateCommandF =
-                hcdCmdService.submit(crmAddSetup, timeout);
-        CommandResponse.Completed expectedResponse = new CommandResponse.Completed(crmAddSetup.runId());
+        CompletableFuture<SubmitResponse> addOrUpdateCommandF =
+                hcdCmdService.submitAndWait(crmAddSetup, timeout);
+        Completed expectedResponse = new Completed(crmAddSetup.runId());
         Assert.assertEquals(expectedResponse, addOrUpdateCommandF.get());
     }
 
     @Test
     public void testCRMUsageForSubCommands() throws Exception {
         Setup crmAddSetup = new Setup(prefix(), crmAddOrUpdateCmd(), Optional.empty());
-        CompletableFuture<CommandResponse.SubmitResponse> addOrUpdateCommandF =
-                hcdCmdService.submit(crmAddSetup, timeout);
-        CommandResponse.Completed expectedResponse = new CommandResponse.Completed(crmAddSetup.runId());
+        CompletableFuture<SubmitResponse> addOrUpdateCommandF =
+                hcdCmdService.submitAndWait(crmAddSetup, timeout);
+        Completed expectedResponse = new Completed(crmAddSetup.runId());
         Assert.assertEquals(expectedResponse, addOrUpdateCommandF.get());
     }
 }

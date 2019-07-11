@@ -5,10 +5,10 @@ import java.util.concurrent.TimeoutException
 import akka.actor.Scheduler
 import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.typed.{ActorRef, ActorSystem}
-import akka.stream.{KillSwitches, Materializer, OverflowStrategy}
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.typed.scaladsl
 import akka.stream.typed.scaladsl.ActorSource
+import akka.stream.{KillSwitches, Materializer, OverflowStrategy}
 import akka.util.Timeout
 import csw.command.api.scaladsl.CommandService
 import csw.command.api.{CurrentStateSubscription, StateMatcher}
@@ -43,13 +43,14 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
     component ? (Validate(controlCommand, _))
   }
 
-  override def submit(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] = {
-    val eventualResponse: Future[SubmitResponse] = component ? (Submit(controlCommand, _))
-    eventualResponse.flatMap {
-      case _: Started ⇒ component ? (CommandResponseManagerMessage.Subscribe(controlCommand.runId, _))
+  override def submit(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] =
+    component ? (Submit(controlCommand, _))
+
+  override def submitAndWait(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] =
+    submit(controlCommand).flatMap {
+      case _: Started ⇒ queryFinal(controlCommand.runId)
       case x          ⇒ Future.successful(x)
     }
-  }
 
   override def submitAll(
       submitCommands: List[ControlCommand]
@@ -58,7 +59,7 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
     class CommandFailureException(val r: SubmitResponse) extends Exception(r.toString)
 
     Source(submitCommands)
-      .mapAsync(1)(submit)
+      .mapAsync(1)(submitAndWait)
       .map { response =>
         if (isNegative(response))
           throw new CommandFailureException(response)

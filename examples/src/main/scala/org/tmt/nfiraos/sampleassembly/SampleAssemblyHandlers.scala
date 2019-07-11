@@ -60,7 +60,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
     val setupCommand                    = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
     // submit command and handle response
-    hcd.submit(setupCommand).onComplete {
+    hcd.submitAndWait(setupCommand).onComplete {
       case scala.util.Success(value) =>
         value match {
           case _: CommandResponse.Locked => log.error("Sleep command failed: HCD is locked.")
@@ -83,7 +83,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
     val setupCommand                    = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
     async {
-      await(hcd.submit(setupCommand)) match {
+      await(hcd.submitAndWait(setupCommand)) match {
         case _: CommandResponse.Locked    => log.error("HCD is locked.")
         case inv: CommandResponse.Invalid => log.error(s"Command is invalid: ${inv.issue.reason}")
         case x: CommandResponse.Error     => log.error(s"Command Completed with error: ${x.message}")
@@ -103,7 +103,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
     val setupCommand                    = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
     // Submit command, and handle validation response. Final response is returned as a Future
-    val submitCommandResponseF: Future[SubmitResponse] = hcd.submit(setupCommand).map {
+    val submitCommandResponseF: Future[SubmitResponse] = hcd.submitAndWait(setupCommand).map {
       case x @ (Invalid(_, _) | Locked(_)) =>
         log.error("Sleep command invalid")
         x

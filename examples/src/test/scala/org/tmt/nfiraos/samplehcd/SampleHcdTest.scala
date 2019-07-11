@@ -90,7 +90,7 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
 
     val hcd = CommandServiceFactory.make(akkaLocation)
     // submit command and handle response
-    val responseF = hcd.submit(setupCommand)
+    val responseF = hcd.submitAndWait(setupCommand)
 
     Await.result(responseF, 10000.millis) shouldBe CommandResponse.Completed(setupCommand.runId)
   }
@@ -114,7 +114,7 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
 
     // submit command and handle response
     intercept[java.util.concurrent.TimeoutException] {
-      val responseF = hcd.submit(setupCommand)
+      val responseF = hcd.submitAndWait(setupCommand)
       Await.result(responseF, 10000.millis) shouldBe CommandResponse.Completed(setupCommand.runId)
     }
   }

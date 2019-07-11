@@ -84,7 +84,7 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
 
     implicit val timeout: Timeout = Timeout(100.millis)
     a[TimeoutException] shouldBe thrownBy(
-      disperserCommandService.submit(commands.Setup(prefix, CommandName("isAlive"), None)).await(200.millis)
+      disperserCommandService.submitAndWait(commands.Setup(prefix, CommandName("isAlive"), None)).await(200.millis)
     )
 
     subscription.unsubscribe()

@@ -60,9 +60,9 @@ class EventServiceIntegrationTest extends FrameworkIntegrationSuite {
     assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)
 
     implicit val timeout: Timeout = Timeout(100.millis)
-    assemblyCommandService.submit(commands.Setup(prefix, CommandName("subscribe.event.success"), None))
+    assemblyCommandService.submitAndWait(commands.Setup(prefix, CommandName("subscribe.event.success"), None))
     Thread.sleep(1000)
-    disperserCommandService.submit(commands.Setup(prefix, CommandName("publish.event.success"), None))
+    disperserCommandService.submitAndWait(commands.Setup(prefix, CommandName("publish.event.success"), None))
     Thread.sleep(1000)
 
     val states = assemblyProbe.receiveAll().filter(_.paramSet.contains(choiceKey.set(eventReceivedChoice)))

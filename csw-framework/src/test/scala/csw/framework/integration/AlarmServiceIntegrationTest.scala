@@ -60,7 +60,7 @@ class AlarmServiceIntegrationTest extends FrameworkIntegrationSuite {
     val commandService = CommandServiceFactory.make(location.get)
 
     implicit val timeout: Timeout = Timeout(1000.millis)
-    commandService.submit(Setup(prefix, setSeverityCommand, None)).await
+    commandService.submitAndWait(Setup(prefix, setSeverityCommand, None)).await
     Thread.sleep(1000)
 
     adminAlarmService.getCurrentSeverity(testAlarmKey).await shouldEqual testSeverity

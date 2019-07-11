@@ -142,7 +142,7 @@ class CommandServiceTest(ignore: Int)
 
       //#invalidCmd
       val invalidSetup    = Setup(prefix, invalidCmd, obsId)
-      val invalidCommandF = assemblyCmdService.submit(invalidSetup)
+      val invalidCommandF = assemblyCmdService.submitAndWait(invalidSetup)
       async {
         await(invalidCommandF) match {
           case Completed(runId) =>
@@ -161,7 +161,7 @@ class CommandServiceTest(ignore: Int)
       //#immediate-response
       val immediateSetup = Setup(prefix, immediateCmd, obsId)
       val immediateCommandF = async {
-        await(assemblyCmdService.submit(immediateSetup)) match {
+        await(assemblyCmdService.submitAndWait(immediateSetup)) match {
           case response: Completed ⇒
             //do something with completed result
             response
@@ -177,7 +177,7 @@ class CommandServiceTest(ignore: Int)
       val longRunningSetup1 = Setup(prefix, longRunningCmd, obsId)
 
       val longRunningResultF = async {
-        await(assemblyCmdService.submit(longRunningSetup1)) match {
+        await(assemblyCmdService.submitAndWait(longRunningSetup1)) match {
           case CompletedWithResult(_, result) =>
             Some(result(encoder).head)
 
@@ -196,7 +196,7 @@ class CommandServiceTest(ignore: Int)
       val longRunningSetup2 = longRunningSetup1.cloneCommand
       val longRunningQueryResultF = async {
         // The following val is set so we can do query and work and complete later
-        val longRunningF = assemblyCmdService.submit(longRunningSetup2)
+        val longRunningF = assemblyCmdService.submitAndWait(longRunningSetup2)
 
         await(assemblyCmdService.query(longRunningSetup2.runId)) match {
           case Started(runId) =>
@@ -224,7 +224,7 @@ class CommandServiceTest(ignore: Int)
       val longRunningSetup3 = longRunningSetup1.cloneCommand
       val queryFinalF = async {
         // The following submit is made without saving the Future!
-        assemblyCmdService.submit(longRunningSetup3)
+        assemblyCmdService.submitAndWait(longRunningSetup3)
 
         // Use queryFinal and runId to wait for completion and result
         await(assemblyCmdService.queryFinal(longRunningSetup3.runId)) match {

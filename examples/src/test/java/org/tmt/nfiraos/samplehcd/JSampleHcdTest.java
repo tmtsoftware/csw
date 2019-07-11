@@ -125,7 +125,7 @@ public class JSampleHcdTest extends JUnitSuite {
 
         ICommandService hcd = CommandServiceFactory.jMake(location, typedActorSystem);
 
-        Assert.assertEquals(hcd.submit(setupCommand, commandResponseTimeout).get(), new CommandResponse.Completed(setupCommand.runId()));
+        Assert.assertEquals(hcd.submitAndWait(setupCommand, commandResponseTimeout).get(), new CommandResponse.Completed(setupCommand.runId()));
     }
     //#submit
 
@@ -151,7 +151,7 @@ public class JSampleHcdTest extends JUnitSuite {
         ICommandService hcd = CommandServiceFactory.jMake(location, typedActorSystem);
 
         thrown.expect(ExecutionException.class);
-        hcd.submit(setupCommand, commandResponseTimeout).get();
+        hcd.submitAndWait(setupCommand, commandResponseTimeout).get();
     }
     //#exception
 }

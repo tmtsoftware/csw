@@ -4,9 +4,9 @@ import akka.actor.typed.scaladsl.ActorContext
 import csw.command.client.messages.TopLevelActorCommonMessage.TrackingEventReceived
 import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
-import csw.params.commands.ControlCommand
 import csw.location.api.models.{Connection, TrackingEvent}
 import csw.params.commands.CommandResponse.{SubmitResponse, ValidateCommandResponse}
+import csw.params.commands.ControlCommand
 
 import scala.concurrent.Future
 

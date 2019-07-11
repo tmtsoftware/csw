@@ -100,7 +100,7 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
         Timeout commandResponseTimeout = new Timeout(10, TimeUnit.SECONDS);
 
         // Submit command, and handle validation response. Final response is returned as a Future
-        CompletableFuture<CommandResponse.SubmitResponse> submitCommandResponseF = hcd.submit(setupCommand, submitTimeout)
+        CompletableFuture<CommandResponse.SubmitResponse> submitCommandResponseF = hcd.submitAndWait(setupCommand, submitTimeout)
                 .thenCompose(commandResponse -> {
                     if (! (commandResponse instanceof CommandResponse.Invalid || commandResponse instanceof CommandResponse.Locked)) {
                         return CompletableFuture.completedFuture(commandResponse);

@@ -174,7 +174,7 @@ class ContainerCmdTest(ignore: Int)
       val laserAssemblySupervisor = laserContainerComponents.head.supervisor
       val laserCompStateProbe     = TestProbe[CurrentState]
 
-      etonCommandService.submit(setupFailure).map { commandResponse ⇒
+      etonCommandService.submitAndWait(setupFailure).map { commandResponse ⇒
         commandResponse shouldBe Invalid
         eatonCompStateProbe
           .expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(commandValidationChoice))))

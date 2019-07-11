@@ -25,6 +25,9 @@ private[command] class JCommandServiceImpl(commandService: CommandService) exten
   override def submit(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[SubmitResponse] =
     commandService.submit(controlCommand)(timeout).toJava.toCompletableFuture
 
+  override def submitAndWait(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[SubmitResponse] =
+    commandService.submitAndWait(controlCommand)(timeout).toJava.toCompletableFuture
+
   override def submitAll(
       controlCommand: java.util.List[ControlCommand],
       timeout: Timeout

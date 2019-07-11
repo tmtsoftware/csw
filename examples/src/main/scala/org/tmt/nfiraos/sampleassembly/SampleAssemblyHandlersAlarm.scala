@@ -64,7 +64,7 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
     val setupCommand                    = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
     // Submit command, and handle validation response. Final response is returned as a Future
-    val submitCommandResponseF: Future[SubmitResponse] = hcd.submit(setupCommand).flatMap {
+    val submitCommandResponseF: Future[SubmitResponse] = hcd.submitAndWait(setupCommand).flatMap {
       case x @ (Invalid(_, _) | Locked(_)) =>
         log.error("Sleep command invalid")
         Future(x)

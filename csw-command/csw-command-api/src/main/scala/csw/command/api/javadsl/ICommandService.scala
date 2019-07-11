@@ -25,13 +25,21 @@ trait ICommandService {
   def validate(controlCommand: ControlCommand): CompletableFuture[ValidateResponse]
 
   /**
+   * Submit given command and returns [[csw.params.commands.CommandResponse.SubmitResponse]] as a Future
+   *
+   * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
+   * @return a CommandResponse as a Future value
+   */
+  def submit(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[SubmitResponse]
+
+  /**
    * Submit a command and Subscribe for the result if it was successfully validated as `Started` to get a
    * final [[csw.params.commands.CommandResponse.SubmitResponse]] as a Future
    *
    * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
    * @return a CommandResponse as a Future value
    */
-  def submit(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[SubmitResponse]
+  def submitAndWait(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[SubmitResponse]
 
   /**
    * Submit multiple commands and get a Source of [[csw.params.commands.CommandResponse.SubmitResponse]] for all commands. The CommandResponse can be a response
