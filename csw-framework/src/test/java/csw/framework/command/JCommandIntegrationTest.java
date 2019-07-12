@@ -188,8 +188,13 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Optional<Integer> actualCmdResponse = longRunningResultF.get();
         Assert.assertEquals(expectedCmdResponse, actualCmdResponse);
 
+        //#submit
         Setup submitSetup = new Setup(prefix(), longRunningCmd(), Optional.empty()).add(intParameter1);
+
         CompletableFuture<SubmitResponse> submitResponse = hcdCmdService.submit(submitSetup, timeout);
+
+        CompletableFuture<SubmitResponse> finalSubmitResponse = hcdCmdService.queryFinal(submitSetup.runId(), timeout);
+        //#submit
 
         SubmitResponse actualSubmitResponse = submitResponse.get();
 

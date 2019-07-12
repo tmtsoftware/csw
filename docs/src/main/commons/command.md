@@ -157,6 +157,63 @@ created for each component for which commands are to be sent.
 
 The API can be exercised as follows for different scenarios of command-based communication:
 
+### submit
+Sending a `submit` message with a command returns a `SubmitResponse` as a Future.
+The Future returned by `submit` will always be the final response in case of short running command, which may be a positive completion (Completed or
+CompletedWithResult) or a negative completion (`Invalid`, `Error`, `Cancelled`, `Locked`). In case of long running command, `Started` response is returned and then
+user can either `query` for response or `queryFinal`  for final response.
+
+This example shows an immediate response command using `submit` that returns `Started`, and `queryFinal` to get the final response.
+
+Scala/submit w/immediate-response
+:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #submit }
+
+Java/submit w/immediate-response
+:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #submit }
+
+Note that the Scala examples are using `async/await` which simplifies handling the Futures, but is not necessary.
+The `async/await` library is not available in Java.
+If using `submit` and the validation fails in the destination component, 
+the `Invalid` response is returned.
+
+Scala/submit w/invalid response
+:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #invalidCmd }
+
+Java/submit w/invalid response
+:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #invalidCmd }
+
+The handling of long-running and immediate completion commands look the same from the command sender's
+perspective. The following example shows a long-running command that returns a value when
+the command action completes with a result.
+
+Scala/submit long running
+:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #longRunning }
+
+Java/submit long running
+:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #longRunning }
+
+If a command is long-running and the sender needs to determine that the
+actions have started properly, the `query` method of `CommandService` can be used as shown in the
+following example without using the Future returned by `submit`, which provides the final
+completion notification.
+
+Scala/submit long running/query
+:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #queryLongRunning }
+
+Java/submit long running/query
+:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #queryLongRunning }
+
+It's also possible to use the runId of the `Setup` with `queryFinal` to determine when the actions are completed. 
+This is equivalent to using the Future returned by `submit`, but in this case, the original Future from `submit` is not available.
+
+Scala/submit long running/queryFinal
+:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #queryFinal }
+
+Java/submit long running/queryFinal
+:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #queryFinal }
+ 
+
+
 ### submitAndWait
 `submitAndWait` is wrapper method which sends `submit` message and waits for final response.
 Sending a `submit` message with a command returns a `SubmitResponse` as a Future.
@@ -254,12 +311,12 @@ Scala/query usage
 Java/query usage
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #query }
 
-### submitAll
+### submitAllAndWait
 `SubmitAll` can be used to send multiple commands sequentially to the same component.
 This could be used to send initialization commands to an HCD, for instance. The
-argument for `submitAll` is a list of commands. `SubmitAll` returns a list of `SubmitResponse`s--one
-for each command in the list.  While `submit` returns a `SubmitResponse`
-as a Future, `submitAll` returns a list of `SubmitResponse`s as a future, which completes when
+argument for `submitAllAndWait` is a list of commands. `SubmitAll` returns a list of `SubmitResponse`s--one
+for each command in the list.  While `submitAndWait` returns a `SubmitResponse`
+as a Future, `submitAllAndWait` returns a list of `SubmitResponse`s as a future, which completes when
 all the commands in the list have completed. 
 
 Scala/query usage
@@ -271,8 +328,8 @@ Java/query usage
 In the first example, three commands are sent and the result is a list with three `SubmitResponse`s. 
 The last one returned invalid and was not executed.
 
-The commands in `submitAll` will execute sequentially, but each one must complete successfully for
-the subsequent commands to be executed. If any one of the commands fails, `submitAll` stops and
+The commands in `submitAllAndWait` will execute sequentially, but each one must complete successfully for
+the subsequent commands to be executed. If any one of the commands fails, `submitAllAndWait` stops and
 the list is returned with the commands that are completed up to and including the command
 that failed. This is shown in the following example by making the invalidCmd second in the list.
 

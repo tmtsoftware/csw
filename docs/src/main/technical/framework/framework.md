@@ -163,8 +163,9 @@ Supervisor actor. The creation of a CommandService instance can be found @ref[he
 The operations allowed through `CommandService` helper are as follows:
 
 - @github[validate](/csw-command/csw-command-client/src/main/scala/csw/command/client/internal/CommandServiceImpl.scala#L38)
-- @github[submit](/csw-command/csw-command-client/src/main/scala/csw/command/client/internal/CommandServiceImpl.scala#L43)
-- @github[submitAll](/csw-command/csw-command-client/src/main/scala/csw/command/client/internal/CommandServiceImpl.scala#L51)
+- @github[submit](/csw-command/csw-command-client/src/main/scala/csw/command/client/internal/CommandServiceImpl.scala#L46)
+- @github[submitAndWait](/csw-command/csw-command-client/src/main/scala/csw/command/client/internal/CommandServiceImpl.scala#L49)
+- @github[submitAllAndWait](/csw-command/csw-command-client/src/main/scala/csw/command/client/internal/CommandServiceImpl.scala#L55)
 - @github[oneway](/csw-command/csw-command-client/src/main/scala/csw/command/client/internal/CommandServiceImpl.scala#L74)
 - @github[onewayAndMatch](/csw-command/csw-command-client/src/main/scala/csw/command/client/internal/CommandServiceImpl.scala#L77)
 - @github[query](/csw-command/csw-command-client/src/main/scala/csw/command/client/internal/CommandServiceImpl.scala#L96)
@@ -173,7 +174,7 @@ The operations allowed through `CommandService` helper are as follows:
  
 ## Receiving Responses from Components
 
-### SubmitAndWait
+### Submit
 
 To understand the flow of the Submit command please refer to this @ref[section](../../commons/command.md#the-submit-message). 
 
