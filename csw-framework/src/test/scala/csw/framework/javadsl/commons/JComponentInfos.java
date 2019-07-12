@@ -3,8 +3,8 @@ package csw.framework.javadsl.commons;
 import csw.framework.javadsl.JComponentInfo;
 import csw.command.client.models.framework.ComponentInfo;
 import csw.command.client.models.framework.LocationServiceUsage;
-import csw.params.core.models.Prefix;
 import csw.location.api.javadsl.JComponentType;
+import csw.params.core.models.Prefix;
 
 import java.time.Duration;
 import java.util.Collections;

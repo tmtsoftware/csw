@@ -2,7 +2,6 @@ package csw.config.client;
 
 import akka.actor.CoordinatedShutdown;
 import akka.actor.typed.ActorSystem;
-import akka.actor.typed.SpawnProtocol;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.http.javadsl.Http;
 import akka.stream.Materializer;

@@ -1,13 +1,14 @@
 package csw.location.server.internal
 
 import akka.serialization.Serializer
+import csw.location.api.codec.DoneCodec
 import csw.location.api.commons.LocationServiceLogger
 import csw.location.model.codecs.LocationCodecs
 import csw.location.model.scaladsl.{Connection, Location, Registration, TrackingEvent}
 import csw.logging.api.scaladsl.Logger
 import io.bullet.borer.Cbor
 
-class LocationAkkaSerializer extends Serializer with LocationCodecs {
+class LocationAkkaSerializer extends Serializer with LocationCodecs with DoneCodec {
 
   override val identifier: Int = 19924
   private val logger: Logger   = LocationServiceLogger.getLogger

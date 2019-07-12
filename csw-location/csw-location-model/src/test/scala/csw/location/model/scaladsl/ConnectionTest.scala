@@ -1,8 +1,7 @@
-package csw.location.api.models
+package csw.location.model.scaladsl
 
 import csw.location.model.scaladsl
 import csw.location.model.scaladsl.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.location.model.scaladsl.{ComponentId, ComponentType, Connection}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 class ConnectionTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {

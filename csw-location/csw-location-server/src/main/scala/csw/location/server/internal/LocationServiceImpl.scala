@@ -17,18 +17,7 @@ import csw.location.api.exceptions.{
   UnregistrationFailed
 }
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
-import csw.location.model.scaladsl.{
-  AkkaLocation,
-  ComponentType,
-  Connection,
-  ConnectionType,
-  Location,
-  LocationRemoved,
-  LocationUpdated,
-  Registration,
-  TrackingEvent,
-  TypedConnection
-}
+import csw.location.model.scaladsl._
 import csw.location.server.commons.{CswCluster, LocationServiceLogger}
 import csw.location.server.internal.Registry.AllServices
 import csw.location.server.internal.StreamExt.RichSource

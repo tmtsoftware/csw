@@ -22,9 +22,12 @@ object Dependencies {
     Seq(
       Enumeratum.`enumeratum`.value,
       Libs.`play-json`.value,
-      Libs.`play-json-derived-codecs`.value             
+      Libs.`play-json-derived-codecs`.value,
+      Borer.`borer-core`.value,
+      Borer.`borer-derivation`.value,
+      Libs.`scalatest`.value % Test,
+      Libs.`mockito-scala`   % Test
     )
-    
   )
 
   val LocationApi = Def.setting(
@@ -32,14 +35,7 @@ object Dependencies {
       Akka.`akka-actor`,
       Akka.`akka-actor-typed`,
       Akka.`akka-stream`,
-      Akka.`akka-stream-typed`,
-      Libs.`play-json`.value,
-      Libs.`play-json-derived-codecs`.value,
-      Enumeratum.`enumeratum`.value,
-      Borer.`borer-core`.value,
-      Borer.`borer-derivation`.value,
-      Libs.`scalatest`.value % Test,
-      Libs.`mockito-scala`   % Test
+      Akka.`akka-stream-typed`
     )
   )
 

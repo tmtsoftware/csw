@@ -14,11 +14,12 @@ import akka.http.scaladsl.unmarshalling.sse.EventStreamUnmarshalling._
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{KillSwitch, KillSwitches, Materializer}
 import akka.{Done, NotUsed, actor}
-import csw.location.api.codecs.LocationCodecs
+import csw.location.api.codec.DoneCodec
 import csw.location.api.exceptions.{OtherLocationIsRegistered, RegistrationFailed}
-import csw.location.api.models.{Registration, RegistrationResult, _}
-import csw.location.api.scaladsl.LocationService
+import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.HttpCodecs
+import csw.location.model.codecs.LocationCodecs
+import csw.location.model.scaladsl._
 import io.bullet.borer.Json
 
 import scala.async.Async.{async, await}
@@ -30,7 +31,8 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
     mat: Materializer
 ) extends LocationService
     with HttpCodecs
-    with LocationCodecs { outer ⇒
+    with LocationCodecs
+    with DoneCodec { outer ⇒
 
   import actorSystem.executionContext
   implicit val untypedSystem: actor.ActorSystem = actorSystem.toUntyped
