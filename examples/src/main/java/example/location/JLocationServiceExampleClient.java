@@ -121,7 +121,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         // to Typed ActorRef[Nothing]
 
         URI actorRefURI = ActorExtension.RichActor(Adapter.toTyped(actorRef)).toURI(typedSystem);
-        AkkaRegistration hcdRegistration = AkkaRegistration.apply(hcdConnection, new Prefix("nfiraos.ncc.tromboneHcd"), actorRefURI);
+        AkkaRegistration hcdRegistration = csw.location.api.AkkaRegistrationFactory.make(hcdConnection, new Prefix("nfiraos.ncc.tromboneHcd"), actorRefURI);
         hcdRegResult = locationService.register(hcdRegistration).get();
 
         // ************************************************************************************************************

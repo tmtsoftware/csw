@@ -1,12 +1,9 @@
-package csw.location.api.models
+package csw.location.model.scaladsl
 
 import java.net.URI
 
-import csw.location.api.codecs.LocationSerializable
-import csw.location.api.commons.LocationServiceLogger
-import csw.location.api.exceptions.LocalAkkaActorRegistrationNotAllowed
-import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.logging.api.scaladsl.Logger
+import csw.location.model.scaladsl.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.location.model.serializable.LocationSerializable
 import csw.params.core.models.Prefix
 
 /**
@@ -29,26 +26,18 @@ sealed abstract class Registration extends LocationSerializable {
 }
 
 /**
- * AkkaRegistration holds the information needed to register an akka location. A [[csw.location.api.exceptions.LocalAkkaActorRegistrationNotAllowed]]
- * is thrown if the actorRef provided is not a remote actorRef
+ * AkkaRegistration holds the information needed to register an akka location
  *
  * @param connection the `Connection` to register with `LocationService`
  * @param prefix prefix of the component
- * @param actorRefURI Provide a remote actor that is offering a connection. Local actors cannot be registered since they can't be
+ * @param actorRefURI Provide a remote actor uri that is offering a connection. Local actors cannot be registered since they can't be
  *                 communicated from components across the network
  */
-final case class AkkaRegistration(
+final case class AkkaRegistration private[csw] (
     connection: AkkaConnection,
     prefix: Prefix,
     actorRefURI: URI
 ) extends Registration {
-
-  if (actorRefURI.getPort == -1) {
-    val log: Logger            = LocationServiceLogger.getLogger
-    val registrationNotAllowed = LocalAkkaActorRegistrationNotAllowed(actorRefURI)
-    log.error(registrationNotAllowed.getMessage, ex = registrationNotAllowed)
-    throw registrationNotAllowed
-  }
 
   /**
    * Create a AkkaLocation that represents the live connection offered by the actor

@@ -22,6 +22,7 @@ trait LocationCodecs extends CommonCodecs {
   implicit lazy val locationCodec: Codec[Location]         = deriveCodec[Location]
   implicit lazy val akkaLocationCodec: Codec[AkkaLocation] = deriveCodec[AkkaLocation]
   implicit lazy val httpLocationCodec: Codec[HttpLocation] = deriveCodec[HttpLocation]
+  implicit lazy val tcpLocationCodec: Codec[TcpLocation]   = deriveCodec[TcpLocation]
 
   implicit lazy val registrationCodec: Codec[Registration]         = deriveCodec[Registration]
   implicit lazy val akkaRegistrationCodec: Codec[AkkaRegistration] = deriveCodec[AkkaRegistration]

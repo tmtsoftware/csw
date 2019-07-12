@@ -6,6 +6,7 @@ import akka.actor.typed
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorSystem, Behavior, SpawnProtocol}
 import com.typesafe.config.{Config, ConfigFactory}
+import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.exceptions.LocalAkkaActorRegistrationNotAllowed
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.client.ActorSystemFactory
@@ -31,7 +32,7 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     val actorRefUri    = actorSystem.toURI
     val prefix         = Prefix("nfiraos.ncc.trombone")
 
-    val akkaRegistration     = AkkaRegistration(akkaConnection, prefix, actorRefUri)
+    val akkaRegistration     = AkkaRegistrationFactory.make(akkaConnection, prefix, actorRefUri)
     val expectedAkkaLocation = AkkaLocation(akkaConnection, prefix, actorRefUri)
 
     akkaRegistration.location(hostname) shouldBe expectedAkkaLocation
@@ -73,7 +74,7 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     val prefix                                           = Prefix("nfiraos.ncc.trombone")
 
     intercept[LocalAkkaActorRegistrationNotAllowed] {
-      AkkaRegistration(akkaConnection, prefix, actorRefURI)
+      AkkaRegistrationFactory.make(akkaConnection, prefix, actorRefURI)
     }
     actorSystem.terminate()
     Await.result(actorSystem.whenTerminated, 10.seconds)

@@ -3,6 +3,7 @@ package csw.location
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.{Behavior, SpawnProtocol}
 import akka.stream.scaladsl.{Keep, Sink}
+import csw.location.api.AkkaRegistrationFactory.make
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.client.ActorSystemFactory
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
@@ -68,9 +69,12 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec
     }
 
     runOn(member1) {
-      val actorRef = ActorSystemFactory.remote(SpawnProtocol.behavior, "test").spawn(Behavior.empty, "trombone-hcd-1")
+      val system   = ActorSystemFactory.remote(SpawnProtocol.behavior, "test")
+      val actorRef = system.spawn(Behavior.empty, "trombone-hcd-1")
 
-      locationService.register(AkkaRegistration(akkaConnection, Prefix("nfiraos.ncc.trombone"), actorRef.toURI)).await
+      locationService
+        .register(make(akkaConnection, Prefix("nfiraos.ncc.trombone"), actorRef.toURI(system)))
+        .await
       enterBarrier("Registration")
 
       Await.ready(system.whenTerminated, 5.seconds)

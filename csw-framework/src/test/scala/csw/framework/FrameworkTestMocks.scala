@@ -15,9 +15,9 @@ import csw.event.client.EventServiceFactory
 import csw.framework.internal.pubsub.PubSubBehavior
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.RegistrationFactory
+import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
-import csw.location.model.scaladsl.AkkaRegistration
 import csw.location.model.scaladsl.Connection.AkkaConnection
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
@@ -33,8 +33,9 @@ import scala.concurrent.Future
 class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol]) extends MockitoSugar with ArgumentMatchersSugar {
 
   ///////////////////////////////////////////////
-  val testActor: ActorRef[Any]                   = TestProbe("test-probe").ref
-  val akkaRegistration                           = AkkaRegistration(mock[AkkaConnection], Prefix("nfiraos.ncc.trombone"), testActor.toURI)
+  val testActor: ActorRef[Any] = TestProbe("test-probe").ref
+  val akkaRegistration =
+    AkkaRegistrationFactory.make(mock[AkkaConnection], Prefix("nfiraos.ncc.trombone"), testActor.toURI)
   val locationService: LocationService           = mock[LocationService]
   val eventServiceFactory: EventServiceFactory   = mock[EventServiceFactory]
   val eventService: EventService                 = mock[EventService]

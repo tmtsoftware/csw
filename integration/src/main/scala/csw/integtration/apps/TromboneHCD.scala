@@ -4,11 +4,12 @@ import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.Behaviors
 import csw.command.client.messages.CommandMessage.Submit
 import csw.integtration.common.TestFutureExtension.RichFuture
+import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.scaladsl.RegistrationResult
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.model.scaladsl.Connection.AkkaConnection
-import csw.location.model.scaladsl.{AkkaRegistration, ComponentId, ComponentType}
+import csw.location.model.scaladsl.{ComponentId, ComponentType}
 import csw.location.server.internal.ServerWiring
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.LoggingSystemFactory
@@ -28,7 +29,7 @@ object TromboneHCD {
   val componentId                           = ComponentId("trombonehcd", ComponentType.HCD)
   val connection                            = AkkaConnection(componentId)
 
-  val registration                           = AkkaRegistration(connection, Prefix("nfiraos.ncc.trombone"), tromboneHcdActorRef.toURI)
+  val registration                           = AkkaRegistrationFactory.make(connection, Prefix("nfiraos.ncc.trombone"), tromboneHcdActorRef.toURI)
   private val locationService                = HttpLocationServiceFactory.makeLocalClient
   val registrationResult: RegistrationResult = locationService.register(registration).await
 

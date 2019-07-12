@@ -1,6 +1,7 @@
 package csw.framework.scaladsl
 
 import akka.actor.typed.{ActorRef, ActorSystem}
+import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.model.scaladsl.AkkaRegistration
 import csw.location.model.scaladsl.Connection.AkkaConnection
@@ -25,6 +26,6 @@ class RegistrationFactory {
       akkaConnection: AkkaConnection,
       prefix: Prefix,
       actorRef: ActorRef[_]
-  )(implicit actorSystem: ActorSystem[_]): AkkaRegistration = AkkaRegistration(akkaConnection, prefix, actorRef.toURI)
+  )(implicit actorSystem: ActorSystem[_]): AkkaRegistration = AkkaRegistrationFactory.make(akkaConnection, prefix, actorRef.toURI)
 
 }

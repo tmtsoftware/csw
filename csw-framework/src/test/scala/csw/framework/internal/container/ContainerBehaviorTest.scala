@@ -20,10 +20,10 @@ import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestMocks
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.scaladsl.RegistrationFactory
+import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.ActorSystemFactory
-import csw.location.model.scaladsl.AkkaRegistration
 import csw.location.model.scaladsl.Connection.AkkaConnection
 import csw.params.core.models.Prefix
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
@@ -40,8 +40,9 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar wit
   private val mocks                                    = new FrameworkTestMocks()
 
   class IdleContainer() {
-    private val testActor: ActorRef[Any]                        = TestProbe("test-probe").ref
-    val akkaRegistration                                        = AkkaRegistration(mock[AkkaConnection], Prefix("nfiraos.ncc.trombone"), testActor.toURI)
+    private val testActor: ActorRef[Any] = TestProbe("test-probe").ref
+    val akkaRegistration =
+      AkkaRegistrationFactory.make(mock[AkkaConnection], Prefix("nfiraos.ncc.trombone"), testActor.toURI)
     val locationService: LocationService                        = mock[LocationService]
     val eventService: EventServiceFactory                       = mock[EventServiceFactory]
     val alarmService: AlarmServiceFactory                       = mock[AlarmServiceFactory]
