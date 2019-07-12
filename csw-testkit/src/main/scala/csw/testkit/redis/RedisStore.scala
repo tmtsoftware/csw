@@ -7,8 +7,7 @@ import akka.http.scaladsl.Http
 import akka.stream.Materializer
 import akka.stream.typed.scaladsl
 import akka.util.Timeout
-import csw.location.api.models.RegistrationResult
-import csw.location.api.scaladsl.LocationService
+import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.model.scaladsl.Connection.TcpConnection
 import csw.location.model.scaladsl.TcpRegistration

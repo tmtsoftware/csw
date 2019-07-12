@@ -10,8 +10,7 @@ import akka.http.scaladsl.Http.ServerBinding
 import csw.config.server.commons.CoordinatedShutdownReasons.FailureReason
 import csw.config.server.commons.{ConfigServerLogger, ConfigServiceConnection}
 import csw.config.server.{ActorRuntime, Settings}
-import csw.location.api.models.RegistrationResult
-import csw.location.api.scaladsl.LocationService
+import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.model.scaladsl.HttpRegistration
 import csw.logging.api.scaladsl.Logger
 import csw.network.utils.{Networks, SocketUtils}

@@ -7,7 +7,7 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.event.client.internal.commons.EventServiceConnection
-import csw.location.api.models.RegistrationResult
+import csw.location.api.scaladsl.RegistrationResult
 import csw.location.model.scaladsl.Connection.TcpConnection
 import csw.network.utils.SocketUtils.getFreePort
 import csw.testkit.redis.RedisStore

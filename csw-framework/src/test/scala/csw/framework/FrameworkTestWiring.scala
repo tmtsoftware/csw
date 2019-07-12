@@ -7,8 +7,7 @@ import akka.stream.Materializer
 import akka.stream.typed.scaladsl.ActorMaterializer
 import csw.commons.redis.EmbeddedRedis
 import csw.event.client.helpers.TestFutureExt.RichFuture
-import csw.location.api.models.RegistrationResult
-import csw.location.api.scaladsl.LocationService
+import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.model.scaladsl.Connection.TcpConnection

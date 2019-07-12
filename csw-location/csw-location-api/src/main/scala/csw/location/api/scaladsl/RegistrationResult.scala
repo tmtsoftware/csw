@@ -1,4 +1,4 @@
-package csw.location.api.models
+package csw.location.api.scaladsl
 
 import akka.Done
 import csw.location.model.scaladsl.Location

@@ -1,7 +1,7 @@
 package csw.integtration.apps
 
 import csw.integtration.common.TestFutureExtension.RichFuture
-import csw.location.api.models.RegistrationResult
+import csw.location.api.scaladsl.RegistrationResult
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.model.scaladsl.Connection.HttpConnection
 import csw.location.model.scaladsl.{ComponentId, ComponentType, HttpRegistration}

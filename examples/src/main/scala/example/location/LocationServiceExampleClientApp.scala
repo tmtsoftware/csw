@@ -13,8 +13,7 @@ import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.framework.commons.CoordinatedShutdownReasons.ActorTerminatedReason
 import csw.location.api.extensions.ActorExtension.RichActor
-import csw.location.api.models._
-import csw.location.api.scaladsl.LocationService
+import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.model
@@ -38,7 +37,6 @@ import scala.concurrent.{Await, Future}
 /**
  * An example location service client application.
  */
-//TODO: Change everything to typed
 object LocationServiceExampleClientApp extends App {
 
   // http location service client expect that location server is running on local machine

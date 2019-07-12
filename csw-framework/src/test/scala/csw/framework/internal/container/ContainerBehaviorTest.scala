@@ -21,8 +21,7 @@ import csw.framework.FrameworkTestMocks
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.scaladsl.RegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
-import csw.location.api.models.RegistrationResult
-import csw.location.api.scaladsl.LocationService
+import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.ActorSystemFactory
 import csw.location.model.scaladsl.AkkaRegistration
 import csw.location.model.scaladsl.Connection.AkkaConnection

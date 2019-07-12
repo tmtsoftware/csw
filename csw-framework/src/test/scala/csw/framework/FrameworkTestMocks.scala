@@ -16,8 +16,7 @@ import csw.framework.internal.pubsub.PubSubBehavior
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.RegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
-import csw.location.api.models.RegistrationResult
-import csw.location.api.scaladsl.LocationService
+import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.model.scaladsl.AkkaRegistration
 import csw.location.model.scaladsl.Connection.AkkaConnection
 import csw.logging.api.scaladsl.Logger

@@ -16,8 +16,7 @@ import csw.location.api.exceptions.{
   RegistrationListingFailed,
   UnregistrationFailed
 }
-import csw.location.api.models.RegistrationResult
-import csw.location.api.scaladsl.LocationService
+import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.model.scaladsl.{
   AkkaLocation,
   ComponentType,
