@@ -120,7 +120,7 @@ Scala
 :   @@snip [SampleHcdTest.scala](../../../../examples/src/test/scala/org/tmt/nfiraos/samplehcd/SampleHcdTest.scala) { #submit }
 
 Java
-:   @@snip [JSampleHcdTest.java](../../../../examples/src/test/java/org/tmt/nfiraos/samplehcd/JSampleHcdTest.java) { #submit }
+:   @@snip [JSampleHcdTest.java](../../../../examples/src/test/java/org/tmt/nfiraos/samplehcd/JSampleHcdTest.java) { #submitAndWait }
 
 Finally, we will show an example of tests that check that exceptions are thrown when expected.  We will do this
 by using the "sleep" command, but failing to wait long enough for the sleep to complete.  This causes a 

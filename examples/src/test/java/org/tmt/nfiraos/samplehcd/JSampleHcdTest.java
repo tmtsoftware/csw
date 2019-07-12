@@ -100,14 +100,15 @@ public class JSampleHcdTest extends JUnitSuite {
         // so we don't know what the first value will be,
         // but we know we should get three consecutive numbers
         int counter0 = counterList.get(0);
-        List<Integer> expectedCounterList = Arrays.asList(counter0, counter0+1, counter0+2);
+        List<Integer> expectedCounterList = Arrays.asList(counter0, counter0 + 1, counter0 + 2);
 
         Assert.assertEquals(expectedCounterList, counterList);
     }
     //#subscribe
 
-    //#submit
+    //#submitAndWait
     private ActorSystem<SpawnProtocol> typedActorSystem = testKit.actorSystem();
+
     @Test
     public void testShouldBeAbleToSendSleepCommandToHCD() throws ExecutionException, InterruptedException {
 
@@ -127,7 +128,7 @@ public class JSampleHcdTest extends JUnitSuite {
 
         Assert.assertEquals(hcd.submitAndWait(setupCommand, commandResponseTimeout).get(), new CommandResponse.Completed(setupCommand.runId()));
     }
-    //#submit
+    //#submitAndWait
 
     //#exception
     @Rule

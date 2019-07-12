@@ -188,10 +188,8 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Optional<Integer> actualCmdResponse = longRunningResultF.get();
         Assert.assertEquals(expectedCmdResponse, actualCmdResponse);
 
-        //#submit
         Setup submitSetup = new Setup(prefix(), longRunningCmd(), Optional.empty()).add(intParameter1);
         CompletableFuture<SubmitResponse> submitResponse = hcdCmdService.submit(submitSetup, timeout);
-        //#submit
 
         SubmitResponse actualSubmitResponse = submitResponse.get();
 
@@ -298,7 +296,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Setup submitAllSetup3 = new Setup(prefix(), invalidCmd(), Optional.empty()).add(encoderParam);
 
         CompletableFuture<List<SubmitResponse>> submitAllF = hcdCmdService
-                .submitAll(
+                .submitAllAndWait(
                         List.of(submitAllSetup1, submitAllSetup2, submitAllSetup3),
                         timeout
                 );
@@ -312,7 +310,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
 
         //#submitAllInvalid
         CompletableFuture<List<SubmitResponse>> submitAllF2 = hcdCmdService
-                .submitAll(
+                .submitAllAndWait(
                         List.of(submitAllSetup1, submitAllSetup3, submitAllSetup2),
                         timeout
                 );
@@ -443,10 +441,10 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Parameter<Integer> intParameter1 = intKey1.set(22, 23);
         Setup failureResCommand1 = new Setup(prefix(), failureAfterValidationCmd(), Optional.empty()).add(intParameter1);
 
-        //#submit
+        //#submitAndWait
         CompletableFuture<SubmitResponse> finalResponseCompletableFuture = hcdCmdService.submitAndWait(failureResCommand1, timeout);
         SubmitResponse actualValidationResponse = finalResponseCompletableFuture.get();
-        //#submit
+        //#submitAndWait
 
         Assert.assertTrue(actualValidationResponse instanceof CommandResponse.Error);
 
@@ -465,7 +463,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Setup setupHcd2 = new Setup(prefix(), mediumRunning(), Optional.empty()).add(encoderParam);
 
         CompletableFuture<List<SubmitResponse>> finalCommandResponse = hcdCmdService
-                .submitAll(
+                .submitAllAndWait(
                         List.of(setupHcd1, setupHcd2),
                         timeout
                 );

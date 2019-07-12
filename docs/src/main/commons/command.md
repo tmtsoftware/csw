@@ -157,13 +157,14 @@ created for each component for which commands are to be sent.
 
 The API can be exercised as follows for different scenarios of command-based communication:
 
-### submit
+### submitAndWait
+`submitAndWait` is wrapper method which sends `submit` message and waits for final response.
 Sending a `submit` message with a command returns a `SubmitResponse` as a Future.
 The Future returned by `submit` will always be the final response, which may be a positive completion (Completed or
 CompletedWithResult) or a negative completion (`Invalid`, `Error`, `Cancelled`, `Locked`). The `Started` response is never seen
 by the programmer when using the `submit` of `CommandService`.
 
-This example shows an immediate completion command using `submit` that returns `Completed`.
+This example shows an immediate completion command using `submitAndWait` that returns `Completed`.
 
 Scala/submit w/immediate-response
 :   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #immediate-response }

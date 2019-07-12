@@ -283,7 +283,7 @@ class CommandServiceTest(ignore: Int)
 
       //#submitAll
       val submitAllF = async {
-        await(assemblyCmdService.submitAll(List(submitAllSetup1, submitAllSetup2, submitAllinvalidSetup)))
+        await(assemblyCmdService.submitAllAndWait(List(submitAllSetup1, submitAllSetup2, submitAllinvalidSetup)))
       }
       val submitAllResponse = Await.result(submitAllF, timeout.duration)
       submitAllResponse.length shouldBe 3
@@ -294,7 +294,7 @@ class CommandServiceTest(ignore: Int)
 
       //#submitAllInvalid
       val submitAllF2 = async {
-        await(assemblyCmdService.submitAll(List(submitAllSetup1, submitAllinvalidSetup, submitAllSetup2)))
+        await(assemblyCmdService.submitAllAndWait(List(submitAllSetup1, submitAllinvalidSetup, submitAllSetup2)))
       }
       val submitAllResponse2 = Await.result(submitAllF2, timeout.duration)
       submitAllResponse2.length shouldBe 2

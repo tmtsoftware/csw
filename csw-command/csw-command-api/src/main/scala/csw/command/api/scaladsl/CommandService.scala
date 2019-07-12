@@ -47,7 +47,7 @@ trait CommandService {
    * @param submitCommands the set of [[csw.params.commands.ControlCommand]] payloads
    * @return a Source of CommandResponse as a stream of CommandResponses for all commands
    */
-  def submitAll(submitCommands: List[ControlCommand])(implicit timeout: Timeout): Future[List[SubmitResponse]]
+  def submitAllAndWait(submitCommands: List[ControlCommand])(implicit timeout: Timeout): Future[List[SubmitResponse]]
 
   /**
    * Send a command as a Oneway and get a [[csw.params.commands.CommandResponse.OnewayResponse]] as a Future. The CommandResponse can be a response

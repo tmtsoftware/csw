@@ -173,7 +173,7 @@ The operations allowed through `CommandService` helper are as follows:
  
 ## Receiving Responses from Components
 
-### Submit
+### SubmitAndWait
 
 To understand the flow of the Submit command please refer to this @ref[section](../../commons/command.md#the-submit-message). 
 

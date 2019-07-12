@@ -52,7 +52,7 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
       case x          ⇒ Future.successful(x)
     }
 
-  override def submitAll(
+  override def submitAllAndWait(
       submitCommands: List[ControlCommand]
   )(implicit timeout: Timeout): Future[List[SubmitResponse]] = {
     // This exception is used to pass the failing command response to the recover to shut down the stream

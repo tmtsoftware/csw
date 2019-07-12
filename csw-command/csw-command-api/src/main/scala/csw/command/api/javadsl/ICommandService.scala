@@ -48,7 +48,7 @@ trait ICommandService {
    * @param submitCommands the set of [[csw.params.commands.ControlCommand]] payloads
    * @return a Source of CommandResponse as a stream of CommandResponses for all commands
    */
-  def submitAll(
+  def submitAllAndWait(
       submitCommands: java.util.List[ControlCommand],
       timeout: Timeout
   ): CompletableFuture[java.util.List[SubmitResponse]]
