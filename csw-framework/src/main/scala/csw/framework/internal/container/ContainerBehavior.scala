@@ -15,7 +15,10 @@ import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, S
 import csw.command.client.messages.{ComponentMessage, ContainerActorMessage, ContainerCommonMessage, ContainerIdleMessage}
 import csw.command.client.models.framework._
 import csw.event.client.EventServiceFactory
-import csw.framework.commons.CoordinatedShutdownReasons.{AllActorsWithinContainerTerminatedReason, FailedToCreateSupervisorsReason}
+import csw.framework.commons.CoordinatedShutdownReasons.{
+  AllActorsWithinContainerTerminatedReason,
+  FailedToCreateSupervisorsReason
+}
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models._
 import csw.framework.scaladsl.RegistrationFactory

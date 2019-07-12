@@ -38,6 +38,7 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-time-clock-js`,
   `csw-logging-macros`,
   `csw-params-js`,
+  `csw-location-model-js`,
   `csw-network-utils`,
   `csw-commons`,
   `csw-benchmark`,

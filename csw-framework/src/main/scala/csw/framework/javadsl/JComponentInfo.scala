@@ -19,7 +19,7 @@ object JComponentInfo {
    * The information needed to create a component. This class is created after de-serializing the config file for the component.
    *
    * @param name the name of the component
-   * @param componentType the type of the component as defined by [[ComponentType]]
+   * @param componentType the type of the component as defined by [[csw.location.model.scaladsl.ComponentType]]
    * @param prefix identifies the subsystem
    * @param className specifies the component to be created by name of the class of it's factory
    * @param locationServiceUsage specifies component's usage of location service

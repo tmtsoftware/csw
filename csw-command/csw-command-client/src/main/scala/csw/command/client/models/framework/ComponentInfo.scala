@@ -11,7 +11,7 @@ import scala.concurrent.duration.{DurationDouble, FiniteDuration}
  *
  * @param name the name of the component
  * @param componentType
- *  : the type of the component as defined by [[ComponentType]]
+ *  : the type of the component as defined by [[csw.location.model.scaladsl.ComponentType]]
  * @param prefix identifies the subsystem
  * @param behaviorFactoryClassName
  *  : specifies the component to be created by name of the class of it's factory
