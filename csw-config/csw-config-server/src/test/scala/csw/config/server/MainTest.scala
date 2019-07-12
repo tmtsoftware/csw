@@ -14,9 +14,9 @@ import com.typesafe.config.ConfigFactory
 import csw.aas.core.commons.AASConnection
 import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.config.server.commons.{ConfigServiceConnection, TestFileUtils}
-import csw.location.api.models.HttpRegistration
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.location.model.scaladsl.HttpRegistration
 import csw.location.server.http.HTTPLocationService
 import org.tmatesoft.svn.core.SVNException
 

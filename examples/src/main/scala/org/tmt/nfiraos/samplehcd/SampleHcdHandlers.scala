@@ -5,7 +5,7 @@ import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.api.models.TrackingEvent
+import csw.location.model.scaladsl.TrackingEvent
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
 import csw.params.core.generics.{Key, KeyType, Parameter}

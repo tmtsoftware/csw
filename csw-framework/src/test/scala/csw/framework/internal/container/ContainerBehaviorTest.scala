@@ -21,10 +21,11 @@ import csw.framework.FrameworkTestMocks
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.scaladsl.RegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{AkkaRegistration, RegistrationResult}
+import csw.location.api.models.RegistrationResult
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.ActorSystemFactory
+import csw.location.model.scaladsl.AkkaRegistration
+import csw.location.model.scaladsl.Connection.AkkaConnection
 import csw.params.core.models.Prefix
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import org.scalatest.{FunSuite, Matchers}

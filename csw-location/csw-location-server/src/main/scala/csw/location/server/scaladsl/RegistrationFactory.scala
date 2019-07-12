@@ -2,8 +2,8 @@ package csw.location.server.scaladsl
 
 import akka.actor.typed.{ActorRef, ActorSystem}
 import csw.location.api.extensions.ActorExtension.RichActor
-import csw.location.api.models.AkkaRegistration
-import csw.location.api.models.Connection.AkkaConnection
+import csw.location.model.scaladsl.AkkaRegistration
+import csw.location.model.scaladsl.Connection.AkkaConnection
 import csw.params.core.models.Prefix
 
 /**

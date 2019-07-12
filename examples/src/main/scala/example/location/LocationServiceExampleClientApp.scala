@@ -1,8 +1,7 @@
 package example.location
 
-import java.net.{InetAddress, URI}
+import java.net.InetAddress
 
-import akka.actor
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior, SpawnProtocol}
 import akka.actor.{Actor, ActorSystem, CoordinatedShutdown, Props, typed}
@@ -14,11 +13,13 @@ import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.framework.commons.CoordinatedShutdownReasons.ActorTerminatedReason
 import csw.location.api.extensions.ActorExtension.RichActor
-import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
-import csw.location.api.models.{AkkaRegistration, HttpRegistration, _}
+import csw.location.api.models._
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.location.model
+import csw.location.model.scaladsl.Connection.{AkkaConnection, HttpConnection}
+import csw.location.model.scaladsl._
 import csw.location.wrapper.LocationServerWiring
 import csw.logging.api.scaladsl._
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
@@ -136,7 +137,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   import akka.actor.typed.scaladsl.adapter._
 
   // dummy HCD connection
-  val hcdConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
+  val hcdConnection = AkkaConnection(model.scaladsl.ComponentId("hcd1", ComponentType.HCD))
   val hcdRegistration: AkkaRegistration = AkkaRegistration(
     hcdConnection,
     Prefix("nfiraos.ncc.tromboneHcd"),
@@ -163,7 +164,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   }
   val typedActorRef: ActorRef[String] = context.system.spawn(behavior(), "typed-actor-ref")
 
-  val assemblyConnection = AkkaConnection(ComponentId("assembly1", ComponentType.Assembly))
+  val assemblyConnection = AkkaConnection(model.scaladsl.ComponentId("assembly1", ComponentType.Assembly))
 
   // Register Typed ActorRef[String] with Location Service
   val assemblyRegistration: AkkaRegistration =

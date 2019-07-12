@@ -2,8 +2,8 @@ package csw.framework.command
 
 import akka.actor.Scheduler
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
@@ -12,9 +12,9 @@ import csw.command.client.messages.CommandMessage.{Oneway, Submit}
 import csw.command.client.messages.CommandResponseManagerMessage.{Query, Subscribe}
 import csw.common.components.command.ComponentStateForCommand.{acceptedCmd, cancelCmd, prefix}
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.helpers.{LSNodeSpec, OneMemberAndSeed}
+import csw.location.model.scaladsl.Connection.AkkaConnection
+import csw.location.model.scaladsl.{ComponentId, ComponentType}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup

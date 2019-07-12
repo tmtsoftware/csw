@@ -2,9 +2,10 @@ package csw.aas.http
 
 import csw.aas.core.commons.AASConnection
 import csw.aas.core.deployment.AuthServiceLocation
-import csw.location.api.models.Connection.HttpConnection
-import csw.location.api.models.{ComponentId, ComponentType, HttpRegistration}
 import csw.location.helpers.LSNodeSpec
+import csw.location.model.scaladsl
+import csw.location.model.scaladsl.Connection.HttpConnection
+import csw.location.model.scaladsl.{ComponentId, ComponentType, HttpRegistration}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import org.scalatest.BeforeAndAfterEach
 import org.tmt.embedded_keycloak.KeycloakData.{ApplicationUser, Client, Realm}
@@ -63,7 +64,10 @@ class AuthIntegrationTest
       enterBarrier("test-server started")
 
       val testServer =
-        locationService.resolve(HttpConnection(ComponentId("TestServer", ComponentType.Service)), defaultTimeout).await.get
+        locationService
+          .resolve(HttpConnection(scaladsl.ComponentId("TestServer", ComponentType.Service)), defaultTimeout)
+          .await
+          .get
 
       requests
         .post(testServer.uri.toString)
@@ -103,8 +107,9 @@ class AuthIntegrationTest
       enterBarrier("keycloak started")
       locationService.resolve(AASConnection.value, defaultTimeout).await
 
-      val stopHandle   = new TestServer(locationService).start(testServerPort).await
-      val registration = HttpRegistration(HttpConnection(ComponentId("TestServer", ComponentType.Service)), testServerPort, "")
+      val stopHandle = new TestServer(locationService).start(testServerPort).await
+      val registration =
+        HttpRegistration(HttpConnection(scaladsl.ComponentId("TestServer", ComponentType.Service)), testServerPort, "")
       locationService.register(registration).await
 
       enterBarrier("test-server started")
@@ -126,7 +131,10 @@ class AuthIntegrationTest
       )
 
       val testServer =
-        locationService.resolve(HttpConnection(ComponentId("TestServer", ComponentType.Service)), defaultTimeout).await.get
+        locationService
+          .resolve(HttpConnection(scaladsl.ComponentId("TestServer", ComponentType.Service)), defaultTimeout)
+          .await
+          .get
       requests
         .post(url = testServer.uri.toString, auth = token)
         .statusCode shouldBe 200
@@ -164,8 +172,9 @@ class AuthIntegrationTest
       enterBarrier("keycloak started")
       locationService.resolve(AASConnection.value, defaultTimeout).await
 
-      val stopHandle   = new TestServer(locationService).start(testServerPort).await
-      val registration = HttpRegistration(HttpConnection(ComponentId("TestServer", ComponentType.Service)), testServerPort, "")
+      val stopHandle = new TestServer(locationService).start(testServerPort).await
+      val registration =
+        HttpRegistration(HttpConnection(scaladsl.ComponentId("TestServer", ComponentType.Service)), testServerPort, "")
       locationService.register(registration).await
 
       enterBarrier("test-server started")
@@ -187,7 +196,10 @@ class AuthIntegrationTest
       )
 
       val testServer =
-        locationService.resolve(HttpConnection(ComponentId("TestServer", ComponentType.Service)), defaultTimeout).await.get
+        locationService
+          .resolve(HttpConnection(scaladsl.ComponentId("TestServer", ComponentType.Service)), defaultTimeout)
+          .await
+          .get
       requests
         .post(url = testServer.uri.toString, auth = token)
         .statusCode shouldBe 403

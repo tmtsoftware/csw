@@ -13,9 +13,9 @@ import csw.event.api.scaladsl.{EventPublisher, EventService, EventSubscriber}
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.internal.commons.serviceresolver.EventServiceLocationResolver
 import csw.event.client.internal.commons.{EventServiceConnection, EventStreamSupervisionStrategy}
-import csw.location.api.models.TcpRegistration
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.internal.LocationServiceClient
+import csw.location.model.scaladsl.TcpRegistration
 
 import scala.async.Async._
 import scala.concurrent.{ExecutionContext, Future}

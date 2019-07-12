@@ -1,6 +1,6 @@
 package csw.location.api.javadsl;
 
-import csw.location.api.models.ComponentType;
+import csw.location.model.scaladsl.ComponentType;
 
 /**
  * Helper class for Java to get the handle of `ComponentType` which is fundamental to LocationService library

@@ -1,5 +1,6 @@
-package csw.location.api.models
-import enumeratum._
+package csw.location.model.scaladsl
+
+import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
 
 import scala.collection.immutable.IndexedSeq
 

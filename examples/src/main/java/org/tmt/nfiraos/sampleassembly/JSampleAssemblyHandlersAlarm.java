@@ -13,7 +13,7 @@ import csw.command.client.messages.TopLevelActorMessage;
 import csw.event.api.javadsl.IEventSubscription;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
-import csw.location.api.models.*;
+import csw.location.model.scaladsl.*;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.CommandName;
 import csw.params.commands.CommandResponse;
@@ -102,7 +102,7 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
         // Submit command, and handle validation response. Final response is returned as a Future
         CompletableFuture<CommandResponse.SubmitResponse> submitCommandResponseF = hcd.submitAndWait(setupCommand, submitTimeout)
                 .thenCompose(commandResponse -> {
-                    if (! (commandResponse instanceof CommandResponse.Invalid || commandResponse instanceof CommandResponse.Locked)) {
+                    if (!(commandResponse instanceof CommandResponse.Invalid || commandResponse instanceof CommandResponse.Locked)) {
                         return CompletableFuture.completedFuture(commandResponse);
                     } else {
                         log.error("Sleep command invalid");
@@ -127,6 +127,7 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
 
     //#initialize
     private Optional<IEventSubscription> maybeEventSubscription = Optional.empty();
+
     @Override
     public CompletableFuture<Void> jInitialize() {
         return CompletableFuture.runAsync(() -> {
@@ -162,9 +163,9 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
 
     //#subscribe
     private void processEvent(Event event) {
-        log.info("Event received: "+ event.eventKey());
+        log.info("Event received: " + event.eventKey());
         if (event instanceof SystemEvent) {
-            SystemEvent sysEvent = (SystemEvent)event;
+            SystemEvent sysEvent = (SystemEvent) event;
             if (event.eventKey().equals(counterEventKey)) {
                 int counter = sysEvent.parameter(hcdCounterKey).head();
                 log.info("Counter = " + counter);
@@ -207,7 +208,7 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
         cswCtx.alarmService().setSeverity(counterAlarmKey, severity)
                 .whenComplete((d, ex) -> {
                     if (ex != null) {
-                        log.error("Error setting severity for alarm "+ counterAlarmKey.name() + ": " + ex.getMessage());
+                        log.error("Error setting severity for alarm " + counterAlarmKey.name() + ": " + ex.getMessage());
                     } else {
                         log.info("Severity for alarm " + counterAlarmKey.name() + " set to " + severity.toString());
                     }

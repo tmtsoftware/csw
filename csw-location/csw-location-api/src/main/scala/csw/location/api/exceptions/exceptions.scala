@@ -2,7 +2,7 @@ package csw.location.api.exceptions
 
 import java.net.URI
 
-import csw.location.api.models.{Connection, Location}
+import csw.location.model.scaladsl.{Connection, Location}
 
 /**
  * An Exception representing failure in registration

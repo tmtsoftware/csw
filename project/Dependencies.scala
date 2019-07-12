@@ -18,6 +18,15 @@ object Dependencies {
     )
   )
 
+  val LocationModel = Def.setting(
+    Seq(
+      Enumeratum.`enumeratum`.value,
+      Libs.`play-json`.value,
+      Libs.`play-json-derived-codecs`.value             
+    )
+    
+  )
+
   val LocationApi = Def.setting(
     Seq(
       Akka.`akka-actor`,

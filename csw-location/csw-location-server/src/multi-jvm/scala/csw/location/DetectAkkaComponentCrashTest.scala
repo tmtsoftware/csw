@@ -4,10 +4,11 @@ import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.{Behavior, SpawnProtocol}
 import akka.stream.scaladsl.{Keep, Sink}
 import csw.location.api.extensions.ActorExtension.RichActor
-import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
-import csw.location.api.models.{HttpRegistration, _}
 import csw.location.client.ActorSystemFactory
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
+import csw.location.model.scaladsl
+import csw.location.model.scaladsl.Connection.{AkkaConnection, HttpConnection}
+import csw.location.model.scaladsl._
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.params.core.models.Prefix
 
@@ -79,7 +80,7 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec
       val port   = 9595
       val prefix = "/trombone/hcd"
 
-      val httpConnection   = HttpConnection(ComponentId("Assembly1", ComponentType.Assembly))
+      val httpConnection   = HttpConnection(scaladsl.ComponentId("Assembly1", ComponentType.Assembly))
       val httpRegistration = HttpRegistration(httpConnection, port, prefix)
       val probe            = TestProbe[TrackingEvent]("test-probe")
 

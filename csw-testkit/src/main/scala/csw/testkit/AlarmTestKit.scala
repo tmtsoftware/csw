@@ -7,8 +7,8 @@ import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.alarm.client.internal.commons.AlarmServiceConnection
-import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.models.RegistrationResult
+import csw.location.model.scaladsl.Connection.TcpConnection
 import csw.network.utils.SocketUtils.getFreePort
 import csw.testkit.redis.RedisStore
 

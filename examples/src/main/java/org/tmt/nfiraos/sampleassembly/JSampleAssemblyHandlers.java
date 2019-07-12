@@ -10,7 +10,7 @@ import csw.command.client.messages.TopLevelActorMessage;
 import csw.event.api.javadsl.IEventSubscription;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
-import csw.location.api.models.*;
+import csw.location.model.scaladsl.*;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.CommandName;
 import csw.params.commands.CommandResponse;
@@ -128,7 +128,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
         // Submit command, and handle validation response. Final response is returned as a Future
         CompletableFuture<CommandResponse.SubmitResponse> submitCommandResponseF = hcd.submitAndWait(setupCommand, submitTimeout)
                 .thenApply(commandResponse -> {
-                    if (! (commandResponse instanceof CommandResponse.Invalid || commandResponse instanceof CommandResponse.Locked)) {
+                    if (!(commandResponse instanceof CommandResponse.Invalid || commandResponse instanceof CommandResponse.Locked)) {
                         return commandResponse;
                     } else {
                         log.error("Sleep command invalid");
@@ -153,6 +153,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
 
     //#initialize
     private Optional<IEventSubscription> maybeEventSubscription = Optional.empty();
+
     @Override
     public CompletableFuture<Void> jInitialize() {
         return CompletableFuture.runAsync(() -> {
@@ -187,9 +188,9 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     private Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter");
 
     private void processEvent(Event event) {
-        log.info("Event received: "+ event.eventKey());
+        log.info("Event received: " + event.eventKey());
         if (event instanceof SystemEvent) {
-            SystemEvent sysEvent = (SystemEvent)event;
+            SystemEvent sysEvent = (SystemEvent) event;
             if (event.eventKey().equals(counterEventKey)) {
                 int counter = sysEvent.parameter(hcdCounterKey).head();
                 log.info("Counter = " + counter);

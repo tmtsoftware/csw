@@ -8,8 +8,10 @@ import csw.location.agent.commons.CoordinatedShutdownReasons.{FailureReason, Pro
 import csw.location.agent.commons.LocationAgentLogger
 import csw.location.agent.models.Command
 import csw.location.agent.wiring.Wiring
-import csw.location.api.models.Connection.{HttpConnection, TcpConnection}
 import csw.location.api.models._
+import csw.location.model.scaladsl
+import csw.location.model.scaladsl.Connection.{HttpConnection, TcpConnection}
+import csw.location.model.scaladsl.{ComponentId, ComponentType, HttpRegistration, TcpRegistration}
 import csw.logging.api.scaladsl.Logger
 
 import scala.collection.immutable.Seq
@@ -19,7 +21,7 @@ import scala.concurrent.{Await, Future}
 import scala.util.control.NonFatal
 
 /**
- * Starts a given external program ([[TcpConnection]]), registers it with the location service and unregisters it when the program exits.
+ * Starts a given external program ([[csw.location.model.scaladsl.Connection.TcpConnection]]), registers it with the location service and unregisters it when the program exits.
  */
 class LocationAgent(names: List[String], command: Command, wiring: Wiring) {
   private val log: Logger = LocationAgentLogger.getLogger
@@ -64,7 +66,7 @@ class LocationAgent(names: List[String], command: Command, wiring: Wiring) {
 
   // Registers a single service as a HTTP service with provided path
   private def registerHttpName(name: String, path: String): Future[RegistrationResult] = {
-    val componentId = ComponentId(name, ComponentType.Service)
+    val componentId = scaladsl.ComponentId(name, ComponentType.Service)
     val connection  = HttpConnection(componentId)
     locationService.register(HttpRegistration(connection, command.port, path))
   }

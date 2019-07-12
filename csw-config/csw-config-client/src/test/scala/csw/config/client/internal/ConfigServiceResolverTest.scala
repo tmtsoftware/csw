@@ -7,9 +7,9 @@ import csw.config.client.ConfigClientBaseSuite
 import csw.config.client.commons.ConfigServiceConnection
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.config.server.commons.TestFutureExtension.RichFuture
-import csw.location.api.models.HttpLocation
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.location.model.scaladsl.HttpLocation
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}

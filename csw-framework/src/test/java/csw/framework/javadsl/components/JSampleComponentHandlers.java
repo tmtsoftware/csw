@@ -6,22 +6,22 @@ import akka.stream.ActorMaterializer;
 import akka.stream.ThrottleMode;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
+import csw.command.client.CommandResponseManager;
+import csw.command.client.messages.TopLevelActorMessage;
 import csw.common.components.command.ComponentStateForCommand;
 import csw.common.components.framework.SampleComponentState;
 import csw.framework.CurrentStatePublisher;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
-import csw.command.client.messages.TopLevelActorMessage;
+import csw.location.model.scaladsl.TrackingEvent;
+import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.*;
-import csw.location.api.models.TrackingEvent;
 import csw.params.core.generics.Key;
-import csw.params.core.models.Id;
-import csw.params.javadsl.JKeyType;
 import csw.params.core.generics.Parameter;
+import csw.params.core.models.Id;
 import csw.params.core.states.CurrentState;
 import csw.params.core.states.StateName;
-import csw.command.client.CommandResponseManager;
-import csw.logging.api.javadsl.ILogger;
+import csw.params.javadsl.JKeyType;
 
 import java.time.Duration;
 import java.util.concurrent.*;
@@ -92,7 +92,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     public CommandResponse.SubmitResponse onSubmit(ControlCommand controlCommand) {
         // Adding item from CommandMessage paramset to ensure things are working
         if (controlCommand.commandName().equals(crmAddOrUpdateCmd())) {
-            return crmAddOrUpdate((Setup)controlCommand);
+            return crmAddOrUpdate((Setup) controlCommand);
         } else {
             CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
             currentStatePublisher.publish(submitState);
@@ -104,7 +104,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     public void onOneway(ControlCommand controlCommand) {
         if (controlCommand.commandName().equals(hcdCurrentStateCmd())) {
             // Special handling for oneway to test current state
-            processCurrentStateOnewayCommand((Setup)controlCommand);
+            processCurrentStateOnewayCommand((Setup) controlCommand);
         } else {
             // Adding item from CommandMessage paramset to ensure things are working
             CurrentState onewayState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.oneWayCommandChoice()));

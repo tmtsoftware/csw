@@ -1,9 +1,8 @@
-package csw.location.api.codecs
+package csw.location.model.codecs
 
 import java.net.URI
 
-import akka.Done
-import csw.location.api.models._
+import csw.location.model.scaladsl._
 import csw.params.core.formats.{CborHelpers, CommonCodecs}
 import io.bullet.borer.Codec
 import io.bullet.borer.derivation.MapBasedCodecs._
@@ -32,6 +31,4 @@ trait LocationCodecs extends CommonCodecs {
   implicit lazy val trackingEventCodec: Codec[TrackingEvent]     = deriveCodec[TrackingEvent]
   implicit lazy val locationUpdatedCodec: Codec[LocationUpdated] = deriveCodec[LocationUpdated]
   implicit lazy val locationRemovedCodec: Codec[LocationRemoved] = deriveCodec[LocationRemoved]
-
-  implicit lazy val doneCodec: Codec[Done] = CborHelpers.bimap[String, Done](_ => Done, _ => "done")
 }

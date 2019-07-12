@@ -1,20 +1,6 @@
 package csw.framework.internal.supervisor
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import csw.framework.ComponentInfos._
-import csw.framework.FrameworkTestSuite
-import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInitializeTimeout}
-import csw.params.commands.CommandResponse._
-import csw.params.commands._
-import csw.command.client.models.matchers.DemandMatcher
-import csw.command.client.models.framework.PubSub.Subscribe
-import csw.command.client.models.framework.ToComponentLifecycleMessage.{GoOffline, GoOnline}
-import csw.command.client.models.framework.{ComponentInfo, LifecycleStateChanged, SupervisorLifecycleState}
-import csw.location.api.models.ComponentType.{Assembly, HCD}
-import csw.location.api.models.Connection.AkkaConnection
-import csw.params.core.generics.{KeyType, Parameter}
-import csw.params.core.models.ObsId
-import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.command.client.messages.CommandMessage.{Oneway, Submit}
 import csw.command.client.messages.ComponentCommonMessage.{
   ComponentStateSubscription,
@@ -25,6 +11,20 @@ import csw.command.client.messages.ContainerIdleMessage
 import csw.command.client.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.Restart
+import csw.command.client.models.framework.PubSub.Subscribe
+import csw.command.client.models.framework.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.command.client.models.framework.{ComponentInfo, LifecycleStateChanged, SupervisorLifecycleState}
+import csw.command.client.models.matchers.DemandMatcher
+import csw.framework.ComponentInfos._
+import csw.framework.FrameworkTestSuite
+import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInitializeTimeout}
+import csw.location.model.scaladsl.ComponentType.{Assembly, HCD}
+import csw.location.model.scaladsl.Connection.AkkaConnection
+import csw.params.commands.CommandResponse._
+import csw.params.commands._
+import csw.params.core.generics.{KeyType, Parameter}
+import csw.params.core.models.ObsId
+import csw.params.core.states.{CurrentState, DemandState, StateName}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.prop.Tables.Table

@@ -4,13 +4,13 @@ import java.time.Duration
 import java.util.Optional
 import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import akka.Done
 import akka.stream.KillSwitch
 import akka.stream.javadsl.Source
-import csw.location.api.models._
 import csw.location.api.scaladsl.LocationService
+import csw.location.model.scaladsl._
 
 /**
  * A LocationService interface to manage connections and their registrations. All operations are non-blocking.

@@ -1,5 +1,7 @@
 package csw.location
 
+import csw.location.model.scaladsl.ComponentType
+
 /**
  * == Location Service ==
  *
@@ -15,7 +17,7 @@ package csw.location
  *  - CLUSTER_SEEDS (The host address and port of the seedNodes of the cluster) Ex. CLUSTER_SEEDS="192.168.121.10:3552, 192.168.121.11:3552"
  *
  * Location service make use of classes defined in `csw-messages` package, for example:
- * - [[csw.location.api.models.Location]] :
+ * - [[csw.location.model.scaladsl.Location]] :
  *  When you resolve component location using [[csw.location.api.scaladsl.LocationService]], you get back this location.
  *  There are three types of Locations:
  *   - [[csw.location.api.models.AkkaLocation]]: holds hostname, port and actorRef which is ready to receive [[csw.params.commands.Command]] from outside.
@@ -23,7 +25,7 @@ package csw.location
  *   - [[csw.location.api.models.HttpLocation]]: holds hostname and port which can be used for further communication.
  *
  * - [[csw.location.api.models.Connection]]  :
- *  Connection holds the identity of component which includes `component name` and [[csw.location.api.models.ComponentType]].
+ *  Connection holds the identity of component which includes `component name` and [[ComponentType]].
  *  Every component needs to register with location service using unique connection.
  *  There are three types of Connections:
  *  - [[csw.location.api.models.Connection.AkkaConnection]]

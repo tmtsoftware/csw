@@ -16,10 +16,10 @@ import csw.command.client.messages.ContainerMessage
 import csw.command.client.models.framework.{Component, Components, ContainerLifecycleState}
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
-import csw.location.api.models.ComponentId
-import csw.location.api.models.ComponentType.{Assembly, HCD}
-import csw.location.api.models.Connection.AkkaConnection
 import csw.location.client.ActorSystemFactory
+import csw.location.model.scaladsl
+import csw.location.model.scaladsl.ComponentType.{Assembly, HCD}
+import csw.location.model.scaladsl.Connection.AkkaConnection
 import csw.logging.api.models.Level
 import csw.logging.api.models.Level.{ERROR, INFO, WARN}
 import csw.logging.client.internal.JsonExtensions.RichJsObject
@@ -43,9 +43,9 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
 
   implicit val testKitSettings: TestKitSettings = TestKitSettings(typedSystem)
 
-  private val laserConnection            = AkkaConnection(ComponentId("Laser", Assembly))
-  private val motionControllerConnection = AkkaConnection(ComponentId("Motion_Controller", HCD))
-  private val galilConnection            = AkkaConnection(ComponentId("Galil", Assembly))
+  private val laserConnection            = AkkaConnection(scaladsl.ComponentId("Laser", Assembly))
+  private val motionControllerConnection = AkkaConnection(scaladsl.ComponentId("Motion_Controller", HCD))
+  private val galilConnection            = AkkaConnection(scaladsl.ComponentId("Galil", Assembly))
 
   private var containerActorSystem: ActorSystem[SpawnProtocol] = _
 

@@ -1,8 +1,8 @@
-package csw.location.api.models
+package csw.location.model.scaladsl
 
-import csw.location.api.codecs.LocationSerializable
-import csw.location.api.models.ConnectionType.{AkkaType, HttpType, TcpType}
-import play.api.libs.json._
+import csw.location.model.scaladsl.ConnectionType.{AkkaType, HttpType, TcpType}
+import csw.location.model.serializable.LocationSerializable
+import play.api.libs.json.{Json, Reads, Writes}
 
 /**
  * Represents a connection based on a componentId and the type of connection offered by the component

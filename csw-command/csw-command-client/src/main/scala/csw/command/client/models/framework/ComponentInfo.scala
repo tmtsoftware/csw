@@ -1,5 +1,5 @@
 package csw.command.client.models.framework
-import csw.location.api.models.{ComponentType, Connection}
+import csw.location.model.scaladsl.{ComponentType, Connection}
 import csw.params.core.models.Prefix
 import play.api.libs.json._
 
@@ -11,7 +11,7 @@ import scala.concurrent.duration.{DurationDouble, FiniteDuration}
  *
  * @param name the name of the component
  * @param componentType
- *  : the type of the component as defined by [[csw.location.api.models.ComponentType]]
+ *  : the type of the component as defined by [[ComponentType]]
  * @param prefix identifies the subsystem
  * @param behaviorFactoryClassName
  *  : specifies the component to be created by name of the class of it's factory

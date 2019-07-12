@@ -5,7 +5,7 @@ import csw.command.client.internal.{CommandCorrelation, CommandResponseState, Co
 import csw.command.client.messages.CommandSerializationMarker._
 import csw.command.client.models.framework.PubSub.SubscriberMessage
 import csw.command.client.models.framework._
-import csw.location.api.models.TrackingEvent
+import csw.location.model.scaladsl.TrackingEvent
 import csw.logging.api.models.Level
 import csw.logging.client.models.LogMetadata
 import csw.params.commands.CommandResponse.{RemoteMsg => _, _}

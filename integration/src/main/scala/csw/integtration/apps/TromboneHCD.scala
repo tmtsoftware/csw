@@ -5,9 +5,10 @@ import akka.actor.typed.scaladsl.Behaviors
 import csw.command.client.messages.CommandMessage.Submit
 import csw.integtration.common.TestFutureExtension.RichFuture
 import csw.location.api.extensions.ActorExtension.RichActor
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{AkkaRegistration, ComponentId, ComponentType, RegistrationResult}
+import csw.location.api.models.RegistrationResult
 import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.location.model.scaladsl.Connection.AkkaConnection
+import csw.location.model.scaladsl.{AkkaRegistration, ComponentId, ComponentType}
 import csw.location.server.internal.ServerWiring
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.LoggingSystemFactory

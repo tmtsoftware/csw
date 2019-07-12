@@ -4,9 +4,10 @@ import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.Behavior
 import akka.stream.scaladsl.{Keep, Sink}
 import csw.location.api.extensions.ActorExtension.RichActor
-import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.location.api.models._
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
+import csw.location.model.scaladsl
+import csw.location.model.scaladsl.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.location.model.scaladsl._
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.params.core.models.Prefix
 
@@ -24,10 +25,10 @@ class TrackLocationTest(ignore: Int, mode: String) extends LSNodeSpec(config = n
     val akkaConnection = AkkaConnection(ComponentId("tromboneHcd", ComponentType.HCD))
 
     //create http connection
-    val httpConnection = HttpConnection(ComponentId("Assembly1", ComponentType.Assembly))
+    val httpConnection = HttpConnection(scaladsl.ComponentId("Assembly1", ComponentType.Assembly))
 
     //create tcp connection
-    val tcpConnection = TcpConnection(ComponentId("redis1", ComponentType.Service))
+    val tcpConnection = TcpConnection(scaladsl.ComponentId("redis1", ComponentType.Service))
 
     val prefix = Prefix("nfiraos.ncc.trombone")
 

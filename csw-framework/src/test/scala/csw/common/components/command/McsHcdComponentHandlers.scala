@@ -1,15 +1,15 @@
 package csw.common.components.command
 
 import akka.actor.typed.scaladsl.ActorContext
+import csw.command.client.messages.CommandResponseManagerMessage.AddOrUpdateCommand
+import csw.command.client.messages.TopLevelActorMessage
 import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.command.client.messages.CommandResponseManagerMessage.AddOrUpdateCommand
-import csw.command.client.messages.TopLevelActorMessage
+import csw.location.model.scaladsl.TrackingEvent
+import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
-import csw.location.api.models.TrackingEvent
-import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong

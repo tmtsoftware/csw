@@ -2,15 +2,16 @@ package csw.testkit.redis
 import java.util.Optional
 
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.{typed, ActorSystem, CoordinatedShutdown}
+import akka.actor.{ActorSystem, CoordinatedShutdown, typed}
 import akka.http.scaladsl.Http
 import akka.stream.Materializer
 import akka.stream.typed.scaladsl
 import akka.util.Timeout
-import csw.location.api.models.Connection.TcpConnection
-import csw.location.api.models.{RegistrationResult, TcpRegistration}
+import csw.location.api.models.RegistrationResult
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.location.model.scaladsl.Connection.TcpConnection
+import csw.location.model.scaladsl.TcpRegistration
 import csw.network.utils.SocketUtils.getFreePort
 import csw.testkit.internal.TestKitUtils
 import redis.embedded.{RedisSentinel, RedisServer}

@@ -26,9 +26,11 @@ import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.IRegistrationResult;
 import csw.location.api.javadsl.JComponentType;
 import csw.location.api.javadsl.JConnectionType;
-import csw.location.api.models.*;
 import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
+import csw.location.model.scaladsl.*;
+import csw.location.model.scaladsl.Connection.AkkaConnection;
+import csw.location.model.scaladsl.Connection.HttpConnection;
 import csw.location.server.internal.ServerWiring;
 import csw.location.server.scaladsl.RegistrationFactory;
 import csw.logging.api.javadsl.ILogger;
@@ -49,8 +51,6 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import static csw.location.api.models.Connection.AkkaConnection;
-import static csw.location.api.models.Connection.HttpConnection;
 
 /**
  * An example location service client application.

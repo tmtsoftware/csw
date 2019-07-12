@@ -3,9 +3,9 @@ package csw.framework.internal.container
 import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
+import akka.actor.typed._
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext}
-import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal, Terminated}
 import csw.alarm.client.AlarmServiceFactory
 import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.command.client.messages.ContainerIdleMessage.SupervisorsCreated
@@ -22,9 +22,9 @@ import csw.framework.commons.CoordinatedShutdownReasons.{
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models._
 import csw.framework.scaladsl.RegistrationFactory
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{AkkaRegistration, ComponentId, ComponentType}
 import csw.location.api.scaladsl.LocationService
+import csw.location.model.scaladsl.{AkkaRegistration, ComponentId, ComponentType}
+import csw.location.model.scaladsl.Connection.AkkaConnection
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.core.models.Prefix
@@ -39,8 +39,8 @@ import scala.util.{Failure, Success}
  * @param ctx                   the [[akka.actor.typed.scaladsl.ActorContext]] under which the actor instance of this behavior is created
  * @param containerInfo         container related information as described in the configuration file
  * @param supervisorInfoFactory the factory for creating the Supervisors for components described in ContainerInfo
- * @param registrationFactory   the factory for creating a typed [[csw.location.api.models.AkkaRegistration]] from
- * [[csw.location.api.models.Connection.AkkaConnection]]
+ * @param registrationFactory   the factory for creating a typed [[csw.location.model.scaladsl.AkkaRegistration]] from
+ *                              [[csw.location.model.scaladsl.Connection.AkkaConnection]]
  * @param eventServiceFactory   the factory to create instance of event service to be used by components to use and/or create publishers and subscribers
  * @param locationService       the single instance of Location service created for a running application
  * @param loggerFactory         factory to create suitable logger instance

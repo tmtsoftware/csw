@@ -4,8 +4,8 @@ import csw.alarm.client.internal.commons.AlarmServiceConnection;
 import csw.config.server.commons.ConfigServiceConnection;
 import csw.event.client.internal.commons.EventServiceConnection;
 import csw.location.api.javadsl.ILocationService;
-import csw.location.api.models.HttpLocation;
-import csw.location.api.models.TcpLocation;
+import csw.location.model.scaladsl.HttpLocation;
+import csw.location.model.scaladsl.TcpLocation;
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -28,7 +28,7 @@ public class FrameworkTestKitJunitTest extends JUnitSuite {
     public void shouldStartAllProvidedCSWServices() throws ExecutionException, InterruptedException {
         Optional<TcpLocation> alarmLocation = locationService.find(AlarmServiceConnection.value()).get();
         Assert.assertTrue(alarmLocation.isPresent());
-        Assert.assertEquals(alarmLocation.orElseThrow().connection(),AlarmServiceConnection.value());
+        Assert.assertEquals(alarmLocation.orElseThrow().connection(), AlarmServiceConnection.value());
 
         Optional<HttpLocation> configLocation = locationService.find(ConfigServiceConnection.value()).get();
         Assert.assertTrue(configLocation.isPresent());

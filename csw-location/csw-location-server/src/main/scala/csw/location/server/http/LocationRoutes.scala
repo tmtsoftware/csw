@@ -7,9 +7,9 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.scaladsl.Source
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
-import csw.location.api.codecs.LocationCodecs
-import csw.location.api.models.{Registration, _}
 import csw.location.api.scaladsl.LocationService
+import csw.location.model.codecs.LocationCodecs
+import csw.location.model.scaladsl._
 import csw.location.server.internal.ActorRuntime
 import io.bullet.borer.Json
 

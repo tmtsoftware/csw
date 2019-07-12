@@ -1,7 +1,7 @@
 package csw.alarm.client.internal.commons
 
-import csw.location.api.models.Connection.TcpConnection
-import csw.location.api.models.{ComponentId, ComponentType}
+import csw.location.model.scaladsl.Connection.TcpConnection
+import csw.location.model.scaladsl.{ComponentId, ComponentType}
 
 /**
  * `AlarmServiceConnection` is a wrapper over predefined `TcpConnection` representing alarm service. It is used to resolve

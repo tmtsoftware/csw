@@ -11,7 +11,7 @@ import csw.command.client.messages.TopLevelActorMessage
 import csw.config.api.models.ConfigData
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.api.models.{LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.location.model.scaladsl.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandResponse.{Accepted, Completed, SubmitResponse, ValidateCommandResponse}
 import csw.params.commands.{ControlCommand, Observe, Setup}

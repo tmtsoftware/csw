@@ -3,7 +3,7 @@ package csw.command.client.extensions
 import akka.actor.typed.{ActorRef, ActorSystem}
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.location.api.extensions.URIExtension.RichURI
-import csw.location.api.models.AkkaLocation
+import csw.location.model.scaladsl.AkkaLocation
 
 import scala.reflect.ClassTag
 

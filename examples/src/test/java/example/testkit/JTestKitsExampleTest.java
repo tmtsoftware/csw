@@ -5,10 +5,10 @@ import akka.actor.typed.SpawnProtocol;
 import akka.stream.typed.javadsl.ActorMaterializerFactory;
 import com.typesafe.config.ConfigFactory;
 import csw.location.api.javadsl.ILocationService;
-import csw.location.api.models.AkkaLocation;
-import csw.location.api.models.ComponentId;
-import csw.location.api.models.Connection.AkkaConnection;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
+import csw.location.model.scaladsl.AkkaLocation;
+import csw.location.model.scaladsl.ComponentId;
+import csw.location.model.scaladsl.Connection.AkkaConnection;
 import csw.testkit.FrameworkTestKit;
 import csw.testkit.javadsl.JCSWService;
 import org.junit.AfterClass;
@@ -56,7 +56,7 @@ public class JTestKitsExampleTest extends JUnitSuite {
 
         //#spawn-using-testkit
 
-        AkkaConnection connection       = new AkkaConnection(new ComponentId("JSampleAssembly", Assembly));
+        AkkaConnection connection = new AkkaConnection(new ComponentId("JSampleAssembly", Assembly));
         Optional<AkkaLocation> akkaLocation = locationService.resolve(connection, Duration.ofSeconds(5)).get();
 
         Assert.assertTrue(akkaLocation.isPresent());

@@ -8,11 +8,12 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.ActorMaterializer
 import akka.stream.typed.scaladsl
 import csw.location.api.extensions.ActorExtension.RichActor
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{AkkaRegistration, ComponentId, ComponentType, RegistrationResult}
+import csw.location.api.models.RegistrationResult
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.location.model.scaladsl.Connection.AkkaConnection
+import csw.location.model.scaladsl.{AkkaRegistration, ComponentId, ComponentType}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.{LoggerFactory, LoggingSystemFactory}

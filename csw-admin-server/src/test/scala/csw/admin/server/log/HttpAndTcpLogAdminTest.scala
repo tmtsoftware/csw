@@ -12,8 +12,9 @@ import csw.commons.http.{ErrorMessage, ErrorResponse}
 import csw.config.server.commons.{ConfigServiceConnection, TestFileUtils}
 import csw.config.server.mocks.MockedAuthentication
 import csw.config.server.{ServerWiring, Settings}
-import csw.location.api.models.Connection.TcpConnection
-import csw.location.api.models.{ComponentId, ComponentType}
+import csw.location.model.scaladsl
+import csw.location.model.scaladsl.Connection.TcpConnection
+import csw.location.model.scaladsl.{ComponentId, ComponentType}
 import csw.logging.client.internal._
 import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.network.utils.Networks
@@ -119,7 +120,7 @@ class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpSupport with Moc
   // DEOPSCSW-160: Config(HTTP) Service can receive and handle runtime update for logging characteristics
   test("set component log level for tcp service not supported") {
 
-    val tcpConnection = TcpConnection(ComponentId("ConfigServer", ComponentType.Service))
+    val tcpConnection = TcpConnection(scaladsl.ComponentId("ConfigServer", ComponentType.Service))
 
     // send http get metadata request and verify the response has correct log levels
     val getLogMetadataUri = Uri.from(

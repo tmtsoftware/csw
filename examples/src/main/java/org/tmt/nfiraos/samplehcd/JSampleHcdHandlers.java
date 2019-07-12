@@ -7,7 +7,7 @@ import akka.actor.typed.javadsl.Behaviors;
 import csw.command.client.messages.TopLevelActorMessage;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
-import csw.location.api.models.TrackingEvent;
+import csw.location.model.scaladsl.TrackingEvent;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.*;
 import csw.params.core.generics.Key;
@@ -81,6 +81,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
 
     //#initialize
     private Optional<Cancellable> maybePublishingGenerator = Optional.empty();
+
     @Override
     public CompletableFuture<Void> jInitialize() {
         return CompletableFuture.runAsync(() -> {
@@ -102,6 +103,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
 
     //#publish
     private int counter = 0;
+
     private Optional<Event> incrementCounterEvent() {
         counter += 1;
         Parameter<Integer> param = JKeyType.IntKey().make("counter").set(counter);

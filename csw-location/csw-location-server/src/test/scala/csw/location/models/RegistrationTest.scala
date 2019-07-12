@@ -8,9 +8,10 @@ import akka.actor.typed.{ActorSystem, Behavior, SpawnProtocol}
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.location.api.exceptions.LocalAkkaActorRegistrationNotAllowed
 import csw.location.api.extensions.ActorExtension.RichActor
-import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.location.api.models._
 import csw.location.client.ActorSystemFactory
+import csw.location.model.scaladsl
+import csw.location.model.scaladsl.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.location.model.scaladsl._
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.network.utils.Networks
 import csw.params.core.models.Prefix
@@ -41,7 +42,7 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     val port     = 9595
     val prefix   = "/trombone/hcd"
 
-    val httpConnection   = HttpConnection(ComponentId("trombone", ComponentType.HCD))
+    val httpConnection   = HttpConnection(scaladsl.ComponentId("trombone", ComponentType.HCD))
     val httpRegistration = HttpRegistration(httpConnection, port, prefix)
 
     val expectedhttpLocation = HttpLocation(httpConnection, new URI(s"http://$hostname:$port/$prefix"))
@@ -53,7 +54,7 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     val hostname = Networks().hostname
     val port     = 9596
 
-    val tcpConnection   = TcpConnection(ComponentId("lgsTrombone", ComponentType.HCD))
+    val tcpConnection   = TcpConnection(scaladsl.ComponentId("lgsTrombone", ComponentType.HCD))
     val tcpRegistration = TcpRegistration(tcpConnection, port)
 
     val expectedTcpLocation = TcpLocation(tcpConnection, new URI(s"tcp://$hostname:$port"))
@@ -68,7 +69,7 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
 
     implicit val actorSystem: ActorSystem[SpawnProtocol] = ActorSystem(SpawnProtocol.behavior, "local-actor-system", config)
     val actorRefURI                                      = actorSystem.spawn(Behaviors.empty, "my-actor-2").toURI
-    val akkaConnection                                   = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
+    val akkaConnection                                   = AkkaConnection(scaladsl.ComponentId("hcd1", ComponentType.HCD))
     val prefix                                           = Prefix("nfiraos.ncc.trombone")
 
     intercept[LocalAkkaActorRegistrationNotAllowed] {

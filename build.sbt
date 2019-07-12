@@ -100,17 +100,30 @@ lazy val `csw-admin-server` = project
 lazy val `csw-location` = project
   .in(file("csw-location"))
   .aggregate(
+    `csw-location-model-jvm`,
+    `csw-location-model-js`,
     `csw-location-api`,
     `csw-location-server`,
     `csw-location-client`,
     `csw-location-agent`
   )
 
+lazy val `csw-location-model` = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("csw-location/csw-location-model"))
+  .enablePlugins(GenJavadocPlugin, MaybeCoverage)
+  .dependsOn(`csw-params`)
+  .settings(fork := false)
+  .settings(libraryDependencies ++= Dependencies.LocationModel.value)
+
+lazy val `csw-location-model-jvm` = `csw-location-model`.jvm
+lazy val `csw-location-model-js`  = `csw-location-model`.js
+
 lazy val `csw-location-api` = project
   .in(file("csw-location/csw-location-api"))
   .dependsOn(
     `csw-logging-client`,
-    `csw-params-jvm`
+    `csw-location-model-jvm`,
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(

@@ -5,8 +5,8 @@ import akka.actor.typed.{ActorRef, ActorSystem, Behavior, Terminated}
 import akka.cluster.ddata.typed.scaladsl.Replicator
 import akka.cluster.ddata.typed.scaladsl.Replicator.Changed
 import csw.location.api.extensions.URIExtension.RichURI
-import csw.location.api.models.{AkkaLocation, Location}
 import csw.location.api.scaladsl.LocationService
+import csw.location.model.scaladsl.{AkkaLocation, Location}
 import csw.location.server.commons.{CswCluster, LocationServiceLogger}
 import csw.location.server.internal.Registry.AllServices
 import csw.logging.api.scaladsl.Logger

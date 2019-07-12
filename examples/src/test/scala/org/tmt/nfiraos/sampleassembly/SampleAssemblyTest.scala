@@ -1,7 +1,7 @@
 package org.tmt.nfiraos.sampleassembly
 
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{ComponentId, ComponentType}
+import csw.location.model.scaladsl.Connection.AkkaConnection
+import csw.location.model.scaladsl.{ComponentId, ComponentType}
 import csw.testkit.scaladsl.CSWService.{AlarmServer, EventServer}
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
 import org.scalatest.FunSuiteLike

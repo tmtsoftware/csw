@@ -11,9 +11,9 @@ import csw.config.server.ServerWiring
 import csw.config.server.commons.ConfigServiceConnection
 import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.location.api.exceptions.OtherLocationIsRegistered
-import csw.location.api.models.HttpRegistration
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.location.model.scaladsl.HttpRegistration
 import csw.location.server.http.HTTPLocationService
 import csw.network.utils.Networks
 

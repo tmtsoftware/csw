@@ -30,7 +30,7 @@ import csw.command.client.models.framework.SupervisorLifecycleState._
 import csw.command.client.models.framework.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.command.client.models.framework._
 import csw.commons.ResourceReader
-import csw.location.api.models.ComponentType
+import csw.location.model.scaladsl.ComponentType
 import csw.logging.api.models.Level
 import csw.logging.client.models.LogMetadata
 import csw.params.commands.CommandResponse._

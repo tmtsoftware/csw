@@ -10,7 +10,6 @@ import akka.japi.Pair;
 import akka.stream.KillSwitch;
 import akka.stream.Materializer;
 import akka.stream.javadsl.Keep;
-import akka.stream.javadsl.Sink;
 import akka.stream.testkit.TestSubscriber;
 import akka.stream.testkit.scaladsl.TestSink;
 import akka.stream.typed.javadsl.ActorMaterializerFactory;
@@ -19,9 +18,12 @@ import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.IRegistrationResult;
 import csw.location.api.javadsl.JComponentType;
 import csw.location.api.javadsl.JConnectionType;
-import csw.location.api.models.*;
 import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
+import csw.location.model.scaladsl.*;
+import csw.location.model.scaladsl.Connection.AkkaConnection;
+import csw.location.model.scaladsl.Connection.HttpConnection;
+import csw.location.model.scaladsl.Connection.TcpConnection;
 import csw.location.server.internal.ServerWiring;
 import csw.location.server.scaladsl.RegistrationFactory;
 import csw.logging.api.javadsl.ILogger;
@@ -42,8 +44,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-
-import static csw.location.api.models.Connection.*;
 
 @SuppressWarnings("ConstantConditions")
 public class JLocationServiceImplTest extends JUnitSuite {
