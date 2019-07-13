@@ -19,11 +19,11 @@ object EventServiceMultiNodeConfig extends MultiNodeConfig {
 
   val totalNumberOfNodes: Int =
     System.getProperty("csw.event.client.perf.nodes") match {
-      case null  ⇒ 2
-      case value ⇒ value.toInt
+      case null  => 2
+      case value => value.toInt
     }
 
-  for (n ← 1 to totalNumberOfNodes) role("node-" + n)
+  for (n <- 1 to totalNumberOfNodes) role("node-" + n)
 
   commonConfig(debugConfig(on = false).withFallback(ConfigFactory.load()))
 }
@@ -58,9 +58,9 @@ class EventServicePerfTest extends BasePerfSuite(EventServiceMultiNodeConfig) {
     }
     enterBarrier("results-printed")
     topProcess.foreach(
-      _ ⇒
+      _ =>
         scenarios.foreach(
-          s ⇒
+          s =>
             plotLatencyHistogram(
               s"${BenchmarkFileReporter.targetDirectory.getAbsolutePath}/${s.name}/Aggregated-*",
               s"[${testConfigs.frequency}Hz]"
@@ -94,7 +94,7 @@ class EventServicePerfTest extends BasePerfSuite(EventServiceMultiNodeConfig) {
         Await.result(resultAggregator.startSubscription().ready(), defaultTimeout)
       }
 
-      val subscribers: immutable.Seq[(Future[Done], PerfSubscriber)] = subIds.map { subId ⇒
+      val subscribers: immutable.Seq[(Future[Done], PerfSubscriber)] = subIds.map { subId =>
         val pubId = if (singlePublisher) 1 else subId
         val subscriber =
           new PerfSubscriber(
@@ -114,7 +114,7 @@ class EventServicePerfTest extends BasePerfSuite(EventServiceMultiNodeConfig) {
       waitForResultsFromAllSubscribers(subscribers)
       rep.halt()
 
-      subscribers.foreach { case (_, subscriber) ⇒ subscriber.printResult() }
+      subscribers.foreach { case (_, subscriber) => subscriber.printResult() }
 
       runOn(activeSubscriberNodes.head) {
         val aggregatedResult = completionProbe.expectMessageType[AggregatedResult](5.minute)
@@ -141,7 +141,7 @@ class EventServicePerfTest extends BasePerfSuite(EventServiceMultiNodeConfig) {
 
       val pubIds = if (singlePublisher) List(1) else pubSubAllocationPerNode(nodeId - 1)
       pubIds.foreach(
-        id ⇒
+        id =>
           new PerfPublisher(
             Prefix(testName),
             id,
@@ -189,9 +189,9 @@ class EventServicePerfTest extends BasePerfSuite(EventServiceMultiNodeConfig) {
   private val scens     = new Scenarios(testConfigs)
   private val scenarios = List(scens.payloadOneToOne, scens.payloadOneToMany)
 
-  for (scenario ← scenarios) {
+  for (scenario <- scenarios) {
     val scenarioName = scenario.name
-    for (currentTest ← scenario.testSettings)
+    for (currentTest <- scenario.testSettings)
       ignore(s"Perf results must be great for ${currentTest.testName} with payloadSize = ${currentTest.payloadSize}") {
         testScenario(scenarioName, currentTest)
       }

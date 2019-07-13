@@ -1,6 +1,6 @@
 package csw.location.client
 
-import akka.actor.typed.{ActorSystem ⇒ TypedActorSystem, Behavior}
+import akka.actor.typed.{ActorSystem => TypedActorSystem, Behavior}
 import com.typesafe.config.ConfigFactory
 import csw.location.api.commons.{Constants, LocationServiceLogger}
 import csw.logging.api.scaladsl.Logger

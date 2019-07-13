@@ -44,7 +44,7 @@ class SVNDirEntryExtTest extends FunSuite with Matchers {
     dirEntry.isFile shouldBe true
     dirEntry.isNotActiveFile(settings.`active-config-suffix`) shouldBe true
 
-    patterns.foreach(pattern ⇒ dirEntry.matches(Some(pattern)) shouldBe true)
+    patterns.foreach(pattern => dirEntry.matches(Some(pattern)) shouldBe true)
   }
 
   test("should not match invalid pattern for relative path") {
@@ -66,7 +66,7 @@ class SVNDirEntryExtTest extends FunSuite with Matchers {
       Pattern.compile("invalidstring")
     )
 
-    patterns.foreach(pattern ⇒ dirEntry.matches(Some(pattern)) shouldBe false)
+    patterns.foreach(pattern => dirEntry.matches(Some(pattern)) shouldBe false)
   }
 
   test("should detect annex and normal file based on type") {

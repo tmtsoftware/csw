@@ -38,7 +38,7 @@ private[client] class RedisConnectionsFactory(
   def redisKeySpaceApi[K: RomaineCodec, V: RomaineCodec](asyncApi: RedisAsyncApi[K, V]): RedisKeySpaceApi[K, V] =
     new RedisKeySpaceApi(subscriptionApi, asyncApi)
 
-  private def redisURI = alarmServiceResolver.uri().map { uri ⇒
+  private def redisURI = alarmServiceResolver.uri().map { uri =>
     RedisURI.Builder.sentinel(uri.getHost, uri.getPort, masterId).build()
   }
 }

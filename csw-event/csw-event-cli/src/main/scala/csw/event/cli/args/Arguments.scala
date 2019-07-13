@@ -28,9 +28,9 @@ trait Arguments { self: OptionParser[Options] =>
       .required()
       .valueName("<event1:key1>,<event2:key2:key3>...")
       .action { (x, c) =>
-        val map = x.map { eventArg ⇒
+        val map = x.map { eventArg =>
           val events = eventArg.split(":").toSet
-          EventKey(events.head) → events.tail
+          EventKey(events.head) -> events.tail
         }.toMap
 
         c.copy(eventsMap = map)
@@ -42,7 +42,7 @@ trait Arguments { self: OptionParser[Options] =>
       .valueName("<file>")
       .action((x, c) => c.copy(eventData = Some(x)))
       .validate(
-        file ⇒
+        file =>
           if (file.exists()) success
           else failure(s"file [${file.getAbsolutePath}] does not exist")
       )
@@ -72,7 +72,7 @@ trait Arguments { self: OptionParser[Options] =>
   def interval: OptionDef[Int, Options] =
     opt[Int]('i', "interval")
       .action((x, c) => c.copy(maybeInterval = Some(x.millis)))
-      .validate { interval ⇒
+      .validate { interval =>
         if (interval > 0) success
         else failure(s"invalid interval :$interval, should be > 0 milliseconds")
       }
@@ -80,7 +80,7 @@ trait Arguments { self: OptionParser[Options] =>
   def period: OptionDef[Int, Options] =
     opt[Int]('p', "period")
       .action((x, c) => c.copy(period = x.seconds))
-      .validate { period ⇒
+      .validate { period =>
         if (period > 0) success
         else failure(s"invalid period :$period, should be > 0 seconds")
       }

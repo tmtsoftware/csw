@@ -29,7 +29,7 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
    * @return a future that completes with string representation of file data
    */
   def toStringF(implicit mat: Materializer): Future[String] =
-    source.runFold("")((str, bs) ⇒ str + bs.utf8String)
+    source.runFold("")((str, bs) => str + bs.utf8String)
 
   /**
    * Returns a future of Config object if the data is in valid parseable HOCON format. Else, throws ConfigException.
@@ -40,7 +40,7 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
    */
   def toConfigObject(implicit mat: Materializer): Future[Config] = {
     import mat.executionContext
-    toStringF.map { s ⇒
+    toStringF.map { s =>
       ConfigFactory.parseString(s)
     }
   }
@@ -76,7 +76,7 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
     source
       .toMat(FileIO.toPath(path))(Keep.right)
       .mapMaterializedValue { resultF =>
-        resultF.map { ioResult ⇒
+        resultF.map { ioResult =>
           ioResult.status.get
           path
         }

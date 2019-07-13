@@ -15,11 +15,11 @@ object ModelObsMultiNodeConfig extends MultiNodeConfig {
 
   val totalNumberOfNodes: Int =
     System.getProperty("csw.event.client.perf.model-obs.nodes") match {
-      case null  ⇒ 2
-      case value ⇒ value.toInt
+      case null  => 2
+      case value => value.toInt
     }
 
-  for (n ← 1 to totalNumberOfNodes) role("node-" + n)
+  for (n <- 1 to totalNumberOfNodes) role("node-" + n)
 
   commonConfig(debugConfig(on = false).withFallback(ConfigFactory.load()))
 
@@ -61,7 +61,7 @@ class ModelObsPerfTest extends BasePerfSuite(ModelObsMultiNodeConfig) {
     }
     enterBarrier("results-printed")
     topProcess.foreach(
-      _ ⇒ plotLatencyHistogram(s"${BenchmarkFileReporter.targetDirectory.getAbsolutePath}/$scenarioName/Aggregated-*", "")
+      _ => plotLatencyHistogram(s"${BenchmarkFileReporter.targetDirectory.getAbsolutePath}/$scenarioName/Aggregated-*", "")
     )
     super.afterAll()
   }
@@ -75,9 +75,9 @@ class ModelObsPerfTest extends BasePerfSuite(ModelObsMultiNodeConfig) {
 
       val rep = reporter(s"ModelObsTest-$nodeId")
 
-      val subscribers = subSettings.flatMap { subSetting ⇒
+      val subscribers = subSettings.flatMap { subSetting =>
         import subSetting._
-        (1 to noOfSubs).map { subId ⇒
+        (1 to noOfSubs).map { subId =>
           val subscriber = new PerfSubscriber(
             newPrefix,
             subId,
@@ -104,9 +104,9 @@ class ModelObsPerfTest extends BasePerfSuite(ModelObsMultiNodeConfig) {
 
       enterBarrier("subscribers-started")
 
-      pubSettings.foreach { pubSetting ⇒
+      pubSettings.foreach { pubSetting =>
         import pubSetting._
-        (1 to noOfPubs).foreach { pubId ⇒
+        (1 to noOfPubs).foreach { pubId =>
           new PerfPublisher(
             newPrefix,
             pubId,
@@ -123,7 +123,7 @@ class ModelObsPerfTest extends BasePerfSuite(ModelObsMultiNodeConfig) {
       waitForResultsFromAllSubscribers(subscribers)
       rep.halt()
 
-      subscribers.foreach { case (_, subscriber) ⇒ subscriber.printResult() }
+      subscribers.foreach { case (_, subscriber) => subscriber.printResult() }
 
       runOn(roles.last) {
         val aggregatedResult = completionProbe.expectMessageType[AggregatedResult](maxTimeout)

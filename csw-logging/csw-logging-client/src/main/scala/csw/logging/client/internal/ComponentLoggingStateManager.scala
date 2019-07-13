@@ -6,7 +6,7 @@ import com.typesafe.config.Config
 import csw.logging.api.models.Level
 import csw.logging.client.models.ComponentLoggingState
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util.Try
 
 private[logging] object ComponentLoggingStateManager {
@@ -25,7 +25,7 @@ private[logging] object ComponentLoggingStateManager {
         .unwrapped()
         .asScala
         .map {
-          case (name, componentLogLevel) ⇒ (name, ComponentLoggingState(Level(componentLogLevel.toString)))
+          case (name, componentLogLevel) => (name, ComponentLoggingState(Level(componentLogLevel.toString)))
         }
         .toMap
     }.getOrElse(Map.empty).asJava)

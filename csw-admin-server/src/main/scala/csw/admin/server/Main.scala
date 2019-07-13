@@ -16,7 +16,7 @@ import scala.concurrent.duration.DurationDouble
 object Main extends App {
   private val name = BuildInfo.name
 
-  new ArgsParser(name).parse(args).foreach {
+  new ArgsParser(name).parse(args.toList).foreach {
     case Options(maybeAdminPort, locationHost) =>
       LocationServerStatus.requireUp(locationHost)
 
@@ -30,9 +30,9 @@ object Main extends App {
       coordinatedShutdown.addTask(
         CoordinatedShutdown.PhaseServiceUnbind,
         "unbind-services"
-      ) { () ⇒
+      ) { () =>
         val hardDeadline = 30.seconds
-        logAdminBindingF.flatMap(_.terminate(hardDeadline)).map(_ ⇒ Done)
+        logAdminBindingF.flatMap(_.terminate(hardDeadline)).map(_ => Done)
       }
   }
 }

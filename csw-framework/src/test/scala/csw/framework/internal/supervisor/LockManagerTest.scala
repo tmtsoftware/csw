@@ -52,7 +52,7 @@ class LockManagerTest extends FunSuite with MockitoSugar with Matchers {
     val lockManager = new LockManager(None, mockedLoggerFactory)
     lockManager.isLocked shouldBe false
 
-    val updatedLockManager = lockManager.lockComponent(prefix, lockingResponseProbe.ref)(Unit)
+    val updatedLockManager = lockManager.lockComponent(prefix, lockingResponseProbe.ref)(())
     lockingResponseProbe.expectMessage(LockAcquired)
     updatedLockManager.isLocked shouldBe true
   }
@@ -63,7 +63,7 @@ class LockManagerTest extends FunSuite with MockitoSugar with Matchers {
     val lockManager = new LockManager(Some(prefix), mockedLoggerFactory)
     lockManager.isLocked shouldBe true
 
-    val updatedLockManager = lockManager.lockComponent(prefix, lockingResponseProbe.ref)(Unit)
+    val updatedLockManager = lockManager.lockComponent(prefix, lockingResponseProbe.ref)(())
     lockingResponseProbe.expectMessage(LockAcquired)
     updatedLockManager.isLocked shouldBe true
   }
@@ -74,7 +74,7 @@ class LockManagerTest extends FunSuite with MockitoSugar with Matchers {
     val lockManager = new LockManager(Some(prefix), mockedLoggerFactory)
     lockManager.isLocked shouldBe true
 
-    val updatedLockManager = lockManager.lockComponent(invalidPrefix, lockingResponseProbe.ref)(Unit)
+    val updatedLockManager = lockManager.lockComponent(invalidPrefix, lockingResponseProbe.ref)(())
     lockingResponseProbe.expectMessageType[AcquiringLockFailed]
     updatedLockManager.isLocked shouldBe true
     updatedLockManager.lockPrefix.get shouldBe prefix
@@ -86,7 +86,7 @@ class LockManagerTest extends FunSuite with MockitoSugar with Matchers {
     val lockManager = new LockManager(Some(prefix), mockedLoggerFactory)
     lockManager.isUnLocked shouldBe false
 
-    val updatedLockManager = lockManager.unlockComponent(prefix, lockingResponseProbe.ref)(Unit)
+    val updatedLockManager = lockManager.unlockComponent(prefix, lockingResponseProbe.ref)(())
     lockingResponseProbe.expectMessage(LockReleased)
     updatedLockManager.isUnLocked shouldBe true
   }
@@ -97,7 +97,7 @@ class LockManagerTest extends FunSuite with MockitoSugar with Matchers {
     val lockManager = new LockManager(Some(prefix), mockedLoggerFactory)
     lockManager.isUnLocked shouldBe false
 
-    val updatedLockManager = lockManager.unlockComponent(invalidPrefix, lockingResponseProbe.ref)(Unit)
+    val updatedLockManager = lockManager.unlockComponent(invalidPrefix, lockingResponseProbe.ref)(())
     lockingResponseProbe.expectMessageType[ReleasingLockFailed]
     updatedLockManager.isUnLocked shouldBe false
   }
@@ -108,7 +108,7 @@ class LockManagerTest extends FunSuite with MockitoSugar with Matchers {
     val lockManager = new LockManager(None, mockedLoggerFactory)
     lockManager.isUnLocked shouldBe true
 
-    val updatedLockManager = lockManager.unlockComponent(prefix, lockingResponseProbe.ref)(Unit)
+    val updatedLockManager = lockManager.unlockComponent(prefix, lockingResponseProbe.ref)(())
     lockingResponseProbe.expectMessage(LockAlreadyReleased)
     updatedLockManager.isUnLocked shouldBe true
   }

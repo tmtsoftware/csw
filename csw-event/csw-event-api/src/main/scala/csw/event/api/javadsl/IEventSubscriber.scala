@@ -66,7 +66,7 @@ trait IEventSubscriber {
    * @param callback a function to execute asynchronously on each received event
    * @return an [[csw.event.api.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
-  def subscribeAsync(eventKeys: util.Set[EventKey], callback: Event ⇒ CompletableFuture[_]): IEventSubscription
+  def subscribeAsync(eventKeys: util.Set[EventKey], callback: Event => CompletableFuture[_]): IEventSubscription
 
   /**
    * Overload for above `subscribeAsync` for receiving event at a `every` frequency according to the specified `mode`. The latest
@@ -85,7 +85,7 @@ trait IEventSubscriber {
    */
   def subscribeAsync(
       eventKeys: util.Set[EventKey],
-      callback: Event ⇒ CompletableFuture[_],
+      callback: Event => CompletableFuture[_],
       every: Duration,
       mode: SubscriptionMode
   ): IEventSubscription

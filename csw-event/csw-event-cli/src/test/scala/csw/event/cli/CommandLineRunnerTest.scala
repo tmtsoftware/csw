@@ -19,7 +19,7 @@ import scala.collection.{immutable, mutable}
 class CommandLineRunnerTest extends SeedData with Eventually {
 
   def events(name: EventName): immutable.Seq[Event] =
-    for (i ← 1 to 10) yield event1.copy(eventName = name, eventId = Id(i.toString))
+    for (i <- 1 to 10) yield event1.copy(eventName = name, eventId = Id(i.toString))
 
   class EventGenerator(eventName: EventName) {
     var counter                               = 0
@@ -109,7 +109,7 @@ class CommandLineRunnerTest extends SeedData with Eventually {
     val expectedEventJson    = removeDynamicKeys(addEventIdAndName(eventJson, eventKey))
 
     val subscriber = eventService.defaultSubscriber
-    subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](e ⇒ queue.enqueue(eventToSanitizedJson(e)))).run()
+    subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](e => queue.enqueue(eventToSanitizedJson(e)))).run()
 
     Thread.sleep(500)
 
@@ -121,7 +121,7 @@ class CommandLineRunnerTest extends SeedData with Eventually {
     // invalid event + 7 events published in previous step
     eventually(queue.size shouldBe 8)
     queue should contain allElementsOf Seq(eventToSanitizedJson(Event.invalidEvent(eventKey))) ++ (1 to 5).map(
-      _ ⇒ expectedEventJson
+      _ => expectedEventJson
     )
   }
 
@@ -194,7 +194,7 @@ class CommandLineRunnerTest extends SeedData with Eventually {
 
     logBuffer.head shouldEqual s"[ERROR] No events published for key: [${eventsGroup.head.eventKey.key}]"
     logBuffer.tail
-      .map(str ⇒ Json.parse(str).as[JsObject])
+      .map(str => Json.parse(str).as[JsObject])
       .map(JsonSupport.readEvent[SystemEvent])
       .shouldEqual(publishedEvents)
   }
@@ -250,7 +250,7 @@ class CommandLineRunnerTest extends SeedData with Eventually {
   }
 
   // publish command generates new id and event time while publishing, hence assertions exclude these keys from json
-  private def removeDynamicKeys(json: JsValue) = JsObject(json.as[JsObject].value -- Seq("eventId", "eventTime"))
+  private def removeDynamicKeys(json: JsValue) = JsObject(json.as[JsObject].value.toMap -- Seq("eventId", "eventTime"))
 
   // publish command with -e argument updates existing prefix and event name from provided json if already present
   // else adds new entry

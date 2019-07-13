@@ -32,7 +32,7 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
 ) extends LocationService
     with HttpCodecs
     with LocationCodecs
-    with DoneCodec { outer ⇒
+    with DoneCodec { outer =>
 
   import actorSystem.executionContext
   implicit val untypedSystem: actor.ActorSystem = actorSystem.toUntyped
@@ -47,19 +47,19 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
     val response      = await(Http().singleRequest(request))
 
     response.status match {
-      case StatusCodes.OK ⇒
+      case StatusCodes.OK =>
         val location0 = await(Unmarshal(response.entity).to[Location])
         CoordinatedShutdown(untypedSystem).addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "unregister")(
-          () ⇒ unregister(location0.connection)
+          () => unregister(location0.connection)
         )
         new RegistrationResult {
           override def unregister(): Future[Done] = outer.unregister(location0.connection)
           override def location: Location         = location0
         }
       //fixme: status code 400 is wrongly mapped to OtherLocationIsRegistered
-      case x @ StatusCodes.BadRequest          ⇒ throw OtherLocationIsRegistered(x.reason)
-      case x @ StatusCodes.InternalServerError ⇒ throw RegistrationFailed(x.reason)
-      case _                                   ⇒ await(throwExOnInvalidResponse[RegistrationResult](request, response))
+      case x @ StatusCodes.BadRequest          => throw OtherLocationIsRegistered(x.reason)
+      case x @ StatusCodes.InternalServerError => throw RegistrationFailed(x.reason)
+      case _                                   => await(throwExOnInvalidResponse[RegistrationResult](request, response))
     }
   }
 
@@ -83,9 +83,9 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
     val request  = HttpRequest(HttpMethods.GET, uri = uri)
     val response = await(Http().singleRequest(request))
     response.status match {
-      case StatusCodes.OK       ⇒ Some(await(Unmarshal(response.entity).to[Location]).asInstanceOf[L])
-      case StatusCodes.NotFound ⇒ None
-      case _                    ⇒ await(throwExOnInvalidResponse[Option[L]](request, response))
+      case StatusCodes.OK       => Some(await(Unmarshal(response.entity).to[Location]).asInstanceOf[L])
+      case StatusCodes.NotFound => None
+      case _                    => await(throwExOnInvalidResponse[Option[L]](request, response))
     }
   }
 
@@ -96,9 +96,9 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
     val request  = HttpRequest(HttpMethods.GET, uri = uri)
     val response = await(Http().singleRequest(request))
     response.status match {
-      case StatusCodes.OK       ⇒ Some(await(Unmarshal(response.entity).to[Location]).asInstanceOf[L])
-      case StatusCodes.NotFound ⇒ None
-      case _                    ⇒ await(throwExOnInvalidResponse[Option[L]](request, response))
+      case StatusCodes.OK       => Some(await(Unmarshal(response.entity).to[Location]).asInstanceOf[L])
+      case StatusCodes.NotFound => None
+      case _                    => await(throwExOnInvalidResponse[Option[L]](request, response))
     }
   }
 
@@ -152,7 +152,7 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
       .viaMat(KillSwitches.single)(Keep.right)
   }
 
-  override def subscribe(connection: Connection, callback: TrackingEvent ⇒ Unit): KillSwitch =
+  override def subscribe(connection: Connection, callback: TrackingEvent => Unit): KillSwitch =
     track(connection).to(Sink.foreach(callback)).run()
 
   private def throwExOnInvalidResponse[T](request: HttpRequest, response: HttpResponse): Future[T] =

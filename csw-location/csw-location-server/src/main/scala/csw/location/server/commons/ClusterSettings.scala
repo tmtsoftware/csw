@@ -7,7 +7,7 @@ import csw.logging.api.scaladsl.Logger
 import csw.network.utils.Networks
 
 import scala.annotation.varargs
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
  * ClusterSettings manages [[com.typesafe.config.Config]] values required by an [[akka.actor.typed.ActorSystem]] to boot. It configures mainly
@@ -57,7 +57,7 @@ private[location] case class ClusterSettings(clusterName: String = Constants.Clu
   private val ClusterPortKey    = "CLUSTER_PORT"
   private val ManagementPortKey = "MANAGEMENT_PORT"
 
-  private def withEntry(key: String, value: Any): ClusterSettings = copy(values = values + (key → value))
+  private def withEntry(key: String, value: Any): ClusterSettings = copy(values = values + (key -> value))
 
   //This method should be used for testing only.
   def withEntries(entries: Map[String, Any]): ClusterSettings = copy(values = values ++ entries)
@@ -78,7 +78,7 @@ private[location] case class ClusterSettings(clusterName: String = Constants.Clu
   //This method should be used for testing only.
   @varargs
   def joinLocal(port: Int, ports: Int*): ClusterSettings = {
-    val seeds = s"$hostname:$port" +: ports.map(port ⇒ s"$hostname:$port")
+    val seeds = s"$hostname:$port" +: ports.map(port => s"$hostname:$port")
     joinSeeds(seeds.mkString(","))
   }
 
@@ -107,17 +107,17 @@ private[location] case class ClusterSettings(clusterName: String = Constants.Clu
   private[location] def seeds = allValues.get(ClusterSeedsKey).toList.flatMap(_.toString.split(",")).map(_.trim)
 
   //Prepare a list of seedNodes
-  def seedNodes: List[String] = seeds.map(seed ⇒ s"akka://$clusterName@$seed")
+  def seedNodes: List[String] = seeds.map(seed => s"akka://$clusterName@$seed")
 
   //Prepare config for ActorSystem to join csw-cluster
   private[location] def config: Config = {
     val computedValues: Map[String, Any] = Map(
-      "akka.remote.artery.canonical.hostname" → hostname,
-      "akka.remote.artery.canonical.port"     → port,
-      "akka.cluster.seed-nodes"               → seedNodes.asJava,
-      "akka.cluster.http.management.hostname" → hostname,
-      "akka.management.http.port"             → managementPort.getOrElse(19999), //management port will never start at 19999
-      "startManagement"                       → managementPort.isDefined
+      "akka.remote.artery.canonical.hostname" -> hostname,
+      "akka.remote.artery.canonical.port"     -> port,
+      "akka.cluster.seed-nodes"               -> seedNodes.asJava,
+      "akka.cluster.http.management.hostname" -> hostname,
+      "akka.management.http.port"             -> managementPort.getOrElse(19999), //management port will never start at 19999
+      "startManagement"                       -> managementPort.isDefined
     )
 
     log.debug(s"ClusterSettings using following configuration: [${computedValues.mkString(", ")}]")

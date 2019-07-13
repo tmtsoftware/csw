@@ -12,9 +12,9 @@ trait HttpSupport extends Directives with JsonSupport {
 
   override val log: Logger = AdminLogger.getLogger
 
-  val logLevelParam: Directive1[Level] = parameter('value).flatMap {
-    case value if Level.hasLevel(value) ⇒ provide(Level(value))
-    case _ ⇒
+  val logLevelParam: Directive1[Level] = parameter("value").flatMap {
+    case value if Level.hasLevel(value) => provide(Level(value))
+    case _ =>
       reject(MalformedQueryParamRejection("value", s"Supported logging levels are [${Level.stringify()}]"))
   }
 
@@ -23,6 +23,6 @@ trait HttpSupport extends Directives with JsonSupport {
   private def logRequest(req: HttpRequest): Unit =
     log.info(
       "HTTP Request received",
-      Map("url" → req.uri.toString(), "method" → req.method.value, "headers" → req.headers.mkString(","))
+      Map("url" -> req.uri.toString(), "method" -> req.method.value, "headers" -> req.headers.mkString(","))
     )
 }

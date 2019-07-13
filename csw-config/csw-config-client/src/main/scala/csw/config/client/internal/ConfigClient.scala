@@ -1,6 +1,6 @@
 package csw.config.client.internal
 
-import java.nio.{file ⇒ jnio}
+import java.nio.{file => jnio}
 import java.time.Instant
 
 import akka.http.scaladsl.Http
@@ -59,8 +59,8 @@ private[config] class ConfigClient(
   private implicit class HttpRequestExt(val httpRequest: HttpRequest) {
 
     def withBearerToken: HttpRequest = bearerTokenHeader match {
-      case Some(auth) ⇒ httpRequest.addHeader(auth)
-      case None       ⇒ httpRequest
+      case Some(auth) => httpRequest.addHeader(auth)
+      case None       => httpRequest
     }
 
   }
@@ -68,7 +68,7 @@ private[config] class ConfigClient(
   override def create(path: jnio.Path, configData: ConfigData, annex: Boolean, comment: String): Future[ConfigId] = async {
     val (prefix, stitchedSource) = configData.source.prefixAndStitch(1)
     val isAnnex                  = if (annex) annex else BinaryUtils.isBinary(await(prefix))
-    val uri                      = await(configUri(path)).withQuery(Query("annex" → isAnnex.toString, "comment" → comment))
+    val uri                      = await(configUri(path)).withQuery(Query("annex" -> isAnnex.toString, "comment" -> comment))
     val entity                   = HttpEntity(ContentTypes.`application/octet-stream`, configData.length, stitchedSource)
 
     val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity).withBearerToken
@@ -77,15 +77,15 @@ private[config] class ConfigClient(
 
     await(
       handleResponse(response) {
-        case StatusCodes.Created  ⇒ Unmarshal(response).to[ConfigId]
-        case StatusCodes.Conflict ⇒ throw FileAlreadyExists(path)
+        case StatusCodes.Created  => Unmarshal(response).to[ConfigId]
+        case StatusCodes.Conflict => throw FileAlreadyExists(path)
       }
     )
   }
 
   override def update(path: jnio.Path, configData: ConfigData, comment: String): Future[ConfigId] = async {
     val entity = HttpEntity(ContentTypes.`application/octet-stream`, configData.length, configData.source)
-    val uri    = await(configUri(path)).withQuery(Query("comment" → comment))
+    val uri    = await(configUri(path)).withQuery(Query("comment" -> comment))
 
     val request = HttpRequest(HttpMethods.PUT, uri = uri, entity = entity).withBearerToken
     maskTokenAndLog(request)
@@ -93,7 +93,7 @@ private[config] class ConfigClient(
 
     await(
       handleResponse(response) {
-        case StatusCodes.OK ⇒ Unmarshal(response).to[ConfigId]
+        case StatusCodes.OK => Unmarshal(response).to[ConfigId]
       }
     )
   }
@@ -107,15 +107,15 @@ private[config] class ConfigClient(
   }
 
   override def getById(path: jnio.Path, configId: ConfigId): Future[Option[ConfigData]] = async {
-    await(get(await(configUri(path)).withQuery(Query("id" → configId.id))))
+    await(get(await(configUri(path)).withQuery(Query("id" -> configId.id))))
   }
 
   override def getByTime(path: jnio.Path, time: Instant): Future[Option[ConfigData]] = async {
-    await(get(await(configUri(path)).withQuery(Query("date" → time.toString))))
+    await(get(await(configUri(path)).withQuery(Query("date" -> time.toString))))
   }
 
   override def exists(path: jnio.Path, id: Option[ConfigId]): Future[Boolean] = async {
-    val uri = await(configUri(path)).withQuery(Query(id.map(configId ⇒ "id" → configId.id.toString).toMap))
+    val uri = await(configUri(path)).withQuery(Query(id.map(configId => "id" -> configId.id.toString).toMap))
 
     val request = HttpRequest(HttpMethods.HEAD, uri = uri)
     maskTokenAndLog(request)
@@ -123,14 +123,14 @@ private[config] class ConfigClient(
 
     await(
       handleResponse(response) {
-        case StatusCodes.OK       ⇒ Future.successful(true)
-        case StatusCodes.NotFound ⇒ Future.successful(false)
+        case StatusCodes.OK       => Future.successful(true)
+        case StatusCodes.NotFound => Future.successful(false)
       }
     )
   }
 
   override def delete(path: jnio.Path, comment: String): Future[Unit] = async {
-    val uri = await(configUri(path)).withQuery(Query("comment" → comment))
+    val uri = await(configUri(path)).withQuery(Query("comment" -> comment))
 
     val request = HttpRequest(HttpMethods.DELETE, uri = uri).withBearerToken
     maskTokenAndLog(request)
@@ -138,14 +138,14 @@ private[config] class ConfigClient(
 
     await(
       handleResponse(response) {
-        case StatusCodes.OK ⇒ Future.unit
+        case StatusCodes.OK => Future.unit
       }
     )
   }
 
   override def list(fileType: Option[FileType] = None, pattern: Option[String] = None): Future[List[ConfigFileInfo]] = async {
     val uri =
-      await(listUri).withQuery(Query(fileType.map("type" → _.entryName).toMap ++ pattern.map("pattern" → _).toMap))
+      await(listUri).withQuery(Query(fileType.map("type" -> _.entryName).toMap ++ pattern.map("pattern" -> _).toMap))
 
     val request = HttpRequest(uri = uri)
     maskTokenAndLog(request)
@@ -153,7 +153,7 @@ private[config] class ConfigClient(
 
     await(
       handleResponse(response) {
-        case StatusCodes.OK ⇒ Unmarshal(response).to[List[ConfigFileInfo]]
+        case StatusCodes.OK => Unmarshal(response).to[List[ConfigFileInfo]]
       }
     )
 
@@ -166,13 +166,13 @@ private[config] class ConfigClient(
     handleHistory(historyActiveUri(path), from, to, maxResults)
 
   override def setActiveVersion(path: jnio.Path, id: ConfigId, comment: String): Future[Unit] =
-    handleActiveConfig(path, Query("id" → id.id.toString, "comment" → comment))
+    handleActiveConfig(path, Query("id" -> id.id.toString, "comment" -> comment))
 
   override def resetActiveVersion(path: jnio.Path, comment: String): Future[Unit] =
-    handleActiveConfig(path, Query("comment" → comment))
+    handleActiveConfig(path, Query("comment" -> comment))
 
   override def getActiveByTime(path: jnio.Path, time: Instant): Future[Option[ConfigData]] = async {
-    await(get(await(activeConfig(path)).withQuery(Query("date" → time.toString))))
+    await(get(await(activeConfig(path)).withQuery(Query("date" -> time.toString))))
   }
 
   override def getActiveVersion(path: jnio.Path): Future[Option[ConfigId]] = async {
@@ -184,8 +184,8 @@ private[config] class ConfigClient(
 
     await(
       handleResponse(response) {
-        case StatusCodes.OK       ⇒ Unmarshal(response).to[ConfigId].map(Some(_))
-        case StatusCodes.NotFound ⇒ Future.successful(None)
+        case StatusCodes.OK       => Unmarshal(response).to[ConfigId].map(Some(_))
+        case StatusCodes.NotFound => Future.successful(None)
       }
     )
   }
@@ -197,7 +197,7 @@ private[config] class ConfigClient(
 
     await(
       handleResponse(response) {
-        case StatusCodes.OK ⇒ Unmarshal(response).to[ConfigMetadata]
+        case StatusCodes.OK => Unmarshal(response).to[ConfigMetadata]
       }
     )
   }
@@ -211,7 +211,7 @@ private[config] class ConfigClient(
 
     await(
       handleResponse(response) {
-        case StatusCodes.OK ⇒ Future.unit
+        case StatusCodes.OK => Future.unit
       }
     )
   }
@@ -225,14 +225,14 @@ private[config] class ConfigClient(
 
     await(
       handleResponse(response) {
-        case StatusCodes.OK if lengthOption.isDefined ⇒
+        case StatusCodes.OK if lengthOption.isDefined =>
           Future.successful(Some(ConfigData.from(response.entity.dataBytes, lengthOption.get)))
-        case StatusCodes.OK ⇒
+        case StatusCodes.OK =>
           //Not consuming the file content will block the connection.
           response.entity.discardBytes()
           logger.error(EmptyResponse.getMessage, ex = EmptyResponse)
           throw EmptyResponse
-        case StatusCodes.NotFound ⇒ Future.successful(None)
+        case StatusCodes.NotFound => Future.successful(None)
       }
     )
   }
@@ -244,7 +244,7 @@ private[config] class ConfigClient(
       maxResults: Int
   ): Future[List[ConfigFileRevision]] = async {
     val _uri =
-      await(uri).withQuery(Query("maxResults" → maxResults.toString, "from" → from.toString, "to" → to.toString))
+      await(uri).withQuery(Query("maxResults" -> maxResults.toString, "from" -> from.toString, "to" -> to.toString))
 
     val request = HttpRequest(uri = _uri)
     maskTokenAndLog(request)
@@ -252,7 +252,7 @@ private[config] class ConfigClient(
 
     await(
       handleResponse(response) {
-        case StatusCodes.OK ⇒ Unmarshal(response).to[List[ConfigFileRevision]]
+        case StatusCodes.OK => Unmarshal(response).to[List[ConfigFileRevision]]
       }
     )
   }
@@ -266,19 +266,19 @@ private[config] class ConfigClient(
     }
 
     val defaultHandler: PartialFunction[StatusCode, Future[T]] = {
-      case StatusCodes.BadRequest   ⇒ contentF.map(res ⇒ logAndThrow(InvalidInput(res.error.message)))
-      case StatusCodes.NotFound     ⇒ contentF.map(res ⇒ logAndThrow(FileNotFound(res.error.message)))
-      case StatusCodes.Unauthorized ⇒ contentF.map(_ ⇒ logAndThrow(Unauthorized))
-      case StatusCodes.Forbidden    ⇒ contentF.map(_ ⇒ logAndThrow(NotAllowed))
-      case _                        ⇒ contentF.map(res ⇒ logAndThrow(new RuntimeException(res.error.message)))
+      case StatusCodes.BadRequest   => contentF.map(res => logAndThrow(InvalidInput(res.error.message)))
+      case StatusCodes.NotFound     => contentF.map(res => logAndThrow(FileNotFound(res.error.message)))
+      case StatusCodes.Unauthorized => contentF.map(_ => logAndThrow(Unauthorized))
+      case StatusCodes.Forbidden    => contentF.map(_ => logAndThrow(NotAllowed))
+      case _                        => contentF.map(res => logAndThrow(new RuntimeException(res.error.message)))
     }
 
     val handler = pf.orElse(defaultHandler)
     handler(response.status)
   }
 
-  private def bearerTokenHeader = tokenFactory.map(_.getToken).map(token ⇒ Authorization(OAuth2BearerToken(token)))
+  private def bearerTokenHeader = tokenFactory.map(_.getToken).map(token => Authorization(OAuth2BearerToken(token)))
 
   private def maskTokenAndLog(httpRequest: HttpRequest): Unit =
-    logger.info(msg = "Sending HTTP request", map = Map("request" → maskRequest(httpRequest).toString()))
+    logger.info(msg = "Sending HTTP request", map = Map("request" -> maskRequest(httpRequest).toString()))
 }

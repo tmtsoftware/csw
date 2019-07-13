@@ -109,7 +109,7 @@ class CborTest extends FunSuite with Matchers {
       OtherIssue("")
     )
 
-    forAll(testData) { commandIssue ⇒
+    forAll(testData) { commandIssue =>
       val bytes = CommandIssueCbor.encode(commandIssue)
       CommandIssueCbor.decode[CommandIssue](bytes) shouldEqual commandIssue
     }

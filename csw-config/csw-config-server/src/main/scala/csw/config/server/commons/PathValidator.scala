@@ -12,7 +12,7 @@ object PathValidator {
 
   private val invalidCharsMessage: String = invalidChars
     .replace("\\s", " ")
-    .map(char ⇒ s"{$char}")
+    .map(char => s"{$char}")
     .mkString(",")
 
   /**

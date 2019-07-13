@@ -28,13 +28,13 @@ trait JsonSupport extends MiscJsonFormats {
 
   implicit val sequenceCommandFormat: Reads[SequenceCommand] = {
     commandFormat.collect(JsonValidationError("invalid sequence command")) {
-      case x: SequenceCommand ⇒ x
+      case x: SequenceCommand => x
     }
   }
 
   implicit val controlCommandFormat: Reads[ControlCommand] = {
     commandFormat.collect(JsonValidationError("invalid control command")) {
-      case x: ControlCommand ⇒ x
+      case x: ControlCommand => x
     }
   }
 

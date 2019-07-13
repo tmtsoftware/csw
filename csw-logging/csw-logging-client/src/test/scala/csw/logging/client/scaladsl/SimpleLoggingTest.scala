@@ -32,7 +32,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     var logMsgLineNumber = TromboneHcd.DEBUG_LINE_NO
 
     eventually(logBuffer.size shouldBe 5)
-    logBuffer.foreach { log ⇒
+    logBuffer.foreach { log =>
       // This assert's that, ISO_INSTANT parser should not throw exception while parsing timestamp from log message
       // If timestamp is in other than UTC(ISO_FORMAT) format, DateTimeFormatter.ISO_INSTANT will throw DateTimeParseException
       // Ex.  2017-07-19T13:23:55.358+03:00 :=> DateTimeFormatter.ISO_INSTANT.parse will throw exception
@@ -64,7 +64,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     var logMsgLineNumber = InnerSourceComponent.TRACE_LINE_NO
 
     eventually(logBuffer.size shouldBe 6)
-    logBuffer.foreach { log ⇒
+    logBuffer.foreach { log =>
       log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "InnerSourceComponent"
       log.getString(LoggingKeys.FILE) shouldBe "InnerSourceComponent.scala"
       log(LoggingKeys.LINE).as[Int] shouldBe logMsgLineNumber
@@ -86,7 +86,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     var logMsgLineNumber = SingletonComponent.TRACE_LINE_NO
 
     eventually(logBuffer.size shouldBe 6)
-    logBuffer.foreach { log ⇒
+    logBuffer.foreach { log =>
       log.contains(LoggingKeys.COMPONENT_NAME) shouldBe true
       log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "SingletonComponent"
       log.getString(LoggingKeys.FILE) shouldBe "SingletonComponent.scala"
@@ -111,7 +111,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     var logMsgLineNumber = SingletonComponent.USER_TRACE_LINE_NO
 
     eventually(logBuffer.size shouldBe 6)
-    logBuffer.foreach { log ⇒
+    logBuffer.foreach { log =>
       //  Count the user messages for test at the end
       var userMsgCount = 0
       log.contains("@componentName") shouldBe true
@@ -145,14 +145,14 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     //  As per the filter, hcd should log 5 message of all level except TRACE
     eventually(logBuffer.size shouldBe 5)
 
-    val groupByComponentNamesLog = logBuffer.groupBy(json ⇒ json.getString(LoggingKeys.COMPONENT_NAME))
+    val groupByComponentNamesLog = logBuffer.groupBy(json => json.getString(LoggingKeys.COMPONENT_NAME))
     val tromboneHcdLogs          = groupByComponentNamesLog("tromboneHcd")
 
     tromboneHcdLogs.size shouldBe 5
 
     // check that log level should be greater than or equal to debug and
     // assert on actual log message
-    tromboneHcdLogs.toList.foreach { log ⇒
+    tromboneHcdLogs.toList.foreach { log =>
       val currentLogLevel = log.getString(LoggingKeys.SEVERITY).toLowerCase
       val currentLogMsg   = log.getString(LoggingKeys.MESSAGE)
       Level(currentLogLevel) >= DEBUG shouldBe true
@@ -173,14 +173,14 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     //  As per the default loglevel = trace, assembly should log all 6 message
     eventually(logBuffer.size shouldBe 6)
 
-    val groupByComponentNamesLog = logBuffer.groupBy(json ⇒ json.getString(LoggingKeys.COMPONENT_NAME))
+    val groupByComponentNamesLog = logBuffer.groupBy(json => json.getString(LoggingKeys.COMPONENT_NAME))
     val tromboneAssemblyLogs     = groupByComponentNamesLog("tromboneAssembly")
 
     tromboneAssemblyLogs.size shouldBe 6
 
     // check that log level should be greater than or equal to debug and
     // assert on actual log message
-    tromboneAssemblyLogs.toList.foreach { log ⇒
+    tromboneAssemblyLogs.toList.foreach { log =>
       val currentLogLevel = log.getString(LoggingKeys.SEVERITY).toLowerCase
       val currentLogMsg   = log.getString(LoggingKeys.MESSAGE)
       Level(currentLogLevel) >= TRACE shouldBe true
@@ -203,7 +203,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     val compName = "tromboneAssembly"
 
     def filterLogsByComponentName(compName: String): Seq[JsObject] = {
-      val groupByComponentNamesLog = logBuffer.groupBy(json ⇒ json.getString(LoggingKeys.COMPONENT_NAME))
+      val groupByComponentNamesLog = logBuffer.toList.groupBy(json => json.getString(LoggingKeys.COMPONENT_NAME))
       groupByComponentNamesLog(compName)
     }
 
@@ -221,7 +221,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
       val tromboneAssemblyLogs = filterLogsByComponentName(compName)
       tromboneAssemblyLogs.size shouldBe logCount
 
-      tromboneAssemblyLogs.toList.foreach { log ⇒
+      tromboneAssemblyLogs.toList.foreach { log =>
         val currentLogLevel = log.getString(LoggingKeys.SEVERITY).toLowerCase
         val currentLogMsg   = log.getString(LoggingKeys.MESSAGE)
         Level(currentLogLevel) >= logLevel shouldBe true
@@ -249,7 +249,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     val compName = TromboneHcd.COMPONENT_NAME
 
     def filterLogsByComponentName(compName: String): Seq[JsObject] = {
-      val groupByComponentNamesLog = logBuffer.groupBy(json ⇒ json.getString(LoggingKeys.COMPONENT_NAME))
+      val groupByComponentNamesLog = logBuffer.toList.groupBy(json => json.getString(LoggingKeys.COMPONENT_NAME))
       groupByComponentNamesLog(compName)
     }
 
@@ -267,7 +267,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
       val tromboneHcdLogs = filterLogsByComponentName(compName)
       tromboneHcdLogs.size shouldBe logCount
 
-      tromboneHcdLogs.toList.foreach { log ⇒
+      tromboneHcdLogs.toList.foreach { log =>
         val currentLogLevel = log.getString(LoggingKeys.SEVERITY).toLowerCase
         val currentLogMsg   = log.getString(LoggingKeys.MESSAGE)
         Level(currentLogLevel) >= logLevel shouldBe true
@@ -282,7 +282,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     new TromboneHcd().startLogging(logMsgMap, "alternative")
     Thread.sleep(100)
 
-    logBuffer.foreach { log ⇒
+    logBuffer.foreach { log =>
       log.getString(LoggingKeys.CATEGORY) shouldBe true
     }
   }
@@ -314,7 +314,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
      *   }
      * }
      */
-    logBuffer.foreach { log ⇒
+    logBuffer.foreach { log =>
       log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "tromboneHcd"
       log.getString(LoggingKeys.SEVERITY) shouldBe ERROR.name
       log.getString(LoggingKeys.CLASS) shouldBe tromboneHcdClassName

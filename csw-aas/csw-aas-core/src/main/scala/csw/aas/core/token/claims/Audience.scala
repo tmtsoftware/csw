@@ -18,14 +18,14 @@ object Audience {
 
   implicit val format: Format[Audience] = new Format[Audience] {
     override def writes(obj: Audience): JsValue = obj.value match {
-      case head :: Nil ⇒ JsString(head)
-      case as          ⇒ JsArray(as.map(JsString))
+      case head :: Nil => JsString(head)
+      case as          => JsArray(as.map(JsString))
     }
 
     override def reads(json: JsValue): JsResult[Audience] = json match {
-      case JsNull       ⇒ JsSuccess(Audience())
-      case JsString(s)  ⇒ JsSuccess(Audience(s))
-      case JsArray(arr) ⇒ JsSuccess(Audience(arr.map(_.as[String])))
+      case JsNull       => JsSuccess(Audience())
+      case JsString(s)  => JsSuccess(Audience(s))
+      case JsArray(arr) => JsSuccess(Audience(arr.toList.map(_.as[String])))
       case _            => JsError(JsPath \ "aud", "parsing failed due to invalid value")
     }
   }

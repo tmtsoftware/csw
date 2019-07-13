@@ -12,17 +12,17 @@ private[framework] class LockManager(val lockPrefix: Option[Prefix], loggerFacto
   private val log: Logger = loggerFactory.getLogger
   private val AdminPrefix = Prefix("csw.admin")
 
-  def lockComponent(source: Prefix, replyTo: ActorRef[LockingResponse])(startTimer: ⇒ Unit): LockManager = lockPrefix match {
-    case None                ⇒ onAcquiringLock(source, replyTo, startTimer)
-    case Some(`source`)      ⇒ onReAcquiringLock(source, replyTo, startTimer)
-    case Some(currentPrefix) ⇒ onAcquiringFailed(replyTo, source, currentPrefix)
+  def lockComponent(source: Prefix, replyTo: ActorRef[LockingResponse])(startTimer: => Unit): LockManager = lockPrefix match {
+    case None                => onAcquiringLock(source, replyTo, startTimer)
+    case Some(`source`)      => onReAcquiringLock(source, replyTo, startTimer)
+    case Some(currentPrefix) => onAcquiringFailed(replyTo, source, currentPrefix)
   }
 
-  def unlockComponent(sourcePrefix: Prefix, replyTo: ActorRef[LockingResponse])(stopTimer: ⇒ Unit): LockManager = {
+  def unlockComponent(sourcePrefix: Prefix, replyTo: ActorRef[LockingResponse])(stopTimer: => Unit): LockManager = {
     (lockPrefix, AdminPrefix) match {
-      case (Some(`sourcePrefix`), _) | (_, `sourcePrefix`) ⇒ onLockReleased(sourcePrefix, replyTo, stopTimer)
-      case (Some(currentPrefix), _)                        ⇒ onLockReleaseFailed(replyTo, sourcePrefix, currentPrefix)
-      case (None, _)                                       ⇒ onLockAlreadyReleased(sourcePrefix, replyTo)
+      case (Some(`sourcePrefix`), _) | (_, `sourcePrefix`) => onLockReleased(sourcePrefix, replyTo, stopTimer)
+      case (Some(currentPrefix), _)                        => onLockReleaseFailed(replyTo, sourcePrefix, currentPrefix)
+      case (None, _)                                       => onLockAlreadyReleased(sourcePrefix, replyTo)
     }
   }
 
@@ -30,13 +30,13 @@ private[framework] class LockManager(val lockPrefix: Option[Prefix], loggerFacto
 
   // Checks to see if component is locked, and if so, does the incoming prefix match the locked prefix
   def allowCommand(msg: CommandMessage): Boolean = lockPrefix match {
-    case None ⇒ true
-    case Some(currentPrefix) ⇒
+    case None => true
+    case Some(currentPrefix) =>
       msg.command.source match {
-        case `currentPrefix` ⇒
+        case `currentPrefix` =>
           log.info(s"Forwarding message ${msg.toString} to TLA for component: $currentPrefix")
           true
-        case _ ⇒
+        case _ =>
           log.error(s"Cannot process the command [${msg.command.toString}] as the lock is acquired by component: $currentPrefix")
           false
       }
@@ -46,14 +46,14 @@ private[framework] class LockManager(val lockPrefix: Option[Prefix], loggerFacto
 
   def isUnLocked: Boolean = lockPrefix.isEmpty
 
-  private def onAcquiringLock(source: Prefix, replyTo: ActorRef[LockingResponse], startTimer: ⇒ Unit): LockManager = {
+  private def onAcquiringLock(source: Prefix, replyTo: ActorRef[LockingResponse], startTimer: => Unit): LockManager = {
     log.info(s"The lock is successfully acquired by component: $source")
     replyTo ! LockAcquired
     startTimer
     new LockManager(Some(source), loggerFactory)
   }
 
-  private def onReAcquiringLock(source: Prefix, replyTo: ActorRef[LockingResponse], startTimer: ⇒ Unit): LockManager = {
+  private def onReAcquiringLock(source: Prefix, replyTo: ActorRef[LockingResponse], startTimer: => Unit): LockManager = {
     log.info(s"The lock is re-acquired by component: $source")
     replyTo ! LockAcquired
     startTimer
@@ -68,7 +68,7 @@ private[framework] class LockManager(val lockPrefix: Option[Prefix], loggerFacto
     this
   }
 
-  private def onLockReleased(source: Prefix, replyTo: ActorRef[LockingResponse], stopTimer: ⇒ Unit): LockManager = {
+  private def onLockReleased(source: Prefix, replyTo: ActorRef[LockingResponse], stopTimer: => Unit): LockManager = {
     log.info(s"The lock is successfully released by component: ${source.prefix}")
     replyTo ! LockReleased
     stopTimer

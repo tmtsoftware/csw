@@ -26,20 +26,20 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
     val dbFactory = new DatabaseServiceFactory(ctx.system)
 
     dbFactory
-      .makeDsl(locationService, "postgres")        // postgres is dbName
-      .foreach((dsl: DSLContext) ⇒ this.dsl = dsl) // save returned dsl to a local variable
+      .makeDsl(locationService, "postgres")         // postgres is dbName
+      .foreach((dsl: DSLContext) => this.dsl = dsl) // save returned dsl to a local variable
     //#dbFactory-access
 
     //#dbFactory-write-access
     dbFactory
       .makeDsl(locationService, "postgres", "DB_WRITE_USERNAME", "DB_WRITE_PASSWORD")
-      .foreach((dsl: DSLContext) ⇒ this.dsl = dsl) // save returned dsl to a local variable
+      .foreach((dsl: DSLContext) => this.dsl = dsl) // save returned dsl to a local variable
     //#dbFactory-write-access
 
     //#dbFactory-test-access
     dbFactory
       .makeDsl()
-      .foreach((dsl: DSLContext) ⇒ this.dsl = dsl) // save returned dsl to a local variable
+      .foreach((dsl: DSLContext) => this.dsl = dsl) // save returned dsl to a local variable
     //#dbFactory-test-access
   }
 
@@ -50,7 +50,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
 
     import csw.database.scaladsl.JooqExtentions.RichQuery
     val createResultF: Future[Integer] = createQuery.executeAsyncScala()
-    createResultF.foreach(result ⇒ println(s"Films table created with $result"))
+    createResultF.foreach(result => println(s"Films table created with $result"))
     //#dsl-create
 
     //#dsl-batch
@@ -63,7 +63,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
 
     import csw.database.scaladsl.JooqExtentions.RichQueries
     val batchResultF: Future[List[Int]] = queries.executeBatchAsync()
-    batchResultF.foreach(results ⇒ println(s"executed queries [$queries] with results [$results]"))
+    batchResultF.foreach(results => println(s"executed queries [$queries] with results [$results]"))
     //#dsl-batch
 
     //#dsl-fetch
@@ -75,7 +75,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
 
     import csw.database.scaladsl.JooqExtentions.RichResultQuery
     val selectResultF: Future[List[Films]] = selectQuery.fetchAsyncScala[Films]
-    selectResultF.foreach(names ⇒ s"Fetched names of films $names")
+    selectResultF.foreach(names => s"Fetched names of films $names")
     //#dsl-fetch
 
     //#dsl-function
@@ -91,7 +91,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
       )
 
     val functionResultF: Future[Integer] = functionQuery.executeAsyncScala()
-    functionResultF.foreach(result ⇒ println(s"Function inc created with $result"))
+    functionResultF.foreach(result => println(s"Function inc created with $result"))
     //#dsl-function
 
     Completed(controlCommand.runId)

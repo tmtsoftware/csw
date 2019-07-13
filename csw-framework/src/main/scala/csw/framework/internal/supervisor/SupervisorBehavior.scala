@@ -105,20 +105,20 @@ private[framework] final class SupervisorBehavior(
   override def onMessage(msg: SupervisorMessage): Behavior[SupervisorMessage] = {
     log.debug(s"Supervisor in lifecycle state :[$lifecycleState] received message :[$msg]")
     (lifecycleState, msg) match {
-      case (SupervisorLifecycleState.Lock, LockAboutToTimeout(replyTo)) ⇒ replyTo ! LockExpiringShortly
-      case (SupervisorLifecycleState.Lock, LockTimedout(replyTo)) ⇒ replyTo ! LockExpired; onLockTimeout()
+      case (SupervisorLifecycleState.Lock, LockAboutToTimeout(replyTo)) => replyTo ! LockExpiringShortly
+      case (SupervisorLifecycleState.Lock, LockTimedout(replyTo)) => replyTo ! LockExpired; onLockTimeout()
       //SupervisorLockMessage has Submit/Oneway as well along with Lock to allow commands from locking source
-      case (SupervisorLifecycleState.Lock, message: SupervisorLockMessage)                     ⇒ onRunning(message)
-      case (SupervisorLifecycleState.Lock, message)                                            ⇒ ignore(message)
-      case (_, commonMessage: ComponentCommonMessage)                                          ⇒ onCommon(commonMessage)
-      case (SupervisorLifecycleState.Idle, idleMessage: SupervisorIdleMessage)                 ⇒ onIdle(idleMessage)
-      case (SupervisorLifecycleState.Restart, restartMessage: SupervisorRestartMessage)        ⇒ onRestarting(restartMessage)
-      case (SupervisorLifecycleState.Running, message: SupervisorInternalRunningMessage)       ⇒ onInternalRunning(message)
-      case (SupervisorLifecycleState.Running, runningMessage: SupervisorRunningMessage)        ⇒ onRunning(runningMessage)
-      case (SupervisorLifecycleState.RunningOffline, runningMessage: SupervisorRunningMessage) ⇒ onRunning(runningMessage)
-      case (_, GetComponentLogMetadata(compName, replyTo))                                     ⇒ replyTo ! LogAdminUtil.getLogMetadata(compName)
-      case (_, SetComponentLogLevel(compName, logLevel))                                       ⇒ LogAdminUtil.setComponentLogLevel(compName, logLevel)
-      case (_, message)                                                                        ⇒ ignore(message)
+      case (SupervisorLifecycleState.Lock, message: SupervisorLockMessage)                     => onRunning(message)
+      case (SupervisorLifecycleState.Lock, message)                                            => ignore(message)
+      case (_, commonMessage: ComponentCommonMessage)                                          => onCommon(commonMessage)
+      case (SupervisorLifecycleState.Idle, idleMessage: SupervisorIdleMessage)                 => onIdle(idleMessage)
+      case (SupervisorLifecycleState.Restart, restartMessage: SupervisorRestartMessage)        => onRestarting(restartMessage)
+      case (SupervisorLifecycleState.Running, message: SupervisorInternalRunningMessage)       => onInternalRunning(message)
+      case (SupervisorLifecycleState.Running, runningMessage: SupervisorRunningMessage)        => onRunning(runningMessage)
+      case (SupervisorLifecycleState.RunningOffline, runningMessage: SupervisorRunningMessage) => onRunning(runningMessage)
+      case (_, GetComponentLogMetadata(compName, replyTo))                                     => replyTo ! LogAdminUtil.getLogMetadata(compName)
+      case (_, SetComponentLogLevel(compName, logLevel))                                       => LogAdminUtil.setComponentLogLevel(compName, logLevel)
+      case (_, message)                                                                        => ignore(message)
     }
     this
   }
@@ -129,18 +129,18 @@ private[framework] final class SupervisorBehavior(
    * @return the existing behavior
    */
   override def onSignal: PartialFunction[Signal, Behavior[SupervisorMessage]] = {
-    case Terminated(componentRef) ⇒
+    case Terminated(componentRef) =>
       log.warn(s"Supervisor in lifecycle state :[$lifecycleState] received terminated signal from component :[$componentRef]")
       timerScheduler.cancel(InitializeTimerKey)
 
       lifecycleState match {
-        case SupervisorLifecycleState.Restart  ⇒ spawn()
-        case SupervisorLifecycleState.Shutdown ⇒ coordinatedShutdown(ShutdownMessageReceivedReason)
-        case SupervisorLifecycleState.Idle     ⇒ if (isStandalone) throw InitializationFailed
-        case _                                 ⇒ updateLifecycleState(SupervisorLifecycleState.Idle) // Change to idle and expect Restart/Shutdown from outside
+        case SupervisorLifecycleState.Restart  => spawn()
+        case SupervisorLifecycleState.Shutdown => coordinatedShutdown(ShutdownMessageReceivedReason)
+        case SupervisorLifecycleState.Idle     => if (isStandalone) throw InitializationFailed
+        case _                                 => updateLifecycleState(SupervisorLifecycleState.Idle) // Change to idle and expect Restart/Shutdown from outside
       }
       this
-    case PostStop ⇒
+    case PostStop =>
       log.warn("Supervisor is shutting down. Un-registering supervisor from location service")
       locationService.unregister(akkaConnection)
       this
@@ -152,11 +152,11 @@ private[framework] final class SupervisorBehavior(
    * @param commonMessage message representing a message received in any lifecycle state
    */
   private def onCommon(commonMessage: ComponentCommonMessage): Unit = commonMessage match {
-    case LifecycleStateSubscription(subscriberMessage) ⇒ pubSubLifecycle ! subscriberMessage
-    case ComponentStateSubscription(subscriberMessage) ⇒ currentStatePublisher.publisherActor.unsafeUpcast ! subscriberMessage
-    case GetSupervisorLifecycleState(replyTo)          ⇒ replyTo ! lifecycleState
-    case Restart                                       ⇒ onRestart()
-    case Shutdown                                      ⇒ onShutdown()
+    case LifecycleStateSubscription(subscriberMessage) => pubSubLifecycle ! subscriberMessage
+    case ComponentStateSubscription(subscriberMessage) => currentStatePublisher.publisherActor.unsafeUpcast ! subscriberMessage
+    case GetSupervisorLifecycleState(replyTo)          => replyTo ! lifecycleState
+    case Restart                                       => onRestart()
+    case Shutdown                                      => onShutdown()
   }
 
   /**
@@ -165,8 +165,8 @@ private[framework] final class SupervisorBehavior(
    * @param idleMessage message representing a message received in [[SupervisorLifecycleState.Idle]] state
    */
   private def onIdle(idleMessage: SupervisorIdleMessage): Unit = idleMessage match {
-    case Running(componentRef) ⇒ onComponentRunning(componentRef)
-    case InitializeTimeout     ⇒ onInitializeTimeout()
+    case Running(componentRef) => onComponentRunning(componentRef)
+    case InitializeTimeout     => onInitializeTimeout()
   }
 
   /**
@@ -175,10 +175,10 @@ private[framework] final class SupervisorBehavior(
    * @param restartMessage message representing a message received in [[SupervisorLifecycleState.Restart]] state
    */
   private def onRestarting(restartMessage: SupervisorRestartMessage): Unit = restartMessage match {
-    case UnRegistrationComplete ⇒
+    case UnRegistrationComplete =>
       log.info("Supervisor unregistered itself from location service")
       respawnComponent()
-    case UnRegistrationFailed(throwable) ⇒
+    case UnRegistrationFailed(throwable) =>
       log.error(throwable.getMessage, ex = throwable)
       respawnComponent()
   }
@@ -189,9 +189,9 @@ private[framework] final class SupervisorBehavior(
    * @param internalRunningMessage message representing a message received in [[SupervisorLifecycleState.Running]] state
    */
   private def onInternalRunning(internalRunningMessage: SupervisorInternalRunningMessage): Unit = internalRunningMessage match {
-    case RegistrationSuccess(componentRef)     ⇒ onRegistrationComplete(componentRef)
-    case RegistrationNotRequired(componentRef) ⇒ onRegistrationComplete(componentRef)
-    case RegistrationFailed(throwable)         ⇒ onRegistrationFailed(throwable)
+    case RegistrationSuccess(componentRef)     => onRegistrationComplete(componentRef)
+    case RegistrationNotRequired(componentRef) => onRegistrationComplete(componentRef)
+    case RegistrationFailed(throwable)         => onRegistrationFailed(throwable)
   }
 
   /**
@@ -200,15 +200,15 @@ private[framework] final class SupervisorBehavior(
    * @param runningMessage message representing a message received in [[SupervisorLifecycleState.Running]] state
    */
   private def onRunning(runningMessage: SupervisorRunningMessage): Unit = runningMessage match {
-    case Query(runId, replyTo)                ⇒ commandResponseManager.commandResponseManagerActor ! Query(runId, replyTo)
-    case Subscribe(runId, replyTo)            ⇒ commandResponseManager.commandResponseManagerActor ! Subscribe(runId, replyTo)
-    case Unsubscribe(runId, replyTo)          ⇒ commandResponseManager.commandResponseManagerActor ! Unsubscribe(runId, replyTo)
-    case Lock(source, replyTo, leaseDuration) ⇒ lockComponent(source, replyTo, leaseDuration)
-    case Unlock(source, replyTo)              ⇒ unlockComponent(source, replyTo)
-    case cmdMsg: CommandMessage ⇒
+    case Query(runId, replyTo)                => commandResponseManager.commandResponseManagerActor ! Query(runId, replyTo)
+    case Subscribe(runId, replyTo)            => commandResponseManager.commandResponseManagerActor ! Subscribe(runId, replyTo)
+    case Unsubscribe(runId, replyTo)          => commandResponseManager.commandResponseManagerActor ! Unsubscribe(runId, replyTo)
+    case Lock(source, replyTo, leaseDuration) => lockComponent(source, replyTo, leaseDuration)
+    case Unlock(source, replyTo)              => unlockComponent(source, replyTo)
+    case cmdMsg: CommandMessage =>
       if (lockManager.allowCommand(cmdMsg)) runningComponent.get ! cmdMsg else cmdMsg.replyTo ! Locked(cmdMsg.command.runId)
-    case runningMessage: RunningMessage ⇒ handleRunningMessage(runningMessage)
-    case msg @ Running(_)               ⇒ log.info(s"Ignoring [$msg] message received from TLA as Supervisor already in Running state")
+    case runningMessage: RunningMessage => handleRunningMessage(runningMessage)
+    case msg @ Running(_)               => log.info(s"Ignoring [$msg] message received from TLA as Supervisor already in Running state")
   }
 
   private def lockComponent(source: Prefix, replyTo: ActorRef[LockingResponse], leaseDuration: FiniteDuration): Unit = {
@@ -234,8 +234,8 @@ private[framework] final class SupervisorBehavior(
 
   private def handleRunningMessage(runningMessage: RunningMessage): Unit = {
     runningMessage match {
-      case Lifecycle(message) ⇒ onLifeCycle(message)
-      case _                  ⇒
+      case Lifecycle(message) => onLifeCycle(message)
+      case _                  =>
     }
     runningComponent.get ! runningMessage
   }
@@ -248,16 +248,16 @@ private[framework] final class SupervisorBehavior(
   private def onShutdown() = {
     updateLifecycleState(SupervisorLifecycleState.Shutdown)
     ctx.child(componentActorName) match {
-      case Some(ref) ⇒ ctx.stop(ref) // stop component actor for a graceful shutdown before shutting down the actor system
-      case None      ⇒ coordinatedShutdown(ShutdownMessageReceivedReason)
+      case Some(ref) => ctx.stop(ref) // stop component actor for a graceful shutdown before shutting down the actor system
+      case None      => coordinatedShutdown(ShutdownMessageReceivedReason)
     }
   }
 
   private def respawnComponent(): Unit = {
     log.info("Supervisor re-spawning component")
     ctx.child(componentActorName) match {
-      case Some(_) ⇒ component.foreach(ctx.stop) // stop component actor for a graceful shutdown before restart
-      case None    ⇒ spawn()
+      case Some(_) => component.foreach(ctx.stop) // stop component actor for a graceful shutdown before restart
+      case None    => spawn()
     }
   }
 
@@ -267,9 +267,9 @@ private[framework] final class SupervisorBehavior(
   }
 
   private def onLifeCycle(message: ToComponentLifecycleMessage): Unit = message match {
-    case GoOffline ⇒
+    case GoOffline =>
       if (lifecycleState == SupervisorLifecycleState.Running) updateLifecycleState(SupervisorLifecycleState.RunningOffline)
-    case GoOnline ⇒
+    case GoOnline =>
       if (lifecycleState == SupervisorLifecycleState.RunningOffline) updateLifecycleState(SupervisorLifecycleState.Running)
   }
 
@@ -278,21 +278,21 @@ private[framework] final class SupervisorBehavior(
       ctx.self ! RegistrationNotRequired(componentRef)
     else
       locationService.register(akkaRegistration).onComplete {
-        case Success(_)         ⇒ ctx.self ! RegistrationSuccess(componentRef)
-        case Failure(throwable) ⇒ ctx.self ! RegistrationFailed(throwable)
+        case Success(_)         => ctx.self ! RegistrationSuccess(componentRef)
+        case Failure(throwable) => ctx.self ! RegistrationFailed(throwable)
       }
   }
 
   private def unRegisterFromLocationService(): Unit = {
     log.debug(s"Un-registering supervisor from location service")
     locationService.unregister(akkaConnection).onComplete {
-      case Success(_)         ⇒ ctx.self ! UnRegistrationComplete
-      case Failure(throwable) ⇒ ctx.self ! UnRegistrationFailed(throwable)
+      case Success(_)         => ctx.self ! UnRegistrationComplete
+      case Failure(throwable) => ctx.self ! UnRegistrationFailed(throwable)
     }
   }
 
   private def onRegistrationComplete(componentRef: ActorRef[RunningMessage]): Unit = {
-    maybeContainerRef.foreach { container ⇒
+    maybeContainerRef.foreach { container =>
       container ! SupervisorLifecycleStateChanged(ctx.self, lifecycleState)
       log.debug(s"Supervisor acknowledged container :[$container] for lifecycle state :[$lifecycleState]")
     }

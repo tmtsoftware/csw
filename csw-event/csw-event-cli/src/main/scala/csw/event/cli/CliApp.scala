@@ -10,11 +10,11 @@ class CliApp(commandLineRunner: CommandLineRunner)(implicit val ec: ExecutionCon
 
   def start(options: Options): Any = {
     options.cmd match {
-      case "inspect"   ⇒ await(commandLineRunner.inspect(options))
-      case "get"       ⇒ await(commandLineRunner.get(options))
-      case "publish"   ⇒ await(commandLineRunner.publish(options))
-      case "subscribe" ⇒ await { val (_, doneF) = commandLineRunner.subscribe(options); doneF }
-      case x           ⇒ throw new RuntimeException(s"Unknown operation: $x")
+      case "inspect"   => await(commandLineRunner.inspect(options))
+      case "get"       => await(commandLineRunner.get(options))
+      case "publish"   => await(commandLineRunner.publish(options))
+      case "subscribe" => await { val (_, doneF) = commandLineRunner.subscribe(options); doneF }
+      case x           => throw new RuntimeException(s"Unknown operation: $x")
 
     }
   }

@@ -11,7 +11,7 @@ import csw.params.core.models.Subsystem
  * @note key is case-insensitive e.g nfiraos.trombone.tromboneaxislowlimitalarm and
  * NFIRAOS.trombone.tromboneaxislowlimitalarm keys are equal
  */
-sealed abstract class Key private[alarm] (subsystem: String, component: String, name: String) extends Proxy {
+sealed abstract class Key private[alarm] (subsystem: String, component: String, name: String) {
   require(component.isDefined, "component should not be an empty value")
   require(name.isDefined, "name should not be an empty value")
 
@@ -21,9 +21,17 @@ sealed abstract class Key private[alarm] (subsystem: String, component: String, 
   val value: String = s"$subsystem$KeySeparator$component$KeySeparator$name".toLowerCase
 
   /**
-   * Equality of the key is based on the subsystem, component and name
+   * Equality of the key is based on the subsystem, component and name. Inlined code from deprecated Proxy class.
    */
-  override def self: Any = value
+  def self: Any              = value
+  override def hashCode: Int = self.hashCode
+  override def equals(that: Any): Boolean = that match {
+    case null => false
+    case _ =>
+      val x = that.asInstanceOf[AnyRef]
+      (x eq this.asInstanceOf[AnyRef]) || (x eq self.asInstanceOf[AnyRef]) || (x equals self)
+  }
+  override def toString: String = "" + self
 }
 
 object Key {
@@ -68,8 +76,8 @@ object Key {
 
   object AlarmKey {
     private[alarm] def apply(keyStr: String): AlarmKey = keyStr.split(KeySeparator) match {
-      case Array(subsystem, component, name) ⇒ AlarmKey(Subsystem.withName(subsystem), component, name)
-      case _                                 ⇒ throw new IllegalArgumentException(s"Unable to parse '$keyStr' to make AlarmKey object")
+      case Array(subsystem, component, name) => AlarmKey(Subsystem.withName(subsystem), component, name)
+      case _                                 => throw new IllegalArgumentException(s"Unable to parse '$keyStr' to make AlarmKey object")
     }
   }
 }

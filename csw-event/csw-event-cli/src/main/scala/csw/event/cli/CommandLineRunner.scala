@@ -23,7 +23,7 @@ import scala.concurrent.Future
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.util.{Failure, Success}
 
-class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, printLine: Any ⇒ Unit) {
+class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, printLine: Any => Unit) {
 
   import actorRuntime._
 
@@ -35,7 +35,7 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
   def get(options: Options): Future[Unit] = async {
     val events = await(getEvents(options.eventsMap.keys.toSeq))
     if (options.isJsonOut)
-      events.foreach(event ⇒ processGetJson(event, options))
+      events.foreach(event => processGetJson(event, options))
     else new EventOnelineTransformer(options).transform(events).foreach(printLine)
   }
 
@@ -44,8 +44,8 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
     val updatedEvent = updateEventParams(event, options.params)
 
     options.maybeInterval match {
-      case Some(interval) ⇒ await(publishEventsWithInterval(updatedEvent, interval, options.period))
-      case None           ⇒ await(publishEvent(updatedEvent))
+      case Some(interval) => await(publishEventsWithInterval(updatedEvent, interval, options.period))
+      case None           => await(publishEvent(updatedEvent))
     }
   }
 
@@ -67,7 +67,7 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
     coordinatedShutdown.addTask(
       CoordinatedShutdown.PhaseBeforeServiceUnbind,
       "unsubscribe-stream"
-    )(() ⇒ subscriptionF.unsubscribe())
+    )(() => subscriptionF.unsubscribe())
 
     (subscriptionF, doneF)
   }
@@ -94,8 +94,8 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
   private def getEvent(key: EventKey, eventData: Option[File]) = {
     val subscriber = eventService.defaultSubscriber
     eventData match {
-      case Some(file) ⇒ Future.successful(readEventFromJson(file, key))
-      case None       ⇒ subscriber.get(key)
+      case Some(file) => Future.successful(readEventFromJson(file, key))
+      case None       => subscriber.get(key)
     }
   }
 
@@ -113,21 +113,21 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
     )
 
   private def updateEventParams(event: Event, paramSet: Set[Parameter[_]]) = event match {
-    case event: SystemEvent  ⇒ event.madd(paramSet)
-    case event: ObserveEvent ⇒ event.madd(paramSet)
+    case event: SystemEvent  => event.madd(paramSet)
+    case event: ObserveEvent => event.madd(paramSet)
   }
 
   private def eventGenerator(initialEvent: Event): Event = initialEvent match {
-    case event: SystemEvent  ⇒ event.copy(eventId = Id(), eventTime = UTCTime.now())
-    case event: ObserveEvent ⇒ event.copy(eventId = Id(), eventTime = UTCTime.now())
+    case event: SystemEvent  => event.copy(eventId = Id(), eventTime = UTCTime.now())
+    case event: ObserveEvent => event.copy(eventId = Id(), eventTime = UTCTime.now())
   }
 
   private def publishEvent(event: Event): Future[Done] = {
     val publisher     = eventService.defaultPublisher
     val publishResult = publisher.publish(event)
     publishResult.onComplete {
-      case Success(_) ⇒ printLine(s"[SUCCESS] Event [${event.eventKey}] published successfully")
-      case Failure(ex) ⇒
+      case Success(_) => printLine(s"[SUCCESS] Event [${event.eventKey}] published successfully")
+      case Failure(ex) =>
         printLine(s"[FAILURE] Failed to publish event [${event.eventKey}] with error: [${ex.getCause.getMessage}]")
     }
     publishResult
@@ -137,7 +137,7 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
     val (killSwitch, doneF) = Source
       .tick(0.millis, interval, ())
       .viaMat(KillSwitches.single)(Keep.right)
-      .map(_ ⇒ eventGenerator(initialEvent))
+      .map(_ => eventGenerator(initialEvent))
       .takeWithin(duration)
       .map(publishEvent)
       .toMat(Sink.ignore)(Keep.both)
@@ -146,7 +146,7 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
     coordinatedShutdown.addTask(
       CoordinatedShutdown.PhaseBeforeServiceUnbind,
       "shutdown-publish-stream"
-    )(() ⇒ Future { killSwitch.shutdown(); Done })
+    )(() => Future { killSwitch.shutdown(); Done })
 
     doneF
   }

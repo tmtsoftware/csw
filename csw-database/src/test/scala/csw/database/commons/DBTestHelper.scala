@@ -23,7 +23,7 @@ object DBTestHelper {
       .start
 
   def dbServiceFactory(system: ActorSystem[_]) =
-    new DatabaseServiceFactory(system, Map(ReadUsernameHolder → "postgres", ReadPasswordHolder → "postgres"))
+    new DatabaseServiceFactory(system, Map(ReadUsernameHolder -> "postgres", ReadPasswordHolder -> "postgres"))
 
   def dslContext(system: ActorSystem[_], port: Int): DSLContext =
     dbServiceFactory(system)

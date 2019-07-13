@@ -20,7 +20,7 @@ import csw.logging.macros.DefaultSourceLocation
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsObject, Json}
 
-import scala.collection.JavaConverters.collectionAsScalaIterableConverter
+import scala.jdk.CollectionConverters._
 import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
@@ -267,12 +267,12 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
           val directByteBufferConstr = buf.getClass.getDeclaredConstructor(classOf[Long], classOf[Int], classOf[Any])
           directByteBufferConstr.setAccessible(true)
         } catch {
-          case e: Exception ⇒
+          case e: Exception =>
         }
         Class.forName(appender).getDeclaredConstructor().newInstance().asInstanceOf[LogAppenderBuilder]
       }
     } catch {
-      case _: Throwable ⇒ throw AppenderNotFoundException(appender)
+      case _: Throwable => throw AppenderNotFoundException(appender)
     }
   }
 }

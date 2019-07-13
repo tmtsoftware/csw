@@ -43,7 +43,7 @@ private[framework] class SupervisorInfoFactory(containerName: String) {
       val actorRefF = richSystem.spawnTyped(supervisorBehavior, componentInfo.name)
       Some(SupervisorInfo(system, Component(await(actorRefF), componentInfo)))
     } recoverWith {
-      case NonFatal(exception) ⇒
+      case NonFatal(exception) =>
         async {
           log.error(
             s"Exception :[${exception.getMessage}] occurred while spawning supervisor: [${componentInfo.name}]",

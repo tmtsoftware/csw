@@ -30,7 +30,7 @@ object LogActorMock {
   def receiveLog(appender: LogAppender): Unit = {
     var jsonObject = Json.obj(
       LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(log.time),
-      LoggingKeys.MESSAGE   → log.msg,
+      LoggingKeys.MESSAGE   -> log.msg,
       LoggingKeys.SEVERITY  -> log.level.name,
       LoggingKeys.CATEGORY  -> Category.Common.name
     )
@@ -46,9 +46,9 @@ object LogActorMock {
       jsonObject = jsonObject ++ Json.obj(LoggingKeys.LINE -> log.sourceLocation.line)
 
     jsonObject = (log.sourceLocation.packageName, log.sourceLocation.className) match {
-      case ("", "") ⇒ jsonObject
-      case ("", c)  ⇒ jsonObject ++ Json.obj(LoggingKeys.CLASS -> c)
-      case (p, c)   ⇒ jsonObject ++ Json.obj(LoggingKeys.CLASS -> s"$p.$c")
+      case ("", "") => jsonObject
+      case ("", c)  => jsonObject ++ Json.obj(LoggingKeys.CLASS -> c)
+      case (p, c)   => jsonObject ++ Json.obj(LoggingKeys.CLASS -> s"$p.$c")
     }
 
     if (log.actorName.isDefined)

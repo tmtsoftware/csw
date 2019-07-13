@@ -46,8 +46,8 @@ class PolicyExpressionTest extends FunSuite with MockitoSugar with Directives wi
       when(token.clientId).thenReturn(if (right) Some("abc") else None)
 
       val authenticator: AsyncAuthenticator[AccessToken] = {
-        case Provided(_) ⇒ Future.successful(Some(token))
-        case _           ⇒ Future.successful(None)
+        case Provided(_) => Future.successful(Some(token))
+        case _           => Future.successful(None)
       }
 
       when(authentication.authenticator).thenReturn(authenticator)
@@ -57,7 +57,7 @@ class PolicyExpressionTest extends FunSuite with MockitoSugar with Directives wi
         case Or  => RealmRolePolicy("admin") | CustomPolicy(_.clientId.isDefined)
       }
 
-      val route: Route = securityDirectives.authenticate { implicit at ⇒
+      val route: Route = securityDirectives.authenticate { implicit at =>
         get {
           securityDirectives.authorize(policyExpression, at) {
             complete("OK")
@@ -81,11 +81,11 @@ class PolicyExpressionTest extends FunSuite with MockitoSugar with Directives wi
     val tokenStr    = "token"
     val tokenHeader = Authorization(OAuth2BearerToken(tokenStr))
 
-    val authenticator: AsyncAuthenticator[AccessToken] = _ ⇒ Future.successful(None)
+    val authenticator: AsyncAuthenticator[AccessToken] = _ => Future.successful(None)
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = securityDirectives.authenticate { implicit at ⇒
+    val route: Route = securityDirectives.authenticate { implicit at =>
       get {
         securityDirectives.authorize(RealmRolePolicy("admin") | ClientRolePolicy("admin"), at) {
           complete("OK")
@@ -101,11 +101,11 @@ class PolicyExpressionTest extends FunSuite with MockitoSugar with Directives wi
   test("policy expression policy should return AuthenticationFailedRejection when token is not present") {
     val authentication: Authentication                 = mock[Authentication]
     val securityDirectives                             = new SecurityDirectives(authentication, "TMT", "test")
-    val authenticator: AsyncAuthenticator[AccessToken] = _ ⇒ Future.successful(None)
+    val authenticator: AsyncAuthenticator[AccessToken] = _ => Future.successful(None)
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = securityDirectives.authenticate { implicit at ⇒
+    val route: Route = securityDirectives.authenticate { implicit at =>
       get {
         securityDirectives.authorize(RealmRolePolicy("admin") & CustomPolicy(_.clientId.isDefined), at) {
           complete("OK")
@@ -130,13 +130,13 @@ class PolicyExpressionTest extends FunSuite with MockitoSugar with Directives wi
     when(token.clientId).thenReturn(Some("abc"))
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
-      case Provided(`tokenStr`) ⇒ Future.successful(Some(token))
-      case _                    ⇒ Future.successful(None)
+      case Provided(`tokenStr`) => Future.successful(Some(token))
+      case _                    => Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = securityDirectives.authenticate { implicit at ⇒
+    val route: Route = securityDirectives.authenticate { implicit at =>
       get {
         securityDirectives.authorize(CustomPolicy(_.clientId.isDefined) & RealmRolePolicy("admin"), at) {
           complete("OK")
@@ -162,13 +162,13 @@ class PolicyExpressionTest extends FunSuite with MockitoSugar with Directives wi
     when(token.hasClientRole("admin", "test")).thenReturn(false)
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
-      case Provided(`tokenStr`) ⇒ Future.successful(Some(token))
-      case _                    ⇒ Future.successful(None)
+      case Provided(`tokenStr`) => Future.successful(Some(token))
+      case _                    => Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = securityDirectives.authenticate { implicit at ⇒
+    val route: Route = securityDirectives.authenticate { implicit at =>
       get {
         securityDirectives.authorize(ClientRolePolicy("admin") | RealmRolePolicy("admin"), at) {
           complete("OK")

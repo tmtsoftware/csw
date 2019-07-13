@@ -84,7 +84,7 @@ object DemoApp extends App {
   containerRef ! GetComponents(probe.ref)
   val components = probe.expectMessageType[Components].components
 
-  private val laserComponent: Component = components.find(x ⇒ x.info.name.equals("Laser")).get
+  private val laserComponent: Component = components.find(x => x.info.name.equals("Laser")).get
 
   while (true) {
     println("------------------------------------")

@@ -76,7 +76,7 @@ class ContainerCmdTest(ignore: Int)
       try {
         testFileUtils.deleteServerFiles()
       } catch {
-        case NonFatal(ex) ⇒ println(s"Exception in deleting server files - ${ex.printStackTrace()}")
+        case NonFatal(ex) => println(s"Exception in deleting server files - ${ex.printStackTrace()}")
       }
     }
     super.afterAll()
@@ -147,7 +147,7 @@ class ContainerCmdTest(ignore: Int)
 
       // check that all the components within supervisor moves to Running lifecycle state
       laserContainerComponents
-        .foreach { component ⇒
+        .foreach { component =>
           component.supervisor ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
           supervisorLifecycleStateProbe.expectMessage(SupervisorLifecycleState.Running)
         }
@@ -175,13 +175,13 @@ class ContainerCmdTest(ignore: Int)
       val laserAssemblySupervisor = laserContainerComponents.head.supervisor
       val laserCompStateProbe     = TestProbe[CurrentState]
 
-      etonCommandService.submitAndWait(setupFailure).map { commandResponse ⇒
+      etonCommandService.submitAndWait(setupFailure).map { commandResponse =>
         commandResponse shouldBe Invalid
         eatonCompStateProbe
           .expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(commandValidationChoice))))
       }
 
-      etonCommandService.oneway(setupSuccess).map { _ ⇒
+      etonCommandService.oneway(setupSuccess).map { _ =>
         eatonCompStateProbe
           .expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(commandValidationChoice))))
         eatonCompStateProbe

@@ -48,7 +48,7 @@ class PerfPublisher(
 
   private def source(eventName: EventName): Source[SystemEvent, Future[Done]] =
     Source(1L to totalMessages)
-      .map { id ⇒
+      .map { id =>
         event(eventName, prefix, id, payload)
       }
       .watchTermination()(Keep.right)
@@ -57,8 +57,8 @@ class PerfPublisher(
 
   def startPublishingWithSource(): Future[Done] =
     for {
-      _   ← publisher.publish(source(eventName))
-      end ← publisher.publish(endEvent)
+      _   <- publisher.publish(source(eventName))
+      end <- publisher.publish(endEvent)
     } yield end
 
   def startPublishingInBatches(): Future[Done] = async {

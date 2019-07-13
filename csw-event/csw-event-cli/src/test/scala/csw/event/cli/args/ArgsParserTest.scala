@@ -19,7 +19,7 @@ class ArgsParserTest extends FunSuite with Matchers {
   def silentParse(args: Array[String]): Option[Options] =
     Console.withOut(outCapture) {
       Console.withErr(errCapture) {
-        new ArgsParser("csw-event-cli").parse(args)
+        new ArgsParser("csw-event-cli").parse(args.toList)
       }
     }
 
@@ -47,13 +47,13 @@ class ArgsParserTest extends FunSuite with Matchers {
 
   test("parse get with only mandatory options") {
     val args = Array("get", "-e", "a.b.c,x.y.z")
-    silentParse(args) shouldBe Some(Options("get", eventsMap = Map(EventKey("a.b.c") → Set(), EventKey("x.y.z") → Set())))
+    silentParse(args) shouldBe Some(Options("get", eventsMap = Map(EventKey("a.b.c") -> Set(), EventKey("x.y.z") -> Set())))
   }
 
   test("parse get with json output") {
     val args = Array("get", "-e", "a.b.c,x.y.z:k2:k3", "-o", "json")
     silentParse(args) shouldBe Some(
-      Options("get", eventsMap = Map(EventKey("a.b.c") → Set(), EventKey("x.y.z") → Set("k2", "k3")), out = "json")
+      Options("get", eventsMap = Map(EventKey("a.b.c") -> Set(), EventKey("x.y.z") -> Set("k2", "k3")), out = "json")
     )
   }
 
@@ -62,7 +62,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     silentParse(args) shouldBe Some(
       Options(
         "get",
-        eventsMap = Map(EventKey("a.b.c") → Set(), EventKey("x.y.z") → Set("k2", "k3")),
+        eventsMap = Map(EventKey("a.b.c") -> Set(), EventKey("x.y.z") -> Set("k2", "k3")),
         printTimestamp = true,
         printId = true,
         printUnits = true,

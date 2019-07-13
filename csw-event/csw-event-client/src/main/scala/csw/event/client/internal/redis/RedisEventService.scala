@@ -28,6 +28,6 @@ private[event] class RedisEventService(eventServiceResolver: EventServiceResolve
 
   // resolve event service every time before creating a new publisher or subscriber
   private def redisURI(): Future[RedisURI] =
-    eventServiceResolver.uri().map(uri ⇒ RedisURI.Builder.sentinel(uri.getHost, uri.getPort, masterId).build())
+    eventServiceResolver.uri().map(uri => RedisURI.Builder.sentinel(uri.getHost, uri.getPort, masterId).build())
 
 }

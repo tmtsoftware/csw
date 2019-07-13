@@ -30,7 +30,7 @@ private[alarm] trait HealthService {
    *         can also throw [[csw.alarm.api.exceptions.KeyNotFoundException]] or
    *         [[csw.alarm.api.exceptions.InactiveAlarmException]]
    */
-  def subscribeAggregatedHealthCallback(key: Key, callback: AlarmHealth ⇒ Unit): AlarmSubscription
+  def subscribeAggregatedHealthCallback(key: Key, callback: AlarmHealth => Unit): AlarmSubscription
 
   /**
    * Calculates the aggregated health for the given alarm/component/subsystem/system and sends to the give actor each time the

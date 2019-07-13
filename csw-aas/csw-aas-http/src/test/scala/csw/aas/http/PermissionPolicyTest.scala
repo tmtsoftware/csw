@@ -24,13 +24,13 @@ class PermissionPolicyTest extends FunSuite with MockitoSugar with Directives wi
     val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
-      case Provided(`invalidTokenStr`) ⇒ Future.successful(None)
-      case _                           ⇒ Future.successful(None)
+      case Provided(`invalidTokenStr`) => Future.successful(None)
+      case _                           => Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = securityDirectives.authenticate { implicit at ⇒
+    val route: Route = securityDirectives.authenticate { implicit at =>
       get {
         securityDirectives.authorize(PermissionPolicy("read"), at) {
           complete("OK")
@@ -47,11 +47,11 @@ class PermissionPolicyTest extends FunSuite with MockitoSugar with Directives wi
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
 
-    val authenticator: AsyncAuthenticator[AccessToken] = _ ⇒ Future.successful(None)
+    val authenticator: AsyncAuthenticator[AccessToken] = _ => Future.successful(None)
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = securityDirectives.authenticate { implicit at ⇒
+    val route: Route = securityDirectives.authenticate { implicit at =>
       get {
         securityDirectives.authorize(PermissionPolicy("read"), at) {
           complete("OK")
@@ -77,13 +77,13 @@ class PermissionPolicyTest extends FunSuite with MockitoSugar with Directives wi
       .thenReturn(false)
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
-      case Provided(`validTokenWithoutPermissionStr`) ⇒ Future.successful(Some(validTokenWithoutPermission))
-      case _                                          ⇒ Future.successful(None)
+      case Provided(`validTokenWithoutPermissionStr`) => Future.successful(Some(validTokenWithoutPermission))
+      case _                                          => Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = securityDirectives.authenticate { implicit at ⇒
+    val route: Route = securityDirectives.authenticate { implicit at =>
       get {
         securityDirectives.authorize(PermissionPolicy("read"), at) {
           complete("OK")
@@ -109,13 +109,13 @@ class PermissionPolicyTest extends FunSuite with MockitoSugar with Directives wi
       .thenReturn(true)
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
-      case Provided(`validTokenWithPermissionStr`) ⇒ Future.successful(Some(validTokenWithPermission))
-      case _                                       ⇒ Future.successful(None)
+      case Provided(`validTokenWithPermissionStr`) => Future.successful(Some(validTokenWithPermission))
+      case _                                       => Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = securityDirectives.authenticate { implicit at ⇒
+    val route: Route = securityDirectives.authenticate { implicit at =>
       get {
         securityDirectives.authorize(PermissionPolicy("read"), at) {
           complete("OK")

@@ -164,10 +164,10 @@ class CommandServiceTest(ignore: Int)
       val immediateSetup = Setup(prefix, immediateCmd, obsId)
       val immediateCommandF = async {
         await(assemblyCmdService.submitAndWait(immediateSetup)) match {
-          case response: Completed ⇒
+          case response: Completed =>
             //do something with completed result
             response
-          case otherResponse ⇒
+          case otherResponse =>
             // do something with other response which is not expected
             otherResponse
         }
@@ -247,9 +247,9 @@ class CommandServiceTest(ignore: Int)
       // Don't care about the futures from async
       val oneWayF = async {
         await(assemblyCmdService.oneway(onewaySetup)) match {
-          case invalid: Invalid ⇒
+          case invalid: Invalid =>
           // Log an error here
-          case _ ⇒
+          case _ =>
           // Ignore anything other than invalid
         }
       }
@@ -259,8 +259,8 @@ class CommandServiceTest(ignore: Int)
       //#validate
       val validateCommandF = async {
         await(assemblyCmdService.validate(immediateSetup)) match {
-          case response: Accepted ⇒ true
-          case Invalid(_, issue)  ⇒
+          case response: Accepted => true
+          case Invalid(_, issue)  =>
             // do something with other response which is not expected
             log.error(s"Command failed to validate with issue: $issue")
             false
@@ -346,7 +346,7 @@ class CommandServiceTest(ignore: Int)
       val matchResponseF: Future[MatchingResponse] = async {
         val onewayResponse: OnewayResponse = await(assemblyCmdService.oneway(setupWithMatcher))
         onewayResponse match {
-          case Accepted(runId) ⇒
+          case Accepted(runId) =>
             val matcherResponse = await(matcherResponseF)
             // create appropriate response if demand state was matched from among the published state or otherwise
             // this would allow the response to be used to complete a command received by the Assembly
@@ -356,7 +356,7 @@ class CommandServiceTest(ignore: Int)
               case mf: MatchFailed =>
                 Error(setupWithMatcher.runId, mf.throwable.getMessage)
             }
-          case invalid: Invalid ⇒
+          case invalid: Invalid =>
             matcher.stop()
             invalid
           case locked: Locked =>
@@ -403,14 +403,14 @@ class CommandServiceTest(ignore: Int)
       val eventualCommandResponse2: Future[MatchingResponse] = async {
         val initialResponse = await(assemblyCmdService.oneway(setupWithFailedMatcher))
         initialResponse match {
-          case _: Accepted ⇒
+          case _: Accepted =>
             val matcherResponse = await(failedMatcherResponseF)
             // create appropriate response if demand state was matched from among the published state or otherwise
             matcherResponse match {
-              case MatchCompleted  ⇒ Completed(setupWithFailedMatcher.runId)
-              case MatchFailed(ex) ⇒ Error(setupWithFailedMatcher.runId, ex.getMessage)
+              case MatchCompleted  => Completed(setupWithFailedMatcher.runId)
+              case MatchFailed(ex) => Error(setupWithFailedMatcher.runId, ex.getMessage)
             }
-          case invalid: Invalid ⇒
+          case invalid: Invalid =>
             matcher.stop()
             invalid
           case locked: Locked =>
@@ -440,12 +440,12 @@ class CommandServiceTest(ignore: Int)
       val eventualCommandResponse1: Future[MatchingResponse] = async {
         val initialResponse = await(assemblyCmdService.oneway(setupWithTimeoutMatcher))
         initialResponse match {
-          case _: Accepted ⇒
+          case _: Accepted =>
             val matcherResponse = await(matcherResponseF1)
             matcherResponse match {
-              case MatchCompleted                                       ⇒ Completed(setupWithMatcher.runId)
-              case MatchFailed(ex) if ex.isInstanceOf[TimeoutException] ⇒ Error(setupWithMatcher.runId, timeoutExMsg)
-              case MatchFailed(ex)                                      ⇒ Error(setupWithMatcher.runId, ex.getMessage)
+              case MatchCompleted                                       => Completed(setupWithMatcher.runId)
+              case MatchFailed(ex) if ex.isInstanceOf[TimeoutException] => Error(setupWithMatcher.runId, timeoutExMsg)
+              case MatchFailed(ex)                                      => Error(setupWithMatcher.runId, ex.getMessage)
             }
           case other @ (Invalid(_, _) | Locked(_)) =>
             matcher.stop()

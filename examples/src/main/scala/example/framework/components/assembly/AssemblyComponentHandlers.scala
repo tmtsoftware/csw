@@ -47,21 +47,21 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
 
     // 3. find a Hcd connection from the connections provided in componentInfo
     val maybeConnection =
-      componentInfo.connections.find(connection ⇒ connection.componentId.componentType == ComponentType.HCD)
+      componentInfo.connections.find(connection => connection.componentId.componentType == ComponentType.HCD)
 
     // 4. If an Hcd is found as a connection, resolve its location from location service and create other
     // required worker actors required by this assembly
 
     maybeConnection match {
-      case Some(_) ⇒
+      case Some(_) =>
         resolveHcd().map {
-          case Some(hcd) ⇒
+          case Some(hcd) =>
             runningHcds = runningHcds.updated(maybeConnection.get, Some(CommandServiceFactory.make(hcd)(ctx.system)))
             diagnosticsPublisher = ctx.spawnAnonymous(DiagnosticsPublisher.behavior(runningHcds(maybeConnection.get).get, worker))
             commandHandler = ctx.spawnAnonymous(CommandHandler.behavior(calculationConfig, runningHcds(maybeConnection.get)))
-          case None ⇒ // do something
+          case None => // do something
         }
-      case None ⇒ Future.successful(Unit)
+      case None => Future.successful(())
     }
 
   }
@@ -69,22 +69,22 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
 
   //#validateCommand-handler
   override def validateCommand(controlCommand: ControlCommand): ValidateCommandResponse = controlCommand match {
-    case _: Setup   ⇒ Accepted(controlCommand.runId) // validation for setup goes here
-    case _: Observe ⇒ Accepted(controlCommand.runId) // validation for observe goes here
+    case _: Setup   => Accepted(controlCommand.runId) // validation for setup goes here
+    case _: Observe => Accepted(controlCommand.runId) // validation for observe goes here
   }
   //#validateCommand-handler
 
   //#onSubmit-handler
   override def onSubmit(controlCommand: ControlCommand): SubmitResponse = controlCommand match {
-    case setup: Setup     ⇒ submitSetup(setup)     // includes logic to handle Submit with Setup config command
-    case observe: Observe ⇒ submitObserve(observe) // includes logic to handle Submit with Observe config command
+    case setup: Setup     => submitSetup(setup)     // includes logic to handle Submit with Setup config command
+    case observe: Observe => submitObserve(observe) // includes logic to handle Submit with Observe config command
   }
   //#onSubmit-handler
 
   //#onOneway-handler
   override def onOneway(controlCommand: ControlCommand): Unit = controlCommand match {
-    case setup: Setup     ⇒ onewaySetup(setup)     // includes logic to handle Oneway with Setup config command
-    case observe: Observe ⇒ onewayObserve(observe) // includes logic to handle Oneway with Observe config command
+    case setup: Setup     => onewaySetup(setup)     // includes logic to handle Oneway with Setup config command
+    case observe: Observe => onewayObserve(observe) // includes logic to handle Oneway with Observe config command
   }
   //#onOneway-handler
 
@@ -108,23 +108,23 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
 
   //#onLocationTrackingEvent-handler
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = trackingEvent match {
-    case LocationUpdated(location)   ⇒ // do something for the tracked location when it is updated
-    case LocationRemoved(connection) ⇒ // do something for the tracked location when it is no longer available
+    case LocationUpdated(location)   => // do something for the tracked location when it is updated
+    case LocationRemoved(connection) => // do something for the tracked location when it is no longer available
   }
   //#onLocationTrackingEvent-handler
 
   private def processSetup(sc: Setup): Unit = {
     sc.commandName.toString match {
-      case "forwardToWorker" ⇒
-      case x                 ⇒ log.error(s"Invalid command [$x] received.")
+      case "forwardToWorker" =>
+      case x                 => log.error(s"Invalid command [$x] received.")
     }
   }
 
   private def processObserve(oc: Observe): Unit = {
     oc.commandName.toString match {
-      case "point"   ⇒
-      case "acquire" ⇒
-      case x         ⇒ log.error(s"Invalid command [$x] received.")
+      case "point"   =>
+      case "acquire" =>
+      case x         => log.error(s"Invalid command [$x] received.")
     }
   }
 
@@ -153,17 +153,17 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
   case class HcdNotFoundException() extends FailureRestart("Could not resolve hcd location. Initialization failure.")
 
   private def resolveHcd(): Future[Option[AkkaLocation]] = {
-    val maybeConnection = componentInfo.connections.find(connection ⇒ connection.componentId.componentType == ComponentType.HCD)
+    val maybeConnection = componentInfo.connections.find(connection => connection.componentId.componentType == ComponentType.HCD)
     maybeConnection match {
-      case Some(hcd) ⇒
+      case Some(hcd) =>
         cswCtx.locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
-          case loc @ Some(akkaLocation) ⇒ loc
-          case None                     ⇒
+          case loc @ Some(akkaLocation) => loc
+          case None                     =>
             // Hcd connection could not be resolved for this Assembly. One option to handle this could be to automatic restart which can give enough time
             // for the Hcd to be available
             throw HcdNotFoundException()
         }
-      case _ ⇒ Future.successful(None)
+      case _ => Future.successful(None)
     }
   }
   //#failureRestart-Exception
@@ -174,8 +174,8 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
   private def getAssemblyConfig: Future[ConfigData] = {
 
     configClientService.getActive(Paths.get("tromboneAssemblyContext.conf")).flatMap {
-      case Some(config) ⇒ Future.successful(config) // do work
-      case None         ⇒
+      case Some(config) => Future.successful(config) // do work
+      case None         =>
         // required configuration could not be found in the configuration service. Component can choose to stop until the configuration is made available in the
         // configuration service and started again
         throw ConfigNotAvailableException()
@@ -185,7 +185,8 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
 
   def resolveHcdAndCreateCommandService(): Unit = {
     var hcd: CommandService = null
-    val hcdConnection       = componentInfo.connections.find(connection ⇒ connection.componentId.componentType == ComponentType.HCD).get
+    val hcdConnection =
+      componentInfo.connections.find(connection => connection.componentId.componentType == ComponentType.HCD).get
 
     // #resolve-hcd-and-create-commandservice
     implicit val system: ActorSystem[Nothing] = ctx.system
@@ -196,7 +197,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
         case _                               => throw HcdNotFoundException()
       }
 
-    eventualCommandService.foreach { commandService ⇒
+    eventualCommandService.foreach { commandService =>
       hcd = commandService
     }
     // #resolve-hcd-and-create-commandservice

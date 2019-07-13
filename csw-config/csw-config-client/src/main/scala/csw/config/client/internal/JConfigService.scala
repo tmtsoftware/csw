@@ -4,13 +4,13 @@ import java.nio.file.Path
 import java.time.Instant
 import java.util.Optional
 import java.util.concurrent.CompletableFuture
-import java.{util, lang ⇒ jl}
+import java.{util, lang => jl}
 
 import csw.config.api.javadsl.IConfigService
 import csw.config.api.models._
 import csw.config.api.scaladsl.ConfigService
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.compat.java8.FutureConverters._
 import scala.compat.java8.OptionConverters._
 

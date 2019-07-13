@@ -18,8 +18,8 @@ object AutoMultiJvm extends AutoPlugin {
   )
 
   def multiNodeHostNames: Seq[String] = sys.env.get("multiNodeHosts") match {
-    case Some(str) ⇒ str.split(",").toSeq
-    case None      ⇒ Seq.empty
+    case Some(str) => str.split(",").toSeq
+    case None      => Seq.empty
   }
 
   override def projectConfigurations: Seq[Configuration] = List(MultiJvm)

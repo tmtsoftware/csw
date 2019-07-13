@@ -38,7 +38,7 @@ private[location] class LocationAkkaSerializerTest extends FunSuite with Matcher
       TcpConnection(scaladsl.ComponentId("TromboneAssembly", Assembly))
     )
 
-    forAll(testData) { connection ⇒
+    forAll(testData) { connection =>
       val serializer = serialization.findSerializerFor(connection)
       serializer.getClass shouldBe classOf[LocationAkkaSerializer]
 
@@ -58,7 +58,7 @@ private[location] class LocationAkkaSerializerTest extends FunSuite with Matcher
       TcpLocation(tcpConnection, new URI(""))
     )
 
-    forAll(testData) { location ⇒
+    forAll(testData) { location =>
       val serializer = serialization.findSerializerFor(location)
       serializer.getClass shouldBe classOf[LocationAkkaSerializer]
 
@@ -78,7 +78,7 @@ private[location] class LocationAkkaSerializerTest extends FunSuite with Matcher
       TcpRegistration(tcpConnection, 1234)
     )
 
-    forAll(testData) { registration ⇒
+    forAll(testData) { registration =>
       val serializer = serialization.findSerializerFor(registration)
       serializer.getClass shouldBe classOf[LocationAkkaSerializer]
 
@@ -97,7 +97,7 @@ private[location] class LocationAkkaSerializerTest extends FunSuite with Matcher
       LocationRemoved(akkaConnection)
     )
 
-    forAll(testData) { trackingEvent ⇒
+    forAll(testData) { trackingEvent =>
       val serializer = serialization.findSerializerFor(trackingEvent)
       serializer.getClass shouldBe classOf[LocationAkkaSerializer]
 

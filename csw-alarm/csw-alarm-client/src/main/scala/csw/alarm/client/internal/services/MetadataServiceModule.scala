@@ -16,7 +16,7 @@ import scala.async.Async.{async, await}
 import scala.concurrent.Future
 
 private[client] trait MetadataServiceModule extends MetadataService {
-  self: StatusService ⇒
+  self: StatusService =>
 
   val redisConnectionsFactory: RedisConnectionsFactory
   import redisConnectionsFactory._
@@ -50,7 +50,7 @@ private[client] trait MetadataServiceModule extends MetadataService {
 
     val metadataKeys = await(metadataApi.keys(key))
     if (metadataKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
-    await(metadataApi.mget(metadataKeys)).collect { case RedisResult(_, Some(metadata)) ⇒ metadata }
+    await(metadataApi.mget(metadataKeys)).collect { case RedisResult(_, Some(metadata)) => metadata }
   }
 
   final override def initAlarms(inputConfig: Config, reset: Boolean): Future[Done] = async {
@@ -62,8 +62,8 @@ private[client] trait MetadataServiceModule extends MetadataService {
 
   private def feedAlarmStore(alarmMetadataSet: AlarmMetadataSet): Future[Done] = {
     val alarms                                = alarmMetadataSet.alarms
-    val metadataMap                           = alarms.map(metadata ⇒ MetadataKey.fromAlarmKey(metadata.alarmKey) → metadata).toMap
-    val statusMap: Map[AlarmKey, AlarmStatus] = alarms.map(metadata ⇒ metadata.alarmKey → AlarmStatus()).toMap
+    val metadataMap                           = alarms.map(metadata => MetadataKey.fromAlarmKey(metadata.alarmKey) -> metadata).toMap
+    val statusMap: Map[AlarmKey, AlarmStatus] = alarms.map(metadata => metadata.alarmKey -> AlarmStatus()).toMap
 
     log.info(s"Feeding alarm metadata in alarm store for following alarms: [${alarms.map(_.alarmKey.value).mkString("\n")}]")
     Future
@@ -73,7 +73,7 @@ private[client] trait MetadataServiceModule extends MetadataService {
           setStatus(statusMap)
         )
       )
-      .map(_ ⇒ Done)
+      .map(_ => Done)
   }
 
   private[alarm] def clearAlarmStore(): Future[Done] = {
@@ -86,7 +86,7 @@ private[client] trait MetadataServiceModule extends MetadataService {
           severityApi.pdel(GlobalKey)
         )
       )
-      .map(_ ⇒ Done)
+      .map(_ => Done)
   }
 
   private[alarm] def setMetadata(alarmKey: AlarmKey, alarmMetadata: AlarmMetadata): Future[Done] =

@@ -6,7 +6,7 @@ import csw.logging.api.scaladsl.Logger
 import csw.network.utils.commons.NetworksLogger
 import csw.network.utils.exceptions.NetworkInterfaceNotFound
 
-import scala.collection.JavaConverters.enumerationAsScalaIteratorConverter
+import scala.jdk.CollectionConverters._
 
 /**
  *  Provides InetAddresses for network interface

@@ -41,13 +41,13 @@ final class ConfigTestKit private (
 
   implicit lazy val actorSystem: ActorSystem[SpawnProtocol] = system
   private[csw] lazy val configWiring: ServerWiring = (serverConfig, testKitSettings.ConfigPort) match {
-    case (Some(_config), _) ⇒
+    case (Some(_config), _) =>
       new ServerWiring {
         override lazy val config: Config                          = _config
         override lazy val actorSystem: ActorSystem[SpawnProtocol] = system
         override lazy val securityDirectives: SecurityDirectives  = _securityDirectives
       }
-    case (_, serverPort) ⇒
+    case (_, serverPort) =>
       new ServerWiring {
         override lazy val actorSystem: ActorSystem[SpawnProtocol] = system
         override lazy val securityDirectives: SecurityDirectives  = _securityDirectives

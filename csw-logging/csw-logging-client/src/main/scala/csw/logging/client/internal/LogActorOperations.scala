@@ -79,7 +79,7 @@ private[logging] object LogActorOperations {
       )
       j0 ++ j1
     }
-    stack
+    stack.toList
   }
 
   // Convert exception to JSON
@@ -96,7 +96,7 @@ private[logging] object LogActorOperations {
         LoggingKeys.MESSAGE -> exToJson(ex),
         LoggingKeys.STACK   -> stack
       ),
-      LoggingKeys.PLAINSTACK → extractPlainStacktrace(ex)
+      LoggingKeys.PLAINSTACK -> extractPlainStacktrace(ex)
     ) ++ j1
   }
 
@@ -110,7 +110,7 @@ private[logging] object LogActorOperations {
 
     var jsonObject = Json.obj(
       LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(log.time),
-      LoggingKeys.MESSAGE   → log.msg,
+      LoggingKeys.MESSAGE   -> log.msg,
       LoggingKeys.SEVERITY  -> log.level.name,
       LoggingKeys.CATEGORY  -> Category.Common.name
     )
@@ -123,9 +123,9 @@ private[logging] object LogActorOperations {
     if (log.sourceLocation.line > 0) jsonObject = jsonObject ++ Json.obj(LoggingKeys.LINE -> log.sourceLocation.line)
 
     jsonObject = (log.sourceLocation.packageName, log.sourceLocation.className) match {
-      case ("", "") ⇒ jsonObject
-      case ("", c)  ⇒ jsonObject ++ Json.obj(LoggingKeys.CLASS -> c)
-      case (p, c)   ⇒ jsonObject ++ Json.obj(LoggingKeys.CLASS -> s"$p.$c")
+      case ("", "") => jsonObject
+      case ("", c)  => jsonObject ++ Json.obj(LoggingKeys.CLASS -> c)
+      case (p, c)   => jsonObject ++ Json.obj(LoggingKeys.CLASS -> s"$p.$c")
     }
 
     if (log.actorName.isDefined) jsonObject = jsonObject ++ Json.obj(LoggingKeys.ACTOR -> log.actorName.get)
@@ -135,8 +135,8 @@ private[logging] object LogActorOperations {
     if (log.ex != NoLogException) jsonObject = jsonObject ++ exceptionJson(log.ex)
 
     jsonObject = log.id match {
-      case RequestId(trackingId, spanId, _) ⇒ jsonObject ++ Json.obj(LoggingKeys.TRACE_ID -> Seq(trackingId, spanId))
-      case _                                ⇒ jsonObject
+      case RequestId(trackingId, spanId, _) => jsonObject ++ Json.obj(LoggingKeys.TRACE_ID -> Seq(trackingId, spanId))
+      case _                                => jsonObject
     }
 
     if (!log.kind.isEmpty) jsonObject = jsonObject ++ Json.obj(LoggingKeys.KIND -> log.kind)

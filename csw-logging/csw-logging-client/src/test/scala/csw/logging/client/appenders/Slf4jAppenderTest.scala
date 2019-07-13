@@ -20,7 +20,7 @@ class Slf4jAppenderTest extends LoggingTestSuite {
 
     Thread.sleep(300)
 
-    logBuffer.foreach { log ⇒
+    logBuffer.foreach { log =>
       val currentLogLevel = log(LoggingKeys.SEVERITY).toString.toLowerCase
       Level(currentLogLevel) >= TRACE shouldBe true
       log(LoggingKeys.MESSAGE).toString shouldBe currentLogLevel

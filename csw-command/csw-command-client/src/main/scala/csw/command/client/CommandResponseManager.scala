@@ -62,7 +62,7 @@ class CommandResponseManager(
   def query(runId: Id)(implicit timeout: Timeout): Future[QueryResponse] = {
     val eventualResponse: Future[QueryResponse] = commandResponseManagerActor ? (Query(runId, _))
     eventualResponse recover {
-      case _: TimeoutException ⇒ CommandNotAvailable(runId)
+      case _: TimeoutException => CommandNotAvailable(runId)
     }
   }
 

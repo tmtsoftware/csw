@@ -608,7 +608,7 @@ class CommandsTest extends FunSpec {
       (wait, wait.cloneCommand)
     )
     it("clone command creates a command from existing command with a new RunId for Setup, Observe or Wait") {
-      forAll(testData) { (command, commandClone) ⇒
+      forAll(testData) { (command, commandClone) =>
         assert(command.runId != commandClone.runId)
         assert(command.commandName == commandClone.commandName)
         assert(command.maybeObsId == commandClone.maybeObsId)

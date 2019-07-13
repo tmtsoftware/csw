@@ -27,10 +27,10 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
 
   // DEOPSCSW-542: Schedule a task to execute in future
   List(
-    ("TAITime", () ⇒ TAITime(TAITime.now().value.plusSeconds(1))), // lazily evaluate time when tests are executed
-    ("UTCTime", () ⇒ UTCTime(UTCTime.now().value.plusSeconds(1)))
+    ("TAITime", () => TAITime(TAITime.now().value.plusSeconds(1))), // lazily evaluate time when tests are executed
+    ("UTCTime", () => UTCTime(UTCTime.now().value.plusSeconds(1)))
   ).foreach {
-    case (name, idealScheduleTime) ⇒
+    case (name, idealScheduleTime) =>
       test(s"[$name] should schedule task at start time") {
         val testProbe = TestProbe()(system.toUntyped)
         val probeMsg  = "echo"

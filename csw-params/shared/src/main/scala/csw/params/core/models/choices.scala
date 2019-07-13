@@ -5,7 +5,7 @@ import java.util
 import play.api.libs.json.{Json, OFormat}
 
 import scala.annotation.varargs
-import scala.collection.JavaConverters.seqAsJavaListConverter
+import scala.jdk.CollectionConverters._
 import scala.language.implicitConversions
 
 /**

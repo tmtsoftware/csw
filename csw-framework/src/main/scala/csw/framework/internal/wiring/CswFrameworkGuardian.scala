@@ -19,7 +19,7 @@ private[framework] object CswFrameworkGuardian {
 
   def behavior: Behavior[GuardianMsg] =
     Behaviors.receive[GuardianMsg] {
-      case (ctx, msg) ⇒
+      case (ctx, msg) =>
         msg match {
           case create: CreateActor[t] =>
             val componentRef = ctx.spawn(create.behavior, create.name, create.props)
@@ -28,7 +28,7 @@ private[framework] object CswFrameworkGuardian {
         }
         Behaviors.same
     } receiveSignal {
-      case (ctx, Terminated(_)) ⇒
+      case (ctx, Terminated(_)) =>
         CoordinatedShutdown(ctx.system.toUntyped).run(ActorTerminatedReason)
         Behaviors.stopped
     }

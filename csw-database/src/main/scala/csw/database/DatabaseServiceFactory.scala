@@ -15,7 +15,7 @@ import org.jooq.impl.DSL
 import org.jooq.{DSLContext, SQLDialect}
 
 import scala.async.Async.{async, await}
-import scala.collection.JavaConverters.mapAsJavaMapConverter
+import scala.jdk.CollectionConverters._
 import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
@@ -92,11 +92,11 @@ class DatabaseServiceFactory private[database] (actorSystem: ActorSystem[_], val
     val uri      = await(resolver.uri())
     val envVars  = sys.env ++ values
     val dataSource: Map[String, Any] = Map(
-      "dataSource.serverName"   → uri.getHost,
-      "dataSource.portNumber"   → uri.getPort,
-      "dataSource.databaseName" → dbName,
-      "dataSource.user"         → envVars(usernameHolder), //NoSuchElementFoundException can be thrown if no env variable is set
-      "dataSource.password"     → envVars(passwordHolder) //NoSuchElementFoundException can be thrown if no env variable is set
+      "dataSource.serverName"   -> uri.getHost,
+      "dataSource.portNumber"   -> uri.getPort,
+      "dataSource.databaseName" -> dbName,
+      "dataSource.user"         -> envVars(usernameHolder), //NoSuchElementFoundException can be thrown if no env variable is set
+      "dataSource.password"     -> envVars(passwordHolder) //NoSuchElementFoundException can be thrown if no env variable is set
     )
     val dataSourceConfig = ConfigFactory.parseMap(dataSource.asJava)
     createDslInternal(Some(dataSourceConfig))
@@ -174,8 +174,8 @@ class DatabaseServiceFactory private[database] (actorSystem: ActorSystem[_], val
     val dataSourceConfig: Config = cswDatabase.getConfig("hikari-datasource")
 
     val finalDataSourceConfig = maybeConfig match {
-      case None               ⇒ dataSourceConfig
-      case Some(customConfig) ⇒ customConfig.withFallback(dataSourceConfig)
+      case None               => dataSourceConfig
+      case Some(customConfig) => customConfig.withFallback(dataSourceConfig)
     }
 
     try {
@@ -185,7 +185,7 @@ class DatabaseServiceFactory private[database] (actorSystem: ActorSystem[_], val
       log.info(s"Connecting to database using config :[$finalDataSourceConfig]")
       DSL.using(new HikariDataSource(hikariConfig), SQLDialect.valueOf(dialect))
     } catch {
-      case NonFatal(ex) ⇒
+      case NonFatal(ex) =>
         val exception = DatabaseException(ex.getMessage, ex.getCause)
         log.error(exception.getMessage, ex = exception)
         throw exception

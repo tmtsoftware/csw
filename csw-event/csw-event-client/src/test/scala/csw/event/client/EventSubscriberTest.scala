@@ -5,7 +5,7 @@ import akka.stream.scaladsl.{Keep, Sink}
 import csw.event.api.scaladsl.SubscriptionModes
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.helpers.Utils._
-import csw.event.client.internal.kafka.KafkaTestProps
+//import csw.event.client.internal.kafka.KafkaTestProps
 import csw.event.client.internal.redis.RedisTestProps
 import csw.event.client.internal.wiring.BaseProperties
 import csw.params.core.models.{Prefix, Subsystem}
@@ -31,26 +31,26 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
 
   var redisTestProps: RedisTestProps = _
-  var kafkaTestProps: KafkaTestProps = _
+//  var kafkaTestProps: KafkaTestProps = _
 
   @BeforeSuite
   def beforeAll(): Unit = {
     redisTestProps = RedisTestProps.createRedisProperties()
-    kafkaTestProps = KafkaTestProps.createKafkaProperties()
+//    kafkaTestProps = KafkaTestProps.createKafkaProperties()
     redisTestProps.start()
-    kafkaTestProps.start()
+//    kafkaTestProps.start()
   }
 
   @AfterSuite
   def afterAll(): Unit = {
     redisTestProps.shutdown()
-    kafkaTestProps.shutdown()
+//    kafkaTestProps.shutdown()
   }
 
   @DataProvider(name = "event-service-provider")
   def pubSubProvider: Array[Array[_ <: BaseProperties]] = Array(
-    Array(redisTestProps),
-    Array(kafkaTestProps)
+    Array(redisTestProps)
+//    Array(kafkaTestProps)
   )
 
   @DataProvider(name = "redis-provider")
@@ -58,8 +58,8 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     Array(redisTestProps)
   )
 
-  val events: immutable.Seq[Event]                  = for (i ← 1 to 1500) yield makeEvent(i)
-  def events(name: EventName): immutable.Seq[Event] = for (i ← 1 to 1500) yield makeEventForKeyName(name, i)
+  val events: immutable.Seq[Event]                  = for (i <- 1 to 1500) yield makeEvent(i)
+  def events(name: EventName): immutable.Seq[Event] = for (i <- 1 to 1500) yield makeEventForKeyName(name, i)
 
   class EventGenerator(eventName: EventName) {
     var counter                               = 0
@@ -112,7 +112,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     val event1    = makeEvent(1)
     val testProbe = TestProbe[Event]()
 
-    val callback: Event ⇒ Future[Event] = event ⇒ Future.successful(testProbe.ref ! event).map(_ ⇒ event)(ec)
+    val callback: Event => Future[Event] = event => Future.successful(testProbe.ref ! event).map(_ => event)(ec)
 
     publisher.publish(event1).await
 
@@ -136,8 +136,8 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     val queue2: mutable.Queue[Event] = new mutable.Queue[Event]()
     val eventKey                     = events.head.eventKey
 
-    val callback: Event ⇒ Future[Unit]  = event ⇒ Future.successful(queue.enqueue(event))
-    val callback2: Event ⇒ Future[Unit] = event ⇒ Future.successful(queue2.enqueue(event))
+    val callback: Event => Future[Unit]  = event => Future.successful(queue.enqueue(event))
+    val callback2: Event => Future[Unit] = event => Future.successful(queue2.enqueue(event))
     eventId = 0
     val cancellable = publisher.publish(eventGenerator(), 1.millis)
 
@@ -160,11 +160,11 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
     val listOfPublishedEvents: ArrayBuffer[Event] = ArrayBuffer.empty
 
-    val testProbe              = TestProbe[Event]()
-    val callback: Event ⇒ Unit = testProbe.ref ! _
+    val testProbe               = TestProbe[Event]()
+    val callback: Event => Unit = testProbe.ref ! _
 
     // all events are published to same topic with different id's
-    (1 to 5).foreach { id ⇒
+    (1 to 5).foreach { id =>
       val event = makeEvent(id)
       listOfPublishedEvents += event
       publisher.publish(event).await
@@ -189,8 +189,8 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     val queue2: mutable.Queue[Event] = new mutable.Queue[Event]()
     val event1                       = makeEvent(1)
 
-    val callback: Event ⇒ Unit  = queue.enqueue(_)
-    val callback2: Event ⇒ Unit = queue2.enqueue(_)
+    val callback: Event => Unit  = queue.enqueue(_)
+    val callback2: Event => Unit = queue2.enqueue(_)
     eventId = 0
     val cancellable = publisher.publish(eventGenerator(), 1.millis)
     Thread.sleep(500) // Needed for redis set which is fire and forget operation

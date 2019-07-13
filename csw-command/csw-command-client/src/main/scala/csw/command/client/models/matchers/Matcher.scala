@@ -34,8 +34,8 @@ class Matcher(
    * @return the result of matching as a Future value of MatcherResponse
    */
   def start: Future[MatcherResponse] = currentStateF.transform {
-    case Success(_)  ⇒ Success(MatchCompleted)
-    case Failure(ex) ⇒ Success(MatchFailed(ex))
+    case Success(_)  => Success(MatchCompleted)
+    case Failure(ex) => Success(MatchFailed(ex))
   }
 
   /**
@@ -55,16 +55,16 @@ class Matcher(
       val eventualCommandResponse: Future[CommandResponse] = async {
         val initialResponse = await(assemblyComponent.oneway(setupWithMatcher))
         initialResponse match {
-          case _: Accepted ⇒
+          case _: Accepted =>
             val matcherResponse = await(matcherResponseF)
             matcherResponse match {
-              case MatchCompleted  ⇒ Completed(setupWithMatcher.runId)
-              case MatchFailed(ex) ⇒ Error(setupWithMatcher.runId, ex.getMessage)
+              case MatchCompleted  => Completed(setupWithMatcher.runId)
+              case MatchFailed(ex) => Error(setupWithMatcher.runId, ex.getMessage)
             }
-          case invalid: Invalid ⇒
+          case invalid: Invalid =>
             matcher.stop()
             invalid
-          case x ⇒ x
+          case x => x
         }
    * }}}
    */
@@ -91,9 +91,9 @@ class Matcher(
   private def source =
     Source
       .actorRef[CurrentState](256, OverflowStrategy.fail)
-      .mapMaterializedValue { ref ⇒
+      .mapMaterializedValue { ref =>
         currentStateSource ! ComponentStateSubscription(Subscribe(ref))
       }
-      .filter(cs ⇒ cs.stateName == stateMatcher.stateName && cs.prefix == stateMatcher.prefix && stateMatcher.check(cs))
+      .filter(cs => cs.stateName == stateMatcher.stateName && cs.prefix == stateMatcher.prefix && stateMatcher.check(cs))
       .completionTimeout(stateMatcher.timeout.duration)
 }

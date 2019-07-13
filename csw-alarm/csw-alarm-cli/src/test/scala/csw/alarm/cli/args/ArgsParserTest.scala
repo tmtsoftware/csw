@@ -15,7 +15,7 @@ class ArgsParserTest extends FunSuite with Matchers {
 
   def silentParse(options: Array[String]): Option[Options] = Console.withOut(outCapture) {
     Console.withErr(errCapture) {
-      new ArgsParser(BuildInfo.name).parse(options)
+      new ArgsParser(BuildInfo.name).parse(options.toList)
     }
   }
 
@@ -155,7 +155,7 @@ class ArgsParserTest extends FunSuite with Matchers {
   val commandsRequiringAlarmKey =
     List("acknowledge", "unacknowledge", "activate", "deactivate", "shelve", "unshelve", "reset")
 
-  commandsRequiringAlarmKey.foreach { command ⇒
+  commandsRequiringAlarmKey.foreach { command =>
     test(s"parse $command command") {
       val options = Array(
         command,

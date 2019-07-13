@@ -90,8 +90,8 @@ class EventServiceFactory(store: EventStore = RedisStore()) {
     def masterId = system.settings.config.getString("csw-event.redis.masterId")
 
     store match {
-      case RedisStore(client) ⇒ new RedisEventService(eventServiceResolver, masterId, client)
-      case KafkaStore         ⇒ new KafkaEventService(eventServiceResolver)
+      case RedisStore(client) => new RedisEventService(eventServiceResolver, masterId, client)
+      case KafkaStore         => new KafkaEventService(eventServiceResolver)
     }
   }
 }

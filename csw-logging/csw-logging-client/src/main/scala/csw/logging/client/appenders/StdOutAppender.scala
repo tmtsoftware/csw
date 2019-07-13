@@ -31,7 +31,7 @@ object StdOutAppender extends LogAppenderBuilder {
  * @param system typed Actor System
  * @param stdHeaders the headers that are fixes for this service
  */
-class StdOutAppender(system: ActorSystem[_], stdHeaders: JsObject, logPrinter: Any ⇒ Unit) extends LogAppender {
+class StdOutAppender(system: ActorSystem[_], stdHeaders: JsObject, logPrinter: Any => Unit) extends LogAppender {
   private[this] val config        = system.settings.config.getConfig("csw-logging.appender-config.stdout")
   private[this] val fullHeaders   = config.getBoolean("fullHeaders")
   private[this] val color         = config.getBoolean("color")

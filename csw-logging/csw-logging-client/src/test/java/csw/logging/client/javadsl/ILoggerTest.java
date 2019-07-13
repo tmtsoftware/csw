@@ -66,7 +66,7 @@ public class ILoggerTest extends JUnitSuite {
     @BeforeClass
     public static void setup() {
         loggingSystem = JLoggingSystemFactory.start("Logger-Test", "SNAPSHOT-1.0", "localhost", actorSystem, appenderBuilders);
-        loggingSystem.setAppenders(scala.collection.JavaConverters.iterableAsScalaIterable(appenderBuilders).toList());
+        loggingSystem.setAppenders(scala.jdk.CollectionConverters.ListHasAsScala(appenderBuilders).asScala().toList());
     }
 
     @After

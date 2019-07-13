@@ -37,7 +37,7 @@ private[logging] class TimeActor(tdone: Promise[Unit]) {
     def end(id: RequestId): Unit = {
       val key = s"${id.trackingId}\t${id.spanId}"
       items.get(key) map { timeItem =>
-        val jitems0 = timeItem.steps map {
+        val jitems0 = timeItem.steps.toList map {
           case (key1, timeStep) =>
             val j1 = Json.obj("name" -> timeStep.name, "time0" -> timeStep.start)
             val j2 = if (timeStep.end == 0) {
@@ -47,9 +47,9 @@ private[logging] class TimeActor(tdone: Promise[Unit]) {
             }
             j1 ++ j2
         }
-        val traceId = Seq(id.trackingId, id.spanId).asJson
-        val jitems  = jitems0.toSeq.sortBy(_.getString("time0"))
-        val j       = Map(LoggingKeys.TRACE_ID -> traceId, "items" -> jitems)
+        val traceId             = Seq(id.trackingId, id.spanId).asJson
+        val jitems              = jitems0.sortBy(_.getString("time0"))
+        val j: Map[String, Any] = Map(LoggingKeys.TRACE_ID -> traceId, "items" -> jitems)
         log.alternative("time", j)
         items -= key
       }

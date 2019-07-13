@@ -38,9 +38,9 @@ trait MockedAuthentication extends MockitoSugar {
   val invalidToken: AccessToken     = mock[AccessToken]
 
   private val authenticator: AsyncAuthenticator[AccessToken] = {
-    case Provided(`roleMissingTokenStr`) ⇒ Future.successful(Some(roleMissingToken))
-    case Provided(`validTokenStr`)       ⇒ Future.successful(Some(validToken))
-    case _                               ⇒ Future.successful(None)
+    case Provided(`roleMissingTokenStr`) => Future.successful(Some(roleMissingToken))
+    case Provided(`validTokenStr`)       => Future.successful(Some(validToken))
+    case _                               => Future.successful(None)
   }
   when(roleMissingToken.hasClientRole("admin", "test")).thenReturn(false)
   when(validToken.hasClientRole("admin", "test")).thenReturn(true)

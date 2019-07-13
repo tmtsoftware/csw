@@ -30,13 +30,13 @@ class AdminExceptionHandlers extends Directives with JsonRejectionHandler {
   def route: Directive[Unit] = handleExceptions(jsonExceptionHandler) & handleRejections(jsonRejectionHandler)
 
   private val jsonExceptionHandler: ExceptionHandler = ExceptionHandler {
-    case ex: UnresolvedAkkaLocationException ⇒
+    case ex: UnresolvedAkkaLocationException =>
       log.error(ex.getMessage, ex = ex)
       complete(JsonSupport.asJsonResponse(StatusCodes.NotFound, ex.getMessage))
-    case ex: UnsupportedConnectionException ⇒
+    case ex: UnsupportedConnectionException =>
       log.error(ex.getMessage, ex = ex)
       complete(JsonSupport.asJsonResponse(StatusCodes.BadRequest, ex.getMessage))
-    case NonFatal(ex) ⇒
+    case NonFatal(ex) =>
       log.error(ex.getMessage, ex = ex)
       complete(JsonSupport.asJsonResponse(StatusCodes.InternalServerError, ex.getMessage))
   }

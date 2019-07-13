@@ -25,7 +25,7 @@ object AlarmServiceClientExampleApp {
   implicit val mat: Materializer           = ActorMaterializer()
   private val locationService              = HttpLocationServiceFactory.makeLocalClient
 
-  private def behaviour[T]: Behaviors.Receive[T] = Behaviors.receive { (ctx, msg) ⇒
+  private def behaviour[T]: Behaviors.Receive[T] = Behaviors.receive { (ctx, msg) =>
     println(msg)
     Behaviors.same
   }
@@ -119,7 +119,7 @@ object AlarmServiceClientExampleApp {
   //#subscribeAggregatedSeverityCallback
   val alarmSubscription: AlarmSubscription = adminAPI.subscribeAggregatedSeverityCallback(
     ComponentKey(NFIRAOS, "tromboneAssembly"),
-    aggregatedSeverity ⇒ { /* do something*/ }
+    aggregatedSeverity => { /* do something*/ }
   )
   // to unsubscribe:
   val unsubscribe1F: Future[Done] = alarmSubscription.unsubscribe()
@@ -137,7 +137,7 @@ object AlarmServiceClientExampleApp {
   //#subscribeAggregatedHealthCallback
   val alarmSubscription3: AlarmSubscription = adminAPI.subscribeAggregatedHealthCallback(
     ComponentKey(IRIS, "ImagerDetectorAssembly"),
-    aggregatedHealth ⇒ { /* do something*/ }
+    aggregatedHealth => { /* do something*/ }
   )
 
   // to unsubscribe

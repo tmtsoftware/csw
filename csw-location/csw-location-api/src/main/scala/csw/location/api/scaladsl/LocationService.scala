@@ -128,6 +128,6 @@ trait LocationService {
    * @param callback the callback function of type `TrackingEvent` => Unit which gets executed on receiving any `TrackingEvent`
    * @return a killswitch which can be shutdown to unsubscribe the consumer
    */
-  def subscribe(connection: Connection, callback: TrackingEvent ⇒ Unit): KillSwitch
+  def subscribe(connection: Connection, callback: TrackingEvent => Unit): KillSwitch
 
 }

@@ -60,7 +60,7 @@ trait EventPublisher {
    * @tparam Mat represents the type of materialized value as defined in the source to be obtained on running the stream
    * @return the materialized value obtained on running the stream
    */
-  def publish[Mat](source: Source[Event, Mat], onError: PublishFailure ⇒ Unit): Mat
+  def publish[Mat](source: Source[Event, Mat], onError: PublishFailure => Unit): Mat
 
   /**
    * Publish [[csw.params.events.Event]] from an `eventGenerator` function, which will be executed at `every` frequency. `Cancellable` can be used to cancel
@@ -113,7 +113,7 @@ trait EventPublisher {
    * @param onError a callback to execute for each event for which publishing failed
    * @return a handle to cancel the event generation through `eventGenerator`
    */
-  def publish(eventGenerator: => Option[Event], every: FiniteDuration, onError: PublishFailure ⇒ Unit): Cancellable
+  def publish(eventGenerator: => Option[Event], every: FiniteDuration, onError: PublishFailure => Unit): Cancellable
 
   /**
    * Publish [[csw.params.events.Event]] from an `eventGenerator` function, which will be started at the specified `startTime`
@@ -138,7 +138,7 @@ trait EventPublisher {
       eventGenerator: => Option[Event],
       startTime: TMTTime,
       every: FiniteDuration,
-      onError: PublishFailure ⇒ Unit
+      onError: PublishFailure => Unit
   ): Cancellable
 
   /**
@@ -193,7 +193,7 @@ trait EventPublisher {
    * @param onError a callback to execute for each event for which publishing failed
    * @return a handle to cancel the event generation through `eventGenerator`
    */
-  def publishAsync(eventGenerator: => Future[Option[Event]], every: FiniteDuration, onError: PublishFailure ⇒ Unit): Cancellable
+  def publishAsync(eventGenerator: => Future[Option[Event]], every: FiniteDuration, onError: PublishFailure => Unit): Cancellable
 
   /**
    * Publish [[csw.params.events.Event]] from an asynchronous `eventGenerator` function, which will be started at the specified `startTime`

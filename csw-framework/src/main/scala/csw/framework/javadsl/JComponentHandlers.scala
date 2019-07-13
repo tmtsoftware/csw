@@ -45,7 +45,7 @@ abstract class JComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCt
    *
    * @return a future which completes when jInitialize completes
    */
-  override def initialize(): Future[Unit] = jInitialize().toScala.map(_ ⇒ Unit)
+  override def initialize(): Future[Unit] = jInitialize().toScala.map(_ => ())
 
   /**
    * Invokes the java helper (jOnShutdown) to shutdown the component
@@ -54,5 +54,5 @@ abstract class JComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCt
    *
    * @return a future which completes when the jOnShutdown completes
    */
-  override def onShutdown(): Future[Unit] = jOnShutdown().toScala.map(_ ⇒ Unit)
+  override def onShutdown(): Future[Unit] = jOnShutdown().toScala.map(_ => ())
 }

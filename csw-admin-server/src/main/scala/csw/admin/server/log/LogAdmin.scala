@@ -28,44 +28,44 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) {
   def getLogMetadata(componentFullName: String): Future[LogMetadata] = async {
     implicit val timeout: Timeout = Timeout(5.seconds)
     await(getLocation(componentFullName)) match {
-      case Some(location: AkkaLocation) ⇒
+      case Some(location: AkkaLocation) =>
         val componentName = location.connection.componentId.name
         log.info(
           "Getting log information from logging system",
           Map(
-            "componentName" → componentFullName,
-            "location"      → location.toString
+            "componentName" -> componentFullName,
+            "location"      -> location.toString
           )
         )
         await(location.componentRef ? (GetComponentLogMetadata(componentName, _)))
-      case _ ⇒ throw UnresolvedAkkaLocationException(componentFullName)
+      case _ => throw UnresolvedAkkaLocationException(componentFullName)
     }
   }
 
   def setLogLevel(componentFullName: String, logLevel: Level): Future[Unit] =
     async {
       await(getLocation(componentFullName)) match {
-        case Some(location: AkkaLocation) ⇒
+        case Some(location: AkkaLocation) =>
           val componentName = location.connection.componentId.name
           log.info(
             s"Setting log level to $logLevel",
             Map(
-              "componentName" → componentFullName,
-              "location"      → location.toString
+              "componentName" -> componentFullName,
+              "location"      -> location.toString
             )
           )
           location.componentRef ! SetComponentLogLevel(componentName, logLevel)
-        case _ ⇒ throw UnresolvedAkkaLocationException(componentFullName)
+        case _ => throw UnresolvedAkkaLocationException(componentFullName)
       }
     }
 
   private def getLocation(componentFullName: String): Future[Option[Location]] =
     async {
       Connection.from(componentFullName) match {
-        case connection: AkkaConnection ⇒ await(locationService.find(connection))
-        case connection: HttpConnection ⇒ throw UnsupportedConnectionException(connection)
-        case connection: TcpConnection  ⇒ throw UnsupportedConnectionException(connection)
-        case _                          ⇒ throw InvalidComponentNameException(componentFullName)
+        case connection: AkkaConnection => await(locationService.find(connection))
+        case connection: HttpConnection => throw UnsupportedConnectionException(connection)
+        case connection: TcpConnection  => throw UnsupportedConnectionException(connection)
+        case _                          => throw InvalidComponentNameException(componentFullName)
       }
     }
 }

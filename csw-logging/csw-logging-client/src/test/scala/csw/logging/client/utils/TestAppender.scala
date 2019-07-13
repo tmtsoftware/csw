@@ -4,7 +4,7 @@ import akka.actor.typed.ActorSystem
 import csw.logging.client.appenders.{LogAppenderBuilder, StdOutAppender}
 import play.api.libs.json.JsObject
 
-class TestAppender(callback: Any ⇒ Unit) extends LogAppenderBuilder {
+class TestAppender(callback: Any => Unit) extends LogAppenderBuilder {
 
   /**
    * A constructor for the TestAppender class.

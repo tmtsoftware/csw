@@ -17,7 +17,7 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
   private val nfiraos: String = NFIRAOS.entryName
   private val dms: String     = DMS.entryName
 
-  private val peakLoadSettings: List[JvmSetting] = (1 to 4).map { n ⇒
+  private val peakLoadSettings: List[JvmSetting] = (1 to 4).map { n =>
     JvmSetting(
       dms,
       List(PubSetting(Prefix(s"$dms-$n"), noOfPubs = 5, adjustedTotalMsgs(1000), rate = 1000, payloadSize = 64)),
@@ -46,11 +46,11 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
           SubSetting(Prefix(s"$tcs-1"), noOfSubs = 250, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
         )
       ) ::
-        List(AOESW, IRIS, NFIRAOS, WFOS).flatMap { subsystem ⇒
+        List(AOESW, IRIS, NFIRAOS, WFOS).flatMap { subsystem =>
           val subsystemName = subsystem.entryName
 
           (1 to 5).map {
-            n ⇒
+            n =>
               JvmSetting(
                 subsystemName,
                 List(
@@ -58,27 +58,27 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
                   PubSetting(Prefix(s"$subsystemName-$n"), noOfPubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                 ),
                 subsystem match {
-                  case AOESW ⇒
+                  case AOESW =>
                     List(
                       SubSetting(Prefix(s"$iris-$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
                       SubSetting(Prefix(s"$iris-$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                     )
-                  case IRIS ⇒
+                  case IRIS =>
                     List(
                       SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
                       SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                     )
-                  case NFIRAOS ⇒
+                  case NFIRAOS =>
                     List(
                       SubSetting(Prefix(s"$wfos-$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
                       SubSetting(Prefix(s"$wfos-$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                     )
-                  case WFOS ⇒
+                  case WFOS =>
                     List(
                       SubSetting(Prefix(s"$nfiraos-$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
                       SubSetting(Prefix(s"$nfiraos-$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                     )
-                  case _ ⇒ Nil
+                  case _ => Nil
                 }
               )
           }
@@ -103,11 +103,11 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
           SubSetting(Prefix(s"$tcs-1"), noOfSubs = 2, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
         )
       ) ::
-        List(AOESW, IRIS, NFIRAOS, WFOS).flatMap { subsystem ⇒
+        List(AOESW, IRIS, NFIRAOS, WFOS).flatMap { subsystem =>
           val subsystemName = subsystem.entryName
 
           (1 to 5).map {
-            n ⇒
+            n =>
               JvmSetting(
                 subsystemName,
                 List(
@@ -115,30 +115,30 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
                   PubSetting(Prefix(s"$subsystemName-$n"), noOfPubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                 ),
                 subsystem match {
-                  case AOESW ⇒
+                  case AOESW =>
                     List(
                       SubSetting(Prefix(s"$iris-$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
                       SubSetting(Prefix(s"$iris-$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128),
                       SubSetting(Prefix(s"$iris-pattern-$n"), noOfSubs = 3, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                     )
-                  case IRIS ⇒
+                  case IRIS =>
                     List(
                       SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
                       SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128),
                       SubSetting(Prefix(s"$aoesw-pattern-$n"), noOfSubs = 3, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                     )
-                  case NFIRAOS ⇒
+                  case NFIRAOS =>
                     List(
                       SubSetting(Prefix(s"$wfos-$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
                       SubSetting(Prefix(s"$wfos-$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128),
                       SubSetting(Prefix(s"$wfos-pattern-$n"), noOfSubs = 2, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                     )
-                  case WFOS ⇒
+                  case WFOS =>
                     List(
                       SubSetting(Prefix(s"$nfiraos-$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
                       SubSetting(Prefix(s"$nfiraos-pattern-$n"), noOfSubs = 2, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                     )
-                  case _ ⇒ Nil
+                  case _ => Nil
                 }
               )
           }
@@ -161,11 +161,11 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
           SubSetting(Prefix(s"$tcs-1"), noOfSubs = 250, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
         )
       ) ::
-        List(AOESW, IRIS, NFIRAOS, WFOS).flatMap { subsystem ⇒
+        List(AOESW, IRIS, NFIRAOS, WFOS).flatMap { subsystem =>
           val subsystemName = subsystem.entryName
 
           (1 to 5).map {
-            n ⇒
+            n =>
               JvmSetting(
                 subsystemName,
                 List(
@@ -199,11 +199,11 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
           SubSetting(Prefix(s"$tcs-1"), noOfSubs = 100, adjustedTotalMsgs(3), rate = 3, payloadSize = 128)
         )
       ) ::
-        List(AOESW, IRIS, NFIRAOS, WFOS).flatMap { subsystem ⇒
+        List(AOESW, IRIS, NFIRAOS, WFOS).flatMap { subsystem =>
           val subsystemName = subsystem.entryName
 
           (1 to 1).map {
-            n ⇒
+            n =>
               JvmSetting(
                 subsystemName,
                 List(
@@ -211,30 +211,30 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
                   PubSetting(Prefix(s"$subsystemName-$n"), noOfPubs = 100, adjustedTotalMsgs(3), rate = 3, payloadSize = 128)
                 ),
                 subsystem match {
-                  case AOESW ⇒
+                  case AOESW =>
                     List(
                       SubSetting(Prefix(s"$iris-$n"), noOfSubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
                       SubSetting(Prefix(s"$iris-$n"), noOfSubs = 100, adjustedTotalMsgs(3), rate = 3, payloadSize = 128)
                     )
-                  case IRIS ⇒
+                  case IRIS =>
                     List(
                       SubSetting(Prefix(s"$tcs-1"), noOfSubs = 1, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
                       SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
                       SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 100, adjustedTotalMsgs(3), rate = 3, payloadSize = 128)
                     )
-                  case NFIRAOS ⇒
+                  case NFIRAOS =>
                     List(
                       SubSetting(Prefix(s"$tcs-1"), noOfSubs = 1, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
                       SubSetting(Prefix(s"$wfos-$n"), noOfSubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
                       SubSetting(Prefix(s"$wfos-$n"), noOfSubs = 100, adjustedTotalMsgs(3), rate = 3, payloadSize = 128)
                     )
-                  case WFOS ⇒
+                  case WFOS =>
                     List(
                       SubSetting(Prefix(s"$tcs-1"), noOfSubs = 3, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
                       SubSetting(Prefix(s"$nfiraos-$n"), noOfSubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
                       SubSetting(Prefix(s"$nfiraos-$n"), noOfSubs = 100, adjustedTotalMsgs(3), rate = 3, payloadSize = 128)
                     )
-                  case _ ⇒ Nil
+                  case _ => Nil
                 }
               )
           }
@@ -256,11 +256,11 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
           SubSetting(Prefix(s"$tcs-1"), noOfSubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
         )
       ) ::
-        List(AOESW).flatMap { subsystem ⇒
+        List(AOESW).flatMap { subsystem =>
           val subsystemName = subsystem.entryName
 
           (1 to 1).map {
-            n ⇒
+            n =>
               JvmSetting(
                 subsystemName,
                 List(
@@ -268,12 +268,12 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
                   PubSetting(Prefix(s"$subsystemName-$n"), noOfPubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
                 ),
                 subsystem match {
-                  case AOESW ⇒
+                  case AOESW =>
                     List(
                       SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 10, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
                       SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
                     )
-                  case _ ⇒ Nil
+                  case _ => Nil
                 }
               )
           }
@@ -298,11 +298,11 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
           SubSetting(Prefix(s"$tcs-pattern-1"), noOfSubs = 1, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
         )
       ) ::
-        List(AOESW).flatMap { subsystem ⇒
+        List(AOESW).flatMap { subsystem =>
           val subsystemName = subsystem.entryName
 
           (1 to 1).map {
-            n ⇒
+            n =>
               JvmSetting(
                 subsystemName,
                 List(
@@ -310,13 +310,13 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
                   PubSetting(Prefix(s"$subsystemName-$n"), noOfPubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
                 ),
                 subsystem match {
-                  case AOESW ⇒
+                  case AOESW =>
                     List(
                       SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 10, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
                       SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128),
                       SubSetting(Prefix(s"$aoesw-pattern-$n"), noOfSubs = 1, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
                     )
-                  case _ ⇒ Nil
+                  case _ => Nil
                 }
               )
           }

@@ -206,7 +206,7 @@ trait EventSubscriber {
    * @param callback  a function to execute on each received event
    * @return an [[csw.event.api.scaladsl.EventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
-  def pSubscribeCallback(subsystem: Subsystem, pattern: String, callback: Event ⇒ Unit): EventSubscription
+  def pSubscribeCallback(subsystem: Subsystem, pattern: String, callback: Event => Unit): EventSubscription
 
   /**
    * Get latest events for multiple Event Keys. The latest events available for the given Event Keys will be received first.

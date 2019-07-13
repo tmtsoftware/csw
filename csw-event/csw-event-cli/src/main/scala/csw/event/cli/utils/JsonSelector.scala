@@ -9,8 +9,8 @@ case class JsonSelector(paths: List[List[String]]) {
     def paramSet: Seq[ParamJson] = json("paramSet").as[Seq[JsObject]].map(x => ParamJson(x, parents))
 
     def select: ParamSetJson = paths match {
-      case Nil ⇒ this
-      case _ ⇒
+      case Nil => this
+      case _ =>
         val selectedSet = paramSet.filter(_.matchesPartialPath).map(_.select)
         copy(json ++ Json.obj("paramSet" -> selectedSet.map(_.json)))
     }

@@ -12,7 +12,7 @@ import csw.params.core.models.{ObsId, Prefix}
 import csw.params.events.SystemEvent
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
-import scala.collection.JavaConverters.collectionAsScalaIterableConverter
+import scala.jdk.CollectionConverters._
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 

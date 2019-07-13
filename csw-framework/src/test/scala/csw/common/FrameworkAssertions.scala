@@ -105,14 +105,14 @@ object FrameworkAssertions extends Matchers with Eventually {
 
   private def findLogMessage(logBuffer: mutable.Buffer[JsObject], message: String): Option[JsObject] =
     logBuffer.find(_.value.exists {
-      case (_, JsString(`message`)) ⇒ true
-      case (_, _)                   ⇒ false
+      case (_, JsString(`message`)) => true
+      case (_, _)                   => false
     })
 
   private def findLogMessageSubString(logBuffer: mutable.Buffer[JsObject], message: String): Option[JsObject] =
     logBuffer.find(_.value.exists {
-      case (_, JsString(actualMessage)) if actualMessage.startsWith(message) ⇒ true
-      case (_, _)                                                            ⇒ false
+      case (_, JsString(actualMessage)) if actualMessage.startsWith(message) => true
+      case (_, _)                                                            => false
     })
 
   private def sanitizeClassName(className: String): String =

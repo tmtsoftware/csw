@@ -10,77 +10,77 @@ class ArgsParser(name: String) {
     private def optionalAlarmKey = List(subsystem, component, alarmName)
 
     cmd("init")
-      .action((_, args) ⇒ args.copy(cmd = "init"))
+      .action((_, args) => args.copy(cmd = "init"))
       .text("initialize the alarm store")
       .children(filePath, localConfig, reset)
 
     cmd("severity")
-      .action((_, args) ⇒ args.copy(cmd = "severity"))
+      .action((_, args) => args.copy(cmd = "severity"))
       .children(
         cmd("get")
-          .action((_, args) ⇒ args.copy(subCmd = "get"))
+          .action((_, args) => args.copy(subCmd = "get"))
           .children(optionalAlarmKey: _*)
           .text("get severity of a subsystem/component/alarm"),
         cmd("set")
-          .action((_, args) ⇒ args.copy(subCmd = "set"))
+          .action((_, args) => args.copy(subCmd = "set"))
           .children(requiredAlarmKey :+ severity :+ refresh: _*)
           .text("set severity of an alarm"),
         cmd("subscribe")
-          .action((_, args) ⇒ args.copy(subCmd = "subscribe"))
+          .action((_, args) => args.copy(subCmd = "subscribe"))
           .children(optionalAlarmKey: _*)
           .text("subscribe to severity of a subsystem/component/alarm")
       )
 
     cmd("health")
-      .action((_, args) ⇒ args.copy(cmd = "health"))
+      .action((_, args) => args.copy(cmd = "health"))
       .children(
         cmd("get")
-          .action((_, args) ⇒ args.copy(subCmd = "get"))
+          .action((_, args) => args.copy(subCmd = "get"))
           .children(optionalAlarmKey: _*)
           .text("get health of a subsystem/component/alarm"),
         cmd("subscribe")
-          .action((_, args) ⇒ args.copy(subCmd = "subscribe"))
+          .action((_, args) => args.copy(subCmd = "subscribe"))
           .children(optionalAlarmKey: _*)
           .text("subscribe to health of a subsystem/component/alarm")
       )
 
     cmd("acknowledge")
-      .action((_, args) ⇒ args.copy(cmd = "acknowledge"))
+      .action((_, args) => args.copy(cmd = "acknowledge"))
       .text("acknowledge an alarm")
       .children(requiredAlarmKey: _*)
 
     cmd("unacknowledge")
-      .action((_, args) ⇒ args.copy(cmd = "unacknowledge"))
+      .action((_, args) => args.copy(cmd = "unacknowledge"))
       .text("unacknowledge an alarm")
       .children(requiredAlarmKey: _*)
 
     cmd("activate")
-      .action((_, args) ⇒ args.copy(cmd = "activate"))
+      .action((_, args) => args.copy(cmd = "activate"))
       .text("activate an alarm")
       .children(requiredAlarmKey: _*)
 
     cmd("deactivate")
-      .action((_, args) ⇒ args.copy(cmd = "deactivate"))
+      .action((_, args) => args.copy(cmd = "deactivate"))
       .text("deactivate an alarm")
       .children(requiredAlarmKey: _*)
 
     cmd("shelve")
-      .action((_, args) ⇒ args.copy(cmd = "shelve"))
+      .action((_, args) => args.copy(cmd = "shelve"))
       .text("shelve an alarm")
       .children(requiredAlarmKey: _*)
 
     cmd("unshelve")
-      .action((_, args) ⇒ args.copy(cmd = "unshelve"))
+      .action((_, args) => args.copy(cmd = "unshelve"))
       .text("unshelve an alarm")
       .children(requiredAlarmKey: _*)
 
     cmd("reset")
-      .action((_, args) ⇒ args.copy(cmd = "reset"))
+      .action((_, args) => args.copy(cmd = "reset"))
       .text("reset latched severity of an alarm")
       .children(requiredAlarmKey: _*)
 
     cmd("list")
-      .action((_, args) ⇒ args.copy(cmd = "list"))
+      .action((_, args) => args.copy(cmd = "list"))
       .text("list alarms")
       .children(optionalAlarmKey :+ metadata :+ status: _*)
 
@@ -118,9 +118,9 @@ class ArgsParser(name: String) {
     }
 
     private def validateKey(c: Options) = (c.maybeSubsystem, c.maybeComponent, c.maybeAlarmName) match {
-      case (None, None, Some(_)) | (Some(_), None, Some(_)) ⇒ failure("Please specify subsystem and component of the alarm.")
-      case (None, Some(_), _)                               ⇒ failure("Please specify subsystem of the component.")
-      case _                                                ⇒ success
+      case (None, None, Some(_)) | (Some(_), None, Some(_)) => failure("Please specify subsystem and component of the alarm.")
+      case (None, Some(_), _)                               => failure("Please specify subsystem of the component.")
+      case _                                                => success
     }
   }
 

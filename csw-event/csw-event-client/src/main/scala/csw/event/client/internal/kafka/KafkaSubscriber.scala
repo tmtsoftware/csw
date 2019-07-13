@@ -14,7 +14,7 @@ import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.common.TopicPartition
 
 import scala.async.Async.{async, await}
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
@@ -39,14 +39,14 @@ private[event] class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[S
     val offsetsF = getLatestOffsets(eventKeys)
 
     // Subscribe to the 0th offset if nothing has been published yet or `current offset - 1` to receive the last published event
-    val updatedOffsetsF = offsetsF.map(_.mapValues(x ⇒ if (x == 0) 0L else x - 1))
+    val updatedOffsetsF = offsetsF.map(_.view.mapValues(x => if (x == 0) 0L else x - 1).toMap)
 
     val manualSubscription = updatedOffsetsF.map(offsets => Subscriptions.assignmentWithOffset(offsets))
     val eventStream        = getEventStream(manualSubscription)
 
     val invalidEvents = offsetsF.map { partitionToOffset =>
       val events = partitionToOffset.collect {
-        case (topicPartition, offset) if offset == 0 ⇒ Event.invalidEvent(EventKey(topicPartition.topic()))
+        case (topicPartition, offset) if offset == 0 => Event.invalidEvent(EventKey(topicPartition.topic()))
       }
       Source(events)
     }
@@ -108,7 +108,7 @@ private[event] class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[S
       .mapMaterializedValue(control => eventSubscription(control, Future.successful(Done)))
   }
 
-  override def pSubscribeCallback(subsystem: Subsystem, pattern: String, callback: Event ⇒ Unit): EventSubscription =
+  override def pSubscribeCallback(subsystem: Subsystem, pattern: String, callback: Event => Unit): EventSubscription =
     eventSubscriberUtil.pSubscribe(pSubscribe(subsystem, pattern), callback)
 
   override def get(eventKeys: Set[EventKey]): Future[Set[Event]] = {
@@ -132,9 +132,11 @@ private[event] class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[S
   //Get the last offset for the given partitions. The last offset of a partition is the offset of the upcoming
   // message, i.e. the offset of the last available message + 1.
   private def getLatestOffsets(eventKeys: Set[EventKey]): Future[Map[TopicPartition, Long]] = {
-    val topicPartitions = eventKeys.map(e ⇒ new TopicPartition(e.key, 0)).toList
+    val topicPartitions = eventKeys.map(e => new TopicPartition(e.key, 0)).toList
     // any interaction with kafka consumer needs special care to handle multi-threaded access
-    consumer.map(consumer ⇒ this.synchronized(consumer.endOffsets(topicPartitions.asJava)).asScala.toMap.mapValues(_.toLong))
+    consumer.map(
+      consumer => this.synchronized(consumer.endOffsets(topicPartitions.asJava)).asScala.view.mapValues(_.toLong).toMap
+    )
   }
 
   private def eventSubscription(controlF: Future[scaladsl.Consumer.Control], completionF: Future[Done]): EventSubscription = {

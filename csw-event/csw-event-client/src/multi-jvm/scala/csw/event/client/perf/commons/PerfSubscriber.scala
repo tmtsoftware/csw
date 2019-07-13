@@ -78,18 +78,18 @@ class PerfSubscriber(
     subscription
       .prefixAndTail(eventKeys.size)
       .flatMapConcat {
-        case (events, remainingSource) ⇒
+        case (events, remainingSource) =>
           events.foreach {
-            case SystemEvent(_, _, `testEventName`, _, _) ⇒
+            case SystemEvent(_, _, `testEventName`, _, _) =>
               initialLatency = getNanos(Instant.now()).toLong - timeBeforeSubscribe
-            case _ ⇒ // Do nothing
+            case _ => // Do nothing
           }
           remainingSource
       }
       .drop(warmup)
       .takeWhile {
-        case SystemEvent(_, _, `endEventName`, _, _) ⇒ false
-        case e @ _ ⇒
+        case SystemEvent(_, _, `endEventName`, _, _) => false
+        case e @ _ =>
           if (isPatternSubscriber & e.eventKey.key.contains(endEventS)) false else true
       }
       .watchTermination()(Keep.right)
@@ -111,7 +111,7 @@ class PerfSubscriber(
     try {
       histogram.recordValue(latency)
     } catch {
-      case _: ArrayIndexOutOfBoundsException ⇒
+      case _: ArrayIndexOutOfBoundsException =>
     }
 
     val currentId = event.eventId.id.toInt

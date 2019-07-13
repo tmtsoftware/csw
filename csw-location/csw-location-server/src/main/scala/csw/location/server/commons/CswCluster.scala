@@ -142,7 +142,7 @@ object CswCluster {
       cswCluster.joinCluster()
       cswCluster
     } catch {
-      case NonFatal(ex) ⇒
+      case NonFatal(ex) =>
         Await.result(cswCluster.shutdown(FailureReason(ex)), 10.seconds)
         log.error(ex.getMessage, ex = ex)
         throw ex

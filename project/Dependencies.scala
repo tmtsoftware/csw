@@ -279,7 +279,7 @@ object Dependencies {
       Libs.`junit`                    % Test,
       Libs.`mockito-scala`            % Test,
       Libs.`embedded-redis`           % Test,
-      Libs.`embedded-kafka`           % Test,
+//      Libs.`embedded-kafka`           % Test,
       Akka.`akka-multi-node-testkit`  % Test,
       Libs.HdrHistogram               % Test,
       Libs.testng                     % Test

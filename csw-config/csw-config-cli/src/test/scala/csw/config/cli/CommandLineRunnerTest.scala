@@ -78,7 +78,7 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
 
     commandLineRunner.create(argsParser.parse(createMinimalArgs).get)
 
-    val getByDateArgs = Array("get", relativeRepoPath, "-o", outputFilePath, "--date", Instant.now.toString)
+    val getByDateArgs = List("get", relativeRepoPath, "-o", outputFilePath, "--date", Instant.now.toString)
 
     val updateConfigId = commandLineRunner.update(argsParser.parse(updateAllArgs).get)
 
@@ -119,35 +119,35 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
 
     //  create 4 normal files
     val normalFiles = for {
-      i ← 1 to 4
+      i <- 1 to 4
     } yield relativeRepoPath(normalFileName, i.toString)
-    normalFiles.map { fileName ⇒
-      commandLineRunner.create(argsParser.parse(Array("create", fileName, "-i", inputFilePath, "-c", comment)).get)
+    normalFiles.map { fileName =>
+      commandLineRunner.create(argsParser.parse(List("create", fileName, "-i", inputFilePath, "-c", comment)).get)
     }
 
     //  create 3 annex files
     val annexFiles = for {
-      i ← 1 to 3
+      i <- 1 to 3
     } yield relativeRepoPath(annexFileName, i.toString)
-    annexFiles.map { fileName ⇒
+    annexFiles.map { fileName =>
       commandLineRunner
-        .create(argsParser.parse(Array("create", fileName, "-i", inputFilePath, "--annex", "-c", comment)).get)
+        .create(argsParser.parse(List("create", fileName, "-i", inputFilePath, "--annex", "-c", comment)).get)
     }
 
-    commandLineRunner.list(argsParser.parse(Array("list", "--annex", "--normal")).get) shouldBe empty
+    commandLineRunner.list(argsParser.parse(List("list", "--annex", "--normal")).get) shouldBe empty
 
     commandLineRunner
-      .list(argsParser.parse(Array("list", "--normal")).get)
-      .map(x ⇒ (x.path.toString, x.author))
-      .toSet shouldBe normalFiles.map(x ⇒ (x, preferredUserName)).toSet
+      .list(argsParser.parse(List("list", "--normal")).get)
+      .map(x => (x.path.toString, x.author))
+      .toSet shouldBe normalFiles.map(x => (x, preferredUserName)).toSet
 
     commandLineRunner
-      .list(argsParser.parse(Array("list", "--annex")).get)
+      .list(argsParser.parse(List("list", "--annex")).get)
       .map(_.path.toString)
       .toSet shouldBe annexFiles.toSet
 
     commandLineRunner
-      .list(argsParser.parse(Array("list", "--pattern", "/path/hcd/*.*")).get)
+      .list(argsParser.parse(List("list", "--pattern", "/path/hcd/*.*")).get)
       .map(_.path.toString)
       .toSet shouldBe (annexFiles ++ normalFiles).toSet
   }
@@ -163,7 +163,7 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
     commandLineRunner.setActiveVersion(parsedSetActiveArgs.get)
 
     val getByDateArgs =
-      Array("getActiveByTime", relativeRepoPath, "-o", outputFilePath, "--date", Instant.now.toString)
+      List("getActiveByTime", relativeRepoPath, "-o", outputFilePath, "--date", Instant.now.toString)
 
     //  get active version of file and store it at location: /tmp/output.txt
     val parsedGetActiveArgs: Option[Options] = argsParser.parse(getMinimalArgs)
@@ -214,7 +214,7 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
     val update2ConfigId                    = commandLineRunner.update(parsedUpdate2Args.get)
     val updateTS                           = Instant.now
 
-    commandLineRunner.history(argsParser.parse(historyArgs).get).map(h ⇒ (h.id, h.author, h.comment)).toSet shouldBe
+    commandLineRunner.history(argsParser.parse(historyArgs).get).map(h => (h.id, h.author, h.comment)).toSet shouldBe
     Set((createConfigId, user1, comment), (updateConfigId, user2, comment), (update2ConfigId, user3, comment))
 
     commandLineRunner
@@ -246,10 +246,10 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
     val parsedUpdate2Args: Option[Options] = argsParser.parse(updateAllArgs)
     val update2ConfigId                    = commandLineRunner.update(parsedUpdate2Args.get) //user3
 
-    val setActiveArgs = Array("setActiveVersion", relativeRepoPath, "--id", updateConfigId.id, "-c", comment)
+    val setActiveArgs = List("setActiveVersion", relativeRepoPath, "--id", updateConfigId.id, "-c", comment)
     commandLineRunner.setActiveVersion(argsParser.parse(setActiveArgs).get) //user4
 
-    commandLineRunner.historyActive(argsParser.parse(historyActiveArgs).get).map(h ⇒ (h.id, h.author, h.comment)).toSet shouldBe
+    commandLineRunner.historyActive(argsParser.parse(historyActiveArgs).get).map(h => (h.id, h.author, h.comment)).toSet shouldBe
     Set((createConfigId, user1, "initializing active file with the first version"), (updateConfigId, user4, comment))
 
     commandLineRunner.resetActiveVersion(argsParser.parse(resetActiveAllArgs).get) //user5
@@ -271,7 +271,7 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
   // DEOPSCSW-69: Use authorization token to get identity of user creating/updating a configuration file
   // DEOPSCSW-65: Support name or role of configuration file creator/updater
   test("login") {
-    val loginParams = argsParser.parse(Array("login"))
+    val loginParams = argsParser.parse(List("login"))
     commandLineRunner.login(loginParams.get)
     verify(nativeAuthAdapter).login()
   }

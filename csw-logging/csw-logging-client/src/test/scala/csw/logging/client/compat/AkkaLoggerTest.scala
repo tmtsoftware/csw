@@ -12,10 +12,10 @@ class MyActor extends Actor with ActorLogging {
   val exception = new RuntimeException("Exception occurred")
 
   def receive = {
-    case "info"  ⇒ log.info("info")
-    case "debug" ⇒ log.debug("debug")
-    case "warn"  ⇒ log.warning("warn")
-    case "error" ⇒ log.error(exception, "error")
+    case "info"  => log.info("info")
+    case "debug" => log.debug("debug")
+    case "warn"  => log.warning("warn")
+    case "error" => log.error(exception, "error")
   }
 }
 
@@ -32,7 +32,7 @@ class AkkaLoggerTest extends LoggingTestSuite with FunSuiteLike with Matchers {
 
     Thread.sleep(300)
 
-    logBuffer.foreach { log ⇒
+    logBuffer.foreach { log =>
       log.contains(LoggingKeys.COMPONENT_NAME) shouldBe false
 
       log.contains(LoggingKeys.SEVERITY) shouldBe true

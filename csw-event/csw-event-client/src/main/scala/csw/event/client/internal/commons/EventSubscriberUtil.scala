@@ -32,8 +32,8 @@ class EventSubscriberUtil(implicit mat: Materializer) {
   def subscribeCallback(eventSource: Source[Event, EventSubscription], callback: Event => Unit): EventSubscription =
     eventSource.to(Sink.foreach(callback)).run()
 
-  def actorCallback(actorRef: ActorRef[Event]): Event ⇒ Unit = event ⇒ actorRef ! event
+  def actorCallback(actorRef: ActorRef[Event]): Event => Unit = event => actorRef ! event
 
-  def pSubscribe(stream: Source[Event, EventSubscription], callback: Event ⇒ Unit): EventSubscription =
+  def pSubscribe(stream: Source[Event, EventSubscription], callback: Event => Unit): EventSubscription =
     stream.toMat(Sink.foreach(callback))(Keep.left).run()
 }

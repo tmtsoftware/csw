@@ -5,7 +5,7 @@ import java.util
 import com.github.ghik.silencer.silent
 import play.api.libs.json.{Format, Json}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.mutable
 import scala.language.implicitConversions
 import scala.reflect.ClassTag
@@ -15,7 +15,7 @@ import scala.reflect.ClassTag
  *
  * @param data input array of array
  */
-case class MatrixData[T: ClassTag](data: mutable.WrappedArray[mutable.WrappedArray[T]]) {
+case class MatrixData[T: ClassTag](data: mutable.ArraySeq[mutable.ArraySeq[T]]) {
 
   /**
    * Returns a value stored at position represented by [row][col]
@@ -27,7 +27,9 @@ case class MatrixData[T: ClassTag](data: mutable.WrappedArray[mutable.WrappedArr
   /**
    * An Array of values this parameter holds
    */
-  def values: Array[Array[T]] = data.array.map(_.array)
+  def values: Array[Array[T]] = {
+    data.array.asInstanceOf[Array[mutable.ArraySeq[T]]].map(_.array.asInstanceOf[Array[T]])
+  }
 
   /**
    * A Java helper that returns an Array of values this parameter holds
@@ -53,7 +55,7 @@ object MatrixData {
    * @return an instance of MatrixData
    */
   implicit def fromArrays[T: ClassTag](values: Array[Array[T]]): MatrixData[T] =
-    new MatrixData[T](values.map(x ⇒ x: mutable.WrappedArray[T]))
+    new MatrixData[T](values.map(x => x: mutable.ArraySeq[T]))
 
   /**
    * Create a MatrixData from Array[T]
@@ -63,7 +65,7 @@ object MatrixData {
    * @return an instance of MatrixData
    */
   def fromArrays[T: ClassTag](values: Array[T]*): MatrixData[T] =
-    new MatrixData[T](values.toArray.map(x ⇒ x: mutable.WrappedArray[T]))
+    new MatrixData[T](values.toArray.map(x => x: mutable.ArraySeq[T]))
 
   /**
    * A Java helper to create an MatrixData from one or more arrays
@@ -73,7 +75,7 @@ object MatrixData {
    * @return an instance of MatrixData
    */
   def fromJavaArrays[T](klass: Class[T], values: Array[Array[T]]): MatrixData[T] =
-    new MatrixData[T](values.map(x ⇒ x: mutable.WrappedArray[T]))(ClassTag(klass))
+    new MatrixData[T](values.map(x => x: mutable.ArraySeq[T]))(ClassTag(klass))
 
   /**
    * Convert a Matrix of data from one type to other
@@ -81,8 +83,8 @@ object MatrixData {
    * @param conversion a function of type A => B
    * @tparam A the source type of data
    * @tparam B the destination type of data
-   * @return a function of type MatrixData[A] ⇒ MatrixData[B]
+   * @return a function of type MatrixData[A] => MatrixData[B]
    */
-  implicit def conversion[A, B](implicit @silent conversion: A ⇒ B): MatrixData[A] ⇒ MatrixData[B] =
+  implicit def conversion[A, B](implicit @silent conversion: A => B): MatrixData[A] => MatrixData[B] =
     _.asInstanceOf[MatrixData[B]]
 }

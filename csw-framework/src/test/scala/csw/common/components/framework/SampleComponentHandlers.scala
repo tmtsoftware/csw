@@ -65,18 +65,18 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   private def processCommand(controlCommand: ControlCommand): Unit = {
 
     lazy val event = SystemEvent(Prefix("test"), EventName("system"))
-    def processEvent(prefix: Prefix): Event ⇒ Unit =
-      _ ⇒
+    def processEvent(prefix: Prefix): Event => Unit =
+      _ =>
         currentStatePublisher.publish(
           CurrentState(prefix, StateName("testStateName"), controlCommand.paramSet + choiceKey.set(eventReceivedChoice))
         )
 
     controlCommand match {
-      case Setup(_, _, `setSeverityCommand`, _, _) ⇒ alarmService.setSeverity(testAlarmKey, testSeverity)
+      case Setup(_, _, `setSeverityCommand`, _, _) => alarmService.setSeverity(testAlarmKey, testSeverity)
 
-      case Setup(_, _, CommandName("publish.event.success"), _, _) ⇒ eventService.defaultPublisher.publish(event)
+      case Setup(_, _, CommandName("publish.event.success"), _, _) => eventService.defaultPublisher.publish(event)
 
-      case Setup(_, somePrefix, CommandName("subscribe.event.success"), _, _) ⇒
+      case Setup(_, somePrefix, CommandName("subscribe.event.success"), _, _) =>
         eventService.defaultSubscriber.subscribeCallback(Set(event.eventKey), processEvent(somePrefix))
 
       case Setup(_, _, CommandName("time.service.scheduler.success"), _, _) =>
@@ -84,16 +84,16 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
           currentStatePublisher.publish(CurrentState(prefix, timeServiceSchedulerState))
         }
 
-      case Setup(_, somePrefix, _, _, _) ⇒
+      case Setup(_, somePrefix, _, _, _) =>
         currentStatePublisher.publish(
           CurrentState(somePrefix, StateName("testStateName"), controlCommand.paramSet + choiceKey.set(setupConfigChoice))
         )
 
-      case Observe(_, somePrefix, _, _, _) ⇒
+      case Observe(_, somePrefix, _, _, _) =>
         currentStatePublisher.publish(
           CurrentState(somePrefix, StateName("testStateName"), controlCommand.paramSet + choiceKey.set(observeConfigChoice))
         )
-      case _ ⇒
+      case _ =>
     }
   }
 
@@ -109,7 +109,7 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   }
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = trackingEvent match {
-    case LocationUpdated(location) ⇒
+    case LocationUpdated(location) =>
       location.connection match {
         case _: AkkaConnection =>
           Future {
@@ -127,7 +127,7 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
             CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(tcpLocationUpdatedChoice)))
           )
       }
-    case LocationRemoved(connection) ⇒
+    case LocationRemoved(connection) =>
       connection match {
         case _: AkkaConnection =>
           currentStatePublisher.publish(

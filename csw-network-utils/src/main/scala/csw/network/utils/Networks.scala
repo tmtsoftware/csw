@@ -41,8 +41,8 @@ case class Networks(private val interfaceName: String, networkProvider: NetworkI
   //Get a flattened seq of Index -> InetAddresses pairs
   private def mappings: Seq[(Int, InetAddress)] =
     for {
-      (index, inetAddresses) ← interfaces
-      inetAddress            ← inetAddresses
+      (index, inetAddresses) <- interfaces
+      inetAddress            <- inetAddresses
     } yield (index, inetAddress)
 
   private def interfaces: Seq[(Int, List[InetAddress])] =
@@ -78,8 +78,8 @@ object Networks {
    */
   def apply(interfaceName: Option[String]): Networks = {
     val ifaceName = interfaceName match {
-      case Some(interface) ⇒ interface
-      case None            ⇒ (sys.env ++ sys.props).getOrElse("INTERFACE_NAME", fallbackInterfaceName)
+      case Some(interface) => interface
+      case None            => (sys.env ++ sys.props).getOrElse("INTERFACE_NAME", fallbackInterfaceName)
     }
     new Networks(ifaceName, new NetworkInterfaceProvider)
   }

@@ -173,14 +173,17 @@ class JsonContractTest extends FunSpec with Matchers {
   // DEOPSCSW-661: Create UTCTimeKey and TAITimeKey replacing TimestampKey in Protobuf parameters
   describe("Exercise all types of keys") {
     it("should able to serialize and deserialize Setup command with all keys to and from json") {
-      val setup       = Setup(prefix, CommandName("move"), Some(obsId), ParamSetData.paramSet)
-      val setupToJson = JsonSupport.writeSequenceCommand(setup)
+      val setup         = Setup(prefix, CommandName("move"), Some(obsId), ParamSetData.paramSet)
+      val setupToJson   = JsonSupport.writeSequenceCommand(setup)
+      val originalSetup = JsonSupport.readSequenceCommand[Setup](setupToJson)
 
       val expectedSetupJson = Source
         .fromResource("json/setup_with_all_keys.json")
         .mkString
         .replace("test-runId", setup.runId.id)
-      setupToJson shouldBe Json.parse(expectedSetupJson)
+
+      val expectedSetup = JsonSupport.readSequenceCommand[Setup](Json.parse(expectedSetupJson))
+      originalSetup shouldBe expectedSetup
     }
   }
 }

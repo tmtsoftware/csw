@@ -25,7 +25,7 @@ class IRIS(logger: LoggerFactory) {
         case LogWarn            => log.warn(irisLogs("warn"))
         case LogError           => log.error(irisLogs("error"))
         case LogFatal           => log.fatal(irisLogs("fatal"))
-        case LogErrorWithMap(x) => log.error("Logging error with map", Map("reason" -> x, "actorRef" → ctx.self.toString))
+        case LogErrorWithMap(x) => log.error("Logging error with map", Map("reason" -> x, "actorRef" -> ctx.self.toString))
       }
       Behaviors.same
     }
@@ -60,12 +60,12 @@ object IRIS {
   def behavior(componentName: String): Behavior[IRISLogMessages] = new IRIS(new LoggerFactory(componentName)).behavior
 
   val irisLogs = Map(
-    "trace" → "iris: trace",
-    "debug" → "iris: debug",
-    "info"  → "iris: info",
-    "warn"  → "iris: warn",
-    "error" → "iris: error",
-    "fatal" → "iris: fatal"
+    "trace" -> "iris: trace",
+    "debug" -> "iris: debug",
+    "info"  -> "iris: info",
+    "warn"  -> "iris: warn",
+    "error" -> "iris: error",
+    "fatal" -> "iris: fatal"
   )
 }
 
@@ -114,7 +114,7 @@ object IrisActorUtil {
         case LogWarn            => log.warn(irisLogs("warn"))
         case LogError           => log.error(irisLogs("error"))
         case LogFatal           => log.fatal(irisLogs("fatal"))
-        case LogErrorWithMap(x) => log.error("Logging error with map", Map("reason" -> x, "actorRef" → ctx.self.toString))
+        case LogErrorWithMap(x) => log.error("Logging error with map", Map("reason" -> x, "actorRef" -> ctx.self.toString))
       }
       Behaviors.same
     }

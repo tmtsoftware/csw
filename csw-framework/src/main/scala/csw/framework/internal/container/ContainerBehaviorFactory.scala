@@ -25,7 +25,7 @@ private[framework] object ContainerBehaviorFactory {
     val supervisorFactory = new SupervisorInfoFactory(containerInfo.name)
     val loggerFactory     = new LoggerFactory(containerInfo.name)
     Behaviors.setup(
-      ctx ⇒
+      ctx =>
         new ContainerBehavior(
           ctx,
           containerInfo,

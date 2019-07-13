@@ -40,7 +40,7 @@ class SeverityServiceModuleTest
   // DEOPSCSW-461: Log entry for severity update by component
   test("setCurrentSeverity should log a message") {
     val logBuffer    = mutable.Buffer.empty[JsObject]
-    val testAppender = new TestAppender(x ⇒ logBuffer += Json.parse(x.toString).as[JsObject])
+    val testAppender = new TestAppender(x => logBuffer += Json.parse(x.toString).as[JsObject])
     val hostName     = InetAddress.getLocalHost.getHostName
 
     val expectedMessage1 =
@@ -482,7 +482,7 @@ class SeverityServiceModuleTest
 
   // DEOPSCSW-444: Set severity api for component
   // DEOPSCSW-494: Incorporate changes in set severity, reset, acknowledgement and latch status
-  SeverityTestCases.foreach { testCase ⇒
+  SeverityTestCases.foreach { testCase =>
     test(testCase.name) {
       feedTestData(testCase)
       import testCase._
@@ -500,7 +500,7 @@ class SeverityServiceModuleTest
   // DEOPSCSW-444: Set severity api for component
   // DEOPSCSW-496: Set Ack status on setSeverity
   // DEOPSCSW-494: Incorporate changes in set severity, reset, acknowledgement and latch status
-  AckStatusTestCases.foreach { testCase ⇒
+  AckStatusTestCases.foreach { testCase =>
     test(testCase.name()) {
       feedTestData(testCase)
       import testCase._
@@ -516,7 +516,7 @@ class SeverityServiceModuleTest
   }
 
   // DEOPSCSW-496 : Set Ack status on setSeverity
-  AckStatusTestCasesForDisconnected.foreach { testCase ⇒
+  AckStatusTestCasesForDisconnected.foreach { testCase =>
     test(testCase.name(Disconnected)) {
       feedTestData(testCase)
       import testCase._

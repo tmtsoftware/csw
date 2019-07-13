@@ -29,7 +29,7 @@ class CommandResponseManagerActorTest extends FunSuite with Matchers with Mockit
   private[csw] def createBehaviorTestKit(
       props: CRMCacheProperties = CRMCacheProperties()
   ): BehaviorTestKit[CommandResponseManagerMessage] = BehaviorTestKit(
-    Behaviors.setup[CommandResponseManagerMessage](_ ⇒ CommandResponseManagerActor.behavior(props, getMockedLogger))
+    Behaviors.setup[CommandResponseManagerMessage](_ => CommandResponseManagerActor.behavior(props, getMockedLogger))
   )
 
   test("should be able to add command entry in Command Response Manager") {
@@ -56,7 +56,7 @@ class CommandResponseManagerActorTest extends FunSuite with Matchers with Mockit
     behaviorTestKit.run(AddSubCommand(parentId, childId))
 
     behaviorTestKit.run(GetCommandCorrelation(commandCorrelationProbe.ref))
-    commandCorrelationProbe.expectMessage(CommandCorrelation(Map(parentId → Set(childId)), Map(childId → parentId)))
+    commandCorrelationProbe.expectMessage(CommandCorrelation(Map(parentId -> Set(childId)), Map(childId -> parentId)))
   }
 
   test("should be able to add subscriber and publish current state to newly added subscriber") {

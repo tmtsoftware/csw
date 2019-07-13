@@ -72,7 +72,7 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
       CommandNotAvailable(Id())
     )
 
-    forAll(testData) { commandResponse ⇒
+    forAll(testData) { commandResponse =>
       val serializer = serialization.findSerializerFor(commandResponse)
       serializer.getClass shouldBe classOf[CommandAkkaSerializer]
 
@@ -88,7 +88,7 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
       DemandState(prefix, StateName("filterwheel"))
     )
 
-    forAll(testData) { stateVariable ⇒
+    forAll(testData) { stateVariable =>
       val serializer = serialization.findSerializerFor(stateVariable)
       serializer.getClass shouldBe classOf[CommandAkkaSerializer]
 
@@ -152,7 +152,7 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
       SetComponentLogLevel("component-name", Level.WARN)
     )
 
-    forAll(testData) { command ⇒
+    forAll(testData) { command =>
       val serializer = serialization.findSerializerFor(command)
       serializer.getClass shouldBe classOf[CommandAkkaSerializer]
 
@@ -173,7 +173,7 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
       LockExpiringShortly
     )
 
-    forAll(testData) { lockingResponse ⇒
+    forAll(testData) { lockingResponse =>
       val serializer = serialization.findSerializerFor(lockingResponse)
       serializer.getClass shouldBe classOf[CommandAkkaSerializer]
 
@@ -205,7 +205,7 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
       SupervisorLifecycleState.Lock
     )
 
-    forAll(testData) { supervisorLifecycleState ⇒
+    forAll(testData) { supervisorLifecycleState =>
       val serializer = serialization.findSerializerFor(supervisorLifecycleState)
       serializer.getClass shouldBe classOf[CommandAkkaSerializer]
 
@@ -222,7 +222,7 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
       ContainerLifecycleState.Running
     )
 
-    forAll(testData) { containerLifecycleState ⇒
+    forAll(testData) { containerLifecycleState =>
       val serializer = serialization.findSerializerFor(containerLifecycleState)
       serializer.getClass shouldBe classOf[CommandAkkaSerializer]
 

@@ -50,7 +50,7 @@ class GatewayClient(serverIp: String, port: Int)(implicit val actorSystem: typed
     }
 
     val sseStream = Source.fromFuture(sseStreamFuture).flatMapConcat(identity)
-    sseStream.map(x ⇒ Json.parse(x.data).as[Event]).viaMat(KillSwitches.single)(Keep.right)
+    sseStream.map(x => Json.parse(x.data).as[Event]).viaMat(KillSwitches.single)(Keep.right)
   }
 
 }
@@ -65,7 +65,7 @@ object Main extends App {
   private val eventName = EventName("gateway")
   private val prefix    = Prefix("tcs.test")
 
-  (1 to 50).map { _ ⇒
+  (1 to 50).map { _ =>
     client
       .subscribe(EventKey(prefix, eventName))
       .runForeach(println)

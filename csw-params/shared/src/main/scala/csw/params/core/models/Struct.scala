@@ -5,7 +5,7 @@ import csw.params.core.generics.{Parameter, ParameterSetType}
 import play.api.libs.json.{Json, OFormat}
 
 import scala.annotation.varargs
-import scala.collection.JavaConverters.iterableAsScalaIterableConverter
+import scala.jdk.CollectionConverters._
 
 /**
  * A configuration for setting telescope and instrument parameters

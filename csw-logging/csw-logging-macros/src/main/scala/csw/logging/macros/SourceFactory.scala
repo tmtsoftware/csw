@@ -10,9 +10,9 @@ trait SourceFactory {
 object SourceFactory {
   implicit def factory: SourceFactory = macro sourceLocationMacro
 
-  def from(f: () ⇒ SourceLocation): SourceFactory = () => f()
+  def from(f: () => SourceLocation): SourceFactory = () => f()
 
-  def from(cls: Class[_]): SourceFactory = from(() ⇒ SourceLocation("", "", cls.getName, -1))
+  def from(cls: Class[_]): SourceFactory = from(() => SourceLocation("", "", cls.getName, -1))
 
   def sourceLocationMacro(c: blackbox.Context): c.Expr[SourceFactory] = {
     import c.universe._

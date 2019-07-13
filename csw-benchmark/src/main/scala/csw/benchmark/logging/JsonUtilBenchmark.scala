@@ -9,7 +9,7 @@ import csw.logging.client.internal.JsonExtensions.RichJsObject
 import org.openjdk.jmh.annotations._
 import play.api.libs.json.{JsObject, Json}
 
-import scala.collection.JavaConverters.asJavaIterableConverter
+import scala.jdk.CollectionConverters._
 
 /**
  * Tests Json utility performance.

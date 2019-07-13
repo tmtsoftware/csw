@@ -55,7 +55,7 @@ private[event] class RedisPublisher(redisURI: Future[RedisURI], redisClient: Red
       set(event, asyncApi) // set will run independent of publish
       Done
     } recover {
-      case NonFatal(ex) ⇒
+      case NonFatal(ex) =>
         val failure = PublishFailure(event, ex)
         eventPublisherUtil.logError(failure)
         throw failure
@@ -64,7 +64,7 @@ private[event] class RedisPublisher(redisURI: Future[RedisURI], redisClient: Red
   override def publish[Mat](source: Source[Event, Mat]): Mat =
     eventPublisherUtil.publishFromSource(source, parallelism, publishInternal, None)
 
-  override def publish[Mat](source: Source[Event, Mat], onError: PublishFailure ⇒ Unit): Mat =
+  override def publish[Mat](source: Source[Event, Mat], onError: PublishFailure => Unit): Mat =
     eventPublisherUtil.publishFromSource(source, parallelism, publishInternal, Some(onError))
 
   override def publish(eventGenerator: => Option[Event], every: FiniteDuration): Cancellable =
@@ -73,7 +73,7 @@ private[event] class RedisPublisher(redisURI: Future[RedisURI], redisClient: Red
   override def publish(eventGenerator: => Option[Event], startTime: TMTTime, every: FiniteDuration): Cancellable =
     publish(eventPublisherUtil.eventSource(Future.successful(eventGenerator), parallelism, startTime.durationFromNow, every))
 
-  override def publish(eventGenerator: ⇒ Option[Event], every: FiniteDuration, onError: PublishFailure ⇒ Unit): Cancellable =
+  override def publish(eventGenerator: => Option[Event], every: FiniteDuration, onError: PublishFailure => Unit): Cancellable =
     publish(eventPublisherUtil.eventSource(Future.successful(eventGenerator), parallelism, defaultInitialDelay, every), onError)
 
   override def publish(
@@ -87,16 +87,16 @@ private[event] class RedisPublisher(redisURI: Future[RedisURI], redisClient: Red
       onError
     )
 
-  override def publishAsync(eventGenerator: ⇒ Future[Option[Event]], every: FiniteDuration): Cancellable =
+  override def publishAsync(eventGenerator: => Future[Option[Event]], every: FiniteDuration): Cancellable =
     publish(eventPublisherUtil.eventSource(eventGenerator, parallelism, defaultInitialDelay, every))
 
   override def publishAsync(eventGenerator: => Future[Option[Event]], startTime: TMTTime, every: FiniteDuration): Cancellable =
     publish(eventPublisherUtil.eventSource(eventGenerator, parallelism, startTime.durationFromNow, every))
 
   override def publishAsync(
-      eventGenerator: ⇒ Future[Option[Event]],
+      eventGenerator: => Future[Option[Event]],
       every: FiniteDuration,
-      onError: PublishFailure ⇒ Unit
+      onError: PublishFailure => Unit
   ): Cancellable =
     publish(eventPublisherUtil.eventSource(eventGenerator, parallelism, defaultInitialDelay, every), onError)
 
@@ -110,11 +110,11 @@ private[event] class RedisPublisher(redisURI: Future[RedisURI], redisClient: Red
 
   override def shutdown(): Future[Done] = {
     eventPublisherUtil.shutdown()
-    asyncApi.quit().map(_ ⇒ Done)
+    asyncApi.quit().map(_ => Done)
   }
 
   private def set(event: Event, commands: RedisAsyncApi[String, Event]): Future[Done] =
-    commands.set(event.eventKey.key, event).recover { case NonFatal(_) ⇒ Done }
+    commands.set(event.eventKey.key, event).recover { case NonFatal(_) => Done }
 
   private def publishInitializationEvent() = Await.result(publish(InitializationEvent.value), 30.seconds)
 

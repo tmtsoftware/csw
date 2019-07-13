@@ -44,8 +44,8 @@ private[containercmd] class ContainerCmd(
   private lazy val wiring: FrameworkWiring = new FrameworkWiring
   import wiring.actorRuntime._
 
-  def start(args: Array[String]): ActorRef[_] = new ArgsParser(name).parse(args) match {
-    case None ⇒ throw UnableToParseOptions
+  def start(args: Array[String]): ActorRef[_] = new ArgsParser(name).parse(args.toList) match {
+    case None => throw UnableToParseOptions
     case Some(Options(standalone, isLocal, inputFilePath)) =>
       LocationServerStatus.requireUpLocally()
 
@@ -58,7 +58,7 @@ private[containercmd] class ContainerCmd(
         log.info(s"Component is successfully created with actor actorRef $actorRef")
         actorRef
       } catch {
-        case NonFatal(ex) ⇒
+        case NonFatal(ex) =>
           log.error(s"${ex.getMessage}", ex = ex)
           shutdown(FailureReason(ex))
           throw ex

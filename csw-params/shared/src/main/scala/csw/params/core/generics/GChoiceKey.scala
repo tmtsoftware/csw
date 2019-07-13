@@ -26,7 +26,7 @@ class GChoiceKey(name: String, keyType: KeyType[Choice], val choices: Choices) e
    * @return a parameter containing the key name, values
    */
   override def set(values: Choice*): Parameter[Choice] = {
-    validate(values)
+    validate(values.toList)
     super.set(values: _*)
   }
 
@@ -38,7 +38,7 @@ class GChoiceKey(name: String, keyType: KeyType[Choice], val choices: Choices) e
    * @return a parameter containing the key name, values, specified unit
    */
   override def set(values: Array[Choice], units: Units): Parameter[Choice] = {
-    validate(values)
+    validate(values.toList)
     super.set(values, units)
   }
 }

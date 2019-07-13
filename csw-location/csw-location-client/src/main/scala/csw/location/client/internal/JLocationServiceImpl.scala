@@ -13,7 +13,7 @@ import csw.location.api.javadsl.{ILocationService, IRegistrationResult}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.model.scaladsl._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.compat.java8.DurationConverters.DurationOps
 import scala.compat.java8.FutureConverters._
 import scala.compat.java8.OptionConverters._

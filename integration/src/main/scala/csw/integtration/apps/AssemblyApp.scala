@@ -33,7 +33,7 @@ object AssemblyApp {
   def main(args: Array[String]): Unit = {}
 
   def behavior: Behaviors.Receive[String] = Behaviors.receiveMessage[String] {
-    case "Unregister" ⇒
+    case "Unregister" =>
       AssemblyApp.registrationResult.unregister()
       Behaviors.same
   }

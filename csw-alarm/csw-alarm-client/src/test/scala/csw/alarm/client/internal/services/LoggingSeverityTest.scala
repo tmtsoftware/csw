@@ -19,7 +19,7 @@ class LoggingSeverityTest
     with StatusServiceModule {
 
   private val logBuffer                    = mutable.Buffer.empty[JsObject]
-  private val testAppender                 = new TestAppender(x ⇒ logBuffer += Json.parse(x.toString).as[JsObject])
+  private val testAppender                 = new TestAppender(x => logBuffer += Json.parse(x.toString).as[JsObject])
   private val loggingSystem: LoggingSystem = new LoggingSystem("logging", "version", "hostName", actorSystem)
 
   override protected def beforeEach(): Unit = {

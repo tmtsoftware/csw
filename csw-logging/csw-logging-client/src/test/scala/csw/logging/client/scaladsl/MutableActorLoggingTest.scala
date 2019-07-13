@@ -11,7 +11,7 @@ import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.LoggingTestSuite
 
 object TromboneMutableActor {
-  def behavior(loggerFactory: LoggerFactory): Behaviors.Receive[LogCommand] = Behaviors.receive { (ctx, msg) ⇒
+  def behavior(loggerFactory: LoggerFactory): Behaviors.Receive[LogCommand] = Behaviors.receive { (ctx, msg) =>
     val log: Logger = loggerFactory.getLogger(ctx)
 
     msg match {
@@ -52,7 +52,7 @@ class MutableActorLoggingTest extends LoggingTestSuite {
 
     sendMessagesToActor()
 
-    logBuffer.foreach { log ⇒
+    logBuffer.foreach { log =>
       log.contains("@componentName") shouldBe true
       log.contains("actor") shouldBe true
       log.getString("@componentName") shouldBe "tromboneMutableHcdActor"
@@ -70,14 +70,14 @@ class MutableActorLoggingTest extends LoggingTestSuite {
     //  TromboneHcd component is logging 7 messages
     //  As per the filter, hcd should log 3 message of level ERROR and FATAL
     val groupByComponentNamesLog =
-      logBuffer.groupBy(json ⇒ json.getString("@componentName"))
+      logBuffer.groupBy(json => json.getString("@componentName"))
     val tromboneHcdLogs = groupByComponentNamesLog("tromboneMutableHcdActor")
 
     tromboneHcdLogs.size shouldBe 3
 
     // check that log level should be greater than or equal to debug and
     // assert on actual log message
-    tromboneHcdLogs.toList.foreach { log ⇒
+    tromboneHcdLogs.toList.foreach { log =>
       log.contains("actor") shouldBe true
       val currentLogLevel = log.getString("@severity").toLowerCase
       Level(currentLogLevel) >= ERROR shouldBe true

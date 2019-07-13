@@ -58,7 +58,7 @@ private[aas] class InstalledAppAuthAdapterImpl(
   override def getAccessToken(minValidity: FiniteDuration = 0.seconds): Option[AccessToken] = {
     def getNewToken: Option[AccessToken] = {
       Try(refreshAccessToken()).recover {
-        case e: Exception ⇒
+        case e: Exception =>
           throw new RuntimeException(s"Error in refreshing token: try login before executing this command ${e.getMessage}")
       }
 
@@ -78,7 +78,7 @@ private[aas] class InstalledAppAuthAdapterImpl(
   }
 
   private def isExpired(accessToken: AccessToken, minValidity: FiniteDuration) =
-    accessToken.exp.exists(x ⇒ (x * 1000 - minValidity.toMillis) < System.currentTimeMillis)
+    accessToken.exp.exists(x => (x * 1000 - minValidity.toMillis) < System.currentTimeMillis)
 
   private def refreshAccessToken(): Unit = {
     refreshTokenStr.foreach(keycloakInstalled.refreshToken)
@@ -88,9 +88,9 @@ private[aas] class InstalledAppAuthAdapterImpl(
   private def accessTokenStr  = queryToken(_.getAccessTokenString, keycloakInstalled.getTokenString)
   private def refreshTokenStr = queryToken(_.getRefreshTokenString, keycloakInstalled.getRefreshToken)
 
-  private def queryToken(withStore: AuthStore ⇒ Option[String], withoutStore: ⇒ String) = maybeStore match {
-    case Some(store) ⇒ withStore(store)
-    case None        ⇒ Option(withoutStore)
+  private def queryToken(withStore: AuthStore => Option[String], withoutStore: => String) = maybeStore match {
+    case Some(store) => withStore(store)
+    case None        => Option(withoutStore)
   }
 
   private def updateAuthStore(): Unit = {

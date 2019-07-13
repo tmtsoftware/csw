@@ -13,7 +13,7 @@ private[event] object EventConverter {
     try {
       Cbor.decode(bytes).withConfig(DecodingConfig(readDoubleAlsoAsFloat = true)).to[Event].value
     } catch {
-      case NonFatal(_) ⇒ Event.badEvent()
+      case NonFatal(_) => Event.badEvent()
     }
   }
 

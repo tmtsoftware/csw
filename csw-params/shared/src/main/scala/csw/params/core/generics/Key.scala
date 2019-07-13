@@ -5,6 +5,7 @@ import csw.params.core.models.Units.NoUnits
 import play.api.libs.json.Format
 
 import scala.annotation.varargs
+import scala.collection.mutable
 import scala.reflect.ClassTag
 import scala.runtime.ScalaRunTime._
 
@@ -34,7 +35,8 @@ case class Key[S: Format: ClassTag] private[generics] (keyName: String, keyType:
    * @param units applicable units
    * @return an instance of Parameter[S] containing the key name, values (call withUnits() on the result to set the units)
    */
-  def set(values: Array[S], units: Units = NoUnits): Parameter[S] = Parameter(keyName, keyType, values, units)
+  def set(values: Array[S], units: Units = NoUnits): Parameter[S] =
+    Parameter(keyName, keyType, mutable.ArraySeq.make(values), units)
 
   /**
    * Sets the values for the key using a variable number of arguments
@@ -43,7 +45,7 @@ case class Key[S: Format: ClassTag] private[generics] (keyName: String, keyType:
    * @return an instance of Parameter[S] containing the key name, values (call withUnits() on the result to set the units)
    */
   @varargs
-  def set(values: S*): Parameter[S] = Parameter(keyName, keyType, values.toArray[S], units)
+  def set(values: S*): Parameter[S] = Parameter(keyName, keyType, mutable.ArraySeq.make(values.toArray[S]), units)
 
   /**
    * Sets the values for the key

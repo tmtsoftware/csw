@@ -7,7 +7,7 @@ import csw.network.utils.internal.NetworkInterfaceProvider
 import org.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
-import scala.collection.JavaConverters.enumerationAsScalaIteratorConverter
+import scala.jdk.CollectionConverters._
 
 class NetworksTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach with MockitoSugar {
 
@@ -65,7 +65,7 @@ class NetworksTest extends FunSuite with Matchers with BeforeAndAfterAll with Be
 
   test("testGetIpv4Address returns inet address when provided a valid interface name") {
     val inetAddresses: List[(String, InetAddress)] =
-      NetworkInterface.getNetworkInterfaces.asScala.toList.map { iface ⇒
+      NetworkInterface.getNetworkInterfaces.asScala.toList.map { iface =>
         Networks(Some(iface.getName)).ipv4AddressWithInterfaceName
       }
 

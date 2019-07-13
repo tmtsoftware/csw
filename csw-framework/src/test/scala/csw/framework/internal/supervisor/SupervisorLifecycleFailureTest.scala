@@ -52,7 +52,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
   // all log messages will be captured in log buffer
   private val logBuffer                    = mutable.Buffer.empty[JsObject]
-  private val testAppender                 = new TestAppender(x ⇒ logBuffer += Json.parse(x.toString).as[JsObject])
+  private val testAppender                 = new TestAppender(x => logBuffer += Json.parse(x.toString).as[JsObject])
   private var loggingSystem: LoggingSystem = _
 
   override protected def beforeAll(): Unit = {
@@ -242,7 +242,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
   }
 
   private def createAnswers(compStateProbe: TestProbe[CurrentState]): Unit = {
-    initializeAnswer = _ ⇒
+    initializeAnswer = _ =>
       Future {
         // small sleep is required in order for test probe to subscribe for component state and lifecycle state
         // before component actually gets initialized
@@ -250,7 +250,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
         compStateProbe.ref ! CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice)))
       }
 
-    shutdownAnswer = _ ⇒
+    shutdownAnswer = _ =>
       Future.successful(compStateProbe.ref ! CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
   }
 }

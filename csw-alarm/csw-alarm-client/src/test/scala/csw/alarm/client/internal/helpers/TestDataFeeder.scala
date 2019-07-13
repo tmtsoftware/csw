@@ -9,7 +9,7 @@ import csw.alarm.client.internal.services.{MetadataServiceModule, SeverityServic
 import csw.params.core.models.Subsystem.AOESW
 
 trait TestDataFeeder {
-  self: SeverityServiceModule with MetadataServiceModule with StatusServiceModule ⇒
+  self: SeverityServiceModule with MetadataServiceModule with StatusServiceModule =>
 
   def feedTestData(testCase: SetSeverityTestCase): Unit =
     feedTestData(

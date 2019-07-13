@@ -5,7 +5,7 @@ import io.lettuce.core.api.async.RedisAsyncCommands
 import romaine.RedisResult
 import romaine.extensions.FutureExtensions.RichFuture
 
-import scala.collection.JavaConverters.{iterableAsScalaIterableConverter, mapAsJavaMapConverter}
+import scala.jdk.CollectionConverters._
 import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.compat.java8.OptionConverters.RichOptionalGeneric
 import scala.concurrent.{ExecutionContext, Future}
@@ -28,7 +28,7 @@ class RedisAsyncApi[K, V](redisAsyncCommands: Future[RedisAsyncCommands[K, V]])(
   def mget(keys: List[K]): Future[List[RedisResult[K, Option[V]]]] =
     redisAsyncCommands.flatMap(
       _.mget(keys: _*).toScala
-        .map(_.asScala.map(kv ⇒ RedisResult(kv.getKey, kv.optional().asScala)).toList)
+        .map(_.asScala.map(kv => RedisResult(kv.getKey, kv.optional().asScala)).toList)
     )
 
   def keys(key: K): Future[List[K]] = redisAsyncCommands.flatMap(_.keys(key).toScala.map(_.asScala.toList))
@@ -38,7 +38,7 @@ class RedisAsyncApi[K, V](redisAsyncCommands: Future[RedisAsyncCommands[K, V]])(
   def del(keys: List[K]): Future[Long] = redisAsyncCommands.flatMap(_.del(keys: _*).toScala.map(_.toLong))
 
   def pdel(pattern: K): Future[Long] =
-    keys(pattern).flatMap(matchedKeys ⇒ if (matchedKeys.nonEmpty) del(matchedKeys) else Future.successful(0))
+    keys(pattern).flatMap(matchedKeys => if (matchedKeys.nonEmpty) del(matchedKeys) else Future.successful(0))
 
   def publish(key: K, value: V): Future[Long] = redisAsyncCommands.flatMap(_.publish(key, value).toScala.map(_.toLong))
 

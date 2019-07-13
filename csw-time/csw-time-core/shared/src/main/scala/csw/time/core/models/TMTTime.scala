@@ -24,8 +24,8 @@ sealed trait TMTTime extends Product with Serializable {
   }
 
   private def currentInstant: Instant = this match {
-    case _: UTCTime ⇒ UTCTime.now().value
-    case _: TAITime ⇒ TAITime.now().value
+    case _: UTCTime => UTCTime.now().value
+    case _: TAITime => TAITime.now().value
   }
 }
 

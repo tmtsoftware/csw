@@ -20,7 +20,7 @@ trait EmbeddedRedis {
       sentinelPort: Int = getFreePort,
       serverPort: Int = getFreePort,
       masterId: String
-  )(f: (SentinelPort, ServerPort) ⇒ T): (T, RedisSentinel, RedisServer) = {
+  )(f: (SentinelPort, ServerPort) => T): (T, RedisSentinel, RedisServer) = {
     val (sentinel, server) = startSentinel(sentinelPort, serverPort, masterId)
     val result             = f(sentinelPort, serverPort)
     (result, sentinel, server)
@@ -62,6 +62,6 @@ trait EmbeddedRedis {
     redisSentinel.stop()
   }
 
-  private def addJvmShutdownHook[T](hook: ⇒ T): Unit =
+  private def addJvmShutdownHook[T](hook: => T): Unit =
     Runtime.getRuntime.addShutdownHook(new Thread { override def run(): Unit = hook })
 }

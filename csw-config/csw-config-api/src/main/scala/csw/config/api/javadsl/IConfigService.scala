@@ -4,7 +4,7 @@ import java.nio.file.Path
 import java.time.Instant
 import java.util.Optional
 import java.util.concurrent.CompletableFuture
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import csw.config.api.models._
 import csw.config.api.scaladsl.ConfigService

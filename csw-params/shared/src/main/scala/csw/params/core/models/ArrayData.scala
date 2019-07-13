@@ -5,7 +5,7 @@ import java.util
 import com.github.ghik.silencer.silent
 import play.api.libs.json.{Format, Json}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.mutable
 import scala.language.implicitConversions
 import scala.reflect.ClassTag
@@ -15,12 +15,12 @@ import scala.reflect.ClassTag
  *
  * @param data input array
  */
-case class ArrayData[T](data: mutable.WrappedArray[T]) {
+case class ArrayData[T](data: mutable.ArraySeq[T]) {
 
   /**
    * An Array of values this parameter holds
    */
-  def values: Array[T] = data.array
+  def values: Array[T] = data.array.asInstanceOf[Array[T]]
 
   /**
    * A Java helper that returns an Array of values this parameter holds
@@ -69,7 +69,7 @@ object ArrayData {
    * @param conversion a function of type A => B
    * @tparam A the source type of data
    * @tparam B the destination type of data
-   * @return a function of type ArrayData[A] ⇒ ArrayData[B]
+   * @return a function of type ArrayData[A] => ArrayData[B]
    */
-  implicit def conversion[A, B](implicit @silent conversion: A ⇒ B): ArrayData[A] ⇒ ArrayData[B] = _.asInstanceOf[ArrayData[B]]
+  implicit def conversion[A, B](implicit @silent conversion: A => B): ArrayData[A] => ArrayData[B] = _.asInstanceOf[ArrayData[B]]
 }

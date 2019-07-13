@@ -45,7 +45,7 @@ object CommandResponseManagerActor {
    * @return behavior for CommandResponseManagerActor
    */
   def behavior(crmCacheProperties: CRMCacheProperties, loggerFactory: LoggerFactory): Behavior[CommandResponseManagerMessage] =
-    Behaviors.setup { ctx ⇒
+    Behaviors.setup { ctx =>
       val log: Logger = loggerFactory.getLogger(ctx)
 
       val commandResponseState: CommandResponseState = new CommandResponseState(crmCacheProperties)
@@ -60,10 +60,10 @@ object CommandResponseManagerActor {
       // This is where the command is initially added. Note that every Submit is added as "Started"/Intermediate
       def addOrUpdateCommand(commandResponse: SubmitResponse): Unit =
         commandResponseState.get(commandResponse.runId) match {
-          case _: CommandNotAvailable ⇒
+          case _: CommandNotAvailable =>
             commandResponseState.add(commandResponse)
             querySubscribers.get(commandResponse.runId).foreach(_ ! commandResponse)
-          case _ ⇒ updateCommand(commandResponse.runId, commandResponse)
+          case _ => updateCommand(commandResponse.runId, commandResponse)
         }
       def updateCommand(runId: Id, updateResponse: SubmitResponse): Unit = {
         val currentResponse = commandResponseState.get(runId)
@@ -80,7 +80,7 @@ object CommandResponseManagerActor {
         // If the sub command has a parent command, fetch the current status of parent command from command status service
         commandCoRelation
           .getParent(commandResponse.runId)
-          .foreach(parentId ⇒ updateParent(parentId, commandResponse))
+          .foreach(parentId => updateParent(parentId, commandResponse))
       }
 
       def updateParent(parentRunId: Id, childCommandResponse: SubmitResponse): Unit =
@@ -117,10 +117,10 @@ object CommandResponseManagerActor {
 
       def query(runId: Id, replyTo: ActorRef[QueryResponse]): Unit = {
         commandResponseState.get(runId) match {
-          case CommandNotAvailable(_) ⇒
+          case CommandNotAvailable(_) =>
             querySubscribers = querySubscribers.addOrUpdate(runId, replyTo)
             ctx.watchWith(replyTo, QuerySubscriberTerminated(replyTo))
-          case response ⇒ replyTo ! response
+          case response => replyTo ! response
         }
       }
 
@@ -132,20 +132,20 @@ object CommandResponseManagerActor {
       def doPublish(commandResponse: SubmitResponse, subscribers: Set[ActorRef[SubmitResponse]]): Unit =
         subscribers.foreach(_ ! commandResponse)
 
-      Behaviors.receiveMessage { msg ⇒
+      Behaviors.receiveMessage { msg =>
         msg match {
-          case AddOrUpdateCommand(cmdStatus)          ⇒ addOrUpdateCommand(cmdStatus)
-          case AddSubCommand(parentRunId, childRunId) ⇒ commandCoRelation = commandCoRelation.add(parentRunId, childRunId)
-          case UpdateSubCommand(cmdStatus)            ⇒ updateSubCommand(cmdStatus)
-          case Query(runId, replyTo)                  ⇒ query(runId, replyTo)
-          case Subscribe(runId, replyTo)              ⇒ subscribe(runId, replyTo)
-          case Unsubscribe(runId, subscriber)         ⇒ commandSubscribers = commandSubscribers.remove(runId, subscriber)
-          case SubscriberTerminated(subscriber)       ⇒ commandSubscribers = commandSubscribers.remove(subscriber)
-          case QuerySubscriberTerminated(subscriber)  ⇒ querySubscribers = querySubscribers.remove(subscriber)
-          case GetCommandCorrelation(replyTo)         ⇒ replyTo ! commandCoRelation
-          case GetCommandResponseState(replyTo)       ⇒ replyTo ! commandResponseState
-          case GetCommandSubscribersState(replyTo)    ⇒ replyTo ! CommandSubscribersState(commandSubscribers)
-          case CleanUpCache                           ⇒ commandResponseState.cleanUp()
+          case AddOrUpdateCommand(cmdStatus)          => addOrUpdateCommand(cmdStatus)
+          case AddSubCommand(parentRunId, childRunId) => commandCoRelation = commandCoRelation.add(parentRunId, childRunId)
+          case UpdateSubCommand(cmdStatus)            => updateSubCommand(cmdStatus)
+          case Query(runId, replyTo)                  => query(runId, replyTo)
+          case Subscribe(runId, replyTo)              => subscribe(runId, replyTo)
+          case Unsubscribe(runId, subscriber)         => commandSubscribers = commandSubscribers.remove(runId, subscriber)
+          case SubscriberTerminated(subscriber)       => commandSubscribers = commandSubscribers.remove(subscriber)
+          case QuerySubscriberTerminated(subscriber)  => querySubscribers = querySubscribers.remove(subscriber)
+          case GetCommandCorrelation(replyTo)         => replyTo ! commandCoRelation
+          case GetCommandResponseState(replyTo)       => replyTo ! commandResponseState
+          case GetCommandSubscribersState(replyTo)    => replyTo ! CommandSubscribersState(commandSubscribers)
+          case CleanUpCache                           => commandResponseState.cleanUp()
         }
         Behaviors.same
       }

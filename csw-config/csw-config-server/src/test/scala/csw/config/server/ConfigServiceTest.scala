@@ -78,14 +78,14 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
       |""".stripMargin
 
   def createConfigs(configFileNames: Set[String]): Set[ConfigId] =
-    configFileNames.map(fileName ⇒ {
+    configFileNames.map(fileName => {
       val fileContent            = scala.io.Source.fromResource(fileName).mkString
       val configData: ConfigData = ConfigData.fromString(fileContent)
       configService.create(Paths.get(fileName), configData, annex = false, s"committing file: $fileName").await
     })
 
   implicit class RichInputStream(is: InputStream) {
-    def toByteArray: Array[Byte] = Stream.continually(is.read).takeWhile(_ != -1).map(_.toByte).toArray
+    def toByteArray: Array[Byte] = LazyList.continually(is.read).takeWhile(_ != -1).map(_.toByte).toArray
   }
 
   // DEOPSCSW-42: Storing text based component configuration (uploading files with various sizes)
@@ -94,11 +94,11 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   test("should able to upload and get component configurations from config service") {
     val configFileNames            = Set("tromboneAssemblyTest.conf", "tromboneContainerTest.conf", "tromboneHCDTest.conf")
     val configIds                  = createConfigs(configFileNames)
-    val configFilePaths: Set[Path] = configFileNames.map(name ⇒ Paths.get(name))
+    val configFilePaths: Set[Path] = configFileNames.map(name => Paths.get(name))
     val tuples                     = configIds zip configFilePaths
 
     for {
-      (configId, path) ← tuples
+      (configId, path) <- tuples
     } yield {
       val configData = configService.getById(path, configId).await
       val source     = scala.io.Source.fromResource(path.toString)
@@ -121,7 +121,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     def binarySourceData = getClass.getClassLoader.getResourceAsStream(binaryFileName)
     val binaryContent    = binarySourceData.toByteArray
 
-    val configData = ConfigData.from(StreamConverters.fromInputStream(() ⇒ binarySourceData), binaryContent.length)
+    val configData = ConfigData.from(StreamConverters.fromInputStream(() => binarySourceData), binaryContent.length)
 
     configService.create(binaryConfPath, configData, annex = true, "commit test file").await
 
@@ -446,7 +446,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val assemblyConfigComment = "hello assembly"
 
     //  Check that files to be added does not already exists in the repo and then add
-    configService.list().await.foreach { fileInfo ⇒
+    configService.list().await.foreach { fileInfo =>
       fileInfo.path should not be tromboneConfig
       fileInfo.path should not be assemblyConfig
     }
@@ -616,7 +616,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
     // verify history of active file from given timestamp
     val historyFrom = configService.historyActive(file, createActiveTS).await
-    historyFrom.map(h ⇒ (h.id, h.comment)) shouldBe List(
+    historyFrom.map(h => (h.id, h.comment)) shouldBe List(
       (configId5, resetActiveComment2),
       (configId4, resetActiveComment1),
       (configId3, setActiveComment)
@@ -624,7 +624,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
     // verify history of active file till given timestamp
     val historyTo = configService.historyActive(file, to = resetActiveTS1).await
-    historyTo.map(h ⇒ (h.id, h.comment)) shouldBe List(
+    historyTo.map(h => (h.id, h.comment)) shouldBe List(
       (configId4, resetActiveComment1),
       (configId3, setActiveComment),
       (configId1, createActiveComment)
@@ -632,7 +632,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
     // verify history of active file within given timestamps
     val historyWithin = configService.historyActive(file, setActiveTS, resetActiveTS2).await
-    historyWithin.map(h ⇒ (h.id, h.comment)) shouldBe List((configId5, resetActiveComment2), (configId4, resetActiveComment1))
+    historyWithin.map(h => (h.id, h.comment)) shouldBe List((configId5, resetActiveComment2), (configId4, resetActiveComment1))
   }
 
   // DEOPSCSW-77: Set default version of configuration file in config service
@@ -758,18 +758,18 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configService.history(file, maxResults = 2).await.size shouldBe 2
 
     // verify history from given timestamp
-    configService.history(file, createTS1).await.map(history ⇒ (history.id, history.comment)) shouldBe List(
+    configService.history(file, createTS1).await.map(history => (history.id, history.comment)) shouldBe List(
       (configId3, comment3),
       (configId2, comment2)
     )
 
     // verify history till given timestamp
-    configService.history(file, to = createTS1).await.map(history ⇒ (history.id, history.comment)) shouldBe List(
+    configService.history(file, to = createTS1).await.map(history => (history.id, history.comment)) shouldBe List(
       (configId1, comment1)
     )
 
     // verify history within given range of timestamp
-    configService.history(file, updateTS2, updateTS3).await.map(history ⇒ (history.id, history.comment)) shouldBe List(
+    configService.history(file, updateTS2, updateTS3).await.map(history => (history.id, history.comment)) shouldBe List(
       (configId3, comment3)
     )
   }
@@ -809,11 +809,11 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
     // verify history of active file from given timestamp
     val historyFrom = configService.historyActive(file, createActiveTS).await
-    historyFrom.map(h ⇒ (h.id, h.comment)) shouldBe List((configId4, resetActiveComment), (configId3, setActiveComment))
+    historyFrom.map(h => (h.id, h.comment)) shouldBe List((configId4, resetActiveComment), (configId3, setActiveComment))
 
     // verify history of active file till given timestamp
     val historyTo = configService.historyActive(file, to = resetActiveTS).await
-    historyTo.map(h ⇒ (h.id, h.comment)) shouldBe List(
+    historyTo.map(h => (h.id, h.comment)) shouldBe List(
       (configId4, resetActiveComment),
       (configId3, setActiveComment),
       (configId1, createActiveComment)
@@ -821,7 +821,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
     // verify history of active file within given timestamps
     val historyWithin = configService.historyActive(file, setActiveTS, resetActiveTS).await
-    historyWithin.map(h ⇒ (h.id, h.comment)) shouldBe List((configId4, resetActiveComment))
+    historyWithin.map(h => (h.id, h.comment)) shouldBe List((configId4, resetActiveComment))
   }
 
   // DEOPSCSW-77: Set default version of configuration file in config service
@@ -899,7 +899,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val assemblyConfigComment = "hello assembly"
 
     // Check that files to be added does not already exists in the repo and then add
-    configService.list().await.foreach { fileInfo ⇒
+    configService.list().await.foreach { fileInfo =>
       fileInfo.path should not be tromboneConfig
       fileInfo.path should not be assemblyConfig
     }

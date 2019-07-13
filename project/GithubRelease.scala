@@ -42,14 +42,14 @@ object GithubRelease extends AutoPlugin {
 
     lazy val testReportZip = target.value / "ghrelease" / "test-reports.zip"
     val testReportHtml     = target.value / "ghrelease" / "test-reports.html"
-    val xmlFiles           = target.all(aggregateFilter).value.flatMap(targetPath ⇒ Path.allSubpaths(targetPath / "test-reports"))
+    val xmlFiles           = target.all(aggregateFilter).value.flatMap(targetPath => Path.allSubpaths(targetPath / "test-reports"))
 
     // 1. include all xml files in single zip
     IO.zip(xmlFiles, testReportZip)
     // 2. generate html report from xml files
-    IO.withTemporaryDirectory { dir ⇒
+    IO.withTemporaryDirectory { dir =>
       // copy xml files from all projects to single directory
-      xmlFiles.foreach { case (file, fileName) ⇒ if (fileName.nonEmpty) Files.copy(file.toPath, (dir / fileName).toPath) }
+      xmlFiles.foreach { case (file, fileName) => if (fileName.nonEmpty) Files.copy(file.toPath, (dir / fileName).toPath) }
 
       // 2.1 create single xml file by merging all xml's
       val xmlFilesDir     = dir.getAbsolutePath
@@ -91,13 +91,13 @@ object GithubRelease extends AutoPlugin {
 
     log.info(s"Staging projects: [${projects.mkString(" ,")}]")
     val stagedFiles = projects
-      .map(p ⇒ stage in Universal in p)
+      .map(p => stage in Universal in p)
       .join
       .value
-      .flatMap(x ⇒ Path.allSubpaths(x.getAbsoluteFile))
+      .flatMap(x => Path.allSubpaths(x.getAbsoluteFile))
       .distinct
       .map {
-        case (source, dest) ⇒ (source, s"$zipFileName/$dest")
+        case (source, dest) => (source, s"$zipFileName/$dest")
       }
 
     ZipHelper.zipNative(stagedFiles, appsZip)

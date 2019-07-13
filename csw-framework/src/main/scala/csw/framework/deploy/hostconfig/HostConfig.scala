@@ -39,12 +39,12 @@ private[hostconfig] class HostConfig(name: String, startLogging: Boolean = false
   private lazy val wiring: FrameworkWiring = new FrameworkWiring
 
   def start(args: Array[String]): Unit =
-    new ArgsParser(name).parse(args) match {
+    new ArgsParser(name).parse(args.toList) match {
       case Some(Options(isLocal, hostConfigPath, Some(containerScript))) =>
         LocationServerStatus.requireUpLocally()
         run(isLocal, hostConfigPath, containerScript)
 
-      case _ ⇒ throw UnableToParseOptions
+      case _ => throw UnableToParseOptions
     }
 
   def run(isLocal: Boolean, hostConfigPath: Option[Path], containerScript: String): Unit =
@@ -58,7 +58,7 @@ private[hostconfig] class HostConfig(name: String, startLogging: Boolean = false
       val pids      = processes.map(_.pid())
       log.info(s"Started processes with following PID's: ${pids.mkString("[", ", ", "]")}")
     } catch {
-      case NonFatal(ex) ⇒
+      case NonFatal(ex) =>
         log.error(s"${ex.getMessage}", ex = ex)
         throw ex
     } finally {
@@ -71,13 +71,13 @@ private[hostconfig] class HostConfig(name: String, startLogging: Boolean = false
   private def bootstrapContainers(containerScript: String, bootstrapInfo: HostBootstrapInfo): Set[Process] =
     bootstrapInfo.containers
       .map {
-        case ContainerBootstrapInfo(Container, configPath, Remote) ⇒
+        case ContainerBootstrapInfo(Container, configPath, Remote) =>
           executeScript(containerScript, configPath)
-        case ContainerBootstrapInfo(Container, configPath, Local) ⇒
+        case ContainerBootstrapInfo(Container, configPath, Local) =>
           executeScript(containerScript, s"$configPath", "--local")
-        case ContainerBootstrapInfo(Standalone, configPath, Remote) ⇒
+        case ContainerBootstrapInfo(Standalone, configPath, Remote) =>
           executeScript(containerScript, s"$configPath", "--standalone")
-        case ContainerBootstrapInfo(Standalone, configPath, Local) ⇒
+        case ContainerBootstrapInfo(Standalone, configPath, Local) =>
           executeScript(containerScript, s"$configPath", "--local", "--standalone")
       }
 

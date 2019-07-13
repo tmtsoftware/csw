@@ -60,7 +60,7 @@ class RedisTestProps(
   override lazy val jSubscriber: IEventSubscriber = jEventService.defaultSubscriber
 
   override def publishGarbage(channel: String, message: String): Future[Done] =
-    asyncConnection.flatMap(c ⇒ c.publish(channel, message).toScala.map(_ ⇒ Done))
+    asyncConnection.flatMap(c => c.publish(channel, message).toScala.map(_ => Done))
 
   override def start(): Unit = {
     val redis = startSentinel(sentinelPort, serverPort, masterId)

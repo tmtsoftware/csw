@@ -10,7 +10,7 @@ private[alarm] trait AlarmJsonSupport {
   implicit lazy val alarmMetadataFormat: Format[AlarmMetadata] =
     Json
       .format[AlarmMetadata]
-      .bimap(identity, metadata ⇒ metadata.copy(supportedSeverities = metadata.allSupportedSeverities))
+      .bimap(identity, metadata => metadata.copy(supportedSeverities = metadata.allSupportedSeverities))
   implicit val alarmMetadataSetFormat: Format[AlarmMetadataSet] = Json.format
 
   implicit lazy val alarmStatusFormat: Format[AlarmStatus] = Json.format

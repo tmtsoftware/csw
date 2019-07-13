@@ -33,17 +33,17 @@ class CustomAppenderBuilderClass extends LogAppenderBuilder {
   val logBuffer: mutable.Buffer[JsObject] = mutable.Buffer.empty[JsObject]
 
   override def apply(system: typed.ActorSystem[_], standardHeaders: JsObject): LogAppender =
-    new CustomAppender(system, standardHeaders, x ⇒ logBuffer += Json.parse(x.toString).as[JsObject])
+    new CustomAppender(system, standardHeaders, x => logBuffer += Json.parse(x.toString).as[JsObject])
 }
 
 object CustomAppenderBuilderObject extends LogAppenderBuilder {
   val logBuffer: mutable.Buffer[JsObject] = mutable.Buffer.empty[JsObject]
 
   override def apply(system: typed.ActorSystem[_], standardHeaders: JsObject): LogAppender =
-    new CustomAppender(system, standardHeaders, x ⇒ logBuffer += Json.parse(x.toString).as[JsObject])
+    new CustomAppender(system, standardHeaders, x => logBuffer += Json.parse(x.toString).as[JsObject])
 }
 
-class CustomAppender(system: typed.ActorSystem[_], stdHeaders: JsObject, callback: Any ⇒ Unit) extends LogAppender {
+class CustomAppender(system: typed.ActorSystem[_], stdHeaders: JsObject, callback: Any => Unit) extends LogAppender {
 
   private[this] val config       = system.settings.config.getConfig("csw-logging.appender-config.my-fav-appender")
   private[this] val logIpAddress = config.getBoolean("logIpAddress")
@@ -54,7 +54,7 @@ class CustomAppender(system: typed.ActorSystem[_], stdHeaders: JsObject, callbac
 
   override def append(baseMsg: JsObject, category: String): Unit = {
     if (logIpAddress)
-      callback((baseMsg ++ Json.obj("IpAddress" → InetAddress.getLocalHost.getHostAddress)).toString())
+      callback((baseMsg ++ Json.obj("IpAddress" -> InetAddress.getLocalHost.getHostAddress)).toString())
     else
       callback(baseMsg.toString())
   }
@@ -87,8 +87,8 @@ class CustomAppenderTest extends FunSuite with Matchers {
     Thread.sleep(200)
     CustomAppenderBuilderObject.logBuffer.size shouldBe 4
 
-    CustomAppenderBuilderObject.logBuffer.forall(log ⇒ log.contains("IpAddress")) shouldBe true
-    CustomAppenderBuilderObject.logBuffer.forall(log ⇒ log.getString("IpAddress") == hostName) shouldBe true
+    CustomAppenderBuilderObject.logBuffer.forall(log => log.contains("IpAddress")) shouldBe true
+    CustomAppenderBuilderObject.logBuffer.forall(log => log.getString("IpAddress") == hostName) shouldBe true
 
     actorSystem.terminate()
     Await.result(actorSystem.whenTerminated, 10.seconds)
@@ -117,8 +117,8 @@ class CustomAppenderTest extends FunSuite with Matchers {
     Thread.sleep(200)
     customAppender.logBuffer.size shouldBe 4
 
-    customAppender.logBuffer.forall(log ⇒ log.contains("IpAddress")) shouldBe true
-    customAppender.logBuffer.forall(log ⇒ log.getString("IpAddress") == hostName) shouldBe true
+    customAppender.logBuffer.forall(log => log.contains("IpAddress")) shouldBe true
+    customAppender.logBuffer.forall(log => log.getString("IpAddress") == hostName) shouldBe true
 
     actorSystem.terminate()
     Await.result(actorSystem.whenTerminated, 10.seconds)
@@ -150,7 +150,7 @@ class CustomAppenderTest extends FunSuite with Matchers {
     Thread.sleep(200)
     customAppender.logBuffer.size shouldBe 4
 
-    customAppender.logBuffer.forall(log ⇒ log.contains("IpAddress")) shouldBe false
+    customAppender.logBuffer.forall(log => log.contains("IpAddress")) shouldBe false
 
     actorSystem.terminate()
     Await.result(actorSystem.whenTerminated, 10.seconds)

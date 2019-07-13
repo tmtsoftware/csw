@@ -12,7 +12,7 @@ import csw.network.utils.Networks
 object Main extends App {
   private val name = BuildInfo.name
 
-  new ArgsParser(name).parse(args).foreach(run)
+  new ArgsParser(name).parse(args.toList).foreach(run)
 
   private def run(options: Options): Unit = {
     LocationServerStatus.requireUp(options.locationHost)

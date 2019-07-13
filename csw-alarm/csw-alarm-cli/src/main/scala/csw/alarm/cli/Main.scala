@@ -10,7 +10,7 @@ import csw.location.client.utils.LocationServerStatus
 object Main extends App {
   private val name: String = BuildInfo.name
 
-  new ArgsParser(name).parse(args).foreach { options =>
+  new ArgsParser(name).parse(args.toList).foreach { options =>
     LocationServerStatus.requireUp(options.locationHost)
     run(options)
   }
@@ -24,7 +24,7 @@ object Main extends App {
       startLogging(name)
       cliApp.execute(options)
     } finally {
-      Http().shutdownAllConnectionPools().onComplete(_ ⇒ shutdown(ApplicationFinishedReason))
+      Http().shutdownAllConnectionPools().onComplete(_ => shutdown(ApplicationFinishedReason))
     }
   }
 

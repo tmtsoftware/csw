@@ -94,5 +94,5 @@ abstract class ComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx
    * @param connection to be tracked for location updates
    */
   def trackConnection(connection: Connection): Unit =
-    cswCtx.locationService.subscribe(connection, trackingEvent ⇒ ctx.self ! TrackingEventReceived(trackingEvent))
+    cswCtx.locationService.subscribe(connection, trackingEvent => ctx.self ! TrackingEventReceived(trackingEvent))
 }

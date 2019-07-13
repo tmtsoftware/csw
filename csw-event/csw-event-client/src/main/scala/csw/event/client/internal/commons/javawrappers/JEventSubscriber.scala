@@ -14,7 +14,7 @@ import csw.event.api.internal.EventServiceExts.RichEventSubscription
 import csw.event.api.javadsl.{IEventSubscriber, IEventSubscription}
 import csw.event.api.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 
-import scala.collection.JavaConverters.{asScalaSetConverter, setAsJavaSetConverter}
+import scala.jdk.CollectionConverters._
 import scala.compat.java8.DurationConverters.DurationOps
 import scala.compat.java8.FutureConverters.{CompletionStageOps, FutureOps}
 
@@ -27,7 +27,7 @@ class JEventSubscriber(eventSubscriber: EventSubscriber) extends IEventSubscribe
     eventSubscriber
       .subscribe(eventKeys.asScala.toSet)
       .asJava
-      .mapMaterializedValue { eventSubscription: EventSubscription ⇒
+      .mapMaterializedValue { eventSubscription: EventSubscription =>
         new IEventSubscription {
           override def unsubscribe(): CompletableFuture[Done] = eventSubscription.unsubscribe().toJava.toCompletableFuture
 
@@ -41,21 +41,21 @@ class JEventSubscriber(eventSubscriber: EventSubscriber) extends IEventSubscribe
       .mapMaterializedValue(_.asJava)
       .asJava
 
-  def subscribeAsync(eventKeys: util.Set[EventKey], callback: Event ⇒ CompletableFuture[_]): IEventSubscription =
-    eventSubscriber.subscribeAsync(eventKeys.asScala.toSet, e ⇒ callback(e).toScala).asJava
+  def subscribeAsync(eventKeys: util.Set[EventKey], callback: Event => CompletableFuture[_]): IEventSubscription =
+    eventSubscriber.subscribeAsync(eventKeys.asScala.toSet, e => callback(e).toScala).asJava
 
   def subscribeAsync(
       eventKeys: util.Set[EventKey],
-      callback: Event ⇒ CompletableFuture[_],
+      callback: Event => CompletableFuture[_],
       every: Duration,
       mode: SubscriptionMode
   ): IEventSubscription =
     eventSubscriber
-      .subscribeAsync(eventKeys.asScala.toSet, e ⇒ callback(e).toScala, every.toScala, mode)
+      .subscribeAsync(eventKeys.asScala.toSet, e => callback(e).toScala, every.toScala, mode)
       .asJava
 
   def subscribeCallback(eventKeys: util.Set[EventKey], callback: Consumer[Event]): IEventSubscription =
-    eventSubscriber.subscribeCallback(eventKeys.asScala.toSet, e ⇒ callback.accept(e)).asJava
+    eventSubscriber.subscribeCallback(eventKeys.asScala.toSet, e => callback.accept(e)).asJava
 
   def subscribeCallback(
       eventKeys: util.Set[EventKey],
@@ -64,7 +64,7 @@ class JEventSubscriber(eventSubscriber: EventSubscriber) extends IEventSubscribe
       mode: SubscriptionMode
   ): IEventSubscription =
     eventSubscriber
-      .subscribeCallback(eventKeys.asScala.toSet, e ⇒ callback.accept(e), every.toScala, mode)
+      .subscribeCallback(eventKeys.asScala.toSet, e => callback.accept(e), every.toScala, mode)
       .asJava
 
   def subscribeActorRef(eventKeys: util.Set[EventKey], actorRef: ActorRef[Event]): IEventSubscription =
@@ -82,7 +82,7 @@ class JEventSubscriber(eventSubscriber: EventSubscriber) extends IEventSubscribe
     eventSubscriber.pSubscribe(subsystem, pattern).mapMaterializedValue(_.asJava).asJava
 
   def pSubscribeCallback(subsystem: Subsystem, pattern: String, callback: Consumer[Event]): IEventSubscription =
-    eventSubscriber.pSubscribeCallback(subsystem, pattern, e ⇒ callback.accept(e)).asJava
+    eventSubscriber.pSubscribeCallback(subsystem, pattern, e => callback.accept(e)).asJava
 
   def get(eventKeys: util.Set[EventKey]): CompletableFuture[util.Set[Event]] =
     eventSubscriber.get(eventKeys.asScala.toSet).toJava.toCompletableFuture.thenApply(_.asJava)
