@@ -8,8 +8,12 @@ import akka.serialization.{Serialization, SerializationExtension}
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
 import csw.command.client.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
 import csw.command.client.messages.CommandSerializationMarker.RemoteMsg
-import csw.command.client.messages.ComponentCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
-import csw.command.client.messages.ContainerCommonMessage.GetContainerLifecycleState
+import csw.command.client.messages.ComponentCommonMessage.{
+  ComponentStateSubscription,
+  GetSupervisorLifecycleState,
+  LifecycleStateSubscription
+}
+import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
@@ -21,6 +25,7 @@ import csw.location.model.codecs.LocationCodecs
 import csw.logging.client.cbor.LoggingCodecs
 import csw.params.core.formats.{CborHelpers, ParamCodecs}
 import io.bullet.borer.derivation.MapBasedCodecs._
+import io.bullet.borer.derivation.ArrayBasedCodecs.deriveCodecForUnaryCaseClass
 import io.bullet.borer.{Codec, Decoder, Encoder}
 
 import scala.concurrent.duration.FiniteDuration
@@ -54,13 +59,15 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
 
   // ************************ LockingResponse Codecs ********************
 
-  implicit lazy val lockReleasedCodec: Codec[LockReleased.type]               = deriveCodec[LockReleased.type]
-  implicit lazy val lockExpiringShortlyCodec: Codec[LockExpiringShortly.type] = deriveCodec[LockExpiringShortly.type]
-  implicit lazy val lockExpiredCodec: Codec[LockExpired.type]                 = deriveCodec[LockExpired.type]
-  implicit lazy val lockAlreadyReleasedCodec: Codec[LockAlreadyReleased.type] = deriveCodec[LockAlreadyReleased.type]
-  implicit lazy val lockAcquiredCodec: Codec[LockAcquired.type]               = deriveCodec[LockAcquired.type]
-  implicit lazy val releasingLockFailedCodec: Codec[ReleasingLockFailed]      = Codec.forCaseClass[ReleasingLockFailed]
-  implicit lazy val acquiringLockFailedCodec: Codec[AcquiringLockFailed]      = Codec.forCaseClass[AcquiringLockFailed]
+  def singletonCodec[T <: Singleton](a: T): Codec[T] = CborHelpers.bimap[String, T](_ => a, _.toString)
+
+  implicit lazy val lockReleasedCodec: Codec[LockReleased.type]               = singletonCodec(LockReleased)
+  implicit lazy val lockExpiringShortlyCodec: Codec[LockExpiringShortly.type] = singletonCodec(LockExpiringShortly)
+  implicit lazy val lockExpiredCodec: Codec[LockExpired.type]                 = singletonCodec(LockExpired)
+  implicit lazy val lockAlreadyReleasedCodec: Codec[LockAlreadyReleased.type] = singletonCodec(LockAlreadyReleased)
+  implicit lazy val lockAcquiredCodec: Codec[LockAcquired.type]               = singletonCodec(LockAcquired)
+  implicit lazy val releasingLockFailedCodec: Codec[ReleasingLockFailed]      = deriveCodecForUnaryCaseClass[ReleasingLockFailed]
+  implicit lazy val acquiringLockFailedCodec: Codec[AcquiringLockFailed]      = deriveCodecForUnaryCaseClass[AcquiringLockFailed]
   implicit lazy val lockingResponseCodec: Codec[LockingResponse]              = deriveCodec[LockingResponse]
 
   // ************************ Components Codecs ********************
@@ -72,8 +79,8 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
 
   // ************************ RemoteMsg Codecs ********************
 
-  implicit lazy val shutdownCodec: Codec[Shutdown.type]  = deriveCodec[Shutdown.type]
-  implicit lazy val restartCodec: Codec[Restart.type]    = deriveCodec[Restart.type]
+  implicit lazy val shutdownCodec: Codec[Shutdown.type]  = singletonCodec(Shutdown)
+  implicit lazy val restartCodec: Codec[Restart.type]    = singletonCodec(Restart)
   implicit lazy val queryCodec: Codec[Query]             = deriveCodec[Query]
   implicit lazy val subscribeCodec: Codec[Subscribe]     = deriveCodec[Subscribe]
   implicit lazy val unsubscribeCodec: Codec[Unsubscribe] = deriveCodec[Unsubscribe]
@@ -92,10 +99,12 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
   implicit lazy val toComponentLifecycleMessagesCodec: Codec[ToComponentLifecycleMessage] = enumCodec[ToComponentLifecycleMessage]
 
   implicit lazy val getContainerLifecycleStateCodec: Codec[GetContainerLifecycleState] = deriveCodec[GetContainerLifecycleState]
+  implicit lazy val getSupervisorLifecycleStateCodec: Codec[GetSupervisorLifecycleState] =
+    deriveCodec[GetSupervisorLifecycleState]
   implicit lazy val setComponentLogLevelCodec: Codec[SetComponentLogLevel]             = deriveCodec[SetComponentLogLevel]
   implicit lazy val getComponentLogMetadataCodec: Codec[GetComponentLogMetadata]       = deriveCodec[GetComponentLogMetadata]
+  implicit lazy val getComponentsCodec: Codec[GetComponents]                           = deriveCodec[GetComponents]
   implicit lazy val logControlMessagesCodec: Codec[LogControlMessages]                 = deriveCodec[LogControlMessages]
   implicit lazy val componentStateSubscriptionCodec: Codec[ComponentStateSubscription] = deriveCodec[ComponentStateSubscription]
   implicit lazy val messageRemoteMsgCodec: Codec[RemoteMsg]                            = deriveCodec[RemoteMsg]
-
 }

@@ -9,7 +9,7 @@ import scala.util.control.NonFatal
 private[event] object EventConverter {
   import csw.params.core.formats.ParamCodecs._
 
-  def toEvent[Chunk: Input.Wrapper](bytes: Chunk): Event = {
+  def toEvent[Chunk: Input.Provider](bytes: Chunk): Event = {
     try {
       Cbor.decode(bytes).withConfig(DecodingConfig(readDoubleAlsoAsFloat = true)).to[Event].value
     } catch {
@@ -17,7 +17,7 @@ private[event] object EventConverter {
     }
   }
 
-  def toBytes[Chunk: Output.Provider](event: Event): Chunk = {
-    Cbor.encode(event).to[Chunk].bytes
+  def toBytes[Chunk: Output.ToTypeProvider](event: Event): Chunk = {
+    Cbor.encode(event).to[Chunk].result
   }
 }

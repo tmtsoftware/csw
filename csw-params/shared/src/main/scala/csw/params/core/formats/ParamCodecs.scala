@@ -13,6 +13,7 @@ import csw.params.core.states.{CurrentState, DemandState, StateName, StateVariab
 import csw.params.events.{Event, EventName, ObserveEvent, SystemEvent}
 import csw.time.core.models.{TAITime, UTCTime}
 import io.bullet.borer._
+import io.bullet.borer.derivation.ArrayBasedCodecs.deriveCodecForUnaryCaseClass
 import io.bullet.borer.derivation.MapBasedCodecs._
 
 import scala.collection.mutable.{WrappedArray => WArray}
@@ -27,12 +28,11 @@ trait ParamCodecs extends CommonCodecs {
 
   // ************************ Base Type Codecs ********************
 
-  //Ensure that Codec.forCaseClass is used ONLY for unary case classes see https://github.com/sirthias/borer/issues/26
-  implicit lazy val choiceCodec: Codec[Choice] = Codec.forCaseClass[Choice]
+  implicit lazy val choiceCodec: Codec[Choice] = deriveCodecForUnaryCaseClass[Choice]
   implicit lazy val raDecCodec: Codec[RaDec]   = deriveCodec[RaDec]
 
-  implicit lazy val tagCodec: Codec[Coords.Tag]                      = Codec.forCaseClass[Coords.Tag]
-  implicit lazy val angleCodec: Codec[Angle]                         = Codec.forCaseClass[Angle]
+  implicit lazy val tagCodec: Codec[Coords.Tag]                      = deriveCodecForUnaryCaseClass[Coords.Tag]
+  implicit lazy val angleCodec: Codec[Angle]                         = deriveCodecForUnaryCaseClass[Angle]
   implicit lazy val properMotionCodec: Codec[ProperMotion]           = deriveCodec[ProperMotion]
   implicit lazy val eqFrameCodec: Codec[EqFrame]                     = CborHelpers.enumCodec[EqFrame]
   implicit lazy val solarSystemObjectCodec: Codec[SolarSystemObject] = CborHelpers.enumCodec[SolarSystemObject]
@@ -47,8 +47,8 @@ trait ParamCodecs extends CommonCodecs {
   implicit lazy val tsCodec: Codec[Timestamp]    = deriveCodec[Timestamp]
   implicit lazy val instantCodec: Codec[Instant] = bimap[Timestamp, Instant](_.toInstant, Timestamp.fromInstant)
 
-  implicit lazy val utcTimeCodec: Codec[UTCTime] = Codec.forCaseClass[UTCTime]
-  implicit lazy val taiTimeCodec: Codec[TAITime] = Codec.forCaseClass[TAITime]
+  implicit lazy val utcTimeCodec: Codec[UTCTime] = deriveCodecForUnaryCaseClass[UTCTime]
+  implicit lazy val taiTimeCodec: Codec[TAITime] = deriveCodecForUnaryCaseClass[TAITime]
 
   // ************************ Composite Codecs ********************
 
@@ -97,9 +97,8 @@ trait ParamCodecs extends CommonCodecs {
 
   // ************************ Event Codecs ********************
 
-  //Codec.forCaseClass does not work for id due to https://github.com/sirthias/borer/issues/23
-  implicit lazy val idCodec: Codec[Id]               = bimap[String, Id](Id(_), _.id)
-  implicit lazy val eventNameCodec: Codec[EventName] = Codec.forCaseClass[EventName]
+  implicit lazy val idCodec: Codec[Id]               = deriveCodecForUnaryCaseClass[Id]
+  implicit lazy val eventNameCodec: Codec[EventName] = deriveCodecForUnaryCaseClass[EventName]
 
   implicit lazy val seCodec: Codec[SystemEvent]  = deriveCodec[SystemEvent]
   implicit lazy val oeCodec: Codec[ObserveEvent] = deriveCodec[ObserveEvent]
@@ -107,8 +106,8 @@ trait ParamCodecs extends CommonCodecs {
 
   // ************************ Command Codecs ********************
 
-  implicit lazy val commandNameCodec: Codec[CommandName] = Codec.forCaseClass[CommandName]
-  implicit lazy val obsIdCodec: Codec[ObsId]             = Codec.forCaseClass[ObsId]
+  implicit lazy val commandNameCodec: Codec[CommandName] = deriveCodecForUnaryCaseClass[CommandName]
+  implicit lazy val obsIdCodec: Codec[ObsId]             = deriveCodecForUnaryCaseClass[ObsId]
 
   implicit lazy val observeCommandCodec: Codec[Observe]          = deriveCodec[Observe]
   implicit lazy val setupCommandCodec: Codec[Setup]              = deriveCodec[Setup]

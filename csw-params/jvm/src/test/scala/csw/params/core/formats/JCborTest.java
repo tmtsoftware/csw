@@ -8,7 +8,6 @@ import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
 import csw.time.core.models.UTCTime;
 import io.bullet.borer.Cbor;
-import io.bullet.borer.Input;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -87,7 +86,7 @@ public class JCborTest extends JUnitSuite {
     public void shouldAbleToConvertToAndFromParameterAndEvent() {
         // ===== Test Parameter SERDE =====
         byte[] byteArray = Cbor.encode(param, ParamCodecs$.MODULE$.paramEncExistential()).toByteArray();
-        Parameter parameterFromBytes = Cbor.decode(byteArray, Input.ByteArrayWrapper$.MODULE$).to(ParamCodecs$.MODULE$.paramDecExistential()).value();
+        Parameter parameterFromBytes = Cbor.decode(byteArray, JInput.FromByteArrayProvider()).to(ParamCodecs$.MODULE$.paramDecExistential()).value();
 
         Assert.assertEquals(param, parameterFromBytes);
 

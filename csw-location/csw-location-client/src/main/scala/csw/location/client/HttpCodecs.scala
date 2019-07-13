@@ -24,6 +24,6 @@ trait HttpCodecs {
   implicit def marshaller[A: Encoder]: ToEntityMarshaller[A] = {
     Marshaller
       .oneOf(mediaTypes: _*)(Marshaller.byteStringMarshaller(_))
-      .compose(Json.encode(_).to[ByteString].bytes)
+      .compose(Json.encode(_).to[ByteString].result)
   }
 }
