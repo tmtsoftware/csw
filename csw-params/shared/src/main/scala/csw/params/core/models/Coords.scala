@@ -2,21 +2,11 @@ package csw.params.core.models
 import java.util
 
 import csw.params.core.models.Coords.EqFrame.ICRS
-import csw.params.core.models.Coords.{
-  AltAzCoord,
-  BASE,
-  CometCoord,
-  Coord,
-  EqCoord,
-  EqFrame,
-  MinorPlanetCoord,
-  SolarSystemCoord,
-  SolarSystemObject,
-  Tag
-}
+import csw.params.core.models.Coords._
+import csw.params.extensions.Formats
 import enumeratum._
 import julienrf.json.derived
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{Format, Json, OFormat}
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable
@@ -45,7 +35,7 @@ object Coords {
   val allTags: Set[Tag]         = Set(BASE, OIWFS1, OIWFS2, OIWFS3, OIWFS4, ODGW1, ODGW2, ODGW3, ODGW4, GUIDER1, GUIDER2)
   val allTagsNames: Set[String] = allTags.map(_.name)
 
-  implicit val tagFormat: OFormat[Tag] = Json.format[Tag]
+  implicit val tagFormat: Format[Tag] = Json.valueFormat[Tag]
 
   sealed trait EqFrame extends EnumEntry
   object EqFrame extends Enum[EqFrame] {
@@ -54,7 +44,7 @@ object Coords {
     case object FK5  extends EqFrame
   }
 
-  implicit val eqfFormat: OFormat[EqFrame] = derived.oformat()
+  implicit val eqfFormat: Format[EqFrame] = Formats.enumFormat
 
   /**
    * All coordinates are a Coord.
@@ -91,7 +81,7 @@ object Coords {
     case object Uranus  extends SolarSystemObject
     case object Pluto   extends SolarSystemObject
 
-    implicit val ssoFormat: OFormat[SolarSystemObject] = derived.oformat()
+    implicit val ssoFormat: Format[SolarSystemObject] = Formats.enumFormat
   }
 
   case class SolarSystemCoord(tag: Tag, body: SolarSystemObject) extends Coord

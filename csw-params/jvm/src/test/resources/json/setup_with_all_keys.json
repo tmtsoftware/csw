@@ -95,33 +95,23 @@
           "pmx" : 0.5,
           "pmy" : 2.33
         },
-        "tag" : {
-          "name" : "BASE"
-        },
-        "frame" : {
-          "ICRS" : { }
-        },
+        "tag" : "BASE",
+        "frame" : "ICRS",
         "catalogName" : "none",
         "ra" : 659912250000,
         "dec" : -109892300000
       }
     }, {
       "SolarSystemCoord" : {
-        "tag" : {
-          "name" : "BASE"
-        },
-        "body" : {
-          "Venus" : { }
-        }
+        "tag" : "BASE",
+        "body" : "Venus"
       }
     }, {
       "MinorPlanetCoord" : {
         "meanAnomaly" : 792000000000,
         "longAscendingNode" : 7200000000,
         "epoch" : 2000,
-        "tag" : {
-          "name" : "GUIDER1"
-        },
+        "tag" : "GUIDER1",
         "inclination" : 324000000000,
         "eccentricity" : 0.234,
         "meanDistance" : 1.4,
@@ -130,9 +120,7 @@
     }, {
       "CometCoord" : {
         "longAscendingNode" : 7200000000,
-        "tag" : {
-          "name" : "BASE"
-        },
+        "tag" : "BASE",
         "epochOfPerihelion" : 2000,
         "inclination" : 324000000000,
         "eccentricity" : 0.234,
@@ -141,9 +129,7 @@
       }
     }, {
       "AltAzCoord" : {
-        "tag" : {
-          "name" : "BASE"
-        },
+        "tag" : "BASE",
         "alt" : 1083600000000,
         "az" : 153000000000
       }
