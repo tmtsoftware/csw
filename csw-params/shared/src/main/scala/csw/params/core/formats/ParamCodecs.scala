@@ -52,7 +52,7 @@ trait ParamCodecs extends CommonCodecs {
 
   // ************************ Composite Codecs ********************
 
-  implicit def arrayDataCodec[T: ClassTag: ArrayEnc: ArrayDec]: Codec[ArrayData[T]] =
+  implicit def arrayDataCodec[T: ArrayEnc: ArrayDec]: Codec[ArrayData[T]] =
     bimap[ArrayS[T], ArrayData[T]](ArrayData(_), _.data)
 
   implicit def matrixDataCodec[T: ClassTag: ArrayEnc: ArrayDec]: Codec[MatrixData[T]] =
@@ -70,9 +70,9 @@ trait ParamCodecs extends CommonCodecs {
   implicit lazy val javaByteArrayEnc: Encoder[Array[JByte]] = Encoder.forByteArray.contramap(_.map(x => x: Byte))
   implicit lazy val javaByteArrayDec: Decoder[Array[JByte]] = Decoder.forByteArray.map(_.map(x => x: JByte))
 
-  implicit def waCodec[T: ClassTag: ArrayEnc: ArrayDec]: Codec[ArrayS[T]] =
+  implicit def waCodec[T: ArrayEnc: ArrayDec]: Codec[ArrayS[T]] =
     bimap[Array[T], ArrayS[T]](x => x: ArrayS[T], _.array.asInstanceOf[Array[T]])
-  implicit def paramCodec[T: ClassTag: ArrayEnc: ArrayDec]: Codec[Parameter[T]] = deriveCodec[Parameter[T]]
+  implicit def paramCodec[T: ArrayEnc: ArrayDec]: Codec[Parameter[T]] = deriveCodec[Parameter[T]]
 
   implicit lazy val paramEncExistential: Encoder[Parameter[_]] = { (w: Writer, value: Parameter[_]) =>
     val encoder: Encoder[Parameter[Any]] = value.keyType.paramEncoder.asInstanceOf[Encoder[Parameter[Any]]]
