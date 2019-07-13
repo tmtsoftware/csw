@@ -4,7 +4,7 @@ import enumeratum.{Enum, EnumEntry}
 import io.bullet.borer.{Codec, Decoder, Encoder}
 
 object CborHelpers {
-  def bimap[From: Encoder: Decoder, To](to: From ⇒ To, from: To ⇒ From): Codec[To] = Codec(
+  def bimap[From: Encoder: Decoder, To](to: From => To, from: To => From): Codec[To] = Codec(
     implicitly[Encoder[From]].contramap(from),
     implicitly[Decoder[From]].map(to)
   )

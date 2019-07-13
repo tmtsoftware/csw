@@ -57,22 +57,22 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
 
   //#validateCommand-handler
   override def validateCommand(controlCommand: ControlCommand): ValidateCommandResponse = controlCommand match {
-    case _: Setup   ⇒ Accepted(controlCommand.runId) // validation for setup goes here
-    case _: Observe ⇒ Accepted(controlCommand.runId) // validation for observe goes here
+    case _: Setup   => Accepted(controlCommand.runId) // validation for setup goes here
+    case _: Observe => Accepted(controlCommand.runId) // validation for observe goes here
   }
   //#validateCommand-handler
 
   //#onSubmit-handler
   override def onSubmit(controlCommand: ControlCommand): SubmitResponse = controlCommand match {
-    case setup: Setup     ⇒ submitSetup(setup)     // includes logic to handle Submit with Setup config command
-    case observe: Observe ⇒ submitObserve(observe) // includes logic to handle Submit with Observe config command
+    case setup: Setup     => submitSetup(setup)     // includes logic to handle Submit with Setup config command
+    case observe: Observe => submitObserve(observe) // includes logic to handle Submit with Observe config command
   }
   //#onSubmit-handler
 
   //#onOneway-handler
   override def onOneway(controlCommand: ControlCommand): Unit = controlCommand match {
-    case setup: Setup     ⇒ onewaySetup(setup)     // includes logic to handle Oneway with Setup config command
-    case observe: Observe ⇒ onewayObserve(observe) // includes logic to handle Oneway with Setup config command
+    case setup: Setup     => onewaySetup(setup)     // includes logic to handle Oneway with Setup config command
+    case observe: Observe => onewayObserve(observe) // includes logic to handle Oneway with Setup config command
   }
   //#onOneway-handler
 
@@ -96,26 +96,26 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
 
   //#onLocationTrackingEvent-handler
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = trackingEvent match {
-    case LocationUpdated(location)   ⇒ // do something for the tracked location when it is updated
-    case LocationRemoved(connection) ⇒ // do something for the tracked location when it is no longer available
+    case LocationUpdated(location)   => // do something for the tracked location when it is updated
+    case LocationRemoved(connection) => // do something for the tracked location when it is no longer available
   }
   //#onLocationTrackingEvent-handler
 
   private def processSetup(sc: Setup): Unit = {
     sc.commandName.toString match {
-      case "axisMove"   ⇒
-      case "axisDatum"  ⇒
-      case "axisHome"   ⇒
-      case "axisCancel" ⇒
-      case x            ⇒ log.error(s"Invalid command [$x] received.")
+      case "axisMove"   =>
+      case "axisDatum"  =>
+      case "axisHome"   =>
+      case "axisCancel" =>
+      case x            => log.error(s"Invalid command [$x] received.")
     }
   }
 
   private def processObserve(oc: Observe): Unit = {
     oc.commandName.toString match {
-      case "point"   ⇒
-      case "acquire" ⇒
-      case x         ⇒ log.error(s"Invalid command [$x] received.")
+      case "point"   =>
+      case "acquire" =>
+      case x         => log.error(s"Invalid command [$x] received.")
     }
   }
 
@@ -139,8 +139,8 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
   private def getHcdConfig: Future[ConfigData] = {
 
     configClientService.getActive(Paths.get("tromboneAssemblyContext.conf")).flatMap {
-      case Some(config) ⇒ Future.successful(config) // do work
-      case None         ⇒
+      case Some(config) => Future.successful(config) // do work
+      case None         =>
         // required configuration could not be found in the configuration service. Component can choose to stop until the configuration is made available in the
         // configuration service and started again
         throw ConfigNotAvailableException()

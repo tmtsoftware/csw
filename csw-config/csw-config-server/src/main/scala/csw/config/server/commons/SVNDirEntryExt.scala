@@ -19,14 +19,14 @@ object SVNDirEntryExt {
       entry.setRelativePath(entry.getRelativePath.stripSuffix(annexSuffix))
 
     def matches(maybePattern: Option[Pattern]): Boolean = maybePattern match {
-      case None          ⇒ true
-      case Some(pattern) ⇒ pattern.matcher(entry.getRelativePath).matches()
+      case None          => true
+      case Some(pattern) => pattern.matcher(entry.getRelativePath).matches()
     }
 
     def matchesFileType(maybeFileType: Option[FileType], annexSuffix: String): Boolean = maybeFileType match {
-      case None                  ⇒ true
-      case Some(FileType.Annex)  ⇒ isAnnex(annexSuffix)
-      case Some(FileType.Normal) ⇒ !isAnnex(annexSuffix)
+      case None                  => true
+      case Some(FileType.Annex)  => isAnnex(annexSuffix)
+      case Some(FileType.Normal) => !isAnnex(annexSuffix)
     }
 
     private def isAnnex(annexSuffix: String): Boolean = entry.getName.endsWith(annexSuffix)

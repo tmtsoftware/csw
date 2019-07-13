@@ -37,7 +37,5 @@ scalacOptions ++= Seq(
   "-deprecation",
   //"-Xfatal-warnings",
   "-Xlint:-unused,_",
-  "-Yno-adapted-args",
   "-Ywarn-dead-code",
-  "-Xfuture"
 )

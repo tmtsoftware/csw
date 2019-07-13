@@ -30,12 +30,12 @@ private[event] class KafkaEventService(eventServiceResolver: EventServiceResolve
   override def makeNewSubscriber(): KafkaSubscriber = new KafkaSubscriber(consumerSettings)
 
   // resolve event service every time before creating a new publisher
-  private def producerSettings: Future[ProducerSettings[String, Array[Byte]]] = eventServiceResolver.uri().map { uri ⇒
+  private def producerSettings: Future[ProducerSettings[String, Array[Byte]]] = eventServiceResolver.uri().map { uri =>
     ProducerSettings(actorSystem.toUntyped, None, None).withBootstrapServers(s"${uri.getHost}:${uri.getPort}")
   }
 
   // resolve event service every time before creating a new subscriber
-  private def consumerSettings: Future[ConsumerSettings[String, Array[Byte]]] = eventServiceResolver.uri().map { uri ⇒
+  private def consumerSettings: Future[ConsumerSettings[String, Array[Byte]]] = eventServiceResolver.uri().map { uri =>
     ConsumerSettings(actorSystem.toUntyped, None, None)
       .withBootstrapServers(s"${uri.getHost}:${uri.getPort}")
       .withGroupId(UUID.randomUUID().toString)

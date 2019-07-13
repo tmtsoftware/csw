@@ -84,10 +84,10 @@ private[framework] final class ContainerBehavior(
   override def onMessage(msg: ContainerActorMessage): Behavior[ContainerActorMessage] = {
     log.debug(s"Container in lifecycle state :[$lifecycleState] received message :[$msg]")
     (lifecycleState, msg) match {
-      case (_, msg: ContainerCommonMessage)                          ⇒ onCommon(msg)
-      case (ContainerLifecycleState.Idle, msg: ContainerIdleMessage) ⇒ onIdle(msg)
-      case (ContainerLifecycleState.Running, msg: Lifecycle)         ⇒ supervisors.foreach(_.component.supervisor ! msg)
-      case (_, message) ⇒
+      case (_, msg: ContainerCommonMessage)                          => onCommon(msg)
+      case (ContainerLifecycleState.Idle, msg: ContainerIdleMessage) => onIdle(msg)
+      case (ContainerLifecycleState.Running, msg: Lifecycle)         => supervisors.foreach(_.component.supervisor ! msg)
+      case (_, message) =>
         log.error(s"Unexpected message :[$message] received by container in lifecycle state :[$lifecycleState]")
     }
     this
@@ -99,7 +99,7 @@ private[framework] final class ContainerBehavior(
    * @return the existing behavior
    */
   override def onSignal: PartialFunction[Signal, Behavior[ContainerActorMessage]] = {
-    case Terminated(supervisor) ⇒
+    case Terminated(supervisor) =>
       log.warn(
         s"Container in lifecycle state :[$lifecycleState] received terminated signal from supervisor :[$supervisor]"
       )
@@ -109,7 +109,7 @@ private[framework] final class ContainerBehavior(
         coordinatedShutdown(AllActorsWithinContainerTerminatedReason)
       }
       this
-    case PostStop ⇒
+    case PostStop =>
       log.warn(s"Un-registering container from location service")
       locationService.unregister(akkaConnection)
       this
@@ -121,16 +121,16 @@ private[framework] final class ContainerBehavior(
    * @param commonMessage message representing a message received in any lifecycle state
    */
   private def onCommon(commonMessage: ContainerCommonMessage): Unit = commonMessage match {
-    case GetComponents(replyTo) ⇒
+    case GetComponents(replyTo) =>
       replyTo ! Components(supervisors.map(_.component))
-    case GetContainerLifecycleState(replyTo) ⇒
+    case GetContainerLifecycleState(replyTo) =>
       replyTo ! lifecycleState
-    case Restart ⇒
+    case Restart =>
       log.debug(s"Container is changing lifecycle state from [$lifecycleState] to [${ContainerLifecycleState.Idle}]")
       lifecycleState = ContainerLifecycleState.Idle
       runningComponents = Set.empty
       supervisors.foreach(_.component.supervisor ! Restart)
-    case Shutdown ⇒
+    case Shutdown =>
       log.debug(s"Container is changing lifecycle state from [$lifecycleState] to [${ContainerLifecycleState.Idle}]")
       lifecycleState = ContainerLifecycleState.Idle
       supervisors.foreach(_.component.supervisor ! Shutdown)
@@ -142,17 +142,17 @@ private[framework] final class ContainerBehavior(
    * @param idleMessage message representing a message received in [[csw.command.client.models.framework.ContainerLifecycleState.Idle]] state
    */
   private def onIdle(idleMessage: ContainerIdleMessage): Unit = idleMessage match {
-    case SupervisorsCreated(supervisorInfos) ⇒
+    case SupervisorsCreated(supervisorInfos) =>
       if (supervisorInfos.isEmpty) {
         log.error(s"Failed to spawn supervisors for ComponentInfo's :[${containerInfo.components.mkString(", ")}]")
         coordinatedShutdown(FailedToCreateSupervisorsReason)
       } else {
         supervisors = supervisorInfos
         log.info(s"Container created following supervisors :[${supervisors.map(_.component.supervisor).mkString(",")}]")
-        supervisors.foreach(supervisorInfo ⇒ ctx.watch(supervisorInfo.component.supervisor))
+        supervisors.foreach(supervisorInfo => ctx.watch(supervisorInfo.component.supervisor))
         updateContainerStateToRunning()
       }
-    case SupervisorLifecycleStateChanged(supervisor, supervisorLifecycleState) ⇒
+    case SupervisorLifecycleStateChanged(supervisor, supervisorLifecycleState) =>
       if (supervisorLifecycleState == SupervisorLifecycleState.Running) {
         runningComponents = runningComponents + supervisor
         updateContainerStateToRunning()
@@ -167,10 +167,10 @@ private[framework] final class ContainerBehavior(
   private def createComponents(componentInfos: Set[ComponentInfo]): Unit = {
     log.info(s"Container is creating following components :[${componentInfos.map(_.name).mkString(", ")}]")
     Future
-      .traverse(componentInfos) { ci ⇒
+      .traverse(componentInfos) { ci =>
         supervisorInfoFactory.make(ctx.self, ci, locationService, eventServiceFactory, alarmServiceFactory, registrationFactory)
       }
-      .foreach(x ⇒ {
+      .foreach(x => {
         ctx.self ! SupervisorsCreated(x.flatten)
       })
   }
@@ -190,8 +190,8 @@ private[framework] final class ContainerBehavior(
       s"Container with connection :[${akkaRegistration.connection.name}] is registering with location service with ref :[${akkaRegistration.actorRefURI}]"
     )
     locationService.register(akkaRegistration).onComplete {
-      case Success(_)         ⇒ log.info(s"Container Registration successful with connection: [$akkaConnection]")
-      case Failure(throwable) ⇒ log.error(throwable.getMessage, ex = throwable)
+      case Success(_)         => log.info(s"Container Registration successful with connection: [$akkaConnection]")
+      case Failure(throwable) => log.error(throwable.getMessage, ex = throwable)
     }
   }
 

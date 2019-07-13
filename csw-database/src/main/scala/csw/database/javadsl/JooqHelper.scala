@@ -18,7 +18,7 @@ object JooqHelper {
    *         indicates that the command was processed successfully and is an update count giving the number of rows in the
    *         database that were affected by the command's execution.
    */
-  def executeBatch(queries: Queries): CompletableFuture[Array[Int]] = AsyncHelper.managedBlock(() ⇒ queries.executeBatch())
+  def executeBatch(queries: Queries): CompletableFuture[Array[Int]] = AsyncHelper.managedBlock(() => queries.executeBatch())
 
   /**
    * Fetches the result in a CompletableFuture. It is a wrapper on Jooq's ResultQuery#fetchAsync().
@@ -29,5 +29,5 @@ object JooqHelper {
    * @return a CompletableFuture that completes with a list of data `'R'`
    */
   def fetchAsync[R](query: ResultQuery[Record], klass: Class[R]): CompletableFuture[java.util.List[R]] =
-    query.fetchAsync().toCompletableFuture.thenApply(x ⇒ x.into(klass))
+    query.fetchAsync().toCompletableFuture.thenApply(x => x.into(klass))
 }

@@ -104,7 +104,7 @@ private[event] class RedisSubscriber(redisURI: Future[RedisURI], redisClient: Re
     eventStream(keyPattern, redisStream)
   }
 
-  override def pSubscribeCallback(subsystem: Subsystem, pattern: String, callback: Event ⇒ Unit): EventSubscription =
+  override def pSubscribeCallback(subsystem: Subsystem, pattern: String, callback: Event => Unit): EventSubscription =
     eventSubscriberUtil.pSubscribe(pSubscribe(subsystem, pattern), callback)
 
   override def get(eventKeys: Set[EventKey]): Future[Set[Event]] = Future.sequence(eventKeys.map(get))

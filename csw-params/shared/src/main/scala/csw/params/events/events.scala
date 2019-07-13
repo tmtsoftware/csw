@@ -9,7 +9,7 @@ import csw.time.core.models.UTCTime
 /**
  * Common trait representing events in TMT like [[csw.params.events.SystemEvent]] and [[csw.params.events.ObserveEvent]]
  */
-sealed trait Event { self: ParameterSetType[_] ⇒
+sealed trait Event { self: ParameterSetType[_] =>
 
   /**
    * A helper to give access of public members of ParameterSetType

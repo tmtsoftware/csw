@@ -7,11 +7,11 @@ trait DiagnosticPublisherMessages
 
 object DiagnosticsPublisher {
   def behavior(runningIn: CommandService, worker: ActorRef[WorkerActorMsg]): Behavior[DiagnosticPublisherMessages] =
-    Behaviors.setup { ctx ⇒
+    Behaviors.setup { ctx =>
       // setup required for actor
 
       Behaviors.receiveMessage {
-        case _ ⇒ // Handle messages and return new behavior
+        case _ => // Handle messages and return new behavior
           Behaviors.same
       }
     }

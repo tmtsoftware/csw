@@ -64,7 +64,7 @@ class BasePerfSuite(config: MultiNodeConfig)
   override def afterAll(): Unit = {
     reporterExecutor.shutdown()
     if (testConfigs.systemMonitoring) {
-      topProcess.foreach { top ⇒
+      topProcess.foreach { top =>
         top.destroyForcibly().waitFor()
         plotCpuUsageGraph()
         plotMemoryUsageGraph()
@@ -90,7 +90,7 @@ class BasePerfSuite(config: MultiNodeConfig)
     var aggregatedLatencyPerNode       = 0L
 
     subscribers.foreach {
-      case (doneF, subscriber) ⇒
+      case (doneF, subscriber) =>
         Await.result(doneF, Duration.Inf)
         if (!subscriber.isPatternSubscriber) {
           outOfOrderCountPerNode += subscriber.outOfOrderCount

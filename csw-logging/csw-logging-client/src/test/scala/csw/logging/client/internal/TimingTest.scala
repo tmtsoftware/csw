@@ -28,8 +28,8 @@ class TimingTest extends LoggingTestSuite with Timing {
   private val irisActorRef = actorSystem.spawn(IRIS.behavior(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
 
   private val fileTimestamp   = FileAppender.decideTimestampForFile(ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC)))
-  private val timeLogFilePath = logFileDir + s"/${loggingSystemName}_${fileTimestamp}_time.log"
-  private val testLogFilePath = logFileDir + s"/${loggingSystemName}_$fileTimestamp.log"
+  private val timeLogFilePath = s"$logFileDir/${loggingSystemName}_${fileTimestamp}_time.log"
+  private val testLogFilePath = s"$logFileDir/${loggingSystemName}_$fileTimestamp.log"
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
@@ -82,8 +82,8 @@ class TimingTest extends LoggingTestSuite with Timing {
     val fileLogBuffer = FileUtils.read(testLogFilePath)
 
     // validating timer logger
-    timeLogBuffer.toList.foreach { log ⇒
-      val itemsMap = log("items").as[List[String]].map(x ⇒ Json.parse(x).as[JsObject]).head
+    timeLogBuffer.toList.foreach { log =>
+      val itemsMap = log("items").as[List[String]].map(x => Json.parse(x).as[JsObject]).head
 
       itemsMap.getString("name") shouldBe timerRegionQueue.dequeue
       itemsMap.contains("time0") shouldBe true
@@ -98,7 +98,7 @@ class TimingTest extends LoggingTestSuite with Timing {
     testLogBuffer(logBuffer)
 
     def testLogBuffer(logBuffer: mutable.Buffer[JsObject]): Unit = {
-      logBuffer.foreach { log ⇒
+      logBuffer.foreach { log =>
         val currentLogLevel = log.getString(LoggingKeys.SEVERITY).toLowerCase
         log.getString(LoggingKeys.MESSAGE) shouldBe IRIS.irisLogs(currentLogLevel)
 

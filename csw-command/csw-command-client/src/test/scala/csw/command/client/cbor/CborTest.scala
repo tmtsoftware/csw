@@ -22,7 +22,7 @@ class CborTest extends FunSuite with Matchers {
       RegisterAndTrackServices
     )
 
-    forAll(testData) { locationServiceUsage ⇒
+    forAll(testData) { locationServiceUsage =>
       val bytes = Cbor.encode[LocationServiceUsage](locationServiceUsage).toByteArray
       Cbor.decode(bytes).to[LocationServiceUsage].value shouldEqual locationServiceUsage
     }

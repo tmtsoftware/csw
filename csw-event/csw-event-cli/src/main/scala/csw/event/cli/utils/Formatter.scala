@@ -20,7 +20,7 @@ case class OnelineFormatter(options: Options) {
 
   private def formatOnelineOutput(lines: List[Oneline]) =
     lines
-      .map { line ⇒
+      .map { line =>
         if (options.printValues && options.printUnits) line.withValuesAndUnits()
         else if (options.printValues) line.withValues()
         else line.withKeyTypeAndUnits()
@@ -45,8 +45,8 @@ case class Oneline(path: String, param: Parameter[_]) {
 
   private def values = {
     val paramValues = param.keyType match {
-      case StringKey ⇒ param.values.map(v ⇒ s""""$v"""") // wrap string values in double quotes
-      case _         ⇒ param.values
+      case StringKey => param.values.map(v => s""""$v"""") // wrap string values in double quotes
+      case _         => param.values
     }
 
     paramValues.mkString(", ")

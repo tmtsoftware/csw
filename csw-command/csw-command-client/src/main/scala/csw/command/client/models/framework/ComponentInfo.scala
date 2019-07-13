@@ -3,7 +3,7 @@ import csw.location.model.scaladsl.{ComponentType, Connection}
 import csw.params.core.models.Prefix
 import play.api.libs.json._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 
 /**
@@ -42,7 +42,7 @@ case object ComponentInfo {
   // specifies how to serialize and de-serialize any FiniteDuration which is initializeTimeout in this case
   private[csw] implicit val finiteDurationReads: Reads[FiniteDuration] = Reads[FiniteDuration](parseDuration)
   private[csw] implicit val finiteDurationWrites: Writes[FiniteDuration] =
-    Writes[FiniteDuration](d ⇒ Json.toJson(d.toString))
+    Writes[FiniteDuration](d => Json.toJson(d.toString))
 
   private[csw] implicit val componentInfoFormat: OFormat[ComponentInfo] = Json.using[Json.WithDefaultValues].format[ComponentInfo]
 

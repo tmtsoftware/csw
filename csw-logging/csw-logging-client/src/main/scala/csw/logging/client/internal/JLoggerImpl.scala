@@ -8,7 +8,7 @@ import csw.logging.api.models.{noId, AnyId}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.macros.SourceFactory
 
-import scala.collection.JavaConverters.mapAsScalaMapConverter
+import scala.jdk.CollectionConverters._
 
 private[logging] class JLoggerImpl(log: Logger, cls: Class[_]) extends ILogger {
 

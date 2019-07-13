@@ -28,11 +28,11 @@ class SchedulerExamples(ctx: ActorContext[UTCTime]) {
 
   // #schedule-once-with-actorRef
   object SchedulingHandler {
-    def behavior: Behavior[UTCTime] = Behaviors.setup { ctx ⇒
+    def behavior: Behavior[UTCTime] = Behaviors.setup { ctx =>
       //setup required for the actor
 
       Behaviors.receiveMessage {
-        case _ ⇒ // handle the message to execute the task on scheduled time and return new behavior
+        case _ => // handle the message to execute the task on scheduled time and return new behavior
           Behaviors.same
       }
     }

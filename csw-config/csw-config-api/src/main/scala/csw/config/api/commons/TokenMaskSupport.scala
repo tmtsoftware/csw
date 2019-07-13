@@ -8,19 +8,19 @@ trait TokenMaskSupport {
   private val maskedToken      = "**********"
   private val maskedAuthHeader = Authorization(OAuth2BearerToken(maskedToken))
 
-  val maskRequest: HttpRequest ⇒ HttpRequest = req ⇒
+  val maskRequest: HttpRequest => HttpRequest = req =>
     req.header[Authorization] match {
-      case Some(_) ⇒ req.removeHeader(Authorization.name).addHeader(maskedAuthHeader)
-      case None    ⇒ req
+      case Some(_) => req.removeHeader(Authorization.name).addHeader(maskedAuthHeader)
+      case None    => req
     }
 
-  val logRequest: HttpRequest ⇒ Unit = req ⇒
+  val logRequest: HttpRequest => Unit = req =>
     logger.info(
       "HTTP request received",
       Map(
-        "url"     → req.uri.toString(),
-        "method"  → req.method.value.toString,
-        "headers" → req.headers.mkString(",")
+        "url"     -> req.uri.toString(),
+        "method"  -> req.method.value.toString,
+        "headers" -> req.headers.mkString(",")
       )
     )
 }

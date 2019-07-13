@@ -10,7 +10,7 @@ import play.api.libs.json._
  * @param connectionType represents a type of connection offered by the Component
  */
 sealed abstract class Connection(val connectionType: ConnectionType) extends LocationSerializable {
-  self: TypedConnection[_] ⇒
+  self: TypedConnection[_] =>
 
   /**
    * A covariant Location type
@@ -60,9 +60,9 @@ object Connection {
    * @return a Connection model created from string
    */
   def from(input: String): Connection = input.split("-") match {
-    case Array(name, componentType, connectionType) ⇒
+    case Array(name, componentType, connectionType) =>
       from(ConnectionInfo(name, ComponentType.withName(componentType), ConnectionType.withName(connectionType)))
-    case _ ⇒ throw new IllegalArgumentException(s"Unable to parse '$input' to make Connection object")
+    case _ => throw new IllegalArgumentException(s"Unable to parse '$input' to make Connection object")
   }
 
   /**
@@ -77,13 +77,13 @@ object Connection {
   )
 
   private def from(componentId: ComponentId, connectionType: ConnectionType): Connection = connectionType match {
-    case AkkaType ⇒ AkkaConnection(componentId)
-    case TcpType  ⇒ TcpConnection(componentId)
-    case HttpType ⇒ HttpConnection(componentId)
+    case AkkaType => AkkaConnection(componentId)
+    case TcpType  => TcpConnection(componentId)
+    case HttpType => HttpConnection(componentId)
   }
 
   implicit val connectionReads: Reads[Connection]   = ConnectionInfo.connectionInfoFormat.map(Connection.from)
-  implicit val connectionWrites: Writes[Connection] = Writes[Connection](c ⇒ Json.toJson(c.connectionInfo))
+  implicit val connectionWrites: Writes[Connection] = Writes[Connection](c => Json.toJson(c.connectionInfo))
 
   /**
    * Represents a connection offered by remote Actors e.g. TromboneAssembly-assembly-akka or TromboneHcd-hcd-akka

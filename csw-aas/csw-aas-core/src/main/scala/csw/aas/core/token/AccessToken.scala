@@ -65,7 +65,7 @@ case class AccessToken(
    * @param resource resource name
    */
   def hasPermission(scope: String, resource: String = "Default Resource"): Boolean = {
-    val result = this.authorization.permissions.exists(p ⇒ p.rsname == resource && p.scopes.contains(scope))
+    val result = this.authorization.permissions.exists(p => p.rsname == resource && p.scopes.contains(scope))
     if (!result) debug(s"'$userOrClientName' doesn't have permission '$scope' for resource '$resource'")
     else debug(s"authorization granted for user '$userOrClientName' via permission '$scope' and resource '$resource'")
     result
@@ -102,9 +102,9 @@ case class AccessToken(
    * Returns username in case of a user token or client id in case of client token
    */
   def userOrClientName: String = (preferred_username, clientId) match {
-    case (Some(u), _)    ⇒ u
-    case (None, Some(c)) ⇒ c
-    case _               ⇒ UnknownUser
+    case (Some(u), _)    => u
+    case (None, Some(c)) => c
+    case _               => UnknownUser
   }
 }
 

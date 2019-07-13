@@ -37,22 +37,22 @@ class LocationAgent(names: List[String], command: Command, wiring: Wiring) {
       log.info(s"Executing specified command: ${command.commandText}")
       val process = Runtime.getRuntime.exec(command.commandText)
       // shutdown location agent on termination of external program started using provided command
-      process.onExit().toScala.onComplete(_ ⇒ shutdown(ProcessTerminated))
+      process.onExit().toScala.onComplete(_ => shutdown(ProcessTerminated))
 
       // delay the registration of component after executing the command
       Thread.sleep(command.delay)
 
       //Register all connections as Http or Tcp
       val results = command.httpPath match {
-        case Some(path) ⇒ Await.result(Future.traverse(names)(registerHttpName(_, path)), timeout)
-        case None       ⇒ Await.result(Future.traverse(names)(registerTcpName), timeout)
+        case Some(path) => Await.result(Future.traverse(names)(registerHttpName(_, path)), timeout)
+        case None       => Await.result(Future.traverse(names)(registerTcpName), timeout)
       }
 
       unregisterOnTermination(results)
 
       process
     } catch {
-      case NonFatal(ex) ⇒ shutdown(FailureReason(ex)); throw ex
+      case NonFatal(ex) => shutdown(FailureReason(ex)); throw ex
     }
 
   // ================= INTERNAL API =================
@@ -83,7 +83,7 @@ class LocationAgent(names: List[String], command: Command, wiring: Wiring) {
   }
 
   private def unregisterServices(results: Seq[RegistrationResult]): Future[Done] = {
-    log.info("Shutdown hook reached, un-registering connections", Map("services" → results.map(_.location.connection.name)))
+    log.info("Shutdown hook reached, un-registering connections", Map("services" -> results.map(_.location.connection.name)))
     Future.traverse(results)(_.unregister()).map { _ =>
       log.info("Services are unregistered")
       Done

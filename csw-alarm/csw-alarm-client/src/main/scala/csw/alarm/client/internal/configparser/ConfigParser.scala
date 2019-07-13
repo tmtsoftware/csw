@@ -16,8 +16,8 @@ private[client] object ConfigParser extends AlarmJsonSupport {
 
   private def parse[T: Format](config: Config): T =
     ConfigValidator.validate(config, ALARMS_SCHEMA) match {
-      case Success          ⇒ configToJsValue(config).as[T]
-      case Failure(reasons) ⇒ throw ConfigParseException(reasons)
+      case Success          => configToJsValue(config).as[T]
+      case Failure(reasons) => throw ConfigParseException(reasons)
     }
 
   private def configToJsValue(config: Config): JsValue = Json.parse(config.root().render(ConfigRenderOptions.concise()))

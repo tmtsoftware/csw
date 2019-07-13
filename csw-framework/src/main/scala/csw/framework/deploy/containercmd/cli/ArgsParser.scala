@@ -21,7 +21,7 @@ private[containercmd] class ArgsParser(name: String) {
       c.copy(local = true)
     } text "Optional: if provided then run using the file on local file system else fetch it from config service"
 
-    arg[String]("<file>") required () action { (x, c) =>
+    arg[String]("<file>").required() action { (x, c) =>
       c.copy(inputFilePath = Some(Paths.get(x)))
     } text "specifies config file path which gets fetched from config service or local file system based on other options"
 

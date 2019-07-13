@@ -43,24 +43,24 @@ private[event] class KafkaPublisher(producerSettings: Future[ProducerSettings[St
   private def publishInternal(event: Event): Future[Done] = {
     val p = Promise[Done]
     kafkaProducer.map(_.send(eventToProducerRecord(event), completePromise(event, p))).recover {
-      case NonFatal(ex) ⇒ p.failure(PublishFailure(event, ex))
-    }
+      case NonFatal(ex) => p.failure(PublishFailure(event, ex))
+    }: Any
     p.future
   }
 
   override def publish[Mat](source: Source[Event, Mat]): Mat =
     eventPublisherUtil.publishFromSource(source, parallelism, publishInternal, None)
 
-  override def publish[Mat](source: Source[Event, Mat], onError: PublishFailure ⇒ Unit): Mat =
+  override def publish[Mat](source: Source[Event, Mat], onError: PublishFailure => Unit): Mat =
     eventPublisherUtil.publishFromSource(source, parallelism, publishInternal, Some(onError))
 
-  override def publish(eventGenerator: ⇒ Option[Event], every: FiniteDuration): Cancellable =
+  override def publish(eventGenerator: => Option[Event], every: FiniteDuration): Cancellable =
     publish(eventPublisherUtil.eventSource(Future.successful(eventGenerator), parallelism, defaultInitialDelay, every))
 
   override def publish(eventGenerator: => Option[Event], startTime: TMTTime, every: FiniteDuration): Cancellable =
     publish(eventPublisherUtil.eventSource(Future.successful(eventGenerator), parallelism, startTime.durationFromNow, every))
 
-  override def publish(eventGenerator: ⇒ Option[Event], every: FiniteDuration, onError: PublishFailure ⇒ Unit): Cancellable =
+  override def publish(eventGenerator: => Option[Event], every: FiniteDuration, onError: PublishFailure => Unit): Cancellable =
     publish(eventPublisherUtil.eventSource(Future.successful(eventGenerator), parallelism, defaultInitialDelay, every), onError)
 
   override def publish(
@@ -106,7 +106,7 @@ private[event] class KafkaPublisher(producerSettings: Future[ProducerSettings[St
 
   // callback to be complete the future operation for publishing when the record has been acknowledged by the server
   private def completePromise(event: Event, promisedDone: Promise[Done]): Callback = {
-    case (_, null)          ⇒ promisedDone.success(Done)
-    case (_, ex: Exception) ⇒ promisedDone.failure(PublishFailure(event, ex))
+    case (_, null)          => promisedDone.success(Done)
+    case (_, ex: Exception) => promisedDone.failure(PublishFailure(event, ex))
   }
 }

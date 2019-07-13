@@ -16,7 +16,7 @@ private[time] class TimeServiceSchedulerImpl(implicit actorSystem: typed.ActorSy
   private val scheduler: Scheduler = actorSystem.scheduler
 
   // ========== scheduleOnce ==========
-  override def scheduleOnce(startTime: TMTTime)(task: ⇒ Unit): Cancellable =
+  override def scheduleOnce(startTime: TMTTime)(task: => Unit): Cancellable =
     scheduler.scheduleOnce(startTime.durationFromNow)(task).toTsCancellable
 
   override def scheduleOnce(startTime: TMTTime, task: Runnable): Cancellable =
@@ -29,7 +29,7 @@ private[time] class TimeServiceSchedulerImpl(implicit actorSystem: typed.ActorSy
   override def schedulePeriodically(interval: Duration, task: Runnable): Cancellable =
     scheduler.schedule(0.millis, FiniteDuration(interval.toNanos, NANOSECONDS), task).toTsCancellable
 
-  override def schedulePeriodically(interval: Duration)(task: ⇒ Unit): Cancellable =
+  override def schedulePeriodically(interval: Duration)(task: => Unit): Cancellable =
     scheduler.schedule(0.millis, FiniteDuration(interval.toNanos, NANOSECONDS))(task).toTsCancellable
 
   override def schedulePeriodically(interval: Duration, receiver: ActorRef, message: Any): Cancellable =
@@ -39,7 +39,7 @@ private[time] class TimeServiceSchedulerImpl(implicit actorSystem: typed.ActorSy
   override def schedulePeriodically(startTime: TMTTime, interval: Duration, task: Runnable): Cancellable =
     scheduler.schedule(startTime.durationFromNow, FiniteDuration(interval.toNanos, NANOSECONDS), task).toTsCancellable
 
-  override def schedulePeriodically(startTime: TMTTime, interval: Duration)(task: ⇒ Unit): Cancellable =
+  override def schedulePeriodically(startTime: TMTTime, interval: Duration)(task: => Unit): Cancellable =
     scheduler.schedule(startTime.durationFromNow, FiniteDuration(interval.toNanos, NANOSECONDS))(task).toTsCancellable
 
   override def schedulePeriodically(startTime: TMTTime, interval: Duration, receiver: ActorRef, message: Any): Cancellable =

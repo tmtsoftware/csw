@@ -31,7 +31,7 @@ class ResultAggregator(
   def startSubscription(): EventSubscription = subscriber.subscribeCallback(Set(EventUtils.perfEventKey), onEvent)
 
   private def onEvent(event: Event): Unit = event match {
-    case event: SystemEvent if newEvent ⇒
+    case event: SystemEvent if newEvent =>
       receivedPerfEventCount += 1
       val histogramBuffer = ByteString(event.get(histogramKey).get.values).asByteBuffer
       histogram.add(Histogram.decodeFromByteBuffer(histogramBuffer, SECONDS.toNanos(10)))
@@ -49,7 +49,7 @@ class ResultAggregator(
         val (latencyPlots, throughputPlots, initialLatencyPlots) = aggregateResult()
         actorRef ! AggregatedResult(latencyPlots, throughputPlots, initialLatencyPlots)
       }
-    case _ ⇒ newEvent = true
+    case _ => newEvent = true
   }
 
   private def aggregateResult(): (LatencyPlots, ThroughputPlots, InitialLatencyPlots) = {

@@ -13,7 +13,7 @@ import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 
-import scala.collection.JavaConverters.{iterableAsScalaIterableConverter, seqAsJavaListConverter}
+import scala.jdk.CollectionConverters._
 import scala.compat.java8.FunctionConverters.enrichAsScalaFromConsumer
 import scala.compat.java8.FutureConverters.FutureOps
 

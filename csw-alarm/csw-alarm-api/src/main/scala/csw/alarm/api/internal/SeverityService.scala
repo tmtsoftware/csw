@@ -40,7 +40,7 @@ private[alarm] trait SeverityService extends AlarmService {
    *         can also throw [[csw.alarm.api.exceptions.KeyNotFoundException]] or
    *         [[csw.alarm.api.exceptions.InactiveAlarmException]]
    */
-  def subscribeAggregatedSeverityCallback(key: Key, callback: FullAlarmSeverity ⇒ Unit): AlarmSubscription
+  def subscribeAggregatedSeverityCallback(key: Key, callback: FullAlarmSeverity => Unit): AlarmSubscription
 
   /**
    * Calculates the aggregated severity for the given alarm/component/subsystem/system and sends to the give actor each time the

@@ -27,7 +27,7 @@ private[location] object StreamExt {
         .map(Option.apply)
         .prepend(Source.single(None))
         .sliding(2)
-        .collect { case Seq(a, b @ Some(x)) if a != b ⇒ x }
+        .collect { case Seq(a, b @ Some(x)) if a != b => x }
   }
 
 }

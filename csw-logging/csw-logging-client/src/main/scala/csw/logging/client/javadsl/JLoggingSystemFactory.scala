@@ -6,7 +6,7 @@ import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.logging.client.appenders.LogAppenderBuilder
 import csw.logging.client.internal.LoggingSystem
 
-import scala.collection.JavaConverters.iterableAsScalaIterableConverter
+import scala.jdk.CollectionConverters._
 
 object JLoggingSystemFactory {
 

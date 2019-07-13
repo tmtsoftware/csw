@@ -9,7 +9,7 @@ import io.bullet.borer.derivation.MapBasedCodecs._
 object LoggingCodecs extends LoggingCodecs
 trait LoggingCodecs {
 
-  def bimap[From: Encoder: Decoder, To](to: From ⇒ To, from: To ⇒ From): Codec[To] = Codec(
+  def bimap[From: Encoder: Decoder, To](to: From => To, from: To => From): Codec[To] = Codec(
     implicitly[Encoder[From]].contramap(from),
     implicitly[Decoder[From]].map(to)
   )

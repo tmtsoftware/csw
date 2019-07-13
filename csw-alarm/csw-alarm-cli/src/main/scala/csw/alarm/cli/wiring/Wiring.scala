@@ -15,19 +15,19 @@ private[alarm] class Wiring {
   lazy val locationService: LocationService         = HttpLocationServiceFactory.makeLocalClient(typedSystem, mat)
   lazy val configClientService: ConfigClientService = ConfigClientFactory.clientApi(typedSystem, locationService)
   lazy val configUtils                              = new ConfigUtils(configClientService)(typedSystem, mat)
-  lazy val printLine: Any ⇒ Unit                    = println
+  lazy val printLine: Any => Unit                   = println
   lazy val commandLineRunner                        = new CommandLineRunner(actorRuntime, locationService, configUtils, printLine)
   lazy val cliApp                                   = new CliApp(commandLineRunner)
 }
 
 object Wiring {
 
-  private[alarm] def make(locationHost: String = "localhost", _printLine: Any ⇒ Unit = println): Wiring =
+  private[alarm] def make(locationHost: String = "localhost", _printLine: Any => Unit = println): Wiring =
     new Wiring {
       override lazy val locationService: LocationService =
         HttpLocationServiceFactory.make(locationHost)(typedSystem, actorRuntime.mat)
 
-      override lazy val printLine: Any ⇒ Unit = _printLine
+      override lazy val printLine: Any => Unit = _printLine
     }
 
 }

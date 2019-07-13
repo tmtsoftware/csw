@@ -64,7 +64,7 @@ object AlarmRefreshActorFactory {
       actorSystem: ActorSystem[SpawnProtocol]
   ): ActorRef[AutoRefreshSeverityMessage] =
     make(
-      (key: AlarmKey, severity: AlarmSeverity) ⇒ setSeverity(key, severity).toScala,
+      (key: AlarmKey, severity: AlarmSeverity) => setSeverity(key, severity).toScala,
       FiniteDuration(refreshInterval.toNanos, TimeUnit.NANOSECONDS)
     )(actorSystem)
 }

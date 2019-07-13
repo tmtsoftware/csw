@@ -20,13 +20,13 @@ private[csw] class Authentication(tokenFactory: TokenFactory)(implicit ec: Execu
    * This is used to create AuthenticationDirective (akka-http)
    */
   def authenticator: AsyncAuthenticator[AccessToken] = {
-    case Provided(token) ⇒
+    case Provided(token) =>
       tokenFactory.makeToken(token).map { eitherAT =>
         eitherAT.foreach(at => debug(s"authentication successful for ${at.userOrClientName}"))
         eitherAT.toOption
       }
 
-    case _ ⇒
+    case _ =>
       warn("authorization information is missing from request. authentication failed")
       Future.successful(None)
   }

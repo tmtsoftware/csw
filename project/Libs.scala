@@ -3,7 +3,7 @@ import sbt.Def.{setting => dep}
 import sbt._
 
 object Libs {
-  val ScalaVersion    = "2.12.8"
+  val ScalaVersion    = "2.13.0"
   val silencerVersion = "1.4.1"
 
   val `scalatest` = dep("org.scalatest" %%% "scalatest" % "3.0.8") //Apache License 2.0
@@ -16,13 +16,13 @@ object Libs {
   val `silencer-lib`       = "com.github.ghik" %% "silencer-lib" % silencerVersion % Compile
   val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.5.11"
   //MIT License
-  val `embedded-keycloak`            = "com.github.tmtsoftware"        % "embedded-keycloak"             % "0.1.2" //Apache 2.0
-  val `logback-classic`              = "ch.qos.logback"                % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
-  val `akka-management-cluster-http` = "com.lightbend.akka.management" %% "akka-management-cluster-http" % "1.0.1"
-  val `svnkit`                       = "org.tmatesoft.svnkit"          % "svnkit"                        % "1.10.1" //TMate Open Source License
-  val `commons-codec`                = "commons-codec"                 % "commons-codec"                 % "1.10" //Apache 2.0
-  val `scala-reflect`                = "org.scala-lang"                % "scala-reflect"                 % ScalaVersion //BSD-3
-  val `gson`                         = "com.google.code.gson"          % "gson"                          % "2.8.5" //Apache 2.0
+  val `embedded-keycloak`            = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak"            % "0.1.4" //Apache 2.0
+  val `logback-classic`              = "ch.qos.logback"                           % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
+  val `akka-management-cluster-http` = "com.lightbend.akka.management"            %% "akka-management-cluster-http" % "1.0.1"
+  val `svnkit`                       = "org.tmatesoft.svnkit"                     % "svnkit"                        % "1.10.1" //TMate Open Source License
+  val `commons-codec`                = "commons-codec"                            % "commons-codec"                 % "1.10" //Apache 2.0
+  val `scala-reflect`                = "org.scala-lang"                           % "scala-reflect"                 % ScalaVersion //BSD-3
+  val `gson`                         = "com.google.code.gson"                     % "gson"                          % "2.8.5" //Apache 2.0
 
   val `play-json` = dep("com.typesafe.play" %%% "play-json" % "2.7.4") //Apache 2.0
 
@@ -32,7 +32,7 @@ object Libs {
   val `reactor-core`        = "io.projectreactor"       % "reactor-core"         % "3.2.10.RELEASE"
   val `reactive-streams`    = "org.reactivestreams"     % "reactive-streams"     % "1.0.2"
   val `akka-stream-kafka`   = "com.typesafe.akka"       %% "akka-stream-kafka"   % "1.0.4"
-  val `embedded-kafka`      = "io.github.embeddedkafka" %% "embedded-kafka"      % "2.3.0"
+//  val `embedded-kafka`      = "io.github.embeddedkafka" %% "embedded-kafka"      % "2.3.0"
   val `embedded-redis`      = "com.github.kstyrc"       % "embedded-redis"       % "0.6"
   val `scala-compiler`      = "org.scala-lang"          % "scala-compiler"       % ScalaVersion
   val `HdrHistogram`        = "org.hdrhistogram"        % "HdrHistogram"         % "2.1.11"

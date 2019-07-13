@@ -15,7 +15,7 @@ import scala.concurrent.duration.DurationDouble
 
 class ConcurrencyInCallbacksExample(publisher: EventPublisher)(implicit actorSystem: ActorSystem[_]) {
 
-  def behavior(): Behavior[TemperatureMessage] = Behaviors.setup { ctx ⇒
+  def behavior(): Behavior[TemperatureMessage] = Behaviors.setup { ctx =>
     implicit val timeout: Timeout     = Timeout(5.seconds)
     implicit val scheduler: Scheduler = actorSystem.scheduler
     implicit val ec: ExecutionContext = actorSystem.executionContext
@@ -31,10 +31,10 @@ class ConcurrencyInCallbacksExample(publisher: EventPublisher)(implicit actorSys
 
     def makeEvent(temp: Temperature) = Some(SystemEvent(prefix, temperatureEventName).add(temperatureKey.set(temp.degrees)))
 
-    Behaviors.receiveMessage { msg ⇒
+    Behaviors.receiveMessage { msg =>
       msg match {
-        case GetTemperature(ref) ⇒ ref ! currentTemperature
-        case PublishTemperature  ⇒
+        case GetTemperature(ref) => ref ! currentTemperature
+        case PublishTemperature  =>
           // Publishes the current Temperature every 50.millis
 
           // This is an INCORRECT way because mutable state is being accessed inside a callback which is not thread-safe.
@@ -44,9 +44,9 @@ class ConcurrencyInCallbacksExample(publisher: EventPublisher)(implicit actorSys
           // The Async API of Publisher is called since the eventGenerator callback returns a Future[Event]
           cancellable = publisher.publishAsync((ctx.self ? GetTemperature).map(makeEvent), 50.millis)
 
-        case CancelPublishingTemperature ⇒ cancellable.cancel()
-        case TemperatureRise(rise)       ⇒ currentTemperature = Temperature(currentTemperature.degrees + rise)
-        case TemperatureDrop(drop)       ⇒ currentTemperature = Temperature(currentTemperature.degrees - drop)
+        case CancelPublishingTemperature => cancellable.cancel()
+        case TemperatureRise(rise)       => currentTemperature = Temperature(currentTemperature.degrees + rise)
+        case TemperatureDrop(drop)       => currentTemperature = Temperature(currentTemperature.degrees - drop)
       }
       Behaviors.same
     }

@@ -8,7 +8,7 @@ import enumeratum._
 import julienrf.json.derived
 import play.api.libs.json.{Format, Json, OFormat}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.immutable
 
 object Coords {

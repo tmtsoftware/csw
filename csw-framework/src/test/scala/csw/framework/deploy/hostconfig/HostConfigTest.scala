@@ -12,7 +12,7 @@ class HostConfigTest extends FunSuite with MockitoSugar with Matchers {
   private val containerCmdAppScript = "containerCmd.sh"
   private val mockedProcesses       = List(mock[Process], mock[Process])
 
-  mockedProcesses.foreach(p ⇒ when(p.pid()).thenReturn(1))
+  mockedProcesses.foreach(p => when(p.pid()).thenReturn(1))
 
   test("should parse host configuration file and invoke container cmd app with valid arguments") {
     var actualScripts: List[(String, List[String])] = Nil
@@ -52,7 +52,7 @@ class HostConfigTest extends FunSuite with MockitoSugar with Matchers {
 
     // verify that two processes gets created for two containers
     // and once application is finished, those processes are exited
-    mockedProcesses.foreach(p ⇒ verify(p, times(1)).pid())
+    mockedProcesses.foreach(p => verify(p, times(1)).pid())
     actualScripts shouldBe expectedScripts
   }
 }

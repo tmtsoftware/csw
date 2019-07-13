@@ -27,13 +27,13 @@ class SecurityDirectivesTest extends FunSuite with MockitoSugar with Directives 
     val validTokenWithPolicyMatch = mock[AccessToken]
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
-      case Provided(`validTokenWithPolicyMatchStr`) ⇒ Future.successful(Some(validTokenWithPolicyMatch))
-      case _                                        ⇒ Future.successful(None)
+      case Provided(`validTokenWithPolicyMatchStr`) => Future.successful(Some(validTokenWithPolicyMatch))
+      case _                                        => Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = sGet(CustomPolicy(_ ⇒ true)) { _ ⇒
+    val route: Route = sGet(CustomPolicy(_ => true)) { _ =>
       complete("OK")
     }
 
@@ -54,13 +54,13 @@ class SecurityDirectivesTest extends FunSuite with MockitoSugar with Directives 
       .thenReturn(true)
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
-      case Provided(`validTokenWithRealmRoleStr`) ⇒ Future.successful(Some(validTokenWithRealmRole))
-      case _                                      ⇒ Future.successful(None)
+      case Provided(`validTokenWithRealmRoleStr`) => Future.successful(Some(validTokenWithRealmRole))
+      case _                                      => Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = sPost(RealmRolePolicy("admin")) { _ ⇒
+    val route: Route = sPost(RealmRolePolicy("admin")) { _ =>
       complete("OK")
     }
 
@@ -83,13 +83,13 @@ class SecurityDirectivesTest extends FunSuite with MockitoSugar with Directives 
       .thenReturn(true)
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
-      case Provided(`validTokenWithPermissionStr`) ⇒ Future.successful(Some(validTokenWithPermission))
-      case _                                       ⇒ Future.successful(None)
+      case Provided(`validTokenWithPermissionStr`) => Future.successful(Some(validTokenWithPermission))
+      case _                                       => Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = sPut(PermissionPolicy("read")) { _ ⇒
+    val route: Route = sPut(PermissionPolicy("read")) { _ =>
       complete("OK")
     }
 
@@ -110,13 +110,13 @@ class SecurityDirectivesTest extends FunSuite with MockitoSugar with Directives 
       .thenReturn(true)
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
-      case Provided(`validTokenWithClientRoleStr`) ⇒ Future.successful(Some(validTokenWithClientRole))
-      case _                                       ⇒ Future.successful(None)
+      case Provided(`validTokenWithClientRoleStr`) => Future.successful(Some(validTokenWithClientRole))
+      case _                                       => Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = sDelete(ClientRolePolicy("admin")) { _ ⇒
+    val route: Route = sDelete(ClientRolePolicy("admin")) { _ =>
       complete("OK")
     }
 
@@ -137,13 +137,13 @@ class SecurityDirectivesTest extends FunSuite with MockitoSugar with Directives 
       .thenReturn(true)
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
-      case Provided(`validTokenWithClientRoleStr`) ⇒ Future.successful(Some(validTokenWithClientRole))
-      case _                                       ⇒ Future.successful(None)
+      case Provided(`validTokenWithClientRoleStr`) => Future.successful(Some(validTokenWithClientRole))
+      case _                                       => Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = sHead(ClientRolePolicy("admin")) { _ ⇒
+    val route: Route = sHead(ClientRolePolicy("admin")) { _ =>
       complete("OK")
     }
 
@@ -157,11 +157,11 @@ class SecurityDirectivesTest extends FunSuite with MockitoSugar with Directives 
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
     import securityDirectives._
 
-    val authenticator: AsyncAuthenticator[AccessToken] = _ ⇒ Future.successful(None)
+    val authenticator: AsyncAuthenticator[AccessToken] = _ => Future.successful(None)
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = sPatch(CustomPolicy(_ => false)) { _ ⇒
+    val route: Route = sPatch(CustomPolicy(_ => false)) { _ =>
       complete("OK")
     }
 

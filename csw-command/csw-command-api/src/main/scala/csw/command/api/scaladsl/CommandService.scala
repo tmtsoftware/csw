@@ -104,7 +104,7 @@ trait CommandService {
    * @param callback the action to be applied on the CurrentState element received as a result of subscription
    * @return a CurrentStateSubscription to stop the subscription
    */
-  def subscribeCurrentState(callback: CurrentState ⇒ Unit): CurrentStateSubscription
+  def subscribeCurrentState(callback: CurrentState => Unit): CurrentStateSubscription
 
   /**
    * Subscribe to the current state of a component corresponding to the [[csw.location.model.scaladsl.AkkaLocation]] of the component
@@ -114,5 +114,5 @@ trait CommandService {
    * @param callback the action to be applied on the CurrentState element received as a result of subscription
    * @return a CurrentStateSubscription to stop the subscription
    */
-  def subscribeCurrentState(names: Set[StateName], callback: CurrentState ⇒ Unit): CurrentStateSubscription
+  def subscribeCurrentState(names: Set[StateName], callback: CurrentState => Unit): CurrentStateSubscription
 }

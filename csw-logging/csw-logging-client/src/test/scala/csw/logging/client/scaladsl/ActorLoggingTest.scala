@@ -35,7 +35,7 @@ class ActorLoggingTest extends LoggingTestSuite {
     // default log level for IrisSupervisorActor is ERROR in config
     var logMsgLineNumber = IRIS.ERROR_LINE_NO
 
-    logBuffer.foreach { log ⇒
+    logBuffer.foreach { log =>
       log.getString(LoggingKeys.COMPONENT_NAME) shouldBe IRIS.COMPONENT_NAME
       log.getString(LoggingKeys.ACTOR) shouldBe irisActorRef.path.toString
       log.getString(LoggingKeys.FILE) shouldBe IRIS.FILE_NAME
@@ -52,7 +52,7 @@ class ActorLoggingTest extends LoggingTestSuite {
     irisActorRef ! LogErrorWithMap("Unknown")
     Thread.sleep(300)
 
-    val errorLevelLogMessages = logBuffer.groupBy(json ⇒ json.getString(LoggingKeys.SEVERITY))("ERROR")
+    val errorLevelLogMessages = logBuffer.groupBy(json => json.getString(LoggingKeys.SEVERITY))("ERROR")
     errorLevelLogMessages.size shouldEqual 1
 
     val expectedMessage  = "Logging error with map"
@@ -69,14 +69,14 @@ class ActorLoggingTest extends LoggingTestSuite {
     sendMessagesToActor()
     //  IrisSupervisorActor is logging 7 messages
     //  As per the filter, hcd should log 3 message of level ERROR and FATAL
-    val groupByComponentNamesLog = logBuffer.groupBy(json ⇒ json.getString(LoggingKeys.COMPONENT_NAME))
+    val groupByComponentNamesLog = logBuffer.groupBy(json => json.getString(LoggingKeys.COMPONENT_NAME))
     val irisLogs                 = groupByComponentNamesLog(IRIS.COMPONENT_NAME)
 
     irisLogs.size shouldBe 3
 
     // check that log level should be greater than or equal to debug and
     // assert on actual log message
-    irisLogs.toList.foreach { log ⇒
+    irisLogs.toList.foreach { log =>
       log.contains(LoggingKeys.ACTOR) shouldBe true
       val currentLogLevel = log.getString(LoggingKeys.SEVERITY).toLowerCase
       Level(currentLogLevel) >= ERROR shouldBe true

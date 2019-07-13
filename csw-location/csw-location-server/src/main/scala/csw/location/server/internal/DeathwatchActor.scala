@@ -27,7 +27,7 @@ private[location] class DeathwatchActor(locationService: LocationService)(implic
    * @see [[akka.actor.Terminated]]
    */
   private[location] def behavior(watchedLocations: Set[Location]): Behavior[Msg] =
-    Behaviors.receive[Msg] { (context, changeMsg) ⇒
+    Behaviors.receive[Msg] { (context, changeMsg) =>
       val log: Logger = LocationServiceLogger.getLogger(context)
 
       val allLocations = changeMsg.get(AllServices.Key).entries.values.toSet
@@ -37,15 +37,15 @@ private[location] class DeathwatchActor(locationService: LocationService)(implic
 
       // Ignore HttpLocation or TcpLocation (Do not watch)
       unwatchedLocations.foreach {
-        case AkkaLocation(_, _, actorRefURI) ⇒
+        case AkkaLocation(_, _, actorRefURI) =>
           log.debug(s"Started watching actor: ${actorRefURI.toString}")
           context.watch(actorRefURI.toActorRef)
-        case _ ⇒ // ignore http and tcp location
+        case _ => // ignore http and tcp location
       }
       //all locations are now watched
       behavior(allLocations)
     } receiveSignal {
-      case (ctx, Terminated(deadActorRef)) ⇒
+      case (ctx, Terminated(deadActorRef)) =>
         val log: Logger = LocationServiceLogger.getLogger(ctx)
 
         log.warn(s"Un-watching terminated actor: ${deadActorRef.toString}")
@@ -53,15 +53,15 @@ private[location] class DeathwatchActor(locationService: LocationService)(implic
         ctx.unwatch(deadActorRef)
         //Unregister the dead location and remove it from the list of watched locations
         val maybeLocation = watchedLocations.find {
-          case AkkaLocation(_, _, actorRefUri) ⇒ deadActorRef == actorRefUri.toActorRef
-          case _                               ⇒ false
+          case AkkaLocation(_, _, actorRefUri) => deadActorRef == actorRefUri.toActorRef
+          case _                               => false
         }
         maybeLocation match {
           case Some(location) =>
             //if deadActorRef is mapped to a location, unregister it and remove it from watched locations
             locationService.unregister(location.connection)
             behavior(watchedLocations - location)
-          case None ⇒
+          case None =>
             //if deadActorRef does not match any location, don't change a thing!
             Behaviors.same
         }

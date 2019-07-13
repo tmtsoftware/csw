@@ -20,7 +20,7 @@ import scala.util.control.NonFatal
 object Main extends App {
   private val name = BuildInfo.name
 
-  new ArgsParser(name).parse(args).foreach {
+  new ArgsParser(name).parse(args.toList).foreach {
     case Options(maybeClusterPort) =>
       if (ClusterAwareSettings.seedNodes.isEmpty) {
         println(
@@ -39,11 +39,11 @@ object Main extends App {
           coordinatedShutdown.addTask(
             CoordinatedShutdown.PhaseServiceUnbind,
             "unbind-services"
-          ) { () ⇒
-            locationBindingF.flatMap(_.terminate(30.seconds)).map(_ ⇒ Done)
+          ) { () =>
+            locationBindingF.flatMap(_.terminate(30.seconds)).map(_ => Done)
           }
         } catch {
-          case NonFatal(ex) ⇒
+          case NonFatal(ex) =>
             println(s"[ERROR] Failed to start location server.")
             ex.printStackTrace()
             shutdown(FailureReason(ex))

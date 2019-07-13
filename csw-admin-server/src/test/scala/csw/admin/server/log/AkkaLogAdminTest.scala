@@ -32,7 +32,7 @@ import csw.params.commands.{CommandName, Setup}
 import csw.params.core.models.Prefix
 import io.lettuce.core.RedisClient
 
-import scala.collection.JavaConverters.mapAsScalaMapConverter
+import scala.jdk.CollectionConverters._
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
@@ -99,8 +99,8 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
     containerRef ! GetComponents(probe.ref)
     val components = probe.expectMessageType[Components].components
 
-    laserComponent = components.find(x ⇒ x.info.name.equals("Laser")).get
-    galilComponent = components.find(x ⇒ x.info.name.equals("Galil")).get
+    laserComponent = components.find(x => x.info.name.equals("Laser")).get
+    galilComponent = components.find(x => x.info.name.equals("Galil")).get
   }
 
   // DEOPSCSW-127: Runtime update for logging characteristics
@@ -153,13 +153,13 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
     Thread.sleep(500)
 
     // default logging level for Laser component is info
-    val groupByComponentNamesLog = logBuffer.groupBy { json ⇒
+    val groupByComponentNamesLog = logBuffer.groupBy { json =>
       if (json.contains("@componentName")) json.getString("@componentName")
     }
     val laserComponentLogs = groupByComponentNamesLog(laserComponent.info.name)
 
-    laserComponentLogs.exists(log ⇒ log.getString("@severity").toLowerCase.equalsIgnoreCase("info")) shouldBe true
-    laserComponentLogs.foreach { log ⇒
+    laserComponentLogs.exists(log => log.getString("@severity").toLowerCase.equalsIgnoreCase("info")) shouldBe true
+    laserComponentLogs.foreach { log =>
       val currentLogLevel = log.getString("@severity").toLowerCase
       Level(currentLogLevel) >= INFO shouldBe true
     }
@@ -189,20 +189,20 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
     galilComponent.supervisor ! Oneway(Setup(prefix, startLoggingCmd, None), probe.ref)
     Thread.sleep(100)
 
-    val groupByAfterFilter       = logBuffer.groupBy(json ⇒ json.getString("@componentName"))
+    val groupByAfterFilter       = logBuffer.groupBy(json => json.getString("@componentName"))
     val laserCompLogsAfterFilter = groupByAfterFilter(laserConnection.componentId.name)
     val galilCompLogsAfterFilter = groupByAfterFilter(galilConnection.componentId.name)
 
-    laserCompLogsAfterFilter.exists(log ⇒ log.getString("@severity").toLowerCase.equalsIgnoreCase("error")) shouldBe true
-    laserCompLogsAfterFilter.foreach { log ⇒
+    laserCompLogsAfterFilter.exists(log => log.getString("@severity").toLowerCase.equalsIgnoreCase("error")) shouldBe true
+    laserCompLogsAfterFilter.foreach { log =>
       val currentLogLevel = log.getString("@severity").toLowerCase
       Level(currentLogLevel) >= ERROR shouldBe true
     }
 
     // this makes sure that, changing log level of one component (laser component) from container does not affect other components (galil component) log level
-    galilCompLogsAfterFilter.exists(log ⇒ log.getString("@severity").toLowerCase.equalsIgnoreCase("info")) shouldBe true
+    galilCompLogsAfterFilter.exists(log => log.getString("@severity").toLowerCase.equalsIgnoreCase("info")) shouldBe true
 
-    galilCompLogsAfterFilter.foreach { log ⇒
+    galilCompLogsAfterFilter.foreach { log =>
       val currentLogLevel = log.getString("@severity").toLowerCase
       Level(currentLogLevel) >= INFO shouldBe true
     }

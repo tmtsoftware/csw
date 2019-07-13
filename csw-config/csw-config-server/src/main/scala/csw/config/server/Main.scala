@@ -22,7 +22,7 @@ object Main {
   def main(args: Array[String]): Unit = start(args, startLogging = true)
 
   def start(args: Array[String], startLogging: Boolean = false): Option[HttpService] =
-    new ArgsParser(name).parse(args).map {
+    new ArgsParser(name).parse(args.toList).map {
       case Options(init, maybePort) =>
         LocationServerStatus.requireUpLocally()
 
@@ -43,9 +43,9 @@ object Main {
           Await.result(httpService.registeredLazyBinding, 15.seconds) // then start the config server and register it with location service
           httpService
         } catch {
-          case ex: SVNException ⇒
+          case ex: SVNException =>
             shutdownAndLog(new RuntimeException(s"Could not open repository located at : ${settings.svnUrl}", ex))
-          case ex: AASResolutionFailed ⇒ shutdownAndLog(ex)
+          case ex: AASResolutionFailed => shutdownAndLog(ex)
         }
     }
 

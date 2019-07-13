@@ -30,47 +30,47 @@ trait HttpSupport extends TokenMaskSupport with Directives with JsonSupport {
 
   override val logger: Logger = ConfigServerLogger.getLogger
 
-  val routeLogger: Directive0 = DebuggingDirectives.logRequest(LoggingMagnet(_ ⇒ maskRequest andThen logRequest))
+  val routeLogger: Directive0 = DebuggingDirectives.logRequest(LoggingMagnet(_ => maskRequest andThen logRequest))
 
-  val idParam: Directive1[Option[ConfigId]]  = parameter('id.?).map(_.map(new ConfigId(_)))
-  val dateParam: Directive1[Option[Instant]] = parameter('date.?).map(_.map(Instant.parse))
-  val fromParam: Directive1[Instant]         = parameter('from.?).map(_.map(Instant.parse).getOrElse(Instant.MIN))
-  val toParam: Directive1[Instant]           = parameter('to.?).map(_.map(Instant.parse).getOrElse(Instant.now()))
-  val maxResultsParam: Directive1[Int]       = parameter('maxResults.as[Int] ? Int.MaxValue)
-  val commentParam: Directive1[String]       = parameter('comment ? "")
-  val annexParam: Directive1[Boolean]        = parameter('annex.as[Boolean] ? false)
+  val idParam: Directive1[Option[ConfigId]]  = parameter("id".?).map(_.map(new ConfigId(_)))
+  val dateParam: Directive1[Option[Instant]] = parameter("date".?).map(_.map(Instant.parse))
+  val fromParam: Directive1[Instant]         = parameter("from".?).map(_.map(Instant.parse).getOrElse(Instant.MIN))
+  val toParam: Directive1[Instant]           = parameter("to".?).map(_.map(Instant.parse).getOrElse(Instant.now()))
+  val maxResultsParam: Directive1[Int]       = parameter("maxResults".as[Int] ? Int.MaxValue)
+  val commentParam: Directive1[String]       = parameter("comment" ? "")
+  val annexParam: Directive1[Boolean]        = parameter("annex".as[Boolean] ? false)
 
   // pattern is an optional parameter coming with list request
   // for list request if the pattern is provided, then it is first compiled and then forwarded to business code to process the request
   // if the pattern provided throws `PatternSyntaxException` then immediate response of `BadRequest` is sent back to client
-  val patternParam: Directive1[Option[String]] = parameter('pattern.?).flatMap {
-    case p @ Some(pattern) ⇒
+  val patternParam: Directive1[Option[String]] = parameter("pattern".?).flatMap {
+    case p @ Some(pattern) =>
       try {
         Pattern.compile(pattern)
         provide(p)
       } catch {
-        case ex: PatternSyntaxException ⇒ reject(MalformedQueryParamRejection("pattern", ex.getMessage))
+        case ex: PatternSyntaxException => reject(MalformedQueryParamRejection("pattern", ex.getMessage))
       }
-    case None ⇒ provide(None)
+    case None => provide(None)
   }
 
   // type is an optional parameter coming with list request
   // for list request if the type is provided, then it is first casted to one of the available types ('Annex' and 'Normal')
   // and then forwarded to business code to process the request
   // if the type provided throws `PatternSyntaxException` then immediate response of `BadRequest` is sent back to client
-  val typeParam: Directive1[Option[FileType]] = parameter('type.?).flatMap {
-    case Some(fileType) ⇒
+  val typeParam: Directive1[Option[FileType]] = parameter("type".?).flatMap {
+    case Some(fileType) =>
       FileType.withNameInsensitiveOption(fileType) match {
-        case ft @ Some(_) ⇒ provide(ft)
-        case None         ⇒ reject(MalformedQueryParamRejection("type", s"Supported types: ${FileType.stringify}"))
+        case ft @ Some(_) => provide(ft)
+        case None         => reject(MalformedQueryParamRejection("type", s"Supported types: ${FileType.stringify}"))
       }
-    case None ⇒ provide(None)
+    case None => provide(None)
   }
 
   val configDataEntity: Directive1[ConfigData] = extractRequestEntity.flatMap {
-    case entity if entity.contentLengthOption.isDefined ⇒
+    case entity if entity.contentLengthOption.isDefined =>
       provide(ConfigData.from(entity.dataBytes, entity.contentLengthOption.get))
-    case _ ⇒
+    case _ =>
       reject(UnsupportedRequestEncodingRejection(HttpEncoding("All encodings with contentLength value")))
   }
 

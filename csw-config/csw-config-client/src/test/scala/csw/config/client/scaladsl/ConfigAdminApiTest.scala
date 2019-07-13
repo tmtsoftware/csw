@@ -148,7 +148,7 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
     // verify history without any parameter
     val configFileHistories = configService.history(file).await
     configFileHistories.size shouldBe 3
-    configFileHistories.map(h ⇒ (h.id, h.author, h.comment)).toSet shouldBe
+    configFileHistories.map(h => (h.id, h.author, h.comment)).toSet shouldBe
     Set((configId1, user1, commitMsg1), (configId2, user2, commitMsg2), (configId3, user3, commitMsg3))
   }
 
@@ -187,7 +187,7 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
     // verify complete history of active file without any parameters
     val completeHistory = configService.historyActive(file).await
     completeHistory.size shouldBe 3
-    completeHistory.map(h ⇒ (h.id, h.author, h.comment)).toSet shouldBe
+    completeHistory.map(h => (h.id, h.author, h.comment)).toSet shouldBe
     Set((configId1, user1, createActiveComment), (configId3, user4, setActiveComment), (configId4, user5, resetActiveComment1))
   }
 
@@ -214,7 +214,7 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
     val expectedResult = Set((configId1, user1, commitMsg1), (configId2, user2, commitMsg2))
 
     fileInfo.size shouldBe expectedResult.size
-    fileInfo.map(h ⇒ (h.id, h.author, h.comment)).toSet shouldBe expectedResult
+    fileInfo.map(h => (h.id, h.author, h.comment)).toSet shouldBe expectedResult
   }
 
 }

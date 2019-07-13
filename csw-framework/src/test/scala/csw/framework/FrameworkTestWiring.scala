@@ -25,7 +25,7 @@ class FrameworkTestWiring(val seedPort: Int = SocketUtils.getFreePort) extends E
       connection: TcpConnection,
       masterId: String
   ): (RegistrationResult, RedisSentinel, RedisServer) =
-    withSentinel(masterId = masterId) { (sentinelPort, _) ⇒
+    withSentinel(masterId = masterId) { (sentinelPort, _) =>
       seedLocationService
         .register(TcpRegistration(connection, sentinelPort))
         .await

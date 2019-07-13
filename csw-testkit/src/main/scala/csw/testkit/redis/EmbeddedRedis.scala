@@ -31,6 +31,6 @@ private[testkit] trait EmbeddedRedis {
     redisSentinel.stop()
   }
 
-  private def addJvmShutdownHook[T](hook: ⇒ T): Unit =
+  private def addJvmShutdownHook[T](hook: => T): Unit =
     Runtime.getRuntime.addShutdownHook(new Thread { override def run(): Unit = hook })
 }

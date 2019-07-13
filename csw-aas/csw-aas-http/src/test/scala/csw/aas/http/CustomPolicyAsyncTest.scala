@@ -24,14 +24,14 @@ class CustomPolicyAsyncTest extends FunSuite with MockitoSugar with Directives w
     val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
-      case Provided(`invalidTokenStr`) ⇒ Future.successful(None)
-      case _                           ⇒ Future.successful(None)
+      case Provided(`invalidTokenStr`) => Future.successful(None)
+      case _                           => Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
 
     val route: Route =
-      securityDirectives.authenticate { implicit at ⇒
+      securityDirectives.authenticate { implicit at =>
         get {
           securityDirectives.authorize(CustomPolicyAsync(token => Future.successful(token.given_name.contains("John"))), at) {
             complete("OK")
@@ -48,11 +48,11 @@ class CustomPolicyAsyncTest extends FunSuite with MockitoSugar with Directives w
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
 
-    val authenticator: AsyncAuthenticator[AccessToken] = _ ⇒ Future.successful(None)
+    val authenticator: AsyncAuthenticator[AccessToken] = _ => Future.successful(None)
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = securityDirectives.authenticate { implicit at ⇒
+    val route: Route = securityDirectives.authenticate { implicit at =>
       get {
         securityDirectives.authorize(CustomPolicyAsync(_ => Future.successful(false)), at) {
           complete("OK")
@@ -75,13 +75,13 @@ class CustomPolicyAsyncTest extends FunSuite with MockitoSugar with Directives w
     val validTokenWithPolicyViolation = mock[AccessToken]
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
-      case Provided(`validTokenWithPolicyViolationStr`) ⇒ Future.successful(Some(validTokenWithPolicyViolation))
-      case _                                            ⇒ Future.successful(None)
+      case Provided(`validTokenWithPolicyViolationStr`) => Future.successful(Some(validTokenWithPolicyViolation))
+      case _                                            => Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = securityDirectives.authenticate { implicit at ⇒
+    val route: Route = securityDirectives.authenticate { implicit at =>
       get {
         securityDirectives.authorize(CustomPolicyAsync(_ => Future.successful(false)), at) {
           complete("OK")
@@ -104,13 +104,13 @@ class CustomPolicyAsyncTest extends FunSuite with MockitoSugar with Directives w
     val validTokenWithPolicyMatch = mock[AccessToken]
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
-      case Provided(`validTokenWithPolicyMatchStr`) ⇒ Future.successful(Some(validTokenWithPolicyMatch))
-      case _                                        ⇒ Future.successful(None)
+      case Provided(`validTokenWithPolicyMatchStr`) => Future.successful(Some(validTokenWithPolicyMatch))
+      case _                                        => Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = securityDirectives.authenticate { implicit at ⇒
+    val route: Route = securityDirectives.authenticate { implicit at =>
       get {
         securityDirectives.authorize(CustomPolicyAsync(_ => Future.successful(true)), at) {
           complete("OK")
@@ -133,13 +133,13 @@ class CustomPolicyAsyncTest extends FunSuite with MockitoSugar with Directives w
     val validTokenWithPolicyMatch = mock[AccessToken]
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
-      case Provided(`validTokenWithPolicyMatchStr`) ⇒ Future.successful(Some(validTokenWithPolicyMatch))
-      case _                                        ⇒ Future.successful(None)
+      case Provided(`validTokenWithPolicyMatchStr`) => Future.successful(Some(validTokenWithPolicyMatch))
+      case _                                        => Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = securityDirectives.authenticate { implicit at ⇒
+    val route: Route = securityDirectives.authenticate { implicit at =>
       get {
         securityDirectives.authorize(CustomPolicyAsync(_ => Future.failed(new RuntimeException("failure has failed"))), at) {
           complete("OK")

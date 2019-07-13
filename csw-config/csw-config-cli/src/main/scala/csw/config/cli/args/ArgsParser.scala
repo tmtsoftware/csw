@@ -35,13 +35,13 @@ class ArgsParser(name: String) {
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "path in the repository",
-      opt[String]('i', "in") required () valueName "<inputFile>" action { (x, c) =>
+      opt[String]('i', "in").required() valueName "<inputFile>" action { (x, c) =>
         c.copy(inputFilePath = Some(Paths.get(x)))
       } text "input file path",
       opt[Unit]("annex") action { (_, c) =>
         c.copy(annex = true)
       } text "optional: add this option for large/binary files",
-      opt[String]('c', "comment") required () action { (x, c) =>
+      opt[String]('c', "comment").required() action { (x, c) =>
         c.copy(comment = Some(x))
       } text "create comment"
     )
@@ -53,10 +53,10 @@ class ArgsParser(name: String) {
       arg[String]("<path>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "path in the repository",
-      opt[String]('i', "in") required () valueName "<inputFile>" action { (x, c) =>
+      opt[String]('i', "in").required() valueName "<inputFile>" action { (x, c) =>
         c.copy(inputFilePath = Some(Paths.get(x)))
       } text "input file path",
-      opt[String]('c', "comment") required () action { (x, c) =>
+      opt[String]('c', "comment").required() action { (x, c) =>
         c.copy(comment = Some(x))
       } text "create comment"
     )
@@ -68,7 +68,7 @@ class ArgsParser(name: String) {
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "path of the file in the repository",
-      opt[String]('o', "out") required () valueName "<outputFile>" action { (x, c) =>
+      opt[String]('o', "out").required() valueName "<outputFile>" action { (x, c) =>
         c.copy(outputFilePath = Some(Paths.get(x)))
       } text "output file path",
       opt[String]("id") action { (x, c) =>
@@ -86,7 +86,7 @@ class ArgsParser(name: String) {
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository",
-      opt[String]('c', "comment") required () action { (x, c) =>
+      opt[String]('c', "comment").required() action { (x, c) =>
         c.copy(comment = Some(x))
       } text "delete comment"
     )
@@ -131,10 +131,10 @@ class ArgsParser(name: String) {
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository",
-      opt[String]("id") required () action { (x, c) =>
+      opt[String]("id").required() action { (x, c) =>
         c.copy(id = Some(x))
       } text "version id of file to be set as active",
-      opt[String]('c', "comment") required () action { (x, c) =>
+      opt[String]('c', "comment").required() action { (x, c) =>
         c.copy(comment = Some(x))
       } text "create comment"
     )
@@ -146,7 +146,7 @@ class ArgsParser(name: String) {
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository",
-      opt[String]('c', "comment") required () action { (x, c) =>
+      opt[String]('c', "comment").required() action { (x, c) =>
         c.copy(comment = Some(x))
       } text "reset comment"
     )
@@ -167,10 +167,10 @@ class ArgsParser(name: String) {
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository",
-      opt[String]("date") required () action { (x, c) =>
+      opt[String]("date").required() action { (x, c) =>
         c.copy(date = Some(Instant.parse(x)))
       } text "optional:. if specified will get the active file matching this date. Format: 2017-04-16T16:15:23.503Z",
-      opt[String]('o', "out") required () valueName "<outputFile>" action { (x, c) =>
+      opt[String]('o', "out").required() valueName "<outputFile>" action { (x, c) =>
         c.copy(outputFilePath = Some(Paths.get(x)))
       } text "output file path"
     )
@@ -214,7 +214,7 @@ class ArgsParser(name: String) {
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "path of the file in the repository",
-      opt[String]('o', "out") required () valueName "<outputFile>" action { (x, c) =>
+      opt[String]('o', "out").required() valueName "<outputFile>" action { (x, c) =>
         c.copy(outputFilePath = Some(Paths.get(x)))
       } text "output file path"
     )

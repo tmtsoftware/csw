@@ -15,7 +15,7 @@ import romaine.extensions.SourceExtensions.RichSource
 import scala.concurrent.Future
 
 private[client] trait HealthServiceModule extends HealthService {
-  self: SeverityService ⇒
+  self: SeverityService =>
 
   val redisConnectionsFactory: RedisConnectionsFactory
   implicit val actorSystem: typed.ActorSystem[_]
@@ -29,7 +29,7 @@ private[client] trait HealthServiceModule extends HealthService {
     getAggregatedSeverity(key).map(AlarmHealth.fromSeverity)
   }
 
-  final override def subscribeAggregatedHealthCallback(key: Key, callback: AlarmHealth ⇒ Unit): AlarmSubscription = {
+  final override def subscribeAggregatedHealthCallback(key: Key, callback: AlarmHealth => Unit): AlarmSubscription = {
     subscribeAggregatedHealth(key).to(Sink.foreach(callback)).run()
   }
 

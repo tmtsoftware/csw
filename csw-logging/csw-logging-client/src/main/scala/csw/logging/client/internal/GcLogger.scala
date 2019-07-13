@@ -8,7 +8,7 @@ import csw.logging.client.scaladsl.GenericLoggerFactory
 import javax.management.openmbean.CompositeData
 import javax.management.{Notification, NotificationEmitter, NotificationListener}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
  * When enabled by the gc configuration option, Garbage collection events are logged to the 'gc' log following the same structure as the other logs.
@@ -36,7 +36,7 @@ private[logging] class GcLogger {
           def getMem(mem: Map[String, MemoryUsage]): List[Map[String, Any]] = {
             val m = mem map {
               case (name, usage) =>
-                Map(name → Map("used" -> usage.getUsed, "max" -> usage.getMax, "committed" -> usage.getCommitted))
+                Map(name -> Map("used" -> usage.getUsed, "max" -> usage.getMax, "committed" -> usage.getCommitted))
             }
             m.toList
           }

@@ -9,7 +9,7 @@ import csw.params.core.models.{Id, ObsId, Prefix}
 /**
  * Common trait representing commands in TMT like Setup, Observe and Wait
  */
-sealed trait Command { self: ParameterSetType[_] ⇒
+sealed trait Command { self: ParameterSetType[_] =>
 
   /**
    * A helper to give access of public members of ParameterSetType
@@ -70,13 +70,13 @@ sealed trait Command { self: ParameterSetType[_] ⇒
 /**
  * Marker trait for sequence parameter sets which is applicable to Sequencer type of components
  */
-sealed trait SequenceCommand extends Command { self: ParameterSetType[_] ⇒
+sealed trait SequenceCommand extends Command { self: ParameterSetType[_] =>
 }
 
 /**
  * Marker trait for control parameter sets which i applicable to Assembly and HCD type of components
  */
-sealed trait ControlCommand extends SequenceCommand { self: ParameterSetType[_] ⇒
+sealed trait ControlCommand extends SequenceCommand { self: ParameterSetType[_] =>
 }
 
 /**

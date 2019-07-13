@@ -3,7 +3,7 @@ package csw.event.client.perf.reporter
 final case class PlotResult(values: Vector[(String, Number)] = Vector.empty) {
 
   def add(key: String, value: Number): PlotResult =
-    copy(values = values :+ (key → value))
+    copy(values = values :+ (key -> value))
 
   def addAll(p: PlotResult): PlotResult =
     copy(values ++ p.values)
@@ -22,7 +22,7 @@ final case class ThroughputPlots(
     println("\t\t\t Throughput(msgs/s) \t\tTotal Dropped \t\t Out Of Order \t")
     println("================================================================================================")
     throughput.labels.zipWithIndex.foreach {
-      case (label, index) ⇒
+      case (label, index) =>
         println(s"$label: ${if (label.length < 7) "\t\t\t" else "\t\t"} ${throughput.results(index).intValue()} \t\t\t ${dropped
           .results(index)
           .intValue()} \t\t\t ${outOfOrder.results(index).intValue()} \t")
@@ -43,7 +43,7 @@ final case class LatencyPlots(
     println("============================================================================================================")
 
     plot50.labels.zipWithIndex.foreach {
-      case (label, index) ⇒
+      case (label, index) =>
         println(s"$label: ${if (label.length < 6) "\t\t" else "\t"} ${plot50.results(index)} \t\t ${plot90
           .results(index)} \t\t ${plot99.results(index)} \t\t ${avg.results(index)} \t")
     }
@@ -62,7 +62,7 @@ final case class InitialLatencyPlots(
     println("============================================================================================================")
 
     plot50.labels.zipWithIndex.foreach {
-      case (label, index) ⇒
+      case (label, index) =>
         println(s"$label: ${if (label.length < 6) "\t\t" else "\t"} ${plot50.results(index)} \t\t ${plot90
           .results(index)} \t\t ${plot99.results(index)} \t")
     }

@@ -36,7 +36,7 @@ class LoggingAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
       Level.FATAL
     )
 
-    forAll(testData) { level ⇒
+    forAll(testData) { level =>
       val serializer = serialization.findSerializerFor(level)
       serializer.getClass shouldBe classOf[LoggingAkkaSerializer]
 

@@ -25,7 +25,7 @@ class InitialPublishLatencyTest extends FunSuite with BeforeAndAfterAll {
 
     defaultSubscriber.subscribeCallback(Set(event.eventKey), report)
 
-    (0 to 500).foreach { id ⇒
+    (0 to 500).foreach { id =>
       defaultPublisher.publish(Utils.makeEvent(id))
       Thread.sleep(10)
     }

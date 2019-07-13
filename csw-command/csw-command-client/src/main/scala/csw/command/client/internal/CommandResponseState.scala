@@ -4,7 +4,7 @@ import csw.command.client.CRMCacheProperties
 import csw.params.commands.CommandResponse.{CommandNotAvailable, QueryResponse, SubmitResponse}
 import csw.params.core.models.Id
 
-import scala.collection.JavaConverters.mapAsScalaConcurrentMapConverter
+import scala.jdk.CollectionConverters._
 
 // Cache command for certain duration and evict them once the expiration happens
 private[command] class CommandResponseState(crmCacheProperties: CRMCacheProperties) {
@@ -20,8 +20,8 @@ private[command] class CommandResponseState(crmCacheProperties: CRMCacheProperti
   def add(initialResponse: SubmitResponse): Unit = cmdToCmdResponse.put(initialResponse.runId, initialResponse)
   def update(commandResponse: SubmitResponse): Unit =
     cachedResponse(commandResponse.runId) match {
-      case Some(_) ⇒ cmdToCmdResponse.put(commandResponse.runId, commandResponse)
-      case None    ⇒
+      case Some(_) => cmdToCmdResponse.put(commandResponse.runId, commandResponse)
+      case None    =>
     }
   def get(runId: Id): QueryResponse  = cachedResponse(runId).getOrElse(CommandNotAvailable(runId))
   def asMap: Map[Id, SubmitResponse] = cmdToCmdResponse.asMap().asScala.toMap

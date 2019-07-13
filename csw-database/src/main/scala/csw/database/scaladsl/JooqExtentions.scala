@@ -1,7 +1,7 @@
 package csw.database.scaladsl
 import org.jooq.{Queries, Query, Record, ResultQuery}
 
-import scala.collection.JavaConverters.asScalaBufferConverter
+import scala.jdk.CollectionConverters._
 import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag

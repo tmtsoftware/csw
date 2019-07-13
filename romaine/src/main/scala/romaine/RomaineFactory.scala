@@ -36,7 +36,7 @@ class RomaineFactory(redisClient: RedisClient)(implicit val ec: ExecutionContext
         }
     )
 
-  private def init[T](conn: () ⇒ Future[T]): Future[T] = Future.unit.flatMap(_ => conn()).recover {
-    case NonFatal(ex) ⇒ throw RedisServerNotAvailable(ex.getCause)
+  private def init[T](conn: () => Future[T]): Future[T] = Future.unit.flatMap(_ => conn()).recover {
+    case NonFatal(ex) => throw RedisServerNotAvailable(ex.getCause)
   }
 }

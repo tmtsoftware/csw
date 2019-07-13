@@ -38,9 +38,7 @@ object Common extends AutoPlugin {
       "-deprecation",
       if (enableFatalWarnings.value) "-Xfatal-warnings" else "",
       "-Xlint:_,-missing-interpolator",
-      "-Yno-adapted-args",
       "-Ywarn-dead-code",
-      "-Xfuture",
 //      "-Xprint:typer"
       if (suppressAnnotatedWarnings.value) s"-P:silencer:sourceRoots=${baseDirectory.value.getCanonicalPath}" else ""
     ),

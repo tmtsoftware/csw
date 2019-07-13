@@ -72,10 +72,10 @@ final class FrameworkTestKit private (
   def start(services: CSWService*): Unit = {
     locationTestKit.startLocationServer()
     services.foreach {
-      case ConfigServer   ⇒ configTestKit.startConfigServer(); configStarted = true
-      case EventServer    ⇒ eventTestKit.startEventService(); eventStarted = true
-      case AlarmServer    ⇒ alarmTestKit.startAlarmService(); alarmStarted = true
-      case LocationServer ⇒ // location server is already started above
+      case ConfigServer   => configTestKit.startConfigServer(); configStarted = true
+      case EventServer    => eventTestKit.startEventService(); eventStarted = true
+      case AlarmServer    => alarmTestKit.startAlarmService(); alarmStarted = true
+      case LocationServer => // location server is already started above
     }
   }
 

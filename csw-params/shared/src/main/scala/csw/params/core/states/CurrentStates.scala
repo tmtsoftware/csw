@@ -1,6 +1,6 @@
 package csw.params.core.states
 
-import scala.collection.JavaConverters.seqAsJavaListConverter
+import scala.jdk.CollectionConverters._
 
 /**
  * Combines multiple CurrentState objects together

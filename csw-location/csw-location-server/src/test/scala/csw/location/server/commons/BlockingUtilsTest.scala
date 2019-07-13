@@ -24,8 +24,8 @@ class BlockingUtilsTest extends FunSuite with Matchers with BeforeAndAfterAll wi
     val replicaCountF: Future[Int] = Future { Thread.sleep(200); 10 }
     def replicaCount: Int =
       if (replicaCountF.isCompleted) replicaCountF.value match {
-        case Some(Success(v)) ⇒ v
-        case _                ⇒ -1
+        case Some(Success(v)) => v
+        case _                => -1
       } else -1
 
     def predicate = replicaCount == upMembers

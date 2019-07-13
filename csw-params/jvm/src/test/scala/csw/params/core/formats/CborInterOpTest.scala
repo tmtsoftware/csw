@@ -10,7 +10,7 @@ class CborInterOpTest extends FunSuite with Matchers {
 
   test("should decode java bytes to scala bytes") {
     val jByteKey: Key[java.lang.Byte]    = JKeyType.ByteKey.make("bytes")
-    val param: Parameter[java.lang.Byte] = jByteKey.set("abc".getBytes().map(x ⇒ x: java.lang.Byte))
+    val param: Parameter[java.lang.Byte] = jByteKey.set("abc".getBytes().map(x => x: java.lang.Byte))
     val bytes: Array[Byte]               = Cbor.encode(param).toByteArray
 
     val parsedParam = Cbor.decode(bytes).to[Parameter[Byte]].value
@@ -19,7 +19,7 @@ class CborInterOpTest extends FunSuite with Matchers {
 
   test("should decode java Integers to scala ints") {
     val jIntKey: Key[Integer]     = JKeyType.IntKey.make("ints")
-    val param: Parameter[Integer] = jIntKey.set(Array(1, 2, 3).map(x ⇒ Integer.valueOf(x)))
+    val param: Parameter[Integer] = jIntKey.set(Array(1, 2, 3).map(x => Integer.valueOf(x)))
     val bytes: Array[Byte]        = Cbor.encode(param).toByteArray
 
     val parsedParam = Cbor.decode(bytes).to[Parameter[Int]].value

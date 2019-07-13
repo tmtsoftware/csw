@@ -22,14 +22,14 @@ case class Options(
 ) {
 
   def alarmKey: AlarmKey = (maybeSubsystem, maybeComponent, maybeAlarmName) match {
-    case (Some(subsystem), Some(component), Some(name)) ⇒ AlarmKey(subsystem, component, name)
-    case _                                              ⇒ throw new IllegalArgumentException("Subsystem, Component or Alarm Name required.")
+    case (Some(subsystem), Some(component), Some(name)) => AlarmKey(subsystem, component, name)
+    case _                                              => throw new IllegalArgumentException("Subsystem, Component or Alarm Name required.")
   }
 
   def key: Key = (maybeSubsystem, maybeComponent, maybeAlarmName) match {
-    case (None, None, None)                       ⇒ GlobalKey
-    case (Some(subsystem), None, None)            ⇒ SubsystemKey(subsystem)
-    case (Some(subsystem), Some(component), None) ⇒ ComponentKey(subsystem, component)
-    case _                                        ⇒ alarmKey
+    case (None, None, None)                       => GlobalKey
+    case (Some(subsystem), None, None)            => SubsystemKey(subsystem)
+    case (Some(subsystem), Some(component), None) => ComponentKey(subsystem, component)
+    case _                                        => alarmKey
   }
 }

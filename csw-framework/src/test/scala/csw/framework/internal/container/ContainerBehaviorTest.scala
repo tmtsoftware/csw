@@ -85,7 +85,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar wit
 
     val containerBehaviorTestkit: BehaviorTestKit[ContainerActorMessage] = BehaviorTestKit(
       Behaviors.setup(
-        ctx ⇒
+        ctx =>
           new ContainerBehavior(
             ctx,
             containerInfo,
@@ -104,7 +104,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar wit
     containerBehaviorTestkit.run(SupervisorsCreated(supervisorInfos))
     val components = Components(supervisorInfos.map(_.component))
     components.components.foreach(
-      component ⇒
+      component =>
         containerBehaviorTestkit.run(SupervisorLifecycleStateChanged(component.supervisor, SupervisorLifecycleState.Running))
     )
   }
@@ -131,11 +131,11 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar wit
 
     // verify that created components are watched by the container
     containerBehaviorTestkit
-      .retrieveAllEffects() shouldBe components.components.map(component ⇒ Watched(component.supervisor)).toList
+      .retrieveAllEffects() shouldBe components.components.map(component => Watched(component.supervisor)).toList
 
     // simulate that container receives LifecycleStateChanged to Running message from all components
     components.components.foreach(
-      component ⇒
+      component =>
         containerBehaviorTestkit.run(SupervisorLifecycleStateChanged(component.supervisor, SupervisorLifecycleState.Running))
     )
 
@@ -176,7 +176,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar wit
 
     // simulate that container receives LifecycleStateChanged to Running message from all components
     components.components.foreach(
-      component ⇒
+      component =>
         containerBehaviorTestkit.run(SupervisorLifecycleStateChanged(component.supervisor, SupervisorLifecycleState.Running))
     )
 

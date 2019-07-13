@@ -43,8 +43,8 @@ case class Store[K, V](map: Map[K, Set[V]]) {
   def remove(value: V): Store[K, V] = {
     def removeValue(keys: List[K], store: Store[K, V]): Store[K, V] = {
       keys match {
-        case Nil                  ⇒ store
-        case key :: remainingKeys ⇒ removeValue(remainingKeys, remove(key, value))
+        case Nil                  => store
+        case key :: remainingKeys => removeValue(remainingKeys, remove(key, value))
       }
     }
 

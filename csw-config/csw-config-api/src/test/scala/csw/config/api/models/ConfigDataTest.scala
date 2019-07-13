@@ -9,7 +9,7 @@ import com.typesafe.config.{Config, ConfigException}
 import csw.config.api.commons.TestFutureExtension.RichFuture
 import org.scalatest.{FunSuiteLike, Matchers}
 
-import scala.collection.JavaConverters.asScalaBufferConverter
+import scala.jdk.CollectionConverters._
 
 class ConfigDataTest extends TestKit(ActorSystem("test-system")) with FunSuiteLike with Matchers {
 

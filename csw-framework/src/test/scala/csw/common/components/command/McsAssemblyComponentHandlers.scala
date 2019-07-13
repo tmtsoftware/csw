@@ -35,30 +35,30 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
 
   override def initialize(): Future[Unit] = {
     componentInfo.connections.headOption match {
-      case Some(hcd) ⇒
+      case Some(hcd) =>
         cswCtx.locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
-          case Some(akkaLocation) ⇒ hcdComponent = CommandServiceFactory.make(akkaLocation)(ctx.system)
-          case None               ⇒ throw new RuntimeException("Could not resolve hcd location, Initialization failure.")
+          case Some(akkaLocation) => hcdComponent = CommandServiceFactory.make(akkaLocation)(ctx.system)
+          case None               => throw new RuntimeException("Could not resolve hcd location, Initialization failure.")
         }
-      case None ⇒ Future.successful(Unit)
+      case None => Future.successful(())
     }
   }
 
-  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = Unit
+  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ()
 
   override def validateCommand(controlCommand: ControlCommand): ValidateCommandResponse = {
     controlCommand.commandName match {
-      case `longRunning` ⇒ Accepted(controlCommand.runId)
-      case `moveCmd`     ⇒ Accepted(controlCommand.runId)
-      case `initCmd`     ⇒ Accepted(controlCommand.runId)
-      case `invalidCmd`  ⇒ Invalid(controlCommand.runId, CommandIssue.OtherIssue("Invalid"))
-      case _             ⇒ Invalid(controlCommand.runId, UnsupportedCommandIssue(controlCommand.commandName.name))
+      case `longRunning` => Accepted(controlCommand.runId)
+      case `moveCmd`     => Accepted(controlCommand.runId)
+      case `initCmd`     => Accepted(controlCommand.runId)
+      case `invalidCmd`  => Invalid(controlCommand.runId, CommandIssue.OtherIssue("Invalid"))
+      case _             => Invalid(controlCommand.runId, UnsupportedCommandIssue(controlCommand.commandName.name))
     }
   }
 
   override def onSubmit(controlCommand: ControlCommand): SubmitResponse = {
     controlCommand.commandName match {
-      case `longRunning` ⇒
+      case `longRunning` =>
         runId = controlCommand.runId
 
         // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
@@ -90,11 +90,11 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
         commandResponseManager
           .queryFinal(controlCommand.runId)
           .foreach {
-            case Completed(_) ⇒
+            case Completed(_) =>
               currentStatePublisher.publish(
                 CurrentState(controlCommand.source, StateName("testStateName"), Set(choiceKey.set(longRunningCmdCompleted)))
               )
-            case _ ⇒
+            case _ =>
           }
         //#subscribe-to-command-response-manager
 
@@ -103,17 +103,17 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
         commandResponseManager
           .query(controlCommand.runId)
           .map(
-            _ ⇒ () // may choose to publish current state to subscribers or do other operations
+            _ => () // may choose to publish current state to subscribers or do other operations
           )
         // Return response
         Started(controlCommand.runId)
       //#query-command-response-manager
 
-      case `initCmd` ⇒ Completed(controlCommand.runId)
+      case `initCmd` => Completed(controlCommand.runId)
 
-      case `moveCmd` ⇒ Completed(controlCommand.runId)
+      case `moveCmd` => Completed(controlCommand.runId)
 
-      case _ ⇒ //do nothing
+      case _ => //do nothing
         Completed(controlCommand.runId)
 
     }
@@ -127,30 +127,30 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
         //#updateSubCommand
         // An original command is split into sub-commands and sent to a component.
         // The current state publishing is not relevant to the updateSubCommand usage.
-        case _: Completed ⇒
+        case _: Completed =>
           controlCommand.runId match {
-            case id if id == shortSetup.runId ⇒
+            case id if id == shortSetup.runId =>
               currentStatePublisher
                 .publish(CurrentState(shortSetup.source, StateName("testStateName"), Set(choiceKey.set(shortCmdCompleted))))
               // As the commands get completed, the results are updated in the commandResponseManager
               commandResponseManager.updateSubCommand(Completed(id))
-            case id if id == mediumSetup.runId ⇒
+            case id if id == mediumSetup.runId =>
               currentStatePublisher
                 .publish(CurrentState(mediumSetup.source, StateName("testStateName"), Set(choiceKey.set(mediumCmdCompleted))))
               commandResponseManager.updateSubCommand(Completed(id))
-            case id if id == longSetup.runId ⇒
+            case id if id == longSetup.runId =>
               currentStatePublisher
                 .publish(CurrentState(longSetup.source, StateName("testStateName"), Set(choiceKey.set(longCmdCompleted))))
               commandResponseManager.updateSubCommand(Completed(id))
           }
         //#updateSubCommand
-        case _ ⇒ // Do nothing
+        case _ => // Do nothing
       }
   }
 
   override def onOneway(controlCommand: ControlCommand): Unit = ???
 
-  override def onShutdown(): Future[Unit] = Future.successful(Unit)
+  override def onShutdown(): Future[Unit] = Future.successful(())
 
   override def onGoOffline(): Unit = ???
 

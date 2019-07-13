@@ -13,19 +13,19 @@ private[event] class Wiring {
   import actorRuntime._
   lazy val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient
   lazy val eventService: EventService       = new EventServiceFactory().make(locationService)
-  lazy val printLine: Any ⇒ Unit            = println
+  lazy val printLine: Any => Unit           = println
   lazy val commandLineRunner                = new CommandLineRunner(eventService, actorRuntime, printLine)
   lazy val cliApp                           = new CliApp(commandLineRunner)
 }
 
 object Wiring {
 
-  private[event] def make(locationHost: String = "localhost", _printLine: Any ⇒ Unit = println): Wiring =
+  private[event] def make(locationHost: String = "localhost", _printLine: Any => Unit = println): Wiring =
     new Wiring {
       override lazy val locationService: LocationService =
         HttpLocationServiceFactory.make(locationHost)(actorSystem, actorRuntime.mat)
 
-      override lazy val printLine: Any ⇒ Unit = _printLine
+      override lazy val printLine: Any => Unit = _printLine
     }
 
 }

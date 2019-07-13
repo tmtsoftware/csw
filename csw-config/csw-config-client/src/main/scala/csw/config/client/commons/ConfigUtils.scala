@@ -34,8 +34,8 @@ class ConfigUtils(configClientService: ConfigClientService)(implicit system: Act
 
   private def getConfigFromRemoteFile(inputFilePath: Path): Future[Config] = async {
     await(configClientService.getActive(inputFilePath)) match {
-      case Some(configData) ⇒ await(configData.toConfigObject)
-      case None             ⇒ throw FileNotFound(inputFilePath)
+      case Some(configData) => await(configData.toConfigObject)
+      case None             => throw FileNotFound(inputFilePath)
     }
   }
 }

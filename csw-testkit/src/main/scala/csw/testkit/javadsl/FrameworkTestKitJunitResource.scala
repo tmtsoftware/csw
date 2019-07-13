@@ -13,7 +13,7 @@ import csw.testkit._
 import csw.testkit.scaladsl.CSWService
 import org.junit.rules.ExternalResource
 
-import scala.collection.JavaConverters.iterableAsScalaIterableConverter
+import scala.jdk.CollectionConverters._
 
 /**
  * A Junit external resource for the [[FrameworkTestKit]], making it possible to have Junit manage the lifecycle of the testkit.

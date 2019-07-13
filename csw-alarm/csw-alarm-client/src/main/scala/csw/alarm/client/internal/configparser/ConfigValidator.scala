@@ -13,7 +13,7 @@ import com.typesafe.config.{Config, ConfigFactory, ConfigRenderOptions}
 import csw.alarm.api.internal.ValidationResult
 import csw.alarm.api.internal.ValidationResult.{Failure, Success}
 
-import scala.collection.JavaConverters.{asScalaIteratorConverter, iterableAsScalaIterableConverter}
+import scala.jdk.CollectionConverters._
 
 /**
  * Uses json-schema to validate the Config File
@@ -98,7 +98,7 @@ private[client] object ConfigValidator {
   // try to get additional messages from the reports section
   private def extractAdditionalMessages(json: JsonNode) =
     Option(json.get("reports"))
-      .map { reports ⇒
+      .map { reports =>
         reports.asScala
           .flatMap(_.elements().asScala)
           .map(_.get("message").asText())

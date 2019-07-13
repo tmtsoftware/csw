@@ -14,8 +14,8 @@ class TromboneHcd() {
   // Tests are written to assert on this line numbers
   // In case any line needs to be added then update constants in companion object
   def startLogging(logs: Map[String, String], kind: String = "all"): Unit = kind match {
-    case "alternative" ⇒ log.alternative("some-alternative-category", Map(LoggingKeys.MSG → logs("alternative")))
-    case "all" ⇒
+    case "alternative" => log.alternative("some-alternative-category", Map(LoggingKeys.MSG -> logs("alternative")))
+    case "all" =>
       log.trace(logs("trace"))
       log.debug(logs("debug"))
       log.info(logs("info"))
@@ -31,7 +31,7 @@ class TromboneHcd() {
       val result = number1 / number2
       s"Result of computation is $result"
     } catch {
-      case ex: ArithmeticException ⇒ log.error(exceptionMsg, ex = ex); exceptionMsg
+      case ex: ArithmeticException => log.error(exceptionMsg, ex = ex); exceptionMsg
     }
   }
 

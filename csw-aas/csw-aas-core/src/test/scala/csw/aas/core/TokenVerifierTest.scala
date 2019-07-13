@@ -68,7 +68,7 @@ class TokenVerifierTest extends FunSuite with MockitoSugar with Matchers with Ei
     )
 
     when(keycloakTokenVerifier.verifyToken(token, deployment)).thenReturn(Future.successful(keycloakAccessToken))
-    tmtTokenVerifier.verifyAndDecode(token).block().right.value shouldBe expectedToken
+    tmtTokenVerifier.verifyAndDecode(token).block().toOption.get shouldBe expectedToken
   }
 
   test("should throw exception while decoding token") {

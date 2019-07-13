@@ -23,7 +23,7 @@ object Settings {
     }
 
   def docExclusions(projects: Seq[ProjectReference]): Seq[Setting[_]] =
-    projects.map(p ⇒ sources in (Compile, doc) in p := Seq.empty) ++ Seq(
+    projects.map(p => sources in (Compile, doc) in p := Seq.empty) ++ Seq(
       unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(projects: _*),
       unidocProjectFilter in (JavaUnidoc, unidoc) := inAnyProject -- inProjects(projects: _*)
     )

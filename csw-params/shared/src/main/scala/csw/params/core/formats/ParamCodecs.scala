@@ -16,7 +16,7 @@ import io.bullet.borer._
 import io.bullet.borer.derivation.ArrayBasedCodecs.deriveCodecForUnaryCaseClass
 import io.bullet.borer.derivation.MapBasedCodecs._
 
-import scala.collection.mutable.{WrappedArray => WArray}
+import scala.collection.mutable.{ArraySeq => ArrayS}
 import scala.reflect.ClassTag
 
 object ParamCodecs extends ParamCodecs
@@ -52,11 +52,11 @@ trait ParamCodecs extends CommonCodecs {
 
   // ************************ Composite Codecs ********************
 
-  implicit def arrayDataCodec[T: ClassTag: ArrayEnc: ArrayDec]: Codec[ArrayData[T]] =
-    bimap[WArray[T], ArrayData[T]](ArrayData(_), _.data)
+  implicit def arrayDataCodec[T: ArrayEnc: ArrayDec]: Codec[ArrayData[T]] =
+    bimap[ArrayS[T], ArrayData[T]](ArrayData(_), _.data)
 
   implicit def matrixDataCodec[T: ClassTag: ArrayEnc: ArrayDec]: Codec[MatrixData[T]] =
-    bimap[WArray[WArray[T]], MatrixData[T]](MatrixData(_), _.data)
+    bimap[ArrayS[ArrayS[T]], MatrixData[T]](MatrixData(_), _.data)(Encoder.forIterable, Decoder.forIterable)
 
   // ************************ Enum Codecs ********************
 
@@ -67,11 +67,12 @@ trait ParamCodecs extends CommonCodecs {
   // ************************ Parameter Codecs ********************
 
   //Do not replace these with bimap, due to an issue with borer https://github.com/sirthias/borer/issues/24
-  implicit lazy val javaByteArrayEnc: Encoder[Array[JByte]] = Encoder.forByteArray.contramap(_.map(x ⇒ x: Byte))
-  implicit lazy val javaByteArrayDec: Decoder[Array[JByte]] = Decoder.forByteArray.map(_.map(x ⇒ x: JByte))
+  implicit lazy val javaByteArrayEnc: Encoder[Array[JByte]] = Encoder.forByteArray.contramap(_.map(x => x: Byte))
+  implicit lazy val javaByteArrayDec: Decoder[Array[JByte]] = Decoder.forByteArray.map(_.map(x => x: JByte))
 
-  implicit def waCodec[T: ClassTag: ArrayEnc: ArrayDec]: Codec[WArray[T]]       = bimap[Array[T], WArray[T]](x => x: WArray[T], _.array)
-  implicit def paramCodec[T: ClassTag: ArrayEnc: ArrayDec]: Codec[Parameter[T]] = deriveCodec[Parameter[T]]
+  implicit def waCodec[T: ArrayEnc: ArrayDec]: Codec[ArrayS[T]] =
+    bimap[Array[T], ArrayS[T]](x => x: ArrayS[T], _.array.asInstanceOf[Array[T]])
+  implicit def paramCodec[T: ArrayEnc: ArrayDec]: Codec[Parameter[T]] = deriveCodec[Parameter[T]]
 
   implicit lazy val paramEncExistential: Encoder[Parameter[_]] = { (w: Writer, value: Parameter[_]) =>
     val encoder: Encoder[Parameter[Any]] = value.keyType.paramEncoder.asInstanceOf[Encoder[Parameter[Any]]]
@@ -88,7 +89,7 @@ trait ParamCodecs extends CommonCodecs {
     val wa = keyType.waDecoder.read(r)
     r.tryReadString("units")
     val units = unitsCodec.decoder.read(r)
-    Parameter(keyName, keyType.asInstanceOf[KeyType[Any]], wa.asInstanceOf[WArray[Any]], units)
+    Parameter(keyName, keyType.asInstanceOf[KeyType[Any]], wa.asInstanceOf[ArrayS[Any]], units)
   }
 
   // ************************ Struct Codecs ********************

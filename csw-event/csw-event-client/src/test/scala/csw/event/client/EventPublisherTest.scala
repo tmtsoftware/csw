@@ -5,13 +5,13 @@ import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.helpers.Utils.{makeDistinctEvent, makeEvent, makeEventWithPrefix}
-import csw.event.client.internal.kafka.KafkaTestProps
+//import csw.event.client.internal.kafka.KafkaTestProps
 import csw.event.client.internal.redis.{InitializationEvent, RedisTestProps}
 import csw.event.client.internal.wiring._
 import csw.params.core.models.{Prefix, Subsystem}
 import csw.params.events.{Event, EventKey}
 import csw.time.core.models.UTCTime
-import net.manub.embeddedkafka.EmbeddedKafka
+//import net.manub.embeddedkafka.EmbeddedKafka
 import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
 import org.scalatestplus.testng.TestNGSuite
@@ -29,31 +29,31 @@ import scala.util.Random
 //DEOPSCSW-395: Provide EventService handle to component developers
 //DEOPSCSW-515: Include Start Time in API
 //DEOPSCSW-516: Optionally Publish - API Change
-class EventPublisherTest extends TestNGSuite with Matchers with Eventually with EmbeddedKafka {
+class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*with EmbeddedKafka*/ {
 
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
 
   var redisTestProps: RedisTestProps = _
-  var kafkaTestProps: KafkaTestProps = _
+//  var kafkaTestProps: KafkaTestProps = _
 
   @BeforeSuite
   def beforeAll(): Unit = {
     redisTestProps = RedisTestProps.createRedisProperties()
-    kafkaTestProps = KafkaTestProps.createKafkaProperties()
+//    kafkaTestProps = KafkaTestProps.createKafkaProperties()
     redisTestProps.start()
-    kafkaTestProps.start()
+//    kafkaTestProps.start()
   }
 
   @AfterSuite
   def afterAll(): Unit = {
     redisTestProps.shutdown()
-    kafkaTestProps.shutdown()
+//    kafkaTestProps.shutdown()
   }
 
   @DataProvider(name = "event-service-provider")
   def pubSubProvider: Array[Array[_ <: BaseProperties]] = Array(
-    Array(redisTestProps),
-    Array(kafkaTestProps)
+    Array(redisTestProps)
+//    Array(kafkaTestProps)
   )
 
   //DEOPSCSW-659: Investigate initial latency in event service pub sub API for single publish
@@ -96,7 +96,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     import baseProperties._
 
     var counter                      = -1
-    val events: immutable.Seq[Event] = for (i ← 1 to 10) yield makeEvent(i)
+    val events: immutable.Seq[Event] = for (i <- 1 to 10) yield makeEvent(i)
 
     def eventGenerator(): Option[Event] = {
       counter += 1
@@ -126,18 +126,18 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     import baseProperties._
 
     val queue: mutable.Queue[Event]  = new mutable.Queue[Event]()
-    val events: immutable.Seq[Event] = for (i ← 101 to 110) yield makeDistinctEvent(i)
+    val events: immutable.Seq[Event] = for (i <- 101 to 110) yield makeDistinctEvent(i)
 
     val subscription = subscriber.subscribe(events.map(_.eventKey).toSet).to(Sink.foreach(queue.enqueue(_))).run()
     subscription.ready().await
 
-    publisher.publish(Source.fromIterator(() ⇒ events.toIterator))
+    publisher.publish(Source.fromIterator(() => events.iterator))
 
     // subscriber will receive an invalid event first as subscription happened before publishing started.
     // The 10 published events will follow
     eventually(queue.size shouldBe 20)
 
-    queue should contain theSameElementsAs events.map(x ⇒ Event.invalidEvent(x.eventKey)) ++ events
+    queue should contain theSameElementsAs events.map(x => Event.invalidEvent(x.eventKey)) ++ events
   }
 
   //DEOPSCSW-000: Publish events with block generating future of event
@@ -147,7 +147,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     import baseProperties._
 
     var counter                      = -1
-    val events: immutable.Seq[Event] = for (i ← 31 to 41) yield makeEventWithPrefix(i, Prefix("test"))
+    val events: immutable.Seq[Event] = for (i <- 31 to 41) yield makeEventWithPrefix(i, Prefix("test"))
 
     def eventGenerator(): Future[Option[Event]] = Future {
       counter += 1
@@ -264,7 +264,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     import baseProperties._
 
     var counter                      = -1
-    val events: immutable.Seq[Event] = for (i ← 31 to 41) yield makeEventWithPrefix(i, Prefix("test.publishAsync"))
+    val events: immutable.Seq[Event] = for (i <- 31 to 41) yield makeEventWithPrefix(i, Prefix("test.publishAsync"))
 
     def eventGenerator(): Future[Option[Event]] = Future {
       counter += 1

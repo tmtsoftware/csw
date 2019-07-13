@@ -17,11 +17,11 @@ import csw.location.client.extensions.LocationServiceExt.RichLocationService
 import csw.location.server.http.HTTPLocationServiceOnPorts
 import csw.network.utils.Networks
 import csw.network.utils.SocketUtils.getFreePort
-import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
+//import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
 
-import scala.collection.JavaConverters.mapAsScalaMapConverter
+import scala.jdk.CollectionConverters._
 import scala.concurrent.Future
 
 class KafkaTestProps(
@@ -31,9 +31,9 @@ class KafkaTestProps(
     additionalBrokerProps: Map[String, String]
 )(implicit val actorSystem: ActorSystem[_])
     extends BaseProperties {
-  private val brokers          = s"PLAINTEXT://${Networks().hostname}:$kafkaPort"
-  private val brokerProperties = Map("listeners" → brokers, "advertised.listeners" → brokers) ++ additionalBrokerProps
-  val config                   = EmbeddedKafkaConfig(customBrokerProperties = brokerProperties, zooKeeperPort = getFreePort)
+//  private val brokers          = s"PLAINTEXT://${Networks().hostname}:$kafkaPort"
+//  private val brokerProperties = Map("listeners" -> brokers, "advertised.listeners" -> brokers) ++ additionalBrokerProps
+//  val config                   = EmbeddedKafkaConfig(customBrokerProperties = brokerProperties, zooKeeperPort = getFreePort)
 
   private val eventServiceFactory = new EventServiceFactory(KafkaStore)
   private lazy val producerSettings: ProducerSettings[String, String] =
@@ -55,12 +55,14 @@ class KafkaTestProps(
   override val eventPattern: String = ".*sys.*"
 
   override def publishGarbage(channel: String, message: String): Future[Done] =
-    Future { kafkaProducer.send(new ProducerRecord(channel, message)).get() }.map(_ ⇒ Done)
+    Future { kafkaProducer.send(new ProducerRecord(channel, message)).get() }.map(_ => Done)
 
-  override def start(): Unit = EmbeddedKafka.start()(config)
+  override def start(): Unit = {
+//    EmbeddedKafka.start()(config)
+  }
 
   override def shutdown(): Unit = {
-    EmbeddedKafka.stop()
+//    EmbeddedKafka.stop()
     Http(actorSystem.toUntyped).shutdownAllConnectionPools().await
     actorSystem.terminate()
     actorSystem.whenTerminated.await

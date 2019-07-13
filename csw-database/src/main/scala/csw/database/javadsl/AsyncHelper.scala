@@ -18,7 +18,7 @@ object AsyncHelper {
    *         the result of type T
    */
   def managedBlock[T](supplier: Supplier[T]): CompletableFuture[T] =
-    CompletableFuture.supplyAsync { () ⇒
+    CompletableFuture.supplyAsync { () =>
       concurrent.blocking {
         supplier.get()
       }

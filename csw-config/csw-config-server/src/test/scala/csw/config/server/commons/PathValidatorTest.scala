@@ -26,7 +26,7 @@ class PathValidatorTest extends FunSuite with Matchers {
       "/invalidpath/sample>.txt"
     )
 
-    paths.foreach { path ⇒
+    paths.foreach { path =>
       PathValidator.isValid(path) shouldBe false
     }
   }

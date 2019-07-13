@@ -18,13 +18,13 @@ class AdminRoutes(logAdmin: LogAdmin, actorRuntime: ActorRuntime, adminException
   import actorRuntime._
   val route: Route = routeLogger {
     adminExceptionHandlers.route {
-      path("admin" / "logging" / Segment / "level") { componentName ⇒
+      path("admin" / "logging" / Segment / "level") { componentName =>
         get {
           complete(logAdmin.getLogMetadata(componentName))
         } ~
         post {
-          logLevelParam { logLevel ⇒
-            complete(logAdmin.setLogLevel(componentName, logLevel).map(_ ⇒ Done))
+          logLevelParam { logLevel =>
+            complete(logAdmin.setLogLevel(componentName, logLevel).map(_ => Done))
           }
         }
       }

@@ -45,7 +45,7 @@ object ExampleServer extends HttpApp with App {
       sPatch(ClientRolePolicy("some-role")) {
         complete("SUCCESS")
       } ~
-      sHead(CustomPolicy(at ⇒ at.given_name.contains("test-user"))) {
+      sHead(CustomPolicy(at => at.given_name.contains("test-user"))) {
         complete("SUCCESS")
       } ~
       sDelete(PermissionPolicy("delete", "person")) {
@@ -146,7 +146,7 @@ object Documentation extends HttpApp {
     //#client-role-policy-usage
 
     // #custom-policy-usage
-    val routeWithCustomPolicy: Route = sPost(CustomPolicy(token ⇒ token.given_name.contains("test-user"))) {
+    val routeWithCustomPolicy: Route = sPost(CustomPolicy(token => token.given_name.contains("test-user"))) {
       complete("OK")
     }
     // #custom-policy-usage

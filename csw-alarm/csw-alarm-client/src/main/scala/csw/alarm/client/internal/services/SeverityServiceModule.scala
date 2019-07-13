@@ -23,7 +23,7 @@ import scala.async.Async.{async, await}
 import scala.concurrent.Future
 
 private[client] trait SeverityServiceModule extends SeverityService {
-  self: MetadataService with StatusService ⇒
+  self: MetadataService with StatusService =>
 
   val redisConnectionsFactory: RedisConnectionsFactory
   def settings: Settings
@@ -50,7 +50,7 @@ private[client] trait SeverityServiceModule extends SeverityService {
     aggregratorByMax(severityList)
   }
 
-  final override def subscribeAggregatedSeverityCallback(key: Key, callback: FullAlarmSeverity ⇒ Unit): AlarmSubscription = {
+  final override def subscribeAggregatedSeverityCallback(key: Key, callback: FullAlarmSeverity => Unit): AlarmSubscription = {
     log.debug(s"Subscribe aggregated severity for alarm [${key.value}] with a callback")
     subscribeAggregatedSeverity(key).to(Sink.foreach(callback)).run()
   }
@@ -97,12 +97,12 @@ private[client] trait SeverityServiceModule extends SeverityService {
     val severitySourceF = async {
       val metadataKeys                          = await(getActiveAlarmKeys(key))
       val activeSeverityKeys: List[SeverityKey] = metadataKeys.map(a => SeverityKey.fromAlarmKey(a))
-      val currentSeverities                     = await(severityApi.mget(activeSeverityKeys)).map(result ⇒ result.key → result.value).toMap
+      val currentSeverities                     = await(severityApi.mget(activeSeverityKeys)).map(result => result.key -> result.value).toMap
 
       keySpaceApi
         .watchKeyspaceValue(activeSeverityKeys, OverflowStrategy.LATEST)
         .scan(currentSeverities) {
-          case (data, RedisResult(severityKey, mayBeSeverity)) ⇒ data + (severityKey → mayBeSeverity)
+          case (data, RedisResult(severityKey, mayBeSeverity)) => data + (severityKey -> mayBeSeverity)
         }
         .map(data => aggregratorByMax(data.values))
         .distinctUntilChanged
@@ -124,7 +124,7 @@ private[client] trait SeverityServiceModule extends SeverityService {
     if (metadataKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
 
     val keys = await(metadataApi.mget(metadataKeys)).collect {
-      case RedisResult(metadataKey, Some(metadata)) if metadata.isActive ⇒ metadataKey
+      case RedisResult(metadataKey, Some(metadata)) if metadata.isActive => metadataKey
     }
 
     if (keys.isEmpty) logAndThrow(InactiveAlarmException(key))

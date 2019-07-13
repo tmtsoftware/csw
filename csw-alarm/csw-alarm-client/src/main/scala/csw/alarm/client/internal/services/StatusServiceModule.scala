@@ -25,7 +25,7 @@ import scala.compat.java8.DurationConverters.DurationOps
 import scala.concurrent.Future
 
 private[client] trait StatusServiceModule extends StatusService {
-  self: SeverityService with MetadataService ⇒
+  self: SeverityService with MetadataService =>
 
   implicit val actorSystem: typed.ActorSystem[_]
   def settings: Settings
@@ -188,13 +188,13 @@ private[client] trait StatusServiceModule extends StatusService {
           initializingApi.set(alarmKey, alarmStatus.initializing)
         )
       )
-      .map(_ ⇒ Done)
+      .map(_ => Done)
   }
 
   private[alarm] def setStatus(statusMap: Map[AlarmKey, AlarmStatus]): Future[Done] =
     Future
-      .sequence(statusMap.map { case (key, status) ⇒ setStatus(key, status) })
-      .map(_ ⇒ Done)
+      .sequence(statusMap.map { case (key, status) => setStatus(key, status) })
+      .map(_ => Done)
 
   final override private[alarm] def clearAllStatus(): Future[Done] =
     Future
@@ -207,7 +207,7 @@ private[client] trait StatusServiceModule extends StatusService {
           initializingApi.pdel(GlobalKey)
         )
       )
-      .map(_ ⇒ Done)
+      .map(_ => Done)
 
   private def getShelveStatus(alarmKey: AlarmKey): Future[ShelveStatus] = async {
     if (await(metadataApi.exists(alarmKey))) await(shelveStatusApi.get(alarmKey)).getOrElse(Unshelved)
@@ -215,11 +215,11 @@ private[client] trait StatusServiceModule extends StatusService {
   }
 
   private[alarm] def getAlarms(key: Key): Future[List[Alarm]] = metadataApi.keys(key).flatMap {
-    Future.traverse(_) { key ⇒
+    Future.traverse(_) { key =>
       for {
-        metadata ← getMetadata(key)
-        status   ← getStatus(key)
-        severity ← getCurrentSeverity(key)
+        metadata <- getMetadata(key)
+        status   <- getStatus(key)
+        severity <- getCurrentSeverity(key)
       } yield Alarm(key, metadata, status, severity)
     }
   }

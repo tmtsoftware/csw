@@ -24,13 +24,13 @@ class ClientRolePolicyTest extends FunSuite with MockitoSugar with Directives wi
     val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
-      case Provided(`invalidTokenStr`) ⇒ Future.successful(None)
-      case _                           ⇒ Future.successful(None)
+      case Provided(`invalidTokenStr`) => Future.successful(None)
+      case _                           => Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = securityDirectives.authenticate { implicit at ⇒
+    val route: Route = securityDirectives.authenticate { implicit at =>
       get {
         securityDirectives.authorize(ClientRolePolicy("admin"), at) {
           complete("OK")
@@ -47,11 +47,11 @@ class ClientRolePolicyTest extends FunSuite with MockitoSugar with Directives wi
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
 
-    val authenticator: AsyncAuthenticator[AccessToken] = _ ⇒ Future.successful(None)
+    val authenticator: AsyncAuthenticator[AccessToken] = _ => Future.successful(None)
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = securityDirectives.authenticate { implicit at ⇒
+    val route: Route = securityDirectives.authenticate { implicit at =>
       get {
         securityDirectives.authorize(ClientRolePolicy("admin"), at) {
           complete("OK")
@@ -78,13 +78,13 @@ class ClientRolePolicyTest extends FunSuite with MockitoSugar with Directives wi
       .thenReturn(false)
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
-      case Provided(`validTokenWithoutClientRoleStr`) ⇒ Future.successful(Some(validTokenWithoutClientRole))
-      case _                                          ⇒ Future.successful(None)
+      case Provided(`validTokenWithoutClientRoleStr`) => Future.successful(Some(validTokenWithoutClientRole))
+      case _                                          => Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = securityDirectives.authenticate { implicit at ⇒
+    val route: Route = securityDirectives.authenticate { implicit at =>
       get {
         securityDirectives.authorize(ClientRolePolicy("admin"), at) {
           complete("OK")
@@ -108,13 +108,13 @@ class ClientRolePolicyTest extends FunSuite with MockitoSugar with Directives wi
       .thenReturn(true)
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
-      case Provided(`validTokenWithClientRoleStr`) ⇒ Future.successful(Some(validTokenWithClientRole))
-      case _                                       ⇒ Future.successful(None)
+      case Provided(`validTokenWithClientRoleStr`) => Future.successful(Some(validTokenWithClientRole))
+      case _                                       => Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = securityDirectives.authenticate { implicit at ⇒
+    val route: Route = securityDirectives.authenticate { implicit at =>
       get {
         securityDirectives.authorize(ClientRolePolicy("admin"), at) {
           complete("OK")

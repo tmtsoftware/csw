@@ -7,7 +7,7 @@ import csw.params.extensions.OptionConverters.RichOption
 import csw.params.core.models.Units
 import play.api.libs.json._
 
-import scala.collection.JavaConverters.seqAsJavaListConverter
+import scala.jdk.CollectionConverters._
 import scala.collection.mutable
 import scala.reflect.ClassTag
 
@@ -16,7 +16,7 @@ object Parameter {
   private[csw] def apply[S](
       keyName: String,
       keyType: KeyType[S],
-      items: mutable.WrappedArray[S],
+      items: mutable.ArraySeq[S],
       units: Units
   ): Parameter[S] =
     new Parameter(keyName, keyType, items, units)
@@ -62,14 +62,14 @@ object Parameter {
 case class Parameter[S] private[params] (
     keyName: String,
     keyType: KeyType[S],
-    items: mutable.WrappedArray[S],
+    items: mutable.ArraySeq[S],
     units: Units
 ) {
 
   /**
    * An Array of values this parameter holds
    */
-  def values: Array[S] = items.array
+  def values: Array[S] = items.array.asInstanceOf[Array[S]]
 
   /**
    * A Java helper that returns a List of values this parameter holds

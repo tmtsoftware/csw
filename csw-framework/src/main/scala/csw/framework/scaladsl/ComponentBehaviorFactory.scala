@@ -29,7 +29,7 @@ abstract class ComponentBehaviorFactory {
    */
   private[framework] def make(supervisor: ActorRef[FromComponentLifecycleMessage], cswCtx: CswContext): Behavior[Nothing] =
     Behaviors
-      .setup[TopLevelActorMessage] { ctx ⇒
+      .setup[TopLevelActorMessage] { ctx =>
         ComponentBehavior.make(supervisor, handlers(ctx, cswCtx), cswCtx)
       }
       .narrow

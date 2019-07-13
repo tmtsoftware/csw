@@ -14,7 +14,7 @@ private[config] object BinaryUtils {
    * @return boolean value indicating if the the byteString represents binary content
    */
   def isBinary(byteStrings: Seq[ByteString]): Boolean = {
-    val bs = byteStrings.foldLeft(ByteString.empty)((bs, d) ⇒ bs ++ d)
+    val bs = byteStrings.foldLeft(ByteString.empty)((bs, d) => bs ++ d)
 
     val bytes: Array[Byte] = bs.toArray.take(1024)
 
@@ -29,7 +29,7 @@ private[config] object BinaryUtils {
    * @return boolean value indicating if the bytes represents text content
    */
   def isNotText(bytes: Array[Byte]): Boolean = {
-    val binaryCount = bytes.count(b ⇒ b < 0x08 || (b > 0x0d && b < 0x20) || b > 0x7F)
+    val binaryCount = bytes.count(b => b < 0x08 || (b > 0x0d && b < 0x20) || b > 0x7F)
     bytes.length > 0 && binaryCount * 1000 / bytes.length > 150
   }
 }

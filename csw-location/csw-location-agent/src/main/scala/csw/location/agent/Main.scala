@@ -16,7 +16,7 @@ object Main {
   def main(args: Array[String]): Unit = start(args, startLogging = true)
 
   def start(args: Array[String], startLogging: Boolean = false): Option[Process] =
-    new ArgsParser(name).parse(args).map { options =>
+    new ArgsParser(name).parse(args.toList).map { options =>
       LocationServerStatus.requireUpLocally()
 
       val wiring = new Wiring

@@ -45,8 +45,8 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
     val effects: immutable.Seq[Effect] = supervisorBehaviorTestKit.retrieveAllEffects()
 
     val spawnedEffects = effects.map {
-      case s: Spawned[_] ⇒ s.childName
-      case _             ⇒ ""
+      case s: Spawned[_] => s.childName
+      case _             => ""
     }
 
     spawnedEffects should contain allOf (

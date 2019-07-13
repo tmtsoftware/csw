@@ -30,7 +30,7 @@ private[config] object ConfigStreamExts {
       import mat.executionContext
       val p = Promise[Seq[Out]]
       val futureSource = source.prefixAndTail(n).runWith(Sink.head).map {
-        case (prefix, remainingSource) ⇒
+        case (prefix, remainingSource) =>
           p.success(prefix)
           Source(prefix) ++ remainingSource
       }

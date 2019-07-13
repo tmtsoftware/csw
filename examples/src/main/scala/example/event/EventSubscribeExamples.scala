@@ -22,7 +22,7 @@ class EventSubscribeExamples(eventService: EventService, hcd: AkkaLocation)(impl
 
       subscriber.subscribeCallback(
         Set(EventKey(hcd.prefix, EventName("filter_wheel"))),
-        event ⇒ { /*do something*/ }
+        event => { /*do something*/ }
       )
     }
   //#with-callback
@@ -48,11 +48,11 @@ class EventSubscribeExamples(eventService: EventService, hcd: AkkaLocation)(impl
   }
 
   object EventHandler {
-    val behavior: Behavior[Event] = Behaviors.setup { ctx ⇒
+    val behavior: Behavior[Event] = Behaviors.setup { ctx =>
       //setup required for the actor
 
       Behaviors.receiveMessage {
-        case _ ⇒ //handle messages and return new behavior with changed state
+        case _ => //handle messages and return new behavior with changed state
           Behaviors.same
       }
     }
@@ -79,7 +79,7 @@ class EventSubscribeExamples(eventService: EventService, hcd: AkkaLocation)(impl
 
       subscriber.subscribeCallback(
         Set(EventKey(hcd.prefix, EventName("filter_wheel"))),
-        event ⇒ { /*do something*/ },
+        event => { /*do something*/ },
         1.seconds,
         SubscriptionModes.RateAdapterMode
       )
@@ -90,7 +90,7 @@ class EventSubscribeExamples(eventService: EventService, hcd: AkkaLocation)(impl
     // #psubscribe
     {
       val subscriber = eventService.defaultSubscriber
-      subscriber.pSubscribeCallback(subsystem, "*", event ⇒ { /*do something*/ })
+      subscriber.pSubscribeCallback(subsystem, "*", event => { /*do something*/ })
     }
   // #psubscribe
 

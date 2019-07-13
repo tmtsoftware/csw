@@ -56,15 +56,15 @@ class LoggerCompTest extends LoggingTestSuite {
     genericLogBuffer.clear()
     tromboneHcdLogBuffer.clear()
 
-    logBuffer.foreach { log ⇒
+    logBuffer.foreach { log =>
       log.value.get(LoggingKeys.COMPONENT_NAME) match {
-        case Some(_) ⇒
+        case Some(_) =>
           val name = log.getString(LoggingKeys.COMPONENT_NAME)
           componentLogBuffer.get(name) match {
-            case Some(xs) ⇒ componentLogBuffer.update(name, xs :+ log)
-            case None     ⇒ componentLogBuffer.put(name, ArrayBuffer(log))
+            case Some(xs) => componentLogBuffer.update(name, xs :+ log)
+            case None     => componentLogBuffer.put(name, ArrayBuffer(log))
           }
-        case None ⇒ genericLogBuffer += log
+        case None => genericLogBuffer += log
       }
     }
     irisLogBuffer = componentLogBuffer(IRIS.COMPONENT_NAME)
@@ -89,7 +89,7 @@ class LoggerCompTest extends LoggingTestSuite {
         expectedFileName: String = "",
         expectedCompName: String = ""
     ): Unit = {
-      logBuffer.foreach { log ⇒
+      logBuffer.foreach { log =>
         val currentLogLevel = log.getString(LoggingKeys.SEVERITY).toLowerCase
         Level(currentLogLevel) >= configuredLogLevel shouldBe true
         if (expectedLogsMap.nonEmpty) log.getString(LoggingKeys.MESSAGE) shouldBe expectedLogsMap(currentLogLevel)

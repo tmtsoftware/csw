@@ -11,7 +11,7 @@ import csw.location.client.utils.LocationServerStatus
 object Main extends App {
   private val name = BuildInfo.name
 
-  new ArgsParser(name).parse(args).foreach { options =>
+  new ArgsParser(name).parse(args.toList).foreach { options =>
     LocationServerStatus.requireUp(options.locationHost)
     run(options)
   }
@@ -25,7 +25,7 @@ object Main extends App {
     try cliApp.start(options)
     finally Http(actorSystem.toUntyped)
       .shutdownAllConnectionPools()
-      .onComplete(_ ⇒ actorRuntime.shutdown(ApplicationFinishedReason))
+      .onComplete(_ => actorRuntime.shutdown(ApplicationFinishedReason))
   }
 }
 // $COVERAGE-ON$

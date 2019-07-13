@@ -37,47 +37,47 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
 
   override def validateCommand(controlCommand: ControlCommand): ValidateCommandResponse = controlCommand.commandName match {
-    case `acceptedCmd`          ⇒ Accepted(controlCommand.runId)
-    case `longRunningCmd`       ⇒ Accepted(controlCommand.runId)
+    case `acceptedCmd`          => Accepted(controlCommand.runId)
+    case `longRunningCmd`       => Accepted(controlCommand.runId)
     case `onewayCmd`            => Accepted(controlCommand.runId)
-    case `matcherCmd`           ⇒ Accepted(controlCommand.runId)
-    case `matcherFailedCmd`     ⇒ Accepted(controlCommand.runId)
-    case `matcherTimeoutCmd`    ⇒ Accepted(controlCommand.runId)
-    case `cancelCmd`            ⇒ Accepted(controlCommand.runId)
+    case `matcherCmd`           => Accepted(controlCommand.runId)
+    case `matcherFailedCmd`     => Accepted(controlCommand.runId)
+    case `matcherTimeoutCmd`    => Accepted(controlCommand.runId)
+    case `cancelCmd`            => Accepted(controlCommand.runId)
     case `assemCurrentStateCmd` => Accepted(controlCommand.runId)
     case `hcdCurrentStateCmd`   => Accepted(controlCommand.runId)
-    case `immediateCmd`         ⇒ Accepted(controlCommand.runId)
-    case `immediateResCmd`      ⇒ Accepted(controlCommand.runId)
-    case `invalidCmd` ⇒
+    case `immediateCmd`         => Accepted(controlCommand.runId)
+    case `immediateResCmd`      => Accepted(controlCommand.runId)
+    case `invalidCmd` =>
       Invalid(controlCommand.runId, OtherIssue(s"Unsupported prefix: ${controlCommand.commandName}"))
-    case _ ⇒ Invalid(controlCommand.runId, WrongPrefixIssue(s"Wrong prefix: ${controlCommand.commandName}"))
+    case _ => Invalid(controlCommand.runId, WrongPrefixIssue(s"Wrong prefix: ${controlCommand.commandName}"))
   }
 
   override def onSubmit(controlCommand: ControlCommand): SubmitResponse = {
 
     controlCommand match {
-      case s @ Setup(_, _, `cancelCmd`, _, _) ⇒ processAcceptedSubmitCmd(s)
-      case s @ Setup(_, _, `longRunningCmd`, _, _) ⇒
+      case s @ Setup(_, _, `cancelCmd`, _, _) => processAcceptedSubmitCmd(s)
+      case s @ Setup(_, _, `longRunningCmd`, _, _) =>
         processCommandWithoutMatcher(s)
         Started(s.runId)
-      case s @ Setup(_, _, `acceptedCmd`, _, _)  ⇒ Started(s.runId)
-      case s @ Setup(_, _, `immediateCmd`, _, _) ⇒ Completed(s.runId)
-      case s @ Setup(_, _, `immediateResCmd`, _, _) ⇒
+      case s @ Setup(_, _, `acceptedCmd`, _, _)  => Started(s.runId)
+      case s @ Setup(_, _, `immediateCmd`, _, _) => Completed(s.runId)
+      case s @ Setup(_, _, `immediateResCmd`, _, _) =>
         CompletedWithResult(s.runId, Result(s.source, Set(KeyType.IntKey.make("encoder").set(20))))
-      case c ⇒
+      case c =>
         Error(controlCommand.runId, s"Some other command received: $c")
     }
   }
 
   override def onOneway(controlCommand: ControlCommand): Unit = controlCommand.commandName match {
-    case `cancelCmd`          ⇒ processAcceptedOnewayCmd(controlCommand)
+    case `cancelCmd`          => processAcceptedOnewayCmd(controlCommand)
     case `onewayCmd`          => // Do nothing
-    case `matcherCmd`         ⇒ processCommandWithMatcher(controlCommand)
-    case `matcherFailedCmd`   ⇒ processCommandWithMatcher(controlCommand)
-    case `acceptedCmd`        ⇒ //mimic long running process by publishing any state
+    case `matcherCmd`         => processCommandWithMatcher(controlCommand)
+    case `matcherFailedCmd`   => processCommandWithMatcher(controlCommand)
+    case `acceptedCmd`        => //mimic long running process by publishing any state
     case `matcherTimeoutCmd`  => processCommandWithMatcher(controlCommand)
     case `hcdCurrentStateCmd` => processCurrentStateOneway(controlCommand)
-    case c                    ⇒ println(s"onOneway received an unknown command: $c")
+    case c                    => println(s"onOneway received an unknown command: $c")
   }
 
   private def processCurrentStateOneway(controlCommand: ControlCommand): Unit = {
@@ -95,7 +95,7 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
   }
 
   private def processAcceptedOnewayCmd(controlCommand: ControlCommand): Unit =
-    controlCommand.paramType.get(cancelCmdId).foreach(param ⇒ processOriginalCommand(Id(param.head)))
+    controlCommand.paramType.get(cancelCmdId).foreach(param => processOriginalCommand(Id(param.head)))
 
   // This simulates a long command that has been started and finishes with a result
   private def processCommandWithoutMatcher(controlCommand: ControlCommand): Unit = {
@@ -129,21 +129,21 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
 
   private def processCommandWithMatcher(controlCommand: ControlCommand): Unit =
     controlCommand.commandName match {
-      case `matcherTimeoutCmd` ⇒ Thread.sleep(1000)
-      case `matcherFailedCmd` ⇒
+      case `matcherTimeoutCmd` => Thread.sleep(1000)
+      case `matcherFailedCmd` =>
         Source(1 to 10)
           .map(
-            i ⇒
+            i =>
               currentStatePublisher.publish(
                 CurrentState(controlCommand.source, StateName("testStateName"), Set(KeyType.IntKey.make("encoder").set(i * 1)))
               )
           )
           .throttle(1, 100.millis, 1, ThrottleMode.Shaping)
           .runWith(Sink.ignore)
-      case _ ⇒
+      case _ =>
         Source(1 to 10)
           .map(
-            i ⇒
+            i =>
               currentStatePublisher.publish(
                 CurrentState(controlCommand.source, StateName("testStateName"), Set(KeyType.IntKey.make("encoder").set(i * 10)))
               )

@@ -79,8 +79,8 @@ class LongRunningCommandTest(ignore: Int)
       // 3. mediumSetup which takes 3 seconds to finish
       //#subscribe-for-result
       val eventualCommandResponse = assemblyCommandService.submitAndWait(assemblyLongSetup).map {
-        case Invalid(runId, _) ⇒ Error(runId, "")
-        case x: SubmitResponse ⇒ x
+        case Invalid(runId, _) => Error(runId, "")
+        case x: SubmitResponse => x
       }
       //#subscribe-for-result
 

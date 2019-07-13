@@ -5,7 +5,7 @@ import java.util
 import csw.params.extensions.OptionConverters.RichOption
 
 import scala.annotation.varargs
-import scala.collection.JavaConverters.{mapAsJavaMapConverter, setAsJavaSetConverter}
+import scala.jdk.CollectionConverters._
 
 /**
  * The base trait for various parameter set types (commands or events)
@@ -96,7 +96,7 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] { self: T =>
    * @return the parameter for the key, if found
    */
   def get[S](keyName: String, keyType: KeyType[S]): Option[Parameter[S]] = {
-    paramSet.find(p ⇒ p.keyName == keyName && p.keyType == keyType).asInstanceOf[Option[Parameter[S]]]
+    paramSet.find(p => p.keyName == keyName && p.keyType == keyType).asInstanceOf[Option[Parameter[S]]]
   }
 
   /**

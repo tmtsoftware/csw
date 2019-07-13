@@ -48,8 +48,8 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
 
   override def submitAndWait(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] =
     submit(controlCommand).flatMap {
-      case _: Started ⇒ queryFinal(controlCommand.runId)
-      case x          ⇒ Future.successful(x)
+      case _: Started => queryFinal(controlCommand.runId)
+      case x          => Future.successful(x)
     }
 
   override def submitAllAndWait(
@@ -85,10 +85,10 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
     val matcher          = new Matcher(component, stateMatcher)
     val matcherResponseF = matcher.start
     oneway(controlCommand).flatMap {
-      case Accepted(runId) ⇒
+      case Accepted(runId) =>
         matcherResponseF.map {
-          case MatchCompleted  ⇒ Completed(runId)
-          case MatchFailed(ex) ⇒ Error(runId, ex.getMessage)
+          case MatchCompleted  => Completed(runId)
+          case MatchFailed(ex) => Error(runId, ex.getMessage)
         }
       case x @ _ =>
         matcher.stop()
@@ -100,7 +100,7 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
   override def query(commandRunId: Id)(implicit timeout: Timeout): Future[QueryResponse] = {
     val eventualResponse: Future[QueryResponse] = component ? (CommandResponseManagerMessage.Query(commandRunId, _))
     eventualResponse recover {
-      case _: TimeoutException ⇒ CommandNotAvailable(commandRunId)
+      case _: TimeoutException => CommandNotAvailable(commandRunId)
     }
   }
 
@@ -124,17 +124,17 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
         bufferSize,
         overflowStrategy = OverflowStrategy.dropHead
       )
-      .mapMaterializedValue { ref ⇒
+      .mapMaterializedValue { ref =>
         if (names.isEmpty) component ! ComponentStateSubscription(Subscribe(ref))
         else component ! ComponentStateSubscription(SubscribeOnly(ref, names))
       }
       .viaMat(KillSwitches.single)(Keep.right)
       .mapMaterializedValue(killSwitch => () => killSwitch.shutdown())
   }
-  override def subscribeCurrentState(callback: CurrentState ⇒ Unit): CurrentStateSubscription =
+  override def subscribeCurrentState(callback: CurrentState => Unit): CurrentStateSubscription =
     subscribeCurrentState().map(callback).toMat(Sink.ignore)(Keep.left).run()
 
-  override def subscribeCurrentState(names: Set[StateName], callback: CurrentState ⇒ Unit): CurrentStateSubscription =
+  override def subscribeCurrentState(names: Set[StateName], callback: CurrentState => Unit): CurrentStateSubscription =
     subscribeCurrentState(names).map(callback).toMat(Sink.ignore)(Keep.left).run()
 
 }

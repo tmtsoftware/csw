@@ -19,7 +19,7 @@ import csw.location.server.http.MultiNodeHTTPLocationService
 import org.scalatest.FunSuiteLike
 import org.tmt.embedded_keycloak.KeycloakData._
 import org.tmt.embedded_keycloak.utils.Ports
-import org.tmt.embedded_keycloak.{EmbeddedKeycloak, KeycloakData, Settings ⇒ KeycloakSettings}
+import org.tmt.embedded_keycloak.{EmbeddedKeycloak, KeycloakData, Settings => KeycloakSettings}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{DurationLong, FiniteDuration}

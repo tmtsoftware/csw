@@ -9,7 +9,7 @@ import csw.params.events.Event
 class EventOnelineTransformer(options: Options) {
 
   def transform(events: Seq[Event]): List[String] = {
-    val onelines = events.flatMap(e ⇒ transform(e)).toList
+    val onelines = events.flatMap(e => transform(e)).toList
     if (options.isTerseOut) onelines else Formatter.EventSeparator :: onelines
   }
 
@@ -28,16 +28,16 @@ class EventOnelineTransformer(options: Options) {
     else param.keyName
 
   private def traverse(params: Set[Parameter[_]], paths: List[String], parentKey: Option[String] = None): List[Oneline] =
-    params.toList.flatMap { param ⇒
+    params.toList.flatMap { param =>
       val currentPath = makeCurrentPath(param, parentKey)
 
       param.keyType match {
-        case StructKey ⇒
+        case StructKey =>
           val nestedParams = param.values.flatMap(_.asInstanceOf[Struct].paramSet).toSet
           traverse(nestedParams, paths, Some(currentPath))
-        case _ if paths.isEmpty || paths.contains(currentPath) || paths.exists(p ⇒ currentPath.contains(p)) ⇒
+        case _ if paths.isEmpty || paths.contains(currentPath) || paths.exists(p => currentPath.contains(p)) =>
           List(Oneline(currentPath, param))
-        case _ ⇒ Nil
+        case _ => Nil
       }
     }
 

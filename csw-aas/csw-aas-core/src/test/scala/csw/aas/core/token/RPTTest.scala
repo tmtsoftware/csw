@@ -9,7 +9,6 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Seconds, Span}
 import org.scalatest.{FunSuite, Matchers}
 
-import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationDouble
@@ -66,7 +65,7 @@ class RPTTest extends FunSuite with MockitoSugar with Matchers with ScalaFutures
       iat = Option(1543474907),
       exp = Option(1543475507),
       iss = Option("http://localhost:8080/auth/realms/example"),
-      aud = Audience(ArrayBuffer("example-app", "example-server")),
+      aud = Audience(List("example-app", "example-server")),
       jti = Option("f493fc38-735a-4c3d-a2e7-5928e8a8e0c1"),
       given_name = Option("test-user"),
       family_name = None,
@@ -76,8 +75,8 @@ class RPTTest extends FunSuite with MockitoSugar with Matchers with ScalaFutures
       scope = Option("profile email"),
       realm_access = Access(Set("offline_access", "uma_authorization", "example-admin-role")),
       resource_access = Map(
-        "account"        → Access(Set("manage-account", "manage-account-links", "view-profile")),
-        "example-server" → Access(Set("person-role"))
+        "account"        -> Access(Set("manage-account", "manage-account-links", "view-profile")),
+        "example-server" -> Access(Set("person-role"))
       ),
       authorization = Authorization(
         Set(

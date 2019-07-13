@@ -42,20 +42,20 @@ private[event] class EventPublisherUtil(implicit ec: ExecutionContext, mat: Mate
   def publishFromSource[Mat](
       source: Source[Event, Mat],
       parallelism: Int,
-      publish: Event ⇒ Future[Done],
-      maybeOnError: Option[PublishFailure ⇒ Unit]
+      publish: Event => Future[Done],
+      maybeOnError: Option[PublishFailure => Unit]
   ): Mat =
     source
-      .mapAsync(parallelism) { event ⇒
+      .mapAsync(parallelism) { event =>
         publishWithRecovery(event, publish, maybeOnError)
       }
       .to(Sink.ignore)
       .run()
 
-  private def publishWithRecovery(event: Event, publish: Event ⇒ Future[Done], maybeOnError: Option[PublishFailure ⇒ Unit]) =
+  private def publishWithRecovery(event: Event, publish: Event => Future[Done], maybeOnError: Option[PublishFailure => Unit]) =
     publish(event).recover[Done] {
-      case failure @ PublishFailure(_, _) ⇒
-        maybeOnError.foreach(onError ⇒ onError(failure))
+      case failure @ PublishFailure(_, _) =>
+        maybeOnError.foreach(onError => onError(failure))
         Done
     }
 
@@ -75,7 +75,7 @@ private[event] class EventPublisherUtil(implicit ec: ExecutionContext, mat: Mate
     eventGenerator
       .collect { case Some(event) => event }
       .recover {
-        case NonFatal(ex) ⇒
+        case NonFatal(ex) =>
           logger.error(ex.getMessage, ex = ex)
           throw ex
       }

@@ -37,7 +37,7 @@ private[framework] object SupervisorBehaviorFactory {
   ): Behavior[ComponentMessage] = {
     Behaviors
       .withTimers[SupervisorMessage](
-        timerScheduler ⇒
+        timerScheduler =>
           Behaviors
             .setup[SupervisorMessage](
               ctx =>

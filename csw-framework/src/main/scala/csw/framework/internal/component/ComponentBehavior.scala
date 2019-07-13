@@ -37,7 +37,7 @@ private[framework] object ComponentBehavior {
       lifecycleHandlers: ComponentHandlers,
       cswCtx: CswContext
   ): Behavior[TopLevelActorMessage] =
-    Behaviors.setup(ctx ⇒ {
+    Behaviors.setup(ctx => {
       import cswCtx._
       import ctx.executionContext
 
@@ -54,13 +54,13 @@ private[framework] object ComponentBehavior {
        * @return the existing behavior
        */
       def onSignal: PartialFunction[(ActorContext[TopLevelActorMessage], Signal), Behavior[TopLevelActorMessage]] = {
-        case (_, PostStop) ⇒
+        case (_, PostStop) =>
           log.warn("Component TLA is shutting down")
           try {
             log.info("Invoking lifecycle handler's onShutdown hook")
             Await.result(lifecycleHandlers.onShutdown(), shutdownTimeout)
           } catch {
-            case NonFatal(throwable) ⇒ log.error(throwable.getMessage, ex = throwable)
+            case NonFatal(throwable) => log.error(throwable.getMessage, ex = throwable)
           }
           Behaviors.same
       }
@@ -70,10 +70,10 @@ private[framework] object ComponentBehavior {
        * @param commonMessage message representing a message received in any lifecycle state
        */
       def onCommon(commonMessage: TopLevelActorCommonMessage): Unit = commonMessage match {
-        case UnderlyingHookFailed(exception) ⇒
+        case UnderlyingHookFailed(exception) =>
           log.error(exception.getMessage, ex = exception)
           throw exception
-        case TrackingEventReceived(trackingEvent) ⇒
+        case TrackingEventReceived(trackingEvent) =>
           lifecycleHandlers.onLocationTrackingEvent(trackingEvent)
       }
 
@@ -82,7 +82,7 @@ private[framework] object ComponentBehavior {
        * @param idleMessage message representing a message received in [[ComponentLifecycleState.Idle]] state
        */
       def onIdle(idleMessage: TopLevelActorIdleMessage): Unit = idleMessage match {
-        case Initialize ⇒
+        case Initialize =>
           async {
             log.info("Invoking lifecycle handler's initialize hook")
             await(lifecycleHandlers.initialize())
@@ -93,15 +93,15 @@ private[framework] object ComponentBehavior {
             // track all connections in component info for location updates
             if (componentInfo.locationServiceUsage == RegisterAndTrackServices) {
               componentInfo.connections.foreach(
-                connection ⇒ {
-                  locationService.subscribe(connection, trackingEvent ⇒ ctx.self ! TrackingEventReceived(trackingEvent))
+                connection => {
+                  locationService.subscribe(connection, trackingEvent => ctx.self ! TrackingEventReceived(trackingEvent))
                 }
               )
             }
             lifecycleState = ComponentLifecycleState.Running
             lifecycleHandlers.isOnline = true
             supervisor ! Running(ctx.self)
-          }.failed.foreach(throwable ⇒ ctx.self ! UnderlyingHookFailed(throwable))
+          }.failed.foreach(throwable => ctx.self ! UnderlyingHookFailed(throwable))
       }
 
       /*
@@ -110,9 +110,9 @@ private[framework] object ComponentBehavior {
        * @param runningMessage message representing a message received in [[ComponentLifecycleState.Running]] state
        */
       def onRun(runningMessage: RunningMessage): Unit = runningMessage match {
-        case Lifecycle(message) ⇒ onLifecycle(message)
-        case x: CommandMessage  ⇒ onRunningCompCommandMessage(x)
-        case msg                ⇒ log.error(s"Component TLA cannot handle message :[$msg]")
+        case Lifecycle(message) => onLifecycle(message)
+        case x: CommandMessage  => onRunningCompCommandMessage(x)
+        case msg                => log.error(s"Component TLA cannot handle message :[$msg]")
       }
 
       /*
@@ -122,7 +122,7 @@ private[framework] object ComponentBehavior {
        */
       def onLifecycle(toComponentLifecycleMessage: ToComponentLifecycleMessage): Unit =
         toComponentLifecycleMessage match {
-          case GoOnline ⇒
+          case GoOnline =>
             // process only if the component is offline currently
             if (!lifecycleHandlers.isOnline) {
               lifecycleHandlers.isOnline = true
@@ -130,7 +130,7 @@ private[framework] object ComponentBehavior {
               lifecycleHandlers.onGoOnline()
               log.debug(s"Component TLA is Online")
             }
-          case GoOffline ⇒
+          case GoOffline =>
             // process only if the component is online currently
             if (lifecycleHandlers.isOnline) {
               lifecycleHandlers.isOnline = false
@@ -146,9 +146,9 @@ private[framework] object ComponentBehavior {
        * @param commandMessage message encapsulating a [[csw.params.commands.Command]]
        */
       def onRunningCompCommandMessage(commandMessage: CommandMessage): Unit = commandMessage match {
-        case Validate(_, replyTo) ⇒ handleValidate(commandMessage, replyTo)
-        case Oneway(_, replyTo)   ⇒ handleOneway(commandMessage, replyTo)
-        case Submit(_, replyTo)   ⇒ handleSubmit(commandMessage, replyTo)
+        case Validate(_, replyTo) => handleValidate(commandMessage, replyTo)
+        case Oneway(_, replyTo)   => handleOneway(commandMessage, replyTo)
+        case Submit(_, replyTo)   => handleSubmit(commandMessage, replyTo)
       }
 
       def handleValidate(commandMessage: CommandMessage, replyTo: ActorRef[ValidateResponse]): Unit = {
@@ -163,10 +163,10 @@ private[framework] object ComponentBehavior {
         replyTo ! validationResponse.asInstanceOf[OnewayResponse]
 
         validationResponse match {
-          case Accepted(_) ⇒
+          case Accepted(_) =>
             log.info(s"Invoking lifecycle handler's onOneway hook with msg :[$commandMessage]")
             lifecycleHandlers.onOneway(commandMessage.command)
-          case invalid: Invalid ⇒
+          case invalid: Invalid =>
             log.debug(s"Command not forwarded to TLA post validation. ValidationResponse was [$invalid]")
         }
       }
@@ -198,13 +198,13 @@ private[framework] object ComponentBehavior {
        */
       Behaviors
         .receiveMessage[TopLevelActorMessage] {
-          msg ⇒
+          msg =>
             log.debug(s"Component TLA in lifecycle state :[$lifecycleState] received message :[$msg]")
             (lifecycleState, msg) match {
-              case (_, msg: TopLevelActorCommonMessage)                          ⇒ onCommon(msg)
-              case (ComponentLifecycleState.Idle, msg: TopLevelActorIdleMessage) ⇒ onIdle(msg)
-              case (ComponentLifecycleState.Running, msg: RunningMessage)        ⇒ onRun(msg)
-              case _ ⇒
+              case (_, msg: TopLevelActorCommonMessage)                          => onCommon(msg)
+              case (ComponentLifecycleState.Idle, msg: TopLevelActorIdleMessage) => onIdle(msg)
+              case (ComponentLifecycleState.Running, msg: RunningMessage)        => onRun(msg)
+              case _ =>
                 log.error(s"Unexpected message :[$msg] received by component in lifecycle state :[$lifecycleState]")
             }
             Behaviors.same

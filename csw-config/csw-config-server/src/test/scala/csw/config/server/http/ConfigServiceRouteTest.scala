@@ -731,7 +731,7 @@ class ConfigServiceRouteTest
     import serverWiring._
     val csRoute: ConfigServiceRoute =
       new ConfigServiceRoute(configServiceFactory, actorRuntime, configHandlers, serverWiring.securityDirectives) {
-        override val logRequest: HttpRequest ⇒ Unit = maskedReq ⇒ requests += maskedReq
+        override val logRequest: HttpRequest => Unit = maskedReq => requests += maskedReq
       }
 
     Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> csRoute.route ~> check {

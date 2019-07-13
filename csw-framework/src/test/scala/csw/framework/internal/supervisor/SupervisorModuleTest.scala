@@ -87,9 +87,9 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     )
 
     // This proves that data used in this test contains HCD and Assembly ComponentType
-    testData.find(info ⇒ info.componentType == HCD && info.name == "SampleHcd") shouldBe Some(hcdInfo)
-    testData.find(info ⇒ info.componentType == HCD && info.name == "JSampleHcd") shouldBe Some(jHcdInfo)
-    testData.find(info ⇒ info.componentType == Assembly && info.name == "SampleAssembly") shouldBe Some(assemblyInfo)
+    testData.find(info => info.componentType == HCD && info.name == "SampleHcd") shouldBe Some(hcdInfo)
+    testData.find(info => info.componentType == HCD && info.name == "JSampleHcd") shouldBe Some(jHcdInfo)
+    testData.find(info => info.componentType == Assembly && info.name == "SampleAssembly") shouldBe Some(assemblyInfo)
 
     forAll(testData) { info =>
       {
@@ -239,7 +239,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-206: Sender to know that Submit configuration command's validation failed
   // DEOPSCSW-214: Sender to know that oneway configuration command's validation failed
   test("component handler should be able to validate a Setup or Observe command as failure during validation") {
-    forAll(testData) { info: ComponentInfo ⇒
+    forAll(testData) { info: ComponentInfo =>
       {
         val mocks                                          = frameworkTestMocks()
         val submitResponseProbe: TestProbe[SubmitResponse] = TestProbe[SubmitResponse]

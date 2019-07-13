@@ -83,15 +83,16 @@ object LocationServiceExampleClient {
   }
 
   //#tracking
-  def sinkBehavior: Behaviors.Receive[ExampleMessages] = Behaviors.receive[ExampleMessages] { (ctx, msg) ⇒
+  def sinkBehavior: Behaviors.Receive[ExampleMessages] = Behaviors.receive[ExampleMessages] { (ctx, msg) =>
     {
       val log: Logger = new LoggerFactory("my-component-name").getLogger(ctx)
 
       msg match {
-        case TrackingEventAdapter(LocationUpdated(loc))  ⇒ log.info(s"Location updated ${locationInfoToString(loc)}")
-        case TrackingEventAdapter(LocationRemoved(conn)) ⇒ log.warn(s"Location removed $conn", Map("connection" → conn.toString))
-        case AllDone(exampleConnection)                  ⇒ log.info(s"Tracking of $exampleConnection complete.")
-        case CustomException(throwable)                  ⇒ log.error(throwable.getMessage, ex = throwable)
+        case TrackingEventAdapter(LocationUpdated(loc)) => log.info(s"Location updated ${locationInfoToString(loc)}")
+        case TrackingEventAdapter(LocationRemoved(conn)) =>
+          log.warn(s"Location removed $conn", Map("connection" -> conn.toString))
+        case AllDone(exampleConnection) => log.info(s"Tracking of $exampleConnection complete.")
+        case CustomException(throwable) => log.error(throwable.getMessage, ex = throwable)
       }
       Behaviors.same
     }
@@ -180,7 +181,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   //#log-info-map
   log.info(
     s"Attempting to find $exampleConnection",
-    Map(Keys.OBS_ID → "foo_obs_id", "exampleConnection" → exampleConnection.name)
+    Map(Keys.OBS_ID -> "foo_obs_id", "exampleConnection" -> exampleConnection.name)
   )
   //#log-info-map
   val findResult: Option[AkkaLocation] = Await.result(locationService.find(exampleConnection), timeout)
@@ -190,7 +191,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   //#log-info
   //#find
 
-  findResult.foreach(akkaLocation ⇒ {
+  findResult.foreach(akkaLocation => {
     //#typed-ref
     // If the component type is HCD or Assembly, use this to get the correct ActorRef
     val typedComponentRef: ActorRef[ComponentMessage] = akkaLocation.componentRef
@@ -207,9 +208,9 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   val resolveResultF: Future[Option[AkkaLocation]] = locationService.resolve(exampleConnection, waitForResolveLimit)
   val resolveResult: Option[AkkaLocation]          = Await.result(resolveResultF, waitForResolveLimit + timeout)
   resolveResult match {
-    case Some(result) ⇒
+    case Some(result) =>
       log.info(s"Resolve result: ${locationInfoToString(result)}")
-    case None ⇒
+    case None =>
       log.info(s"Timeout waiting for location $exampleConnection to resolve.")
   }
   //#resolve
@@ -239,7 +240,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   // filter akka locations based on prefix
   val akkaLocations: List[AkkaLocation] = Await.result(locationService.listByPrefix("nfiraos.ncc"), timeout)
   log.info("Registered akka locations for nfiraos.ncc")
-  akkaLocations.foreach(c ⇒ log.info(s"--- ${locationInfoToString(c)}"))
+  akkaLocations.foreach(c => log.info(s"--- ${locationInfoToString(c)}"))
   //#filtering-prefix
 
   if (resolveResult.isDefined) {
@@ -315,7 +316,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
     // A location was removed
     case LocationRemoved(conn) =>
-      log.info(s"Location removed $conn", Map("connection" → conn.toString))
+      log.info(s"Location removed $conn", Map("connection" -> conn.toString))
 
     case AllDone =>
       log.info(s"Tracking of $exampleConnection complete.")

@@ -49,7 +49,7 @@ object LocationServiceExampleComponent {
   case class ClientMessage(replyTo: typed.ActorRef[_])
 
   def behaviour(locationService: LocationService): Behaviors.Receive[ClientMessage] =
-    Behaviors.receive[ClientMessage]((ctx, msg) ⇒ {
+    Behaviors.receive[ClientMessage]((ctx, msg) => {
       val log: Logger = new LoggerFactory("my-component-name").getLogger(ctx)
       log.info("In actor LocationServiceExampleComponent")
       // Register with the location service
@@ -65,7 +65,7 @@ object LocationServiceExampleComponent {
 
       log.info("LocationServiceExampleComponent registered.")
       msg match {
-        case ClientMessage(replyTo) ⇒
+        case ClientMessage(replyTo) =>
           log.info(s"Received scala client message from: $replyTo")
           Behaviors.same
       }

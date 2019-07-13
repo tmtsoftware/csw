@@ -9,7 +9,7 @@ import csw.event.api.exceptions.EventServerNotAvailable
  */
 private[event] object EventStreamSupervisionStrategy {
   val decider: Supervision.Decider = {
-    case _: EventServerNotAvailable ⇒ Supervision.Stop
-    case _                          ⇒ Supervision.Resume
+    case _: EventServerNotAvailable => Supervision.Stop
+    case _                          => Supervision.Resume
   }
 }

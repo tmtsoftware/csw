@@ -3,7 +3,7 @@ package csw.config.api.javadsl
 import java.nio.file.Path
 import java.util.Optional
 import java.util.concurrent.CompletableFuture
-import java.{lang ⇒ jl}
+import java.{lang => jl}
 
 import csw.config.api.models._
 import csw.config.api.scaladsl.ConfigService

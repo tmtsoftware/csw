@@ -143,13 +143,13 @@ object CommandResponse {
    * @return a CommandResponse that has runId as provided id
    */
   def withRunId(id: Id, response: SubmitResponse): SubmitResponse = response match {
-    case started: Started                         ⇒ started.copy(runId = id)
-    case invalid: Invalid                         ⇒ invalid.copy(runId = id)
-    case completedWithResult: CompletedWithResult ⇒ completedWithResult.copy(runId = id)
-    case completed: Completed                     ⇒ completed.copy(runId = id)
-    case locked: Locked                           ⇒ locked.copy(runId = id)
-    case error: Error                             ⇒ error.copy(runId = id)
-    case cancelled: Cancelled                     ⇒ cancelled.copy(runId = id)
+    case started: Started                         => started.copy(runId = id)
+    case invalid: Invalid                         => invalid.copy(runId = id)
+    case completedWithResult: CompletedWithResult => completedWithResult.copy(runId = id)
+    case completed: Completed                     => completed.copy(runId = id)
+    case locked: Locked                           => locked.copy(runId = id)
+    case error: Error                             => error.copy(runId = id)
+    case cancelled: Cancelled                     => cancelled.copy(runId = id)
   }
 
   /**

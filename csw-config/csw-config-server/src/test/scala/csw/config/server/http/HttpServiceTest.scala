@@ -75,7 +75,7 @@ class HttpServiceTest extends HTTPLocationService {
     //TODO: Find a way to assert server is not bounded
     try actorRuntime.shutdown(UnknownReason).await
     catch {
-      case NonFatal(_) ⇒
+      case NonFatal(_) =>
     }
   }
 }

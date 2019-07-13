@@ -6,7 +6,7 @@ import csw.location.model.scaladsl.Connection.HttpConnection
 import csw.location.model.scaladsl.{ComponentId, ComponentType, HttpLocation}
 import org.scalatest.{FunSuite, Matchers}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class AuthConfigTest extends FunSuite with Matchers {
   test("should create KeycloakDeployment from config") {
@@ -34,7 +34,7 @@ class AuthConfigTest extends FunSuite with Matchers {
   }
 
   test("should throw exception if client-id is not present in config") {
-    val map: Map[String, String] = Map("auth-config.realm" → "test")
+    val map: Map[String, String] = Map("auth-config.realm" -> "test")
     val config                   = ConfigFactory.parseMap(map.asJava)
 
     val authConfig = AuthConfig.create(config)

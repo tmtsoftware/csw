@@ -218,7 +218,7 @@ class ConfigClientExampleTest
 
     //create config files at those paths
     paths map {
-      case (path, fileType) ⇒
+      case (path, fileType) =>
         val createF = async {
           await(
             adminApi.create(path, ConfigData.fromString(defaultStrConf), Annex == fileType, "initial commit")
@@ -229,30 +229,30 @@ class ConfigClientExampleTest
 
     val assertionF = async {
       //retrieve list of all files; for demonstration purpose show validate return values
-      await(adminApi.list()).map(info ⇒ info.path).toSet shouldBe paths.map {
-        case (path, _) ⇒ path
+      await(adminApi.list()).map(info => info.path).toSet shouldBe paths.map {
+        case (path, _) => path
       }.toSet
 
       //retrieve list of files based on type; for demonstration purpose validate return values
-      await(adminApi.list(Some(Annex))).map(info ⇒ info.path).toSet shouldBe paths.collect {
-        case (path, fileType) if fileType == Annex ⇒ path
+      await(adminApi.list(Some(Annex))).map(info => info.path).toSet shouldBe paths.collect {
+        case (path, fileType) if fileType == Annex => path
       }.toSet
-      await(adminApi.list(Some(FileType.Normal))).map(info ⇒ info.path).toSet shouldBe paths.collect {
-        case (path, fileType) if fileType == FileType.Normal ⇒ path
+      await(adminApi.list(Some(FileType.Normal))).map(info => info.path).toSet shouldBe paths.collect {
+        case (path, fileType) if fileType == FileType.Normal => path
       }.toSet
 
       //retrieve list using pattern; for demonstration purpose validate return values
-      await(adminApi.list(None, Some(".*.conf"))).map(info ⇒ info.path.toString).toSet shouldBe Set(
+      await(adminApi.list(None, Some(".*.conf"))).map(info => info.path.toString).toSet shouldBe Set(
         "a/b/c/hcd/hcd.conf",
         "a/c/trombone.conf",
         "testing/test.conf"
       )
       //retrieve list using pattern and file type; for demonstration purpose validate return values
-      await(adminApi.list(Some(FileType.Normal), Some(".*.conf"))).map(info ⇒ info.path.toString).toSet shouldBe
+      await(adminApi.list(Some(FileType.Normal), Some(".*.conf"))).map(info => info.path.toString).toSet shouldBe
       Set("a/b/c/hcd/hcd.conf", "testing/test.conf")
-      await(adminApi.list(Some(Annex), Some("a/c.*"))).map(info ⇒ info.path.toString).toSet shouldBe
+      await(adminApi.list(Some(Annex), Some("a/c.*"))).map(info => info.path.toString).toSet shouldBe
       Set("a/c/trombone.conf")
-      await(adminApi.list(Some(FileType.Normal), Some("test.*"))).map(info ⇒ info.path.toString).toSet shouldBe
+      await(adminApi.list(Some(FileType.Normal), Some("test.*"))).map(info => info.path.toString).toSet shouldBe
       Set("testing/test.conf")
     }
     Await.result(assertionF, 2.seconds)

@@ -24,8 +24,8 @@ private[csw] class LoggerImpl(maybeComponentName: Option[String], actorName: Opt
   private def all(
       level: Level,
       id: AnyId,
-      msg: ⇒ String,
-      map: ⇒ Map[String, Any],
+      msg: => String,
+      map: => Map[String, Any],
       ex: Throwable,
       sourceLocation: SourceLocation
   ): Unit = {
@@ -45,25 +45,25 @@ private[csw] class LoggerImpl(maybeComponentName: Option[String], actorName: Opt
 
   // implicit factory makes `file`, `line` and `class` to appear in log statements
   // it uses scala macros to capture these details
-  def trace(msg: ⇒ String, map: ⇒ Map[String, Any], ex: Throwable, id: AnyId)(implicit factory: SourceFactory): Unit =
+  def trace(msg: => String, map: => Map[String, Any], ex: Throwable, id: AnyId)(implicit factory: SourceFactory): Unit =
     if (componentLoggingState.doTrace || has(id, TRACE)) all(TRACE, id, msg, map, ex, factory.get())
 
-  def debug(msg: ⇒ String, map: ⇒ Map[String, Any], ex: Throwable, id: AnyId)(implicit factory: SourceFactory): Unit =
+  def debug(msg: => String, map: => Map[String, Any], ex: Throwable, id: AnyId)(implicit factory: SourceFactory): Unit =
     if (componentLoggingState.doDebug || has(id, DEBUG)) all(DEBUG, id, msg, map, ex, factory.get())
 
-  override def info(msg: ⇒ String, map: ⇒ Map[String, Any], ex: Throwable, id: AnyId)(
+  override def info(msg: => String, map: => Map[String, Any], ex: Throwable, id: AnyId)(
       implicit factory: SourceFactory
   ): Unit = if (componentLoggingState.doInfo || has(id, INFO)) all(INFO, id, msg, map, ex, factory.get())
 
-  override def warn(msg: ⇒ String, map: ⇒ Map[String, Any], ex: Throwable, id: AnyId)(
+  override def warn(msg: => String, map: => Map[String, Any], ex: Throwable, id: AnyId)(
       implicit factory: SourceFactory
   ): Unit = if (componentLoggingState.doWarn || has(id, WARN)) all(WARN, id, msg, map, ex, factory.get())
 
-  override def error(msg: ⇒ String, map: ⇒ Map[String, Any], ex: Throwable, id: AnyId)(
+  override def error(msg: => String, map: => Map[String, Any], ex: Throwable, id: AnyId)(
       implicit factory: SourceFactory
   ): Unit = if (componentLoggingState.doError || has(id, ERROR)) all(ERROR, id, msg, map, ex, factory.get())
 
-  override def fatal(msg: ⇒ String, map: ⇒ Map[String, Any], ex: Throwable, id: AnyId)(
+  override def fatal(msg: => String, map: => Map[String, Any], ex: Throwable, id: AnyId)(
       implicit factory: SourceFactory
   ): Unit = all(FATAL, id, msg, map, ex, factory.get())
 

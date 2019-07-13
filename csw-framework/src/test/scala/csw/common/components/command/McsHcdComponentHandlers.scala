@@ -24,11 +24,11 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
 
   override def validateCommand(controlCommand: ControlCommand): ValidateCommandResponse = {
     controlCommand.commandName match {
-      case `longRunning`               ⇒ Accepted(controlCommand.runId)
-      case `mediumRunning`             ⇒ Accepted(controlCommand.runId)
-      case `shortRunning`              ⇒ Accepted(controlCommand.runId)
-      case `failureAfterValidationCmd` ⇒ Accepted(controlCommand.runId)
-      case _ ⇒
+      case `longRunning`               => Accepted(controlCommand.runId)
+      case `mediumRunning`             => Accepted(controlCommand.runId)
+      case `shortRunning`              => Accepted(controlCommand.runId)
+      case `failureAfterValidationCmd` => Accepted(controlCommand.runId)
+      case _ =>
         Invalid(controlCommand.runId, UnsupportedCommandIssue(controlCommand.commandName.name))
     }
   }
@@ -36,7 +36,7 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   //#addOrUpdateCommand
   override def onSubmit(controlCommand: ControlCommand): SubmitResponse = {
     controlCommand.commandName match {
-      case `longRunning` ⇒
+      case `longRunning` =>
         ctx.scheduleOnce(
           5.seconds,
           commandResponseManager.commandResponseManagerActor,
@@ -44,24 +44,24 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         )
         Started(controlCommand.runId)
       //#addOrUpdateCommand
-      case `mediumRunning` ⇒
+      case `mediumRunning` =>
         ctx.scheduleOnce(
           3.seconds,
           commandResponseManager.commandResponseManagerActor,
           AddOrUpdateCommand(Completed(controlCommand.runId))
         )
         Started(controlCommand.runId)
-      case `shortRunning` ⇒
+      case `shortRunning` =>
         ctx.scheduleOnce(
           1.seconds,
           commandResponseManager.commandResponseManagerActor,
           AddOrUpdateCommand(Completed(controlCommand.runId))
         )
         Started(controlCommand.runId)
-      case `failureAfterValidationCmd` ⇒
+      case `failureAfterValidationCmd` =>
         commandResponseManager.addOrUpdateCommand(Error(controlCommand.runId, "Failed command"))
         Error(controlCommand.runId, "Failed command")
-      case _ ⇒
+      case _ =>
         Error(controlCommand.runId, "Unknown Command")
     }
   }

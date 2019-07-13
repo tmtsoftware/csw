@@ -25,13 +25,13 @@ class EmptyPolicyTest extends FunSuite with MockitoSugar with Directives with Sc
     val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
-      case Provided(`invalidTokenStr`) ⇒ Future.successful(None)
-      case _                           ⇒ Future.successful(None)
+      case Provided(`invalidTokenStr`) => Future.successful(None)
+      case _                           => Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = securityDirectives.authenticate { implicit at ⇒
+    val route: Route = securityDirectives.authenticate { implicit at =>
       get {
         securityDirectives.authorize(EmptyPolicy, at) {
           complete("OK")
@@ -48,11 +48,11 @@ class EmptyPolicyTest extends FunSuite with MockitoSugar with Directives with Sc
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
 
-    val authenticator: AsyncAuthenticator[AccessToken] = _ ⇒ Future.successful(None)
+    val authenticator: AsyncAuthenticator[AccessToken] = _ => Future.successful(None)
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = securityDirectives.authenticate { implicit at ⇒
+    val route: Route = securityDirectives.authenticate { implicit at =>
       get {
         securityDirectives.authorize(EmptyPolicy, at) {
           complete("OK")
@@ -78,13 +78,13 @@ class EmptyPolicyTest extends FunSuite with MockitoSugar with Directives with Sc
       .thenReturn(true)
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
-      case Provided(`validTokenWithPermissionStr`) ⇒ Future.successful(Some(validTokenWithPermission))
-      case _                                       ⇒ Future.successful(None)
+      case Provided(`validTokenWithPermissionStr`) => Future.successful(Some(validTokenWithPermission))
+      case _                                       => Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = securityDirectives.authenticate { implicit at ⇒
+    val route: Route = securityDirectives.authenticate { implicit at =>
       get {
         securityDirectives.authorize(EmptyPolicy, at) {
           complete("OK")

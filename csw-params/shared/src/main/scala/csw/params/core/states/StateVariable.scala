@@ -6,7 +6,7 @@ import csw.params.core.models.Prefix
 import csw.serializable.CommandSerializable
 
 import scala.annotation.varargs
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
  * Base trait for state variables
@@ -67,7 +67,7 @@ object StateVariable {
    * @return a new CurrentStates object containing all the given CurrentState objects
    */
   @varargs
-  def createCurrentStates(states: CurrentState*): CurrentStates = CurrentStates(states)
+  def createCurrentStates(states: CurrentState*): CurrentStates = CurrentStates(states.toList)
 
   /**
    * A Java helper method to create CurrentState
@@ -75,7 +75,7 @@ object StateVariable {
    * @param states one or more CurrentState objects
    * @return a new CurrentStates object containing all the given CurrentState objects
    */
-  def createCurrentStates(states: java.util.List[CurrentState]): CurrentStates = CurrentStates(states.asScala)
+  def createCurrentStates(states: java.util.List[CurrentState]): CurrentStates = CurrentStates(states.asScala.toList)
 }
 
 /**

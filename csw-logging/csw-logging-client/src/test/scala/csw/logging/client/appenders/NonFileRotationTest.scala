@@ -9,7 +9,7 @@ import csw.logging.client.utils.FileUtils
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 import play.api.libs.json.{JsObject, Json}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
@@ -18,7 +18,7 @@ import scala.concurrent.duration.DurationLong
 class NonFileRotationTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
   private val logFileDir = Paths.get("/tmp/csw-test-logs/").toFile
   private val map: Map[String, Any] = Map(
-    "csw-logging.appender-config.file.rotate" → false
+    "csw-logging.appender-config.file.rotate" -> false
   )
   private val config                    = ConfigFactory.parseMap(map.asJava).withFallback(ConfigFactory.load())
   private val actorSystem               = ActorSystem(SpawnProtocol.behavior, "test-1", config)

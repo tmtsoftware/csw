@@ -25,7 +25,7 @@ class CommandLineRunner(
     actorRuntime: ActorRuntime,
     locationService: LocationService,
     configUtils: ConfigUtils,
-    printLine: Any ⇒ Unit
+    printLine: Any => Unit
 ) {
   import actorRuntime._
 
@@ -55,7 +55,8 @@ class CommandLineRunner(
           Done
         }
 
-    val refreshActor = AlarmRefreshActorFactory.make(refreshSeverity, refreshInterval)
+    val refreshActor =
+      AlarmRefreshActorFactory.make((alarmKey, alarmSeverity) => refreshSeverity(alarmKey, alarmSeverity), refreshInterval)
     refreshActor ! AutoRefreshSeverity(options.alarmKey, options.severity.get)
     refreshActor
   }
@@ -63,7 +64,7 @@ class CommandLineRunner(
   def subscribeSeverity(options: Options): (AlarmSubscription, Future[Done]) = {
     val (subscription, doneF) = alarmService
       .subscribeAggregatedSeverity(options.key)
-      .toMat(Sink.foreach(severity ⇒ printLine(Formatter.formatAggregatedSeverity(options.key, severity))))(Keep.both)
+      .toMat(Sink.foreach(severity => printLine(Formatter.formatAggregatedSeverity(options.key, severity))))(Keep.both)
       .run()
 
     unsubscribeOnCoordinatedShutdown(subscription)
@@ -105,7 +106,7 @@ class CommandLineRunner(
   def subscribeHealth(options: Options): (AlarmSubscription, Future[Done]) = {
     val (subscription, doneF) = alarmService
       .subscribeAggregatedHealth(options.key)
-      .toMat(Sink.foreach(health ⇒ printLine(Formatter.formatAggregatedHealth(options.key, health))))(Keep.both)
+      .toMat(Sink.foreach(health => printLine(Formatter.formatAggregatedHealth(options.key, health))))(Keep.both)
       .run()
 
     unsubscribeOnCoordinatedShutdown(subscription)
@@ -113,7 +114,7 @@ class CommandLineRunner(
   }
 
   private def unsubscribeOnCoordinatedShutdown(subscription: AlarmSubscription): Unit =
-    coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "unsubscribe-health-stream") { () ⇒
+    coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "unsubscribe-health-stream") { () =>
       subscription.unsubscribe()
     }
 }

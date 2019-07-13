@@ -68,8 +68,8 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     supervisorLifecycleStateProbe.expectMessage(SupervisorLifecycleState.Idle)
 
     val spawnedEffects = supervisorBehaviorKit.retrieveAllEffects().map {
-      case s: Spawned[_] ⇒ s.childName
-      case _             ⇒ ""
+      case s: Spawned[_] => s.childName
+      case _             => ""
     }
 
     spawnedEffects should contain allOf (SupervisorBehavior.PubSubLifecycleActor, componentActorName)

@@ -38,7 +38,7 @@ class ArgsParser(name: String) {
       c.copy(port = Some(x))
     } text "Optional port number the application listens on (default: use value of $name.port from config file, or use a random, free port.)"
 
-    arg[File]("<app-config>") optional () maxOccurs 1 action { (x, c) =>
+    arg[File]("<app-config>").optional() maxOccurs 1 action { (x, c) =>
       c.copy(appConfigFile = Some(x))
     } text "optional config file in HOCON format (Options specified as: $name.command, $name.port, etc.)"
 
@@ -50,7 +50,7 @@ class ArgsParser(name: String) {
       c.copy(noExit = true)
     } text "for testing: prevents application from exiting after running command"
 
-    opt[String]("http") action { (p, c) ⇒
+    opt[String]("http") action { (p, c) =>
       c.copy(httpPath = Some(p))
     } text "The parameter is optional. Registers services as http with path provided, by default services will be registered as tcp "
 

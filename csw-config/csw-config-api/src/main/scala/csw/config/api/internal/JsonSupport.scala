@@ -17,8 +17,8 @@ private[config] trait JsonSupport extends PlayJsonSupport {
     override def writes(obj: Path): JsValue = JsString(obj.toString)
 
     override def reads(json: JsValue): JsResult[Path] = json match {
-      case JsString(value) ⇒ JsSuccess(Paths.get(value))
-      case _               ⇒ JsError(s"can not parse $json into Path")
+      case JsString(value) => JsSuccess(Paths.get(value))
+      case _               => JsError(s"can not parse $json into Path")
     }
   }
 
@@ -26,8 +26,8 @@ private[config] trait JsonSupport extends PlayJsonSupport {
     override def writes(obj: Instant): JsValue = JsString(obj.toString)
 
     override def reads(json: JsValue): JsResult[Instant] = json match {
-      case JsString(value) ⇒ JsSuccess(Instant.parse(value))
-      case _               ⇒ throw new RuntimeException("can not parse")
+      case JsString(value) => JsSuccess(Instant.parse(value))
+      case _               => throw new RuntimeException("can not parse")
     }
   }
 
@@ -40,8 +40,8 @@ private[config] trait JsonSupport extends PlayJsonSupport {
     @silent implicit val configIdFormat: Format[ConfigId] = new Format[ConfigId] {
       override def writes(o: ConfigId): JsValue = JsString(o.id)
       override def reads(json: JsValue): JsResult[ConfigId] = json match {
-        case JsString(x) ⇒ JsSuccess(ConfigId(x))
-        case _           ⇒ JsError(s"can not parse $json into configId")
+        case JsString(x) => JsSuccess(ConfigId(x))
+        case _           => JsError(s"can not parse $json into configId")
       }
     }
     Json.format[ConfigFileInfo]
@@ -54,8 +54,8 @@ private[config] trait JsonSupport extends PlayJsonSupport {
     @silent implicit val configIdFormat: Format[ConfigId] = new Format[ConfigId] {
       override def writes(o: ConfigId): JsValue = JsString(o.id)
       override def reads(json: JsValue): JsResult[ConfigId] = json match {
-        case JsString(x) ⇒ JsSuccess(ConfigId(x))
-        case _           ⇒ JsError(s"can not parse $json into configId")
+        case JsString(x) => JsSuccess(ConfigId(x))
+        case _           => JsError(s"can not parse $json into configId")
       }
     }
     Json.format[ConfigFileRevision]

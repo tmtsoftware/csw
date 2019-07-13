@@ -12,7 +12,7 @@ import scala.concurrent.duration._
 import scala.io.Source
 import scala.util.Random
 
-trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
+trait SystemMonitoringSupport { _: MultiNodeSpec =>
 
   lazy val pid: Int = {
     import java.lang.management._
@@ -49,7 +49,7 @@ trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
         .getLines()
         .zipWithIndex
         .map {
-          case (line, n) ⇒ if (n == 0) s"Timestamp $line" else s"$n \t\t $line"
+          case (line, n) => if (n == 0) s"Timestamp $line" else s"$n \t\t $line"
         }
         .foreach(w.println)
       w.close()
@@ -95,7 +95,7 @@ trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
       import scala.concurrent.ExecutionContext.Implicits.global
 
       val afterDelay = akka.pattern.after(delay, system.scheduler)(Future.successful("GO!"))
-      afterDelay onComplete { it ⇒
+      afterDelay onComplete { it =>
         val perfCommand = s"$perfJavaFlamesPath $pid"
         println(s"[perf @ ${myself.name}($pid)][OUT]: " + perfCommand)
 
