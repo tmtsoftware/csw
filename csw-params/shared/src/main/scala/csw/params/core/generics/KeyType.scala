@@ -1,14 +1,13 @@
 package csw.params.core.generics
 
+import csw.params.core.formats.ParamCodecs
 import csw.params.core.formats.ParamCodecs._
-import csw.params.core.formats.{ParamCodecs, JsonSupport}
-import csw.params.core.models.Coords.{AltAzCoord, CometCoord, Coord, EqCoord, MinorPlanetCoord, SolarSystemCoord}
+import csw.params.core.models.Coords._
 import csw.params.core.models.Units.second
 import csw.params.core.models._
 import csw.time.core.models.{TAITime, UTCTime}
 import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
 import io.bullet.borer.{Decoder, Encoder}
-import play.api.libs.json._
 
 import scala.collection.{immutable, mutable}
 import scala.reflect.ClassTag
@@ -18,11 +17,9 @@ import scala.reflect.ClassTag
  *
  * @tparam S the type of values that will sit against the key in Parameter
  */
-sealed class KeyType[S: Format: ClassTag: ArrayEnc: ArrayDec] extends EnumEntry with Serializable {
+sealed class KeyType[S: ArrayEnc: ArrayDec] extends EnumEntry with Serializable {
   override def hashCode: Int              = toString.hashCode
   override def equals(that: Any): Boolean = that.toString == this.toString
-
-  private[params] lazy val paramFormat: Format[Parameter[S]] = Parameter.parameterFormat[S]
 
   private[params] lazy val paramEncoder: Encoder[Parameter[S]]     = ParamCodecs.paramCodec[S].encoder
   private[params] lazy val waDecoder: Decoder[mutable.ArraySeq[S]] = ParamCodecs.waCodec[S].decoder
@@ -33,7 +30,7 @@ sealed class KeyType[S: Format: ClassTag: ArrayEnc: ArrayDec] extends EnumEntry 
  *
  * @tparam S the type of values that will sit against the key in Parameter
  */
-class SimpleKeyType[S: Format: ClassTag: ArrayEnc: ArrayDec] extends KeyType[S] {
+class SimpleKeyType[S: ClassTag: ArrayEnc: ArrayDec] extends KeyType[S] {
 
   /**
    * Make a Key from provided name
@@ -51,7 +48,7 @@ class SimpleKeyType[S: Format: ClassTag: ArrayEnc: ArrayDec] extends KeyType[S] 
  * @param defaultUnits applicable units
  * @tparam S the type of values that will sit against the key in Parameter
  */
-sealed class SimpleKeyTypeWithUnits[S: Format: ClassTag: ArrayEnc: ArrayDec](defaultUnits: Units) extends KeyType[S] {
+sealed class SimpleKeyTypeWithUnits[S: ClassTag: ArrayEnc: ArrayDec](defaultUnits: Units) extends KeyType[S] {
 
   /**
    * Make a Key from provided name
@@ -65,19 +62,17 @@ sealed class SimpleKeyTypeWithUnits[S: Format: ClassTag: ArrayEnc: ArrayDec](def
 /**
  * A KeyType that holds array
  */
-class ArrayKeyType[S: Format: ClassTag: ArrayEnc: ArrayDec] extends SimpleKeyType[ArrayData[S]]
+class ArrayKeyType[S: ClassTag: ArrayEnc: ArrayDec] extends SimpleKeyType[ArrayData[S]]
 
 /**
  * A KeyType that holds Matrix
  */
-class MatrixKeyType[S: Format: ClassTag: ArrayEnc: ArrayDec] extends SimpleKeyType[MatrixData[S]]
+class MatrixKeyType[S: ClassTag: ArrayEnc: ArrayDec] extends SimpleKeyType[MatrixData[S]]
 
 /**
  * KeyTypes defined for consumption in Scala code
  */
 object KeyType extends Enum[KeyType[_]] with PlayJsonEnum[KeyType[_]] {
-
-  import JsonSupport._
 
   /**
    * values return a Seq of all KeyTypes provided by `csw-messages`
@@ -127,6 +122,4 @@ object KeyType extends Enum[KeyType[_]] with PlayJsonEnum[KeyType[_]] {
   case object IntMatrixKey    extends MatrixKeyType[Int]
   case object FloatMatrixKey  extends MatrixKeyType[Float]
   case object DoubleMatrixKey extends MatrixKeyType[Double]
-
-  implicit def format2[T]: Format[KeyType[T]] = implicitly[Format[KeyType[_]]].asInstanceOf[Format[KeyType[T]]]
 }

@@ -3,51 +3,12 @@ package csw.params.core.generics
 import java.util
 import java.util.Optional
 
-import csw.params.extensions.OptionConverters.RichOption
 import csw.params.core.models.Units
-import play.api.libs.json._
+import csw.params.extensions.OptionConverters.RichOption
+import io.bullet.borer.derivation.key
 
-import scala.jdk.CollectionConverters._
 import scala.collection.mutable
-import scala.reflect.ClassTag
-
-object Parameter {
-
-  private[csw] def apply[S](
-      keyName: String,
-      keyType: KeyType[S],
-      items: mutable.ArraySeq[S],
-      units: Units
-  ): Parameter[S] =
-    new Parameter(keyName, keyType, items, units)
-
-  private[params] implicit def parameterFormat[T: Format: ClassTag]: Format[Parameter[T]] =
-    new Format[Parameter[T]] {
-      override def writes(obj: Parameter[T]): JsValue = {
-        JsObject(
-          Seq(
-            "keyName" -> JsString(obj.keyName),
-            "keyType" -> JsString(obj.keyType.entryName),
-            "values"  -> Json.toJson(obj.values),
-            "units"   -> JsString(obj.units.entryName)
-          )
-        )
-      }
-
-      override def reads(json: JsValue): JsResult[Parameter[T]] = {
-        JsSuccess(
-          Parameter(
-            (json \ "keyName").as[String],
-            (json \ "keyType").as[KeyType[T]],
-            (json \ "values").as[Array[T]],
-            (json \ "units").as[Units]
-          )
-        )
-      }
-    }
-
-  def apply[T](implicit x: Format[Parameter[T]]): Format[Parameter[T]] = x
-}
+import scala.jdk.CollectionConverters._
 
 /**
  * Parameter represents a KeyName, KeyType, array of values and units applicable to values. Parameter sits as payload for
@@ -59,10 +20,10 @@ object Parameter {
  * @param units applicable units
  * @tparam S the type of items this parameter holds
  */
-case class Parameter[S] private[params] (
+case class Parameter[S](
     keyName: String,
     keyType: KeyType[S],
-    items: mutable.ArraySeq[S],
+    @key("values") items: mutable.ArraySeq[S],
     units: Units
 ) {
 
@@ -132,12 +93,12 @@ case class Parameter[S] private[params] (
   def withUnits(unitsIn: Units): Parameter[S] = copy(units = unitsIn)
 
   /**
-   * A comma separated string representation of all values this parameter holds
-   */
-  def valuesToString: String = items.mkString("(", ",", ")")
-
-  /**
    * Returns a formatted string representation with a KeyName
    */
   override def toString: String = s"$keyName($valuesToString$units)"
+
+  /**
+   * A comma separated string representation of all values this parameter holds
+   */
+  def valuesToString: String = items.mkString("(", ",", ")")
 }

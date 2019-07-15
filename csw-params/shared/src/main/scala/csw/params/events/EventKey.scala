@@ -1,7 +1,6 @@
 package csw.params.events
 
 import csw.params.core.models.Prefix
-import play.api.libs.json.{Json, OFormat}
 
 /**
  * A wrapper class representing the key for an event e.g. tcs.prog.cloudcover.oiwfsProbeDemands
@@ -22,6 +21,4 @@ object EventKey {
     val strings = eventKeyStr.splitAt(eventKeyStr.lastIndexOf(SEPARATOR))
     new EventKey(Prefix(strings._1), EventName(strings._2.tail))
   }
-
-  private[params] implicit val format: OFormat[EventKey] = Json.format[EventKey]
 }

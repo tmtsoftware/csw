@@ -1,230 +1,382 @@
 {
-  "type" : "Setup",
-  "runId": "test-runId",
-  "source" : "wfos.blue.filter",
-  "commandName" : "move",
-  "maybeObsId" : "Obs001",
-  "paramSet" : [ {
-    "keyName" : "LongKey",
-    "keyType" : "LongKey",
-    "values" : [ 50, 60 ],
-    "units" : "NoUnits"
-  }, {
-    "keyName" : "RaDecKey",
-    "keyType" : "RaDecKey",
-    "values" : [ {
-      "ra" : 7.3,
-      "dec" : 12.1
-    } ],
-    "units" : "NoUnits"
-  }, {
-    "keyName" : "FloatKey",
-    "keyType" : "FloatKey",
-    "values" : [ 90, 100 ],
-    "units" : "NoUnits"
-  }, {
-    "keyName" : "StructKey",
-    "keyType" : "StructKey",
-    "values" : [ {
-      "paramSet" : [ {
-        "keyName" : "BooleanKey",
-        "keyType" : "BooleanKey",
-        "values" : [ true, false ],
-        "units" : "NoUnits"
-      }, {
-        "keyName" : "ByteKey",
-        "keyType" : "ByteKey",
-        "values" : [ 10, 20 ],
-        "units" : "NoUnits"
-      } ]
-    } ],
-    "units" : "NoUnits"
-  }, {
-    "keyName" : "IntArrayKey",
-    "keyType" : "IntArrayKey",
-    "values" : [ {
-      "data" : [ 7, 8 ]
-    } ],
-    "units" : "NoUnits"
-  }, {
-    "keyName" : "IntMatrix",
-    "keyType" : "IntMatrixKey",
-    "values" : [ {
-      "data" : [ [ 12, 13 ], [ 14, 15 ] ]
-    } ],
-    "units" : "NoUnits"
-  }, {
-    "keyName" : "LongArrayKey",
-    "keyType" : "LongArrayKey",
-    "values" : [ {
-      "data" : [ 5, 6 ]
-    } ],
-    "units" : "NoUnits"
-  }, {
-    "keyName" : "ShortKey",
-    "keyType" : "ShortKey",
-    "values" : [ 30, 40 ],
-    "units" : "NoUnits"
-  }, {
-    "keyName" : "LongMatrix",
-    "keyType" : "LongMatrixKey",
-    "values" : [ {
-      "data" : [ [ 8, 9 ], [ 10, 11 ] ]
-    } ],
-    "units" : "NoUnits"
-  }, {
-    "keyName" : "ByteMatrix",
-    "keyType" : "ByteMatrixKey",
-    "values" : [ {
-      "data" : [ [ 1, 2 ], [ 3, 4 ] ]
-    } ],
-    "units" : "NoUnits"
-  }, {
-    "keyName" : "ShortArrayKey",
-    "keyType" : "ShortArrayKey",
-    "values" : [ {
-      "data" : [ 3, 4 ]
-    } ],
-    "units" : "NoUnits"
-  }, {
-    "keyName" : "CoordKey",
-    "keyType" : "CoordKey",
-    "values" : [ {
-      "EqCoord" : {
-        "pm" : {
-          "pmx" : 0.5,
-          "pmy" : 2.33
-        },
-        "tag" : "BASE",
-        "frame" : "ICRS",
-        "catalogName" : "none",
-        "ra" : 659912250000,
-        "dec" : -109892300000
+  "Setup": {
+    "runId": "test-runId",
+    "source": "wfos.blue.filter",
+    "commandName": "move",
+    "maybeObsId": "Obs001",
+    "paramSet": [
+      {
+        "keyName": "LongKey",
+        "keyType": "LongKey",
+        "values": [
+          50,
+          60
+        ],
+        "units": "NoUnits"
+      },
+      {
+        "keyName": "RaDecKey",
+        "keyType": "RaDecKey",
+        "values": [
+          {
+            "ra": 7.3,
+            "dec": 12.1
+          }
+        ],
+        "units": "NoUnits"
+      },
+      {
+        "keyName": "FloatKey",
+        "keyType": "FloatKey",
+        "values": [
+          90,
+          100
+        ],
+        "units": "NoUnits"
+      },
+      {
+        "keyName": "StructKey",
+        "keyType": "StructKey",
+        "values": [
+          {
+            "paramSet": [
+              {
+                "keyName": "BooleanKey",
+                "keyType": "BooleanKey",
+                "values": [
+                  true,
+                  false
+                ],
+                "units": "NoUnits"
+              },
+              {
+                "keyName": "ByteKey",
+                "keyType": "ByteKey",
+                "values": [
+                  10,
+                  20
+                ],
+                "units": "NoUnits"
+              }
+            ]
+          }
+        ],
+        "units": "NoUnits"
+      },
+      {
+        "keyName": "IntArrayKey",
+        "keyType": "IntArrayKey",
+        "values": [
+          [
+            7,
+            8
+          ]
+        ],
+        "units": "NoUnits"
+      },
+      {
+        "keyName": "IntMatrix",
+        "keyType": "IntMatrixKey",
+        "values": [
+          [
+            [
+              12,
+              13
+            ],
+            [
+              14,
+              15
+            ]
+          ]
+        ],
+        "units": "NoUnits"
+      },
+      {
+        "keyName": "LongArrayKey",
+        "keyType": "LongArrayKey",
+        "values": [
+          [
+            5,
+            6
+          ]
+        ],
+        "units": "NoUnits"
+      },
+      {
+        "keyName": "ShortKey",
+        "keyType": "ShortKey",
+        "values": [
+          30,
+          40
+        ],
+        "units": "NoUnits"
+      },
+      {
+        "keyName": "LongMatrix",
+        "keyType": "LongMatrixKey",
+        "values": [
+          [
+            [
+              8,
+              9
+            ],
+            [
+              10,
+              11
+            ]
+          ]
+        ],
+        "units": "NoUnits"
+      },
+      {
+        "keyName": "ByteMatrix",
+        "keyType": "ByteMatrixKey",
+        "values": [
+          [
+            [
+              1,
+              2
+            ],
+            [
+              3,
+              4
+            ]
+          ]
+        ],
+        "units": "NoUnits"
+      },
+      {
+        "keyName": "ShortArrayKey",
+        "keyType": "ShortArrayKey",
+        "values": [
+          [
+            3,
+            4
+          ]
+        ],
+        "units": "NoUnits"
+      },
+      {
+        "keyName": "CoordKey",
+        "keyType": "CoordKey",
+        "values": [
+          {
+            "EqCoord": {
+              "tag": "BASE",
+              "ra": 659912250000,
+              "dec": -109892300000,
+              "frame": "ICRS",
+              "catalogName": "none",
+              "pm": {
+                "pmx": 0.5,
+                "pmy": 2.33
+              }
+            }
+          },
+          {
+            "SolarSystemCoord": {
+              "tag": "BASE",
+              "body": "Venus"
+            }
+          },
+          {
+            "MinorPlanetCoord": {
+              "tag": "GUIDER1",
+              "epoch": 2000,
+              "inclination": 324000000000,
+              "longAscendingNode": 7200000000,
+              "argOfPerihelion": 360000000000,
+              "meanDistance": 1.4,
+              "eccentricity": 0.234,
+              "meanAnomaly": 792000000000
+            }
+          },
+          {
+            "CometCoord": {
+              "tag": "BASE",
+              "epochOfPerihelion": 2000,
+              "inclination": 324000000000,
+              "longAscendingNode": 7200000000,
+              "argOfPerihelion": 360000000000,
+              "perihelionDistance": 1.4,
+              "eccentricity": 0.234
+            }
+          },
+          {
+            "AltAzCoord": {
+              "tag": "BASE",
+              "alt": 1083600000000,
+              "az": 153000000000
+            }
+          }
+        ],
+        "units": "NoUnits"
+      },
+      {
+        "keyName": "ByteKey",
+        "keyType": "ByteKey",
+        "values": [
+          10,
+          20
+        ],
+        "units": "NoUnits"
+      },
+      {
+        "keyName": "DoubleKey",
+        "keyType": "DoubleKey",
+        "values": [
+          110,
+          120
+        ],
+        "units": "NoUnits"
+      },
+      {
+        "keyName": "DoubleArrayKey",
+        "keyType": "DoubleArrayKey",
+        "values": [
+          [
+            11,
+            12
+          ]
+        ],
+        "units": "NoUnits"
+      },
+      {
+        "keyName": "DoubleMatrix",
+        "keyType": "DoubleMatrixKey",
+        "values": [
+          [
+            [
+              20,
+              21
+            ],
+            [
+              22,
+              23
+            ]
+          ]
+        ],
+        "units": "NoUnits"
+      },
+      {
+        "keyName": "ByteArrayKey",
+        "keyType": "ByteArrayKey",
+        "values": [
+          [
+            1,
+            2
+          ]
+        ],
+        "units": "NoUnits"
+      },
+      {
+        "keyName": "CharKey",
+        "keyType": "CharKey",
+        "values": [
+          65,
+          66
+        ],
+        "units": "NoUnits"
+      },
+      {
+        "keyName": "IntKey",
+        "keyType": "IntKey",
+        "values": [
+          70,
+          80
+        ],
+        "units": "NoUnits"
+      },
+      {
+        "keyName": "UTCTimeKey",
+        "keyType": "UTCTimeKey",
+        "values": [
+          "1970-01-01T00:00:00Z",
+          "2017-09-04T19:00:00.123456789Z"
+        ],
+        "units": "second"
+      },
+      {
+        "keyName": "ChoiceKey",
+        "keyType": "ChoiceKey",
+        "values": [
+          "First",
+          "Second"
+        ],
+        "units": "NoUnits"
+      },
+      {
+        "keyName": "FloatArrayKey",
+        "keyType": "FloatArrayKey",
+        "values": [
+          [
+            9,
+            10
+          ]
+        ],
+        "units": "NoUnits"
+      },
+      {
+        "keyName": "StringKey",
+        "keyType": "StringKey",
+        "values": [
+          "Str1",
+          "Str2"
+        ],
+        "units": "NoUnits"
+      },
+      {
+        "keyName": "BooleanKey",
+        "keyType": "BooleanKey",
+        "values": [
+          true,
+          false
+        ],
+        "units": "NoUnits"
+      },
+      {
+        "keyName": "TAITimeKey",
+        "keyType": "TAITimeKey",
+        "values": [
+          "1970-01-01T00:00:00Z",
+          "2017-09-04T19:00:00.123456789Z"
+        ],
+        "units": "second"
+      },
+      {
+        "keyName": "ShortMatrix",
+        "keyType": "ShortMatrixKey",
+        "values": [
+          [
+            [
+              4,
+              5
+            ],
+            [
+              6,
+              7
+            ]
+          ]
+        ],
+        "units": "NoUnits"
+      },
+      {
+        "keyName": "FloatMatrix",
+        "keyType": "FloatMatrixKey",
+        "values": [
+          [
+            [
+              16,
+              17
+            ],
+            [
+              18,
+              19
+            ]
+          ]
+        ],
+        "units": "NoUnits"
       }
-    }, {
-      "SolarSystemCoord" : {
-        "tag" : "BASE",
-        "body" : "Venus"
-      }
-    }, {
-      "MinorPlanetCoord" : {
-        "meanAnomaly" : 792000000000,
-        "longAscendingNode" : 7200000000,
-        "epoch" : 2000,
-        "tag" : "GUIDER1",
-        "inclination" : 324000000000,
-        "eccentricity" : 0.234,
-        "meanDistance" : 1.4,
-        "argOfPerihelion" : 360000000000
-      }
-    }, {
-      "CometCoord" : {
-        "longAscendingNode" : 7200000000,
-        "tag" : "BASE",
-        "epochOfPerihelion" : 2000,
-        "inclination" : 324000000000,
-        "eccentricity" : 0.234,
-        "perihelionDistance" : 1.4,
-        "argOfPerihelion" : 360000000000
-      }
-    }, {
-      "AltAzCoord" : {
-        "tag" : "BASE",
-        "alt" : 1083600000000,
-        "az" : 153000000000
-      }
-    } ],
-    "units" : "NoUnits"
-  }, {
-    "keyName" : "ByteKey",
-    "keyType" : "ByteKey",
-    "values" : [ 10, 20 ],
-    "units" : "NoUnits"
-  }, {
-    "keyName" : "DoubleKey",
-    "keyType" : "DoubleKey",
-    "values" : [ 110, 120 ],
-    "units" : "NoUnits"
-  }, {
-    "keyName" : "DoubleArrayKey",
-    "keyType" : "DoubleArrayKey",
-    "values" : [ {
-      "data" : [ 11, 12 ]
-    } ],
-    "units" : "NoUnits"
-  }, {
-    "keyName" : "DoubleMatrix",
-    "keyType" : "DoubleMatrixKey",
-    "values" : [ {
-      "data" : [ [ 20, 21 ], [ 22, 23 ] ]
-    } ],
-    "units" : "NoUnits"
-  }, {
-    "keyName" : "ByteArrayKey",
-    "keyType" : "ByteArrayKey",
-    "values" : [ {
-      "data" : [ 1, 2 ]
-    } ],
-    "units" : "NoUnits"
-  }, {
-    "keyName" : "CharKey",
-    "keyType" : "CharKey",
-    "values" : [ "A", "B" ],
-    "units" : "NoUnits"
-  }, {
-    "keyName" : "IntKey",
-    "keyType" : "IntKey",
-    "values" : [ 70, 80 ],
-    "units" : "NoUnits"
-  }, {
-    "keyName" : "UTCTimeKey",
-    "keyType" : "UTCTimeKey",
-    "values" : [ "1970-01-01T00:00:00Z", "2017-09-04T19:00:00.123456789Z" ],
-    "units" : "second"
-  }, {
-    "keyName" : "ChoiceKey",
-    "keyType" : "ChoiceKey",
-    "values" : [ {
-      "name" : "First"
-    }, {
-      "name" : "Second"
-    } ],
-    "units" : "NoUnits"
-  }, {
-    "keyName" : "FloatArrayKey",
-    "keyType" : "FloatArrayKey",
-    "values" : [ {
-      "data" : [ 9, 10 ]
-    } ],
-    "units" : "NoUnits"
-  }, {
-    "keyName" : "StringKey",
-    "keyType" : "StringKey",
-    "values" : [ "Str1", "Str2" ],
-    "units" : "NoUnits"
-  }, {
-    "keyName" : "BooleanKey",
-    "keyType" : "BooleanKey",
-    "values" : [ true, false ],
-    "units" : "NoUnits"
-  }, {
-    "keyName" : "TAITimeKey",
-    "keyType" : "TAITimeKey",
-    "values" : [ "1970-01-01T00:00:00Z", "2017-09-04T19:00:00.123456789Z" ],
-    "units" : "second"
-  }, {
-    "keyName" : "ShortMatrix",
-    "keyType" : "ShortMatrixKey",
-    "values" : [ {
-      "data" : [ [ 4, 5 ], [ 6, 7 ] ]
-    } ],
-    "units" : "NoUnits"
-  }, {
-    "keyName" : "FloatMatrix",
-    "keyType" : "FloatMatrixKey",
-    "values" : [ {
-      "data" : [ [ 16, 17 ], [ 18, 19 ] ]
-    } ],
-    "units" : "NoUnits"
-  } ]
+    ]
+  }
 }

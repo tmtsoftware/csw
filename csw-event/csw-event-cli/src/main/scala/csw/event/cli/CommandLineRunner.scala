@@ -11,7 +11,7 @@ import csw.event.api.scaladsl.{EventService, EventSubscription}
 import csw.event.cli.args.Options
 import csw.event.cli.utils.{EventJsonTransformer, EventOnelineTransformer, Formatter}
 import csw.event.cli.wiring.ActorRuntime
-import csw.params.core.formats.JsonSupport
+import csw.params.core.formats.{JsonSupport, ParamCodecs}
 import csw.params.core.generics.Parameter
 import csw.params.core.models.Id
 import csw.params.events._
@@ -26,6 +26,7 @@ import scala.util.{Failure, Success}
 class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, printLine: Any => Unit) {
 
   import actorRuntime._
+  import ParamCodecs.utcTimeCodec
 
   def inspect(options: Options): Future[Unit] = async {
     val events = await(getEvents(options.eventKeys))
@@ -107,7 +108,7 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
   private def updateEventMetadata(json: JsValue, eventKey: EventKey) =
     json.as[JsObject] ++ Json.obj(
       ("eventId", Id().id),
-      ("eventTime", UTCTime.now()),
+      ("eventTime", JsonSupport.writes(UTCTime.now())),
       ("source", eventKey.source.prefix),
       ("eventName", eventKey.eventName.name)
     )

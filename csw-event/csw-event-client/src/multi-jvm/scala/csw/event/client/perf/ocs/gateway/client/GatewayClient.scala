@@ -1,4 +1,5 @@
 package csw.event.client.perf.ocs.gateway.client
+
 import akka.NotUsed
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
@@ -18,14 +19,13 @@ import csw.location.client.ActorSystemFactory
 import csw.params.core.formats.JsonSupport
 import csw.params.core.models.Prefix
 import csw.params.events.{Event, EventKey, EventName}
-import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 import play.api.libs.json.Json
 
 import scala.async.Async._
 
-class GatewayClient(serverIp: String, port: Int)(implicit val actorSystem: typed.ActorSystem[_], mat: Materializer)
-    extends PlayJsonSupport
-    with JsonSupport {
+class GatewayClient(serverIp: String, port: Int)(implicit val actorSystem: typed.ActorSystem[_], mat: Materializer) {
+
+  import csw.params.core.formats.ParamCodecs._
 
   implicit val untypedsystem: ActorSystem = actorSystem.toUntyped
   import actorSystem.executionContext
@@ -50,7 +50,7 @@ class GatewayClient(serverIp: String, port: Int)(implicit val actorSystem: typed
     }
 
     val sseStream = Source.fromFuture(sseStreamFuture).flatMapConcat(identity)
-    sseStream.map(x => Json.parse(x.data).as[Event]).viaMat(KillSwitches.single)(Keep.right)
+    sseStream.map(x ⇒ JsonSupport.reads[Event](Json.parse(x.data))).viaMat(KillSwitches.single)(Keep.right)
   }
 
 }

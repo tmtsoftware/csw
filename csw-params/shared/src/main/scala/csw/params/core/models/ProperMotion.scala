@@ -7,8 +7,6 @@ case class ProperMotion(pmx: Double, pmy: Double) {
 
 object ProperMotion {
   val DEFAULT_PROPERMOTION = ProperMotion(0.0, 0.0)
-  //used by play-json
-  implicit val pmFormat: OFormat[ProperMotion] = Json.format[ProperMotion]
 }
 
 case class PMValue(uaspyr: Long) extends AnyVal with Serializable with Ordered[PMValue] {

@@ -1,16 +1,15 @@
 {
-  "type": "Wait",
-  "runId": "test-runId",
-  "source": "wfos.blue.filter",
-  "commandName": "move",
-  "maybeObsId": "Obs001",
-  "paramSet": [
-    {
-      "keyName": "myMatrix",
-      "keyType": "LongMatrixKey",
-      "values": [
-        {
-          "data": [
+  "Wait": {
+    "runId": "test-runId",
+    "source": "wfos.blue.filter",
+    "commandName": "move",
+    "maybeObsId": "Obs001",
+    "paramSet": [
+      {
+        "keyName": "myMatrix",
+        "keyType": "LongMatrixKey",
+        "values": [
+          [
             [
               1,
               2,
@@ -26,10 +25,8 @@
               6,
               12
             ]
-          ]
-        },
-        {
-          "data": [
+          ],
+          [
             [
               2,
               3,
@@ -46,9 +43,9 @@
               10
             ]
           ]
-        }
-      ],
-      "units": "NoUnits"
-    }
-  ]
+        ],
+        "units": "NoUnits"
+      }
+    ]
+  }
 }

@@ -34,7 +34,6 @@ case class ArrayData[T](data: mutable.ArraySeq[T]) {
 }
 
 object ArrayData {
-  implicit def format[T: Format: ClassTag]: Format[ArrayData[T]] = Json.format[ArrayData[T]]
 
   /**
    * Create an ArrayData from one or more values

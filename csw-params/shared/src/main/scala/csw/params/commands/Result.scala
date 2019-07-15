@@ -1,9 +1,7 @@
 package csw.params.commands
 
-import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.{Parameter, ParameterSetKeyData, ParameterSetType}
 import csw.params.core.models.Prefix
-import play.api.libs.json.{Json, OFormat}
 
 /**
  * A result containing parameters for command response
@@ -30,7 +28,7 @@ case class Result(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parame
 
 }
 
-object Result extends JsonSupport {
+object Result {
 
   /**
    * A helper method to create Result instance
@@ -41,6 +39,4 @@ object Result extends JsonSupport {
    */
   def apply(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): Result =
     new Result(prefix).madd(paramSet)
-
-  implicit val format: OFormat[Result] = Json.format[Result]
 }

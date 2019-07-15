@@ -33,10 +33,8 @@ case class Struct private[params] (paramSet: Set[Parameter[_]]) extends Paramete
   override def toString: String = paramSet.mkString(", ")
 }
 
-object Struct extends JsonSupport {
+object Struct {
   //used by play-json
-  implicit val format: OFormat[Struct] = Json.format[Struct]
-
   /**
    * A helper method to create Struct from given paramSet
    *

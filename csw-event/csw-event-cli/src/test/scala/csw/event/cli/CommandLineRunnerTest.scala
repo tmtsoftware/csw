@@ -136,7 +136,7 @@ class CommandLineRunnerTest extends SeedData with Eventually {
     val intParam      = IntKey.make("testKey2").set(1, 2, 3).withUnits(meter)
 
     val expectedEvent     = stringToEvent[ObserveEvent](observeEventContent).madd(strParam, intParam)
-    val expectedEventJson = JsonSupport.writeEvent[ObserveEvent](expectedEvent)
+    val expectedEventJson = JsonSupport.writeEvent(expectedEvent)
 
     // first publish event with default data from json file
     commandLineRunner.publish(argsParser.parse(Seq("publish", "-e", eventKey.key, "--data", path.toString)).get).await
@@ -157,7 +157,7 @@ class CommandLineRunnerTest extends SeedData with Eventually {
     val updatedIntParam     = IntKey.make("testKey2").set(4).withUnits(meter)
 
     val updatedExpectedEvent     = stringToEvent[ObserveEvent](observeEventContent).madd(updatedStrParam, updatedIntParam)
-    val updatedExpectedEventJson = JsonSupport.writeEvent[ObserveEvent](updatedExpectedEvent)
+    val updatedExpectedEventJson = JsonSupport.writeEvent(updatedExpectedEvent)
 
     commandLineRunner
       .publish(argsParser.parse(Seq("publish", "-e", eventKey.key, "--params", updateCmdLineParams)).get)

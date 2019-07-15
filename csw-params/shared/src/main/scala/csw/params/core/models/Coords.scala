@@ -3,12 +3,9 @@ import java.util
 
 import csw.params.core.models.Coords.EqFrame.ICRS
 import csw.params.core.models.Coords._
-import csw.params.extensions.Formats
-import enumeratum._
-import julienrf.json.derived
-import play.api.libs.json.{Format, Json, OFormat}
-
 import scala.jdk.CollectionConverters._
+import enumeratum._
+
 import scala.collection.immutable
 
 object Coords {
@@ -35,16 +32,12 @@ object Coords {
   val allTags: Set[Tag]         = Set(BASE, OIWFS1, OIWFS2, OIWFS3, OIWFS4, ODGW1, ODGW2, ODGW3, ODGW4, GUIDER1, GUIDER2)
   val allTagsNames: Set[String] = allTags.map(_.name)
 
-  implicit val tagFormat: Format[Tag] = Json.valueFormat[Tag]
-
   sealed trait EqFrame extends EnumEntry
   object EqFrame extends Enum[EqFrame] {
     override def values: immutable.IndexedSeq[EqFrame] = findValues
     case object ICRS extends EqFrame
     case object FK5  extends EqFrame
   }
-
-  implicit val eqfFormat: Format[EqFrame] = Formats.enumFormat
 
   /**
    * All coordinates are a Coord.
@@ -54,19 +47,11 @@ object Coords {
     val tag: Tag
   }
 
-  object Coord {
-    implicit val jsonFormat: OFormat[Coord] = derived.oformat()
-  }
-
   case class AltAzCoord(tag: Tag, alt: Angle, az: Angle) extends Coord {
     override def toString: String = s"AltAzCoord($tag ${alt.toDegree}  ${az.toDegree})"
   }
-  object AltAzCoord {
-    implicit val coordFormat: OFormat[AltAzCoord] = Json.format[AltAzCoord]
-  }
 
   sealed trait SolarSystemObject extends EnumEntry
-
   object SolarSystemObject extends Enum[SolarSystemObject] {
 
     override def values: immutable.IndexedSeq[SolarSystemObject] = findValues
@@ -80,14 +65,9 @@ object Coords {
     case object Neptune extends SolarSystemObject
     case object Uranus  extends SolarSystemObject
     case object Pluto   extends SolarSystemObject
-
-    implicit val ssoFormat: Format[SolarSystemObject] = Formats.enumFormat
   }
 
   case class SolarSystemCoord(tag: Tag, body: SolarSystemObject) extends Coord
-  object SolarSystemCoord {
-    implicit val coordFormat: OFormat[SolarSystemCoord] = Json.format[SolarSystemCoord]
-  }
 
   case class MinorPlanetCoord(
       tag: Tag,
@@ -99,9 +79,6 @@ object Coords {
       eccentricity: Double,
       meanAnomaly: Angle // degrees
   ) extends Coord
-  object MinorPlanetCoord {
-    implicit val coordFormat: OFormat[MinorPlanetCoord] = Json.format[MinorPlanetCoord]
-  }
 
   case class CometCoord(
       tag: Tag,
@@ -112,9 +89,6 @@ object Coords {
       perihelionDistance: Double, // AU
       eccentricity: Double
   ) extends Coord
-  object CometCoord {
-    implicit val coordFormat: OFormat[CometCoord] = Json.format[CometCoord]
-  }
 
   import EqCoord._
 
@@ -221,9 +195,6 @@ object Coords {
       val (ra, dec) = Angle.parseRaDe(radec)
       apply(tag, ra, dec, frame, catalogName, ProperMotion(pmx, pmy))
     }
-
-    //used by play-json
-    implicit val coordFormat: OFormat[EqCoord] = Json.format[EqCoord]
   }
 }
 
@@ -231,8 +202,8 @@ object Coords {
  * For the Java API
  */
 object JCoords {
-  val ICRS: EqFrame = Coords.EqFrame.ICRS
-  val FK5: EqFrame  = Coords.EqFrame.FK5
+  val ICRS: EqFrame = EqFrame.ICRS
+  val FK5: EqFrame  = EqFrame.FK5
 
   val DEFAULT_FRAME: EqFrame  = ICRS
   val DEFAULT_TAG: Tag        = BASE
@@ -259,26 +230,4 @@ object JEqCoord {
 
   def asBoth(radec: String, frame: EqFrame, tag: Tag, catalogName: String, pmx: Double, pmy: Double): EqCoord =
     EqCoord.asBoth(radec, frame, tag, catalogName, pmx, pmy)
-
-  def coordFormat: OFormat[EqCoord] = EqCoord.coordFormat
-}
-
-object JAltAzCoord {
-  def coordFormat: OFormat[AltAzCoord] = AltAzCoord.coordFormat
-}
-
-object JSolarSystemCoord {
-  def coordFormat: OFormat[SolarSystemCoord] = SolarSystemCoord.coordFormat
-}
-
-object JMinorPlanetCoord {
-  def coordFormat: OFormat[MinorPlanetCoord] = MinorPlanetCoord.coordFormat
-}
-
-object JCometCoord {
-  def coordFormat: OFormat[CometCoord] = CometCoord.coordFormat
-}
-
-object JCoord {
-  def jsonFormat: OFormat[Coord] = Coord.jsonFormat
 }

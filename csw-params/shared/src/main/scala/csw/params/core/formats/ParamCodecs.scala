@@ -1,6 +1,6 @@
 package csw.params.core.formats
 
-import java.lang.{Byte => JByte}
+import java.lang.{Byte ⇒ JByte}
 import java.time.Instant
 
 import csw.params.commands.CommandIssue._
@@ -21,6 +21,7 @@ import scala.reflect.ClassTag
 
 object ParamCodecs extends ParamCodecs
 trait ParamCodecs extends CommonCodecs {
+
   import CborHelpers._
 
   type ArrayEnc[T] = Encoder[Array[T]]
@@ -44,8 +45,17 @@ trait ParamCodecs extends CommonCodecs {
   implicit lazy val altAzCoordCodec: Codec[AltAzCoord]             = deriveCodec[AltAzCoord]
   implicit lazy val coordCodec: Codec[Coord]                       = deriveCodec[Coord]
 
-  implicit lazy val tsCodec: Codec[Timestamp]    = deriveCodec[Timestamp]
-  implicit lazy val instantCodec: Codec[Instant] = bimap[Timestamp, Instant](_.toInstant, Timestamp.fromInstant)
+  implicit lazy val tsCodec: Codec[Timestamp] = deriveCodec[Timestamp]
+
+  implicit lazy val instantEnc: Encoder[Instant] = CborHelpers.targetSpecificEnc(
+    cborEnc = tsCodec.encoder.contramap(Timestamp.fromInstant),
+    jsonEnc = Encoder.forString.contramap(_.toString)
+  )
+
+  implicit lazy val instantDec: Decoder[Instant] = CborHelpers.targetSpecificDec(
+    cborDec = tsCodec.decoder.map(_.toInstant),
+    jsonDec = Decoder.forString.map(Instant.parse)
+  )
 
   implicit lazy val utcTimeCodec: Codec[UTCTime] = deriveCodecForUnaryCaseClass[UTCTime]
   implicit lazy val taiTimeCodec: Codec[TAITime] = deriveCodecForUnaryCaseClass[TAITime]
@@ -60,9 +70,10 @@ trait ParamCodecs extends CommonCodecs {
 
   // ************************ Enum Codecs ********************
 
-  implicit lazy val unitsCodec: Codec[Units]                   = enumCodec[Units]
-  implicit lazy val keyTypeCodecExistential: Codec[KeyType[_]] = enumCodec[KeyType[_]]
-  implicit def keyTypeCodec[T]: Codec[KeyType[T]]              = keyTypeCodecExistential.asInstanceOf[Codec[KeyType[T]]]
+  implicit lazy val unitsCodec: Codec[Units]                   = CborHelpers.enumCodec[Units]
+  implicit lazy val keyTypeCodecExistential: Codec[KeyType[_]] = CborHelpers.enumCodec[KeyType[_]]
+
+  implicit def keyTypeCodec[T]: Codec[KeyType[T]] = keyTypeCodecExistential.asInstanceOf[Codec[KeyType[T]]]
 
   // ************************ Parameter Codecs ********************
 
@@ -72,6 +83,18 @@ trait ParamCodecs extends CommonCodecs {
 
   implicit def waCodec[T: ArrayEnc: ArrayDec]: Codec[ArrayS[T]] =
     bimap[Array[T], ArrayS[T]](x => x: ArrayS[T], _.array.asInstanceOf[Array[T]])
+
+  //Do not put the bytesEnc and bytesDec inside Codec, due to an issue with borer https://github.com/sirthias/borer/issues/24
+  implicit lazy val bytesEnc: Encoder[Array[Byte]] = CborHelpers.targetSpecificEnc(
+    cborEnc = Encoder.forByteArray,
+    jsonEnc = Encoder.forArray[Byte]
+  )
+
+  implicit lazy val bytesDec: Decoder[Array[Byte]] = CborHelpers.targetSpecificDec(
+    cborDec = Decoder.forByteArray,
+    jsonDec = Decoder.forArray[Byte]
+  )
+
   implicit def paramCodec[T: ArrayEnc: ArrayDec]: Codec[Parameter[T]] = deriveCodec[Parameter[T]]
 
   implicit lazy val paramEncExistential: Encoder[Parameter[_]] = { (w: Writer, value: Parameter[_]) =>
@@ -80,15 +103,18 @@ trait ParamCodecs extends CommonCodecs {
   }
 
   implicit lazy val paramDecExistential: Decoder[Parameter[_]] = { r: Reader =>
-    r.tryReadMapHeader(4) || r.tryReadArrayHeader(4)
+    r.tryReadMapHeader(4) || r.tryReadMapStart() || r.tryReadArrayHeader(4) || r.tryReadArrayStart()
     r.tryReadString("keyName")
     val keyName = r.readString()
     r.tryReadString("keyType")
     val keyType = KeyType.withNameInsensitive(r.readString())
-    r.tryReadString("items")
+    r.tryReadString("values")
     val wa = keyType.waDecoder.read(r)
     r.tryReadString("units")
     val units = unitsCodec.decoder.read(r)
+    if (r.target != Cbor) {
+      r.tryReadBreak()
+    }
     Parameter(keyName, keyType.asInstanceOf[KeyType[Any]], wa.asInstanceOf[ArrayS[Any]], units)
   }
 
@@ -100,10 +126,9 @@ trait ParamCodecs extends CommonCodecs {
 
   implicit lazy val idCodec: Codec[Id]               = deriveCodecForUnaryCaseClass[Id]
   implicit lazy val eventNameCodec: Codec[EventName] = deriveCodecForUnaryCaseClass[EventName]
-
-  implicit lazy val seCodec: Codec[SystemEvent]  = deriveCodec[SystemEvent]
-  implicit lazy val oeCodec: Codec[ObserveEvent] = deriveCodec[ObserveEvent]
-  implicit lazy val eventCodec: Codec[Event]     = deriveCodec[Event]
+  implicit lazy val seCodec: Codec[SystemEvent]      = deriveCodec[SystemEvent]
+  implicit lazy val oeCodec: Codec[ObserveEvent]     = deriveCodec[ObserveEvent]
+  implicit lazy val eventCodec: Codec[Event]         = deriveCodec[Event]
 
   // ************************ Command Codecs ********************
 
@@ -171,11 +196,12 @@ trait ParamCodecs extends CommonCodecs {
   implicit lazy val currentStateCodec: Codec[CurrentState]   = deriveCodec[CurrentState]
   implicit lazy val stateVariableCodec: Codec[StateVariable] = deriveCodec[StateVariable]
 
+  // ************************ Subsystem Codecs ********************
+  implicit lazy val subSystemCodec: Codec[Subsystem] = CborHelpers.enumCodec[Subsystem]
 }
 
 case class Timestamp(seconds: Long, nanos: Long) {
   def toInstant: Instant = Instant.ofEpochSecond(seconds, nanos)
-
 }
 
 object Timestamp {

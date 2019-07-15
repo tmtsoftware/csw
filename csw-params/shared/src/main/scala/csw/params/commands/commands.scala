@@ -82,11 +82,11 @@ sealed trait ControlCommand extends SequenceCommand { self: ParameterSetType[_] 
 /**
  * A parameter set for setting telescope and instrument parameters. Constructor is private to ensure RunId is created internally to guarantee unique value.
  */
-case class Setup private[params] (
+case class Setup(
     runId: Id,
     source: Prefix,
     commandName: CommandName,
-    maybeObsId: Option[ObsId],
+    maybeObsId: Option[ObsId] = None,
     paramSet: Set[Parameter[_]]
 ) extends ParameterSetType[Setup]
     with ControlCommand {
@@ -114,15 +114,6 @@ case class Setup private[params] (
 }
 
 object Setup {
-
-  // The default apply method is used only internally while reading the incoming json and de-serializing it to setup model
-  private[params] def apply(
-      runId: Id,
-      source: Prefix,
-      commandName: CommandName,
-      maybeObsId: Option[ObsId],
-      paramSet: Set[Parameter[_]]
-  ): Setup = new Setup(runId, source, commandName, maybeObsId, paramSet)
 
   /**
    * The apply method is used to create Setup command by end-user. runId is not accepted and will be created internally to guarantee unique value.
@@ -155,7 +146,7 @@ case class Observe private[params] (
     runId: Id,
     source: Prefix,
     commandName: CommandName,
-    maybeObsId: Option[ObsId],
+    maybeObsId: Option[ObsId] = None,
     paramSet: Set[Parameter[_]]
 ) extends ParameterSetType[Observe]
     with ControlCommand {
@@ -183,15 +174,6 @@ case class Observe private[params] (
 }
 
 object Observe {
-
-  // The default apply method is used only internally while reading the incoming json and de-serializing it to observe model
-  private[params] def apply(
-      runId: Id,
-      source: Prefix,
-      commandName: CommandName,
-      maybeObsId: Option[ObsId],
-      paramSet: Set[Parameter[_]]
-  ) = new Observe(runId, source, commandName, maybeObsId, paramSet)
 
   /**
    * The apply method is used to create Observe command by end-user. runId is not accepted and will be created internally to guarantee unique value.
@@ -224,7 +206,7 @@ case class Wait private[params] (
     runId: Id,
     source: Prefix,
     commandName: CommandName,
-    maybeObsId: Option[ObsId],
+    maybeObsId: Option[ObsId] = None,
     paramSet: Set[Parameter[_]]
 ) extends ParameterSetType[Wait]
     with SequenceCommand {
@@ -252,15 +234,6 @@ case class Wait private[params] (
 }
 
 object Wait {
-
-  // The default apply method is used only internally while reading the incoming json and de-serializing it to wait model
-  private[params] def apply(
-      runId: Id,
-      source: Prefix,
-      commandName: CommandName,
-      maybeObsId: Option[ObsId],
-      paramSet: Set[Parameter[_]]
-  ) = new Wait(runId, source, commandName, maybeObsId, paramSet)
 
   /**
    * The apply method is used to create Wait command by end-user. runId is not accepted and will be created internally to guarantee unique value.
