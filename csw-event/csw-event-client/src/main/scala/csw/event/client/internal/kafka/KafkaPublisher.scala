@@ -24,6 +24,7 @@ import scala.util.control.NonFatal
  * @param ec               the execution context to be used for performing asynchronous operations
  * @param mat              the materializer to be used for materializing underlying streams
  */
+// $COVERAGE-OFF$
 private[event] class KafkaPublisher(producerSettings: Future[ProducerSettings[String, Array[Byte]]])(
     implicit ec: ExecutionContext,
     mat: Materializer
@@ -110,3 +111,4 @@ private[event] class KafkaPublisher(producerSettings: Future[ProducerSettings[St
     case (_, ex: Exception) => promisedDone.failure(PublishFailure(event, ex))
   }
 }
+// $COVERAGE-ON$
