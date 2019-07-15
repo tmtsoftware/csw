@@ -6,25 +6,26 @@
     "eventTime": "2017-08-09T06:40:00.898Z",
     "paramSet": [
       {
-        "keyName": "arrayDataKey",
-        "keyType": "ByteArrayKey",
-        "values": [
-          [
-            1,
-            2,
-            3,
-            4,
-            5
+        "ByteArrayKey": {
+          "keyName": "arrayDataKey",
+          "values": [
+            [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            [
+              10,
+              20,
+              30,
+              40,
+              50
+            ]
           ],
-          [
-            10,
-            20,
-            30,
-            40,
-            50
-          ]
-        ],
-        "units": "NoUnits"
+          "units": "NoUnits"
+        }
       }
     ]
   }

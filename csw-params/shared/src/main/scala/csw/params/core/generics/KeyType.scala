@@ -1,7 +1,7 @@
 package csw.params.core.generics
 
-import csw.params.core.formats.ParamCodecs
 import csw.params.core.formats.ParamCodecs._
+import csw.params.core.formats.{ParamCodecs, ParamCore}
 import csw.params.core.models.Coords._
 import csw.params.core.models.Units.second
 import csw.params.core.models._
@@ -9,7 +9,6 @@ import csw.time.core.models.{TAITime, UTCTime}
 import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
 import io.bullet.borer.{Decoder, Encoder}
 
-import scala.collection.{immutable, mutable}
 import scala.reflect.ClassTag
 
 /**
@@ -22,7 +21,7 @@ sealed class KeyType[S: ArrayEnc: ArrayDec] extends EnumEntry with Serializable 
   override def equals(that: Any): Boolean = that.toString == this.toString
 
   private[params] lazy val paramEncoder: Encoder[Parameter[S]]     = ParamCodecs.paramCodec[S].encoder
-  private[params] lazy val waDecoder: Decoder[mutable.ArraySeq[S]] = ParamCodecs.waCodec[S].decoder
+  private[params] lazy val paramCoreDecoder: Decoder[ParamCore[S]] = ParamCodecs.paramCoreCodec[S].decoder
 }
 
 /**
@@ -77,7 +76,7 @@ object KeyType extends Enum[KeyType[_]] with PlayJsonEnum[KeyType[_]] {
   /**
    * values return a Seq of all KeyTypes provided by `csw-messages`
    */
-  override def values: immutable.IndexedSeq[KeyType[_]] = findValues
+  override def values: IndexedSeq[KeyType[_]] = findValues
 
   case object ChoiceKey extends KeyType[Choice] {
     def make(name: String, choices: Choices): GChoiceKey = new GChoiceKey(name, this, choices)

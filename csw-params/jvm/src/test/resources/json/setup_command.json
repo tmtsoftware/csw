@@ -6,19 +6,20 @@
     "maybeObsId": "Obs001",
     "paramSet": [
       {
-        "keyName": "coords",
-        "keyType": "RaDecKey",
-        "values": [
-          {
-            "ra": 7.3,
-            "dec": 12.1
-          },
-          {
-            "ra": 9.1,
-            "dec": 2.9
-          }
-        ],
-        "units": "NoUnits"
+        "RaDecKey": {
+          "keyName": "coords",
+          "values": [
+            {
+              "ra": 7.3,
+              "dec": 12.1
+            },
+            {
+              "ra": 9.1,
+              "dec": 2.9
+            }
+          ],
+          "units": "NoUnits"
+        }
       }
     ]
   }

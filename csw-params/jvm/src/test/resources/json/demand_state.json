@@ -6,40 +6,46 @@
     },
     "paramSet": [
       {
-        "keyName": "charKey",
-        "keyType": "CharKey",
-        "values": [
-          65,66,67
-        ],
-        "units": "NoUnits"
+        "CharKey": {
+          "keyName": "charKey",
+          "values": [
+            65,
+            66,
+            67
+          ],
+          "units": "NoUnits"
+        }
       },
       {
-        "keyName": "intKey",
-        "keyType": "IntKey",
-        "values": [
-          1,
-          2,
-          3
-        ],
-        "units": "meter"
+        "IntKey": {
+          "keyName": "intKey",
+          "values": [
+            1,
+            2,
+            3
+          ],
+          "units": "meter"
+        }
       },
       {
-        "keyName": "booleanKey",
-        "keyType": "BooleanKey",
-        "values": [
-          true,
-          false
-        ],
-        "units": "NoUnits"
+        "BooleanKey": {
+          "keyName": "booleanKey",
+          "values": [
+            true,
+            false
+          ],
+          "units": "NoUnits"
+        }
       },
       {
-        "keyName": "utcTimeKey",
-        "keyType": "UTCTimeKey",
-        "values": [
-          "1970-01-01T00:00:00Z",
-          "2017-09-04T16:28:00.123456789Z"
-        ],
-        "units": "second"
+        "UTCTimeKey": {
+          "keyName": "utcTimeKey",
+          "values": [
+            "1970-01-01T00:00:00Z",
+            "2017-09-04T16:28:00.123456789Z"
+          ],
+          "units": "second"
+        }
       }
     ]
   }

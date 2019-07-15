@@ -6,20 +6,22 @@
     "maybeObsId": "Obs001",
     "paramSet": [
       {
-        "keyName": "repeat",
-        "keyType": "IntKey",
-        "values": [
-          22
-        ],
-        "units": "NoUnits"
+        "IntKey": {
+          "keyName": "repeat",
+          "values": [
+            22
+          ],
+          "units": "NoUnits"
+        }
       },
       {
-        "keyName": "expTime",
-        "keyType": "StringKey",
-        "values": [
-          "11:10"
-        ],
-        "units": "NoUnits"
+        "StringKey": {
+          "keyName": "expTime",
+          "values": [
+            "11:10"
+          ],
+          "units": "NoUnits"
+        }
       }
     ]
   }

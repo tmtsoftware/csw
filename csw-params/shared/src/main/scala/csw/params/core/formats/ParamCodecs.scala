@@ -95,7 +95,10 @@ trait ParamCodecs extends CommonCodecs {
     jsonDec = Decoder.forArray[Byte]
   )
 
-  implicit def paramCodec[T: ArrayEnc: ArrayDec]: Codec[Parameter[T]] = deriveCodec[Parameter[T]]
+  implicit def paramCoreCodec[T: ArrayEnc: ArrayDec]: Codec[ParamCore[T]] = deriveCodec[ParamCore[T]]
+
+  implicit def paramCodec[T: ArrayEnc: ArrayDec]: Codec[Parameter[T]] =
+    bimap[Map[String, ParamCore[T]], Parameter[T]](ParamCore.toParam, ParamCore.fromParam)
 
   implicit lazy val paramEncExistential: Encoder[Parameter[_]] = { (w: Writer, value: Parameter[_]) =>
     val encoder: Encoder[Parameter[Any]] = value.keyType.paramEncoder.asInstanceOf[Encoder[Parameter[Any]]]
@@ -103,19 +106,14 @@ trait ParamCodecs extends CommonCodecs {
   }
 
   implicit lazy val paramDecExistential: Decoder[Parameter[_]] = { r: Reader =>
-    r.tryReadMapHeader(4) || r.tryReadMapStart() || r.tryReadArrayHeader(4) || r.tryReadArrayStart()
-    r.tryReadString("keyName")
-    val keyName = r.readString()
-    r.tryReadString("keyType")
-    val keyType = KeyType.withNameInsensitive(r.readString())
-    r.tryReadString("values")
-    val wa = keyType.waDecoder.read(r)
-    r.tryReadString("units")
-    val units = unitsCodec.decoder.read(r)
+    r.tryReadMapHeader(1) || r.tryReadMapStart() || r.tryReadArrayHeader(1) || r.tryReadArrayStart()
+    val keyTypeName = r.readString()
+    val keyType     = KeyType.withNameInsensitive(keyTypeName)
+    val paramCore   = keyType.paramCoreDecoder.read(r)
     if (r.target != Cbor) {
       r.tryReadBreak()
     }
-    Parameter(keyName, keyType.asInstanceOf[KeyType[Any]], wa.asInstanceOf[ArrayS[Any]], units)
+    ParamCore.toParam(Map(keyTypeName -> paramCore))
   }
 
   // ************************ Struct Codecs ********************
@@ -207,4 +205,20 @@ case class Timestamp(seconds: Long, nanos: Long) {
 
 object Timestamp {
   def fromInstant(instant: Instant): Timestamp = Timestamp(instant.getEpochSecond, instant.getNano)
+}
+
+case class ParamCore[T](
+    keyName: String,
+    values: ArrayS[T],
+    units: Units
+)
+
+object ParamCore {
+  def toParam[T](map: Map[String, ParamCore[T]]): Parameter[T] = {
+    val (keyType, param) = map.head
+    Parameter(param.keyName, KeyType.withNameInsensitive(keyType).asInstanceOf[KeyType[T]], param.values, param.units)
+  }
+  def fromParam[T](param: Parameter[T]): Map[String, ParamCore[T]] = {
+    Map(param.keyType.entryName -> ParamCore(param.keyName, param.items, param.units))
+  }
 }
