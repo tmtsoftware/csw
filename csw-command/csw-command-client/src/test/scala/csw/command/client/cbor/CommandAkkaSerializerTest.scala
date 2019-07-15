@@ -9,12 +9,21 @@ import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.serialization.SerializationExtension
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
 import csw.command.client.messages.CommandResponseManagerMessage.Query
-import csw.command.client.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.command.client.messages.ComponentCommonMessage.{
+  ComponentStateSubscription,
+  GetSupervisorLifecycleState,
+  LifecycleStateSubscription
+}
 import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
-import csw.command.client.messages.{CommandResponseManagerMessage, ComponentMessage, GetComponentLogMetadata, SetComponentLogLevel}
+import csw.command.client.messages.{
+  CommandResponseManagerMessage,
+  ComponentMessage,
+  GetComponentLogMetadata,
+  SetComponentLogLevel
+}
 import csw.command.client.models.framework.LockingResponse._
 import csw.command.client.models.framework.PubSub.{Subscribe, SubscribeOnly, Unsubscribe}
 import csw.command.client.models.framework.SupervisorLifecycleState._

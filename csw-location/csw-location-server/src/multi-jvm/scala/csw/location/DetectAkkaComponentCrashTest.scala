@@ -72,7 +72,7 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec
       val actorRef = system.spawn(Behavior.empty, "trombone-hcd-1")
 
       locationService
-        .register(make(akkaConnection, Prefix("nfiraos.ncc.trombone"), actorRef.toURI(system)))
+        .register(make(akkaConnection, Prefix("nfiraos.ncc.trombone"), actorRef.toURI))
         .await
       enterBarrier("Registration")
 

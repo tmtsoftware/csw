@@ -73,7 +73,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
           make(
             akkaConnection,
             Prefix("nfiraos.ncc.trombone"),
-            newTypedSystem.spawn(Behavior.empty, "empty").toURI(newTypedSystem)
+            newTypedSystem.spawn(Behavior.empty, "empty").toURI
           )
         )
         .await

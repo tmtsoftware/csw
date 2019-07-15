@@ -148,7 +148,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
         }
       }), name = "my-actor-1")
       .toTyped
-      .toURI(context.system.toTyped)
+      .toURI
   )
 
   // Register UnTyped ActorRef with Location service. Import scaladsl adapter to implicitly convert

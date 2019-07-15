@@ -24,7 +24,7 @@ import csw.framework.models._
 import csw.framework.scaladsl.RegistrationFactory
 import csw.location.api.scaladsl.LocationService
 import csw.location.model.Connection.AkkaConnection
-import csw.location.model.{AkkaRegistration, ComponentId, ComponentType, Connection}
+import csw.location.model.{AkkaRegistration, ComponentId, ComponentType}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.core.models.Prefix
@@ -40,7 +40,7 @@ import scala.util.{Failure, Success}
  * @param containerInfo         container related information as described in the configuration file
  * @param supervisorInfoFactory the factory for creating the Supervisors for components described in ContainerInfo
  * @param registrationFactory   the factory for creating a typed [[AkkaRegistration]] from
- *                              [[Connection.AkkaConnection]]
+ *                              [[csw.location.model.Connection.AkkaConnection]]
  * @param eventServiceFactory   the factory to create instance of event service to be used by components to use and/or create publishers and subscribers
  * @param locationService       the single instance of Location service created for a running application
  * @param loggerFactory         factory to create suitable logger instance
@@ -61,7 +61,7 @@ private[framework] final class ContainerBehavior(
   private val containerPrefix = Prefix(s"${Container.entryName}.${containerInfo.name}")
   private val akkaConnection  = AkkaConnection(ComponentId(containerInfo.name, ComponentType.Container))
   private val akkaRegistration: AkkaRegistration =
-    registrationFactory.akkaTyped(akkaConnection, containerPrefix, ctx.self)(ctx.system)
+    registrationFactory.akkaTyped(akkaConnection, containerPrefix, ctx.self)
 
   // Set of successfully created supervisors for components
   var supervisors: Set[SupervisorInfo] = Set.empty

@@ -44,7 +44,7 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol]) extends Mo
   val registrationResult: RegistrationResult     = mock[RegistrationResult]
   val registrationFactory: RegistrationFactory   = mock[RegistrationFactory]
 
-  when(registrationFactory.akkaTyped(any[AkkaConnection], any[Prefix], any[ActorRef[_]])(any[ActorSystem[_]]))
+  when(registrationFactory.akkaTyped(any[AkkaConnection], any[Prefix], any[ActorRef[_]]))
     .thenReturn(akkaRegistration)
   when(locationService.register(akkaRegistration)).thenReturn(Future.successful(registrationResult))
   when(locationService.unregister(any[AkkaConnection])).thenReturn(Future.successful(Done))
