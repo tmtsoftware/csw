@@ -1,7 +1,7 @@
 package csw.aas.core.commons
-import csw.location.model.ComponentId
-import csw.location.model.Connection.HttpConnection
-import csw.location.model.ComponentType
+import csw.location.models.ComponentId
+import csw.location.models.Connection.HttpConnection
+import csw.location.models.ComponentType
 
 /**
  * `AASConnection` is a wrapper over predefined `HttpConnection` representing Authentication and Authorization service.

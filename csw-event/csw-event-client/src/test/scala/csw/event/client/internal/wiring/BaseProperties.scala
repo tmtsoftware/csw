@@ -15,7 +15,7 @@ import csw.event.client.internal.commons.serviceresolver.EventServiceLocationRes
 import csw.event.client.internal.commons.{EventServiceConnection, EventStreamSupervisionStrategy}
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.internal.LocationServiceClient
-import csw.location.model.TcpRegistration
+import csw.location.models.TcpRegistration
 
 import scala.async.Async._
 import scala.concurrent.{ExecutionContext, Future}

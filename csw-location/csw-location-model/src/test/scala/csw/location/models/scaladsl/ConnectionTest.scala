@@ -1,8 +1,8 @@
-package csw.location.model.scaladsl
+package csw.location.models.scaladsl
 
-import csw.location.model
-import csw.location.model.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.location.model.{ComponentId, ComponentType, Connection}
+import csw.location.models
+import csw.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.location.models.{ComponentId, ComponentType, Connection}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 class ConnectionTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
@@ -20,34 +20,34 @@ class ConnectionTest extends FunSuite with Matchers with BeforeAndAfterAll with 
 
   test("should able to form a string representation for http connection for config service") {
     val expectedHttpConnectionName = "config-service-http"
-    val httpConnection             = HttpConnection(model.ComponentId("config", ComponentType.Service))
+    val httpConnection             = HttpConnection(models.ComponentId("config", ComponentType.Service))
     httpConnection.name shouldBe expectedHttpConnectionName
   }
 
   test("should able to form a string representation for akka connection for trombone container") {
     val expectedAkkaConnectionName = "tromboneContainer-container-akka"
-    val akkaConnection             = AkkaConnection(model.ComponentId("tromboneContainer", ComponentType.Container))
+    val akkaConnection             = AkkaConnection(models.ComponentId("tromboneContainer", ComponentType.Container))
     akkaConnection.name shouldBe expectedAkkaConnectionName
   }
 
   test("should able to form a string representation for akka connection for trombone assembly") {
     val expectedAkkaConnectionName = "tromboneAssembly-assembly-akka"
-    val akkaConnection             = AkkaConnection(model.ComponentId("tromboneAssembly", ComponentType.Assembly))
+    val akkaConnection             = AkkaConnection(models.ComponentId("tromboneAssembly", ComponentType.Assembly))
     akkaConnection.name shouldBe expectedAkkaConnectionName
   }
 
   test("should able to form a connection for components from a valid string representation") {
     Connection.from("tromboneAssembly-assembly-akka") shouldBe
-    AkkaConnection(model.ComponentId("tromboneAssembly", ComponentType.Assembly))
+    AkkaConnection(models.ComponentId("tromboneAssembly", ComponentType.Assembly))
 
     Connection.from("tromboneHcd-hcd-akka") shouldBe
-    AkkaConnection(model.ComponentId("tromboneHcd", ComponentType.HCD))
+    AkkaConnection(models.ComponentId("tromboneHcd", ComponentType.HCD))
 
     Connection.from("redis-service-tcp") shouldBe
-    TcpConnection(model.ComponentId("redis", ComponentType.Service))
+    TcpConnection(models.ComponentId("redis", ComponentType.Service))
 
     Connection.from("configService-service-http") shouldBe
-    HttpConnection(model.ComponentId("configService", ComponentType.Service))
+    HttpConnection(models.ComponentId("configService", ComponentType.Service))
   }
 
   test("should not be able to form a connection for components from an invalid string representation") {

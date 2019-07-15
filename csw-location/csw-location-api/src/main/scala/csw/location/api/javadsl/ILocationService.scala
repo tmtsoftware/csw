@@ -10,7 +10,7 @@ import akka.Done
 import akka.stream.KillSwitch
 import akka.stream.javadsl.Source
 import csw.location.api.scaladsl.LocationService
-import csw.location.model._
+import csw.location.models._
 
 /**
  * A LocationService interface to manage connections and their registrations. All operations are non-blocking.

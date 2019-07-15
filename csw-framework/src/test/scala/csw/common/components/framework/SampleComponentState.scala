@@ -2,8 +2,8 @@ package csw.common.components.framework
 
 import csw.alarm.api.models.AlarmSeverity.Warning
 import csw.alarm.api.models.Key.AlarmKey
-import csw.location.model.{ComponentId, ComponentType}
-import csw.location.model.Connection.{HttpConnection, TcpConnection}
+import csw.location.models.{ComponentId, ComponentType}
+import csw.location.models.Connection.{HttpConnection, TcpConnection}
 import csw.params.commands.CommandName
 import csw.params.core.generics.GChoiceKey
 import csw.params.core.generics.KeyType.ChoiceKey

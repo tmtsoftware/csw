@@ -1,5 +1,5 @@
 package csw.command.client.models.framework
-import csw.location.model.{ComponentType, Connection}
+import csw.location.models.{ComponentType, Connection}
 import csw.params.core.models.Prefix
 import play.api.libs.json._
 
@@ -11,7 +11,7 @@ import scala.jdk.CollectionConverters._
  *
  * @param name the name of the component
  * @param componentType
- *  : the type of the component as defined by [[csw.location.model.ComponentType]]
+ *  : the type of the component as defined by [[csw.location.models.ComponentType]]
  * @param prefix identifies the subsystem
  * @param behaviorFactoryClassName
  *  : specifies the component to be created by name of the class of it's factory

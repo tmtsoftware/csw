@@ -1,4 +1,4 @@
-package csw.location.model
+package csw.location.models
 
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry, PlayJsonEnum}

@@ -2,8 +2,8 @@ package csw.location.server.internal
 
 import akka.serialization.Serializer
 import csw.location.api.commons.LocationServiceLogger
-import csw.location.model.codecs.LocationCodecs
-import csw.location.model.{Connection, Location, Registration, TrackingEvent}
+import csw.location.models.codecs.LocationCodecs
+import csw.location.models.{Connection, Location, Registration, TrackingEvent}
 import csw.logging.api.scaladsl.Logger
 import io.bullet.borer.Cbor
 

@@ -19,9 +19,9 @@ import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.client.ActorSystemFactory
-import csw.location.model.ComponentType.HCD
-import csw.location.model.Connection.AkkaConnection
-import csw.location.model.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.location.models.ComponentType.HCD
+import csw.location.models.Connection.AkkaConnection
+import csw.location.models.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.logging.api.models.Level.INFO
 import csw.logging.client.internal.LoggingSystem
 import csw.params.core.states.{CurrentState, StateName}

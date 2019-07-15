@@ -8,8 +8,8 @@ import csw.admin.server.wiring.ActorRuntime
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.{GetComponentLogMetadata, SetComponentLogLevel}
 import csw.location.api.scaladsl.LocationService
-import csw.location.model.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.location.model.{AkkaLocation, Connection, Location}
+import csw.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.location.models.{AkkaLocation, Connection, Location}
 import csw.logging.api.models.Level
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.models.LogMetadata

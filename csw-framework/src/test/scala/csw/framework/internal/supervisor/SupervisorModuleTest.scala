@@ -18,8 +18,8 @@ import csw.command.client.models.matchers.DemandMatcher
 import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestSuite
 import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInitializeTimeout}
-import csw.location.model.ComponentType.{Assembly, HCD}
-import csw.location.model.Connection.AkkaConnection
+import csw.location.models.ComponentType.{Assembly, HCD}
+import csw.location.models.Connection.AkkaConnection
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
 import csw.params.core.generics.{KeyType, Parameter}

@@ -17,9 +17,9 @@ import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.model
-import csw.location.model.Connection.{AkkaConnection, HttpConnection}
-import csw.location.model._
+import csw.location.models
+import csw.location.models.Connection.{AkkaConnection, HttpConnection}
+import csw.location.models._
 import csw.location.wrapper.LocationServerWiring
 import csw.logging.api.scaladsl._
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
@@ -164,7 +164,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   }
   val typedActorRef: ActorRef[String] = context.system.spawn(behavior(), "typed-actor-ref")
 
-  val assemblyConnection = AkkaConnection(model.ComponentId("assembly1", ComponentType.Assembly))
+  val assemblyConnection = AkkaConnection(models.ComponentId("assembly1", ComponentType.Assembly))
 
   // Register Typed ActorRef[String] with Location Service
   val assemblyRegistration: AkkaRegistration =

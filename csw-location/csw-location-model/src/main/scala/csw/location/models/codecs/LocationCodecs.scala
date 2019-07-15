@@ -1,8 +1,8 @@
-package csw.location.model.codecs
+package csw.location.models.codecs
 
 import java.net.URI
 
-import csw.location.model._
+import csw.location.models._
 import csw.params.core.formats.{CborHelpers, CommonCodecs}
 import io.bullet.borer.Codec
 import io.bullet.borer.derivation.MapBasedCodecs._

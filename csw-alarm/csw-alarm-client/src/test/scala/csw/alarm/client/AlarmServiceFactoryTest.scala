@@ -6,7 +6,7 @@ import csw.alarm.client.internal.commons.AlarmServiceConnection
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.model.TcpRegistration
+import csw.location.models.TcpRegistration
 import csw.location.server.http.HTTPLocationService
 
 // DEOPSCSW-481: Component Developer API available to all CSW components

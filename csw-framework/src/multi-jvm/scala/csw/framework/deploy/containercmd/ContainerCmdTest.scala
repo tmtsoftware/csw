@@ -25,8 +25,8 @@ import csw.config.server.commons.TestFileUtils
 import csw.config.server.mocks.MockedAuthentication
 import csw.config.server.{ServerWiring, Settings}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.location.model.{ComponentId, ComponentType}
-import csw.location.model.Connection.AkkaConnection
+import csw.location.models.{ComponentId, ComponentType}
+import csw.location.models.Connection.AkkaConnection
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse.Invalid
 import csw.params.commands.{CommandName, Setup}

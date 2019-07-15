@@ -38,7 +38,7 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-time-clock-js`,
   `csw-logging-macros`,
   `csw-params-js`,
-  `csw-location-model-js`,
+  `csw-location-models-js`,
   `csw-network-utils`,
   `csw-commons`,
   `csw-benchmark`,
@@ -101,15 +101,15 @@ lazy val `csw-admin-server` = project
 lazy val `csw-location` = project
   .in(file("csw-location"))
   .aggregate(
-    `csw-location-model-jvm`,
-    `csw-location-model-js`,
+    `csw-location-models-jvm`,
+    `csw-location-models-js`,
     `csw-location-api`,
     `csw-location-server`,
     `csw-location-client`,
     `csw-location-agent`
   )
 
-lazy val `csw-location-model` = crossProject(JSPlatform, JVMPlatform)
+lazy val `csw-location-models` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .in(file("csw-location/csw-location-model"))
   .enablePlugins(PublishBintray, GenJavadocPlugin)
@@ -117,14 +117,14 @@ lazy val `csw-location-model` = crossProject(JSPlatform, JVMPlatform)
   .settings(fork := false)
   .settings(libraryDependencies ++= Dependencies.LocationModel.value)
 
-lazy val `csw-location-model-jvm` = `csw-location-model`.jvm
-lazy val `csw-location-model-js`  = `csw-location-model`.js
+lazy val `csw-location-models-jvm` = `csw-location-models`.jvm
+lazy val `csw-location-models-js`  = `csw-location-models`.js
 
 lazy val `csw-location-api` = project
   .in(file("csw-location/csw-location-api"))
   .dependsOn(
     `csw-logging-client`,
-    `csw-location-model-jvm`,
+    `csw-location-models-jvm`,
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(

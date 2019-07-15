@@ -12,8 +12,8 @@ import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.model.Connection.AkkaConnection
-import csw.location.model.{ComponentId, ComponentType}
+import csw.location.models.Connection.AkkaConnection
+import csw.location.models.{ComponentId, ComponentType}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.{LoggerFactory, LoggingSystemFactory}

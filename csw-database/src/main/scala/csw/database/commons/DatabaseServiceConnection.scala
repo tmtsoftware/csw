@@ -1,7 +1,7 @@
 package csw.database.commons
 
-import csw.location.model.Connection.TcpConnection
-import csw.location.model.{ComponentId, ComponentType}
+import csw.location.models.Connection.TcpConnection
+import csw.location.models.{ComponentId, ComponentType}
 
 /**
  * `DatabaseServiceConnection` is a wrapper over predefined `TcpConnection` representing database service. It is used to resolve

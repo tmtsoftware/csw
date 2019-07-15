@@ -8,8 +8,8 @@ import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.util.ByteString
 import csw.location.api.scaladsl.LocationService
-import csw.location.model.ComponentType
-import csw.location.model.Connection.HttpConnection
+import csw.location.models.ComponentType
+import csw.location.models.Connection.HttpConnection
 import csw.params.commands.CommandResponse.{Error, OnewayResponse, SubmitResponse, ValidateResponse}
 import csw.params.commands.{CommandResponse, ControlCommand}
 import csw.params.core.formats.JsonSupport._

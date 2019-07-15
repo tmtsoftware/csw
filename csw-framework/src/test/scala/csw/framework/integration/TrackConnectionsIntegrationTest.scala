@@ -15,10 +15,10 @@ import csw.common.components.framework.SampleComponentState._
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.location.client.ActorSystemFactory
-import csw.location.model
-import csw.location.model.ComponentType.{Assembly, HCD}
-import csw.location.model.Connection.AkkaConnection
-import csw.location.model.{ComponentId, HttpRegistration, TcpRegistration}
+import csw.location.models
+import csw.location.models.ComponentType.{Assembly, HCD}
+import csw.location.models.Connection.AkkaConnection
+import csw.location.models.{ComponentId, HttpRegistration, TcpRegistration}
 import csw.params.commands
 import csw.params.commands.CommandName
 import csw.params.core.states.{CurrentState, StateName}
@@ -107,7 +107,7 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
     val assemblySupervisor = Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring).await
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")
-    val akkaConnection                = AkkaConnection(model.ComponentId("IFS_Detector", HCD))
+    val akkaConnection                = AkkaConnection(models.ComponentId("IFS_Detector", HCD))
 
     assertThatSupervisorIsRunning(assemblySupervisor, supervisorLifecycleStateProbe, 5.seconds)
 

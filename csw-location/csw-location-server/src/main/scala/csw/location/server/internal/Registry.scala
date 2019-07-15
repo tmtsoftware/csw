@@ -5,7 +5,7 @@ import akka.cluster.ddata.Replicator._
 import akka.cluster.ddata._
 import akka.cluster.ddata.typed.scaladsl.Replicator
 import csw.location.api.commons.Constants
-import csw.location.model.{Connection, Location}
+import csw.location.models.{Connection, Location}
 
 import scala.concurrent.duration.DurationDouble
 

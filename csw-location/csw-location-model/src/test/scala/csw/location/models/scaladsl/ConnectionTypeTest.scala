@@ -1,6 +1,6 @@
-package csw.location.model.scaladsl
+package csw.location.models.scaladsl
 
-import csw.location.model.ConnectionType
+import csw.location.models.ConnectionType
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 class ConnectionTypeTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {

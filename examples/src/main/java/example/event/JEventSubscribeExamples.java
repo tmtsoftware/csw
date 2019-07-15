@@ -10,7 +10,7 @@ import csw.event.api.javadsl.IEventSubscriber;
 import csw.event.api.javadsl.IEventSubscription;
 import csw.event.api.scaladsl.SubscriptionModes;
 import csw.event.client.internal.commons.javawrappers.JEventService;
-import csw.location.model.AkkaLocation;
+import csw.location.models.AkkaLocation;
 import csw.params.core.models.Subsystem;
 import csw.params.events.Event;
 import csw.params.events.EventKey;

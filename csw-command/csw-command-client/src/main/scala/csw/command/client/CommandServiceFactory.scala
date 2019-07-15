@@ -3,7 +3,7 @@ import akka.actor.typed.ActorSystem
 import csw.command.api.javadsl.ICommandService
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.internal.{CommandServiceImpl, JCommandServiceImpl}
-import csw.location.model.AkkaLocation
+import csw.location.models.AkkaLocation
 
 /**
  * The factory helps in creating CommandService api for scala and java both

@@ -12,8 +12,8 @@ import csw.commons.http.{ErrorMessage, ErrorResponse}
 import csw.config.server.commons.{ConfigServiceConnection, TestFileUtils}
 import csw.config.server.mocks.MockedAuthentication
 import csw.config.server.{ServerWiring, Settings}
-import csw.location.model.Connection.TcpConnection
-import csw.location.model.{ComponentId, ComponentType}
+import csw.location.models.Connection.TcpConnection
+import csw.location.models.{ComponentId, ComponentType}
 import csw.logging.client.internal._
 import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.network.utils.Networks

@@ -1,9 +1,9 @@
-package csw.location.model
+package csw.location.models
 
 import java.net.URI
 
-import csw.location.model.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.location.model.codecs.LocationSerializable
+import csw.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.location.models.codecs.LocationSerializable
 import csw.params.core.models.Prefix
 
 /**

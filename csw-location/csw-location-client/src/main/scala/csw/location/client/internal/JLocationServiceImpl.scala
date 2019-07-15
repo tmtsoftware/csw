@@ -11,7 +11,7 @@ import akka.stream.KillSwitch
 import akka.stream.javadsl.Source
 import csw.location.api.javadsl.{ILocationService, IRegistrationResult}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
-import csw.location.model._
+import csw.location.models._
 
 import scala.compat.java8.DurationConverters.DurationOps
 import scala.compat.java8.FutureConverters._
