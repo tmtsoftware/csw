@@ -2,8 +2,6 @@ package csw.params.core.models
 
 import java.util
 
-import play.api.libs.json.{Json, OFormat}
-
 import scala.annotation.varargs
 import scala.jdk.CollectionConverters._
 import scala.language.implicitConversions

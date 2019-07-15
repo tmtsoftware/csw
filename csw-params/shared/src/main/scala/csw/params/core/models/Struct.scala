@@ -1,8 +1,6 @@
 package csw.params.core.models
 
-import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.{Parameter, ParameterSetType}
-import play.api.libs.json.{Json, OFormat}
 
 import scala.annotation.varargs
 import scala.jdk.CollectionConverters._

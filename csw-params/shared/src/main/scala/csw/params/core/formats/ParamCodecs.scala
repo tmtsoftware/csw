@@ -1,6 +1,6 @@
 package csw.params.core.formats
 
-import java.lang.{Byte ⇒ JByte}
+import java.lang.{Byte => JByte}
 import java.time.Instant
 
 import csw.params.commands.CommandIssue._
@@ -161,6 +161,7 @@ trait ParamCodecs extends CommonCodecs {
   implicit lazy val lockedCodec: Codec[Locked]                                      = deriveCodec[Locked]
   implicit lazy val commandNotAvailableCodec: Codec[CommandNotAvailable]            = deriveCodec[CommandNotAvailable]
   implicit lazy val commandResponseRemoteMsgCodec: Codec[CommandResponse.RemoteMsg] = deriveCodec[CommandResponse.RemoteMsg]
+  implicit lazy val commandResponseCodec: Codec[CommandResponse]                    = deriveCodec[CommandResponse]
 
   // ************************ CommandIssue Codecs ********************
 

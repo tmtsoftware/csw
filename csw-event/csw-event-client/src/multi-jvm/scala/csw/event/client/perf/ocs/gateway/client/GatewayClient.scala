@@ -50,7 +50,7 @@ class GatewayClient(serverIp: String, port: Int)(implicit val actorSystem: typed
     }
 
     val sseStream = Source.fromFuture(sseStreamFuture).flatMapConcat(identity)
-    sseStream.map(x ⇒ JsonSupport.reads[Event](Json.parse(x.data))).viaMat(KillSwitches.single)(Keep.right)
+    sseStream.map(x => JsonSupport.reads[Event](Json.parse(x.data))).viaMat(KillSwitches.single)(Keep.right)
   }
 
 }

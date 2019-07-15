@@ -1,5 +1,4 @@
 package csw.params.core.models
-import play.api.libs.json.{Json, OFormat}
 
 case class ProperMotion(pmx: Double, pmy: Double) {
   override def toString: String = s"$pmx/$pmy"

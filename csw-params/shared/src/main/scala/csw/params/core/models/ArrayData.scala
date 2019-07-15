@@ -3,8 +3,6 @@ package csw.params.core.models
 import java.util
 
 import com.github.ghik.silencer.silent
-import play.api.libs.json.{Format, Json}
-
 import scala.jdk.CollectionConverters._
 import scala.collection.mutable
 import scala.language.implicitConversions

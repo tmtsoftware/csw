@@ -12,8 +12,7 @@ import csw.location.model.scaladsl.ComponentType
 import csw.params.commands.CommandResponse.{Error, OnewayResponse, SubmitResponse, ValidateResponse}
 import csw.params.commands.{CommandResponse, ControlCommand}
 import csw.location.model.scaladsl.Connection.HttpConnection
-import csw.params.core.formats.JsonSupport._
-import play.api.libs.json.Json
+import io.bullet.borer.Json
 
 import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContext, Future}
@@ -30,6 +29,8 @@ case class HttpCommandService(
     locationService: LocationService,
     connection: HttpConnection
 ) {
+
+  import csw.params.core.formats.ParamCodecs._
 
   implicit val sys: akka.actor.ActorSystem = system.toUntyped
   implicit val mat: Materializer           = ActorMaterializer()(system)
@@ -62,9 +63,8 @@ case class HttpCommandService(
           val componentName = controlCommand.commandName
           val componentType = ComponentType.Service
           // For compatibility with ESW, use the following style URI
-          val uri = s"http://${loc.uri.getHost}:${loc.uri.getPort}/command/${componentType.name}/${componentName.name}/$method"
-//          val json = Json.encode(controlCommand).toUtf8String
-          val json = Json.toJson(controlCommand).toString()
+          val uri  = s"http://${loc.uri.getHost}:${loc.uri.getPort}/command/${componentType.name}/${componentName.name}/$method"
+          val json = Json.encode(controlCommand).toUtf8String
           val response = await(
             Http(sys).singleRequest(
               HttpRequest(
@@ -76,8 +76,7 @@ case class HttpCommandService(
           )
           if (response.status == StatusCodes.OK) {
             val bs = await(concatByteStrings(response.entity.dataBytes))
-//            Json.decode(bs.toArray).to[CommandResponse].value
-            Json.parse(bs.utf8String).as[CommandResponse]
+            Json.decode(bs.toArray).to[CommandResponse].value
           } else {
             Error(controlCommand.runId, s"Error response from ${connection.componentId.name}: $response")
           }

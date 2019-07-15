@@ -6,7 +6,7 @@ import csw.params.commands._
 import csw.params.core.states.StateVariable
 import csw.params.events._
 import io.bullet.borer.{Decoder, Encoder, Json}
-import play.api.libs.json.{Json ⇒ PJson, _}
+import play.api.libs.json.{Json => PJson, _}
 
 object JsonSupport extends JsonSupport
 

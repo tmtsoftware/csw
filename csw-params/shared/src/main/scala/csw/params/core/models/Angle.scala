@@ -6,8 +6,6 @@ package csw.params.core.models
  *  it will be useful, but WITHOUT ANY WARRANTY.
  */
 
-import play.api.libs.json._
-
 import scala.language.implicitConversions
 
 /**
