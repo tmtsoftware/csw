@@ -17,9 +17,10 @@ import csw.command.client.models.framework.{Component, Components, ContainerLife
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.client.ActorSystemFactory
-import csw.location.model.scaladsl
-import csw.location.model.scaladsl.ComponentType.{Assembly, HCD}
-import csw.location.model.scaladsl.Connection.AkkaConnection
+import csw.location.model
+import csw.location.model.ComponentId
+import csw.location.model.ComponentType.{Assembly, HCD}
+import csw.location.model.Connection.AkkaConnection
 import csw.logging.api.models.Level
 import csw.logging.api.models.Level.{ERROR, INFO, WARN}
 import csw.logging.client.internal.JsonExtensions.RichJsObject
@@ -32,9 +33,9 @@ import csw.params.commands.{CommandName, Setup}
 import csw.params.core.models.Prefix
 import io.lettuce.core.RedisClient
 
-import scala.jdk.CollectionConverters._
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
+import scala.jdk.CollectionConverters._
 
 class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
 
@@ -43,9 +44,9 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
 
   implicit val testKitSettings: TestKitSettings = TestKitSettings(typedSystem)
 
-  private val laserConnection            = AkkaConnection(scaladsl.ComponentId("Laser", Assembly))
-  private val motionControllerConnection = AkkaConnection(scaladsl.ComponentId("Motion_Controller", HCD))
-  private val galilConnection            = AkkaConnection(scaladsl.ComponentId("Galil", Assembly))
+  private val laserConnection            = AkkaConnection(ComponentId("Laser", Assembly))
+  private val motionControllerConnection = AkkaConnection(model.ComponentId("Motion_Controller", HCD))
+  private val galilConnection            = AkkaConnection(model.ComponentId("Galil", Assembly))
 
   private var containerActorSystem: ActorSystem[SpawnProtocol] = _
 

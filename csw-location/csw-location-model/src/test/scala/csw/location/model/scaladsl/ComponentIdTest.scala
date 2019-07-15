@@ -1,6 +1,6 @@
 package csw.location.model.scaladsl
 
-import csw.location.model.scaladsl
+import csw.location.model.{ComponentId, ComponentType}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 class ComponentIdTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
@@ -16,7 +16,7 @@ class ComponentIdTest extends FunSuite with Matchers with BeforeAndAfterAll with
 
   test("should not contain '-' in component's name") {
     val illegalArgumentException = intercept[IllegalArgumentException] {
-      scaladsl.ComponentId("redis-service", ComponentType.Service)
+      ComponentId("redis-service", ComponentType.Service)
     }
 
     illegalArgumentException.getMessage shouldBe "requirement failed: component name has '-'"

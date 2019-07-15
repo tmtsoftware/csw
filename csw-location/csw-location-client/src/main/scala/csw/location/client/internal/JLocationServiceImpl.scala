@@ -11,13 +11,13 @@ import akka.stream.KillSwitch
 import akka.stream.javadsl.Source
 import csw.location.api.javadsl.{ILocationService, IRegistrationResult}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
-import csw.location.model.scaladsl._
+import csw.location.model._
 
-import scala.jdk.CollectionConverters._
 import scala.compat.java8.DurationConverters.DurationOps
 import scala.compat.java8.FutureConverters._
 import scala.compat.java8.OptionConverters._
 import scala.concurrent.ExecutionContext
+import scala.jdk.CollectionConverters._
 
 private[location] class JLocationServiceImpl(locationService: LocationService)(implicit ec: ExecutionContext)
     extends ILocationService {

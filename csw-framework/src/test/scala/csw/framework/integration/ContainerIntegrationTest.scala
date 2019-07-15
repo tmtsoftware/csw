@@ -22,10 +22,10 @@ import csw.common.components.framework.SampleComponentState._
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.client.ActorSystemFactory
-import csw.location.model.scaladsl
-import csw.location.model.scaladsl.ComponentType.{Assembly, HCD}
-import csw.location.model.scaladsl.Connection.AkkaConnection
-import csw.location.model.scaladsl.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
+import csw.location.model
+import csw.location.model.ComponentType.{Assembly, HCD}
+import csw.location.model.Connection.AkkaConnection
+import csw.location.model.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
 import csw.params.core.states.{CurrentState, StateName}
 import io.lettuce.core.RedisClient
 
@@ -39,9 +39,9 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 
   private val irisContainerConnection  = AkkaConnection(ComponentId("IRIS_Container", ComponentType.Container))
-  private val filterAssemblyConnection = AkkaConnection(scaladsl.ComponentId("Filter", Assembly))
-  private val instrumentHcdConnection  = AkkaConnection(scaladsl.ComponentId("Instrument_Filter", HCD))
-  private val disperserHcdConnection   = AkkaConnection(scaladsl.ComponentId("Disperser", HCD))
+  private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
+  private val instrumentHcdConnection  = AkkaConnection(model.ComponentId("Instrument_Filter", HCD))
+  private val disperserHcdConnection   = AkkaConnection(model.ComponentId("Disperser", HCD))
   private val containerActorSystem: ActorSystem[SpawnProtocol] =
     ActorSystemFactory.remote(SpawnProtocol.behavior, "container-system")
 

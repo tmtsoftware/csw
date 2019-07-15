@@ -9,7 +9,7 @@ import csw.database.commons.DatabaseServiceConnection;
 import csw.database.javadsl.JooqHelper;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
-import csw.location.model.scaladsl.TcpRegistration;
+import csw.location.model.TcpRegistration;
 import csw.location.server.http.JHTTPLocationService;
 import org.jooq.DSLContext;
 import org.junit.AfterClass;

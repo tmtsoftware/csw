@@ -15,10 +15,10 @@ import csw.common.components.framework.SampleComponentState._
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.location.client.ActorSystemFactory
-import csw.location.model.scaladsl
-import csw.location.model.scaladsl.ComponentType.{Assembly, HCD}
-import csw.location.model.scaladsl.Connection.AkkaConnection
-import csw.location.model.scaladsl.{ComponentId, HttpRegistration, TcpRegistration}
+import csw.location.model
+import csw.location.model.ComponentType.{Assembly, HCD}
+import csw.location.model.Connection.AkkaConnection
+import csw.location.model.{ComponentId, HttpRegistration, TcpRegistration}
 import csw.params.commands
 import csw.params.commands.CommandName
 import csw.params.core.states.{CurrentState, StateName}
@@ -31,7 +31,7 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 
   private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
-  private val disperserHcdConnection   = AkkaConnection(scaladsl.ComponentId("Disperser", HCD))
+  private val disperserHcdConnection   = AkkaConnection(ComponentId("Disperser", HCD))
 
   override def afterAll(): Unit = {
     super.afterAll()
@@ -107,7 +107,7 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
     val assemblySupervisor = Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring).await
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")
-    val akkaConnection                = AkkaConnection(scaladsl.ComponentId("IFS_Detector", HCD))
+    val akkaConnection                = AkkaConnection(model.ComponentId("IFS_Detector", HCD))
 
     assertThatSupervisorIsRunning(assemblySupervisor, supervisorLifecycleStateProbe, 5.seconds)
 

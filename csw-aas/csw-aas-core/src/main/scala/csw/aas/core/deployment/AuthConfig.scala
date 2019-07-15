@@ -3,7 +3,7 @@ import java.io.{ByteArrayInputStream, InputStream}
 
 import com.typesafe.config._
 import csw.aas.core.commons.AuthLogger
-import csw.location.model.scaladsl.HttpLocation
+import csw.location.model.HttpLocation
 import org.keycloak.adapters.{KeycloakDeployment, KeycloakDeploymentBuilder}
 import org.keycloak.authorization.client.Configuration
 

@@ -7,9 +7,8 @@ import csw.location.api.AkkaRegistrationFactory.make
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.client.ActorSystemFactory
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.location.model.scaladsl
-import csw.location.model.scaladsl.Connection.{AkkaConnection, HttpConnection}
-import csw.location.model.scaladsl._
+import csw.location.model.Connection.{AkkaConnection, HttpConnection}
+import csw.location.model._
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.params.core.models.Prefix
 
@@ -73,7 +72,7 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec
       val actorRef = system.spawn(Behavior.empty, "trombone-hcd-1")
 
       locationService
-        .register(make(akkaConnection, Prefix("nfiraos.ncc.trombone"), actorRef.toURI(system)))
+        .register(make(akkaConnection, Prefix("nfiraos.ncc.trombone"), actorRef.toURI))
         .await
       enterBarrier("Registration")
 
@@ -84,7 +83,7 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec
       val port   = 9595
       val prefix = "/trombone/hcd"
 
-      val httpConnection   = HttpConnection(scaladsl.ComponentId("Assembly1", ComponentType.Assembly))
+      val httpConnection   = HttpConnection(ComponentId("Assembly1", ComponentType.Assembly))
       val httpRegistration = HttpRegistration(httpConnection, port, prefix)
       val probe            = TestProbe[TrackingEvent]("test-probe")
 

@@ -17,9 +17,9 @@ import csw.command.client.models.matchers.{DemandMatcher, Matcher, MatcherRespon
 import csw.common.utils.LockCommandFactory
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.location.model.scaladsl
-import csw.location.model.scaladsl.{AkkaLocation, ComponentId, ComponentType}
-import csw.location.model.scaladsl.Connection.AkkaConnection
+import csw.location.model
+import csw.location.model.Connection.AkkaConnection
+import csw.location.model.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
@@ -133,12 +133,12 @@ class CommandServiceTest(ignore: Int)
 
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
       val assemblyLocF =
-        locationService.resolve(AkkaConnection(scaladsl.ComponentId("Assembly", ComponentType.Assembly)), 5.seconds)
+        locationService.resolve(AkkaConnection(ComponentId("Assembly", ComponentType.Assembly)), 5.seconds)
       val assemblyLocation: AkkaLocation = Await.result(assemblyLocF, 10.seconds).get
       val assemblyCmdService             = CommandServiceFactory.make(assemblyLocation)
 
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
-      val hcdLocF                   = locationService.resolve(AkkaConnection(scaladsl.ComponentId("HCD", ComponentType.HCD)), 5.seconds)
+      val hcdLocF                   = locationService.resolve(AkkaConnection(model.ComponentId("HCD", ComponentType.HCD)), 5.seconds)
       val hcdLocation: AkkaLocation = Await.result(hcdLocF, 10.seconds).get
       val hcdCmdService             = CommandServiceFactory.make(hcdLocation)
 

@@ -14,7 +14,7 @@ import csw.alarm.client.internal.helpers.AlarmServiceTestSetup;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
-import csw.location.model.scaladsl.TcpRegistration;
+import csw.location.model.TcpRegistration;
 import csw.location.server.http.JHTTPLocationService;
 import org.junit.*;
 import org.scalatestplus.junit.JUnitSuite;

@@ -2,7 +2,7 @@ package csw.location.model.codecs
 
 import java.net.URI
 
-import csw.location.model.scaladsl._
+import csw.location.model._
 import csw.params.core.formats.{CborHelpers, CommonCodecs}
 import io.bullet.borer.Codec
 import io.bullet.borer.derivation.MapBasedCodecs._

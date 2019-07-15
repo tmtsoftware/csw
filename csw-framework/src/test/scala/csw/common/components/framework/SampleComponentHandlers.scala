@@ -4,8 +4,8 @@ import akka.actor.typed.scaladsl.ActorContext
 import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.model.scaladsl.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.location.model.scaladsl.{LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.location.model.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.location.model.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandIssue.OtherIssue
 import csw.params.commands.CommandResponse._

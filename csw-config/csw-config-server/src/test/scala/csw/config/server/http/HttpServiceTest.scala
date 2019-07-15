@@ -13,7 +13,7 @@ import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.location.api.exceptions.OtherLocationIsRegistered
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.model.scaladsl.HttpRegistration
+import csw.location.model.HttpRegistration
 import csw.location.server.http.HTTPLocationService
 import csw.network.utils.Networks
 

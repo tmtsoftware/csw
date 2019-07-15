@@ -2,9 +2,8 @@ package csw.common.components.framework
 
 import csw.alarm.api.models.AlarmSeverity.Warning
 import csw.alarm.api.models.Key.AlarmKey
-import csw.location.model.scaladsl
-import csw.location.model.scaladsl.Connection.{HttpConnection, TcpConnection}
-import csw.location.model.scaladsl.{ComponentId, ComponentType}
+import csw.location.model.{ComponentId, ComponentType}
+import csw.location.model.Connection.{HttpConnection, TcpConnection}
 import csw.params.commands.CommandName
 import csw.params.core.generics.GChoiceKey
 import csw.params.core.generics.KeyType.ChoiceKey
@@ -62,7 +61,7 @@ object SampleComponentState {
     )
   val choiceKey: GChoiceKey          = ChoiceKey.make("choiceKey", choices)
   val httpConnection: HttpConnection = HttpConnection(ComponentId("exampleHTTPService", ComponentType.Service))
-  val tcpConnection: TcpConnection   = TcpConnection(scaladsl.ComponentId("exampleTcpService", ComponentType.Service))
+  val tcpConnection: TcpConnection   = TcpConnection(ComponentId("exampleTcpService", ComponentType.Service))
 
   // States
   val timeServiceSchedulerState = StateName("timeServiceSchedulerState")

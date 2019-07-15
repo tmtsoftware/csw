@@ -1,7 +1,7 @@
 package csw.location.server.scaladsl
 
-import csw.location.model.scaladsl.Connection.TcpConnection
-import csw.location.model.scaladsl.{ComponentId, ComponentType, TcpRegistration}
+import csw.location.model.Connection.TcpConnection
+import csw.location.model.{ComponentId, ComponentType, TcpRegistration}
 import csw.location.server.commons.TestFutureExtension.RichFuture
 import csw.location.server.commons._
 import csw.location.server.internal.LocationServiceFactory

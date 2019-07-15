@@ -1,4 +1,4 @@
-package csw.location.model.scaladsl
+package csw.location.model
 
 import play.api.libs.json.{Format, Json}
 

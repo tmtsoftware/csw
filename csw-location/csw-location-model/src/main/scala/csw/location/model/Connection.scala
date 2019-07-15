@@ -1,7 +1,7 @@
-package csw.location.model.scaladsl
+package csw.location.model
 
-import csw.location.model.scaladsl.ConnectionType.{AkkaType, HttpType, TcpType}
-import csw.location.model.serializable.LocationSerializable
+import csw.location.model.ConnectionType.{AkkaType, HttpType, TcpType}
+import csw.location.model.codecs.LocationSerializable
 import play.api.libs.json._
 
 /**

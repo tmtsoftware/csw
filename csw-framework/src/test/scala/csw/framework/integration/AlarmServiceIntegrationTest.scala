@@ -11,9 +11,9 @@ import csw.common.FrameworkAssertions.assertThatSupervisorIsRunning
 import csw.common.components.framework.SampleComponentState._
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
-import csw.location.model.scaladsl
-import csw.location.model.scaladsl.ComponentType.HCD
-import csw.location.model.scaladsl.Connection.AkkaConnection
+import csw.location.model.ComponentId
+import csw.location.model.ComponentType.HCD
+import csw.location.model.Connection.AkkaConnection
 import csw.params.commands.Setup
 import redis.embedded.{RedisSentinel, RedisServer}
 
@@ -51,7 +51,7 @@ class AlarmServiceIntegrationTest extends FrameworkIntegrationSuite {
     Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring)
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")
-    val akkaConnection                = AkkaConnection(scaladsl.ComponentId("IFS_Detector", HCD))
+    val akkaConnection                = AkkaConnection(ComponentId("IFS_Detector", HCD))
     val location                      = locationService.resolve(akkaConnection, 5.seconds).await
 
     val supervisorRef = location.get.componentRef

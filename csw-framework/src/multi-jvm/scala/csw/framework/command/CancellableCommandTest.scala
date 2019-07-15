@@ -13,8 +13,8 @@ import csw.command.client.messages.CommandResponseManagerMessage.{Query, Subscri
 import csw.common.components.command.ComponentStateForCommand.{acceptedCmd, cancelCmd, prefix}
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.helpers.{LSNodeSpec, OneMemberAndSeed}
-import csw.location.model.scaladsl.Connection.AkkaConnection
-import csw.location.model.scaladsl.{ComponentId, ComponentType}
+import csw.location.model.{ComponentId, ComponentType}
+import csw.location.model.Connection.AkkaConnection
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup

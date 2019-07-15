@@ -18,7 +18,7 @@ import csw.framework.scaladsl.RegistrationFactory
 import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
-import csw.location.model.scaladsl.Connection.AkkaConnection
+import csw.location.model.Connection.AkkaConnection
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.LoggerFactory
@@ -44,7 +44,7 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol]) extends Mo
   val registrationResult: RegistrationResult     = mock[RegistrationResult]
   val registrationFactory: RegistrationFactory   = mock[RegistrationFactory]
 
-  when(registrationFactory.akkaTyped(any[AkkaConnection], any[Prefix], any[ActorRef[_]])(any[ActorSystem[_]]))
+  when(registrationFactory.akkaTyped(any[AkkaConnection], any[Prefix], any[ActorRef[_]]))
     .thenReturn(akkaRegistration)
   when(locationService.register(akkaRegistration)).thenReturn(Future.successful(registrationResult))
   when(locationService.unregister(any[AkkaConnection])).thenReturn(Future.successful(Done))

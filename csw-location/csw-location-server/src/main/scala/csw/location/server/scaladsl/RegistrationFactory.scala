@@ -1,10 +1,10 @@
 package csw.location.server.scaladsl
 
-import akka.actor.typed.{ActorRef, ActorSystem}
+import akka.actor.typed.ActorRef
 import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
-import csw.location.model.scaladsl.AkkaRegistration
-import csw.location.model.scaladsl.Connection.AkkaConnection
+import csw.location.model.AkkaRegistration
+import csw.location.model.Connection.AkkaConnection
 import csw.params.core.models.Prefix
 
 /**
@@ -22,10 +22,7 @@ class RegistrationFactory {
    * @param actorRef the supervisor actorRef of the component
    * @return a handle to the AkkaRegistration that is used to register in location service
    */
-  def akkaTyped(
-      akkaConnection: AkkaConnection,
-      prefix: Prefix,
-      actorRef: ActorRef[_]
-  )(implicit actorSystem: ActorSystem[_]): AkkaRegistration = AkkaRegistrationFactory.make(akkaConnection, prefix, actorRef.toURI)
+  def akkaTyped(akkaConnection: AkkaConnection, prefix: Prefix, actorRef: ActorRef[_]): AkkaRegistration =
+    AkkaRegistrationFactory.make(akkaConnection, prefix, actorRef.toURI)
 
 }

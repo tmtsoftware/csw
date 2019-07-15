@@ -1,6 +1,6 @@
 package csw.location.api.javadsl;
 
-import csw.location.model.scaladsl.ConnectionType;
+import csw.location.model.ConnectionType;
 
 /**
  * Helper class for Java to get the handle of `ConnectionType` which is fundamental to LocationService library
