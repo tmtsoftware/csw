@@ -2,8 +2,8 @@ package csw.aas.core.deployment
 import java.net.URI
 
 import com.typesafe.config.{ConfigException, ConfigFactory}
-import csw.location.model.scaladsl.Connection.HttpConnection
-import csw.location.model.scaladsl.{ComponentId, ComponentType, HttpLocation}
+import csw.location.model.Connection.HttpConnection
+import csw.location.model.{ComponentId, ComponentType, HttpLocation}
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.jdk.CollectionConverters._

@@ -2,9 +2,9 @@ package org.tmt.nfiraos.sampleassembly;
 
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.JComponentType;
-import csw.location.model.scaladsl.AkkaLocation;
-import csw.location.model.scaladsl.ComponentId;
-import csw.location.model.scaladsl.Connection;
+import csw.location.model.AkkaLocation;
+import csw.location.model.ComponentId;
+import csw.location.model.Connection;
 import csw.testkit.javadsl.FrameworkTestKitJunitResource;
 import csw.testkit.javadsl.JCSWService;
 import org.junit.Assert;

@@ -10,9 +10,10 @@ import csw.common.components.framework.SampleComponentState._
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.internal.commons.EventServiceConnection
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
-import csw.location.model.scaladsl
-import csw.location.model.scaladsl.ComponentType.{Assembly, HCD}
-import csw.location.model.scaladsl.Connection.AkkaConnection
+import csw.location.model
+import csw.location.model.ComponentId
+import csw.location.model.ComponentType.{Assembly, HCD}
+import csw.location.model.Connection.AkkaConnection
 import csw.params.commands
 import csw.params.commands.CommandName
 import csw.params.core.states.{CurrentState, StateName}
@@ -28,8 +29,8 @@ class EventServiceIntegrationTest extends FrameworkIntegrationSuite {
   private var sentinel: RedisSentinel = _
   private var server: RedisServer     = _
 
-  private val filterAssemblyConnection = AkkaConnection(scaladsl.ComponentId("Filter", Assembly))
-  private val disperserHcdConnection   = AkkaConnection(scaladsl.ComponentId("Disperser", HCD))
+  private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
+  private val disperserHcdConnection   = AkkaConnection(model.ComponentId("Disperser", HCD))
   private val wiring                   = FrameworkWiring.make(seedActorSystem)
 
   override protected def beforeAll(): Unit = {

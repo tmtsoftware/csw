@@ -10,7 +10,7 @@ import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import csw.location.api.codec.DoneCodec
 import csw.location.api.scaladsl.LocationService
 import csw.location.model.codecs.LocationCodecs
-import csw.location.model.scaladsl._
+import csw.location.model._
 import csw.location.server.internal.ActorRuntime
 import io.bullet.borer.Json
 

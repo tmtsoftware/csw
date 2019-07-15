@@ -18,8 +18,8 @@ import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.model
-import csw.location.model.scaladsl.Connection.{AkkaConnection, HttpConnection}
-import csw.location.model.scaladsl._
+import csw.location.model.Connection.{AkkaConnection, HttpConnection}
+import csw.location.model._
 import csw.location.wrapper.LocationServerWiring
 import csw.logging.api.scaladsl._
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
@@ -137,7 +137,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   import akka.actor.typed.scaladsl.adapter._
 
   // dummy HCD connection
-  val hcdConnection = AkkaConnection(model.scaladsl.ComponentId("hcd1", ComponentType.HCD))
+  val hcdConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
   val hcdRegistration: AkkaRegistration = AkkaRegistrationFactory.make(
     hcdConnection,
     Prefix("nfiraos.ncc.tromboneHcd"),
@@ -164,7 +164,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   }
   val typedActorRef: ActorRef[String] = context.system.spawn(behavior(), "typed-actor-ref")
 
-  val assemblyConnection = AkkaConnection(model.scaladsl.ComponentId("assembly1", ComponentType.Assembly))
+  val assemblyConnection = AkkaConnection(model.ComponentId("assembly1", ComponentType.Assembly))
 
   // Register Typed ActorRef[String] with Location Service
   val assemblyRegistration: AkkaRegistration =

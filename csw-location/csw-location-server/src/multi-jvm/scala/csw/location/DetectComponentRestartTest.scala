@@ -8,8 +8,8 @@ import csw.location.api.AkkaRegistrationFactory.make
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.location.model.scaladsl.Connection.AkkaConnection
-import csw.location.model.scaladsl._
+import csw.location.model.Connection.AkkaConnection
+import csw.location.model.{ComponentId, ComponentType, LocationRemoved, LocationUpdated}
 import csw.location.server.commons.CswCluster
 import csw.location.server.internal.{LocationServiceFactory, ServerWiring}
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory

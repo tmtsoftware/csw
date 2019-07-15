@@ -2,11 +2,7 @@ package csw.framework.internal.supervisor
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import csw.command.client.messages.CommandMessage.{Oneway, Submit}
-import csw.command.client.messages.ComponentCommonMessage.{
-  ComponentStateSubscription,
-  GetSupervisorLifecycleState,
-  LifecycleStateSubscription
-}
+import csw.command.client.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.command.client.messages.ContainerIdleMessage
 import csw.command.client.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.command.client.messages.RunningMessage.Lifecycle
@@ -18,8 +14,8 @@ import csw.command.client.models.matchers.DemandMatcher
 import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestSuite
 import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInitializeTimeout}
-import csw.location.model.scaladsl.ComponentType.{Assembly, HCD}
-import csw.location.model.scaladsl.Connection.AkkaConnection
+import csw.location.model.ComponentType.{Assembly, HCD}
+import csw.location.model.Connection.AkkaConnection
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
 import csw.params.core.generics.{KeyType, Parameter}

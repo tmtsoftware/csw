@@ -1,6 +1,6 @@
 package csw.admin.server.log.exceptions
 
-import csw.location.model.scaladsl.Connection
+import csw.location.model.Connection
 
 case class InvalidComponentNameException(componentName: String)
     extends RuntimeException(s"$componentName is not a valid component name")

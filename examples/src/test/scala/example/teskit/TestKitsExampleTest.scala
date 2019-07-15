@@ -3,9 +3,9 @@ package example.teskit
 import com.typesafe.config.ConfigFactory
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.model.scaladsl
-import csw.location.model.scaladsl.ComponentType.Assembly
-import csw.location.model.scaladsl.Connection.AkkaConnection
+import csw.location.model.ComponentId
+import csw.location.model.ComponentType.Assembly
+import csw.location.model.Connection.AkkaConnection
 import csw.testkit.FrameworkTestKit
 import csw.testkit.scaladsl.CSWService.{ConfigServer, EventServer}
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
@@ -45,7 +45,7 @@ class TestKitsExampleTest extends FunSuiteLike with BeforeAndAfterAll with Match
 
     //#spawn-using-testkit
 
-    val connection       = AkkaConnection(scaladsl.ComponentId("SampleAssembly", Assembly))
+    val connection       = AkkaConnection(ComponentId("SampleAssembly", Assembly))
     val assemblyLocation = Await.result(locationService.resolve(connection, 5.seconds), 10.seconds)
     assemblyLocation.value.connection shouldBe connection
   }

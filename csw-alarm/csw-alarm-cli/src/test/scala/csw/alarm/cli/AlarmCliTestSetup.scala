@@ -7,7 +7,7 @@ import csw.alarm.cli.utils.TestFutureExt.RichFuture
 import csw.alarm.cli.wiring.Wiring
 import csw.alarm.client.internal.commons.AlarmServiceConnection
 import csw.commons.redis.EmbeddedRedis
-import csw.location.model.scaladsl.TcpRegistration
+import csw.location.model.TcpRegistration
 import csw.location.server.http.HTTPLocationService
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.SpanSugar.convertFloatToGrainOfTime

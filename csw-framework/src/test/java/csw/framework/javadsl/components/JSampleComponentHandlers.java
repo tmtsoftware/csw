@@ -13,7 +13,7 @@ import csw.common.components.framework.SampleComponentState;
 import csw.framework.CurrentStatePublisher;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
-import csw.location.model.scaladsl.TrackingEvent;
+import csw.location.model.TrackingEvent;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.*;
 import csw.params.core.generics.Key;

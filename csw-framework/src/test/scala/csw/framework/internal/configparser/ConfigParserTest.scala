@@ -6,8 +6,8 @@ import csw.command.client.models.framework.LocationServiceUsage.{DoNotRegister, 
 import csw.framework.models.ConfigFileLocation.{Local, Remote}
 import csw.framework.models.ContainerMode.{Container, Standalone}
 import csw.framework.models.{ContainerBootstrapInfo, ContainerInfo, HostBootstrapInfo}
-import csw.location.model.scaladsl.ComponentType.{Assembly, HCD}
-import csw.location.model.scaladsl.Connection
+import csw.location.model.ComponentType.{Assembly, HCD}
+import csw.location.model.Connection
 import csw.params.core.models.Prefix
 import org.scalatest.{FunSuite, Matchers}
 

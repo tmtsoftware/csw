@@ -1,17 +1,17 @@
 package csw.command.client
 
-import akka.http.scaladsl.Http
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.util.ByteString
 import csw.location.api.scaladsl.LocationService
-import csw.location.model.scaladsl.ComponentType
+import csw.location.model.ComponentType
+import csw.location.model.Connection.HttpConnection
 import csw.params.commands.CommandResponse.{Error, OnewayResponse, SubmitResponse, ValidateResponse}
 import csw.params.commands.{CommandResponse, ControlCommand}
-import csw.location.model.scaladsl.Connection.HttpConnection
 import csw.params.core.formats.JsonSupport._
 import play.api.libs.json.Json
 

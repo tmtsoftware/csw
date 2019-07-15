@@ -1,7 +1,8 @@
 package csw.location.model.scaladsl
 
-import csw.location.model.scaladsl
-import csw.location.model.scaladsl.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.location.model
+import csw.location.model.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.location.model.{ComponentId, ComponentType, Connection}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 class ConnectionTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
@@ -13,40 +14,40 @@ class ConnectionTest extends FunSuite with Matchers with BeforeAndAfterAll with 
 
   test("should able to form a string representation for tcp connection for redis") {
     val expectedTcpConnectionName = "redis-service-tcp"
-    val tcpConnection             = TcpConnection(scaladsl.ComponentId("redis", ComponentType.Service))
+    val tcpConnection             = TcpConnection(ComponentId("redis", ComponentType.Service))
     tcpConnection.name shouldBe expectedTcpConnectionName
   }
 
   test("should able to form a string representation for http connection for config service") {
     val expectedHttpConnectionName = "config-service-http"
-    val httpConnection             = HttpConnection(scaladsl.ComponentId("config", ComponentType.Service))
+    val httpConnection             = HttpConnection(model.ComponentId("config", ComponentType.Service))
     httpConnection.name shouldBe expectedHttpConnectionName
   }
 
   test("should able to form a string representation for akka connection for trombone container") {
     val expectedAkkaConnectionName = "tromboneContainer-container-akka"
-    val akkaConnection             = AkkaConnection(scaladsl.ComponentId("tromboneContainer", ComponentType.Container))
+    val akkaConnection             = AkkaConnection(model.ComponentId("tromboneContainer", ComponentType.Container))
     akkaConnection.name shouldBe expectedAkkaConnectionName
   }
 
   test("should able to form a string representation for akka connection for trombone assembly") {
     val expectedAkkaConnectionName = "tromboneAssembly-assembly-akka"
-    val akkaConnection             = AkkaConnection(scaladsl.ComponentId("tromboneAssembly", ComponentType.Assembly))
+    val akkaConnection             = AkkaConnection(model.ComponentId("tromboneAssembly", ComponentType.Assembly))
     akkaConnection.name shouldBe expectedAkkaConnectionName
   }
 
   test("should able to form a connection for components from a valid string representation") {
     Connection.from("tromboneAssembly-assembly-akka") shouldBe
-    AkkaConnection(scaladsl.ComponentId("tromboneAssembly", ComponentType.Assembly))
+    AkkaConnection(model.ComponentId("tromboneAssembly", ComponentType.Assembly))
 
     Connection.from("tromboneHcd-hcd-akka") shouldBe
-    AkkaConnection(scaladsl.ComponentId("tromboneHcd", ComponentType.HCD))
+    AkkaConnection(model.ComponentId("tromboneHcd", ComponentType.HCD))
 
     Connection.from("redis-service-tcp") shouldBe
-    TcpConnection(scaladsl.ComponentId("redis", ComponentType.Service))
+    TcpConnection(model.ComponentId("redis", ComponentType.Service))
 
     Connection.from("configService-service-http") shouldBe
-    HttpConnection(scaladsl.ComponentId("configService", ComponentType.Service))
+    HttpConnection(model.ComponentId("configService", ComponentType.Service))
   }
 
   test("should not be able to form a connection for components from an invalid string representation") {

@@ -14,8 +14,8 @@ import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.command.client.models.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.model.scaladsl.Connection.AkkaConnection
-import csw.location.model.scaladsl.{AkkaLocation, ComponentId, ComponentType}
+import csw.location.model.Connection.AkkaConnection
+import csw.location.model.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.server.commons.BlockingUtils
 
 import scala.concurrent.Await

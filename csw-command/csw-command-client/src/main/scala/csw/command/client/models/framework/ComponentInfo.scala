@@ -1,17 +1,17 @@
 package csw.command.client.models.framework
-import csw.location.model.scaladsl.{ComponentType, Connection}
+import csw.location.model.{ComponentType, Connection}
 import csw.params.core.models.Prefix
 import play.api.libs.json._
 
-import scala.jdk.CollectionConverters._
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
+import scala.jdk.CollectionConverters._
 
 /**
  * The information needed to create a component. This class is created after de-serializing the config file for the component.
  *
  * @param name the name of the component
  * @param componentType
- *  : the type of the component as defined by [[csw.location.model.scaladsl.ComponentType]]
+ *  : the type of the component as defined by [[csw.location.model.ComponentType]]
  * @param prefix identifies the subsystem
  * @param behaviorFactoryClassName
  *  : specifies the component to be created by name of the class of it's factory

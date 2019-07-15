@@ -9,7 +9,7 @@ import akka.util.Timeout
 import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.model.scaladsl.TrackingEvent
+import csw.location.model.TrackingEvent
 import csw.params.commands.CommandIssue.{OtherIssue, WrongPrefixIssue}
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{ControlCommand, Result, Setup}

@@ -19,7 +19,7 @@ import csw.command.client.messages.{CommandResponseManagerMessage, ComponentMess
 import csw.command.client.models.framework.PubSub.{Subscribe, SubscribeOnly}
 import csw.command.client.models.matchers.Matcher
 import csw.command.client.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
-import csw.location.model.scaladsl.AkkaLocation
+import csw.location.model.AkkaLocation
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id

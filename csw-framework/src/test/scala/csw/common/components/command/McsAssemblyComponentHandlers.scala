@@ -9,7 +9,7 @@ import csw.command.client.messages.TopLevelActorMessage
 import csw.common.components.command.ComponentStateForCommand.{longRunningCmdCompleted, _}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.model.scaladsl.{AkkaLocation, TrackingEvent}
+import csw.location.model.{AkkaLocation, TrackingEvent}
 import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandIssue, ControlCommand, Setup}

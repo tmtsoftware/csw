@@ -11,7 +11,7 @@ import csw.config.server.commons.CoordinatedShutdownReasons.FailureReason
 import csw.config.server.commons.{ConfigServerLogger, ConfigServiceConnection}
 import csw.config.server.{ActorRuntime, Settings}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
-import csw.location.model.scaladsl.HttpRegistration
+import csw.location.model
 import csw.logging.api.scaladsl.Logger
 import csw.network.utils.{Networks, SocketUtils}
 
@@ -82,7 +82,7 @@ class HttpService(
   }
 
   private def register(binding: ServerBinding): Future[RegistrationResult] = {
-    val registration = HttpRegistration(
+    val registration = model.HttpRegistration(
       connection = ConfigServiceConnection.value,
       port = binding.localAddress.getPort,
       path = ""

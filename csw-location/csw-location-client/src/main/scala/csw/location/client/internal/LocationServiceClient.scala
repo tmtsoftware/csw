@@ -18,8 +18,17 @@ import csw.location.api.codec.DoneCodec
 import csw.location.api.exceptions.{OtherLocationIsRegistered, RegistrationFailed}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.HttpCodecs
+import csw.location.model.{
+  AkkaLocation,
+  ComponentType,
+  Connection,
+  ConnectionType,
+  Location,
+  Registration,
+  TrackingEvent,
+  TypedConnection
+}
 import csw.location.model.codecs.LocationCodecs
-import csw.location.model.scaladsl._
 import io.bullet.borer.Json
 
 import scala.async.Async.{async, await}
