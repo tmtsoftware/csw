@@ -28,6 +28,7 @@ import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.location.models.{ComponentId, ComponentType}
 import csw.location.models.Connection.AkkaConnection
 import csw.location.server.http.MultiNodeHTTPLocationService
+import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.params.commands.CommandResponse.Invalid
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.generics.{KeyType, Parameter}
@@ -65,6 +66,7 @@ class ContainerCmdTest(ignore: Int)
 
   private val testFileUtils = new TestFileUtils(new Settings(ConfigFactory.load()))
 
+  LoggingSystemFactory.start("", "", "", typedSystem)
   override def beforeAll(): Unit = {
     super.beforeAll()
     testFileUtils.deleteServerFiles()
