@@ -18,7 +18,7 @@ object Dependencies {
     )
   )
 
-  val LocationModel = Def.setting(
+  val LocationModels = Def.setting(
     Seq(
       Enumeratum.`enumeratum`.value,
       Libs.`play-json`.value,
