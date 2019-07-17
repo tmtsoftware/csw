@@ -79,9 +79,6 @@ lazy val `csw` = project
   .settings(Settings.docExclusions(unidocExclusions))
   .settings(Settings.multiJvmTestTask(multiJvmProjects))
   .settings(GithubRelease.githubReleases(githubReleases))
-  .settings(commands += Command.command("testUntilFailed") { state =>
-    "csw-framework/multi-jvm:testOnly *ContainerCmdTest*" :: "testUntilFailed" :: state
-  })
   .settings(
     bootstrap in Coursier := CoursierPlugin.bootstrapTask(githubReleases).value
   )
