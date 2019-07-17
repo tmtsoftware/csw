@@ -21,7 +21,7 @@ import csw.framework.internal.component.ComponentBehavior
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
-import csw.logging.api.models.Level.ERROR
+import csw.logging.models.Level.ERROR
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.scaladsl.LoggerFactory

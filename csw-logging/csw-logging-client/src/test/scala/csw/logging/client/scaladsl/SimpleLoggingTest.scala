@@ -4,13 +4,13 @@ import java.time._
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
-import csw.logging.api.models.Level
-import csw.logging.api.models.Level._
+import csw.logging.models.Level._
 import csw.logging.client.commons.{Constants, LoggingKeys, TMTDateTimeFormatter}
 import csw.logging.client.components.{InnerSourceComponent, SingletonComponent, TromboneAssembly, TromboneHcd}
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.internal.LoggingState
 import csw.logging.client.utils.LoggingTestSuite
+import csw.logging.models.Level
 import org.scalatest.concurrent.Eventually
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import play.api.libs.json.JsObject

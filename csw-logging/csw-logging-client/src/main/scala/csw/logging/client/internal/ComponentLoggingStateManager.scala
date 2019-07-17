@@ -3,8 +3,8 @@ package csw.logging.client.internal
 import java.util.concurrent.ConcurrentHashMap
 
 import com.typesafe.config.Config
-import csw.logging.api.models.Level
 import csw.logging.client.models.ComponentLoggingState
+import csw.logging.models.Level
 
 import scala.jdk.CollectionConverters._
 import scala.util.Try

@@ -1,11 +1,11 @@
 package csw.logging.client.compat
 
 import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
-import csw.logging.api.models.Level
-import csw.logging.api.models.Level.INFO
+import csw.logging.models.Level.INFO
 import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.LoggingTestSuite
+import csw.logging.models.Level
 import org.scalatest.{FunSuiteLike, Matchers}
 
 class MyActor extends Actor with ActorLogging {

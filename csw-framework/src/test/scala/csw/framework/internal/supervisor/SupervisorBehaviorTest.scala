@@ -10,8 +10,8 @@ import csw.common.components.framework.SampleComponentBehaviorFactory
 import csw.common.extensions.CswContextExtensions.RichCswContext
 import csw.framework.ComponentInfos._
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
-import csw.logging.api.models.Level.WARN
-import csw.logging.client.models.LogMetadata
+import csw.logging.models.Level.WARN
+import csw.logging.models.LogMetadata
 import org.mockito.{ArgumentMatchers, MockitoSugar}
 
 import scala.collection.immutable

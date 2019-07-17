@@ -167,6 +167,14 @@ object Dependencies {
     )
   )
 
+  val LoggingModels = Def.setting(
+    Seq(
+      Enumeratum.`enumeratum`.value,
+      Borer.`borer-core`.value,
+      Borer.`borer-derivation`.value,
+    )
+  )
+
   val LoggingClient = Def.setting(
     Seq(
       Libs.`config`,
@@ -179,7 +187,6 @@ object Dependencies {
       Libs.`scalatest`.value % Test,
       Libs.`junit`           % Test,
       Borer.`borer-core`.value,
-      Borer.`borer-derivation`.value,
       Libs.`gson` % Test
     )
   )

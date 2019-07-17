@@ -1,4 +1,4 @@
-package csw.logging.api.models
+package csw.logging.models
 
 import java.util.UUID
 
@@ -13,10 +13,10 @@ sealed trait AnyId
  *
  * @param trackingId the global unique id of the request
  *                   optional: A new unique id will be created if this is not specified
- * @param spanId a sub-id used when a a service is called multiple times for the same global request
- *               optional: defaults to 0
- * @param level a field for controlling per request log levels
- *              optional: defaults to no per request control
+ * @param spanId     a sub-id used when a a service is called multiple times for the same global request
+ *                   optional: defaults to 0
+ * @param level      a field for controlling per request log levels
+ *                   optional: defaults to no per request control
  */
 case class RequestId(
     trackingId: String = UUID.randomUUID().toString,

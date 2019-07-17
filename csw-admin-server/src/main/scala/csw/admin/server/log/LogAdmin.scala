@@ -10,9 +10,8 @@ import csw.command.client.messages.{GetComponentLogMetadata, SetComponentLogLeve
 import csw.location.api.scaladsl.LocationService
 import csw.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.models.{AkkaLocation, Connection, Location}
-import csw.logging.api.models.Level
 import csw.logging.api.scaladsl.Logger
-import csw.logging.client.models.LogMetadata
+import csw.logging.models.{Level, LogMetadata}
 
 import scala.async.Async._
 import scala.concurrent.Future

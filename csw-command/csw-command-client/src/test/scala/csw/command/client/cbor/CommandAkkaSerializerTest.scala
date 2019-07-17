@@ -31,8 +31,7 @@ import csw.command.client.models.framework.ToComponentLifecycleMessage.{GoOfflin
 import csw.command.client.models.framework._
 import csw.commons.ResourceReader
 import csw.location.models.ComponentType
-import csw.logging.api.models.Level
-import csw.logging.client.models.LogMetadata
+import csw.logging.models.{Level, LogMetadata}
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
 import csw.params.core.generics.KeyType.{ByteArrayKey, IntKey}

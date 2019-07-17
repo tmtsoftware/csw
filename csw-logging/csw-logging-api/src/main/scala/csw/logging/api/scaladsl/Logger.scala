@@ -1,8 +1,8 @@
 package csw.logging.api.scaladsl
 
 import csw.logging.api.NoLogException
-import csw.logging.api.models._
 import csw.logging.macros.SourceFactory
+import csw.logging.models.{AnyId, noId}
 
 trait Logger {
 

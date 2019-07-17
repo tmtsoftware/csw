@@ -39,6 +39,7 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-logging-macros`,
   `csw-params-js`,
   `csw-location-models-js`,
+  `csw-logging-models-js`,
   `csw-network-utils`,
   `csw-commons`,
   `csw-benchmark`,
@@ -78,6 +79,9 @@ lazy val `csw` = project
   .settings(Settings.docExclusions(unidocExclusions))
   .settings(Settings.multiJvmTestTask(multiJvmProjects))
   .settings(GithubRelease.githubReleases(githubReleases))
+  .settings(commands += Command.command("testUntilFailed") { state =>
+    "csw-framework/multi-jvm:testOnly *ContainerCmdTest*" :: "testUntilFailed" :: state
+  })
   .settings(
     bootstrap in Coursier := CoursierPlugin.bootstrapTask(githubReleases).value
   )
@@ -235,6 +239,8 @@ lazy val `csw-logging` = project
   .in(file("csw-logging"))
   .aggregate(
     `csw-logging-macros`,
+    `csw-logging-models-jvm`,
+    `csw-logging-models-js`,
     `csw-logging-api`,
     `csw-logging-client`
   )
@@ -245,9 +251,23 @@ lazy val `csw-logging-macros` = project
     libraryDependencies += Libs.`scala-reflect`
   )
 
+lazy val `csw-logging-models` = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("csw-logging/csw-logging-models"))
+
+  .enablePlugins(PublishBintray, GenJavadocPlugin)
+  .settings(fork := false)
+  .settings(libraryDependencies ++= Dependencies.LoggingModels.value)
+
+lazy val `csw-logging-models-jvm` = `csw-logging-models`.jvm
+lazy val `csw-logging-models-js`  = `csw-logging-models`.js
+
 lazy val `csw-logging-api` = project
   .in(file("csw-logging/csw-logging-api"))
-  .dependsOn(`csw-logging-macros`)
+  .dependsOn(
+    `csw-logging-macros`,
+    `csw-logging-models-jvm`
+  )
   .settings(
     libraryDependencies += Enumeratum.`enumeratum`.value
   )

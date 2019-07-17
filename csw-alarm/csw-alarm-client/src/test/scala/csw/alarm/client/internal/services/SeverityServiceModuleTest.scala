@@ -15,7 +15,7 @@ import csw.alarm.api.models._
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.alarm.client.internal.helpers.{AlarmServiceTestSetup, TestDataFeeder}
 import csw.alarm.client.internal.services.SeverityTestScenarios._
-import csw.logging.api.models.Level.DEBUG
+import csw.logging.models.Level.DEBUG
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.utils.TestAppender

@@ -4,7 +4,6 @@ import java.nio.file.Paths
 import java.time.{ZoneId, ZoneOffset, ZonedDateTime}
 
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import csw.logging.api.models.RequestId
 import csw.logging.client.appenders.FileAppender
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.commons.LoggingKeys
@@ -12,6 +11,7 @@ import csw.logging.client.components.IRIS
 import csw.logging.client.components.IRIS._
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.{FileUtils, LoggingTestSuite}
+import csw.logging.models.RequestId
 import play.api.libs.json.{JsObject, Json}
 
 import scala.collection.mutable

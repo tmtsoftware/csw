@@ -1,7 +1,6 @@
-package csw.logging.client.models
+package csw.logging.models
 
-import csw.logging.api.models.Level
-import csw.serializable.LoggingSerializable
+import csw.logging.models.codecs.LoggingSerializable
 
 /**
  * Holds metadata information about logging configuration

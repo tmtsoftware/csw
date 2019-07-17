@@ -1,9 +1,9 @@
 package csw.logging.client.appenders
 
-import csw.logging.api.models.Level
-import csw.logging.api.models.Level.TRACE
+import csw.logging.models.Level.TRACE
 import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.utils.LoggingTestSuite
+import csw.logging.models.Level
 import org.slf4j.LoggerFactory
 
 class Slf4jAppenderTest extends LoggingTestSuite {

@@ -1,9 +1,8 @@
 package csw.admin.server.log
 
 import csw.admin.server.commons.AdminLogger
-import csw.logging.api.models.Level
 import csw.logging.api.scaladsl.Logger
-import csw.logging.client.models.LogMetadata
+import csw.logging.models.{Level, LogMetadata}
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 import play.api.libs.json._
 

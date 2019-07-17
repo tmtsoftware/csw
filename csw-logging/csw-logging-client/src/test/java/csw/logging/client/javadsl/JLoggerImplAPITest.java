@@ -6,9 +6,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import csw.logging.api.javadsl.ILogger;
-import csw.logging.api.models.Level;
-import csw.logging.api.models.Level$;
-import csw.logging.api.models.RequestId;
+import csw.logging.models.Level;
+import csw.logging.models.Level$;
+import csw.logging.models.RequestId;
 import csw.logging.client.appenders.LogAppenderBuilder;
 import csw.logging.client.commons.LoggingKeys$;
 import csw.logging.client.internal.LoggingSystem;
@@ -39,13 +39,13 @@ public class JLoggerImplAPITest extends JUnitSuite {
     private RuntimeException runtimeException = new RuntimeException(exceptionMessage);
     private RequestId requestId = JRequestId.id();
     private Map<String, Object> data = Map.of(
-        JKeys.OBS_ID, "foo_obs_id",
-        "key1", "value1",
-        "key2", "value2"
+            JKeys.OBS_ID, "foo_obs_id",
+            "key1", "value1",
+            "key2", "value2"
     );
     private String className = getClass().getName();
 
-    private static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.behavior(),"base-system");
+    private static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.behavior(), "base-system");
     private static LoggingSystem loggingSystem;
 
     private static List<JsonObject> logBuffer = new Vector<>();
@@ -170,7 +170,6 @@ public class JLoggerImplAPITest extends JUnitSuite {
         testCommonProperties(Level.TRACE$.MODULE$);
         testAllOverloads();
     }
-
 
 
     @Test

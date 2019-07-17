@@ -1,6 +1,6 @@
-package csw.logging.api.models
+package csw.logging.models
 
-import csw.serializable.LoggingSerializable
+import csw.logging.models.codecs.LoggingSerializable
 import enumeratum._
 
 import scala.collection.immutable.IndexedSeq

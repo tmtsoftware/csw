@@ -4,10 +4,10 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{Behavior, PostStop}
 import akka.event.LogSource
-import csw.logging.api.models.Level
 import csw.logging.client.appenders.LogAppender
 import csw.logging.client.commons.Category
 import csw.logging.client.internal.LogActorMessages._
+import csw.logging.models.Level
 import play.api.libs.json.JsObject
 
 import scala.concurrent.Promise

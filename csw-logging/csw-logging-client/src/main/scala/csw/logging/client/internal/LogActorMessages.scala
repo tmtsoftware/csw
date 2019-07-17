@@ -1,9 +1,9 @@
 package csw.logging.client.internal
 
-import csw.logging.api.models.AnyId
-import csw.logging.api.models.Level
+import csw.logging.models.AnyId
 import csw.logging.client.appenders.LogAppender
 import csw.logging.macros.SourceLocation
+import csw.logging.models.{AnyId, Level}
 import play.api.libs.json.JsObject
 
 // Parent trait for Log messages shared with Log Actor

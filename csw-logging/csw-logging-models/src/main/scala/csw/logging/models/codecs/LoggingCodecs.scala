@@ -1,10 +1,9 @@
-package csw.logging.client.cbor
+package csw.logging.models.codecs
 
-import csw.logging.api.models.Level
-import csw.logging.client.models.LogMetadata
+import csw.logging.models.{Level, LogMetadata}
 import enumeratum.{Enum, EnumEntry}
-import io.bullet.borer.{Codec, Decoder, Encoder}
 import io.bullet.borer.derivation.MapBasedCodecs._
+import io.bullet.borer.{Codec, Decoder, Encoder}
 
 object LoggingCodecs extends LoggingCodecs
 trait LoggingCodecs {

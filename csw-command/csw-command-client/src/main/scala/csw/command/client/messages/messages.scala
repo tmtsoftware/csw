@@ -6,8 +6,7 @@ import csw.command.client.messages.CommandSerializationMarker._
 import csw.command.client.models.framework.PubSub.SubscriberMessage
 import csw.command.client.models.framework._
 import csw.location.models.TrackingEvent
-import csw.logging.api.models.Level
-import csw.logging.client.models.LogMetadata
+import csw.logging.models.{Level, LogMetadata}
 import csw.params.commands.CommandResponse.{RemoteMsg => _, _}
 import csw.params.commands.ControlCommand
 import csw.params.core.models.{Id, Prefix}

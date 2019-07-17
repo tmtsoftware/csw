@@ -22,7 +22,7 @@ import csw.location.client.ActorSystemFactory
 import csw.location.models.ComponentType.HCD
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.logging.api.models.Level.INFO
+import csw.logging.models.Level.INFO
 import csw.logging.client.internal.LoggingSystem
 import csw.params.core.states.{CurrentState, StateName}
 import io.lettuce.core.RedisClient

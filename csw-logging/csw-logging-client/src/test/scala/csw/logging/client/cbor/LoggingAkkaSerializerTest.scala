@@ -4,8 +4,7 @@ import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.actor.typed
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.serialization.SerializationExtension
-import csw.logging.api.models.Level
-import csw.logging.client.models.LogMetadata
+import csw.logging.models.{Level, LogMetadata}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.prop.Tables.Table

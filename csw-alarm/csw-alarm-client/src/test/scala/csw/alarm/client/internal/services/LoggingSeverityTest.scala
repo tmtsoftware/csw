@@ -3,7 +3,7 @@ import com.typesafe.config.ConfigFactory
 import csw.alarm.api.models.AlarmSeverity
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
-import csw.logging.api.models.Level.DEBUG
+import csw.logging.models.Level.DEBUG
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.utils.TestAppender

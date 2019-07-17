@@ -1,7 +1,7 @@
 package csw.logging.client.internal
 
 import com.typesafe.config.ConfigFactory
-import csw.logging.api.models.Level.{DEBUG, ERROR, FATAL, INFO}
+import csw.logging.models.Level.{DEBUG, ERROR, FATAL, INFO}
 import org.scalatest.{FunSuite, Matchers}
 
 class ComponentLoggingStateManagerTest extends FunSuite with Matchers {
