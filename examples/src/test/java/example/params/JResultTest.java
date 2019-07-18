@@ -83,7 +83,7 @@ public class JResultTest extends JUnitSuite {
 
         //values
         Double[][] doubles = {{1.0, 2.0, 3.0}, {4.1, 5.1, 6.1}, {7.2, 8.2, 9.2}};
-        MatrixData<Double> m1 = MatrixData.fromJavaArrays(Double.class, doubles);
+        MatrixData<Double> m1 = MatrixData.fromArrays(doubles);
 
         //parameter
         Parameter<MatrixData<Double>> i1 = k1.set(m1);

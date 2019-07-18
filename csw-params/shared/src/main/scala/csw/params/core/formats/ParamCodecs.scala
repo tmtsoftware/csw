@@ -64,10 +64,10 @@ trait ParamCodecs extends CommonCodecs {
 
   // ************************ Composite Codecs ********************
   implicit def arrayDataCodec[T: ArrayEnc: ArrayDec]: Codec[ArrayData[T]] =
-    Codec.bimap[ArrayS[T], ArrayData[T]](_.data, ArrayData(_))
+    Codec.bimap[Array[T], ArrayData[T]](_.values, ArrayData.fromArray)
 
   implicit def matrixDataCodec[T: ClassTag: ArrayEnc: ArrayDec]: Codec[MatrixData[T]] =
-    Codec.bimap[ArrayS[ArrayS[T]], MatrixData[T]](_.data, MatrixData(_))(Encoder.forIterable, Decoder.forIterable)
+    Codec.bimap[Array[Array[T]], MatrixData[T]](_.values, MatrixData.fromArrays)
 
   // ************************ Parameter Codecs ********************
   //Do not replace these with bimap, due to an issue with borer https://github.com/sirthias/borer/issues/24

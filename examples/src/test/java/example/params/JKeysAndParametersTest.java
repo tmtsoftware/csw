@@ -11,6 +11,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
 import csw.params.core.models.Coords.*;
+
 import static csw.params.core.models.JCoords.*;
 import static csw.params.core.models.Coords.*;
 
@@ -77,8 +78,8 @@ public class JKeysAndParametersTest extends JUnitSuite {
         Key<ArrayData<Double>> filterKey = JKeyType.DoubleArrayKey().make("filter");
 
         //Store some values using helper method in ArrayData
-        Parameter<ArrayData<Double>> p1 = filterKey.set(ArrayData.fromJavaArray(arr1), ArrayData.fromJavaArray(arr2));
-        Parameter<ArrayData<Double>> p2 = filterKey.set(ArrayData.fromJavaArray(arr2)).withUnits(JUnits.liter);
+        Parameter<ArrayData<Double>> p1 = filterKey.set(ArrayData.fromArray(arr1), ArrayData.fromArray(arr2));
+        Parameter<ArrayData<Double>> p2 = filterKey.set(ArrayData.fromArray(arr2)).withUnits(JUnits.liter);
 
         //add units to existing parameters
         Parameter<ArrayData<Double>> p1AsCount = p1.withUnits(JUnits.count);
@@ -116,10 +117,10 @@ public class JKeysAndParametersTest extends JUnitSuite {
 
         //Store some values using helper method in ArrayData
         Parameter<MatrixData<Byte>> p1 = encoderKey.set(
-                MatrixData.fromJavaArrays(Byte.class, m1),
-                MatrixData.fromJavaArrays(Byte.class, m2));
+                MatrixData.fromArrays(m1),
+                MatrixData.fromArrays(m2));
         Parameter<MatrixData<Byte>> p2 = encoderKey.set(
-                MatrixData.fromJavaArrays(Byte.class, m2)
+                MatrixData.fromArrays(m2)
         ).withUnits(JUnits.liter);
 
         //add units to existing parameters
@@ -231,15 +232,15 @@ public class JKeysAndParametersTest extends JUnitSuite {
         ProperMotion pm = new ProperMotion(0.5, 2.33);
 
         EqCoord eqCoord = new EqCoord("12:13:14.15", "-30:31:32.3", FK5(), BASE(),
-            DEFAULT_CATNAME(), pm.pmx(), pm.pmy());
+                DEFAULT_CATNAME(), pm.pmx(), pm.pmy());
 
         SolarSystemCoord solarSystemCoord = new SolarSystemCoord(BASE(), Venus());
 
         MinorPlanetCoord minorPlanetCoord = new MinorPlanetCoord(GUIDER1(), 2000, JAngle.degree(90),
-            JAngle.degree(2), JAngle.degree(100), 1.4, 0.234, JAngle.degree(220));
+                JAngle.degree(2), JAngle.degree(100), 1.4, 0.234, JAngle.degree(220));
 
         CometCoord cometCoord = new CometCoord(BASE(), 2000.0, JAngle.degree(90),
-            JAngle.degree(2), JAngle.degree(100), 1.4, 0.234);
+                JAngle.degree(2), JAngle.degree(100), 1.4, 0.234);
 
         AltAzCoord altAzCoord = new AltAzCoord(BASE(), JAngle.degree(301), JAngle.degree(42.5));
 
@@ -249,12 +250,12 @@ public class JKeysAndParametersTest extends JUnitSuite {
         Parameter<Coord> posParam = basePosKey.set(eqCoord, solarSystemCoord, minorPlanetCoord, cometCoord, altAzCoord);
 
         //retrieving values
-        assert(posParam.jValues().size() == 5);
-        assert(posParam.jValues().get(0).equals(eqCoord));
-        assert(posParam.jValues().get(1).equals(solarSystemCoord));
-        assert(posParam.jValues().get(2).equals(minorPlanetCoord));
-        assert(posParam.jValues().get(3).equals(cometCoord));
-        assert(posParam.jValues().get(4).equals(altAzCoord));
+        assert (posParam.jValues().size() == 5);
+        assert (posParam.jValues().get(0).equals(eqCoord));
+        assert (posParam.jValues().get(1).equals(solarSystemCoord));
+        assert (posParam.jValues().get(2).equals(minorPlanetCoord));
+        assert (posParam.jValues().get(3).equals(cometCoord));
+        assert (posParam.jValues().get(4).equals(altAzCoord));
         //#coords
     }
 
