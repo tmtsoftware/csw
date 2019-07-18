@@ -1,7 +1,7 @@
 package csw.command.client.extensions
 
 import akka.actor.typed.{ActorRef, ActorSystem}
-import csw.command.client.messages.{ComponentMessage, ContainerMessage}
+import csw.command.client.messages.{ComponentMessage, ContainerMessage, SequencerMsg}
 import csw.location.api.extensions.URIExtension.RichURI
 import csw.location.models.AkkaLocation
 
@@ -36,5 +36,8 @@ object AkkaLocationExt {
      * @return a typed ActorRef that understands only ContainerMessage
      */
     def containerRef(implicit actorSystem: ActorSystem[_]): ActorRef[ContainerMessage] = typedRef[ContainerMessage]
+
+    private[command] def sequencerRef(implicit actorSystem: ActorSystem[_]): ActorRef[SequencerMsg] = typedRef[SequencerMsg]
+
   }
 }

@@ -11,3 +11,10 @@ final case class Sequence private[params] (runId: Id, commands: Seq[SequenceComm
 object Sequence {
   def apply(command: SequenceCommand, commands: SequenceCommand*): Sequence = Sequence(Id(), command :: commands.toList)
 }
+
+sealed trait ProcessSequenceError extends CommandSerializable
+
+object ProcessSequenceError {
+  case object DuplicateIdsFound           extends ProcessSequenceError
+  case object ExistingSequenceIsInProcess extends ProcessSequenceError
+}
