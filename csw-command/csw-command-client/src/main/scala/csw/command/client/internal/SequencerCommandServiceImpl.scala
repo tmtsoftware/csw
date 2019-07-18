@@ -1,8 +1,8 @@
 package csw.command.client.internal
 
-import akka.actor.typed.{ActorRef, ActorSystem}
-import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.Scheduler
+import akka.actor.typed.scaladsl.AskPattern._
+import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.command.api.scaladsl.SequencerCommandService
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
