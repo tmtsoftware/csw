@@ -6,13 +6,14 @@ import akka.http.scaladsl.model._
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.typed.scaladsl.ActorMaterializer
-import akka.util.ByteString
+import akka.util.{ByteString, Timeout}
 import csw.location.api.scaladsl.LocationService
 import csw.location.models.ComponentType
 import csw.location.models.Connection.HttpConnection
 import csw.params.commands.CommandResponse.{Error, OnewayResponse, SubmitResponse, ValidateResponse}
 import csw.params.commands.{CommandResponse, ControlCommand}
 import csw.params.core.formats.JsonSupport._
+import csw.params.core.models.Id
 import play.api.libs.json.Json
 
 import scala.async.Async.{async, await}
@@ -35,6 +36,17 @@ case class HttpCommandService(
   implicit val mat: Materializer           = ActorMaterializer()(system)
   implicit val ec: ExecutionContext        = system.executionContext
 
+  private val componentName = connection.componentId.name
+  private val componentType = ComponentType.Service.name
+
+  private def concatByteStrings(source: Source[ByteString, _]): Future[ByteString] = {
+    val sink = Sink.fold[ByteString, ByteString](ByteString()) {
+      case (acc, bs) =>
+        acc ++ bs
+    }
+    source.runWith(sink)
+  }
+
   /**
    * Posts a command to the given HTTP connection and returns the response as a CommandResponse.
    * It is assumed that the HTTP service accepts the command as JSON encoded and responds with a
@@ -45,45 +57,32 @@ case class HttpCommandService(
    * @param controlCommand the command to send to the service
    * @return the command response or an Error response, if something fails
    */
-  private def handleCommand(method: String, controlCommand: ControlCommand): Future[CommandResponse] = {
-
-    def concatByteStrings(source: Source[ByteString, _]): Future[ByteString] = {
-      val sink = Sink.fold[ByteString, ByteString](ByteString()) {
-        case (acc, bs) =>
-          acc ++ bs
-      }
-      source.runWith(sink)
-    }
-
-    async {
-      val maybeLocation = await(locationService.find(connection))
-      maybeLocation match {
-        case Some(loc) =>
-          val componentName = controlCommand.commandName
-          val componentType = ComponentType.Service
-          // For compatibility with ESW, use the following style URI
-          val uri = s"http://${loc.uri.getHost}:${loc.uri.getPort}/command/${componentType.name}/${componentName.name}/$method"
+  private def handleCommand(method: String, controlCommand: ControlCommand): Future[CommandResponse] = async {
+    val maybeLocation = await(locationService.find(connection))
+    maybeLocation match {
+      case Some(loc) =>
+        // For compatibility with ESW, use the following style URI
+        val uri = s"http://${loc.uri.getHost}:${loc.uri.getPort}/command/$componentType/$componentName/$method"
 //          val json = Json.encode(controlCommand).toUtf8String
-          val json = Json.toJson(controlCommand).toString()
-          val response = await(
-            Http(sys).singleRequest(
-              HttpRequest(
-                HttpMethods.POST,
-                uri,
-                entity = HttpEntity(ContentTypes.`application/json`, json)
-              )
+        val json = Json.toJson(controlCommand).toString()
+        val response = await(
+          Http(sys).singleRequest(
+            HttpRequest(
+              HttpMethods.POST,
+              uri,
+              entity = HttpEntity(ContentTypes.`application/json`, json)
             )
           )
-          if (response.status == StatusCodes.OK) {
-            val bs = await(concatByteStrings(response.entity.dataBytes))
+        )
+        if (response.status == StatusCodes.OK) {
+          val bs = await(concatByteStrings(response.entity.dataBytes))
 //            Json.decode(bs.toArray).to[CommandResponse].value
-            Json.parse(bs.utf8String).as[CommandResponse]
-          } else {
-            Error(controlCommand.runId, s"Error response from ${connection.componentId.name}: $response")
-          }
-        case None =>
-          Error(controlCommand.runId, s"Can't locate connection for ${connection.componentId.name}")
-      }
+          Json.parse(bs.utf8String).as[CommandResponse]
+        } else {
+          Error(controlCommand.runId, s"Error response from ${connection.componentId.name}: $response")
+        }
+      case None =>
+        Error(controlCommand.runId, s"Can't locate connection for ${connection.componentId.name}")
     }
   }
 
@@ -120,4 +119,37 @@ case class HttpCommandService(
    */
   def validate(controlCommand: ControlCommand): Future[ValidateResponse] =
     handleCommand("validate", controlCommand).map(_.asInstanceOf[ValidateResponse])
+
+  /**
+   * Query for the final result of a long running command which was sent as Submit to get a [[csw.params.commands.CommandResponse.SubmitResponse]] as a Future
+   *
+   * @param commandRunId the runId of the command for which response is required
+   * @return a CommandResponse as a Future value
+   */
+  def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse] = async {
+    val maybeLocation = await(locationService.find(connection))
+    maybeLocation match {
+      case Some(loc) =>
+        // For compatibility with ESW, use the following style URI
+        val uri = s"http://${loc.uri.getHost}:${loc.uri.getPort}/command/$componentType/$componentName/${commandRunId.id}"
+        val response = await(
+          Http(sys).singleRequest(
+            HttpRequest(
+              HttpMethods.GET,
+              uri
+            )
+          )
+        )
+        if (response.status == StatusCodes.OK) {
+          val bs = await(concatByteStrings(response.entity.dataBytes))
+          //            Json.decode(bs.toArray).to[CommandResponse].value
+          Json.parse(bs.utf8String).as[CommandResponse].asInstanceOf[SubmitResponse]
+        } else {
+          Error(commandRunId, s"Error response from ${connection.componentId.name}: $response")
+        }
+      case None =>
+        Error(commandRunId, s"Can't locate connection for ${connection.componentId.name}")
+    }
+  }
+
 }
