@@ -127,6 +127,7 @@ case class HttpCommandService(
    * @return a CommandResponse as a Future value
    */
   def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse] = async {
+    assert(timeout.duration.isFinite) // FIXME: Just to get rid of the warning, for now
     val maybeLocation = await(locationService.find(connection))
     maybeLocation match {
       case Some(loc) =>
