@@ -17,7 +17,7 @@ import csw.location.api.exceptions.{
   UnregistrationFailed
 }
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
-import csw.location.model._
+import csw.location.models._
 import csw.location.server.commons.{CswCluster, LocationServiceLogger}
 import csw.location.server.internal.Registry.AllServices
 import csw.location.server.internal.StreamExt.RichSource

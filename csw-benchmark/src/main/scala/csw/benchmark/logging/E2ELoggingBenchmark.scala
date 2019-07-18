@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor.typed
 import akka.actor.typed.SpawnProtocol
-import csw.logging.api.models.Level.INFO
+import csw.logging.models.Level.INFO
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.appenders.FileAppender
 import csw.logging.client.internal.{LoggerImpl, LoggingSystem}

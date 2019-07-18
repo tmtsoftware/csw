@@ -1,14 +1,14 @@
 package csw.logging.client.scaladsl
 
 import akka.actor.typed.ActorRef
-import csw.logging.api.models.Level
-import csw.logging.api.models.Level._
+import csw.logging.models.Level._
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.components.IRIS._
 import csw.logging.client.components._
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.LoggingTestSuite
+import csw.logging.models.Level
 import play.api.libs.json.JsObject
 
 import scala.collection.mutable

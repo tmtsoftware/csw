@@ -9,8 +9,8 @@ import csw.location.agent.commons.LocationAgentLogger
 import csw.location.agent.models.Command
 import csw.location.agent.wiring.Wiring
 import csw.location.api.scaladsl.RegistrationResult
-import csw.location.model.Connection.{HttpConnection, TcpConnection}
-import csw.location.model._
+import csw.location.models.Connection.{HttpConnection, TcpConnection}
+import csw.location.models._
 import csw.logging.api.scaladsl.Logger
 
 import scala.collection.immutable.Seq

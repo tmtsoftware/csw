@@ -3,7 +3,7 @@ package csw.location.api.scaladsl
 import akka.Done
 import akka.stream.KillSwitch
 import akka.stream.scaladsl.Source
-import csw.location.model._
+import csw.location.models._
 
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration

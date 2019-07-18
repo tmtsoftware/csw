@@ -8,11 +8,12 @@ import csw.location.api.AkkaRegistrationFactory.make
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.location.model.Connection.AkkaConnection
-import csw.location.model.{ComponentId, ComponentType, LocationRemoved, LocationUpdated}
+import csw.location.models.Connection.AkkaConnection
+import csw.location.models.{ComponentId, ComponentType, LocationRemoved, LocationUpdated}
 import csw.location.server.commons.CswCluster
 import csw.location.server.internal.{LocationServiceFactory, ServerWiring}
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
+import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.params.core.models.Prefix
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
@@ -30,7 +31,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
-
+  LoggingSystemFactory.start("", "", "", typedSystem)
   test("should detect re-registering of new location for a connection that has crashed/gone away") {
 
     val akkaConnection = AkkaConnection(ComponentId("TromboneHcd", ComponentType.HCD))

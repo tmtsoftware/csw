@@ -1,6 +1,6 @@
 package csw.logging.client.javadsl
 
-import csw.logging.api.models.RequestId
+import csw.logging.models.RequestId
 
 /**
  * Helper class for Java to get the handle of RequestId

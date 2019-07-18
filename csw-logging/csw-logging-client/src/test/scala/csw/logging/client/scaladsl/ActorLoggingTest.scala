@@ -1,13 +1,13 @@
 package csw.logging.client.scaladsl
 
-import csw.logging.api.models.Level
-import csw.logging.api.models.Level.ERROR
+import csw.logging.models.Level.ERROR
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.components.IRIS
 import csw.logging.client.components.IRIS._
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.LoggingTestSuite
+import csw.logging.models.Level
 
 class ActorLoggingTest extends LoggingTestSuite {
   private val irisActorRef =

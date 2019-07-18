@@ -3,9 +3,9 @@ package org.tmt.nfiraos.samplehcd
 import akka.actor.typed.ActorSystem
 import akka.util.Timeout
 import csw.command.client.CommandServiceFactory
-import csw.location.model
-import csw.location.model.Connection.AkkaConnection
-import csw.location.model.{ComponentId, ComponentType}
+import csw.location.models
+import csw.location.models.Connection.AkkaConnection
+import csw.location.models.{ComponentId, ComponentType}
 import csw.params.commands.{CommandName, CommandResponse, Setup}
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.{ObsId, Prefix, Units}
@@ -107,7 +107,7 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
     val setupCommand                    = Setup(Prefix("test"), CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
-    val connection = AkkaConnection(model.ComponentId("SampleHcd", ComponentType.HCD))
+    val connection = AkkaConnection(models.ComponentId("SampleHcd", ComponentType.HCD))
 
     val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
 

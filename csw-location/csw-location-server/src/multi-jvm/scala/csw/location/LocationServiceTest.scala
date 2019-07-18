@@ -1,8 +1,8 @@
 package csw.location
 
 import csw.location.helpers.{LSNodeSpec, OneMemberAndSeed}
-import csw.location.model.Connection.{HttpConnection, TcpConnection}
-import csw.location.model.{ComponentId, ComponentType, HttpRegistration, TcpRegistration}
+import csw.location.models.Connection.{HttpConnection, TcpConnection}
+import csw.location.models.{ComponentId, ComponentType, HttpRegistration, TcpRegistration}
 import csw.location.server.commons.TestFutureExtension.RichFuture
 import org.scalatest.BeforeAndAfterEach
 

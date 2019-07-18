@@ -1,14 +1,14 @@
 package csw.logging.client.scaladsl
 
 import akka.actor.typed.scaladsl.Behaviors
-import csw.logging.api.models.Level
-import csw.logging.api.models.Level.ERROR
+import csw.logging.models.Level.ERROR
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.LogCommand
 import csw.logging.client.LogCommand._
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.LoggingTestSuite
+import csw.logging.models.Level
 
 object TromboneMutableActor {
   def behavior(loggerFactory: LoggerFactory): Behaviors.Receive[LogCommand] = Behaviors.receive { (ctx, msg) =>

@@ -10,8 +10,8 @@ import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.model.Connection.TcpConnection
-import csw.location.model.TcpRegistration
+import csw.location.models.Connection.TcpConnection
+import csw.location.models.TcpRegistration
 import csw.network.utils.SocketUtils
 import redis.embedded.{RedisSentinel, RedisServer}
 

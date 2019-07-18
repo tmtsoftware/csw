@@ -21,8 +21,8 @@ import csw.command.client.messages.{GetComponentLogMetadata, LogControlMessages,
 import csw.command.client.models.framework.LockingResponse._
 import csw.command.client.models.framework.PubSub.{Publish, PublisherMessage, SubscriberMessage}
 import csw.command.client.models.framework.{PubSub, _}
-import csw.location.model.codecs.LocationCodecs
-import csw.logging.client.cbor.LoggingCodecs
+import csw.location.models.codecs.LocationCodecs
+import csw.logging.models.codecs.LoggingCodecs
 import csw.params.core.formats.{CborHelpers, ParamCodecs}
 import io.bullet.borer.derivation.MapBasedCodecs._
 import io.bullet.borer.derivation.ArrayBasedCodecs.deriveCodecForUnaryCaseClass

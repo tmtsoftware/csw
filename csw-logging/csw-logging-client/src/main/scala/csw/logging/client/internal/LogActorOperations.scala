@@ -3,12 +3,12 @@ package csw.logging.client.internal
 import java.io.{PrintWriter, StringWriter}
 
 import csw.logging.api._
-import csw.logging.api.models.Level
-import csw.logging.api.models.RequestId
+import csw.logging.models.RequestId
 import csw.logging.client.commons.{Category, LoggingKeys, TMTDateTimeFormatter}
 import csw.logging.client.internal.JsonExtensions.AnyToJson
 import csw.logging.client.internal.LogActorMessages._
 import csw.logging.client.scaladsl.RichException
+import csw.logging.models.{Level, RequestId}
 import play.api.libs.json.{JsObject, Json}
 
 private[logging] object LogActorOperations {

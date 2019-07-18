@@ -2,8 +2,8 @@ package csw.logging.api.javadsl
 
 import java.util.function.Supplier
 
-import csw.logging.api.models.AnyId
 import csw.logging.api.scaladsl.Logger
+import csw.logging.models.AnyId
 
 // scalastyle:off file.size.limit
 

@@ -6,10 +6,10 @@ import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, Behavior}
 import akka.serialization.SerializationExtension
 import csw.location.api.extensions.ActorExtension.RichActor
-import csw.location.model
-import csw.location.model.ComponentType.Assembly
-import csw.location.model.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.location.model._
+import csw.location.models
+import csw.location.models.ComponentType.Assembly
+import csw.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.location.models._
 import csw.params.core.models.Prefix
 import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.prop.Tables.Table
@@ -35,7 +35,7 @@ private[location] class LocationAkkaSerializerTest extends FunSuite with Matcher
       "Connection models",
       AkkaConnection(ComponentId("TromboneAssembly", Assembly)),
       HttpConnection(ComponentId("TromboneAssembly", Assembly)),
-      TcpConnection(model.ComponentId("TromboneAssembly", Assembly))
+      TcpConnection(models.ComponentId("TromboneAssembly", Assembly))
     )
 
     forAll(testData) { connection =>
@@ -48,9 +48,9 @@ private[location] class LocationAkkaSerializerTest extends FunSuite with Matcher
   }
 
   test("should use location serializer for Location (de)serialization") {
-    val akkaConnection = AkkaConnection(model.ComponentId("TromboneAssembly", Assembly))
-    val httpConnection = HttpConnection(model.ComponentId("TromboneAssembly", Assembly))
-    val tcpConnection  = TcpConnection(model.ComponentId("TromboneAssembly", Assembly))
+    val akkaConnection = AkkaConnection(models.ComponentId("TromboneAssembly", Assembly))
+    val httpConnection = HttpConnection(models.ComponentId("TromboneAssembly", Assembly))
+    val tcpConnection  = TcpConnection(models.ComponentId("TromboneAssembly", Assembly))
     val testData = Table(
       "Location models",
       AkkaLocation(akkaConnection, prefix, system.toURI),
@@ -68,9 +68,9 @@ private[location] class LocationAkkaSerializerTest extends FunSuite with Matcher
   }
 
   test("should use location serializer for Registration (de)serialization") {
-    val akkaConnection = AkkaConnection(model.ComponentId("TromboneAssembly", Assembly))
-    val httpConnection = HttpConnection(model.ComponentId("TromboneAssembly", Assembly))
-    val tcpConnection  = TcpConnection(model.ComponentId("TromboneAssembly", Assembly))
+    val akkaConnection = AkkaConnection(models.ComponentId("TromboneAssembly", Assembly))
+    val httpConnection = HttpConnection(models.ComponentId("TromboneAssembly", Assembly))
+    val tcpConnection  = TcpConnection(models.ComponentId("TromboneAssembly", Assembly))
     val testData = Table(
       "Registration models",
       AkkaRegistration(akkaConnection, prefix, system.toURI),
@@ -88,7 +88,7 @@ private[location] class LocationAkkaSerializerTest extends FunSuite with Matcher
   }
 
   test("should use location serializer for TrackingEvent (de)serialization") {
-    val akkaConnection = AkkaConnection(model.ComponentId("TromboneAssembly", Assembly))
+    val akkaConnection = AkkaConnection(models.ComponentId("TromboneAssembly", Assembly))
     val akkaLocation   = AkkaLocation(akkaConnection, prefix, system.toURI)
 
     val testData = Table(

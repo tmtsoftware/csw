@@ -23,8 +23,8 @@ import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models._
 import csw.framework.scaladsl.RegistrationFactory
 import csw.location.api.scaladsl.LocationService
-import csw.location.model.Connection.AkkaConnection
-import csw.location.model.{AkkaRegistration, ComponentId, ComponentType}
+import csw.location.models.Connection.AkkaConnection
+import csw.location.models.{AkkaRegistration, ComponentId, ComponentType}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.core.models.Prefix
@@ -40,7 +40,7 @@ import scala.util.{Failure, Success}
  * @param containerInfo         container related information as described in the configuration file
  * @param supervisorInfoFactory the factory for creating the Supervisors for components described in ContainerInfo
  * @param registrationFactory   the factory for creating a typed [[AkkaRegistration]] from
- *                              [[csw.location.model.Connection.AkkaConnection]]
+ *                              [[csw.location.models.Connection.AkkaConnection]]
  * @param eventServiceFactory   the factory to create instance of event service to be used by components to use and/or create publishers and subscribers
  * @param locationService       the single instance of Location service created for a running application
  * @param loggerFactory         factory to create suitable logger instance

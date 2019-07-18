@@ -1,11 +1,10 @@
 package csw.logging.client.cbor
 
 import akka.serialization.Serializer
-import csw.logging.api.models.Level
 import csw.logging.api.scaladsl.Logger
-import csw.logging.client.cbor.LoggingCodecs._
-import csw.logging.client.models.LogMetadata
+import csw.logging.models.codecs.LoggingCodecs._
 import csw.logging.client.scaladsl.GenericLoggerFactory
+import csw.logging.models.{Level, LogMetadata}
 import io.bullet.borer.Cbor
 
 class LoggingAkkaSerializer extends Serializer {

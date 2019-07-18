@@ -38,7 +38,8 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-time-clock-js`,
   `csw-logging-macros`,
   `csw-params-js`,
-  `csw-location-model-js`,
+  `csw-location-models-js`,
+  `csw-logging-models-js`,
   `csw-network-utils`,
   `csw-commons`,
   `csw-benchmark`,
@@ -101,30 +102,30 @@ lazy val `csw-admin-server` = project
 lazy val `csw-location` = project
   .in(file("csw-location"))
   .aggregate(
-    `csw-location-model-jvm`,
-    `csw-location-model-js`,
+    `csw-location-models-jvm`,
+    `csw-location-models-js`,
     `csw-location-api`,
     `csw-location-server`,
     `csw-location-client`,
     `csw-location-agent`
   )
 
-lazy val `csw-location-model` = crossProject(JSPlatform, JVMPlatform)
+lazy val `csw-location-models` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
-  .in(file("csw-location/csw-location-model"))
-  .enablePlugins(GenJavadocPlugin)
+  .in(file("csw-location/csw-location-models"))
+  .enablePlugins(PublishBintray, GenJavadocPlugin)
   .dependsOn(`csw-params`)
   .settings(fork := false)
-  .settings(libraryDependencies ++= Dependencies.LocationModel.value)
+  .settings(libraryDependencies ++= Dependencies.LocationModels.value)
 
-lazy val `csw-location-model-jvm` = `csw-location-model`.jvm
-lazy val `csw-location-model-js`  = `csw-location-model`.js
+lazy val `csw-location-models-jvm` = `csw-location-models`.jvm
+lazy val `csw-location-models-js`  = `csw-location-models`.js
 
 lazy val `csw-location-api` = project
   .in(file("csw-location/csw-location-api"))
   .dependsOn(
     `csw-logging-client`,
-    `csw-location-model-jvm`,
+    `csw-location-models-jvm`
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(
@@ -235,6 +236,8 @@ lazy val `csw-logging` = project
   .in(file("csw-logging"))
   .aggregate(
     `csw-logging-macros`,
+    `csw-logging-models-jvm`,
+    `csw-logging-models-js`,
     `csw-logging-api`,
     `csw-logging-client`
   )
@@ -245,9 +248,23 @@ lazy val `csw-logging-macros` = project
     libraryDependencies += Libs.`scala-reflect`
   )
 
+lazy val `csw-logging-models` = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("csw-logging/csw-logging-models"))
+
+  .enablePlugins(PublishBintray, GenJavadocPlugin)
+  .settings(fork := false)
+  .settings(libraryDependencies ++= Dependencies.LoggingModels.value)
+
+lazy val `csw-logging-models-jvm` = `csw-logging-models`.jvm
+lazy val `csw-logging-models-js`  = `csw-logging-models`.js
+
 lazy val `csw-logging-api` = project
   .in(file("csw-logging/csw-logging-api"))
-  .dependsOn(`csw-logging-macros`)
+  .dependsOn(
+    `csw-logging-macros`,
+    `csw-logging-models-jvm`
+  )
   .settings(
     libraryDependencies += Enumeratum.`enumeratum`.value
   )

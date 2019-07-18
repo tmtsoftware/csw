@@ -9,9 +9,9 @@ import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.common.components.framework.SampleComponentState._
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
-import csw.location.model.ComponentId
-import csw.location.model.ComponentType.Assembly
-import csw.location.model.Connection.AkkaConnection
+import csw.location.models.ComponentId
+import csw.location.models.ComponentType.Assembly
+import csw.location.models.Connection.AkkaConnection
 import csw.params.commands
 import csw.params.commands.CommandName
 import csw.params.core.states.CurrentState

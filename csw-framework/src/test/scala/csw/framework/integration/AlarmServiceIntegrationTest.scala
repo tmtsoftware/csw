@@ -11,9 +11,9 @@ import csw.common.FrameworkAssertions.assertThatSupervisorIsRunning
 import csw.common.components.framework.SampleComponentState._
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
-import csw.location.model.ComponentId
-import csw.location.model.ComponentType.HCD
-import csw.location.model.Connection.AkkaConnection
+import csw.location.models.ComponentId
+import csw.location.models.ComponentType.HCD
+import csw.location.models.Connection.AkkaConnection
 import csw.params.commands.Setup
 import redis.embedded.{RedisSentinel, RedisServer}
 

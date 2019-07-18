@@ -6,7 +6,7 @@ import java.util.concurrent.CompletableFuture
 import akka.Done
 import akka.actor.typed.{ActorSystem, Props, SpawnProtocol}
 import ch.qos.logback.classic.LoggerContext
-import csw.logging.api.models.{Level, Levels}
+import csw.logging.models.{Level, Levels, LogMetadata}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.appenders.LogAppenderBuilder
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
@@ -14,7 +14,6 @@ import csw.logging.client.commons.{Constants, LoggingKeys}
 import csw.logging.client.exceptions.AppenderNotFoundException
 import csw.logging.client.internal.LogActorMessages._
 import csw.logging.client.internal.TimeActorMessages.TimeDone
-import csw.logging.client.models.LogMetadata
 import csw.logging.client.scaladsl.GenericLoggerFactory
 import csw.logging.macros.DefaultSourceLocation
 import org.slf4j.LoggerFactory

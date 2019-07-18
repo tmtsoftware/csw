@@ -10,8 +10,8 @@ import com.typesafe.config.ConfigFactory
 import csw.commons.ResourceReader
 import csw.location.agent.common.TestFutureExtension.RichFuture
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.model.Connection.{HttpConnection, TcpConnection}
-import csw.location.model.{ComponentId, ComponentType}
+import csw.location.models.Connection.{HttpConnection, TcpConnection}
+import csw.location.models.{ComponentId, ComponentType}
 import csw.network.utils.Networks
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
 import org.scalatest.FunSuiteLike

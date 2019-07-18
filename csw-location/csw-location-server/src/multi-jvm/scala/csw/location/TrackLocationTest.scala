@@ -6,8 +6,8 @@ import akka.stream.scaladsl.{Keep, Sink}
 import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.location.model.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.location.model._
+import csw.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.location.models._
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.params.core.models.Prefix
 
@@ -28,7 +28,7 @@ class TrackLocationTest(ignore: Int, mode: String) extends LSNodeSpec(config = n
     val httpConnection = HttpConnection(ComponentId("Assembly1", ComponentType.Assembly))
 
     //create tcp connection
-    val tcpConnection = TcpConnection(model.ComponentId("redis1", ComponentType.Service))
+    val tcpConnection = TcpConnection(models.ComponentId("redis1", ComponentType.Service))
 
     val prefix = Prefix("nfiraos.ncc.trombone")
 

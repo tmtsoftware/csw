@@ -17,16 +17,15 @@ import csw.command.client.models.framework.{Component, Components, ContainerLife
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.client.ActorSystemFactory
-import csw.location.model
-import csw.location.model.ComponentId
-import csw.location.model.ComponentType.{Assembly, HCD}
-import csw.location.model.Connection.AkkaConnection
-import csw.logging.api.models.Level
-import csw.logging.api.models.Level.{ERROR, INFO, WARN}
+import csw.location.models
+import csw.location.models.ComponentId
+import csw.location.models.ComponentType.{Assembly, HCD}
+import csw.location.models.Connection.AkkaConnection
+import csw.logging.models.Level.{ERROR, INFO, WARN}
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.internal._
-import csw.logging.client.models.LogMetadata
 import csw.logging.client.scaladsl.LoggingSystemFactory
+import csw.logging.models.{Level, LogMetadata}
 import csw.network.utils.Networks
 import csw.params.commands.CommandResponse.OnewayResponse
 import csw.params.commands.{CommandName, Setup}
@@ -45,8 +44,8 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
   implicit val testKitSettings: TestKitSettings = TestKitSettings(typedSystem)
 
   private val laserConnection            = AkkaConnection(ComponentId("Laser", Assembly))
-  private val motionControllerConnection = AkkaConnection(model.ComponentId("Motion_Controller", HCD))
-  private val galilConnection            = AkkaConnection(model.ComponentId("Galil", Assembly))
+  private val motionControllerConnection = AkkaConnection(models.ComponentId("Motion_Controller", HCD))
+  private val galilConnection            = AkkaConnection(models.ComponentId("Galil", Assembly))
 
   private var containerActorSystem: ActorSystem[SpawnProtocol] = _
 

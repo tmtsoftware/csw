@@ -2,9 +2,9 @@ package csw.logging.client.compat
 
 import akka.actor.Actor
 import akka.event.Logging._
-import csw.logging.api.models.Level
 import csw.logging.client.internal.LogActorMessages.LogAkka
 import csw.logging.client.internal.MessageHandler
+import csw.logging.models.Level
 
 /**
  * This actor is wired up as akka logger in `logging.conf`. The instance of this actor is created via reflection. When log
@@ -12,7 +12,7 @@ import csw.logging.client.internal.MessageHandler
  * and forward it to underlying logging code.
  */
 private[logging] class AkkaLogger extends Actor {
-  import csw.logging.api.models.Level._
+  import Level._
 
   def receive: Receive = {
     case InitializeLogger(_) => sender ! LoggerInitialized

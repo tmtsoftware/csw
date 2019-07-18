@@ -1,6 +1,6 @@
 package csw.logging.client.internal
 
-import csw.logging.api.models.RequestId
+import csw.logging.models.RequestId
 
 import scala.util.Random
 

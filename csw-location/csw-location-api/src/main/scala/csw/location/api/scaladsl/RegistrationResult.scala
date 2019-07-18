@@ -1,7 +1,7 @@
 package csw.location.api.scaladsl
 
 import akka.Done
-import csw.location.model.Location
+import csw.location.models.Location
 
 import scala.concurrent.Future
 

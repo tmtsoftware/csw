@@ -3,8 +3,8 @@ package csw.integtration.tests
 import akka.actor.CoordinatedShutdown.UnknownReason
 import csw.integtration.common.TestFutureExtension.RichFuture
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.model.Connection.AkkaConnection
-import csw.location.model.{AkkaLocation, ComponentId, ComponentType}
+import csw.location.models.Connection.AkkaConnection
+import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.server.commons.ClusterAwareSettings
 import csw.location.server.internal.ServerWiring
 import csw.logging.client.scaladsl.LoggingSystemFactory

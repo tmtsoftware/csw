@@ -1,7 +1,7 @@
 package csw.event.client.internal.commons
 
-import csw.location.model.Connection.TcpConnection
-import csw.location.model.{ComponentId, ComponentType}
+import csw.location.models.Connection.TcpConnection
+import csw.location.models.{ComponentId, ComponentType}
 
 /**
  * `EventServiceConnection` is a wrapper over predefined `TcpConnection` representing event service. It is used to resolve

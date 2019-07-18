@@ -5,12 +5,12 @@ import java.time.temporal.ChronoUnit
 import java.time.{LocalDateTime, ZoneId, ZoneOffset, ZonedDateTime}
 
 import akka.actor.typed.ActorSystem
-import csw.logging.api.models.Level
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.{Category, Constants, LoggingKeys, TMTDateTimeFormatter}
 import csw.logging.client.exceptions.BaseLogPathNotDefined
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.internal.LoggerImpl
+import csw.logging.models.Level
 import play.api.libs.json.JsObject
 
 import scala.concurrent.{ExecutionContextExecutor, Future, Promise}

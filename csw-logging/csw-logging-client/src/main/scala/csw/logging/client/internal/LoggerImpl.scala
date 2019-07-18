@@ -2,8 +2,8 @@ package csw.logging.client.internal
 
 import java.time.Instant
 
-import csw.logging.api.models.Level._
-import csw.logging.api.models.{AnyId, Level, RequestId}
+import csw.logging.models.Level._
+import csw.logging.models.{AnyId, RequestId}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.{Constants, LoggingKeys}
 import csw.logging.client.internal.JsonExtensions.AnyMapToJson
@@ -11,6 +11,7 @@ import csw.logging.client.internal.LogActorMessages.{Log, LogAltMessage}
 import csw.logging.client.internal.LoggingState._
 import csw.logging.client.models.ComponentLoggingState
 import csw.logging.macros.{SourceFactory, SourceLocation}
+import csw.logging.models.{AnyId, Level, RequestId}
 
 private[csw] class LoggerImpl(maybeComponentName: Option[String], actorName: Option[String]) extends Logger {
 
