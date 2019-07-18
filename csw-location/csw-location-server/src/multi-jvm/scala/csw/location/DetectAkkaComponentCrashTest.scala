@@ -10,7 +10,6 @@ import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.location.models._
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
-import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.params.core.models.Prefix
 
 import scala.concurrent.Await
@@ -33,7 +32,6 @@ class DetectAkkaComponentCrashTestMultiJvmNode3 extends DetectAkkaComponentCrash
 **/
 class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec(config = new TwoMembersAndSeed, mode) {
 
-  LoggingSystemFactory.start("", "", "", typedSystem)
   import config._
   import cswCluster.mat
 
