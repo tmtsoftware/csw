@@ -1,10 +1,10 @@
 package csw.location.server.commons
 
+import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
-import akka.actor.{CoordinatedShutdown, Scheduler}
+import akka.actor.typed.{ActorRef, ActorSystem, Scheduler, SpawnProtocol}
 import akka.cluster.ddata.SelfUniqueAddress
 import akka.cluster.ddata.typed.scaladsl
 import akka.cluster.ddata.typed.scaladsl.{DistributedData, Replicator}

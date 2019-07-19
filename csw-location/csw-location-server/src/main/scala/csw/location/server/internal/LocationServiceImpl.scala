@@ -50,8 +50,8 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     // Registering a location needs to read from other replicas to avoid duplicate location registration before performing the update
     // This approach is inspired from Migration Guide section of https://github.com/patriknw/akka-data-replication
     val initialValue = (replicator ? service.getByMajority).map {
-      case x @ GetSuccess(_, _) => x.get(service.Key)
-      case _                    => service.EmptyValue
+      case x @ GetSuccess(_) => x.get(service.Key)
+      case _                 => service.EmptyValue
     }
 
     //Create an update message to update the value of connection key. if the current value is None or same as

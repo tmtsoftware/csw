@@ -1,9 +1,11 @@
 package csw.event.client.perf.ocs.gateway.client
 
 import akka.NotUsed
+import akka.actor.ActorSystem
+import akka.actor.typed.Scheduler
+import akka.actor.typed
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.{ActorSystem, Scheduler, typed}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.sse.ServerSentEvent
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest, Uri}
