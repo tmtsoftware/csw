@@ -70,22 +70,24 @@ object Jackson {
 }
 
 object Akka {
-  val Version                    = "2.6.0-M4" //all akka is Apache License 2.0
-  val `akka-stream`              = "com.typesafe.akka" %% "akka-stream" % Version
-  val `akka-stream-typed`        = "com.typesafe.akka" %% "akka-stream-typed" % Version
-  val `akka-remote`              = "com.typesafe.akka" %% "akka-remote" % Version
-  val `akka-stream-testkit`      = "com.typesafe.akka" %% "akka-stream-testkit" % Version
-  val `akka-actor`               = "com.typesafe.akka" %% "akka-actor" % Version
-  val `akka-actor-typed`         = "com.typesafe.akka" %% "akka-actor-typed" % Version
+  //REMEMBER: remove Akka-snapshot resolver from Common settings once moved to a stable version
+  val Version = "2.6-20190712-192311" //all akka is Apache License 2.0
+
+  val `akka-stream`              = "com.typesafe.akka" %% "akka-stream"              % Version
+  val `akka-stream-typed`        = "com.typesafe.akka" %% "akka-stream-typed"        % Version
+  val `akka-remote`              = "com.typesafe.akka" %% "akka-remote"              % Version
+  val `akka-stream-testkit`      = "com.typesafe.akka" %% "akka-stream-testkit"      % Version
+  val `akka-actor`               = "com.typesafe.akka" %% "akka-actor"               % Version
+  val `akka-actor-typed`         = "com.typesafe.akka" %% "akka-actor-typed"         % Version
   val `akka-actor-testkit-typed` = "com.typesafe.akka" %% "akka-actor-testkit-typed" % Version
-  val `akka-distributed-data`    = "com.typesafe.akka" %% "akka-distributed-data" % Version
-  val `akka-multi-node-testkit`  = "com.typesafe.akka" %% "akka-multi-node-testkit" % Version
-  val `akka-cluster-tools`       = "com.typesafe.akka" %% "akka-cluster-tools" % Version
-  val `akka-cluster`             = "com.typesafe.akka" %% "akka-cluster" % Version
-  val `akka-cluster-typed`       = "com.typesafe.akka" %% "akka-cluster-typed" % Version
-  val `akka-slf4j`               = "com.typesafe.akka" %% "akka-slf4j" % Version
-  val `cluster-sharding`         = "com.typesafe.akka" %% "akka-cluster-sharding" % Version
-  val `akka-persistence`         = "com.typesafe.akka" %% "akka-persistence" % Version
+  val `akka-distributed-data`    = "com.typesafe.akka" %% "akka-distributed-data"    % Version
+  val `akka-multi-node-testkit`  = "com.typesafe.akka" %% "akka-multi-node-testkit"  % Version
+  val `akka-cluster-tools`       = "com.typesafe.akka" %% "akka-cluster-tools"       % Version
+  val `akka-cluster`             = "com.typesafe.akka" %% "akka-cluster"             % Version
+  val `akka-cluster-typed`       = "com.typesafe.akka" %% "akka-cluster-typed"       % Version
+  val `akka-slf4j`               = "com.typesafe.akka" %% "akka-slf4j"               % Version
+  val `cluster-sharding`         = "com.typesafe.akka" %% "akka-cluster-sharding"    % Version
+  val `akka-persistence`         = "com.typesafe.akka" %% "akka-persistence"         % Version
 }
 
 object AkkaHttp {
