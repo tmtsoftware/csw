@@ -17,7 +17,14 @@ import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetCon
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
-import csw.command.client.messages.{GetComponentLogMetadata, LogControlMessages, SetComponentLogLevel}
+import csw.command.client.messages.{
+  ExternalSequencerMsg,
+  GetComponentLogMetadata,
+  LogControlMessages,
+  ProcessSequence,
+  SequencerMsg,
+  SetComponentLogLevel
+}
 import csw.command.client.models.framework.LockingResponse._
 import csw.command.client.models.framework.PubSub.{Publish, PublisherMessage, SubscriberMessage}
 import csw.command.client.models.framework.{PubSub, _}
@@ -58,8 +65,6 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
     }, finiteDuration => (finiteDuration.length, finiteDuration.unit.toString))
 
   // ************************ LockingResponse Codecs ********************
-
-  def singletonCodec[T <: Singleton](a: T): Codec[T] = CborHelpers.bimap[String, T](_ => a, _.toString)
 
   implicit lazy val lockReleasedCodec: Codec[LockReleased.type]               = singletonCodec(LockReleased)
   implicit lazy val lockExpiringShortlyCodec: Codec[LockExpiringShortly.type] = singletonCodec(LockExpiringShortly)
@@ -107,4 +112,10 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
   implicit lazy val logControlMessagesCodec: Codec[LogControlMessages]                 = deriveCodec[LogControlMessages]
   implicit lazy val componentStateSubscriptionCodec: Codec[ComponentStateSubscription] = deriveCodec[ComponentStateSubscription]
   implicit lazy val messageRemoteMsgCodec: Codec[RemoteMsg]                            = deriveCodec[RemoteMsg]
+
+  // ************************ SequencerMsg Codecs ********************
+
+  implicit lazy val processSequenceCodec: Codec[ProcessSequence]  = deriveCodec[ProcessSequence]
+  implicit lazy val externalMsgCodec: Codec[ExternalSequencerMsg] = deriveCodec[ExternalSequencerMsg]
+  implicit lazy val sequencerMsgCodec: Codec[SequencerMsg]        = deriveCodec[SequencerMsg]
 }

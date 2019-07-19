@@ -44,7 +44,7 @@ object ComponentType extends Enum[ComponentType] with PlayJsonEnum[ComponentType
   /**
    * Represents a component that controls one or more assemblies or sequencers
    */
-  case object Sequencer extends ComponentType("ComponentMessage")
+  case object Sequencer extends ComponentType("SequencerMsg")
 
   /**
    * Represents a general purpose service component e.g. actor and/or web service application
