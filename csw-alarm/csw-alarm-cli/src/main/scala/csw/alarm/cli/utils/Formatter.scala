@@ -1,6 +1,6 @@
 package csw.alarm.cli.utils
 
-import csw.alarm.models.Separators.KeySeparator
+import csw.alarm.commons.Separators.KeySeparator
 import csw.alarm.models.Key._
 import csw.alarm.models._
 import csw.alarm.cli.args.Options

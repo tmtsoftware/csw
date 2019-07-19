@@ -1,5 +1,5 @@
 package csw.alarm.models
-import Separators.KeySeparator
+import csw.alarm.commons.Separators.KeySeparator
 import csw.alarm.models.Key.{AlarmKey, ComponentKey, GlobalKey, SubsystemKey}
 import csw.params.core.models.Subsystem
 import csw.params.core.models.Subsystem.NFIRAOS

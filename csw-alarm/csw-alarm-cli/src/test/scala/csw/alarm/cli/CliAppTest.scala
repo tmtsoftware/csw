@@ -4,7 +4,7 @@ import java.nio.file.Paths
 
 import com.typesafe.config.ConfigFactory
 import csw.alarm.api.exceptions.KeyNotFoundException
-import csw.alarm.models.Separators.KeySeparator
+import csw.alarm.commons.Separators.KeySeparator
 import csw.alarm.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.alarm.models.ActivationStatus.{Active, Inactive}
 import csw.alarm.models.AlarmHealth.{Bad, Good, Ill}

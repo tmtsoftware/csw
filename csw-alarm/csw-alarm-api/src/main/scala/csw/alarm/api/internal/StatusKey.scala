@@ -1,6 +1,6 @@
 package csw.alarm.api.internal
 
-import csw.alarm.models.Separators.KeySeparator
+import csw.alarm.commons.Separators.KeySeparator
 import csw.alarm.models.Key
 
 import scala.language.implicitConversions
