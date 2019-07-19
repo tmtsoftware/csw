@@ -1,7 +1,7 @@
 package csw.alarm.client.internal.helpers
 
-import csw.alarm.api.models.Key.AlarmKey
-import csw.alarm.api.models.{AcknowledgementStatus, AlarmSeverity, FullAlarmSeverity}
+import csw.alarm.models.Key.AlarmKey
+import csw.alarm.models.{AcknowledgementStatus, AlarmSeverity, FullAlarmSeverity}
 
 case class SetSeverityAckStatusTestCase(
     alarmKey: AlarmKey,

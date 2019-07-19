@@ -309,11 +309,17 @@ object Dependencies {
     )
   )
 
-  val AlarmApi = Def.setting(
+  val AlarmModels = Def.setting(
     Seq(
       Enumeratum.`enumeratum`.value,
       Libs.`config`,
       Libs.`play-json`.value,
+      Libs.`scalatest`.value % Test
+    )
+  )
+  
+  val AlarmApi = Def.setting(
+    Seq(
       Akka.`akka-actor`,
       Akka.`akka-actor-typed`,
       Akka.`akka-stream`,

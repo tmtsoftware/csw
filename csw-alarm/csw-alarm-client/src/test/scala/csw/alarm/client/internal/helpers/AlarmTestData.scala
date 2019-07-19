@@ -1,9 +1,9 @@
 package csw.alarm.client.internal.helpers
-import csw.alarm.api.models.ActivationStatus.{Active, Inactive}
-import csw.alarm.api.models.AlarmSeverity._
-import csw.alarm.api.models.AlarmType.Absolute
-import csw.alarm.api.models.Key.AlarmKey
-import csw.alarm.api.models.{AlarmMetadata, AlarmType}
+import csw.alarm.models.ActivationStatus.{Active, Inactive}
+import csw.alarm.models.AlarmSeverity._
+import csw.alarm.models.AlarmType.Absolute
+import csw.alarm.models.Key.AlarmKey
+import csw.alarm.models.{AlarmMetadata, AlarmType}
 import csw.params.core.models.Subsystem.{LGSF, NFIRAOS, TCS}
 
 trait AlarmTestData {

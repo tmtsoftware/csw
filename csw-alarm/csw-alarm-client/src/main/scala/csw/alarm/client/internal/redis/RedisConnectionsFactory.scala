@@ -1,7 +1,7 @@
 package csw.alarm.client.internal.redis
 
 import csw.alarm.api.internal._
-import csw.alarm.api.models._
+import csw.alarm.models._
 import csw.alarm.client.internal.commons.serviceresolver.AlarmServiceResolver
 import csw.time.core.models.UTCTime
 import io.lettuce.core.RedisURI

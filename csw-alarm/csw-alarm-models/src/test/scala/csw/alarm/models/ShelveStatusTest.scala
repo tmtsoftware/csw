@@ -1,6 +1,6 @@
-package csw.alarm.api.models
+package csw.alarm.models
 
-import csw.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
+import csw.alarm.models.ShelveStatus.{Shelved, Unshelved}
 
 // DEOPSCSW-442: Model to represent Alarm Shelve status
 class ShelveStatusTest extends EnumTest(ShelveStatus) {

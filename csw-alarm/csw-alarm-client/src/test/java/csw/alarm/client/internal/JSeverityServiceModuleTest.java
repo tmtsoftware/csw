@@ -5,9 +5,9 @@ import com.typesafe.config.ConfigFactory;
 import csw.alarm.api.exceptions.InvalidSeverityException;
 import csw.alarm.api.javadsl.IAlarmService;
 import csw.alarm.api.javadsl.JAlarmSeverity;
-import csw.alarm.api.models.*;
 import csw.alarm.api.scaladsl.AlarmAdminService;
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup;
+import csw.alarm.models.*;
 import csw.params.javadsl.JSubsystem;
 import csw.time.core.models.UTCTime;
 import org.junit.AfterClass;
@@ -21,7 +21,7 @@ import scala.concurrent.duration.FiniteDuration;
 
 import java.util.concurrent.TimeUnit;
 
-import static csw.alarm.api.models.Key.AlarmKey;
+import static csw.alarm.models.Key.AlarmKey;
 import static org.hamcrest.CoreMatchers.isA;
 import static org.junit.Assert.*;
 
@@ -66,8 +66,8 @@ public class JSeverityServiceModuleTest extends JUnitSuite {
         assertEquals(JAlarmSeverity.Disconnected, initialSeverity);
 
         AlarmStatus initialStatus = getStatus(tromboneAxisHighLimitAlarm);
-        assertEquals(AcknowledgementStatus.Acknowledged$.MODULE$,initialStatus.acknowledgementStatus());
-        assertEquals(JAlarmSeverity.Disconnected,initialStatus.latchedSeverity());
+        assertEquals(AcknowledgementStatus.Acknowledged$.MODULE$, initialStatus.acknowledgementStatus());
+        assertEquals(JAlarmSeverity.Disconnected, initialStatus.latchedSeverity());
 
         //set severity to Major
         AlarmStatus status = setSeverityAndGetStatus(tromboneAxisHighLimitAlarm, JAlarmSeverity.Major);
@@ -105,8 +105,8 @@ public class JSeverityServiceModuleTest extends JUnitSuite {
         assertEquals(JAlarmSeverity.Disconnected, initialSeverity);
 
         AlarmStatus initialStatus = getStatus(tromboneAxisHighLimitAlarm);
-        assertEquals(AcknowledgementStatus.Acknowledged$.MODULE$,initialStatus.acknowledgementStatus());
-        assertEquals(JAlarmSeverity.Disconnected,initialStatus.latchedSeverity());
+        assertEquals(AcknowledgementStatus.Acknowledged$.MODULE$, initialStatus.acknowledgementStatus());
+        assertEquals(JAlarmSeverity.Disconnected, initialStatus.latchedSeverity());
 
 
         AlarmStatus status = setSeverityAndGetStatus(tromboneAxisHighLimitAlarm, JAlarmSeverity.Major);
@@ -135,8 +135,8 @@ public class JSeverityServiceModuleTest extends JUnitSuite {
         assertEquals(JAlarmSeverity.Disconnected, initialSeverity);
 
         AlarmStatus initialStatus = getStatus(tromboneAxisLowLimitAlarm);
-        assertEquals( AcknowledgementStatus.Acknowledged$.MODULE$,initialStatus.acknowledgementStatus());
-        assertEquals(JAlarmSeverity.Disconnected,initialStatus.latchedSeverity());
+        assertEquals(AcknowledgementStatus.Acknowledged$.MODULE$, initialStatus.acknowledgementStatus());
+        assertEquals(JAlarmSeverity.Disconnected, initialStatus.latchedSeverity());
 
         AlarmStatus status = setSeverityAndGetStatus(tromboneAxisLowLimitAlarm, JAlarmSeverity.Major);
         assertEquals(AcknowledgementStatus.Unacknowledged$.MODULE$, status.acknowledgementStatus());

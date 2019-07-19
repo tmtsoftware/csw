@@ -1,7 +1,7 @@
 package csw.common.components.framework
 
-import csw.alarm.api.models.AlarmSeverity.Warning
-import csw.alarm.api.models.Key.AlarmKey
+import csw.alarm.models.AlarmSeverity.Warning
+import csw.alarm.models.Key.AlarmKey
 import csw.location.models.{ComponentId, ComponentType}
 import csw.location.models.Connection.{HttpConnection, TcpConnection}
 import csw.params.commands.CommandName

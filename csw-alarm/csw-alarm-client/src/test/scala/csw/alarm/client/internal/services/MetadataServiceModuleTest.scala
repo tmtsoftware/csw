@@ -3,12 +3,12 @@ package csw.alarm.client.internal.services
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.alarm.api.exceptions.KeyNotFoundException
 import csw.alarm.api.internal.MetadataKey
-import csw.alarm.api.models.ActivationStatus.{Active, Inactive}
-import csw.alarm.api.models.AlarmHealth.Bad
-import csw.alarm.api.models.AlarmSeverity._
-import csw.alarm.api.models.FullAlarmSeverity.Disconnected
-import csw.alarm.api.models.Key.{AlarmKey, ComponentKey, GlobalKey, SubsystemKey}
-import csw.alarm.api.models.{ActivationStatus, AlarmStatus}
+import csw.alarm.models.ActivationStatus.{Active, Inactive}
+import csw.alarm.models.AlarmHealth.Bad
+import csw.alarm.models.AlarmSeverity._
+import csw.alarm.models.FullAlarmSeverity.Disconnected
+import csw.alarm.models.Key.{AlarmKey, ComponentKey, GlobalKey, SubsystemKey}
+import csw.alarm.models.{ActivationStatus, AlarmStatus}
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.params.core.models.Subsystem

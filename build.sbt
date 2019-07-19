@@ -40,6 +40,7 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-params-js`,
   `csw-location-models-js`,
   `csw-logging-models-js`,
+  `csw-alarm-models-js`,
   `csw-network-utils`,
   `csw-commons`,
   `csw-benchmark`,
@@ -391,14 +392,27 @@ lazy val `csw-event-cli` = project
 lazy val `csw-alarm` = project
   .in(file("csw-alarm"))
   .aggregate(
+    `csw-alarm-models-jvm`,
+    `csw-alarm-models-js`,
     `csw-alarm-api`,
     `csw-alarm-client`,
     `csw-alarm-cli`
   )
 
+lazy val `csw-alarm-models` = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("csw-alarm/csw-alarm-models"))
+  .dependsOn(`csw-params`, `csw-time-core`)
+  .enablePlugins(PublishBintray, GenJavadocPlugin)
+  .settings(fork := false)
+  .settings(libraryDependencies ++= Dependencies.AlarmModels.value)
+
+lazy val `csw-alarm-models-jvm` = `csw-alarm-models`.jvm
+lazy val `csw-alarm-models-js`  = `csw-alarm-models`.js
+
 lazy val `csw-alarm-api` = project
   .in(file("csw-alarm/csw-alarm-api"))
-  .dependsOn(`csw-params-jvm`, `csw-time-core-jvm`)
+  .dependsOn(`csw-alarm-models-jvm`)
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(libraryDependencies ++= Dependencies.AlarmApi.value)
 

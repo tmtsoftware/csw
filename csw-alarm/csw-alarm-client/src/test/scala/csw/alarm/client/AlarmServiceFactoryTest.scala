@@ -1,6 +1,6 @@
 package csw.alarm.client
 import com.typesafe.config.ConfigFactory
-import csw.alarm.api.models.AlarmSeverity.Indeterminate
+import csw.alarm.models.AlarmSeverity.Indeterminate
 import csw.alarm.api.scaladsl.{AlarmAdminService, AlarmService}
 import csw.alarm.client.internal.commons.AlarmServiceConnection
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup

@@ -1,4 +1,4 @@
-package csw.alarm.api.models
+package csw.alarm.models
 
 import enumeratum.{Enum, EnumEntry}
 import org.scalatest.{FunSuite, Matchers}

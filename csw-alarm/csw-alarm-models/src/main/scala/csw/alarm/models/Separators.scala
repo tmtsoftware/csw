@@ -1,4 +1,4 @@
-package csw.alarm.api.internal
+package csw.alarm.models
 
 private[alarm] object Separators {
   // Use "-" as separator since hyphen is an unsupported character in subsystem, component and alarm name

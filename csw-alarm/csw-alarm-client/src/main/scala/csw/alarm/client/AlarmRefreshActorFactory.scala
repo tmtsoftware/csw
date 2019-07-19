@@ -8,8 +8,8 @@ import akka.Done
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import csw.alarm.api.javadsl.IAlarmService
-import csw.alarm.api.models.Key.AlarmKey
-import csw.alarm.api.models.{AlarmSeverity, AutoRefreshSeverityMessage}
+import csw.alarm.models.Key.AlarmKey
+import csw.alarm.models.{AlarmSeverity, AutoRefreshSeverityMessage}
 import csw.alarm.api.scaladsl.AlarmService
 import csw.alarm.client.internal.auto_refresh.AlarmRefreshActor
 
@@ -24,7 +24,7 @@ object AlarmRefreshActorFactory {
    * @param alarmService instance of alarm service or custom implementation of [[csw.alarm.api.scaladsl.AlarmService]], you can use lambda expression here
    * @param refreshInterval interval after which alarm will be refreshed
    * @param actorSystem actorSystem used for creating actor
-   * @return [[akka.actor.typed.ActorRef]] which accepts [[csw.alarm.api.models.AutoRefreshSeverityMessage]]
+   * @return [[akka.actor.typed.ActorRef]] which accepts [[csw.alarm.models.AutoRefreshSeverityMessage]]
    */
   def make(
       alarmService: AlarmService,
@@ -41,7 +41,7 @@ object AlarmRefreshActorFactory {
    * @param alarmService instance of alarm service or custom implementation of [[csw.alarm.api.scaladsl.AlarmService]], you can use lambda expression here
    * @param refreshInterval interval after which alarm will be refreshed
    * @param actorSystem actorSystem used for creating actor
-   * @return [[akka.actor.typed.ActorRef]] which accepts [[csw.alarm.api.models.AutoRefreshSeverityMessage]]
+   * @return [[akka.actor.typed.ActorRef]] which accepts [[csw.alarm.models.AutoRefreshSeverityMessage]]
    */
   def jMake(
       alarmService: IAlarmService,
@@ -56,7 +56,7 @@ object AlarmRefreshActorFactory {
    * @param setSeverity function responsible for setting severity of alarm
    * @param refreshInterval interval after which alarm will be refreshed
    * @param actorSystem actorSystem used for creating actor
-   * @return [[akka.actor.typed.ActorRef]] which accepts [[csw.alarm.api.models.AutoRefreshSeverityMessage]]
+   * @return [[akka.actor.typed.ActorRef]] which accepts [[csw.alarm.models.AutoRefreshSeverityMessage]]
    */
   def jMake(
       setSeverity: BiFunction[AlarmKey, AlarmSeverity, CompletableFuture[Done]],

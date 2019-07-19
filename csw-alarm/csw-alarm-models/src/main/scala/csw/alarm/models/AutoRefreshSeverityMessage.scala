@@ -1,6 +1,6 @@
-package csw.alarm.api.models
+package csw.alarm.models
 
-import csw.alarm.api.models.Key.AlarmKey
+import csw.alarm.models.Key.AlarmKey
 
 sealed trait AutoRefreshSeverityMessage {
   def key: AlarmKey

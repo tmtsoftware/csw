@@ -1,4 +1,5 @@
-package csw.alarm.api.internal
+package csw.alarm.models
+
 import java.util.regex.Pattern
 
 private[alarm] object RichStringExtentions {

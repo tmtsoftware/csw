@@ -7,12 +7,12 @@ import akka.actor.typed
 import akka.actor.typed._
 import csw.alarm.api.exceptions.KeyNotFoundException
 import csw.alarm.api.internal._
-import csw.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
-import csw.alarm.api.models.AlarmSeverity.Okay
-import csw.alarm.api.models.FullAlarmSeverity.Disconnected
-import csw.alarm.api.models.Key.{AlarmKey, GlobalKey}
-import csw.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
-import csw.alarm.api.models._
+import csw.alarm.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
+import csw.alarm.models.AlarmSeverity.Okay
+import csw.alarm.models.FullAlarmSeverity.Disconnected
+import csw.alarm.models.Key.{AlarmKey, GlobalKey}
+import csw.alarm.models.ShelveStatus.{Shelved, Unshelved}
+import csw.alarm.models._
 import csw.alarm.client.internal.AlarmServiceLogger
 import csw.alarm.client.internal.commons.Settings
 import csw.alarm.client.internal.extensions.TimeExtensions.RichClock

@@ -1,8 +1,8 @@
 package csw.alarm.api.internal
 import akka.Done
 import com.typesafe.config.Config
-import csw.alarm.api.models.Key.AlarmKey
-import csw.alarm.api.models.{AlarmMetadata, Key}
+import csw.alarm.models.Key.AlarmKey
+import csw.alarm.models.{AlarmMetadata, Key}
 
 import scala.concurrent.Future
 
@@ -14,8 +14,8 @@ private[alarm] trait MetadataService {
    *
    * @note severity of the alarm is not loaded in store and is by default inferred as Disconnected until component starts
    *       updating severity
-   * @see [[csw.alarm.api.models.AlarmMetadata]],
-   *     [[csw.alarm.api.models.AlarmStatus]]
+   * @see [[csw.alarm.models.AlarmMetadata]],
+   *     [[csw.alarm.models.AlarmStatus]]
    * @param inputConfig represents the data for all alarms to be loaded in alarm store
    * @param reset the alarm store before loading the data
    * @return a future which completes when data is loaded successfully in alarm store or fails with

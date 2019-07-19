@@ -7,7 +7,7 @@ import akka.stream.typed.javadsl.ActorMaterializerFactory;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import csw.alarm.api.javadsl.IAlarmService;
-import csw.alarm.api.models.FullAlarmSeverity;
+import csw.alarm.models.FullAlarmSeverity;
 import csw.alarm.api.scaladsl.AlarmAdminService;
 import csw.alarm.client.internal.commons.AlarmServiceConnection;
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup;

@@ -3,9 +3,9 @@ package csw.alarm.api.javadsl
 import java.util.concurrent.CompletableFuture
 
 import akka.Done
-import csw.alarm.api.models.AlarmSeverity
-import csw.alarm.api.models.Key.AlarmKey
 import csw.alarm.api.scaladsl.AlarmService
+import csw.alarm.models.AlarmSeverity
+import csw.alarm.models.Key.AlarmKey
 
 /**
  * An AlarmService interface to set the severity of alarms

@@ -1,6 +1,6 @@
 package csw.alarm.api.internal
 import akka.actor.typed.ActorRef
-import csw.alarm.api.models.{AlarmHealth, Key}
+import csw.alarm.models.{AlarmHealth, Key}
 import csw.alarm.api.scaladsl.AlarmSubscription
 
 import scala.concurrent.Future

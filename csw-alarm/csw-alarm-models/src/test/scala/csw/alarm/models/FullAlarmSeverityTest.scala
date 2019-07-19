@@ -1,7 +1,7 @@
-package csw.alarm.api.models
+package csw.alarm.models
 
-import csw.alarm.api.models.AlarmSeverity._
-import csw.alarm.api.models.FullAlarmSeverity.Disconnected
+import csw.alarm.models.AlarmSeverity._
+import csw.alarm.models.FullAlarmSeverity.Disconnected
 
 // DEOPSCSW-437 : Model to represent alarm severities
 class FullAlarmSeverityTest extends EnumTest(FullAlarmSeverity) {

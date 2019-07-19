@@ -1,7 +1,7 @@
-package csw.alarm.api.models
-import csw.alarm.api.models.ActivationStatus.{Active, Inactive}
-import csw.alarm.api.models.AlarmSeverity._
-import csw.alarm.api.models.Key.AlarmKey
+package csw.alarm.models
+import csw.alarm.models.ActivationStatus.{Active, Inactive}
+import csw.alarm.models.AlarmSeverity._
+import csw.alarm.models.Key.AlarmKey
 import csw.params.core.models.Subsystem.NFIRAOS
 import org.scalatest.{FunSuite, Matchers}
 

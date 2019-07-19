@@ -1,7 +1,7 @@
 package csw.alarm.api.exceptions
 
-import csw.alarm.api.models.Key.AlarmKey
-import csw.alarm.api.models.{FullAlarmSeverity, Key}
+import csw.alarm.models.Key.AlarmKey
+import csw.alarm.models.{FullAlarmSeverity, Key}
 
 /**
  * Represents the exception thrown when it is attempted to set severity that is not supported by the alarm

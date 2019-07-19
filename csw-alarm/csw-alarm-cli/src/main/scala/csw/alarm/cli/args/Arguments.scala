@@ -2,7 +2,7 @@ package csw.alarm.cli.args
 
 import java.nio.file.Paths
 
-import csw.alarm.api.models.AlarmSeverity
+import csw.alarm.models.AlarmSeverity
 import csw.params.core.models.Subsystem
 import scopt.{OptionDef, OptionParser}
 

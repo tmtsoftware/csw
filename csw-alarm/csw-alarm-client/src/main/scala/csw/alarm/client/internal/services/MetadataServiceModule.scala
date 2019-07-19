@@ -4,12 +4,12 @@ import akka.Done
 import com.typesafe.config.Config
 import csw.alarm.api.exceptions.KeyNotFoundException
 import csw.alarm.api.internal.{AlarmMetadataSet, MetadataKey, MetadataService, StatusService}
-import csw.alarm.api.models.ActivationStatus.{Active, Inactive}
-import csw.alarm.api.models.Key.{AlarmKey, GlobalKey}
-import csw.alarm.api.models.{AlarmMetadata, AlarmStatus, Key}
 import csw.alarm.client.internal.AlarmServiceLogger
 import csw.alarm.client.internal.configparser.ConfigParser
 import csw.alarm.client.internal.redis.RedisConnectionsFactory
+import csw.alarm.models.ActivationStatus.{Active, Inactive}
+import csw.alarm.models.Key.{AlarmKey, GlobalKey}
+import csw.alarm.models.{AlarmMetadata, AlarmStatus, Key}
 import romaine.RedisResult
 
 import scala.async.Async.{async, await}

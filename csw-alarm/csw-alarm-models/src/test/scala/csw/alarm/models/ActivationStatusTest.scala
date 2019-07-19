@@ -1,6 +1,6 @@
-package csw.alarm.api.models
+package csw.alarm.models
 
-import csw.alarm.api.models.ActivationStatus.{Active, Inactive}
+import csw.alarm.models.ActivationStatus.{Active, Inactive}
 
 // DEOPSCSW-443: Model to represent Alarm Activation status
 class ActivationStatusTest extends EnumTest(ActivationStatus) {

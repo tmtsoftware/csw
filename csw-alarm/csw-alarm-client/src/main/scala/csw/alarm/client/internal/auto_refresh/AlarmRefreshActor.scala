@@ -2,10 +2,10 @@ package csw.alarm.client.internal.auto_refresh
 
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
-import csw.alarm.api.models.AutoRefreshSeverityMessage
-import csw.alarm.api.models.AutoRefreshSeverityMessage.{AutoRefreshSeverity, CancelAutoRefresh, SetSeverity}
+import csw.alarm.models.AutoRefreshSeverityMessage.{AutoRefreshSeverity, CancelAutoRefresh, SetSeverity}
 import csw.alarm.api.scaladsl.AlarmService
 import csw.alarm.client.internal.AlarmServiceLogger
+import csw.alarm.models.AutoRefreshSeverityMessage
 import csw.logging.api.scaladsl.Logger
 
 import scala.concurrent.duration.FiniteDuration

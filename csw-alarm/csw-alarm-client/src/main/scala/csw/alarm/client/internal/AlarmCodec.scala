@@ -1,7 +1,7 @@
 package csw.alarm.client.internal
 
 import csw.alarm.api.internal._
-import csw.alarm.api.models._
+import csw.alarm.models._
 import csw.time.core.models.UTCTime
 import play.api.libs.json.{Format, Json}
 import romaine.codec.RomaineCodec

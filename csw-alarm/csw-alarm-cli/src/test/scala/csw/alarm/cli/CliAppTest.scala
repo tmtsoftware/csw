@@ -4,19 +4,19 @@ import java.nio.file.Paths
 
 import com.typesafe.config.ConfigFactory
 import csw.alarm.api.exceptions.KeyNotFoundException
-import csw.alarm.api.internal.Separators.KeySeparator
-import csw.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
-import csw.alarm.api.models.ActivationStatus.{Active, Inactive}
-import csw.alarm.api.models.AlarmHealth
-import csw.alarm.api.models.AlarmHealth.{Bad, Good, Ill}
-import csw.alarm.api.models.AlarmSeverity._
-import csw.alarm.api.models.AutoRefreshSeverityMessage.CancelAutoRefresh
-import csw.alarm.api.models.FullAlarmSeverity.Disconnected
-import csw.alarm.api.models.Key.{AlarmKey, GlobalKey}
-import csw.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
+import csw.alarm.models.Separators.KeySeparator
+import csw.alarm.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
+import csw.alarm.models.ActivationStatus.{Active, Inactive}
+import csw.alarm.models.AlarmHealth.{Bad, Good, Ill}
+import csw.alarm.models.AlarmSeverity._
+import csw.alarm.models.AutoRefreshSeverityMessage.CancelAutoRefresh
+import csw.alarm.models.FullAlarmSeverity.Disconnected
+import csw.alarm.models.Key.{AlarmKey, GlobalKey}
+import csw.alarm.models.ShelveStatus.{Shelved, Unshelved}
 import csw.alarm.cli.args.Options
 import csw.alarm.cli.utils.IterableExtensions.RichStringIterable
 import csw.alarm.cli.utils.TestFutureExt.RichFuture
+import csw.alarm.models.AlarmHealth
 import csw.commons.ResourceReader
 import csw.config.api.models.ConfigData
 import csw.config.client.scaladsl.ConfigClientFactory

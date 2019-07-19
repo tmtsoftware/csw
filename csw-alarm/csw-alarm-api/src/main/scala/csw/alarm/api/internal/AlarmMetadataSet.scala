@@ -1,4 +1,5 @@
 package csw.alarm.api.internal
-import csw.alarm.api.models.AlarmMetadata
+
+import csw.alarm.models.AlarmMetadata
 
 private[alarm] case class AlarmMetadataSet(alarms: Set[AlarmMetadata])

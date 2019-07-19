@@ -7,9 +7,9 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.Materializer
 import akka.stream.typed.scaladsl.ActorMaterializer
 import com.typesafe.config._
-import csw.alarm.api.models.AlarmSeverity.Okay
-import csw.alarm.api.models.Key.{AlarmKey, ComponentKey, SubsystemKey}
-import csw.alarm.api.models.{AlarmHealth, AlarmMetadata, AlarmStatus, FullAlarmSeverity}
+import csw.alarm.models.AlarmSeverity.Okay
+import csw.alarm.models.Key.{AlarmKey, ComponentKey, SubsystemKey}
+import csw.alarm.models.{AlarmHealth, AlarmMetadata, AlarmStatus, FullAlarmSeverity}
 import csw.alarm.api.scaladsl.{AlarmAdminService, AlarmService, AlarmSubscription}
 import csw.alarm.client.AlarmServiceFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory

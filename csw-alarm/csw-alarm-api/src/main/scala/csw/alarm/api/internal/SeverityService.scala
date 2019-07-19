@@ -1,8 +1,8 @@
 package csw.alarm.api.internal
 import akka.actor.typed.ActorRef
 import akka.stream.scaladsl.Source
-import csw.alarm.api.models.Key.AlarmKey
-import csw.alarm.api.models.{FullAlarmSeverity, Key}
+import csw.alarm.models.Key.AlarmKey
+import csw.alarm.models.{FullAlarmSeverity, Key}
 import csw.alarm.api.scaladsl.{AlarmService, AlarmSubscription}
 
 import scala.concurrent.Future

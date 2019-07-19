@@ -7,7 +7,7 @@ package csw.alarm
  * in two flavours. One provides admin level management like reset alarm, subscribe to alarm, etc. And other provides component
  * level api e.g. set the severity of an alarm.
  *
- * An alarm is uniquely identified within the component with [[csw.alarm.api.models.Key.AlarmKey]]. The alarm key is composed of
+ * An alarm is uniquely identified within the component with [[csw.alarm.models.Key.AlarmKey]]. The alarm key is composed of
  * a [[csw.params.core.models.Subsystem]], component name, alarm name.
  *
  * === Example: Alarm Service ===

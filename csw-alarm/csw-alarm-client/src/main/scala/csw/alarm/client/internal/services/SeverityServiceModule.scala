@@ -8,9 +8,9 @@ import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.typed.scaladsl
 import csw.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
 import csw.alarm.api.internal._
-import csw.alarm.api.models.FullAlarmSeverity.Disconnected
-import csw.alarm.api.models.Key.AlarmKey
-import csw.alarm.api.models.{AlarmSeverity, FullAlarmSeverity, Key}
+import csw.alarm.models.FullAlarmSeverity.Disconnected
+import csw.alarm.models.Key.AlarmKey
+import csw.alarm.models.{AlarmSeverity, FullAlarmSeverity, Key}
 import csw.alarm.api.scaladsl.AlarmSubscription
 import csw.alarm.client.internal.commons.Settings
 import csw.alarm.client.internal.redis.RedisConnectionsFactory

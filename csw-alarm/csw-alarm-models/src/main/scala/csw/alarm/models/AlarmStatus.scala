@@ -1,7 +1,8 @@
-package csw.alarm.api.models
-import csw.alarm.api.models.AcknowledgementStatus.Acknowledged
-import csw.alarm.api.models.FullAlarmSeverity.Disconnected
-import csw.alarm.api.models.ShelveStatus.Unshelved
+package csw.alarm.models
+
+import csw.alarm.models.AcknowledgementStatus.Acknowledged
+import csw.alarm.models.FullAlarmSeverity.Disconnected
+import csw.alarm.models.ShelveStatus.Unshelved
 import csw.time.core.models.UTCTime
 
 /**

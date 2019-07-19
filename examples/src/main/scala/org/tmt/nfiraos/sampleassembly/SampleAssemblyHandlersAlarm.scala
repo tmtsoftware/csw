@@ -2,8 +2,8 @@ package org.tmt.nfiraos.sampleassembly
 
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.util.Timeout
-import csw.alarm.api.models.AlarmSeverity
-import csw.alarm.api.models.Key.AlarmKey
+import csw.alarm.models.AlarmSeverity
+import csw.alarm.models.Key.AlarmKey
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandServiceFactory
 import csw.command.client.messages.TopLevelActorMessage

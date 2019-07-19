@@ -1,7 +1,8 @@
-package csw.alarm.api.models
-import csw.alarm.api.models.ActivationStatus.Active
-import csw.alarm.api.models.AlarmSeverity.{Indeterminate, Okay}
-import csw.alarm.api.models.Key.AlarmKey
+package csw.alarm.models
+
+import csw.alarm.models.ActivationStatus.Active
+import csw.alarm.models.AlarmSeverity.{Indeterminate, Okay}
+import csw.alarm.models.Key.AlarmKey
 import csw.params.core.models.Subsystem
 
 /**

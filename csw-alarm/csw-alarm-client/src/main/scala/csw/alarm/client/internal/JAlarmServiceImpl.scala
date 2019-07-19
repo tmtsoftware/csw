@@ -4,7 +4,7 @@ import java.util.concurrent.CompletableFuture
 
 import akka.Done
 import csw.alarm.api.javadsl.IAlarmService
-import csw.alarm.api.models.{AlarmSeverity, Key}
+import csw.alarm.models.{AlarmSeverity, Key}
 import csw.alarm.api.scaladsl.AlarmService
 
 import scala.compat.java8.FutureConverters.FutureOps

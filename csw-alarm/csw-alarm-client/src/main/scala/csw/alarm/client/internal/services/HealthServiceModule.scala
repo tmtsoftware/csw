@@ -6,7 +6,7 @@ import akka.stream.Materializer
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.typed.scaladsl
 import csw.alarm.api.internal.{HealthService, SeverityService}
-import csw.alarm.api.models.{AlarmHealth, Key}
+import csw.alarm.models.{AlarmHealth, Key}
 import csw.alarm.api.scaladsl.AlarmSubscription
 import csw.alarm.client.internal.AlarmServiceLogger
 import csw.alarm.client.internal.redis.RedisConnectionsFactory

@@ -2,7 +2,7 @@ package csw.alarm.cli.args
 import java.io.ByteArrayOutputStream
 import java.nio.file.Paths
 
-import csw.alarm.api.models.AlarmSeverity.Major
+import csw.alarm.models.AlarmSeverity.Major
 import csw.alarm.cli.BuildInfo
 import csw.params.core.models.Subsystem.NFIRAOS
 import org.scalatest.{FunSuite, Matchers}

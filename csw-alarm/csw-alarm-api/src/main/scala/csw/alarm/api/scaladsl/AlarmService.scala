@@ -1,8 +1,8 @@
 package csw.alarm.api.scaladsl
 
 import akka.Done
-import csw.alarm.api.models.AlarmSeverity
-import csw.alarm.api.models.Key.AlarmKey
+import csw.alarm.models.AlarmSeverity
+import csw.alarm.models.Key.AlarmKey
 
 import scala.concurrent.Future
 

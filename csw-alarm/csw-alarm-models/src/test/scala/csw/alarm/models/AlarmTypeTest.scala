@@ -1,6 +1,6 @@
-package csw.alarm.api.models
+package csw.alarm.models
 
-import csw.alarm.api.models.AlarmType._
+import csw.alarm.models.AlarmType._
 
 // DEOPSCSW-438: Model to represent Alarm type values
 class AlarmTypeTest extends EnumTest(AlarmType) {

@@ -1,6 +1,6 @@
-package csw.alarm.api.models
+package csw.alarm.models
 
-import csw.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
+import csw.alarm.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 
 // DEOPSCSW-441: Model to represent Alarm Acknowledgement status
 class AcknowledgementStatusTest extends EnumTest(AcknowledgementStatus) {

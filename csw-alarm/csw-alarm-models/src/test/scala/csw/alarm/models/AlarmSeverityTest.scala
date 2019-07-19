@@ -1,6 +1,6 @@
-package csw.alarm.api.models
+package csw.alarm.models
 
-import csw.alarm.api.models.AlarmSeverity._
+import csw.alarm.models.AlarmSeverity._
 
 class AlarmSeverityTest extends EnumTest(AlarmSeverity) {
   override val expectedValues = Set(Indeterminate, Okay, Warning, Major, Critical)

@@ -1,8 +1,9 @@
-package csw.alarm.api.models
+package csw.alarm.models
+
 import java.util.regex.Pattern
 
-import csw.alarm.api.internal.RichStringExtentions.RichString
-import csw.alarm.api.internal.Separators.KeySeparator
+import csw.alarm.models.RichStringExtentions.RichString
+import csw.alarm.models.Separators.KeySeparator
 import csw.params.core.models.Subsystem
 
 /**

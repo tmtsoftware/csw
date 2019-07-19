@@ -1,6 +1,6 @@
 package csw.alarm.api.internal
 
-import csw.alarm.api.models._
+import csw.alarm.models._
 import csw.params.core.models.Subsystem
 import csw.params.extensions.Formats
 import csw.params.extensions.Formats.MappableFormat

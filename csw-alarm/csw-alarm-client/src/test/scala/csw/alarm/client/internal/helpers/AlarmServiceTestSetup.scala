@@ -7,7 +7,7 @@ import akka.stream.typed.scaladsl
 import com.typesafe.config.ConfigFactory
 import csw.alarm.api.internal.{MetadataKey, SeverityKey}
 import csw.alarm.api.javadsl.IAlarmService
-import csw.alarm.api.models.{AlarmMetadata, FullAlarmSeverity}
+import csw.alarm.models.{AlarmMetadata, FullAlarmSeverity}
 import csw.alarm.api.scaladsl.AlarmAdminService
 import csw.alarm.client.AlarmServiceFactory
 import csw.alarm.client.internal.commons.Settings
