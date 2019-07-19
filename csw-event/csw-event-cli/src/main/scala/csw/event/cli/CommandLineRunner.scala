@@ -102,10 +102,12 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
 
   private def readEventFromJson(data: File, eventKey: EventKey) = {
     val eventJson = Json.parse(scala.io.Source.fromFile(data).mkString)
-    JsonSupport.readEvent[Event](updateEventMetadata(eventJson, eventKey))
+    val (k, v)    = eventJson.as[JsObject].value.head
+    val jsObject  = updateEventMetadata(v.as[JsObject], eventKey)
+    JsonSupport.readEvent[Event](Json.obj((k, jsObject)))
   }
 
-  private def updateEventMetadata(json: JsValue, eventKey: EventKey) =
+  private def updateEventMetadata(json: JsValue, eventKey: EventKey): JsObject =
     json.as[JsObject] ++ Json.obj(
       ("eventId", Id().id),
       ("eventTime", JsonSupport.writes(UTCTime.now())),

@@ -250,14 +250,24 @@ class CommandLineRunnerTest extends SeedData with Eventually {
   }
 
   // publish command generates new id and event time while publishing, hence assertions exclude these keys from json
-  private def removeDynamicKeys(json: JsValue) = JsObject(json.as[JsObject].value.toMap -- Seq("eventId", "eventTime"))
+  private def removeDynamicKeys(json: JsValue) = {
+    val (k, v)   = json.as[JsObject].value.head
+    val jsObject = v.as[JsObject].value.toMap -- Seq("eventId", "eventTime")
+    Json.obj(k -> jsObject)
+  }
 
   // publish command with -e argument updates existing prefix and event name from provided json if already present
   // else adds new entry
-  private def addEventIdAndName(json: JsValue, eventKey: EventKey) = json.as[JsObject] ++ Json.obj(
-    ("source", eventKey.source.prefix),
-    ("eventName", eventKey.eventName.name)
-  )
+  private def addEventIdAndName(json: JsValue, eventKey: EventKey) = {
+    val (k, v) = json.as[JsObject].value.head
+
+    val jsObject = v.as[JsObject] ++ Json.obj(
+      ("source", eventKey.source.prefix),
+      ("eventName", eventKey.eventName.name)
+    )
+
+    Json.obj(k -> jsObject)
+  }
 
   private def eventToSanitizedJson(event: Event)                = removeDynamicKeys(JsonSupport.writeEvent(event))
   private def stringToEvent[T <: Event](eventString: String): T = JsonSupport.readEvent[T](Json.parse(eventString))
