@@ -6,12 +6,13 @@
     "eventTime": "2018-07-02T09:23:26.477Z",
     "paramSet": [
       {
-        "keyName": "epoch",
-        "keyType": "DoubleKey",
-        "values": [
-          1950
-        ],
-        "units": "NoUnits"
+        "DoubleKey": {
+          "keyName": "epoch",
+          "values": [
+            1950
+          ],
+          "units": "NoUnits"
+        }
       }
     ]
   }
