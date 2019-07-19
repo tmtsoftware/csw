@@ -20,7 +20,6 @@ import scala.concurrent.duration.DurationInt
 
 private[location] class LocationAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
-  // need to instantiate from remote factory to wire up serializer
   private final implicit val system: ActorSystem[_] = ActorSystem(Behavior.empty, "example")
   private final val serialization                   = SerializationExtension(system.toUntyped)
   private final val prefix                          = Prefix("wfos.prog.cloudcover")

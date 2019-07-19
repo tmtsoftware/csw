@@ -115,12 +115,14 @@ lazy val `csw-location` = project
 lazy val `csw-location-models` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .in(file("csw-location/csw-location-models"))
-  .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
+  .enablePlugins(PublishBintray, GenJavadocPlugin)
   .dependsOn(`csw-params`)
   .settings(fork := false)
   .settings(libraryDependencies ++= Dependencies.LocationModels.value)
 
 lazy val `csw-location-models-jvm` = `csw-location-models`.jvm
+  .enablePlugins(MaybeCoverage)
+
 lazy val `csw-location-models-js`  = `csw-location-models`.js
 
 lazy val `csw-location-api` = project
@@ -417,11 +419,13 @@ lazy val `csw-alarm-models` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .in(file("csw-alarm/csw-alarm-models"))
   .dependsOn(`csw-params`, `csw-time-core`)
-  .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
+  .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(fork := false)
   .settings(libraryDependencies ++= Dependencies.AlarmModels.value)
 
 lazy val `csw-alarm-models-jvm` = `csw-alarm-models`.jvm
+  .enablePlugins(MaybeCoverage)
+
 lazy val `csw-alarm-models-js`  = `csw-alarm-models`.js
 
 lazy val `csw-alarm-api` = project
