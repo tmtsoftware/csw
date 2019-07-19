@@ -6,24 +6,34 @@ import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.command.api.scaladsl.SequencerCommandService
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.client.messages.{ProcessSequence, SequencerMsg}
+import csw.command.client.messages.ProcessSequence
 import csw.location.models.AkkaLocation
-import csw.params.commands.CommandResponse.SubmitResponse
+import csw.params.commands.CommandResponse.{Error, SubmitResponse}
+import csw.params.commands.ProcessSequenceError.{DuplicateIdsFound, ExistingSequenceIsInProcess}
 import csw.params.commands.{ProcessSequenceError, Sequence}
 
+import scala.async.Async.{async, await}
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 
 class SequencerCommandServiceImpl(sequencerLocation: AkkaLocation)(
     implicit system: ActorSystem[_]
 ) extends SequencerCommandService {
-
+  import system.executionContext
   private implicit val timeout: Timeout     = Timeout(10.hour)
   private implicit val scheduler: Scheduler = system.scheduler
 
-  private val sequencer: ActorRef[SequencerMsg] = sequencerLocation.sequencerRef
+  private val sequencer: ActorRef[ProcessSequence] = sequencerLocation.sequencerRef
 
-  override def submit(sequence: Sequence): Future[Either[ProcessSequenceError, SubmitResponse]] =
-    sequencer ? (ProcessSequence(sequence, _))
-
+  override def submit(sequence: Sequence): Future[SubmitResponse] = async {
+    val processResponseF: Future[Either[ProcessSequenceError, SubmitResponse]] = sequencer ? (ProcessSequence(sequence, _))
+    await(processResponseF) match {
+      case Right(submitResponse) => submitResponse
+      case Left(error) =>
+        error match {
+          case DuplicateIdsFound           => Error(sequence.runId, "Duplicate command Id's found in given sequence")
+          case ExistingSequenceIsInProcess => Error(sequence.runId, "Submit failed, existing sequence is already in progress")
+        }
+    }
+  }
 }

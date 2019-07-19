@@ -37,7 +37,7 @@ class SequencerCommandServiceImplTest
   private val sequencerCS = new SequencerCommandServiceImpl(location)
 
   test("should submit sequence to the sequencer") {
-    sequencerCS.submit(sequence).futureValue should ===(sequenceResponse)
+    sequencerCS.submit(sequence).futureValue should ===(sequenceResponse.value)
   }
 
 }

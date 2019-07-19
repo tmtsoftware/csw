@@ -17,22 +17,15 @@ import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetCon
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
-import csw.command.client.messages.{
-  ExternalSequencerMsg,
-  GetComponentLogMetadata,
-  LogControlMessages,
-  ProcessSequence,
-  SequencerMsg,
-  SetComponentLogLevel
-}
+import csw.command.client.messages.{GetComponentLogMetadata, LogControlMessages, ProcessSequence, SetComponentLogLevel}
 import csw.command.client.models.framework.LockingResponse._
 import csw.command.client.models.framework.PubSub.{Publish, PublisherMessage, SubscriberMessage}
 import csw.command.client.models.framework.{PubSub, _}
 import csw.location.models.codecs.LocationCodecs
 import csw.logging.models.codecs.LoggingCodecs
 import csw.params.core.formats.{CborHelpers, ParamCodecs}
-import io.bullet.borer.derivation.MapBasedCodecs._
 import io.bullet.borer.derivation.ArrayBasedCodecs.deriveCodecForUnaryCaseClass
+import io.bullet.borer.derivation.MapBasedCodecs._
 import io.bullet.borer.{Codec, Decoder, Encoder}
 
 import scala.concurrent.duration.FiniteDuration
@@ -115,7 +108,5 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
 
   // ************************ SequencerMsg Codecs ********************
 
-  implicit lazy val processSequenceCodec: Codec[ProcessSequence]  = deriveCodec[ProcessSequence]
-  implicit lazy val externalMsgCodec: Codec[ExternalSequencerMsg] = deriveCodec[ExternalSequencerMsg]
-  implicit lazy val sequencerMsgCodec: Codec[SequencerMsg]        = deriveCodec[SequencerMsg]
+  implicit lazy val processSequenceCodec: Codec[ProcessSequence] = deriveCodec[ProcessSequence]
 }

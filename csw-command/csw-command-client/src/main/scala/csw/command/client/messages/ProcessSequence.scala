@@ -5,7 +5,7 @@ import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.commands.{ProcessSequenceError, Sequence}
 import csw.serializable.CommandSerializable
 
-sealed trait SequencerMsg
-sealed trait ExternalSequencerMsg extends SequencerMsg with CommandSerializable
+trait SequencerMsg
 final case class ProcessSequence(sequence: Sequence, replyTo: ActorRef[Either[ProcessSequenceError, SubmitResponse]])
-    extends ExternalSequencerMsg
+    extends SequencerMsg
+    with CommandSerializable
