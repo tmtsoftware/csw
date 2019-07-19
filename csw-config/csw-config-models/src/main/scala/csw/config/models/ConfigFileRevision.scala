@@ -1,4 +1,4 @@
-package csw.config.api.models
+package csw.config.models
 
 import java.time.Instant
 

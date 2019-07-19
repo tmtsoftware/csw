@@ -3,7 +3,7 @@ package csw.config.server.commons
 import java.util.Date
 import java.util.regex.Pattern
 
-import csw.config.api.models.FileType
+import csw.config.models.FileType
 import csw.config.server.{ServerWiring, Settings}
 import csw.config.server.commons.SVNDirEntryExt.RichSvnDirEntry
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}

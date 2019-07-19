@@ -7,13 +7,14 @@ import java.time.Instant
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.stream.scaladsl.StreamConverters
 import com.typesafe.config.{Config, ConfigFactory}
+import csw.commons.ResourceReader
+import csw.config.api.ConfigData
 import csw.config.api.exceptions.{FileAlreadyExists, FileNotFound}
-import csw.config.api.models._
 import csw.config.api.scaladsl.ConfigService
+import csw.config.models.{ConfigFileInfo, ConfigFileRevision, ConfigId, FileType}
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.config.server.files.Sha1
-import csw.commons.ResourceReader
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 

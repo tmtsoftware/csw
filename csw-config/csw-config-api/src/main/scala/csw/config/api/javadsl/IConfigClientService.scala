@@ -5,8 +5,9 @@ import java.util.Optional
 import java.util.concurrent.CompletableFuture
 import java.{lang => jl}
 
-import csw.config.api.models._
+import csw.config.api.ConfigData
 import csw.config.api.scaladsl.ConfigService
+import csw.config.models.ConfigId
 
 /**
  * Defines an interface to be used by clients for retrieving configuration information

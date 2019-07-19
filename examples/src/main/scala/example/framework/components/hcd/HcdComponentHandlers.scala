@@ -8,7 +8,7 @@ import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.AskPattern.Askable
 import akka.util.Timeout
 import csw.command.client.messages.TopLevelActorMessage
-import csw.config.api.models.ConfigData
+import csw.config.api.ConfigData
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.models.{LocationRemoved, LocationUpdated, TrackingEvent}

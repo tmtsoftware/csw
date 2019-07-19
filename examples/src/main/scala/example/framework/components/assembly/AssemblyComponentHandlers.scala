@@ -7,7 +7,7 @@ import akka.actor.typed.{ActorRef, ActorSystem}
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandServiceFactory
 import csw.command.client.messages.TopLevelActorMessage
-import csw.config.api.models.ConfigData
+import csw.config.api.ConfigData
 import csw.framework.exceptions.{FailureRestart, FailureStop}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers

@@ -3,7 +3,8 @@ package csw.config.api.scaladsl
 import java.nio.file.Path
 import java.time.Instant
 
-import csw.config.api.models.{FileType, _}
+import csw.config.api.ConfigData
+import csw.config.models._
 
 import scala.concurrent.Future
 

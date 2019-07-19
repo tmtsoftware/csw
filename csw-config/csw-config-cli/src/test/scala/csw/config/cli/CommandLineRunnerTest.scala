@@ -9,11 +9,11 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.Materializer
 import akka.stream.typed.scaladsl.ActorMaterializer
 import csw.aas.installed.api.InstalledAppAuthAdapter
-import csw.config.api.models.ConfigId
 import csw.config.cli.args.{ArgsParser, Options}
 import csw.config.cli.wiring.Wiring
 import csw.config.commons.TestFutureExtension.RichFuture
 import csw.config.commons.{ArgsUtil, TestFileUtils}
+import csw.config.models.ConfigId
 import csw.config.server.ServerWiring
 import csw.config.server.mocks.MockedAuthentication
 import csw.location.client.scaladsl.HttpLocationServiceFactory

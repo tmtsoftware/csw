@@ -19,7 +19,7 @@ import csw.command.client.models.framework.PubSub.Subscribe
 import csw.command.client.models.framework.ToComponentLifecycleMessage.GoOffline
 import csw.command.client.models.framework.{Components, ContainerLifecycleState, SupervisorLifecycleState}
 import csw.common.FrameworkAssertions._
-import csw.config.api.models.ConfigData
+import csw.config.api.ConfigData
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.mocks.MockedAuthentication

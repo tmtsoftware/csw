@@ -5,10 +5,11 @@ import java.nio.file.{Path, Paths}
 import java.time.Instant
 
 import csw.commons.ResourceReader
-import csw.config.api.models.FileType.{Annex, Normal}
-import csw.config.api.models.{ConfigData, ConfigId, ConfigMetadata, FileType}
+import csw.config.api.ConfigData
 import csw.config.api.scaladsl.{ConfigClientService, ConfigService}
 import csw.config.client.scaladsl.ConfigClientFactory
+import csw.config.models.FileType.{Annex, Normal}
+import csw.config.models.{ConfigId, ConfigMetadata, FileType}
 import csw.config.server.mocks.MockedAuthentication
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory

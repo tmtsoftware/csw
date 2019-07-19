@@ -1,4 +1,4 @@
-package csw.config.api.models
+package csw.config.api
 
 import java.io.InputStream
 import java.nio.file.Path

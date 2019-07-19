@@ -41,6 +41,7 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-location-models-js`,
   `csw-logging-models-js`,
   `csw-alarm-models-js`,
+  `csw-config-models-js`,
   `csw-network-utils`,
   `csw-commons`,
   `csw-benchmark`,
@@ -174,16 +175,29 @@ lazy val `csw-location-agent` = project
 lazy val `csw-config` = project
   .in(file("csw-config"))
   .aggregate(
+    `csw-config-models-jvm`,
+    `csw-config-models-js`,
     `csw-config-api`,
     `csw-config-server`,
     `csw-config-client`,
     `csw-config-cli`
   )
 
+lazy val `csw-config-models` = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("csw-config/csw-config-models"))
+  .enablePlugins(PublishBintray, GenJavadocPlugin)
+  .dependsOn(`csw-params`)
+  .settings(fork := false)
+  .settings(libraryDependencies ++= Dependencies.LocationModels.value)
+
+lazy val `csw-config-models-jvm` = `csw-config-models`.jvm
+lazy val `csw-config-models-js`  = `csw-config-models`.js
+
 lazy val `csw-config-api` = project
   .in(file("csw-config/csw-config-api"))
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
-  .dependsOn(`csw-logging-api`)
+  .dependsOn(`csw-logging-api`, `csw-config-models-jvm`)
   .settings(
     libraryDependencies ++= Dependencies.ConfigApi.value
   )

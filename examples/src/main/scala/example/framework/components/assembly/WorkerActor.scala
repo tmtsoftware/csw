@@ -2,7 +2,7 @@ package example.framework.components.assembly
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
-import csw.config.api.models.ConfigData
+import csw.config.api.ConfigData
 import example.framework.components.assembly.WorkerActorMsgs.{GetStatistics, InitialState}
 
 trait WorkerActorMsg

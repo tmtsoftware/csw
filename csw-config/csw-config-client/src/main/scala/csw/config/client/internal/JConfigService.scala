@@ -6,9 +6,10 @@ import java.util.Optional
 import java.util.concurrent.CompletableFuture
 import java.{util, lang => jl}
 
+import csw.config.api.ConfigData
 import csw.config.api.javadsl.IConfigService
-import csw.config.api.models._
 import csw.config.api.scaladsl.ConfigService
+import csw.config.models.{ConfigFileInfo, ConfigFileRevision, ConfigId, ConfigMetadata, FileType}
 
 import scala.jdk.CollectionConverters._
 import scala.compat.java8.FutureConverters._

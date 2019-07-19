@@ -2,7 +2,8 @@ package csw.config.api.scaladsl
 
 import java.nio.file.Path
 
-import csw.config.api.models._
+import csw.config.api.ConfigData
+import csw.config.models.ConfigId
 
 import scala.concurrent.Future
 
@@ -15,7 +16,7 @@ trait ConfigClientService {
    * Returns true if the given path exists and is being managed
    *
    * @param path the file path relative to the repository root
-   * @param id revision of the file
+   * @param id   revision of the file
    * @return a future that completes with true if the file exists, false otherwise. It can fail with
    *         [[csw.config.api.exceptions.InvalidInput]] or [[csw.config.api.exceptions.FileNotFound]]
    */

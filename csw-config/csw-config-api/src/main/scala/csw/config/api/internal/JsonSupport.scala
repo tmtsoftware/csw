@@ -4,7 +4,7 @@ import java.nio.file.{Path, Paths}
 import java.time.Instant
 
 import com.github.ghik.silencer.silent
-import csw.config.api.models.{ConfigFileInfo, ConfigFileRevision, ConfigId, ConfigMetadata}
+import csw.config.models.{ConfigFileInfo, ConfigFileRevision, ConfigId, ConfigMetadata}
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 import play.api.libs.json._
 

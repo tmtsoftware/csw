@@ -4,16 +4,16 @@ import java.nio.file.{Files, Paths}
 
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.http.scaladsl.Http
-import csw.config.api.TokenFactory
+import csw.commons.ResourceReader
+import csw.config.api.{ConfigData, TokenFactory}
 import csw.config.api.exceptions.{FileNotFound, InvalidInput, NotAllowed, Unauthorized}
-import csw.config.api.models.{ConfigData, FileType}
 import csw.config.api.scaladsl.ConfigService
 import csw.config.client.ConfigClientBaseSuite
+import csw.config.models.FileType
 import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.config.server.files.Sha1
 import csw.config.server.{ConfigServiceTest, ServerWiring}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.commons.ResourceReader
 
 // DEOPSCSW-138: Split Config API into Admin API and Client API
 // DEOPSCSW-80: HTTP based access for configuration file

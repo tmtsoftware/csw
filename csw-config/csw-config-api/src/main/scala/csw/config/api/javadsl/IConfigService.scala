@@ -6,8 +6,9 @@ import java.util.Optional
 import java.util.concurrent.CompletableFuture
 import java.{util => ju}
 
-import csw.config.api.models._
+import csw.config.api.ConfigData
 import csw.config.api.scaladsl.ConfigService
+import csw.config.models._
 
 /**
  * Defines an interface to be used by admin users for storing and retrieving configuration information

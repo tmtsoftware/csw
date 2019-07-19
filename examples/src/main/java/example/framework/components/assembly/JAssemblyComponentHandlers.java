@@ -10,7 +10,7 @@ import csw.command.client.CommandServiceFactory;
 import csw.command.client.messages.TopLevelActorMessage;
 import csw.command.client.models.framework.ComponentInfo;
 import csw.config.api.javadsl.IConfigClientService;
-import csw.config.api.models.ConfigData;
+import csw.config.api.ConfigData;
 import csw.config.client.javadsl.JConfigClientFactory;
 import csw.event.api.javadsl.IEventService;
 import csw.framework.CurrentStatePublisher;

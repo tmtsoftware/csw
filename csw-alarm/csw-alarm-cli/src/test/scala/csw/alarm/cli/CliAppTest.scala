@@ -18,7 +18,7 @@ import csw.alarm.cli.utils.IterableExtensions.RichStringIterable
 import csw.alarm.cli.utils.TestFutureExt.RichFuture
 import csw.alarm.models.AlarmHealth
 import csw.commons.ResourceReader
-import csw.config.api.models.ConfigData
+import csw.config.api.ConfigData
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.mocks.MockedAuthentication

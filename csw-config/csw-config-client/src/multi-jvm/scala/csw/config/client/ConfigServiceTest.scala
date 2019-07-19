@@ -4,7 +4,7 @@ import java.nio.file.Paths
 
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.ConfigFactory
-import csw.config.api.models.ConfigData
+import csw.config.api.ConfigData
 import csw.config.client.helpers.OneClientAndServer
 import csw.config.client.internal.ActorRuntime
 import csw.config.client.scaladsl.ConfigClientFactory

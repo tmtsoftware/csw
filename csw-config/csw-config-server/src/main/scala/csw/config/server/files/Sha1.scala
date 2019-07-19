@@ -6,7 +6,7 @@ import java.security.MessageDigest
 import akka.stream.Materializer
 import akka.stream.scaladsl.{FileIO, Flow, Keep, Sink, Source}
 import akka.util.ByteString
-import csw.config.api.models.ConfigData
+import csw.config.api.ConfigData
 
 import scala.concurrent.Future
 

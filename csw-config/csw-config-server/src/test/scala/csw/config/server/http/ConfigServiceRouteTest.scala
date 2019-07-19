@@ -7,8 +7,9 @@ import akka.http.scaladsl.model.headers.Authorization
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import csw.commons.http.ErrorResponse
+import csw.config.api.ConfigData
 import csw.config.api.commons.Constants
-import csw.config.api.models.{ConfigData, ConfigFileRevision, ConfigId, _}
+import csw.config.models.{ConfigFileInfo, ConfigFileRevision, ConfigId, ConfigMetadata}
 import csw.config.server.ServerWiring
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.mocks.MockedAuthentication

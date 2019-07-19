@@ -11,9 +11,10 @@ import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.directives.{DebuggingDirectives, LoggingMagnet}
 import akka.http.scaladsl.unmarshalling.{FromEntityUnmarshaller, Unmarshaller}
 import akka.util.ByteString
+import csw.config.api.ConfigData
 import csw.config.api.commons.TokenMaskSupport
 import csw.config.api.internal.JsonSupport
-import csw.config.api.models.{ConfigData, ConfigId, FileType}
+import csw.config.models.{ConfigId, FileType}
 import csw.config.server.commons.{ConfigServerLogger, PathValidator}
 import csw.logging.api.scaladsl.Logger
 

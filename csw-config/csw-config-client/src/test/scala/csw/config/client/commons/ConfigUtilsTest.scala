@@ -7,8 +7,8 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.Materializer
 import akka.stream.typed.scaladsl
 import com.typesafe.config.{Config, ConfigFactory}
+import csw.config.api.ConfigData
 import csw.config.api.exceptions.{LocalFileNotFound, UnableToParseOptions}
-import csw.config.api.models.ConfigData
 import csw.config.api.scaladsl.ConfigClientService
 import org.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}

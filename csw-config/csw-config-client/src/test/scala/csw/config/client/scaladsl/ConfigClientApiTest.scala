@@ -4,7 +4,7 @@ import java.nio.file.Paths
 
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.http.scaladsl.Http
-import csw.config.api.models.ConfigData
+import csw.config.api.ConfigData
 import csw.config.api.scaladsl.{ConfigClientService, ConfigService}
 import csw.config.client.ConfigClientBaseSuite
 import csw.config.server.ServerWiring

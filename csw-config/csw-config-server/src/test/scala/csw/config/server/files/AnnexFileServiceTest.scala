@@ -2,7 +2,7 @@ package csw.config.server.files
 
 import java.nio.file.Paths
 
-import csw.config.api.models.ConfigData
+import csw.config.api.ConfigData
 import csw.config.server.ServerWiring
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.commons.TestFutureExtension.RichFuture

@@ -1,6 +1,6 @@
 package csw.config.api.javadsl;
 
-import csw.config.api.models.FileType;
+import csw.config.models.FileType;
 
 /**
  * Helper class for Java to get the handle of file types

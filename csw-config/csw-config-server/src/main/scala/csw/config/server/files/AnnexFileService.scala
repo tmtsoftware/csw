@@ -3,7 +3,7 @@ package csw.config.server.files
 import java.nio.file.{Path, Paths}
 
 import akka.stream.scaladsl.{FileIO, Keep}
-import csw.config.api.models.ConfigData
+import csw.config.api.ConfigData
 import csw.config.server.commons.ConfigServerLogger
 import csw.config.server.{ActorRuntime, Settings}
 import csw.logging.api.scaladsl.Logger

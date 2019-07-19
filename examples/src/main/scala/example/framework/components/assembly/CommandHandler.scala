@@ -3,7 +3,7 @@ package example.framework.components.assembly
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
 import csw.command.api.scaladsl.CommandService
-import csw.config.api.models.ConfigData
+import csw.config.api.ConfigData
 
 trait CommandHandlerMsgs
 

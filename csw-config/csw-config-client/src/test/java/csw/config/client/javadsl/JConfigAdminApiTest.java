@@ -1,12 +1,16 @@
 package csw.config.client.javadsl;
 
 import akka.stream.Materializer;
+import csw.config.api.ConfigData;
 import csw.config.api.exceptions.FileAlreadyExists;
 import csw.config.api.exceptions.FileNotFound;
 import csw.config.api.javadsl.IConfigService;
 import csw.config.api.javadsl.JFileType;
-import csw.config.api.models.*;
 import csw.config.client.JConfigClientBaseSuite;
+import csw.config.models.ConfigFileInfo;
+import csw.config.models.ConfigFileRevision;
+import csw.config.models.ConfigId;
+import csw.config.models.ConfigMetadata;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.scalatestplus.junit.JUnitSuite;
@@ -125,11 +129,11 @@ public class JConfigAdminApiTest extends JUnitSuite {
 
     // DEOPSCSW-46: Unique identifier for configuration file version
     @Test
-    public void  testEachRevisionHasUniqueId() throws ExecutionException, InterruptedException {
-        Path tromboneHcdConf       = Paths.get("trombone/test/hcd/akka/hcd.conf");
-        Path tromboneAssemblyConf  = Paths.get("trombone/test/assembly/akka/assembly.conf");
+    public void testEachRevisionHasUniqueId() throws ExecutionException, InterruptedException {
+        Path tromboneHcdConf = Paths.get("trombone/test/hcd/akka/hcd.conf");
+        Path tromboneAssemblyConf = Paths.get("trombone/test/assembly/akka/assembly.conf");
         Path tromboneContainerConf = Paths.get("trombone/test/container/akka/container.conf");
-        Path redisConf             = Paths.get("redis/test/text/redis.conf");
+        Path redisConf = Paths.get("redis/test/text/redis.conf");
 
         ConfigId configId1 = configService.create(tromboneHcdConf, ConfigData.fromString(configValue1), "creating tromboneHCD.conf").get();
         ConfigId configId2 = configService.create(tromboneAssemblyConf, ConfigData.fromString(configValue2), "creating tromboneAssembly.conf").get();
@@ -200,15 +204,15 @@ public class JConfigAdminApiTest extends JUnitSuite {
         String secondUser = "secondUser";
         String thirdUser = "thirdUser";
         when(jConfigClientBaseSuite.validToken().preferred_username())
-                .thenReturn(new Some(firstUser),new Some(secondUser),new Some(thirdUser));
+                .thenReturn(new Some(firstUser), new Some(secondUser), new Some(thirdUser));
 
         when(jConfigClientBaseSuite.validToken().userOrClientName())
                 .thenReturn(firstUser, secondUser, thirdUser);
 
-        try{
+        try {
             exception.expectCause(isA(FileNotFound.class));
             configService.history(path).get();
-        }finally {
+        } finally {
             String comment1 = "commit version 1";
             String comment2 = "commit version 2";
             String comment3 = "commit version 3";
@@ -264,7 +268,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
 
         String firstUser = "firstUser";
         String secondUser = "secondUser";
-        when(jConfigClientBaseSuite.validToken().preferred_username()).thenReturn(new Some(firstUser),new Some(secondUser));
+        when(jConfigClientBaseSuite.validToken().preferred_username()).thenReturn(new Some(firstUser), new Some(secondUser));
         when(jConfigClientBaseSuite.validToken().userOrClientName()).thenReturn(firstUser, secondUser);
 
         String tromboneConfigComment = "hello trombone";
@@ -333,8 +337,8 @@ public class JConfigAdminApiTest extends JUnitSuite {
     public void testGetHistoryOfActiveVersionsOfFile() throws ExecutionException, InterruptedException {
         String createActiveComment = "initializing active file with the first version";
         // create file
-        Path file      = Paths.get("/tmt/test/setactive/getactive/resetactive/active.conf");
-        ConfigId configId1 = configService.create(file, ConfigData.fromString(configValue1),  false, "create").get();
+        Path file = Paths.get("/tmt/test/setactive/getactive/resetactive/active.conf");
+        ConfigId configId1 = configService.create(file, ConfigData.fromString(configValue1), false, "create").get();
         Instant createActiveTS = Instant.now();
 
         // update file twice
@@ -397,18 +401,18 @@ public class JConfigAdminApiTest extends JUnitSuite {
 
         String firstUser = "firstUser";
         String secondUser = "secondUser";
-        when(jConfigClientBaseSuite.validToken().preferred_username()).thenReturn(new Some(firstUser),new Some(secondUser));
+        when(jConfigClientBaseSuite.validToken().preferred_username()).thenReturn(new Some(firstUser), new Some(secondUser));
         when(jConfigClientBaseSuite.validToken().userOrClientName()).thenReturn(firstUser, secondUser);
 
         String tromboneConfigComment = "test{Annex file no1}";
         String assemblyConfigComment = "test{Annex file no2}";
 
         ConfigId tromboneConfigId = configService.create(tromboneConfig, ConfigData.fromString("axisName = tromboneAxis"),
-                                                        true,
-                                                         tromboneConfigComment).get();
+                true,
+                tromboneConfigComment).get();
         ConfigId assemblyConfigId = configService.create(assemblyConfig, ConfigData.fromString("assemblyHCDCount = 3"),
-                                                        true,
-                                                         assemblyConfigComment).get();
+                true,
+                assemblyConfigComment).get();
 
         ConfigFileInfo tromboneConfigInfo = new ConfigFileInfo(tromboneConfig, tromboneConfigId, firstUser, tromboneConfigComment);
         ConfigFileInfo assemblyConfigInfo = new ConfigFileInfo(assemblyConfig, assemblyConfigId, secondUser, assemblyConfigComment);
@@ -509,15 +513,15 @@ public class JConfigAdminApiTest extends JUnitSuite {
 
         String firstUser = "firstUser";
         String secondUser = "secondUser";
-        when(jConfigClientBaseSuite.validToken().preferred_username()).thenReturn(new Some(firstUser),new Some(secondUser));
-        when(jConfigClientBaseSuite.validToken().userOrClientName()).thenReturn(firstUser,secondUser);
+        when(jConfigClientBaseSuite.validToken().preferred_username()).thenReturn(new Some(firstUser), new Some(secondUser));
+        when(jConfigClientBaseSuite.validToken().userOrClientName()).thenReturn(firstUser, secondUser);
 
         // Add files to repo
         ConfigId tromboneConfigId = configService
-                .create(tromboneConfig, ConfigData.fromString(configValue1),false, tromboneConfigComment)
+                .create(tromboneConfig, ConfigData.fromString(configValue1), false, tromboneConfigComment)
                 .get();
         ConfigId assemblyConfigId = configService
-                .create(assemblyConfig, ConfigData.fromString(configValue2),true, assemblyConfigComment)
+                .create(assemblyConfig, ConfigData.fromString(configValue2), true, assemblyConfigComment)
                 .get();
 
         configService.setActiveVersion(tromboneConfig, tromboneConfigId, "setting active version").get();

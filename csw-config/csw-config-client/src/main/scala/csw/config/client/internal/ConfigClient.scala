@@ -9,14 +9,14 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import csw.commons.http.ErrorResponse
-import csw.config.api.TokenFactory
 import csw.config.api.commons.{BinaryUtils, TokenMaskSupport}
 import csw.config.api.exceptions._
 import csw.config.api.internal.ConfigStreamExts.RichSource
 import csw.config.api.internal.JsonSupport
-import csw.config.api.models._
 import csw.config.api.scaladsl.ConfigService
+import csw.config.api.{ConfigData, TokenFactory}
 import csw.config.client.commons.ConfigClientLogger
+import csw.config.models._
 import csw.logging.api.scaladsl.Logger
 
 import scala.async.Async._

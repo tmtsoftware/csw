@@ -98,16 +98,22 @@ object Dependencies {
     )
   )
 
-  val ConfigApi = Def.setting(
+  val ConfigModels = Def.setting(
     Seq(
       Enumeratum.`enumeratum`.value,
+      Libs.`config`,
+      Libs.`play-json`.value,
+      Libs.`scala-java8-compat`,
+      Libs.`scalatest`.value     % Test,
+    )
+  )
+  
+  val ConfigApi = Def.setting(
+    Seq(
       Akka.`akka-actor`,
       Akka.`akka-stream`,
       Akka.`akka-stream-typed`,
       Libs.`akka-http-play-json`,
-      Libs.`config`,
-      Libs.`play-json`.value,
-      Libs.`scala-java8-compat`,
       Libs.`scalatest`.value     % Test,
       Akka.`akka-stream-testkit` % Test
     )

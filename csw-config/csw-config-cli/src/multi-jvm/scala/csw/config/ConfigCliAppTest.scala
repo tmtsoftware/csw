@@ -7,7 +7,7 @@ import akka.stream.typed.scaladsl.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import csw.aas.installed.api.InstalledAppAuthAdapter
 import csw.commons.ResourceReader
-import csw.config.api.models.ConfigData
+import csw.config.api.ConfigData
 import csw.config.cli.wiring.Wiring
 import csw.config.client.internal.ActorRuntime
 import csw.config.client.scaladsl.ConfigClientFactory

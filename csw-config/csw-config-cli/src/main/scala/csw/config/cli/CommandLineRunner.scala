@@ -3,11 +3,12 @@ package csw.config.cli
 import java.nio.file.{Files, Path}
 
 import csw.aas.installed.api.InstalledAppAuthAdapter
+import csw.config.api.ConfigData
 import csw.config.api.exceptions.FileNotFound
-import csw.config.api.models._
 import csw.config.api.scaladsl.ConfigService
 import csw.config.cli.args.Options
 import csw.config.client.internal.ActorRuntime
+import csw.config.models._
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}

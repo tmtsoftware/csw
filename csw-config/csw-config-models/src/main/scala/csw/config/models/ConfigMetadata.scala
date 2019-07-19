@@ -1,4 +1,4 @@
-package csw.config.api.models
+package csw.config.models
 
 /**
  * Holds metadata information about config server

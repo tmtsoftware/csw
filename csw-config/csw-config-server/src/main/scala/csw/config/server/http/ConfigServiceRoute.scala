@@ -54,19 +54,19 @@ class ConfigServiceRoute(
                 }
               }
             } ~
-            sPost(ClientRolePolicy(AdminRole)) { token =>
+            sPost(ClientRolePolicy(AdminRole)) { token => // create file - http://{{hostname}}:{{port}}/config/{{path}}?annex=true&comment=abcd
               (configDataEntity & annexParam & commentParam) { (configData, annex, comment) =>
                 complete(
                   StatusCodes.Created -> configService(token.userOrClientName).create(filePath, configData, annex, comment)
                 )
               }
             } ~
-            sPut(ClientRolePolicy(AdminRole)) { token =>
+            sPut(ClientRolePolicy(AdminRole)) { token => // update file - http://{{hostname}}:{{port}}/config/{{path}}?comment=abcd
               (configDataEntity & commentParam) { (configData, comment) =>
                 complete(configService(token.userOrClientName).update(filePath, configData, comment))
               }
             } ~
-            sDelete(ClientRolePolicy(AdminRole)) { token =>
+            sDelete(ClientRolePolicy(AdminRole)) { token => // delete file - http://{{hostname}}:{{port}}/config/{{path}}?comment=abcd
               commentParam { comment =>
                 complete(configService(token.userOrClientName).delete(filePath, comment).map(_ => Done))
               }
@@ -83,7 +83,8 @@ class ConfigServiceRoute(
             (get & rejectEmptyResponse) { // fetch the active version - http://{{hostname}}:{{port}}/active-version/{{path}}
               complete(configService().getActiveVersion(filePath))
             } ~
-            sPut(ClientRolePolicy(AdminRole)) { token =>
+            sPut(ClientRolePolicy(AdminRole)) { token => // set active version - http://{{hostname}}:{{port}}/config/{{path}}?id=my_id&comment=abcd
+              // reset active version - http://{{hostname}}:{{port}}/config/{{path}}?comment=abcd
               (idParam & commentParam) {
                 case (Some(configId), comment) =>
                   complete(configService(token.userOrClientName).setActiveVersion(filePath, configId, comment).map(_ => Done))

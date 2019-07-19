@@ -6,7 +6,7 @@ import java.time.Instant
 import java.util.regex.Pattern
 
 import akka.dispatch.MessageDispatcher
-import csw.config.api.models.FileType
+import csw.config.models.FileType
 import csw.config.server.Settings
 import csw.config.server.commons.ConfigServerLogger
 import csw.config.server.commons.SVNDirEntryExt.RichSvnDirEntry

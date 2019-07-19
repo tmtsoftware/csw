@@ -1,7 +1,7 @@
 package csw.config.server.commons
 import java.util.regex.Pattern
 
-import csw.config.api.models.FileType
+import csw.config.models.FileType
 import org.tmatesoft.svn.core.{SVNDirEntry, SVNNodeKind}
 
 object SVNDirEntryExt {

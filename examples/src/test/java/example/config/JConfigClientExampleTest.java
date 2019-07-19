@@ -3,11 +3,15 @@ package example.config;
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.SpawnProtocol;
 import akka.stream.Materializer;
+import csw.config.api.ConfigData;
 import csw.config.api.javadsl.IConfigClientService;
 import csw.config.api.javadsl.IConfigService;
 import csw.config.api.javadsl.JFileType;
-import csw.config.api.models.*;
 import csw.config.client.javadsl.JConfigClientFactory;
+import csw.config.models.ConfigFileInfo;
+import csw.config.models.ConfigFileRevision;
+import csw.config.models.ConfigId;
+import csw.config.models.ConfigMetadata;
 import csw.config.server.ServerWiring;
 import csw.config.server.mocks.JMockedAuthentication;
 import csw.location.api.javadsl.ILocationService;
@@ -198,24 +202,24 @@ public class JConfigClientExampleTest extends JUnitSuite {
 
         //retrieve full list; for demonstration purpose validate return values
         Assert.assertEquals(Set.of(tromboneId, hcdId, fits1Id, fits2Id, testId),
-            adminApi.list().get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
+                adminApi.list().get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
 
         //retrieve list of files based on type; for demonstration purpose validate return values
         Assert.assertEquals(Set.of(tromboneId, fits1Id, testId),
-            adminApi.list(JFileType.Annex).get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
+                adminApi.list(JFileType.Annex).get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
         Assert.assertEquals(Set.of(hcdId, fits2Id),
-            adminApi.list(JFileType.Normal).get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
+                adminApi.list(JFileType.Normal).get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
 
         //retrieve list using pattern; for demonstration purpose validate return values
         Assert.assertEquals(Set.of(tromboneId, hcdId, testId),
-            adminApi.list(".*.conf").get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
+                adminApi.list(".*.conf").get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
         //retrieve list using pattern and file type; for demonstration purpose validate return values
         Assert.assertEquals(Set.of(tromboneId, testId),
-            adminApi.list(JFileType.Annex, ".*.conf").get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
+                adminApi.list(JFileType.Annex, ".*.conf").get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
         Assert.assertEquals(Set.of(tromboneId),
-            adminApi.list(JFileType.Annex, "a/c.*").get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
+                adminApi.list(JFileType.Annex, "a/c.*").get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
         Assert.assertEquals(Set.of(testId),
-            adminApi.list(JFileType.Annex, "test.*").get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
+                adminApi.list(JFileType.Annex, "test.*").get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
         //#list
     }
 
@@ -234,16 +238,16 @@ public class JConfigClientExampleTest extends JUnitSuite {
         //full file history
         List<ConfigFileRevision> fullHistory = adminApi.history(filePath).get();
         Assert.assertEquals(List.of(id2, id1, id0),
-            fullHistory.stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
+                fullHistory.stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
         Assert.assertEquals(List.of("third commit", "second commit", "first commit"),
-            fullHistory.stream().map(ConfigFileRevision::comment).collect(Collectors.toList()));
+                fullHistory.stream().map(ConfigFileRevision::comment).collect(Collectors.toList()));
 
         //drop initial revision and take only update revisions
         Assert.assertEquals(List.of(id2, id1),
-            adminApi.history(filePath, tBeginUpdate, tEndUpdate).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
+                adminApi.history(filePath, tBeginUpdate, tEndUpdate).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
         //take last two revisions
         Assert.assertEquals(List.of(id2, id1),
-            adminApi.history(filePath, 2).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
+                adminApi.history(filePath, 2).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
         //#history
     }
 
@@ -256,7 +260,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
         //create will make the 1st revision active with a default comment
         ConfigId id1 = adminApi.create(filePath, ConfigData.fromString(defaultStrConf), false, "first commit").get();
         Assert.assertEquals(List.of(id1),
-            adminApi.historyActive(filePath).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
+                adminApi.historyActive(filePath).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
         //ensure active version is set
         Assert.assertEquals(id1, adminApi.getActiveVersion(filePath).get().orElseThrow());
 

@@ -6,6 +6,7 @@ import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.testkit.TestKit
 import com.typesafe.config.{Config, ConfigException}
+import csw.config.api.ConfigData
 import csw.config.api.commons.TestFutureExtension.RichFuture
 import org.scalatest.{FunSuiteLike, Matchers}
 
