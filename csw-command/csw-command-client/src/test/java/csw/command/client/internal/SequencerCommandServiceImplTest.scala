@@ -2,7 +2,7 @@ package csw.command.client.internal
 
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.actor.typed.javadsl.Behaviors
-import csw.command.client.messages.{ProcessSequence, SequencerMsg}
+import csw.command.client.messages.{ProcessSequence, ProcessSequenceResponse, SequencerMsg}
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
@@ -21,7 +21,7 @@ class SequencerCommandServiceImplTest
     with ScalaFutures {
 
   private val sequence         = Sequence(Setup(Prefix("test"), CommandName("command-1"), None))
-  private val sequenceResponse = Right(Completed(sequence.runId))
+  private val sequenceResponse = ProcessSequenceResponse(Right(Completed(sequence.runId)))
 
   private val mockedBehavior = Behaviors.receiveMessage[SequencerMsg] {
     case ProcessSequence(`sequence`, replyTo) =>
@@ -37,7 +37,7 @@ class SequencerCommandServiceImplTest
   private val sequencerCS = new SequencerCommandServiceImpl(location)
 
   test("should submit sequence to the sequencer") {
-    sequencerCS.submit(sequence).futureValue should ===(sequenceResponse.value)
+    sequencerCS.submit(sequence).futureValue should ===(sequenceResponse.response.toOption.get)
   }
 
 }

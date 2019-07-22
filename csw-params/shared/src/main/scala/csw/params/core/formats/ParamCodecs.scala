@@ -5,7 +5,6 @@ import java.time.Instant
 
 import csw.params.commands.CommandIssue._
 import csw.params.commands.CommandResponse._
-import csw.params.commands.ProcessSequenceError.{DuplicateIdsFound, ExistingSequenceIsInProcess}
 import csw.params.commands._
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.Coords._
@@ -142,15 +141,7 @@ trait ParamCodecs extends CommonCodecs {
   implicit lazy val sequenceCommandCodec: Codec[SequenceCommand]         = deriveCodec[SequenceCommand]
   implicit lazy val controlCommandCodec: Codec[ControlCommand]           = deriveCodec[ControlCommand]
   implicit lazy val commandCodec: Codec[Command]                         = deriveCodec[Command]
-
-  // ************************ Sequence Codecs ********************
-  implicit lazy val sequenceCodec: Codec[Sequence] = deriveCodec[Sequence]
-
-  // ProcessSequenceErrorCodecs
-  implicit lazy val duplicateIdsFoundCodec: Codec[DuplicateIdsFound.type] = singletonCodec(DuplicateIdsFound)
-  implicit lazy val existingSequenceIsInProcessCodec: Codec[ExistingSequenceIsInProcess.type] =
-    singletonCodec(ExistingSequenceIsInProcess)
-  implicit lazy val processSequenceErrorCodec: Codec[ProcessSequenceError] = deriveCodec[ProcessSequenceError]
+  implicit lazy val sequenceCodec: Codec[Sequence]                       = deriveCodec[Sequence]
 
   // ************************ CommandResponse Codecs ********************
 
