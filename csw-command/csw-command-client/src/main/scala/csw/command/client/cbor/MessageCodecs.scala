@@ -31,7 +31,7 @@ import csw.command.client.models.framework.PubSub.{Publish, PublisherMessage, Su
 import csw.command.client.models.framework.{PubSub, _}
 import csw.location.models.codecs.LocationCodecs
 import csw.logging.models.codecs.LoggingCodecs
-import csw.params.core.formats.{CborHelpers, ParamCodecs}
+import csw.params.core.formats.{CodecHelpers, ParamCodecs}
 import io.bullet.borer.derivation.ArrayBasedCodecs.deriveCodecForUnaryCaseClass
 import io.bullet.borer.derivation.MapBasedCodecs._
 import io.bullet.borer.{Codec, Decoder, Encoder}
@@ -43,7 +43,7 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
   implicit def actorSystem: ActorSystem[_]
 
   implicit def actorRefCodec[T]: Codec[ActorRef[T]] =
-    CborHelpers.bimap[String, ActorRef[T]](
+    CodecHelpers.bimap[String, ActorRef[T]](
       path => {
         val provider = SerializationExtension(actorSystem.toUntyped).system.provider
         provider.resolveActorRef(path)

@@ -3,7 +3,7 @@ package csw.params.core.formats
 import enumeratum.{Enum, EnumEntry}
 import io.bullet.borer.{Cbor, Codec, Decoder, Encoder}
 
-object CborHelpers {
+object CodecHelpers {
   def bimap[From: Encoder: Decoder, To](to: From => To, from: To => From): Codec[To] = Codec(
     implicitly[Encoder[From]].contramap(from),
     implicitly[Decoder[From]].map(to)

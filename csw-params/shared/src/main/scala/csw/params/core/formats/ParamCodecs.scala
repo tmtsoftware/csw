@@ -22,12 +22,12 @@ import scala.reflect.ClassTag
 object ParamCodecs extends ParamCodecs
 trait ParamCodecs extends CommonCodecs {
 
-  import CborHelpers._
+  import CodecHelpers._
 
   type ArrayEnc[T] = Encoder[Array[T]]
   type ArrayDec[T] = Decoder[Array[T]]
 
-  def singletonCodec[T <: Singleton](a: T): Codec[T] = CborHelpers.bimap[String, T](_ => a, _.toString)
+  def singletonCodec[T <: Singleton](a: T): Codec[T] = CodecHelpers.bimap[String, T](_ => a, _.toString)
 
   // ************************ Base Type Codecs ********************
 
@@ -37,8 +37,8 @@ trait ParamCodecs extends CommonCodecs {
   implicit lazy val tagCodec: Codec[Coords.Tag]                      = deriveCodecForUnaryCaseClass[Coords.Tag]
   implicit lazy val angleCodec: Codec[Angle]                         = deriveCodecForUnaryCaseClass[Angle]
   implicit lazy val properMotionCodec: Codec[ProperMotion]           = deriveCodec[ProperMotion]
-  implicit lazy val eqFrameCodec: Codec[EqFrame]                     = CborHelpers.enumCodec[EqFrame]
-  implicit lazy val solarSystemObjectCodec: Codec[SolarSystemObject] = CborHelpers.enumCodec[SolarSystemObject]
+  implicit lazy val eqFrameCodec: Codec[EqFrame]                     = CodecHelpers.enumCodec[EqFrame]
+  implicit lazy val solarSystemObjectCodec: Codec[SolarSystemObject] = CodecHelpers.enumCodec[SolarSystemObject]
 
   implicit lazy val eqCoordCodec: Codec[EqCoord]                   = deriveCodec[EqCoord]
   implicit lazy val solarSystemCoordCodec: Codec[SolarSystemCoord] = deriveCodec[SolarSystemCoord]
@@ -49,12 +49,12 @@ trait ParamCodecs extends CommonCodecs {
 
   implicit lazy val tsCodec: Codec[Timestamp] = deriveCodec[Timestamp]
 
-  implicit lazy val instantEnc: Encoder[Instant] = CborHelpers.targetSpecificEnc(
+  implicit lazy val instantEnc: Encoder[Instant] = CodecHelpers.targetSpecificEnc(
     cborEnc = tsCodec.encoder.contramap(Timestamp.fromInstant),
     jsonEnc = Encoder.forString.contramap(_.toString)
   )
 
-  implicit lazy val instantDec: Decoder[Instant] = CborHelpers.targetSpecificDec(
+  implicit lazy val instantDec: Decoder[Instant] = CodecHelpers.targetSpecificDec(
     cborDec = tsCodec.decoder.map(_.toInstant),
     jsonDec = Decoder.forString.map(Instant.parse)
   )
@@ -72,8 +72,8 @@ trait ParamCodecs extends CommonCodecs {
 
   // ************************ Enum Codecs ********************
 
-  implicit lazy val unitsCodec: Codec[Units]                   = CborHelpers.enumCodec[Units]
-  implicit lazy val keyTypeCodecExistential: Codec[KeyType[_]] = CborHelpers.enumCodec[KeyType[_]]
+  implicit lazy val unitsCodec: Codec[Units]                   = CodecHelpers.enumCodec[Units]
+  implicit lazy val keyTypeCodecExistential: Codec[KeyType[_]] = CodecHelpers.enumCodec[KeyType[_]]
 
   implicit def keyTypeCodec[T]: Codec[KeyType[T]] = keyTypeCodecExistential.asInstanceOf[Codec[KeyType[T]]]
 
@@ -87,12 +87,12 @@ trait ParamCodecs extends CommonCodecs {
     bimap[Array[T], ArrayS[T]](x => x: ArrayS[T], _.array.asInstanceOf[Array[T]])
 
   //Do not put the bytesEnc and bytesDec inside Codec, due to an issue with borer https://github.com/sirthias/borer/issues/24
-  implicit lazy val bytesEnc: Encoder[Array[Byte]] = CborHelpers.targetSpecificEnc(
+  implicit lazy val bytesEnc: Encoder[Array[Byte]] = CodecHelpers.targetSpecificEnc(
     cborEnc = Encoder.forByteArray,
     jsonEnc = Encoder.forArray[Byte]
   )
 
-  implicit lazy val bytesDec: Decoder[Array[Byte]] = CborHelpers.targetSpecificDec(
+  implicit lazy val bytesDec: Decoder[Array[Byte]] = CodecHelpers.targetSpecificDec(
     cborDec = Decoder.forByteArray,
     jsonDec = Decoder.forArray[Byte]
   )
@@ -203,7 +203,7 @@ trait ParamCodecs extends CommonCodecs {
   implicit lazy val stateVariableCodec: Codec[StateVariable] = deriveCodec[StateVariable]
 
   // ************************ Subsystem Codecs ********************
-  implicit lazy val subSystemCodec: Codec[Subsystem] = CborHelpers.enumCodec[Subsystem]
+  implicit lazy val subSystemCodec: Codec[Subsystem] = CodecHelpers.enumCodec[Subsystem]
 }
 
 case class Timestamp(seconds: Long, nanos: Long) {
