@@ -28,9 +28,9 @@ case class ConfigParseException(reasons: List[String]) extends RuntimeException(
  *
  * @param message represents the message with the key that is not present in the alarm store
  */
-case class KeyNotFoundException private (message: String) extends RuntimeException(message)
+case class KeyNotFoundException (message: String) extends RuntimeException(message)
 
-private[alarm] object KeyNotFoundException {
+private object KeyNotFoundException {
 
   def apply(key: AlarmKey): KeyNotFoundException =
     new KeyNotFoundException(s"Key: [${key.value}] not found in Alarm Store.")
