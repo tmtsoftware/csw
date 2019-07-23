@@ -4,6 +4,7 @@ import csw.alarm.models.AlarmSeverity
 import csw.params.core.formats.CodecHelpers
 import io.bullet.borer.Codec
 
-object AlarmCodecs {
+object AlarmCodecs extends AlarmCodecs
+trait AlarmCodecs {
   implicit val alarmSeverityCodec: Codec[AlarmSeverity] = CodecHelpers.enumCodec[AlarmSeverity]
 }
