@@ -4,13 +4,13 @@ import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.stream.Materializer
-import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.util.{ByteString, Timeout}
 import csw.location.api.scaladsl.LocationService
 import csw.location.models.ComponentType
 import csw.location.models.Connection.HttpConnection
-import csw.params.commands.CommandResponse.{Error, OnewayResponse, SubmitResponse, ValidateResponse}
+import csw.params.commands.CommandResponse.{Error, OnewayResponse, Started, SubmitResponse, ValidateResponse, isNegative}
 import csw.params.commands.{CommandResponse, ControlCommand}
 import csw.params.core.models.Id
 import io.bullet.borer.Json
@@ -97,6 +97,49 @@ case class HttpCommandService(
     handleCommand("submit", controlCommand).map(_.asInstanceOf[SubmitResponse])
 
   /**
+   * Submit a command and Subscribe for the result if it was successfully validated as `Started` to get a
+   * final [[csw.params.commands.CommandResponse.SubmitResponse]] as a Future
+   *
+   * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
+   * @return a CommandResponse as a Future value
+   */
+  def submitAndWait(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] =
+    submit(controlCommand).flatMap {
+      case _: Started => queryFinal(controlCommand.runId)
+      case x          => Future.successful(x)
+    }
+
+  /**
+   * Submit multiple commands and get a List of [[csw.params.commands.CommandResponse.SubmitResponse]] for all commands. The CommandResponse can be a response
+   * of validation (Accepted, Invalid) or a final Response. In case of response as `Accepted`, final CommandResponse can be obtained by using `subscribe` API.
+   *
+   * @param submitCommands the set of [[csw.params.commands.ControlCommand]] payloads
+   * @return a Source of CommandResponse as a stream of CommandResponses for all commands
+   */
+  def submitAllAndWait(
+      submitCommands: List[ControlCommand]
+  )(implicit timeout: Timeout): Future[List[SubmitResponse]] = {
+    // This exception is used to pass the failing command response to the recover to shut down the stream
+    class CommandFailureException(val r: SubmitResponse) extends Exception(r.toString)
+
+    Source(submitCommands)
+      .mapAsync(1)(submitAndWait)
+      .map { response =>
+        if (isNegative(response))
+          throw new CommandFailureException(response)
+        else
+          response
+      }
+      .recover {
+        // If the command fails, then terminate but return the last response giving the problem, others are ignored
+        case ex: CommandFailureException => ex.r
+      }
+      .toMat(Sink.seq)(Keep.right)
+      .run()
+      .map(_.toList)
+  }
+
+  /**
    * Posts a oneway command to the given HTTP connection and returns a OnewayResponse.
    * It is assumed that the HTTP service accepts the command as JSON encoded.
    * Note that the HTTP service must also be registered with the Location Service.
@@ -149,4 +192,5 @@ case class HttpCommandService(
         Error(commandRunId, s"Can't locate connection for ${connection.componentId.name}")
     }
   }
+
 }
