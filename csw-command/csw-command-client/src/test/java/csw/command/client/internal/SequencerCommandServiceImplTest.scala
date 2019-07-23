@@ -21,9 +21,8 @@ class SequencerCommandServiceImplTest
     with MockitoSugar
     with ScalaFutures {
 
-  private val sequence = Sequence(Setup(Prefix("test"), CommandName("command-1"), None))
+  private val sequence         = Sequence(Setup(Prefix("test"), CommandName("command-1"), None))
   private var sequenceResponse = ProcessSequenceResponse(Right(Completed(sequence.runId)))
-
 
   private val mockedBehavior = Behaviors.receiveMessage[SequencerMsg] {
     case ProcessSequence(`sequence`, replyTo) =>

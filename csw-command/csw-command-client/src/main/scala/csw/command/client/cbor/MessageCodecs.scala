@@ -14,18 +14,10 @@ import csw.command.client.messages.ComponentCommonMessage.{
   LifecycleStateSubscription
 }
 import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.command.client.messages.ProcessSequenceError.{DuplicateIdsFound, ExistingSequenceIsInProcess}
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
-import csw.command.client.messages.{
-  GetComponentLogMetadata,
-  LogControlMessages,
-  ProcessSequence,
-  ProcessSequenceError,
-  ProcessSequenceResponse,
-  SetComponentLogLevel
-}
+import csw.command.client.messages._
 import csw.command.client.models.framework.LockingResponse._
 import csw.command.client.models.framework.PubSub.{Publish, PublisherMessage, SubscriberMessage}
 import csw.command.client.models.framework.{PubSub, _}
@@ -116,10 +108,8 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
 
   // ************************ SequencerMsg Codecs ********************
 
-  implicit lazy val processSequenceCodec: Codec[ProcessSequence]          = deriveCodec[ProcessSequence]
-  implicit lazy val duplicateIdsFoundCodec: Codec[DuplicateIdsFound.type] = singletonCodec(DuplicateIdsFound)
-  implicit lazy val existingSequenceIsInProcessCodec: Codec[ExistingSequenceIsInProcess.type] =
-    singletonCodec(ExistingSequenceIsInProcess)
-  implicit lazy val processSequenceErrorCodec: Codec[ProcessSequenceError]       = deriveCodec[ProcessSequenceError]
-  implicit lazy val processSequenceResponseCodec: Codec[ProcessSequenceResponse] = deriveCodec[ProcessSequenceResponse]
+  implicit lazy val processSequenceCodec: Codec[ProcessSequence]           = deriveCodec[ProcessSequence]
+  implicit lazy val processSequenceErrorCodec: Codec[ProcessSequenceError] = enumCodec[ProcessSequenceError]
+  implicit lazy val processSequenceResponseCodec: Codec[ProcessSequenceResponse] =
+    deriveCodecForUnaryCaseClass[ProcessSequenceResponse]
 }
