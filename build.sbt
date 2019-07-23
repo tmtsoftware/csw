@@ -359,6 +359,8 @@ lazy val `csw-command-client` = project
   .dependsOn(
     `csw-command-api`,
     `csw-logging-client`,
+    `csw-location-client` % "test->test",
+    `csw-location-server` % "test->test",
     `csw-commons` % "test->test"
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm, MaybeCoverage)
