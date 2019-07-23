@@ -15,15 +15,11 @@ import csw.command.client.messages.ComponentCommonMessage.{
   LifecycleStateSubscription
 }
 import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.command.client.messages.ProcessSequenceError.DuplicateIdsFound
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
-import csw.command.client.messages.{
-  CommandResponseManagerMessage,
-  ComponentMessage,
-  GetComponentLogMetadata,
-  SetComponentLogLevel
-}
+import csw.command.client.messages._
 import csw.command.client.models.framework.LockingResponse._
 import csw.command.client.models.framework.PubSub.{Subscribe, SubscribeOnly, Unsubscribe}
 import csw.command.client.models.framework.SupervisorLifecycleState._
@@ -248,6 +244,30 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
 
     val bytes = serializer.toBinary(components)
     serializer.fromBinary(bytes, Some(components.getClass)) shouldEqual components
+  }
+
+  test("should use command serializer for (de)serialize ProcessSequence") {
+    val processSequenceProbe = TestProbe[ProcessSequenceResponse]
+
+    val command: SequenceCommand = Setup(Prefix("test"), CommandName("c1"), Some(ObsId("obsId"))).copy(runId = Id())
+    val sequence                 = Sequence(command)
+    val processSequence          = ProcessSequence(sequence, processSequenceProbe.ref)
+
+    val serializer = serialization.findSerializerFor(processSequence)
+    serializer.getClass shouldBe classOf[CommandAkkaSerializer]
+
+    val bytes = serializer.toBinary(processSequence)
+    serializer.fromBinary(bytes, Some(processSequence.getClass)) shouldEqual processSequence
+  }
+
+  test("should use command serializer for (de)serialize ProcessSequenceResponse") {
+    val processSequenceResponse = ProcessSequenceResponse(Left(DuplicateIdsFound))
+
+    val serializer = serialization.findSerializerFor(processSequenceResponse)
+    serializer.getClass shouldBe classOf[CommandAkkaSerializer]
+
+    val bytes = serializer.toBinary(processSequenceResponse)
+    serializer.fromBinary(bytes, Some(processSequenceResponse.getClass)) shouldEqual processSequenceResponse
   }
 
 }
