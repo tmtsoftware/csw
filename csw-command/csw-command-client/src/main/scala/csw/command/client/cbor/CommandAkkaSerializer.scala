@@ -4,7 +4,8 @@ import akka.actor.ExtendedActorSystem
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.serialization.Serializer
-import csw.command.client.messages.{CommandSerializationMarker, ProcessSequence, ProcessSequenceResponse}
+import csw.command.client.messages._
+import csw.command.client.messages.sequencer.{LoadAndStartSequence, SequenceError, SequenceResponse}
 import csw.command.client.models.framework._
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.GenericLoggerFactory
@@ -28,8 +29,9 @@ class CommandAkkaSerializer(_actorSystem: ExtendedActorSystem) extends Serialize
     case x: LifecycleStateChanged                => Cbor.encode(x).toByteArray
     case x: Components                           => Cbor.encode(x).toByteArray
     case x: LockingResponse                      => Cbor.encode(x).toByteArray
-    case x: ProcessSequence                      => Cbor.encode(x).toByteArray
-    case x: ProcessSequenceResponse              => Cbor.encode(x).toByteArray
+    case x: LoadAndStartSequence                 => Cbor.encode(x).toByteArray
+    case x: SequenceError                        => Cbor.encode(x).toByteArray
+    case x: SequenceResponse                     => Cbor.encode(x).toByteArray
     case _ =>
       val ex = new RuntimeException(s"does not support encoding of $o")
       logger.error(ex.getMessage, ex = ex)
@@ -55,10 +57,12 @@ class CommandAkkaSerializer(_actorSystem: ExtendedActorSystem) extends Serialize
       Cbor.decode(bytes).to[Components].value
     } else if (classOf[LockingResponse].isAssignableFrom(manifest.get)) {
       Cbor.decode(bytes).to[LockingResponse].value
-    } else if (classOf[ProcessSequence].isAssignableFrom(manifest.get)) {
-      Cbor.decode(bytes).to[ProcessSequence].value
-    } else if (classOf[ProcessSequenceResponse].isAssignableFrom(manifest.get)) {
-      Cbor.decode(bytes).to[ProcessSequenceResponse].value
+    } else if (classOf[LoadAndStartSequence].isAssignableFrom(manifest.get)) {
+      Cbor.decode(bytes).to[LoadAndStartSequence].value
+    } else if (classOf[SequenceError].isAssignableFrom(manifest.get)) {
+      Cbor.decode(bytes).to[SequenceError].value
+    } else if (classOf[SequenceResponse].isAssignableFrom(manifest.get)) {
+      Cbor.decode(bytes).to[SequenceResponse].value
     } else {
       val ex = new RuntimeException(s"does not support decoding of ${manifest.get}")
       logger.error(ex.getMessage, ex = ex)

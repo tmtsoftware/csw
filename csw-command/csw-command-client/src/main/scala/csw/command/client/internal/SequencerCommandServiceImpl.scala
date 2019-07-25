@@ -6,8 +6,9 @@ import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.command.api.scaladsl.SequencerCommandService
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.client.messages.ProcessSequenceError.{DuplicateIdsFound, ExistingSequenceIsInProcess}
-import csw.command.client.messages.{ProcessSequence, ProcessSequenceResponse}
+import csw.command.client.messages
+import csw.command.client.messages.sequencer.SequenceError.{DuplicateIdsFound, ExistingSequenceIsInProcess}
+import csw.command.client.messages.sequencer.{LoadAndStartSequence, SequenceResponse}
 import csw.location.models.AkkaLocation
 import csw.params.commands.CommandResponse.{Error, SubmitResponse}
 import csw.params.commands.Sequence
@@ -23,11 +24,11 @@ class SequencerCommandServiceImpl(sequencerLocation: AkkaLocation)(
   private implicit val timeout: Timeout     = Timeout(10.hour)
   private implicit val scheduler: Scheduler = system.scheduler
 
-  private val sequencer: ActorRef[ProcessSequence] = sequencerLocation.sequencerRef
+  private val sequencer: ActorRef[LoadAndStartSequence] = sequencerLocation.sequencerRef
 
   override def submit(sequence: Sequence): Future[SubmitResponse] = async {
-    val processResponseF: Future[ProcessSequenceResponse] = sequencer ? (ProcessSequence(sequence, _))
-    await(processResponseF).response match {
+    val sequenceResponseF: Future[SequenceResponse] = sequencer ? (messages.sequencer.LoadAndStartSequence(sequence, _))
+    await(sequenceResponseF).response match {
       case Right(submitResponse) => submitResponse
       case Left(error) =>
         error match {

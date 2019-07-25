@@ -2,8 +2,8 @@ package csw.command.client.internal
 
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.actor.typed.javadsl.Behaviors
-import csw.command.client.messages.ProcessSequenceError.{DuplicateIdsFound, ExistingSequenceIsInProcess}
-import csw.command.client.messages.{ProcessSequence, ProcessSequenceResponse, SequencerMsg}
+import csw.command.client.messages.sequencer.SequenceError.{DuplicateIdsFound, ExistingSequenceIsInProcess}
+import csw.command.client.messages.sequencer.{LoadAndStartSequence, SequenceResponse, SequencerMsg}
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
@@ -22,10 +22,10 @@ class SequencerCommandServiceImplTest
     with ScalaFutures {
 
   private val sequence         = Sequence(Setup(Prefix("test"), CommandName("command-1"), None))
-  private var sequenceResponse = ProcessSequenceResponse(Right(Completed(sequence.runId)))
+  private var sequenceResponse = SequenceResponse(Right(Completed(sequence.runId)))
 
   private val mockedBehavior = Behaviors.receiveMessage[SequencerMsg] {
-    case ProcessSequence(`sequence`, replyTo) =>
+    case LoadAndStartSequence(`sequence`, replyTo) =>
       replyTo ! sequenceResponse
       Behaviors.same
     case _ => Behaviors.same
@@ -42,14 +42,14 @@ class SequencerCommandServiceImplTest
   }
 
   test("should get DuplicateIds error for invalid sequence") {
-    sequenceResponse = ProcessSequenceResponse(Left(DuplicateIdsFound))
+    sequenceResponse = SequenceResponse(Left(DuplicateIdsFound))
     sequencerCommandService.submit(sequence).futureValue should ===(
       Error(sequence.runId, "Duplicate command Ids found in given sequence")
     )
   }
 
   test("should get ExistingSequenceIsInProcess error") {
-    sequenceResponse = ProcessSequenceResponse(Left(ExistingSequenceIsInProcess))
+    sequenceResponse = SequenceResponse(Left(ExistingSequenceIsInProcess))
     sequencerCommandService.submit(sequence).futureValue should ===(
       Error(sequence.runId, "Submit failed, existing sequence is already in progress")
     )
