@@ -31,7 +31,7 @@ object Libs {
   val `lettuce`             = "io.lettuce"              % "lettuce-core"         % "5.1.7.RELEASE"
   val `reactor-core`        = "io.projectreactor"       % "reactor-core"         % "3.2.10.RELEASE"
   val `reactive-streams`    = "org.reactivestreams"     % "reactive-streams"     % "1.0.2"
-  val `akka-stream-kafka`   = "com.typesafe.akka"       %% "akka-stream-kafka"   % "1.0.4"
+  val `akka-stream-kafka`   = "com.typesafe.akka"       %% "akka-stream-kafka"   % "1.0.5"
 //  val `embedded-kafka`      = "io.github.embeddedkafka" %% "embedded-kafka"      % "2.3.0"
   val `embedded-redis`      = "com.github.kstyrc"       % "embedded-redis"       % "0.6"
   val `scala-compiler`      = "org.scala-lang"          % "scala-compiler"       % ScalaVersion
