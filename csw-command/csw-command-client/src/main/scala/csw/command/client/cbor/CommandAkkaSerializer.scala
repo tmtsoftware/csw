@@ -11,7 +11,9 @@ import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.GenericLoggerFactory
 import csw.params.commands.CommandResponse
 import csw.params.core.states.StateVariable
-import io.bullet.borer.Cbor
+import io.bullet.borer.{Cbor, Decoder}
+
+import scala.reflect.ClassTag
 
 class CommandAkkaSerializer(_actorSystem: ExtendedActorSystem) extends Serializer with MessageCodecs {
 
@@ -40,32 +42,29 @@ class CommandAkkaSerializer(_actorSystem: ExtendedActorSystem) extends Serialize
 
   override def includeManifest: Boolean = true
 
-  override def fromBinary(bytes: Array[Byte], manifest: Option[Class[_]]): AnyRef =
-    if (classOf[CommandResponse.RemoteMsg].isAssignableFrom(manifest.get)) {
-      Cbor.decode(bytes).to[CommandResponse.RemoteMsg].value
-    } else if (classOf[StateVariable].isAssignableFrom(manifest.get)) {
-      Cbor.decode(bytes).to[StateVariable].value
-    } else if (classOf[CommandSerializationMarker.RemoteMsg].isAssignableFrom(manifest.get)) {
-      Cbor.decode(bytes).to[CommandSerializationMarker.RemoteMsg].value
-    } else if (classOf[SupervisorLifecycleState].isAssignableFrom(manifest.get)) {
-      Cbor.decode(bytes).to[SupervisorLifecycleState].value
-    } else if (classOf[ContainerLifecycleState].isAssignableFrom(manifest.get)) {
-      Cbor.decode(bytes).to[ContainerLifecycleState].value
-    } else if (classOf[LifecycleStateChanged].isAssignableFrom(manifest.get)) {
-      Cbor.decode(bytes).to[LifecycleStateChanged].value
-    } else if (classOf[Components].isAssignableFrom(manifest.get)) {
-      Cbor.decode(bytes).to[Components].value
-    } else if (classOf[LockingResponse].isAssignableFrom(manifest.get)) {
-      Cbor.decode(bytes).to[LockingResponse].value
-    } else if (classOf[LoadAndStartSequence].isAssignableFrom(manifest.get)) {
-      Cbor.decode(bytes).to[LoadAndStartSequence].value
-    } else if (classOf[SequenceError].isAssignableFrom(manifest.get)) {
-      Cbor.decode(bytes).to[SequenceError].value
-    } else if (classOf[SequenceResponse].isAssignableFrom(manifest.get)) {
-      Cbor.decode(bytes).to[SequenceResponse].value
-    } else {
+  override def fromBinary(bytes: Array[Byte], manifest: Option[Class[_]]): AnyRef = {
+    def fromBinary[T: ClassTag: Decoder]: Option[T] = {
+      val clazz = scala.reflect.classTag[T].runtimeClass
+      if (clazz.isAssignableFrom(manifest.get)) Some(Cbor.decode(bytes).to[T].value)
+      else None
+    }
+
+    {
+      fromBinary[CommandResponse.RemoteMsg] orElse
+      fromBinary[StateVariable] orElse
+      fromBinary[CommandSerializationMarker.RemoteMsg] orElse
+      fromBinary[SupervisorLifecycleState] orElse
+      fromBinary[ContainerLifecycleState] orElse
+      fromBinary[LifecycleStateChanged] orElse
+      fromBinary[Components] orElse
+      fromBinary[LockingResponse] orElse
+      fromBinary[LoadAndStartSequence] orElse
+      fromBinary[SequenceError] orElse
+      fromBinary[SequenceResponse]
+    }.getOrElse {
       val ex = new RuntimeException(s"does not support decoding of ${manifest.get}")
       logger.error(ex.getMessage, ex = ex)
       throw ex
     }
+  }
 }

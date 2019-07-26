@@ -18,7 +18,6 @@ import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.messages._
-import csw.command.client.messages.sequencer.SequenceError.{DuplicateIdsFound, ExistingSequenceIsInProcess}
 import csw.command.client.messages.sequencer.{LoadAndStartSequence, SequenceError, SequenceResponse}
 import csw.command.client.models.framework.LockingResponse._
 import csw.command.client.models.framework.PubSub.{Publish, PublisherMessage, SubscriberMessage}
@@ -110,10 +109,7 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
 
   // ************************ SequencerMsg Codecs ********************
 
-  implicit lazy val loadAndStartSequenceCodec: Codec[LoadAndStartSequence]     = deriveCodec[LoadAndStartSequence]
-  implicit lazy val duplicateIdsFoundErrorCodec: Codec[DuplicateIdsFound.type] = singletonCodec(DuplicateIdsFound)
-  implicit lazy val existingSequenceIsInProcessCodec: Codec[ExistingSequenceIsInProcess.type] =
-    singletonCodec(ExistingSequenceIsInProcess)
-  implicit lazy val sequenceErrorCodec: Codec[SequenceError]       = deriveCodec[SequenceError]
-  implicit lazy val sequenceResponseCodec: Codec[SequenceResponse] = deriveCodec[SequenceResponse]
+  implicit lazy val loadAndStartSequenceCodec: Codec[LoadAndStartSequence] = deriveCodec[LoadAndStartSequence]
+  implicit lazy val sequenceErrorCodec: Codec[SequenceError]               = enumCodec[SequenceError]
+  implicit lazy val sequenceResponseCodec: Codec[SequenceResponse]         = deriveCodec[SequenceResponse]
 }
