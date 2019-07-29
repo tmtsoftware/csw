@@ -31,7 +31,7 @@ object Libs {
   val `lettuce`             = "io.lettuce"              % "lettuce-core"         % "5.1.7.RELEASE"
   val `reactor-core`        = "io.projectreactor"       % "reactor-core"         % "3.2.10.RELEASE"
   val `reactive-streams`    = "org.reactivestreams"     % "reactive-streams"     % "1.0.2"
-  val `akka-stream-kafka`   = "com.typesafe.akka"       %% "akka-stream-kafka"   % "1.0.4"
+  val `akka-stream-kafka`   = "com.typesafe.akka"       %% "akka-stream-kafka"   % "1.0.5"
 //  val `embedded-kafka`      = "io.github.embeddedkafka" %% "embedded-kafka"      % "2.3.0"
   val `embedded-redis`      = "com.github.kstyrc"       % "embedded-redis"       % "0.6"
   val `scala-compiler`      = "org.scala-lang"          % "scala-compiler"       % ScalaVersion
@@ -43,7 +43,7 @@ object Libs {
   val `json-schema-validator`    = "com.github.fge" % "json-schema-validator" % "2.2.8" //LGPL/ASL
   val `play-json-derived-codecs` = dep("org.julienrf" %%% "play-json-derived-codecs" % "6.0.0")
 
-  val `jna`             = "net.java.dev.jna"              % "jna"             % "5.3.1"
+  val `jna`             = "net.java.dev.jna"              % "jna"             % "5.4.0"
   val `postgresql`      = "org.postgresql"                % "postgresql"      % "42.2.6"
   val `hikaricp`        = "com.zaxxer"                    % "HikariCP"        % "3.3.1" //Apache License 2.0
   val `otj-pg-embedded` = "com.opentable.components"      % "otj-pg-embedded" % "0.13.1"
@@ -96,7 +96,7 @@ object Akka {
 }
 
 object AkkaHttp {
-  val Version             = "10.1.8"
+  val Version             = "10.1.9"
   val `akka-http`         = "com.typesafe.akka" %% "akka-http" % Version //ApacheV2
   val `akka-http-testkit` = "com.typesafe.akka" %% "akka-http-testkit" % Version //ApacheV2
   val `akka-http-cors`    = "ch.megard" %% "akka-http-cors" % "0.4.1"
