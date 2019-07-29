@@ -55,7 +55,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
         else config.settings.config
 
       val newSystem      = makeSystem(newConfig)
-      val newTypedSystem = newSystem.toTyped.asInstanceOf[ActorSystem[SpawnProtocol]]
+      val newTypedSystem = newSystem.toTyped.asInstanceOf[ActorSystem[SpawnProtocol.Command]]
 
       val freshLocationService = mode match {
         case "http" =>

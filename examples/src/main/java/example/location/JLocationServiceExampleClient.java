@@ -330,7 +330,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         Await.result(locationWiring.locationHttpService().start(), new FiniteDuration(5, TimeUnit.SECONDS));
 
         //#create-actor-system
-        ActorSystem<SpawnProtocol> typedSystem = ActorSystemFactory.remote(SpawnProtocol.behavior(), "csw-examples-locationServiceClient");
+        ActorSystem<SpawnProtocol.Command> typedSystem = ActorSystemFactory.remote(SpawnProtocol.create(), "csw-examples-locationServiceClient");
         //#create-actor-system
 
         //#create-logging-system

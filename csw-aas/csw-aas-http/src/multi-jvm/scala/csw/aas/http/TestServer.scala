@@ -27,7 +27,7 @@ class TestServer(locationService: LocationService)(implicit ec: ExecutionContext
 
   def start(testServerPort: Int): Future[Http.ServerBinding] = {
 
-    implicit val system: typed.ActorSystem[SpawnProtocol] = ActorSystem(SpawnProtocol.behavior, "test")
+    implicit val system: typed.ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "test")
     implicit val untypedSystem: actor.ActorSystem         = system.toUntyped
     LoggingSystemFactory.start("test-server", "", "", system)
     implicit val materializer: ActorMaterializer = scaladsl.ActorMaterializer()

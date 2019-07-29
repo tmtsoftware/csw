@@ -16,10 +16,10 @@ import static csw.params.javadsl.JSubsystem.NFIRAOS;
 
 public class JAlarmServiceClientExampleApp {
 
-    private ActorSystem<SpawnProtocol> actorSystem;
+    private ActorSystem<SpawnProtocol.Command> actorSystem;
     private ILocationService jLocationService;
 
-    public JAlarmServiceClientExampleApp(akka.actor.typed.ActorSystem<SpawnProtocol> actorSystem, ILocationService locationService) throws ExecutionException, InterruptedException {
+    public JAlarmServiceClientExampleApp(akka.actor.typed.ActorSystem<SpawnProtocol.Command> actorSystem, ILocationService locationService) throws ExecutionException, InterruptedException {
         this.actorSystem = actorSystem;
         this.jLocationService = locationService;
 

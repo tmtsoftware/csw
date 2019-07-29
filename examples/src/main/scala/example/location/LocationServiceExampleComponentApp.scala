@@ -26,9 +26,9 @@ import scala.concurrent.{Await, Future}
  * An example that shows how to register a component actor with the location service.
  */
 object LocationServiceExampleComponentApp extends App {
-  implicit val system: typed.ActorSystem[SpawnProtocol] = ActorSystemFactory.remote(SpawnProtocol.behavior, "example-system")
-  implicit val mat: ActorMaterializer                   = scaladsl.ActorMaterializer()
-  private val locationService                           = HttpLocationServiceFactory.makeLocalClient
+  implicit val system: typed.ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "example-system")
+  implicit val mat: ActorMaterializer                           = scaladsl.ActorMaterializer()
+  private val locationService                                   = HttpLocationServiceFactory.makeLocalClient
 
   //#create-logging-system
   private val host = InetAddress.getLocalHost.getHostName

@@ -49,7 +49,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
   private val motionControllerConnection = AkkaConnection(models.ComponentId("Motion_Controller", HCD))
   private val galilConnection            = AkkaConnection(models.ComponentId("Galil", Assembly))
 
-  private var containerActorSystem: ActorSystem[SpawnProtocol] = _
+  private var containerActorSystem: ActorSystem[SpawnProtocol.Command] = _
 
   private var laserComponent: Component = _
   private var galilComponent: Component = _
@@ -70,7 +70,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
     // this will start seed on port 3652 and log admin server on 7879
     adminWiring.locationService
 
-    containerActorSystem = ActorSystemFactory.remote(SpawnProtocol.behavior, "container-system")
+    containerActorSystem = ActorSystemFactory.remote(SpawnProtocol(), "container-system")
 
     // this will start container on random port and join seed and form a cluster
     val containerRef = startContainerAndWaitForRunning()

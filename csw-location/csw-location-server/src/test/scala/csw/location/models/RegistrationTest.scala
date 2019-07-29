@@ -67,10 +67,10 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
         akka.actor.provider = local
       """)
 
-    implicit val actorSystem: ActorSystem[SpawnProtocol] = ActorSystem(SpawnProtocol.behavior, "local-actor-system", config)
-    val actorRefURI                                      = actorSystem.spawn(Behaviors.empty, "my-actor-2").toURI
-    val akkaConnection                                   = AkkaConnection(models.ComponentId("hcd1", ComponentType.HCD))
-    val prefix                                           = Prefix("nfiraos.ncc.trombone")
+    implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "local-actor-system", config)
+    val actorRefURI                                              = actorSystem.spawn(Behaviors.empty, "my-actor-2").toURI
+    val akkaConnection                                           = AkkaConnection(models.ComponentId("hcd1", ComponentType.HCD))
+    val prefix                                                   = Prefix("nfiraos.ncc.trombone")
 
     intercept[LocalAkkaActorRegistrationNotAllowed] {
       AkkaRegistrationFactory.make(akkaConnection, prefix, actorRefURI)

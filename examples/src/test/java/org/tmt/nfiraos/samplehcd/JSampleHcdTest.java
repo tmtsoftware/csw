@@ -108,7 +108,7 @@ public class JSampleHcdTest extends JUnitSuite {
     //#subscribe
 
     //#submitAndWait
-    private ActorSystem<SpawnProtocol> typedActorSystem = testKit.actorSystem();
+    private ActorSystem<SpawnProtocol.Command> typedActorSystem = testKit.actorSystem();
 
     // DEOPSCSW-39: examples of Location Service
     @Test

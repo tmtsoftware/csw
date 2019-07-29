@@ -10,16 +10,16 @@ import csw.location.server.http.{LocationExceptionHandler, LocationHttpService, 
 
 // $COVERAGE-OFF$
 private[csw] class ServerWiring {
-  lazy val config: Config                          = ConfigFactory.load()
-  lazy val settings                                = new Settings(config)
-  lazy val clusterSettings: ClusterSettings        = ClusterAwareSettings.onPort(settings.clusterPort)
-  lazy val actorSystem: ActorSystem[SpawnProtocol] = clusterSettings.system
-  lazy val untypedActorSystem: actor.ActorSystem   = clusterSettings.system.toUntyped
-  lazy val actorRuntime                            = new ActorRuntime(actorSystem)
-  lazy val locationService: LocationService        = LocationServiceFactory.withSystem(actorSystem)
-  lazy val locationExceptionHandler                = new LocationExceptionHandler
-  lazy val locationRoutes                          = new LocationRoutes(locationService, locationExceptionHandler, actorRuntime)
-  lazy val locationHttpService                     = new LocationHttpService(locationRoutes, actorRuntime, settings)
+  lazy val config: Config                                  = ConfigFactory.load()
+  lazy val settings                                        = new Settings(config)
+  lazy val clusterSettings: ClusterSettings                = ClusterAwareSettings.onPort(settings.clusterPort)
+  lazy val actorSystem: ActorSystem[SpawnProtocol.Command] = clusterSettings.system
+  lazy val untypedActorSystem: actor.ActorSystem           = clusterSettings.system.toUntyped
+  lazy val actorRuntime                                    = new ActorRuntime(actorSystem)
+  lazy val locationService: LocationService                = LocationServiceFactory.withSystem(actorSystem)
+  lazy val locationExceptionHandler                        = new LocationExceptionHandler
+  lazy val locationRoutes                                  = new LocationRoutes(locationService, locationExceptionHandler, actorRuntime)
+  lazy val locationHttpService                             = new LocationHttpService(locationRoutes, actorRuntime, settings)
 }
 
 private[csw] object ServerWiring {
@@ -46,9 +46,9 @@ private[csw] object ServerWiring {
       override lazy val clusterSettings: ClusterSettings = _clusterSettings
     }
 
-  def make(_actorSystem: ActorSystem[SpawnProtocol]): ServerWiring =
+  def make(_actorSystem: ActorSystem[SpawnProtocol.Command]): ServerWiring =
     new ServerWiring {
-      override lazy val actorSystem: ActorSystem[SpawnProtocol] = _actorSystem
+      override lazy val actorSystem: ActorSystem[SpawnProtocol.Command] = _actorSystem
     }
 }
 // $COVERAGE-ON$

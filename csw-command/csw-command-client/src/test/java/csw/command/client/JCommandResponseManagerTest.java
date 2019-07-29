@@ -12,7 +12,7 @@ import org.scalatestplus.junit.JUnitSuite;
 import java.util.concurrent.TimeUnit;
 
 public class JCommandResponseManagerTest extends JUnitSuite {
-    private ActorSystem<SpawnProtocol> actorSystem = ActorSystem.apply(SpawnProtocol.behavior(), "java-test-command-response-manager");
+    private ActorSystem<SpawnProtocol.Command> actorSystem = ActorSystem.apply(SpawnProtocol.create(), "java-test-command-response-manager");
     private Timeout timeOut = Timeout.apply(10, TimeUnit.SECONDS);
 
     @Test

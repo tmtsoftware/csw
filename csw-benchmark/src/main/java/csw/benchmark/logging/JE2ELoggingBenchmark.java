@@ -36,13 +36,13 @@ import java.util.concurrent.TimeUnit;
 @Fork(value = 1)
 public class JE2ELoggingBenchmark extends JUnitSuite {
     private ILogger log;
-    private static ActorSystem<SpawnProtocol> actorSystem;
+    private static ActorSystem<SpawnProtocol.Command> actorSystem;
     private JPerson person;
 
     @Setup
     public void setup() {
         log = JGenericLoggerFactory.getLogger(getClass());
-        actorSystem = akka.actor.typed.ActorSystem.create(SpawnProtocol.behavior(), "JE2E");
+        actorSystem = akka.actor.typed.ActorSystem.create(SpawnProtocol.create(), "JE2E");
         LoggingSystem loggingSystem = JLoggingSystemFactory.start("JE2E-Bench", "SNAPSHOT-1.0", "localhost", actorSystem, List.of(JLogAppenderBuilders.FileAppender()));
         loggingSystem.setDefaultLogLevel(Level.INFO$.MODULE$);
         person = JPerson.createDummy();

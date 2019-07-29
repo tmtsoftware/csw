@@ -42,7 +42,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
     private static JMockedAuthentication mocks = new JMockedAuthentication();
     private static ConfigTestKit configTestKit = testKit.frameworkTestKit().configTestKit();
     private static ServerWiring configWiring = configTestKit.configWiring();
-    private static ActorSystem<SpawnProtocol> actorSystem = configWiring.actorSystem();
+    private static ActorSystem<SpawnProtocol.Command> actorSystem = configWiring.actorSystem();
     private static Materializer mat = configWiring.actorRuntime().mat();
 
     private static ILocationService clientLocationService = testKit.jLocationService();

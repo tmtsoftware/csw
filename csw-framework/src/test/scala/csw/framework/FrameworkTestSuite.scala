@@ -19,10 +19,10 @@ import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
 private[csw] abstract class FrameworkTestSuite extends FunSuite with Matchers with BeforeAndAfterAll {
-  implicit val typedSystem: ActorSystem[SpawnProtocol] = ActorSystemFactory.remote(SpawnProtocol.behavior, "testHcd")
-  implicit val settings: TestKitSettings               = TestKitSettings(typedSystem)
-  implicit val timeout: Timeout                        = Timeout(5.seconds)
-  def frameworkTestMocks(): FrameworkTestMocks         = new FrameworkTestMocks
+  implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "testHcd")
+  implicit val settings: TestKitSettings                       = TestKitSettings(typedSystem)
+  implicit val timeout: Timeout                                = Timeout(5.seconds)
+  def frameworkTestMocks(): FrameworkTestMocks                 = new FrameworkTestMocks
 
   override protected def afterAll(): Unit = {
     typedSystem.terminate()

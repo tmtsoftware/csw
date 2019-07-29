@@ -37,7 +37,7 @@ class CancellableCommandTest(ignore: Int)
     with MockitoSugar {
   import config._
 
-  implicit val actorSystem: ActorSystem[SpawnProtocol] = system.toTyped.asInstanceOf[ActorSystem[SpawnProtocol]]
+  implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = system.toTyped.asInstanceOf[ActorSystem[SpawnProtocol.Command]]
   implicit val mat: Materializer                       = ActorMaterializer()
   implicit val ec: ExecutionContext                    = actorSystem.executionContext
   implicit val timeout: Timeout                        = 5.seconds

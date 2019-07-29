@@ -13,7 +13,7 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 class AdminWiring {
   lazy val config: Config                                = ConfigFactory.load()
   lazy val settings                                      = new Settings(config)
-  lazy val actorSystem: typed.ActorSystem[SpawnProtocol] = ActorSystemFactory.remote(SpawnProtocol.behavior, "admin-server")
+  lazy val actorSystem: typed.ActorSystem[SpawnProtocol] = ActorSystemFactory.remote(SpawnProtocol(), "admin-server")
   lazy val actorRuntime                                  = new ActorRuntime(actorSystem)
 
   lazy val locationService: LocationService   = HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)

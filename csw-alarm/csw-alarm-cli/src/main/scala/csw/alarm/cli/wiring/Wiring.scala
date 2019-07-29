@@ -8,8 +8,8 @@ import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 
 private[alarm] class Wiring {
-  lazy val typedSystem: ActorSystem[SpawnProtocol] = ActorSystem(SpawnProtocol.behavior, "alarm-cli")
-  lazy val actorRuntime                            = new ActorRuntime(typedSystem)
+  lazy val typedSystem: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "alarm-cli")
+  lazy val actorRuntime                                    = new ActorRuntime(typedSystem)
   import actorRuntime._
 
   lazy val locationService: LocationService         = HttpLocationServiceFactory.makeLocalClient(typedSystem, mat)

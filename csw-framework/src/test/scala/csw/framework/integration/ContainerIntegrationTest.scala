@@ -41,8 +41,8 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
   private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
   private val instrumentHcdConnection  = AkkaConnection(models.ComponentId("Instrument_Filter", HCD))
   private val disperserHcdConnection   = AkkaConnection(models.ComponentId("Disperser", HCD))
-  private val containerActorSystem: ActorSystem[SpawnProtocol] =
-    ActorSystemFactory.remote(SpawnProtocol.behavior, "container-system")
+  private val containerActorSystem: ActorSystem[SpawnProtocol.Command] =
+    ActorSystemFactory.remote(SpawnProtocol(), "container-system")
 
   override def afterAll(): Unit = {
     containerActorSystem.terminate()

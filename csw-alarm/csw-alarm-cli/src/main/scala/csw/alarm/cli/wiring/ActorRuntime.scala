@@ -14,11 +14,11 @@ import csw.network.utils.Networks
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
-class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol]) {
-  implicit lazy val typedSystem: ActorSystem[SpawnProtocol] = _typedSystem
-  implicit lazy val untypedSystem: actor.ActorSystem        = _typedSystem.toUntyped
-  implicit lazy val ec: ExecutionContextExecutor            = untypedSystem.dispatcher
-  implicit lazy val mat: Materializer                       = ActorMaterializer()(typedSystem)
+class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol.Command]) {
+  implicit lazy val typedSystem: ActorSystem[SpawnProtocol.Command] = _typedSystem
+  implicit lazy val untypedSystem: actor.ActorSystem                = _typedSystem.toUntyped
+  implicit lazy val ec: ExecutionContextExecutor                    = untypedSystem.dispatcher
+  implicit lazy val mat: Materializer                               = ActorMaterializer()(typedSystem)
 
   lazy val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(untypedSystem)
 

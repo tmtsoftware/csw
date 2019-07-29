@@ -36,7 +36,7 @@ public class JDatabaseServiceFactoryTest extends JUnitSuite {
 
     private static Integer port = 5432;
     private static JHTTPLocationService jHttpLocationService;
-    private static akka.actor.typed.ActorSystem<SpawnProtocol> typedSystem;
+    private static akka.actor.typed.ActorSystem<SpawnProtocol.Command> typedSystem;
     private static EmbeddedPostgres postgres;
     private static DatabaseServiceFactory dbFactory;
     private static ILocationService locationService;
@@ -46,7 +46,7 @@ public class JDatabaseServiceFactoryTest extends JUnitSuite {
 
     @BeforeClass
     public static void setup() throws ExecutionException, InterruptedException, TimeoutException {
-        typedSystem = akka.actor.typed.ActorSystem.apply(SpawnProtocol.behavior(), "test");
+        typedSystem = akka.actor.typed.ActorSystem.apply(SpawnProtocol.create(), "test");
 //        untypedSystem = Adapter.toUntyped(typedSystem);
         Materializer mat = ActorMaterializerFactory.create(typedSystem);
 

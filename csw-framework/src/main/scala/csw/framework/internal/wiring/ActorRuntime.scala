@@ -18,8 +18,8 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 /**
  * A convenient class wrapping actor system and providing handles for execution context, materializer and clean up of actor system
  */
-class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol]) {
-  implicit val typedSystem: ActorSystem[SpawnProtocol] = _typedSystem
+class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol.Command]) {
+  implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = _typedSystem
   implicit val untypedSystem: actor.ActorSystem        = _typedSystem.toUntyped
   implicit val ec: ExecutionContextExecutor            = typedSystem.executionContext
   implicit val mat: Materializer                       = ActorMaterializer()

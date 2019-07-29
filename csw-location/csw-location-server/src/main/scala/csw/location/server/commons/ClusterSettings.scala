@@ -129,7 +129,7 @@ private[location] case class ClusterSettings(clusterName: String = Constants.Clu
 
   }
 
-  def system: ActorSystem[SpawnProtocol] = ActorSystem(SpawnProtocol.behavior, clusterName, config)
+  def system: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), clusterName, config)
 }
 
 /**

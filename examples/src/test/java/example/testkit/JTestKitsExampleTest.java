@@ -39,7 +39,7 @@ public class JTestKitsExampleTest extends JUnitSuite {
     }
     //#framework-testkit
 
-    private ActorSystem<SpawnProtocol> system = frameworkTestKit.actorSystem();
+    private ActorSystem<SpawnProtocol.Command> system = frameworkTestKit.actorSystem();
     private ILocationService locationService =
             JHttpLocationServiceFactory.makeLocalClient(system, ActorMaterializerFactory.create(system));
 

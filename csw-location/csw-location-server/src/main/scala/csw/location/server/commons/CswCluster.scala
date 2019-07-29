@@ -29,7 +29,7 @@ import scala.util.control.NonFatal
  *
  * @note it is highly recommended that explicit creation of CswCluster should be for advanced usages or testing purposes only
  */
-class CswCluster private (_typedSystem: ActorSystem[SpawnProtocol]) {
+class CswCluster private (_typedSystem: ActorSystem[SpawnProtocol.Command]) {
 
   private val log: Logger = LocationServiceLogger.getLogger
 
@@ -38,14 +38,14 @@ class CswCluster private (_typedSystem: ActorSystem[SpawnProtocol]) {
    */
   val hostname: String = _typedSystem.settings.config.getString("akka.remote.artery.canonical.hostname")
 
-  implicit val typedSystem: ActorSystem[SpawnProtocol] = _typedSystem
-  implicit val untypedSystem: actor.ActorSystem        = _typedSystem.toUntyped
-  implicit val scheduler: Scheduler                    = typedSystem.scheduler
-  implicit val ec: ExecutionContext                    = typedSystem.executionContext
-  implicit val mat: ActorMaterializer                  = makeMat()
-  implicit val cluster: Cluster                        = Cluster(typedSystem)
-  private val distributedData: DistributedData         = scaladsl.DistributedData(typedSystem)
-  implicit val node: SelfUniqueAddress                 = distributedData.selfUniqueAddress
+  implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = _typedSystem
+  implicit val untypedSystem: actor.ActorSystem                = _typedSystem.toUntyped
+  implicit val scheduler: Scheduler                            = typedSystem.scheduler
+  implicit val ec: ExecutionContext                            = typedSystem.executionContext
+  implicit val mat: ActorMaterializer                          = makeMat()
+  implicit val cluster: Cluster                                = Cluster(typedSystem)
+  private val distributedData: DistributedData                 = scaladsl.DistributedData(typedSystem)
+  implicit val node: SelfUniqueAddress                         = distributedData.selfUniqueAddress
 
   /**
    * Gives the replicator for the current ActorSystem
@@ -135,7 +135,7 @@ object CswCluster {
    *
    * @return an instance of CswCluster
    */
-  def withSystem(actorSystem: ActorSystem[SpawnProtocol]): CswCluster = {
+  def withSystem(actorSystem: ActorSystem[SpawnProtocol.Command]): CswCluster = {
     val cswCluster = new CswCluster(actorSystem)
     try {
       cswCluster.startClusterManagement()

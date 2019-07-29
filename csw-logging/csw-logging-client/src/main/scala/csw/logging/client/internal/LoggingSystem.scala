@@ -34,7 +34,7 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
  * @param host host name (to log).
  * @param system an ActorSystem used to create log actors
  */
-class LoggingSystem private[csw] (name: String, version: String, host: String, val system: ActorSystem[SpawnProtocol]) {
+class LoggingSystem private[csw] (name: String, version: String, host: String, val system: ActorSystem[SpawnProtocol.Command]) {
 
   private val log: Logger = GenericLoggerFactory.getLogger
 

@@ -44,9 +44,9 @@ import scala.concurrent.duration.DurationDouble
 
 class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
-  private final implicit val system: ActorSystem[SpawnProtocol] = typed.ActorSystem(SpawnProtocol.behavior, "example")
-  private final val serialization                               = SerializationExtension(system.toUntyped)
-  private final val prefix                                      = Prefix("wfos.prog.cloudcover")
+  private final implicit val system: ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "example")
+  private final val serialization                                       = SerializationExtension(system.toUntyped)
+  private final val prefix                                              = Prefix("wfos.prog.cloudcover")
 
   override protected def afterAll(): Unit = {
     system.terminate()

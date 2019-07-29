@@ -72,7 +72,7 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec
     }
 
     runOn(member1) {
-      val system   = ActorSystemFactory.remote(SpawnProtocol.behavior, "test")
+      val system   = ActorSystemFactory.remote(SpawnProtocol(), "test")
       val actorRef = system.spawn(Behaviors.empty, "trombone-hcd-1")
 
       locationService

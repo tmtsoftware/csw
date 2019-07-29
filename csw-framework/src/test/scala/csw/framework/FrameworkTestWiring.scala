@@ -15,9 +15,9 @@ import redis.embedded.{RedisSentinel, RedisServer}
 
 class FrameworkTestWiring(val seedPort: Int = SocketUtils.getFreePort) extends EmbeddedRedis {
 
-  implicit val seedActorSystem: ActorSystem[SpawnProtocol] = ActorSystemFactory.remote(SpawnProtocol.behavior, "seed-system")
-  implicit val mat: Materializer                           = ActorMaterializer()
-  val seedLocationService: LocationService                 = HttpLocationServiceFactory.makeLocalClient
+  implicit val seedActorSystem: ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "seed-system")
+  implicit val mat: Materializer                                   = ActorMaterializer()
+  val seedLocationService: LocationService                         = HttpLocationServiceFactory.makeLocalClient
 
   def startSentinelAndRegisterService(
       connection: TcpConnection,

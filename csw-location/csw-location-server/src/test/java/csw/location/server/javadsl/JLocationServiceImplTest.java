@@ -51,7 +51,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
     private static ServerWiring wiring;
 
     private static akka.actor.ActorSystem untypedSystem;
-    private static ActorSystem<SpawnProtocol> typedSystem;
+    private static ActorSystem<SpawnProtocol.Command> typedSystem;
     private static Materializer mat;
     private static ILocationService locationService;
 
@@ -72,7 +72,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
     @BeforeClass
     public static void setup() throws Exception {
         wiring = new ServerWiring();
-        typedSystem = ActorSystemFactory.remote(SpawnProtocol.behavior(), "test");
+        typedSystem = ActorSystemFactory.remote(SpawnProtocol.create(), "test");
         untypedSystem = Adapter.toUntyped(typedSystem);
         mat = ActorMaterializerFactory.create(typedSystem);
         TestProbe<Object> actorTestProbe = TestProbe.create("test-actor", typedSystem);

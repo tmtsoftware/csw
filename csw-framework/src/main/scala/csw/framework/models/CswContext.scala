@@ -57,7 +57,7 @@ object CswContext {
       componentInfo: ComponentInfo
   )(implicit richSystem: CswFrameworkSystem): Future[CswContext] = {
 
-    implicit val typedSystem: typed.ActorSystem[SpawnProtocol] = richSystem.system
+    implicit val typedSystem: typed.ActorSystem[SpawnProtocol.Command] = richSystem.system
     implicit val scheduler: Scheduler                          = richSystem.scheduler
     implicit val ec: ExecutionContextExecutor                  = typedSystem.executionContext
 

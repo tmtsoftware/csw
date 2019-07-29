@@ -45,18 +45,18 @@ class LocationServiceCompTest(mode: String)
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
-  implicit var untypedSystem: ActorSystem                    = _
-  implicit var typedSystem: typed.ActorSystem[SpawnProtocol] = _
-  implicit var ec: ExecutionContext                          = _
-  implicit var mat: Materializer                             = _
-  var clusterSystem: typed.ActorSystem[SpawnProtocol]        = _
-  private var locationService: LocationService               = _
+  implicit var untypedSystem: ActorSystem                            = _
+  implicit var typedSystem: typed.ActorSystem[SpawnProtocol.Command] = _
+  implicit var ec: ExecutionContext                                  = _
+  implicit var mat: Materializer                                     = _
+  var clusterSystem: typed.ActorSystem[SpawnProtocol.Command]        = _
+  private var locationService: LocationService                       = _
 
   private val prefix                    = Prefix("nfiraos.ncc.trombone")
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 100.millis)
 
   override protected def beforeAll(): Unit = {
-    typedSystem = ActorSystemFactory.remote(SpawnProtocol.behavior, "test")
+    typedSystem = ActorSystemFactory.remote(SpawnProtocol(), "test")
     untypedSystem = typedSystem.toUntyped
     ec = untypedSystem.dispatcher
     mat = ActorMaterializer()(typedSystem)
