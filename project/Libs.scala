@@ -4,7 +4,7 @@ import sbt._
 
 object Libs {
   val ScalaVersion    = "2.13.0"
-  val silencerVersion = "1.4.1"
+  val silencerVersion = "1.4.2"
 
   val `scalatest` = dep("org.scalatest" %%% "scalatest" % "3.0.8") //Apache License 2.0
 
