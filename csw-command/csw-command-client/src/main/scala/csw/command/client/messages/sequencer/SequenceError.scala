@@ -1,14 +1,11 @@
 package csw.command.client.messages.sequencer
 
 import csw.serializable.CommandSerializable
-import enumeratum.{Enum, EnumEntry}
 
-import scala.collection.immutable
+sealed trait SequenceError extends CommandSerializable
 
-sealed trait SequenceError extends CommandSerializable with EnumEntry
-
-object SequenceError extends Enum[SequenceError] {
-  override def values: immutable.IndexedSeq[SequenceError] = findValues
+object SequenceError {
   case object DuplicateIdsFound           extends SequenceError
   case object ExistingSequenceIsInProcess extends SequenceError
+  case class GenericError(error: String)  extends SequenceError
 }

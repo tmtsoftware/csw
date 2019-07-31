@@ -7,7 +7,7 @@ import akka.util.Timeout
 import csw.command.api.scaladsl.SequencerCommandService
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages
-import csw.command.client.messages.sequencer.SequenceError.{DuplicateIdsFound, ExistingSequenceIsInProcess}
+import csw.command.client.messages.sequencer.SequenceError.{DuplicateIdsFound, ExistingSequenceIsInProcess, GenericError}
 import csw.command.client.messages.sequencer.{LoadAndStartSequence, SequenceResponse}
 import csw.location.models.AkkaLocation
 import csw.params.commands.CommandResponse.{Error, SubmitResponse}
@@ -34,6 +34,7 @@ class SequencerCommandServiceImpl(sequencerLocation: AkkaLocation)(
         error match {
           case DuplicateIdsFound           => Error(sequence.runId, "Duplicate command Ids found in given sequence")
           case ExistingSequenceIsInProcess => Error(sequence.runId, "Submit failed, existing sequence is already in progress")
+          case GenericError(error)         => Error(sequence.runId, error.toString)
         }
     }
   }
