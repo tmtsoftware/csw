@@ -1,15 +1,15 @@
 package csw.event.client.perf.event_service
 
 import akka.Done
+import akka.actor.testkit.typed.scaladsl
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.remote.testconductor.RoleName
 import akka.remote.testkit.MultiNodeConfig
-import akka.actor.testkit.typed.scaladsl
 import com.typesafe.config.ConfigFactory
-import csw.params.core.models.Prefix
 import csw.event.client.perf.BasePerfSuite
 import csw.event.client.perf.commons.{EventsSetting, PerfPublisher, PerfSubscriber}
 import csw.event.client.perf.reporter._
+import csw.params.core.models.Prefix
 
 import scala.collection.immutable
 import scala.concurrent.duration._

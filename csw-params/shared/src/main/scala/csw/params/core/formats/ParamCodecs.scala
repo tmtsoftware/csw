@@ -80,8 +80,8 @@ trait ParamCodecs extends CommonCodecs {
   // ************************ Parameter Codecs ********************
 
   //Do not replace these with bimap, due to an issue with borer https://github.com/sirthias/borer/issues/24
-  implicit lazy val javaByteArrayEnc: Encoder[Array[JByte]] = Encoder.forByteArray.contramap(_.map(x => x: Byte))
-  implicit lazy val javaByteArrayDec: Decoder[Array[JByte]] = Decoder.forByteArray.map(_.map(x => x: JByte))
+  implicit lazy val javaByteArrayEnc: Encoder[Array[JByte]] = bytesEnc.contramap(_.map(x => x: Byte))
+  implicit lazy val javaByteArrayDec: Decoder[Array[JByte]] = bytesDec.map(_.map(x => x: JByte))
 
   implicit def waCodec[T: ArrayEnc: ArrayDec]: Codec[ArrayS[T]] =
     bimap[Array[T], ArrayS[T]](x => x: ArrayS[T], _.array.asInstanceOf[Array[T]])

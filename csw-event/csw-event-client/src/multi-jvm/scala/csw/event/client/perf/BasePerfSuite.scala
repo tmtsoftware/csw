@@ -112,8 +112,8 @@ class BasePerfSuite(config: MultiNodeConfig)
     Await.result(
       publisher.publish(
         EventUtils.perfResultEvent(
-          byteBuffer.array(),
-          initialLatencyByteBuffer.array(),
+          byteBuffer.array().map(x => x: Short),
+          initialLatencyByteBuffer.array().map(x => x: Short),
           eventsReceivedPerNode / nanosToSeconds(totalTimePerNode),
           totalDroppedPerNode,
           outOfOrderCountPerNode,
