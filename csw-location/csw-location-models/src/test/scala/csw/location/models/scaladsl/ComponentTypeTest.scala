@@ -5,9 +5,11 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 class ComponentTypeTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
-  test("ComponentType should be any one of this types : 'container', 'hcd', 'assembly' and 'service'") {
+  test(
+    "ComponentType should be any one of this types : 'container', 'hcd', 'assembly', 'sequence', 'sequencecomponent' and 'service'"
+  ) {
 
-    val expectedComponentTypeValues = Set("container", "hcd", "assembly", "service", "sequencer")
+    val expectedComponentTypeValues = Set("container", "hcd", "assembly", "service", "sequencer", "sequencecomponent")
     val actualComponentTypeValues: Set[String] =
       ComponentType.values.map(componentType => componentType.entryName).toSet
 
