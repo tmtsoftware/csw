@@ -19,8 +19,7 @@ import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.messages._
-import csw.command.client.messages.sequencer.SequenceError.ExistingSequenceIsInProcess
-import csw.command.client.messages.sequencer.{LoadAndStartSequence, SequenceResponse}
+import csw.command.client.messages.sequencer.LoadAndStartSequence
 import csw.command.client.models.framework.LockingResponse._
 import csw.command.client.models.framework.PubSub.{Subscribe, SubscribeOnly, Unsubscribe}
 import csw.command.client.models.framework.SupervisorLifecycleState._
@@ -248,26 +247,16 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
   }
 
   test("should use command serializer for (de)serialize LoadAndStartSequence") {
-    val sequenceResponseProbe = TestProbe[SequenceResponse]
+    val submitResponseProbe = TestProbe[SubmitResponse]
 
     val command: SequenceCommand = Setup(Prefix("test"), CommandName("c1"), Some(ObsId("obsId"))).copy(runId = Id())
     val sequence                 = Sequence(command)
-    val loadAndStartSequence     = LoadAndStartSequence(sequence, sequenceResponseProbe.ref)
+    val loadAndStartSequence     = LoadAndStartSequence(sequence, submitResponseProbe.ref)
 
     val serializer = serialization.findSerializerFor(loadAndStartSequence)
     serializer.getClass shouldBe classOf[CommandAkkaSerializer]
 
     val bytes = serializer.toBinary(loadAndStartSequence)
     serializer.fromBinary(bytes, Some(loadAndStartSequence.getClass)) shouldEqual loadAndStartSequence
-  }
-
-  test("should use command serializer for (de)serialize SequenceResponse") {
-    val sequenceResponse = SequenceResponse(Left(ExistingSequenceIsInProcess))
-
-    val serializer = serialization.findSerializerFor(sequenceResponse)
-    serializer.getClass shouldBe classOf[CommandAkkaSerializer]
-
-    val bytes = serializer.toBinary(sequenceResponse)
-    serializer.fromBinary(bytes, Some(sequenceResponse.getClass)) shouldEqual sequenceResponse
   }
 }

@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit
 import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.serialization.{Serialization, SerializationExtension}
-import com.github.ghik.silencer.silent
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
 import csw.command.client.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
 import csw.command.client.messages.CommandSerializationMarker.RemoteMsg
@@ -19,8 +18,7 @@ import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.messages._
-import csw.command.client.messages.sequencer.SequenceError.{DuplicateIdsFound, ExistingSequenceIsInProcess, GenericError}
-import csw.command.client.messages.sequencer.{LoadAndStartSequence, SequenceError, SequenceResponse}
+import csw.command.client.messages.sequencer.LoadAndStartSequence
 import csw.command.client.models.framework.LockingResponse._
 import csw.command.client.models.framework.PubSub.{Publish, PublisherMessage, SubscriberMessage}
 import csw.command.client.models.framework.{PubSub, _}
@@ -112,14 +110,4 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
   // ************************ SequencerMsg Codecs ********************
 
   implicit lazy val loadAndStartSequenceCodec: Codec[LoadAndStartSequence] = deriveCodec[LoadAndStartSequence]
-
-  implicit lazy val sequenceErrorCodec: Codec[SequenceError] = {
-    @silent implicit val sequenceIsInProcess: Codec[ExistingSequenceIsInProcess.type] =
-      singletonCodec(ExistingSequenceIsInProcess)
-    @silent implicit val duplicateIdsFoundError: Codec[DuplicateIdsFound.type] = singletonCodec(DuplicateIdsFound)
-    @silent implicit val genericError: Codec[GenericError]                     = deriveCodecForUnaryCaseClass[GenericError]
-    deriveCodec[SequenceError]
-  }
-
-  implicit lazy val sequenceResponseCodec: Codec[SequenceResponse] = deriveCodec[SequenceResponse]
 }
