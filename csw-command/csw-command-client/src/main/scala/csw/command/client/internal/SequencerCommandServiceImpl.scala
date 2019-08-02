@@ -6,7 +6,6 @@ import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.command.api.scaladsl.SequencerCommandService
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.client.messages
 import csw.command.client.messages.sequencer.LoadAndStartSequence
 import csw.location.models.AkkaLocation
 import csw.params.commands.CommandResponse.SubmitResponse
@@ -24,5 +23,5 @@ class SequencerCommandServiceImpl(sequencerLocation: AkkaLocation)(
   private val sequencer: ActorRef[LoadAndStartSequence] = sequencerLocation.sequencerRef
 
   override def submit(sequence: Sequence): Future[SubmitResponse] =
-    sequencer ? (messages.sequencer.LoadAndStartSequence(sequence, _))
+    sequencer ? (LoadAndStartSequence(sequence, _))
 }
