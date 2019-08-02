@@ -3,13 +3,14 @@ package csw.event.cli.args
 import java.io.File
 
 import csw.params.core.generics.Parameter
+import csw.params.core.models.Subsystem
 import csw.params.events.EventKey
 
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 
 case class Options(
     cmd: String = "",
-    eventKey: EventKey = EventKey("unused.key"),
+    eventKey: EventKey = EventKey(s"${Subsystem.TEST}.unused.key"),
     eventKeys: Seq[EventKey] = Seq.empty,
     eventsMap: Map[EventKey, Set[String]] = Map.empty,
     eventData: Option[File] = None,

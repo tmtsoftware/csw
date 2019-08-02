@@ -11,12 +11,13 @@ import play.api.libs.json._
 case class Prefix(prefix: String) {
   val subsystem: Subsystem = {
     require(prefix != null)
-    Subsystem.withNameOption(prefix.splitAt(prefix.indexOf(SEPARATOR))._1).getOrElse(Subsystem.BAD)
+    val subsystemStr = prefix.split(SEPARATOR).head // this is safe and will not throw exception
+    Subsystem.withNameInsensitive(subsystemStr) // throw exception if invalid subsystem provided
   }
 }
 
 object Prefix {
-  private val SEPARATOR = "."
+  private val SEPARATOR = '.'
   implicit val format: Format[Prefix] = new Format[Prefix] {
     override def writes(obj: Prefix): JsValue           = JsString(obj.prefix)
     override def reads(json: JsValue): JsResult[Prefix] = JsSuccess(Prefix(json.as[String]))

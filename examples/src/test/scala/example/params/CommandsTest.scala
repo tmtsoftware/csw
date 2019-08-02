@@ -27,9 +27,8 @@ class CommandsTest extends FunSpec with Matchers {
       //just by supplying prefix
       val prefix2: Prefix = Prefix("tcs.mobie.blue.filter")
 
-      //invalid prefix string that cant be mapped to a valid subsystem,
-      // will automatically get Subsystem.BAD
-      val badPrefix: Prefix = Prefix("abcdefgh")
+      //invalid prefix string which does not contain valid subsystem in the beginning will throw an exception,
+      //val badPrefix: Prefix = Prefix("abcdefgh")
 
       //use implicit conversion to convert from String to Prefix
       val prefix3: Prefix = Prefix("wfos.prog.cloudcover")
@@ -39,7 +38,6 @@ class CommandsTest extends FunSpec with Matchers {
       assert(prefix1.subsystem === Subsystem.NFIRAOS)
       assert(prefix2.subsystem === Subsystem.TCS)
       assert(prefix3.subsystem === Subsystem.WFOS)
-      assert(badPrefix.subsystem === Subsystem.BAD)
     }
   }
 

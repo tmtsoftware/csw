@@ -12,7 +12,7 @@ object ComponentInfos {
   val assemblyInfo: ComponentInfo = ComponentInfo(
     "SampleAssembly",
     Assembly,
-    Prefix("wfos"),
+    Prefix("wfos.test"),
     "csw.common.components.framework.SampleComponentBehaviorFactory",
     DoNotRegister,
     Set.empty
@@ -21,7 +21,7 @@ object ComponentInfos {
   val assemblyInfoToSimulateFailure: ComponentInfo = ComponentInfo(
     "trombone",
     Assembly,
-    Prefix("wfos"),
+    Prefix("wfos.test"),
     "csw.common.components.framework.ComponentBehaviorFactoryToSimulateFailure",
     DoNotRegister,
     Set.empty
@@ -30,7 +30,7 @@ object ComponentInfos {
   val hcdInfo: ComponentInfo = ComponentInfo(
     "SampleHcd",
     HCD,
-    Prefix("wfos"),
+    Prefix("wfos.test"),
     "csw.common.components.framework.SampleComponentBehaviorFactory",
     RegisterOnly,
     Set.empty
@@ -39,7 +39,7 @@ object ComponentInfos {
   val hcdInfoWithInitializeTimeout: ComponentInfo = ComponentInfo(
     "SampleHcd",
     HCD,
-    Prefix("wfos"),
+    Prefix("wfos.test"),
     "csw.common.components.framework.SampleComponentBehaviorFactory",
     RegisterOnly,
     Set.empty,
@@ -49,7 +49,7 @@ object ComponentInfos {
   val hcdInfoWithRunTimeout: ComponentInfo = ComponentInfo(
     "SampleHcd",
     HCD,
-    Prefix("wfos"),
+    Prefix("wfos.test"),
     "csw.common.components.framework.SampleComponentBehaviorFactory",
     RegisterOnly,
     Set.empty,
@@ -59,7 +59,7 @@ object ComponentInfos {
   val dummyInfo: ComponentInfo = ComponentInfo(
     "DummyHcd",
     HCD,
-    Prefix("wfos"),
+    Prefix("wfos.test"),
     "dummy",
     DoNotRegister
   )

@@ -60,7 +60,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*wit
   @Test
   def should_publish_initialization_event_on_publisher_creation(): Unit = {
     redisTestProps.publisher // access lazy publisher so that it gets evaluated
-    val initEventKey = EventKey(s"${Subsystem.TEST}.init")
+    val initEventKey = EventKey(s"${Subsystem.TEST}.first.event.init")
     val initEvent    = redisTestProps.subscriber.get(initEventKey).await
     initEvent.paramSet shouldBe InitializationEvent.value.paramSet
   }
@@ -147,7 +147,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*wit
     import baseProperties._
 
     var counter                      = -1
-    val events: immutable.Seq[Event] = for (i <- 31 to 41) yield makeEventWithPrefix(i, Prefix("test"))
+    val events: immutable.Seq[Event] = for (i <- 31 to 41) yield makeEventWithPrefix(i, Prefix("test.move"))
 
     def eventGenerator(): Future[Option[Event]] = Future {
       counter += 1
@@ -176,7 +176,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*wit
   def should_be_able_to_maintain_ordering_while_publish(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
-    val prefix             = Prefix("ordering.test.prefix")
+    val prefix             = Prefix("test.ordering.prefix")
     val event1             = makeEventWithPrefix(1, prefix)
     val event2             = makeEventWithPrefix(2, prefix)
     val event3             = makeEventWithPrefix(3, prefix)

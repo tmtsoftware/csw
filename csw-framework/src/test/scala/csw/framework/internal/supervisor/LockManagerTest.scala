@@ -3,7 +3,7 @@ package csw.framework.internal.supervisor
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.{typed, ActorSystem}
+import akka.actor.{ActorSystem, typed}
 import csw.command.client.messages.CommandMessage.Submit
 import csw.command.client.models.framework.LockingResponse
 import csw.command.client.models.framework.LockingResponse._
@@ -12,7 +12,7 @@ import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.generics.{KeyType, Parameter}
-import csw.params.core.models.{ObsId, Prefix}
+import csw.params.core.models.{ObsId, Prefix, Subsystem}
 import org.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
@@ -144,8 +144,8 @@ class LockManagerTest extends FunSuite with MockitoSugar with Matchers {
   // DEOPSCSW-302: Support Unlocking by Admin
   test("should allow unlocking any locked component by admin") {
     val replyTo        = TestProbe[SubmitResponse].ref
-    val adminPrefix    = Prefix("csw.admin")
-    val nonAdminPrefix = Prefix("NonAdmin")
+    val adminPrefix    = Prefix(s"${Subsystem.Admin}.csw")
+    val nonAdminPrefix = Prefix(s"${Subsystem.TEST}.NonAdmin")
 
     val lockManager = new LockManager(lockPrefix = Some(prefix), mockedLoggerFactory)
     lockManager.isLocked shouldBe true

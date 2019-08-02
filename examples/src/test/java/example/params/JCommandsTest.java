@@ -39,15 +39,13 @@ public class JCommandsTest extends JUnitSuite {
         //just by supplying prefix
         Prefix prefix2 = new Prefix("tcs.mobie.blue.filter");
 
-        //invalid prefix string that cant be mapped to a valid subsystem,
-        // will automatically get Subsystem.BAD
-        Prefix badPrefix = new Prefix("abcdefgh");
+        //invalid prefix string which does not contain valid subsystem in the beginning will throw an exception,
+        // Prefix badPrefix = new Prefix("abcdefgh");
         //#prefix
 
         //validations
         Assert.assertSame(prefix1.subsystem(), JSubsystem.NFIRAOS);
         Assert.assertSame(prefix2.subsystem(), JSubsystem.TCS);
-        Assert.assertSame(badPrefix.subsystem(), JSubsystem.BAD);
     }
 
     @Test

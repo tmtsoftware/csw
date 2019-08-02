@@ -390,7 +390,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_retrieve_InvalidEvent(baseProperties: BaseProperties): Unit = {
     import baseProperties._
-    val eventKey = EventKey("test")
+    val eventKey = EventKey("test.a.b.c")
 
     val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).take(1).toMat(Sink.seq)(Keep.both).run()
 

@@ -382,7 +382,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_retrieve_InvalidEvent(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
-        EventKey eventKey = EventKey.apply(Prefix.apply("test"), EventName.apply("test"));
+        EventKey eventKey = EventKey.apply(Prefix.apply("test.invalid"), EventName.apply("test"));
 
         Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).take(1).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
 
@@ -428,7 +428,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     //DEOPSCSW-344: Retrieve recently published event using prefix and eventname
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_get_InvalidEvent(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
-        EventKey eventKey = EventKey.apply(Prefix.apply("test"), EventName.apply("test"));
+        EventKey eventKey = EventKey.apply(Prefix.apply("test.invalid"), EventName.apply("test"));
         Event event = baseProperties.jSubscriber().get(eventKey).get(10, TimeUnit.SECONDS);
 
         Assert.assertTrue(event.isInvalid());

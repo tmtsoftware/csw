@@ -249,7 +249,7 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
   test("should use command serializer for (de)serialize LoadAndStartSequence") {
     val submitResponseProbe = TestProbe[SubmitResponse]
 
-    val command: SequenceCommand = Setup(Prefix("test"), CommandName("c1"), Some(ObsId("obsId"))).copy(runId = Id())
+    val command: SequenceCommand = Setup(Prefix("test.move"), CommandName("c1"), Some(ObsId("obsId"))).copy(runId = Id())
     val sequence                 = Sequence(command)
     val loadAndStartSequence     = LoadAndStartSequence(sequence, submitResponseProbe.ref)
 

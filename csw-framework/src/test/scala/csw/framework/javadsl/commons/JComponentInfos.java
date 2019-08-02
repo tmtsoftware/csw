@@ -15,7 +15,7 @@ public class JComponentInfos {
     public static ComponentInfo jHcdInfo = JComponentInfo.from(
             "JSampleHcd",
             JComponentType.HCD,
-            new Prefix("wfos"),
+            new Prefix("wfos.test"),
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
             LocationServiceUsage.JRegisterOnly(),
             Collections.emptySet(),
@@ -25,7 +25,7 @@ public class JComponentInfos {
     public static ComponentInfo jHcdInfoWithInitializeTimeout = JComponentInfo.from(
             "trombone",
             JComponentType.HCD,
-            new Prefix("wfos"),
+            new Prefix("wfos.test"),
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
             LocationServiceUsage.JRegisterOnly(),
             Collections.emptySet(),

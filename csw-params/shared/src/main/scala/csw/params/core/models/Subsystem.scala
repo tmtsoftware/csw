@@ -63,6 +63,8 @@ object Subsystem extends Enum[Subsystem] with PlayJsonEnum[Subsystem] {
   case object WFOS    extends Subsystem("Wide Field Optical Spectrometer")
 
   case object Container extends Subsystem("Container Subsystem")
+
+  case object Admin extends Subsystem("Admin System")
   // for testing
   case object TEST extends Subsystem("Testing System")
   case object BAD  extends Subsystem("Unknown/default Subsystem")

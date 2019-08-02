@@ -20,11 +20,12 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
   private val peakLoadSettings: List[JvmSetting] = (1 to 4).map { n =>
     JvmSetting(
       dms,
-      List(PubSetting(Prefix(s"$dms-$n"), noOfPubs = 5, adjustedTotalMsgs(1000), rate = 1000, payloadSize = 64)),
-      List(SubSetting(Prefix(s"$dms-$n"), noOfSubs = 5, adjustedTotalMsgs(1000), rate = 1000, payloadSize = 64))
+      List(PubSetting(Prefix(s"$dms.$n"), noOfPubs = 5, adjustedTotalMsgs(1000), rate = 1000, payloadSize = 64)),
+      List(SubSetting(Prefix(s"$dms.$n"), noOfSubs = 5, adjustedTotalMsgs(1000), rate = 1000, payloadSize = 64))
     )
   }.toList
 
+  private val tcs1Prefix = Prefix(s"$tcs.1")
   /**
    * Don not run below scenarios on local box, as it generates load and requires multiple machines to support.
    * For Local testing, try runnig scenarios mentioned at the bottom of this file.
@@ -36,14 +37,14 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
       JvmSetting(
         tcs,
         List(
-          PubSetting(Prefix(s"$tcs-1"), noOfPubs = 3, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
-          PubSetting(Prefix(s"$tcs-1"), noOfPubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-          PubSetting(Prefix(s"$tcs-1"), noOfPubs = 250, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+          PubSetting(tcs1Prefix, noOfPubs = 3, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
+          PubSetting(tcs1Prefix, noOfPubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+          PubSetting(tcs1Prefix, noOfPubs = 250, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
         ),
         List(
-          SubSetting(Prefix(s"$tcs-1"), noOfSubs = 3, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
-          SubSetting(Prefix(s"$tcs-1"), noOfSubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-          SubSetting(Prefix(s"$tcs-1"), noOfSubs = 250, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+          SubSetting(tcs1Prefix, noOfSubs = 3, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
+          SubSetting(tcs1Prefix, noOfSubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+          SubSetting(tcs1Prefix, noOfSubs = 250, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
         )
       ) ::
         List(AOESW, IRIS, NFIRAOS, WFOS).flatMap { subsystem =>
@@ -54,29 +55,29 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
               JvmSetting(
                 subsystemName,
                 List(
-                  PubSetting(Prefix(s"$subsystemName-$n"), noOfPubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-                  PubSetting(Prefix(s"$subsystemName-$n"), noOfPubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+                  PubSetting(Prefix(s"$subsystemName.$n"), noOfPubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                  PubSetting(Prefix(s"$subsystemName.$n"), noOfPubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                 ),
                 subsystem match {
                   case AOESW =>
                     List(
-                      SubSetting(Prefix(s"$iris-$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-                      SubSetting(Prefix(s"$iris-$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+                      SubSetting(Prefix(s"$iris.$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                      SubSetting(Prefix(s"$iris.$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                     )
                   case IRIS =>
                     List(
-                      SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-                      SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+                      SubSetting(Prefix(s"$aoesw.$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                      SubSetting(Prefix(s"$aoesw.$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                     )
                   case NFIRAOS =>
                     List(
-                      SubSetting(Prefix(s"$wfos-$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-                      SubSetting(Prefix(s"$wfos-$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+                      SubSetting(Prefix(s"$wfos.$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                      SubSetting(Prefix(s"$wfos.$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                     )
                   case WFOS =>
                     List(
-                      SubSetting(Prefix(s"$nfiraos-$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-                      SubSetting(Prefix(s"$nfiraos-$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+                      SubSetting(Prefix(s"$nfiraos.$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                      SubSetting(Prefix(s"$nfiraos.$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                     )
                   case _ => Nil
                 }
@@ -92,15 +93,15 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
       JvmSetting(
         tcs,
         List(
-          PubSetting(Prefix(s"$tcs-1"), noOfPubs = 3, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
-          PubSetting(Prefix(s"$tcs-1"), noOfPubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-          PubSetting(Prefix(s"$tcs-1"), noOfPubs = 250, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+          PubSetting(tcs1Prefix, noOfPubs = 3, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
+          PubSetting(tcs1Prefix, noOfPubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+          PubSetting(tcs1Prefix, noOfPubs = 250, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
         ),
         List(
-          SubSetting(Prefix(s"$tcs-1"), noOfSubs = 3, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
-          SubSetting(Prefix(s"$tcs-1"), noOfSubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-          SubSetting(Prefix(s"$tcs-1"), noOfSubs = 250, adjustedTotalMsgs(1), rate = 1, payloadSize = 128),
-          SubSetting(Prefix(s"$tcs-1"), noOfSubs = 2, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+          SubSetting(tcs1Prefix, noOfSubs = 3, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
+          SubSetting(tcs1Prefix, noOfSubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+          SubSetting(tcs1Prefix, noOfSubs = 250, adjustedTotalMsgs(1), rate = 1, payloadSize = 128),
+          SubSetting(tcs1Prefix, noOfSubs = 2, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
         )
       ) ::
         List(AOESW, IRIS, NFIRAOS, WFOS).flatMap { subsystem =>
@@ -111,32 +112,32 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
               JvmSetting(
                 subsystemName,
                 List(
-                  PubSetting(Prefix(s"$subsystemName-$n"), noOfPubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-                  PubSetting(Prefix(s"$subsystemName-$n"), noOfPubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+                  PubSetting(Prefix(s"$subsystemName.$n"), noOfPubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                  PubSetting(Prefix(s"$subsystemName.$n"), noOfPubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                 ),
                 subsystem match {
                   case AOESW =>
                     List(
-                      SubSetting(Prefix(s"$iris-$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-                      SubSetting(Prefix(s"$iris-$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128),
-                      SubSetting(Prefix(s"$iris-pattern-$n"), noOfSubs = 3, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+                      SubSetting(Prefix(s"$iris.$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                      SubSetting(Prefix(s"$iris.$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128),
+                      SubSetting(Prefix(s"$iris.pattern.$n"), noOfSubs = 3, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                     )
                   case IRIS =>
                     List(
-                      SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-                      SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128),
-                      SubSetting(Prefix(s"$aoesw-pattern-$n"), noOfSubs = 3, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+                      SubSetting(Prefix(s"$aoesw.$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                      SubSetting(Prefix(s"$aoesw.$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128),
+                      SubSetting(Prefix(s"$aoesw.pattern.$n"), noOfSubs = 3, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                     )
                   case NFIRAOS =>
                     List(
-                      SubSetting(Prefix(s"$wfos-$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-                      SubSetting(Prefix(s"$wfos-$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128),
-                      SubSetting(Prefix(s"$wfos-pattern-$n"), noOfSubs = 2, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+                      SubSetting(Prefix(s"$wfos.$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                      SubSetting(Prefix(s"$wfos.$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128),
+                      SubSetting(Prefix(s"$wfos.pattern.$n"), noOfSubs = 2, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                     )
                   case WFOS =>
                     List(
-                      SubSetting(Prefix(s"$nfiraos-$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-                      SubSetting(Prefix(s"$nfiraos-pattern-$n"), noOfSubs = 2, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+                      SubSetting(Prefix(s"$nfiraos.$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                      SubSetting(Prefix(s"$nfiraos.pattern.$n"), noOfSubs = 2, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                     )
                   case _ => Nil
                 }
@@ -151,14 +152,14 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
       JvmSetting(
         tcs,
         List(
-          PubSetting(Prefix(s"$tcs-1"), noOfPubs = 3, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
-          PubSetting(Prefix(s"$tcs-1"), noOfPubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-          PubSetting(Prefix(s"$tcs-1"), noOfPubs = 250, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+          PubSetting(tcs1Prefix, noOfPubs = 3, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
+          PubSetting(tcs1Prefix, noOfPubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+          PubSetting(tcs1Prefix, noOfPubs = 250, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
         ),
         List(
-          SubSetting(Prefix(s"$tcs-1"), noOfSubs = 3, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
-          SubSetting(Prefix(s"$tcs-1"), noOfSubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-          SubSetting(Prefix(s"$tcs-1"), noOfSubs = 250, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+          SubSetting(tcs1Prefix, noOfSubs = 3, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
+          SubSetting(tcs1Prefix, noOfSubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+          SubSetting(tcs1Prefix, noOfSubs = 250, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
         )
       ) ::
         List(AOESW, IRIS, NFIRAOS, WFOS).flatMap { subsystem =>
@@ -169,12 +170,12 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
               JvmSetting(
                 subsystemName,
                 List(
-                  PubSetting(Prefix(s"$subsystemName-$n"), noOfPubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-                  PubSetting(Prefix(s"$subsystemName-$n"), noOfPubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+                  PubSetting(Prefix(s"$subsystemName.$n"), noOfPubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                  PubSetting(Prefix(s"$subsystemName.$n"), noOfPubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                 ),
                 List(
-                  SubSetting(Prefix(s"$subsystemName-$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-                  SubSetting(Prefix(s"$subsystemName-$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+                  SubSetting(Prefix(s"$subsystemName.$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                  SubSetting(Prefix(s"$subsystemName.$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                 )
               )
           }
@@ -190,13 +191,13 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
       JvmSetting(
         tcs,
         List(
-          PubSetting(Prefix(s"$tcs-1"), noOfPubs = 3, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
-          PubSetting(Prefix(s"$tcs-1"), noOfPubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-          PubSetting(Prefix(s"$tcs-1"), noOfPubs = 100, adjustedTotalMsgs(3), rate = 3, payloadSize = 128)
+          PubSetting(tcs1Prefix, noOfPubs = 3, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
+          PubSetting(tcs1Prefix, noOfPubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+          PubSetting(tcs1Prefix, noOfPubs = 100, adjustedTotalMsgs(3), rate = 3, payloadSize = 128)
         ),
         List(
-          SubSetting(Prefix(s"$tcs-1"), noOfSubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-          SubSetting(Prefix(s"$tcs-1"), noOfSubs = 100, adjustedTotalMsgs(3), rate = 3, payloadSize = 128)
+          SubSetting(tcs1Prefix, noOfSubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+          SubSetting(tcs1Prefix, noOfSubs = 100, adjustedTotalMsgs(3), rate = 3, payloadSize = 128)
         )
       ) ::
         List(AOESW, IRIS, NFIRAOS, WFOS).flatMap { subsystem =>
@@ -207,32 +208,32 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
               JvmSetting(
                 subsystemName,
                 List(
-                  PubSetting(Prefix(s"$subsystemName-$n"), noOfPubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-                  PubSetting(Prefix(s"$subsystemName-$n"), noOfPubs = 100, adjustedTotalMsgs(3), rate = 3, payloadSize = 128)
+                  PubSetting(Prefix(s"$subsystemName.$n"), noOfPubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                  PubSetting(Prefix(s"$subsystemName.$n"), noOfPubs = 100, adjustedTotalMsgs(3), rate = 3, payloadSize = 128)
                 ),
                 subsystem match {
                   case AOESW =>
                     List(
-                      SubSetting(Prefix(s"$iris-$n"), noOfSubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-                      SubSetting(Prefix(s"$iris-$n"), noOfSubs = 100, adjustedTotalMsgs(3), rate = 3, payloadSize = 128)
+                      SubSetting(Prefix(s"$iris.$n"), noOfSubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                      SubSetting(Prefix(s"$iris.$n"), noOfSubs = 100, adjustedTotalMsgs(3), rate = 3, payloadSize = 128)
                     )
                   case IRIS =>
                     List(
-                      SubSetting(Prefix(s"$tcs-1"), noOfSubs = 1, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
-                      SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-                      SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 100, adjustedTotalMsgs(3), rate = 3, payloadSize = 128)
+                      SubSetting(tcs1Prefix, noOfSubs = 1, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
+                      SubSetting(Prefix(s"$aoesw.$n"), noOfSubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                      SubSetting(Prefix(s"$aoesw.$n"), noOfSubs = 100, adjustedTotalMsgs(3), rate = 3, payloadSize = 128)
                     )
                   case NFIRAOS =>
                     List(
-                      SubSetting(Prefix(s"$tcs-1"), noOfSubs = 1, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
-                      SubSetting(Prefix(s"$wfos-$n"), noOfSubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-                      SubSetting(Prefix(s"$wfos-$n"), noOfSubs = 100, adjustedTotalMsgs(3), rate = 3, payloadSize = 128)
+                      SubSetting(tcs1Prefix, noOfSubs = 1, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
+                      SubSetting(Prefix(s"$wfos.$n"), noOfSubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                      SubSetting(Prefix(s"$wfos.$n"), noOfSubs = 100, adjustedTotalMsgs(3), rate = 3, payloadSize = 128)
                     )
                   case WFOS =>
                     List(
-                      SubSetting(Prefix(s"$tcs-1"), noOfSubs = 3, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
-                      SubSetting(Prefix(s"$nfiraos-$n"), noOfSubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-                      SubSetting(Prefix(s"$nfiraos-$n"), noOfSubs = 100, adjustedTotalMsgs(3), rate = 3, payloadSize = 128)
+                      SubSetting(tcs1Prefix, noOfSubs = 3, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
+                      SubSetting(Prefix(s"$nfiraos.$n"), noOfSubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                      SubSetting(Prefix(s"$nfiraos.$n"), noOfSubs = 100, adjustedTotalMsgs(3), rate = 3, payloadSize = 128)
                     )
                   case _ => Nil
                 }
@@ -246,14 +247,14 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
       JvmSetting(
         tcs,
         List(
-          PubSetting(Prefix(s"$tcs-1"), noOfPubs = 1, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
-          PubSetting(Prefix(s"$tcs-1"), noOfPubs = 10, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-          PubSetting(Prefix(s"$tcs-1"), noOfPubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
+          PubSetting(tcs1Prefix, noOfPubs = 1, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
+          PubSetting(tcs1Prefix, noOfPubs = 10, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+          PubSetting(tcs1Prefix, noOfPubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
         ),
         List(
-          SubSetting(Prefix(s"$tcs-1"), noOfSubs = 1, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
-          SubSetting(Prefix(s"$tcs-1"), noOfSubs = 10, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-          SubSetting(Prefix(s"$tcs-1"), noOfSubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
+          SubSetting(tcs1Prefix, noOfSubs = 1, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
+          SubSetting(tcs1Prefix, noOfSubs = 10, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+          SubSetting(tcs1Prefix, noOfSubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
         )
       ) ::
         List(AOESW).flatMap { subsystem =>
@@ -264,14 +265,14 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
               JvmSetting(
                 subsystemName,
                 List(
-                  PubSetting(Prefix(s"$subsystemName-$n"), noOfPubs = 10, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-                  PubSetting(Prefix(s"$subsystemName-$n"), noOfPubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
+                  PubSetting(Prefix(s"$subsystemName.$n"), noOfPubs = 10, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                  PubSetting(Prefix(s"$subsystemName.$n"), noOfPubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
                 ),
                 subsystem match {
                   case AOESW =>
                     List(
-                      SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 10, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-                      SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
+                      SubSetting(Prefix(s"$aoesw.$n"), noOfSubs = 10, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                      SubSetting(Prefix(s"$aoesw.$n"), noOfSubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
                     )
                   case _ => Nil
                 }
@@ -287,15 +288,15 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
       JvmSetting(
         tcs,
         List(
-          PubSetting(Prefix(s"$tcs-1"), noOfPubs = 1, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
-          PubSetting(Prefix(s"$tcs-1"), noOfPubs = 10, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-          PubSetting(Prefix(s"$tcs-1"), noOfPubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
+          PubSetting(tcs1Prefix, noOfPubs = 1, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
+          PubSetting(tcs1Prefix, noOfPubs = 10, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+          PubSetting(tcs1Prefix, noOfPubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
         ),
         List(
-          SubSetting(Prefix(s"$tcs-1"), noOfSubs = 1, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
-          SubSetting(Prefix(s"$tcs-1"), noOfSubs = 10, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-          SubSetting(Prefix(s"$tcs-1"), noOfSubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128),
-          SubSetting(Prefix(s"$tcs-pattern-1"), noOfSubs = 1, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
+          SubSetting(tcs1Prefix, noOfSubs = 1, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
+          SubSetting(tcs1Prefix, noOfSubs = 10, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+          SubSetting(tcs1Prefix, noOfSubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128),
+          SubSetting(Prefix(s"$tcs.pattern.1"), noOfSubs = 1, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
         )
       ) ::
         List(AOESW).flatMap { subsystem =>
@@ -306,15 +307,15 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
               JvmSetting(
                 subsystemName,
                 List(
-                  PubSetting(Prefix(s"$subsystemName-$n"), noOfPubs = 10, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-                  PubSetting(Prefix(s"$subsystemName-$n"), noOfPubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
+                  PubSetting(Prefix(s"$subsystemName.$n"), noOfPubs = 10, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                  PubSetting(Prefix(s"$subsystemName.$n"), noOfPubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
                 ),
                 subsystem match {
                   case AOESW =>
                     List(
-                      SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 10, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-                      SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128),
-                      SubSetting(Prefix(s"$aoesw-pattern-$n"), noOfSubs = 1, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
+                      SubSetting(Prefix(s"$aoesw.$n"), noOfSubs = 10, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                      SubSetting(Prefix(s"$aoesw.$n"), noOfSubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128),
+                      SubSetting(Prefix(s"$aoesw.pattern.$n"), noOfSubs = 1, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
                     )
                   case _ => Nil
                 }

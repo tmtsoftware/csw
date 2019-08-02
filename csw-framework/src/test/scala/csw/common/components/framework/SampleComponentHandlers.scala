@@ -64,7 +64,7 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   // DEOPSCSW-372: Provide an API for PubSubActor that hides actor based interaction
   private def processCommand(controlCommand: ControlCommand): Unit = {
 
-    lazy val event = SystemEvent(Prefix("test"), EventName("system"))
+    lazy val event = SystemEvent(Prefix("test.move"), EventName("system"))
     def processEvent(prefix: Prefix): Event => Unit =
       _ =>
         currentStatePublisher.publish(
