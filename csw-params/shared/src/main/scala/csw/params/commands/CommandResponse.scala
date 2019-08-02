@@ -154,6 +154,20 @@ object CommandResponse {
     case cancelled: Cancelled                     => cancelled.copy(runId = id)
   }
 
+  def asOther(id: Id, commandName: CommandName, response: SubmitResponse): SubmitResponse = response match {
+    case started: Started                         ⇒ started.copy(runId = id, commandName = commandName)
+    case invalid: Invalid                         ⇒ invalid.copy(runId = id, commandName = commandName)
+    case completedWithResult: CompletedWithResult ⇒ completedWithResult.copy(runId = id)
+    case completed: Completed                     ⇒ completed.copy(runId = id, commandName = commandName)
+    case locked: Locked                           ⇒ locked.copy(runId = id)
+    case error: Error                             ⇒ error.copy(runId = id)
+    case cancelled: Cancelled                     ⇒ cancelled.copy(runId = id)
+  }
+
+  object To {
+    def started(id: Id, commandName: CommandName): SubmitResponse = Started(commandName, id)
+  }
+
   /**
    * Tests a response to determine if it is a final command state
    *

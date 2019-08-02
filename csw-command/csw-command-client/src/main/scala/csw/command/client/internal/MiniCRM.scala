@@ -84,7 +84,8 @@ object MiniCRM {
           replyTo ! startedList.toList
           Behaviors.same
         case Print =>
-          println(s"responseList: $responseList, waiterList: $waiterList")
+          println("PRINT MINCRM")
+          //println(s"responseList: $responseList, waiterList: $waiterList")
           Behaviors.same
         case _ =>
           Behaviors.same

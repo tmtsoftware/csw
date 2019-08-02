@@ -95,11 +95,11 @@ println("1")
       probe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(mediumCmdCompleted))))
       probe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(longCmdCompleted))))
       println("2")
-      //probe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(longRunningCmdCompleted))))
-println("3")
+      probe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(longRunningCmdCompleted))))
+println("3 - got the damn final event")
 
       val aresult = Await.result(assemblyCommandService.queryFinal(runId), 20.seconds)
-      println(s">>>>>>4 $aresult")
+      println(s">>>>>>4 and damn final queryFinal $aresult")
 
       //#submit
       /*
@@ -120,9 +120,9 @@ println("3")
 
       // Use the initial future to determine the when completed
       finalResponse.map(_ shouldBe a[Completed])
-
+*/
       enterBarrier("long-commands")
-
+/*
       val assemblyInvalidSetup = Setup(prefix, invalidCmd, Some(obsId))
 
       // First test sends two commands that complete immediately successfully

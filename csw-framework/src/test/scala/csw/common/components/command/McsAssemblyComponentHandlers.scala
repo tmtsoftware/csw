@@ -2,7 +2,10 @@ package csw.common.components.command
 
 import akka.actor.Scheduler
 import akka.actor.typed.scaladsl.ActorContext
+import akka.stream.scaladsl.Source
 import akka.util.Timeout
+import csw.command.api.CommandCompleter
+import csw.command.api.CommandCompleter.{Completer, OverallResponse}
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandServiceFactory
 import csw.command.client.messages.TopLevelActorMessage
@@ -12,12 +15,13 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.{AkkaLocation, TrackingEvent}
 import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 import csw.params.commands.CommandResponse._
-import csw.params.commands.{CommandIssue, CommandName, ControlCommand, Setup}
+import csw.params.commands.{CommandIssue, CommandName, CommandResponse, ControlCommand, Setup}
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
     extends ComponentHandlers(ctx, cswCtx) {
@@ -79,9 +83,10 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
         // longSetup takes 5 seconds to finish
         // shortSetup takes 1 second to finish
         // mediumSetup takes 3 seconds to finish
-        processCommand(runId, longSetup) // THIS DOESN"T WORK JUST GETTING IT TO COMPILE
-        processCommand(runId, shortSetup)
-        processCommand(runId, mediumSetup)
+        //processCommand(longSetup) // THIS DOESN"T WORK JUST GETTING IT TO COMPILE
+        //processCommand(shortSetup)
+        //processCommand(mediumSetup)
+        processLongRunningCommand(runId, controlCommand)
 
         // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
         //#subscribe-to-command-response-manager
@@ -127,12 +132,88 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
     }
   }
 
-  private def processCommand2(): Unit = {
-    val x = hcdComponent.submitAll(List(longSetup, shortSetup, mediumSetup))
+  def seqFutures[T, U](items: TraversableOnce[T])(yourfunction: T => Future[U]): Future[List[U]] = {
+    items.foldLeft(Future.successful[List[U]](Nil)) { (f, item) =>
+      f.flatMap { x =>
+        yourfunction(item).map(_ :: x)
+      }
+    } map (_.reverse)
+  }
+
+  private def processLongRunningCommand(runId: Id, controlCommand: ControlCommand): Unit = {
+
+    println("IN PROCESS LONG RUNNING COMMAND")
+    // Could be different components, can't actually submit parallel commands to an HCD
+    val long   = hcdComponent.submit(longSetup)
+    val medium = hcdComponent.submit(mediumSetup)
+    val short  = hcdComponent.submit(shortSetup)
+
+    val x = Future.sequence(Set(long, medium, short)).onComplete {
+      case Success(sr) =>
+        println("Got to here")
+        val completer = CommandCompleter.Completer(sr)
+        sr.foreach(processCommand2(_, completer))
+        completer.waitComplete().onComplete {
+          case Success(x) =>
+            println("Got Success: " + x)
+            currentStatePublisher.publish(
+              CurrentState(controlCommand.source, StateName("testStateName"), Set(choiceKey.set(longRunningCmdCompleted)))
+            )
+            val yy = Completed(controlCommand.commandName, runId)
+            println("YY: " + yy)
+            commandUpdatePublisher.update(yy)
+          case Failure(x) =>
+            println("GOt failure")
+        }
+        println("Done foreach")
+      case Failure(ex) => println("Some future failure")
+    }
 
   }
 
-  private def processCommand(runId: Id, controlCommand: ControlCommand): Unit = {
+  private def processCommand2(sr: SubmitResponse, completer: Completer): Unit = {
+    sr match {
+      // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
+      //#updateSubCommand
+      // An original command is split into sub-commands and sent to a component.
+      // The current state publishing is not relevant to the updateSubCommand usage.
+      case Started(commandName, runId) ⇒
+        commandName match {
+          case n if n == shortSetup.commandName ⇒
+            hcdComponent.queryFinal(runId).map { sr =>
+              currentStatePublisher
+                .publish(CurrentState(shortSetup.source, StateName("testStateName"), Set(choiceKey.set(shortCmdCompleted))))
+              println(s"Updating short and completer: $sr")
+              //commandUpdatePublisher.update(sr)
+              completer.update(sr)
+            }
+          // As the commands get completed, the results are updated in
+          // the commandResponseManager
+
+          case n if n == mediumSetup.commandName ⇒
+            hcdComponent.queryFinal(runId).map { sr =>
+              currentStatePublisher
+                .publish(CurrentState(mediumSetup.source, StateName("testStateName"), Set(choiceKey.set(mediumCmdCompleted))))
+              println(s"Updating medium: $sr")
+              //commandUpdatePublisher.update(sr)
+              completer.update(sr)
+            }
+
+          case n if n == longSetup.commandName ⇒
+            hcdComponent.queryFinal(runId).map { sr =>
+              currentStatePublisher
+                .publish(CurrentState(longSetup.source, StateName("testStateName"), Set(choiceKey.set(longCmdCompleted))))
+              println(s"Updating long: $sr")
+              //commandUpdatePublisher.update(sr)
+              completer.update(sr)
+            }
+        }
+      //#updateSubCommand
+      case _ ⇒ // Do nothing
+    }
+  }
+
+  private def processCommand(controlCommand: ControlCommand): Unit = {
     hcdComponent
       .submit(controlCommand)
       .map {
@@ -146,7 +227,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
               hcdComponent.queryFinal(runId).map { sr =>
                 currentStatePublisher
                   .publish(CurrentState(shortSetup.source, StateName("testStateName"), Set(choiceKey.set(shortCmdCompleted))))
-                println(s"Updating short: $sr")
+                println(s"Updating xshort: $sr")
                 commandUpdatePublisher.update(sr)
               }
             // As the commands get completed, the results are updated in
@@ -158,8 +239,6 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
                   .publish(CurrentState(mediumSetup.source, StateName("testStateName"), Set(choiceKey.set(mediumCmdCompleted))))
                 println(s"Updating medium: $sr")
                 commandUpdatePublisher.update(sr)
-                println("Calling qf2")
-                queryFinal2(dummy())
               }
 
             case n if n == longSetup.commandName ⇒
@@ -175,17 +254,6 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
       }
   }
 
-  def dummy(): Future[SubmitResponse] = {
-    println("Dummy:")
-    Future.successful(Completed(CommandName("Dummy"), Id("1")))
-  }
-
-  type T1 = Id => Future[SubmitResponse]
-  def queryFinal2(c: => Future[SubmitResponse]): Future[SubmitResponse] = {
-    println("Calling c in qf2")
-    c
-    //Future(Completed(CommandName("a"), Id("1")))
-  }
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = ???
 
   override def onShutdown(): Future[Unit] = Future.successful(Unit)
