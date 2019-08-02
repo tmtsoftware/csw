@@ -16,7 +16,7 @@
 
 ### csw.g8
 1. Merge `dev` branch to master
-2. Run `giter8-release` pipeline by providing `VERSION` number
+2. Run `giter8-prod` pipeline by providing `VERSION` number
 
 ### Release `csw-js` (if needed)
 - Release `csw-js` if keycloak version is updated in csw
