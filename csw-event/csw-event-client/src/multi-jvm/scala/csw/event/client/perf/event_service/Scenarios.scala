@@ -9,7 +9,7 @@ class Scenarios(testConfigs: TestConfigs) {
   def adjustedTotalMessages(n: Long): Long = (n * totalMessagesFactor).toLong
 
   val warmUp = TestSettings(
-    testName = "warm-up",
+    testName = "tcs.warm-up",
     totalTestMsgs = adjustedTotalMessages(10000),
     payloadSize = 100,
     publisherSubscriberPairs = 1,
@@ -54,49 +54,49 @@ class Scenarios(testConfigs: TestConfigs) {
     "payload-1-to-1",
     List(
       TestSettings(
-        testName = "1-to-1-size-100",
+        testName = "tcs.1-to-1-size-100",
         totalTestMsgs = adjustedTotalMessages(2000),
         payloadSize = 100,
         publisherSubscriberPairs = 1,
         singlePublisher = false
       )
 //      TestSettings(
-//        testName = "1-to-1-size-1KB",
+//        testName = "tcs.1-to-1-size-1KB",
 //        totalTestMsgs = adjustedTotalMessages(2000),
 //        payloadSize = 1024,
 //        publisherSubscriberPairs = 1,
 //        singlePublisher = false
 //      )
 //    TestSettings(
-//      testName = "1-to-1-size-10KB",
+//      testName = "tcs.1-to-1-size-10KB",
 //      totalTestMsgs = adjustedTotalMessages(10000),
 //      payloadSize = 10 * 1024,
 //      publisherSubscriberPairs = 1,
 //      singlePublisher = false
 //    ),
 //    TestSettings(
-//      testName = "1-to-1-size-100KB",
+//      testName = "tcs.1-to-1-size-100KB",
 //      totalTestMsgs = adjustedTotalMessages(10000),
 //      payloadSize = 100 * 1024,
 //      publisherSubscriberPairs = 1,
 //      singlePublisher = false
 //    ),
 //    TestSettings(
-//      testName = "1-to-1-size-300KB",
+//      testName = "tcs.1-to-1-size-300KB",
 //      totalTestMsgs = adjustedTotalMessages(10000),
 //      payloadSize = 300 * 1024,
 //      publisherSubscriberPairs = 1,
 //      singlePublisher = false
 //    ),
 //    TestSettings(
-//      testName = "1-to-1-size-500KB",
+//      testName = "tcs.1-to-1-size-500KB",
 //      totalTestMsgs = adjustedTotalMessages(10000),
 //      payloadSize = 500 * 1024,
 //      publisherSubscriberPairs = 1,
 //      singlePublisher = false
 //    ),
 //    TestSettings(
-//      testName = "1-to-1-size-600KB",
+//      testName = "tcs.1-to-1-size-600KB",
 //      totalTestMsgs = adjustedTotalMessages(10000),
 //      payloadSize = 600 * 1024,
 //      publisherSubscriberPairs = 1,
@@ -109,14 +109,14 @@ class Scenarios(testConfigs: TestConfigs) {
     "payload-1-to-Many",
     List(
       TestSettings(
-        testName = "1-to-5-size-100",
+        testName = "tcs.1-to-5-size-100",
         totalTestMsgs = adjustedTotalMessages(2000),
         payloadSize = 100,
         publisherSubscriberPairs = 5,
         singlePublisher = true
       ),
       TestSettings(
-        testName = "1-to-5-size-1KB",
+        testName = "tcs.1-to-5-size-1KB",
         totalTestMsgs = adjustedTotalMessages(2000),
         payloadSize = 1024,
         publisherSubscriberPairs = 5,
@@ -129,42 +129,42 @@ class Scenarios(testConfigs: TestConfigs) {
     "one-to-many",
     List(
       TestSettings(
-        testName = "1-to-1",
+        testName = "tcs.1-to-1",
         totalTestMsgs = adjustedTotalMessages(10000),
         payloadSize = 100,
         publisherSubscriberPairs = 1,
         singlePublisher = true
       ),
       TestSettings(
-        testName = "1-to-5",
+        testName = "tcs.1-to-5",
         totalTestMsgs = adjustedTotalMessages(10000),
         payloadSize = 100,
         publisherSubscriberPairs = 5,
         singlePublisher = true
       ),
       TestSettings(
-        testName = "1-to-10",
+        testName = "tcs.1-to-10",
         totalTestMsgs = adjustedTotalMessages(10000),
         payloadSize = 100,
         publisherSubscriberPairs = 10,
         singlePublisher = true
       ),
       TestSettings(
-        testName = "1-to-50",
+        testName = "tcs.1-to-50",
         totalTestMsgs = adjustedTotalMessages(10000),
         payloadSize = 100,
         publisherSubscriberPairs = 50,
         singlePublisher = true
       ),
       TestSettings(
-        testName = "1-to-100",
+        testName = "tcs.1-to-100",
         totalTestMsgs = adjustedTotalMessages(10000),
         payloadSize = 100,
         publisherSubscriberPairs = 100,
         singlePublisher = true
       ),
       TestSettings(
-        testName = "1-to-200",
+        testName = "tcs.1-to-200",
         totalTestMsgs = adjustedTotalMessages(10000),
         payloadSize = 100,
         publisherSubscriberPairs = 200,
@@ -177,49 +177,49 @@ class Scenarios(testConfigs: TestConfigs) {
     "many-to-many",
     List(
       TestSettings(
-        testName = "one-to-one",
+        testName = "tcs.one-to-one",
         totalTestMsgs = adjustedTotalMessages(10000),
         payloadSize = 100,
         publisherSubscriberPairs = 1,
         singlePublisher = false
       ),
       TestSettings(
-        testName = "5-to-5",
+        testName = "tcs.5-to-5",
         totalTestMsgs = adjustedTotalMessages(10000),
         payloadSize = 100,
         publisherSubscriberPairs = 5,
         singlePublisher = false
       ),
       TestSettings(
-        testName = "10-to-10",
+        testName = "tcs.10-to-10",
         totalTestMsgs = adjustedTotalMessages(10000),
         payloadSize = 100,
         publisherSubscriberPairs = 10,
         singlePublisher = false
       ),
       TestSettings(
-        testName = "25-to-25",
+        testName = "tcs.25-to-25",
         totalTestMsgs = adjustedTotalMessages(10000),
         payloadSize = 100,
         publisherSubscriberPairs = 25,
         singlePublisher = false
       ),
       TestSettings(
-        testName = "50-to-50",
+        testName = "tcs.50-to-50",
         totalTestMsgs = adjustedTotalMessages(10000),
         payloadSize = 100,
         publisherSubscriberPairs = 50,
         singlePublisher = false
       ),
       TestSettings(
-        testName = "60-to-60",
+        testName = "tcs.60-to-60",
         totalTestMsgs = adjustedTotalMessages(10000),
         payloadSize = 100,
         publisherSubscriberPairs = 60,
         singlePublisher = false
       ),
       TestSettings(
-        testName = "70-to-70",
+        testName = "tcs.70-to-70",
         totalTestMsgs = adjustedTotalMessages(10000),
         payloadSize = 70,
         publisherSubscriberPairs = 70,
@@ -232,49 +232,49 @@ class Scenarios(testConfigs: TestConfigs) {
     "all",
     List(
       TestSettings(
-        testName = "1-to-1",
+        testName = "tcs.1-to-1",
         totalTestMsgs = adjustedTotalMessages(5000),
         payloadSize = 100,
         publisherSubscriberPairs = 1,
         singlePublisher = false
       ),
       TestSettings(
-        testName = "1-to-1-size-1k",
+        testName = "tcs.1-to-1-size-1k",
         totalTestMsgs = adjustedTotalMessages(5000),
         payloadSize = 1000,
         publisherSubscriberPairs = 1,
         singlePublisher = false
       ),
       TestSettings(
-        testName = "1-to-1-size-10k",
+        testName = "tcs.1-to-1-size-10k",
         totalTestMsgs = adjustedTotalMessages(5000),
         payloadSize = 1000,
         publisherSubscriberPairs = 1,
         singlePublisher = false
       ),
       TestSettings(
-        testName = "5-to-5",
+        testName = "tcs.5-to-5",
         totalTestMsgs = adjustedTotalMessages(5000),
         payloadSize = 100,
         publisherSubscriberPairs = 5,
         singlePublisher = false
       ),
       TestSettings(
-        testName = "10-to-10",
+        testName = "tcs.10-to-10",
         totalTestMsgs = adjustedTotalMessages(5000),
         payloadSize = 100,
         publisherSubscriberPairs = 10,
         singlePublisher = false
       ),
       TestSettings(
-        testName = "1-to-5",
+        testName = "tcs.1-to-5",
         totalTestMsgs = adjustedTotalMessages(5000),
         payloadSize = 100,
         publisherSubscriberPairs = 5,
         singlePublisher = true
       ),
       TestSettings(
-        testName = "1-to-10",
+        testName = "tcs.1-to-10",
         totalTestMsgs = adjustedTotalMessages(5000),
         payloadSize = 100,
         publisherSubscriberPairs = 10,

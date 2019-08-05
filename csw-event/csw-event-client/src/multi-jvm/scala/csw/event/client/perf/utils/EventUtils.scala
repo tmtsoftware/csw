@@ -9,7 +9,7 @@ import csw.params.core.models.{Id, Prefix}
 import csw.time.core.models.UTCTime
 
 object EventUtils {
-  private val prefix = Prefix("dummy")
+  private val prefix = Prefix("csw.dummy")
   val testEventS     = "move"
   val endEventS      = "end"
 
