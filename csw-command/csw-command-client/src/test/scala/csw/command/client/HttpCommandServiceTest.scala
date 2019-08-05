@@ -44,7 +44,7 @@ class HttpCommandServiceTest extends FunSuite with Matchers with BeforeAndAfterA
   private val connection      = HttpConnection(ComponentId(testCompName, ComponentType.Service))
 
   private val basePosKey = CoordKey.make("BasePosition")
-  private val prefix     = Prefix("test.command")
+  private val prefix     = Prefix("csw.command")
   private val key1: Key[Float] =
     KeyType.FloatKey.make("assemblyEventValue1")
   private val key1b: Key[Float] =

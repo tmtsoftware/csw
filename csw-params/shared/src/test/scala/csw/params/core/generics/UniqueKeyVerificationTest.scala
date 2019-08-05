@@ -140,7 +140,7 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
 
       //parameters with duplicate key via constructor
       val state = DemandState(
-        Prefix("test.prefix"),
+        Prefix("csw.prefix"),
         StateName("testStateName"),
         Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3)
       )
@@ -161,7 +161,7 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
       //parameters with duplicate key via constructor
       val state =
         CurrentState(
-          Prefix("test.prefix"),
+          Prefix("csw.prefix"),
           StateName("testStateName"),
           Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3)
         )

@@ -39,7 +39,4 @@ public class JSubsystem {
     public static final Subsystem TCS       = Subsystem.TCS$.MODULE$;
     public static final Subsystem TINC      = Subsystem.TINC$.MODULE$;
     public static final Subsystem WFOS      = Subsystem.WFOS$.MODULE$;
-    // for testing
-    public static final Subsystem TEST      = Subsystem.TEST$.MODULE$;
-    public static final Subsystem BAD       = Subsystem.BAD$.MODULE$;
 }

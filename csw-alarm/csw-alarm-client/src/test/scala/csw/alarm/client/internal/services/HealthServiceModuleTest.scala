@@ -3,15 +3,15 @@ package csw.alarm.client.internal.services
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import com.typesafe.config.ConfigFactory
 import csw.alarm.api.exceptions.{InactiveAlarmException, KeyNotFoundException}
+import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
+import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
+import csw.alarm.models.AlarmHealth
 import csw.alarm.models.AlarmHealth.{Bad, Good, Ill}
 import csw.alarm.models.AlarmSeverity._
 import csw.alarm.models.FullAlarmSeverity.Disconnected
 import csw.alarm.models.Key.{ComponentKey, GlobalKey, SubsystemKey}
 import csw.alarm.models.ShelveStatus.Shelved
-import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
-import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
-import csw.alarm.models.AlarmHealth
-import csw.params.core.models.Subsystem.{BAD, LGSF, NFIRAOS, TCS}
+import csw.params.core.models.Subsystem.{CSW, LGSF, NFIRAOS, TCS}
 
 import scala.concurrent.duration.DurationLong
 
@@ -127,7 +127,7 @@ class HealthServiceModuleTest
 
   // DEOPSCSW-466: Fetch alarm severity, component or subsystem
   test("getAggregatedHealth should throw KeyNotFoundException when key is invalid") {
-    an[KeyNotFoundException] shouldBe thrownBy(getAggregatedHealth(SubsystemKey(BAD)).await)
+    an[KeyNotFoundException] shouldBe thrownBy(getAggregatedHealth(SubsystemKey(CSW)).await)
   }
 
   // DEOPSCSW-466: Fetch alarm severity, component or subsystem
@@ -244,12 +244,12 @@ class HealthServiceModuleTest
 
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
   test("subscribeAggregatedSeverityCallback should throw KeyNotFoundException if the key does not match any key") {
-    a[KeyNotFoundException] shouldBe thrownBy(subscribeAggregatedHealthCallback(SubsystemKey(BAD), println).ready().await)
+    a[KeyNotFoundException] shouldBe thrownBy(subscribeAggregatedHealthCallback(SubsystemKey(CSW), println).ready().await)
   }
 
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
   test("subscribeAggregatedHealthCallback should throw KeyNotFoundException when key is invalid") {
-    a[KeyNotFoundException] shouldBe thrownBy(subscribeAggregatedHealthCallback(SubsystemKey(BAD), println).ready().await)
+    a[KeyNotFoundException] shouldBe thrownBy(subscribeAggregatedHealthCallback(SubsystemKey(CSW), println).ready().await)
   }
 
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all

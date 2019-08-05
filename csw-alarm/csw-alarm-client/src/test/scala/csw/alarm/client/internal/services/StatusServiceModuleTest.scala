@@ -16,7 +16,7 @@ import csw.alarm.client.internal.extensions.TimeExtensions
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.params.core.models.Subsystem
-import csw.params.core.models.Subsystem.BAD
+import csw.params.core.models.Subsystem.CSW
 import org.scalatest.AppendedClues
 import reactor.core.publisher.FluxSink.OverflowStrategy
 import romaine.{RedisResult, RedisValueChange}
@@ -156,7 +156,7 @@ class StatusServiceModuleTest
 
   // DEOPSCSW-447: Reset api for alarm
   test("reset should throw exception if key does not exist") {
-    val invalidAlarm = AlarmKey(BAD, "invalid", "invalid")
+    val invalidAlarm = AlarmKey(CSW, "invalid", "invalid")
     a[KeyNotFoundException] shouldBe thrownBy(reset(invalidAlarm).await)
   }
 
@@ -189,13 +189,13 @@ class StatusServiceModuleTest
 
   // DEOPSCSW-446: Acknowledge api for alarm
   test("acknowledge should throw exception if key does not exist") {
-    val invalidAlarm = AlarmKey(BAD, "invalid", "invalid")
+    val invalidAlarm = AlarmKey(CSW, "invalid", "invalid")
     a[KeyNotFoundException] shouldBe thrownBy(acknowledge(invalidAlarm).await)
   }
 
   // DEOPSCSW-446: Acknowledge api for alarm
   test("unacknowledge should throw exception if key does not exist") {
-    val invalidAlarm = AlarmKey(BAD, "invalid", "invalid")
+    val invalidAlarm = AlarmKey(CSW, "invalid", "invalid")
     a[KeyNotFoundException] shouldBe thrownBy(unacknowledge(invalidAlarm).await)
   }
 
@@ -240,7 +240,7 @@ class StatusServiceModuleTest
   }
 
   test("getStatus should throw exception if key does not exist") {
-    val invalidAlarm = AlarmKey(Subsystem.BAD, "invalid", "invalid")
+    val invalidAlarm = AlarmKey(Subsystem.CSW, "invalid", "invalid")
     a[KeyNotFoundException] shouldBe thrownBy(getStatus(invalidAlarm).await)
   }
 

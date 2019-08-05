@@ -10,7 +10,7 @@ import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 
 case class Options(
     cmd: String = "",
-    eventKey: EventKey = EventKey(s"${Subsystem.TEST}.unused.key"),
+    eventKey: EventKey = EventKey(s"${Subsystem.CSW}.unused.key"),
     eventKeys: Seq[EventKey] = Seq.empty,
     eventsMap: Map[EventKey, Set[String]] = Map.empty,
     eventData: Option[File] = None,

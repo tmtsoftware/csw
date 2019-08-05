@@ -21,7 +21,7 @@ class SequencerCommandServiceImplTest
     with ScalaFutures {
 
   test("should submit sequence to the sequencer") {
-    val sequence = Sequence(Setup(Prefix("test.move"), CommandName("command-1"), None))
+    val sequence = Sequence(Setup(Prefix("csw.move"), CommandName("command-1"), None))
 
     val submitResponse: SubmitResponse = Completed(sequence.runId)
 

@@ -60,7 +60,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*wit
   @Test
   def should_publish_initialization_event_on_publisher_creation(): Unit = {
     redisTestProps.publisher // access lazy publisher so that it gets evaluated
-    val initEventKey = EventKey(s"${Subsystem.TEST}.first.event.init")
+    val initEventKey = EventKey(s"${Subsystem.CSW}.first.event.init")
     val initEvent    = redisTestProps.subscriber.get(initEventKey).await
     initEvent.paramSet shouldBe InitializationEvent.value.paramSet
   }
@@ -147,7 +147,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*wit
     import baseProperties._
 
     var counter                      = -1
-    val events: immutable.Seq[Event] = for (i <- 31 to 41) yield makeEventWithPrefix(i, Prefix("test.move"))
+    val events: immutable.Seq[Event] = for (i <- 31 to 41) yield makeEventWithPrefix(i, Prefix("csw.move"))
 
     def eventGenerator(): Future[Option[Event]] = Future {
       counter += 1
@@ -176,7 +176,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*wit
   def should_be_able_to_maintain_ordering_while_publish(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
-    val prefix             = Prefix("test.ordering.prefix")
+    val prefix             = Prefix("csw.ordering.prefix")
     val event1             = makeEventWithPrefix(1, prefix)
     val event2             = makeEventWithPrefix(2, prefix)
     val event3             = makeEventWithPrefix(3, prefix)
@@ -213,7 +213,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*wit
   def should_be_able_to_publish_event_via_event_generator_with_start_time(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
-    val eventKey: EventKey = EventKey("test.publish.system")
+    val eventKey: EventKey = EventKey("csw.publish.system")
     var counter            = 0
     // Queue for events of event generator
     val generatorEvents = mutable.Queue[Event]()
@@ -224,7 +224,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*wit
       counter += 1
       if (counter % 2 == 0) None
       else {
-        val event: Event = makeEventWithPrefix(counter, Prefix("test.publish"))
+        val event: Event = makeEventWithPrefix(counter, Prefix("csw.publish"))
         // Save the events as they are created for later test
         generatorEvents.enqueue(event)
         Some(event)
@@ -264,7 +264,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*wit
     import baseProperties._
 
     var counter                      = -1
-    val events: immutable.Seq[Event] = for (i <- 31 to 41) yield makeEventWithPrefix(i, Prefix("test.publishAsync"))
+    val events: immutable.Seq[Event] = for (i <- 31 to 41) yield makeEventWithPrefix(i, Prefix("csw.publishAsync"))
 
     def eventGenerator(): Future[Option[Event]] = Future {
       counter += 1

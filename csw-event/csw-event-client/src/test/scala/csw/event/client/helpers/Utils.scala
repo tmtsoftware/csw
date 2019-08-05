@@ -8,7 +8,7 @@ import csw.params.javadsl.JKeyType
 import csw.time.core.models.UTCTime
 
 object Utils {
-  val prefix                  = Prefix("test.prefix")
+  val prefix                  = Prefix("csw.prefix")
   val eventName               = EventName("system")
   val event                   = SystemEvent(prefix, eventName)
   val timeNanosKey: Key[Long] = LongKey.make("eventTime")

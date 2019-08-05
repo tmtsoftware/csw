@@ -10,7 +10,7 @@ import csw.params.core.models.{Prefix, Subsystem}
 
 private[framework] class LockManager(val lockPrefix: Option[Prefix], loggerFactory: LoggerFactory) {
   private val log: Logger = loggerFactory.getLogger
-  private val AdminPrefix = Prefix(s"${Subsystem.Admin}.csw")
+  private val AdminPrefix = Prefix(s"${Subsystem.CSW}.admin")
 
   def lockComponent(source: Prefix, replyTo: ActorRef[LockingResponse])(startTimer: => Unit): LockManager = lockPrefix match {
     case None                => onAcquiringLock(source, replyTo, startTimer)

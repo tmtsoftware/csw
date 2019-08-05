@@ -202,7 +202,7 @@ retain the Lock on the component, sender will have to resend the `Lock` message.
  
 There are two ways component can be unlocked:
 1. Sending `Unlock` message (Note: This message should be sent by same component who has already locked component)
-1. Sending `Unlock` message with admin Prefix i.e. `Prefix("admin.csw")`, this is treated as Admin Unlock command.
+1. Sending `Unlock` message with admin Prefix i.e. `Prefix("csw.admin")`, this is treated as Admin Unlock command.
 
 ## CSW Services Injection
 To provide access to CSW Services, they are injected into the `ComponentHandlers` class in the constructor in a `CswContext` object.

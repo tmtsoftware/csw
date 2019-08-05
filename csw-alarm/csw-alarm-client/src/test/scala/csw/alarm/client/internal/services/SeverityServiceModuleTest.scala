@@ -19,7 +19,7 @@ import csw.logging.models.Level.DEBUG
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.utils.TestAppender
-import csw.params.core.models.Subsystem.{BAD, LGSF, NFIRAOS, TCS}
+import csw.params.core.models.Subsystem.{CSW, LGSF, NFIRAOS, TCS}
 import play.api.libs.json.{JsObject, Json}
 
 import scala.collection.mutable
@@ -87,7 +87,7 @@ class SeverityServiceModuleTest
 
   // DEOPSCSW-444: Set severity api for component
   test("setSeverity should throw KeyNotFoundException when tried to set severity for key which does not exists in alarm store") {
-    val invalidKey = AlarmKey(BAD, "trombone", "fakeAlarm")
+    val invalidKey = AlarmKey(CSW, "trombone", "fakeAlarm")
     an[KeyNotFoundException] shouldBe thrownBy(setSeverity(invalidKey, Critical).await)
   }
 
@@ -177,7 +177,7 @@ class SeverityServiceModuleTest
 
   // DEOPSCSW-457: Fetch current alarm severity
   test("getCurrentSeverity should throw exception if key does not exist") {
-    val invalidAlarm = AlarmKey(BAD, "invalid", "invalid")
+    val invalidAlarm = AlarmKey(CSW, "invalid", "invalid")
     an[KeyNotFoundException] shouldBe thrownBy(getCurrentSeverity(invalidAlarm).await)
   }
 
@@ -268,7 +268,7 @@ class SeverityServiceModuleTest
 
   // DEOPSCSW-465: Fetch alarm severity, component or subsystem
   test("getAggregatedSeverity should throw KeyNotFoundException when key is invalid") {
-    val invalidAlarm = ComponentKey(BAD, "invalid")
+    val invalidAlarm = ComponentKey(CSW, "invalid")
     an[KeyNotFoundException] shouldBe thrownBy(getAggregatedSeverity(invalidAlarm).await)
   }
 
@@ -408,7 +408,7 @@ class SeverityServiceModuleTest
 
   // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
   test("subscribeAggregatedSeverity should throw KeyNotFoundException when key is invalid") {
-    val invalidAlarm = ComponentKey(BAD, "invalid")
+    val invalidAlarm = ComponentKey(CSW, "invalid")
     a[KeyNotFoundException] shouldBe thrownBy(subscribeAggregatedSeverityCallback(invalidAlarm, println).ready().await)
   }
 

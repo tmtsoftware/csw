@@ -76,7 +76,7 @@ class ImageSerializationBenchmark {
     val binaryImgData: ArrayData[Byte]    = ArrayData.fromArray(img_32k_Bytes)
     val param: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData withUnits pascal
 
-    val observe           = Observe(Prefix("test.originationPrefix"), CommandName(prefixStr), Some(obsId)).add(param)
+    val observe           = Observe(Prefix("csw.originationPrefix"), CommandName(prefixStr), Some(obsId)).add(param)
     val observeSerializer = serialization.findSerializerFor(observe)
 
     observeSerializer.toBinary(observe)
@@ -91,7 +91,7 @@ class ImageSerializationBenchmark {
     val binaryImgData: ArrayData[Byte]    = ArrayData.fromArray(img_128k_Bytes)
     val param: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData withUnits pascal
 
-    val observe           = Observe(Prefix("test.originationPrefix"), CommandName(prefixStr), Some(obsId)).add(param)
+    val observe           = Observe(Prefix("csw.originationPrefix"), CommandName(prefixStr), Some(obsId)).add(param)
     val observeSerializer = serialization.findSerializerFor(observe)
 
     observeSerializer.toBinary(observe)
@@ -106,7 +106,7 @@ class ImageSerializationBenchmark {
     val binaryImgData: ArrayData[Byte]    = ArrayData.fromArray(img_512k_Bytes)
     val param: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData withUnits pascal
 
-    val observe           = Observe(Prefix("test.originationPrefix"), CommandName(prefixStr), Some(obsId)).add(param)
+    val observe           = Observe(Prefix("csw.originationPrefix"), CommandName(prefixStr), Some(obsId)).add(param)
     val observeSerializer = serialization.findSerializerFor(observe)
 
     observeSerializer.toBinary(observe)

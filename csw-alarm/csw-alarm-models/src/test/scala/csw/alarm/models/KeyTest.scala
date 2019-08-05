@@ -47,13 +47,13 @@ class KeyTest extends FunSuite with Matchers with TableDrivenPropertyChecks {
 
   test("ComponentKey should not allow empty values") {
     intercept[IllegalArgumentException] {
-      ComponentKey(Subsystem.TEST, null)
+      ComponentKey(Subsystem.CSW, null)
     }
   }
 
   test("AlarmKey should not allow empty values") {
     intercept[IllegalArgumentException] {
-      Key.AlarmKey(Subsystem.TEST, "test", "")
+      Key.AlarmKey(Subsystem.CSW, "test", "")
     }
   }
 }

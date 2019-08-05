@@ -249,13 +249,13 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   def should_be_able_to_subscribe_an_event_with_pattern_from_different_subsystem(redisProps: RedisTestProps): Unit = {
     import redisProps._
 
-    val testEvent1 = makeEventWithPrefix(1, Prefix("test.prefix"))
-    val testEvent2 = makeEventWithPrefix(2, Prefix("test.prefix"))
+    val testEvent1 = makeEventWithPrefix(1, Prefix("csw.prefix"))
+    val testEvent2 = makeEventWithPrefix(2, Prefix("csw.prefix"))
     val tcsEvent1  = makeEventWithPrefix(1, Prefix("tcs.prefix"))
     val testProbe  = TestProbe[Event]()
 
     // pattern is * for redis
-    val subscription = subscriber.pSubscribeCallback(Subsystem.TEST, eventPattern, testProbe.ref ! _)
+    val subscription = subscriber.pSubscribeCallback(Subsystem.CSW, eventPattern, testProbe.ref ! _)
     subscription.ready.await
     Thread.sleep(500)
 
@@ -282,7 +282,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     val testEvent3 = makeEventForKeyName(EventName("temperature"), 3)
     val testEvent4 = makeEventForKeyName(EventName("move"), 4)
     val testEvent5 = makeEventForKeyName(EventName("cove"), 5)
-    val testEvent6 = makeEventForPrefixAndKeyName(Prefix("test.test_prefix"), EventName("move"), 6)
+    val testEvent6 = makeEventForPrefixAndKeyName(Prefix("csw.test_prefix"), EventName("move"), 6)
 
     val inbox  = TestInbox[Event]()
     val inbox2 = TestInbox[Event]()
@@ -296,11 +296,11 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     val eventPattern4 = "test_prefix.*" //subscribe to all events with prefix `test_prefix` irresepective of event names
     val eventPattern5 = "*"             //subscribe to all events with prefix `test_prefix` irresepective of event names
 
-    val subscription  = subscriber.pSubscribeCallback(Subsystem.TEST, eventPattern, inbox.ref ! _)
-    val subscription2 = subscriber.pSubscribeCallback(Subsystem.TEST, eventPattern2, inbox2.ref ! _)
-    val subscription3 = subscriber.pSubscribeCallback(Subsystem.TEST, eventPattern3, inbox3.ref ! _)
-    val subscription4 = subscriber.pSubscribeCallback(Subsystem.TEST, eventPattern4, inbox4.ref ! _)
-    val subscription5 = subscriber.pSubscribeCallback(Subsystem.TEST, eventPattern5, inbox5.ref ! _)
+    val subscription  = subscriber.pSubscribeCallback(Subsystem.CSW, eventPattern, inbox.ref ! _)
+    val subscription2 = subscriber.pSubscribeCallback(Subsystem.CSW, eventPattern2, inbox2.ref ! _)
+    val subscription3 = subscriber.pSubscribeCallback(Subsystem.CSW, eventPattern3, inbox3.ref ! _)
+    val subscription4 = subscriber.pSubscribeCallback(Subsystem.CSW, eventPattern4, inbox4.ref ! _)
+    val subscription5 = subscriber.pSubscribeCallback(Subsystem.CSW, eventPattern5, inbox5.ref ! _)
 
     subscription.ready().await
     subscription2.ready().await
@@ -342,7 +342,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   def should_be_able_to_make_independent_subscriptions(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
-    val prefix        = Prefix("test.prefix")
+    val prefix        = Prefix("csw.prefix")
     val eventName1    = EventName("system1")
     val eventName2    = EventName("system2")
     val event1: Event = SystemEvent(prefix, eventName1)
@@ -390,7 +390,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_retrieve_InvalidEvent(baseProperties: BaseProperties): Unit = {
     import baseProperties._
-    val eventKey = EventKey("test.a.b.c")
+    val eventKey = EventKey("csw.a.b.c")
 
     val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).take(1).toMat(Sink.seq)(Keep.both).run()
 

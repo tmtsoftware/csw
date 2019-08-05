@@ -59,8 +59,8 @@ class CommandLineRunnerTest extends SeedData with Eventually {
 
   // DEOPSCSW-431: [Event Cli] Get command
   test("should able to get appropriate error message when there is no event published for provided key") {
-    commandLineRunner.get(argsParser.parse(Seq("get", "-e", "test.x.y.invalid_key", "--out", "json")).get).await
-    logBuffer.head shouldEqual "[ERROR] No events published for key: [test.x.y.invalid_key]"
+    commandLineRunner.get(argsParser.parse(Seq("get", "-e", "csw.x.y.invalid_key", "--out", "json")).get).await
+    logBuffer.head shouldEqual "[ERROR] No events published for key: [csw.x.y.invalid_key]"
   }
 
   // DEOPSCSW-431: [Event Cli] Get command

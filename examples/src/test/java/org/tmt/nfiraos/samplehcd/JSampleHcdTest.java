@@ -116,7 +116,7 @@ public class JSampleHcdTest extends JUnitSuite {
         Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
         Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond);
 
-        Setup setupCommand = new Setup(new Prefix("test.move"), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
+        Setup setupCommand = new Setup(new Prefix("csw.move"), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
 
         Timeout commandResponseTimeout = new Timeout(10, TimeUnit.SECONDS);
 
@@ -141,7 +141,7 @@ public class JSampleHcdTest extends JUnitSuite {
         Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
         Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond);
 
-        Setup setupCommand = new Setup(new Prefix("test.move"), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
+        Setup setupCommand = new Setup(new Prefix("csw.move"), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
 
         Timeout commandResponseTimeout = new Timeout(1, TimeUnit.SECONDS);
 

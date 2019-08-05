@@ -157,7 +157,7 @@ public class JEventPublisherTest extends TestNGSuite {
     public void should_be_able_to_publish_an_event_with_block_generating_future_of_event_with_duration(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         List<Event> events = new ArrayList<>();
         for (int i = 31; i < 41; i++) {
-            events.add(Utils.makeEventWithPrefix(i, new Prefix("test.move")));
+            events.add(Utils.makeEventWithPrefix(i, new Prefix("csw.move")));
         }
 
         EventKey eventKey = events.get(0).eventKey();
@@ -191,7 +191,7 @@ public class JEventPublisherTest extends TestNGSuite {
     //DEOPSCSW-595: Enforce ordering in publish
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_maintain_ordering_while_publish(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
-        Prefix prefix = Prefix.apply("test.ordering.prefix");
+        Prefix prefix = Prefix.apply("csw.ordering.prefix");
         Event event1 = Utils.makeEventWithPrefix(6, prefix);
         Event event2 = Utils.makeEventWithPrefix(7, prefix);
         Event event3 = Utils.makeEventWithPrefix(8, prefix);
@@ -231,7 +231,7 @@ public class JEventPublisherTest extends TestNGSuite {
     public void should_be_able_to_publish_event_via_event_generator_with_start_time(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         List<Event> events = new ArrayList<>();
         for (int i = 31; i < 41; i++) {
-            events.add(Utils.makeEventWithPrefix(i, new Prefix("test.start.time.test.publish")));
+            events.add(Utils.makeEventWithPrefix(i, new Prefix("csw.start.time.test.publish")));
         }
 
         EventKey eventKey = events.get(0).eventKey();
@@ -267,7 +267,7 @@ public class JEventPublisherTest extends TestNGSuite {
     public void should_be_able_to_publish_event_via_asynchronous_event_generator_with_start_time(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         List<Event> events = new ArrayList<>();
         for (int i = 31; i < 41; i++) {
-            events.add(Utils.makeEventWithPrefix(i, new Prefix("test.start.time.test.publishAsync")));
+            events.add(Utils.makeEventWithPrefix(i, new Prefix("csw.start.time.test.publishAsync")));
         }
 
         EventKey eventKey = events.get(0).eventKey();

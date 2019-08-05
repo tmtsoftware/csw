@@ -222,7 +222,7 @@ class LocationServiceCompTest(mode: String)
     val hostname = Networks().hostname
     //create http registration
     val port             = 9595
-    val prefix           = "test.trombone.hcd"
+    val prefix           = "csw.trombone.hcd"
     val httpConnection   = HttpConnection(models.ComponentId("Assembly1", ComponentType.Assembly))
     val httpRegistration = HttpRegistration(httpConnection, port, prefix)
 
@@ -262,7 +262,7 @@ class LocationServiceCompTest(mode: String)
     val hostname = Networks().hostname
     //create http registration
     val port             = 9595
-    val prefix           = "test.trombone.hcd"
+    val prefix           = "csw.trombone.hcd"
     val httpConnection   = HttpConnection(models.ComponentId("trombone1", ComponentType.HCD))
     val httpRegistration = HttpRegistration(httpConnection, port, prefix)
 

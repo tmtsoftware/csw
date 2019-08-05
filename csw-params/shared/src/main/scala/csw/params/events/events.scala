@@ -89,7 +89,7 @@ object Event {
    *
    * @return an invalid event with the key representing a bad key by using a BAD subsystem
    */
-  def badEvent(): SystemEvent = Event.invalidEvent(EventKey(s"${Subsystem.BAD}.parse.fail"))
+  def badEvent(): SystemEvent = Event.invalidEvent(EventKey(s"${Subsystem.CSW}.parse.fail"))
 }
 
 /**
