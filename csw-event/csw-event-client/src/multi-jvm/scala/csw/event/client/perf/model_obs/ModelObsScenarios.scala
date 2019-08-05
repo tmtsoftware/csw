@@ -26,6 +26,7 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
   }.toList
 
   private val tcs1Prefix = Prefix(s"$tcs.1")
+
   /**
    * Don not run below scenarios on local box, as it generates load and requires multiple machines to support.
    * For Local testing, try runnig scenarios mentioned at the bottom of this file.
@@ -33,6 +34,47 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
   // DEOPSCSW-405: [Redis]Measure performance of model observatory scenario
   // DEOPSCSW-406: [Kafka]Measure performance of model observatory scenario
   val idealMultiNodeModelObsScenario: ModelObservatoryTestSettings =
+    ModelObservatoryTestSettings(
+      JvmSetting(
+        tcs,
+        List(
+          PubSetting(tcs1Prefix, noOfPubs = 3, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
+          PubSetting(tcs1Prefix, noOfPubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+          PubSetting(tcs1Prefix, noOfPubs = 250, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+        ),
+        List(
+          SubSetting(tcs1Prefix, noOfSubs = 3, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
+          SubSetting(tcs1Prefix, noOfSubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+          SubSetting(tcs1Prefix, noOfSubs = 250, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+        )
+      ) ::
+        List(AOESW, IRIS, NFIRAOS, WFOS).flatMap { subsystem =>
+          val subsystemName = subsystem.entryName
+
+          (1 to 5).map {
+            n =>
+              JvmSetting(
+                subsystemName,
+                List(
+                  PubSetting(Prefix(s"$subsystemName.$n"), noOfPubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                  PubSetting(Prefix(s"$subsystemName.$n"), noOfPubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+                ),
+                List(
+                  SubSetting(Prefix(s"$subsystemName.$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                  SubSetting(Prefix(s"$subsystemName.$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+                )
+              )
+          }
+        }
+    )
+
+  /**
+   * Don not run below scenarios on local box, as it generates load and requires multiple machines to support.
+   * For Local testing, try runnig scenarios mentioned at the bottom of this file.
+   * */
+  // DEOPSCSW-405: [Redis]Measure performance of model observatory scenario
+  // DEOPSCSW-406: [Kafka]Measure performance of model observatory scenario
+  val idealMultiNodeModelObsScenarioAfterAwsNtpClockSync: ModelObservatoryTestSettings =
     ModelObservatoryTestSettings(
       JvmSetting(
         tcs,
