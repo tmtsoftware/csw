@@ -11,4 +11,5 @@
 * [Time service](../services/time.md)
 * [Database service](../services/database.md)
 * [Authentication and authorization service](../services/aas.md)
+* [Sequencer Command Service](../services/sequencerCommandService.md)
 @@@
