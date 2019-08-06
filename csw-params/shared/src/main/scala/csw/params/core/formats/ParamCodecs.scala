@@ -19,7 +19,12 @@ import io.bullet.borer.derivation.MapBasedCodecs._
 import scala.collection.mutable.{ArraySeq => ArrayS}
 import scala.reflect.ClassTag
 
-object ParamCodecs extends ParamCodecs
+object JParamCodecs extends ParamCodecs
+object ParamCodecs  extends ParamCodecs
+
+/**
+ * Supports (de)serialization of csw models
+ */
 trait ParamCodecs extends CommonCodecs {
 
   import CodecHelpers._
