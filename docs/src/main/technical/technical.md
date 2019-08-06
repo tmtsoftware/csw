@@ -5,6 +5,7 @@
 @@@ index
 
 * [Component Framework](framework/framework.md)
+* [Commands](command/command.md)
 * [CSW params](params/params.md)
 * [Location Service](location/location.md)
 * [Configuration Service](configuration/configuration.md)
