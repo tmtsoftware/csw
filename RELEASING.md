@@ -5,6 +5,15 @@
 ### Git
 * Make sure git authentication works on jenkins agent by running cmd: `ssh -vT git@github.com`
 
+### Node
+* Node is installed
+* npm module `junit-merge` is installed (for merging multiple xml test reports into one)
+* npm module `junit-viewer` is installed (for generating html test report from merged xml)
+
+### Bintray
+* Make sure bintray credentials are setup properly by running cmd: `sbt bintrayWhoami`
+* Make sure bintray credentials contain API key of bintray user, not password.
+
 ## Steps to release
 
 ### csw

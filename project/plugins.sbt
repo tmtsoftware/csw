@@ -27,7 +27,7 @@ addSbtPlugin("ohnosequences" % "sbt-github-release" % "0.7.0")
 addSbtCoursier
 classpathTypes += "maven-plugin"
 
-libraryDependencies += "com.sun.activation"   % "javax.activation" % "1.2.0"
+libraryDependencies += "com.sun.activation" % "javax.activation" % "1.2.0"
 
 scalacOptions ++= Seq(
   "-encoding",
@@ -37,5 +37,5 @@ scalacOptions ++= Seq(
   "-deprecation",
   //"-Xfatal-warnings",
   "-Xlint:-unused,_",
-  "-Ywarn-dead-code",
+  "-Ywarn-dead-code"
 )
