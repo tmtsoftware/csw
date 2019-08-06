@@ -23,6 +23,10 @@
 4. Exclude projects from `build.sbt` which you do not want to release
 5. Run `csw-prod` pipeline by providing `VERSION` number. (This automatically triggers `acceptance-release` pipeline)
 
+### csw-acceptance
+- Update the release notes (`notes/<version>.markdown`)
+- Pipeline will automatically triggered on the successful run of `csw-prod` pipeline
+
 ### csw.g8
 1. Merge `dev` branch to master
 2. Run `giter8-prod` pipeline by providing `VERSION` number
