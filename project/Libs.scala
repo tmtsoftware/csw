@@ -51,7 +51,7 @@ object Libs {
   val `jboss-logging`   = "org.jboss.logging"             % "jboss-logging"   % "3.4.0.Final"
   val `config`          = "com.typesafe"                  % "config"          % "1.3.4"
   val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.3.0"
-  val `caffeine`        = "com.github.ben-manes.caffeine" % "caffeine"        % "2.7.0"
+  val `caffeine`        = "com.github.ben-manes.caffeine" % "caffeine"        % "2.8.0"
 
 }
 
