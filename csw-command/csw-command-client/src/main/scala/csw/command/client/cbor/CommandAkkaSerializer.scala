@@ -57,7 +57,7 @@ class CommandAkkaSerializer(_actorSystem: ExtendedActorSystem) extends Serialize
       fromBinary[Components] orElse
       fromBinary[LockingResponse] orElse
       fromBinary[LoadAndStartSequence]
-    }.getOrElse {
+    } getOrElse {
       val ex = new RuntimeException(s"does not support decoding of ${manifest.get}")
       logger.error(ex.getMessage, ex = ex)
       throw ex

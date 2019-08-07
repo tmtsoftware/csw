@@ -5,7 +5,9 @@ import csw.location.api.commons.LocationServiceLogger
 import csw.location.models.codecs.LocationCodecs
 import csw.location.models.{Connection, Location, Registration, TrackingEvent}
 import csw.logging.api.scaladsl.Logger
-import io.bullet.borer.Cbor
+import io.bullet.borer.{Cbor, Decoder}
+
+import scala.reflect.ClassTag
 
 class LocationAkkaSerializer extends Serializer with LocationCodecs {
 
@@ -26,19 +28,21 @@ class LocationAkkaSerializer extends Serializer with LocationCodecs {
   }
 
   override def fromBinary(bytes: Array[Byte], manifest: Option[Class[_]]): AnyRef = {
-    if (classOf[Connection].isAssignableFrom(manifest.get)) {
-      Cbor.decode(bytes).to[Connection].value
-    } else if (classOf[Location].isAssignableFrom(manifest.get)) {
-      Cbor.decode(bytes).to[Location].value
-    } else if (classOf[Registration].isAssignableFrom(manifest.get)) {
-      Cbor.decode(bytes).to[Registration].value
-    } else if (classOf[TrackingEvent].isAssignableFrom(manifest.get)) {
-      Cbor.decode(bytes).to[TrackingEvent].value
-    } else {
+    def fromBinary[T: ClassTag: Decoder]: Option[T] = {
+      val clazz = scala.reflect.classTag[T].runtimeClass
+      if (clazz.isAssignableFrom(manifest.get)) Some(Cbor.decode(bytes).to[T].value)
+      else None
+    }
+
+    {
+      fromBinary[Connection] orElse
+      fromBinary[Location] orElse
+      fromBinary[Registration] orElse
+      fromBinary[TrackingEvent]
+    } getOrElse {
       val ex = new RuntimeException(s"does not support decoding of ${manifest.get}")
       logger.error(ex.getMessage, ex = ex)
       throw ex
     }
   }
-
 }

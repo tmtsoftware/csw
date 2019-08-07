@@ -5,10 +5,11 @@ import csw.logging.api.scaladsl.Logger
 import csw.logging.models.codecs.LoggingCodecs._
 import csw.logging.client.scaladsl.GenericLoggerFactory
 import csw.logging.models.{Level, LogMetadata}
-import io.bullet.borer.Cbor
+import io.bullet.borer.{Cbor, Decoder}
+
+import scala.reflect.ClassTag
 
 class LoggingAkkaSerializer extends Serializer {
-
   private val logger: Logger   = GenericLoggerFactory.getLogger
   override def identifier: Int = 19925
 
@@ -23,14 +24,20 @@ class LoggingAkkaSerializer extends Serializer {
 
   override def includeManifest: Boolean = true
 
-  override def fromBinary(bytes: Array[Byte], manifest: Option[Class[_]]): AnyRef =
-    if (classOf[LogMetadata].isAssignableFrom(manifest.get)) {
-      Cbor.decode(bytes).to[LogMetadata].value
-    } else if (classOf[Level].isAssignableFrom(manifest.get)) {
-      Cbor.decode(bytes).to[Level].value
-    } else {
+  override def fromBinary(bytes: Array[Byte], manifest: Option[Class[_]]): AnyRef = {
+    def fromBinary[T: ClassTag: Decoder]: Option[T] = {
+      val clazz = scala.reflect.classTag[T].runtimeClass
+      if (clazz.isAssignableFrom(manifest.get)) Some(Cbor.decode(bytes).to[T].value)
+      else None
+    }
+
+    {
+      fromBinary[LogMetadata] orElse
+      fromBinary[Level]
+    } getOrElse {
       val ex = new RuntimeException(s"does not support decoding of ${manifest.get}")
       logger.error(ex.getMessage, ex = ex)
       throw ex
     }
+  }
 }
