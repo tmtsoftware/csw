@@ -166,7 +166,6 @@ trait ParamCodecs extends CommonCodecs {
   private[formats] implicit lazy val cancelledCodec: Codec[Cancelled]                     = deriveCodec[Cancelled]
   private[formats] implicit lazy val lockedCodec: Codec[Locked]                           = deriveCodec[Locked]
   private[formats] implicit lazy val commandNotAvailableCodec: Codec[CommandNotAvailable] = deriveCodec[CommandNotAvailable]
-  implicit lazy val commandResponseRemoteMsgCodec: Codec[CommandResponse.RemoteMsg]       = deriveCodec[CommandResponse.RemoteMsg]
   implicit lazy val commandResponseCodec: Codec[CommandResponse]                          = deriveCodec[CommandResponse]
 
   // ************************ CommandIssue Codecs ********************

@@ -7,7 +7,7 @@ import csw.command.client.models.framework.PubSub.SubscriberMessage
 import csw.command.client.models.framework._
 import csw.location.models.TrackingEvent
 import csw.logging.models.{Level, LogMetadata}
-import csw.params.commands.CommandResponse.{RemoteMsg => _, _}
+import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
 import csw.params.core.models.{Id, Prefix}
 import csw.params.core.states.CurrentState

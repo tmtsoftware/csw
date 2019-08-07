@@ -24,7 +24,7 @@ class CommandAkkaSerializer(_actorSystem: ExtendedActorSystem) extends Serialize
 
   override def toBinary(o: AnyRef): Array[Byte] = o match {
     case x: CommandSerializationMarker.RemoteMsg => Cbor.encode(x).toByteArray
-    case x: CommandResponse.RemoteMsg            => Cbor.encode(x).toByteArray
+    case x: CommandResponse                      => Cbor.encode(x).toByteArray
     case x: StateVariable                        => Cbor.encode(x).toByteArray
     case x: SupervisorLifecycleState             => Cbor.encode(x).toByteArray
     case x: ContainerLifecycleState              => Cbor.encode(x).toByteArray
@@ -48,7 +48,7 @@ class CommandAkkaSerializer(_actorSystem: ExtendedActorSystem) extends Serialize
     }
 
     {
-      fromBinary[CommandResponse.RemoteMsg] orElse
+      fromBinary[CommandResponse] orElse
       fromBinary[StateVariable] orElse
       fromBinary[CommandSerializationMarker.RemoteMsg] orElse
       fromBinary[SupervisorLifecycleState] orElse
