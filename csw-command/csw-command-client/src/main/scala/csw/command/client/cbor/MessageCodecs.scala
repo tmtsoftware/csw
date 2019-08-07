@@ -24,7 +24,7 @@ import csw.command.client.models.framework.PubSub.{Publish, PublisherMessage, Su
 import csw.command.client.models.framework.{PubSub, _}
 import csw.location.models.codecs.LocationCodecs
 import csw.logging.models.codecs.LoggingCodecs
-import csw.params.core.formats.{CodecHelpers, ParamCodecs}
+import csw.params.core.formats.ParamCodecs
 import io.bullet.borer.derivation.ArrayBasedCodecs.deriveUnaryCodec
 import io.bullet.borer.derivation.MapBasedCodecs._
 import io.bullet.borer.{Codec, Decoder, Encoder}
@@ -36,12 +36,12 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
   implicit def actorSystem: ActorSystem[_]
 
   implicit def actorRefCodec[T]: Codec[ActorRef[T]] =
-    CodecHelpers.bimap[String, ActorRef[T]](
+    Codec.bimap[String, ActorRef[T]](
+      actorRef => Serialization.serializedActorPath(actorRef.toUntyped),
       path => {
         val provider = SerializationExtension(actorSystem.toUntyped).system.provider
         provider.resolveActorRef(path)
-      },
-      actorRef => Serialization.serializedActorPath(actorRef.toUntyped)
+      }
     )
 
   implicit def subscribeMessageCodec[T: Encoder: Decoder]: Codec[PubSub.Subscribe[T]] = deriveCodec[PubSub.Subscribe[T]]
@@ -54,9 +54,10 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
   implicit def pubSubCodec[T: Encoder: Decoder]: Codec[PubSub[T]]                         = deriveCodec[PubSub[T]]
 
   implicit lazy val durationCodec: Codec[FiniteDuration] =
-    bimap[(Long, String), FiniteDuration]({
-      case (length, unitStr) => FiniteDuration(length, TimeUnit.valueOf(unitStr))
-    }, finiteDuration => (finiteDuration.length, finiteDuration.unit.toString))
+    Codec.bimap[(Long, String), FiniteDuration](
+      finiteDuration => (finiteDuration.length, finiteDuration.unit.toString),
+      { case (length, unitStr) => FiniteDuration(length, TimeUnit.valueOf(unitStr)) }
+    )
 
   // ************************ LockingResponse Codecs ********************
 

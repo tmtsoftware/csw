@@ -11,8 +11,8 @@ import io.bullet.borer.derivation.MapBasedCodecs._
 object ConfigCodecs extends ConfigCodecs
 trait ConfigCodecs {
 
-  implicit lazy val pathCodec: Codec[Path]       = CodecHelpers.bimap[String, Path](Paths.get(_), _.toString)
-  implicit lazy val instantCodec: Codec[Instant] = CodecHelpers.bimap[String, Instant](Instant.parse, _.toString)
+  implicit lazy val pathCodec: Codec[Path]       = Codec.bimap[String, Path](_.toString, Paths.get(_))
+  implicit lazy val instantCodec: Codec[Instant] = Codec.bimap[String, Instant](_.toString, Instant.parse)
 
   // don't make configIdCodec unary codec as this codec will be used in http json
   implicit lazy val configIdCodec: Codec[ConfigId]                     = deriveCodec[ConfigId]

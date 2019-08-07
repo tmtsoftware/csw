@@ -15,9 +15,9 @@ trait LocationCodecs extends CommonCodecs {
   implicit lazy val connectionInfoCodec: Codec[ConnectionInfo] = deriveCodec[ConnectionInfo]
 
   implicit def connectionCodec[C <: Connection]: Codec[C] =
-    CodecHelpers.bimap[ConnectionInfo, C](x => Connection.from(x).asInstanceOf[C], _.connectionInfo)
+    Codec.bimap[ConnectionInfo, C](_.connectionInfo, x => Connection.from(x).asInstanceOf[C])
 
-  implicit lazy val uriCodec: Codec[URI] = CodecHelpers.bimap[String, URI](new URI(_), _.toString)
+  implicit lazy val uriCodec: Codec[URI] = Codec.bimap[String, URI](_.toString, new URI(_))
 
   implicit lazy val locationCodec: Codec[Location]         = deriveCodec[Location]
   implicit lazy val akkaLocationCodec: Codec[AkkaLocation] = deriveCodec[AkkaLocation]

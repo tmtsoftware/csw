@@ -27,12 +27,10 @@ object ParamCodecs  extends ParamCodecs
  */
 trait ParamCodecs extends CommonCodecs {
 
-  import CodecHelpers._
-
   type ArrayEnc[T] = Encoder[Array[T]]
   type ArrayDec[T] = Decoder[Array[T]]
 
-  def singletonCodec[T <: Singleton](a: T): Codec[T] = CodecHelpers.bimap[String, T](_ => a, _.toString)
+  def singletonCodec[T <: Singleton](a: T): Codec[T] = Codec.bimap[String, T](_.toString, _ => a)
 
   // ************************ Base Type Codecs ********************
 
@@ -70,10 +68,10 @@ trait ParamCodecs extends CommonCodecs {
   // ************************ Composite Codecs ********************
 
   implicit def arrayDataCodec[T: ArrayEnc: ArrayDec]: Codec[ArrayData[T]] =
-    bimap[ArrayS[T], ArrayData[T]](ArrayData(_), _.data)
+    Codec.bimap[ArrayS[T], ArrayData[T]](_.data, ArrayData(_))
 
   implicit def matrixDataCodec[T: ClassTag: ArrayEnc: ArrayDec]: Codec[MatrixData[T]] =
-    bimap[ArrayS[ArrayS[T]], MatrixData[T]](MatrixData(_), _.data)(Encoder.forIterable, Decoder.forIterable)
+    Codec.bimap[ArrayS[ArrayS[T]], MatrixData[T]](_.data, MatrixData(_))(Encoder.forIterable, Decoder.forIterable)
 
   // ************************ Enum Codecs ********************
 
@@ -89,7 +87,7 @@ trait ParamCodecs extends CommonCodecs {
   implicit lazy val javaByteArrayDec: Decoder[Array[JByte]] = bytesDec.map(_.map(x => x: JByte))
 
   implicit def waCodec[T: ArrayEnc: ArrayDec]: Codec[ArrayS[T]] =
-    bimap[Array[T], ArrayS[T]](x => x: ArrayS[T], _.array.asInstanceOf[Array[T]])
+    Codec.bimap[Array[T], ArrayS[T]](_.array.asInstanceOf[Array[T]], x => x: ArrayS[T])
 
   //Do not put the bytesEnc and bytesDec inside Codec, due to an issue with borer https://github.com/sirthias/borer/issues/24
   implicit lazy val bytesEnc: Encoder[Array[Byte]] = Encoder.targetSpecific(
@@ -105,7 +103,7 @@ trait ParamCodecs extends CommonCodecs {
   implicit def paramCoreCodec[T: ArrayEnc: ArrayDec]: Codec[ParamCore[T]] = deriveCodec[ParamCore[T]]
 
   implicit def paramCodec[T: ArrayEnc: ArrayDec]: Codec[Parameter[T]] =
-    bimap[Map[String, ParamCore[T]], Parameter[T]](ParamCore.toParam, ParamCore.fromParam)
+    Codec.bimap[Map[String, ParamCore[T]], Parameter[T]](ParamCore.fromParam, ParamCore.toParam)
 
   implicit lazy val paramEncExistential: Encoder[Parameter[_]] = { (w: Writer, value: Parameter[_]) =>
     val encoder: Encoder[Parameter[Any]] = value.keyType.paramEncoder.asInstanceOf[Encoder[Parameter[Any]]]
