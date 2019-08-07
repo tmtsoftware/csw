@@ -1,0 +1,28 @@
+
+## CSW - TMT Common Software v1.0.0-RC1
+
+This is release v1.0.0-RC1 of the TMT Common Software.
+
+See [CHANGELOG.md](CHANGELOG.md) for details of all releases.
+
+### Changes
+- Replaced Kryo serialization with Borer-CBOR for Akka actor messages
+- Replaced Play-JSON with Borer-JSON in Location service
+- Made Location, Config and Alarm service models to be cross compilable for ScalaJs
+- Removed `BAD` and `TEST` subsystems
+- Added SequencerCommandService and docs for it
+- Separated Command service docs from Framework docs
+
+### Api changes
+- Rename `submit` api to `submitAndWait` in Command service as it waits for final response
+- Rename `submitAll` to `submitAllAndWait` in Command service as it waits for final response of all commands 
+- Added `submit` api in Command service which will submit the command to component and return the SubmitResponse
+- `Prefix` creation will throw `NoSuchElementException` if invalid subsystem is provided 
+
+### Version Upgrades
+- Scala version upgrade to 2.13.0
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/1.0.0-RC1/
+- Scaladoc: https://tmtsoftware.github.io/csw/1.0.0-RC1/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/1.0.0-RC1/api/java/index.html
