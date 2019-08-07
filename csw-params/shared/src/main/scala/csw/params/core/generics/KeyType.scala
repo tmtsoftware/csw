@@ -6,7 +6,7 @@ import csw.params.core.models.Coords._
 import csw.params.core.models.Units.second
 import csw.params.core.models._
 import csw.time.core.models.{TAITime, UTCTime}
-import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
+import enumeratum.{Enum, EnumEntry}
 import io.bullet.borer.{Decoder, Encoder}
 
 import scala.reflect.ClassTag
@@ -71,7 +71,7 @@ class MatrixKeyType[S: ClassTag: ArrayEnc: ArrayDec] extends SimpleKeyType[Matri
 /**
  * KeyTypes defined for consumption in Scala code
  */
-object KeyType extends Enum[KeyType[_]] with PlayJsonEnum[KeyType[_]] {
+object KeyType extends Enum[KeyType[_]] {
 
   /**
    * values return a Seq of all KeyTypes provided by `csw-messages`

@@ -1,5 +1,5 @@
 package csw.params.core.models
-import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
+import enumeratum.{Enum, EnumEntry}
 
 import scala.collection.immutable
 
@@ -24,7 +24,7 @@ sealed abstract class Units(name: String, description: String) extends EnumEntry
   def getDescription: String = description
 }
 
-object Units extends Enum[Units] with PlayJsonEnum[Units] {
+object Units extends Enum[Units] {
 
   /**
    * A Seq of all values that are Units

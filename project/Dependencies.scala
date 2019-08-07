@@ -20,6 +20,9 @@ object Dependencies {
   val LocationModels = Def.setting(
     Seq(
       Enumeratum.`enumeratum`.value,
+      Enumeratum.`enumeratum-play-json`.value,
+      Libs.`play-json`.value,
+      Libs.`play-json-derived-codecs`.value,
       Borer.`borer-core`.value,
       Borer.`borer-derivation`.value,
       Libs.`scalatest`.value % Test,
@@ -190,9 +193,6 @@ object Dependencies {
   val Params = Def.setting(
     Seq(
       Enumeratum.`enumeratum`.value,
-      Enumeratum.`enumeratum-play-json`.value,
-      Libs.`play-json`.value,
-      Libs.`play-json-derived-codecs`.value,
       Borer.`borer-core`.value,
       Borer.`borer-derivation`.value,
       Libs.`scalatest`.value % Test
@@ -266,7 +266,6 @@ object Dependencies {
     Seq(
       Enumeratum.`enumeratum`.value,
       Libs.`config`,
-      Libs.`play-json`.value,
       Libs.`scala-async`.value,
       Libs.`scala-java8-compat`,
       Akka.`akka-stream`,

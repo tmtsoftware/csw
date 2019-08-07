@@ -1,7 +1,7 @@
 package csw.params.core.models
 
 import enumeratum.EnumEntry.Lowercase
-import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
+import enumeratum.{Enum, EnumEntry}
 
 import scala.collection.immutable
 
@@ -26,7 +26,7 @@ sealed abstract class Subsystem(description: String) extends EnumEntry with Lowe
 /**
  * Defines constants for the available subsystems
  */
-object Subsystem extends Enum[Subsystem] with PlayJsonEnum[Subsystem] {
+object Subsystem extends Enum[Subsystem] {
 
   override def values: immutable.IndexedSeq[Subsystem] = findValues
 
