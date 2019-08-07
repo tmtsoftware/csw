@@ -7,11 +7,11 @@ See [CHANGELOG.md](CHANGELOG.md) for details of all releases.
 
 ### Changes
 - Replaced Kryo serialization with Borer-CBOR for Akka actor messages
-- Replaced Play-JSON with Borer-JSON in Location service
+- Replaced Play-JSON with Borer-JSON in Location service, Configuration Service and Admin Service
 - Made Location, Config and Alarm service models to be cross compilable for ScalaJs
 - Removed `BAD` and `TEST` subsystems
 - Added SequencerCommandService and docs for it
-- Separated Command service docs from Framework docs
+- Separated Command service docs technical from Framework docs
 
 ### Api changes
 - Rename `submit` api to `submitAndWait` in Command service as it waits for final response

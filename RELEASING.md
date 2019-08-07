@@ -17,7 +17,7 @@
 ## Steps to release
 
 ### csw
-1. Update release notes (`notes/<version>.markdown`)
+1. Update release notes (`notes/<version>.markdown`) in `csw` and `csw-acceptance` repo
 2. Update top level `CHANGELOG.md`
 3. Update top level `README.md`
 4. Exclude projects from `build.sbt` which you do not want to release
@@ -31,7 +31,7 @@
 1. Merge `dev` branch to master
 2. Run `giter8-prod` pipeline by providing `VERSION` number
 
-### Release `csw-js` (if needed)
+### Release csw-js (if needed)
 - Release `csw-js` if keycloak version is updated in csw
 
 ### Release csw-client
