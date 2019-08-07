@@ -43,9 +43,8 @@ abstract class ComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx
   def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit
 
   /**
-   * The validateCommand is invoked when a command is received by this component. If a command can be completed immediately,
-   * a CommandResponse indicating the final response for the command can be returned. If a command requires time for processing,
-   * the component is required to validate the ControlCommand received and return a validation result as Accepted or Invalid.
+   * The validateCommand is invoked when a command is received by this component.
+   * The component is required to validate the ControlCommand received and return a validation result as Accepted or Invalid.
    *
    * @param controlCommand represents a command received e.g. Setup, Observe or wait
    * @return a CommandResponse after validation
