@@ -54,14 +54,14 @@ trait ParamCodecs extends CommonCodecs {
 
   implicit lazy val tsCodec: Codec[Timestamp] = deriveCodec[Timestamp]
 
-  implicit lazy val instantEnc: Encoder[Instant] = CodecHelpers.targetSpecificEnc(
-    cborEnc = tsCodec.encoder.contramap(Timestamp.fromInstant),
-    jsonEnc = Encoder.forString.contramap(_.toString)
+  implicit lazy val instantEnc: Encoder[Instant] = Encoder.targetSpecific(
+    cbor = tsCodec.encoder.contramap(Timestamp.fromInstant),
+    json = Encoder.forString.contramap(_.toString)
   )
 
-  implicit lazy val instantDec: Decoder[Instant] = CodecHelpers.targetSpecificDec(
-    cborDec = tsCodec.decoder.map(_.toInstant),
-    jsonDec = Decoder.forString.map(Instant.parse)
+  implicit lazy val instantDec: Decoder[Instant] = Decoder.targetSpecific(
+    cbor = tsCodec.decoder.map(_.toInstant),
+    json = Decoder.forString.map(Instant.parse)
   )
 
   implicit lazy val utcTimeCodec: Codec[UTCTime] = deriveUnaryCodec[UTCTime]
@@ -92,14 +92,14 @@ trait ParamCodecs extends CommonCodecs {
     bimap[Array[T], ArrayS[T]](x => x: ArrayS[T], _.array.asInstanceOf[Array[T]])
 
   //Do not put the bytesEnc and bytesDec inside Codec, due to an issue with borer https://github.com/sirthias/borer/issues/24
-  implicit lazy val bytesEnc: Encoder[Array[Byte]] = CodecHelpers.targetSpecificEnc(
-    cborEnc = Encoder.forByteArrayDefault,
-    jsonEnc = Encoder.forArray[Byte]
+  implicit lazy val bytesEnc: Encoder[Array[Byte]] = Encoder.targetSpecific(
+    cbor = Encoder.forByteArrayDefault,
+    json = Encoder.forArray[Byte]
   )
 
-  implicit lazy val bytesDec: Decoder[Array[Byte]] = CodecHelpers.targetSpecificDec(
-    cborDec = Decoder.forByteArrayDefault,
-    jsonDec = Decoder.forArray[Byte]
+  implicit lazy val bytesDec: Decoder[Array[Byte]] = Decoder.targetSpecific(
+    cbor = Decoder.forByteArrayDefault,
+    json = Decoder.forArray[Byte]
   )
 
   implicit def paramCoreCodec[T: ArrayEnc: ArrayDec]: Codec[ParamCore[T]] = deriveCodec[ParamCore[T]]

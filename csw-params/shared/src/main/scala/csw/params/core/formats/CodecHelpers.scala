@@ -10,14 +10,4 @@ object CodecHelpers {
   )
 
   def enumCodec[T <: EnumEntry: Enum]: Codec[T] = bimap[String, T](implicitly[Enum[T]].withNameInsensitive, _.entryName)
-
-  def targetSpecificEnc[T](cborEnc: Encoder[T], jsonEnc: Encoder[T]): Encoder[T] = { (writer, value) =>
-    val enc = if (writer.target == Cbor) cborEnc else jsonEnc
-    enc.write(writer, value)
-  }
-
-  def targetSpecificDec[T](cborDec: Decoder[T], jsonDec: Decoder[T]): Decoder[T] = { reader =>
-    val dec = if (reader.target == Cbor) cborDec else jsonDec
-    dec.read(reader)
-  }
 }
