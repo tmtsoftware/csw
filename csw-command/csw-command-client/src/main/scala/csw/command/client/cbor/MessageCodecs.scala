@@ -25,7 +25,7 @@ import csw.command.client.models.framework.{PubSub, _}
 import csw.location.models.codecs.LocationCodecs
 import csw.logging.models.codecs.LoggingCodecs
 import csw.params.core.formats.{CodecHelpers, ParamCodecs}
-import io.bullet.borer.derivation.ArrayBasedCodecs.deriveCodecForUnaryCaseClass
+import io.bullet.borer.derivation.ArrayBasedCodecs.deriveUnaryCodec
 import io.bullet.borer.derivation.MapBasedCodecs._
 import io.bullet.borer.{Codec, Decoder, Encoder}
 
@@ -65,8 +65,8 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
   implicit lazy val lockExpiredCodec: Codec[LockExpired.type]                 = singletonCodec(LockExpired)
   implicit lazy val lockAlreadyReleasedCodec: Codec[LockAlreadyReleased.type] = singletonCodec(LockAlreadyReleased)
   implicit lazy val lockAcquiredCodec: Codec[LockAcquired.type]               = singletonCodec(LockAcquired)
-  implicit lazy val releasingLockFailedCodec: Codec[ReleasingLockFailed]      = deriveCodecForUnaryCaseClass[ReleasingLockFailed]
-  implicit lazy val acquiringLockFailedCodec: Codec[AcquiringLockFailed]      = deriveCodecForUnaryCaseClass[AcquiringLockFailed]
+  implicit lazy val releasingLockFailedCodec: Codec[ReleasingLockFailed]      = deriveUnaryCodec[ReleasingLockFailed]
+  implicit lazy val acquiringLockFailedCodec: Codec[AcquiringLockFailed]      = deriveUnaryCodec[AcquiringLockFailed]
   implicit lazy val lockingResponseCodec: Codec[LockingResponse]              = deriveCodec[LockingResponse]
 
   // ************************ Components Codecs ********************
