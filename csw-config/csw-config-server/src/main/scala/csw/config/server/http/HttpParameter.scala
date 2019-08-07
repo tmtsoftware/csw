@@ -4,16 +4,11 @@ import java.nio.file.{Path, Paths}
 import java.time.Instant
 import java.util.regex.{Pattern, PatternSyntaxException}
 
-import akka.http.scaladsl.marshalling.{Marshaller, ToEntityMarshaller}
-import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.HttpEncoding
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.directives.{DebuggingDirectives, LoggingMagnet}
-import akka.http.scaladsl.unmarshalling.{FromEntityUnmarshaller, Unmarshaller}
-import akka.util.ByteString
 import csw.config.api.ConfigData
 import csw.config.api.commons.TokenMaskSupport
-import csw.config.api.internal.JsonSupport
 import csw.config.models.{ConfigId, FileType}
 import csw.config.server.commons.{ConfigServerLogger, PathValidator}
 import csw.logging.api.scaladsl.Logger
@@ -21,7 +16,7 @@ import csw.logging.api.scaladsl.Logger
 /**
  * Helper class for ConfigServiceRoute
  */
-trait HttpSupport extends TokenMaskSupport with Directives with JsonSupport {
+trait HttpParameter extends TokenMaskSupport with Directives with HttpCodecs {
 
   def prefix(prefix: String): Directive1[Path] = path(prefix / Remaining).flatMap { path =>
     validate(PathValidator.isValid(path), PathValidator.message(path)).tmap[Path] { _ =>
@@ -74,17 +69,4 @@ trait HttpSupport extends TokenMaskSupport with Directives with JsonSupport {
     case _ =>
       reject(UnsupportedRequestEncodingRejection(HttpEncoding("All encodings with contentLength value")))
   }
-
-  // This marshaller is used to create a response stream for get/getActive requests
-  implicit val configDataMarshaller: ToEntityMarshaller[ConfigData] = Marshaller.opaque { configData =>
-    HttpEntity(ContentTypes.`application/octet-stream`, configData.length, configData.source)
-  }
-
-  implicit val configDataUnmarshaller: FromEntityUnmarshaller[String] =
-    Unmarshaller.byteStringUnmarshaller
-      .forContentTypes(ContentTypes.`application/octet-stream`)
-      .mapWithCharset {
-        case (ByteString.empty, _) => throw Unmarshaller.NoContentException
-        case (data, charset)       => data.decodeString(charset.nioCharset.name)
-      }
 }

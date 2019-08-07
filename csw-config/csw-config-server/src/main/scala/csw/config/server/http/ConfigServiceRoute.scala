@@ -9,6 +9,7 @@ import csw.config.api.scaladsl.ConfigService
 import csw.config.server.ActorRuntime
 import csw.config.server.svn.SvnConfigServiceFactory
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
+import csw.config.models.codecs.ConfigCodecs
 
 /**
  * Routes supported by config server
@@ -22,7 +23,9 @@ class ConfigServiceRoute(
     actorRuntime: ActorRuntime,
     configHandlers: ConfigHandlers,
     securityDirectives: SecurityDirectives
-) extends HttpSupport {
+) extends HttpParameter
+    with ConfigCodecs
+    with HttpCodecs {
 
   import actorRuntime._
   import securityDirectives._

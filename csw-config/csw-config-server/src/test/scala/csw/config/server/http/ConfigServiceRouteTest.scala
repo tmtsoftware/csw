@@ -30,7 +30,7 @@ class ConfigServiceRouteTest
     with BeforeAndAfterAll
     with BeforeAndAfterEach
     with Matchers
-    with HttpSupport
+    with HttpParameter
     with MockitoSugar
     with MockedAuthentication {
 
@@ -40,6 +40,8 @@ class ConfigServiceRouteTest
   val serverWiring: ServerWiring = ServerWiring.make(securityDirectives)
   import serverWiring._
   import configServiceRoute.route
+  import csw.config.models.codecs.ConfigCodecs._
+  import csw.commons.http.codecs.ErrorCodecs._
 
   private val testFileUtils = new TestFileUtils(settings)
 

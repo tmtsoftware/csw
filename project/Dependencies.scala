@@ -11,8 +11,7 @@ object Dependencies {
       Akka.`akka-actor-typed`,
       AkkaHttp.`akka-http`,
       Libs.`scala-async`.value,
-      Libs.`play-json`.value,
-      Libs.`akka-http-play-json`,
+      Borer.`borer-compat-akka`.value,
       Libs.`scopt`,
       Libs.`scalatest`.value % Test
     )
@@ -21,8 +20,6 @@ object Dependencies {
   val LocationModels = Def.setting(
     Seq(
       Enumeratum.`enumeratum`.value,
-      Libs.`play-json`.value,
-      Libs.`play-json-derived-codecs`.value,
       Borer.`borer-core`.value,
       Borer.`borer-derivation`.value,
       Libs.`scalatest`.value % Test,
@@ -57,8 +54,6 @@ object Dependencies {
       Akka.`akka-persistence`,
       Libs.`akka-management-cluster-http`,
       AkkaHttp.`akka-http`,
-      Libs.`akka-http-play-json`,
-      Libs.`play-json`.value,
       Borer.`borer-compat-akka`.value,
       Akka.`akka-actor-testkit-typed` % Test,
       Libs.`scalatest`.value          % Test,
@@ -79,8 +74,6 @@ object Dependencies {
       Akka.`akka-remote`,
       Libs.`scala-async`.value,
       Libs.`scala-java8-compat`,
-      Libs.`play-json`.value,
-      Libs.`akka-http-play-json`,
       Borer.`borer-compat-akka`.value,
       Libs.`scalatest`.value % Test
     )
@@ -102,7 +95,6 @@ object Dependencies {
     Seq(
       Enumeratum.`enumeratum`.value,
       Libs.`config`,
-      Libs.`play-json`.value,
       Libs.`scala-java8-compat`,
       Libs.`scalatest`.value     % Test,
     )
@@ -113,7 +105,7 @@ object Dependencies {
       Akka.`akka-actor`,
       Akka.`akka-stream`,
       Akka.`akka-stream-typed`,
-      Libs.`akka-http-play-json`,
+      AkkaHttp.`akka-http`,
       Libs.`scalatest`.value     % Test,
       Akka.`akka-stream-testkit` % Test
     )
@@ -125,8 +117,7 @@ object Dependencies {
       Akka.`akka-stream`,
       Akka.`akka-stream-typed`,
       Akka.`akka-actor`,
-      Libs.`play-json`.value,
-      Libs.`akka-http-play-json`,
+      Borer.`borer-compat-akka`.value,
       Libs.`scala-async`.value,
       Libs.`scala-java8-compat`,
       Libs.`config`,
@@ -143,11 +134,10 @@ object Dependencies {
   val ConfigClient = Def.setting(
     Seq(
       Libs.`config`,
-      Libs.`play-json`.value,
       Akka.`akka-actor`,
       Akka.`akka-stream`,
       Akka.`akka-stream-typed`,
-      Libs.`akka-http-play-json`,
+      Borer.`borer-compat-akka`.value,
       AkkaHttp.`akka-http`,
       Libs.`scala-async`.value,
       Libs.`scala-java8-compat`,
@@ -480,7 +470,7 @@ object Dependencies {
     Seq(
       Akka.`akka-actor`,
       AkkaHttp.`akka-http`,
-      Libs.`play-json`.value,
+      Borer.`borer-compat-akka`.value,
       Libs.`scalatest`.value % Test,
       Libs.`embedded-redis`  % Test
     )

@@ -9,14 +9,16 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import csw.commons.http.ErrorResponse
+import csw.commons.http.codecs.ErrorCodecs
 import csw.config.api.commons.{BinaryUtils, TokenMaskSupport}
 import csw.config.api.exceptions._
 import csw.config.api.internal.ConfigStreamExts.RichSource
-import csw.config.api.internal.JsonSupport
 import csw.config.api.scaladsl.ConfigService
 import csw.config.api.{ConfigData, TokenFactory}
+import csw.config.client.HttpCodecs
 import csw.config.client.commons.ConfigClientLogger
 import csw.config.models._
+import csw.config.models.codecs.ConfigCodecs
 import csw.logging.api.scaladsl.Logger
 
 import scala.async.Async._
@@ -34,13 +36,13 @@ private[config] class ConfigClient(
     actorRuntime: ActorRuntime,
     tokenFactory: Option[TokenFactory] = None
 ) extends ConfigService
-    with TokenMaskSupport {
+    with TokenMaskSupport
+    with ErrorCodecs
+    with ConfigCodecs
+    with HttpCodecs {
 
   override val logger: Logger = ConfigClientLogger.getLogger
 
-  //Importing JsonSupport using an object to prevent JsonSupport methods appearing in ConfigClient scala documentation
-  private object JsonSupport extends JsonSupport
-  import JsonSupport._
   import actorRuntime._
 
   private def configUri(path: jnio.Path): Future[Uri] = baseUri(Path / "config" ++ Path / Path(path.toString))
