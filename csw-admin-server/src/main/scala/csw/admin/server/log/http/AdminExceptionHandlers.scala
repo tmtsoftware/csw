@@ -6,20 +6,8 @@ import csw.admin.server.commons.AdminLogger
 import csw.admin.server.log.exceptions.{UnresolvedAkkaLocationException, UnsupportedConnectionException}
 import csw.commons.http.{JsonRejectionHandler, JsonSupport}
 import csw.logging.api.scaladsl.Logger
-import play.api.libs.json.{Json, OFormat}
 
 import scala.util.control.NonFatal
-
-// Two classes are used just to wrap status code and error message inside "error" key in json representation
-case class ErrorResponse(error: ErrorMessage)
-case object ErrorResponse {
-  implicit val errorResponseFormat: OFormat[ErrorResponse] = Json.format[ErrorResponse]
-}
-
-case class ErrorMessage(code: Int, message: String)
-case object ErrorMessage {
-  implicit val errorMessageFormat: OFormat[ErrorMessage] = Json.format[ErrorMessage]
-}
 
 /**
  * Maps server side exceptions to Http Status codes

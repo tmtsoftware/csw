@@ -4,13 +4,12 @@ import akka.http.scaladsl.model.HttpRequest
 import akka.http.scaladsl.server.directives.{DebuggingDirectives, LoggingMagnet}
 import akka.http.scaladsl.server.{Directive0, Directive1, Directives, MalformedQueryParamRejection}
 import csw.admin.server.commons.AdminLogger
-import csw.admin.server.log.JsonSupport
 import csw.logging.api.scaladsl.Logger
 import csw.logging.models.Level
 
-trait HttpSupport extends Directives with JsonSupport {
+trait HttpParameter extends Directives {
 
-  override val log: Logger = AdminLogger.getLogger
+  val log: Logger = AdminLogger.getLogger
 
   val logLevelParam: Directive1[Level] = parameter("value").flatMap {
     case value if Level.hasLevel(value) => provide(Level(value))

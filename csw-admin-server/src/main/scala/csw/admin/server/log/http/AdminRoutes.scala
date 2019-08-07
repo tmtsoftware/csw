@@ -4,6 +4,7 @@ import akka.Done
 import akka.http.scaladsl.server.Route
 import csw.admin.server.log.LogAdmin
 import csw.admin.server.wiring.ActorRuntime
+import csw.logging.models.codecs.LoggingCodecs
 
 /**
  * Routes supported by Admin server
@@ -13,7 +14,9 @@ import csw.admin.server.wiring.ActorRuntime
  * @param adminExceptionHandlers exception handler which maps server side exceptions to Http Status codes
  */
 class AdminRoutes(logAdmin: LogAdmin, actorRuntime: ActorRuntime, adminExceptionHandlers: AdminExceptionHandlers)
-    extends HttpSupport {
+    extends HttpParameter
+    with LoggingCodecs
+    with HttpCodecs {
 
   import actorRuntime._
   val route: Route = routeLogger {

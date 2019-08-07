@@ -8,7 +8,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest, StatusCodes, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import com.typesafe.config.ConfigFactory
-import csw.admin.server.log.http.HttpSupport
+import csw.admin.server.log.http.HttpParameter
 import csw.admin.server.wiring.AdminWiring
 import csw.command.client.messages.CommandMessage.Oneway
 import csw.command.client.messages.ContainerCommonMessage.GetComponents
@@ -36,10 +36,12 @@ import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 import scala.jdk.CollectionConverters._
 
-class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
+class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
 
   private val adminWiring: AdminWiring = AdminWiring.make(Some(7879))
   import adminWiring.actorRuntime._
+  import csw.logging.models.codecs.LoggingCodecs._
+  import csw.admin.server.log.http.HttpCodecs._
 
   implicit val testKitSettings: TestKitSettings = TestKitSettings(typedSystem)
 
