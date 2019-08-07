@@ -16,7 +16,7 @@ See [CHANGELOG.md](CHANGELOG.md) for details of all releases.
 ### Api changes
 - Rename `submit` api to `submitAndWait` in Command service as it waits for final response
 - Rename `submitAll` to `submitAllAndWait` in Command service as it waits for final response of all commands 
-- Added `submit` api in Command service which will submit the command to component and return the SubmitResponse
+- Added `submit` api in Command service which returns a future with the initial response which could be `Started` for a long running command
 - `Prefix` creation will throw `NoSuchElementException` if invalid subsystem is provided 
 
 ### Version Upgrades
