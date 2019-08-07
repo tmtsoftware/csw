@@ -69,7 +69,7 @@ class BasePerfSuite(config: MultiNodeConfig)
         plotCpuUsageGraph()
         plotMemoryUsageGraph()
       }
-      plotJstat().foreach(_.exitValue())
+      plotJstat().foreach(_.waitFor())
     }
     multiNodeSpecAfterAll()
   }

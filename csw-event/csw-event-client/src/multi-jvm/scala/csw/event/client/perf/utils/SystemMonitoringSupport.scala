@@ -12,7 +12,7 @@ import scala.concurrent.duration._
 import scala.io.Source
 import scala.util.Random
 
-trait SystemMonitoringSupport { _: MultiNodeSpec =>
+trait SystemMonitoringSupport { multiNodeSpec: MultiNodeSpec =>
 
   lazy val pid: Int = {
     import java.lang.management._
@@ -55,7 +55,7 @@ trait SystemMonitoringSupport { _: MultiNodeSpec =>
       w.close()
       tmpFile.renameTo(originalFile)
 
-      Some(executeCmd(s"$jstatPlotPath -m $jstatResultsPath"))
+      Some(executeCmd(s"$jstatPlotPath", "-m", s"$jstatResultsPath"))
     } else None
   }
 
@@ -113,15 +113,19 @@ trait SystemMonitoringSupport { _: MultiNodeSpec =>
   private def executeCmd(cmd: String*): Process = {
     println(s"[Info] Executing command : [${cmd.mkString(" ")}]")
     val process = new ProcessBuilder(cmd: _*).start()
-    Source
-      .fromInputStream(process.getErrorStream)
-      .getLines()
-      .foreach(line => println(s"[Error @ ${myself.name}($pid)] " + line))
+    import multiNodeSpec.system.dispatcher
 
-    Source
-      .fromInputStream(process.getInputStream)
-      .getLines()
-      .foreach(line => println(s"[Info @ ${myself.name}($pid)] " + line))
+    Future {
+      Source
+        .fromInputStream(process.getErrorStream)
+        .getLines()
+        .foreach(line => println(s"[Error @ ${myself.name}($pid)] " + line))
+
+      Source
+        .fromInputStream(process.getInputStream)
+        .getLines()
+        .foreach(line => println(s"[Info @ ${myself.name}($pid)] " + line))
+    }
 
     process
   }
