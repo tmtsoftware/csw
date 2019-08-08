@@ -9,6 +9,30 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
+## [CSW v1.0.0] - 2019-08-09
+
+This is the first major release of the TMT Common Software for project stakeholders.
+See [here](https://tmtsoftware.github.io/csw/1.0.0/) for a detailed documentation of this version of the CSW software.
+
+### Changes
+- Added `SequencerCommandService`
+- Replaced Kryo serialization with Borer-CBOR for Akka actor messages
+- Replaced Play-JSON with Borer-JSON in Location service
+- Removed `BAD` and `TEST` subsystems
+- Made Alarm, Config, Logging and Location service models to be cross compilable for ScalaJs
+
+### Api changes
+- Command Service
+    - `submit` now returns its initial response (e.g. `Started`) instead of waiting for the final response 
+    - Added `submitAndWait` which will submit the command and wait for its final response
+    - Rename `submitAll` to `submitAllAndWait` in Command service as it waits for final response of all submitted commands
+
+- `Prefix` creation will throw `NoSuchElementException` if invalid subsystem is provided
+- Replaced `ActorRef` with ActorRef `URI` in `AkkaRegistration`
+
+### Version Upgrades
+- Scala version upgrade to 2.13.0
+
 ## [CSW v1.0.0-RC1] - 2019-08-07
 
 This is the release candidate 1 for the First major release of the TMT Common Software for project stakeholders.
@@ -23,10 +47,10 @@ See [here](https://tmtsoftware.github.io/csw/1.0.0-RC1/) for a detailed document
 ### Api changes
 - Command Service
     - Rename `submit` api to `submitAndWait` in Command service as it waits for final response
-    - Rename `submitAll` to `submitAllAndWait` in Command service as it waits for final response of all commands 
+    - Rename `submitAll` to `submitAllAndWait` in Command service as it waits for final response of all commands
     - Added `submit` api in Command service which will submit the command to component and return the SubmitResponse
-    - `Prefix` creation will throw `NoSuchElementException` if invalid subsystem is provided
-    - Added `submit` which returns a future with the initial response of sequence
+ 
+- `Prefix` creation will throw `NoSuchElementException` if invalid subsystem is provided
 
 ### Version Upgrades
 - Scala version upgrade to 2.13.0
