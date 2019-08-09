@@ -6,7 +6,7 @@ As the ESW design is developed, these command structures may evolve.
 
 ## ObsId
 
-An ObsID, or observation Id, indicates the observation the command is associated with. 
+An `ObsID`, or observation ID, indicates the observation the command is associated with. 
 It can be constructed by creating an instance of `ObsId`. 
 
 Scala
@@ -37,7 +37,7 @@ continuous with no spaces.
 
 ## Setup Command
 
-This command is used to describe a goal that a system should match. Component developer will require to supply 
+This command is used to describe a goal that a system should match. The component developer is required to supply 
 following arguments to create a `Setup` command.
 
  
@@ -55,7 +55,7 @@ Java
  
 ## Observe Command
 
-This command describes a science observation. Sent only to Science Detector Assemblies and Sequencers.
+This command describes a science observation. It is intended to only be sent to Science Detector Assemblies and Sequencers.
 
 Scala
 :   @@snip [CommandsTest.scala](../../../../examples/src/test/scala/example/params/CommandsTest.scala) { #observe }
@@ -65,7 +65,7 @@ Java
 
 ## Wait Command
 
-This command causes a Sequencer to wait until notified.
+This command causes a Sequencer to wait until notified.  It can only be sent to Sequencers.
 
 Scala
 :   @@snip [CommandsTest.scala](../../../../examples/src/test/scala/example/params/CommandsTest.scala) { #wait }
@@ -105,9 +105,9 @@ Java
 
 ## Cloning a Command
 
-In order to track the completion of a command, every command that is sent must have a unique RunId.
+In order to track the completion of a command, every command that is sent must have a unique `RunId`.
 If you wish to resubmit a previously sent Setup, the `cloneCommand` method must be used prior to submission
-to create a new command from existing parameters, but with a new RunId.
+to create a new command from existing parameters, but with a new `RunId`.
 
 Scala
 :   @@snip [CommandsTest.scala](../../../../examples/src/test/scala/example/params/CommandsTest.scala) { #clone-command }

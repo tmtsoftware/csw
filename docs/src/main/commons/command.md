@@ -1,9 +1,9 @@
 # Communication using Commands
 
-**csw-command** library provides support for command based communication between components. 
+The **csw-command** library provides support for command based communication between components. 
 
 This section describes how to communicate with any other component using commands. To check how to manage commands
-received, please visit @ref:[Managing Command State](../framework/managing-command-state.md)
+received, please visit @ref:[Component Handlers](../framework/handling-lifecycle.md) and @ref:[Managing Command State](../framework/managing-command-state.md).
 
 ## Dependencies
 
@@ -16,8 +16,8 @@ sbt
 
 ## Command-based Communication Between Components
 
-A component can send @ref:[Commands](../params/commands.md) to other components. The commands can be sent as following 
-with three types of messages: 
+A component can send @ref:[Commands](../params/commands.md) to other components. The commands can be sent as one of the following 
+three types of messages: 
 
 * **submit** - A command is sent as Submit when the result of completion is desired.
 * **oneway** - A command is sent as Oneway when the result of completion is not desired.
@@ -33,21 +33,25 @@ desired.  It is also useful when tracking completion using a Matcher
 and current state values (see below) or events.
 
 A `validate` message is used to ask a destination component to validate a command and determine if the command can
-be executed. But it does not execute the command and returns the result of validation. In some scenarios,
+be executed. It does not execute the command and only returns the result of validation. In some scenarios,
 it may be useful to test to see if a command can be executed prior to trying to execute the command.
 
-@@@ warning { title='Significant Update to Command Service' }
+### Component Locking
 
-Thanks to an issue brought up by a user of Release 0.4, the Command Service API and command-related component handlers 
-have been modified in this release. The result is a much improved, simplified API that is easier
-to understand, and refines the responsibilities of the handlers. Code that has been written for 0.5 or 
-0.4 will need to be updated.
+If a component is locked, any Command Service command will have a response of `Locked`.  This corresponding handler will not
+be called until the component is unlocked.  See @ref:[Creating a Component](create-component.md) for more information
+on locking.  
 
-@@@
-
+Note that the code in the receiving component's handler does not need to return `Locked`. If the component has been Locked, the component's 
+Supervisor returns the `Locked` response to the caller and the handler is not called.
 
 ### Command Validation
-The first step in processing a command--either `submit` or `oneway`--is validation.  If not locked, the
+Command validations occur in two scenarios.  One is using the `validate` message as described above.  For example, `validate` 
+could be used by an Assembly when it needs to send multiple commands to different HCDs and it wants
+to first check that all the HCDs can execute their commands before sending a command to any of the HCDs.  
+The second scenario is that it is always the first step in processing a command--either `submit` or `oneway`.
+  
+If the receiving component is not locked, the
 component's supervisor calls the `validateCommand` handler of the Top Level Actor. The developer code evaluates
 and returns a `ValidateCommandResponse` as shown in the following table.  
 
@@ -57,8 +61,6 @@ and returns a `ValidateCommandResponse` as shown in the following table.
 | Invalid | The command is not valid and cannot be executed. The response includes a reason in the form of a `CommandIssue` |
 | Locked | The component is locked by some other command sender. The validation could not occur.
 
-Note that the developer code does not need to return `Locked`. If the component has been Locked, the component's 
-Supervisor returns the `Locked` response to the caller and the `validateCommand` handler is not called.
 
 ### The Submit Message
 A `submit` message is sent with its @ref:[command](../params/commands.md) to a component destination. 
@@ -67,9 +69,9 @@ If the `validateCommand` handler returns `Accepted`, the framework calls the `on
 Actor. The `onSubmit` handler always returns a `SubmitResponse`.
 
 ####Immediate Completion Scenario
-If the actions of the `submit` command take a very short time to complete they may be completed by the 
+If the actions of the `submit` command take a very short time to complete, they may be completed by the 
 `onSubmit` handler.  This is called *immediate completion*. The time for the actions to complete should be
-less than 1 second. (Note: The framework will timeout if the onSubmit handler does not return a response within 1 second.)
+less than 1 second. (Note: The framework will timeout if the `onSubmit` handler does not return a response within 1 second.)
 In this scenario with `onSubmit`, the values of `SubmitResponse` can be `Completed`, `CompletedWithResult`, or `Error`.
 `Error` is returned when the actions could not be accomplished. This is different than `Invalid`, which indicates 
 that the command could not be validated.
@@ -80,17 +82,14 @@ If the actions do not produce a value for the client, the `Completed` `SubmitRes
 
 ####Long Running Actions Scenario
 When actions take longer than 1 second, `onSubmit` should start the actions and return the `Started` `SubmitResponse`. The
-`Started` response indicates to the framework that long running actions have been started. In this case, the 
-`Started` is returned to the sender of the command. Note, however, that the response returned to the sender
-by `submit` in the Command Service API is the final `SubmitResponse` returned when the actions are finished, not 
-`Started`.
+`Started` response indicates to the framework that long running actions have been started.
 
-Once the long running actions have started, the client code must notify the framework when the actions are
+Once the long running actions have started, the receiving component code must notify the framework when the actions are
 completed. This is done be updating the @ref:[Command Response Manager](../framework/managing-command-state.md).
 
-In addition to the values returned for immediate completion, long running actions can return `Cancelled`. If
-the component supports a special command to cancel actions, the cancelled command should return `Cancelled` when
-successfully cancelled and the command that cancels a command should return `Completed`.
+In addition to the values returned for immediate completion, long running actions can return `Cancelled`.  If
+the component supports a separate command to stop a long running command, the stopped command should return `Cancelled` when
+successfully cancelled.  The command that cancels the long running command should return `Completed`.
  
 The following table summarizes all the possible values for `SubmitResponse`.
 
@@ -128,31 +127,16 @@ doesn't really care about completion such as the case when demands are being sen
 is still present to ensure the HCD supports the standalone operation requirement and can check that 
 it is not getting out of range values.
 
-`Oneway` is can be used with a *matcher*. The matcher can use CurrentState or even events from Event Service
-to determine completion. This is more complicated than `submit` but may be useful in some scenarios.
-
-###The Validate Message
-The `validate` message is available when the sender wants to validate a @ref:[command](../params/commands.md)
-but does not want to execute any associated actions. `Validate` returns a `ValidateResponse`. If the
-component is not locked, the `validateCommand` handler of the Top Level Actor is called and the developer 
-code evaluates the command and returns a `ValidateResponse` as shown in the following table.  
-
-| ValidateResponse | Description |
-| :---: | --- |
-| Accepted | The command is valid and can be executed by the component. |
-| Invalid | The command is not valid and cannot be executed. The response includes a reason in the form of a `CommandIssue` |
-| Locked | The component is locked by some other command sender. The validation could not occur.
-
-`Validate` could be used by an Assembly when it needs to send multiple commands to different HCDs and it wants
-to first check that all the HCDs can execute their commands before sending a command to any of the HCDs.  
+`Oneway` can be used with a *matcher*. The matcher can use CurrentState or even events from the Event Service
+to determine completion. This can be more complicated than `submit`, but may be useful in some scenarios.
 
 ## CommandService
 
 A helper/wrapper is provided called `CommandService` that provides a convenient way to use the Command Service 
 with a component from the Location Service. 
 
-A `CommandService` instance is created using an `AkkaLocation` discovered from the Location Service.
-This `CommandService` instance will has methods for communicating with the component. A new `CommandService` is 
+A `CommandService` instance is created using an `AkkaLocation` of the receiving component, discovered from the Location Service.
+This `CommandService` instance has methods for communicating with the component. A new `CommandService` is 
 created for each component for which commands are to be sent.
 
 The API can be exercised as follows for different scenarios of command-based communication:
@@ -298,7 +282,7 @@ At any time, the `query` call of `CommandService` can be used to check the curre
 a command that has been sent via the `submit` message using the command's `runId`. 
 This is most useful with a long-running command but all commands that use `submit` are available.
 
-The `query` message returns a `QueryResponse`, which includes all of the values of `SubmitResponse`
+The `query` message returns a `QueryResponse`, which coubld be any of the values of `SubmitResponse`
 plus the `CommandNotAvailable` response. This response occurs when the framework has no knowledge
 of the command associated with the `runId` passed with the `query`. The previous long-running
 example above showed the use of `query` to check that the actions associated with a command that
@@ -314,7 +298,7 @@ Java/query usage
 ### submitAllAndWait
 `SubmitAll` can be used to send multiple commands sequentially to the same component.
 This could be used to send initialization commands to an HCD, for instance. The
-argument for `submitAllAndWait` is a list of commands. `SubmitAll` returns a list of `SubmitResponse`s--one
+argument for `submitAllAndWait` is a list of commands. `SubmitAll` returns a list of `SubmitResponse`s -- one
 for each command in the list.  While `submitAndWait` returns a `SubmitResponse`
 as a Future, `submitAllAndWait` returns a list of `SubmitResponse`s as a future, which completes when
 all the commands in the list have completed. 
@@ -331,7 +315,7 @@ The last one returned invalid and was not executed.
 The commands in `submitAllAndWait` will execute sequentially, but each one must complete successfully for
 the subsequent commands to be executed. If any one of the commands fails, `submitAllAndWait` stops and
 the list is returned with the commands that are completed up to and including the command
-that failed. This is shown in the following example by making the invalidCmd second in the list.
+that failed. This is shown in the following example by making the invalid command second in the list.
 
 Scala/query usage
 :   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #submitAllInvalid }
@@ -351,10 +335,10 @@ Callbacks are not thread-safe on the JVM. If you are doing side effects/mutation
 @@@
 
 
-`SubscribeCurrentState` returns a handle of `CurrentStateSubscription` which should be used 
+`SubscribeCurrentState` returns a handle of the `CurrentStateSubscription` which should be used 
 to unsubscribe the subscription.
 
-The following example code shows an Assembly that subscribes to all `CurrentState` of an HCD.
+The following example code shows an Assembly that subscribes to all `CurrentState` items of an HCD.
 The example sends a `Setup` with an encoder parameter value to the HCD as a `oneway` message.
 
 Scala
@@ -381,7 +365,7 @@ published by a component.
 
 The `matcher` is provided to allow a component sending a command to use `CurrentState` published by a 
 component to determine when actions are complete. The expected case is an Assembly using the `CurrentState`
-published by an HCD. When using a `submit` completion is determined in the destination. In some
+published by an HCD. When using a `submit`, completion is determined in the destination. In some
 scenarios, the Assembly may want to determine when actions are complete. This is what the
  `matcher` allows.
  
@@ -411,7 +395,7 @@ the `stop` method of the matcher as shown in the example.
 
 ### onewayAndMatch
 `CommandService` provides a short-cut called `onewayAndMatch` that combines a `oneway` and a `matcher`
- and implements much of the boilerplate of the previous example. This can be often be used saving code. 
+ and implements much of the boilerplate of the previous example.
  
 Scala
 :   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #onewayAndMatch }

@@ -1,25 +1,20 @@
 # Event Service
 
 The Event Service implements the [publish/subscribe messaging paradigm](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) where 
-one component publishes an event and all components that have subscribed receive the event. In CSW, the events published are
+one component publishes an event and all clients that have subscribed receive the event. In CSW, the events published are
 described under the messages documentation @ref:[here](./../params/events.md).
-One advantage of this type of message system and Event Service also is that publishers and subscribers are decoupled. 
+One advantage of this type of message system for the Event Service is that publishers and subscribers are decoupled. 
 This decoupling of publishers and subscribers can allow for greater scalability and a more dynamic network topology.
 Publishers can publish regardless of whether there are subscribers, and subscribers can subscribe even if there are no publishers. 
 The relationship between publishers and subscribers can be one-to-one, one-to-many, many to one, or even many-to-many. 
 
-Event Service is optimized for the high performance requirements of events as demands with varying rates, for ex. 100 Hz, 50 Hz etc., but
+The Event Service is optimized for the high performance requirements of events as demands with varying rates, (e.g. 100 Hz, 50 Hz etc.), but
 can also be used with events that are published infrequently or when values change. 
 In the TMT control system, events may be created as the output of a calculation by one component for the input to a calculation in 
 one or more other components. Demand events often consist of events that are published at a specific rate.
 
-The Event Service provides an API that allows events to be published and also allows 
-clients to subscribe and unsubscribe to specific events and call developer code when events are received.
-
-Event Service also stores the most recent published event for every unique event by prefix and name. This is useful for publishing
-components when an event contains state information that changes. Other components needing to check the state can do so without
-the overhead of subscribing. 
-
+The Event Service also stores the most recent published event for every unique event by prefix and name. This allows components 
+needing to check the state of another component can do so without the overhead of subscribing. 
 
 ## Dependencies
 
@@ -36,38 +31,37 @@ sbt
 ## Accessing Event Service
 
 When you create component handlers using `csw-framework` as explained @ref:[here](./../framework/creating-components.md), 
-you get a handle to `EventService` which is created by `csw-framework`
+you get a handle to `EventService` which is created by `csw-framework`, which provides the following features: 
 
-Using `EventService` you can start publishing or subscribing to events. 
-`EventService` is injected in component handlers via `csw-framwework` and provides the following features: 
-
-__Access to `defaultPublisher`__: Using `defaultPublisher` in `EventService`, you can publish a single event or a stream 
+__Access to `defaultPublisher`__: Using the `defaultPublisher` in `EventService`, you can publish a single event or a stream 
 of demand events to Event Service. 
-In most cases, you should use `defaultPublisher`, because you can then pass the instance of `EventService` in worker actors 
-or different places in your code and call `eventService.defaultPublisher` to access publisher. 
+In most cases, you should use the `defaultPublisher`, because you can then pass the instance of `EventService` in worker actors 
+or different places in your code and call `eventService.defaultPublisher` to access the publisher. 
 Each `EventPublisher` has its own TCP connection to the Event Service.
 When you reuse the `defaultPublisher` instance of `EventPublisher`, all events published go through same TCP connection. 
 
-__Access to `defaultSubscriber`__: Using `defaultSubscriber`, you can subscribe to specific event keys. 
-You can share `defaultSubscriber` in the same way as `defaultPublisher` by passing an instance of `EventService` to different parts of your code.
+__Access to `defaultSubscriber`__: Using the `defaultSubscriber`, you can subscribe to specific event keys. 
+You can share the `defaultSubscriber` in the same way as `defaultPublisher` by passing an instance of `EventService` to different parts of your code.
 Unlike `defaultPublisher`, each subscription with `defaultSubscriber.subscribe` creates a new TCP connection for just that subscription. 
-This behavior is the same whether you use `defaultSubscriber` or `makeNewSubscriber` call on `EventService`.
+This behavior is the same whether you use the `defaultSubscriber` or the `makeNewSubscriber` call on `EventService`.
 
 Each `EventSubscriber` also has one TCP connection that is used to provide the latest event from the event server when
-subscribing and also for the explicit `get` calls.  That means, with `defaultSubscriber`, you are sharing same connection 
+subscribing and for the explicit `get` calls.  That means, with `defaultSubscriber`, you are sharing same connection 
 for getting latest events and creating a new connection for each subscribe call.  The underlying event server can handle
 many connections, but it is good to understand how connections are used and reused.
 
 __Creating a new `Publisher` or `Subscriber`__:
 The `makeNewPublisher` API of Event Service can be used to create a new publisher which would internally create a new TCP connection to the Event Store.
-One of the use cases of this API could be to publish high frequency event streams in order to dedicate a separate connection to demanding streams without affecting the performance of all other low frequency (for ex. 1Hz, 20Hz etc.) event streams.
+One of the use cases of this API could be to publish high frequency event streams in order to dedicate a separate connection to 
+demanding streams without affecting the performance of all other low frequency (for ex. 1Hz, 20Hz etc.) event streams.
 
-However, `makeNewSubscriber` API does not really have any specific use cases. Both `defaultSubscriber` and `makeNewSubscriber` APIs behave almost similar since the `subscribe` API of EventService itself creates a new connection for every subscription. 
+However, `makeNewSubscriber` API does not really have any specific use cases. Both `defaultSubscriber` and `makeNewSubscriber` 
+APIs behave almost similar since the `subscribe` API of EventService itself creates a new connection for every subscription. 
 Prefer using `defaultSubscriber` over `makeNewSubscriber`.
 
 ## Usage of EventPublisher
 
-Below examples demonstrate the usage of multiple variations of publish API.
+Below examples demonstrate the usage of multiple variations of the publish API.
 
 ### For Single Event
 
@@ -112,7 +106,7 @@ Scala
 Java
 :   @@snip [JEventPublishExamples.java](../../../../examples/src/main/java/example/event/JEventPublishExamples.java) { #with-source }
 
-This API also demonstrates the usage of onError callback which can be used to be alerted to and handle events that failed while being published. 
+This API also demonstrates the usage of an onError callback which can be used to handle events that failed while being published. 
 
 You can find complete list of APIs supported by `EventPublisher` and `IEventPublisher` with detailed description of each API here: 
 
@@ -144,7 +138,9 @@ Callbacks are not thread-safe on the JVM. If you need to do side effects/mutatio
 
 ### With Asynchronous Callback
 
-This API is useful when you want to subscribe to events with a callback that has an asynchronous behavior. The callback is of type event => future and it ensures that the event callbacks are called sequentially in such a way that the subsequent execution will start only after the prior one finishes. 
+This API is useful when you want to subscribe to events with a callback that has an asynchronous behavior. The callback is 
+of type `Event => Future` and it ensures that the event callbacks are called sequentially in such a way that the subsequent 
+execution will start only after the prior one finishes. 
 This API gives the guarantee of ordered execution of the asynchronous callbacks.
 
 Scala
@@ -170,7 +166,7 @@ Java
 
 This API takes a set of Event keys to subscribe to and returns a 
 Source of events (see [Akka stream documentation](https://doc.akka.io/docs/akka/current/stream/index.html?language=scala)). 
-This API gives more control to the user to customize behavior of an event stream.
+This API gives more control to the user to customize the behavior of an event stream.
 
 Scala
 :   @@snip [EventSubscribeExamples.scala](../../../../examples/src/main/scala/example/event/EventSubscribeExamples.scala) { #with-source }
@@ -185,7 +181,7 @@ There will be scenarios where you would like to control the rate of events recei
 For instance, slow subscribers can receive events at their own specified speed rather than being overloaded 
 with events to catch up with the publisher's speed. 
 
-All the APIs in EventSubscriber can be provided with `interval` and `SubscriptionMode` 
+All the APIs in EventSubscriber can be provided with an `interval` and a `SubscriptionMode` 
 to control the subscription rate. Following example demonstrates this with the subscribeCallback API. 
 
 Scala
@@ -205,8 +201,8 @@ Read more about Subscription Mode @scaladoc[here](csw/event/api/scaladsl/Subscri
 
 ### Pattern Subscription
 
-The following example demonstrates the usage of pattern subscribe API with callback. Events with keys that match the specified pattern 
-and belong to the given subsystem are received by the subscriber. 
+The following example demonstrates the usage of the pattern subscribe API with a callback. Events with keys that match the specified pattern 
+and belong to the specified subsystem are received by the subscriber. 
 The callback function provided is called on each event received.
 
 Scala
@@ -230,19 +226,19 @@ The use of certain patterns and many pattern-based subscriptions can impact the 
 On subscription to event keys, you receive an @scaladoc[EventSubscription](csw/event/api/scaladsl/EventSubscription) 
 which provides following APIs:
 
-* `unsubscribe`: On un-subscribing, the event stream is destroyed and the connection created to event server while subscription is released. 
+* `unsubscribe`: Used to unsubscribe by destroying the event stream and releasing the the connection to the Event Server. 
 
 * `ready`: check if event subscription is successful or not. 
 
-You can find complete list of API's supported by `EventSubscriber` and `IEventSubscriber` with detailed description 
+You can find complete list of APIs supported by `EventSubscriber` and `IEventSubscriber` with detailed description 
 of each API here: 
 
 * @scaladoc[EventSubscriber](csw/event/api/scaladsl/EventSubscriber)
 * @javadoc[IEventSubscriber](csw/event/api/javadsl/IEventSubscriber)
 
 ## Create Event Service
-If you are not using csw-framework, you can create @scaladoc[EventService](csw/event/api/scaladsl/EventService) 
-using @scaladoc[EventServiceFactory](csw/event/EventServiceFactory).
+If you are not using csw-framework, you can create the @scaladoc[EventService](csw/event/api/scaladsl/EventService) 
+using an @scaladoc[EventServiceFactory](csw/event/EventServiceFactory).
 
 Scala
 :   @@snip [EventServiceCreationExamples.scala](../../../../examples/src/main/scala/example/event/EventServiceCreationExamples.scala) { #default-event-service }
@@ -253,11 +249,11 @@ Java
 The provided implementation of Event Service is backed up by Redis. The above example demonstrates creation of Event Service 
 with default Redis client options. 
 You can optionally supply a RedisClient to the EventStore from outside which allows 
-you to customize the behaviour of RedisClient used by Event Service, which in most often be required in test scope only. 
+you to customize the behavior of the RedisClient used by Event Service, which will usually only be required in testing. 
 
 RedisClient is an expensive resource. Reuse this instance as much as possible.
 
-Note that it is the responsibility of consumer of this API to shutdown Redis Client when it is no longer in use.
+Note that it is the responsibility of the consumer of this API to shutdown the Redis Client when it is no longer in use.
 
 Scala
 :   @@snip [EventServiceCreationExamples.scala](../../../../examples/src/main/scala/example/event/EventServiceCreationExamples.scala) { #redis-event-service }

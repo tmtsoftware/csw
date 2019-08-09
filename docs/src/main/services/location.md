@@ -3,7 +3,7 @@
 The Location Service handles component (i.e., Applications, Sequencers, Assemblies, HCDs, and Services) registration 
 and discovery in the distributed TMT software system.
 
-CSW Location Service cluster must be running, and appropriate environment variables set to run apps.
+The CSW Location Service cluster must be running, and appropriate environment variables set to run apps.
 See @ref:[CSW Location Server](../apps/cswlocationserver.md).
 
 A component’s location information can be used by other components and services to connect to it and use it. 
@@ -12,18 +12,6 @@ An example of location information is:
 * host address/port pairs
 * URL/URIs paths
 * connection protocols
-* log-admin actor reference
-
-@@@ note { title="async handling in scala and java examples." }
-
- * **Scala:** `async` marks a block of asynchronous code and allows to `await` the computation till the Future is complete.
-      For more info, please refer to: https://github.com/scala/async
- 
- * **Java non-blocking example:** The code snippets use `CompletableFuture` and its `thenAsync`, `thenApply` methods. This style allows to compose multiple Futures and not block the calling thread till Futures are complete. 
-
- * **Java blocking example:** The code snippets use `CompletableFuture` using `get` blocking call. This style blocks the calling thread till the Future is complete.
-    
-@@@
 
 ## Dependencies
 
@@ -57,18 +45,18 @@ Java
 
 ## Creating Components, Connections and Registrations
 
-An Application, Sequencer, Assembly, HCD, or Service component may need to be used by another component as part of normal observatory operations. 
-It must register its location information with Location Service so that other components can find it. A location information comprises of:
+An Application, Sequencer, Assembly, HCD, or Service may need to be used by another component as part of normal observatory operations. 
+It must register its location information with Location Service so that other components can find it. Location information is comprised of:
 
-* **ComponentId** : A component id comprises of 
-    * **ComponentName** : a name depicting the component.
+* **ComponentId** : A component ID consisting of 
+    * **ComponentName** : a name describing the component.
     * **ComponentType** : such as Container, Sequencer, HCD, Assembly, Service.
    
 * **ConnectionType** : the means to reach components. These are categorized as `Akka`, `HTTP`, or `Tcp` type connections.
 
-The location information is stored in Location Service as **Registrations**.
+The location information is stored in the Location Service as **Registrations**.
 
-Some of the examples of string representation of a connection are:
+Some of the examples of the string representation of a connection are:
  
 * TromboneAssembly-assembly-akka 
 * TromboneHcd-hcd-akka 
@@ -77,9 +65,9 @@ Some of the examples of string representation of a connection are:
 
 The `register` API takes a `Registration` parameter and returns a future registration result. 
 If registration fails for some reason, the returned future will fail with an exception. 
-(Registration will fail if the `csw-location-server` application is not running or could not be found or if the given component name was already registered.)
+(Registration will fail if the `csw-location-server` application is not running or could not be found, or if the given component name was already registered.)
 
-The following example shows registration of both UnTyped ActorRef and Typed ActorRef:
+The following example shows registration of both an UnTyped ActorRef and a Typed ActorRef:
  
 Scala
 :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/example/location/LocationServiceExampleClientApp.scala) { #Components-Connections-Registrations }
@@ -90,16 +78,16 @@ Java
 @@@ note
 
 The `AkkaRegistration` api takes only Typed ActorRefs. Hence, to register an UnTyped ActorRef for an akka connection, it needs to be
-adapted to Typed `ActorRef[Nothing]`. This can be achieved using adapter provided for scaladsl and javadsl. The usage of adapter is
-shown in above snippet for scala and java both. 
+adapted to Typed `ActorRef[Nothing]`, using adapters provided by Akka.  The usage of the adapter is
+shown in the above snippet for both Scala and Java. 
 
 Also, note that for components, the registration will be taken care of via `csw-framework`. Hence, component developers won't register any connections during their development.
-So, above demonstration of registering connections is for explanatory and testing purpose only.  
+So, the above demonstration of registering connections is for explanatory and testing purposes only.  
 @@@
 
 ## Creating ActorRef for Registration
 
-Make sure the ActorSystem used to start actors using the location service is created using `ActorSystemFactory` as follows:
+The ActorSystem used to start actors that will be registered in the Location Service must be created using an `ActorSystemFactory` as follows:
  
 
 Scala
@@ -110,7 +98,7 @@ Java
 
 This is required to start a remote ActorSystem on the same network interface where the csw-cluster is running. 
 All the ActorRefs created using this ActorSystem will be available for communication from other components 
-that are part of csw-cluster.
+that are part of the CSW Cluster.
 
 ## Resolving Connections
 
@@ -121,7 +109,7 @@ A connection of interest can be looked up using the `resolve` or `find` methods:
 `resolve` gets the location for a connection from the local cache. 
 If not found in the cache, it waits for the event to arrive within the specified time limit and returns None on failure.    
 
-`find` returns the location for a connection from the local cache and returns None if not found there.    
+`find` returns the location for a connection from the local cache and returns None if not immediately found there.    
 
 Scala
 :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/example/location/LocationServiceExampleClientApp.scala) { #find }
@@ -162,9 +150,9 @@ If not, eventually the operation will timeout and the output should read:
 
 @@@ note
 
-The `resolve` and `find` api returns the concrete `Location` type i.e. `Akkalocation`, `HttpLocation` or `TcpLocation` as demonstrated in this section. Once the akka location
-is found or resolved, we need to retain the type to the actorRef, since the explicit type annotation is removed from the program, before it is executed at run-time 
-(refer [type erasure](https://en.wikipedia.org/wiki/Type_erasure)). Use following `AkkaLocation` api to get the correct Typed ActorRef:
+The `resolve` and `find` api returns the concrete `Location` type i.e. `Akkalocation`, `HttpLocation` or `TcpLocation` as demonstrated in this section. Once the Akka location
+is found or resolved, we need to ascribe the type to the ActorRef, since the explicit type annotation is removed from the program before it is executed at run-time 
+(see [type erasure](https://en.wikipedia.org/wiki/Type_erasure)). Use following `AkkaLocation` API to get the correct Typed ActorRef:
 
 Scala
 :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/example/location/LocationServiceExampleClientApp.scala) { #typed-ref }
@@ -176,7 +164,7 @@ Java
 ## Filtering
 
 The `list` API and its variants offer means to inquire about available connections with the Location Service. 
-The **parameter-less** `list` returns all available connections
+The *parameter-less* `list` returns all available connections
 
 Scala
 :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/example/location/LocationServiceExampleClientApp.scala) { #list }
@@ -250,23 +238,22 @@ The log output should contain:
 The lifecycle of a connection of interest can be followed using either the `track` API or the `subscribe` API.  
 
 These methods take a `Connection` instance as a parameter. **A `Connection` need not already be registered with Location Service.** 
-It's alright to track connections that will be registered in future. 
+It's okay to track connections that will be registered in future. 
 
-A `track` API returns two values:     
-* A **source** that will emit a stream of `TrackingEvents` for the connection.  
-* A **KillSwitch** to turn off the stream when no longer needed.  
+The `track` API returns two values:     
+  * A **source** that will emit a stream of `TrackingEvents` for the connection.  
+  * A **KillSwitch** to turn off the stream when no longer needed.  
 
 The Akka stream API provides many building blocks to process this stream, such as Flow and Sink. 
 In the example below, `Sink.actorRef` is used to forward any location messages received to the current actor (self).
 
 A consumer can shut down the stream using the KillSwitch.
 
-
 The `subscribe` API allows the caller to track a connection and receive the TrackingEvent notifications via a callback. 
 
-The API expects following parameters :    
-* An existing connection or a connection to be registered in the future.  
-* A callback that implements `Consumer`, receives the TrackEvent as a parameter.  
+The API expects following parameters:    
+  * An existing connection or a connection to be registered in the future.  
+  * A callback that implements `Consumer` and receives the TrackEvent as a parameter.  
 
 @@@ note
 Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor. Here is an @github[example](/examples/src/main/scala/example/event/ConcurrencyInCallbacksExample.scala) of how it can be done.

@@ -6,7 +6,7 @@ through the Sequencer components to the Assemblies, HCDs and finally to the hard
 At each hop Commands are validated, interpreted and further propagated making their journey to its 
 destination. Commands provide flexible placeholders to store values to convey precise intent of the sender component.
 
-`csw-params` is available for Scala and [scala.js](https://www.scala-js.org/).
+`csw-params` is available for Scala, Java, and [scala.js](https://www.scala-js.org/).
 
 ## Dependencies
 

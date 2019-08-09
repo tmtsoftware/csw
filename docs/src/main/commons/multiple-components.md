@@ -111,7 +111,7 @@ Java
 }
 ``` 
 
-The name of the component, the type(hcd, service, etc) and the connection(akka, http, tcp) will be used to create a `Connection` object. The Connection object will be then used to
+The name of the component, the type (hcd, service, etc) and the connection (akka, http, tcp) will be used to create a `Connection` object. The Connection object will be then used to
 track the location of a component using location service.
 
 The `Location` object has one of the following types:
@@ -136,7 +136,7 @@ More details about tracking connections can be found @ref:[here](../framework/tr
 
 #### *Tutorial: Developing an Assembly*
 
-For our sample component, we will set it up so that when the HCD is found by the location service, we will immediately send a command to it.  We
+For our sample component, we will set it up so that when the HCD is found by the Location Service, we will immediately send a command to it.  We
 will do this by using the location to obtain a `CommandService` reference (see @ref:[below](multiple-components.md#sending-commands)) to the HCD, and then pass this reference to a worker actor
 to send and monitor the command (we will get more into this command actor later), so that we don't block our Assembly from receiving 
 messages.  If we are notified that the HCD is removed, log a message.  
@@ -156,7 +156,7 @@ in `ComponentHandlers`. The `trackConnection` method will take the `Connection` 
 
 @@@ note { title=Note }
 
-Connections tracked by `csw-framework` (from a configuration file) or by a component developer using the `trackConnection` method both will be received in the `onLocationTrackingEvent`
+Connections tracked by `csw-framework` (from the configuration file) or by a component developer using the `trackConnection` method both will be received in the `onLocationTrackingEvent`
 hook of `ComponentHandlers`. 
 
 @@@
@@ -180,14 +180,21 @@ If a component wants to send a command to another component, it uses a `CommandS
 
 ## Tracking Long Running Commands
 
-The `submit` method has been written so that it will return a Future response encapsulating a `SubmitResponse` type.   If the Future completes, 
+The Command Service provides a few different ways of performing `Submit` commands.   In particular, for sending single commands, there are two flavors: `submit`
+and `submitAndWait`.  Both commands take a `Setup` or `Observe` and return a Future response encapsulating a `SubmitResponse` type.  The 
+difference is when handling long running commands.  If the command is short, in both cases, the Future returned by the command
+is expected to complete quickly with the response as a `Completed ` or `CompletedWithResult` (or some error response).  If the 
+command is long running, the `submit` command should return a `Started` response.  Then the 
+final response of the command must be obtained from the `CommandResponseManager` through polling (`query`) or subscribing (`queryFinal`).
+A `submitAndWait` combines the `submit` with the `queryFinal`, so that the Future returned from the command doesn't complete until the long
+running command completes and returns the final `SubmitResponse`.  That is to say, if the Future completes, 
 no matter whether the command has an immediate response or is long-running, is invalid, or encounters an error at any point, 
-the Future completes with the final response.  If there is an exception, which may occur if the `submit` times out, that must
-be handled explicity using Future exception handling (this can be done many ways; an example is given below).
+the Future completes with the final response.  If there is an exception, which may occur if the command times out, that must
+be handled explicitly using Future exception handling (this can be done many ways; an example is given below).
 
 #### *Tutorial: Developing an Assembly*
 
-We use our worker actor to submit the command to the HCD, and then subscribe to the HCD's `CommandResponseManager` for command completion.
+We use our worker actor to submit the command to the HCD, and then subscribe to the HCD's `CommandResponseManager` for command completion, using the shortcut `submitAndWait`.
 
 Scala
 :   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/sampleassembly/SampleAssemblyHandlers.scala) { #worker-actor }
@@ -206,7 +213,7 @@ More details on how to use `Matcher` can  be found @ref:[here](./command.md#matc
 ## PubSub Connection
 
 A component might need to subscribe to the current state of any other component provided it knows the location of that component. In order to subscribe to current state, it may
-use the `subscribeCurrentState` method of the `CommandService`. More details about the usage of `subscribeCurrentState` can ber found @ref:[here](./command.md#subscribecurrentstate).
+use the `subscribeCurrentState` method of the `CommandService`. More details about the usage of `subscribeCurrentState` can be found @ref:[here](./command.md#subscribecurrentstate).
 
 If a component wants to publish its current state then it can use the `currentStatePublisher` provided by `csw-framework`
 in the `CswContext` object passed into `ComponentHandlers`. More details about the usage
@@ -214,7 +221,7 @@ of `currentStatePublisher` can be found @ref:[here](../framework/publishing-stat
 
 ## Subscribing to Events
 
-To subscribe to events, a subscriber is accessed done in a similar way to publishing.  Typically a `defaultSubscriber`
+To subscribe to events, a subscriber is accessed in a similar way to publishing.  Typically a `defaultSubscriber`
 is obtained, but additional subscribers with their own connection can be created.
 
 The subscribe API specifies a set of `Events` to subscribe to and then specifies how the events should be handled. 

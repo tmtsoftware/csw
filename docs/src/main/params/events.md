@@ -3,14 +3,14 @@
 Events are the most basic type of asynchronous notification in TMT when an activity occurs 
 somewhere in the TMT system and other components need to be notified. Each type of event has a unique 
 purpose and unique information, but they all share same structural features. 
-All events have **EventInfo** and **ParameterSet**.
+All events have **EventInfo** and a **ParameterSet**.
 
 @@@ note
 
-`csw-params` library offers out of the box support to serialize Events using **Cbor**, so that events can be produced and 
-consumed by JVM(Java virtual machine) as well as Non-JVM applications.
+The `csw-params` library offers out of the box support to serialize Events using **Cbor**, so that events can be produced and 
+consumed by JVM (Java virtual machine) as well as Non-JVM applications.
 
-For more on Cbor refer @ref:[technical doc](../technical/params/params.md).
+For more on Cbor, refer to the @ref:[technical doc](../technical/params/params.md).
 
 @@@
 
@@ -39,13 +39,12 @@ Java
 ## Observe Event
 
 ObserveEvent are standardized events used to describe an activities within the data acquisition process. 
-These events are ublished only by Science Detector Assemblies, which emit ObserveEvents during their exposures 
+These events are typically published by Science Detector Assemblies, which emit ObserveEvents during their exposures 
 to signal the occurrence of specific activities/actions during the acquisition of data. 
-Observe Events are published by the detector system using the Event Service.
 
 @@@ note
 
-The current ObserveEvents do not match the descriptions of the ESW Phase 1 review. The model files and documents
+The example ObserveEvents do not match the descriptions of the ESW Phase 1 review. The model files and documents
 can be used to create standard ObserveEvents.
 
 @@@

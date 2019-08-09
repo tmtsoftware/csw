@@ -96,7 +96,7 @@ Java
 :   @@snip [JSampleHcdTest.java](../../../../examples/src/test/java/org/tmt/nfiraos/samplehcd/JSampleHcdTest.java) { #setup }
 
 Now let's add a test to verify our component is publishing.  We will set up a test subscriber to the
-`counterEvent` Events publisihed by the HCD.  Since we cannot guarantee the order in which the
+`counterEvent` Events published by the HCD.  Since we cannot guarantee the order in which the
 tests are run, we cannot be certain how long the component has been running when this specific test is run.
 Therefore, checking the contents of the Events received is tricky.  We will wait a bit at the start of the 
 test to ensure we don't get a InvalidEvent, which would be returned if we start our subscription before the

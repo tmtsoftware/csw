@@ -17,7 +17,7 @@ A key is **unique** in a `ParameterSet` since it is a Set.
  
  * choose an appropriate KeyType from the tables below for your language(Scala/Java).    
  * calling the `make` method on KeyType and supplying a String keyName will return a suitably typed Key instance.    
- * explore the overloaded `set` and `->` methods, which will allow you to store values of the based on chosen KeyType. e.g. `JKeyType.BooleanKey` will allow storing only `java.lang.Boolean` values.
+ * exploit the overloaded `set` and `->` methods, which will allow you to store values of the based on chosen KeyType. e.g. `JKeyType.BooleanKey` will allow storing only `java.lang.Boolean` values.
  
 ## Primitive Datatypes
 
@@ -125,7 +125,8 @@ Java
 
 ### Struct
 
-Stores a set of Parameters for telescope and instrument control. Lot of utility functions available for store, add, remove, list Keys and Paramete
+Structs can be used to create a hierarchy of parameters.  The following snippet also demonstrates some of the utility functions
+available for manipulating parameter sets.
 
 Scala
 :   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersTest.scala) { #struct }

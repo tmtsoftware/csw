@@ -1,6 +1,6 @@
 # Framework for creating components (HCD, Assembly, Container)
 
-**csw-framework** library provides support for creating a component as defined by the TMT. 
+**csw-framework** library provides support for creating a component as defined by TMT. 
 
 ## Dependencies
 

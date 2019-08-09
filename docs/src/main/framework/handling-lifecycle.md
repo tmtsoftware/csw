@@ -7,35 +7,29 @@ component-specific code as described below.
 
 ## Component Lifecycle
 For each component, the CSW framework creates a `Supervisor` that creates the TLA, and along with the abstract behavior
-class provided by the framework, it starts up and intiailizes the component in a standardized way. At the conclusion of 
+class provided by the framework, it starts up and initializes the component in a standardized way. At the conclusion of 
 the startup of the component, it is ready to receive commands from the outside world. The following figure is used to 
 describe the startup lifecycle interactions between the framework and the TLA.
 
 ![lifecycle](../images/framework/Lifecycle.png)
 
-As described in @ref:[Creating a Component](../commons/create-component.md), in either standalone or when running within 
-a container, a `Supervisor` is created with a @ref:[ComponentInfo](describing-components.md) file. The figure shows
-that the Supervisor in the framework creates the specified TLA. Once the TLA is created, the framework calls the `initialize`
-handler. This is the oportunity for the component to perform initialization needed before it is ready to receive commands.
-
-The TLA indicates a successful `initialize` by returning. If it cannot initialize, it can throw an exception, which will be
-caught and logged. The Supervisor will retry the creation and initialization of the TLA three times. If it fails after
-three times processing stops.
-
-@@@ note
-After failing to create and initialize three times, the Supervisor will log a message and stop. In the future when the 
-Alarm Service exists, there
-will probably be an alarm that will be set to notify the operator of a failure since there is serious problem.
-@@@
-
-When `initialize` succeeds, the Supervisor in the framework and the component itself enter the Running state. When in
-the Running state, commands received from outside the component are passed to the TLA (see below).
 
 ### initialize
 
-The `initialize` handler is invoked when the component is created. This is different than constructor initialization to allow non-blocking 
-asynchronous operations. The component can initialize state such as configuration to be fetched from Configuration Service, 
-location of components or services to be fetched from Location Service etc. These vary from component to component.
+As described in @ref:[Creating a Component](../commons/create-component.md),  a `Supervisor` is created based
+on the contents of the @ref:[ComponentInfo](describing-components.md) file.  The figure shows
+that the Supervisor in the framework creates the specified TLA. Once the TLA is created, the framework calls the `initialize`
+handler. This is the opportunity for the component to perform any initialization needed before it is ready to receive commands.
+
+The implementation of the `initialize` handler is up to the developer.  A common task will be for the component to fetch a configuration
+from the Configuration Service.  It may also determine the location of components or services it needs from the Location Service.
+
+The TLA indicates a successful `initialize` by returning normally. If it cannot initialize, the handler should throw an exception, which will be
+caught and logged. The Supervisor will retry the creation and initialization of the TLA three times. If it fails after
+three times, the Supervisor will log a message and stop.
+
+When `initialize` succeeds, the Supervisor in the framework and the component itself enter the Running state. When in
+the Running state, commands received from outside the component are passed to the TLA (see below).
 
 Assembly/Scala
 :   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/assembly/AssemblyComponentHandlers.scala) { #initialize-handler }
@@ -67,18 +61,17 @@ the `onTrackingEvent` @ref:[`onTrackingEvent`](tracking-connections.md) handler.
 
 ## Shutting Down
 A component may be shutdown by an external administrative program whether it is deployed in a container or standalone.
-Shutting down may occur when the component is `Running`/`onLine` or `offLine` (see below).
-
-The TLA provides a handler called `onShutdown` that is called by the Supervisor when shutting down to give the TLA an opportunity to perform
-any clean up it may require such as freeing resources.
-
-As with `initialize` the framework will only wait for 10 seconds for the component to return from `doShutdown`.
-If it does not return, it is assumed the TLA is damaged. After successful return from `doShutdown`, the
-Supervisor deletes the component. The `doShutdown` timeout cannot be changed.
+Shutting down may occur when the component is in the `Running` state, either `online` or `offline` (see below).
 
 ### onShutdown
 
-The `onShutdown` handler can be used for carrying out the tasks which will allow the component to shutdown gracefully. 
+The TLA provides a handler called `onShutdown` that is called by the Supervisor when shutting down to give the TLA an opportunity to perform
+any clean up it may require, such as freeing resources.
+
+As with `initialize`, there is a timeout that the framework will wait for the component to return from `onShutdown`.  This is 
+currently set to 10 seconds and cannot be overridden.
+If it does not return, it is assumed that the TLA is damaged and the TLA is destroyed immediately. After a
+successful return from `onShutdown`, the Supervisor deletes the component. 
 
 Assembly/Scala
 :   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/assembly/AssemblyComponentHandlers.scala) { #onShutdown-handler }
@@ -94,7 +87,7 @@ Hcd/Java
 
 ### Restarting
 A component may be restarted by an external administrative program whether it is deployed in a container or standalone.
-A restart may occur when the component is `Running`/`onLine` or `offLine` (see below).
+A restart may occur when the component is in the `Running` state, either `online` or `offline` (see below).
 
 A `restart` causes the component to be destroyed and re-created with a new TLA. The `onShutdown`
 handler is called to allow the component to tidy up before it is destroyed. Then the Supervisor
@@ -112,6 +105,15 @@ handler is called. The component should make any changes in its operation for of
 
 If a component is to transition from the offline state to the online state, the `onGoOnline`
 handler is called. The component should make any changes in its operation needed for online use.
+
+@@@ note { title=Note }
+
+Unless implemented by the developer, there is no fundamental difference in the inherent behavior of a component when in 
+either state.  These two states provide a standard way for code to be implemented via these handlers for the transition
+from one state to another, allowing the component to prepare itself to be online (ready for operations) or offline (stowed 
+or dormant).  Any call to transition to a online/offline state when the component is already in that state is a no op.
+
+@@@
 
 ### isOnline
 
@@ -155,20 +157,20 @@ Hcd/Java
 The remaining handlers are associated with handling incoming commands. There is a handler
 for submit commands called `onSubmit` and a handler for oneway called `onOneway`.
 
+This section gives an introduction to the command handlers.  For more information on how to send and monitor commands,
+see the @ref:[Communication using Commands](../commons/command.md) page.
+
 ### validateCommand
 
-Whenever a command is received by a component it is first validated. The component should
-inspect the command and its parameters to determine if the actions related to the command
-can be executed or started. For instance, if an Assembly or HCD can only handle one command
+The `validateCommand` handler allows the component to inspect a command and its parameters to determine if the actions related to the command
+can be executed or started. If it is okay, an `Accepted` response is returned.  If not, `Invalid` is returned. Validation may 
+also take into consideration the state of the component. For instance, if an Assembly or HCD can only handle one command
 at a time, `validateCommand` should return an return `Invalid` if a second command is received.
 
-A command can be sent as a `Submit` or `Oneway` message to the component. The `onSubmit` and `onOneway` handlers are only
-called if `validateCommand` returns `Accepted`. `Oneway` messages return their validation response or indicate the component is
-currently locked as a `OnewayResponse`.
-The `onSubmit` handler can complete the actions immediately by returning a `SubmitResponse` indicating 
-the final response (`Completed`, `CompletedWithResult`, `Error`). If the command actions require time for processing, the `onSubmit` handler 
-returns `Started` indicating to the framework that there are long-running actions. 
-More information about sending commands using `CommandService` is @ref:[here](../commons/command.md)
+The handler is called whenever a command is sent as a `Submit` or `Oneway` message to the component. If the handler returns `Accepted`,
+the corresponding `onSubmit` or `onOneway` handler is called.   This handler can also be called when the Command Service method
+`validateCommand` is used, to preview the acceptance of a command before it is sent using `submit` or `oneway`.  In this case, 
+the `onSubmit` or `onOneway` handler is not called.
 
 Assembly/Scala
 :   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/assembly/AssemblyComponentHandlers.scala) { #validateCommand-handler }
@@ -181,13 +183,14 @@ Hcd/Scala
 
 Hcd/Java
 :   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/hcd/JHcdComponentHandlers.java) { #validateCommand-handler }
- 
-If a response can be provided immediately, a final `CommandResponse` such as `CommandCompleted` or `Error` can be sent from this handler.
 
 ### onSubmit
 
 On receiving a command sent using the `submit` message, the `onSubmit` handler is invoked for a component only if the `validateCommand` handler returns `Accepted`. 
 The `onSubmit` handler returns a `SubmitResponse` indicating if the command is completed immediately, or if it is long-running by returning a `Started` response. 
+Completion of a long running command is then tracked using the `CommandResponseManager`, described in more detail in the
+@ref:[Managing Command State](managing-command-state.md) page.  
+
 The example shows one way to process `Setup` and `Observe` commands separately.
 
 Assembly/Scala
@@ -206,5 +209,3 @@ Assembly/Scala
 
 Assembly/Java
 :   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/assembly/JAssemblyComponentHandlers.java) { #onOneway-handler }
-
-More information on handling commands is provided @ref:[here](../commons/command.md).

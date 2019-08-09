@@ -1,7 +1,7 @@
 # Managing Command State
 
-A component has access to `commandResponseManager` which is used to manage the state of commands during its execution.
-On receiving a command as a part of `onSubmit` and if the command is accepted by the component, 
+A component has access to the `commandResponseManager` which is used to manage the state of commands during its execution.
+On receiving a command as a part of `onSubmit`, and if the command is accepted by the component, 
 the framework adds the command to an internal CommandResponseManager (CRM).
 The framework also uses the `SubmitResponse` returned by the `onSubmit` handler to update the CommandResponseManager. 
 In many cases, this is adequate and no other information is required to handle completion information.
@@ -17,7 +17,7 @@ components that may also take time to complete.
 ## Updating a Long-running Command
 
 In the first scenario, the developer has a long-running command and does not start any sub-commands or
-does not with to use the CRM to help manage subcommands. In this case, once
+does not need to use the CRM to help manage subcommands. In this case, once
 the actions are completed, `addOrUpdateCommand` is used to notify the CRM that the actions are complete. This will cause
 the original sender to be notified of completion using the `SubmitResponse` passed to `addOrUpdateCommand`.
 
@@ -34,7 +34,7 @@ Java
 
 ## Using the CRM with Subcommands
 
-If while processing a received command, the component needs to create and send commands to other components (e.g, an Assembly
+If while processing a received command, the component needs to create and send commands to other components (e.g. an Assembly
 sending commands to one or more HCDs) it can use the CRM to help manage responses from the sub-commands.
 
 A received command that requires one or more sub-commands must first associate the sub-commands with the received
@@ -58,7 +58,7 @@ Java
 Use `updateSubCommand` to update the CRM with the `SubmitResponse` of the sub-commands. 
 This can trigger the delivery of the status of the original/parent command when
 status of all the sub-commands have been updated. A `SubmitResponse` indicating failure such as `Cancelled` or `Error` in any one 
-of the sub-commands results in the error status of the parent command. Status of any other sub-commands wil not be 
+of the sub-commands results in the error status of the parent command. Status of any other sub-commands will not be 
 considered in this case.
 
 Scala

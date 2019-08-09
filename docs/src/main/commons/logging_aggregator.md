@@ -23,7 +23,7 @@ If logs are generated in non-JSON format, which will be the case for Redis, sysl
 
 After the JSON data is indexed in Elasticearch, Kibana provides powerful visualization tools and dashboards that offer various interactive diagrams to visualize complex queries. 
 
-Filebeat is responsible for watching log files and shipping it to the centralized Logstash component.
+Filebeat is responsible for watching log files and shipping them to the centralized Logstash component.
 As shown in the above architecture diagram, all machines in TMT can run Filebeat to watch log files. 
 Filebeat maintains a marker in a registry for the last read position in a file,
 so that it can resume where it left off should it need to be restarted. Applications can keep emitting logs to the file 

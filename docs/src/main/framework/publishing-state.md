@@ -16,10 +16,10 @@ information to create events that describe the state of the Assembly and HCD.
 2. 'CurrentState' information published by the HCD can be used by an Assembly to complete commands that have been submitted
 to the Assembly.
 
-The CommandService shows examples of the use of `CurrentState` for use case 2. See @ref:[Matching state for command completion](../commons/command.md#matching-state-for-command-completion).
+The CommandService shows examples of the use of `CurrentState` for the second use case. See @ref:[Matching state for command completion](../commons/command.md#matching-state-for-command-completion).
 
 A subscriber can subscribe to all `CurrentState` published by an HCD or to specific `CurrentState` specified by its 
-`StateName`. The publisher does not need to do anything special to support this features.
+`StateName`. The publisher does not need to do anything special to support these features.
 
 Scala
 :   @@snip [SampleComponentHandlers.scala](../../../../csw-framework/src/test/scala/csw/common/components/framework/SampleComponentHandlers.scala) { #currentStatePublisher }

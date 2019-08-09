@@ -20,16 +20,16 @@ Hcd/Java
 **Converting a typed actor system to an untyped actor system** 
 
 The `ctx` available to the component is of type `akka.actor.typed.scaladsl.ActorContext` in Scala or `akka.actor.typed.javadsl.ActorContext` 
-in Java. This context can be used to get resources such as actor system which is also typed. In order to get the untyped 
+in Java. This context can be used to get resources such as an actor system which is also typed. In order to get the untyped 
 version of an actor system or actor references, Akka has  provided some implicit extension methods in Scala and static
 methods in Java which can be used by adding the following import: 
 
-`import akka.actor.typed.scaladsl.adapter._`  for Scala and,
-`import akka.actor.typed.javadsl.Adapter.*` for Java
+* Scala: `import akka.actor.typed.scaladsl.adapter._`
+* Java: `import akka.actor.typed.javadsl.Adapter.*`
 
 @@@
 
-A component can be created by a factory which extends `ComponentBehaviorFactory` base class and provides a definition of `handlers` method to return the appropriate implementation of `ComponentHandlers`.
+A component can be created by a factory which extends the `ComponentBehaviorFactory` base class and provides a definition of the `handlers` method to return the appropriate implementation of `ComponentHandlers`.
 
 Assembly/Scala
 :   @@snip [AssemblyComponentBehaviorFactory.scala](../../../../examples/src/main/scala/example/framework/components/assembly/AssemblyComponentBehaviorFactory.scala) { #component-factory }

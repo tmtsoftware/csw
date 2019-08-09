@@ -1,6 +1,6 @@
 # Handling Exceptions
 
-A component should create exceptions belonging to following two types:
+A component should create exceptions belonging to one of the two following types:
 
 1. **FailureRestart** : As a part of any handler, if an exception can be handled by restarting the component, an exception of type `FailureRestart` should be 
     thrown to let the framework restart the component. The component's state will be cleared/reinitialized. The `onInitialize` handler will be invoked again.
