@@ -6,7 +6,7 @@ at different levels viz., `trace`, `debug`, `info`, `warn` and `error`.
 
 The library allows separate log levels for the logging API, Akka logging, and Slf4J.
 Also, it provides ability to set different log levels for different components.
-To understand how to use the API refer to @ref:[this doc](../../services/logging.md).  
+To understand how to use the API, refer to @ref:[this doc](../../services/logging.md).  
 
 ## Implementation Details
 

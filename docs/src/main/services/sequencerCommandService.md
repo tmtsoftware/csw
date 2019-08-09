@@ -1,7 +1,7 @@
 # Sequencer Command Service
 
-Sequencer command service provides ability to send `Sequence` of commands to a running `Sequencer`. It sends the provided sequence
-  to sequencer and returns `Future[Submit Response]`.
+The Sequencer Command Service provides the ability to send a `Sequence` of commands to a running `Sequencer`. It sends the provided Sequence
+  to a Sequencer and returns `Future[Submit Response]`.
 
 ## Dependencies
 
@@ -16,17 +16,17 @@ sbt
     @@@
     
 ## Creating Sequencer Command Service
-To create Sequencer Command Service, you need to resolve `AkkaLocation` of the `Sequencer` using `LocationService`. Pass the resolved
-location to `SequencerCommandServiceFactory` which will return handle of `SequencerCommandService`. 
+To create a Sequencer Command Service, you need to resolve the `AkkaLocation` of the `Sequencer` using the Location Service. Pass the resolved
+location to a `SequencerCommandServiceFactory`, which will return the handle of a `SequencerCommandService`. 
 
 Scala
 :   @@snip [SequencerCommandServiceExample.scala](../../../../examples/src/main/scala/example/sequencerCommandService/SequencerCommandServiceExample.scala) { #create-sequence-command-service }
 
-## Submitting sequence to a sequencer
+## Submitting Sequence to a Sequencer
 
-To submit sequence to Sequencer, `SequencerCommandService` provides `submit` api. Submit method takes a sequence and returns
- `Future[SubmitResponse]`. It starts execution of the sent sequence and returns `Future[Submit Response]` which will complete
-  when sequence is finished or Sequencer is not available.
+To submit a Sequence to Sequencer, `SequencerCommandService` provides a `submit` API. The submit method takes a Sequence and returns a
+ `Future[SubmitResponse]`. It starts execution of the sent Sequence and returns `Future[Submit Response]`, which will complete
+  when Sequence is finished or an error if the Sequencer is not available.
 
 Scala
 :   @@snip [SequencerCommandServiceExample.scala](../../../../examples/src/main/scala/example/sequencerCommandService/SequencerCommandServiceExample.scala) { #submit-sequence }

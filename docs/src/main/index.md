@@ -200,7 +200,7 @@ The Database Service provides API to manage database connections and access data
 `Postgres` as database server. It uses `Jooq` library underneath to manage database access, connection pooling, etc.
 To describe `JOOQ` briefly, it is a java library that provides api for accessing data i.e. DDL support, DML support, fetch,
 batch execution, prepared statements, etc. safety against sql injection connection pooling, etc. To know more about JOOQ and
-it's features please refer this [link](https://www.jooq.org/learn/).
+it's features, please refer to this [link](https://www.jooq.org/learn/).
 
 ### @ref:[Framework](commons/framework.md)
 The framework provides templates for @ref:[creating](./commons/create-component.md) and running the kind of software components 

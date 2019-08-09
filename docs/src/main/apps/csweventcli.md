@@ -11,7 +11,7 @@ A command line application that facilitates interaction with @ref:[Event Service
 
 ### inspect
 
-Takes a comma separated list of events and displays event's parameter information which includes key name, key type and unit along with metadata (event key, timestamp & id).
+Takes a comma separated list of events and displays each event's parameter information which includes key name, key type, and unit along with metadata (event key, timestamp & id).
 
  * `-e`, `--events` : comma separated list of events to inspect
  
@@ -27,7 +27,7 @@ csw-event-cli inspect -e wfos.prog.cloudcover,wfos.prog.filter
  
 ### get
 
-Takes a comma separated list of events with nested key paths and displays event information including values either in oneline or json format.
+Takes a comma separated list of events with nested key paths and displays event information including values either in oneline or JSON format.
 
  * `-e`, `--events`     comma separated list of events in the form of `<event1:key1>,<event2:key2:key3>`, use `:` to separate multiple keys for same event. Ex. `-e a.b.c:struct1/ra,x.y.z:struct2/dec:epoch`
  * `-o`, `--out`        output format, default is oneline
@@ -62,27 +62,27 @@ csw-event-cli get -e wfos.prog.cloudcover:epoch -o json
 Displays event `wfos.prog.cloudcover` with only `epcoh` key in JSON format.
 
 @@@ note
-`-t`, `--id` & `--u` options are not applicable when `-o json` option is provided. Event displayed in `json` format will always have `timestamp`, `event id` and `units` irrespective of whether those options are provided or not via CLI.
+`-t`, `--id` & `--u` options are not applicable when `-o json` option is provided. An Event displayed in JSON format will always have `timestamp`, `event id` and `units` irrespective of whether those options are provided via the CLI.
 @@@
 
  
 ### publish
 
-Publishes an event to event server from provided input data file or CLI params.
+Publishes an event to the Event Server from the provided input data file or CLI params.
 
  * `-e`, `--event`      event key to publish
  * `--data`             absolute file path which contains event in JSON format
  * `--params`           pipe '|' separated list of params enclosed in double quotes in the form of `"keyName:keyType:unit=values| ..."`. unit is optional here. Supported key types are: 
                         `[i = IntKey | s = StringKey | f = FloatKey | d = DoubleKey | l = LongKey | b = BooleanKey]`.
                         You can optionally choose to enclose param values in \[, \] brackets.
-                        Values of string key should be provided in single quotes and use backslash to escape string.
+                        Values of a string key should be provided in single quotes and use backslash to escape string.
                         Ex. `"addressKey:s=['Kevin O\'Brien','Chicago, USA']|timestampKey:s=['2016-08-05T16:23:19.002']"`
- * `-i`, `--interval`   interval in `<ms>` to publish event, single event will be published if not provided
- * `-p`, `--period`     publish events for this duration `<seconds>` on provided interval. Default is `2147483` seconds.
+ * `-i`, `--interval`   interval in milliseconds to publish event. A single event will be published, if not provided
+ * `-p`, `--period`     publish events for this duration in seconds on provided interval. Default is `2147483` seconds.
 
 @@@ note
-If `--data` & `--params` are provided together, then event is generated from both `--data` file & `--params` option.
-`--params` takes a precedence and overrides params from event data file if it is already present in the file.
+If `--data` & `--params` are provided together, then the Event is generated from both `--data` file & `--params` option.
+`--params` takes a precedence and overrides params from the Event data file if it is already present in the file.
 
 Option `-p` should be used with `-i`, otherwise `-p` is ignored. 
 @@@
@@ -93,28 +93,28 @@ Option `-p` should be used with `-i`, otherwise `-p` is ignored.
 ```
 csw-event-cli publish -e wfos.prog.cloudcover --data /path/to/event.json
 ```
-Creates event from provided JSON file and publishes same with key `wfos.prog.cloudcover` to event server. 
+Creates event from provided JSON file and publishes it with key `wfos.prog.cloudcover` to the Event Server. 
 
 2. 
 ```
 csw-event-cli publish -e wfos.prog.cloudcover --data /path/to/event.json -i 500 -p 60
 ```
-Creates event from provided JSON file and publishes same event at every `500ms` for duration of `60s`. 
+Creates an Event from provided JSON file and publishes it every `500ms` for duration of `60s`. 
 
 3. 
 ```
 csw-event-cli publish -e wfos.prog.cloudcover --params "k1:s=['Kevin O\'Brien','Chicago, USA']|k2:s=['2016-08-05T16:23:19.002']"
 ```
-First fetches already published event for key `wfos.prog.cloudcover` from event server and then updates that event with provided `--params`
-If provided keys are already present in existing event, then those will be updated else new param entries will be added to event.
-If no event is published in past for provided key, then new event gets created with provided params and event key. 
+First fetches already published Event for key `wfos.prog.cloudcover` from the Event Server and then updates that Event with provided `--params`
+If provided keys are already present in existing Event, then those will be updated.  Otherwise, new param entries will be added to the Event.
+If no Event is published in past for the provided key, then the new Event gets created with the provided params and Event key. 
 
 ### subscribe
 
-Takes a comma separated list of events with nested key paths and displays continuous stream of event information as soon as it receives event. 
+Takes a comma separated list of Events with nested key paths and displays continuous stream of Event information as soon as it receives the Event. 
 
- * `-e`, `--events`     comma separated list of events in the form of `<event1:key1>,<event2:key2:key3>`, use `:` to separate multiple keys for same event. Ex. `-e a.b.c:struct1/ra,x.y.z:struct2/dec:epoch`
- * `-i`, `--interval`   interval in `<ms>`, receive an event exactly at each interval
+ * `-e`, `--events`     comma separated list of Events in the form of `<event1:key1>,<event2:key2:key3>`, use `:` to separate multiple keys for the same Event. Ex. `-e a.b.c:struct1/ra,x.y.z:struct2/dec:epoch`
+ * `-i`, `--interval`   interval in milliseconds which to receive an Event
  * `-o`, `--out`        output format, default is oneline
  * `-t`, `--timestamp`  display timestamp
  * `--id`               display event id
@@ -126,31 +126,31 @@ Takes a comma separated list of events with nested key paths and displays contin
 ```
 csw-event-cli subscribe -e wfos.prog.cloudcover
 ```
-Subscribes to event key `wfos.prog.cloudcover` and displays all keys information as soon as there is an event published for key `wfos.prog.cloudcover` in the form of oneline.
+Subscribes to Event key `wfos.prog.cloudcover` and displays all key information as soon as there is an Event published for key `wfos.prog.cloudcover` with the oneline format.
 
 2. 
 ```
 csw-event-cli subscribe -e wfos.prog.cloudcover:struct1/ra:epoch -t --id -u
 ```
-Subscribes to event key `wfos.prog.cloudcover` and displays information of only `struct1/ra` and `epoch` keys 
-along with `timestamp`, `event id` and `units` of provided keys in oneline form as soon as there is an event published for key `wfos.prog.cloudcover`.
+Subscribes to the Event key `wfos.prog.cloudcover` and displays information of only the `struct1/ra` and `epoch` keys 
+along with `timestamp`, `event id` and `units` of tge provided keys in oneline format as soon as there is an Event published for the key `wfos.prog.cloudcover`.
 
 3. 
 ```
 csw-event-cli subscribe -e wfos.prog.cloudcover -i 500
 ```
-Subscribes to event key `wfos.prog.cloudcover` and displays all keys information at provided interval <500ms>.
-Irrespective of whether there are multiple events published for key `wfos.prog.cloudcover` within `500ms` interval or not, 
-at every tick (i.e. 500ms), latest event information will be displayed on the console. 
+Subscribes to the Event key `wfos.prog.cloudcover` and displays all key information at provided interval <500ms>.
+Irrespective of whether there are multiple Events published for the key `wfos.prog.cloudcover` within `500ms` interval or not, 
+at every tick (i.e. 500ms), the latest Event information will be displayed on the console. 
 
 4. 
 ```
 csw-event-cli subscribe -e wfos.prog.cloudcover:epoch -o json
 ```
-Subscribes to event key `wfos.prog.cloudcover` and displays only `epoch` key information as soon as there is an event published for key `wfos.prog.cloudcover` in the form of JSON.
+Subscribes to Event key `wfos.prog.cloudcover` and displays only `epoch` key information as soon as there is an Event published for key `wfos.prog.cloudcover`, in JSON format.
 
 @@@ note
-`-t`, `--id` & `--u` options are not applicable when `-o json` option is provided. Event displayed in `json` format will always have `timestamp`, `event id` and `units` irrespective of whether those options are provided or not via CLI.
+`-t`, `--id` & `--u` options are not applicable when the `-o json` option is provided. An Event displayed in `json` format will always have `timestamp`, `event id` and `units` irrespective of whether those options are provided via the CLI.
 @@@
 
 ## About this application 
@@ -164,7 +164,7 @@ Prints the version of the application.
 @@@ note
 
 All the above examples require that `csw-location-server` is running on local machine at `localhost:7654`.
-If `csw-location-server` is running on remote machine having Ip address `172.1.1.2`, then you need to pass additional `--locationHost 172.1.1.2` command line argument.
+If `csw-location-server` is running on a remote machine with an IP address of `172.1.1.2`, then you need to pass the additional `--locationHost 172.1.1.2` command line argument.
 Example:
 `csw-event-cli get -e wfos.prog.cloudcover --locationHost 172.1.1.2`
 
@@ -174,13 +174,13 @@ Example:
 While testing or development, in order to use this CLI application, below prerequisites must be satisfied:  
 
 *  @ref:[csw-location-server](./../apps/cswlocationserver.md) application is running.
-*  @ref:[csw-location-agent](./../apps/cswlocationagent.md) application is running, which has started event server and registered it to location service.
+*  @ref:[csw-location-agent](./../apps/cswlocationagent.md) application is running, which has started the Event Server and registered it to the Location Service.
 
-Please refer @ref:[Starting Apps for Development](./../commons/apps.md#starting-apps-for-development) section for more details on how to start these applications using `csw-services.sh` script.
+Please refer to @ref:[Starting Apps for Development](./../commons/apps.md#starting-apps-for-development) section for more details on how to start these applications using `csw-services.sh` script.
 
 ## Monitor statistics
 
-`Event Service` uses [redis](https://redis.io/) as a event store. Using `redis-cli`, you can monitor continuous stats about Event service.
+`Event Service` uses [redis](https://redis.io/) as the event store. Using `redis-cli`, you can monitor continuous stats about the Event Service.
 
 ```
 $ redis-cli --stat
@@ -194,18 +194,18 @@ keys       mem      clients blocked requests            connections
 305        20.74M   605     0       2001565 (+40728)    615
 ```
 
-In above example, new line is printed every second with useful information and also the difference between the current and old data point. 
+In the above example, a new line is printed every second with useful information, including the difference between current and old data points. 
 
-* `keys`: Represents all the keys present in the Redis database which in case of event service are EventKeys
-* `clients`: Represents total number of clients currently connected to Redis server
-* `requests`: Represents total number of Redis commands processed along with delta between every interval, in this case 1 second
-* `connections`: Represents total number of socket connections opened to Redis server
+* `keys`: Represents all the keys present in the Redis database, which in case of the Event Service are EventKeys
+* `clients`: Represents total number of clients currently connected to the Redis server
+* `requests`: Represents total number of Redis commands processed along with a delta between every interval, specified with the `-i` option (see below)
+* `connections`: Represents total number of socket connections opened to the Redis server
 
 The `-i <interval>` option in this case works as a modifier in order to change the frequency at which new lines are emitted. The default is one second.
 
-You can explicitly pass hostname and port of Redis server while running `redis-cli`
+You can explicitly pass the hostname and port of the Redis server while running `redis-cli`
 ```
 $ redis-cli -h redis.tmt.org -p 6379
 ```
 
-Detailed list of operations you can perform with `redis-cli` can be found [here](https://redis.io/topics/rediscli) 
+A detailed list of operations you can perform with `redis-cli` can be found [here](https://redis.io/topics/rediscli) 

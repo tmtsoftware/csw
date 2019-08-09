@@ -75,7 +75,7 @@ Java
 
 Creating `adminAPI` requires instance of `TokenFactory`. `TokenFactory` has a `getToken` method which returns a raw access token string 
 which is used by the config client to provide access to the Config Server. 
-For more details, refer bottom section on @ref:[Admin Protected Routes](./config.md#admin-protected-routes)
+For more details, refer to bottom section on @ref:[Admin Protected Routes](./config.md#admin-protected-routes)
 
 @@@
 

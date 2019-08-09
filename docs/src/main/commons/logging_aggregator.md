@@ -8,7 +8,7 @@ and the [Filebeat](https://www.elastic.co/guide/en/beats/filebeat/current/index.
 @@@ note
 
 The basic/elastic license of Elastic stack, which is a free license, should be sufficient for TMT's purposes. To know 
-more about what features are available in the basic license refer this [link](https://www.elastic.co/subscriptions).
+more about what features are available in the basic license refer to this [link](https://www.elastic.co/subscriptions).
 
 @@@
 
@@ -82,7 +82,7 @@ Scala/Java applications using the CSW Logging framework follow these conventions
 ### Scala/Java
 
 For Scala/Java applications to dump logs in a file, it is important that developers enable the `FileAppender` in `application.conf`. To know more about how
-to configure `FileAppender` please refer the @ref:[logging documentation](../services/logging.md#configuration). Once, the `FileAppender` is enabled, the log files
+to configure `FileAppender` please refer to the @ref:[logging documentation](../services/logging.md#configuration). Once, the `FileAppender` is enabled, the log files
 will be generated under `TMT_LOG_HOME`. If `TMT_LOG_HOME` is not set as an environment variable then a `BaseLogPathNotDefined` exception will be thrown. 
 For tests, you can hard code a logging directory without setting the `TMT_LOG_HOME` environment variable by 
 overriding the `baseLogPath` configuration setting in the logging configuration in your `application.conf` file.
@@ -272,7 +272,7 @@ Logs generated from Keycloak needs to be watched by Filebeat and aggregated. Hen
 to start JBoss server which will make JBoss server to log in JSON format, enable keycloak logs, and generate log files under `TMT_LOG_HOME`.
 
 Note that system generated logs on Keycloak machine also needs to be watched by Filebeat and aggregated. In order to watch Keycloak logs from 
-`TMT_LOG_HOME` and enable system module refer the steps from @ref:[here](logging_aggregator.md#filebeat-watching-tmt-app-logs-and-system-generated-logs).  
+`TMT_LOG_HOME` and enable system module, refer to the steps from @ref:[here](logging_aggregator.md#filebeat-watching-tmt-app-logs-and-system-generated-logs).  
 
 ## System logs on Logstash and Kibana machines
 
@@ -310,7 +310,7 @@ Hence, make sure that latest Docker setup is installed and running before starti
 generated in `tmp/csw/logs`. Hence, developers writing Scala/Java/Python/C++/C applications need to generate log files under `/tmp/csw/logs`. 
 
 Also, note that csw apps started via `csw-services.sh` will generate log files under `/tmp/csw/logs` and thus, it will be aggregated by the Elastic docker container.
-To know more about setting up docker and starting Elastic please refer @ref:[Starting Elastic logging aggregator for Development](apps.md#starting-elk-logging-aggregator-for-development). 
+To know more about setting up docker and starting Elastic, please refer to @ref:[Starting Elastic logging aggregator for Development](apps.md#starting-elk-logging-aggregator-for-development). 
 
 @@@ note
 

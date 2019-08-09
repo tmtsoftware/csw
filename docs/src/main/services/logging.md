@@ -4,7 +4,7 @@ The Logging Service library provides an advanced logging facility for CSW compon
 
 @@@note
 
-This page explains local logging only. To understand centralized logging facility refer to @ref:[this page](../commons/logging_aggregator.md).
+This page explains local logging only. To understand centralized logging facility, refer to @ref:[this page](../commons/logging_aggregator.md).
 
 @@@
     
@@ -394,7 +394,7 @@ This functionality is included in the framework code and users should not have t
 
 @@@
 
-In order to create a LoggerFactory with a custom componentName refer the following code:
+In order to create a LoggerFactory with a custom componentName, refer to the following code:
  
 Scala
 :   @@snip [Sample](../../../../examples/src/main/scala/example/logging/client/componentlogger/loggers.scala) { #logger-factory-creation }

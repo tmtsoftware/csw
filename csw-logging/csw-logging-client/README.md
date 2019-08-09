@@ -15,7 +15,7 @@ The high level features provided by this library are :
 The codebase in this module is based on [persist-logging library](https://github.com/nestorpersist/logging).
 We appreciate efforts put in by authors of the persist-logging library which made our development fast and easy.
 
-If you want to get started with logging service, refer the [examples](https://tmtsoftware.github.io/csw/services/logging.html).
+If you want to get started with logging service, refer to the [examples](https://tmtsoftware.github.io/csw/services/logging.html).
 
 You can refer to Scala documentation [here](https://tmtsoftware.github.io/csw/api/scala/csw/logging/index.html).
 

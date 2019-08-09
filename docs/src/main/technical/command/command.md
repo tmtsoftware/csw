@@ -1,7 +1,7 @@
 # Command
 
 Commands can be sent to other component and responses can be received in return. To understand the underlying framework 
-of the components and it's deployment please refer the @ref[framework technical doc](../framework/framework.md).
+of the components and its deployment, please refer to the @ref[framework technical doc](../framework/framework.md).
 
 ## Sending Commands from the Component
 
@@ -26,19 +26,19 @@ The operations allowed through `CommandService` helper are as follows:
 
 ### Submit
 
-To understand the flow of the Submit command please refer to this @ref[section](../../commons/command.md#the-submit-message). 
+To understand the flow of the Submit command, please refer to this @ref[section](../../commons/command.md#the-submit-message). 
 
 ![submit](media/submit.png)
 
 ### Oneway
 
-To understand the flow of Oneway please refer to this @ref[section](../../commons/command.md#the-oneway-message).
+To understand the flow of Oneway, please refer to this @ref[section](../../commons/command.md#the-oneway-message).
  
 ![oneway](media/oneway.png)
 
 ### Validate
 
-To understand the flow of the Validate command please refer to this @ref[section](../../commons/command.md#the-validate-message) and the code base for the implementation can be
+To understand the flow of the Validate command, please refer to this @ref[section](../../commons/command.md#the-validate-message) and the code base for the implementation can be
 found @github[here](/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala#L154).
 
 ### Command Response Manager

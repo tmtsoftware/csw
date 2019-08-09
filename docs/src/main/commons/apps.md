@@ -52,16 +52,16 @@ one or more of the following options are specified.
 
 @@@ note
 
-While starting database service, make sure that
+While starting the Database Service, make sure that
  
- * `PGDATA` environment variable is set to postgres data directory where postgres is installed e.g. for mac: "/usr/local/var/postgres" and
- * there is a password set for the valid Postgres user. If not, go to postgres shell via `psql` and run `ALTER USER <username> WITH PASSWORD '<mypassword>';`.
-If there is any problem entering postgres shell, go to `conf` folder -> `database_service` -> `pg_hba.conf` and change `password` to `trust`. Try entering
-postgres shell again and set the password. Once set successfully, revert `trust` to `password` in `pg_hba.conf` and run database service via `csw-services.sh`.   
+ * The `PGDATA` environment variable is set to the Postgres data directory where Postgres is installed e.g. for mac: "/usr/local/var/postgres" and
+ * there is a password set for the valid Postgres user. If not, go to the Postgres shell via `psql` and run `ALTER USER <username> WITH PASSWORD '<mypassword>';`.
+If there is any problem entering the Postgres shell, go to the `conf` folder -> `database_service` -> `pg_hba.conf` and change `password` to `trust`. Try entering
+the Postgres shell again and set the password. Once set successfully, revert `trust` to `password` in `pg_hba.conf` and run the Database Service via `csw-services.sh`.   
 
 @@@
 
-With this, the component code is now ready to connect to provided services via `csw-services.sh`.   
+With this, the component code is now ready to connect to the provided services via `csw-services.sh`.   
 
 ## Starting Elastic Logging Aggregator for Development
 
@@ -70,26 +70,26 @@ Elastic stack ([Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/ref
            [Kibana](https://www.elastic.co/guide/en/kibana/current/index.html) and 
            [Filebeat](https://www.elastic.co/guide/en/beats/filebeat/current/index.html)) is used to aggregate logs generated from TMT applications (Scala/Java/Python/C++/C) and
 CSW services (mentioned in the previous section). For development purposes, [Docker compose](https://docs.docker.com/compose/) is used. Hence, make sure that latest
-Docker setup is installed and running before starting the Elastic stack. To know more about how Elastic stack works please refer @ref[Logging Aggregator](logging_aggregator.md).
+Docker setup is installed and running before starting the Elastic stack. To know more about how Elastic stack works please refer to @ref[Logging Aggregator](logging_aggregator.md).
 
-For host setup follow the below given steps:
+For the host setup, follow the below given steps:
 
 * Install [Docker](https://www.docker.com/community-edition#/download) version **18.09+**
 * Install [Docker Compose](https://docs.docker.com/compose/install/) version **1.24.0+**
 
-On distributions which have SELinux enabled out-of-the-box you will need to either re-context the files or set SELinux
+On distributions which have SELinux enabled out-of-the-box, you will need to either re-context the files or set SELinux
 into Permissive mode in order for docker-elk to start properly. For example, on Redhat and CentOS, the following will
 apply the proper context:
 
 ```console
 $ chcon -R system_u:object_r:admin_home_t:s0 docker-elk/
 ```
-To know more about running Docker for Mac please refer this [link](https://docs.docker.com/v17.12/docker-for-mac/). For Windows, ensure that the
+To know more about running Docker for Mac please refer to this [link](https://docs.docker.com/v17.12/docker-for-mac/). For Windows, ensure that the
 "Shared Drives" feature is enabled for the `C:` drive (Docker for Windows > Settings > Shared Drives).
 See [Configuring Docker for Windows Shared Drives](https://blogs.msdn.microsoft.com/stevelasker/2016/06/14/configuring-docker-for-windows-volumes/) (MSDN Blog).
 
 Assuming that the developer has downloaded `csw-apps-<some-version>.zip` from [csw releases](https://github.com/tmtsoftware/csw/releases)
-and unzipped it, there are four folders, as follows, in `csw-apps-<some-version>`
+and unzipped it, there are four folders, as follows, in `csw-apps-<some-version>`:
 
 * bin
 * lib

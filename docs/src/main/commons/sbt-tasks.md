@@ -5,7 +5,7 @@ csw uses multiple plugins in the sbt ecosystem to help accomplish a variety of t
 | :------------: |:--------------: | :-------------------------|
 | default in sbt | test            | compile and run all tests including scala tests, java tests, multi-jvm/multi-node tests |
 | default in sbt | test:test       | compile and run all tests excluding multi-jvm/multi-node tests |
-| default in sbt | publishLocal    | install your libraries in local Ivy repository so they can be added as dependencies to other projects |       
+| default in sbt | publishLocal    | install your libraries in the local Ivy repository so they can be added as dependencies to other projects |       
 | [sbt-multi-jvm](https://doc.akka.io/docs/akka/current/multi-jvm-testing.html?language=scala#multi-jvm-testing) | multi-jvm:test  | provides support for running applications (objects with main methods) and ScalaTest tests in multiple JVMs at the same time. |
 | [sbt-site](https://www.scala-sbt.org/sbt-site/) | makeSite | generates project’s webpage in the target/site directory|
 | [sbt-ghpages](https://github.com/sbt/sbt-ghpages) | ghpagesPushSite | publish project website to [GitHub Pages](https://pages.github.com/)|

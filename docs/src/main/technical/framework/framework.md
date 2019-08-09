@@ -54,7 +54,7 @@ The ComponentBehavior actor has the framework behavior such as lifecycle.  It ma
 
 @@@
 
-To know more about the responsibility of Supervisor and Top Level Actor please refer this @ref:[section](../../commons/create-component.md#anatomy-of-component).
+To know more about the responsibility of Supervisor and Top Level Actor, please refer to this @ref:[section](../../commons/create-component.md#anatomy-of-component).
 
 The interaction between supervisor and Top Level Actor when creating the component is shown below:
 
@@ -75,7 +75,7 @@ document. The Supervisor code base wiring restart strategy can be found @github[
 
 Once the handler is spawned it receives an `ActorContext` and @github[CswContext](/csw-framework/src/main/scala/csw/framework/models/CswContext.scala) in its
 constructor. The `ActorContext` is used to get the `ActorSystem` of the component and maybe spawn other actors i.e worker actors for maintaining state.
-The `CswContext` can be used to get the handle of all the services provided by CSW. To know more about these services please refer to this
+The `CswContext` can be used to get the handle of all the services provided by CSW. To know more about these services, please refer to this
 @ref[section](../../commons/create-component.md#csw-services-injection).
 
 
@@ -83,8 +83,8 @@ The `CswContext` can be used to get the handle of all the services provided by C
 
 Every component needs to provide a startup config file called the Component Info File that contains component details such as name, type, handler class name, tracking details, etc.
 The contents of this file is used by Supervisor to create and setup the component as well as some customization.
-To know more about what is it and how to write the Component Info File please refer this @ref[section](../../framework/describing-components.md) and 
-a @ref[sample file](../../commons/multiple-components.md#component-configuration-componentinfo). 
+To know more about what is it and how to write the Component Info File, please refer to this @ref[section](../../framework/describing-components.md) and 
+this @ref[sample file](../../commons/multiple-components.md#component-configuration-componentinfo). 
 
 The name of the Component Info File needs to be passed to @ref[Container/Standalone app](../../framework/deploying-components.md) at the time of startup.
 The file is either fetched from `Configuration Service` or taken from local path on the machine to parse to a @github[ComponentInfo](/csw-command/csw-command-client/src/main/scala/csw/command/client/models/framework/ComponentInfo.scala)
@@ -155,11 +155,11 @@ The code base that implements Lock can be found @github[here](/csw-framework/src
 
 ## Sending Commands from the Component
 
-Please refer the section for @ref[sending commands to other component](../command/command.md#sending-commands-from-the-component)
+Please refer to the section for @ref[sending commands to other component](../command/command.md#sending-commands-from-the-component)
 
 ## Receiving Responses from Components
 
-Please refer the section for @ref[receiving responses from other components](../command/command.md#receiving-responses-from-components)
+Please refer to the section for @ref[receiving responses from other components](../command/command.md#receiving-responses-from-components)
 
 ## Deploying Component in Container or Standalone Mode
 

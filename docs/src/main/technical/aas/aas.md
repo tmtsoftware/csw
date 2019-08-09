@@ -5,7 +5,7 @@
 Authentication and Authorization Service provides suit of libraries which help to enforce authentication and authorization 
 for web applications and cli applications in TMT ecosystem.
 
-It provides following libraries (aka adapters). For information on _using_ these adapters, refer following sections:
+It provides following libraries (aka adapters). For information on _using_ these adapters, refer to following sections:
 
 - @ref:[Akka HTTP Adapter - csw-aas-http](../../services/aas/csw-aas-http.md) - This is adapter which enables security for akka http server applications 
 - @ref:[Installed Auth Adapter - csw-aas-installed](../../services/aas/csw-aas-installed.md) - This is adapter which enables security for cli applications 
@@ -15,7 +15,7 @@ These adapters are written on top of [client adapters](https://www.keycloak.org/
 
 ![AAS Adapters](aas-adapters.png) 
 
-For more information on internals of these adapters refer following sections:
+For more information on internals of these adapters, refer to following sections:
 
 - @ref:[Akka HTTP Adapter - csw-aas-http](./csw-aas-http.md) 
 - @ref:[Installed Auth Adapter - csw-aas-installed](./csw-aas-installed.md) 

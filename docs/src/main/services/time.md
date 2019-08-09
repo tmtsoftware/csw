@@ -1,10 +1,10 @@
 # Time Service
 
-The Time Service provides APIs to access time in Coordinated Universal Time (UTC) and International Atomic Time (TAI) time scales with up to nano 
-second precision when available. 
-It also provides APIs for scheduling periodic and non-periodic tasks in the future, which are optimised for scheduling at up to 1KHz frequency.
+The Time Service provides APIs to access time in Coordinated Universal Time (UTC) and International Atomic Time (TAI) time scales 
+with up to nanosecond precision when available. 
+It also provides APIs for scheduling periodic and non-periodic tasks in the future, which are optimized for scheduling at up to 1KHz frequency.
 
-TMT has standardised on the use of [Precision Time Protocol (PTP)](https://en.wikipedia.org/wiki/Precision_Time_Protocol) as the basis of time 
+TMT has standardized on the use of [Precision Time Protocol (PTP)](https://en.wikipedia.org/wiki/Precision_Time_Protocol) as the basis of time 
 to achieve sub-microsecond accuracy and precision between computers. The Time Service provides each participating computer with access to time synchronized by PTP. 
 
 At the telescope site, the Global Positioning System (GPS) provides an absolute time base, and a
@@ -60,7 +60,7 @@ There are total three APIs provided by the Time Service:
 
 ### TMTTime API
 
-TMTTime represents an instantaneous point in time with nanosecond precision. It's a wrapper around Instant and provides additional information 
+TMTTime represents an instantaneous point in time with nanosecond precision. It is a wrapper around [Instant](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/time/Instant.html) and provides additional information 
 about the timescale of the instant. 
 
 TMTTime supports two timescales:
@@ -77,7 +77,7 @@ Scala
 Java
 :   @@snip [JTMTTimeExamples.java](../../../../examples/src/main/java/example/time/JTMTTimeExamples.java) { #current-time }
 
-Note that time is returned a UTCTime or TAITime object so that it is possible to determine the time scale of the
+Note that time is returned as a UTCTime or TAITime object so that it is possible to determine the time scale of the
 time value by inspection.
 
 #### Converting from UTC to TAI Time and Vice-versa
@@ -96,7 +96,7 @@ This API provides additional time zone related functionality on top of TMTTime. 
 Java *ZonedDateTime* representation of a TMTTime.
 
 #### At Local Time Zone
-Gets the given TMTTime at Local time zone. The local time zone is fetched from the calling system's default time zone.
+Gets the given TMTTime at the local time zone. The local time zone is fetched from the calling system's default time zone.
 
 Scala
 :   @@snip [TMTTimeExamples.scala](../../../../examples/src/main/scala/example/time/TMTTimeExamples.scala) { #at-local }
@@ -105,7 +105,7 @@ Java
 :   @@snip [JTMTTimeExamples.java](../../../../examples/src/main/java/example/time/JTMTTimeExamples.java) { #at-local }
 
 #### At Hawaii (HST) Timezone
-Gets the given TMTTime at Hawaii time zone.
+Gets the given TMTTime at the Hawaii time zone.
 
 Scala
 :   @@snip [TMTTimeExamples.scala](../../../../examples/src/main/scala/example/time/TMTTimeExamples.scala) { #at-hawaii }
@@ -130,7 +130,7 @@ For component developers, the scheduler API is provided as a @scaladoc[TimeServi
 object in the `CswContext` object injected into the ComponentHandlers class provided by the framework.  
 
 If you are not using csw-framework, you can create @scaladoc[TimeServiceScheduler](csw/time/scheduler/api/TimeServiceScheduler)
-using @scaladoc[TimeServiceSchedulerFactory](csw/time/scheduler/TimeServiceSchedulerFactory$) as follows.
+using @scaladoc[TimeServiceSchedulerFactory](csw/time/scheduler/TimeServiceSchedulerFactory$) as follows:
 
 Scala
 :   @@snip [TimeSchedulerExamples.scala](../../../../examples/src/main/scala/example/time/SchedulerExamples.scala) { #create-scheduler }

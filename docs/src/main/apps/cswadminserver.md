@@ -1,12 +1,12 @@
 # csw-admin-server
 
-A HTTP server application that supports changing/getting log level of component. 
+A HTTP server application that supports changing/getting the log level of component. 
 
 ## Prerequisites
 
-A required check before starting csw-admin-server app is to ensure the csw-cluster is setup and location sever is available so that using HTTP location client, 
-it can resolve components for which log level needs to be fetched/changed..
-Kindly refer to @ref:[CSW Location Server](../apps/cswlocationserver.md) for more information about location server setup.
+A required check before starting csw-admin-server app is to ensure the csw-cluster is setup and the Location Server is available so that when using the HTTP location client, 
+it can resolve components for which the log level needs to be fetched/changed..
+Kindly refer to @ref:[CSW Location Server](../apps/cswlocationserver.md) for more information about the Location Server setup.
 
 ## Command line parameter options
 
@@ -21,27 +21,27 @@ Kindly refer to @ref:[CSW Location Server](../apps/cswlocationserver.md) for mor
 ```
 csw-admin-server
 ```  
-Start HTTP server on default port 7878.
+Start an HTTP server on default port 7878.
 
 @@@ note
-This requires that location server is running locally
+This requires that the Location Server is running locally
 @@@
 
 2. 
 ```
 csw-admin-server --locationHost 172.1.1.2
 ```  
-Start HTTP server on default port 7878.
+Start an HTTP server on default port 7878.
 
 @@@ note
-This indicates, location server is running on remote machine having ip address=`172.1.1.2`
+This indicates that the Location Server is running on a remote machine at the IP address=`172.1.1.2`
 @@@
  
 3. 
 ```
 csw-admin-server --port 8080
 ```  
-Start HTTP server on port 8080.
+Start an HTTP server on port 8080.
 
 4. 
 ```
@@ -59,7 +59,7 @@ Prints application version
  ## Accessing csw-admin-server routes via HTTP (curl)
  
  
-1. Get LogMetadata : Returns current log level of component along with default, akka and slf4j log levels.
+1. Get LogMetadata: Returns current log level of a component along with the default, akka and slf4j log levels.
  
  * Request:
  ```
@@ -76,7 +76,7 @@ Prints application version
     }
  ```
  
-2. Set Log Level : Sets the log level of component and returns with status code 200 OK
+2. Set Log Level: Sets the log level of a component and returns with status code 200 OK
  
  * Request:
  ```
@@ -85,6 +85,6 @@ Prints application version
 
 @@@ note
 
- Assuming csw-admin-server is running on IP 10.131.21.184 on port 7878.
+ This assumes the csw-admin-server is running on IP 10.131.21.184 on port 7878.
 
 @@@

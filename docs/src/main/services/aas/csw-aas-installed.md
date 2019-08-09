@@ -22,12 +22,12 @@ sbt
 
 To run a client app with AAS access, we need
 
-* CSW Location Service running
-* AAS instance running and registered with Location Service
-* protected HTTP server running
+* The CSW Location Service running
+* An AAS instance running and registered with the Location Service
+* A protected HTTP server running
 
 All of these can be running on different machines. To start a Location Service and AAS 
-server on a local machine, you can make use of  the`csw-services.sh` script.
+server on a local machine, you can make use of the`csw-services.sh` script.
 
 ## Application Configurations
 
@@ -50,7 +50,7 @@ auth-config {
 
 ## Building a CLI Application
 
-Let's say that we have an existing akka-http application which has some open and 
+Let's say that we have an existing Akka HTTP application which has some open and 
 some protected routes, and we want to build a CLI client which accesses these routes.
 
 Scala
@@ -84,7 +84,7 @@ In a real application, you would ideally want to use `LocationServerStatus.requi
 @@@
 
 Next, we will instantiate `InstalledAppAuthAdapter`. There is a factory already available to create the 
-required instance. We will create a small factory on top this factory to keep our Main.scala clean.
+required instance. We will create a small factory on top of this factory to keep our Main.scala clean.
 
 Scala
 :   @@snip [Adapter-Factory](../../../../../examples/src/main/scala/example/auth/installed/AdapterFactory.scala) { #adapter-factory }
@@ -128,7 +128,7 @@ Let's go through each command one by one:
 Scala
 :   @@snip [LoginCommand](../../../../../examples/src/main/scala/example/auth/installed/commands/LoginCommand.scala) { #login-command }
 
-Here the constructor takes an `InstalledAppAuthAdapter` as a parameter and in the `run` method, 
+Here the constructor takes an `InstalledAppAuthAdapter` as a parameter, and in the `run` method, 
 it calls `installedAppAuthAdapter.login()`. This method opens a browser and redirects the user
 to a TMT login screen (served by AAS). In the background, it starts an HTTP server
 on a random port. Once the user submits the correct credentials on the login screen, AAS
@@ -172,12 +172,12 @@ Since the post route is protected by a realm role policy in our example server, 
 bearer token in the request header. 
 
 `installedAppAuthAdapter.getAccessTokenString()` checks the `FileAuthStore` and returns an `Option[String]`.
-If the Option is `None`, it means  that user has not logged in and an error message is displayed. If the token is 
+If the Option is `None`, it means that user has not logged in and an error message is displayed. If the token is 
 found, the bearer token is obtained and passed in the header of the request to the HTTP server.  The HTTP server 
 uses this token to determine whether the client has the proper permissions to perform the request.
 
 If the response status code is 200, it means authentication and authorization were successful. In our example,
-authorization required that the user had `admin` role. 
+authorization required that the user had the `admin` role. 
 
 If the response is 401 (`StatusCodes.Unauthorized`), there is something wrong with the token. 
 It could indicate that token has expired or does not have a valid signature. 
