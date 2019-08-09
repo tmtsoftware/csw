@@ -9,7 +9,7 @@ sealed trait BaseSetting {
   def rate: Int
   def payloadSize: Int
 
-  val warmup: Int       = rate * 20
+  val warmup: Int       = rate * 30
   val newPrefix: Prefix = Prefix(s"${prefix.prefix}-${rate}Hz")
 }
 

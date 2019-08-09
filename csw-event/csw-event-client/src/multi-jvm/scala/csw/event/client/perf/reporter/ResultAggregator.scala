@@ -33,11 +33,11 @@ class ResultAggregator(
   private def onEvent(event: Event): Unit = event match {
     case event: SystemEvent if newEvent =>
       receivedPerfEventCount += 1
-      val histogramBuffer = ByteString(event.get(histogramKey).get.values.map(x => x.toByte)).asByteBuffer
+      val histogramBuffer = ByteString(event.get(histogramKey).get.values).asByteBuffer
       histogram.add(Histogram.decodeFromByteBuffer(histogramBuffer, SECONDS.toNanos(10)))
 
       val initialLatencyHistogramBuffer =
-        ByteString(event.get(initialLatencyHistogramKey).get.values.map(x => x.toByte)).asByteBuffer
+        ByteString(event.get(initialLatencyHistogramKey).get.values).asByteBuffer
       initialLatencyHistogram.add(Histogram.decodeFromByteBuffer(initialLatencyHistogramBuffer, SECONDS.toNanos(10)))
 
       throughput += event.get(throughputKey).get.head

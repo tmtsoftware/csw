@@ -42,7 +42,7 @@ class PerfPublisher(
     eventId += 1
     // send extra two end events in case one goes missing
     // subscriber stops listening on receiving first end event, hence not affected by publisher publishing multiple end events
-    if (eventId > totalMessages + 2) cancellable.cancel()
+    if (eventId > totalMessages + 10) cancellable.cancel()
     if (eventId < totalMessages) event(eventName, prefix, eventId, payload) else endEvent
   }
 

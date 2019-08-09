@@ -15,7 +15,7 @@ object ModelObsMultiNodeConfig extends MultiNodeConfig {
 
   val totalNumberOfNodes: Int =
     System.getProperty("csw.event.client.perf.model-obs.nodes") match {
-      case null  => 2
+      case null  => 21
       case value => value.toInt
     }
 
@@ -25,27 +25,27 @@ object ModelObsMultiNodeConfig extends MultiNodeConfig {
 
 }
 
-class ModelObsPerfTestMultiJvmNode1 extends ModelObsPerfTest
-class ModelObsPerfTestMultiJvmNode2 extends ModelObsPerfTest
-//class ModelObsPerfTestMultiJvmNode3 extends ModelObsPerfTest
-//class ModelObsPerfTestMultiJvmNode4 extends ModelObsPerfTest
-//class ModelObsPerfTestMultiJvmNode5 extends ModelObsPerfTest
-//class ModelObsPerfTestMultiJvmNode6  extends ModelObsPerfTest
-//class ModelObsPerfTestMultiJvmNode7  extends ModelObsPerfTest
-//class ModelObsPerfTestMultiJvmNode8  extends ModelObsPerfTest
-//class ModelObsPerfTestMultiJvmNode9  extends ModelObsPerfTest
-//class ModelObsPerfTestMultiJvmNode10 extends ModelObsPerfTest
-//class ModelObsPerfTestMultiJvmNode11 extends ModelObsPerfTest
-//class ModelObsPerfTestMultiJvmNode12 extends ModelObsPerfTest
-//class ModelObsPerfTestMultiJvmNode13 extends ModelObsPerfTest
-//class ModelObsPerfTestMultiJvmNode14 extends ModelObsPerfTest
-//class ModelObsPerfTestMultiJvmNode15 extends ModelObsPerfTest
-//class ModelObsPerfTestMultiJvmNode16 extends ModelObsPerfTest
-//class ModelObsPerfTestMultiJvmNode17 extends ModelObsPerfTest
-//class ModelObsPerfTestMultiJvmNode18 extends ModelObsPerfTest
-//class ModelObsPerfTestMultiJvmNode19 extends ModelObsPerfTest
-//class ModelObsPerfTestMultiJvmNode20 extends ModelObsPerfTest
-//class ModelObsPerfTestMultiJvmNode21 extends ModelObsPerfTest
+class ModelObsPerfTestMultiJvmNode1  extends ModelObsPerfTest
+class ModelObsPerfTestMultiJvmNode2  extends ModelObsPerfTest
+class ModelObsPerfTestMultiJvmNode3  extends ModelObsPerfTest
+class ModelObsPerfTestMultiJvmNode4  extends ModelObsPerfTest
+class ModelObsPerfTestMultiJvmNode5  extends ModelObsPerfTest
+class ModelObsPerfTestMultiJvmNode6  extends ModelObsPerfTest
+class ModelObsPerfTestMultiJvmNode7  extends ModelObsPerfTest
+class ModelObsPerfTestMultiJvmNode8  extends ModelObsPerfTest
+class ModelObsPerfTestMultiJvmNode9  extends ModelObsPerfTest
+class ModelObsPerfTestMultiJvmNode10 extends ModelObsPerfTest
+class ModelObsPerfTestMultiJvmNode11 extends ModelObsPerfTest
+class ModelObsPerfTestMultiJvmNode12 extends ModelObsPerfTest
+class ModelObsPerfTestMultiJvmNode13 extends ModelObsPerfTest
+class ModelObsPerfTestMultiJvmNode14 extends ModelObsPerfTest
+class ModelObsPerfTestMultiJvmNode15 extends ModelObsPerfTest
+class ModelObsPerfTestMultiJvmNode16 extends ModelObsPerfTest
+class ModelObsPerfTestMultiJvmNode17 extends ModelObsPerfTest
+class ModelObsPerfTestMultiJvmNode18 extends ModelObsPerfTest
+class ModelObsPerfTestMultiJvmNode19 extends ModelObsPerfTest
+class ModelObsPerfTestMultiJvmNode20 extends ModelObsPerfTest
+class ModelObsPerfTestMultiJvmNode21 extends ModelObsPerfTest
 
 // DEOPSCSW-362: [Redis]Support publication of 20, 64byte events at 1Khz
 // DEOPSCSW-405: [Redis]Measure performance of model observatory scenario
@@ -139,7 +139,7 @@ class ModelObsPerfTest extends BasePerfSuite(ModelObsMultiNodeConfig) {
 
   //DEOPSCSW-336: Pattern based subscription analysis and performance testing
   ignore("Perf results must be great for model observatory use case") {
-    runScenario(scenarios.modelObsScenarioWithTwoProcesses)
+    runScenario(scenarios.idealMultiNodeModelObsScenario)
   }
 
 }

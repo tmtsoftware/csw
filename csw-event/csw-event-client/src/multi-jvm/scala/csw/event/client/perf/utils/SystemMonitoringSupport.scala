@@ -21,11 +21,11 @@ trait SystemMonitoringSupport { multiNodeSpec: MultiNodeSpec =>
   }
 
   val homeDir: String        = System.getProperty("user.home")
-  val perfScriptsDir: String = System.getProperty("user.dir") + "/scripts/perf"
+  val perfScriptsDir: String = "/home/centos/project/csw/scripts/perf"
   val perfJavaFlamesPath     = s"$homeDir/TMT/perf-map-agent/bin/perf-java-flames"
   val topResultsPath         = s"$homeDir/perf/top_${Instant.now()}.log"
   val jstatResultsPath       = s"$homeDir/perf/jstat/${myself.name}_jstat_${pid}_${Instant.now()}.log"
-  val jstatPlotPath          = s"$homeDir/TMT/pritam/jstatplot/target/universal/stage/bin/jstatplot"
+  val jstatPlotPath          = s"$homeDir/project/jstatplot/target/universal/stage/bin/jstatplot"
 
   def plotCpuUsageGraph(): Process    = executeCmd(s"$perfScriptsDir/cpu_plot.sh", topResultsPath)
   def plotMemoryUsageGraph(): Process = executeCmd(s"$perfScriptsDir/memory_plot.sh", topResultsPath)
