@@ -5,6 +5,9 @@ import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.helpers.Utils.{makeDistinctEvent, makeEvent, makeEventWithPrefix}
+import csw.params.core.generics.{Key, Parameter}
+import csw.params.core.generics.KeyType.ByteKey
+import csw.params.events.{EventName, SystemEvent}
 //import csw.event.client.internal.kafka.KafkaTestProps
 import csw.event.client.internal.redis.{InitializationEvent, RedisTestProps}
 import csw.event.client.internal.wiring._
@@ -290,5 +293,23 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*wit
     // subscriber will receive an invalid event first as subscription happened before publishing started.
     // The 4 published events will follow
     queue should (have length 3 and contain allElementsOf Seq(Event.invalidEvent(eventKey)) ++ events.take(2))
+  }
+
+  @Test(dataProvider = "event-service-provider")
+  def large_event_test(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
+
+    val payloadKey: Key[Byte]       = ByteKey.make("payloadKey")
+    val payload: Array[Byte]        = ("0" * 1024 * 2).getBytes("utf-8")
+    val paramSet: Set[Parameter[_]] = Set(payloadKey.set(payload))
+    val event1                      = SystemEvent(Prefix("csw.abc"), EventName("system_1"), paramSet)
+
+    val eventKey: EventKey = event1.eventKey
+    val testProbe          = TestProbe[Event]()
+    val subscription       = subscriber.subscribe(Set(eventKey)).toMat(Sink.foreach(testProbe.ref ! _))(Keep.left).run()
+    subscription.ready().await
+
+    publisher.publish(event1).await
+    testProbe.expectMessageType[SystemEvent]
   }
 }

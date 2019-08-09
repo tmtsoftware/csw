@@ -91,12 +91,12 @@ trait ParamCodecs extends CommonCodecs {
 
   //Do not put the bytesEnc and bytesDec inside Codec, due to an issue with borer https://github.com/sirthias/borer/issues/24
   implicit lazy val bytesEnc: Encoder[Array[Byte]] = Encoder.targetSpecific(
-    cbor = Encoder.forByteArrayDefault,
+    cbor = Encoder.forArray[Byte],
     json = Encoder.forArray[Byte]
   )
 
   implicit lazy val bytesDec: Decoder[Array[Byte]] = Decoder.targetSpecific(
-    cbor = Decoder.forByteArrayDefault,
+    cbor = Decoder.forArray[Byte],
     json = Decoder.forArray[Byte]
   )
 
