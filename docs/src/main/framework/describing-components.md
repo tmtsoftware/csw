@@ -46,4 +46,4 @@ be used in accordance with the `locationServiceUsage` property to automatically 
     * RegisterOnly : Register this component with the Location Service
     * RegisterAndTrackServices : Register this component with the Location Service as well as track the components/services listed in the `connections` property
 * **initializeTimeout** (Optional) : An optional parameter that specifies the timeout time for the initialization phase of the component lifecycle (see  
-@ref:[Component Handlers](../commons/handling-lifecycle.md)).  This is specified using a whole number and then units (e.g. "5 seconds"), where the units
+@ref:[Component Handlers](handling-lifecycle.md)).  This is specified using a whole number and then units (e.g. "5 seconds"), where the units
