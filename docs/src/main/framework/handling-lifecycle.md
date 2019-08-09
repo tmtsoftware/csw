@@ -106,7 +106,7 @@ handler is called. The component should make any changes in its operation for of
 If a component is to transition from the offline state to the online state, the `onGoOnline`
 handler is called. The component should make any changes in its operation needed for online use.
 
-@@@ note { title=Note }
+@@@ note
 
 Unless implemented by the developer, there is no fundamental difference in the inherent behavior of a component when in 
 either state.  These two states provide a standard way for code to be implemented via these handlers for the transition

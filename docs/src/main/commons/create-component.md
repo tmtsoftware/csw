@@ -322,8 +322,8 @@ The response returned from `validateCommand` hook of `ComponentHandlers` will be
 response returned was `Accepted`, then it either calls the `onSubmit` hook or the `onOneway` hook of `ComponentHandlers` depending on the wrapper(submit or oneway) in which the command
 was received. 
 
-If the command was received as a `Submit`, then the Top Level Actor adds the response returned from the `validateCommand` hook in the `CommandResponseManager`.
-If the response was `Accepted`, the TLA then calls the `onSubmit` hook of `ComponentHandlers`.   The return value of `onSubmit` is then returned to the sender,
+If the response was `Accepted`, the TLA adds the `Started` status for the command in the `CommandResponseManager` and then
+calls the `onSubmit` hook of `ComponentHandlers`. The return value of `onSubmit` is then returned to the sender,
 which can be a `Completed` or `CompletedWithResult` for commands that return quickly, or `Started` for long running commands.  If the response was `Invalid`, this is returned to the
 sender of the command.
 

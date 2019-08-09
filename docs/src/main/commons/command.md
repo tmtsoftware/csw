@@ -38,7 +38,7 @@ it may be useful to test to see if a command can be executed prior to trying to 
 
 ### Component Locking
 
-If a component is locked, any Command Service command will have a response of `Locked`.  This corresponding handler will not
+If a component is locked, any Command Service command will have a response of `Locked`. The corresponding handler will not
 be called until the component is unlocked.  See @ref:[Creating a Component](create-component.md) for more information
 on locking.  
 
