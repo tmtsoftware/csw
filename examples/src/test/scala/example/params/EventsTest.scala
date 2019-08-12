@@ -1,14 +1,11 @@
 package example.params
 
-import java.time.Instant
-
 import csw.params.core.formats.{EventCbor, JsonSupport}
 import csw.params.core.generics.KeyType.{DoubleMatrixKey, RaDecKey}
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.Units.arcmin
 import csw.params.core.models._
 import csw.params.events._
-import csw.time.core.models.UTCTime
 import org.scalatest.{FunSpec, Matchers}
 
 class EventsTest extends FunSpec with Matchers {
@@ -16,7 +13,7 @@ class EventsTest extends FunSpec with Matchers {
   describe("Examples of EventTime") {
     it("should show usage of utility functions") {
       //#eventtime
-      val source    = Prefix("filter.wheel")
+      val source    = Prefix("iris.filter.wheel")
       val eventName = EventName("temperatures")
       val event     = SystemEvent(source, eventName)
 
@@ -24,7 +21,8 @@ class EventsTest extends FunSpec with Matchers {
       val eventTime = event.eventTime
       //#eventtime
 
-      println(eventTime)
+      assert(eventName == event.eventName)
+      assert(eventTime == event.eventTime)
     }
   }
 
