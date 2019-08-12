@@ -1,7 +1,7 @@
 
-## CSW - TMT Common Software v1.0.0
+## CSW - TMT Common Software v1.0.0-RC2
 
-This is release v1.0.0 of the TMT Common Software.
+This is release v1.0.0-RC2 of the TMT Common Software.
 
 See [CHANGELOG.md](CHANGELOG.md) for details of all releases.
 
@@ -25,6 +25,6 @@ See [CHANGELOG.md](CHANGELOG.md) for details of all releases.
 - Scala version upgrade to 2.13.0
 
 ### Documentation
-- Reference paradox documentation: https://tmtsoftware.github.io/csw/1.0.0/
-- Scaladoc: https://tmtsoftware.github.io/csw/1.0.0/api/scala/index.html
-- Javadoc: https://tmtsoftware.github.io/csw/1.0.0/api/java/index.html
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/1.0.0-RC2/
+- Scaladoc: https://tmtsoftware.github.io/csw/1.0.0-RC2/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/1.0.0-RC2/api/java/index.html
