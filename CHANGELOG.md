@@ -9,10 +9,10 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
-## [CSW v1.0.0] - 2019-08-09
+## [CSW v1.0.0-RC2] - 2019-08-12
 
-This is the first major release of the TMT Common Software for project stakeholders.
-See [here](https://tmtsoftware.github.io/csw/1.0.0/) for a detailed documentation of this version of the CSW software.
+This is the release candidate 2 for the first major release of the TMT Common Software for project stakeholders.
+See [here](https://tmtsoftware.github.io/csw/1.0.0-RC2/) for a detailed documentation of this version of the CSW software.
 
 ### Changes
 - Added `SequencerCommandService`
@@ -35,7 +35,7 @@ See [here](https://tmtsoftware.github.io/csw/1.0.0/) for a detailed documentatio
 
 ## [CSW v1.0.0-RC1] - 2019-08-07
 
-This is the release candidate 1 for the First major release of the TMT Common Software for project stakeholders.
+This is the release candidate 1 for the first major release of the TMT Common Software for project stakeholders.
 See [here](https://tmtsoftware.github.io/csw/1.0.0-RC1/) for a detailed documentation of this version of the CSW software.
 
 ### Changes
