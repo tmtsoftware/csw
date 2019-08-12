@@ -97,12 +97,12 @@ class LongRunningCommandTest(ignore: Int)
 
       //#submit
       val setupForSubscribe = Setup(prefix, longRunning, Some(obsId))
-      val response          = assemblyCommandService.submit(setupForSubscribe)
+      val initialResponse   = assemblyCommandService.submit(setupForSubscribe)
       val finalResponse     = assemblyCommandService.queryFinal(setupForSubscribe.runId)
       //#submit
 
       // handler will immediately give Started as response for long running command
-      Await.result(response, 5.seconds) shouldBe Started(setupForSubscribe.runId)
+      Await.result(initialResponse, 5.seconds) shouldBe Started(setupForSubscribe.runId)
 
       Await.result(finalResponse, 20.seconds) shouldBe Completed(setupForSubscribe.runId)
 

@@ -142,12 +142,12 @@ class CommandServiceTest(ignore: Int)
       val hcdLocation: AkkaLocation = Await.result(hcdLocF, 10.seconds).get
       val hcdCmdService             = CommandServiceFactory.make(hcdLocation)
 
-      //#invalidCmd
-      val invalidSetup    = Setup(prefix, invalidCmd, obsId)
-      val invalidCommandF = assemblyCmdService.submitAndWait(invalidSetup)
+      //#invalidSubmitCmd
+      val invalidSubmitSetup    = Setup(prefix, invalidCmd, obsId)
+      val invalidSubmitCommandF = assemblyCmdService.submit(invalidSubmitSetup)
       async {
-        await(invalidCommandF) match {
-          case Completed(runId) =>
+        await(invalidSubmitCommandF) match {
+          case Started(runId) =>
           // Do Completed thing
           case Invalid(runId, issue) =>
             issue shouldBe a[Invalid]
@@ -156,7 +156,23 @@ class CommandServiceTest(ignore: Int)
             log.error(s"Some other response: $other")
         }
       }
-      //#invalidCmd
+      //#invalidSubmitCmd
+
+      // #submitAndQuery
+      val longRunningSetup4 = Setup(prefix, longRunningCmd, obsId)
+
+      async {
+        assemblyCmdService.submit(longRunningSetup4)
+
+        await(assemblyCmdService.query(longRunningSetup4.runId)) match {
+          case Started(runId) =>
+          // happy case - no action needed
+          // Do some other work
+          case a =>
+          // log.error. This indicates that the command probably failed to start.
+        }
+      }
+      // #submitAndQuery
 
       // DEOPSCSW-233: Hide implementation by having a CCS API
       // short running command
@@ -174,6 +190,22 @@ class CommandServiceTest(ignore: Int)
       }
       //#immediate-response
       Await.result(immediateCommandF, timeout.duration) shouldBe Completed(immediateSetup.runId)
+
+      //#invalidCmd
+      val invalidSetup    = Setup(prefix, invalidCmd, obsId)
+      val invalidCommandF = assemblyCmdService.submitAndWait(invalidSetup)
+      async {
+        await(invalidCommandF) match {
+          case Completed(runId) =>
+          // Do Completed thing
+          case Invalid(runId, issue) =>
+            issue shouldBe a[Invalid]
+          case other =>
+            // Unexpected result
+            log.error(s"Some other response: $other")
+        }
+      }
+      //#invalidCmd
 
       // #longRunning
       val longRunningSetup1 = Setup(prefix, longRunningCmd, obsId)
@@ -218,16 +250,17 @@ class CommandServiceTest(ignore: Int)
             None
         }
       }
-      Await.result(longRunningQueryResultF, timeout.duration) shouldBe Some(20)
       // #queryLongRunning
+      Await.result(longRunningQueryResultF, timeout.duration) shouldBe Some(20)
 
       // This test shows DEOPSCSW-623 because submit is issued without future and queryFinal works
-      // #queryFinal
-      val longRunningSetup3 = longRunningSetup1.cloneCommand
-      val queryFinalF = async {
-        // The following submit is made without saving the Future!
-        assemblyCmdService.submitAndWait(longRunningSetup3)
 
+      val longRunningSetup3 = longRunningSetup1.cloneCommand
+      assemblyCmdService.submit(longRunningSetup3)
+
+      // #queryFinal
+      val queryFinalF = async {
+        // longRunningSetup3 has already been submitted
         // Use queryFinal and runId to wait for completion and result
         await(assemblyCmdService.queryFinal(longRunningSetup3.runId)) match {
           case CompletedWithResult(_, result) =>

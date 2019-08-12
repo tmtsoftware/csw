@@ -36,6 +36,7 @@ import csw.params.commands.Result;
 import csw.params.commands.Setup;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
+import csw.params.core.models.Id;
 import csw.params.core.states.CurrentState;
 import csw.params.core.states.DemandState;
 import csw.params.core.states.StateName;
@@ -165,10 +166,67 @@ public class JCommandIntegrationTest extends JUnitSuite {
         SubmitResponse actualImdInvalidCmdResponse = imdInvalidCmdResponseCompletableFuture.get();
         Assert.assertTrue(actualImdInvalidCmdResponse instanceof Invalid);
 
+        Key<Integer> intKey3 = JKeyType.IntKey().make("encoder");
+        Parameter<Integer> intParameter3 = intKey3.set(22, 23);
+        //#invalidSubmitCmd
+        Setup invalidSubmitSetup = new Setup(prefix(), invalidCmd(), Optional.empty()).add(intParameter2);
+        CompletableFuture<SubmitResponse> invalidSubmitCommandF =
+                hcdCmdService.submit(invalidSetup, timeout).thenApply(
+                        response -> {
+                            if (response instanceof Started) {
+                                //do something with completed result
+                            } else if (response instanceof Invalid) {
+                                // Cast the response to get the issue
+                                Invalid invalid = (Invalid) response;
+                                assert (invalid.issue().reason().contains("failure"));
+                            }
+                            return response;
+                        }
+                );
+        //#invalidSubmitCmd
+        Invalid expectedSubmitInvalidResponse = new Invalid(invalidSetup.runId(), new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
+        Assert.assertEquals(expectedInvalidResponse, invalidCommandF.get());
+
+        CompletableFuture<SubmitResponse> imdInvalidSubmitCmdResponseCompletableFuture = hcdCmdService.submitAndWait(invalidSetup, timeout);
+        SubmitResponse actualSubmitImdInvalidCmdResponse = imdInvalidSubmitCmdResponseCompletableFuture.get();
+        Assert.assertTrue(actualSubmitImdInvalidCmdResponse instanceof Invalid);
+
+        Setup longRunningSubmitSetup2 = new Setup(prefix(), longRunningCmd(), Optional.empty()).add(intParameter1);
+        Key<Integer> encoder2 = JKeyType.IntKey().make("encoder");
+        CompletableFuture<SubmitResponse> longRunningResultF2 =
+                hcdCmdService.submit(longRunningSubmitSetup2, timeout)
+                        .thenCompose(response -> {
+                            if (response instanceof Started) {
+                                // This extracts and returns the the first value of parameter encoder
+                                Id id = ((Started) response).runId();
+                                return hcdCmdService.queryFinal(id, timeout);
+                            } else {
+                                // For some other response (Invalid command)
+                                return CompletableFuture.failedFuture(new RuntimeException("Submitted command is invalid"));
+                            }
+                        });
+
+        Key<Integer> encoder = JKeyType.IntKey().make("encoder");
+        //#submitAndQuery
+        Setup longRunningQuerySetup3 = new Setup(prefix(), longRunningCmd(), Optional.empty()).add(intParameter1);
+        CompletableFuture<SubmitResponse> longRunningSubmitResultF3 =
+                hcdCmdService.submit(longRunningQuerySetup3, timeout);
+
+        // do some work before querying for the result of above command as needed
+        CompletableFuture<QueryResponse> queryResponseF3 = hcdCmdService.query(longRunningQuerySetup3.runId(), timeout);
+        queryResponseF3.thenAccept(r -> {
+            if (r instanceof Started) {
+                // happy case - no action needed
+                // Do some other work
+            } else {
+                // log.error. This indicates that the command probably failed to start.
+            }
+        });
+        //#submitAndQuery
+
         // long running command which does not use matcher
         //#longRunning
         Setup longRunningSetup1 = new Setup(prefix(), longRunningCmd(), Optional.empty()).add(intParameter1);
-        Key<Integer> encoder = JKeyType.IntKey().make("encoder");
         CompletableFuture<Optional<Integer>> longRunningResultF =
                 hcdCmdService.submitAndWait(longRunningSetup1, timeout)
                         .thenCompose(response -> {
@@ -230,13 +288,15 @@ public class JCommandIntegrationTest extends JUnitSuite {
                         return CompletableFuture.completedFuture(Optional.empty());
                     }
                 });
-        Assert.assertEquals(Optional.of(20), intF.get());
         //#queryLongRunning
+        Assert.assertEquals(Optional.of(20), intF.get());
+
+        Setup longRunningSetup3 = longRunningSetup1.cloneCommand();
+        hcdCmdService.submit(longRunningSetup3, timeout);
 
         //#queryFinal
-        Setup longRunningSetup3 = longRunningSetup1.cloneCommand();
-        hcdCmdService.submitAndWait(longRunningSetup3, timeout);
 
+        // longRunningSetup3 has already been submitted
         CompletableFuture<Optional<Integer>> int3F =
                 hcdCmdService.queryFinal(longRunningSetup3.runId(), timeout).thenCompose(response -> {
                     if (response instanceof CompletedWithResult) {
