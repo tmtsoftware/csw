@@ -15,8 +15,7 @@ For more on Cbor, refer to the @ref:[technical doc](../technical/params/params.m
 @@@
 
 ## EventTime
-Each event includes its time of creation in UTC format. 
-To create an event instance at the current time use the default constructor. For other utility functions, see below examples:
+Each event includes its time of creation in UTC format. You can access that eventTime as follows:
 
 Scala
 :   @@snip [EventsTest.scala](../../../../examples/src/test/scala/example/params/EventsTest.scala) { #eventtime }

@@ -1,6 +1,6 @@
 package example.time
 
-import java.time.{ZoneId, ZonedDateTime}
+import java.time.{Instant, ZoneId, ZonedDateTime}
 
 import csw.time.core.TMTTimeHelper
 import csw.time.core.models.{TAITime, UTCTime}
@@ -13,6 +13,14 @@ object TMTTimeExamples {
   // get current TAI time
   val taiTime: TAITime = TAITime.now()
   //#current-time
+
+  // #creating-time-instances
+  //creating a UTCTime of an hour ago
+  val utcTimeOfHourAgo: UTCTime = UTCTime(Instant.now().minusSeconds(3600))
+
+  //creating a TAITime of an hour ago
+  val taiTimeOfHourAgo: TAITime = TAITime(Instant.now().minusSeconds(3600))
+  // #creating-time-instances
 
   def conversion(): Unit = {
     //#conversion

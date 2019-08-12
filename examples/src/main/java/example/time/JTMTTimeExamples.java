@@ -4,6 +4,7 @@ import csw.time.core.TMTTimeHelper;
 import csw.time.core.models.TAITime;
 import csw.time.core.models.UTCTime;
 
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
@@ -15,6 +16,19 @@ class JTMTTimeExamples {
     // get current TAI time
     private TAITime taiTime = TAITime.now();
     //#current-time
+
+    // #creating-time-instances
+    //creating a UTCTime of an hour ago
+    private UTCTime utcTimeOfHourAgo = new UTCTime(Instant.now().minusSeconds(3600));
+
+    //creating a TAITime of an hour ago
+    private TAITime taiTimeOfHourAgo = new TAITime(Instant.now().minusSeconds(3600));
+    // #creating-time-instances
+
+    void usage() {
+        System.out.println(utcTimeOfHourAgo);
+        System.out.println(taiTimeOfHourAgo);
+    }
 
     void conversion() {
         //#conversion

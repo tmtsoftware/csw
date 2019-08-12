@@ -80,6 +80,16 @@ Java
 Note that time is returned as a UTCTime or TAITime object so that it is possible to determine the time scale of the
 time value by inspection.
 
+#### Creating custom time instances
+To create custom time instances, you can use the default constructors of UTC and TAI times.
+
+Scala
+:   @@snip [TMTTimeExamples.scala](../../../../examples/src/main/scala/example/time/TMTTimeExamples.scala) { #creating-time-instances }
+
+Java
+:   @@snip [JTMTTimeExamples.java](../../../../examples/src/main/java/example/time/JTMTTimeExamples.java) { #creating-time-instances }
+
+
 #### Converting from UTC to TAI Time and Vice-versa
 Each time object provides a way to convert to the other.
 

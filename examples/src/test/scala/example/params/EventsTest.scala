@@ -16,24 +16,15 @@ class EventsTest extends FunSpec with Matchers {
   describe("Examples of EventTime") {
     it("should show usage of utility functions") {
       //#eventtime
-      //default constructor will return current time in UTC
-      val now: UTCTime = UTCTime.now()
+      val source    = Prefix("filter.wheel")
+      val eventName = EventName("temperatures")
+      val event     = SystemEvent(source, eventName)
 
-      //using constructor
-      val anHourAgo: UTCTime = UTCTime(Instant.now().minusSeconds(3600))
-
-      //current event time using utility function
-      val currentTime: UTCTime = UTCTime.now()
-
-      //some past time using utility function
-      val aDayAgo = UTCTime(Instant.now.minusSeconds(86400))
-
+      // accessing eventTime
+      val eventTime = event.eventTime
       //#eventtime
 
-      //validations
-      assert(now.value.isAfter(anHourAgo.value))
-      assert(anHourAgo.value.isAfter(aDayAgo.value))
-      assert(currentTime.value.isAfter(anHourAgo.value))
+      println(eventTime)
     }
   }
 
