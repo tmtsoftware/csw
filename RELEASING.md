@@ -18,6 +18,7 @@
 
 ### csw
 1. Update release notes (`notes/<version>.markdown`) in `csw` and `csw-acceptance` repo
+#### Note - The version in `notes` should be of format `v1.0.0` but while triggering the pipeline build parameter should be of format `1.0.0` 
 2. Update top level `CHANGELOG.md`
 3. Update top level `README.md`
 4. Exclude projects from `build.sbt` which you do not want to release

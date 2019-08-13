@@ -9,14 +9,15 @@ import akka.stream.{KillSwitches, Materializer}
 import csw.event.api.scaladsl.SubscriptionModes.RateAdapterMode
 import csw.event.api.scaladsl.{EventService, EventSubscription}
 import csw.event.cli.args.Options
-import csw.event.cli.utils.{EventJsonTransformer, EventOnelineTransformer, Formatter}
+import csw.event.cli.extenstion.RichStringExtentions.JsonDecodeRichString
+import csw.event.cli.utils.{EventOnelineTransformer, EventTransformer, Formatter}
 import csw.event.cli.wiring.ActorRuntime
-import csw.params.core.formats.{JsonSupport, ParamCodecs}
+import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.Parameter
 import csw.params.core.models.Id
 import csw.params.events._
 import csw.time.core.models.UTCTime
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.Json
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
@@ -26,7 +27,6 @@ import scala.util.{Failure, Success}
 class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, printLine: Any => Unit) {
 
   import actorRuntime._
-  import ParamCodecs.utcTimeCodec
 
   def inspect(options: Options): Future[Unit] = async {
     val events = await(getEvents(options.eventKeys))
@@ -76,14 +76,12 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
   private def processEvent(options: Options, event: Event): Unit =
     if (options.isJsonOut) processGetJson(event, options)
     else new EventOnelineTransformer(options).transform(event).foreach(printLine)
-
   private def processGetJson(event: Event, options: Options): Unit = {
     if (event.isInvalid) printLine(Formatter.invalidKey(event.eventKey))
     else {
       val paths                = options.paths(event.eventKey)
-      val eventJson            = JsonSupport.writeEvent(event).as[JsObject]
-      val transformedEventJson = EventJsonTransformer.transform(eventJson, paths)
-      printLine(Json.prettyPrint(transformedEventJson))
+      val transformedEventJson = EventTransformer.transform(event, paths)
+      printLine(Json.prettyPrint(JsonSupport.writeEvent(transformedEventJson)))
     }
   }
 
@@ -100,20 +98,14 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
     }
   }
 
+  import csw.params.core.formats.ParamCodecs._
   private def readEventFromJson(data: File, eventKey: EventKey) = {
-    val eventJson = Json.parse(scala.io.Source.fromFile(data).mkString)
-    val (k, v)    = eventJson.as[JsObject].value.head
-    val jsObject  = updateEventMetadata(v.as[JsObject], eventKey)
-    JsonSupport.readEvent[Event](Json.obj((k, jsObject)))
+    val event = scala.io.Source.fromFile(data).mkString.parse[Event]
+    event match {
+      case se @ SystemEvent(_, _, _, _, paramSet)  => se.copy(Id(), eventKey.source, eventKey.eventName, UTCTime.now(), paramSet)
+      case oe @ ObserveEvent(_, _, _, _, paramSet) => oe.copy(Id(), eventKey.source, eventKey.eventName, UTCTime.now(), paramSet)
+    }
   }
-
-  private def updateEventMetadata(json: JsValue, eventKey: EventKey): JsObject =
-    json.as[JsObject] ++ Json.obj(
-      ("eventId", Id().id),
-      ("eventTime", JsonSupport.writes(UTCTime.now())),
-      ("source", eventKey.source.prefix),
-      ("eventName", eventKey.eventName.name)
-    )
 
   private def updateEventParams(event: Event, paramSet: Set[Parameter[_]]) = event match {
     case event: SystemEvent  => event.madd(paramSet)
