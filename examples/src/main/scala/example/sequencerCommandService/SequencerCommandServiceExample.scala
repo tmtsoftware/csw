@@ -19,8 +19,8 @@ import scala.concurrent.duration.DurationLong
 object SequencerCommandServiceExample extends App {
 
   implicit val mat: ActorMaterializer = scaladsl.ActorMaterializer()
-  implicit lazy val typedSystem: ActorSystem[SpawnProtocol] =
-    ActorSystemFactory.remote(SpawnProtocol.behavior, "sequencer-system")
+  implicit lazy val typedSystem: ActorSystem[SpawnProtocol.Command] =
+    ActorSystemFactory.remote(SpawnProtocol(), "sequencer-system")
 
   private val locationService = HttpLocationServiceFactory.makeLocalClient(typedSystem, mat)
 
