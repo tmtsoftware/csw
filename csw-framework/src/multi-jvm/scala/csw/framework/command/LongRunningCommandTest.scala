@@ -16,7 +16,7 @@ import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandIssue.OtherIssue
 import csw.params.commands.CommandResponse._
-import csw.params.commands.Setup
+import csw.params.commands.{CommandName, Setup}
 import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, StateName}
 import io.lettuce.core.RedisClient
@@ -70,59 +70,72 @@ class LongRunningCommandTest(ignore: Int)
       // element to a test probe actor
       assemblyCommandService.subscribeCurrentState(probe.ref ! _)
       //#subscribeCurrentState
-println("1")
+
+      // assemblyLongSetup does the following:
       // send submit with setup to assembly running in JVM-2
       // then assembly will split it into three sub commands [McsAssemblyComponentHandlers]
       // assembly will forward this sub commands to hcd in following sequence
       // 1. longSetup which takes 5 seconds to finish
       // 2. shortSetup which takes 1 second to finish
       // 3. mediumSetup which takes 3 seconds to finish
+      // Test 1 submits the long command and gets the initial response that should be started because
+      // it is a long-running command.  Then it monitors the various events that are generated to make sure
+      // the test is running properly.  A queryFinal is then used to wait for the assembly command to complete
+      // after all the subcommands to the HCDs have completed
       //#subscribe-for-result
-      val eventualCommandResponse = assemblyCommandService.submit(assemblyLongSetup).map {
-        case Invalid(cname, runId, _) ⇒ Error(cname, runId, "")
-        case x: SubmitResponse ⇒
-          println(s"Submit returned $x")
-          x
-      }
-      val runId = Await.result(eventualCommandResponse, 10.seconds).runId
+      val test1InitialFuture = assemblyCommandService.submit(assemblyLongSetup)
 
+      val test1InitialResponse = Await.result(test1InitialFuture, 2.seconds)
+      test1InitialResponse shouldBe a[Started]
+      val test1RunId = test1InitialResponse.runId
       //#subscribe-for-result
-
 
       // verify that commands gets completed in following sequence
       // ShortSetup => MediumSetup => LongSetup
       probe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shortCmdCompleted))))
       probe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(mediumCmdCompleted))))
       probe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(longCmdCompleted))))
-      println("2")
+      // This is the final command completing
       probe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(longRunningCmdCompleted))))
-println("3 - got the damn final event")
 
-      val aresult = Await.result(assemblyCommandService.queryFinal(runId), 20.seconds)
-      println(s">>>>>>4 and damn final queryFinal $aresult")
+      val test1Final = Await.result(assemblyCommandService.queryFinal(test1RunId), 10.seconds)
+      test1Final shouldBe a[Completed]
+      test1Final.runId shouldBe test1RunId
+      // End of Test 1
 
       //#submit
-      /*
-      val setupForSubscribe = Setup(prefix, longRunning, Some(obsId))
-      val response          = assemblyCommandService.submit(setupForSubscribe)
+      // Test 2 shows that submitAndWait can send the same command and wait for final completion
+      val test2Response = assemblyCommandService.submitAndWait(assemblyLongSetup)
       //#submit
 
-      Await.result(response, 20.seconds) shouldBe a[Completed]
+      val test2Final = Await.result(test2Response, 20.seconds)
+      test2Final shouldBe a[Completed]
+      test2Final.commandName shouldEqual assemblyLongSetup.commandName
+      // End of Test 2
 
+      // Test 3 starts the long running command and uses query to examine the status of the command
+      // prior to joining for completion with queryFinal allowing some work
       //#query-response
-      val setupForQuery = Setup(prefix, longRunning, Some(obsId))
-      val finalResponse = assemblyCommandService.submit(setupForQuery)
+      val test3InitialResponse = Await.result(assemblyCommandService.submit(assemblyLongSetup), 5.seconds)
+      val test3RunId = test3InitialResponse.runId
 
       //do some work before querying for the result of above command as needed
-      //val eventualResponse: Future[QueryResponse] = assemblyCommandService.query(setupForQuery.runId)  ?? Can't do this?
+      //Note at this point, the above submit would return quickly with the Started status so this is somewhat
+      // redundant. This would allow you to see if it had completed since the first response
+      val test3QueryResponse: Future[QueryResponse] = assemblyCommandService.query(test3RunId)
+
+      // Command is still just started
       //#query-response
-      //eventualResponse.map(_ shouldBe Started(setupForQuery.runId))
+      test3QueryResponse.map(_ shouldBe Started(CommandName(""), test3RunId))
 
       // Use the initial future to determine the when completed
-      finalResponse.map(_ shouldBe a[Completed])
-*/
+      val test3Final = Await.result(assemblyCommandService.queryFinal(test3RunId), 10.seconds)
+      test3Final shouldBe a[Completed]
+      test3Final.runId shouldEqual test3RunId
+
       enterBarrier("long-commands")
-/*
+
+      // Used for invalid command tests
       val assemblyInvalidSetup = Setup(prefix, invalidCmd, Some(obsId))
 
       // First test sends two commands that complete immediately successfully
@@ -144,9 +157,9 @@ println("3 - got the damn final event")
       val multiResponse2 = assemblyCommandService.submitAll(List(assemblyInitSetup, assemblyMoveSetup, assemblyInvalidSetup))
       whenReady(multiResponse2, PatienceConfiguration.Timeout(5.seconds)) { result =>
         result.length shouldBe 3
-        result(0) shouldBe a[Completed] //(assemblyInitSetup.runId)
-        result(1) shouldBe a[Completed] //(assemblyMoveSetup.runId)
-        result(2) shouldBe a[Invalid] // (assemblyInvalidSetup.runId, OtherIssue("Invalid"))
+        result(0) shouldBe a[Completed]
+        result(1) shouldBe a[Completed]
+        result(2) shouldBe a[Invalid]
         result(2).asInstanceOf[Invalid].issue shouldBe OtherIssue("Invalid")
       }
 
@@ -154,8 +167,8 @@ println("3 - got the damn final event")
       val multiResponse3 = assemblyCommandService.submitAll(List(assemblyInitSetup, assemblyInvalidSetup, assemblyMoveSetup))
       whenReady(multiResponse3, PatienceConfiguration.Timeout(5.seconds)) { result =>
         result.length shouldBe 2
-        result(0) shouldBe a[Completed] // (assemblyInitSetup.runId)
-        result(1) shouldBe a[Invalid] //(assemblyInvalidSetup.runId, OtherIssue("Invalid"))
+        result(0) shouldBe a[Completed]
+        result(1) shouldBe a[Invalid]
         result(1).asInstanceOf[Invalid].issue shouldBe OtherIssue("Invalid")
       }
 
@@ -166,7 +179,7 @@ println("3 - got the damn final event")
         result(0) shouldBe a[Completed] //(assemblyInitSetup.runId)
         result(1) shouldBe a[Completed] // (assemblyLongSetup.runId)
       }
-*/
+
       enterBarrier("multiple-components-submit-multiple-commands")
 
       enterBarrier("multiple-components-submit-subscribe-multiple-commands")

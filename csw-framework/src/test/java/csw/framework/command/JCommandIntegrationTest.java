@@ -419,8 +419,6 @@ public class JCommandIntegrationTest extends JUnitSuite {
         CommandResponse.SubmitResponse actualLockedCmdResponse = lockedCmdResCompletableFuture.get();
 
         String reason = "This component is locked by component " + prefix();
-        //CommandResponse.Locked expectedLockedCmdResponse = new CommandResponse.Locked(imdSetupCommand.runId());
-        //Assert.assertEquals(expectedLockedCmdResponse, actualLockedCmdResponse);
         Assert.assertTrue(actualLockedCmdResponse instanceof CommandResponse.Locked);
 
         // Unlock component

@@ -13,10 +13,10 @@ import akka.util.Timeout
 import csw.command.api.scaladsl.CommandService
 import csw.command.api.{CommandUpdateSubscription, CurrentStateSubscription, StateMatcher}
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.client.internal.MiniCRM.MiniCRMMessage.{AddResponse, AddStarted, Print, Query, Query2, QueryFinal}
+import csw.command.client.internal.MiniCRM.MiniCRMMessage.{AddResponse, AddStarted, Query, QueryFinal}
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
 import csw.command.client.messages.ComponentCommonMessage.ComponentStateSubscription
-import csw.command.client.messages.{CommandResponseManagerMessage, ComponentMessage}
+import csw.command.client.messages.ComponentMessage
 import csw.command.client.models.framework.PubSub.{Subscribe, SubscribeOnly}
 import csw.command.client.models.matchers.Matcher
 import csw.command.client.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
@@ -40,14 +40,15 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
   private val component: ActorRef[ComponentMessage] = componentLocation.componentRef
   private val ValidateTimeout                       = 1.seconds
 
-  val name = componentLocation.connection.componentId.fullName
-  println("Name is: " + name)
-  lazy val miniCRM: ActorRef[MiniCRM.CRMMessage] = Await.result(actorSystem.systemActorOf(MiniCRM.make(), name), 5.seconds)
+  private val name = componentLocation.connection.componentId.fullName
+  println("Name for CServImpl: " + name)
+  // TODO -- THIS NEEDS TO BE DONE CORRECTLY
+  private lazy val miniCRM: ActorRef[MiniCRM.CRMMessage] =
+    Await.result(actorSystem.systemActorOf(MiniCRM.make(), name), 5.seconds)
 
   val commandSubscription: CommandUpdateSubscription =
     new CommandUpdateSubscriptionImpl(component, None, { sr: SubmitResponse =>
       miniCRM ! AddResponse(sr)
-      miniCRM ! Print
     })
 
   override def validate(controlCommand: ControlCommand): Future[ValidateResponse] = {
@@ -61,9 +62,8 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
       case started: Started =>
         miniCRM ! AddStarted(started)
         queryFinal(started.runId)
-      case x => {
+      case x =>
         Future.successful(x)
-      }
     }
   }
 
@@ -130,11 +130,8 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
   }
 
   // components coming via this api will be removed from  subscriber's list after timeout
-  override def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse] = {
-    val result: Future[SubmitResponse] = miniCRM ? (QueryFinal(commandRunId, _))
-    println(s"Query final done with $result")
-    result
-  }
+  override def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse] =
+    miniCRM ? (QueryFinal(commandRunId, _))
 
   /**
    * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component

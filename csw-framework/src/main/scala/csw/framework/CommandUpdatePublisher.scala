@@ -2,7 +2,6 @@ package csw.framework
 
 import akka.actor.typed.ActorRef
 import csw.command.client.models.framework.PubSub.{Publish, PublisherMessage}
-import csw.params.commands.CommandResponse
 import csw.params.commands.CommandResponse.SubmitResponse
 
 /**
@@ -17,6 +16,8 @@ class CommandUpdatePublisher private[framework] (val publisherActor: ActorRef[Pu
    *
    * @param commandUpdate [[csw.params.commands.CommandResponse.SubmitResponse]] to be published
    */
-  def update(commandUpdate: CommandResponse): Unit = publisherActor ! Publish(commandUpdate.asInstanceOf[SubmitResponse])
+  def update(commandUpdate: SubmitResponse): Unit = {
+    publisherActor ! Publish[SubmitResponse](commandUpdate)
+  }
 
 }

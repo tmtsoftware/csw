@@ -92,8 +92,6 @@ trait CommandService {
    */
   def query(commandRunId: Id)(implicit timeout: Timeout): Future[QueryResponse]
 
-  def query2(commandRunId: Id)(implicit timeout: Timeout): Future[Option[SubmitResponse]]
-
   /**
    * Query for the final result of a long running command which was sent as Submit to get a [[csw.params.commands.CommandResponse.SubmitResponse]] as a Future
    *

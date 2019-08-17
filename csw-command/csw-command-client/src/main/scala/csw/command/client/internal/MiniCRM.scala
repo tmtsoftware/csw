@@ -2,47 +2,34 @@ package csw.command.client.internal
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
-import csw.command.client.internal.MiniCRM.MiniCRMMessage.{
-  AddResponse,
-  AddStarted,
-  GetResponses,
-  GetStarters,
-  GetWaiters,
-  Print,
-  Query,
-  Query2,
-  QueryFinal
-}
 import csw.params.commands.CommandName
-import csw.params.commands.CommandResponse.{CommandNotAvailable, QueryResponse, SubmitResponse}
+import csw.params.commands.CommandResponse.{CommandNotAvailable, QueryResponse, Started, SubmitResponse}
 import csw.params.core.models.Id
 
 import scala.collection.mutable.ListBuffer
 
 object MiniCRM {
 
-  type Responses            = List[SubmitResponse]
-  type Starters             = List[QueryResponse]
-  type Waiters              = List[(Id, ActorRef[SubmitResponse])]
+  type Responses = List[SubmitResponse]
+  type Starters = List[QueryResponse]
+  type Waiters = List[(Id, ActorRef[SubmitResponse])]
   private type ResponseList = SizedList[SubmitResponse]
-  private type StartedList  = SizedList[SubmitResponse]
-  private type WaiterList   = SizedList[(Id, ActorRef[SubmitResponse])]
+  private type StartedList = SizedList[SubmitResponse]
+  private type WaiterList = SizedList[(Id, ActorRef[SubmitResponse])]
 
   sealed trait CRMMessage
-
   object MiniCRMMessage {
+    case class AddResponse(commandResponse: SubmitResponse) extends CRMMessage
+    case class AddStarted(startedResponse: Started) extends CRMMessage
+    case class QueryFinal(runId: Id, replyTo: ActorRef[SubmitResponse]) extends CRMMessage
+    case class Query(runId: Id, replyTo: ActorRef[QueryResponse]) extends CRMMessage
 
-    case class AddResponse(commandResponse: SubmitResponse)                 extends CRMMessage
-    case class AddStarted(startedResponse: SubmitResponse)                  extends CRMMessage
-    case class QueryFinal(runId: Id, replyTo: ActorRef[SubmitResponse])     extends CRMMessage
-    case class Query(runId: Id, replyTo: ActorRef[QueryResponse])           extends CRMMessage
-    case class Query2(runId: Id, replyTo: ActorRef[Option[SubmitResponse]]) extends CRMMessage
-
-    case object Print                                                              extends CRMMessage
-    case class GetResponses(replyTo: ActorRef[List[SubmitResponse]])               extends CRMMessage
+    case class Print(replyTo: ActorRef[String]) extends CRMMessage
+    case class GetResponses(replyTo: ActorRef[List[SubmitResponse]]) extends CRMMessage
     case class GetWaiters(replyTo: ActorRef[List[(Id, ActorRef[SubmitResponse])]]) extends CRMMessage
-    case class GetStarters(replTo: ActorRef[List[SubmitResponse]])                 extends CRMMessage
+    case class GetStarters(replTo: ActorRef[List[SubmitResponse]]) extends CRMMessage
   }
+  import MiniCRMMessage._
 
   def make(startedSize: Int = 10, responseSize: Int = 10, waiterSize: Int = 10): Behavior[CRMMessage] =
     Behaviors.setup(_ => handle(new StartedList(startedSize), new ResponseList(responseSize), new WaiterList(waiterSize)))
@@ -50,12 +37,10 @@ object MiniCRM {
   // scalastyle:off method.length
   // scalastyle:off cyclomatic.complexity
   def handle(startedList: StartedList, responseList: ResponseList, waiterList: WaiterList): Behavior[CRMMessage] = {
-    //println(s"Handle: $startedList, $responseList, $waiterList")
     Behaviors.receive { (_, message) =>
       message match {
         case AddResponse(cmdResponse) =>
           // The new command state -- only way to get this is from Behavior receiving Started
-          println("Add response: " + cmdResponse)
           handle(startedList, responseList.append(cmdResponse), updateWaiters(waiterList, cmdResponse))
         case AddStarted(startedResponse) =>
           handle(startedList.append(startedResponse), responseList, waiterList)
@@ -71,9 +56,6 @@ object MiniCRM {
         case Query(runId, replyTo: ActorRef[QueryResponse]) =>
           replyTo ! getResponse(startedList, responseList, runId)
           Behavior.same
-        case Query2(runId, replyTo: ActorRef[Option[SubmitResponse]]) =>
-          replyTo ! getResponse2(startedList, responseList, runId)
-          Behavior.same
         case GetWaiters(replyTo) =>
           replyTo ! waiterList.toList
           Behavior.same
@@ -83,9 +65,8 @@ object MiniCRM {
         case GetStarters(replyTo) =>
           replyTo ! startedList.toList
           Behaviors.same
-        case Print =>
-          println("PRINT MINCRM")
-          //println(s"responseList: $responseList, waiterList: $waiterList")
+        case Print(replyTo) =>
+          replyTo ! s"responseList: $responseList, waiterList: $waiterList"
           Behaviors.same
         case _ =>
           Behaviors.same
@@ -117,7 +98,6 @@ object MiniCRM {
     waiterList.foreach(
       w =>
         if (w._1 == response.runId) {
-          //println(s"Updating waiter: ${w._2} with ${w._1}")
           w._2 ! response
         }
     )
@@ -125,10 +105,17 @@ object MiniCRM {
     waiterList.remove(_._1 == response.runId)
   }
 
+  /**
+   * This is a specialized list that will only keep a maximum number of elements
+   * @param max size of list to retain
+   * @param initList the list can be iniitalized with some values
+   * @tparam T the type of elements in the list
+   */
   private class SizedList[T](max: Int, initList: List[T] = List.empty) extends Traversable[T] {
     val list: ListBuffer[T] = ListBuffer() ++= initList
 
     def append(sr: T): SizedList[T] = {
+      // If the list is at the maximum, remove 1 and add the new one
       if (list.size == max) {
         list.trimStart(1)
       }

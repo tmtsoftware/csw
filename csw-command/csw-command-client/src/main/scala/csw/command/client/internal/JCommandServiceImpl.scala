@@ -9,7 +9,7 @@ import csw.command.api.javadsl.ICommandService
 import csw.command.api.scaladsl.CommandService
 import csw.command.api.{CurrentStateSubscription, StateMatcher}
 import csw.params.commands.CommandResponse._
-import csw.params.commands.{CommandName, ControlCommand}
+import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 

@@ -22,7 +22,7 @@ object CommandCompleter {
 
     // Catch the case where one of the startedResponses is a negative
     // Or all the startedResponses are already completed
-    if (alreadyCompleted.filter(CommandResponse.isNegative(_)).nonEmpty || alreadyCompleted == expectedResponses) {
+    if (alreadyCompleted.exists(CommandResponse.isNegative(_)) || alreadyCompleted == expectedResponses) {
       checkAndComplete(expectedResponses)
     }
 

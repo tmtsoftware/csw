@@ -10,7 +10,6 @@ import csw.command.client.internal.MiniCRM.MiniCRMMessage.{
   GetStarters,
   GetWaiters,
   Query,
-  Query2,
   QueryFinal
 }
 import csw.params.commands.CommandName
@@ -78,7 +77,7 @@ class MiniCRMTest extends FunSuite with Matchers with BeforeAndAfterAll {
   }
 
   // This test adds a response and then does a queryFinal to make sure that
-  // 1. The queryFinal complets correctly
+  // 1. The queryFinal completes correctly
   // 2. The response remains
   // 3. The waiters are removed
   test("add response first then queryFinal") {
@@ -153,7 +152,8 @@ class MiniCRMTest extends FunSuite with Matchers with BeforeAndAfterAll {
   }
 
   // Verify that it is possible to have two waiters for the same id and both get updated
-  test("queryFinal twise, then add response -- should get both updates") {
+  // It is desired that if the same client does queryFinal twice, both get an answer
+  test("queryFinal twice, then add response -- should get both updates") {
     val crm                   = testKit.spawn(MiniCRM.make())
     val commandResponseProbe1 = testKit.createTestProbe[SubmitResponse]()
     val commandResponseProbe2 = testKit.createTestProbe[SubmitResponse]()
@@ -183,10 +183,92 @@ class MiniCRMTest extends FunSuite with Matchers with BeforeAndAfterAll {
     val responses1 = responseProbe.expectMessageType[Responses]
     responses1.size shouldBe 1
 
-    println("Reson1: " + responses1.head.stateName)
     crm ! GetWaiters(waiterListProbe.ref)
     val waiters2 = waiterListProbe.expectMessageType[Waiters]
     waiters2.isEmpty shouldBe true
+  }
+
+  // Verify that it is possible to have two waiters for the same id and both get updated
+  // In this case the same client does queryFinal twice, both get an answer
+  test("queryFinal twice, but receiver is the same actor!") {
+    val crm                   = testKit.spawn(MiniCRM.make())
+    val commandResponseProbe1 = testKit.createTestProbe[SubmitResponse]()
+    val responseProbe         = testKit.createTestProbe[Responses]()
+    val waiterListProbe       = testKit.createTestProbe[Waiters]()
+
+    val id1 = Id("1")
+
+    crm ! QueryFinal(id1, commandResponseProbe1.ref)
+    commandResponseProbe1.expectNoMessage(100.milli)
+
+    crm ! QueryFinal(id1, commandResponseProbe1.ref)
+    commandResponseProbe1.expectNoMessage(100.milli)
+
+    crm ! GetWaiters(waiterListProbe.ref)
+    val waiters1 = waiterListProbe.expectMessageType[Waiters]
+    waiters1.size shouldBe 2
+
+    val r1 = Completed(CommandName("1"), id1)
+    crm ! AddResponse(r1)
+
+    // Both get updated
+    commandResponseProbe1.expectMessage(r1)
+    commandResponseProbe1.expectMessage(r1)
+
+    crm ! GetResponses(responseProbe.ref)
+    val responses1 = responseProbe.expectMessageType[Responses]
+    responses1.size shouldBe 1
+  }
+
+  // This scenario checks that same source doing queryFinal after completed still works
+  // 1. queryFinal should complete
+  // 2. second queryFinal should still work and return the same
+  test("queryFinal waiting for final, then check queryFinal again") {
+    val crm                  = testKit.spawn(MiniCRM.make())
+    val commandResponseProbe = testKit.createTestProbe[SubmitResponse]()
+
+    val id1 = Id("1")
+
+    crm ! QueryFinal(id1, commandResponseProbe.ref)
+    commandResponseProbe.expectNoMessage(100.milli)
+
+    val r1 = Completed(CommandName("1"), id1)
+    crm ! AddResponse(r1)
+    commandResponseProbe.expectMessage(r1)
+
+    // Second should still work
+    crm ! QueryFinal(id1, commandResponseProbe.ref)
+    commandResponseProbe.expectMessage(r1)
+  }
+
+  // This scenario checks that same source doing query after completed still works
+  // 1. Start the command
+  // 2. Query should show started
+  // 3, Complete command and queryFinal should complete
+  // 4. Second query should still work and return the same complete
+  test("query after starting, wait for final, then check query again") {
+    val crm                  = testKit.spawn(MiniCRM.make())
+    val commandResponseProbe = testKit.createTestProbe[QueryResponse]()
+
+    val id1 = Id("1")
+    val r0 = Started(CommandName("1"), id1)
+    crm ! AddStarted(r0)
+
+    crm ! Query(id1, commandResponseProbe.ref)
+    commandResponseProbe.expectMessage(r0)
+
+    val r1 = Completed(CommandName("1"), id1)
+    crm ! AddResponse(r1)
+
+    crm ! QueryFinal(id1, commandResponseProbe.ref)
+
+    // Second should still work
+    crm ! Query(id1, commandResponseProbe.ref)
+    commandResponseProbe.expectMessage(r1)
+
+    // Make sure miniCRM isn't removing, check again
+    crm ! Query(id1, commandResponseProbe.ref)
+    commandResponseProbe.expectMessage(r1)
   }
 
   // This test adds responses to make sure SizedList is removing oldest and restricting size
@@ -279,7 +361,6 @@ class MiniCRMTest extends FunSuite with Matchers with BeforeAndAfterAll {
     val responseProbe = testKit.createTestProbe[Responses]()
     val startersProbe = testKit.createTestProbe[Starters]()
     val queryProbe    = testKit.createTestProbe[QueryResponse]()
-    val query2Probe   = testKit.createTestProbe[Option[SubmitResponse]]()
 
     val id1 = Id("1")
     val id2 = Id("2")
@@ -320,17 +401,5 @@ class MiniCRMTest extends FunSuite with Matchers with BeforeAndAfterAll {
     queryProbe.expectMessage(r5)
     crm ! Query(id4, queryProbe.ref)
     queryProbe.expectMessage(CommandNotAvailable(CommandName("CommandNotAvailable"), id4))
-    //queryProbe.expectMessage(None)
-
-    println("Y1")
-    crm ! Query2(id1, query2Probe.ref)
-    query2Probe.expectMessage(Some(r1))
-    crm ! Query2(id2, query2Probe.ref)
-    query2Probe.expectMessage(Some(r2))
-    crm ! Query2(id3, query2Probe.ref)
-    query2Probe.expectMessage(Some(r5))
-    crm ! Query2(id4, query2Probe.ref)
-    query2Probe.expectMessage(None)
-    println("Y2")
   }
 }

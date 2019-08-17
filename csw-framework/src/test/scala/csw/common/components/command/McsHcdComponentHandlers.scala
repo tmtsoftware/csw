@@ -1,7 +1,6 @@
 package csw.common.components.command
 
 import akka.actor.typed.scaladsl.ActorContext
-import csw.command.api.CommandCompleter
 import csw.command.client.messages.TopLevelActorMessage
 import csw.command.client.models.framework.PubSub.Publish
 import csw.common.components.command.ComponentStateForCommand._
@@ -22,7 +21,7 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   import cswCtx._
   override def initialize(): Future[Unit] = Future.unit
 
-  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
+  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}
 
   override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse = {
     controlCommand.commandName match {
@@ -41,7 +40,7 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
       case `longRunning` ⇒
         ctx.scheduleOnce(
           5.seconds,
-          //commandResponseManager.commandResponseManagerActor,
+          // Here the Completed is sent directly to the publish actor
           commandUpdatePublisher.publisherActor,
           Publish[SubmitResponse](Completed(controlCommand.commandName, runId))
         )
@@ -69,11 +68,11 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
     }
   }
 
-  override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = ???
+  override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
 
-  override def onShutdown(): Future[Unit] = ???
+  override def onShutdown(): Future[Unit] = Future.unit
 
-  override def onGoOffline(): Unit = ???
+  override def onGoOffline(): Unit = {}
 
-  override def onGoOnline(): Unit = ???
+  override def onGoOnline(): Unit = {}
 }

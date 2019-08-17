@@ -5,14 +5,13 @@ import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{ActorMaterializer, ThrottleMode}
-import akka.util.Timeout
 import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models._
 import csw.params.commands.CommandIssue.{OtherIssue, WrongPrefixIssue}
 import csw.params.commands.CommandResponse._
-import csw.params.commands.{ControlCommand, Result, Setup}
+import csw.params.commands.{CommandName, ControlCommand, Result, Setup}
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
@@ -26,11 +25,12 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
 
   import cswCtx._
   private val cancelCmdId = KeyType.StringKey.make("cancelCmdId")
+  private val cancelCmdName = KeyType.StringKey.make(name = "cancelCmdName")
 
   import ComponentStateForCommand._
-  implicit val actorSystem: actor.ActorSystem = ctx.system.toUntyped
-  implicit val ec: ExecutionContext           = ctx.executionContext
-  implicit val mat: ActorMaterializer         = ActorMaterializer()
+  private implicit val actorSystem: actor.ActorSystem = ctx.system.toUntyped
+  private implicit val ec: ExecutionContext = ctx.executionContext
+  private implicit val mat: ActorMaterializer = ActorMaterializer()
 
   override def initialize(): Future[Unit] = Future.unit
 
@@ -38,46 +38,51 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
 
   override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse =
     controlCommand.commandName match {
-      case `acceptedCmd`          ⇒ Accepted(controlCommand.commandName, runId)
-      case `longRunningCmd`       ⇒ Accepted(controlCommand.commandName, runId)
-      case `onewayCmd`            => Accepted(controlCommand.commandName, runId)
-      case `matcherCmd`           ⇒ Accepted(controlCommand.commandName, runId)
-      case `matcherFailedCmd`     ⇒ Accepted(controlCommand.commandName, runId)
-      case `matcherTimeoutCmd`    ⇒ Accepted(controlCommand.commandName, runId)
-      case `cancelCmd`            ⇒ Accepted(controlCommand.commandName, runId)
+      case `acceptedCmd` ⇒ Accepted(controlCommand.commandName, runId)
+      case `longRunningCmd` ⇒ Accepted(controlCommand.commandName, runId)
+      case `onewayCmd` => Accepted(controlCommand.commandName, runId)
+      case `matcherCmd` ⇒ Accepted(controlCommand.commandName, runId)
+      case `matcherFailedCmd` ⇒ Accepted(controlCommand.commandName, runId)
+      case `matcherTimeoutCmd` ⇒ Accepted(controlCommand.commandName, runId)
+      case `cancelCmd` ⇒ Accepted(controlCommand.commandName, runId)
       case `assemCurrentStateCmd` => Accepted(controlCommand.commandName, runId)
       case `hcdCurrentStateCmd`   => Accepted(controlCommand.commandName, runId)
-      case `immediateCmd`         ⇒ Accepted(controlCommand.commandName, runId)
-      case `immediateResCmd`      ⇒ Accepted(controlCommand.commandName, runId)
+      case `immediateCmd` ⇒ Accepted(controlCommand.commandName, runId)
+      case `immediateResCmd` ⇒ Accepted(controlCommand.commandName, runId)
       case `invalidCmd` ⇒
         Invalid(controlCommand.commandName, runId, OtherIssue(s"Unsupported prefix: ${controlCommand.commandName}"))
       case _ ⇒ Invalid(controlCommand.commandName, runId, WrongPrefixIssue(s"Wrong prefix: ${controlCommand.commandName}"))
     }
 
   override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse = {
-
     controlCommand match {
-      case s @ Setup(_, `cancelCmd`, _, _) ⇒ processAcceptedSubmitCmd(runId, s)
+      case s @ Setup(_, `cancelCmd`, _, _) ⇒
+        processAcceptedSubmitCmd(runId, s)
       case s @ Setup(_, `longRunningCmd`, _, _) ⇒
         processCommandWithoutMatcher(runId, s)
         Started(controlCommand.commandName, runId)
-      case s @ Setup(_, `acceptedCmd`, _, _)  ⇒ Started(s.commandName, runId)
-      case s @ Setup(_, `immediateCmd`, _, _) ⇒ Completed(s.commandName, runId)
+      case s @ Setup(_, `acceptedCmd`, _, _) ⇒
+        // Update so it can be returned when cancelled
+        Started(s.commandName, runId)
+      case s @ Setup(_, `immediateCmd`, _, _) ⇒
+        Completed(s.commandName, runId)
       case s @ Setup(_, `immediateResCmd`, _, _) ⇒
         CompletedWithResult(controlCommand.commandName, runId, Result(s.source, Set(KeyType.IntKey.make("encoder").set(20))))
-      case c ⇒ Error(controlCommand.commandName, runId, s"Some other command received: $c")
+      case c ⇒
+        Error(controlCommand.commandName, runId, s"Some other command received: $c")
     }
   }
 
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = controlCommand.commandName match {
-    case `cancelCmd`          ⇒ processAcceptedOnewayCmd(controlCommand)
-    case `onewayCmd`          => // Do nothing
-    case `matcherCmd`         ⇒ processCommandWithMatcher(controlCommand)
-    case `matcherFailedCmd`   ⇒ processCommandWithMatcher(controlCommand)
-    case `acceptedCmd`        ⇒ //mimic long running process by publishing any state
+    case `cancelCmd` =>
+      processAcceptedSubmitCmd(runId, controlCommand.asInstanceOf[Setup])
+    case `onewayCmd`  => // Do nothing
+    case `matcherCmd` => processCommandWithMatcher(controlCommand)
+    case `matcherFailedCmd` ⇒ processCommandWithMatcher(controlCommand)
+    case `acceptedCmd` ⇒ //mimic long running process by publishing any state
     case `matcherTimeoutCmd`  => processCommandWithMatcher(controlCommand)
     case `hcdCurrentStateCmd` => processCurrentStateOneway(controlCommand)
-    case c                    ⇒ println(s"onOneway received an unknown command: $c")
+    case c ⇒ println(s"onOneway received an unknown command: $c")
   }
 
   private def processCurrentStateOneway(controlCommand: ControlCommand): Unit = {
@@ -87,20 +92,46 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
     //#subscribeCurrentState
   }
 
-  private def processAcceptedSubmitCmd(runId: Id, controlCommand: ControlCommand): SubmitResponse = {
-    controlCommand.paramType.get(cancelCmdId) match {
-      case None        => Error(controlCommand.commandName, runId, "Cancel command not present")
-      case Some(param) => processCancelCommand(controlCommand, runId, Id(param.head))
+  private def processAcceptedSubmitCmd(cancelCommandId: Id, cancelCommandSetup: Setup): SubmitResponse = {
+    val commandToCancelId: Option[Parameter[String]] = cancelCommandSetup.get(cancelCmdId)
+    val commandToCancelName: Option[Parameter[String]] = cancelCommandSetup.get(cancelCmdName)
+    if (commandToCancelId.isEmpty || commandToCancelName.isEmpty)
+      Error(
+        cancelCommandSetup.commandName,
+        cancelCommandId,
+        "Cancel command or cancel command name not present in cancel command"
+      )
+    else {
+      processCancelCommand(
+        cancelCommandId,
+        cancelCommandSetup,
+        CommandName(commandToCancelName.get.head),
+        Id(commandToCancelId.get.head)
+      )
     }
   }
 
-  private def processAcceptedOnewayCmd(controlCommand: ControlCommand): Unit =
-    controlCommand.paramType.get(cancelCmdId).foreach(param ⇒ processOriginalCommand(controlCommand, Id(param.head)))
+  private def processCancelCommand(
+      cancelCommandId: Id,
+      cancelCommandSetup: Setup,
+      commandToCancelName: CommandName,
+      commandToCancelId: Id
+  ): SubmitResponse = {
+    processOriginalCommand(commandToCancelName, commandToCancelId)
+    // This completes the cancel command itself
+    Completed(cancelCommandSetup.commandName, cancelCommandId)
+  }
+
+  // This simulates the low-level handling of cancelling the original long-running command
+  private def processOriginalCommand(commandToCancelName: CommandName, commandToCancelId: Id): Unit = {
+    // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
+    commandUpdatePublisher.update(Cancelled(commandToCancelName, commandToCancelId))
+  }
 
   // This simulates a long command that has been started and finishes with a result
   private def processCommandWithoutMatcher(runId: Id, controlCommand: ControlCommand): Unit = {
     val param: Parameter[Int] = encoder.set(20)
-    val result                = Result(controlCommand.source, Set(param))
+    val result = Result(controlCommand.source, Set(param))
 
     // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
     // This simulates a long running command that eventually updates with a result
@@ -112,25 +143,6 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
         case Success(sr)        => commandUpdatePublisher.update(sr) // This is replacement for CRM
         case Failure(exception) => println(s"processWithout exception ${exception.getMessage}")
       }
-  }
-
-  private def processCancelCommand(controlCommand: ControlCommand, runId: Id, cancelId: Id): SubmitResponse = {
-    processOriginalCommand(controlCommand, cancelId)
-    Completed(controlCommand.commandName, runId)
-  }
-
-  // This simulates the handling of cancelling a long command
-  private def processOriginalCommand(controlCommand: ControlCommand, runId: Id): Unit = {
-    implicit val timeout: Timeout = 1.seconds
-
-    // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
-    /* // TODO NEED TO FIGURE THIS OUT
-    val eventualResponse: Future[QueryResponse] = commandResponseManager.query(runId)
-    eventualResponse.onComplete {
-      case Success(x) => commandResponseManager.addOrUpdateCommand(Cancelled(controlCommand.commandName, runId))
-      case Failure(x) => println("Eventual response error occured: " + x.getMessage)
-    }
-   */
   }
 
   private def processCommandWithMatcher(controlCommand: ControlCommand): Unit =

@@ -11,9 +11,9 @@ import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.core.states.StateName
 
 /**
- * The handle to the subscription created for the current state published by the specified publisher
+ * The handle to the subscription created for the command updates published by the specified publisher
  *
- * @param publisher the source of the current state
+ * @param publisher the source of the command updates
  * @param callback the action to perform on each received element
  * @param mat the materializer to materialize the underlying stream
  */
@@ -25,10 +25,10 @@ private[internal] class CommandUpdateSubscriptionImpl(
     extends CommandUpdateSubscription {
 
   /**
-   * Create a stream of current state change of a component. An actorRef plays the source of the stream. When stream starts
-   * running (materialized) the source actorRef subscribes itself to CurrentState change of the target component. Any change in
-   * current state of target component will push the current state to source actorRef and this will flow though the stream
-   * to sink. The callback provided by component developers is executed for the current state flowing through the stream.
+   * Create a stream of command updates to a command service. An actorRef plays the source of the stream. When stream starts
+   * running (materialized) the source actorRef subscribes itself to command updates from the target component. Any published
+   * SubmitResponse will push to source actorRef and this will flow though the stream
+   * to sink. The callback provided by command service impl is executed for the SubmitResponse flowing through the stream.
    */
   private def source: Source[SubmitResponse, Unit] = {
     val bufferSize = 256
@@ -36,11 +36,10 @@ private[internal] class CommandUpdateSubscriptionImpl(
       .actorRef[SubmitResponse](bufferSize, OverflowStrategy.dropHead)
       .mapMaterializedValue { ref ⇒
         names match {
-          case Some(value) => publisher ! StartedCommandSubscription(SubscribeOnly(ref, value))
-          case None => {
-            println(s"Got Started command subsc for: $ref - publisher: $publisher")
+          case Some(value) =>
+            publisher ! StartedCommandSubscription(SubscribeOnly(ref, value))
+          case None =>
             publisher ! StartedCommandSubscription(Subscribe(ref))
-          }
         }
       }
   }
@@ -54,5 +53,7 @@ private[internal] class CommandUpdateSubscriptionImpl(
   /**
    * Unsubscribe to the current state being published
    */
-  override def unsubscribe(): Unit = killSwitch.shutdown()
+  override def unsubscribe(): Unit = {
+    killSwitch.shutdown()
+  }
 }
