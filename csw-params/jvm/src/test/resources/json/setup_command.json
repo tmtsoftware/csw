@@ -2,7 +2,7 @@
   "Setup": {
     "source": "wfos.blue.filter",
     "commandName": "move",
-    "maybeObsId": "Obs001",
+    "maybeObsId": ["Obs001"],
     "paramSet": [
       {
         "RaDecKey": {

@@ -77,10 +77,10 @@ sealed trait ControlCommand extends SequenceCommand { self: ParameterSetType[_] 
 /**
  * A parameter set for setting telescope and instrument parameters.
  */
-case class Setup(
+case class Setup private[params] (
     source: Prefix,
     commandName: CommandName,
-    maybeObsId: Option[ObsId] = None /* Not sure of codec problem*/,
+    maybeObsId: Option[ObsId] /* Not sure of codec problem*/,
     paramSet: Set[Parameter[_]]
 ) extends ParameterSetType[Setup]
     with ControlCommand {
@@ -111,7 +111,19 @@ object Setup {
    * @return a new instance of Setup with empty paramSet
    */
   def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId]): Setup =
-    apply(source, commandName, maybeObsId, Set.empty)
+    new Setup(source, commandName, maybeObsId, Set.empty)
+
+  /**
+   * The apply method is used to create Setup command by end-user.
+   *
+   * @param source prefix representing source of the command
+   * @param commandName the name of the command
+   * @param maybeObsId an optional obsId for command
+   * @param paramSet an initial set of parameters (keys with values)
+   * @return a new instance of Setup
+   */
+  def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]]): Setup =
+    apply(source, commandName, maybeObsId).madd(paramSet)
 }
 
 /**
@@ -151,7 +163,19 @@ object Observe {
    * @return a new instance of Observe with empty paramSet
    */
   def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId]): Observe =
-    apply(source, commandName, maybeObsId, Set.empty)
+    new Observe(source, commandName, maybeObsId, Set.empty)
+
+  /**
+   * The apply method is used to create Observe command by end-user.
+   *
+   * @param source prefix representing source of the command
+   * @param commandName the name of the command
+   * @param maybeObsId an optional obsId for command
+   * @param paramSet an initial set of parameters (keys with values)
+   * @return a new instance of Observe
+   */
+  def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]]): Observe =
+    apply(source, commandName, maybeObsId).madd(paramSet)
 }
 
 /**
