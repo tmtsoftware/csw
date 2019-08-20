@@ -80,7 +80,7 @@ sealed trait ControlCommand extends SequenceCommand { self: ParameterSetType[_] 
 case class Setup private[params] (
     source: Prefix,
     commandName: CommandName,
-    maybeObsId: Option[ObsId] /* Not sure of codec problem*/,
+    maybeObsId: Option[ObsId],
     paramSet: Set[Parameter[_]]
 ) extends ParameterSetType[Setup]
     with ControlCommand {
@@ -132,7 +132,7 @@ object Setup {
 case class Observe private[params] (
     source: Prefix,
     commandName: CommandName,
-    maybeObsId: Option[ObsId] /* = None Not sure of codec problem */,
+    maybeObsId: Option[ObsId],
     paramSet: Set[Parameter[_]]
 ) extends ParameterSetType[Observe]
     with ControlCommand {
