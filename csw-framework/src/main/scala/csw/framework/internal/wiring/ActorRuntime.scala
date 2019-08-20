@@ -1,9 +1,9 @@
 package csw.framework.internal.wiring
 
-import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import akka.actor.{CoordinatedShutdown, Scheduler}
 import akka.stream.Materializer
 import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.{Done, actor}
@@ -18,13 +18,13 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 /**
  * A convenient class wrapping actor system and providing handles for execution context, materializer and clean up of actor system
  */
-private[framework] class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol]) {
+class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol]) {
   implicit val typedSystem: ActorSystem[SpawnProtocol] = _typedSystem
   implicit val untypedSystem: actor.ActorSystem        = _typedSystem.toUntyped
   implicit val ec: ExecutionContextExecutor            = typedSystem.executionContext
   implicit val mat: Materializer                       = ActorMaterializer()
-
-  private[framework] val coordinatedShutdown = CoordinatedShutdown(untypedSystem)
+  implicit lazy val scheduler: Scheduler               = typedSystem.scheduler
+  lazy val coordinatedShutdown: CoordinatedShutdown    = CoordinatedShutdown(untypedSystem)
 
   def startLogging(name: String): LoggingSystem =
     LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, typedSystem)
