@@ -48,10 +48,10 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
   implicit def subscribeOnlyMessageCodec[T: Encoder: Decoder]: Codec[PubSub.SubscribeOnly[T]] =
     deriveCodec[PubSub.SubscribeOnly[T]]
   implicit def unsubscribeMessageCodec[T: Encoder: Decoder]: Codec[PubSub.Unsubscribe[T]] = deriveCodec[PubSub.Unsubscribe[T]]
-  implicit def subscriberMessageCodec[T: Encoder: Decoder]: Codec[SubscriberMessage[T]] = deriveCodec[SubscriberMessage[T]]
-  implicit def publishCodec[T: Encoder: Decoder]: Codec[Publish[T]] = deriveCodec[Publish[T]]
-  implicit def publisherMessageCodec[T: Encoder: Decoder]: Codec[PublisherMessage[T]] = deriveCodec[PublisherMessage[T]]
-  implicit def pubSubCodec[T: Encoder: Decoder]: Codec[PubSub[T]] = deriveCodec[PubSub[T]]
+  implicit def subscriberMessageCodec[T: Encoder: Decoder]: Codec[SubscriberMessage[T]]   = deriveCodec[SubscriberMessage[T]]
+  implicit def publishCodec[T: Encoder: Decoder]: Codec[Publish[T]]                       = deriveCodec[Publish[T]]
+  implicit def publisherMessageCodec[T: Encoder: Decoder]: Codec[PublisherMessage[T]]     = deriveCodec[PublisherMessage[T]]
+  implicit def pubSubCodec[T: Encoder: Decoder]: Codec[PubSub[T]]                         = deriveCodec[PubSub[T]]
 
   implicit lazy val durationCodec: Codec[FiniteDuration] =
     Codec.bimap[(Long, String), FiniteDuration](
@@ -61,50 +61,50 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
 
   // ************************ LockingResponse Codecs ********************
 
-  implicit lazy val lockReleasedCodec: Codec[LockReleased.type] = singletonCodec(LockReleased)
+  implicit lazy val lockReleasedCodec: Codec[LockReleased.type]               = singletonCodec(LockReleased)
   implicit lazy val lockExpiringShortlyCodec: Codec[LockExpiringShortly.type] = singletonCodec(LockExpiringShortly)
-  implicit lazy val lockExpiredCodec: Codec[LockExpired.type] = singletonCodec(LockExpired)
+  implicit lazy val lockExpiredCodec: Codec[LockExpired.type]                 = singletonCodec(LockExpired)
   implicit lazy val lockAlreadyReleasedCodec: Codec[LockAlreadyReleased.type] = singletonCodec(LockAlreadyReleased)
-  implicit lazy val lockAcquiredCodec: Codec[LockAcquired.type] = singletonCodec(LockAcquired)
-  implicit lazy val releasingLockFailedCodec: Codec[ReleasingLockFailed] = deriveUnaryCodec[ReleasingLockFailed]
-  implicit lazy val acquiringLockFailedCodec: Codec[AcquiringLockFailed] = deriveUnaryCodec[AcquiringLockFailed]
-  implicit lazy val lockingResponseCodec: Codec[LockingResponse] = deriveCodec[LockingResponse]
+  implicit lazy val lockAcquiredCodec: Codec[LockAcquired.type]               = singletonCodec(LockAcquired)
+  implicit lazy val releasingLockFailedCodec: Codec[ReleasingLockFailed]      = deriveUnaryCodec[ReleasingLockFailed]
+  implicit lazy val acquiringLockFailedCodec: Codec[AcquiringLockFailed]      = deriveUnaryCodec[AcquiringLockFailed]
+  implicit lazy val lockingResponseCodec: Codec[LockingResponse]              = deriveCodec[LockingResponse]
 
   // ************************ Components Codecs ********************
 
   implicit lazy val locationServiceUsageCodec: Codec[LocationServiceUsage] = enumCodec[LocationServiceUsage]
-  implicit lazy val componentInfoCodec: Codec[ComponentInfo] = deriveCodec[ComponentInfo]
-  implicit lazy val componentCodec: Codec[Component] = deriveCodec[Component]
-  implicit lazy val componentsCodec: Codec[Components] = deriveCodec[Components]
+  implicit lazy val componentInfoCodec: Codec[ComponentInfo]               = deriveCodec[ComponentInfo]
+  implicit lazy val componentCodec: Codec[Component]                       = deriveCodec[Component]
+  implicit lazy val componentsCodec: Codec[Components]                     = deriveCodec[Components]
 
   // ************************ RemoteMsg Codecs ********************
 
   implicit lazy val shutdownCodec: Codec[Shutdown.type] = singletonCodec(Shutdown)
-  implicit lazy val restartCodec: Codec[Restart.type] = singletonCodec(Restart)
-  implicit lazy val submitCodec: Codec[Submit] = deriveCodec[Submit]
-  implicit lazy val oneWayCodec: Codec[Oneway] = deriveCodec[Oneway]
-  implicit lazy val validateCodec: Codec[Validate] = deriveCodec[Validate]
-  implicit lazy val lockCodec: Codec[Lock] = deriveCodec[Lock]
-  implicit lazy val unlockCodec: Codec[Unlock] = deriveCodec[Unlock]
-  implicit lazy val lifecycleCodec: Codec[Lifecycle] = deriveCodec[Lifecycle]
+  implicit lazy val restartCodec: Codec[Restart.type]   = singletonCodec(Restart)
+  implicit lazy val submitCodec: Codec[Submit]          = deriveCodec[Submit]
+  implicit lazy val oneWayCodec: Codec[Oneway]          = deriveCodec[Oneway]
+  implicit lazy val validateCodec: Codec[Validate]      = deriveCodec[Validate]
+  implicit lazy val lockCodec: Codec[Lock]              = deriveCodec[Lock]
+  implicit lazy val unlockCodec: Codec[Unlock]          = deriveCodec[Unlock]
+  implicit lazy val lifecycleCodec: Codec[Lifecycle]    = deriveCodec[Lifecycle]
 
-  implicit lazy val lifecycleStateChangedCodec: Codec[LifecycleStateChanged] = deriveCodec[LifecycleStateChanged]
+  implicit lazy val lifecycleStateChangedCodec: Codec[LifecycleStateChanged]           = deriveCodec[LifecycleStateChanged]
   implicit lazy val lifecycleStateSubscriptionCodec: Codec[LifecycleStateSubscription] = deriveCodec[LifecycleStateSubscription]
 
-  implicit lazy val containerLifecycleStateCodec: Codec[ContainerLifecycleState] = enumCodec[ContainerLifecycleState]
-  implicit lazy val supervisorLifecycleStateCodec: Codec[SupervisorLifecycleState] = enumCodec[SupervisorLifecycleState]
+  implicit lazy val containerLifecycleStateCodec: Codec[ContainerLifecycleState]          = enumCodec[ContainerLifecycleState]
+  implicit lazy val supervisorLifecycleStateCodec: Codec[SupervisorLifecycleState]        = enumCodec[SupervisorLifecycleState]
   implicit lazy val toComponentLifecycleMessagesCodec: Codec[ToComponentLifecycleMessage] = enumCodec[ToComponentLifecycleMessage]
 
   implicit lazy val getContainerLifecycleStateCodec: Codec[GetContainerLifecycleState] = deriveCodec[GetContainerLifecycleState]
   implicit lazy val getSupervisorLifecycleStateCodec: Codec[GetSupervisorLifecycleState] =
     deriveCodec[GetSupervisorLifecycleState]
-  implicit lazy val setComponentLogLevelCodec: Codec[SetComponentLogLevel] = deriveCodec[SetComponentLogLevel]
-  implicit lazy val getComponentLogMetadataCodec: Codec[GetComponentLogMetadata] = deriveCodec[GetComponentLogMetadata]
-  implicit lazy val getComponentsCodec: Codec[GetComponents] = deriveCodec[GetComponents]
-  implicit lazy val logControlMessagesCodec: Codec[LogControlMessages] = deriveCodec[LogControlMessages]
+  implicit lazy val setComponentLogLevelCodec: Codec[SetComponentLogLevel]             = deriveCodec[SetComponentLogLevel]
+  implicit lazy val getComponentLogMetadataCodec: Codec[GetComponentLogMetadata]       = deriveCodec[GetComponentLogMetadata]
+  implicit lazy val getComponentsCodec: Codec[GetComponents]                           = deriveCodec[GetComponents]
+  implicit lazy val logControlMessagesCodec: Codec[LogControlMessages]                 = deriveCodec[LogControlMessages]
   implicit lazy val componentStateSubscriptionCodec: Codec[ComponentStateSubscription] = deriveCodec[ComponentStateSubscription]
   implicit lazy val startedCommandSubscriptionCodec: Codec[StartedCommandSubscription] = deriveCodec[StartedCommandSubscription]
-  implicit lazy val messageRemoteMsgCodec: Codec[RemoteMsg] = deriveCodec[RemoteMsg]
+  implicit lazy val messageRemoteMsgCodec: Codec[RemoteMsg]                            = deriveCodec[RemoteMsg]
 
   // ************************ SequencerMsg Codecs ********************
 

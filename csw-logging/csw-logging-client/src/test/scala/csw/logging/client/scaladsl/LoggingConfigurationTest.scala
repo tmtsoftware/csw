@@ -28,19 +28,19 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-142: Flexibility of logging approaches
 // DEOPSCSW-649: Fixed directory configuration for multi JVM scenario
 class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
-  val log: Logger = GenericLoggerFactory.getLogger
-  private val logFileDir = Paths.get("/tmp/csw-test-logs").toFile
-  private val sampleLogMessage = "Sample log message"
-  private val fileTimestamp = FileAppender.decideTimestampForFile(ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC)))
-  private val loggingSystemName = "Test"
+  val log: Logger                            = GenericLoggerFactory.getLogger
+  private val logFileDir                     = Paths.get("/tmp/csw-test-logs").toFile
+  private val sampleLogMessage               = "Sample log message"
+  private val fileTimestamp                  = FileAppender.decideTimestampForFile(ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC)))
+  private val loggingSystemName              = "Test"
   private val testLogFilePathWithServiceName = s"$logFileDir/${loggingSystemName}_$fileTimestamp.log"
 
-  private val hostname = "localhost"
-  private val version = "SNAPSHOT-1.0"
+  private val hostname  = "localhost"
+  private val version   = "SNAPSHOT-1.0"
   private val className = getClass.getName
-  private val fileName = "LoggingConfigurationTest.scala"
+  private val fileName  = "LoggingConfigurationTest.scala"
 
-  private val outStream = new ByteArrayOutputStream
+  private val outStream       = new ByteArrayOutputStream
   private val stdOutLogBuffer = mutable.Buffer.empty[JsObject]
 
   override protected def beforeAll(): Unit = {
@@ -111,7 +111,7 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
                       """.stripMargin)
         .withFallback(ConfigFactory.load())
 
-    val actorSystem = ActorSystem(SpawnProtocol.behavior, "test", config)
+    val actorSystem   = ActorSystem(SpawnProtocol.behavior, "test", config)
     val loggingSystem = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
 
     loggingSystem.getAppenders shouldBe List(FileAppender)
@@ -148,7 +148,7 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
                       """.stripMargin)
         .withFallback(ConfigFactory.load())
 
-    val actorSystem = typed.ActorSystem(SpawnProtocol.behavior, "test", config)
+    val actorSystem   = typed.ActorSystem(SpawnProtocol.behavior, "test", config)
     val loggingSystem = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
 
     loggingSystem.getAppenders shouldBe List(FileAppender)
@@ -189,7 +189,7 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
                       """.stripMargin)
         .withFallback(ConfigFactory.load())
 
-    lazy val actorSystem = typed.ActorSystem(SpawnProtocol.behavior, "test", config)
+    lazy val actorSystem   = typed.ActorSystem(SpawnProtocol.behavior, "test", config)
     lazy val loggingSystem = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
 
     // default log level is trace but file appender is filtering logs at debug level, hence trace level log should not be written to file
@@ -256,8 +256,8 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
                      """.stripMargin)
         .withFallback(ConfigFactory.load())
 
-    lazy val actorSystem = typed.ActorSystem(SpawnProtocol.behavior, "test", config)
-    lazy val loggingSystem = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
+    lazy val actorSystem                 = typed.ActorSystem(SpawnProtocol.behavior, "test", config)
+    lazy val loggingSystem               = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
     var expectedTimestamp: ZonedDateTime = null
 
     Console.withOut(outStream) {
@@ -293,8 +293,8 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
                      """.stripMargin)
         .withFallback(ConfigFactory.load())
 
-    lazy val actorSystem = typed.ActorSystem(SpawnProtocol.behavior, "test", config)
-    lazy val loggingSystem = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
+    lazy val actorSystem                 = typed.ActorSystem(SpawnProtocol.behavior, "test", config)
+    lazy val loggingSystem               = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
     var expectedTimestamp: ZonedDateTime = null
 
     Console.withOut(outStream) {
@@ -333,8 +333,8 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
                      """.stripMargin)
         .withFallback(ConfigFactory.load())
 
-    lazy val actorSystem = typed.ActorSystem(SpawnProtocol.behavior, "test", config)
-    lazy val loggingSystem = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
+    lazy val actorSystem                 = typed.ActorSystem(SpawnProtocol.behavior, "test", config)
+    lazy val loggingSystem               = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
     var expectedTimestamp: ZonedDateTime = null
 
     Console.withOut(os) {

@@ -19,7 +19,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class CommandHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {
   import cswCtx._
 
-  private val log: Logger = loggerFactory.getLogger(ctx)
+  private val log: Logger                   = loggerFactory.getLogger(ctx)
   private implicit val ec: ExecutionContext = ctx.executionContext
 
   override def initialize(): Future[Unit] = {

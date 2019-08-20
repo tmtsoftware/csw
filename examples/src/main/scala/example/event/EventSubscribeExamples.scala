@@ -41,7 +41,7 @@ class EventSubscribeExamples(eventService: EventService, hcd: AkkaLocation)(impl
 
   //#with-actor-ref
   def subscribe(ctx: ActorContext[TopLevelActorMessage]): EventSubscription = {
-    val subscriber = eventService.defaultSubscriber
+    val subscriber                    = eventService.defaultSubscriber
     val eventHandler: ActorRef[Event] = ctx.spawnAnonymous(EventHandler.behavior)
 
     subscriber.subscribeActorRef(Set(EventKey(hcd.prefix, EventName("filter_wheel"))), eventHandler)

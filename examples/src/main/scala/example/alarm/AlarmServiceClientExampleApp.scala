@@ -21,9 +21,9 @@ import scala.util.{Failure, Success}
 object AlarmServiceClientExampleApp {
 
   implicit val actorSystem: ActorSystem[_] = typed.ActorSystem(Behaviors.empty, "")
-  implicit val ec: ExecutionContext = actorSystem.executionContext
-  implicit val mat: Materializer = ActorMaterializer()
-  private val locationService = HttpLocationServiceFactory.makeLocalClient
+  implicit val ec: ExecutionContext        = actorSystem.executionContext
+  implicit val mat: Materializer           = ActorMaterializer()
+  private val locationService              = HttpLocationServiceFactory.makeLocalClient
 
   private def behaviour[T]: Behaviors.Receive[T] = Behaviors.receive { (ctx, msg) =>
     println(msg)
@@ -44,17 +44,17 @@ object AlarmServiceClientExampleApp {
   private val adminAPI2 = new AlarmServiceFactory().makeAdminApi(locationService)
   //#create-scala-api
 
-  val clientAPI: AlarmService = clientAPI1
+  val clientAPI: AlarmService     = clientAPI1
   val adminAPI: AlarmAdminService = adminAPI1
 
   //#setSeverity-scala
-  val alarmKey = AlarmKey(NFIRAOS, "trombone", "tromboneAxisLowLimitAlarm")
+  val alarmKey              = AlarmKey(NFIRAOS, "trombone", "tromboneAxisLowLimitAlarm")
   val resultF: Future[Done] = clientAPI.setSeverity(alarmKey, Okay)
   //#setSeverity-scala
 
   //#initAlarms
-  val resource = "test-alarms/valid-alarms.conf"
-  val alarmsConfig: Config = ConfigFactory.parseResources(resource)
+  val resource               = "test-alarms/valid-alarms.conf"
+  val alarmsConfig: Config   = ConfigFactory.parseResources(resource)
   val result2F: Future[Done] = adminAPI.initAlarms(alarmsConfig)
   //#initAlarms
 
@@ -99,7 +99,7 @@ object AlarmServiceClientExampleApp {
   //#getCurrentSeverity
 
   //#getAggregatedSeverity
-  val componentKey = ComponentKey(NFIRAOS, "tromboneAssembly")
+  val componentKey                                   = ComponentKey(NFIRAOS, "tromboneAssembly")
   val aggregatedSeverityF: Future[FullAlarmSeverity] = adminAPI.getAggregatedSeverity(componentKey)
   aggregatedSeverityF.onComplete {
     case Success(severity)  => println(s"aggregate severity: ${severity.name}: ${severity.level}")
@@ -108,7 +108,7 @@ object AlarmServiceClientExampleApp {
   //#getAggregatedSeverity
 
   //#getAggregatedHealth
-  val subsystemKey = SubsystemKey(IRIS)
+  val subsystemKey                 = SubsystemKey(IRIS)
   val healthF: Future[AlarmHealth] = adminAPI.getAggregatedHealth(subsystemKey)
   healthF.onComplete {
     case Success(health)    => println(s"${subsystemKey.subsystem.name} health = ${health.entryName}")
@@ -145,7 +145,7 @@ object AlarmServiceClientExampleApp {
   //#subscribeAggregatedHealthCallback
 
   //#subscribeAggregatedHealthActorRef
-  val healthActorRef = typed.ActorSystem(behaviour[AlarmHealth], "healthActor")
+  val healthActorRef                        = typed.ActorSystem(behaviour[AlarmHealth], "healthActor")
   val alarmSubscription4: AlarmSubscription = adminAPI.subscribeAggregatedHealthActorRef(SubsystemKey(IRIS), healthActorRef)
 
   // to unsubscribe

@@ -16,7 +16,7 @@ import scala.concurrent.duration.DurationDouble
 class ConcurrencyInCallbacksExample(publisher: EventPublisher)(implicit actorSystem: ActorSystem[_]) {
 
   def behavior(): Behavior[TemperatureMessage] = Behaviors.setup { ctx =>
-    implicit val timeout: Timeout = Timeout(5.seconds)
+    implicit val timeout: Timeout     = Timeout(5.seconds)
     implicit val scheduler: Scheduler = actorSystem.scheduler
     implicit val ec: ExecutionContext = actorSystem.executionContext
 
@@ -25,8 +25,8 @@ class ConcurrencyInCallbacksExample(publisher: EventPublisher)(implicit actorSys
 
     var cancellable: Cancellable = null
 
-    val prefix: Prefix = Prefix("wfos.blue.assembly")
-    val temperatureKey: Key[Int] = KeyType.IntKey.make("temperature")
+    val prefix: Prefix                  = Prefix("wfos.blue.assembly")
+    val temperatureKey: Key[Int]        = KeyType.IntKey.make("temperature")
     val temperatureEventName: EventName = EventName("temperature")
 
     def makeEvent(temp: Temperature) = Some(SystemEvent(prefix, temperatureEventName).add(temperatureKey.set(temp.degrees)))
@@ -57,8 +57,8 @@ case class Temperature(degrees: Int)
 trait TemperatureMessage
 object TemperatureMessage {
   case class GetTemperature(ref: ActorRef[Temperature]) extends TemperatureMessage
-  case object PublishTemperature extends TemperatureMessage
-  case object CancelPublishingTemperature extends TemperatureMessage
-  case class TemperatureRise(degrees: Int) extends TemperatureMessage
-  case class TemperatureDrop(degrees: Int) extends TemperatureMessage
+  case object PublishTemperature                        extends TemperatureMessage
+  case object CancelPublishingTemperature               extends TemperatureMessage
+  case class TemperatureRise(degrees: Int)              extends TemperatureMessage
+  case class TemperatureDrop(degrees: Int)              extends TemperatureMessage
 }

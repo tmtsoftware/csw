@@ -23,9 +23,9 @@ case class Options(
     period: FiniteDuration = (Int.MaxValue / 1000).seconds,
     locationHost: String = "localhost"
 ) {
-  def isJsonOut: Boolean = out == "json"
-  def isOnelineOut: Boolean = out == "oneline"
-  def isTerseOut: Boolean = out == "terse"
-  def printValues: Boolean = cmd != "inspect"
+  def isJsonOut: Boolean                 = out == "json"
+  def isOnelineOut: Boolean              = out == "oneline"
+  def isTerseOut: Boolean                = out == "terse"
+  def printValues: Boolean               = cmd != "inspect"
   def paths(key: EventKey): List[String] = eventsMap.getOrElse(key, Nil).toList
 }

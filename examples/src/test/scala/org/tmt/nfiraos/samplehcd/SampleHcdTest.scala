@@ -28,7 +28,7 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
 
   import scala.concurrent.duration._
   test("HCD should be locatable using Location Service") {
-    val connection = AkkaConnection(ComponentId("SampleHcd", ComponentType.HCD))
+    val connection   = AkkaConnection(ComponentId("SampleHcd", ComponentType.HCD))
     val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
 
     akkaLocation.connection shouldBe connection
@@ -38,10 +38,10 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
   //#subscribe
   test("should be able to subscribe to HCD events") {
     val counterEventKey = EventKey(Prefix("nfiraos.samplehcd"), EventName("HcdCounter"))
-    val hcdCounterKey = KeyType.IntKey.make("counter")
+    val hcdCounterKey   = KeyType.IntKey.make("counter")
 
     val eventService = eventServiceFactory.make(locationService)(actorSystem)
-    val subscriber = eventService.defaultSubscriber
+    val subscriber   = eventService.defaultSubscriber
 
     // wait for a bit to ensure HCD has started and published an event
     Thread.sleep(2000)
@@ -81,9 +81,9 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
     implicit val sleepCommandTimeout: Timeout = Timeout(10000.millis)
 
     // Construct Setup command
-    val sleepTimeKey: Key[Long] = KeyType.LongKey.make("SleepTime")
+    val sleepTimeKey: Key[Long]         = KeyType.LongKey.make("SleepTime")
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
-    val setupCommand = Setup(Prefix("csw.move"), CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
+    val setupCommand                    = Setup(Prefix("csw.move"), CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
     val connection = AkkaConnection(ComponentId("SampleHcd", ComponentType.HCD))
 
@@ -103,9 +103,9 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
     implicit val sleepCommandTimeout: Timeout = Timeout(1000.millis)
 
     // Construct Setup command
-    val sleepTimeKey: Key[Long] = KeyType.LongKey.make("SleepTime")
+    val sleepTimeKey: Key[Long]         = KeyType.LongKey.make("SleepTime")
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
-    val setupCommand = Setup(Prefix("csw.move"), CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
+    val setupCommand                    = Setup(Prefix("csw.move"), CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
     val connection = AkkaConnection(models.ComponentId("SampleHcd", ComponentType.HCD))
 

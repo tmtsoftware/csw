@@ -21,17 +21,17 @@ private[logging] object LoggingState {
   // This value gets overridden by 'logLevel' field from configuration file when logging system is started
   var defaultLogLevel = Level("INFO")
 
-  var logLevel: Level = _
-  var akkaLogLevel: Level = _
+  var logLevel: Level      = _
+  var akkaLogLevel: Level  = _
   var slf4jLogLevel: Level = _
   // queue of messages sent before logger is started
   val msgs = new mutable.Queue[LogActorMessages]()
 
   // LogActor that gets instantiated when LoggingSystem starts
   var maybeLogActor: Option[ActorRef[LogActorMessages]] = None
-  @volatile var loggerStopping = false
+  @volatile var loggerStopping                          = false
 
-  var doTime: Boolean = false
+  var doTime: Boolean                                     = false
   var timeActorOption: Option[ActorRef[TimeActorMessage]] = None
 
   // use to sync akka logging actor shutdown

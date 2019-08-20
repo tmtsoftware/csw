@@ -16,7 +16,7 @@ import scala.concurrent.duration.DurationDouble
  * Application object to start the ConfigServer from command line.
  */
 object Main {
-  private val name = BuildInfo.name
+  private val name        = BuildInfo.name
   private val log: Logger = ConfigServerLogger.getLogger
 
   def main(args: Array[String]): Unit = start(args, startLogging = true)
@@ -39,7 +39,7 @@ object Main {
         if (init) svnRepo.initSvnRepo()
 
         try {
-          svnRepo.testConnection() // first test if the svn repo can be accessed successfully
+          svnRepo.testConnection()                                    // first test if the svn repo can be accessed successfully
           Await.result(httpService.registeredLazyBinding, 15.seconds) // then start the config server and register it with location service
           httpService
         } catch {

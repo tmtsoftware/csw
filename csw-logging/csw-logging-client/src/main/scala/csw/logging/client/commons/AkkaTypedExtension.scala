@@ -12,8 +12,8 @@ import scala.concurrent.duration.{DurationInt, FiniteDuration}
 object AkkaTypedExtension {
   implicit class UserActorFactory(system: ActorSystem[SpawnProtocol]) {
     private val defaultDuration: FiniteDuration = 5.seconds
-    private implicit val timeout: Timeout = Timeout(defaultDuration)
-    private implicit val scheduler: Scheduler = system.scheduler
+    private implicit val timeout: Timeout       = Timeout(defaultDuration)
+    private implicit val scheduler: Scheduler   = system.scheduler
 
     def spawn[T](behavior: Behavior[T], name: String, props: Props = Props.empty): ActorRef[T] = {
       Await.result(system ? Spawn(behavior, name, props), defaultDuration)

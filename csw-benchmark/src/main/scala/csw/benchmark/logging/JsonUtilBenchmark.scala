@@ -42,7 +42,7 @@ class JsonUtilBenchmark {
 
   val expectedLogMsgJson1: JsObject = Json.parse(logMsgString1).as[JsObject]
 
-  var gson: Gson = _
+  var gson: Gson                        = _
   var jacksonObjectMapper: ObjectMapper = _
 
   @Setup(Level.Trial)

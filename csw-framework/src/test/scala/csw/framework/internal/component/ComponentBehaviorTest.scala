@@ -37,7 +37,7 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar with Ma
       ComponentInfos.hcdInfo
     )
 
-    val factory = new TestComponentBehaviorFactory(sampleComponentHandler)
+    val factory                             = new TestComponentBehaviorFactory(sampleComponentHandler)
     private val behavior: Behavior[Nothing] = factory.make(supervisorProbe.ref, cswCtx)
     val componentBehaviorTestKit: BehaviorTestKit[TopLevelActorMessage] =
       BehaviorTestKit(behavior.asInstanceOf[Behavior[TopLevelActorMessage]])
@@ -45,7 +45,7 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar with Ma
 
   test("component should send itself initialize message and handle initialization") {
     val supervisorProbe = TestProbe[FromComponentLifecycleMessage]
-    val testData = new TestData(supervisorProbe)
+    val testData        = new TestData(supervisorProbe)
     import testData._
 
     componentBehaviorTestKit.selfInbox.receiveMessage() shouldBe Initialize

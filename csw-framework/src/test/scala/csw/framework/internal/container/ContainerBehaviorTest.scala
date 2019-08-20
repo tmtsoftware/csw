@@ -36,24 +36,24 @@ import scala.util.Success
 //DEOPSCSW-216-Locate and connect components to send AKKA commands
 class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar with ArgumentMatchersSugar {
   implicit val typedSystem: ActorSystem[SpawnProtocol] = ActorSystemFactory.remote(SpawnProtocol.behavior, "test")
-  implicit val settings: TestKitSettings = TestKitSettings(typedSystem)
-  private val mocks = new FrameworkTestMocks()
+  implicit val settings: TestKitSettings               = TestKitSettings(typedSystem)
+  private val mocks                                    = new FrameworkTestMocks()
 
   class IdleContainer() {
     private val testActor: ActorRef[Any] = TestProbe("test-probe").ref
     val akkaRegistration =
       AkkaRegistrationFactory.make(mock[AkkaConnection], Prefix("nfiraos.ncc.trombone"), testActor.toURI)
-    val locationService: LocationService = mock[LocationService]
-    val eventService: EventServiceFactory = mock[EventServiceFactory]
-    val alarmService: AlarmServiceFactory = mock[AlarmServiceFactory]
-    val registrationResult: RegistrationResult = mock[RegistrationResult]
+    val locationService: LocationService                        = mock[LocationService]
+    val eventService: EventServiceFactory                       = mock[EventServiceFactory]
+    val alarmService: AlarmServiceFactory                       = mock[AlarmServiceFactory]
+    val registrationResult: RegistrationResult                  = mock[RegistrationResult]
     private[container] var supervisorInfos: Set[SupervisorInfo] = Set.empty
-    var componentProbes: Set[TestProbe[ComponentMessage]] = Set.empty
-    val supervisorInfoFactory: SupervisorInfoFactory = mock[SupervisorInfoFactory]
+    var componentProbes: Set[TestProbe[ComponentMessage]]       = Set.empty
+    val supervisorInfoFactory: SupervisorInfoFactory            = mock[SupervisorInfoFactory]
 
     private def answer(ci: ComponentInfo): Future[Some[SupervisorInfo]] = {
       val componentProbe: TestProbe[ComponentMessage] = TestProbe(ci.name)
-      val supervisorInfo = SupervisorInfo(typedSystem, Component(componentProbe.ref, ci))
+      val supervisorInfo                              = SupervisorInfo(typedSystem, Component(componentProbe.ref, ci))
 
       supervisorInfos += SupervisorInfo(typedSystem, Component(componentProbe.ref, ci))
       componentProbes += componentProbe
@@ -114,7 +114,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar wit
     import idleContainer._
     verify(locationService).register(akkaRegistration)
 
-    val getComponentsProbe = TestProbe[Components]
+    val getComponentsProbe           = TestProbe[Components]
     val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]
 
     containerBehaviorTestkit.run(GetComponents(getComponentsProbe.ref))

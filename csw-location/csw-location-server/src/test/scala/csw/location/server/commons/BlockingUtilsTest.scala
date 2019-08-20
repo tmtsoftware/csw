@@ -20,7 +20,7 @@ class BlockingUtilsTest extends FunSuite with Matchers with BeforeAndAfterAll wi
 
     import scala.concurrent.ExecutionContext.Implicits.global
 
-    val upMembers = 10
+    val upMembers                  = 10
     val replicaCountF: Future[Int] = Future { Thread.sleep(200); 10 }
     def replicaCount: Int =
       if (replicaCountF.isCompleted) replicaCountF.value match {

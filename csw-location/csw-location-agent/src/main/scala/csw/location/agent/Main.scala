@@ -11,7 +11,7 @@ import csw.location.client.utils.LocationServerStatus
  */
 object Main {
   private val name = BuildInfo.name
-  private val log = LocationAgentLogger.getLogger
+  private val log  = LocationAgentLogger.getLogger
 
   def main(args: Array[String]): Unit = start(args, startLogging = true)
 

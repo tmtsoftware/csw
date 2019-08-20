@@ -40,7 +40,7 @@ class ConfigClientExampleTest
   //#create-api
 
   override def beforeEach(): Unit = configTestKit.initSvnRepo()
-  override def afterEach(): Unit = configTestKit.deleteServerFiles()
+  override def afterEach(): Unit  = configTestKit.deleteServerFiles()
 
   //#declare_string_config
   val defaultStrConf: String = "foo { bar { baz : 1234 } }"
@@ -95,13 +95,13 @@ class ConfigClientExampleTest
         val config1: ConfigData = ConfigData.fromString(configString)
 
         //construct ConfigData from a local file containing binary data
-        val srcFilePath = ResourceReader.copyToTmp("/smallBinary.bin")
+        val srcFilePath         = ResourceReader.copyToTmp("/smallBinary.bin")
         val config2: ConfigData = ConfigData.fromPath(srcFilePath)
 
         //construct ConfigData from Array[Byte] by reading a local file
-        val stream: InputStream = getClass.getClassLoader.getResourceAsStream("smallBinary.bin")
+        val stream: InputStream    = getClass.getClassLoader.getResourceAsStream("smallBinary.bin")
         def byteArray: Array[Byte] = Stream.continually(stream.read).takeWhile(_ != -1).map(_.toByte).toArray
-        val config3 = ConfigData.fromBytes(byteArray)
+        val config3                = ConfigData.fromBytes(byteArray)
 
         //store the config, at a specified path as normal text file
         val id1: ConfigId =
@@ -264,13 +264,13 @@ class ConfigClientExampleTest
     //#history
     val assertionF = async {
       val filePath = Paths.get("/a/test.conf")
-      val id0 = await(adminApi.create(filePath, ConfigData.fromString(defaultStrConf), annex = false, "first commit"))
+      val id0      = await(adminApi.create(filePath, ConfigData.fromString(defaultStrConf), annex = false, "first commit"))
 
       //override the contents twice
       val tBeginUpdate = Instant.now()
-      val id1 = await(adminApi.update(filePath, ConfigData.fromString("changing contents"), "second commit"))
-      val id2 = await(adminApi.update(filePath, ConfigData.fromString("changing contents again"), "third commit"))
-      val tEndUpdate = Instant.now()
+      val id1          = await(adminApi.update(filePath, ConfigData.fromString("changing contents"), "second commit"))
+      val id2          = await(adminApi.update(filePath, ConfigData.fromString("changing contents again"), "third commit"))
+      val tEndUpdate   = Instant.now()
 
       //full file history
       val fullHistory = await(adminApi.history(filePath))
@@ -290,7 +290,7 @@ class ConfigClientExampleTest
   test("historyActive-setActiveVersion-resetActiveVersion-getActiveVersion-getActiveByTime") {
     //#active-file-mgmt
     val assertionF = async {
-      val tBegin = Instant.now()
+      val tBegin   = Instant.now()
       val filePath = Paths.get("/a/test.conf")
       //create will make the 1st revision active with a default comment
       val id1 = await(adminApi.create(filePath, ConfigData.fromString(defaultStrConf), annex = false, "first"))

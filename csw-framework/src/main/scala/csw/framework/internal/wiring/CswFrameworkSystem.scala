@@ -18,8 +18,8 @@ import scala.concurrent.duration.DurationDouble
  * as provided in the `typed` actor world.
  */
 private[framework] class CswFrameworkSystem(val system: typed.ActorSystem[SpawnProtocol]) {
-  implicit val scheduler: Scheduler = system.scheduler
-  implicit val timeout: Timeout = Timeout(2.seconds)
+  implicit val scheduler: Scheduler     = system.scheduler
+  implicit val timeout: Timeout         = Timeout(2.seconds)
   private val cswFrameworkGuardianActor = system.spawn(CswFrameworkGuardian.behavior, "system")
   def spawnTyped[T](behavior: Behavior[T], name: String, props: Props = Props.empty): Future[ActorRef[T]] =
     cswFrameworkGuardianActor ? CreateActor(behavior, name, props)

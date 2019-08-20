@@ -23,7 +23,7 @@ private[framework] object ContainerBehaviorFactory {
       registrationFactory: RegistrationFactory
   ): Behavior[ContainerActorMessage] = {
     val supervisorFactory = new SupervisorInfoFactory(containerInfo.name)
-    val loggerFactory = new LoggerFactory(containerInfo.name)
+    val loggerFactory     = new LoggerFactory(containerInfo.name)
     Behaviors.setup(
       ctx =>
         new ContainerBehavior(

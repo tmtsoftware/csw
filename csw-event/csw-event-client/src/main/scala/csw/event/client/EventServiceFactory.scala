@@ -84,7 +84,7 @@ class EventServiceFactory(store: EventStore = RedisStore()) {
     )
 
   private def eventService(eventServiceResolver: EventServiceResolver)(implicit system: ActorSystem[_]) = {
-    implicit val ec: ExecutionContext = system.executionContext
+    implicit val ec: ExecutionContext       = system.executionContext
     implicit val materializer: Materializer = mat()
 
     def masterId = system.settings.config.getString("csw-event.redis.masterId")

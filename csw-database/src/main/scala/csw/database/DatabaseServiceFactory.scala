@@ -47,7 +47,7 @@ class DatabaseServiceFactory private[database] (actorSystem: ActorSystem[_], val
    */
   def this(actorSystem: ActorSystem[_]) = this(actorSystem, Map.empty)
 
-  private val log: Logger = DatabaseLogger.getLogger
+  private val log: Logger    = DatabaseLogger.getLogger
   private val config: Config = actorSystem.settings.config
 
   private implicit val ec: ExecutionContext = actorSystem.executionContext
@@ -89,14 +89,14 @@ class DatabaseServiceFactory private[database] (actorSystem: ActorSystem[_], val
       passwordHolder: String
   ): Future[DSLContext] = async {
     val resolver = new DatabaseServiceLocationResolver(locationService)
-    val uri = await(resolver.uri())
-    val envVars = sys.env ++ values
+    val uri      = await(resolver.uri())
+    val envVars  = sys.env ++ values
     val dataSource: Map[String, Any] = Map(
-      "dataSource.serverName" -> uri.getHost,
-      "dataSource.portNumber" -> uri.getPort,
+      "dataSource.serverName"   -> uri.getHost,
+      "dataSource.portNumber"   -> uri.getPort,
       "dataSource.databaseName" -> dbName,
-      "dataSource.user" -> envVars(usernameHolder), //NoSuchElementFoundException can be thrown if no env variable is set
-      "dataSource.password" -> envVars(passwordHolder) //NoSuchElementFoundException can be thrown if no env variable is set
+      "dataSource.user"         -> envVars(usernameHolder), //NoSuchElementFoundException can be thrown if no env variable is set
+      "dataSource.password"     -> envVars(passwordHolder) //NoSuchElementFoundException can be thrown if no env variable is set
     )
     val dataSourceConfig = ConfigFactory.parseMap(dataSource.asJava)
     createDslInternal(Some(dataSourceConfig))
@@ -170,7 +170,7 @@ class DatabaseServiceFactory private[database] (actorSystem: ActorSystem[_], val
 
   /************ INTERNAL ************/
   private def createDslInternal(maybeConfig: Option[Config] = None): DSLContext = {
-    val cswDatabase: Config = config.getConfig("csw-database")
+    val cswDatabase: Config      = config.getConfig("csw-database")
     val dataSourceConfig: Config = cswDatabase.getConfig("hikari-datasource")
 
     val finalDataSourceConfig = maybeConfig match {
@@ -180,7 +180,7 @@ class DatabaseServiceFactory private[database] (actorSystem: ActorSystem[_], val
 
     try {
       val hikariConfig = new HikariConfig(toProperties(finalDataSourceConfig))
-      val dialect = cswDatabase.getString("databaseDialect")
+      val dialect      = cswDatabase.getString("databaseDialect")
 
       log.info(s"Connecting to database using config :[$finalDataSourceConfig]")
       DSL.using(new HikariDataSource(hikariConfig), SQLDialect.valueOf(dialect))

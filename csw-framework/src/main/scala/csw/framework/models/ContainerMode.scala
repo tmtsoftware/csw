@@ -12,7 +12,7 @@ private[csw] object ContainerMode extends Enum[ContainerMode] with PlayJsonEnum[
 
   override def values: immutable.IndexedSeq[ContainerMode] = findValues
 
-  case object Container extends ContainerMode
+  case object Container  extends ContainerMode
   case object Standalone extends ContainerMode
 
 }

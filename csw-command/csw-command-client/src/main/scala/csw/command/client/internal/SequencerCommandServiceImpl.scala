@@ -17,7 +17,7 @@ import scala.concurrent.duration.DurationInt
 class SequencerCommandServiceImpl(sequencerLocation: AkkaLocation)(
     implicit system: ActorSystem[_]
 ) extends SequencerCommandService {
-  private implicit val timeout: Timeout = Timeout(10.hour)
+  private implicit val timeout: Timeout     = Timeout(10.hour)
   private implicit val scheduler: Scheduler = system.scheduler
 
   private val sequencer: ActorRef[LoadAndStartSequence] = sequencerLocation.sequencerRef

@@ -18,7 +18,7 @@ class WriteCommand(val installedAppAuthAdapter: InstalledAppAuthAdapter, value: 
     installedAppAuthAdapter.getAccessTokenString() match {
       case Some(token) =>
         val bearerToken = headers.OAuth2BearerToken(token)
-        val url = s"http://localhost:7000/data?value=$value"
+        val url         = s"http://localhost:7000/data?value=$value"
         val response =
           Await.result(
             Http(actorSystem.toUntyped).singleRequest(

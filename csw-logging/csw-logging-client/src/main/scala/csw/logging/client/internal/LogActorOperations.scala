@@ -36,12 +36,12 @@ private[logging] object LogActorOperations {
     if (logSlf4j.level.pos >= slf4jLogLevel.pos) {
       var jsonObject = Json.obj(
         LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(logSlf4j.time),
-        LoggingKeys.MESSAGE -> logSlf4j.msg,
-        LoggingKeys.FILE -> logSlf4j.file,
-        LoggingKeys.SEVERITY -> logSlf4j.level.name,
-        LoggingKeys.CLASS -> logSlf4j.className,
-        LoggingKeys.KIND -> "slf4j",
-        LoggingKeys.CATEGORY -> Category.Common.name
+        LoggingKeys.MESSAGE   -> logSlf4j.msg,
+        LoggingKeys.FILE      -> logSlf4j.file,
+        LoggingKeys.SEVERITY  -> logSlf4j.level.name,
+        LoggingKeys.CLASS     -> logSlf4j.className,
+        LoggingKeys.KIND      -> "slf4j",
+        LoggingKeys.CATEGORY  -> Category.Common.name
       )
       if (logSlf4j.line > 0) jsonObject = jsonObject ++ Json.obj(LoggingKeys.LINE -> logSlf4j.line)
       if (logSlf4j.ex != NoLogException) jsonObject = jsonObject ++ exceptionJson(logSlf4j.ex)
@@ -54,12 +54,12 @@ private[logging] object LogActorOperations {
       val msg1 = if (logAkka.msg == null) "UNKNOWN" else logAkka.msg
       var jsonObject = Json.obj(
         LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(logAkka.time),
-        LoggingKeys.KIND -> "akka",
-        LoggingKeys.MESSAGE -> msg1.toString,
-        LoggingKeys.ACTOR -> logAkka.source,
-        LoggingKeys.SEVERITY -> logAkka.level.name,
-        LoggingKeys.CLASS -> logAkka.clazz.getName,
-        LoggingKeys.CATEGORY -> Category.Common.name
+        LoggingKeys.KIND      -> "akka",
+        LoggingKeys.MESSAGE   -> msg1.toString,
+        LoggingKeys.ACTOR     -> logAkka.source,
+        LoggingKeys.SEVERITY  -> logAkka.level.name,
+        LoggingKeys.CLASS     -> logAkka.clazz.getName,
+        LoggingKeys.CATEGORY  -> Category.Common.name
       )
 
       if (logAkka.cause.isDefined) jsonObject = jsonObject ++ exceptionJson(logAkka.cause.get)
@@ -73,8 +73,8 @@ private[logging] object LogActorOperations {
         if (trace.getLineNumber > 0) Json.obj(LoggingKeys.LINE -> trace.getLineNumber)
         else Json.obj()
       val j1 = Json.obj(
-        LoggingKeys.CLASS -> trace.getClassName,
-        LoggingKeys.FILE -> trace.getFileName,
+        LoggingKeys.CLASS  -> trace.getClassName,
+        LoggingKeys.FILE   -> trace.getFileName,
         LoggingKeys.METHOD -> trace.getMethodName
       )
       j0 ++ j1
@@ -94,7 +94,7 @@ private[logging] object LogActorOperations {
     Json.obj(
       LoggingKeys.TRACE -> Json.obj(
         LoggingKeys.MESSAGE -> exToJson(ex),
-        LoggingKeys.STACK -> stack
+        LoggingKeys.STACK   -> stack
       ),
       LoggingKeys.PLAINSTACK -> extractPlainStacktrace(ex)
     ) ++ j1
@@ -110,9 +110,9 @@ private[logging] object LogActorOperations {
 
     var jsonObject = Json.obj(
       LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(log.time),
-      LoggingKeys.MESSAGE -> log.msg,
-      LoggingKeys.SEVERITY -> log.level.name,
-      LoggingKeys.CATEGORY -> Category.Common.name
+      LoggingKeys.MESSAGE   -> log.msg,
+      LoggingKeys.SEVERITY  -> log.level.name,
+      LoggingKeys.CATEGORY  -> Category.Common.name
     )
 
     // This lime adds the user map objects as additional JsonObjects if the map is not empty

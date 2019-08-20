@@ -39,13 +39,13 @@ class CswCluster private (_typedSystem: ActorSystem[SpawnProtocol]) {
   val hostname: String = _typedSystem.settings.config.getString("akka.remote.artery.canonical.hostname")
 
   implicit val typedSystem: ActorSystem[SpawnProtocol] = _typedSystem
-  implicit val untypedSystem: actor.ActorSystem = _typedSystem.toUntyped
-  implicit val scheduler: Scheduler = typedSystem.scheduler
-  implicit val ec: ExecutionContext = typedSystem.executionContext
-  implicit val mat: ActorMaterializer = makeMat()
-  implicit val cluster: Cluster = Cluster(typedSystem)
-  private val distributedData: DistributedData = scaladsl.DistributedData(typedSystem)
-  implicit val node: SelfUniqueAddress = distributedData.selfUniqueAddress
+  implicit val untypedSystem: actor.ActorSystem        = _typedSystem.toUntyped
+  implicit val scheduler: Scheduler                    = typedSystem.scheduler
+  implicit val ec: ExecutionContext                    = typedSystem.executionContext
+  implicit val mat: ActorMaterializer                  = makeMat()
+  implicit val cluster: Cluster                        = Cluster(typedSystem)
+  private val distributedData: DistributedData         = scaladsl.DistributedData(typedSystem)
+  implicit val node: SelfUniqueAddress                 = distributedData.selfUniqueAddress
 
   /**
    * Gives the replicator for the current ActorSystem
@@ -88,10 +88,10 @@ class CswCluster private (_typedSystem: ActorSystem[SpawnProtocol]) {
     }
 
     val confirmationActorF: ActorRef[Any] = typedSystem.spawn(ClusterConfirmationActor.behavior(), "ClusterConfirmationActor")
-    implicit val timeout: Timeout = Timeout(5.seconds)
-    def statusF: Future[Option[Done]] = confirmationActorF ? HasJoinedCluster
-    def status: Option[Done] = Await.result(statusF, 5.seconds)
-    val success = BlockingUtils.poll(status.isDefined, 20.seconds)
+    implicit val timeout: Timeout         = Timeout(5.seconds)
+    def statusF: Future[Option[Done]]     = confirmationActorF ? HasJoinedCluster
+    def status: Option[Done]              = Await.result(statusF, 5.seconds)
+    val success                           = BlockingUtils.poll(status.isDefined, 20.seconds)
     if (!success) {
       log.error(CouldNotJoinCluster.getMessage, ex = CouldNotJoinCluster)
       throw CouldNotJoinCluster

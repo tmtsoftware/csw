@@ -45,15 +45,15 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
 
   import actorSystem.executionContext
   implicit val untypedSystem: actor.ActorSystem = actorSystem.toUntyped
-  implicit val scheduler: Scheduler = actorSystem.scheduler
+  implicit val scheduler: Scheduler             = actorSystem.scheduler
 
   private val baseUri = s"http://$serverIp:$serverPort/location"
 
   override def register(registration: Registration): Future[RegistrationResult] = async {
-    val uri = Uri(baseUri + "/register")
+    val uri           = Uri(baseUri + "/register")
     val requestEntity = await(Marshal(registration).to[RequestEntity])
-    val request = HttpRequest(HttpMethods.POST, uri = uri, entity = requestEntity)
-    val response = await(Http().singleRequest(request))
+    val request       = HttpRequest(HttpMethods.POST, uri = uri, entity = requestEntity)
+    val response      = await(Http().singleRequest(request))
 
     response.status match {
       case StatusCodes.OK =>
@@ -63,7 +63,7 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
         )
         new RegistrationResult {
           override def unregister(): Future[Done] = outer.unregister(location0.connection)
-          override def location: Location = location0
+          override def location: Location         = location0
         }
       //fixme: status code 400 is wrongly mapped to OtherLocationIsRegistered
       case x @ StatusCodes.BadRequest          => throw OtherLocationIsRegistered(x.reason)
@@ -73,23 +73,23 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
   }
 
   override def unregister(connection: Connection): Future[Done] = async {
-    val uri = Uri(baseUri + "/unregister")
+    val uri           = Uri(baseUri + "/unregister")
     val requestEntity = await(Marshal(connection).to[RequestEntity])
-    val request = HttpRequest(HttpMethods.POST, uri = uri, entity = requestEntity)
-    val response = await(Http().singleRequest(request))
+    val request       = HttpRequest(HttpMethods.POST, uri = uri, entity = requestEntity)
+    val response      = await(Http().singleRequest(request))
     await(Unmarshal(response.entity).to[Done])
   }
 
   override def unregisterAll(): Future[Done] = async {
-    val uri = Uri(baseUri + "/unregisterAll")
-    val request = HttpRequest(HttpMethods.POST, uri = uri)
+    val uri      = Uri(baseUri + "/unregisterAll")
+    val request  = HttpRequest(HttpMethods.POST, uri = uri)
     val response = await(Http().singleRequest(request))
     await(Unmarshal(response.entity).to[Done])
   }
 
   override def find[L <: Location](connection: TypedConnection[L]): Future[Option[L]] = async {
-    val uri = Uri(s"$baseUri/find/${connection.name}")
-    val request = HttpRequest(HttpMethods.GET, uri = uri)
+    val uri      = Uri(s"$baseUri/find/${connection.name}")
+    val request  = HttpRequest(HttpMethods.GET, uri = uri)
     val response = await(Http().singleRequest(request))
     response.status match {
       case StatusCodes.OK       => Some(await(Unmarshal(response.entity).to[Location]).asInstanceOf[L])
@@ -102,7 +102,7 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
     val uri = Uri(
       s"$baseUri/resolve/${connection.name}?within=${within.length.toString + within.unit.toString.toLowerCase}"
     )
-    val request = HttpRequest(HttpMethods.GET, uri = uri)
+    val request  = HttpRequest(HttpMethods.GET, uri = uri)
     val response = await(Http().singleRequest(request))
     response.status match {
       case StatusCodes.OK       => Some(await(Unmarshal(response.entity).to[Location]).asInstanceOf[L])
@@ -112,42 +112,42 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
   }
 
   override def list: Future[List[Location]] = async {
-    val uri = Uri(baseUri + "/list")
-    val request = HttpRequest(HttpMethods.GET, uri = uri)
+    val uri      = Uri(baseUri + "/list")
+    val request  = HttpRequest(HttpMethods.GET, uri = uri)
     val response = await(Http().singleRequest(request))
     await(Unmarshal(response.entity).to[List[Location]])
   }
 
   override def list(componentType: ComponentType): Future[List[Location]] = async {
-    val uri = Uri(s"$baseUri/list?componentType=$componentType")
-    val request = HttpRequest(HttpMethods.GET, uri = uri)
+    val uri      = Uri(s"$baseUri/list?componentType=$componentType")
+    val request  = HttpRequest(HttpMethods.GET, uri = uri)
     val response = await(Http().singleRequest(request))
     await(Unmarshal(response.entity).to[List[Location]])
   }
 
   override def list(hostname: String): Future[List[Location]] = async {
-    val uri = Uri(s"$baseUri/list?hostname=$hostname")
-    val request = HttpRequest(HttpMethods.GET, uri = uri)
+    val uri      = Uri(s"$baseUri/list?hostname=$hostname")
+    val request  = HttpRequest(HttpMethods.GET, uri = uri)
     val response = await(Http().singleRequest(request))
     await(Unmarshal(response.entity).to[List[Location]])
   }
 
   override def list(connectionType: ConnectionType): Future[List[Location]] = async {
-    val uri = Uri(s"$baseUri/list?connectionType=${connectionType.entryName}")
-    val request = HttpRequest(HttpMethods.GET, uri = uri)
+    val uri      = Uri(s"$baseUri/list?connectionType=${connectionType.entryName}")
+    val request  = HttpRequest(HttpMethods.GET, uri = uri)
     val response = await(Http().singleRequest(request))
     await(Unmarshal(response.entity).to[List[Location]])
   }
 
   override def listByPrefix(prefix: String): Future[List[AkkaLocation]] = async {
-    val uri = Uri(s"$baseUri/list?prefix=$prefix")
-    val request = HttpRequest(HttpMethods.GET, uri = uri)
+    val uri      = Uri(s"$baseUri/list?prefix=$prefix")
+    val request  = HttpRequest(HttpMethods.GET, uri = uri)
     val response = await(Http().singleRequest(request))
     await(Unmarshal(response.entity).to[List[AkkaLocation]])
   }
 
   override def track(connection: Connection): Source[TrackingEvent, KillSwitch] = {
-    val uri = Uri(s"$baseUri/track/${connection.name}")
+    val uri     = Uri(s"$baseUri/track/${connection.name}")
     val request = HttpRequest(HttpMethods.GET, uri = uri)
     val sseStreamFuture = async {
       val response = await(Http().singleRequest(request))

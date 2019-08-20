@@ -8,14 +8,14 @@ import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 
 private[event] class Wiring {
-  lazy val actorSystem = ActorSystem(SpawnProtocol.behavior, "event-cli")
+  lazy val actorSystem  = ActorSystem(SpawnProtocol.behavior, "event-cli")
   lazy val actorRuntime = new ActorRuntime(actorSystem)
   import actorRuntime._
   lazy val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient
-  lazy val eventService: EventService = new EventServiceFactory().make(locationService)
-  lazy val printLine: Any => Unit = println
-  lazy val commandLineRunner = new CommandLineRunner(eventService, actorRuntime, printLine)
-  lazy val cliApp = new CliApp(commandLineRunner)
+  lazy val eventService: EventService       = new EventServiceFactory().make(locationService)
+  lazy val printLine: Any => Unit           = println
+  lazy val commandLineRunner                = new CommandLineRunner(eventService, actorRuntime, printLine)
+  lazy val cliApp                           = new CliApp(commandLineRunner)
 }
 
 object Wiring {

@@ -4,13 +4,13 @@ package csw.event.cli.args
 object Separators {
   val PARAMS_SEP = '|'
 
-  val KEY_SEP = ':'
+  val KEY_SEP       = ':'
   val KEY_VALUE_SEP = '='
 
-  val VALUES_DELIMITER = ','
+  val VALUES_DELIMITER  = ','
   val VALUES_QUOTE_CHAR = '\''
-  val VALUES_OPENING = "\\["
-  val VALUES_CLOSING = "\\]"
+  val VALUES_OPENING    = "\\["
+  val VALUES_CLOSING    = "\\]"
 
   val DEFAULT_ESC_CHAR = '\\'
 }

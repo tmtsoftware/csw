@@ -16,10 +16,10 @@ import scala.concurrent.duration.DurationInt
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 @BenchmarkMode(Array(Mode.All))
 class SchedulerBenchmark {
-  final private val Offset = 20L
+  final private val Offset                  = 20L
   final private val OperationsPerInvocation = 1
 
-  private val actorSystem: ActorSystem[_] = ActorSystem(Behaviors.empty, "test")
+  private val actorSystem: ActorSystem[_]                = ActorSystem(Behaviors.empty, "test")
   private var timeServiceScheduler: TimeServiceScheduler = _
 
   @Setup

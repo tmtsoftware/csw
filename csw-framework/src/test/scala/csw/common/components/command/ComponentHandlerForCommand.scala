@@ -24,13 +24,13 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
     extends ComponentHandlers(ctx, cswCtx) {
 
   import cswCtx._
-  private val cancelCmdId = KeyType.StringKey.make("cancelCmdId")
+  private val cancelCmdId   = KeyType.StringKey.make("cancelCmdId")
   private val cancelCmdName = KeyType.StringKey.make(name = "cancelCmdName")
 
   import ComponentStateForCommand._
   private implicit val actorSystem: actor.ActorSystem = ctx.system.toUntyped
-  private implicit val ec: ExecutionContext = ctx.executionContext
-  private implicit val mat: ActorMaterializer = ActorMaterializer()
+  private implicit val ec: ExecutionContext           = ctx.executionContext
+  private implicit val mat: ActorMaterializer         = ActorMaterializer()
 
   override def initialize(): Future[Unit] = Future.unit
 
@@ -93,7 +93,7 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
   }
 
   private def processAcceptedSubmitCmd(cancelCommandId: Id, cancelCommandSetup: Setup): SubmitResponse = {
-    val commandToCancelId: Option[Parameter[String]] = cancelCommandSetup.get(cancelCmdId)
+    val commandToCancelId: Option[Parameter[String]]   = cancelCommandSetup.get(cancelCmdId)
     val commandToCancelName: Option[Parameter[String]] = cancelCommandSetup.get(cancelCmdName)
     if (commandToCancelId.isEmpty || commandToCancelName.isEmpty)
       Error(
@@ -131,7 +131,7 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
   // This simulates a long command that has been started and finishes with a result
   private def processCommandWithoutMatcher(runId: Id, controlCommand: ControlCommand): Unit = {
     val param: Parameter[Int] = encoder.set(20)
-    val result = Result(controlCommand.source, Set(param))
+    val result                = Result(controlCommand.source, Set(param))
 
     // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
     // This simulates a long running command that eventually updates with a result

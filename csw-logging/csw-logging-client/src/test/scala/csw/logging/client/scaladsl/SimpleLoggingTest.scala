@@ -146,7 +146,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     eventually(logBuffer.size shouldBe 5)
 
     val groupByComponentNamesLog = logBuffer.groupBy(json => json.getString(LoggingKeys.COMPONENT_NAME))
-    val tromboneHcdLogs = groupByComponentNamesLog("tromboneHcd")
+    val tromboneHcdLogs          = groupByComponentNamesLog("tromboneHcd")
 
     tromboneHcdLogs.size shouldBe 5
 
@@ -154,7 +154,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     // assert on actual log message
     tromboneHcdLogs.toList.foreach { log =>
       val currentLogLevel = log.getString(LoggingKeys.SEVERITY).toLowerCase
-      val currentLogMsg = log.getString(LoggingKeys.MESSAGE)
+      val currentLogMsg   = log.getString(LoggingKeys.MESSAGE)
       Level(currentLogLevel) >= DEBUG shouldBe true
       currentLogMsg shouldBe logMsgMap(currentLogLevel)
     }
@@ -174,7 +174,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     eventually(logBuffer.size shouldBe 6)
 
     val groupByComponentNamesLog = logBuffer.groupBy(json => json.getString(LoggingKeys.COMPONENT_NAME))
-    val tromboneAssemblyLogs = groupByComponentNamesLog("tromboneAssembly")
+    val tromboneAssemblyLogs     = groupByComponentNamesLog("tromboneAssembly")
 
     tromboneAssemblyLogs.size shouldBe 6
 
@@ -182,7 +182,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     // assert on actual log message
     tromboneAssemblyLogs.toList.foreach { log =>
       val currentLogLevel = log.getString(LoggingKeys.SEVERITY).toLowerCase
-      val currentLogMsg = log.getString(LoggingKeys.MESSAGE)
+      val currentLogMsg   = log.getString(LoggingKeys.MESSAGE)
       Level(currentLogLevel) >= TRACE shouldBe true
       currentLogMsg shouldBe logMsgMap(currentLogLevel)
     }
@@ -223,7 +223,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
 
       tromboneAssemblyLogs.toList.foreach { log =>
         val currentLogLevel = log.getString(LoggingKeys.SEVERITY).toLowerCase
-        val currentLogMsg = log.getString(LoggingKeys.MESSAGE)
+        val currentLogMsg   = log.getString(LoggingKeys.MESSAGE)
         Level(currentLogLevel) >= logLevel shouldBe true
         currentLogMsg shouldBe logMsgMap(currentLogLevel)
       }
@@ -269,7 +269,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
 
       tromboneHcdLogs.toList.foreach { log =>
         val currentLogLevel = log.getString(LoggingKeys.SEVERITY).toLowerCase
-        val currentLogMsg = log.getString(LoggingKeys.MESSAGE)
+        val currentLogMsg   = log.getString(LoggingKeys.MESSAGE)
         Level(currentLogLevel) >= logLevel shouldBe true
         currentLogMsg shouldBe logMsgMap(currentLogLevel)
       }
@@ -288,7 +288,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
   }
 
   test("should able to log exception at ERROR level with complete stacktrace") {
-    val tromboneHcd = new TromboneHcd()
+    val tromboneHcd          = new TromboneHcd()
     val tromboneHcdClassName = tromboneHcd.getClass.getName
 
     val computationResultMsg = tromboneHcd.compute(10, 0)

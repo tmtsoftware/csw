@@ -30,7 +30,7 @@ class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpParameter with M
 
   implicit val testKitSettings: TestKitSettings = TestKitSettings(typedSystem)
 
-  private val serverWiring = ServerWiring.make(adminWiring.locationService, securityDirectives)
+  private val serverWiring  = ServerWiring.make(adminWiring.locationService, securityDirectives)
   private val testFileUtils = new TestFileUtils(new Settings(ConfigFactory.load()))
 
   private var loggingSystem: LoggingSystem = _
@@ -69,7 +69,7 @@ class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpParameter with M
       path = s"/admin/logging/${ConfigServiceConnection.value.name}/level"
     )
 
-    val getLogMetadataRequest = HttpRequest(HttpMethods.GET, uri = getLogMetadataUri)
+    val getLogMetadataRequest  = HttpRequest(HttpMethods.GET, uri = getLogMetadataUri)
     val getLogMetadataResponse = Await.result(Http().singleRequest(getLogMetadataRequest), 5.seconds)
     getLogMetadataResponse.status shouldBe StatusCodes.BadRequest
     val response = Await.result(Unmarshal(getLogMetadataResponse).to[ErrorResponse], 5.seconds)
@@ -89,7 +89,7 @@ class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpParameter with M
       queryString = Some("value=debug")
     )
 
-    val setLogLevelRequest = HttpRequest(HttpMethods.POST, uri = getLogMetadataUri)
+    val setLogLevelRequest  = HttpRequest(HttpMethods.POST, uri = getLogMetadataUri)
     val setLogLevelResponse = Await.result(Http().singleRequest(setLogLevelRequest), 5.seconds)
     setLogLevelResponse.status shouldBe StatusCodes.BadRequest
     val response = Await.result(Unmarshal(setLogLevelResponse).to[ErrorResponse], 5.seconds)
@@ -110,7 +110,7 @@ class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpParameter with M
       path = s"/admin/logging/${tcpConnection.name}/level"
     )
 
-    val getLogMetadataRequest = HttpRequest(HttpMethods.GET, uri = getLogMetadataUri)
+    val getLogMetadataRequest  = HttpRequest(HttpMethods.GET, uri = getLogMetadataUri)
     val getLogMetadataResponse = Await.result(Http().singleRequest(getLogMetadataRequest), 5.seconds)
     getLogMetadataResponse.status shouldBe StatusCodes.BadRequest
     val response = Await.result(Unmarshal(getLogMetadataResponse).to[ErrorResponse], 5.seconds)
@@ -132,7 +132,7 @@ class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpParameter with M
       queryString = Some("value=debug")
     )
 
-    val setLogLevelRequest = HttpRequest(HttpMethods.POST, uri = getLogMetadataUri)
+    val setLogLevelRequest  = HttpRequest(HttpMethods.POST, uri = getLogMetadataUri)
     val setLogLevelResponse = Await.result(Http().singleRequest(setLogLevelRequest), 5.seconds)
     setLogLevelResponse.status shouldBe StatusCodes.BadRequest
     val response = Await.result(Unmarshal(setLogLevelResponse).to[ErrorResponse], 5.seconds)

@@ -27,7 +27,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   def configService: ConfigService
 
   private lazy val wiring: ServerWiring = serverWiring
-  private lazy val testFileUtils = new TestFileUtils(wiring.settings)
+  private lazy val testFileUtils        = new TestFileUtils(wiring.settings)
 
   import wiring.actorRuntime._
   protected lazy val serverConfigService: ConfigService = wiring.configServiceFactory.make()
@@ -80,7 +80,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
   def createConfigs(configFileNames: Set[String]): Set[ConfigId] =
     configFileNames.map(fileName => {
-      val fileContent = scala.io.Source.fromResource(fileName).mkString
+      val fileContent            = scala.io.Source.fromResource(fileName).mkString
       val configData: ConfigData = ConfigData.fromString(fileContent)
       configService.create(Paths.get(fileName), configData, annex = false, s"committing file: $fileName").await
     })
@@ -93,16 +93,16 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   // DEOPSCSW-71: Retrieve any version of a configuration file using its unique id
   // DEOPSCSW-48: Store new configuration file in Config. service
   test("should able to upload and get component configurations from config service") {
-    val configFileNames = Set("tromboneAssemblyTest.conf", "tromboneContainerTest.conf", "tromboneHCDTest.conf")
-    val configIds = createConfigs(configFileNames)
+    val configFileNames            = Set("tromboneAssemblyTest.conf", "tromboneContainerTest.conf", "tromboneHCDTest.conf")
+    val configIds                  = createConfigs(configFileNames)
     val configFilePaths: Set[Path] = configFileNames.map(name => Paths.get(name))
-    val tuples = configIds zip configFilePaths
+    val tuples                     = configIds zip configFilePaths
 
     for {
       (configId, path) <- tuples
     } yield {
       val configData = configService.getById(path, configId).await
-      val source = scala.io.Source.fromResource(path.toString)
+      val source     = scala.io.Source.fromResource(path.toString)
       try source.mkString shouldEqual configData.get.toStringF.await
       finally {
         source.close()
@@ -120,7 +120,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val binaryConfPath = Paths.get("tmt/trombone/test/conf/large/" + binaryFileName)
 
     def binarySourceData = getClass.getClassLoader.getResourceAsStream(binaryFileName)
-    val binaryContent = binarySourceData.toByteArray
+    val binaryContent    = binarySourceData.toByteArray
 
     val configData = ConfigData.from(StreamConverters.fromInputStream(() => binarySourceData), binaryContent.length)
 
@@ -142,8 +142,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
   //  DEOPSCSW-42: Storing text based component configuration
   test("should ignore '/' at the beginning of file path and create a file") {
-    val fileName = "csw.conf/1/2/3"
-    val file = Paths.get(s"/$fileName")
+    val fileName             = "csw.conf/1/2/3"
+    val file                 = Paths.get(s"/$fileName")
     val fileWithoutBackslash = Paths.get(fileName)
     configService.create(file, ConfigData.fromString(configValue1), annex = false, "commit csw file").await
 
@@ -234,11 +234,11 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
   // DEOPSCSW-46: Unique identifier for configuration file version
   test("each revision of file should have unique identifier") {
-    val tromboneHcdConf = Paths.get("trombone/test/hcd/akka/hcd.conf")
-    val tromboneAssemblyConf = Paths.get("trombone/test/assembly/akka/assembly.conf")
+    val tromboneHcdConf       = Paths.get("trombone/test/hcd/akka/hcd.conf")
+    val tromboneAssemblyConf  = Paths.get("trombone/test/assembly/akka/assembly.conf")
     val tromboneContainerConf = Paths.get("trombone/test/container/akka/container.conf")
-    val binaryConfPath = Paths.get("trombone/test/binary/binaryConf.bin")
-    val expectedConfigIds = List(ConfigId(1), ConfigId(3), ConfigId(5), ConfigId(7), ConfigId(9), ConfigId(10))
+    val binaryConfPath        = Paths.get("trombone/test/binary/binaryConf.bin")
+    val expectedConfigIds     = List(ConfigId(1), ConfigId(3), ConfigId(5), ConfigId(7), ConfigId(9), ConfigId(10))
 
     //consumes 2 revisions, one for actual file one for active file
     val configId1 = configService
@@ -281,10 +281,10 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   // DEOPSCSW-71: Retrieve any version of a configuration file using its unique id
   // DEOPSCSW-45: Saving version information for config. file
   test("should able to retrieve the specific version of file by config ID") {
-    val tromboneHcdConf = Paths.get("trombone/test/hcd/akka/hcd.conf")
-    val tromboneAssemblyConf = Paths.get("trombone/test/assembly/akka/assembly.conf")
+    val tromboneHcdConf       = Paths.get("trombone/test/hcd/akka/hcd.conf")
+    val tromboneAssemblyConf  = Paths.get("trombone/test/assembly/akka/assembly.conf")
     val tromboneContainerConf = Paths.get("trombone/test/container/akka/container.conf")
-    val redisConf = Paths.get("redis/test/text/redis.conf")
+    val redisConf             = Paths.get("redis/test/text/redis.conf")
 
     val configId1 = configService
       .create(tromboneHcdConf, ConfigData.fromString(configValue1), comment = "creating tromboneHCD conf")
@@ -357,11 +357,11 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
   //DEOPSCSW-85 Record of time and date when config file is created/updated
   test("should record datetime for creation of config file") {
-    val file = Paths.get("/tmt/lgs/trombone/hcd.conf")
+    val file       = Paths.get("/tmt/lgs/trombone/hcd.conf")
     val commitMsg1 = "commit version: 1"
 
     val configData = ConfigData.fromString(configValue1)
-    val now = Instant.now()
+    val now        = Instant.now()
     configService.create(file, configData, annex = false, commitMsg1).await
 
     val configFileHistories = configService.history(file).await
@@ -372,12 +372,12 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
   //DEOPSCSW-85 Record of time and date when config file is created/updated
   test("should record datetime when config file is updated") {
-    val file = Paths.get("/tmt/lgs/trombone/hcd.conf")
+    val file       = Paths.get("/tmt/lgs/trombone/hcd.conf")
     val configData = ConfigData.fromString(configValue1)
     configService.create(file, configData, annex = false, "commit version: 1").await
 
     val updatedConfigData = ConfigData.fromString(configValue2)
-    val now = Instant.now()
+    val now               = Instant.now()
     configService.update(file, updatedConfigData, "commit version: 2").await
 
     val configFileHistories = configService.history(file).await
@@ -402,7 +402,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val commitMsg3 = "commit version: 3"
 
     val configId1 = configService.create(file, ConfigData.fromString(configValue1), annex = false, commitMsg1).await
-    val createTS = Instant.now
+    val createTS  = Instant.now
 
     val configId2 = configService.update(file, ConfigData.fromString(configValue2), commitMsg2).await
     val updateTS1 = Instant.now
@@ -581,7 +581,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val createActiveComment = "initializing active file with the first version"
 
     // create file
-    val configId1 = configService.create(file, ConfigData.fromString(configValue1), annex = false, "create").await
+    val configId1      = configService.create(file, ConfigData.fromString(configValue1), annex = false, "create").await
     val createActiveTS = Instant.now()
 
     // update file twice
@@ -668,7 +668,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
   // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
   test("should be able to store and retrieve file from annex store") {
-    val file = Paths.get("SomeAnnexFile.txt")
+    val file    = Paths.get("SomeAnnexFile.txt")
     val content = "testing annex file"
 
     val configData = ConfigData.fromString(content)
@@ -676,7 +676,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     //verify that files smaller than annex-min-file-size go to annex if flag is set
     serverWiring.settings.`annex-min-file-size` > configData.length shouldBe true
 
-    val configId = configService.create(file, configData, annex = true, "committing annex file").await
+    val configId    = configService.create(file, configData, annex = true, "committing annex file").await
     val fileContent = configService.getById(file, configId).await.get
     fileContent.toStringF.await shouldBe content
 
@@ -692,10 +692,10 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
   // DEOPSCSW-135: Validation of suffix for active and sha files
   test("should list files from annex store without .$sha1 suffix") {
-    val file1 = Paths.get("AnnexFile1.txt")
+    val file1    = Paths.get("AnnexFile1.txt")
     val comment1 = "committing annex file"
 
-    val file2 = Paths.get("AnnexFile2.txt")
+    val file2    = Paths.get("AnnexFile2.txt")
     val comment2 = "committing one more annex file"
 
     val configId1 =
@@ -716,20 +716,20 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   test("should be able to update and retrieve the history of a file in annex store") {
     val file = Paths.get("SomeAnnexFile.txt")
 
-    val comment1 = "create"
+    val comment1    = "create"
     val configData1 = ConfigData.fromString(configValue1)
-    val configId1 = configService.create(file, configData1, annex = true, comment1).await
-    val createTS1 = Instant.now
+    val configId1   = configService.create(file, configData1, annex = true, comment1).await
+    val createTS1   = Instant.now
 
-    val comment2 = "update 1"
+    val comment2    = "update 1"
     val configData2 = ConfigData.fromString(configValue2)
-    val configId2 = configService.update(file, configData2, comment2).await
-    val updateTS2 = Instant.now
+    val configId2   = configService.update(file, configData2, comment2).await
+    val updateTS2   = Instant.now
 
-    val comment3 = "update 2"
+    val comment3    = "update 2"
     val configData3 = ConfigData.fromString(configValue3)
-    val configId3 = configService.update(file, configData3, comment3).await
-    val updateTS3 = Instant.now
+    val configId3   = configService.update(file, configData3, comment3).await
+    val updateTS3   = Instant.now
 
     configService.getById(file, configId1).await.get.toStringF.await shouldBe configValue1
     configService.getById(file, configId2).await.get.toStringF.await shouldBe configValue2
@@ -782,7 +782,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val createActiveComment = "initializing active file with the first version"
 
     // create file
-    val configId1 = configService.create(file, ConfigData.fromString(configValue1), annex = true, "create").await
+    val configId1      = configService.create(file, ConfigData.fromString(configValue1), annex = true, "create").await
     val createActiveTS = Instant.now()
 
     // update file twice
@@ -829,7 +829,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   // DEOPSCSW-78: Get the default version of a configuration file
   // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
   test("should be able to get active file from annex store") {
-    val file = Paths.get("SomeAnnexFile.txt")
+    val file    = Paths.get("SomeAnnexFile.txt")
     val content = "testing annex file"
     val configId =
       configService.create(file, ConfigData.fromString(content), annex = true, "committing annex file").await
@@ -864,7 +864,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   test("should be able to get time stamped file from annex store") {
     val initialTime = Instant.MIN
 
-    val file = Paths.get("SomeAnnexFile.txt")
+    val file    = Paths.get("SomeAnnexFile.txt")
     val content = "testing annex file"
     configService.create(file, ConfigData.fromString(content), annex = true, "committing file to annex store").await
 
@@ -929,12 +929,12 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   // DEOPSCSW-81: Storing large files in the configuration service
   // DEOPSCSW-131: Detect and handle oversize files
   test("should be able to store and retrieve text file from annex store when size is greater than configured size") {
-    val fileName = "/tromboneContainerTest.conf"
-    val path = ResourceReader.copyToTmp(fileName)
-    val configData = ConfigData.fromPath(path)
-    val config: Config = ConfigFactory.parseString("csw-config-server.annex-min-file-size=1 KiB")
+    val fileName              = "/tromboneContainerTest.conf"
+    val path                  = ResourceReader.copyToTmp(fileName)
+    val configData            = ConfigData.fromPath(path)
+    val config: Config        = ConfigFactory.parseString("csw-config-server.annex-min-file-size=1 KiB")
     val serverWiringAnnexTest = ServerWiring.make(config)
-    val cs = serverWiringAnnexTest.configServiceFactory.make()
+    val cs                    = serverWiringAnnexTest.configServiceFactory.make()
 
     val configId = cs.create(Paths.get(fileName), configData, annex = false, s"committing file: $fileName").await
 
@@ -950,8 +950,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
   //DEOPSCSW-75 List the names of configuration files that match a path
   test("should list all files in a repository") {
-    val tromboneConfig = Paths.get("a/c/trombone.conf")
-    val hcdConfig = Paths.get("a/b/c/hcd/hcd.conf")
+    val tromboneConfig        = Paths.get("a/c/trombone.conf")
+    val hcdConfig             = Paths.get("a/b/c/hcd/hcd.conf")
     val assemblyBinaryConfig1 = Paths.get("a/b/assembly/assembly1.fits")
     val assemblyBinaryConfig2 = Paths.get("a/b/c/assembly/assembly2.fits")
 
@@ -973,7 +973,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   test("should give empty list if pattern does not match any file") {
     val tromboneConfig = Paths.get("a/c/trombone.conf")
     val assemblyConfig = Paths.get("a/b/assembly/assembly.conf")
-    val hcdConfig = Paths.get("a/b/c/hcd/hcd.conf")
+    val hcdConfig      = Paths.get("a/b/c/hcd/hcd.conf")
 
     configService.create(tromboneConfig, ConfigData.fromString(configValue1), annex = false, "hello trombone").await
     configService.create(assemblyConfig, ConfigData.fromString(configValue2), annex = true, "hello assembly").await
@@ -987,7 +987,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   test("should filter list based on the pattern") {
     val tromboneConfig = Paths.get("a/c/trombone.conf")
     val assemblyConfig = Paths.get("a/b/assembly/assembly.conf")
-    val hcdConfig = Paths.get("a/b/c/hcd/hcd.conf")
+    val hcdConfig      = Paths.get("a/b/c/hcd/hcd.conf")
 
     configService.create(tromboneConfig, ConfigData.fromString(configValue1), annex = false, "hello trombone").await
     configService.create(assemblyConfig, ConfigData.fromString(configValue2), annex = true, "hello assembly").await
@@ -1009,8 +1009,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   //DEOPSCSW-132 List oversize and normal sized files
   //DEOPSCSW-75 List the names of configuration files that match a path
   test("should filter list based on the type and pattern") {
-    val tromboneConfig = Paths.get("a/c/trombone.conf")
-    val hcdConfig = Paths.get("a/b/c/hcd/hcd.conf")
+    val tromboneConfig   = Paths.get("a/c/trombone.conf")
+    val hcdConfig        = Paths.get("a/b/c/hcd/hcd.conf")
     val assemblyBinConf1 = Paths.get("a/b/assembly/assembly1.fits")
     val assemblyBinConf2 = Paths.get("a/b/c/assembly/assembly2.fits")
 
@@ -1085,7 +1085,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
       """.stripMargin)
 
     val serverWiringMetadataTest = ServerWiring.make(config)
-    val cs = serverWiringMetadataTest.configServiceFactory.make()
+    val cs                       = serverWiringMetadataTest.configServiceFactory.make()
 
     val metadata = cs.getMetadata.await
     metadata.repoPath shouldBe "/test/csw-config-svn"

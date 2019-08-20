@@ -24,7 +24,7 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
   import testMocks._
 
   val containerIdleMessageProbe: TestProbe[ContainerIdleMessage] = TestProbe[ContainerIdleMessage]
-  private val timerScheduler = mock[TimerScheduler[SupervisorMessage]]
+  private val timerScheduler                                     = mock[TimerScheduler[SupervisorMessage]]
 
   doNothing
     .when(timerScheduler)
@@ -37,7 +37,7 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
   doNothing.when(timerScheduler).cancel(ArgumentMatchers.eq(SupervisorBehavior.InitializeTimerKey))
 
   val supervisorBehavior: Behavior[ComponentMessage] = createBehavior(timerScheduler)
-  val componentTLAName = s"${hcdInfo.name}-${SupervisorBehavior.ComponentActorNameSuffix}"
+  val componentTLAName                               = s"${hcdInfo.name}-${SupervisorBehavior.ComponentActorNameSuffix}"
 
   test("Supervisor should create child actors for TLA, pub-sub actor for lifecycle and component state") {
     val supervisorBehaviorTestKit = BehaviorTestKit(supervisorBehavior)
@@ -58,7 +58,7 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
   test("Supervisor should watch child component actor [TLA]") {
     val supervisorBehaviorTestKit = BehaviorTestKit(supervisorBehavior)
 
-    val componentActor = supervisorBehaviorTestKit.childInbox(componentTLAName).ref
+    val componentActor       = supervisorBehaviorTestKit.childInbox(componentTLAName).ref
     val pubSubLifecycleActor = supervisorBehaviorTestKit.childInbox(SupervisorBehavior.PubSubLifecycleActor).ref
 
     supervisorBehaviorTestKit.retrieveAllEffects() should contain(Watched(componentActor))
@@ -67,7 +67,7 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
 
   test("Supervisor should support concurrent updates to log-levels of components") {
     val supervisorBehaviorTestKit = BehaviorTestKit(supervisorBehavior)
-    val logMetadataProbe = TestProbe[LogMetadata]("log")
+    val logMetadataProbe          = TestProbe[LogMetadata]("log")
     import typedSystem.executionContext
 
     Future {

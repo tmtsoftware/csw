@@ -9,7 +9,7 @@ import scala.concurrent.duration.{Duration, DurationDouble, DurationInt}
 private[network] object BlockingUtils {
 
   def poll(predicate: => Boolean, max: Duration = 5.seconds): Boolean = {
-    def now = System.nanoTime.nanos
+    def now  = System.nanoTime.nanos
     val stop = now + max
 
     @tailrec

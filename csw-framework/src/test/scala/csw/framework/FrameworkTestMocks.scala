@@ -34,13 +34,13 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol]) extends Mo
   val testActor: ActorRef[Any] = TestProbe("test-probe").ref
   val akkaRegistration =
     AkkaRegistrationFactory.make(mock[AkkaConnection], Prefix("nfiraos.ncc.trombone"), testActor.toURI)
-  val locationService: LocationService = mock[LocationService]
-  val eventServiceFactory: EventServiceFactory = mock[EventServiceFactory]
-  val eventService: EventService = mock[EventService]
-  val alarmService: AlarmService = mock[AlarmService]
+  val locationService: LocationService           = mock[LocationService]
+  val eventServiceFactory: EventServiceFactory   = mock[EventServiceFactory]
+  val eventService: EventService                 = mock[EventService]
+  val alarmService: AlarmService                 = mock[AlarmService]
   val timeServiceScheduler: TimeServiceScheduler = mock[TimeServiceScheduler]
-  val registrationResult: RegistrationResult = mock[RegistrationResult]
-  val registrationFactory: RegistrationFactory = mock[RegistrationFactory]
+  val registrationResult: RegistrationResult     = mock[RegistrationResult]
+  val registrationFactory: RegistrationFactory   = mock[RegistrationFactory]
 
   when(registrationFactory.akkaTyped(any[AkkaConnection], any[Prefix], any[ActorRef[_]]))
     .thenReturn(akkaRegistration)
@@ -51,11 +51,11 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol]) extends Mo
   ///////////////////////////////////////////////
 
   val lifecycleStateProbe: TestProbe[LifecycleStateChanged] = TestProbe[LifecycleStateChanged]
-  val compStateProbe: TestProbe[CurrentState] = TestProbe[CurrentState]
+  val compStateProbe: TestProbe[CurrentState]               = TestProbe[CurrentState]
 
   ///////////////////////////////////////////////
   val loggerFactory: LoggerFactory = mock[LoggerFactory]
-  val logger: Logger = mock[Logger]
+  val logger: Logger               = mock[Logger]
 
   when(loggerFactory.getLogger).thenReturn(logger)
   when(loggerFactory.getLogger(any[actor.ActorContext])).thenReturn(logger)

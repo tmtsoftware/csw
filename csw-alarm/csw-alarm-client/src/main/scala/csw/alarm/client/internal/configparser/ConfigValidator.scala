@@ -19,7 +19,7 @@ import scala.jdk.CollectionConverters._
  * Uses json-schema to validate the Config File
  */
 private[client] object ConfigValidator {
-  private val loadingCfg = LoadingConfiguration.newBuilder.addScheme("config", ConfigDownloader).freeze
+  private val loadingCfg        = LoadingConfiguration.newBuilder.addScheme("config", ConfigDownloader).freeze
   private val jsonSchemaFactory = JsonSchemaFactory.newBuilder.setLoadingConfiguration(loadingCfg).freeze
 
   /**
@@ -29,7 +29,7 @@ private[client] object ConfigValidator {
    * @return the config contents in JSON format
    */
   private def conciseJsonFrom(config: Config) = config.root.render(ConfigRenderOptions.concise())
-  private def jsonNodeFrom(config: Config) = JsonLoader.fromString(conciseJsonFrom(config))
+  private def jsonNodeFrom(config: Config)    = JsonLoader.fromString(conciseJsonFrom(config))
 
   // Adds a custom URI scheme, so that config:/... loads the config file as a resource
   // and converts it to JSON. In this way you can use "$ref": "config:/myfile.conf"
@@ -51,8 +51,8 @@ private[client] object ConfigValidator {
    */
   def validate(inputConfig: Config, schemaConfig: Config): ValidationResult = {
     val jsonSchema = jsonSchemaFactory.getJsonSchema(jsonNodeFrom(schemaConfig))
-    val jsonInput = jsonNodeFrom(inputConfig)
-    val fileName = inputConfig.origin().filename()
+    val jsonInput  = jsonNodeFrom(inputConfig)
+    val fileName   = inputConfig.origin().filename()
 
     validate(jsonSchema, jsonInput, fileName)
   }
@@ -75,9 +75,9 @@ private[client] object ConfigValidator {
   // 'source' is the name of the original input file.
   private def formatMsg(msg: ProcessingMessage, source: String): String = {
     // try to get a nicely formatted error message that includes the necessary info
-    val json = msg.asJson()
-    val loc = extractErrorLocation(json, source)
-    val schemaStr = extractJsonSchemaStr(json)
+    val json             = msg.asJson()
+    val loc              = extractErrorLocation(json, source)
+    val schemaStr        = extractJsonSchemaStr(json)
     val messages: String = extractAdditionalMessages(json)
 
     s"$loc: ${msg.getLogLevel}: ${msg.getMessage}$schemaStr$messages"

@@ -32,10 +32,10 @@ private[event] class RedisPublisher(redisURI: Future[RedisURI], redisClient: Red
 ) extends EventPublisher {
 
   // inorder to preserve the order of publishing events, the parallelism level is maintained to 1
-  private val parallelism = 1
+  private val parallelism                         = 1
   private val defaultInitialDelay: FiniteDuration = 0.millis
-  private val eventPublisherUtil = new EventPublisherUtil()
-  private val romaineFactory = new RomaineFactory(redisClient)
+  private val eventPublisherUtil                  = new EventPublisherUtil()
+  private val romaineFactory                      = new RomaineFactory(redisClient)
   import EventRomaineCodecs._
 
   private val asyncApi: RedisAsyncApi[String, Event] = romaineFactory.redisAsyncApi(redisURI)

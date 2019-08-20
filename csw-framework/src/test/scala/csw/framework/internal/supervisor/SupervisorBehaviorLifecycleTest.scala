@@ -32,10 +32,10 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val testMocks: FrameworkTestMocks = frameworkTestMocks()
     import testMocks._
 
-    val sampleHcdHandler: ComponentHandlers = mock[ComponentHandlers]
-    val timerScheduler: TimerScheduler[SupervisorMessage] = mock[TimerScheduler[SupervisorMessage]]
+    val sampleHcdHandler: ComponentHandlers                        = mock[ComponentHandlers]
+    val timerScheduler: TimerScheduler[SupervisorMessage]          = mock[TimerScheduler[SupervisorMessage]]
     val containerIdleMessageProbe: TestProbe[ContainerIdleMessage] = TestProbe[ContainerIdleMessage]
-    val componentActorName = s"${compInfo.name}-${SupervisorBehavior.ComponentActorNameSuffix}"
+    val componentActorName                                         = s"${compInfo.name}-${SupervisorBehavior.ComponentActorNameSuffix}"
     val supervisorBehaviorKit = BehaviorTestKit(
       Behaviors
         .setup[SupervisorMessage](
@@ -78,7 +78,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val testData = new TestData(hcdInfo)
     import testData._
     import testData.testMocks._
-    val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
+    val supervisorLifecycleStateProbe            = TestProbe[SupervisorLifecycleState]
     val childRef: ActorRef[TopLevelActorMessage] = supervisorBehaviorKit.childInbox(componentActorName).ref
 
     supervisorBehaviorKit.run(Running(childRef))
@@ -94,7 +94,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val testData = new TestData(hcdInfo.copy(locationServiceUsage = DoNotRegister))
     import testData._
     import testData.testMocks._
-    val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
+    val supervisorLifecycleStateProbe            = TestProbe[SupervisorLifecycleState]
     val childRef: ActorRef[TopLevelActorMessage] = supervisorBehaviorKit.childInbox(componentActorName).ref
 
     supervisorBehaviorKit.run(Running(childRef))
@@ -113,7 +113,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val testData = new TestData(hcdInfo)
     import testData._
 
-    val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
+    val supervisorLifecycleStateProbe            = TestProbe[SupervisorLifecycleState]
     val childRef: ActorRef[TopLevelActorMessage] = supervisorBehaviorKit.childInbox(componentActorName).ref
 
     supervisorBehaviorKit.run(Running(childRef))
@@ -133,7 +133,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   test("supervisor should publish state change if locationServiceUsage is DoNotRegister") {
     val testData = new TestData(hcdInfo)
     import testData._
-    val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
+    val supervisorLifecycleStateProbe            = TestProbe[SupervisorLifecycleState]
     val childRef: ActorRef[TopLevelActorMessage] = supervisorBehaviorKit.childInbox(componentActorName).ref
 
     supervisorBehaviorKit.run(Running(childRef))
@@ -156,7 +156,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val testData = new TestData(hcdInfo)
     import testData._
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
-    val subscriberProbe = TestProbe[LifecycleStateChanged]
+    val subscriberProbe               = TestProbe[LifecycleStateChanged]
 
     supervisorBehaviorKit.run(GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref))
     val previousSupervisorLifecycleState = supervisorLifecycleStateProbe.expectMessageType[SupervisorLifecycleState]
@@ -222,7 +222,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   test("supervisor should handle lifecycle GoOnline message") {
     val testData = new TestData(hcdInfo)
     import testData._
-    val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
+    val supervisorLifecycleStateProbe                        = TestProbe[SupervisorLifecycleState]
     val childComponentInbox: TestInbox[TopLevelActorMessage] = supervisorBehaviorKit.childInbox(componentActorName)
 
     supervisorBehaviorKit.run(Running(childComponentInbox.ref))

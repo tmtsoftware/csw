@@ -17,16 +17,16 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 class ConfigClientApiTest extends ConfigClientBaseSuite {
 
   private val serverWiring = ServerWiring.make(securityDirectives)
-  private val httpService = serverWiring.httpService
+  private val httpService  = serverWiring.httpService
 
   import serverWiring.actorRuntime._
 
   private val clientLocationService = HttpLocationServiceFactory.makeLocalClient
-  private val testFileUtils = new TestFileUtils(serverWiring.settings)
+  private val testFileUtils         = new TestFileUtils(serverWiring.settings)
 
   //Why 2 instances of ConfigService? adminAPI is used to set configurations; clientAPI is used for validation/testing
   val configClientService: ConfigClientService = ConfigClientFactory.clientApi(typedSystem, clientLocationService)
-  val configAdminService: ConfigService = ConfigClientFactory.adminApi(typedSystem, clientLocationService, factory)
+  val configAdminService: ConfigService        = ConfigClientFactory.adminApi(typedSystem, clientLocationService, factory)
 
   override def beforeEach(): Unit = serverWiring.svnRepo.initSvnRepo()
 

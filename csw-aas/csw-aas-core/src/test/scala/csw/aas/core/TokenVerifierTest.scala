@@ -17,18 +17,18 @@ import scala.concurrent.Future
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
 class TokenVerifierTest extends FunSuite with MockitoSugar with Matchers with EitherValues {
   private val keycloakTokenVerifier: KeycloakTokenVerifier = mock[KeycloakTokenVerifier]
-  private val authConfig: AuthConfig = mock[AuthConfig]
-  private val deployment: KeycloakDeployment = authConfig.getDeployment
+  private val authConfig: AuthConfig                       = mock[AuthConfig]
+  private val deployment: KeycloakDeployment               = authConfig.getDeployment
 
   when(authConfig.getDeployment).thenReturn(deployment)
 
   private val keycloakAccessToken: KeycloakAccessToken = new KeycloakAccessToken()
-  private val tmtTokenVerifier: TokenVerifier = new TokenVerifier(keycloakTokenVerifier, authConfig)
+  private val tmtTokenVerifier: TokenVerifier          = new TokenVerifier(keycloakTokenVerifier, authConfig)
 
   test("should throw exception while verifyAndDecode token") {
-    val token = "test-token"
+    val token                  = "test-token"
     val validationExceptionMsg = "invalid token"
-    val validationException = new TokenSignatureInvalidException(keycloakAccessToken, validationExceptionMsg)
+    val validationException    = new TokenSignatureInvalidException(keycloakAccessToken, validationExceptionMsg)
 
     when(keycloakTokenVerifier.verifyToken(token, deployment)).thenReturn(Future.failed(validationException))
 
@@ -36,9 +36,9 @@ class TokenVerifierTest extends FunSuite with MockitoSugar with Matchers with Ei
   }
 
   test("should throw TokenExpired exception while verifying token") {
-    val token = "test-token"
+    val token                    = "test-token"
     val tokenExpiredExceptionMsg = "Token expired"
-    val tokenExpiredException = new TokenNotActiveException(keycloakAccessToken, tokenExpiredExceptionMsg)
+    val tokenExpiredException    = new TokenNotActiveException(keycloakAccessToken, tokenExpiredExceptionMsg)
 
     when(keycloakTokenVerifier.verifyToken(token, deployment)).thenReturn(Future.failed(tokenExpiredException))
 
@@ -72,7 +72,7 @@ class TokenVerifierTest extends FunSuite with MockitoSugar with Matchers with Ei
   }
 
   test("should throw exception while decoding token") {
-    val invalidJsonToken = "ey.wer.erwe.werw"
+    val invalidJsonToken     = "ey.wer.erwe.werw"
     val expectedExceptionMsg = "Expected token [ey.wer.erwe.werw] to be composed of 2 or 3 parts separated by dots."
 
     when(keycloakTokenVerifier.verifyToken(invalidJsonToken, deployment)).thenReturn(Future.successful(keycloakAccessToken))

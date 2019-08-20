@@ -24,7 +24,7 @@ class CborSerializationBenchmark {
 
 object BigCborTest extends App {
   val bytes: Array[Byte] = EventCbor.encode(Data.bigEvent)
-  val event = EventCbor.decode[SystemEvent](bytes)
+  val event              = EventCbor.decode[SystemEvent](bytes)
   assert(event == Data.bigEvent)
   println(bytes.length)
 }
@@ -37,6 +37,6 @@ object CrossLanguageCbor extends App {
   bos.close()
 
   val readBytes = Files.readAllBytes(Paths.get("/tmp/input.cbor"))
-  val event = EventCbor.decode[SystemEvent](readBytes)
+  val event     = EventCbor.decode[SystemEvent](readBytes)
   println(event)
 }

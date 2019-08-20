@@ -42,17 +42,17 @@ import scala.concurrent.{ExecutionContext, Future}
 class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
   val supervisorLifecycleStateProbe: TestProbe[SupervisorLifecycleState] = TestProbe[SupervisorLifecycleState]
-  var supervisorRef: ActorRef[ComponentMessage] = _
-  var initializeAnswer: Answer[Future[Unit]] = _
-  var submitAnswer: Answer[Future[Unit]] = _
-  var shutdownAnswer: Answer[Future[Unit]] = _
-  var runAnswer: Answer[Future[Unit]] = _
+  var supervisorRef: ActorRef[ComponentMessage]                          = _
+  var initializeAnswer: Answer[Future[Unit]]                             = _
+  var submitAnswer: Answer[Future[Unit]]                                 = _
+  var shutdownAnswer: Answer[Future[Unit]]                               = _
+  var runAnswer: Answer[Future[Unit]]                                    = _
 
   implicit val ec: ExecutionContext = typedSystem.executionContext
 
   // all log messages will be captured in log buffer
-  private val logBuffer = mutable.Buffer.empty[JsObject]
-  private val testAppender = new TestAppender(x => logBuffer += Json.parse(x.toString).as[JsObject])
+  private val logBuffer                    = mutable.Buffer.empty[JsObject]
+  private val testAppender                 = new TestAppender(x => logBuffer += Json.parse(x.toString).as[JsObject])
   private var loggingSystem: LoggingSystem = _
 
   override protected def beforeAll(): Unit = {
@@ -123,7 +123,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     val testMocks = frameworkTestMocks()
     import testMocks._
 
-    val componentHandlers = createComponentHandlers(testMocks)
+    val componentHandlers   = createComponentHandlers(testMocks)
     val failureRestartExMsg = "testing FailureRestart"
 
     // Throw a `FailureRestart` on the first attempt to initialize but initialize successfully on the next attempt
@@ -163,13 +163,13 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     val testMocks = frameworkTestMocks()
     import testMocks._
 
-    val componentHandlers = createComponentHandlers(testMocks)
+    val componentHandlers   = createComponentHandlers(testMocks)
     val failureRestartExMsg = "testing FailureRestart"
-    val unexpectedMessage = "Unexpected message :[Running"
+    val unexpectedMessage   = "Unexpected message :[Running"
 
-    val obsId: ObsId = ObsId("Obs001")
+    val obsId: ObsId          = ObsId("Obs001")
     val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
-    val setup: Setup = Setup(prefix, CommandName("move"), Some(obsId), Set(param))
+    val setup: Setup          = Setup(prefix, CommandName("move"), Some(obsId), Set(param))
 
     doThrow(TestFailureRestart(failureRestartExMsg))
       .when(componentHandlers)
@@ -260,5 +260,5 @@ class SampleBehaviorFactory(componentHandlers: ComponentHandlers) extends Compon
     componentHandlers
 }
 
-case class TestFailureStop(msg: String) extends FailureStop(msg)
+case class TestFailureStop(msg: String)    extends FailureStop(msg)
 case class TestFailureRestart(msg: String) extends FailureRestart(msg)

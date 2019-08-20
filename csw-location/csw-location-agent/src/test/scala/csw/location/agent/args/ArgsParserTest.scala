@@ -23,9 +23,9 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
     }
 
   test("test parser with valid arguments") {
-    val port = 5555
+    val port     = 5555
     val services = "redis,alarm,watchdog"
-    val args = Array("--name", services, "--port", port.toString, "--command", "sleep 5")
+    val args     = Array("--name", services, "--port", port.toString, "--command", "sleep 5")
 
     val x: Option[Options] = silentParse(args)
     x should contain(Options(List("redis", "alarm", "watchdog"), Some("sleep 5"), Some(port), None, None))
@@ -33,9 +33,9 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
 
   // DEOPSCSW-628: Add support for registering service as HTTP in location agent
   test("test parser for http command line argument") {
-    val port = 5555
+    val port     = 5555
     val services = "aas"
-    val args = Array("--name", services, "--port", port.toString, "--command", "sleep 5", "--http", "testPath")
+    val args     = Array("--name", services, "--port", port.toString, "--command", "sleep 5", "--http", "testPath")
 
     val x: Option[Options] = silentParse(args)
     x should contain(Options(List("aas"), Some("sleep 5"), Some(port), None, None, httpPath = Some("testPath")))
@@ -53,48 +53,48 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
   }
 
   test("test parser with only --name option, should be allowed") {
-    val args = Array[String]("--name", "myService")
+    val args               = Array[String]("--name", "myService")
     val x: Option[Options] = silentParse(args)
 
     x should contain(Options(List("myService"), None, None, None, None))
   }
 
   test("test parser without --name option, should error out") {
-    val args = Array[String]("abcd")
+    val args               = Array[String]("abcd")
     val x: Option[Options] = silentParse(args)
 
     x shouldEqual None
   }
 
   test("test parser with service name containing '-' character, should error out") {
-    val args = Array[String]("--name", "alarm-service")
+    val args               = Array[String]("--name", "alarm-service")
     val x: Option[Options] = silentParse(args)
     x shouldEqual None
   }
 
   test("test parser with list of services containing leading/trailing whitespace, should error out") {
-    val args = Array[String]("--name", "   redis-server,   alarm,watchdog   ")
+    val args               = Array[String]("--name", "   redis-server,   alarm,watchdog   ")
     val x: Option[Options] = silentParse(args)
 
     x shouldEqual None
   }
 
   test("test parser with service name containing leading whitespace, should error out") {
-    val args = Array[String]("--name", " someService")
+    val args               = Array[String]("--name", " someService")
     val x: Option[Options] = silentParse(args)
 
     x shouldEqual None
   }
 
   test("test parser with service name containing trailing whitespace, should error out") {
-    val args = Array[String]("--name", "someService ")
+    val args               = Array[String]("--name", "someService ")
     val x: Option[Options] = silentParse(args)
 
     x shouldEqual None
   }
 
   test("test parser with service name containing both leading and trailing whitespaces, error is shown") {
-    val args = Array[String]("--name", " someService ")
+    val args               = Array[String]("--name", " someService ")
     val x: Option[Options] = silentParse(args)
 
     x shouldEqual None

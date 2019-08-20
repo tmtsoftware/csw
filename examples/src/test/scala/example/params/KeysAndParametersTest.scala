@@ -19,8 +19,8 @@ class KeysAndParametersTest extends FunSpec with Matchers {
 
       //making 3 keys
       val k1: Key[Boolean] = KeyType.BooleanKey.make(s1)
-      val k2: Key[Short] = KeyType.ShortKey.make("RandomKeyName")
-      val k3: Key[String] = KeyType.StringKey.make(s1)
+      val k2: Key[Short]   = KeyType.ShortKey.make("RandomKeyName")
+      val k3: Key[String]  = KeyType.StringKey.make(s1)
 
       //storing a single value
       val booleanParam: Parameter[Boolean] = k1.set(true)
@@ -31,7 +31,7 @@ class KeysAndParametersTest extends FunSpec with Matchers {
       val paramWithShorts3: Parameter[Short] = k2 -> Array[Short](1, 2, 3, 4)
 
       //associating units
-      val weekDays: Array[String] = Array("Sunday", "Monday", "Tuesday")
+      val weekDays: Array[String]            = Array("Sunday", "Monday", "Tuesday")
       val paramWithUnits1: Parameter[String] = k3.set(weekDays, Units.day)
       val paramWithUnits2: Parameter[String] = k3 -> weekDays withUnits Units.day
 
@@ -77,7 +77,7 @@ class KeysAndParametersTest extends FunSpec with Matchers {
       assert(p1.units === Units.NoUnits)
 
       //retrieving values
-      val head: Array[Double] = p1.head.data.toArray
+      val head: Array[Double]                 = p1.head.data.toArray
       val allValues: Array[ArrayData[Double]] = p1.values
       //#arrays
 
@@ -108,7 +108,7 @@ class KeysAndParametersTest extends FunSpec with Matchers {
       assert(p1.units === Units.NoUnits)
 
       //retrieving values
-      val head: Array[Array[Byte]] = p1.head.data.map(_.toArray).toArray
+      val head: Array[Array[Byte]]           = p1.head.data.map(_.toArray).toArray
       val allValues: Array[MatrixData[Byte]] = p1.values
       //#matrices
 
@@ -144,7 +144,7 @@ class KeysAndParametersTest extends FunSpec with Matchers {
       assert(p2.units === Units.NoUnits)
 
       //retrieving values
-      val head: Choice = p1.head
+      val head: Choice          = p1.head
       val values: Array[Choice] = p2.values
 
       //#choice
@@ -174,7 +174,7 @@ class KeysAndParametersTest extends FunSpec with Matchers {
       assert(p2.units === Units.NoUnits)
 
       //retrieving values
-      val head: RaDec = p1.head
+      val head: RaDec          = p1.head
       val values: Array[RaDec] = p2.values
 
       //#radec
@@ -190,16 +190,16 @@ class KeysAndParametersTest extends FunSpec with Matchers {
       import Coords._
 
       // Coordinate types
-      val pm = ProperMotion(0.5, 2.33)
-      val eqCoord = EqCoord(ra = "12:13:14.15", dec = "-30:31:32.3", frame = FK5, pmx = pm.pmx, pmy = pm.pmy)
+      val pm               = ProperMotion(0.5, 2.33)
+      val eqCoord          = EqCoord(ra = "12:13:14.15", dec = "-30:31:32.3", frame = FK5, pmx = pm.pmx, pmy = pm.pmy)
       val solarSystemCoord = SolarSystemCoord(Tag("BASE"), Venus)
       val minorPlanetCoord = MinorPlanetCoord(Tag("GUIDER1"), 2000, 90.degree, 2.degree, 100.degree, 1.4, 0.234, 220.degree)
-      val cometCoord = CometCoord(Tag("BASE"), 2000.0, 90.degree, 2.degree, 100.degree, 1.4, 0.234)
-      val altAzCoord = AltAzCoord(Tag("BASE"), 301.degree, 42.5.degree)
+      val cometCoord       = CometCoord(Tag("BASE"), 2000.0, 90.degree, 2.degree, 100.degree, 1.4, 0.234)
+      val altAzCoord       = AltAzCoord(Tag("BASE"), 301.degree, 42.5.degree)
 
       // Can use base trait CoordKey to store values for all types
       val basePosKey = CoordKey.make("BasePosition")
-      val posParam = basePosKey.set(eqCoord, solarSystemCoord, minorPlanetCoord, cometCoord, altAzCoord)
+      val posParam   = basePosKey.set(eqCoord, solarSystemCoord, minorPlanetCoord, cometCoord, altAzCoord)
 
       //retrieving values
       assert(posParam.values.length == 5)
@@ -216,8 +216,8 @@ class KeysAndParametersTest extends FunSpec with Matchers {
       //keys
       val skey: Key[Struct] = StructKey.make("myStruct")
 
-      val ra = KeyType.StringKey.make("ra")
-      val dec = KeyType.StringKey.make("dec")
+      val ra    = KeyType.StringKey.make("ra")
+      val dec   = KeyType.StringKey.make("dec")
       val epoch = KeyType.DoubleKey.make("epoch")
 
       //initialize struct
@@ -235,20 +235,20 @@ class KeysAndParametersTest extends FunSpec with Matchers {
       assert(p2.units === Units.NoUnits)
 
       //retrieving values
-      val head: Struct = p1.head
+      val head: Struct          = p1.head
       val values: Array[Struct] = p2.values
 
       //get individual keys
-      val firstKey: Option[Parameter[String]] = struct1.get(KeyType.StringKey.make("ra"))
+      val firstKey: Option[Parameter[String]]  = struct1.get(KeyType.StringKey.make("ra"))
       val secondKey: Option[Parameter[String]] = struct1.get("dec", KeyType.StringKey)
-      val thirdKey: Option[Parameter[Double]] = struct1.get("epoch", KeyType.DoubleKey)
+      val thirdKey: Option[Parameter[Double]]  = struct1.get("epoch", KeyType.DoubleKey)
 
       //access parameter using 'parameter' or 'apply' method
       assert(struct1.parameter(ra) === struct1(ra))
 
       //remove a parameter and verify it doesn't exist
       val mutated1: Struct = struct1.remove(ra) //using key
-      val mutated2 = struct1.remove(firstKey.get)
+      val mutated2         = struct1.remove(firstKey.get)
       assert(mutated1.exists(ra) === false)
       assert(mutated2.exists(ra) === false)
 
@@ -277,16 +277,16 @@ class KeysAndParametersTest extends FunSpec with Matchers {
 
       //making 3 keys
       val k1: Key[Boolean] = KeyType.BooleanKey.make(s1)
-      val k2: Key[Short] = KeyType.ShortKey.make("RandomKeyName")
-      val k3: Key[String] = KeyType.StringKey.make(s1)
+      val k2: Key[Short]   = KeyType.ShortKey.make("RandomKeyName")
+      val k3: Key[String]  = KeyType.StringKey.make(s1)
 
       //storing a single value, default unit is NoUnits
       val bParam: Parameter[Boolean] = k1.set(true)
-      val bDefaultUnitSet: Boolean = bParam.units === Units.NoUnits //true
+      val bDefaultUnitSet: Boolean   = bParam.units === Units.NoUnits //true
 
       //default unit for UTCTimeKey
       val tParam: Parameter[UTCTime] = KeyType.UTCTimeKey.make("now").set(UTCTime.now())
-      val defaultTimeUnit: Units = tParam.units //is second
+      val defaultTimeUnit: Units     = tParam.units //is second
 
       //storing multiple values
       val paramOfShorts: Parameter[Short] = k2.set(1, 2, 3, 4)

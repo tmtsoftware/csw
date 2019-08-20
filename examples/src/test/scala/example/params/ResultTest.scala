@@ -18,17 +18,17 @@ class ResultTest extends FunSpec with Matchers {
     it("Should show usage of Result") {
       //#result
       //keys
-      val k1: Key[Int] = KeyType.IntKey.make("encoder")
-      val k2: Key[Int] = KeyType.IntKey.make("windspeed")
+      val k1: Key[Int]    = KeyType.IntKey.make("encoder")
+      val k2: Key[Int]    = KeyType.IntKey.make("windspeed")
       val k3: Key[String] = KeyType.StringKey.make("filter")
-      val k4: Key[Int] = KeyType.IntKey.make("notUsed")
+      val k4: Key[Int]    = KeyType.IntKey.make("notUsed")
 
       //prefixes
       val prefix = Prefix("wfos.prog.cloudcover")
 
       //parameters
-      val p1: Parameter[Int] = k1.set(22)
-      val p2: Parameter[Int] = k2.set(44)
+      val p1: Parameter[Int]    = k1.set(22)
+      val p2: Parameter[Int]    = k2.set(44)
       val p3: Parameter[String] = k3.set("A", "B", "C", "D")
 
       //Create Result using madd
@@ -113,8 +113,8 @@ class ResultTest extends FunSpec with Matchers {
       //#unique-key
       //keys
       val encoderKey: Key[Int] = KeyType.IntKey.make("encoder")
-      val filterKey: Key[Int] = KeyType.IntKey.make("filter")
-      val miscKey: Key[Int] = KeyType.IntKey.make("misc.")
+      val filterKey: Key[Int]  = KeyType.IntKey.make("filter")
+      val miscKey: Key[Int]    = KeyType.IntKey.make("misc.")
 
       //prefix
       val prefix = Prefix("wfos.blue.filter")

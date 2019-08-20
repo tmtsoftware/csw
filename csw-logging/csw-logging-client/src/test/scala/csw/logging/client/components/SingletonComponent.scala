@@ -21,8 +21,8 @@ object SingletonComponent {
 
   val TRACE_LINE_NO = 14
   val DEBUG_LINE_NO = TRACE_LINE_NO + 1
-  val INFO_LINE_NO = TRACE_LINE_NO + 2
-  val WARN_LINE_NO = TRACE_LINE_NO + 3
+  val INFO_LINE_NO  = TRACE_LINE_NO + 2
+  val WARN_LINE_NO  = TRACE_LINE_NO + 3
   val ERROR_LINE_NO = TRACE_LINE_NO + 4
   val FATAL_LINE_NO = TRACE_LINE_NO + 5
 

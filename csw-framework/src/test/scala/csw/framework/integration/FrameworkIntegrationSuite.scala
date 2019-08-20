@@ -17,7 +17,7 @@ trait FrameworkIntegrationSuite
     with MockitoSugar {
 
   private val locationWiring = new ServerWiring
-  val testWiring = new FrameworkTestWiring()
+  val testWiring             = new FrameworkTestWiring()
 
   override protected def beforeAll(): Unit = locationWiring.locationHttpService.start()
 

@@ -16,7 +16,7 @@ class MultiActorSystemTest extends FunSuite with Matchers with BeforeAndAfterAll
   private val system1 = ClusterSettings().onPort(3552).system
   private val system2 = ClusterSettings().joinLocal(3552).system
 
-  private val locationService = LocationServiceFactory.withCluster(CswCluster.withSystem(system1))
+  private val locationService  = LocationServiceFactory.withCluster(CswCluster.withSystem(system1))
   private val locationService2 = LocationServiceFactory.withCluster(CswCluster.withSystem(system2))
 
   val tcpRegistration: TcpRegistration = TcpRegistration(connection, 1234)

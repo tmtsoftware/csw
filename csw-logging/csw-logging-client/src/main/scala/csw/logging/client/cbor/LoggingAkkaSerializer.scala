@@ -10,7 +10,7 @@ import io.bullet.borer.{Cbor, Decoder}
 import scala.reflect.ClassTag
 
 class LoggingAkkaSerializer extends Serializer {
-  private val logger: Logger = GenericLoggerFactory.getLogger
+  private val logger: Logger   = GenericLoggerFactory.getLogger
   override def identifier: Int = 19925
 
   override def toBinary(o: AnyRef): Array[Byte] = o match {

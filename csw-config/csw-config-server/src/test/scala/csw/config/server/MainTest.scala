@@ -24,14 +24,14 @@ import scala.concurrent.duration._
 
 // DEOPSCSW-130: Command line App for HTTP server
 class MainTest extends HTTPLocationService {
-  implicit val actorSystem: ActorSystem[_] = ActorSystem(Behaviors.empty, "config-server")
+  implicit val actorSystem: ActorSystem[_]      = ActorSystem(Behaviors.empty, "config-server")
   implicit val untypedSystem: actor.ActorSystem = actorSystem.toUntyped
-  implicit val mat: Materializer = ActorMaterializer()
+  implicit val mat: Materializer                = ActorMaterializer()
 
   private val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient
 
   private val testFileUtils = new TestFileUtils(new Settings(ConfigFactory.load()))
-  private val AASPort = 8080
+  private val AASPort       = 8080
 
   override def beforeAll(): Unit = {
     super.beforeAll()
@@ -67,7 +67,7 @@ class MainTest extends HTTPLocationService {
 
       val uri = Uri(configServiceLocation.uri.toString).withPath(Path / "list")
 
-      val request = HttpRequest(uri = uri)
+      val request  = HttpRequest(uri = uri)
       val response = Http().singleRequest(request).await
       response.status shouldBe StatusCodes.OK
       response.discardEntityBytes()
@@ -90,7 +90,7 @@ class MainTest extends HTTPLocationService {
       configServiceLocation.connection shouldBe ConfigServiceConnection.value
       val uri = Uri(configServiceLocation.uri.toString).withPath(Path / "list")
 
-      val request = HttpRequest(uri = uri)
+      val request  = HttpRequest(uri = uri)
       val response = Http().singleRequest(request).await
       response.status shouldBe StatusCodes.OK
     } finally {

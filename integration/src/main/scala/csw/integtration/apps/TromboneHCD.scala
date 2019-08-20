@@ -26,11 +26,11 @@ object TromboneHCD {
   import adminWiring.actorRuntime._
 
   val tromboneHcdActorRef: ActorRef[Submit] = typedSystem.spawn(behavior, "trombone-hcd")
-  val componentId = ComponentId("trombonehcd", ComponentType.HCD)
-  val connection = AkkaConnection(componentId)
+  val componentId                           = ComponentId("trombonehcd", ComponentType.HCD)
+  val connection                            = AkkaConnection(componentId)
 
-  val registration = AkkaRegistrationFactory.make(connection, Prefix("nfiraos.ncc.trombone"), tromboneHcdActorRef.toURI)
-  private val locationService = HttpLocationServiceFactory.makeLocalClient
+  val registration                           = AkkaRegistrationFactory.make(connection, Prefix("nfiraos.ncc.trombone"), tromboneHcdActorRef.toURI)
+  private val locationService                = HttpLocationServiceFactory.makeLocalClient
   val registrationResult: RegistrationResult = locationService.register(registration).await
 
   println("Trombone HCD registered")

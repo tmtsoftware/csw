@@ -27,8 +27,8 @@ import scala.concurrent.{Await, Future}
  */
 object LocationServiceExampleComponentApp extends App {
   implicit val system: typed.ActorSystem[SpawnProtocol] = ActorSystemFactory.remote(SpawnProtocol.behavior, "example-system")
-  implicit val mat: ActorMaterializer = scaladsl.ActorMaterializer()
-  private val locationService = HttpLocationServiceFactory.makeLocalClient
+  implicit val mat: ActorMaterializer                   = scaladsl.ActorMaterializer()
+  private val locationService                           = HttpLocationServiceFactory.makeLocalClient
 
   //#create-logging-system
   private val host = InetAddress.getLocalHost.getHostName

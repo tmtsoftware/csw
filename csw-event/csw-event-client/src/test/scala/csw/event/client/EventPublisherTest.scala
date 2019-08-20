@@ -64,7 +64,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*wit
   def should_publish_initialization_event_on_publisher_creation(): Unit = {
     redisTestProps.publisher // access lazy publisher so that it gets evaluated
     val initEventKey = EventKey(s"${Subsystem.CSW}.first.event.init")
-    val initEvent = redisTestProps.subscriber.get(initEventKey).await
+    val initEvent    = redisTestProps.subscriber.get(initEventKey).await
     initEvent.paramSet shouldBe InitializationEvent.value.paramSet
   }
 
@@ -73,9 +73,9 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*wit
   def should_be_able_to_publish_and_subscribe_an_event(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
-    val event1 = makeDistinctEvent(Random.nextInt())
+    val event1             = makeDistinctEvent(Random.nextInt())
     val eventKey: EventKey = event1.eventKey
-    val testProbe = TestProbe[Event]()
+    val testProbe          = TestProbe[Event]()
 
     publisher.publish(event1).await
     Thread.sleep(500) // Needed for redis set which is fire and forget operation
@@ -98,7 +98,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*wit
   def should_be_able_to_publish_an_event_with_duration(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
-    var counter = -1
+    var counter                      = -1
     val events: immutable.Seq[Event] = for (i <- 1 to 10) yield makeEvent(i)
 
     def eventGenerator(): Option[Event] = {
@@ -108,7 +108,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*wit
     }
 
     val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
-    val eventKey: EventKey = makeEvent(0).eventKey
+    val eventKey: EventKey          = makeEvent(0).eventKey
 
     val subscription = subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](queue.enqueue(_))).run()
     subscription.ready().await
@@ -128,7 +128,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*wit
   def should_be_able_to_publish_concurrently_to_the_different_channel(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
-    val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
+    val queue: mutable.Queue[Event]  = new mutable.Queue[Event]()
     val events: immutable.Seq[Event] = for (i <- 101 to 110) yield makeDistinctEvent(i)
 
     val subscription = subscriber.subscribe(events.map(_.eventKey).toSet).to(Sink.foreach(queue.enqueue(_))).run()
@@ -149,7 +149,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*wit
   def should_be_able_to_publish_an_event_with_block_generating_future_of_event(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
-    var counter = -1
+    var counter                      = -1
     val events: immutable.Seq[Event] = for (i <- 31 to 41) yield makeEventWithPrefix(i, Prefix("csw.move"))
 
     def eventGenerator(): Future[Option[Event]] = Future {
@@ -159,7 +159,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*wit
     }
 
     val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
-    val eventKey: EventKey = events.head.eventKey
+    val eventKey: EventKey          = events.head.eventKey
 
     val subscription = subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](queue.enqueue(_))).run()
     subscription.ready().await
@@ -179,14 +179,14 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*wit
   def should_be_able_to_maintain_ordering_while_publish(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
-    val prefix = Prefix("csw.ordering.prefix")
-    val event1 = makeEventWithPrefix(1, prefix)
-    val event2 = makeEventWithPrefix(2, prefix)
-    val event3 = makeEventWithPrefix(3, prefix)
-    val event4 = makeEventWithPrefix(4, prefix)
-    val event5 = makeEventWithPrefix(5, prefix)
+    val prefix             = Prefix("csw.ordering.prefix")
+    val event1             = makeEventWithPrefix(1, prefix)
+    val event2             = makeEventWithPrefix(2, prefix)
+    val event3             = makeEventWithPrefix(3, prefix)
+    val event4             = makeEventWithPrefix(4, prefix)
+    val event5             = makeEventWithPrefix(5, prefix)
     val eventKey: EventKey = event1.eventKey
-    val testProbe = TestProbe[Event]()
+    val testProbe          = TestProbe[Event]()
 
     val subscription = subscriber
       .subscribe(Set(eventKey))
@@ -217,7 +217,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*wit
     import baseProperties._
 
     val eventKey: EventKey = EventKey("csw.publish.system")
-    var counter = 0
+    var counter            = 0
     // Queue for events of event generator
     val generatorEvents = mutable.Queue[Event]()
 
@@ -266,7 +266,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*wit
   def should_be_able_to_publish_event_via_asynchronous_event_generator_with_start_time(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
-    var counter = -1
+    var counter                      = -1
     val events: immutable.Seq[Event] = for (i <- 31 to 41) yield makeEventWithPrefix(i, Prefix("csw.publishAsync"))
 
     def eventGenerator(): Future[Option[Event]] = Future {
@@ -276,7 +276,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*wit
     }
 
     val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
-    val eventKey: EventKey = events.head.eventKey
+    val eventKey: EventKey          = events.head.eventKey
 
     val subscription = subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](queue.enqueue(_))).run()
     subscription.ready().await
@@ -299,14 +299,14 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*wit
   def large_event_test(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
-    val payloadKey: Key[Byte] = ByteKey.make("payloadKey")
-    val payload: Array[Byte] = ("0" * 1024 * 2).getBytes("utf-8")
+    val payloadKey: Key[Byte]       = ByteKey.make("payloadKey")
+    val payload: Array[Byte]        = ("0" * 1024 * 2).getBytes("utf-8")
     val paramSet: Set[Parameter[_]] = Set(payloadKey.set(payload))
-    val event1 = SystemEvent(Prefix("csw.abc"), EventName("system_1"), paramSet)
+    val event1                      = SystemEvent(Prefix("csw.abc"), EventName("system_1"), paramSet)
 
     val eventKey: EventKey = event1.eventKey
-    val testProbe = TestProbe[Event]()
-    val subscription = subscriber.subscribe(Set(eventKey)).toMat(Sink.foreach(testProbe.ref ! _))(Keep.left).run()
+    val testProbe          = TestProbe[Event]()
+    val subscription       = subscriber.subscribe(Set(eventKey)).toMat(Sink.foreach(testProbe.ref ! _))(Keep.left).run()
     subscription.ready().await
 
     publisher.publish(event1).await

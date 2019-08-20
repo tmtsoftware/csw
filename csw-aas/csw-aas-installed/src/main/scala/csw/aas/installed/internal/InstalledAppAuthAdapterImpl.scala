@@ -85,7 +85,7 @@ private[aas] class InstalledAppAuthAdapterImpl(
     updateAuthStore()
   }
 
-  private def accessTokenStr = queryToken(_.getAccessTokenString, keycloakInstalled.getTokenString)
+  private def accessTokenStr  = queryToken(_.getAccessTokenString, keycloakInstalled.getTokenString)
   private def refreshTokenStr = queryToken(_.getRefreshTokenString, keycloakInstalled.getRefreshToken)
 
   private def queryToken(withStore: AuthStore => Option[String], withoutStore: => String) = maybeStore match {

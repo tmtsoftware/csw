@@ -32,12 +32,12 @@ import scala.concurrent.duration.DurationDouble
 // DEOPSCSW-187: Efficient serialization to/from binary
 @State(Scope.Benchmark)
 class ImageDeSerializationBenchmark {
-  private final var system: ActorSystem[_] = _
+  private final var system: ActorSystem[_]       = _
   private final var serialization: Serialization = _
-  private final var prefixStr: String = _
-  private final var obsId: ObsId = _
+  private final var prefixStr: String            = _
+  private final var obsId: ObsId                 = _
 
-  private final var img_32k_tuple: (Array[Byte], Observe) = _
+  private final var img_32k_tuple: (Array[Byte], Observe)  = _
   private final var img_128k_tuple: (Array[Byte], Observe) = _
   private final var img_512k_tuple: (Array[Byte], Observe) = _
 
@@ -60,14 +60,14 @@ class ImageDeSerializationBenchmark {
   }
 
   def serializeImage(file: String): (Array[Byte], Observe) = {
-    val path = Paths.get(getClass.getResource(file).getPath)
-    val binaryData = Files.readAllBytes(path)
+    val path                           = Paths.get(getClass.getResource(file).getPath)
+    val binaryData                     = Files.readAllBytes(path)
     val imageKey: Key[ArrayData[Byte]] = ByteArrayKey.make("imageKey")
 
-    val binaryImgData: ArrayData[Byte] = ArrayData.fromArray(binaryData)
+    val binaryImgData: ArrayData[Byte]    = ArrayData.fromArray(binaryData)
     val param: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData withUnits pascal
 
-    val observe = Observe(Prefix("csw.originationPrefix"), CommandName(prefixStr), Some(obsId)).add(param)
+    val observe           = Observe(Prefix("csw.originationPrefix"), CommandName(prefixStr), Some(obsId)).add(param)
     val observeSerializer = serialization.findSerializerFor(observe)
 
     (observeSerializer.toBinary(observe), observe)

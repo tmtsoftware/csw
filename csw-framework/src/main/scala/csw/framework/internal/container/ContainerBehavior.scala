@@ -57,9 +57,9 @@ private[framework] final class ContainerBehavior(
 ) extends AbstractBehavior[ContainerActorMessage] {
 
   import ctx.executionContext
-  private val log: Logger = loggerFactory.getLogger(ctx)
+  private val log: Logger     = loggerFactory.getLogger(ctx)
   private val containerPrefix = Prefix(s"${Container.entryName}.${containerInfo.name}")
-  private val akkaConnection = AkkaConnection(ComponentId(containerInfo.name, ComponentType.Container))
+  private val akkaConnection  = AkkaConnection(ComponentId(containerInfo.name, ComponentType.Container))
   private val akkaRegistration: AkkaRegistration =
     registrationFactory.akkaTyped(akkaConnection, containerPrefix, ctx.self)
 
@@ -68,7 +68,7 @@ private[framework] final class ContainerBehavior(
 
   // Set of created supervisors which moved into Running state
   var runningComponents: Set[ActorRef[ComponentMessage]] = Set.empty
-  var lifecycleState: ContainerLifecycleState = ContainerLifecycleState.Idle
+  var lifecycleState: ContainerLifecycleState            = ContainerLifecycleState.Idle
 
   registerWithLocationService()
 

@@ -22,7 +22,7 @@ class MyActor extends Actor with ActorLogging {
 class AkkaLoggerTest extends LoggingTestSuite with FunSuiteLike with Matchers {
 
   test("logging framework should capture akka log messages and log it") {
-    val actorRef = ActorSystem("test1").actorOf(Props(new MyActor()), "my-actor")
+    val actorRef  = ActorSystem("test1").actorOf(Props(new MyActor()), "my-actor")
     val className = classOf[MyActor].getName
 
     actorRef ! "info"

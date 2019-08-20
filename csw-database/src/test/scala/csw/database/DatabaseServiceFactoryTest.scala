@@ -24,15 +24,15 @@ import scala.concurrent.ExecutionContext
 //DEOPSCSW-615: DB service accessible to CSW component developers
 class DatabaseServiceFactoryTest extends FunSuite with Matchers with BeforeAndAfterAll with HTTPLocationService {
   private implicit val typedSystem: ActorSystem[SpawnProtocol] = typed.ActorSystem(SpawnProtocol.behavior, "test")
-  private implicit val ec: ExecutionContext = typedSystem.executionContext
-  private implicit val mat: Materializer = ActorMaterializer()
+  private implicit val ec: ExecutionContext                    = typedSystem.executionContext
+  private implicit val mat: Materializer                       = ActorMaterializer()
 
-  private val dbName: String = "postgres"
-  private val port: Int = 5432
-  private val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient
-  private var postgres: EmbeddedPostgres = _
+  private val dbName: String                    = "postgres"
+  private val port: Int                         = 5432
+  private val locationService: LocationService  = HttpLocationServiceFactory.makeLocalClient
+  private var postgres: EmbeddedPostgres        = _
   private var dbFactory: DatabaseServiceFactory = _
-  private var testDsl: DSLContext = _
+  private var testDsl: DSLContext               = _
 
   override def beforeAll(): Unit = {
     postgres = DBTestHelper.postgres(port)

@@ -33,8 +33,8 @@ case class HttpCommandService(
 ) {
 
   implicit val sys: akka.actor.ActorSystem = system.toUntyped
-  implicit val mat: Materializer = ActorMaterializer()(system)
-  implicit val ec: ExecutionContext = system.executionContext
+  implicit val mat: Materializer           = ActorMaterializer()(system)
+  implicit val ec: ExecutionContext        = system.executionContext
 
   private val componentName = connection.componentId.name
   private val componentType = ComponentType.Service.name
@@ -62,7 +62,7 @@ case class HttpCommandService(
     maybeLocation match {
       case Some(loc) =>
         // For compatibility with ESW, use the following style URI
-        val uri = s"http://${loc.uri.getHost}:${loc.uri.getPort}/command/$componentType/$componentName/$method"
+        val uri  = s"http://${loc.uri.getHost}:${loc.uri.getPort}/command/$componentType/$componentName/$method"
         val json = Json.encode(controlCommand).toUtf8String
         val response = await(
           Http(sys).singleRequest(

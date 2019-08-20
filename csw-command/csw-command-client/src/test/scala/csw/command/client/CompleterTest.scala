@@ -16,9 +16,9 @@ class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll {
     val id1 = Id("1")
     val id2 = Id("2")
     val id3 = Id("3")
-    val r1 = Started(CommandName("1"), id1)
-    val r2 = Started(CommandName("2"), id2)
-    val r3 = Started(CommandName("3"), id3)
+    val r1  = Started(CommandName("1"), id1)
+    val r2  = Started(CommandName("2"), id2)
+    val r3  = Started(CommandName("3"), id3)
 
     val c1 = Completer(Set(r1, r2, r3))
 
@@ -37,9 +37,9 @@ class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll {
     val id1 = Id("1")
     val id2 = Id("2")
     val id3 = Id("3")
-    val r1 = Completed(CommandName("1"), id1)
-    val r2 = Started(CommandName("2"), id2)
-    val r3 = Completed(CommandName("3"), id3)
+    val r1  = Completed(CommandName("1"), id1)
+    val r2  = Started(CommandName("2"), id2)
+    val r3  = Completed(CommandName("3"), id3)
 
     val c1 = Completer(Set(r1, r2, r3))
 
@@ -56,8 +56,8 @@ class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll {
     val id1 = Id("1")
     val id2 = Id("2")
     val id3 = Id("3")
-    val r1 = Started(CommandName("1"), id1)
-    val r3 = Started(CommandName("3"), id3)
+    val r1  = Started(CommandName("1"), id1)
+    val r3  = Started(CommandName("3"), id3)
 
     val c1 = Completer(Set(r1, r3))
 
@@ -74,9 +74,9 @@ class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll {
     val id1 = Id("1")
     val id2 = Id("2")
     val id3 = Id("3")
-    val r1 = Started(CommandName("1"), id1)
-    val r2 = Started(CommandName("2"), id2)
-    val r3 = Started(CommandName("3"), id3)
+    val r1  = Started(CommandName("1"), id1)
+    val r2  = Started(CommandName("2"), id2)
+    val r3  = Started(CommandName("3"), id3)
 
     val c1 = Completer(Set(r1, r2, r3))
 
@@ -95,9 +95,9 @@ class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll {
     val id1 = Id("1")
     val id2 = Id("2")
     val id3 = Id("3")
-    val r1 = Completed(CommandName("1"), id1)
-    val r2 = Completed(CommandName("2"), id2)
-    val r3 = Completed(CommandName("3"), id3)
+    val r1  = Completed(CommandName("1"), id1)
+    val r2  = Completed(CommandName("2"), id2)
+    val r3  = Completed(CommandName("3"), id3)
 
     val c1 = Completer(Set(r1, r2, r3))
 
@@ -112,8 +112,8 @@ class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll {
   test("test with all already Error") {
     val id1 = Id("1")
     val id2 = Id("2")
-    val r1 = Error(CommandName("1"), id1, "Error")
-    val r2 = Error(CommandName("2"), id2, "Error")
+    val r1  = Error(CommandName("1"), id1, "Error")
+    val r2  = Error(CommandName("2"), id2, "Error")
 
     val c1 = Completer(Set(r1, r2))
 
@@ -126,8 +126,8 @@ class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll {
   test("test with one Invalid") {
     val id1 = Id("1")
     val id2 = Id("2")
-    val r1 = Started(CommandName("1"), id1)
-    val r2 = Invalid(CommandName("2"), id2, OtherIssue("TEST"))
+    val r1  = Started(CommandName("1"), id1)
+    val r2  = Invalid(CommandName("2"), id2, OtherIssue("TEST"))
 
     val c1 = Completer(Set(r1, r2))
 
@@ -141,8 +141,8 @@ class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll {
   test("test easy case where updating same response more than once") {
     val id1 = Id("1")
     val id2 = Id("2")
-    val r1 = Started(CommandName("1"), id1)
-    val r2 = Started(CommandName("2"), id2)
+    val r1  = Started(CommandName("1"), id1)
+    val r2  = Started(CommandName("2"), id2)
 
     val c1 = Completer(Set(r1, r2))
 

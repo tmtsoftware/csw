@@ -30,7 +30,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
 
   import cswCtx._
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
-  private val log = loggerFactory.getLogger
+  private val log                           = loggerFactory.getLogger
 
   //#worker-actor
   sealed trait WorkerCommand
@@ -55,9 +55,9 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   def handle(hcd: CommandService): Unit = {
 
     // Construct Setup command
-    val sleepTimeKey: Key[Long] = KeyType.LongKey.make("SleepTime")
+    val sleepTimeKey: Key[Long]         = KeyType.LongKey.make("SleepTime")
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
-    val setupCommand = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
+    val setupCommand                    = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
     // submit command and handle response
     hcd.submitAndWait(setupCommand).onComplete {
@@ -78,9 +78,9 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   def handleUsingAsync(hcd: CommandService): Unit = {
 
     // Construct Setup command
-    val sleepTimeKey: Key[Long] = KeyType.LongKey.make("SleepTime")
+    val sleepTimeKey: Key[Long]         = KeyType.LongKey.make("SleepTime")
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
-    val setupCommand = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
+    val setupCommand                    = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
     async {
       await(hcd.submitAndWait(setupCommand)) match {
@@ -98,9 +98,9 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   def handleUsingMap(hcd: CommandService): Unit = {
 
     // Construct Setup command
-    val sleepTimeKey: Key[Long] = KeyType.LongKey.make("SleepTime")
+    val sleepTimeKey: Key[Long]         = KeyType.LongKey.make("SleepTime")
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
-    val setupCommand = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
+    val setupCommand                    = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
     // Submit command, and handle validation response. Final response is returned as a Future
     val submitCommandResponseF: Future[SubmitResponse] = hcd.submitAndWait(setupCommand).map {
@@ -151,7 +151,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
 
   //#subscribe
   private val counterEventKey = EventKey(Prefix("nfiraos.samplehcd"), EventName("HcdCounter"))
-  private val hcdCounterKey = KeyType.IntKey.make("counter")
+  private val hcdCounterKey   = KeyType.IntKey.make("counter")
 
   private def processEvent(event: Event): Unit = {
     log.info(s"Event received: ${event.eventKey}")

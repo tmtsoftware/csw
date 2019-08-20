@@ -21,7 +21,7 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
     extends ComponentHandlers(ctx, cswCtx) {
   import cswCtx._
 
-  val log: Logger = loggerFactory.getLogger(ctx)
+  val log: Logger                   = loggerFactory.getLogger(ctx)
   implicit val ec: ExecutionContext = ctx.executionContext
 
   import SampleComponentState._

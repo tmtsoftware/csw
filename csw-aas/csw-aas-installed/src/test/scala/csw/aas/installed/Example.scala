@@ -16,7 +16,7 @@ import scala.concurrent.duration.DurationLong
 object Example extends App {
 
   private implicit val actorSystem: typed.ActorSystem[_] = ActorSystem(Behaviors.empty, "test")
-  private implicit val actorMaterializer: Materializer = ActorMaterializer()
+  private implicit val actorMaterializer: Materializer   = ActorMaterializer()
   import actorSystem._
 
   val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient

@@ -28,14 +28,14 @@ trait MockedAuthentication extends MockitoSugar {
   val securityDirectives = new SecurityDirectives(authentication, keycloakDeployment.getRealm, keycloakDeployment.getResourceName)
 
   val roleMissingTokenStr = "rolemissing"
-  val validTokenStr = "valid"
-  val invalidTokenStr = "invalid"
+  val validTokenStr       = "valid"
+  val invalidTokenStr     = "invalid"
 
   val preferredUserName = "root"
 
   val roleMissingToken: AccessToken = mock[AccessToken]
-  val validToken: AccessToken = mock[AccessToken]
-  val invalidToken: AccessToken = mock[AccessToken]
+  val validToken: AccessToken       = mock[AccessToken]
+  val invalidToken: AccessToken     = mock[AccessToken]
 
   private val authenticator: AsyncAuthenticator[AccessToken] = {
     case Provided(`roleMissingTokenStr`) => Future.successful(Some(roleMissingToken))
@@ -49,8 +49,8 @@ trait MockedAuthentication extends MockitoSugar {
   when(authentication.authenticator).thenReturn(authenticator)
 
   val roleMissingTokenHeader = Authorization(OAuth2BearerToken(roleMissingTokenStr))
-  val validTokenHeader = Authorization(OAuth2BearerToken(validTokenStr))
-  val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
+  val validTokenHeader       = Authorization(OAuth2BearerToken(validTokenStr))
+  val invalidTokenHeader     = Authorization(OAuth2BearerToken(invalidTokenStr))
 
   val factory: TokenFactory = mock[TokenFactory]
   when(factory.getToken).thenReturn(validTokenStr)

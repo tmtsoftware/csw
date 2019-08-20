@@ -39,7 +39,7 @@ private[csw] class AuthServiceLocation(locationService: LocationService) {
   private[csw] def register(authServicePort: Int): Future[RegistrationResult] = {
     val authServicePath = "auth"
     debug(s"registering aas with location service on port: $authServicePort and at path: $authServicePath")
-    val httpRegistration = HttpRegistration(AASConnection.value, authServicePort, authServicePath)
+    val httpRegistration   = HttpRegistration(AASConnection.value, authServicePort, authServicePath)
     val registrationResult = locationService.register(httpRegistration)
     debug("aas registered with location service")
     registrationResult

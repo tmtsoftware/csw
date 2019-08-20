@@ -20,7 +20,7 @@ import scala.concurrent.duration.DurationInt
 class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.config) with FunSuiteLike {
 
   private val manualTime = ManualTime()(system)
-  private val jitter = 10
+  private val jitter     = 10
 
 //  private implicit val system1: typed.ActorSystem[_] = typed.ActorSystem(Behavior.empty, "test")
   private val timeService = TimeServiceSchedulerFactory.make()
@@ -33,7 +33,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
     case (name, idealScheduleTime) =>
       test(s"[$name] should schedule task at start time") {
         val testProbe = TestProbe()(system.toUntyped)
-        val probeMsg = "echo"
+        val probeMsg  = "echo"
 
         val cancellable = timeService.scheduleOnce(idealScheduleTime())(testProbe.ref ! probeMsg)
         manualTime.timePasses(500.millis)
@@ -49,7 +49,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
   // DEOPSCSW-547: Cancel scheduled timers for periodic tasks
   test("[TAITime] should schedule a task periodically at given interval") {
     val buffer: ArrayBuffer[Int] = ArrayBuffer.empty
-    val atomicInt = new AtomicInteger(0)
+    val atomicInt                = new AtomicInteger(0)
     val cancellable: Cancellable = timeService.schedulePeriodically(Duration.ofMillis(100)) {
       buffer += atomicInt.getAndIncrement()
     }
@@ -62,8 +62,8 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
   // DEOPSCSW-547: Cancel scheduled timers for periodic tasks
   test("[TAITime] should schedule a task periodically at given interval after start time") {
     val buffer: ArrayBuffer[Int] = ArrayBuffer.empty
-    val atomicInt = new AtomicInteger(0)
-    val startTime: TAITime = new TAITime(TAITime.now().value.plusSeconds(1))
+    val atomicInt                = new AtomicInteger(0)
+    val startTime: TAITime       = new TAITime(TAITime.now().value.plusSeconds(1))
 
     val cancellable: Cancellable = timeService.schedulePeriodically(startTime, Duration.ofMillis(100)) {
       buffer += atomicInt.getAndIncrement()
@@ -79,12 +79,12 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
   test("should schedule multiple tasks at same start time") {
     // we do not want manual config in this test to compare start time with task execution time
     // hence separate instance of actor system is created here which does not use ManualConfig
-    val system = typed.ActorSystem(Behavior.empty, "test1")
+    val system      = typed.ActorSystem(Behavior.empty, "test1")
     val timeService = TimeServiceSchedulerFactory.make()(system)
-    val testProbe = scaladsl.TestProbe[UTCTime]("blah")(system)
+    val testProbe   = scaladsl.TestProbe[UTCTime]("blah")(system)
 
-    val startTime = UTCTime(UTCTime.now().value.plusSeconds(1))
-    val cancellable = timeService.scheduleOnce(startTime)(testProbe.ref ! UTCTime.now())
+    val startTime    = UTCTime(UTCTime.now().value.plusSeconds(1))
+    val cancellable  = timeService.scheduleOnce(startTime)(testProbe.ref ! UTCTime.now())
     val cancellable2 = timeService.scheduleOnce(startTime)(testProbe.ref ! UTCTime.now())
 
     val utcTime1 = testProbe.expectMessageType[UTCTime]
@@ -105,14 +105,14 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
   test("repeating task that also saves time") {
     // we do not want manual config in this test to compare start time with task execution time
     // hence separate instance of actor system is created here which does not use ManualConfig
-    val system = typed.ActorSystem(Behavior.empty, "test1")
+    val system      = typed.ActorSystem(Behavior.empty, "test1")
     val timeService = TimeServiceSchedulerFactory.make()(system)
-    val testProbe = scaladsl.TestProbe[UTCTime]()(system)
+    val testProbe   = scaladsl.TestProbe[UTCTime]()(system)
 
     val buffer: ArrayBuffer[Int] = ArrayBuffer.empty
 
-    val atomicInt = new AtomicInteger(0)
-    val startTime = UTCTime.now()
+    val atomicInt    = new AtomicInteger(0)
+    val startTime    = UTCTime.now()
     val offset: Long = 100L // milliseconds
     val cancellable: Cancellable = timeService.schedulePeriodically(Duration.ofMillis(offset)) {
       buffer += atomicInt.getAndIncrement()
@@ -142,14 +142,14 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
   test("repeating task that also saves time but with an offset") {
     // we do not want manual config in this test to compare start time with task execution time
     // hence separate instance of actor system is created here which does not use ManualConfig
-    val system = typed.ActorSystem(Behavior.empty, "test1")
+    val system      = typed.ActorSystem(Behavior.empty, "test1")
     val timeService = TimeServiceSchedulerFactory.make()(system)
-    val testProbe = scaladsl.TestProbe[UTCTime]()(system)
+    val testProbe   = scaladsl.TestProbe[UTCTime]()(system)
 
     val buffer: ArrayBuffer[Int] = ArrayBuffer.empty
 
-    val atomicInt = new AtomicInteger(0)
-    val startTime = UTCTime(UTCTime.now().value.plusSeconds(1L))
+    val atomicInt    = new AtomicInteger(0)
+    val startTime    = UTCTime(UTCTime.now().value.plusSeconds(1L))
     val offset: Long = 100L // milliseconds
     val cancellable: Cancellable = timeService.schedulePeriodically(startTime, Duration.ofMillis(offset)) {
       buffer += atomicInt.getAndIncrement()

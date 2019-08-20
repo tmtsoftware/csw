@@ -16,7 +16,7 @@ import scala.concurrent.duration.DurationInt
 
 class TimeServiceSchedulerPerfTest extends ScalaTestWithActorTestKit with FunSuiteLike with BeforeAndAfterAll {
 
-  private val sys = ActorSystem(Behaviors.empty, "test")
+  private val sys         = ActorSystem(Behaviors.empty, "test")
   private val timeService = TimeServiceSchedulerFactory.make()(sys)
 
   for (scenario <- TestSettings.all) {
@@ -38,20 +38,20 @@ class TimeServiceSchedulerPerfTest extends ScalaTestWithActorTestKit with FunSui
           val times = probe.receiveMessages(nTasks, 1.hour).map { t: UTCTime =>
             t
           }
-          val histogram = new Histogram(3)
+          val histogram               = new Histogram(3)
           val histogramForConsistency = new Histogram(3)
 
           times.zipWithIndex.toList.foreach {
             case (_, i) =>
-              val currentTime = times(i).value
+              val currentTime  = times(i).value
               val t1_s: Double = currentTime.getEpochSecond
-              val ns: Double = currentTime.getNano
-              val t1 = (t1_s * 1000 * 1000 * 1000) + ns
+              val ns: Double   = currentTime.getNano
+              val t1           = (t1_s * 1000 * 1000 * 1000) + ns
 
               val previousTime = if (i == 0) UTCTime(Instant.now) else times(i - 1)
               val t2_s: Double = previousTime.value.getEpochSecond
               val ns_2: Double = previousTime.value.getNano
-              val t2 = (t2_s * 1000 * 1000 * 1000) + ns_2
+              val t2           = (t2_s * 1000 * 1000 * 1000) + ns_2
 
               val diff = math.abs(((t1 - t2) - (offset * 1000 * 1000)) / 1000).toLong
               histogram.recordValue(diff)

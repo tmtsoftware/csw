@@ -24,10 +24,10 @@ import scala.util.{Failure, Success}
 class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
     extends ComponentHandlers(ctx, cswCtx) {
 
-  private implicit val timeout: Timeout = 10.seconds
+  private implicit val timeout: Timeout     = 10.seconds
   private implicit val ec: ExecutionContext = ctx.executionContext
-  private var hcdComponent: CommandService = _
-  private val assemblyPrefix = prefix
+  private var hcdComponent: CommandService  = _
+  private val assemblyPrefix                = prefix
 
   import cswCtx._
 
@@ -76,14 +76,14 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
 
   private def processLongRunningCommand(runId: Id, controlCommand: ControlCommand): Unit = {
     // Could be different components, can't actually submit parallel commands to an HCD
-    val shortSetup = Setup(assemblyPrefix, shortRunning, None)
+    val shortSetup  = Setup(assemblyPrefix, shortRunning, None)
     val mediumSetup = Setup(assemblyPrefix, mediumRunning, None)
-    val longSetup = Setup(assemblyPrefix, longRunning, None)
+    val longSetup   = Setup(assemblyPrefix, longRunning, None)
 
     // If doing serially, use submitAll
-    val long = hcdComponent.submit(longSetup)
+    val long   = hcdComponent.submit(longSetup)
     val medium = hcdComponent.submit(mediumSetup)
-    val short = hcdComponent.submit(shortSetup)
+    val short  = hcdComponent.submit(shortSetup)
 
     // sequence used here to issue commands in parallel
     Future.sequence(Set(long, medium, short)).onComplete {

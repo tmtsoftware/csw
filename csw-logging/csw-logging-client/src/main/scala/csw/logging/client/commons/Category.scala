@@ -13,6 +13,6 @@ private[csw] object Category extends Enum[Category] {
   override def values: immutable.IndexedSeq[Category] = findValues
 
   case object Common extends Category
-  case object Gc extends Category
-  case object Time extends Category
+  case object Gc     extends Category
+  case object Time   extends Category
 }

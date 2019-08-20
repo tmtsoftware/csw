@@ -24,9 +24,9 @@ import scala.concurrent.duration.{Duration, DurationDouble}
 object BenchmarkHelpers {
 
   def spawnStandaloneComponent(actorSystem: typed.ActorSystem[SpawnProtocol], config: Config): CommandService = {
-    val mat = scaladsl.ActorMaterializer()(actorSystem)
-    val locationService = HttpLocationServiceFactory.makeLocalClient(actorSystem, mat)
-    val wiring: FrameworkWiring = FrameworkWiring.make(actorSystem, locationService)
+    val mat                                                    = scaladsl.ActorMaterializer()(actorSystem)
+    val locationService                                        = HttpLocationServiceFactory.makeLocalClient(actorSystem, mat)
+    val wiring: FrameworkWiring                                = FrameworkWiring.make(actorSystem, locationService)
     implicit val typedSystem: typed.ActorSystem[SpawnProtocol] = actorSystem
 
     val probe = TestProbe[SupervisorLifecycleState]

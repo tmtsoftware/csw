@@ -22,8 +22,8 @@ import scala.concurrent.duration._
 class MainTest extends ScalaTestFrameworkTestKit with FunSuiteLike {
 
   implicit private val system: typed.ActorSystem[_] = typed.ActorSystem(Behaviors.empty, "test-system")
-  implicit private val mat: Materializer = ActorMaterializer()
-  private val locationService = HttpLocationServiceFactory.makeLocalClient
+  implicit private val mat: Materializer            = ActorMaterializer()
+  private val locationService                       = HttpLocationServiceFactory.makeLocalClient
 
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 100.millis)
 
@@ -50,10 +50,10 @@ class MainTest extends ScalaTestFrameworkTestKit with FunSuiteLike {
   }
 
   test("Test with config file") {
-    val name = "test2"
+    val name       = "test2"
     val configFile = ResourceReader.copyToTmp("/test2.conf").toFile
-    val config = ConfigFactory.parseFile(configFile)
-    val port = config.getInt("test2.port")
+    val config     = ConfigFactory.parseFile(configFile)
+    val port       = config.getInt("test2.port")
 
     val args = Array("--name", name, "--no-exit", configFile.getAbsolutePath)
     testWithTcp(args, name, port)
@@ -62,7 +62,7 @@ class MainTest extends ScalaTestFrameworkTestKit with FunSuiteLike {
   private def testWithTcp(args: Array[String], name: String, port: Int) = {
     val process = Main.start(args).get
 
-    val connection = TcpConnection(ComponentId(name, ComponentType.Service))
+    val connection       = TcpConnection(ComponentId(name, ComponentType.Service))
     val resolvedLocation = locationService.resolve(connection, 5.seconds).await.get
 
     resolvedLocation.connection shouldBe connection
@@ -75,7 +75,7 @@ class MainTest extends ScalaTestFrameworkTestKit with FunSuiteLike {
   private def testWithHttp(args: Array[String], name: String, port: Int, path: String) = {
     val process = Main.start(args).get
 
-    val connection = HttpConnection(ComponentId(name, ComponentType.Service))
+    val connection       = HttpConnection(ComponentId(name, ComponentType.Service))
     val resolvedLocation = locationService.resolve(connection, 5.seconds).await.get
 
     resolvedLocation.connection shouldBe connection

@@ -53,11 +53,11 @@ object DemoApp extends App {
   val frameworkWiring = FrameworkWiring.make(frameworkSystem)
 
   implicit val typedSystem: ActorSystem[SpawnProtocol] = frameworkWiring.actorSystem
-  implicit val testKitSettings: TestKitSettings = TestKitSettings(typedSystem)
+  implicit val testKitSettings: TestKitSettings        = TestKitSettings(typedSystem)
 
   private val cmdResponseProbe = TestProbe[OnewayResponse]
-  private val startLoggingCmd = CommandName("StartLogging")
-  private val prefix = Prefix("iris.command")
+  private val startLoggingCmd  = CommandName("StartLogging")
+  private val prefix           = Prefix("iris.command")
 
   private def startSeed() = {
     val loggingSystem = LoggingSystemFactory.start("logging", "version", Networks().hostname, typedSystem)
@@ -68,7 +68,7 @@ object DemoApp extends App {
 
   private def spawnContainer(): ActorRef[ContainerMessage] = {
 
-    val config = ConfigFactory.load("laser_container.conf")
+    val config       = ConfigFactory.load("laser_container.conf")
     val containerRef = Await.result(Container.spawn(config, frameworkWiring), 5.seconds)
 
     val containerStateProbe = TestProbe[ContainerLifecycleState]

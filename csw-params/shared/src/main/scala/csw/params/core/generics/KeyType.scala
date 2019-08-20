@@ -17,10 +17,10 @@ import scala.reflect.ClassTag
  * @tparam S the type of values that will sit against the key in Parameter
  */
 sealed class KeyType[S: ArrayEnc: ArrayDec] extends EnumEntry with Serializable {
-  override def hashCode: Int = toString.hashCode
+  override def hashCode: Int              = toString.hashCode
   override def equals(that: Any): Boolean = that.toString == this.toString
 
-  private[params] lazy val paramEncoder: Encoder[Parameter[S]] = ParamCodecs.paramCodec[S].encoder
+  private[params] lazy val paramEncoder: Encoder[Parameter[S]]     = ParamCodecs.paramCodec[S].encoder
   private[params] lazy val paramCoreDecoder: Decoder[ParamCore[S]] = ParamCodecs.paramCoreCodec[S].decoder
 }
 
@@ -84,41 +84,41 @@ object KeyType extends Enum[KeyType[_]] {
       new GChoiceKey(name, this, Choices(restChoices.toSet + firstChoice))
   }
 
-  case object StringKey extends SimpleKeyType[String]
-  case object StructKey extends SimpleKeyType[Struct]
+  case object StringKey  extends SimpleKeyType[String]
+  case object StructKey  extends SimpleKeyType[Struct]
   case object UTCTimeKey extends SimpleKeyTypeWithUnits[UTCTime](second)
   case object TAITimeKey extends SimpleKeyTypeWithUnits[TAITime](second)
 
-  case object RaDecKey extends SimpleKeyType[RaDec]
-  case object EqCoordKey extends SimpleKeyType[EqCoord]
+  case object RaDecKey            extends SimpleKeyType[RaDec]
+  case object EqCoordKey          extends SimpleKeyType[EqCoord]
   case object SolarSystemCoordKey extends SimpleKeyType[SolarSystemCoord]
   case object MinorPlanetCoordKey extends SimpleKeyType[MinorPlanetCoord]
-  case object CometCoordKey extends SimpleKeyType[CometCoord]
-  case object AltAzCoordKey extends SimpleKeyType[AltAzCoord]
-  case object CoordKey extends SimpleKeyType[Coord]
+  case object CometCoordKey       extends SimpleKeyType[CometCoord]
+  case object AltAzCoordKey       extends SimpleKeyType[AltAzCoord]
+  case object CoordKey            extends SimpleKeyType[Coord]
 
   //scala
   case object BooleanKey extends SimpleKeyType[Boolean]
-  case object CharKey extends SimpleKeyType[Char]
+  case object CharKey    extends SimpleKeyType[Char]
 
-  case object ByteKey extends SimpleKeyType[Byte]
-  case object ShortKey extends SimpleKeyType[Short]
-  case object LongKey extends SimpleKeyType[Long]
-  case object IntKey extends SimpleKeyType[Int]
-  case object FloatKey extends SimpleKeyType[Float]
+  case object ByteKey   extends SimpleKeyType[Byte]
+  case object ShortKey  extends SimpleKeyType[Short]
+  case object LongKey   extends SimpleKeyType[Long]
+  case object IntKey    extends SimpleKeyType[Int]
+  case object FloatKey  extends SimpleKeyType[Float]
   case object DoubleKey extends SimpleKeyType[Double]
 
-  case object ByteArrayKey extends ArrayKeyType[Byte]
-  case object ShortArrayKey extends ArrayKeyType[Short]
-  case object LongArrayKey extends ArrayKeyType[Long]
-  case object IntArrayKey extends ArrayKeyType[Int]
-  case object FloatArrayKey extends ArrayKeyType[Float]
+  case object ByteArrayKey   extends ArrayKeyType[Byte]
+  case object ShortArrayKey  extends ArrayKeyType[Short]
+  case object LongArrayKey   extends ArrayKeyType[Long]
+  case object IntArrayKey    extends ArrayKeyType[Int]
+  case object FloatArrayKey  extends ArrayKeyType[Float]
   case object DoubleArrayKey extends ArrayKeyType[Double]
 
-  case object ByteMatrixKey extends MatrixKeyType[Byte]
-  case object ShortMatrixKey extends MatrixKeyType[Short]
-  case object LongMatrixKey extends MatrixKeyType[Long]
-  case object IntMatrixKey extends MatrixKeyType[Int]
-  case object FloatMatrixKey extends MatrixKeyType[Float]
+  case object ByteMatrixKey   extends MatrixKeyType[Byte]
+  case object ShortMatrixKey  extends MatrixKeyType[Short]
+  case object LongMatrixKey   extends MatrixKeyType[Long]
+  case object IntMatrixKey    extends MatrixKeyType[Int]
+  case object FloatMatrixKey  extends MatrixKeyType[Float]
   case object DoubleMatrixKey extends MatrixKeyType[Double]
 }

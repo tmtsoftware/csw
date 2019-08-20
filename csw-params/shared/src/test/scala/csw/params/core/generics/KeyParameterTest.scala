@@ -46,7 +46,7 @@ class KeyParameterTest extends FunSpec with Matchers {
   describe("test booleanKey") {
 
     val tval = false
-    val bk = KeyType.BooleanKey.make(s1)
+    val bk   = KeyType.BooleanKey.make(s1)
 
     it("should allow single val") {
       val ii = bk.set(tval)
@@ -75,7 +75,7 @@ class KeyParameterTest extends FunSpec with Matchers {
 
   describe("test charItem") {
     val tval = 'K'
-    val lk = KeyType.CharKey.make(s1)
+    val lk   = KeyType.CharKey.make(s1)
 
     it("should allow single val") {
       val li = lk.set(tval)
@@ -105,7 +105,7 @@ class KeyParameterTest extends FunSpec with Matchers {
   // DEOPSCSW-186: Binary value payload
   describe("test ByteItem") {
     val tval: Byte = 123
-    val lk = KeyType.ByteKey.make(s1)
+    val lk         = KeyType.ByteKey.make(s1)
 
     it("should allow single val") {
       val li = lk.set(tval)
@@ -139,7 +139,7 @@ class KeyParameterTest extends FunSpec with Matchers {
 
     val la1 = ArrayData(a1)
     val la2 = ArrayData(a2)
-    val lk = KeyType.ByteArrayKey.make(s1)
+    val lk  = KeyType.ByteArrayKey.make(s1)
 
     it("should test single item") {
       val di: Parameter[ArrayData[Byte]] = lk.set(la1)
@@ -198,7 +198,7 @@ class KeyParameterTest extends FunSpec with Matchers {
 
     val lm1 = MatrixData.fromArrays(m1)
     val lm2 = MatrixData.fromArrays(m2)
-    val dk = ByteMatrixKey.make(s1)
+    val dk  = ByteMatrixKey.make(s1)
 
     it("should work with a single item") {
       val di = dk.set(lm1)
@@ -253,7 +253,7 @@ class KeyParameterTest extends FunSpec with Matchers {
 
   describe("test ShortItem") {
     val tval: Short = 1234
-    val lk = KeyType.ShortKey.make(s1)
+    val lk          = KeyType.ShortKey.make(s1)
 
     it("should allow single val") {
       val li = lk.set(tval)
@@ -286,7 +286,7 @@ class KeyParameterTest extends FunSpec with Matchers {
 
     val la1 = ArrayData(a1)
     val la2 = ArrayData(a2)
-    val lk = KeyType.ShortArrayKey.make(s1)
+    val lk  = KeyType.ShortArrayKey.make(s1)
 
     it("should test single item") {
       val di = lk.set(la1)
@@ -340,7 +340,7 @@ class KeyParameterTest extends FunSpec with Matchers {
 
     val lm1 = MatrixData.fromArrays(m1)
     val lm2 = MatrixData.fromArrays(m2)
-    val dk = ShortMatrixKey.make(s1)
+    val dk  = ShortMatrixKey.make(s1)
 
     it("should work with a single item") {
       val di = dk.set(lm1)
@@ -390,7 +390,7 @@ class KeyParameterTest extends FunSpec with Matchers {
 
   describe("test IntItem") {
     val tval: Int = 1234
-    val lk = KeyType.IntKey.make(s1)
+    val lk        = KeyType.IntKey.make(s1)
 
     it("should allow single val") {
       val li = lk.set(tval)
@@ -423,7 +423,7 @@ class KeyParameterTest extends FunSpec with Matchers {
 
     val la1 = ArrayData(a1)
     val la2 = ArrayData(a2)
-    val lk = KeyType.IntArrayKey.make(s1)
+    val lk  = KeyType.IntArrayKey.make(s1)
 
     it("should test single item") {
       val di = lk.set(la1)
@@ -477,7 +477,7 @@ class KeyParameterTest extends FunSpec with Matchers {
 
     val lm1 = MatrixData.fromArrays(m1)
     val lm2 = MatrixData.fromArrays(m2)
-    val dk = IntMatrixKey.make(s1)
+    val dk  = IntMatrixKey.make(s1)
 
     it("should work with a single item") {
       val di = dk.set(lm1)
@@ -526,7 +526,7 @@ class KeyParameterTest extends FunSpec with Matchers {
   }
 
   describe("test longKey") {
-    val lval = 1234L
+    val lval          = 1234L
     val lk: Key[Long] = KeyType.LongKey.make(s1)
 
     it("should allow single val") {
@@ -556,8 +556,8 @@ class KeyParameterTest extends FunSpec with Matchers {
     val a1: Array[Long] = Array(1, 2, 3, 4, 5)
     val a2: Array[Long] = Array(10, 20, 30, 40, 50)
 
-    val la1: ArrayData[Long] = ArrayData(a1)
-    val la2: ArrayData[Long] = ArrayData(a2)
+    val la1: ArrayData[Long]     = ArrayData(a1)
+    val la2: ArrayData[Long]     = ArrayData(a2)
     val lk: Key[ArrayData[Long]] = KeyType.LongArrayKey.make(s1)
 
     it("should test single item") {
@@ -610,8 +610,8 @@ class KeyParameterTest extends FunSpec with Matchers {
     val m1: Array[Array[Long]] = Array(Array(1, 2, 3), Array(4, 5, 6), Array(7, 8, 9))
     val m2: Array[Array[Long]] = Array(Array(1, 2, 3, 4, 5), Array(10, 20, 30, 40, 50))
 
-    val lm1: MatrixData[Long] = MatrixData.fromArrays(m1)
-    val lm2: MatrixData[Long] = MatrixData.fromArrays(m2)
+    val lm1: MatrixData[Long]     = MatrixData.fromArrays(m1)
+    val lm2: MatrixData[Long]     = MatrixData.fromArrays(m2)
     val dk: Key[MatrixData[Long]] = LongMatrixKey.make(s1)
 
     it("should work with a single item") {
@@ -662,7 +662,7 @@ class KeyParameterTest extends FunSpec with Matchers {
 
   describe("test floatItem") {
     val tval: Float = 123.456f
-    val lk = KeyType.FloatKey.make(s1)
+    val lk          = KeyType.FloatKey.make(s1)
 
     it("should allow single val") {
       val li = lk.set(tval)
@@ -694,7 +694,7 @@ class KeyParameterTest extends FunSpec with Matchers {
 
     val la1 = ArrayData(a1)
     val la2 = ArrayData(a2)
-    val lk = KeyType.FloatArrayKey.make(s1)
+    val lk  = KeyType.FloatArrayKey.make(s1)
 
     it("should test single item") {
       val di = lk.set(la1)
@@ -748,7 +748,7 @@ class KeyParameterTest extends FunSpec with Matchers {
 
     val lm1 = MatrixData.fromArrays(m1)
     val lm2 = MatrixData.fromArrays(m2)
-    val dk = FloatMatrixKey.make(s1)
+    val dk  = FloatMatrixKey.make(s1)
 
     it("should work with a single item") {
       val di = dk.set(lm1)
@@ -798,7 +798,7 @@ class KeyParameterTest extends FunSpec with Matchers {
 
   describe("test doubleItem") {
     val tval: Double = 123.456
-    val lk = KeyType.DoubleKey.make(s1)
+    val lk           = KeyType.DoubleKey.make(s1)
 
     it("should allow single val") {
       val li = lk.set(tval)
@@ -830,7 +830,7 @@ class KeyParameterTest extends FunSpec with Matchers {
 
     val la1 = ArrayData(a1)
     val la2 = ArrayData(a2)
-    val lk = KeyType.DoubleArrayKey.make(s1)
+    val lk  = KeyType.DoubleArrayKey.make(s1)
 
     it("should test single item") {
       val di = lk.set(la1)
@@ -884,7 +884,7 @@ class KeyParameterTest extends FunSpec with Matchers {
 
     val lm1 = MatrixData.fromArrays(m1)
     val lm2 = MatrixData.fromArrays(m2)
-    val dk = DoubleMatrixKey.make(s1)
+    val dk  = DoubleMatrixKey.make(s1)
 
     it("should work with a single item") {
       val di = dk.set(lm1)
@@ -935,7 +935,7 @@ class KeyParameterTest extends FunSpec with Matchers {
   //DEOPSCSW-282: Add a timestamp Key and Parameter
   //DEOPSCSW-661: Create UTCTimeKey and TAITimeKey replacing TimestampKey in Protobuf parameters
   describe("test UTCTimeItems") {
-    val utcTimeValue: UTCTime = UTCTime.now()
+    val utcTimeValue: UTCTime    = UTCTime.now()
     val utcTimeKey: Key[UTCTime] = KeyType.UTCTimeKey.make(s1)
 
     it("should allow create a Timestamp parameter from a timestamp key") {
@@ -981,7 +981,7 @@ class KeyParameterTest extends FunSpec with Matchers {
 
   //DEOPSCSW-661: Create UTCTimeKey and TAITimeKey replacing TimestampKey in Protobuf parameters
   describe("test TAITimeItems") {
-    val taiTimeValue: TAITime = TAITime.now()
+    val taiTimeValue: TAITime    = TAITime.now()
     val taiTimeKey: Key[TAITime] = KeyType.TAITimeKey.make(s1)
 
     it("should allow create a Timestamp parameter from a timestamp key") {
@@ -1055,10 +1055,10 @@ class KeyParameterTest extends FunSpec with Matchers {
     it("should allow creation with individual Choice items") {
       // Now create with individual Choice items
       val uninitialized = Choice("uninitialized")
-      val ready = Choice("ready")
-      val busy = Choice("busy")
-      val continuous = Choice("continuous")
-      val error = Choice("error")
+      val ready         = Choice("ready")
+      val busy          = Choice("busy")
+      val continuous    = Choice("continuous")
+      val error         = Choice("error")
 
       val cmd = ChoiceKey.make("cmd", uninitialized, ready, busy, continuous, error)
       cmd.choices should be(Choices(Set(uninitialized, ready, busy, continuous, error)))
@@ -1071,9 +1071,9 @@ class KeyParameterTest extends FunSpec with Matchers {
 
   describe("test raDecKey") {
 
-    val keyName = "raDecKey"
-    val raDec1 = RaDec(1.0, 2.0)
-    val raDec2 = RaDec(3.0, 4.0)
+    val keyName  = "raDecKey"
+    val raDec1   = RaDec(1.0, 2.0)
+    val raDec2   = RaDec(3.0, 4.0)
     val raDecKey = KeyType.RaDecKey.make(keyName)
 
     it("should allow single val") {
@@ -1103,14 +1103,14 @@ class KeyParameterTest extends FunSpec with Matchers {
     import Angle._
     import Coords._
     it("Should allow coordinate types") {
-      val basePosKey = CoordKey.make("BasePosition")
-      val pm = ProperMotion(0.5, 2.33)
-      val eqCoord = EqCoord(ra = "12:13:14.15", dec = "-30:31:32.3", frame = FK5, pmx = pm.pmx, pmy = pm.pmy)
+      val basePosKey       = CoordKey.make("BasePosition")
+      val pm               = ProperMotion(0.5, 2.33)
+      val eqCoord          = EqCoord(ra = "12:13:14.15", dec = "-30:31:32.3", frame = FK5, pmx = pm.pmx, pmy = pm.pmy)
       val solarSystemCoord = SolarSystemCoord(Tag("BASE"), Venus)
       val minorPlanetCoord = MinorPlanetCoord(Tag("GUIDER1"), 2000, 90.degree, 2.degree, 100.degree, 1.4, 0.234, 220.degree)
-      val cometCoord = CometCoord(Tag("BASE"), 2000.0, 90.degree, 2.degree, 100.degree, 1.4, 0.234)
-      val altAzCoord = AltAzCoord(Tag("BASE"), 301.degree, 42.5.degree)
-      val posParam = basePosKey.set(eqCoord, solarSystemCoord, minorPlanetCoord, cometCoord, altAzCoord)
+      val cometCoord       = CometCoord(Tag("BASE"), 2000.0, 90.degree, 2.degree, 100.degree, 1.4, 0.234)
+      val altAzCoord       = AltAzCoord(Tag("BASE"), 301.degree, 42.5.degree)
+      val posParam         = basePosKey.set(eqCoord, solarSystemCoord, minorPlanetCoord, cometCoord, altAzCoord)
 
       assert(posParam.values.length == 5)
       assert(posParam.values(0) == eqCoord)
@@ -1123,7 +1123,7 @@ class KeyParameterTest extends FunSpec with Matchers {
 
   describe("test stringKey") {
 
-    val keyName = "stringKey"
+    val keyName   = "stringKey"
     val stringKey = KeyType.StringKey.make(keyName)
 
     it("should allow single val") {
@@ -1153,10 +1153,10 @@ class KeyParameterTest extends FunSpec with Matchers {
     it("should allow creating Struct items") {
       val skey = StructKey.make("myStruct")
 
-      val ra = KeyType.StringKey.make("ra")
-      val dec = KeyType.StringKey.make("dec")
+      val ra    = KeyType.StringKey.make("ra")
+      val dec   = KeyType.StringKey.make("dec")
       val epoch = KeyType.DoubleKey.make("epoch")
-      val sc1 = Struct().madd(ra.set("12:13:14.1"), dec.set("32:33:34.4"), epoch.set(1950.0))
+      val sc1   = Struct().madd(ra.set("12:13:14.1"), dec.set("32:33:34.4"), epoch.set(1950.0))
 
       val citem = skey.set(sc1)
 

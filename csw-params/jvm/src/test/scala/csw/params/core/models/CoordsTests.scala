@@ -81,7 +81,7 @@ class CoordsTests extends FunSpec with Matchers {
 
     it("should convert frame to/from JSON") {
       val f1: EqFrame = ICRS
-      val j1 = JsonSupport.writes(f1)
+      val j1          = JsonSupport.writes(f1)
       JsonSupport.reads[EqFrame](j1) shouldEqual ICRS
     }
 
@@ -124,7 +124,7 @@ class CoordsTests extends FunSpec with Matchers {
       // Check EqCoordinate
       val eq = EqCoord(ra = 180.0, frame = FK5, dec = 32.0, pmx = pm.pmx, pmy = pm.pmy)
 
-      val js = JsonSupport.writes(eq)
+      val js   = JsonSupport.writes(eq)
       val eqIn = JsonSupport.reads[EqCoord](js)
       eqIn shouldBe eq
     }
@@ -134,16 +134,16 @@ class CoordsTests extends FunSpec with Matchers {
       // Check EqCoordinate
       val eq = EqCoord(ra = 180.0, frame = FK5, dec = 32.0, pmx = pm.pmx, pmy = pm.pmy)
 
-      val baseKey = EqCoordKey.make("BasePosition")
+      val baseKey  = EqCoordKey.make("BasePosition")
       val posParam = baseKey.set(eq)
 
       val paramOut = JsonSupport.writes(posParam)
-      val paramIn = JsonSupport.reads[Parameter[EqCoord]](paramOut)
+      val paramIn  = JsonSupport.reads[Parameter[EqCoord]](paramOut)
       paramIn shouldEqual posParam
 
       val setup: Setup = Setup(src, CommandName("test"), None).add(posParam)
-      val setupOut = JsonSupport.writeSequenceCommand(setup)
-      val setupIn = JsonSupport.readSequenceCommand[Setup](setupOut)
+      val setupOut     = JsonSupport.writeSequenceCommand(setup)
+      val setupIn      = JsonSupport.readSequenceCommand[Setup](setupOut)
 
       setupIn shouldEqual setup
     }
@@ -153,17 +153,17 @@ class CoordsTests extends FunSpec with Matchers {
       // Check EqCoordinate
       val eq = EqCoord(ra = 180.0, frame = FK5, dec = 32.0, pmx = pm.pmx, pmy = pm.pmy)
 
-      val baseKey = CoordKey.make("BasePosition")
+      val baseKey  = CoordKey.make("BasePosition")
       val posParam = baseKey.set(eq)
 
       val paramOut = JsonSupport.writes(posParam)
-      val paramIn = JsonSupport.reads[Parameter[Coord]](paramOut)
+      val paramIn  = JsonSupport.reads[Parameter[Coord]](paramOut)
       paramIn shouldEqual posParam
 
       val setup: Setup = Setup(src, CommandName("test"), None).add(posParam)
 
       val setupOut = JsonSupport.writeSequenceCommand(setup)
-      val setupIn = JsonSupport.readSequenceCommand[Setup](setupOut)
+      val setupIn  = JsonSupport.readSequenceCommand[Setup](setupOut)
 
       setupIn shouldEqual setup
     }
@@ -236,7 +236,7 @@ class CoordsTests extends FunSpec with Matchers {
       findTagInParameter(targets, BASE) shouldEqual Some(c0)
 
       val obsMode = obsModeKey.set("IRIS LGS Mode 1")
-      val setup = Setup(src, CommandName("slewAndFollow"), None).madd(obsMode, targets)
+      val setup   = Setup(src, CommandName("slewAndFollow"), None).madd(obsMode, targets)
 
       val setupTargets = setup.get(coordKey).get
       findTagInParameter(setupTargets, OIWFS2) shouldEqual Some(c2)
@@ -247,9 +247,9 @@ class CoordsTests extends FunSpec with Matchers {
     it("Create multiple positions in individual params for each major type: base, oiwfs, guide") {
       val obsModeKey = StringKey.make("obsmode")
 
-      val baseKey = CoordKey.make("BasePosition")
-      val oiwfsKey = CoordKey.make("OIWFSPositions")
-      val odgwKey = CoordKey.make("ODGWPositions")
+      val baseKey   = CoordKey.make("BasePosition")
+      val oiwfsKey  = CoordKey.make("OIWFSPositions")
+      val odgwKey   = CoordKey.make("ODGWPositions")
       val guiderKey = CoordKey.make("GuiderPositions")
 
       val c0 = EqCoord("12:32:45", "+45:17:50", tag = BASE, frame = FK5, pmx = 0.9, pmy = -0.4)

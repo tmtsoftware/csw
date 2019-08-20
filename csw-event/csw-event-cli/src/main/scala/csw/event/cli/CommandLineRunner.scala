@@ -41,7 +41,7 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
   }
 
   def publish(options: Options): Future[Done] = async {
-    val event = await(getEvent(options.eventKey, options.eventData))
+    val event        = await(getEvent(options.eventKey, options.eventData))
     val updatedEvent = updateEventParams(event, options.params)
 
     options.maybeInterval match {
@@ -51,7 +51,7 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
   }
 
   def subscribe(options: Options)(implicit mat: Materializer): (EventSubscription, Future[Done]) = {
-    val keys = options.eventsMap.keys.toSet
+    val keys        = options.eventsMap.keys.toSet
     val subscriberF = eventService.defaultSubscriber
 
     val eventStream = options.maybeInterval match {
@@ -79,7 +79,7 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
   private def processGetJson(event: Event, options: Options): Unit = {
     if (event.isInvalid) printLine(Formatter.invalidKey(event.eventKey))
     else {
-      val paths = options.paths(event.eventKey)
+      val paths                = options.paths(event.eventKey)
       val transformedEventJson = EventTransformer.transform(event, paths)
       printLine(Json.prettyPrint(JsonSupport.writeEvent(transformedEventJson)))
     }
@@ -118,7 +118,7 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
   }
 
   private def publishEvent(event: Event): Future[Done] = {
-    val publisher = eventService.defaultPublisher
+    val publisher     = eventService.defaultPublisher
     val publishResult = publisher.publish(event)
     publishResult.onComplete {
       case Success(_) => printLine(s"[SUCCESS] Event [${event.eventKey}] published successfully")

@@ -8,13 +8,13 @@ import csw.params.javadsl.JKeyType
 import csw.time.core.models.UTCTime
 
 object Utils {
-  val prefix = Prefix("csw.prefix")
-  val eventName = EventName("system")
-  val event = SystemEvent(prefix, eventName)
+  val prefix                  = Prefix("csw.prefix")
+  val eventName               = EventName("system")
+  val event                   = SystemEvent(prefix, eventName)
   val timeNanosKey: Key[Long] = LongKey.make("eventTime")
 
   private val jParam: Parameter[Integer] = JKeyType.IntKey.make("counter").set(1)
-  private val param: Parameter[Int] = IntKey.make("counter").set(1)
+  private val param: Parameter[Int]      = IntKey.make("counter").set(1)
 
   def makeEvent(id: Int): Event = event.copy(
     eventId = Id(id.toString),

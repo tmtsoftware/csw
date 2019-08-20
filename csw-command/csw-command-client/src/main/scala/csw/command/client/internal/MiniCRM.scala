@@ -10,24 +10,24 @@ import scala.collection.mutable.ListBuffer
 
 object MiniCRM {
 
-  type Responses = List[SubmitResponse]
-  type Starters = List[QueryResponse]
-  type Waiters = List[(Id, ActorRef[SubmitResponse])]
+  type Responses            = List[SubmitResponse]
+  type Starters             = List[QueryResponse]
+  type Waiters              = List[(Id, ActorRef[SubmitResponse])]
   private type ResponseList = SizedList[SubmitResponse]
-  private type StartedList = SizedList[SubmitResponse]
-  private type WaiterList = SizedList[(Id, ActorRef[SubmitResponse])]
+  private type StartedList  = SizedList[SubmitResponse]
+  private type WaiterList   = SizedList[(Id, ActorRef[SubmitResponse])]
 
   sealed trait CRMMessage
   object MiniCRMMessage {
-    case class AddResponse(commandResponse: SubmitResponse) extends CRMMessage
-    case class AddStarted(startedResponse: Started) extends CRMMessage
+    case class AddResponse(commandResponse: SubmitResponse)             extends CRMMessage
+    case class AddStarted(startedResponse: Started)                     extends CRMMessage
     case class QueryFinal(runId: Id, replyTo: ActorRef[SubmitResponse]) extends CRMMessage
-    case class Query(runId: Id, replyTo: ActorRef[QueryResponse]) extends CRMMessage
+    case class Query(runId: Id, replyTo: ActorRef[QueryResponse])       extends CRMMessage
 
-    case class Print(replyTo: ActorRef[String]) extends CRMMessage
-    case class GetResponses(replyTo: ActorRef[List[SubmitResponse]]) extends CRMMessage
+    case class Print(replyTo: ActorRef[String])                                    extends CRMMessage
+    case class GetResponses(replyTo: ActorRef[List[SubmitResponse]])               extends CRMMessage
     case class GetWaiters(replyTo: ActorRef[List[(Id, ActorRef[SubmitResponse])]]) extends CRMMessage
-    case class GetStarters(replTo: ActorRef[List[SubmitResponse]]) extends CRMMessage
+    case class GetStarters(replTo: ActorRef[List[SubmitResponse]])                 extends CRMMessage
   }
   import MiniCRMMessage._
 

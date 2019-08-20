@@ -30,10 +30,10 @@ private[event] class KafkaPublisher(producerSettings: Future[ProducerSettings[St
     mat: Materializer
 ) extends EventPublisher {
 
-  private val parallelism = 1
+  private val parallelism                         = 1
   private val defaultInitialDelay: FiniteDuration = 0.millis
-  private val kafkaProducer = producerSettings.map(_.createKafkaProducer())
-  private val eventPublisherUtil = new EventPublisherUtil()
+  private val kafkaProducer                       = producerSettings.map(_.createKafkaProducer())
+  private val eventPublisherUtil                  = new EventPublisherUtil()
 
   private val streamTermination: Future[Done] = eventPublisherUtil.streamTermination(publishInternal)
 

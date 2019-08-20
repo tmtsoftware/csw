@@ -5,7 +5,7 @@ import redis.embedded.{RedisSentinel, RedisServer}
 
 trait EmbeddedRedis {
 
-  type ServerPort = Int
+  type ServerPort   = Int
   type SentinelPort = Int
 
   def withRedis[T](port: Int = getFreePort)(f: ServerPort => T): T = {
@@ -22,7 +22,7 @@ trait EmbeddedRedis {
       masterId: String
   )(f: (SentinelPort, ServerPort) => T): (T, RedisSentinel, RedisServer) = {
     val (sentinel, server) = startSentinel(sentinelPort, serverPort, masterId)
-    val result = f(sentinelPort, serverPort)
+    val result             = f(sentinelPort, serverPort)
     (result, sentinel, server)
   }
 

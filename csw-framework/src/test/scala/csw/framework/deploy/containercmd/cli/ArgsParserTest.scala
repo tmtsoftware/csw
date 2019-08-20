@@ -25,19 +25,19 @@ class ArgsParserTest extends org.scalatest.FunSuite with Matchers with BeforeAnd
     }
 
   test("should parse arguments when all arguments are provided") {
-    val args = Array("--standalone", "--local", inputFilePath)
+    val args                     = Array("--standalone", "--local", inputFilePath)
     val options: Option[Options] = silentParse(args)
     options should contain(Options(standalone = true, local = true, Some(Paths.get(inputFilePath))))
   }
 
   test("should parse arguments with default value of false when standalone option is not provided") {
-    val args = Array("--local", inputFilePath)
+    val args                     = Array("--local", inputFilePath)
     val options: Option[Options] = silentParse(args)
     options should contain(Options(standalone = false, local = true, Some(Paths.get(inputFilePath))))
   }
 
   test("should parse arguments with default value of false when local option is not provided") {
-    val args = Array("--standalone", inputFilePath)
+    val args                     = Array("--standalone", inputFilePath)
     val options: Option[Options] = silentParse(args)
     options should contain(Options(standalone = true, local = false, Some(Paths.get(inputFilePath))))
   }

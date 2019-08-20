@@ -18,7 +18,7 @@ import scala.collection.mutable
 
 // DEOPSCSW-649: Fixed directory configuration for multi JVM scenario
 class TimingTest extends LoggingTestSuite with Timing {
-  private val logFileDir = Paths.get("/tmp/csw-test-logs/").toFile
+  private val logFileDir        = Paths.get("/tmp/csw-test-logs/").toFile
   private val loggingSystemName = "TimingTest"
 
   override lazy val actorSystem = ActorSystem(SpawnProtocol.behavior, "timing-test-system")
@@ -27,7 +27,7 @@ class TimingTest extends LoggingTestSuite with Timing {
 
   private val irisActorRef = actorSystem.spawn(IRIS.behavior(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
 
-  private val fileTimestamp = FileAppender.decideTimestampForFile(ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC)))
+  private val fileTimestamp   = FileAppender.decideTimestampForFile(ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC)))
   private val timeLogFilePath = s"$logFileDir/${loggingSystemName}_${fileTimestamp}_time.log"
   private val testLogFilePath = s"$logFileDir/${loggingSystemName}_$fileTimestamp.log"
 
@@ -51,9 +51,9 @@ class TimingTest extends LoggingTestSuite with Timing {
     irisActorRef ! LogFatal
   }
 
-  private val timerTestRegionName = "Timer-Test"
+  private val timerTestRegionName        = "Timer-Test"
   private val startEndTimeTestRegionName = "Start-End-Time-Test"
-  private val timerRegionQueue = mutable.Queue[String](timerTestRegionName, startEndTimeTestRegionName)
+  private val timerRegionQueue           = mutable.Queue[String](timerTestRegionName, startEndTimeTestRegionName)
 
   def logMessagesWithTimer(): Unit =
     Time(RequestId(), timerTestRegionName) {
@@ -61,7 +61,7 @@ class TimingTest extends LoggingTestSuite with Timing {
     }
 
   def logMessagesWithStartAndEndTimer(): Unit = {
-    val id = RequestId()
+    val id         = RequestId()
     val startToken = time.start(id, startEndTimeTestRegionName)
     sendLogMsgToIRISActor()
     time.end(id, startEndTimeTestRegionName, startToken)

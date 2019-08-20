@@ -46,11 +46,11 @@ private[config] class ConfigClient(
   import actorRuntime._
 
   private def configUri(path: jnio.Path): Future[Uri] = baseUri(Path / "config" ++ Path / Path(path.toString))
-  private def activeConfig(path: jnio.Path) = baseUri(Path / "active-config" ++ Path / Path(path.toString))
-  private def activeConfigVersion(path: jnio.Path) = baseUri(Path / "active-version" ++ Path / Path(path.toString))
-  private def historyUri(path: jnio.Path) = baseUri(Path / "history" ++ Path / Path(path.toString))
-  private def historyActiveUri(path: jnio.Path) = baseUri(Path / "history-active" ++ Path / Path(path.toString))
-  private def metadataUri = baseUri(Path / "metadata")
+  private def activeConfig(path: jnio.Path)           = baseUri(Path / "active-config" ++ Path / Path(path.toString))
+  private def activeConfigVersion(path: jnio.Path)    = baseUri(Path / "active-version" ++ Path / Path(path.toString))
+  private def historyUri(path: jnio.Path)             = baseUri(Path / "history" ++ Path / Path(path.toString))
+  private def historyActiveUri(path: jnio.Path)       = baseUri(Path / "history-active" ++ Path / Path(path.toString))
+  private def metadataUri                             = baseUri(Path / "metadata")
 
   private def listUri = baseUri(Path / "list")
 
@@ -69,9 +69,9 @@ private[config] class ConfigClient(
 
   override def create(path: jnio.Path, configData: ConfigData, annex: Boolean, comment: String): Future[ConfigId] = async {
     val (prefix, stitchedSource) = configData.source.prefixAndStitch(1)
-    val isAnnex = if (annex) annex else BinaryUtils.isBinary(await(prefix))
-    val uri = await(configUri(path)).withQuery(Query("annex" -> isAnnex.toString, "comment" -> comment))
-    val entity = HttpEntity(ContentTypes.`application/octet-stream`, configData.length, stitchedSource)
+    val isAnnex                  = if (annex) annex else BinaryUtils.isBinary(await(prefix))
+    val uri                      = await(configUri(path)).withQuery(Query("annex" -> isAnnex.toString, "comment" -> comment))
+    val entity                   = HttpEntity(ContentTypes.`application/octet-stream`, configData.length, stitchedSource)
 
     val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity).withBearerToken
     maskTokenAndLog(request)
@@ -87,7 +87,7 @@ private[config] class ConfigClient(
 
   override def update(path: jnio.Path, configData: ConfigData, comment: String): Future[ConfigId] = async {
     val entity = HttpEntity(ContentTypes.`application/octet-stream`, configData.length, configData.source)
-    val uri = await(configUri(path)).withQuery(Query("comment" -> comment))
+    val uri    = await(configUri(path)).withQuery(Query("comment" -> comment))
 
     val request = HttpRequest(HttpMethods.PUT, uri = uri, entity = entity).withBearerToken
     maskTokenAndLog(request)

@@ -34,17 +34,17 @@ import csw.location.server.commons.TestFutureExtension.RichFuture
 class HttpCommandServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with HTTPLocationService {
 
   implicit val typedSystem: typed.ActorSystem[_] = ActorSystem(Behavior.empty, "HttpCommandServiceTest")
-  implicit val untypedSystem: actor.ActorSystem = typedSystem.toUntyped
-  implicit val ec: ExecutionContext = typedSystem.executionContext
-  implicit val mat: Materializer = ActorMaterializer()
-  implicit val timeout: Timeout = Timeout(5.seconds)
+  implicit val untypedSystem: actor.ActorSystem  = typedSystem.toUntyped
+  implicit val ec: ExecutionContext              = typedSystem.executionContext
+  implicit val mat: Materializer                 = ActorMaterializer()
+  implicit val timeout: Timeout                  = Timeout(5.seconds)
 
   private val locationService = HttpLocationServiceFactory.makeLocalClient
-  private val testCompName = "testComponent"
-  private val connection = HttpConnection(ComponentId(testCompName, ComponentType.Service))
+  private val testCompName    = "testComponent"
+  private val connection      = HttpConnection(ComponentId(testCompName, ComponentType.Service))
 
   private val basePosKey = CoordKey.make("BasePosition")
-  private val prefix = Prefix("csw.command")
+  private val prefix     = Prefix("csw.command")
   private val key1: Key[Float] =
     KeyType.FloatKey.make("assemblyEventValue1")
   private val key1b: Key[Float] =
@@ -188,9 +188,9 @@ class HttpCommandServiceTest extends FunSuite with Matchers with BeforeAndAfterA
   test("Should be able to validate, send commands, query status of commands") {
     val service = HttpCommandService(typedSystem, locationService, connection)
     service.validate(testCommand).await shouldBe a[Accepted] //(testCommand.commandName, _))
-    service.oneway(testCommand).await shouldBe a[Accepted] //(testCommand.runId))
+    service.oneway(testCommand).await shouldBe a[Accepted]   //(testCommand.runId))
     val result = service.submit(testCommand).await
-    result shouldBe a[Completed] // (testCommand.runId))
+    result shouldBe a[Completed]                                 // (testCommand.runId))
     service.queryFinal(result.runId).await shouldBe a[Completed] //(testCommand.runId))
   }
 }

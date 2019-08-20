@@ -33,12 +33,12 @@ import csw.testkit.redis.RedisStore
 final class AlarmTestKit private (_system: ActorSystem[SpawnProtocol], testKitSettings: TestKitSettings) extends RedisStore {
 
   override implicit val system: ActorSystem[SpawnProtocol] = _system
-  override implicit lazy val timeout: Timeout = testKitSettings.DefaultTimeout
-  override protected lazy val masterId: String = system.settings.config.getString("csw-alarm.redis.masterId")
-  override protected lazy val connection: TcpConnection = AlarmServiceConnection.value
+  override implicit lazy val timeout: Timeout              = testKitSettings.DefaultTimeout
+  override protected lazy val masterId: String             = system.settings.config.getString("csw-alarm.redis.masterId")
+  override protected lazy val connection: TcpConnection    = AlarmServiceConnection.value
 
   private def getSentinelPort: Int = testKitSettings.AlarmSentinelPort.getOrElse(getFreePort)
-  private def getMasterPort: Int = testKitSettings.AlarmMasterPort.getOrElse(getFreePort)
+  private def getMasterPort: Int   = testKitSettings.AlarmMasterPort.getOrElse(getFreePort)
 
   /**
    * Scala API to Start Alarm service

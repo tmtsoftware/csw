@@ -5,7 +5,7 @@ import csw.logging.api.scaladsl.Logger
 
 trait TokenMaskSupport {
   private[config] val logger: Logger
-  private val maskedToken = "**********"
+  private val maskedToken      = "**********"
   private val maskedAuthHeader = Authorization(OAuth2BearerToken(maskedToken))
 
   val maskRequest: HttpRequest => HttpRequest = req =>
@@ -18,8 +18,8 @@ trait TokenMaskSupport {
     logger.info(
       "HTTP request received",
       Map(
-        "url" -> req.uri.toString(),
-        "method" -> req.method.value.toString,
+        "url"     -> req.uri.toString(),
+        "method"  -> req.method.value.toString,
         "headers" -> req.headers.mkString(",")
       )
     )

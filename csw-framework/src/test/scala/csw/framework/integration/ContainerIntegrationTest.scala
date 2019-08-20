@@ -38,10 +38,10 @@ import scala.concurrent.duration.DurationLong
 class ContainerIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 
-  private val irisContainerConnection = AkkaConnection(ComponentId("IRIS_Container", ComponentType.Container))
+  private val irisContainerConnection  = AkkaConnection(ComponentId("IRIS_Container", ComponentType.Container))
   private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
-  private val instrumentHcdConnection = AkkaConnection(models.ComponentId("Instrument_Filter", HCD))
-  private val disperserHcdConnection = AkkaConnection(models.ComponentId("Disperser", HCD))
+  private val instrumentHcdConnection  = AkkaConnection(models.ComponentId("Instrument_Filter", HCD))
+  private val disperserHcdConnection   = AkkaConnection(models.ComponentId("Disperser", HCD))
   private val containerActorSystem: ActorSystem[SpawnProtocol] =
     ActorSystemFactory.remote(SpawnProtocol.behavior, "container-system")
 
@@ -58,14 +58,14 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
     val containerRef =
       Container.spawn(ConfigFactory.load("container.conf"), wiring).await
 
-    val componentsProbe = TestProbe[Components]("comp-probe")
+    val componentsProbe              = TestProbe[Components]("comp-probe")
     val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]("container-lifecycle-state-probe")
-    val assemblyProbe = TestProbe[CurrentState]("assembly-state-probe")
-    val filterProbe = TestProbe[CurrentState]("filter-state-probe")
-    val disperserProbe = TestProbe[CurrentState]("disperser-state-probe")
+    val assemblyProbe                = TestProbe[CurrentState]("assembly-state-probe")
+    val filterProbe                  = TestProbe[CurrentState]("filter-state-probe")
+    val disperserProbe               = TestProbe[CurrentState]("disperser-state-probe")
 
-    val assemblyLifecycleStateProbe = TestProbe[LifecycleStateChanged]("assembly-lifecycle-probe")
-    val filterLifecycleStateProbe = TestProbe[LifecycleStateChanged]("filter-lifecycle-probe")
+    val assemblyLifecycleStateProbe  = TestProbe[LifecycleStateChanged]("assembly-lifecycle-probe")
+    val filterLifecycleStateProbe    = TestProbe[LifecycleStateChanged]("filter-lifecycle-probe")
     val disperserLifecycleStateProbe = TestProbe[LifecycleStateChanged]("disperser-lifecycle-probe")
 
     // initially container is put in Idle lifecycle state and wait for all the components to move into Running lifecycle state
@@ -88,19 +88,19 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
 
     // resolve all the components from container using location service
     val filterAssemblyLocation = seedLocationService.find(filterAssemblyConnection).await
-    val instrumentHcdLocation = seedLocationService.find(instrumentHcdConnection).await
-    val disperserHcdLocation = seedLocationService.find(disperserHcdConnection).await
+    val instrumentHcdLocation  = seedLocationService.find(instrumentHcdConnection).await
+    val disperserHcdLocation   = seedLocationService.find(disperserHcdConnection).await
 
     filterAssemblyLocation.isDefined shouldBe true
     instrumentHcdLocation.isDefined shouldBe true
     disperserHcdLocation.isDefined shouldBe true
 
-    val assemblySupervisor = filterAssemblyLocation.get.componentRef
-    val filterSupervisor = instrumentHcdLocation.get.componentRef
+    val assemblySupervisor  = filterAssemblyLocation.get.componentRef
+    val filterSupervisor    = instrumentHcdLocation.get.componentRef
     val disperserSupervisor = disperserHcdLocation.get.componentRef
 
-    val assemblyCommandService = CommandServiceFactory.make(filterAssemblyLocation.get)
-    val filterCommandService = CommandServiceFactory.make(instrumentHcdLocation.get)
+    val assemblyCommandService  = CommandServiceFactory.make(filterAssemblyLocation.get)
+    val filterCommandService    = CommandServiceFactory.make(instrumentHcdLocation.get)
     val disperserCommandService = CommandServiceFactory.make(disperserHcdLocation.get)
 
     // DEOPSCSW-372: Provide an API for PubSubActor that hides actor based interaction
@@ -169,10 +169,10 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
 
     assertThatContainerIsRunning(resolvedContainerRef, containerLifecycleStateProbe, 2.seconds)
 
-    val containerTracker = testkit.TestProbe()(seedActorSystem.toUntyped)
+    val containerTracker      = testkit.TestProbe()(seedActorSystem.toUntyped)
     val filterAssemblyTracker = testkit.TestProbe()(seedActorSystem.toUntyped)
-    val instrumentHcdTracker = testkit.TestProbe()(seedActorSystem.toUntyped)
-    val disperserHcdTracker = testkit.TestProbe()(seedActorSystem.toUntyped)
+    val instrumentHcdTracker  = testkit.TestProbe()(seedActorSystem.toUntyped)
+    val disperserHcdTracker   = testkit.TestProbe()(seedActorSystem.toUntyped)
 
     // start tracking container and all the components, so that on Shutdown message, all the trackers gets LocationRemoved event
     seedLocationService
@@ -208,9 +208,9 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
     // this proves that postStop signal of all supervisor's gets invoked
     // as supervisor gets unregistered in postStop signal
     val filterAssemblyRemoved = filterAssemblyTracker.fishForSpecificMessage(5.seconds) { case x: LocationRemoved => x }
-    val instrumentHcdRemoved = instrumentHcdTracker.fishForSpecificMessage(5.seconds) { case x: LocationRemoved   => x }
-    val disperserHcdRemoved = disperserHcdTracker.fishForSpecificMessage(5.seconds) { case x: LocationRemoved     => x }
-    val containerRemoved = containerTracker.fishForSpecificMessage(5.seconds) { case x: LocationRemoved           => x }
+    val instrumentHcdRemoved  = instrumentHcdTracker.fishForSpecificMessage(5.seconds) { case x: LocationRemoved  => x }
+    val disperserHcdRemoved   = disperserHcdTracker.fishForSpecificMessage(5.seconds) { case x: LocationRemoved   => x }
+    val containerRemoved      = containerTracker.fishForSpecificMessage(5.seconds) { case x: LocationRemoved      => x }
 
     filterAssemblyRemoved.connection shouldBe filterAssemblyConnection
     instrumentHcdRemoved.connection shouldBe instrumentHcdConnection

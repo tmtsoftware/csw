@@ -18,10 +18,10 @@ class SecurityDirectivesTest extends FunSuite with MockitoSugar with Directives 
 
   test("sGet using customPolicy should return 200 OK when policy matches") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
     import securityDirectives._
 
-    val validTokenWithPolicyMatchStr = "validTokenWithPolicyMatch"
+    val validTokenWithPolicyMatchStr    = "validTokenWithPolicyMatch"
     val validTokenWithPolicyMatchHeader = Authorization(OAuth2BearerToken(validTokenWithPolicyMatchStr))
 
     val validTokenWithPolicyMatch = mock[AccessToken]
@@ -44,11 +44,11 @@ class SecurityDirectivesTest extends FunSuite with MockitoSugar with Directives 
 
   test("sPost using realmRole should return 200 OK when token is valid & has realmRole") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
     import securityDirectives._
 
-    val validTokenWithRealmRoleStr = "validTokenWithRealmRoleStr"
-    val validTokenWithRealmRole = mock[AccessToken]
+    val validTokenWithRealmRoleStr    = "validTokenWithRealmRoleStr"
+    val validTokenWithRealmRole       = mock[AccessToken]
     val validTokenWithRealmRoleHeader = Authorization(OAuth2BearerToken(validTokenWithRealmRoleStr))
     when(validTokenWithRealmRole.hasRealmRole("admin"))
       .thenReturn(true)
@@ -71,10 +71,10 @@ class SecurityDirectivesTest extends FunSuite with MockitoSugar with Directives 
 
   test("sPut using permission should return 200 OK when token is valid & has permission") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
     import securityDirectives._
 
-    val validTokenWithPermissionStr = "validTokenWithPermissionStr"
+    val validTokenWithPermissionStr    = "validTokenWithPermissionStr"
     val validTokenWithPermissionHeader = Authorization(OAuth2BearerToken(validTokenWithPermissionStr))
 
     val validTokenWithPermission = mock[AccessToken]
@@ -100,11 +100,11 @@ class SecurityDirectivesTest extends FunSuite with MockitoSugar with Directives 
 
   test("sDelete using clientRole should return 200 OK when token is valid & has clientRole") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
     import securityDirectives._
 
-    val validTokenWithClientRoleStr = "validTokenWithClientRoleStr"
-    val validTokenWithClientRole = mock[AccessToken]
+    val validTokenWithClientRoleStr    = "validTokenWithClientRoleStr"
+    val validTokenWithClientRole       = mock[AccessToken]
     val validTokenWithClientRoleHeader = Authorization(OAuth2BearerToken(validTokenWithClientRoleStr))
     when(validTokenWithClientRole.hasClientRole("admin", "test"))
       .thenReturn(true)
@@ -127,11 +127,11 @@ class SecurityDirectivesTest extends FunSuite with MockitoSugar with Directives 
 
   test("sHead using clientRole should return 200 OK when token is valid & has clientRole") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
     import securityDirectives._
 
-    val validTokenWithClientRoleStr = "validTokenWithClientRoleStr"
-    val validTokenWithClientRole = mock[AccessToken]
+    val validTokenWithClientRoleStr    = "validTokenWithClientRoleStr"
+    val validTokenWithClientRole       = mock[AccessToken]
     val validTokenWithClientRoleHeader = Authorization(OAuth2BearerToken(validTokenWithClientRoleStr))
     when(validTokenWithClientRole.hasClientRole("admin", "test"))
       .thenReturn(true)
@@ -154,7 +154,7 @@ class SecurityDirectivesTest extends FunSuite with MockitoSugar with Directives 
 
   test("sPatch using customPolicy should return AuthenticationFailedRejection when token is not present") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
     import securityDirectives._
 
     val authenticator: AsyncAuthenticator[AccessToken] = _ => Future.successful(None)

@@ -89,7 +89,7 @@ object FrameworkAssertions extends Matchers with Eventually {
     logMsg.getString("class") shouldBe sanitizeClassName(className)
 
     logMsg.contains("trace") shouldBe true
-    val traceBlock = logMsg("trace").asInstanceOf[JsObject]
+    val traceBlock    = logMsg("trace").asInstanceOf[JsObject]
     val traceMsgBlock = traceBlock("message").as[JsObject]
     traceMsgBlock.getString("ex") shouldBe s"class ${sanitizeClassName(exceptionClassName)}"
     traceMsgBlock.getString("message") shouldBe exceptionMessage

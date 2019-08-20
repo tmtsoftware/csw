@@ -15,13 +15,13 @@ import org.scalatest.FunSpec
 class EqualityTest extends FunSpec {
 
   describe("Array-based long array equality") {
-    val k1 = KeyType.LongArrayKey.make("myLongArray")
+    val k1                  = KeyType.LongArrayKey.make("myLongArray")
     val m1: ArrayData[Long] = ArrayData(Array(1, 2, 3))
     val m2: ArrayData[Long] = ArrayData(Array(1, 2, 3))
     val m3: ArrayData[Long] = ArrayData(Array(1, 2, 4))
-    val i1 = k1.set(m1)
-    val i2 = k1.set(m2)
-    val i3 = k1.set(m3)
+    val i1                  = k1.set(m1)
+    val i2                  = k1.set(m2)
+    val i3                  = k1.set(m3)
 
     it("should short circuit with identical same arrays") {
       assert(k1.set(m1).equals(k1.set(m1)))
@@ -44,15 +44,15 @@ class EqualityTest extends FunSpec {
   }
 
   describe("Array-based long matrix equality") {
-    val k1 = LongMatrixKey.make("myMatrix")
+    val k1                   = LongMatrixKey.make("myMatrix")
     val m1: MatrixData[Long] = MatrixData.fromArrays(Array(1, 2, 3), Array(2, 3, 6), Array(4, 6, 12))
     val m2: MatrixData[Long] = MatrixData.fromArrays(Array(1, 2, 3), Array(2, 3, 6), Array(4, 6, 12))
     val m3: MatrixData[Long] = MatrixData.fromArrays(Array(1, 2, 3), Array(2, 3, 6), Array(0, 6, 12)) // Note one value different
     val m4: MatrixData[Long] = MatrixData.fromArrays(Array(1, 0, 0), Array(0, 1, 0), Array(0, 0, 1))
-    val i1 = k1.set(m1)
-    val i2 = k1.set(m2)
-    val i3 = k1.set(m3)
-    val i4 = k1.set(m4)
+    val i1                   = k1.set(m1)
+    val i2                   = k1.set(m2)
+    val i3                   = k1.set(m3)
+    val i4                   = k1.set(m4)
 
     it("should short circuit with identical same matrices") {
       assert(i1.equals(i1))
@@ -276,15 +276,15 @@ class EqualityTest extends FunSpec {
   }
 
   describe("Array-based int matrix equality") {
-    val k1 = IntMatrixKey.make("myMatrix")
+    val k1                  = IntMatrixKey.make("myMatrix")
     val m1: MatrixData[Int] = MatrixData.fromArrays(Array[Int](1, 2, 3), Array[Int](2, 3, 6), Array[Int](4, 6, 12))
     val m2: MatrixData[Int] = MatrixData.fromArrays(Array[Int](1, 2, 3), Array[Int](2, 3, 6), Array[Int](4, 6, 12))
     val m3: MatrixData[Int] = MatrixData.fromArrays(Array[Int](1, 2, 3), Array[Int](2, 3, 6), Array[Int](0, 6, 12)) // Note one value different
     val m4: MatrixData[Int] = MatrixData.fromArrays(Array[Int](1, 0, 0), Array[Int](0, 1, 0), Array[Int](0, 0, 1))
-    val i1 = k1.set(m1)
-    val i2 = k1.set(m2)
-    val i3 = k1.set(m3)
-    val i4 = k1.set(m4)
+    val i1                  = k1.set(m1)
+    val i2                  = k1.set(m2)
+    val i3                  = k1.set(m3)
+    val i4                  = k1.set(m4)
 
     it("should short circuit with identical same matrices") {
       assert(i1.equals(i1))

@@ -28,13 +28,13 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
   }
 
   implicit val system: typed.ActorSystem[SpawnProtocol] = ActorSystemFactory.remote(SpawnProtocol.behavior, "test-1")
-  implicit val untypedSystem: ActorSystem = system.toUntyped
-  implicit val testKitSettings: TestKitSettings = TestKitSettings(system)
-  private val mocks = new FrameworkTestMocks()
-  private val prefix = Prefix("wfos.red.detector")
+  implicit val untypedSystem: ActorSystem               = system.toUntyped
+  implicit val testKitSettings: TestKitSettings         = TestKitSettings(system)
+  private val mocks                                     = new FrameworkTestMocks()
+  private val prefix                                    = Prefix("wfos.red.detector")
 
-  private val lifecycleProbe1 = TestProbe[LifecycleStateChanged]
-  private val lifecycleProbe2 = TestProbe[LifecycleStateChanged]
+  private val lifecycleProbe1    = TestProbe[LifecycleStateChanged]
+  private val lifecycleProbe2    = TestProbe[LifecycleStateChanged]
   private val currentStateProbe1 = TestInbox[CurrentState]()
   private val currentStateProbe2 = TestInbox[CurrentState]()
 
@@ -55,7 +55,7 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   test("message should be published to all the subscribers") {
     val pubSubBehavior: BehaviorTestKit[PubSub[LifecycleStateChanged]] = createLifecycleStatePubSubBehavior()
-    val supervisorProbe = TestProbe[ComponentMessage]
+    val supervisorProbe                                                = TestProbe[ComponentMessage]
 
     pubSubBehavior.run(Subscribe(lifecycleProbe1.ref))
     pubSubBehavior.run(Subscribe(lifecycleProbe2.ref))
@@ -78,7 +78,7 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
     pubSubBehavior.run(Publish(currentState2))
     pubSubBehavior.run(Publish(currentState3))
 
-    val currentStates = currentStateProbe1.receiveAll()
+    val currentStates  = currentStateProbe1.receiveAll()
     val currentStates2 = currentStateProbe2.receiveAll()
 
     currentStates shouldEqual Seq(currentState1, currentState2, currentState3)
@@ -87,7 +87,7 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   test("should not receive messages on un-subscription") {
     val pubSubBehavior: BehaviorTestKit[PubSub[LifecycleStateChanged]] = createLifecycleStatePubSubBehavior()
-    val supervisorProbe = TestProbe[ComponentMessage]
+    val supervisorProbe                                                = TestProbe[ComponentMessage]
 
     pubSubBehavior.run(Subscribe(lifecycleProbe1.ref))
     pubSubBehavior.run(Subscribe(lifecycleProbe2.ref))
@@ -106,9 +106,9 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
     val commandStateProbe1 = TestInbox[SubmitResponse]()
     val commandStateProbe2 = TestInbox[SubmitResponse]()
-    val commandState1 = Error(CommandName("test1"), Id(), "ERROR")
-    val commandState2 = Completed(CommandName("test2"), Id())
-    val commandState3 = Completed(CommandName("test3"), Id())
+    val commandState1      = Error(CommandName("test1"), Id(), "ERROR")
+    val commandState2      = Completed(CommandName("test2"), Id())
+    val commandState3      = Completed(CommandName("test3"), Id())
 
     pubSubBehavior.run(Subscribe(commandStateProbe1.ref))
     pubSubBehavior.run(SubscribeOnly(commandStateProbe2.ref, Set(commandState2.stateName)))
@@ -117,7 +117,7 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
     pubSubBehavior.run(Publish(commandState2))
     pubSubBehavior.run(Publish(commandState3))
 
-    val currentStates = commandStateProbe1.receiveAll()
+    val currentStates  = commandStateProbe1.receiveAll()
     val currentStates2 = commandStateProbe2.receiveAll()
 
     currentStates shouldEqual Seq(commandState1, commandState2, commandState3)

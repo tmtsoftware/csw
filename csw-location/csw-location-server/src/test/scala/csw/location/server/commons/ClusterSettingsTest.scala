@@ -23,7 +23,7 @@ class ClusterSettingsTest extends FunSuite with Matchers with BeforeAndAfterAll 
 
   test("default cluster settings are used when no custom parameters are supplied") {
     val clusterSettings = ClusterSettings()
-    val config = clusterSettings.config
+    val config          = clusterSettings.config
 
     clusterSettings.clusterName shouldBe Constants.ClusterName
     config.getString("akka.remote.artery.canonical.hostname") shouldBe Networks().hostname
@@ -44,7 +44,7 @@ class ClusterSettingsTest extends FunSuite with Matchers with BeforeAndAfterAll 
   }
 
   test("cluster settings with join Local") {
-    val port = 9010
+    val port     = 9010
     val portList = List(9000, 9001, 9002, 9003)
     val hostname = Networks().hostname
     val clusterSettings: ClusterSettings =
@@ -57,9 +57,9 @@ class ClusterSettingsTest extends FunSuite with Matchers with BeforeAndAfterAll 
   }
 
   test("cluster settings with custom values") {
-    val port = 9001
-    val ipList = List("10.10.10.10", "10.10.10.11", "10.10.10.12")
-    val values = Map("INTERFACE_NAME" -> "en0", "CLUSTER_SEEDS" -> ipList.mkString(", "), "CLUSTER_PORT" -> "9000")
+    val port                             = 9001
+    val ipList                           = List("10.10.10.10", "10.10.10.11", "10.10.10.12")
+    val values                           = Map("INTERFACE_NAME" -> "en0", "CLUSTER_SEEDS" -> ipList.mkString(", "), "CLUSTER_PORT" -> "9000")
     val clusterSettings: ClusterSettings = ClusterSettings(values = values).onPort(port)
 
     clusterSettings.interfaceName shouldBe Some("en0")
@@ -70,8 +70,8 @@ class ClusterSettingsTest extends FunSuite with Matchers with BeforeAndAfterAll 
   }
 
   test("cluster settings with system properties") {
-    val systemPort = 9002
-    val systemSeeds = "10.10.10.12, 10.10.10.13"
+    val systemPort          = 9002
+    val systemSeeds         = "10.10.10.12, 10.10.10.13"
     val systemInterfacename = "eth0"
 
     System.setProperty("CLUSTER_SEEDS", systemSeeds.toString)

@@ -33,7 +33,7 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) {
           "Getting log information from logging system",
           Map(
             "componentName" -> componentFullName,
-            "location" -> location.toString
+            "location"      -> location.toString
           )
         )
         await(location.componentRef ? (GetComponentLogMetadata(componentName, _)))
@@ -50,7 +50,7 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) {
             s"Setting log level to $logLevel",
             Map(
               "componentName" -> componentFullName,
-              "location" -> location.toString
+              "location"      -> location.toString
             )
           )
           location.componentRef ! SetComponentLogLevel(componentName, logLevel)

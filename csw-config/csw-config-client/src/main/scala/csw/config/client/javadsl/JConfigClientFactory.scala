@@ -41,7 +41,7 @@ object JConfigClientFactory {
       locationService: ILocationService,
       tokenFactory: Option[TokenFactory] = None
   ): IConfigService = {
-    val actorRuntime = new ActorRuntime(actorSystem)
+    val actorRuntime  = new ActorRuntime(actorSystem)
     val configService = ConfigClientFactory.make(actorRuntime, locationService.asScala, tokenFactory)
     new JConfigService(configService, actorRuntime)
   }

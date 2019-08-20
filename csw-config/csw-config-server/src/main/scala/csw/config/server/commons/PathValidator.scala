@@ -7,7 +7,7 @@ import java.util.regex.Pattern
  */
 object PathValidator {
 
-  private val invalidChars = "!#<>$%&'@^`~+,;=\\s"
+  private val invalidChars   = "!#<>$%&'@^`~+,;=\\s"
   private val invalidPattern = Pattern.compile(s"[$invalidChars]+")
 
   private val invalidCharsMessage: String = invalidChars

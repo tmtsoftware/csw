@@ -38,8 +38,8 @@ import scala.concurrent.duration.DurationLong
 class StandaloneComponentTest extends FrameworkIntegrationSuite {
   import testWiring._
   // all log messages will be captured in log buffer
-  private val logBuffer = mutable.Buffer.empty[JsObject]
-  private val testAppender = new TestAppender(x => logBuffer += Json.parse(x.toString).as[JsObject])
+  private val logBuffer                    = mutable.Buffer.empty[JsObject]
+  private val testAppender                 = new TestAppender(x => logBuffer += Json.parse(x.toString).as[JsObject])
   private var loggingSystem: LoggingSystem = _
   // using standaloneActorSystem to start component instead of seedActorSystem,
   // to assert shutdown of the component(which will also shutdown standaloneActorSystem)
@@ -64,8 +64,8 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
     Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring)
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")
-    val supervisorStateProbe = TestProbe[CurrentState]("supervisor-state-probe")
-    val akkaConnection = AkkaConnection(ComponentId("IFS_Detector", HCD))
+    val supervisorStateProbe          = TestProbe[CurrentState]("supervisor-state-probe")
+    val akkaConnection                = AkkaConnection(ComponentId("IFS_Detector", HCD))
 
     // verify component gets registered with location service
     val maybeLocation = seedLocationService.resolve(akkaConnection, 5.seconds).await

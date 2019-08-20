@@ -30,9 +30,9 @@ object LogActorMock {
   def receiveLog(appender: LogAppender): Unit = {
     var jsonObject = Json.obj(
       LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(log.time),
-      LoggingKeys.MESSAGE -> log.msg,
-      LoggingKeys.SEVERITY -> log.level.name,
-      LoggingKeys.CATEGORY -> Category.Common.name
+      LoggingKeys.MESSAGE   -> log.msg,
+      LoggingKeys.SEVERITY  -> log.level.name,
+      LoggingKeys.CATEGORY  -> Category.Common.name
     )
 
     // This lime adds the user map objects as additional JsonObjects if the map is not empty

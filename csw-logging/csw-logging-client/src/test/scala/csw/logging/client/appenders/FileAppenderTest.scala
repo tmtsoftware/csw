@@ -18,8 +18,8 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-123: Allow local component logs to be output to a file
 // DEOPSCSW-649: Fixed directory configuration for multi JVM scenario
 class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
-  private val logFileDir = Paths.get("/tmp/csw-test-logs/").toFile
-  private val actorSystem = ActorSystem(SpawnProtocol.behavior, "test-1")
+  private val logFileDir                = Paths.get("/tmp/csw-test-logs/").toFile
+  private val actorSystem               = ActorSystem(SpawnProtocol.behavior, "test-1")
   private val standardHeaders: JsObject = Json.obj(LoggingKeys.HOST -> "localhost", LoggingKeys.NAME -> "test-service")
 
   private val fileAppender = new FileAppender(actorSystem, standardHeaders)
@@ -73,16 +73,16 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
   val expectedLogMsgJson2: JsObject = Json.parse(logMsgString2).as[JsObject]
   val expectedLogMsgJson3: JsObject = Json.parse(logMsgString3).as[JsObject]
 
-  private val date1 = expectedLogMsgJson1.getString(LoggingKeys.TIMESTAMP)
-  private val localDateTime1 = FileAppender.decideTimestampForFile(TMTDateTimeFormatter.parse(date1))
+  private val date1            = expectedLogMsgJson1.getString(LoggingKeys.TIMESTAMP)
+  private val localDateTime1   = FileAppender.decideTimestampForFile(TMTDateTimeFormatter.parse(date1))
   private val logFileFullPath1 = logFileDir.getAbsolutePath ++ s"/test-service_${localDateTime1}_alternative.log"
 
-  private val date2 = expectedLogMsgJson2.getString(LoggingKeys.TIMESTAMP)
-  private val localDateTime2 = FileAppender.decideTimestampForFile(TMTDateTimeFormatter.parse(date2))
+  private val date2            = expectedLogMsgJson2.getString(LoggingKeys.TIMESTAMP)
+  private val localDateTime2   = FileAppender.decideTimestampForFile(TMTDateTimeFormatter.parse(date2))
   private val logFileFullPath2 = logFileDir.getAbsolutePath ++ s"/test-service_$localDateTime2.log"
 
-  private val date3 = expectedLogMsgJson3.getString(LoggingKeys.TIMESTAMP)
-  private val localDateTime3 = FileAppender.decideTimestampForFile(TMTDateTimeFormatter.parse(date3))
+  private val date3            = expectedLogMsgJson3.getString(LoggingKeys.TIMESTAMP)
+  private val localDateTime3   = FileAppender.decideTimestampForFile(TMTDateTimeFormatter.parse(date3))
   private val logFileFullPath3 = logFileDir.getAbsolutePath ++ s"/test-service_$localDateTime3.log"
 
   override protected def beforeAll(): Unit = {

@@ -54,7 +54,7 @@ object ParameterArgParser {
     }
   }
 
-  private def ltrim(prefix: String): String => String = _.replaceAll(s"^$prefix+", "")
-  private def rtrim(suffix: String): String => String = _.replaceAll(s"$suffix+$$", "")
+  private def ltrim(prefix: String): String => String                     = _.replaceAll(s"^$prefix+", "")
+  private def rtrim(suffix: String): String => String                     = _.replaceAll(s"$suffix+$$", "")
   private def trim(input: String, prefix: String, suffix: String): String = (ltrim(prefix) andThen rtrim(suffix))(input)
 }

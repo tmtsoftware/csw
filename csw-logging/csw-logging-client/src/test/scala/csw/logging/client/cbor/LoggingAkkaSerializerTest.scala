@@ -12,12 +12,12 @@ import org.scalatest.prop.Tables.Table
 class LoggingAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   private final implicit val system: ActorSystem[SpawnProtocol] = typed.ActorSystem(SpawnProtocol.behavior, "example")
-  private final val serialization = SerializationExtension(system.toUntyped)
+  private final val serialization                               = SerializationExtension(system.toUntyped)
 
   test("should use Logging serializer for LogMetaData (de)serialization") {
 
     val logMetadata = LogMetadata(Level.INFO, Level.INFO, Level.INFO, Level.INFO)
-    val serializer = serialization.findSerializerFor(logMetadata)
+    val serializer  = serialization.findSerializerFor(logMetadata)
     serializer.getClass shouldBe classOf[LoggingAkkaSerializer]
 
     val bytes = serializer.toBinary(logMetadata)

@@ -48,7 +48,7 @@ class CswContext(
 object CswContext {
 
   private val PubSubComponentActor = "pub-sub-component"
-  private val PubSubCommandActor = "pub-sub-command"
+  private val PubSubCommandActor   = "pub-sub-command"
 
   private[framework] def make(
       locationService: LocationService,
@@ -58,13 +58,13 @@ object CswContext {
   )(implicit richSystem: CswFrameworkSystem): Future[CswContext] = {
 
     implicit val typedSystem: typed.ActorSystem[SpawnProtocol] = richSystem.system
-    implicit val ec: ExecutionContextExecutor = typedSystem.executionContext
+    implicit val ec: ExecutionContextExecutor                  = typedSystem.executionContext
 
-    val eventService = eventServiceFactory.make(locationService)
-    val alarmService = alarmServiceFactory.makeClientApi(locationService)
+    val eventService         = eventServiceFactory.make(locationService)
+    val alarmService         = alarmServiceFactory.makeClientApi(locationService)
     val timeServiceScheduler = TimeServiceSchedulerFactory.make()
 
-    val loggerFactory = new LoggerFactory(componentInfo.name)
+    val loggerFactory       = new LoggerFactory(componentInfo.name)
     val configClientService = ConfigClientFactory.clientApi(typedSystem, locationService)
     async {
 

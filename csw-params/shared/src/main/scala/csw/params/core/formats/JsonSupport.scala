@@ -22,7 +22,7 @@ trait JsonSupport {
   import ParamCodecs._
 
   def writes[T: Encoder](x: T): JsValue = PJson.parse(Json.encode(x).toUtf8String)
-  def reads[T: Decoder](x: JsValue): T = Json.decode(x.toString().getBytes(StandardCharsets.UTF_8)).to[T].value
+  def reads[T: Decoder](x: JsValue): T  = Json.decode(x.toString().getBytes(StandardCharsets.UTF_8)).to[T].value
 
   /**
    * Writes a SequenceParameterSet to JSON

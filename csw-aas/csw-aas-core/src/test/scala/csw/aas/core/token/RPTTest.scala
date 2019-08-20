@@ -19,7 +19,7 @@ class RPTTest extends FunSuite with MockitoSugar with Matchers with ScalaFutures
   implicit override val patienceConfig: PatienceConfig = PatienceConfig(Span(1, Seconds), Span(1, Seconds))
 
   test("should create accessToken") {
-    val authzClient = mock[AuthzClient]
+    val authzClient           = mock[AuthzClient]
     val authorizationResource = mock[AuthorizationResource]
     val authorizationResponse = mock[AuthorizationResponse]
     val token =
@@ -51,7 +51,7 @@ class RPTTest extends FunSuite with MockitoSugar with Matchers with ScalaFutures
   }
 
   test("should create RPTn") {
-    val authzClient = mock[AuthzClient]
+    val authzClient           = mock[AuthzClient]
     val authorizationResource = mock[AuthorizationResource]
     val authorizationResponse = mock[AuthorizationResponse]
     val tokenStr =
@@ -75,7 +75,7 @@ class RPTTest extends FunSuite with MockitoSugar with Matchers with ScalaFutures
       scope = Option("profile email"),
       realm_access = Access(Set("offline_access", "uma_authorization", "example-admin-role")),
       resource_access = Map(
-        "account" -> Access(Set("manage-account", "manage-account-links", "view-profile")),
+        "account"        -> Access(Set("manage-account", "manage-account-links", "view-profile")),
         "example-server" -> Access(Set("person-role"))
       ),
       authorization = Authorization(
@@ -95,10 +95,10 @@ class RPTTest extends FunSuite with MockitoSugar with Matchers with ScalaFutures
   }
 
   test("should fail for creating accessToken") {
-    val authzClient = mock[AuthzClient]
+    val authzClient           = mock[AuthzClient]
     val authorizationResource = mock[AuthorizationResource]
-    val token = "asd.adsasd.asd.qwe"
-    val rpt = RPT(authzClient)
+    val token                 = "asd.adsasd.asd.qwe"
+    val rpt                   = RPT(authzClient)
 
     when(authzClient.authorization(token)).thenReturn(authorizationResource)
     when(authorizationResource.authorize())

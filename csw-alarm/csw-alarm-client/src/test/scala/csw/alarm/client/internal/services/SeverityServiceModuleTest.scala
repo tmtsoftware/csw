@@ -39,9 +39,9 @@ class SeverityServiceModuleTest
 
   // DEOPSCSW-461: Log entry for severity update by component
   test("setCurrentSeverity should log a message") {
-    val logBuffer = mutable.Buffer.empty[JsObject]
+    val logBuffer    = mutable.Buffer.empty[JsObject]
     val testAppender = new TestAppender(x => logBuffer += Json.parse(x.toString).as[JsObject])
-    val hostName = InetAddress.getLocalHost.getHostName
+    val hostName     = InetAddress.getLocalHost.getHostName
 
     val expectedMessage1 =
       "Setting severity [critical] for alarm [nfiraos-trombone-tromboneaxislowlimitalarm] with expire timeout [1] seconds"
@@ -107,7 +107,7 @@ class SeverityServiceModuleTest
     status.latchedSeverity shouldBe Disconnected
     status.shelveStatus shouldBe Unshelved
 
-    val status1 = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
+    val status1                     = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
     val expectedRecordedTimeSpread1 = Instant.now.toEpochMilli +- 100
     status1.alarmTime.value.toEpochMilli shouldBe expectedRecordedTimeSpread1
 
@@ -135,7 +135,7 @@ class SeverityServiceModuleTest
 
   // DEOPSCSW-444: Set severity api for component
   test("setSeverity should not auto-acknowledge alarm even when it is auto-acknowledgable") {
-    val status = getStatus(tromboneAxisHighLimitAlarmKey).await
+    val status   = getStatus(tromboneAxisHighLimitAlarmKey).await
     val metadata = getMetadata(tromboneAxisHighLimitAlarmKey).await
     metadata.isAutoAcknowledgeable shouldBe true
     status.acknowledgementStatus shouldBe Acknowledged
@@ -149,7 +149,7 @@ class SeverityServiceModuleTest
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
   // DEOPSCSW-500: Update alarm time on current severity change
   test("setSeverity should not update alarm time when current severity does not change") {
-    val status = getStatus(tromboneAxisHighLimitAlarmKey).await
+    val status           = getStatus(tromboneAxisHighLimitAlarmKey).await
     val defaultAlarmTime = status.alarmTime
 
     // latch it to major
@@ -284,7 +284,7 @@ class SeverityServiceModuleTest
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldBe Disconnected
 
     // alarm subscription - nfiraos.trombone
-    val testProbe = TestProbe[FullAlarmSeverity]()(actorSystem)
+    val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem)
     val alarmSubscription = subscribeAggregatedSeverityCallback(tromboneAxisLowLimitAlarmKey, testProbe.ref ! _)
     alarmSubscription.ready().await
     testProbe.expectMessage(Disconnected) // on subscription, current aggregated severity will be calculated
@@ -311,7 +311,7 @@ class SeverityServiceModuleTest
     getCurrentSeverity(outOfRangeOffloadAlarmKey).await shouldBe Disconnected
 
     // subsystem subscription - tcs
-    val testProbe = TestProbe[FullAlarmSeverity]()(actorSystem)
+    val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem)
     val alarmSubscription = subscribeAggregatedSeverityCallback(SubsystemKey(TCS), testProbe.ref ! _)
     alarmSubscription.ready().await
     testProbe.expectMessage(Disconnected) // on subscription, current aggregated severity will be calculated
@@ -335,13 +335,13 @@ class SeverityServiceModuleTest
     getCurrentSeverity(splitterLimitAlarmKey).await shouldBe Disconnected
 
     // component subscription - nfiraos.trombone
-    val testProbe1 = TestProbe[FullAlarmSeverity]()(actorSystem)
+    val testProbe1         = TestProbe[FullAlarmSeverity]()(actorSystem)
     val alarmSubscription1 = subscribeAggregatedSeverityCallback(ComponentKey(NFIRAOS, "trombone"), testProbe1.ref ! _)
     alarmSubscription1.ready().await
     testProbe1.expectMessage(Disconnected) // on subscription, current aggregated severity will be calculated
 
     // global subscription
-    val testProbe2 = TestProbe[FullAlarmSeverity]()(actorSystem)
+    val testProbe2         = TestProbe[FullAlarmSeverity]()(actorSystem)
     val alarmSubscription2 = subscribeAggregatedSeverityCallback(GlobalKey, testProbe2.ref ! _)
     alarmSubscription2.ready().await
     testProbe2.expectMessage(Disconnected) // on subscription, current aggregated severity will be calculated
@@ -376,7 +376,7 @@ class SeverityServiceModuleTest
     getCurrentSeverity(enclosureTempHighAlarmKey).await shouldBe Disconnected
     getCurrentSeverity(enclosureTempLowAlarmKey).await shouldBe Disconnected
 
-    val testProbe = TestProbe[FullAlarmSeverity]()(actorSystem)
+    val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem)
     val alarmSubscription = subscribeAggregatedSeverityCallback(ComponentKey(NFIRAOS, "enclosure"), testProbe.ref ! _)
     alarmSubscription.ready().await
     testProbe.expectMessage(Disconnected) // on subscription, current aggregated severity will be calculated
@@ -418,7 +418,7 @@ class SeverityServiceModuleTest
     getCurrentSeverity(cpuExceededAlarmKey).await shouldBe Disconnected
 
     // subsystem subscription - tcs
-    val testProbe = TestProbe[FullAlarmSeverity]()(actorSystem)
+    val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem)
     val alarmSubscription = subscribeAggregatedSeverityActorRef(SubsystemKey(TCS), testProbe.ref)
     alarmSubscription.ready().await
     testProbe.expectMessage(Disconnected) // on subscription, current aggregated severity will be calculated
@@ -440,7 +440,7 @@ class SeverityServiceModuleTest
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldBe Disconnected
     getCurrentSeverity(enclosureTempLowAlarmKey).await shouldBe Disconnected
 
-    val testProbe = TestProbe[FullAlarmSeverity]()(actorSystem)
+    val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem)
     val alarmSubscription = subscribeAggregatedSeverityActorRef(SubsystemKey(NFIRAOS), testProbe.ref)
     alarmSubscription.ready().await
     testProbe.expectMessage(Disconnected) // on subscription, current aggregated severity will be calculated

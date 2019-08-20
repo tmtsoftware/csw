@@ -12,8 +12,8 @@ class TMTTimeTest extends FunSuite {
   private val jitter = 100
 
   test("should get utc time") {
-    val utcTime = UTCTime.now()
-    val fixedInstant = Instant.now()
+    val utcTime        = UTCTime.now()
+    val fixedInstant   = Instant.now()
     val expectedMillis = fixedInstant.toEpochMilli
 
     utcTime.value.toEpochMilli.toDouble shouldEqual expectedMillis.toDouble +- jitter
@@ -27,7 +27,7 @@ class TMTTimeTest extends FunSuite {
 
   test("should give time duration between given timestamp and current time") {
     val expectedDuration = 1.second.toMillis +- jitter.millis.toMillis
-    val futureTime = UTCTime(Instant.now().plusSeconds(1))
+    val futureTime       = UTCTime(Instant.now().plusSeconds(1))
     futureTime.durationFromNow.toMillis shouldBe expectedDuration
   }
 }

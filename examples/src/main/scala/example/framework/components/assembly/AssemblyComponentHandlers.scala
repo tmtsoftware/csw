@@ -30,10 +30,10 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
   import cswCtx._
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
 
-  private val log: Logger = loggerFactory.getLogger(ctx)
+  private val log: Logger                                          = loggerFactory.getLogger(ctx)
   private var runningHcds: Map[Connection, Option[CommandService]] = Map.empty
-  var diagnosticsPublisher: ActorRef[DiagnosticPublisherMessages] = _
-  var commandHandler: ActorRef[CommandHandlerMsgs] = _
+  var diagnosticsPublisher: ActorRef[DiagnosticPublisherMessages]  = _
+  var commandHandler: ActorRef[CommandHandlerMsgs]                 = _
 
   //#initialize-handler
   override def initialize(): Future[Unit] = async {
@@ -77,14 +77,14 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
 
   //#onSubmit-handler
   override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse = controlCommand match {
-    case setup: Setup     => submitSetup(runId, setup) // includes logic to handle Submit with Setup config command
+    case setup: Setup     => submitSetup(runId, setup)     // includes logic to handle Submit with Setup config command
     case observe: Observe => submitObserve(runId, observe) // includes logic to handle Submit with Observe config command
   }
   //#onSubmit-handler
 
   //#onOneway-handler
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = controlCommand match {
-    case setup: Setup     => onewaySetup(runId, setup) // includes logic to handle Oneway with Setup config command
+    case setup: Setup     => onewaySetup(runId, setup)     // includes logic to handle Oneway with Setup config command
     case observe: Observe => onewayObserve(runId, observe) // includes logic to handle Oneway with Observe config command
   }
   //#onOneway-handler

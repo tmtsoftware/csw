@@ -22,11 +22,11 @@ trait AlarmCliTestSetup extends HTTPLocationService with EmbeddedRedis with Even
   val cliWiring: Wiring = Wiring.make(_printLine = printLine)
   import cliWiring._
 
-  val argsParser = new ArgsParser(BuildInfo.name)
+  val argsParser                        = new ArgsParser(BuildInfo.name)
   val logBuffer: mutable.Buffer[String] = mutable.Buffer.empty[String]
 
   var redisSentinel: RedisSentinel = _
-  var redisServer: RedisServer = _
+  var redisServer: RedisServer     = _
 
   private def printLine(msg: Any): Unit = logBuffer += msg.toString
 

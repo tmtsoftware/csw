@@ -17,7 +17,7 @@ import scala.reflect.ClassTag
 
 class CommandAkkaSerializer(_actorSystem: ExtendedActorSystem) extends Serializer with MessageCodecs {
 
-  private val logger: Logger = GenericLoggerFactory.getLogger
+  private val logger: Logger                        = GenericLoggerFactory.getLogger
   override implicit def actorSystem: ActorSystem[_] = _actorSystem.toTyped
 
   override def identifier: Int = 19923

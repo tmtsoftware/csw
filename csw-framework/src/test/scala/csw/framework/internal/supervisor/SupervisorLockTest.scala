@@ -23,7 +23,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
   //DEOPSCSW-222: Locking a component for a specific duration
   test("should able to lock and unlock a component") {
     val lockingStateProbe = TestProbe[LockingResponse]
-    val mocks = frameworkTestMocks()
+    val mocks             = frameworkTestMocks()
     import mocks._
 
     val supervisorRef = createSupervisorAndStartTLA(assemblyInfo, mocks)
@@ -75,14 +75,14 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-222: Locking a component for a specific duration
   // DEOPSCSW-301: Support UnLocking
   test("should forward command messages from client that locked the component and reject for other clients ") {
-    val lockingStateProbe = TestProbe[LockingResponse]
+    val lockingStateProbe   = TestProbe[LockingResponse]
     val submitResponseProbe = TestProbe[SubmitResponse]
 
     val source1Prefix = Prefix("wfos.prog.cloudcover.source1")
-    val commandName1 = CommandName("move.Client1.success")
+    val commandName1  = CommandName("move.Client1.success")
     val source2Prefix = Prefix("wfos.prog.cloudcover.source2")
-    val commandName2 = CommandName("move.Client2.success")
-    val obsId = ObsId("Obs001")
+    val commandName2  = CommandName("move.Client2.success")
+    val obsId         = ObsId("Obs001")
 
     val mocks = frameworkTestMocks()
     import mocks._
@@ -128,12 +128,12 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-222: Locking a component for a specific duration
   // DEOPSCSW-301: Support UnLocking
   test("should forward messages that are of type SupervisorLockMessage to TLA") {
-    val lockingStateProbe = TestProbe[LockingResponse]
+    val lockingStateProbe  = TestProbe[LockingResponse]
     val queryResponseProbe = TestProbe[QueryResponse]()(typedSystem)
 
     val sourcePrefix = Prefix("wfos.prog.cloudcover.source")
-    val commandName = CommandName("move.Client1.success")
-    val obsId = ObsId("Obs001")
+    val commandName  = CommandName("move.Client1.success")
+    val obsId        = ObsId("Obs001")
 
     val mocks = frameworkTestMocks()
     import mocks._
@@ -160,13 +160,13 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
   // DEOPSCSW-223 Expiry of component Locking mode
   test("should expire lock after timeout") {
-    val lockingStateProbe = TestProbe[LockingResponse]
+    val lockingStateProbe   = TestProbe[LockingResponse]
     val submitResponseProbe = TestProbe[SubmitResponse]
 
     val source1Prefix = Prefix("wfos.prog.cloudcover.Client1.success")
     val source2Prefix = Prefix("wfos.prog.cloudcover.source2.success")
-    val commandName = CommandName("success.move")
-    val obsId = ObsId("Obs001")
+    val commandName   = CommandName("success.move")
+    val obsId         = ObsId("Obs001")
 
     val mocks = frameworkTestMocks()
     import mocks._
@@ -206,7 +206,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-223 Expiry of component Locking mode
   test("should not publish LockExpired or LockExpiringShortly messages if component is unlocked within timeout") {
     val lockingStateProbe = TestProbe[LockingResponse]
-    val client1Prefix = Prefix("wfos.prog.cloudcover.Client1.success")
+    val client1Prefix     = Prefix("wfos.prog.cloudcover.Client1.success")
 
     val mocks = frameworkTestMocks()
     import mocks._

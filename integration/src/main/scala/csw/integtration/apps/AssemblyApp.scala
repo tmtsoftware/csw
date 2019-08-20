@@ -24,10 +24,10 @@ object AssemblyApp {
   import adminWiring.actorRuntime._
 
   val assemblyActorRef: typed.ActorRef[String] = typedSystem.spawn(behavior, "assembly")
-  val componentId = ComponentId("assembly", ComponentType.Assembly)
-  val connection = AkkaConnection(componentId)
+  val componentId                              = ComponentId("assembly", ComponentType.Assembly)
+  val connection                               = AkkaConnection(componentId)
 
-  val registration = AkkaRegistrationFactory.make(connection, Prefix("nfiraos.ncc.trombone"), assemblyActorRef.toURI)
+  val registration                           = AkkaRegistrationFactory.make(connection, Prefix("nfiraos.ncc.trombone"), assemblyActorRef.toURI)
   val registrationResult: RegistrationResult = HttpLocationServiceFactory.makeLocalClient.register(registration).await
 
   def main(args: Array[String]): Unit = {}

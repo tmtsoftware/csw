@@ -12,7 +12,7 @@ import scala.reflect.ClassTag
 class LocationAkkaSerializer extends Serializer with LocationCodecs {
 
   override val identifier: Int = 19924
-  private val logger: Logger = LocationServiceLogger.getLogger
+  private val logger: Logger   = LocationServiceLogger.getLogger
 
   override def includeManifest: Boolean = true
 

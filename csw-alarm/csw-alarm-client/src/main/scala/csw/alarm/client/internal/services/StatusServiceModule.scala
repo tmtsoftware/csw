@@ -36,11 +36,11 @@ private[client] trait StatusServiceModule extends StatusService {
 
   final override def getStatus(alarmKey: AlarmKey): Future[AlarmStatus] = async {
     log.debug(s"Getting status for alarm [${alarmKey.value}]")
-    val ackStatusF: Future[Option[AcknowledgementStatus]] = ackStatusApi.get(alarmKey)
+    val ackStatusF: Future[Option[AcknowledgementStatus]]   = ackStatusApi.get(alarmKey)
     val latchedSeverityF: Future[Option[FullAlarmSeverity]] = latchedSeverityApi.get(alarmKey)
-    val shelveStatusF: Future[ShelveStatus] = getShelveStatus(alarmKey)
-    val alarmTimeF: Future[Option[UTCTime]] = alarmTimeApi.get(alarmKey)
-    val initializingF: Future[Option[Boolean]] = initializingApi.get(alarmKey)
+    val shelveStatusF: Future[ShelveStatus]                 = getShelveStatus(alarmKey)
+    val alarmTimeF: Future[Option[UTCTime]]                 = alarmTimeApi.get(alarmKey)
+    val initializingF: Future[Option[Boolean]]              = initializingApi.get(alarmKey)
 
     val defaultAlarmStatus = AlarmStatus()
     AlarmStatus(
@@ -58,7 +58,7 @@ private[client] trait StatusServiceModule extends StatusService {
     log.debug(s"Reset alarm [${alarmKey.value}]")
 
     val currentSeverity = await(getCurrentSeverity(alarmKey))
-    val originalStatus = await(getStatus(alarmKey))
+    val originalStatus  = await(getStatus(alarmKey))
 
     val acknowledgedStatus = originalStatus.copy(
       //reset operation acknowledges alarm
@@ -105,7 +105,7 @@ private[client] trait StatusServiceModule extends StatusService {
       newHeartbeatSeverity: FullAlarmSeverity
   ): Future[Done] = async {
 
-    val metadata = await(getMetadata(alarmKey))
+    val metadata       = await(getMetadata(alarmKey))
     val originalStatus = await(getStatus(alarmKey))
 
     // This class is not exposed outside `updateStatusForSeverity` function because
@@ -132,7 +132,7 @@ private[client] trait StatusServiceModule extends StatusService {
        * @return updated AlarmStatus
        */
       def updateAckStatus(): AlarmStatus = {
-        def isAutoAckAndOkay = metadata.isAutoAcknowledgeable && newHeartbeatSeverity == Okay
+        def isAutoAckAndOkay            = metadata.isAutoAcknowledgeable && newHeartbeatSeverity == Okay
         def isSeverityChangedAndNotOkay = newHeartbeatSeverity != currentHeartbeatSeverity && newHeartbeatSeverity != Okay
 
         if (isAutoAckAndOkay) targetAlarmStatus.copy(acknowledgementStatus = Acknowledged)
@@ -218,7 +218,7 @@ private[client] trait StatusServiceModule extends StatusService {
     Future.traverse(_) { key =>
       for {
         metadata <- getMetadata(key)
-        status <- getStatus(key)
+        status   <- getStatus(key)
         severity <- getCurrentSeverity(key)
       } yield Alarm(key, metadata, status, severity)
     }

@@ -76,7 +76,7 @@ class RedisKeySpaceApi[K: RomaineCodec, V: RomaineCodec](
         subscriptionF =>
           new RedisSubscription {
             override def unsubscribe(): Future[Done] = subscriptionF.flatMap(_.unsubscribe())
-            override def ready(): Future[Done] = subscriptionF.flatMap(_.ready())
+            override def ready(): Future[Done]       = subscriptionF.flatMap(_.ready())
           }
       )
   }

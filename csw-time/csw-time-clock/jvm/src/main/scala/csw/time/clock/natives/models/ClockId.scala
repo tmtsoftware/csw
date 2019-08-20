@@ -20,8 +20,8 @@ package csw.time.clock.natives.models
  */
 private[time] object ClockId {
   //  #clock-id
-  val ClockRealtime = 0 // system-wide realtime clock. Its time represents seconds and nanoseconds since the Epoch
-  val ClockTAI = 11 // It is basically defined as CLOCK_REALTIME(UTC) + tai_offset.
+  val ClockRealtime = 0  // system-wide realtime clock. Its time represents seconds and nanoseconds since the Epoch
+  val ClockTAI      = 11 // It is basically defined as CLOCK_REALTIME(UTC) + tai_offset.
   //  #clock-id
 
 }

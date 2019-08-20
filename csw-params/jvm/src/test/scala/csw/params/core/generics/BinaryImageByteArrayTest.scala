@@ -14,13 +14,13 @@ class BinaryImageByteArrayTest extends FunSpec with Matchers {
   describe("test ByteArrayKey") {
     // DEOPSCSW-186: Binary value payload
     it("should able to create parameter representing binary image") {
-      val keyName = "imageKey"
+      val keyName                        = "imageKey"
       val imageKey: Key[ArrayData[Byte]] = ByteArrayKey.make(keyName)
 
-      val imgPath = ResourceReader.copyToTmp("/smallBinary.bin", ".bin")
+      val imgPath  = ResourceReader.copyToTmp("/smallBinary.bin", ".bin")
       val imgBytes = Files.readAllBytes(imgPath)
 
-      val binaryImgData: ArrayData[Byte] = ArrayData.fromArray(imgBytes)
+      val binaryImgData: ArrayData[Byte]          = ArrayData.fromArray(imgBytes)
       val binaryParam: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData withUnits encoder
 
       binaryParam.head shouldBe binaryImgData

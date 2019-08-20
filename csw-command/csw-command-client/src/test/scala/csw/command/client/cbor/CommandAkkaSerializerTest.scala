@@ -44,9 +44,9 @@ import scala.concurrent.duration.DurationDouble
 class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   private final implicit val system: ActorSystem[SpawnProtocol] = typed.ActorSystem(SpawnProtocol.behavior, "example")
-  private final val serialization = SerializationExtension(system.toUntyped)
-  private final val prefix = Prefix("wfos.prog.cloudcover")
-  private final val commandName = CommandName("test")
+  private final val serialization                               = SerializationExtension(system.toUntyped)
+  private final val prefix                                      = Prefix("wfos.prog.cloudcover")
+  private final val commandName                                 = CommandName("test")
 
   override protected def afterAll(): Unit = {
     system.terminate()
@@ -96,27 +96,27 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
     val prefix = Prefix("wfos.prog.cloudcover")
 
     val intKey = IntKey.make("intKey")
-    val param = intKey.set(1, 2, 3).withUnits(coulomb)
-    val setup = Setup(prefix, CommandName("move"), Some(ObsId("Obs001"))).add(param)
+    val param  = intKey.set(1, 2, 3).withUnits(coulomb)
+    val setup  = Setup(prefix, CommandName("move"), Some(ObsId("Obs001"))).add(param)
 
-    val keyName = "imageKey"
-    val imageKey: Key[ArrayData[Byte]] = ByteArrayKey.make(keyName)
-    val imgPath = ResourceReader.copyToTmp("/smallBinary.bin", ".bin")
-    val imgBytes = Files.readAllBytes(imgPath)
-    val binaryImgData: ArrayData[Byte] = ArrayData.fromArray(imgBytes)
+    val keyName                            = "imageKey"
+    val imageKey: Key[ArrayData[Byte]]     = ByteArrayKey.make(keyName)
+    val imgPath                            = ResourceReader.copyToTmp("/smallBinary.bin", ".bin")
+    val imgBytes                           = Files.readAllBytes(imgPath)
+    val binaryImgData: ArrayData[Byte]     = ArrayData.fromArray(imgBytes)
     val param2: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData withUnits pascal
-    val observe = Observe(prefix, CommandName("move"), Some(ObsId("Obs001"))).add(param2)
+    val observe                            = Observe(prefix, CommandName("move"), Some(ObsId("Obs001"))).add(param2)
 
-    val submitResponseProbe = TestProbe[SubmitResponse]
-    val onewayResponseProbe = TestProbe[OnewayResponse]
+    val submitResponseProbe   = TestProbe[SubmitResponse]
+    val onewayResponseProbe   = TestProbe[OnewayResponse]
     val validateResponseProbe = TestProbe[ValidateResponse]
-    val lockingResponseProbe = TestProbe[LockingResponse]
+    val lockingResponseProbe  = TestProbe[LockingResponse]
 
-    val lifecycleProbe = TestProbe[LifecycleStateChanged]
-    val currentStateProbe = TestProbe[CurrentState]
+    val lifecycleProbe                = TestProbe[LifecycleStateChanged]
+    val currentStateProbe             = TestProbe[CurrentState]
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
 
-    val componentsProbe = TestProbe[Components]
+    val componentsProbe              = TestProbe[Components]
     val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]
 
     val logMetadataProbe = TestProbe[LogMetadata]
@@ -246,8 +246,8 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
     val submitResponseProbe = TestProbe[SubmitResponse]
 
     val command: SequenceCommand = Setup(Prefix("csw.move"), CommandName("c1"), Some(ObsId("obsId")))
-    val sequence = Sequence(command)
-    val loadAndStartSequence = LoadAndStartSequence(sequence, submitResponseProbe.ref)
+    val sequence                 = Sequence(command)
+    val loadAndStartSequence     = LoadAndStartSequence(sequence, submitResponseProbe.ref)
 
     val serializer = serialization.findSerializerFor(loadAndStartSequence)
     serializer.getClass shouldBe classOf[CommandAkkaSerializer]

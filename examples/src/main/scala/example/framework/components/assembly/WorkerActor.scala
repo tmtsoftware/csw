@@ -7,9 +7,9 @@ import example.framework.components.assembly.WorkerActorMsgs.{GetStatistics, Ini
 
 trait WorkerActorMsg
 object WorkerActorMsgs {
-  case class InitialState(replyTo: ActorRef[Int]) extends WorkerActorMsg
+  case class InitialState(replyTo: ActorRef[Int])      extends WorkerActorMsg
   case class JInitialState(replyTo: ActorRef[Integer]) extends WorkerActorMsg
-  case class GetStatistics(replyTo: ActorRef[Int]) extends WorkerActorMsg
+  case class GetStatistics(replyTo: ActorRef[Int])     extends WorkerActorMsg
 }
 
 object WorkerActor {

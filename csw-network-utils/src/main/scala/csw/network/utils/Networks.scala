@@ -42,7 +42,7 @@ case class Networks(private val interfaceName: String, networkProvider: NetworkI
   private def mappings: Seq[(Int, InetAddress)] =
     for {
       (index, inetAddresses) <- interfaces
-      inetAddress <- inetAddresses
+      inetAddress            <- inetAddresses
     } yield (index, inetAddress)
 
   private def interfaces: Seq[(Int, List[InetAddress])] =

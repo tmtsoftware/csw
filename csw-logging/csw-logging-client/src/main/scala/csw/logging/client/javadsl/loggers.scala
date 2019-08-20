@@ -13,10 +13,10 @@ import csw.logging.client.scaladsl.LoggerFactory
 abstract class JBaseLoggerFactory private[logging] (maybeComponentName: Option[String]) {
   def getLogger[T](ctx: ActorContext[T], klass: Class[_]): ILogger = new JLoggerImpl(logger(Some(actorPath(ctx.getSelf))), klass)
   def getLogger(ctx: actor.ActorContext, klass: Class[_]): ILogger = new JLoggerImpl(logger(Some(actorPath(ctx.self))), klass)
-  def getLogger(klass: Class[_]): ILogger = new JLoggerImpl(logger(None), klass)
+  def getLogger(klass: Class[_]): ILogger                          = new JLoggerImpl(logger(None), klass)
 
-  private def logger(maybeActorRef: Option[String]): Logger = new LoggerImpl(maybeComponentName, maybeActorRef)
-  private def actorPath(actorRef: ActorRef): String = ActorPath.fromString(Serialization.serializedActorPath(actorRef)).toString
+  private def logger(maybeActorRef: Option[String]): Logger  = new LoggerImpl(maybeComponentName, maybeActorRef)
+  private def actorPath(actorRef: ActorRef): String          = ActorPath.fromString(Serialization.serializedActorPath(actorRef)).toString
   private def actorPath(actorRef: typed.ActorRef[_]): String = actorPath(actorRef.toUntyped)
 }
 

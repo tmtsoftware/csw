@@ -22,13 +22,13 @@ private[client] class RedisConnectionsFactory(
 ) {
   import csw.alarm.client.internal.AlarmCodec._
 
-  lazy val metadataApi: RedisAsyncApi[MetadataKey, AlarmMetadata] = asyncApi
-  lazy val severityApi: RedisAsyncApi[SeverityKey, FullAlarmSeverity] = asyncApi
+  lazy val metadataApi: RedisAsyncApi[MetadataKey, AlarmMetadata]                   = asyncApi
+  lazy val severityApi: RedisAsyncApi[SeverityKey, FullAlarmSeverity]               = asyncApi
   lazy val latchedSeverityApi: RedisAsyncApi[LatchedSeverityKey, FullAlarmSeverity] = asyncApi
-  lazy val alarmTimeApi: RedisAsyncApi[AlarmTimeKey, UTCTime] = asyncApi
-  lazy val ackStatusApi: RedisAsyncApi[AckStatusKey, AcknowledgementStatus] = asyncApi
-  lazy val shelveStatusApi: RedisAsyncApi[ShelveStatusKey, ShelveStatus] = asyncApi
-  lazy val initializingApi: RedisAsyncApi[InitializingKey, Boolean] = asyncApi
+  lazy val alarmTimeApi: RedisAsyncApi[AlarmTimeKey, UTCTime]                       = asyncApi
+  lazy val ackStatusApi: RedisAsyncApi[AckStatusKey, AcknowledgementStatus]         = asyncApi
+  lazy val shelveStatusApi: RedisAsyncApi[ShelveStatusKey, ShelveStatus]            = asyncApi
+  lazy val initializingApi: RedisAsyncApi[InitializingKey, Boolean]                 = asyncApi
 
   def asyncApi[K: RomaineCodec, V: RomaineCodec]: RedisAsyncApi[K, V] = romaineFactory.redisAsyncApi[K, V](redisURI)
 

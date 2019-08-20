@@ -10,7 +10,7 @@ import csw.logging.client.scaladsl.LoggingSystemFactory
 
 object TestService {
   val componentId = ComponentId("redisservice", ComponentType.Service)
-  val connection = HttpConnection(componentId)
+  val connection  = HttpConnection(componentId)
 
   private val Path = "redisservice.org/test"
   private val Port = 9999
@@ -22,7 +22,7 @@ object TestService {
 
   import adminWiring.actorRuntime._
 
-  val registration = HttpRegistration(connection, Port, Path)
+  val registration                           = HttpRegistration(connection, Port, Path)
   val registrationResult: RegistrationResult = HttpLocationServiceFactory.makeLocalClient.register(registration).await
 
   print("Redis Service Registered")

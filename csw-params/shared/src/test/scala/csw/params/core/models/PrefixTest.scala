@@ -6,7 +6,7 @@ class PrefixTest extends FunSuite with Matchers {
 
   test("should able to create Prefix and access subsystem from valid prefix string") {
     val prefixStr = "tcs.mobie.blue.filter"
-    val prefix = Prefix(prefixStr)
+    val prefix    = Prefix(prefixStr)
 
     prefix.subsystem shouldBe Subsystem.TCS
   }

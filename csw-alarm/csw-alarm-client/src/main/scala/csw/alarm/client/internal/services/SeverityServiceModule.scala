@@ -45,8 +45,8 @@ private[client] trait SeverityServiceModule extends SeverityService {
 
     val activeAlarms: List[MetadataKey] = await(getActiveAlarmKeys(key))
     val severityKeys: List[SeverityKey] = activeAlarms.map(a => SeverityKey.fromAlarmKey(a))
-    val severityValues = await(severityApi.mget(severityKeys))
-    val severityList = severityValues.map(_.value)
+    val severityValues                  = await(severityApi.mget(severityKeys))
+    val severityList                    = severityValues.map(_.value)
     aggregratorByMax(severityList)
   }
 
@@ -95,9 +95,9 @@ private[client] trait SeverityServiceModule extends SeverityService {
     val keySpaceApi = redisKeySpaceApi(severityApi)
 
     val severitySourceF = async {
-      val metadataKeys = await(getActiveAlarmKeys(key))
+      val metadataKeys                          = await(getActiveAlarmKeys(key))
       val activeSeverityKeys: List[SeverityKey] = metadataKeys.map(a => SeverityKey.fromAlarmKey(a))
-      val currentSeverities = await(severityApi.mget(activeSeverityKeys)).map(result => result.key -> result.value).toMap
+      val currentSeverities                     = await(severityApi.mget(activeSeverityKeys)).map(result => result.key -> result.value).toMap
 
       keySpaceApi
         .watchKeyspaceValue(activeSeverityKeys, OverflowStrategy.LATEST)
@@ -113,7 +113,7 @@ private[client] trait SeverityServiceModule extends SeverityService {
       .mapMaterializedValue { mat =>
         new AlarmSubscription {
           override def unsubscribe(): Future[Done] = mat.flatMap(_.unsubscribe())
-          override def ready(): Future[Done] = mat.flatMap(_.ready())
+          override def ready(): Future[Done]       = mat.flatMap(_.ready())
         }
       }
   }

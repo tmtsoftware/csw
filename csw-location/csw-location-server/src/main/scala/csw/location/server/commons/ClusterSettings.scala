@@ -51,10 +51,10 @@ import scala.jdk.CollectionConverters._
  *
  */
 private[location] case class ClusterSettings(clusterName: String = Constants.ClusterName, values: Map[String, Any] = Map.empty) {
-  private val log: Logger = LocationServiceLogger.getLogger
-  private val InterfaceNameKey = "INTERFACE_NAME"
-  private val ClusterSeedsKey = "CLUSTER_SEEDS"
-  private val ClusterPortKey = "CLUSTER_PORT"
+  private val log: Logger       = LocationServiceLogger.getLogger
+  private val InterfaceNameKey  = "INTERFACE_NAME"
+  private val ClusterSeedsKey   = "CLUSTER_SEEDS"
+  private val ClusterPortKey    = "CLUSTER_PORT"
   private val ManagementPortKey = "MANAGEMENT_PORT"
 
   private def withEntry(key: String, value: Any): ClusterSettings = copy(values = values + (key -> value))
@@ -113,11 +113,11 @@ private[location] case class ClusterSettings(clusterName: String = Constants.Clu
   private[location] def config: Config = {
     val computedValues: Map[String, Any] = Map(
       "akka.remote.artery.canonical.hostname" -> hostname,
-      "akka.remote.artery.canonical.port" -> port,
-      "akka.cluster.seed-nodes" -> seedNodes.asJava,
+      "akka.remote.artery.canonical.port"     -> port,
+      "akka.cluster.seed-nodes"               -> seedNodes.asJava,
       "akka.cluster.http.management.hostname" -> hostname,
-      "akka.management.http.port" -> managementPort.getOrElse(19999), //management port will never start at 19999
-      "startManagement" -> managementPort.isDefined
+      "akka.management.http.port"             -> managementPort.getOrElse(19999), //management port will never start at 19999
+      "startManagement"                       -> managementPort.isDefined
     )
 
     log.debug(s"ClusterSettings using following configuration: [${computedValues.mkString(", ")}]")

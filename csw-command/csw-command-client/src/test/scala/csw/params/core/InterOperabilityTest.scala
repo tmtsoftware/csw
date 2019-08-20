@@ -27,15 +27,15 @@ case class CommandMsg(
 class InterOperabilityTest extends FunSuite with Matchers with BeforeAndAfterAll {
   implicit val timeout: Timeout = Timeout(5.seconds)
 
-  private val prefixStr = "wfos.red.detector"
+  private val prefixStr    = "wfos.red.detector"
   private val obsId: ObsId = ObsId("Obs001")
-  private val intKey = KeyType.IntKey.make("intKey")
-  private val stringKey = KeyType.StringKey.make("stringKey")
-  private val intParam = intKey.set(22, 33)
-  private val stringParam = stringKey.set("First", "Second")
+  private val intKey       = KeyType.IntKey.make("intKey")
+  private val stringKey    = KeyType.StringKey.make("stringKey")
+  private val intParam     = intKey.set(22, 33)
+  private val stringParam  = stringKey.set("First", "Second")
 
   private implicit val system: ActorSystem[_] = ActorSystem(Behavior.empty, "test")
-  implicit val testKit: TestKitSettings = TestKitSettings(system)
+  implicit val testKit: TestKitSettings       = TestKitSettings(system)
 
   private val scalaSetup = Setup(Prefix(prefixStr), CommandName(prefixStr), Some(obsId)).add(intParam).add(stringParam)
 
@@ -53,9 +53,9 @@ class InterOperabilityTest extends FunSuite with Matchers with BeforeAndAfterAll
   // 2. onMessage, Java actor extracts paramSet from Setup command and replies back to scala actor
   // 3. also, java actor creates StatusEvent and forward it to scala actor
   test("should able to send commands/events from scala code to java and vice a versa") {
-    val ackProbe = TestProbe[java.util.Set[Parameter[_]]]
+    val ackProbe     = TestProbe[java.util.Set[Parameter[_]]]
     val replyToProbe = TestProbe[SystemEvent]
-    val obsIdProbe = TestProbe[Optional[ObsId]]
+    val obsIdProbe   = TestProbe[Optional[ObsId]]
 
     jCommandHandlerActor ! CommandMsg(scalaSetup, ackProbe.ref, replyToProbe.ref, obsIdProbe.ref)
 

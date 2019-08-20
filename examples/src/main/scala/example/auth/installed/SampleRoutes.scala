@@ -15,7 +15,7 @@ import scala.concurrent.ExecutionContext
 object SampleRoutes {
 
   implicit val actorSystem: ActorSystem[_] = ActorSystem(Behaviors.empty, "test")
-  implicit val ec: ExecutionContext = actorSystem.executionContext
+  implicit val ec: ExecutionContext        = actorSystem.executionContext
   val securityDirectives =
     csw.aas.http.SecurityDirectives(ConfigFactory.parseString("""
       | auth-config {
@@ -31,12 +31,12 @@ object SampleRoutes {
 
   val routes: Route =
     pathPrefix("data") {
-      get { // un-protected route for reading data
+      get {                    // un-protected route for reading data
         pathEndOrSingleSlash { // e.g HTTP GET http://localhost:7000/data
           complete(data)
         }
       } ~ sPost(RealmRolePolicy("admin")) { // only users with 'admin' role is allowed for this route
-        parameter("value") { value => // e.g POST GET localhost:7000/data?value=abc
+        parameter("value") { value =>       // e.g POST GET localhost:7000/data?value=abc
           data = data + value
           complete(StatusCodes.OK)
         }

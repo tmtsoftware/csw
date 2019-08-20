@@ -19,10 +19,10 @@ import scala.concurrent.{Await, ExecutionContext}
 //DEOPSCSW-601: Create Database API
 //DEOPSCSW-616: Create a method to send a query (select) sql string to a database
 class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with BeforeAndAfterAll {
-  private val system: ActorSystem[_] = ActorSystem(Behaviors.empty, "test")
+  private val system: ActorSystem[_]        = ActorSystem(Behaviors.empty, "test")
   private implicit val ec: ExecutionContext = system.executionContext
-  private var postgres: EmbeddedPostgres = _
-  private var dsl: DSLContext = _
+  private var postgres: EmbeddedPostgres    = _
+  private var dsl: DSLContext               = _
 
   override def beforeAll: Unit = {
     postgres = DBTestHelper.postgres(0) // 0 is random port
@@ -119,7 +119,7 @@ class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with 
   //DEOPSCSW-609: Examples of Record creation
   test("should be able to query records from the table") {
     // create films and insert movie_1
-    val movieName = "movie_1"
+    val movieName  = "movie_1"
     val movieName2 = "movie_2"
     dsl
       .query("CREATE TABLE films (id SERIAL PRIMARY KEY, name VARCHAR (10) UNIQUE NOT NULL)")

@@ -38,13 +38,13 @@ import scala.concurrent.{Await, ExecutionContext}
 class CommandIntegrationTests extends FrameworkIntegrationSuite {
   import testWiring._
 
-  private val irisContainerConnection = AkkaConnection(ComponentId("WFOS_Container", ComponentType.Container))
+  private val irisContainerConnection  = AkkaConnection(ComponentId("WFOS_Container", ComponentType.Container))
   private val filterAssemblyConnection = AkkaConnection(ComponentId("FilterASS", Assembly))
-  private val filterHCDConnection = AkkaConnection(ComponentId("FilterHCD", HCD))
+  private val filterHCDConnection      = AkkaConnection(ComponentId("FilterHCD", HCD))
   private val containerActorSystem: ActorSystem[SpawnProtocol] =
     ActorSystemFactory.remote(SpawnProtocol.behavior, "container-system")
-  val obsId = Some(ObsId("Obs001"))
-  implicit val timeout: Timeout = 12.seconds
+  val obsId                         = Some(ObsId("Obs001"))
+  implicit val timeout: Timeout     = 12.seconds
   implicit val ec: ExecutionContext = containerActorSystem.executionContext
 
   override def afterAll(): Unit = {
@@ -60,10 +60,10 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
     val containerRef =
       Container.spawn(ConfigFactory.load("command_container.conf"), wiring).await
 
-    val componentsProbe = TestProbe[Components]("comp-probe")
+    val componentsProbe              = TestProbe[Components]("comp-probe")
     val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]("container-lifecycle-state-probe")
-    val filterAssemblyStateProbe = TestProbe[CurrentState]("assembly-state-probe")
-    val filterHCDStateProbe = TestProbe[CurrentState]("hcd-state-probe")
+    val filterAssemblyStateProbe     = TestProbe[CurrentState]("assembly-state-probe")
+    val filterHCDStateProbe          = TestProbe[CurrentState]("hcd-state-probe")
 
     val assemblyLifecycleStateProbe = TestProbe[LifecycleStateChanged]("assembly-lifecycle-probe")
 
@@ -87,13 +87,13 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
 
     // resolve all the components from container using location service
     val filterAssemblyLocation = seedLocationService.find(filterAssemblyConnection).await
-    val filterHCDLocation = seedLocationService.find(filterHCDConnection).await
+    val filterHCDLocation      = seedLocationService.find(filterHCDConnection).await
 
     filterAssemblyLocation.isDefined shouldBe true
     filterHCDLocation.isDefined shouldBe true
 
     val filterAssemblyCS = CommandServiceFactory.make(filterAssemblyLocation.get)
-    val filterHcdCS = CommandServiceFactory.make(filterHCDLocation.get)
+    val filterHcdCS      = CommandServiceFactory.make(filterHCDLocation.get)
 
     // DEOPSCSW-372: Provide an API for PubSubActor that hides actor based interaction
     // Subscribe to component's current state
@@ -112,7 +112,7 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
     supervisorLifecycleStateProbe.expectMessage(SupervisorLifecycleState.Running)
 
     // Send short command to make sure it works
-    val short = Setup(seqPrefix, immediateCmd, obsId)
+    val short  = Setup(seqPrefix, immediateCmd, obsId)
     var result = Await.result(filterAssemblyCS.submit(short), timeout.duration)
     result shouldBe a[Completed]
     result.commandName shouldEqual immediateCmd
