@@ -12,18 +12,18 @@ import scala.language.implicitConversions
  */
 class FileAuthStore(storePath: Path) extends AuthStore {
 
-  private val idTokenFileName      = "id_token"
+  private val idTokenFileName = "id_token"
   private val refreshTokenFileName = "refresh_token"
-  private val accessTokenFileName  = "access_token"
+  private val accessTokenFileName = "access_token"
 
-  private val idTokenPath      = toPath(idTokenFileName)
+  private val idTokenPath = toPath(idTokenFileName)
   private val refreshTokenPath = toPath(refreshTokenFileName)
-  private val accessTokenPath  = toPath(accessTokenFileName)
+  private val accessTokenPath = toPath(accessTokenFileName)
 
   private def toPath(name: String) = Paths.get(s"${storePath.toString}/$name")
 
-  override def getAccessTokenString: Option[String]  = read(accessTokenPath)
-  override def getIdTokenString: Option[String]      = read(idTokenPath)
+  override def getAccessTokenString: Option[String] = read(accessTokenPath)
+  override def getIdTokenString: Option[String] = read(idTokenPath)
   override def getRefreshTokenString: Option[String] = read(refreshTokenPath)
 
   override def clearStorage(): Unit = delete(storePath)

@@ -6,7 +6,7 @@ import csw.command.client.models.framework.PubSub.Publish
 import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.api.models.TrackingEvent
+import csw.location.models.TrackingEvent
 import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
@@ -25,11 +25,11 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
 
   override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse = {
     controlCommand.commandName match {
-      case `longRunning`               ⇒ Accepted(controlCommand.commandName, runId)
-      case `mediumRunning`             ⇒ Accepted(controlCommand.commandName, runId)
-      case `shortRunning`              ⇒ Accepted(controlCommand.commandName, runId)
-      case `failureAfterValidationCmd` ⇒ Accepted(controlCommand.commandName, runId)
-      case _ ⇒
+      case `longRunning`               => Accepted(controlCommand.commandName, runId)
+      case `mediumRunning`             => Accepted(controlCommand.commandName, runId)
+      case `shortRunning`              => Accepted(controlCommand.commandName, runId)
+      case `failureAfterValidationCmd` => Accepted(controlCommand.commandName, runId)
+      case _ =>
         Invalid(controlCommand.commandName, runId, UnsupportedCommandIssue(controlCommand.commandName.name))
     }
   }
@@ -37,7 +37,7 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   //#addOrUpdateCommand
   override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse = {
     controlCommand.commandName match {
-      case `longRunning` ⇒
+      case `longRunning` =>
         ctx.scheduleOnce(
           5.seconds,
           // Here the Completed is sent directly to the publish actor
@@ -46,24 +46,24 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         )
         Started(controlCommand.commandName, runId)
       //#addOrUpdateCommand
-      case `mediumRunning` ⇒
+      case `mediumRunning` =>
         ctx.scheduleOnce(
           3.seconds,
           commandUpdatePublisher.publisherActor,
           Publish[SubmitResponse](Completed(controlCommand.commandName, runId))
         )
         Started(controlCommand.commandName, runId)
-      case `shortRunning` ⇒
+      case `shortRunning` =>
         ctx.scheduleOnce(
           1.seconds,
           commandUpdatePublisher.publisherActor,
           Publish[SubmitResponse](Completed(controlCommand.commandName, runId))
         )
         Started(controlCommand.commandName, runId)
-      case `failureAfterValidationCmd` ⇒
+      case `failureAfterValidationCmd` =>
         //  SHOULDN"T BE NEEDED commandUpdatePublisher.update(Error(controlCommand.commandName, runId, "Failed command"))
         Error(controlCommand.commandName, runId, "Failed command")
-      case _ ⇒
+      case _ =>
         Error(controlCommand.commandName, runId, "Unknown Command")
     }
   }

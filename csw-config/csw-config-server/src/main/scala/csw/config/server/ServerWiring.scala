@@ -14,22 +14,22 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
  */
 private[csw] class ServerWiring {
   lazy val config: Config = ConfigFactory.load()
-  lazy val settings       = new Settings(config)
+  lazy val settings = new Settings(config)
 
-  lazy val actorSystem  = ActorSystem(SpawnProtocol.behavior, "config-server")
+  lazy val actorSystem = ActorSystem(SpawnProtocol.behavior, "config-server")
   lazy val actorRuntime = new ActorRuntime(actorSystem, settings)
   import actorRuntime._
 
-  lazy val annexFileRepo    = new AnnexFileRepo(actorRuntime.blockingIoDispatcher)
+  lazy val annexFileRepo = new AnnexFileRepo(actorRuntime.blockingIoDispatcher)
   lazy val annexFileService = new AnnexFileService(settings, annexFileRepo, actorRuntime)
 
-  lazy val svnRepo              = new SvnRepo(settings.`svn-user-name`, settings, actorRuntime.blockingIoDispatcher)
+  lazy val svnRepo = new SvnRepo(settings.`svn-user-name`, settings, actorRuntime.blockingIoDispatcher)
   lazy val configServiceFactory = new SvnConfigServiceFactory(actorRuntime, annexFileService)
 
   lazy val locationService: LocationService =
     HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
 
-  lazy val configHandlers     = new ConfigHandlers
+  lazy val configHandlers = new ConfigHandlers
   lazy val securityDirectives = SecurityDirectives(config, locationService)
   lazy val configServiceRoute = new ConfigServiceRoute(configServiceFactory, actorRuntime, configHandlers, securityDirectives)
 
@@ -49,7 +49,7 @@ private[csw] object ServerWiring {
   }
 
   def make(_locationService: LocationService, _securityDirectives: SecurityDirectives): ServerWiring = new ServerWiring {
-    override lazy val locationService: LocationService       = _locationService
+    override lazy val locationService: LocationService = _locationService
     override lazy val securityDirectives: SecurityDirectives = _securityDirectives
   }
 

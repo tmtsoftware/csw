@@ -29,8 +29,8 @@ class AlarmRefreshActorTest
   import actorSystem.executionContext
 
   val tromboneAxisHighLimitAlarmKey = AlarmKey(NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm")
-  val tcsAxisHighLimitAlarmKey      = AlarmKey(NFIRAOS, "tcs", "tromboneAxisHighLimitAlarm")
-  private val manualTime            = ManualTime()
+  val tcsAxisHighLimitAlarmKey = AlarmKey(NFIRAOS, "tcs", "tromboneAxisHighLimitAlarm")
+  private val manualTime = ManualTime()
 
   private def send[T](msg: T, to: ActorRef[T]): Future[Done] = Future { to ! msg; Done }
 

@@ -94,7 +94,7 @@ class ArgsParser(name: String) {
 
     checkConfig { c =>
       val commandsAllowingPartialKey = List("list", "severity", "health")
-      val commandsHavingSubCommands  = List("severity", "health")
+      val commandsHavingSubCommands = List("severity", "health")
 
       if (c.cmd.isEmpty)
         failure("""

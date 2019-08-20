@@ -34,7 +34,7 @@ private[event] class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[S
 ) extends EventSubscriber {
 
   private val consumer: Future[Consumer[String, Array[Byte]]] = consumerSettings.map(_.createKafkaConsumer())
-  private val eventSubscriberUtil                             = new EventSubscriberUtil()
+  private val eventSubscriberUtil = new EventSubscriberUtil()
 
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
     val offsetsF = getLatestOffsets(eventKeys)
@@ -43,7 +43,7 @@ private[event] class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[S
     val updatedOffsetsF = offsetsF.map(_.view.mapValues(x => if (x == 0) 0L else x - 1).toMap)
 
     val manualSubscription = updatedOffsetsF.map(offsets => Subscriptions.assignmentWithOffset(offsets))
-    val eventStream        = getEventStream(manualSubscription)
+    val eventStream = getEventStream(manualSubscription)
 
     val invalidEvents = offsetsF.map { partitionToOffset =>
       val events = partitionToOffset.collect {
@@ -102,7 +102,7 @@ private[event] class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[S
   ): EventSubscription = subscribeCallback(eventKeys, eventSubscriberUtil.actorCallback(actorRef), every, mode)
 
   override def pSubscribe(subsystem: Subsystem, pattern: String): Source[Event, EventSubscription] = {
-    val keyPattern   = s"${subsystem.entryName}.*${Utils.globToRegex(pattern)}"
+    val keyPattern = s"${subsystem.entryName}.*${Utils.globToRegex(pattern)}"
     val subscription = Subscriptions.topicPattern(keyPattern)
 
     getEventStream(Future.successful(subscription))

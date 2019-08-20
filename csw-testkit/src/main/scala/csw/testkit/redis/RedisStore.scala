@@ -25,11 +25,11 @@ private[testkit] trait RedisStore extends EmbeddedRedis {
   protected def connection: TcpConnection
 
   implicit lazy val untypedSystem: ActorSystem = system.toUntyped
-  implicit lazy val mat: Materializer          = scaladsl.ActorMaterializer()
-  implicit lazy val ec: ExecutionContext       = system.executionContext
+  implicit lazy val mat: Materializer = scaladsl.ActorMaterializer()
+  implicit lazy val ec: ExecutionContext = system.executionContext
 
   private var redisSentinel: Option[RedisSentinel] = None
-  private var redisServer: Option[RedisServer]     = None
+  private var redisServer: Option[RedisServer] = None
 
   private implicit lazy val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient
 

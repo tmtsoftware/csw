@@ -21,8 +21,8 @@ import scala.concurrent.duration.DurationInt
 private[location] class LocationAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   private final implicit val system: ActorSystem[_] = ActorSystem(Behavior.empty, "example")
-  private final val serialization                   = SerializationExtension(system.toUntyped)
-  private final val prefix                          = Prefix("wfos.prog.cloudcover")
+  private final val serialization = SerializationExtension(system.toUntyped)
+  private final val prefix = Prefix("wfos.prog.cloudcover")
 
   override protected def afterAll(): Unit = {
     system.terminate()
@@ -49,7 +49,7 @@ private[location] class LocationAkkaSerializerTest extends FunSuite with Matcher
   test("should use location serializer for Location (de)serialization") {
     val akkaConnection = AkkaConnection(models.ComponentId("TromboneAssembly", Assembly))
     val httpConnection = HttpConnection(models.ComponentId("TromboneAssembly", Assembly))
-    val tcpConnection  = TcpConnection(models.ComponentId("TromboneAssembly", Assembly))
+    val tcpConnection = TcpConnection(models.ComponentId("TromboneAssembly", Assembly))
     val testData = Table(
       "Location models",
       AkkaLocation(akkaConnection, prefix, system.toURI),
@@ -69,7 +69,7 @@ private[location] class LocationAkkaSerializerTest extends FunSuite with Matcher
   test("should use location serializer for Registration (de)serialization") {
     val akkaConnection = AkkaConnection(models.ComponentId("TromboneAssembly", Assembly))
     val httpConnection = HttpConnection(models.ComponentId("TromboneAssembly", Assembly))
-    val tcpConnection  = TcpConnection(models.ComponentId("TromboneAssembly", Assembly))
+    val tcpConnection = TcpConnection(models.ComponentId("TromboneAssembly", Assembly))
     val testData = Table(
       "Registration models",
       AkkaRegistration(akkaConnection, prefix, system.toURI),
@@ -88,7 +88,7 @@ private[location] class LocationAkkaSerializerTest extends FunSuite with Matcher
 
   test("should use location serializer for TrackingEvent (de)serialization") {
     val akkaConnection = AkkaConnection(models.ComponentId("TromboneAssembly", Assembly))
-    val akkaLocation   = AkkaLocation(akkaConnection, prefix, system.toURI)
+    val akkaLocation = AkkaLocation(akkaConnection, prefix, system.toURI)
 
     val testData = Table(
       "TrackingEvent models",

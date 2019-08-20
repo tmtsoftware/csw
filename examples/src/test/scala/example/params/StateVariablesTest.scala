@@ -19,17 +19,17 @@ class StateVariablesTest extends FunSpec with Matchers {
       val prefix = Prefix("wfos.prog.cloudcover")
 
       //key
-      val charKey: Key[Char]       = KeyType.CharKey.make("charKey")
-      val intKey: Key[Int]         = KeyType.IntKey.make("intKey")
+      val charKey: Key[Char] = KeyType.CharKey.make("charKey")
+      val intKey: Key[Int] = KeyType.IntKey.make("intKey")
       val booleanKey: Key[Boolean] = KeyType.BooleanKey.make("booleanKey")
       val utcTimeKey: Key[UTCTime] = KeyType.UTCTimeKey.make("utcTimeKey")
-      val notUsedKey: Key[String]  = KeyType.StringKey.make("notUsed")
+      val notUsedKey: Key[String] = KeyType.StringKey.make("notUsed")
 
       //parameters
-      val charParam: Parameter[Char]       = charKey.set('A', 'B', 'C').withUnits(NoUnits)
-      val intParam: Parameter[Int]         = intKey.set(1, 2, 3).withUnits(meter)
+      val charParam: Parameter[Char] = charKey.set('A', 'B', 'C').withUnits(NoUnits)
+      val intParam: Parameter[Int] = intKey.set(1, 2, 3).withUnits(meter)
       val booleanParam: Parameter[Boolean] = booleanKey.set(true, false)
-      val utcTime: Parameter[UTCTime]      = utcTimeKey.set(UTCTime.now())
+      val utcTime: Parameter[UTCTime] = utcTimeKey.set(UTCTime.now())
 
       //create DemandState and use sequential add
       val ds1: DemandState = DemandState(prefix, StateName("testStateName")).add(charParam).add(intParam)
@@ -45,7 +45,7 @@ class StateVariablesTest extends FunSpec with Matchers {
       val p1: Option[Parameter[Int]] = ds1.get(intKey)
 
       //access values
-      val v1: Array[Char]    = ds1(charKey).values
+      val v1: Array[Char] = ds1(charKey).values
       val v2: Array[Boolean] = ds2.parameter(booleanKey).values
       val missingKeys: Set[String] = ds3.missingKeys(
         charKey,
@@ -80,17 +80,17 @@ class StateVariablesTest extends FunSpec with Matchers {
       val prefix = Prefix("wfos.prog.cloudcover")
 
       //key
-      val charKey    = KeyType.CharKey.make("charKey")
-      val intKey     = KeyType.IntKey.make("intKey")
+      val charKey = KeyType.CharKey.make("charKey")
+      val intKey = KeyType.IntKey.make("intKey")
       val booleanKey = KeyType.BooleanKey.make("booleanKey")
       val utcTimeKey = KeyType.UTCTimeKey.make("utcTimeKey")
       val notUsedKey = KeyType.StringKey.make("notUsed")
 
       //parameters
-      val charParam    = charKey.set('A', 'B', 'C').withUnits(NoUnits)
-      val intParam     = intKey.set(1, 2, 3).withUnits(meter)
+      val charParam = charKey.set('A', 'B', 'C').withUnits(NoUnits)
+      val intParam = intKey.set(1, 2, 3).withUnits(meter)
       val booleanParam = booleanKey.set(true, false)
-      val utcTime      = utcTimeKey.set(UTCTime.now)
+      val utcTime = utcTimeKey.set(UTCTime.now)
 
       //create CurrentState and use sequential add
       val cs1 = CurrentState(prefix, StateName("testStateName")).add(charParam).add(intParam)
@@ -106,7 +106,7 @@ class StateVariablesTest extends FunSpec with Matchers {
       val p1: Option[Parameter[Int]] = cs1.get(intKey)
 
       //access values
-      val v1: Array[Char]    = cs1(charKey).values
+      val v1: Array[Char] = cs1(charKey).values
       val v2: Array[Boolean] = cs2.parameter(booleanKey).values
       val missingKeys: Set[String] = cs3.missingKeys(
         charKey,
@@ -153,7 +153,7 @@ class StateVariablesTest extends FunSpec with Matchers {
       val p1: Parameter[MatrixData[Double]] = k1.set(m1)
 
       //state variables
-      val ds: DemandState  = DemandState(Prefix("wfos.blue.filter"), StateName("testStateName")).add(p1)
+      val ds: DemandState = DemandState(Prefix("wfos.blue.filter"), StateName("testStateName")).add(p1)
       val cs: CurrentState = CurrentState(Prefix("wfos.blue.filter"), StateName("testStateName")).add(p1)
 
       //json support - write
@@ -167,7 +167,7 @@ class StateVariablesTest extends FunSpec with Matchers {
       val scFromPrettyStr = JsonSupport.readStateVariable[DemandState](Json.parse(str))
 
       //json support - read
-      val ds1: DemandState  = JsonSupport.readStateVariable[DemandState](dsJson)
+      val ds1: DemandState = JsonSupport.readStateVariable[DemandState](dsJson)
       val cs1: CurrentState = JsonSupport.readStateVariable[CurrentState](csJson)
       //#json-serialization
 
@@ -184,8 +184,8 @@ class StateVariablesTest extends FunSpec with Matchers {
       //#unique-key
       //keys
       val encoderKey: Key[Int] = KeyType.IntKey.make("encoder")
-      val filterKey: Key[Int]  = KeyType.IntKey.make("filter")
-      val miscKey: Key[Int]    = KeyType.IntKey.make("misc.")
+      val filterKey: Key[Int] = KeyType.IntKey.make("filter")
+      val miscKey: Key[Int] = KeyType.IntKey.make("misc.")
 
       //prefix
       val prefix = Prefix("wfos.blue.filter")

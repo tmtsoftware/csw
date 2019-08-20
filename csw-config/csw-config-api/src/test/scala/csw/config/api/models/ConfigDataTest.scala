@@ -40,7 +40,7 @@ class ConfigDataTest extends TestKit(ActorSystem("test-system")) with FunSuiteLi
 
   //DEOPSCSW-72: Retrieve a configuration file to a specified file location on a local disk
   test("should be able to save ConfigData to local disc") {
-    val configData     = ConfigData.fromString(expectedStringConfigData)
+    val configData = ConfigData.fromString(expectedStringConfigData)
     val tempOutputFile = Files.createTempFile("temp-config", ".conf")
     configData.toPath(tempOutputFile).await
     Files.readString(tempOutputFile) shouldBe expectedStringConfigData

@@ -111,7 +111,7 @@ object MiniCRM {
    * @param initList the list can be iniitalized with some values
    * @tparam T the type of elements in the list
    */
-  private class SizedList[T](max: Int, initList: List[T] = List.empty) extends Traversable[T] {
+  private class SizedList[T](max: Int, initList: List[T] = List.empty) {
     val list: ListBuffer[T] = ListBuffer() ++= initList
 
     def append(sr: T): SizedList[T] = {
@@ -123,7 +123,7 @@ object MiniCRM {
       this
     }
 
-    override def toList: List[T] = list.toList
+    def toList: List[T] = list.toList
 
     def remove(f: T => Boolean): SizedList[T] = {
       val newList = list.filterNot(f)

@@ -25,7 +25,7 @@ object AkkaRegistrationFactory {
    */
   def make(connection: AkkaConnection, prefix: Prefix, actorRefURI: URI): AkkaRegistration = {
     if (actorRefURI.getPort == -1) {
-      val log: Logger            = LocationServiceLogger.getLogger
+      val log: Logger = LocationServiceLogger.getLogger
       val registrationNotAllowed = LocalAkkaActorRegistrationNotAllowed(actorRefURI)
       log.error(registrationNotAllowed.getMessage, ex = registrationNotAllowed)
       throw registrationNotAllowed

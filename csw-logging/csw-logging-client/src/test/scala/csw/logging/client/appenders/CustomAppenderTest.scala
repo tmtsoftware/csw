@@ -45,7 +45,7 @@ object CustomAppenderBuilderObject extends LogAppenderBuilder {
 
 class CustomAppender(system: typed.ActorSystem[_], stdHeaders: JsObject, callback: Any => Unit) extends LogAppender {
 
-  private[this] val config       = system.settings.config.getConfig("csw-logging.appender-config.my-fav-appender")
+  private[this] val config = system.settings.config.getConfig("csw-logging.appender-config.my-fav-appender")
   private[this] val logIpAddress = config.getBoolean("logIpAddress")
 
   override def stop(): Future[Unit] = Future.successful(())
@@ -79,7 +79,7 @@ class CustomAppenderTest extends FunSuite with Matchers {
         |}
       """.stripMargin)
 
-    val actorSystem   = typed.ActorSystem(SpawnProtocol.behavior, "test", config.resolve())
+    val actorSystem = typed.ActorSystem(SpawnProtocol.behavior, "test", config.resolve())
     val loggingSystem = LoggingSystemFactory.start("foo-name", "foo-version", hostName, actorSystem)
     loggingSystem.setAppenders(List(CustomAppenderBuilderObject))
 
@@ -108,8 +108,8 @@ class CustomAppenderTest extends FunSuite with Matchers {
         |}
       """.stripMargin)
 
-    val actorSystem    = typed.ActorSystem(SpawnProtocol.behavior, "test", config.resolve())
-    val loggingSystem  = LoggingSystemFactory.start("foo-name", "foo-version", hostName, actorSystem)
+    val actorSystem = typed.ActorSystem(SpawnProtocol.behavior, "test", config.resolve())
+    val loggingSystem = LoggingSystemFactory.start("foo-name", "foo-version", hostName, actorSystem)
     val customAppender = new CustomAppenderBuilderClass
     loggingSystem.setAppenders(List(customAppender))
 
@@ -141,8 +141,8 @@ class CustomAppenderTest extends FunSuite with Matchers {
                                              |}
                                            """.stripMargin)
 
-    val actorSystem    = typed.ActorSystem(SpawnProtocol.behavior, "test", config.resolve())
-    val loggingSystem  = LoggingSystemFactory.start("foo-name", "foo-version", hostName, actorSystem)
+    val actorSystem = typed.ActorSystem(SpawnProtocol.behavior, "test", config.resolve())
+    val loggingSystem = LoggingSystemFactory.start("foo-name", "foo-version", hostName, actorSystem)
     val customAppender = new CustomAppenderBuilderClass
     loggingSystem.setAppenders(List(customAppender))
 

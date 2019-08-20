@@ -43,12 +43,12 @@ class MetadataServiceModuleTest
   // DEOPSCSW-463: Fetch Alarm List for a component name or pattern
   test("getMetadata should fetch all alarms for a component") {
     initTestAlarms()
-    val tromboneKey      = ComponentKey(NFIRAOS, "trombone")
+    val tromboneKey = ComponentKey(NFIRAOS, "trombone")
     val tromboneMetadata = getMetadata(tromboneKey).await
     tromboneMetadata.length shouldBe 2
     tromboneMetadata should contain allElementsOf List(tromboneAxisLowLimitAlarm, tromboneAxisHighLimitAlarm)
 
-    val enclosureKey      = ComponentKey(NFIRAOS, "enclosure")
+    val enclosureKey = ComponentKey(NFIRAOS, "enclosure")
     val enclosureMetadata = getMetadata(enclosureKey).await
     enclosureMetadata.length shouldBe 2
     enclosureMetadata should contain allElementsOf List(enclosureTempHighAlarm, enclosureTempLowAlarm)
@@ -58,7 +58,7 @@ class MetadataServiceModuleTest
   test("getMetadata should fetch all alarms for a subsystem") {
     initTestAlarms()
     val nfiraosKey = SubsystemKey(NFIRAOS)
-    val metadata   = getMetadata(nfiraosKey).await
+    val metadata = getMetadata(nfiraosKey).await
     metadata.length shouldBe 5
     metadata should contain allElementsOf List(
       splitterLimitAlarm,
@@ -73,7 +73,7 @@ class MetadataServiceModuleTest
   test("getMetadata should fetch all alarms of whole system") {
     initTestAlarms()
     val globalKey = GlobalKey
-    val metadata  = getMetadata(globalKey).await
+    val metadata = getMetadata(globalKey).await
     metadata.length shouldBe 8
     metadata should contain allElementsOf List(
       tromboneAxisHighLimitAlarm,
@@ -93,7 +93,7 @@ class MetadataServiceModuleTest
   }
 
   val fourAlarmsConfig: Config = ConfigFactory.parseResources("test-alarms/valid-alarms.conf")
-  val twoAlarmsConfig: Config  = ConfigFactory.parseResources("test-alarms/two-valid-alarms.conf")
+  val twoAlarmsConfig: Config = ConfigFactory.parseResources("test-alarms/two-valid-alarms.conf")
 
   test("initAlarms should load alarms from provided config file") {
     clearAlarmStore().await

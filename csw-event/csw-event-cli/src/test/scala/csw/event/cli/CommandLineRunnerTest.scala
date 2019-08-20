@@ -22,9 +22,9 @@ class CommandLineRunnerTest extends SeedData with Eventually {
     for (i <- 1 to 10) yield event1.copy(eventName = name, eventId = Id(i.toString))
 
   class EventGenerator(eventName: EventName) {
-    var counter                               = 0
+    var counter = 0
     var publishedEvents: mutable.Queue[Event] = mutable.Queue.empty
-    val eventsGroup: immutable.Seq[Event]     = events(eventName)
+    val eventsGroup: immutable.Seq[Event] = events(eventName)
 
     def generate: Option[Event] = Option {
       val event = eventsGroup(counter)
@@ -85,7 +85,7 @@ class CommandLineRunnerTest extends SeedData with Eventually {
   // DEOPSCSW-432: [Event Cli] Publish command
   test("should able to publish event when event key and event json file provided") {
     val (path, eventContent) = ResourceReader.readAndCopyToTmp("/publish/observe_event.json")
-    val eventJson            = Json.parse(eventContent)
+    val eventJson = Json.parse(eventContent)
 
     val eventKey = EventKey("wfos.blue.filter.wheel")
     commandLineRunner.publish(argsParser.parse(Seq("publish", "-e", eventKey.key, "--data", path.toString)).get).await
@@ -93,7 +93,7 @@ class CommandLineRunnerTest extends SeedData with Eventually {
     eventually(timeout = timeout(5.seconds), interval = interval(100.millis)) {
       commandLineRunner.get(argsParser.parse(Seq("get", "-e", eventKey.key, "-o", "json")).get).await
 
-      val actualEventJson   = removeDynamicKeys(Json.parse(logBuffer.last))
+      val actualEventJson = removeDynamicKeys(Json.parse(logBuffer.last))
       val expectedEventJson = removeDynamicKeys(addEventIdAndName(eventJson, eventKey))
 
       actualEventJson shouldBe expectedEventJson
@@ -102,11 +102,11 @@ class CommandLineRunnerTest extends SeedData with Eventually {
 
   // DEOPSCSW-432: [Event Cli] Publish command
   test("should able to publish event with interval") {
-    val queue                = new mutable.Queue[JsObject]()
-    val eventKey             = EventKey("tcs.mobie.blue.filter")
+    val queue = new mutable.Queue[JsObject]()
+    val eventKey = EventKey("tcs.mobie.blue.filter")
     val (path, eventContent) = ResourceReader.readAndCopyToTmp("/publish/observe_event.json")
-    val eventJson            = Json.parse(eventContent)
-    val expectedEventJson    = removeDynamicKeys(addEventIdAndName(eventJson, eventKey))
+    val eventJson = Json.parse(eventContent)
+    val expectedEventJson = removeDynamicKeys(addEventIdAndName(eventJson, eventKey))
 
     val subscriber = eventService.defaultSubscriber
     subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](e => queue.enqueue(eventToSanitizedJson(e)))).run()
@@ -127,15 +127,15 @@ class CommandLineRunnerTest extends SeedData with Eventually {
 
   // DEOPSCSW-436: [Event Cli] Specialized Publish command (take params from command line)
   test("should able to publish event when params are provided") {
-    val filePath                    = "/publish/observe_event.json"
+    val filePath = "/publish/observe_event.json"
     val (path, observeEventContent) = ResourceReader.readAndCopyToTmp(filePath)
-    val eventKey                    = EventKey("wfos.test.move")
+    val eventKey = EventKey("wfos.test.move")
 
     val cmdLineParams = "testKey:s=[test]|testKey2:i:meter=[1,2,3]"
-    val strParam      = StringKey.make("testKey").set("test")
-    val intParam      = IntKey.make("testKey2").set(1, 2, 3).withUnits(meter)
+    val strParam = StringKey.make("testKey").set("test")
+    val intParam = IntKey.make("testKey2").set(1, 2, 3).withUnits(meter)
 
-    val expectedEvent     = stringToEvent[ObserveEvent](observeEventContent).madd(strParam, intParam)
+    val expectedEvent = stringToEvent[ObserveEvent](observeEventContent).madd(strParam, intParam)
     val expectedEventJson = JsonSupport.writeEvent(expectedEvent)
 
     // first publish event with default data from json file
@@ -153,10 +153,10 @@ class CommandLineRunnerTest extends SeedData with Eventually {
 
     // verify existing params get updated if provided cmd line params already present
     val updateCmdLineParams = "testKey:s=['test1','test2']|testKey2:i:meter=[4]"
-    val updatedStrParam     = StringKey.make("testKey").set("test1", "test2")
-    val updatedIntParam     = IntKey.make("testKey2").set(4).withUnits(meter)
+    val updatedStrParam = StringKey.make("testKey").set("test1", "test2")
+    val updatedIntParam = IntKey.make("testKey2").set(4).withUnits(meter)
 
-    val updatedExpectedEvent     = stringToEvent[ObserveEvent](observeEventContent).madd(updatedStrParam, updatedIntParam)
+    val updatedExpectedEvent = stringToEvent[ObserveEvent](observeEventContent).madd(updatedStrParam, updatedIntParam)
     val updatedExpectedEventJson = JsonSupport.writeEvent(updatedExpectedEvent)
 
     commandLineRunner
@@ -184,7 +184,7 @@ class CommandLineRunnerTest extends SeedData with Eventually {
       commandLineRunner.subscribe(argsParser.parse(Seq("subscribe", "-o", "json", "--events", eventKey.key)).get)
     Thread.sleep(500)
 
-    val publisher   = eventService.defaultPublisher
+    val publisher = eventService.defaultPublisher
     val cancellable = publisher.publish(eventGenerator.generate, 400.millis)
 
     Thread.sleep(1000)
@@ -209,7 +209,7 @@ class CommandLineRunnerTest extends SeedData with Eventually {
     import eventGenerator._
 
     val eventKey: EventKey = eventsGroup.head.eventKey
-    val publisher          = eventService.defaultPublisher
+    val publisher = eventService.defaultPublisher
 
     val (subscriptionF, _) =
       commandLineRunner.subscribe(argsParser.parse(Seq("subscribe", "--events", eventKey.key, "--id")).get)
@@ -234,7 +234,7 @@ class CommandLineRunnerTest extends SeedData with Eventually {
     import eventGenerator._
 
     val eventKey: EventKey = eventsGroup.head.eventKey
-    val publisher          = eventService.defaultPublisher
+    val publisher = eventService.defaultPublisher
 
     val (subscriptionF, _) =
       commandLineRunner.subscribe(argsParser.parse(Seq("subscribe", "--events", eventKey.key, "--out", "terse")).get)
@@ -251,7 +251,7 @@ class CommandLineRunnerTest extends SeedData with Eventually {
 
   // publish command generates new id and event time while publishing, hence assertions exclude these keys from json
   private def removeDynamicKeys(json: JsValue) = {
-    val (k, v)   = json.as[JsObject].value.head
+    val (k, v) = json.as[JsObject].value.head
     val jsObject = v.as[JsObject].value.toMap -- Seq("eventId", "eventTime")
     Json.obj(k -> jsObject)
   }
@@ -269,7 +269,7 @@ class CommandLineRunnerTest extends SeedData with Eventually {
     Json.obj(k -> jsObject)
   }
 
-  private def eventToSanitizedJson(event: Event)                = removeDynamicKeys(JsonSupport.writeEvent(event))
+  private def eventToSanitizedJson(event: Event) = removeDynamicKeys(JsonSupport.writeEvent(event))
   private def stringToEvent[T <: Event](eventString: String): T = JsonSupport.readEvent[T](Json.parse(eventString))
-  private def strToJsObject(js: String)                         = Json.parse(js).as[JsObject]
+  private def strToJsObject(js: String) = Json.parse(js).as[JsObject]
 }

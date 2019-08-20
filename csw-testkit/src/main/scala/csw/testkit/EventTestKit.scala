@@ -32,13 +32,13 @@ import csw.testkit.redis.RedisStore
  */
 final class EventTestKit private (_system: typed.ActorSystem[_], testKitSettings: TestKitSettings) extends RedisStore {
 
-  override implicit val system: typed.ActorSystem[_]    = _system
-  override implicit lazy val timeout: Timeout           = testKitSettings.DefaultTimeout
-  override protected lazy val masterId: String          = system.settings.config.getString("csw-event.redis.masterId")
+  override implicit val system: typed.ActorSystem[_] = _system
+  override implicit lazy val timeout: Timeout = testKitSettings.DefaultTimeout
+  override protected lazy val masterId: String = system.settings.config.getString("csw-event.redis.masterId")
   override protected lazy val connection: TcpConnection = EventServiceConnection.value
 
   private def getSentinelPort: Int = testKitSettings.EventSentinelPort.getOrElse(getFreePort)
-  private def getMasterPort: Int   = testKitSettings.EventMasterPort.getOrElse(getFreePort)
+  private def getMasterPort: Int = testKitSettings.EventMasterPort.getOrElse(getFreePort)
 
   /**
    * Scala API to Start Event service

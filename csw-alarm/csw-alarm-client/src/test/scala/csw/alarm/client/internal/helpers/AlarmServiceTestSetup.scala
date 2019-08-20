@@ -32,7 +32,7 @@ class AlarmServiceTestSetup
     with AlarmTestData
     with BeforeAndAfterAll
     with BeforeAndAfterEach {
-  val hostname    = "localhost"
+  val hostname = "localhost"
   val alarmServer = "alarmServer"
 
   val (sentinelPort, serverPort) = (getFreePort, getFreePort)
@@ -44,17 +44,17 @@ class AlarmServiceTestSetup
   private val redisClient = RedisClient.create()
 
   implicit val actorSystem: typed.ActorSystem[SpawnProtocol] = typed.ActorSystem(SpawnProtocol.behavior, "alarm-server")
-  implicit val ec: ExecutionContext                          = actorSystem.executionContext
-  implicit val mat: ActorMaterializer                        = scaladsl.ActorMaterializer()
+  implicit val ec: ExecutionContext = actorSystem.executionContext
+  implicit val mat: ActorMaterializer = scaladsl.ActorMaterializer()
 
-  val alarmServiceFactory             = new AlarmServiceFactory(redisClient)
+  val alarmServiceFactory = new AlarmServiceFactory(redisClient)
   val alarmService: AlarmAdminService = alarmServiceFactory.makeAdminApi(hostname, sentinelPort)
-  val jAlarmService: IAlarmService    = alarmServiceFactory.jMakeClientApi(hostname, sentinelPort, actorSystem)
+  val jAlarmService: IAlarmService = alarmServiceFactory.jMakeClientApi(hostname, sentinelPort, actorSystem)
 
   import csw.alarm.client.internal.AlarmCodec._
 
-  val connsFactory: RedisConnectionsFactory                          = new RedisConnectionsFactory(resolver, alarmServer, new RomaineFactory(redisClient))
-  val testMetadataApi: RedisAsyncApi[MetadataKey, AlarmMetadata]     = connsFactory.asyncApi[MetadataKey, AlarmMetadata]
+  val connsFactory: RedisConnectionsFactory = new RedisConnectionsFactory(resolver, alarmServer, new RomaineFactory(redisClient))
+  val testMetadataApi: RedisAsyncApi[MetadataKey, AlarmMetadata] = connsFactory.asyncApi[MetadataKey, AlarmMetadata]
   val testSeverityApi: RedisAsyncApi[SeverityKey, FullAlarmSeverity] = connsFactory.asyncApi[SeverityKey, FullAlarmSeverity]
 
   override protected def afterAll(): Unit = {

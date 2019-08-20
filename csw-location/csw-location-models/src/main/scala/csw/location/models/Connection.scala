@@ -82,7 +82,7 @@ object Connection {
     case HttpType => HttpConnection(componentId)
   }
 
-  implicit val connectionReads: Reads[Connection]   = ConnectionInfo.connectionInfoFormat.map(Connection.from)
+  implicit val connectionReads: Reads[Connection] = ConnectionInfo.connectionInfoFormat.map(Connection.from)
   implicit val connectionWrites: Writes[Connection] = Writes[Connection](c => Json.toJson(c.connectionInfo))
 
   /**

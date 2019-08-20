@@ -8,11 +8,11 @@ import org.scalatest.events._
 import scala.collection.mutable
 
 class FileAcceptanceTestReporter extends Reporter {
-  private val data      = mutable.ListBuffer[String]()
+  private val data = mutable.ListBuffer[String]()
   private val delimiter = "\t"
 
   private val filePath = s"target/acceptance/acceptance-test-report.txt"
-  private val file     = new File(filePath)
+  private val file = new File(filePath)
   if (file.exists()) file.delete()
   file.getParentFile.mkdirs
   private val writer = new FileWriter(file, true)

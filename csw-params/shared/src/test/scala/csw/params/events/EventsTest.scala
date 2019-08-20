@@ -16,14 +16,14 @@ class EventsTest extends FunSpec with Matchers {
 
   private val s1Key = KeyType.IntKey.make(s1)
 
-  private val ck        = Prefix("wfos.blue.filter")
+  private val ck = Prefix("wfos.blue.filter")
   private val eventName = EventName("filter wheel")
 
   describe("SystemEvent Test") {
-    val k1     = KeyType.IntKey.make("encoder")
-    val k2     = KeyType.IntKey.make("windspeed")
-    val k3     = KeyType.IntKey.make("notUsed")
-    val k4     = KeyType.ByteKey.make("image")
+    val k1 = KeyType.IntKey.make("encoder")
+    val k2 = KeyType.IntKey.make("windspeed")
+    val k3 = KeyType.IntKey.make("notUsed")
+    val k4 = KeyType.ByteKey.make("image")
     val prefix = Prefix("wfos.prog.cloudcover")
 
     it("should create with prefix and eventName") {
@@ -56,8 +56,8 @@ class EventsTest extends FunSpec with Matchers {
     }
 
     it("Should allow removing") {
-      val i1  = k1.set(22)
-      val i2  = k2.set(44)
+      val i1 = k1.set(22)
+      val i2 = k2.set(44)
       val sc1 = SystemEvent(prefix, eventName).madd(i1, i2)
 
       assert(sc1.size == 2)
@@ -71,8 +71,8 @@ class EventsTest extends FunSpec with Matchers {
     }
 
     it("Should allow adding") {
-      val i1  = k1.set(22)
-      val i2  = k2.set(44)
+      val i1 = k1.set(22)
+      val i2 = k2.set(44)
       val sc1 = SystemEvent(prefix, eventName).madd(i1)
 
       assert(sc1.size == 1)
@@ -85,7 +85,7 @@ class EventsTest extends FunSpec with Matchers {
     }
 
     it("Should access metadata fields") {
-      val i1  = k1.set(22)
+      val i1 = k1.set(22)
       val sc1 = SystemEvent(prefix, eventName).madd(i1)
 
       assert(sc1.size == 1)
@@ -114,10 +114,10 @@ class EventsTest extends FunSpec with Matchers {
   }
 
   describe("ObserveEvent Test") {
-    val k1     = KeyType.IntKey.make("encoder")
-    val k2     = KeyType.IntKey.make("windspeed")
-    val k3     = KeyType.IntKey.make("notUsed")
-    val k4     = KeyType.ByteKey.make("image")
+    val k1 = KeyType.IntKey.make("encoder")
+    val k2 = KeyType.IntKey.make("windspeed")
+    val k3 = KeyType.IntKey.make("notUsed")
+    val k4 = KeyType.ByteKey.make("image")
     val prefix = Prefix("wfos.prog.cloudcover")
 
     it("should create with prefix and eventName") {
@@ -150,8 +150,8 @@ class EventsTest extends FunSpec with Matchers {
     }
 
     it("Should allow removing") {
-      val i1  = k1.set(22)
-      val i2  = k2.set(44)
+      val i1 = k1.set(22)
+      val i2 = k2.set(44)
       val oc1 = ObserveEvent(prefix, eventName).madd(i1, i2)
 
       assert(oc1.size == 2)
@@ -165,8 +165,8 @@ class EventsTest extends FunSpec with Matchers {
     }
 
     it("Should allow adding") {
-      val i1  = k1.set(22)
-      val i2  = k2.set(44)
+      val i1 = k1.set(22)
+      val i2 = k2.set(44)
       val oc1 = ObserveEvent(prefix, eventName).madd(i1)
 
       assert(oc1.size == 1)
@@ -179,7 +179,7 @@ class EventsTest extends FunSpec with Matchers {
     }
 
     it("Should access metadata fields") {
-      val i1  = k1.set(22)
+      val i1 = k1.set(22)
       val oc1 = ObserveEvent(prefix, eventName).madd(i1)
 
       assert(oc1.size == 1)

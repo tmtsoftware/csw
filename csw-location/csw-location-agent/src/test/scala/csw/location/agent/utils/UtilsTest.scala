@@ -9,7 +9,7 @@ import org.scalatest.{FunSuite, Matchers}
 class UtilsTest extends FunSuite with Matchers {
 
   test("testGetAppConfig") {
-    val configFile        = ResourceReader.copyToTmp("/redisTest.conf").toFile
+    val configFile = ResourceReader.copyToTmp("/redisTest.conf").toFile
     val x: Option[Config] = Utils.getAppConfig(configFile)
 
     x.isDefined shouldBe true
@@ -17,7 +17,7 @@ class UtilsTest extends FunSuite with Matchers {
   }
 
   test("testNonExistantAppConfig") {
-    val configFile        = new File("/doesNotExist.conf")
+    val configFile = new File("/doesNotExist.conf")
     val x: Option[Config] = Utils.getAppConfig(configFile)
     x shouldBe None
   }

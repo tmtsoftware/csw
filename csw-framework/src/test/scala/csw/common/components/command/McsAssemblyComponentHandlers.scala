@@ -10,7 +10,7 @@ import csw.command.client.messages.TopLevelActorMessage
 import csw.common.components.command.ComponentStateForCommand.{longRunningCmdCompleted, _}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.api.models.{AkkaLocation, TrackingEvent}
+import csw.location.models.{AkkaLocation, TrackingEvent}
 import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandIssue, ControlCommand, Setup}
@@ -33,43 +33,43 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
 
   override def initialize(): Future[Unit] = {
     componentInfo.connections.headOption match {
-      case Some(hcd) ⇒
+      case Some(hcd) =>
         cswCtx.locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
-          case Some(akkaLocation) ⇒ hcdComponent = CommandServiceFactory.make(akkaLocation)(ctx.system)
-          case None ⇒ throw new RuntimeException("Could not resolve hcd location, Initialization failure.")
+          case Some(akkaLocation) => hcdComponent = CommandServiceFactory.make(akkaLocation)(ctx.system)
+          case None               => throw new RuntimeException("Could not resolve hcd location, Initialization failure.")
         }
-      case None ⇒ Future.successful(Unit)
+      case None => Future.unit
     }
   }
 
-  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = Unit
+  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ()
 
   override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse = {
     controlCommand.commandName match {
-      case `longRunning` ⇒ Accepted(controlCommand.commandName, runId)
-      case `moveCmd` ⇒ Accepted(controlCommand.commandName, runId)
-      case `initCmd` ⇒ Accepted(controlCommand.commandName, runId)
-      case `invalidCmd` ⇒
+      case `longRunning` => Accepted(controlCommand.commandName, runId)
+      case `moveCmd`     => Accepted(controlCommand.commandName, runId)
+      case `initCmd`     => Accepted(controlCommand.commandName, runId)
+      case `invalidCmd` =>
         Invalid(controlCommand.commandName, runId, CommandIssue.OtherIssue("Invalid"))
-      case _ ⇒ Invalid(controlCommand.commandName, runId, UnsupportedCommandIssue(controlCommand.commandName.name))
+      case _ => Invalid(controlCommand.commandName, runId, UnsupportedCommandIssue(controlCommand.commandName.name))
     }
   }
 
   override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse = {
     controlCommand.commandName match {
-      case `longRunning` ⇒
+      case `longRunning` =>
         processLongRunningCommand(runId, controlCommand)
 
         // Return response
         Started(controlCommand.commandName, runId)
 
-      case `initCmd` ⇒
+      case `initCmd` =>
         Completed(controlCommand.commandName, runId)
 
-      case `moveCmd` ⇒
+      case `moveCmd` =>
         Completed(controlCommand.commandName, runId)
 
-      case _ ⇒ //do nothing
+      case _ => // do nothing
         Completed(controlCommand.commandName, runId)
     }
   }
@@ -122,23 +122,23 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
       // An original command is split into sub-commands and sent to a component.
       // The current state publishing is not relevant to the updateSubCommand usage.
       // As the commands get completed, the results are updated using the command completer
-      case Started(commandName, runId) ⇒
+      case Started(commandName, runId) =>
         commandName match {
-          case n if n == shortRunning ⇒
+          case n if n == shortRunning =>
             hcdComponent.queryFinal(runId).map { sr =>
               currentStatePublisher
                 .publish(CurrentState(assemblyPrefix, StateName("testStateName"), Set(choiceKey.set(shortCmdCompleted))))
               completer.update(sr)
             }
 
-          case n if n == mediumRunning ⇒
+          case n if n == mediumRunning =>
             hcdComponent.queryFinal(runId).map { sr =>
               currentStatePublisher
                 .publish(CurrentState(assemblyPrefix, StateName("testStateName"), Set(choiceKey.set(mediumCmdCompleted))))
               completer.update(sr)
             }
 
-          case n if n == longRunning ⇒
+          case n if n == longRunning =>
             hcdComponent.queryFinal(runId).map { sr =>
               currentStatePublisher
                 .publish(CurrentState(assemblyPrefix, StateName("testStateName"), Set(choiceKey.set(longCmdCompleted))))
@@ -146,7 +146,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
             }
         }
       //#updateSubCommand
-      case _ ⇒ // Do nothing
+      case _ => // Do nothing
     }
   }
 

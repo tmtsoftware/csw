@@ -35,7 +35,7 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
 
   import cswCtx._
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
-  private val log                           = loggerFactory.getLogger
+  private val log = loggerFactory.getLogger
 
   //#worker-actor
   sealed trait WorkerCommand
@@ -59,9 +59,9 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
   def handle(hcd: CommandService): Unit = {
 
     // Construct Setup command
-    val sleepTimeKey: Key[Long]         = KeyType.LongKey.make("SleepTime")
+    val sleepTimeKey: Key[Long] = KeyType.LongKey.make("SleepTime")
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
-    val setupCommand                    = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
+    val setupCommand = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
     // Submit command, and handle validation response. Final response is returned as a Future
     val submitCommandResponseF: Future[SubmitResponse] = hcd.submitAndWait(setupCommand).flatMap {
@@ -108,7 +108,7 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
   //#track-location
 
   private val counterEventKey = EventKey(Prefix("nfiraos.samplehcd"), EventName("HcdCounter"))
-  private val hcdCounterKey   = KeyType.IntKey.make("counter")
+  private val hcdCounterKey = KeyType.IntKey.make("counter")
 
   //#subscribe
   private def processEvent(event: Event): Unit = {
@@ -128,8 +128,8 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
   //#subscribe
 
   //#alarm
-  private val safeRange  = 0 to 10
-  private val warnRange  = 11 to 15
+  private val safeRange = 0 to 10
+  private val warnRange = 11 to 15
   private val majorRange = 16 to 20
   private def getCounterSeverity(counter: Int) = counter match {
     case x if safeRange contains x  => AlarmSeverity.Okay

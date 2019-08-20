@@ -16,10 +16,10 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 
 private[admin] class ActorRuntime(_typedSystem: typed.ActorSystem[SpawnProtocol]) {
   implicit val typedSystem: typed.ActorSystem[SpawnProtocol] = _typedSystem
-  implicit val untypedSystem: actor.ActorSystem              = _typedSystem.toUntyped
-  implicit val ec: ExecutionContextExecutor                  = untypedSystem.dispatcher
-  implicit val mat: Materializer                             = ActorMaterializer()(typedSystem)
-  implicit val scheduler: Scheduler                          = untypedSystem.scheduler
+  implicit val untypedSystem: actor.ActorSystem = _typedSystem.toUntyped
+  implicit val ec: ExecutionContextExecutor = untypedSystem.dispatcher
+  implicit val mat: Materializer = ActorMaterializer()(typedSystem)
+  implicit val scheduler: Scheduler = untypedSystem.scheduler
 
   private[admin] val coordinatedShutdown = CoordinatedShutdown(untypedSystem)
 

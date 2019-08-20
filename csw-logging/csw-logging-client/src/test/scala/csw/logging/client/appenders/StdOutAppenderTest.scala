@@ -19,7 +19,7 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
 
   private val standardHeaders: JsObject = Json.obj(
     LoggingKeys.VERSION -> 1,
-    LoggingKeys.EX      -> "localhost",
+    LoggingKeys.EX -> "localhost",
     LoggingKeys.SERVICE -> Json.obj("name" -> "test-service", "version" -> "1.2.3")
   )
 
@@ -86,20 +86,20 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
       .withFallback(ConfigFactory.load())
 
     val actorSystemWithOneLineTrueConfig = ActorSystem(SpawnProtocol.behavior, "test-2", config)
-    val stdOutAppenderForOneLineMsg      = new StdOutAppender(actorSystemWithOneLineTrueConfig, standardHeaders, println)
+    val stdOutAppenderForOneLineMsg = new StdOutAppender(actorSystemWithOneLineTrueConfig, standardHeaders, println)
 
     Console.withOut(outCapture) {
       stdOutAppenderForOneLineMsg.append(expectedLogJson, Category.Common.name)
     }
 
-    val actualOneLineLogMsg   = outCapture.toString.replace("\n", "")
-    val severity              = expectedLogJson.getString(LoggingKeys.SEVERITY)
-    val msg                   = expectedLogJson.getString(LoggingKeys.MESSAGE)
-    val fileName              = expectedLogJson.getString(LoggingKeys.FILE)
-    val lineNumber            = expectedLogJson.getString(LoggingKeys.LINE)
-    val plainStack            = expectedLogJson.getString(LoggingKeys.PLAINSTACK)
-    val timestamp             = expectedLogJson.getString(LoggingKeys.TIMESTAMP)
-    val component             = expectedLogJson.getString(LoggingKeys.COMPONENT_NAME)
+    val actualOneLineLogMsg = outCapture.toString.replace("\n", "")
+    val severity = expectedLogJson.getString(LoggingKeys.SEVERITY)
+    val msg = expectedLogJson.getString(LoggingKeys.MESSAGE)
+    val fileName = expectedLogJson.getString(LoggingKeys.FILE)
+    val lineNumber = expectedLogJson.getString(LoggingKeys.LINE)
+    val plainStack = expectedLogJson.getString(LoggingKeys.PLAINSTACK)
+    val timestamp = expectedLogJson.getString(LoggingKeys.TIMESTAMP)
+    val component = expectedLogJson.getString(LoggingKeys.COMPONENT_NAME)
     val expectedOneLineLogMsg = f"$timestamp $severity%-5s $component ($fileName $lineNumber) - $msg [Stacktrace] $plainStack"
 
     actualOneLineLogMsg shouldBe expectedOneLineLogMsg

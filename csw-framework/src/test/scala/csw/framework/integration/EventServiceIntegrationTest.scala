@@ -25,13 +25,13 @@ import scala.concurrent.duration.DurationLong
 class EventServiceIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 
-  private val masterId: String        = ConfigFactory.load().getString("csw-event.redis.masterId")
+  private val masterId: String = ConfigFactory.load().getString("csw-event.redis.masterId")
   private var sentinel: RedisSentinel = _
-  private var server: RedisServer     = _
+  private var server: RedisServer = _
 
   private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
-  private val disperserHcdConnection   = AkkaConnection(models.ComponentId("Disperser", HCD))
-  private val wiring                   = FrameworkWiring.make(seedActorSystem)
+  private val disperserHcdConnection = AkkaConnection(models.ComponentId("Disperser", HCD))
+  private val wiring = FrameworkWiring.make(seedActorSystem)
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
@@ -48,14 +48,14 @@ class EventServiceIntegrationTest extends FrameworkIntegrationSuite {
   test("should be able to publish and subscribe to events") {
     val containerRef = Container.spawn(ConfigFactory.load("container_tracking_connections.conf"), wiring).await
 
-    val assemblyProbe                = TestInbox[CurrentState]()
+    val assemblyProbe = TestInbox[CurrentState]()
     val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]("container-lifecycle-state-probe")
     assertThatContainerIsRunning(containerRef, containerLifecycleStateProbe, 5.seconds)
 
     val filterAssemblyLocation = wiring.locationService.find(filterAssemblyConnection).await
-    val disperserHcdLocation   = wiring.locationService.find(disperserHcdConnection).await
+    val disperserHcdLocation = wiring.locationService.find(disperserHcdConnection).await
 
-    val assemblyCommandService  = CommandServiceFactory.make(filterAssemblyLocation.get)(wiring.actorSystem)
+    val assemblyCommandService = CommandServiceFactory.make(filterAssemblyLocation.get)(wiring.actorSystem)
     val disperserCommandService = CommandServiceFactory.make(disperserHcdLocation.get)(wiring.actorSystem)
 
     assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)

@@ -25,7 +25,7 @@ private[testkit] trait MockedAuthentication extends MockitoSugar {
   val _securityDirectives =
     new SecurityDirectives(authentication, keycloakDeployment.getRealm, keycloakDeployment.getResourceName)
 
-  private val validTokenStr           = "valid"
+  private val validTokenStr = "valid"
   private val validToken: AccessToken = mock[AccessToken]
 
   private val authenticator: AsyncAuthenticator[AccessToken] = {

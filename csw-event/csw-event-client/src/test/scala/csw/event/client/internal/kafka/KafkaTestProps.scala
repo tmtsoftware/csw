@@ -42,12 +42,12 @@ class KafkaTestProps(
 
   private lazy val kafkaProducer = producerSettings.createKafkaProducer()
 
-  val eventService: EventService   = eventServiceFactory.make(locationService)
+  val eventService: EventService = eventServiceFactory.make(locationService)
   val jEventService: IEventService = eventServiceFactory.jMake(locationService.asJava, actorSystem)
 
-  override val publisher: EventPublisher     = eventService.defaultPublisher
-  override val subscriber: EventSubscriber   = eventService.defaultSubscriber
-  override val jPublisher: IEventPublisher   = jEventService.defaultPublisher
+  override val publisher: EventPublisher = eventService.defaultPublisher
+  override val subscriber: EventSubscriber = eventService.defaultSubscriber
+  override val jPublisher: IEventPublisher = jEventService.defaultPublisher
   override val jSubscriber: IEventSubscriber = jEventService.defaultSubscriber
 
   override def toString: String = "Kafka"

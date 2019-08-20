@@ -20,13 +20,13 @@ class EventPublishExamples(eventService: EventService, log: Logger) {
     //#single-event
     {
       val publisher = eventService.defaultPublisher
-      val event     = SystemEvent(componentInfo.prefix, EventName("filter_wheel"))
+      val event = SystemEvent(componentInfo.prefix, EventName("filter_wheel"))
       publisher.publish(event)
     }
   //#single-event
 
   def source(componentInfo: ComponentInfo): Future[Done] = {
-    val n: Int                                             = 10
+    val n: Int = 10
     def makeEvent(i: Int, prefix: Prefix, name: EventName) = SystemEvent(prefix, name)
 
     //#with-source
@@ -45,9 +45,9 @@ class EventPublishExamples(eventService: EventService, log: Logger) {
   def generator(componentInfo: ComponentInfo): Cancellable =
     //#event-generator
     {
-      val publisher        = eventService.defaultPublisher
+      val publisher = eventService.defaultPublisher
       val baseEvent: Event = SystemEvent(componentInfo.prefix, EventName("filter_wheel"))
-      val interval         = 100.millis
+      val interval = 100.millis
 
       // this holds the logic for event generation, could be based on some computation or current state of HCD
       def eventGenerator(): Option[Event] = baseEvent match {

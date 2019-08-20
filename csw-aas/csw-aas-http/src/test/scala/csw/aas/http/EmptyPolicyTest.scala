@@ -17,11 +17,11 @@ import scala.concurrent.Future
 class EmptyPolicyTest extends FunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
   test("empty policy should return AuthenticationFailedRejection when token is invalid") {
-    val authentication: Authentication         = mock[Authentication]
+    val authentication: Authentication = mock[Authentication]
     val securityDirectives: SecurityDirectives = new SecurityDirectives(authentication, "TMT", "test")
     //new SecurityDirectives(authentication, authConfig)
 
-    val invalidTokenStr    = "invalid"
+    val invalidTokenStr = "invalid"
     val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
@@ -46,7 +46,7 @@ class EmptyPolicyTest extends FunSuite with MockitoSugar with Directives with Sc
 
   test("empty policy should return AuthenticationFailedRejection when token is not present") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives = new SecurityDirectives(authentication, "TMT", "test")
 
     val authenticator: AsyncAuthenticator[AccessToken] = _ => Future.successful(None)
 
@@ -67,9 +67,9 @@ class EmptyPolicyTest extends FunSuite with MockitoSugar with Directives with Sc
 
   test("empty policy should return 200 OK when token is valid & has permission") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives = new SecurityDirectives(authentication, "TMT", "test")
 
-    val validTokenWithPermissionStr    = "validTokenWithPermissionStr"
+    val validTokenWithPermissionStr = "validTokenWithPermissionStr"
     val validTokenWithPermissionHeader = Authorization(OAuth2BearerToken(validTokenWithPermissionStr))
 
     val validTokenWithPermission = mock[AccessToken]

@@ -13,7 +13,7 @@ sealed trait EventStore
  */
 object EventStores {
   case class RedisStore(redisClient: RedisClient = RedisClient.create()) extends EventStore
-  case object KafkaStore                                                 extends EventStore
+  case object KafkaStore extends EventStore
 
   /**
    * Java helpers to select appropriate event store.

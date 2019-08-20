@@ -28,13 +28,13 @@ trait HttpParameter extends TokenMaskSupport with Directives with HttpCodecs {
 
   val routeLogger: Directive0 = DebuggingDirectives.logRequest(LoggingMagnet(_ => maskRequest andThen logRequest))
 
-  val idParam: Directive1[Option[ConfigId]]  = parameter("id".?).map(_.map(new ConfigId(_)))
+  val idParam: Directive1[Option[ConfigId]] = parameter("id".?).map(_.map(new ConfigId(_)))
   val dateParam: Directive1[Option[Instant]] = parameter("date".?).map(_.map(Instant.parse))
-  val fromParam: Directive1[Instant]         = parameter("from".?).map(_.map(Instant.parse).getOrElse(Instant.MIN))
-  val toParam: Directive1[Instant]           = parameter("to".?).map(_.map(Instant.parse).getOrElse(Instant.now()))
-  val maxResultsParam: Directive1[Int]       = parameter("maxResults".as[Int] ? Int.MaxValue)
-  val commentParam: Directive1[String]       = parameter("comment" ? "")
-  val annexParam: Directive1[Boolean]        = parameter("annex".as[Boolean] ? false)
+  val fromParam: Directive1[Instant] = parameter("from".?).map(_.map(Instant.parse).getOrElse(Instant.MIN))
+  val toParam: Directive1[Instant] = parameter("to".?).map(_.map(Instant.parse).getOrElse(Instant.now()))
+  val maxResultsParam: Directive1[Int] = parameter("maxResults".as[Int] ? Int.MaxValue)
+  val commentParam: Directive1[String] = parameter("comment" ? "")
+  val annexParam: Directive1[Boolean] = parameter("annex".as[Boolean] ? false)
 
   // pattern is an optional parameter coming with list request
   // for list request if the pattern is provided, then it is first compiled and then forwarded to business code to process the request

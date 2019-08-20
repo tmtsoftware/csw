@@ -24,10 +24,10 @@ class RedisSubscriptionApi[K, V](reactiveApiFactory: () => Future[RedisPubSubRea
       overflowStrategy: OverflowStrategy,
       reactiveApiFactory: () => Future[RedisReactiveApi[K, V]]
   ): Source[RedisResult[K, V], RedisSubscription] = {
-    val reactiveApiF                                                    = reactiveApiFactory()
-    val futureSource                                                    = reactiveApiF.map(_.observe(overflowStrategy))
+    val reactiveApiF = reactiveApiFactory()
+    val futureSource = reactiveApiF.map(_.observe(overflowStrategy))
     val redisKeyValueSource: Source[RedisResult[K, V], Future[NotUsed]] = Source.fromFutureSource(futureSource)
-    val connectedF                                                      = futureSource.flatMap(_ => reactiveApiF.flatMap(_.subscribe(keys)))
+    val connectedF = futureSource.flatMap(_ => reactiveApiF.flatMap(_.subscribe(keys)))
 
     redisKeyValueSource.cancellable
       .watchTermination()(Keep.both)

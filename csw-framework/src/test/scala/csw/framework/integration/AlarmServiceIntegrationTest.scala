@@ -24,12 +24,12 @@ import scala.concurrent.duration.DurationLong
 class AlarmServiceIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 
-  private val masterId: String        = ConfigFactory.load().getString("csw-alarm.redis.masterId")
+  private val masterId: String = ConfigFactory.load().getString("csw-alarm.redis.masterId")
   private var sentinel: RedisSentinel = _
-  private var server: RedisServer     = _
+  private var server: RedisServer = _
 
   private val wiring: FrameworkWiring = FrameworkWiring.make(seedActorSystem)
-  private val adminAlarmService       = wiring.alarmServiceFactory.makeAdminApi(wiring.locationService)
+  private val adminAlarmService = wiring.alarmServiceFactory.makeAdminApi(wiring.locationService)
 
   override def beforeAll(): Unit = {
     super.beforeAll()
@@ -51,8 +51,8 @@ class AlarmServiceIntegrationTest extends FrameworkIntegrationSuite {
     Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring)
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")
-    val akkaConnection                = AkkaConnection(ComponentId("IFS_Detector", HCD))
-    val location                      = locationService.resolve(akkaConnection, 5.seconds).await
+    val akkaConnection = AkkaConnection(ComponentId("IFS_Detector", HCD))
+    val location = locationService.resolve(akkaConnection, 5.seconds).await
 
     val supervisorRef = location.get.componentRef
     assertThatSupervisorIsRunning(supervisorRef, supervisorLifecycleStateProbe, 5.seconds)

@@ -37,7 +37,7 @@ private[event] class RedisSubscriber(redisURI: Future[RedisURI], redisClient: Re
 
   import EventRomaineCodecs._
 
-  private val log                 = EventServiceLogger.getLogger
+  private val log = EventServiceLogger.getLogger
   private val eventSubscriberUtil = new EventSubscriberUtil()
 
   private val romaineFactory = new RomaineFactory(redisClient)

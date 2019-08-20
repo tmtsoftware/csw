@@ -25,11 +25,11 @@ import org.scalatest.{BeforeAndAfterEach, Matchers}
 // DEOPSCSW-576: Auth token for Configuration service
 class CommandLineRunnerTest extends HTTPLocationService with Matchers with BeforeAndAfterEach with MockedAuthentication {
 
-  private val clientSystem: typed.ActorSystem[_]         = typed.ActorSystem(Behaviors.empty, "config-cli")
-  private val clientMat: Materializer                    = ActorMaterializer()(clientSystem)
-  private val locationService                            = HttpLocationServiceFactory.makeLocalClient(clientSystem, clientMat)
+  private val clientSystem: typed.ActorSystem[_] = typed.ActorSystem(Behaviors.empty, "config-cli")
+  private val clientMat: Materializer = ActorMaterializer()(clientSystem)
+  private val locationService = HttpLocationServiceFactory.makeLocalClient(clientSystem, clientMat)
   private val nativeAuthAdapter: InstalledAppAuthAdapter = mock[InstalledAppAuthAdapter]
-  private val clientWiring                               = Wiring.noPrinting(locationService, factory, nativeAuthAdapter)
+  private val clientWiring = Wiring.noPrinting(locationService, factory, nativeAuthAdapter)
 
   private val serverWiring = ServerWiring.make(locationService, securityDirectives)
 
@@ -113,8 +113,8 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
 
   // DEOPSCSW-577: Ability to view detailed change log in SVN
   test("should be able to list files with author and use filter pattern") {
-    val normalFileName                                = "troubleshooting"
-    val annexFileName                                 = "firmware"
+    val normalFileName = "troubleshooting"
+    val annexFileName = "firmware"
     def relativeRepoPath(fileName: String, i: String) = s"path/hcd/$fileName$i.conf"
 
     //  create 4 normal files
@@ -202,17 +202,17 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
 
     //  create file
     val parsedCreateArgs: Option[Options] = argsParser.parse(createMinimalArgs)
-    val createConfigId                    = commandLineRunner.create(parsedCreateArgs.get)
-    val createTS                          = Instant.now
+    val createConfigId = commandLineRunner.create(parsedCreateArgs.get)
+    val createTS = Instant.now
 
     //  update file content
     val parsedUpdateArgs: Option[Options] = argsParser.parse(updateAllArgs)
-    val updateConfigId                    = commandLineRunner.update(parsedUpdateArgs.get)
+    val updateConfigId = commandLineRunner.update(parsedUpdateArgs.get)
 
     //  update file content
     val parsedUpdate2Args: Option[Options] = argsParser.parse(updateAllArgs)
-    val update2ConfigId                    = commandLineRunner.update(parsedUpdate2Args.get)
-    val updateTS                           = Instant.now
+    val update2ConfigId = commandLineRunner.update(parsedUpdate2Args.get)
+    val updateTS = Instant.now
 
     commandLineRunner.history(argsParser.parse(historyArgs).get).map(h => (h.id, h.author, h.comment)).toSet shouldBe
     Set((createConfigId, user1, comment), (updateConfigId, user2, comment), (update2ConfigId, user3, comment))
@@ -235,16 +235,16 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
 
     //  create file
     val parsedCreateArgs: Option[Options] = argsParser.parse(createMinimalArgs)
-    val createConfigId                    = commandLineRunner.create(parsedCreateArgs.get) //user1
-    val createTS                          = Instant.now
+    val createConfigId = commandLineRunner.create(parsedCreateArgs.get) //user1
+    val createTS = Instant.now
 
     //  update file content
     val parsedUpdateArgs: Option[Options] = argsParser.parse(updateAllArgs)
-    val updateConfigId                    = commandLineRunner.update(parsedUpdateArgs.get) //user2
+    val updateConfigId = commandLineRunner.update(parsedUpdateArgs.get) //user2
 
     //  update file content
     val parsedUpdate2Args: Option[Options] = argsParser.parse(updateAllArgs)
-    val update2ConfigId                    = commandLineRunner.update(parsedUpdate2Args.get) //user3
+    val update2ConfigId = commandLineRunner.update(parsedUpdate2Args.get) //user3
 
     val setActiveArgs = List("setActiveVersion", relativeRepoPath, "--id", updateConfigId.id, "-c", comment)
     commandLineRunner.setActiveVersion(argsParser.parse(setActiveArgs).get) //user4
@@ -263,7 +263,7 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
 
   test("get repository MetaData from server") {
     val parsedMetaDataArgs: Option[Options] = argsParser.parse(meteDataArgs)
-    val actualMetadata                      = commandLineRunner.getMetadata(parsedMetaDataArgs.get)
+    val actualMetadata = commandLineRunner.getMetadata(parsedMetaDataArgs.get)
     actualMetadata.toString should not be empty
   }
 

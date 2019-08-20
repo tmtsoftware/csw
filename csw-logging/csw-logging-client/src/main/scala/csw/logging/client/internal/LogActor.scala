@@ -30,13 +30,13 @@ private[logging] object LogActor {
       import LogActorOperations._
 
       implicit val logSource: LogSource[AnyRef] = new LogSource[AnyRef] {
-        def genString(o: AnyRef): String           = o.getClass.getName
+        def genString(o: AnyRef): String = o.getClass.getName
         override def getClazz(o: AnyRef): Class[_] = o.getClass
       }
 
-      var level: Level                = initLevel
-      var akkaLogLevel: Level         = initAkkaLevel
-      var slf4jLogLevel: Level        = initSlf4jLevel
+      var level: Level = initLevel
+      var akkaLogLevel: Level = initAkkaLevel
+      var slf4jLogLevel: Level = initSlf4jLevel
       var appenders: Seq[LogAppender] = appends
 
       // Send JSON log object for each appender configured for the logging system

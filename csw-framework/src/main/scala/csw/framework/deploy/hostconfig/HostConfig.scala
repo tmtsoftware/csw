@@ -33,7 +33,7 @@ object HostConfig {
 }
 
 private[hostconfig] class HostConfig(name: String, startLogging: Boolean = false) {
-  private val log: Logger             = new LoggerFactory(name).getLogger
+  private val log: Logger = new LoggerFactory(name).getLogger
   private val timeout: FiniteDuration = 10.seconds
 
   private lazy val wiring: FrameworkWiring = new FrameworkWiring
@@ -51,11 +51,11 @@ private[hostconfig] class HostConfig(name: String, startLogging: Boolean = false
     try {
       if (startLogging) wiring.actorRuntime.startLogging(name)
 
-      val hostConfig    = Await.result(wiring.configUtils.getConfig(isLocal, hostConfigPath, None), timeout)
+      val hostConfig = Await.result(wiring.configUtils.getConfig(isLocal, hostConfigPath, None), timeout)
       val bootstrapInfo = ConfigParser.parseHost(hostConfig)
       log.info(s"Bootstrapping containers: [${bootstrapInfo.containers}]")
       val processes = bootstrapContainers(containerScript, bootstrapInfo)
-      val pids      = processes.map(_.pid())
+      val pids = processes.map(_.pid())
       log.info(s"Started processes with following PID's: ${pids.mkString("[", ", ", "]")}")
     } catch {
       case NonFatal(ex) =>

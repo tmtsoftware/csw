@@ -10,7 +10,7 @@ import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll{
+class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   test("test easy case with all started") {
     val id1 = Id("1")
@@ -28,8 +28,9 @@ class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll{
     c1.update(Completed(CommandName("3"), id3))
 
     val res = Await.result(x, 1.seconds)
-    res shouldEqual OverallSuccess(Set(Completed(CommandName("1"), id1),
-      Completed(CommandName("2"), id2), Completed(CommandName("3"), id3)))
+    res shouldEqual OverallSuccess(
+      Set(Completed(CommandName("1"), id1), Completed(CommandName("2"), id2), Completed(CommandName("3"), id3))
+    )
   }
 
   test("test easy case with 1 completed and 1 started") {
@@ -46,8 +47,9 @@ class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll{
     c1.update(Completed(CommandName("2"), id2))
 
     val res = Await.result(x, 1.seconds)
-    res shouldEqual OverallSuccess(Set(Completed(CommandName("1"), id1),
-      Completed(CommandName("2"), id2), Completed(CommandName("3"), id3)))
+    res shouldEqual OverallSuccess(
+      Set(Completed(CommandName("1"), id1), Completed(CommandName("2"), id2), Completed(CommandName("3"), id3))
+    )
   }
 
   test("test easy case with update not in completer") {
@@ -61,7 +63,7 @@ class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll{
 
     val x = c1.waitComplete()
     c1.update(Completed(CommandName("1"), id1))
-    c1.update(Completed(CommandName("2"), id2))   // This one is not in completer
+    c1.update(Completed(CommandName("2"), id2)) // This one is not in completer
     c1.update(Completed(CommandName("3"), id3))
 
     val res = Await.result(x, 1.seconds)
@@ -84,8 +86,9 @@ class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll{
     c1.update(Completed(CommandName("3"), id3))
 
     val res = Await.result(x, 1.seconds)
-    res shouldEqual OverallFailure(Set(Completed(CommandName("1"), id1),
-      Error(CommandName("2"), id2, "Error"),  Completed(CommandName("3"), id3)))
+    res shouldEqual OverallFailure(
+      Set(Completed(CommandName("1"), id1), Error(CommandName("2"), id2, "Error"), Completed(CommandName("3"), id3))
+    )
   }
 
   test("test with all already completed") {
@@ -101,8 +104,9 @@ class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll{
     val x = c1.waitComplete()
 
     val res = Await.result(x, 1.seconds)
-    res shouldEqual OverallSuccess(Set(Completed(CommandName("1"), id1),
-      Completed(CommandName("2"), id2),  Completed(CommandName("3"), id3)))
+    res shouldEqual OverallSuccess(
+      Set(Completed(CommandName("1"), id1), Completed(CommandName("2"), id2), Completed(CommandName("3"), id3))
+    )
   }
 
   test("test with all already Error") {
@@ -130,8 +134,7 @@ class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll{
     val x = c1.waitComplete()
 
     val res = Await.result(x, 1.seconds)
-    res shouldEqual OverallFailure(Set(Started(CommandName("1"), id1),
-      Invalid(CommandName("2"), id2, OtherIssue("TEST"))))
+    res shouldEqual OverallFailure(Set(Started(CommandName("1"), id1), Invalid(CommandName("2"), id2, OtherIssue("TEST"))))
   }
 
   // This works because of use of Sets

@@ -77,13 +77,13 @@ object InstalledAppAuthAdapterFactory {
       implicit executionContext: ExecutionContext
   ): InstalledAppAuthAdapter = {
     val authServiceLocation = Await.result(AuthServiceLocation(locationService).resolve(5.seconds), 10.seconds)
-    val authConfig          = AuthConfig.create(config = config, authServerLocation = Some(authServiceLocation))
-    val tokenVerifier       = TokenVerifier(authConfig)
+    val authConfig = AuthConfig.create(config = config, authServerLocation = Some(authServiceLocation))
+    val tokenVerifier = TokenVerifier(authConfig)
     new InstalledAppAuthAdapterImpl(new KeycloakInstalled(authConfig.getDeployment), tokenVerifier, secretStore)
   }
 
   private def make(secretStore: Option[AuthStore])(implicit executionContext: ExecutionContext): InstalledAppAuthAdapter = {
-    val authConfig    = AuthConfig.create()
+    val authConfig = AuthConfig.create()
     val tokenVerifier = TokenVerifier(authConfig)
     new InstalledAppAuthAdapterImpl(new KeycloakInstalled(authConfig.getDeployment), tokenVerifier, secretStore)
   }

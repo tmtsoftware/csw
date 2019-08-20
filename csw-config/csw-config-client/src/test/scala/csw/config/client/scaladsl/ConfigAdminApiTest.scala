@@ -23,7 +23,7 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
   override val serverWiring: ServerWiring = ServerWiring.make(securityDirectives)
   import serverWiring.actorRuntime._
 
-  private val httpService           = serverWiring.httpService
+  private val httpService = serverWiring.httpService
   private val clientLocationService = HttpLocationServiceFactory.makeLocalClient
 
   override val configService: ConfigService = ConfigClientFactory.adminApi(typedSystem, clientLocationService, factory)
@@ -54,10 +54,10 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
   // DEOPSCSW-81: Storing large files in the configuration service
   // DEOPSCSW-131: Detect and handle oversize files
   test("should be able to store and retrieve binary file in annex dir") {
-    val fileName   = "smallBinary.bin"
-    val path       = ResourceReader.copyToTmp("/" + fileName, ".bin")
+    val fileName = "smallBinary.bin"
+    val path = ResourceReader.copyToTmp("/" + fileName, ".bin")
     val configData = ConfigData.fromPath(path)
-    val repoPath   = Paths.get(fileName)
+    val repoPath = Paths.get(fileName)
 
     //verify that files smaller than annex-min-file-size go to annex if encoding is Binary
     serverWiring.settings.`annex-min-file-size` should be > configData.length
@@ -210,7 +210,7 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
     // will use user2
     val configId2 = configService.create(file2, ConfigData.fromString(configValue2), annex = false, commitMsg2).await
 
-    val fileInfo       = configService.list().await
+    val fileInfo = configService.list().await
     val expectedResult = Set((configId1, user1, commitMsg1), (configId2, user2, commitMsg2))
 
     fileInfo.size shouldBe expectedResult.size

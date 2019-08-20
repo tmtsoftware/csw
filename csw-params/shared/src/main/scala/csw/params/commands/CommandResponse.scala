@@ -45,7 +45,8 @@ object CommandResponse {
    * Responses returned can be Invalid, Started, Completed, CompletedWithResult, Error, Cancelled, Locked
    */
   sealed trait SubmitResponse extends QueryResponse {
-    def stateName: StateName = StateName(getClass.getName)
+    // stateName is the simple class name as a String: Completed, Error, etc.
+    def stateName: StateName = StateName(getClass.getSimpleName)
   }
 
   /**
@@ -65,7 +66,10 @@ object CommandResponse {
    *
    * @param runId the runId of command for which this response is created
    */
-  case class Accepted(commandName: CommandName, runId: Id) extends ValidateCommandResponse with ValidateResponse with OnewayResponse
+  case class Accepted(commandName: CommandName, runId: Id)
+      extends ValidateCommandResponse
+      with ValidateResponse
+      with OnewayResponse
 
   /**
    * Represents an intermediate response stating a long running command has been started
@@ -87,7 +91,7 @@ object CommandResponse {
    *
    * @param runId of command for which this response is created
    */
-  case class Completed(commandName, CommandName, runId: Id) extends SubmitResponse with MatchingResponse
+  case class Completed(commandName: CommandName, runId: Id) extends SubmitResponse with MatchingResponse
 
   /**
    * Represents a negative response invalidating a command received
@@ -108,9 +112,7 @@ object CommandResponse {
    * @param runId of command for which this response is created
    * @param message describing the reason or cause or action item of the error encountered while executing the command
    */
-  case class Error(commandName: CommandName, runId: Id, message: String)
-      extends SubmitResponse
-      with MatchingResponse
+  case class Error(commandName: CommandName, runId: Id, message: String) extends SubmitResponse with MatchingResponse
 
   /**
    * Represents a negative response that describes the cancellation of command
@@ -136,37 +138,6 @@ object CommandResponse {
    * @param runId of command for which this response is created
    */
   case class CommandNotAvailable(commandName: CommandName, runId: Id) extends QueryResponse
-
-  /**
-   * Transform a given CommandResponse to a response with the provided Id
-   *
-   * @param id       the RunId for the new CommandResponse
-   * @param response the CommandResponse to be transformed
-   * @return a CommandResponse that has runId as provided id
-   */
-  def withRunId(id: Id, response: SubmitResponse): SubmitResponse = response match {
-    case started: Started                         => started.copy(runId = id)
-    case invalid: Invalid                         => invalid.copy(runId = id)
-    case completedWithResult: CompletedWithResult => completedWithResult.copy(runId = id)
-    case completed: Completed                     => completed.copy(runId = id)
-    case locked: Locked                           => locked.copy(runId = id)
-    case error: Error                             => error.copy(runId = id)
-    case cancelled: Cancelled                     => cancelled.copy(runId = id)
-  }
-
-  def asOther(id: Id, commandName: CommandName, response: SubmitResponse): SubmitResponse = response match {
-    case started: Started                         ⇒ started.copy(runId = id, commandName = commandName)
-    case invalid: Invalid                         ⇒ invalid.copy(runId = id, commandName = commandName)
-    case completedWithResult: CompletedWithResult ⇒ completedWithResult.copy(runId = id)
-    case completed: Completed                     ⇒ completed.copy(runId = id, commandName = commandName)
-    case locked: Locked                           ⇒ locked.copy(runId = id)
-    case error: Error                             ⇒ error.copy(runId = id)
-    case cancelled: Cancelled                     ⇒ cancelled.copy(runId = id)
-  }
-
-  object To {
-    def started(id: Id, commandName: CommandName): SubmitResponse = Started(commandName, id)
-  }
 
   /**
    * Tests a response to determine if it is a final command state

@@ -13,8 +13,8 @@ import scala.concurrent.duration.DurationDouble
 
 //DEOPSCSW-615: DB service accessible to CSW component developers
 class DatabaseServiceFactoryFailureTest extends FunSuite with Matchers with BeforeAndAfterAll {
-  private val system: ActorSystem[_]            = ActorSystem(Behaviors.empty, "test")
-  private var postgres: EmbeddedPostgres        = _
+  private val system: ActorSystem[_] = ActorSystem(Behaviors.empty, "test")
+  private var postgres: EmbeddedPostgres = _
   private var dbFactory: DatabaseServiceFactory = _
 
   override def beforeAll(): Unit = {

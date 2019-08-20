@@ -15,7 +15,7 @@ class AnnexFileServiceTest extends FunSuite with Matchers with BeforeAndAfterAll
   import wiring._
 
   private val testFileUtils = new TestFileUtils(settings)
-  private val annexFileDir  = Paths.get(wiring.settings.`annex-files-dir`).toFile
+  private val annexFileDir = Paths.get(wiring.settings.`annex-files-dir`).toFile
 
   import actorRuntime._
 
@@ -32,7 +32,7 @@ class AnnexFileServiceTest extends FunSuite with Matchers with BeforeAndAfterAll
     testFileUtils.deleteDirectoryRecursively(annexFileDir)
 
   test("storing annex file") {
-    val actualSha   = annexFileService.post(configData).await
+    val actualSha = annexFileService.post(configData).await
     val expectedSha = Sha1.fromConfigData(configData).await
 
     actualSha shouldBe expectedSha

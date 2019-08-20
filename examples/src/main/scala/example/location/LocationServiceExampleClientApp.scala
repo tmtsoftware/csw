@@ -68,8 +68,8 @@ object LocationServiceExampleClientApp extends App {
 sealed trait ExampleMessages
 object ExampleMessages {
   case class TrackingEventAdapter(trackingEvent: TrackingEvent) extends ExampleMessages
-  case class CustomException(throwable: Throwable)              extends ExampleMessages
-  case class AllDone(exampleConnection: Connection)             extends ExampleMessages
+  case class CustomException(throwable: Throwable) extends ExampleMessages
+  case class AllDone(exampleConnection: Connection) extends ExampleMessages
 }
 
 object LocationServiceExampleClient {
@@ -108,7 +108,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   val log: Logger = new LoggerFactory("my-component-name").getLogger(context)
 
-  private val timeout             = 5.seconds
+  private val timeout = 5.seconds
   private val waitForResolveLimit = 30.seconds
 
   // EXAMPLE DEMO START
@@ -126,9 +126,9 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   // add some dummy registrations for illustrative purposes
 
   // dummy http connection
-  val httpPort                          = 8080
-  val httpConnection                    = HttpConnection(ComponentId("configuration", ComponentType.Service))
-  val httpRegistration                  = HttpRegistration(httpConnection, httpPort, "path123")
+  val httpPort = 8080
+  val httpConnection = HttpConnection(ComponentId("configuration", ComponentType.Service))
+  val httpRegistration = HttpRegistration(httpConnection, httpPort, "path123")
   val httpRegResult: RegistrationResult = Await.result(locationService.register(httpRegistration), 2.seconds)
 
   // ************************************************************************************************************
@@ -206,7 +206,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   log.info(s"Attempting to resolve $exampleConnection with a wait of $waitForResolveLimit ...")
 
   val resolveResultF: Future[Option[AkkaLocation]] = locationService.resolve(exampleConnection, waitForResolveLimit)
-  val resolveResult: Option[AkkaLocation]          = Await.result(resolveResultF, waitForResolveLimit + timeout)
+  val resolveResult: Option[AkkaLocation] = Await.result(resolveResultF, waitForResolveLimit + timeout)
   resolveResult match {
     case Some(result) =>
       log.info(s"Resolve result: ${locationInfoToString(result)}")

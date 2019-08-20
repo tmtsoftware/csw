@@ -22,9 +22,9 @@ import csw.common.components.command.CommandComponentState._
 import csw.common.FrameworkAssertions._
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
-import csw.location.api.models.ComponentType.{Assembly, HCD}
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{ComponentId, ComponentType}
+import csw.location.models.ComponentType.{Assembly, HCD}
+import csw.location.models.Connection.AkkaConnection
+import csw.location.models.{ComponentId, ComponentType}
 import csw.location.client.ActorSystemFactory
 import csw.params.commands.CommandResponse.{Accepted, Completed, Error, Invalid, Started}
 import csw.params.commands.Setup
@@ -187,7 +187,7 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
     result shouldBe a[Started]
     result.commandName shouldEqual longRunningToAsmInvalid.commandName
     Await.result(filterAssemblyCS.queryFinal(result.runId), timeout.duration) shouldBe
-      Error(longRunningToAsmInvalid.commandName, result.runId, "ERROR")
+    Error(longRunningToAsmInvalid.commandName, result.runId, "ERROR")
 
     // ********** Message: Shutdown **********
     Http(containerActorSystem.toUntyped).shutdownAllConnectionPools().await

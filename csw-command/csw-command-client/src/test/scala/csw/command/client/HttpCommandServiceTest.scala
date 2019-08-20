@@ -34,17 +34,17 @@ import csw.location.server.commons.TestFutureExtension.RichFuture
 class HttpCommandServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with HTTPLocationService {
 
   implicit val typedSystem: typed.ActorSystem[_] = ActorSystem(Behavior.empty, "HttpCommandServiceTest")
-  implicit val untypedSystem: actor.ActorSystem  = typedSystem.toUntyped
-  implicit val ec: ExecutionContext              = typedSystem.executionContext
-  implicit val mat: Materializer                 = ActorMaterializer()
-  implicit val timeout: Timeout                  = Timeout(5.seconds)
+  implicit val untypedSystem: actor.ActorSystem = typedSystem.toUntyped
+  implicit val ec: ExecutionContext = typedSystem.executionContext
+  implicit val mat: Materializer = ActorMaterializer()
+  implicit val timeout: Timeout = Timeout(5.seconds)
 
   private val locationService = HttpLocationServiceFactory.makeLocalClient
-  private val testCompName    = "testComponent"
-  private val connection      = HttpConnection(ComponentId(testCompName, ComponentType.Service))
+  private val testCompName = "testComponent"
+  private val connection = HttpConnection(ComponentId(testCompName, ComponentType.Service))
 
   private val basePosKey = CoordKey.make("BasePosition")
-  private val prefix     = Prefix("csw.command")
+  private val prefix = Prefix("csw.command")
   private val key1: Key[Float] =
     KeyType.FloatKey.make("assemblyEventValue1")
   private val key1b: Key[Float] =
@@ -58,13 +58,13 @@ class HttpCommandServiceTest extends FunSuite with Matchers with BeforeAndAfterA
 
   private val testCommand = makeTestCommand()
 
-  private def validateCommand(componentName: String, command: ControlCommand): ValidateResponse = {
+  private def validateCommand(componentName: String, runId: Id, command: ControlCommand): ValidateResponse = {
     if (componentName == testCompName && command == testCommand)
-      Accepted(command.runId)
+      Accepted(command.commandName, runId)
     else if (componentName != testCompName)
-      Invalid(command.runId, OtherIssue(s"Expected component name: $testCompName, but got $componentName"))
+      Invalid(command.commandName, runId, OtherIssue(s"Expected component name: $testCompName, but got $componentName"))
     else
-      Invalid(command.runId, OtherIssue(s"Expected command to be: $testCommand, but got $command"))
+      Invalid(command.commandName, runId, OtherIssue(s"Expected command to be: $testCommand, but got $command"))
   }
 
   // Test HTTP route
@@ -76,28 +76,28 @@ class HttpCommandServiceTest extends FunSuite with Matchers with BeforeAndAfterA
           post {
             path("validate") {
               entity(as[ControlCommand]) { command =>
-                complete(Future.successful(validateCommand(componentName, command)))
+                complete(Future.successful(validateCommand(componentName, Id(), command)))
               }
             } ~
             path("submit") {
               entity(as[ControlCommand]) { command =>
-                val v = validateCommand(componentName, command)
+                val v = validateCommand(componentName, Id(), command)
                 val x: SubmitResponse = v match {
-                  case _: Accepted => Completed(command.runId)
-                  case _           => Error(command.runId, "Wrong command or component name")
+                  case _: Accepted => Completed(v.commandName, v.runId)
+                  case _           => Error(v.commandName, v.runId, "Wrong command or component name")
                 }
                 complete(Future.successful(x))
               }
             } ~
             path("oneway") {
               entity(as[ControlCommand]) { command =>
-                complete(Future.successful(validateCommand(componentName, command)))
+                complete(Future.successful(validateCommand(componentName, Id(), command)))
               }
             }
           } ~
           get {
             path(Segment) { runId =>
-              val x: Future[SubmitResponse] = Future.successful(Completed(Id(runId)))
+              val x: Future[SubmitResponse] = Future.successful(Completed(CommandName("TEST"), Id(runId)))
               complete(x)
             }
           }
@@ -187,9 +187,10 @@ class HttpCommandServiceTest extends FunSuite with Matchers with BeforeAndAfterA
 
   test("Should be able to validate, send commands, query status of commands") {
     val service = HttpCommandService(typedSystem, locationService, connection)
-    assert(service.validate(testCommand).await == Accepted(testCommand.runId))
-    assert(service.oneway(testCommand).await == Accepted(testCommand.runId))
-    assert(service.submit(testCommand).await == Completed(testCommand.runId))
-    assert(service.queryFinal(testCommand.runId).await == Completed(testCommand.runId))
+    service.validate(testCommand).await shouldBe a[Accepted] //(testCommand.commandName, _))
+    service.oneway(testCommand).await shouldBe a[Accepted] //(testCommand.runId))
+    val result = service.submit(testCommand).await
+    result shouldBe a[Completed] // (testCommand.runId))
+    service.queryFinal(result.runId).await shouldBe a[Completed] //(testCommand.runId))
   }
 }

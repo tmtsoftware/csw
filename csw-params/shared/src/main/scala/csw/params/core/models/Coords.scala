@@ -18,25 +18,25 @@ object Coords {
   case class Tag(name: String) {
     override def toString: String = name
   }
-  val BASE                      = Tag("BASE")
-  val OIWFS1                    = Tag("OIWFS1")
-  val OIWFS2                    = Tag("OIWFS2")
-  val OIWFS3                    = Tag("OIWFS3")
-  val OIWFS4                    = Tag("OIWFS4")
-  val ODGW1                     = Tag("ODGW1")
-  val ODGW2                     = Tag("ODGW2")
-  val ODGW3                     = Tag("ODGW3")
-  val ODGW4                     = Tag("ODGW4")
-  val GUIDER1                   = Tag("GUIDER1")
-  val GUIDER2                   = Tag("GUIDER2")
-  val allTags: Set[Tag]         = Set(BASE, OIWFS1, OIWFS2, OIWFS3, OIWFS4, ODGW1, ODGW2, ODGW3, ODGW4, GUIDER1, GUIDER2)
+  val BASE = Tag("BASE")
+  val OIWFS1 = Tag("OIWFS1")
+  val OIWFS2 = Tag("OIWFS2")
+  val OIWFS3 = Tag("OIWFS3")
+  val OIWFS4 = Tag("OIWFS4")
+  val ODGW1 = Tag("ODGW1")
+  val ODGW2 = Tag("ODGW2")
+  val ODGW3 = Tag("ODGW3")
+  val ODGW4 = Tag("ODGW4")
+  val GUIDER1 = Tag("GUIDER1")
+  val GUIDER2 = Tag("GUIDER2")
+  val allTags: Set[Tag] = Set(BASE, OIWFS1, OIWFS2, OIWFS3, OIWFS4, ODGW1, ODGW2, ODGW3, ODGW4, GUIDER1, GUIDER2)
   val allTagsNames: Set[String] = allTags.map(_.name)
 
   sealed trait EqFrame extends EnumEntry
   object EqFrame extends Enum[EqFrame] {
     override def values: immutable.IndexedSeq[EqFrame] = findValues
     case object ICRS extends EqFrame
-    case object FK5  extends EqFrame
+    case object FK5 extends EqFrame
   }
 
   /**
@@ -57,35 +57,35 @@ object Coords {
     override def values: immutable.IndexedSeq[SolarSystemObject] = findValues
 
     case object Mercury extends SolarSystemObject
-    case object Venus   extends SolarSystemObject
-    case object Moon    extends SolarSystemObject
-    case object Mars    extends SolarSystemObject
+    case object Venus extends SolarSystemObject
+    case object Moon extends SolarSystemObject
+    case object Mars extends SolarSystemObject
     case object Jupiter extends SolarSystemObject
-    case object Saturn  extends SolarSystemObject
+    case object Saturn extends SolarSystemObject
     case object Neptune extends SolarSystemObject
-    case object Uranus  extends SolarSystemObject
-    case object Pluto   extends SolarSystemObject
+    case object Uranus extends SolarSystemObject
+    case object Pluto extends SolarSystemObject
   }
 
   case class SolarSystemCoord(tag: Tag, body: SolarSystemObject) extends Coord
 
   case class MinorPlanetCoord(
       tag: Tag,
-      epoch: Double,            // TT as a Modified Julian Date
-      inclination: Angle,       // degrees
+      epoch: Double, // TT as a Modified Julian Date
+      inclination: Angle, // degrees
       longAscendingNode: Angle, // degrees
-      argOfPerihelion: Angle,   // degrees
-      meanDistance: Double,     // AU
+      argOfPerihelion: Angle, // degrees
+      meanDistance: Double, // AU
       eccentricity: Double,
       meanAnomaly: Angle // degrees
   ) extends Coord
 
   case class CometCoord(
       tag: Tag,
-      epochOfPerihelion: Double,  // TT as a Modified Julian Date
-      inclination: Angle,         // degrees
-      longAscendingNode: Angle,   // degrees
-      argOfPerihelion: Angle,     // degrees
+      epochOfPerihelion: Double, // TT as a Modified Julian Date
+      inclination: Angle, // degrees
+      longAscendingNode: Angle, // degrees
+      argOfPerihelion: Angle, // degrees
       perihelionDistance: Double, // AU
       eccentricity: Double
   ) extends Coord
@@ -152,10 +152,10 @@ object Coords {
   }
 
   object EqCoord {
-    val DEFAULT_FRAME: EqFrame  = ICRS
-    val DEFAULT_TAG: Tag        = BASE
-    val DEFAULT_PMX: Double     = ProperMotion.DEFAULT_PROPERMOTION.pmx
-    val DEFAULT_PMY: Double     = ProperMotion.DEFAULT_PROPERMOTION.pmy
+    val DEFAULT_FRAME: EqFrame = ICRS
+    val DEFAULT_TAG: Tag = BASE
+    val DEFAULT_PMX: Double = ProperMotion.DEFAULT_PROPERMOTION.pmx
+    val DEFAULT_PMY: Double = ProperMotion.DEFAULT_PROPERMOTION.pmy
     val DEFAULT_CATNAME: String = "none"
 
     /**
@@ -203,25 +203,25 @@ object Coords {
  */
 object JCoords {
   val ICRS: EqFrame = EqFrame.ICRS
-  val FK5: EqFrame  = EqFrame.FK5
+  val FK5: EqFrame = EqFrame.FK5
 
-  val DEFAULT_FRAME: EqFrame  = ICRS
-  val DEFAULT_TAG: Tag        = BASE
-  val DEFAULT_PMX: Double     = ProperMotion.DEFAULT_PROPERMOTION.pmx
-  val DEFAULT_PMY: Double     = ProperMotion.DEFAULT_PROPERMOTION.pmy
+  val DEFAULT_FRAME: EqFrame = ICRS
+  val DEFAULT_TAG: Tag = BASE
+  val DEFAULT_PMX: Double = ProperMotion.DEFAULT_PROPERMOTION.pmx
+  val DEFAULT_PMY: Double = ProperMotion.DEFAULT_PROPERMOTION.pmy
   val DEFAULT_CATNAME: String = "none"
 
   val Mercury: SolarSystemObject = SolarSystemObject.Mercury
-  val Venus: SolarSystemObject   = SolarSystemObject.Venus
-  val Moon: SolarSystemObject    = SolarSystemObject.Moon
-  val Mars: SolarSystemObject    = SolarSystemObject.Mars
+  val Venus: SolarSystemObject = SolarSystemObject.Venus
+  val Moon: SolarSystemObject = SolarSystemObject.Moon
+  val Mars: SolarSystemObject = SolarSystemObject.Mars
   val Jupiter: SolarSystemObject = SolarSystemObject.Jupiter
-  val Saturn: SolarSystemObject  = SolarSystemObject.Saturn
+  val Saturn: SolarSystemObject = SolarSystemObject.Saturn
   val Neptune: SolarSystemObject = SolarSystemObject.Neptune
-  val Uranus: SolarSystemObject  = SolarSystemObject.Uranus
-  val Pluto: SolarSystemObject   = SolarSystemObject.Pluto
+  val Uranus: SolarSystemObject = SolarSystemObject.Uranus
+  val Pluto: SolarSystemObject = SolarSystemObject.Pluto
 
-  def allTags: util.Set[Tag]        = Coords.allTags.asJava
+  def allTags: util.Set[Tag] = Coords.allTags.asJava
   def allTagNames: util.Set[String] = Coords.allTagsNames.asJava
 }
 

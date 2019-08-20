@@ -42,15 +42,15 @@ class RedisTestProps(
     redisClient.connectAsync(new StringCodec(), redisURI).toScala.map(_.async())
 
   var redisSentinel: RedisSentinel = _
-  var redisServer: RedisServer     = _
+  var redisServer: RedisServer = _
 
   override val eventPattern: String = "*"
 
   private val eventServiceFactory = new EventServiceFactory(RedisStore(redisClient))
 
-  val eventService: EventService       = eventServiceFactory.make(locationService)
-  val jEventService: IEventService     = new JEventService(eventService)
-  lazy val publisher: EventPublisher   = eventService.defaultPublisher
+  val eventService: EventService = eventServiceFactory.make(locationService)
+  val jEventService: IEventService = new JEventService(eventService)
+  lazy val publisher: EventPublisher = eventService.defaultPublisher
   lazy val subscriber: EventSubscriber = eventService.defaultSubscriber
 
   override def toString: String = name
@@ -91,7 +91,7 @@ object RedisTestProps extends EmbeddedRedis {
     val locationServer = new HTTPLocationServiceOnPorts(clusterPort, httpLocationServicePort)
     locationServer.beforeAll()
     val (locationService, system) = createInfra(sentinelPort, httpLocationServicePort)
-    val redisClient: RedisClient  = RedisClient.create()
+    val redisClient: RedisClient = RedisClient.create()
     redisClient.setOptions(clientOptions)
 
     new RedisTestProps("Redis", sentinelPort, serverPort, redisClient, locationService, locationServer)(system)

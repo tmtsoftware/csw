@@ -30,9 +30,9 @@ import scala.concurrent.duration.DurationLong
 @State(Scope.Benchmark)
 class E2ELoggingBenchmark {
   var actorSystem: typed.ActorSystem[SpawnProtocol] = _
-  var log: Logger                                   = _
-  var fileAppender: FileAppender                    = _
-  var person: Person                                = _
+  var log: Logger = _
+  var fileAppender: FileAppender = _
+  var person: Person = _
 
   @Setup(Level.Trial)
   def setup(): Unit = {

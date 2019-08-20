@@ -54,13 +54,13 @@ object ParamSetData {
   private val p25 = StructKey.make("StructKey").set(Struct(Set(p1, p2)))
   private val p26 = StringKey.make("StringKey").set("Str1", "Str2")
 
-  private val pm               = ProperMotion(0.5, 2.33)
-  private val eqCoord          = EqCoord(ra = "12:13:14.15", dec = "-30:31:32.3", frame = FK5, pmx = pm.pmx, pmy = pm.pmy)
+  private val pm = ProperMotion(0.5, 2.33)
+  private val eqCoord = EqCoord(ra = "12:13:14.15", dec = "-30:31:32.3", frame = FK5, pmx = pm.pmx, pmy = pm.pmy)
   private val solarSystemCoord = SolarSystemCoord(Tag("BASE"), Venus)
   private val minorPlanetCoord = MinorPlanetCoord(Tag("GUIDER1"), 2000, 90.degree, 2.degree, 100.degree, 1.4, 0.234, 220.degree)
-  private val cometCoord       = CometCoord(Tag("BASE"), 2000.0, 90.degree, 2.degree, 100.degree, 1.4, 0.234)
-  private val altAzCoord       = AltAzCoord(Tag("BASE"), 301.degree, 42.5.degree)
-  private val p27              = CoordKey.make("CoordKey").set(eqCoord, solarSystemCoord, minorPlanetCoord, cometCoord, altAzCoord)
+  private val cometCoord = CometCoord(Tag("BASE"), 2000.0, 90.degree, 2.degree, 100.degree, 1.4, 0.234)
+  private val altAzCoord = AltAzCoord(Tag("BASE"), 301.degree, 42.5.degree)
+  private val p27 = CoordKey.make("CoordKey").set(eqCoord, solarSystemCoord, minorPlanetCoord, cometCoord, altAzCoord)
 
   val paramSet: Set[Parameter[_]] =
     Set(

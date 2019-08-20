@@ -9,14 +9,14 @@ import csw.command.client.CommandServiceFactory
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.CommandMessage.Submit
 import csw.command.client.models.framework.LockingResponse
-import csw.command.client.models.framework.LockingResponses.LockAcquired
+import csw.command.client.models.framework.LockingResponse.LockAcquired
 import csw.command.client.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.command.client.models.matchers.{DemandMatcher, Matcher, MatcherResponse}
 import csw.common.utils.LockCommandFactory
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
+import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.location.models.Connection.AkkaConnection
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
@@ -161,10 +161,10 @@ class CommandServiceTest(ignore: Int)
       val immediateSetup = Setup(prefix, immediateCmd, obsId)
       val immediateCommandF = async {
         await(assemblyCmdService.submitAndWait(immediateSetup)) match {
-          case response: Completed ⇒
+          case response: Completed =>
             //do something with completed result
             response
-          case otherResponse ⇒
+          case otherResponse =>
             // do something with other response which is not expected
             otherResponse
         }
@@ -246,9 +246,9 @@ class CommandServiceTest(ignore: Int)
       // Don't care about the futures from async
       val oneWayF = async {
         await(assemblyCmdService.oneway(onewaySetup)) match {
-          case invalid: Invalid ⇒
+          case invalid: Invalid =>
           // Log an error here
-          case _ ⇒
+          case _ =>
           // Ignore anything other than invalid
         }
       }
@@ -258,8 +258,8 @@ class CommandServiceTest(ignore: Int)
       //#validate
       val validateCommandF = async {
         await(assemblyCmdService.validate(immediateSetup)) match {
-          case _: Accepted          ⇒ true
-          case Invalid(_, _, issue) ⇒
+          case _: Accepted          => true
+          case Invalid(_, _, issue) =>
             // do something with other response which is not expected
             log.error(s"Command failed to validate with issue: $issue")
             false
@@ -286,7 +286,7 @@ class CommandServiceTest(ignore: Int)
 
       //#submitAll
       val submitAllF = async {
-        await(assemblyCmdService.submitAll(List(submitAllSetup1, submitAllSetup2, submitAllinvalidSetup)))
+        await(assemblyCmdService.submitAllAndWait(List(submitAllSetup1, submitAllSetup2, submitAllinvalidSetup)))
       }
       val submitAllResponse = Await.result(submitAllF, timeout.duration)
       submitAllResponse.length shouldBe 3
@@ -297,7 +297,7 @@ class CommandServiceTest(ignore: Int)
 
       //#submitAllInvalid
       val submitAllF2 = async {
-        await(assemblyCmdService.submitAll(List(submitAllSetup1, submitAllinvalidSetup, submitAllSetup2)))
+        await(assemblyCmdService.submitAllAndWait(List(submitAllSetup1, submitAllinvalidSetup, submitAllSetup2)))
       }
       val submitAllResponse2 = Await.result(submitAllF2, timeout.duration)
       submitAllResponse2.length shouldBe 2
@@ -347,7 +347,7 @@ class CommandServiceTest(ignore: Int)
       val matchResponseF: Future[MatchingResponse] = async {
         val onewayResponse: OnewayResponse = await(assemblyCmdService.oneway(setupWithMatcher))
         onewayResponse match {
-          case Accepted(_, runId) ⇒
+          case Accepted(_, runId) =>
             val matcherResponse: MatcherResponse = await(matcherResponseF)
             // create appropriate response if demand state was matched from among the published state or otherwise
             // this would allow the response to be used to complete a command received by the Assembly
@@ -357,7 +357,7 @@ class CommandServiceTest(ignore: Int)
               case mf: MatchFailed =>
                 Error(setupWithMatcher.commandName, onewayResponse.runId, mf.throwable.getMessage)
             }
-          case invalid: Invalid ⇒
+          case invalid: Invalid =>
             matcher.stop()
             invalid
           case locked: Locked =>
@@ -404,14 +404,14 @@ class CommandServiceTest(ignore: Int)
       val eventualCommandResponse2: Future[MatchingResponse] = async {
         val initialResponse = await(assemblyCmdService.oneway(setupWithFailedMatcher))
         initialResponse match {
-          case _: Accepted ⇒
+          case _: Accepted =>
             val matcherResponse = await(failedMatcherResponseF)
             // create appropriate response if demand state was matched from among the published state or otherwise
             matcherResponse match {
-              case MatchCompleted  ⇒ Completed(setupWithFailedMatcher.commandName, initialResponse.runId)
-              case MatchFailed(ex) ⇒ Error(setupWithFailedMatcher.commandName, initialResponse.runId, ex.getMessage)
+              case MatchCompleted  => Completed(setupWithFailedMatcher.commandName, initialResponse.runId)
+              case MatchFailed(ex) => Error(setupWithFailedMatcher.commandName, initialResponse.runId, ex.getMessage)
             }
-          case invalid: Invalid ⇒
+          case invalid: Invalid =>
             matcher.stop()
             invalid
           case locked: Locked =>
@@ -440,13 +440,13 @@ class CommandServiceTest(ignore: Int)
       val eventualCommandResponse1: Future[MatchingResponse] = async {
         val initialResponse = await(assemblyCmdService.oneway(setupWithTimeoutMatcher))
         initialResponse match {
-          case _: Accepted ⇒
+          case _: Accepted =>
             val matcherResponse = await(matcherResponseF1)
             matcherResponse match {
-              case MatchCompleted ⇒ Completed(setupWithTimeoutMatcher.commandName, initialResponse.runId)
-              case MatchFailed(ex) if ex.isInstanceOf[TimeoutException] ⇒
+              case MatchCompleted => Completed(setupWithTimeoutMatcher.commandName, initialResponse.runId)
+              case MatchFailed(ex) if ex.isInstanceOf[TimeoutException] =>
                 Error(setupWithTimeoutMatcher.commandName, initialResponse.runId, timeoutExMsg)
-              case MatchFailed(ex) ⇒ Error(setupWithTimeoutMatcher.commandName, initialResponse.runId, ex.getMessage)
+              case MatchFailed(ex) => Error(setupWithTimeoutMatcher.commandName, initialResponse.runId, ex.getMessage)
             }
           case other @ (Invalid(_, _, _) | Locked(_, _)) =>
             matcher.stop()

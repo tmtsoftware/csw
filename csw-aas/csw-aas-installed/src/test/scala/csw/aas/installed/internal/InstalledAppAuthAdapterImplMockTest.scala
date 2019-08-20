@@ -18,17 +18,17 @@ import scala.concurrent.duration.DurationInt
 class InstalledAppAuthAdapterImplMockTest extends FunSuite with MockitoSugar with Matchers {
 
   class AuthMocks {
-    val keycloakInstalled: KeycloakInstalled     = mock[KeycloakInstalled]
-    val kd: KeycloakDeployment                   = mock[KeycloakDeployment]
-    val store: FileAuthStore                     = mock[FileAuthStore]
+    val keycloakInstalled: KeycloakInstalled = mock[KeycloakInstalled]
+    val kd: KeycloakDeployment = mock[KeycloakDeployment]
+    val store: FileAuthStore = mock[FileAuthStore]
     val accessTokenResponse: AccessTokenResponse = mock[AccessTokenResponse]
-    val tokenVerifier: TokenVerifier             = mock[TokenVerifier]
-    val accessToken: AccessToken                 = mock[AccessToken]
-    val refreshedAccessToken: AccessToken        = mock[AccessToken]
+    val tokenVerifier: TokenVerifier = mock[TokenVerifier]
+    val accessToken: AccessToken = mock[AccessToken]
+    val refreshedAccessToken: AccessToken = mock[AccessToken]
 
-    val accessTokenStr          = "access_token"
-    val idTokenStr              = "id_token"
-    val refreshTokenStr         = "refresh_token"
+    val accessTokenStr = "access_token"
+    val idTokenStr = "id_token"
+    val refreshTokenStr = "refresh_token"
     val refreshedAccessTokenStr = "refreshed_access_token"
 
     // mock keycloakInstalled calls
@@ -96,8 +96,8 @@ class InstalledAppAuthAdapterImplMockTest extends FunSuite with MockitoSugar wit
     import mocks._
 
     val maxTokenValidity = 5
-    val tokenExp         = (System.currentTimeMillis() / 1000) + maxTokenValidity
-    val token            = AccessToken(exp = Some(tokenExp))
+    val tokenExp = (System.currentTimeMillis() / 1000) + maxTokenValidity
+    val token = AccessToken(exp = Some(tokenExp))
 
     when(tokenVerifier.verifyAndDecode(accessTokenStr)).thenReturn(Future.successful(Right(token)))
 
@@ -126,9 +126,9 @@ class InstalledAppAuthAdapterImplMockTest extends FunSuite with MockitoSugar wit
     val mocks = new AuthMocks
     import mocks._
 
-    val maxTokenValidity  = 5
+    val maxTokenValidity = 5
     val minValidityNeeded = 10
-    val tokenExp          = (System.currentTimeMillis() / 1000) + maxTokenValidity
+    val tokenExp = (System.currentTimeMillis() / 1000) + maxTokenValidity
 
     when(tokenVerifier.verifyAndDecode(accessTokenStr)).thenReturn(Future.successful(Right(AccessToken(exp = Some(tokenExp)))))
     when(store.getAccessTokenString).thenReturn(Some(accessTokenStr)).andThen(Some(refreshedAccessTokenStr))
@@ -145,9 +145,9 @@ class InstalledAppAuthAdapterImplMockTest extends FunSuite with MockitoSugar wit
     val mocks = new AuthMocks
     import mocks._
 
-    val tokenValidity  = 10
+    val tokenValidity = 10
     val currentSeconds = (System.currentTimeMillis() / 1000) + tokenValidity
-    val validToken     = AccessToken(exp = Some(currentSeconds))
+    val validToken = AccessToken(exp = Some(currentSeconds))
 
     when(tokenVerifier.verifyAndDecode(accessTokenStr)).thenReturn(Future.successful(Right(validToken)))
 

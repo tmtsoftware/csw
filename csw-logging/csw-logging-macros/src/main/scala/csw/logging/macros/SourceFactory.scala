@@ -17,7 +17,7 @@ object SourceFactory {
   def sourceLocationMacro(c: blackbox.Context): c.Expr[SourceFactory] = {
     import c.universe._
 
-    val p    = c.macroApplication.pos
+    val p = c.macroApplication.pos
     val file = p.source.file.name
     val line = p.line
 

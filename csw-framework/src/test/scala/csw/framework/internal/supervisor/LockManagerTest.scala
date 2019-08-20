@@ -20,18 +20,18 @@ import org.scalatest.{FunSuite, Matchers}
 // DEOPSCSW-301: Support UnLocking
 class LockManagerTest extends FunSuite with MockitoSugar with Matchers {
 
-  private val prefix        = Prefix("wfos.blue.filter")
+  private val prefix = Prefix("wfos.blue.filter")
   private val invalidPrefix = Prefix("wfos.blue.filter.invalid")
 
-  implicit val system: ActorSystem                     = ActorSystem()
+  implicit val system: ActorSystem = ActorSystem()
   implicit val typedSystem: typed.ActorSystem[Nothing] = system.toTyped
-  implicit val testKitSettings: TestKitSettings        = TestKitSettings(typedSystem)
+  implicit val testKitSettings: TestKitSettings = TestKitSettings(typedSystem)
 
   private val intParam: Parameter[Int] = KeyType.IntKey.make("intKey").set(1, 2, 3)
-  private val setup: Setup             = Setup(prefix, CommandName("move"), Some(ObsId("obs1001")), Set(intParam))
-  private val invalidSetup: Setup      = Setup(invalidPrefix, CommandName("move"), Some(ObsId("obs1001")), Set(intParam))
-  private val mockedLoggerFactory      = mock[LoggerFactory]
-  private val mockedLogger             = mock[Logger]
+  private val setup: Setup = Setup(prefix, CommandName("move"), Some(ObsId("obs1001")), Set(intParam))
+  private val invalidSetup: Setup = Setup(invalidPrefix, CommandName("move"), Some(ObsId("obs1001")), Set(intParam))
+  private val mockedLoggerFactory = mock[LoggerFactory]
+  private val mockedLogger = mock[Logger]
   when(mockedLoggerFactory.getLogger).thenReturn(mockedLogger)
 
   test("should be locked when prefix is available") {
@@ -142,8 +142,8 @@ class LockManagerTest extends FunSuite with MockitoSugar with Matchers {
 
   // DEOPSCSW-302: Support Unlocking by Admin
   test("should allow unlocking any locked component by admin") {
-    val replyTo        = TestProbe[SubmitResponse].ref
-    val adminPrefix    = Prefix(s"${Subsystem.CSW}.admin")
+    val replyTo = TestProbe[SubmitResponse].ref
+    val adminPrefix = Prefix(s"${Subsystem.CSW}.admin")
     val nonAdminPrefix = Prefix(s"${Subsystem.CSW}.NonAdmin")
 
     val lockManager = new LockManager(lockPrefix = Some(prefix), mockedLoggerFactory)
@@ -152,7 +152,7 @@ class LockManagerTest extends FunSuite with MockitoSugar with Matchers {
     val nonAdminCmd: Setup = Setup(nonAdminPrefix, CommandName("move"), Some(ObsId("obs1001")), Set(intParam))
     lockManager.allowCommand(Submit(nonAdminCmd, replyTo)) shouldBe false
 
-    val probe               = TestProbe[LockingResponse]
+    val probe = TestProbe[LockingResponse]
     val unlockedLockManager = lockManager.unlockComponent(adminPrefix, probe.ref) {}
     probe.expectMessage(LockReleased)
 

@@ -18,15 +18,15 @@ import scala.collection.mutable.ArrayBuffer
 class LoggerCompTest extends LoggingTestSuite {
 
   private val irisSupervisorActorRef = actorSystem.spawn(IRIS.behavior(IRIS.COMPONENT_NAME), "IrisSupervisorActor")
-  private val irisUtilActorRef       = actorSystem.spawn(IrisActorUtil.behavior, "IrisUtilActor")
-  private val irisTLA                = new IrisTLA()
-  private val irisUtil               = new IrisUtil()
-  private val tromboneHcd            = new TromboneHcd()
+  private val irisUtilActorRef = actorSystem.spawn(IrisActorUtil.behavior, "IrisUtilActor")
+  private val irisTLA = new IrisTLA()
+  private val irisUtil = new IrisUtil()
+  private val tromboneHcd = new TromboneHcd()
 
   private var componentLogBuffer: mutable.Map[String, ArrayBuffer[JsObject]] = mutable.Map.empty
-  var genericLogBuffer: mutable.Buffer[JsObject]                             = mutable.Buffer.empty[JsObject]
-  private var irisLogBuffer                                                  = mutable.Buffer.empty[JsObject]
-  private var tromboneHcdLogBuffer                                           = mutable.Buffer.empty[JsObject]
+  var genericLogBuffer: mutable.Buffer[JsObject] = mutable.Buffer.empty[JsObject]
+  private var irisLogBuffer = mutable.Buffer.empty[JsObject]
+  private var tromboneHcdLogBuffer = mutable.Buffer.empty[JsObject]
 
   def sendMessagesToActor(actorRef: ActorRef[IRISLogMessages]): Unit = {
     actorRef ! LogTrace

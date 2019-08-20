@@ -33,16 +33,18 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
     extends CommandService {
 
   private implicit val ec: ExecutionContext = actorSystem.executionContext
-  private implicit val mat: Materializer    = scaladsl.ActorMaterializer()
+  private implicit val mat: Materializer = scaladsl.ActorMaterializer()
   private implicit val scheduler: Scheduler = actorSystem.scheduler
-  private implicit val timeout: Timeout     = 100.milli
+  private implicit val timeout: Timeout = 100.milli
 
   private val component: ActorRef[ComponentMessage] = componentLocation.componentRef
-  private val ValidateTimeout                       = 1.seconds
+  private val ValidateTimeout = 1.seconds
 
-  private val name = componentLocation.connection.componentId.fullName
-  println("Name for CServImpl: " + name)
-  // TODO -- THIS NEEDS TO BE DONE CORRECTLY
+  // Mini CRM Actor needs to have unique name
+  private val r = scala.util.Random
+  private val name = s"${componentLocation.connection.componentId.fullName}-${r.nextInt(1000)}"
+  println("Name for CommandService MiniCRM Impl: " + name)
+  // TODO -- THE creation of this child NEEDS TO BE DONE CORRECTLY
   private lazy val miniCRM: ActorRef[MiniCRM.CRMMessage] =
     Await.result(actorSystem.systemActorOf(MiniCRM.make(), name), 5.seconds)
 
@@ -107,7 +109,7 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
       controlCommand: ControlCommand,
       stateMatcher: StateMatcher
   )(implicit timeout: Timeout): Future[MatchingResponse] = {
-    val matcher          = new Matcher(component, stateMatcher)
+    val matcher = new Matcher(component, stateMatcher)
     val matcherResponseF = matcher.start
     oneway(controlCommand).flatMap {
       case Accepted(controlCommand.commandName, runId) =>

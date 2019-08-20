@@ -41,15 +41,6 @@ trait CommandService {
   def submitAndWait(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse]
 
   /**
-   * Submit a command and Subscribe for the result if it was successfully validated as `Started` to get a
-   * final [[csw.params.commands.CommandResponse.SubmitResponse]] as a Future
-   *
-   * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
-   * @return a CommandResponse as a Future value
-   */
-  def submitAndWait(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse]
-
-  /**
    * Submit multiple commands and get a List of [[csw.params.commands.CommandResponse.SubmitResponse]] for all commands. The CommandResponse can be a response
    * of validation (Accepted, Invalid) or a final Response. In case of response as `Accepted`, final CommandResponse can be obtained by using `subscribe` API.
    *

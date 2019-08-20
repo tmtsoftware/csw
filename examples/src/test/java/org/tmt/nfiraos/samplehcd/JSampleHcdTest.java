@@ -33,6 +33,7 @@ import org.scalatestplus.junit.JUnitSuite;
 
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -126,7 +127,9 @@ public class JSampleHcdTest extends JUnitSuite {
 
         ICommandService hcd = CommandServiceFactory.jMake(location, typedActorSystem);
 
-        Assert.assertEquals(hcd.submitAndWait(setupCommand, commandResponseTimeout).get(), new CommandResponse.Completed(setupCommand.runId()));
+        CommandResponse.SubmitResponse result = hcd.submitAndWait(setupCommand, commandResponseTimeout).get();
+        Assert.assertEquals(result.commandName(), setupCommand.commandName());
+        Assert.assertTrue(result instanceof CommandResponse.Completed);
     }
     //#submitAndWait
 

@@ -55,8 +55,8 @@ class ActorLoggingTest extends LoggingTestSuite {
     val errorLevelLogMessages = logBuffer.groupBy(json => json.getString(LoggingKeys.SEVERITY))("ERROR")
     errorLevelLogMessages.size shouldEqual 1
 
-    val expectedMessage  = "Logging error with map"
-    val expectedReason   = "Unknown"
+    val expectedMessage = "Logging error with map"
+    val expectedReason = "Unknown"
     val expectedActorRef = irisActorRef.toString
     errorLevelLogMessages.head.getString("message") shouldBe expectedMessage
     errorLevelLogMessages.head.getString("reason") shouldBe expectedReason
@@ -70,7 +70,7 @@ class ActorLoggingTest extends LoggingTestSuite {
     //  IrisSupervisorActor is logging 7 messages
     //  As per the filter, hcd should log 3 message of level ERROR and FATAL
     val groupByComponentNamesLog = logBuffer.groupBy(json => json.getString(LoggingKeys.COMPONENT_NAME))
-    val irisLogs                 = groupByComponentNamesLog(IRIS.COMPONENT_NAME)
+    val irisLogs = groupByComponentNamesLog(IRIS.COMPONENT_NAME)
 
     irisLogs.size shouldBe 3
 

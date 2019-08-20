@@ -33,14 +33,14 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   private val successMsg = "[SUCCESS] Command executed successfully."
   private val failureMsg = "[FAILURE] Failed to execute the command."
 
-  private val tromboneAxisLowLimitKey  = AlarmKey(NFIRAOS, "trombone", "tromboneaxislowlimitalarm")
+  private val tromboneAxisLowLimitKey = AlarmKey(NFIRAOS, "trombone", "tromboneaxislowlimitalarm")
   private val tromboneAxisHighLimitKey = AlarmKey(NFIRAOS, "trombone", "tromboneaxishighlimitalarm")
-  private val encTempLowKey            = AlarmKey(NFIRAOS, "enclosure", "templowalarm")
-  private val encTempHighKey           = AlarmKey(NFIRAOS, "enclosure", "temphighalarm")
-  private val beamSplitterLimitKey     = AlarmKey(NFIRAOS, "beamsplitter", "splitterlimitalarm")
-  private val cpuExceededKey           = AlarmKey(TCS, "tcspk", "cpuexceededalarm")
-  private val outOfRangeOffloadKey     = AlarmKey(TCS, "corrections", "outofrangeoffload")
-  private val cpuIdleKey               = AlarmKey(LGSF, "tcspkinactive", "cpuidlealarm")
+  private val encTempLowKey = AlarmKey(NFIRAOS, "enclosure", "templowalarm")
+  private val encTempHighKey = AlarmKey(NFIRAOS, "enclosure", "temphighalarm")
+  private val beamSplitterLimitKey = AlarmKey(NFIRAOS, "beamsplitter", "splitterlimitalarm")
+  private val cpuExceededKey = AlarmKey(TCS, "tcspk", "cpuexceededalarm")
+  private val outOfRangeOffloadKey = AlarmKey(TCS, "corrections", "outofrangeoffload")
+  private val cpuIdleKey = AlarmKey(LGSF, "tcspkinactive", "cpuidlealarm")
 
   private val allAlarmKeys = Set(
     tromboneAxisLowLimitKey,
@@ -56,7 +56,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   override def beforeEach(): Unit = {
     // init alarm store
     val filePath = ResourceReader.copyToTmp("/valid-alarms.conf")
-    val initCmd  = Options(cmd = "init", filePath = Some(filePath), isLocal = true, reset = true)
+    val initCmd = Options(cmd = "init", filePath = Some(filePath), isLocal = true, reset = true)
     cliApp.execute(initCmd)
     logBuffer.clear()
   }
@@ -70,7 +70,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   // DEOPSCSW-470: CLI application to exercise and test the alarm API
   test("should initialize alarms in alarm store from local config") {
     val filePath = ResourceReader.copyToTmp("/valid-alarms.conf")
-    val cmd      = Options(cmd = "init", filePath = Some(filePath), isLocal = true, reset = true)
+    val cmd = Options(cmd = "init", filePath = Some(filePath), isLocal = true, reset = true)
 
     clearAlarmStore().futureValue
     a[KeyNotFoundException] shouldBe thrownBy(getMetadata(GlobalKey).await)
@@ -89,8 +89,8 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
     serverWiring.svnRepo.initSvnRepo()
     val (binding, regResult) = serverWiring.httpService.registeredLazyBinding.futureValue
 
-    val configData    = ConfigData.fromPath(ResourceReader.copyToTmp("/valid-alarms.conf"))
-    val configPath    = Paths.get("valid-alarms.conf")
+    val configData = ConfigData.fromPath(ResourceReader.copyToTmp("/valid-alarms.conf"))
+    val configPath = Paths.get("valid-alarms.conf")
     val configService = ConfigClientFactory.adminApi(actorRuntime.typedSystem, locationService, factory)
     configService.create(configPath, configData, comment = "commit test file").futureValue
 
@@ -113,7 +113,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   // DEOPSCSW-470: CLI application to exercise and test the alarm API
   test("should fail to initialize alarms in alarm store when config service is down") {
     val configPath = Paths.get("valid-alarms.conf")
-    val cmd        = Options(cmd = "init", filePath = Some(configPath), reset = true)
+    val cmd = Options(cmd = "init", filePath = Some(configPath), reset = true)
 
     clearAlarmStore().futureValue
     cliApp.execute(cmd)
@@ -530,8 +530,8 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
 
   // DEOPSCSW-479: Subscribe to health changes of component/subsystem/all alarms using CLI Interface
   test("should subscribe health of subsystem/component/alarm") {
-    val subsystem         = tromboneAxisHighLimitKey.subsystem
-    val component         = tromboneAxisHighLimitKey.component
+    val subsystem = tromboneAxisHighLimitKey.subsystem
+    val component = tromboneAxisHighLimitKey.component
     val tromboneComponent = s"$subsystem-$component"
 
     val cmd = Options(

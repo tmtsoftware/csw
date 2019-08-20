@@ -8,7 +8,7 @@ import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.params.commands.CommandResponse.{Completed, SubmitResponse}
 import csw.params.commands.{CommandName, Sequence, Setup}
-import csw.params.core.models.Prefix
+import csw.params.core.models.{Id, Prefix}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSuiteLike, Matchers}
 import org.scalatestplus.mockito.MockitoSugar
@@ -23,7 +23,7 @@ class SequencerCommandServiceImplTest
   test("should submit sequence to the sequencer") {
     val sequence = Sequence(Setup(Prefix("csw.move"), CommandName("command-1"), None))
 
-    val submitResponse: SubmitResponse = Completed(sequence.runId)
+    val submitResponse: SubmitResponse = Completed(CommandName("Sequence"), Id())
 
     val sequencer = spawn(Behaviors.receiveMessage[SequencerMsg] {
       case LoadAndStartSequence(`sequence`, replyTo) =>

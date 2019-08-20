@@ -15,7 +15,7 @@ import scala.concurrent.{Await, ExecutionContext}
 // #read-command
 class ReadCommand(implicit val actorSystem: typed.ActorSystem[_]) extends AppCommand {
   override def run(): Unit = {
-    val url      = "http://localhost:7000/data"
+    val url = "http://localhost:7000/data"
     val response = Await.result(Http(actorSystem.toUntyped).singleRequest(HttpRequest(uri = Uri(url))), 2.seconds)
     println(convertToString(response.entity))
   }
@@ -24,7 +24,7 @@ class ReadCommand(implicit val actorSystem: typed.ActorSystem[_]) extends AppCom
 
 object ReadCommand {
   def convertToString(entity: ResponseEntity)(implicit actorSystem: typed.ActorSystem[_]): String = {
-    implicit val ec: ExecutionContext   = actorSystem.executionContext
+    implicit val ec: ExecutionContext = actorSystem.executionContext
     implicit val mat: ActorMaterializer = scaladsl.ActorMaterializer()
     Await.result(Unmarshaller.stringUnmarshaller(entity), 2.seconds)
   }

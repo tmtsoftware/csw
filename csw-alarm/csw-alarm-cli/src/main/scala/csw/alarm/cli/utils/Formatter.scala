@@ -24,8 +24,8 @@ object Formatter {
     }).mkString(s"$Separator$Newline", s"\n$Separator$Newline", s"$Newline$Separator")
 
   def formatAggregatedSeverity(key: Key, severity: FullAlarmSeverity): String = msg(key, "Severity", severity.toString)
-  def formatAggregatedHealth(key: Key, health: AlarmHealth): String           = msg(key, "Health", health.toString)
-  def formatRefreshSeverity(key: Key, severity: FullAlarmSeverity): String    = s"Severity for [$key] refreshed to: $severity"
+  def formatAggregatedHealth(key: Key, health: AlarmHealth): String = msg(key, "Health", health.toString)
+  def formatRefreshSeverity(key: Key, severity: FullAlarmSeverity): String = s"Severity for [$key] refreshed to: $severity"
 
   def msg(key: Key, property: String, value: String): String = key match {
     case GlobalKey                          => s"Aggregated $property of Alarm Service: $value"
@@ -70,7 +70,7 @@ object Formatter {
     ).mkString(Newline)
   }
 
-  private def formatKey(key: AlarmKey): String                    = s"Alarm Key: $key"
+  private def formatKey(key: AlarmKey): String = s"Alarm Key: $key"
   private def formatSeverity(severity: FullAlarmSeverity): String = s"Current Severity: $severity"
 
 }

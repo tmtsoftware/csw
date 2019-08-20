@@ -24,7 +24,7 @@ sealed abstract class Key private[alarm] (subsystem: String, component: String, 
   /**
    * Equality of the key is based on the subsystem, component and name. Inlined code from deprecated Proxy class.
    */
-  def self: Any              = value
+  def self: Any = value
   override def hashCode: Int = self.hashCode
   override def equals(that: Any): Boolean = that match {
     case null => false

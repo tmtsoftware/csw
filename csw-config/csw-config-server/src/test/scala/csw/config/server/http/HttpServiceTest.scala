@@ -21,8 +21,8 @@ import scala.util.control.NonFatal
 
 class HttpServiceTest extends HTTPLocationService {
 
-  implicit val system: ActorSystem[_]              = ActorSystem(Behaviors.empty, "test")
-  implicit val mat: ActorMaterializer              = ActorMaterializer()
+  implicit val system: ActorSystem[_] = ActorSystem(Behaviors.empty, "test")
+  implicit val mat: ActorMaterializer = ActorMaterializer()
   private val testLocationService: LocationService = HttpLocationServiceFactory.makeLocalClient
 
   //register AAS with location service

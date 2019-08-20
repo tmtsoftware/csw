@@ -1,6 +1,5 @@
 {
   "Wait": {
-    "runId": "test-runId",
     "source": "wfos.blue.filter",
     "commandName": "move",
     "maybeObsId": "Obs001",

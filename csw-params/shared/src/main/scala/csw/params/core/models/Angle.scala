@@ -290,13 +290,13 @@ object Angle {
       s"${hour}h"
     } else if (isNear(ra, H2R / 60)) {
       val hour = (ra * R2H).toInt
-      val min  = Math.round((ra - H2R * hour) * R2H * 60).toInt
+      val min = Math.round((ra - H2R * hour) * R2H * 60).toInt
       s"${hour}h ${min}m"
     } else {
       val hour = (ra * R2H).toInt
-      val min  = ((ra - H2R * hour) * R2H * 60).toInt
-      val sec  = (ra - H2R * hour - min * H2R / 60) * R2H * 3600
-      val s    = formatSecs(sec)
+      val min = ((ra - H2R * hour) * R2H * 60).toInt
+      val sec = (ra - H2R * hour - min * H2R / 60) * R2H * 3600
+      val s = formatSecs(sec)
       s"${hour}h ${min}m ${s}s"
     }
   }
@@ -322,7 +322,7 @@ object Angle {
       val deg = (de * R2D).toInt
       val min = ((de - D2R * deg) * R2D * 60).toInt
       val sec = (de - D2R * deg - min * D2R / 60) * R2D * 3600
-      val s   = formatSecs(sec)
+      val s = formatSecs(sec)
       sign + deg + DEGREE_SIGN + min + "'" + s + "\""
     }
   }
@@ -343,7 +343,7 @@ object Angle {
     //this code is from JH labs projection lib
     val dlat = math.sin((de2 - de1) / 2)
     val dlon = math.sin((ra2 - ra1) / 2)
-    val r    = math.sqrt(dlat * dlat + Math.cos(de1) * Math.cos(de2) * dlon * dlon)
+    val r = math.sqrt(dlat * dlat + Math.cos(de1) * Math.cos(de2) * dlon * dlon)
     2.0 * math.asin(r)
   }
 

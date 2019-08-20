@@ -1,7 +1,6 @@
 package csw.command.client.messages
 
 import akka.actor.typed.ActorRef
-import csw.command.client.internal.{CommandCorrelation, CommandResponseState, CommandSubscribersState}
 import csw.command.client.messages.CommandSerializationMarker._
 import csw.command.client.models.framework.PubSub.SubscriberMessage
 import csw.command.client.models.framework._
@@ -9,7 +8,7 @@ import csw.location.models.TrackingEvent
 import csw.logging.models.{Level, LogMetadata}
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
-import csw.params.core.models.{Id, Prefix}
+import csw.params.core.models.Prefix
 import csw.params.core.states.CurrentState
 import csw.serializable.CommandSerializable
 
@@ -26,7 +25,7 @@ sealed trait TopLevelActorMessage
 
 private[csw] sealed trait TopLevelActorCommonMessage extends TopLevelActorMessage
 private[csw] object TopLevelActorCommonMessage {
-  case class UnderlyingHookFailed(throwable: Throwable)          extends TopLevelActorCommonMessage
+  case class UnderlyingHookFailed(throwable: Throwable) extends TopLevelActorCommonMessage
   case class TrackingEventReceived(trackingEvent: TrackingEvent) extends TopLevelActorCommonMessage
 }
 
@@ -78,7 +77,7 @@ object CommandMessage {
   case class Validate(command: ControlCommand, replyTo: ActorRef[ValidateResponse]) extends CommandMessage with RemoteMsg
 }
 
-private[csw] case class LockTimedout(replyTo: ActorRef[LockingResponse])       extends SupervisorMessage
+private[csw] case class LockTimedout(replyTo: ActorRef[LockingResponse]) extends SupervisorMessage
 private[csw] case class LockAboutToTimeout(replyTo: ActorRef[LockingResponse]) extends SupervisorMessage
 
 /**
@@ -170,14 +169,14 @@ sealed trait SupervisorRunningMessage extends ComponentMessage
 
 private[csw] sealed trait SupervisorInternalRunningMessage extends SupervisorMessage
 private[csw] object SupervisorInternalRunningMessage {
-  case class RegistrationSuccess(componentRef: ActorRef[RunningMessage])     extends SupervisorInternalRunningMessage
+  case class RegistrationSuccess(componentRef: ActorRef[RunningMessage]) extends SupervisorInternalRunningMessage
   case class RegistrationNotRequired(componentRef: ActorRef[RunningMessage]) extends SupervisorInternalRunningMessage
-  case class RegistrationFailed(throwable: Throwable)                        extends SupervisorInternalRunningMessage
+  case class RegistrationFailed(throwable: Throwable) extends SupervisorInternalRunningMessage
 }
 
 private[csw] sealed trait SupervisorRestartMessage extends SupervisorMessage
 private[csw] object SupervisorRestartMessage {
-  case object UnRegistrationComplete                    extends SupervisorRestartMessage
+  case object UnRegistrationComplete extends SupervisorRestartMessage
   case class UnRegistrationFailed(throwable: Throwable) extends SupervisorRestartMessage
 }
 

@@ -13,7 +13,7 @@ private[time] object TMTClock {
 }
 
 private[time] class NonLinuxClock extends TMTClock {
-  override def offset: Int         = TimeConstants.taiOffset
+  override def offset: Int = TimeConstants.taiOffset
   override def utcInstant: Instant = Instant.now()
   override def taiInstant: Instant = Instant.now().plusSeconds(offset)
 }

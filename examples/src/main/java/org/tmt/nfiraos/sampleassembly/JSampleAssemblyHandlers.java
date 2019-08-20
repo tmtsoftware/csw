@@ -95,8 +95,8 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
         Timeout commandResponseTimeout = new Timeout(10, TimeUnit.SECONDS);
 
         // Submit command and handle response
-        hcd.submitAndWait(setupCommand, commandResponseTimeout)
-                .exceptionally(ex -> new CommandResponse.Error(setupCommand.commandName(), setupCommand.runId(), "Exception occurred when sending command: " + ex.getMessage()))
+        hcd.submitAndWait(setupCommand, commandResponseTimeout)   // FIXME -- NEED to ask about exceptionally runId
+                .exceptionally(ex -> new CommandResponse.Error(setupCommand.commandName(), Id.apply(), "Exception occurred when sending command: " + ex.getMessage()))
                 .thenAccept(commandResponse -> {
                     if (commandResponse instanceof CommandResponse.Locked) {
                         log.error("Sleed command failed: HCD is locked");

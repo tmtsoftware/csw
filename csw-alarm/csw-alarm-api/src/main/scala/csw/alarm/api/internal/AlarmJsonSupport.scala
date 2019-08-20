@@ -15,11 +15,11 @@ private[alarm] trait AlarmJsonSupport {
 
   implicit lazy val alarmStatusFormat: Format[AlarmStatus] = Json.format
 
-  implicit lazy val subsystemFormat: Format[Subsystem]                         = Formats.enumFormat
-  implicit lazy val alarmSeverityFormat: Format[FullAlarmSeverity]             = Formats.enumFormat
+  implicit lazy val subsystemFormat: Format[Subsystem] = Formats.enumFormat
+  implicit lazy val alarmSeverityFormat: Format[FullAlarmSeverity] = Formats.enumFormat
   implicit lazy val acknowledgementStatusFormat: Format[AcknowledgementStatus] = Formats.enumFormat
-  implicit lazy val activationStatusFormat: Format[ActivationStatus]           = Formats.enumFormat
-  implicit lazy val alarmTypeFormat: Format[AlarmType]                         = Formats.enumFormat
-  implicit lazy val shelveStatusFormat: Format[ShelveStatus]                   = Formats.enumFormat
-  implicit lazy val alarmHealthFormat: Format[AlarmHealth]                     = Formats.enumFormat
+  implicit lazy val activationStatusFormat: Format[ActivationStatus] = Formats.enumFormat
+  implicit lazy val alarmTypeFormat: Format[AlarmType] = Formats.enumFormat
+  implicit lazy val shelveStatusFormat: Format[ShelveStatus] = Formats.enumFormat
+  implicit lazy val alarmHealthFormat: Format[AlarmHealth] = Formats.enumFormat
 }

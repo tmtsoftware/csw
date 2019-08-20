@@ -20,7 +20,7 @@ import csw.params.core.states.StateName
 private[internal] class CommandUpdateSubscriptionImpl(
     publisher: ActorRef[StartedCommandSubscription],
     names: Option[Set[StateName]],
-    callback: SubmitResponse ⇒ Unit
+    callback: SubmitResponse => Unit
 )(implicit val mat: Materializer)
     extends CommandUpdateSubscription {
 
@@ -34,7 +34,7 @@ private[internal] class CommandUpdateSubscriptionImpl(
     val bufferSize = 256
     Source
       .actorRef[SubmitResponse](bufferSize, OverflowStrategy.dropHead)
-      .mapMaterializedValue { ref ⇒
+      .mapMaterializedValue { ref =>
         names match {
           case Some(value) =>
             publisher ! StartedCommandSubscription(SubscribeOnly(ref, value))

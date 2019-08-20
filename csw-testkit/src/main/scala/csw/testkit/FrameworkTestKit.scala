@@ -45,16 +45,16 @@ final class FrameworkTestKit private (
     val alarmTestKit: AlarmTestKit
 ) {
 
-  implicit lazy val system: ActorSystem     = actorSystem.toUntyped
+  implicit lazy val system: ActorSystem = actorSystem.toUntyped
   lazy val frameworkWiring: FrameworkWiring = FrameworkWiring.make(actorSystem)
-  implicit lazy val ec: ExecutionContext    = frameworkWiring.actorRuntime.ec
-  implicit lazy val mat: Materializer       = frameworkWiring.actorRuntime.mat
+  implicit lazy val ec: ExecutionContext = frameworkWiring.actorRuntime.ec
+  implicit lazy val mat: Materializer = frameworkWiring.actorRuntime.mat
 
   implicit val timeout: Timeout = locationTestKit.timeout
 
   private var configStarted = false
-  private var eventStarted  = false
-  private var alarmStarted  = false
+  private var eventStarted = false
+  private var alarmStarted = false
 
   /**
    * Before running tests, use this or [FrameworkTestKit#start] method to start required services

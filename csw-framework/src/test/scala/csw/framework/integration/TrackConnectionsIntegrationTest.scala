@@ -31,7 +31,7 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 
   private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
-  private val disperserHcdConnection   = AkkaConnection(ComponentId("Disperser", HCD))
+  private val disperserHcdConnection = AkkaConnection(ComponentId("Disperser", HCD))
 
   override def afterAll(): Unit = {
     super.afterAll()
@@ -41,14 +41,14 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
   // DEOPSCSW-220: Access and Monitor components for current values
   // DEOPSCSW-221: Avoid sending commands to non-executing components
   test("should track connections when locationServiceUsage is RegisterAndTrackServices") {
-    val containerActorSystem    = ActorSystemFactory.remote(SpawnProtocol.behavior, "test1")
+    val containerActorSystem = ActorSystemFactory.remote(SpawnProtocol.behavior, "test1")
     val wiring: FrameworkWiring = FrameworkWiring.make(containerActorSystem, mock[RedisClient])
 
     // start a container and verify it moves to running lifecycle state
     val containerRef = Container.spawn(ConfigFactory.load("container_tracking_connections.conf"), wiring).await
 
     val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]("container-lifecycle-state-probe")
-    val assemblyProbe                = TestProbe[CurrentState]("assembly-state-probe")
+    val assemblyProbe = TestProbe[CurrentState]("assembly-state-probe")
 
     // initially container is put in Idle lifecycle state and wait for all the components to move into Running lifecycle state
     // ********** Message: GetContainerLifecycleState **********
@@ -56,11 +56,11 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
 
     // resolve all the components from container using location service
     val filterAssemblyLocation = wiring.locationService.find(filterAssemblyConnection).await
-    val disperserHcdLocation   = wiring.locationService.find(disperserHcdConnection).await
+    val disperserHcdLocation = wiring.locationService.find(disperserHcdConnection).await
 
     val assemblyCommandService = CommandServiceFactory.make(filterAssemblyLocation.get)(containerActorSystem)
 
-    val disperserComponentRef   = disperserHcdLocation.get.componentRef
+    val disperserComponentRef = disperserHcdLocation.get.componentRef
     val disperserCommandService = CommandServiceFactory.make(disperserHcdLocation.get)(containerActorSystem)
 
     // Subscribe to component's current state
@@ -101,20 +101,20 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
    * */
   //DEOPSCSW-219 Discover component connection using HTTP protocol
   test("component should be able to track http and tcp connections") {
-    val componentActorSystem    = ActorSystemFactory.remote(SpawnProtocol.behavior, "test2")
+    val componentActorSystem = ActorSystemFactory.remote(SpawnProtocol.behavior, "test2")
     val wiring: FrameworkWiring = FrameworkWiring.make(componentActorSystem, mock[RedisClient])
     // start component in standalone mode
     val assemblySupervisor = Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring).await
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")
-    val akkaConnection                = AkkaConnection(models.ComponentId("IFS_Detector", HCD))
+    val akkaConnection = AkkaConnection(models.ComponentId("IFS_Detector", HCD))
 
     assertThatSupervisorIsRunning(assemblySupervisor, supervisorLifecycleStateProbe, 5.seconds)
 
     val resolvedAkkaLocation = wiring.locationService.resolve(akkaConnection, 5.seconds).await.value
     resolvedAkkaLocation.connection shouldBe akkaConnection
 
-    val assemblyProbe          = TestProbe[CurrentState]("assembly-state-probe")
+    val assemblyProbe = TestProbe[CurrentState]("assembly-state-probe")
     val assemblyCommandService = CommandServiceFactory.make(resolvedAkkaLocation)(componentActorSystem)
     // Subscribe to component's current state
     assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)

@@ -4,7 +4,7 @@ import java.net.ServerSocket
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 class LocationServerStatusTest extends FunSuite with Matchers with BeforeAndAfterAll {
-  val serverPort   = 7654
+  val serverPort = 7654
   val serverSocket = new ServerSocket(serverPort)
 
   override protected def afterAll(): Unit = serverSocket.close()

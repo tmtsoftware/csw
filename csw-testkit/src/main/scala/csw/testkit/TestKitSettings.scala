@@ -37,16 +37,16 @@ final class TestKitSettings(val config: Config) {
   val DefaultTimeout: Timeout = Timeout(config.getDuration("default-timeout").toScala)
 
   val LocationClusterPort: Option[Int] = toOption(locationConfig.getInt("cluster-port"))
-  val ConfigPort: Option[Int]          = toOption(configServerConfig.getInt("port"))
-  val EventSentinelPort: Option[Int]   = toOption(eventConfig.getInt("sentinel-port"))
-  val EventMasterPort: Option[Int]     = toOption(eventConfig.getInt("master-port"))
-  val AlarmSentinelPort: Option[Int]   = toOption(alarmConfig.getInt("sentinel-port"))
-  val AlarmMasterPort: Option[Int]     = toOption(alarmConfig.getInt("master-port"))
+  val ConfigPort: Option[Int] = toOption(configServerConfig.getInt("port"))
+  val EventSentinelPort: Option[Int] = toOption(eventConfig.getInt("sentinel-port"))
+  val EventMasterPort: Option[Int] = toOption(eventConfig.getInt("master-port"))
+  val AlarmSentinelPort: Option[Int] = toOption(alarmConfig.getInt("sentinel-port"))
+  val AlarmMasterPort: Option[Int] = toOption(alarmConfig.getInt("master-port"))
 
-  private def locationConfig     = config.getConfig("location")
+  private def locationConfig = config.getConfig("location")
   private def configServerConfig = config.getConfig("config")
-  private def eventConfig        = config.getConfig("event")
-  private def alarmConfig        = config.getConfig("alarm")
+  private def eventConfig = config.getConfig("event")
+  private def alarmConfig = config.getConfig("alarm")
 
   private def toOption(i: Int) =
     if (i == 0) None

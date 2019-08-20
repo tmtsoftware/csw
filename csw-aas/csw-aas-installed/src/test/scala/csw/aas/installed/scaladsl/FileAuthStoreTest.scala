@@ -8,13 +8,13 @@ import os.Path
 
 class FileAuthStoreTest extends FunSuite with BeforeAndAfterEach {
 
-  private val path: os.Path    = os.Path(new File("test-tokens").getAbsolutePath)
-  private val testAccessToken  = "test-access-token"
-  private val testIdToken      = "test-id-token"
+  private val path: os.Path = os.Path(new File("test-tokens").getAbsolutePath)
+  private val testAccessToken = "test-access-token"
+  private val testIdToken = "test-id-token"
   private val testRefreshToken = "test-refresh-token"
 
-  private val accessTokenPath: Path  = path / "access_token"
-  private val idTokenPath: Path      = path / "id_token"
+  private val accessTokenPath: Path = path / "access_token"
+  private val idTokenPath: Path = path / "id_token"
   private val refreshTokenPath: Path = path / "refresh_token"
 
   val store = new FileAuthStore(path.toNIO)
@@ -50,8 +50,8 @@ class FileAuthStoreTest extends FunSuite with BeforeAndAfterEach {
   }
 
   test("saveTokens should save the given token to respective files") {
-    val accessToken  = "refreshed-access-token"
-    val idToken      = "refreshed-id-token"
+    val accessToken = "refreshed-access-token"
+    val idToken = "refreshed-id-token"
     val refreshToken = "refreshed-refresh-token"
 
     store.saveTokens(idToken, accessToken, refreshToken)

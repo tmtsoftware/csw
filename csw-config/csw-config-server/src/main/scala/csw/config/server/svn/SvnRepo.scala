@@ -99,7 +99,7 @@ class SvnRepo(userName: String, settings: Settings, blockingIoDispatcher: Messag
       editor.openFile(filePath, SVNRepository.INVALID_REVISION)
       editor.applyTextDelta(filePath, null)
       val deltaGenerator = new SVNDeltaGenerator
-      val checksum       = deltaGenerator.sendDelta(filePath, data, editor, true)
+      val checksum = deltaGenerator.sendDelta(filePath, data, editor, true)
       editor.closeFile(filePath, checksum)
       editor.closeDir()
       editor.closeEdit
@@ -116,7 +116,7 @@ class SvnRepo(userName: String, settings: Settings, blockingIoDispatcher: Messag
     withAsyncSvnOpFactory { svnOperationFactory =>
       // svn always stores file in the repo without '/' prefix.
       // Hence if input pattern is provided like '/root/', then prefix '/' need to be striped to get the list of files from root folder.
-      val compiledPattern            = pattern.map(pat => Pattern.compile(pat.stripPrefix("/")))
+      val compiledPattern = pattern.map(pat => Pattern.compile(pat.stripPrefix("/")))
       var entries: List[SVNDirEntry] = List.empty
 
       // if the fileType(Annex or Normal) is defined then filter the list of files with this type
@@ -143,7 +143,7 @@ class SvnRepo(userName: String, settings: Settings, blockingIoDispatcher: Messag
   def hist(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[SVNLogEntry]] = withAsyncSvnClientMgr {
     clientManager =>
       var logEntries = List[SVNLogEntry]()
-      val logClient  = clientManager.getLogClient
+      val logClient = clientManager.getLogClient
       val handler: ISVNLogEntryHandler = logEntry =>
         logEntries =
           if (logEntry.getDate.toInstant.isAfter(from) && logEntry.getDate.toInstant.isBefore(to)) logEntry :: logEntries
@@ -207,7 +207,7 @@ class SvnRepo(userName: String, settings: Settings, blockingIoDispatcher: Messag
     finally clientManager.dispose()
   }
 
-  private def withAsyncSvn[T](f: SVNRepository => T): Future[T]                = Future { withSvn(f) }
+  private def withAsyncSvn[T](f: SVNRepository => T): Future[T] = Future { withSvn(f) }
   private def withAsyncSvnOpFactory[T](f: SvnOperationFactory => T): Future[T] = Future { withSvnOpFactory(f) }
-  private def withAsyncSvnClientMgr[T](f: SVNClientManager => T): Future[T]    = Future { withSvnClientMgr(f) }
+  private def withAsyncSvnClientMgr[T](f: SVNClientManager => T): Future[T] = Future { withSvnClientMgr(f) }
 }

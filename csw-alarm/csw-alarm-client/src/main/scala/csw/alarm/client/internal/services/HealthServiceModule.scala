@@ -21,7 +21,7 @@ private[client] trait HealthServiceModule extends HealthService {
   implicit val actorSystem: typed.ActorSystem[_]
   import redisConnectionsFactory._
 
-  private val log                             = AlarmServiceLogger.getLogger
+  private val log = AlarmServiceLogger.getLogger
   private implicit lazy val mat: Materializer = scaladsl.ActorMaterializer()
 
   final override def getAggregatedHealth(key: Key): Future[AlarmHealth] = {

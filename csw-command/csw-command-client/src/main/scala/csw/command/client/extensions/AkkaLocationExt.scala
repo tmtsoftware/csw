@@ -13,7 +13,7 @@ object AkkaLocationExt {
   implicit class RichAkkaLocation(val akkaLocation: AkkaLocation) {
 
     private def typedRef[T: ClassTag](implicit actorSystem: ActorSystem[_]): ActorRef[T] = {
-      val typeManifest    = scala.reflect.classTag[T].runtimeClass.getSimpleName
+      val typeManifest = scala.reflect.classTag[T].runtimeClass.getSimpleName
       val messageManifest = akkaLocation.connection.componentId.componentType.messageManifest
 
       require(

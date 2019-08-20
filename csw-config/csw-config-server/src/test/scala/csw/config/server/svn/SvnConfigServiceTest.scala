@@ -9,14 +9,14 @@ import csw.config.server.commons.TestFutureExtension.RichFuture
 
 class SvnConfigServiceTest extends ConfigServiceTest {
 
-  override val serverWiring: ServerWiring   = new ServerWiring
+  override val serverWiring: ServerWiring = new ServerWiring
   override val configService: ConfigService = serverWiring.configServiceFactory.make()
   import serverWiring.actorRuntime._
 
   // DEOPSCSW-141: Change the 'create' API
   test("create call should create a normal file and active file in repo and reset should not delete active file") {
 
-    val filePath       = Paths.get("/tmt/tcp/redis/text/redis.conf")
+    val filePath = Paths.get("/tmt/tcp/redis/text/redis.conf")
     val activeFilePath = Paths.get(filePath.toString + serverWiring.settings.`active-config-suffix`)
 
     val configId1 =

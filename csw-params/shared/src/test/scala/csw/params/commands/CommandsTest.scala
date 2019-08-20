@@ -14,20 +14,20 @@ import scala.util.Try
 // DEOPSCSW-320: Add command type in Setup, observe and wait
 class CommandsTest extends FunSpec {
 
-  private val ck1         = "wfos.prog.cloudcover"
-  private val ck3         = "wfos.red.detector"
+  private val ck1 = "wfos.prog.cloudcover"
+  private val ck3 = "wfos.red.detector"
   private val commandName = CommandName("move")
 
   private val obsId: ObsId = ObsId("Obs001")
   describe("Setup config tests") {
-    val k1    = KeyType.IntKey.make("encoder")
-    val k2    = KeyType.StringKey.make("stringThing")
+    val k1 = KeyType.IntKey.make("encoder")
+    val k2 = KeyType.StringKey.make("stringThing")
     val k2bad = KeyType.IntKey.make("stringThing")
-    val k3    = KeyType.IntKey.make("notUsed")
+    val k3 = KeyType.IntKey.make("notUsed")
 
     it("Should allow adding keys using single set") {
-      val i1  = k1.set(22)
-      val i2  = k2.set("A")
+      val i1 = k1.set(22)
+      val i2 = k2.set("A")
       val sc1 = Setup(Prefix(ck3), commandName, Some(obsId)).add(i1).add(i2)
       assert(sc1.size == 2)
       assert(sc1.exists(k1))
@@ -63,7 +63,7 @@ class CommandsTest extends FunSpec {
       var sc1 = Setup(Prefix(ck3), commandName, Some(obsId))
       sc1 = sc1.madd(k1.set(22).withUnits(degree), k2.set("C"))
 
-      val v1: Parameter[Int]    = sc1(k1)
+      val v1: Parameter[Int] = sc1(k1)
       val v2: Parameter[String] = sc1(k2)
       assert(sc1.get(k1).isDefined)
       assert(sc1.get(k2).isDefined)
@@ -89,8 +89,8 @@ class CommandsTest extends FunSpec {
     it("Should able to create with Byte Parameteret") {
       val byteKey1 = ByteKey.make("byteKey1")
       val byteKey2 = ByteKey.make("byteKey2")
-      val bytes1   = Array[Byte](10, 20)
-      val bytes2   = Array[Byte](30, 40)
+      val bytes1 = Array[Byte](10, 20)
+      val bytes2 = Array[Byte](30, 40)
 
       val i1 = byteKey1.set(bytes1)
       val i2 = byteKey2.set(bytes2)
@@ -164,8 +164,8 @@ class CommandsTest extends FunSpec {
     val k1 = KeyType.IntKey.make("repeat")
     val k2 = KeyType.IntKey.make("expTime")
     it("Should allow adding keys") {
-      val i1  = k1.set(22)
-      val i2  = k2.set(44)
+      val i1 = k1.set(22)
+      val i2 = k2.set(44)
       val oc1 = Observe(Prefix(ck3), commandName, Some(obsId)).add(i1).add(i2)
       assert(oc1.size == 2)
       assert(oc1.exists(k1))
@@ -247,8 +247,8 @@ class CommandsTest extends FunSpec {
     val k1 = KeyType.IntKey.make("repeat")
     val k2 = KeyType.IntKey.make("expTime")
     it("Should allow adding keys") {
-      val i1  = k1.set(22)
-      val i2  = k2.set(44)
+      val i1 = k1.set(22)
+      val i2 = k2.set(44)
       val wc1 = Wait(Prefix(ck3), commandName, Some(obsId)).add(i1).add(i2)
       assert(wc1.size == 2)
       assert(wc1.exists(k1))
@@ -326,11 +326,11 @@ class CommandsTest extends FunSpec {
   }
 
   describe("testing for getting typed items") {
-    val t1  = KeyType.IntKey.make("test1")
+    val t1 = KeyType.IntKey.make("test1")
     val sc1 = Setup(Prefix(ck3), commandName, Some(obsId)).add(t1.set(Array(22), degree))
 
     val item: Option[Parameter[Int]] = sc1.get(t1) // Works now!
-    val itm: Parameter[Int]          = item.get
+    val itm: Parameter[Int] = item.get
     assert(itm.units == degree)
     val i: Int = itm(0)
     assert(i == 22)
@@ -341,7 +341,7 @@ class CommandsTest extends FunSpec {
   }
 
   describe("Checking for item types in configs") {
-    val k1: Key[Int]    = KeyType.IntKey.make("itest")
+    val k1: Key[Int] = KeyType.IntKey.make("itest")
     val k2: Key[Double] = KeyType.DoubleKey.make("dtest")
     val k3: Key[String] = KeyType.StringKey.make("stest")
 
@@ -352,7 +352,7 @@ class CommandsTest extends FunSpec {
     it("Should get as IntItem") {
       val sc = Setup(Prefix(ck3), commandName, Some(obsId)).add(i1).add(i2).add(i3)
 
-      val out1: Option[Parameter[Int]]    = sc.get(k1)
+      val out1: Option[Parameter[Int]] = sc.get(k1)
       val out2: Option[Parameter[Double]] = sc.get(k2)
       val out3: Option[Parameter[String]] = sc.get(k3)
 
@@ -363,7 +363,7 @@ class CommandsTest extends FunSpec {
   }
 
   describe("Check for multi-add") {
-    val k1: Key[Int]    = KeyType.IntKey.make("itest")
+    val k1: Key[Int] = KeyType.IntKey.make("itest")
     val k2: Key[Double] = KeyType.DoubleKey.make("dtest")
     val k3: Key[String] = KeyType.StringKey.make("stest")
 
@@ -517,12 +517,12 @@ class CommandsTest extends FunSpec {
     val k3 = KeyType.StringKey.make("stest")
     val k4 = KeyType.LongArrayKey.make("lartest")
 
-    val i1  = k1.set(1, 2, 3).withUnits(degree)
+    val i1 = k1.set(1, 2, 3).withUnits(degree)
     val i11 = k1.set(1, 2, 3).withUnits(degree) // This is here to see if it is checking equality or address
-    val i2  = k2.set(1.0, 2.0, 3.0).withUnits(meter)
-    val i3  = k3.set("A", "B", "C")
-    val i4  = k4.set(ArrayData(Array.fill[Long](100)(10)), ArrayData(Array.fill[Long](100)(100)))
-    val i5  = k1.set(22) // This is not added for testing not present removal
+    val i2 = k2.set(1.0, 2.0, 3.0).withUnits(meter)
+    val i3 = k3.set("A", "B", "C")
+    val i4 = k4.set(ArrayData(Array.fill[Long](100)(10)), ArrayData(Array.fill[Long](100)(100)))
+    val i5 = k1.set(22) // This is not added for testing not present removal
 
     it("Should allow removing one at a time") {
       var sc1 = Setup(Prefix(ck3), commandName, Some(obsId)).madd(i1, i2, i3, i4)
@@ -618,5 +618,5 @@ class CommandsTest extends FunSpec {
 
     }
   }
-   */
+ */
 }

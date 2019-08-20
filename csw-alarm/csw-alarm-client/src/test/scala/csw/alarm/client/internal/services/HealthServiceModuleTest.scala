@@ -142,7 +142,7 @@ class HealthServiceModuleTest
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldBe Disconnected
 
     // alarm subscription - nfiraos.trombone.tromboneAxisLowLimitAlarm
-    val testProbe         = TestProbe[AlarmHealth]()(actorSystem)
+    val testProbe = TestProbe[AlarmHealth]()(actorSystem)
     val alarmSubscription = subscribeAggregatedHealthCallback(tromboneAxisLowLimitAlarmKey, testProbe.ref ! _)
     alarmSubscription.ready().await
     testProbe.expectMessage(Bad) // on subscription, current aggregated health will be calculated
@@ -170,7 +170,7 @@ class HealthServiceModuleTest
     getCurrentSeverity(outOfRangeOffloadAlarmKey).await shouldBe Disconnected
 
     // subsystem subscription - tcs
-    val testProbe         = TestProbe[AlarmHealth]()(actorSystem)
+    val testProbe = TestProbe[AlarmHealth]()(actorSystem)
     val alarmSubscription = subscribeAggregatedHealthCallback(SubsystemKey(TCS), testProbe.ref ! _)
     alarmSubscription.ready().await
     testProbe.expectMessage(Bad) // on subscription, current aggregated health will be calculated
@@ -196,7 +196,7 @@ class HealthServiceModuleTest
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldBe Disconnected
 
     // component subscription - nfiraos.trombone
-    val testProbe         = TestProbe[AlarmHealth]()(actorSystem)
+    val testProbe = TestProbe[AlarmHealth]()(actorSystem)
     val alarmSubscription = subscribeAggregatedHealthCallback(ComponentKey(NFIRAOS, "trombone"), testProbe.ref ! _)
     alarmSubscription.ready().await
     testProbe.expectMessage(Bad) // on subscription, current aggregated health will be calculated
@@ -266,7 +266,7 @@ class HealthServiceModuleTest
     getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Disconnected
 
     // subsystem subscription - tcs
-    val testProbe         = TestProbe[AlarmHealth]()(actorSystem)
+    val testProbe = TestProbe[AlarmHealth]()(actorSystem)
     val alarmSubscription = subscribeAggregatedHealthActorRef(SubsystemKey(TCS), testProbe.ref)
     alarmSubscription.ready().await
     testProbe.expectMessage(Bad) // on subscription, current aggregated health will be calculated
@@ -288,7 +288,7 @@ class HealthServiceModuleTest
     getAggregatedHealth(GlobalKey).await shouldBe Bad
     getCurrentSeverity(cpuExceededAlarmKey).await shouldBe Disconnected
 
-    val testProbe         = TestProbe[AlarmHealth]()(actorSystem)
+    val testProbe = TestProbe[AlarmHealth]()(actorSystem)
     val alarmSubscription = subscribeAggregatedHealthActorRef(SubsystemKey(TCS), testProbe.ref)
     alarmSubscription.ready().await
     testProbe.expectMessage(Bad) // on subscription, current aggregated health will be calculated
@@ -311,7 +311,7 @@ class HealthServiceModuleTest
     val metadataList = getMetadata(SubsystemKey(LGSF)).await
     metadataList.foreach(m => m.isActive shouldBe false)
     a[InactiveAlarmException] shouldBe thrownBy {
-      val testProbe    = TestProbe[AlarmHealth]()(actorSystem)
+      val testProbe = TestProbe[AlarmHealth]()(actorSystem)
       val subscription = subscribeAggregatedHealthActorRef(SubsystemKey(LGSF), testProbe.ref)
       subscription.ready().await
     }

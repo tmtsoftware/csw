@@ -10,10 +10,10 @@ import org.scalatest.{FunSpec, Matchers}
 class UniqueKeyVerificationTest extends FunSpec with Matchers {
 
   val encoderKey: Key[Int] = KeyType.IntKey.make("encoder")
-  val filterKey: Key[Int]  = KeyType.IntKey.make("filter")
-  val miscKey: Key[Int]    = KeyType.IntKey.make("misc.")
+  val filterKey: Key[Int] = KeyType.IntKey.make("filter")
+  val miscKey: Key[Int] = KeyType.IntKey.make("misc.")
 
-  val runId  = Id()
+  val runId = Id()
   val prefix = Prefix("wfos.blue.filter")
 
   private val encParam1 = encoderKey.set(1)

@@ -15,7 +15,6 @@ import csw.command.client.CommandServiceFactory;
 import csw.command.client.extensions.AkkaLocationExt;
 import csw.command.client.messages.SupervisorLockMessage;
 import csw.command.client.models.framework.LockingResponse;
-import csw.command.client.models.framework.LockingResponses;
 import csw.command.client.models.matchers.DemandMatcher;
 import csw.command.client.models.matchers.Matcher;
 import csw.command.client.models.matchers.MatcherResponse;
@@ -24,10 +23,10 @@ import csw.common.components.framework.SampleComponentState;
 import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;
 import csw.location.api.javadsl.ILocationService;
-import csw.location.api.models.AkkaLocation;
-import csw.location.api.models.ComponentId;
 import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
+import csw.location.models.AkkaLocation;
+import csw.location.models.ComponentId;
 import csw.location.server.http.JHTTPLocationService;
 import csw.params.commands.CommandIssue;
 import csw.params.commands.CommandResponse;
@@ -61,7 +60,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static csw.common.components.command.ComponentStateForCommand.*;
 import static csw.location.api.javadsl.JComponentType.HCD;
-import static csw.location.api.models.Connection.AkkaConnection;
+import static csw.location.models.Connection.AkkaConnection;
 
 // DEOPSCSW-217: Execute RPC like commands
 // DEOPSCSW-224: Inter component command sending
@@ -292,7 +291,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Setup submitAllSetup3 = new Setup(prefix(), invalidCmd(), Optional.empty()).add(encoderParam);
 
         CompletableFuture<List<CommandResponse.SubmitResponse>> submitAllF = hcdCmdService
-                .submitAll(
+                .submitAllAndWait(
                         List.of(submitAllSetup1, submitAllSetup2, submitAllSetup3),
                         timeout
                 );
@@ -306,7 +305,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
 
         //#submitAllInvalid
         CompletableFuture<List<CommandResponse.SubmitResponse>> submitAllF2 = hcdCmdService
-                .submitAll(
+                .submitAllAndWait(
                         List.of(submitAllSetup1, submitAllSetup3, submitAllSetup2),
                         timeout
                 );
@@ -351,7 +350,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         DemandMatcher demandMatcher = new DemandMatcher(new DemandState(prefix(), new StateName("testStateName")).add(param), false, timeout);
 
         // create the matcher instance
-        Matcher matcher = new Matcher(AkkaLocationExt.RichAkkaLocation(hcdLocation).componentRef().narrow(), demandMatcher, ec, mat);
+        Matcher matcher = new Matcher(AkkaLocationExt.RichAkkaLocation(hcdLocation).componentRef(hcdActorSystem).narrow(), demandMatcher, ec, mat);
 
         // start the matcher so that it is ready to receive state published by the source
         CompletableFuture<MatcherResponse> matcherResponseFuture = matcher.jStart();
@@ -407,8 +406,8 @@ public class JCommandIntegrationTest extends JUnitSuite {
         FiniteDuration duration = new FiniteDuration(5, TimeUnit.SECONDS);
 
         // Lock component
-        AkkaLocationExt.RichAkkaLocation(hcdLocation).componentRef().tell(new SupervisorLockMessage.Lock(prefix(), probe.ref(), duration));
-        probe.expectMessage(LockingResponses.lockAcquired());
+        AkkaLocationExt.RichAkkaLocation(hcdLocation).componentRef(hcdActorSystem).tell(new SupervisorLockMessage.Lock(prefix(), probe.ref(), duration));
+        probe.expectMessage(LockingResponse.lockAcquired());
 
         Key<Integer> intKey2 = JKeyType.IntKey().make("encoder");
         Parameter<Integer> intParameter2 = intKey2.set(22, 23);
@@ -422,8 +421,8 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Assert.assertTrue(actualLockedCmdResponse instanceof CommandResponse.Locked);
 
         // Unlock component
-        AkkaLocationExt.RichAkkaLocation(hcdLocation).componentRef().tell(new SupervisorLockMessage.Unlock(prefix(), probe.ref()));
-        probe.expectMessage(LockingResponses.lockReleased());
+        AkkaLocationExt.RichAkkaLocation(hcdLocation).componentRef(hcdActorSystem).tell(new SupervisorLockMessage.Unlock(prefix(), probe.ref()));
+        probe.expectMessage(LockingResponse.lockReleased());
 
         CompletableFuture<CommandResponse.SubmitResponse> cmdAfterUnlockResCompletableFuture = hcdCmdService.submit(imdSetupCommand, timeout);
         CommandResponse.SubmitResponse actualCmdResponseAfterUnlock = cmdAfterUnlockResCompletableFuture.get();
@@ -461,7 +460,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Setup setupHcd2 = new Setup(prefix(), mediumRunning(), Optional.empty()).add(encoderParam);
 
         CompletableFuture<List<CommandResponse.SubmitResponse>> finalCommandResponse = hcdCmdService
-                .submitAll(
+                .submitAllAndWait(
                         List.of(setupHcd1, setupHcd2),
                         timeout
                 );

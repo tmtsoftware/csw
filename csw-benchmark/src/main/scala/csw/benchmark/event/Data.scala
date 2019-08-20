@@ -8,17 +8,17 @@ import csw.params.events.{EventName, SystemEvent}
 import csw.time.core.models.TAITime
 
 object Data {
-  private val byteKey       = KeyType.ByteKey.make("bytes")
-  private val intKey        = KeyType.IntKey.make("ints")
-  private val doubleKey     = KeyType.DoubleKey.make("doubles")
-  private val floatKey      = KeyType.FloatKey.make("floats")
-  private val stringKey     = KeyType.StringKey.make("strings")
-  private val radecKey      = KeyType.RaDecKey.make("radecs")
-  private val choiceKey     = KeyType.ChoiceKey.make("choices", Choices(Set(Choice("100"))))
-  private val taiTimeKey    = KeyType.TAITimeKey.make("tai-times")
-  private val arrayDataKey  = KeyType.IntArrayKey.make("intarrays")
+  private val byteKey = KeyType.ByteKey.make("bytes")
+  private val intKey = KeyType.IntKey.make("ints")
+  private val doubleKey = KeyType.DoubleKey.make("doubles")
+  private val floatKey = KeyType.FloatKey.make("floats")
+  private val stringKey = KeyType.StringKey.make("strings")
+  private val radecKey = KeyType.RaDecKey.make("radecs")
+  private val choiceKey = KeyType.ChoiceKey.make("choices", Choices(Set(Choice("100"))))
+  private val taiTimeKey = KeyType.TAITimeKey.make("tai-times")
+  private val arrayDataKey = KeyType.IntArrayKey.make("intarrays")
   private val matrixDataKey = KeyType.IntMatrixKey.make("intmatrices")
-  private val structKey     = KeyType.StructKey.make("structs")
+  private val structKey = KeyType.StructKey.make("structs")
 
   private val paramSet: Set[Parameter[_]] = Set(
     byteKey.set(100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100),
@@ -63,9 +63,9 @@ object Data {
     )
   )
 
-  private val baseEvent       = SystemEvent(Prefix("a.b"), EventName("eventName1"))
+  private val baseEvent = SystemEvent(Prefix("a.b"), EventName("eventName1"))
   val data: Parameter[Struct] = structKey.set((1 to 150).map(_ => Struct(paramSet)): _*)
-  val bigEvent: SystemEvent   = baseEvent.copy(paramSet = Set(data))
+  val bigEvent: SystemEvent = baseEvent.copy(paramSet = Set(data))
 
   val smallEvent: SystemEvent = baseEvent.copy(
     paramSet = Set(

@@ -66,12 +66,12 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
 
   LoggingState.slf4jLogLevel = defaultSlf4jLogLevel
 
-  private[this] val gc   = loggingConfig.getBoolean("gc")
+  private[this] val gc = loggingConfig.getBoolean("gc")
   private[this] val time = loggingConfig.getBoolean("time")
 
   private[this] implicit val ec: ExecutionContext = system.executionContext
-  private[this] val done                          = Promise[Unit]
-  private[this] val timeActorDonePromise          = Promise[Unit]
+  private[this] val done = Promise[Unit]
+  private[this] val timeActorDonePromise = Promise[Unit]
 
   private[this] val initialComponentsLoggingState = ComponentLoggingStateManager.from(loggingConfig)
 
@@ -237,7 +237,7 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
     }
 
     def finishAppenders(): Future[Unit] = Future.sequence(appenders map (_.finish())).map(_ => ())
-    def stopAppenders(): Future[Unit]   = Future.sequence(appenders map (_.stop())).map(_ => ())
+    def stopAppenders(): Future[Unit] = Future.sequence(appenders map (_.stop())).map(_ => ())
 
     //Stop gc logger
     gcLogger.foreach(_.stop())

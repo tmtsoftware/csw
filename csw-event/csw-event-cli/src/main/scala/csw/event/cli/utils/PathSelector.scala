@@ -22,12 +22,12 @@ case class PathSelector(paths: List[List[String]]) {
   }
 
   private case class ParamCtx(param: Parameter[Any], parents: List[String]) {
-    def matchesPartialPath: Boolean      = paths.exists(_.startsWith(path))
+    def matchesPartialPath: Boolean = paths.exists(_.startsWith(path))
     private def matchesFullPath: Boolean = paths.contains(path)
 
     def select: ParamCtx = {
       val selectedStructCtx = if (matchesFullPath) structsItems else structsItems.map(_.select)
-      val selectedStructs   = selectedStructCtx.filter(_.paramSet.nonEmpty).map(_.struct)
+      val selectedStructs = selectedStructCtx.filter(_.paramSet.nonEmpty).map(_.struct)
       copy(param = param.copy(items = selectedStructs ++ simpleItems))
     }
 

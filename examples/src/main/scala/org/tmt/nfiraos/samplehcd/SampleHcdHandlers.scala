@@ -25,7 +25,7 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {
   import cswCtx._
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
-  private val log                           = loggerFactory.getLogger
+  private val log = loggerFactory.getLogger
 
   //#worker-actor
   sealed trait WorkerCommand

@@ -18,9 +18,9 @@ class PermissionPolicyTest extends FunSuite with MockitoSugar with Directives wi
 
   test("permission policy should return AuthenticationFailedRejection when token is invalid") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives = new SecurityDirectives(authentication, "TMT", "test")
 
-    val invalidTokenStr    = "invalid"
+    val invalidTokenStr = "invalid"
     val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
@@ -45,7 +45,7 @@ class PermissionPolicyTest extends FunSuite with MockitoSugar with Directives wi
 
   test("permission policy should return AuthenticationFailedRejection when token is not present") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives = new SecurityDirectives(authentication, "TMT", "test")
 
     val authenticator: AsyncAuthenticator[AccessToken] = _ => Future.successful(None)
 
@@ -66,9 +66,9 @@ class PermissionPolicyTest extends FunSuite with MockitoSugar with Directives wi
 
   test("permission policy should return AuthorizationFailedRejection when token does not have permission") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives = new SecurityDirectives(authentication, "TMT", "test")
 
-    val validTokenWithoutPermissionStr    = "validTokenWithoutPermissionStr"
+    val validTokenWithoutPermissionStr = "validTokenWithoutPermissionStr"
     val validTokenWithoutPermissionHeader = Authorization(OAuth2BearerToken(validTokenWithoutPermissionStr))
 
     val validTokenWithoutPermission = mock[AccessToken]
@@ -98,9 +98,9 @@ class PermissionPolicyTest extends FunSuite with MockitoSugar with Directives wi
 
   test("permission policy should return 200 OK when token is valid & has permission") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives = new SecurityDirectives(authentication, "TMT", "test")
 
-    val validTokenWithPermissionStr    = "validTokenWithPermissionStr"
+    val validTokenWithPermissionStr = "validTokenWithPermissionStr"
     val validTokenWithPermissionHeader = Authorization(OAuth2BearerToken(validTokenWithPermissionStr))
 
     val validTokenWithPermission = mock[AccessToken]

@@ -14,8 +14,8 @@ private[logging] class ComponentLoggingState(level: Level) {
 
   @volatile var doTrace: Boolean = false
   @volatile var doDebug: Boolean = false
-  @volatile var doInfo: Boolean  = true
-  @volatile var doWarn: Boolean  = true
+  @volatile var doInfo: Boolean = true
+  @volatile var doWarn: Boolean = true
   @volatile var doError: Boolean = true
   @volatile var doFatal: Boolean = true
 

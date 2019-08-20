@@ -25,7 +25,7 @@ object SequencerCommandServiceExample extends App {
   private val locationService = HttpLocationServiceFactory.makeLocalClient(typedSystem, mat)
 
   // #create-sequence-command-service
-  private val connection             = AkkaConnection(ComponentId("sequencer", ComponentType.Sequencer))
+  private val connection = AkkaConnection(ComponentId("sequencer", ComponentType.Sequencer))
   private val location: AkkaLocation = Await.result(locationService.resolve(connection, 5.seconds), 5.seconds).get
 
   val sequencerCommandService: SequencerCommandServiceImpl = SequencerCommandServiceFactory.make(location)

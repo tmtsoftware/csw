@@ -29,7 +29,7 @@ import scala.concurrent.duration.DurationLong
 @State(Scope.Benchmark)
 class FileAppenderBenchmark {
   var actorSystem: typed.ActorSystem[SpawnProtocol] = _
-  var fileAppender: FileAppender                    = _
+  var fileAppender: FileAppender = _
 
   @Setup(Level.Trial)
   def setup(): Unit = {

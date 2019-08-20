@@ -17,7 +17,7 @@ class EventServiceCreationExamples {
   private implicit val actorSystem: typed.ActorSystem[_] =
     ActorSystemFactory.remote(SpawnProtocol.behavior, "event-creation-examples")
   private implicit val mat: Materializer = ActorMaterializer()
-  private val locationService            = HttpLocationServiceFactory.makeLocalClient
+  private val locationService = HttpLocationServiceFactory.makeLocalClient
 
   def defaultEventService(): Unit = {
     //#default-event-service
@@ -33,7 +33,7 @@ class EventServiceCreationExamples {
     //#redis-event-service
 
     val clientOptions = ClientOptions.builder().disconnectedBehavior(DisconnectedBehavior.REJECT_COMMANDS).build
-    val redisClient   = RedisClient.create()
+    val redisClient = RedisClient.create()
     redisClient.setOptions(clientOptions)
 
     // create event service using location service

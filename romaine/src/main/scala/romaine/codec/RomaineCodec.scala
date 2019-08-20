@@ -10,7 +10,7 @@ trait RomaineCodec[T] { outer =>
   def fromBytes(byteBuffer: ByteBuffer): T
 
   def bimap[S](from: S => T, to: T => S): RomaineCodec[S] = new RomaineCodec[S] {
-    override def toBytes(value: S): ByteBuffer        = outer.toBytes(from(value))
+    override def toBytes(value: S): ByteBuffer = outer.toBytes(from(value))
     override def fromBytes(byteBuffer: ByteBuffer): S = to(outer.fromBytes(byteBuffer))
   }
 }
@@ -27,11 +27,11 @@ object RomaineCodec {
 
   implicit class ToBytesAndString[A](val x: A) extends AnyVal {
     def asBytes(implicit c: RomaineCodec[A]): ByteBuffer = c.toBytes(x)
-    def asString(implicit c: RomaineCodec[A]): String    = stringCodec.fromBytes(x.asBytes)
+    def asString(implicit c: RomaineCodec[A]): String = stringCodec.fromBytes(x.asBytes)
   }
 
   implicit lazy val byteBufferCodec: RomaineCodec[ByteBuffer] = new RomaineCodec[ByteBuffer] {
-    override def toBytes(value: ByteBuffer): ByteBuffer        = value
+    override def toBytes(value: ByteBuffer): ByteBuffer = value
     override def fromBytes(byteBuffer: ByteBuffer): ByteBuffer = byteBuffer
   }
 

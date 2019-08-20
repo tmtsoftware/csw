@@ -75,12 +75,12 @@ sealed trait ControlCommand extends SequenceCommand { self: ParameterSetType[_] 
 }
 
 /**
- * A parameter set for setting telescope and instrument parameters. Constructor is private to ensure RunId is created internally to guarantee unique value.
+ * A parameter set for setting telescope and instrument parameters.
  */
 case class Setup private[params] (
     source: Prefix,
     commandName: CommandName,
-    maybeObsId: Option[ObsId] = None,
+    maybeObsId: Option[ObsId] = None /* Not sure of codec problem*/,
     paramSet: Set[Parameter[_]]
 ) extends ParameterSetType[Setup]
     with ControlCommand {
@@ -95,7 +95,7 @@ case class Setup private[params] (
    * Create a new Setup instance when a parameter is added or removed
    *
    * @param data set of parameters
-   * @return a new instance of Setup with new runId and provided data
+   * @return a new instance of Setup with provided data
    */
   override protected def create(data: Set[Parameter[_]]): Setup = copy(paramSet = data)
 }
@@ -103,36 +103,36 @@ case class Setup private[params] (
 object Setup {
 
   /**
-   * The apply method is used to create Setup command by end-user. runId is not accepted and will be created internally to guarantee unique value.
+   * The apply method is used to create Setup command by end-user.
    *
    * @param source prefix representing source of the command
    * @param commandName the name of the command
    * @param maybeObsId an optional obsId for command
-   * @return a new instance of Setup with auto-generated runId and empty paramSet
+   * @return a new instance of Setup with empty paramSet
    */
   def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId]): Setup =
     apply(source, commandName, maybeObsId, Set.empty)
 
   /**
-   * The apply method is used to create Setup command by end-user. runId is not accepted and will be created internally to guarantee unique value.
+   * The apply method is used to create Setup command by end-user.
    *
    * @param source prefix representing source of the command
    * @param commandName the name of the command
    * @param maybeObsId an optional obsId for command
    * @param paramSet an initial set of parameters (keys with values)
-   * @return a new instance of Setup with auto-generated runId
+   * @return a new instance of Setup
    */
   def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]]): Setup =
-    new Setup(source, commandName, maybeObsId, paramSet)
+    new Setup(source, commandName, maybeObsId, Set.empty).madd(paramSet)
 }
 
 /**
- * A parameter set for setting telescope and instrument parameters. Constructor is private to ensure RunId is created internally to guarantee unique value.
+ * A parameter set for setting telescope and instrument parameters.
  */
 case class Observe private[params] (
     source: Prefix,
     commandName: CommandName,
-    maybeObsId: Option[ObsId] = None,
+    maybeObsId: Option[ObsId] /* = None Not sure of codec problem */,
     paramSet: Set[Parameter[_]]
 ) extends ParameterSetType[Observe]
     with ControlCommand {
@@ -147,7 +147,7 @@ case class Observe private[params] (
    * Create a new Observe instance when a parameter is added or removed
    *
    * @param data set of parameters
-   * @return a new instance of Observe with new runId and provided data
+   * @return a new instance of Observe with new provided data
    */
   override protected def create(data: Set[Parameter[_]]): Observe = copy(paramSet = data)
 }
@@ -155,36 +155,36 @@ case class Observe private[params] (
 object Observe {
 
   /**
-   * The apply method is used to create Observe command by end-user. runId is not accepted and will be created internally to guarantee unique value.
+   * The apply method is used to create Observe command by end-user.
    *
    * @param source prefix representing source of the command
    * @param commandName the name of the command
    * @param maybeObsId an optional obsId for command
-   * @return a new instance of Observe with auto-generated runId and empty paramSet
+   * @return a new instance of Observe with empty paramSet
    */
   def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId]): Observe =
     apply(source, commandName, maybeObsId, Set.empty)
 
   /**
-   * The apply method is used to create Observe command by end-user. runId is not accepted and will be created internally to guarantee unique value.
+   * The apply method is used to create Observe command by end-user.
    *
    * @param source prefix representing source of the command
    * @param commandName the name of the command
    * @param maybeObsId an optional obsId for command
    * @param paramSet an initial set of parameters (keys with values)
-   * @return a new instance of Observe with auto-generated runId
+   * @return a new instance of Observe
    */
   def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]]): Observe =
-    new Observe(source, commandName, maybeObsId, paramSet)
+    new Observe(source, commandName, maybeObsId, Set.empty).madd(paramSet)
 }
 
 /**
- * A parameter set for setting telescope and instrument parameters. Constructor is private to ensure RunId is created internally to guarantee unique value.
+ * A parameter set for setting telescope and instrument parameters.
  */
 case class Wait private[params] (
     source: Prefix,
     commandName: CommandName,
-    maybeObsId: Option[ObsId] = None,
+    maybeObsId: Option[ObsId] /* = None Not sure of codec problem */,
     paramSet: Set[Parameter[_]]
 ) extends ParameterSetType[Wait]
     with SequenceCommand {
@@ -199,7 +199,7 @@ case class Wait private[params] (
    * Create a new Wait instance when a parameter is added or removed
    *
    * @param data set of parameters
-   * @return a new instance of Wait with new runId and provided data
+   * @return a new instance of Wait with new provided data
    */
   override protected def create(data: Set[Parameter[_]]): Wait = copy(paramSet = data)
 }
@@ -207,25 +207,25 @@ case class Wait private[params] (
 object Wait {
 
   /**
-   * The apply method is used to create Wait command by end-user. runId is not accepted and will be created internally to guarantee unique value.
+   * The apply method is used to create Wait command by end-user.
    *
    * @param source prefix representing source of the command
    * @param commandName the name of the command
    * @param maybeObsId an optional obsId for command
-   * @return a new instance of Wait with auto-generated runId and empty paramSet
+   * @return a new instance of Wait with empty paramSet
    */
   def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId]): Wait =
     apply(source, commandName, maybeObsId, Set.empty)
 
   /**
-   * The apply method is used to create Wait command by end-user. runId is not accepted and will be created internally to guarantee unique value.
+   * The apply method is used to create Wait command by end-user.
    *
    * @param source prefix representing source of the command
    * @param commandName the name of the command
    * @param maybeObsId an optional obsId for command
    * @param paramSet an initial set of parameters (keys with values)
-   * @return a new instance of Wait with auto-generated runId
+   * @return a new instance of Wait
    */
   def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]]): Wait =
-    new Wait(source, commandName, maybeObsId, paramSet)
+    new Wait(source, commandName, maybeObsId, Set.empty).madd(paramSet)
 }

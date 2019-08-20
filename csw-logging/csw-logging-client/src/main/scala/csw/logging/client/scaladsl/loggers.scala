@@ -12,7 +12,7 @@ import csw.logging.client.javadsl.JLoggerFactory
 abstract class BaseLoggerFactory private[logging] (maybeComponentName: Option[String]) {
   def getLogger[T](ctx: ActorContext[T]): Logger = new LoggerImpl(maybeComponentName, Some(actorPath(ctx.self.toUntyped)))
   def getLogger(ctx: actor.ActorContext): Logger = new LoggerImpl(maybeComponentName, Some(actorPath(ctx.self)))
-  def getLogger: Logger                          = new LoggerImpl(maybeComponentName, None)
+  def getLogger: Logger = new LoggerImpl(maybeComponentName, None)
 
   private def actorPath(actorRef: ActorRef): String = ActorPath.fromString(Serialization.serializedActorPath(actorRef)).toString
 }

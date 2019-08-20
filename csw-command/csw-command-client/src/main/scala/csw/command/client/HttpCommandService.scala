@@ -11,7 +11,7 @@ import csw.location.api.scaladsl.LocationService
 import csw.location.models.ComponentType
 import csw.location.models.Connection.HttpConnection
 import csw.params.commands.CommandResponse.{Error, OnewayResponse, Started, SubmitResponse, ValidateResponse, isNegative}
-import csw.params.commands.{CommandResponse, ControlCommand}
+import csw.params.commands.{CommandName, CommandResponse, ControlCommand}
 import csw.params.core.models.Id
 import io.bullet.borer.Json
 import csw.params.core.formats.ParamCodecs._
@@ -33,8 +33,8 @@ case class HttpCommandService(
 ) {
 
   implicit val sys: akka.actor.ActorSystem = system.toUntyped
-  implicit val mat: Materializer           = ActorMaterializer()(system)
-  implicit val ec: ExecutionContext        = system.executionContext
+  implicit val mat: Materializer = ActorMaterializer()(system)
+  implicit val ec: ExecutionContext = system.executionContext
 
   private val componentName = connection.componentId.name
   private val componentType = ComponentType.Service.name
@@ -62,7 +62,7 @@ case class HttpCommandService(
     maybeLocation match {
       case Some(loc) =>
         // For compatibility with ESW, use the following style URI
-        val uri  = s"http://${loc.uri.getHost}:${loc.uri.getPort}/command/$componentType/$componentName/$method"
+        val uri = s"http://${loc.uri.getHost}:${loc.uri.getPort}/command/$componentType/$componentName/$method"
         val json = Json.encode(controlCommand).toUtf8String
         val response = await(
           Http(sys).singleRequest(
@@ -77,10 +77,12 @@ case class HttpCommandService(
           val bs = await(concatByteStrings(response.entity.dataBytes))
           Json.decode(bs.toArray).to[CommandResponse].value
         } else {
-          Error(controlCommand.runId, s"Error response from ${connection.componentId.name}: $response")
+          // FIXME - need to get returned runId from server
+          Error(controlCommand.commandName, Id(), s"Error response from ${connection.componentId.name}: $response")
         }
       case None =>
-        Error(controlCommand.runId, s"Can't locate connection for ${connection.componentId.name}")
+        // FIXME - need to get returned runId from server
+        Error(controlCommand.commandName, Id(), s"Can't locate connection for ${connection.componentId.name}")
     }
   }
 
@@ -105,7 +107,7 @@ case class HttpCommandService(
    */
   def submitAndWait(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] =
     submit(controlCommand).flatMap {
-      case _: Started => queryFinal(controlCommand.runId)
+      case s: Started => queryFinal(s.runId)
       case x          => Future.successful(x)
     }
 
@@ -186,10 +188,12 @@ case class HttpCommandService(
           val bs = await(concatByteStrings(response.entity.dataBytes))
           Json.decode(bs.toArray).to[SubmitResponse].value
         } else {
-          Error(commandRunId, s"Error response from ${connection.componentId.name}: $response")
+          //FIXME -- Need to get the command name returned as part of response
+          Error(CommandName("ERROR"), commandRunId, s"Error response from ${connection.componentId.name}: $response")
         }
       case None =>
-        Error(commandRunId, s"Can't locate connection for ${connection.componentId.name}")
+        //FIXME -- Need to get the command name returned as part of response
+        Error(CommandName("ERROR"), commandRunId, s"Can't locate connection for ${connection.componentId.name}")
     }
   }
 

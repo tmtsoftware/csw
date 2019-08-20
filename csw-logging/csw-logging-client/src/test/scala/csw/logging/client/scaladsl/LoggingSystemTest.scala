@@ -16,7 +16,7 @@ import scala.concurrent.duration.DurationDouble
 class LoggingSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
   // This will load default configuration in application.conf file if provided
   private var loggingSystem: LoggingSystem = _
-  private val config                       = ConfigFactory.load().getConfig("csw-logging")
+  private val config = ConfigFactory.load().getConfig("csw-logging")
 
   override protected def beforeAll(): Unit = loggingSystem = LoggingSystemFactory.start()
 
@@ -38,8 +38,8 @@ class LoggingSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
   }
 
   test("should able to set log level for default logger, slf4j and akka") {
-    val logLevel      = "debug"
-    val akkaLogLevel  = "Error"
+    val logLevel = "debug"
+    val akkaLogLevel = "Error"
     val slf4jLogLevel = "INFO"
 
     loggingSystem.setDefaultLogLevel(Level(akkaLogLevel))
@@ -58,7 +58,7 @@ class LoggingSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   // DEOPSCSW-142: Flexibility of logging approaches
   test("should throw AppenderNotFoundException for an invalid appender configured") {
-    val config      = ConfigFactory.parseString("""
+    val config = ConfigFactory.parseString("""
         |csw-logging {
         | appenders = ["abcd"]
         |}

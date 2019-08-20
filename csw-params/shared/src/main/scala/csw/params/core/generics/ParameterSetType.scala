@@ -243,7 +243,7 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] { self: T =>
    * @return a Set of key names
    */
   def missingKeys(keys: Key[_]*): Set[String] = {
-    val argKeySet        = keys.map(_.keyName).toSet
+    val argKeySet = keys.map(_.keyName).toSet
     val parametersKeySet = paramSet.map(_.keyName)
     argKeySet.diff(parametersKeySet)
   }

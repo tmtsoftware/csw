@@ -34,7 +34,7 @@ class LocationServiceMultipleNICTest() extends FunSuite with Matchers with Befor
   test("should list and resolve component having multiple-nic's") {
 
     val componentId = ComponentId("assembly", ComponentType.Assembly)
-    val connection  = AkkaConnection(componentId)
+    val connection = AkkaConnection(componentId)
 
     eventually(locationService.list.await should have size 1)
 

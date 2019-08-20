@@ -16,8 +16,8 @@ object RedisKeyspaceEvent extends Enum[RedisKeyspaceEvent] {
   implicit val codec: RomaineCodec[RedisKeyspaceEvent] =
     RomaineCodec.stringCodec.bimap(_.entryName, withNameInsensitiveOption(_).getOrElse(Unknown))
 
-  case object Set     extends RedisKeyspaceEvent("set")
+  case object Set extends RedisKeyspaceEvent("set")
   case object Expired extends RedisKeyspaceEvent("expired")
-  case object Delete  extends RedisKeyspaceEvent("del")
+  case object Delete extends RedisKeyspaceEvent("del")
   case object Unknown extends RedisKeyspaceEvent("unknown")
 }

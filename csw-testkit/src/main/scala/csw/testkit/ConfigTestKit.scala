@@ -43,14 +43,14 @@ final class ConfigTestKit private (
   private[csw] lazy val configWiring: ServerWiring = (serverConfig, testKitSettings.ConfigPort) match {
     case (Some(_config), _) =>
       new ServerWiring {
-        override lazy val config: Config                          = _config
+        override lazy val config: Config = _config
         override lazy val actorSystem: ActorSystem[SpawnProtocol] = system
-        override lazy val securityDirectives: SecurityDirectives  = _securityDirectives
+        override lazy val securityDirectives: SecurityDirectives = _securityDirectives
       }
     case (_, serverPort) =>
       new ServerWiring {
         override lazy val actorSystem: ActorSystem[SpawnProtocol] = system
-        override lazy val securityDirectives: SecurityDirectives  = _securityDirectives
+        override lazy val securityDirectives: SecurityDirectives = _securityDirectives
         override lazy val settings: Settings = new Settings(config) {
           override val `service-port`: Int = serverPort.getOrElse(super.`service-port`)
         }
@@ -60,8 +60,8 @@ final class ConfigTestKit private (
   private var configServer: Option[Http.ServerBinding] = None
 
   implicit lazy val ec: ExecutionContextExecutor = configWiring.actorRuntime.ec
-  implicit lazy val mat: Materializer            = configWiring.actorRuntime.mat
-  implicit lazy val timeout: Timeout             = testKitSettings.DefaultTimeout
+  implicit lazy val mat: Materializer = configWiring.actorRuntime.mat
+  implicit lazy val timeout: Timeout = testKitSettings.DefaultTimeout
 
   /**
    * Start HTTP Config server on provided port in constructor or configuration and create clean copy of SVN repo

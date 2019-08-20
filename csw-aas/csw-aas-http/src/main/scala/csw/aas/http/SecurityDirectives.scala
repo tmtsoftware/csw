@@ -26,8 +26,8 @@ class SecurityDirectives private[csw] (authentication: Authentication, realm: St
   private val logger = AuthLogger.getLogger
   import logger._
 
-  implicit def toRouteFunction(route: Route): AccessToken => Route                            = _ => route
-  implicit def toBooleanFunction(bool: Boolean): AccessToken => Boolean                       = _ => bool
+  implicit def toRouteFunction(route: Route): AccessToken => Route = _ => route
+  implicit def toBooleanFunction(bool: Boolean): AccessToken => Boolean = _ => bool
   implicit def toBooleanFutureFunction(bool: Future[Boolean]): AccessToken => Future[Boolean] = _ => bool
 
   private[aas] def authenticate: AuthenticationDirective[AccessToken] =
@@ -177,8 +177,8 @@ object SecurityDirectives {
 
   private def from(authConfig: AuthConfig)(implicit ec: ExecutionContext): SecurityDirectives = {
     val keycloakDeployment = authConfig.getDeployment
-    val tokenVerifier      = TokenVerifier(authConfig)
-    val authentication     = new Authentication(new TokenFactory(keycloakDeployment, tokenVerifier, authConfig.permissionsEnabled))
+    val tokenVerifier = TokenVerifier(authConfig)
+    val authentication = new Authentication(new TokenFactory(keycloakDeployment, tokenVerifier, authConfig.permissionsEnabled))
     new SecurityDirectives(authentication, keycloakDeployment.getRealm, keycloakDeployment.getResourceName)
   }
 }

@@ -8,9 +8,9 @@ import org.scalatestplus.mockito.MockitoSugar
 // DEOPSCSW-314: End to End Automated Test for host-config-app
 class HostConfigTest extends FunSuite with MockitoSugar with Matchers {
 
-  private val configPath            = ResourceReader.copyToTmp("/parsing_test_conf/hostconfig/valid_hostconfig.conf")
+  private val configPath = ResourceReader.copyToTmp("/parsing_test_conf/hostconfig/valid_hostconfig.conf")
   private val containerCmdAppScript = "containerCmd.sh"
-  private val mockedProcesses       = List(mock[Process], mock[Process])
+  private val mockedProcesses = List(mock[Process], mock[Process])
 
   mockedProcesses.foreach(p => when(p.pid()).thenReturn(1))
 

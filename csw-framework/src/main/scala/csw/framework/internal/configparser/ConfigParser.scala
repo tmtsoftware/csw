@@ -9,9 +9,9 @@ import play.api.libs.json._
  * Parses the information represented in configuration files into respective models
  */
 private[csw] object ConfigParser {
-  def parseContainer(config: Config): ContainerInfo  = parse[ContainerInfo](config)
+  def parseContainer(config: Config): ContainerInfo = parse[ContainerInfo](config)
   def parseStandalone(config: Config): ComponentInfo = parse[ComponentInfo](config)
-  def parseHost(config: Config): HostBootstrapInfo   = parse[HostBootstrapInfo](config)
+  def parseHost(config: Config): HostBootstrapInfo = parse[HostBootstrapInfo](config)
 
   private def parse[T: Format](config: Config): T = {
     val json = configToJsValue(config)

@@ -64,7 +64,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
 
     Thread.sleep(1000) // wait till the publisher is shutdown successfully
 
-    val event       = Utils.makeEvent(1)
+    val event = Utils.makeEvent(1)
     val eventStream = Source.single(event)
 
     publisher.publish(eventStream, onError = testProbe.ref ! _)
@@ -96,7 +96,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
 
   test("should throw EventServerNotAvailable exception on subscription failure") {
     import redisTestProps._
-    val event1             = makeDistinctEvent(Random.nextInt())
+    val event1 = makeDistinctEvent(Random.nextInt())
     val eventKey: EventKey = event1.eventKey
 
     redisServer.stop()
@@ -134,7 +134,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     import redisTestProps._
     val publisher = eventService.makeNewPublisher()
     val testProbe = TestProbe[PublishFailure]()(actorSystem)
-    val event     = Utils.makeEvent(1)
+    val event = Utils.makeEvent(1)
 
     publisher.publish(event).await
 
@@ -156,7 +156,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     import redisTestProps._
     val publisher = eventService.makeNewPublisher()
     val testProbe = TestProbe[PublishFailure]()(actorSystem)
-    val event     = Utils.makeEvent(1)
+    val event = Utils.makeEvent(1)
 
     publisher.publish(event).await
 
@@ -178,7 +178,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     import redisTestProps._
     val publisher = eventService.makeNewPublisher()
     val testProbe = TestProbe[PublishFailure]()(actorSystem)
-    val event     = Utils.makeEvent(1)
+    val event = Utils.makeEvent(1)
 
     publisher.publish(event).await
 
@@ -199,7 +199,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     import redisTestProps._
     val publisher = eventService.makeNewPublisher()
     val testProbe = TestProbe[PublishFailure]()(actorSystem)
-    val event     = Utils.makeEvent(1)
+    val event = Utils.makeEvent(1)
 
     publisher.publish(event).await
 

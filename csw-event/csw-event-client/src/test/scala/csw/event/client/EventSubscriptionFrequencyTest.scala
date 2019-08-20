@@ -52,9 +52,9 @@ class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Even
   def events(name: EventName): immutable.Seq[Event] = for (i <- 1 to 1500) yield makeEventForKeyName(name, i)
 
   class EventGenerator(eventName: EventName) {
-    var counter                               = 0
+    var counter = 0
     var publishedEvents: mutable.Queue[Event] = mutable.Queue.empty
-    val eventsGroup: immutable.Seq[Event]     = events(eventName)
+    val eventsGroup: immutable.Seq[Event] = events(eventName)
 
     def generator: Option[Event] = Option {
       counter += 1
@@ -99,9 +99,9 @@ class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Even
   ): Unit = {
     import baseProperties._
 
-    val receivedEvents: mutable.Queue[Event]  = new mutable.Queue[Event]()
+    val receivedEvents: mutable.Queue[Event] = new mutable.Queue[Event]()
     val receivedEvents2: mutable.Queue[Event] = new mutable.Queue[Event]()
-    val eventGenerator                        = new EventGenerator(EventName(s"system_${Random.nextInt()}"))
+    val eventGenerator = new EventGenerator(EventName(s"system_${Random.nextInt()}"))
     import eventGenerator._
     val eventKey: EventKey = eventsGroup.head.eventKey
 

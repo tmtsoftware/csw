@@ -10,9 +10,9 @@ import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
 import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
+import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.location.models.Connection.AkkaConnection
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandIssue.OtherIssue
 import csw.params.commands.CommandResponse._
@@ -144,7 +144,7 @@ class LongRunningCommandTest(ignore: Int)
       val assemblyMoveSetup = Setup(prefix, moveCmd, Some(obsId))
 
       val multiResponse1: Future[List[SubmitResponse]] =
-        assemblyCommandService.submitAll(List(assemblyInitSetup, assemblyMoveSetup))
+        assemblyCommandService.submitAllAndWait(List(assemblyInitSetup, assemblyMoveSetup))
       //#submitAll
 
       whenReady(multiResponse1, PatienceConfiguration.Timeout(5.seconds)) { result =>
@@ -154,7 +154,7 @@ class LongRunningCommandTest(ignore: Int)
       }
 
       // Second test sends three commands with last invalid
-      val multiResponse2 = assemblyCommandService.submitAll(List(assemblyInitSetup, assemblyMoveSetup, assemblyInvalidSetup))
+      val multiResponse2 = assemblyCommandService.submitAllAndWait(List(assemblyInitSetup, assemblyMoveSetup, assemblyInvalidSetup))
       whenReady(multiResponse2, PatienceConfiguration.Timeout(5.seconds)) { result =>
         result.length shouldBe 3
         result(0) shouldBe a[Completed]
@@ -164,7 +164,7 @@ class LongRunningCommandTest(ignore: Int)
       }
 
       // Second test sends three commands with second invalid so last one is unexecuted
-      val multiResponse3 = assemblyCommandService.submitAll(List(assemblyInitSetup, assemblyInvalidSetup, assemblyMoveSetup))
+      val multiResponse3 = assemblyCommandService.submitAllAndWait(List(assemblyInitSetup, assemblyInvalidSetup, assemblyMoveSetup))
       whenReady(multiResponse3, PatienceConfiguration.Timeout(5.seconds)) { result =>
         result.length shouldBe 2
         result(0) shouldBe a[Completed]
@@ -173,7 +173,7 @@ class LongRunningCommandTest(ignore: Int)
       }
 
       // Last test does an init of assembly and then sends the long command
-      val multiResponse4 = assemblyCommandService.submitAll(List(assemblyInitSetup, assemblyLongSetup))
+      val multiResponse4 = assemblyCommandService.submitAllAndWait(List(assemblyInitSetup, assemblyLongSetup))
       whenReady(multiResponse4, PatienceConfiguration.Timeout(10.seconds)) { result =>
         result.length shouldBe 2
         result(0) shouldBe a[Completed] //(assemblyInitSetup.runId)

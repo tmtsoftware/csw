@@ -12,7 +12,7 @@ private[csw] object ConfigFileLocation extends Enum[ConfigFileLocation] with Pla
 
   override def values: immutable.IndexedSeq[ConfigFileLocation] = findValues
 
-  case object Local  extends ConfigFileLocation
+  case object Local extends ConfigFileLocation
   case object Remote extends ConfigFileLocation
 
 }

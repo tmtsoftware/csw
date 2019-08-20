@@ -46,15 +46,15 @@ class ConfigServiceRouteTest
   private val testFileUtils = new TestFileUtils(settings)
 
   private val configValue1 = "axisName = tromboneAxis"
-  private val configFile1  = ConfigData.fromString(configValue1)
+  private val configFile1 = ConfigData.fromString(configValue1)
 
   private val updatedConfigValue1 = "assemblyHCDCount = 3"
-  private val updatedConfigFile1  = ConfigData.fromString(updatedConfigValue1)
+  private val updatedConfigFile1 = ConfigData.fromString(updatedConfigValue1)
 
   private val configValue2 = "name = NFIRAOS Trombone Assembly"
-  private val configFile2  = ConfigData.fromString(configValue2)
+  private val configFile2 = ConfigData.fromString(configValue2)
 
-  private val emptyString     = ""
+  private val emptyString = ""
   private val emptyConfigFile = ConfigData.fromString(emptyString)
 
   override protected def beforeAll(): Unit = testFileUtils.deleteServerFiles()
@@ -341,7 +341,7 @@ class ConfigServiceRouteTest
   // DEOPSCSW-577: Ability to view detailed change log in SVN
   // DEOPSCSW-625: Include username from svn in history model of config service
   test("history - success  status code") {
-    val bilal  = "bilal"
+    val bilal = "bilal"
     val poorva = "poorva"
 
     when(validToken.preferred_username)
@@ -560,8 +560,8 @@ class ConfigServiceRouteTest
   // DEOPSCSW-577: Ability to view detailed change log in SVN
   // DEOPSCSW-625: Include username from svn in history model of config service
   test("history-active - success  status code") {
-    val bilal   = "bilal"
-    val poorva  = "poorva"
+    val bilal = "bilal"
+    val poorva = "poorva"
     val shubham = "shubham"
 
     when(validToken.preferred_username)

@@ -9,7 +9,7 @@ object LoggingCodecs extends LoggingCodecs
 trait LoggingCodecs {
   def enumCodec[T <: EnumEntry: Enum]: Codec[T] = Codec.bimap[String, T](_.entryName, implicitly[Enum[T]].withNameInsensitive)
 
-  implicit lazy val levelCodec: Codec[Level]             = enumCodec[Level]
+  implicit lazy val levelCodec: Codec[Level] = enumCodec[Level]
   implicit lazy val logMetadataCodec: Codec[LogMetadata] = deriveCodec[LogMetadata]
 
 }

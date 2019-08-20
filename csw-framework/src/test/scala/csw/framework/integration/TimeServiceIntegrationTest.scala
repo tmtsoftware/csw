@@ -24,7 +24,7 @@ class TimeServiceIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 
   private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
-  private val wiring                   = FrameworkWiring.make(seedActorSystem)
+  private val wiring = FrameworkWiring.make(seedActorSystem)
 
   override def afterAll(): Unit = {
     super.afterAll()
@@ -33,7 +33,7 @@ class TimeServiceIntegrationTest extends FrameworkIntegrationSuite {
   test("should be able to schedule using time service") {
     val containerRef = Container.spawn(ConfigFactory.load("container_tracking_connections.conf"), wiring).await
 
-    val assemblyProbe                = TestInbox[CurrentState]()
+    val assemblyProbe = TestInbox[CurrentState]()
     val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]("container-lifecycle-state-probe")
     assertThatContainerIsRunning(containerRef, containerLifecycleStateProbe, 5.seconds)
 

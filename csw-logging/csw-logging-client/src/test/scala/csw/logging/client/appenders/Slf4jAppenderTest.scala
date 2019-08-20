@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory
 
 class Slf4jAppenderTest extends LoggingTestSuite {
 
-  private val logger    = LoggerFactory.getLogger(classOf[Slf4jAppenderTest])
+  private val logger = LoggerFactory.getLogger(classOf[Slf4jAppenderTest])
   private val className = getClass.getName
 
   test("logging framework should capture slf4j logs and log it") {

@@ -32,17 +32,17 @@ object StdOutAppender extends LogAppenderBuilder {
  * @param stdHeaders the headers that are fixes for this service
  */
 class StdOutAppender(system: ActorSystem[_], stdHeaders: JsObject, logPrinter: Any => Unit) extends LogAppender {
-  private[this] val config        = system.settings.config.getConfig("csw-logging.appender-config.stdout")
-  private[this] val fullHeaders   = config.getBoolean("fullHeaders")
-  private[this] val color         = config.getBoolean("color")
-  private[this] val summary       = config.getBoolean("summary")
-  private[this] val pretty        = config.getBoolean("pretty")
-  private[this] val oneLine       = config.getBoolean("oneLine")
+  private[this] val config = system.settings.config.getConfig("csw-logging.appender-config.stdout")
+  private[this] val fullHeaders = config.getBoolean("fullHeaders")
+  private[this] val color = config.getBoolean("color")
+  private[this] val summary = config.getBoolean("summary")
+  private[this] val pretty = config.getBoolean("pretty")
+  private[this] val oneLine = config.getBoolean("oneLine")
   private[this] val logLevelLimit = Level(config.getString("logLevelLimit"))
 
   private[this] var categories = Map.empty[String, Int]
-  private[this] var levels     = Map.empty[String, Int]
-  private[this] var kinds      = Map.empty[String, Int]
+  private[this] var levels = Map.empty[String, Int]
+  private[this] var kinds = Map.empty[String, Int]
 
   /**
    * Writes a log message to stdout
@@ -90,11 +90,11 @@ class StdOutAppender(system: ActorSystem[_], stdHeaders: JsObject, logPrinter: A
     }
 
   private def oneLine(baseMsg: JsObject, level: String, maybeKind: String) = {
-    val msg       = baseMsg.getString(LoggingKeys.MESSAGE)
-    val kind      = if (!maybeKind.isEmpty) s":$maybeKind" else ""
-    val file      = baseMsg.getString(LoggingKeys.FILE)
-    val where     = if (!file.isEmpty) s" ($file ${baseMsg.getString(LoggingKeys.LINE)})" else ""
-    val comp      = baseMsg.getString(LoggingKeys.COMPONENT_NAME)
+    val msg = baseMsg.getString(LoggingKeys.MESSAGE)
+    val kind = if (!maybeKind.isEmpty) s":$maybeKind" else ""
+    val file = baseMsg.getString(LoggingKeys.FILE)
+    val where = if (!file.isEmpty) s" ($file ${baseMsg.getString(LoggingKeys.LINE)})" else ""
+    val comp = baseMsg.getString(LoggingKeys.COMPONENT_NAME)
     val timestamp = baseMsg.getString(LoggingKeys.TIMESTAMP)
 
     val plainStack =
@@ -130,7 +130,7 @@ class StdOutAppender(system: ActorSystem[_], stdHeaders: JsObject, logPrinter: A
       val cats = if (categories.isEmpty) Json.obj() else Json.obj("alts" -> categories)
       val levs = if (levels.isEmpty) Json.obj() else Json.obj("levels" -> levels)
       val knds = if (kinds.isEmpty) Json.obj() else Json.obj("kinds" -> kinds)
-      val txt  = Json.prettyPrint(levs ++ cats ++ knds)
+      val txt = Json.prettyPrint(levs ++ cats ++ knds)
       val colorTxt = if (color) {
         s"${Console.BLUE}$txt${Console.RESET}"
       } else {

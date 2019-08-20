@@ -35,10 +35,10 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
   val log: Logger = loggerFactory.getLogger(ctx)
 
   implicit val ec: ExecutionContext = ctx.executionContext
-  implicit val timeout: Timeout     = 5.seconds
+  implicit val timeout: Timeout = 5.seconds
   implicit val scheduler: Scheduler = ctx.system.scheduler
-  var current: Int                  = _
-  var stats: Int                    = _
+  var current: Int = _
+  var stats: Int = _
 
   //#initialize-handler
   override def initialize(): Future[Unit] = async {
@@ -65,14 +65,14 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
 
   //#onSubmit-handler
   override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse = controlCommand match {
-    case setup: Setup     => submitSetup(runId, setup)     // includes logic to handle Submit with Setup config command
+    case setup: Setup     => submitSetup(runId, setup) // includes logic to handle Submit with Setup config command
     case observe: Observe => submitObserve(runId, observe) // includes logic to handle Submit with Observe config command
   }
   //#onSubmit-handler
 
   //#onOneway-handler
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = controlCommand match {
-    case setup: Setup     => onewaySetup(setup)     // includes logic to handle Oneway with Setup config command
+    case setup: Setup     => onewaySetup(setup) // includes logic to handle Oneway with Setup config command
     case observe: Observe => onewayObserve(observe) // includes logic to handle Oneway with Setup config command
   }
   //#onOneway-handler

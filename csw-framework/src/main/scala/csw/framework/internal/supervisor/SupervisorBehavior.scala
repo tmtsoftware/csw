@@ -47,12 +47,12 @@ import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.util.{Failure, Success}
 
 private[framework] object SupervisorBehavior {
-  val PubSubLifecycleActor            = "pub-sub-lifecycle"
-  val InitializeTimerKey              = "initialize-timer"
-  val ComponentActorNameSuffix        = "component-actor"
+  val PubSubLifecycleActor = "pub-sub-lifecycle"
+  val InitializeTimerKey = "initialize-timer"
+  val ComponentActorNameSuffix = "component-actor"
   val CommandResponseManagerActorName = "command-response-manager"
-  val LockNotificationKey             = "lockNotification"
-  val LockExpirationKey               = "lockExpiration"
+  val LockNotificationKey = "lockNotification"
+  val LockExpirationKey = "lockExpiration"
 }
 
 /**
@@ -78,21 +78,21 @@ private[framework] final class SupervisorBehavior(
   import cswCtx._
   import ctx.executionContext
 
-  private val log: Logger                                  = loggerFactory.getLogger(ctx)
-  private val componentName: String                        = componentInfo.name
-  private val componentActorName: String                   = s"$componentName-$ComponentActorNameSuffix"
-  private val akkaConnection: AkkaConnection               = AkkaConnection(ComponentId(componentName, componentInfo.componentType))
-  private val prefix: Prefix                               = componentInfo.prefix
-  private val akkaRegistration: AkkaRegistration           = registrationFactory.akkaTyped(akkaConnection, prefix, ctx.self)
-  private val isStandalone: Boolean                        = maybeContainerRef.isEmpty
+  private val log: Logger = loggerFactory.getLogger(ctx)
+  private val componentName: String = componentInfo.name
+  private val componentActorName: String = s"$componentName-$ComponentActorNameSuffix"
+  private val akkaConnection: AkkaConnection = AkkaConnection(ComponentId(componentName, componentInfo.componentType))
+  private val prefix: Prefix = componentInfo.prefix
+  private val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(akkaConnection, prefix, ctx.self)
+  private val isStandalone: Boolean = maybeContainerRef.isEmpty
   private[framework] val initializeTimeout: FiniteDuration = componentInfo.initializeTimeout
 
   private[framework] val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] = makePubSubLifecycle()
 
-  private var runningComponent: Option[ActorRef[RunningMessage]]  = None
-  private var lockManager: LockManager                            = new LockManager(None, loggerFactory)
+  private var runningComponent: Option[ActorRef[RunningMessage]] = None
+  private var lockManager: LockManager = new LockManager(None, loggerFactory)
   private[framework] var lifecycleState: SupervisorLifecycleState = SupervisorLifecycleState.Idle
-  private[framework] var component: Option[ActorRef[Nothing]]     = None
+  private[framework] var component: Option[ActorRef[Nothing]] = None
 
   spawnAndWatchComponent()
 

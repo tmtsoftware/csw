@@ -10,16 +10,16 @@ import csw.location.server.http.{LocationExceptionHandler, LocationHttpService, 
 
 // $COVERAGE-OFF$
 private[csw] class ServerWiring {
-  lazy val config: Config                          = ConfigFactory.load()
-  lazy val settings                                = new Settings(config)
-  lazy val clusterSettings: ClusterSettings        = ClusterAwareSettings.onPort(settings.clusterPort)
+  lazy val config: Config = ConfigFactory.load()
+  lazy val settings = new Settings(config)
+  lazy val clusterSettings: ClusterSettings = ClusterAwareSettings.onPort(settings.clusterPort)
   lazy val actorSystem: ActorSystem[SpawnProtocol] = clusterSettings.system
-  lazy val untypedActorSystem: actor.ActorSystem   = clusterSettings.system.toUntyped
-  lazy val actorRuntime                            = new ActorRuntime(actorSystem)
-  lazy val locationService: LocationService        = LocationServiceFactory.withSystem(actorSystem)
-  lazy val locationExceptionHandler                = new LocationExceptionHandler
-  lazy val locationRoutes                          = new LocationRoutes(locationService, locationExceptionHandler, actorRuntime)
-  lazy val locationHttpService                     = new LocationHttpService(locationRoutes, actorRuntime, settings)
+  lazy val untypedActorSystem: actor.ActorSystem = clusterSettings.system.toUntyped
+  lazy val actorRuntime = new ActorRuntime(actorSystem)
+  lazy val locationService: LocationService = LocationServiceFactory.withSystem(actorSystem)
+  lazy val locationExceptionHandler = new LocationExceptionHandler
+  lazy val locationRoutes = new LocationRoutes(locationService, locationExceptionHandler, actorRuntime)
+  lazy val locationHttpService = new LocationHttpService(locationRoutes, actorRuntime, settings)
 }
 
 private[csw] object ServerWiring {
@@ -36,7 +36,7 @@ private[csw] object ServerWiring {
       override lazy val settings: Settings = {
         new Settings(config) {
           override val clusterPort: Int = maybeClusterPort.getOrElse(super.clusterPort)
-          override val httpPort: Int    = mayBeHttpPort.getOrElse(super.httpPort)
+          override val httpPort: Int = mayBeHttpPort.getOrElse(super.httpPort)
         }
       }
     }

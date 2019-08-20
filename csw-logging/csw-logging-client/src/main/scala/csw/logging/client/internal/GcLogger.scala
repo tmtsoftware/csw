@@ -26,7 +26,7 @@ private[logging] class GcLogger {
       @Override
       def handleNotification(notification: Notification, handback: Object): Unit =
         if (notification.getType.equals(GarbageCollectionNotificationInfo.GARBAGE_COLLECTION_NOTIFICATION)) {
-          val info     = GarbageCollectionNotificationInfo.from(notification.getUserData.asInstanceOf[CompositeData])
+          val info = GarbageCollectionNotificationInfo.from(notification.getUserData.asInstanceOf[CompositeData])
           val duration = info.getGcInfo.getDuration // microseconds
           val gcaction = info.getGcAction
           val gctype =
@@ -41,14 +41,14 @@ private[logging] class GcLogger {
             m.toList
           }
           val data = Map(
-            "type"     -> gctype,
-            "id"       -> info.getGcInfo.getId,
-            "name"     -> info.getGcName,
-            "cause"    -> info.getGcCause,
-            "start"    -> info.getGcInfo.getStartTime,
-            "end"      -> info.getGcInfo.getEndTime,
-            "before"   -> getMem(info.getGcInfo.getMemoryUsageBeforeGc.asScala.toMap[String, MemoryUsage]),
-            "after"    -> getMem(info.getGcInfo.getMemoryUsageAfterGc.asScala.toMap[String, MemoryUsage]),
+            "type" -> gctype,
+            "id" -> info.getGcInfo.getId,
+            "name" -> info.getGcName,
+            "cause" -> info.getGcCause,
+            "start" -> info.getGcInfo.getStartTime,
+            "end" -> info.getGcInfo.getEndTime,
+            "before" -> getMem(info.getGcInfo.getMemoryUsageBeforeGc.asScala.toMap[String, MemoryUsage]),
+            "after" -> getMem(info.getGcInfo.getMemoryUsageAfterGc.asScala.toMap[String, MemoryUsage]),
             "duration" -> duration
           )
 

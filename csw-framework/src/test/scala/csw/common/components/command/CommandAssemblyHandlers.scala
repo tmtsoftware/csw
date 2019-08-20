@@ -11,11 +11,11 @@ import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandServiceFactory
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.api.models.ComponentType.HCD
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{ComponentId, TrackingEvent}
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.location.models.{ComponentId, TrackingEvent}
+import csw.location.models.ComponentType.HCD
+import csw.location.models.Connection.AkkaConnection
 import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandIssue.OtherIssue
 import csw.params.commands.CommandResponse._
@@ -147,7 +147,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
             commandUpdatePublisher.update(Error(command.commandName, runId, s"$exception"))
         }
         Started(command.commandName, runId)
-      case _ ⇒
+      case _ =>
         Invalid(command.commandName, runId, CommandIssue.UnsupportedCommandIssue(s"${command.commandName.name}"))
     }
 

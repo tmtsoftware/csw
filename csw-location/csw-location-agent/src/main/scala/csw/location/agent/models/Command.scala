@@ -18,8 +18,8 @@ object Command {
   val defaultDelay = 1000
   def parse(options: Options): Command = {
     val appConfig: Option[Config] = options.appConfigFile.flatMap(Utils.getAppConfig)
-    val optionsHandler            = OptionsHandler(options, appConfig)
-    val port                      = optionsHandler.portOpt("port", options.port)
+    val optionsHandler = OptionsHandler(options, appConfig)
+    val port = optionsHandler.portOpt("port", options.port)
     val command = optionsHandler
       .stringOpt("command", options.command)
       .getOrElse("false") //if command is not specified, registration will proceed with "false" command.

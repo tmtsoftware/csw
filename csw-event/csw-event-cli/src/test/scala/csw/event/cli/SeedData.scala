@@ -24,12 +24,12 @@ trait SeedData extends HTTPLocationService with Matchers with BeforeAndAfterEach
   val cliWiring: Wiring = Wiring.make(_printLine = printLine)
   import cliWiring._
 
-  val argsParser                        = new ArgsParser("csw-event-cli")
+  val argsParser = new ArgsParser("csw-event-cli")
   val logBuffer: mutable.Buffer[String] = mutable.Buffer.empty[String]
-  var redisSentinel: RedisSentinel      = _
-  var redisServer: RedisServer          = _
-  var event1: SystemEvent               = _
-  var event2: ObserveEvent              = _
+  var redisSentinel: RedisSentinel = _
+  var redisServer: RedisServer = _
+  var event1: SystemEvent = _
+  var event2: ObserveEvent = _
 
   private def printLine(msg: Any): Unit = logBuffer += msg.toString
 

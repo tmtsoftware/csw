@@ -51,7 +51,7 @@ class CommandLineRunner(
     val inputFilePath = options.inputFilePath.get
     if (Files.exists(inputFilePath)) {
       val configData = ConfigData.fromPath(inputFilePath)
-      val configId   = await(configService.update(options.relativeRepoPath.get, configData, options.comment.get))
+      val configId = await(configService.update(options.relativeRepoPath.get, configData, options.comment.get))
       printLine(s"File : ${options.relativeRepoPath.get} is updated with id : ${configId.id}")
       configId
     } else throw FileNotFound(inputFilePath)

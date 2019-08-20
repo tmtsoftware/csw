@@ -45,17 +45,17 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
 
   implicit val testKitSettings: TestKitSettings = TestKitSettings(typedSystem)
 
-  private val laserConnection            = AkkaConnection(ComponentId("Laser", Assembly))
+  private val laserConnection = AkkaConnection(ComponentId("Laser", Assembly))
   private val motionControllerConnection = AkkaConnection(models.ComponentId("Motion_Controller", HCD))
-  private val galilConnection            = AkkaConnection(models.ComponentId("Galil", Assembly))
+  private val galilConnection = AkkaConnection(models.ComponentId("Galil", Assembly))
 
   private var containerActorSystem: ActorSystem[SpawnProtocol] = _
 
   private var laserComponent: Component = _
   private var galilComponent: Component = _
-  private val probe                     = TestProbe[OnewayResponse]
-  private val startLoggingCmd           = CommandName("StartLogging")
-  private val prefix                    = Prefix("iris.command")
+  private val probe = TestProbe[OnewayResponse]
+  private val startLoggingCmd = CommandName("StartLogging")
+  private val prefix = Prefix("iris.command")
 
   private var loggingSystem: LoggingSystem = _
 
@@ -88,8 +88,8 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
 
   def startContainerAndWaitForRunning(): ActorRef[ContainerMessage] = {
     val frameworkWiring = FrameworkWiring.make(containerActorSystem, mock[RedisClient])
-    val config          = ConfigFactory.load("laser_container.conf")
-    val containerRef    = Await.result(Container.spawn(config, frameworkWiring), 5.seconds)
+    val config = ConfigFactory.load("laser_container.conf")
+    val containerRef = Await.result(Container.spawn(config, frameworkWiring), 5.seconds)
 
     val containerStateProbe = TestProbe[ContainerLifecycleState]
     assertThatContainerIsRunning(containerRef, containerStateProbe, 5.seconds)
@@ -117,15 +117,15 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
       path = s"/admin/logging/${motionControllerConnection.name}/level"
     )
 
-    val getLogMetadataRequest   = HttpRequest(HttpMethods.GET, uri = getLogMetadataUri)
+    val getLogMetadataRequest = HttpRequest(HttpMethods.GET, uri = getLogMetadataUri)
     val getLogMetadataResponse1 = Await.result(Http().singleRequest(getLogMetadataRequest), 5.seconds)
-    val logMetadata1            = Await.result(Unmarshal(getLogMetadataResponse1).to[LogMetadata], 5.seconds)
+    val logMetadata1 = Await.result(Unmarshal(getLogMetadataResponse1).to[LogMetadata], 5.seconds)
 
     getLogMetadataResponse1.status shouldBe StatusCodes.OK
 
-    val config     = ConfigFactory.load().getConfig("csw-logging")
-    val logLevel   = Level(config.getString("logLevel"))
-    val akkaLevel  = Level(config.getString("akkaLogLevel"))
+    val config = ConfigFactory.load().getConfig("csw-logging")
+    val logLevel = Level(config.getString("logLevel"))
+    val akkaLevel = Level(config.getString("akkaLogLevel"))
     val slf4jLevel = Level(config.getString("slf4jLogLevel"))
     val componentLogLevel = Level(
       config.getObject("component-log-levels").unwrapped().asScala(motionControllerConnection.componentId.name).toString
@@ -139,7 +139,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
 
     // verify getLogMetadata http request gives updated log levels in response
     val getLogMetadataResponse2 = Await.result(Http().singleRequest(getLogMetadataRequest), 5.seconds)
-    val logMetadata2            = Await.result(Unmarshal(getLogMetadataResponse2).to[LogMetadata], 5.seconds)
+    val logMetadata2 = Await.result(Unmarshal(getLogMetadataResponse2).to[LogMetadata], 5.seconds)
 
     logMetadata2 shouldBe LogMetadata(ERROR, WARN, slf4jLevel, componentLogLevel)
 
@@ -175,7 +175,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
       queryString = Some("value=error")
     )
 
-    val request  = HttpRequest(HttpMethods.POST, uri = uri)
+    val request = HttpRequest(HttpMethods.POST, uri = uri)
     val response = Await.result(Http().singleRequest(request), 5.seconds)
 
     response.status shouldBe StatusCodes.OK
@@ -191,7 +191,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
     galilComponent.supervisor ! Oneway(Setup(prefix, startLoggingCmd, None), probe.ref)
     Thread.sleep(100)
 
-    val groupByAfterFilter       = logBuffer.groupBy(json => json.getString("@componentName"))
+    val groupByAfterFilter = logBuffer.groupBy(json => json.getString("@componentName"))
     val laserCompLogsAfterFilter = groupByAfterFilter(laserConnection.componentId.name)
     val galilCompLogsAfterFilter = groupByAfterFilter(galilConnection.componentId.name)
 
@@ -219,7 +219,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
       path = s"/admin/logging/abcd-hcd-akka/level"
     )
 
-    val getLogMetadataRequest   = HttpRequest(HttpMethods.GET, uri = getLogMetadataUri)
+    val getLogMetadataRequest = HttpRequest(HttpMethods.GET, uri = getLogMetadataUri)
     val getLogMetadataResponse1 = Await.result(Http().singleRequest(getLogMetadataRequest), 5.seconds)
 
     getLogMetadataResponse1.status shouldBe StatusCodes.NotFound
@@ -235,7 +235,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
       queryString = Some("value=error1")
     )
 
-    val request  = HttpRequest(HttpMethods.POST, uri = uri)
+    val request = HttpRequest(HttpMethods.POST, uri = uri)
     val response = Await.result(Http().singleRequest(request), 5.seconds)
 
     response.status shouldBe StatusCodes.BadRequest

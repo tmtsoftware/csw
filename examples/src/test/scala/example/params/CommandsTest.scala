@@ -46,17 +46,17 @@ class CommandsTest extends FunSpec with Matchers {
     it("Should show usage of Setup command") {
       //#setup
       //keys
-      val k1: Key[Int]    = KeyType.IntKey.make("encoder")
+      val k1: Key[Int] = KeyType.IntKey.make("encoder")
       val k2: Key[String] = KeyType.StringKey.make("stringThing")
       val k2bad: Key[Int] = KeyType.IntKey.make("missingKey")
-      val k3: Key[Int]    = KeyType.IntKey.make("filter")
-      val k4: Key[Float]  = KeyType.FloatKey.make("correction")
+      val k3: Key[Int] = KeyType.IntKey.make("filter")
+      val k4: Key[Float] = KeyType.FloatKey.make("correction")
 
       //prefix
       val prefix: Prefix = Prefix("wfos.red.detector")
 
       //parameters
-      val i1: Parameter[Int]    = k1.set(22)
+      val i1: Parameter[Int] = k1.set(22)
       val i2: Parameter[String] = k2.set("A")
 
       //create Setup, add sequentially using add
@@ -66,11 +66,11 @@ class CommandsTest extends FunSpec with Matchers {
       val k1Exists: Boolean = sc1.exists(k1) //true
 
       //access parameters
-      val tryParam1: Try[Parameter[Int]] = Try(sc1(k1))    //success
-      val tryk2Bad: Try[Parameter[Int]]  = Try(sc1(k2bad)) //failure
+      val tryParam1: Try[Parameter[Int]] = Try(sc1(k1)) //success
+      val tryk2Bad: Try[Parameter[Int]] = Try(sc1(k2bad)) //failure
 
       //add more than one parameters, using madd
-      val sc2: Setup     = sc1.madd(k3.set(1, 2, 3, 4).withUnits(Units.day), k4.set(1.0f, 2.0f))
+      val sc2: Setup = sc1.madd(k3.set(1, 2, 3, 4).withUnits(Units.day), k4.set(1.0f, 2.0f))
       val paramSize: Int = sc2.size
 
       //add binary payload
@@ -106,9 +106,9 @@ class CommandsTest extends FunSpec with Matchers {
       //#observe
       //keys
       val k1: Key[Boolean] = KeyType.BooleanKey.make("repeat")
-      val k2: Key[Int]     = KeyType.IntKey.make("expTime")
-      val k2bad: Key[Int]  = KeyType.IntKey.make("missingKey")
-      val k3: Key[Int]     = KeyType.IntKey.make("filter")
+      val k2: Key[Int] = KeyType.IntKey.make("expTime")
+      val k2bad: Key[Int] = KeyType.IntKey.make("missingKey")
+      val k3: Key[Int] = KeyType.IntKey.make("filter")
       val k4: Key[UTCTime] = KeyType.UTCTimeKey.make("creation-time")
 
       //prefix
@@ -116,21 +116,21 @@ class CommandsTest extends FunSpec with Matchers {
 
       //parameters
       val i1: Parameter[Boolean] = k1.set(true, false, true, false)
-      val i2: Parameter[Int]     = k2.set(1, 2, 3, 4)
+      val i2: Parameter[Int] = k2.set(1, 2, 3, 4)
 
       //create Observe, add sequentially using add
       val oc1: Observe = Observe(prefix, CommandName("move"), Some(obsId)).add(i1).add(i2)
 
       //access parameters using apply method
       val k1Param: Parameter[Boolean] = oc1.get(k1).get //true
-      val values: Array[Boolean]      = k1Param.values
+      val values: Array[Boolean] = k1Param.values
 
       //access parameters
-      val tryParam1: Try[Parameter[Boolean]] = Try(oc1(k1))    //success
-      val tryk2Bad: Try[Parameter[Int]]      = Try(oc1(k2bad)) //failure
+      val tryParam1: Try[Parameter[Boolean]] = Try(oc1(k1)) //success
+      val tryk2Bad: Try[Parameter[Int]] = Try(oc1(k2bad)) //failure
 
       //add more than one parameters, using madd
-      val oc2: Observe   = oc1.madd(k3.set(1, 2, 3, 4).withUnits(Units.day), k4.set(UTCTime.now()))
+      val oc2: Observe = oc1.madd(k3.set(1, 2, 3, 4).withUnits(Units.day), k4.set(UTCTime.now()))
       val paramSize: Int = oc2.size
 
       //update existing key with set
@@ -154,14 +154,14 @@ class CommandsTest extends FunSpec with Matchers {
       //#wait
       //keys
       val k1: Key[Boolean] = KeyType.BooleanKey.make("repeat")
-      val k2: Key[Int]     = KeyType.IntKey.make("expTime")
-      val k2bad: Key[Int]  = KeyType.IntKey.make("missingKey")
-      val k3: Key[Int]     = KeyType.IntKey.make("filter")
+      val k2: Key[Int] = KeyType.IntKey.make("expTime")
+      val k2bad: Key[Int] = KeyType.IntKey.make("missingKey")
+      val k3: Key[Int] = KeyType.IntKey.make("filter")
       val k4: Key[UTCTime] = KeyType.UTCTimeKey.make("creation-time")
 
       //parameters
       val i1: Parameter[Boolean] = k1.set(true, false, true, false)
-      val i2: Parameter[Int]     = k2.set(1, 2, 3, 4)
+      val i2: Parameter[Int] = k2.set(1, 2, 3, 4)
 
       //prefix
       val prefix: Prefix = Prefix("wfos.red.detector")
@@ -171,14 +171,14 @@ class CommandsTest extends FunSpec with Matchers {
 
       //access params using get method
       val k1Param: Option[Parameter[Boolean]] = wc1.get(k1)
-      val values: Array[Boolean]              = k1Param.map(_.values).getOrElse(Array.empty[Boolean])
+      val values: Array[Boolean] = k1Param.map(_.values).getOrElse(Array.empty[Boolean])
 
       //access parameters
-      val tryParam1: Try[Parameter[Boolean]] = Try(wc1(k1))    //success
-      val tryk2Bad: Try[Parameter[Int]]      = Try(wc1(k2bad)) //failure
+      val tryParam1: Try[Parameter[Boolean]] = Try(wc1(k1)) //success
+      val tryk2Bad: Try[Parameter[Int]] = Try(wc1(k2bad)) //failure
 
       //add more than one parameters, using madd
-      val wc2: Wait      = wc1.madd(k3.set(1, 2, 3, 4).withUnits(Units.day), k4.set(UTCTime.now()))
+      val wc2: Wait = wc1.madd(k3.set(1, 2, 3, 4).withUnits(Units.day), k4.set(UTCTime.now()))
       val paramSize: Int = wc2.size
 
       //update existing key with set
@@ -221,9 +221,9 @@ class CommandsTest extends FunSpec with Matchers {
       val i1: Parameter[MatrixData[Double]] = k1.set(m1)
 
       //commands
-      val sc: Setup   = Setup(prefix, CommandName("move"), Some(obsId)).add(i1)
+      val sc: Setup = Setup(prefix, CommandName("move"), Some(obsId)).add(i1)
       val oc: Observe = Observe(prefix, CommandName("move"), Some(obsId)).add(i1)
-      val wc: Wait    = Wait(prefix, CommandName("move"), Some(obsId)).add(i1)
+      val wc: Wait = Wait(prefix, CommandName("move"), Some(obsId)).add(i1)
 
       //json support - write
       val scJson: JsValue = JsonSupport.writeSequenceCommand(sc)
@@ -237,9 +237,9 @@ class CommandsTest extends FunSpec with Matchers {
       val scFromPrettyStr = JsonSupport.readSequenceCommand[Setup](Json.parse(str))
 
       //json support - read
-      val sc1: Setup   = JsonSupport.readSequenceCommand[Setup](scJson)
+      val sc1: Setup = JsonSupport.readSequenceCommand[Setup](scJson)
       val oc1: Observe = JsonSupport.readSequenceCommand[Observe](ocJson)
-      val wc1: Wait    = JsonSupport.readSequenceCommand[Wait](wcJson)
+      val wc1: Wait = JsonSupport.readSequenceCommand[Wait](wcJson)
       //#json-serialization
 
       //validations
@@ -256,8 +256,8 @@ class CommandsTest extends FunSpec with Matchers {
       //#unique-key
       //keys
       val encoderKey: Key[Int] = KeyType.IntKey.make("encoder")
-      val filterKey: Key[Int]  = KeyType.IntKey.make("filter")
-      val miscKey: Key[Int]    = KeyType.IntKey.make("misc.")
+      val filterKey: Key[Int] = KeyType.IntKey.make("filter")
+      val miscKey: Key[Int] = KeyType.IntKey.make("misc.")
 
       //prefix
       val prefix: Prefix = Prefix("wfos.red.detector")
@@ -283,6 +283,7 @@ class CommandsTest extends FunSpec with Matchers {
         )
       //four duplicate keys are removed; now contains one Encoder and one Filter key
       val uniqueKeys1 = setup.paramSet.toList.map(_.keyName)
+      println("Uni 1: " + setup)
 
       //try adding duplicate keys via add + madd
       val changedSetup: Setup = setup
@@ -310,12 +311,12 @@ class CommandsTest extends FunSpec with Matchers {
 
   // DEOPSCSW-392: Provide a helper method in commands to create unique runId
   describe("Examples of clone command") {
-    val k1             = KeyType.IntKey.make("itest")
-    val commandName    = CommandName("command-name")
+    val k1 = KeyType.IntKey.make("itest")
+    val commandName = CommandName("command-name")
     val prefix: Prefix = Prefix("wfos.red.detector")
 
     val i1 = k1.set(1, 2, 3).withUnits(degree)
-/*
+    /*
     it("clone command creates a command from existing command with a new RunId for Setup, Observe or Wait") {
       //#clone-command
       val setup  = Setup(prefix, commandName, Some(obsId)).madd(i1)
@@ -347,6 +348,6 @@ class CommandsTest extends FunSpec with Matchers {
       assert(wait.paramSet == wait2.paramSet)
     }
 
- */
+   */
   }
 }

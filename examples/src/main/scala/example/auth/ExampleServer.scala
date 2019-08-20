@@ -66,8 +66,8 @@ object LoggingSupport {
 
 object AsyncSupport {
   implicit val actorSystem: typed.ActorSystem[SpawnProtocol] = typed.ActorSystem(SpawnProtocol.behavior, "")
-  implicit val ec: ExecutionContext                          = ExecutionContext.global
-  implicit val mat: Materializer                             = ActorMaterializer()
+  implicit val ec: ExecutionContext = ExecutionContext.global
+  implicit val mat: Materializer = ActorMaterializer()
 }
 
 object LocationServiceSupport {
@@ -187,11 +187,11 @@ object Documentation extends HttpApp {
 object SampleHttpApp extends HttpApp with App {
 
   implicit val actorSystem: ActorSystem[SpawnProtocol] = typed.ActorSystem(SpawnProtocol.behavior, "sample-http-app")
-  implicit val ec: ExecutionContext                    = actorSystem.executionContext
-  implicit val mat: Materializer                       = scaladsl.ActorMaterializer()
+  implicit val ec: ExecutionContext = actorSystem.executionContext
+  implicit val mat: Materializer = scaladsl.ActorMaterializer()
 
   val locationService = HttpLocationServiceFactory.makeLocalClient
-  val directives      = SecurityDirectives(locationService)
+  val directives = SecurityDirectives(locationService)
   import directives._
 
   override protected def routes: Route = pathPrefix("api") {

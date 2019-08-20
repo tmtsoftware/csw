@@ -34,24 +34,24 @@ class IRIS(logger: LoggerFactory) {
 
 object IRIS {
 
-  val TRACE_LINE_NO         = 22
-  val DEBUG_LINE_NO         = TRACE_LINE_NO + 1
-  val INFO_LINE_NO          = TRACE_LINE_NO + 2
-  val WARN_LINE_NO          = TRACE_LINE_NO + 3
-  val ERROR_LINE_NO         = TRACE_LINE_NO + 4
-  val FATAL_LINE_NO         = TRACE_LINE_NO + 5
+  val TRACE_LINE_NO = 22
+  val DEBUG_LINE_NO = TRACE_LINE_NO + 1
+  val INFO_LINE_NO = TRACE_LINE_NO + 2
+  val WARN_LINE_NO = TRACE_LINE_NO + 3
+  val ERROR_LINE_NO = TRACE_LINE_NO + 4
+  val FATAL_LINE_NO = TRACE_LINE_NO + 5
   val LOG_ERROR_WITH_MAP_NO = TRACE_LINE_NO + 6
 
   val COMPONENT_NAME = "IRIS"
-  val CLASS_NAME     = "csw.logging.client.components.IRIS"
-  val FILE_NAME      = "IRIS.scala"
+  val CLASS_NAME = "csw.logging.client.components.IRIS"
+  val FILE_NAME = "IRIS.scala"
 
   sealed trait IRISLogMessages
 
   case object LogTrace extends IRISLogMessages
   case object LogDebug extends IRISLogMessages
-  case object LogInfo  extends IRISLogMessages
-  case object LogWarn  extends IRISLogMessages
+  case object LogInfo extends IRISLogMessages
+  case object LogWarn extends IRISLogMessages
   case object LogError extends IRISLogMessages
   case object LogFatal extends IRISLogMessages
 
@@ -62,8 +62,8 @@ object IRIS {
   val irisLogs = Map(
     "trace" -> "iris: trace",
     "debug" -> "iris: debug",
-    "info"  -> "iris: info",
-    "warn"  -> "iris: warn",
+    "info" -> "iris: info",
+    "warn" -> "iris: warn",
     "error" -> "iris: error",
     "fatal" -> "iris: fatal"
   )

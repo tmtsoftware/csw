@@ -32,8 +32,8 @@ case class OnelineFormatter(options: Options) {
 
   def header(event: Event): String = {
     val timestamp = if (options.printTimestamp) s"Timestamp: ${event.eventTime.toString}" else ""
-    val id        = if (options.printId) s"Id: ${event.eventId.id}" else ""
-    val key       = s"EventKey: ${event.eventKey.key}"
+    val id = if (options.printId) s"Id: ${event.eventId.id}" else ""
+    val key = s"EventKey: ${event.eventKey.key}"
 
     val header = List(key, timestamp, id).filter(_.nonEmpty).mkString(" | ")
     header + "\n"

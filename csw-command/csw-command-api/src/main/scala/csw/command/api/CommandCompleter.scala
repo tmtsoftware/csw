@@ -15,9 +15,9 @@ object CommandCompleter {
 
   case class Completer(expectedResponses: Set[SubmitResponse]) {
     private val alreadyCompleted: Set[SubmitResponse] = expectedResponses.filter(CommandResponse.isFinal(_))
-    private val startedRunIds                         = expectedResponses.filter(CommandResponse.isIntermediate(_)).map(_.runId)
+    private val startedRunIds = expectedResponses.filter(CommandResponse.isIntermediate(_)).map(_.runId)
     // This accumulates responses until all are gathered
-    private var responses       = Set.empty[SubmitResponse]
+    private var responses = Set.empty[SubmitResponse]
     private val completePromise = Promise[OverallResponse]()
 
     // Catch the case where one of the startedResponses is a negative

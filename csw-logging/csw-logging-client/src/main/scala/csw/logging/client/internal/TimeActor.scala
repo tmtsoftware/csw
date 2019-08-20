@@ -27,7 +27,7 @@ private[logging] class TimeActor(tdone: Promise[Unit]) {
 
   def behavior: Behavior[TimeActorMessage] = Behaviors.setup[TimeActorMessage] { ctx =>
     val log: Logger = GenericLoggerFactory.getLogger(ctx)
-    val items       = mutable.HashMap[String, TimeItem]()
+    val items = mutable.HashMap[String, TimeItem]()
 
     def start(id: RequestId, time: Long): Unit = {
       val key = s"${id.trackingId}\t${id.spanId}"
@@ -47,8 +47,8 @@ private[logging] class TimeActor(tdone: Promise[Unit]) {
             }
             j1 ++ j2
         }
-        val traceId             = Seq(id.trackingId, id.spanId).asJson
-        val jitems              = jitems0.sortBy(_.getString("time0"))
+        val traceId = Seq(id.trackingId, id.spanId).asJson
+        val jitems = jitems0.sortBy(_.getString("time0"))
         val j: Map[String, Any] = Map(LoggingKeys.TRACE_ID -> traceId, "items" -> jitems)
         log.alternative("time", j)
         items -= key
@@ -56,7 +56,7 @@ private[logging] class TimeActor(tdone: Promise[Unit]) {
     }
 
     def logStart(id: RequestId, name: String, uid: String, time: Long): Unit = {
-      val key  = s"${id.trackingId}\t${id.spanId}"
+      val key = s"${id.trackingId}\t${id.spanId}"
       val key1 = s"$name\t$uid"
       val first = if (!items.isDefinedAt(key)) {
         start(id, time)
@@ -68,7 +68,7 @@ private[logging] class TimeActor(tdone: Promise[Unit]) {
     }
 
     def logEnd(id: RequestId, name: String, uid: String, time: Long): Unit = {
-      val key  = s"${id.trackingId}\t${id.spanId}"
+      val key = s"${id.trackingId}\t${id.spanId}"
       val key1 = s"$name\t$uid"
       items.get(key) foreach { timeItem =>
         timeItem.steps.get(key1) foreach { timeStep =>

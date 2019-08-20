@@ -13,7 +13,7 @@ import scala.collection.immutable.Seq
 object HttpCodecs extends HttpCodecs
 trait HttpCodecs {
 
-  lazy val mediaTypes: Seq[MediaType.WithFixedCharset]     = List(`application/json`)
+  lazy val mediaTypes: Seq[MediaType.WithFixedCharset] = List(`application/json`)
   lazy val unmarshallerContentTypes: Seq[ContentTypeRange] = mediaTypes.map(ContentTypeRange.apply)
 
   implicit def unmarshaller[A: Decoder]: FromEntityUnmarshaller[A] = {

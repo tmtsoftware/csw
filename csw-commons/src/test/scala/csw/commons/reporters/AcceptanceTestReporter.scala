@@ -9,8 +9,8 @@ import org.scalatest.events._
 import scala.collection.mutable
 
 class AcceptanceTestReporter extends Reporter {
-  private val data      = mutable.ListBuffer[List[Any]]()
-  private val dateTime  = new Date
+  private val data = mutable.ListBuffer[List[Any]]()
+  private val dateTime = new Date
   private val timestamp = new SimpleDateFormat("YYYY/MM/dd HH:mm:ss").format(dateTime)
 
   override def apply(event: Event): Unit = event match {

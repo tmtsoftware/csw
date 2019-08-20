@@ -7,7 +7,7 @@ import scala.io.Source
 
 object ResourceReader {
   type TempFilePath = Path
-  type FileContent  = String
+  type FileContent = String
 
   def copyToTmp(fileName: String, suffix: String = ".tmp"): TempFilePath = {
     val resourceStream = getClass.getResourceAsStream(fileName)
@@ -22,7 +22,7 @@ object ResourceReader {
 
   def readAndCopyToTmp(fileName: String): (TempFilePath, FileContent) = {
     val tempPath = copyToTmp(fileName)
-    val source   = Source.fromFile(tempPath.toFile)
+    val source = Source.fromFile(tempPath.toFile)
     try {
       (tempPath, source.mkString)
     } finally {

@@ -27,7 +27,7 @@ private[event] class KafkaEventService(eventServiceResolver: EventServiceResolve
 
   implicit val executionContext: ExecutionContext = actorSystem.executionContext
 
-  override def makeNewPublisher(): KafkaPublisher   = new KafkaPublisher(producerSettings)
+  override def makeNewPublisher(): KafkaPublisher = new KafkaPublisher(producerSettings)
   override def makeNewSubscriber(): KafkaSubscriber = new KafkaSubscriber(consumerSettings)
 
   // resolve event service every time before creating a new publisher
