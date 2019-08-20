@@ -2,6 +2,7 @@ package csw.command.client
 
 import akka.actor
 import akka.actor.typed
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, Behavior}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives.{entity, _}
@@ -10,25 +11,24 @@ import akka.stream.Materializer
 import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.util.Timeout
 import csw.location.client.HttpCodecs
-import csw.location.models.{ComponentId, ComponentType, HttpRegistration}
-import csw.params.commands.CommandIssue.OtherIssue
-import csw.params.commands.CommandResponse.{Accepted, Completed, Error, Invalid, SubmitResponse, ValidateResponse}
-import csw.params.commands.{CommandName, ControlCommand, Setup}
-import csw.params.core.formats.ParamCodecs
-import csw.params.core.generics.{Key, KeyType}
-import csw.params.core.generics.KeyType.CoordKey
-import csw.params.core.models.Coords.EqFrame.FK5
-import csw.params.core.models.Coords.SolarSystemObject.Venus
-import csw.params.core.models.{Angle, Coords, Id, Prefix, ProperMotion, Struct}
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
-
-import scala.concurrent.{ExecutionContext, Future}
-import scala.concurrent.duration.DurationLong
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.models.Connection.HttpConnection
-import csw.location.server.http.HTTPLocationService
+import csw.location.models.{ComponentId, ComponentType, HttpRegistration}
 import csw.location.server.commons.TestFutureExtension.RichFuture
+import csw.location.server.http.HTTPLocationService
+import csw.params.commands.CommandIssue.OtherIssue
+import csw.params.commands.CommandResponse._
+import csw.params.commands.{CommandName, ControlCommand, Setup}
+import csw.params.core.formats.ParamCodecs
+import csw.params.core.generics.KeyType.CoordKey
+import csw.params.core.generics.{Key, KeyType}
+import csw.params.core.models.Coords.EqFrame.FK5
+import csw.params.core.models.Coords.SolarSystemObject.Venus
+import csw.params.core.models._
+import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+
+import scala.concurrent.duration.DurationLong
+import scala.concurrent.{ExecutionContext, Future}
 
 //noinspection ScalaStyle
 class HttpCommandServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with HTTPLocationService {
