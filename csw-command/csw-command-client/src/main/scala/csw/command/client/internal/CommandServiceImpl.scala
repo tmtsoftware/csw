@@ -43,8 +43,6 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
   // Mini CRM Actor needs to have unique name
   private val r    = scala.util.Random
   private val name = s"${componentLocation.connection.componentId.fullName}-${r.nextInt(1000)}"
-  println("Name for CommandService MiniCRM Impl: " + name)
-  // TODO -- THE creation of this child NEEDS TO BE DONE CORRECTLY
   private lazy val miniCRM: ActorRef[MiniCRM.CRMMessage] =
     Await.result(actorSystem.systemActorOf(MiniCRM.make(), name), 5.seconds)
 

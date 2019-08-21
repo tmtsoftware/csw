@@ -31,6 +31,7 @@ object MiniCRM {
   }
   import MiniCRMMessage._
 
+  //noinspection ScalaStyle
   def make(startedSize: Int = 10, responseSize: Int = 10, waiterSize: Int = 10): Behavior[CRMMessage] =
     Behaviors.setup(_ => handle(new StartedList(startedSize), new ResponseList(responseSize), new WaiterList(waiterSize)))
 
@@ -88,10 +89,10 @@ object MiniCRM {
           .getOrElse(CommandNotAvailable(CommandName("CommandNotAvailable"), runId))
       )
 
-  def getResponse2(startedList: StartedList, responseList: ResponseList, runId: Id): Option[SubmitResponse] =
-    responseList
-      .query(_.runId == runId)
-      .orElse(startedList.query(_.runId == runId))
+//  def getResponse2(startedList: StartedList, responseList: ResponseList, runId: Id): Option[SubmitResponse] =
+//    responseList
+//      .query(_.runId == runId)
+//      .orElse(startedList.query(_.runId == runId))
 
   def updateWaiters(waiterList: WaiterList, response: SubmitResponse): WaiterList = {
     // Send final response to any waiters that match runId
@@ -108,7 +109,7 @@ object MiniCRM {
   /**
    * This is a specialized list that will only keep a maximum number of elements
    * @param max size of list to retain
-   * @param initList the list can be iniitalized with some values
+   * @param initList the list can be initialized with some values
    * @tparam T the type of elements in the list
    */
   private class SizedList[T](max: Int, initList: List[T] = List.empty) {
