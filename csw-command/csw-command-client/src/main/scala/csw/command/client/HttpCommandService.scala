@@ -77,11 +77,11 @@ case class HttpCommandService(
           val bs = await(concatByteStrings(response.entity.dataBytes))
           Json.decode(bs.toArray).to[CommandResponse].value
         } else {
-          // FIXME - need to get returned runId from server
+          // Server error: Return error with generated runId
           Error(controlCommand.commandName, Id(), s"Error response from ${connection.componentId.name}: $response")
         }
       case None =>
-        // FIXME - need to get returned runId from server
+        // Couldn't locate the server: Return error with generated runId
         Error(controlCommand.commandName, Id(), s"Can't locate connection for ${connection.componentId.name}")
     }
   }
@@ -188,11 +188,11 @@ case class HttpCommandService(
           val bs = await(concatByteStrings(response.entity.dataBytes))
           Json.decode(bs.toArray).to[SubmitResponse].value
         } else {
-          //FIXME -- Need to get the command name returned as part of response
+          // Server error: Return error with generated runId
           Error(CommandName("ERROR"), commandRunId, s"Error response from ${connection.componentId.name}: $response")
         }
       case None =>
-        //FIXME -- Need to get the command name returned as part of response
+        // Couldn't locate the server: Return error with generated runId
         Error(CommandName("ERROR"), commandRunId, s"Can't locate connection for ${connection.componentId.name}")
     }
   }

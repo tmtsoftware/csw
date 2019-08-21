@@ -283,7 +283,6 @@ class CommandsTest extends FunSpec with Matchers {
         )
       //four duplicate keys are removed; now contains one Encoder and one Filter key
       val uniqueKeys1 = setup.paramSet.toList.map(_.keyName)
-      println("Uni 1: " + setup)
 
       //try adding duplicate keys via add + madd
       val changedSetup: Setup = setup

@@ -134,7 +134,7 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
     miniCRM ? (QueryFinal(commandRunId, _))
 
   /**
-   * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
+   * Subscribe to the current state of a component corresponding to the [[csw.location.models.AkkaLocation]] of the component
    *
    * @param names subscribe to states which have any of the provided value for name.
    *              If no states are provided, subscription in made to all the states.

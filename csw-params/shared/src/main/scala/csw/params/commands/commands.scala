@@ -184,7 +184,7 @@ object Observe {
 case class Wait private[params] (
     source: Prefix,
     commandName: CommandName,
-    maybeObsId: Option[ObsId] /* = None Not sure of codec problem */,
+    maybeObsId: Option[ObsId],
     paramSet: Set[Parameter[_]]
 ) extends ParameterSetType[Wait]
     with SequenceCommand {

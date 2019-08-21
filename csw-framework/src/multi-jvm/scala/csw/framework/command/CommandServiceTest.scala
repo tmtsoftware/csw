@@ -1,6 +1,6 @@
 package csw.framework.command
 
-import akka.actor.testkit.typed.scaladsl.TestProbe
+  import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
