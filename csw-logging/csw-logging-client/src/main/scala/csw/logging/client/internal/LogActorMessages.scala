@@ -1,6 +1,5 @@
 package csw.logging.client.internal
 
-import csw.logging.models.AnyId
 import csw.logging.client.appenders.LogAppender
 import csw.logging.macros.SourceLocation
 import csw.logging.models.{AnyId, Level}
