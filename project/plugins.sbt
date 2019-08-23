@@ -21,7 +21,7 @@ addSbtPlugin("org.portable-scala"                % "sbt-scalajs-crossproject"   
 addSbtPlugin("org.scala-js"                      % "sbt-scalajs"                % "0.6.28")
 addSbtPlugin("com.github.cb372"                  % "sbt-explicit-dependencies"  % "0.2.9")
 
-resolvers += "Jenkins repo" at "http://repo.jenkins-ci.org/public/"
+resolvers += "Jenkins repo" at "https://repo.jenkins-ci.org/public/"
 addSbtPlugin("ohnosequences" % "sbt-github-release" % "0.7.0")
 
 addSbtCoursier
