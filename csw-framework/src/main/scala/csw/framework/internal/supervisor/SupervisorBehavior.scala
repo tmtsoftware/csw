@@ -35,10 +35,10 @@ import csw.framework.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehavior
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, RegistrationFactory}
-import csw.location.models.{AkkaRegistration, ComponentId}
 import csw.location.models.Connection.AkkaConnection
+import csw.location.models.{AkkaRegistration, ComponentId}
 import csw.logging.api.scaladsl.Logger
-import csw.logging.client.internal.LogAdminUtil
+import csw.logging.client.commons.LogAdminUtil
 import csw.params.commands.CommandResponse.Locked
 import csw.params.core.models.{Id, Prefix}
 

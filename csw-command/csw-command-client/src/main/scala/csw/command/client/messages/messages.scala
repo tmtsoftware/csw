@@ -2,6 +2,7 @@ package csw.command.client.messages
 
 import akka.actor.typed.ActorRef
 import csw.command.client.messages.CommandSerializationMarker._
+import csw.command.client.messages.sequencer.SequencerMsg
 import csw.command.client.models.framework.PubSub.SubscriberMessage
 import csw.command.client.models.framework._
 import csw.location.models.TrackingEvent
@@ -278,7 +279,7 @@ private[csw] object FromSupervisorMessage {
 ////////////////
 
 // Parent trait for Messages which will be send to components for interacting with its logging system
-sealed trait LogControlMessages extends ComponentMessage with CommandSerializable
+sealed trait LogControlMessages extends ComponentMessage with SequencerMsg with CommandSerializable
 
 // Message to get Logging configuration metadata of the receiver
 case class GetComponentLogMetadata(componentName: String, replyTo: ActorRef[LogMetadata])
