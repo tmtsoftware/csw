@@ -25,7 +25,7 @@ object Common extends AutoPlugin {
     scalaVersion := Libs.ScalaVersion,
     homepage := Some(url("https://github.com/tmtsoftware/csw")),
     resolvers += "jitpack" at "https://jitpack.io",
-    resolvers += "bintray" at "http://jcenter.bintray.com",
+    resolvers += "bintray" at "https://jcenter.bintray.com",
     scmInfo := Some(
       ScmInfo(url("https://github.com/tmtsoftware/csw"), "git@github.com:tmtsoftware/csw.git")
     ),
