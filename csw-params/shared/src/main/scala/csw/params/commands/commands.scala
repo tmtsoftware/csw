@@ -82,7 +82,7 @@ sealed trait ControlCommand extends SequenceCommand { self: ParameterSetType[_] 
 /**
  * A parameter set for setting telescope and instrument parameters. Constructor is private to ensure RunId is created internally to guarantee unique value.
  */
-case class Setup(
+case class Setup private[params] (
     runId: Id,
     source: Prefix,
     commandName: CommandName,
