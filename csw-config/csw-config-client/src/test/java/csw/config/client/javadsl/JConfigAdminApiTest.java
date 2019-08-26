@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 import static org.hamcrest.CoreMatchers.isA;
 import static org.mockito.Mockito.when;
 
+// DEOPSCSW-88: Config service API implementation details need to be hidden from component developer
 // DEOPSCSW-138: Split Config API into Admin API and Client API
 // DEOPSCSW-103: Java API for Configuration service
 public class JConfigAdminApiTest extends JUnitSuite {

@@ -51,6 +51,7 @@ public class JSampleHcdTest extends JUnitSuite {
         testKit.spawnStandalone(com.typesafe.config.ConfigFactory.load("JSampleHcdStandalone.conf"));
     }
 
+    // DEOPSCSW-39: examples of Location Service
     @Test
     public void testHCDShouldBeLocatableUsingLocationService() throws ExecutionException, InterruptedException {
         Connection.AkkaConnection connection = new Connection.AkkaConnection(new ComponentId("JSampleHcd", JComponentType.HCD));
@@ -110,6 +111,7 @@ public class JSampleHcdTest extends JUnitSuite {
     //#submitAndWait
     private ActorSystem<SpawnProtocol> typedActorSystem = testKit.actorSystem();
 
+    // DEOPSCSW-39: examples of Location Service
     @Test
     public void testShouldBeAbleToSendSleepCommandToHCD() throws ExecutionException, InterruptedException {
 

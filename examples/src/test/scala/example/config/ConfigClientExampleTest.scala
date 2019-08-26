@@ -21,6 +21,7 @@ import scala.async.Async._
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, Future}
 
+// DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
 // DEOPSCSW-592: Create csw testkit for component writers
 class ConfigClientExampleTest
     extends ScalaTestFrameworkTestKit(ConfigServer)

@@ -17,6 +17,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 
+// DEOPSCSW-39: examples of Location Service
 //#intro
 public class JSampleAssemblyTest extends JUnitSuite {
     @ClassRule

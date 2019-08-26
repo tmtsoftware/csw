@@ -92,6 +92,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
         Await.result(wiring.actorRuntime().shutdown(CoordinatedShutdown.UnknownReason$.MODULE$), FiniteDuration.create(5, TimeUnit.SECONDS));
     }
 
+    // DEOPSCSW-13: Java API for location service
     @Test
     public void testRegistrationAndUnregistrationOfHttpComponent() throws ExecutionException, InterruptedException {
         int port = 8080;
@@ -104,6 +105,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
     }
 
     @Test
+    // DEOPSCSW-39: examples of Location Service
     public void testLocationServiceRegisterWithAkkaHttpTcpAsSequence() throws ExecutionException, InterruptedException {
         int port = 8080;
         AkkaRegistration akkaRegistration = new RegistrationFactory().akkaTyped(akkaHcdConnection, prefix, actorRef);
@@ -120,6 +122,8 @@ public class JLocationServiceImplTest extends JUnitSuite {
         Assert.assertEquals(tcpRegistration.location(Networks.apply().hostname()), locationService.find(tcpServiceConnection).get().orElseThrow());
     }
 
+    // DEOPSCSW-13: Java API for location service
+    // DEOPSCSW-39: examples of Location Service
     @Test
     public void testResolveTcpConnection() throws ExecutionException, InterruptedException {
         int port = 1234;
@@ -129,6 +133,8 @@ public class JLocationServiceImplTest extends JUnitSuite {
         Assert.assertEquals(tcpRegistration.location(Networks.apply().hostname()), locationService.find(tcpServiceConnection).get().orElseThrow());
     }
 
+    // DEOPSCSW-13: Java API for location service
+    // DEOPSCSW-39: examples of Location Service
     @Test
     public void testResolveAkkaConnection() throws ExecutionException, InterruptedException {
         AkkaRegistration registration = new RegistrationFactory().akkaTyped(akkaHcdConnection, prefix, actorRef);
@@ -137,6 +143,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
     }
 
     @Test
+    // DEOPSCSW-39: examples of Location Service
     public void testHttpRegistration() throws ExecutionException, InterruptedException {
         int port = 8080;
         String Path = "/path/to/resource";
@@ -150,6 +157,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
     }
 
     @Test
+    // DEOPSCSW-39: examples of Location Service
     public void testTcpRegistration() throws ExecutionException, InterruptedException {
         int port = 8080;
         TcpRegistration tcpRegistration = new TcpRegistration(tcpServiceConnection, port);
@@ -161,6 +169,8 @@ public class JLocationServiceImplTest extends JUnitSuite {
         locationService.unregister(tcpServiceConnection).get();
     }
 
+    // DEOPSCSW-13: Java API for location service
+    // DEOPSCSW-39: examples of Location Service
     @Test
     public void testAkkaRegistration() throws ExecutionException, InterruptedException {
         AkkaRegistration registration = new RegistrationFactory().akkaTyped(akkaHcdConnection, prefix, actorRef);
@@ -171,6 +181,8 @@ public class JLocationServiceImplTest extends JUnitSuite {
         locationService.unregister(akkaHcdConnection).get();
     }
 
+    // DEOPSCSW-13: Java API for location service
+    // DEOPSCSW-39: examples of Location Service
     @Test
     public void testListComponents() throws ExecutionException, InterruptedException {
         //  Register Http connection
@@ -195,6 +207,9 @@ public class JLocationServiceImplTest extends JUnitSuite {
         Assert.assertEquals(locations, actualSetOfLocations);
     }
 
+    // DEOPSCSW-13: Java API for location service
+    // DEOPSCSW-24: Filter by comp/service type
+    // DEOPSCSW-39: examples of Location Service
     @Test
     public void testListComponentsByComponentType() throws ExecutionException, InterruptedException {
         //  Register HCD type component
@@ -247,6 +262,9 @@ public class JLocationServiceImplTest extends JUnitSuite {
         Assert.assertEquals(serviceLocations, actualSetOfLocations);
     }
 
+    // DEOPSCSW-13: Java API for location service
+    // DEOPSCSW-31: Filter by hostname
+    // DEOPSCSW-39: examples of Location Service
     @Test
     public void testListComponentsByHostname() throws ExecutionException, InterruptedException {
         //  Register Tcp connection
@@ -266,6 +284,9 @@ public class JLocationServiceImplTest extends JUnitSuite {
         Assert.assertEquals(locations, actualSetOfLocations);
     }
 
+    // DEOPSCSW-13: Java API for location service
+    // DEOPSCSW-32: Filter by connection type
+    // DEOPSCSW-39: examples of Location Service
     @Test
     public void testListComponentsByConnectionType() throws ExecutionException, InterruptedException {
         // Register Tcp connection
@@ -317,6 +338,8 @@ public class JLocationServiceImplTest extends JUnitSuite {
         Assert.assertEquals(akkaLocations, locationService.listByPrefix("nfiraos.ncc.trombone").get());
     }
 
+    // DEOPSCSW-26: Track a connection
+    // DEOPSCSW-39: examples of Location Service
     @Test
     public void testTrackingConnection() throws ExecutionException, InterruptedException {
         int Port = 1234;
@@ -344,6 +367,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
         source.second().expectComplete();
     }
 
+    // DEOPSCSW-26: Track a connection
     @Test
     public void testSubscribeConnection() throws ExecutionException, InterruptedException {
         int Port = 1234;
@@ -376,6 +400,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
         }
     }
 
+    // DEOPSCSW-35: CRDT detects comp/service crash
     @Test
     public void testUnregisteringDeadActorByDeathWatch() throws ExecutionException, InterruptedException {
         ComponentId componentId = new ComponentId("hcd1", JComponentType.HCD);

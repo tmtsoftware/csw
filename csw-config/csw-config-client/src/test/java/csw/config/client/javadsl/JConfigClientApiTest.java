@@ -50,6 +50,7 @@ public class JConfigClientApiTest extends JUnitSuite {
     private String configValue2 = "axisName11 = tromboneAxis\naxisName22 = tromboneAxis2\naxisName3 = tromboneAxis33";
     private String configValue3 = "axisName111 = tromboneAxis\naxisName222 = tromboneAxis2\naxisName3 = tromboneAxis333";
 
+    // DEOPSCSW-88: Config service API implementation details need to be hidden from component developer
     @Test
     public void testConfigClientApi() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/text-files/trombone_hcd/application.conf");

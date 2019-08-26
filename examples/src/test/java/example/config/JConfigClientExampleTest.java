@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 
 public class JConfigClientExampleTest extends JUnitSuite {
 
+    // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
     // DEOPSCSW-592: Create csw testkit for component writers
     @ClassRule
     public static final FrameworkTestKitJunitResource testKit = new FrameworkTestKitJunitResource(List.of(JCSWService.ConfigServer));
