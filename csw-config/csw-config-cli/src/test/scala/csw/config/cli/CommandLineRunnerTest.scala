@@ -191,6 +191,7 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
     readFile(outputFilePath) shouldEqual inputFileContents
   }
 
+  // DEOPSCSW-66: Include identity of configuration file creator/editor
   // DEOPSCSW-577: Ability to view detailed change log in SVN
   // DEOPSCSW-625: Include username from svn in history model of config service
   test("should able to fetch history of file.") {
@@ -222,6 +223,7 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
       .map(_.id) shouldBe List(update2ConfigId, updateConfigId)
   }
 
+  // DEOPSCSW-66: Include identity of configuration file creator/editor
   // DEOPSCSW-577: Ability to view detailed change log in SVN
   // DEOPSCSW-625: Include username from svn in history model of config service
   test("should able to fetch history of active files.") {

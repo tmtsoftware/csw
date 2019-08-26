@@ -64,6 +64,7 @@ class ConfigClientApiTest extends ConfigClientBaseSuite {
       |axisName333 = tromboneAxis333
       |""".stripMargin
 
+  // DEOPSCSW-88: Config service API implementation details need to be hidden from component developer
   test("should able to get, set and reset the active version of config file") {
     // create file
     val file = Paths.get("/tmt/test/setactive/getactive/resetactive/active.conf")

@@ -20,6 +20,7 @@ class TrackLocationTest(ignore: Int, mode: String) extends LSNodeSpec(config = n
   import config._
   import cswCluster.mat
 
+  // DEOPSCSW-26: Track a connection
   test("two components should able to track same connection and single component should able to track two components") {
     //create akka connection
     val akkaConnection = AkkaConnection(ComponentId("tromboneHcd", ComponentType.HCD))

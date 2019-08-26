@@ -35,6 +35,9 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec
   import config._
   import cswCluster.mat
 
+  // DEOPSCSW-15: Spike jmDNS/CRDT perf
+  // DEOPSCSW-35: CRDT detects comp/service crash
+  // DEOPSCSW-36: Track a crashed service/comp
   test("akka component running on one node should detect if other component running on another node crashes") {
 
     val akkaConnection = AkkaConnection(ComponentId("Container1", ComponentType.Container))

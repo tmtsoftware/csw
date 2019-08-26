@@ -18,6 +18,7 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 // DEOPSCSW-138: Split Config API into Admin API and Client API
 // DEOPSCSW-80: HTTP based access for configuration file
 // DEOPSCSW-576: Auth token for Configuration service
+// DEOPSCSW-88: Config service API implementation details need to be hidden from component developer
 class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
 
   override val serverWiring: ServerWiring = ServerWiring.make(securityDirectives)
