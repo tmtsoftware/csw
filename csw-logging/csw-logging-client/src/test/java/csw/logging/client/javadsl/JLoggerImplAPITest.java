@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 import static csw.logging.client.utils.Eventually.eventually;
 
+// DEOPSCSW-114: Inherit the code base from persist-logger project
 // DEOPSCSW-115: Format and control logging content
 // DEOPSCSW-271: API change
 // DEOPSCSW-278: Create Java API without arguments as suppliers
