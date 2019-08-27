@@ -96,6 +96,7 @@ class SeverityServiceModuleTest
     an[InvalidSeverityException] shouldBe thrownBy(setSeverity(tromboneAxisHighLimitAlarmKey, Critical).await)
   }
 
+  // DEOPSCSW-440: Model to represent Alarm Latched status
   // DEOPSCSW-444: Set severity api for component
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
   // DEOPSCSW-500: Update alarm time on current severity change
