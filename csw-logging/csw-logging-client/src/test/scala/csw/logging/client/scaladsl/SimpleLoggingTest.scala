@@ -17,6 +17,7 @@ import play.api.libs.json.JsObject
 
 class SimpleLoggingTest extends LoggingTestSuite with Eventually {
 
+  // DEOPSCSW-114: Inherit the code base from persist-logger project
   // DEOPSCSW-116: Make log messages identifiable with components
   // DEOPSCSW-118: Provide UTC time for each log message
   // DEOPSCSW-119: Associate source with each log message
@@ -51,6 +52,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     }
   }
 
+  // DEOPSCSW-114: Inherit the code base from persist-logger project
   // DEOPSCSW-116: Make log messages identifiable with components
   // DEOPSCSW-119: Associate source with each log message
   // DEOPSCSW-121: Define structured tags for log messages
@@ -73,6 +75,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     }
   }
 
+  // DEOPSCSW-114: Inherit the code base from persist-logger project
   // DEOPSCSW-116: Make log messages identifiable with components
   // DEOPSCSW-119: Associate source with each log message
   // DEOPSCSW-121: Define structured tags for log messages
@@ -96,6 +99,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     }
   }
 
+  // DEOPSCSW-114: Inherit the code base from persist-logger project
   // DEOPSCSW-116: Make log messages identifiable with components
   // DEOPSCSW-119: Associate source with each log message
   // DEOPSCSW-121: Define structured tags for log messages
