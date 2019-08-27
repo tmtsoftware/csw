@@ -63,11 +63,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static csw.common.components.command.ComponentStateForCommand.*;
 import static csw.location.api.javadsl.JComponentType.HCD;
 
+// DEOPSCSW-212: Send oneway command
 // DEOPSCSW-217: Execute RPC like commands
 // DEOPSCSW-224: Inter component command sending
 // DEOPSCSW-225: Allow components to receive commands
 // DEOPSCSW-227: Distribute commands to multiple destinations
 // DEOPSCSW-228: Assist Components with command completion
+// DEOPSCSW-234: CCS accessibility to all CSW component builders
 // DEOPSCSW-317: Use state values of HCD to determine command completion
 // DEOPSCSW-321: AkkaLocation provides wrapper for ActorRef[ComponentMessage]
 public class JCommandIntegrationTest extends JUnitSuite {

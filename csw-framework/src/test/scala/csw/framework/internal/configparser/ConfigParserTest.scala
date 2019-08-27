@@ -15,6 +15,7 @@ import scala.concurrent.duration.DurationInt
 
 // DEOPSCSW-167: Creation and Deployment of Standalone Components
 // DEOPSCSW-170: Starting component using a file format
+// DEOPSCSW-172: Starting a container from configuration file
 // DEOPSCSW-283: Parsing HOCON conf file
 class ConfigParserTest extends FunSuite with Matchers {
 

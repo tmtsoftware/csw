@@ -9,6 +9,7 @@ import csw.time.core.models.UTCTime
 import org.scalatest.{FunSpec, Matchers}
 
 class KeysAndParametersTest extends FunSpec with Matchers {
+  // DEOPSCSW-196: Command Payloads for variable command content
   describe("Examples of keys and parameters") {
 
     it("should show usage of primitive types") {

@@ -49,6 +49,7 @@ class ContainerCmdTestMultiJvm3 extends ContainerCmdTest(0)
 // DEOPSCSW-168: Deployment of multiple Assemblies and HCDs
 // DEOPSCSW-169: Creation of Multiple Components
 // DEOPSCSW-171: Starting component from command line
+// DEOPSCSW-172: Starting a container from configuration file
 // DEOPSCSW-182: Control Life Cycle of Components
 // DEOPSCSW-203: Write component-specific verification code
 // DEOPSCSW-216: Locate and connect components to send AKKA commands

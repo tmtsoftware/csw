@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+//DEOPSCSW-331: Event Service Accessible to all CSW component builders
 public class JEventsTest extends JUnitSuite {
 
     @Test

@@ -11,6 +11,7 @@ import org.scalatest.{FunSpec, Matchers}
 
 import scala.util.Try
 
+// DEOPSCSW-196: Command Payloads for variable command content
 class CommandsTest extends FunSpec with Matchers {
 
   //#obsid

@@ -27,9 +27,9 @@ import csw.params.core.models.Id
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 
-// TODO -- DID I REMOVE SOMETHING FORM THIS?  Why are there so many unused imports?
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
 // DEOPSCSW-177: Hooks for lifecycle management
+// DEOPSCSW-181: Multiple Examples for Lifecycle Support
 class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
   class TestData(compInfo: ComponentInfo) {
