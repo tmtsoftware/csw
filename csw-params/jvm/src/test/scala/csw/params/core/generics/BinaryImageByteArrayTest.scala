@@ -11,8 +11,8 @@ import org.scalatest.{FunSpec, Matchers}
 class BinaryImageByteArrayTest extends FunSpec with Matchers {
 
   // DEOPSCSW-186: Binary value payload
+  // DEOPSCSW-331: Complex payload - Include byte in paramset for Event and ObserveEvent
   describe("test ByteArrayKey") {
-    // DEOPSCSW-186: Binary value payload
     it("should able to create parameter representing binary image") {
       val keyName                        = "imageKey"
       val imageKey: Key[ArrayData[Byte]] = ByteArrayKey.make(keyName)
