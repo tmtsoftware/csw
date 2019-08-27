@@ -39,6 +39,7 @@ import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContext, Future}
 
 // DEOPSCSW-178: Lifecycle success/failure notification
+// DEOPSCSW-181: Multiple Examples for Lifecycle Support
 class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
   val supervisorLifecycleStateProbe: TestProbe[SupervisorLifecycleState] = TestProbe[SupervisorLifecycleState]

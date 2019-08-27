@@ -30,6 +30,7 @@ import scala.concurrent.duration.DurationDouble
 //
 
 // DEOPSCSW-187: Efficient serialization to/from binary
+// DEOPSCSW-331: Complex payload - Include byte in paramset for Event and ObserveEvent
 @State(Scope.Benchmark)
 class ImageDeSerializationBenchmark {
   private final var system: ActorSystem[_]       = _

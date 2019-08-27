@@ -8,6 +8,7 @@ import csw.params.core.models._
 import csw.params.events._
 import org.scalatest.{FunSpec, Matchers}
 
+//DEOPSCSW-331: Event Service Accessible to all CSW component builders
 class EventsTest extends FunSpec with Matchers {
 
   describe("Examples of EventTime") {
@@ -26,6 +27,7 @@ class EventsTest extends FunSpec with Matchers {
     }
   }
 
+  // DEOPSCSW-330: Include complex payloads - paramset in Event and ObserveEvent
   describe("Examples of Events") {
     it("should show usages of ObserveEvent") {
 
@@ -80,6 +82,7 @@ class EventsTest extends FunSpec with Matchers {
       assert(se2 != se4)
     }
 
+    // DEOPSCSW-330: Include complex payloads - paramset in Event and ObserveEvent
     it("should show usages of SystemEvent") {
 
       //#systemevent

@@ -68,11 +68,13 @@ class CommandServiceTestMultiJvm3 extends CommandServiceTest(0)
 // DEOPSCSW-202: Verification of submit commands
 // DEOPSCSW-207: Report on Configuration Command Completion
 // DEOPSCSW-208: Report failure on Configuration Completion command
+// DEOPSCSW-212: Send oneway command
 // DEOPSCSW-217: Execute RPC like commands
 // DEOPSCSW-222: Locking a component for a specific duration
 // DEOPSCSW-224: Inter component command sending
 // DEOPSCSW-225: Allow components to receive commands
 // DEOPSCSW-228: Assist Components with command completion
+// DEOPSCSW-234: CCS accessibility to all CSW component builders
 // DEOPSCSW-313: Support short running actions by providing immediate response
 // DEOPSCSW-321: AkkaLocation provides wrapper for ActorRef[ComponentMessage]
 // DEOPSCSW-623: Make query wait till Started

@@ -18,6 +18,7 @@ import scala.collection.{immutable, mutable}
 import scala.concurrent.duration.DurationLong
 import scala.util.Random
 
+//DEOPSCSW-331: Event Service Accessible to all CSW component builders
 class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Eventually {
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
 

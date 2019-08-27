@@ -21,6 +21,7 @@ import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 import scala.util.Random
 
+//DEOPSCSW-331: Event Service Accessible to all CSW component builders
 //DEOPSCSW-334: Publish an event
 //DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
 //DEOPSCSW-337: Subscribe to an event based on prefix
