@@ -17,7 +17,7 @@ import scala.concurrent.duration.DurationInt
 class TimeServiceSchedulerPerfTest extends ScalaTestWithActorTestKit with FunSuiteLike with BeforeAndAfterAll {
 
   private val sys         = ActorSystem(Behaviors.empty, "test")
-  private val timeService = TimeServiceSchedulerFactory.make()(sys)
+  private val timeService = TimeServiceSchedulerFactory.make()(sys.scheduler, sys.executionContext)
 
   for (scenario <- TestSettings.all) {
     import scenario._

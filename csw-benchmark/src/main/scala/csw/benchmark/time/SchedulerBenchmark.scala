@@ -24,7 +24,7 @@ class SchedulerBenchmark {
 
   @Setup
   def setup(): Unit = {
-    timeServiceScheduler = TimeServiceSchedulerFactory.make()(actorSystem)
+    timeServiceScheduler = TimeServiceSchedulerFactory.make()(actorSystem.scheduler, actorSystem.executionContext)
   }
 
   @TearDown

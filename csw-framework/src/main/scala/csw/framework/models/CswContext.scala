@@ -62,7 +62,7 @@ object CswContext {
 
     val eventService         = eventServiceFactory.make(locationService)
     val alarmService         = alarmServiceFactory.makeClientApi(locationService)
-    val timeServiceScheduler = TimeServiceSchedulerFactory.make()
+    val timeServiceScheduler = TimeServiceSchedulerFactory.make()(typedSystem.scheduler, typedSystem.executionContext)
 
     val loggerFactory       = new LoggerFactory(componentInfo.name)
     val configClientService = ConfigClientFactory.clientApi(typedSystem, locationService)
