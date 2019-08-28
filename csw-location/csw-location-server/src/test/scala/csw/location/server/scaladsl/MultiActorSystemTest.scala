@@ -1,5 +1,7 @@
 package csw.location.server.scaladsl
 
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import csw.location.api.scaladsl.LocationService
 import csw.location.models.Connection.TcpConnection
 import csw.location.models.{ComponentId, ComponentType, TcpRegistration}
 import csw.location.server.commons.TestFutureExtension.RichFuture
@@ -11,15 +13,24 @@ import scala.concurrent.duration.DurationInt
 
 class MultiActorSystemTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
-  val connection: TcpConnection = TcpConnection(ComponentId("exampleTCPService", ComponentType.Service))
+  var connection: TcpConnection = _
 
-  private val system1 = ClusterSettings().onPort(3552).system
-  private val system2 = ClusterSettings().joinLocal(3552).system
+  private var system1: ActorSystem[SpawnProtocol] = _
+  private var system2: ActorSystem[SpawnProtocol] = _
 
-  private val locationService  = LocationServiceFactory.withCluster(CswCluster.withSystem(system1))
-  private val locationService2 = LocationServiceFactory.withCluster(CswCluster.withSystem(system2))
+  private var locationService: LocationService  = _
+  private var locationService2: LocationService = _
 
-  val tcpRegistration: TcpRegistration = TcpRegistration(connection, 1234)
+  var tcpRegistration: TcpRegistration = _
+
+  override protected def beforeAll(): Unit = {
+    connection = TcpConnection(ComponentId("exampleTCPService", ComponentType.Service))
+    system1 = ClusterSettings().onPort(3558).system
+    system2 = ClusterSettings().joinLocal(3558).system
+    locationService = LocationServiceFactory.withCluster(CswCluster.withSystem(system1))
+    locationService2 = LocationServiceFactory.withCluster(CswCluster.withSystem(system2))
+    tcpRegistration = TcpRegistration(connection, 1234)
+  }
 
   override protected def afterAll(): Unit = {
     system2.terminate()
