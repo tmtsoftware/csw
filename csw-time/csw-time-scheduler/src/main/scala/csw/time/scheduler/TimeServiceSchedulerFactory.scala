@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext
 /**
  * Factory to create [[csw.time.scheduler.api.TimeServiceScheduler]]
  */
-object TimeServiceSchedulerFactory {
+class TimeServiceSchedulerFactory {
 
   /**
    * API to create [[csw.time.scheduler.api.TimeServiceScheduler]]
