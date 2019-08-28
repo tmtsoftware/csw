@@ -15,6 +15,7 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import play.api.libs.json.JsObject
 
+// DEOPSCSW-158: Logging service API implementation details to be hidden from component developer
 class SimpleLoggingTest extends LoggingTestSuite with Eventually {
 
   // DEOPSCSW-114: Inherit the code base from persist-logger project

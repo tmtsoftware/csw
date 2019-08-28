@@ -8,6 +8,7 @@ import org.scalatest.Matchers._
 
 import scala.concurrent.duration.DurationDouble
 
+// DEOPSCSW-549: Time service api
 class TMTTimeTest extends FunSuite {
   private val jitter = 100
 

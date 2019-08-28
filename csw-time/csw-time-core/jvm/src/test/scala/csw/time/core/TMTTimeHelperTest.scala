@@ -14,6 +14,7 @@ class TMTTimeHelperTest extends FunSuite with Matchers {
    */
 
   // DEOPSCSW-533: Access parts of UTC date.time in Java and Scala
+  // DEOPSCSW-549: Time service api
   // This test is sufficient to show code works in both Scala and Java
   // since UTCTime.toZonedDateTime is used in both languages.
 
@@ -30,6 +31,7 @@ class TMTTimeHelperTest extends FunSuite with Matchers {
   }
 
   // DEOPSCSW-536: Access parts of TAI date.time in Java and Scala
+  // DEOPSCSW-549: Time service api
   // This test is sufficient to show code works in both Scala and Java
   // since TaiTime.value.atZone is used in both languages.
 
@@ -46,6 +48,7 @@ class TMTTimeHelperTest extends FunSuite with Matchers {
   }
 
   // DEOPSCSW-540: Access parts of Remote time/date in Java and Scala
+  // DEOPSCSW-549: Time service api
   // This test is sufficient to show code works in both Scala and Java
   // since UTCTime.atZone is used in both languages.
   test("should access parts of a remote time") {

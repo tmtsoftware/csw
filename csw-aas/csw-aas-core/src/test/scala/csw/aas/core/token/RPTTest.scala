@@ -13,6 +13,7 @@ import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationDouble
 
+// DEOPSCSW-558: SPIKE: Token containing user info and roles
 // DEOPSCSW-578: Programming Interface for accessing userinfo
 class RPTTest extends FunSuite with MockitoSugar with Matchers with ScalaFutures {
 

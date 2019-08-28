@@ -27,6 +27,7 @@ import static csw.logging.client.utils.Eventually.eventually;
 
 // DEOPSCSW-114: Inherit the code base from persist-logger project
 // DEOPSCSW-115: Format and control logging content
+// DEOPSCSW-158: Logging service API implementation details to be hidden from component developer
 // DEOPSCSW-271: API change
 // DEOPSCSW-278: Create Java API without arguments as suppliers
 public class JLoggerImplAPITest extends JUnitSuite {

@@ -47,6 +47,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
 
   // DEOPSCSW-544: Schedule a task to be executed repeatedly
   // DEOPSCSW-547: Cancel scheduled timers for periodic tasks
+  // DEOPSCSW-549: Time service api
   test("[TAITime] should schedule a task periodically at given interval") {
     val buffer: ArrayBuffer[Int] = ArrayBuffer.empty
     val atomicInt                = new AtomicInteger(0)
@@ -60,6 +61,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
 
   // DEOPSCSW-545: Start a repeating task with initial offset
   // DEOPSCSW-547: Cancel scheduled timers for periodic tasks
+  // DEOPSCSW-549: Time service api
   test("[TAITime] should schedule a task periodically at given interval after start time") {
     val buffer: ArrayBuffer[Int] = ArrayBuffer.empty
     val atomicInt                = new AtomicInteger(0)
@@ -76,6 +78,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
   }
 
   // DEOPSCSW-542: Schedule a task to execute in future
+  // DEOPSCSW-549: Time service api
   test("should schedule multiple tasks at same start time") {
     // we do not want manual config in this test to compare start time with task execution time
     // hence separate instance of actor system is created here which does not use ManualConfig
@@ -102,6 +105,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
   }
 
   // DEOPSCSW-544: Schedule a task to execute in future with actual times
+  // DEOPSCSW-549: Time service api
   test("repeating task that also saves time") {
     // we do not want manual config in this test to compare start time with task execution time
     // hence separate instance of actor system is created here which does not use ManualConfig
@@ -139,6 +143,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
 
   // DEOPSCSW-544: Schedule a task to execute in future with actual times
   // DEOPSCSW-545: Start a repeating task with an initial offset
+  // DEOPSCSW-549: Time service api
   test("repeating task that also saves time but with an offset") {
     // we do not want manual config in this test to compare start time with task execution time
     // hence separate instance of actor system is created here which does not use ManualConfig

@@ -20,6 +20,7 @@ class AuthIntegrationTestMultiJvmNode1 extends AuthIntegrationTest
 class AuthIntegrationTestMultiJvmNode2 extends AuthIntegrationTest
 class AuthIntegrationTestMultiJvmNode3 extends AuthIntegrationTest
 
+//DEOPSCSW-571: Setup sample gateway for piping all requests from single source
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
 class AuthIntegrationTest
     extends LSNodeSpec(config = new MultiNodeTestConfig, mode = "http")
