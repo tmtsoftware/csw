@@ -42,8 +42,8 @@ class ConfigCliAuthTest(ignore: Int)
   import config._
   import system.dispatcher
 
-  private val adminUser     = "kevin"
-  private val adminPassword = "abcd"
+  private val adminUser     = "admin"
+  private val adminPassword = "tmt-admin"
 
   private val testFileUtils = new TestFileUtils(new Settings(ConfigFactory.load()))
 
