@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
 
 public class JConfigClientExampleTest extends JUnitSuite {
 
-    // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
     // DEOPSCSW-592: Create csw testkit for component writers
     @ClassRule
     public static final FrameworkTestKitJunitResource testKit = new FrameworkTestKitJunitResource(List.of(JCSWService.ConfigServer));
@@ -85,6 +84,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
         //#exists
     }
 
+    // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
     @Test
     public void testGetActive() throws ExecutionException, InterruptedException {
         //#getActive
@@ -98,6 +98,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
         //#getActive
     }
 
+    // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
     @Test
     public void testCreateUpdateDelete() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
         //#create
@@ -132,6 +133,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
         //#delete
     }
 
+    // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
     @Test
     public void testGetById() throws ExecutionException, InterruptedException {
         //#getById
@@ -144,6 +146,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
         //#getById
     }
 
+    // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
     @Test
     public void testGetLatest() throws ExecutionException, InterruptedException {
         //#getLatest
@@ -162,6 +165,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
         //#getLatest
     }
 
+    // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
     @Test
     public void testGetByTime() throws ExecutionException, InterruptedException {
         //#getByTime
@@ -183,6 +187,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
         //#getByTime
     }
 
+    // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
     @Test
     public void testList() throws ExecutionException, InterruptedException {
         //#list
@@ -224,6 +229,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
         //#list
     }
 
+    // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
     @Test
     public void testHistory() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
         //#history
@@ -252,6 +258,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
         //#history
     }
 
+    // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
     @Test
     public void testActiveFileManagement() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
         //#active-file-mgmt

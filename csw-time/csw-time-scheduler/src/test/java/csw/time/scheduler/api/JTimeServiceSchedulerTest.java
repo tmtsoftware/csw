@@ -36,6 +36,7 @@ public class JTimeServiceSchedulerTest extends JUnitSuite {
     //------------------------------Scheduling-------------------------------
 
     // DEOPSCSW-542: Schedule a task to execute in future
+    // DEOPSCSW-549: Time service api
     @Test
     public void should_schedule_task_at_start_time() {
         TestProbe testProbe = new TestProbe(untypedSystem);
@@ -53,6 +54,7 @@ public class JTimeServiceSchedulerTest extends JUnitSuite {
     }
 
     // DEOPSCSW-543: Notification on Scheduled timer expiry
+    // DEOPSCSW-549: Time service api
     @Test
     public void should_schedule_message_at_start_time() {
         TestProbe testProbe = new TestProbe(untypedSystem);
@@ -69,6 +71,7 @@ public class JTimeServiceSchedulerTest extends JUnitSuite {
 
     // DEOPSCSW-544: Schedule a task to be executed repeatedly
     // DEOPSCSW-547: Cancel scheduled timers for periodic tasks
+    // DEOPSCSW-549: Time service api
     @Test
     public void should_schedule_a_task_periodically_at_given_interval() {
         List<String> list = new ArrayList<>();
@@ -82,6 +85,7 @@ public class JTimeServiceSchedulerTest extends JUnitSuite {
     }
 
     // DEOPSCSW-546: Notification on Scheduled Periodic timer expiry
+    // DEOPSCSW-549: Time service api
     @Test
     public void should_schedule_a_message_periodically_at_given_interval() {
         Cancellable cancellable = timeServiceScheduler.schedulePeriodically(Duration.ofMillis(100), untypedTestKit.getRef(), "echo");
@@ -96,6 +100,7 @@ public class JTimeServiceSchedulerTest extends JUnitSuite {
 
     //DEOPSCSW-545: Start a repeating task with initial offset
     //DEOPSCSW-547: Cancel scheduled timers for periodic tasks
+    // DEOPSCSW-549: Time service api
     @Test
     public void should_schedule_a_task_periodically_at_given_interval_after_start_time() {
         List<String> list = new ArrayList<>();
@@ -113,6 +118,7 @@ public class JTimeServiceSchedulerTest extends JUnitSuite {
     }
 
     // DEOPSCSW-546: Notification on Scheduled Periodic timer expiry
+    // DEOPSCSW-549: Time service api
     @Test
     public void should_schedule_a_message_periodically_at_given_interval_after_start_time() {
         TAITime startTime = new TAITime(TAITime.now().value().plusSeconds(1));
@@ -129,6 +135,7 @@ public class JTimeServiceSchedulerTest extends JUnitSuite {
     }
 
     //DEOPSCSW-547: Cancel scheduled timers for single scheduled tasks
+    // DEOPSCSW-549: Time service api
     @Test
     public void should_cancel_single_scheduled_task() {
         TestProbe testProbe = new TestProbe(untypedSystem);

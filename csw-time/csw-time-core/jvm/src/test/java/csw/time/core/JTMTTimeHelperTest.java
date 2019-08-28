@@ -20,6 +20,7 @@ public class JTMTTimeHelperTest extends JUnitSuite {
     private TestProperties testProperties = JTestProperties.instance();
 
     //DEOPSCSW-541: PTP accuracy and precision while reading remote location time
+    //DEOPSCSW-549: Time service api
     @Test
     public void should_get_maximum_precision_while_reading_remote_location_utc_time() {
         eventually(java.time.Duration.ofSeconds(5), () -> {
@@ -35,7 +36,8 @@ public class JTMTTimeHelperTest extends JUnitSuite {
 
     }
 
-    // DEOPSCSW-539: Ability to read local time that is synchronized with PTP time, at remote observing sites
+    //DEOPSCSW-539: Ability to read local time that is synchronized with PTP time, at remote observing sites
+    //DEOPSCSW-549: Time service api
     @Test
     public void should_get_hawaii_local_date_time_and_date_time_at_provided_zone_id_from_utctime() {
         ZoneId hawaiiZone = ZoneId.of("US/Hawaii");

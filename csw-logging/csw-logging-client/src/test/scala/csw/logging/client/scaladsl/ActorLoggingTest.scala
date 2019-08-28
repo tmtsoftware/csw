@@ -28,6 +28,7 @@ class ActorLoggingTest extends LoggingTestSuite {
   // DEOPSCSW-117: Provide unique name for each logging instance of components
   // DEOPSCSW-119: Associate source with each log message
   // DEOPSCSW-121: Define structured tags for log messages
+  // DEOPSCSW-158: Logging service API implementation details to be hidden from component developer
   test("messages logged from actor should contain component name, file name, class name, line number and actor path") {
 
     sendMessagesToActor()
