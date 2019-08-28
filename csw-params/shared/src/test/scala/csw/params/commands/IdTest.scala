@@ -4,7 +4,7 @@ import org.scalatest.{FunSuite, Matchers}
 
 //DEOPSCSW-205 Return unique id on successful command verification
 class IdTest extends FunSuite with Matchers {
-
+  // No longer needed
   /*
   test("should able to create setup commands having unique runId") {
 

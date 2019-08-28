@@ -115,14 +115,14 @@ public class JCommandIntegrationTest extends JUnitSuite {
     @Test
     public void testCommandExecutionBetweenComponents() throws Exception {
 
-        // immediate response - CompletedWithResult
+        // immediate response - Completed with a result
         Key<Integer> intKey1 = JKeyType.IntKey().make("encoder");
         Parameter<Integer> intParameter1 = intKey1.set(22, 23);
         Setup imdResCommand = new Setup(prefix(), immediateResCmd(), Optional.empty()).add(intParameter1);
 
         CompletableFuture<CommandResponse.SubmitResponse> imdResCmdResponseCompletableFuture = hcdCmdService.submitAndWait(imdResCommand, timeout);
         CommandResponse.SubmitResponse actualImdCmdResponse = imdResCmdResponseCompletableFuture.get();
-        Assert.assertTrue(actualImdCmdResponse instanceof CommandResponse.CompletedWithResult);
+        Assert.assertTrue(actualImdCmdResponse instanceof CommandResponse.Completed);
 
         Setup immediateCmd = new Setup(prefix(), immediateCmd(), Optional.empty()).add(intParameter1);
         //#immediate-response
@@ -177,9 +177,9 @@ public class JCommandIntegrationTest extends JUnitSuite {
         CompletableFuture<Optional<Integer>> longRunningResultF =
                 hcdCmdService.submitAndWait(longRunningSetup, timeout)
                         .thenCompose(response -> {
-                            if (response instanceof CommandResponse.CompletedWithResult) {
+                            if (response instanceof CommandResponse.Completed) {
                                 // This extracts and returns the the first value of parameter encoder
-                                Result result = ((CommandResponse.CompletedWithResult) response).result();
+                                Result result = ((CommandResponse.Completed) response).result();
                                 Optional<Integer> rvalue = Optional.of(result.jGet(encoder).orElseThrow().head());
                                 return CompletableFuture.completedFuture(rvalue);
                             } else {
@@ -212,9 +212,9 @@ public class JCommandIntegrationTest extends JUnitSuite {
 
         CompletableFuture<Optional<Integer>> intF =
                 longRunningCommandResultF.thenCompose(response -> {
-            if (response instanceof CommandResponse.CompletedWithResult) {
+            if (response instanceof CommandResponse.Completed) {
                 // This extracts and returns the the first value of parameter encoder
-                Result result = ((CommandResponse.CompletedWithResult) response).result();
+                Result result = ((CommandResponse.Completed) response).result();
                 Optional<Integer> rvalue = Optional.of(result.jGet(encoder).orElseThrow().head());
                 return CompletableFuture.completedFuture(rvalue);
             } else {
@@ -231,9 +231,9 @@ public class JCommandIntegrationTest extends JUnitSuite {
 
         CompletableFuture<Optional<Integer>> int3F =
                 hcdCmdService.queryFinal(sresponse.runId(), timeout).thenCompose(response -> {
-                    if (response instanceof CommandResponse.CompletedWithResult) {
+                    if (response instanceof CommandResponse.Completed) {
                         // This extracts and returns the the first value of parameter encoder
-                        Result result = ((CommandResponse.CompletedWithResult) response).result();
+                        Result result = ((CommandResponse.Completed) response).result();
                         Optional<Integer> rvalue = Optional.of(result.jGet(encoder).orElseThrow().head());
                         return CompletableFuture.completedFuture(rvalue);
                     } else {
@@ -282,7 +282,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
 
         //#query
         CompletableFuture<CommandResponse.QueryResponse> queryResponseF2 = hcdCmdService.query(sresponse.runId(), timeout);
-        Assert.assertTrue(queryResponseF2.get() instanceof CommandResponse.CompletedWithResult);
+        Assert.assertTrue(queryResponseF2.get() instanceof CommandResponse.Completed);
         //#query
 
         Parameter<Integer> encoderParam = JKeyType.IntKey().make("encoder").set(22, 23);
@@ -301,7 +301,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         List<CommandResponse.SubmitResponse> submitAllResponse = submitAllF.get();
         Assert.assertEquals(submitAllResponse.size(), 3);
         Assert.assertTrue(submitAllResponse.get(0) instanceof CommandResponse.Completed);
-        Assert.assertTrue(submitAllResponse.get(1) instanceof CommandResponse.CompletedWithResult);
+        Assert.assertTrue(submitAllResponse.get(1) instanceof CommandResponse.Completed);
         Assert.assertTrue(submitAllResponse.get(2) instanceof CommandResponse.Invalid);
         //#submitAll
 

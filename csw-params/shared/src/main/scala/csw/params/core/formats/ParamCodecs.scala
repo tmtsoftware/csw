@@ -157,7 +157,6 @@ trait ParamCodecs extends CommonCodecs {
   implicit lazy val matchingCommandResponseCodec: Codec[MatchingResponse]                 = deriveCodec[MatchingResponse]
   private[formats] implicit lazy val acceptedCodec: Codec[Accepted]                       = deriveCodec[Accepted]
   private[formats] implicit lazy val startedCodec: Codec[Started]                         = deriveCodec[Started]
-  private[formats] implicit lazy val completedWithResultCodec: Codec[CompletedWithResult] = deriveCodec[CompletedWithResult]
   private[formats] implicit lazy val completedCodec: Codec[Completed]                     = deriveCodec[Completed]
   private[formats] implicit lazy val invalidCodec: Codec[Invalid]                         = deriveCodec[Invalid]
   private[formats] implicit lazy val errorCodec: Codec[Error]                             = deriveCodec[Error]

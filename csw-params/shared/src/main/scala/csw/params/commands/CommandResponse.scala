@@ -84,14 +84,14 @@ object CommandResponse {
    * @param runId of command for which this response is created
    * @param result describing the result of completion
    */
-  case class CompletedWithResult(commandName: CommandName, runId: Id, result: Result) extends SubmitResponse
+  case class Completed(commandName: CommandName, runId: Id, result: Result = Result.emptyResult)
+      extends SubmitResponse
+      with MatchingResponse {
 
-  /**
-   * Represents a positive response stating completion of command
-   *
-   * @param runId of command for which this response is created
-   */
-  case class Completed(commandName: CommandName, runId: Id) extends SubmitResponse with MatchingResponse
+    def hasResult = result.nonEmpty
+
+    def this(commandName: CommandName, runId: Id) = this(commandName, runId, Result())
+  }
 
   /**
    * Represents a negative response invalidating a command received
@@ -157,8 +157,8 @@ object CommandResponse {
    * @return true if it is positive
    */
   def isPositive(qr: QueryResponse): Boolean = qr match {
-    case Completed(_, _) | CompletedWithResult(_, _, _) => true
-    case _                                              => false
+    case Completed(_, _, _) => true
+    case _                  => false
   }
 
   /**

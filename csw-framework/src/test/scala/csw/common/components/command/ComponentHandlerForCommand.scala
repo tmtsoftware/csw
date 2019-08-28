@@ -67,7 +67,7 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
       case s @ Setup(_, `immediateCmd`, _, _) =>
         Completed(s.commandName, runId)
       case s @ Setup(_, `immediateResCmd`, _, _) =>
-        CompletedWithResult(controlCommand.commandName, runId, Result(s.source, Set(KeyType.IntKey.make("encoder").set(20))))
+        Completed(controlCommand.commandName, runId, Result(KeyType.IntKey.make("encoder").set(20)))
       case c =>
         Error(controlCommand.commandName, runId, s"Some other command received: $c")
     }
@@ -131,12 +131,12 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
   // This simulates a long command that has been started and finishes with a result
   private def processCommandWithoutMatcher(runId: Id, controlCommand: ControlCommand): Unit = {
     val param: Parameter[Int] = encoder.set(20)
-    val result                = Result(controlCommand.source, Set(param))
+    val result                = Result(param)
 
     // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
     // This simulates a long running command that eventually updates with a result
     Source
-      .fromFuture(Future(CompletedWithResult(controlCommand.commandName, runId, result)))
+      .fromFuture(Future(Completed(controlCommand.commandName, runId, result)))
       .delay(500.milli)
       .runWith(Sink.head)
       .onComplete {

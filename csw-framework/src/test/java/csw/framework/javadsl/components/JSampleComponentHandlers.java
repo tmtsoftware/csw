@@ -119,8 +119,8 @@ public class JSampleComponentHandlers extends JComponentHandlers {
             return new CommandResponse.Completed(controlCommand.commandName(), runId);
         } else if (controlCommand.commandName().equals(immediateResCmd())) {
             Parameter<Integer> param = JKeyType.IntKey().make("encoder").set(22);
-            Result result = new Result(controlCommand.source().prefix()).add(param);
-            return new CommandResponse.CompletedWithResult(controlCommand.commandName(), runId, result);
+            Result result = new Result().add(param);
+            return new CommandResponse.Completed(controlCommand.commandName(), runId, result);
         } else if (controlCommand.commandName().equals(ComponentStateForCommand.matcherCmd())) {
             processCommandWithMatcher(controlCommand);
             return new CommandResponse.Started(controlCommand.commandName(), runId);
@@ -136,7 +136,8 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     //#addOrUpdateCommand
     private CommandResponse.SubmitResponse crmAddOrUpdate(ControlCommand controlCommand, Id runId) {
         // This simulates some worker task doing something that finishes after onSubmit returns
-        Runnable task = () -> commandUpdatePublisher.update(new CommandResponse.Completed(controlCommand.commandName(), runId));
+        Runnable task = () ->
+                commandUpdatePublisher.update(new CommandResponse.Completed(controlCommand.commandName(), runId));
 
         // Wait a bit and then set CRM to Completed
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
@@ -184,10 +185,10 @@ public class JSampleComponentHandlers extends JComponentHandlers {
             return new CommandResponse.Started(controlCommand.commandName(), runId);
         } else {
             Parameter<Integer> parameter = JKeyType.IntKey().make("encoder").set(20);
-            Result result = new Result(controlCommand.source().prefix()).add(parameter);
+            Result result = new Result().add(parameter);
 
             // Set CRM to Completed after 1 second
-            sendCRM(new CommandResponse.CompletedWithResult(controlCommand.commandName(), runId, result));
+            sendCRM(new CommandResponse.Completed(controlCommand.commandName(), runId, result));
             return new CommandResponse.Started(controlCommand.commandName(), runId);
         }
 

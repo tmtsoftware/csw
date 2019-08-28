@@ -145,7 +145,7 @@ class CommandServiceTest(ignore: Int)
       val invalidCommandF = assemblyCmdService.submitAndWait(invalidSetup)
       async {
         await(invalidCommandF) match {
-          case Completed(invalidSetup.commandName, _) =>
+          case Completed(invalidSetup.commandName, _, _) =>
           // Do Completed thing
           case Invalid(invalidSetup.commandName, _, _) =>
           //issue shouldBe a[Invalid]
@@ -179,7 +179,8 @@ class CommandServiceTest(ignore: Int)
 
       val longRunningResultF = async {
         await(assemblyCmdService.submitAndWait(longRunningSetup)) match {
-          case CompletedWithResult(longRunningSetup.commandName, _, result) =>
+          case Completed(longRunningSetup.commandName, _, result) =>
+            result.nonEmpty shouldBe true
             Some(result(encoder).head)
 
           case otherResponse =>
@@ -212,7 +213,7 @@ class CommandServiceTest(ignore: Int)
 
         // Now wait for completion and result
         await(assemblyCmdService.queryFinal(longRunningRunId)) match {
-          case CompletedWithResult(_, _, result) =>
+          case Completed(_, _, result) =>
             Some(result(encoder).head)
 
           case otherResponse =>
@@ -231,7 +232,7 @@ class CommandServiceTest(ignore: Int)
 
         // Use queryFinal and runId to wait for completion and result
         await(assemblyCmdService.queryFinal(runId)) match {
-          case CompletedWithResult(_, _, result) =>
+          case Completed(_, _, result) =>
             Some(result(encoder).head)
 
           case otherResponse =>
@@ -279,7 +280,7 @@ class CommandServiceTest(ignore: Int)
       //#query
       // Check on a command that was completed in the past
       val queryValue = Await.result(assemblyCmdService.query(longRunningRunId), timeout.duration)
-      queryValue shouldBe a[CompletedWithResult]
+      queryValue shouldBe a[Completed]
       //#query
 
       val submitAllSetup1       = Setup(prefix, immediateCmd, obsId)
@@ -293,7 +294,7 @@ class CommandServiceTest(ignore: Int)
       val submitAllResponse = Await.result(submitAllF, timeout.duration)
       submitAllResponse.length shouldBe 3
       submitAllResponse(0) shouldBe a[Completed]
-      submitAllResponse(1) shouldBe a[CompletedWithResult]
+      submitAllResponse(1) shouldBe a[Completed]
       submitAllResponse(2) shouldBe a[Invalid]
       //#submitAll
 
@@ -479,7 +480,7 @@ class CommandServiceTest(ignore: Int)
       // send command with lock token and expect command processing response with result
       val assemblySetup2 = Setup(prefix, immediateResCmd, obsId)
       assemblyLocation.componentRef ! Submit(assemblySetup2, submitResponseProbe.ref)
-      submitResponseProbe.expectMessageType[CompletedWithResult](5.seconds)
+      submitResponseProbe.expectMessageType[Completed](5.seconds)
 
       enterBarrier("command-when-locked")
     }
