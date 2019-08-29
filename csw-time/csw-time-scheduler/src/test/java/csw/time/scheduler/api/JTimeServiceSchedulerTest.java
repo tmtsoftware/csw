@@ -30,7 +30,7 @@ public class JTimeServiceSchedulerTest extends JUnitSuite {
     private ManualTime manualTime = ManualTime.get(typedSystem);
 
     private TimeServiceScheduler timeServiceScheduler =
-            new TimeServiceSchedulerFactory().make(typedSystem.scheduler(), typedSystem.executionContext());
+            new TimeServiceSchedulerFactory(typedSystem.scheduler()).make(typedSystem.executionContext());
 
     private ActorSystem untypedSystem = ActorSystemAdapter.toUntyped(typedSystem);
     private TestKit untypedTestKit = new TestKit(untypedSystem);
