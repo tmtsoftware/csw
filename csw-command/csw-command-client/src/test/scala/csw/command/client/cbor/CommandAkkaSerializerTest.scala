@@ -246,7 +246,7 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
     serializer.fromBinary(bytes, Some(components.getClass)) shouldEqual components
   }
 
-  test("should use command serializer for (de)serialize LoadAndStartSequence") {
+  test("should use command serializer for (de)serialize LoadAndProcessSequence") {
     val submitResponseProbe = TestProbe[SubmitResponse]
 
     val command: SequenceCommand = Setup(Prefix("csw.move"), CommandName("c1"), Some(ObsId("obsId"))).copy(runId = Id())

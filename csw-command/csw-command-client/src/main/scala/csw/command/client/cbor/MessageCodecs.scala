@@ -110,5 +110,5 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
 
   // ************************ SequencerMsg Codecs ********************
 
-  implicit lazy val loadAndStartSequenceCodec: Codec[LoadAndProcessSequence] = deriveCodec[LoadAndProcessSequence]
+  implicit lazy val loadAndProcessSequenceCodec: Codec[LoadAndProcessSequence] = deriveCodec[LoadAndProcessSequence]
 }
