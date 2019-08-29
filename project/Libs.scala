@@ -51,8 +51,8 @@ object Libs {
   val `jboss-logging`   = "org.jboss.logging"             % "jboss-logging"   % "3.4.1.Final"
   val `config`          = "com.typesafe"                  % "config"          % "1.3.4"
   val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.3.0"
-  val `caffeine`        = "com.github.ben-manes.caffeine" % "caffeine"        % "2.8.0"
-
+  val `caffeine`        = "com.github.ben-manes.caffeine" % "caffeine"        % "2.8.0",
+  val `dns4s`           = "com.github.mkroli"             %% "dns4s-akka"     % "0.11"
 }
 
 object Borer {

@@ -58,6 +58,7 @@ object Dependencies {
       Libs.`akka-management-cluster-http`,
       AkkaHttp.`akka-http`,
       Borer.`borer-compat-akka`.value,
+      Libs.`dns4s`,
       Akka.`akka-actor-testkit-typed` % Test,
       Libs.`scalatest`.value          % Test,
       Libs.`junit`                    % Test,
@@ -102,7 +103,7 @@ object Dependencies {
       Libs.`scalatest`.value     % Test,
     )
   )
-  
+
   val ConfigApi = Def.setting(
     Seq(
       Akka.`akka-actor`,
@@ -312,7 +313,7 @@ object Dependencies {
       Libs.`scalatest`.value % Test
     )
   )
-  
+
   val AlarmApi = Def.setting(
     Seq(
       Akka.`akka-actor`,
