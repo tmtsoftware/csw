@@ -18,7 +18,7 @@ import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.messages._
-import csw.command.client.messages.sequencer.LoadAndStartSequence
+import csw.command.client.messages.sequencer.LoadAndProcessSequence
 import csw.command.client.models.framework.LockingResponse._
 import csw.command.client.models.framework.PubSub.{Publish, PublisherMessage, SubscriberMessage}
 import csw.command.client.models.framework.{PubSub, _}
@@ -110,5 +110,5 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
 
   // ************************ SequencerMsg Codecs ********************
 
-  implicit lazy val loadAndStartSequenceCodec: Codec[LoadAndStartSequence] = deriveCodec[LoadAndStartSequence]
+  implicit lazy val loadAndStartSequenceCodec: Codec[LoadAndProcessSequence] = deriveCodec[LoadAndProcessSequence]
 }

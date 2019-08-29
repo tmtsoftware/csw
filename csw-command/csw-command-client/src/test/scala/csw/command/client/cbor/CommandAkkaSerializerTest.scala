@@ -19,7 +19,7 @@ import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.messages._
-import csw.command.client.messages.sequencer.LoadAndStartSequence
+import csw.command.client.messages.sequencer.LoadAndProcessSequence
 import csw.command.client.models.framework.LockingResponse._
 import csw.command.client.models.framework.PubSub.{Subscribe, SubscribeOnly, Unsubscribe}
 import csw.command.client.models.framework.SupervisorLifecycleState._
@@ -251,12 +251,12 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
 
     val command: SequenceCommand = Setup(Prefix("csw.move"), CommandName("c1"), Some(ObsId("obsId"))).copy(runId = Id())
     val sequence                 = Sequence(command)
-    val loadAndStartSequence     = LoadAndStartSequence(sequence, submitResponseProbe.ref)
+    val loadAndProcessSequence   = LoadAndProcessSequence(sequence, submitResponseProbe.ref)
 
-    val serializer = serialization.findSerializerFor(loadAndStartSequence)
+    val serializer = serialization.findSerializerFor(loadAndProcessSequence)
     serializer.getClass shouldBe classOf[CommandAkkaSerializer]
 
-    val bytes = serializer.toBinary(loadAndStartSequence)
-    serializer.fromBinary(bytes, Some(loadAndStartSequence.getClass)) shouldEqual loadAndStartSequence
+    val bytes = serializer.toBinary(loadAndProcessSequence)
+    serializer.fromBinary(bytes, Some(loadAndProcessSequence.getClass)) shouldEqual loadAndProcessSequence
   }
 }

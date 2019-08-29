@@ -6,6 +6,6 @@ import csw.params.commands.Sequence
 import csw.serializable.CommandSerializable
 
 trait SequencerMsg
-final case class LoadAndStartSequence(sequence: Sequence, replyTo: ActorRef[SubmitResponse])
+final case class LoadAndProcessSequence(sequence: Sequence, replyTo: ActorRef[SubmitResponse])
     extends SequencerMsg
     with CommandSerializable
