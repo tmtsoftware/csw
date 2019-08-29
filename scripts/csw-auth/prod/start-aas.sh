@@ -151,8 +151,8 @@ function addTestUsers {
     if ${exampleDemo} ; then
         ./add-user-keycloak.sh -u test-user -p abcd -r example
     else
-        ./add-user-keycloak.sh -u admin -p "tmt-admin" -r TMT
-        ./add-user-keycloak.sh -u dev -p "tmt-dev" -r TMT
+        ./add-user-keycloak.sh -u "config-admin" -p "config-admin" -r TMT
+        ./add-user-keycloak.sh -u "config-user" -p "config-user" -r TMT
     fi
 }
 
@@ -166,7 +166,7 @@ function associateRoleToTestUsers {
         ./kcadm.sh add-roles --uusername test-user --rolename example-admin-role -r example
     else
         echo "[INFO] Associate roles to test users"
-        ./kcadm.sh add-roles --uusername admin --rolename admin --cclientid csw-config-server -r TMT
+        ./kcadm.sh add-roles --uusername "config-admin" --rolename admin --cclientid csw-config-server -r TMT
     fi
 }
 
