@@ -9,6 +9,35 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
+## [CSW v1.0.0] - 2019-08-30
+
+This is the first major release of the TMT Common Software for project stakeholders. 
+See [here](https://tmtsoftware.github.io/csw/1.0.0/) for a detailed documentation of this version of the CSW software.
+
+### Changes
+- Replaced Kryo serialization with Borer-CBOR for Akka actor messages
+- Replaced Play-JSON with Borer-JSON in Location service, Configuration Service and Admin Service
+- Made Location, Config, Logging and Alarm service models to be cross compilable for ScalaJs
+- Removed `BAD` and `TEST` subsystems
+- Added SequencerCommandService and docs for it
+- Separated Command service docs technical from Framework docs
+
+### Api changes
+- CommandService
+    - `submit` now returns its initial response (e.g. `Started`) instead of waiting for the final response 
+    - Added `submitAndWait` which will submit the command and wait for its final response
+    - Rename `submitAll` to `submitAllAndWait` in Command service as it waits for final response of all commands
+- `Prefix` creation will throw `NoSuchElementException` if invalid subsystem is provided
+- Replaced `ActorRef` with ActorRef `URI` in `AkkaRegistration`  
+
+### Version Upgrades
+- Scala version upgrade to 2.13.0
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/1.0.0/
+- Scaladoc: https://tmtsoftware.github.io/csw/1.0.0/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/1.0.0/api/java/index.html
+
 ## [CSW v1.0.0-RC4] - 2019-08-28
 
 This is the release candidate 4 for the first major release of the TMT Common Software for project stakeholders.
