@@ -5,8 +5,10 @@ import akka.actor.CoordinatedShutdown
 import csw.location.server.cli.{ArgsParser, Options}
 import csw.location.server.commons.ClusterAwareSettings
 import csw.location.server.commons.CoordinatedShutdownReasons.FailureReason
+import csw.location.server.dns.LocationDnsActor
 import csw.location.server.internal.ServerWiring
 
+import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 import scala.util.control.NonFatal
 
@@ -35,6 +37,8 @@ object Main extends App {
           startLogging(name, clusterSettings.hostname)
 
           val locationBindingF = locationHttpService.start()
+
+          Await.result(LocationDnsActor.start(locationService), 2.seconds)
 
           coordinatedShutdown.addTask(
             CoordinatedShutdown.PhaseServiceUnbind,
