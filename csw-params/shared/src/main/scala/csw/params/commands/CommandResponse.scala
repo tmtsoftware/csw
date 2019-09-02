@@ -12,6 +12,12 @@ sealed trait CommandResponse extends CommandSerializable {
    * @return the runId of command for which this response is created
    */
   def runId: Id
+
+  /**
+   * A helper method to get the name of the command associated with this command response
+   *
+   * @return the CommandName of this response
+   */
   def commandName: CommandName
 }
 
@@ -64,6 +70,7 @@ object CommandResponse {
   /**
    * Represents a final response stating acceptance of a command received
    *
+   * @param commandName the commandName associated with this response
    * @param runId the runId of command for which this response is created
    */
   case class Accepted(commandName: CommandName, runId: Id)
@@ -74,6 +81,7 @@ object CommandResponse {
   /**
    * Represents an intermediate response stating a long running command has been started
    *
+   * @param commandName the commandName associated with this response
    * @param runId of command for which this response is created
    */
   case class Started(commandName: CommandName, runId: Id) extends SubmitResponse
@@ -81,21 +89,30 @@ object CommandResponse {
   /**
    * Represents a positive response stating completion of command
    *
+   * @param commandName the commandName associated with this response
    * @param runId of command for which this response is created
-   * @param result describing the result of completion
+   * @param result describing the result of completion if needed
    */
   case class Completed(commandName: CommandName, runId: Id, result: Result = Result.emptyResult)
       extends SubmitResponse
       with MatchingResponse {
 
-    def hasResult = result.nonEmpty
+    /**
+    * Check to see if this response has a result
+     * @return `true` if the response contains a non-empty result, `false` otherwise.
+     */
+    def hasResult:Boolean = result.nonEmpty
 
+    /**
+     * A java helper to construct a Completed response
+     */
     def this(commandName: CommandName, runId: Id) = this(commandName, runId, Result())
   }
 
   /**
    * Represents a negative response invalidating a command received
    *
+   * @param commandName the commandName associated with this response
    * @param runId of command for which this response is created
    * @param issue describing the cause of invalidation
    */
@@ -109,6 +126,7 @@ object CommandResponse {
   /**
    * Represents a negative response that describes an error in executing the command
    *
+   * @param commandName the commandName associated with this response
    * @param runId of command for which this response is created
    * @param message describing the reason or cause or action item of the error encountered while executing the command
    */
@@ -117,6 +135,7 @@ object CommandResponse {
   /**
    * Represents a negative response that describes the cancellation of command
    *
+   * @param commandName the commandName associated with this response
    * @param runId of command for which this response is created
    */
   case class Cancelled(commandName: CommandName, runId: Id) extends SubmitResponse
@@ -124,6 +143,7 @@ object CommandResponse {
   /**
    * Represents a negative response stating that a component is Locked and command was not validated or executed
    *
+   * @param commandName the commandName associated with this response
    * @param runId of command for which this response is created
    */
   case class Locked(commandName: CommandName, runId: Id)
@@ -135,6 +155,7 @@ object CommandResponse {
   /**
    * A negative response stating that a command with given runId is not available or cannot be located
    *
+   * @param commandName the commandName associated with this response
    * @param runId of command for which this response is created
    */
   case class CommandNotAvailable(commandName: CommandName, runId: Id) extends QueryResponse
@@ -191,6 +212,7 @@ object CommandResponse {
     case _             => false
   }
 
+  // Provided for the pubsub interface
   object SubmitResponse {
     implicit object NameableSubmitResponse extends Nameable[SubmitResponse] {
       override def name(state: SubmitResponse): StateName = state.stateName
