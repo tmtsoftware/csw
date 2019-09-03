@@ -35,10 +35,15 @@
 
 ### Release csw-js (if needed)
 - Release `csw-js` if keycloak version is updated in csw
+1. Update release notes (`notes/<version>.markdown`) in `csw`
+2. Update top level `CHANGELOG.md`
+3. Update top level `README.md`
+4. Refer the RELEASING.md of csw-js
 
 ### Release csw-client
 1. Update the csw version in `build.sbt`
 2. Release `csw-client` with the latest `VERSION` of csw.
+    There is not pieline to release csw-client but only `git tag v0.0.0` and `git push origin v0.0.0` 
 
 #### Note - `VERSION` tag is version number with 'v' as prefix. For eg. `v0.0.0`
 

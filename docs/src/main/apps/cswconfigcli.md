@@ -20,8 +20,19 @@ A command line application that facilitates interaction with the Configuration S
 * getActive
 
 ## login
-`create, update, delete, setActiveVersion & resetActiveVersion` commands are admin protected. In order to use those, you need to login first.
-You need to have valid user name and password to login which has the admin role assigned to it.
+`create, update, delete, setActiveVersion & resetActiveVersion` commands are protected behind authorization
+ and require admin role. In order to use those, you need to login a with an account having `admin` privileges.
+
+For development and testing purposes, AAS comes pre-bundled with a user account for config service
+
+```yaml
+username = config-admin
+password = config-admin
+```
+
+@@@ note
+These credentials will not be available in actual production environment.
+@@@ 
 
 For development and testing purposes, AAS comes pre-bundled with the following user accounts for config service:
 
