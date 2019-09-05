@@ -14,6 +14,7 @@ import org.scalatest.{EitherValues, FunSuite, Matchers}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
+//DEOPSCSW-558: SPIKE: Token containing user info and roles
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
 class TokenVerifierTest extends FunSuite with MockitoSugar with Matchers with EitherValues {
   private val keycloakTokenVerifier: KeycloakTokenVerifier = mock[KeycloakTokenVerifier]

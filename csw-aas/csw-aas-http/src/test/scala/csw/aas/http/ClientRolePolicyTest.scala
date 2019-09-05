@@ -43,6 +43,8 @@ class ClientRolePolicyTest extends FunSuite with MockitoSugar with Directives wi
     }
   }
 
+  // DEOPSCSW-572: REQ: Associate each role with set of privileges/restrictions
+  // DEOPSCSW-573: REQ:Support configurable roles
   test("clientRole policy should return AuthenticationFailedRejection when token is not present") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
@@ -64,6 +66,8 @@ class ClientRolePolicyTest extends FunSuite with MockitoSugar with Directives wi
     }
   }
 
+  // DEOPSCSW-572: REQ: Associate each role with set of privileges/restrictions
+  // DEOPSCSW-573: REQ:Support configurable roles
   test("clientRole policy should return AuthorizationFailedRejection when token does not have clientRole") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
@@ -97,6 +101,8 @@ class ClientRolePolicyTest extends FunSuite with MockitoSugar with Directives wi
     }
   }
 
+  // DEOPSCSW-572: REQ: Associate each role with set of privileges/restrictions
+  // DEOPSCSW-573: REQ:Support configurable roles
   test("clientRole policy should return 200 OK when token is valid & has clientRole") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")

@@ -178,6 +178,7 @@ class MetadataServiceModuleTest
     alarmStatus shouldEqual AlarmStatus().copy(alarmTime = alarmStatus.alarmTime)
   }
 
+  // DEOPSCSW-443: Model to represent Alarm Activation status
   // DEOPSCSW-448: Set Activation status for an alarm entity
   test("activate should activate an inactive alarm") {
     initTestAlarms()
@@ -190,6 +191,7 @@ class MetadataServiceModuleTest
     getMetadata(cpuIdleAlarmKey).await.activationStatus shouldBe Active
   }
 
+  // DEOPSCSW-443: Model to represent Alarm Activation status
   // DEOPSCSW-448: Set Activation status for an alarm entity
   test("deActivate should deactivate an active alarm") {
     initTestAlarms()
@@ -202,6 +204,7 @@ class MetadataServiceModuleTest
     getMetadata(outOfRangeOffloadAlarmKey).await.activationStatus shouldBe Inactive
   }
 
+  // DEOPSCSW-443: Model to represent Alarm Activation status
   // DEOPSCSW-448: Set Activation status for an alarm entity
   test("should throw exception when tried to activate/deactivate alarm which is not present in alarm store") {
     val invalidKey = AlarmKey(Subsystem.CSW, "invalid", "invalid")

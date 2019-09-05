@@ -24,6 +24,7 @@ public class JTMTTimeTest extends JUnitSuite {
     //------------------------------UTC-------------------------------
 
     //DEOPSCSW-532: Synchronize activities with other comp. using UTC
+    //DEOPSCSW-549: Time service api
     // This test is sufficient to show code works in both Scala and Java
     // since UTCTime.now is used in both languages.
     @Test
@@ -38,6 +39,7 @@ public class JTMTTimeTest extends JUnitSuite {
 
     //DEOPSCSW-537: Scala and Java API for conversion between TAI and UTC
     //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
+    //DEOPSCSW-549: Time service api
     @Test
     public void should_convert_utc_to_tai() {
         UTCTime utcTime = UTCTime.now();
@@ -47,6 +49,7 @@ public class JTMTTimeTest extends JUnitSuite {
     }
 
     //DEOPSCSW-534: PTP accuracy and precision while reading UTC
+    //DEOPSCSW-549: Time service api
     @Test
     public void should_get_maximum_precision_supported_by_system_in_utc() {
         assertFalse(TestUtil.formatWithPrecision(UTCTime.now().value(), testProperties.precision()).endsWith("000"));
@@ -56,6 +59,7 @@ public class JTMTTimeTest extends JUnitSuite {
 
     //DEOPSCSW-535: Synchronize activities with other comp, using TAI
     //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
+    //DEOPSCSW-549: Time service api
     @Test
     public void should_get_tai_time() {
         TAITime taiTime = TAITime.now();
@@ -92,6 +96,7 @@ public class JTMTTimeTest extends JUnitSuite {
 
     //DEOPSCSW-537: Scala and Java API for conversion between TAI and UTC
     //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
+    //DEOPSCSW-549: Time service api
     @Test
     public void should_convert_tai_to_utc() {
         TAITime taiTime = TAITime.now();
@@ -101,6 +106,7 @@ public class JTMTTimeTest extends JUnitSuite {
     }
 
     //DEOPSCSW-538: PTP accuracy and precision while reading TAI
+    //DEOPSCSW-549: Time service api
     @Test
     public void should_get_maximum_precision_supported_by_system_in_tai() {
         assertFalse(TestUtil.formatWithPrecision(TAITime.now().value(), testProperties.precision()).endsWith("000"));
