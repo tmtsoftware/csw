@@ -85,7 +85,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
     val system                        = typed.ActorSystem(Behavior.empty, "test1")
     implicit val ec: ExecutionContext = system.executionContext
 
-    val timeService = new TimeServiceSchedulerFactory().make()
+    val timeService = new TimeServiceSchedulerFactory()(system.scheduler).make()
     val testProbe   = scaladsl.TestProbe[UTCTime]("blah")(system)
 
     val startTime    = UTCTime(UTCTime.now().value.plusSeconds(1))
@@ -114,7 +114,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
     val system                        = typed.ActorSystem(Behavior.empty, "test1")
     implicit val ec: ExecutionContext = system.executionContext
 
-    val timeService = new TimeServiceSchedulerFactory().make()
+    val timeService = new TimeServiceSchedulerFactory()(system.scheduler).make()
 
     val testProbe = scaladsl.TestProbe[UTCTime]()(system)
 
@@ -154,7 +154,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
     // hence separate instance of actor typedSystem is created here which does not use ManualConfig
     val system                        = typed.ActorSystem(Behavior.empty, "test1")
     implicit val ec: ExecutionContext = system.executionContext
-    val timeService                   = new TimeServiceSchedulerFactory().make()
+    val timeService                   = new TimeServiceSchedulerFactory()(system.scheduler).make()
     val testProbe                     = scaladsl.TestProbe[UTCTime]()(system)
 
     val buffer: ArrayBuffer[Int] = ArrayBuffer.empty
