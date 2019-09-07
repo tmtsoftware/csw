@@ -3,7 +3,8 @@ package csw.time.scheduler.internal
 import java.time.Duration
 import java.util.concurrent.TimeUnit.NANOSECONDS
 
-import akka.actor.{ActorRef, Scheduler}
+import akka.actor.ActorRef
+import akka.actor.typed.Scheduler
 import csw.time.core.models.TMTTime
 import csw.time.scheduler.api.{Cancellable, TimeServiceScheduler}
 import csw.time.scheduler.internal.extensions.RichCancellableExt.RichCancellable

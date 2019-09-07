@@ -15,8 +15,8 @@ class MultiActorSystemTest extends FunSuite with Matchers with BeforeAndAfterAll
 
   var connection: TcpConnection = _
 
-  private var system1: ActorSystem[SpawnProtocol] = _
-  private var system2: ActorSystem[SpawnProtocol] = _
+  private var system1: ActorSystem[SpawnProtocol.Command] = _
+  private var system2: ActorSystem[SpawnProtocol.Command] = _
 
   private var locationService: LocationService  = _
   private var locationService2: LocationService = _
