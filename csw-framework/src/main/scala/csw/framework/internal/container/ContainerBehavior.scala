@@ -195,5 +195,5 @@ private[framework] final class ContainerBehavior(
     }
   }
 
-  private def coordinatedShutdown(reason: Reason): Future[Done] = CoordinatedShutdown(ctx.system.toUntyped).run(reason)
+  private def coordinatedShutdown(reason: Reason): Future[Done] = CoordinatedShutdown(ctx.system.toClassic).run(reason)
 }

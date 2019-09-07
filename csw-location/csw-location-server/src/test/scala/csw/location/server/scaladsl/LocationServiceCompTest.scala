@@ -8,7 +8,6 @@ import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.{ActorSystem, CoordinatedShutdown, PoisonPill, typed}
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Keep, Sink}
-import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.testkit.TestProbe
 import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.AkkaRegistrationFactory.make
@@ -57,9 +56,9 @@ class LocationServiceCompTest(mode: String)
 
   override protected def beforeAll(): Unit = {
     typedSystem = ActorSystemFactory.remote(SpawnProtocol(), "test")
-    untypedSystem = typedSystem.toUntyped
+    untypedSystem = typedSystem.toClassic
     ec = untypedSystem.dispatcher
-    mat = ActorMaterializer()(typedSystem)
+    mat = Materializer(typedSystem)
     clusterSystem = ClusterAwareSettings.system
 
     locationService = mode match {
@@ -70,7 +69,7 @@ class LocationServiceCompTest(mode: String)
   override protected def afterEach(): Unit = locationService.unregisterAll().await
 
   override protected def afterAll(): Unit = {
-    if (mode == "cluster") CoordinatedShutdown(clusterSystem.toUntyped).run(UnknownReason).await
+    if (mode == "cluster") CoordinatedShutdown(clusterSystem.toClassic).run(UnknownReason).await
     CoordinatedShutdown(untypedSystem).run(UnknownReason).await
   }
 

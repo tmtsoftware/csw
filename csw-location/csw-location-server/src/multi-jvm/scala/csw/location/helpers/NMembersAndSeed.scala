@@ -16,7 +16,7 @@ class NMembersAndSeed(n: Int) extends MultiNodeConfig {
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
-  def makeSystem(config: Config): actor.ActorSystem = ActorSystem(SpawnProtocol(), settings.clusterName, config).toUntyped
+  def makeSystem(config: Config): actor.ActorSystem = ActorSystem(SpawnProtocol(), settings.clusterName, config).toClassic
 
   val seed: RoleName = addRole("seed")(settings.onPort(3552))
 

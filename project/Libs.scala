@@ -71,7 +71,7 @@ object Jackson {
 
 object Akka {
   //REMEMBER: remove Akka-snapshot resolver from Common settings once moved to a stable version
-  val Version = "2.6.0-M6" //all akka is Apache License 2.0
+  val Version = "2.6.0-M7" //all akka is Apache License 2.0
 
   val `akka-stream`              = "com.typesafe.akka" %% "akka-stream"              % Version
   val `akka-stream-typed`        = "com.typesafe.akka" %% "akka-stream-typed"        % Version

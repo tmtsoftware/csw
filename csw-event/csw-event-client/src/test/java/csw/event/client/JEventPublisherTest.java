@@ -80,7 +80,7 @@ public class JEventPublisherTest extends TestNGSuite {
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
         Thread.sleep(500); // Needed for redis set which is fire and forget operation
 
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(set).take(2).toMat(Sink.foreach(event -> probe.ref().tell(event)), Keep.left()).run(baseProperties.resumingMat());
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(set).take(2).toMat(Sink.foreach(event -> probe.ref().tell(event)), Keep.left()).withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
         subscription.ready().get(10, TimeUnit.SECONDS);
 
         probe.expectMessage(event1);
@@ -103,7 +103,7 @@ public class JEventPublisherTest extends TestNGSuite {
         EventKey eventKey = Utils.makeEvent(0).eventKey();
 
         List<Event> queue = new ArrayList<>();
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).toMat(Sink.foreach(queue::add), Keep.left()).run(baseProperties.resumingMat());
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).toMat(Sink.foreach(queue::add), Keep.left()).withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
         subscription.ready().get(10, TimeUnit.SECONDS);
         Thread.sleep(500); // Needed for getting the latest event
 
@@ -137,7 +137,7 @@ public class JEventPublisherTest extends TestNGSuite {
         }
 
         Set<Event> queue = new HashSet<>();
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(events.stream().map(Event::eventKey).collect(Collectors.toSet())).toMat(Sink.foreach(queue::add), Keep.left()).run(baseProperties.resumingMat());
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(events.stream().map(Event::eventKey).collect(Collectors.toSet())).toMat(Sink.foreach(queue::add), Keep.left()).withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
         subscription.ready().get(10, TimeUnit.SECONDS);
 
         baseProperties.jPublisher().publish(Source.fromIterator(events::iterator));
@@ -164,7 +164,7 @@ public class JEventPublisherTest extends TestNGSuite {
         EventKey eventKey = events.get(0).eventKey();
 
         List<Event> queue = new ArrayList<>();
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).toMat(Sink.foreach(queue::add), Keep.left()).run(baseProperties.resumingMat());
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).toMat(Sink.foreach(queue::add), Keep.left()).withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
         subscription.ready().get(10, TimeUnit.SECONDS);
         Thread.sleep(500); // Needed for getting the latest event
 
@@ -205,7 +205,7 @@ public class JEventPublisherTest extends TestNGSuite {
         IEventSubscription subscription = baseProperties.jSubscriber()
                 .subscribe(Set.of(eventKey))
                 .toMat(Sink.foreach((Procedure<Event>) testProbe.ref()::tell), Keep.left())
-                .run(baseProperties.resumingMat());
+                .withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
 
         subscription.ready().get(10, TimeUnit.SECONDS);
         Thread.sleep(500);
@@ -238,7 +238,7 @@ public class JEventPublisherTest extends TestNGSuite {
         EventKey eventKey = events.get(0).eventKey();
 
         List<Event> queue = new ArrayList<>();
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).toMat(Sink.foreach(queue::add), Keep.left()).run(baseProperties.resumingMat());
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).toMat(Sink.foreach(queue::add), Keep.left()).withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
         subscription.ready().get(10, TimeUnit.SECONDS);
         Thread.sleep(500); // Needed for getting the latest event
 
@@ -274,7 +274,7 @@ public class JEventPublisherTest extends TestNGSuite {
         EventKey eventKey = events.get(0).eventKey();
 
         List<Event> queue = new ArrayList<>();
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).toMat(Sink.foreach(queue::add), Keep.left()).run(baseProperties.resumingMat());
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).toMat(Sink.foreach(queue::add), Keep.left()).withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
         subscription.ready().get(10, TimeUnit.SECONDS);
         Thread.sleep(500); // Needed for getting the latest event
 

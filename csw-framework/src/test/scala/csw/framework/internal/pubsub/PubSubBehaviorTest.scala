@@ -26,7 +26,7 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
   }
 
   implicit val system: typed.ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "test-1")
-  implicit val untypedSystem: ActorSystem                       = system.toUntyped
+  implicit val untypedSystem: ActorSystem                       = system.toClassic
   implicit val testKitSettings: TestKitSettings                 = TestKitSettings(system)
   private val mocks                                             = new FrameworkTestMocks()
   private val prefix                                            = Prefix("wfos.red.detector")

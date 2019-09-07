@@ -4,6 +4,7 @@ import akka.actor.Cancellable;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Adapter;
 import akka.stream.ActorMaterializer;
+import akka.stream.Materializer;
 import akka.stream.ThrottleMode;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
@@ -188,7 +189,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
                     return i;
                 })
                 .throttle(1, Duration.ofMillis(100), 1, ThrottleMode.shaping())
-                .runWith(Sink.ignore(), ActorMaterializer.create(Adapter.toUntyped(actorContext.getSystem())));
+                .runWith(Sink.ignore(), Materializer.createMaterializer(Adapter.toClassic(actorContext.getSystem())));
     }
 
 

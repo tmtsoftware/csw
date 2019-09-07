@@ -12,7 +12,7 @@ import org.scalatest.prop.Tables.Table
 class LoggingAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   private final implicit val system: ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "example")
-  private final val serialization                                       = SerializationExtension(system.toUntyped)
+  private final val serialization                                       = SerializationExtension(system.toClassic)
 
   test("should use Logging serializer for LogMetaData (de)serialization") {
 

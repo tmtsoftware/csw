@@ -9,7 +9,6 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives.{entity, _}
 import akka.http.scaladsl.server.Route
 import akka.stream.Materializer
-import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.util.Timeout
 import csw.location.client.HttpCodecs
 import csw.location.client.scaladsl.HttpLocationServiceFactory
@@ -35,9 +34,9 @@ import scala.concurrent.{ExecutionContext, Future}
 class HttpCommandServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with HTTPLocationService {
 
   implicit val typedSystem: typed.ActorSystem[_] = ActorSystem(Behaviors.empty, "HttpCommandServiceTest")
-  implicit val untypedSystem: actor.ActorSystem  = typedSystem.toUntyped
+  implicit val untypedSystem: actor.ActorSystem  = typedSystem.toClassic
   implicit val ec: ExecutionContext              = typedSystem.executionContext
-  implicit val mat: Materializer                 = ActorMaterializer()
+  implicit val mat: Materializer                 = Materializer(typedSystem)
   implicit val timeout: Timeout                  = Timeout(5.seconds)
 
   private val locationService = HttpLocationServiceFactory.makeLocalClient

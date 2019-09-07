@@ -4,8 +4,6 @@ import akka.actor.typed
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.http.scaladsl.server._
 import akka.stream.Materializer
-import akka.stream.typed.scaladsl
-import akka.stream.typed.scaladsl.ActorMaterializer
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import csw.aas.http.AuthorizationPolicy._
 import csw.aas.http.SecurityDirectives
@@ -67,7 +65,7 @@ object LoggingSupport {
 object AsyncSupport {
   implicit val actorSystem: typed.ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "")
   implicit val ec: ExecutionContext                                  = ExecutionContext.global
-  implicit val mat: Materializer                                     = ActorMaterializer()
+  implicit val mat: Materializer                                     = Materializer(actorSystem)
 }
 
 object LocationServiceSupport {
@@ -188,7 +186,7 @@ object SampleHttpApp extends HttpApp with App {
 
   implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "sample-http-app")
   implicit val ec: ExecutionContext                            = actorSystem.executionContext
-  implicit val mat: Materializer                               = scaladsl.ActorMaterializer()
+  implicit val mat: Materializer                               = Materializer(actorSystem)
 
   val locationService = HttpLocationServiceFactory.makeLocalClient
   val directives      = SecurityDirectives(locationService)

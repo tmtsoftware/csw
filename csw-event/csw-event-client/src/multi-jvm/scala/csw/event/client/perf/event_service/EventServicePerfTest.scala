@@ -2,7 +2,7 @@ package csw.event.client.perf.event_service
 
 import akka.Done
 import akka.actor.testkit.typed.scaladsl
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.scaladsl.adapter._
 import akka.remote.testconductor.RoleName
 import akka.remote.testkit.MultiNodeConfig
 import com.typesafe.config.ConfigFactory

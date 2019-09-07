@@ -5,7 +5,6 @@ import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, Scheduler, SpawnProtocol}
 import akka.actor.CoordinatedShutdown
 import akka.stream.Materializer
-import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.{Done, actor}
 import csw.location.server.BuildInfo
 import csw.logging.client.internal.LoggingSystem
@@ -15,9 +14,9 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 
 private[location] class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol.Command]) {
   implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = _typedSystem
-  implicit val untypedSystem: actor.ActorSystem                = _typedSystem.toUntyped
+  implicit val untypedSystem: actor.ActorSystem                = _typedSystem.toClassic
   implicit val ec: ExecutionContextExecutor                    = typedSystem.executionContext
-  implicit val mat: Materializer                               = ActorMaterializer()
+  implicit val mat: Materializer                               = Materializer(typedSystem)
   implicit val scheduler: Scheduler                            = typedSystem.scheduler
 
   private[location] val coordinatedShutdown = CoordinatedShutdown(untypedSystem)

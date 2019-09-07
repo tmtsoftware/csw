@@ -14,7 +14,7 @@ private[csw] class ServerWiring {
   lazy val settings                                        = new Settings(config)
   lazy val clusterSettings: ClusterSettings                = ClusterAwareSettings.onPort(settings.clusterPort)
   lazy val actorSystem: ActorSystem[SpawnProtocol.Command] = clusterSettings.system
-  lazy val untypedActorSystem: actor.ActorSystem           = clusterSettings.system.toUntyped
+  lazy val untypedActorSystem: actor.ActorSystem           = clusterSettings.system.toClassic
   lazy val actorRuntime                                    = new ActorRuntime(actorSystem)
   lazy val locationService: LocationService                = LocationServiceFactory.withSystem(actorSystem)
   lazy val locationExceptionHandler                        = new LocationExceptionHandler

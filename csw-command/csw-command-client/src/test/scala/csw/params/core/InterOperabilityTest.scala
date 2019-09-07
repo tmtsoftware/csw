@@ -13,9 +13,9 @@ import csw.params.core.models.{ObsId, Prefix}
 import csw.params.events.SystemEvent
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
-import scala.jdk.CollectionConverters._
+import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, Future}
+import scala.jdk.CollectionConverters._
 
 case class CommandMsg(
     command: Command,
@@ -40,10 +40,8 @@ class InterOperabilityTest extends FunSuite with Matchers with BeforeAndAfterAll
 
   private val scalaSetup = Setup(Prefix(prefixStr), CommandName(prefixStr), Some(obsId)).add(intParam).add(stringParam)
 
-  private val javaCmdHandlerBehavior: Future[ActorRef[CommandMsg]] =
+  private val jCommandHandlerActor: ActorRef[CommandMsg] =
     system.systemActorOf[CommandMsg](JavaCommandHandler.behavior(), "javaCommandHandler")
-
-  private val jCommandHandlerActor: ActorRef[CommandMsg] = Await.result(javaCmdHandlerBehavior, 5.seconds)
 
   override protected def afterAll(): Unit = {
     system.terminate()

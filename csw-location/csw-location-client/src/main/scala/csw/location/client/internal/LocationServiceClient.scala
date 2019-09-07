@@ -44,7 +44,7 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
     with DoneCodec { outer =>
 
   import actorSystem.executionContext
-  implicit val untypedSystem: actor.ActorSystem = actorSystem.toUntyped
+  implicit val untypedSystem: actor.ActorSystem = actorSystem.toClassic
   implicit val scheduler: Scheduler             = actorSystem.scheduler
 
   private val baseUri = s"http://$serverIp:$serverPort/location"

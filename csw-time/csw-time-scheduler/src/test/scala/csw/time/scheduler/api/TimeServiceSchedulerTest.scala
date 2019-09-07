@@ -33,7 +33,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
   ).foreach {
     case (name, idealScheduleTime) =>
       test(s"[$name] should schedule task at start time") {
-        val testProbe = TestProbe()(system.toUntyped)
+        val testProbe = TestProbe()(system.toClassic)
         val probeMsg  = "echo"
 
         val cancellable = timeService.scheduleOnce(idealScheduleTime())(testProbe.ref ! probeMsg)

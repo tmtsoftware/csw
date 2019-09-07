@@ -11,7 +11,6 @@ import akka.actor.typed.javadsl.Adapter;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.japi.Pair;
 import akka.japi.pf.ReceiveBuilder;
-import akka.stream.ActorMaterializer;
 import akka.stream.KillSwitch;
 import akka.stream.Materializer;
 import akka.stream.javadsl.Keep;
@@ -61,7 +60,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
     private ActorSystem<Void> typedSystem = Adapter.toTyped(this.system);
     //#create-location-service
     private akka.actor.ActorSystem system = context().system();
-    private ActorMaterializer mat = ActorMaterializer.create(system);
+    private Materializer mat = Materializer.createMaterializer(system);
     private ILocationService locationService = JHttpLocationServiceFactory.makeLocalClient(Adapter.toTyped(system), mat);
     //#create-location-service
 
@@ -199,7 +198,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         // example code showing how to get the actorRef for remote component and send it a message
         if (resolveResult.isPresent()) {
             AkkaLocation loc = resolveResult.orElseThrow();
-            ActorRef actorRef = Adapter.toUntyped(new URIExtension.RichURI(loc.uri()).toActorRef(typedSystem));
+            ActorRef actorRef = Adapter.toClassic(new URIExtension.RichURI(loc.uri()).toActorRef(typedSystem));
 //            actorRef.tell(LocationServiceExampleComponent.ClientMessage, getSelf());
         }
     }
@@ -249,7 +248,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
 
         // track connection to LocationServiceExampleComponent
         // Calls track method for example connection and forwards location messages to this actor
-        Materializer mat = ActorMaterializer.create(getContext());
+        Materializer mat = Materializer.createMaterializer(getContext());
         log.info("Starting to track " + exampleConnection);
         locationService.track(exampleConnection).toMat(Sink.actorRef(getSelf(), AllDone.class), Keep.both()).run(mat);
 

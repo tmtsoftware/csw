@@ -1,6 +1,6 @@
 package csw.event.client.perf.model_obs
 
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.scaladsl.adapter._
 import akka.remote.testkit.MultiNodeConfig
 import akka.actor.testkit.typed.scaladsl
 import akka.actor.typed.ActorSystem

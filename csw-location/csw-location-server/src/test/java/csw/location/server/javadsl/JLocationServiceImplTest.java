@@ -12,7 +12,6 @@ import akka.stream.Materializer;
 import akka.stream.javadsl.Keep;
 import akka.stream.testkit.TestSubscriber;
 import akka.stream.testkit.scaladsl.TestSink;
-import akka.stream.typed.javadsl.ActorMaterializerFactory;
 import csw.location.api.commons.Constants;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.IRegistrationResult;
@@ -73,8 +72,8 @@ public class JLocationServiceImplTest extends JUnitSuite {
     public static void setup() throws Exception {
         wiring = new ServerWiring();
         typedSystem = ActorSystemFactory.remote(SpawnProtocol.create(), "test");
-        untypedSystem = Adapter.toUntyped(typedSystem);
-        mat = ActorMaterializerFactory.create(typedSystem);
+        untypedSystem = Adapter.toClassic(typedSystem);
+        mat = Materializer.createMaterializer(typedSystem);
         TestProbe<Object> actorTestProbe = TestProbe.create("test-actor", typedSystem);
         actorRef = actorTestProbe.ref();
         locationService = JHttpLocationServiceFactory.makeLocalClient(typedSystem, mat);

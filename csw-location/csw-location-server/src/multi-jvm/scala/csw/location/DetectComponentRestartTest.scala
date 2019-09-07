@@ -1,9 +1,9 @@
 package csw.location
 
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.stream.typed.scaladsl.ActorMaterializer
+import akka.stream.Materializer
 import akka.testkit.TestProbe
 import csw.location.api.AkkaRegistrationFactory.make
 import csw.location.api.extensions.ActorExtension.RichActor
@@ -62,7 +62,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
           Try(ServerWiring.make(newTypedSystem).locationHttpService.start().await) match {
             case _ => // ignore binding errors
           }
-          HttpLocationServiceFactory.makeLocalClient(newTypedSystem, ActorMaterializer()(newTypedSystem))
+          HttpLocationServiceFactory.makeLocalClient(newTypedSystem, Materializer(newTypedSystem))
         case "cluster" => LocationServiceFactory.withCluster(CswCluster.withSystem(newTypedSystem))
       }
 

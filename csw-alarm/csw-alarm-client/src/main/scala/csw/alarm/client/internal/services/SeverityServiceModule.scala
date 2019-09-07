@@ -2,19 +2,18 @@ package csw.alarm.client.internal.services
 
 import akka.Done
 import akka.actor.typed
-import akka.actor.typed.{ActorRef, _}
+import akka.actor.typed.ActorRef
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Sink, Source}
-import akka.stream.typed.scaladsl
 import csw.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
 import csw.alarm.api.internal._
+import csw.alarm.api.scaladsl.AlarmSubscription
+import csw.alarm.client.internal.{AlarmRomaineCodec, AlarmServiceLogger}
+import csw.alarm.client.internal.commons.Settings
+import csw.alarm.client.internal.redis.RedisConnectionsFactory
 import csw.alarm.models.FullAlarmSeverity.Disconnected
 import csw.alarm.models.Key.AlarmKey
 import csw.alarm.models.{AlarmSeverity, FullAlarmSeverity, Key}
-import csw.alarm.api.scaladsl.AlarmSubscription
-import csw.alarm.client.internal.commons.Settings
-import csw.alarm.client.internal.redis.RedisConnectionsFactory
-import csw.alarm.client.internal.{AlarmRomaineCodec, AlarmServiceLogger}
 import reactor.core.publisher.FluxSink.OverflowStrategy
 import romaine.RedisResult
 import romaine.extensions.SourceExtensions.RichSource
@@ -32,7 +31,7 @@ private[client] trait SeverityServiceModule extends SeverityService {
 
   private val log = AlarmServiceLogger.getLogger
 
-  private implicit lazy val mat: Materializer = scaladsl.ActorMaterializer()
+  private implicit lazy val mat: Materializer = Materializer(actorSystem)
 
   final override def setSeverity(alarmKey: AlarmKey, severity: AlarmSeverity): Future[Done] = async {
     val currentSeverity = await(getCurrentSeverity(alarmKey))

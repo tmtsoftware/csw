@@ -44,7 +44,7 @@ final class FrameworkTestKit private (
     val alarmTestKit: AlarmTestKit
 ) {
 
-  implicit lazy val system: ActorSystem     = actorSystem.toUntyped
+  implicit lazy val system: ActorSystem     = actorSystem.toClassic
   lazy val frameworkWiring: FrameworkWiring = FrameworkWiring.make(actorSystem)
   implicit lazy val ec: ExecutionContext    = frameworkWiring.actorRuntime.ec
   implicit lazy val mat: Materializer       = frameworkWiring.actorRuntime.mat

@@ -4,8 +4,7 @@ import akka.actor.testkit.typed.javadsl.TestInbox;
 import akka.actor.testkit.typed.javadsl.TestProbe;
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.SpawnProtocol;
-import akka.stream.ActorMaterializer;
-import akka.stream.typed.javadsl.ActorMaterializerFactory;
+import akka.stream.Materializer;
 import akka.util.Timeout;
 import com.typesafe.config.ConfigFactory;
 import csw.command.api.CurrentStateSubscription;
@@ -75,7 +74,7 @@ import csw.location.api.javadsl.JComponentType;
 public class JCommandIntegrationTest extends JUnitSuite {
     private static ActorSystem<SpawnProtocol.Command> hcdActorSystem = ActorSystemFactory.remote(SpawnProtocol.create(), "test");
     private ExecutionContext ec = hcdActorSystem.executionContext();
-    private static ActorMaterializer mat = ActorMaterializerFactory.create(hcdActorSystem);
+    private static Materializer mat = Materializer.createMaterializer(hcdActorSystem);
 
     private static JHTTPLocationService jHttpLocationService;
     private static ILocationService locationService;

@@ -92,7 +92,7 @@ public class JEventSubscriberTest extends TestNGSuite {
                 baseProperties.jSubscriber().subscribe(set)
                         .take(2)
                         .toMat(Sink.foreach(event -> probe.ref().tell(event)), Keep.left())
-                        .run(baseProperties.resumingMat());
+                        .withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
 
         subscription.ready().get(10, TimeUnit.SECONDS);
         probe.expectMessage(Event$.MODULE$.invalidEvent(eventKey));
@@ -338,10 +338,10 @@ public class JEventSubscriberTest extends TestNGSuite {
         Event event1 = new SystemEvent(prefix, eventName1);
         Event event2 = new SystemEvent(prefix, eventName2);
 
-        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Set.of(event1.eventKey())).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
+        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Set.of(event1.eventKey())).take(2).toMat(Sink.seq(), Keep.both()).withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
         pair.first().ready().get(10, TimeUnit.SECONDS);
 
-        Pair<IEventSubscription, CompletionStage<List<Event>>> pair2 = baseProperties.jSubscriber().subscribe(Set.of(event2.eventKey())).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
+        Pair<IEventSubscription, CompletionStage<List<Event>>> pair2 = baseProperties.jSubscriber().subscribe(Set.of(event2.eventKey())).take(2).toMat(Sink.seq(), Keep.both()).withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
         pair2.first().ready().get(10, TimeUnit.SECONDS);
         Thread.sleep(500);
 
@@ -369,7 +369,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         baseProperties.jPublisher().publish(event2).get(10, TimeUnit.SECONDS); // latest event before subscribing
         Thread.sleep(500); // Needed for redis set which is fire and forget operation
 
-        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
+        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).take(2).toMat(Sink.seq(), Keep.both()).withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
         pair.first().ready().get(10, TimeUnit.SECONDS);
         Thread.sleep(500);
 
@@ -385,7 +385,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     public void should_be_able_to_retrieve_InvalidEvent(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         EventKey eventKey = EventKey.apply(Prefix.apply("csw.invalid"), EventName.apply("test"));
 
-        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).take(1).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
+        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).take(1).toMat(Sink.seq(), Keep.both()).withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
 
         Assert.assertEquals(List.of(Event$.MODULE$.invalidEvent(eventKey)), pair.second().toCompletableFuture().get(10, TimeUnit.SECONDS));
     }
@@ -404,7 +404,7 @@ public class JEventSubscriberTest extends TestNGSuite {
 
         Set<EventKey> eventKeys = Set.of(eventKey1, eventKey2);
 
-        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(eventKeys).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
+        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(eventKeys).take(2).toMat(Sink.seq(), Keep.both()).withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
 
         Set<Event> actualEvents = Set.copyOf(pair.second().toCompletableFuture().get(10, TimeUnit.SECONDS));
 

@@ -2,7 +2,7 @@ package example.testkit;
 
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.SpawnProtocol;
-import akka.stream.typed.javadsl.ActorMaterializerFactory;
+import akka.stream.Materializer;
 import com.typesafe.config.ConfigFactory;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
@@ -41,7 +41,7 @@ public class JTestKitsExampleTest extends JUnitSuite {
 
     private ActorSystem<SpawnProtocol.Command> system = frameworkTestKit.actorSystem();
     private ILocationService locationService =
-            JHttpLocationServiceFactory.makeLocalClient(system, ActorMaterializerFactory.create(system));
+            JHttpLocationServiceFactory.makeLocalClient(system, Materializer.createMaterializer(system));
 
     @Test
     public void shouldAbleToSpawnContainerUsingTestKit() throws ExecutionException, InterruptedException {

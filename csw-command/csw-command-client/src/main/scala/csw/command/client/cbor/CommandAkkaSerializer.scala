@@ -2,7 +2,7 @@ package csw.command.client.cbor
 
 import akka.actor.ExtendedActorSystem
 import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.scaladsl.adapter._
 import akka.serialization.Serializer
 import csw.command.client.messages._
 import csw.command.client.messages.sequencer.SubmitSequenceAndWait

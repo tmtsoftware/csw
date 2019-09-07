@@ -4,7 +4,7 @@ import akka.actor
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.stream.scaladsl.{Sink, Source}
-import akka.stream.{ActorMaterializer, ThrottleMode}
+import akka.stream.{Materializer, ThrottleMode}
 import akka.util.Timeout
 import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
@@ -29,9 +29,9 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
   private val cancelCmdId = KeyType.StringKey.make("cancelCmdId")
 
   import ComponentStateForCommand._
-  implicit val actorSystem: actor.ActorSystem = ctx.system.toUntyped
+  implicit val actorSystem: actor.ActorSystem = ctx.system.toClassic
   implicit val ec: ExecutionContext           = ctx.executionContext
-  implicit val mat: ActorMaterializer         = ActorMaterializer()
+  implicit val mat: Materializer              = Materializer(actorSystem)
 
   override def initialize(): Future[Unit] = Future.unit
 

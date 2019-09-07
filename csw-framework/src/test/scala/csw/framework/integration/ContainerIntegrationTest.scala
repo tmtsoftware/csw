@@ -169,10 +169,10 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
 
     assertThatContainerIsRunning(resolvedContainerRef, containerLifecycleStateProbe, 2.seconds)
 
-    val containerTracker      = testkit.TestProbe()(seedActorSystem.toUntyped)
-    val filterAssemblyTracker = testkit.TestProbe()(seedActorSystem.toUntyped)
-    val instrumentHcdTracker  = testkit.TestProbe()(seedActorSystem.toUntyped)
-    val disperserHcdTracker   = testkit.TestProbe()(seedActorSystem.toUntyped)
+    val containerTracker      = testkit.TestProbe()(seedActorSystem.toClassic)
+    val filterAssemblyTracker = testkit.TestProbe()(seedActorSystem.toClassic)
+    val instrumentHcdTracker  = testkit.TestProbe()(seedActorSystem.toClassic)
+    val disperserHcdTracker   = testkit.TestProbe()(seedActorSystem.toClassic)
 
     // start tracking container and all the components, so that on Shutdown message, all the trackers gets LocationRemoved event
     seedLocationService

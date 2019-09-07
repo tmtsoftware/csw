@@ -2,8 +2,9 @@ package csw.event.client.internal.kafka
 
 import akka.Done
 import akka.actor.Cancellable
+import akka.actor.typed.ActorSystem
 import akka.kafka.ProducerSettings
-import akka.stream.Materializer
+import akka.stream.Attributes
 import akka.stream.scaladsl.Source
 import csw.event.api.exceptions.PublishFailure
 import csw.event.api.scaladsl.EventPublisher
@@ -22,12 +23,13 @@ import scala.util.control.NonFatal
  *
  * @param producerSettings future of settings for akka-streams-kafka API for Apache Kafka producer
  * @param ec               the execution context to be used for performing asynchronous operations
- * @param mat              the materializer to be used for materializing underlying streams
+ * @param attributes       the attributes to be used for materializing underlying streams
  */
 // $COVERAGE-OFF$
 private[event] class KafkaPublisher(producerSettings: Future[ProducerSettings[String, Array[Byte]]])(
     implicit ec: ExecutionContext,
-    mat: Materializer
+    actorSystem: ActorSystem[_],
+    attributes: Attributes
 ) extends EventPublisher {
 
   private val parallelism                         = 1

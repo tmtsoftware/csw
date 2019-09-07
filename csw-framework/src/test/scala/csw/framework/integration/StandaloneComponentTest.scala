@@ -80,7 +80,7 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
     val supervisorCommandService = CommandServiceFactory.make(resolvedAkkaLocation)
 
     val (_, akkaProbe) =
-      seedLocationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent](seedActorSystem.toUntyped))(Keep.both).run()
+      seedLocationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent](seedActorSystem.toClassic))(Keep.both).run()
     akkaProbe.requestNext() shouldBe a[LocationUpdated]
 
     // on shutdown, component unregisters from location service

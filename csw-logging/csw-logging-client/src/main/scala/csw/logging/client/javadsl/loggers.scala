@@ -17,7 +17,7 @@ abstract class JBaseLoggerFactory private[logging] (maybeComponentName: Option[S
 
   private def logger(maybeActorRef: Option[String]): Logger  = new LoggerImpl(maybeComponentName, maybeActorRef)
   private def actorPath(actorRef: ActorRef): String          = ActorPath.fromString(Serialization.serializedActorPath(actorRef)).toString
-  private def actorPath(actorRef: typed.ActorRef[_]): String = actorPath(actorRef.toUntyped)
+  private def actorPath(actorRef: typed.ActorRef[_]): String = actorPath(actorRef.toClassic)
 }
 
 /**

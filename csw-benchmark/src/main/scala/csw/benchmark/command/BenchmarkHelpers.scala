@@ -3,7 +3,7 @@ package csw.benchmark.command
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed
 import akka.actor.typed.{ActorRef, SpawnProtocol}
-import akka.stream.typed.scaladsl
+import akka.stream.Materializer
 import com.typesafe.config.Config
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandServiceFactory
@@ -24,7 +24,7 @@ import scala.concurrent.duration.{Duration, DurationDouble}
 object BenchmarkHelpers {
 
   def spawnStandaloneComponent(actorSystem: typed.ActorSystem[SpawnProtocol.Command], config: Config): CommandService = {
-    val mat                                                            = scaladsl.ActorMaterializer()(actorSystem)
+    val mat                                                            = Materializer(actorSystem)
     val locationService                                                = HttpLocationServiceFactory.makeLocalClient(actorSystem, mat)
     val wiring: FrameworkWiring                                        = FrameworkWiring.make(actorSystem, locationService)
     implicit val typedSystem: typed.ActorSystem[SpawnProtocol.Command] = actorSystem

@@ -2,7 +2,6 @@ package csw.framework
 import akka.Done
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.stream.Materializer
-import akka.stream.typed.scaladsl.ActorMaterializer
 import csw.commons.redis.EmbeddedRedis
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
@@ -16,7 +15,7 @@ import redis.embedded.{RedisSentinel, RedisServer}
 class FrameworkTestWiring(val seedPort: Int = SocketUtils.getFreePort) extends EmbeddedRedis {
 
   implicit val seedActorSystem: ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "seed-system")
-  implicit val mat: Materializer                                   = ActorMaterializer()
+  implicit val mat: Materializer                                   = Materializer(seedActorSystem)
   val seedLocationService: LocationService                         = HttpLocationServiceFactory.makeLocalClient
 
   def startSentinelAndRegisterService(

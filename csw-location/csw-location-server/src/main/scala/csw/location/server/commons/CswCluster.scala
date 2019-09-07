@@ -10,7 +10,7 @@ import akka.cluster.ddata.typed.scaladsl
 import akka.cluster.ddata.typed.scaladsl.{DistributedData, Replicator}
 import akka.cluster.typed.{Cluster, Join}
 import akka.management.scaladsl.AkkaManagement
-import akka.stream.typed.scaladsl.ActorMaterializer
+import akka.stream.Materializer
 import akka.util.Timeout
 import akka.{Done, actor}
 import csw.location.api.exceptions.CouldNotJoinCluster
@@ -39,10 +39,10 @@ class CswCluster private (_typedSystem: ActorSystem[SpawnProtocol.Command]) {
   val hostname: String = _typedSystem.settings.config.getString("akka.remote.artery.canonical.hostname")
 
   implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = _typedSystem
-  implicit val untypedSystem: actor.ActorSystem                = _typedSystem.toUntyped
+  implicit val untypedSystem: actor.ActorSystem                = _typedSystem.toClassic
   implicit val scheduler: Scheduler                            = typedSystem.scheduler
   implicit val ec: ExecutionContext                            = typedSystem.executionContext
-  implicit val mat: ActorMaterializer                          = makeMat()
+  implicit val mat: Materializer                               = makeMat()
   implicit val cluster: Cluster                                = Cluster(typedSystem)
   private val distributedData: DistributedData                 = scaladsl.DistributedData(typedSystem)
   implicit val node: SelfUniqueAddress                         = distributedData.selfUniqueAddress
@@ -60,7 +60,7 @@ class CswCluster private (_typedSystem: ActorSystem[SpawnProtocol.Command]) {
   /**
    * Creates an ActorMaterializer for current ActorSystem
    */
-  private def makeMat(): ActorMaterializer = ActorMaterializer()(typedSystem)
+  private def makeMat(): Materializer = Materializer(typedSystem)
 
   /**
    * If `startManagement` flag is set to true (which is true only when a managementPort is defined in ClusterSettings)

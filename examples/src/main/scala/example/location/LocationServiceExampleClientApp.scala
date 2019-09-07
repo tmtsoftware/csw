@@ -50,7 +50,7 @@ object LocationServiceExampleClientApp extends App {
     ActorSystemFactory.remote(SpawnProtocol(), "csw-examples-locationServiceClient")
   //#create-actor-system
 
-  implicit val mat: ActorMaterializer = scaladsl.ActorMaterializer()
+  implicit val mat: Materializer = Materializer(typedSystem)
 
   //#create-location-service
   private val locationService = HttpLocationServiceFactory.makeLocalClient(typedSystem, mat)

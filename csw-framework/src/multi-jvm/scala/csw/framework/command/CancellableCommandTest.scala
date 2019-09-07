@@ -1,10 +1,9 @@
 package csw.framework.command
 
-import akka.actor.typed.Scheduler
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.stream.{ActorMaterializer, Materializer}
+import akka.actor.typed.scaladsl.adapter._
+import akka.actor.typed.{ActorSystem, Scheduler, SpawnProtocol}
+import akka.stream.Materializer
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
@@ -13,8 +12,8 @@ import csw.command.client.messages.CommandResponseManagerMessage.{Query, Subscri
 import csw.common.components.command.ComponentStateForCommand.{acceptedCmd, cancelCmd, prefix}
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.helpers.{LSNodeSpec, OneMemberAndSeed}
-import csw.location.models.{ComponentId, ComponentType}
 import csw.location.models.Connection.AkkaConnection
+import csw.location.models.{ComponentId, ComponentType}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup
@@ -38,7 +37,7 @@ class CancellableCommandTest(ignore: Int)
   import config._
 
   implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = system.toTyped.asInstanceOf[ActorSystem[SpawnProtocol.Command]]
-  implicit val mat: Materializer                       = ActorMaterializer()
+  implicit val mat: Materializer                       = Materializer(typedSystem)
   implicit val ec: ExecutionContext                    = actorSystem.executionContext
   implicit val timeout: Timeout                        = 5.seconds
   implicit val scheduler: Scheduler                    = actorSystem.scheduler

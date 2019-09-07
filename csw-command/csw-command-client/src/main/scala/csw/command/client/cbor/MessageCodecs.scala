@@ -34,9 +34,9 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
 
   implicit def actorRefCodec[T]: Codec[ActorRef[T]] =
     Codec.bimap[String, ActorRef[T]](
-      actorRef => Serialization.serializedActorPath(actorRef.toUntyped),
+      actorRef => Serialization.serializedActorPath(actorRef.toClassic),
       path => {
-        val provider = SerializationExtension(actorSystem.toUntyped).system.provider
+        val provider = SerializationExtension(actorSystem.toClassic).system.provider
         provider.resolveActorRef(path)
       }
     )

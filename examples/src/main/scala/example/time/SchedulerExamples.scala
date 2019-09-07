@@ -42,7 +42,7 @@ class SchedulerExamples(ctx: ActorContext[UTCTime]) {
     }
   }
 
-  private val actorRef: ActorRef = ctx.spawnAnonymous(SchedulingHandler.behavior).toUntyped
+  private val actorRef: ActorRef = ctx.spawnAnonymous(SchedulingHandler.behavior).toClassic
 
   timeServiceScheduler.scheduleOnce(utcTime, actorRef, UTCTime.now())
 

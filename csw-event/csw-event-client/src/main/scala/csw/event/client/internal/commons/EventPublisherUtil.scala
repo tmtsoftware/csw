@@ -1,9 +1,10 @@
 package csw.event.client.internal.commons
 
 import akka.Done
+import akka.actor.typed.ActorSystem
 import akka.actor.{Cancellable, PoisonPill}
 import akka.stream.scaladsl.{Sink, Source}
-import akka.stream.{Materializer, OverflowStrategy}
+import akka.stream.{Attributes, OverflowStrategy}
 import csw.event.api.exceptions.PublishFailure
 import csw.params.events.Event
 
@@ -14,7 +15,7 @@ import scala.util.control.NonFatal
 /**
  * Utility class to provided common functionalities to different implementations of EventPublisher
  */
-private[event] class EventPublisherUtil(implicit ec: ExecutionContext, mat: Materializer) {
+private[event] class EventPublisherUtil(implicit ec: ExecutionContext, actorSystem: ActorSystem[_], attributes: Attributes) {
 
   private val logger = EventServiceLogger.getLogger
 
@@ -28,6 +29,7 @@ private[event] class EventPublisherUtil(implicit ec: ExecutionContext, mat: Mate
             case ex => p.tryFailure(ex)
           }
       }
+      .withAttributes(attributes)
       .runForeach(_ => ())
 
   // create an akka stream source out of eventGenerator function
@@ -49,6 +51,7 @@ private[event] class EventPublisherUtil(implicit ec: ExecutionContext, mat: Mate
       .mapAsync(parallelism) { event =>
         publishWithRecovery(event, publish, maybeOnError)
       }
+      .withAttributes(attributes)
       .to(Sink.ignore)
       .run()
 

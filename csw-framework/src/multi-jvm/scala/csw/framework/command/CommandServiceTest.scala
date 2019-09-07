@@ -1,9 +1,9 @@
 package csw.framework.command
 
-import akka.actor.typed.Scheduler
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.stream.{ActorMaterializer, Materializer}
+import akka.actor.typed.Scheduler
+import akka.stream.Materializer
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.api.StateMatcher
@@ -90,7 +90,7 @@ class CommandServiceTest(ignore: Int)
   import csw.common.components.command.ComponentStateForCommand._
 
 //  implicit val actorSystem: ActorSystem[_] = system.toTyped
-  implicit val mat: Materializer        = ActorMaterializer()
+  implicit val mat: Materializer        = Materializer(typedSystem)
   implicit val ec: ExecutionContext     = typedSystem.executionContext
   implicit val timeout: Timeout         = 5.seconds
   implicit val scheduler: Scheduler     = typedSystem.scheduler
