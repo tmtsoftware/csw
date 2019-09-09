@@ -181,6 +181,16 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
       result.runId
     )
 
+    // Try using completer in Assembly with ActorCompleter
+    val longRunningToAsmCompActor = Setup(seqPrefix, longRunningCmdToAsmCActor, obsId)
+    result = Await.result(filterAssemblyCS.submit(longRunningToAsmCompActor), timeout.duration)
+    result shouldBe a[Started]
+    result.commandName shouldEqual longRunningToAsmCompActor.commandName
+    Await.result(filterAssemblyCS.queryFinal(result.runId), timeout.duration) shouldBe Completed(
+      longRunningToAsmCompActor.commandName,
+      result.runId
+    )
+
     // Try using completer in Assembly
     val longRunningToAsmInvalid = Setup(seqPrefix, longRunningCmdToAsmInvalid, obsId)
     result = Await.result(filterAssemblyCS.submit(longRunningToAsmInvalid), timeout.duration)

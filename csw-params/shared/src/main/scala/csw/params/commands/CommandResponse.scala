@@ -98,10 +98,10 @@ object CommandResponse {
       with MatchingResponse {
 
     /**
-    * Check to see if this response has a result
+     * Check to see if this response has a result
      * @return `true` if the response contains a non-empty result, `false` otherwise.
      */
-    def hasResult:Boolean = result.nonEmpty
+    def hasResult: Boolean = result.nonEmpty
 
     /**
      * A java helper to construct a Completed response

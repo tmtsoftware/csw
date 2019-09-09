@@ -5,7 +5,10 @@ import csw.params.commands.CommandResponse.SubmitResponse
 
 import scala.concurrent.{Future, Promise}
 
-object CommandCompleter {
+/**
+ *  Contains the Completer class and data types
+ */
+object Completer {
 
   trait OverallResponse {
     def responses: Set[SubmitResponse]
@@ -14,19 +17,21 @@ object CommandCompleter {
   case class OverallFailure(responses: Set[SubmitResponse]) extends OverallResponse
 
   case class Completer(expectedResponses: Set[SubmitResponse]) {
+    // alreadyCompleted is the set of commands that are already completed when handed to the actor
     private val alreadyCompleted: Set[SubmitResponse] = expectedResponses.filter(CommandResponse.isFinal(_))
-    private val startedRunIds                         = expectedResponses.filter(CommandResponse.isIntermediate(_)).map(_.runId)
-    // This accumulates responses until all are gathered
-    private var responses       = Set.empty[SubmitResponse]
+    // started is the set of commands that are started/long-running
+    private val started: Set[SubmitResponse]          = expectedResponses.filter(CommandResponse.isIntermediate(_))
+    // This accumulates responses until all expected are gathered
+    private var updates         = Set.empty[SubmitResponse]
     private val completePromise = Promise[OverallResponse]()
 
-    // Catch the case where one of the startedResponses is a negative
-    // Or all the startedResponses are already completed
-    if (alreadyCompleted.exists(CommandResponse.isNegative(_)) || alreadyCompleted == expectedResponses) {
+    // Catch the case where one of the already completed is a negative resulting in failure already
+    // Or all the commands are already completed
+    if (alreadyCompleted.exists(CommandResponse.isNegative(_)) || started.isEmpty) {
       checkAndComplete(expectedResponses)
     }
 
-    // This looks through a set of SubmitResponse and determines if it a an overall success or failure
+    // This looks through a set of SubmitResponse and determines if it is an overall success or failure
     private def checkAndComplete(s: Set[SubmitResponse]): Unit = {
       if (!s.exists(CommandResponse.isNegative(_)))
         completePromise.success(OverallSuccess(s))
@@ -38,12 +43,12 @@ object CommandCompleter {
      * Called to update the completer with a final result of a long running command
      * @param sr the [[SubmitResponse]] of the completed command
      */
-    def update(sr: SubmitResponse): Unit = {
+    def update(sr: SubmitResponse): Unit = synchronized {
       // Only accept an update from an expected runId is reason for second test
-      if (startedRunIds.contains(sr.runId) && !responses.exists(_.runId == sr.runId)) {
-        responses += sr
-        if (startedRunIds == responses.map(_.runId)) {
-          checkAndComplete(alreadyCompleted ++ responses)
+      if (started.map(_.runId).contains(sr.runId) && !updates.exists(_.runId == sr.runId)) {
+        updates += sr
+        if (started.map(_.runId) == updates.map(_.runId)) {
+          checkAndComplete(alreadyCompleted ++ updates)
         }
       }
     }
@@ -56,5 +61,4 @@ object CommandCompleter {
       completePromise.future
     }
   }
-
 }

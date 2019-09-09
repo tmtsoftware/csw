@@ -1,6 +1,6 @@
 package csw.command.client
 
-import csw.command.api.CommandCompleter.{Completer, OverallFailure, OverallSuccess}
+import csw.command.api.Completer.{Completer, OverallFailure, OverallSuccess}
 import csw.params.commands.CommandIssue.OtherIssue
 import csw.params.commands.CommandName
 import csw.params.commands.CommandResponse.{Completed, Error, Invalid, Started}
@@ -33,7 +33,28 @@ class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll {
     )
   }
 
-  test("test easy case with 1 completed and 1 started") {
+  test("test case with all started, first returns error") {
+    val id1 = Id("1")
+    val id2 = Id("2")
+    val id3 = Id("3")
+    val r1  = Started(CommandName("1"), id1)
+    val r2  = Started(CommandName("2"), id2)
+    val r3  = Started(CommandName("3"), id3)
+
+    val c1 = Completer(Set(r1, r2, r3))
+
+    val x = c1.waitComplete()
+    c1.update(Error(CommandName("1"), id1, "ERROR"))
+    c1.update(Completed(CommandName("2"), id2))
+    c1.update(Completed(CommandName("3"), id3))
+
+    val res = Await.result(x, 1.seconds)
+    res shouldEqual OverallFailure(
+      Set(Error(CommandName("1"), id1, "ERROR"), Completed(CommandName("2"), id2), Completed(CommandName("3"), id3))
+    )
+  }
+
+  test("test easy case with 2 completed and 1 started") {
     val id1 = Id("1")
     val id2 = Id("2")
     val id3 = Id("3")

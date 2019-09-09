@@ -46,10 +46,8 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
   private lazy val miniCRM: ActorRef[MiniCRM.CRMMessage] =
     Await.result(actorSystem.systemActorOf(MiniCRM.make(), name), 5.seconds)
 
-  val commandSubscription: CommandUpdateSubscription =
-    new CommandUpdateSubscriptionImpl(component, None, { sr: SubmitResponse =>
-      miniCRM ! AddResponse(sr)
-    })
+  // This provides the handler that is called when the component pubsub updates
+  subscribeCommandUpdates((sr: SubmitResponse) => miniCRM ! AddResponse(sr))
 
   override def validate(controlCommand: ControlCommand): Future[ValidateResponse] = {
     implicit val timeout: Timeout = Timeout(ValidateTimeout)
@@ -170,7 +168,7 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
   override def subscribeCurrentState(names: Set[StateName], callback: CurrentState => Unit): CurrentStateSubscription =
     subscribeCurrentState(names).map(callback).toMat(Sink.ignore)(Keep.left).run()
 
-  def subscribeCommandUpdates(callback: SubmitResponse => Unit): CommandUpdateSubscription =
+  private def subscribeCommandUpdates(callback: SubmitResponse => Unit): CommandUpdateSubscription =
     new CommandUpdateSubscriptionImpl(component, None, callback)
 
 }
