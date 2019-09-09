@@ -2,10 +2,11 @@ package csw.location.server
 
 import akka.Done
 import akka.actor.CoordinatedShutdown
+import akka.util.Timeout
 import csw.location.server.cli.{ArgsParser, Options}
 import csw.location.server.commons.ClusterAwareSettings
 import csw.location.server.commons.CoordinatedShutdownReasons.FailureReason
-import csw.location.server.dns.LocationDnsActor
+import csw.location.server.dns.LocationDnsActorTyped
 import csw.location.server.internal.ServerWiring
 
 import scala.concurrent.Await
@@ -38,7 +39,8 @@ object Main extends App {
 
           val locationBindingF = locationHttpService.start()
 
-          Await.result(LocationDnsActor.start(locationService), 2.seconds)
+          implicit val timeout: Timeout = Timeout(2.seconds)
+          Await.result(LocationDnsActorTyped.start(53, locationService), timeout.duration)
 
           coordinatedShutdown.addTask(
             CoordinatedShutdown.PhaseServiceUnbind,
