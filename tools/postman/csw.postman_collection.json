@@ -1515,12 +1515,12 @@
                 },
                 {
                   "key": "username",
-                  "value": "admin",
+                  "value": "config-admin",
                   "type": "text"
                 },
                 {
                   "key": "password",
-                  "value": "tmt-admin",
+                  "value": "config-admin",
                   "type": "text"
                 }
               ]
