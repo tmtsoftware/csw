@@ -23,7 +23,11 @@ import scala.collection.mutable.ListBuffer
  * miniCRM is written in the "immutable" style so all state is passed between calls to new Behaviors
  *
  * The CommandService only submits Started commands to the miniCRM. When a Started SubmitResponse is received,
- * miniCRM receives an AddStarted method. Whenever the component associated with the
+ * miniCRM receives an AddStarted method. Whenever the component associated with the miniCRM receives the final
+ * completion message, it calls AddResponse.
+ *
+ * Query and QueryFinal are used by the CommandService to provide a response. Both of these methods look within
+ * the three lists above for their responses.
  */
 object MiniCRM {
 
