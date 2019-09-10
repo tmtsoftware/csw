@@ -19,11 +19,12 @@ class LocationDnsActor(locationService: LocationService) extends Actor {
   override def receive: Receive = {
 
     case Query(q) ~ Questions(QName(host) ~ TypeA() :: Nil) =>
+      val senderCached = sender()
       resolve(host).onComplete {
         case Success(ip) =>
-          sender ! Response(q) ~ Answers(RRName(host) ~ ARecord(ip)) ~ AuthoritativeAnswer
+          senderCached ! Response(q) ~ Answers(RRName(host) ~ ARecord(ip)) ~ AuthoritativeAnswer
         case Failure(_) =>
-          sender ! Response(q) ~ Refused
+          senderCached ! Response(q) ~ Refused
       }
 
     case message: Message =>
