@@ -9,7 +9,9 @@ import csw.logging.client.exceptions.AppenderNotFoundException
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.models.Level
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import play.api.libs.json.JsObject
 
+import scala.collection.mutable
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
@@ -37,7 +39,7 @@ class LoggingSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
       .toUpperCase
   }
 
-  test("should able to set log level for default logger, slf4j and akka") {
+  test("should be able to set log level for default logger, slf4j and akka") {
     val logLevel      = "debug"
     val akkaLogLevel  = "Error"
     val slf4jLogLevel = "INFO"
@@ -52,7 +54,7 @@ class LoggingSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
   }
 
   // DEOPSCSW-142: Flexibility of logging approaches
-  test("should able to parse appenders from configuration file") {
+  test("should be able to parse appenders from configuration file") {
     loggingSystem.getAppenders.toSet shouldBe Set(StdOutAppender, FileAppender)
   }
 
