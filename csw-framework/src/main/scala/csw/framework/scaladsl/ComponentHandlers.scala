@@ -7,6 +7,7 @@ import csw.framework.models.CswContext
 import csw.location.models.{Connection, TrackingEvent}
 import csw.params.commands.CommandResponse.{SubmitResponse, ValidateCommandResponse}
 import csw.params.commands.ControlCommand
+import csw.time.core.models.UTCTime
 
 import scala.concurrent.Future
 
@@ -67,6 +68,10 @@ abstract class ComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx
    * @param controlCommand represents a command received e.g. Setup, Observe or wait
    */
   def onOneway(controlCommand: ControlCommand): Unit
+
+  def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = ???
+
+  def onOperationsMode(startTime: UTCTime): Unit = ???
 
   /**
    * The onShutdown handler can be used for carrying out the tasks which will allow the component to shutdown gracefully

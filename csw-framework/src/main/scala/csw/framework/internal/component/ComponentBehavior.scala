@@ -4,6 +4,7 @@ import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
 import csw.command.client.messages.CommandResponseManagerMessage.AddOrUpdateCommand
+import csw.command.client.messages.DiagnosticDataMessage.{DiagnosticMode, OperationsMode}
 import csw.command.client.messages.FromComponentLifecycleMessage.Running
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.TopLevelActorCommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
@@ -16,6 +17,7 @@ import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandResponse._
+import csw.time.core.models.UTCTime
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Await
@@ -110,9 +112,10 @@ private[framework] object ComponentBehavior {
        * @param runningMessage message representing a message received in [[ComponentLifecycleState.Running]] state
        */
       def onRun(runningMessage: RunningMessage): Unit = runningMessage match {
-        case Lifecycle(message) => onLifecycle(message)
-        case x: CommandMessage  => onRunningCompCommandMessage(x)
-        case msg                => log.error(s"Component TLA cannot handle message :[$msg]")
+        case Lifecycle(message)       => onLifecycle(message)
+        case x: CommandMessage        => onRunningCompCommandMessage(x)
+        case x: DiagnosticDataMessage => onRunningCompDiagnosticDataMessage(x)
+        case msg                      => log.error(s"Component TLA cannot handle message :[$msg]")
       }
 
       /*
@@ -139,6 +142,11 @@ private[framework] object ComponentBehavior {
               log.debug(s"Component TLA is Offline")
             }
         }
+
+      def onRunningCompDiagnosticDataMessage(diagnosticDataMessage: DiagnosticDataMessage): Unit = diagnosticDataMessage match {
+        case DiagnosticMode(startTime, hint) => lifecycleHandlers.onDiagnosticMode(startTime, hint)
+        case OperationsMode(startTime)       => lifecycleHandlers.onOperationsMode(startTime)
+      }
 
       /*
        * Defines action for messages which represent a [[csw.params.commands.Command]]

@@ -3,12 +3,15 @@ package csw.framework.internal.component
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import akka.actor.typed.Behavior
 import csw.command.client.CommandResponseManager
+import csw.command.client.messages.DiagnosticDataMessage.DiagnosticMode
 import csw.command.client.messages.FromComponentLifecycleMessage.Running
 import csw.command.client.messages.TopLevelActorIdleMessage.Initialize
 import csw.command.client.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{ComponentInfos, CurrentStatePublisher, FrameworkTestSuite}
+import csw.time.core.models.{TMTTime, UTCTime}
+import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar
 import org.scalatest.Matchers
 
@@ -17,7 +20,6 @@ import scala.concurrent.Future
 // DEOPSCSW-165-CSW Assembly Creation
 // DEOPSCSW-166-CSW HCD Creation
 class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar with Matchers {
-
   class TestData(supervisorProbe: TestProbe[FromComponentLifecycleMessage]) {
 
     val sampleComponentHandler: ComponentHandlers = mock[ComponentHandlers]
@@ -55,5 +57,17 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar with Ma
     supervisorProbe.expectMessageType[Running]
     verify(sampleComponentHandler).initialize()
     verify(sampleComponentHandler).isOnline_=(true)
+  }
+
+  test("component should handle DiagnosticMode message") {
+    val supervisorProbe = TestProbe[FromComponentLifecycleMessage]
+    val testData        = new TestData(supervisorProbe)
+    import testData._
+
+    val startTime = UTCTime.now()
+    val hint      = "engineering"
+    componentBehaviorTestKit.run(Initialize)
+    componentBehaviorTestKit.run(DiagnosticMode(startTime, hint))
+    verify(sampleComponentHandler).onDiagnosticMode(startTime, hint)
   }
 }

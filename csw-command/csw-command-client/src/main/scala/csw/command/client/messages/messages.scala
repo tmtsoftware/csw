@@ -13,6 +13,7 @@ import csw.params.commands.ControlCommand
 import csw.params.core.models.{Id, Prefix}
 import csw.params.core.states.CurrentState
 import csw.serializable.CommandSerializable
+import csw.time.core.models.UTCTime
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -122,6 +123,13 @@ object RunningMessage {
    *                e.g. GoOffline or GoOnline
    */
   case class Lifecycle(message: ToComponentLifecycleMessage) extends RunningMessage with ContainerMessage with RemoteMsg
+}
+
+sealed trait DiagnosticDataMessage extends RunningMessage with CommandSerializable
+
+object DiagnosticDataMessage {
+  case class DiagnosticMode(startTime: UTCTime, hint: String) extends DiagnosticDataMessage with RemoteMsg
+  case class OperationsMode(startTime: UTCTime)               extends DiagnosticDataMessage with RemoteMsg
 }
 
 /**
