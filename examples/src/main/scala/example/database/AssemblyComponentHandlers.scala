@@ -8,6 +8,7 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.location.models.TrackingEvent
 import csw.params.commands.CommandResponse.Completed
 import csw.params.commands.{CommandResponse, ControlCommand}
+import csw.time.core.models.UTCTime
 import org.jooq.{DSLContext, Query}
 
 import scala.async.Async.async
@@ -99,6 +100,8 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit                              = ???
   override def validateCommand(controlCommand: ControlCommand): CommandResponse.ValidateCommandResponse = ???
   override def onOneway(controlCommand: ControlCommand): Unit                                           = ???
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit                                 = ???
+  override def onOperationsMode(startTime: UTCTime): Unit                                               = ???
   override def onShutdown(): Future[Unit]                                                               = ???
   override def onGoOffline(): Unit                                                                      = ???
   override def onGoOnline(): Unit                                                                       = ???

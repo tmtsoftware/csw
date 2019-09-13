@@ -16,6 +16,7 @@ import csw.params.commands.{ControlCommand, Result, Setup}
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
+import csw.time.core.models.UTCTime
 
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContext, Future}
@@ -151,6 +152,10 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
           .throttle(1, 100.millis, 1, ThrottleMode.Shaping)
           .runWith(Sink.ignore)
     }
+
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = ???
+
+  override def onOperationsMode(startTime: UTCTime): Unit = ???
 
   override def onShutdown(): Future[Unit] = ???
 

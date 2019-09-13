@@ -108,6 +108,10 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
     Thread.sleep(500)
   }
 
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = ???
+
+  override def onOperationsMode(startTime: UTCTime): Unit = ???
+
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = trackingEvent match {
     case LocationUpdated(location) =>
       location.connection match {

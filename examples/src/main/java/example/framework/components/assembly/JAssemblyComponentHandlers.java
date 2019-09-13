@@ -28,6 +28,7 @@ import csw.params.core.models.Prefix;
 import csw.params.core.states.CurrentState;
 import csw.params.core.states.StateName;
 import csw.params.javadsl.JKeyType;
+import csw.time.core.models.UTCTime;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.nio.file.Paths;
@@ -154,6 +155,14 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         // do something when going online
     }
     //#onGoOnline-handler
+
+    @Override
+    public void onDiagnosticMode(UTCTime startTime, String hint) {
+    }
+
+    @Override
+    public void onOperationsMode(UTCTime startTime) {
+    }
 
     //#onShutdown-handler
     @Override

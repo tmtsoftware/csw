@@ -17,7 +17,6 @@ import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandResponse._
-import csw.time.core.models.UTCTime
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Await

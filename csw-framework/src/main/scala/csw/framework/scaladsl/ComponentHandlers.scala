@@ -69,9 +69,9 @@ abstract class ComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx
    */
   def onOneway(controlCommand: ControlCommand): Unit
 
-  def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = ???
+  def onDiagnosticMode(startTime: UTCTime, hint: String): Unit
 
-  def onOperationsMode(startTime: UTCTime): Unit = ???
+  def onOperationsMode(startTime: UTCTime): Unit
 
   /**
    * The onShutdown handler can be used for carrying out the tasks which will allow the component to shutdown gracefully

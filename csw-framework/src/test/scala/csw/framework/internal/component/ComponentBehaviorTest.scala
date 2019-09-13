@@ -10,8 +10,7 @@ import csw.command.client.messages.{CommandResponseManagerMessage, FromComponent
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{ComponentInfos, CurrentStatePublisher, FrameworkTestSuite}
-import csw.time.core.models.{TMTTime, UTCTime}
-import org.mockito.ArgumentMatchers.any
+import csw.time.core.models.UTCTime
 import org.mockito.MockitoSugar
 import org.scalatest.Matchers
 

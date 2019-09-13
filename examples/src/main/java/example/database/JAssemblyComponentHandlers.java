@@ -9,6 +9,7 @@ import csw.framework.models.JCswContext;
 import csw.location.models.TrackingEvent;
 import csw.params.commands.CommandResponse;
 import csw.params.commands.ControlCommand;
+import csw.time.core.models.UTCTime;
 import org.jooq.*;
 
 import java.util.Arrays;
@@ -58,6 +59,14 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     @Override
     public CompletableFuture<Void> jOnShutdown() {
         return null;
+    }
+
+    @Override
+    public void onDiagnosticMode(UTCTime startTime, String hint) {
+    }
+
+    @Override
+    public void onOperationsMode(UTCTime startTime) {
     }
 
     @Override

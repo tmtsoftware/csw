@@ -11,6 +11,7 @@ import csw.params.commands._
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.Id
 import csw.params.events.{EventName, SystemEvent}
+import csw.time.core.models.UTCTime
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
@@ -129,5 +130,9 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   override def onGoOffline(): Unit = {}
 
   override def onGoOnline(): Unit = {}
+
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {}
+
+  override def onOperationsMode(startTime: UTCTime): Unit = {}
 
 }

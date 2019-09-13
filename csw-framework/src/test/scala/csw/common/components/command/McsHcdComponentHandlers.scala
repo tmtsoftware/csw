@@ -10,6 +10,7 @@ import csw.location.models.TrackingEvent
 import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
+import csw.time.core.models.UTCTime
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
@@ -67,6 +68,10 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   }
 
   override def onOneway(controlCommand: ControlCommand): Unit = ???
+
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = ???
+
+  override def onOperationsMode(startTime: UTCTime): Unit = ???
 
   override def onShutdown(): Future[Unit] = ???
 

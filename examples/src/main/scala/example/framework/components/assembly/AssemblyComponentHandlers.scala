@@ -15,6 +15,7 @@ import csw.location.models._
 import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandResponse.{Accepted, Completed, SubmitResponse, ValidateCommandResponse}
 import csw.params.commands._
+import csw.time.core.models.UTCTime
 
 import scala.async.Async._
 import scala.concurrent.duration.DurationDouble
@@ -105,6 +106,14 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
     // clean up resources
   }
   //#onShutdown-handler
+
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {
+    // do something on Diagnostic Mode
+  }
+
+  override def onOperationsMode(startTime: UTCTime): Unit = {
+    // do something on Operations Mode
+  }
 
   //#onLocationTrackingEvent-handler
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = trackingEvent match {

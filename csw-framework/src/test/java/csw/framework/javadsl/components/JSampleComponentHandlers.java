@@ -22,6 +22,7 @@ import csw.params.core.models.Id;
 import csw.params.core.states.CurrentState;
 import csw.params.core.states.StateName;
 import csw.params.javadsl.JKeyType;
+import csw.time.core.models.UTCTime;
 
 import java.time.Duration;
 import java.util.concurrent.*;
@@ -241,5 +242,13 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     public void onGoOnline() {
         CurrentState onlineState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.onlineChoice()));
         currentStatePublisher.publish(onlineState);
+    }
+
+    @Override
+    public void onDiagnosticMode(UTCTime startTime, String hint) {
+    }
+
+    @Override
+    public void onOperationsMode(UTCTime startTime) {
     }
 }

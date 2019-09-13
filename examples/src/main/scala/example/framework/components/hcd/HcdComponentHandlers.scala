@@ -15,6 +15,7 @@ import csw.location.models.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandResponse.{Accepted, Completed, SubmitResponse, ValidateCommandResponse}
 import csw.params.commands.{ControlCommand, Observe, Setup}
+import csw.time.core.models.UTCTime
 import example.framework.components.ConfigNotAvailableException
 import example.framework.components.assembly.WorkerActorMsgs.{GetStatistics, InitialState}
 import example.framework.components.assembly.{WorkerActor, WorkerActorMsg}
@@ -93,6 +94,14 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
     // clean up resources
   }
   //#onShutdown-handler
+
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {
+    // do something on Diagnostic Mode
+  }
+
+  override def onOperationsMode(startTime: UTCTime): Unit = {
+    // do something on Operations Mode
+  }
 
   //#onLocationTrackingEvent-handler
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = trackingEvent match {
