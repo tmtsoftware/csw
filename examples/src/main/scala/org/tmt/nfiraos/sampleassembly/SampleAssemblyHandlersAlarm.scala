@@ -168,7 +168,7 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
 
   override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {}
 
-  override def onOperationsMode(startTime: UTCTime): Unit = {}
+  override def onOperationsMode(): Unit = {}
 
   override def onGoOffline(): Unit = {}
 

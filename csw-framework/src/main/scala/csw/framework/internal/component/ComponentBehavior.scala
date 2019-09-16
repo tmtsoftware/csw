@@ -144,7 +144,7 @@ private[framework] object ComponentBehavior {
 
       def onRunningCompDiagnosticDataMessage(diagnosticDataMessage: DiagnosticDataMessage): Unit = diagnosticDataMessage match {
         case DiagnosticMode(startTime, hint) => lifecycleHandlers.onDiagnosticMode(startTime, hint)
-        case OperationsMode(startTime)       => lifecycleHandlers.onOperationsMode(startTime)
+        case OperationsMode                  => lifecycleHandlers.onOperationsMode()
       }
 
       /*

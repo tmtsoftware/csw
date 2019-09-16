@@ -133,6 +133,6 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
 
   override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {}
 
-  override def onOperationsMode(startTime: UTCTime): Unit = {}
+  override def onOperationsMode(): Unit = {}
 
 }

@@ -153,7 +153,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
 
   override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = ???
 
-  override def onOperationsMode(startTime: UTCTime): Unit = ???
+  override def onOperationsMode(): Unit = ???
 
   override def onShutdown(): Future[Unit] = Future.successful(())
 

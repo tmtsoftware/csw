@@ -77,7 +77,7 @@ class DiagnosticDataIntegrationTest extends FrameworkIntegrationSuite {
     supervisorRef ! DiagnosticMode(UTCTime.now(), "unsupportedHint")
     eventProbe.expectNoMessage()
 
-    supervisorRef ! OperationsMode(UTCTime.now())
+    supervisorRef ! OperationsMode
     eventProbe.expectNoMessage()
 
   }

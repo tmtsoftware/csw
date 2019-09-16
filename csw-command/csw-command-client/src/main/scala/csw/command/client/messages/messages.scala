@@ -129,7 +129,7 @@ sealed trait DiagnosticDataMessage extends RunningMessage with CommandSerializab
 
 object DiagnosticDataMessage {
   case class DiagnosticMode(startTime: UTCTime, hint: String) extends DiagnosticDataMessage with RemoteMsg
-  case class OperationsMode(startTime: UTCTime)               extends DiagnosticDataMessage with RemoteMsg
+  case object OperationsMode                                  extends DiagnosticDataMessage with RemoteMsg
 }
 
 /**

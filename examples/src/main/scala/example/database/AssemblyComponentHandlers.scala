@@ -101,7 +101,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
   override def validateCommand(controlCommand: ControlCommand): CommandResponse.ValidateCommandResponse = ???
   override def onOneway(controlCommand: ControlCommand): Unit                                           = ???
   override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit                                 = ???
-  override def onOperationsMode(startTime: UTCTime): Unit                                               = ???
+  override def onOperationsMode(): Unit                                                                 = ???
   override def onShutdown(): Future[Unit]                                                               = ???
   override def onGoOffline(): Unit                                                                      = ???
   override def onGoOnline(): Unit                                                                       = ???

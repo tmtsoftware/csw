@@ -155,7 +155,7 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
 
   override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = ???
 
-  override def onOperationsMode(startTime: UTCTime): Unit = ???
+  override def onOperationsMode(): Unit = ???
 
   override def onShutdown(): Future[Unit] = ???
 

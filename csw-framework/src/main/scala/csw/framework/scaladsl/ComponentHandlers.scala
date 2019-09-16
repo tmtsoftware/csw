@@ -79,10 +79,8 @@ abstract class ComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx
 
   /**
    * On receiving a operations mode command, the current diagnostic data mode is halted.
-   *
-   * @param startTime represents the time at which the operations mode actions will take effect
    */
-  def onOperationsMode(startTime: UTCTime): Unit
+  def onOperationsMode(): Unit
 
   /**
    * The onShutdown handler can be used for carrying out the tasks which will allow the component to shutdown gracefully

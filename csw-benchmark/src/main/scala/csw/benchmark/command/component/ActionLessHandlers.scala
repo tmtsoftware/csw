@@ -34,5 +34,5 @@ class ActionLessHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCon
 
   override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = ???
 
-  override def onOperationsMode(startTime: UTCTime): Unit = ???
+  override def onOperationsMode(): Unit = ???
 }

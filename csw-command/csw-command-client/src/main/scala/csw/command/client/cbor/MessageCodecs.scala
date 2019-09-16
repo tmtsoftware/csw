@@ -76,19 +76,19 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
 
   // ************************ RemoteMsg Codecs ********************
 
-  implicit lazy val shutdownCodec: Codec[Shutdown.type]        = singletonCodec(Shutdown)
-  implicit lazy val restartCodec: Codec[Restart.type]          = singletonCodec(Restart)
-  implicit lazy val queryCodec: Codec[Query]                   = deriveCodec[Query]
-  implicit lazy val subscribeCodec: Codec[Subscribe]           = deriveCodec[Subscribe]
-  implicit lazy val unsubscribeCodec: Codec[Unsubscribe]       = deriveCodec[Unsubscribe]
-  implicit lazy val submitCodec: Codec[Submit]                 = deriveCodec[Submit]
-  implicit lazy val oneWayCodec: Codec[Oneway]                 = deriveCodec[Oneway]
-  implicit lazy val validateCodec: Codec[Validate]             = deriveCodec[Validate]
-  implicit lazy val lockCodec: Codec[Lock]                     = deriveCodec[Lock]
-  implicit lazy val unlockCodec: Codec[Unlock]                 = deriveCodec[Unlock]
-  implicit lazy val lifecycleCodec: Codec[Lifecycle]           = deriveCodec[Lifecycle]
-  implicit lazy val diagnosticModeCodec: Codec[DiagnosticMode] = deriveCodec[DiagnosticMode]
-  implicit lazy val operationsModeCodec: Codec[OperationsMode] = deriveUnaryCodec[OperationsMode]
+  implicit lazy val shutdownCodec: Codec[Shutdown.type]             = singletonCodec(Shutdown)
+  implicit lazy val restartCodec: Codec[Restart.type]               = singletonCodec(Restart)
+  implicit lazy val queryCodec: Codec[Query]                        = deriveCodec[Query]
+  implicit lazy val subscribeCodec: Codec[Subscribe]                = deriveCodec[Subscribe]
+  implicit lazy val unsubscribeCodec: Codec[Unsubscribe]            = deriveCodec[Unsubscribe]
+  implicit lazy val submitCodec: Codec[Submit]                      = deriveCodec[Submit]
+  implicit lazy val oneWayCodec: Codec[Oneway]                      = deriveCodec[Oneway]
+  implicit lazy val validateCodec: Codec[Validate]                  = deriveCodec[Validate]
+  implicit lazy val lockCodec: Codec[Lock]                          = deriveCodec[Lock]
+  implicit lazy val unlockCodec: Codec[Unlock]                      = deriveCodec[Unlock]
+  implicit lazy val lifecycleCodec: Codec[Lifecycle]                = deriveCodec[Lifecycle]
+  implicit lazy val diagnosticModeCodec: Codec[DiagnosticMode]      = deriveCodec[DiagnosticMode]
+  implicit lazy val operationsModeCodec: Codec[OperationsMode.type] = singletonCodec(OperationsMode)
 
   implicit lazy val lifecycleStateChangedCodec: Codec[LifecycleStateChanged]           = deriveCodec[LifecycleStateChanged]
   implicit lazy val lifecycleStateSubscriptionCodec: Codec[LifecycleStateSubscription] = deriveCodec[LifecycleStateSubscription]

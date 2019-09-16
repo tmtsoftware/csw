@@ -188,7 +188,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
     // do something on Diagnostic Mode
   }
 
-  override def onOperationsMode(startTime: UTCTime): Unit = {
+  override def onOperationsMode(): Unit = {
     // do something on Operations Mode
   }
 

@@ -127,7 +127,7 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   //#onDiagnostic-mode
 
   //#onOperations-mode
-  override def onOperationsMode(startTime: UTCTime): Unit = {
+  override def onOperationsMode(): Unit = {
     diagModeCancellable.foreach(_.cancel())
   }
   //#onOperations-mode

@@ -249,6 +249,6 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     }
 
     @Override
-    public void onOperationsMode(UTCTime startTime) {
+    public void onOperationsMode() {
     }
 }

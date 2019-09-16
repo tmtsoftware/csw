@@ -185,6 +185,6 @@ public class JSampleHcdHandlers extends JComponentHandlers {
     }
 
     @Override
-    public void onOperationsMode(UTCTime startTime) {
+    public void onOperationsMode() {
     }
 }

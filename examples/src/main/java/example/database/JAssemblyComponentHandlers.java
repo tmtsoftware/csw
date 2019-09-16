@@ -66,7 +66,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     }
 
     @Override
-    public void onOperationsMode(UTCTime startTime) {
+    public void onOperationsMode() {
     }
 
     @Override

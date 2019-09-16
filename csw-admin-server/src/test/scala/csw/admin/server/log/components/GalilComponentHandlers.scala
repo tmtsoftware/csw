@@ -48,5 +48,5 @@ class GalilComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
 
   override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = ()
 
-  override def onOperationsMode(startTime: UTCTime): Unit = ()
+  override def onOperationsMode(): Unit = ()
 }
