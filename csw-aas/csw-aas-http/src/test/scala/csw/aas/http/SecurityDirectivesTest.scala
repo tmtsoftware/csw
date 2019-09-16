@@ -16,6 +16,34 @@ import scala.concurrent.Future
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
 class SecurityDirectivesTest extends FunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
+  test("auth using customPolicy should return 200 OK when policy matches") {
+    val authentication: Authentication = mock[Authentication]
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    import securityDirectives._
+
+    val validTokenWithPolicyMatchStr    = "validTokenWithPolicyMatch"
+    val validTokenWithPolicyMatchHeader = Authorization(OAuth2BearerToken(validTokenWithPolicyMatchStr))
+
+    val validTokenWithPolicyMatch = mock[AccessToken]
+
+    val authenticator: AsyncAuthenticator[AccessToken] = {
+      case Provided(`validTokenWithPolicyMatchStr`) => Future.successful(Some(validTokenWithPolicyMatch))
+      case _                                        => Future.successful(None)
+    }
+
+    when(authentication.authenticator).thenReturn(authenticator)
+
+    val route: Route = post {
+      auth(CustomPolicy(_ => true)) { _ =>
+        complete("OK")
+      }
+    }
+
+    Post("/").addHeader(validTokenWithPolicyMatchHeader) ~> route ~> check {
+      status shouldBe StatusCodes.OK
+    }
+  }
+
   test("sGet using customPolicy should return 200 OK when policy matches") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")

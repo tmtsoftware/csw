@@ -69,7 +69,15 @@ class SecurityDirectives private[csw] (authentication: Authentication, realm: St
     }
 
   private def sMethod(httpMethod: HttpMethod, authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] =
-    method(httpMethod) & authenticate.flatMap(token => authorize(authorizationPolicy, token) & provide(token))
+    method(httpMethod) & auth(authorizationPolicy)
+
+  /**
+   * Rejects all un-authorized requests
+   * @param authorizationPolicy Authorization policy to use for filtering requests.
+   *                            There are different types of authorization policies. See [[csw.aas.http.AuthorizationPolicy]]
+   */
+  def auth(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] =
+    authenticate.flatMap(token => authorize(authorizationPolicy, token) & provide(token))
 
   /**
    * Rejects all un-authorized and non-POST requests
