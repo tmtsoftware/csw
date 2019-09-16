@@ -110,6 +110,7 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
     Thread.sleep(500)
   }
 
+  //#onDiagnostic-mode
   // While dealing with mutable state, make sure you create a worker actor to avoid concurrency issues
   // For functionality demonstration, we have simply used a mutable variable without worker actor
   var diagModeCancellable: Option[Cancellable] = None
@@ -123,10 +124,13 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
       case _ =>
     }
   }
+  //#onDiagnostic-mode
 
+  //#onOperations-mode
   override def onOperationsMode(startTime: UTCTime): Unit = {
     diagModeCancellable.foreach(_.cancel())
   }
+  //#onOperations-mode
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = trackingEvent match {
     case LocationUpdated(location) =>

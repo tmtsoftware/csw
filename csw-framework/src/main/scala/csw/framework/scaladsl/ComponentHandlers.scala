@@ -69,8 +69,19 @@ abstract class ComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx
    */
   def onOneway(controlCommand: ControlCommand): Unit
 
+  /**
+   * On receiving a diagnostic data command, the component goes into a diagnostic data mode based on hint at the specified startTime.
+   * Validation of supported hints need to be handled by the component writer.
+   * @param startTime represents the time at which the diagnostic mode actions will take effect
+   * @param hint represents supported diagnostic data mode for a component
+   */
   def onDiagnosticMode(startTime: UTCTime, hint: String): Unit
 
+  /**
+   * On receiving a operations mode command, the current diagnostic data mode is halted.
+   *
+   * @param startTime represents the time at which the operations mode actions will take effect
+   */
   def onOperationsMode(startTime: UTCTime): Unit
 
   /**
