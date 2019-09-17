@@ -4,6 +4,7 @@ import csw.aas.core.TokenVerificationFailure.InvalidToken
 import csw.aas.core.commons.AuthLogger
 import org.keycloak.authorization.client.AuthzClient
 import pdi.jwt.{JwtJson, JwtOptions}
+import play.api.libs.json.JsString
 
 import scala.concurrent.{blocking, ExecutionContext, Future}
 import scala.util.control.NonFatal
@@ -44,6 +45,7 @@ private[aas] class RPT(authzClient: AuthzClient)(implicit ec: ExecutionContext) 
   private def decodeRPT(rptString: String): Either[TokenVerificationFailure, AccessToken] =
     JwtJson
       .decodeJson(rptString, JwtOptions(signature = false, expiration = false, notBefore = false))
+      .map(_ + (("value", JsString(rptString))))
       .toLeftMappedEither("error while decoding RPT")
       .flatMap { js =>
         Try { js.as[AccessToken] }.toLeftMappedEither("error while mapping RPT json to access token")
