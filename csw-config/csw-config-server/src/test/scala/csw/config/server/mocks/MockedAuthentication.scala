@@ -9,8 +9,8 @@ import csw.aas.http.{Authentication, SecurityDirectives}
 import csw.config.api.TokenFactory
 import org.keycloak.adapters.KeycloakDeployment
 import org.mockito.MockitoSugar
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class JMockedAuthentication extends MockedAuthentication
@@ -25,7 +25,8 @@ trait MockedAuthentication extends MockitoSugar {
   private val authConfig: AuthConfig = mock[AuthConfig]
   when(authConfig.getDeployment).thenReturn(keycloakDeployment)
 
-  val securityDirectives = new SecurityDirectives(authentication, keycloakDeployment.getRealm, keycloakDeployment.getResourceName)
+  val securityDirectives =
+    new SecurityDirectives(authentication, keycloakDeployment.getRealm, keycloakDeployment.getResourceName, false)
 
   val roleMissingTokenStr = "rolemissing"
   val validTokenStr       = "valid"
