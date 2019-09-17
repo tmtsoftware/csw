@@ -34,7 +34,7 @@ class SecurityDirectivesTest extends FunSuite with MockitoSugar with Directives 
     when(authentication.authenticator).thenReturn(authenticator)
 
     val route: Route = post {
-      auth(CustomPolicy(_ => true)) { _ =>
+      secure(CustomPolicy(_ => true)) { _ =>
         complete("OK")
       }
     }
