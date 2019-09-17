@@ -19,65 +19,39 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.implicitConversions
 import scala.util.{Failure, Success}
 
-class SecurityDirectives private[csw] (authentication: Authentication, realm: String, resourceName: String)(
+class SecurityDirectives private[csw] (
+    authentication: Authentication,
+    realm: String,
+    resourceName: String,
+    disabled: Boolean
+)(
     implicit ec: ExecutionContext
 ) {
 
   private val logger = AuthLogger.getLogger
   import logger._
 
+  if (disabled)
+    warn(
+      "Security directives initialized with auth disabled. " +
+        "All un-authorised calls will be granted access"
+    )
+
   implicit def toRouteFunction(route: Route): AccessToken => Route                            = _ => route
   implicit def toBooleanFunction(bool: Boolean): AccessToken => Boolean                       = _ => bool
   implicit def toBooleanFutureFunction(bool: Future[Boolean]): AccessToken => Future[Boolean] = _ => bool
-
-  private[aas] def authenticate: AuthenticationDirective[AccessToken] =
-    authenticateOAuth2Async(realm, authentication.authenticator)
-
-  private[aas] def authorize(authorizationPolicy: AuthorizationPolicy, accessToken: AccessToken): Directive0 =
-    authorizationPolicy match {
-      case ClientRolePolicy(name)           => keycloakAuthorize(accessToken.hasClientRole(name, resourceName))
-      case RealmRolePolicy(name)            => keycloakAuthorize(accessToken.hasRealmRole(name))
-      case PermissionPolicy(name, resource) => keycloakAuthorize(accessToken.hasPermission(name, resource))
-      case CustomPolicy(predicate) =>
-        keycloakAuthorize {
-          val result = predicate(accessToken)
-          if (!result) debug(s"'${accessToken.userOrClientName}' failed custom policy authorization")
-          else debug(s"authorization succeeded for '${accessToken.userOrClientName}' via a custom policy")
-          result
-        }
-      case CustomPolicyAsync(predicate) =>
-        keycloakAuthorizeAsync {
-          val result = predicate(accessToken)
-          result.onComplete {
-            case Success(authorized) =>
-              if (authorized) {
-                debug(s"authorization succeeded for '${accessToken.userOrClientName}' via a custom policy")
-              } else {
-                warn(s"'${accessToken.userOrClientName}' failed custom policy authorization")
-              }
-            case Failure(exception) =>
-              error(s"error while executing async custom policy for ${accessToken.userOrClientName}", ex = exception)
-          }
-          result
-        }
-      case EmptyPolicy => Directive.Empty
-      case PolicyExpression(left, op, right) =>
-        op match {
-          case And => authorize(left, accessToken) & authorize(right, accessToken)
-          case Or  => authorize(left, accessToken) | authorize(right, accessToken)
-        }
-    }
-
-  private def sMethod(httpMethod: HttpMethod, authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] =
-    method(httpMethod) & secure(authorizationPolicy)
 
   /**
    * Rejects all un-authorized requests
    * @param authorizationPolicy Authorization policy to use for filtering requests.
    *                            There are different types of authorization policies. See [[csw.aas.http.AuthorizationPolicy]]
    */
-  def secure(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] =
-    authenticate.flatMap(token => authorize(authorizationPolicy, token) & provide(token))
+  def secure(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = {
+    if (!disabled)
+      authenticate.flatMap(token => authorize(authorizationPolicy, token) & provide(token))
+    else
+      provide(AccessToken())
+  }
 
   /**
    * Rejects all un-authorized and non-POST requests
@@ -134,6 +108,47 @@ class SecurityDirectives private[csw] (authentication: Authentication, realm: St
    *                            There are different types of authorization policies. See [[csw.aas.http.AuthorizationPolicy]]
    */
   def sConnect(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = sMethod(CONNECT, authorizationPolicy)
+
+  private[aas] def authenticate: AuthenticationDirective[AccessToken] =
+    authenticateOAuth2Async(realm, authentication.authenticator)
+
+  private[aas] def authorize(authorizationPolicy: AuthorizationPolicy, accessToken: AccessToken): Directive0 =
+    authorizationPolicy match {
+      case ClientRolePolicy(name)           => keycloakAuthorize(accessToken.hasClientRole(name, resourceName))
+      case RealmRolePolicy(name)            => keycloakAuthorize(accessToken.hasRealmRole(name))
+      case PermissionPolicy(name, resource) => keycloakAuthorize(accessToken.hasPermission(name, resource))
+      case CustomPolicy(predicate) =>
+        keycloakAuthorize {
+          val result = predicate(accessToken)
+          if (!result) debug(s"'${accessToken.userOrClientName}' failed custom policy authorization")
+          else debug(s"authorization succeeded for '${accessToken.userOrClientName}' via a custom policy")
+          result
+        }
+      case CustomPolicyAsync(predicate) =>
+        keycloakAuthorizeAsync {
+          val result = predicate(accessToken)
+          result.onComplete {
+            case Success(authorized) =>
+              if (authorized) {
+                debug(s"authorization succeeded for '${accessToken.userOrClientName}' via a custom policy")
+              } else {
+                warn(s"'${accessToken.userOrClientName}' failed custom policy authorization")
+              }
+            case Failure(exception) =>
+              error(s"error while executing async custom policy for ${accessToken.userOrClientName}", ex = exception)
+          }
+          result
+        }
+      case EmptyPolicy => Directive.Empty
+      case PolicyExpression(left, op, right) =>
+        op match {
+          case And => authorize(left, accessToken) & authorize(right, accessToken)
+          case Or  => authorize(left, accessToken) | authorize(right, accessToken)
+        }
+    }
+
+  private def sMethod(httpMethod: HttpMethod, authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] =
+    method(httpMethod) & secure(authorizationPolicy)
 }
 
 /**
@@ -148,6 +163,13 @@ object SecurityDirectives {
    * Expects auth-server-url to be present in config.
    */
   def apply()(implicit ec: ExecutionContext): SecurityDirectives = from(AuthConfig.create())
+
+  private def from(authConfig: AuthConfig)(implicit ec: ExecutionContext): SecurityDirectives = {
+    val keycloakDeployment = authConfig.getDeployment
+    val tokenVerifier      = TokenVerifier(authConfig)
+    val authentication     = new Authentication(new TokenFactory(keycloakDeployment, tokenVerifier, authConfig.permissionsEnabled))
+    new SecurityDirectives(authentication, keycloakDeployment.getRealm, keycloakDeployment.getResourceName, authConfig.disabled)
+  }
 
   /**
    * Creates instance of [[csw.aas.http.SecurityDirectives]] using configurations
@@ -182,11 +204,4 @@ object SecurityDirectives {
   //todo: see if its possible to remove blocking here
   private def authLocation(locationService: LocationService)(implicit ec: ExecutionContext) =
     Await.result(AuthServiceLocation(locationService).resolve(5.seconds), 10.seconds)
-
-  private def from(authConfig: AuthConfig)(implicit ec: ExecutionContext): SecurityDirectives = {
-    val keycloakDeployment = authConfig.getDeployment
-    val tokenVerifier      = TokenVerifier(authConfig)
-    val authentication     = new Authentication(new TokenFactory(keycloakDeployment, tokenVerifier, authConfig.permissionsEnabled))
-    new SecurityDirectives(authentication, keycloakDeployment.getRealm, keycloakDeployment.getResourceName)
-  }
 }

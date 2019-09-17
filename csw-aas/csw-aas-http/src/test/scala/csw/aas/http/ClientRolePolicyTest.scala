@@ -18,7 +18,7 @@ class ClientRolePolicyTest extends FunSuite with MockitoSugar with Directives wi
 
   test("clientRole policy should return AuthenticationFailedRejection when token is invalid") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
     val invalidTokenStr    = "invalid"
     val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
@@ -47,7 +47,7 @@ class ClientRolePolicyTest extends FunSuite with MockitoSugar with Directives wi
   // DEOPSCSW-573: REQ:Support configurable roles
   test("clientRole policy should return AuthenticationFailedRejection when token is not present") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
     val authenticator: AsyncAuthenticator[AccessToken] = _ => Future.successful(None)
 
@@ -70,7 +70,7 @@ class ClientRolePolicyTest extends FunSuite with MockitoSugar with Directives wi
   // DEOPSCSW-573: REQ:Support configurable roles
   test("clientRole policy should return AuthorizationFailedRejection when token does not have clientRole") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
     val validTokenWithoutClientRoleStr = "validTokenWithoutClientRoleStr"
 
@@ -105,7 +105,7 @@ class ClientRolePolicyTest extends FunSuite with MockitoSugar with Directives wi
   // DEOPSCSW-573: REQ:Support configurable roles
   test("clientRole policy should return 200 OK when token is valid & has clientRole") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
     val validTokenWithClientRoleStr    = "validTokenWithClientRoleStr"
     val validTokenWithClientRole       = mock[AccessToken]

@@ -18,7 +18,7 @@ class RealmRolePolicyTest extends FunSuite with MockitoSugar with Directives wit
 
   test("realmRole policy should return AuthenticationFailedRejection when token is invalid") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
     val invalidTokenStr    = "invalid"
     val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
@@ -45,7 +45,7 @@ class RealmRolePolicyTest extends FunSuite with MockitoSugar with Directives wit
 
   test("realmRole policy should return AuthenticationFailedRejection when token is not present") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
     val authenticator: AsyncAuthenticator[AccessToken] = _ => Future.successful(None)
 
@@ -66,7 +66,7 @@ class RealmRolePolicyTest extends FunSuite with MockitoSugar with Directives wit
 
   test("realmRole policy should return AuthorizationFailedRejection when token does not have realmRole") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
     val validTokenWithoutRealmRoleStr = "validTokenWithoutRealmRoleStr"
 
@@ -99,7 +99,7 @@ class RealmRolePolicyTest extends FunSuite with MockitoSugar with Directives wit
 
   test("realmRole policy should return 200 OK when token is valid & has realmRole") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
     val validTokenWithRealmRoleStr    = "validTokenWithRealmRoleStr"
     val validTokenWithRealmRole       = mock[AccessToken]

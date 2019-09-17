@@ -18,7 +18,7 @@ class CustomPolicyTest extends FunSuite with MockitoSugar with Directives with S
 
   test("custom policy should return AuthenticationFailedRejection when token is invalid") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
     val invalidTokenStr    = "invalid"
     val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
@@ -46,7 +46,7 @@ class CustomPolicyTest extends FunSuite with MockitoSugar with Directives with S
 
   test("custom policy should return AuthenticationFailedRejection when token is not present") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
     val authenticator: AsyncAuthenticator[AccessToken] = _ => Future.successful(None)
 
@@ -67,7 +67,7 @@ class CustomPolicyTest extends FunSuite with MockitoSugar with Directives with S
 
   test("custom policy should return AuthorizationFailedRejection when policy does not match") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
     val validTokenWithPolicyViolationStr    = "validTokenWithPolicyViolation"
     val validTokenWithPolicyViolationHeader = Authorization(OAuth2BearerToken(validTokenWithPolicyViolationStr))
@@ -96,7 +96,7 @@ class CustomPolicyTest extends FunSuite with MockitoSugar with Directives with S
 
   test("custom policy should return 200 OK when policy matches") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
     val validTokenWithPolicyMatchStr    = "validTokenWithPolicyMatch"
     val validTokenWithPolicyMatchHeader = Authorization(OAuth2BearerToken(validTokenWithPolicyMatchStr))

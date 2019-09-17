@@ -20,10 +20,19 @@ import scala.util.Try
 class AuthConfig private (config: Config, authServiceLocation: Option[HttpLocation]) {
 
   private val logger = AuthLogger.getLogger
+
+  private val disabledKey          = "disabled"
+  private val enablePermissionsKey = "enable-permissions"
+  private val clientIdKey          = "client-id"
+
   import logger._
 
-  val permissionsEnabled: Boolean = {
-    val mayBeValue = Try { config.getBoolean("enable-permissions") }.toOption
+  val permissionsEnabled: Boolean = optionalBoolean(enablePermissionsKey)
+
+  val disabled: Boolean = optionalBoolean(disabledKey)
+
+  private def optionalBoolean(key: String) = {
+    val mayBeValue = Try { config.getBoolean(key) }.toOption
     mayBeValue.nonEmpty && mayBeValue.get
   }
 
@@ -46,10 +55,11 @@ class AuthConfig private (config: Config, authServiceLocation: Option[HttpLocati
     }
 
   private def convertToDeployment(config: Config): KeycloakDeployment = {
-    val clientId = config.getString("client-id")
+    val clientId = config.getString(clientIdKey)
     val safeConfig = config
-      .withoutPath("enable-permissions")
-      .withoutPath("client-id")
+      .withoutPath(enablePermissionsKey)
+      .withoutPath(disabledKey)
+      .withoutPath(clientIdKey)
       .withValue("resource", ConfigValueFactory.fromAnyRef(clientId))
 
     debug("converting auth config to json")
@@ -71,6 +81,8 @@ object AuthConfig {
   private val logger = AuthLogger.getLogger
   import logger._
 
+  private val authConfigKey = "auth-config"
+
   /**
    * Creates an instance of [[csw.aas.core.deployment.AuthConfig]]
    *
@@ -84,7 +96,7 @@ object AuthConfig {
       authServerLocation: Option[HttpLocation] = None
   ): AuthConfig = {
     debug("loading auth config")
-    new AuthConfig(config.getConfig("auth-config"), authServerLocation)
+    new AuthConfig(config.getConfig(authConfigKey), authServerLocation)
   }
 
   private[aas] implicit def deploymentToConfig(deployment: KeycloakDeployment): Configuration =
