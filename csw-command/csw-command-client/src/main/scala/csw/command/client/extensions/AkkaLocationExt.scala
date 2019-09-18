@@ -38,8 +38,7 @@ object AkkaLocationExt {
      */
     def containerRef(implicit actorSystem: ActorSystem[_]): ActorRef[ContainerMessage] = typedRef[ContainerMessage]
 
-    private[csw] def sequencerRef(implicit actorSystem: ActorSystem[_]): ActorRef[SequencerMsg] =
-      typedRef[SequencerMsg]
+    def sequencerRef(implicit actorSystem: ActorSystem[_]): ActorRef[SequencerMsg] = typedRef[SequencerMsg]
 
   }
 }
