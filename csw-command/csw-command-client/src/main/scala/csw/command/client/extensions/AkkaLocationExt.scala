@@ -38,6 +38,11 @@ object AkkaLocationExt {
      */
     def containerRef(implicit actorSystem: ActorSystem[_]): ActorRef[ContainerMessage] = typedRef[ContainerMessage]
 
+    /**
+     * If the component type is Sequencer, use this to get the correct ActorRef
+     *
+     * @return a typed ActorRef that understands only SequencerMsg
+     */
     def sequencerRef(implicit actorSystem: ActorSystem[_]): ActorRef[SequencerMsg] = typedRef[SequencerMsg]
 
   }
