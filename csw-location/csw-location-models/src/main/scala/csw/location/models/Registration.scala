@@ -82,6 +82,8 @@ final case class HttpRegistration(
    *
    * @param hostname provide the hostname where Http service is available
    */
-  override def location(hostname: String): Location =
+  override def location(hostname: String): Location = {
+    println("Called location: " + hostname)
     HttpLocation(connection, new URI(s"http://$hostname:$port/$path"))
+  }
 }

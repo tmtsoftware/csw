@@ -3,7 +3,7 @@ import akka.actor.typed.ActorSystem
 import csw.command.api.javadsl.ICommandService
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.internal.{CommandServiceImpl, JCommandServiceImpl}
-import csw.location.models.AkkaLocation
+import csw.location.models.{AkkaLocation, HttpLocation}
 
 /**
  * The factory helps in creating CommandService api for scala and java both
@@ -34,4 +34,8 @@ object CommandServiceFactory extends ICommandServiceFactory {
    */
   def jMake(componentLocation: AkkaLocation, actorSystem: ActorSystem[_]): ICommandService =
     new JCommandServiceImpl(make(componentLocation)(actorSystem))
+
+
+  def make(componentLocation: HttpLocation)(implicit actorSystem: ActorSystem[_]): ComponentHttpCommandService =
+    new ComponentHttpCommandService(componentLocation)
 }

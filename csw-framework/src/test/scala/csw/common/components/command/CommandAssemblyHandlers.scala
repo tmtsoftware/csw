@@ -58,6 +58,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   override def initialize(): Future[Unit] = {
     // DEOPSCSW-153: Accessibility of logging service to other CSW components
     log.info("Initializing Component TLA")
+    println("Initializing Component TLA")
     Thread.sleep(100)
     //#currentStatePublisher
     // Publish the CurrentState using parameter set created using a sample Choice parameter
@@ -98,6 +99,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   private def processCommand(runId: Id, command: ControlCommand): SubmitResponse =
     command.commandName match {
       case `immediateCmd` =>
+        println("IMmediate damn it")
         Completed(command.commandName, runId)
       case `longRunningCmd` =>
         timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plusSeconds(2))) {
@@ -201,6 +203,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   }
 
   override def onShutdown(): Future[Unit] = Future {
+    println("ON Shutdown")
     currentStatePublisher.publish(CurrentState(filterAsmPrefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
     Thread.sleep(500)
   }

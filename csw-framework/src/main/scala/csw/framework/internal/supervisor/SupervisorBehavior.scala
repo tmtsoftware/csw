@@ -1,27 +1,24 @@
 package csw.framework.internal.supervisor
 
 import akka.Done
-import akka.actor.CoordinatedShutdown
+import akka.actor.{CoordinatedShutdown, Scheduler}
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed._
 import akka.actor.typed.scaladsl._
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import csw.command.client.messages.ComponentCommonMessage.{
-  ComponentStateSubscription,
-  GetSupervisorLifecycleState,
-  LifecycleStateSubscription,
-  StartedCommandSubscription
-}
+import akka.actor.typed.scaladsl.AskPattern._
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.Http.ServerBinding
+import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Route
+import akka.util.Timeout
+import csw.command.client.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription, StartedCommandSubscription}
 import csw.command.client.messages.FromComponentLifecycleMessage.Running
 import csw.command.client.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorIdleMessage.InitializeTimeout
-import csw.command.client.messages.SupervisorInternalRunningMessage.{
-  RegistrationFailed,
-  RegistrationNotRequired,
-  RegistrationSuccess
-}
+import csw.command.client.messages.SupervisorInternalRunningMessage.{RegistrationFailed, RegistrationNotRequired, RegistrationSuccess}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
 import csw.command.client.messages._
@@ -33,13 +30,19 @@ import csw.command.client.models.framework._
 import csw.framework.commons.CoordinatedShutdownReasons.ShutdownMessageReceivedReason
 import csw.framework.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehavior
+import csw.framework.internal.supervisor.ComponentHttpBehavior.ComponentHttpMessage
+import csw.framework.internal.supervisor.ComponentHttpBehavior.ComponentHttpMessage.Start
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, RegistrationFactory}
-import csw.location.models.Connection.AkkaConnection
-import csw.location.models.{AkkaRegistration, ComponentId}
+import csw.location.client.HttpCodecs
+import csw.location.models.Connection.{AkkaConnection, HttpConnection}
+import csw.location.models.{AkkaRegistration, ComponentId, HttpRegistration}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.LogAdminUtil
-import csw.params.commands.CommandResponse.Locked
+import csw.network.utils.Networks
+import csw.params.commands.CommandResponse.{Completed, Locked, SubmitResponse}
+import csw.params.commands.ControlCommand
+import csw.params.core.formats.ParamCodecs
 import csw.params.core.models.{Id, Prefix}
 
 import scala.concurrent.Future
@@ -82,6 +85,7 @@ private[framework] final class SupervisorBehavior(
   private val componentName: String                        = componentInfo.name
   private val componentActorName: String                   = s"$componentName-$ComponentActorNameSuffix"
   private val akkaConnection: AkkaConnection               = AkkaConnection(ComponentId(componentName, componentInfo.componentType))
+  private val httpConection: HttpConnection                = HttpConnection(ComponentId(componentName, componentInfo.componentType))
   private val prefix: Prefix                               = componentInfo.prefix
   private val akkaRegistration: AkkaRegistration           = registrationFactory.akkaTyped(akkaConnection, prefix, ctx.self)
   private val isStandalone: Boolean                        = maybeContainerRef.isEmpty
@@ -275,11 +279,12 @@ private[framework] final class SupervisorBehavior(
   private def registerWithLocationService(componentRef: ActorRef[RunningMessage]): Unit = {
     if (componentInfo.locationServiceUsage == DoNotRegister) //Honour DoNotRegister received in componentInfo
       ctx.self ! RegistrationNotRequired(componentRef)
-    else
+    else {
       locationService.register(akkaRegistration).onComplete {
         case Success(_)         => ctx.self ! RegistrationSuccess(componentRef)
         case Failure(throwable) => ctx.self ! RegistrationFailed(throwable)
       }
+    }
   }
 
   private def unRegisterFromLocationService(): Unit = {
@@ -330,12 +335,22 @@ private[framework] final class SupervisorBehavior(
   }
 
   private def onComponentRunning(componentRef: ActorRef[RunningMessage]): Unit = {
+    implicit val scheduler: Scheduler = ctx.system.scheduler
+    implicit val timeout: Timeout = 3.seconds
+
     log.info("Received Running message from component within timeout, cancelling InitializeTimer")
     timerScheduler.cancel(InitializeTimerKey)
 
     updateLifecycleState(SupervisorLifecycleState.Running)
     runningComponent = Some(componentRef)
     registerWithLocationService(componentRef)
+    //initHttpAndRegisterWithLocationService()
+    val xx:ActorRef[ComponentHttpMessage] = ctx.spawn(ComponentHttpBehavior.make(ctx.self, componentName), "httpComp")
+    println("XX: " + "Yes here: " + xx)
+    println("Send Start")
+    val port:Future[Int] = xx ? (ref => Start(ref))
+    port.map(registerHttpWithLocationService(_))
+    println("registeration done")
   }
 
   private def onRegistrationFailed(throwable: Throwable) = {
@@ -349,4 +364,66 @@ private[framework] final class SupervisorBehavior(
     log.debug(s"Supervisor is changing lifecycle state from [$lifecycleState] to [$state]")
     lifecycleState = state
   }
+
+  //private implicit val system = ActorSystem("my-system")
+  private implicit val actorSystem  = ctx.system.toUntyped
+  private implicit val materializer = akka.stream.ActorMaterializer()
+/*
+  private class ComponentRoutes() extends ParamCodecs with HttpCodecs {
+    println("COmp name: " + componentName)
+    def testRoutes(): Route = path("hello") {
+      get { complete("What the fuck") }
+    }
+
+    def componentRoutes(componentName: String): Route =
+        pathPrefix(componentName) {
+          pathPrefix("command") {
+            post {
+              path("submit") {
+                entity(as[ControlCommand]) { command =>
+                  println("Command: " + command)
+                  val x: SubmitResponse = Completed(command.commandName, Id())
+                  complete(x)
+                }
+              }
+            }
+          }
+        }
+
+    val route: Route = componentRoutes(componentName)
+  }
+*/
+  //      complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<h1>Say Hello to Akka-Http damn it</h1"))
+//      }
+//    }
+
+
+
+  private def initHttpAndRegisterWithLocationService(route: Route): Unit = {
+    val hostname = Networks().hostname
+    println("Hostname: " + hostname)
+    val serverBinding = Http().bindAndHandle(handler = route, interface = hostname, port = 8080)
+    serverBinding.onComplete {
+      case Success(binding) =>
+        println("binding: " + binding)
+        registerHttpWithLocationService(binding.localAddress.getPort)
+        println("Done here")
+      case Failure(throwable) => println("There is an exception: " + throwable)
+    }
+  }
+
+  private def registerHttpWithLocationService(port: Int): Unit = {
+    if (componentInfo.locationServiceUsage != DoNotRegister) { //Honour DoNotRegister received in componentInfo
+
+      val path = s"${componentInfo.name}"
+      println(s"Path is: $path at port $port")
+
+      locationService.register(HttpRegistration(httpConection, port, path)).onComplete {
+        case Success(_)         => println("Finished Http register")
+        case Failure(throwable) => ctx.self ! RegistrationFailed(throwable)
+      }
+    }
+  }
+
+  println("Done maybe")
 }
