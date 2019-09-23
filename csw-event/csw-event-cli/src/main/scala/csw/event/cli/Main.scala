@@ -23,9 +23,7 @@ object Main extends App {
     startLogging(name)
 
     try cliApp.start(options)
-    finally Http(actorSystem.toUntyped)
-      .shutdownAllConnectionPools()
-      .onComplete(_ => actorRuntime.shutdown(ApplicationFinishedReason))
+    finally actorRuntime.shutdown(ApplicationFinishedReason)
   }
 }
 // $COVERAGE-ON$

@@ -32,7 +32,6 @@ class FrameworkTestWiring(val seedPort: Int = SocketUtils.getFreePort) extends E
     }
 
   def shutdown(): Done = {
-    Http(seedActorSystem.toUntyped).shutdownAllConnectionPools().await
     seedActorSystem.terminate()
     seedActorSystem.whenTerminated.await
   }

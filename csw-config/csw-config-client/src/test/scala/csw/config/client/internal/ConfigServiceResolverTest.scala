@@ -20,7 +20,6 @@ class ConfigServiceResolverTest extends ConfigClientBaseSuite {
   import actorRuntime._
 
   override protected def afterAll(): Unit = {
-    Http().shutdownAllConnectionPools().await
     typedSystem.terminate()
     typedSystem.whenTerminated.await
     super.afterAll()

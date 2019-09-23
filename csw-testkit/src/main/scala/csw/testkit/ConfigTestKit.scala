@@ -101,7 +101,6 @@ final class ConfigTestKit private (
    */
   def shutdownConfigServer(): Unit = {
     deleteServerFiles()
-    TestKitUtils.await(Http(system.toUntyped).shutdownAllConnectionPools(), timeout)
     terminateServer()
     TestKitUtils.coordShutdown(configWiring.actorRuntime.shutdown, timeout)
   }

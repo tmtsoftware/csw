@@ -24,7 +24,7 @@ object Main extends App {
       startLogging(name)
       cliApp.execute(options)
     } finally {
-      Http().shutdownAllConnectionPools().onComplete(_ => shutdown(ApplicationFinishedReason))
+      shutdown(ApplicationFinishedReason)
     }
   }
 

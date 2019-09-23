@@ -90,7 +90,7 @@ class LocationAgent(names: List[String], command: Command, wiring: Wiring) {
   }
 
   private def shutdown(reason: Reason) = Await.result(
-    Http().shutdownAllConnectionPools().flatMap(_ => coordinatedShutdown.run(reason)),
+    coordinatedShutdown.run(reason),
     timeout
   )
 }

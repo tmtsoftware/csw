@@ -197,7 +197,6 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
       .run()
 
     // ********** Message: Shutdown **********
-    Http(containerActorSystem.toUntyped).shutdownAllConnectionPools().await
     resolvedContainerRef ! Shutdown
 
     // this proves that ComponentBehaviors postStop signal gets invoked for all components

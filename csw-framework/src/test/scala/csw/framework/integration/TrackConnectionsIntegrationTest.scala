@@ -89,7 +89,6 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
     )
 
     subscription.unsubscribe()
-    Http(containerActorSystem.toUntyped).shutdownAllConnectionPools().await
     containerActorSystem.terminate()
     containerActorSystem.whenTerminated.await
   }
@@ -148,7 +147,6 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
       CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(tcpLocationRemovedChoice)))
     )
 
-    Http(componentActorSystem.toUntyped).shutdownAllConnectionPools().await
     componentActorSystem.terminate()
     componentActorSystem.whenTerminated.await
   }

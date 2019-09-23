@@ -51,7 +51,6 @@ private[testkit] trait RedisStore extends EmbeddedRedis {
 
   def shutdown(): Unit = {
     stopRedis()
-    TestKitUtils.await(Http().shutdownAllConnectionPools(), timeout)
     TestKitUtils.coordShutdown(CoordinatedShutdown(untypedSystem).run, timeout)
   }
 }

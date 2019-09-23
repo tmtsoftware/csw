@@ -38,7 +38,6 @@ class ConfigClientApiTest extends ConfigClientBaseSuite {
   }
 
   override def afterAll(): Unit = {
-    Http().shutdownAllConnectionPools().await
     httpService.shutdown(UnknownReason).await
     super.afterAll()
   }

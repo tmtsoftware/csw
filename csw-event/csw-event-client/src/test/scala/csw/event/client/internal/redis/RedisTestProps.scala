@@ -72,7 +72,6 @@ class RedisTestProps(
     publisher.shutdown().await
     redisClient.shutdown()
     stopSentinel(redisSentinel, redisServer)
-    Http(actorSystem.toUntyped).shutdownAllConnectionPools().await
     actorSystem.terminate()
     actorSystem.whenTerminated.await
     locationServer.afterAll()

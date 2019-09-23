@@ -24,9 +24,7 @@ object Main extends App {
     try {
       cliApp.start(options)
     } finally {
-      Http(actorRuntime.untypedSystem)
-        .shutdownAllConnectionPools()
-        .foreach(_ => actorRuntime.shutdown(ApplicationFinishedReason))(actorRuntime.ec)
+      actorRuntime.shutdown(ApplicationFinishedReason)
     }
   }
 }

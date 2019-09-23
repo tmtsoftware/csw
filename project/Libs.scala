@@ -14,7 +14,7 @@ object Libs {
   val `junit`              = "junit" % "junit" % "4.12" //Eclipse Public License 1.0
   val `silencer-plugin`    = compilerPlugin("com.github.ghik" %% "silencer-plugin" % silencerVersion)
   val `silencer-lib`       = "com.github.ghik" %% "silencer-lib" % silencerVersion % Compile
-  val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.5.15"
+  val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.5.17"
   //MIT License
   val `embedded-keycloak`            = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak"            % "0.1.6" //Apache 2.0
   val `logback-classic`              = "ch.qos.logback"                           % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
@@ -26,8 +26,8 @@ object Libs {
 
   val `play-json` = dep("com.typesafe.play" %%% "play-json" % "2.7.4") //Apache 2.0
 
-  val `akka-http-play-json` = "de.heikoseeberger"   %% "akka-http-play-json" % "1.27.0" //Apache 2.0
-  val `jwt-play-json`       = "com.pauldijou"       %% "jwt-play-json"       % "4.0.0"
+  val `akka-http-play-json` = "de.heikoseeberger"   %% "akka-http-play-json" % "1.29.1" //Apache 2.0
+  val `jwt-play-json`       = "com.pauldijou"       %% "jwt-play-json"       % "4.1.0"
   val `lettuce`             = "io.lettuce"          % "lettuce-core"         % "5.1.8.RELEASE"
   val `reactor-core`        = "io.projectreactor"   % "reactor-core"         % "3.2.12.RELEASE"
   val `reactive-streams`    = "org.reactivestreams" % "reactive-streams"     % "1.0.3"
@@ -44,10 +44,10 @@ object Libs {
   val `play-json-derived-codecs` = dep("org.julienrf" %%% "play-json-derived-codecs" % "6.0.0")
 
   val `jna`             = "net.java.dev.jna"              % "jna"             % "5.4.0"
-  val `postgresql`      = "org.postgresql"                % "postgresql"      % "42.2.6"
-  val `hikaricp`        = "com.zaxxer"                    % "HikariCP"        % "3.3.1" //Apache License 2.0
+  val `postgresql`      = "org.postgresql"                % "postgresql"      % "42.2.8"
+  val `hikaricp`        = "com.zaxxer"                    % "HikariCP"        % "3.4.1" //Apache License 2.0
   val `otj-pg-embedded` = "com.opentable.components"      % "otj-pg-embedded" % "0.13.1"
-  val httpclient        = "org.apache.httpcomponents"     % "httpclient"      % "4.5.9"
+  val httpclient        = "org.apache.httpcomponents"     % "httpclient"      % "4.5.10"
   val `jboss-logging`   = "org.jboss.logging"             % "jboss-logging"   % "3.4.1.Final"
   val `config`          = "com.typesafe"                  % "config"          % "1.3.4"
   val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.3.0"
@@ -65,7 +65,7 @@ object Borer {
 }
 
 object Jackson {
-  val Version                = "2.9.9"
+  val Version                = "2.9.10"
   val `jackson-core`         = "com.fasterxml.jackson.core" % "jackson-core" % Version
   val `jackson-databind`     = "com.fasterxml.jackson.core" % "jackson-databind" % Version
   val `jackson-module-scala` = "com.fasterxml.jackson.module" %% "jackson-module-scala" % Version
@@ -96,7 +96,7 @@ object Akka {
 }
 
 object AkkaHttp {
-  val Version             = "10.1.9"
+  val Version             = "10.1.10"
   val `akka-http`         = "com.typesafe.akka" %% "akka-http" % Version //ApacheV2
   val `akka-http-testkit` = "com.typesafe.akka" %% "akka-http-testkit" % Version //ApacheV2
   val `akka-http-cors`    = "ch.megard" %% "akka-http-cors" % "0.4.1"

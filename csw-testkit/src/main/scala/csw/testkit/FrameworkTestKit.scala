@@ -105,7 +105,6 @@ final class FrameworkTestKit private (
    * Shutdown all testkits which are started.
    */
   def shutdown(): Unit = {
-    TestKitUtils.await(Http().shutdownAllConnectionPools(), timeout)
     if (configStarted) configTestKit.deleteServerFiles(); configTestKit.terminateServer()
     if (eventStarted) eventTestKit.stopRedis()
     if (alarmStarted) alarmTestKit.stopRedis()

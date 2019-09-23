@@ -63,7 +63,6 @@ class KafkaTestProps(
 
   override def shutdown(): Unit = {
 //    EmbeddedKafka.stop()
-    Http(actorSystem.toUntyped).shutdownAllConnectionPools().await
     actorSystem.terminate()
     actorSystem.whenTerminated.await
     locationServer.afterAll()
