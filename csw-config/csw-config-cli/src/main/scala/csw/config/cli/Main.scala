@@ -1,6 +1,5 @@
 package csw.config.cli
 
-import akka.http.scaladsl.Http
 import csw.config.cli.args.{ArgsParser, Options}
 import csw.config.cli.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
 import csw.config.cli.wiring.Wiring

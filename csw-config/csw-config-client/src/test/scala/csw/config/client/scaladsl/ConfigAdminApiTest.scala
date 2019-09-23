@@ -3,7 +3,6 @@ package csw.config.client.scaladsl
 import java.nio.file.{Files, Paths}
 
 import akka.actor.CoordinatedShutdown.UnknownReason
-import akka.http.scaladsl.Http
 import csw.commons.ResourceReader
 import csw.config.api.{ConfigData, TokenFactory}
 import csw.config.api.exceptions.{FileNotFound, InvalidInput, NotAllowed, Unauthorized}

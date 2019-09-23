@@ -2,7 +2,6 @@ package csw.config.client.internal
 
 import java.net.URI
 
-import akka.http.scaladsl.Http
 import csw.config.client.ConfigClientBaseSuite
 import csw.config.client.commons.ConfigServiceConnection
 import csw.config.client.scaladsl.ConfigClientFactory

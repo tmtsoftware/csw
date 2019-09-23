@@ -1,6 +1,5 @@
 package csw.alarm.cli
 
-import akka.http.scaladsl.Http
 import csw.alarm.cli.args.{ArgsParser, Options}
 import csw.alarm.cli.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
 import csw.alarm.cli.wiring.Wiring

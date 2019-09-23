@@ -2,8 +2,6 @@ package csw.framework.integration
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.SpawnProtocol
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory

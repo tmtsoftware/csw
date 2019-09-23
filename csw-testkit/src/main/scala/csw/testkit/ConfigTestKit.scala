@@ -3,7 +3,6 @@ package csw.testkit
 import java.nio.file.Paths
 
 import akka.actor.typed
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.http.scaladsl.Http
 import akka.stream.Materializer

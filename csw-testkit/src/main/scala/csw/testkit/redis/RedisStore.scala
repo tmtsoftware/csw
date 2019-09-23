@@ -3,7 +3,6 @@ import java.util.Optional
 
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.{ActorSystem, CoordinatedShutdown, typed}
-import akka.http.scaladsl.Http
 import akka.stream.Materializer
 import akka.stream.typed.scaladsl
 import akka.util.Timeout

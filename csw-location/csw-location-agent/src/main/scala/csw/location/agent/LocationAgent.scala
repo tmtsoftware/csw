@@ -3,7 +3,6 @@ package csw.location.agent
 import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
-import akka.http.scaladsl.Http
 import csw.location.agent.commons.CoordinatedShutdownReasons.{FailureReason, ProcessTerminated}
 import csw.location.agent.commons.LocationAgentLogger
 import csw.location.agent.models.Command
