@@ -1,34 +1,34 @@
 package csw.framework.command
 
   import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.stream.{ActorMaterializer, Materializer}
-import akka.util.Timeout
-import com.typesafe.config.ConfigFactory
-import csw.command.api.StateMatcher
-import csw.command.client.CommandServiceFactory
-import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.client.messages.CommandMessage.Submit
-import csw.command.client.models.framework.LockingResponse
-import csw.command.client.models.framework.LockingResponse.LockAcquired
-import csw.command.client.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
-import csw.command.client.models.matchers.{DemandMatcher, Matcher, MatcherResponse}
-import csw.common.utils.LockCommandFactory
-import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
-import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
-import csw.location.models.Connection.AkkaConnection
-import csw.location.server.http.MultiNodeHTTPLocationService
-import csw.params.commands.CommandResponse._
-import csw.params.commands._
-import csw.params.core.generics.Parameter
-import csw.params.core.models.{Id, ObsId, Prefix}
-import csw.params.core.states.{CurrentState, DemandState, StateName}
-import io.lettuce.core.RedisClient
-import org.mockito.MockitoSugar
+  import akka.stream.{ActorMaterializer, Materializer}
+  import akka.util.Timeout
+  import com.typesafe.config.ConfigFactory
+  import csw.command.api.StateMatcher
+  import csw.command.client.CommandServiceFactory
+  import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
+  import csw.command.client.messages.CommandMessage.Submit
+  import csw.command.client.models.framework.LockingResponse
+  import csw.command.client.models.framework.LockingResponse.LockAcquired
+  import csw.command.client.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
+  import csw.command.client.models.matchers.{DemandMatcher, Matcher, MatcherResponse}
+  import csw.common.utils.LockCommandFactory
+  import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
+  import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
+  import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
+  import csw.location.models.Connection.AkkaConnection
+  import csw.location.server.http.MultiNodeHTTPLocationService
+  import csw.params.commands.CommandResponse._
+  import csw.params.commands._
+  import csw.params.core.generics.Parameter
+  import csw.params.core.models.{Id, ObsId, Prefix}
+  import csw.params.core.states.{CurrentState, DemandState, StateName}
+  import io.lettuce.core.RedisClient
+  import org.mockito.MockitoSugar
 
-import scala.async.Async._
-import scala.concurrent.duration.DurationDouble
-import scala.concurrent.{Await, ExecutionContext, Future, TimeoutException}
+  import scala.async.Async._
+  import scala.concurrent.duration.DurationDouble
+  import scala.concurrent.{Await, ExecutionContext, Future, TimeoutException}
 
 /**
  * Test Configuration :
@@ -87,11 +87,9 @@ class CommandServiceTest(ignore: Int)
   import csw.common.components.command.ComponentStateForCommand._
 
 //  implicit val actorSystem: ActorSystem[_] = system.toTyped
-  private implicit val mat: Materializer    = ActorMaterializer()
-  private implicit val ec: ExecutionContext = typedSystem.executionContext
-  private implicit val timeout: Timeout     = 5.seconds
-  //private implicit val scheduler: Scheduler     = typedSystem.scheduler
-  //private implicit val testkit: TestKitSettings = TestKitSettings(typedSystem)
+  private implicit val mat: Materializer        = ActorMaterializer()
+  private implicit val ec: ExecutionContext     = typedSystem.executionContext
+  private implicit val timeout: Timeout         = 5.seconds
 
   test("sender of command should receive appropriate responses") {
 

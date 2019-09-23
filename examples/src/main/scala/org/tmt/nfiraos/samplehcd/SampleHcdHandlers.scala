@@ -39,7 +39,7 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
             log.trace(s"WorkerActor received sleep command with time of ${sleep.timeInMillis} ms")
             // simulate long running command
             Thread.sleep(sleep.timeInMillis)
-            commandUpdatePublisher.update(CommandResponse.Completed(sleep.controlCommand.commandName, sleep.runId))
+            commandResponseManager.updateCommand(CommandResponse.Completed(sleep.controlCommand.commandName, sleep.runId))
           case _ => log.error("Unsupported message type")
         }
         Behaviors.same

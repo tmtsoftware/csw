@@ -1,8 +1,8 @@
 package csw.common.components.command
 
 import akka.actor.typed.scaladsl.ActorContext
+import csw.command.client.MiniCRM.MiniCRMMessage.AddResponse
 import csw.command.client.messages.TopLevelActorMessage
-import csw.command.client.models.framework.PubSub.Publish
 import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
@@ -41,23 +41,23 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         ctx.scheduleOnce(
           5.seconds,
           // Here the Completed is sent directly to the publish actor
-          commandUpdatePublisher.publisherActor,
-          Publish[SubmitResponse](Completed(controlCommand.commandName, runId))
+          commandResponseManager.commandResponseManagerActor,
+          AddResponse(Completed(controlCommand.commandName, runId))
         )
         Started(controlCommand.commandName, runId)
       //#addOrUpdateCommand
       case `mediumRunning` =>
         ctx.scheduleOnce(
           3.seconds,
-          commandUpdatePublisher.publisherActor,
-          Publish[SubmitResponse](Completed(controlCommand.commandName, runId))
+          commandResponseManager.commandResponseManagerActor,
+          AddResponse(Completed(controlCommand.commandName, runId))
         )
         Started(controlCommand.commandName, runId)
       case `shortRunning` =>
         ctx.scheduleOnce(
           1.seconds,
-          commandUpdatePublisher.publisherActor,
-          Publish[SubmitResponse](Completed(controlCommand.commandName, runId))
+          commandResponseManager.commandResponseManagerActor,
+          AddResponse(Completed(controlCommand.commandName, runId))
         )
         Started(controlCommand.commandName, runId)
       case `failureAfterValidationCmd` =>

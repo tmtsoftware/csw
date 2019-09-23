@@ -35,7 +35,13 @@ object CommandServiceFactory extends ICommandServiceFactory {
   def jMake(componentLocation: AkkaLocation, actorSystem: ActorSystem[_]): ICommandService =
     new JCommandServiceImpl(make(componentLocation)(actorSystem))
 
-
+  /**
+   * Make an HTTP-CommandService instance for scala
+   *
+   * @param componentLocation the destination component location to which commands need to be sent
+   * @param actorSystem of the component used for executing commands to other components and wait for the responses
+   * @return an instance of type ComponentHttpCommandService
+   */
   def make(componentLocation: HttpLocation)(implicit actorSystem: ActorSystem[_]): ComponentHttpCommandService =
     new ComponentHttpCommandService(componentLocation)
 }

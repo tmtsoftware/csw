@@ -1,9 +1,8 @@
 package csw.command.client
 
 import akka.actor.testkit.typed.scaladsl.ActorTestKit
-import csw.command.client.internal.MiniCRM
-import csw.command.client.internal.MiniCRM.{Responses, Starters, Waiters}
-import csw.command.client.internal.MiniCRM.MiniCRMMessage.{
+import csw.command.client.MiniCRM.{Responses, Starters, Waiters}
+import csw.command.client.MiniCRM.MiniCRMMessage.{
   AddResponse,
   AddStarted,
   GetResponses,

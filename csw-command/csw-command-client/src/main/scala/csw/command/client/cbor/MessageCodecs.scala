@@ -9,7 +9,6 @@ import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
 import csw.command.client.messages.CommandSerializationMarker.RemoteMsg
 import csw.command.client.messages.ComponentCommonMessage.{
   ComponentStateSubscription,
-  StartedCommandSubscription,
   GetSupervisorLifecycleState,
   LifecycleStateSubscription
 }
@@ -81,6 +80,8 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
 
   implicit lazy val shutdownCodec: Codec[Shutdown.type] = singletonCodec(Shutdown)
   implicit lazy val restartCodec: Codec[Restart.type]   = singletonCodec(Restart)
+  implicit lazy val queryCodec: Codec[Query]            = deriveCodec[Query]
+  implicit lazy val queryFinalCodec: Codec[QueryFinal]  = deriveCodec[QueryFinal]
   implicit lazy val submitCodec: Codec[Submit]          = deriveCodec[Submit]
   implicit lazy val oneWayCodec: Codec[Oneway]          = deriveCodec[Oneway]
   implicit lazy val validateCodec: Codec[Validate]      = deriveCodec[Validate]
@@ -103,7 +104,6 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
   implicit lazy val getComponentsCodec: Codec[GetComponents]                           = deriveCodec[GetComponents]
   implicit lazy val logControlMessagesCodec: Codec[LogControlMessages]                 = deriveCodec[LogControlMessages]
   implicit lazy val componentStateSubscriptionCodec: Codec[ComponentStateSubscription] = deriveCodec[ComponentStateSubscription]
-  implicit lazy val startedCommandSubscriptionCodec: Codec[StartedCommandSubscription] = deriveCodec[StartedCommandSubscription]
   implicit lazy val messageRemoteMsgCodec: Codec[RemoteMsg]                            = deriveCodec[RemoteMsg]
 
   // ************************ SequencerMsg Codecs ********************

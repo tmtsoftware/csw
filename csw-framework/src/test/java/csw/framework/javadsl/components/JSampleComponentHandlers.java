@@ -6,10 +6,10 @@ import akka.stream.ActorMaterializer;
 import akka.stream.ThrottleMode;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
+import csw.command.client.CommandResponseManager;
 import csw.command.client.messages.TopLevelActorMessage;
 import csw.common.components.command.ComponentStateForCommand;
 import csw.common.components.framework.SampleComponentState;
-import csw.framework.CommandUpdatePublisher;
 import csw.framework.CurrentStatePublisher;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
@@ -32,8 +32,8 @@ public class JSampleComponentHandlers extends JComponentHandlers {
 
     // Demonstrating logger accessibility in Java Component handlers
     private ILogger log;
+    private CommandResponseManager commandResponseManager;
     private CurrentStatePublisher currentStatePublisher;
-    private CommandUpdatePublisher commandUpdatePublisher;
     private CurrentState currentState = new CurrentState(SampleComponentState.prefix(), new StateName("testStateName"));
     private ActorContext<TopLevelActorMessage> actorContext;
 
@@ -41,7 +41,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         super(ctx, cswCtx);
         this.currentStatePublisher = cswCtx.currentStatePublisher();
         this.log = cswCtx.loggerFactory().getLogger(getClass());
-        this.commandUpdatePublisher = cswCtx.commandUpdatePublisher();
+        this.commandResponseManager = cswCtx.commandResponseManager();
         this.actorContext = ctx;
     }
 
@@ -137,7 +137,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     private CommandResponse.SubmitResponse crmAddOrUpdate(ControlCommand controlCommand, Id runId) {
         // This simulates some worker task doing something that finishes after onSubmit returns
         Runnable task = () ->
-                commandUpdatePublisher.update(new CommandResponse.Completed(controlCommand.commandName(), runId));
+                commandResponseManager.updateCommand(new CommandResponse.Completed(controlCommand.commandName(), runId));
 
         // Wait a bit and then set CRM to Completed
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
@@ -173,7 +173,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
                     currentStatePublisher.publish(new CurrentState(controlCommand.source(), new StateName("testStateName")).add(JKeyType.IntKey().make("encoder").set(i * 10)));
                     return i;
                 })
-                .throttle(1, Duration.ofMillis(100), 1, ThrottleMode.shaping())
+                .throttle(1, Duration.ofMillis(100), 1, (ThrottleMode) ThrottleMode.shaping())
                 .runWith(Sink.ignore(), ActorMaterializer.create(Adapter.toUntyped(actorContext.getSystem())));
     }
 
@@ -196,7 +196,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
 
     private void sendCRM(CommandResponse.SubmitResponse response) {
         Runnable task = () -> {
-            commandUpdatePublisher.update(response);
+            commandResponseManager.updateCommand(response);
         };
         // Wait a bit and then set CRM to Completed
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();

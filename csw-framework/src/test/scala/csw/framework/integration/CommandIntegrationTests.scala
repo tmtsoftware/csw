@@ -199,6 +199,19 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
     Await.result(filterAssemblyCS.queryFinal(result.runId), timeout.duration) shouldBe
     Error(longRunningToAsmInvalid.commandName, result.runId, "ERROR")
 
+    val submitAllSetup1       = Setup(seqPrefix, immediateCmd, obsId)
+    val submitAllSetup2       = Setup(seqPrefix, longRunningCmd, obsId)
+    val submitAllinvalidSetup = Setup(seqPrefix, invalidCmd, obsId)
+
+    //#submitAll
+    val submitAllF        = filterAssemblyCS.submitAllAndWait(List(submitAllSetup1, submitAllSetup2, submitAllinvalidSetup))
+    val submitAllResponse = Await.result(submitAllF, timeout.duration)
+    submitAllResponse.length shouldBe 3
+    submitAllResponse(0) shouldBe a[Completed]
+    submitAllResponse(1) shouldBe a[Completed]
+    submitAllResponse(2) shouldBe a[Invalid]
+    //#submitAll
+
     // ********** Message: Shutdown **********
     Http(containerActorSystem.toUntyped).shutdownAllConnectionPools().await
     resolvedContainerRef ! Shutdown

@@ -69,7 +69,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
                         log.trace(() -> "WorkerActor received sleep command with time of " + sleep.timeInMillis + " ms");
                         // simulate long running command
                         Thread.sleep(sleep.timeInMillis);
-                        cswCtx.commandUpdatePublisher().update(new CommandResponse.Completed(sleep.setup.commandName(), sleep.runId));
+                        cswCtx.commandResponseManager().updateCommand(new CommandResponse.Completed(sleep.setup.commandName(), sleep.runId));
                     } else {
                         log.error("Unsupported message type");
                     }

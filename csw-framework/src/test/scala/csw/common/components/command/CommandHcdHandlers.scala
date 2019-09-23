@@ -70,19 +70,19 @@ class CommandHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCon
         Completed(command.commandName, runId)
       case `longRunningCmdToHcd` =>
         timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plusSeconds(3))) {
-          commandUpdatePublisher.update(Completed(command.commandName, runId))
+          commandResponseManager.updateCommand(Completed(command.commandName, runId))
         }
         // HCD starts long-running command and returns started
         Started(command.commandName, runId)
       case `shorterHcdCmd` =>
         timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plusSeconds(1))) {
-          commandUpdatePublisher.update(Completed(command.commandName, runId))
+          commandResponseManager.updateCommand(Completed(command.commandName, runId))
         }
         // HCD starts shorter command and returns started
         Started(command.commandName, runId)
       case `shorterHcdErrorCmd` =>
         timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plusSeconds(1))) {
-          commandUpdatePublisher.update(Error(command.commandName, runId, "ERROR"))
+          commandResponseManager.updateCommand(Error(command.commandName, runId, "ERROR"))
         }
         // HCD starts shorter command and returns started
         Started(command.commandName, runId)
@@ -96,5 +96,5 @@ class CommandHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCon
     Thread.sleep(500)
   }
 
-  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
+  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}
 }

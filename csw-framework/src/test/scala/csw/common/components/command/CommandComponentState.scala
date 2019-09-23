@@ -19,6 +19,7 @@ object CommandComponentState {
   val longRunningCmdToAsmInvalid = CommandName("move.accept.toAsmError")
   val longRunningCmdToAsmComp    = CommandName("move.accept.toAsmWithCompleter")
   val longRunningCmdToAsmCActor  = CommandName("move.accept.toAsmWithCompleterActor")
+  val cmdWithBigParameter        = CommandName("complex.command.parameters")
   val shorterHcdCmd              = CommandName("move.accept.shorterInHcd")
   val shorterHcdErrorCmd         = CommandName("move.accept.shorterErrorInHcd")
 

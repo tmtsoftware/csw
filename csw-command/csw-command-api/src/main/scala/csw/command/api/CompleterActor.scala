@@ -23,7 +23,7 @@ object CompleterActor {
       // alreadyCompleted is the set of commands that are already completed when handed to the actor
       val alreadyCompleted: Set[SubmitResponse] = expectedResponses.filter(CommandResponse.isFinal(_))
       // started is the set of commands that are started/long-running
-      val started: Set[SubmitResponse]          = expectedResponses.filter(CommandResponse.isIntermediate(_))
+      val started: Set[SubmitResponse] = expectedResponses.filter(CommandResponse.isIntermediate(_))
 
       // This accumulates updates from started commands until all are gathered
       val updates = Set.empty[SubmitResponse]

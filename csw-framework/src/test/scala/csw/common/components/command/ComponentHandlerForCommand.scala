@@ -125,7 +125,7 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
   // This simulates the low-level handling of cancelling the original long-running command
   private def processOriginalCommand(commandToCancelName: CommandName, commandToCancelId: Id): Unit = {
     // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
-    commandUpdatePublisher.update(Cancelled(commandToCancelName, commandToCancelId))
+    commandResponseManager.updateCommand(Cancelled(commandToCancelName, commandToCancelId))
   }
 
   // This simulates a long command that has been started and finishes with a result
@@ -140,7 +140,7 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
       .delay(500.milli)
       .runWith(Sink.head)
       .onComplete {
-        case Success(sr)        => commandUpdatePublisher.update(sr) // This is replacement for CRM
+        case Success(sr)        => commandResponseManager.updateCommand(sr)
         case Failure(exception) => println(s"processWithout exception ${exception.getMessage}")
       }
   }

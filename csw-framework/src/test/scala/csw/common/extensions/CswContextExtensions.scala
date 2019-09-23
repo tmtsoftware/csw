@@ -13,7 +13,7 @@ object CswContextExtensions {
         cswCtx.loggerFactory,
         cswCtx.configClientService,
         cswCtx.currentStatePublisher,
-        cswCtx.commandUpdatePublisher,
+        cswCtx.commandResponseManager,
         newComponentInfo
       )
   }

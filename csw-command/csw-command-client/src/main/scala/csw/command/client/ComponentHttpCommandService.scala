@@ -1,6 +1,5 @@
 package csw.command.client
 
-import akka.actor.Scheduler
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.http.scaladsl.Http
@@ -10,7 +9,15 @@ import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.typed.scaladsl
 import akka.util.{ByteString, Timeout}
 import csw.location.models.HttpLocation
-import csw.params.commands.CommandResponse.{Error, OnewayResponse, Started, SubmitResponse, ValidateResponse, isNegative}
+import csw.params.commands.CommandResponse.{
+  Error,
+  OnewayResponse,
+  QueryResponse,
+  Started,
+  SubmitResponse,
+  ValidateResponse,
+  isNegative
+}
 import csw.params.commands.{CommandName, CommandResponse, ControlCommand}
 import csw.params.core.models.Id
 import io.bullet.borer.Json
@@ -28,7 +35,6 @@ case class ComponentHttpCommandService(componentLocation: HttpLocation)(implicit
   private implicit val sys: akka.actor.ActorSystem = actorSystem.toUntyped
   private implicit val ec: ExecutionContext        = actorSystem.executionContext
   private implicit val mat: Materializer           = scaladsl.ActorMaterializer()
-  private implicit val scheduler: Scheduler        = actorSystem.scheduler
 
   private val componentName = componentLocation.connection.componentId.name
 
@@ -51,11 +57,9 @@ case class ComponentHttpCommandService(componentLocation: HttpLocation)(implicit
    * @return the command response or an Error response, if something fails
    */
   private def handleCommand(method: String, controlCommand: ControlCommand): Future[CommandResponse] = async {
-    // For compatibility with ESW, use the following style URI
-    //val uri  = s"http://${loc.uri.getHost}:${loc.uri.getPort}/command/$componentName/$method"
-    val uri = s"${componentLocation.uri.toString}/command/$method"
+    // For commands, URI is location:port/componentName/$method
+    val uri = s"${componentLocation.uri.toString}/$method"
 
-    println("URI: " + uri)
     val json = Json.encode(controlCommand).toUtf8String
     val response = await(
       Http(sys).singleRequest(
@@ -71,7 +75,7 @@ case class ComponentHttpCommandService(componentLocation: HttpLocation)(implicit
       Json.decode(bs.toArray).to[CommandResponse].value
     } else {
       // Server error: Return error with generated runId
-      Error(controlCommand.commandName, Id(), s"Error response from ${componentName}: $response")
+      Error(controlCommand.commandName, Id(), s"Error response from $componentName: $response")
     }
   }
 
@@ -101,8 +105,9 @@ case class ComponentHttpCommandService(componentLocation: HttpLocation)(implicit
     }
 
   /**
-   * Submit multiple commands and get a List of [[csw.params.commands.CommandResponse.SubmitResponse]] for all commands. The CommandResponse can be a response
-   * of validation (Accepted, Invalid) or a final Response. In case of response as `Accepted`, final CommandResponse can be obtained by using `subscribe` API.
+   * Submit multiple commands and get a List of [[csw.params.commands.CommandResponse.SubmitResponse]]
+   * for all commands. The CommandResponse can be a response of validation (Accepted, Invalid)
+   * or a final Response.
    *
    * @param submitCommands the set of [[csw.params.commands.ControlCommand]] payloads
    * @return a Source of CommandResponse as a stream of CommandResponses for all commands
@@ -153,7 +158,37 @@ case class ComponentHttpCommandService(componentLocation: HttpLocation)(implicit
     handleCommand("validate", controlCommand).map(_.asInstanceOf[ValidateResponse])
 
   /**
-   * Query for the final result of a long running command which was sent as Submit to get a [[csw.params.commands.CommandResponse.SubmitResponse]] as a Future
+   * Query for the final result of a long running command which was sent as Submit
+   * to get a [[csw.params.commands.CommandResponse.SubmitResponse]] as a Future
+   *
+   * @param commandRunId the runId of the command for which response is required
+   * @return a CommandResponse as a Future value
+   */
+  def query(commandRunId: Id)(implicit timeout: Timeout): Future[QueryResponse] = async {
+    assert(timeout.duration.isFinite) // FIXME: Just to get rid of the warning, for now
+
+    // For query, URI is location:port/componentName/query/$commandRunId
+    val uri = s"${componentLocation.uri.toString}/query/${commandRunId.id}"
+    val response = await(
+      Http(sys).singleRequest(
+        HttpRequest(
+          HttpMethods.GET,
+          uri
+        )
+      )
+    )
+    if (response.status == StatusCodes.OK) {
+      val bs = await(concatByteStrings(response.entity.dataBytes))
+      Json.decode(bs.toArray).to[QueryResponse].value
+    } else {
+      // Server error: Return error with generated runId
+      Error(CommandName("ERRORX"), commandRunId, s"Error response from $componentName: $response")
+    }
+  }
+
+  /**
+   * Query for the final result of a long running command which was sent as Submit to get
+   * a [[csw.params.commands.CommandResponse.SubmitResponse]] as a Future
    *
    * @param commandRunId the runId of the command for which response is required
    * @return a CommandResponse as a Future value
@@ -161,9 +196,8 @@ case class ComponentHttpCommandService(componentLocation: HttpLocation)(implicit
   def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse] = async {
     assert(timeout.duration.isFinite) // FIXME: Just to get rid of the warning, for now
 
-    // For compatibility with ESW, use the following style URI
-    //val uri = s"http://${loc.uri.getHost}:${loc.uri.getPort}/command/$componentType/$componentName/${commandRunId.id}"
-    val uri = componentLocation.uri.toString
+    // For query, URI is location:port/componentName/queryFinal/$commandRunId
+    val uri = s"${componentLocation.uri.toString}/queryFinal/${commandRunId.id}"
     val response = await(
       Http(sys).singleRequest(
         HttpRequest(

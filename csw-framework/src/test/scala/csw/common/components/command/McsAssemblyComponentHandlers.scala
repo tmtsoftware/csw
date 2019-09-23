@@ -100,13 +100,13 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
             )
             overall match {
               case OverallSuccess(_) =>
-                commandUpdatePublisher.update(Completed(controlCommand.commandName, runId))
+                commandResponseManager.updateCommand(Completed(controlCommand.commandName, runId))
               case OverallFailure(responses) =>
-                commandUpdatePublisher.update(Error(controlCommand.commandName, runId, s"$responses"))
+                commandResponseManager.updateCommand(Error(controlCommand.commandName, runId, s"$responses"))
             }
           case Failure(x) =>
             // Lift subcommand timeout to an error
-            commandUpdatePublisher.update(Error(controlCommand.commandName, runId, s"${x.toString}"))
+            commandResponseManager.updateCommand(Error(controlCommand.commandName, runId, s"${x.toString}"))
         }
       case Failure(ex) =>
         println(s"Some future failure-log: $ex")

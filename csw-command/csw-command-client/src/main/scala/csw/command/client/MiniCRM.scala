@@ -1,4 +1,4 @@
-package csw.command.client.internal
+package csw.command.client
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
@@ -10,24 +10,26 @@ import scala.collection.mutable.ListBuffer
 
 /**
  * miniCRM is described here.
- * miniCRM is designed to be used with a CommandService object, which encapsulates commands sent to one
+ * miniCRM is designed to be a limited commandResponseManager, which encapsulates commands sent to one
  * Assembly or HCD. A miniCRM supports the two CommandService methods called query and queryFinal.
  * It keeps three list types: StartedList, ResponseList, and WaiterList
- * StartedList: This is a list of commands that have returned Started to the CommandService. They are still
- *               executing, having return Started
- * ResponseList: This is a list of SubmitResponses published by the component this CommandService commands. This is
- *               called from the PubSub handler provided by the CommandService when subscribing to command updates
- * WaiterList: This is a list of queryFinal callers.  The list contains tuples of (id, ActorRef[SubmitResponse). Each
- *              entry is an actor waiting for the final response for the command with the given id.
+ * StartedList: This is a list of commands that have returned Started by the handlers. They are still
+ *               executing, having returned Started
+ * ResponseList: This is a list of SubmitResponses published by the component. This is called by the handlers
+ *               when they publish the final SubmitResponse for a started command
+ * WaiterList: This is a list of queryFinal callers.  The list contains tuples of (id, ActorRef[SubmitResponse]).
+ *              Each entry is an actor waiting for the final response for the command with the given id.
  *
  * miniCRM is written in the "immutable" style so all state is passed between calls to new Behaviors
  *
- * The CommandService only submits Started commands to the miniCRM. When a Started SubmitResponse is received,
- * miniCRM receives an AddStarted method. Whenever the component associated with the miniCRM receives the final
- * completion message, it calls AddResponse.
+ * The ComponentBehavior only submits Started commands to the miniCRM when a Started is returned from a submit
+ * handler. When a Started SubmitResponse is received, miniCRM receives an AddStarted call from ComponentBehavior.
+ * Whenever the component publishes the final completion message, it calls AddResponse, which triggers calls to any
+ * waiters associated with the runId.
  *
- * Query and QueryFinal are used by the CommandService to provide a response. Both of these methods look within
- * the three lists above for their responses.
+ * Query and QueryFinal are used by the CommandService to provide the status of a command.
+ * Both of these methods look within the three lists above for their responses.
+ * Note that miniCRM does not handle any other commands besides ones that return Started.
  */
 object MiniCRM {
 
@@ -107,8 +109,8 @@ object MiniCRM {
   /**
    * Update a WaiterList and return the new WaiterList. This is called from more than one place so it's
    * in its own function.
-   * Waiters are always added, no matter what. There should never be more than one waiter for an Id, but
-   * things work fine if there are more than 1
+   * Waiters are always added, no matter what. There is not a big chance of more than one waiter for
+   * a specific runId, but things work fine if there are more than one. The updated waiter list is returned.
    * @param waiterList a WaiterList of Id, ActurRef[SubmitResponse] tuples.
    * @param runId the new runId
    * @param replyTo the new ActorRef[SubmitResponse]
@@ -120,10 +122,11 @@ object MiniCRM {
   /**
    * getResponse function handles the query message. It is passed the current StartedList and ResponseList.
    * First it looks through the ResponseList to see if any SubmitResponses have been received for this runId.
-   * ResponseList only has updates from started commands. If it finds it in the responseList, that means that the
-   * final response has been received from the component. If it doesn't find it in the responseList, it looks in the
-   * StartedList, which contains commands that have Started, but are still executing. When the input Id is found, the
-   * SubmitResponse is found. If the runId is not in either list, CommandNotAvailable is returned -- QueryResponse.
+   * ResponseList only has updates from Started commands. If it finds it in the responseList, that means that the
+   * final response has been updated by the component. If it doesn't find it in the responseList, it looks in the
+   * StartedList that contains all commands that have Started, but are still executing (i.e., no final response yet)
+   * When the input Id is matched, the QueryResponse is found and returned.
+   * If the runId is not in either list, CommandNotAvailable is returned -- QueryResponse.
    * @param startedList contains Started responses for Ids that have started, but not finished
    * @param responseList contains SubmitResponses that have been received from the destination component
    * @param runId the runId the query is interested in
@@ -139,9 +142,9 @@ object MiniCRM {
       )
 
   /**
-   * updateWaiters looks through the waiterList input for any ActorRefs waiting for the id of the input response.
+   * updateWaiters looks through the waiterList input for any ActorRefs matching the id of the input response.
    * For every waiter waiting for the id of the response, the response is sent to the ActorRef. Then
-   * that entry is removed from the WaiterList and returned to the caller
+   * that entry is removed from the WaiterList and the updated list is returned to the caller
    * @param waiterList the list of (id, ActorRef[SubmitResponse]) -- callers of queryFinal
    * @param response a received update SubmitResponse from a component
    * @return new WaiterList, maybe be the same if no matches, or may be smaller but the number of waiters

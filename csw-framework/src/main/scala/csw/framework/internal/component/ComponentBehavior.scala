@@ -2,6 +2,7 @@ package csw.framework.internal.component
 
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal}
+import csw.command.client.MiniCRM.MiniCRMMessage.AddStarted
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
 import csw.command.client.messages.FromComponentLifecycleMessage.Running
 import csw.command.client.messages.RunningMessage.Lifecycle
@@ -176,7 +177,13 @@ private[framework] object ComponentBehavior {
         lifecycleHandlers.validateCommand(runId, commandMessage.command) match {
           case Accepted(_, _) =>
             log.info(s"Invoking lifecycle handler's onSubmit hook with msg :[$commandMessage]")
-            replyTo ! lifecycleHandlers.onSubmit(runId, commandMessage.command)
+            val submitResponse = lifecycleHandlers.onSubmit(runId, commandMessage.command)
+            submitResponse match {
+              case started: Started =>
+                commandResponseManager.commandResponseManagerActor ! AddStarted(started)
+              case _ => // Do nothing
+            }
+            replyTo ! submitResponse
           case invalid: Invalid =>
             log.debug(s"Command not forwarded to TLA post validation. ValidationResponse was [$invalid]")
             replyTo ! invalid

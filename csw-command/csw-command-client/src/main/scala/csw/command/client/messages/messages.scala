@@ -9,7 +9,7 @@ import csw.location.models.TrackingEvent
 import csw.logging.models.{Level, LogMetadata}
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
-import csw.params.core.models.Prefix
+import csw.params.core.models.{Id, Prefix}
 import csw.params.core.states.CurrentState
 import csw.serializable.CommandSerializable
 
@@ -206,15 +206,6 @@ object ComponentCommonMessage {
       with RemoteMsg
 
   /**
-   * Represents a message to subscribe to changes of a started command
-   *
-   * @param subscriberMessage tells the component to subscribe to or unsubscribe from CurrentState notifications
-   */
-  case class StartedCommandSubscription(subscriberMessage: SubscriberMessage[SubmitResponse])
-      extends ComponentCommonMessage
-      with RemoteMsg
-
-  /**
    * Represents a message to get current lifecycle state of a component
    *
    * @param replyTo an ActorRef that will receive SupervisorLifecycleState
@@ -277,6 +268,22 @@ private[csw] object FromSupervisorMessage {
 }
 
 ////////////////
+
+/**
+ * Represents a message to query the command status of a command running on some component
+ *
+ * @param runId represents an unique identifier of command
+ * @param replyTo represents the actor that will receive the command status
+ */
+case class Query(runId: Id, replyTo: ActorRef[QueryResponse]) extends SupervisorLockMessage with RemoteMsg
+
+/**
+ * Represents a message to subscribe to change in command status of a command running on some component
+ *
+ * @param runId represents an unique identifier of command
+ * @param replyTo represents the actor that will receive the notification of change in command status
+ */
+case class QueryFinal(runId: Id, replyTo: ActorRef[SubmitResponse]) extends SupervisorLockMessage with RemoteMsg
 
 // Parent trait for Messages which will be send to components for interacting with its logging system
 sealed trait LogControlMessages extends ComponentMessage with SequencerMsg with CommandSerializable

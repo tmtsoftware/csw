@@ -11,12 +11,11 @@ import akka.stream.typed.scaladsl.ActorSource
 import akka.stream.{KillSwitches, Materializer, OverflowStrategy}
 import akka.util.Timeout
 import csw.command.api.scaladsl.CommandService
-import csw.command.api.{CommandUpdateSubscription, CurrentStateSubscription, StateMatcher}
+import csw.command.api.{CurrentStateSubscription, StateMatcher}
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.client.internal.MiniCRM.MiniCRMMessage.{AddResponse, AddStarted, Query, QueryFinal}
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
 import csw.command.client.messages.ComponentCommonMessage.ComponentStateSubscription
-import csw.command.client.messages.ComponentMessage
+import csw.command.client.messages.{ComponentMessage, Query, QueryFinal}
 import csw.command.client.models.framework.PubSub.{Subscribe, SubscribeOnly}
 import csw.command.client.models.matchers.Matcher
 import csw.command.client.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
@@ -27,7 +26,7 @@ import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 
 import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(implicit val actorSystem: ActorSystem[_])
     extends CommandService {
@@ -35,19 +34,9 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
   private implicit val ec: ExecutionContext = actorSystem.executionContext
   private implicit val mat: Materializer    = scaladsl.ActorMaterializer()
   private implicit val scheduler: Scheduler = actorSystem.scheduler
-  private implicit val timeout: Timeout     = 100.milli
 
   private val component: ActorRef[ComponentMessage] = componentLocation.componentRef
   private val ValidateTimeout                       = 1.seconds
-
-  // Mini CRM Actor needs to have unique name
-  private val r    = scala.util.Random
-  private val name = s"${componentLocation.connection.componentId.fullName}-${r.nextInt(1000)}"
-  private lazy val miniCRM: ActorRef[MiniCRM.CRMMessage] =
-    Await.result(actorSystem.systemActorOf(MiniCRM.make(), name), 5.seconds)
-
-  // This provides the handler that is called when the component pubsub updates
-  subscribeCommandUpdates((sr: SubmitResponse) => miniCRM ! AddResponse(sr))
 
   override def validate(controlCommand: ControlCommand): Future[ValidateResponse] = {
     implicit val timeout: Timeout = Timeout(ValidateTimeout)
@@ -57,23 +46,13 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
   def submitAndWait(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] = {
     val eventualResponse: Future[SubmitResponse] = component ? (Submit(controlCommand, _))
     eventualResponse.flatMap {
-      case started: Started =>
-        miniCRM ! AddStarted(started)
-        queryFinal(started.runId)
-      case x =>
-        Future.successful(x)
+      case started: Started => queryFinal(started.runId)
+      case x                => Future.successful(x)
     }
   }
 
-  override def submit(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] = {
-    val eventualResponse: Future[SubmitResponse] = component ? (Submit(controlCommand, _))
-    eventualResponse.map {
-      case started: Started =>
-        miniCRM ! AddStarted(started)
-      case _ =>
-    }
-    eventualResponse
-  }
+  override def submit(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] =
+    component ? (Submit(controlCommand, _))
 
   override def submitAllAndWait(
       submitCommands: List[ControlCommand]
@@ -121,7 +100,7 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
 
   // components coming via this api will be removed from  subscriber's list after timeout
   def query(commandRunId: Id)(implicit timeout: Timeout): Future[QueryResponse] = {
-    val eventualResponse: Future[QueryResponse] = miniCRM ? (Query(commandRunId, _))
+    val eventualResponse: Future[QueryResponse] = component ? (Query(commandRunId, _))
     eventualResponse recover {
       case _: TimeoutException => CommandNotAvailable(CommandName("CommandNotAvailable"), commandRunId)
     }
@@ -129,7 +108,7 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
 
   // components coming via this api will be removed from  subscriber's list after timeout
   override def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse] =
-    miniCRM ? (QueryFinal(commandRunId, _))
+    component ? (QueryFinal(commandRunId, _))
 
   /**
    * Subscribe to the current state of a component corresponding to the [[csw.location.models.AkkaLocation]] of the component
@@ -167,8 +146,5 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
 
   override def subscribeCurrentState(names: Set[StateName], callback: CurrentState => Unit): CurrentStateSubscription =
     subscribeCurrentState(names).map(callback).toMat(Sink.ignore)(Keep.left).run()
-
-  private def subscribeCommandUpdates(callback: SubmitResponse => Unit): CommandUpdateSubscription =
-    new CommandUpdateSubscriptionImpl(component, None, callback)
 
 }

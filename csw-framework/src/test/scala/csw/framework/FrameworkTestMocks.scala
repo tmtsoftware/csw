@@ -5,6 +5,7 @@ import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import akka.{Done, actor}
 import csw.alarm.api.scaladsl.AlarmService
+import csw.command.client.{CommandResponseManager, MiniCRM}
 import csw.command.client.models.framework.{LifecycleStateChanged, PubSub}
 import csw.config.api.scaladsl.ConfigClientService
 import csw.config.client.scaladsl.ConfigClientFactory
@@ -16,6 +17,7 @@ import csw.framework.scaladsl.RegistrationFactory
 import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
+import csw.location.models.AkkaRegistration
 import csw.location.models.Connection.AkkaConnection
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
@@ -32,7 +34,7 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol]) extends Mo
 
   ///////////////////////////////////////////////
   val testActor: ActorRef[Any] = TestProbe("test-probe").ref
-  val akkaRegistration =
+  val akkaRegistration: AkkaRegistration =
     AkkaRegistrationFactory.make(mock[AkkaConnection], Prefix("nfiraos.ncc.trombone"), testActor.toURI)
   val locationService: LocationService           = mock[LocationService]
   val eventServiceFactory: EventServiceFactory   = mock[EventServiceFactory]
@@ -64,11 +66,16 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol]) extends Mo
   ///////////////////////////////////////////////
   val pubSubComponentActor: ActorRef[PubSub[CurrentState]] =
     system.spawn(PubSubBehavior.make[CurrentState](loggerFactory), "pub-sub")
-  val currentStatePublisher = new CurrentStatePublisher(pubSubComponentActor)
+  val currentStatePublisher: CurrentStatePublisher = new CurrentStatePublisher(pubSubComponentActor)
 
   val pubSubCommandEventActor: ActorRef[PubSub[SubmitResponse]] =
     system.spawn(PubSubBehavior.make[SubmitResponse](loggerFactory), name = "pub-sub-update")
-  val commandEventPublisher = new CommandUpdatePublisher(pubSubCommandEventActor)
+
+  val commandResponseManagerActor: TestProbe[MiniCRM.CRMMessage] = TestProbe[MiniCRM.CRMMessage]
+  val commandResponseManager: CommandResponseManager             = mock[CommandResponseManager]
+
+  when(commandResponseManager.commandResponseManagerActor).thenReturn(commandResponseManagerActor.ref)
+  doNothing.when(commandResponseManager).updateCommand(any[SubmitResponse])
 
   ///////////////////////////////////////////////
   val configClientService: ConfigClientService = ConfigClientFactory.clientApi(system, locationService)
@@ -82,7 +89,7 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol]) extends Mo
       loggerFactory,
       configClientService,
       currentStatePublisher,
-      commandEventPublisher,
+      commandResponseManager,
       ComponentInfos.dummyInfo
     )
 }

@@ -76,7 +76,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   def validateCommand(runId: Id, command: ControlCommand): ValidateCommandResponse = {
     command.commandName match {
       case `immediateCmd` | `longRunningCmd` | `longRunningCmdToAsm` | `longRunningCmdToAsmComp` | `longRunningCmdToAsmInvalid` |
-          `longRunningCmdToAsmCActor` =>
+          `longRunningCmdToAsmCActor` | `cmdWithBigParameter` =>
         Accepted(command.commandName, runId)
       case `invalidCmd` =>
         Invalid(command.commandName, runId, OtherIssue("Invalid"))
@@ -99,12 +99,12 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   private def processCommand(runId: Id, command: ControlCommand): SubmitResponse =
     command.commandName match {
       case `immediateCmd` =>
-        println("IMmediate damn it")
         Completed(command.commandName, runId)
       case `longRunningCmd` =>
         timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plusSeconds(2))) {
           // After time expires, send final update
-          commandUpdatePublisher.update(Completed(command.commandName, runId))
+          //commandUpdatePublisher.update(Completed(command.commandName, runId))
+          commandResponseManager.updateCommand(Completed(command.commandName, runId))
         }
         // Starts long-runing and returns started
         Started(command.commandName, runId)
@@ -112,7 +112,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         hcdComponent.submitAndWait(longRunning).map {
           case r: Completed =>
             assert(r.commandName == longRunning.commandName)
-            commandUpdatePublisher.update(Completed(command.commandName, runId))
+            commandResponseManager.updateCommand(Completed(command.commandName, runId))
           case x =>
           //println("Some other response in asm: " + x)
         }
@@ -128,13 +128,13 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
 
             completer.waitComplete().collect {
               case OverallSuccess(_) =>
-                commandUpdatePublisher.update(Completed(command.commandName, runId))
+                commandResponseManager.updateCommand(Completed(command.commandName, runId))
               case OverallFailure(responses) =>
-                commandUpdatePublisher.update(Error(command.commandName, runId, s"$responses"))
+                commandResponseManager.updateCommand(Error(command.commandName, runId, s"$responses"))
             }
           case Failure(exception) =>
             // Lift subcommand timeout to an error
-            commandUpdatePublisher.update(Error(command.commandName, runId, s"$exception"))
+            commandResponseManager.updateCommand(Error(command.commandName, runId, s"$exception"))
         }
         Started(command.commandName, runId)
       case `longRunningCmdToAsmCActor` =>
@@ -152,14 +152,14 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
             val f: Future[OverallResponse] = completer.ask(ref => WaitComplete(ref))
             f.map {
               case OverallSuccess(_) =>
-                commandUpdatePublisher.update(Completed(command.commandName, runId))
+                commandResponseManager.updateCommand(Completed(command.commandName, runId))
               case OverallFailure(responses) =>
-                commandUpdatePublisher.update(Error(command.commandName, runId, s"$responses"))
+                commandResponseManager.updateCommand(Error(command.commandName, runId, s"$responses"))
             }
 
           case Failure(exception) =>
             // Lift subcommand timeout to an error
-            commandUpdatePublisher.update(Error(command.commandName, runId, s"$exception"))
+            commandResponseManager.updateCommand(Error(command.commandName, runId, s"$exception"))
         }
         Started(command.commandName, runId)
       case `longRunningCmdToAsmInvalid` =>
@@ -172,16 +172,18 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
 
             completer.waitComplete().collect {
               case OverallSuccess(_) =>
-                commandUpdatePublisher.update(Completed(command.commandName, runId))
+                commandResponseManager.updateCommand(Completed(command.commandName, runId))
               case OverallFailure(_) =>
                 // Could look at the responses here and improve update
-                commandUpdatePublisher.update(Error(command.commandName, runId, "ERROR"))
+                commandResponseManager.updateCommand(Error(command.commandName, runId, "ERROR"))
             }
           case Failure(exception) =>
             // Lift subcommand timeout to an error
-            commandUpdatePublisher.update(Error(command.commandName, runId, s"$exception"))
+            commandResponseManager.updateCommand(Error(command.commandName, runId, s"$exception"))
         }
         Started(command.commandName, runId)
+      case `cmdWithBigParameter` =>
+        Completed(command.commandName, runId, Result(command.paramSet))
       case _ =>
         Invalid(command.commandName, runId, CommandIssue.UnsupportedCommandIssue(s"${command.commandName.name}"))
     }
@@ -203,7 +205,6 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   }
 
   override def onShutdown(): Future[Unit] = Future {
-    println("ON Shutdown")
     currentStatePublisher.publish(CurrentState(filterAsmPrefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
     Thread.sleep(500)
   }
