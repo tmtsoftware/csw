@@ -56,7 +56,7 @@ object Libs {
 }
 
 object Borer {
-  val Version = "0.11.1"
+  val Version = "1.0.0"
   val Org     = "io.bullet"
 
   val `borer-core`        = dep(Org %%% "borer-core"        % Version)
