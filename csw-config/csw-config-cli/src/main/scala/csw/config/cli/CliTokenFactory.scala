@@ -10,9 +10,10 @@ import csw.config.api.TokenFactory
  */
 class CliTokenFactory(installedAuthAdapter: InstalledAppAuthAdapter) extends TokenFactory {
 
-  override def getToken: String =
+  override def getToken: String = {
     installedAuthAdapter
-      .getAccessTokenString()
+      .getAccessToken()
+      .map(_.value)
       .getOrElse(throw new RuntimeException("Missing access token, You must login before executing this command."))
-
+  }
 }

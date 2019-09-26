@@ -15,7 +15,7 @@ import csw.aas.http.AuthorizationPolicy.{EmptyPolicy, _}
 import csw.location.api.scaladsl.LocationService
 
 import scala.concurrent.duration.DurationDouble
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.language.implicitConversions
 import scala.util.{Failure, Success}
 
@@ -201,7 +201,6 @@ object SecurityDirectives {
   def apply(config: Config, locationService: LocationService)(implicit ec: ExecutionContext): SecurityDirectives =
     from(AuthConfig.create(config, Some(authLocation(locationService))))
 
-  //todo: see if its possible to remove blocking here
   private def authLocation(locationService: LocationService)(implicit ec: ExecutionContext) =
-    Await.result(AuthServiceLocation(locationService).resolve(5.seconds), 10.seconds)
+    AuthServiceLocation(locationService).resolve(5.seconds)
 }
