@@ -72,7 +72,7 @@ private[framework] final class SupervisorBehavior(
     componentBehaviorFactory: ComponentBehaviorFactory,
     registrationFactory: RegistrationFactory,
     cswCtx: CswContext
-) extends AbstractBehavior[SupervisorMessage] {
+) extends AbstractBehavior[SupervisorMessage](ctx) {
 
   import SupervisorBehavior._
   import cswCtx._

@@ -54,7 +54,7 @@ private[framework] final class ContainerBehavior(
     eventServiceFactory: EventServiceFactory,
     alarmServiceFactory: AlarmServiceFactory,
     loggerFactory: LoggerFactory
-) extends AbstractBehavior[ContainerActorMessage] {
+) extends AbstractBehavior[ContainerActorMessage](ctx) {
 
   import ctx.executionContext
   private val log: Logger     = loggerFactory.getLogger(ctx)

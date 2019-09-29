@@ -1,5 +1,6 @@
 package csw.framework.integration
 
+import akka.actor.Status
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
@@ -177,22 +178,22 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
     // start tracking container and all the components, so that on Shutdown message, all the trackers gets LocationRemoved event
     seedLocationService
       .track(irisContainerConnection)
-      .toMat(Sink.actorRef[TrackingEvent](containerTracker.ref, "Completed"))(Keep.both)
+      .toMat(Sink.actorRef[TrackingEvent](containerTracker.ref, "Completed", t => Status.Failure(t)))(Keep.both)
       .run()
 
     seedLocationService
       .track(filterAssemblyConnection)
-      .toMat(Sink.actorRef[TrackingEvent](filterAssemblyTracker.ref, "Completed"))(Keep.both)
+      .toMat(Sink.actorRef[TrackingEvent](filterAssemblyTracker.ref, "Completed", t => Status.Failure(t)))(Keep.both)
       .run()
 
     seedLocationService
       .track(instrumentHcdConnection)
-      .toMat(Sink.actorRef[TrackingEvent](instrumentHcdTracker.ref, "Completed"))(Keep.both)
+      .toMat(Sink.actorRef[TrackingEvent](instrumentHcdTracker.ref, "Completed", t => Status.Failure(t)))(Keep.both)
       .run()
 
     seedLocationService
       .track(disperserHcdConnection)
-      .toMat(Sink.actorRef[TrackingEvent](disperserHcdTracker.ref, "Completed"))(Keep.both)
+      .toMat(Sink.actorRef[TrackingEvent](disperserHcdTracker.ref, "Completed", t => Status.Failure(t)))(Keep.both)
       .run()
 
     // ********** Message: Shutdown **********
