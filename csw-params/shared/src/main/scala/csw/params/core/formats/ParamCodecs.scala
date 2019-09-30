@@ -199,7 +199,7 @@ trait ParamCodecs extends CommonCodecs {
 
   // ************************ StateVariable Codecs ********************
 
-  implicit lazy val stateNameCodec: Codec[StateName]         = deriveCodec[StateName]
+  implicit lazy val stateNameCodec: Codec[StateName]         = deriveUnaryCodec[StateName]
   implicit lazy val demandStateCodec: Codec[DemandState]     = deriveCodec[DemandState]
   implicit lazy val currentStateCodec: Codec[CurrentState]   = deriveCodec[CurrentState]
   implicit lazy val stateVariableCodec: Codec[StateVariable] = deriveCodec[StateVariable]
