@@ -8,8 +8,6 @@ import csw.location.models.HttpLocation
 import org.keycloak.adapters.{KeycloakDeployment, KeycloakDeploymentBuilder}
 import org.keycloak.authorization.client.Configuration
 
-import scala.concurrent.duration.DurationLong
-import scala.concurrent.{Await, Future}
 import scala.language.implicitConversions
 import scala.util.Try
 
@@ -81,8 +79,8 @@ object AuthConfig {
   private val logger = AuthLogger.getLogger
   import logger._
 
-  private val authConfigKey = "auth-config"
-  private val disabledKey   = "disabled"
+  private[csw] val authConfigKey = "auth-config"
+  private[csw] val disabledKey   = "disabled"
 
   /**
    * Creates an instance of [[csw.aas.core.deployment.AuthConfig]]
@@ -92,23 +90,11 @@ object AuthConfig {
    *                            otherwise it will rely on config for auth-service-url
    */
   def create(
-      // todo : is this right place to load config? or should it be passed from outside
       config: Config = ConfigFactory.load(),
-      authServerLocation: Option[Future[HttpLocation]] = None
+      authServerLocation: Option[HttpLocation] = None
   ): AuthConfig = {
-    val authConfig = config.getConfig(authConfigKey)
-    val disabled   = optionalBoolean(authConfig, disabledKey)
-
-    (authServerLocation, disabled) match {
-      case (_, true) | (None, _) =>
-        debug("loading auth config")
-        new AuthConfig(authConfig, None)
-      case (Some(locationF), _) =>
-        debug("resolving auth service")
-        val location = Await.result(locationF, 5.seconds)
-        debug("loading auth config")
-        new AuthConfig(authConfig, Some(location))
-    }
+    debug("loading auth config")
+    new AuthConfig(config.getConfig(authConfigKey), authServerLocation)
   }
 
   private def optionalBoolean(config: Config, key: String) = {

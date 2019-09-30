@@ -6,7 +6,6 @@ import csw.location.models.Connection.HttpConnection
 import csw.location.models.{ComponentId, ComponentType, HttpLocation}
 import org.scalatest.{FunSuite, Matchers}
 
-import scala.concurrent.Future
 import scala.jdk.CollectionConverters._
 
 class AuthConfigTest extends FunSuite with Matchers {
@@ -39,7 +38,7 @@ class AuthConfigTest extends FunSuite with Matchers {
     val config        = ConfigFactory.load()
     val authServerUrl = "http://somehost:someport"
     val httpLocation  = HttpLocation(HttpConnection(ComponentId("testComponent", ComponentType.Service)), new URI(authServerUrl))
-    val authConfig    = AuthConfig.create(config, authServerLocation = Some(Future.successful(httpLocation)))
+    val authConfig    = AuthConfig.create(config, authServerLocation = Some(httpLocation))
 
     val deployment = authConfig.getDeployment
 
