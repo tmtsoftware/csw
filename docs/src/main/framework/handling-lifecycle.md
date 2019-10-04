@@ -214,16 +214,17 @@ Assembly/Java
 
 ###  onDiagnosticMode
 
-A Component can receive a `onDiagnosticMode` command from other components at any time.
-On receiving the `onDiagnosticMode` command, the components can start publishing some diagnostic data as desired.
-This command can be received by a component only in the Running state and is ignored otherwise.
+A Component can receive a `DiagnosticMode` command from other components at any time. The `onDiagnosticMode` handler
+of the component is invoked on receiving the command.
+Inside the handler, the components can start publishing some diagnostic data as desired.
+The `DiagnosticMode` command can be received by a component only in the Running state and is ignored otherwise.
 The diagnosticMode handler contains a `startTime` which is a @scaladoc[UTCTime](csw/time/core/models/UTCTime) 
 and a String parameter called `hint` with the name of the technical data mode. The component should read the hint and 
 publish events accordingly.
 
 @@@note
 
-A component developer should be careful to make any changes in its internal state in any callbacks. For example,
+A component developer should be careful to make any changes in the component's internal state in any callbacks. For example,
  while calling `timeServiceScheduler.schedule` or `eventPublisher.publish`, if you are trying to mutate state in 
  the callbacks passed to them, you might run into concurrency issues. Hence, in such scenarios, it is recommended to
  use a `WorkerActor` to manage the state.
@@ -244,19 +245,25 @@ Unsupported hints should be rejected by a component.
 
 The example shows one usage of `onDiagnosticMode` handler.
 
-Assembly/Scala
+Scala
 :   @@snip [SampleComponentHandlers.scala](../../../../csw-framework/src/test/scala/csw/common/components/framework/SampleComponentHandlers.scala) { #onDiagnostic-mode }
+
+Java
+:   @@snip [JSampleComponentHandlers.java](../../../../csw-framework/src/test/java/csw/framework/javadsl/components/JSampleComponentHandlers.java) { #onDiagnostic-mode }
 
 ### onOperationsMode
 
-Components can receive an `onOperationsMode` command which is used to halt all diagnostic modes. 
-The Operations Mode command is received through the `onOperationsMode` handler in the CSW Assembly, and HCD component. 
-The `onOperationsMode` handler is only called when the component is in the Running lifecycle state.
+Components can receive an `OperationsMode` command which is used to halt all diagnostic modes. The `onOperationsMode` handler
+of the component will be invoked on receiving this command.
+Similar to `DiagnosticMode` command, the `OperationsMode` command is also handled only in the Running state and is ignored otherwise.
 If in a technical data mode, the component should immediately halt its diagnostic mode and return to normal operations behavior.
 Even if the component does not define any diagnostic modes, it must be prepared to receive and
 process an `onOperationsMode` handler call. The component should return completion without error.
 
 The example shows one usage of `onOperationsMode` handler.
 
-Assembly/Scala
+Scala
 :   @@snip [SampleComponentHandlers.scala](../../../../csw-framework/src/test/scala/csw/common/components/framework/SampleComponentHandlers.scala) { #onOperations-mode }
+
+Java
+:   @@snip [JSampleComponentHandlers.java](../../../../csw-framework/src/test/java/csw/framework/javadsl/components/JSampleComponentHandlers.java) { #onOperations-mode }

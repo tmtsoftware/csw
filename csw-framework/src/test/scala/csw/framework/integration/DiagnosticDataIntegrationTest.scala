@@ -74,8 +74,9 @@ class DiagnosticDataIntegrationTest extends FrameworkIntegrationSuite {
     eventProbe.expectNoMessage(1.second)
     eventProbe.expectMessageType[SystemEvent].eventKey shouldEqual diagnosticKey
 
+    // unsupportedHint is ignored by the component, it continues to publish in previous diagMode
     supervisorRef ! DiagnosticMode(UTCTime.now(), "unsupportedHint")
-    eventProbe.expectNoMessage()
+    eventProbe.expectMessageType[SystemEvent].eventKey shouldEqual diagnosticKey
 
     supervisorRef ! OperationsMode
     eventProbe.expectNoMessage()
