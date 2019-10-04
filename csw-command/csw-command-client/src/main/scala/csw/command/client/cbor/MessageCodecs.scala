@@ -58,11 +58,11 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
 
   // ************************ LockingResponse Codecs ********************
 
-  implicit lazy val lockReleasedCodec: Codec[LockReleased.type]               = singletonCodec(LockReleased)
-  implicit lazy val lockExpiringShortlyCodec: Codec[LockExpiringShortly.type] = singletonCodec(LockExpiringShortly)
-  implicit lazy val lockExpiredCodec: Codec[LockExpired.type]                 = singletonCodec(LockExpired)
-  implicit lazy val lockAlreadyReleasedCodec: Codec[LockAlreadyReleased.type] = singletonCodec(LockAlreadyReleased)
-  implicit lazy val lockAcquiredCodec: Codec[LockAcquired.type]               = singletonCodec(LockAcquired)
+  implicit lazy val lockReleasedCodec: Codec[LockReleased.type]               = deriveCodec[LockReleased.type]
+  implicit lazy val lockExpiringShortlyCodec: Codec[LockExpiringShortly.type] = deriveCodec[LockExpiringShortly.type]
+  implicit lazy val lockExpiredCodec: Codec[LockExpired.type]                 = deriveCodec[LockExpired.type]
+  implicit lazy val lockAlreadyReleasedCodec: Codec[LockAlreadyReleased.type] = deriveCodec[LockAlreadyReleased.type]
+  implicit lazy val lockAcquiredCodec: Codec[LockAcquired.type]               = deriveCodec[LockAcquired.type]
   implicit lazy val releasingLockFailedCodec: Codec[ReleasingLockFailed]      = deriveUnaryCodec[ReleasingLockFailed]
   implicit lazy val acquiringLockFailedCodec: Codec[AcquiringLockFailed]      = deriveUnaryCodec[AcquiringLockFailed]
   implicit lazy val lockingResponseCodec: Codec[LockingResponse]              = deriveCodec[LockingResponse]
@@ -76,8 +76,8 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
 
   // ************************ RemoteMsg Codecs ********************
 
-  implicit lazy val shutdownCodec: Codec[Shutdown.type]             = singletonCodec(Shutdown)
-  implicit lazy val restartCodec: Codec[Restart.type]               = singletonCodec(Restart)
+  implicit lazy val shutdownCodec: Codec[Shutdown.type]             = deriveCodec[Shutdown.type]
+  implicit lazy val restartCodec: Codec[Restart.type]               = deriveCodec[Restart.type]
   implicit lazy val queryCodec: Codec[Query]                        = deriveCodec[Query]
   implicit lazy val subscribeCodec: Codec[Subscribe]                = deriveCodec[Subscribe]
   implicit lazy val unsubscribeCodec: Codec[Unsubscribe]            = deriveCodec[Unsubscribe]
@@ -88,7 +88,7 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
   implicit lazy val unlockCodec: Codec[Unlock]                      = deriveCodec[Unlock]
   implicit lazy val lifecycleCodec: Codec[Lifecycle]                = deriveCodec[Lifecycle]
   implicit lazy val diagnosticModeCodec: Codec[DiagnosticMode]      = deriveCodec[DiagnosticMode]
-  implicit lazy val operationsModeCodec: Codec[OperationsMode.type] = singletonCodec(OperationsMode)
+  implicit lazy val operationsModeCodec: Codec[OperationsMode.type] = deriveCodec[OperationsMode.type]
 
   implicit lazy val lifecycleStateChangedCodec: Codec[LifecycleStateChanged]           = deriveCodec[LifecycleStateChanged]
   implicit lazy val lifecycleStateSubscriptionCodec: Codec[LifecycleStateSubscription] = deriveCodec[LifecycleStateSubscription]

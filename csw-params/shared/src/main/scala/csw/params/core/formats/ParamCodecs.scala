@@ -30,8 +30,6 @@ trait ParamCodecs extends CommonCodecs {
   type ArrayEnc[T] = Encoder[Array[T]]
   type ArrayDec[T] = Decoder[Array[T]]
 
-  def singletonCodec[T <: Singleton](a: T): Codec[T] = Codec.bimap[String, T](_.toString, _ => a)
-
   // ************************ Base Type Codecs ********************
 
   implicit lazy val choiceCodec: Codec[Choice] = deriveUnaryCodec[Choice]
