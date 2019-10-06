@@ -3,7 +3,6 @@ package csw.testkit
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorRef, SpawnProtocol}
 import akka.actor.{typed, ActorSystem}
-import akka.http.scaladsl.Http
 import akka.stream.Materializer
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
@@ -105,7 +104,6 @@ final class FrameworkTestKit private (
    * Shutdown all testkits which are started.
    */
   def shutdown(): Unit = {
-    TestKitUtils.await(Http().shutdownAllConnectionPools(), timeout)
     if (configStarted) configTestKit.deleteServerFiles(); configTestKit.terminateServer()
     if (eventStarted) eventTestKit.stopRedis()
     if (alarmStarted) alarmTestKit.stopRedis()

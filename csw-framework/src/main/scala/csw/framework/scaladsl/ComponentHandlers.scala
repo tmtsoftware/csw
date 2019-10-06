@@ -8,6 +8,7 @@ import csw.location.models.{Connection, TrackingEvent}
 import csw.params.commands.CommandResponse.{SubmitResponse, ValidateCommandResponse}
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
+import csw.time.core.models.UTCTime
 
 import scala.concurrent.Future
 
@@ -63,11 +64,24 @@ abstract class ComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx
 
   /**
    * On receiving a command as Oneway, the onOneway handler is invoked for a component only if the validateCommand handler
-   * returns Accepted.In case a command is received as a oneway, command response should not be provided to the sender.
+   * returns Accepted. In case a command is received as a oneway, command response should not be provided to the sender.
    *
    * @param controlCommand represents a command received e.g. Setup, Observe or wait
    */
   def onOneway(runId: Id, controlCommand: ControlCommand): Unit
+
+  /**
+   * On receiving a diagnostic data command, the component goes into a diagnostic data mode based on hint at the specified startTime.
+   * Validation of supported hints need to be handled by the component writer.
+   * @param startTime represents the time at which the diagnostic mode actions will take effect
+   * @param hint represents supported diagnostic data mode for a component
+   */
+  def onDiagnosticMode(startTime: UTCTime, hint: String): Unit
+
+  /**
+   * On receiving a operations mode command, the current diagnostic data mode is halted.
+   */
+  def onOperationsMode(): Unit
 
   /**
    * The onShutdown handler can be used for carrying out the tasks which will allow the component to shutdown gracefully

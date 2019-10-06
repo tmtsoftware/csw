@@ -45,15 +45,6 @@ trait InstalledAppAuthAdapter {
   def loginCommandLine(redirectUri: String): Boolean
 
   /**
-   * Access token in string format
-   *
-   * @param minValidity ensure that returned access token is valid at-least for given duration.
-   *                    Will refresh the token if required.
-   * @return access token in string format if it is present in [[AuthStore]]. This token could be signed or encrypted
-   */
-  def getAccessTokenString(minValidity: FiniteDuration = 0.seconds): Option[String]
-
-  /**
    * Get [[csw.aas.core.token.AccessToken]] converted from raw access token string fetched from [[AuthStore]]
    *
    * @param minValidity ensure that returned access token is valid at-least for given duration.

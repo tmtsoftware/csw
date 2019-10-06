@@ -1,7 +1,5 @@
 package csw.event.cli
 
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.http.scaladsl.Http
 import csw.event.cli.args.{ArgsParser, Options}
 import csw.event.cli.commons.ApplicationFinishedReason
 import csw.event.cli.wiring.Wiring
@@ -23,9 +21,7 @@ object Main extends App {
     startLogging(name)
 
     try cliApp.start(options)
-    finally Http(actorSystem.toUntyped)
-      .shutdownAllConnectionPools()
-      .onComplete(_ => actorRuntime.shutdown(ApplicationFinishedReason))
+    finally actorRuntime.shutdown(ApplicationFinishedReason)
   }
 }
 // $COVERAGE-ON$

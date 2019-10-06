@@ -233,6 +233,7 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
       LoggingState.loggerStopping = true
       logActor ! StopLogging
       LoggingState.maybeLogActor = None
+      LoggingState.loggerStopping = false
       done.future
     }
 

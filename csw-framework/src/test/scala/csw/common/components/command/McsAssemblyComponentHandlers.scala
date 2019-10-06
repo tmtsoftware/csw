@@ -15,6 +15,7 @@ import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandIssue, ControlCommand, Setup}
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
+import csw.time.core.models.UTCTime
 
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContext, Future}
@@ -37,7 +38,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
           case Some(akkaLocation) => hcdComponent = CommandServiceFactory.make(akkaLocation)(ctx.system)
           case None               => throw new RuntimeException("Could not resolve hcd location, Initialization failure.")
         }
-      case None => Future.unit
+      case None => Future.successful(())
     }
   }
 
@@ -111,7 +112,6 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
       case Failure(ex) =>
         println(s"Some future failure-log: $ex")
     }
-
   }
 
   private def handleSubcommandResponse(startedResponse: SubmitResponse, completer: Completer): Unit = {
@@ -150,6 +150,11 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
   }
 
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
+
+  override def onShutdown(): Future[Unit] = Future.unit
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = ???
+
+  override def onOperationsMode(): Unit = {}
 
   override def onShutdown(): Future[Unit] = Future.unit
 

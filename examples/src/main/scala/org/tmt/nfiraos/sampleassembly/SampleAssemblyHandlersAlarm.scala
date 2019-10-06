@@ -17,6 +17,7 @@ import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.Subsystem.NFIRAOS
 import csw.params.core.models.{Id, ObsId, Prefix, Units}
 import csw.params.events._
+import csw.time.core.models.UTCTime
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContextExecutor, Future}
@@ -166,6 +167,10 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
     Completed(controlCommand.commandName, runId)
 
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
+
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {}
+
+  override def onOperationsMode(): Unit = {}
 
   override def onGoOffline(): Unit = {}
 

@@ -30,6 +30,7 @@ import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
 import csw.params.javadsl.JUnits;
+import csw.time.core.models.UTCTime;
 
 import java.util.Optional;
 import java.util.Set;
@@ -237,5 +238,13 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
 
     @Override
     public void onGoOnline() {
+    }
+
+    @Override
+    public void onDiagnosticMode(UTCTime startTime, String hint) {
+    }
+
+    @Override
+    public void onOperationsMode() {
     }
 }

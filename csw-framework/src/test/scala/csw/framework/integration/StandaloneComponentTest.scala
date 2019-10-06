@@ -3,7 +3,6 @@ package csw.framework.integration
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.http.scaladsl.Http
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import com.typesafe.config.ConfigFactory
@@ -86,7 +85,6 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
 
     // on shutdown, component unregisters from location service
     supervisorCommandService.subscribeCurrentState(supervisorStateProbe.ref ! _)
-    Http(standaloneComponentActorSystem.toUntyped).shutdownAllConnectionPools().await
     supervisorRef ! Shutdown
 
     // this proves that ComponentBehaviors postStop signal gets invoked

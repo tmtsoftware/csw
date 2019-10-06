@@ -11,6 +11,7 @@ import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
+import csw.time.core.models.UTCTime
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
@@ -71,6 +72,11 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
 
   override def onShutdown(): Future[Unit] = Future.unit
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = ???
+
+  override def onOperationsMode(): Unit = {}
+
+  override def onShutdown(): Future[Unit] = {}
 
   override def onGoOffline(): Unit = {}
 

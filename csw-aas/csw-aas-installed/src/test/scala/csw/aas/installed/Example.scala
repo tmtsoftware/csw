@@ -33,7 +33,7 @@ object Example extends App {
   private val timeLeft: Long = expires - System.currentTimeMillis() / 1000
   println(s"time left to expire: $timeLeft")
 
-  println(installedAuthAdapter.getAccessTokenString())
+  println(installedAuthAdapter.getAccessToken())
 
-  println(installedAuthAdapter.getAccessTokenString((timeLeft + 100).seconds))
+  println(installedAuthAdapter.getAccessToken((timeLeft + 100).seconds))
 }

@@ -2,8 +2,6 @@ package csw.framework.integration
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.SpawnProtocol
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
@@ -89,7 +87,6 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
     )
 
     subscription.unsubscribe()
-    Http(containerActorSystem.toUntyped).shutdownAllConnectionPools().await
     containerActorSystem.terminate()
     containerActorSystem.whenTerminated.await
   }
@@ -148,7 +145,6 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
       CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(tcpLocationRemovedChoice)))
     )
 
-    Http(componentActorSystem.toUntyped).shutdownAllConnectionPools().await
     componentActorSystem.terminate()
     componentActorSystem.whenTerminated.await
   }

@@ -1,9 +1,7 @@
 {
   "DemandState": {
     "prefix": "wfos.blue.filter",
-    "stateName": {
-      "name": "testStateName"
-    },
+    "stateName": "testStateName",
     "paramSet": [
       {
         "CharKey": {

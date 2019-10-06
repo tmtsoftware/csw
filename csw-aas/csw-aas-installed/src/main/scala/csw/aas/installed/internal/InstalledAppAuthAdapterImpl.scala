@@ -2,9 +2,10 @@ package csw.aas.installed.internal
 
 import csw.aas.core.TokenVerificationFailure.TokenExpired
 import csw.aas.core.TokenVerifier
+import csw.aas.core.deployment.AuthConfig
 import csw.aas.core.token.AccessToken
 import csw.aas.core.utils.Conversions.RichEitherTFuture
-import csw.aas.installed.api.{AuthStore, InstalledAppAuthAdapter}
+import csw.aas.installed.api._
 import org.keycloak.adapters.installed.KeycloakInstalled
 
 import scala.concurrent.ExecutionContext
@@ -12,11 +13,14 @@ import scala.concurrent.duration.{DurationLong, FiniteDuration}
 import scala.util.Try
 
 private[aas] class InstalledAppAuthAdapterImpl(
+    authConfig: AuthConfig,
     val keycloakInstalled: KeycloakInstalled,
     tokenVerifier: TokenVerifier,
     maybeStore: Option[AuthStore] = None
 )(implicit executionContext: ExecutionContext)
     extends InstalledAppAuthAdapter {
+
+  import authConfig.disabled
 
   override def login(): Unit = {
     keycloakInstalled.login()
@@ -50,11 +54,6 @@ private[aas] class InstalledAppAuthAdapterImpl(
     bool
   }
 
-  override def getAccessTokenString(minValidity: FiniteDuration = 0.seconds): Option[String] = {
-    getAccessToken(minValidity)
-    accessTokenStr
-  }
-
   override def getAccessToken(minValidity: FiniteDuration = 0.seconds): Option[AccessToken] = {
     def getNewToken: Option[AccessToken] = {
       Try(refreshAccessToken()).recover {
@@ -65,15 +64,18 @@ private[aas] class InstalledAppAuthAdapterImpl(
       accessTokenStr.flatMap(atr => tokenVerifier.verifyAndDecode(atr).block().toOption)
     }
 
-    val mayBeAccessTokenVerification = maybeStore match {
-      case Some(store) => store.getAccessTokenString.map(tokenVerifier.verifyAndDecode(_).block())
-      case None        => Some(tokenVerifier.verifyAndDecode(keycloakInstalled.getTokenString).block())
-    }
-
-    mayBeAccessTokenVerification.flatMap {
-      case Right(at)          => if (isExpired(at, minValidity)) getNewToken else Some(at)
-      case Left(TokenExpired) => getNewToken
-      case _                  => None
+    if (disabled) {
+      Some(AccessToken())
+    } else {
+      val mayBeAccessTokenVerification = maybeStore match {
+        case Some(store) => store.getAccessTokenString.map(tokenVerifier.verifyAndDecode(_).block())
+        case None        => Some(tokenVerifier.verifyAndDecode(keycloakInstalled.getTokenString).block())
+      }
+      mayBeAccessTokenVerification.flatMap {
+        case Right(at)          => if (isExpired(at, minValidity)) getNewToken else Some(at)
+        case Left(TokenExpired) => getNewToken
+        case _                  => None
+      }
     }
   }
 

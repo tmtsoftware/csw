@@ -8,6 +8,7 @@ import org.keycloak.common.VerificationException
 import org.keycloak.exceptions.TokenNotActiveException
 import org.keycloak.representations.{AccessToken => KAccessToken}
 import pdi.jwt.{JwtJson, JwtOptions}
+import play.api.libs.json.JsString
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
@@ -38,6 +39,7 @@ class TokenVerifier private[aas] (keycloakTokenVerifier: KeycloakTokenVerifier, 
   private def decode(token: String): Either[TokenVerificationFailure, AccessToken] =
     JwtJson
       .decodeJson(token, JwtOptions(signature = false, expiration = false, notBefore = false))
+      .map(_ + (("value", JsString(token))))
       .map(_.as[AccessToken])
       .toEither
       .left

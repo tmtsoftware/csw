@@ -30,8 +30,6 @@ trait ParamCodecs extends CommonCodecs {
   type ArrayEnc[T] = Encoder[Array[T]]
   type ArrayDec[T] = Decoder[Array[T]]
 
-  def singletonCodec[T <: Singleton](a: T): Codec[T] = Codec.bimap[String, T](_.toString, _ => a)
-
   // ************************ Base Type Codecs ********************
 
   implicit lazy val choiceCodec: Codec[Choice] = deriveUnaryCodec[Choice]
@@ -198,7 +196,7 @@ trait ParamCodecs extends CommonCodecs {
 
   // ************************ StateVariable Codecs ********************
 
-  implicit lazy val stateNameCodec: Codec[StateName]         = deriveCodec[StateName]
+  implicit lazy val stateNameCodec: Codec[StateName]         = deriveUnaryCodec[StateName]
   implicit lazy val demandStateCodec: Codec[DemandState]     = deriveCodec[DemandState]
   implicit lazy val currentStateCodec: Codec[CurrentState]   = deriveCodec[CurrentState]
   implicit lazy val stateVariableCodec: Codec[StateVariable] = deriveCodec[StateVariable]

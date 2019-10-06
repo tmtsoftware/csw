@@ -37,7 +37,7 @@ class LoggingSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
       .toUpperCase
   }
 
-  test("should able to set log level for default logger, slf4j and akka") {
+  test("should be able to set log level for default logger, slf4j and akka") {
     val logLevel      = "debug"
     val akkaLogLevel  = "Error"
     val slf4jLogLevel = "INFO"
@@ -52,7 +52,7 @@ class LoggingSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
   }
 
   // DEOPSCSW-142: Flexibility of logging approaches
-  test("should able to parse appenders from configuration file") {
+  test("should be able to parse appenders from configuration file") {
     loggingSystem.getAppenders.toSet shouldBe Set(StdOutAppender, FileAppender)
   }
 

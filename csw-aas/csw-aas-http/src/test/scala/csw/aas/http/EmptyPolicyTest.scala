@@ -18,7 +18,7 @@ class EmptyPolicyTest extends FunSuite with MockitoSugar with Directives with Sc
 
   test("empty policy should return AuthenticationFailedRejection when token is invalid") {
     val authentication: Authentication         = mock[Authentication]
-    val securityDirectives: SecurityDirectives = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives: SecurityDirectives = new SecurityDirectives(authentication, "TMT", "test", false)
     //new SecurityDirectives(authentication, authConfig)
 
     val invalidTokenStr    = "invalid"
@@ -46,7 +46,7 @@ class EmptyPolicyTest extends FunSuite with MockitoSugar with Directives with Sc
 
   test("empty policy should return AuthenticationFailedRejection when token is not present") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
     val authenticator: AsyncAuthenticator[AccessToken] = _ => Future.successful(None)
 
@@ -67,7 +67,7 @@ class EmptyPolicyTest extends FunSuite with MockitoSugar with Directives with Sc
 
   test("empty policy should return 200 OK when token is valid & has permission") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
     val validTokenWithPermissionStr    = "validTokenWithPermissionStr"
     val validTokenWithPermissionHeader = Authorization(OAuth2BearerToken(validTokenWithPermissionStr))

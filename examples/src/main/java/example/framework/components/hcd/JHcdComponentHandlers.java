@@ -18,6 +18,7 @@ import csw.location.models.TrackingEvent;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.*;
 import csw.params.core.models.Id;
+import csw.time.core.models.UTCTime;
 import example.framework.components.ConfigNotAvailableException;
 import example.framework.components.assembly.WorkerActor;
 import example.framework.components.assembly.WorkerActorMsg;
@@ -50,7 +51,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
         super(ctx, cswCtx);
         this.ctx = ctx;
         this.componentInfo = cswCtx.componentInfo();
-        //this.commandResponseManager = cswCtx.commandResponseManager();
+        this.commandResponseManager = cswCtx.commandResponseManager();
         this.currentStatePublisher = cswCtx.currentStatePublisher();
         this.locationService = cswCtx.locationService();
         this.eventService = cswCtx.eventService();
@@ -130,6 +131,14 @@ public class JHcdComponentHandlers extends JComponentHandlers {
         // do something when going online
     }
     //#onGoOnline-handler
+
+    @Override
+    public void onDiagnosticMode(UTCTime startTime, String hint) {
+    }
+
+    @Override
+    public void onOperationsMode() {
+    }
 
     //#onShutdown-handler
     @Override

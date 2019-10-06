@@ -3,7 +3,6 @@ package csw.event.client.internal.kafka
 import akka.Done
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.http.scaladsl.Http
 import akka.kafka.ProducerSettings
 import csw.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.event.api.scaladsl.{EventPublisher, EventService, EventSubscriber}
@@ -63,7 +62,6 @@ class KafkaTestProps(
 
   override def shutdown(): Unit = {
 //    EmbeddedKafka.stop()
-    Http(actorSystem.toUntyped).shutdownAllConnectionPools().await
     actorSystem.terminate()
     actorSystem.whenTerminated.await
     locationServer.afterAll()

@@ -9,12 +9,14 @@ import java.time.{ZoneId, ZoneOffset, ZonedDateTime}
 import akka.actor.typed
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.ConfigFactory
-import csw.logging.models.Level.{DEBUG, INFO, TRACE}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.appenders.{FileAppender, StdOutAppender}
 import csw.logging.client.commons.{LoggingKeys, TMTDateTimeFormatter}
 import csw.logging.client.internal.JsonExtensions.RichJsObject
+import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.utils.FileUtils
+import csw.logging.models.Level
+import csw.logging.models.Level.{DEBUG, ERROR, INFO, TRACE}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 import play.api.libs.json.{JsObject, Json}
 
@@ -61,31 +63,38 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
     }
   }
 
-  def testLogConfiguration(logBuffer: mutable.Seq[JsObject], headersEnabled: Boolean, expectedTimestamp: ZonedDateTime): Unit = {
-    logBuffer.size shouldBe 1
+  def testLogConfiguration(
+      logBuffer: mutable.Seq[JsObject],
+      headersEnabled: Boolean,
+      expectedTimestamp: ZonedDateTime,
+      expectedSize: Int = 1,
+      expectedSeverity: Level = INFO
+  ): Unit = {
+    logBuffer.size shouldBe expectedSize
 
-    val jsonLogMessage = logBuffer.head
-    // Standard header fields -> Logging System Name, Hostname, Version
-    jsonLogMessage.contains(LoggingKeys.NAME) shouldBe headersEnabled
-    jsonLogMessage.contains(LoggingKeys.HOST) shouldBe headersEnabled
-    jsonLogMessage.contains(LoggingKeys.VERSION) shouldBe headersEnabled
+    logBuffer.foreach { jsonLogMessage =>
+      // Standard header fields -> Logging System Name, Hostname, Version
+      jsonLogMessage.contains(LoggingKeys.NAME) shouldBe headersEnabled
+      jsonLogMessage.contains(LoggingKeys.HOST) shouldBe headersEnabled
+      jsonLogMessage.contains(LoggingKeys.VERSION) shouldBe headersEnabled
 
-    if (headersEnabled) {
-      jsonLogMessage.getString(LoggingKeys.NAME) shouldBe loggingSystemName
-      jsonLogMessage.getString(LoggingKeys.HOST) shouldBe hostname
-      jsonLogMessage.getString(LoggingKeys.VERSION) shouldBe version
+      if (headersEnabled) {
+        jsonLogMessage.getString(LoggingKeys.NAME) shouldBe loggingSystemName
+        jsonLogMessage.getString(LoggingKeys.HOST) shouldBe hostname
+        jsonLogMessage.getString(LoggingKeys.VERSION) shouldBe version
+      }
+
+      jsonLogMessage.getString(LoggingKeys.MESSAGE) shouldBe sampleLogMessage
+      jsonLogMessage.getString(LoggingKeys.SEVERITY) shouldBe expectedSeverity.name
+      jsonLogMessage.getString(LoggingKeys.CLASS) shouldBe className
+      jsonLogMessage.getString(LoggingKeys.FILE) shouldBe fileName
+
+      // This assert's that, ISO_INSTANT parser should not throw exception while parsing timestamp from log message
+      // If timestamp is in other than UTC(ISO_FORMAT) format, DateTimeFormatter.ISO_INSTANT will throw DateTimeParseException
+      noException shouldBe thrownBy(DateTimeFormatter.ISO_INSTANT.parse(jsonLogMessage.getString(LoggingKeys.TIMESTAMP)))
+      val actualDateTime = TMTDateTimeFormatter.parse(jsonLogMessage.getString(LoggingKeys.TIMESTAMP))
+      ChronoUnit.MILLIS.between(expectedTimestamp, actualDateTime) <= 50 shouldBe true
     }
-
-    jsonLogMessage.getString(LoggingKeys.MESSAGE) shouldBe sampleLogMessage
-    jsonLogMessage.getString(LoggingKeys.SEVERITY) shouldBe INFO.name
-    jsonLogMessage.getString(LoggingKeys.CLASS) shouldBe className
-    jsonLogMessage.getString(LoggingKeys.FILE) shouldBe fileName
-
-    // This assert's that, ISO_INSTANT parser should not throw exception while parsing timestamp from log message
-    // If timestamp is in other than UTC(ISO_FORMAT) format, DateTimeFormatter.ISO_INSTANT will throw DateTimeParseException
-    noException shouldBe thrownBy(DateTimeFormatter.ISO_INSTANT.parse(jsonLogMessage.getString(LoggingKeys.TIMESTAMP)))
-    val actualDateTime = TMTDateTimeFormatter.parse(jsonLogMessage.getString(LoggingKeys.TIMESTAMP))
-    ChronoUnit.MILLIS.between(expectedTimestamp, actualDateTime) <= 50 shouldBe true
 
   }
 
@@ -289,25 +298,29 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
                        |     logLevelLimit = info
                        |   }
                        | }
+                       | logLevel = warn
                        |}
                      """.stripMargin)
         .withFallback(ConfigFactory.load())
 
     lazy val actorSystem                 = typed.ActorSystem(SpawnProtocol.behavior, "test", config)
-    lazy val loggingSystem               = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
+    var loggingSystem: LoggingSystem     = null
     var expectedTimestamp: ZonedDateTime = null
 
     Console.withOut(outStream) {
-      loggingSystem
+      log.error(sampleLogMessage)
+      log.info(sampleLogMessage)
+      loggingSystem = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
       expectedTimestamp = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
-      doLogging()
+      log.error(sampleLogMessage)
+      log.info(sampleLogMessage)
       Thread.sleep(100)
     }
 
     loggingSystem.getAppenders shouldBe List(StdOutAppender)
 
     parse(outStream.toString)
-    testLogConfiguration(stdOutLogBuffer, false, expectedTimestamp)
+    testLogConfiguration(stdOutLogBuffer, false, expectedTimestamp, 2, ERROR)
 
     // clean up
     stdOutLogBuffer.clear()
@@ -345,7 +358,7 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
     }
     loggingSystem.getAppenders shouldBe List(StdOutAppender)
 
-    val expectedOneLineLog = " INFO   (LoggingConfigurationTest.scala 93) - Sample log message"
+    val expectedOneLineLog = " INFO   (LoggingConfigurationTest.scala 102) - Sample log message"
 
     val (timestamp, message) = os.toString.trim.splitAt(24)
 

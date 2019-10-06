@@ -209,3 +209,61 @@ Assembly/Scala
 
 Assembly/Java
 :   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/assembly/JAssemblyComponentHandlers.java) { #onOneway-handler }
+
+## Handling Diagnostic Data
+
+###  onDiagnosticMode
+
+A Component can receive a `DiagnosticMode` command from other components at any time. The `onDiagnosticMode` handler
+of the component is invoked on receiving the command.
+Inside the handler, the components can start publishing some diagnostic data as desired.
+The `DiagnosticMode` command can be received by a component only in the Running state and is ignored otherwise.
+The diagnosticMode handler contains a `startTime` which is a @scaladoc[UTCTime](csw/time/core/models/UTCTime) 
+and a String parameter called `hint` with the name of the technical data mode. The component should read the hint and 
+publish events accordingly.
+
+@@@note
+
+A component developer should be careful to make any changes in the component's internal state in any callbacks. For example,
+ while calling `timeServiceScheduler.schedule` or `eventPublisher.publish`, if you are trying to mutate state in 
+ the callbacks passed to them, you might run into concurrency issues. Hence, in such scenarios, it is recommended to
+ use a `WorkerActor` to manage the state.
+
+@@@
+
+The startTime is included so a diagnosticMode can be synchronized in time with diagnosticMode starting in other components.
+The Time Service can be used to schedule execution of some tasks at the specified startTime.
+Event Service publish Api can also be used in order to start publishing events at the specified startTime.
+A component can only be in one technical data mode at a time. If the component is in one technical data, then on
+receiving command to go in another technical mode, the component should stop/halt the previous  
+diagnosticMode handler, and should enter the new technical data mode.
+Even if the component does not define any diagnostic modes, it must be prepared to receive and process diagnosticMode 
+handler without an error by completing with no changes.
+
+The supported diagnostic mode hints of a component are published in the component's model files.
+Unsupported hints should be rejected by a component.
+
+The example shows one usage of `onDiagnosticMode` handler.
+
+Scala
+:   @@snip [SampleComponentHandlers.scala](../../../../csw-framework/src/test/scala/csw/common/components/framework/SampleComponentHandlers.scala) { #onDiagnostic-mode }
+
+Java
+:   @@snip [JSampleComponentHandlers.java](../../../../csw-framework/src/test/java/csw/framework/javadsl/components/JSampleComponentHandlers.java) { #onDiagnostic-mode }
+
+### onOperationsMode
+
+Components can receive an `OperationsMode` command which is used to halt all diagnostic modes. The `onOperationsMode` handler
+of the component will be invoked on receiving this command.
+Similar to `DiagnosticMode` command, the `OperationsMode` command is also handled only in the Running state and is ignored otherwise.
+If in a technical data mode, the component should immediately halt its diagnostic mode and return to normal operations behavior.
+Even if the component does not define any diagnostic modes, it must be prepared to receive and
+process an `onOperationsMode` handler call. The component should return completion without error.
+
+The example shows one usage of `onOperationsMode` handler.
+
+Scala
+:   @@snip [SampleComponentHandlers.scala](../../../../csw-framework/src/test/scala/csw/common/components/framework/SampleComponentHandlers.scala) { #onOperations-mode }
+
+Java
+:   @@snip [JSampleComponentHandlers.java](../../../../csw-framework/src/test/java/csw/framework/javadsl/components/JSampleComponentHandlers.java) { #onOperations-mode }

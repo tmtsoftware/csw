@@ -36,7 +36,7 @@ class PolicyExpressionTest extends FunSuite with MockitoSugar with Directives wi
     import testCase._
     test(s"$left $operator $right = $expectedOutcome") {
       val authentication: Authentication = mock[Authentication]
-      val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+      val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
       val tokenStr = "token"
       val token    = mock[AccessToken]
@@ -76,7 +76,7 @@ class PolicyExpressionTest extends FunSuite with MockitoSugar with Directives wi
 
   test("policy expression should return AuthenticationFailedRejection when token is invalid") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
     val tokenStr    = "token"
     val tokenHeader = Authorization(OAuth2BearerToken(tokenStr))
@@ -100,7 +100,7 @@ class PolicyExpressionTest extends FunSuite with MockitoSugar with Directives wi
 
   test("policy expression policy should return AuthenticationFailedRejection when token is not present") {
     val authentication: Authentication                 = mock[Authentication]
-    val securityDirectives                             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives                             = new SecurityDirectives(authentication, "TMT", "test", false)
     val authenticator: AsyncAuthenticator[AccessToken] = _ => Future.successful(None)
 
     when(authentication.authenticator).thenReturn(authenticator)
@@ -120,7 +120,7 @@ class PolicyExpressionTest extends FunSuite with MockitoSugar with Directives wi
 
   test("policy expression policy should return AuthorizationFailedRejection when expression resolves to false") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
     val tokenStr = "token"
     val token    = mock[AccessToken]
@@ -151,7 +151,7 @@ class PolicyExpressionTest extends FunSuite with MockitoSugar with Directives wi
 
   test("policy expression policy should return 200 OK when token is valid & policy expression resolves to true") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
     val tokenStr                       = "token"
     val token                          = mock[AccessToken]
     val header                         = Authorization(OAuth2BearerToken(tokenStr))

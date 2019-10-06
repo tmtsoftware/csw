@@ -1,8 +1,6 @@
 package csw.framework
 import akka.Done
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.http.scaladsl.Http
 import akka.stream.Materializer
 import akka.stream.typed.scaladsl.ActorMaterializer
 import csw.commons.redis.EmbeddedRedis
@@ -32,7 +30,6 @@ class FrameworkTestWiring(val seedPort: Int = SocketUtils.getFreePort) extends E
     }
 
   def shutdown(): Done = {
-    Http(seedActorSystem.toUntyped).shutdownAllConnectionPools().await
     seedActorSystem.terminate()
     seedActorSystem.whenTerminated.await
   }

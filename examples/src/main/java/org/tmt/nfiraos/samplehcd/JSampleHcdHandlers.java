@@ -17,6 +17,7 @@ import csw.params.events.Event;
 import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
+import csw.time.core.models.UTCTime;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -179,5 +180,13 @@ public class JSampleHcdHandlers extends JComponentHandlers {
 
     @Override
     public void onGoOnline() {
+    }
+
+    @Override
+    public void onDiagnosticMode(UTCTime startTime, String hint) {
+    }
+
+    @Override
+    public void onOperationsMode() {
     }
 }

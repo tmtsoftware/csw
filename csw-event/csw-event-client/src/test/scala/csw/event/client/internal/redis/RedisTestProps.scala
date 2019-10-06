@@ -2,8 +2,6 @@ package csw.event.client.internal.redis
 
 import akka.Done
 import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.http.scaladsl.Http
 import com.typesafe.config.ConfigFactory
 import csw.commons.redis.EmbeddedRedis
 import csw.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
@@ -72,7 +70,6 @@ class RedisTestProps(
     publisher.shutdown().await
     redisClient.shutdown()
     stopSentinel(redisSentinel, redisServer)
-    Http(actorSystem.toUntyped).shutdownAllConnectionPools().await
     actorSystem.terminate()
     actorSystem.whenTerminated.await
     locationServer.afterAll()
