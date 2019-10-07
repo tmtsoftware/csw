@@ -1,13 +1,11 @@
 package csw.framework.internal.supervisor
 
 import akka.Done
-import akka.actor.{CoordinatedShutdown, Scheduler}
+import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed._
 import akka.actor.typed.scaladsl._
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.typed.scaladsl.AskPattern._
-import akka.util.Timeout
 import csw.command.client.MiniCRM.MiniCRMMessage
 import csw.command.client.messages.ComponentCommonMessage.{
   ComponentStateSubscription,
@@ -35,12 +33,10 @@ import csw.command.client.models.framework._
 import csw.framework.commons.CoordinatedShutdownReasons.ShutdownMessageReceivedReason
 import csw.framework.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehavior
-import csw.framework.internal.supervisor.ComponentHttpBehavior.ComponentHttpMessage
-import csw.framework.internal.supervisor.ComponentHttpBehavior.ComponentHttpMessage.Start
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, RegistrationFactory}
-import csw.location.models.Connection.{AkkaConnection, HttpConnection}
-import csw.location.models.{AkkaRegistration, ComponentId, HttpRegistration}
+import csw.location.models.Connection.AkkaConnection
+import csw.location.models.{AkkaRegistration, ComponentId}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.LogAdminUtil
 import csw.params.commands.CommandResponse.Locked
@@ -54,7 +50,6 @@ private[framework] object SupervisorBehavior {
   val PubSubLifecycleActor            = "pub-sub-lifecycle"
   val InitializeTimerKey              = "initialize-timer"
   val ComponentActorNameSuffix        = "component-actor"
-  val HttpComponentEndpointSuffix     = "http-endpoint"
   val CommandResponseManagerActorName = "command-response-manager"
   val LockNotificationKey             = "lockNotification"
   val LockExpirationKey               = "lockExpiration"
@@ -86,9 +81,7 @@ private[framework] final class SupervisorBehavior(
   private val log: Logger                                  = loggerFactory.getLogger(ctx)
   private val componentName: String                        = componentInfo.name
   private val componentActorName: String                   = s"$componentName-$ComponentActorNameSuffix"
-  private val httpComponentActorName: String               = s"$componentName-$HttpComponentEndpointSuffix"
   private val akkaConnection: AkkaConnection               = AkkaConnection(ComponentId(componentName, componentInfo.componentType))
-  private val httpConnection: HttpConnection               = HttpConnection(ComponentId(componentName, componentInfo.componentType))
   private val prefix: Prefix                               = componentInfo.prefix
   private val akkaRegistration: AkkaRegistration           = registrationFactory.akkaTyped(akkaConnection, prefix, ctx.self)
   private val isStandalone: Boolean                        = maybeContainerRef.isEmpty
@@ -250,7 +243,6 @@ private[framework] final class SupervisorBehavior(
 
   private def onRestart(): Unit = {
     updateLifecycleState(SupervisorLifecycleState.Restart)
-    unRegisterHttpEndpointFromLocationService()
     unRegisterFromLocationService()
   }
 
@@ -293,28 +285,9 @@ private[framework] final class SupervisorBehavior(
     }
   }
 
-  private def registerHttpEndpointWithLocationService(port: Int): Unit = {
-    if (componentInfo.locationServiceUsage != DoNotRegister) { //Honour DoNotRegister received in componentInfo
-      // Path is just component name
-      val path = s"${componentInfo.name}"
-      locationService.register(HttpRegistration(httpConnection, port, path)).onComplete {
-        case Success(_)         => // Assume registration success for component is based on Akka
-        case Failure(throwable) => ctx.self ! RegistrationFailed(throwable)
-      }
-    }
-  }
-
   private def unRegisterFromLocationService(): Unit = {
     log.debug(s"Un-registering supervisor from location service")
     locationService.unregister(akkaConnection).onComplete {
-      case Success(_)         => ctx.self ! UnRegistrationComplete
-      case Failure(throwable) => ctx.self ! UnRegistrationFailed(throwable)
-    }
-  }
-
-  private def unRegisterHttpEndpointFromLocationService(): Unit = {
-    log.debug(s"Un-registering HTTP endpoint from location service")
-    locationService.unregister(httpConnection).onComplete {
       case Success(_)         => ctx.self ! UnRegistrationComplete
       case Failure(throwable) => ctx.self ! UnRegistrationFailed(throwable)
     }
@@ -360,22 +333,12 @@ private[framework] final class SupervisorBehavior(
   }
 
   private def onComponentRunning(componentRef: ActorRef[RunningMessage]): Unit = {
-    implicit val timeout: Timeout     = 3.seconds
-
     log.info("Received Running message from component within timeout, cancelling InitializeTimer")
     timerScheduler.cancel(InitializeTimerKey)
 
     updateLifecycleState(SupervisorLifecycleState.Running)
     runningComponent = Some(componentRef)
     registerWithLocationService(componentRef)
-
-    // Create the HTTP endpoint - would be nice if optional
-    val httpBehavior: ActorRef[ComponentHttpMessage] =
-      ctx.spawn(ComponentHttpBehavior.make(loggerFactory, ctx.self, componentName), httpComponentActorName)
-    // Start to get the port for registering with Location Service
-    implicit val scheduler: Scheduler = ctx.system.scheduler
-    val port: Future[Int] = httpBehavior ? (ref => Start(ref))
-    port.map(registerHttpEndpointWithLocationService(_))
   }
 
   private def onRegistrationFailed(throwable: Throwable) = {
@@ -389,5 +352,4 @@ private[framework] final class SupervisorBehavior(
     log.debug(s"Supervisor is changing lifecycle state from [$lifecycleState] to [$state]")
     lifecycleState = state
   }
-
 }

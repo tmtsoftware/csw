@@ -101,9 +101,9 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit                                         = ???
   override def validateCommand(runId: Id, controlCommand: ControlCommand): CommandResponse.ValidateCommandResponse = ???
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit                                           = ???
-  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit                                 = ???
-  override def onOperationsMode(): Unit                                                                 = ???
-  override def onShutdown(): Future[Unit]                                                               = ???
-  override def onGoOffline(): Unit                                                                      = ???
-  override def onGoOnline(): Unit                                                                       = ???
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit                                            = ???
+  override def onOperationsMode(): Unit                                                                            = ???
+  override def onShutdown(): Future[Unit]                                                                          = ???
+  override def onGoOffline(): Unit                                                                                 = ???
+  override def onGoOnline(): Unit                                                                                  = ???
 }
