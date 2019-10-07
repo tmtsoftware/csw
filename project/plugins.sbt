@@ -24,6 +24,9 @@ addSbtPlugin("com.github.cb372"                  % "sbt-explicit-dependencies"  
 resolvers += "Jenkins repo" at "https://repo.jenkins-ci.org/public/"
 addSbtPlugin("ohnosequences" % "sbt-github-release" % "0.7.0")
 
+resolvers += Resolver.bintrayRepo("twtmt", "sbt-plugins")
+addSbtPlugin("com.github.tmtsoftware" % "sbt-docs" % "0.1.2")
+
 classpathTypes += "maven-plugin"
 
 libraryDependencies += "com.sun.activation" % "javax.activation" % "1.2.0"
