@@ -72,11 +72,10 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
 
   override def onShutdown(): Future[Unit] = Future.unit
-  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = ???
+
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {}
 
   override def onOperationsMode(): Unit = {}
-
-  override def onShutdown(): Future[Unit] = {}
 
   override def onGoOffline(): Unit = {}
 

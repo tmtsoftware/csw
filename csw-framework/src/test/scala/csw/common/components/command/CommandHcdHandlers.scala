@@ -97,4 +97,8 @@ class CommandHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCon
   }
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}
+
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {}
+
+  override def onOperationsMode(): Unit = {}
 }

@@ -79,8 +79,6 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
   implicit lazy val restartCodec: Codec[Restart.type]               = deriveCodec[Restart.type]
   implicit lazy val queryCodec: Codec[Query]                        = deriveCodec[Query]
   implicit lazy val queryFinalCodec: Codec[QueryFinal]              = deriveCodec[QueryFinal]
-  implicit lazy val subscribeCodec: Codec[Subscribe]                = deriveCodec[Subscribe]
-  implicit lazy val unsubscribeCodec: Codec[Unsubscribe]            = deriveCodec[Unsubscribe]
   implicit lazy val submitCodec: Codec[Submit]                      = deriveCodec[Submit]
   implicit lazy val oneWayCodec: Codec[Oneway]                      = deriveCodec[Oneway]
   implicit lazy val validateCodec: Codec[Validate]                  = deriveCodec[Validate]

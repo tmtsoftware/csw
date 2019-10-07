@@ -210,4 +210,8 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   }
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}
+
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {}
+
+  override def onOperationsMode(): Unit = {}
 }

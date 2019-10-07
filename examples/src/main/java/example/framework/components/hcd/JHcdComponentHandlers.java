@@ -3,6 +3,7 @@ package example.framework.components.hcd;
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.AskPattern;
+import csw.command.client.CommandResponseManager;
 import csw.command.client.messages.TopLevelActorMessage;
 import csw.command.client.models.framework.ComponentInfo;
 import csw.config.api.javadsl.IConfigClientService;
@@ -34,6 +35,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
 
     private final ActorContext<TopLevelActorMessage> ctx;
     private final ComponentInfo componentInfo;
+    private final CommandResponseManager commandResponseManager;
     private final CurrentStatePublisher currentStatePublisher;
     private final ILocationService locationService;
     private final IEventService eventService;
