@@ -1,9 +1,9 @@
 package csw.alarm.api.internal
 
 import csw.alarm.models._
-import csw.params.core.models.Subsystem
 import csw.params.extensions.Formats
 import csw.params.extensions.Formats.MappableFormat
+import enumeratum.{Enum, EnumEntry}
 import play.api.libs.json.{Format, Json}
 
 private[alarm] trait AlarmJsonSupport {
@@ -15,11 +15,6 @@ private[alarm] trait AlarmJsonSupport {
 
   implicit lazy val alarmStatusFormat: Format[AlarmStatus] = Json.format
 
-  implicit lazy val subsystemFormat: Format[Subsystem]                         = Formats.enumFormat
-  implicit lazy val alarmSeverityFormat: Format[FullAlarmSeverity]             = Formats.enumFormat
-  implicit lazy val acknowledgementStatusFormat: Format[AcknowledgementStatus] = Formats.enumFormat
-  implicit lazy val activationStatusFormat: Format[ActivationStatus]           = Formats.enumFormat
-  implicit lazy val alarmTypeFormat: Format[AlarmType]                         = Formats.enumFormat
-  implicit lazy val shelveStatusFormat: Format[ShelveStatus]                   = Formats.enumFormat
-  implicit lazy val alarmHealthFormat: Format[AlarmHealth]                     = Formats.enumFormat
+  implicit def enumFormat[T <: EnumEntry: Enum]: Format[T] =
+    Formats.of[String].bimap[T](_.entryName, implicitly[Enum[T]].withNameInsensitive)
 }
