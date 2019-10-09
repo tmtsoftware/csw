@@ -1,19 +1,20 @@
 package csw.aas.core.token
-import csw.aas.core.TokenVerificationFailure
+
+import csw.aas.core.{AuthCodecs, TokenVerificationFailure}
 import csw.aas.core.TokenVerificationFailure.InvalidToken
 import csw.aas.core.commons.AuthLogger
+import io.bullet.borer.Json
 import org.keycloak.authorization.client.AuthzClient
-import pdi.jwt.{JwtJson, JwtOptions}
-import play.api.libs.json.JsString
+import pdi.jwt.{Jwt, JwtOptions}
 
-import scala.concurrent.{blocking, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future, blocking}
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
 /**
  * Represents an Access token which contains permissions
  */
-private[aas] class RPT(authzClient: AuthzClient)(implicit ec: ExecutionContext) {
+private[aas] class RPT(authzClient: AuthzClient)(implicit ec: ExecutionContext) extends AuthCodecs {
   private val logger = AuthLogger.getLogger
   import logger._
 
@@ -43,17 +44,13 @@ private[aas] class RPT(authzClient: AuthzClient)(implicit ec: ExecutionContext) 
    * @param rptString RPT string
    */
   private def decodeRPT(rptString: String): Either[TokenVerificationFailure, AccessToken] =
-    JwtJson
-      .decodeJson(rptString, JwtOptions(signature = false, expiration = false, notBefore = false))
-      .map(_ + (("value", JsString(rptString))))
-      .toLeftMappedEither("error while decoding RPT")
-      .flatMap { js =>
-        Try { js.as[AccessToken] }.toLeftMappedEither("error while mapping RPT json to access token")
-      }
-      .map { at =>
-        debug(s"successfully fetched RPT from keycloak for ${at.userOrClientName}")
-        at
-      }
+    Try {
+      val claim = Jwt.decodeRaw(rptString, JwtOptions(signature = false, expiration = false, notBefore = false)).get
+      Json.decode(claim.getBytes()).to[AccessToken].value.copy(value = rptString)
+    }.toLeftMappedEither("error while decoding RPT").map { at =>
+      debug(s"successfully fetched RPT from keycloak for ${at.userOrClientName}")
+      at
+    }
 
   implicit private class TryOps[T](tryValue: Try[T]) {
     def toLeftMappedEither(logMsg: String): Either[InvalidToken, T] = tryValue.toEither.left.map {

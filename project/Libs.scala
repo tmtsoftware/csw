@@ -27,7 +27,7 @@ object Libs {
   val `play-json` = dep("com.typesafe.play" %%% "play-json" % "2.7.4") //Apache 2.0
 
   val `akka-http-play-json` = "de.heikoseeberger"   %% "akka-http-play-json" % "1.29.1" //Apache 2.0
-  val `jwt-play-json`       = "com.pauldijou"       %% "jwt-play-json"       % "4.1.0"
+  val `jwt-core`            = "com.pauldijou"       %% "jwt-core"            % "4.1.0"
   val `lettuce`             = "io.lettuce"          % "lettuce-core"         % "5.1.8.RELEASE"
   val `reactor-core`        = "io.projectreactor"   % "reactor-core"         % "3.2.12.RELEASE"
   val `reactive-streams`    = "org.reactivestreams" % "reactive-streams"     % "1.0.3"

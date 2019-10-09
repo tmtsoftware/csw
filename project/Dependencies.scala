@@ -99,10 +99,10 @@ object Dependencies {
       Enumeratum.`enumeratum`.value,
       Libs.`config`,
       Libs.`scala-java8-compat`,
-      Libs.`scalatest`.value     % Test,
+      Libs.`scalatest`.value % Test
     )
   )
-  
+
   val ConfigApi = Def.setting(
     Seq(
       Akka.`akka-actor`,
@@ -170,7 +170,7 @@ object Dependencies {
     Seq(
       Enumeratum.`enumeratum`.value,
       Borer.`borer-core`.value,
-      Borer.`borer-derivation`.value,
+      Borer.`borer-derivation`.value
     )
   )
 
@@ -282,9 +282,9 @@ object Dependencies {
       Libs.`mockito-scala`            % Test,
       Libs.`embedded-redis`           % Test,
 //      Libs.`embedded-kafka`           % Test,
-      Akka.`akka-multi-node-testkit`  % Test,
-      Libs.HdrHistogram               % Test,
-      Libs.testng                     % Test
+      Akka.`akka-multi-node-testkit` % Test,
+      Libs.HdrHistogram              % Test,
+      Libs.testng                    % Test
     )
   )
 
@@ -312,7 +312,7 @@ object Dependencies {
       Libs.`scalatest`.value % Test
     )
   )
-  
+
   val AlarmApi = Def.setting(
     Seq(
       Akka.`akka-actor`,
@@ -434,7 +434,7 @@ object Dependencies {
 
   val CswAasCore = Def.setting(
     Seq(
-      Libs.`jwt-play-json`,
+      Libs.`jwt-core`,
       Libs.`play-json`.value,
       Libs.`config`,
       Keycloak.`keycloak-core`,
