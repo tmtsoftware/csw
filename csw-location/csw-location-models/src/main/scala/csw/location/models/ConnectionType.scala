@@ -1,6 +1,6 @@
 package csw.location.models
 
-import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
+import enumeratum.{Enum, EnumEntry}
 
 import scala.collection.immutable.IndexedSeq
 
@@ -17,7 +17,7 @@ sealed abstract class ConnectionType private[location] (override val entryName: 
   def name: String = entryName
 }
 
-object ConnectionType extends Enum[ConnectionType] with PlayJsonEnum[ConnectionType] {
+object ConnectionType extends Enum[ConnectionType] {
 
   /**
    * Returns a sequence of all connection types

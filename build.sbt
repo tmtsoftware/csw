@@ -288,7 +288,7 @@ lazy val `csw-logging-api` = project
     `csw-logging-models-jvm`
   )
   .settings(
-    libraryDependencies += Enumeratum.`enumeratum`.value
+    libraryDependencies += Libs.`enumeratum`.value
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
 

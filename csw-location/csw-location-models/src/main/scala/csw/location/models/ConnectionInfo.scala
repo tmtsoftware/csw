@@ -1,7 +1,5 @@
 package csw.location.models
 
-import play.api.libs.json.{Json, OFormat}
-
 /**
  * ConnectionInfo represents a component name, component type and connection type
  *
@@ -11,8 +9,4 @@ import play.api.libs.json.{Json, OFormat}
  */
 case class ConnectionInfo private[location] (name: String, componentType: ComponentType, connectionType: ConnectionType) {
   override def toString: String = s"$name-${componentType.name}-${connectionType.name}"
-}
-
-private[location] object ConnectionInfo {
-  private[location] implicit val connectionInfoFormat: OFormat[ConnectionInfo] = Json.format[ConnectionInfo]
 }
