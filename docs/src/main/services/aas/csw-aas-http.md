@@ -48,11 +48,25 @@ uses permission based authorization policies, this config needs to be set to tru
 `client-id` is a mandatory configuration which specifies the client ID of the app as per its registration
 in AAS.
 
+`disabled` is an optional config with default value of `false`. This flag can
+be turned on for local development and testing purposes. When turned on, all 
+http requests bypass all security policies. Clients don't have to pass any 
+token in the requests. It can greatly ease the process of testing business 
+logic without having to go through the process of creating users, managing 
+roles and logging in with user credentials to generate valid access tokens.
+
+
+@@@ warning { title='Caution' }
+Please use `disabled` flag with caution. If accidentally turned on in production, confidential data
+can be compromised 
+@@@
+
 ```hocon
 auth-config {
   realm = TMT # DEFAULT
   enable-permissions = false # DEFAULT
   client-id = demo-cli # REQUIRED
+  disabled = false # DEFAULT
 } 
 ```
 
@@ -190,6 +204,10 @@ Scala
 
 Both of the above approaches compile and are valid. The access token holds basic information about the user 
 or the client who has made the request.
+
+@@@ note
+When `disabled` flag is true in `auth-config`, all fields of access token will be set to `None`
+@@@ 
 
 Please go through the API documentation to know more about Access Tokens.
 

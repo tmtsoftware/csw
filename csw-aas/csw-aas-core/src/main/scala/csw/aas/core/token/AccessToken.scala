@@ -2,7 +2,6 @@ package csw.aas.core.token
 
 import csw.aas.core.commons.AuthLogger
 import csw.aas.core.token.claims.{Access, Audience, Authorization}
-import play.api.libs.json._
 
 /**
  * Represents JSON Web Token (JWT) for TMT.
@@ -107,8 +106,4 @@ case class AccessToken(
     case (None, Some(c)) => c
     case _               => UnknownUser
   }
-}
-
-object AccessToken {
-  implicit val accessTokenFormat: OFormat[AccessToken] = Json.using[Json.WithDefaultValues].format
 }

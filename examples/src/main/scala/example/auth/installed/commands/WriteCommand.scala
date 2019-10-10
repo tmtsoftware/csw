@@ -15,9 +15,9 @@ class WriteCommand(val installedAppAuthAdapter: InstalledAppAuthAdapter, value: 
 ) extends AppCommand {
   override def run(): Unit = {
 
-    installedAppAuthAdapter.getAccessTokenString() match {
+    installedAppAuthAdapter.getAccessToken() match {
       case Some(token) =>
-        val bearerToken = headers.OAuth2BearerToken(token)
+        val bearerToken = headers.OAuth2BearerToken(token.value)
         val url         = s"http://localhost:7000/data?value=$value"
         val response =
           Await.result(

@@ -10,7 +10,8 @@ import akka.util.{ByteString, Timeout}
 import csw.location.api.scaladsl.LocationService
 import csw.location.models.ComponentType
 import csw.location.models.Connection.HttpConnection
-import csw.params.commands.CommandResponse.{Error, OnewayResponse, Started, SubmitResponse, ValidateResponse, isNegative}
+import csw.params.commands.CommandIssue.{OtherIssue, UnresolvedLocationsIssue}
+import csw.params.commands.CommandResponse.{Error, Invalid, OnewayResponse, Started, SubmitResponse, ValidateResponse, isNegative}
 import csw.params.commands.{CommandResponse, ControlCommand}
 import csw.params.core.models.Id
 import io.bullet.borer.Json
@@ -18,6 +19,12 @@ import csw.params.core.formats.ParamCodecs._
 
 import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContext, Future}
+
+object HttpCommandService {
+  val submitCommand   = "submit"
+  val onewayCommand   = "oneway"
+  val validateCommand = "validate"
+}
 
 /**
  * Support for sending commands to an HTTP service (normally from a CSW component).
@@ -31,6 +38,7 @@ case class HttpCommandService(
     locationService: LocationService,
     connection: HttpConnection
 ) {
+  import HttpCommandService._
 
   implicit val sys: akka.actor.ActorSystem = system.toUntyped
   implicit val mat: Materializer           = ActorMaterializer()(system)
@@ -77,10 +85,20 @@ case class HttpCommandService(
           val bs = await(concatByteStrings(response.entity.dataBytes))
           Json.decode(bs.toArray).to[CommandResponse].value
         } else {
-          Error(controlCommand.runId, s"Error response from ${connection.componentId.name}: $response")
+          val s = s"Error response from ${connection.componentId.name}: $response"
+          method match {
+            case `submitCommand` => Error(controlCommand.runId, s)
+            case _               => Invalid(controlCommand.runId, OtherIssue(s))
+          }
+
         }
       case None =>
-        Error(controlCommand.runId, s"Can't locate connection for ${connection.componentId.name}")
+        val s = s"Can't locate connection for ${connection.componentId.name}"
+        method match {
+          case `submitCommand` => Error(controlCommand.runId, s)
+          case _               => Invalid(controlCommand.runId, UnresolvedLocationsIssue(s))
+        }
+
     }
   }
 
@@ -94,7 +112,7 @@ case class HttpCommandService(
    * @return the command response or an Error response, if something fails
    */
   def submit(controlCommand: ControlCommand): Future[SubmitResponse] =
-    handleCommand("submit", controlCommand).map(_.asInstanceOf[SubmitResponse])
+    handleCommand(submitCommand, controlCommand).map(_.asInstanceOf[SubmitResponse])
 
   /**
    * Submit a command and Subscribe for the result if it was successfully validated as `Started` to get a
@@ -148,7 +166,7 @@ case class HttpCommandService(
    * @return a future OnewayResponse: Accepted or Invalid, if there was an error
    */
   def oneway(controlCommand: ControlCommand): Future[OnewayResponse] =
-    handleCommand("oneway", controlCommand).map(_.asInstanceOf[OnewayResponse])
+    handleCommand(onewayCommand, controlCommand).map(_.asInstanceOf[OnewayResponse])
 
   /**
    * Posts a validate command to the given HTTP connection and returns a ValidateResponse.
@@ -159,7 +177,7 @@ case class HttpCommandService(
    * @return a future OnewayResponse: Accepted or Invalid, if there was an error
    */
   def validate(controlCommand: ControlCommand): Future[ValidateResponse] =
-    handleCommand("validate", controlCommand).map(_.asInstanceOf[ValidateResponse])
+    handleCommand(validateCommand, controlCommand).map(_.asInstanceOf[ValidateResponse])
 
   /**
    * Query for the final result of a long running command which was sent as Submit to get a [[csw.params.commands.CommandResponse.SubmitResponse]] as a Future

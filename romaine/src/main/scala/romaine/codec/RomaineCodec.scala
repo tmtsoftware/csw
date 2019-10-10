@@ -35,15 +35,6 @@ object RomaineCodec {
     override def fromBytes(byteBuffer: ByteBuffer): ByteBuffer = byteBuffer
   }
 
-  implicit lazy val byteArrayCodec: RomaineCodec[Array[Byte]] = new RomaineCodec[Array[Byte]] {
-    override def toBytes(value: Array[Byte]): ByteBuffer = ByteBuffer.wrap(value)
-    override def fromBytes(byteBuffer: ByteBuffer): Array[Byte] = {
-      val array = new Array[Byte](byteBuffer.remaining())
-      byteBuffer.get(array)
-      array
-    }
-  }
-
   implicit lazy val stringCodec: RomaineCodec[String] = {
     val utf8StringCodec = new Utf8StringCodec()
     byteBufferCodec.bimap[String](utf8StringCodec.encodeValue, utf8StringCodec.decodeValue)

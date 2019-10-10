@@ -1,4 +1,5 @@
 package csw.framework.models
+
 import enumeratum._
 
 import scala.collection.immutable
@@ -8,7 +9,7 @@ import scala.collection.immutable
  */
 private[csw] sealed abstract class ConfigFileLocation extends EnumEntry
 
-private[csw] object ConfigFileLocation extends Enum[ConfigFileLocation] with PlayJsonEnum[ConfigFileLocation] {
+private[csw] object ConfigFileLocation extends Enum[ConfigFileLocation] {
 
   override def values: immutable.IndexedSeq[ConfigFileLocation] = findValues
 

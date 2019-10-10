@@ -3,8 +3,7 @@ package csw.config.models.codecs
 import java.nio.file.{Path, Paths}
 import java.time.Instant
 
-import csw.config.models.{ConfigFileInfo, ConfigFileRevision, ConfigId, ConfigMetadata, FileType}
-import csw.params.core.formats.CodecHelpers
+import csw.config.models.{ConfigFileInfo, ConfigFileRevision, ConfigId, ConfigMetadata}
 import io.bullet.borer.Codec
 import io.bullet.borer.derivation.MapBasedCodecs._
 
@@ -19,6 +18,4 @@ trait ConfigCodecs {
   implicit lazy val configFileInfoCodec: Codec[ConfigFileInfo]         = deriveCodec[ConfigFileInfo]
   implicit lazy val configFileRevisionCodec: Codec[ConfigFileRevision] = deriveCodec[ConfigFileRevision]
   implicit lazy val configMetadataCodec: Codec[ConfigMetadata]         = deriveCodec[ConfigMetadata]
-  implicit lazy val fileTypeCodec: Codec[FileType]                     = CodecHelpers.enumCodec[FileType]
-
 }

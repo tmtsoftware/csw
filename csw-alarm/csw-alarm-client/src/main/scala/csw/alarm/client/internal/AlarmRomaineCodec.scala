@@ -3,14 +3,14 @@ package csw.alarm.client.internal
 import csw.alarm.api.internal._
 import csw.alarm.models._
 import csw.time.core.models.UTCTime
-import play.api.libs.json.{Format, Json}
+import io.bullet.borer.{Codec, Json}
 import romaine.codec.RomaineCodec
 import romaine.codec.RomaineCodec.stringCodec
 
-private[client] object AlarmCodec extends AlarmJsonSupport {
-  def viaJsonCodec[A: Format]: RomaineCodec[A] = stringCodec.bimap[A](
-    x => Json.toJson(x).toString(),
-    x => Json.parse(x).as[A]
+private[client] object AlarmRomaineCodec extends AlarmCodecs {
+  def viaJsonCodec[A: Codec]: RomaineCodec[A] = stringCodec.bimap[A](
+    x => Json.encode(x).toUtf8String,
+    x => Json.decode(x.getBytes()).to[A].value
   )
 
   //Key Codecs

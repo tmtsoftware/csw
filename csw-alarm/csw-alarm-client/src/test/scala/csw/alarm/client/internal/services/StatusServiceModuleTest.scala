@@ -310,7 +310,7 @@ class StatusServiceModuleTest
    */
   private def startAlarmWatcher(): RedisSubscription = {
     //import codecs
-    import csw.alarm.client.internal.AlarmCodec._
+    import csw.alarm.client.internal.AlarmRomaineCodec._
 
     //import helpers
     import connsFactory._
