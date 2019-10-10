@@ -24,6 +24,16 @@ public class JComponentType {
     public static final ComponentType Assembly = ComponentType.Assembly$.MODULE$;
 
     /**
+     * A component that controls one or more sequencers or assemblies
+     */
+    public static final ComponentType Sequencer = ComponentType.Sequencer$.MODULE$;
+
+    /**
+     * A sequence component e.g ocs_1, iris_1
+     */
+    public static final ComponentType SequenceComponent = ComponentType.SequenceComponent$.MODULE$;
+
+    /**
      * A general purpose service component (actor and/or web service application)
      */
     public static final ComponentType Service = ComponentType.Service$.MODULE$;

@@ -1,7 +1,10 @@
 package csw.command.client.models.framework
+
+import csw.location.models.codecs.LocationCodecs
 import csw.location.models.{ComponentType, Connection}
 import csw.params.core.models.Prefix
-import play.api.libs.json._
+import io.bullet.borer.Codec
+import io.bullet.borer.derivation.MapBasedCodecs
 
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.jdk.CollectionConverters._
@@ -37,19 +40,14 @@ final case class ComponentInfo(
   def getConnections: java.util.List[Connection] = connections.toList.asJava
 }
 
-case object ComponentInfo {
-
-  // specifies how to serialize and de-serialize any FiniteDuration which is initializeTimeout in this case
-  private[csw] implicit val finiteDurationReads: Reads[FiniteDuration] = Reads[FiniteDuration](parseDuration)
-  private[csw] implicit val finiteDurationWrites: Writes[FiniteDuration] =
-    Writes[FiniteDuration](d => Json.toJson(d.toString))
-
-  private[csw] implicit val componentInfoFormat: OFormat[ComponentInfo] = Json.using[Json.WithDefaultValues].format[ComponentInfo]
-
-  private def parseDuration(json: JsValue): JsResult[FiniteDuration] = json.validate[String].flatMap { str =>
-    str.split(" ") match {
-      case Array(length: String, unit: String) => JsSuccess(FiniteDuration.apply(length.toLong, unit))
-      case _                                   => JsError("error.expected.duration.finite")
+case object ComponentInfo extends LocationCodecs {
+  implicit lazy val finiteDurationCodec: Codec[FiniteDuration] = Codec.bimap[String, FiniteDuration](
+    _.toString(),
+    _.split(" ") match {
+      case Array(length, unit) => FiniteDuration(length.toLong, unit)
+      case _                   => throw new RuntimeException("error.expected.duration.finite")
     }
-  }
+  )
+
+  implicit lazy val ComponentInfoCodec: Codec[ComponentInfo] = MapBasedCodecs.deriveCodec
 }

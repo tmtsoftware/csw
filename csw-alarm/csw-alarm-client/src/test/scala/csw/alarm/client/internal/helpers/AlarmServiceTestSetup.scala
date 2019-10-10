@@ -51,7 +51,7 @@ class AlarmServiceTestSetup
   val alarmService: AlarmAdminService = alarmServiceFactory.makeAdminApi(hostname, sentinelPort)
   val jAlarmService: IAlarmService    = alarmServiceFactory.jMakeClientApi(hostname, sentinelPort, actorSystem)
 
-  import csw.alarm.client.internal.AlarmCodec._
+  import csw.alarm.client.internal.AlarmRomaineCodec._
 
   val connsFactory: RedisConnectionsFactory                          = new RedisConnectionsFactory(resolver, alarmServer, new RomaineFactory(redisClient))
   val testMetadataApi: RedisAsyncApi[MetadataKey, AlarmMetadata]     = connsFactory.asyncApi[MetadataKey, AlarmMetadata]

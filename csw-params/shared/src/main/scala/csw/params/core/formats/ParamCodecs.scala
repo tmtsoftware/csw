@@ -19,8 +19,11 @@ import io.bullet.borer.derivation.MapBasedCodecs._
 import scala.collection.mutable.{ArraySeq => ArrayS}
 import scala.reflect.ClassTag
 
-object JParamCodecs extends ParamCodecs
-object ParamCodecs  extends ParamCodecs
+object JParamCodecs extends ParamCodecs {
+  //just needed for the Java test, which should not exist
+  val eqFrameCodec: Codec[EqFrame] = implicitly[Codec[EqFrame]]
+}
+object ParamCodecs extends ParamCodecs
 
 /**
  * Supports (de)serialization of csw models
@@ -30,18 +33,14 @@ trait ParamCodecs extends CommonCodecs {
   type ArrayEnc[T] = Encoder[Array[T]]
   type ArrayDec[T] = Decoder[Array[T]]
 
-  def singletonCodec[T <: Singleton](a: T): Codec[T] = Codec.bimap[String, T](_.toString, _ => a)
-
   // ************************ Base Type Codecs ********************
 
   implicit lazy val choiceCodec: Codec[Choice] = deriveUnaryCodec[Choice]
   implicit lazy val raDecCodec: Codec[RaDec]   = deriveCodec[RaDec]
 
-  implicit lazy val tagCodec: Codec[Coords.Tag]                      = deriveUnaryCodec[Coords.Tag]
-  implicit lazy val angleCodec: Codec[Angle]                         = deriveUnaryCodec[Angle]
-  implicit lazy val properMotionCodec: Codec[ProperMotion]           = deriveCodec[ProperMotion]
-  implicit lazy val eqFrameCodec: Codec[EqFrame]                     = CodecHelpers.enumCodec[EqFrame]
-  implicit lazy val solarSystemObjectCodec: Codec[SolarSystemObject] = CodecHelpers.enumCodec[SolarSystemObject]
+  implicit lazy val tagCodec: Codec[Coords.Tag]            = deriveUnaryCodec[Coords.Tag]
+  implicit lazy val angleCodec: Codec[Angle]               = deriveUnaryCodec[Angle]
+  implicit lazy val properMotionCodec: Codec[ProperMotion] = deriveCodec[ProperMotion]
 
   implicit lazy val eqCoordCodec: Codec[EqCoord]                   = deriveCodec[EqCoord]
   implicit lazy val solarSystemCoordCodec: Codec[SolarSystemCoord] = deriveCodec[SolarSystemCoord]
@@ -75,8 +74,7 @@ trait ParamCodecs extends CommonCodecs {
 
   // ************************ Enum Codecs ********************
 
-  implicit lazy val unitsCodec: Codec[Units]                   = CodecHelpers.enumCodec[Units]
-  implicit lazy val keyTypeCodecExistential: Codec[KeyType[_]] = CodecHelpers.enumCodec[KeyType[_]]
+  implicit lazy val keyTypeCodecExistential: Codec[KeyType[_]] = enumCodec[KeyType[_]]
 
   implicit def keyTypeCodec[T]: Codec[KeyType[T]] = keyTypeCodecExistential.asInstanceOf[Codec[KeyType[T]]]
 
@@ -199,13 +197,12 @@ trait ParamCodecs extends CommonCodecs {
 
   // ************************ StateVariable Codecs ********************
 
-  implicit lazy val stateNameCodec: Codec[StateName]         = deriveCodec[StateName]
+  implicit lazy val stateNameCodec: Codec[StateName]         = deriveUnaryCodec[StateName]
   implicit lazy val demandStateCodec: Codec[DemandState]     = deriveCodec[DemandState]
   implicit lazy val currentStateCodec: Codec[CurrentState]   = deriveCodec[CurrentState]
   implicit lazy val stateVariableCodec: Codec[StateVariable] = deriveCodec[StateVariable]
 
   // ************************ Subsystem Codecs ********************
-  implicit lazy val subSystemCodec: Codec[Subsystem] = CodecHelpers.enumCodec[Subsystem]
 }
 
 case class Timestamp(seconds: Long, nanos: Long) {
