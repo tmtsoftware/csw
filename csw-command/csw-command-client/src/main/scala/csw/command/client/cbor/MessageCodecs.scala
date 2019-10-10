@@ -92,10 +92,6 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
   implicit lazy val lifecycleStateChangedCodec: Codec[LifecycleStateChanged]           = deriveCodec[LifecycleStateChanged]
   implicit lazy val lifecycleStateSubscriptionCodec: Codec[LifecycleStateSubscription] = deriveCodec[LifecycleStateSubscription]
 
-  implicit lazy val containerLifecycleStateCodec: Codec[ContainerLifecycleState]          = enumCodec[ContainerLifecycleState]
-  implicit lazy val supervisorLifecycleStateCodec: Codec[SupervisorLifecycleState]        = enumCodec[SupervisorLifecycleState]
-  implicit lazy val toComponentLifecycleMessagesCodec: Codec[ToComponentLifecycleMessage] = enumCodec[ToComponentLifecycleMessage]
-
   implicit lazy val getContainerLifecycleStateCodec: Codec[GetContainerLifecycleState] = deriveCodec[GetContainerLifecycleState]
   implicit lazy val getSupervisorLifecycleStateCodec: Codec[GetSupervisorLifecycleState] =
     deriveCodec[GetSupervisorLifecycleState]

@@ -49,15 +49,13 @@ trait ParamCodecs extends CommonCodecs {
   implicit lazy val altAzCoordCodec: Codec[AltAzCoord]             = deriveCodec[AltAzCoord]
   implicit lazy val coordCodec: Codec[Coord]                       = deriveCodec[Coord]
 
-  implicit lazy val tsCodec: Codec[Timestamp] = deriveCodec[Timestamp]
-
   implicit lazy val instantEnc: Encoder[Instant] = Encoder.targetSpecific(
-    cbor = tsCodec.encoder.contramap(Timestamp.fromInstant),
+    cbor = deriveEncoder[Timestamp].contramap(instant => Timestamp(instant.getEpochSecond, instant.getNano)),
     json = Encoder.forString.contramap(_.toString)
   )
 
   implicit lazy val instantDec: Decoder[Instant] = Decoder.targetSpecific(
-    cbor = tsCodec.decoder.map(_.toInstant),
+    cbor = deriveDecoder[Timestamp].map(ts => Instant.ofEpochSecond(ts.seconds, ts.nanos)),
     json = Decoder.forString.map(Instant.parse)
   )
 
@@ -71,12 +69,6 @@ trait ParamCodecs extends CommonCodecs {
 
   implicit def matrixDataCodec[T: ClassTag: ArrayEnc: ArrayDec]: Codec[MatrixData[T]] =
     Codec.bimap[ArrayS[ArrayS[T]], MatrixData[T]](_.data, MatrixData(_))(Encoder.forIterable, Decoder.forIterable)
-
-  // ************************ Enum Codecs ********************
-
-  implicit lazy val keyTypeCodecExistential: Codec[KeyType[_]] = enumCodec[KeyType[_]]
-
-  implicit def keyTypeCodec[T]: Codec[KeyType[T]] = keyTypeCodecExistential.asInstanceOf[Codec[KeyType[T]]]
 
   // ************************ Parameter Codecs ********************
 
@@ -205,13 +197,7 @@ trait ParamCodecs extends CommonCodecs {
   // ************************ Subsystem Codecs ********************
 }
 
-case class Timestamp(seconds: Long, nanos: Long) {
-  def toInstant: Instant = Instant.ofEpochSecond(seconds, nanos)
-}
-
-object Timestamp {
-  def fromInstant(instant: Instant): Timestamp = Timestamp(instant.getEpochSecond, instant.getNano)
-}
+case class Timestamp(seconds: Long, nanos: Long)
 
 case class ParamCore[T](
     keyName: String,
