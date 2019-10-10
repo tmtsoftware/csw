@@ -1,7 +1,6 @@
 package csw.framework.models
 
 import csw.command.client.models.framework.ComponentInfo
-import play.api.libs.json._
 
 /**
  * Container information as represented in the configuration file
@@ -11,8 +10,4 @@ import play.api.libs.json._
  */
 private[framework] final case class ContainerInfo(name: String, components: Set[ComponentInfo]) {
   require(components.nonEmpty, "components can not be empty.")
-}
-
-case object ContainerInfo {
-  private[csw] implicit val format: OFormat[ContainerInfo] = Json.format[ContainerInfo]
 }

@@ -4,19 +4,20 @@ import csw.aas.core.TokenVerificationFailure.{InvalidToken, TokenExpired}
 import csw.aas.core.commons.AuthLogger
 import csw.aas.core.deployment.AuthConfig
 import csw.aas.core.token.AccessToken
+import io.bullet.borer.Json
 import org.keycloak.common.VerificationException
 import org.keycloak.exceptions.TokenNotActiveException
 import org.keycloak.representations.{AccessToken => KAccessToken}
-import pdi.jwt.{JwtJson, JwtOptions}
-import play.api.libs.json.JsString
+import pdi.jwt.{Jwt, JwtOptions}
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 import scala.util.control.NonFatal
 
 /**
  * Verifies & decodes the access token into [[csw.aas.core.token.AccessToken]]
  */
-class TokenVerifier private[aas] (keycloakTokenVerifier: KeycloakTokenVerifier, authConfig: AuthConfig) {
+class TokenVerifier private[aas] (keycloakTokenVerifier: KeycloakTokenVerifier, authConfig: AuthConfig) extends AuthCodecs {
 
   private val logger = AuthLogger.getLogger
   import logger._
@@ -37,17 +38,14 @@ class TokenVerifier private[aas] (keycloakTokenVerifier: KeycloakTokenVerifier, 
       }
 
   private def decode(token: String): Either[TokenVerificationFailure, AccessToken] =
-    JwtJson
-      .decodeJson(token, JwtOptions(signature = false, expiration = false, notBefore = false))
-      .map(_ + (("value", JsString(token))))
-      .map(_.as[AccessToken])
-      .toEither
-      .left
-      .map {
-        case NonFatal(e) =>
-          error("token verification failed", ex = e)
-          InvalidToken(e.getMessage)
-      }
+    Try {
+      val claim = Jwt.decodeRaw(token, JwtOptions(signature = false, expiration = false, notBefore = false)).get
+      Json.decode(claim.getBytes()).to[AccessToken].value.copy(value = token)
+    }.toEither.left.map {
+      case NonFatal(e) =>
+        error("token verification failed", ex = e)
+        InvalidToken(e.getMessage)
+    }
 
   /**
    * Verifies the access token string for signature and expiry date

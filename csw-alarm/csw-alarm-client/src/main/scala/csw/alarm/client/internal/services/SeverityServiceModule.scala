@@ -14,7 +14,7 @@ import csw.alarm.models.{AlarmSeverity, FullAlarmSeverity, Key}
 import csw.alarm.api.scaladsl.AlarmSubscription
 import csw.alarm.client.internal.commons.Settings
 import csw.alarm.client.internal.redis.RedisConnectionsFactory
-import csw.alarm.client.internal.{AlarmCodec, AlarmServiceLogger}
+import csw.alarm.client.internal.{AlarmRomaineCodec, AlarmServiceLogger}
 import reactor.core.publisher.FluxSink.OverflowStrategy
 import romaine.RedisResult
 import romaine.extensions.SourceExtensions.RichSource
@@ -89,7 +89,7 @@ private[client] trait SeverityServiceModule extends SeverityService {
   // channel: e.g. __keyspace@0__:status.nfiraos.trombone.tromboneAxisLowLimitAlarm,
   // message: event type as value: e.g. set, expire, expired
   private[alarm] def subscribeAggregatedSeverity(key: Key): Source[FullAlarmSeverity, AlarmSubscription] = {
-    import AlarmCodec._
+    import AlarmRomaineCodec._
 
     // create new connection for every client
     val keySpaceApi = redisKeySpaceApi(severityApi)

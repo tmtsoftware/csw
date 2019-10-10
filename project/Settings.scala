@@ -1,32 +1,8 @@
-import ParadoxSite.docsParentDir
 import com.typesafe.sbt.MultiJvmPlugin.MultiJvmKeys.MultiJvm
-import com.typesafe.sbt.site.SitePlugin.autoImport._
 import sbt.Keys._
 import sbt._
-import sbtunidoc.BaseUnidocPlugin.autoImport.{unidoc, unidocProjectFilter}
-import sbtunidoc.JavaUnidocPlugin.autoImport.JavaUnidoc
-import sbtunidoc.ScalaUnidocPlugin.autoImport.ScalaUnidoc
 
 object Settings {
-  def mergeSiteWith(p: Project): Setting[Task[Seq[(File, String)]]] =
-    (mappings in makeSite) := {
-      val cswVersion   = version.value
-      val siteMappings = (mappings in makeSite).value ++ (mappings in makeSite in p).value
-
-      val siteMappingsWithoutVersion = siteMappings.map { case (file, output) => (file, s"/$docsParentDir/" + output) }
-      val siteMappingsWithVersion    = siteMappings.map { case (file, output) => (file, s"/$docsParentDir/" + cswVersion + output) }
-
-      // keep documentation for SNAPSHOT versions in SNAPSHOT directory. (Don't copy SNAPSHOT docs to top level)
-      // If not SNAPSHOT version, then copy latest version of documentation to top level as well as inside corresponding version directory
-      if (cswVersion.endsWith("-SNAPSHOT")) siteMappingsWithVersion
-      else siteMappingsWithoutVersion ++ siteMappingsWithVersion
-    }
-
-  def docExclusions(projects: Seq[ProjectReference]): Seq[Setting[_]] =
-    projects.map(p => sources in (Compile, doc) in p := Seq.empty) ++ Seq(
-      unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(projects: _*),
-      unidocProjectFilter in (JavaUnidoc, unidoc) := inAnyProject -- inProjects(projects: _*)
-    )
 
   def addAliases: Seq[Setting[_]] = {
     addCommandAlias(
@@ -46,5 +22,12 @@ object Settings {
       MultiJvm / test / aggregate := false,
       MultiJvm / test := Def.sequential(tasks.init, tasks.last).value
     )
+  }
+
+  // export CSW_JS_VERSION env variable which is compatible with csw
+  // this represents version number of javascript docs maintained at https://github.com/tmtsoftware/csw-js
+  def cswJsVersion: String = (sys.env ++ sys.props).get("CSW_JS_VERSION") match {
+    case Some(v) => v
+    case None    => "0.1-SNAPSHOT"
   }
 }

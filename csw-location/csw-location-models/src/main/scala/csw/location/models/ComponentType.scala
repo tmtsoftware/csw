@@ -1,7 +1,7 @@
 package csw.location.models
 
 import enumeratum.EnumEntry.Lowercase
-import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
+import enumeratum.{Enum, EnumEntry}
 
 import scala.collection.immutable.IndexedSeq
 
@@ -19,7 +19,7 @@ sealed abstract class ComponentType(val messageManifest: String) extends EnumEnt
   def name: String = entryName
 }
 
-object ComponentType extends Enum[ComponentType] with PlayJsonEnum[ComponentType] {
+object ComponentType extends Enum[ComponentType] {
 
   /**
    * Returns a sequence of all component types

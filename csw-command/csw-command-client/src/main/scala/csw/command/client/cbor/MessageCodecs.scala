@@ -69,10 +69,9 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
 
   // ************************ Components Codecs ********************
 
-  implicit lazy val locationServiceUsageCodec: Codec[LocationServiceUsage] = enumCodec[LocationServiceUsage]
-  implicit lazy val componentInfoCodec: Codec[ComponentInfo]               = deriveCodec[ComponentInfo]
-  implicit lazy val componentCodec: Codec[Component]                       = deriveCodec[Component]
-  implicit lazy val componentsCodec: Codec[Components]                     = deriveCodec[Components]
+  implicit lazy val componentInfoCodec: Codec[ComponentInfo] = deriveCodec[ComponentInfo]
+  implicit lazy val componentCodec: Codec[Component]         = deriveCodec[Component]
+  implicit lazy val componentsCodec: Codec[Components]       = deriveCodec[Components]
 
   // ************************ RemoteMsg Codecs ********************
 
