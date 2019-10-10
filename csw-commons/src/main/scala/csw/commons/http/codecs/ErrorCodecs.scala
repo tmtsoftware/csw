@@ -6,6 +6,6 @@ import io.bullet.borer.derivation.MapBasedCodecs._
 
 object ErrorCodecs extends ErrorCodecs
 trait ErrorCodecs {
-  implicit lazy val errorMessageCodec: Codec[ErrorMessage]   = deriveCodec[ErrorMessage]
-  implicit lazy val errorResponseCodec: Codec[ErrorResponse] = deriveCodec[ErrorResponse]
+  implicit lazy val errorMessageCodec: Codec[ErrorMessage]   = deriveCodec
+  implicit lazy val errorResponseCodec: Codec[ErrorResponse] = deriveCodec
 }

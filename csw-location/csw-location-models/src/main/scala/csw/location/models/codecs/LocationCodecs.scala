@@ -9,25 +9,27 @@ import io.bullet.borer.derivation.MapBasedCodecs._
 
 object LocationCodecs extends LocationCodecs
 trait LocationCodecs extends CommonCodecs {
-  implicit lazy val componentIdCodec: Codec[ComponentId]       = deriveCodec[ComponentId]
-  implicit lazy val connectionInfoCodec: Codec[ConnectionInfo] = deriveCodec[ConnectionInfo]
+  implicit lazy val componentIdCodec: Codec[ComponentId]       = deriveCodec
+  implicit lazy val connectionInfoCodec: Codec[ConnectionInfo] = deriveCodec
 
-  implicit def connectionCodec[C <: Connection]: Codec[C] =
-    Codec.bimap[ConnectionInfo, C](_.connectionInfo, x => Connection.from(x).asInstanceOf[C])
+  implicit def connectionCodec[C <: Connection]: Codec[C] = Codec.bimap[ConnectionInfo, C](
+    _.connectionInfo,
+    x => Connection.from(x).asInstanceOf[C]
+  )
 
   implicit lazy val uriCodec: Codec[URI] = Codec.bimap[String, URI](_.toString, new URI(_))
 
-  implicit lazy val locationCodec: Codec[Location]         = deriveCodec[Location]
-  implicit lazy val akkaLocationCodec: Codec[AkkaLocation] = deriveCodec[AkkaLocation]
-  implicit lazy val httpLocationCodec: Codec[HttpLocation] = deriveCodec[HttpLocation]
-  implicit lazy val tcpLocationCodec: Codec[TcpLocation]   = deriveCodec[TcpLocation]
+  implicit lazy val locationCodec: Codec[Location]         = deriveCodec
+  implicit lazy val akkaLocationCodec: Codec[AkkaLocation] = deriveCodec
+  implicit lazy val httpLocationCodec: Codec[HttpLocation] = deriveCodec
+  implicit lazy val tcpLocationCodec: Codec[TcpLocation]   = deriveCodec
 
-  implicit lazy val registrationCodec: Codec[Registration]         = deriveCodec[Registration]
-  implicit lazy val akkaRegistrationCodec: Codec[AkkaRegistration] = deriveCodec[AkkaRegistration]
-  implicit lazy val tcpRegistrationCodec: Codec[TcpRegistration]   = deriveCodec[TcpRegistration]
-  implicit lazy val httpRegistrationCodec: Codec[HttpRegistration] = deriveCodec[HttpRegistration]
+  implicit lazy val registrationCodec: Codec[Registration]         = deriveCodec
+  implicit lazy val akkaRegistrationCodec: Codec[AkkaRegistration] = deriveCodec
+  implicit lazy val tcpRegistrationCodec: Codec[TcpRegistration]   = deriveCodec
+  implicit lazy val httpRegistrationCodec: Codec[HttpRegistration] = deriveCodec
 
-  implicit lazy val trackingEventCodec: Codec[TrackingEvent]     = deriveCodec[TrackingEvent]
-  implicit lazy val locationUpdatedCodec: Codec[LocationUpdated] = deriveCodec[LocationUpdated]
-  implicit lazy val locationRemovedCodec: Codec[LocationRemoved] = deriveCodec[LocationRemoved]
+  implicit lazy val trackingEventCodec: Codec[TrackingEvent]     = deriveCodec
+  implicit lazy val locationUpdatedCodec: Codec[LocationUpdated] = deriveCodec
+  implicit lazy val locationRemovedCodec: Codec[LocationRemoved] = deriveCodec
 }

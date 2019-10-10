@@ -6,10 +6,11 @@ import io.bullet.borer.Codec
 import io.bullet.borer.derivation.MapBasedCodecs.deriveCodec
 
 private[alarm] trait AlarmCodecs extends ParamCodecs {
-  implicit lazy val alarmMetadataFormat: Codec[AlarmMetadata] =
-    deriveCodec[AlarmMetadata]
-      .bimap[AlarmMetadata](identity, metadata => metadata.copy(supportedSeverities = metadata.allSupportedSeverities))
+  implicit lazy val alarmMetadataFormat: Codec[AlarmMetadata] = deriveCodec[AlarmMetadata].bimap[AlarmMetadata](
+    identity,
+    metadata => metadata.copy(supportedSeverities = metadata.allSupportedSeverities)
+  )
 
-  implicit val alarmMetadataSetFormat: Codec[AlarmMetadataSet] = deriveCodec[AlarmMetadataSet]
-  implicit lazy val alarmStatusFormat: Codec[AlarmStatus]      = deriveCodec[AlarmStatus]
+  implicit lazy val alarmMetadataSetFormat: Codec[AlarmMetadataSet] = deriveCodec
+  implicit lazy val alarmStatusFormat: Codec[AlarmStatus]           = deriveCodec
 }

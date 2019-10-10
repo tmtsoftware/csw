@@ -7,10 +7,10 @@ import io.bullet.borer.derivation.MapBasedCodecs.deriveCodec
 import io.bullet.borer.{Codec, Decoder, Dom, Encoder}
 
 trait AuthCodecs {
-  implicit lazy val accessCodec: Codec[Access]               = deriveCodec[Access]
-  implicit lazy val authorizationCodec: Codec[Authorization] = deriveCodec[Authorization]
-  implicit lazy val permissionCodec: Codec[Permission]       = deriveCodec[Permission]
-  implicit lazy val accessTokenCodec: Codec[AccessToken]     = deriveCodec[AccessToken]
+  implicit lazy val accessCodec: Codec[Access]               = deriveCodec
+  implicit lazy val authorizationCodec: Codec[Authorization] = deriveCodec
+  implicit lazy val permissionCodec: Codec[Permission]       = deriveCodec
+  implicit lazy val accessTokenCodec: Codec[AccessToken]     = deriveCodec
 
   implicit lazy val audienceEnc: Encoder[Audience] = implicitly[Encoder[Element]].contramap[Audience] { audience =>
     audience.value match {

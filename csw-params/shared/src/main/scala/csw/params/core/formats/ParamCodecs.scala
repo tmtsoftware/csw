@@ -3,6 +3,7 @@ package csw.params.core.formats
 import java.lang.{Byte => JByte}
 import java.time.Instant
 
+import com.github.ghik.silencer.silent
 import csw.params.commands.CommandIssue._
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
@@ -34,20 +35,19 @@ trait ParamCodecs extends CommonCodecs {
   type ArrayDec[T] = Decoder[Array[T]]
 
   // ************************ Base Type Codecs ********************
+  implicit lazy val choiceCodec: Codec[Choice] = deriveUnaryCodec
+  implicit lazy val raDecCodec: Codec[RaDec]   = deriveCodec
 
-  implicit lazy val choiceCodec: Codec[Choice] = deriveUnaryCodec[Choice]
-  implicit lazy val raDecCodec: Codec[RaDec]   = deriveCodec[RaDec]
+  implicit lazy val tagCodec: Codec[Coords.Tag]            = deriveUnaryCodec
+  implicit lazy val angleCodec: Codec[Angle]               = deriveUnaryCodec
+  implicit lazy val properMotionCodec: Codec[ProperMotion] = deriveCodec
 
-  implicit lazy val tagCodec: Codec[Coords.Tag]            = deriveUnaryCodec[Coords.Tag]
-  implicit lazy val angleCodec: Codec[Angle]               = deriveUnaryCodec[Angle]
-  implicit lazy val properMotionCodec: Codec[ProperMotion] = deriveCodec[ProperMotion]
-
-  implicit lazy val eqCoordCodec: Codec[EqCoord]                   = deriveCodec[EqCoord]
-  implicit lazy val solarSystemCoordCodec: Codec[SolarSystemCoord] = deriveCodec[SolarSystemCoord]
-  implicit lazy val minorPlanetCoordCodec: Codec[MinorPlanetCoord] = deriveCodec[MinorPlanetCoord]
-  implicit lazy val cometCoordCodec: Codec[CometCoord]             = deriveCodec[CometCoord]
-  implicit lazy val altAzCoordCodec: Codec[AltAzCoord]             = deriveCodec[AltAzCoord]
-  implicit lazy val coordCodec: Codec[Coord]                       = deriveCodec[Coord]
+  implicit lazy val eqCoordCodec: Codec[EqCoord]                   = deriveCodec
+  implicit lazy val solarSystemCoordCodec: Codec[SolarSystemCoord] = deriveCodec
+  implicit lazy val minorPlanetCoordCodec: Codec[MinorPlanetCoord] = deriveCodec
+  implicit lazy val cometCoordCodec: Codec[CometCoord]             = deriveCodec
+  implicit lazy val altAzCoordCodec: Codec[AltAzCoord]             = deriveCodec
+  implicit lazy val coordCodec: Codec[Coord]                       = deriveCodec
 
   implicit lazy val instantEnc: Encoder[Instant] = Encoder.targetSpecific(
     cbor = deriveEncoder[Timestamp].contramap(instant => Timestamp(instant.getEpochSecond, instant.getNano)),
@@ -59,11 +59,10 @@ trait ParamCodecs extends CommonCodecs {
     json = Decoder.forString.map(Instant.parse)
   )
 
-  implicit lazy val utcTimeCodec: Codec[UTCTime] = deriveUnaryCodec[UTCTime]
-  implicit lazy val taiTimeCodec: Codec[TAITime] = deriveUnaryCodec[TAITime]
+  implicit lazy val utcTimeCodec: Codec[UTCTime] = deriveUnaryCodec
+  implicit lazy val taiTimeCodec: Codec[TAITime] = deriveUnaryCodec
 
   // ************************ Composite Codecs ********************
-
   implicit def arrayDataCodec[T: ArrayEnc: ArrayDec]: Codec[ArrayData[T]] =
     Codec.bimap[ArrayS[T], ArrayData[T]](_.data, ArrayData(_))
 
@@ -71,7 +70,6 @@ trait ParamCodecs extends CommonCodecs {
     Codec.bimap[ArrayS[ArrayS[T]], MatrixData[T]](_.data, MatrixData(_))(Encoder.forIterable, Decoder.forIterable)
 
   // ************************ Parameter Codecs ********************
-
   //Do not replace these with bimap, due to an issue with borer https://github.com/sirthias/borer/issues/24
   implicit lazy val javaByteArrayEnc: Encoder[Array[JByte]] = bytesEnc.contramap(_.map(x => x: Byte))
   implicit lazy val javaByteArrayDec: Decoder[Array[JByte]] = bytesDec.map(_.map(x => x: JByte))
@@ -90,7 +88,7 @@ trait ParamCodecs extends CommonCodecs {
     json = Decoder.forArray[Byte]
   )
 
-  implicit def paramCoreCodec[T: ArrayEnc: ArrayDec]: Codec[ParamCore[T]] = deriveCodec[ParamCore[T]]
+  implicit def paramCoreCodec[T: ArrayEnc: ArrayDec]: Codec[ParamCore[T]] = deriveCodec
 
   implicit def paramCodec[T: ArrayEnc: ArrayDec]: Codec[Parameter[T]] =
     Codec.bimap[Map[String, ParamCore[T]], Parameter[T]](ParamCore.fromParam, ParamCore.toParam)
@@ -112,89 +110,71 @@ trait ParamCodecs extends CommonCodecs {
   }
 
   // ************************ Struct Codecs ********************
-
-  implicit lazy val structCodec: Codec[Struct] = deriveCodec[Struct]
+  implicit lazy val structCodec: Codec[Struct] = deriveCodec
 
   // ************************ Event Codecs ********************
-
-  implicit lazy val idCodec: Codec[Id]                            = deriveUnaryCodec[Id]
-  implicit lazy val eventNameCodec: Codec[EventName]              = deriveUnaryCodec[EventName]
-  private[formats] implicit lazy val seCodec: Codec[SystemEvent]  = deriveCodec[SystemEvent]
-  private[formats] implicit lazy val oeCodec: Codec[ObserveEvent] = deriveCodec[ObserveEvent]
-  implicit lazy val eventCodec: Codec[Event]                      = deriveCodec[Event]
+  implicit lazy val idCodec: Codec[Id]                            = deriveUnaryCodec
+  implicit lazy val eventNameCodec: Codec[EventName]              = deriveUnaryCodec
+  private[formats] implicit lazy val seCodec: Codec[SystemEvent]  = deriveCodec
+  private[formats] implicit lazy val oeCodec: Codec[ObserveEvent] = deriveCodec
+  implicit lazy val eventCodec: Codec[Event]                      = deriveCodec
 
   // ************************ Command Codecs ********************
+  implicit lazy val commandNameCodec: Codec[CommandName] = deriveUnaryCodec
+  implicit lazy val obsIdCodec: Codec[ObsId]             = deriveUnaryCodec
 
-  implicit lazy val commandNameCodec: Codec[CommandName] = deriveUnaryCodec[CommandName]
-  implicit lazy val obsIdCodec: Codec[ObsId]             = deriveUnaryCodec[ObsId]
-
-  private[formats] implicit lazy val observeCommandCodec: Codec[Observe] = deriveCodec[Observe]
-  private[formats] implicit lazy val setupCommandCodec: Codec[Setup]     = deriveCodec[Setup]
-  private[formats] implicit lazy val waitCommandCodec: Codec[Wait]       = deriveCodec[Wait]
-  implicit lazy val sequenceCommandCodec: Codec[SequenceCommand]         = deriveCodec[SequenceCommand]
-  implicit lazy val controlCommandCodec: Codec[ControlCommand]           = deriveCodec[ControlCommand]
-  implicit lazy val commandCodec: Codec[Command]                         = deriveCodec[Command]
-  implicit lazy val sequenceCodec: Codec[Sequence]                       = deriveCodec[Sequence]
+  private[formats] implicit lazy val observeCommandCodec: Codec[Observe] = deriveCodec
+  private[formats] implicit lazy val setupCommandCodec: Codec[Setup]     = deriveCodec
+  private[formats] implicit lazy val waitCommandCodec: Codec[Wait]       = deriveCodec
+  implicit lazy val sequenceCommandCodec: Codec[SequenceCommand]         = deriveCodec
+  implicit lazy val controlCommandCodec: Codec[ControlCommand]           = deriveCodec
+  implicit lazy val commandCodec: Codec[Command]                         = deriveCodec
+  implicit lazy val sequenceCodec: Codec[Sequence]                       = deriveCodec
 
   // ************************ CommandResponse Codecs ********************
+  implicit lazy val resultCodec: Codec[Result] = deriveCodec
 
-  implicit lazy val resultCodec: Codec[Result]                                            = deriveCodec[Result]
-  implicit lazy val validateCommandResponseCodec: Codec[ValidateCommandResponse]          = deriveCodec[ValidateCommandResponse]
-  implicit lazy val validateResponseCodec: Codec[ValidateResponse]                        = deriveCodec[ValidateResponse]
-  implicit lazy val oneWayCommandResponseCodec: Codec[OnewayResponse]                     = deriveCodec[OnewayResponse]
-  implicit lazy val submitCommandResponseCodec: Codec[SubmitResponse]                     = deriveCodec[SubmitResponse]
-  implicit lazy val queryCommandResponseCodec: Codec[QueryResponse]                       = deriveCodec[QueryResponse]
-  implicit lazy val matchingCommandResponseCodec: Codec[MatchingResponse]                 = deriveCodec[MatchingResponse]
-  private[formats] implicit lazy val acceptedCodec: Codec[Accepted]                       = deriveCodec[Accepted]
-  private[formats] implicit lazy val startedCodec: Codec[Started]                         = deriveCodec[Started]
-  private[formats] implicit lazy val completedWithResultCodec: Codec[CompletedWithResult] = deriveCodec[CompletedWithResult]
-  private[formats] implicit lazy val completedCodec: Codec[Completed]                     = deriveCodec[Completed]
-  private[formats] implicit lazy val invalidCodec: Codec[Invalid]                         = deriveCodec[Invalid]
-  private[formats] implicit lazy val errorCodec: Codec[Error]                             = deriveCodec[Error]
-  private[formats] implicit lazy val cancelledCodec: Codec[Cancelled]                     = deriveCodec[Cancelled]
-  private[formats] implicit lazy val lockedCodec: Codec[Locked]                           = deriveCodec[Locked]
-  private[formats] implicit lazy val commandNotAvailableCodec: Codec[CommandNotAvailable] = deriveCodec[CommandNotAvailable]
-  implicit lazy val commandResponseCodec: Codec[CommandResponse]                          = deriveCodec[CommandResponse]
+  implicit def commandResponseCodec[T <: CommandResponse]: Codec[T] = commandResponseCodecValue.asInstanceOf[Codec[T]]
+  lazy val commandResponseCodecValue: Codec[CommandResponse] = {
+    @silent implicit lazy val acceptedCodec: Codec[Accepted]                       = deriveCodec
+    @silent implicit lazy val startedCodec: Codec[Started]                         = deriveCodec
+    @silent implicit lazy val completedWithResultCodec: Codec[CompletedWithResult] = deriveCodec
+    @silent implicit lazy val completedCodec: Codec[Completed]                     = deriveCodec
+    @silent implicit lazy val invalidCodec: Codec[Invalid]                         = deriveCodec
+    @silent implicit lazy val errorCodec: Codec[Error]                             = deriveCodec
+    @silent implicit lazy val cancelledCodec: Codec[Cancelled]                     = deriveCodec
+    @silent implicit lazy val lockedCodec: Codec[Locked]                           = deriveCodec
+    @silent implicit lazy val commandNotAvailableCodec: Codec[CommandNotAvailable] = deriveCodec
+    deriveCodec
+  }
 
   // ************************ CommandIssue Codecs ********************
-
-  private[formats] implicit lazy val missingKeyIssueCodec: Codec[MissingKeyIssue]   = deriveCodec[MissingKeyIssue]
-  private[formats] implicit lazy val wrongPrefixIssueCodec: Codec[WrongPrefixIssue] = deriveCodec[WrongPrefixIssue]
-  private[formats] implicit lazy val wrongParameterTypeIssueCodec: Codec[WrongParameterTypeIssue] =
-    deriveCodec[WrongParameterTypeIssue]
-  private[formats] implicit lazy val wrongUnitsIssueCodec: Codec[WrongUnitsIssue] = deriveCodec[WrongUnitsIssue]
-  private[formats] implicit lazy val wrongNumberOfParametersIssueCodec: Codec[WrongNumberOfParametersIssue] =
-    deriveCodec[WrongNumberOfParametersIssue]
-  private[formats] implicit lazy val assemblyBusyIssueCodec: Codec[AssemblyBusyIssue] = deriveCodec[AssemblyBusyIssue]
-  private[formats] implicit lazy val unresolvedLocationsIssueCodec: Codec[UnresolvedLocationsIssue] =
-    deriveCodec[UnresolvedLocationsIssue]
-  private[formats] implicit lazy val parameterValueOutOfRangeIssueCodec: Codec[ParameterValueOutOfRangeIssue] =
-    deriveCodec[ParameterValueOutOfRangeIssue]
-  private[formats] implicit lazy val wrongInternalStateIssueCodec: Codec[WrongInternalStateIssue] =
-    deriveCodec[WrongInternalStateIssue]
-  private[formats] implicit lazy val unsupportedCommandInStateIssueCodec: Codec[UnsupportedCommandInStateIssue] =
-    deriveCodec[UnsupportedCommandInStateIssue]
-  private[formats] implicit lazy val unsupportedCommandIssueCodec: Codec[UnsupportedCommandIssue] =
-    deriveCodec[UnsupportedCommandIssue]
-  private[formats] implicit lazy val requiredServiceUnavailableIssueCodec: Codec[RequiredServiceUnavailableIssue] =
-    deriveCodec[RequiredServiceUnavailableIssue]
-  private[formats] implicit lazy val requiredHCDUnavailableIssueCodec: Codec[RequiredHCDUnavailableIssue] =
-    deriveCodec[RequiredHCDUnavailableIssue]
-  private[formats] implicit lazy val requiredAssemblyUnavailableIssueCodec: Codec[RequiredAssemblyUnavailableIssue] =
-    deriveCodec[RequiredAssemblyUnavailableIssue]
-  private[formats] implicit lazy val requiredSequencerUnavailableIssueCodec: Codec[RequiredSequencerUnavailableIssue] =
-    deriveCodec[RequiredSequencerUnavailableIssue]
-  private[formats] implicit lazy val otherIssueCodec: Codec[OtherIssue] = deriveCodec[OtherIssue]
-  implicit lazy val commandIssueCodec: Codec[CommandIssue]              = deriveCodec[CommandIssue]
+  implicit def commandIssueCodec[T <: CommandIssue]: Codec[T] = commandIssueCodecValue.asInstanceOf[Codec[T]]
+  lazy val commandIssueCodecValue: Codec[CommandIssue] = {
+    @silent implicit lazy val missingKeyIssueCodec: Codec[MissingKeyIssue]                                     = deriveCodec
+    @silent implicit lazy val wrongPrefixIssueCodec: Codec[WrongPrefixIssue]                                   = deriveCodec
+    @silent implicit lazy val wrongParameterTypeIssueCodec: Codec[WrongParameterTypeIssue]                     = deriveCodec
+    @silent implicit lazy val wrongUnitsIssueCodec: Codec[WrongUnitsIssue]                                     = deriveCodec
+    @silent implicit lazy val wrongNumberOfParametersIssueCodec: Codec[WrongNumberOfParametersIssue]           = deriveCodec
+    @silent implicit lazy val assemblyBusyIssueCodec: Codec[AssemblyBusyIssue]                                 = deriveCodec
+    @silent implicit lazy val unresolvedLocationsIssueCodec: Codec[UnresolvedLocationsIssue]                   = deriveCodec
+    @silent implicit lazy val parameterValueOutOfRangeIssueCodec: Codec[ParameterValueOutOfRangeIssue]         = deriveCodec
+    @silent implicit lazy val wrongInternalStateIssueCodec: Codec[WrongInternalStateIssue]                     = deriveCodec
+    @silent implicit lazy val unsupportedCommandInStateIssueCodec: Codec[UnsupportedCommandInStateIssue]       = deriveCodec
+    @silent implicit lazy val unsupportedCommandIssueCodec: Codec[UnsupportedCommandIssue]                     = deriveCodec
+    @silent implicit lazy val requiredServiceUnavailableIssueCodec: Codec[RequiredServiceUnavailableIssue]     = deriveCodec
+    @silent implicit lazy val requiredHCDUnavailableIssueCodec: Codec[RequiredHCDUnavailableIssue]             = deriveCodec
+    @silent implicit lazy val requiredAssemblyUnavailableIssueCodec: Codec[RequiredAssemblyUnavailableIssue]   = deriveCodec
+    @silent implicit lazy val requiredSequencerUnavailableIssueCodec: Codec[RequiredSequencerUnavailableIssue] = deriveCodec
+    @silent implicit lazy val otherIssueCodec: Codec[OtherIssue]                                               = deriveCodec
+    deriveCodec
+  }
 
   // ************************ StateVariable Codecs ********************
-
-  implicit lazy val stateNameCodec: Codec[StateName]         = deriveUnaryCodec[StateName]
-  implicit lazy val demandStateCodec: Codec[DemandState]     = deriveCodec[DemandState]
-  implicit lazy val currentStateCodec: Codec[CurrentState]   = deriveCodec[CurrentState]
-  implicit lazy val stateVariableCodec: Codec[StateVariable] = deriveCodec[StateVariable]
-
-  // ************************ Subsystem Codecs ********************
+  implicit lazy val stateNameCodec: Codec[StateName]         = deriveUnaryCodec
+  implicit lazy val demandStateCodec: Codec[DemandState]     = deriveCodec
+  implicit lazy val currentStateCodec: Codec[CurrentState]   = deriveCodec
+  implicit lazy val stateVariableCodec: Codec[StateVariable] = deriveCodec
 }
 
 case class Timestamp(seconds: Long, nanos: Long)

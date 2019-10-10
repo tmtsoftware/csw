@@ -6,7 +6,10 @@ import io.bullet.borer.Codec
 import io.bullet.borer.derivation.ArrayBasedCodecs.deriveUnaryCodec
 
 trait CommonCodecs {
-  implicit lazy val prefixCodec: Codec[Prefix] = deriveUnaryCodec[Prefix]
-  implicit def enumCodec[T <: EnumEntry: Enum]: Codec[T] =
-    Codec.bimap[String, T](_.entryName, implicitly[Enum[T]].withNameInsensitive)
+  implicit lazy val prefixCodec: Codec[Prefix] = deriveUnaryCodec
+
+  implicit def enumCodec[T <: EnumEntry: Enum]: Codec[T] = Codec.bimap[String, T](
+    _.entryName,
+    implicitly[Enum[T]].withNameInsensitive
+  )
 }
