@@ -63,7 +63,7 @@ abstract class ComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx
 
   /**
    * On receiving a command as Oneway, the onOneway handler is invoked for a component only if the validateCommand handler
-   * returns Accepted.In case a command is received as a oneway, command response should not be provided to the sender.
+   * returns Accepted. In case a command is received as a oneway, command response should not be provided to the sender.
    *
    * @param controlCommand represents a command received e.g. Setup, Observe or wait
    */

@@ -5,7 +5,7 @@ import akka.http.scaladsl.model.HttpMethods._
 import akka.http.scaladsl.server.Directives.{authorize => keycloakAuthorize, authorizeAsync => keycloakAuthorizeAsync, _}
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.directives.AuthenticationDirective
-import com.typesafe.config.Config
+import com.typesafe.config.{Config, ConfigFactory}
 import csw.aas.core.TokenVerifier
 import csw.aas.core.commons.AuthLogger
 import csw.aas.core.deployment.{AuthConfig, AuthServiceLocation}
@@ -13,11 +13,12 @@ import csw.aas.core.token.{AccessToken, TokenFactory}
 import csw.aas.http.AuthorizationPolicy.PolicyExpression.{And, Or}
 import csw.aas.http.AuthorizationPolicy.{EmptyPolicy, _}
 import csw.location.api.scaladsl.LocationService
+import csw.location.models.HttpLocation
 
 import scala.concurrent.duration.DurationDouble
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.implicitConversions
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 class SecurityDirectives private[csw] (
     authentication: Authentication,
@@ -162,24 +163,7 @@ object SecurityDirectives {
    *
    * Expects auth-server-url to be present in config.
    */
-  def apply()(implicit ec: ExecutionContext): SecurityDirectives = from(AuthConfig.create())
-
-  private def from(authConfig: AuthConfig)(implicit ec: ExecutionContext): SecurityDirectives = {
-    val keycloakDeployment = authConfig.getDeployment
-    val tokenVerifier      = TokenVerifier(authConfig)
-    val authentication     = new Authentication(new TokenFactory(keycloakDeployment, tokenVerifier, authConfig.permissionsEnabled))
-    new SecurityDirectives(authentication, keycloakDeployment.getRealm, keycloakDeployment.getResourceName, authConfig.disabled)
-  }
-
-  /**
-   * Creates instance of [[csw.aas.http.SecurityDirectives]] using configurations
-   * from application and reference.conf.
-   *
-   * @param locationService LocationService instance used to resolve auth server url (blocking call)
-   * Resolves auth server url using location service (blocking call)
-   */
-  def apply(locationService: LocationService)(implicit ec: ExecutionContext): SecurityDirectives =
-    from(AuthConfig.create(authServerLocation = Some(authLocation(locationService))))
+  def apply()(implicit ec: ExecutionContext): SecurityDirectives = apply(ConfigFactory.load)
 
   /**
    * Creates instance of [[csw.aas.http.SecurityDirectives]] using provided configurations
@@ -192,15 +176,42 @@ object SecurityDirectives {
     from(AuthConfig.create(config, None))
 
   /**
+   * Creates instance of [[csw.aas.http.SecurityDirectives]] using configurations
+   * from application and reference.conf.
+   *
+   * @param locationService LocationService instance used to resolve auth server url (blocking call)
+   * Resolves auth server url using location service (blocking call)
+   */
+  def apply(locationService: LocationService)(implicit ec: ExecutionContext): SecurityDirectives = {
+    val config        = ConfigFactory.load()
+    val maybeLocation = if (disabled(config)) None else Some(authLocation(locationService))
+    from(AuthConfig.create(config, maybeLocation))
+  }
+
+  /**
    * Creates instance of [[csw.aas.http.SecurityDirectives]] using provided configurations
    * and auth server url using location service
    *
    * @param config Config object provided
    * @param locationService LocationService instance used to resolve auth server url (blocking call)
    */
-  def apply(config: Config, locationService: LocationService)(implicit ec: ExecutionContext): SecurityDirectives =
-    from(AuthConfig.create(config, Some(authLocation(locationService))))
+  def apply(config: Config, locationService: LocationService)(implicit ec: ExecutionContext): SecurityDirectives = {
+    val maybeLocation = if (disabled(config)) None else Some(authLocation(locationService))
+    from(AuthConfig.create(config, maybeLocation))
+  }
 
-  private def authLocation(locationService: LocationService)(implicit ec: ExecutionContext) =
-    AuthServiceLocation(locationService).resolve(5.seconds)
+  private def from(authConfig: AuthConfig)(implicit ec: ExecutionContext): SecurityDirectives = {
+    val keycloakDeployment = authConfig.getDeployment
+    val tokenVerifier      = TokenVerifier(authConfig)
+    val authentication     = new Authentication(new TokenFactory(keycloakDeployment, tokenVerifier, authConfig.permissionsEnabled))
+    new SecurityDirectives(authentication, keycloakDeployment.getRealm, keycloakDeployment.getResourceName, authConfig.disabled)
+  }
+
+  private def disabled(config: Config): Boolean = {
+    val mayBeValue = Try { config.getConfig(AuthConfig.authConfigKey).getBoolean(AuthConfig.disabledKey) }.toOption
+    mayBeValue.nonEmpty && mayBeValue.get
+  }
+
+  private def authLocation(locationService: LocationService)(implicit ec: ExecutionContext): HttpLocation =
+    Await.result(AuthServiceLocation(locationService).resolve(5.seconds), 6.seconds)
 }

@@ -1,6 +1,5 @@
 import java.io.File
 
-import ParadoxSite.docsParentDir
 import sbt.Keys._
 import sbt.io.Path
 import sbt.{Def, _}
@@ -24,22 +23,6 @@ object PublishBintray extends AutoPlugin {
   override def projectSettings: Seq[Setting[_]] = Seq(
     bintrayOrganization := Some("twtmt"),
     bintrayPackage := "csw"
-  )
-}
-
-object GithubPublishDocs extends AutoPlugin {
-  import com.typesafe.sbt.SbtGit.GitKeys
-  import com.typesafe.sbt.sbtghpages.GhpagesPlugin
-  import GhpagesPlugin.autoImport._
-
-  override def requires: Plugins = GhpagesPlugin
-
-  override def projectSettings: Seq[Setting[_]] = Seq(
-    ghpagesBranch := "master",
-    includeFilter in ghpagesCleanSite := new FileFilter {
-      override def accept(pathname: File): Boolean = pathname.getAbsolutePath.contains(s"$docsParentDir/${version.value}")
-    },
-    GitKeys.gitRemoteRepo := "git@github.com:tmtsoftware/tmtsoftware.github.io.git"
   )
 }
 

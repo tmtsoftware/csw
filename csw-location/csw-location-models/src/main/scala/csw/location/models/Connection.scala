@@ -2,7 +2,6 @@ package csw.location.models
 
 import csw.location.models.ConnectionType.{AkkaType, HttpType, TcpType}
 import csw.location.models.codecs.LocationSerializable
-import play.api.libs.json._
 
 /**
  * Represents a connection based on a componentId and the type of connection offered by the component
@@ -81,9 +80,6 @@ object Connection {
     case TcpType  => TcpConnection(componentId)
     case HttpType => HttpConnection(componentId)
   }
-
-  implicit val connectionReads: Reads[Connection]   = ConnectionInfo.connectionInfoFormat.map(Connection.from)
-  implicit val connectionWrites: Writes[Connection] = Writes[Connection](c => Json.toJson(c.connectionInfo))
 
   /**
    * Represents a connection offered by remote Actors e.g. TromboneAssembly-assembly-akka or TromboneHcd-hcd-akka

@@ -8,7 +8,7 @@ import csw.aas.installed.internal.InstalledAppAuthAdapterImpl
 import csw.location.api.scaladsl.LocationService
 import org.keycloak.adapters.installed.KeycloakInstalled
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration.DurationInt
 
 object InstalledAppAuthAdapterFactory {
@@ -76,7 +76,7 @@ object InstalledAppAuthAdapterFactory {
   private def make(locationService: LocationService, secretStore: Option[AuthStore], config: Config = ConfigFactory.load())(
       implicit executionContext: ExecutionContext
   ): InstalledAppAuthAdapter = {
-    val authServiceLocationF = AuthServiceLocation(locationService).resolve(5.seconds)
+    val authServiceLocationF = Await.result(AuthServiceLocation(locationService).resolve(5.seconds), 6.seconds)
     val authConfig           = AuthConfig.create(config = config, authServerLocation = Some(authServiceLocationF))
     val tokenVerifier        = TokenVerifier(authConfig)
     new InstalledAppAuthAdapterImpl(authConfig, new KeycloakInstalled(authConfig.getDeployment), tokenVerifier, secretStore)

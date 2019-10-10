@@ -3,14 +3,12 @@ package csw.location.models.codecs
 import java.net.URI
 
 import csw.location.models._
-import csw.params.core.formats.{CodecHelpers, CommonCodecs}
+import csw.params.core.formats.CommonCodecs
 import io.bullet.borer.Codec
 import io.bullet.borer.derivation.MapBasedCodecs._
 
 object LocationCodecs extends LocationCodecs
 trait LocationCodecs extends CommonCodecs {
-  implicit lazy val connectionTypeCodec: Codec[ConnectionType] = CodecHelpers.enumCodec[ConnectionType]
-  implicit lazy val componentTypeCodec: Codec[ComponentType]   = CodecHelpers.enumCodec[ComponentType]
   implicit lazy val componentIdCodec: Codec[ComponentId]       = deriveCodec[ComponentId]
   implicit lazy val connectionInfoCodec: Codec[ConnectionInfo] = deriveCodec[ConnectionInfo]
 
