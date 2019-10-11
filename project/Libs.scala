@@ -20,7 +20,7 @@ object Libs {
   val `svnkit`                       = "org.tmatesoft.svnkit"                     % "svnkit"                        % "1.10.1" //TMate Open Source License
   val `commons-codec`                = "commons-codec"                            % "commons-codec"                 % "1.10" //Apache 2.0
   val `scala-reflect`                = "org.scala-lang"                           % "scala-reflect"                 % ScalaVersion //BSD-3
-  val `gson`                         = "com.google.code.gson"                     % "gson"                          % "2.8.5" //Apache 2.0
+  val `gson`                         = "com.google.code.gson"                     % "gson"                          % "2.8.6" //Apache 2.0
 
   val `play-json`         = dep("com.typesafe.play" %%% "play-json"         % "2.7.4") //Apache 2.0
   val `enumeratum`        = dep("com.beachape"      %%% "enumeratum"        % "1.5.13") //MIT License
@@ -28,8 +28,8 @@ object Libs {
   val `scalatest`         = dep("org.scalatest"     %%% "scalatest"         % "3.0.8") //Apache License 2.0
 
   val `jwt-core`          = "com.pauldijou"       %% "jwt-core"          % "4.1.0"
-  val `lettuce`           = "io.lettuce"          % "lettuce-core"       % "5.1.8.RELEASE"
-  val `reactor-core`      = "io.projectreactor"   % "reactor-core"       % "3.2.12.RELEASE"
+  val `lettuce`           = "io.lettuce"          % "lettuce-core"       % "5.2.0.RELEASE"
+  val `reactor-core`      = "io.projectreactor"   % "reactor-core"       % "3.3.0.RELEASE"
   val `reactive-streams`  = "org.reactivestreams" % "reactive-streams"   % "1.0.3"
   val `akka-stream-kafka` = "com.typesafe.akka"   %% "akka-stream-kafka" % "1.0.5"
 //  val `embedded-kafka`      = "io.github.embeddedkafka" %% "embedded-kafka"      % "2.3.0"
@@ -44,7 +44,7 @@ object Libs {
   val `jna`             = "net.java.dev.jna"              % "jna"             % "5.4.0"
   val `postgresql`      = "org.postgresql"                % "postgresql"      % "42.2.8"
   val `hikaricp`        = "com.zaxxer"                    % "HikariCP"        % "3.4.1" //Apache License 2.0
-  val `otj-pg-embedded` = "com.opentable.components"      % "otj-pg-embedded" % "0.13.1"
+  val `otj-pg-embedded` = "com.opentable.components"      % "otj-pg-embedded" % "0.13.2"
   val httpclient        = "org.apache.httpcomponents"     % "httpclient"      % "4.5.10"
   val `jboss-logging`   = "org.jboss.logging"             % "jboss-logging"   % "3.4.1.Final"
   val `config`          = "com.typesafe"                  % "config"          % "1.3.4"
@@ -63,7 +63,7 @@ object Borer {
 }
 
 object Jackson {
-  val Version                = "2.9.10"
+  val Version                = "2.10.0"
   val `jackson-core`         = "com.fasterxml.jackson.core" % "jackson-core" % Version
   val `jackson-databind`     = "com.fasterxml.jackson.core" % "jackson-databind" % Version
   val `jackson-module-scala` = "com.fasterxml.jackson.module" %% "jackson-module-scala" % Version

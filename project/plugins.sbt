@@ -3,7 +3,7 @@ addSbtPlugin("org.scalameta"                     % "sbt-scalafmt"               
 addSbtPlugin("com.dwijnand"                      % "sbt-dynver"                 % "4.0.0")
 addSbtPlugin("com.thoughtworks.sbt-api-mappings" % "sbt-api-mappings"           % "3.0.0")
 addSbtPlugin("org.foundweekends"                 % "sbt-bintray"                % "0.5.5")
-addSbtPlugin("com.timushev.sbt"                  % "sbt-updates"                % "0.4.2")
+addSbtPlugin("com.timushev.sbt"                  % "sbt-updates"                % "0.4.3")
 addSbtPlugin("org.scoverage"                     % "sbt-scoverage"              % "1.6.0")
 addSbtPlugin("com.typesafe.sbt"                  % "sbt-native-packager"        % "1.4.1")
 addSbtPlugin("com.typesafe.sbt"                  % "sbt-multi-jvm"              % "0.4.0")
@@ -15,7 +15,7 @@ addSbtPlugin("io.spray"                          % "sbt-revolver"               
 addSbtPlugin("com.typesafe.sbt"                  % "sbt-git"                    % "1.0.0")
 addSbtPlugin("org.portable-scala"                % "sbt-scalajs-crossproject"   % "0.6.1")
 addSbtPlugin("org.scala-js"                      % "sbt-scalajs"                % "0.6.29")
-addSbtPlugin("com.github.cb372"                  % "sbt-explicit-dependencies"  % "0.2.10")
+addSbtPlugin("com.github.cb372"                  % "sbt-explicit-dependencies"  % "0.2.11")
 
 resolvers += "Jenkins repo" at "https://repo.jenkins-ci.org/public/"
 addSbtPlugin("ohnosequences" % "sbt-github-release" % "0.7.0")
