@@ -47,7 +47,7 @@ object Libs {
   val `otj-pg-embedded` = "com.opentable.components"      % "otj-pg-embedded" % "0.13.2"
   val httpclient        = "org.apache.httpcomponents"     % "httpclient"      % "4.5.10"
   val `jboss-logging`   = "org.jboss.logging"             % "jboss-logging"   % "3.4.1.Final"
-  val `config`          = "com.typesafe"                  % "config"          % "1.3.4"
+  val `config`          = "com.typesafe"                  % "config"          % "1.4.0"
   val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.3.0"
   val `caffeine`        = "com.github.ben-manes.caffeine" % "caffeine"        % "2.8.0"
 
