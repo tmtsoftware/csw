@@ -1,7 +1,7 @@
 package csw.command.client
 
 import akka.actor.typed.{ActorRef, ActorSystem}
-import csw.command.client.MiniCRM.MiniCRMMessage.AddResponse
+import csw.command.client.MiniCRM.CRMMessage.AddResponse
 import csw.params.commands.CommandResponse.SubmitResponse
 
 /**

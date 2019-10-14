@@ -1,29 +1,22 @@
 package csw.framework.internal.supervisor
 
 import akka.Done
-import akka.actor.{CoordinatedShutdown, Scheduler}
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed._
+import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.typed.scaladsl._
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.typed.scaladsl.AskPattern._
+import akka.actor.{CoordinatedShutdown, Scheduler}
 import akka.util.Timeout
-import csw.command.client.MiniCRM.MiniCRMMessage
-import csw.command.client.messages.ComponentCommonMessage.{
-  ComponentStateSubscription,
-  GetSupervisorLifecycleState,
-  LifecycleStateSubscription
-}
+import csw.command.client.MiniCRM
+import csw.command.client.MiniCRM.CRMMessage
+import csw.command.client.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.command.client.messages.FromComponentLifecycleMessage.Running
 import csw.command.client.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorIdleMessage.InitializeTimeout
-import csw.command.client.messages.SupervisorInternalRunningMessage.{
-  RegistrationFailed,
-  RegistrationNotRequired,
-  RegistrationSuccess
-}
+import csw.command.client.messages.SupervisorInternalRunningMessage.{RegistrationFailed, RegistrationNotRequired, RegistrationSuccess}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
 import csw.command.client.messages._
@@ -207,9 +200,9 @@ private[framework] final class SupervisorBehavior(
    * @param runningMessage message representing a message received in [[SupervisorLifecycleState.Running]] state
    */
   private def onRunning(runningMessage: SupervisorRunningMessage): Unit = runningMessage match {
-    case Query(runId, replyTo) => commandResponseManager.commandResponseManagerActor ! MiniCRMMessage.Query(runId, replyTo)
+    case Query(runId, replyTo) => commandResponseManager.commandResponseManagerActor ! CRMMessage.Query(runId, replyTo)
     case QueryFinal(runId, replyTo) =>
-      commandResponseManager.commandResponseManagerActor ! MiniCRMMessage.QueryFinal(runId, replyTo)
+      commandResponseManager.commandResponseManagerActor ! CRMMessage.QueryFinal(runId, replyTo)
     case Lock(source, replyTo, leaseDuration) => lockComponent(source, replyTo, leaseDuration)
     case Unlock(source, replyTo)              => unlockComponent(source, replyTo)
     case cmdMsg: CommandMessage =>

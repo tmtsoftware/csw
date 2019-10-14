@@ -92,7 +92,7 @@ trait ICommandService {
    * @param commandRunId the runId of the command for which response is required
    * @return a CommandResponse as a Future value
    */
-  def queryFinal(commandRunId: Id, timeout: Timeout): CompletableFuture[SubmitResponse]
+  def queryFinal(commandRunId: Id, timeout: Timeout): CompletableFuture[QueryResponse]
 
   /**
    * Subscribe to all the current states of a component corresponding to the [[csw.location.models.AkkaLocation]] of the component

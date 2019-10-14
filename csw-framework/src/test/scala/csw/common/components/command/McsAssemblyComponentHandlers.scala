@@ -10,6 +10,7 @@ import csw.common.components.command.ComponentStateForCommand.{longRunningCmdCom
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.models.{AkkaLocation, TrackingEvent}
+import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandIssue, ControlCommand, Setup}
@@ -22,6 +23,7 @@ import scala.util.{Failure, Success}
 
 class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
     extends ComponentHandlers(ctx, cswCtx) {
+  val a:Logger = cswCtx.loggerFactory.getLogger
 
   private implicit val timeout: Timeout     = 10.seconds
   private implicit val ec: ExecutionContext = ctx.executionContext
@@ -88,7 +90,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
     Future.sequence(Set(long, medium, short)).onComplete {
       case Success(responses) =>
         // Create a Completer that can be handed in and used to wait for all subcommands to complete
-        val completer = Completer(responses)
+        val completer = new Completer(responses, cswCtx.loggerFactory)
         // Hand the completer to the handleSubcommandResponse so it can be used to update when subcommands complete
         responses.foreach(handleSubcommandResponse(_, completer))
 

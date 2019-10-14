@@ -46,8 +46,12 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
   def submitAndWait(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] = {
     val eventualResponse: Future[SubmitResponse] = component ? (Submit(controlCommand, _))
     eventualResponse.flatMap {
-      case started: Started => queryFinal(started.runId)
-      case x                => Future.successful(x)
+      case started: Started =>
+        queryFinal(started.runId).map {
+          case response: SubmitResponse => response
+          case _: CommandNotAvailable   => throw new RuntimeException("Failed to query response of the command")
+        }
+      case finalResponse => Future.successful(finalResponse)
     }
   }
 
@@ -107,7 +111,7 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
   }
 
   // components coming via this api will be removed from  subscriber's list after timeout
-  override def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse] =
+  override def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[QueryResponse] =
     component ? (QueryFinal(commandRunId, _))
 
   /**

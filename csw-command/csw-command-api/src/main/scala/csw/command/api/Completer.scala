@@ -1,8 +1,15 @@
 package csw.command.api
 
-import csw.params.commands.CommandResponse
-import csw.params.commands.CommandResponse.SubmitResponse
+import java.util
+import java.util.concurrent.ConcurrentHashMap
 
+import csw.logging.client.scaladsl.{GenericLoggerFactory, LoggerFactory}
+import csw.params.commands.CommandResponse
+import csw.params.commands.CommandResponse.{QueryResponse, SubmitResponse}
+import csw.params.core.models.Id
+
+import scala.collection.JavaConverters.mapAsJavaMapConverter
+import scala.collection.convert.ImplicitConversionsToScala.{`iterable AsScalaIterable`, `map AsScalaConcurrentMap`, `set asScala`}
 import scala.concurrent.{Future, Promise}
 
 /**
@@ -11,45 +18,54 @@ import scala.concurrent.{Future, Promise}
 object Completer {
 
   trait OverallResponse {
-    def responses: Set[SubmitResponse]
+    def responses: Set[QueryResponse]
   }
-  case class OverallSuccess(responses: Set[SubmitResponse]) extends OverallResponse
-  case class OverallFailure(responses: Set[SubmitResponse]) extends OverallResponse
+  case class OverallSuccess(responses: Set[QueryResponse]) extends OverallResponse
+  case class OverallFailure(responses: Set[QueryResponse]) extends OverallResponse
 
-  case class Completer(expectedResponses: Set[SubmitResponse]) {
-    // alreadyCompleted is the set of commands that are already completed when handed to the actor
-    private val alreadyCompleted: Set[SubmitResponse] = expectedResponses.filter(CommandResponse.isFinal(_))
-    // started is the set of commands that are started/long-running
-    private val started: Set[SubmitResponse] = expectedResponses.filter(CommandResponse.isIntermediate(_))
-    // This accumulates responses until all expected are gathered
-    private var updates         = Set.empty[SubmitResponse]
+  class Completer(responses: Set[SubmitResponse], loggerFactory: LoggerFactory) {
+    private val data            = new ConcurrentHashMap[Id, QueryResponse](responses.map(res => res.runId -> res).toMap.asJava)
     private val completePromise = Promise[OverallResponse]()
+    private val log             = loggerFactory.getLogger
+    import log._
 
     // Catch the case where one of the already completed is a negative resulting in failure already
     // Or all the commands are already completed
-    if (alreadyCompleted.exists(CommandResponse.isNegative(_)) || started.isEmpty) {
-      checkAndComplete(expectedResponses)
-    }
 
-    // This looks through a set of SubmitResponse and determines if it is an overall success or failure
-    private def checkAndComplete(s: Set[SubmitResponse]): Unit = {
-      if (!s.exists(CommandResponse.isNegative(_)))
-        completePromise.success(OverallSuccess(s))
-      else
-        completePromise.success(OverallFailure(s))
+    private def isAnyResponseNegative: Boolean = data.exists { case (_, res) => CommandResponse.isNegative(res) }
+    private def areAllResponsesFinal: Boolean  = data.forall { case (_, res) => CommandResponse.isFinal(res) }
+
+    checkAndComplete()
+
+    // This looks through all the SubmitResponses and determines if it is an overall success or failure
+    private def checkAndComplete(): Unit = {
+      if (areAllResponsesFinal) {
+        if (isAnyResponseNegative) completePromise.trySuccess(OverallFailure(data.values().toSet))
+        else completePromise.trySuccess(OverallSuccess(data.values().toSet))
+      }
     }
 
     /**
      * Called to update the completer with a final result of a long running command
-     * @param sr the [[SubmitResponse]] of the completed command
+     * @param response the [[SubmitResponse]] of the completed command
      */
-    def update(sr: SubmitResponse): Unit = synchronized {
-      // Only accept an update from an expected runId is reason for second test
-      if (started.map(_.runId).contains(sr.runId) && !updates.exists(_.runId == sr.runId)) {
-        updates += sr
-        if (started.map(_.runId) == updates.map(_.runId)) {
-          checkAndComplete(alreadyCompleted ++ updates)
+    def update(response: QueryResponse): Unit = {
+      if (data.containsKey(response.runId)) {
+        if (CommandResponse.isIntermediate(data(response.runId))) {
+          data.put(response.runId, response)
+          checkAndComplete()
+        } else {
+          warn(
+            "An attempt to update a finished command was detected and was ignored",
+            Map(
+              "runId"            -> response.runId,
+              "existingResponse" -> data(response.runId),
+              "newResponse"      -> response
+            )
+          )
         }
+      } else {
+        warn("An attempt to update a non-existing command was detected and ignored", Map("runId" -> response.runId))
       }
     }
 

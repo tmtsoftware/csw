@@ -449,7 +449,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         // using separate submit and wait API
         CompletableFuture<CommandResponse.SubmitResponse> validationResponse = hcdCmdService.submit(failureResCommand, timeout);
         Id runId = validationResponse.get().runId();
-        CompletableFuture<CommandResponse.SubmitResponse> finalResponse = hcdCmdService.queryFinal(runId, timeout);
+        CompletableFuture<CommandResponse.QueryResponse> finalResponse = hcdCmdService.queryFinal(runId, timeout);
         Assert.assertTrue(finalResponse.get() instanceof CommandResponse.Error);  // This should fail but I guess not typed by compiler
     }
 

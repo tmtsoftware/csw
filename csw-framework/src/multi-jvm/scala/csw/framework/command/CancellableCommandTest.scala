@@ -45,34 +45,41 @@ class CancellableCommandTest(ignore: Int)
     }
 
     runOn(member) {
-      val obsId = Some(ObsId("Obs001"))
-      val cancelCmdId = KeyType.StringKey.make("cancelCmdId")
+      val obsId         = Some(ObsId("Obs001"))
+      val cancelCmdId   = KeyType.StringKey.make("cancelCmdId")
       val cancelCmdName = KeyType.StringKey.make(name = "cancelCmdName")
 
       enterBarrier("spawned")
 
       // resolve the assembly running on seed
       val assemblyLocF =
-        locationService.resolve(AkkaConnection(ComponentId("Monitor_Assembly", ComponentType.Assembly)).of[AkkaLocation], 5.seconds)
-      val assemblyLoc:AkkaLocation = Await.result(assemblyLocF, 10.seconds).get
+        locationService.resolve(
+          AkkaConnection(ComponentId("Monitor_Assembly", ComponentType.Assembly)).of[AkkaLocation],
+          5.seconds
+        )
+      val assemblyLoc: AkkaLocation = Await.result(assemblyLocF, 10.seconds).get
 
       val assemblyCommandService = CommandServiceFactory.make(assemblyLoc)
 
       // original command is submit and Cancel command is also submit
       // This returns Started, so it is a long-running and we are free to cancel it
-      val originalSetup = Setup(prefix, acceptedCmd, obsId)
+      val originalSetup    = Setup(prefix, acceptedCmd, obsId)
       var originalResponse = Await.result(assemblyCommandService.submit(originalSetup), 5.seconds)
       originalResponse shouldBe a[Started]
 
       // This is the cancel command that is processed
-      val cancelSetup = Setup(prefix, cancelCmd, obsId,
-        Set(cancelCmdId.set(originalResponse.runId.id), cancelCmdName.set(originalSetup.commandName.name)))
+      val cancelSetup = Setup(
+        prefix,
+        cancelCmd,
+        obsId,
+        Set(cancelCmdId.set(originalResponse.runId.id), cancelCmdName.set(originalSetup.commandName.name))
+      )
       var cancelAsSubmitResponse = Await.result(assemblyCommandService.submit(cancelSetup), 5.seconds)
       cancelAsSubmitResponse shouldBe a[Completed]
       cancelAsSubmitResponse.commandName shouldBe cancelSetup.commandName
 
-      var waitForCancel = assemblyCommandService.queryFinal(originalResponse.runId)
-      var originalFinalResponse:SubmitResponse = Await.result(waitForCancel, 5.seconds)
+      var waitForCancel                        = assemblyCommandService.queryFinal(originalResponse.runId)
+      var originalFinalResponse: QueryResponse = Await.result(waitForCancel, 5.seconds)
       originalFinalResponse shouldBe a[Cancelled]
       originalFinalResponse.runId shouldEqual originalResponse.runId
       originalFinalResponse.commandName shouldEqual originalResponse.commandName
@@ -81,8 +88,12 @@ class CancellableCommandTest(ignore: Int)
       originalResponse = Await.result(assemblyCommandService.submit(originalSetup), 5.seconds)
       originalResponse shouldBe a[Started]
 
-      val cancelSetup2 = Setup(prefix, cancelCmd, obsId,
-        Set(cancelCmdId.set(originalResponse.runId.id), cancelCmdName.set(originalSetup.commandName.name)))
+      val cancelSetup2 = Setup(
+        prefix,
+        cancelCmd,
+        obsId,
+        Set(cancelCmdId.set(originalResponse.runId.id), cancelCmdName.set(originalSetup.commandName.name))
+      )
       var cancelAsOnewayResponse = Await.result(assemblyCommandService.oneway(cancelSetup2), 5.seconds)
       cancelAsOnewayResponse shouldBe a[Accepted]
       cancelAsOnewayResponse.commandName shouldBe cancelSetup2.commandName

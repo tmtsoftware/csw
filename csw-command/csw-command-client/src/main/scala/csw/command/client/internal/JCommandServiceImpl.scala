@@ -51,7 +51,7 @@ private[command] class JCommandServiceImpl(commandService: CommandService) exten
   override def query(commandRunId: Id, timeout: Timeout): CompletableFuture[QueryResponse] =
     commandService.query(commandRunId)(timeout).toJava.toCompletableFuture
 
-  override def queryFinal(commandRunId: Id, timeout: Timeout): CompletableFuture[SubmitResponse] =
+  override def queryFinal(commandRunId: Id, timeout: Timeout): CompletableFuture[QueryResponse] =
     commandService.queryFinal(commandRunId)(timeout).toJava.toCompletableFuture
 
   override def subscribeCurrentState(): Source[CurrentState, CurrentStateSubscription] =

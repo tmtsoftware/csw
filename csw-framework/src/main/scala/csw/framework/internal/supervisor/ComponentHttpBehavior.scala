@@ -93,7 +93,7 @@ object ComponentHttpBehavior {
               complete(response)
             } ~
             pathPrefix("queryFinal" / Segment) { runId =>
-              val response: Future[SubmitResponse] = supervisor ? (QueryFinal(Id(runId), _))
+              val response: Future[QueryResponse] = supervisor ? (QueryFinal(Id(runId), _))
               complete(response)
             }
           }

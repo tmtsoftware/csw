@@ -283,7 +283,7 @@ case class Query(runId: Id, replyTo: ActorRef[QueryResponse]) extends Supervisor
  * @param runId represents an unique identifier of command
  * @param replyTo represents the actor that will receive the notification of change in command status
  */
-case class QueryFinal(runId: Id, replyTo: ActorRef[SubmitResponse]) extends SupervisorLockMessage with RemoteMsg
+case class QueryFinal(runId: Id, replyTo: ActorRef[QueryResponse]) extends SupervisorLockMessage with RemoteMsg
 
 // Parent trait for Messages which will be send to components for interacting with its logging system
 sealed trait LogControlMessages extends ComponentMessage with SequencerMsg with CommandSerializable

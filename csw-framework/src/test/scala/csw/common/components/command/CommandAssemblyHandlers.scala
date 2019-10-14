@@ -3,22 +3,19 @@ package csw.common.components.command
 import akka.actor.typed.scaladsl.ActorContext
 import akka.stream.Materializer
 import akka.stream.typed.scaladsl.ActorMaterializer
-import csw.command.client.messages.TopLevelActorMessage
-import CommandComponentState._
-import akka.actor.Scheduler
-import akka.actor.typed.ActorRef
 import akka.util.Timeout
-import csw.command.api.CompleterActor
 import csw.command.api.Completer.{Completer, OverallFailure, OverallResponse, OverallSuccess}
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandServiceFactory
+import csw.command.client.messages.TopLevelActorMessage
+import csw.common.components.command.CommandComponentState._
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.models.{ComponentId, TrackingEvent}
 import csw.location.models.ComponentType.HCD
 import csw.location.models.Connection.AkkaConnection
+import csw.location.models.{ComponentId, TrackingEvent}
 import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandIssue.OtherIssue
 import csw.params.commands.CommandResponse._
@@ -28,10 +25,6 @@ import csw.params.core.states.{CurrentState, StateName}
 import csw.time.core.models.UTCTime
 
 import scala.concurrent.duration._
-import akka.actor.typed.scaladsl.AskPattern._
-import csw.command.api.CompleterActor.CommandCompleterMessage
-import csw.command.api.CompleterActor.CommandCompleterMessage.{Update, WaitComplete}
-
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -123,7 +116,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         val shorter = hcdComponent.submit(shortRunning)
         Future.sequence(Set(long, shorter)).onComplete {
           case Success(responses) =>
-            val completer: Completer = Completer(responses)
+            val completer: Completer = new Completer(responses, cswCtx.loggerFactory)
             responses.foreach(doComplete(_, completer))
 
             completer.waitComplete().collect {
@@ -139,17 +132,16 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         Started(command.commandName, runId)
       case `longRunningCmdToAsmCActor` =>
         implicit val timeout: Timeout     = 3.seconds
-        implicit val scheduler: Scheduler = ctx.system.scheduler
         implicit val ec: ExecutionContext = ctx.system.executionContext
 
         val long    = hcdComponent.submit(longRunning)
         val shorter = hcdComponent.submit(shortRunning)
         Future.sequence(Set(long, shorter)).onComplete {
           case Success(responses) =>
-            val completer: ActorRef[CommandCompleterMessage] = ctx.spawn(CompleterActor(responses), "c1")
-            responses.foreach(doComplete2(_, completer))
+            val completer = new Completer(responses, cswCtx.loggerFactory)
+            responses.foreach(doComplete(_, completer))
 
-            val f: Future[OverallResponse] = completer.ask(ref => WaitComplete(ref))
+            val f: Future[OverallResponse] = completer.waitComplete()
             f.map {
               case OverallSuccess(_) =>
                 commandResponseManager.updateCommand(Completed(command.commandName, runId))
@@ -167,7 +159,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         val shorter = hcdComponent.submit(shortRunningError)
         Future.sequence(Set(long, shorter)).onComplete {
           case Success(responses) =>
-            val completer = Completer(responses)
+            val completer = new Completer(responses, cswCtx.loggerFactory)
             responses.foreach(doComplete(_, completer))
 
             completer.waitComplete().collect {
@@ -193,14 +185,6 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
       case Started(_, runId) => hcdComponent.queryFinal(runId).map(completer.update)
       case a =>
         completer.update(Error(a.commandName, a.runId, "First command response was not started!"))
-    }
-  }
-
-  private def doComplete2(firstResponse: SubmitResponse, completer: ActorRef[CommandCompleterMessage]): Unit = {
-    firstResponse match {
-      case Started(_, runId) => hcdComponent.queryFinal(runId).map(completer ! Update(_))
-      case a =>
-        completer ! Update(Error(a.commandName, a.runId, "First command response was not started!"))
     }
   }
 
