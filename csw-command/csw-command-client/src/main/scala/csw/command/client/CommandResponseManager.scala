@@ -1,8 +1,8 @@
 package csw.command.client
 
 import akka.actor.typed.ActorRef
-import com.github.benmanes.caffeine.cache.{Cache, Caffeine}
-import csw.params.commands.CommandName
+import com.github.benmanes.caffeine.cache.{Cache, Caffeine, RemovalCause}
+import csw.params.commands.{CommandName, CommandResponse}
 import csw.params.commands.CommandResponse.{CommandNotAvailable, QueryResponse, Started, SubmitResponse}
 import csw.params.core.models.Id
 
@@ -14,7 +14,14 @@ import scala.jdk.CollectionConverters.ConcurrentMapHasAsScala
 class CommandResponseManager(maxSize: Int) {
   case class CRMState(response: SubmitResponse, subscribers: Set[ActorRef[QueryResponse]] = Set.empty)
 
-  private val cache: Cache[Id, CRMState] = Caffeine.newBuilder().maximumSize(maxSize).build()
+  private val cache: Cache[Id, CRMState] = Caffeine
+    .newBuilder()
+    .maximumSize(maxSize)
+    .removalListener((k: Id, v: CRMState, _: RemovalCause) => {
+      //fixme: log a warning
+      v.subscribers.foreach(_ ! CommandResponse.Error(v.response.commandName, k, "too many commands"))
+    })
+    .build()
 
   private[csw] def queryFinal(runId: Id, replyTo: ActorRef[QueryResponse]): Unit = {
     val currentStateMaybe = Option(cache.getIfPresent(runId))

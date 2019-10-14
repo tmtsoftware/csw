@@ -1,15 +1,14 @@
-package csw.command.api
+package csw.command.client
 
-import java.util
 import java.util.concurrent.ConcurrentHashMap
 
-import csw.logging.client.scaladsl.{GenericLoggerFactory, LoggerFactory}
+import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse
 import csw.params.commands.CommandResponse.{QueryResponse, SubmitResponse}
 import csw.params.core.models.Id
 
 import scala.collection.JavaConverters.mapAsJavaMapConverter
-import scala.collection.convert.ImplicitConversionsToScala.{`iterable AsScalaIterable`, `map AsScalaConcurrentMap`, `set asScala`}
+import scala.collection.convert.ImplicitConversionsToScala.{`iterable AsScalaIterable`, `map AsScalaConcurrentMap`}
 import scala.concurrent.{Future, Promise}
 
 /**
@@ -23,7 +22,11 @@ object Completer {
   case class OverallSuccess(responses: Set[QueryResponse]) extends OverallResponse
   case class OverallFailure(responses: Set[QueryResponse]) extends OverallResponse
 
-  class Completer(responses: Set[SubmitResponse], loggerFactory: LoggerFactory) {
+  class Completer private (
+      responses: Set[SubmitResponse],
+      loggerFactory: LoggerFactory,
+      maybeCrm: Option[CommandResponseManager]
+  ) {
     private val data            = new ConcurrentHashMap[Id, QueryResponse](responses.map(res => res.runId -> res).toMap.asJava)
     private val completePromise = Promise[OverallResponse]()
     private val log             = loggerFactory.getLogger
@@ -32,16 +35,30 @@ object Completer {
     // Catch the case where one of the already completed is a negative resulting in failure already
     // Or all the commands are already completed
 
-    private def isAnyResponseNegative: Boolean = data.exists { case (_, res) => CommandResponse.isNegative(res) }
-    private def areAllResponsesFinal: Boolean  = data.forall { case (_, res) => CommandResponse.isFinal(res) }
+    private def maybeNegativeResponse: Option[QueryResponse] =
+      data.find { case (_, res) => CommandResponse.isNegative(res) }.map(_._2)
+    private def areAllResponsesFinal: Boolean = data.forall { case (_, res) => CommandResponse.isFinal(res) }
 
     checkAndComplete()
 
     // This looks through all the SubmitResponses and determines if it is an overall success or failure
     private def checkAndComplete(): Unit = {
       if (areAllResponsesFinal) {
-        if (isAnyResponseNegative) completePromise.trySuccess(OverallFailure(data.values().toSet))
-        else completePromise.trySuccess(OverallSuccess(data.values().toSet))
+        if (maybeNegativeResponse.isDefined) {
+          completePromise.trySuccess(OverallFailure(data.values().toSet))
+//          maybeCrm.foreach(
+//            crm =>
+//            // fixme:
+//              crm.updateCommand(maybeNegativeResponse.get match {
+//                case response: SubmitResponse => response
+//                case CommandResponse.CommandNotAvailable(commandName, runId) =>
+//                  Error(commandName, runId, "Downstream failed to process too many commands")
+//              })
+//          )
+        } else {
+          completePromise.trySuccess(OverallSuccess(data.values().toSet))
+//          maybeCrm.map(crm => crm.updateCommand(Completed()))
+        }
       }
     }
 
@@ -76,5 +93,13 @@ object Completer {
     def waitComplete(): Future[OverallResponse] = {
       completePromise.future
     }
+
+  }
+
+  object Completer {
+    def apply(responses: Set[SubmitResponse], loggerFactory: LoggerFactory): Completer =
+      new Completer(responses, loggerFactory, None)
+    def withAutoCompletion(responses: Set[SubmitResponse], loggerFactory: LoggerFactory, crm: CommandResponseManager) =
+      new Completer(responses, loggerFactory, Some(crm))
   }
 }

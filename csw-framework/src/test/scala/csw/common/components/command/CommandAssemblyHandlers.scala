@@ -4,7 +4,7 @@ import akka.actor.typed.scaladsl.ActorContext
 import akka.stream.Materializer
 import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.util.Timeout
-import csw.command.api.Completer.{Completer, OverallFailure, OverallResponse, OverallSuccess}
+import csw.command.client.Completer.{Completer, OverallFailure, OverallResponse, OverallSuccess}
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandServiceFactory
 import csw.command.client.messages.TopLevelActorMessage
@@ -116,7 +116,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         val shorter = hcdComponent.submit(shortRunning)
         Future.sequence(Set(long, shorter)).onComplete {
           case Success(responses) =>
-            val completer: Completer = new Completer(responses, cswCtx.loggerFactory)
+            val completer: Completer = Completer(responses, cswCtx.loggerFactory)
             responses.foreach(doComplete(_, completer))
 
             completer.waitComplete().collect {
@@ -138,7 +138,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         val shorter = hcdComponent.submit(shortRunning)
         Future.sequence(Set(long, shorter)).onComplete {
           case Success(responses) =>
-            val completer = new Completer(responses, cswCtx.loggerFactory)
+            val completer = Completer(responses, cswCtx.loggerFactory)
             responses.foreach(doComplete(_, completer))
 
             val f: Future[OverallResponse] = completer.waitComplete()
@@ -159,7 +159,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         val shorter = hcdComponent.submit(shortRunningError)
         Future.sequence(Set(long, shorter)).onComplete {
           case Success(responses) =>
-            val completer = new Completer(responses, cswCtx.loggerFactory)
+            val completer = Completer(responses, cswCtx.loggerFactory)
             responses.foreach(doComplete(_, completer))
 
             completer.waitComplete().collect {

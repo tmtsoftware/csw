@@ -2,7 +2,7 @@ package csw.common.components.command
 
 import akka.actor.typed.scaladsl.ActorContext
 import akka.util.Timeout
-import csw.command.api.Completer.{Completer, OverallFailure, OverallSuccess}
+import csw.command.client.Completer.{Completer, OverallFailure, OverallSuccess}
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandServiceFactory
 import csw.command.client.messages.TopLevelActorMessage
@@ -90,11 +90,10 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
     Future.sequence(Set(long, medium, short)).onComplete {
       case Success(responses) =>
         // Create a Completer that can be handed in and used to wait for all subcommands to complete
-        val completer = new Completer(responses, cswCtx.loggerFactory)
+        val completer = Completer(responses, cswCtx.loggerFactory)
         // Hand the completer to the handleSubcommandResponse so it can be used to update when subcommands complete
         responses.foreach(handleSubcommandResponse(_, completer))
 
-        // This is here to handle when all the subcommands complete and send the message needed for the test
         completer.waitComplete().onComplete {
           case Success(overall) =>
             currentStatePublisher.publish(

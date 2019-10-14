@@ -1,6 +1,6 @@
 package csw.command.client
 
-import csw.command.api.Completer.{Completer, OverallFailure, OverallSuccess}
+import Completer.{Completer, OverallFailure, OverallSuccess}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandIssue.OtherIssue
@@ -27,7 +27,7 @@ class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll with M
     val r2  = Started(CommandName("2"), id2)
     val r3  = Started(CommandName("3"), id3)
 
-    val c1 = new Completer(Set(r1, r2, r3), loggerFactory)
+    val c1 = Completer(Set(r1, r2, r3), loggerFactory)
 
     val x = c1.waitComplete()
     c1.update(Completed(CommandName("1"), id1))
@@ -48,7 +48,7 @@ class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll with M
     val r2  = Started(CommandName("2"), id2)
     val r3  = Started(CommandName("3"), id3)
 
-    val c1 = new Completer(Set(r1, r2, r3), loggerFactory)
+    val c1 = Completer(Set(r1, r2, r3), loggerFactory)
 
     val x = c1.waitComplete()
     c1.update(Error(CommandName("1"), id1, "ERROR"))
@@ -69,7 +69,7 @@ class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll with M
     val r2  = Started(CommandName("2"), id2)
     val r3  = Completed(CommandName("3"), id3)
 
-    val c1 = new Completer(Set(r1, r2, r3), loggerFactory)
+    val c1 = Completer(Set(r1, r2, r3), loggerFactory)
 
     val x = c1.waitComplete()
     c1.update(Completed(CommandName("2"), id2))
@@ -87,7 +87,7 @@ class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll with M
     val r1  = Started(CommandName("1"), id1)
     val r3  = Started(CommandName("3"), id3)
 
-    val c1 = new Completer(Set(r1, r3), loggerFactory)
+    val c1 = Completer(Set(r1, r3), loggerFactory)
 
     val x = c1.waitComplete()
     c1.update(Completed(CommandName("1"), id1))
@@ -106,7 +106,7 @@ class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll with M
     val r2  = Started(CommandName("2"), id2)
     val r3  = Started(CommandName("3"), id3)
 
-    val c1 = new Completer(Set(r1, r2, r3), loggerFactory)
+    val c1 = Completer(Set(r1, r2, r3), loggerFactory)
 
     val x = c1.waitComplete()
     c1.update(Completed(CommandName("1"), id1))
@@ -127,7 +127,7 @@ class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll with M
     val r2  = Completed(CommandName("2"), id2)
     val r3  = Completed(CommandName("3"), id3)
 
-    val c1 = new Completer(Set(r1, r2, r3), loggerFactory)
+    val c1 = Completer(Set(r1, r2, r3), loggerFactory)
 
     val x = c1.waitComplete()
 
@@ -143,7 +143,7 @@ class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll with M
     val r1  = Error(CommandName("1"), id1, "Error")
     val r2  = Error(CommandName("2"), id2, "Error")
 
-    val c1 = new Completer(Set(r1, r2), loggerFactory)
+    val c1 = Completer(Set(r1, r2), loggerFactory)
 
     val x = c1.waitComplete()
 
@@ -157,7 +157,7 @@ class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll with M
     val r1  = Completed(CommandName("1"), id1)
     val r2  = Invalid(CommandName("2"), id2, OtherIssue("TEST"))
 
-    val c1 = new Completer(Set(r1, r2), loggerFactory)
+    val c1 = Completer(Set(r1, r2), loggerFactory)
 
     val x = c1.waitComplete()
 
@@ -172,7 +172,7 @@ class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll with M
     val r1  = Started(CommandName("1"), id1)
     val r2  = Started(CommandName("2"), id2)
 
-    val c1 = new Completer(Set(r1, r2), loggerFactory)
+    val c1 = Completer(Set(r1, r2), loggerFactory)
 
     val x = c1.waitComplete()
     c1.update(Completed(CommandName("1"), id1))
