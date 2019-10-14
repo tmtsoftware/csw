@@ -1,16 +1,11 @@
 package csw.command.client
 
 import akka.actor.testkit.typed.scaladsl.ActorTestKit
-import csw.command.client.MiniCRM.CRMMessage.{AddResponse, GetState}
-import csw.command.client.MiniCRM.CRMState
 import csw.params.commands.CommandName
 import csw.params.commands.CommandResponse._
 import csw.params.core.models.Id
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
-
-import scala.concurrent.duration._
-
-class MiniCRMTest extends FunSuite with Matchers with BeforeAndAfterAll {
+class CommandResponseManagerTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   val testKit = ActorTestKit()
 
@@ -18,48 +13,38 @@ class MiniCRMTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   // This test just adds responses to make sure they are added properly to the response list
   test("add responses, check inclusion") {
-    val crm           = testKit.spawn(MiniCRM.make())
-    val responseProbe = testKit.createTestProbe[Map[Id, CRMState]]()
+    val crm = new CommandResponseManager(10)
 
     val id1 = Id()
 
     val r1 = Completed(CommandName("1"), id1)
-    crm ! AddResponse(r1)
-    crm ! GetState(responseProbe.ref)
+    crm.updateCommand(r1)
+    val crmState1 = crm.getState
 
-    val responses1 = responseProbe.expectMessageType[Map[Id, CRMState]]
-    responses1.size shouldBe 1
-    responses1(id1).response shouldBe r1
+    crmState1.size shouldBe 1
+    crmState1(id1).response shouldBe r1
 
     val id2 = Id()
 
     val r2 = Completed(CommandName("2"), id2)
-    crm ! AddResponse(r2)
-    crm ! GetState(responseProbe.ref)
+    crm.updateCommand(r2)
+    val crmState2 = crm.getState
 
     // Responses are appended
-    val responses2 = responseProbe.expectMessageType[Map[Id, CRMState]]
-    responses2.size shouldBe 2
-    responses2(id1).response shouldBe r1
-    responses2(id2).response shouldBe r2
+    crmState2.size shouldBe 2
+    crmState2(id1).response shouldBe r1
+    crmState2(id2).response shouldBe r2
   }
 
   // This test makes sure waiters are added properly
-//  test("add waiters, check inclusion") {
-//    val crm             = testKit.spawn(MiniCRM.make())
-//    val responseProbe   = testKit.createTestProbe[SubmitResponse]()
-//    val waiterListProbe = testKit.createTestProbe[Waiters]
-//
-//    val id1 = Id("1")
-//    crm ! QueryFinal(id1, responseProbe.ref)
-//    responseProbe.expectNoMessage(100.millis)
-//
-//    crm ! GetWaiters(waiterListProbe.ref)
-//    val waiters1 = waiterListProbe.expectMessageType[Waiters]
-//    waiters1.size shouldBe 1
-//    waiters1 shouldBe List((id1, responseProbe.ref))
-//
-//    val id2 = Id("2")
+  test("add waiters, check inclusion") {
+    val crm           = new CommandResponseManager(10)
+    val responseProbe = testKit.createTestProbe[QueryResponse]()
+    val id1           = Id("1")
+    crm.queryFinal(id1, responseProbe.ref)
+    responseProbe.expectMessage(CommandNotAvailable(CommandName("CommandNotAvailable"), id1))
+
+    //    val id2 = Id("2")
 //    crm ! QueryFinal(id2, responseProbe.ref)
 //    responseProbe.expectNoMessage(100.millis)
 //
@@ -67,7 +52,7 @@ class MiniCRMTest extends FunSuite with Matchers with BeforeAndAfterAll {
 //    val waiters2 = waiterListProbe.expectMessageType[Waiters]
 //    waiters2.size shouldBe 2
 //    waiters2 shouldBe List((id1, responseProbe.ref), (id2, responseProbe.ref))
-//  }
+  }
 //
 //  // This test adds a response and then does a queryFinal to make sure that
 //  // 1. The queryFinal completes correctly

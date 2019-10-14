@@ -5,7 +5,7 @@ import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import akka.{Done, actor}
 import csw.alarm.api.scaladsl.AlarmService
-import csw.command.client.{CommandResponseManager, MiniCRM}
+import csw.command.client.CommandResponseManager
 import csw.command.client.models.framework.{LifecycleStateChanged, PubSub}
 import csw.config.api.scaladsl.ConfigClientService
 import csw.config.client.scaladsl.ConfigClientFactory
@@ -71,10 +71,8 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol]) extends Mo
   val pubSubCommandEventActor: ActorRef[PubSub[SubmitResponse]] =
     system.spawn(PubSubBehavior.make[SubmitResponse](loggerFactory), name = "pub-sub-update")
 
-  val commandResponseManagerActor: TestProbe[MiniCRM.CRMMessage] = TestProbe[MiniCRM.CRMMessage]
-  val commandResponseManager: CommandResponseManager             = mock[CommandResponseManager]
+  val commandResponseManager: CommandResponseManager = mock[CommandResponseManager]
 
-  when(commandResponseManager.commandResponseManagerActor).thenReturn(commandResponseManagerActor.ref)
   doNothing.when(commandResponseManager).updateCommand(any[SubmitResponse])
 
   ///////////////////////////////////////////////

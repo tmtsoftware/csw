@@ -23,7 +23,7 @@ import scala.util.{Failure, Success}
 
 class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
     extends ComponentHandlers(ctx, cswCtx) {
-  val a:Logger = cswCtx.loggerFactory.getLogger
+  val a: Logger = cswCtx.loggerFactory.getLogger
 
   private implicit val timeout: Timeout     = 10.seconds
   private implicit val ec: ExecutionContext = ctx.executionContext

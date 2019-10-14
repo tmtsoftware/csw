@@ -1,7 +1,6 @@
 package csw.common.components.command
 
 import akka.actor.typed.scaladsl.ActorContext
-import csw.command.client.MiniCRM.CRMMessage.AddResponse
 import csw.command.client.messages.TopLevelActorMessage
 import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.models.CswContext
@@ -36,29 +35,28 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
 
   //#addOrUpdateCommand
   override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse = {
+    import ctx.executionContext
+    val scheduler = ctx.system.scheduler
+
+    new Runnable {
+      override def run(): Unit = {}
+    }
+
     controlCommand.commandName match {
       case `longRunning` =>
-        ctx.scheduleOnce(
-          5.seconds,
-          // Here the Completed is sent directly to the publish actor
-          commandResponseManager.commandResponseManagerActor,
-          AddResponse(Completed(controlCommand.commandName, runId))
-        )
+        scheduler.scheduleOnce(5.seconds) {
+          commandResponseManager.updateCommand(Completed(controlCommand.commandName, runId))
+        }
         Started(controlCommand.commandName, runId)
-      //#addOrUpdateCommand
       case `mediumRunning` =>
-        ctx.scheduleOnce(
-          3.seconds,
-          commandResponseManager.commandResponseManagerActor,
-          AddResponse(Completed(controlCommand.commandName, runId))
-        )
+        scheduler.scheduleOnce(3.seconds) {
+          commandResponseManager.updateCommand(Completed(controlCommand.commandName, runId))
+        }
         Started(controlCommand.commandName, runId)
       case `shortRunning` =>
-        ctx.scheduleOnce(
-          1.seconds,
-          commandResponseManager.commandResponseManagerActor,
-          AddResponse(Completed(controlCommand.commandName, runId))
-        )
+        scheduler.scheduleOnce(1.seconds) {
+          commandResponseManager.updateCommand(Completed(controlCommand.commandName, runId))
+        }
         Started(controlCommand.commandName, runId)
       case `failureAfterValidationCmd` =>
         //  SHOULDN"T BE NEEDED commandUpdatePublisher.update(Error(controlCommand.commandName, runId, "Failed command"))

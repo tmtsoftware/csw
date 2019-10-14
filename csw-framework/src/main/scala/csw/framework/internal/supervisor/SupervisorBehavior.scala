@@ -8,15 +8,21 @@ import akka.actor.typed.scaladsl._
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.{CoordinatedShutdown, Scheduler}
 import akka.util.Timeout
-import csw.command.client.MiniCRM
-import csw.command.client.MiniCRM.CRMMessage
-import csw.command.client.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.command.client.messages.ComponentCommonMessage.{
+  ComponentStateSubscription,
+  GetSupervisorLifecycleState,
+  LifecycleStateSubscription
+}
 import csw.command.client.messages.FromComponentLifecycleMessage.Running
 import csw.command.client.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorIdleMessage.InitializeTimeout
-import csw.command.client.messages.SupervisorInternalRunningMessage.{RegistrationFailed, RegistrationNotRequired, RegistrationSuccess}
+import csw.command.client.messages.SupervisorInternalRunningMessage.{
+  RegistrationFailed,
+  RegistrationNotRequired,
+  RegistrationSuccess
+}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
 import csw.command.client.messages._
@@ -200,9 +206,8 @@ private[framework] final class SupervisorBehavior(
    * @param runningMessage message representing a message received in [[SupervisorLifecycleState.Running]] state
    */
   private def onRunning(runningMessage: SupervisorRunningMessage): Unit = runningMessage match {
-    case Query(runId, replyTo) => commandResponseManager.commandResponseManagerActor ! CRMMessage.Query(runId, replyTo)
-    case QueryFinal(runId, replyTo) =>
-      commandResponseManager.commandResponseManagerActor ! CRMMessage.QueryFinal(runId, replyTo)
+    case Query(runId, replyTo)                => commandResponseManager.query(runId, replyTo)
+    case QueryFinal(runId, replyTo)           => commandResponseManager.queryFinal(runId, replyTo)
     case Lock(source, replyTo, leaseDuration) => lockComponent(source, replyTo, leaseDuration)
     case Unlock(source, replyTo)              => unlockComponent(source, replyTo)
     case cmdMsg: CommandMessage =>
@@ -353,7 +358,7 @@ private[framework] final class SupervisorBehavior(
   }
 
   private def onComponentRunning(componentRef: ActorRef[RunningMessage]): Unit = {
-    implicit val timeout: Timeout     = 3.seconds
+    implicit val timeout: Timeout = 3.seconds
 
     log.info("Received Running message from component within timeout, cancelling InitializeTimer")
     timerScheduler.cancel(InitializeTimerKey)
@@ -367,7 +372,7 @@ private[framework] final class SupervisorBehavior(
       ctx.spawn(ComponentHttpBehavior.make(loggerFactory, ctx.self, componentName), httpComponentActorName)
     // Start to get the port for registering with Location Service
     implicit val scheduler: Scheduler = ctx.system.scheduler
-    val port: Future[Int] = httpBehavior ? (ref => Start(ref))
+    val port: Future[Int]             = httpBehavior ? (ref => Start(ref))
     port.map(registerHttpEndpointWithLocationService(_))
   }
 
