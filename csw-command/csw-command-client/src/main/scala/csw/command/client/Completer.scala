@@ -3,8 +3,8 @@ package csw.command.client
 import java.util.concurrent.ConcurrentHashMap
 
 import csw.logging.client.scaladsl.LoggerFactory
-import csw.params.commands.CommandResponse
-import csw.params.commands.CommandResponse.{QueryResponse, SubmitResponse}
+import csw.params.commands.CommandResponse.{Completed, Error, QueryResponse, SubmitResponse}
+import csw.params.commands.{CommandResponse, ControlCommand}
 import csw.params.core.models.Id
 
 import scala.collection.JavaConverters.mapAsJavaMapConverter
@@ -23,11 +23,13 @@ object Completer {
   case class OverallFailure(responses: Set[QueryResponse]) extends OverallResponse
 
   class Completer private (
-      responses: Set[SubmitResponse],
+      maybeParentId: Option[Id],
+      maybeParentCommand: Option[ControlCommand],
+      childResponses: Set[SubmitResponse],
       loggerFactory: LoggerFactory,
       maybeCrm: Option[CommandResponseManager]
   ) {
-    private val data            = new ConcurrentHashMap[Id, QueryResponse](responses.map(res => res.runId -> res).toMap.asJava)
+    private val data            = new ConcurrentHashMap[Id, QueryResponse](childResponses.map(res => res.runId -> res).toMap.asJava)
     private val completePromise = Promise[OverallResponse]()
     private val log             = loggerFactory.getLogger
     import log._
@@ -41,23 +43,14 @@ object Completer {
 
     checkAndComplete()
 
-    // This looks through all the SubmitResponses and determines if it is an overall success or failure
     private def checkAndComplete(): Unit = {
       if (areAllResponsesFinal) {
         if (maybeNegativeResponse.isDefined) {
+          maybeCrm.foreach(_.updateCommand(Error(maybeParentCommand.get.commandName, maybeParentId.get, "Downstream failed")))
           completePromise.trySuccess(OverallFailure(data.values().toSet))
-//          maybeCrm.foreach(
-//            crm =>
-//            // fixme:
-//              crm.updateCommand(maybeNegativeResponse.get match {
-//                case response: SubmitResponse => response
-//                case CommandResponse.CommandNotAvailable(commandName, runId) =>
-//                  Error(commandName, runId, "Downstream failed to process too many commands")
-//              })
-//          )
         } else {
+          maybeCrm.foreach(_.updateCommand(Completed(maybeParentCommand.get.commandName, maybeParentId.get)))
           completePromise.trySuccess(OverallSuccess(data.values().toSet))
-//          maybeCrm.map(crm => crm.updateCommand(Completed()))
         }
       }
     }
@@ -98,8 +91,15 @@ object Completer {
 
   object Completer {
     def apply(responses: Set[SubmitResponse], loggerFactory: LoggerFactory): Completer =
-      new Completer(responses, loggerFactory, None)
-    def withAutoCompletion(responses: Set[SubmitResponse], loggerFactory: LoggerFactory, crm: CommandResponseManager) =
-      new Completer(responses, loggerFactory, Some(crm))
+      new Completer(None, None, responses, loggerFactory, None)
+
+    def withAutoCompletion(
+        parentId: Id,
+        parentCommand: ControlCommand,
+        childResponses: Set[SubmitResponse],
+        loggerFactory: LoggerFactory,
+        crm: CommandResponseManager
+    ) = new Completer(Some(parentId), Some(parentCommand), childResponses, loggerFactory, Some(crm))
+
   }
 }

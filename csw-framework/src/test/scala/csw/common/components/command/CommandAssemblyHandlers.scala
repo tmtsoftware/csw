@@ -116,18 +116,20 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         val shorter = hcdComponent.submit(shortRunning)
         Future.sequence(Set(long, shorter)).onComplete {
           case Success(responses) =>
-            val completer: Completer = Completer(responses, cswCtx.loggerFactory)
+            val completer: Completer =
+              Completer.withAutoCompletion(runId, command, responses, cswCtx.loggerFactory, commandResponseManager)
             responses.foreach(doComplete(_, completer))
 
-            completer.waitComplete().collect {
-              case OverallSuccess(_) =>
-                commandResponseManager.updateCommand(Completed(command.commandName, runId))
-              case OverallFailure(responses) =>
-                commandResponseManager.updateCommand(Error(command.commandName, runId, s"$responses"))
-            }
-          case Failure(exception) =>
-            // Lift subcommand timeout to an error
-            commandResponseManager.updateCommand(Error(command.commandName, runId, s"$exception"))
+            completer.waitComplete() //.collect {
+//              case OverallSuccess(_) =>
+//                commandResponseManager.updateCommand(Completed(command.commandName, runId))
+//              case OverallFailure(responses) =>
+//                commandResponseManager.updateCommand(Error(command.commandName, runId, s"$responses"))
+//            }
+//          should move inside
+//          case Failure(exception) =>
+//            // Lift subcommand timeout to an error
+//            commandResponseManager.updateCommand(Error(command.commandName, runId, s"$exception"))
         }
         Started(command.commandName, runId)
       case `longRunningCmdToAsmCActor` =>
@@ -142,12 +144,12 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
             responses.foreach(doComplete(_, completer))
 
             val f: Future[OverallResponse] = completer.waitComplete()
-            f.map {
-              case OverallSuccess(_) =>
-                commandResponseManager.updateCommand(Completed(command.commandName, runId))
-              case OverallFailure(responses) =>
-                commandResponseManager.updateCommand(Error(command.commandName, runId, s"$responses"))
-            }
+//            f.map {
+//              case OverallSuccess(_) =>
+//                commandResponseManager.updateCommand(Completed(command.commandName, runId))
+//              case OverallFailure(responses) =>
+//                commandResponseManager.updateCommand(Error(command.commandName, runId, s"$responses"))
+//            }
 
           case Failure(exception) =>
             // Lift subcommand timeout to an error
@@ -162,13 +164,13 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
             val completer = Completer(responses, cswCtx.loggerFactory)
             responses.foreach(doComplete(_, completer))
 
-            completer.waitComplete().collect {
-              case OverallSuccess(_) =>
-                commandResponseManager.updateCommand(Completed(command.commandName, runId))
-              case OverallFailure(_) =>
-                // Could look at the responses here and improve update
-                commandResponseManager.updateCommand(Error(command.commandName, runId, "ERROR"))
-            }
+            completer.waitComplete() //.collect {
+//              case OverallSuccess(_) =>
+//                commandResponseManager.updateCommand(Completed(command.commandName, runId))
+//              case OverallFailure(_) =>
+//                // Could look at the responses here and improve update
+//                commandResponseManager.updateCommand(Error(command.commandName, runId, "ERROR"))
+//            }
           case Failure(exception) =>
             // Lift subcommand timeout to an error
             commandResponseManager.updateCommand(Error(command.commandName, runId, s"$exception"))
