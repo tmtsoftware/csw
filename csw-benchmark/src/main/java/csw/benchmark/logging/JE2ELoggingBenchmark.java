@@ -43,7 +43,7 @@ public class JE2ELoggingBenchmark extends JUnitSuite {
     public void setup() {
         log = JGenericLoggerFactory.getLogger(getClass());
         actorSystem = akka.actor.typed.ActorSystem.create(SpawnProtocol.behavior(), "JE2E");
-        LoggingSystem loggingSystem = JLoggingSystemFactory.start("JE2E-Bench", "SNAPSHOT-1.0", "localhost", actorSystem, List.of(JLogAppenderBuilders.FileAppender));
+        LoggingSystem loggingSystem = JLoggingSystemFactory.start("JE2E-Bench", "SNAPSHOT-1.0", "localhost", actorSystem, List.of(JLogAppenderBuilders.FileAppender()));
         loggingSystem.setDefaultLogLevel(Level.INFO$.MODULE$);
         person = JPerson.createDummy();
     }

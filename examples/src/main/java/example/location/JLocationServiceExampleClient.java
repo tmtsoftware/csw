@@ -100,14 +100,14 @@ public class JLocationServiceExampleClient extends AbstractActor {
         //#Components-Connections-Registrations
 
         // dummy http connection
-        HttpConnection httpConnection = new HttpConnection(new ComponentId("configuration", JComponentType.Service));
+        HttpConnection httpConnection = new HttpConnection(new ComponentId("configuration", JComponentType.Service()));
         HttpRegistration httpRegistration = new HttpRegistration(httpConnection, 8080, "path123");
         httpRegResult = locationService.register(httpRegistration).get();
 
         // ************************************************************************************************************
 
         // dummy HCD connection
-        AkkaConnection hcdConnection = new AkkaConnection(new ComponentId("hcd1", JComponentType.HCD));
+        AkkaConnection hcdConnection = new AkkaConnection(new ComponentId("hcd1", JComponentType.HCD()));
         ActorRef actorRef = getContext().actorOf(Props.create(AbstractActor.class, () -> new AbstractActor() {
                     @Override
                     public Receive createReceive() {
@@ -131,7 +131,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         });
         akka.actor.typed.ActorRef<String> typedActorRef = Adapter.spawn(context(), behavior, "typed-actor-ref");
 
-        AkkaConnection assemblyConnection = new AkkaConnection(new ComponentId("assembly1", JComponentType.Assembly));
+        AkkaConnection assemblyConnection = new AkkaConnection(new ComponentId("assembly1", JComponentType.Assembly()));
 
         // Register Typed ActorRef[String] with Location Service
         AkkaRegistration assemblyRegistration = new RegistrationFactory().akkaTyped(assemblyConnection, new Prefix("nfiraos.ncc.tromboneAssembly"), typedActorRef);
@@ -216,7 +216,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
 
         //#filtering-component
         // filter connections based on component type
-        List<Location> componentList = locationService.list(JComponentType.Assembly).get();
+        List<Location> componentList = locationService.list(JComponentType.Assembly()).get();
         log.info("Registered Assemblies:");
         for (Location loc : componentList) {
             log.info("--- " + connectionInfo(loc.connection()));
@@ -226,7 +226,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
 
         //#filtering-connection
         // filter connections based on connection type
-        List<Location> akkaList = locationService.list(JConnectionType.AkkaType).get();
+        List<Location> akkaList = locationService.list(JConnectionType.AkkaType()).get();
         log.info("Registered Akka connections:");
         for (Location loc : akkaList) {
             log.info("--- " + connectionInfo(loc.connection()));

@@ -21,7 +21,7 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-import static csw.location.api.javadsl.JComponentType.Assembly;
+import csw.location.api.javadsl.JComponentType;
 
 public class JTestKitsExampleTest extends JUnitSuite {
 
@@ -56,7 +56,7 @@ public class JTestKitsExampleTest extends JUnitSuite {
 
         //#spawn-using-testkit
 
-        AkkaConnection connection = new AkkaConnection(new ComponentId("JSampleAssembly", Assembly));
+        AkkaConnection connection = new AkkaConnection(new ComponentId("JSampleAssembly", JComponentType.Assembly()));
         Optional<AkkaLocation> akkaLocation = locationService.resolve(connection, Duration.ofSeconds(5)).get();
 
         Assert.assertTrue(akkaLocation.isPresent());

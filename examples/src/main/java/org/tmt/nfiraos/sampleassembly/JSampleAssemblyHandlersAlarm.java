@@ -194,13 +194,13 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
     //#alarm
     private AlarmSeverity getCounterSeverity(int counter) {
         if (counter >= 0 && counter <= 10) {
-            return JAlarmSeverity.Okay;
+            return JAlarmSeverity.Okay();
         } else if (counter >= 11 && counter <= 15) {
-            return JAlarmSeverity.Warning;
+            return JAlarmSeverity.Warning();
         } else if (counter >= 16 && counter <= 20) {
-            return JAlarmSeverity.Major;
+            return JAlarmSeverity.Major();
         }
-        return JAlarmSeverity.Critical;
+        return JAlarmSeverity.Critical();
     }
 
     private void setCounterAlarm(int counter) {

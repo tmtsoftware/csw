@@ -15,7 +15,7 @@ import org.scalatestplus.junit.JUnitSuite;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 
-import static csw.alarm.api.javadsl.JAlarmSeverity.Major;
+import csw.alarm.api.javadsl.JAlarmSeverity;
 import static csw.params.javadsl.JSubsystem.NFIRAOS;
 
 public class JAlarmRefreshActorTest extends JUnitSuite {
@@ -33,7 +33,7 @@ public class JAlarmRefreshActorTest extends JUnitSuite {
             return Done.done();
         }), Duration.ofMillis(200), typedSystem);
 
-        ref.tell(new AutoRefreshSeverity(alarmKey, Major));
+        ref.tell(new AutoRefreshSeverity(alarmKey, JAlarmSeverity.Major()));
         probe.expectMessage(refreshMsg);
         probe.expectNoMessage(Duration.ofMillis(190));
         probe.expectMessage(Duration.ofMillis(50), refreshMsg);

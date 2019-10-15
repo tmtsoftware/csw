@@ -25,7 +25,7 @@ import scala.concurrent.duration.FiniteDuration;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import static csw.alarm.api.javadsl.JAlarmSeverity.Indeterminate;
+import csw.alarm.api.javadsl.JAlarmSeverity;
 
 // DEOPSCSW-481: Component Developer API available to all CSW components
 public class JAlarmServiceFactoryTest extends JUnitSuite {
@@ -62,18 +62,18 @@ public class JAlarmServiceFactoryTest extends JUnitSuite {
     @Test
     public void shouldCreateClientAlarmServiceUsingLocationService() throws Exception {
         IAlarmService alarmServiceUsingLS = alarmServiceFactory.jMakeClientApi(locationService, seedSystem);
-        alarmServiceUsingLS.setSeverity(testSetup.tromboneAxisHighLimitAlarmKey(), Indeterminate).get();
+        alarmServiceUsingLS.setSeverity(testSetup.tromboneAxisHighLimitAlarmKey(), JAlarmSeverity.Indeterminate()).get();
 
         FullAlarmSeverity alarmSeverity = Await.result(alarmService.getCurrentSeverity(testSetup.tromboneAxisHighLimitAlarmKey()), Duration.create(5, TimeUnit.SECONDS));
-        Assert.assertEquals(alarmSeverity, Indeterminate);
+        Assert.assertEquals(alarmSeverity, JAlarmSeverity.Indeterminate());
     }
 
     @Test
     public void shouldCreateClientAlarmServiceUsingHostAndPort() throws Exception {
         IAlarmService alarmServiceUsingHostPort = alarmServiceFactory.jMakeClientApi(testSetup.hostname(), testSetup.sentinelPort(), seedSystem);
-        alarmServiceUsingHostPort.setSeverity(testSetup.tromboneAxisHighLimitAlarmKey(), Indeterminate).get();
+        alarmServiceUsingHostPort.setSeverity(testSetup.tromboneAxisHighLimitAlarmKey(), JAlarmSeverity.Indeterminate()).get();
 
         FullAlarmSeverity alarmSeverity = Await.result(alarmService.getCurrentSeverity(testSetup.tromboneAxisHighLimitAlarmKey()), Duration.create(5, TimeUnit.SECONDS));
-        Assert.assertEquals(alarmSeverity, Indeterminate);
+        Assert.assertEquals(alarmSeverity, JAlarmSeverity.Indeterminate());
     }
 }
