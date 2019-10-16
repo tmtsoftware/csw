@@ -4,9 +4,9 @@ import akka.actor.typed.scaladsl.ActorContext
 import akka.stream.Materializer
 import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.util.Timeout
-import csw.command.client.Completer.{Completer, OverallFailure, OverallResponse, OverallSuccess}
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandServiceFactory
+import csw.command.client.Completer.{Completer, OverallFailure, OverallSuccess}
 import csw.command.client.messages.TopLevelActorMessage
 import csw.common.components.command.CommandComponentState._
 import csw.framework.models.CswContext
@@ -26,7 +26,6 @@ import csw.time.core.models.UTCTime
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
 class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
     extends ComponentHandlers(ctx, cswCtx) {
@@ -112,69 +111,36 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         // Assembly starts long-running and returns started
         Started(command.commandName, runId)
       case `longRunningCmdToAsmComp` =>
-        val long    = hcdComponent.submit(longRunning)
-        val shorter = hcdComponent.submit(shortRunning)
-        Future.sequence(Set(long, shorter)).onComplete {
-          case Success(responses) =>
-            val completer: Completer =
-              Completer.withAutoCompletion(runId, command, responses, cswCtx.loggerFactory, commandResponseManager)
-            responses.foreach(doComplete(_, completer))
-
-            completer.waitComplete() //.collect {
-//              case OverallSuccess(_) =>
-//                commandResponseManager.updateCommand(Completed(command.commandName, runId))
-//              case OverallFailure(responses) =>
-//                commandResponseManager.updateCommand(Error(command.commandName, runId, s"$responses"))
-//            }
-//          should move inside
-//          case Failure(exception) =>
-//            // Lift subcommand timeout to an error
-//            commandResponseManager.updateCommand(Error(command.commandName, runId, s"$exception"))
-        }
+        val long      = hcdComponent.submit(longRunning)
+        val shorter   = hcdComponent.submit(shortRunning)
+        val responses = Set(long, shorter)
+        val completer: Completer =
+          Completer.withAutoCompletion(runId, command, responses, cswCtx.loggerFactory, commandResponseManager)
+        responses.foreach(resF => resF.foreach(res => doComplete(res, completer)))
         Started(command.commandName, runId)
       case `longRunningCmdToAsmCActor` =>
         implicit val timeout: Timeout     = 3.seconds
         implicit val ec: ExecutionContext = ctx.system.executionContext
 
-        val long    = hcdComponent.submit(longRunning)
-        val shorter = hcdComponent.submit(shortRunning)
-        Future.sequence(Set(long, shorter)).onComplete {
-          case Success(responses) =>
-            val completer = Completer(responses, cswCtx.loggerFactory)
-            responses.foreach(doComplete(_, completer))
-
-            val f: Future[OverallResponse] = completer.waitComplete()
-//            f.map {
-//              case OverallSuccess(_) =>
-//                commandResponseManager.updateCommand(Completed(command.commandName, runId))
-//              case OverallFailure(responses) =>
-//                commandResponseManager.updateCommand(Error(command.commandName, runId, s"$responses"))
-//            }
-
-          case Failure(exception) =>
-            // Lift subcommand timeout to an error
-            commandResponseManager.updateCommand(Error(command.commandName, runId, s"$exception"))
+        val longF     = hcdComponent.submit(longRunning)
+        val shorterF  = hcdComponent.submit(shortRunning)
+        val responses = Set(longF, shorterF)
+        val completer = Completer(responses, cswCtx.loggerFactory)
+        responses.foreach(resF => resF.foreach(res => doComplete(res, completer)))
+        completer.waitComplete().foreach {
+          case OverallSuccess(_) =>
+            commandResponseManager.updateCommand(Completed(command.commandName, runId))
+          case OverallFailure(responses) =>
+            commandResponseManager.updateCommand(Error(command.commandName, runId, s"$responses"))
         }
+
         Started(command.commandName, runId)
       case `longRunningCmdToAsmInvalid` =>
-        val long    = hcdComponent.submit(longRunning)
-        val shorter = hcdComponent.submit(shortRunningError)
-        Future.sequence(Set(long, shorter)).onComplete {
-          case Success(responses) =>
-            val completer = Completer(responses, cswCtx.loggerFactory)
-            responses.foreach(doComplete(_, completer))
-
-            completer.waitComplete() //.collect {
-//              case OverallSuccess(_) =>
-//                commandResponseManager.updateCommand(Completed(command.commandName, runId))
-//              case OverallFailure(_) =>
-//                // Could look at the responses here and improve update
-//                commandResponseManager.updateCommand(Error(command.commandName, runId, "ERROR"))
-//            }
-          case Failure(exception) =>
-            // Lift subcommand timeout to an error
-            commandResponseManager.updateCommand(Error(command.commandName, runId, s"$exception"))
-        }
+        val long      = hcdComponent.submit(longRunning)
+        val shorter   = hcdComponent.submit(shortRunningError)
+        val responses = Set(long, shorter)
+        val completer = Completer.withAutoCompletion(runId, command, responses, cswCtx.loggerFactory, commandResponseManager)
+        responses.foreach(resF => resF.foreach(res => doComplete(res, completer)))
         Started(command.commandName, runId)
       case `cmdWithBigParameter` =>
         Completed(command.commandName, runId, Result(command.paramSet))

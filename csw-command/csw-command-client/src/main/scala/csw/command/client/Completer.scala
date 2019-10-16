@@ -1,15 +1,16 @@
 package csw.command.client
 
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse.{Completed, Error, QueryResponse, SubmitResponse}
 import csw.params.commands.{CommandResponse, ControlCommand}
 import csw.params.core.models.Id
 
-import scala.collection.JavaConverters.mapAsJavaMapConverter
 import scala.collection.convert.ImplicitConversionsToScala.{`iterable AsScalaIterable`, `map AsScalaConcurrentMap`}
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.util.{Failure, Success}
 
 /**
  *  Contains the Completer class and data types
@@ -25,35 +26,24 @@ object Completer {
   class Completer private (
       maybeParentId: Option[Id],
       maybeParentCommand: Option[ControlCommand],
-      childResponses: Set[SubmitResponse],
+      childResponses: Set[Future[SubmitResponse]],
       loggerFactory: LoggerFactory,
       maybeCrm: Option[CommandResponseManager]
-  ) {
-    private val data            = new ConcurrentHashMap[Id, QueryResponse](childResponses.map(res => res.runId -> res).toMap.asJava)
+  )(implicit ec: ExecutionContext) {
+
+    private val data         = new ConcurrentHashMap[Id, QueryResponse]()
+    private val failureCount = new AtomicInteger(0)
+
+    childResponses.foreach(_.onComplete {
+      case Success(response) => data.put(response.runId, response)
+      case Failure(_)        => failureCount.getAndIncrement()
+    })
+
     private val completePromise = Promise[OverallResponse]()
     private val log             = loggerFactory.getLogger
     import log._
 
-    // Catch the case where one of the already completed is a negative resulting in failure already
-    // Or all the commands are already completed
-
-    private def maybeNegativeResponse: Option[QueryResponse] =
-      data.find { case (_, res) => CommandResponse.isNegative(res) }.map(_._2)
-    private def areAllResponsesFinal: Boolean = data.forall { case (_, res) => CommandResponse.isFinal(res) }
-
     checkAndComplete()
-
-    private def checkAndComplete(): Unit = {
-      if (areAllResponsesFinal) {
-        if (maybeNegativeResponse.isDefined) {
-          maybeCrm.foreach(_.updateCommand(Error(maybeParentCommand.get.commandName, maybeParentId.get, "Downstream failed")))
-          completePromise.trySuccess(OverallFailure(data.values().toSet))
-        } else {
-          maybeCrm.foreach(_.updateCommand(Completed(maybeParentCommand.get.commandName, maybeParentId.get)))
-          completePromise.trySuccess(OverallSuccess(data.values().toSet))
-        }
-      }
-    }
 
     /**
      * Called to update the completer with a final result of a long running command
@@ -67,11 +57,7 @@ object Completer {
         } else {
           warn(
             "An attempt to update a finished command was detected and was ignored",
-            Map(
-              "runId"            -> response.runId,
-              "existingResponse" -> data(response.runId),
-              "newResponse"      -> response
-            )
+            Map("runId" -> response.runId, "existingResponse" -> data(response.runId), "newResponse" -> response)
           )
         }
       } else {
@@ -87,19 +73,37 @@ object Completer {
       completePromise.future
     }
 
+    private def isAnyResponseNegative: Boolean =
+      data.exists { case (_, res) => CommandResponse.isNegative(res) } || failureCount.get() > 0
+
+    private def areAllResponsesFinal: Boolean =
+      data.forall { case (_, res) => CommandResponse.isFinal(res) } && ((data.size() + failureCount.get()) == childResponses.size)
+
+    private def checkAndComplete(): Unit = {
+      if (areAllResponsesFinal) {
+        if (isAnyResponseNegative) {
+          maybeCrm.foreach(_.updateCommand(Error(maybeParentCommand.get.commandName, maybeParentId.get, "Downstream failed")))
+          completePromise.trySuccess(OverallFailure(data.values().toSet))
+        } else {
+          maybeCrm.foreach(_.updateCommand(Completed(maybeParentCommand.get.commandName, maybeParentId.get)))
+          completePromise.trySuccess(OverallSuccess(data.values().toSet))
+        }
+      }
+    }
   }
 
   object Completer {
-    def apply(responses: Set[SubmitResponse], loggerFactory: LoggerFactory): Completer =
+    def apply(responses: Set[Future[SubmitResponse]], loggerFactory: LoggerFactory)(implicit ec: ExecutionContext): Completer =
       new Completer(None, None, responses, loggerFactory, None)
 
     def withAutoCompletion(
         parentId: Id,
         parentCommand: ControlCommand,
-        childResponses: Set[SubmitResponse],
+        childResponses: Set[Future[SubmitResponse]],
         loggerFactory: LoggerFactory,
         crm: CommandResponseManager
-    ) = new Completer(Some(parentId), Some(parentCommand), childResponses, loggerFactory, Some(crm))
+    )(implicit ec: ExecutionContext) =
+      new Completer(Some(parentId), Some(parentCommand), childResponses, loggerFactory, Some(crm))
 
   }
 }

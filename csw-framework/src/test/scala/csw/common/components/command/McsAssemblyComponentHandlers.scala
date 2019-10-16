@@ -2,9 +2,9 @@ package csw.common.components.command
 
 import akka.actor.typed.scaladsl.ActorContext
 import akka.util.Timeout
-import csw.command.client.Completer.{Completer, OverallFailure, OverallSuccess}
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandServiceFactory
+import csw.command.client.Completer.{Completer, OverallFailure, OverallSuccess}
 import csw.command.client.messages.TopLevelActorMessage
 import csw.common.components.command.ComponentStateForCommand.{longRunningCmdCompleted, _}
 import csw.framework.models.CswContext
@@ -87,30 +87,25 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
     val short  = hcdComponent.submit(shortSetup)
 
     // sequence used here to issue commands in parallel
-    Future.sequence(Set(long, medium, short)).onComplete {
-      case Success(responses) =>
-        // Create a Completer that can be handed in and used to wait for all subcommands to complete
-        val completer = Completer(responses, cswCtx.loggerFactory)
-        // Hand the completer to the handleSubcommandResponse so it can be used to update when subcommands complete
-        responses.foreach(handleSubcommandResponse(_, completer))
+    val responses = Set(long, medium, short)
+    val completer = Completer(responses, cswCtx.loggerFactory)
+    // Hand the completer to the handleSubcommandResponse so it can be used to update when subcommands complete
+    responses.foreach(resF => resF.foreach(res => handleSubcommandResponse(res, completer)))
 
-        completer.waitComplete().onComplete {
-          case Success(overall) =>
-            currentStatePublisher.publish(
-              CurrentState(controlCommand.source, StateName("testStateName"), Set(choiceKey.set(longRunningCmdCompleted)))
-            )
-            overall match {
-              case OverallSuccess(_) =>
-                commandResponseManager.updateCommand(Completed(controlCommand.commandName, runId))
-              case OverallFailure(responses) =>
-                commandResponseManager.updateCommand(Error(controlCommand.commandName, runId, s"$responses"))
-            }
-          case Failure(x) =>
-            // Lift subcommand timeout to an error
-            commandResponseManager.updateCommand(Error(controlCommand.commandName, runId, s"${x.toString}"))
+    completer.waitComplete().onComplete {
+      case Success(overall) =>
+        currentStatePublisher.publish(
+          CurrentState(controlCommand.source, StateName("testStateName"), Set(choiceKey.set(longRunningCmdCompleted)))
+        )
+        overall match {
+          case OverallSuccess(_) =>
+            commandResponseManager.updateCommand(Completed(controlCommand.commandName, runId))
+          case OverallFailure(responses) =>
+            commandResponseManager.updateCommand(Error(controlCommand.commandName, runId, s"$responses"))
         }
-      case Failure(ex) =>
-        println(s"Some future failure-log: $ex")
+      case Failure(x) =>
+        // Lift subcommand timeout to an error
+        commandResponseManager.updateCommand(Error(controlCommand.commandName, runId, s"${x.toString}"))
     }
 
   }

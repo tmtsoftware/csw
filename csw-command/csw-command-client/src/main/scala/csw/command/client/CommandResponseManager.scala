@@ -18,12 +18,13 @@ class CommandResponseManager(maxSize: Int) {
     .newBuilder()
     .maximumSize(maxSize)
     .removalListener((k: Id, v: CRMState, _: RemovalCause) => {
-      //fixme: log a warning
+      //todo: log a warning
       v.subscribers.foreach(_ ! CommandResponse.Error(v.response.commandName, k, "too many commands"))
     })
     .build()
 
   private[csw] def queryFinal(runId: Id, replyTo: ActorRef[QueryResponse]): Unit = {
+
     val currentStateMaybe = Option(cache.getIfPresent(runId))
     currentStateMaybe match {
       case Some(state @ CRMState(_: Started, _)) =>
@@ -48,6 +49,8 @@ class CommandResponseManager(maxSize: Int) {
    *
    * @param submitResponse final update for a started command [[csw.params.commands.CommandResponse.SubmitResponse]]
    */
+
+  // fixme: update to subscribers not being done. can be done in cache update key as well
   def updateCommand(submitResponse: SubmitResponse): Unit = cache.put(submitResponse.runId, CRMState(submitResponse))
 
 }
