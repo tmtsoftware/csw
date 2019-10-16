@@ -3,7 +3,7 @@ import akka.actor.typed
 import akka.actor.typed.SpawnProtocol
 import csw.alarm.api.scaladsl.AlarmService
 import csw.alarm.client.AlarmServiceFactory
-import csw.command.client.CommandResponseManager
+import csw.command.client.{CommandResponseManager, MiniCRM}
 import csw.command.client.models.framework.ComponentInfo
 import csw.config.api.scaladsl.ConfigClientService
 import csw.config.client.scaladsl.ConfigClientFactory
@@ -74,7 +74,9 @@ object CswContext {
       val currentStatePublisher = new CurrentStatePublisher(pubSubComponentActor)
 
       // create CommandResponseManager (CRM)
-      val crm = new CommandResponseManager(10)
+      val crmBehavior = MiniCRM.make()
+      val crmActor    = await(richSystem.spawnTyped(crmBehavior, CommandResponseManagerActorName))
+      val crm         = new CommandResponseManager(crmActor, 10)
 
       new CswContext(
         locationService,

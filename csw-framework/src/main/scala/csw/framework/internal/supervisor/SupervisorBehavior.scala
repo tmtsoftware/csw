@@ -8,6 +8,7 @@ import akka.actor.typed.scaladsl._
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.{CoordinatedShutdown, Scheduler}
 import akka.util.Timeout
+import csw.command.client.MiniCRM.CRMMessage
 import csw.command.client.messages.ComponentCommonMessage.{
   ComponentStateSubscription,
   GetSupervisorLifecycleState,
@@ -206,8 +207,9 @@ private[framework] final class SupervisorBehavior(
    * @param runningMessage message representing a message received in [[SupervisorLifecycleState.Running]] state
    */
   private def onRunning(runningMessage: SupervisorRunningMessage): Unit = runningMessage match {
-    case Query(runId, replyTo)                => commandResponseManager.query(runId, replyTo)
-    case QueryFinal(runId, replyTo)           => commandResponseManager.queryFinal(runId, replyTo)
+    case Query(runId, replyTo) => commandResponseManager.commandResponseManagerActor ! CRMMessage.Query(runId, replyTo)
+    case QueryFinal(runId, replyTo) =>
+      commandResponseManager.commandResponseManagerActor ! CRMMessage.QueryFinal(runId, replyTo)
     case Lock(source, replyTo, leaseDuration) => lockComponent(source, replyTo, leaseDuration)
     case Unlock(source, replyTo)              => unlockComponent(source, replyTo)
     case cmdMsg: CommandMessage =>

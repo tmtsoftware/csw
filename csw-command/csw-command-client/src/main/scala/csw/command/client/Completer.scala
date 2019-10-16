@@ -49,7 +49,9 @@ object Completer {
      * Called to update the completer with a final result of a long running command
      * @param response the [[SubmitResponse]] of the completed command
      */
-    def update(response: QueryResponse): Unit = {
+    // this is incorrect. since initial responses are added to data cache on future completion, this method if not used properly will result
+    // into unexpected behavior. e.g. update happens before future completion
+    def update(response: QueryResponse): Unit =
       if (data.containsKey(response.runId)) {
         if (CommandResponse.isIntermediate(data(response.runId))) {
           data.put(response.runId, response)
@@ -63,15 +65,12 @@ object Completer {
       } else {
         warn("An attempt to update a non-existing command was detected and ignored", Map("runId" -> response.runId))
       }
-    }
 
     /**
      * Called by client code to wait for all long-running commands to complete
      * @return An [[OverallResponse]] indicating the success or failure of the completed commands
      */
-    def waitComplete(): Future[OverallResponse] = {
-      completePromise.future
-    }
+    def waitComplete(): Future[OverallResponse] = completePromise.future
 
     private def isAnyResponseNegative: Boolean =
       data.exists { case (_, res) => CommandResponse.isNegative(res) } || failureCount.get() > 0
@@ -79,7 +78,7 @@ object Completer {
     private def areAllResponsesFinal: Boolean =
       data.forall { case (_, res) => CommandResponse.isFinal(res) } && ((data.size() + failureCount.get()) == childResponses.size)
 
-    private def checkAndComplete(): Unit = {
+    private def checkAndComplete(): Unit =
       if (areAllResponsesFinal) {
         if (isAnyResponseNegative) {
           maybeCrm.foreach(_.updateCommand(Error(maybeParentCommand.get.commandName, maybeParentId.get, "Downstream failed")))
@@ -89,7 +88,6 @@ object Completer {
           completePromise.trySuccess(OverallSuccess(data.values().toSet))
         }
       }
-    }
   }
 
   object Completer {
