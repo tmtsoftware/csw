@@ -3,8 +3,8 @@ package csw.common.components.command
 import akka.actor.typed.scaladsl.ActorContext
 import akka.util.Timeout
 import csw.command.api.scaladsl.CommandService
-import csw.command.client.CommandServiceFactory
-import csw.command.client.Completer.{Completer, OverallFailure, OverallSuccess}
+import csw.command.client.CompleterActor.{OverallFailure, OverallSuccess}
+import csw.command.client.{CommandServiceFactory, Completer}
 import csw.command.client.messages.TopLevelActorMessage
 import csw.common.components.command.ComponentStateForCommand.{longRunningCmdCompleted, _}
 import csw.framework.models.CswContext
@@ -88,7 +88,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
 
     // sequence used here to issue commands in parallel
     val responses = Set(long, medium, short)
-    val completer = Completer(responses, cswCtx.loggerFactory)
+    val completer = Completer(responses, cswCtx.loggerFactory)(ctx)
     // Hand the completer to the handleSubcommandResponse so it can be used to update when subcommands complete
     responses.foreach(resF => resF.foreach(res => handleSubcommandResponse(res, completer)))
 

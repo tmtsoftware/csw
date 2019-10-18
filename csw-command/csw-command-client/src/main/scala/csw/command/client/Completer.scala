@@ -34,14 +34,14 @@ class Completer private (ref: ActorRef[CommandCompleterMessage])(implicit ctx: A
    *
    * @return An [[OverallResponse]] indicating the success or failure of the completed commands
    */
-  def waitComplete()(implicit timeout: Timeout = Timeout(5.seconds)): Future[OverallResponse] = {
+  def waitComplete()(implicit timeout: Timeout): Future[OverallResponse] = {
     implicit val scheduler: Scheduler = ctx.system.scheduler
     ref ? WaitComplete
   }
 }
 
 object Completer {
-  def make(responses: Set[Future[SubmitResponse]], loggerFactory: LoggerFactory)(implicit ctx: ActorContext[_]) =
+  def apply(responses: Set[Future[SubmitResponse]], loggerFactory: LoggerFactory)(implicit ctx: ActorContext[_]) =
     new Completer(CompleterActor.make(responses, loggerFactory))
 
   def withAutoCompletion(
