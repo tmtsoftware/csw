@@ -1,16 +1,14 @@
 package csw.command.client
 
 import akka.actor.testkit.typed.scaladsl.ActorTestKit
-import csw.command.client.MiniCRM.CRMMessage.{AddResponse, GetState}
-import csw.command.client.MiniCRM.CRMState
+import csw.command.client.CommandResponseManagerActor.CRMMessage.{AddResponse, GetState}
+import csw.command.client.CommandResponseManagerActor.CRMState
 import csw.params.commands.CommandName
 import csw.params.commands.CommandResponse._
 import csw.params.core.models.Id
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
-import scala.concurrent.duration._
-
-class MiniCRMTest extends FunSuite with Matchers with BeforeAndAfterAll {
+class CommandResponseManagerActorTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   val testKit = ActorTestKit()
 
@@ -18,7 +16,7 @@ class MiniCRMTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   // This test just adds responses to make sure they are added properly to the response list
   test("add responses, check inclusion") {
-    val crm           = testKit.spawn(MiniCRM.make())
+    val crm           = testKit.spawn(CommandResponseManagerActor.make(10))
     val responseProbe = testKit.createTestProbe[Map[Id, CRMState]]()
 
     val id1 = Id()

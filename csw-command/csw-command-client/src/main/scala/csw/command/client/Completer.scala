@@ -13,7 +13,6 @@ import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 
 import scala.concurrent.Future
-import scala.concurrent.duration.DurationLong
 
 /**
  *  Contains the Completer class and data types
@@ -41,7 +40,7 @@ class Completer private (ref: ActorRef[CommandCompleterMessage])(implicit ctx: A
 }
 
 object Completer {
-  def apply(responses: Set[Future[SubmitResponse]], loggerFactory: LoggerFactory)(implicit ctx: ActorContext[_]) =
+  def apply(responses: Set[Future[SubmitResponse]], loggerFactory: LoggerFactory)(implicit ctx: ActorContext[_]): Completer =
     new Completer(CompleterActor.make(responses, loggerFactory))
 
   def withAutoCompletion(

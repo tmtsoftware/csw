@@ -178,7 +178,7 @@ private[framework] object ComponentBehavior {
             log.info(s"Invoking lifecycle handler's onSubmit hook with msg :[$commandMessage]")
             val submitResponse = lifecycleHandlers.onSubmit(runId, commandMessage.command)
             submitResponse match {
-              case started: Started => commandResponseManager.updateCommand(started)
+              case started: Started => commandResponseManager.addCommand(started)
               case _                => // Do nothing
             }
             replyTo ! submitResponse

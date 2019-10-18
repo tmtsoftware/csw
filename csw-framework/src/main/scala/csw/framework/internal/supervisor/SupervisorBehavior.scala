@@ -8,7 +8,7 @@ import akka.actor.typed.scaladsl._
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.{CoordinatedShutdown, Scheduler}
 import akka.util.Timeout
-import csw.command.client.MiniCRM.CRMMessage
+import csw.command.client.CommandResponseManagerActor.CRMMessage
 import csw.command.client.messages.ComponentCommonMessage.{
   ComponentStateSubscription,
   GetSupervisorLifecycleState,
