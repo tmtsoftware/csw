@@ -7,7 +7,6 @@ import akka.actor.typed.scaladsl.AskPattern._
 import akka.util.Timeout
 import csw.command.client.CompleterActor.CommandCompleterMessage.{Update, WaitComplete}
 import csw.command.client.CompleterActor.{CommandCompleterMessage, OverallResponse}
-import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse.{QueryResponse, SubmitResponse}
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
@@ -40,16 +39,15 @@ class Completer private (ref: ActorRef[CommandCompleterMessage])(implicit ctx: A
 }
 
 object Completer {
-  def apply(responses: Set[Future[SubmitResponse]], loggerFactory: LoggerFactory)(implicit ctx: ActorContext[_]): Completer =
-    new Completer(CompleterActor.make(responses, loggerFactory))
+  def apply(responses: Set[Future[SubmitResponse]])(implicit ctx: ActorContext[_]): Completer =
+    new Completer(CompleterActor.make(responses))
 
   def withAutoCompletion(
+      childResponses: Set[Future[SubmitResponse]],
       parentId: Id,
       parentCommand: ControlCommand,
-      childResponses: Set[Future[SubmitResponse]],
-      loggerFactory: LoggerFactory,
       crm: CommandResponseManager
   )(implicit ctx: ActorContext[_]): Completer =
-    new Completer(CompleterActor.withAutoCompletion(parentId, parentCommand, childResponses, loggerFactory, crm))
+    new Completer(CompleterActor.withAutoCompletion(childResponses, parentId, parentCommand, crm))
 
 }

@@ -88,7 +88,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
 
     // sequence used here to issue commands in parallel
     val responses = Set(long, medium, short)
-    val completer = Completer(responses, cswCtx.loggerFactory)(ctx)
+    val completer = Completer(responses)(ctx)
     // Hand the completer to the handleSubcommandResponse so it can be used to update when subcommands complete
     responses.foreach(resF => resF.foreach(res => handleSubcommandResponse(res, completer)))
 

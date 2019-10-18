@@ -115,7 +115,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         val shorter   = hcdComponent.submit(shortRunning)
         val responses = Set(long, shorter)
         val completer: Completer =
-          Completer.withAutoCompletion(runId, command, responses, cswCtx.loggerFactory, commandResponseManager)(ctx)
+          Completer.withAutoCompletion(responses, runId, command, commandResponseManager)(ctx)
         responses.foreach(resF => resF.foreach(res => doComplete(res, completer)))
         Started(command.commandName, runId)
       case `longRunningCmdToAsmCActor` =>
@@ -125,7 +125,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         val longF     = hcdComponent.submit(longRunning)
         val shorterF  = hcdComponent.submit(shortRunning)
         val responses = Set(longF, shorterF)
-        val completer = Completer(responses, cswCtx.loggerFactory)(ctx)
+        val completer = Completer(responses)(ctx)
         responses.foreach(resF => resF.foreach(res => doComplete(res, completer)))
         completer.waitComplete().foreach {
           case OverallSuccess(_) =>
@@ -139,7 +139,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         val long      = hcdComponent.submit(longRunning)
         val shorter   = hcdComponent.submit(shortRunningError)
         val responses = Set(long, shorter)
-        val completer = Completer.withAutoCompletion(runId, command, responses, cswCtx.loggerFactory, commandResponseManager)(ctx)
+        val completer = Completer.withAutoCompletion(responses, runId, command, commandResponseManager)(ctx)
         responses.foreach(resF => resF.foreach(res => doComplete(res, completer)))
         Started(command.commandName, runId)
       case `cmdWithBigParameter` =>
