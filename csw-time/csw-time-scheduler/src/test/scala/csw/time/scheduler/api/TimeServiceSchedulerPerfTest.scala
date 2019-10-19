@@ -5,7 +5,7 @@ import java.time.{Duration, Instant}
 
 import akka.actor.testkit.typed.scaladsl
 import akka.actor.testkit.typed.scaladsl.{ScalaTestWithActorTestKit, TestProbe}
-import akka.actor.typed.ActorSystem
+import akka.actor.typed.{ActorSystem, Scheduler}
 import akka.actor.typed.scaladsl.Behaviors
 import csw.time.core.models.UTCTime
 import csw.time.scheduler.TimeServiceSchedulerFactory
@@ -19,6 +19,7 @@ class TimeServiceSchedulerPerfTest extends ScalaTestWithActorTestKit with FunSui
 
   private val sys                                         = ActorSystem(Behaviors.empty, "test")
   private implicit val executionContext: ExecutionContext = sys.executionContext
+  private implicit val scheduler: Scheduler               = sys.scheduler
   private val timeService                                 = new TimeServiceSchedulerFactory().make()
 
   for (scenario <- TestSettings.all) {

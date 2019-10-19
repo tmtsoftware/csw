@@ -19,7 +19,14 @@ private[event] class EventPublisherUtil(implicit ec: ExecutionContext, actorSyst
 
   private val logger = EventServiceLogger.getLogger
 
-  lazy val (actorRef, stream) = Source.actorRef[(Event, Promise[Done])](1024, OverflowStrategy.dropHead).preMaterialize()
+  lazy val (actorRef, stream) = Source
+    .actorRef[(Event, Promise[Done])](
+      PartialFunction.empty,
+      PartialFunction.empty,
+      1024,
+      OverflowStrategy.dropHead
+    )
+    .preMaterialize()
 
   def streamTermination(f: Event => Future[Done]): Future[Done] =
     stream

@@ -2,7 +2,6 @@ package csw.command.client
 
 import java.util.concurrent.{CompletableFuture, TimeoutException}
 
-import akka.actor.typed.Scheduler
 import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
@@ -24,7 +23,6 @@ class CommandResponseManager(
     private[csw] val commandResponseManagerActor: ActorRef[CommandResponseManagerMessage]
 )(implicit val actorSystem: ActorSystem[_]) {
 
-  private implicit val scheduler: Scheduler = actorSystem.scheduler
   private implicit val ec: ExecutionContext = actorSystem.executionContext
 
   /**

@@ -51,7 +51,7 @@ private[event] class RedisSubscriber(redisURI: Future[RedisURI], redisClient: Re
     log.info(s"Subscribing to event keys: $eventKeys")
     val eventSubscriptionApi: RedisSubscriptionApi[EventKey, Event] = subscriptionApi()
 
-    val latestEventStream: Source[Event, NotUsed] = Source.fromFuture(get(eventKeys)).mapConcat(identity)
+    val latestEventStream: Source[Event, NotUsed] = Source.future(get(eventKeys)).mapConcat(identity)
     val redisStream: Source[Event, RedisSubscription] =
       eventSubscriptionApi.subscribe(eventKeys.toList, OverflowStrategy.LATEST).map(_.value)
 

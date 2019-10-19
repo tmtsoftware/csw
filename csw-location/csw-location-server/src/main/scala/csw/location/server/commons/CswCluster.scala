@@ -4,7 +4,7 @@ import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.typed.{ActorRef, ActorSystem, Scheduler, SpawnProtocol}
+import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import akka.cluster.ddata.SelfUniqueAddress
 import akka.cluster.ddata.typed.scaladsl
 import akka.cluster.ddata.typed.scaladsl.{DistributedData, Replicator}
@@ -40,7 +40,6 @@ class CswCluster private (_typedSystem: ActorSystem[SpawnProtocol.Command]) {
 
   implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = _typedSystem
   implicit val untypedSystem: actor.ActorSystem                = _typedSystem.toClassic
-  implicit val scheduler: Scheduler                            = typedSystem.scheduler
   implicit val ec: ExecutionContext                            = typedSystem.executionContext
   implicit val mat: Materializer                               = makeMat()
   implicit val cluster: Cluster                                = Cluster(typedSystem)

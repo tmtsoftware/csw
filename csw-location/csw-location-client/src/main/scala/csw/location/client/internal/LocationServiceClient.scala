@@ -153,7 +153,7 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
       val response = await(Http().singleRequest(request))
       await(Unmarshal(response.entity).to[Source[ServerSentEvent, NotUsed]])
     }
-    val sseStream = Source.fromFuture(sseStreamFuture).flatMapConcat(identity)
+    val sseStream = Source.future(sseStreamFuture).flatMapConcat(identity)
     sseStream
       .map { x =>
         Json.decode(x.data.getBytes("utf8")).to[TrackingEvent].value

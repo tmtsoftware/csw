@@ -47,7 +47,7 @@ object Libs {
   val `otj-pg-embedded` = "com.opentable.components"      % "otj-pg-embedded" % "0.13.2"
   val httpclient        = "org.apache.httpcomponents"     % "httpclient"      % "4.5.10"
   val `jboss-logging`   = "org.jboss.logging"             % "jboss-logging"   % "3.4.1.Final"
-  val `config`          = "com.typesafe"                  % "config"          % "1.3.4"
+  val `config`          = "com.typesafe"                  % "config"          % "1.4.0"
   val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.3.0"
   val `caffeine`        = "com.github.ben-manes.caffeine" % "caffeine"        % "2.8.0"
 
@@ -70,8 +70,7 @@ object Jackson {
 }
 
 object Akka {
-  //REMEMBER: remove Akka-snapshot resolver from Common settings once moved to a stable version
-  val Version = "2.6.0-M8" //all akka is Apache License 2.0
+  val Version = "2.6.0-RC1" //all akka is Apache License 2.0
 
   val `akka-stream`              = "com.typesafe.akka" %% "akka-stream"              % Version
   val `akka-stream-typed`        = "com.typesafe.akka" %% "akka-stream-typed"        % Version
@@ -91,10 +90,11 @@ object Akka {
 }
 
 object AkkaHttp {
-  val Version             = "10.1.10"
-  val `akka-http`         = "com.typesafe.akka" %% "akka-http" % Version //ApacheV2
-  val `akka-http-testkit` = "com.typesafe.akka" %% "akka-http-testkit" % Version //ApacheV2
-  val `akka-http-cors`    = "ch.megard" %% "akka-http-cors" % "0.4.1"
+  val Version                = "10.1.10"
+  val `akka-http`            = "com.typesafe.akka" %% "akka-http" % Version //ApacheV2
+  val `akka-http-testkit`    = "com.typesafe.akka" %% "akka-http-testkit" % Version //ApacheV2
+  val `akka-http-cors`       = "ch.megard" %% "akka-http-cors" % "0.4.1"
+  val `akka-http-spray-json` = "com.typesafe.akka" %% "akka-http-spray-json" % Version
 }
 
 object Keycloak {

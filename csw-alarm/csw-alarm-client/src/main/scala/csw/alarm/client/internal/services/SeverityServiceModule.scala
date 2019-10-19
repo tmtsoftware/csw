@@ -108,7 +108,7 @@ private[client] trait SeverityServiceModule extends SeverityService {
     }
 
     Source
-      .fromFutureSource(severitySourceF)
+      .futureSource(severitySourceF)
       .mapMaterializedValue { mat =>
         new AlarmSubscription {
           override def unsubscribe(): Future[Done] = mat.flatMap(_.unsubscribe())

@@ -1,7 +1,7 @@
 package csw.command.client.internal
 
 import akka.actor.typed.scaladsl.AskPattern._
-import akka.actor.typed.{ActorRef, ActorSystem, Scheduler}
+import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.command.api.scaladsl.SequencerCommandService
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
@@ -16,8 +16,7 @@ import scala.concurrent.duration.DurationInt
 class SequencerCommandServiceImpl(sequencerLocation: AkkaLocation)(
     implicit system: ActorSystem[_]
 ) extends SequencerCommandService {
-  private implicit val timeout: Timeout     = Timeout(10.hour)
-  private implicit val scheduler: Scheduler = system.scheduler
+  private implicit val timeout: Timeout = Timeout(10.hour)
 
   private val sequencer: ActorRef[SubmitSequenceAndWait] = sequencerLocation.sequencerRef
 
