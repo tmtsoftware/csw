@@ -1,6 +1,7 @@
 package csw.framework.integration
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
+import akka.actor.typed.SpawnProtocol.Spawn
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.http.scaladsl.Http
@@ -11,13 +12,7 @@ import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.command.client.messages.SupervisorContainerCommonMessages.Shutdown
-import csw.command.client.models.framework.{
-  Components,
-  ContainerLifecycleState,
-  LifecycleStateChanged,
-  PubSub,
-  SupervisorLifecycleState
-}
+import csw.command.client.models.framework.{Components, ContainerLifecycleState, LifecycleStateChanged, PubSub, SupervisorLifecycleState}
 import csw.common.components.command.CommandComponentState._
 import csw.common.FrameworkAssertions._
 import csw.event.client.helpers.TestFutureExt.RichFuture
@@ -41,8 +36,8 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
   private val irisContainerConnection  = AkkaConnection(ComponentId("WFOS_Container", ComponentType.Container))
   private val filterAssemblyConnection = AkkaConnection(ComponentId("FilterASS", Assembly))
   private val filterHCDConnection      = AkkaConnection(ComponentId("FilterHCD", HCD))
-  private val containerActorSystem: ActorSystem[SpawnProtocol] =
-    ActorSystemFactory.remote(SpawnProtocol.behavior, "container-system")
+  private val containerActorSystem: ActorSystem[SpawnProtocol.Command] =
+    ActorSystemFactory.remote(SpawnProtocol(), "container-system")
   val obsId                         = Some(ObsId("Obs001"))
   implicit val timeout: Timeout     = 12.seconds
   implicit val ec: ExecutionContext = containerActorSystem.executionContext
@@ -213,7 +208,7 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
     //#submitAll
 
     // ********** Message: Shutdown **********
-    Http(containerActorSystem.toUntyped).shutdownAllConnectionPools().await
+    Http(containerActorSystem.toClassic).shutdownAllConnectionPools().await
     resolvedContainerRef ! Shutdown
 
     // this proves that ComponentBehaviors postStop signal gets invoked for all components

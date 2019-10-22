@@ -29,7 +29,7 @@ abstract class ScalaTestFrameworkTestKit(val frameworkTestKit: FrameworkTestKit,
   def this(services: CSWService*) = this(FrameworkTestKit(), services: _*)
 
   /** Initialize testkit with provided actorSystem */
-  def this(actorSystem: ActorSystem[SpawnProtocol]) = this(FrameworkTestKit(actorSystem))
+  def this(actorSystem: ActorSystem[SpawnProtocol.Command]) = this(FrameworkTestKit(actorSystem))
 
   /** Delegate to framework testkit */
   def spawnContainer(config: Config): ActorRef[ContainerMessage] = frameworkTestKit.spawnContainer(config)

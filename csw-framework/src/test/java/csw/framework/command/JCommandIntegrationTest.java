@@ -4,8 +4,7 @@ import akka.actor.testkit.typed.javadsl.TestInbox;
 import akka.actor.testkit.typed.javadsl.TestProbe;
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.SpawnProtocol;
-import akka.stream.ActorMaterializer;
-import akka.stream.typed.javadsl.ActorMaterializerFactory;
+import akka.stream.Materializer;
 import akka.util.Timeout;
 import com.typesafe.config.ConfigFactory;
 import csw.command.api.CurrentStateSubscription;
@@ -59,6 +58,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static csw.common.components.command.ComponentStateForCommand.*;
+import csw.location.api.javadsl.JComponentType;
 import static csw.location.api.javadsl.JComponentType.HCD;
 import static csw.location.models.Connection.AkkaConnection;
 
@@ -72,9 +72,9 @@ import static csw.location.models.Connection.AkkaConnection;
 // DEOPSCSW-317: Use state values of HCD to determine command completion
 // DEOPSCSW-321: AkkaLocation provides wrapper for ActorRef[ComponentMessage]
 public class JCommandIntegrationTest extends JUnitSuite {
-    private static ActorSystem<SpawnProtocol> hcdActorSystem = ActorSystemFactory.remote(SpawnProtocol.behavior(), "test");
+    private static ActorSystem<SpawnProtocol.Command> hcdActorSystem = ActorSystemFactory.remote(SpawnProtocol.create(), "test");
     private ExecutionContext ec = hcdActorSystem.executionContext();
-    private static ActorMaterializer mat = ActorMaterializerFactory.create(hcdActorSystem);
+    private static Materializer mat = Materializer.createMaterializer(hcdActorSystem);
 
     private static JHTTPLocationService jHttpLocationService;
     private static ILocationService locationService;
@@ -104,7 +104,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         FrameworkWiring wiring = FrameworkWiring.make(hcdActorSystem, redisClient);
         Await.result(Standalone.spawn(ConfigFactory.load("mcs_hcd_java.conf"), wiring), new FiniteDuration(5, TimeUnit.SECONDS));
 
-        AkkaConnection akkaConnection = new AkkaConnection(new ComponentId("Test_Component_Running_Long_Command_Java", HCD));
+        AkkaConnection akkaConnection = new AkkaConnection(new ComponentId("Test_Component_Running_Long_Command_Java", JComponentType.HCD()));
         CompletableFuture<Optional<AkkaLocation>> eventualLocation = locationService.resolve(akkaConnection, java.time.Duration.ofSeconds(5));
         Optional<AkkaLocation> maybeLocation = eventualLocation.get();
         Assert.assertTrue(maybeLocation.isPresent());

@@ -4,7 +4,8 @@ import akka.actor
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.stream.scaladsl.{Sink, Source}
-import akka.stream.{ActorMaterializer, ThrottleMode}
+import akka.stream.{Materializer, ThrottleMode}
+import akka.util.Timeout
 import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
@@ -15,6 +16,7 @@ import csw.params.commands.{CommandName, ControlCommand, Result, Setup}
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
+import csw.time.core.models.UTCTime
 
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContext, Future}
@@ -28,9 +30,9 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
   private val cancelCmdName = KeyType.StringKey.make(name = "cancelCmdName")
 
   import ComponentStateForCommand._
-  private implicit val actorSystem: actor.ActorSystem = ctx.system.toUntyped
+  private implicit val actorSystem: actor.ActorSystem = ctx.system.toClassic
   private implicit val ec: ExecutionContext           = ctx.executionContext
-  private implicit val mat: ActorMaterializer         = ActorMaterializer()
+  private implicit val mat: Materializer              = Materializer(actorSystem)
 
   override def initialize(): Future[Unit] = Future.unit
 
@@ -136,7 +138,7 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
     // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
     // This simulates a long running command that eventually updates with a result
     Source
-      .fromFuture(Future(Completed(controlCommand.commandName, runId, result)))
+      .future(Future(Completed(controlCommand.commandName, runId, result)))
       .delay(500.milli)
       .runWith(Sink.head)
       .onComplete {
@@ -169,6 +171,10 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
           .throttle(1, 100.millis, 1, ThrottleMode.Shaping)
           .runWith(Sink.ignore)
     }
+
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = ???
+
+  override def onOperationsMode(): Unit = ???
 
   override def onShutdown(): Future[Unit] = ???
 

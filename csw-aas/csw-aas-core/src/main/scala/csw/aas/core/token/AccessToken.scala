@@ -2,12 +2,11 @@ package csw.aas.core.token
 
 import csw.aas.core.commons.AuthLogger
 import csw.aas.core.token.claims.{Access, Audience, Authorization}
-import play.api.libs.json._
 
 /**
  * Represents JSON Web Token (JWT) for TMT.
  * JWTs part of OpenID Connect specification
- *
+ * @param value JWT string representation of access token
  * @param sub Subject (whom the token refers to)
  * @param iat Issued at (Seconds since UNIX epoch)
  * @param exp Expiration Time (Seconds since UNIX epoch)
@@ -31,6 +30,7 @@ import play.api.libs.json._
  *                   This is present only when request is on behalf of a client and not user
  */
 case class AccessToken(
+    value: String = "",
     //standard checks
     sub: Option[String] = None,
     iat: Option[Long] = None,
@@ -106,8 +106,4 @@ case class AccessToken(
     case (None, Some(c)) => c
     case _               => UnknownUser
   }
-}
-
-object AccessToken {
-  implicit val accessTokenFormat: OFormat[AccessToken] = Json.using[Json.WithDefaultValues].format
 }

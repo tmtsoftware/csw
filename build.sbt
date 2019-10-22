@@ -1,7 +1,13 @@
+import org.tmt.sbt.docs.DocKeys._
+import org.tmt.sbt.docs.{Settings => DocSettings}
 import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
 
 val enableCoverage         = sys.props.get("enableCoverage").contains("true")
 val MaybeCoverage: Plugins = if (enableCoverage) Coverage else Plugins.empty
+
+docsRepo in ThisBuild := "git@github.com:tmtsoftware/tmtsoftware.github.io.git"
+docsParentDir in ThisBuild := "csw"
+gitCurrentRepo in ThisBuild := "https://github.com/tmtsoftware/csw"
 
 lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-admin-server`,
@@ -73,12 +79,12 @@ lazy val multiJvmProjects: Seq[ProjectReference] = Seq(
 /* ================= Root Project ============== */
 lazy val `csw` = project
   .in(file("."))
-  .enablePlugins(NoPublish, UnidocSite, GithubPublishDocs, GitBranchPrompt, GithubRelease, CoursierPlugin)
+  .enablePlugins(NoPublish, UnidocSitePlugin, GithubPublishPlugin, GitBranchPrompt, GithubRelease, CoursierPlugin)
   .disablePlugins(BintrayPlugin)
   .aggregate(aggregatedProjects: _*)
-  .settings(Settings.mergeSiteWith(docs))
+  .settings(DocSettings.makeSiteMappings(docs))
   .settings(Settings.addAliases)
-  .settings(Settings.docExclusions(unidocExclusions))
+  .settings(DocSettings.docExclusions(unidocExclusions))
   .settings(Settings.multiJvmTestTask(multiJvmProjects))
   .settings(GithubRelease.githubReleases(githubReleases))
   .settings(
@@ -282,7 +288,7 @@ lazy val `csw-logging-api` = project
     `csw-logging-models-jvm`
   )
   .settings(
-    libraryDependencies += Enumeratum.`enumeratum`.value
+    libraryDependencies += Libs.`enumeratum`.value
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
 
@@ -551,7 +557,13 @@ lazy val `romaine` = project
   )
 
 /* ================= Paradox Docs ============== */
-lazy val docs = project.enablePlugins(NoPublish, ParadoxSite)
+lazy val docs = project
+  .enablePlugins(NoPublish, ParadoxMaterialSitePlugin)
+  .settings(
+    paradoxProperties in Paradox ++= Map(
+      "extref.csw_js.base_url" -> s"https://tmtsoftware.github.io/csw-js/${Settings.cswJsVersion}/%s"
+    )
+  )
 
 /* =================== Examples ================ */
 lazy val examples = project

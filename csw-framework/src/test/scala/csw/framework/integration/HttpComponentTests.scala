@@ -47,8 +47,8 @@ class HttpComponentTests extends FrameworkIntegrationSuite {
   private val filterHCDConnection      = AkkaConnection(ComponentId("FilterHCD", HCD))
   private val httpFilterAssembly       = HttpConnection(ComponentId("FilterASS", Assembly))
 
-  private val containerActorSystem: ActorSystem[SpawnProtocol] =
-    ActorSystemFactory.remote(SpawnProtocol.behavior, "container-system")
+  private val containerActorSystem: ActorSystem[SpawnProtocol.Command] =
+    ActorSystemFactory.remote(SpawnProtocol(), "container-system")
   val obsId                         = Some(ObsId("Obs001"))
   implicit val timeout: Timeout     = 12.seconds
   implicit val ec: ExecutionContext = containerActorSystem.executionContext
@@ -229,7 +229,7 @@ class HttpComponentTests extends FrameworkIntegrationSuite {
     result.asInstanceOf[Completed].result.paramSet shouldBe setupForBigParameters.paramSet
 
     // ********** Message: Shutdown **********
-    Http(containerActorSystem.toUntyped).shutdownAllConnectionPools().await
+    Http(containerActorSystem.toClassic).shutdownAllConnectionPools().await
     resolvedContainerRef ! Shutdown
 
     // this proves that ComponentBehaviors postStop signal gets invoked for all components

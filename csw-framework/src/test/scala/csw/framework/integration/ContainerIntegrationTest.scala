@@ -1,9 +1,9 @@
 package csw.framework.integration
 
+import akka.actor.Status
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.http.scaladsl.Http
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.testkit
 import com.typesafe.config.ConfigFactory
@@ -42,8 +42,8 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
   private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
   private val instrumentHcdConnection  = AkkaConnection(models.ComponentId("Instrument_Filter", HCD))
   private val disperserHcdConnection   = AkkaConnection(models.ComponentId("Disperser", HCD))
-  private val containerActorSystem: ActorSystem[SpawnProtocol] =
-    ActorSystemFactory.remote(SpawnProtocol.behavior, "container-system")
+  private val containerActorSystem: ActorSystem[SpawnProtocol.Command] =
+    ActorSystemFactory.remote(SpawnProtocol(), "container-system")
 
   override def afterAll(): Unit = {
     containerActorSystem.terminate()
@@ -170,34 +170,33 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
 
     assertThatContainerIsRunning(resolvedContainerRef, containerLifecycleStateProbe, 2.seconds)
 
-    val containerTracker      = testkit.TestProbe()(seedActorSystem.toUntyped)
-    val filterAssemblyTracker = testkit.TestProbe()(seedActorSystem.toUntyped)
-    val instrumentHcdTracker  = testkit.TestProbe()(seedActorSystem.toUntyped)
-    val disperserHcdTracker   = testkit.TestProbe()(seedActorSystem.toUntyped)
+    val containerTracker      = testkit.TestProbe()(seedActorSystem.toClassic)
+    val filterAssemblyTracker = testkit.TestProbe()(seedActorSystem.toClassic)
+    val instrumentHcdTracker  = testkit.TestProbe()(seedActorSystem.toClassic)
+    val disperserHcdTracker   = testkit.TestProbe()(seedActorSystem.toClassic)
 
     // start tracking container and all the components, so that on Shutdown message, all the trackers gets LocationRemoved event
     seedLocationService
       .track(irisContainerConnection)
-      .toMat(Sink.actorRef[TrackingEvent](containerTracker.ref, "Completed"))(Keep.both)
+      .toMat(Sink.actorRef[TrackingEvent](containerTracker.ref, "Completed", t => Status.Failure(t)))(Keep.both)
       .run()
 
     seedLocationService
       .track(filterAssemblyConnection)
-      .toMat(Sink.actorRef[TrackingEvent](filterAssemblyTracker.ref, "Completed"))(Keep.both)
+      .toMat(Sink.actorRef[TrackingEvent](filterAssemblyTracker.ref, "Completed", t => Status.Failure(t)))(Keep.both)
       .run()
 
     seedLocationService
       .track(instrumentHcdConnection)
-      .toMat(Sink.actorRef[TrackingEvent](instrumentHcdTracker.ref, "Completed"))(Keep.both)
+      .toMat(Sink.actorRef[TrackingEvent](instrumentHcdTracker.ref, "Completed", t => Status.Failure(t)))(Keep.both)
       .run()
 
     seedLocationService
       .track(disperserHcdConnection)
-      .toMat(Sink.actorRef[TrackingEvent](disperserHcdTracker.ref, "Completed"))(Keep.both)
+      .toMat(Sink.actorRef[TrackingEvent](disperserHcdTracker.ref, "Completed", t => Status.Failure(t)))(Keep.both)
       .run()
 
     // ********** Message: Shutdown **********
-    Http(containerActorSystem.toUntyped).shutdownAllConnectionPools().await
     resolvedContainerRef ! Shutdown
 
     // this proves that ComponentBehaviors postStop signal gets invoked for all components

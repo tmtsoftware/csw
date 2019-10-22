@@ -2,9 +2,9 @@ package csw.location.client.internal
 
 import java.io.IOException
 
-import akka.actor.typed.ActorSystem
+import akka.actor.typed.{ActorSystem, Scheduler}
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.{CoordinatedShutdown, Scheduler}
+import akka.actor.CoordinatedShutdown
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshalling.Marshal
 import akka.http.scaladsl.model._
@@ -44,7 +44,7 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
     with DoneCodec { outer =>
 
   import actorSystem.executionContext
-  implicit val untypedSystem: actor.ActorSystem = actorSystem.toUntyped
+  implicit val untypedSystem: actor.ActorSystem = actorSystem.toClassic
   implicit val scheduler: Scheduler             = actorSystem.scheduler
 
   private val baseUri = s"http://$serverIp:$serverPort/location"
@@ -153,7 +153,7 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
       val response = await(Http().singleRequest(request))
       await(Unmarshal(response.entity).to[Source[ServerSentEvent, NotUsed]])
     }
-    val sseStream = Source.fromFuture(sseStreamFuture).flatMapConcat(identity)
+    val sseStream = Source.future(sseStreamFuture).flatMapConcat(identity)
     sseStream
       .map { x =>
         Json.decode(x.data.getBytes("utf8")).to[TrackingEvent].value

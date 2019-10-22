@@ -1,7 +1,6 @@
 package csw.command.client
 
-import akka.actor.Scheduler
-import akka.actor.typed.ActorRef
+import akka.actor.typed.{ActorRef, Scheduler}
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.AskPattern._
 import akka.util.Timeout

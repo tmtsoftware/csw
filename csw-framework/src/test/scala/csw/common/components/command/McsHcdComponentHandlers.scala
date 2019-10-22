@@ -9,6 +9,7 @@ import csw.location.models.TrackingEvent
 import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
+import csw.time.core.models.UTCTime
 import csw.params.core.models.Id
 
 import scala.concurrent.Future
@@ -44,19 +45,19 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
 
     controlCommand.commandName match {
       case `longRunning` =>
-        scheduler.scheduleOnce(5.seconds) {
-          commandResponseManager.updateCommand(Completed(controlCommand.commandName, runId))
-        }
+        scheduler.scheduleOnce(5.seconds,
+          () => commandResponseManager.updateCommand(Completed(controlCommand.commandName, runId))
+        )
         Started(controlCommand.commandName, runId)
       case `mediumRunning` =>
-        scheduler.scheduleOnce(3.seconds) {
-          commandResponseManager.updateCommand(Completed(controlCommand.commandName, runId))
-        }
+        scheduler.scheduleOnce(3.seconds,
+          () => commandResponseManager.updateCommand(Completed(controlCommand.commandName, runId))
+        )
         Started(controlCommand.commandName, runId)
       case `shortRunning` =>
-        scheduler.scheduleOnce(1.seconds) {
-          commandResponseManager.updateCommand(Completed(controlCommand.commandName, runId))
-        }
+        scheduler.scheduleOnce(1.seconds,
+          () => commandResponseManager.updateCommand(Completed(controlCommand.commandName, runId))
+        )
         Started(controlCommand.commandName, runId)
       case `failureAfterValidationCmd` =>
         //  SHOULDN"T BE NEEDED commandUpdatePublisher.update(Error(controlCommand.commandName, runId, "Failed command"))
@@ -67,6 +68,10 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   }
 
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
+
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = ???
+
+  override def onOperationsMode(): Unit = ???
 
   override def onShutdown(): Future[Unit] = Future.unit
 

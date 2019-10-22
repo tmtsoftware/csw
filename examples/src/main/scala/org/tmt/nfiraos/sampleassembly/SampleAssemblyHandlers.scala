@@ -14,6 +14,7 @@ import csw.params.commands.{CommandName, CommandResponse, ControlCommand, Setup}
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.{Id, ObsId, Prefix, Units}
 import csw.params.events._
+import csw.time.core.models.UTCTime
 
 import scala.async.Async._
 import scala.concurrent.{ExecutionContextExecutor, Future}
@@ -184,6 +185,14 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse = Completed(controlCommand.commandName, runId)
 
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
+
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {
+    // do something on Diagnostic Mode
+  }
+
+  override def onOperationsMode(): Unit = {
+    // do something on Operations Mode
+  }
 
   override def onGoOffline(): Unit = {}
 

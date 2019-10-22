@@ -9,6 +9,7 @@ import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandResponse.{Accepted, Completed, SubmitResponse, ValidateCommandResponse}
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
+import csw.time.core.models.UTCTime
 
 import scala.concurrent.Future
 
@@ -46,4 +47,8 @@ class GalilComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   override def onGoOffline(): Unit = ()
 
   override def onGoOnline(): Unit = ()
+
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = ()
+
+  override def onOperationsMode(): Unit = ()
 }

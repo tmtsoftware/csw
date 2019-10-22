@@ -1,10 +1,9 @@
 package csw.framework.internal.supervisor
 
-import akka.actor.{ActorSystem, Scheduler}
+import akka.actor.{ActorSystem, typed}
 import akka.actor.typed.scaladsl.AskPattern._
-import akka.actor.typed.{ActorRef, Behavior}
 import akka.actor.typed.scaladsl._
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.{ActorRef, Behavior, Scheduler}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.server.Directives._
@@ -24,9 +23,10 @@ import csw.params.core.formats.ParamCodecs
 import csw.params.core.models.Id
 
 import scala.async.Async.{async, await}
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
-import scala.concurrent.ExecutionContext.Implicits.global
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 
 object ComponentHttpBehavior {
   implicit val defaultTimeout: Timeout = 10.seconds
@@ -104,8 +104,7 @@ object ComponentHttpBehavior {
     }
 
     def initHttpEndPoint(ctx: ActorContext[_], route: Route): Future[ServerBinding] = async {
-      implicit val actorSystem: ActorSystem        = ctx.system.toUntyped
-      implicit val materializer: ActorMaterializer = akka.stream.ActorMaterializer()
+      implicit val actorSystem: ActorSystem = ctx.system.toClassic
 
       val hostname = Networks().hostname
       // The following uses the hostname and creates a port for the HTTP endpoint

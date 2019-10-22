@@ -53,7 +53,7 @@ private[event] class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[S
     }
 
     eventStream
-      .prepend(Source.fromFutureSource(invalidEvents))
+      .prepend(Source.futureSource(invalidEvents))
       .watchTermination()(Keep.both)
       .mapMaterializedValue {
         case (controlF, completionF) =>
@@ -127,7 +127,7 @@ private[event] class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[S
 
   private def getEventStream(subscription: Future[Subscription]): Source[Event, Future[scaladsl.Consumer.Control]] = {
     val future = subscription.flatMap(s => consumerSettings.map(c => scaladsl.Consumer.plainSource(c, s)))
-    Source.fromFutureSource(future).map(x => EventConverter.toEvent(x.value()))
+    Source.futureSource(future).map(x => EventConverter.toEvent(x.value()))
   }
 
   //Get the last offset for the given partitions. The last offset of a partition is the offset of the upcoming

@@ -1,8 +1,10 @@
 package csw.framework.javadsl.components;
 
+import akka.actor.Cancellable;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Adapter;
 import akka.stream.ActorMaterializer;
+import akka.stream.Materializer;
 import akka.stream.ThrottleMode;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
@@ -10,6 +12,7 @@ import csw.command.client.CommandResponseManager;
 import csw.command.client.messages.TopLevelActorMessage;
 import csw.common.components.command.ComponentStateForCommand;
 import csw.common.components.framework.SampleComponentState;
+import csw.event.api.javadsl.IEventService;
 import csw.framework.CurrentStatePublisher;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
@@ -19,11 +22,16 @@ import csw.params.commands.*;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.Id;
+import csw.params.core.models.Prefix;
 import csw.params.core.states.CurrentState;
 import csw.params.core.states.StateName;
+import csw.params.events.EventName;
+import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
+import csw.time.core.models.UTCTime;
 
 import java.time.Duration;
+import java.util.Optional;
 import java.util.concurrent.*;
 
 import static csw.common.components.command.ComponentStateForCommand.*;
@@ -36,6 +44,8 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     private CurrentStatePublisher currentStatePublisher;
     private CurrentState currentState = new CurrentState(SampleComponentState.prefix(), new StateName("testStateName"));
     private ActorContext<TopLevelActorMessage> actorContext;
+    private IEventService eventService;
+    private Optional<Cancellable> diagModeCancellable = Optional.empty();
 
     JSampleComponentHandlers(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
         super(ctx, cswCtx);
@@ -43,6 +53,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         this.log = cswCtx.loggerFactory().getLogger(getClass());
         this.commandResponseManager = cswCtx.commandResponseManager();
         this.actorContext = ctx;
+        this.eventService = cswCtx.eventService();
     }
 
     @Override
@@ -173,8 +184,8 @@ public class JSampleComponentHandlers extends JComponentHandlers {
                     currentStatePublisher.publish(new CurrentState(controlCommand.source(), new StateName("testStateName")).add(JKeyType.IntKey().make("encoder").set(i * 10)));
                     return i;
                 })
-                .throttle(1, Duration.ofMillis(100), 1, (ThrottleMode) ThrottleMode.shaping())
-                .runWith(Sink.ignore(), ActorMaterializer.create(Adapter.toUntyped(actorContext.getSystem())));
+                .throttle(1, Duration.ofMillis(100), 1, (ThrottleMode)ThrottleMode.shaping())
+                .runWith(Sink.ignore(), Materializer.createMaterializer(Adapter.toClassic(actorContext.getSystem())));
     }
 
 
@@ -235,4 +246,31 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         CurrentState onlineState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.onlineChoice()));
         currentStatePublisher.publish(onlineState);
     }
+
+    //#onDiagnostic-mode
+    @Override
+    public void onDiagnosticMode(UTCTime startTime, String hint) {
+        if (hint.equals("engineering")) {
+            var event = new SystemEvent(new Prefix("TCS.prefix"), new EventName("eventName"))
+                    .add(JKeyType.IntKey().make("diagnostic-data").set(1));
+            diagModeCancellable.map(Cancellable::cancel); // cancel previous diagnostic publishing
+            diagModeCancellable = Optional.of(
+                    eventService.defaultPublisher().publish(
+                            () -> Optional.of(event),
+                            startTime,
+                            Duration.ofMillis(200)
+                    )
+
+            );
+        }
+        // other supported diagnostic modes go here
+    }
+    //#onDiagnostic-mode
+
+    //#onOperations-mode
+    @Override
+    public void onOperationsMode() {
+        diagModeCancellable.map(Cancellable::cancel); // cancel diagnostic mode
+    }
+    //#onOperations-mode
 }

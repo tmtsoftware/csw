@@ -35,9 +35,9 @@ import scala.util.Success
 //DEOPSCSW-182-Control Life Cycle of Components
 //DEOPSCSW-216-Locate and connect components to send AKKA commands
 class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar with ArgumentMatchersSugar {
-  implicit val typedSystem: ActorSystem[SpawnProtocol] = ActorSystemFactory.remote(SpawnProtocol.behavior, "test")
-  implicit val settings: TestKitSettings               = TestKitSettings(typedSystem)
-  private val mocks                                    = new FrameworkTestMocks()
+  implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "test")
+  implicit val settings: TestKitSettings                       = TestKitSettings(typedSystem)
+  private val mocks                                            = new FrameworkTestMocks()
 
   class IdleContainer() {
     private val testActor: ActorRef[Any] = TestProbe("test-probe").ref

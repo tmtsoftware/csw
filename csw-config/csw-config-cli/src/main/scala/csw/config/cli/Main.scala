@@ -1,6 +1,5 @@
 package csw.config.cli
 
-import akka.http.scaladsl.Http
 import csw.config.cli.args.{ArgsParser, Options}
 import csw.config.cli.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
 import csw.config.cli.wiring.Wiring
@@ -24,9 +23,7 @@ object Main extends App {
     try {
       cliApp.start(options)
     } finally {
-      Http(actorRuntime.untypedSystem)
-        .shutdownAllConnectionPools()
-        .foreach(_ => actorRuntime.shutdown(ApplicationFinishedReason))(actorRuntime.ec)
+      actorRuntime.shutdown(ApplicationFinishedReason)
     }
   }
 }

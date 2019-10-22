@@ -3,6 +3,7 @@ package csw.framework.internal.component
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
+import csw.command.client.messages.DiagnosticDataMessage.{DiagnosticMode, OperationsMode}
 import csw.command.client.messages.FromComponentLifecycleMessage.Running
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.TopLevelActorCommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
@@ -110,9 +111,10 @@ private[framework] object ComponentBehavior {
        * @param runningMessage message representing a message received in [[ComponentLifecycleState.Running]] state
        */
       def onRun(runningMessage: RunningMessage): Unit = runningMessage match {
-        case Lifecycle(message) => onLifecycle(message)
-        case x: CommandMessage  => onRunningCompCommandMessage(x)
-        case msg                => log.error(s"Component TLA cannot handle message :[$msg]")
+        case Lifecycle(message)       => onLifecycle(message)
+        case x: CommandMessage        => onRunningCompCommandMessage(x)
+        case x: DiagnosticDataMessage => onRunningCompDiagnosticDataMessage(x)
+        case msg                      => log.error(s"Component TLA cannot handle message :[$msg]")
       }
 
       /*
@@ -139,6 +141,11 @@ private[framework] object ComponentBehavior {
               log.debug(s"Component TLA is Offline")
             }
         }
+
+      def onRunningCompDiagnosticDataMessage(diagnosticDataMessage: DiagnosticDataMessage): Unit = diagnosticDataMessage match {
+        case DiagnosticMode(startTime, hint) => lifecycleHandlers.onDiagnosticMode(startTime, hint)
+        case OperationsMode                  => lifecycleHandlers.onOperationsMode()
+      }
 
       /*
        * Defines action for messages which represent a [[csw.params.commands.Command]]

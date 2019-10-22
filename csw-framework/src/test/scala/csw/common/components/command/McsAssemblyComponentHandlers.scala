@@ -1,5 +1,6 @@
 package csw.common.components.command
 
+import akka.actor.typed.Scheduler
 import akka.actor.typed.scaladsl.ActorContext
 import akka.util.Timeout
 import csw.command.api.scaladsl.CommandService
@@ -16,6 +17,7 @@ import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandIssue, ControlCommand, Setup}
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
+import csw.time.core.models.UTCTime
 
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContext, Future}
@@ -146,6 +148,10 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
   }
 
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
+
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = ???
+
+  override def onOperationsMode(): Unit = ???
 
   override def onShutdown(): Future[Unit] = Future.unit
 

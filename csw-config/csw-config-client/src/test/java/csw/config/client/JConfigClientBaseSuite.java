@@ -53,7 +53,6 @@ public class JConfigClientBaseSuite extends JMockedAuthentication {
     }
 
     public void cleanup() throws Exception {
-        Http.get(actorRuntime.untypedSystem()).shutdownAllConnectionPools().toCompletableFuture().get(10, TimeUnit.SECONDS);
         Await.result(httpService.shutdown(CoordinatedShutdown.unknownReason()), timeout);
         Await.result(actorRuntime.untypedSystem().terminate(), timeout);
         Await.result(serverWiring.actorRuntime().untypedSystem().terminate(), timeout);

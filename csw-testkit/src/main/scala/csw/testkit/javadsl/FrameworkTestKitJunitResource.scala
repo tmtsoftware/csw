@@ -54,12 +54,12 @@ final class FrameworkTestKitJunitResource(val frameworkTestKit: FrameworkTestKit
   def this(services: java.util.List[CSWService]) = this(FrameworkTestKit(), services)
 
   /** Initialize testkit with provided actorSystem */
-  def this(actorSystem: typed.ActorSystem[SpawnProtocol]) = this(FrameworkTestKit(actorSystem), Collections.emptyList())
+  def this(actorSystem: typed.ActorSystem[SpawnProtocol.Command]) = this(FrameworkTestKit(actorSystem), Collections.emptyList())
 
   private val wiring = frameworkTestKit.frameworkWiring
 
   /** Easy access to testkits untyped actor system from java */
-  lazy val actorSystem: typed.ActorSystem[SpawnProtocol] = wiring.actorSystem
+  lazy val actorSystem: typed.ActorSystem[SpawnProtocol.Command] = wiring.actorSystem
 
   /** Easy access to testkits typed actor system from java (just wraps untyped to typed). */
 //  lazy val typedSystem: typed.ActorSystem[_] = actorSystem.toTyped

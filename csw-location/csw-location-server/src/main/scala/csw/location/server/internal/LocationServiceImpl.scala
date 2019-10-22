@@ -50,8 +50,8 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     // Registering a location needs to read from other replicas to avoid duplicate location registration before performing the update
     // This approach is inspired from Migration Guide section of https://github.com/patriknw/akka-data-replication
     val initialValue = (replicator ? service.getByMajority).map {
-      case x @ GetSuccess(_, _) => x.get(service.Key)
-      case _                    => service.EmptyValue
+      case x @ GetSuccess(_) => x.get(service.Key)
+      case _                 => service.EmptyValue
     }
 
     //Create an update message to update the value of connection key. if the current value is None or same as
@@ -158,8 +158,8 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
    * List all locations registered with CRDT
    */
   def list: Future[List[Location]] = (replicator ? AllServices.get).map {
-    case x @ GetSuccess(AllServices.Key, _) => x.get(AllServices.Key).entries.values.toList
-    case NotFound(AllServices.Key, _)       => List.empty
+    case x @ GetSuccess(_)            => x.get(AllServices.Key).entries.values.toList
+    case NotFound(AllServices.Key, _) => List.empty
     case _ =>
       val listingFailed = RegistrationListingFailed
       log.error(listingFailed.getMessage, ex = listingFailed)

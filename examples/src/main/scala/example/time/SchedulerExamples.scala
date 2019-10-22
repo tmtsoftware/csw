@@ -2,7 +2,7 @@ package example.time
 
 import java.time.Duration
 
-import akka.actor.typed.Behavior
+import akka.actor.typed.{Behavior, Scheduler}
 import akka.actor.typed.scaladsl.adapter.TypedActorRefOps
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.{ActorRef, typed}
@@ -10,18 +10,22 @@ import csw.time.core.models.UTCTime
 import csw.time.scheduler.TimeServiceSchedulerFactory
 import csw.time.scheduler.api.TimeServiceScheduler
 
+import scala.concurrent.ExecutionContext
+
 class SchedulerExamples(ctx: ActorContext[UTCTime]) {
 
-  implicit val actorSystem: typed.ActorSystem[_] = ctx.system
   //#create-scheduler
   // create time service scheduler using the factory method
-  private val scheduler: TimeServiceScheduler = TimeServiceSchedulerFactory.make()(actorSystem)
+  implicit val actorSystem: typed.ActorSystem[_]         = ctx.system
+  implicit val scheduler: Scheduler                      = actorSystem.scheduler
+  implicit val executionContext: ExecutionContext        = actorSystem.executionContext
+  private val timeServiceScheduler: TimeServiceScheduler = new TimeServiceSchedulerFactory().make()
   //#create-scheduler
 
   private val utcTime = UTCTime.now()
 
   // #schedule-once
-  scheduler.scheduleOnce(utcTime) {
+  timeServiceScheduler.scheduleOnce(utcTime) {
     // do something
   }
   // #schedule-once
@@ -38,18 +42,18 @@ class SchedulerExamples(ctx: ActorContext[UTCTime]) {
     }
   }
 
-  private val actorRef: ActorRef = ctx.spawnAnonymous(SchedulingHandler.behavior).toUntyped
+  private val actorRef: ActorRef = ctx.spawnAnonymous(SchedulingHandler.behavior).toClassic
 
-  scheduler.scheduleOnce(utcTime, actorRef, UTCTime.now())
+  timeServiceScheduler.scheduleOnce(utcTime, actorRef, UTCTime.now())
 
   // #schedule-once-with-actorRef
 
   // #schedule-periodically
-  scheduler.schedulePeriodically(Duration.ofMillis(50)) { /* do something*/ }
+  timeServiceScheduler.schedulePeriodically(Duration.ofMillis(50)) { /* do something*/ }
   // #schedule-periodically
 
   // #schedule-periodically-with-startTime
-  scheduler.schedulePeriodically(utcTime, Duration.ofMillis(50)) { /* do something*/ }
+  timeServiceScheduler.schedulePeriodically(utcTime, Duration.ofMillis(50)) { /* do something*/ }
   // #schedule-periodically-with-startTime
 
 }

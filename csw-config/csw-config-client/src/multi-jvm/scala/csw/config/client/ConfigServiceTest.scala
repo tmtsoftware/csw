@@ -43,7 +43,7 @@ class ConfigServiceTest(ignore: Int)
 
     runOn(client) {
       enterBarrier("server-started")
-      val actorRuntime = new ActorRuntime(ActorSystem(SpawnProtocol.behavior, "Guardian"))
+      val actorRuntime = new ActorRuntime(ActorSystem(SpawnProtocol(), "Guardian"))
       import actorRuntime._
       val configService = ConfigClientFactory.adminApi(actorRuntime.typedSystem, locationService, factory)
 

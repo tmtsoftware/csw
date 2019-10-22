@@ -30,6 +30,7 @@ import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
 import csw.params.javadsl.JUnits;
+import csw.time.core.models.UTCTime;
 
 import java.util.Optional;
 import java.util.Set;
@@ -194,13 +195,13 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
     //#alarm
     private AlarmSeverity getCounterSeverity(int counter) {
         if (counter >= 0 && counter <= 10) {
-            return JAlarmSeverity.Okay;
+            return JAlarmSeverity.Okay();
         } else if (counter >= 11 && counter <= 15) {
-            return JAlarmSeverity.Warning;
+            return JAlarmSeverity.Warning();
         } else if (counter >= 16 && counter <= 20) {
-            return JAlarmSeverity.Major;
+            return JAlarmSeverity.Major();
         }
-        return JAlarmSeverity.Critical;
+        return JAlarmSeverity.Critical();
     }
 
     private void setCounterAlarm(int counter) {
@@ -237,5 +238,13 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
 
     @Override
     public void onGoOnline() {
+    }
+
+    @Override
+    public void onDiagnosticMode(UTCTime startTime, String hint) {
+    }
+
+    @Override
+    public void onOperationsMode() {
     }
 }

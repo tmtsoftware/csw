@@ -12,6 +12,7 @@ import csw.params.commands.ControlCommand
 import csw.params.core.models.{Id, Prefix}
 import csw.params.core.states.CurrentState
 import csw.serializable.CommandSerializable
+import csw.time.core.models.UTCTime
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -121,6 +122,13 @@ object RunningMessage {
    *                e.g. GoOffline or GoOnline
    */
   case class Lifecycle(message: ToComponentLifecycleMessage) extends RunningMessage with ContainerMessage with RemoteMsg
+}
+
+sealed trait DiagnosticDataMessage extends RunningMessage with CommandSerializable
+
+object DiagnosticDataMessage {
+  case class DiagnosticMode(startTime: UTCTime, hint: String) extends DiagnosticDataMessage with RemoteMsg
+  case object OperationsMode                                  extends DiagnosticDataMessage with RemoteMsg
 }
 
 /**
@@ -286,12 +294,10 @@ case class Query(runId: Id, replyTo: ActorRef[QueryResponse]) extends Supervisor
 case class QueryFinal(runId: Id, replyTo: ActorRef[QueryResponse]) extends SupervisorLockMessage with RemoteMsg
 
 // Parent trait for Messages which will be send to components for interacting with its logging system
-sealed trait LogControlMessages extends ComponentMessage with SequencerMsg with CommandSerializable
+sealed trait LogControlMessage extends ComponentMessage with SequencerMsg with CommandSerializable
 
 // Message to get Logging configuration metadata of the receiver
-case class GetComponentLogMetadata(componentName: String, replyTo: ActorRef[LogMetadata])
-    extends LogControlMessages
-    with RemoteMsg
+case class GetComponentLogMetadata(componentName: String, replyTo: ActorRef[LogMetadata]) extends LogControlMessage with RemoteMsg
 
 // Message to change the log level of any component
-case class SetComponentLogLevel(componentName: String, logLevel: Level) extends LogControlMessages with RemoteMsg
+case class SetComponentLogLevel(componentName: String, logLevel: Level) extends LogControlMessage with RemoteMsg

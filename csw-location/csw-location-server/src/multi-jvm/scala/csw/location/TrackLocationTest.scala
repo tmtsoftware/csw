@@ -1,7 +1,7 @@
 package csw.location
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.Behavior
+import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.scaladsl.{Keep, Sink}
 import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
@@ -34,7 +34,7 @@ class TrackLocationTest(ignore: Int, mode: String) extends LSNodeSpec(config = n
     val prefix = Prefix("nfiraos.ncc.trombone")
 
     runOn(seed) {
-      val actorRef = cswCluster.typedSystem.spawn(Behavior.empty, "trombone-hcd")
+      val actorRef = cswCluster.typedSystem.spawn(Behaviors.empty, "trombone-hcd")
       locationService.register(AkkaRegistrationFactory.make(akkaConnection, prefix, actorRef.toURI)).await
       enterBarrier("Registration")
 

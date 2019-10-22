@@ -2,12 +2,12 @@ package csw.location.server.scaladsl
 
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.scaladsl
+import akka.actor.typed.SpawnProtocol
+import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.typed.{Behavior, SpawnProtocol}
 import akka.actor.{ActorSystem, CoordinatedShutdown, PoisonPill, typed}
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Keep, Sink}
-import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.testkit.TestProbe
 import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.AkkaRegistrationFactory.make
@@ -44,21 +44,21 @@ class LocationServiceCompTest(mode: String)
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
-  implicit var untypedSystem: ActorSystem                    = _
-  implicit var typedSystem: typed.ActorSystem[SpawnProtocol] = _
-  implicit var ec: ExecutionContext                          = _
-  implicit var mat: Materializer                             = _
-  var clusterSystem: typed.ActorSystem[SpawnProtocol]        = _
-  private var locationService: LocationService               = _
+  implicit var untypedSystem: ActorSystem                            = _
+  implicit var typedSystem: typed.ActorSystem[SpawnProtocol.Command] = _
+  implicit var ec: ExecutionContext                                  = _
+  implicit var mat: Materializer                                     = _
+  var clusterSystem: typed.ActorSystem[SpawnProtocol.Command]        = _
+  private var locationService: LocationService                       = _
 
   private val prefix                    = Prefix("nfiraos.ncc.trombone")
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 100.millis)
 
   override protected def beforeAll(): Unit = {
-    typedSystem = ActorSystemFactory.remote(SpawnProtocol.behavior, "test")
-    untypedSystem = typedSystem.toUntyped
+    typedSystem = ActorSystemFactory.remote(SpawnProtocol(), "test")
+    untypedSystem = typedSystem.toClassic
     ec = untypedSystem.dispatcher
-    mat = ActorMaterializer()(typedSystem)
+    mat = Materializer(typedSystem)
     clusterSystem = ClusterAwareSettings.system
 
     locationService = mode match {
@@ -69,7 +69,7 @@ class LocationServiceCompTest(mode: String)
   override protected def afterEach(): Unit = locationService.unregisterAll().await
 
   override protected def afterAll(): Unit = {
-    if (mode == "cluster") CoordinatedShutdown(clusterSystem.toUntyped).run(UnknownReason).await
+    if (mode == "cluster") CoordinatedShutdown(clusterSystem.toClassic).run(UnknownReason).await
     CoordinatedShutdown(untypedSystem).run(UnknownReason).await
   }
 
@@ -143,7 +143,7 @@ class LocationServiceCompTest(mode: String)
   test("should able to register, resolve, list and unregister akka location") {
     val componentId      = models.ComponentId("hcd1", ComponentType.HCD)
     val connection       = AkkaConnection(componentId)
-    val actorRef         = typedSystem.spawn(Behavior.empty, "my-actor-1")
+    val actorRef         = typedSystem.spawn(Behaviors.empty, "my-actor-1")
     val akkaRegistration = AkkaRegistrationFactory.make(connection, Prefix("nfiraos.ncc.trombone"), actorRef.toURI)
 
     // register, resolve & list akka connection for the first time
@@ -172,7 +172,7 @@ class LocationServiceCompTest(mode: String)
   test("akka location death watch actor should unregister services whose actorRef is terminated") {
     val componentId = models.ComponentId("hcd1", ComponentType.HCD)
     val connection  = AkkaConnection(componentId)
-    val actorRef    = typedSystem.spawn(Behavior.empty[Any], "my-actor-to-die")
+    val actorRef    = typedSystem.spawn(Behaviors.empty[Any], "my-actor-to-die")
 
     locationService
       .register(make(connection, prefix, actorRef.toURI))
@@ -251,7 +251,7 @@ class LocationServiceCompTest(mode: String)
     //create akka registration
     val akkaComponentId  = models.ComponentId("container1", ComponentType.Container)
     val akkaConnection   = AkkaConnection(akkaComponentId)
-    val actorRef         = typedSystem.spawn(Behavior.empty, "container1-actor")
+    val actorRef         = typedSystem.spawn(Behaviors.empty, "container1-actor")
     val akkaRegistration = AkkaRegistrationFactory.make(akkaConnection, Prefix(prefix), actorRef.toURI)
 
     val httpRegistrationResult = locationService.register(httpRegistration).await
@@ -373,7 +373,7 @@ class LocationServiceCompTest(mode: String)
   // DEOPSCSW-24: Filter by comp/service type
   test("should filter components with component type") {
     val hcdConnection = AkkaConnection(models.ComponentId("hcd1", ComponentType.HCD))
-    val actorRef      = typedSystem.spawn(Behavior.empty, "my-actor-2")
+    val actorRef      = typedSystem.spawn(Behaviors.empty, "my-actor-2")
 
     locationService.register(make(hcdConnection, prefix, actorRef.toURI)).await
 
@@ -395,7 +395,7 @@ class LocationServiceCompTest(mode: String)
   test("should filter connections based on Connection type") {
     val hcdAkkaConnection = AkkaConnection(models.ComponentId("hcd1", ComponentType.HCD))
     val actorRef = typedSystem.spawn(
-      Behavior.empty,
+      Behaviors.empty,
       "my-actor-3"
     )
 
@@ -433,7 +433,7 @@ class LocationServiceCompTest(mode: String)
 
     val akkaConnection = AkkaConnection(models.ComponentId("hcd1", ComponentType.HCD))
     val actorRef = typedSystem.spawn(
-      Behavior.empty,
+      Behaviors.empty,
       "my-actor-4"
     )
 
@@ -455,9 +455,9 @@ class LocationServiceCompTest(mode: String)
     val akkaConnection2 = AkkaConnection(models.ComponentId("assembly2", ComponentType.Assembly))
     val akkaConnection3 = AkkaConnection(models.ComponentId("hcd3", ComponentType.HCD))
 
-    val actorRef  = typedSystem.spawn(Behavior.empty, "")
-    val actorRef2 = typedSystem.spawn(Behavior.empty, "")
-    val actorRef3 = typedSystem.spawn(Behavior.empty, "")
+    val actorRef  = typedSystem.spawn(Behaviors.empty, "")
+    val actorRef2 = typedSystem.spawn(Behaviors.empty, "")
+    val actorRef3 = typedSystem.spawn(Behaviors.empty, "")
 
     locationService.register(make(akkaConnection1, Prefix("nfiraos.ncc.tromboneHcd1"), actorRef.toURI)).await
     locationService

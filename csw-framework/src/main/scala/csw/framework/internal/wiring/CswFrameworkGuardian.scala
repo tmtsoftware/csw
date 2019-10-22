@@ -29,7 +29,7 @@ private[framework] object CswFrameworkGuardian {
         Behaviors.same
     } receiveSignal {
       case (ctx, Terminated(_)) =>
-        CoordinatedShutdown(ctx.system.toUntyped).run(ActorTerminatedReason)
+        CoordinatedShutdown(ctx.system.toClassic).run(ActorTerminatedReason)
         Behaviors.stopped
     }
 }

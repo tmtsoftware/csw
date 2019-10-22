@@ -1,8 +1,9 @@
 package csw.location
 
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.typed.{ActorSystem, Behavior, SpawnProtocol}
-import akka.stream.typed.scaladsl.ActorMaterializer
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.scaladsl.adapter._
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import akka.stream.Materializer
 import akka.testkit.TestProbe
 import csw.location.api.AkkaRegistrationFactory.make
 import csw.location.api.extensions.ActorExtension.RichActor
@@ -37,7 +38,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
     runOn(member1) {
       locationService
         .register(
-          make(akkaConnection, Prefix("nfiraos.ncc.trombone"), typedSystem.spawn(Behavior.empty, "empty").toURI)
+          make(akkaConnection, Prefix("nfiraos.ncc.trombone"), typedSystem.spawn(Behaviors.empty, "empty").toURI)
         )
         .await
 
@@ -54,14 +55,14 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
         else config.settings.config
 
       val newSystem      = makeSystem(newConfig)
-      val newTypedSystem = newSystem.toTyped.asInstanceOf[ActorSystem[SpawnProtocol]]
+      val newTypedSystem = newSystem.toTyped.asInstanceOf[ActorSystem[SpawnProtocol.Command]]
 
       val freshLocationService = mode match {
         case "http" =>
           Try(ServerWiring.make(newTypedSystem).locationHttpService.start().await) match {
             case _ => // ignore binding errors
           }
-          HttpLocationServiceFactory.makeLocalClient(newTypedSystem, ActorMaterializer()(newTypedSystem))
+          HttpLocationServiceFactory.makeLocalClient(newTypedSystem, Materializer(newTypedSystem))
         case "cluster" => LocationServiceFactory.withCluster(CswCluster.withSystem(newTypedSystem))
       }
 
@@ -72,7 +73,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
           make(
             akkaConnection,
             Prefix("nfiraos.ncc.trombone"),
-            newTypedSystem.spawn(Behavior.empty, "empty").toURI
+            newTypedSystem.spawn(Behaviors.empty, "empty").toURI
           )
         )
         .await

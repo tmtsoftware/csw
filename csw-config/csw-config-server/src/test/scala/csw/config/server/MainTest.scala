@@ -9,7 +9,6 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes, Uri}
 import akka.stream.Materializer
-import akka.stream.typed.scaladsl.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import csw.aas.core.commons.AASConnection
 import csw.config.server.commons.TestFutureExtension.RichFuture
@@ -25,8 +24,8 @@ import scala.concurrent.duration._
 // DEOPSCSW-130: Command line App for HTTP server
 class MainTest extends HTTPLocationService {
   implicit val actorSystem: ActorSystem[_]      = ActorSystem(Behaviors.empty, "config-server")
-  implicit val untypedSystem: actor.ActorSystem = actorSystem.toUntyped
-  implicit val mat: Materializer                = ActorMaterializer()
+  implicit val untypedSystem: actor.ActorSystem = actorSystem.toClassic
+  implicit val mat: Materializer                = Materializer(actorSystem)
 
   private val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient
 

@@ -3,6 +3,7 @@ import java.io.{ByteArrayInputStream, InputStream}
 
 import com.typesafe.config._
 import csw.aas.core.commons.AuthLogger
+import csw.aas.core.deployment.AuthConfig._
 import csw.location.models.HttpLocation
 import org.keycloak.adapters.{KeycloakDeployment, KeycloakDeploymentBuilder}
 import org.keycloak.authorization.client.Configuration
@@ -19,13 +20,14 @@ import scala.util.Try
  */
 class AuthConfig private (config: Config, authServiceLocation: Option[HttpLocation]) {
 
-  private val logger = AuthLogger.getLogger
-  import logger._
+  private val enablePermissionsKey = "enable-permissions"
+  private val clientIdKey          = "client-id"
 
-  val permissionsEnabled: Boolean = {
-    val mayBeValue = Try { config.getBoolean("enable-permissions") }.toOption
-    mayBeValue.nonEmpty && mayBeValue.get
-  }
+  val permissionsEnabled: Boolean = optionalBoolean(config, enablePermissionsKey)
+  val disabled: Boolean           = optionalBoolean(config, disabledKey)
+  private val logger              = AuthLogger.getLogger
+
+  import logger._
 
   /**
    * Creates an instance of KeycloakDeployment using app config.
@@ -36,6 +38,11 @@ class AuthConfig private (config: Config, authServiceLocation: Option[HttpLocati
    */
   private[csw] def getDeployment: KeycloakDeployment =
     authServiceLocation match {
+      case None if (disabled) =>
+        debug("creating keycloak deployment for disabled configuration")
+        val configWithDisabledUrl =
+          config.withValue("auth-server-url", ConfigValueFactory.fromAnyRef("http://disabled-auth-service"))
+        convertToDeployment(configWithDisabledUrl)
       case None =>
         debug("creating keycloak deployment with configured keycloak location")
         convertToDeployment(config)
@@ -46,10 +53,11 @@ class AuthConfig private (config: Config, authServiceLocation: Option[HttpLocati
     }
 
   private def convertToDeployment(config: Config): KeycloakDeployment = {
-    val clientId = config.getString("client-id")
+    val clientId = config.getString(clientIdKey)
     val safeConfig = config
-      .withoutPath("enable-permissions")
-      .withoutPath("client-id")
+      .withoutPath(enablePermissionsKey)
+      .withoutPath(disabledKey)
+      .withoutPath(clientIdKey)
       .withValue("resource", ConfigValueFactory.fromAnyRef(clientId))
 
     debug("converting auth config to json")
@@ -71,6 +79,9 @@ object AuthConfig {
   private val logger = AuthLogger.getLogger
   import logger._
 
+  private[csw] val authConfigKey = "auth-config"
+  private[csw] val disabledKey   = "disabled"
+
   /**
    * Creates an instance of [[csw.aas.core.deployment.AuthConfig]]
    *
@@ -79,12 +90,16 @@ object AuthConfig {
    *                            otherwise it will rely on config for auth-service-url
    */
   def create(
-      // todo : is this right place to load config? or should it be passed from outside
       config: Config = ConfigFactory.load(),
       authServerLocation: Option[HttpLocation] = None
   ): AuthConfig = {
     debug("loading auth config")
-    new AuthConfig(config.getConfig("auth-config"), authServerLocation)
+    new AuthConfig(config.getConfig(authConfigKey), authServerLocation)
+  }
+
+  private def optionalBoolean(config: Config, key: String) = {
+    val mayBeValue = Try { config.getBoolean(key) }.toOption
+    mayBeValue.nonEmpty && mayBeValue.get
   }
 
   private[aas] implicit def deploymentToConfig(deployment: KeycloakDeployment): Configuration =

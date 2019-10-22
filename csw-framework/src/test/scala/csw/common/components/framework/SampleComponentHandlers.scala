@@ -1,5 +1,6 @@
 package csw.common.components.framework
 
+import akka.actor.Cancellable
 import akka.actor.typed.scaladsl.ActorContext
 import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
@@ -15,6 +16,7 @@ import csw.params.core.states.{CurrentState, StateName}
 import csw.params.events.{Event, EventName, SystemEvent}
 import csw.time.core.models.UTCTime
 
+import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContext, Future}
 
 class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
@@ -107,6 +109,28 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
     currentStatePublisher.publish(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
     Thread.sleep(500)
   }
+
+  //#onDiagnostic-mode
+  // While dealing with mutable state, make sure you create a worker actor to avoid concurrency issues
+  // For functionality demonstration, we have simply used a mutable variable without worker actor
+  var diagModeCancellable: Option[Cancellable] = None
+
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {
+    hint match {
+      case "engineering" =>
+        val event = SystemEvent(prefix, diagnosticDataEventName).add(diagnosticModeParam)
+        diagModeCancellable.foreach(_.cancel()) // cancel previous diagnostic publishing
+        diagModeCancellable = Some(eventService.defaultPublisher.publish(Some(event), startTime, 200.millis))
+      case _ =>
+    }
+  }
+  //#onDiagnostic-mode
+
+  //#onOperations-mode
+  override def onOperationsMode(): Unit = {
+    diagModeCancellable.foreach(_.cancel())
+  }
+  //#onOperations-mode
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = trackingEvent match {
     case LocationUpdated(location) =>

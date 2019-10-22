@@ -6,7 +6,6 @@ import akka.actor.typed
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.Materializer
-import akka.stream.typed.scaladsl.ActorMaterializer
 import csw.aas.installed.scaladsl.FileAuthStore
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
@@ -16,7 +15,7 @@ import scala.concurrent.duration.DurationLong
 object Example extends App {
 
   private implicit val actorSystem: typed.ActorSystem[_] = ActorSystem(Behaviors.empty, "test")
-  private implicit val actorMaterializer: Materializer   = ActorMaterializer()
+  private implicit val actorMaterializer: Materializer   = Materializer(actorSystem)
   import actorSystem._
 
   val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient
@@ -33,7 +32,7 @@ object Example extends App {
   private val timeLeft: Long = expires - System.currentTimeMillis() / 1000
   println(s"time left to expire: $timeLeft")
 
-  println(installedAuthAdapter.getAccessTokenString())
+  println(installedAuthAdapter.getAccessToken())
 
-  println(installedAuthAdapter.getAccessTokenString((timeLeft + 100).seconds))
+  println(installedAuthAdapter.getAccessToken((timeLeft + 100).seconds))
 }

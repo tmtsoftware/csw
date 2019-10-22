@@ -2,8 +2,6 @@ package csw.framework.integration
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.SpawnProtocol
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
@@ -41,7 +39,7 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
   // DEOPSCSW-220: Access and Monitor components for current values
   // DEOPSCSW-221: Avoid sending commands to non-executing components
   test("should track connections when locationServiceUsage is RegisterAndTrackServices") {
-    val containerActorSystem    = ActorSystemFactory.remote(SpawnProtocol.behavior, "test1")
+    val containerActorSystem    = ActorSystemFactory.remote(SpawnProtocol(), "test1")
     val wiring: FrameworkWiring = FrameworkWiring.make(containerActorSystem, mock[RedisClient])
 
     // start a container and verify it moves to running lifecycle state
@@ -89,7 +87,6 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
     )
 
     subscription.unsubscribe()
-    Http(containerActorSystem.toUntyped).shutdownAllConnectionPools().await
     containerActorSystem.terminate()
     containerActorSystem.whenTerminated.await
   }
@@ -101,7 +98,7 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
    * */
   //DEOPSCSW-219 Discover component connection using HTTP protocol
   test("component should be able to track http and tcp connections") {
-    val componentActorSystem    = ActorSystemFactory.remote(SpawnProtocol.behavior, "test2")
+    val componentActorSystem    = ActorSystemFactory.remote(SpawnProtocol(), "test2")
     val wiring: FrameworkWiring = FrameworkWiring.make(componentActorSystem, mock[RedisClient])
     // start component in standalone mode
     val assemblySupervisor = Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring).await
@@ -148,7 +145,6 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
       CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(tcpLocationRemovedChoice)))
     )
 
-    Http(componentActorSystem.toUntyped).shutdownAllConnectionPools().await
     componentActorSystem.terminate()
     componentActorSystem.whenTerminated.await
   }

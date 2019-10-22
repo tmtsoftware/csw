@@ -90,7 +90,12 @@ class Matcher(
 
   private def source =
     Source
-      .actorRef[CurrentState](256, OverflowStrategy.fail)
+      .actorRef[CurrentState](
+        PartialFunction.empty,
+        PartialFunction.empty,
+        256,
+        OverflowStrategy.fail
+      )
       .mapMaterializedValue { ref =>
         currentStateSource ! ComponentStateSubscription(Subscribe(ref))
       }

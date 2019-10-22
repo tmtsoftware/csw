@@ -29,7 +29,7 @@ private[location] object LocationServiceFactory {
    * @throws csw.location.api.exceptions.CouldNotJoinCluster
    * @return an instance of `LocationService`
    */
-  def withSystem(actorSystem: ActorSystem[SpawnProtocol]): LocationService =
+  def withSystem(actorSystem: ActorSystem[SpawnProtocol.Command]): LocationService =
     withCluster(CswCluster.withSystem(actorSystem))
 
   /**

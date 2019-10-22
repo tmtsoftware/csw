@@ -5,19 +5,22 @@ import java.time.{Duration, Instant}
 
 import akka.actor.testkit.typed.scaladsl
 import akka.actor.testkit.typed.scaladsl.{ScalaTestWithActorTestKit, TestProbe}
-import akka.actor.typed.ActorSystem
+import akka.actor.typed.{ActorSystem, Scheduler}
 import akka.actor.typed.scaladsl.Behaviors
 import csw.time.core.models.UTCTime
 import csw.time.scheduler.TimeServiceSchedulerFactory
 import org.HdrHistogram.Histogram
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike}
 
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
 
 class TimeServiceSchedulerPerfTest extends ScalaTestWithActorTestKit with FunSuiteLike with BeforeAndAfterAll {
 
-  private val sys         = ActorSystem(Behaviors.empty, "test")
-  private val timeService = TimeServiceSchedulerFactory.make()(sys)
+  private val sys                                         = ActorSystem(Behaviors.empty, "test")
+  private implicit val executionContext: ExecutionContext = sys.executionContext
+  private implicit val scheduler: Scheduler               = sys.scheduler
+  private val timeService                                 = new TimeServiceSchedulerFactory().make()
 
   for (scenario <- TestSettings.all) {
     import scenario._

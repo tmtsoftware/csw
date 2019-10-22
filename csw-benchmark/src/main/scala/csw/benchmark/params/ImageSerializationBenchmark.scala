@@ -56,7 +56,7 @@ class ImageSerializationBenchmark {
     img_512k_Bytes = Files.readAllBytes(img_512k_Path)
 
     system = ActorSystem(Behaviors.empty, "example")
-    serialization = SerializationExtension(system.toUntyped)
+    serialization = SerializationExtension(system.toClassic)
     prefixStr = "wfos.prog.cloudcover"
     obsId = ObsId("Obs001")
   }

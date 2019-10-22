@@ -3,7 +3,6 @@ package csw.location.agent
 import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
-import akka.http.scaladsl.Http
 import csw.location.agent.commons.CoordinatedShutdownReasons.{FailureReason, ProcessTerminated}
 import csw.location.agent.commons.LocationAgentLogger
 import csw.location.agent.models.Command
@@ -90,7 +89,7 @@ class LocationAgent(names: List[String], command: Command, wiring: Wiring) {
   }
 
   private def shutdown(reason: Reason) = Await.result(
-    Http().shutdownAllConnectionPools().flatMap(_ => coordinatedShutdown.run(reason)),
+    coordinatedShutdown.run(reason),
     timeout
   )
 }

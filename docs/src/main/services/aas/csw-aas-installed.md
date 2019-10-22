@@ -41,10 +41,22 @@ this, however it might be useful to override this while testing your app.
 `client-id` is a mandatory configuration which specifies the client ID of the app as per its registration
 in AAS.
 
+`disabled` is an optional configuration with default value of `false`. This flag can 
+be turned on for local development and testing purposes. It can greatly ease 
+the process of testing business logic without having to go through the process 
+of creating users, managing roles and logging in with user credentials to 
+generate valid access tokens. For it to work, the same flag needs to turned 
+on in the server application too.
+
+@@@ warning  { title='Caution' }
+This should not be used in production
+@@@
+
 ```hocon
 auth-config {
   realm = TMT # DEFAULT
   client-id = demo-cli # REQUIRED
+  disabled = false # DEFAULT
 }
 ```
 

@@ -2,7 +2,8 @@ package csw.event.client.internal.redis
 
 import akka.Done
 import akka.actor.Cancellable
-import akka.stream.Materializer
+import akka.actor.typed.ActorSystem
+import akka.stream.Attributes
 import akka.stream.scaladsl.Source
 import csw.event.api.exceptions.PublishFailure
 import csw.event.api.scaladsl.EventPublisher
@@ -24,10 +25,11 @@ import scala.util.control.NonFatal
  *
  * @param redisURI    future containing connection details for the Redis/Sentinel connections.
  * @param redisClient redis client available from lettuce
- * @param mat         the materializer to be used for materializing underlying streams
+ * @param attributes used for materializing underlying streams
  */
 private[event] class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(
-    implicit mat: Materializer,
+    implicit attributes: Attributes,
+    actorSystem: ActorSystem[_],
     ec: ExecutionContext
 ) extends EventPublisher {
 

@@ -51,7 +51,7 @@ private[event] class RedisSubscriber(redisURI: Future[RedisURI], redisClient: Re
     log.info(s"Subscribing to event keys: $eventKeys")
     val eventSubscriptionApi: RedisSubscriptionApi[EventKey, Event] = subscriptionApi()
 
-    val latestEventStream: Source[Event, NotUsed] = Source.fromFuture(get(eventKeys)).mapConcat(identity)
+    val latestEventStream: Source[Event, NotUsed] = Source.future(get(eventKeys)).mapConcat(identity)
     val redisStream: Source[Event, RedisSubscription] =
       eventSubscriptionApi.subscribe(eventKeys.toList, OverflowStrategy.LATEST).map(_.value)
 
@@ -111,7 +111,7 @@ private[event] class RedisSubscriber(redisURI: Future[RedisURI], redisClient: Re
 
   override def get(eventKey: EventKey): Future[Event] = async {
     log.info(s"Fetching event key: $eventKey")
-    val event = await(asyncApi.get(eventKey))
+    val event = await(recoverWithError(asyncApi.get(eventKey)))
     event.getOrElse(Event.invalidEvent(eventKey))
   }
 
@@ -125,9 +125,12 @@ private[event] class RedisSubscriber(redisURI: Future[RedisURI], redisClient: Re
           log.info(s"Unsubscribing for keys=$eventKeys")
           redisSubscription.unsubscribe()
         }
-        override def ready(): Future[Done] = redisSubscription.ready().recover {
-          case RedisServerNotAvailable(ex) => throw EventServerNotAvailable(ex)
-        }
+        override def ready(): Future[Done] = recoverWithError(redisSubscription.ready())
       }
     }
+
+  private def recoverWithError[T](f: Future[T]) = f.recover {
+    case RedisServerNotAvailable(ex) => throw EventServerNotAvailable(ex)
+  }
+
 }

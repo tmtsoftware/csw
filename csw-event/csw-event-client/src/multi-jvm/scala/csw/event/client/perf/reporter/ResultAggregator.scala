@@ -5,14 +5,12 @@ import java.util.concurrent.TimeUnit.SECONDS
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
-import akka.util.{ByteString, Timeout}
+import akka.util.ByteString
 import csw.event.api.scaladsl.{EventSubscriber, EventSubscription}
-import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.perf.utils.EventUtils
 import csw.event.client.perf.utils.EventUtils._
 import csw.params.events.{Event, SystemEvent}
 import org.HdrHistogram.Histogram
-import org.scalatest.time.SpanSugar.convertDoubleToGrainOfTime
 
 class ResultAggregator(
     scenarioName: String,
@@ -87,8 +85,7 @@ class ResultAggregator(
     }
   }
 
-  implicit private val timeout: Timeout          = Timeout(20.seconds)
-  private val eventHandlerActor: ActorRef[Event] = system.systemActorOf(eventHandler, "result-agg").await
+  private val eventHandlerActor: ActorRef[Event] = system.systemActorOf(eventHandler, "result-agg")
 
   def startSubscription(): EventSubscription = subscriber.subscribeActorRef(Set(EventUtils.perfEventKey), eventHandlerActor)
 }

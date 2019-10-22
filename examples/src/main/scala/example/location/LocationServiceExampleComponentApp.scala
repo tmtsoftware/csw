@@ -5,8 +5,7 @@ import java.net.InetAddress
 import akka.actor.typed
 import akka.actor.typed.SpawnProtocol
 import akka.actor.typed.scaladsl.Behaviors
-import akka.stream.ActorMaterializer
-import akka.stream.typed.scaladsl
+import akka.stream.Materializer
 import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
@@ -26,9 +25,9 @@ import scala.concurrent.{Await, Future}
  * An example that shows how to register a component actor with the location service.
  */
 object LocationServiceExampleComponentApp extends App {
-  implicit val system: typed.ActorSystem[SpawnProtocol] = ActorSystemFactory.remote(SpawnProtocol.behavior, "example-system")
-  implicit val mat: ActorMaterializer                   = scaladsl.ActorMaterializer()
-  private val locationService                           = HttpLocationServiceFactory.makeLocalClient
+  implicit val system: typed.ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "example-system")
+  implicit val mat: Materializer                                = Materializer(system)
+  private val locationService                                   = HttpLocationServiceFactory.makeLocalClient
 
   //#create-logging-system
   private val host = InetAddress.getLocalHost.getHostName

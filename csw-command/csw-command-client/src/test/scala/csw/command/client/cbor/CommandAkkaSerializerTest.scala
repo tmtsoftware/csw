@@ -18,7 +18,7 @@ import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.messages._
-import csw.command.client.messages.sequencer.LoadAndStartSequence
+import csw.command.client.messages.sequencer.SubmitSequenceAndWait
 import csw.command.client.models.framework.LockingResponse._
 import csw.command.client.models.framework.PubSub.{Subscribe, SubscribeOnly, Unsubscribe}
 import csw.command.client.models.framework.SupervisorLifecycleState._
@@ -43,9 +43,9 @@ import scala.concurrent.duration.DurationDouble
 
 class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
-  private final implicit val system: ActorSystem[SpawnProtocol] = typed.ActorSystem(SpawnProtocol.behavior, "example")
-  private final val serialization                               = SerializationExtension(system.toUntyped)
-  private final val prefix                                      = Prefix("wfos.prog.cloudcover")
+  private final implicit val system: ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "example")
+  private final val serialization                                       = SerializationExtension(system.toClassic)
+  private final val prefix                                              = Prefix("wfos.prog.cloudcover")
   private final val commandName                                 = CommandName("test")
 
   override protected def afterAll(): Unit = {
@@ -241,17 +241,17 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
     serializer.fromBinary(bytes, Some(components.getClass)) shouldEqual components
   }
 
-  test("should use command serializer for (de)serialize LoadAndStartSequence") {
+  test("should use command serializer for (de)serialize LoadAndProcessSequence") {
     val submitResponseProbe = TestProbe[SubmitResponse]
 
     val command: SequenceCommand = Setup(Prefix("csw.move"), CommandName("c1"), Some(ObsId("obsId")))
     val sequence                 = Sequence(command)
-    val loadAndStartSequence     = LoadAndStartSequence(sequence, submitResponseProbe.ref)
+    val loadAndProcessSequence   = SubmitSequenceAndWait(sequence, submitResponseProbe.ref)
 
-    val serializer = serialization.findSerializerFor(loadAndStartSequence)
+    val serializer = serialization.findSerializerFor(loadAndProcessSequence)
     serializer.getClass shouldBe classOf[CommandAkkaSerializer]
 
-    val bytes = serializer.toBinary(loadAndStartSequence)
-    serializer.fromBinary(bytes, Some(loadAndStartSequence.getClass)) shouldEqual loadAndStartSequence
+    val bytes = serializer.toBinary(loadAndProcessSequence)
+    serializer.fromBinary(bytes, Some(loadAndProcessSequence.getClass)) shouldEqual loadAndProcessSequence
   }
 }

@@ -6,7 +6,6 @@ import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.stream.Materializer
-import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.{actor, Done}
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
@@ -16,9 +15,9 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
  */
 private[csw] class ActorRuntime(_typedSystem: ActorSystem[_] = ActorSystem(Behaviors.empty, "config-client-system")) {
   implicit val typedSystem: ActorSystem[_]      = _typedSystem
-  implicit val untypedSystem: actor.ActorSystem = typedSystem.toUntyped
+  implicit val untypedSystem: actor.ActorSystem = typedSystem.toClassic
   implicit val ec: ExecutionContextExecutor     = typedSystem.executionContext
-  implicit val mat: Materializer                = ActorMaterializer()(typedSystem)
+  implicit val mat: Materializer                = Materializer(typedSystem)
 
   val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(untypedSystem)
 

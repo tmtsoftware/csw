@@ -3,7 +3,7 @@ package romaine.codec
 import java.nio.ByteBuffer
 
 import enumeratum.{Enum, EnumEntry}
-import io.lettuce.core.codec.Utf8StringCodec
+import io.lettuce.core.codec.StringCodec
 
 trait RomaineCodec[T] { outer =>
   def toBytes(value: T): ByteBuffer
@@ -35,18 +35,8 @@ object RomaineCodec {
     override def fromBytes(byteBuffer: ByteBuffer): ByteBuffer = byteBuffer
   }
 
-  implicit lazy val byteArrayCodec: RomaineCodec[Array[Byte]] = new RomaineCodec[Array[Byte]] {
-    override def toBytes(value: Array[Byte]): ByteBuffer = ByteBuffer.wrap(value)
-    override def fromBytes(byteBuffer: ByteBuffer): Array[Byte] = {
-      val array = new Array[Byte](byteBuffer.remaining())
-      byteBuffer.get(array)
-      array
-    }
-  }
-
   implicit lazy val stringCodec: RomaineCodec[String] = {
-    val utf8StringCodec = new Utf8StringCodec()
-    byteBufferCodec.bimap[String](utf8StringCodec.encodeValue, utf8StringCodec.decodeValue)
+    byteBufferCodec.bimap[String](StringCodec.UTF8.encodeValue, StringCodec.UTF8.decodeValue)
   }
 
   implicit def enumRomainCodec[T <: EnumEntry: Enum]: RomaineCodec[T] =

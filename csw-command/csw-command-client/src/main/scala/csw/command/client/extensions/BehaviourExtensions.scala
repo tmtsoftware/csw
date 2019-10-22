@@ -1,7 +1,7 @@
 package csw.command.client.extensions
 
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed._
+import akka.actor.typed.{ActorRef, Behavior, BehaviorInterceptor, Signal, TypedActorContext}
 
 import scala.concurrent.ExecutionContext
 import scala.reflect.ClassTag
@@ -38,7 +38,7 @@ object BehaviourExtensions {
   def withRunnableRef[T: ClassTag](factory: ActorRef[Runnable] => Behavior[T]): Behavior[T] = {
     Behaviors
       .setup[Any] { ctx =>
-        Behaviors.intercept[Any, T](new WithRunnableInterceptor[T])(factory(ctx.self))
+        Behaviors.intercept[Any, T](() => new WithRunnableInterceptor[T])(factory(ctx.self))
       }
       .narrow
   }

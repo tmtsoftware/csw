@@ -8,8 +8,8 @@ import csw.aas.http.{Authentication, SecurityDirectives}
 import csw.config.api.TokenFactory
 import org.keycloak.adapters.KeycloakDeployment
 import org.mockito.MockitoSugar
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 private[testkit] trait MockedAuthentication extends MockitoSugar {
@@ -23,7 +23,7 @@ private[testkit] trait MockedAuthentication extends MockitoSugar {
   when(authConfig.getDeployment).thenReturn(keycloakDeployment)
 
   val _securityDirectives =
-    new SecurityDirectives(authentication, keycloakDeployment.getRealm, keycloakDeployment.getResourceName)
+    new SecurityDirectives(authentication, keycloakDeployment.getRealm, keycloakDeployment.getResourceName, false)
 
   private val validTokenStr           = "valid"
   private val validToken: AccessToken = mock[AccessToken]

@@ -71,7 +71,7 @@ class RedisKeySpaceApi[K: RomaineCodec, V: RomaineCodec](
     })
 
     Source
-      .fromFutureSource(sourceF)
+      .futureSource(sourceF)
       .mapMaterializedValue(
         subscriptionF =>
           new RedisSubscription {

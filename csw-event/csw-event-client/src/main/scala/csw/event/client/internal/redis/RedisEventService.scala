@@ -1,6 +1,7 @@
 package csw.event.client.internal.redis
 
-import akka.stream.Materializer
+import akka.actor.typed.ActorSystem
+import akka.stream.Attributes
 import csw.event.api.scaladsl.EventService
 import csw.event.client.internal.commons.serviceresolver.EventServiceResolver
 import io.lettuce.core.{RedisClient, RedisURI}
@@ -15,11 +16,12 @@ import scala.concurrent.{ExecutionContext, Future}
  * @param masterId the Id used by Redis Sentinel to identify the master
  * @param redisClient the client instance of [[io.lettuce.core.RedisClient]]
  * @param executionContext the execution context to be used for performing asynchronous operations
- * @param mat the materializer to be used for materializing underlying streams
+ * @param attributes used for materializing underlying streams
  */
 private[event] class RedisEventService(eventServiceResolver: EventServiceResolver, masterId: String, redisClient: RedisClient)(
     implicit val executionContext: ExecutionContext,
-    mat: Materializer
+    actorSystem: ActorSystem[_],
+    attributes: Attributes
 ) extends EventService {
 
   override def makeNewPublisher(): RedisPublisher = new RedisPublisher(redisURI(), redisClient)

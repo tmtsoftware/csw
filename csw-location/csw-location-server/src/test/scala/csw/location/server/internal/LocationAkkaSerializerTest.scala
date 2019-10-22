@@ -2,8 +2,9 @@ package csw.location.server.internal
 
 import java.net.URI
 
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.typed.{ActorSystem, Behavior}
 import akka.serialization.SerializationExtension
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.models
@@ -19,9 +20,9 @@ import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
 private[location] class LocationAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAfterAll {
-
-  private final implicit val system: ActorSystem[_] = ActorSystem(Behavior.empty, "example")
-  private final val serialization                   = SerializationExtension(system.toUntyped)
+  // need to instantiate from remote factory to wire up serializer
+  private final implicit val system: ActorSystem[_] = ActorSystem(Behaviors.empty, "example")
+  private final val serialization                   = SerializationExtension(system.toClassic)
   private final val prefix                          = Prefix("wfos.prog.cloudcover")
 
   override protected def afterAll(): Unit = {

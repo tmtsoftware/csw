@@ -31,8 +31,8 @@ private[framework] class SupervisorInfoFactory(containerName: String) {
       alarmServiceFactory: AlarmServiceFactory,
       registrationFactory: RegistrationFactory
   ): Future[Option[SupervisorInfo]] = {
-    implicit val system: ActorSystem[SpawnProtocol] =
-      ActorSystemFactory.remote(SpawnProtocol.behavior, s"${componentInfo.name}-system")
+    implicit val system: ActorSystem[SpawnProtocol.Command] =
+      ActorSystemFactory.remote(SpawnProtocol(), s"${componentInfo.name}-system")
     implicit val ec: ExecutionContextExecutor = system.executionContext
     val richSystem                            = new CswFrameworkSystem(system)
 

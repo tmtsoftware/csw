@@ -3,7 +3,7 @@ package csw.config.api.models
 import java.nio.file.Files
 
 import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, Materializer}
+import akka.stream.Materializer
 import akka.testkit.TestKit
 import com.typesafe.config.{Config, ConfigException}
 import csw.config.api.ConfigData
@@ -14,7 +14,7 @@ import scala.jdk.CollectionConverters._
 
 class ConfigDataTest extends TestKit(ActorSystem("test-system")) with FunSuiteLike with Matchers {
 
-  implicit val mat: Materializer = ActorMaterializer()
+  implicit val mat: Materializer = Materializer(system)
 
   val expectedStringConfigData: String =
     """

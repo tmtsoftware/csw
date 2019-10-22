@@ -6,8 +6,6 @@ import akka.actor.typed.SpawnProtocol;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import csw.logging.models.Level;
-import csw.logging.models.Level$;
 import csw.logging.client.appenders.LogAppenderBuilder;
 import csw.logging.client.commons.AkkaTypedExtension;
 import csw.logging.client.commons.LoggingKeys$;
@@ -15,6 +13,8 @@ import csw.logging.client.components.trombone.JTromboneHCDSupervisorActor;
 import csw.logging.client.internal.LoggingSystem;
 import csw.logging.client.utils.JLogUtil;
 import csw.logging.client.utils.TestAppender;
+import csw.logging.models.Level;
+import csw.logging.models.Level$;
 import org.junit.*;
 import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 import static csw.logging.client.utils.Eventually.eventually;
 
 public class ILoggerActorTest extends JUnitSuite {
-    protected static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.behavior(), "base-system");
+    protected static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
     protected static LoggingSystem loggingSystem;
 
     protected static List<JsonObject> logBuffer = new ArrayList<>();

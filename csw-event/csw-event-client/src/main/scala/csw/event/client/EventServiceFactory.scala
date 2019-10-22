@@ -1,9 +1,7 @@
 package csw.event.client
 
 import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.stream.typed.scaladsl.ActorMaterializer
-import akka.stream.{ActorMaterializerSettings, Materializer}
+import akka.stream.{ActorAttributes, Attributes}
 import csw.event.api.javadsl.IEventService
 import csw.event.api.scaladsl.EventService
 import csw.event.client.internal.commons.EventStreamSupervisionStrategy
@@ -78,14 +76,9 @@ class EventServiceFactory(store: EventStore = RedisStore()) {
     new JEventService(eventService)
   }
 
-  private def mat()(implicit actorSystem: ActorSystem[_]): Materializer =
-    ActorMaterializer(
-      Some(ActorMaterializerSettings(actorSystem.toUntyped).withSupervisionStrategy(EventStreamSupervisionStrategy.decider))
-    )
-
   private def eventService(eventServiceResolver: EventServiceResolver)(implicit system: ActorSystem[_]) = {
-    implicit val ec: ExecutionContext       = system.executionContext
-    implicit val materializer: Materializer = mat()
+    implicit val ec: ExecutionContext   = system.executionContext
+    implicit val attributes: Attributes = ActorAttributes.supervisionStrategy(EventStreamSupervisionStrategy.decider)
 
     def masterId = system.settings.config.getString("csw-event.redis.masterId")
 

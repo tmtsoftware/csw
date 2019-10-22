@@ -46,11 +46,11 @@ object LocationServiceExampleClientApp extends App {
   Await.result(wiring.locationHttpService.start(), 5.seconds)
   val untypedSystem = ActorSystem("untyped-system")
   //#create-actor-system
-  implicit val typedSystem: typed.ActorSystem[SpawnProtocol] =
-    ActorSystemFactory.remote(SpawnProtocol.behavior, "csw-examples-locationServiceClient")
+  implicit val typedSystem: typed.ActorSystem[SpawnProtocol.Command] =
+    ActorSystemFactory.remote(SpawnProtocol(), "csw-examples-locationServiceClient")
   //#create-actor-system
 
-  implicit val mat: ActorMaterializer = scaladsl.ActorMaterializer()
+  implicit val mat: Materializer = Materializer(typedSystem)
 
   //#create-location-service
   private val locationService = HttpLocationServiceFactory.makeLocalClient(typedSystem, mat)

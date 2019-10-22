@@ -2,6 +2,7 @@ package csw.aas.installed.internal
 
 import csw.aas.core.TokenVerificationFailure.TokenExpired
 import csw.aas.core.TokenVerifier
+import csw.aas.core.deployment.AuthConfig
 import csw.aas.core.token.AccessToken
 import csw.aas.installed.scaladsl.FileAuthStore
 import org.keycloak.adapters.KeycloakDeployment
@@ -25,15 +26,20 @@ class InstalledAppAuthAdapterImplMockTest extends FunSuite with MockitoSugar wit
     val tokenVerifier: TokenVerifier             = mock[TokenVerifier]
     val accessToken: AccessToken                 = mock[AccessToken]
     val refreshedAccessToken: AccessToken        = mock[AccessToken]
+    val authConfig: AuthConfig                   = mock[AuthConfig]
 
     val accessTokenStr          = "access_token"
     val idTokenStr              = "id_token"
     val refreshTokenStr         = "refresh_token"
     val refreshedAccessTokenStr = "refreshed_access_token"
 
+    when(authConfig.getDeployment).thenReturn(kd)
+
     // mock keycloakInstalled calls
     when(keycloakInstalled.getTokenResponse).thenReturn(accessTokenResponse)
     when(keycloakInstalled.getDeployment).thenReturn(kd)
+
+    doNothing.when(keycloakInstalled).login()
 
     // mock keycloak's access token response calls
     when(accessTokenResponse.getToken).thenReturn(accessTokenStr)
@@ -49,7 +55,8 @@ class InstalledAppAuthAdapterImplMockTest extends FunSuite with MockitoSugar wit
     when(tokenVerifier.verifyAndDecode(accessTokenStr)).thenReturn(Future.successful(Right(accessToken)))
     when(tokenVerifier.verifyAndDecode(refreshedAccessTokenStr)).thenReturn(Future.successful(Right(refreshedAccessToken)))
 
-    val authService = new InstalledAppAuthAdapterImpl(keycloakInstalled, tokenVerifier, Some(store))
+    val authService = new InstalledAppAuthAdapterImpl(authConfig, keycloakInstalled, tokenVerifier, Some(store))
+//    val disabledAuthService = new InstalledAppAuthAdapterImpl(authConfig, keycloakInstalled, tokenVerifier, Some(store))
   }
 
   test("login") {
@@ -107,7 +114,16 @@ class InstalledAppAuthAdapterImplMockTest extends FunSuite with MockitoSugar wit
     verify(tokenVerifier).verifyAndDecode(accessTokenStr)
   }
 
-  test("getAccessToken- expired token") {
+  test("getAccessToken - disabled auth") {
+    val mocks = new AuthMocks
+    import mocks._
+
+    when(authConfig.disabled).thenReturn(true)
+
+    authService.getAccessToken() shouldBe Some(AccessToken())
+  }
+
+  test("getAccessToken - expired token") {
     val mocks = new AuthMocks
     import mocks._
 
@@ -139,21 +155,5 @@ class InstalledAppAuthAdapterImplMockTest extends FunSuite with MockitoSugar wit
     verify(store, times(2)).getAccessTokenString
     verify(keycloakInstalled).refreshToken(refreshTokenStr)
     verify(tokenVerifier).verifyAndDecode(refreshedAccessTokenStr)
-  }
-
-  test("getAccessTokenStr") {
-    val mocks = new AuthMocks
-    import mocks._
-
-    val tokenValidity  = 10
-    val currentSeconds = (System.currentTimeMillis() / 1000) + tokenValidity
-    val validToken     = AccessToken(exp = Some(currentSeconds))
-
-    when(tokenVerifier.verifyAndDecode(accessTokenStr)).thenReturn(Future.successful(Right(validToken)))
-
-    authService.getAccessTokenString() shouldBe Some(accessTokenStr)
-
-    verify(store, times(2)).getAccessTokenString
-    verify(tokenVerifier).verifyAndDecode(accessTokenStr)
   }
 }

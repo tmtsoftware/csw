@@ -9,6 +9,7 @@ import csw.location.models.TrackingEvent
 import csw.params.commands.CommandResponse.Completed
 import csw.params.commands.{CommandResponse, ControlCommand}
 import csw.params.core.models.Id
+import csw.time.core.models.UTCTime
 import org.jooq.{DSLContext, Query}
 
 import scala.async.Async.async
@@ -97,10 +98,12 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
 
     Completed(controlCommand.commandName, runId)
   }
-  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit                                         = ???
+  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit                              = ???
   override def validateCommand(runId: Id, controlCommand: ControlCommand): CommandResponse.ValidateCommandResponse = ???
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit                                           = ???
-  override def onShutdown(): Future[Unit]                                                                          = ???
-  override def onGoOffline(): Unit                                                                                 = ???
-  override def onGoOnline(): Unit                                                                                  = ???
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit                                 = ???
+  override def onOperationsMode(): Unit                                                                 = ???
+  override def onShutdown(): Future[Unit]                                                               = ???
+  override def onGoOffline(): Unit                                                                      = ???
+  override def onGoOnline(): Unit                                                                       = ???
 }

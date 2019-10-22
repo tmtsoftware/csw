@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 import static csw.logging.client.utils.Eventually.eventually;
 
 public class JGenericLoggerTest extends JUnitSuite {
-    private static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.behavior(), "base-system");
+    private static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
     private static LoggingSystem loggingSystem;
 
     private static List<JsonObject> logBuffer = new ArrayList<>();

@@ -45,7 +45,7 @@ class ImageDeSerializationBenchmark {
   @Setup(Level.Trial)
   def setup(): Unit = {
     system = ActorSystem(Behaviors.empty, "example")
-    serialization = SerializationExtension(system.toUntyped)
+    serialization = SerializationExtension(system.toClassic)
     prefixStr = "wfos.prog.cloudcover"
     obsId = ObsId("Obs001")
 

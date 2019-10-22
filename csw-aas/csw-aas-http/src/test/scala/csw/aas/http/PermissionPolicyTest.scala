@@ -18,7 +18,7 @@ class PermissionPolicyTest extends FunSuite with MockitoSugar with Directives wi
 
   test("permission policy should return AuthenticationFailedRejection when token is invalid") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
     val invalidTokenStr    = "invalid"
     val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
@@ -45,7 +45,7 @@ class PermissionPolicyTest extends FunSuite with MockitoSugar with Directives wi
 
   test("permission policy should return AuthenticationFailedRejection when token is not present") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
     val authenticator: AsyncAuthenticator[AccessToken] = _ => Future.successful(None)
 
@@ -66,7 +66,7 @@ class PermissionPolicyTest extends FunSuite with MockitoSugar with Directives wi
 
   test("permission policy should return AuthorizationFailedRejection when token does not have permission") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
     val validTokenWithoutPermissionStr    = "validTokenWithoutPermissionStr"
     val validTokenWithoutPermissionHeader = Authorization(OAuth2BearerToken(validTokenWithoutPermissionStr))
@@ -98,7 +98,7 @@ class PermissionPolicyTest extends FunSuite with MockitoSugar with Directives wi
 
   test("permission policy should return 200 OK when token is valid & has permission") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test")
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
     val validTokenWithPermissionStr    = "validTokenWithPermissionStr"
     val validTokenWithPermissionHeader = Authorization(OAuth2BearerToken(validTokenWithPermissionStr))

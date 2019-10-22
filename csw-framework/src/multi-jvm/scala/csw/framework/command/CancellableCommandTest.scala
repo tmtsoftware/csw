@@ -1,15 +1,18 @@
 package csw.framework.command
 
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import akka.actor.testkit.typed.scaladsl.TestProbe
+import akka.actor.typed.scaladsl.adapter._
+import akka.actor.typed.{ActorSystem, Scheduler, SpawnProtocol}
+import akka.stream.Materializer
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
 import csw.common.components.command.ComponentStateForCommand.{acceptedCmd, cancelCmd, prefix}
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.helpers.{LSNodeSpec, OneMemberAndSeed}
-import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.location.models.{ComponentId, ComponentType}
 import csw.location.models.Connection.AkkaConnection
+import csw.location.models.{ComponentId, ComponentType}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup
@@ -19,7 +22,8 @@ import io.lettuce.core.RedisClient
 import org.mockito.MockitoSugar
 
 import scala.concurrent.duration.DurationInt
-import scala.concurrent.Await
+import scala.concurrent.{Await, ExecutionContext}
+import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
 
 class CancellableCommandTestMultiJvm1 extends CancellableCommandTest(0)
 
@@ -32,8 +36,11 @@ class CancellableCommandTest(ignore: Int)
     with MockitoSugar {
   import config._
 
-  private implicit val actorSystem: ActorSystem[SpawnProtocol] = system.toTyped.asInstanceOf[ActorSystem[SpawnProtocol]]
+  private implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = system.toTyped.asInstanceOf[ActorSystem[SpawnProtocol.Command]]
+  private implicit val mat: Materializer                       = Materializer(typedSystem)
+  private implicit val ec: ExecutionContext                    = actorSystem.executionContext
   private implicit val timeout: Timeout                        = 5.seconds
+  private implicit val scheduler: Scheduler                    = actorSystem.scheduler
 
   test("a long running command should be cancellable") {
     runOn(seed) {

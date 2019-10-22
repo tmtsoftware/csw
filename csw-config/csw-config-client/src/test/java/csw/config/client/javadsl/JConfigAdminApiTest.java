@@ -586,32 +586,32 @@ public class JConfigAdminApiTest extends JUnitSuite {
         configService.create(hcdConfig, ConfigData.fromString(configValue3), false, "hello hcd").get();
 
         Set<Path> expected1 = Set.of(assemblyConfig1, assemblyConfig2);
-        Stream<Path> actualStream1 = configService.list(JFileType.Annex).get().stream().map(ConfigFileInfo::path);
+        Stream<Path> actualStream1 = configService.list(JFileType.Annex()).get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(expected1, actualStream1.collect(Collectors.toSet()));
 
         Set<Path> expected2 = Set.of(tromboneConfig, hcdConfig);
-        Stream<Path> actualStream2 = configService.list(JFileType.Normal).get().stream().map(ConfigFileInfo::path);
+        Stream<Path> actualStream2 = configService.list(JFileType.Normal()).get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(expected2, actualStream2.collect(Collectors.toSet()));
 
         Set<Path> expected3 = Set.of(assemblyConfig2);
-        Stream<Path> actualStream3 = configService.list(JFileType.Annex, "a/b/c.*").get().stream().map(ConfigFileInfo::path);
+        Stream<Path> actualStream3 = configService.list(JFileType.Annex(), "a/b/c.*").get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(expected3, actualStream3.collect(Collectors.toSet()));
 
-        Stream<Path> actualStream4 = configService.list(JFileType.Annex, ".*.conf").get().stream().map(ConfigFileInfo::path);
+        Stream<Path> actualStream4 = configService.list(JFileType.Annex(), ".*.conf").get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(expected1, actualStream4.collect(Collectors.toSet()));
 
-        Stream<Path> actualStream5 = configService.list(JFileType.Annex, ".*assembly.*").get().stream().map(ConfigFileInfo::path);
+        Stream<Path> actualStream5 = configService.list(JFileType.Annex(), ".*assembly.*").get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(expected1, actualStream5.collect(Collectors.toSet()));
 
         Set<Path> expected6 = Set.of(hcdConfig);
-        Stream<Path> actualStream6 = configService.list(JFileType.Normal, "a/b/c.*").get().stream().map(ConfigFileInfo::path);
+        Stream<Path> actualStream6 = configService.list(JFileType.Normal(), "a/b/c.*").get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(expected6, actualStream6.collect(Collectors.toSet()));
 
-        Stream<Path> actualStream7 = configService.list(JFileType.Normal, ".*.conf").get().stream().map(ConfigFileInfo::path);
+        Stream<Path> actualStream7 = configService.list(JFileType.Normal(), ".*.conf").get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(expected2, actualStream7.collect(Collectors.toSet()));
 
         Set<Path> expected8 = Set.of(tromboneConfig);
-        Stream<Path> actualStream8 = configService.list(JFileType.Normal, ".*trombone.*").get().stream().map(ConfigFileInfo::path);
+        Stream<Path> actualStream8 = configService.list(JFileType.Normal(), ".*trombone.*").get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(expected8, actualStream8.collect(Collectors.toSet()));
     }
 

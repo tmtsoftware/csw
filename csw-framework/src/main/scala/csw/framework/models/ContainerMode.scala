@@ -1,4 +1,5 @@
 package csw.framework.models
+
 import enumeratum._
 
 import scala.collection.immutable
@@ -8,7 +9,7 @@ import scala.collection.immutable
  */
 private[framework] sealed abstract class ContainerMode extends EnumEntry
 
-private[csw] object ContainerMode extends Enum[ContainerMode] with PlayJsonEnum[ContainerMode] {
+private[csw] object ContainerMode extends Enum[ContainerMode] {
 
   override def values: immutable.IndexedSeq[ContainerMode] = findValues
 

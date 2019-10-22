@@ -28,6 +28,7 @@ import csw.params.core.models.Prefix;
 import csw.params.core.states.CurrentState;
 import csw.params.core.states.StateName;
 import csw.params.javadsl.JKeyType;
+import csw.time.core.models.UTCTime;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.nio.file.Paths;
@@ -85,7 +86,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
         // find a Hcd connection from the connections provided in componentInfo
         Optional<Connection> mayBeConnection = componentInfo.getConnections().stream()
-                .filter(connection -> connection.componentId().componentType() == JComponentType.HCD)
+                .filter(connection -> connection.componentId().componentType() == JComponentType.HCD())
                 .findFirst();
 
         // If an Hcd is found as a connection, resolve its location from location service and create other
@@ -155,6 +156,14 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         // do something when going online
     }
     //#onGoOnline-handler
+
+    @Override
+    public void onDiagnosticMode(UTCTime startTime, String hint) {
+    }
+
+    @Override
+    public void onOperationsMode() {
+    }
 
     //#onShutdown-handler
     @Override
@@ -286,7 +295,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     private CompletableFuture<Optional<AkkaLocation>> resolveHcd() {
         // find a Hcd connection from the connections provided in componentInfo
         Optional<Connection> mayBeConnection = componentInfo.getConnections().stream()
-                .filter(connection -> connection.componentId().componentType() == JComponentType.HCD)
+                .filter(connection -> connection.componentId().componentType() == JComponentType.HCD())
                 .findFirst();
 
         // If an Hcd is found as a connection, resolve its location from location service and create other
@@ -326,7 +335,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     private void resolveHcdAndCreateCommandService() throws ExecutionException, InterruptedException {
 
         TypedConnection<AkkaLocation> hcdConnection = componentInfo.getConnections().stream()
-                .filter(connection -> connection.componentId().componentType() == JComponentType.HCD)
+                .filter(connection -> connection.componentId().componentType() == JComponentType.HCD())
                 .findFirst().orElseThrow().<AkkaLocation>of();
 
         // #resolve-hcd-and-create-commandservice

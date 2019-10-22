@@ -3,9 +3,7 @@ import java.util.Optional
 
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.{ActorSystem, CoordinatedShutdown, typed}
-import akka.http.scaladsl.Http
 import akka.stream.Materializer
-import akka.stream.typed.scaladsl
 import akka.util.Timeout
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
@@ -24,8 +22,8 @@ private[testkit] trait RedisStore extends EmbeddedRedis {
   protected def masterId: String
   protected def connection: TcpConnection
 
-  implicit lazy val untypedSystem: ActorSystem = system.toUntyped
-  implicit lazy val mat: Materializer          = scaladsl.ActorMaterializer()
+  implicit lazy val untypedSystem: ActorSystem = system.toClassic
+  implicit lazy val mat: Materializer          = Materializer(system)
   implicit lazy val ec: ExecutionContext       = system.executionContext
 
   private var redisSentinel: Option[RedisSentinel] = None
@@ -51,7 +49,6 @@ private[testkit] trait RedisStore extends EmbeddedRedis {
 
   def shutdown(): Unit = {
     stopRedis()
-    TestKitUtils.await(Http().shutdownAllConnectionPools(), timeout)
     TestKitUtils.coordShutdown(CoordinatedShutdown(untypedSystem).run, timeout)
   }
 }

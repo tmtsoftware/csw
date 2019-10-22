@@ -21,7 +21,7 @@ class TimingTest extends LoggingTestSuite with Timing {
   private val logFileDir        = Paths.get("/tmp/csw-test-logs/").toFile
   private val loggingSystemName = "TimingTest"
 
-  override lazy val actorSystem = ActorSystem(SpawnProtocol.behavior, "timing-test-system")
+  override lazy val actorSystem = ActorSystem(SpawnProtocol(), "timing-test-system")
   override lazy val loggingSystem =
     new LoggingSystem(loggingSystemName, "version", "localhost", actorSystem)
 

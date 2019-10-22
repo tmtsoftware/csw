@@ -10,7 +10,7 @@ import csw.logging.client.internal.LoggerImpl
 import csw.logging.client.javadsl.JLoggerFactory
 
 abstract class BaseLoggerFactory private[logging] (maybeComponentName: Option[String]) {
-  def getLogger[T](ctx: ActorContext[T]): Logger = new LoggerImpl(maybeComponentName, Some(actorPath(ctx.self.toUntyped)))
+  def getLogger[T](ctx: ActorContext[T]): Logger = new LoggerImpl(maybeComponentName, Some(actorPath(ctx.self.toClassic)))
   def getLogger(ctx: actor.ActorContext): Logger = new LoggerImpl(maybeComponentName, Some(actorPath(ctx.self)))
   def getLogger: Logger                          = new LoggerImpl(maybeComponentName, None)
 
