@@ -46,7 +46,7 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
   private final implicit val system: ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "example")
   private final val serialization                                       = SerializationExtension(system.toClassic)
   private final val prefix                                              = Prefix("wfos.prog.cloudcover")
-  private final val commandName                                 = CommandName("test")
+  private final val commandName                                         = CommandName("test")
 
   override protected def afterAll(): Unit = {
     system.terminate()

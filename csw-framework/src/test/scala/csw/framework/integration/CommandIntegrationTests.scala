@@ -12,7 +12,13 @@ import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.command.client.messages.SupervisorContainerCommonMessages.Shutdown
-import csw.command.client.models.framework.{Components, ContainerLifecycleState, LifecycleStateChanged, PubSub, SupervisorLifecycleState}
+import csw.command.client.models.framework.{
+  Components,
+  ContainerLifecycleState,
+  LifecycleStateChanged,
+  PubSub,
+  SupervisorLifecycleState
+}
 import csw.common.components.command.CommandComponentState._
 import csw.common.FrameworkAssertions._
 import csw.event.client.helpers.TestFutureExt.RichFuture

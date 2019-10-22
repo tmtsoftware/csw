@@ -9,13 +9,21 @@ import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.{CoordinatedShutdown, Scheduler, typed}
 import akka.util.Timeout
 import csw.command.client.CommandResponseManagerActor.CRMMessage
-import csw.command.client.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.command.client.messages.ComponentCommonMessage.{
+  ComponentStateSubscription,
+  GetSupervisorLifecycleState,
+  LifecycleStateSubscription
+}
 import csw.command.client.messages.FromComponentLifecycleMessage.Running
 import csw.command.client.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorIdleMessage.InitializeTimeout
-import csw.command.client.messages.SupervisorInternalRunningMessage.{RegistrationFailed, RegistrationNotRequired, RegistrationSuccess}
+import csw.command.client.messages.SupervisorInternalRunningMessage.{
+  RegistrationFailed,
+  RegistrationNotRequired,
+  RegistrationSuccess
+}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
 import csw.command.client.messages._
@@ -366,7 +374,7 @@ private[framework] final class SupervisorBehavior(
       ctx.spawn(ComponentHttpBehavior.make(loggerFactory, ctx.self, componentName), httpComponentActorName)
     // Start to get the port for registering with Location Service
     implicit val scheduler: typed.Scheduler = ctx.system.scheduler
-    val port: Future[Int]             = httpBehavior ? (ref => Start(ref))
+    val port: Future[Int]                   = httpBehavior ? (ref => Start(ref))
     port.map(registerHttpEndpointWithLocationService)
   }
 

@@ -45,17 +45,20 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
 
     controlCommand.commandName match {
       case `longRunning` =>
-        scheduler.scheduleOnce(5.seconds,
+        scheduler.scheduleOnce(
+          5.seconds,
           () => commandResponseManager.updateCommand(Completed(controlCommand.commandName, runId))
         )
         Started(controlCommand.commandName, runId)
       case `mediumRunning` =>
-        scheduler.scheduleOnce(3.seconds,
+        scheduler.scheduleOnce(
+          3.seconds,
           () => commandResponseManager.updateCommand(Completed(controlCommand.commandName, runId))
         )
         Started(controlCommand.commandName, runId)
       case `shortRunning` =>
-        scheduler.scheduleOnce(1.seconds,
+        scheduler.scheduleOnce(
+          1.seconds,
           () => commandResponseManager.updateCommand(Completed(controlCommand.commandName, runId))
         )
         Started(controlCommand.commandName, runId)

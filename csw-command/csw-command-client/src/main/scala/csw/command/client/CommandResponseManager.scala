@@ -15,7 +15,6 @@ class CommandResponseManager(val commandResponseManagerActor: ActorRef[CRMMessag
    *
    * @param submitResponse final update for a started command [[csw.params.commands.CommandResponse.SubmitResponse]]
    */
-  // fixme: update to subscribers not being done.
   def updateCommand(submitResponse: SubmitResponse): Unit = commandResponseManagerActor ! UpdateResponse(submitResponse)
 
   private[csw] def addCommand(submitResponse: SubmitResponse): Unit = commandResponseManagerActor ! AddResponse(submitResponse)
