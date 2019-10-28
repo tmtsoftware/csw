@@ -5,7 +5,7 @@ import akka.actor.typed.{ActorRef, Behavior}
 import csw.command.client.CompleterActor.CommandCompleterMessage.{Kill, Update, WaitComplete}
 import csw.command.client.extensions.BehaviourExtensions
 import csw.params.commands.CommandResponse.{Completed, Error, QueryResponse, SubmitResponse}
-import csw.params.commands.{CommandResponse, ControlCommand}
+import csw.params.commands.{CommandName, CommandResponse, ControlCommand}
 import csw.params.core.models.Id
 
 import scala.concurrent.{Future, Promise}
@@ -58,19 +58,32 @@ object CompleterActor {
             warn("An attempt to update a non-existing command was detected and ignored", Map("runId" -> response.runId))
           }
 
+        def isAnyResponseFailed: Boolean = failureCount > 0
+
         def isAnyResponseNegative: Boolean =
-          childResponses.exists { case (_, res) => CommandResponse.isNegative(res) } || failureCount > 0
+          childResponses.exists { case (_, res) => CommandResponse.isNegative(res) }
 
         def areAllResponsesFinal: Boolean =
           childResponses.forall { case (_, res) => CommandResponse.isFinal(res) } && ((childResponses.size + failureCount) == childResponsesF.size)
 
         def checkAndComplete(): Unit =
           if (areAllResponsesFinal) {
-            if (isAnyResponseNegative) {
+            if (isAnyResponseNegative || isAnyResponseFailed) {
               maybeCrm.foreach(
                 _.updateCommand(Error(maybeParentCommand.get.commandName, maybeParentId.get, "Downstream failed"))
               )
-              completePromise.trySuccess(OverallFailure(childResponses.values.toSet))
+              completePromise.trySuccess(
+                OverallFailure(
+                  if (isAnyResponseFailed)
+                    childResponses.values.toSet + Error(
+                      CommandName("Invalid"),
+                      Id("Invalid"),
+                      "One or more response future failed"
+                    )
+                  else
+                    childResponses.values.toSet
+                )
+              )
             } else {
               maybeCrm.foreach(_.updateCommand(Completed(maybeParentCommand.get.commandName, maybeParentId.get)))
               completePromise.trySuccess(OverallSuccess(childResponses.values.toSet))

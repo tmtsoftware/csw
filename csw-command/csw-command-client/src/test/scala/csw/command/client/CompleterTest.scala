@@ -187,6 +187,24 @@ class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll with M
     res shouldEqual OverallFailure(Set(Completed(CommandName("1"), id1), Invalid(CommandName("2"), id2, OtherIssue("TEST"))))
   }
 
+  test("case with a future fails") {
+    val testKit = ActorTestKit()
+    val r1      = Future.failed(new RuntimeException("network error"))
+    val r2      = Future.successful(Completed(CommandName("some command"), Id("1")))
+
+    implicit val system = testKit.system
+
+    val completer = new Completer(testKit.spawn(CompleterActor.behavior(Set(r1, r2), None, None, None)))
+
+    val res = blockFor(completer.waitComplete())
+    res shouldEqual OverallFailure(
+      Set(
+        Error(CommandName("Invalid"), Id("Invalid"), "One or more response future failed"),
+        Completed(CommandName("some command"), Id("1"))
+      )
+    )
+  }
+
   // This works because of use of Sets
   test("case where updating same response more than once") {
     val testKit         = ActorTestKit()
