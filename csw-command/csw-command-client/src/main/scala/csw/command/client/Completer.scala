@@ -1,6 +1,6 @@
 package csw.command.client
 
-import akka.actor.typed.{ActorRef, Scheduler}
+import akka.actor.typed.{ActorRef, ActorSystem, Scheduler}
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.AskPattern._
 import akka.util.Timeout
@@ -15,7 +15,7 @@ import scala.concurrent.Future
 /**
  *  Contains the Completer class and data types
  */
-class Completer private (ref: ActorRef[CommandCompleterMessage])(implicit ctx: ActorContext[_]) {
+class Completer private[client] (ref: ActorRef[CommandCompleterMessage])(implicit system: ActorSystem[_]) {
 
   /**
    * Called to update the completer with a final result of a long running command
@@ -32,14 +32,13 @@ class Completer private (ref: ActorRef[CommandCompleterMessage])(implicit ctx: A
    * @return An [[OverallResponse]] indicating the success or failure of the completed commands
    */
   def waitComplete()(implicit timeout: Timeout): Future[OverallResponse] = {
-    implicit val scheduler: Scheduler = ctx.system.scheduler
     ref ? WaitComplete
   }
 }
 
 object Completer {
   def apply(responses: Set[Future[SubmitResponse]])(implicit ctx: ActorContext[_]): Completer =
-    new Completer(CompleterActor.make(responses))
+    new Completer(CompleterActor.make(responses))(implicitly(ctx.system))
 
   def withAutoCompletion(
       childResponses: Set[Future[SubmitResponse]],
@@ -47,6 +46,6 @@ object Completer {
       parentCommand: ControlCommand,
       crm: CommandResponseManager
   )(implicit ctx: ActorContext[_]): Completer =
-    new Completer(CompleterActor.withAutoCompletion(childResponses, parentId, parentCommand, crm))
+    new Completer(CompleterActor.withAutoCompletion(childResponses, parentId, parentCommand, crm))(implicitly(ctx.system))
 
 }

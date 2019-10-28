@@ -21,7 +21,7 @@ object CompleterActor {
   ): ActorRef[CommandCompleterMessage] =
     ctx.spawnAnonymous(behavior(responses, None, None, None))
 
-  private def behavior(
+  private[client] def behavior(
       childResponsesF: Set[Future[SubmitResponse]],
       maybeParentId: Option[Id],
       maybeParentCommand: Option[ControlCommand],
@@ -76,6 +76,8 @@ object CompleterActor {
               completePromise.trySuccess(OverallSuccess(childResponses.values.toSet))
             }
           }
+
+        Future.sequence((childResponsesF)).onComplete(_ => checkAndComplete())
 
         Behaviors.receive[CommandCompleterMessage] { (ctx, msg) =>
           msg match {
