@@ -1,13 +1,11 @@
 package csw.framework.internal.supervisor
 
 import akka.Done
+import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed._
-import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.typed.scaladsl._
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.{CoordinatedShutdown, Scheduler, typed}
-import akka.util.Timeout
 import csw.command.client.CommandResponseManagerActor.CRMMessage
 import csw.command.client.messages.ComponentCommonMessage.{
   ComponentStateSubscription,

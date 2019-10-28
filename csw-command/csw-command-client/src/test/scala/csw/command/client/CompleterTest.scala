@@ -189,7 +189,7 @@ class CompleterTest extends FunSuite with Matchers with BeforeAndAfterAll with M
 
   // This works because of use of Sets
   test("case where updating same response more than once") {
-    val testKit = ActorTestKit()
+    val testKit         = ActorTestKit()
     implicit val system = testKit.system
 
     val id1 = Id("1")

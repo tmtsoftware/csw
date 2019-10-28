@@ -1,7 +1,6 @@
 package csw.framework.integration
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.SpawnProtocol.Spawn
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.http.scaladsl.Http
@@ -12,26 +11,20 @@ import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.command.client.messages.SupervisorContainerCommonMessages.Shutdown
-import csw.command.client.models.framework.{
-  Components,
-  ContainerLifecycleState,
-  LifecycleStateChanged,
-  PubSub,
-  SupervisorLifecycleState
-}
-import csw.common.components.command.CommandComponentState._
+import csw.command.client.models.framework._
 import csw.common.FrameworkAssertions._
+import csw.common.components.command.CommandComponentState._
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
+import csw.location.client.ActorSystemFactory
 import csw.location.models.ComponentType.{Assembly, HCD}
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{ComponentId, ComponentType}
-import csw.location.client.ActorSystemFactory
-import csw.params.commands.CommandResponse.{Accepted, Completed, Error, Invalid, Started}
+import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup
+import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, StateName}
 import io.lettuce.core.RedisClient
-import csw.params.core.models.ObsId
 
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, ExecutionContext}

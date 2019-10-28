@@ -1,12 +1,11 @@
 package csw.common.components.command
 
-import akka.actor.typed.Scheduler
 import akka.actor.typed.scaladsl.ActorContext
 import akka.util.Timeout
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.CompleterActor.{OverallFailure, OverallSuccess}
-import csw.command.client.{CommandServiceFactory, Completer}
 import csw.command.client.messages.TopLevelActorMessage
+import csw.command.client.{CommandServiceFactory, Completer}
 import csw.common.components.command.ComponentStateForCommand.{longRunningCmdCompleted, _}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
