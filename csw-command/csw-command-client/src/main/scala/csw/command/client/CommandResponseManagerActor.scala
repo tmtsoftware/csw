@@ -32,9 +32,11 @@ object CommandResponseManagerActor {
       val cache: Cache[Id, CRMState] = Caffeine
         .newBuilder()
         .maximumSize(maxSize)
-        .removalListener((k: Id, v: CRMState, _: RemovalCause) => {
-          //todo: log a warning
-          v.subscribers.foreach(_ ! CommandResponse.Error(v.response.commandName, k, "too many commands"))
+        .removalListener((id: Id, state: CRMState, cause: RemovalCause) => {
+          if (cause.wasEvicted()) {
+            //todo: log a warning
+            state.subscribers.foreach(_ ! CommandResponse.Error(state.response.commandName, id, "too many commands"))
+          }
         })
         .build()
 
@@ -50,7 +52,7 @@ object CommandResponseManagerActor {
                 //notify all subscribers
                 sub.foreach(_.tell(newResponse))
                 // removing all subscribers
-                cache.put(response.runId, state.copy(subscribers = Set.empty))
+                cache.put(response.runId, state.copy(subscribers = Set.empty, response = newResponse))
               case Some(CRMState(prevResponse, _)) if (CommandResponse.isFinal(prevResponse)) =>
               //todo: log warning
             }

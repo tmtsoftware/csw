@@ -1,12 +1,12 @@
 package csw.command.client
 
+import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.typed.{ActorRef, ActorSystem}
-import csw.command.client.CommandResponseManagerActor.CRMMessage
-import csw.command.client.CommandResponseManagerActor.CRMMessage.{AddResponse, UpdateResponse}
+import akka.util.Timeout
+import csw.command.client.CommandResponseManagerActor.{CRMMessage, CRMState}
+import csw.command.client.CommandResponseManagerActor.CRMMessage._
 import csw.params.commands.CommandResponse.{QueryResponse, SubmitResponse}
 import csw.params.core.models.Id
-import akka.actor.typed.scaladsl.AskPattern._
-import akka.util.Timeout
 
 import scala.concurrent.Future
 
@@ -15,6 +15,9 @@ import scala.concurrent.Future
  */
 class CommandResponseManager(val commandResponseManagerActor: ActorRef[CRMMessage])(implicit val actorSystem: ActorSystem[_]) {
 
+  private[csw] def addCommand(submitResponse: SubmitResponse): Unit = commandResponseManagerActor ! AddResponse(submitResponse)
+
+  //fixme: should be renamed to updateResponse?
   /**
    * Add a new command or update an existing command with the provided status
    *
@@ -22,8 +25,11 @@ class CommandResponseManager(val commandResponseManagerActor: ActorRef[CRMMessag
    */
   def updateCommand(submitResponse: SubmitResponse): Unit = commandResponseManagerActor ! UpdateResponse(submitResponse)
 
-  def queryFinal(runId: Id)(implicit timeout: Timeout): Future[QueryResponse] =
-    commandResponseManagerActor ? (CRMMessage.QueryFinal(runId, _))
+  def query(runId: Id)(implicit timeout: Timeout): Future[QueryResponse] =
+    commandResponseManagerActor ? (Query(runId, _))
 
-  private[csw] def addCommand(submitResponse: SubmitResponse): Unit = commandResponseManagerActor ! AddResponse(submitResponse)
+  def queryFinal(runId: Id)(implicit timeout: Timeout): Future[QueryResponse] =
+    commandResponseManagerActor ? (QueryFinal(runId, _))
+
+  private[client] def getState(implicit timeout: Timeout): Future[Map[Id, CRMState]] = commandResponseManagerActor ? GetState
 }

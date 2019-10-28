@@ -5,7 +5,6 @@ import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{Materializer, ThrottleMode}
-import akka.util.Timeout
 import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
