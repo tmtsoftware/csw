@@ -18,7 +18,7 @@ class CommandResponseManagerTest extends FunSuite with Matchers with BeforeAndAf
   implicit val timeout: Timeout               = Timeout(5.seconds)
   val maxSize                                 = 10
 
-  object TestDsl {
+  object CRMTestDsl {
     implicit class RichBlockingFuture[T](f: Future[T]) {
       def shouldResolveTo(expected: T, timeout: FiniteDuration = 5.seconds): Assertion = {
         val actual = Await.result(f, timeout)
@@ -56,19 +56,19 @@ class CommandResponseManagerTest extends FunSuite with Matchers with BeforeAndAf
     def started(number: Int): Started         = Started(commandName(number), id(number))
     def error(id: Id, message: String): Error = Error(commandName(id.id.toInt), id, message)
 
-    def id1: Id = id(1)
-    def id2: Id = id(2)
+    val id1: Id = id(1)
+    val id2: Id = id(2)
 
     def tooManyCommands(id: Id): Error                   = error(id, "too many commands")
     def commandNotAvailable(id: Id): CommandNotAvailable = CommandNotAvailable(CommandName("CommandNotAvailable"), id)
 
-    def completed1: Completed = completed(1)
-    def completed2: Completed = completed(2)
+    val completed1: Completed = completed(1)
+    val completed2: Completed = completed(2)
 
-    def started1: Started = started(1)
-    def started2: Started = started(2)
+    val started1: Started = started(1)
+    val started2: Started = started(2)
   }
-  import TestDsl._
+  import CRMTestDsl._
 
   override def afterAll(): Unit = testKit.shutdownTestKit()
 
@@ -78,10 +78,11 @@ class CommandResponseManagerTest extends FunSuite with Matchers with BeforeAndAf
     val crm = new CommandResponseManager(testKit.spawn(CommandResponseManagerActor.make(maxSize)))
 
     crm.addCommand(completed1)
-    crm.responseFor(id1) shouldBe completed1
+    crm.stateFor(id1).response shouldBe completed1
 
     crm.addCommand(completed2)
-    crm.responseFor(id2) shouldBe completed2
+    crm.stateFor(id1).response shouldBe completed1
+    crm.stateFor(id2).response shouldBe completed2
   }
 
   // This test adds a response and then does a queryFinal to make sure that
@@ -167,8 +168,8 @@ class CommandResponseManagerTest extends FunSuite with Matchers with BeforeAndAf
     //ensure both futures got completed
     (f1.isCompleted && f2.isCompleted) shouldBe true
 
-    f1.block() shouldBe completed1
-    f2.block() shouldBe completed2
+    f1 shouldResolveTo completed1
+    f2 shouldResolveTo completed2
 
     //it should clear subscribers
     crm.subscriberCount shouldBe 0
@@ -197,7 +198,7 @@ class CommandResponseManagerTest extends FunSuite with Matchers with BeforeAndAf
     //ensure future got completed
     future.isCompleted shouldBe true
 
-    future.block() shouldBe completed1
+    future shouldResolveTo completed1
 
     //it should clear subscribers
     crm.subscriberCountFor(id1) shouldBe 0
