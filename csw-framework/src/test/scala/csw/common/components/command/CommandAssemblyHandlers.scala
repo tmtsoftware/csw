@@ -162,17 +162,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}
 
-  /**
-   * On receiving a diagnostic data command, the component goes into a diagnostic data mode based on hint at the specified startTime.
-   * Validation of supported hints need to be handled by the component writer.
-   *
-   * @param startTime represents the time at which the diagnostic mode actions will take effect
-   * @param hint      represents supported diagnostic data mode for a component
-   */
-  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = ???
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {}
 
-  /**
-   * On receiving a operations mode command, the current diagnostic data mode is halted.
-   */
-  override def onOperationsMode(): Unit = ???
+  override def onOperationsMode(): Unit = {}
 }

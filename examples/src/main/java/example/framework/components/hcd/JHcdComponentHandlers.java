@@ -3,6 +3,7 @@ package example.framework.components.hcd;
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.AskPattern;
+import csw.command.client.CommandResponseManager;
 import csw.command.client.messages.TopLevelActorMessage;
 import csw.command.client.models.framework.ComponentInfo;
 import csw.config.api.javadsl.IConfigClientService;
@@ -17,8 +18,8 @@ import csw.location.models.LocationUpdated;
 import csw.location.models.TrackingEvent;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.*;
-import csw.time.core.models.UTCTime;
 import csw.params.core.models.Id;
+import csw.time.core.models.UTCTime;
 import example.framework.components.ConfigNotAvailableException;
 import example.framework.components.assembly.WorkerActor;
 import example.framework.components.assembly.WorkerActorMsg;
@@ -34,6 +35,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
 
     private final ActorContext<TopLevelActorMessage> ctx;
     private final ComponentInfo componentInfo;
+    private final CommandResponseManager commandResponseManager;
     private final CurrentStatePublisher currentStatePublisher;
     private final ILocationService locationService;
     private final IEventService eventService;
@@ -51,7 +53,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
         super(ctx, cswCtx);
         this.ctx = ctx;
         this.componentInfo = cswCtx.componentInfo();
-        //this.commandResponseManager = cswCtx.commandResponseManager();
+        this.commandResponseManager = cswCtx.commandResponseManager();
         this.currentStatePublisher = cswCtx.currentStatePublisher();
         this.locationService = cswCtx.locationService();
         this.eventService = cswCtx.eventService();

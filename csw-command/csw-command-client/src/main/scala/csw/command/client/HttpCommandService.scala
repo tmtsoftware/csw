@@ -92,6 +92,7 @@ case class HttpCommandService(
 
         }
       case None =>
+        // Couldn't locate the server: Return error with generated runId
         val s = s"Can't locate connection for ${connection.componentId.name}"
         method match {
           case `submitCommand` => Error(controlCommand.commandName, Id(), s)

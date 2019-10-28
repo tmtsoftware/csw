@@ -41,7 +41,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
           case Some(akkaLocation) => hcdComponent = CommandServiceFactory.make(akkaLocation)(ctx.system)
           case None               => throw new RuntimeException("Could not resolve hcd location, Initialization failure.")
         }
-      case None => Future.unit
+      case None => Future.successful(())
     }
   }
 
@@ -109,7 +109,6 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
         // Lift subcommand timeout to an error
         commandResponseManager.updateCommand(Error(controlCommand.commandName, runId, s"${x.toString}"))
     }
-
   }
 
   private def handleSubcommandResponse(startedResponse: SubmitResponse, completer: Completer): Unit = {
@@ -149,9 +148,9 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
 
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
 
-  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = ???
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {}
 
-  override def onOperationsMode(): Unit = ???
+  override def onOperationsMode(): Unit = {}
 
   override def onShutdown(): Future[Unit] = Future.unit
 
