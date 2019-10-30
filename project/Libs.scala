@@ -41,7 +41,7 @@ object Libs {
   val `scala-csv`             = "com.github.tototoshi" %% "scala-csv"            % "1.3.6"
   val `json-schema-validator` = "com.github.fge"       % "json-schema-validator" % "2.2.11" //LGPL/ASL
 
-  val `jna`             = "net.java.dev.jna"              % "jna"             % "5.4.0"
+  val `jna`             = "net.java.dev.jna"              % "jna"             % "5.5.0"
   val `postgresql`      = "org.postgresql"                % "postgresql"      % "42.2.8"
   val `hikaricp`        = "com.zaxxer"                    % "HikariCP"        % "3.4.1" //Apache License 2.0
   val `otj-pg-embedded` = "com.opentable.components"      % "otj-pg-embedded" % "0.13.2"
