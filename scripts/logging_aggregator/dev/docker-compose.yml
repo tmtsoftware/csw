@@ -55,7 +55,7 @@ services:
       args:
         ELK_VERSION: $ELK_VERSION
     volumes:
-      - /tmp/csw/logs/:/usr/share/filebeat/watch:ro
+      - /tmp/tmt/logs/:/usr/share/filebeat/watch:ro
       - ./filebeat/config/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
     networks:
       - elk
