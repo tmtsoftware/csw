@@ -92,8 +92,9 @@ class CswCluster private (_typedSystem: ActorSystem[SpawnProtocol.Command]) {
     def status: Option[Done]              = Await.result(statusF, 5.seconds)
     val success                           = BlockingUtils.poll(status.isDefined, 20.seconds)
     if (!success) {
-      log.error(CouldNotJoinCluster.getMessage, ex = CouldNotJoinCluster)
-      throw CouldNotJoinCluster
+      val couldNotJoinCluster = CouldNotJoinCluster()
+      log.error(couldNotJoinCluster.getMessage, ex = couldNotJoinCluster)
+      throw couldNotJoinCluster
     }
     confirmationActorF ! Shutdown
     Done

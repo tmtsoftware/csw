@@ -161,7 +161,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     case x @ GetSuccess(_)            => x.get(AllServices.Key).entries.values.toList
     case NotFound(AllServices.Key, _) => List.empty
     case _ =>
-      val listingFailed = RegistrationListingFailed
+      val listingFailed = RegistrationListingFailed()
       log.error(listingFailed.getMessage, ex = listingFailed)
       throw listingFailed
   }
