@@ -5,6 +5,7 @@ filebeat:
       paths:
         - ${TMT_LOG_HOME:?Set TMT_LOG_HOME environment variable}/*.log
         - ${TMT_LOG_HOME:?Set TMT_LOG_HOME environment variable}/*/*.log
+        - ${TMT_LOG_HOME:?Set TMT_LOG_HOME environment variable}/*/*/*.log
       fields_under_root: true
       fields:
         json: true
