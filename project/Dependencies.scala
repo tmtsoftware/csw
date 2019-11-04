@@ -21,8 +21,7 @@ object Dependencies {
     Seq(
       Libs.`enumeratum`.value,
       Libs.`play-json`.value,
-      Borer.`borer-core`.value,
-      Borer.`borer-derivation`.value,
+      MSocket.`msocket-api`.value,
       Libs.`scalatest`.value % Test,
       Libs.`mockito-scala`   % Test
     )
@@ -55,7 +54,7 @@ object Dependencies {
       Akka.`akka-persistence`,
       Libs.`akka-management-cluster-http`,
       AkkaHttp.`akka-http`,
-      Borer.`borer-compat-akka`.value,
+      MSocket.`msocket-impl-jvm`,
       Akka.`akka-actor-testkit-typed` % Test,
       Libs.`scalatest`.value          % Test,
       Libs.`junit`                    % Test,
@@ -75,7 +74,7 @@ object Dependencies {
       Akka.`akka-remote`,
       Libs.`scala-async`,
       Libs.`scala-java8-compat`,
-      Borer.`borer-compat-akka`.value,
+      MSocket.`msocket-impl-jvm`,
       Libs.`scalatest`.value % Test
     )
   )

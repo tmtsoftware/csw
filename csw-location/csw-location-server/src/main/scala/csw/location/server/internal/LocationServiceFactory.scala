@@ -1,7 +1,8 @@
 package csw.location.server.internal
 
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import csw.location.api.scaladsl.LocationService
+import csw.location.api.scaladsl.{LocationService, LocationServiceE}
+import csw.location.client.internal.LocationServiceClient
 import csw.location.server.commons.{ClusterSettings, CswCluster}
 
 /**
@@ -46,7 +47,9 @@ private[location] object LocationServiceFactory {
    * @return an instance of `LocationService`
    */
   def withCluster(cswCluster: CswCluster): LocationService = {
-    val locationService: LocationService = new LocationServiceImpl(cswCluster)
+    import cswCluster.ec
+    val locationServiceE: LocationServiceE = new LocationServiceImpl(cswCluster)
+    val locationService: LocationService   = new LocationServiceClient(locationServiceE)
     // starts a DeathwatchActor each time a LocationService is created
     DeathwatchActor.start(cswCluster, locationService)
     locationService

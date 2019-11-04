@@ -7,11 +7,11 @@ import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
 
 import akka.Done
-import akka.stream.KillSwitch
 import akka.stream.javadsl.Source
 import csw.location.api.javadsl.{ILocationService, IRegistrationResult}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.models._
+import msocket.api.models.Subscription
 
 import scala.compat.java8.DurationConverters.DurationOps
 import scala.compat.java8.FutureConverters._
@@ -52,10 +52,10 @@ private[location] class JLocationServiceImpl(locationService: LocationService)(i
   override def listByPrefix(prefix: String): CompletableFuture[util.List[AkkaLocation]] =
     locationService.listByPrefix(prefix).map(_.asJava).toJava.toCompletableFuture
 
-  override def track(connection: Connection): Source[TrackingEvent, KillSwitch] =
+  override def track(connection: Connection): Source[TrackingEvent, Subscription] =
     locationService.track(connection).asJava
 
-  override def subscribe(connection: Connection, consumer: Consumer[TrackingEvent]): KillSwitch =
+  override def subscribe(connection: Connection, consumer: Consumer[TrackingEvent]): Subscription =
     locationService.subscribe(connection, consumer.accept)
 
   override def asScala: LocationService = locationService

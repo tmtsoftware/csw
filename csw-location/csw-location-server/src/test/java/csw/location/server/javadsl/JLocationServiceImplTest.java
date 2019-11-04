@@ -29,6 +29,7 @@ import csw.logging.client.javadsl.JLoggerFactory;
 import csw.network.utils.Networks;
 import csw.params.core.models.Prefix;
 import csw.params.javadsl.JSubsystem;
+import msocket.api.models.Subscription;
 import org.junit.*;
 import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
@@ -346,7 +347,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
         TcpConnection redis2Connection = new TcpConnection(new ComponentId(new Prefix(JSubsystem.CSW, "redis2"), JComponentType.Service()));
         TcpRegistration redis2registration = new TcpRegistration(redis2Connection, Port);
 
-        Pair<KillSwitch, TestSubscriber.Probe<TrackingEvent>> source = locationService.track(redis1Connection).toMat(TestSink.probe(untypedSystem), Keep.both()).run(typedSystem);
+        Pair<Subscription, TestSubscriber.Probe<TrackingEvent>> source = locationService.track(redis1Connection).toMat(TestSink.probe(untypedSystem), Keep.both()).run(typedSystem);
 
         IRegistrationResult result = locationService.register(redis1Registration).get();
         IRegistrationResult result2 = locationService.register(redis2registration).get();
@@ -360,7 +361,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
         source.second().request(1);
         source.second().expectNext(new LocationRemoved(redis1Connection));
 
-        source.first().shutdown();
+        source.first().cancel();
         source.second().expectComplete();
     }
 
@@ -374,7 +375,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
         //Test probe actor to receive the TrackingEvent notifications
         TestProbe probe = TestProbe.create(typedSystem);
 
-        KillSwitch killSwitch = locationService.subscribe(redis1Connection, trackingEvent -> probe.ref().tell(trackingEvent));
+        Subscription killSwitch = locationService.subscribe(redis1Connection, trackingEvent -> probe.ref().tell(trackingEvent));
 
         locationService.register(redis1Registration).toCompletableFuture().get();
         probe.expectMessage(new LocationUpdated(redis1Registration.location(Networks.apply().hostname())));
@@ -383,7 +384,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
         probe.expectMessage(new LocationRemoved(redis1Registration.connection()));
 
         //shutdown the notification stream, should no longer receive any notifications
-        killSwitch.shutdown();
+        killSwitch.cancel();
         probe.expectNoMessage(Duration.of(200, ChronoUnit.MILLIS));
     }
 

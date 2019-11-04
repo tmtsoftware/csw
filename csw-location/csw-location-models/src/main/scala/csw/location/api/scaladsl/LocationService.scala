@@ -1,9 +1,9 @@
 package csw.location.api.scaladsl
 
 import akka.Done
-import akka.stream.KillSwitch
 import akka.stream.scaladsl.Source
 import csw.location.models._
+import msocket.api.models.Subscription
 
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
@@ -116,7 +116,7 @@ trait LocationService {
    * @return A stream that emits events related to the connection. It can be cancelled using KillSwitch. This will stop giving
    *         events for earlier tracked connection
    */
-  def track(connection: Connection): Source[TrackingEvent, KillSwitch]
+  def track(connection: Connection): Source[TrackingEvent, Subscription]
 
   /**
    * Subscribe to tracking events for a connection by providing a callback
@@ -128,6 +128,7 @@ trait LocationService {
    * @param callback the callback function of type `TrackingEvent` => Unit which gets executed on receiving any `TrackingEvent`
    * @return a killswitch which can be shutdown to unsubscribe the consumer
    */
-  def subscribe(connection: Connection, callback: TrackingEvent => Unit): KillSwitch
+  def subscribe(connection: Connection, callback: TrackingEvent => Unit): Subscription
 
+  def locationServiceE: LocationServiceE
 }

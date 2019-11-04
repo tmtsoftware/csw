@@ -6,7 +6,14 @@ import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.location.api.scaladsl.LocationService
 import csw.location.server.commons.{ClusterAwareSettings, ClusterSettings}
-import csw.location.server.http.{LocationExceptionHandler, LocationHttpService, LocationRoutes}
+import csw.location.server.http.{
+  LocationExceptionHandler,
+  LocationHttpHandler,
+  LocationHttpService,
+  LocationRoutes,
+  LocationWebsocketHandler
+}
+import msocket.impl.Encoding
 
 // $COVERAGE-OFF$
 private[csw] class ServerWiring {
@@ -18,8 +25,11 @@ private[csw] class ServerWiring {
   lazy val actorRuntime                                    = new ActorRuntime(actorSystem)
   lazy val locationService: LocationService                = LocationServiceFactory.withSystem(actorSystem)
   lazy val locationExceptionHandler                        = new LocationExceptionHandler
-  lazy val locationRoutes                                  = new LocationRoutes(locationService, locationExceptionHandler, actorRuntime)
-  lazy val locationHttpService                             = new LocationHttpService(locationRoutes, actorRuntime, settings)
+  private val httpHandler                                  = new LocationHttpHandler(locationService.locationServiceE)
+  private def websocketHandlerFactory(encoding: Encoding[_]) =
+    new LocationWebsocketHandler(locationService.locationServiceE, encoding)
+  lazy val locationRoutes      = new LocationRoutes(httpHandler, websocketHandlerFactory, locationExceptionHandler, actorRuntime)
+  lazy val locationHttpService = new LocationHttpService(locationRoutes, actorRuntime, settings)
 }
 
 private[csw] object ServerWiring {

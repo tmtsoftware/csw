@@ -7,10 +7,10 @@ import java.util.function.Consumer
 import java.{util => ju}
 
 import akka.Done
-import akka.stream.KillSwitch
 import akka.stream.javadsl.Source
 import csw.location.api.scaladsl.LocationService
 import csw.location.models._
+import msocket.api.models.Subscription
 
 /**
  * A LocationService interface to manage connections and their registrations. All operations are non-blocking.
@@ -122,7 +122,7 @@ trait ILocationService {
    * @return A stream that emits events related to the connection. It can be cancelled using KillSwitch. This will stop giving
    *         events for earlier tracked connection
    */
-  def track(connection: Connection): Source[TrackingEvent, KillSwitch]
+  def track(connection: Connection): Source[TrackingEvent, Subscription]
 
   /**
    * Subscribe to tracking events for a connection by providing a consumer
@@ -135,7 +135,7 @@ trait ILocationService {
    * @param consumer the `Consumer` function that consumes `TrakingEvent`
    * @return a killswitch which can be shutdown to unsubscribe the consumer
    */
-  def subscribe(connection: Connection, consumer: Consumer[TrackingEvent]): KillSwitch
+  def subscribe(connection: Connection, consumer: Consumer[TrackingEvent]): Subscription
 
   /**
    * Returns the Scala API for this instance of location service

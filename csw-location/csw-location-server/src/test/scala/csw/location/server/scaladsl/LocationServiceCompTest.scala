@@ -211,7 +211,7 @@ class LocationServiceCompTest(mode: String)
     result2.unregister().await
     probe.expectMessage(LocationRemoved(redis1Connection))
 
-    switch.shutdown()
+    switch.cancel()
   }
 
   // DEOPSCSW-12: Create location service API
@@ -231,7 +231,7 @@ class LocationServiceCompTest(mode: String)
     locationService.unregister(redis1Connection).await
     probe.expectMsg(LocationRemoved(redis1Registration.connection))
 
-    switch.shutdown()
+    switch.cancel()
     locationService.register(redis1Registration).await
     probe.expectNoMessage(200.millis)
   }
@@ -268,13 +268,13 @@ class LocationServiceCompTest(mode: String)
     httpProbe.expectMessage(LocationRemoved(httpConnection))
 
     //stop tracking http connection
-    httpSwitch.shutdown()
+    httpSwitch.cancel()
 
     //unregister and stop tracking akka connection
     akkaRegistrationResult.unregister().await
     akkaProbe.expectMessage(LocationRemoved(akkaConnection))
 
-    akkaSwitch.shutdown()
+    akkaSwitch.cancel()
   }
 
   // DEOPSCSW-26: Track a connection
@@ -296,7 +296,7 @@ class LocationServiceCompTest(mode: String)
     httpProbe.expectMessage(LocationUpdated(httpRegistration.location(hostname)))
 
     //stop tracking http connection
-    httpSwitch.shutdown()
+    httpSwitch.cancel()
 
     httpRegistrationResult.unregister().await
 

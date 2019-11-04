@@ -1,7 +1,7 @@
 package csw.location.api.scaladsl
 
 import akka.Done
-import csw.location.models.Location
+import csw.location.models.{Connection, Location}
 
 import scala.concurrent.Future
 
@@ -26,4 +26,11 @@ trait RegistrationResult {
    * @return the handle to the `Location` that got registered in `LocationService`
    */
   def location: Location
+}
+
+object RegistrationResult {
+  def from(_location: Location, _unregister: Connection => Future[Done]): RegistrationResult = new RegistrationResult {
+    override def unregister(): Future[Done] = _unregister(location.connection)
+    override def location: Location         = _location
+  }
 }

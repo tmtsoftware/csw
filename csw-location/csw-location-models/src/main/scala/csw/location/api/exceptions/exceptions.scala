@@ -4,12 +4,23 @@ import java.net.URI
 
 import csw.location.models.{Connection, Location}
 
+sealed trait RegistrationError extends Throwable
+
 /**
  * An Exception representing failure in registration
  *
  */
-case class RegistrationFailed(msg: String) extends RuntimeException(msg) {
+case class RegistrationFailed(msg: String) extends RuntimeException(msg) with RegistrationError {
   def this(connection: Connection) = this(s"unable to register $connection")
+}
+
+/**
+ * An Exception representing failure in registration as other location is already registered in place of the given location
+ *
+ */
+case class OtherLocationIsRegistered(msg: String) extends RuntimeException(msg) with RegistrationError {
+  def this(location: Location, otherLocation: Location) =
+    this(s"there is other location=$otherLocation registered against name=${location.connection.name}.")
 }
 
 /**
@@ -18,15 +29,6 @@ case class RegistrationFailed(msg: String) extends RuntimeException(msg) {
  * @param connection a connection for which un-registration failed
  */
 case class UnregistrationFailed(connection: Connection) extends RuntimeException(s"unable to unregister $connection")
-
-/**
- * An Exception representing failure in registration as other location is already registered in place of the given location
- *
- */
-case class OtherLocationIsRegistered(msg: String) extends RuntimeException(msg) {
-  def this(location: Location, otherLocation: Location) =
-    this(s"there is other location=$otherLocation registered against name=${location.connection.name}.")
-}
 
 /**
  * An Exception representing failure in registering non remote actors
