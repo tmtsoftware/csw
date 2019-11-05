@@ -8,7 +8,6 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives.{entity, _}
 import akka.http.scaladsl.server.Route
 import akka.util.Timeout
-import csw.location.client.HttpCodecs
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.models.Connection.HttpConnection
 import csw.location.models.{ComponentId, ComponentType, HttpRegistration}
