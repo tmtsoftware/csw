@@ -1,6 +1,6 @@
 package csw.time.scheduler
 
-import akka.actor.Scheduler
+import akka.actor.typed.Scheduler
 import csw.time.scheduler.api.TimeServiceScheduler
 import csw.time.scheduler.internal.TimeServiceSchedulerImpl
 

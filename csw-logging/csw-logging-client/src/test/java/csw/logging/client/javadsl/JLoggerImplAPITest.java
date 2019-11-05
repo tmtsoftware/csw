@@ -47,7 +47,7 @@ public class JLoggerImplAPITest extends JUnitSuite {
     );
     private String className = getClass().getName();
 
-    private static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.behavior(), "base-system");
+    private static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
     private static LoggingSystem loggingSystem;
 
     private static List<JsonObject> logBuffer = new Vector<>();

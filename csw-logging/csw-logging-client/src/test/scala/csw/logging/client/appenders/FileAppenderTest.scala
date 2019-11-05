@@ -19,7 +19,7 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-649: Fixed directory configuration for multi JVM scenario
 class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
   private val logFileDir                = Paths.get("/tmp/csw-test-logs/").toFile
-  private val actorSystem               = ActorSystem(SpawnProtocol.behavior, "test-1")
+  private val actorSystem               = ActorSystem(SpawnProtocol(), "test-1")
   private val standardHeaders: JsObject = Json.obj(LoggingKeys.HOST -> "localhost", LoggingKeys.NAME -> "test-service")
 
   private val fileAppender = new FileAppender(actorSystem, standardHeaders)
@@ -110,7 +110,7 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
                                            """.stripMargin)
 
     intercept[BaseLogPathNotDefined] {
-      new FileAppender(ActorSystem(SpawnProtocol.behavior, "test-2", config.resolve()), standardHeaders)
+      new FileAppender(ActorSystem(SpawnProtocol(), "test-2", config.resolve()), standardHeaders)
     }
   }
 

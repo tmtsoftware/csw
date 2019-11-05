@@ -29,7 +29,7 @@ object AlarmRefreshActorFactory {
   def make(
       alarmService: AlarmService,
       refreshInterval: FiniteDuration
-  )(implicit actorSystem: ActorSystem[SpawnProtocol]): ActorRef[AutoRefreshSeverityMessage] =
+  )(implicit actorSystem: ActorSystem[SpawnProtocol.Command]): ActorRef[AutoRefreshSeverityMessage] =
     actorSystem.spawn(
       Behaviors.withTimers[AutoRefreshSeverityMessage](AlarmRefreshActor.behavior(_, alarmService, refreshInterval)),
       ""
@@ -46,7 +46,7 @@ object AlarmRefreshActorFactory {
   def jMake(
       alarmService: IAlarmService,
       refreshInterval: Duration,
-      actorSystem: ActorSystem[SpawnProtocol]
+      actorSystem: ActorSystem[SpawnProtocol.Command]
   ): ActorRef[AutoRefreshSeverityMessage] =
     make(alarmService.asScala, FiniteDuration(refreshInterval.toNanos, TimeUnit.NANOSECONDS))(actorSystem)
 
@@ -61,7 +61,7 @@ object AlarmRefreshActorFactory {
   def jMake(
       setSeverity: BiFunction[AlarmKey, AlarmSeverity, CompletableFuture[Done]],
       refreshInterval: Duration,
-      actorSystem: ActorSystem[SpawnProtocol]
+      actorSystem: ActorSystem[SpawnProtocol.Command]
   ): ActorRef[AutoRefreshSeverityMessage] =
     make(
       (key: AlarmKey, severity: AlarmSeverity) => setSeverity(key, severity).toScala,

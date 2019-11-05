@@ -3,7 +3,6 @@ package example.event
 import akka.actor.typed
 import akka.actor.typed.SpawnProtocol
 import akka.stream.Materializer
-import akka.stream.typed.scaladsl.ActorMaterializer
 import csw.event.api.scaladsl.EventService
 import csw.event.client.EventServiceFactory
 import csw.event.client.models.EventStores.{KafkaStore, RedisStore}
@@ -15,8 +14,8 @@ import io.lettuce.core.{ClientOptions, RedisClient}
 class EventServiceCreationExamples {
 
   private implicit val actorSystem: typed.ActorSystem[_] =
-    ActorSystemFactory.remote(SpawnProtocol.behavior, "event-creation-examples")
-  private implicit val mat: Materializer = ActorMaterializer()
+    ActorSystemFactory.remote(SpawnProtocol(), "event-creation-examples")
+  private implicit val mat: Materializer = Materializer(actorSystem)
   private val locationService            = HttpLocationServiceFactory.makeLocalClient
 
   def defaultEventService(): Unit = {

@@ -26,7 +26,7 @@ class RedisSubscriptionApi[K, V](reactiveApiFactory: () => Future[RedisPubSubRea
   ): Source[RedisResult[K, V], RedisSubscription] = {
     val reactiveApiF                                                    = reactiveApiFactory()
     val futureSource                                                    = reactiveApiF.map(_.observe(overflowStrategy))
-    val redisKeyValueSource: Source[RedisResult[K, V], Future[NotUsed]] = Source.fromFutureSource(futureSource)
+    val redisKeyValueSource: Source[RedisResult[K, V], Future[NotUsed]] = Source.futureSource(futureSource)
     val connectedF                                                      = futureSource.flatMap(_ => reactiveApiF.flatMap(_.subscribe(keys)))
 
     redisKeyValueSource.cancellable

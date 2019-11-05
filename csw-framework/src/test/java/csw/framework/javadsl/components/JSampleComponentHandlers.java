@@ -4,6 +4,7 @@ import akka.actor.Cancellable;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Adapter;
 import akka.stream.ActorMaterializer;
+import akka.stream.Materializer;
 import akka.stream.ThrottleMode;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
@@ -103,7 +104,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     public CommandResponse.SubmitResponse onSubmit(Id runId, ControlCommand controlCommand) {
         // Adding item from CommandMessage paramset to ensure things are working
         if (controlCommand.commandName().equals(crmAddOrUpdateCmd())) {
-            return crmAddOrUpdate(controlCommand, runId);
+            return crmAddOrUpdate((Setup) controlCommand);
         } else {
             CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
             currentStatePublisher.publish(submitState);
@@ -145,17 +146,21 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     }
 
     //#addOrUpdateCommand
-    private CommandResponse.SubmitResponse crmAddOrUpdate(ControlCommand controlCommand, Id runId) {
+    private CommandResponse.SubmitResponse crmAddOrUpdate(Setup setup) {
         // This simulates some worker task doing something that finishes after onSubmit returns
-        Runnable task = () ->
-                commandResponseManager.updateCommand(new CommandResponse.Completed(runId));
+        Runnable task = new Runnable() {
+            @Override
+            public void run() {
+                commandResponseManager.update(new Completed(setup.runId()));
+            }
+        };
 
         // Wait a bit and then set CRM to Completed
-        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-        executor.schedule(task, 1, TimeUnit.SECONDS);
+        ExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        ((ScheduledExecutorService) executor).schedule(task, 1, TimeUnit.SECONDS);
 
         // Return Started from onSubmit
-        return new CommandResponse.Started(runId);
+        return new Started(runId);
     }
     //#addOrUpdateCommand
 
@@ -184,12 +189,12 @@ public class JSampleComponentHandlers extends JComponentHandlers {
                     currentStatePublisher.publish(new CurrentState(controlCommand.source(), new StateName("testStateName")).add(JKeyType.IntKey().make("encoder").set(i * 10)));
                     return i;
                 })
-                .throttle(1, Duration.ofMillis(100), 1, (ThrottleMode) ThrottleMode.shaping())
-                .runWith(Sink.ignore(), ActorMaterializer.create(Adapter.toUntyped(actorContext.getSystem())));
+                .throttle(1, Duration.ofMillis(100), 1, (ThrottleMode)ThrottleMode.shaping())
+                .runWith(Sink.ignore(), Materializer.createMaterializer(Adapter.toClassic(actorContext.getSystem())));
     }
 
 
-    private CommandResponse.SubmitResponse processCommandWithoutMatcher(Id runId, ControlCommand controlCommand) {
+    private SubmitResponse processCommandWithoutMatcher(Id runId, ControlCommand controlCommand) {
         if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
             // Set CRM to Error after 1 second
             sendCRM(1, new CommandResponse.Error(runId, "Unknown Error occurred"));
@@ -200,7 +205,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
 
             // Returns Started and completes through CRM after 1 second
             sendCRM(1, new CommandResponse.Completed(runId, result));
-            return new CommandResponse.Started(runId);
+            return new Started(runId);
         }
     }
 

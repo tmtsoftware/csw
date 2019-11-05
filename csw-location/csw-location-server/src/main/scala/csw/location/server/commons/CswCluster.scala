@@ -1,18 +1,18 @@
 package csw.location.server.commons
 
+import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
-import akka.actor.{CoordinatedShutdown, Scheduler}
 import akka.cluster.ddata.SelfUniqueAddress
 import akka.cluster.ddata.typed.scaladsl
 import akka.cluster.ddata.typed.scaladsl.{DistributedData, Replicator}
 import akka.cluster.typed.{Cluster, Join}
 import akka.management.scaladsl.AkkaManagement
-import akka.stream.typed.scaladsl.ActorMaterializer
+import akka.stream.Materializer
 import akka.util.Timeout
-import akka.{actor, Done}
+import akka.{Done, actor}
 import csw.location.api.exceptions.CouldNotJoinCluster
 import csw.location.server.commons.ClusterConfirmationMessages.{HasJoinedCluster, Shutdown}
 import csw.location.server.commons.CoordinatedShutdownReasons.FailureReason
@@ -29,7 +29,7 @@ import scala.util.control.NonFatal
  *
  * @note it is highly recommended that explicit creation of CswCluster should be for advanced usages or testing purposes only
  */
-class CswCluster private (_typedSystem: ActorSystem[SpawnProtocol]) {
+class CswCluster private (_typedSystem: ActorSystem[SpawnProtocol.Command]) {
 
   private val log: Logger = LocationServiceLogger.getLogger
 
@@ -38,14 +38,13 @@ class CswCluster private (_typedSystem: ActorSystem[SpawnProtocol]) {
    */
   val hostname: String = _typedSystem.settings.config.getString("akka.remote.artery.canonical.hostname")
 
-  implicit val typedSystem: ActorSystem[SpawnProtocol] = _typedSystem
-  implicit val untypedSystem: actor.ActorSystem        = _typedSystem.toUntyped
-  implicit val scheduler: Scheduler                    = typedSystem.scheduler
-  implicit val ec: ExecutionContext                    = typedSystem.executionContext
-  implicit val mat: ActorMaterializer                  = makeMat()
-  implicit val cluster: Cluster                        = Cluster(typedSystem)
-  private val distributedData: DistributedData         = scaladsl.DistributedData(typedSystem)
-  implicit val node: SelfUniqueAddress                 = distributedData.selfUniqueAddress
+  implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = _typedSystem
+  implicit val untypedSystem: actor.ActorSystem                = _typedSystem.toClassic
+  implicit val ec: ExecutionContext                            = typedSystem.executionContext
+  implicit val mat: Materializer                               = makeMat()
+  implicit val cluster: Cluster                                = Cluster(typedSystem)
+  private val distributedData: DistributedData                 = scaladsl.DistributedData(typedSystem)
+  implicit val node: SelfUniqueAddress                         = distributedData.selfUniqueAddress
 
   /**
    * Gives the replicator for the current ActorSystem
@@ -60,7 +59,7 @@ class CswCluster private (_typedSystem: ActorSystem[SpawnProtocol]) {
   /**
    * Creates an ActorMaterializer for current ActorSystem
    */
-  private def makeMat(): ActorMaterializer = ActorMaterializer()(typedSystem)
+  private def makeMat(): Materializer = Materializer(typedSystem)
 
   /**
    * If `startManagement` flag is set to true (which is true only when a managementPort is defined in ClusterSettings)
@@ -93,8 +92,9 @@ class CswCluster private (_typedSystem: ActorSystem[SpawnProtocol]) {
     def status: Option[Done]              = Await.result(statusF, 5.seconds)
     val success                           = BlockingUtils.poll(status.isDefined, 20.seconds)
     if (!success) {
-      log.error(CouldNotJoinCluster.getMessage, ex = CouldNotJoinCluster)
-      throw CouldNotJoinCluster
+      val couldNotJoinCluster = CouldNotJoinCluster()
+      log.error(couldNotJoinCluster.getMessage, ex = couldNotJoinCluster)
+      throw couldNotJoinCluster
     }
     confirmationActorF ! Shutdown
     Done
@@ -135,7 +135,7 @@ object CswCluster {
    *
    * @return an instance of CswCluster
    */
-  def withSystem(actorSystem: ActorSystem[SpawnProtocol]): CswCluster = {
+  def withSystem(actorSystem: ActorSystem[SpawnProtocol.Command]): CswCluster = {
     val cswCluster = new CswCluster(actorSystem)
     try {
       cswCluster.startClusterManagement()

@@ -2,7 +2,6 @@ package csw.database;
 
 import akka.actor.typed.SpawnProtocol;
 import akka.stream.Materializer;
-import akka.stream.typed.javadsl.ActorMaterializerFactory;
 import com.opentable.db.postgres.embedded.EmbeddedPostgres;
 import csw.database.commons.DBTestHelper;
 import csw.database.commons.DatabaseServiceConnection;
@@ -36,7 +35,7 @@ public class JDatabaseServiceFactoryTest extends JUnitSuite {
 
     private static Integer port = 5432;
     private static JHTTPLocationService jHttpLocationService;
-    private static akka.actor.typed.ActorSystem<SpawnProtocol> typedSystem;
+    private static akka.actor.typed.ActorSystem<SpawnProtocol.Command> typedSystem;
     private static EmbeddedPostgres postgres;
     private static DatabaseServiceFactory dbFactory;
     private static ILocationService locationService;
@@ -46,9 +45,9 @@ public class JDatabaseServiceFactoryTest extends JUnitSuite {
 
     @BeforeClass
     public static void setup() throws ExecutionException, InterruptedException, TimeoutException {
-        typedSystem = akka.actor.typed.ActorSystem.apply(SpawnProtocol.behavior(), "test");
-//        untypedSystem = Adapter.toUntyped(typedSystem);
-        Materializer mat = ActorMaterializerFactory.create(typedSystem);
+        typedSystem = akka.actor.typed.ActorSystem.apply(SpawnProtocol.create(), "test");
+//        untypedSystem = Adapter.toClassic(typedSystem);
+        Materializer mat = Materializer.createMaterializer(typedSystem);
 
         dbFactory = DBTestHelper.dbServiceFactory(typedSystem);
         postgres = DBTestHelper.postgres(port); // 0 is random port

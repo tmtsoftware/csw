@@ -22,39 +22,39 @@ public class JIrisSupervisorMutableActor {
             return BehaviorBuilder.<LogCommand>create()
                     .onMessage(LogCommand.class,
                             command -> command == LogCommand.LogTrace$.MODULE$,
-                            (ctx,command) -> {
+                            (command) -> {
                                 log.trace(command.toString());
                                 return Behaviors.same();
                             })
                     .onMessage(LogCommand.class,
                             command -> command == LogCommand.LogDebug$.MODULE$,
-                            (ctx,command) -> {
+                            (command) -> {
                                 log.debug(command.toString());
-                                return Behavior.same();
+                                return Behaviors.same();
                             })
                     .onMessage(LogCommand.class,
                             command -> command == LogCommand.LogInfo$.MODULE$,
-                            (ctx,command) -> {
+                            (command) -> {
                                 log.info(command.toString());
-                                return Behavior.same();
+                                return Behaviors.same();
                             })
                     .onMessage(LogCommand.class,
                             command -> command == LogCommand.LogWarn$.MODULE$,
-                            (ctx,command) -> {
+                            (command) -> {
                                 log.warn(command.toString());
-                                return Behavior.same();
+                                return Behaviors.same();
                             })
                     .onMessage(LogCommand.class,
                             command -> command == LogCommand.LogError$.MODULE$,
-                            (ctx,command) -> {
+                            (command) -> {
                                 log.error(command.toString());
-                                return Behavior.same();
+                                return Behaviors.same();
                             })
                     .onMessage(LogCommand.class,
                             command -> command == LogCommand.LogFatal$.MODULE$,
-                            (ctx,command) -> {
+                            (command) -> {
                                 log.fatal(command.toString());
-                                return Behavior.same();
+                                return Behaviors.same();
                             })
                     .build();
         });

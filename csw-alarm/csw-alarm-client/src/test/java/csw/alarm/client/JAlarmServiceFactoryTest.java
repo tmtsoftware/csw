@@ -2,15 +2,14 @@ package csw.alarm.client;
 
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.javadsl.Behaviors;
-import akka.stream.ActorMaterializer;
-import akka.stream.typed.javadsl.ActorMaterializerFactory;
+import akka.stream.Materializer;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import csw.alarm.api.javadsl.IAlarmService;
-import csw.alarm.models.FullAlarmSeverity;
 import csw.alarm.api.scaladsl.AlarmAdminService;
 import csw.alarm.client.internal.commons.AlarmServiceConnection;
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup;
+import csw.alarm.models.FullAlarmSeverity;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
@@ -25,7 +24,7 @@ import scala.concurrent.duration.FiniteDuration;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import static csw.alarm.api.javadsl.JAlarmSeverity.Indeterminate;
+import csw.alarm.api.javadsl.JAlarmSeverity;
 
 // DEOPSCSW-481: Component Developer API available to all CSW components
 public class JAlarmServiceFactoryTest extends JUnitSuite {
@@ -35,7 +34,7 @@ public class JAlarmServiceFactoryTest extends JUnitSuite {
     private static AlarmServiceTestSetup testSetup = new AlarmServiceTestSetup();
     private AlarmServiceFactory alarmServiceFactory = testSetup.alarmServiceFactory();
     private static ActorSystem<Object> seedSystem = ActorSystemFactory.remote(Behaviors.empty(), "test");
-    private static ActorMaterializer mat = ActorMaterializerFactory.create(seedSystem);
+    private static Materializer mat = Materializer.createMaterializer(seedSystem);
     private static ILocationService locationService = JHttpLocationServiceFactory.makeLocalClient(seedSystem, mat);
     private AlarmAdminService alarmService = testSetup.alarmService();
 
@@ -62,18 +61,18 @@ public class JAlarmServiceFactoryTest extends JUnitSuite {
     @Test
     public void shouldCreateClientAlarmServiceUsingLocationService() throws Exception {
         IAlarmService alarmServiceUsingLS = alarmServiceFactory.jMakeClientApi(locationService, seedSystem);
-        alarmServiceUsingLS.setSeverity(testSetup.tromboneAxisHighLimitAlarmKey(), Indeterminate).get();
+        alarmServiceUsingLS.setSeverity(testSetup.tromboneAxisHighLimitAlarmKey(), JAlarmSeverity.Indeterminate()).get();
 
         FullAlarmSeverity alarmSeverity = Await.result(alarmService.getCurrentSeverity(testSetup.tromboneAxisHighLimitAlarmKey()), Duration.create(5, TimeUnit.SECONDS));
-        Assert.assertEquals(alarmSeverity, Indeterminate);
+        Assert.assertEquals(alarmSeverity, JAlarmSeverity.Indeterminate());
     }
 
     @Test
     public void shouldCreateClientAlarmServiceUsingHostAndPort() throws Exception {
         IAlarmService alarmServiceUsingHostPort = alarmServiceFactory.jMakeClientApi(testSetup.hostname(), testSetup.sentinelPort(), seedSystem);
-        alarmServiceUsingHostPort.setSeverity(testSetup.tromboneAxisHighLimitAlarmKey(), Indeterminate).get();
+        alarmServiceUsingHostPort.setSeverity(testSetup.tromboneAxisHighLimitAlarmKey(), JAlarmSeverity.Indeterminate()).get();
 
         FullAlarmSeverity alarmSeverity = Await.result(alarmService.getCurrentSeverity(testSetup.tromboneAxisHighLimitAlarmKey()), Duration.create(5, TimeUnit.SECONDS));
-        Assert.assertEquals(alarmSeverity, Indeterminate);
+        Assert.assertEquals(alarmSeverity, JAlarmSeverity.Indeterminate());
     }
 }

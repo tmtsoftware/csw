@@ -1,16 +1,17 @@
 package csw.event.client.perf.ocs.gateway.client
 
 import akka.NotUsed
+import akka.actor.ActorSystem
+import akka.actor.typed.Scheduler
+import akka.actor.typed
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.{ActorSystem, Scheduler, typed}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.sse.ServerSentEvent
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.http.scaladsl.unmarshalling.sse.EventStreamUnmarshalling._
 import akka.stream.scaladsl.{Keep, Source}
-import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.stream.{KillSwitches, Materializer, UniqueKillSwitch}
 import csw.event.api.scaladsl.EventService
 import csw.event.client.EventServiceFactory
@@ -27,7 +28,7 @@ class GatewayClient(serverIp: String, port: Int)(implicit val actorSystem: typed
 
   import csw.params.core.formats.ParamCodecs._
 
-  implicit val untypedsystem: ActorSystem = actorSystem.toUntyped
+  implicit val untypedsystem: ActorSystem = actorSystem.toClassic
   import actorSystem.executionContext
   implicit val scheduler: Scheduler = actorSystem.scheduler
 
@@ -49,7 +50,7 @@ class GatewayClient(serverIp: String, port: Int)(implicit val actorSystem: typed
       await(Unmarshal(response.entity).to[Source[ServerSentEvent, NotUsed]])
     }
 
-    val sseStream = Source.fromFuture(sseStreamFuture).flatMapConcat(identity)
+    val sseStream = Source.future(sseStreamFuture).flatMapConcat(identity)
     sseStream.map(x => JsonSupport.reads[Event](Json.parse(x.data))).viaMat(KillSwitches.single)(Keep.right)
   }
 
@@ -58,7 +59,7 @@ class GatewayClient(serverIp: String, port: Int)(implicit val actorSystem: typed
 object Main extends App {
 
   private implicit val system: typed.ActorSystem[_] = ActorSystemFactory.remote(Behaviors.empty, "event-client-system")
-  private implicit val mat: Materializer            = ActorMaterializer()
+  private implicit val mat: Materializer            = Materializer(system)
 
   private val client = new GatewayClient("localhost", 9090)
 

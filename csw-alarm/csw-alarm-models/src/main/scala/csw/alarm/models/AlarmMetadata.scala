@@ -19,7 +19,7 @@ case class AlarmMetadata private[alarm] (
     description: String,
     location: String,
     alarmType: AlarmType,
-    private[alarm] val supportedSeverities: Set[FullAlarmSeverity],
+    supportedSeverities: Set[FullAlarmSeverity],
     probableCause: String,
     operatorResponse: String,
     isAutoAcknowledgeable: Boolean,

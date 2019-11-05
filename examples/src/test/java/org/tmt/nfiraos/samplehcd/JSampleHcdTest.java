@@ -53,7 +53,7 @@ public class JSampleHcdTest extends JUnitSuite {
     // DEOPSCSW-39: examples of Location Service
     @Test
     public void testHCDShouldBeLocatableUsingLocationService() throws ExecutionException, InterruptedException {
-        Connection.AkkaConnection connection = new Connection.AkkaConnection(new ComponentId("JSampleHcd", JComponentType.HCD));
+        Connection.AkkaConnection connection = new Connection.AkkaConnection(new ComponentId("JSampleHcd", JComponentType.HCD()));
         ILocationService locationService = testKit.jLocationService();
         AkkaLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().orElseThrow();
 
@@ -108,7 +108,7 @@ public class JSampleHcdTest extends JUnitSuite {
     //#subscribe
 
     //#submitAndWait
-    private ActorSystem<SpawnProtocol> typedActorSystem = testKit.actorSystem();
+    private ActorSystem<SpawnProtocol.Command> typedActorSystem = testKit.actorSystem();
 
     // DEOPSCSW-39: examples of Location Service
     @Test
@@ -122,7 +122,7 @@ public class JSampleHcdTest extends JUnitSuite {
 
         Timeout commandResponseTimeout = new Timeout(10, TimeUnit.SECONDS);
 
-        Connection.AkkaConnection connection = new Connection.AkkaConnection(new ComponentId("JSampleHcd", JComponentType.HCD));
+        Connection.AkkaConnection connection = new Connection.AkkaConnection(new ComponentId("JSampleHcd", JComponentType.HCD()));
         ILocationService locationService = testKit.jLocationService();
         AkkaLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().orElseThrow();
 
@@ -148,7 +148,7 @@ public class JSampleHcdTest extends JUnitSuite {
 
         Timeout commandResponseTimeout = new Timeout(1, TimeUnit.SECONDS);
 
-        Connection.AkkaConnection connection = new Connection.AkkaConnection(new ComponentId("JSampleHcd", JComponentType.HCD));
+        Connection.AkkaConnection connection = new Connection.AkkaConnection(new ComponentId("JSampleHcd", JComponentType.HCD()));
         ILocationService locationService = testKit.jLocationService();
         AkkaLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().orElseThrow();
 

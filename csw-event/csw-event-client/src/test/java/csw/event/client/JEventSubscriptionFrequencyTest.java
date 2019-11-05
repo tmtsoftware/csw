@@ -128,10 +128,10 @@ public class JEventSubscriptionFrequencyTest extends TestNGSuite {
 
         Cancellable cancellable = baseProperties.jPublisher().publish(eventGenerator.generator(), Duration.ofMillis(100));
         Thread.sleep(500);
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(Set.of(eventKey), Duration.ZERO.plusMillis(600), SubscriptionModes.jRateAdapterMode()).toMat(Sink.foreach(receivedEvents::add), Keep.left()).run(baseProperties.resumingMat());
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(Set.of(eventKey), Duration.ZERO.plusMillis(600), SubscriptionModes.jRateAdapterMode()).toMat(Sink.foreach(receivedEvents::add), Keep.left()).withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
         subscription.ready().get(10, TimeUnit.SECONDS);
 
-        IEventSubscription subscription2 = baseProperties.jSubscriber().subscribe(Set.of(eventKey), Duration.ZERO.plusMillis(800), SubscriptionModes.jRateAdapterMode()).toMat(Sink.foreach(receivedEvents2::add), Keep.left()).run(baseProperties.resumingMat());
+        IEventSubscription subscription2 = baseProperties.jSubscriber().subscribe(Set.of(eventKey), Duration.ZERO.plusMillis(800), SubscriptionModes.jRateAdapterMode()).toMat(Sink.foreach(receivedEvents2::add), Keep.left()).withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
         subscription2.ready().get(10, TimeUnit.SECONDS);
 
         Thread.sleep(2000);

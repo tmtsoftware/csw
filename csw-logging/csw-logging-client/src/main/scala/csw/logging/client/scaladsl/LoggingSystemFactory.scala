@@ -18,7 +18,7 @@ object LoggingSystemFactory {
       "foo-name",
       "foo-version",
       InetAddress.getLocalHost.getHostName,
-      ActorSystem(SpawnProtocol.behavior, "logging")
+      ActorSystem(SpawnProtocol(), "logging")
     )
 
   /**
@@ -31,6 +31,6 @@ object LoggingSystemFactory {
    * @param actorSystem the ActorSystem used to create LogActor from LoggingSystem
    * @return the instance of LoggingSystem
    */
-  def start(name: String, version: String, hostName: String, actorSystem: ActorSystem[SpawnProtocol]): LoggingSystem =
+  def start(name: String, version: String, hostName: String, actorSystem: ActorSystem[SpawnProtocol.Command]): LoggingSystem =
     new LoggingSystem(name, version, hostName, actorSystem)
 }

@@ -8,6 +8,6 @@ import akka.serialization.Serialization
 
 object ActorExtension {
   implicit class RichActor(actorRef: ActorRef[_]) {
-    def toURI: URI = new URI(Serialization.serializedActorPath(actorRef.toUntyped))
+    def toURI: URI = new URI(Serialization.serializedActorPath(actorRef.toClassic))
   }
 }

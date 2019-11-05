@@ -10,4 +10,4 @@ import akka.actor.typed.{ActorSystem, SpawnProtocol}
  *               received by a container.
  * @param component represents a supervisor actor reference and componentInfo
  */
-private[csw] case class SupervisorInfo(system: ActorSystem[SpawnProtocol], component: Component)
+private[csw] case class SupervisorInfo(system: ActorSystem[SpawnProtocol.Command], component: Component)

@@ -17,4 +17,6 @@ trait SequencerCommandService {
    * @return a SubmitResponse as a Future value
    */
   def submitAndWait(sequence: Sequence): Future[SubmitResponse]
+
+  def queryFinal(): Future[SubmitResponse]
 }

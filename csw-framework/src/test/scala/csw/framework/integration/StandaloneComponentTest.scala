@@ -42,8 +42,8 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
   private var loggingSystem: LoggingSystem = _
   // using standaloneActorSystem to start component instead of seedActorSystem,
   // to assert shutdown of the component(which will also shutdown standaloneActorSystem)
-  private val standaloneComponentActorSystem: ActorSystem[SpawnProtocol] =
-    ActorSystemFactory.remote(SpawnProtocol.behavior, "test")
+  private val standaloneComponentActorSystem: ActorSystem[SpawnProtocol.Command] =
+    ActorSystemFactory.remote(SpawnProtocol(), "test")
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
@@ -80,7 +80,7 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
     val supervisorCommandService = CommandServiceFactory.make(resolvedAkkaLocation)
 
     val (_, akkaProbe) =
-      seedLocationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent](seedActorSystem.toUntyped))(Keep.both).run()
+      seedLocationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent](seedActorSystem.toClassic))(Keep.both).run()
     akkaProbe.requestNext() shouldBe a[LocationUpdated]
 
     // on shutdown, component unregisters from location service

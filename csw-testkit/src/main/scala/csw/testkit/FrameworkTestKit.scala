@@ -37,14 +37,14 @@ import scala.concurrent.ExecutionContext
  *
  */
 final class FrameworkTestKit private (
-    val actorSystem: typed.ActorSystem[SpawnProtocol],
+    val actorSystem: typed.ActorSystem[SpawnProtocol.Command],
     val locationTestKit: LocationTestKit,
     val configTestKit: ConfigTestKit,
     val eventTestKit: EventTestKit,
     val alarmTestKit: AlarmTestKit
 ) {
 
-  implicit lazy val system: ActorSystem     = actorSystem.toUntyped
+  implicit lazy val system: ActorSystem     = actorSystem.toClassic
   lazy val frameworkWiring: FrameworkWiring = FrameworkWiring.make(actorSystem)
   implicit lazy val ec: ExecutionContext    = frameworkWiring.actorRuntime.ec
   implicit lazy val mat: Materializer       = frameworkWiring.actorRuntime.mat
@@ -122,7 +122,7 @@ object FrameworkTestKit {
    * @return handle to FrameworkTestKit which can be used to start and stop all services started
    */
   def apply(
-      actorSystem: typed.ActorSystem[SpawnProtocol] = ActorSystemFactory.remote(SpawnProtocol.behavior, "framework-testkit"),
+      actorSystem: typed.ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "framework-testkit"),
       testKitSettings: TestKitSettings = TestKitSettings(ConfigFactory.load())
   ): FrameworkTestKit = new FrameworkTestKit(
     actorSystem,
@@ -145,7 +145,7 @@ object FrameworkTestKit {
    * @param actorSystem actorSystem used for spawning components
    * @return handle to FrameworkTestKit which can be used to start and stop all services started
    */
-  def create(actorSystem: typed.ActorSystem[SpawnProtocol]): FrameworkTestKit = apply(actorSystem)
+  def create(actorSystem: typed.ActorSystem[SpawnProtocol.Command]): FrameworkTestKit = apply(actorSystem)
 
   /**
    * Java API for creating FrameworkTestKit

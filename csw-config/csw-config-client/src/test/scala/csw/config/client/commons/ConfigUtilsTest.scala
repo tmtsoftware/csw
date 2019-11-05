@@ -5,7 +5,6 @@ import java.nio.file.{Files, Paths}
 import akka.actor.typed
 import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.Materializer
-import akka.stream.typed.scaladsl
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.config.api.ConfigData
 import csw.config.api.exceptions.{LocalFileNotFound, UnableToParseOptions}
@@ -19,7 +18,7 @@ import scala.concurrent.{Await, Future}
 class ConfigUtilsTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll with MockitoSugar {
 
   implicit val system: typed.ActorSystem[Nothing] = typed.ActorSystem(Behaviors.empty, "test")
-  implicit val mat: Materializer                  = scaladsl.ActorMaterializer()
+  implicit val mat: Materializer                  = Materializer(system)
 
   test("should throw exception if input file and default config is empty") {
     val mockedConfigClientService = mock[ConfigClientService]

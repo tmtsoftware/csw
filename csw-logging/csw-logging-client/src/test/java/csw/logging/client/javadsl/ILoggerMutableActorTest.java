@@ -29,7 +29,7 @@ import static csw.logging.client.utils.Eventually.eventually;
 
 // DEOPSCSW-280 SPIKE: Introduce Akkatyped in logging
 public class ILoggerMutableActorTest extends JUnitSuite {
-    protected static ActorSystem<SpawnProtocol> actorSystem = ActorSystem.create(SpawnProtocol.behavior(), "base-system");
+    protected static ActorSystem<SpawnProtocol.Command> actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
     protected static LoggingSystem loggingSystem;
 
     protected static List<JsonObject> logBuffer = new ArrayList<>();

@@ -28,12 +28,12 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-279: Test logging performance
 @State(Scope.Benchmark)
 class FileAppenderBenchmark {
-  var actorSystem: typed.ActorSystem[SpawnProtocol] = _
-  var fileAppender: FileAppender                    = _
+  var actorSystem: typed.ActorSystem[SpawnProtocol.Command] = _
+  var fileAppender: FileAppender                            = _
 
   @Setup(Level.Trial)
   def setup(): Unit = {
-    actorSystem = typed.ActorSystem(SpawnProtocol.behavior, "logging")
+    actorSystem = typed.ActorSystem(SpawnProtocol(), "logging")
     new LoggingSystem("FileAppender", "SNAPSHOT-1.0", InetAddress.getLocalHost.getHostName, actorSystem)
     fileAppender = new FileAppender(actorSystem, LogActorMock.standardHeaders)
   }

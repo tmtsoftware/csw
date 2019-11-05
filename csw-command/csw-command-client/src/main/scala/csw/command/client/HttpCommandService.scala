@@ -5,7 +5,6 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Keep, Sink, Source}
-import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.util.{ByteString, Timeout}
 import csw.location.api.scaladsl.LocationService
 import csw.location.models.ComponentType
@@ -40,8 +39,8 @@ case class HttpCommandService(
 ) {
   import HttpCommandService._
 
-  implicit val sys: akka.actor.ActorSystem = system.toUntyped
-  implicit val mat: Materializer           = ActorMaterializer()(system)
+  implicit val sys: akka.actor.ActorSystem = system.toClassic
+  implicit val mat: Materializer           = Materializer(system)
   implicit val ec: ExecutionContext        = system.executionContext
 
   private val componentName = connection.componentId.name

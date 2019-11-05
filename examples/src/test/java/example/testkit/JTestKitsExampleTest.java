@@ -2,7 +2,7 @@ package example.testkit;
 
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.SpawnProtocol;
-import akka.stream.typed.javadsl.ActorMaterializerFactory;
+import akka.stream.Materializer;
 import com.typesafe.config.ConfigFactory;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
@@ -21,7 +21,7 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-import static csw.location.api.javadsl.JComponentType.Assembly;
+import csw.location.api.javadsl.JComponentType;
 
 public class JTestKitsExampleTest extends JUnitSuite {
 
@@ -39,9 +39,9 @@ public class JTestKitsExampleTest extends JUnitSuite {
     }
     //#framework-testkit
 
-    private ActorSystem<SpawnProtocol> system = frameworkTestKit.actorSystem();
+    private ActorSystem<SpawnProtocol.Command> system = frameworkTestKit.actorSystem();
     private ILocationService locationService =
-            JHttpLocationServiceFactory.makeLocalClient(system, ActorMaterializerFactory.create(system));
+            JHttpLocationServiceFactory.makeLocalClient(system, Materializer.createMaterializer(system));
 
     @Test
     public void shouldAbleToSpawnContainerUsingTestKit() throws ExecutionException, InterruptedException {
@@ -56,7 +56,7 @@ public class JTestKitsExampleTest extends JUnitSuite {
 
         //#spawn-using-testkit
 
-        AkkaConnection connection = new AkkaConnection(new ComponentId("JSampleAssembly", Assembly));
+        AkkaConnection connection = new AkkaConnection(new ComponentId("JSampleAssembly", JComponentType.Assembly()));
         Optional<AkkaLocation> akkaLocation = locationService.resolve(connection, Duration.ofSeconds(5)).get();
 
         Assert.assertTrue(akkaLocation.isPresent());

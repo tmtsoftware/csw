@@ -15,7 +15,7 @@ import scala.concurrent.duration.DurationInt
 // DEOPSCSW-122: Allow local component logs to be output to STDOUT
 class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
 
-  private val actorSystem = ActorSystem(SpawnProtocol.behavior, "test-1")
+  private val actorSystem = ActorSystem(SpawnProtocol(), "test-1")
 
   private val standardHeaders: JsObject = Json.obj(
     LoggingKeys.VERSION -> 1,
@@ -85,7 +85,7 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
       .parseString("csw-logging.appender-config.stdout.oneLine=true")
       .withFallback(ConfigFactory.load())
 
-    val actorSystemWithOneLineTrueConfig = ActorSystem(SpawnProtocol.behavior, "test-2", config)
+    val actorSystemWithOneLineTrueConfig = ActorSystem(SpawnProtocol(), "test-2", config)
     val stdOutAppenderForOneLineMsg      = new StdOutAppender(actorSystemWithOneLineTrueConfig, standardHeaders, println)
 
     Console.withOut(outCapture) {

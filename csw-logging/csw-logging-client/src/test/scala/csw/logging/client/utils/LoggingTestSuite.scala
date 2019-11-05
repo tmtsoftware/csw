@@ -13,7 +13,7 @@ import scala.concurrent.duration.DurationLong
 
 abstract class LoggingTestSuite() extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
 
-  protected lazy val actorSystem                    = ActorSystem(SpawnProtocol.behavior, "test")
+  protected lazy val actorSystem                    = ActorSystem(SpawnProtocol(), "test")
   protected val logBuffer: mutable.Buffer[JsObject] = mutable.Buffer.empty[JsObject]
   protected val testAppender                        = new TestAppender(x => logBuffer += Json.parse(x.toString).as[JsObject])
 

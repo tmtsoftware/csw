@@ -1,5 +1,6 @@
 package csw.command.client.models.framework
-import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
+
+import enumeratum.{Enum, EnumEntry}
 
 import scala.collection.immutable
 
@@ -9,7 +10,7 @@ import scala.collection.immutable
  */
 sealed abstract class LocationServiceUsage extends EnumEntry
 
-object LocationServiceUsage extends Enum[LocationServiceUsage] with PlayJsonEnum[LocationServiceUsage] {
+object LocationServiceUsage extends Enum[LocationServiceUsage] {
   override def values: immutable.IndexedSeq[LocationServiceUsage] = findValues
 
   /**

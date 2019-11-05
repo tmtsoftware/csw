@@ -2,18 +2,17 @@ package csw.alarm.client.internal.helpers
 
 import akka.actor.typed
 import akka.actor.typed.SpawnProtocol
-import akka.stream.ActorMaterializer
-import akka.stream.typed.scaladsl
+import akka.stream.Materializer
 import com.typesafe.config.ConfigFactory
 import csw.alarm.api.internal.{MetadataKey, SeverityKey}
 import csw.alarm.api.javadsl.IAlarmService
-import csw.alarm.models.{AlarmMetadata, FullAlarmSeverity}
 import csw.alarm.api.scaladsl.AlarmAdminService
 import csw.alarm.client.AlarmServiceFactory
 import csw.alarm.client.internal.commons.Settings
 import csw.alarm.client.internal.commons.serviceresolver.AlarmServiceHostPortResolver
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.alarm.client.internal.redis.RedisConnectionsFactory
+import csw.alarm.models.{AlarmMetadata, FullAlarmSeverity}
 import csw.commons.redis.EmbeddedRedis
 import csw.network.utils.SocketUtils.getFreePort
 import io.lettuce.core.RedisClient
@@ -43,15 +42,15 @@ class AlarmServiceTestSetup
 
   private val redisClient = RedisClient.create()
 
-  implicit val actorSystem: typed.ActorSystem[SpawnProtocol] = typed.ActorSystem(SpawnProtocol.behavior, "alarm-server")
-  implicit val ec: ExecutionContext                          = actorSystem.executionContext
-  implicit val mat: ActorMaterializer                        = scaladsl.ActorMaterializer()
+  implicit val actorSystem: typed.ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "alarm-server")
+  implicit val ec: ExecutionContext                                  = actorSystem.executionContext
+  implicit val mat: Materializer                                     = Materializer(actorSystem)
 
   val alarmServiceFactory             = new AlarmServiceFactory(redisClient)
   val alarmService: AlarmAdminService = alarmServiceFactory.makeAdminApi(hostname, sentinelPort)
   val jAlarmService: IAlarmService    = alarmServiceFactory.jMakeClientApi(hostname, sentinelPort, actorSystem)
 
-  import csw.alarm.client.internal.AlarmCodec._
+  import csw.alarm.client.internal.AlarmRomaineCodec._
 
   val connsFactory: RedisConnectionsFactory                          = new RedisConnectionsFactory(resolver, alarmServer, new RomaineFactory(redisClient))
   val testMetadataApi: RedisAsyncApi[MetadataKey, AlarmMetadata]     = connsFactory.asyncApi[MetadataKey, AlarmMetadata]

@@ -106,7 +106,7 @@ class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime
       .alsoToMat(FileIO.toPath(path))(Keep.right)
       .toMat(Sha1.sink)(Keep.both)
       .run()
-    await(resultF).status.get
+    await(resultF)
     (path, await(shaF))
   }
 

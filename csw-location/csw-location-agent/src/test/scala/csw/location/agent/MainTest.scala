@@ -5,7 +5,6 @@ import java.net.URI
 import akka.actor.typed
 import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.Materializer
-import akka.stream.typed.scaladsl.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import csw.commons.ResourceReader
 import csw.location.agent.common.TestFutureExtension.RichFuture
@@ -22,7 +21,7 @@ import scala.concurrent.duration._
 class MainTest extends ScalaTestFrameworkTestKit with FunSuiteLike {
 
   implicit private val system: typed.ActorSystem[_] = typed.ActorSystem(Behaviors.empty, "test-system")
-  implicit private val mat: Materializer            = ActorMaterializer()
+  implicit private val mat: Materializer            = Materializer(system)
   private val locationService                       = HttpLocationServiceFactory.makeLocalClient
 
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 100.millis)

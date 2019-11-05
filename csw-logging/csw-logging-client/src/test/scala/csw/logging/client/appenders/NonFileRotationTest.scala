@@ -21,7 +21,7 @@ class NonFileRotationTest extends FunSuite with Matchers with BeforeAndAfterEach
     "csw-logging.appender-config.file.rotate" -> false
   )
   private val config                    = ConfigFactory.parseMap(map.asJava).withFallback(ConfigFactory.load())
-  private val actorSystem               = ActorSystem(SpawnProtocol.behavior, "test-1", config)
+  private val actorSystem               = ActorSystem(SpawnProtocol(), "test-1", config)
   private val standardHeaders: JsObject = Json.obj(LoggingKeys.HOST -> "localhost", LoggingKeys.NAME -> "test-service")
 
   private val fileAppender = new FileAppender(actorSystem, standardHeaders)

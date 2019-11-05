@@ -11,7 +11,6 @@ import akka.actor.typed.javadsl.Adapter;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.japi.Pair;
 import akka.japi.pf.ReceiveBuilder;
-import akka.stream.ActorMaterializer;
 import akka.stream.KillSwitch;
 import akka.stream.Materializer;
 import akka.stream.javadsl.Keep;
@@ -61,7 +60,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
     private ActorSystem<Void> typedSystem = Adapter.toTyped(this.system);
     //#create-location-service
     private akka.actor.ActorSystem system = context().system();
-    private ActorMaterializer mat = ActorMaterializer.create(system);
+    private Materializer mat = Materializer.createMaterializer(system);
     private ILocationService locationService = JHttpLocationServiceFactory.makeLocalClient(Adapter.toTyped(system), mat);
     //#create-location-service
 
@@ -100,14 +99,14 @@ public class JLocationServiceExampleClient extends AbstractActor {
         //#Components-Connections-Registrations
 
         // dummy http connection
-        HttpConnection httpConnection = new HttpConnection(new ComponentId("configuration", JComponentType.Service));
+        HttpConnection httpConnection = new HttpConnection(new ComponentId("configuration", JComponentType.Service()));
         HttpRegistration httpRegistration = new HttpRegistration(httpConnection, 8080, "path123");
         httpRegResult = locationService.register(httpRegistration).get();
 
         // ************************************************************************************************************
 
         // dummy HCD connection
-        AkkaConnection hcdConnection = new AkkaConnection(new ComponentId("hcd1", JComponentType.HCD));
+        AkkaConnection hcdConnection = new AkkaConnection(new ComponentId("hcd1", JComponentType.HCD()));
         ActorRef actorRef = getContext().actorOf(Props.create(AbstractActor.class, () -> new AbstractActor() {
                     @Override
                     public Receive createReceive() {
@@ -131,7 +130,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         });
         akka.actor.typed.ActorRef<String> typedActorRef = Adapter.spawn(context(), behavior, "typed-actor-ref");
 
-        AkkaConnection assemblyConnection = new AkkaConnection(new ComponentId("assembly1", JComponentType.Assembly));
+        AkkaConnection assemblyConnection = new AkkaConnection(new ComponentId("assembly1", JComponentType.Assembly()));
 
         // Register Typed ActorRef[String] with Location Service
         AkkaRegistration assemblyRegistration = new RegistrationFactory().akkaTyped(assemblyConnection, new Prefix("nfiraos.ncc.tromboneAssembly"), typedActorRef);
@@ -199,7 +198,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         // example code showing how to get the actorRef for remote component and send it a message
         if (resolveResult.isPresent()) {
             AkkaLocation loc = resolveResult.orElseThrow();
-            ActorRef actorRef = Adapter.toUntyped(new URIExtension.RichURI(loc.uri()).toActorRef(typedSystem));
+            ActorRef actorRef = Adapter.toClassic(new URIExtension.RichURI(loc.uri()).toActorRef(typedSystem));
 //            actorRef.tell(LocationServiceExampleComponent.ClientMessage, getSelf());
         }
     }
@@ -216,7 +215,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
 
         //#filtering-component
         // filter connections based on component type
-        List<Location> componentList = locationService.list(JComponentType.Assembly).get();
+        List<Location> componentList = locationService.list(JComponentType.Assembly()).get();
         log.info("Registered Assemblies:");
         for (Location loc : componentList) {
             log.info("--- " + connectionInfo(loc.connection()));
@@ -226,7 +225,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
 
         //#filtering-connection
         // filter connections based on connection type
-        List<Location> akkaList = locationService.list(JConnectionType.AkkaType).get();
+        List<Location> akkaList = locationService.list(JConnectionType.AkkaType()).get();
         log.info("Registered Akka connections:");
         for (Location loc : akkaList) {
             log.info("--- " + connectionInfo(loc.connection()));
@@ -249,7 +248,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
 
         // track connection to LocationServiceExampleComponent
         // Calls track method for example connection and forwards location messages to this actor
-        Materializer mat = ActorMaterializer.create(getContext());
+        Materializer mat = Materializer.createMaterializer(getContext());
         log.info("Starting to track " + exampleConnection);
         locationService.track(exampleConnection).toMat(Sink.actorRef(getSelf(), AllDone.class), Keep.both()).run(mat);
 
@@ -330,7 +329,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         Await.result(locationWiring.locationHttpService().start(), new FiniteDuration(5, TimeUnit.SECONDS));
 
         //#create-actor-system
-        ActorSystem<SpawnProtocol> typedSystem = ActorSystemFactory.remote(SpawnProtocol.behavior(), "csw-examples-locationServiceClient");
+        ActorSystem<SpawnProtocol.Command> typedSystem = ActorSystemFactory.remote(SpawnProtocol.create(), "csw-examples-locationServiceClient");
         //#create-actor-system
 
         //#create-logging-system

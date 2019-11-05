@@ -4,8 +4,6 @@ import java.time.{Duration, Instant}
 import java.util.concurrent.TimeUnit.NANOSECONDS
 
 import csw.time.clock.natives.models.TMTClock.clock
-import julienrf.json.derived
-import play.api.libs.json._
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -30,15 +28,6 @@ sealed trait TMTTime extends Product with Serializable {
 }
 
 object TMTTime {
-
-  implicit val instantFormat: Format[Instant] = new Format[Instant] {
-    override def reads(json: JsValue): JsResult[Instant] = JsSuccess(Instant.parse(json.as[String]))
-    override def writes(instant: Instant): JsValue       = JsString(instant.toString)
-  }
-
-  implicit val tmtTimeFormat: OFormat[TMTTime]      = derived.flat.oformat((__ \ "type").format[String])
-  implicit def utcTimeReads[T <: TMTTime]: Reads[T] = tmtTimeFormat.map(_.asInstanceOf[T])
-
   // Allows UTCTime and TAITime to be sorted
   implicit def orderByInstant[A <: TMTTime]: Ordering[A] = Ordering.by(e => e.value)
 }
@@ -61,11 +50,6 @@ final case class UTCTime(value: Instant) extends TMTTime {
 }
 
 object UTCTime {
-
-  implicit def utcTimeFormat(implicit instantFormat: Format[Instant]): Format[UTCTime] = new Format[UTCTime] {
-    override def writes(time: UTCTime): JsValue          = instantFormat.writes(time.value)
-    override def reads(json: JsValue): JsResult[UTCTime] = instantFormat.reads(json).map(UTCTime(_))
-  }
 
   /**
    * Obtains the PTP (Precision Time Protocol) synchronized current UTC time.
@@ -96,11 +80,6 @@ final case class TAITime(value: Instant) extends TMTTime {
 }
 
 object TAITime {
-
-  implicit def taiTimeFormat(implicit instantFormat: Format[Instant]): Format[TAITime] = new Format[TAITime] {
-    override def writes(time: TAITime): JsValue          = instantFormat.writes(time.value)
-    override def reads(json: JsValue): JsResult[TAITime] = instantFormat.reads(json).map(TAITime(_))
-  }
 
   /**
    * Obtains the PTP (Precision Time Protocol) synchronized current time in TAI timescale.

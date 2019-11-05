@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 import static csw.logging.client.utils.Eventually.eventually;
 
 public class ILoggerActorTest extends JUnitSuite {
-    protected static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.behavior(), "base-system");
+    protected static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
     protected static LoggingSystem loggingSystem;
 
     protected static List<JsonObject> logBuffer = new ArrayList<>();

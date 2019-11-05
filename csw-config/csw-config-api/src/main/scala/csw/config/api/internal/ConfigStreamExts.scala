@@ -34,7 +34,7 @@ private[config] object ConfigStreamExts {
           p.success(prefix)
           Source(prefix) ++ remainingSource
       }
-      (p.future, Source.fromFutureSource(futureSource))
+      (p.future, Source.futureSource(futureSource))
     }
 
   }

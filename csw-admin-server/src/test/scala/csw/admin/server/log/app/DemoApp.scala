@@ -49,11 +49,11 @@ object DemoApp extends App {
 
   val adminWiring: AdminWiring = new AdminWiring()
 
-  val frameworkSystem = ActorSystemFactory.remote(SpawnProtocol.behavior, "framework")
+  val frameworkSystem = ActorSystemFactory.remote(SpawnProtocol(), "framework")
   val frameworkWiring = FrameworkWiring.make(frameworkSystem)
 
-  implicit val typedSystem: ActorSystem[SpawnProtocol] = frameworkWiring.actorSystem
-  implicit val testKitSettings: TestKitSettings        = TestKitSettings(typedSystem)
+  implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = frameworkWiring.actorSystem
+  implicit val testKitSettings: TestKitSettings                = TestKitSettings(typedSystem)
 
   private val cmdResponseProbe = TestProbe[OnewayResponse]
   private val startLoggingCmd  = CommandName("StartLogging")

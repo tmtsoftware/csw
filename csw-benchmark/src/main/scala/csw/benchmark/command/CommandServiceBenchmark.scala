@@ -3,7 +3,7 @@ package csw.benchmark.command
 import java.util.concurrent.TimeUnit
 
 import akka.actor.CoordinatedShutdown.UnknownReason
-import akka.actor.Scheduler
+import akka.actor.typed.Scheduler
 import akka.util
 import com.typesafe.config.ConfigFactory
 import csw.benchmark.command.BenchmarkHelpers.spawnStandaloneComponent

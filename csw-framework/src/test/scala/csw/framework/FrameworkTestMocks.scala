@@ -30,7 +30,7 @@ import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import scala.concurrent.Future
 
-class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol]) extends MockitoSugar with ArgumentMatchersSugar {
+class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol.Command]) extends MockitoSugar with ArgumentMatchersSugar {
 
   ///////////////////////////////////////////////
   val testActor: ActorRef[Any] = TestProbe("test-probe").ref

@@ -1,10 +1,9 @@
 package csw.framework.command
 
-import akka.actor.Scheduler
+import akka.actor.typed.Scheduler
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.stream.Materializer
-import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
@@ -41,7 +40,7 @@ class LongRunningCommandTest(ignore: Int)
     with MockitoSugar {
   import config._
 
-  implicit val mat: Materializer            = ActorMaterializer()
+  implicit val mat: Materializer            = Materializer(typedSystem)
   implicit val ec: ExecutionContextExecutor = typedSystem.executionContext
   implicit val timeout: Timeout             = 20.seconds
   implicit val scheduler: Scheduler         = typedSystem.scheduler

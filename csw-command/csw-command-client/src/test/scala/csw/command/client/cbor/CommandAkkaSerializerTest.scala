@@ -8,17 +8,14 @@ import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.serialization.SerializationExtension
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
-import csw.command.client.messages.ComponentCommonMessage.{
-  ComponentStateSubscription,
-  GetSupervisorLifecycleState,
-  LifecycleStateSubscription
-}
+import csw.command.client.messages.CommandResponseManagerMessage.Query
+import csw.command.client.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.messages._
-import csw.command.client.messages.sequencer.SubmitSequenceAndWait
+import csw.command.client.messages.sequencer.SequencerMsg.{QueryFinal, SubmitSequenceAndWait}
 import csw.command.client.models.framework.LockingResponse._
 import csw.command.client.models.framework.PubSub.{Subscribe, SubscribeOnly, Unsubscribe}
 import csw.command.client.models.framework.SupervisorLifecycleState._
@@ -43,9 +40,9 @@ import scala.concurrent.duration.DurationDouble
 
 class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
-  private final implicit val system: ActorSystem[SpawnProtocol] = typed.ActorSystem(SpawnProtocol.behavior, "example")
-  private final val serialization                               = SerializationExtension(system.toUntyped)
-  private final val prefix                                      = Prefix("wfos.prog.cloudcover")
+  private final implicit val system: ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "example")
+  private final val serialization                                       = SerializationExtension(system.toClassic)
+  private final val prefix                                              = Prefix("wfos.prog.cloudcover")
 
   override protected def afterAll(): Unit = {
     system.terminate()
@@ -108,6 +105,7 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
     val submitResponseProbe   = TestProbe[SubmitResponse]
     val onewayResponseProbe   = TestProbe[OnewayResponse]
     val validateResponseProbe = TestProbe[ValidateResponse]
+    val queryResponseProbe    = TestProbe[QueryResponse]
     val lockingResponseProbe  = TestProbe[LockingResponse]
 
     val lifecycleProbe                = TestProbe[LifecycleStateChanged]
@@ -137,6 +135,7 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
       GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref),
       GetComponents(componentsProbe.ref),
       GetContainerLifecycleState(containerLifecycleStateProbe.ref),
+      Query(Id(), queryResponseProbe.ref),
       GetComponentLogMetadata("component-name", logMetadataProbe.ref),
       SetComponentLogLevel("component-name", Level.WARN)
     )
@@ -240,17 +239,23 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
     serializer.fromBinary(bytes, Some(components.getClass)) shouldEqual components
   }
 
-  test("should use command serializer for (de)serialize LoadAndProcessSequence") {
-    val submitResponseProbe = TestProbe[SubmitResponse]
-
-    val command: SequenceCommand = Setup(Prefix("csw.move"), CommandName("c1"), Some(ObsId("obsId")))
+  test("should use command serializer for (de)serialize SequencerMsg") {
+    val submitResponseProbe      = TestProbe[SubmitResponse]
+    val command: SequenceCommand = Setup(Prefix("csw.move"), CommandName("c1"), Some(ObsId("obsId"))).copy(runId = Id())
     val sequence                 = Sequence(command)
-    val loadAndProcessSequence   = SubmitSequenceAndWait(sequence, submitResponseProbe.ref)
 
-    val serializer = serialization.findSerializerFor(loadAndProcessSequence)
-    serializer.getClass shouldBe classOf[CommandAkkaSerializer]
+    val testData = Table(
+      "SequencerMsg models",
+      SubmitSequenceAndWait(sequence, submitResponseProbe.ref),
+      QueryFinal(submitResponseProbe.ref)
+    )
 
-    val bytes = serializer.toBinary(loadAndProcessSequence)
-    serializer.fromBinary(bytes, Some(loadAndProcessSequence.getClass)) shouldEqual loadAndProcessSequence
+    forAll(testData) { sequencerMsg =>
+      val serializer = serialization.findSerializerFor(sequencerMsg)
+      serializer.getClass shouldBe classOf[CommandAkkaSerializer]
+
+      val bytes = serializer.toBinary(sequencerMsg)
+      serializer.fromBinary(bytes, Some(sequencerMsg.getClass)) shouldEqual sequencerMsg
+    }
   }
 }

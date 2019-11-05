@@ -72,7 +72,7 @@ private[framework] final class SupervisorBehavior(
     componentBehaviorFactory: ComponentBehaviorFactory,
     registrationFactory: RegistrationFactory,
     cswCtx: CswContext
-) extends AbstractBehavior[SupervisorMessage] {
+) extends AbstractBehavior[SupervisorMessage](ctx) {
 
   import SupervisorBehavior._
   import cswCtx._
@@ -319,7 +319,7 @@ private[framework] final class SupervisorBehavior(
     ctx.spawn[Nothing](behavior, componentActorName)
   }
 
-  private def coordinatedShutdown(reason: Reason): Future[Done] = CoordinatedShutdown(ctx.system.toUntyped).run(reason)
+  private def coordinatedShutdown(reason: Reason): Future[Done] = CoordinatedShutdown(ctx.system.toClassic).run(reason)
 
   private def makePubSubLifecycle(): ActorRef[PubSub[LifecycleStateChanged]] =
     ctx.spawn(PubSubBehavior.make[LifecycleStateChanged](loggerFactory), SupervisorBehavior.PubSubLifecycleActor)

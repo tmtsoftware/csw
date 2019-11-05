@@ -39,25 +39,9 @@ case class LocalAkkaActorRegistrationNotAllowed(actorRefURI: URI)
 /**
  * An Exception representing failure in listing locations
  */
-case object RegistrationListingFailed extends RuntimeException(s"unable to get the list of registered locations")
-
-/**
- * Represents if the distributed data is not confirmed to be replicated on current node
- */
-case object CouldNotEnsureDataReplication
-    extends RuntimeException("could not ensure that the data is replicated in location service cluster")
+case class RegistrationListingFailed() extends RuntimeException(s"unable to get the list of registered locations")
 
 /**
  * Represents the current node is not able to join the cluster
  */
-case object CouldNotJoinCluster extends RuntimeException("could not join cluster")
-
-/**
- * ClusterSeedsNotFound is thrown while creating location service remote http client if CLUSTER_SEEDS are not provided or set in
- * as environment variable
- */
-case object ClusterSeedsNotFound
-    extends RuntimeException(
-      "CLUSTER_SEEDS setting is not specified either as env variable or system property. " +
-        "Please check online documentation for this set-up."
-    )
+case class CouldNotJoinCluster() extends RuntimeException("could not join cluster")
