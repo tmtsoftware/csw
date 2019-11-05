@@ -1,4 +1,4 @@
-package csw.location.client.internal
+package csw.location.api.client
 
 import akka.Done
 import akka.stream.scaladsl.Source
@@ -7,8 +7,8 @@ import csw.location.api.scaladsl.{LocationService, LocationServiceE, Registratio
 import csw.location.models._
 import msocket.api.models.Subscription
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.{ExecutionContext, Future}
 
 class LocationServiceClient(
     client: LocationServiceE

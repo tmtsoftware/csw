@@ -2,11 +2,11 @@ package csw.location.client.scaladsl
 
 import akka.actor.typed.ActorSystem
 import akka.stream.Materializer
-import csw.location.api.client.LocationServiceClientE
+import csw.location.api.client.{LocationServiceClient, LocationServiceClientE}
 import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.messages.{LocationHttpMessage, LocationWebsocketMessage}
 import csw.location.api.scaladsl.LocationService
-import csw.location.client.internal.{LocationServiceClient, Settings}
+import csw.location.client.internal.Settings
 import msocket.api.Transport
 import msocket.impl.Encoding.JsonText
 import msocket.impl.post.HttpPostTransport

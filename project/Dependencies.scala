@@ -21,18 +21,7 @@ object Dependencies {
     Seq(
       Libs.`enumeratum`.value,
       Libs.`play-json`.value,
-      MSocket.`msocket-api`.value,
-      Libs.`scalatest`.value % Test,
-      Libs.`mockito-scala`   % Test
-    )
-  )
-
-  val LocationApi = Def.setting(
-    Seq(
-      Akka.`akka-actor`,
-      Akka.`akka-actor-typed`,
-      Akka.`akka-stream`,
-      Akka.`akka-stream-typed`
+      Libs.`scalatest`.value % Test
     )
   )
 

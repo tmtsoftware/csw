@@ -1,8 +1,8 @@
 package csw.location.server.internal
 
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import csw.location.api.client.LocationServiceClient
 import csw.location.api.scaladsl.{LocationService, LocationServiceE}
-import csw.location.client.internal.LocationServiceClient
 import csw.location.server.commons.{ClusterSettings, CswCluster}
 
 /**

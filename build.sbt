@@ -43,10 +43,9 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-time-core-js`,
   `csw-time-clock-js`,
   `csw-logging-macros`,
-  `csw-params`.jvm,
   `csw-params`.js,
   `csw-command-api`.js,
-  `csw-location-models-js`,
+  `csw-location-models`.js,
   `csw-logging-models-js`,
   `csw-alarm-models-js`,
   `csw-config-models-js`,
@@ -112,9 +111,10 @@ lazy val `csw-admin-server` = project
 lazy val `csw-location` = project
   .in(file("csw-location"))
   .aggregate(
-    `csw-location-models-jvm`,
-    `csw-location-models-js`,
-    `csw-location-api`,
+    `csw-location-models`.jvm,
+    `csw-location-models`.js,
+    `csw-location-api`.jvm,
+    `csw-location-api`.js,
     `csw-location-server`,
     `csw-location-client`,
     `csw-location-agent`
@@ -128,26 +128,19 @@ lazy val `csw-location-models` = crossProject(JSPlatform, JVMPlatform)
   .settings(fork := false)
   .settings(libraryDependencies ++= Dependencies.LocationModels.value)
 
-lazy val `csw-location-models-jvm` = `csw-location-models`.jvm
-  .enablePlugins(MaybeCoverage)
-
-lazy val `csw-location-models-js` = `csw-location-models`.js
-
-lazy val `csw-location-api` = project
+lazy val `csw-location-api` = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Full)
   .in(file("csw-location/csw-location-api"))
-  .dependsOn(
-    `csw-logging-client`,
-    `csw-location-models-jvm`
-  )
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
-  .settings(
-    libraryDependencies ++= Dependencies.LocationApi.value
-  )
+  .dependsOn(`csw-location-models`)
+  .jvmConfigure(_.dependsOn(`csw-logging-client`))
+  .settings(libraryDependencies += MSocket.`msocket-api`.value)
+  .settings(fork := false)
 
 lazy val `csw-location-server` = project
   .in(file("csw-location/csw-location-server"))
   .dependsOn(
-    `csw-location-api`,
+    `csw-location-api`.jvm,
     `csw-logging-client`,
     `csw-network-utils`,
     `csw-location-client` % "test->compile;multi-jvm->compile",
@@ -161,7 +154,7 @@ lazy val `csw-location-server` = project
 lazy val `csw-location-client` = project
   .in(file("csw-location/csw-location-client"))
   .dependsOn(
-    `csw-location-api`,
+    `csw-location-api`.jvm,
     `csw-network-utils`
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
@@ -230,7 +223,7 @@ lazy val `csw-config-client` = project
   .in(file("csw-config/csw-config-client"))
   .dependsOn(
     `csw-config-api`,
-    `csw-location-api`,
+    `csw-location-api`.jvm,
     `csw-commons`         % "compile->compile;test->test",
     `csw-location-server` % "multi-jvm->multi-jvm",
     `csw-config-server`   % "test->test;multi-jvm->test"
@@ -353,8 +346,8 @@ lazy val `csw-command-api` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("csw-command/csw-command-api"))
   .dependsOn(
-    `csw-params`,
-    `csw-location-models`
+    `csw-params`
+    `csw-location-api`
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(libraryDependencies ++= Dependencies.CommandApi.value)
@@ -397,7 +390,7 @@ lazy val `csw-event-client` = project
     `csw-event-api`,
     `csw-logging-client`,
     `romaine`,
-    `csw-location-api`,
+    `csw-location-api`.jvm,
     `csw-location-server` % "test->test;multi-jvm->multi-jvm",
     `csw-commons`         % "test->test"
   )
@@ -449,7 +442,7 @@ lazy val `csw-alarm-client` = project
   .in(file("csw-alarm/csw-alarm-client"))
   .dependsOn(
     `csw-alarm-api`,
-    `csw-location-api`,
+    `csw-location-api`.jvm,
     `csw-logging-client`,
     `romaine`,
     `csw-logging-client`  % "test->test",
@@ -532,7 +525,7 @@ lazy val `csw-testkit` = project
 
 lazy val `csw-database` = project
   .dependsOn(
-    `csw-location-api`,
+    `csw-location-api`.jvm,
     `csw-location-server` % "test->compile;test->test"
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
@@ -645,7 +638,7 @@ lazy val `csw-aas` = project
 
 lazy val `csw-aas-core` = project
   .in(file("csw-aas/csw-aas-core"))
-  .dependsOn(`csw-logging-client`, `csw-location-api`)
+  .dependsOn(`csw-logging-client`, `csw-location-api`.jvm)
   .settings(
     libraryDependencies ++= Dependencies.CswAasCore.value
   )
