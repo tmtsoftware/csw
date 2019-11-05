@@ -154,8 +154,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     // Client 1 sends submit command with tokenId in parameter set
     val setup = Setup(sourcePrefix, commandName, Some(obsId))
     supervisorRef ! Submit(setup, queryResponseProbe.ref)
-    val response: Completed = queryResponseProbe.expectMessageType[Completed]
-    response.commandName shouldBe commandName
+    queryResponseProbe.expectMessageType[Completed]
   }
 
   // DEOPSCSW-223 Expiry of component Locking mode

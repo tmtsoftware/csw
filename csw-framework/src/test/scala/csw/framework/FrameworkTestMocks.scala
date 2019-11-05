@@ -68,9 +68,6 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol]) extends Mo
     system.spawn(PubSubBehavior.make[CurrentState](loggerFactory), "pub-sub")
   val currentStatePublisher: CurrentStatePublisher = new CurrentStatePublisher(pubSubComponentActor)
 
-  val pubSubCommandEventActor: ActorRef[PubSub[SubmitResponse]] =
-    system.spawn(PubSubBehavior.make[SubmitResponse](loggerFactory), name = "pub-sub-update")
-
   val commandResponseManagerActor: TestProbe[MiniCRM.CRMMessage] = TestProbe[MiniCRM.CRMMessage]
   val commandResponseManager: CommandResponseManager             = mock[CommandResponseManager]
 

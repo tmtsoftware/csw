@@ -24,14 +24,15 @@ class CommandHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCon
 
   override def initialize(): Future[Unit] = {
     // DEOPSCSW-153: Accessibility of logging service to other CSW comp    onents
-    log.info("Initializing Component TLA")
+    log.info("Initializing HCD Component TLA")
+    println("Initializing HCD Component TLA")
     Thread.sleep(100)
 
     //#currentStatePublisher
     // Publish the CurrentState using parameter set created using a sample Choice parameter
     currentStatePublisher.publish(CurrentState(filterHcdPrefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
     //#currentStatePublisher
-
+    println("done hcd")
     Future.unit
   }
 
@@ -43,13 +44,12 @@ class CommandHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCon
 
   def validateCommand(runId: Id, command: ControlCommand): ValidateCommandResponse = {
     command.commandName match {
-      case `immediateCmd`        => Accepted(command.commandName, runId)
-      case `longRunningCmdToHcd` => Accepted(command.commandName, runId)
-      case `shorterHcdCmd`       => Accepted(command.commandName, runId)
-      case `shorterHcdErrorCmd`  => Accepted(command.commandName, runId)
-      case `invalidCmd`          => Invalid(command.commandName, runId, OtherIssue("Invalid"))
-      case _ =>
-        Invalid(command.commandName, runId, OtherIssue("Testing: Received failure, will return Invalid."))
+      case `immediateCmd`        => Accepted(runId)
+      case `longRunningCmdToHcd` => Accepted(runId)
+      case `shorterHcdCmd`       => Accepted(runId)
+      case `shorterHcdErrorCmd`  => Accepted(runId)
+      case `invalidCmd`          => Invalid(runId, OtherIssue("Invalid"))
+      case _                     => Invalid(runId, OtherIssue("Testing: Received failure, will return Invalid."))
     }
   }
 
@@ -67,27 +67,27 @@ class CommandHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCon
   private def processCommand(runId: Id, command: ControlCommand): SubmitResponse = {
     command.commandName match {
       case `immediateCmd` =>
-        Completed(command.commandName, runId)
+        Completed(runId)
       case `longRunningCmdToHcd` =>
         timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plusSeconds(3))) {
-          commandResponseManager.updateCommand(Completed(command.commandName, runId))
+          commandResponseManager.updateCommand(Completed(runId))
         }
         // HCD starts long-running command and returns started
-        Started(command.commandName, runId)
+        Started(runId)
       case `shorterHcdCmd` =>
         timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plusSeconds(1))) {
-          commandResponseManager.updateCommand(Completed(command.commandName, runId))
+          commandResponseManager.updateCommand(Completed(runId))
         }
         // HCD starts shorter command and returns started
-        Started(command.commandName, runId)
+        Started(runId)
       case `shorterHcdErrorCmd` =>
         timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plusSeconds(1))) {
-          commandResponseManager.updateCommand(Error(command.commandName, runId, "ERROR"))
+          commandResponseManager.updateCommand(Error(runId, "ERROR"))
         }
         // HCD starts shorter command and returns started
-        Started(command.commandName, runId)
+        Started(runId)
       case _ =>
-        Invalid(command.commandName, runId, CommandIssue.UnsupportedCommandIssue(s"${command.commandName.name}"))
+        Invalid(runId, CommandIssue.UnsupportedCommandIssue(s"${command.commandName.name}"))
     }
   }
 

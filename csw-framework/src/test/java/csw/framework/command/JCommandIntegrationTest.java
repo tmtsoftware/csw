@@ -115,21 +115,13 @@ public class JCommandIntegrationTest extends JUnitSuite {
     @Test
     public void testCommandExecutionBetweenComponents() throws Exception {
 
-        // immediate response - Completed with a result
         Key<Integer> intKey1 = JKeyType.IntKey().make("encoder");
         Parameter<Integer> intParameter1 = intKey1.set(22, 23);
-        Setup imdResCommand = new Setup(prefix(), immediateResCmd(), Optional.empty()).add(intParameter1);
-
-        CompletableFuture<CommandResponse.SubmitResponse> imdResCmdResponseCompletableFuture = hcdCmdService.submitAndWait(imdResCommand, timeout);
-        CommandResponse.SubmitResponse actualImdCmdResponse = imdResCmdResponseCompletableFuture.get();
-        Assert.assertTrue(actualImdCmdResponse instanceof CommandResponse.Completed);
 
         Setup immediateCmd = new Setup(prefix(), immediateCmd(), Optional.empty()).add(intParameter1);
         //#immediate-response
         CompletableFuture<CommandResponse.SubmitResponse> immediateCommandF =
-                hcdCmdService
-                        .submitAndWait(immediateCmd, timeout)
-                        .thenApply(
+                hcdCmdService.submitAndWait(immediateCmd, timeout).thenApply(
                                 response -> {
                                     if (response instanceof CommandResponse.Completed) {
                                         //do something with completed result
@@ -141,34 +133,43 @@ public class JCommandIntegrationTest extends JUnitSuite {
                         );
         //#immediate-response
         Assert.assertTrue(immediateCommandF.get() instanceof CommandResponse.Completed);
+        CommandResponse.Completed completed = (CommandResponse.Completed)immediateCommandF.get();
+        Assert.assertFalse(completed.result().nonEmpty());
+
+        // immediate response - Completed with a result equal to input
+        Setup imdResCommand = new Setup(prefix(), immediateResCmd(), Optional.empty()).add(intParameter1);
+
+        CompletableFuture<CommandResponse.SubmitResponse> imdResCmdResponseCompletableFuture = hcdCmdService.submitAndWait(imdResCommand, timeout);
+        CommandResponse.SubmitResponse actualImdCmdResponse = imdResCmdResponseCompletableFuture.get();
+        Assert.assertTrue(actualImdCmdResponse instanceof CommandResponse.Completed);
+        completed = (CommandResponse.Completed)actualImdCmdResponse;
+        Assert.assertTrue(completed.result().nonEmpty());
+        Assert.assertEquals(imdResCommand.paramSet(), completed.result().paramSet());
 
         Key<Integer> intKey2 = JKeyType.IntKey().make("encoder");
         Parameter<Integer> intParameter2 = intKey2.set(22, 23);
+
         //#invalidCmd
         Setup invalidSetup = new Setup(prefix(), invalidCmd(), Optional.empty()).add(intParameter2);
         CompletableFuture<CommandResponse.SubmitResponse> invalidCommandF =
                 hcdCmdService.submitAndWait(invalidSetup, timeout).thenApply(
                         response -> {
-                            if (response instanceof CommandResponse.Completed) {
-                                //do something with completed result
-                            } else if (response instanceof CommandResponse.Invalid) {
+                            if (response instanceof CommandResponse.Invalid) {
                                 // Cast the response to get the issue
                                 CommandResponse.Invalid invalid = (CommandResponse.Invalid) response;
                                 assert (invalid.issue().reason().contains("failure"));
+                            } else {
+                                // Just do something to make the test fail
+                                throw new IllegalArgumentException();
                             }
                             return response;
                         }
                 );
         //#invalidCmd
-        //CommandResponse.Invalid expectedInvalidResponse = new CommandResponse.Invalid(_, new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
-        //Assert.assert(expectedInvalidResponse, invalidCommandF.get());
+
         Assert.assertTrue(invalidCommandF.get() instanceof CommandResponse.Invalid);
         CommandResponse.Invalid invalidResponse = (CommandResponse.Invalid)invalidCommandF.get();
         Assert.assertEquals(new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."), invalidResponse.issue());
-
-        CompletableFuture<CommandResponse.SubmitResponse> imdInvalidCmdResponseCompletableFuture = hcdCmdService.submitAndWait(invalidSetup, timeout);
-        CommandResponse.SubmitResponse actualImdInvalidCmdResponse = imdInvalidCmdResponseCompletableFuture.get();
-        Assert.assertTrue(actualImdInvalidCmdResponse instanceof CommandResponse.Invalid);
 
         // long running command which does not use matcher
         //#longRunning
@@ -186,7 +187,6 @@ public class JCommandIntegrationTest extends JUnitSuite {
                                 // For some other response, return empty
                                 return CompletableFuture.completedFuture(Optional.empty());
                             }
-
                         });
         //#longRunning
         Optional<Integer> expectedCmdResponse = Optional.of(20);
@@ -365,19 +365,19 @@ public class JCommandIntegrationTest extends JUnitSuite {
                     if (initialCommandResponse instanceof CommandResponse.Accepted) {
                         return matcherResponseFuture.thenApply(matcherResponse -> {
                             if (matcherResponse.getClass().isAssignableFrom(MatcherResponses.jMatchCompleted().getClass()))
-                                return new CommandResponse.Completed(setupWithMatcher.commandName(), initialCommandResponse.runId());
+                                return new CommandResponse.Completed(initialCommandResponse.runId());
                             else
-                                return new CommandResponse.Error(setupWithMatcher.commandName(), initialCommandResponse.runId(), "Match not completed");
+                                return new CommandResponse.Error(initialCommandResponse.runId(), "Match not completed");
                         });
 
                     } else {
                         matcher.stop();
-                        return CompletableFuture.completedFuture(new CommandResponse.Error(setupWithMatcher.commandName(), initialCommandResponse.runId(), "Matcher failed"));
+                        return CompletableFuture.completedFuture(new CommandResponse.Error(initialCommandResponse.runId(), "Matcher failed"));
                     }
                 });
 
         CommandResponse.MatchingResponse actualResponse = matchResponseF.get();
-        CommandResponse.Completed expectedResponse = new CommandResponse.Completed(setupWithMatcher.commandName(), actualResponse.runId());   // Not a great test for now
+        CommandResponse.Completed expectedResponse = new CommandResponse.Completed(actualResponse.runId());   // Not a great test for now
         Assert.assertEquals(expectedResponse, actualResponse);
         //#matcher
 

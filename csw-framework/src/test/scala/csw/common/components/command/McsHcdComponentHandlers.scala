@@ -1,7 +1,6 @@
 package csw.common.components.command
 
 import akka.actor.typed.scaladsl.ActorContext
-import csw.command.client.MiniCRM.MiniCRMMessage.AddResponse
 import csw.command.client.messages.TopLevelActorMessage
 import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.models.CswContext
@@ -14,7 +13,6 @@ import csw.params.core.models.Id
 import csw.time.core.models.UTCTime
 
 import scala.concurrent.Future
-import scala.concurrent.duration.DurationLong
 
 class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
     extends ComponentHandlers(ctx, cswCtx) {
@@ -26,12 +24,11 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
 
   override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse = {
     controlCommand.commandName match {
-      case `longRunning`               => Accepted(controlCommand.commandName, runId)
-      case `mediumRunning`             => Accepted(controlCommand.commandName, runId)
-      case `shortRunning`              => Accepted(controlCommand.commandName, runId)
-      case `failureAfterValidationCmd` => Accepted(controlCommand.commandName, runId)
-      case _ =>
-        Invalid(controlCommand.commandName, runId, UnsupportedCommandIssue(controlCommand.commandName.name))
+      case `longRunning`               => Accepted(runId)
+      case `mediumRunning`             => Accepted(runId)
+      case `shortRunning`              => Accepted(runId)
+      case `failureAfterValidationCmd` => Accepted(runId)
+      case _                           => Invalid(runId, UnsupportedCommandIssue(controlCommand.commandName.name))
     }
   }
 
@@ -39,33 +36,26 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse = {
     controlCommand.commandName match {
       case `longRunning` =>
-        ctx.scheduleOnce(
-          5.seconds,
-          // Here the Completed is sent directly to the publish actor
-          commandResponseManager.commandResponseManagerActor,
-          AddResponse(Completed(controlCommand.commandName, runId))
-        )
-        Started(controlCommand.commandName, runId)
+        timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plusSeconds(5))) {
+          commandResponseManager.updateCommand(Completed(runId))
+        }
+        Started(runId)
       //#addOrUpdateCommand
       case `mediumRunning` =>
-        ctx.scheduleOnce(
-          3.seconds,
-          commandResponseManager.commandResponseManagerActor,
-          AddResponse(Completed(controlCommand.commandName, runId))
-        )
-        Started(controlCommand.commandName, runId)
+        timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plusSeconds(3))) {
+          commandResponseManager.updateCommand(Completed(runId))
+        }
+        Started(runId)
       case `shortRunning` =>
-        ctx.scheduleOnce(
-          1.seconds,
-          commandResponseManager.commandResponseManagerActor,
-          AddResponse(Completed(controlCommand.commandName, runId))
-        )
-        Started(controlCommand.commandName, runId)
+        timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plusSeconds(1))) {
+          commandResponseManager.updateCommand(Completed(runId))
+          //commandResponseManager.updateCommand(Error(runId, "Totally fucked"))
+        }
+        Started(runId)
       case `failureAfterValidationCmd` =>
-        //  SHOULDN"T BE NEEDED commandUpdatePublisher.update(Error(controlCommand.commandName, runId, "Failed command"))
-        Error(controlCommand.commandName, runId, "Failed command")
+        Error(runId, "Failed command")
       case _ =>
-        Error(controlCommand.commandName, runId, "Unknown Command")
+        Error(runId, "Unknown Command")
     }
   }
 

@@ -79,9 +79,9 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     public CommandResponse.ValidateCommandResponse validateCommand(Id runId, ControlCommand controlCommand) {
         if (controlCommand.commandName().equals(hcdCurrentStateCmd())) {
             // This is special because test doesn't want these other CurrentState values published
-            return new CommandResponse.Accepted(controlCommand.commandName(), runId);
+            return new CommandResponse.Accepted(runId);
         } else if (controlCommand.commandName().equals(crmAddOrUpdateCmd())) {
-            return new CommandResponse.Accepted(controlCommand.commandName(), runId);
+            return new CommandResponse.Accepted(runId);
         } else {
             // All other tests
             CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.commandValidationChoice()));
@@ -89,11 +89,12 @@ public class JSampleComponentHandlers extends JComponentHandlers {
 
             // Special case to accept failure after validation
             if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
-                return new CommandResponse.Accepted(controlCommand.commandName(), runId);
+                return new CommandResponse.Accepted(runId);
             } else if (controlCommand.commandName().name().contains("failure")) {
-                return new CommandResponse.Invalid(controlCommand.commandName(), runId, new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
+                // invalidCmd comes here
+                return new CommandResponse.Invalid(runId, new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
             } else {
-                return new CommandResponse.Accepted(controlCommand.commandName(), runId);
+                return new CommandResponse.Accepted(runId);
             }
         }
     }
@@ -126,35 +127,35 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     private CommandResponse.SubmitResponse processSubmitCommand(Id runId, ControlCommand controlCommand) {
         publishCurrentState(controlCommand);
         if (controlCommand.commandName().equals(immediateCmd())) {
-            return new CommandResponse.Completed(controlCommand.commandName(), runId);
+            return new CommandResponse.Completed(runId);
         } else if (controlCommand.commandName().equals(immediateResCmd())) {
-            Parameter<Integer> param = JKeyType.IntKey().make("encoder").set(22);
-            Result result = new Result().add(param);
-            return new CommandResponse.Completed(controlCommand.commandName(), runId, result);
+            // Copy the input paramset to the output
+            Result result = new Result(controlCommand.paramSet());
+            return new CommandResponse.Completed(runId, result);
         } else if (controlCommand.commandName().equals(ComponentStateForCommand.matcherCmd())) {
             processCommandWithMatcher(controlCommand);
-            return new CommandResponse.Started(controlCommand.commandName(), runId);
+            return new CommandResponse.Started(runId);
         } else if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
             return processCommandWithoutMatcher(runId, controlCommand);
         } else if (controlCommand.commandName().equals(ComponentStateForCommand.longRunningCmd())) {
             return processCommandWithoutMatcher(runId, controlCommand);
         }
 
-        return new CommandResponse.Completed(controlCommand.commandName(), runId);
+        return new CommandResponse.Completed(runId);
     }
 
     //#addOrUpdateCommand
     private CommandResponse.SubmitResponse crmAddOrUpdate(ControlCommand controlCommand, Id runId) {
         // This simulates some worker task doing something that finishes after onSubmit returns
         Runnable task = () ->
-                commandResponseManager.updateCommand(new CommandResponse.Completed(controlCommand.commandName(), runId));
+                commandResponseManager.updateCommand(new CommandResponse.Completed(runId));
 
         // Wait a bit and then set CRM to Completed
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         executor.schedule(task, 1, TimeUnit.SECONDS);
 
         // Return Started from onSubmit
-        return new CommandResponse.Started(controlCommand.commandName(), runId);
+        return new CommandResponse.Started(runId);
     }
     //#addOrUpdateCommand
 
@@ -191,26 +192,32 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     private CommandResponse.SubmitResponse processCommandWithoutMatcher(Id runId, ControlCommand controlCommand) {
         if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
             // Set CRM to Error after 1 second
-            sendCRM(new CommandResponse.Error(controlCommand.commandName(), runId, "Unknown Error occurred"));
-            return new CommandResponse.Started(controlCommand.commandName(), runId);
+            sendCRM(1, new CommandResponse.Error(runId, "Unknown Error occurred"));
+            return new CommandResponse.Started(runId);
         } else {
             Parameter<Integer> parameter = JKeyType.IntKey().make("encoder").set(20);
             Result result = new Result().add(parameter);
 
-            // Set CRM to Completed after 1 second
-            sendCRM(new CommandResponse.Completed(controlCommand.commandName(), runId, result));
-            return new CommandResponse.Started(controlCommand.commandName(), runId);
+            // Returns Started and completes through CRM after 1 second
+            sendCRM(1, new CommandResponse.Completed(runId, result));
+            return new CommandResponse.Started(runId);
         }
-
     }
 
-    private void sendCRM(CommandResponse.SubmitResponse response) {
+    private void parameterDelay(Id runId, Setup setup) {
+        Key<Integer> encoder = JKeyType.IntKey().make("delay");
+        int delay = setup.jGet(encoder).orElseThrow().head();
+        sendCRM(delay, new CommandResponse.Completed(runId));
+    }
+
+    // This test routine just delays before updating CRM - delay is always in seconds
+    private void sendCRM(long delay, CommandResponse.SubmitResponse response) {
         Runnable task = () -> {
             commandResponseManager.updateCommand(response);
         };
-        // Wait a bit and then set CRM to Completed
+        // Wait a bit and then set CRM to response
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-        executor.schedule(task, 1, TimeUnit.SECONDS);
+        executor.schedule(task, delay, TimeUnit.SECONDS);
     }
 
     private void publishCurrentState(ControlCommand controlCommand) {

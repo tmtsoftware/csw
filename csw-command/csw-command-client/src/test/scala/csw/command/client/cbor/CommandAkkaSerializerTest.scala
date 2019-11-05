@@ -46,7 +46,6 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
   private final implicit val system: ActorSystem[SpawnProtocol] = typed.ActorSystem(SpawnProtocol.behavior, "example")
   private final val serialization                               = SerializationExtension(system.toUntyped)
   private final val prefix                                      = Prefix("wfos.prog.cloudcover")
-  private final val commandName                                 = CommandName("test")
 
   override protected def afterAll(): Unit = {
     system.terminate()
@@ -56,14 +55,14 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
   test("should use command serializer for CommandResponse (de)serialization") {
     val testData = Table(
       "CommandResponse models",
-      Accepted(commandName, Id()),
-      Started(commandName, Id()),
-      Completed(commandName, Id(), Result.emptyResult),
-      Invalid(commandName, Id(), CommandIssue.OtherIssue("test issue")),
-      Error(commandName, Id(), "test"),
-      Cancelled(commandName, Id()),
-      Locked(commandName, Id()),
-      CommandNotAvailable(commandName, Id())
+      Accepted(Id()),
+      Started(Id()),
+      Completed(Id(), Result.emptyResult),
+      Invalid(Id(), CommandIssue.OtherIssue("test issue")),
+      Error(Id(), "test"),
+      Cancelled(Id()),
+      Locked(Id()),
+      CommandNotAvailable(Id())
     )
 
     forAll(testData) { commandResponse =>

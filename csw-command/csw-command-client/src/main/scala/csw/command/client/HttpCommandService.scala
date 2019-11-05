@@ -10,7 +10,7 @@ import akka.util.{ByteString, Timeout}
 import csw.location.api.scaladsl.LocationService
 import csw.location.models.ComponentType
 import csw.location.models.Connection.HttpConnection
-import csw.params.commands.{CommandName, CommandResponse, ControlCommand}
+import csw.params.commands.{CommandResponse, ControlCommand}
 import csw.params.commands.CommandIssue.{OtherIssue, UnresolvedLocationsIssue}
 import csw.params.commands.CommandResponse.{Error, Invalid, OnewayResponse, Started, SubmitResponse, ValidateResponse, isNegative}
 import csw.params.core.models.Id
@@ -88,8 +88,8 @@ case class HttpCommandService(
           // Server error: Return error with generated runId
           val s = s"Error response from ${connection.componentId.name}: $response"
           method match {
-            case `submitCommand` => Error(controlCommand.commandName, Id(), s)
-            case _               => Invalid(controlCommand.commandName, Id(), OtherIssue(s))
+            case `submitCommand` => Error(Id(), s)
+            case _               => Invalid(Id(), OtherIssue(s))
           }
 
         }
@@ -97,8 +97,8 @@ case class HttpCommandService(
         // Couldn't locate the server: Return error with generated runId
         val s = s"Can't locate connection for ${connection.componentId.name}"
         method match {
-          case `submitCommand` => Error(controlCommand.commandName, Id(), s)
-          case _               => Invalid(controlCommand.commandName, Id(), UnresolvedLocationsIssue(s))
+          case `submitCommand` => Error(Id(), s)
+          case _               => Invalid(Id(), UnresolvedLocationsIssue(s))
         }
 
     }
@@ -207,11 +207,11 @@ case class HttpCommandService(
           Json.decode(bs.toArray).to[SubmitResponse].value
         } else {
           // Server error: Return error with generated runId
-          Error(CommandName("ERROR"), commandRunId, s"Error response from ${connection.componentId.name}: $response")
+          Error(commandRunId, s"Error response from ${connection.componentId.name}: $response")
         }
       case None =>
         // Couldn't locate the server: Return error with generated runId
-        Error(CommandName("ERROR"), commandRunId, s"Can't locate connection for ${connection.componentId.name}")
+        Error(commandRunId, s"Can't locate connection for ${connection.componentId.name}")
     }
   }
 

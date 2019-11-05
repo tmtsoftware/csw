@@ -66,7 +66,7 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
 
     // Submit command, and handle validation response. Final response is returned as a Future
     val submitCommandResponseF: Future[SubmitResponse] = hcd.submitAndWait(setupCommand).flatMap {
-      case x @ (Invalid(_, _, _) | Locked(_, _)) =>
+      case x @ (Invalid(_, _) | Locked(_)) =>
         log.error("Sleep command invalid")
         Future(x)
       case x =>
@@ -160,11 +160,9 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
     maybeEventSubscription.foreach(_.unsubscribe())
   }
 
-  override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse =
-    Accepted(controlCommand.commandName, runId)
+  override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse = Accepted(runId)
 
-  override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse =
-    Completed(controlCommand.commandName, runId)
+  override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse = Completed(runId)
 
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
 

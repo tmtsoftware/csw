@@ -21,7 +21,7 @@ import csw.command.client.models.matchers.Matcher
 import csw.command.client.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.location.models.AkkaLocation
 import csw.params.commands.CommandResponse._
-import csw.params.commands.{CommandName, ControlCommand}
+import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 
@@ -87,10 +87,10 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
     val matcher          = new Matcher(component, stateMatcher)
     val matcherResponseF = matcher.start
     oneway(controlCommand).flatMap {
-      case Accepted(controlCommand.commandName, runId) =>
+      case Accepted(runId) =>
         matcherResponseF.map {
-          case MatchCompleted  => Completed(controlCommand.commandName, runId)
-          case MatchFailed(ex) => Error(controlCommand.commandName, runId, ex.getMessage)
+          case MatchCompleted  => Completed(runId)
+          case MatchFailed(ex) => Error(runId, ex.getMessage)
         }
       case x @ _ =>
         matcher.stop()
@@ -102,7 +102,7 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
   def query(commandRunId: Id)(implicit timeout: Timeout): Future[QueryResponse] = {
     val eventualResponse: Future[QueryResponse] = component ? (Query(commandRunId, _))
     eventualResponse recover {
-      case _: TimeoutException => CommandNotAvailable(CommandName("CommandNotAvailable"), commandRunId)
+      case _: TimeoutException => CommandNotAvailable(commandRunId)
     }
   }
 

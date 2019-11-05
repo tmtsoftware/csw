@@ -171,7 +171,7 @@ private[framework] object ComponentBehavior {
         replyTo ! validationResponse.asInstanceOf[OnewayResponse]
 
         validationResponse match {
-          case Accepted(_, _) =>
+          case Accepted(_) =>
             log.info(s"Invoking lifecycle handler's onOneway hook with msg :[$commandMessage]")
             lifecycleHandlers.onOneway(runId, commandMessage.command)
           case invalid: Invalid =>
@@ -182,7 +182,7 @@ private[framework] object ComponentBehavior {
       def handleSubmit(runId: Id, commandMessage: CommandMessage, replyTo: ActorRef[SubmitResponse]): Unit = {
         log.info(s"Invoking lifecycle handler's validateCommand hook with msg :[$commandMessage]")
         lifecycleHandlers.validateCommand(runId, commandMessage.command) match {
-          case Accepted(_, _) =>
+          case Accepted(_) =>
             log.info(s"Invoking lifecycle handler's onSubmit hook with msg :[$commandMessage]")
             val submitResponse = lifecycleHandlers.onSubmit(runId, commandMessage.command)
             submitResponse match {

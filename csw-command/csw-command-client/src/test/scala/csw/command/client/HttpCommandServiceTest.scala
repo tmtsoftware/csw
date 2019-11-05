@@ -60,11 +60,11 @@ class HttpCommandServiceTest extends FunSuite with Matchers with BeforeAndAfterA
 
   private def validateCommand(componentName: String, runId: Id, command: ControlCommand): ValidateResponse = {
     if (componentName == testCompName && command == testCommand)
-      Accepted(command.commandName, runId)
+      Accepted(runId)
     else if (componentName != testCompName)
-      Invalid(command.commandName, runId, OtherIssue(s"Expected component name: $testCompName, but got $componentName"))
+      Invalid(runId, OtherIssue(s"Expected component name: $testCompName, but got $componentName"))
     else
-      Invalid(command.commandName, runId, OtherIssue(s"Expected command to be: $testCommand, but got $command"))
+      Invalid(runId, OtherIssue(s"Expected command to be: $testCommand, but got $command"))
   }
 
   // Test HTTP route
@@ -83,8 +83,8 @@ class HttpCommandServiceTest extends FunSuite with Matchers with BeforeAndAfterA
               entity(as[ControlCommand]) { command =>
                 val v = validateCommand(componentName, Id(), command)
                 val x: SubmitResponse = v match {
-                  case _: Accepted => Completed(v.commandName, v.runId)
-                  case _           => Error(v.commandName, v.runId, "Wrong command or component name")
+                  case _: Accepted => Completed(v.runId)
+                  case _           => Error(v.runId, "Wrong command or component name")
                 }
                 complete(Future.successful(x))
               }
@@ -97,7 +97,7 @@ class HttpCommandServiceTest extends FunSuite with Matchers with BeforeAndAfterA
           } ~
           get {
             path(Segment) { runId =>
-              val x: Future[SubmitResponse] = Future.successful(Completed(CommandName("TEST"), Id(runId)))
+              val x: Future[SubmitResponse] = Future.successful(Completed(Id(runId)))
               complete(x)
             }
           }

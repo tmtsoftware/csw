@@ -207,7 +207,7 @@ private[framework] final class SupervisorBehavior(
     case Unlock(source, replyTo)              => unlockComponent(source, replyTo)
     case cmdMsg: CommandMessage =>
       if (lockManager.allowCommand(cmdMsg)) runningComponent.get ! cmdMsg
-      else cmdMsg.replyTo ! Locked(cmdMsg.command.commandName, Id()) /// NOTE: Here creating new ID which is different than old
+      else cmdMsg.replyTo ! Locked(Id()) /// NOTE: Here creating new ID which is different than old impl
     case runningMessage: RunningMessage => handleRunningMessage(runningMessage)
     case msg @ Running(_)               => log.info(s"Ignoring [$msg] message received from TLA as Supervisor already in Running state")
   }

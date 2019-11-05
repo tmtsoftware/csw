@@ -16,7 +16,7 @@ import csw.location.models.Connection.AkkaConnection
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandIssue.OtherIssue
 import csw.params.commands.CommandResponse._
-import csw.params.commands.{CommandName, Setup}
+import csw.params.commands.Setup
 import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, StateName}
 import io.lettuce.core.RedisClient
@@ -84,12 +84,11 @@ class LongRunningCommandTest(ignore: Int)
       // after all the subcommands to the HCDs have completed
       //#subscribe-for-result
       val test1InitialFuture = assemblyCommandService.submit(assemblyLongSetup)
-
       val test1InitialResponse = Await.result(test1InitialFuture, 2.seconds)
       test1InitialResponse shouldBe a[Started]
       val test1RunId = test1InitialResponse.runId
-      //#subscribe-for-result
 
+      //#subscribe-for-result
       // verify that commands gets completed in following sequence
       // ShortSetup => MediumSetup => LongSetup
       probe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shortCmdCompleted))))
@@ -98,7 +97,7 @@ class LongRunningCommandTest(ignore: Int)
       // This is the final command completing
       probe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(longRunningCmdCompleted))))
 
-      val test1Final = Await.result(assemblyCommandService.queryFinal(test1RunId), 10.seconds)
+      val test1Final = Await.result(assemblyCommandService.queryFinal(test1RunId), 15.seconds)
       test1Final shouldBe a[Completed]
       test1Final.runId shouldBe test1RunId
       // End of Test 1
@@ -110,7 +109,6 @@ class LongRunningCommandTest(ignore: Int)
 
       val test2Final = Await.result(test2Response, 20.seconds)
       test2Final shouldBe a[Completed]
-      test2Final.commandName shouldEqual assemblyLongSetup.commandName
       // End of Test 2
 
       // Test 3 starts the long running command and uses query to examine the status of the command
@@ -126,7 +124,7 @@ class LongRunningCommandTest(ignore: Int)
 
       // Command is still just started
       //#query-response
-      test3QueryResponse.map(_ shouldBe Started(CommandName(""), test3RunId))
+      test3QueryResponse.map(_ shouldBe Started(test3RunId))
 
       // Use the initial future to determine the when completed
       val test3Final = Await.result(assemblyCommandService.queryFinal(test3RunId), 10.seconds)

@@ -21,10 +21,10 @@ import java.util.concurrent.CompletionStage;
 //DEOPSCSW-615: DB service accessible to CSW component developers
 public class JAssemblyComponentHandlers extends JComponentHandlers {
 
-    ActorContext<TopLevelActorMessage> ctx;
-    JCswContext cswCtx;
-    DatabaseServiceFactory dbFactory;
-    DSLContext dsl;
+    private ActorContext<TopLevelActorMessage> ctx;
+    private JCswContext cswCtx;
+    private DatabaseServiceFactory dbFactory;
+    private DSLContext dsl;
 
     public JAssemblyComponentHandlers(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
         super(ctx, cswCtx);
@@ -125,7 +125,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         CompletionStage<Integer> functionResultF = functionQuery.executeAsync();
         functionResultF.thenAccept(result -> System.out.println("Function inc created with  " + result));
         //#dsl-function
-        return new CommandResponse.Completed(controlCommand.commandName(), runId);
+        return new CommandResponse.Completed(runId);
     }
 
     @Override

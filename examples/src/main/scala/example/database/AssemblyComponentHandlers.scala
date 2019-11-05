@@ -96,7 +96,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
     functionResultF.foreach(result => println(s"Function inc created with $result"))
     //#dsl-function
 
-    Completed(controlCommand.commandName, runId)
+    Completed(runId)
   }
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit                                         = ???
   override def validateCommand(runId: Id, controlCommand: ControlCommand): CommandResponse.ValidateCommandResponse = ???

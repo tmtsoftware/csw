@@ -143,9 +143,9 @@ class CommandServiceTest(ignore: Int)
       val invalidCommandF = assemblyCmdService.submitAndWait(invalidSetup)
       async {
         await(invalidCommandF) match {
-          case Completed(invalidSetup.commandName, _, _) =>
+          case Completed(_, _) =>
           // Do Completed thing
-          case Invalid(invalidSetup.commandName, _, _) =>
+          case Invalid(_, _) =>
           //issue shouldBe a[Invalid]
           case other =>
             // Unexpected result
@@ -177,7 +177,7 @@ class CommandServiceTest(ignore: Int)
 
       val longRunningResultF = async {
         await(assemblyCmdService.submitAndWait(longRunningSetup)) match {
-          case Completed(longRunningSetup.commandName, _, result) =>
+          case Completed(_, result) =>
             result.nonEmpty shouldBe true
             Some(result(encoder).head)
 
@@ -201,7 +201,7 @@ class CommandServiceTest(ignore: Int)
         longRunningRunId = await(longRunningF).runId
 
         await(assemblyCmdService.query(longRunningRunId)) match {
-          case Started(longRunningSetup.commandName, runId) =>
+          case Started(runId) =>
             runId shouldEqual longRunningRunId
           // happy case - no action needed
           // Do some other work
@@ -211,7 +211,7 @@ class CommandServiceTest(ignore: Int)
 
         // Now wait for completion and result
         await(assemblyCmdService.queryFinal(longRunningRunId)) match {
-          case Completed(_, _, result) =>
+          case Completed(_, result) =>
             Some(result(encoder).head)
 
           case otherResponse =>
@@ -230,7 +230,7 @@ class CommandServiceTest(ignore: Int)
 
         // Use queryFinal and runId to wait for completion and result
         await(assemblyCmdService.queryFinal(runId)) match {
-          case Completed(_, _, result) =>
+          case Completed(_, result) =>
             Some(result(encoder).head)
 
           case otherResponse =>
@@ -260,7 +260,7 @@ class CommandServiceTest(ignore: Int)
       val validateCommandF = async {
         await(assemblyCmdService.validate(immediateSetup)) match {
           case _: Accepted          => true
-          case Invalid(_, _, issue) =>
+          case Invalid(_, issue) =>
             // do something with other response which is not expected
             log.error(s"Command failed to validate with issue: $issue")
             false
@@ -271,9 +271,8 @@ class CommandServiceTest(ignore: Int)
       //#validate
 
       // test CommandNotAvailable after timeout of 1 seconds
-      Await.result(assemblyCmdService.query(Id("blah"))(1.seconds), 2.seconds) shouldEqual CommandNotAvailable(
-        CommandName("CommandNotAvailable"),
-        Id("blah"))
+      Await.result(assemblyCmdService.query(Id("blah"))(1.seconds), 2.seconds) shouldEqual
+        CommandNotAvailable(Id("blah"))
 
       //#query
       // Check on a command that was completed in the past
@@ -348,15 +347,15 @@ class CommandServiceTest(ignore: Int)
       val matchResponseF: Future[MatchingResponse] = async {
         val onewayResponse: OnewayResponse = await(assemblyCmdService.oneway(setupWithMatcher))
         onewayResponse match {
-          case Accepted(_, runId) =>
+          case Accepted(runId) =>
             val matcherResponse: MatcherResponse = await(matcherResponseF)
             // create appropriate response if demand state was matched from among the published state or otherwise
             // this would allow the response to be used to complete a command received by the Assembly
             matcherResponse match {
               case MatchCompleted =>
-                Completed(setupWithMatcher.commandName, onewayResponse.runId)
+                Completed(onewayResponse.runId)
               case mf: MatchFailed =>
-                Error(setupWithMatcher.commandName, onewayResponse.runId, mf.throwable.getMessage)
+                Error(onewayResponse.runId, mf.throwable.getMessage)
             }
           case invalid: Invalid =>
             matcher.stop()
@@ -409,8 +408,8 @@ class CommandServiceTest(ignore: Int)
             val matcherResponse = await(failedMatcherResponseF)
             // create appropriate response if demand state was matched from among the published state or otherwise
             matcherResponse match {
-              case MatchCompleted  => Completed(setupWithFailedMatcher.commandName, initialResponse.runId)
-              case MatchFailed(ex) => Error(setupWithFailedMatcher.commandName, initialResponse.runId, ex.getMessage)
+              case MatchCompleted  => Completed(initialResponse.runId)
+              case MatchFailed(ex) => Error(initialResponse.runId, ex.getMessage)
             }
           case invalid: Invalid =>
             matcher.stop()
@@ -444,12 +443,12 @@ class CommandServiceTest(ignore: Int)
           case _: Accepted =>
             val matcherResponse = await(matcherResponseF1)
             matcherResponse match {
-              case MatchCompleted => Completed(setupWithTimeoutMatcher.commandName, initialResponse.runId)
+              case MatchCompleted => Completed(initialResponse.runId)
               case MatchFailed(ex) if ex.isInstanceOf[TimeoutException] =>
-                Error(setupWithTimeoutMatcher.commandName, initialResponse.runId, timeoutExMsg)
-              case MatchFailed(ex) => Error(setupWithTimeoutMatcher.commandName, initialResponse.runId, ex.getMessage)
+                Error(initialResponse.runId, timeoutExMsg)
+              case MatchFailed(ex) => Error(initialResponse.runId, ex.getMessage)
             }
-          case other @ (Invalid(_, _, _) | Locked(_, _)) =>
+          case other @ (Invalid(_, _) | Locked(_)) =>
             matcher.stop()
             other.asInstanceOf[MatchingResponse]
         }

@@ -54,7 +54,7 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
     // Adding passed in parameter to see if data is transferred properly
     currentStatePublisher.publish(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(submitCommandChoice))))
     processCommand(controlCommand)
-    Completed(controlCommand.commandName, runId)
+    Completed(runId)
   }
 
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {
@@ -101,8 +101,8 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
 
   def validateCommand(runId: Id, command: ControlCommand): ValidateCommandResponse = {
     currentStatePublisher.publish(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(commandValidationChoice))))
-    if (command.commandName.name.contains("success")) Accepted(command.commandName, runId)
-    else Invalid(command.commandName, runId, OtherIssue("Testing: Received failure, will return Invalid."))
+    if (command.commandName.name.contains("success")) Accepted(runId)
+    else Invalid(runId, OtherIssue("Testing: Received failure, will return Invalid."))
   }
 
   override def onShutdown(): Future[Unit] = Future {

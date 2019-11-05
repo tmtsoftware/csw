@@ -28,9 +28,10 @@ import csw.location.models.{ComponentId, ComponentType}
 import csw.location.client.ActorSystemFactory
 import csw.params.commands.CommandResponse.{Accepted, Completed, Error, Invalid, Started}
 import csw.params.commands.Setup
+import csw.params.core.generics.KeyType
 import csw.params.core.states.{CurrentState, StateName}
 import io.lettuce.core.RedisClient
-import csw.params.core.models.ObsId
+import csw.params.core.models.{ObsId, Units}
 
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, ExecutionContext}
@@ -111,35 +112,33 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
     // make sure that all the components are in running lifecycle state before sending lifecycle messages
     supervisorLifecycleStateProbe.expectMessage(SupervisorLifecycleState.Running)
 
-    // Send short command to make sure it works
-    val short  = Setup(seqPrefix, immediateCmd, obsId)
-    var result = Await.result(filterAssemblyCS.submit(short), timeout.duration)
-    result shouldBe a[Completed]
-    result.commandName shouldEqual immediateCmd
-
     // Make sure errors are handled in validation
     val invalid = Setup(seqPrefix, invalidCmd, obsId)
-    result = Await.result(filterAssemblyCS.submit(invalid), timeout.duration)
+    var result  = Await.result(filterAssemblyCS.submit(invalid), timeout.duration)
     result shouldBe a[Invalid]
-    result.commandName shouldEqual invalidCmd
 
-    // Long running where command completes after Started, uses Submit so returns right away
+    // Send short command to make sure basic functionality works
+    val short = Setup(seqPrefix, immediateCmd, obsId)
+    result = Await.result(filterAssemblyCS.submit(short), timeout.duration)
+    result shouldBe a[Completed]
+
+    // Long running where command in Assembly completes after Started, uses Submit so returns right away
     val longRunning = Setup(seqPrefix, longRunningCmd, obsId)
     result = Await.result(filterAssemblyCS.submit(longRunning), timeout.duration)
     result shouldBe a[Started]
 
-    // Check with query should be Started
+    // Check with query should be Started if quick
     val qresult = Await.result(filterAssemblyCS.query(result.runId), timeout.duration)
-    qresult shouldBe Started(longRunningCmd, result.runId)
+    qresult shouldBe Started(result.runId)
 
     // Wait for completion with queryFinal
-    Await.result(filterAssemblyCS.queryFinal(result.runId), timeout.duration) shouldBe Completed(longRunningCmd, result.runId)
+    Await.result(filterAssemblyCS.queryFinal(result.runId), timeout.duration) shouldBe Completed(result.runId)
 
     // Now query should show Completed
-    Await.result(filterAssemblyCS.query(result.runId), timeout.duration) shouldBe Completed(longRunningCmd, result.runId)
+    Await.result(filterAssemblyCS.query(result.runId), timeout.duration) shouldBe Completed(result.runId)
 
     // Make sure queryFinal returns immediately and properly for something already completed
-    Await.result(filterAssemblyCS.queryFinal(result.runId), timeout.duration) shouldBe Completed(longRunningCmd, result.runId)
+    Await.result(filterAssemblyCS.queryFinal(result.runId), timeout.duration) shouldBe Completed(result.runId)
 
     // Reuse the long running command, but now just wait, no way to use runId so no query or queryFinal is useful
     Await.result(filterAssemblyCS.submitAndWait(longRunning), timeout.duration) shouldBe a[Completed]
@@ -153,7 +152,6 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
     // This executes a command in Assembly that goes to HCD
     result = Await.result(filterAssemblyCS.submitAndWait(longRunningToAsm), timeout.duration)
     result shouldBe a[Completed]
-    result.commandName shouldEqual longRunningToAsm.commandName
 
     // Long running where command completes after Started, uses Submit so returns right away
     result = Await.result(filterAssemblyCS.submit(longRunningToAsm), timeout.duration)
@@ -165,39 +163,22 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
     // Can also do the whole thing with oneway if necessary (same in old version)
     val onewayResult = Await.result(filterAssemblyCS.oneway(longRunningToAsm), timeout.duration)
     onewayResult shouldBe a[Accepted]
-    // Can queryFinal also
-    Await.result(filterAssemblyCS.queryFinal(onewayResult.runId), timeout.duration) shouldBe Completed(
-      longRunningToAsm.commandName,
-      onewayResult.runId
-    )
 
-    // Try using completer in Assembly
+    // Can queryFinal also
+    Await.result(filterAssemblyCS.queryFinal(onewayResult.runId), timeout.duration) shouldBe Completed(onewayResult.runId)
+
+    // Try using completer like behavior in Assembly
     val longRunningToAsmComp = Setup(seqPrefix, longRunningCmdToAsmComp, obsId)
     result = Await.result(filterAssemblyCS.submit(longRunningToAsmComp), timeout.duration)
     result shouldBe a[Started]
-    result.commandName shouldEqual longRunningToAsmComp.commandName
-    Await.result(filterAssemblyCS.queryFinal(result.runId), timeout.duration) shouldBe Completed(
-      longRunningToAsmComp.commandName,
-      result.runId
-    )
 
-    // Try using completer in Assembly with ActorCompleter
-    val longRunningToAsmCompActor = Setup(seqPrefix, longRunningCmdToAsmCActor, obsId)
-    result = Await.result(filterAssemblyCS.submit(longRunningToAsmCompActor), timeout.duration)
-    result shouldBe a[Started]
-    result.commandName shouldEqual longRunningToAsmCompActor.commandName
-    Await.result(filterAssemblyCS.queryFinal(result.runId), timeout.duration) shouldBe Completed(
-      longRunningToAsmCompActor.commandName,
-      result.runId
-    )
+    Await.result(filterAssemblyCS.queryFinal(result.runId), timeout.duration) shouldBe Completed(result.runId)
 
-    // Try using completer in Assembly
+    // Long running that returns an error from HCD
     val longRunningToAsmInvalid = Setup(seqPrefix, longRunningCmdToAsmInvalid, obsId)
     result = Await.result(filterAssemblyCS.submit(longRunningToAsmInvalid), timeout.duration)
     result shouldBe a[Started]
-    result.commandName shouldEqual longRunningToAsmInvalid.commandName
-    Await.result(filterAssemblyCS.queryFinal(result.runId), timeout.duration) shouldBe
-    Error(longRunningToAsmInvalid.commandName, result.runId, "ERROR")
+    Await.result(filterAssemblyCS.queryFinal(result.runId), timeout.duration) shouldBe Error(result.runId, "ERROR")
 
     val submitAllSetup1       = Setup(seqPrefix, immediateCmd, obsId)
     val submitAllSetup2       = Setup(seqPrefix, longRunningCmd, obsId)
@@ -212,12 +193,24 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
     submitAllResponse(2) shouldBe a[Invalid]
     //#submitAll
 
+    // Make sure we can return a result
+    val k1 = KeyType.IntKey.make("encoder")
+    val k2 = KeyType.StringKey.make("stringThing")
+    val rsetup = Setup(seqPrefix, cmdWithBigParameter, obsId)
+      .madd(k1.set(545).withUnits(Units.millimeter), k2.set("This", "is", "good"))
+    result = Await.result(filterAssemblyCS.submitAndWait(rsetup), timeout.duration)
+    result shouldBe a[Completed]
+    val completedResult = result.asInstanceOf[Completed]
+    completedResult.result.nonEmpty shouldBe true
+    completedResult.result.paramSet shouldEqual rsetup.paramSet
+
     // ********** Message: Shutdown **********
     Http(containerActorSystem.toUntyped).shutdownAllConnectionPools().await
     resolvedContainerRef ! Shutdown
 
     // this proves that ComponentBehaviors postStop signal gets invoked for all components
     // as onShutdownHook of all TLA gets invoked from postStop signal
+
     filterAssemblyStateProbe.expectMessage(
       CurrentState(filterAsmPrefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice)))
     )

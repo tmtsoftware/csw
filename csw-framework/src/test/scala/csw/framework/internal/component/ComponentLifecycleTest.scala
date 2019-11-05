@@ -129,8 +129,8 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
 
     // Capture the first runId passed in validateCommand
     when(sampleHcdHandler.validateCommand(idCaptor.capture, any[Setup]))
-      .thenAnswer((id: Id, cc: ControlCommand) => Accepted(cc.commandName, id))
-    when(sampleHcdHandler.onSubmit(any[Id], any[Setup])).thenAnswer((id: Id, cc: ControlCommand) => Completed(cc.commandName, id))
+      .thenAnswer((id: Id, cc: ControlCommand) => Accepted(id))
+    when(sampleHcdHandler.onSubmit(any[Id], any[Setup])).thenAnswer((id: Id, cc: ControlCommand) => Completed(id))
 
     componentBehaviorTestKit.run(Submit(sc1, submitResponseProbe.ref))
 
@@ -138,7 +138,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
     val testId = idCaptor.value
     verify(sampleHcdHandler).validateCommand(testId, sc1)
     verify(sampleHcdHandler).onSubmit(testId, sc1)
-    submitResponseProbe.expectMessage(Completed(sc1.commandName, testId))
+    submitResponseProbe.expectMessage(Completed(testId))
   }
 
   test("running component should handle Oneway command") {
@@ -156,7 +156,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
 
     // A one way returns validation but is not entered into command response manager
     when(sampleHcdHandler.validateCommand(idCaptor.capture, any[Setup]))
-      .thenAnswer((id: Id, cc: ControlCommand) => Accepted(cc.commandName, id))
+      .thenAnswer((id: Id, cc: ControlCommand) => Accepted(id))
     doNothing.when(sampleHcdHandler).onOneway(any[Id], any[Setup])
 
     componentBehaviorTestKit.run(Oneway(sc1, onewayResponseProbe.ref))
@@ -164,7 +164,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
     val testId = idCaptor.value
     verify(sampleHcdHandler).validateCommand(testId, sc1)
     verify(sampleHcdHandler).onOneway(testId, sc1)
-    onewayResponseProbe.expectMessage(Accepted(sc1.commandName, testId))
+    onewayResponseProbe.expectMessage(Accepted(testId))
     // Shouldn't get anything here
     onewayResponseProbe.expectNoMessage(3.seconds)
   }
@@ -184,15 +184,15 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
     val idCaptor = ArgCaptor[Id]
     // validate returns Accepted and onSubmit returns Completed
     when(sampleHcdHandler.validateCommand(idCaptor.capture, any[Setup]))
-      .thenAnswer((id: Id, cc: ControlCommand) => Accepted(cc.commandName, id))
-    when(sampleHcdHandler.onSubmit(any[Id], any[Setup])).thenAnswer((id: Id, cc: ControlCommand) => Completed(cc.commandName, id))
+      .thenAnswer((id: Id, cc: ControlCommand) => Accepted(id))
+    when(sampleHcdHandler.onSubmit(any[Id], any[Setup])).thenAnswer((id: Id, cc: ControlCommand) => Completed(id))
 
     componentBehaviorTestKit.run(Submit(sc1, submitResponseProbe.ref))
 
     val testId = idCaptor.value
     verify(sampleHcdHandler).validateCommand(testId, sc1)
     verify(sampleHcdHandler).onSubmit(testId, sc1)
-    submitResponseProbe.expectMessage(Completed(sc1.commandName, testId))
+    submitResponseProbe.expectMessage(Completed(testId))
   }
 
   // Demonstrate oneway failure
@@ -211,7 +211,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
 
     //val invalid = Invalid(sc1.commandName, testId, OtherIssue("error from the test command"))
     when(sampleHcdHandler.validateCommand(idCaptor.capture, any[Setup]))
-      .thenAnswer((id: Id, cc: ControlCommand) => Invalid(cc.commandName, id, OtherIssue("error from the test command")))
+      .thenAnswer((id: Id, cc: ControlCommand) => Invalid(id, OtherIssue("error from the test command")))
     doNothing.when(sampleHcdHandler).onOneway(any[Id], any[Setup])
 
     componentBehaviorTestKit.run(Oneway(sc1, onewayResponseProbe.ref))
@@ -221,9 +221,8 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
     verify(sampleHcdHandler).validateCommand(testId, sc1)
     // onOneway called
     verify(sampleHcdHandler, never).onOneway(testId, sc1)
-    onewayResponseProbe.expectMessage(Invalid(sc1.commandName, testId, OtherIssue("error from the test command")))
+    onewayResponseProbe.expectMessage(Invalid(testId, OtherIssue("error from the test command")))
     // No contact on command response manager
     onewayResponseProbe.expectNoMessage(3.seconds)
   }
-
 }

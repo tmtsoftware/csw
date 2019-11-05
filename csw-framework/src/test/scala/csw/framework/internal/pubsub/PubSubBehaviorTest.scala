@@ -11,9 +11,7 @@ import csw.command.client.models.framework.{LifecycleStateChanged, PubSub, Super
 import csw.framework.FrameworkTestMocks
 import csw.location.client.ActorSystemFactory
 import csw.logging.api.scaladsl.Logger
-import csw.params.commands.CommandName
-import csw.params.commands.CommandResponse.{Completed, Error, SubmitResponse}
-import csw.params.core.models.{Id, Prefix}
+import csw.params.core.models.Prefix
 import csw.params.core.states.{CurrentState, StateName}
 import org.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -46,9 +44,6 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
     BehaviorTestKit(PubSubBehavior.make(mocks.loggerFactory))
 
   def createCurrentStatePubSubBehavior(): BehaviorTestKit[PubSub[CurrentState]] =
-    BehaviorTestKit(PubSubBehavior.make(mocks.loggerFactory))
-
-  def createCommandStatePubSubBehavior(): BehaviorTestKit[PubSub[SubmitResponse]] =
     BehaviorTestKit(PubSubBehavior.make(mocks.loggerFactory))
 
   override protected def afterAll(): Unit = Await.result(untypedSystem.terminate(), 5.seconds)
@@ -99,28 +94,5 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
     lifecycleProbe2.expectMessage(LifecycleStateChanged(supervisorProbe.ref, SupervisorLifecycleState.Running))
     lifecycleProbe1.expectNoMessage(50.millis)
-  }
-
-  test("CommandState should be published to the subscribers depending on names") {
-    val pubSubBehavior: BehaviorTestKit[PubSub[SubmitResponse]] = createCommandStatePubSubBehavior()
-
-    val commandStateProbe1 = TestInbox[SubmitResponse]()
-    val commandStateProbe2 = TestInbox[SubmitResponse]()
-    val commandState1      = Error(CommandName("test1"), Id(), "ERROR")
-    val commandState2      = Completed(CommandName("test2"), Id())
-    val commandState3      = Completed(CommandName("test3"), Id())
-
-    pubSubBehavior.run(Subscribe(commandStateProbe1.ref))
-    pubSubBehavior.run(SubscribeOnly(commandStateProbe2.ref, Set(commandState2.stateName)))
-
-    pubSubBehavior.run(Publish(commandState1))
-    pubSubBehavior.run(Publish(commandState2))
-    pubSubBehavior.run(Publish(commandState3))
-
-    val currentStates  = commandStateProbe1.receiveAll()
-    val currentStates2 = commandStateProbe2.receiveAll()
-
-    currentStates shouldEqual Seq(commandState1, commandState2, commandState3)
-    currentStates2 shouldEqual Seq(commandState2, commandState3)
   }
 }

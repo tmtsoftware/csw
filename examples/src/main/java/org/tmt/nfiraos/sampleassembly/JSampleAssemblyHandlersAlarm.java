@@ -108,7 +108,7 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
                         return CompletableFuture.completedFuture(commandResponse);
                     } else {
                         log.error("Sleep command invalid");
-                        return CompletableFuture.completedFuture(new CommandResponse.Error(setupCommand.commandName(), commandResponse.runId(), "test error"));
+                        return CompletableFuture.completedFuture(new CommandResponse.Error(commandResponse.runId(), "test error"));
                     }
                 });
 
@@ -225,7 +225,7 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
 
     @Override
     public CommandResponse.SubmitResponse onSubmit(Id runId, ControlCommand controlCommand) {
-        return new CommandResponse.Completed(controlCommand.commandName(), runId);
+        return new CommandResponse.Completed(runId);
     }
 
     @Override

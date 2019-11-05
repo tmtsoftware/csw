@@ -97,10 +97,10 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
 
         // Submit command and handle response
         hcd.submitAndWait(setupCommand, commandResponseTimeout)   // FIXME -- NEED to ask about exceptionally runId
-                .exceptionally(ex -> new CommandResponse.Error(setupCommand.commandName(), Id.apply(), "Exception occurred when sending command: " + ex.getMessage()))
+                .exceptionally(ex -> new CommandResponse.Error(Id.apply(), "Exception occurred when sending command: " + ex.getMessage()))
                 .thenAccept(commandResponse -> {
                     if (commandResponse instanceof CommandResponse.Locked) {
-                        log.error("Sleed command failed: HCD is locked");
+                        log.error("Sleep command failed: HCD is locked");
                     } else if (commandResponse instanceof CommandResponse.Invalid) {
                         CommandResponse.Invalid inv = (CommandResponse.Invalid) commandResponse;
                         log.error("Sleep command invalid (" + inv.issue().getClass().getSimpleName() + "): " + inv.issue().reason());
@@ -134,9 +134,9 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
                         return commandResponse;
                     } else {
                         log.error("Sleep command invalid");
-                        return new CommandResponse.Error(setupCommand.commandName(), commandResponse.runId(), "test error");
+                        return new CommandResponse.Error(commandResponse.runId(), "test error");
                     }
-                }).exceptionally(ex -> new CommandResponse.Error(setupCommand.commandName(), Id.apply(), ex.getMessage()))  //TODO Not sure how to handle this
+                }).exceptionally(ex -> new CommandResponse.Error(Id.apply(), ex.getMessage()))  //TODO Not sure how to handle this
                 .toCompletableFuture();
 
 
@@ -223,7 +223,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
 
     @Override
     public CommandResponse.SubmitResponse onSubmit(Id runId, ControlCommand controlCommand) {
-        return new CommandResponse.Completed(controlCommand.commandName(), runId);
+        return new CommandResponse.Completed(runId);
     }
 
     @Override

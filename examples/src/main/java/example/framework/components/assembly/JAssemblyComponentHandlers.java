@@ -5,6 +5,7 @@ import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.util.Timeout;
 import csw.command.api.javadsl.ICommandService;
+import csw.command.client.CommandResponseManager;
 import csw.command.client.CommandServiceFactory;
 import csw.command.client.messages.TopLevelActorMessage;
 import csw.command.client.models.framework.ComponentInfo;
@@ -47,6 +48,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     private final ActorContext<TopLevelActorMessage> ctx;
     private final ComponentInfo componentInfo;
     private final CurrentStatePublisher currentStatePublisher;
+    private final CommandResponseManager commandResponseManager;
     private final ILocationService locationService;
     private final IEventService eventService;
     private ILogger log;
@@ -59,8 +61,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         super(ctx, cswCtx);
         this.ctx = ctx;
         this.componentInfo = cswCtx.componentInfo();
-        //this.commandResponseManager = cswCtx.commandResponseManager();
-
+        this.commandResponseManager = cswCtx.commandResponseManager();
         this.currentStatePublisher = cswCtx.currentStatePublisher();
         this.locationService = cswCtx.locationService();
         this.eventService = cswCtx.eventService();
@@ -110,12 +111,12 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     public CommandResponse.ValidateCommandResponse validateCommand(Id runId, ControlCommand controlCommand) {
         if (controlCommand instanceof Setup) {
             // validation for setup goes here
-            return new CommandResponse.Accepted(controlCommand.commandName(), runId);
+            return new CommandResponse.Accepted(runId);
         } else if (controlCommand instanceof Observe) {
             // validation for observe goes here
-            return new CommandResponse.Accepted(controlCommand.commandName(), runId);
+            return new CommandResponse.Accepted(runId);
         } else {
-            return new CommandResponse.Invalid(controlCommand.commandName(), runId, new CommandIssue.AssemblyBusyIssue("Command not supported"));
+            return new CommandResponse.Invalid(runId, new CommandIssue.AssemblyBusyIssue("Command not supported"));
         }
     }
     //#validateCommand-handler
@@ -128,8 +129,8 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         else if (controlCommand instanceof Observe)
             return submitObserve(runId, (Observe) controlCommand); // includes logic to handle Submit with Observe config command
         else
-            return new CommandResponse.Error(controlCommand.commandName(),
-                    runId, "Submitted command not supported: " + controlCommand.commandName().name());
+            return new CommandResponse.Error(runId,
+                    "Submitted command not supported: " + controlCommand.commandName().name());
     }
     //#onSubmit-handler
 
@@ -224,7 +225,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                             if (commandResponse instanceof CommandResponse.Completed) {
                                 // As the commands get completed, the results are updated in the commandResponseManager
                                 // TODO: FIX ME
-                               // commandResponseManager.updateSubCommand(commandResponse);
+                               commandResponseManager.updateCommand(commandResponse);
                             } else {
                                 // do something
                             }
@@ -245,7 +246,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 */
             default:
                 log.error("Invalid command [" + sc + "] received.");
-                return new CommandResponse.Invalid(sc.commandName(), runId, new CommandIssue.UnsupportedCommandIssue(sc.commandName().toString()));   //TODO Guessed
+                return new CommandResponse.Invalid(runId, new CommandIssue.UnsupportedCommandIssue(sc.commandName().toString()));   //TODO Guessed
         }
     }
 
@@ -256,7 +257,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
             default:
                 log.error("Invalid command [" + oc + "] received.");
         }
-        return new CommandResponse.Completed(oc.commandName(), runId);
+        return new CommandResponse.Completed(runId);
     }
 
     /**
@@ -264,12 +265,12 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
      */
     private CommandResponse.SubmitResponse submitSetup(Id runId, Setup setup) {
         processSetup(runId, setup);
-        return new CommandResponse.Started(setup.commandName(), runId);
+        return new CommandResponse.Started(runId);
     }
 
     private CommandResponse.SubmitResponse submitObserve(Id runId, Observe observe) {
         processObserve(runId, observe);
-        return new CommandResponse.Completed(observe.commandName(), runId);
+        return new CommandResponse.Completed(runId);
     }
 
     private void onewaySetup(Id runId, Setup setup) {

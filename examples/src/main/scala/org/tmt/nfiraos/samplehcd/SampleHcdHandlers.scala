@@ -40,7 +40,7 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
             log.trace(s"WorkerActor received sleep command with time of ${sleep.timeInMillis} ms")
             // simulate long running command
             Thread.sleep(sleep.timeInMillis)
-            commandResponseManager.updateCommand(CommandResponse.Completed(sleep.controlCommand.commandName, sleep.runId))
+            commandResponseManager.updateCommand(CommandResponse.Completed(sleep.runId))
           case _ => log.error("Unsupported message type")
         }
         Behaviors.same
@@ -91,8 +91,8 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse = {
     log.info(s"Validating command: ${controlCommand.commandName.name}")
     controlCommand.commandName.name match {
-      case "sleep" => Accepted(controlCommand.commandName, runId)
-      case x       => Invalid(controlCommand.commandName, runId, CommandIssue.UnsupportedCommandIssue(s"Command $x. not supported."))
+      case "sleep" => Accepted(runId)
+      case x       => Invalid(runId, CommandIssue.UnsupportedCommandIssue(s"Command $x. not supported."))
     }
   }
   //#validate
@@ -104,7 +104,7 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
     controlCommand match {
       case setupCommand: Setup => onSetup(runId, setupCommand)
       case observeCommand: Observe => // implement (or not)
-        Error(controlCommand.commandName, runId, "Observe not supported")
+        Error(runId, "Observe not supported")
     }
   }
 
@@ -121,7 +121,7 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
 
     workerActor ! Sleep(setup, runId, sleepTimeInMillis)
 
-    Started(setup.commandName, runId)
+    Started(runId)
   }
   //#onSetup
 

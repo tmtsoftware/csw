@@ -59,8 +59,8 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
 
   //#validateCommand-handler
   override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse = controlCommand match {
-    case _: Setup   => Accepted(controlCommand.commandName, runId) // validation for setup goes here
-    case _: Observe => Accepted(controlCommand.commandName, runId) // validation for observe goes here
+    case _: Setup   => Accepted(runId) // validation for setup goes here
+    case _: Observe => Accepted(runId) // validation for observe goes here
   }
   //#validateCommand-handler
 
@@ -134,12 +134,12 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
    */
   private def submitSetup(runId: Id, setup: Setup): SubmitResponse = {
     processSetup(setup)
-    Completed(setup.commandName, runId)
+    Completed(runId)
   }
 
   private def submitObserve(runId: Id, observe: Observe): SubmitResponse = {
     processObserve(observe)
-    Completed(observe.commandName, runId)
+    Completed(runId)
   }
 
   private def onewaySetup(setup: Setup): Unit = processSetup(setup)

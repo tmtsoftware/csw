@@ -88,12 +88,12 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     public CommandResponse.ValidateCommandResponse validateCommand(Id runId, ControlCommand controlCommand) {
         if (controlCommand instanceof Setup) {
             // validation for setup goes here
-            return new CommandResponse.Accepted(controlCommand.commandName(), runId);
+            return new CommandResponse.Accepted(runId);
         } else if (controlCommand instanceof Observe) {
             // validation for observe goes here
-            return new CommandResponse.Accepted(controlCommand.commandName(), runId);
+            return new CommandResponse.Accepted(runId);
         } else {
-            return new CommandResponse.Invalid(controlCommand.commandName(), runId, new CommandIssue.UnsupportedCommandIssue(controlCommand.commandName().name()));
+            return new CommandResponse.Invalid(runId, new CommandIssue.UnsupportedCommandIssue(controlCommand.commandName().name()));
         }
     }
     //#validateCommand-handler
@@ -106,7 +106,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
         else if (controlCommand instanceof Observe)
             return submitObserve(runId, (Observe) controlCommand); // includes logic to handle Submit with Observe config command"
         else
-            return new CommandResponse.Error(controlCommand.commandName(), runId, "Unknown command: " + controlCommand.commandName().name());
+            return new CommandResponse.Error(runId, "Unknown command: " + controlCommand.commandName().name());
     }
     //#onSubmit-handler
 
@@ -171,7 +171,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
             default:
                 log.error("Invalid command [" + sc + "] received.");
         }
-        return new CommandResponse.Completed(sc.commandName(), runId);
+        return new CommandResponse.Completed(runId);
     }
 
     private CommandResponse.SubmitResponse processObserve(Id runId, Observe oc) {
@@ -181,7 +181,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
             default:
                 log.error("Invalid command [" + oc + "] received.");
         }
-        return new CommandResponse.Completed(oc.commandName(), runId);
+        return new CommandResponse.Completed(runId);
     }
 
     /**

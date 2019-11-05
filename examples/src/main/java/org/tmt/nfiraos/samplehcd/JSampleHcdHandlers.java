@@ -70,7 +70,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
                         log.trace(() -> "WorkerActor received sleep command with time of " + sleep.timeInMillis + " ms");
                         // simulate long running command
                         Thread.sleep(sleep.timeInMillis);
-                        cswCtx.commandResponseManager().updateCommand(new CommandResponse.Completed(sleep.setup.commandName(), sleep.runId));
+                        cswCtx.commandResponseManager().updateCommand(new CommandResponse.Completed(sleep.runId));
                     } else {
                         log.error("Unsupported message type");
                     }
@@ -130,9 +130,9 @@ public class JSampleHcdHandlers extends JComponentHandlers {
         String commandName = controlCommand.commandName().name();
         log.info(() -> "Validating command: " + commandName);
         if (commandName.equals("sleep")) {
-            return new CommandResponse.Accepted(controlCommand.commandName(), runId);
+            return new CommandResponse.Accepted(runId);
         }
-        return new CommandResponse.Invalid(controlCommand.commandName(), runId, new CommandIssue.UnsupportedCommandIssue("Command " + commandName + ". not supported."));
+        return new CommandResponse.Invalid(runId, new CommandIssue.UnsupportedCommandIssue("Command " + commandName + ". not supported."));
     }
     //#validate
 
@@ -144,11 +144,11 @@ public class JSampleHcdHandlers extends JComponentHandlers {
 
         if (controlCommand instanceof Setup) {
             onSetup(runId, (Setup) controlCommand);
-            return new CommandResponse.Started(controlCommand.commandName(), runId);
+            return new CommandResponse.Started(runId);
         } else if (controlCommand instanceof Observe) {
             // implement (or not)
         }
-        return new CommandResponse.Error(controlCommand.commandName(), runId, "Observe command not supported");
+        return new CommandResponse.Error(runId, "Observe command not supported");
     }
 
     private void onSetup(Id runId, Setup setup) {

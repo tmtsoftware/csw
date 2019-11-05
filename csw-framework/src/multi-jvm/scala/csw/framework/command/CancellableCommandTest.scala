@@ -69,13 +69,11 @@ class CancellableCommandTest(ignore: Int)
         Set(cancelCmdId.set(originalResponse.runId.id), cancelCmdName.set(originalSetup.commandName.name)))
       var cancelAsSubmitResponse = Await.result(assemblyCommandService.submit(cancelSetup), 5.seconds)
       cancelAsSubmitResponse shouldBe a[Completed]
-      cancelAsSubmitResponse.commandName shouldBe cancelSetup.commandName
 
       var waitForCancel = assemblyCommandService.queryFinal(originalResponse.runId)
       var originalFinalResponse:SubmitResponse = Await.result(waitForCancel, 5.seconds)
       originalFinalResponse shouldBe a[Cancelled]
       originalFinalResponse.runId shouldEqual originalResponse.runId
-      originalFinalResponse.commandName shouldEqual originalResponse.commandName
 
       // original command is submit but Cancel command is oneway
       originalResponse = Await.result(assemblyCommandService.submit(originalSetup), 5.seconds)
@@ -85,13 +83,11 @@ class CancellableCommandTest(ignore: Int)
         Set(cancelCmdId.set(originalResponse.runId.id), cancelCmdName.set(originalSetup.commandName.name)))
       var cancelAsOnewayResponse = Await.result(assemblyCommandService.oneway(cancelSetup2), 5.seconds)
       cancelAsOnewayResponse shouldBe a[Accepted]
-      cancelAsOnewayResponse.commandName shouldBe cancelSetup2.commandName
 
       waitForCancel = assemblyCommandService.queryFinal(originalResponse.runId)
       originalFinalResponse = Await.result(waitForCancel, 5.seconds)
       originalFinalResponse shouldBe a[Cancelled]
       originalFinalResponse.runId shouldEqual originalResponse.runId
-      originalFinalResponse.commandName shouldEqual originalResponse.commandName
 
       // original command is oneway but Cancel command is submit
       // Here a oneway can only be Accepted
@@ -100,7 +96,6 @@ class CancellableCommandTest(ignore: Int)
 
       cancelAsSubmitResponse = Await.result(assemblyCommandService.submit(cancelSetup), 5.seconds)
       cancelAsSubmitResponse shouldBe a[Completed]
-      cancelAsSubmitResponse.commandName shouldBe cancelSetup.commandName
 
       // Note, even though initial was a oneway, with this approach a cancel can be used
       // as long as original command updates with cancelled. This was same as commandResponseManager
@@ -108,7 +103,6 @@ class CancellableCommandTest(ignore: Int)
       originalFinalResponse = Await.result(waitForCancel, 5.seconds)
       originalFinalResponse shouldBe a[Cancelled]
       originalFinalResponse.runId shouldEqual originalResponse.runId
-      originalFinalResponse.commandName shouldEqual originalResponse.commandName
 
       // original command is oneway and Cancel command is also oneway
       originalResponse2 = Await.result(assemblyCommandService.oneway(originalSetup), 5.seconds)
@@ -116,7 +110,6 @@ class CancellableCommandTest(ignore: Int)
 
       cancelAsOnewayResponse = Await.result(assemblyCommandService.oneway(cancelSetup2), 5.seconds)
       cancelAsOnewayResponse shouldBe a[Accepted]
-      cancelAsOnewayResponse.commandName shouldBe cancelSetup2.commandName
 
       // Note, even though initial was a oneway, with this approach a cancel can be used
       // as long as original command updates with cancelled. This was same as commandResponseManager
@@ -124,7 +117,6 @@ class CancellableCommandTest(ignore: Int)
       originalFinalResponse = Await.result(waitForCancel, 5.seconds)
       originalFinalResponse shouldBe a[Cancelled]
       originalFinalResponse.runId shouldEqual originalResponse.runId
-      originalFinalResponse.commandName shouldEqual originalResponse.commandName
     }
     enterBarrier("end")
   }
