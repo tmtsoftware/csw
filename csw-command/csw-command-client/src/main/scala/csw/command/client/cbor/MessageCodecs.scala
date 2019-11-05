@@ -15,7 +15,7 @@ import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.messages._
-import csw.command.client.messages.sequencer.SubmitSequenceAndWait
+import csw.command.client.messages.sequencer.SequencerMsg.{QueryFinal, SubmitSequenceAndWait}
 import csw.command.client.models.framework.LockingResponse._
 import csw.command.client.models.framework.PubSub.{Publish, PublisherMessage, SubscriberMessage}
 import csw.command.client.models.framework.{PubSub, _}
@@ -100,4 +100,5 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
   // ************************ SequencerMsg Codecs ********************
 
   implicit lazy val submitSequenceAndWaitCodec: Codec[SubmitSequenceAndWait] = deriveCodec
+  implicit lazy val queryFinalCodec: Codec[QueryFinal]                       = deriveUnaryCodec
 }

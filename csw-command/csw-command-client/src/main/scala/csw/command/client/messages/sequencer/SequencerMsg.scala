@@ -6,6 +6,11 @@ import csw.params.commands.Sequence
 import csw.serializable.CommandSerializable
 
 trait SequencerMsg
-final case class SubmitSequenceAndWait(sequence: Sequence, replyTo: ActorRef[SubmitResponse])
-    extends SequencerMsg
-    with CommandSerializable
+
+object SequencerMsg {
+  final case class SubmitSequenceAndWait(sequence: Sequence, replyTo: ActorRef[SubmitResponse])
+      extends SequencerMsg
+      with CommandSerializable
+
+  final case class QueryFinal(replyTo: ActorRef[SubmitResponse]) extends SequencerMsg with CommandSerializable
+}
