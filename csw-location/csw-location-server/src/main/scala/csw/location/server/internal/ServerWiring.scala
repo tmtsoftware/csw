@@ -3,32 +3,34 @@ package csw.location.server.internal
 import akka.actor
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import akka.http.scaladsl.server.Route
 import com.typesafe.config.{Config, ConfigFactory}
+import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.scaladsl.LocationService
 import csw.location.server.commons.{ClusterAwareSettings, ClusterSettings}
-import csw.location.server.http.{
-  LocationExceptionHandler,
-  LocationHttpHandler,
-  LocationHttpService,
-  LocationRoutes,
-  LocationWebsocketHandler
-}
-import msocket.impl.Encoding
+import csw.location.server.http.{LocationExceptionHandler, LocationHttpHandler, LocationHttpService, LocationWebsocketHandler}
+import msocket.impl.post.PostRouteFactory
+import msocket.impl.ws.WebsocketRouteFactory
+import msocket.impl.{Encoding, RouteFactory}
 
 // $COVERAGE-OFF$
-private[csw] class ServerWiring {
-  lazy val config: Config                                  = ConfigFactory.load()
-  lazy val settings                                        = new Settings(config)
-  lazy val clusterSettings: ClusterSettings                = ClusterAwareSettings.onPort(settings.clusterPort)
-  lazy val actorSystem: ActorSystem[SpawnProtocol.Command] = clusterSettings.system
-  lazy val untypedActorSystem: actor.ActorSystem           = clusterSettings.system.toClassic
-  lazy val actorRuntime                                    = new ActorRuntime(actorSystem)
-  lazy val locationService: LocationService                = LocationServiceFactory.withSystem(actorSystem)
-  lazy val locationExceptionHandler                        = new LocationExceptionHandler
-  private val httpHandler                                  = new LocationHttpHandler(locationService.locationServiceE)
+private[csw] class ServerWiring extends LocationServiceCodecs {
+  lazy val config: Config                                           = ConfigFactory.load()
+  lazy val settings                                                 = new Settings(config)
+  lazy val clusterSettings: ClusterSettings                         = ClusterAwareSettings.onPort(settings.clusterPort)
+  implicit lazy val actorSystem: ActorSystem[SpawnProtocol.Command] = clusterSettings.system
+  lazy val untypedActorSystem: actor.ActorSystem                    = clusterSettings.system.toClassic
+  lazy val actorRuntime                                             = new ActorRuntime(actorSystem)
+  lazy val locationService: LocationService                         = LocationServiceFactory.withSystem(actorSystem)
+  lazy val locationExceptionHandler                                 = new LocationExceptionHandler
+  private val postHandler                                           = new LocationHttpHandler(locationService.locationServiceE)
   private def websocketHandlerFactory(encoding: Encoding[_]) =
     new LocationWebsocketHandler(locationService.locationServiceE, encoding)
-  lazy val locationRoutes      = new LocationRoutes(httpHandler, websocketHandlerFactory, locationExceptionHandler, actorRuntime)
+
+  lazy val locationRoutes: Route = RouteFactory.combine(
+    new PostRouteFactory("post-endpoint", postHandler),
+    new WebsocketRouteFactory("websocket-endpoint", websocketHandlerFactory)
+  )
   lazy val locationHttpService = new LocationHttpService(locationRoutes, actorRuntime, settings)
 }
 

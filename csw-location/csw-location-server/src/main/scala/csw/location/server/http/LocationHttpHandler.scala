@@ -1,20 +1,20 @@
 package csw.location.server.http
 
-import akka.http.scaladsl.server.StandardRoute
+import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Route
 import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.messages.LocationHttpMessage
 import csw.location.api.messages.LocationHttpMessage._
 import csw.location.api.scaladsl.LocationServiceE
 import msocket.api.MessageHandler
 import msocket.impl.post.ServerHttpCodecs
-import akka.http.scaladsl.server.Directives._
 
 class LocationHttpHandler(locationServiceE: LocationServiceE)
-    extends MessageHandler[LocationHttpMessage, StandardRoute]
+    extends MessageHandler[LocationHttpMessage, Route]
     with LocationServiceCodecs
     with ServerHttpCodecs {
 
-  override def handle(request: LocationHttpMessage): StandardRoute = request match {
+  override def handle(request: LocationHttpMessage): Route = request match {
     case Register(registration)               => complete(locationServiceE.register(registration))
     case Unregister(connection)               => complete(locationServiceE.unregister(connection))
     case UnregisterAll                        => complete(locationServiceE.unregisterAll())
