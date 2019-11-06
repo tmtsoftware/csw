@@ -76,7 +76,7 @@ trait CommandService {
 
   /**
    * Query for the result of a long running command which was sent as Submit to get a [[csw.params.commands.CommandResponse.QueryResponse]] as a Future.
-   * Query allows checking to see if a long-running command is completed without waiting as with [[queryFinal()]].
+   * Query allows checking to see if a long-running command is completed without waiting as with [[queryFinal]].
    *
    * @param commandRunId the runId of the command for which response is required
    * @return an QueryResponse as a Future value

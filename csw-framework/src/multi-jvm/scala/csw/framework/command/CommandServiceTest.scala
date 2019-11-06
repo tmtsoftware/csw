@@ -1,7 +1,7 @@
 package csw.framework.command
 
   import akka.actor.testkit.typed.scaladsl.TestProbe
-  import akka.stream.{ActorMaterializer, Materializer}
+  import akka.stream.Materializer
   import akka.util.Timeout
   import com.typesafe.config.ConfigFactory
   import csw.command.api.StateMatcher
@@ -15,8 +15,8 @@ package csw.framework.command
   import csw.common.utils.LockCommandFactory
   import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
   import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-  import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
   import csw.location.models.Connection.AkkaConnection
+  import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
   import csw.location.server.http.MultiNodeHTTPLocationService
   import csw.params.commands.CommandResponse._
   import csw.params.commands._
@@ -87,7 +87,7 @@ class CommandServiceTest(ignore: Int)
   import csw.common.components.command.ComponentStateForCommand._
 
 //  implicit val actorSystem: ActorSystem[_] = system.toTyped
-  private implicit val mat: Materializer        = ActorMaterializer()
+  private implicit val mat: Materializer        = Materializer.createMaterializer(system)
   private implicit val ec: ExecutionContext     = typedSystem.executionContext
   private implicit val timeout: Timeout         = 5.seconds
 
