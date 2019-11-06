@@ -8,7 +8,6 @@ import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.serialization.SerializationExtension
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
-import csw.command.client.messages.CommandResponseManagerMessage.Query
 import csw.command.client.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.command.client.messages.RunningMessage.Lifecycle
@@ -241,7 +240,7 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
 
   test("should use command serializer for (de)serialize SequencerMsg") {
     val submitResponseProbe      = TestProbe[SubmitResponse]
-    val command: SequenceCommand = Setup(Prefix("csw.move"), CommandName("c1"), Some(ObsId("obsId"))).copy(runId = Id())
+    val command: SequenceCommand = Setup(Prefix("csw.move"), CommandName("c1"), Some(ObsId("obsId")))
     val sequence                 = Sequence(command)
 
     val testData = Table(

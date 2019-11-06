@@ -1,8 +1,6 @@
 package csw.common.components.command
 
 import akka.actor.typed.scaladsl.ActorContext
-import akka.stream.Materializer
-import akka.stream.typed.scaladsl.ActorMaterializer
 import csw.command.client.messages.TopLevelActorMessage
 import CommandComponentState._
 import akka.util.Timeout
@@ -10,8 +8,6 @@ import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandServiceFactory
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.api.scaladsl.LocationService
-import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.models.{ComponentId, TrackingEvent}
 import csw.location.models.ComponentType.HCD
 import csw.location.models.Connection.AkkaConnection
@@ -37,11 +33,11 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
 
   private val log: Logger                   = loggerFactory.getLogger(ctx)
   private implicit val ec: ExecutionContext = ctx.executionContext
-  private val clientMat: Materializer       = ActorMaterializer()(ctx.system)
+  //private val clientMat: Materializer       = ActorMaterializer()(ctx.system)
   private implicit val timeout: Timeout     = 15.seconds
 
   private val filterHCDConnection      = AkkaConnection(ComponentId("FilterHCD", HCD))
-  val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient(ctx.system, clientMat)
+  //val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient(ctx.system, clientMat)
 
   private val filterHCDLocation    = Await.result(locationService.resolve(filterHCDConnection, 5.seconds), 5.seconds)
   var hcdComponent: CommandService = CommandServiceFactory.make(filterHCDLocation.get)(ctx.system)

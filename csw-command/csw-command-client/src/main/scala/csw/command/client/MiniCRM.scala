@@ -83,11 +83,11 @@ object MiniCRM {
         case Query(runId, replyTo: ActorRef[QueryResponse]) =>
           // check for a response or started and return the first match
           replyTo ! getResponse(startedList, responseList, runId)
-          Behavior.same
+          Behaviors.same
         case GetWaiters(replyTo) =>
           // Used only for tests
           replyTo ! waiterList.toList
-          Behavior.same
+          Behaviors.same
         case GetResponses(replyTo) =>
           // Used only for tests
           replyTo ! responseList.toList

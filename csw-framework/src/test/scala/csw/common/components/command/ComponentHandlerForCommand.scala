@@ -5,7 +5,6 @@ import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{Materializer, ThrottleMode}
-import akka.util.Timeout
 import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
@@ -29,9 +28,9 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
   private val cancelCmdId = KeyType.StringKey.make("cancelCmdId")
 
   import ComponentStateForCommand._
-  private implicit val actorSystem: actor.ActorSystem = ctx.system.toUntyped
+  private implicit val actorSystem: actor.ActorSystem = ctx.system.toClassic
   private implicit val ec: ExecutionContext           = ctx.executionContext
-  private implicit val mat: ActorMaterializer         = ActorMaterializer()
+  private implicit val mat: Materializer              = Materializer(actorSystem)
 
   override def initialize(): Future[Unit] = Future.unit
 
@@ -74,7 +73,7 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
   }
 
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = controlCommand.commandName match {
-    case `cancelCmd` => processAcceptedOnewayCmd(runId, controlCommand)
+    case `cancelCmd` => processAcceptedSubmitCmd(runId, controlCommand.asInstanceOf[Setup])
     case `onewayCmd`          => // Do nothing
     case `matcherCmd`         => processCommandWithMatcher(controlCommand)
     case `matcherFailedCmd`   => processCommandWithMatcher(controlCommand)
@@ -91,15 +90,26 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
     //#subscribeCurrentState
   }
 
-  private def processAcceptedSubmitCmd(controlCommand: ControlCommand): SubmitResponse = {
-    controlCommand.paramType.get(cancelCmdId) match {
-      case None        => Error(controlCommand.runId, "Cancel command not present")
-      case Some(param) => processCancelCommand(controlCommand.runId, Id(param.head))
+  private def processAcceptedSubmitCmd(cancelCommandId: Id, cancelCommandSetup: Setup): SubmitResponse = {
+    val commandToCancelId: Option[Parameter[String]]   = cancelCommandSetup.get(cancelCmdId)
+    if (commandToCancelId.isEmpty)
+      Error(cancelCommandId, "Cancel command not present in cancel command")
+    else {
+      processCancelCommand(cancelCommandId, Id(commandToCancelId.get.head))
     }
   }
 
-  private def processAcceptedOnewayCmd(controlCommand: ControlCommand): Unit =
-    controlCommand.paramType.get(cancelCmdId).foreach(param => processOriginalCommand(Id(param.head)))
+  private def processCancelCommand(cancelCommandId: Id, commandToCancelId: Id): SubmitResponse = {
+    processOriginalCommand(commandToCancelId)
+    // This completes the cancel command itself
+    Completed(cancelCommandId)
+  }
+
+  // This simulates the low-level handling of cancelling the original long-running command
+  private def processOriginalCommand(commandToCancelId: Id): Unit = {
+    // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
+    commandResponseManager.updateCommand(Cancelled(commandToCancelId))
+  }
 
   // This simulates a long command that has been started and finishes with a result
   private def processCommandWithoutMatcher(runId: Id, controlCommand: ControlCommand): Unit = {
@@ -108,21 +118,14 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
 
     // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
     // This simulates a long running command that eventually updates with a result
-    Source.future(Future(CompletedWithResult(controlCommand.runId, result))).delay(250.milli).runWith(Sink.head).onComplete {
-      case Success(sr)        => commandResponseManager.addOrUpdateCommand(sr)
-      case Failure(exception) => println(s"processWithout exception ${exception.getMessage}")
-    }
-  }
-
-  private def processCancelCommand(runId: Id, cancelId: Id): SubmitResponse = {
-    processOriginalCommand(cancelId)
-    Completed(runId)
-  }
-
-  // This simulates the low-level handling of cancelling the original long-running command
-  private def processOriginalCommand(commandToCancelName: CommandName, commandToCancelId: Id): Unit = {
-    // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
-    commandResponseManager.updateCommand(Cancelled(commandToCancelId))
+    Source
+      .future(Future(Completed(runId, result)))
+      .delay(250.milli)
+      .runWith(Sink.head)
+      .onComplete {
+        case Success(sr)        => commandResponseManager.updateCommand(sr)
+        case Failure(exception) => println(s"processWithout exception ${exception.getMessage}")
+      }
   }
 
   private def processCommandWithMatcher(controlCommand: ControlCommand): Unit =

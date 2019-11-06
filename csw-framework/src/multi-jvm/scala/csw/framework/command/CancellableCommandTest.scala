@@ -1,6 +1,6 @@
 package csw.framework.command
 
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
@@ -8,8 +8,8 @@ import csw.command.client.CommandServiceFactory
 import csw.common.components.command.ComponentStateForCommand.{acceptedCmd, cancelCmd, prefix}
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.helpers.{LSNodeSpec, OneMemberAndSeed}
-import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.models.Connection.AkkaConnection
+import csw.location.models.{ComponentId, ComponentType}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup
@@ -32,7 +32,7 @@ class CancellableCommandTest(ignore: Int)
     with MockitoSugar {
   import config._
 
-  private implicit val actorSystem: ActorSystem[SpawnProtocol] = system.toTyped.asInstanceOf[ActorSystem[SpawnProtocol]]
+  private implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = system.toTyped.asInstanceOf[ActorSystem[SpawnProtocol.Command]]
   private implicit val timeout: Timeout                        = 5.seconds
 
   test("a long running command should be cancellable") {
@@ -53,8 +53,8 @@ class CancellableCommandTest(ignore: Int)
 
       // resolve the assembly running on seed
       val assemblyLocF =
-        locationService.resolve(AkkaConnection(ComponentId("Monitor_Assembly", ComponentType.Assembly)).of[AkkaLocation], 5.seconds)
-      val assemblyLoc:AkkaLocation = Await.result(assemblyLocF, 10.seconds).get
+        locationService.resolve(AkkaConnection(ComponentId("Monitor_Assembly", ComponentType.Assembly)), 5.seconds)
+      val assemblyLoc = Await.result(assemblyLocF, 10.seconds).get
 
       val assemblyCommandService = CommandServiceFactory.make(assemblyLoc)
 

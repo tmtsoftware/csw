@@ -14,7 +14,7 @@ import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.messages._
-import csw.command.client.messages.sequencer.SequencerMsg.{QueryFinal, SubmitSequenceAndWait}
+import csw.command.client.messages.sequencer.SequencerMsg.{QueryFinal => SequencerQueryFinal, SubmitSequenceAndWait}
 import csw.command.client.models.framework.LockingResponse._
 import csw.command.client.models.framework.PubSub.{Publish, PublisherMessage, SubscriberMessage}
 import csw.command.client.models.framework.{PubSub, _}
@@ -75,8 +75,7 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
   implicit lazy val shutdownCodec: Codec[Shutdown.type]                                  = deriveCodec
   implicit lazy val restartCodec: Codec[Restart.type]                                    = deriveCodec
   implicit lazy val queryCodec: Codec[Query]                                             = deriveCodec
-  implicit lazy val subscribeCodec: Codec[Subscribe]                                     = deriveCodec
-  implicit lazy val unsubscribeCodec: Codec[Unsubscribe]                                 = deriveCodec
+  implicit lazy val queryFinalCodec: Codec[QueryFinal]                                   = deriveCodec
   implicit lazy val submitCodec: Codec[Submit]                                           = deriveCodec
   implicit lazy val oneWayCodec: Codec[Oneway]                                           = deriveCodec
   implicit lazy val validateCodec: Codec[Validate]                                       = deriveCodec
@@ -98,6 +97,6 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
 
   // ************************ SequencerMsg Codecs ********************
 
-  implicit lazy val submitSequenceAndWaitCodec: Codec[SubmitSequenceAndWait] = deriveCodec
-  implicit lazy val queryFinalCodec: Codec[QueryFinal]                       = deriveUnaryCodec
+  implicit lazy val submitSequenceAndWaitCodec: Codec[SubmitSequenceAndWait]             = deriveCodec
+  implicit lazy val sequencerQueryFinalCodec: Codec[SequencerQueryFinal]                 = deriveUnaryCodec
 }

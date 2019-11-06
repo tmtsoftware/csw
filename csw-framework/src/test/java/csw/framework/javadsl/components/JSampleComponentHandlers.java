@@ -3,7 +3,6 @@ package csw.framework.javadsl.components;
 import akka.actor.Cancellable;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Adapter;
-import akka.stream.ActorMaterializer;
 import akka.stream.Materializer;
 import akka.stream.ThrottleMode;
 import akka.stream.javadsl.Sink;
@@ -19,6 +18,7 @@ import csw.framework.models.JCswContext;
 import csw.location.models.TrackingEvent;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.*;
+import csw.params.commands.CommandResponse.*;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.Id;
@@ -104,7 +104,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     public CommandResponse.SubmitResponse onSubmit(Id runId, ControlCommand controlCommand) {
         // Adding item from CommandMessage paramset to ensure things are working
         if (controlCommand.commandName().equals(crmAddOrUpdateCmd())) {
-            return crmAddOrUpdate((Setup) controlCommand);
+            return crmAddOrUpdate((Setup) controlCommand, runId);
         } else {
             CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
             currentStatePublisher.publish(submitState);
@@ -146,18 +146,18 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     }
 
     //#addOrUpdateCommand
-    private CommandResponse.SubmitResponse crmAddOrUpdate(Setup setup) {
+    private CommandResponse.SubmitResponse crmAddOrUpdate(Setup setup, Id runId) {
         // This simulates some worker task doing something that finishes after onSubmit returns
         Runnable task = new Runnable() {
             @Override
             public void run() {
-                commandResponseManager.update(new Completed(setup.runId()));
+                commandResponseManager.updateCommand(new Completed(runId));
             }
         };
 
         // Wait a bit and then set CRM to Completed
-        ExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-        ((ScheduledExecutorService) executor).schedule(task, 1, TimeUnit.SECONDS);
+        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        executor.schedule(task, 1, TimeUnit.SECONDS);
 
         // Return Started from onSubmit
         return new Started(runId);
