@@ -8,7 +8,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.scaladsl.LocationService
 import csw.location.server.commons.{ClusterAwareSettings, ClusterSettings}
-import csw.location.server.http.{LocationExceptionHandler, LocationHttpHandler, LocationHttpService, LocationWebsocketHandler}
+import csw.location.server.http.{LocationHttpHandler, LocationHttpService, LocationWebsocketHandler}
 import msocket.impl.post.PostRouteFactory
 import msocket.impl.ws.WebsocketRouteFactory
 import msocket.impl.{Encoding, RouteFactory}
@@ -22,7 +22,6 @@ private[csw] class ServerWiring extends LocationServiceCodecs {
   lazy val untypedActorSystem: actor.ActorSystem                    = clusterSettings.system.toClassic
   lazy val actorRuntime                                             = new ActorRuntime(actorSystem)
   lazy val locationService: LocationService                         = LocationServiceFactory.withSystem(actorSystem)
-  lazy val locationExceptionHandler                                 = new LocationExceptionHandler
   private val postHandler                                           = new LocationHttpHandler(locationService.locationServiceE)
   private def websocketHandlerFactory(encoding: Encoding[_]) =
     new LocationWebsocketHandler(locationService.locationServiceE, encoding)
