@@ -24,7 +24,7 @@ class SequencerCommandServiceImplTest
   test("should submit sequence to the sequencer") {
     val sequence = Sequence(Setup(Prefix("csw.move"), CommandName("command-1"), None))
 
-    val submitResponse: SubmitResponse = Completed(Id())
+    val submitResponse: SubmitResponse     = Completed(Id())
     val queryFinalResponse: SubmitResponse = Completed(sequence.runId)
 
     val sequencer = spawn(Behaviors.receiveMessage[SequencerMsg] {

@@ -26,7 +26,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
   test("logs should contain component name and source location in terms of file name, class name and line number") {
     val expectedDateTime = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
     new TromboneHcd().startLogging(logMsgMap)
-    Thread.sleep(300)
+    Thread.sleep(400)
 
     // Verify log level for tromboneHcd is at debug level in config
     LoggingState.componentsLoggingState.get(TromboneHcd.COMPONENT_NAME).componentLogLevel shouldBe DEBUG

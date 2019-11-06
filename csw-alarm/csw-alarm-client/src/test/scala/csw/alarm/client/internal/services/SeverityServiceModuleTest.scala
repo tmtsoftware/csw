@@ -51,7 +51,7 @@ class SeverityServiceModuleTest
     loggingSystem.setAppenders(List(testAppender))
     loggingSystem.setDefaultLogLevel(DEBUG)
     setCurrentSeverity(tromboneAxisLowLimitAlarmKey, AlarmSeverity.Critical).await
-    Thread.sleep(100)
+    Thread.sleep(200)
     val messages = logBuffer.map(log => log.getString("message"))
     messages.contains(expectedMessage1) shouldBe true
     messages.contains(expectedMessage2) shouldBe true

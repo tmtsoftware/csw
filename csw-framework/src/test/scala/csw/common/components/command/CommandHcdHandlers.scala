@@ -23,16 +23,14 @@ class CommandHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCon
   private implicit val ec: ExecutionContext = ctx.executionContext
 
   override def initialize(): Future[Unit] = {
-    // DEOPSCSW-153: Accessibility of logging service to other CSW comp    onents
+    // DEOPSCSW-153: Accessibility of logging service to other CSW components
     log.info("Initializing HCD Component TLA")
-    println("Initializing HCD Component TLA")
     Thread.sleep(100)
 
     //#currentStatePublisher
     // Publish the CurrentState using parameter set created using a sample Choice parameter
     currentStatePublisher.publish(CurrentState(filterHcdPrefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
     //#currentStatePublisher
-    println("done hcd")
     Future.unit
   }
 

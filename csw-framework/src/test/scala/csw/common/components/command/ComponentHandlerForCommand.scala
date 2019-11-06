@@ -73,7 +73,7 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
   }
 
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = controlCommand.commandName match {
-    case `cancelCmd` => processAcceptedSubmitCmd(runId, controlCommand.asInstanceOf[Setup])
+    case `cancelCmd`          => processAcceptedSubmitCmd(runId, controlCommand.asInstanceOf[Setup])
     case `onewayCmd`          => // Do nothing
     case `matcherCmd`         => processCommandWithMatcher(controlCommand)
     case `matcherFailedCmd`   => processCommandWithMatcher(controlCommand)
@@ -91,7 +91,7 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
   }
 
   private def processAcceptedSubmitCmd(cancelCommandId: Id, cancelCommandSetup: Setup): SubmitResponse = {
-    val commandToCancelId: Option[Parameter[String]]   = cancelCommandSetup.get(cancelCmdId)
+    val commandToCancelId: Option[Parameter[String]] = cancelCommandSetup.get(cancelCmdId)
     if (commandToCancelId.isEmpty)
       Error(cancelCommandId, "Cancel command not present in cancel command")
     else {

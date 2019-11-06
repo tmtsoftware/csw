@@ -21,8 +21,6 @@ import csw.time.core.models.UTCTime
 
 import scala.concurrent.duration._
 import csw.command.client.CommandResponseManager.{OverallFailure, OverallSuccess}
-import csw.common.components.command.ComponentStateForCommand.choiceKey
-
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -34,9 +32,9 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   private val log: Logger                   = loggerFactory.getLogger(ctx)
   private implicit val ec: ExecutionContext = ctx.executionContext
   //private val clientMat: Materializer       = ActorMaterializer()(ctx.system)
-  private implicit val timeout: Timeout     = 15.seconds
+  private implicit val timeout: Timeout = 15.seconds
 
-  private val filterHCDConnection      = AkkaConnection(ComponentId("FilterHCD", HCD))
+  private val filterHCDConnection = AkkaConnection(ComponentId("FilterHCD", HCD))
   //val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient(ctx.system, clientMat)
 
   private val filterHCDLocation    = Await.result(locationService.resolve(filterHCDConnection, 5.seconds), 5.seconds)
@@ -52,7 +50,6 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
 
     Thread.sleep(100)
     //#currentStatePublisher
-    println("CuurentStatePub: " + currentStatePublisher)
     // Publish the CurrentState using parameter set created using a sample Choice parameter
     currentStatePublisher.publish(CurrentState(filterAsmPrefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
     //#currentStatePublisher
