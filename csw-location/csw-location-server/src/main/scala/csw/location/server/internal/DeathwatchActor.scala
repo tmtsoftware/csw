@@ -3,7 +3,7 @@ package csw.location.server.internal
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior, Terminated}
 import akka.cluster.ddata.typed.scaladsl.Replicator
-import akka.cluster.ddata.typed.scaladsl.Replicator.Changed
+import akka.cluster.ddata.typed.scaladsl.Replicator.{Changed, SubscribeResponse}
 import csw.location.api.extensions.URIExtension.RichURI
 import csw.location.api.scaladsl.LocationService
 import csw.location.models.{AkkaLocation, Location}
@@ -81,9 +81,13 @@ private[location] object DeathwatchActor {
    */
   def start(cswCluster: CswCluster, locationService: LocationService): ActorRef[Msg] = {
     log.debug("Starting Deathwatch actor")
-    val actorRef = cswCluster.typedSystem.spawn(
+    val behavior: Behavior[Msg] = new DeathwatchActor(locationService)(cswCluster.typedSystem).behavior(Set.empty)
+    val widenedBehaviour: Behavior[SubscribeResponse[AllServices.Value]] = behavior.transformMessages {
+      case x @ Changed(_) => x
+    }
+    val actorRef: ActorRef[SubscribeResponse[AllServices.Value]] = cswCluster.typedSystem.spawn(
       //span the actor with empty set of watched locations
-      new DeathwatchActor(locationService)(cswCluster.typedSystem).behavior(Set.empty),
+      widenedBehaviour,
       name = "location-service-death-watch-actor"
     )
 
