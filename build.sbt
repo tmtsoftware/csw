@@ -134,6 +134,7 @@ lazy val `csw-location-api` = crossProject(JSPlatform, JVMPlatform)
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .dependsOn(`csw-location-models`)
   .jvmConfigure(_.dependsOn(`csw-logging-client`))
+  .jsSettings(SettingKey[Boolean]("ide-skip-project") := true)
   .settings(libraryDependencies += MSocket.`msocket-api`.value)
   .settings(fork := false)
 

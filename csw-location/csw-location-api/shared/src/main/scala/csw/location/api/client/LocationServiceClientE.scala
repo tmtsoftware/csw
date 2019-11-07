@@ -3,7 +3,6 @@ package csw.location.api.client
 import akka.Done
 import akka.stream.Materializer
 import akka.stream.scaladsl.Source
-import com.github.ghik.silencer.silent
 import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.exceptions.{RegistrationError, RegistrationListingFailed, UnregistrationFailed}
 import csw.location.api.messages.LocationHttpMessage._
@@ -18,10 +17,11 @@ import msocket.impl.extensions.SourceExtensions.SourceWithSubscribe
 
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
+
 class LocationServiceClientE(
     httpTransport: Transport[LocationHttpMessage],
     websocketTransport: Transport[LocationWebsocketMessage]
-)(implicit @silent mat: Materializer)
+)(implicit mat: Materializer)
     extends LocationServiceE
     with LocationServiceCodecs
     with BasicCodecs {
