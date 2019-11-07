@@ -61,7 +61,7 @@ object LockingResponse {
   /**
    * Java API: Lock expired notification which is sent to component who acquired lock previously
    */
-  def lockExpired: LockingResponse = LockAcquired
+  def lockExpired: LockingResponse = LockExpired
 
   /**
    * Scala API: Lock expiring notification which is sent after a duration calculated by [leaseDuration - (leaseDuration / 10)]
