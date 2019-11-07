@@ -54,7 +54,7 @@ object Libs {
 }
 
 object MSocket {
-  val Version            = "7020014017"
+  val Version            = "b6e3211"
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-impl-jvm` = "com.github.tmtsoftware.msocket" %% "msocket-impl-jvm" % Version
 }
