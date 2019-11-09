@@ -15,8 +15,6 @@ import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
 import csw.command.client.messages.ComponentCommonMessage.ComponentStateSubscription
 import csw.command.client.messages.{ComponentMessage, Query, QueryFinal}
 import csw.command.client.models.framework.PubSub.{Subscribe, SubscribeOnly}
-import csw.command.client.models.matchers.Matcher
-import csw.command.client.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.location.models.AkkaLocation
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
@@ -25,6 +23,7 @@ import csw.params.core.states.{CurrentState, StateName}
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(implicit val actorSystem: ActorSystem[_])
     extends CommandService {
@@ -80,17 +79,18 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
       controlCommand: ControlCommand,
       stateMatcher: StateMatcher
   )(implicit timeout: Timeout): Future[MatchingResponse] = {
-    val matcher          = new Matcher(component, stateMatcher)
-    val matcherResponseF = matcher.start
+    val eventualCurrentState = subscribeCurrentState()
+      .filter(cs => cs.stateName == stateMatcher.stateName && cs.prefix == stateMatcher.prefix && stateMatcher.check(cs))
+      .completionTimeout(stateMatcher.timeout.duration)
+      .runWith(Sink.head)
+
     oneway(controlCommand).flatMap {
       case Accepted(runId) =>
-        matcherResponseF.map {
-          case MatchCompleted  => Completed(runId)
-          case MatchFailed(ex) => Error(runId, ex.getMessage)
+        eventualCurrentState.transform {
+          case Success(_)  => Success(Completed(runId))
+          case Failure(ex) => Success(Error(runId, ex.getMessage))
         }
-      case x @ _ =>
-        matcher.stop()
-        Future.successful(x.asInstanceOf[MatchingResponse])
+      case x @ _ => Future.successful(x.asInstanceOf[MatchingResponse])
     }
   }
 

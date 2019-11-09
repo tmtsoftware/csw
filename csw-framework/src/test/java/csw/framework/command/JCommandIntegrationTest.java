@@ -14,13 +14,11 @@ import csw.command.client.extensions.AkkaLocationExt;
 import csw.command.client.messages.SupervisorLockMessage;
 import csw.command.client.models.framework.LockingResponse;
 import csw.command.client.models.matchers.DemandMatcher;
-import csw.command.client.models.matchers.Matcher;
-import csw.command.client.models.matchers.MatcherResponse;
-import csw.command.client.models.matchers.MatcherResponses;
 import csw.common.components.framework.SampleComponentState;
 import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;
 import csw.location.api.javadsl.ILocationService;
+import csw.location.api.javadsl.JComponentType;
 import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import csw.location.models.AkkaLocation;
@@ -59,8 +57,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static csw.common.components.command.ComponentStateForCommand.*;
-
-import csw.location.api.javadsl.JComponentType;
 
 // DEOPSCSW-212: Send oneway command
 // DEOPSCSW-217: Execute RPC like commands
@@ -390,30 +386,9 @@ public class JCommandIntegrationTest extends JUnitSuite {
         // create a StateMatcher which specifies the desired algorithm and state to be matched.
         DemandMatcher demandMatcher = new DemandMatcher(new DemandState(prefix(), new StateName("testStateName")).add(param), false, timeout);
 
-        // create the matcher instance
-        Matcher matcher = new Matcher(AkkaLocationExt.RichAkkaLocation(hcdLocation).componentRef(hcdActorSystem).narrow(), demandMatcher, hcdActorSystem);
-
-        // start the matcher so that it is ready to receive state published by the source
-        CompletableFuture<MatcherResponse> matcherResponseFuture = matcher.jStart();
-
         // Submit command as a oneway and if the command is successfully validated,
         // check for matching of demand state against current state
-        CompletableFuture<MatchingResponse> matchResponseF = hcdCmdService
-                .oneway(setupWithMatcher, timeout)
-                .thenCompose(initialCommandResponse -> {
-                    if (initialCommandResponse instanceof Accepted) {
-                        return matcherResponseFuture.thenApply(matcherResponse -> {
-                            if (matcherResponse.getClass().isAssignableFrom(MatcherResponses.jMatchCompleted().getClass()))
-                                return new Completed(initialCommandResponse.runId());
-                            else
-                                return new CommandResponse.Error(initialCommandResponse.runId(), "Match not completed");
-                        });
-
-                    } else {
-                        matcher.stop();
-                        return CompletableFuture.completedFuture(new CommandResponse.Error(initialCommandResponse.runId(), "Matcher failed"));
-                    }
-                });
+        CompletableFuture<MatchingResponse> matchResponseF = hcdCmdService.onewayAndMatch(setupWithMatcher, demandMatcher, timeout);
 
         MatchingResponse actualResponse = matchResponseF.get();
         Completed expectedResponse = new Completed(actualResponse.runId());
