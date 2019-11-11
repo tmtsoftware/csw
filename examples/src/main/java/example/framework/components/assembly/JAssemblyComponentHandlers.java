@@ -29,6 +29,7 @@ import csw.params.core.models.Prefix;
 import csw.params.core.states.CurrentState;
 import csw.params.core.states.StateName;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JSubsystem;
 import csw.time.core.models.UTCTime;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -189,11 +190,11 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         switch (sc.commandName().name()) {
             case "forwardToWorker":
                 //#addSubCommand
-                Prefix prefix1 = new Prefix("wfos.red.detector");
+                Prefix prefix1 = new Prefix(JSubsystem.WFOS, "red.detector");
                 Setup subCommand1 = new Setup(prefix1, new CommandName("sub-command-1"), sc.jMaybeObsId());
                 //commandResponseManager.addSubCommand(sc.runId, subCommand1.runId());              //TODO Don't know how to solve subcommands!!!
 
-                Prefix prefix2 = new Prefix("wfos.blue.detector");
+                Prefix prefix2 = new Prefix(JSubsystem.WFOS, "blue.detector");
                 Setup subCommand2 = new Setup(prefix2, new CommandName("sub-command-2"), sc.jMaybeObsId());
                 //commandResponseManager.addSubCommand(sc.runId(), subCommand2.runId());
                 //#addSubCommand

@@ -53,9 +53,11 @@ class JsonTest extends FunSpec {
     val prefix: Prefix = Prefix("wfos.filter.wheel")
 
     it("should encode and decode properly") {
-      val expectedJson = Json.parse("\"wfos.filter.wheel\"")
+      val expectedJson = Json.obj("subsystem" -> "wfos", "componentName" -> "filter.wheel")
       val json         = JsonSupport.writes(prefix)
       val sub          = JsonSupport.reads[Prefix](json)
+      println(json)
+      println(expectedJson)
       assert(sub == prefix)
       assert(json.equals(expectedJson))
     }
@@ -485,7 +487,7 @@ class JsonTest extends FunSpec {
   describe("Test Long Array items") {
     it("Should allow long array values") {
       val k1: Key[ArrayData[Long]]       = KeyType.LongArrayKey.make("myArray")
-      val m1: ArrayData[Long]            = ArrayData(Array(1, 2, 3))
+      val m1: ArrayData[Long]            = ArrayData(Array(1L, 2L, 3L))
       val i1: Parameter[ArrayData[Long]] = k1.set(m1)
       val sc1                            = Setup(ck, CommandName("move"), Some(obsId)).add(i1)
       assert(sc1(k1).head == m1)

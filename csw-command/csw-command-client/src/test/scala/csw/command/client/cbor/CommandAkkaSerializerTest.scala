@@ -230,7 +230,13 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
         Set(
           Component(
             componentMessageProbe.ref,
-            ComponentInfo("component-name", ComponentType.HCD, prefix, "behavior-class-name", LocationServiceUsage.DoNotRegister)
+            ComponentInfo(
+              "componentName",
+              prefix.subsystem,
+              ComponentType.HCD,
+              "behavior-class-name",
+              LocationServiceUsage.DoNotRegister
+            )
           )
         )
       )

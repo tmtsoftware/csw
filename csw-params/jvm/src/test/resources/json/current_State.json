@@ -1,6 +1,6 @@
 {
   "CurrentState": {
-    "prefix": "wfos.blue.filter",
+    "prefix": {"subsystem":"wfos","componentName":"blue.filter"},
     "stateName": "testStateName",
     "paramSet": [
       {

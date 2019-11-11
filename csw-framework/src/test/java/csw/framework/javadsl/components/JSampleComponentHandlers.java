@@ -3,6 +3,7 @@ package csw.framework.javadsl.components;
 import akka.actor.Cancellable;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Adapter;
+import akka.stream.Materializer;
 import akka.stream.ThrottleMode;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
@@ -27,6 +28,7 @@ import csw.params.core.states.StateName;
 import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JSubsystem;
 import csw.time.core.models.UTCTime;
 
 import java.time.Duration;
@@ -261,7 +263,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     @Override
     public void onDiagnosticMode(UTCTime startTime, String hint) {
         if (hint.equals("engineering")) {
-            var event = new SystemEvent(new Prefix("TCS.prefix"), new EventName("eventName"))
+            var event = new SystemEvent(new Prefix(JSubsystem.TCS, "prefix"), new EventName("eventName"))
                     .add(JKeyType.IntKey().make("diagnostic-data").set(1));
             diagModeCancellable.map(Cancellable::cancel); // cancel previous diagnostic publishing
             diagModeCancellable = Optional.of(

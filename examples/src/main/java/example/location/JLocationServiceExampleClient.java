@@ -36,6 +36,7 @@ import csw.logging.client.javadsl.JKeys;
 import csw.logging.client.javadsl.JLoggerFactory;
 import csw.logging.client.javadsl.JLoggingSystemFactory;
 import csw.params.core.models.Prefix;
+import csw.params.javadsl.JSubsystem;
 import scala.concurrent.Await;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -117,7 +118,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         // to Typed ActorRef[Nothing]
 
         URI actorRefURI = ActorExtension.RichActor(Adapter.toTyped(actorRef)).toURI();
-        AkkaRegistration hcdRegistration = csw.location.api.AkkaRegistrationFactory.make(hcdConnection, new Prefix("nfiraos.ncc.tromboneHcd"), actorRefURI);
+        AkkaRegistration hcdRegistration = csw.location.api.AkkaRegistrationFactory.make(hcdConnection, new Prefix(JSubsystem.NFIRAOS, "ncc.tromboneHcd"), actorRefURI);
         hcdRegResult = locationService.register(hcdRegistration).get();
 
         // ************************************************************************************************************
@@ -128,7 +129,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         AkkaConnection assemblyConnection = new AkkaConnection(new ComponentId("assembly1", JComponentType.Assembly()));
 
         // Register Typed ActorRef[String] with Location Service
-        AkkaRegistration assemblyRegistration = new RegistrationFactory().akkaTyped(assemblyConnection, new Prefix("nfiraos.ncc.tromboneAssembly"), typedActorRef);
+        AkkaRegistration assemblyRegistration = new RegistrationFactory().akkaTyped(assemblyConnection, new Prefix(JSubsystem.NFIRAOS, "ncc.tromboneAssembly"), typedActorRef);
 
 
         assemblyRegResult = locationService.register(assemblyRegistration).get();

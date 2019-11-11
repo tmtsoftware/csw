@@ -20,10 +20,10 @@ trait ParameterSetKeyData { self: ParameterSetType[_] =>
   /**
    * The prefix for the parameter set
    */
-  final def prefixStr: String = prefix.prefix
+  final def prefixStr: String = prefix.key
 
   /**
    * A String representation for concrete implementation of this trait
    */
-  override def toString: String = s"$typeName([$subsystem, $prefixStr]$dataToString)"
+  override def toString: String = s"$typeName([$prefix]$dataToString)"
 }

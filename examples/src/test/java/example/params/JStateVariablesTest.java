@@ -10,6 +10,7 @@ import csw.params.core.states.CurrentState;
 import csw.params.core.states.DemandState;
 import csw.params.core.states.StateName;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JSubsystem;
 import csw.time.core.models.UTCTime;
 import org.junit.Assert;
 import org.junit.Test;
@@ -29,7 +30,7 @@ public class JStateVariablesTest extends JUnitSuite {
     public void showUsageOfDemandState() {
         //#demandstate
         //prefix
-        Prefix prefix = new Prefix("wfos.prog.cloudcover");
+        Prefix prefix = new Prefix(JSubsystem.WFOS, "prog.cloudcover");
 
         //keys
         Key<Character> charKey = JKeyType.CharKey().make("charKey");
@@ -91,7 +92,7 @@ public class JStateVariablesTest extends JUnitSuite {
     public void showUsageOfCurrentState() {
         //#currentstate
         //prefix
-        Prefix prefix = new Prefix("wfos.prog.cloudcover");
+        Prefix prefix = new Prefix(JSubsystem.WFOS, "prog.cloudcover");
 
         //keys
         Key<Character> charKey = JKeyType.CharKey().make("charKey");
@@ -163,8 +164,8 @@ public class JStateVariablesTest extends JUnitSuite {
         Parameter<MatrixData<Double>> i1 = k1.set(m1);
 
         //state variables
-        DemandState ds = new DemandState(new Prefix("wfos.blue.filter"), new StateName("testStateName")).add(i1);
-        CurrentState cs = new CurrentState(new Prefix("wfos.blue.filter"), new StateName("testStateName")).add(i1);
+        DemandState ds = new DemandState(new Prefix(JSubsystem.WFOS, "blue.filter"), new StateName("testStateName")).add(i1);
+        CurrentState cs = new CurrentState(new Prefix(JSubsystem.WFOS, "blue.filter"), new StateName("testStateName")).add(i1);
 
         //json support - write
         JsValue dsJson = JavaJsonSupport.writeStateVariable(ds);
@@ -196,7 +197,7 @@ public class JStateVariablesTest extends JUnitSuite {
         Key<Integer> miscKey = JKeyType.IntKey().make("misc.");
 
         //prefix
-        Prefix prefix = new Prefix("wfos.blue.filter");
+        Prefix prefix = new Prefix(JSubsystem.WFOS, "blue.filter");
 
         //params
         Parameter<Integer> encParam1 = encoderKey.set(1);

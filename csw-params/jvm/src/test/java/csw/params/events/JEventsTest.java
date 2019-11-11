@@ -5,6 +5,7 @@ import csw.params.core.generics.Parameter;
 import csw.params.core.generics.ParameterSetType;
 import csw.params.core.models.Prefix;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JSubsystem;
 import org.junit.Assert;
 import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
@@ -29,7 +30,7 @@ public class JEventsTest extends JUnitSuite {
     private final Parameter<Integer> epochIntParam = epochIntKey.set(44, 55);
     private final Parameter<Byte> epochByteParam = epochByteKey.set(new Byte[]{10, 20});
 
-    private final Prefix prefix = new Prefix("wfos.red.detector");
+    private final Prefix prefix = new Prefix(JSubsystem.WFOS, "red.detector");
 
     private<T extends ParameterSetType & Event> void assertOnEventsAPI(T event) {
 
@@ -39,7 +40,7 @@ public class JEventsTest extends JUnitSuite {
         Assert.assertEquals(prefix, event.source());
         Assert.assertEquals(name, event.eventName());
         Assert.assertNotNull(event.eventTime());
-        Assert.assertEquals(event.eventKey().toString(), prefix.prefix() + "." + name.name());
+        Assert.assertEquals(event.eventKey().toString(), prefix + "." + name.name());
 
         // contains and exists
         Assert.assertFalse(event.contains(notUsedKey));

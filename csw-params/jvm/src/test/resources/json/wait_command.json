@@ -1,6 +1,6 @@
 {
   "Wait": {
-    "source": "wfos.blue.filter",
+    "source": {"subsystem":"wfos","componentName":"blue.filter"},
     "commandName": "move",
     "maybeObsId": ["Obs001"],
     "paramSet": [

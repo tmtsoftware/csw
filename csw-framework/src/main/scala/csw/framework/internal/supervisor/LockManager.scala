@@ -62,14 +62,14 @@ private[framework] class LockManager(val lockPrefix: Option[Prefix], loggerFacto
 
   private def onAcquiringFailed(replyTo: ActorRef[LockingResponse], source: Prefix, currentPrefix: Prefix) = {
     val failureReason =
-      s"Invalid source ${source.prefix} for acquiring lock. Currently it is acquired by component: ${currentPrefix.prefix}"
+      s"Invalid source ${source} for acquiring lock. Currently it is acquired by component: ${currentPrefix}"
     log.error(failureReason)
     replyTo ! AcquiringLockFailed(failureReason)
     this
   }
 
   private def onLockReleased(source: Prefix, replyTo: ActorRef[LockingResponse], stopTimer: => Unit): LockManager = {
-    log.info(s"The lock is successfully released by component: ${source.prefix}")
+    log.info(s"The lock is successfully released by component: ${source}")
     replyTo ! LockReleased
     stopTimer
     new LockManager(None, loggerFactory)
@@ -77,14 +77,14 @@ private[framework] class LockManager(val lockPrefix: Option[Prefix], loggerFacto
 
   private def onLockReleaseFailed(replyTo: ActorRef[LockingResponse], source: Prefix, currentPrefix: Prefix) = {
     val failureReason =
-      s"Invalid source ${source.prefix} for releasing lock. Currently it is acquired by component: ${currentPrefix.prefix}"
+      s"Invalid source ${source} for releasing lock. Currently it is acquired by component: ${currentPrefix}"
     log.error(failureReason)
     replyTo ! ReleasingLockFailed(failureReason)
     this
   }
 
   private def onLockAlreadyReleased(source: Prefix, replyTo: ActorRef[LockingResponse]): LockManager = {
-    log.warn(s"Cannot release lock for ${source.prefix} as it is already released")
+    log.warn(s"Cannot release lock for ${source} as it is already released")
     replyTo ! LockAlreadyReleased
     this
   }

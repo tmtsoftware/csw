@@ -11,12 +11,13 @@ import csw.params.core.models.Prefix;
 import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JSubsystem;
 
 import java.util.Set;
 
 public abstract class JavaCommandHandler {
 
-    private static final Prefix prefix = new Prefix("wfos.red.detector");
+    private static final Prefix prefix = new Prefix(JSubsystem.WFOS, "red.detector");
 
     private static final Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder");
     private static final Key<String> epochStringKey = JKeyType.StringKey().make("epoch");

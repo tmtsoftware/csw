@@ -41,7 +41,7 @@ class PerfSubscriber(
   private lazy val ocsGatewayClient = new GatewayClient("localhost", 9090)
 
   val histogram: Histogram   = new Histogram(SECONDS.toNanos(10), 3)
-  private val resultReporter = new ResultReporter(prefix.prefix, actorSystem)
+  private val resultReporter = new ResultReporter(prefix.key, actorSystem)
 
   var startTime           = 0L
   var totalTime           = 0L
@@ -136,6 +136,6 @@ class PerfSubscriber(
       avgLatency()
     )
 
-  def isPatternSubscriber: Boolean = patternBasedSubscription & prefix.prefix.contains("pattern")
+  def isPatternSubscriber: Boolean = patternBasedSubscription & prefix.key.contains("pattern")
 
 }

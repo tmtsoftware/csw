@@ -15,7 +15,7 @@ import play.api.libs.json._
 
 import scala.collection.{immutable, mutable}
 
-class CommandLineRunnerTest extends SeedData with Eventually {
+class CommandLineRunnerTest extends SeedData with Eventually with csw.params.core.formats.CommonCodecs {
 
   def events(name: EventName): immutable.Seq[Event] =
     for (i <- 1 to 10) yield event1.copy(eventName = name, eventId = Id(i.toString))
@@ -255,7 +255,7 @@ class CommandLineRunnerTest extends SeedData with Eventually {
     val (k, v) = json.as[JsObject].value.head
 
     val jsObject = v.as[JsObject] ++ Json.obj(
-      ("source", eventKey.source.prefix),
+      ("source", Json.obj("subsystem" -> eventKey.source.subsystem.name, "componentName" -> eventKey.source.componentName)),
       ("eventName", eventKey.eventName.name)
     )
 
