@@ -185,7 +185,7 @@ class LongRunningCommandTest(ignore: Int)
     runOn(member1) {
       // spawn single assembly running in Standalone mode in jvm-2
       val wiring       = FrameworkWiring.make(typedSystem, locationService, mock[RedisClient])
-      val assemblyConf = ConfigFactory.load("command/mcs_assembly.conf")
+      val assemblyConf = ConfigFactory.load("command/iris_assembly.conf")
       Await.result(Standalone.spawn(assemblyConf, wiring), 5.seconds)
       enterBarrier("spawned")
       enterBarrier("long-commands")
@@ -196,7 +196,7 @@ class LongRunningCommandTest(ignore: Int)
     runOn(member2) {
       // spawn single hcd running in Standalone mode in jvm-3
       val wiring  = FrameworkWiring.make(typedSystem, locationService, mock[RedisClient])
-      val hcdConf = ConfigFactory.load("command/mcs_hcd.conf")
+      val hcdConf = ConfigFactory.load("command/iris_hcd.conf")
       Await.result(Standalone.spawn(hcdConf, wiring), 5.seconds)
       enterBarrier("spawned")
       enterBarrier("long-commands")
