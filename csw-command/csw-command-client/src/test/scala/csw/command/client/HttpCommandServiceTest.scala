@@ -20,8 +20,8 @@ import csw.params.commands.CommandIssue.OtherIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, ControlCommand, Setup}
 import csw.params.core.formats.ParamCodecs
-import csw.params.core.generics.KeyType.CoordKey
-import csw.params.core.generics.{Key, KeyType}
+import csw.params.core.generics.Key
+import csw.params.core.generics.KeyType._
 import csw.params.core.models.Coords.EqFrame.FK5
 import csw.params.core.models.Coords.SolarSystemObject.Venus
 import csw.params.core.models._
@@ -43,18 +43,13 @@ class HttpCommandServiceTest extends FunSuite with Matchers with BeforeAndAfterA
   private val testCompName    = "testComponent"
   private val connection      = HttpConnection(ComponentId(testCompName, ComponentType.Service))
 
-  private val basePosKey = CoordKey.make("BasePosition")
-  private val prefix     = Prefix("csw.command")
-  private val key1: Key[Float] =
-    KeyType.FloatKey.make("assemblyEventValue1")
-  private val key1b: Key[Float] =
-    KeyType.FloatKey.make("assemblyEventValue1b")
-  private val key2b: Key[Struct] =
-    KeyType.StructKey.make("assemblyEventStructValue2b")
-  private val key3: Key[Int] =
-    KeyType.IntKey.make("assemblyEventStructValue3")
-  private val key4: Key[Byte] =
-    KeyType.ByteKey.make("assemblyEventStructValue4")
+  private val basePosKey         = CoordKey.make("BasePosition")
+  private val prefix             = Prefix("csw.command")
+  private val key1: Key[Float]   = FloatKey.make("assemblyEventValue1")
+  private val key1b: Key[Float]  = FloatKey.make("assemblyEventValue1b")
+  private val key2b: Key[Struct] = StructKey.make("assemblyEventStructValue2b")
+  private val key3: Key[Int]     = IntKey.make("assemblyEventStructValue3")
+  private val key4: Key[Byte]    = ByteKey.make("assemblyEventStructValue4")
 
   private val testCommand = makeTestCommand()
 
