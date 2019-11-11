@@ -30,6 +30,7 @@ import csw.logging.client.commons.AkkaTypedExtension;
 import csw.logging.client.javadsl.JLoggerFactory;
 import csw.network.utils.Networks;
 import csw.params.core.models.Prefix;
+import csw.params.javadsl.JSubsystem;
 import org.junit.*;
 import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
@@ -66,7 +67,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
     private HttpConnection httpServiceConnection = new HttpConnection(httpServiceComponentId);
     private String Path = "/path/to/resource";
 
-    private Prefix prefix = new Prefix("nfiraos.ncc.trombone");
+    private Prefix prefix = new Prefix(JSubsystem.NFIRAOS, "ncc.trombone");
 
     @BeforeClass
     public static void setup() throws Exception {
@@ -321,9 +322,9 @@ public class JLocationServiceImplTest extends JUnitSuite {
         AkkaConnection akkaHcdConnection3 = new AkkaConnection(new ComponentId("hcd3", JComponentType.HCD()));
 
         // Register Akka connection
-        AkkaRegistration akkaRegistration1 = new RegistrationFactory().akkaTyped(akkaHcdConnection1, new Prefix("nfiraos.ncc.tromboneHcd1"), actorRef);
-        AkkaRegistration akkaRegistration2 = new RegistrationFactory().akkaTyped(akkaHcdConnection2, new Prefix("nfiraos.ncc.tromboneAssembly2"), actorRef);
-        AkkaRegistration akkaRegistration3 = new RegistrationFactory().akkaTyped(akkaHcdConnection3, new Prefix("nfiraos.ncc.tromboneHcd3"), actorRef);
+        AkkaRegistration akkaRegistration1 = new RegistrationFactory().akkaTyped(akkaHcdConnection1, new Prefix(JSubsystem.NFIRAOS, "ncc.tromboneHcd1"), actorRef);
+        AkkaRegistration akkaRegistration2 = new RegistrationFactory().akkaTyped(akkaHcdConnection2, new Prefix(JSubsystem.NFIRAOS, "ncc.tromboneAssembly2"), actorRef);
+        AkkaRegistration akkaRegistration3 = new RegistrationFactory().akkaTyped(akkaHcdConnection3, new Prefix(JSubsystem.NFIRAOS, "ncc.tromboneHcd3"), actorRef);
         locationService.register(akkaRegistration1).get();
         locationService.register(akkaRegistration2).get();
         locationService.register(akkaRegistration3).get();

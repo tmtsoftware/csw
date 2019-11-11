@@ -25,6 +25,7 @@ import csw.params.events.EventKey;
 import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JSubsystem;
 import csw.params.javadsl.JUnits;
 import csw.time.core.models.UTCTime;
 
@@ -185,7 +186,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     //#track-location
 
     //#subscribe
-    private EventKey counterEventKey = new EventKey(new Prefix("nfiraos.samplehcd"), new EventName("HcdCounter"));
+    private EventKey counterEventKey = new EventKey(new Prefix(JSubsystem.NFIRAOS, "samplehcd"), new EventName("HcdCounter"));
     private Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter");
 
     private void processEvent(Event event) {

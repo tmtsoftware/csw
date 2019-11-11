@@ -7,6 +7,7 @@ import csw.params.core.generics.Parameter;
 import csw.params.core.models.ObsId;
 import csw.params.core.models.Prefix;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JSubsystem;
 import org.junit.Assert;
 import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
@@ -24,15 +25,15 @@ public class JStateVariableTest extends JUnitSuite {
     private final Parameter<Integer> encoderParam = encoderIntKey.set(22, 33);
     private final Parameter<String> epochStringParam = epochStringKey.set("A", "B");
 
-    private final String prefix = "wfos.red.detector";
+    private final Prefix prefix = new Prefix(JSubsystem.WFOS, "red.detector");
 
     @Test
     public void shouldAbleToCreateCurrentState() {
-        CurrentState currentState = new CurrentState(new Prefix(prefix), new StateName("testStateName")).add(encoderParam).add(epochStringParam);
+        CurrentState currentState = new CurrentState(prefix, new StateName("testStateName")).add(encoderParam).add(epochStringParam);
 
         // typeName and prefix
         Assert.assertEquals(CurrentState.class.getSimpleName(), currentState.typeName());
-        Assert.assertEquals(new Prefix(prefix), currentState.prefix());
+        Assert.assertEquals(prefix, currentState.prefix());
 
         // exists
         Assert.assertTrue(currentState.exists(epochStringKey));
@@ -45,7 +46,7 @@ public class JStateVariableTest extends JUnitSuite {
 
     @Test
     public void shouldAbleToCreateCurrentStateFromSetup() {
-        Prefix source = new Prefix(prefix);
+        Prefix source = prefix;
         Setup setup = new Setup(source, new CommandName("move"), Optional.of(new ObsId("obsId"))).add(encoderParam).add(epochStringParam);
         CurrentState currentState = new CurrentState(new StateName("testStateName"), setup);
 
@@ -64,11 +65,11 @@ public class JStateVariableTest extends JUnitSuite {
 
     @Test
     public void shouldAbleToCreateDemandState() {
-        DemandState demandState = new DemandState(new Prefix(prefix), new StateName("testStateName")).add(encoderParam).add(epochStringParam);
+        DemandState demandState = new DemandState(prefix, new StateName("testStateName")).add(encoderParam).add(epochStringParam);
 
         // typeName and prefix
         Assert.assertEquals(DemandState.class.getSimpleName(), demandState.typeName());
-        Assert.assertEquals(new Prefix(prefix), demandState.prefix());
+        Assert.assertEquals(prefix, demandState.prefix());
 
         // exists
         Assert.assertTrue(demandState.exists(epochStringKey));
@@ -81,7 +82,7 @@ public class JStateVariableTest extends JUnitSuite {
 
     @Test
     public void shouldAbleToCreateDemandStateFromSetup() {
-        Prefix source = new Prefix(prefix);
+        Prefix source = prefix;
         Setup setup = new Setup(source, new CommandName("move"), Optional.of(new ObsId("obsId"))).add(encoderParam).add(epochStringParam);
         DemandState demandState = new DemandState(new StateName("testStateName"), setup);
 
@@ -100,17 +101,17 @@ public class JStateVariableTest extends JUnitSuite {
 
     @Test
     public void shouldAbleToMatchWithDefaultMatcher() {
-        CurrentState currentState = new CurrentState(new Prefix(prefix), new StateName("testStateName")).add(encoderParam).add(epochStringParam);
-        DemandState demandState = new DemandState(new Prefix(prefix), new StateName("testStateName")).add(encoderParam).add(epochStringParam);
+        CurrentState currentState = new CurrentState(prefix, new StateName("testStateName")).add(encoderParam).add(epochStringParam);
+        DemandState demandState = new DemandState(prefix, new StateName("testStateName")).add(encoderParam).add(epochStringParam);
 
         Assert.assertTrue(StateVariable.defaultMatcher(demandState, currentState));
     }
 
     @Test
     public void shouldAbleToCreateCurrentStatesUsingVargs() {
-        CurrentState currentState1 = new CurrentState(new Prefix(prefix), new StateName("testStateName")).add(encoderParam);
-        CurrentState currentState2 = new CurrentState(new Prefix(prefix), new StateName("testStateName")).add(epochStringParam);
-        CurrentState currentState3 = new CurrentState(new Prefix(prefix), new StateName("testStateName")).add(epochStringParam);
+        CurrentState currentState1 = new CurrentState(prefix, new StateName("testStateName")).add(encoderParam);
+        CurrentState currentState2 = new CurrentState(prefix, new StateName("testStateName")).add(epochStringParam);
+        CurrentState currentState3 = new CurrentState(prefix, new StateName("testStateName")).add(epochStringParam);
         List<CurrentState> expectedCurrentStates = Arrays.asList(currentState1, currentState2, currentState3);
 
         CurrentStates currentStates = StateVariable.createCurrentStates(currentState1, currentState2, currentState3);
@@ -121,9 +122,9 @@ public class JStateVariableTest extends JUnitSuite {
 
     @Test
     public void shouldAbleToCreateCurrentStatesUsingList() {
-        CurrentState currentState1 = new CurrentState(new Prefix(prefix), new StateName("testStateName")).add(encoderParam);
-        CurrentState currentState2 = new CurrentState(new Prefix(prefix), new StateName("testStateName")).add(epochStringParam);
-        CurrentState currentState3 = new CurrentState(new Prefix(prefix), new StateName("testStateName")).add(epochStringParam);
+        CurrentState currentState1 = new CurrentState(prefix, new StateName("testStateName")).add(encoderParam);
+        CurrentState currentState2 = new CurrentState(prefix, new StateName("testStateName")).add(epochStringParam);
+        CurrentState currentState3 = new CurrentState(prefix, new StateName("testStateName")).add(epochStringParam);
         List<CurrentState> expectedCurrentStates = Arrays.asList(currentState1, currentState2, currentState3);
 
         CurrentStates currentStates = StateVariable.createCurrentStates(expectedCurrentStates);

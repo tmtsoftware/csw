@@ -5,6 +5,7 @@ import csw.params.commands.Setup;
 import csw.params.core.formats.JParamCodecs;
 import csw.params.core.formats.JavaJsonSupport;
 import csw.params.core.models.Coords.*;
+import csw.params.javadsl.JSubsystem;
 import org.junit.Test;
 
 import java.util.Optional;
@@ -20,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 @SuppressWarnings({"SameParameterValue", "FieldCanBeLocal"})
 public class JCoordsTest {
     private double delta = 0.00000001;
-    private Prefix src = new Prefix("esw.ocs.seq");
+    private Prefix src = new Prefix(JSubsystem.ESW, "ocs.seq");
 
     // Basic Eq Coordinate Tests
 

@@ -34,10 +34,10 @@ public class JCommandsTest extends JUnitSuite {
     public void showUsageOfUtilityFunctions() {
         //#prefix
         //using constructor, supplying subsystem and prefix both
-        Prefix prefix1 = new Prefix("nfiraos.ncc.trombone");
+        Prefix prefix1 = new Prefix(JSubsystem.NFIRAOS, "ncc.trombone");
 
         //just by supplying prefix
-        Prefix prefix2 = new Prefix("tcs.mobie.blue.filter");
+        Prefix prefix2 = new Prefix(JSubsystem.TCS, "mobie.blue.filter");
 
         //invalid prefix string which does not contain valid subsystem in the beginning will throw an exception,
         // Prefix badPrefix = new Prefix("abcdefgh");
@@ -59,14 +59,14 @@ public class JCommandsTest extends JUnitSuite {
         Key<Float> k4 = JKeyType.FloatKey().make("correction");
 
         //prefix
-        String prefixName = "wfos.red.detector";
+        Prefix prefix = new Prefix(JSubsystem.WFOS, "red.detector");
 
         //parameters
         Parameter<Integer> i1 = k1.set(22);
         Parameter<String> i2 = k2.set("A");
 
         //create setup, add sequentially using add
-        Setup sc1 = new Setup(new Prefix(prefixName), new CommandName("move"), Optional.of(obsId)).add(i1).add(i2);
+        Setup sc1 = new Setup(prefix, new CommandName("move"), Optional.of(obsId)).add(i1).add(i2);
 
         //access keys
         boolean k1Exists = sc1.exists(k1); //true
@@ -88,7 +88,7 @@ public class JCommandsTest extends JUnitSuite {
         Parameter<Byte> b1 = byteKey1.set(bytes1);
         Parameter<Byte> b2 = byteKey2.set(bytes2);
 
-        Setup sc3 = new Setup(new Prefix(prefixName), new CommandName("move"), Optional.of(obsId)).add(b1).add(b2);
+        Setup sc3 = new Setup(prefix, new CommandName("move"), Optional.of(obsId)).add(b1).add(b2);
 
         //remove a key
         Setup sc4 = sc3.remove(b1);
@@ -118,7 +118,7 @@ public class JCommandsTest extends JUnitSuite {
         Key<UTCTime> k4 = JKeyType.UTCTimeKey().make("creation-time");
 
         //prefix
-        String prefixName = "wfos.red.detector";
+        Prefix prefix = new Prefix(JSubsystem.WFOS, "red.detector");
 
         //parameters
         Boolean[] boolArray = {true, false, true, false};
@@ -126,7 +126,7 @@ public class JCommandsTest extends JUnitSuite {
         Parameter<Integer> i2 = k2.set(1, 2, 3, 4);
 
         //create Observe, add sequentially using add
-        Observe oc1 = new Observe(new Prefix(prefixName), new CommandName("move"), Optional.of(obsId)).add(i1).add(i2);
+        Observe oc1 = new Observe(prefix, new CommandName("move"), Optional.of(obsId)).add(i1).add(i2);
 
         //access parameters
         Optional<Parameter<Boolean>> k1Param = oc1.jGet(k1); //present
@@ -170,7 +170,7 @@ public class JCommandsTest extends JUnitSuite {
         Key<UTCTime> k4 = JKeyType.UTCTimeKey().make("creation-time");
 
         //prefix
-        String prefixName = "wfos.red.detector";
+        Prefix prefix = new Prefix(JSubsystem.WFOS, "red.detector");
 
         //parameters
         Boolean[] boolArray = {true, false, true, false};
@@ -178,7 +178,7 @@ public class JCommandsTest extends JUnitSuite {
         Parameter<Integer> i2 = k2.set(1, 2, 3, 4);
 
         //create Wait, add sequentially using add
-        Wait wc1 = new Wait(new Prefix(prefixName), new CommandName("move"), Optional.of(obsId)).add(i1).add(i2);
+        Wait wc1 = new Wait(prefix, new CommandName("move"), Optional.of(obsId)).add(i1).add(i2);
 
         //access parameters using jGet
         Optional<Parameter<Boolean>> k1Param = wc1.jGet(k1); //present
@@ -224,12 +224,12 @@ public class JCommandsTest extends JUnitSuite {
         //parameter
         Parameter<MatrixData<Double>> i1 = k1.set(m1);
 
-        String prefixName = "wfos.blue.filter";
+        Prefix prefix = new Prefix(JSubsystem.WFOS, "blue.filter");
 
         //commands
-        Setup sc = new Setup(new Prefix(prefixName), new CommandName("move"), Optional.of(obsId)).add(i1);
-        Observe oc = new Observe(new Prefix(prefixName), new CommandName("move"), Optional.of(obsId)).add(i1);
-        Wait wc = new Wait(new Prefix(prefixName), new CommandName("move"), Optional.of(obsId)).add(i1);
+        Setup sc = new Setup(prefix, new CommandName("move"), Optional.of(obsId)).add(i1);
+        Observe oc = new Observe(prefix, new CommandName("move"), Optional.of(obsId)).add(i1);
+        Wait wc = new Wait(prefix, new CommandName("move"), Optional.of(obsId)).add(i1);
 
         //json support - write
         JsValue scJson = JavaJsonSupport.writeSequenceCommand(sc);
@@ -259,7 +259,7 @@ public class JCommandsTest extends JUnitSuite {
         Key<Integer> miscKey = JKeyType.IntKey().make("misc.");
 
         //prefix
-        String prefix = "wfos.blue.filter";
+        Prefix prefix = new Prefix(JSubsystem.WFOS, "blue.filter");
 
         //params
         Parameter<Integer> encParam1 = encoderKey.set(1);
@@ -273,7 +273,7 @@ public class JCommandsTest extends JUnitSuite {
         Parameter<Integer> miscParam1 = miscKey.set(100);
 
         //Setup command with duplicate key via madd
-        Setup setup = new Setup(new Prefix(prefix), new CommandName("move"), Optional.of(obsId)).madd(
+        Setup setup = new Setup(prefix, new CommandName("move"), Optional.of(obsId)).madd(
                 encParam1,
                 encParam2,
                 encParam3,
@@ -302,19 +302,19 @@ public class JCommandsTest extends JUnitSuite {
 
     @Test
     public void showCloneCommandExample() {
-        String prefix = "wfos.blue.filter";
+        Prefix prefix = new Prefix(JSubsystem.WFOS, "blue.filter");
         Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder");
         Parameter<Integer> encoderParam = encoderIntKey.set(22, 33);
         CommandName commandName = new CommandName("move");
 
         //#clone-command
-        Setup setup = new Setup(new Prefix(prefix), commandName, Optional.of(obsId)).add(encoderParam);
+        Setup setup = new Setup(prefix, commandName, Optional.of(obsId)).add(encoderParam);
         Setup setup2 = setup.cloneCommand();
 
-        Observe observe = new Observe(new Prefix(prefix), commandName, Optional.empty()).add(encoderParam);
+        Observe observe = new Observe(prefix, commandName, Optional.empty()).add(encoderParam);
         Observe observe2 = observe.cloneCommand();
 
-        Wait wait = new Wait(new Prefix(prefix), commandName, Optional.of(obsId)).add(encoderParam);
+        Wait wait = new Wait(prefix, commandName, Optional.of(obsId)).add(encoderParam);
         Wait wait2 = wait.cloneCommand();
         //#clone-command
 

@@ -37,7 +37,7 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
 
   //#subscribe
   test("should be able to subscribe to HCD events") {
-    val counterEventKey = EventKey(Prefix("nfiraos.samplehcd"), EventName("HcdCounter"))
+    val counterEventKey = EventKey(Prefix("nfiraos.SampleHcd"), EventName("HcdCounter"))
     val hcdCounterKey   = KeyType.IntKey.make("counter")
 
     val eventService = eventServiceFactory.make(locationService)(actorSystem)

@@ -9,7 +9,11 @@ import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.serialization.SerializationExtension
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
 import csw.command.client.messages.CommandResponseManagerMessage.Query
-import csw.command.client.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.command.client.messages.ComponentCommonMessage.{
+  ComponentStateSubscription,
+  GetSupervisorLifecycleState,
+  LifecycleStateSubscription
+}
 import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
@@ -230,7 +234,13 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
         Set(
           Component(
             componentMessageProbe.ref,
-            ComponentInfo("component-name", ComponentType.HCD, prefix, "behavior-class-name", LocationServiceUsage.DoNotRegister)
+            ComponentInfo(
+              "componentName",
+              prefix.subsystem,
+              ComponentType.HCD,
+              "behavior-class-name",
+              LocationServiceUsage.DoNotRegister
+            )
           )
         )
       )

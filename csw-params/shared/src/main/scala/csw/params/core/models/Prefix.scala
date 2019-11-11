@@ -1,21 +1,30 @@
 package csw.params.core.models
 
-import csw.params.core.models.Prefix.SEPARATOR
-
 /**
  * A top level key for a parameter set: combination of subsystem and the subsystem's prefix
  * Eg. tcs.filter.wheel
  *
- * @param prefix    the subsystem's prefix
+ * @note Component name should not contain
+ *  - leading or trailing spaces
+ *  - and hyphen (-)
+ * @param subsystem     component subsystem
+ * @param componentName component name
  */
-case class Prefix(prefix: String) {
-  val subsystem: Subsystem = {
-    require(prefix != null)
-    val subsystemStr = prefix.split(SEPARATOR).head // this is safe and will not throw exception
-    Subsystem.withNameInsensitive(subsystemStr) // throw exception if invalid subsystem provided
-  }
+case class Prefix(subsystem: Subsystem, componentName: String) {
+  require(componentName == componentName.trim, "component name has leading and trailing whitespaces")
+
+  require(!componentName.contains("-"), "component name has '-'")
+
+  val key = s"${subsystem.name}${Prefix.SEPARATOR}$componentName"
+
+  override def toString: String = key
 }
 
 object Prefix {
-  private val SEPARATOR = '.'
+  def apply(key: String): Prefix = {
+    require(key.contains(SEPARATOR))
+    val parts = key.splitAt(key.indexOf(SEPARATOR))
+    Prefix(Subsystem.withNameInsensitive(parts._1), parts._2.tail)
+  }
+  private val SEPARATOR = "."
 }

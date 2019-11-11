@@ -6,6 +6,7 @@ import csw.params.core.generics.ParameterSetType;
 import csw.params.core.models.ObsId;
 import csw.params.core.models.Prefix;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JSubsystem;
 import org.junit.Assert;
 import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
@@ -33,7 +34,7 @@ public class JCommandsTest extends JUnitSuite {
     private final Parameter<Integer> epochIntParam = epochIntKey.set(44, 55);
 
     private final ObsId obsId = new ObsId("obsId");
-    private final String prefix = "wfos.red.detector";
+    private final Prefix prefix = new Prefix(WFOS, "red.detector");
     private final CommandName commandName = new CommandName("move");
 
     private void assertOnCommandAPI(ParameterSetType<?> command) {
@@ -82,12 +83,12 @@ public class JCommandsTest extends JUnitSuite {
     // DEOPSCSW-369: Unique runId for commands
     @Test
     public void shouldAbleToCreateAndAccessSetupCommand() {
-        Setup setup = new Setup(new Prefix(prefix), commandName, Optional.of(obsId)).add(encoderParam).add(epochStringParam);
+        Setup setup = new Setup(prefix, commandName, Optional.of(obsId)).add(encoderParam).add(epochStringParam);
 
         // runId, obsId, prefix, subsystem
         Assert.assertNotNull(setup.runId());
         Assert.assertEquals(Optional.of(obsId), setup.jMaybeObsId());
-        Assert.assertEquals(prefix, setup.source().prefix());
+        Assert.assertEquals(prefix, setup.source());
         Assert.assertEquals(WFOS, setup.source().subsystem());
         Assert.assertEquals(commandName, setup.commandName());
 
@@ -112,12 +113,12 @@ public class JCommandsTest extends JUnitSuite {
     // DEOPSCSW-369: Unique runId for commands
     @Test
     public void shouldAbleToCreateAndAccessObserveCommand() {
-        Observe observe = new Observe(new Prefix(prefix), commandName, Optional.empty()).add(encoderParam).add(epochStringParam);
+        Observe observe = new Observe(prefix, commandName, Optional.empty()).add(encoderParam).add(epochStringParam);
 
         // runId, prefix, obsId, subsystem
         Assert.assertNotNull(observe.runId());
         Assert.assertEquals(Optional.empty(), observe.jMaybeObsId());
-        Assert.assertEquals(prefix, observe.source().prefix());
+        Assert.assertEquals(prefix, observe.source());
         Assert.assertEquals(commandName, observe.commandName());
         Assert.assertEquals(WFOS, observe.source().subsystem());
 
@@ -141,12 +142,12 @@ public class JCommandsTest extends JUnitSuite {
     // DEOPSCSW-369: Unique runId for commands
     @Test
     public void shouldAbleToCreateAndAccessWaitCommand() {
-        Wait wait = new Wait(new Prefix(prefix), commandName, Optional.of(obsId)).add(encoderParam).add(epochStringParam);
+        Wait wait = new Wait(prefix, commandName, Optional.of(obsId)).add(encoderParam).add(epochStringParam);
 
         // runId, obsId, prefix, subsystem
         Assert.assertNotNull(wait.runId());
         Assert.assertEquals(obsId, wait.jMaybeObsId().orElseThrow());
-        Assert.assertEquals(prefix, wait.source().prefix());
+        Assert.assertEquals(prefix, wait.source());
         Assert.assertEquals(commandName, wait.commandName());
         Assert.assertEquals(WFOS, wait.source().subsystem());
 
@@ -169,7 +170,7 @@ public class JCommandsTest extends JUnitSuite {
 
     @Test
     public void shoulRdAbleToCloneAnExistingCommand() {
-        Setup setup = new Setup(new Prefix(prefix), commandName, Optional.of(obsId)).add(encoderParam).add(epochStringParam);
+        Setup setup = new Setup(prefix, commandName, Optional.of(obsId)).add(encoderParam).add(epochStringParam);
         Setup setup2 = setup.cloneCommand();
         Assert.assertNotEquals(setup.runId(), setup2.runId());
         Assert.assertEquals(setup.commandName(), setup2.commandName());
@@ -177,7 +178,7 @@ public class JCommandsTest extends JUnitSuite {
         Assert.assertEquals(setup.jParamSet(), setup2.jParamSet());
         Assert.assertEquals(setup.source(), setup2.source());
 
-        Observe observe = new Observe(new Prefix(prefix), commandName, Optional.empty()).add(encoderParam).add(epochStringParam);
+        Observe observe = new Observe(prefix, commandName, Optional.empty()).add(encoderParam).add(epochStringParam);
         Observe observe2 = observe.cloneCommand();
         Assert.assertNotEquals(observe.runId(), observe2.runId());
         Assert.assertEquals(observe.commandName(), observe2.commandName());
@@ -185,7 +186,7 @@ public class JCommandsTest extends JUnitSuite {
         Assert.assertEquals(observe.jParamSet(), observe2.jParamSet());
         Assert.assertEquals(observe.source(), observe2.source());
 
-        Wait wait = new Wait(new Prefix(prefix), commandName, Optional.of(obsId)).add(encoderParam).add(epochStringParam);
+        Wait wait = new Wait(prefix, commandName, Optional.of(obsId)).add(encoderParam).add(epochStringParam);
         Wait wait2 = wait.cloneCommand();
         Assert.assertNotEquals(wait.runId(), wait2.runId());
         Assert.assertEquals(wait.commandName(), wait2.commandName());

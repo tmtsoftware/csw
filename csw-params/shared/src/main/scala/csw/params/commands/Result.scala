@@ -24,7 +24,7 @@ case class Result(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parame
   /**
    * A java helper to construct Result
    */
-  def this(prefix: String) = this(Prefix(prefix))
+  def this(prefix: Prefix) = this(prefix, Set.empty[Parameter[_]])
 
 }
 

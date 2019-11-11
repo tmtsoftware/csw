@@ -4,15 +4,15 @@ import csw.command.client.models.framework.ComponentInfo
 import csw.command.client.models.framework.LocationServiceUsage.{DoNotRegister, RegisterOnly}
 import csw.framework.models.ContainerInfo
 import csw.location.models.ComponentType.{Assembly, HCD}
-import csw.params.core.models.Prefix
+import csw.params.core.models.Subsystem
 
 import scala.concurrent.duration.DurationDouble
 
 object ComponentInfos {
   val assemblyInfo: ComponentInfo = ComponentInfo(
     "SampleAssembly",
+    Subsystem.WFOS,
     Assembly,
-    Prefix("wfos.test"),
     "csw.common.components.framework.SampleComponentBehaviorFactory",
     DoNotRegister,
     Set.empty
@@ -20,8 +20,8 @@ object ComponentInfos {
 
   val assemblyInfoToSimulateFailure: ComponentInfo = ComponentInfo(
     "trombone",
+    Subsystem.WFOS,
     Assembly,
-    Prefix("wfos.test"),
     "csw.common.components.framework.ComponentBehaviorFactoryToSimulateFailure",
     DoNotRegister,
     Set.empty
@@ -29,8 +29,8 @@ object ComponentInfos {
 
   val hcdInfo: ComponentInfo = ComponentInfo(
     "SampleHcd",
+    Subsystem.WFOS,
     HCD,
-    Prefix("wfos.test"),
     "csw.common.components.framework.SampleComponentBehaviorFactory",
     RegisterOnly,
     Set.empty
@@ -38,8 +38,8 @@ object ComponentInfos {
 
   val hcdInfoWithInitializeTimeout: ComponentInfo = ComponentInfo(
     "SampleHcd",
+    Subsystem.WFOS,
     HCD,
-    Prefix("wfos.test"),
     "csw.common.components.framework.SampleComponentBehaviorFactory",
     RegisterOnly,
     Set.empty,
@@ -48,8 +48,8 @@ object ComponentInfos {
 
   val hcdInfoWithRunTimeout: ComponentInfo = ComponentInfo(
     "SampleHcd",
+    Subsystem.WFOS,
     HCD,
-    Prefix("wfos.test"),
     "csw.common.components.framework.SampleComponentBehaviorFactory",
     RegisterOnly,
     Set.empty,
@@ -58,8 +58,8 @@ object ComponentInfos {
 
   val dummyInfo: ComponentInfo = ComponentInfo(
     "DummyHcd",
+    Subsystem.WFOS,
     HCD,
-    Prefix("wfos.test"),
     "dummy",
     DoNotRegister
   )

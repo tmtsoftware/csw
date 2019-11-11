@@ -39,8 +39,8 @@ class GatewayClient(serverIp: String, port: Int)(implicit val actorSystem: typed
 
   def subscribe(eventKey: EventKey): Source[Event, UniqueKillSwitch] = {
     val subsystem = eventKey.source.subsystem
-    val prefix    = eventKey.source.prefix
-    val component = prefix.splitAt(prefix.indexOf(".") + 1)._2
+    val prefix    = eventKey.source
+    val component = prefix.componentName
 
     val uri     = Uri(s"$baseUri/subscribe/$subsystem?component=$component&event=${eventKey.eventName.name}")
     val request = HttpRequest(HttpMethods.GET, uri = uri)

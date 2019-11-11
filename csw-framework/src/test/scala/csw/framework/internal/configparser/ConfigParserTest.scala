@@ -8,7 +8,7 @@ import csw.framework.models.ContainerMode.{Container, Standalone}
 import csw.framework.models.{ContainerBootstrapInfo, ContainerInfo, HostBootstrapInfo}
 import csw.location.models.ComponentType.{Assembly, HCD}
 import csw.location.models.Connection
-import csw.params.core.models.Prefix
+import csw.params.core.models.Subsystem
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationInt
@@ -20,32 +20,32 @@ import scala.concurrent.duration.DurationInt
 class ConfigParserTest extends FunSuite with Matchers {
 
   private val assemblyInfo = ComponentInfo(
-    "Assembly-1",
+    "Assembly1",
+    Subsystem.TCS,
     Assembly,
-    Prefix("tcs.mobie.blue.filter"),
     "csw.pkgDemo.assembly1.Assembly1",
     DoNotRegister,
     Set(Connection.from("HCD2A-hcd-akka"), Connection.from("HCD2C-hcd-akka")),
     5.seconds
   )
   private val hcd2AInfo = ComponentInfo(
-    "HCD-2A",
+    "HCD2A",
+    Subsystem.TCS,
     HCD,
-    Prefix("tcs.mobie.blue.filter"),
     "csw.pkgDemo.hcd2.Hcd2",
     RegisterOnly,
     Set.empty
   )
   private val hcd2BInfo = ComponentInfo(
-    "HCD-2B",
+    "HCD2B",
+    Subsystem.TCS,
     HCD,
-    Prefix("tcs.mobie.blue.disperser"),
     "csw.pkgDemo.hcd2.Hcd2",
     DoNotRegister,
     Set.empty
   )
 
-  private val containerInfo = ContainerInfo("Container-1", Set(assemblyInfo, hcd2AInfo, hcd2BInfo))
+  private val containerInfo = ContainerInfo("Container1", Set(assemblyInfo, hcd2AInfo, hcd2BInfo))
 
   private val containerBootstrapInfo = ContainerBootstrapInfo(
     Container,
@@ -106,7 +106,7 @@ class ConfigParserTest extends FunSuite with Matchers {
     }
   }
 
-  test("should able to throw error when 'prefix' is missing for assembly") {
+  test("should able to throw error when 'subsystem' is missing for assembly") {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/assembly/missing_prefix.conf")
 
     intercept[java.lang.RuntimeException] {
@@ -155,7 +155,7 @@ class ConfigParserTest extends FunSuite with Matchers {
     }
   }
 
-  test("should able to throw error when 'prefix' is missing for hcd") {
+  test("should able to throw error when 'subsystem' is missing for hcd") {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/hcd/missing_prefix.conf")
 
     intercept[java.lang.RuntimeException] {

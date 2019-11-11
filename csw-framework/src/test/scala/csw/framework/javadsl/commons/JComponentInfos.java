@@ -5,6 +5,7 @@ import csw.command.client.models.framework.ComponentInfo;
 import csw.command.client.models.framework.LocationServiceUsage;
 import csw.location.api.javadsl.JComponentType;
 import csw.params.core.models.Prefix;
+import csw.params.javadsl.JSubsystem;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -14,8 +15,8 @@ public class JComponentInfos {
 
     public static ComponentInfo jHcdInfo = JComponentInfo.from(
             "JSampleHcd",
+            JSubsystem.WFOS,
             JComponentType.HCD(),
-            new Prefix("wfos.test"),
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
             LocationServiceUsage.JRegisterOnly(),
             Collections.emptySet(),
@@ -24,8 +25,8 @@ public class JComponentInfos {
 
     public static ComponentInfo jHcdInfoWithInitializeTimeout = JComponentInfo.from(
             "trombone",
+            JSubsystem.WFOS,
             JComponentType.HCD(),
-            new Prefix("wfos.test"),
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
             LocationServiceUsage.JRegisterOnly(),
             Collections.emptySet(),

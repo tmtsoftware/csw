@@ -2,7 +2,7 @@ package csw.command.client.models.framework
 
 import csw.location.models.codecs.LocationCodecs
 import csw.location.models.{ComponentType, Connection}
-import csw.params.core.models.Prefix
+import csw.params.core.models.{Prefix, Subsystem}
 import io.bullet.borer.Codec
 import io.bullet.borer.derivation.MapBasedCodecs
 
@@ -13,9 +13,9 @@ import scala.jdk.CollectionConverters._
  * The information needed to create a component. This class is created after de-serializing the config file for the component.
  *
  * @param name the name of the component
+ * @param subsystem identifies the subsystem
  * @param componentType
  *  : the type of the component as defined by [[csw.location.models.ComponentType]]
- * @param prefix identifies the subsystem
  * @param behaviorFactoryClassName
  *  : specifies the component to be created by name of the class of it's factory
  * @param locationServiceUsage
@@ -26,13 +26,14 @@ import scala.jdk.CollectionConverters._
  */
 final case class ComponentInfo(
     name: String,
+    subsystem: Subsystem,
     componentType: ComponentType,
-    prefix: Prefix,
     behaviorFactoryClassName: String,
     locationServiceUsage: LocationServiceUsage,
     connections: Set[Connection] = Set.empty,
     initializeTimeout: FiniteDuration = 10.seconds
 ) {
+  val prefix = Prefix(subsystem, name)
 
   /**
    * Java API to get the list of connections for the assembly

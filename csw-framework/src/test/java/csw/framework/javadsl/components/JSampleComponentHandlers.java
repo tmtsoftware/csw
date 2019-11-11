@@ -3,7 +3,6 @@ package csw.framework.javadsl.components;
 import akka.actor.Cancellable;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Adapter;
-import akka.stream.ActorMaterializer;
 import akka.stream.Materializer;
 import akka.stream.ThrottleMode;
 import akka.stream.javadsl.Sink;
@@ -28,6 +27,7 @@ import csw.params.core.states.StateName;
 import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JSubsystem;
 import csw.time.core.models.UTCTime;
 
 import java.time.Duration;
@@ -130,7 +130,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
             return new CommandResponse.Completed(controlCommand.runId());
         } else if (controlCommand.commandName().equals(immediateResCmd())) {
             Parameter<Integer> param = JKeyType.IntKey().make("encoder").set(22);
-            Result result = new Result(controlCommand.source().prefix()).add(param);
+            Result result = new Result(controlCommand.source()).add(param);
             return new CommandResponse.CompletedWithResult(controlCommand.runId(), result);
         } else if (controlCommand.commandName().equals(ComponentStateForCommand.matcherCmd())) {
             processCommandWithMatcher(controlCommand);
@@ -200,7 +200,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
             return new CommandResponse.Started(controlCommand.runId());
         } else {
             Parameter<Integer> parameter = JKeyType.IntKey().make("encoder").set(20);
-            Result result = new Result(controlCommand.source().prefix()).add(parameter);
+            Result result = new Result(controlCommand.source()).add(parameter);
 
             // Set CRM to Completed after 1 second
             sendCRM(controlCommand.runId(), new CommandResponse.CompletedWithResult(controlCommand.runId(), result));
@@ -258,7 +258,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     @Override
     public void onDiagnosticMode(UTCTime startTime, String hint) {
         if (hint.equals("engineering")) {
-            var event = new SystemEvent(new Prefix("TCS.prefix"), new EventName("eventName"))
+            var event = new SystemEvent(new Prefix(JSubsystem.TCS, "prefix"), new EventName("eventName"))
                     .add(JKeyType.IntKey().make("diagnostic-data").set(1));
             diagModeCancellable.map(Cancellable::cancel); // cancel previous diagnostic publishing
             diagModeCancellable = Optional.of(

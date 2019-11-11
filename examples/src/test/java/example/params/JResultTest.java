@@ -2,12 +2,14 @@ package example.params;
 
 import csw.params.commands.Result;
 import csw.params.core.formats.JavaJsonSupport;
+import csw.params.core.models.Prefix;
 import csw.params.javadsl.JKeyType;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.MatrixData;
 import csw.params.core.models.ObsId;
 import csw.params.core.models.Id;
+import csw.params.javadsl.JSubsystem;
 import org.junit.Assert;
 import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
@@ -33,7 +35,7 @@ public class JResultTest extends JUnitSuite {
         Key<Integer> k4 = JKeyType.IntKey().make("notUsed");
 
         //prefix
-        String prefix = "wfos.prog.cloudcover";
+        Prefix prefix = new Prefix(JSubsystem.WFOS, "prog.cloudcover");
 
         //#obsid
         ObsId obsId = new ObsId("Obs001");
@@ -92,7 +94,7 @@ public class JResultTest extends JUnitSuite {
         ObsId obsId = new ObsId("Obs001");
 
         //prefix
-        String prefix = "wfos.prog.cloudcover";
+        Prefix prefix = new Prefix(JSubsystem.WFOS, "prog.cloudcover");
 
         //result
         Result result = new Result(prefix).add(i1);
@@ -122,7 +124,7 @@ public class JResultTest extends JUnitSuite {
         ObsId obsId = new ObsId("Obs001");
 
         //prefix
-        String prefix = "wfos.blue.filter";
+        Prefix prefix = new Prefix(JSubsystem.WFOS, "blue.filter");
 
         //params
         Parameter<Integer> encParam1 = encoderKey.set(1);
