@@ -152,16 +152,18 @@ This example shows an immediate response command using `submit` that returns `St
 Scala/submit w/immediate-response
 :   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #submit }
 
+#Fixme for Kim: This snip is broken. Fix #submit and then make it `@@snip`.
 Java/submit w/immediate-response
-:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #submit }
+:   snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #submit }
 
 Note that the Scala examples are using `async/await` which simplifies handling the Futures, but is not necessary.
 The `async/await` library is not available in Java.
 If using `submit` and the validation fails in the destination component, 
 the `Invalid` response is returned.
 
+#Fixme for Kim: This snip is broken. Fix #submit and then make it `@@snip`.
 Scala/submit w/invalid response
-:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #invalidSubmitCmd }
+:   snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #invalidSubmitCmd }
 
 Java/submit w/invalid response
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #invalidSubmitCmd }
@@ -181,8 +183,9 @@ actions have started properly, the `query` method of `CommandService` can be use
 following example without using the Future returned by `submit`, which provides the final
 completion notification.
 
+#Fixme for Kim: This snip is broken. Fix #submit and then make it `@@snip`.
 Scala/submit long running/query
-:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #submitAndQuery }
+:   snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #submitAndQuery }
 
 Java/submit long running/query
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #submitAndQuery } 
