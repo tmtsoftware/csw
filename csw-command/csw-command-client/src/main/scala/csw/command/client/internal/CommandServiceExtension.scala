@@ -1,7 +1,5 @@
 package csw.command.client.internal
 
-import java.util.concurrent.TimeoutException
-
 import akka.actor.typed.ActorSystem
 import akka.util.Timeout
 import csw.command.api.StateMatcher
@@ -12,7 +10,7 @@ import csw.params.core.states.CurrentState
 import akka.actor.typed.scaladsl.adapter._
 
 import scala.async.Async.{async, await}
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.{Future, Promise, TimeoutException}
 import scala.util.{Failure, Success}
 
 class CommandServiceExtension(commandService: CommandService)(implicit val actorSystem: ActorSystem[_]) {

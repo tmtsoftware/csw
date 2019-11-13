@@ -1,6 +1,7 @@
 package csw.framework.internal.supervisor
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
+import csw.command.api.DemandMatcher
 import csw.command.client.messages.CommandMessage.{Oneway, Submit}
 import csw.command.client.messages.ComponentCommonMessage.{
   ComponentStateSubscription,
@@ -14,7 +15,6 @@ import csw.command.client.messages.SupervisorContainerCommonMessages.Restart
 import csw.command.client.models.framework.PubSub.Subscribe
 import csw.command.client.models.framework.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.command.client.models.framework.{ComponentInfo, LifecycleStateChanged, SupervisorLifecycleState}
-import csw.command.client.models.matchers.DemandMatcher
 import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestSuite
 import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInitializeTimeout}

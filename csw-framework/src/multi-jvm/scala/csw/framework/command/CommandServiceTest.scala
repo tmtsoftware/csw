@@ -3,13 +3,12 @@ package csw.framework.command
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import csw.command.api.StateMatcher
+import csw.command.api.{DemandMatcher, StateMatcher}
 import csw.command.client.CommandServiceFactory
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.CommandMessage.Submit
 import csw.command.client.models.framework.LockingResponse
 import csw.command.client.models.framework.LockingResponse.LockAcquired
-import csw.command.client.models.matchers.DemandMatcher
 import csw.common.utils.LockCommandFactory
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}

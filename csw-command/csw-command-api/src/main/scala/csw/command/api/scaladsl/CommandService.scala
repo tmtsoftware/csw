@@ -1,4 +1,5 @@
 package csw.command.api.scaladsl
+
 import akka.stream.scaladsl.Source
 import akka.util.Timeout
 import csw.command.api.{CurrentStateSubscription, StateMatcher}

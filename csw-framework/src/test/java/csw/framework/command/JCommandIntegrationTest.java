@@ -13,7 +13,7 @@ import csw.command.client.CommandServiceFactory;
 import csw.command.client.extensions.AkkaLocationExt;
 import csw.command.client.messages.SupervisorLockMessage;
 import csw.command.client.models.framework.LockingResponse;
-import csw.command.client.models.matchers.DemandMatcher;
+import csw.command.api.DemandMatcher;
 import csw.common.components.framework.SampleComponentState;
 import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;
