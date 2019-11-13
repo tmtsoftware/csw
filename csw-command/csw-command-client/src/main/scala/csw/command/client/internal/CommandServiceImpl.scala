@@ -3,6 +3,7 @@ package csw.command.client.internal
 import java.util.concurrent.TimeoutException
 
 import akka.actor.typed.scaladsl.AskPattern._
+import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.typed.scaladsl.ActorSource
@@ -21,8 +22,9 @@ import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 
+import async.Async._
 import scala.concurrent.duration.DurationInt
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.{Failure, Success}
 
 private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(implicit val actorSystem: ActorSystem[_])
@@ -49,27 +51,18 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
   override def submit(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] =
     component ? (Submit(controlCommand, _))
 
-  override def submitAllAndWait(
-      submitCommands: List[ControlCommand]
-  )(implicit timeout: Timeout): Future[List[SubmitResponse]] = {
-    // This exception is used to pass the failing command response to the recover to shut down the stream
-    class CommandFailureException(val r: SubmitResponse) extends Exception(r.toString)
-
-    Source(submitCommands)
-      .mapAsync(1)(submitAndWait)
-      .map { response =>
-        if (isNegative(response))
-          throw new CommandFailureException(response)
-        else
-          response
+  override def submitAllAndWait(submitCommands: List[ControlCommand])(implicit timeout: Timeout): Future[List[SubmitResponse]] = {
+    async {
+      val iterator                             = submitCommands.iterator
+      var result: List[SubmitResponse]         = Nil
+      var lastResponse: Option[SubmitResponse] = None
+      while (iterator.hasNext && lastResponse.forall(x => !isNegative(x))) {
+        val response = await(submitAndWait(iterator.next()))
+        result ::= response
+        lastResponse = Some(response)
       }
-      .recover {
-        // If the command fails, then terminate but return the last response giving the problem, others are ignored
-        case ex: CommandFailureException => ex.r
-      }
-      .toMat(Sink.seq)(Keep.right)
-      .run()
-      .map(_.toList)
+      result.reverse
+    }
   }
 
   override def oneway(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[OnewayResponse] =
@@ -79,10 +72,24 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
       controlCommand: ControlCommand,
       stateMatcher: StateMatcher
   )(implicit timeout: Timeout): Future[MatchingResponse] = {
-    val eventualCurrentState = subscribeCurrentState()
-      .filter(cs => cs.stateName == stateMatcher.stateName && cs.prefix == stateMatcher.prefix && stateMatcher.check(cs))
-      .completionTimeout(stateMatcher.timeout.duration)
-      .runWith(Sink.head)
+
+    val p: Promise[CurrentState] = Promise()
+
+    val subscription = subscribeCurrentState { cs =>
+      if (cs.stateName == stateMatcher.stateName && cs.prefix == stateMatcher.prefix && stateMatcher.check(cs)) {
+        p.trySuccess(cs)
+      }
+    }
+
+    akka.pattern.after(stateMatcher.timeout.duration, actorSystem.scheduler.toClassic) {
+      if (!p.isCompleted) {
+        p.tryFailure(new TimeoutException(s"matching could not be done within ${stateMatcher.timeout.duration}"))
+        subscription.unsubscribe()
+      }
+      p.future
+    }
+
+    val eventualCurrentState = p.future
 
     oneway(controlCommand).flatMap {
       case Accepted(runId) =>

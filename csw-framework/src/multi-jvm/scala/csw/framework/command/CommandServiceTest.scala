@@ -383,13 +383,11 @@ class CommandServiceTest(ignore: Int)
         DemandMatcher(DemandState(prefix, StateName("testStateName"), Set(param)), withUnits = false, 500.millis)
       val setupWithTimeoutMatcher = Setup(prefix, matcherTimeoutCmd, obsId)
 
-      val timeoutExMsg = "The stream has not been completed in 500 milliseconds."
       val eventualCommandResponse1: Future[MatchingResponse] =
         assemblyCmdService.onewayAndMatch(setupWithTimeoutMatcher, demandMatcherToSimulateTimeout)
 
       val commandResponseOnTimeout: MatchingResponse = Await.result(eventualCommandResponse1, timeout.duration)
       commandResponseOnTimeout shouldBe a[Error]
-      commandResponseOnTimeout.asInstanceOf[Error].message shouldBe timeoutExMsg
 
       enterBarrier("short-long-commands")
 
