@@ -51,7 +51,7 @@ class CommandServiceExtension(commandService: CommandService)(implicit val actor
     PortableAkka.setTimeout(stateMatcher.timeout.duration) {
       if (!p.isCompleted) {
         p.tryFailure(new TimeoutException(s"matching could not be done within ${stateMatcher.timeout.duration}"))
-        subscription.unsubscribe()
+        subscription.cancel()
       }
       p.future
     }

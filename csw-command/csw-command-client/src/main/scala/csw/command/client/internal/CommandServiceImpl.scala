@@ -8,8 +8,8 @@ import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.typed.scaladsl.ActorSource
 import akka.stream.{KillSwitches, OverflowStrategy}
 import akka.util.Timeout
+import csw.command.api.StateMatcher
 import csw.command.api.scaladsl.{CommandService, CommandServiceExtension}
-import csw.command.api.{CurrentStateSubscription, StateMatcher}
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
 import csw.command.client.messages.ComponentCommonMessage.ComponentStateSubscription
@@ -20,6 +20,7 @@ import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
+import msocket.api.models.Subscription
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
@@ -74,7 +75,7 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
    *              If no states are provided, subscription in made to all the states.
    * @return a CurrentStateSubscription to stop the subscription
    */
-  override def subscribeCurrentState(names: Set[StateName]): Source[CurrentState, CurrentStateSubscription] = {
+  override def subscribeCurrentState(names: Set[StateName]): Source[CurrentState, Subscription] = {
     val bufferSize = 256
 
     /*
@@ -98,10 +99,10 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
       .mapMaterializedValue(killSwitch => () => killSwitch.shutdown())
   }
 
-  override def subscribeCurrentState(callback: CurrentState => Unit): CurrentStateSubscription =
+  override def subscribeCurrentState(callback: CurrentState => Unit): Subscription =
     subscribeCurrentState().map(callback).toMat(Sink.ignore)(Keep.left).run()
 
-  override def subscribeCurrentState(names: Set[StateName], callback: CurrentState => Unit): CurrentStateSubscription =
+  override def subscribeCurrentState(names: Set[StateName], callback: CurrentState => Unit): Subscription =
     subscribeCurrentState(names).map(callback).toMat(Sink.ignore)(Keep.left).run()
 
 }

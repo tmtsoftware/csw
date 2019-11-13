@@ -86,7 +86,7 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
       disperserCommandService.submitAndWait(commands.Setup(prefix, CommandName("isAlive"), None)).await(200.millis)
     )
 
-    subscription.unsubscribe()
+    subscription.cancel()
     containerActorSystem.terminate()
     containerActorSystem.whenTerminated.await
   }

@@ -2,11 +2,12 @@ package csw.command.api.scaladsl
 
 import akka.stream.scaladsl.Source
 import akka.util.Timeout
-import csw.command.api.{CurrentStateSubscription, StateMatcher}
+import csw.command.api.StateMatcher
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
+import msocket.api.models.Subscription
 
 import scala.concurrent.Future
 
@@ -99,16 +100,16 @@ trait CommandService {
    *              If no states are provided, all the current states will be received.
    * @return a stream of current states with CurrentStateSubscription as the materialized value which can be used to stop the subscription
    */
-  def subscribeCurrentState(names: Set[StateName] = Set.empty): Source[CurrentState, CurrentStateSubscription]
+  def subscribeCurrentState(names: Set[StateName] = Set.empty): Source[CurrentState, Subscription]
 
   /**
    * Subscribe to the current state of a component corresponding to the [[csw.location.models.AkkaLocation]] of the component
    *
    * @note Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
    * @param callback the action to be applied on the CurrentState element received as a result of subscription
-   * @return a CurrentStateSubscription to stop the subscription
+   * @return a Subscription to stop the subscription
    */
-  def subscribeCurrentState(callback: CurrentState => Unit): CurrentStateSubscription
+  def subscribeCurrentState(callback: CurrentState => Unit): Subscription
 
   /**
    * Subscribe to the current state of a component corresponding to the [[csw.location.models.AkkaLocation]] of the component
@@ -116,7 +117,7 @@ trait CommandService {
    * @note Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
    * @param names subscribe to only those states which have any of the provided value for name
    * @param callback the action to be applied on the CurrentState element received as a result of subscription
-   * @return a CurrentStateSubscription to stop the subscription
+   * @return a Subscription to stop the subscription
    */
-  def subscribeCurrentState(names: Set[StateName], callback: CurrentState => Unit): CurrentStateSubscription
+  def subscribeCurrentState(names: Set[StateName], callback: CurrentState => Unit): Subscription
 }

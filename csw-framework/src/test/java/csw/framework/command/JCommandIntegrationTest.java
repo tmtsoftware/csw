@@ -6,14 +6,13 @@ import akka.actor.typed.ActorSystem;
 import akka.actor.typed.SpawnProtocol;
 import akka.util.Timeout;
 import com.typesafe.config.ConfigFactory;
-import csw.command.api.CurrentStateSubscription;
+import csw.command.api.DemandMatcher;
 import csw.command.api.StateMatcher;
 import csw.command.api.javadsl.ICommandService;
 import csw.command.client.CommandServiceFactory;
 import csw.command.client.extensions.AkkaLocationExt;
 import csw.command.client.messages.SupervisorLockMessage;
 import csw.command.client.models.framework.LockingResponse;
-import csw.command.api.DemandMatcher;
 import csw.common.components.framework.SampleComponentState;
 import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;
@@ -38,6 +37,7 @@ import csw.params.core.states.DemandState;
 import csw.params.core.states.StateName;
 import csw.params.javadsl.JKeyType;
 import io.lettuce.core.RedisClient;
+import msocket.api.models.Subscription;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -359,7 +359,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Setup currStateSetup = new Setup(prefix(), hcdCurrentStateCmd(), Optional.empty()).add(encoder.set(expectedEncoderValue));
         // Setup a callback response to CurrentState - use AtomicInteger to capture final value
         final AtomicInteger cstate = new AtomicInteger((1));
-        CurrentStateSubscription subscription = hcdCmdService.subscribeCurrentState(cs -> {
+        Subscription subscription = hcdCmdService.subscribeCurrentState(cs -> {
             // Example sets variable outside scope of closure
             cstate.set(cs.jGet(encoder).orElseThrow().head());
         });
@@ -374,7 +374,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Assert.assertEquals(expectedEncoderValue, cstate.get());
 
         // Unsubscribe from CurrentState
-        subscription.unsubscribe();
+        subscription.cancel();
         //#subscribeCurrentState
 
         // DEOPSCSW-229: Provide matchers infrastructure for comparison
@@ -490,7 +490,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         //#subscribeCurrentState
         // subscribe to the current state of an assembly component and use a callback which forwards each received
         // element to a test probe actor
-        CurrentStateSubscription subscription = hcdCmdService.subscribeCurrentState(currentState -> probe.ref().tell(currentState));
+        Subscription subscription = hcdCmdService.subscribeCurrentState(currentState -> probe.ref().tell(currentState));
         //#subscribeCurrentState
 
         hcdCmdService.submitAndWait(setup, timeout);
@@ -505,7 +505,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         probe.expectMessage(expectedSetupCurrentState);
 
         // unsubscribe and verify no messages received by probe
-        subscription.unsubscribe();
+        subscription.cancel();
         Thread.sleep(1000);
 
         hcdCmdService.submitAndWait(setup, timeout);
@@ -525,7 +525,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         //#subscribeOnlyCurrentState
         // subscribe to the current state of an assembly component and use a callback which forwards each received
         // element to a test probe actor
-        CurrentStateSubscription subscription = hcdCmdService.subscribeCurrentState(Set.of(StateName.apply("testStateSetup")), currentState -> inbox.getRef().tell(currentState));
+        Subscription subscription = hcdCmdService.subscribeCurrentState(Set.of(StateName.apply("testStateSetup")), currentState -> inbox.getRef().tell(currentState));
         //#subscribeOnlyCurrentState
 
         hcdCmdService.submitAndWait(setup, timeout);
@@ -542,7 +542,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Assert.assertFalse(receivedStates.contains(expectedSubmitCurrentState));
         Assert.assertTrue(receivedStates.contains(expectedSetupCurrentState));
 
-        subscription.unsubscribe();
+        subscription.cancel();
     }
 
     @Test

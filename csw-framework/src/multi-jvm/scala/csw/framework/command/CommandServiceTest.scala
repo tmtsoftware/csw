@@ -317,7 +317,7 @@ class CommandServiceTest(ignore: Int)
       cstate(encoder).head shouldBe expectedEncoderValue
 
       // Unsubscribe to CurrentState
-      subscription.unsubscribe()
+      subscription.cancel()
       //#subscribeCurrentState
 
       // DEOPSCSW-229: Provide matchers infrastructure for comparison

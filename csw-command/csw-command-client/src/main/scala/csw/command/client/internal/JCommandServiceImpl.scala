@@ -5,17 +5,18 @@ import java.util.function.Consumer
 
 import akka.stream.javadsl.Source
 import akka.util.Timeout
+import csw.command.api.StateMatcher
 import csw.command.api.javadsl.ICommandService
 import csw.command.api.scaladsl.CommandService
-import csw.command.api.{CurrentStateSubscription, StateMatcher}
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
+import msocket.api.models.Subscription
 
-import scala.jdk.CollectionConverters._
 import scala.compat.java8.FunctionConverters.enrichAsScalaFromConsumer
 import scala.compat.java8.FutureConverters.FutureOps
+import scala.jdk.CollectionConverters._
 
 private[command] class JCommandServiceImpl(commandService: CommandService) extends ICommandService {
 
@@ -54,17 +55,17 @@ private[command] class JCommandServiceImpl(commandService: CommandService) exten
   override def queryFinal(commandRunId: Id, timeout: Timeout): CompletableFuture[SubmitResponse] =
     commandService.queryFinal(commandRunId)(timeout).toJava.toCompletableFuture
 
-  override def subscribeCurrentState(): Source[CurrentState, CurrentStateSubscription] =
+  override def subscribeCurrentState(): Source[CurrentState, Subscription] =
     commandService.subscribeCurrentState().asJava
 
-  override def subscribeCurrentState(names: java.util.Set[StateName]): Source[CurrentState, CurrentStateSubscription] =
+  override def subscribeCurrentState(names: java.util.Set[StateName]): Source[CurrentState, Subscription] =
     commandService.subscribeCurrentState(names.asScala.toSet).asJava
 
-  override def subscribeCurrentState(callback: Consumer[CurrentState]): CurrentStateSubscription =
+  override def subscribeCurrentState(callback: Consumer[CurrentState]): Subscription =
     commandService.subscribeCurrentState(callback.asScala)
 
   override def subscribeCurrentState(
       names: java.util.Set[StateName],
       callback: Consumer[CurrentState]
-  ): CurrentStateSubscription = commandService.subscribeCurrentState(names.asScala.toSet, callback.asScala)
+  ): Subscription = commandService.subscribeCurrentState(names.asScala.toSet, callback.asScala)
 }
