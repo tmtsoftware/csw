@@ -8,7 +8,7 @@ import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.typed.scaladsl.ActorSource
 import akka.stream.{KillSwitches, OverflowStrategy}
 import akka.util.Timeout
-import csw.command.api.scaladsl.CommandService
+import csw.command.api.scaladsl.{CommandService, CommandServiceExtension}
 import csw.command.api.{CurrentStateSubscription, StateMatcher}
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}

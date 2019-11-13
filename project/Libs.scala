@@ -112,3 +112,9 @@ object Jooq {
   val `jooq-meta`    = "org.jooq" % "jooq-meta" % Version
   val `jooq-codegen` = "org.jooq" % "jooq-codegen" % Version
 }
+
+object MSocket {
+  val Version            = "0.1.0-SNAPSHOT"
+  val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
+  val `msocket-impl-jvm` = "com.github.tmtsoftware.msocket" %% "msocket-impl-jvm" % Version
+}

@@ -1,15 +1,14 @@
-package csw.command.client.internal
+package csw.command.api.scaladsl
 
 import akka.actor.typed.ActorSystem
 import akka.util.Timeout
 import csw.command.api.StateMatcher
-import csw.command.api.scaladsl.CommandService
-import csw.params.commands.CommandResponse.{Accepted, Completed, Error, MatchingResponse, Started, SubmitResponse, isNegative}
+import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
 import csw.params.core.states.CurrentState
-import akka.actor.typed.scaladsl.adapter._
+import portable.akka.extensions.PortableAkka
 
-import scala.async.Async.{async, await}
+import async.Async._
 import scala.concurrent.{Future, Promise, TimeoutException}
 import scala.util.{Failure, Success}
 
@@ -49,7 +48,7 @@ class CommandServiceExtension(commandService: CommandService)(implicit val actor
       }
     }
 
-    akka.pattern.after(stateMatcher.timeout.duration, actorSystem.scheduler.toClassic) {
+    PortableAkka.setTimeout(stateMatcher.timeout.duration) {
       if (!p.isCompleted) {
         p.tryFailure(new TimeoutException(s"matching could not be done within ${stateMatcher.timeout.duration}"))
         subscription.unsubscribe()
