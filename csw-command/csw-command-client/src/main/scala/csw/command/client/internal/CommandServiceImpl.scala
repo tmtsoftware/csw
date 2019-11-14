@@ -10,12 +10,10 @@ import akka.stream.{KillSwitches, OverflowStrategy}
 import akka.util.Timeout
 import csw.command.api.StateMatcher
 import csw.command.api.scaladsl.{CommandService, CommandServiceExtension}
-import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
 import csw.command.client.messages.ComponentCommonMessage.ComponentStateSubscription
 import csw.command.client.messages.{ComponentMessage, Query, QueryFinal}
 import csw.command.client.models.framework.PubSub.{Subscribe, SubscribeOnly}
-import csw.location.models.AkkaLocation
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
@@ -25,12 +23,11 @@ import msocket.api.models.Subscription
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 
-private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(implicit val actorSystem: ActorSystem[_])
+private[command] class CommandServiceImpl(component: ActorRef[ComponentMessage])(implicit val actorSystem: ActorSystem[_])
     extends CommandService {
 
   private implicit val ec: ExecutionContext = actorSystem.executionContext
 
-  private val component: ActorRef[ComponentMessage] = componentLocation.componentRef
   private val ValidateTimeout                       = 1.seconds
 
   private val extension = new CommandServiceExtension(this)

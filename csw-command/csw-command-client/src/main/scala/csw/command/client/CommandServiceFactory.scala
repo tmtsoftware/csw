@@ -1,8 +1,10 @@
 package csw.command.client
-import akka.actor.typed.ActorSystem
+import akka.actor.typed.{ActorRef, ActorSystem}
 import csw.command.api.javadsl.ICommandService
 import csw.command.api.scaladsl.CommandService
+import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.internal.{CommandServiceImpl, JCommandServiceImpl}
+import csw.command.client.messages.ComponentMessage
 import csw.location.models.AkkaLocation
 
 /**
@@ -23,7 +25,10 @@ object CommandServiceFactory extends ICommandServiceFactory {
    * @return an instance of type CommandService
    */
   def make(componentLocation: AkkaLocation)(implicit actorSystem: ActorSystem[_]): CommandService =
-    new CommandServiceImpl(componentLocation)
+    new CommandServiceImpl(componentLocation.componentRef)
+
+  def make2(component: ActorRef[ComponentMessage])(implicit actorSystem: ActorSystem[_]): CommandService =
+    new CommandServiceImpl(component)
 
   /**
    * Make a CommandService instance for java

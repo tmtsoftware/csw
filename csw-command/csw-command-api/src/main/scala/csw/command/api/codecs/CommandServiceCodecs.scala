@@ -9,6 +9,7 @@ import io.bullet.borer.Codec
 import io.bullet.borer.derivation.MapBasedCodecs.deriveCodec
 import io.bullet.borer.derivation.ArrayBasedCodecs.deriveUnaryCodec
 
+object CommandServiceCodecs extends CommandServiceCodecs
 trait CommandServiceCodecs extends ParamCodecs {
 
   implicit def httpCodec[T <: CommandServiceHttpMessage]: Codec[T] = httpCodecsValue.asInstanceOf[Codec[T]]

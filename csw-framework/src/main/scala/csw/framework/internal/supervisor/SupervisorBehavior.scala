@@ -2,22 +2,15 @@ package csw.framework.internal.supervisor
 
 import akka.actor.typed._
 import akka.actor.typed.scaladsl._
+import akka.http.scaladsl.server.Route
 import csw.command.client.MiniCRM.MiniCRMMessage
-import csw.command.client.messages.ComponentCommonMessage.{
-  ComponentStateSubscription,
-  GetSupervisorLifecycleState,
-  LifecycleStateSubscription
-}
+import csw.command.client.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.command.client.messages.FromComponentLifecycleMessage.Running
 import csw.command.client.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorIdleMessage.InitializeTimeout
-import csw.command.client.messages.SupervisorInternalRunningMessage.{
-  RegistrationFailed,
-  RegistrationNotRequired,
-  RegistrationSuccess
-}
+import csw.command.client.messages.SupervisorInternalRunningMessage.{RegistrationFailed, RegistrationNotRequired, RegistrationSuccess}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
 import csw.command.client.messages._
@@ -30,7 +23,7 @@ import csw.framework.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehavior
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, RegistrationFactory}
-import csw.location.models.Connection.AkkaConnection
+import csw.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.location.models.{AkkaRegistration, ComponentId}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.LogAdminUtil
@@ -72,12 +65,16 @@ private[framework] final class SupervisorBehavior(
   import cswCtx._
   import ctx.executionContext
 
-  private val log: Logger                                  = loggerFactory.getLogger(ctx)
-  private val componentName: String                        = componentInfo.name
-  private val componentActorName: String                   = s"$componentName-$ComponentActorNameSuffix"
-  private val akkaConnection: AkkaConnection               = AkkaConnection(ComponentId(componentName, componentInfo.componentType))
-  private val prefix: Prefix                               = componentInfo.prefix
-  private val akkaRegistration: AkkaRegistration           = registrationFactory.akkaTyped(akkaConnection, prefix, ctx.self)
+  private val log: Logger                        = loggerFactory.getLogger(ctx)
+  private val componentName: String              = componentInfo.name
+  private val componentActorName: String         = s"$componentName-$ComponentActorNameSuffix"
+  private val akkaConnection: AkkaConnection     = AkkaConnection(ComponentId(componentName, componentInfo.componentType))
+  private val httpConnection: HttpConnection     = HttpConnection(ComponentId(componentName, componentInfo.componentType))
+  private val prefix: Prefix                     = componentInfo.prefix
+  private val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(akkaConnection, prefix, ctx.self)
+  private val route: Route                       = CommandServiceRoutesFactory.createRoutes(ctx.self)(ctx.system)
+  private val httpService                                = new HttpService(locationService, route, log, httpConnection)(ctx.system)
+
   private val isStandalone: Boolean                        = maybeContainerRef.isEmpty
   private[framework] val initializeTimeout: FiniteDuration = componentInfo.initializeTimeout
 
@@ -136,7 +133,7 @@ private[framework] final class SupervisorBehavior(
       this
     case PostStop =>
       log.warn("Supervisor is shutting down. Un-registering supervisor from location service")
-      locationService.unregister(akkaConnection)
+      locationService.unregister(httpConnection).flatMap(_ => locationService.unregister(akkaConnection))
       this
   }
 
@@ -272,7 +269,8 @@ private[framework] final class SupervisorBehavior(
     if (componentInfo.locationServiceUsage == DoNotRegister) //Honour DoNotRegister received in componentInfo
       ctx.self ! RegistrationNotRequired(componentRef)
     else {
-      locationService.register(akkaRegistration).onComplete {
+
+      locationService.register(akkaRegistration).flatMap(_ => httpService.registeredLazyBinding).onComplete {
         case Success(_)         => ctx.self ! RegistrationSuccess(componentRef)
         case Failure(throwable) => ctx.self ! RegistrationFailed(throwable)
       }
@@ -281,7 +279,7 @@ private[framework] final class SupervisorBehavior(
 
   private def unRegisterFromLocationService(): Unit = {
     log.debug(s"Un-registering supervisor from location service")
-    locationService.unregister(akkaConnection).onComplete {
+    locationService.unregister(httpConnection).flatMap(_ => locationService.unregister(akkaConnection)).onComplete {
       case Success(_)         => ctx.self ! UnRegistrationComplete
       case Failure(throwable) => ctx.self ! UnRegistrationFailed(throwable)
     }
