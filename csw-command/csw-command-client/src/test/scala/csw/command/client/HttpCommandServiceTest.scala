@@ -185,4 +185,22 @@ class HttpCommandServiceTest extends FunSuite with Matchers with BeforeAndAfterA
     result shouldBe a[Completed]                                 // (testCommand.runId))
     service.queryFinal(result.runId).await shouldBe a[Completed] //(testCommand.runId))
   }
+
+  test("Should be able to validate, send commands, query status of commands using submitAndWait") {
+    val service = HttpCommandService(typedSystem, locationService, connection)
+    service.validate(testCommand).await shouldBe a[Accepted] //(testCommand.commandName, _))
+    service.oneway(testCommand).await shouldBe a[Accepted]   //(testCommand.runId))
+    val result = service.submitAndWait(testCommand).await
+    result shouldBe a[Completed]                                 // (testCommand.runId))
+    service.queryFinal(result.runId).await shouldBe a[Completed] //(testCommand.runId))
+  }
+
+  test("Should be able to validate, send commands, query status of commands using submitAllAndWait") {
+    val service = HttpCommandService(typedSystem, locationService, connection)
+    service.validate(testCommand).await shouldBe a[Accepted] //(testCommand.commandName, _))
+    service.oneway(testCommand).await shouldBe a[Accepted]   //(testCommand.runId))
+    val result = service.submitAllAndWait(List(testCommand)).await.head
+    result shouldBe a[Completed]                                 // (testCommand.runId))
+    service.queryFinal(result.runId).await shouldBe a[Completed] //(testCommand.runId))
+  }
 }
