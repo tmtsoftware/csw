@@ -4,7 +4,7 @@ import java.io.InputStream
 import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
 
-import akka.stream.Materializer
+import akka.actor.typed.ActorSystem
 import akka.stream.scaladsl.{FileIO, Keep, Source, StreamConverters}
 import akka.util.ByteString
 import com.typesafe.config.{Config, ConfigFactory}
@@ -25,21 +25,21 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
   /**
    * Returns a future string by reading the source
    *
-   * @param mat an akka materializer required to start the stream of file data that will form a string out of bytes
+   * @param system an akka system required to start the stream of file data that will form a string out of bytes
    * @return a future that completes with string representation of file data
    */
-  def toStringF(implicit mat: Materializer): Future[String] =
+  def toStringF(implicit system: ActorSystem[_]): Future[String] =
     source.runFold("")((str, bs) => str + bs.utf8String)
 
   /**
    * Returns a future of Config object if the data is in valid parseable HOCON format. Else, throws ConfigException.
    *
-   * @param mat an akka materializer required to start the stream of file data that will form a string out of bytes
+   * @param system an akka system required to start the stream of file data that will form a string out of bytes
    *            and parse it to `Config` model
    * @return a future that completes with `Config` model representing the file data
    */
-  def toConfigObject(implicit mat: Materializer): Future[Config] = {
-    import mat.executionContext
+  def toConfigObject(implicit system: ActorSystem[_]): Future[Config] = {
+    import system.executionContext
     toStringF.map { s =>
       ConfigFactory.parseString(s)
     }
@@ -48,31 +48,31 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
   /**
    * Java API that returns a future string by reading the source.
    *
-   * @param mat an akka materializer required to start the stream of file data that will form a string out of bytes
+   * @param system required to start the stream of file data that will form a string out of bytes
    * @return a CompletableFuture that completes with string representation of file data
    */
-  private[config] def toJStringF(implicit mat: Materializer): CompletableFuture[String] =
+  private[config] def toJStringF(implicit system: ActorSystem[_]): CompletableFuture[String] =
     toStringF.toJava.toCompletableFuture
 
   /**
    * Returns a future of Config object if the data is in valid parseable HOCON format. Else, throws ConfigException.
    *
-   * @param mat an akka materializer required to start the stream of file data that will form a string out of bytes
-   *            and parse it to `Config` model
+   * @param system an akka system required to start the stream of file data that will form a string out of bytes
+   *               and parse it to `Config` model
    * @return a CompletableFuture that completes with `Config` model representing the file data
    */
-  private[config] def toJConfigObject(implicit mat: Materializer): CompletableFuture[Config] =
+  private[config] def toJConfigObject(implicit system: ActorSystem[_]): CompletableFuture[Config] =
     toConfigObject.toJava.toCompletableFuture
 
   /**
    * Writes config data to a provided file path and returns future file
    *
    * @param path the path to which the file data from config service is dumped on local machine
-   * @param mat an akka materializer required to start the stream of file data and dump it onto the provided `path`
+   * @param system an akka system required to start the stream of file data and dump it onto the provided `path`
    * @return a future of path that represents the file path on local machine
    */
-  def toPath(path: Path)(implicit mat: Materializer): Future[Path] = {
-    import mat.executionContext
+  def toPath(path: Path)(implicit system: ActorSystem[_]): Future[Path] = {
+    import system.executionContext
     source
       .toMat(FileIO.toPath(path))(Keep.right)
       .mapMaterializedValue { resultF =>
@@ -84,10 +84,10 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
   /**
    * Returns an inputStream which emits the bytes read from source of file data
    *
-   * @param mat an akka materializer required to start the stream of file data and convert it to InputStream
+   * @param system an akka system required to start the stream of file data and convert it to InputStream
    * @return an inputStream which emits the bytes read from source of file data
    */
-  private[config] def toInputStream(implicit mat: Materializer): InputStream =
+  private[config] def toInputStream(implicit system: ActorSystem[_]): InputStream =
     source.runWith(StreamConverters.asInputStream())
 }
 

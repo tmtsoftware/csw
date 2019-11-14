@@ -27,7 +27,7 @@ private[csw] class ServerWiring {
   lazy val configServiceFactory = new SvnConfigServiceFactory(actorRuntime, annexFileService)
 
   lazy val locationService: LocationService =
-    HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
+    HttpLocationServiceFactory.makeLocalClient(actorSystem)
 
   lazy val configHandlers     = new ConfigHandlers
   lazy val securityDirectives = SecurityDirectives(config, locationService)

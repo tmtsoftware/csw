@@ -2,7 +2,6 @@ package csw.database
 
 import akka.actor.typed
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.stream.Materializer
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import csw.database.DatabaseServiceFactory.{ReadPasswordHolder, ReadUsernameHolder}
 import csw.database.commons.{DBTestHelper, DatabaseServiceConnection}
@@ -24,7 +23,6 @@ import scala.concurrent.ExecutionContext
 class DatabaseServiceFactoryTest extends FunSuite with Matchers with BeforeAndAfterAll with HTTPLocationService {
   private implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "test")
   private implicit val ec: ExecutionContext                            = typedSystem.executionContext
-  private implicit val mat: Materializer                               = Materializer(typedSystem)
 
   private val dbName: String                    = "postgres"
   private val port: Int                         = 5432

@@ -5,12 +5,12 @@ import java.net.URI
 import akka.Done
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
-import akka.stream.{ActorAttributes, Attributes, Materializer}
+import akka.stream.{ActorAttributes, Attributes}
 import csw.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.event.api.scaladsl.{EventPublisher, EventService, EventSubscriber}
 import csw.event.client.helpers.TestFutureExt.RichFuture
-import csw.event.client.internal.commons.{EventServiceConnection, EventStreamSupervisionStrategy}
 import csw.event.client.internal.commons.serviceresolver.EventServiceLocationResolver
+import csw.event.client.internal.commons.{EventServiceConnection, EventStreamSupervisionStrategy}
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.internal.LocationServiceClient
 import csw.location.models.TcpRegistration
@@ -44,7 +44,6 @@ object BaseProperties {
   def createInfra(serverPort: Int, httpPort: Int): (LocationService, ActorSystem[Nothing]) = {
 
     implicit val typedSystem: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "event-server")
-    implicit val mat: Materializer                 = Materializer(typedSystem)
 
     val locationService = new LocationServiceClient("localhost", httpPort)
     val tcpRegistration = TcpRegistration(EventServiceConnection.value, serverPort)

@@ -2,6 +2,7 @@ package csw.admin.server.log
 
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.TestKitSettings
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest, StatusCodes, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
@@ -70,7 +71,7 @@ class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpParameter with M
     )
 
     val getLogMetadataRequest  = HttpRequest(HttpMethods.GET, uri = getLogMetadataUri)
-    val getLogMetadataResponse = Await.result(Http().singleRequest(getLogMetadataRequest), 5.seconds)
+    val getLogMetadataResponse = Await.result(Http()(typedSystem.toClassic).singleRequest(getLogMetadataRequest), 5.seconds)
     getLogMetadataResponse.status shouldBe StatusCodes.BadRequest
     val response = Await.result(Unmarshal(getLogMetadataResponse).to[ErrorResponse], 5.seconds)
     response shouldBe ErrorResponse(ErrorMessage(400, ConfigServiceConnection.value.toString ++ " is not supported"))
@@ -90,7 +91,7 @@ class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpParameter with M
     )
 
     val setLogLevelRequest  = HttpRequest(HttpMethods.POST, uri = getLogMetadataUri)
-    val setLogLevelResponse = Await.result(Http().singleRequest(setLogLevelRequest), 5.seconds)
+    val setLogLevelResponse = Await.result(Http()(typedSystem.toClassic).singleRequest(setLogLevelRequest), 5.seconds)
     setLogLevelResponse.status shouldBe StatusCodes.BadRequest
     val response = Await.result(Unmarshal(setLogLevelResponse).to[ErrorResponse], 5.seconds)
     response shouldBe ErrorResponse(ErrorMessage(400, ConfigServiceConnection.value.toString ++ " is not supported"))
@@ -111,7 +112,7 @@ class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpParameter with M
     )
 
     val getLogMetadataRequest  = HttpRequest(HttpMethods.GET, uri = getLogMetadataUri)
-    val getLogMetadataResponse = Await.result(Http().singleRequest(getLogMetadataRequest), 5.seconds)
+    val getLogMetadataResponse = Await.result(Http()(typedSystem.toClassic).singleRequest(getLogMetadataRequest), 5.seconds)
     getLogMetadataResponse.status shouldBe StatusCodes.BadRequest
     val response = Await.result(Unmarshal(getLogMetadataResponse).to[ErrorResponse], 5.seconds)
     response shouldBe ErrorResponse(ErrorMessage(400, tcpConnection.toString ++ " is not supported"))
@@ -133,7 +134,7 @@ class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpParameter with M
     )
 
     val setLogLevelRequest  = HttpRequest(HttpMethods.POST, uri = getLogMetadataUri)
-    val setLogLevelResponse = Await.result(Http().singleRequest(setLogLevelRequest), 5.seconds)
+    val setLogLevelResponse = Await.result(Http()(typedSystem.toClassic).singleRequest(setLogLevelRequest), 5.seconds)
     setLogLevelResponse.status shouldBe StatusCodes.BadRequest
     val response = Await.result(Unmarshal(setLogLevelResponse).to[ErrorResponse], 5.seconds)
     response shouldBe ErrorResponse(ErrorMessage(400, tcpConnection.toString ++ " is not supported"))

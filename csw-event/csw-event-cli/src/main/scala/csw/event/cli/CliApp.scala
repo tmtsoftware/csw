@@ -1,12 +1,12 @@
 package csw.event.cli
 
-import akka.stream.Materializer
+import akka.actor.typed.ActorSystem
 import csw.event.cli.args.Options
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{Await, Future}
 
-class CliApp(commandLineRunner: CommandLineRunner)(implicit val ec: ExecutionContext, mat: Materializer) {
+class CliApp(commandLineRunner: CommandLineRunner)(implicit val system: ActorSystem[_]) {
 
   def start(options: Options): Any = {
     options.cmd match {
@@ -15,7 +15,6 @@ class CliApp(commandLineRunner: CommandLineRunner)(implicit val ec: ExecutionCon
       case "publish"   => await(commandLineRunner.publish(options))
       case "subscribe" => await { val (_, doneF) = commandLineRunner.subscribe(options); doneF }
       case x           => throw new RuntimeException(s"Unknown operation: $x")
-
     }
   }
 

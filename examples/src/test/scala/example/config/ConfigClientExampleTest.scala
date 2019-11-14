@@ -73,7 +73,7 @@ class ConfigClientExampleTest
       await(adminApi.create(filePath, ConfigData.fromString(defaultStrConf), annex = false, "First commit"))
 
       val activeFile: Option[ConfigData] = await(clientApi.getActive(filePath))
-      await(activeFile.get.toStringF(mat)) shouldBe defaultStrConf
+      await(activeFile.get.toStringF(actorSystem)) shouldBe defaultStrConf
     }
     Await.result(doneF, 5.seconds)
     //#getActive
@@ -159,7 +159,7 @@ class ConfigClientExampleTest
 
       //validate
       val actualData = await(adminApi.getById(filePath, id)).get
-      await(actualData.toStringF(mat)) shouldBe defaultStrConf
+      await(actualData.toStringF(actorSystem)) shouldBe defaultStrConf
     }
     Await.result(doneF, 2.seconds)
     //#getById
@@ -179,7 +179,7 @@ class ConfigClientExampleTest
       //get the latest file
       val newConfigData = await(adminApi.getLatest(filePath)).get
       //validate
-      await(newConfigData.toStringF(mat)) shouldBe newContent
+      await(newConfigData.toStringF(actorSystem)) shouldBe newContent
     }
     Await.result(assertionF, 2.seconds)
     //#getLatest
@@ -198,10 +198,10 @@ class ConfigClientExampleTest
       await(adminApi.update(filePath, ConfigData.fromString(newContent), "changed!!"))
 
       val initialData: ConfigData = await(adminApi.getByTime(filePath, tInitial)).get
-      await(initialData.toStringF(mat)) shouldBe defaultStrConf
+      await(initialData.toStringF(actorSystem)) shouldBe defaultStrConf
 
       val latestData = await(adminApi.getByTime(filePath, Instant.now())).get
-      await(latestData.toStringF(mat)) shouldBe newContent
+      await(latestData.toStringF(actorSystem)) shouldBe newContent
     }
     Await.result(assertionF, 2.seconds)
     //#getByTime
@@ -340,7 +340,7 @@ class ConfigClientExampleTest
 
       //get contents of active version at a specified instance
       val initialContents = await(adminApi.getActiveByTime(filePath, tBegin)).get
-      await(initialContents.toStringF(mat)) shouldBe defaultStrConf
+      await(initialContents.toStringF(actorSystem)) shouldBe defaultStrConf
     }
     Await.result(assertionF, 5.seconds)
     //#active-file-mgmt

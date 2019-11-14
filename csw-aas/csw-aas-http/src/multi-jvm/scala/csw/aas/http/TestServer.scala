@@ -7,7 +7,6 @@ import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import akka.stream.Materializer
 import csw.aas.http.AuthorizationPolicy.RealmRolePolicy
 import csw.location.api.scaladsl.LocationService
 import csw.logging.client.scaladsl.LoggingSystemFactory
@@ -26,10 +25,9 @@ class TestServer(locationService: LocationService)(implicit ec: ExecutionContext
 
   def start(testServerPort: Int): Future[Http.ServerBinding] = {
 
-    implicit val system: typed.ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "test")
-    implicit val untypedSystem: actor.ActorSystem                 = system.toClassic
+    val system: typed.ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "test")
+    implicit val untypedSystem: actor.ActorSystem        = system.toClassic
     LoggingSystemFactory.start("test-server", "", "", system)
-    implicit val materializer: Materializer = Materializer(system)
     Http().bindAndHandle(routes, "0.0.0.0", testServerPort)
   }
 }

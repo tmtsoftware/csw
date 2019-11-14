@@ -5,7 +5,6 @@ import java.net.InetAddress
 import akka.actor.typed
 import akka.actor.typed.SpawnProtocol
 import akka.actor.typed.scaladsl.Behaviors
-import akka.stream.Materializer
 import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
@@ -26,7 +25,6 @@ import scala.concurrent.{Await, Future}
  */
 object LocationServiceExampleComponentApp extends App {
   implicit val system: typed.ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "example-system")
-  implicit val mat: Materializer                                = Materializer(system)
   private val locationService                                   = HttpLocationServiceFactory.makeLocalClient
 
   //#create-logging-system

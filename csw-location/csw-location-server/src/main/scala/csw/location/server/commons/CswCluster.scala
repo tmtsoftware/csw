@@ -1,5 +1,6 @@
 package csw.location.server.commons
 
+import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.AskPattern._
@@ -10,9 +11,7 @@ import akka.cluster.ddata.typed.scaladsl
 import akka.cluster.ddata.typed.scaladsl.{DistributedData, Replicator}
 import akka.cluster.typed.{Cluster, Join}
 import akka.management.scaladsl.AkkaManagement
-import akka.stream.Materializer
 import akka.util.Timeout
-import akka.{Done, actor}
 import csw.location.api.exceptions.CouldNotJoinCluster
 import csw.location.server.commons.ClusterConfirmationMessages.{HasJoinedCluster, Shutdown}
 import csw.location.server.commons.CoordinatedShutdownReasons.FailureReason
@@ -39,12 +38,11 @@ class CswCluster private (_typedSystem: ActorSystem[SpawnProtocol.Command]) {
   val hostname: String = _typedSystem.settings.config.getString("akka.remote.artery.canonical.hostname")
 
   implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = _typedSystem
-  implicit val untypedSystem: actor.ActorSystem                = _typedSystem.toClassic
-  implicit val ec: ExecutionContext                            = typedSystem.executionContext
-  implicit val mat: Materializer                               = makeMat()
-  implicit val cluster: Cluster                                = Cluster(typedSystem)
-  private val distributedData: DistributedData                 = scaladsl.DistributedData(typedSystem)
-  implicit val node: SelfUniqueAddress                         = distributedData.selfUniqueAddress
+//  implicit val untypedSystem: actor.ActorSystem                = _typedSystem.toClassic
+  implicit val ec: ExecutionContext            = typedSystem.executionContext
+  implicit val cluster: Cluster                = Cluster(typedSystem)
+  private val distributedData: DistributedData = scaladsl.DistributedData(typedSystem)
+  implicit val node: SelfUniqueAddress         = distributedData.selfUniqueAddress
 
   /**
    * Gives the replicator for the current ActorSystem
@@ -54,12 +52,7 @@ class CswCluster private (_typedSystem: ActorSystem[SpawnProtocol.Command]) {
   /**
    * Gives handle to CoordinatedShutdown extension
    */
-  val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(untypedSystem)
-
-  /**
-   * Creates an ActorMaterializer for current ActorSystem
-   */
-  private def makeMat(): Materializer = Materializer(typedSystem)
+  val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(_typedSystem.toClassic)
 
   /**
    * If `startManagement` flag is set to true (which is true only when a managementPort is defined in ClusterSettings)
@@ -71,7 +64,7 @@ class CswCluster private (_typedSystem: ActorSystem[SpawnProtocol.Command]) {
   private def startClusterManagement(): Unit = {
     val startManagement = typedSystem.settings.config.getBoolean("startManagement")
     if (startManagement) {
-      val akkaManagement = AkkaManagement(untypedSystem)
+      val akkaManagement = AkkaManagement(_typedSystem.toClassic)
       Await.result(akkaManagement.start(), 10.seconds)
     }
   }

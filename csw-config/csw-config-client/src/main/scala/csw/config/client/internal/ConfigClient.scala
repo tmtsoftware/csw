@@ -3,6 +3,7 @@ package csw.config.client.internal
 import java.nio.{file => jnio}
 import java.time.Instant
 
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.Uri.{Path, Query}
 import akka.http.scaladsl.model._
@@ -68,14 +69,14 @@ private[config] class ConfigClient(
   }
 
   override def create(path: jnio.Path, configData: ConfigData, annex: Boolean, comment: String): Future[ConfigId] = async {
-    val (prefix, stitchedSource) = configData.source.prefixAndStitch(1)
+    val (prefix, stitchedSource) = configData.source.prefixAndStitch(1)(actorRuntime.typedSystem)
     val isAnnex                  = if (annex) annex else BinaryUtils.isBinary(await(prefix))
     val uri                      = await(configUri(path)).withQuery(Query("annex" -> isAnnex.toString, "comment" -> comment))
     val entity                   = HttpEntity(ContentTypes.`application/octet-stream`, configData.length, stitchedSource)
 
     val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity).withBearerToken
     maskTokenAndLog(request)
-    val response = await(Http().singleRequest(request))
+    val response = await(Http()(typedSystem.toClassic).singleRequest(request))
 
     await(
       handleResponse(response) {
@@ -91,7 +92,7 @@ private[config] class ConfigClient(
 
     val request = HttpRequest(HttpMethods.PUT, uri = uri, entity = entity).withBearerToken
     maskTokenAndLog(request)
-    val response = await(Http().singleRequest(request))
+    val response = await(Http()(typedSystem.toClassic).singleRequest(request))
 
     await(
       handleResponse(response) {
@@ -121,7 +122,7 @@ private[config] class ConfigClient(
 
     val request = HttpRequest(HttpMethods.HEAD, uri = uri)
     maskTokenAndLog(request)
-    val response = await(Http().singleRequest(request))
+    val response = await(Http()(typedSystem.toClassic).singleRequest(request))
 
     await(
       handleResponse(response) {
@@ -136,7 +137,7 @@ private[config] class ConfigClient(
 
     val request = HttpRequest(HttpMethods.DELETE, uri = uri).withBearerToken
     maskTokenAndLog(request)
-    val response = await(Http().singleRequest(request))
+    val response = await(Http()(typedSystem.toClassic).singleRequest(request))
 
     await(
       handleResponse(response) {
@@ -151,7 +152,7 @@ private[config] class ConfigClient(
 
     val request = HttpRequest(uri = uri)
     maskTokenAndLog(request)
-    val response = await(Http().singleRequest(request))
+    val response = await(Http()(typedSystem.toClassic).singleRequest(request))
 
     await(
       handleResponse(response) {
@@ -182,7 +183,7 @@ private[config] class ConfigClient(
 
     val request = HttpRequest(uri = uri)
     maskTokenAndLog(request)
-    val response = await(Http().singleRequest(request))
+    val response = await(Http()(typedSystem.toClassic).singleRequest(request))
 
     await(
       handleResponse(response) {
@@ -195,7 +196,7 @@ private[config] class ConfigClient(
   override def getMetadata: Future[ConfigMetadata] = async {
     val request = HttpRequest(uri = await(metadataUri))
     maskTokenAndLog(request)
-    val response = await(Http().singleRequest(request))
+    val response = await(Http()(typedSystem.toClassic).singleRequest(request))
 
     await(
       handleResponse(response) {
@@ -209,7 +210,7 @@ private[config] class ConfigClient(
 
     val request = HttpRequest(HttpMethods.PUT, uri = uri).withBearerToken
     maskTokenAndLog(request)
-    val response = await(Http().singleRequest(request))
+    val response = await(Http()(typedSystem.toClassic).singleRequest(request))
 
     await(
       handleResponse(response) {
@@ -221,7 +222,7 @@ private[config] class ConfigClient(
   private def get(uri: Uri): Future[Option[ConfigData]] = async {
     val request = HttpRequest(uri = uri)
     maskTokenAndLog(request)
-    val response = await(Http().singleRequest(request))
+    val response = await(Http()(typedSystem.toClassic).singleRequest(request))
 
     val lengthOption = response.entity.contentLengthOption
 
@@ -250,7 +251,7 @@ private[config] class ConfigClient(
 
     val request = HttpRequest(uri = _uri)
     maskTokenAndLog(request)
-    val response = await(Http().singleRequest(request))
+    val response = await(Http()(typedSystem.toClassic).singleRequest(request))
 
     await(
       handleResponse(response) {

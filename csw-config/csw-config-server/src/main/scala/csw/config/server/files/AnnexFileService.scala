@@ -2,6 +2,7 @@ package csw.config.server.files
 
 import java.nio.file.{Path, Paths}
 
+import akka.stream.Materializer.matFromSystem
 import akka.stream.scaladsl.{FileIO, Keep}
 import csw.config.api.ConfigData
 import csw.config.server.commons.ConfigServerLogger
@@ -19,7 +20,7 @@ import scala.concurrent.Future
  *
  * @param settings retrieve the directory path to store annex files from settings
  * @param fileRepo FileRepo performs file operations with a blocking dispatcher
- * @param actorRuntime ActorRuntime provides runtime accessories related to ActorSystem like Materializer, ExecutionContext etc.
+ * @param actorRuntime ActorRuntime provides runtime accessories related to ActorSystem like ExecutionContext etc.
  */
 class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime: ActorRuntime) {
 
@@ -105,7 +106,7 @@ class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime
     val (resultF, shaF) = configData.source
       .alsoToMat(FileIO.toPath(path))(Keep.right)
       .toMat(Sha1.sink)(Keep.both)
-      .run()
+      .run()(matFromSystem(typedSystem))
     await(resultF)
     (path, await(shaF))
   }

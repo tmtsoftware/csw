@@ -3,7 +3,6 @@ package csw.config
 import java.nio.file.{Files, Paths}
 
 import akka.actor.typed.scaladsl.adapter._
-import akka.stream.Materializer
 import com.typesafe.config.ConfigFactory
 import csw.aas.installed.api.InstalledAppAuthAdapter
 import csw.commons.ResourceReader
@@ -67,7 +66,6 @@ class ConfigCliAppTest(ignore: Int)
     // config client command line app is exercised on client1
     runOn(client1) {
       enterBarrier("server-started")
-      implicit val mat: Materializer = Materializer(typedSystem)
 
       def cliApp() = Wiring.noPrinting(HttpLocationServiceFactory.makeLocalClient, factory, nativeAuthAdapter).cliApp
 
@@ -93,22 +91,23 @@ class ConfigCliAppTest(ignore: Int)
     // config client admin api is exercised on client2
     runOn(client2) {
       enterBarrier("server-started")
-      val actorRuntime = new ActorRuntime(system.toTyped)
-      import actorRuntime._
+      val actorRuntime  = new ActorRuntime(system.toTyped)
       val configService = ConfigClientFactory.adminApi(system.toTyped, locationService, factory)
 
       enterBarrier("client1-create")
-      val actualConfigValue = configService.getLatest(Paths.get(repoPath1)).await.get.toStringF.await
+      val actualConfigValue = configService.getLatest(Paths.get(repoPath1)).await.get.toStringF(actorRuntime.typedSystem).await
       actualConfigValue shouldBe inputFileContents
       enterBarrier("client2-create-pass")
 
       enterBarrier("client1-update")
-      val actualUpdatedConfigValue = configService.getLatest(Paths.get(repoPath1)).await.get.toStringF.await
+      val actualUpdatedConfigValue =
+        configService.getLatest(Paths.get(repoPath1)).await.get.toStringF(actorRuntime.typedSystem).await
       actualUpdatedConfigValue shouldBe updatedInputFileContents
       enterBarrier("client2-update-pass")
 
       enterBarrier("client1-setActive")
-      val actualActiveConfigValue = configService.getActive(Paths.get(repoPath1)).await.get.toStringF.await
+      val actualActiveConfigValue =
+        configService.getActive(Paths.get(repoPath1)).await.get.toStringF(actorRuntime.typedSystem).await
       actualActiveConfigValue shouldBe inputFileContents
 
       configService

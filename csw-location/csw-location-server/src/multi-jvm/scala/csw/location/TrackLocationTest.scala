@@ -18,7 +18,6 @@ class TrackLocationTestMultiJvmNode3 extends TrackLocationTest(0, "cluster")
 class TrackLocationTest(ignore: Int, mode: String) extends LSNodeSpec(config = new TwoMembersAndSeed, mode) {
 
   import config._
-  import cswCluster.mat
 
   // DEOPSCSW-26: Track a connection
   test("two components should able to track same connection and single component should able to track two components") {

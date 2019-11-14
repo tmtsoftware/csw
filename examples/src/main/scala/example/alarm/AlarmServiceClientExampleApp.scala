@@ -4,7 +4,6 @@ import akka.Done
 import akka.actor.typed
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
-import akka.stream.Materializer
 import com.typesafe.config._
 import csw.alarm.models.AlarmSeverity.Okay
 import csw.alarm.models.Key.{AlarmKey, ComponentKey, SubsystemKey}
@@ -21,7 +20,6 @@ object AlarmServiceClientExampleApp {
 
   implicit val actorSystem: ActorSystem[_] = typed.ActorSystem(Behaviors.empty, "")
   implicit val ec: ExecutionContext        = actorSystem.executionContext
-  implicit val mat: Materializer           = Materializer(actorSystem)
   private val locationService              = HttpLocationServiceFactory.makeLocalClient
 
   private def behaviour[T]: Behaviors.Receive[T] = Behaviors.receive { (ctx, msg) =>

@@ -3,7 +3,7 @@ package csw.config.server.files
 import java.nio.file.Path
 import java.security.MessageDigest
 
-import akka.stream.Materializer
+import akka.actor.typed.ActorSystem
 import akka.stream.scaladsl.{FileIO, Flow, Keep, Sink, Source}
 import akka.util.ByteString
 import csw.config.api.ConfigData
@@ -15,18 +15,18 @@ import scala.concurrent.Future
  */
 object Sha1 {
 
-  private def fromSource(source: Source[ByteString, Any])(implicit mat: Materializer): Future[String] =
+  private def fromSource(source: Source[ByteString, Any])(implicit system: ActorSystem[_]): Future[String] =
     source.runWith(sink)
 
   /**
    * Create the sha digest of the data from the given configData model.
    *
    * @param configData the configData model to get the data from
-   * @param mat an akka materializer required to start the stream of data that will incrementally calculate the sha digest
+   * @param system required to get the SystemMaterializer to start the stream of data that will incrementally calculate the sha digest
    *            of it
    * @return a future that completes with calculated sha value of the data
    */
-  def fromConfigData(configData: ConfigData)(implicit mat: Materializer): Future[String] =
+  def fromConfigData(configData: ConfigData)(implicit system: ActorSystem[_]): Future[String] =
     fromSource(configData.source)
 
   /**
@@ -35,11 +35,11 @@ object Sha1 {
    * stored both places and find out discrepancies if any.
    *
    * @param path the path to get the data from
-   * @param mat an akka materializer required to start the stream of data that will incrementally calculate the sha digest
+   * @param system required to get the SystemMaterializer to start the stream of data that will incrementally calculate the sha digest
    *            of it
    * @return a future that completes with calculated sha value of the data
    */
-  def fromPath(path: Path)(implicit mat: Materializer): Future[String] =
+  def fromPath(path: Path)(implicit system: ActorSystem[_]): Future[String] =
     fromSource(FileIO.fromPath(path))
 
   /**

@@ -34,7 +34,9 @@ class HttpService(
     actorRuntime: ActorRuntime
 ) {
 
-  import actorRuntime._
+  import actorRuntime.untypedSystem
+  import actorRuntime.ec
+  import actorRuntime.coordinatedShutdown
 
   private val log: Logger = ConfigServerLogger.getLogger
 

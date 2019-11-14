@@ -2,9 +2,9 @@ package csw.location.client.internal
 
 import java.io.IOException
 
-import akka.actor.typed.{ActorSystem, Scheduler}
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.CoordinatedShutdown
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.{ActorSystem, Scheduler}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshalling.Marshal
 import akka.http.scaladsl.model._
@@ -12,23 +12,14 @@ import akka.http.scaladsl.model.sse.ServerSentEvent
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.http.scaladsl.unmarshalling.sse.EventStreamUnmarshalling._
 import akka.stream.scaladsl.{Keep, Sink, Source}
-import akka.stream.{KillSwitch, KillSwitches, Materializer}
-import akka.{Done, NotUsed, actor}
+import akka.stream.{KillSwitch, KillSwitches}
+import akka.{Done, NotUsed}
 import csw.location.api.codec.DoneCodec
 import csw.location.api.exceptions.{OtherLocationIsRegistered, RegistrationFailed}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.HttpCodecs
-import csw.location.models.{
-  AkkaLocation,
-  ComponentType,
-  Connection,
-  ConnectionType,
-  Location,
-  Registration,
-  TrackingEvent,
-  TypedConnection
-}
 import csw.location.models.codecs.LocationCodecs
+import csw.location.models._
 import io.bullet.borer.Json
 
 import scala.async.Async.{async, await}
@@ -36,16 +27,14 @@ import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
 private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
-    implicit val actorSystem: ActorSystem[_],
-    mat: Materializer
+    implicit val actorSystem: ActorSystem[_]
 ) extends LocationService
     with HttpCodecs
     with LocationCodecs
     with DoneCodec { outer =>
 
   import actorSystem.executionContext
-  implicit val untypedSystem: actor.ActorSystem = actorSystem.toClassic
-  implicit val scheduler: Scheduler             = actorSystem.scheduler
+  implicit val scheduler: Scheduler = actorSystem.scheduler
 
   private val baseUri = s"http://$serverIp:$serverPort/location"
 
@@ -53,12 +42,12 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
     val uri           = Uri(baseUri + "/register")
     val requestEntity = await(Marshal(registration).to[RequestEntity])
     val request       = HttpRequest(HttpMethods.POST, uri = uri, entity = requestEntity)
-    val response      = await(Http().singleRequest(request))
+    val response      = await(Http()(actorSystem.toClassic).singleRequest(request))
 
     response.status match {
       case StatusCodes.OK =>
         val location0 = await(Unmarshal(response.entity).to[Location])
-        CoordinatedShutdown(untypedSystem).addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "unregister")(
+        CoordinatedShutdown(actorSystem.toClassic).addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "unregister")(
           () => unregister(location0.connection)
         )
         new RegistrationResult {
@@ -76,21 +65,21 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
     val uri           = Uri(baseUri + "/unregister")
     val requestEntity = await(Marshal(connection).to[RequestEntity])
     val request       = HttpRequest(HttpMethods.POST, uri = uri, entity = requestEntity)
-    val response      = await(Http().singleRequest(request))
+    val response      = await(Http()(actorSystem.toClassic).singleRequest(request))
     await(Unmarshal(response.entity).to[Done])
   }
 
   override def unregisterAll(): Future[Done] = async {
     val uri      = Uri(baseUri + "/unregisterAll")
     val request  = HttpRequest(HttpMethods.POST, uri = uri)
-    val response = await(Http().singleRequest(request))
+    val response = await(Http()(actorSystem.toClassic).singleRequest(request))
     await(Unmarshal(response.entity).to[Done])
   }
 
   override def find[L <: Location](connection: TypedConnection[L]): Future[Option[L]] = async {
     val uri      = Uri(s"$baseUri/find/${connection.name}")
     val request  = HttpRequest(HttpMethods.GET, uri = uri)
-    val response = await(Http().singleRequest(request))
+    val response = await(Http()(actorSystem.toClassic).singleRequest(request))
     response.status match {
       case StatusCodes.OK       => Some(await(Unmarshal(response.entity).to[Location]).asInstanceOf[L])
       case StatusCodes.NotFound => None
@@ -103,7 +92,7 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
       s"$baseUri/resolve/${connection.name}?within=${within.length.toString + within.unit.toString.toLowerCase}"
     )
     val request  = HttpRequest(HttpMethods.GET, uri = uri)
-    val response = await(Http().singleRequest(request))
+    val response = await(Http()(actorSystem.toClassic).singleRequest(request))
     response.status match {
       case StatusCodes.OK       => Some(await(Unmarshal(response.entity).to[Location]).asInstanceOf[L])
       case StatusCodes.NotFound => None
@@ -114,35 +103,35 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
   override def list: Future[List[Location]] = async {
     val uri      = Uri(baseUri + "/list")
     val request  = HttpRequest(HttpMethods.GET, uri = uri)
-    val response = await(Http().singleRequest(request))
+    val response = await(Http()(actorSystem.toClassic).singleRequest(request))
     await(Unmarshal(response.entity).to[List[Location]])
   }
 
   override def list(componentType: ComponentType): Future[List[Location]] = async {
     val uri      = Uri(s"$baseUri/list?componentType=$componentType")
     val request  = HttpRequest(HttpMethods.GET, uri = uri)
-    val response = await(Http().singleRequest(request))
+    val response = await(Http()(actorSystem.toClassic).singleRequest(request))
     await(Unmarshal(response.entity).to[List[Location]])
   }
 
   override def list(hostname: String): Future[List[Location]] = async {
     val uri      = Uri(s"$baseUri/list?hostname=$hostname")
     val request  = HttpRequest(HttpMethods.GET, uri = uri)
-    val response = await(Http().singleRequest(request))
+    val response = await(Http()(actorSystem.toClassic).singleRequest(request))
     await(Unmarshal(response.entity).to[List[Location]])
   }
 
   override def list(connectionType: ConnectionType): Future[List[Location]] = async {
     val uri      = Uri(s"$baseUri/list?connectionType=${connectionType.entryName}")
     val request  = HttpRequest(HttpMethods.GET, uri = uri)
-    val response = await(Http().singleRequest(request))
+    val response = await(Http()(actorSystem.toClassic).singleRequest(request))
     await(Unmarshal(response.entity).to[List[Location]])
   }
 
   override def listByPrefix(prefix: String): Future[List[AkkaLocation]] = async {
     val uri      = Uri(s"$baseUri/list?prefix=$prefix")
     val request  = HttpRequest(HttpMethods.GET, uri = uri)
-    val response = await(Http().singleRequest(request))
+    val response = await(Http()(actorSystem.toClassic).singleRequest(request))
     await(Unmarshal(response.entity).to[List[AkkaLocation]])
   }
 
@@ -150,7 +139,8 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(
     val uri     = Uri(s"$baseUri/track/${connection.name}")
     val request = HttpRequest(HttpMethods.GET, uri = uri)
     val sseStreamFuture = async {
-      val response = await(Http().singleRequest(request))
+      val response              = await(Http()(actorSystem.toClassic).singleRequest(request))
+      implicit val unmarshaller = fromEventsStream(actorSystem.toClassic)
       await(Unmarshal(response.entity).to[Source[ServerSentEvent, NotUsed]])
     }
     val sseStream = Source.future(sseStreamFuture).flatMapConcat(identity)

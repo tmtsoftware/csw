@@ -2,7 +2,6 @@ package csw.alarm.client.internal.helpers
 
 import akka.actor.typed
 import akka.actor.typed.SpawnProtocol
-import akka.stream.Materializer
 import com.typesafe.config.ConfigFactory
 import csw.alarm.api.internal.{MetadataKey, SeverityKey}
 import csw.alarm.api.javadsl.IAlarmService
@@ -44,7 +43,6 @@ class AlarmServiceTestSetup
 
   implicit val actorSystem: typed.ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "alarm-server")
   implicit val ec: ExecutionContext                                  = actorSystem.executionContext
-  implicit val mat: Materializer                                     = Materializer(actorSystem)
 
   val alarmServiceFactory             = new AlarmServiceFactory(redisClient)
   val alarmService: AlarmAdminService = alarmServiceFactory.makeAdminApi(hostname, sentinelPort)

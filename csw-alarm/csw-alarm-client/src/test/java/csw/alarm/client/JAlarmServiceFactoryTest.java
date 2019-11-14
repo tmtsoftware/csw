@@ -2,7 +2,6 @@ package csw.alarm.client;
 
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.javadsl.Behaviors;
-import akka.stream.Materializer;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import csw.alarm.api.javadsl.IAlarmService;
@@ -34,8 +33,7 @@ public class JAlarmServiceFactoryTest extends JUnitSuite {
     private static AlarmServiceTestSetup testSetup = new AlarmServiceTestSetup();
     private AlarmServiceFactory alarmServiceFactory = testSetup.alarmServiceFactory();
     private static ActorSystem<Object> seedSystem = ActorSystemFactory.remote(Behaviors.empty(), "test");
-    private static Materializer mat = Materializer.createMaterializer(seedSystem);
-    private static ILocationService locationService = JHttpLocationServiceFactory.makeLocalClient(seedSystem, mat);
+    private static ILocationService locationService = JHttpLocationServiceFactory.makeLocalClient(seedSystem);
     private AlarmAdminService alarmService = testSetup.alarmService();
 
     @BeforeClass

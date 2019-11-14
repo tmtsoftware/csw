@@ -4,7 +4,7 @@ import akka.actor
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.stream.scaladsl.{Sink, Source}
-import akka.stream.{Materializer, ThrottleMode}
+import akka.stream.ThrottleMode
 import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
@@ -30,7 +30,6 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
   import ComponentStateForCommand._
   private implicit val actorSystem: actor.ActorSystem = ctx.system.toClassic
   private implicit val ec: ExecutionContext           = ctx.executionContext
-  private implicit val mat: Materializer              = Materializer(actorSystem)
 
   override def initialize(): Future[Unit] = Future.unit
 

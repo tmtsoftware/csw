@@ -7,7 +7,7 @@ import scala.concurrent.Future
 
 class LocationHttpService(locationRoutes: LocationRoutes, actorRuntime: ActorRuntime, settings: Settings) {
 
-  import actorRuntime._
+  import actorRuntime.untypedSystem
 
   def start(): Future[Http.ServerBinding] = {
     Http().bindAndHandle(

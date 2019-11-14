@@ -23,7 +23,7 @@ object Wiring {
   private[event] def make(locationHost: String = "localhost", _printLine: Any => Unit = println): Wiring =
     new Wiring {
       override lazy val locationService: LocationService =
-        HttpLocationServiceFactory.make(locationHost)(actorSystem, actorRuntime.mat)
+        HttpLocationServiceFactory.make(locationHost)(actorSystem)
 
       override lazy val printLine: Any => Unit = _printLine
     }

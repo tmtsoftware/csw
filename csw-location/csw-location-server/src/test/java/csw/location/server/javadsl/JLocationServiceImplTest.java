@@ -8,7 +8,6 @@ import akka.actor.typed.javadsl.Adapter;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.japi.Pair;
 import akka.stream.KillSwitch;
-import akka.stream.Materializer;
 import akka.stream.javadsl.Keep;
 import akka.stream.testkit.TestSubscriber;
 import akka.stream.testkit.scaladsl.TestSink;
@@ -51,7 +50,6 @@ public class JLocationServiceImplTest extends JUnitSuite {
 
     private static akka.actor.ActorSystem untypedSystem;
     private static ActorSystem<SpawnProtocol.Command> typedSystem;
-    private static Materializer mat;
     private static ILocationService locationService;
 
     private ComponentId akkaHcdComponentId = new ComponentId("hcd1", JComponentType.HCD());
@@ -73,10 +71,9 @@ public class JLocationServiceImplTest extends JUnitSuite {
         wiring = new ServerWiring();
         typedSystem = ActorSystemFactory.remote(SpawnProtocol.create(), "test");
         untypedSystem = Adapter.toClassic(typedSystem);
-        mat = Materializer.createMaterializer(typedSystem);
         TestProbe<Object> actorTestProbe = TestProbe.create("test-actor", typedSystem);
         actorRef = actorTestProbe.ref();
-        locationService = JHttpLocationServiceFactory.makeLocalClient(typedSystem, mat);
+        locationService = JHttpLocationServiceFactory.makeLocalClient(typedSystem);
         Await.result(wiring.locationHttpService().start(), FiniteDuration.create(5, TimeUnit.SECONDS));
     }
 
@@ -348,7 +345,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
         TcpConnection redis2Connection = new TcpConnection(new ComponentId("redis2", JComponentType.Service()));
         TcpRegistration redis2registration = new TcpRegistration(redis2Connection, Port);
 
-        Pair<KillSwitch, TestSubscriber.Probe<TrackingEvent>> source = locationService.track(redis1Connection).toMat(TestSink.probe(untypedSystem), Keep.both()).run(mat);
+        Pair<KillSwitch, TestSubscriber.Probe<TrackingEvent>> source = locationService.track(redis1Connection).toMat(TestSink.probe(untypedSystem), Keep.both()).run(typedSystem);
 
         IRegistrationResult result = locationService.register(redis1Registration).get();
         IRegistrationResult result2 = locationService.register(redis2registration).get();

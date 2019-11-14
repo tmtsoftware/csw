@@ -12,7 +12,6 @@ import akka.actor.typed.javadsl.Behaviors;
 import akka.japi.Pair;
 import akka.japi.pf.ReceiveBuilder;
 import akka.stream.KillSwitch;
-import akka.stream.Materializer;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
 import csw.command.client.extensions.AkkaLocationExt;
@@ -60,8 +59,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
     private ActorSystem<Void> typedSystem = Adapter.toTyped(this.system);
     //#create-location-service
     private akka.actor.ActorSystem system = context().system();
-    private Materializer mat = Materializer.createMaterializer(system);
-    private ILocationService locationService = JHttpLocationServiceFactory.makeLocalClient(Adapter.toTyped(system), mat);
+    private ILocationService locationService = JHttpLocationServiceFactory.makeLocalClient(Adapter.toTyped(system));
     //#create-location-service
 
     private AkkaConnection exampleConnection = LocationServiceExampleComponent.connection();
@@ -125,9 +123,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
 
         // ************************************************************************************************************
 
-        Behavior<String> behavior = Behaviors.setup(ctx -> {
-            return Behaviors.same();
-        });
+        Behavior<String> behavior = Behaviors.setup(ctx -> Behaviors.same());
         akka.actor.typed.ActorRef<String> typedActorRef = Adapter.spawn(context(), behavior, "typed-actor-ref");
 
         AkkaConnection assemblyConnection = new AkkaConnection(new ComponentId("assembly1", JComponentType.Assembly()));
@@ -248,13 +244,12 @@ public class JLocationServiceExampleClient extends AbstractActor {
 
         // track connection to LocationServiceExampleComponent
         // Calls track method for example connection and forwards location messages to this actor
-        Materializer mat = Materializer.createMaterializer(getContext());
         log.info("Starting to track " + exampleConnection);
-        locationService.track(exampleConnection).toMat(Sink.actorRef(getSelf(), AllDone.class), Keep.both()).run(mat);
+        locationService.track(exampleConnection).toMat(Sink.actorRef(getSelf(), AllDone.class), Keep.both()).run(typedSystem);
 
         //track returns a Killswitch, that can be used to turn off notifications arbitarily
         //in this case track a connection for 5 seconds, after that schedule switching off the stream
-        Pair pair = locationService.track(exampleConnection).toMat(Sink.ignore(), Keep.both()).run(mat);
+        Pair pair = locationService.track(exampleConnection).toMat(Sink.ignore(), Keep.both()).run(typedSystem);
         context().system().scheduler().scheduleOnce(
                 Duration.ofSeconds(5),
                 () -> ((KillSwitch) pair.first()).shutdown(),

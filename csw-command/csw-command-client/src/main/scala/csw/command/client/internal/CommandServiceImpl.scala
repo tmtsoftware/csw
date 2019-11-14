@@ -6,7 +6,7 @@ import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.typed.scaladsl.ActorSource
-import akka.stream.{KillSwitches, Materializer, OverflowStrategy}
+import akka.stream.{KillSwitches, OverflowStrategy}
 import akka.util.Timeout
 import csw.command.api.scaladsl.CommandService
 import csw.command.api.{CurrentStateSubscription, StateMatcher}
@@ -30,7 +30,6 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
     extends CommandService {
 
   private implicit val ec: ExecutionContext = actorSystem.executionContext
-  private implicit val mat: Materializer    = Materializer(actorSystem)
 
   private val component: ActorRef[ComponentMessage] = componentLocation.componentRef
   private val ValidateTimeout                       = 1.seconds

@@ -1,6 +1,5 @@
 package csw.config.server
 
-import akka.actor
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
@@ -8,7 +7,6 @@ import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes, Uri}
-import akka.stream.Materializer
 import com.typesafe.config.ConfigFactory
 import csw.aas.core.commons.AASConnection
 import csw.config.server.commons.TestFutureExtension.RichFuture
@@ -23,9 +21,7 @@ import scala.concurrent.duration._
 
 // DEOPSCSW-130: Command line App for HTTP server
 class MainTest extends HTTPLocationService {
-  implicit val actorSystem: ActorSystem[_]      = ActorSystem(Behaviors.empty, "config-server")
-  implicit val untypedSystem: actor.ActorSystem = actorSystem.toClassic
-  implicit val mat: Materializer                = Materializer(actorSystem)
+  implicit val actorSystem: ActorSystem[_] = ActorSystem(Behaviors.empty, "config-server")
 
   private val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient
 
@@ -67,7 +63,7 @@ class MainTest extends HTTPLocationService {
       val uri = Uri(configServiceLocation.uri.toString).withPath(Path / "list")
 
       val request  = HttpRequest(uri = uri)
-      val response = Http().singleRequest(request).await
+      val response = Http()(actorSystem.toClassic).singleRequest(request).await
       response.status shouldBe StatusCodes.OK
       response.discardEntityBytes()
     } finally {
@@ -90,7 +86,7 @@ class MainTest extends HTTPLocationService {
       val uri = Uri(configServiceLocation.uri.toString).withPath(Path / "list")
 
       val request  = HttpRequest(uri = uri)
-      val response = Http().singleRequest(request).await
+      val response = Http()(actorSystem.toClassic).singleRequest(request).await
       response.status shouldBe StatusCodes.OK
     } finally {
       httpService.shutdown(UnknownReason).await

@@ -1,5 +1,6 @@
 package csw.admin.server.log.http
 
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import csw.admin.server.commons.AdminLogger
@@ -18,7 +19,9 @@ import scala.util.control.NonFatal
 class AdminHttpService(adminRoutes: AdminRoutes, actorRuntime: ActorRuntime, settings: Settings) {
   private val log: Logger = AdminLogger.getLogger
 
-  import actorRuntime._
+  implicit val classicSystem = actorRuntime.typedSystem.toClassic
+  import actorRuntime.ec
+  import actorRuntime.shutdown
 
   lazy val registeredLazyBinding: Future[ServerBinding] = async {
     val binding = await(bind())

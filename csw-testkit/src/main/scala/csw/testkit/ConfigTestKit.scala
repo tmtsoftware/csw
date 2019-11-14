@@ -5,7 +5,6 @@ import java.nio.file.Paths
 import akka.actor.typed
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.http.scaladsl.Http
-import akka.stream.Materializer
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.aas.http.SecurityDirectives
@@ -59,7 +58,6 @@ final class ConfigTestKit private (
   private var configServer: Option[Http.ServerBinding] = None
 
   implicit lazy val ec: ExecutionContextExecutor = configWiring.actorRuntime.ec
-  implicit lazy val mat: Materializer            = configWiring.actorRuntime.mat
   implicit lazy val timeout: Timeout             = testKitSettings.DefaultTimeout
 
   /**

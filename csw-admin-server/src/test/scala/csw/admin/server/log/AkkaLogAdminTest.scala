@@ -3,6 +3,7 @@ package csw.admin.server.log
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest, StatusCodes, Uri}
@@ -118,7 +119,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
     )
 
     val getLogMetadataRequest   = HttpRequest(HttpMethods.GET, uri = getLogMetadataUri)
-    val getLogMetadataResponse1 = Await.result(Http().singleRequest(getLogMetadataRequest), 5.seconds)
+    val getLogMetadataResponse1 = Await.result(Http()(typedSystem.toClassic).singleRequest(getLogMetadataRequest), 5.seconds)
     val logMetadata1            = Await.result(Unmarshal(getLogMetadataResponse1).to[LogMetadata], 5.seconds)
 
     getLogMetadataResponse1.status shouldBe StatusCodes.OK
@@ -138,7 +139,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
     loggingSystem.setAkkaLevel(WARN)
 
     // verify getLogMetadata http request gives updated log levels in response
-    val getLogMetadataResponse2 = Await.result(Http().singleRequest(getLogMetadataRequest), 5.seconds)
+    val getLogMetadataResponse2 = Await.result(Http()(typedSystem.toClassic).singleRequest(getLogMetadataRequest), 5.seconds)
     val logMetadata2            = Await.result(Unmarshal(getLogMetadataResponse2).to[LogMetadata], 5.seconds)
 
     logMetadata2 shouldBe LogMetadata(ERROR, WARN, slf4jLevel, componentLogLevel)
@@ -176,7 +177,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
     )
 
     val request  = HttpRequest(HttpMethods.POST, uri = uri)
-    val response = Await.result(Http().singleRequest(request), 5.seconds)
+    val response = Await.result(Http()(typedSystem.toClassic).singleRequest(request), 5.seconds)
 
     response.status shouldBe StatusCodes.OK
 
@@ -220,7 +221,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
     )
 
     val getLogMetadataRequest   = HttpRequest(HttpMethods.GET, uri = getLogMetadataUri)
-    val getLogMetadataResponse1 = Await.result(Http().singleRequest(getLogMetadataRequest), 5.seconds)
+    val getLogMetadataResponse1 = Await.result(Http()(typedSystem.toClassic).singleRequest(getLogMetadataRequest), 5.seconds)
 
     getLogMetadataResponse1.status shouldBe StatusCodes.NotFound
   }
@@ -236,7 +237,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
     )
 
     val request  = HttpRequest(HttpMethods.POST, uri = uri)
-    val response = Await.result(Http().singleRequest(request), 5.seconds)
+    val response = Await.result(Http()(typedSystem.toClassic).singleRequest(request), 5.seconds)
 
     response.status shouldBe StatusCodes.BadRequest
 

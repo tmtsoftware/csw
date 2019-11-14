@@ -5,8 +5,7 @@ import akka.actor.testkit.typed.scaladsl
 import akka.actor.typed.SpawnProtocol
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.{ActorSystem, CoordinatedShutdown, PoisonPill, typed}
-import akka.stream.Materializer
+import akka.actor.{CoordinatedShutdown, PoisonPill, typed}
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.testkit.TestProbe
 import csw.location.api.AkkaRegistrationFactory
@@ -44,10 +43,8 @@ class LocationServiceCompTest(mode: String)
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
-  implicit var untypedSystem: ActorSystem                            = _
   implicit var typedSystem: typed.ActorSystem[SpawnProtocol.Command] = _
   implicit var ec: ExecutionContext                                  = _
-  implicit var mat: Materializer                                     = _
   var clusterSystem: typed.ActorSystem[SpawnProtocol.Command]        = _
   private var locationService: LocationService                       = _
 
@@ -56,9 +53,7 @@ class LocationServiceCompTest(mode: String)
 
   override protected def beforeAll(): Unit = {
     typedSystem = ActorSystemFactory.remote(SpawnProtocol(), "test")
-    untypedSystem = typedSystem.toClassic
-    ec = untypedSystem.dispatcher
-    mat = Materializer(typedSystem)
+    ec = typedSystem.executionContext
     clusterSystem = ClusterAwareSettings.system
 
     locationService = mode match {
@@ -70,7 +65,7 @@ class LocationServiceCompTest(mode: String)
 
   override protected def afterAll(): Unit = {
     if (mode == "cluster") CoordinatedShutdown(clusterSystem.toClassic).run(UnknownReason).await
-    CoordinatedShutdown(untypedSystem).run(UnknownReason).await
+    CoordinatedShutdown(typedSystem.toClassic).run(UnknownReason).await
   }
 
   // DEOPSCSW-12: Create location service API
@@ -224,7 +219,7 @@ class LocationServiceCompTest(mode: String)
     val redis1Connection   = TcpConnection(models.ComponentId("redis1", ComponentType.Service))
     val redis1Registration = TcpRegistration(redis1Connection, Port)
 
-    val probe = TestProbe()
+    val probe = TestProbe()(typedSystem.toClassic)
 
     val switch = locationService.subscribe(redis1Connection, te => probe.ref ! te)
 

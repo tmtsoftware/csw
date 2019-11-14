@@ -19,9 +19,9 @@ abstract class LSNodeSpec[T <: NMembersAndSeed](val config: T, mode: String = "c
     with BeforeAndAfterAll {
 
   implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = system.toTyped.asInstanceOf[ActorSystem[SpawnProtocol.Command]]
-  protected val cswCluster: CswCluster                 = CswCluster.withSystem(typedSystem)
+  protected val cswCluster: CswCluster                         = CswCluster.withSystem(typedSystem)
   lazy protected val locationService: LocationService = mode match {
-    case "http"    => HttpLocationServiceFactory.makeLocalClient(typedSystem, cswCluster.mat)
+    case "http"    => HttpLocationServiceFactory.makeLocalClient(typedSystem)
     case "cluster" => LocationServiceFactory.withCluster(cswCluster)
   }
 

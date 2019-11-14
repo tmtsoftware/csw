@@ -3,7 +3,6 @@ package csw.testkit
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorRef, SpawnProtocol}
 import akka.actor.{typed, ActorSystem}
-import akka.stream.Materializer
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
@@ -47,7 +46,6 @@ final class FrameworkTestKit private (
   implicit lazy val system: ActorSystem     = actorSystem.toClassic
   lazy val frameworkWiring: FrameworkWiring = FrameworkWiring.make(actorSystem)
   implicit lazy val ec: ExecutionContext    = frameworkWiring.actorRuntime.ec
-  implicit lazy val mat: Materializer       = frameworkWiring.actorRuntime.mat
 
   implicit val timeout: Timeout = locationTestKit.timeout
 

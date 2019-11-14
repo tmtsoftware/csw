@@ -1,10 +1,9 @@
 package csw.event.cli
 
-import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
+import csw.commons.ResourceReader
 import csw.event.cli.IterableExtensions.RichStringIterable
 import csw.event.client.helpers.TestFutureExt.RichFuture
-import csw.commons.ResourceReader
 import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.KeyType.{IntKey, StringKey}
 import csw.params.core.models.Id
@@ -174,8 +173,6 @@ class CommandLineRunnerTest extends SeedData with Eventually {
   // DEOPSCSW-433: [Event Cli] Subscribe command
   test("should be able to subscribe and get json output to event key") {
 
-    implicit val mat: Materializer = actorRuntime.mat
-
     val eventGenerator = new EventGenerator(EventName("system_1"))
     import eventGenerator._
     val eventKey: EventKey = eventsGroup.head.eventKey
@@ -203,8 +200,6 @@ class CommandLineRunnerTest extends SeedData with Eventually {
   test("should be able to subscribe to event key and get oneline output") {
     import cliWiring._
 
-    implicit val mat: Materializer = actorRuntime.mat
-
     val eventGenerator = new EventGenerator(EventName("system_2"))
     import eventGenerator._
 
@@ -227,8 +222,6 @@ class CommandLineRunnerTest extends SeedData with Eventually {
   // DEOPSCSW-433: [Event Cli] Subscribe command
   test("should be able to subscribe to event key using terse mode and get oneline output") {
     import cliWiring._
-
-    implicit val mat: Materializer = actorRuntime.mat
 
     val eventGenerator = new EventGenerator(EventName("system_3"))
     import eventGenerator._

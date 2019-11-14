@@ -3,7 +3,6 @@ package csw.config.client.commons
 import java.nio.file.{Files, Path}
 
 import akka.actor.typed.ActorSystem
-import akka.stream.Materializer
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.config.api.exceptions.{FileNotFound, LocalFileNotFound, UnableToParseOptions}
 import csw.config.api.scaladsl.ConfigClientService
@@ -11,7 +10,7 @@ import csw.config.api.scaladsl.ConfigClientService
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
 
-class ConfigUtils(configClientService: ConfigClientService)(implicit system: ActorSystem[_], mat: Materializer) {
+class ConfigUtils(configClientService: ConfigClientService)(implicit system: ActorSystem[_]) {
 
   import system.executionContext
 

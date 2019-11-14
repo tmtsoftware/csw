@@ -34,7 +34,6 @@ class DetectAkkaComponentCrashTestMultiJvmNode3 extends DetectAkkaComponentCrash
 class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec(config = new TwoMembersAndSeed, mode) {
 
   import config._
-  import cswCluster.mat
 
   // DEOPSCSW-15: Spike jmDNS/CRDT perf
   // DEOPSCSW-35: CRDT detects comp/service crash

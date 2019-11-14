@@ -27,7 +27,9 @@ class CommandLineRunner(
     configUtils: ConfigUtils,
     printLine: Any => Unit
 ) {
-  import actorRuntime._
+  import actorRuntime.typedSystem
+  import actorRuntime.ec
+  import actorRuntime.coordinatedShutdown
 
   private[alarm] val alarmService: AlarmServiceImpl = new AlarmServiceFactory().makeAlarmImpl(locationService)
 

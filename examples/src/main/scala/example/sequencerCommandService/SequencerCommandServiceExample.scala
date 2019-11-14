@@ -1,7 +1,6 @@
 package example.sequencerCommandService
 
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.stream.Materializer
 import csw.command.client.SequencerCommandServiceFactory
 import csw.command.client.internal.SequencerCommandServiceImpl
 import csw.location.client.ActorSystemFactory
@@ -17,11 +16,10 @@ import scala.concurrent.duration.DurationLong
 
 object SequencerCommandServiceExample extends App {
 
-  implicit val mat: Materializer = Materializer(typedSystem)
   implicit lazy val typedSystem: ActorSystem[SpawnProtocol.Command] =
     ActorSystemFactory.remote(SpawnProtocol(), "sequencer-system")
 
-  private val locationService = HttpLocationServiceFactory.makeLocalClient(typedSystem, mat)
+  private val locationService = HttpLocationServiceFactory.makeLocalClient(typedSystem)
 
   // #create-sequence-command-service
   private val connection             = AkkaConnection(ComponentId("sequencer", ComponentType.Sequencer))

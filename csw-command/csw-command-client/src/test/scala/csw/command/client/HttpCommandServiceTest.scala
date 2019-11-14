@@ -1,6 +1,5 @@
 package csw.command.client
 
-import akka.actor
 import akka.actor.typed
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.javadsl.Behaviors
@@ -8,7 +7,6 @@ import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives.{entity, _}
 import akka.http.scaladsl.server.Route
-import akka.stream.Materializer
 import akka.util.Timeout
 import csw.location.client.HttpCodecs
 import csw.location.client.scaladsl.HttpLocationServiceFactory
@@ -33,13 +31,12 @@ import scala.concurrent.{ExecutionContext, Future}
 //noinspection ScalaStyle
 class HttpCommandServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with HTTPLocationService {
 
-  implicit val typedSystem: typed.ActorSystem[_] = ActorSystem(Behaviors.empty, "HttpCommandServiceTest")
-  implicit val untypedSystem: actor.ActorSystem  = typedSystem.toClassic
-  implicit val ec: ExecutionContext              = typedSystem.executionContext
-  implicit val mat: Materializer                 = Materializer(typedSystem)
-  implicit val timeout: Timeout                  = Timeout(5.seconds)
+  val typedSystem: typed.ActorSystem[_] = ActorSystem(Behaviors.empty, "HttpCommandServiceTest")
+  implicit val classicSystem            = typedSystem.toClassic
+  implicit val ec: ExecutionContext     = typedSystem.executionContext
+  implicit val timeout: Timeout         = Timeout(5.seconds)
 
-  private val locationService = HttpLocationServiceFactory.makeLocalClient
+  private val locationService = HttpLocationServiceFactory.makeLocalClient(typedSystem)
   private val testCompName    = "testComponent"
   private val connection      = HttpConnection(ComponentId(testCompName, ComponentType.Service))
 
@@ -160,7 +157,7 @@ class HttpCommandServiceTest extends FunSuite with Matchers with BeforeAndAfterA
       )
   }
 
-  private val server = Http()
+  private val server = Http()(typedSystem.toClassic)
     .bindAndHandle(
       handler = new CommandRoutes().route,
       interface = "0.0.0.0",

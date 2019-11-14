@@ -2,10 +2,10 @@ package csw.command.client.models.matchers
 
 import java.util.concurrent.CompletableFuture
 
-import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.adapter._
+import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.{Keep, Sink, Source}
-import akka.stream.{KillSwitches, Materializer, OverflowStrategy}
+import akka.stream.{KillSwitches, OverflowStrategy}
 import csw.command.api.StateMatcher
 import csw.command.client.messages.ComponentCommonMessage.ComponentStateSubscription
 import csw.command.client.models.framework.PubSub.Subscribe
@@ -13,7 +13,7 @@ import csw.command.client.models.matchers.MatcherResponses.{MatchCompleted, Matc
 import csw.params.core.states.CurrentState
 
 import scala.compat.java8.FutureConverters.FutureOps
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 /**
@@ -26,17 +26,18 @@ import scala.util.{Failure, Success}
 class Matcher(
     currentStateSource: ActorRef[ComponentStateSubscription],
     stateMatcher: StateMatcher
-)(implicit ec: ExecutionContext, mat: Materializer) {
+)(implicit system: ActorSystem[_]) {
 
   /**
    * Start the matching process
    *
    * @return the result of matching as a Future value of MatcherResponse
    */
-  def start: Future[MatcherResponse] = currentStateF.transform {
-    case Success(_)  => Success(MatchCompleted)
-    case Failure(ex) => Success(MatchFailed(ex))
-  }
+  def start: Future[MatcherResponse] =
+    currentStateF.transform {
+      case Success(_)  => Success(MatchCompleted)
+      case Failure(ex) => Success(MatchFailed(ex))
+    }(system.executionContext)
 
   /**
    * Start the matching process from Java application
@@ -50,22 +51,22 @@ class Matcher(
    * in command execution, the matching was started before knowing the actual result of validation and the validation failed.
    *
    * {{{
-      val matcherResponseF: Future[MatcherResponse] = matcher.start
-
-      val eventualCommandResponse: Future[CommandResponse] = async {
-        val initialResponse = await(assemblyComponent.oneway(setupWithMatcher))
-        initialResponse match {
-          case _: Accepted =>
-            val matcherResponse = await(matcherResponseF)
-            matcherResponse match {
-              case MatchCompleted  => Completed(setupWithMatcher.runId)
-              case MatchFailed(ex) => Error(setupWithMatcher.runId, ex.getMessage)
-            }
-          case invalid: Invalid =>
-            matcher.stop()
-            invalid
-          case x => x
-        }
+   *val matcherResponseF: Future[MatcherResponse] = matcher.start
+ **
+ val eventualCommandResponse: Future[CommandResponse] = async {
+   *val initialResponse = await(assemblyComponent.oneway(setupWithMatcher))
+   *initialResponse match {
+   *case _: Accepted =>
+   *val matcherResponse = await(matcherResponseF)
+   *matcherResponse match {
+   *case MatchCompleted  => Completed(setupWithMatcher.runId)
+   *case MatchFailed(ex) => Error(setupWithMatcher.runId, ex.getMessage)
+   *}
+   *case invalid: Invalid =>
+   *matcher.stop()
+   *invalid
+   *case x => x
+   *}
    * }}}
    */
   def stop(): Unit = killSwitch.abort(MatchAborted(stateMatcher.prefix))

@@ -6,9 +6,7 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior, SpawnProtocol}
 import akka.actor.{Actor, ActorSystem, CoordinatedShutdown, Props, typed}
 import akka.stream.scaladsl.{Keep, Sink}
-import akka.stream.typed.scaladsl
 import akka.stream.typed.scaladsl.ActorSink
-import akka.stream.{ActorMaterializer, Materializer}
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.framework.commons.CoordinatedShutdownReasons.ActorTerminatedReason
@@ -50,10 +48,8 @@ object LocationServiceExampleClientApp extends App {
     ActorSystemFactory.remote(SpawnProtocol(), "csw-examples-locationServiceClient")
   //#create-actor-system
 
-  implicit val mat: Materializer = Materializer(typedSystem)
-
   //#create-location-service
-  private val locationService = HttpLocationServiceFactory.makeLocalClient(typedSystem, mat)
+  private val locationService = HttpLocationServiceFactory.makeLocalClient(typedSystem)
   //#create-location-service
 
   //#create-logging-system
@@ -74,7 +70,7 @@ object ExampleMessages {
 
 object LocationServiceExampleClient {
 
-  def props(locationService: LocationService, loggingSystem: LoggingSystem)(implicit mat: Materializer): Props =
+  def props(locationService: LocationService, loggingSystem: LoggingSystem): Props =
     Props(new LocationServiceExampleClient(locationService, loggingSystem))
 
   def locationInfoToString(loc: Location): String = {
@@ -103,8 +99,7 @@ object LocationServiceExampleClient {
 /**
  * A test client actor that uses the location service to resolve services
  */
-class LocationServiceExampleClient(locationService: LocationService, loggingSystem: LoggingSystem)(implicit mat: Materializer)
-    extends akka.actor.Actor {
+class LocationServiceExampleClient(locationService: LocationService, loggingSystem: LoggingSystem) extends akka.actor.Actor {
 
   val log: Logger = new LoggerFactory("my-component-name").getLogger(context)
 

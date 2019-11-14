@@ -10,7 +10,7 @@ import csw.logging.models.codecs.LoggingCodecs
  * Routes supported by Admin server
  *
  * @param logAdmin instance of log admin to which the routes will delegate operations
- * @param actorRuntime actorRuntime provides runtime accessories related to ActorSystem like Materializer, ExecutionContext etc.
+ * @param actorRuntime actorRuntime provides runtime accessories related to ActorSystem like ExecutionContext etc.
  * @param adminExceptionHandlers exception handler which maps server side exceptions to Http Status codes
  */
 class AdminRoutes(logAdmin: LogAdmin, actorRuntime: ActorRuntime, adminExceptionHandlers: AdminExceptionHandlers)

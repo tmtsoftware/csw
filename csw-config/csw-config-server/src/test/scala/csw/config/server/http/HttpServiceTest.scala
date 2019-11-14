@@ -5,7 +5,6 @@ import java.net.BindException
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
-import akka.stream.Materializer
 import csw.aas.core.commons.AASConnection
 import csw.config.server.ServerWiring
 import csw.config.server.commons.ConfigServiceConnection
@@ -22,7 +21,6 @@ import scala.util.control.NonFatal
 class HttpServiceTest extends HTTPLocationService {
 
   implicit val system: ActorSystem[_]              = ActorSystem(Behaviors.empty, "test")
-  implicit val mat: Materializer                   = Materializer(system)
   private val testLocationService: LocationService = HttpLocationServiceFactory.makeLocalClient
 
   //register AAS with location service

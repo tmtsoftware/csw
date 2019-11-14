@@ -3,7 +3,6 @@ package csw.framework.javadsl.components;
 import akka.actor.Cancellable;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Adapter;
-import akka.stream.Materializer;
 import akka.stream.ThrottleMode;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
@@ -189,8 +188,8 @@ public class JSampleComponentHandlers extends JComponentHandlers {
                     currentStatePublisher.publish(new CurrentState(controlCommand.source(), new StateName("testStateName")).add(JKeyType.IntKey().make("encoder").set(i * 10)));
                     return i;
                 })
-                .throttle(1, Duration.ofMillis(100), 1, (ThrottleMode)ThrottleMode.shaping())
-                .runWith(Sink.ignore(), Materializer.createMaterializer(Adapter.toClassic(actorContext.getSystem())));
+                .throttle(1, Duration.ofMillis(100), 1, (ThrottleMode) ThrottleMode.shaping())
+                .runWith(Sink.ignore(), actorContext.getSystem());
     }
 
 

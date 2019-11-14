@@ -5,7 +5,6 @@ import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpRequest, ResponseEntity, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshaller
-import akka.stream.Materializer
 import example.auth.installed.commands.ReadCommand.convertToString
 
 import scala.concurrent.duration.DurationLong
@@ -24,7 +23,6 @@ class ReadCommand(implicit val actorSystem: typed.ActorSystem[_]) extends AppCom
 object ReadCommand {
   def convertToString(entity: ResponseEntity)(implicit actorSystem: typed.ActorSystem[_]): String = {
     implicit val ec: ExecutionContext = actorSystem.executionContext
-    implicit val mat: Materializer    = Materializer(actorSystem)
     Await.result(Unmarshaller.stringUnmarshaller(entity), 2.seconds)
   }
 }

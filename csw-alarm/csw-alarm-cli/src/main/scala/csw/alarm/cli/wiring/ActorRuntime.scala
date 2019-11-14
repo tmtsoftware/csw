@@ -4,7 +4,6 @@ import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.stream.Materializer
 import akka.{Done, actor}
 import csw.alarm.cli.BuildInfo
 import csw.logging.client.internal.LoggingSystem
@@ -17,7 +16,6 @@ class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol.Command]) {
   implicit lazy val typedSystem: ActorSystem[SpawnProtocol.Command] = _typedSystem
   implicit lazy val untypedSystem: actor.ActorSystem                = _typedSystem.toClassic
   implicit lazy val ec: ExecutionContextExecutor                    = untypedSystem.dispatcher
-  implicit lazy val mat: Materializer                               = Materializer(typedSystem)
 
   lazy val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(untypedSystem)
 

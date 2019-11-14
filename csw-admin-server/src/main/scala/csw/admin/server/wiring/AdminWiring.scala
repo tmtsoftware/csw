@@ -16,7 +16,7 @@ class AdminWiring {
   lazy val actorSystem: typed.ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "admin-server")
   lazy val actorRuntime                                          = new ActorRuntime(actorSystem)
 
-  lazy val locationService: LocationService   = HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
+  lazy val locationService: LocationService   = HttpLocationServiceFactory.makeLocalClient(actorSystem)
   lazy val logAdmin: LogAdmin                 = new LogAdmin(locationService, actorRuntime)
   lazy val adminHandlers                      = new AdminExceptionHandlers
   lazy val adminRoutes                        = new AdminRoutes(logAdmin, actorRuntime, adminHandlers)
@@ -28,7 +28,7 @@ object AdminWiring {
   def make(maybeAdminPort: Option[Int], locationHost: String = "localhost"): AdminWiring =
     new AdminWiring {
       override lazy val locationService: LocationService =
-        HttpLocationServiceFactory.make(locationHost)(actorSystem, actorRuntime.mat)
+        HttpLocationServiceFactory.make(locationHost)(actorSystem)
 
       override lazy val settings: Settings = new Settings(config) {
         override val adminPort: Int = maybeAdminPort.getOrElse(super.adminPort)

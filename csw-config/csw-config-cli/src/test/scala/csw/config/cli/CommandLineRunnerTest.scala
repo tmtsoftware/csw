@@ -6,7 +6,6 @@ import java.time.Instant
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.typed
 import akka.actor.typed.scaladsl.Behaviors
-import akka.stream.Materializer
 import csw.aas.installed.api.InstalledAppAuthAdapter
 import csw.config.cli.args.{ArgsParser, Options}
 import csw.config.cli.wiring.Wiring
@@ -25,8 +24,7 @@ import org.scalatest.{BeforeAndAfterEach, Matchers}
 class CommandLineRunnerTest extends HTTPLocationService with Matchers with BeforeAndAfterEach with MockedAuthentication {
 
   private val clientSystem: typed.ActorSystem[_]         = typed.ActorSystem(Behaviors.empty, "config-cli")
-  private val clientMat: Materializer                    = Materializer(clientSystem)
-  private val locationService                            = HttpLocationServiceFactory.makeLocalClient(clientSystem, clientMat)
+  private val locationService                            = HttpLocationServiceFactory.makeLocalClient(clientSystem)
   private val nativeAuthAdapter: InstalledAppAuthAdapter = mock[InstalledAppAuthAdapter]
   private val clientWiring                               = Wiring.noPrinting(locationService, factory, nativeAuthAdapter)
 

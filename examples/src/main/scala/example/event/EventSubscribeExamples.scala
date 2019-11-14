@@ -1,8 +1,7 @@
 package example.event
 
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
-import akka.actor.typed.{ActorRef, Behavior}
-import akka.stream.Materializer
+import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import akka.stream.scaladsl.Sink
 import csw.command.client.messages.TopLevelActorMessage
 import csw.event.api.scaladsl.{EventService, EventSubscription, SubscriptionModes}
@@ -13,7 +12,7 @@ import csw.params.events.{Event, EventKey, EventName}
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
 
-class EventSubscribeExamples(eventService: EventService, hcd: AkkaLocation)(implicit mat: Materializer) {
+class EventSubscribeExamples(eventService: EventService, hcd: AkkaLocation)(implicit system: ActorSystem[_]) {
 
   def callback(): EventSubscription =
     //#with-callback
