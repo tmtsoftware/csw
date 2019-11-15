@@ -18,9 +18,9 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
  */
 class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol.Command]) {
   implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = _typedSystem
-  implicit val untypedSystem: actor.ActorSystem                = _typedSystem.toClassic
   implicit val ec: ExecutionContextExecutor                    = typedSystem.executionContext
-  lazy val coordinatedShutdown: CoordinatedShutdown            = CoordinatedShutdown(untypedSystem)
+  val classicSystem: actor.ActorSystem                         = typedSystem.toClassic
+  lazy val coordinatedShutdown: CoordinatedShutdown            = CoordinatedShutdown(classicSystem)
 
   def startLogging(name: String): LoggingSystem =
     LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, typedSystem)

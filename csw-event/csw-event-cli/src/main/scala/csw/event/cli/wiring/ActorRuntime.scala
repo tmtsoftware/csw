@@ -1,6 +1,6 @@
 package csw.event.cli.wiring
 
-import akka.Done
+import akka.{Done, actor}
 import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
@@ -16,7 +16,8 @@ class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol.Command]) {
   implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = _typedSystem
   implicit val ec: ExecutionContextExecutor                    = typedSystem.executionContext
 
-  val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(typedSystem.toClassic)
+  val classicSystem: actor.ActorSystem         = typedSystem.toClassic
+  val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(classicSystem)
 
   def startLogging(name: String): LoggingSystem =
     LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, typedSystem)

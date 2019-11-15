@@ -1,10 +1,10 @@
 package csw.location.agent.wiring
 
+import akka.{Done, actor}
+import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.{ActorSystem, Scheduler, SpawnProtocol}
-import akka.actor.CoordinatedShutdown
-import akka.{Done, actor}
 import csw.location.agent.BuildInfo
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.scaladsl.LoggingSystemFactory
@@ -14,11 +14,11 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 
 private[agent] class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol.Command]) {
   implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = _typedSystem
-  implicit val untypedSystem: actor.ActorSystem                = _typedSystem.toClassic
   implicit val ec: ExecutionContextExecutor                    = typedSystem.executionContext
   implicit val scheduler: Scheduler                            = typedSystem.scheduler
 
-  val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(untypedSystem)
+  val classicSystem: actor.ActorSystem         = typedSystem.toClassic
+  val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(classicSystem)
 
   def startLogging(name: String): LoggingSystem =
     LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, typedSystem)

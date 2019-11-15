@@ -1,14 +1,13 @@
 package csw.location.server.http
 
+import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import csw.location.server.internal.{ActorRuntime, Settings}
 
 import scala.concurrent.Future
 
 class LocationHttpService(locationRoutes: LocationRoutes, actorRuntime: ActorRuntime, settings: Settings) {
-
-  import actorRuntime.untypedSystem
-
+  implicit val classicSystem: ActorSystem = actorRuntime.classicSystem
   def start(): Future[Http.ServerBinding] = {
     Http().bindAndHandle(
       handler = locationRoutes.routes,

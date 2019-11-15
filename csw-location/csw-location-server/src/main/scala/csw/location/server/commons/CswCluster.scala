@@ -1,6 +1,6 @@
 package csw.location.server.commons
 
-import akka.Done
+import akka.{Done, actor}
 import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.AskPattern._
@@ -38,11 +38,11 @@ class CswCluster private (_typedSystem: ActorSystem[SpawnProtocol.Command]) {
   val hostname: String = _typedSystem.settings.config.getString("akka.remote.artery.canonical.hostname")
 
   implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = _typedSystem
-//  implicit val untypedSystem: actor.ActorSystem                = _typedSystem.toClassic
-  implicit val ec: ExecutionContext            = typedSystem.executionContext
-  implicit val cluster: Cluster                = Cluster(typedSystem)
-  private val distributedData: DistributedData = scaladsl.DistributedData(typedSystem)
-  implicit val node: SelfUniqueAddress         = distributedData.selfUniqueAddress
+  val untypedSystem: actor.ActorSystem                         = _typedSystem.toClassic
+  implicit val ec: ExecutionContext                            = typedSystem.executionContext
+  implicit val cluster: Cluster                                = Cluster(typedSystem)
+  private val distributedData: DistributedData                 = scaladsl.DistributedData(typedSystem)
+  implicit val node: SelfUniqueAddress                         = distributedData.selfUniqueAddress
 
   /**
    * Gives the replicator for the current ActorSystem

@@ -52,7 +52,7 @@ public class JConfigClientBaseSuite extends JMockedAuthentication {
         Await.result(httpService.shutdown(CoordinatedShutdown.unknownReason()), timeout);
         actorRuntime.typedSystem().terminate();
         Await.result(actorRuntime.typedSystem().whenTerminated(), timeout);
-        Await.result(serverWiring.actorRuntime().untypedSystem().terminate(), timeout);
+        Await.result(serverWiring.actorRuntime().classicSystem().terminate(), timeout);
         Await.result(locationWiring.actorRuntime().shutdown(CoordinatedShutdown.unknownReason()), timeout);
     }
 }

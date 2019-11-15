@@ -1,6 +1,6 @@
 package csw.config.client.internal
 
-import akka.Done
+import akka.{Done, actor}
 import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.ActorSystem
@@ -16,7 +16,8 @@ private[csw] class ActorRuntime(_typedSystem: ActorSystem[_] = ActorSystem(Behav
   implicit val typedSystem: ActorSystem[_]  = _typedSystem
   implicit val ec: ExecutionContextExecutor = typedSystem.executionContext
 
-  val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(typedSystem.toClassic)
+  val classicSystem: actor.ActorSystem         = typedSystem.toClassic
+  val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(classicSystem)
 
   /**
    * The shutdown method helps self node to gracefully quit the akka cluster. It is used by `csw-config-cli`

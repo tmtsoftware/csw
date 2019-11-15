@@ -2,7 +2,7 @@ package csw.config.server
 
 import java.util.concurrent.CompletableFuture
 
-import akka.{actor, Done}
+import akka.{Done, actor}
 import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
@@ -20,12 +20,12 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
  */
 private[config] class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol.Command], val settings: Settings) {
   implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = _typedSystem
-  implicit val untypedSystem: actor.ActorSystem                = _typedSystem.toClassic
   implicit val ec: ExecutionContextExecutor                    = typedSystem.executionContext
 
-  val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(untypedSystem)
+  val classicSystem: actor.ActorSystem         = typedSystem.toClassic
+  val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(classicSystem)
 
-  val blockingIoDispatcher: MessageDispatcher = untypedSystem.dispatchers.lookup(settings.`blocking-io-dispatcher`)
+  val blockingIoDispatcher: MessageDispatcher = classicSystem.dispatchers.lookup(settings.`blocking-io-dispatcher`)
 
   def startLogging(name: String): LoggingSystem =
     LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, typedSystem)
