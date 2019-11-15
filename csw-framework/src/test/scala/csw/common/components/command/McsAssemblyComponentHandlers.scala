@@ -9,7 +9,7 @@ import csw.command.client.messages.TopLevelActorMessage
 import csw.common.components.command.ComponentStateForCommand.{longRunningCmdCompleted, _}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.models.{AkkaLocation, TrackingEvent}
+import csw.location.models.{HttpLocation, TrackingEvent}
 import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandIssue, ControlCommand, Setup}
@@ -35,7 +35,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
   override def initialize(): Future[Unit] = {
     componentInfo.connections.headOption match {
       case Some(hcd) =>
-        cswCtx.locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
+        cswCtx.locationService.resolve(hcd.of[HttpLocation], 5.seconds).map {
           case Some(akkaLocation) => hcdComponent = CommandServiceFactory.make(akkaLocation)(ctx.system)
           case None               => throw new RuntimeException("Could not resolve hcd location, Initialization failure.")
         }

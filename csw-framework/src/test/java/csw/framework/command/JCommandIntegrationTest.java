@@ -22,7 +22,8 @@ import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import csw.location.models.AkkaLocation;
 import csw.location.models.ComponentId;
-import csw.location.models.Connection.AkkaConnection;
+import csw.location.models.Connection;
+import csw.location.models.HttpLocation;
 import csw.location.server.http.JHTTPLocationService;
 import csw.params.commands.CommandIssue;
 import csw.params.commands.CommandResponse;
@@ -74,7 +75,8 @@ public class JCommandIntegrationTest extends JUnitSuite {
     private static JHTTPLocationService jHttpLocationService;
     private static ILocationService locationService;
     private static ICommandService hcdCmdService;
-    private static AkkaLocation hcdLocation;
+    private static HttpLocation hcdLocation;
+    private static AkkaLocation hcdLocation2;
     private Timeout timeout = new Timeout(5, TimeUnit.SECONDS);
 
     @BeforeClass
@@ -83,7 +85,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         jHttpLocationService.beforeAll();
 
         locationService = JHttpLocationServiceFactory.makeLocalClient(hcdActorSystem);
-        hcdLocation = getLocation();
+        getLocation();
         hcdCmdService = CommandServiceFactory.jMake(hcdLocation, hcdActorSystem);
     }
 
@@ -94,17 +96,22 @@ public class JCommandIntegrationTest extends JUnitSuite {
         jHttpLocationService.afterAll();
     }
 
-    private static AkkaLocation getLocation() throws Exception {
+    private static void getLocation() throws Exception {
         RedisClient redisClient = null;
         FrameworkWiring wiring = FrameworkWiring.make(hcdActorSystem, redisClient);
         Await.result(Standalone.spawn(ConfigFactory.load("aps_hcd_java.conf"), wiring), new FiniteDuration(5, TimeUnit.SECONDS));
 
-        AkkaConnection akkaConnection = new AkkaConnection(new ComponentId("Test_Component_Running_Long_Command_Java", JComponentType.HCD()));
-        CompletableFuture<Optional<AkkaLocation>> eventualLocation = locationService.resolve(akkaConnection, java.time.Duration.ofSeconds(5));
-        Optional<AkkaLocation> maybeLocation = eventualLocation.get();
-        Assert.assertTrue(maybeLocation.isPresent());
+        Connection.HttpConnection akkaConnection = new Connection.HttpConnection(new ComponentId("Test_Component_Running_Long_Command_Java", JComponentType.HCD()));
+        Connection.AkkaConnection akkaConnection2 = new Connection.AkkaConnection(new ComponentId("Test_Component_Running_Long_Command_Java", JComponentType.HCD()));
 
-        return maybeLocation.orElseThrow();
+        CompletableFuture<Optional<HttpLocation>> eventualLocation = locationService.resolve(akkaConnection, java.time.Duration.ofSeconds(5));
+        CompletableFuture<Optional<AkkaLocation>> eventualLocation2 = locationService.resolve(akkaConnection2, java.time.Duration.ofSeconds(5));
+        Optional<HttpLocation> maybeLocation = eventualLocation.get();
+        Optional<AkkaLocation> maybeLocation2 = eventualLocation2.get();
+
+        Assert.assertTrue(maybeLocation.isPresent());
+        hcdLocation = maybeLocation.orElseThrow();
+        hcdLocation2 = maybeLocation2.orElseThrow();
     }
 
     @Test
@@ -414,7 +421,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         FiniteDuration duration = new FiniteDuration(5, TimeUnit.SECONDS);
 
         // Lock component
-        AkkaLocationExt.RichAkkaLocation(hcdLocation).componentRef(hcdActorSystem).tell(new SupervisorLockMessage.Lock(prefix(), probe.ref(), duration));
+        AkkaLocationExt.RichAkkaLocation(hcdLocation2).componentRef(hcdActorSystem).tell(new SupervisorLockMessage.Lock(prefix(), probe.ref(), duration));
         probe.expectMessage(LockingResponse.lockAcquired());
 
         Key<Integer> intKey2 = JKeyType.IntKey().make("encoder");
@@ -429,7 +436,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Assert.assertTrue(actualLockedCmdResponse instanceof CommandResponse.Locked);
 
         // Unlock component
-        AkkaLocationExt.RichAkkaLocation(hcdLocation).componentRef(hcdActorSystem).tell(new SupervisorLockMessage.Unlock(prefix(), probe.ref()));
+        AkkaLocationExt.RichAkkaLocation(hcdLocation2).componentRef(hcdActorSystem).tell(new SupervisorLockMessage.Unlock(prefix(), probe.ref()));
         probe.expectMessage(LockingResponse.lockReleased());
 
         CompletableFuture<CommandResponse.SubmitResponse> cmdAfterUnlockResCompletableFuture = hcdCmdService.submit(imdSetupCommand, timeout);

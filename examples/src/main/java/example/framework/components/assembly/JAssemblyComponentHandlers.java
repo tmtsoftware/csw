@@ -225,7 +225,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                             if (commandResponse instanceof CommandResponse.Completed) {
                                 // As the commands get completed, the results are updated in the commandResponseManager
                                 // TODO: FIX ME
-                               commandResponseManager.updateCommand(commandResponse);
+                                commandResponseManager.updateCommand(commandResponse);
                             } else {
                                 // do something
                             }
@@ -293,7 +293,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         }
     }
 
-    private CompletableFuture<Optional<AkkaLocation>> resolveHcd() {
+    private CompletableFuture<Optional<HttpLocation>> resolveHcd() {
         // find a Hcd connection from the connections provided in componentInfo
         Optional<Connection> mayBeConnection = componentInfo.getConnections().stream()
                 .filter(connection -> connection.componentId().componentType() == JComponentType.HCD())
@@ -302,8 +302,8 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         // If an Hcd is found as a connection, resolve its location from location service and create other
         // required worker actors required by this assembly
         if (mayBeConnection.isPresent()) {
-            CompletableFuture<Optional<AkkaLocation>> resolve = locationService.resolve(mayBeConnection.orElseThrow().<AkkaLocation>of(), Duration.ofSeconds(5));
-            return resolve.thenCompose((Optional<AkkaLocation> resolvedHcd) -> {
+            CompletableFuture<Optional<HttpLocation>> resolve = locationService.resolve(mayBeConnection.orElseThrow().of(), Duration.ofSeconds(5));
+            return resolve.thenCompose((Optional<HttpLocation> resolvedHcd) -> {
                 if (resolvedHcd.isPresent())
                     return CompletableFuture.completedFuture(resolvedHcd);
                 else
@@ -335,14 +335,14 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
     private void resolveHcdAndCreateCommandService() throws ExecutionException, InterruptedException {
 
-        TypedConnection<AkkaLocation> hcdConnection = componentInfo.getConnections().stream()
+        TypedConnection<HttpLocation> hcdConnection = componentInfo.getConnections().stream()
                 .filter(connection -> connection.componentId().componentType() == JComponentType.HCD())
-                .findFirst().orElseThrow().<AkkaLocation>of();
+                .findFirst().orElseThrow().of();
 
         // #resolve-hcd-and-create-commandservice
-        CompletableFuture<Optional<AkkaLocation>> resolvedHcdLocation = locationService.resolve(hcdConnection, Duration.ofSeconds(5));
+        CompletableFuture<Optional<HttpLocation>> resolvedHcdLocation = locationService.resolve(hcdConnection, Duration.ofSeconds(5));
 
-        CompletableFuture<ICommandService> eventualCommandService = resolvedHcdLocation.thenApply((Optional<AkkaLocation> hcdLocation) -> {
+        CompletableFuture<ICommandService> eventualCommandService = resolvedHcdLocation.thenApply((Optional<HttpLocation> hcdLocation) -> {
             if (hcdLocation.isPresent())
                 return CommandServiceFactory.jMake(hcdLocation.orElseThrow(), ctx.getSystem());
             else

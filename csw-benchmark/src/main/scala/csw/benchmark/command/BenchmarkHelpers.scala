@@ -13,8 +13,8 @@ import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.command.client.models.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.models.Connection.AkkaConnection
-import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.location.models.Connection.{AkkaConnection, HttpConnection}
+import csw.location.models.{ComponentId, ComponentType}
 import csw.location.server.commons.BlockingUtils
 
 import scala.concurrent.Await
@@ -30,10 +30,12 @@ object BenchmarkHelpers {
     val probe = TestProbe[SupervisorLifecycleState]
 
     Standalone.spawn(config, wiring)
-    val akkaLocation: AkkaLocation =
+    val akkaLocation =
+      Await.result(locationService.resolve(HttpConnection(ComponentId("Perf", ComponentType.HCD)), 5.seconds), 5.seconds).get
+    val akkaLocation2 =
       Await.result(locationService.resolve(AkkaConnection(ComponentId("Perf", ComponentType.HCD)), 5.seconds), 5.seconds).get
 
-    assertThatSupervisorIsRunning(akkaLocation.componentRef, probe, 5.seconds)
+    assertThatSupervisorIsRunning(akkaLocation2.componentRef, probe, 5.seconds)
 
     CommandServiceFactory.make(akkaLocation)
   }

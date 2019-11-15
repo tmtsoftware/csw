@@ -18,7 +18,7 @@ import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.client.ActorSystemFactory
 import csw.location.models.ComponentType.{Assembly, HCD}
-import csw.location.models.Connection.AkkaConnection
+import csw.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.location.models.{ComponentId, ComponentType}
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup
@@ -33,9 +33,10 @@ import scala.concurrent.{Await, ExecutionContext}
 class CommandIntegrationTests extends FrameworkIntegrationSuite {
   import testWiring._
 
-  private val irisContainerConnection  = AkkaConnection(ComponentId("WFOS_Container", ComponentType.Container))
-  private val filterAssemblyConnection = AkkaConnection(ComponentId("FilterASS", Assembly))
-  private val filterHCDConnection      = AkkaConnection(ComponentId("FilterHCD", HCD))
+  private val irisContainerConnection   = AkkaConnection(ComponentId("WFOS_Container", ComponentType.Container))
+  private val filterAssemblyConnection  = HttpConnection(ComponentId("FilterASS", Assembly))
+  private val filterAssemblyConnection2 = AkkaConnection(ComponentId("FilterASS", Assembly))
+  private val filterHCDConnection       = HttpConnection(ComponentId("FilterHCD", HCD))
   private val containerActorSystem: ActorSystem[SpawnProtocol.Command] =
     ActorSystemFactory.remote(SpawnProtocol(), "container-system")
   val obsId                         = Some(ObsId("Obs001"))
@@ -81,8 +82,9 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
     components.size shouldBe 2
 
     // resolve all the components from container using location service
-    val filterAssemblyLocation = seedLocationService.find(filterAssemblyConnection).await
-    val filterHCDLocation      = seedLocationService.find(filterHCDConnection).await
+    val filterAssemblyLocation  = seedLocationService.find(filterAssemblyConnection).await
+    val filterAssemblyLocation2 = seedLocationService.find(filterAssemblyConnection2).await
+    val filterHCDLocation       = seedLocationService.find(filterHCDConnection).await
 
     filterAssemblyLocation.isDefined shouldBe true
     filterHCDLocation.isDefined shouldBe true
@@ -96,12 +98,12 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
     filterHcdCS.subscribeCurrentState(filterHCDStateProbe.ref ! _)
 
     // Subscribe to component's lifecycle state
-    filterAssemblyLocation.foreach(
+    filterAssemblyLocation2.foreach(
       l => l.componentRef ! LifecycleStateSubscription(PubSub.Subscribe(assemblyLifecycleStateProbe.ref))
     )
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
-    filterAssemblyLocation.foreach(l => l.componentRef ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref))
+    filterAssemblyLocation2.foreach(l => l.componentRef ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref))
 
     // make sure that all the components are in running lifecycle state before sending lifecycle messages
     supervisorLifecycleStateProbe.expectMessage(SupervisorLifecycleState.Running)

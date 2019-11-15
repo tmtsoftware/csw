@@ -83,6 +83,7 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
 
       case Setup(_, CommandName("time.service.scheduler.success"), _, _) =>
         timeServiceScheduler.scheduleOnce(UTCTime.now()) {
+          println("*********************************************")
           currentStatePublisher.publish(CurrentState(prefix, timeServiceSchedulerState))
         }
 

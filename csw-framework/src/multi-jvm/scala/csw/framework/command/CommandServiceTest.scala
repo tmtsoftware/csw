@@ -12,8 +12,8 @@ import csw.command.client.models.framework.LockingResponse.LockAcquired
 import csw.common.utils.LockCommandFactory
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.location.models.Connection.AkkaConnection
-import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.location.models.Connection.{AkkaConnection, HttpConnection}
+import csw.location.models.{ComponentId, ComponentType}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
@@ -124,14 +124,16 @@ class CommandServiceTest(ignore: Int)
       enterBarrier("spawned")
 
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
-      val assemblyLocF                   = locationService.resolve(AkkaConnection(ComponentId("Assembly", ComponentType.Assembly)), 5.seconds)
-      val assemblyLocation: AkkaLocation = Await.result(assemblyLocF, 10.seconds).get
-      val assemblyCmdService             = CommandServiceFactory.make(assemblyLocation)
+      val assemblyLocF       = locationService.resolve(HttpConnection(ComponentId("Assembly", ComponentType.Assembly)), 5.seconds)
+      val assemblyLocF2       = locationService.resolve(AkkaConnection(ComponentId("Assembly", ComponentType.Assembly)), 5.seconds)
+      val assemblyLocation   = Await.result(assemblyLocF, 10.seconds).get
+      val assemblyLocation2   = Await.result(assemblyLocF2, 10.seconds).get
+      val assemblyCmdService = CommandServiceFactory.make(assemblyLocation)
 
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
-      val hcdLocF                   = locationService.resolve(AkkaConnection(ComponentId("HCD", ComponentType.HCD)), 5.seconds)
-      val hcdLocation: AkkaLocation = Await.result(hcdLocF, 10.seconds).get
-      val hcdCmdService             = CommandServiceFactory.make(hcdLocation)
+      val hcdLocF       = locationService.resolve(HttpConnection(ComponentId("HCD", ComponentType.HCD)), 5.seconds)
+      val hcdLocation   = Await.result(hcdLocF, 10.seconds).get
+      val hcdCmdService = CommandServiceFactory.make(hcdLocation)
 
       //#invalidCmd
       val invalidSetup    = Setup(prefix, invalidCmd, obsId)
@@ -392,7 +394,7 @@ class CommandServiceTest(ignore: Int)
 
       // acquire lock on assembly
       val lockResponseProbe = TestProbe[LockingResponse]
-      assemblyLocation.componentRef ! LockCommandFactory.make(prefix, lockResponseProbe.ref)
+      assemblyLocation2.componentRef ! LockCommandFactory.make(prefix, lockResponseProbe.ref)
       lockResponseProbe.expectMessage(LockAcquired)
 
       enterBarrier("assembly-locked")
@@ -401,12 +403,12 @@ class CommandServiceTest(ignore: Int)
 
       // send command with lock token and expect command processing response
       val assemblySetup = Setup(prefix, immediateCmd, obsId)
-      assemblyLocation.componentRef ! Submit(assemblySetup, submitResponseProbe.ref)
+      assemblyLocation2.componentRef ! Submit(assemblySetup, submitResponseProbe.ref)
       submitResponseProbe.expectMessageType[Completed](5.seconds)
 
       // send command with lock token and expect command processing response with result
       val assemblySetup2 = Setup(prefix, immediateResCmd, obsId)
-      assemblyLocation.componentRef ! Submit(assemblySetup2, submitResponseProbe.ref)
+      assemblyLocation2.componentRef ! Submit(assemblySetup2, submitResponseProbe.ref)
       submitResponseProbe.expectMessageType[Completed](5.seconds)
 
       enterBarrier("command-when-locked")

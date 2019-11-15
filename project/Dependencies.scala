@@ -205,7 +205,6 @@ object Dependencies {
 
   val Framework = Def.setting(
     Seq(
-      MSocket.`msocket-impl-jvm`,
       Libs.`enumeratum`.value,
       Libs.`config`,
       Akka.`akka-actor`,
@@ -226,6 +225,7 @@ object Dependencies {
 
   val CommandClient = Def.setting(
     Seq(
+      MSocket.`msocket-impl-jvm`,
       Libs.`enumeratum`.value,
       Libs.`config`,
       Libs.`play-json`.value,

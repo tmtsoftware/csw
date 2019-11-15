@@ -15,7 +15,7 @@ import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.location.client.ActorSystemFactory
 import csw.location.models
 import csw.location.models.ComponentType.{Assembly, HCD}
-import csw.location.models.Connection.AkkaConnection
+import csw.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.location.models.{ComponentId, HttpRegistration, TcpRegistration}
 import csw.params.commands
 import csw.params.commands.CommandName
@@ -28,8 +28,9 @@ import scala.concurrent.duration.DurationLong
 class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 
-  private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
-  private val disperserHcdConnection   = AkkaConnection(ComponentId("Disperser", HCD))
+  private val filterAssemblyConnection = HttpConnection(ComponentId("Filter", Assembly))
+  private val disperserHcdConnection   = HttpConnection(ComponentId("Disperser", HCD))
+  private val disperserHcdConnection2  = AkkaConnection(ComponentId("Disperser", HCD))
 
   override def afterAll(): Unit = {
     super.afterAll()
@@ -55,10 +56,11 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
     // resolve all the components from container using location service
     val filterAssemblyLocation = wiring.locationService.find(filterAssemblyConnection).await
     val disperserHcdLocation   = wiring.locationService.find(disperserHcdConnection).await
+    val disperserHcdLocation2  = wiring.locationService.find(disperserHcdConnection2).await
 
     val assemblyCommandService = CommandServiceFactory.make(filterAssemblyLocation.get)(containerActorSystem)
 
-    val disperserComponentRef   = disperserHcdLocation.get.componentRef
+    val disperserComponentRef   = disperserHcdLocation2.get.componentRef
     val disperserCommandService = CommandServiceFactory.make(disperserHcdLocation.get)(containerActorSystem)
 
     // Subscribe to component's current state
@@ -104,7 +106,7 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
     val assemblySupervisor = Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring).await
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")
-    val akkaConnection                = AkkaConnection(models.ComponentId("IFS_Detector", HCD))
+    val akkaConnection                = HttpConnection(models.ComponentId("IFS_Detector", HCD))
 
     assertThatSupervisorIsRunning(assemblySupervisor, supervisorLifecycleStateProbe, 5.seconds)
 

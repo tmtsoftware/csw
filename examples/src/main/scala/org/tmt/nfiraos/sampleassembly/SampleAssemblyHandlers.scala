@@ -8,7 +8,7 @@ import csw.command.client.messages.TopLevelActorMessage
 import csw.event.api.scaladsl.EventSubscription
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.models.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.location.models.{HttpLocation, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, CommandResponse, ControlCommand, Setup}
 import csw.params.core.generics.{Key, KeyType, Parameter}
@@ -143,7 +143,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
     log.debug(s"onLocationTrackingEvent called: $trackingEvent")
     trackingEvent match {
       case LocationUpdated(location) =>
-        val hcd = CommandServiceFactory.make(location.asInstanceOf[AkkaLocation])(ctx.system)
+        val hcd = CommandServiceFactory.make(location.asInstanceOf[HttpLocation])(ctx.system)
         commandSender ! SendCommand(hcd)
       case LocationRemoved(_) => log.info("HCD no longer available")
     }

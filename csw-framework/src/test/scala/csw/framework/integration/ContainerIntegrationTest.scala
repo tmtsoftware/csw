@@ -24,7 +24,7 @@ import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.client.ActorSystemFactory
 import csw.location.models
 import csw.location.models.ComponentType.{Assembly, HCD}
-import csw.location.models.Connection.AkkaConnection
+import csw.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.location.models.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
 import csw.params.core.states.{CurrentState, StateName}
 import io.lettuce.core.RedisClient
@@ -38,10 +38,14 @@ import scala.concurrent.duration.DurationLong
 class ContainerIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 
-  private val irisContainerConnection  = AkkaConnection(ComponentId("IRIS_Container", ComponentType.Container))
-  private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
-  private val instrumentHcdConnection  = AkkaConnection(models.ComponentId("Instrument_Filter", HCD))
-  private val disperserHcdConnection   = AkkaConnection(models.ComponentId("Disperser", HCD))
+  private val irisContainerConnection = AkkaConnection(ComponentId("IRIS_Container", ComponentType.Container))
+
+  private val filterAssemblyConnection  = HttpConnection(ComponentId("Filter", Assembly))
+  private val filterAssemblyConnection2 = AkkaConnection(ComponentId("Filter", Assembly))
+  private val instrumentHcdConnection   = HttpConnection(models.ComponentId("Instrument_Filter", HCD))
+  private val instrumentHcdConnection2  = AkkaConnection(models.ComponentId("Instrument_Filter", HCD))
+  private val disperserHcdConnection    = HttpConnection(models.ComponentId("Disperser", HCD))
+  private val disperserHcdConnection2   = AkkaConnection(models.ComponentId("Disperser", HCD))
   private val containerActorSystem: ActorSystem[SpawnProtocol.Command] =
     ActorSystemFactory.remote(SpawnProtocol(), "container-system")
 
@@ -88,17 +92,20 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
     components.size shouldBe 3
 
     // resolve all the components from container using location service
-    val filterAssemblyLocation = seedLocationService.find(filterAssemblyConnection).await
-    val instrumentHcdLocation  = seedLocationService.find(instrumentHcdConnection).await
-    val disperserHcdLocation   = seedLocationService.find(disperserHcdConnection).await
+    val filterAssemblyLocation  = seedLocationService.find(filterAssemblyConnection).await
+    val filterAssemblyLocation2 = seedLocationService.find(filterAssemblyConnection2).await
+    val instrumentHcdLocation   = seedLocationService.find(instrumentHcdConnection).await
+    val instrumentHcdLocation2  = seedLocationService.find(instrumentHcdConnection2).await
+    val disperserHcdLocation    = seedLocationService.find(disperserHcdConnection).await
+    val disperserHcdLocation2   = seedLocationService.find(disperserHcdConnection2).await
 
     filterAssemblyLocation.isDefined shouldBe true
     instrumentHcdLocation.isDefined shouldBe true
     disperserHcdLocation.isDefined shouldBe true
 
-    val assemblySupervisor  = filterAssemblyLocation.get.componentRef
-    val filterSupervisor    = instrumentHcdLocation.get.componentRef
-    val disperserSupervisor = disperserHcdLocation.get.componentRef
+    val assemblySupervisor  = filterAssemblyLocation2.get.componentRef
+    val filterSupervisor    = instrumentHcdLocation2.get.componentRef
+    val disperserSupervisor = disperserHcdLocation2.get.componentRef
 
     val assemblyCommandService  = CommandServiceFactory.make(filterAssemblyLocation.get)
     val filterCommandService    = CommandServiceFactory.make(instrumentHcdLocation.get)

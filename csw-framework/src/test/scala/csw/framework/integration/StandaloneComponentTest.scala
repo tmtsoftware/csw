@@ -19,7 +19,7 @@ import csw.framework.internal.component.ComponentBehavior
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.client.ActorSystemFactory
 import csw.location.models.ComponentType.HCD
-import csw.location.models.Connection.AkkaConnection
+import csw.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.location.models.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.logging.models.Level.INFO
 import csw.logging.client.internal.LoggingSystem
@@ -65,22 +65,24 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")
     val supervisorStateProbe          = TestProbe[CurrentState]("supervisor-state-probe")
-    val akkaConnection                = AkkaConnection(ComponentId("IFS_Detector", HCD))
+    val connection                    = HttpConnection(ComponentId("IFS_Detector", HCD))
+    val connection2                   = AkkaConnection(ComponentId("IFS_Detector", HCD))
 
     // verify component gets registered with location service
-    val maybeLocation = seedLocationService.resolve(akkaConnection, 5.seconds).await
+    val maybeLocation  = seedLocationService.resolve(connection, 5.seconds).await
+    val maybeLocation2 = seedLocationService.resolve(connection2, 5.seconds).await
 
     maybeLocation.isDefined shouldBe true
     val resolvedAkkaLocation = maybeLocation.get
-    resolvedAkkaLocation.connection shouldBe akkaConnection
+    resolvedAkkaLocation.connection shouldBe connection
 
-    val supervisorRef = resolvedAkkaLocation.componentRef
+    val supervisorRef = maybeLocation2.get.componentRef
     assertThatSupervisorIsRunning(supervisorRef, supervisorLifecycleStateProbe, 5.seconds)
 
     val supervisorCommandService = CommandServiceFactory.make(resolvedAkkaLocation)
 
     val (_, akkaProbe) =
-      seedLocationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent](seedActorSystem.toClassic))(Keep.both).run()
+      seedLocationService.track(connection).toMat(TestSink.probe[TrackingEvent](seedActorSystem.toClassic))(Keep.both).run()
     akkaProbe.requestNext() shouldBe a[LocationUpdated]
 
     // on shutdown, component unregisters from location service
@@ -93,7 +95,7 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
 
     // this proves that postStop signal of supervisor gets invoked
     // as supervisor gets unregistered in postStop signal
-    akkaProbe.requestNext(10.seconds) shouldBe LocationRemoved(akkaConnection)
+    akkaProbe.requestNext(10.seconds) shouldBe LocationRemoved(connection)
 
     // this proves that on shutdown message, supervisor's actor system gets terminated
     // if it does not get terminated in 5 seconds, future will fail which in turn fail this test

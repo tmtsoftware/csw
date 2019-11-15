@@ -12,6 +12,7 @@ import csw.location.api.javadsl.JComponentType;
 import csw.location.models.AkkaLocation;
 import csw.location.models.ComponentId;
 import csw.location.models.Connection;
+import csw.location.models.HttpLocation;
 import csw.params.commands.CommandName;
 import csw.params.commands.CommandResponse;
 import csw.params.commands.Setup;
@@ -122,9 +123,9 @@ public class JSampleHcdTest extends JUnitSuite {
 
         Timeout commandResponseTimeout = new Timeout(10, TimeUnit.SECONDS);
 
-        Connection.AkkaConnection connection = new Connection.AkkaConnection(new ComponentId("JSampleHcd", JComponentType.HCD()));
+        Connection.HttpConnection connection = new Connection.HttpConnection(new ComponentId("JSampleHcd", JComponentType.HCD()));
         ILocationService locationService = testKit.jLocationService();
-        AkkaLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().orElseThrow();
+        HttpLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().orElseThrow();
 
         ICommandService hcd = CommandServiceFactory.jMake(location, typedActorSystem);
 
@@ -148,9 +149,9 @@ public class JSampleHcdTest extends JUnitSuite {
 
         Timeout commandResponseTimeout = new Timeout(1, TimeUnit.SECONDS);
 
-        Connection.AkkaConnection connection = new Connection.AkkaConnection(new ComponentId("JSampleHcd", JComponentType.HCD()));
+        Connection.HttpConnection connection = new Connection.HttpConnection(new ComponentId("JSampleHcd", JComponentType.HCD()));
         ILocationService locationService = testKit.jLocationService();
-        AkkaLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().orElseThrow();
+        HttpLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().orElseThrow();
 
         ICommandService hcd = CommandServiceFactory.jMake(location, typedActorSystem);
 
