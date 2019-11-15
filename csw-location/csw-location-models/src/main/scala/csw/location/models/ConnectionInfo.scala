@@ -1,12 +1,14 @@
 package csw.location.models
 
+import csw.params.core.models.Prefix
+
 /**
  * ConnectionInfo represents a component name, component type and connection type
  *
- * @param name represents a component name e.g. TromboneAssembly
+ * @param prefix represents a prefix of a component e.g. nfiraos.TromboneAssembly
  * @param componentType represents the type of component e.g. Assembly, HCD, etc
  * @param connectionType represents the type of connection e.g. akka, http, tcp
  */
-case class ConnectionInfo private[location] (name: String, componentType: ComponentType, connectionType: ConnectionType) {
-  override def toString: String = s"$name-${componentType.name}-${connectionType.name}"
+case class ConnectionInfo private[location] (prefix: Prefix, componentType: ComponentType, connectionType: ConnectionType) {
+  override def toString: String = s"${prefix.handle}-${componentType.name}-${connectionType.name}"
 }
