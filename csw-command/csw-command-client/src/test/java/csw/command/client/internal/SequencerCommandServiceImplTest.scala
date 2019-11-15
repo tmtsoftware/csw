@@ -23,16 +23,17 @@ class SequencerCommandServiceImplTest
     with ScalaFutures {
 
   test("should submit sequence to the sequencer") {
-    val sequence = Sequence(Setup(Prefix("csw.move"), CommandName("command-1"), None))
+    val sequence   = Sequence(Setup(Prefix("csw.move"), CommandName("command-1"), None))
+    val sequenceId = sequence.runId
 
     val submitResponse: SubmitResponse     = Completed(Id())
-    val queryFinalResponse: SubmitResponse = Completed(sequence.runId)
+    val queryFinalResponse: SubmitResponse = Completed(sequenceId)
 
     val sequencer = spawn(Behaviors.receiveMessage[SequencerMsg] {
       case SubmitSequenceAndWait(`sequence`, replyTo) =>
         replyTo ! submitResponse
         Behaviors.same
-      case QueryFinal(replyTo) =>
+      case QueryFinal(`sequenceId`, replyTo) =>
         replyTo ! queryFinalResponse
         Behaviors.same
       case _ => Behaviors.same
@@ -44,6 +45,6 @@ class SequencerCommandServiceImplTest
     val sequencerCommandService = SequencerCommandServiceFactory.make(location)
 
     sequencerCommandService.submitAndWait(sequence).futureValue should ===(submitResponse)
-    sequencerCommandService.queryFinal().futureValue should ===(queryFinalResponse)
+    sequencerCommandService.queryFinal(sequenceId).futureValue should ===(queryFinalResponse)
   }
 }

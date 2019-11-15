@@ -2,6 +2,7 @@ package csw.command.api.scaladsl
 
 import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.commands.Sequence
+import csw.params.core.models.Id
 
 import scala.concurrent.Future
 
@@ -18,5 +19,5 @@ trait SequencerCommandService {
    */
   def submitAndWait(sequence: Sequence): Future[SubmitResponse]
 
-  def queryFinal(): Future[SubmitResponse]
+  def queryFinal(sequenceId: Id): Future[SubmitResponse]
 }

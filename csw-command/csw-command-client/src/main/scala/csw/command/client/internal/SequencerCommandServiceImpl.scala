@@ -10,6 +10,7 @@ import csw.command.client.messages.sequencer.SequencerMsg.{QueryFinal, SubmitSeq
 import csw.location.models.AkkaLocation
 import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.commands.Sequence
+import csw.params.core.models.Id
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
@@ -24,5 +25,5 @@ class SequencerCommandServiceImpl(sequencerLocation: AkkaLocation)(
   override def submitAndWait(sequence: Sequence): Future[SubmitResponse] =
     sequencer ? (SubmitSequenceAndWait(sequence, _))
 
-  override def queryFinal(): Future[SubmitResponse] = sequencer ? QueryFinal
+  override def queryFinal(sequenceId: Id): Future[SubmitResponse] = sequencer ? (QueryFinal(sequenceId, _))
 }
