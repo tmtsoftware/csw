@@ -9,6 +9,8 @@ import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import csw.location.models.AkkaLocation;
 import csw.location.models.ComponentId;
 import csw.location.models.Connection.AkkaConnection;
+import csw.params.core.models.Prefix;
+import csw.params.javadsl.JSubsystem;
 import csw.testkit.FrameworkTestKit;
 import csw.testkit.javadsl.JCSWService;
 import org.junit.AfterClass;
@@ -56,7 +58,7 @@ public class JTestKitsExampleTest extends JUnitSuite {
 
         //#spawn-using-testkit
 
-        AkkaConnection connection = new AkkaConnection(new ComponentId("JSampleAssembly", JComponentType.Assembly()));
+        AkkaConnection connection = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "JSampleAssembly"), JComponentType.Assembly()));
         Optional<AkkaLocation> akkaLocation = locationService.resolve(connection, Duration.ofSeconds(5)).get();
 
         Assert.assertTrue(akkaLocation.isPresent());

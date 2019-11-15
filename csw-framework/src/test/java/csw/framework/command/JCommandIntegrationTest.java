@@ -22,6 +22,7 @@ import csw.common.components.framework.SampleComponentState;
 import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;
 import csw.location.api.javadsl.ILocationService;
+import csw.location.api.javadsl.JComponentType;
 import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import csw.location.models.AkkaLocation;
@@ -36,10 +37,12 @@ import csw.params.commands.Setup;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.Id;
+import csw.params.core.models.Prefix;
 import csw.params.core.states.CurrentState;
 import csw.params.core.states.DemandState;
 import csw.params.core.states.StateName;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JSubsystem;
 import io.lettuce.core.RedisClient;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -60,7 +63,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static csw.common.components.command.ComponentStateForCommand.*;
-import csw.location.api.javadsl.JComponentType;
 
 // DEOPSCSW-212: Send oneway command
 // DEOPSCSW-217: Execute RPC like commands
@@ -104,7 +106,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         FrameworkWiring wiring = FrameworkWiring.make(hcdActorSystem, redisClient);
         Await.result(Standalone.spawn(ConfigFactory.load("mcs_hcd_java.conf"), wiring), new FiniteDuration(5, TimeUnit.SECONDS));
 
-        AkkaConnection akkaConnection = new AkkaConnection(new ComponentId("Test_Component_Running_Long_Command_Java", JComponentType.HCD()));
+        AkkaConnection akkaConnection = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.MCS, "Test_Component_Running_Long_Command_Java"), JComponentType.HCD()));
         CompletableFuture<Optional<AkkaLocation>> eventualLocation = locationService.resolve(akkaConnection, java.time.Duration.ofSeconds(5));
         Optional<AkkaLocation> maybeLocation = eventualLocation.get();
         Assert.assertTrue(maybeLocation.isPresent());

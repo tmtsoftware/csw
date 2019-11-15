@@ -12,6 +12,7 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.models.Connection.{HttpConnection, TcpConnection}
 import csw.location.models.{ComponentId, ComponentType}
 import csw.network.utils.Networks
+import csw.params.core.models.{Prefix, Subsystem}
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
 import org.scalatest.FunSuiteLike
 
@@ -61,7 +62,7 @@ class MainTest extends ScalaTestFrameworkTestKit with FunSuiteLike {
   private def testWithTcp(args: Array[String], name: String, port: Int) = {
     val process = Main.start(args).get
 
-    val connection       = TcpConnection(ComponentId(name, ComponentType.Service))
+    val connection       = TcpConnection(ComponentId(Prefix(Subsystem.CSW, name), ComponentType.Service)) // TODO test take prefix?
     val resolvedLocation = locationService.resolve(connection, 5.seconds).await.get
 
     resolvedLocation.connection shouldBe connection
@@ -74,7 +75,7 @@ class MainTest extends ScalaTestFrameworkTestKit with FunSuiteLike {
   private def testWithHttp(args: Array[String], name: String, port: Int, path: String) = {
     val process = Main.start(args).get
 
-    val connection       = HttpConnection(ComponentId(name, ComponentType.Service))
+    val connection       = HttpConnection(ComponentId(Prefix(Subsystem.CSW, name), ComponentType.Service)) // TODO
     val resolvedLocation = locationService.resolve(connection, 5.seconds).await.get
 
     resolvedLocation.connection shouldBe connection

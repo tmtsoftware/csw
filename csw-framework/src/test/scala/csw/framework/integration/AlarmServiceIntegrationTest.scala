@@ -15,6 +15,7 @@ import csw.location.models.ComponentId
 import csw.location.models.ComponentType.HCD
 import csw.location.models.Connection.AkkaConnection
 import csw.params.commands.Setup
+import csw.params.core.models.{Prefix, Subsystem}
 import redis.embedded.{RedisSentinel, RedisServer}
 
 import scala.concurrent.duration.DurationLong
@@ -51,7 +52,7 @@ class AlarmServiceIntegrationTest extends FrameworkIntegrationSuite {
     Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring)
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")
-    val akkaConnection                = AkkaConnection(ComponentId("IFS_Detector", HCD))
+    val akkaConnection                = AkkaConnection(ComponentId(Prefix(Subsystem.IRIS, "IFS_Detector"), HCD))
     val location                      = locationService.resolve(akkaConnection, 5.seconds).await
 
     val supervisorRef = location.get.componentRef

@@ -14,7 +14,7 @@ import csw.location.models
 import csw.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.network.utils.Networks
-import csw.params.core.models.Prefix
+import csw.params.core.models.{Prefix, Subsystem}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.Await
@@ -27,7 +27,7 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
   test("should able to create the AkkaRegistration which should internally create AkkaLocation") {
     val hostname = Networks().hostname
 
-    val akkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
+    val akkaConnection = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
     val actorRefUri    = actorSystem.toURI
     val prefix         = Prefix("nfiraos.ncc.trombone")
 
@@ -42,7 +42,7 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     val port     = 9595
     val prefix   = "/trombone/hcd"
 
-    val httpConnection   = HttpConnection(ComponentId("trombone", ComponentType.HCD))
+    val httpConnection   = HttpConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "trombone"), ComponentType.HCD))
     val httpRegistration = HttpRegistration(httpConnection, port, prefix)
 
     val expectedhttpLocation = HttpLocation(httpConnection, new URI(s"http://$hostname:$port/$prefix"))
@@ -54,7 +54,7 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     val hostname = Networks().hostname
     val port     = 9596
 
-    val tcpConnection   = TcpConnection(models.ComponentId("lgsTrombone", ComponentType.HCD))
+    val tcpConnection   = TcpConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "lgsTrombone"), ComponentType.HCD))
     val tcpRegistration = TcpRegistration(tcpConnection, port)
 
     val expectedTcpLocation = TcpLocation(tcpConnection, new URI(s"tcp://$hostname:$port"))
@@ -69,7 +69,7 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
 
     implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "local-actor-system", config)
     val actorRefURI                                              = actorSystem.spawn(Behaviors.empty, "my-actor-2").toURI
-    val akkaConnection                                           = AkkaConnection(models.ComponentId("hcd1", ComponentType.HCD))
+    val akkaConnection                                           = AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
     val prefix                                                   = Prefix("nfiraos.ncc.trombone")
 
     intercept[LocalAkkaActorRegistrationNotAllowed] {

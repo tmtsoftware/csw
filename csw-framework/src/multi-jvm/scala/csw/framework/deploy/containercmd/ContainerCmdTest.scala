@@ -32,7 +32,7 @@ import csw.params.commands.CommandResponse.Invalid
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.Subsystem.Container
-import csw.params.core.models.{ObsId, Prefix}
+import csw.params.core.models.{ObsId, Prefix, Subsystem}
 import csw.params.core.states.{CurrentState, StateName}
 
 import scala.concurrent.duration.DurationLong
@@ -111,7 +111,7 @@ class ContainerCmdTest(ignore: Int)
       enterBarrier("running")
 
       val maybeContainerLoc =
-        locationService.resolve(AkkaConnection(ComponentId("LGSF_Container", ComponentType.Container)), 5.seconds).await
+        locationService.resolve(AkkaConnection(ComponentId(Prefix(Subsystem.Container, "LGSF_Container"), ComponentType.Container)), 5.seconds).await
 
       maybeContainerLoc.isDefined shouldBe true
 
@@ -154,7 +154,7 @@ class ContainerCmdTest(ignore: Int)
       enterBarrier("running")
 
       // resolve and send message to component running in different jvm or on different physical machine
-      val etonSupervisorF        = locationService.resolve(AkkaConnection(ComponentId("Eton", ComponentType.HCD)), 2.seconds)
+      val etonSupervisorF        = locationService.resolve(AkkaConnection(ComponentId(Prefix(Subsystem.MCS, "Eton"), ComponentType.HCD)), 2.seconds)
       val etonSupervisorLocation = Await.result(etonSupervisorF, 15.seconds).get
 
       val etonSupervisorTypedRef = etonSupervisorLocation.componentRef

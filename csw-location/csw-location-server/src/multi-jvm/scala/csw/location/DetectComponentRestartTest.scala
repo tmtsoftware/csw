@@ -14,7 +14,7 @@ import csw.location.models.{ComponentId, ComponentType, LocationRemoved, Locatio
 import csw.location.server.commons.CswCluster
 import csw.location.server.internal.{LocationServiceFactory, ServerWiring}
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
-import csw.params.core.models.Prefix
+import csw.params.core.models.{Prefix, Subsystem}
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
 import scala.concurrent.Await
@@ -33,7 +33,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
   test("should detect re-registering of new location for a connection that has crashed/gone away") {
 
-    val akkaConnection = AkkaConnection(ComponentId("TromboneHcd", ComponentType.HCD))
+    val akkaConnection = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "TromboneHcd"), ComponentType.HCD))
 
     runOn(member1) {
       locationService

@@ -10,5 +10,5 @@ import csw.params.core.models.Prefix
  * @param connectionType represents the type of connection e.g. akka, http, tcp
  */
 case class ConnectionInfo private[location] (prefix: Prefix, componentType: ComponentType, connectionType: ConnectionType) {
-  override def toString: String = s"${prefix.handle}-${componentType.name}-${connectionType.name}"
+  override def toString: String = s"${prefix}-${componentType.name}-${connectionType.name}"
 }

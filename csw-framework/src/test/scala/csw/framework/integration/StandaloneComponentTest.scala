@@ -23,6 +23,7 @@ import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.logging.models.Level.INFO
 import csw.logging.client.internal.LoggingSystem
+import csw.params.core.models.{Prefix, Subsystem}
 import csw.params.core.states.{CurrentState, StateName}
 import io.lettuce.core.RedisClient
 import play.api.libs.json.{JsObject, Json}
@@ -65,7 +66,7 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")
     val supervisorStateProbe          = TestProbe[CurrentState]("supervisor-state-probe")
-    val akkaConnection                = AkkaConnection(ComponentId("IFS_Detector", HCD))
+    val akkaConnection                = AkkaConnection(ComponentId(Prefix(Subsystem.IRIS, "IFS_Detector"), HCD))
 
     // verify component gets registered with location service
     val maybeLocation = seedLocationService.resolve(akkaConnection, 5.seconds).await
@@ -107,7 +108,7 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
     // DEOPSCSW-180: Generic and Specific Log messages
     assertThatMessageIsLogged(
       logBuffer,
-      "IFS_Detector",
+      "iris.IFS_Detector",
       "Invoking lifecycle handler's initialize hook",
       INFO,
       ComponentBehavior.getClass.getName
@@ -115,7 +116,7 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
     // log message from Component handler
     assertThatMessageIsLogged(
       logBuffer,
-      "IFS_Detector",
+      "iris.IFS_Detector",
       "Initializing Component TLA",
       INFO,
       classOf[SampleComponentHandlers].getName

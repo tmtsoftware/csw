@@ -9,7 +9,7 @@ import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.models._
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
-import csw.params.core.models.Prefix
+import csw.params.core.models.{Prefix, Subsystem}
 
 class TrackLocationTestMultiJvmNode1 extends TrackLocationTest(0, "cluster")
 class TrackLocationTestMultiJvmNode2 extends TrackLocationTest(0, "cluster")
@@ -23,13 +23,13 @@ class TrackLocationTest(ignore: Int, mode: String) extends LSNodeSpec(config = n
   // DEOPSCSW-26: Track a connection
   test("two components should able to track same connection and single component should able to track two components") {
     //create akka connection
-    val akkaConnection = AkkaConnection(ComponentId("tromboneHcd", ComponentType.HCD))
+    val akkaConnection = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneHcd"), ComponentType.HCD))
 
     //create http connection
-    val httpConnection = HttpConnection(ComponentId("Assembly1", ComponentType.Assembly))
+    val httpConnection = HttpConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "Assembly1"), ComponentType.Assembly))
 
     //create tcp connection
-    val tcpConnection = TcpConnection(models.ComponentId("redis1", ComponentType.Service))
+    val tcpConnection = TcpConnection(models.ComponentId(Prefix(Subsystem.CSW, "redis1"), ComponentType.Service))
 
     val prefix = Prefix("nfiraos.ncc.trombone")
 

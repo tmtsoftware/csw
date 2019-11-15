@@ -9,7 +9,7 @@ import csw.params.commands.CommandName
 import csw.params.core.generics.{GChoiceKey, Parameter}
 import csw.params.core.generics.KeyType.{ChoiceKey, StringKey}
 import csw.params.core.models.Subsystem.NFIRAOS
-import csw.params.core.models.{Choice, Choices, Prefix}
+import csw.params.core.models.{Choice, Choices, Prefix, Subsystem}
 import csw.params.core.states.StateName
 import csw.params.events.EventName
 
@@ -64,9 +64,11 @@ object SampleComponentState {
       tcpLocationRemovedChoice,
       eventReceivedChoice
     )
-  val choiceKey: GChoiceKey          = ChoiceKey.make("choiceKey", choices)
-  val httpConnection: HttpConnection = HttpConnection(ComponentId("exampleHTTPService", ComponentType.Service))
-  val tcpConnection: TcpConnection   = TcpConnection(ComponentId("exampleTcpService", ComponentType.Service))
+  val choiceKey: GChoiceKey = ChoiceKey.make("choiceKey", choices)
+  val httpConnection: HttpConnection = HttpConnection(
+    ComponentId(Prefix(Subsystem.CSW, "exampleHTTPService"), ComponentType.Service)
+  )
+  val tcpConnection: TcpConnection = TcpConnection(ComponentId(Prefix(Subsystem.CSW, "exampleTcpService"), ComponentType.Service))
 
   // States
   val timeServiceSchedulerState = StateName("timeServiceSchedulerState")

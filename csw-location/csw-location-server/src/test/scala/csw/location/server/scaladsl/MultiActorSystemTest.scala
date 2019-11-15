@@ -7,6 +7,7 @@ import csw.location.models.{ComponentId, ComponentType, TcpRegistration}
 import csw.location.server.commons.TestFutureExtension.RichFuture
 import csw.location.server.commons._
 import csw.location.server.internal.LocationServiceFactory
+import csw.params.core.models.{Prefix, Subsystem}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationInt
@@ -24,7 +25,7 @@ class MultiActorSystemTest extends FunSuite with Matchers with BeforeAndAfterAll
   var tcpRegistration: TcpRegistration = _
 
   override protected def beforeAll(): Unit = {
-    connection = TcpConnection(ComponentId("exampleTCPService", ComponentType.Service))
+    connection = TcpConnection(ComponentId(Prefix(Subsystem.CSW, "exampleTCPService"), ComponentType.Service))
     system1 = ClusterSettings().onPort(3558).system
     system2 = ClusterSettings().joinLocal(3558).system
     locationService = LocationServiceFactory.withCluster(CswCluster.withSystem(system1))

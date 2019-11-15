@@ -9,7 +9,7 @@ import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.params.commands.CommandResponse.{Completed, CompletedWithResult, SubmitResponse}
 import csw.params.commands.{CommandName, Result, Sequence, Setup}
-import csw.params.core.models.Prefix
+import csw.params.core.models.{Prefix, Subsystem}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSuiteLike, Matchers}
 import org.scalatestplus.mockito.MockitoSugar
@@ -38,7 +38,11 @@ class SequencerCommandServiceImplTest
     })
 
     val location =
-      AkkaLocation(AkkaConnection(ComponentId("sequencer", ComponentType.Sequencer)), Prefix("iris.x.y"), sequencer.toURI)
+      AkkaLocation(
+        AkkaConnection(ComponentId(Prefix(Subsystem.IRIS, "sequencer"), ComponentType.Sequencer)),
+        Prefix("iris.x.y"),
+        sequencer.toURI
+      )
 
     val sequencerCommandService = new SequencerCommandServiceImpl(location)
 

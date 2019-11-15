@@ -14,6 +14,7 @@ import csw.location.models.ComponentType.Assembly
 import csw.location.models.Connection.AkkaConnection
 import csw.params.commands
 import csw.params.commands.CommandName
+import csw.params.core.models.{Prefix, Subsystem}
 import csw.params.core.states.CurrentState
 
 import scala.concurrent.duration.DurationLong
@@ -23,7 +24,7 @@ class TimeServiceIntegrationTest extends FrameworkIntegrationSuite {
 
   import testWiring._
 
-  private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
+  private val filterAssemblyConnection = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "Filter"), Assembly))
   private val wiring                   = FrameworkWiring.make(seedActorSystem)
 
   override def afterAll(): Unit = {

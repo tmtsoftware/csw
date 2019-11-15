@@ -21,13 +21,14 @@ class AdminRoutes(logAdmin: LogAdmin, actorRuntime: ActorRuntime, adminException
   import actorRuntime._
   val route: Route = routeLogger {
     adminExceptionHandlers.route {
-      path("admin" / "logging" / Segment / "level") { componentName =>
+      path("admin" / "logging" / Segment / "level") { connectionName =>
+        // connectionName should be prefixHandle-componentType-connectionType.   see ConnectionInfo.scala
         get {
-          complete(logAdmin.getLogMetadata(componentName))
+          complete(logAdmin.getLogMetadata(connectionName))
         } ~
         post {
           logLevelParam { logLevel =>
-            complete(logAdmin.setLogLevel(componentName, logLevel).map(_ => Done))
+            complete(logAdmin.setLogLevel(connectionName, logLevel).map(_ => Done))
           }
         }
       }

@@ -20,7 +20,7 @@ trait ParameterSetKeyData { self: ParameterSetType[_] =>
   /**
    * The prefix for the parameter set
    */
-  final def prefixStr: String = prefix.key
+  final def prefixStr: String = prefix.toString
 
   /**
    * A String representation for concrete implementation of this trait

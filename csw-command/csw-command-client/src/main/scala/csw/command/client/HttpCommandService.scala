@@ -43,7 +43,7 @@ case class HttpCommandService(
   implicit val mat: Materializer           = Materializer(system)
   implicit val ec: ExecutionContext        = system.executionContext
 
-  private val componentName = connection.componentId.name
+  private val componentName = connection.componentId.prefix.toString
   private val componentType = ComponentType.Service.name
 
   private def concatByteStrings(source: Source[ByteString, _]): Future[ByteString] = {
@@ -84,7 +84,7 @@ case class HttpCommandService(
           val bs = await(concatByteStrings(response.entity.dataBytes))
           Json.decode(bs.toArray).to[CommandResponse].value
         } else {
-          val s = s"Error response from ${connection.componentId.name}: $response"
+          val s = s"Error response from ${connection.componentId.prefix}: $response"
           method match {
             case `submitCommand` => Error(controlCommand.runId, s)
             case _               => Invalid(controlCommand.runId, OtherIssue(s))
@@ -92,7 +92,7 @@ case class HttpCommandService(
 
         }
       case None =>
-        val s = s"Can't locate connection for ${connection.componentId.name}"
+        val s = s"Can't locate connection for ${connection.componentId.prefix}"
         method match {
           case `submitCommand` => Error(controlCommand.runId, s)
           case _               => Invalid(controlCommand.runId, UnresolvedLocationsIssue(s))
@@ -203,10 +203,10 @@ case class HttpCommandService(
           val bs = await(concatByteStrings(response.entity.dataBytes))
           Json.decode(bs.toArray).to[SubmitResponse].value
         } else {
-          Error(commandRunId, s"Error response from ${connection.componentId.name}: $response")
+          Error(commandRunId, s"Error response from ${connection.componentId.prefix}: $response")
         }
       case None =>
-        Error(commandRunId, s"Can't locate connection for ${connection.componentId.name}")
+        Error(commandRunId, s"Can't locate connection for ${connection.componentId.prefix}")
     }
   }
 

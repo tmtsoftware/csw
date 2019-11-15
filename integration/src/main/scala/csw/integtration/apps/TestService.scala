@@ -7,9 +7,10 @@ import csw.location.models.Connection.HttpConnection
 import csw.location.models.{ComponentId, ComponentType, HttpRegistration}
 import csw.location.server.internal.ServerWiring
 import csw.logging.client.scaladsl.LoggingSystemFactory
+import csw.params.core.models.{Prefix, Subsystem}
 
 object TestService {
-  val componentId = ComponentId("redisservice", ComponentType.Service)
+  val componentId = ComponentId(Prefix(Subsystem.CSW, "redisservice"), ComponentType.Service)
   val connection  = HttpConnection(componentId)
 
   private val Path = "redisservice.org/test"

@@ -18,7 +18,7 @@ import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup
 import csw.params.core.generics.KeyType
-import csw.params.core.models.ObsId
+import csw.params.core.models.{ObsId, Prefix, Subsystem}
 import io.lettuce.core.RedisClient
 import org.mockito.MockitoSugar
 
@@ -62,7 +62,7 @@ class CancellableCommandTest(ignore: Int)
 
       // resolve the assembly running on seed
       val assemblyLocF =
-        locationService.resolve(AkkaConnection(ComponentId("Monitor_Assembly", ComponentType.Assembly)), 5.seconds)
+        locationService.resolve(AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "Monitor_Assembly"), ComponentType.Assembly)), 5.seconds)
       val assemblyRef = Await.result(assemblyLocF, 10.seconds).map(_.componentRef).get
 
       // original command is submit and Cancel command is also submit

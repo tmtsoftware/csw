@@ -14,7 +14,7 @@ import csw.location.server.internal.ServerWiring
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.params.commands.{CommandName, Setup}
-import csw.params.core.models.Prefix
+import csw.params.core.models.{Prefix, Subsystem}
 
 object TromboneHCD {
 
@@ -26,7 +26,7 @@ object TromboneHCD {
   import adminWiring.actorRuntime._
 
   val tromboneHcdActorRef: ActorRef[Submit] = typedSystem.spawn(behavior, "trombone-hcd")
-  val componentId                           = ComponentId("trombonehcd", ComponentType.HCD)
+  val componentId                           = ComponentId(Prefix(Subsystem.NFIRAOS, "trombonehcd"), ComponentType.HCD)
   val connection                            = AkkaConnection(componentId)
 
   val registration                           = AkkaRegistrationFactory.make(connection, Prefix("nfiraos.ncc.trombone"), tromboneHcdActorRef.toURI)

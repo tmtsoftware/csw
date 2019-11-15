@@ -25,15 +25,15 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) {
   private val log: Logger = AdminLogger.getLogger
   import actorRuntime._
 
-  def getLogMetadata(componentFullName: String): Future[LogMetadata] = async {
+  def getLogMetadata(connectionName: String): Future[LogMetadata] = async {
     implicit val timeout: Timeout = Timeout(5.seconds)
-    await(getLocation(componentFullName)) match {
+    await(getLocation(connectionName)) match {
       case Some(location: AkkaLocation) =>
-        val componentName = location.connection.componentId.name
+        val componentName = location.connection.componentId.prefix.toString
         log.info(
           "Getting log information from logging system",
           Map(
-            "componentName" -> componentFullName,
+            "componentName" -> connectionName,
             "location"      -> location.toString
           )
         )
@@ -44,19 +44,19 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) {
         }
 
         await(metadataF)
-      case _ => throw UnresolvedAkkaLocationException(componentFullName)
+      case _ => throw UnresolvedAkkaLocationException(connectionName)
     }
   }
 
-  def setLogLevel(componentFullName: String, logLevel: Level): Future[Unit] =
+  def setLogLevel(connectionName: String, logLevel: Level): Future[Unit] =
     async {
-      await(getLocation(componentFullName)) match {
+      await(getLocation(connectionName)) match {
         case Some(location: AkkaLocation) =>
-          val componentName = location.connection.componentId.name
+          val componentName = location.connection.componentId.prefix.toString
           log.info(
             s"Setting log level to $logLevel",
             Map(
-              "componentName" -> componentFullName,
+              "componentName" -> connectionName,
               "location"      -> location.toString
             )
           )
@@ -64,17 +64,17 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) {
             case Sequencer => location.sequencerRef ! SetComponentLogLevel(componentName, logLevel)
             case _         => location.componentRef ! SetComponentLogLevel(componentName, logLevel)
           }
-        case _ => throw UnresolvedAkkaLocationException(componentFullName)
+        case _ => throw UnresolvedAkkaLocationException(connectionName)
       }
     }
 
-  private def getLocation(componentFullName: String): Future[Option[Location]] =
+  private def getLocation(connectionName: String): Future[Option[Location]] =
     async {
-      Connection.from(componentFullName) match {
+      Connection.from(connectionName) match {
         case connection: AkkaConnection => await(locationService.find(connection))
         case connection: HttpConnection => throw UnsupportedConnectionException(connection)
         case connection: TcpConnection  => throw UnsupportedConnectionException(connection)
-        case _                          => throw InvalidComponentNameException(componentFullName)
+        case _                          => throw InvalidComponentNameException(connectionName)
       }
     }
 }

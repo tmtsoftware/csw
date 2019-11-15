@@ -25,7 +25,7 @@ class ConfigParserTest extends FunSuite with Matchers {
     Assembly,
     "csw.pkgDemo.assembly1.Assembly1",
     DoNotRegister,
-    Set(Connection.from("HCD2A-hcd-akka"), Connection.from("HCD2C-hcd-akka")),
+    Set(Connection.from("tcs.HCD2A-hcd-akka"), Connection.from("tcs.HCD2C-hcd-akka")),
     5.seconds
   )
   private val hcd2AInfo = ComponentInfo(

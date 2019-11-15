@@ -17,6 +17,7 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.server.commons.BlockingUtils
+import csw.params.core.models.{Prefix, Subsystem}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{Duration, DurationDouble}
@@ -33,7 +34,12 @@ object BenchmarkHelpers {
 
     Standalone.spawn(config, wiring)
     val akkaLocation: AkkaLocation =
-      Await.result(locationService.resolve(AkkaConnection(ComponentId("Perf", ComponentType.HCD)), 5.seconds), 5.seconds).get
+      Await
+        .result(
+          locationService.resolve(AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "Perf"), ComponentType.HCD)), 5.seconds),
+          5.seconds
+        )
+        .get
 
     assertThatSupervisorIsRunning(akkaLocation.componentRef, probe, 5.seconds)
 

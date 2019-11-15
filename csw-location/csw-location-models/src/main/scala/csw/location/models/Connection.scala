@@ -2,6 +2,7 @@ package csw.location.models
 
 import csw.location.models.ConnectionType.{AkkaType, HttpType, TcpType}
 import csw.location.models.codecs.LocationSerializable
+import csw.params.core.models.Prefix
 
 /**
  * Represents a connection based on a componentId and the type of connection offered by the component
@@ -24,7 +25,7 @@ sealed abstract class Connection(val connectionType: ConnectionType) extends Loc
   /**
    * Returns a ConnectionInfo which represents component name, component type and connection type for this Connection
    */
-  def connectionInfo: ConnectionInfo = ConnectionInfo(componentId.name, componentId.componentType, connectionType)
+  def connectionInfo: ConnectionInfo = ConnectionInfo(componentId.prefix, componentId.componentType, connectionType)
 
   /**
    * Creates a unique name for Connection based on Component name, ComponentType and ConnectionType
@@ -60,7 +61,7 @@ object Connection {
    */
   def from(input: String): Connection = input.split("-") match {
     case Array(name, componentType, connectionType) =>
-      from(ConnectionInfo(name, ComponentType.withName(componentType), ConnectionType.withName(connectionType)))
+      from(ConnectionInfo(Prefix(name), ComponentType.withName(componentType), ConnectionType.withName(connectionType)))
     case _ => throw new IllegalArgumentException(s"Unable to parse '$input' to make Connection object")
   }
 
@@ -71,7 +72,7 @@ object Connection {
    * @return A Connection created from connectionInfo
    */
   def from(connectionInfo: ConnectionInfo): Connection = from(
-    ComponentId(connectionInfo.name, connectionInfo.componentType),
+    ComponentId(connectionInfo.prefix, connectionInfo.componentType), // TODO: is this right?
     connectionInfo.connectionType
   )
 
@@ -82,17 +83,17 @@ object Connection {
   }
 
   /**
-   * Represents a connection offered by remote Actors e.g. TromboneAssembly-assembly-akka or TromboneHcd-hcd-akka
+   * Represents a connection offered by remote Actors e.g. nfiraos.TromboneAssembly-assembly-akka or nfiraos.TromboneHcd-hcd-akka
    */
   case class AkkaConnection(componentId: ComponentId) extends TypedConnection[AkkaLocation](AkkaType)
 
   /**
-   * Represents a http connection provided by the component e.g. ConfigServer-service-http
+   * Represents a http connection provided by the component e.g. csw.ConfigServer-service-http
    */
   case class HttpConnection(componentId: ComponentId) extends TypedConnection[HttpLocation](HttpType)
 
   /**
-   * represents a tcp connection provided by the component e.g. EventService-service-tcp
+   * represents a tcp connection provided by the component e.g. csw.EventService-service-tcp
    */
   case class TcpConnection(componentId: ComponentId) extends TypedConnection[TcpLocation](TcpType)
 }
