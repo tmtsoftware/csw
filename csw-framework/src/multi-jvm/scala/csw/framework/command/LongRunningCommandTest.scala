@@ -15,7 +15,7 @@ import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandIssue.OtherIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup
-import csw.params.core.models.ObsId
+import csw.params.core.models.{ObsId, Prefix, Subsystem}
 import csw.params.core.states.{CurrentState, StateName}
 import io.lettuce.core.RedisClient
 import org.mockito.MockitoSugar
@@ -53,7 +53,7 @@ class LongRunningCommandTest(ignore: Int)
       // resolve assembly running in jvm-2 and send setup command expecting immediate command completion response
       val assemblyLocF =
         locationService.resolve(
-          AkkaConnection(ComponentId("Test_Component_Running_Long_Command", ComponentType.Assembly)),
+          AkkaConnection(ComponentId(Prefix(Subsystem.MCS, "Test_Component_Running_Long_Command"), ComponentType.Assembly)),
           5.seconds
         )
       val assemblyLocation: AkkaLocation = Await.result(assemblyLocF, 10.seconds).get

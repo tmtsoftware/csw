@@ -36,9 +36,9 @@ class HttpCommandServiceTest extends FunSuite with Matchers with BeforeAndAfterA
   implicit val ec: ExecutionContext     = typedSystem.executionContext
   implicit val timeout: Timeout         = Timeout(5.seconds)
 
-  private val locationService = HttpLocationServiceFactory.makeLocalClient(typedSystem)
-  private val testCompName    = "testComponent"
-  private val connection      = HttpConnection(ComponentId(testCompName, ComponentType.Service))
+  private val locationService = HttpLocationServiceFactory.makeLocalClient
+  private val testCompName    = "csw.testComponent"
+  private val connection      = HttpConnection(ComponentId(Prefix(Subsystem.CSW, "testComponent"), ComponentType.Service))
 
   private val basePosKey         = CoordKey.make("BasePosition")
   private val prefix             = Prefix("csw.command")

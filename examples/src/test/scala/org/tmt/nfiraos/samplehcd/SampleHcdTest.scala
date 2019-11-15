@@ -8,7 +8,7 @@ import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{ComponentId, ComponentType}
 import csw.params.commands.{CommandName, CommandResponse, Setup}
 import csw.params.core.generics.{Key, KeyType, Parameter}
-import csw.params.core.models.{ObsId, Prefix, Units}
+import csw.params.core.models.{ObsId, Prefix, Subsystem, Units}
 import csw.params.events.{Event, EventKey, EventName, SystemEvent}
 import csw.testkit.scaladsl.CSWService.{AlarmServer, EventServer}
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
@@ -28,7 +28,7 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
 
   import scala.concurrent.duration._
   test("HCD should be locatable using Location Service") {
-    val connection   = AkkaConnection(ComponentId("SampleHcd", ComponentType.HCD))
+    val connection   = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "SampleHcd"), ComponentType.HCD))
     val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
 
     akkaLocation.connection shouldBe connection
@@ -85,7 +85,7 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
     val setupCommand                    = Setup(Prefix("csw.move"), CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
-    val connection = AkkaConnection(ComponentId("SampleHcd", ComponentType.HCD))
+    val connection = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "SampleHcd"), ComponentType.HCD))
 
     val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
 
@@ -107,7 +107,7 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
     val setupCommand                    = Setup(Prefix("csw.move"), CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
-    val connection = AkkaConnection(models.ComponentId("SampleHcd", ComponentType.HCD))
+    val connection = AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "SampleHcd"), ComponentType.HCD))
 
     val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
 

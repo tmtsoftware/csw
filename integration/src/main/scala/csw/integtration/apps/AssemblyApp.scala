@@ -13,7 +13,7 @@ import csw.location.server.commons.ClusterAwareSettings
 import csw.location.server.internal.ServerWiring
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.LoggingSystemFactory
-import csw.params.core.models.Prefix
+import csw.params.core.models.{Prefix, Subsystem}
 
 object AssemblyApp {
 
@@ -24,7 +24,7 @@ object AssemblyApp {
   import adminWiring.actorRuntime._
 
   val assemblyActorRef: typed.ActorRef[String] = typedSystem.spawn(behavior, "assembly")
-  val componentId                              = ComponentId("assembly", ComponentType.Assembly)
+  val componentId                              = ComponentId(Prefix(Subsystem.NFIRAOS, "assembly"), ComponentType.Assembly)
   val connection                               = AkkaConnection(componentId)
 
   val registration                           = AkkaRegistrationFactory.make(connection, Prefix("nfiraos.ncc.trombone"), assemblyActorRef.toURI)

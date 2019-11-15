@@ -4,6 +4,7 @@ import csw.location.helpers.{LSNodeSpec, OneMemberAndSeed}
 import csw.location.models.Connection.{HttpConnection, TcpConnection}
 import csw.location.models.{ComponentId, ComponentType, HttpRegistration, TcpRegistration}
 import csw.location.server.commons.TestFutureExtension.RichFuture
+import csw.params.core.models.{Prefix, Subsystem}
 import org.scalatest.BeforeAndAfterEach
 
 import scala.collection.immutable.Set
@@ -21,12 +22,12 @@ class LocationServiceTest(ignore: Int, mode: String)
   // DEOPSCSW-16: Register a component
   test("ensure that a component registered by one node is resolved and listed on all the nodes") {
     val tcpPort         = 446
-    val tcpConnection   = TcpConnection(ComponentId("redis", ComponentType.Service))
+    val tcpConnection   = TcpConnection(ComponentId(Prefix(Subsystem.CSW, "redis"), ComponentType.Service))
     val tcpRegistration = TcpRegistration(tcpConnection, tcpPort)
 
     val httpPort         = 81
     val httpPath         = "/test/hcd"
-    val httpConnection   = HttpConnection(ComponentId("tromboneHcd", ComponentType.HCD))
+    val httpConnection   = HttpConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneHcd"), ComponentType.HCD))
     val httpRegistration = HttpRegistration(httpConnection, httpPort, httpPath)
 
     runOn(seed) {

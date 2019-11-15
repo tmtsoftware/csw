@@ -14,6 +14,7 @@ import csw.location.models.ComponentId
 import csw.location.models.ComponentType.HCD
 import csw.location.models.Connection.AkkaConnection
 import csw.logging.client.scaladsl.LoggingSystemFactory
+import csw.params.core.models.{Prefix, Subsystem}
 import csw.params.events.{Event, EventKey, SystemEvent}
 import csw.time.core.models.UTCTime
 import redis.embedded.{RedisSentinel, RedisServer}
@@ -49,7 +50,7 @@ class DiagnosticDataIntegrationTest extends FrameworkIntegrationSuite {
     Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring)
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")
-    val akkaConnection                = AkkaConnection(ComponentId("IFS_Detector", HCD))
+    val akkaConnection                = AkkaConnection(ComponentId(Prefix(Subsystem.IRIS, "IFS_Detector"), HCD))
     val location                      = locationService.resolve(akkaConnection, 5.seconds).await
 
     LoggingSystemFactory.start("", "", "", actorSystem)

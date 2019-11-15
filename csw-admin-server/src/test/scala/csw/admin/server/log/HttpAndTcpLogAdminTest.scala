@@ -17,6 +17,7 @@ import csw.location.models.{ComponentId, ComponentType}
 import csw.logging.client.internal._
 import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.network.utils.Networks
+import csw.params.core.models.{Prefix, Subsystem}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
@@ -100,7 +101,7 @@ class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpParameter with M
   // DEOPSCSW-160: Config(HTTP) Service can receive and handle runtime update for logging characteristics
   test("get component log meta data and set log level for tcp service not supported") {
 
-    val tcpConnection = TcpConnection(ComponentId("ConfigServer", ComponentType.Service))
+    val tcpConnection = TcpConnection(ComponentId(Prefix(Subsystem.CSW, "ConfigServer"), ComponentType.Service))
 
     // send http get metadata request and verify the response has correct log levels
     val getLogMetadataUri = Uri.from(
@@ -121,7 +122,7 @@ class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpParameter with M
   // DEOPSCSW-160: Config(HTTP) Service can receive and handle runtime update for logging characteristics
   test("set component log level for tcp service not supported") {
 
-    val tcpConnection = TcpConnection(ComponentId("ConfigServer", ComponentType.Service))
+    val tcpConnection = TcpConnection(ComponentId(Prefix(Subsystem.CSW, "ConfigServer"), ComponentType.Service))
 
     // send http get metadata request and verify the response has correct log levels
     val getLogMetadataUri = Uri.from(

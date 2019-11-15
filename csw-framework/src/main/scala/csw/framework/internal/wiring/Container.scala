@@ -24,6 +24,6 @@ private[csw] object Container {
         registrationFactory
       )
     val cswFrameworkSystem = new CswFrameworkSystem(actorSystem)
-    cswFrameworkSystem.spawnTyped(containerBehavior, containerInfo.name)
+    cswFrameworkSystem.spawnTyped(containerBehavior, containerInfo.prefix.toString)
   }
 }

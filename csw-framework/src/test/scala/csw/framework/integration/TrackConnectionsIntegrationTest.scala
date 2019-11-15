@@ -19,6 +19,7 @@ import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{ComponentId, HttpRegistration, TcpRegistration}
 import csw.params.commands
 import csw.params.commands.CommandName
+import csw.params.core.models.{Prefix, Subsystem}
 import csw.params.core.states.{CurrentState, StateName}
 import io.lettuce.core.RedisClient
 
@@ -28,8 +29,8 @@ import scala.concurrent.duration.DurationLong
 class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 
-  private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
-  private val disperserHcdConnection   = AkkaConnection(ComponentId("Disperser", HCD))
+  private val filterAssemblyConnection = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "Filter"), Assembly))
+  private val disperserHcdConnection   = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "Disperser"), HCD))
 
   override def afterAll(): Unit = {
     super.afterAll()
@@ -104,7 +105,7 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
     val assemblySupervisor = Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring).await
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")
-    val akkaConnection                = AkkaConnection(models.ComponentId("IFS_Detector", HCD))
+    val akkaConnection                = AkkaConnection(models.ComponentId(Prefix(Subsystem.IRIS, "IFS_Detector"), HCD))
 
     assertThatSupervisorIsRunning(assemblySupervisor, supervisorLifecycleStateProbe, 5.seconds)
 

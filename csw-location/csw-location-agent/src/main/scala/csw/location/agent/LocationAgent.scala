@@ -11,6 +11,7 @@ import csw.location.api.scaladsl.RegistrationResult
 import csw.location.models.Connection.{HttpConnection, TcpConnection}
 import csw.location.models._
 import csw.logging.api.scaladsl.Logger
+import csw.params.core.models.{Prefix, Subsystem}
 
 import scala.collection.immutable.Seq
 import scala.compat.java8.FutureConverters.CompletionStageOps
@@ -56,15 +57,15 @@ class LocationAgent(names: List[String], command: Command, wiring: Wiring) {
   // ================= INTERNAL API =================
 
   // Registers a single service as a TCP service
-  private def registerTcpName(name: String): Future[RegistrationResult] = {
-    val componentId = ComponentId(name, ComponentType.Service)
+  private def registerTcpName(name: String): Future[RegistrationResult] = { // TODO  take a prefix?
+    val componentId = ComponentId(Prefix(Subsystem.CSW, name), ComponentType.Service)
     val connection  = TcpConnection(componentId)
     locationService.register(TcpRegistration(connection, command.port))
   }
 
   // Registers a single service as a HTTP service with provided path
-  private def registerHttpName(name: String, path: String): Future[RegistrationResult] = {
-    val componentId = ComponentId(name, ComponentType.Service)
+  private def registerHttpName(name: String, path: String): Future[RegistrationResult] = { // TODO
+    val componentId = ComponentId(Prefix(Subsystem.CSW, name), ComponentType.Service)
     val connection  = HttpConnection(componentId)
     locationService.register(HttpRegistration(connection, command.port, path))
   }

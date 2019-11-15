@@ -15,7 +15,7 @@ import csw.location.models.{ComponentId, ComponentType}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.{LoggerFactory, LoggingSystemFactory}
-import csw.params.core.models.Prefix
+import csw.params.core.models.{Prefix, Subsystem}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -37,7 +37,7 @@ object LocationServiceExampleComponentApp extends App {
 
 object LocationServiceExampleComponent {
   // Component ID of the service
-  val componentId = ComponentId("LocationServiceExampleComponent", ComponentType.Assembly)
+  val componentId = ComponentId(Prefix(Subsystem.CSW, "LocationServiceExampleComponent"), ComponentType.Assembly)
 
   // Connection for the service
   val connection = AkkaConnection(componentId)

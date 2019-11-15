@@ -53,7 +53,7 @@ class CancellableCommandTest(ignore: Int)
 
       // resolve the assembly running on seed
       val assemblyLocF =
-        locationService.resolve(AkkaConnection(ComponentId("Monitor_Assembly", ComponentType.Assembly)), 5.seconds)
+        locationService.resolve(AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "Monitor_Assembly"), ComponentType.Assembly)), 5.seconds)
       val assemblyLoc = Await.result(assemblyLocF, 10.seconds).get
 
       val assemblyCommandService = CommandServiceFactory.make(assemblyLoc)

@@ -12,18 +12,17 @@ package csw.params.core.models
  */
 case class Prefix(subsystem: Subsystem, componentName: String) {
   require(componentName == componentName.trim, "component name has leading and trailing whitespaces")
-
   require(!componentName.contains("-"), "component name has '-'")
 
-  val key = s"${subsystem.name}${Prefix.SEPARATOR}$componentName"
-
-  override def toString: String = key
+  private val handle            = s"${subsystem.name}${Prefix.SEPARATOR}$componentName"
+  val actorSystemName: String   = handle.replace('.', '_')
+  override def toString: String = handle
 }
 
 object Prefix {
-  def apply(key: String): Prefix = {
-    require(key.contains(SEPARATOR))
-    val parts = key.splitAt(key.indexOf(SEPARATOR))
+  def apply(handle: String): Prefix = {
+    require(handle.contains(SEPARATOR))
+    val parts = handle.splitAt(handle.indexOf(SEPARATOR))
     Prefix(Subsystem.withNameInsensitive(parts._1), parts._2.tail)
   }
   private val SEPARATOR = "."

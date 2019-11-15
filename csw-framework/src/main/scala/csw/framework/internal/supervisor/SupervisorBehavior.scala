@@ -73,10 +73,9 @@ private[framework] final class SupervisorBehavior(
   import ctx.executionContext
 
   private val log: Logger                                  = loggerFactory.getLogger(ctx)
-  private val componentName: String                        = componentInfo.name
-  private val componentActorName: String                   = s"$componentName-$ComponentActorNameSuffix"
-  private val akkaConnection: AkkaConnection               = AkkaConnection(ComponentId(componentName, componentInfo.componentType))
   private val prefix: Prefix                               = componentInfo.prefix
+  private val componentActorName: String                   = s"${prefix}-$ComponentActorNameSuffix"
+  private val akkaConnection: AkkaConnection               = AkkaConnection(ComponentId(prefix, componentInfo.componentType))
   private val akkaRegistration: AkkaRegistration           = registrationFactory.akkaTyped(akkaConnection, prefix, ctx.self)
   private val isStandalone: Boolean                        = maybeContainerRef.isEmpty
   private[framework] val initializeTimeout: FiniteDuration = componentInfo.initializeTimeout
@@ -110,8 +109,8 @@ private[framework] final class SupervisorBehavior(
       case (SupervisorLifecycleState.Running, message: SupervisorInternalRunningMessage)       => onInternalRunning(message)
       case (SupervisorLifecycleState.Running, runningMessage: SupervisorRunningMessage)        => onRunning(runningMessage)
       case (SupervisorLifecycleState.RunningOffline, runningMessage: SupervisorRunningMessage) => onRunning(runningMessage)
-      case (_, GetComponentLogMetadata(compName, replyTo))                                     => replyTo ! LogAdminUtil.getLogMetadata(compName)
-      case (_, SetComponentLogLevel(compName, logLevel))                                       => LogAdminUtil.setComponentLogLevel(compName, logLevel)
+      case (_, GetComponentLogMetadata(prefixHandle, replyTo))                                 => replyTo ! LogAdminUtil.getLogMetadata(prefixHandle)
+      case (_, SetComponentLogLevel(prefixHandle, logLevel))                                   => LogAdminUtil.setComponentLogLevel(prefixHandle, logLevel)
       case (_, message)                                                                        => ignore(message)
     }
     this

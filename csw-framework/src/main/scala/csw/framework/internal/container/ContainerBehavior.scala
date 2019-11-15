@@ -19,8 +19,6 @@ import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{AkkaRegistration, ComponentId, ComponentType}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
-import csw.params.core.models.Prefix
-import csw.params.core.models.Subsystem.Container
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
@@ -50,8 +48,8 @@ private[framework] final class ContainerBehavior(
 
   import ctx.executionContext
   private val log: Logger     = loggerFactory.getLogger(ctx)
-  private val containerPrefix = Prefix(s"${Container.entryName}.${containerInfo.name}")
-  private val akkaConnection  = AkkaConnection(ComponentId(containerInfo.name, ComponentType.Container))
+  private val containerPrefix = containerInfo.prefix
+  private val akkaConnection  = AkkaConnection(ComponentId(containerPrefix, ComponentType.Container))
   private val akkaRegistration: AkkaRegistration =
     registrationFactory.akkaTyped(akkaConnection, containerPrefix, ctx.self)
 
@@ -61,7 +59,6 @@ private[framework] final class ContainerBehavior(
   // Set of created supervisors which moved into Running state
   var runningComponents: Set[ActorRef[ComponentMessage]] = Set.empty
   var lifecycleState: ContainerLifecycleState            = ContainerLifecycleState.Idle
-
   registerWithLocationService()
 
   // Failure in registration above doesn't affect creation of components

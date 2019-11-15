@@ -30,7 +30,7 @@ object Standalone {
     async {
       val cswCtxF            = CswContext.make(locationService, eventServiceFactory, alarmServiceFactory, componentInfo)(richSystem)
       val supervisorBehavior = SupervisorBehaviorFactory.make(None, registrationFactory, await(cswCtxF))
-      await(richSystem.spawnTyped(supervisorBehavior, componentInfo.name))
+      await(richSystem.spawnTyped(supervisorBehavior, componentInfo.prefix.toString))
     }
   }
 }

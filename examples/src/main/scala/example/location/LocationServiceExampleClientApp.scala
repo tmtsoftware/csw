@@ -22,7 +22,7 @@ import csw.logging.api.scaladsl._
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.scaladsl.{Keys, LoggerFactory, LoggingSystemFactory}
-import csw.params.core.models.Prefix
+import csw.params.core.models.{Prefix, Subsystem}
 import example.location.ExampleMessages.{AllDone, CustomException, TrackingEventAdapter}
 import example.location.LocationServiceExampleClient.locationInfoToString
 import example.location.LocationServiceExampleClientApp.typedSystem
@@ -121,7 +121,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   // dummy http connection
   val httpPort                          = 8080
-  val httpConnection                    = HttpConnection(ComponentId("configuration", ComponentType.Service))
+  val httpConnection                    = HttpConnection(ComponentId(Prefix(Subsystem.CSW, "configuration"), ComponentType.Service))
   val httpRegistration                  = HttpRegistration(httpConnection, httpPort, "path123")
   val httpRegResult: RegistrationResult = Await.result(locationService.register(httpRegistration), 2.seconds)
 
@@ -131,7 +131,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   import akka.actor.typed.scaladsl.adapter._
 
   // dummy HCD connection
-  val hcdConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
+  val hcdConnection = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
   val hcdRegistration: AkkaRegistration = AkkaRegistrationFactory.make(
     hcdConnection,
     Prefix("nfiraos.ncc.tromboneHcd"),
@@ -158,7 +158,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   }
   val typedActorRef: ActorRef[String] = context.system.spawn(behavior(), "typed-actor-ref")
 
-  val assemblyConnection = AkkaConnection(models.ComponentId("assembly1", ComponentType.Assembly))
+  val assemblyConnection = AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "assembly1"), ComponentType.Assembly))
 
   // Register Typed ActorRef[String] with Location Service
   val assemblyRegistration: AkkaRegistration =

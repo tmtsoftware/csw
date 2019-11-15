@@ -4,6 +4,7 @@ import java.net.URI
 import com.typesafe.config.{ConfigException, ConfigFactory, ConfigValueFactory}
 import csw.location.models.Connection.HttpConnection
 import csw.location.models.{ComponentId, ComponentType, HttpLocation}
+import csw.params.core.models.{Prefix, Subsystem}
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.jdk.CollectionConverters._
@@ -37,8 +38,11 @@ class AuthConfigTest extends FunSuite with Matchers {
   test("should create KeycloakDeployment from config and auth server url from location service") {
     val config        = ConfigFactory.load()
     val authServerUrl = "http://somehost:someport"
-    val httpLocation  = HttpLocation(HttpConnection(ComponentId("testComponent", ComponentType.Service)), new URI(authServerUrl))
-    val authConfig    = AuthConfig.create(config, authServerLocation = Some(httpLocation))
+    val httpLocation = HttpLocation(
+      HttpConnection(ComponentId(Prefix(Subsystem.CSW, "testComponent"), ComponentType.Service)),
+      new URI(authServerUrl)
+    )
+    val authConfig = AuthConfig.create(config, authServerLocation = Some(httpLocation))
 
     val deployment = authConfig.getDeployment
 

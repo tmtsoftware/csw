@@ -11,7 +11,7 @@ import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.location.models._
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
-import csw.params.core.models.Prefix
+import csw.params.core.models.{Prefix, Subsystem}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -40,7 +40,7 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec
   // DEOPSCSW-36: Track a crashed service/comp
   test("akka component running on one node should detect if other component running on another node crashes") {
 
-    val akkaConnection = AkkaConnection(ComponentId("Container1", ComponentType.Container))
+    val akkaConnection = AkkaConnection(ComponentId(Prefix(Subsystem.Container, "Container1"), ComponentType.Container))
 
     runOn(seed) {
 
@@ -86,7 +86,7 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec
       val port   = 9595
       val prefix = "/trombone/hcd"
 
-      val httpConnection   = HttpConnection(ComponentId("Assembly1", ComponentType.Assembly))
+      val httpConnection   = HttpConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "Assembly1"), ComponentType.Assembly))
       val httpRegistration = HttpRegistration(httpConnection, port, prefix)
       val probe            = TestProbe[TrackingEvent]("test-probe")
 

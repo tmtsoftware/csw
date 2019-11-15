@@ -9,7 +9,7 @@ import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.commands.{CommandName, Sequence, Setup}
-import csw.params.core.models.Prefix
+import csw.params.core.models.{Prefix, Subsystem}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
@@ -22,7 +22,7 @@ object SequencerCommandServiceExample extends App {
   private val locationService = HttpLocationServiceFactory.makeLocalClient(typedSystem)
 
   // #create-sequence-command-service
-  private val connection             = AkkaConnection(ComponentId("sequencer", ComponentType.Sequencer))
+  private val connection             = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "sequencer"), ComponentType.Sequencer))
   private val location: AkkaLocation = Await.result(locationService.resolve(connection, 5.seconds), 5.seconds).get
 
   val sequencerCommandService: SequencerCommandServiceImpl = SequencerCommandServiceFactory.make(location)

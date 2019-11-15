@@ -97,14 +97,14 @@ public class JLocationServiceExampleClient extends AbstractActor {
         //#Components-Connections-Registrations
 
         // dummy http connection
-        HttpConnection httpConnection = new HttpConnection(new ComponentId("configuration", JComponentType.Service()));
+        HttpConnection httpConnection = new HttpConnection(new ComponentId(new Prefix(JSubsystem.CSW, "configuration"), JComponentType.Service()));
         HttpRegistration httpRegistration = new HttpRegistration(httpConnection, 8080, "path123");
         httpRegResult = locationService.register(httpRegistration).get();
 
         // ************************************************************************************************************
 
         // dummy HCD connection
-        AkkaConnection hcdConnection = new AkkaConnection(new ComponentId("hcd1", JComponentType.HCD()));
+        AkkaConnection hcdConnection = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "hcd1"), JComponentType.HCD()));
         ActorRef actorRef = getContext().actorOf(Props.create(AbstractActor.class, () -> new AbstractActor() {
                     @Override
                     public Receive createReceive() {
@@ -126,7 +126,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         Behavior<String> behavior = Behaviors.setup(ctx -> Behaviors.same());
         akka.actor.typed.ActorRef<String> typedActorRef = Adapter.spawn(context(), behavior, "typed-actor-ref");
 
-        AkkaConnection assemblyConnection = new AkkaConnection(new ComponentId("assembly1", JComponentType.Assembly()));
+        AkkaConnection assemblyConnection = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "assembly1"), JComponentType.Assembly()));
 
         // Register Typed ActorRef[String] with Location Service
         AkkaRegistration assemblyRegistration = new RegistrationFactory().akkaTyped(assemblyConnection, new Prefix(JSubsystem.NFIRAOS, "ncc.tromboneAssembly"), typedActorRef);

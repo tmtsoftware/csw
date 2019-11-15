@@ -16,6 +16,7 @@ import csw.location.models.ComponentType.{Assembly, HCD}
 import csw.location.models.Connection.AkkaConnection
 import csw.params.commands
 import csw.params.commands.CommandName
+import csw.params.core.models.{Prefix, Subsystem}
 import csw.params.core.states.{CurrentState, StateName}
 import redis.embedded.{RedisSentinel, RedisServer}
 
@@ -29,8 +30,8 @@ class EventServiceIntegrationTest extends FrameworkIntegrationSuite {
   private var sentinel: RedisSentinel = _
   private var server: RedisServer     = _
 
-  private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
-  private val disperserHcdConnection   = AkkaConnection(models.ComponentId("Disperser", HCD))
+  private val filterAssemblyConnection = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "Filter"), Assembly))
+  private val disperserHcdConnection   = AkkaConnection(models.ComponentId(Prefix(Subsystem.TCS, "Disperser"), HCD))
   private val wiring                   = FrameworkWiring.make(seedActorSystem)
 
   override protected def beforeAll(): Unit = {

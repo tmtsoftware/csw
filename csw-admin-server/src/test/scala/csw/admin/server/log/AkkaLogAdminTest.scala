@@ -29,7 +29,7 @@ import csw.logging.models.{Level, LogMetadata}
 import csw.network.utils.Networks
 import csw.params.commands.CommandResponse.OnewayResponse
 import csw.params.commands.{CommandName, Setup}
-import csw.params.core.models.Prefix
+import csw.params.core.models.{Prefix, Subsystem}
 import io.lettuce.core.RedisClient
 
 import scala.concurrent.Await
@@ -45,9 +45,9 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
 
   implicit val testKitSettings: TestKitSettings = TestKitSettings(typedSystem)
 
-  private val laserConnection            = AkkaConnection(ComponentId("Laser", Assembly))
-  private val motionControllerConnection = AkkaConnection(models.ComponentId("Motion_Controller", HCD))
-  private val galilConnection            = AkkaConnection(models.ComponentId("Galil", Assembly))
+  private val laserConnection            = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "Laser"), Assembly))
+  private val motionControllerConnection = AkkaConnection(models.ComponentId(Prefix(Subsystem.TCS, "Motion_Controller"), HCD))
+  private val galilConnection            = AkkaConnection(models.ComponentId(Prefix(Subsystem.TCS, "Galil"), Assembly))
 
   private var containerActorSystem: ActorSystem[SpawnProtocol.Command] = _
 
@@ -128,7 +128,11 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
     val akkaLevel  = Level(config.getString("akkaLogLevel"))
     val slf4jLevel = Level(config.getString("slf4jLogLevel"))
     val componentLogLevel = Level(
-      config.getObject("component-log-levels").unwrapped().asScala(motionControllerConnection.componentId.name).toString
+      config
+        .getObject("component-log-levels")
+        .unwrapped()
+        .asScala(motionControllerConnection.componentId.prefix.toString)
+        .toString
     )
 
     logMetadata1 shouldBe LogMetadata(logLevel, akkaLevel, slf4jLevel, componentLogLevel)
@@ -158,7 +162,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
     val groupByComponentNamesLog = logBuffer.groupBy { json =>
       if (json.contains("@componentName")) json.getString("@componentName")
     }
-    val laserComponentLogs = groupByComponentNamesLog(laserComponent.info.name)
+    val laserComponentLogs = groupByComponentNamesLog(laserComponent.info.prefix.toString)
 
     laserComponentLogs.exists(log => log.getString("@severity").toLowerCase.equalsIgnoreCase("info")) shouldBe true
     laserComponentLogs.foreach { log =>
@@ -174,7 +178,6 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
       path = s"/admin/logging/${laserConnection.name}/level",
       queryString = Some("value=error")
     )
-
     val request  = HttpRequest(HttpMethods.POST, uri = uri)
     val response = Await.result(Http()(typedSystem.toClassic).singleRequest(request), 5.seconds)
 
@@ -192,8 +195,8 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
     Thread.sleep(100)
 
     val groupByAfterFilter       = logBuffer.groupBy(json => json.getString("@componentName"))
-    val laserCompLogsAfterFilter = groupByAfterFilter(laserConnection.componentId.name)
-    val galilCompLogsAfterFilter = groupByAfterFilter(galilConnection.componentId.name)
+    val laserCompLogsAfterFilter = groupByAfterFilter(laserConnection.componentId.prefix.toString)
+    val galilCompLogsAfterFilter = groupByAfterFilter(galilConnection.componentId.prefix.toString)
 
     laserCompLogsAfterFilter.exists(log => log.getString("@severity").toLowerCase.equalsIgnoreCase("error")) shouldBe true
     laserCompLogsAfterFilter.foreach { log =>
@@ -216,7 +219,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
       scheme = "http",
       host = Networks().hostname,
       port = 7879,
-      path = s"/admin/logging/abcd-hcd-akka/level"
+      path = s"/admin/logging/tcs.abcd-hcd-akka/level"
     )
 
     val getLogMetadataRequest   = HttpRequest(HttpMethods.GET, uri = getLogMetadataUri)

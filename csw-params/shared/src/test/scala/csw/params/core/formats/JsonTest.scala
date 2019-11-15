@@ -56,8 +56,6 @@ class JsonTest extends FunSpec {
       val expectedJson = Json.obj("subsystem" -> "wfos", "componentName" -> "filter.wheel")
       val json         = JsonSupport.writes(prefix)
       val sub          = JsonSupport.reads[Prefix](json)
-      println(json)
-      println(expectedJson)
       assert(sub == prefix)
       assert(json.equals(expectedJson))
     }

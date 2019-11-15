@@ -36,7 +36,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val sampleHcdHandler: ComponentHandlers                        = mock[ComponentHandlers]
     val timerScheduler: TimerScheduler[SupervisorMessage]          = mock[TimerScheduler[SupervisorMessage]]
     val containerIdleMessageProbe: TestProbe[ContainerIdleMessage] = TestProbe[ContainerIdleMessage]
-    val componentActorName                                         = s"${compInfo.name}-${SupervisorBehavior.ComponentActorNameSuffix}"
+    val componentActorName                                         = s"${compInfo.prefix}-${SupervisorBehavior.ComponentActorNameSuffix}"
     val supervisorBehaviorKit = BehaviorTestKit(
       Behaviors
         .setup[SupervisorMessage](
