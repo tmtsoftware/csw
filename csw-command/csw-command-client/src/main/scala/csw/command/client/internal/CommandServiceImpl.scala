@@ -88,18 +88,12 @@ private[command] class CommandServiceImpl(component: ActorRef[ComponentMessage])
         bufferSize,
         overflowStrategy = OverflowStrategy.dropHead
       )
-      .map { x =>
-        println(s"11111111111111")
-        println(x)
-        x
-      }
       .mapMaterializedValue { ref =>
         if (names.isEmpty) component ! ComponentStateSubscription(Subscribe(ref))
         else component ! ComponentStateSubscription(SubscribeOnly(ref, names))
-        () => ()
       }
-//      .viaMat(KillSwitches.single)(Keep.right)
-//      .mapMaterializedValue(killSwitch => () => killSwitch.shutdown())
+      .viaMat(KillSwitches.single)(Keep.right)
+      .mapMaterializedValue(killSwitch => () => killSwitch.shutdown())
 
   }
 

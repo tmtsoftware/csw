@@ -11,12 +11,11 @@ import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.models.ComponentId
 import csw.location.models.ComponentType.Assembly
-import csw.location.models.Connection.{AkkaConnection, HttpConnection}
-import csw.logging.client.scaladsl.LoggingSystemFactory
+import csw.location.models.Connection.HttpConnection
 import csw.params.commands
 import csw.params.commands.CommandName
 import csw.params.core.states.CurrentState
-import csw.command.client.extensions.AkkaLocationExt._
+
 import scala.concurrent.duration.DurationLong
 
 //DEOPSCSW-550: Provide TimeService accessible to component developers
@@ -26,8 +25,6 @@ class TimeServiceIntegrationTest extends FrameworkIntegrationSuite {
 
   private val filterAssemblyConnection = HttpConnection(ComponentId("Filter", Assembly))
   private val wiring                   = FrameworkWiring.make(seedActorSystem)
-
-  LoggingSystemFactory.forTestingOnly()
 
   override def afterAll(): Unit = {
     super.afterAll()
@@ -42,20 +39,14 @@ class TimeServiceIntegrationTest extends FrameworkIntegrationSuite {
 
     val filterAssemblyLocation = testWiring.seedLocationService.find(filterAssemblyConnection).await
 
-//    val assemblyCommandService = CommandServiceFactory.make2(filterAssemblyLocation.get.componentRef)
     val assemblyCommandService = CommandServiceFactory.make(filterAssemblyLocation.get)
 
-    assemblyCommandService.subscribeCurrentState { state =>
-      println("77777777777777")
-      println(state)
-    }
+    assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)
 
-    implicit val timeout: Timeout = Timeout(1000.millis)
+    implicit val timeout: Timeout = Timeout(100.millis)
     assemblyCommandService.submitAndWait(commands.Setup(prefix, CommandName("time.service.scheduler.success"), None))
-    Thread.sleep(5000)
+    Thread.sleep(1000)
 
-//    val value1: Seq[CurrentState] = assemblyProbe.receiveAll()
-//    value1.foreach(println)
-//    value1 should contain(CurrentState(prefix, timeServiceSchedulerState))
+    assemblyProbe.receiveAll() should contain(CurrentState(prefix, timeServiceSchedulerState))
   }
 }
