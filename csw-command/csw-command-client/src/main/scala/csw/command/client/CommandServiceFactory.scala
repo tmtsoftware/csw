@@ -35,8 +35,8 @@ object CommandServiceFactory extends ICommandServiceFactory {
     val baseUri      = componentLocation.uri.toString
     val webSocketUri = Uri(baseUri).withScheme("ws").withPath(Path("/websocket-endpoint"))
     val httpUri      = Uri(baseUri).withPath(Path("/post-endpoint"))
-    println(httpUri.toString())
-    println(webSocketUri.toString())
+    println(httpUri)
+    println(webSocketUri)
     new CommandServiceClient(
       new HttpPostTransport(httpUri.toString(), JsonText, () => None),
       new WebsocketTransport(webSocketUri.toString(), JsonText)
