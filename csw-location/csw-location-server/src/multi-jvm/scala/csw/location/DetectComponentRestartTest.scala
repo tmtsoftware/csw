@@ -37,7 +37,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
     runOn(member1) {
       locationService
         .register(
-          make(akkaConnection, Prefix("nfiraos.ncc.trombone"), typedSystem.spawn(Behaviors.empty, "empty").toURI)
+          make(akkaConnection, typedSystem.spawn(Behaviors.empty, "empty").toURI)
         )
         .await
 
@@ -71,7 +71,6 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
         .register(
           make(
             akkaConnection,
-            Prefix("nfiraos.ncc.trombone"),
             newTypedSystem.spawn(Behaviors.empty, "empty").toURI
           )
         )

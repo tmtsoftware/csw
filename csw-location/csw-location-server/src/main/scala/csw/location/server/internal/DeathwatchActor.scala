@@ -37,7 +37,7 @@ private[location] class DeathwatchActor(locationService: LocationService)(implic
 
       // Ignore HttpLocation or TcpLocation (Do not watch)
       unwatchedLocations.foreach {
-        case AkkaLocation(_, _, actorRefURI) =>
+        case AkkaLocation(_, actorRefURI) =>
           log.debug(s"Started watching actor: ${actorRefURI.toString}")
           context.watch(actorRefURI.toActorRef)
         case _ => // ignore http and tcp location
@@ -53,8 +53,8 @@ private[location] class DeathwatchActor(locationService: LocationService)(implic
         ctx.unwatch(deadActorRef)
         //Unregister the dead location and remove it from the list of watched locations
         val maybeLocation = watchedLocations.find {
-          case AkkaLocation(_, _, actorRefUri) => deadActorRef == actorRefUri.toActorRef
-          case _                               => false
+          case AkkaLocation(_, actorRefUri) => deadActorRef == actorRefUri.toActorRef
+          case _                            => false
         }
         maybeLocation match {
           case Some(location) =>

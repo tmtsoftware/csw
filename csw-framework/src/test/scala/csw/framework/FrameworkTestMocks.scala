@@ -34,8 +34,8 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol.Command]) ex
 
   ///////////////////////////////////////////////
   val testActor: ActorRef[Any] = TestProbe("test-probe").ref
-  val akkaRegistration: AkkaRegistration =
-    AkkaRegistrationFactory.make(mock[AkkaConnection], Prefix("nfiraos.ncc.trombone"), testActor.toURI)
+  val akkaRegistration =
+    AkkaRegistrationFactory.make(mock[AkkaConnection], testActor.toURI)
   val locationService: LocationService           = mock[LocationService]
   val eventServiceFactory: EventServiceFactory   = mock[EventServiceFactory]
   val eventService: EventService                 = mock[EventService]
@@ -44,7 +44,7 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol.Command]) ex
   val registrationResult: RegistrationResult     = mock[RegistrationResult]
   val registrationFactory: RegistrationFactory   = mock[RegistrationFactory]
 
-  when(registrationFactory.akkaTyped(any[AkkaConnection], any[Prefix], any[ActorRef[_]]))
+  when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]]))
     .thenReturn(akkaRegistration)
   when(locationService.register(akkaRegistration)).thenReturn(Future.successful(registrationResult))
   when(locationService.unregister(any[AkkaConnection])).thenReturn(Future.successful(Done))

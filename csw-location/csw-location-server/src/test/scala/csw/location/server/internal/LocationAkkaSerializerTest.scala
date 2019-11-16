@@ -53,7 +53,7 @@ private[location] class LocationAkkaSerializerTest extends FunSuite with Matcher
     val tcpConnection  = TcpConnection(models.ComponentId(prefix, Assembly))
     val testData = Table(
       "Location models",
-      AkkaLocation(akkaConnection, prefix, system.toURI),
+      AkkaLocation(akkaConnection, system.toURI),
       HttpLocation(httpConnection, new URI("")),
       TcpLocation(tcpConnection, new URI(""))
     )
@@ -73,7 +73,7 @@ private[location] class LocationAkkaSerializerTest extends FunSuite with Matcher
     val tcpConnection  = TcpConnection(models.ComponentId(prefix, Assembly))
     val testData = Table(
       "Registration models",
-      AkkaRegistration(akkaConnection, prefix, system.toURI),
+      AkkaRegistration(akkaConnection, system.toURI),
       HttpRegistration(httpConnection, 1234, ""),
       TcpRegistration(tcpConnection, 1234)
     )
@@ -89,7 +89,7 @@ private[location] class LocationAkkaSerializerTest extends FunSuite with Matcher
 
   test("should use location serializer for TrackingEvent (de)serialization") {
     val akkaConnection = AkkaConnection(models.ComponentId(prefix, Assembly))
-    val akkaLocation   = AkkaLocation(akkaConnection, prefix, system.toURI)
+    val akkaLocation   = AkkaLocation(akkaConnection, system.toURI)
 
     val testData = Table(
       "TrackingEvent models",

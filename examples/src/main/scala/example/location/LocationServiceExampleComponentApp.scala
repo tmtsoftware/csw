@@ -54,7 +54,6 @@ object LocationServiceExampleComponent {
         locationService.register(
           AkkaRegistrationFactory.make(
             LocationServiceExampleComponent.connection,
-            Prefix("nfiraos.ncc.trombone"),
             ctx.self.toURI
           )
         )

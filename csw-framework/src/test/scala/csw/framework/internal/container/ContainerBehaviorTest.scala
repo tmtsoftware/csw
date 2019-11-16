@@ -42,7 +42,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar wit
   class IdleContainer() {
     private val testActor: ActorRef[Any] = TestProbe("test-probe").ref
     val akkaRegistration =
-      AkkaRegistrationFactory.make(mock[AkkaConnection], Prefix("nfiraos.ncc.trombone"), testActor.toURI)
+      AkkaRegistrationFactory.make(mock[AkkaConnection], testActor.toURI)
     val locationService: LocationService                        = mock[LocationService]
     val eventService: EventServiceFactory                       = mock[EventServiceFactory]
     val alarmService: AlarmServiceFactory                       = mock[AlarmServiceFactory]
@@ -73,7 +73,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar wit
     ).thenAnswer((_: ActorRef[ContainerIdleMessage], ci: ComponentInfo) => answer(ci))
 
     private val registrationFactory: RegistrationFactory = mock[RegistrationFactory]
-    when(registrationFactory.akkaTyped(any[AkkaConnection], any[Prefix], any[ActorRef[_]]))
+    when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]]))
       .thenReturn(akkaRegistration)
 
     private val eventualRegistrationResult: Future[RegistrationResult] =

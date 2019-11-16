@@ -30,11 +30,9 @@ class TrackLocationTest(ignore: Int, mode: String) extends LSNodeSpec(config = n
     //create tcp connection
     val tcpConnection = TcpConnection(models.ComponentId(Prefix(Subsystem.CSW, "redis1"), ComponentType.Service))
 
-    val prefix = Prefix("nfiraos.ncc.trombone")
-
     runOn(seed) {
       val actorRef = cswCluster.typedSystem.spawn(Behaviors.empty, "trombone-hcd")
-      locationService.register(AkkaRegistrationFactory.make(akkaConnection, prefix, actorRef.toURI)).await
+      locationService.register(AkkaRegistrationFactory.make(akkaConnection, actorRef.toURI)).await
       enterBarrier("Registration")
 
       locationService.unregister(akkaConnection).await

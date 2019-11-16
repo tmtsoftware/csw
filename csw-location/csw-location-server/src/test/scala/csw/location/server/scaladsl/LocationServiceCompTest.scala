@@ -48,7 +48,6 @@ class LocationServiceCompTest(mode: String)
   var clusterSystem: typed.ActorSystem[SpawnProtocol.Command]        = _
   private var locationService: LocationService                       = _
 
-  private val prefix                    = Prefix("nfiraos.ncc.trombone")
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 100.millis)
 
   override protected def beforeAll(): Unit = {
@@ -139,7 +138,7 @@ class LocationServiceCompTest(mode: String)
     val componentId      = models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD)
     val connection       = AkkaConnection(componentId)
     val actorRef         = typedSystem.spawn(Behaviors.empty, "my-actor-1")
-    val akkaRegistration = AkkaRegistrationFactory.make(connection, Prefix("nfiraos.ncc.trombone"), actorRef.toURI)
+    val akkaRegistration = AkkaRegistrationFactory.make(connection, actorRef.toURI)
 
     // register, resolve & list akka connection for the first time
     locationService.register(akkaRegistration).await.location.connection shouldBe connection
@@ -170,7 +169,7 @@ class LocationServiceCompTest(mode: String)
     val actorRef    = typedSystem.spawn(Behaviors.empty[Any], "my-actor-to-die")
 
     locationService
-      .register(make(connection, prefix, actorRef.toURI))
+      .register(make(connection, actorRef.toURI))
       .await
       .location
       .connection shouldBe connection
@@ -178,7 +177,7 @@ class LocationServiceCompTest(mode: String)
     Thread.sleep(10)
 
     locationService.list.await shouldBe List(
-      make(connection, prefix, actorRef.toURI).location(Networks().hostname)
+      make(connection, actorRef.toURI).location(Networks().hostname)
     )
 
     actorRef ! PoisonPill
@@ -239,15 +238,15 @@ class LocationServiceCompTest(mode: String)
     val hostname = Networks().hostname
     //create http registration
     val port             = 9595
-    val prefix           = "csw.trombone.hcd"
-    val httpConnection   = HttpConnection(models.ComponentId(Prefix(Subsystem.CSW, "Assembly1"), ComponentType.Assembly))
-    val httpRegistration = HttpRegistration(httpConnection, port, prefix)
+    val prefix           = Prefix(Subsystem.CSW, "Assembly1")
+    val httpConnection   = HttpConnection(models.ComponentId(prefix, ComponentType.Assembly))
+    val httpRegistration = HttpRegistration(httpConnection, port, prefix.toString)
 
     //create akka registration
     val akkaComponentId  = models.ComponentId(Prefix(Subsystem.CSW, "container1"), ComponentType.Container)
     val akkaConnection   = AkkaConnection(akkaComponentId)
     val actorRef         = typedSystem.spawn(Behaviors.empty, "container1-actor")
-    val akkaRegistration = AkkaRegistrationFactory.make(akkaConnection, Prefix(prefix), actorRef.toURI)
+    val akkaRegistration = AkkaRegistrationFactory.make(akkaConnection, actorRef.toURI)
 
     val httpRegistrationResult = locationService.register(httpRegistration).await
     val akkaRegistrationResult = locationService.register(akkaRegistration).await
@@ -280,9 +279,9 @@ class LocationServiceCompTest(mode: String)
     val hostname = Networks().hostname
     //create http registration
     val port             = 9595
-    val prefix           = "csw.trombone.hcd"
-    val httpConnection   = HttpConnection(models.ComponentId(Prefix(Subsystem.CSW, "trombone1"), ComponentType.HCD))
-    val httpRegistration = HttpRegistration(httpConnection, port, prefix)
+    val prefix           = Prefix(Subsystem.CSW, "trombone1")
+    val httpConnection   = HttpConnection(models.ComponentId(prefix, ComponentType.HCD))
+    val httpRegistration = HttpRegistration(httpConnection, port, prefix.toString)
 
     val httpRegistrationResult = locationService.register(httpRegistration).await
 
@@ -370,7 +369,7 @@ class LocationServiceCompTest(mode: String)
     val hcdConnection = AkkaConnection(models.ComponentId(Prefix(Subsystem.CSW, "hcd1"), ComponentType.HCD))
     val actorRef      = typedSystem.spawn(Behaviors.empty, "my-actor-2")
 
-    locationService.register(make(hcdConnection, prefix, actorRef.toURI)).await
+    locationService.register(make(hcdConnection, actorRef.toURI)).await
 
     val redisConnection = TcpConnection(models.ComponentId(Prefix(Subsystem.CSW, "redis"), ComponentType.Service))
     locationService.register(TcpRegistration(redisConnection, 1234)).await
@@ -394,7 +393,7 @@ class LocationServiceCompTest(mode: String)
       "my-actor-3"
     )
 
-    locationService.register(make(hcdAkkaConnection, prefix, actorRef.toURI)).await
+    locationService.register(make(hcdAkkaConnection, actorRef.toURI)).await
 
     val redisTcpConnection = TcpConnection(models.ComponentId(Prefix(Subsystem.CSW, "redis"), ComponentType.Service))
     locationService.register(TcpRegistration(redisTcpConnection, 1234)).await
@@ -432,7 +431,7 @@ class LocationServiceCompTest(mode: String)
       "my-actor-4"
     )
 
-    locationService.register(make(akkaConnection, prefix, actorRef.toURI)).await
+    locationService.register(make(akkaConnection, actorRef.toURI)).await
 
     locationService.list(Networks().hostname).await.map(_.connection).toSet shouldBe Set(
       tcpConnection,
@@ -446,19 +445,18 @@ class LocationServiceCompTest(mode: String)
   // DEOPSCSW-308: Add prefix in Location service models
   // DEOPSCSW-12: Create location service API
   test("should filter akka connections based on prefix") {
-    val akkaConnection1 = AkkaConnection(models.ComponentId(Prefix(Subsystem.CSW, "hcd1"), ComponentType.HCD))
-    val akkaConnection2 = AkkaConnection(models.ComponentId(Prefix(Subsystem.CSW, "assembly2"), ComponentType.Assembly))
-    val akkaConnection3 = AkkaConnection(models.ComponentId(Prefix(Subsystem.CSW, "hcd3"), ComponentType.HCD))
+    val akkaConnection1 = AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "ncc.trombone.hcd1"), ComponentType.HCD))
+    val akkaConnection2 =
+      AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "ncc.trombone.assembly2"), ComponentType.Assembly))
+    val akkaConnection3 = AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "ncc.trombone.hcd3"), ComponentType.HCD))
 
     val actorRef  = typedSystem.spawn(Behaviors.empty, "")
     val actorRef2 = typedSystem.spawn(Behaviors.empty, "")
     val actorRef3 = typedSystem.spawn(Behaviors.empty, "")
 
-    locationService.register(make(akkaConnection1, Prefix("nfiraos.ncc.tromboneHcd1"), actorRef.toURI)).await
-    locationService
-      .register(make(akkaConnection2, Prefix("nfiraos.ncc.tromboneAssembly2"), actorRef2.toURI))
-      .await
-    locationService.register(make(akkaConnection3, Prefix("nfiraos.ncc.tromboneHcd3"), actorRef3.toURI)).await
+    locationService.register(make(akkaConnection1, actorRef.toURI)).await
+    locationService.register(make(akkaConnection2, actorRef2.toURI)).await
+    locationService.register(make(akkaConnection3, actorRef3.toURI)).await
 
     locationService.listByPrefix("nfiraos.ncc.trombone").await.map(_.connection).toSet shouldBe Set(
       akkaConnection1,

@@ -51,7 +51,7 @@ private[framework] final class ContainerBehavior(
   private val containerPrefix = containerInfo.prefix
   private val akkaConnection  = AkkaConnection(ComponentId(containerPrefix, ComponentType.Container))
   private val akkaRegistration: AkkaRegistration =
-    registrationFactory.akkaTyped(akkaConnection, containerPrefix, ctx.self)
+    registrationFactory.akkaTyped(akkaConnection, ctx.self)
 
   // Set of successfully created supervisors for components
   var supervisors: Set[SupervisorInfo] = Set.empty

@@ -29,13 +29,11 @@ sealed abstract class Registration extends LocationSerializable {
  * AkkaRegistration holds the information needed to register an akka location
  *
  * @param connection the `Connection` to register with `LocationService`
- * @param prefix prefix of the component
  * @param actorRefURI Provide a remote actor uri that is offering a connection. Local actors cannot be registered since they can't be
  *                 communicated from components across the network
  */
 final case class AkkaRegistration private[csw] (
     connection: AkkaConnection,
-    prefix: Prefix,
     actorRefURI: URI
 ) extends Registration {
 
@@ -45,7 +43,7 @@ final case class AkkaRegistration private[csw] (
    * @param hostname provide a hostname where the connection endpoint is available
    * @return an AkkaLocation location representing a live connection at provided hostname
    */
-  override def location(hostname: String): Location = AkkaLocation(connection, prefix, actorRefURI)
+  override def location(hostname: String): Location = AkkaLocation(connection, actorRefURI)
 }
 
 /**
