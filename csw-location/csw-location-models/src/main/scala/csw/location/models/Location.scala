@@ -21,6 +21,8 @@ sealed abstract class Location extends LocationSerializable {
    */
   def uri: URI
 
+  def prefix: Prefix = connection.connectionInfo.prefix
+
 }
 
 /**
@@ -29,10 +31,9 @@ sealed abstract class Location extends LocationSerializable {
  * @note Do not directly access actorRef from constructor, use one of component() or containerRef() method
  *       to get the correctly typed actor reference.
  * @param connection represents a connection based on a componentId and the type of connection offered by the component
- * @param prefix prefix of the component
  * @param uri represents the actor URI of the component. Gateway or router for a component that other components will resolve and talk to.
  */
-final case class AkkaLocation(connection: AkkaConnection, prefix: Prefix, uri: URI) extends Location
+final case class AkkaLocation(connection: AkkaConnection, uri: URI) extends Location
 
 /**
  * Represents a live Tcp connection

@@ -121,7 +121,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         // to Typed ActorRef[Nothing]
 
         URI actorRefURI = ActorExtension.RichActor(Adapter.toTyped(actorRef)).toURI();
-        AkkaRegistration hcdRegistration = csw.location.api.AkkaRegistrationFactory.make(hcdConnection, new Prefix(JSubsystem.NFIRAOS, "ncc.tromboneHcd"), actorRefURI);
+        AkkaRegistration hcdRegistration = csw.location.api.AkkaRegistrationFactory.make(hcdConnection, actorRefURI);
         hcdRegResult = locationService.register(hcdRegistration).get();
 
         // ************************************************************************************************************
@@ -134,7 +134,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         AkkaConnection assemblyConnection = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "assembly1"), JComponentType.Assembly()));
 
         // Register Typed ActorRef[String] with Location Service
-        AkkaRegistration assemblyRegistration = new RegistrationFactory().akkaTyped(assemblyConnection, new Prefix(JSubsystem.NFIRAOS, "ncc.tromboneAssembly"), typedActorRef);
+        AkkaRegistration assemblyRegistration = new RegistrationFactory().akkaTyped(assemblyConnection, typedActorRef);
 
 
         assemblyRegResult = locationService.register(assemblyRegistration).get();

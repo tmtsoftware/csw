@@ -29,10 +29,9 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
 
     val akkaConnection = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
     val actorRefUri    = actorSystem.toURI
-    val prefix         = Prefix("nfiraos.ncc.trombone")
 
-    val akkaRegistration     = AkkaRegistrationFactory.make(akkaConnection, prefix, actorRefUri)
-    val expectedAkkaLocation = AkkaLocation(akkaConnection, prefix, actorRefUri)
+    val akkaRegistration     = AkkaRegistrationFactory.make(akkaConnection, actorRefUri)
+    val expectedAkkaLocation = AkkaLocation(akkaConnection, actorRefUri)
 
     akkaRegistration.location(hostname) shouldBe expectedAkkaLocation
   }
@@ -70,10 +69,9 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "local-actor-system", config)
     val actorRefURI                                              = actorSystem.spawn(Behaviors.empty, "my-actor-2").toURI
     val akkaConnection                                           = AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
-    val prefix                                                   = Prefix("nfiraos.ncc.trombone")
 
     intercept[LocalAkkaActorRegistrationNotAllowed] {
-      AkkaRegistrationFactory.make(akkaConnection, prefix, actorRefURI)
+      AkkaRegistrationFactory.make(akkaConnection, actorRefURI)
     }
     actorSystem.terminate()
     Await.result(actorSystem.whenTerminated, 10.seconds)

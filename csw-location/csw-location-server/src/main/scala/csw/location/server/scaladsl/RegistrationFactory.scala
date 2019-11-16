@@ -18,11 +18,10 @@ class RegistrationFactory {
    * is not a remote actorRef.
    *
    * @param akkaConnection the AkkaConnection representing the component
-   * @param prefix the prefix of the component
    * @param actorRef the supervisor actorRef of the component
    * @return a handle to the AkkaRegistration that is used to register in location service
    */
-  def akkaTyped(akkaConnection: AkkaConnection, prefix: Prefix, actorRef: ActorRef[_]): AkkaRegistration =
-    AkkaRegistrationFactory.make(akkaConnection, prefix, actorRef.toURI)
+  def akkaTyped(akkaConnection: AkkaConnection, actorRef: ActorRef[_]): AkkaRegistration =
+    AkkaRegistrationFactory.make(akkaConnection, actorRef.toURI)
 
 }

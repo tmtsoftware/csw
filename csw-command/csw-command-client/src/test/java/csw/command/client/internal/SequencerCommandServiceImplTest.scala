@@ -40,7 +40,6 @@ class SequencerCommandServiceImplTest
     val location =
       AkkaLocation(
         AkkaConnection(ComponentId(Prefix(Subsystem.IRIS, "sequencer"), ComponentType.Sequencer)),
-        Prefix("iris.x.y"),
         sequencer.toURI
       )
 
