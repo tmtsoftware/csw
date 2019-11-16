@@ -82,7 +82,7 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         eventService.defaultSubscriber.subscribeCallback(Set(event.eventKey), processEvent(somePrefix))
 
       case Setup(_, CommandName("time.service.scheduler.success"), _, _) =>
-        timeServiceScheduler.scheduleOnce(UTCTime.after(500.millis)) {
+        timeServiceScheduler.scheduleOnce(UTCTime.now()) {
           currentStatePublisher.publish(CurrentState(prefix, timeServiceSchedulerState))
         }
 
