@@ -1,10 +1,10 @@
 package csw.event.client.internal.kafka
 
 import akka.Done
-import akka.actor.typed.ActorRef
+import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.kafka.{ConsumerSettings, Subscription, Subscriptions, scaladsl}
 import akka.stream.scaladsl.{Keep, Sink, Source}
-import akka.stream.{Materializer, StreamDetachedException}
+import akka.stream.{Attributes, StreamDetachedException}
 import csw.event.api.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import csw.event.client.internal.commons.{EventConverter, EventSubscriberUtil}
 import csw.event.client.utils.Utils
@@ -14,9 +14,9 @@ import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.common.TopicPartition
 
 import scala.async.Async.{async, await}
-import scala.jdk.CollectionConverters._
+import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.{ExecutionContext, Future}
+import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 
 /**
@@ -24,14 +24,16 @@ import scala.util.control.NonFatal
  * and subscribing events.
  *
  * @param consumerSettings  future of settings for akka-streams-kafka API for Apache Kafka consumer
- * @param ec                the execution context to be used for performing asynchronous operations
- * @param mat               the materializer to be used for materializing underlying streams
+ * @param attributes  resuming materializer for publishing streams
+ * @param actorSystem to be used for performing asynchronous operations
  */
 // $COVERAGE-OFF$
 private[event] class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[String, Array[Byte]]])(
-    implicit ec: ExecutionContext,
-    mat: Materializer
+    implicit attributes: Attributes,
+    actorSystem: ActorSystem[_]
 ) extends EventSubscriber {
+
+  import actorSystem.executionContext
 
   private val consumer: Future[Consumer[String, Array[Byte]]] = consumerSettings.map(_.createKafkaConsumer())
   private val eventSubscriberUtil                             = new EventSubscriberUtil()
