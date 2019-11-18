@@ -5,8 +5,8 @@ import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import akka.{Done, actor}
 import csw.alarm.api.scaladsl.AlarmService
-import csw.command.client.{CommandResponseManager, MiniCRM}
 import csw.command.client.models.framework.{LifecycleStateChanged, PubSub}
+import csw.command.client.{CommandResponseManager, MiniCRM}
 import csw.config.api.scaladsl.ConfigClientService
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.event.api.scaladsl.EventService
@@ -17,8 +17,8 @@ import csw.framework.scaladsl.RegistrationFactory
 import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
+import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{AkkaRegistration, HttpRegistration}
-import csw.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.LoggerFactory
