@@ -15,7 +15,7 @@ import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
 import org.scalatest.{BeforeAndAfterEach, FunSuiteLike}
 
 import scala.collection.mutable
-import scala.concurrent.Await
+import scala.concurrent.{Await, TimeoutException}
 
 //#setup
 class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with FunSuiteLike with BeforeAndAfterEach {
@@ -114,7 +114,7 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
     val hcd = CommandServiceFactory.make(akkaLocation)
 
     // submit command and handle response
-    intercept[java.util.concurrent.TimeoutException] {
+    intercept[TimeoutException] {
       val responseF = hcd.submitAndWait(setupCommand)
       Await.result(responseF, 10000.millis) shouldBe a[CommandResponse.Completed]
     }
