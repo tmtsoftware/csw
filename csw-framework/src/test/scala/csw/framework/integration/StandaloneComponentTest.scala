@@ -87,6 +87,7 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
 
     // on shutdown, component unregisters from location service
     supervisorCommandService.subscribeCurrentState(supervisorStateProbe.ref ! _)
+    Thread.sleep(200)
     supervisorRef ! Shutdown
 
     // this proves that ComponentBehaviors postStop signal gets invoked

@@ -371,6 +371,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
             cstate.set(cs.jGet(encoder).orElseThrow().head());
         });
 
+        Thread.sleep(200);
         // Send a oneway to the HCD that will cause a publish of a CurrentState with the encoder value
         // in the command parameter "encoder"
         hcdCmdService.oneway(currStateSetup, timeout);
@@ -500,6 +501,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Subscription subscription = hcdCmdService.subscribeCurrentState(currentState -> probe.ref().tell(currentState));
         //#subscribeCurrentState
 
+        Thread.sleep(200);
         hcdCmdService.submitAndWait(setup, timeout);
 
         CurrentState currentState = new CurrentState(SampleComponentState.prefix(), new StateName("testStateName"));
@@ -535,6 +537,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Subscription subscription = hcdCmdService.subscribeCurrentState(Set.of(StateName.apply("testStateSetup")), currentState -> inbox.getRef().tell(currentState));
         //#subscribeOnlyCurrentState
 
+        Thread.sleep(200);
         hcdCmdService.submitAndWait(setup, timeout);
 
         CurrentState currentState = new CurrentState(SampleComponentState.prefix(), new StateName("testStateName"));

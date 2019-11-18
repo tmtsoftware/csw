@@ -19,7 +19,7 @@ import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestSuite
 import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInitializeTimeout}
 import csw.location.models.ComponentType.{Assembly, HCD}
-import csw.location.models.Connection.AkkaConnection
+import csw.location.models.Connection
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
 import csw.params.core.generics.{KeyType, Parameter}
@@ -318,7 +318,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
         containerIdleMessageProbe.expectMessage(SupervisorLifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
-        verify(locationService).unregister(any[AkkaConnection])
+        verify(locationService, times(2)).unregister(any[Connection])
         verify(locationService, times(2)).register(akkaRegistration)
       }
     }
