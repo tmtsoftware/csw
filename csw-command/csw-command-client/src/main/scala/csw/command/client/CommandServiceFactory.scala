@@ -23,6 +23,9 @@ trait ICommandServiceFactory {
 
 object CommandServiceFactory extends ICommandServiceFactory {
 
+  private[csw] def make(component: ActorRef[ComponentMessage])(implicit actorSystem: ActorSystem[_]): CommandService =
+    new CommandServiceImpl(component)
+
   /**
    * Make a CommandService instance for scala
    *
@@ -40,9 +43,6 @@ object CommandServiceFactory extends ICommandServiceFactory {
       new WebsocketTransport(webSocketUri.toString(), JsonText)
     )
   }
-
-  def make2(component: ActorRef[ComponentMessage])(implicit actorSystem: ActorSystem[_]): CommandService =
-    new CommandServiceImpl(component)
 
   /**
    * Make a CommandService instance for java

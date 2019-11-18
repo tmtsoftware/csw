@@ -14,7 +14,7 @@ object CommandServiceRoutesFactory {
   import CommandServiceCodecs._
 
   def createRoutes(component: ActorRef[ComponentMessage])(implicit actorSystem: ActorSystem[_]): Route = {
-    val commandService                                  = CommandServiceFactory.make2(component)
+    val commandService                                  = CommandServiceFactory.make(component)
     val httpHandlers                                    = new CommandServiceHttpHandlers(commandService)
     def websocketHandlersFactory(encoding: Encoding[_]) = new CommandServiceWebsocketHandlers(commandService, encoding)
     RouteFactory.combine(
