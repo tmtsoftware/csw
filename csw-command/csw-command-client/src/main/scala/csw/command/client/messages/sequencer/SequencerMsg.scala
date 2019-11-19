@@ -13,5 +13,5 @@ object SequencerMsg {
       extends SequencerMsg
       with CommandSerializable
 
-  final case class QueryFinal(sequenceId: Id, replyTo: ActorRef[SubmitResponse]) extends SequencerMsg with CommandSerializable
+  final case class QueryFinal(runId: Id, replyTo: ActorRef[SubmitResponse]) extends SequencerMsg with CommandSerializable
 }

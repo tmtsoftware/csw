@@ -25,5 +25,5 @@ class SequencerCommandServiceImpl(sequencerLocation: AkkaLocation)(
   override def submitAndWait(sequence: Sequence): Future[SubmitResponse] =
     sequencer ? (SubmitSequenceAndWait(sequence, _))
 
-  override def queryFinal(sequenceId: Id): Future[SubmitResponse] = sequencer ? (QueryFinal(sequenceId, _))
+  override def queryFinal(runId: Id): Future[SubmitResponse] = sequencer ? (QueryFinal(runId, _))
 }
