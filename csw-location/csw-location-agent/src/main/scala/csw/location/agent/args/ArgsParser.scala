@@ -3,6 +3,7 @@ package csw.location.agent.args
 import java.io.File
 
 import csw.location.agent.BuildInfo
+import csw.params.core.models.Prefix
 import scopt.OptionParser
 
 /**
@@ -13,7 +14,7 @@ class ArgsParser(name: String) {
   val parser: OptionParser[Options] = new scopt.OptionParser[Options](name) {
     head(name, BuildInfo.version)
 
-    def acceptableServiceNames(services: Seq[String]): Either[String, Unit] = {
+    def acceptableServiceNames(services: Seq[String]): Either[String, Unit] = { // TODO modify to work with prefix or just elimninate?
       val allValid = services.forall { service =>
         !service.contains("-") && service.trim == service
       }
@@ -21,13 +22,13 @@ class ArgsParser(name: String) {
       else failure("Service name cannot have '-' or leading/trailing spaces")
     }
 
-    opt[Seq[String]]("name")
+    opt[Seq[String]]("prefix")
       .required()
-      .valueName("<name1>[,<name2>,...]")
-      .action((x, c) => c.copy(names = x.toList))
-      .validate(xs => acceptableServiceNames(xs))
+      .valueName("<prefix1>[,<prefix2>,...]")
+      .action((x, c) => c.copy(prefixes = x.map(Prefix(_)).toList))
+//      .validate(xs => acceptableServiceNames(xs))
       .text(
-        "Required: The name (or names, separated by comma) used to register the application (also root name in config file)."
+        "Required: The prefix (or prefixes, separated by comma) used to register the application (also root name in config file)."
       )
 
     opt[String]('c', "command") valueName "<name>" action { (x, c) =>
@@ -36,11 +37,11 @@ class ArgsParser(name: String) {
 
     opt[Int]('p', "port") valueName "<number>" action { (x, c) =>
       c.copy(port = Some(x))
-    } text "Optional port number the application listens on (default: use value of $name.port from config file, or use a random, free port.)"
+    } text "Optional port number the application listens on (default: use value of prefix.port from config file, or use a random, free port.)"
 
     arg[File]("<app-config>").optional() maxOccurs 1 action { (x, c) =>
       c.copy(appConfigFile = Some(x))
-    } text "optional config file in HOCON format (Options specified as: $name.command, $name.port, etc.)"
+    } text "optional config file in HOCON format (Options specified as: $prefix.command, prefix.port, etc.)"
 
     opt[Int]("delay") action { (x, c) =>
       c.copy(delay = Some(x))
