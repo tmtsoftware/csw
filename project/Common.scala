@@ -65,7 +65,7 @@ object Common extends AutoPlugin {
     autoCompilerPlugins := true,
     cancelable in Global := true, // allow ongoing test(or any task) to cancel with ctrl + c and still remain inside sbt
     scalafmtOnCompile := true,
-    unidocGenjavadocVersion := "0.13",
+    unidocGenjavadocVersion := "0.15",
     dependencyUpdatesFilter := dependencyUpdatesFilter.value - moduleFilter(organization = "org.scala-lang")
   )
 }

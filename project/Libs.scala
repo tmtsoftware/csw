@@ -3,20 +3,20 @@ import sbt.Def.{setting => dep}
 import sbt._
 
 object Libs {
-  val ScalaVersion    = "2.13.0"
-  val silencerVersion = "1.4.2"
+  val ScalaVersion    = "2.13.1"
+  val silencerVersion = "1.4.4"
 
   val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0" //BSD 3-clause "New" or "Revised" License
   val `scala-async`        = "org.scala-lang.modules" %% "scala-async" % "0.10.0" //BSD 3-clause "New" or "Revised" License
   val `scopt`              = "com.github.scopt" %% "scopt" % "3.7.1" //MIT License
   val `junit`              = "junit" % "junit" % "4.12" //Eclipse Public License 1.0
-  val `silencer-plugin`    = compilerPlugin("com.github.ghik" %% "silencer-plugin" % silencerVersion)
-  val `silencer-lib`       = "com.github.ghik" %% "silencer-lib" % silencerVersion % Compile
+  val `silencer-plugin`    = compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full)
+  val `silencer-lib`       = "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
   val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.7.1"
 
-  val `embedded-keycloak`            = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak"            % "98a7c0b" //Apache 2.0
+  val `embedded-keycloak`            = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak"            % "65e273d" //Apache 2.0
   val `logback-classic`              = "ch.qos.logback"                           % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
-  val `akka-management-cluster-http` = "com.lightbend.akka.management"            %% "akka-management-cluster-http" % "1.0.4"
+  val `akka-management-cluster-http` = "com.lightbend.akka.management"            %% "akka-management-cluster-http" % "1.0.5"
   val `svnkit`                       = "org.tmatesoft.svnkit"                     % "svnkit"                        % "1.10.1" //TMate Open Source License
   val `commons-codec`                = "commons-codec"                            % "commons-codec"                 % "1.10" //Apache 2.0
   val `scala-reflect`                = "org.scala-lang"                           % "scala-reflect"                 % ScalaVersion //BSD-3
@@ -63,7 +63,7 @@ object Borer {
 }
 
 object Jackson {
-  val Version                = "2.10.0"
+  val Version                = "2.10.1"
   val `jackson-core`         = "com.fasterxml.jackson.core" % "jackson-core" % Version
   val `jackson-databind`     = "com.fasterxml.jackson.core" % "jackson-databind" % Version
   val `jackson-module-scala` = "com.fasterxml.jackson.module" %% "jackson-module-scala" % Version
@@ -93,12 +93,12 @@ object AkkaHttp {
   val Version                = "10.1.10"
   val `akka-http`            = "com.typesafe.akka" %% "akka-http" % Version //ApacheV2
   val `akka-http-testkit`    = "com.typesafe.akka" %% "akka-http-testkit" % Version //ApacheV2
-  val `akka-http-cors`       = "ch.megard" %% "akka-http-cors" % "0.4.1"
+  val `akka-http-cors`       = "ch.megard" %% "akka-http-cors" % "0.4.2"
   val `akka-http-spray-json` = "com.typesafe.akka" %% "akka-http-spray-json" % Version
 }
 
 object Keycloak {
-  val Version                 = "7.0.1"
+  val Version                 = "8.0.0"
   val `keycloak-adapter-core` = "org.keycloak" % "keycloak-adapter-core" % Version
   val `keycloak-core`         = "org.keycloak" % "keycloak-core" % Version
   val `keycloak-installed`    = "org.keycloak" % "keycloak-installed-adapter" % Version

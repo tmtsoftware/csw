@@ -17,6 +17,7 @@ import csw.config.server.{ServerWiring, Settings}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.helpers.LSNodeSpec
 import csw.location.server.http.MultiNodeHTTPLocationService
+import org.mockito.MockitoSugar
 import org.scalatest.FunSuiteLike
 
 class ConfigCliAppTestMultiJvmNode1 extends ConfigCliAppTest(0)
@@ -28,7 +29,8 @@ class ConfigCliAppTest(ignore: Int)
     extends LSNodeSpec(config = new TwoClientsAndServer, mode = "http")
     with MultiNodeHTTPLocationService
     with FunSuiteLike
-    with MockedAuthentication {
+    with MockedAuthentication
+    with MockitoSugar {
 
   import config._
 
