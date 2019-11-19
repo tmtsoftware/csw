@@ -66,6 +66,7 @@ object Common extends AutoPlugin {
     cancelable in Global := true, // allow ongoing test(or any task) to cancel with ctrl + c and still remain inside sbt
     scalafmtOnCompile := true,
     unidocGenjavadocVersion := "0.15",
-    dependencyUpdatesFilter := dependencyUpdatesFilter.value - moduleFilter(organization = "org.scala-lang")
+    dependencyUpdatesFilter := dependencyUpdatesFilter.value - moduleFilter(organization = "org.scala-lang"),
+    scalacOptions += "-P:silencer:globalFilters=`silencer-plugin` was enabled but the @silent annotation was not found on classpath - have you added `silencer-lib` as a library dependency?"
   )
 }
