@@ -22,7 +22,7 @@ import scala.util.control.NonFatal
 /**
  * Starts a given external program ([[Connection.TcpConnection]]), registers it with the location service and unregisters it when the program exits.
  */
-class LocationAgent(names: List[String], command: Command, wiring: Wiring) {
+class LocationAgent(prefixes: List[Prefix], command: Command, wiring: Wiring) {
   private val log: Logger = LocationAgentLogger.getLogger
 
   private val timeout: FiniteDuration = 10.seconds
@@ -43,8 +43,8 @@ class LocationAgent(names: List[String], command: Command, wiring: Wiring) {
 
       //Register all connections as Http or Tcp
       val results = command.httpPath match {
-        case Some(path) => Await.result(Future.traverse(names)(registerHttpName(_, path)), timeout)
-        case None       => Await.result(Future.traverse(names)(registerTcpName), timeout)
+        case Some(path) => Await.result(Future.traverse(prefixes)(registerHttpName(_, path)), timeout)
+        case None       => Await.result(Future.traverse(prefixes)(registerTcpName), timeout)
       }
 
       unregisterOnTermination(results)
@@ -57,15 +57,15 @@ class LocationAgent(names: List[String], command: Command, wiring: Wiring) {
   // ================= INTERNAL API =================
 
   // Registers a single service as a TCP service
-  private def registerTcpName(name: String): Future[RegistrationResult] = { // TODO  take a prefix?
-    val componentId = ComponentId(Prefix(Subsystem.CSW, name), ComponentType.Service)
+  private def registerTcpName(prefix: Prefix): Future[RegistrationResult] = {
+    val componentId = ComponentId(prefix, ComponentType.Service)
     val connection  = TcpConnection(componentId)
     locationService.register(TcpRegistration(connection, command.port))
   }
 
   // Registers a single service as a HTTP service with provided path
-  private def registerHttpName(name: String, path: String): Future[RegistrationResult] = { // TODO
-    val componentId = ComponentId(Prefix(Subsystem.CSW, name), ComponentType.Service)
+  private def registerHttpName(prefix: Prefix, path: String): Future[RegistrationResult] = {
+    val componentId = ComponentId(prefix, ComponentType.Service)
     val connection  = HttpConnection(componentId)
     locationService.register(HttpRegistration(connection, command.port, path))
   }

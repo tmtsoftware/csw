@@ -21,7 +21,7 @@ case class Prefix(subsystem: Subsystem, componentName: String) {
 
 object Prefix {
   def apply(handle: String): Prefix = {
-    require(handle.contains(SEPARATOR))
+    require(handle.contains(SEPARATOR), s"prefix must have a '$SEPARATOR' separator")
     val parts = handle.splitAt(handle.indexOf(SEPARATOR))
     Prefix(Subsystem.withNameInsensitive(parts._1), parts._2.tail)
   }

@@ -15,7 +15,7 @@ final case class OptionsHandler(options: Options, appConfig: Option[Config]) {
     } else {
       appConfig.flatMap { c =>
         // XXX: Using only first name here
-        val path = s"${options.names.head}.$entry"
+        val path = s"${options.prefixes.head}.$entry"
         if (c.hasPath(path)) Some(c.getString(path)) else None
       }
     }

@@ -27,7 +27,7 @@ object AssemblyApp {
   val componentId                              = ComponentId(Prefix(Subsystem.NFIRAOS, "assembly"), ComponentType.Assembly)
   val connection                               = AkkaConnection(componentId)
 
-  val registration                           = AkkaRegistrationFactory.make(connection, Prefix("nfiraos.ncc.trombone"), assemblyActorRef.toURI)
+  val registration                           = AkkaRegistrationFactory.make(connection, assemblyActorRef.toURI)
   val registrationResult: RegistrationResult = HttpLocationServiceFactory.makeLocalClient.register(registration).await
 
   def main(args: Array[String]): Unit = {}
