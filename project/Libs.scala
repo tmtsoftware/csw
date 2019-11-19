@@ -3,16 +3,16 @@ import sbt.Def.{setting => dep}
 import sbt._
 
 object Libs {
-  val ScalaVersion    = "2.13.1"
+  val ScalaVersion    = "2.13.0"
   val silencerVersion = "1.4.4"
 
   val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0" //BSD 3-clause "New" or "Revised" License
-  val `scala-async`        = "org.scala-lang.modules" %% "scala-async" % "0.10.0" //BSD 3-clause "New" or "Revised" License
-  val `scopt`              = "com.github.scopt" %% "scopt" % "3.7.1" //MIT License
-  val `junit`              = "junit" % "junit" % "4.12" //Eclipse Public License 1.0
-  val `silencer-plugin`    = compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full)
-  val `silencer-lib`       = "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
-  val `mockito-scala`      = "org.mockito" %% "mockito-scala" % "1.7.1"
+  val `scala-async`        = "org.scala-lang.modules" %% "scala-async"        % "0.10.0" //BSD 3-clause "New" or "Revised" License
+  val `scopt`              = "com.github.scopt"       %% "scopt"              % "3.7.1" //MIT License
+  val `junit`              = "junit"                  % "junit"               % "4.12" //Eclipse Public License 1.0
+  val `silencer-plugin`    = "com.github.ghik"        % "silencer-plugin"     % silencerVersion cross CrossVersion.full
+  val `silencer-lib`       = "com.github.ghik"        % "silencer-lib"        % silencerVersion cross CrossVersion.full
+  val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.7.1"
 
   val `embedded-keycloak`            = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak"            % "65e273d" //Apache 2.0
   val `logback-classic`              = "ch.qos.logback"                           % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1

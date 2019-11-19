@@ -60,7 +60,7 @@ object Common extends AutoPlugin {
     fork := true,
     suppressAnnotatedWarnings := true,
     enableFatalWarnings := false,
-    libraryDependencies ++= Seq(`silencer-lib`),
+    libraryDependencies ++= Seq(`silencer-lib` % Provided),
     libraryDependencies ++= (if (suppressAnnotatedWarnings.value) Seq(compilerPlugin(`silencer-plugin`)) else Seq.empty),
     autoCompilerPlugins := true,
     cancelable in Global := true, // allow ongoing test(or any task) to cancel with ctrl + c and still remain inside sbt
