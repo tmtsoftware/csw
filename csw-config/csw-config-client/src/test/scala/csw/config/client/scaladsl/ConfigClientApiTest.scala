@@ -2,7 +2,6 @@ package csw.config.client.scaladsl
 
 import java.nio.file.Paths
 
-import akka.actor.CoordinatedShutdown.UnknownReason
 import csw.config.api.ConfigData
 import csw.config.api.scaladsl.{ConfigClientService, ConfigService}
 import csw.config.client.ConfigClientBaseSuite
@@ -37,7 +36,7 @@ class ConfigClientApiTest extends ConfigClientBaseSuite {
   }
 
   override def afterAll(): Unit = {
-    httpService.shutdown(UnknownReason).await
+    httpService.shutdown().await
     super.afterAll()
   }
 

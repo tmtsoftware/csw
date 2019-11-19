@@ -1,6 +1,5 @@
 package csw.location.server.javadsl;
 
-import akka.actor.CoordinatedShutdown;
 import akka.actor.PoisonPill;
 import akka.actor.testkit.typed.javadsl.TestProbe;
 import akka.actor.typed.*;

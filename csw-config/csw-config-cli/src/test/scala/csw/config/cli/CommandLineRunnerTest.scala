@@ -3,7 +3,6 @@ package csw.config.cli
 import java.nio.file.{Files, Paths}
 import java.time.Instant
 
-import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.typed
 import akka.actor.typed.scaladsl.Behaviors
 import csw.aas.installed.api.InstalledAppAuthAdapter
@@ -51,8 +50,8 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
     if (Files.exists(Paths.get(outputFilePath))) Files.delete(Paths.get(outputFilePath))
   }
   override def afterAll(): Unit = {
-    serverWiring.httpService.shutdown(UnknownReason).await
-    clientWiring.actorRuntime.shutdown(UnknownReason).await
+    serverWiring.httpService.shutdown().await
+    clientWiring.actorRuntime.shutdown().await
     serverWiring.actorRuntime.shutdown().await
     Files.delete(Paths.get(inputFilePath))
     Files.delete(Paths.get(updatedInputFilePath))

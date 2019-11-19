@@ -1,11 +1,10 @@
 package csw.location.server.scaladsl
 
-import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.scaladsl
 import akka.actor.typed.SpawnProtocol
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.{CoordinatedShutdown, PoisonPill, typed}
+import akka.actor.{PoisonPill, typed}
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.testkit.TestProbe
 import csw.location.api.AkkaRegistrationFactory
@@ -64,8 +63,12 @@ class LocationServiceCompTest(mode: String)
   override protected def afterEach(): Unit = locationService.unregisterAll().await
 
   override protected def afterAll(): Unit = {
-    if (mode == "cluster") CoordinatedShutdown(clusterSystem.toClassic).run(UnknownReason).await
-    CoordinatedShutdown(typedSystem.toClassic).run(UnknownReason).await
+    if (mode == "cluster") {
+      clusterSystem.terminate()
+      clusterSystem.whenTerminated.await
+    }
+    typedSystem.terminate()
+    typedSystem.whenTerminated.await
   }
 
   // DEOPSCSW-12: Create location service API

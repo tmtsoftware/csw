@@ -4,10 +4,8 @@ import java.net.BindException
 
 import akka.Done
 import akka.actor.{ActorSystem, CoordinatedShutdown}
-import akka.actor.CoordinatedShutdown.Reason
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
-import csw.config.server.commons.CoordinatedShutdownReasons.FailureReason
 import csw.config.server.commons.{ConfigServerLogger, ConfigServiceConnection}
 import csw.config.server.{ActorRuntime, Settings}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
@@ -58,10 +56,10 @@ class HttpService(
     log.info(s"Server online at http://${binding.localAddress.getHostName}:${binding.localAddress.getPort}/")
     (binding, registrationResult)
   } recoverWith {
-    case NonFatal(ex) => shutdown(FailureReason(ex)).map(_ => throw ex)
+    case NonFatal(ex) => shutdown().map(_ => throw ex)
   }
 
-  def shutdown(reason: Reason): Future[Done] = actorRuntime.shutdown()
+  def shutdown(): Future[Done] = actorRuntime.shutdown()
 
   private def bind() = {
     val _host = Networks().hostname

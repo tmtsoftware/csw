@@ -2,7 +2,6 @@ package csw.testkit.internal
 import java.io.File
 
 import akka.Done
-import akka.actor.CoordinatedShutdown.{Reason, UnknownReason}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import akka.util.Timeout
@@ -13,7 +12,7 @@ private[testkit] object TestKitUtils {
 
   def await[T](f: Future[T], timeout: Timeout): T = Await.result(f, timeout.duration)
 
-  def coordShutdown(f: Reason => Future[Done], timeout: Timeout): Done = await(f.apply(UnknownReason), timeout.duration)
+  def shutdown(f: => Future[Done], timeout: Timeout): Done = await(f, timeout.duration)
 
   def terminateHttpServerBinding(binding: ServerBinding, timeout: Timeout): Http.HttpTerminated =
     await(binding.terminate(timeout.duration), timeout)
