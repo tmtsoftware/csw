@@ -8,12 +8,9 @@ import csw.command.client.messages.sequencer.SequencerMsg.{QueryFinal, SubmitSeq
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
-import csw.params.commands.CommandResponse.{Completed, CompletedWithResult, SubmitResponse}
-import csw.params.commands.{CommandName, Result, Sequence, Setup}
-import csw.params.core.models.{Prefix, Subsystem}
 import csw.params.commands.CommandResponse.{Completed, SubmitResponse}
 import csw.params.commands.{CommandName, Sequence, Setup}
-import csw.params.core.models.{Id, Prefix}
+import csw.params.core.models.{Id, Prefix, Subsystem}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSuiteLike, Matchers}
 import org.scalatestplus.mockito.MockitoSugar

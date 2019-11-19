@@ -53,7 +53,7 @@ class LongRunningCommandTest(ignore: Int)
       // resolve assembly running in jvm-2 and send setup command expecting immediate command completion response
       val assemblyLocF =
         locationService.resolve(
-          AkkaConnection(ComponentId(Prefix(Subsystem.MCS, "Test_Component_Running_Long_Command"), ComponentType.Assembly)),
+          AkkaConnection(ComponentId(Prefix(Subsystem.IRIS, "Test_Component_Running_Long_Command"), ComponentType.Assembly)),
           5.seconds
         )
       val assemblyLocation: AkkaLocation = Await.result(assemblyLocF, 10.seconds).get

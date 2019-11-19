@@ -14,7 +14,7 @@ import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup
 import csw.params.core.generics.KeyType
-import csw.params.core.models.ObsId
+import csw.params.core.models.{ObsId, Prefix, Subsystem}
 import io.lettuce.core.RedisClient
 import org.mockito.MockitoSugar
 

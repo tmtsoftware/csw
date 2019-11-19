@@ -15,12 +15,13 @@ import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandIssue.OtherIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
-import csw.params.core.models.Id
+import csw.params.core.models.{Id, Prefix, Subsystem}
 import csw.params.core.states.{CurrentState, StateName}
 import csw.time.core.models.UTCTime
 
 import scala.concurrent.duration._
 import csw.command.client.CommandResponseManager.{OverallFailure, OverallSuccess}
+
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -33,7 +34,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   private implicit val ec: ExecutionContext = ctx.executionContext
   private implicit val timeout: Timeout     = 15.seconds
 
-  private val filterHCDConnection = AkkaConnection(ComponentId("FilterHCD", HCD))
+  private val filterHCDConnection = AkkaConnection(ComponentId(Prefix(Subsystem.IRIS, "FilterHCD"), HCD))
   //val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient(ctx.system, clientMat)
 
   private val filterHCDLocation    = Await.result(locationService.resolve(filterHCDConnection, 5.seconds), 5.seconds)

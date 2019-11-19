@@ -5,8 +5,8 @@ import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import akka.{Done, actor}
 import csw.alarm.api.scaladsl.AlarmService
-import csw.command.client.{CommandResponseManager, MiniCRM}
 import csw.command.client.models.framework.{LifecycleStateChanged, PubSub}
+import csw.command.client.{CommandResponseManager, MiniCRM}
 import csw.config.api.scaladsl.ConfigClientService
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.event.api.scaladsl.EventService
@@ -17,13 +17,11 @@ import csw.framework.scaladsl.RegistrationFactory
 import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
-import csw.location.models.AkkaRegistration
 import csw.location.models.Connection.AkkaConnection
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse.SubmitResponse
-import csw.params.core.models.Prefix
 import csw.params.core.states.CurrentState
 import csw.time.scheduler.api.TimeServiceScheduler
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
@@ -33,9 +31,8 @@ import scala.concurrent.Future
 class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol.Command]) extends MockitoSugar with ArgumentMatchersSugar {
 
   ///////////////////////////////////////////////
-  val testActor: ActorRef[Any] = TestProbe("test-probe").ref
-  val akkaRegistration =
-    AkkaRegistrationFactory.make(mock[AkkaConnection], testActor.toURI)
+  val testActor: ActorRef[Any]                   = TestProbe("test-probe").ref
+  val akkaRegistration                           = AkkaRegistrationFactory.make(mock[AkkaConnection], testActor.toURI)
   val locationService: LocationService           = mock[LocationService]
   val eventServiceFactory: EventServiceFactory   = mock[EventServiceFactory]
   val eventService: EventService                 = mock[EventService]

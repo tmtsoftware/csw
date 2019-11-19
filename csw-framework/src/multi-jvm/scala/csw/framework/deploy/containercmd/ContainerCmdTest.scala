@@ -154,7 +154,7 @@ class ContainerCmdTest(ignore: Int)
       enterBarrier("running")
 
       // resolve and send message to component running in different jvm or on different physical machine
-      val etonSupervisorF        = locationService.resolve(AkkaConnection(ComponentId(Prefix(Subsystem.MCS, "Eton"), ComponentType.HCD)), 2.seconds)
+      val etonSupervisorF        = locationService.resolve(AkkaConnection(ComponentId(Prefix(Subsystem.IRIS, "Eton"), ComponentType.HCD)), 2.seconds)
       val etonSupervisorLocation = Await.result(etonSupervisorF, 15.seconds).get
 
       val etonSupervisorTypedRef = etonSupervisorLocation.componentRef

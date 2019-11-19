@@ -83,7 +83,6 @@ case class HttpCommandService(
           Json.decode(bs.toArray).to[CommandResponse].value
         } else {
           // Server error: Return error with generated runId
-          val s = s"Error response from ${connection.componentId.name}: $response"
           val s = s"Error response from ${connection.componentId.prefix}: $response"
           method match {
             case `submitCommand` => Error(Id(), s)
