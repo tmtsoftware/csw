@@ -1,7 +1,7 @@
 # Creating a Component
 
-This walk through helps in creating a CSW component in Scala/Java. CSW components depend on the `csw-framework` package,
-which can be found @ref:[here](./framework.md). This section discusses constructing a HCD, 
+This walk-through helps in creating a CSW component in Scala/Java. CSW components depend on the `csw-framework` package,
+which can be found @ref:[here](./framework.md). This section discusses constructing an HCD, 
 but the principles apply to an Assembly as well. We will be constructing the Assembly in the next section @ref:[Working with Multiple Components](./multiple-components.md). 
 
 #### *Tutorial: Developing an HCD*
@@ -28,18 +28,18 @@ and other asynchronous code in various ways.  The following constructs are commo
 
 ## Anatomy of Component
     
-A component consists of a Supervisor actor, a Top Level Actor, a component handler, and one or more worker actors. From all these, `csw-framework`
+A component consists of a Supervisor actor, a Top Level Actor (TLA) that provides _component handlers_, and one or more worker actors. From all these, `csw-framework`
 provides the Supervisor actor, the Top Level Actor and an abstract class of handlers. Component developers are expected to implement these handlers, 
-which collectively act as the gateway from the framework to component code.   
+which collectively act as the gateway from the framework to the developer's component code.   
      
 ## Supervisor
 
 A Supervisor actor is the actor first started for any component. The main responsibilities that the Supervisor performs is as follows:
 
--   Implement and manage the component lifecycle for the TLA and for the rest of the system (see @ref:[Lifecycle](#lifecycle) below).
--   Register itself with the Location Service.
+-   Implement and manage the component lifecycle for the TLA and for the rest of the system (see [Lifecycle](#lifecycle) below).
+-   Register the component with the Location Service.
 -   Provide an administrative interface to the component to the rest of the system. For
-instance, the Container can perform some administrative communication with the Supervisor such as restart or shutdown.
+instance, the Container can perform some administrative communication with the Supervisor such as restart or shutdown of the component.
 -   Allow components outside of the Supervisor and TLA to monitor the lifecycle state of the TLA. This is particularly useful for testing, when the test needs to know that the component is
 ready before performing its test actions.
 
@@ -53,24 +53,26 @@ The source code of the Supervisor actor can be found [here]($github.base_url$/cs
 
 ## Top level actor
 
-While the Supervisor works as the external interface for the component and the manager of its Lifecycle, the functional implementation
+While the Supervisor works as the external interface for the component and the manager of its lifecycle, the functional implementation
 of a component is implemented in a Top Level Actor (TLA), spawned by the Supervisor actor for any component. 
-However, the developer is not expected to implement TLA code directly.  Instead, the functionality of the TLA is added by
-implementing the `ComponentHandlers` abstract class, consisting of a list of a methods, or `hooks`, called by the TLA during specific lifecycle and command events (see @ref:[Handlers](#handlers)).
-The `ComponentHandlers` implementation is specified during construction using a factory (see @ref:[Constructing The Component](#constructing-the-component)) 
+However, the developer is not expected to implement a TLA code entirely.  Instead, the component-specific functionality of the TLA is added by
+implementing the `ComponentHandlers` abstract class, consisting of a list of a methods, or `hooks`, called by the TLA during specific lifecycle and command events (see [Handlers](#handlers)).
+The `ComponentHandlers` implementation is specified during construction using a factory (see [Constructing The Component](#constructing-the-component)) 
 
 The source code of the Top Level Actor can be found [here]($github.base_url$/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala).
 
 ## Handlers
 
-The following hooks should be overridden in your ComponentHandlers implementation class:
+The following hooks may be overridden in your ComponentHandlers implementation class:
 
 -   `initialize`: called when the component is starting up, prior to be put into the Running state.
 -   `validateCommand`: called when the component receives a command to validate it can be executed.  (see @ref:[Validation](#validation))  
 -   `onSubmit`: called on Submit command if validateCommand returns `Accepted`.
 -   `onOneway`: called on Oneway command if validateCommand returns `Accepted`.
 -   `onGoOffline`: called when the component receives an external message from an administrative client to go offline.
--   `onGoOnline`: called when the component receives an external message from an administrative client to go online. 
+-   `onGoOnline`: called when the component receives an external message from an administrative client to go online.
+-   `onDiagnosticMode`: called when the component receives an external message from a client to enter a specified diagnostic behavior.
+-   `onOperationsMode`: called when the component receives an external message from a client to exit any diagnostic behavior and return to normal, operations behavior.
 -   `onLocationTrackingEvent`: called when a tracked dependency changes location state. (see @ref:[Tracking Dependencies](./multiple-components.md#tracking-dependencies))
 -   `onShutdown`: called when the component is shutting down.
 
@@ -80,24 +82,24 @@ More details about handler significance and invocation can be found @ref:[here](
 
 @@@ note { title=Note }
 
-If the component developer wishes to write the handler implementation in Java, then he/she needs to implement the Java version of `ComponentHandlers`
+If the component developer wishes to write the component handler implementation in Java, they need to implement the Java version of `ComponentHandlers`
 which is `JComponentHandlers`. The source code of `JComponentHandlers` can be found [here]($github.base_url$/csw-framework/src/main/scala/csw/framework/javadsl/JComponentHandlers.scala).
-Any further reference to `ComponentHandlers` should implicitly also apply to `JComponentHandlers`.
+Any further reference to `ComponentHandlers` should be inferred as also applying to `JComponentHandlers`.
 
 @@@
 
 #### *Tutorial: Developing an HCD*
 
-As seen in the @ref:[Getting Started](getting-started.md) page, if you are using the giter8 template, handler classes for both the HCD and Assembly are written for you, with handler implementations stubbed out.
-We will walkthrough filling them in below.
+As seen in the @ref:[Getting Started](getting-started.md) page, if you are using the giter8 template, component handler classes for both the HCD and Assembly are written for you, with implementations stubbed out.
+We will walk-through filling them in below.
 
 
 ## Constructing the Component
 
-After writing the handlers, component developer needs to wire it up with framework. In order to do this, the developer 
-needs to implement a `ComponentBehaviorFactory`. This factory should be configured in the configuration file for
-the component (see example below). The `csw-framework` picks up the full path of
-`ComponentBehaviorFactory` from configuration file and spawns the component handlers using this factory in a process of
+After writing the component handlers, a developer needs to wire it up with the framework. In order to do this, the developer 
+needs to first implement a `ComponentBehaviorFactory`. This factory should be specified in a ComponentInfo configuration file for
+the component (see example below). The `csw-framework` picks up the full path of the
+`ComponentBehaviorFactory` from configuration file and the Supervisor spawns the component handlers using this factory in the process of
 booting a component. The factory is instantiated using Java reflection.
 
 Additional sample code to implement the `ComponentBehaviorFactory` can be found @ref:[here](../framework/creating-components.md) 
@@ -110,8 +112,8 @@ As seen in the @ref:[Getting Started](getting-started.md) page, if using the tem
 
 ## Component Configuration (ComponentInfo)
 
-The component configuration contains details needed to spawn a component. This configuration resides in a configuration file
-for a particular component. The template creates one for our sample HCD as follows:
+The component configuration, called the ComponentInfo file, contains details needed to spawn a component. This configuration defines a few
+parameters needed for a particular component. The template creates one for our sample HCD as follows:
 
 
 Scala
@@ -123,17 +125,18 @@ Java
 
 @@@ note { title=Note }
 
-`behaviorFactoryClassName` refers to class name of the concrete implementation of `ComponentBehaviorFactory`, which is `SampleHcdBehaviorFactory` for Scala in above example, `JSampleHcdBehaviorFactory` for Java.
+`behaviorFactoryClassName` refers to class name of the a concrete implementation of `ComponentBehaviorFactory`, which is `SampleHcdBehaviorFactory` for Scala in above example, `JSampleHcdBehaviorFactory` for Java.
 
 @@@
 
-The `name` and `componentType` are used to create the `ComponentId`, representing a unique component in the Location Service.
+The `prefix` and `componentType` are used to create the `ComponentId`, representing the unique component in the Location Service.
 
 The `locationServiceUsage` is used by the Supervisor actor to decide whether to only register a component with the Location Service or to register and track other components.
   
-The configuration file is parsed to a `ComponentInfo` object and injected in the Supervisor actor. It is then injected in `ComponentHandlers` while spawning a component.
+This file is parsed to a `ComponentInfo` object and injected in the Supervisor actor. It is then injected in `ComponentHandlers` while spawning a component and
+the contents is available for the developer.
 
-The configuration can also contain a list of components and services it wishes to track as dependencies. See @ref:[Tracking Dependencies](./multiple-components.md#tracking-dependencies).
+The ComponentInfo file can also contain a list of components and services it wishes to track as dependencies. See @ref:[Tracking Dependencies](./multiple-components.md#tracking-dependencies).
 
 More details about `ComponentInfo` can be found @ref:[here](../framework/describing-components.md).
 
@@ -150,21 +153,21 @@ The Supervisor of a component manages its lifecycle state, which can be one of t
 -   Shutdown
 -   Lock
 
-The state the component is in dictates the actions it can take when it receives a message or command, and how those actions are carried out.
+The state the component is in dictates the actions it can take when it receives a message or command, and whether those actions are carried out.
 
 
-### Idle
+### Idle and Initialize
 
 The component initializes in the idle state. The Top Level Actor calls the `initialize` hook of `ComponentHandlers` as the first thing on boot-up.
-Component developers write their initialization logic in this hook. The logic could also do things like accessing the Configuration Service
+Component developers write their initialization logic in this hook. The logic can also do things like accessing the Configuration Service
 to fetch the hardware configurations to set the hardware to default positions.
 
 After initialization, if the component would have configured `RegisterAndTrack` for `locationServiceUsage`, then the Top Level Actor will start tracking
 the `connections` configured for that component. This use case is mostly applicable for Sequencers and Assemblies. HCDs mostly will have `RegisterOnly`
 configured for `locationServiceUsage`.
 
-The Supervisor actor will now register itself with the Location Service.  Registering with the Location Service will notify other components
-tracking this component with a `LocationUpdated` event containing a `Location` with a reference to the Supervisor actor.
+If `initialize` is successful, the Supervisor will register the component with the Location Service.  Registering with the Location Service will 
+notify other components tracking this component with a `LocationUpdated` event containing a `Location` with a reference to the Supervisor of the component.
 
 After successful registration, the component will transition to the `Running` state. 
 
@@ -172,8 +175,12 @@ After successful registration, the component will transition to the `Running` st
 
 When the supervisor actor receives `Initialized` message from the Top Level Actor after successful initialization, it registers itself with the Location Service and transitions
 the component to `Running` state. Running state signifies that the component is accessible via the Location Service, which allows other entities to communicate
-with it by sending commands via messages. Any commands received by the Supervisor actor will be
-forwarded to the Top Level Actor for processing.
+with it by sending commands via messages. Any commands received by the Supervisor actor will be forwarded to the Top Level Actor for processing.
+
+@@@ note { title=Note }
+The component **should be ready** for operation after successfully leaving the `initialize` handler and entering `Running`. 
+A component should ready to process **any** command after initialization and must not require specific commands to be issued by users in order to become ready.
+@@@ 
 
 ### RunningOffline
 
@@ -199,13 +206,14 @@ Then, the Top Level Actor is stopped and the `postStop` hook of the Top Level Ac
 any cleanup of resources or logic that should be executed for graceful shutdown of component in this hook.  
 
 After successful shutdown of component, the Supervisor actor will create the Top Level Actor again from scratch.  This will cause the `initialize` hook of `ComponentHandlers` to be called
-again. After successful initialization of the component, the Supervisor actor will register itself with the Location Service.
+again. After successful initialization of the component, the Supervisor actor will register itself with the Location Service once more.
 
 ### Shutdown
 
 When the Supervisor actor receives a `Shutdown` message, it transitions the component to the `Shutdown` state.  Any commands received while a shutdown is in progress will be ignored.
 Then, it will stop the Top Level Actor. The `postStop` hook of the Top Level Actor will call the `onShutdown` hook of `ComponentHandlers`. Component developers are expected to write 
-any cleanup of resources or logic that should be executed for graceful shutdown of component in this hook.
+any cleanup of resources or logic that should be executed for graceful shutdown of component in this hook. The component, including the Supervisor, exits
+after `onShutdown` completes. 
 
 ### Lock
 
@@ -222,8 +230,8 @@ There are two ways component can be unlocked:
 1. Sending `Unlock` message with an administrative Prefix.
 
 ## CSW Services Injection
-To provide access to CSW Services, they are injected into the `ComponentHandlers` class in the constructor in a `CswContext` object.
-This object provides the following services:
+To provide access to CSW Services for the TLA, they are injected into the `ComponentHandlers` class in the constructor in a `CswContext` object.
+This object provides the following services through their respective APIs:
 
   * Location Service
   * Event Service
@@ -240,7 +248,7 @@ And the following utilities:
 
 ## Logging
 
-`csw-framework` will provide a `LoggerFactory` in the `CswContext` injected in the constructor of `ComponentHandlers`. The `LoggerFactory` will have the component's name predefined in
+`csw-framework` provides a `LoggerFactory` in the `CswContext` injected in the constructor of `ComponentHandlers`. The `LoggerFactory` will have the component's Prefix predefined in
 it. The component developer is expected to use this factory to log statements.
 
 Logging works much like other popular loggers such as *log4j*.  However, with the development of log management tools such as *logstash*, 
@@ -265,12 +273,12 @@ Java
 In the example code, you'll notice we have added some functionality to start publishing events.  We will cover the Event Service later.
 You can leave that code out for now.
 
-Next we'll add some command handling.
+Next we'll discuss handling commands.
 
 ## Receiving Commands
 
 A command is something that carries some metadata and a set of parameters. A component sends messages to other components using `commands`.
-Various kinds of commands are as follows:
+The three kinds of commands are as follows:
 
 -   Setup : Contains goal, command, or demand information to be used to
             configure the target OMOA component.
@@ -279,18 +287,21 @@ Various kinds of commands are as follows:
              by the ESW subsystem.
 -   Wait: Sequencer only.  Instructs a sequencer to pause until told to continue.
 
+A Sequencer receives a Sequence, which is a list of the above commands.
+
 More details about creating commands can be found @ref:[here](../params/commands.md#setup-command).
 
-Whenever a command is sent to a component, it is wrapped inside a command wrapper. There are two kinds of command wrappers:
+Whenever a command is sent to a component, it is sent using a Command Service method. There are two ways to send a command:
 
--   Submit: A command is wrapped in submit when the completion result is expected from receiver component 
--   Oneway: A command is wrapped in oneway when the completion of command is not expected from receiver component.  Depending on the implementation, 
-it sometimes can be determined by subscribing to receiver component's state
+-   Submit: A command is sent using submit when a completion result is expected from receiver component 
+-   Oneway: A command is sent using oneway when the completion of command is not expected from receiver component.
 
 ## Validation
 
-When a command is received by a component, the Top Level Actor will call the `validateCommand` hook of `ComponentHandlers`. Component developers are expected to perform appropriate
-validation of command, whether it is valid to execute, and return a `ValidateCommandResponse`. The `ValidateCommandResponse` returned from this hook will be sent back to sender directly by `csw-framework`.
+When any command is received by a component using `submit` or `oneway`, the Top Level Actor will first call the `validateCommand` hook of `ComponentHandlers`. 
+Component developers are expected to perform appropriate validation of a command, 
+whether it is valid to execute, and return a `ValidateCommandResponse`. 
+The `ValidateCommandResponse` returned from this hook will be returned to the sender directly by `csw-framework` if the command fails validation.
 
 The component developer should return either an `Accepted` response or an
 or `Invalid` response specifying whether the command is valid to be executed or not.
@@ -318,26 +329,30 @@ Java
 
 ## Command Response
 
-The response returned from `validateCommand` hook of `ComponentHandlers` will be received by the Top Level Actor. If the
-response returned was `Accepted`, then it either calls the `onSubmit` hook or the `onOneway` hook of `ComponentHandlers` depending on the wrapper(submit or oneway) in which the command
-was received. 
+The response returned from `validateCommand` handler of `ComponentHandlers` will be received by the Supervisor. If the
+response returned was `Accepted`, then it either calls the `onSubmit` hook or the `onOneway` hook of `ComponentHandlers` depending 
+on the whether submit, submitAndWait, or oneway was used to send the command.
 
-If the response was `Accepted`, the TLA adds the `Started` status for the command in the `CommandResponseManager` and then
+If sent with `submit` and the validation response is `Accepted`, the Supervisor
 calls the `onSubmit` hook of `ComponentHandlers`. The return value of `onSubmit` is then returned to the sender,
-which can be a `Completed` for commands that return quickly, or `Started` for long running commands.  If the response was `Invalid`, this is returned to the
-sender of the command.
+which can be a `Completed` for commands that return quickly, or `Started` for long running commands.  If the response from validation was `Invalid`, 
+this is returned to the sender of the command without calling the `onSubmit` handler.
 
-In case the command received by a component a `Oneway`, the response is not added to the `CommandResponseManager`, and the `onOneway`
-hook of `ComponentHandlers` is called.  The validation response is sent back to the sender of the command.
+If `onSubmit` returns `Started`, the component's `CommandResponseManager` keeps track of the status of long running submit commands. 
+The sender of a `Started` command (and any component, really) can query a `Started` command's status or wait 
+for the final response using the `CommandService` API.
 
-The `CommandResponseManager` is responsible for managing and bookkeeping the command status of long running submit commands.
-The sender of the command (and any component, really) can query the command statuses or subscribe to changes in command statuses using the `CommandService`. 
+If a command is sent using `oneway`, the validation handler if called first. The `onOneway`
+handler of `ComponentHandlers` is also called when the validation result is `Accepted`.  
+The validation response is always sent back to the sender as the response for a `oneway` command.
 
-The `CommandService` class provides helper methods for communicating with other components, and should be a component's primary means of sending
+The `CommandService` class provides convenient API methods for communicating with other components, and should be a component's primary means of sending
 commands to other components. This will be described in the next tutorial section, @ref:[Sending Commands](./multiple-components.md#sending-commands).
 
-When the `onSubmit` hook is called, it is the responsibility of component developers to update the status of the received command in the `CommandResponseManager` as it changes. An instance
-of `CommandResponseManager` is provided in the `CswContext` object in `ComponentHandlers` and should be injected in any worker actor or other actor/class created for the component that needs it.   
+When the `onSubmit` hook is called and `Started` is returned, it is the responsibility of the component developer to update sender with 
+the final status of the `Started` command when it completes using the `CommandResponseManager` API. An instance
+of `CommandResponseManager` is provided in the `CswContext` object in `ComponentHandlers` 
+and should be injected in any worker actor or other actor/class created for the component that needs it.   
 
 More details on the methods available in `CommandResponseManager` can be found @ref:[here](../framework/managing-command-state.md).
 
@@ -366,9 +381,9 @@ having to inject them into our new Actor class.
 
 Note that our `onSetup` command handling logic returns a `Started` response.  This indicates that the command is a long-running
 command and will be finished after some time, and that the final result will be posted to the `CommandResponseManager`.  The
-`submit` command in the CommandService is implemented such that when it receives the `Started` response, it automatically
-starts a subscription to the `CommandResponseManager` for the final response, and when it is published, the Future returned by
-`submit` command is completed with this value.
+`submitAndWait` command in the CommandService is implemented such that when it receives a `Started` response, it automatically
+issues a `queryFinal` to the commanded component to await the final completion response. When the command is updated using the `CommandResponseManager`, 
+the Future returned by `submitAndWait` command is completed with this value.
 
 Scala
 :   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/samplehcd/SampleHcdHandlers.scala) { #worker-actor }
@@ -396,7 +411,7 @@ by an `EventGenerator`, which is simply a function that returns an event.
 
 #### *Tutorial: Developing an HCD*
 
-Let's add a publisher to our component.  We will use the default publisher that will periodically publish events
+Let's add a publisher to our component. We will use the default publisher that will periodically publish events
 generated by an `EventGenerator`. 
 
 Scala
@@ -468,7 +483,7 @@ where `<iname>` is your interface name (e.g. `en0`).
 ## Building and Running component in standalone mode
 
 Once the component is ready, it is started using the `ContainerCmd` object in standalone mode. 
-The details about starting the `ContainerCmd` in standalone mode can be found @ref:[here](../framework/deploying-components.md).
+The details for starting the `ContainerCmd` in standalone mode can be found @ref:[here](../framework/deploying-components.md).
 
 There are various ways to build and run the project.  A simple way during development is to to use sbt to run it. 
 The sbt command `runMain` can be used to specify an application with a main method and run it with arguments specified at the command line.  When this

@@ -1,12 +1,13 @@
 # Multiple Components
 
 In this part of the tutorial, we will demonstrate functionality involving multiple components.  
-We will do this by creating an Assembly, demonstrating how to deploy start the Assembly and an HCD in a container, and 
+We will do this by creating an Assembly, demonstrating how to deploy the Assembly and an HCD in a container, and 
 having them communicate with each other.
 
 ## Creating an Assembly
 
-Similar to the HCD in the previous page, to create an assembly, the component developer needs to implement the `ComponentHandlers`.
+Similar to the HCD in the previous page, to create an Assembly, the component developer needs to implement the `ComponentHandlers`
+for the Assembly.
 More details about implementing ComponentHandlers can be found @ref:[here](./create-component.md#handlers). 
 
 #### *Tutorial: Developing an Assembly*
@@ -27,7 +28,7 @@ Once again, ignore the code about setting up the subscription.  This will be cov
 
 ## Component Configuration (ComponentInfo)
 
-Also similar  to the HCD, we will need to create a ComponentInfo file for the Assembly. The following shows an example of 
+Also as with the HCD, we need to create a ComponentInfo file for the Assembly. The following shows an example of 
 ComponentInfo file for an Assembly:
 
 
@@ -68,12 +69,15 @@ connections = [
 
 @@@ note { title=Note }
 
-There is a section for listing connections. These are the connections that the component will automatically track, and can be other components or services.
-When available, it may make sense to track things like the Event Service. These connections can also be specified for HCDs, but of course, they should not have any component dependencies.
+There is a section for listing connections. These are the connections that the component will automatically track and can be other components or services.
+For instance, an Assembly may command one or more HCDs. Entries here can be used to track those HCDs and the Assembly will be notified if one of the tracked HCDs
+starts up, crashes, or shuts down.
+When available, it may make sense to track things like the Event Service. These connections can also be specified for HCDs, but of course, HCDs should not have any component dependencies.
 
 @@@
 
-The above shows a configuration file for running in standalone mode.  If we want to run both the assembly and HCD in a container, the file would look like this:
+The above shows a configuration file for running in standalone mode.  If we want to run both the assembly and HCD in a container, the 
+ComponentInfo file combined entries for both components and looks like this:
 
 
 Scala
@@ -89,13 +93,14 @@ Another sample container configuration file can be found [here]($github.base_url
 
 ## Tracking Dependencies
 
-The connections that are defined in the configuration file for an assembly will be tracked by the `csw-framework`. For each connection the following details are configured:
+The connections that are defined in the ComponentInfo file for an Assembly will be tracked by the `csw-framework`. 
+For each connection the following details are configured:
 
 Scala
 :    
 ```
 {
-    name: "SampleHcd"
+    prefix: "nfiraos.SampleHcd"
     componentType: hcd
     connectionType: akka
 }
@@ -105,39 +110,40 @@ Java
 :    
 ```
 {
-    name: "JSampleHcd"
+    prefix: "nfiraos.JSampleHcd"
     componentType: hcd
     connectionType: akka
 }
 ``` 
 
-The name of the component, the type (hcd, service, etc) and the connection (akka, http, tcp) will be used to create a `Connection` object. The Connection object will be then used to
-track the location of a component using location service.
+The Prefix of the component consisting of a valid subsystem and the component's name, the component type (hcd, service, etc) 
+and the connection type (akka, http, tcp) will be used to create a `Connection` object. The Connection object will be then used to
+track the location of a component using Location Service.
 
 The `Location` object has one of the following types:
 
 -   AkkaLocation: Contains the remote address of the actorRef. The actorRef will be the Supervisor actor of a component.
 -   HttpLocation: Holds the HTTP URI of the web server, e.g. Configuration Service
--   TcpLocation: Represents a TCP URI of the server, e.g. Event Service 
+-   TcpLocation: Represents a TCP URI of the server or service, e.g. Event Service 
 
-More details about tracking a component using the location service can be found @ref:[here](../services/location.md#tracking-and-subscribing).
+More details about tracking a component using the Location Service can be found @ref:[here](../services/location.md#tracking-and-subscribing).
  
 ## onLocationTrackingEvent Handler
 
-For all the tracked connections, whenever a location is changed, added, or removed, one of the following events is generated:
+For all the tracked connections, whenever a `Location` is changed, added, or removed, one of the following events is generated:
 
 -   LocationUpdated: a location was added or changed
 -   LocationRemoved: a location is no longer available on the network
 
-Whenever such an event is generated, the Top level actor will call the `onLocationTrackingEvent` hook of `ComponentHandlers` with the event(LocationUpdated or LocationRemoved)
-as parameter of the hook.
+Whenever such an event is generated, the Top level actor will call the `onLocationTrackingEvent` hook of `ComponentHandlers` with the event (LocationUpdated or LocationRemoved)
+as parameter of the handler.
 
 More details about tracking connections can be found @ref:[here](../framework/tracking-connections.md).
 
 #### *Tutorial: Developing an Assembly*
 
 For our sample component, we will set it up so that when the HCD is found by the Location Service, we will immediately send a command to it.  We
-will do this by using the location to obtain a `CommandService` reference (see @ref:[below](multiple-components.md#sending-commands)) to the HCD, and then pass this reference to a worker actor
+will do this by using the `Location` obtained to create a `CommandService` reference (see @ref:[below](multiple-components.md#sending-commands)) to the HCD, and then pass this reference to a worker actor
 to send and monitor the command (we will get more into this command actor later), so that we don't block our Assembly from receiving 
 messages.  If we are notified that the HCD is removed, log a message.  
 

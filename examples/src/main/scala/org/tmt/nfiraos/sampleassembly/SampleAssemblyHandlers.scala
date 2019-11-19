@@ -1,24 +1,39 @@
 package org.tmt.nfiraos.sampleassembly
 
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
-import akka.util.Timeout
-import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandServiceFactory
 import csw.command.client.messages.TopLevelActorMessage
 import csw.event.api.scaladsl.EventSubscription
 import csw.framework.models.CswContext
-import csw.framework.scaladsl.ComponentHandlers
-import csw.location.models.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
+import csw.location.models.{AkkaLocation, ComponentId, ComponentType, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.params.commands.CommandResponse._
-import csw.params.commands.{CommandName, CommandResponse, ControlCommand, Setup}
-import csw.params.core.generics.{Key, KeyType, Parameter}
-import csw.params.core.models.{Id, ObsId, Units}
+import csw.params.commands.{CommandIssue, ControlCommand, Observe, Setup}
+import csw.params.core.generics.KeyType
+import csw.params.core.models.Id
 import csw.params.events._
-import csw.prefix.models.Prefix
+import csw.prefix.models.{Prefix, Subsystem}
 import csw.time.core.models.UTCTime
+import akka.actor.typed.{ActorRef, Behavior, Scheduler}
+import akka.util.Timeout
+import csw.command.api.scaladsl.CommandService
+import csw.params.commands.CommandIssue.{MissingKeyIssue, ParameterValueOutOfRangeIssue, UnsupportedCommandIssue}
+import org.tmt.nfiraos.shared.SampleInfo._
+import org.tmt.nfiraos.shared.WorkerMonitor
+import org.tmt.nfiraos.shared.WorkerMonitor.{AddWorker, GetWorker, Info, Response}
+import akka.actor.typed.scaladsl.AskPattern._
+import csw.command.client.CommandResponseManager.{OverallFailure, OverallSuccess}
+import csw.command.client.extensions.AkkaLocationExt
+import csw.location.models.Connection.AkkaConnection
 
-import scala.async.Async._
 import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.concurrent.duration._
+import scala.util.{Failure, Success}
+
+private class SampleAssemblyBehaviorFactory extends ComponentBehaviorFactory {
+  protected override def handlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext): ComponentHandlers =
+    new SampleAssemblyHandlers(ctx, cswCtx)
+}
 
 /**
  * Domain specific logic should be written in below handlers.
@@ -31,99 +46,14 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {
 
   import cswCtx._
-  implicit val ec: ExecutionContextExecutor = ctx.executionContext
-  private val log                           = loggerFactory.getLogger
-
-  //#worker-actor
-  sealed trait WorkerCommand
-  case class SendCommand(hcd: CommandService) extends WorkerCommand
-
-  private val commandSender =
-    ctx.spawn(
-      Behaviors.receiveMessage[WorkerCommand](msg => {
-        msg match {
-          case command: SendCommand =>
-            log.trace(s"WorkerActor received SendCommand message.")
-            handle(command.hcd)
-          case _ => log.error("Unsupported message type")
-        }
-        Behaviors.same
-      }),
-      "CommandSender"
-    )
-
-  import scala.concurrent.duration._
-  private implicit val sleepCommandTimeout: Timeout = Timeout(10000.millis)
-  def handle(hcd: CommandService): Unit = {
-
-    // Construct Setup command
-    val sleepTimeKey: Key[Long]         = KeyType.LongKey.make("SleepTime")
-    val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
-    val setupCommand                    = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
-
-    // submit command and handle response
-    hcd.submitAndWait(setupCommand).onComplete {
-      case scala.util.Success(value) =>
-        value match {
-          case _: CommandResponse.Locked => log.error("Sleep command failed: HCD is locked.")
-          case inv: CommandResponse.Invalid =>
-            log.error(s"Command is invalid: (${inv.issue.getClass.getSimpleName}): ${inv.issue.reason}")
-          case x: CommandResponse.Error     => log.error(s"Command Completed with error: ${x.message}")
-          case _: CommandResponse.Completed => log.info("Command completed successfully")
-          case _                            => log.error("Command failed")
-        }
-      case scala.util.Failure(ex) => log.error(s"Exception occured when sending command: ${ex.getMessage}")
-    }
-  }
-  //#worker-actor
-
-  def handleUsingAsync(hcd: CommandService): Unit = {
-
-    // Construct Setup command
-    val sleepTimeKey: Key[Long]         = KeyType.LongKey.make("SleepTime")
-    val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
-    val setupCommand                    = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
-
-    async {
-      await(hcd.submitAndWait(setupCommand)) match {
-        case _: CommandResponse.Locked    => log.error("HCD is locked.")
-        case inv: CommandResponse.Invalid => log.error(s"Command is invalid: ${inv.issue.reason}")
-        case x: CommandResponse.Error     => log.error(s"Command Completed with error: ${x.message}")
-        case _: CommandResponse.Completed => log.info("Command completed successfully")
-        case _                            => log.error("Command failed")
-      }
-    } recover {
-      case ex: RuntimeException => log.error(s"Command failed: ${ex.getMessage}")
-    }
-  }
-
-  def handleUsingMap(hcd: CommandService): Unit = {
-
-    // Construct Setup command
-    val sleepTimeKey: Key[Long]         = KeyType.LongKey.make("SleepTime")
-    val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
-    val setupCommand                    = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
-
-    // Submit command, and handle validation response. Final response is returned as a Future
-    val submitCommandResponseF: Future[SubmitResponse] = hcd.submitAndWait(setupCommand).map {
-      case x @ (Invalid(_, _) | Locked(_)) =>
-        log.error("Sleep command invalid")
-        x
-      case x =>
-        x
-    } recover {
-      case ex: RuntimeException =>
-        CommandResponse.Error(Id(), ex.getMessage) //TODO Not sure what to do with this???
-    }
-
-    // Wait for final response, and log result
-    submitCommandResponseF.foreach {
-      case _: CommandResponse.Completed => log.info("Command completed successfully")
-      case x: CommandResponse.Error     => log.error(s"Command Completed with error: ${x.message}")
-      case _                            => log.error("Command failed")
-    }
-
-  }
+  private implicit val ec: ExecutionContextExecutor = ctx.executionContext
+  private implicit val system                       = ctx.system
+  private implicit val timeout: Timeout             = 10.seconds
+  private val log                                   = loggerFactory.getLogger
+  private val prefix:Prefix                         = cswCtx.componentInfo.prefix
+  private val hcdConnection   = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "samplehcd"), ComponentType.HCD))
+  private var hcdLocation:AkkaLocation              = _
+  private var hcdCS: Option[CommandService]         = None
 
   //#initialize
   private var maybeEventSubscription: Option[EventSubscription] = None
@@ -144,13 +74,20 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
     log.debug(s"onLocationTrackingEvent called: $trackingEvent")
     trackingEvent match {
       case LocationUpdated(location) =>
-        val hcd = CommandServiceFactory.make(location.asInstanceOf[AkkaLocation])(ctx.system)
-        commandSender ! SendCommand(hcd)
-      case LocationRemoved(_) => log.info("HCD no longer available")
+        println("HCD CS Created")
+        hcdLocation = location.asInstanceOf[AkkaLocation]
+        hcdCS = Some(CommandServiceFactory.make(location))
+      //commandSender ! SendCommand(hcd)
+      case LocationRemoved(connection) =>
+        if (connection == hcdConnection) {
+          log.info("HCD no longer available")
+          //hcdLocation =
+          hcdCS = None
+        }
     }
   }
-  //#track-location
 
+  //#track-location
   //#subscribe
   private val counterEventKey = EventKey(Prefix("nfiraos.samplehcd"), EventName("HcdCounter"))
   private val hcdCounterKey   = KeyType.IntKey.make("counter")
@@ -180,10 +117,101 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   }
   //#subscribe
 
-  override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse =
-    Accepted(runId)
+  override def validateCommand(runId: Id, command: ControlCommand): ValidateCommandResponse =
+    SampleValidation.doAssemblyValidation(runId, command)
 
-  override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse = Completed(runId)
+  override def onSubmit(runId: Id, command: ControlCommand): SubmitResponse =
+    command match {
+      case s: Setup => onSetup(runId, s)
+      case _: Observe =>
+        Invalid(runId, UnsupportedCommandIssue("Observe commands not supported"))
+    }
+
+  private def onSetup(runId: Id, setup: Setup): SubmitResponse = {
+
+    setup.commandName match {
+      case `immediateCommand` =>
+        Completed(runId)
+      case `shortCommand` =>
+        commandHCD(runId, Setup(prefix, hcdShort, setup.maybeObsId))
+        Started(runId)
+      case `mediumCommand` =>
+        commandHCD(runId, Setup(prefix, hcdMedium, setup.maybeObsId))
+        Started(runId)
+      case `longCommand` =>
+        commandHCD(runId, Setup(prefix, hcdLong, setup.maybeObsId))
+        Started(runId)
+      case `cancelLongCommand` =>
+        commandHCD(runId, Setup(prefix, hcdCancelLong, setup.maybeObsId).copy(paramSet = setup.paramSet))
+        Started(runId)
+      case `complexCommand` =>
+        val medium = simpleHCD(runId, Setup(prefix, hcdMedium, setup.maybeObsId))
+        val long = simpleHCD(runId, Setup(prefix, hcdLong, setup.maybeObsId))
+
+        commandResponseManager.queryFinalAll(medium, long).map {
+          case OverallSuccess(_) =>
+            // Don't care about individual responses with success
+            commandResponseManager.updateCommand(Completed(runId))
+          case OverallFailure(responses) =>
+            val errors = responses.filter(isNegative(_))
+            commandResponseManager.updateCommand(errors.head.withRunId(runId))
+        }.recover(ex => commandResponseManager.updateCommand(Error(runId, ex.toString)))
+
+        Started(runId)
+      case `sendToLocked` =>
+        Completed(runId)
+      case `sleep` =>
+        sleepHCD(runId, setup, setup(sleepTimeKey).head)
+        Started(runId)
+      case _ =>
+        Invalid(runId, CommandIssue.UnsupportedCommandIssue(s"${setup.commandName.name}"))
+    }
+  }
+
+  private def sleepHCD(runId: Id, setup:Setup, sleepTime:Long): Unit = {
+    println("sleepHCD")
+    hcdCS match {
+      case Some(cs) =>
+        println("Input setup: " + setup)
+        val s = Setup(prefix, hcdSleep, None).add(setSleepTime(sleepTime))
+        println("Input setup for HCD: " + s)
+        cs.submit(s).map {
+          case started: Started =>
+            println("Assembly received started")
+            cs.queryFinal(started.runId).foreach { sr =>
+              println(s"Query Final final returned: $sr")
+              commandResponseManager.updateCommand(sr.withRunId(runId))
+            }
+          case other =>
+            commandResponseManager.updateCommand(other.withRunId(runId))
+          }
+      case None =>
+        commandResponseManager.updateCommand(Error(runId, s"A needed HCD is not available: ${hcdConnection.componentId}"))
+    }
+  }
+
+  private def commandHCD(runId: Id, setup:Setup): Unit = {
+    println("commandHCD")
+    hcdCS match {
+      case Some(cs) =>
+        println("Input setup: " + setup)
+        cs.submitAndWait(setup).map { sr =>
+          commandResponseManager.updateCommand(sr.withRunId(runId))
+        }
+      case None =>
+        commandResponseManager.updateCommand(Error(runId, s"A needed HCD is not available: ${hcdConnection.componentId}"))
+    }
+  }
+
+  private def simpleHCD(runId: Id, setup:Setup):Future[SubmitResponse] = {
+    println("SimpleHCD")
+    hcdCS match {
+      case Some(cs) =>
+        cs.submitAndWait(setup)
+      case None =>
+        Future(Error(runId, s"A needed HCD is not available: ${hcdConnection.componentId}"))
+    }
+  }
 
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
 

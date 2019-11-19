@@ -10,14 +10,17 @@ import csw.location.models.TrackingEvent
 import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
-import csw.params.core.generics.{KeyType, Parameter}
+import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.Id
 import csw.params.events.{EventName, SystemEvent}
 import csw.time.core.models.UTCTime
 import org.tmt.nfiraos.shared.SampleInfo._
+import org.tmt.nfiraos.shared.WorkerMonitor
+import org.tmt.nfiraos.shared.WorkerMonitor.{AddWorker, GetWorker, Response}
+import akka.actor.typed.scaladsl.AskPattern._
 import akka.util.Timeout
 import org.tmt.nfiraos.sampleassembly.SampleValidation
-import org.tmt.nfiraos.samplehcd.SleepWorker.{Cancel, Sleep, SleepWorkerMessages}
+import org.tmt.nfiraos.samplehcd.SleepWorkerWithMonitor.{Cancel, Sleep, SleepWorkerWithMonitorMessages}
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
@@ -29,18 +32,12 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
  * and if validation is successful, then onSubmit hook gets invoked.
  * You can find more information on this here : https://tmtsoftware.github.io/csw/framework.html
  */
-class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {
+class SampleHcdHandlersWithMonitor(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {
   import cswCtx._
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
   private val log                           = loggerFactory.getLogger
 
-  // Storage for most recent long command for cancel - not a great implementation, but here to show async possible
-  var longWorker:Option[ActorRef[SleepWorkerMessages]] = None
-
-  // Sleep periods in milliseconds for short, medium, and long commands
-  private val shortSleepPeriod:Long                 = 600L
-  private val mediumSleepPeriod:Long                = 2000L
-  private val longSleepPeriod:Long                  = 4000L
+  private val workerMonitor = ctx.spawnAnonymous(WorkerMonitor[ActorRef[SleepWorkerWithMonitorMessages]](cswCtx))
 
   //#worker-actor
 
@@ -102,44 +99,30 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
     }
   }
 
-  def onSetup(runId: Id, setup: Setup): SubmitResponse = {
-    log.info(s"HCD onSubmit received command: $setup")
-    println(s"HCD onSubmit received command: $setup")
+  def onSetup(runId: Id, setup: Setup): SubmitResponse =
     setup.commandName match {
-      case `hcdShort` =>
-        val worker = ctx.spawnAnonymous(SleepWorker(cswCtx))
-        worker ! Sleep(runId, shortSleepPeriod)
-        Started(runId)
-      case `hcdMedium` =>
-        val worker = ctx.spawnAnonymous(SleepWorker(cswCtx))
-        worker ! Sleep(runId, mediumSleepPeriod)
-        Started(runId)
-      case `hcdLong` =>
-        val worker = ctx.spawnAnonymous(SleepWorker(cswCtx))
-        // Store the value of the current long worker for potential cancel
-        longWorker = Some(worker)
-        worker ! Sleep(runId, longSleepPeriod)
-        Started(runId)
       case `hcdSleep` =>
+        println(s"HCD Received command: $setup")
         val sleepTime = setup(sleepTimeKey).head
-        val worker = ctx.spawnAnonymous(SleepWorker(cswCtx))
-        worker ! Sleep(runId, sleepTime)
+        val worker = ctx.spawnAnonymous(SleepWorkerWithMonitor(cswCtx))
+        workerMonitor ! AddWorker(runId, worker)
+        worker ! Sleep(runId, sleepTime, workerMonitor)
         Started(runId)
-      case `hcdCancelLong` =>
+      case `cancelWorker` =>
         val cancelRunId = Id(setup(cancelKey).head)
         println(s"HCD Received cancel worker: $cancelRunId")
         implicit val timeout:Timeout = 10.seconds
         implicit val sched:Scheduler = ctx.system.scheduler
-        // Kill long here
-        longWorker.map(_ ! Cancel)
-        longWorker = None
+        val r:Future[Response[ActorRef[SleepWorkerWithMonitorMessages]]] = workerMonitor.ask(replyTo => GetWorker(cancelRunId, replyTo))
+        r.foreach { res =>
+          println(s"Cancelling: $res")
+          res.response ! Cancel
+        }
         Completed(runId)
       case other =>
         println(s"HCD Bad command: $other")
         Invalid(runId, UnsupportedCommandIssue(s"Sample HCD does not support: $other"))
   }
-  }
-
   //#onSetup
 
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
