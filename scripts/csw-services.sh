@@ -28,10 +28,7 @@
 # Run from the directory containing the script
 cd "$( dirname "${BASH_SOURCE[0]}" )"
 
-export TMT_LOG_HOME=/tmp/tmt/logs
-
-# csw log directory
-TMT_CSW_LOG_HOME=/tmp/tmt/logs/csw
+export TMT_LOG_HOME=/tmp/tmt/logs/csw
 
 # Setting default values
 seed_port=5552
@@ -56,7 +53,7 @@ shouldStartDatabase=false
 
 script_name=$0
 
-logDir=/tmp/tmt/logs/csw
+logDir=${TMT_LOG_HOME}
 test -d ${logDir} || mkdir -p ${logDir}
 
 # We need at least this version of Redis
@@ -193,7 +190,7 @@ function start_sentinel() {
             cp -f ${sentinelTemplateConf} ${sentinelConf}
             sed -i- -e "s/eventServer 127.0.0.1/eventServer ${IP}/g" ${sentinelConf}
             sed -i- -e "s/alarmServer 127.0.0.1/alarmServer ${IP}/g" ${sentinelConf}
-            nohup ./csw-location-agent --name "EventServer,AlarmServer" --command "$redisSentinel ${sentinelConf} --port ${sentinel_port} --logfile ${TMT_CSW_LOG_HOME}/sentinel.log" --port "${sentinel_port}" -J-Dcsw-location-client.server-http-port=${location_http_port} &
+            nohup ./csw-location-agent --name "EventServer,AlarmServer" --command "$redisSentinel ${sentinelConf} --port ${sentinel_port} --logfile ${TMT_LOG_HOME}/sentinel.log" --port "${sentinel_port}" -J-Dcsw-location-client.server-http-port=${location_http_port} &
             echo $! > ${sentinelPidFile}
             echo ${sentinel_port} > ${sentinelPortFile}
         else
