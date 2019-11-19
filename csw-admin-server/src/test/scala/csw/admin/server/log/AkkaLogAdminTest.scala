@@ -1,6 +1,5 @@
 package csw.admin.server.log
 
-import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
@@ -22,10 +21,10 @@ import csw.location.models
 import csw.location.models.ComponentId
 import csw.location.models.ComponentType.{Assembly, HCD}
 import csw.location.models.Connection.AkkaConnection
-import csw.logging.models.Level.{ERROR, INFO, WARN}
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.internal._
 import csw.logging.client.scaladsl.LoggingSystemFactory
+import csw.logging.models.Level.{ERROR, INFO, WARN}
 import csw.logging.models.{Level, LogMetadata}
 import csw.network.utils.Networks
 import csw.params.commands.CommandResponse.OnewayResponse
@@ -41,8 +40,8 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
 
   private val adminWiring: AdminWiring = AdminWiring.make(Some(7879))
   import adminWiring.actorRuntime._
-  import csw.logging.models.codecs.LoggingCodecs._
   import csw.admin.server.log.http.HttpCodecs._
+  import csw.logging.models.codecs.LoggingCodecs._
 
   implicit val testKitSettings: TestKitSettings = TestKitSettings(typedSystem)
 
@@ -81,7 +80,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
   override protected def afterEach(): Unit = logBuffer.clear()
 
   override def afterAll(): Unit = {
-    Await.result(adminWiring.actorRuntime.shutdown(UnknownReason), 10.seconds)
+    Await.result(adminWiring.actorRuntime.shutdown(), 10.seconds)
     containerActorSystem.terminate()
     Await.result(containerActorSystem.whenTerminated, 5.seconds)
     super.afterAll()

@@ -9,7 +9,6 @@ import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.typed.scaladsl.ActorSink
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
-import csw.framework.commons.CoordinatedShutdownReasons.ActorTerminatedReason
 import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
@@ -295,7 +294,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
     //#unregister
 
     // Gracefully shutdown actor system
-    Await.result(CoordinatedShutdown(context.system).run(ActorTerminatedReason), 20.seconds)
+    Await.result(context.system.terminate(), 20.seconds)
 
     //#stop-logging-system
     // Only call this once per application

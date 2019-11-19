@@ -84,8 +84,9 @@ public class JLocationServiceImplTest extends JUnitSuite {
 
     @AfterClass
     public static void shutdown() throws Exception {
-        Await.result(CoordinatedShutdown.get(untypedSystem).run(CoordinatedShutdown.unknownReason()), FiniteDuration.create(5, TimeUnit.SECONDS));
-        Await.result(wiring.actorRuntime().shutdown(CoordinatedShutdown.UnknownReason$.MODULE$), FiniteDuration.create(5, TimeUnit.SECONDS));
+        typedSystem.terminate();
+        Await.result(typedSystem.whenTerminated(), FiniteDuration.create(5, TimeUnit.SECONDS));
+        Await.result(wiring.actorRuntime().shutdown(), FiniteDuration.create(5, TimeUnit.SECONDS));
     }
 
     // DEOPSCSW-13: Java API for location service

@@ -88,8 +88,8 @@ class LocationAgent(names: List[String], command: Command, wiring: Wiring) {
     }
   }
 
-  private def shutdown(reason: Reason) = Await.result(
-    coordinatedShutdown.run(reason),
-    timeout
-  )
+  private def shutdown(reason: Reason) = {
+    typedSystem.terminate()
+    Await.result(typedSystem.whenTerminated, timeout)
+  }
 }

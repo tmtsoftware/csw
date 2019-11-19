@@ -1,7 +1,6 @@
 package csw.framework.internal.wiring
 
 import akka.actor.CoordinatedShutdown
-import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.{Done, actor}
@@ -25,6 +24,9 @@ class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol.Command]) {
   def startLogging(name: String): LoggingSystem =
     LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, typedSystem)
 
-  def shutdown(reason: Reason): Future[Done] = coordinatedShutdown.run(reason)
+  def shutdown(): Future[Done] = {
+    typedSystem.terminate()
+    typedSystem.whenTerminated
+  }
 }
 // $COVERAGE-ON$

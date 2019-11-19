@@ -53,7 +53,7 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
   override def afterAll(): Unit = {
     serverWiring.httpService.shutdown(UnknownReason).await
     clientWiring.actorRuntime.shutdown(UnknownReason).await
-    serverWiring.actorRuntime.shutdown(UnknownReason).await
+    serverWiring.actorRuntime.shutdown().await
     Files.delete(Paths.get(inputFilePath))
     Files.delete(Paths.get(updatedInputFilePath))
     super.afterAll()

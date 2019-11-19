@@ -17,7 +17,6 @@ import akka.stream.javadsl.Sink;
 import csw.command.client.extensions.AkkaLocationExt;
 import csw.command.client.messages.ComponentMessage;
 import csw.command.client.messages.ContainerMessage;
-import csw.framework.commons.CoordinatedShutdownReasons;
 import csw.location.api.extensions.ActorExtension;
 import csw.location.api.extensions.URIExtension;
 import csw.location.api.javadsl.ILocationService;
@@ -281,7 +280,8 @@ public class JLocationServiceExampleClient extends AbstractActor {
         //#unregister
 
         try {
-            CoordinatedShutdown.get(context().system()).runAll(CoordinatedShutdownReasons.actorTerminatedReason()).toCompletableFuture().get();
+            context().system().terminate();
+            context().system().getWhenTerminated().toCompletableFuture().get();
             // #log-info-error
         } catch (InterruptedException | ExecutionException ex) {
             log.info(ex.getMessage(), ex);

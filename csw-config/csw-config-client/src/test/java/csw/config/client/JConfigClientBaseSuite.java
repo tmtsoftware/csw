@@ -2,7 +2,6 @@ package csw.config.client;
 
 import akka.actor.CoordinatedShutdown;
 import akka.actor.typed.ActorSystem;
-import akka.actor.typed.javadsl.Adapter;
 import akka.actor.typed.javadsl.Behaviors;
 import csw.config.api.javadsl.IConfigClientService;
 import csw.config.api.javadsl.IConfigService;
@@ -53,6 +52,6 @@ public class JConfigClientBaseSuite extends JMockedAuthentication {
         actorRuntime.typedSystem().terminate();
         Await.result(actorRuntime.typedSystem().whenTerminated(), timeout);
         Await.result(serverWiring.actorRuntime().classicSystem().terminate(), timeout);
-        Await.result(locationWiring.actorRuntime().shutdown(CoordinatedShutdown.unknownReason()), timeout);
+        Await.result(locationWiring.actorRuntime().shutdown(), timeout);
     }
 }

@@ -1,6 +1,5 @@
 package csw.admin.server.log
 
-import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.http.scaladsl.Http
@@ -54,7 +53,7 @@ class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpParameter with M
 
   override def afterAll(): Unit = {
     testFileUtils.deleteServerFiles()
-    Await.result(adminWiring.actorRuntime.shutdown(UnknownReason), 10.seconds)
+    Await.result(adminWiring.actorRuntime.shutdown(), 10.seconds)
     super.afterAll()
   }
 

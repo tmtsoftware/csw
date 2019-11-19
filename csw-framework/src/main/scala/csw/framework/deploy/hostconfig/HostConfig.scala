@@ -2,8 +2,7 @@ package csw.framework.deploy.hostconfig
 
 import java.nio.file.Path
 
-import akka.actor.CoordinatedShutdown.Reason
-import csw.framework.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
+import akka.Done
 import csw.framework.deploy.hostconfig.cli.{ArgsParser, Options}
 import csw.framework.exceptions.UnableToParseOptions
 import csw.framework.internal.configparser.ConfigParser
@@ -65,7 +64,7 @@ private[hostconfig] class HostConfig(name: String, startLogging: Boolean = false
       log.info("Exiting host config application.")
       // once all the processes are started for each container,
       // host applications actor system is no longer needed
-      shutdown(ApplicationFinishedReason)
+      shutdown()
     }
 
   private def bootstrapContainers(containerScript: String, bootstrapInfo: HostBootstrapInfo): Set[Process] =
@@ -88,6 +87,6 @@ private[hostconfig] class HostConfig(name: String, startLogging: Boolean = false
     new ProcessBuilder(cmd: _*).start()
   }
 
-  private def shutdown(reason: Reason) = Await.result(wiring.actorRuntime.shutdown(reason), timeout)
+  private def shutdown(): Done = Await.result(wiring.actorRuntime.shutdown(), timeout)
 }
 // $COVERAGE-ON$

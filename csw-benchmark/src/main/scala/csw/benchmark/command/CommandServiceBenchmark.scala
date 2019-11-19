@@ -2,7 +2,6 @@ package csw.benchmark.command
 
 import java.util.concurrent.TimeUnit
 
-import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.typed.Scheduler
 import akka.util
 import com.typesafe.config.ConfigFactory
@@ -53,7 +52,7 @@ class CommandServiceBenchmark {
 
   @TearDown(Level.Trial)
   def teardown(): Unit = {
-    Await.result(adminWiring.actorRuntime.shutdown(UnknownReason), 5.seconds)
+    Await.result(adminWiring.actorRuntime.shutdown(), 5.seconds)
   }
 
   @Benchmark

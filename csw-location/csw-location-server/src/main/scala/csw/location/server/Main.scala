@@ -4,7 +4,6 @@ import akka.Done
 import akka.actor.CoordinatedShutdown
 import csw.location.server.cli.{ArgsParser, Options}
 import csw.location.server.commons.ClusterAwareSettings
-import csw.location.server.commons.CoordinatedShutdownReasons.FailureReason
 import csw.location.server.internal.ServerWiring
 
 import scala.concurrent.duration.DurationDouble
@@ -46,7 +45,7 @@ object Main extends App {
           case NonFatal(ex) =>
             println(s"[ERROR] Failed to start location server.")
             ex.printStackTrace()
-            shutdown(FailureReason(ex))
+            shutdown()
         }
       }
   }

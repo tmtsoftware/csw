@@ -1,6 +1,5 @@
 package csw.alarm.cli
 
-import akka.actor.CoordinatedShutdown.UnknownReason
 import com.typesafe.config.ConfigFactory
 import csw.alarm.cli.args.ArgsParser
 import csw.alarm.cli.utils.TestFutureExt.RichFuture
@@ -49,7 +48,7 @@ trait AlarmCliTestSetup extends HTTPLocationService with EmbeddedRedis with Even
 
   override def afterAll(): Unit = {
     stopSentinel(redisSentinel, redisServer)
-    cliWiring.actorRuntime.shutdown(UnknownReason).await
+    cliWiring.actorRuntime.shutdown().await
     super.afterAll()
   }
 }

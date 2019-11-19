@@ -2,7 +2,6 @@ package csw.config.server.http
 
 import java.net.BindException
 
-import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import csw.aas.core.commons.AASConnection
@@ -47,7 +46,7 @@ class HttpServiceTest extends HTTPLocationService {
     val location = registrationResult.location
     location.uri.getHost shouldBe Networks().hostname
     location.connection shouldBe ConfigServiceConnection.value
-    actorRuntime.shutdown(UnknownReason).await
+    actorRuntime.shutdown().await
   }
 
   test("should not register with location service if server binding fails") {
@@ -71,7 +70,7 @@ class HttpServiceTest extends HTTPLocationService {
     a[OtherLocationIsRegistered] shouldBe thrownBy(httpService.registeredLazyBinding.await)
 
     //TODO: Find a way to assert server is not bounded
-    try actorRuntime.shutdown(UnknownReason).await
+    try actorRuntime.shutdown().await
     catch {
       case NonFatal(_) =>
     }

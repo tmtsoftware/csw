@@ -1,10 +1,6 @@
 package csw.framework.internal.container
 
-import akka.Done
-import akka.actor.CoordinatedShutdown
-import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed._
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext}
 import csw.alarm.client.AlarmServiceFactory
 import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
@@ -15,10 +11,6 @@ import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, S
 import csw.command.client.messages.{ComponentMessage, ContainerActorMessage, ContainerCommonMessage, ContainerIdleMessage}
 import csw.command.client.models.framework._
 import csw.event.client.EventServiceFactory
-import csw.framework.commons.CoordinatedShutdownReasons.{
-  AllActorsWithinContainerTerminatedReason,
-  FailedToCreateSupervisorsReason
-}
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models._
 import csw.framework.scaladsl.RegistrationFactory
@@ -106,7 +98,7 @@ private[framework] final class ContainerBehavior(
       supervisors = supervisors.filterNot(_.component.supervisor == supervisor)
       if (supervisors.isEmpty) {
         log.warn("All supervisors from this container are terminated. Initiating co-ordinated shutdown.")
-        coordinatedShutdown(AllActorsWithinContainerTerminatedReason)
+        ctx.system.terminate()
       }
       this
     case PostStop =>
@@ -145,7 +137,7 @@ private[framework] final class ContainerBehavior(
     case SupervisorsCreated(supervisorInfos) =>
       if (supervisorInfos.isEmpty) {
         log.error(s"Failed to spawn supervisors for ComponentInfo's :[${containerInfo.components.mkString(", ")}]")
-        coordinatedShutdown(FailedToCreateSupervisorsReason)
+        ctx.system.terminate()
       } else {
         supervisors = supervisorInfos
         log.info(s"Container created following supervisors :[${supervisors.map(_.component.supervisor).mkString(",")}]")
@@ -194,6 +186,4 @@ private[framework] final class ContainerBehavior(
       case Failure(throwable) => log.error(throwable.getMessage, ex = throwable)
     }
   }
-
-  private def coordinatedShutdown(reason: Reason): Future[Done] = CoordinatedShutdown(ctx.system.toClassic).run(reason)
 }

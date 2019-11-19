@@ -3,9 +3,8 @@ package csw.config.server.http
 import java.net.BindException
 
 import akka.Done
-import akka.actor.CoordinatedShutdown
+import akka.actor.{ActorSystem, CoordinatedShutdown}
 import akka.actor.CoordinatedShutdown.Reason
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import csw.config.server.commons.CoordinatedShutdownReasons.FailureReason
@@ -35,9 +34,8 @@ class HttpService(
     actorRuntime: ActorRuntime
 ) {
 
-  import actorRuntime.ec
-  import actorRuntime.coordinatedShutdown
-  implicit val classicSystem = actorRuntime.typedSystem.toClassic
+  import actorRuntime.{coordinatedShutdown, ec}
+  implicit val classicSystem: ActorSystem = actorRuntime.classicSystem
 
   private val log: Logger = ConfigServerLogger.getLogger
 
@@ -63,7 +61,7 @@ class HttpService(
     case NonFatal(ex) => shutdown(FailureReason(ex)).map(_ => throw ex)
   }
 
-  def shutdown(reason: Reason): Future[Done] = actorRuntime.shutdown(reason)
+  def shutdown(reason: Reason): Future[Done] = actorRuntime.shutdown()
 
   private def bind() = {
     val _host = Networks().hostname

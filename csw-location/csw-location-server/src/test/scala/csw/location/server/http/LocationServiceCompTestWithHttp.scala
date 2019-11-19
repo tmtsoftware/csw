@@ -1,6 +1,5 @@
 package csw.location.server.http
 
-import akka.actor.CoordinatedShutdown.UnknownReason
 import csw.location.server.commons.TestFutureExtension.RichFuture
 import csw.location.server.internal.ServerWiring
 import csw.location.server.scaladsl.LocationServiceCompTest
@@ -16,7 +15,7 @@ class LocationServiceCompTestWithHttp extends LocationServiceCompTest("http") {
   }
 
   override protected def afterAll(): Unit = {
-    wiring.actorRuntime.shutdown(UnknownReason).await
+    wiring.actorRuntime.shutdown().await
     super.afterAll()
   }
 }

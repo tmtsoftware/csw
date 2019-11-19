@@ -1,6 +1,5 @@
 package csw.integtration.tests
 
-import akka.actor.CoordinatedShutdown.UnknownReason
 import csw.integtration.common.TestFutureExtension.RichFuture
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.models.Connection.AkkaConnection
@@ -29,7 +28,7 @@ class LocationServiceMultipleNICTest() extends FunSuite with Matchers with Befor
   import adminWiring.actorRuntime._
   private val locationService = HttpLocationServiceFactory.makeLocalClient
 
-  override def afterAll(): Unit = Await.result(adminWiring.actorRuntime.shutdown(UnknownReason), 5.seconds)
+  override def afterAll(): Unit = Await.result(adminWiring.actorRuntime.shutdown(), 5.seconds)
 
   test("should list and resolve component having multiple-nic's") {
 

@@ -2,12 +2,11 @@ package csw.config.server
 
 import java.util.concurrent.CompletableFuture
 
-import akka.{Done, actor}
 import akka.actor.CoordinatedShutdown
-import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.dispatch.MessageDispatcher
+import akka.{Done, actor}
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.network.utils.Networks
@@ -30,7 +29,10 @@ private[config] class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol.Comma
   def startLogging(name: String): LoggingSystem =
     LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, typedSystem)
 
-  def shutdown(reason: Reason): Future[Done] = coordinatedShutdown.run(reason)
+  def shutdown(): Future[Done] = {
+    typedSystem.terminate()
+    typedSystem.whenTerminated
+  }
 
-  def jShutdown(reason: Reason): CompletableFuture[Done] = shutdown(reason).toJava.toCompletableFuture
+  def jShutdown(): CompletableFuture[Done] = shutdown().toJava.toCompletableFuture
 }

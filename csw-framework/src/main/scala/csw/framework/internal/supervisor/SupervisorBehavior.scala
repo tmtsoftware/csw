@@ -1,11 +1,7 @@
 package csw.framework.internal.supervisor
 
-import akka.Done
-import akka.actor.CoordinatedShutdown
-import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed._
 import akka.actor.typed.scaladsl._
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import csw.command.client.MiniCRM.MiniCRMMessage
 import csw.command.client.messages.ComponentCommonMessage.{
   ComponentStateSubscription,
@@ -30,7 +26,6 @@ import csw.command.client.models.framework.LockingResponse.{LockExpired, LockExp
 import csw.command.client.models.framework.PubSub.Publish
 import csw.command.client.models.framework.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.command.client.models.framework._
-import csw.framework.commons.CoordinatedShutdownReasons.ShutdownMessageReceivedReason
 import csw.framework.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehavior
 import csw.framework.models.CswContext
@@ -42,7 +37,6 @@ import csw.logging.client.commons.LogAdminUtil
 import csw.params.commands.CommandResponse.Locked
 import csw.params.core.models.{Id, Prefix}
 
-import scala.concurrent.Future
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.util.{Failure, Success}
 
@@ -135,7 +129,7 @@ private[framework] final class SupervisorBehavior(
 
       lifecycleState match {
         case SupervisorLifecycleState.Restart  => spawn()
-        case SupervisorLifecycleState.Shutdown => coordinatedShutdown(ShutdownMessageReceivedReason)
+        case SupervisorLifecycleState.Shutdown => ctx.system.terminate()
         case SupervisorLifecycleState.Idle     => if (isStandalone) throw InitializationFailed
         case _                                 => updateLifecycleState(SupervisorLifecycleState.Idle) // Change to idle and expect Restart/Shutdown from outside
       }
@@ -250,7 +244,7 @@ private[framework] final class SupervisorBehavior(
     updateLifecycleState(SupervisorLifecycleState.Shutdown)
     ctx.child(componentActorName) match {
       case Some(ref) => ctx.stop(ref) // stop component actor for a graceful shutdown before shutting down the actor system
-      case None      => coordinatedShutdown(ShutdownMessageReceivedReason)
+      case None      => ctx.system.terminate()
     }
   }
 
@@ -318,8 +312,6 @@ private[framework] final class SupervisorBehavior(
 
     ctx.spawn[Nothing](behavior, componentActorName)
   }
-
-  private def coordinatedShutdown(reason: Reason): Future[Done] = CoordinatedShutdown(ctx.system.toClassic).run(reason)
 
   private def makePubSubLifecycle(): ActorRef[PubSub[LifecycleStateChanged]] =
     ctx.spawn(PubSubBehavior.make[LifecycleStateChanged](loggerFactory), SupervisorBehavior.PubSubLifecycleActor)

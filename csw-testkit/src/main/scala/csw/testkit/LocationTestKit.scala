@@ -1,5 +1,6 @@
 package csw.testkit
 
+import akka.actor.CoordinatedShutdown
 import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
@@ -45,7 +46,7 @@ final class LocationTestKit private (testKitSettings: TestKitSettings) {
    */
   def shutdownLocationServer(): Unit = {
     locationServer.foreach(TestKitUtils.terminateHttpServerBinding(_, timeout))
-    TestKitUtils.coordShutdown(shutdown, timeout.duration)
+    TestKitUtils.coordShutdown((reason: CoordinatedShutdown.Reason) => shutdown(), timeout.duration)
   }
 
 }

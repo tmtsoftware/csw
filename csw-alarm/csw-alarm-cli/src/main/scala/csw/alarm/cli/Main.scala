@@ -1,7 +1,6 @@
 package csw.alarm.cli
 
 import csw.alarm.cli.args.{ArgsParser, Options}
-import csw.alarm.cli.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
 import csw.alarm.cli.wiring.Wiring
 import csw.location.client.utils.LocationServerStatus
 
@@ -23,7 +22,7 @@ object Main extends App {
       startLogging(name)
       cliApp.execute(options)
     } finally {
-      shutdown(ApplicationFinishedReason)
+      shutdown()
     }
   }
 

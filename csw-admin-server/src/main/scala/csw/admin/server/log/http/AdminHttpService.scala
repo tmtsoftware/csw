@@ -1,10 +1,10 @@
 package csw.admin.server.log.http
 
+import akka.actor.ActorSystem
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import csw.admin.server.commons.AdminLogger
-import csw.admin.server.commons.CoordinatedShutdownReasons.FailureReason
 import csw.admin.server.wiring.{ActorRuntime, Settings}
 import csw.logging.api.scaladsl.Logger
 import csw.network.utils.Networks
@@ -19,9 +19,8 @@ import scala.util.control.NonFatal
 class AdminHttpService(adminRoutes: AdminRoutes, actorRuntime: ActorRuntime, settings: Settings) {
   private val log: Logger = AdminLogger.getLogger
 
-  implicit val classicSystem = actorRuntime.typedSystem.toClassic
-  import actorRuntime.ec
-  import actorRuntime.shutdown
+  implicit val classicSystem: ActorSystem = actorRuntime.typedSystem.toClassic
+  import actorRuntime.{ec, shutdown}
 
   lazy val registeredLazyBinding: Future[ServerBinding] = async {
     val binding = await(bind())
@@ -30,7 +29,7 @@ class AdminHttpService(adminRoutes: AdminRoutes, actorRuntime: ActorRuntime, set
   } recoverWith {
     case NonFatal(ex) =>
       log.error("can not start admin http server", ex = ex)
-      shutdown(FailureReason(ex)).map(_ => throw ex)
+      shutdown().map(_ => throw ex)
   }
 
   private def bind() = Http().bindAndHandle(

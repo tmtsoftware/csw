@@ -2,10 +2,9 @@ package csw.framework.deploy.containercmd
 
 import java.nio.file.Path
 
-import akka.actor.CoordinatedShutdown.Reason
+import akka.Done
 import akka.actor.typed.ActorRef
 import com.typesafe.config.Config
-import csw.framework.commons.CoordinatedShutdownReasons.FailureReason
 import csw.framework.deploy.containercmd.cli.{ArgsParser, Options}
 import csw.framework.exceptions.UnableToParseOptions
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
@@ -60,7 +59,7 @@ private[containercmd] class ContainerCmd(
       } catch {
         case NonFatal(ex) =>
           log.error(s"${ex.getMessage}", ex = ex)
-          shutdown(FailureReason(ex))
+          shutdown()
           throw ex
       }
   }
@@ -82,6 +81,6 @@ private[containercmd] class ContainerCmd(
     if (standalone) Standalone.spawn(config, wiring)
     else Container.spawn(config, wiring)
 
-  private def shutdown(reason: Reason) = Await.result(wiring.actorRuntime.shutdown(reason), 10.seconds)
+  private def shutdown(): Done = Await.result(wiring.actorRuntime.shutdown(), 10.seconds)
 }
 // $COVERAGE-ON$

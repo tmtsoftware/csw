@@ -1,10 +1,9 @@
 package csw.location.server.http
 
-import akka.actor.CoordinatedShutdown.UnknownReason
 import csw.location.server.commons.TestFutureExtension.RichFuture
 import csw.location.server.internal.ServerWiring
-import org.scalatest.concurrent.ScalaFutures
 import org.mockito.MockitoSugar
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuiteLike, Matchers}
 
 trait HTTPLocationService
@@ -24,7 +23,7 @@ trait HTTPLocationService
   }
 
   override def beforeAll(): Unit = start()
-  override def afterAll(): Unit  = locationWiring.map(_.actorRuntime.shutdown(UnknownReason).await)
+  override def afterAll(): Unit  = locationWiring.map(_.actorRuntime.shutdown().await)
 
 }
 
