@@ -3,23 +3,23 @@ filebeat:
     - module: elasticsearch
       server:
         enabled: true
-        var.paths: ["${TMT_LOG_HOME}/*.log", "${TMT_LOG_HOME}/*/*.log"]
+        var.paths: ["${TMT_LOG_HOME}/**/*.log"]
         var.convert_timezone: true
       gc:
         enabled: false
-        var.paths: ["${TMT_LOG_HOME}/*.log", "${TMT_LOG_HOME}/*/*.log"]
+        var.paths: ["${TMT_LOG_HOME}/**/*.log"]
         var.convert_timezone: true
       audit:
         enabled: false
-        var.paths: ["${TMT_LOG_HOME}/*.log", "${TMT_LOG_HOME}/*/*.log"]
+        var.paths: ["${TMT_LOG_HOME}/**/*.log"]
         var.convert_timezone: true
       slowlog:
         enabled: false
-        var.paths: ["${TMT_LOG_HOME}/*.log", "${TMT_LOG_HOME}/*/*.log"]
+        var.paths: ["${TMT_LOG_HOME}/**/*.log"]
         var.convert_timezone: true
       deprecation:
         enabled: false
-        var.paths: ["${TMT_LOG_HOME}/*.log", "${TMT_LOG_HOME}/*/*.log"]
+        var.paths: ["${TMT_LOG_HOME}/**/*.log"]
         var.convert_timezone: true
     - module: system
       syslog:

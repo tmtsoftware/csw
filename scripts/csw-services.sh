@@ -28,7 +28,7 @@
 # Run from the directory containing the script
 cd "$( dirname "${BASH_SOURCE[0]}" )"
 
-export TMT_LOG_HOME=/tmp/csw/logs
+export TMT_LOG_HOME=/tmp/tmt/logs/csw
 
 # Setting default values
 seed_port=5552
@@ -53,7 +53,7 @@ shouldStartDatabase=false
 
 script_name=$0
 
-logDir=/tmp/csw/logs
+logDir=${TMT_LOG_HOME}
 test -d ${logDir} || mkdir -p ${logDir}
 
 # We need at least this version of Redis
