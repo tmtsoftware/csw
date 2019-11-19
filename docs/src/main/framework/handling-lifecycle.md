@@ -106,12 +106,15 @@ handler is called. The component should make any changes in its operation for of
 If a component is to transition from the offline state to the online state, the `onGoOnline`
 handler is called. The component should make any changes in its operation needed for online use.
 
-@@@ note
+@@@ note {title="Online vs Offline"}
 
 Unless implemented by the developer, there is no fundamental difference in the inherent behavior of a component when in 
 either state.  These two states provide a standard way for code to be implemented via these handlers for the transition
 from one state to another, allowing the component to prepare itself to be online (ready for operations) or offline (stowed 
 or dormant).  Any call to transition to a online/offline state when the component is already in that state is a no op.
+
+However, when offline, a component should take actions that make sense when offline. For instance, it should not
+follow the telescope motion or take actions as if online.  
 
 @@@
 
@@ -222,6 +225,15 @@ The diagnosticMode handler contains a `startTime` which is a @scaladoc[UTCTime](
 and a String parameter called `hint` with the name of the technical data mode. The component should read the hint and 
 publish events accordingly.
 
+The startTime is included so a diagnosticMode can be synchronized in time with diagnosticMode starting in other components.
+The Time Service can be used to schedule execution of some tasks at the specified startTime.
+Event Service publish API can also be used in order to start publishing events at the specified startTime.
+A component can only be in one technical data mode at a time. If the component is in one technical data, then on
+receiving command to go in another technical mode, the component should stop/halt the previous  
+diagnosticMode handler, and should enter the new technical data mode.
+Even if the component does not define any diagnostic modes, it must be prepared to receive and process diagnosticMode 
+handler without an error by completing with no changes. This is equivalent to leaving the handler empty.
+
 @@@note
 
 A component developer should be careful to make any changes in the component's internal state in any callbacks. For example,
@@ -230,15 +242,6 @@ A component developer should be careful to make any changes in the component's i
  use a `WorkerActor` to manage the state.
 
 @@@
-
-The startTime is included so a diagnosticMode can be synchronized in time with diagnosticMode starting in other components.
-The Time Service can be used to schedule execution of some tasks at the specified startTime.
-Event Service publish Api can also be used in order to start publishing events at the specified startTime.
-A component can only be in one technical data mode at a time. If the component is in one technical data, then on
-receiving command to go in another technical mode, the component should stop/halt the previous  
-diagnosticMode handler, and should enter the new technical data mode.
-Even if the component does not define any diagnostic modes, it must be prepared to receive and process diagnosticMode 
-handler without an error by completing with no changes.
 
 The supported diagnostic mode hints of a component are published in the component's model files.
 Unsupported hints should be rejected by a component.

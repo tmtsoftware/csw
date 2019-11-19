@@ -355,6 +355,20 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Assert.assertTrue(submitAllResponse2.get(1) instanceof Invalid);
         //#submitAllInvalid
 
+        //#queryF
+        // Test Test
+        Setup qfAllSetup1 = new Setup(prefix(), shortRunning(), Optional.empty());
+        Setup qfAllSetup2 = new Setup(prefix(), mediumRunning(), Optional.empty());
+        Setup qfAllSetup3 = new Setup(prefix(), longRunning(), Optional.empty());
+        CompletableFuture<SubmitResponse> shortSubmit = hcdCmdService.submitAndWait(qfAllSetup1, timeout);
+        CompletableFuture<SubmitResponse> mediumSubmit = hcdCmdService.submitAndWait(qfAllSetup2, timeout);
+        CompletableFuture<SubmitResponse> longSubmit = hcdCmdService.submitAndWait(qfAllSetup3, timeout);
+
+        
+
+
+        //#queryF
+
         //#subscribeCurrentState
         // Subscriber code
         int expectedEncoderValue = 234;
