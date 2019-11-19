@@ -3,9 +3,7 @@ filebeat:
     - type: log
       enabled: true
       paths:
-        - /usr/share/filebeat/watch/*.log
-        - /usr/share/filebeat/watch/*/*.log
-        - /usr/share/filebeat/watch/*/*/*.log
+        - /usr/share/filebeat/watch/**/*.log
       fields_under_root: true
       fields:
         json: true
