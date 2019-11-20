@@ -30,10 +30,10 @@ class EventSubscriberUtil(implicit actorSystem: ActorSystem[_]) {
     eventSource.mapAsync(1)(x => callback(x)).withAttributes(attributes).to(Sink.ignore).run()
 
   def subscribeCallback(eventSource: Source[Event, EventSubscription], callback: Event => Unit): EventSubscription =
-    eventSource.withAttributes(attributes).to(Sink.foreach(callback)).run()
+    eventSource.to(Sink.foreach(callback)).withAttributes(attributes).run()
 
   def actorCallback(actorRef: ActorRef[Event]): Event => Unit = event => actorRef ! event
 
   def pSubscribe(stream: Source[Event, EventSubscription], callback: Event => Unit): EventSubscription =
-    stream.withAttributes(attributes).toMat(Sink.foreach(callback))(Keep.left).run()
+    stream.toMat(Sink.foreach(callback))(Keep.left).withAttributes(attributes).run()
 }
