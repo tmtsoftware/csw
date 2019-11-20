@@ -10,7 +10,7 @@ import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.params.commands.CommandIssue.UnsupportedCommandInStateIssue
 import csw.params.commands.CommandResponse.{Completed, Invalid, SubmitResponse}
-import csw.params.commands.{CommandIssue, CommandName, Sequence, Setup}
+import csw.params.commands.{CommandName, Sequence, Setup}
 import csw.params.core.models.{Id, Prefix}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSuiteLike, Matchers}
