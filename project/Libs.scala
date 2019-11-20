@@ -22,7 +22,7 @@ object Libs {
   val `scala-reflect`                = "org.scala-lang"                           % "scala-reflect"                 % ScalaVersion //BSD-3
   val `gson`                         = "com.google.code.gson"                     % "gson"                          % "2.8.6" //Apache 2.0
 
-  val `play-json`         = dep("com.typesafe.play" %%% "play-json"         % "2.7.4") //Apache 2.0
+  val `play-json`         = dep("com.typesafe.play" %%% "play-json"         % "2.8.0") //Apache 2.0
   val `enumeratum`        = dep("com.beachape"      %%% "enumeratum"        % "1.5.13") //MIT License
   val `scalajs-java-time` = dep("org.scala-js"      %%% "scalajs-java-time" % "0.2.5")
   val `scalatest`         = dep("org.scalatest"     %%% "scalatest"         % "3.0.8") //Apache License 2.0
