@@ -246,11 +246,12 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
     val submitResponseProbe      = TestProbe[SubmitResponse]
     val command: SequenceCommand = Setup(Prefix("csw.move"), CommandName("c1"), Some(ObsId("obsId")))
     val sequence                 = Sequence(command)
+    val sequenceId               = Id()
 
     val testData = Table(
       "SequencerMsg models",
       SubmitSequenceAndWait(sequence, submitResponseProbe.ref),
-      QueryFinal(sequence.runId, submitResponseProbe.ref)
+      QueryFinal(sequenceId, submitResponseProbe.ref)
     )
 
     forAll(testData) { sequencerMsg =>

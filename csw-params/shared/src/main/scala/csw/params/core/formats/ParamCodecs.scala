@@ -129,7 +129,7 @@ trait ParamCodecs extends CommonCodecs {
   implicit lazy val sequenceCommandCodec: Codec[SequenceCommand]         = deriveCodec
   implicit lazy val controlCommandCodec: Codec[ControlCommand]           = deriveCodec
   implicit lazy val commandCodec: Codec[Command]                         = deriveCodec
-  implicit lazy val sequenceCodec: Codec[Sequence]                       = deriveCodec
+  implicit lazy val sequenceCodec: Codec[Sequence]                       = deriveUnaryCodec
 
   // ************************ CommandResponse Codecs ********************
   implicit lazy val resultCodec: Codec[Result] = deriveCodec
