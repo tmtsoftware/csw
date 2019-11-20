@@ -1,7 +1,5 @@
 package csw.command.client.cbor
 
-import java.util.concurrent.TimeUnit
-
 import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.serialization.{Serialization, SerializationExtension}
@@ -19,6 +17,7 @@ import csw.command.client.messages.sequencer.SequencerMsg.{
   Query => SequencerQuery,
   QueryFinal => SequencerQueryFinal
 }
+import csw.command.client.messages.sequencer.SequencerMsg.{SubmitSequenceAndWait, QueryFinal => SequencerQueryFinal}
 import csw.command.client.models.framework.LockingResponse._
 import csw.command.client.models.framework.PubSub.{Publish, PublisherMessage, SubscriberMessage}
 import csw.command.client.models.framework.{PubSub, _}
@@ -28,10 +27,9 @@ import csw.params.core.formats.ParamCodecs
 import io.bullet.borer.derivation.ArrayBasedCodecs.deriveUnaryCodec
 import io.bullet.borer.derivation.MapBasedCodecs._
 import io.bullet.borer.{Codec, Decoder, Encoder}
+import msocket.api.codecs.BasicCodecs
 
-import scala.concurrent.duration.FiniteDuration
-
-trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
+trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs with BasicCodecs {
 
   implicit def actorSystem: ActorSystem[_]
 
@@ -51,11 +49,6 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
   implicit def publishCodec[T: Encoder: Decoder]: Codec[Publish[T]]                           = deriveCodec
   implicit def publisherMessageCodec[T: Encoder: Decoder]: Codec[PublisherMessage[T]]         = deriveCodec
   implicit def pubSubCodec[T: Encoder: Decoder]: Codec[PubSub[T]]                             = deriveCodec
-
-  implicit lazy val durationCodec: Codec[FiniteDuration] = Codec.bimap[(Long, String), FiniteDuration](
-    finiteDuration => (finiteDuration.length, finiteDuration.unit.toString),
-    { case (length, unitStr) => FiniteDuration(length, TimeUnit.valueOf(unitStr)) }
-  )
 
   // ************************ LockingResponse Codecs ********************
 

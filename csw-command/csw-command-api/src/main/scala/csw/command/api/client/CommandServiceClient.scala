@@ -52,7 +52,7 @@ class CommandServiceClient(
     httpTransport.requestResponse[QueryResponse](Query(commandRunId))
 
   override def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse] =
-    websocketTransport.requestResponse[SubmitResponse](QueryFinal(commandRunId), timeout.duration)
+    websocketTransport.requestResponse[SubmitResponse](QueryFinal(commandRunId, timeout), timeout.duration)
 
   override def subscribeCurrentState(names: Set[StateName]): Source[CurrentState, Subscription] =
     websocketTransport.requestStream[CurrentState](SubscribeCurrentState(names))

@@ -8,9 +8,10 @@ import csw.params.core.formats.ParamCodecs
 import io.bullet.borer.Codec
 import io.bullet.borer.derivation.MapBasedCodecs.deriveCodec
 import io.bullet.borer.derivation.ArrayBasedCodecs.deriveUnaryCodec
+import msocket.api.codecs.BasicCodecs
 
 object CommandServiceCodecs extends CommandServiceCodecs
-trait CommandServiceCodecs extends ParamCodecs {
+trait CommandServiceCodecs extends ParamCodecs with BasicCodecs {
 
   implicit def httpCodec[T <: CommandServiceHttpMessage]: Codec[T] = httpCodecsValue.asInstanceOf[Codec[T]]
 
@@ -25,7 +26,7 @@ trait CommandServiceCodecs extends ParamCodecs {
   implicit def websocketCodec[T <: CommandServiceWebsocketMessage]: Codec[T] = websocketCodecs.asInstanceOf[Codec[T]]
 
   lazy val websocketCodecs: Codec[CommandServiceWebsocketMessage] = {
-    @silent implicit lazy val queryFinalCodec: Codec[QueryFinal]                       = deriveUnaryCodec
+    @silent implicit lazy val queryFinalCodec: Codec[QueryFinal]                       = deriveCodec
     @silent implicit lazy val subscribeCurrentStateCodec: Codec[SubscribeCurrentState] = deriveUnaryCodec
     deriveCodec
   }

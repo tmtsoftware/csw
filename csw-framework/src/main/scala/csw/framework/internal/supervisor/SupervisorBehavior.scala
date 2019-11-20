@@ -4,13 +4,21 @@ import akka.actor.typed._
 import akka.actor.typed.scaladsl._
 import akka.http.scaladsl.server.Route
 import csw.command.client.MiniCRM.MiniCRMMessage
-import csw.command.client.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.command.client.messages.ComponentCommonMessage.{
+  ComponentStateSubscription,
+  GetSupervisorLifecycleState,
+  LifecycleStateSubscription
+}
 import csw.command.client.messages.FromComponentLifecycleMessage.Running
 import csw.command.client.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorIdleMessage.InitializeTimeout
-import csw.command.client.messages.SupervisorInternalRunningMessage.{RegistrationFailed, RegistrationNotRequired, RegistrationSuccess}
+import csw.command.client.messages.SupervisorInternalRunningMessage.{
+  RegistrationFailed,
+  RegistrationNotRequired,
+  RegistrationSuccess
+}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
 import csw.command.client.messages._
