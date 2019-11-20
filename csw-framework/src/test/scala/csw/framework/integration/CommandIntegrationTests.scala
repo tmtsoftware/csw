@@ -33,7 +33,7 @@ import scala.concurrent.{Await, ExecutionContext}
 class CommandIntegrationTests extends FrameworkIntegrationSuite {
   import testWiring._
 
-  private val irisContainerConnection = AkkaConnection(
+  private val wfosContainerConnection = AkkaConnection(
     ComponentId(Prefix(Subsystem.Container, "WFOS_Container"), ComponentType.Container)
   )
   private val filterAssemblyConnection = AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "FilterASS"), Assembly))
@@ -72,7 +72,7 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
     assertThatContainerIsRunning(containerRef, containerLifecycleStateProbe, 5.seconds)
 
     // resolve container using location service
-    val containerLocation = seedLocationService.resolve(irisContainerConnection, 5.seconds).await
+    val containerLocation = seedLocationService.resolve(wfosContainerConnection, 5.seconds).await
 
     containerLocation.isDefined shouldBe true
     val resolvedContainerRef = containerLocation.get.containerRef

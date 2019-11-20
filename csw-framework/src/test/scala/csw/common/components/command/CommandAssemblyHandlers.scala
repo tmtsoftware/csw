@@ -34,7 +34,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   private implicit val ec: ExecutionContext = ctx.executionContext
   private implicit val timeout: Timeout     = 15.seconds
 
-  private val filterHCDConnection = AkkaConnection(ComponentId(Prefix(Subsystem.IRIS, "FilterHCD"), HCD))
+  private val filterHCDConnection = AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "FilterHCD"), HCD))
   //val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient(ctx.system, clientMat)
 
   private val filterHCDLocation    = Await.result(locationService.resolve(filterHCDConnection, 5.seconds), 5.seconds)

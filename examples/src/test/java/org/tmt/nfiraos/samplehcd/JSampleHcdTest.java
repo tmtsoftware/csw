@@ -65,21 +65,21 @@ public class JSampleHcdTest extends JUnitSuite {
     //#subscribe
     @Test
     public void testShouldBeAbleToSubscribeToHCDEvents() throws InterruptedException {
-        EventKey counterEventKey = new EventKey(new Prefix(JSubsystem.NFIRAOS, "samplehcd"), new EventName("HcdCounter"));
+        EventKey counterEventKey = new EventKey(new Prefix(JSubsystem.NFIRAOS, "JSampleHcd"), new EventName("HcdCounter"));
         Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter");
 
         IEventService eventService = testKit.jEventService();
         IEventSubscriber subscriber = eventService.defaultSubscriber();
 
         // wait for a bit to ensure HCD has started and published an event
-        Thread.sleep(2500);
+        Thread.sleep(2000);
 
 
         ArrayList<Event> subscriptionEventList = new ArrayList<>();
         subscriber.subscribeCallback(Set.of(counterEventKey), subscriptionEventList::add);
 
-        // Sleep for 5 seconds, to allow HCD to publish events
-        Thread.sleep(5000);
+        // Sleep for 4 seconds, to allow HCD to publish events
+        Thread.sleep(4000);
 
         // Event publishing period is 2 seconds.
         // Expecting 3 events: first event on subscription

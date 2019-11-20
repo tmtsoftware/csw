@@ -154,7 +154,7 @@ private[framework] final class ContainerBehavior(
    * @param componentInfos components to be created as specified in the configuration file
    */
   private def createComponents(componentInfos: Set[ComponentInfo]): Unit = {
-    log.info(s"Container is creating following components :[${componentInfos.map(_.name).mkString(", ")}]")
+    log.info(s"Container is creating following components :[${componentInfos.map(_.prefix.toString).mkString(", ")}]")
     Future
       .traverse(componentInfos) { ci =>
         supervisorInfoFactory.make(ctx.self, ci, locationService, eventServiceFactory, alarmServiceFactory, registrationFactory)

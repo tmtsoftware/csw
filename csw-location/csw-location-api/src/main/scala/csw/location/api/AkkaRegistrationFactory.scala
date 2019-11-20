@@ -7,7 +7,6 @@ import csw.location.api.exceptions.LocalAkkaActorRegistrationNotAllowed
 import csw.location.models.AkkaRegistration
 import csw.location.models.Connection.AkkaConnection
 import csw.logging.api.scaladsl.Logger
-import csw.params.core.models.Prefix
 
 /**
  * A factory to create AkkaRegistration

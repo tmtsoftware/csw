@@ -5,7 +5,6 @@ import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.models.AkkaRegistration
 import csw.location.models.Connection.AkkaConnection
-import csw.params.core.models.Prefix
 
 /**
  * `RegistrationFactory` helps creating an AkkaRegistration. It is currently used by `csw-framework` to register different components on jvm boot-up.
