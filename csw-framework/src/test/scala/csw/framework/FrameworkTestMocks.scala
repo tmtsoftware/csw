@@ -49,7 +49,6 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol.Command]) ex
   when(locationService.register(akkaRegistration)).thenReturn(Future.successful(registrationResult))
   when(locationService.unregister(any[AkkaConnection])).thenReturn(Future.successful(Done))
   when(eventServiceFactory.make(any[LocationService])(any[ActorSystem[_]])).thenReturn(eventService)
-  when(eventService.executionContext).thenReturn(system.executionContext)
   ///////////////////////////////////////////////
 
   val lifecycleStateProbe: TestProbe[LifecycleStateChanged] = TestProbe[LifecycleStateChanged]

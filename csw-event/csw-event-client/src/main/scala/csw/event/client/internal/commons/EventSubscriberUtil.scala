@@ -1,11 +1,12 @@
 package csw.event.client.internal.commons
 
 import akka.actor.typed.{ActorRef, ActorSystem}
+import akka.stream.FlowShape
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.stage.GraphStage
-import akka.stream.{Attributes, FlowShape}
 import csw.event.api.scaladsl.SubscriptionModes.{RateAdapterMode, RateLimiterMode}
 import csw.event.api.scaladsl.{EventSubscription, SubscriptionMode}
+import csw.event.client.internal.commons.EventStreamSupervisionStrategy.attributes
 import csw.event.client.internal.commons.throttle.{RateAdapterStage, RateLimiterStage}
 import csw.params.events.Event
 
@@ -15,7 +16,7 @@ import scala.concurrent.duration.FiniteDuration
 /**
  * Utility class to provided common functionalities to different implementations of EventSubscriber
  */
-class EventSubscriberUtil(implicit actorSystem: ActorSystem[_], attributes: Attributes) {
+class EventSubscriberUtil(implicit actorSystem: ActorSystem[_]) {
 
   def subscriptionModeStage(
       every: FiniteDuration,

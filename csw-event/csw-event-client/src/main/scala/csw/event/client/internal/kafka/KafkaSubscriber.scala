@@ -3,8 +3,8 @@ package csw.event.client.internal.kafka
 import akka.Done
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.kafka.{ConsumerSettings, Subscription, Subscriptions, scaladsl}
+import akka.stream.StreamDetachedException
 import akka.stream.scaladsl.{Keep, Sink, Source}
-import akka.stream.{Attributes, StreamDetachedException}
 import csw.event.api.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import csw.event.client.internal.commons.{EventConverter, EventSubscriberUtil}
 import csw.event.client.utils.Utils
@@ -24,13 +24,11 @@ import scala.util.control.NonFatal
  * and subscribing events.
  *
  * @param consumerSettings  future of settings for akka-streams-kafka API for Apache Kafka consumer
- * @param attributes  resuming materializer for publishing streams
  * @param actorSystem to be used for performing asynchronous operations
  */
 // $COVERAGE-OFF$
 private[event] class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[String, Array[Byte]]])(
-    implicit attributes: Attributes,
-    actorSystem: ActorSystem[_]
+    implicit actorSystem: ActorSystem[_]
 ) extends EventSubscriber {
 
   import actorSystem.executionContext
