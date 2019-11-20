@@ -11,7 +11,7 @@ object Settings {
     ) ++
     addCommandAlias(
       "buildAll",
-      ";set every enableFatalWarnings := true; scalafmtCheck; scalastyle; clean; makeSite; test:compile; multi-jvm:compile; set every enableFatalWarnings := false"
+      ";set every enableFatalWarnings := true; scalafmtCheck; scalastyle; clean; makeSite; test:compile; multi-jvm:compile; set enableFatalWarnings := false;"
     )
   }
 
