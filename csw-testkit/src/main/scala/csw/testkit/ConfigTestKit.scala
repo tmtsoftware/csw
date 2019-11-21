@@ -2,7 +2,7 @@ package csw.testkit
 
 import java.nio.file.Paths
 
-import akka.actor.{CoordinatedShutdown, typed}
+import akka.actor.typed
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.http.scaladsl.Http
 import akka.util.Timeout
@@ -99,7 +99,7 @@ final class ConfigTestKit private (
   def shutdownConfigServer(): Unit = {
     deleteServerFiles()
     terminateServer()
-    TestKitUtils.coordShutdown((reason: CoordinatedShutdown.Reason) => configWiring.actorRuntime.shutdown(), timeout)
+    TestKitUtils.shutdown(configWiring.actorRuntime.shutdown(), timeout)
   }
 
 }

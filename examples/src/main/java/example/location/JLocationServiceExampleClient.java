@@ -2,7 +2,6 @@ package example.location;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
-import akka.actor.CoordinatedShutdown;
 import akka.actor.Props;
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.Behavior;

@@ -2,7 +2,7 @@ package csw.testkit
 
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorRef, SpawnProtocol}
-import akka.actor.{ActorSystem, CoordinatedShutdown, typed}
+import akka.actor.{ActorSystem, typed}
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
@@ -105,7 +105,7 @@ final class FrameworkTestKit private (
     if (configStarted) configTestKit.deleteServerFiles(); configTestKit.terminateServer()
     if (eventStarted) eventTestKit.stopRedis()
     if (alarmStarted) alarmTestKit.stopRedis()
-    TestKitUtils.coordShutdown((reason: CoordinatedShutdown.Reason) => frameworkWiring.actorRuntime.shutdown(), timeout)
+    TestKitUtils.shutdown(frameworkWiring.actorRuntime.shutdown(), timeout)
     locationTestKit.shutdownLocationServer()
   }
 }

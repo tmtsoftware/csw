@@ -1,7 +1,6 @@
 package csw.event.client.internal.redis
 
 import akka.actor.typed.{ActorRef, ActorSystem}
-import akka.stream.Attributes
 import akka.stream.scaladsl.{Keep, Source}
 import akka.{Done, NotUsed}
 import csw.event.api.exceptions.EventServerNotAvailable
@@ -27,12 +26,10 @@ import scala.concurrent.duration.FiniteDuration
  *
  * @param redisURI    future containing connection details for the Redis/Sentinel connections.
  * @param redisClient redis client available from lettuce
- * @param attributes  resuming materializer for publishing streams
  * @param actorSystem to be used for performing asynchronous operations
  */
 private[event] class RedisSubscriber(redisURI: Future[RedisURI], redisClient: RedisClient)(
-    implicit attributes: Attributes,
-    actorSystem: ActorSystem[_]
+    implicit actorSystem: ActorSystem[_]
 ) extends EventSubscriber {
 
   import EventRomaineCodecs._

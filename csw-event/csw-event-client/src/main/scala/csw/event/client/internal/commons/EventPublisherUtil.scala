@@ -3,21 +3,24 @@ package csw.event.client.internal.commons
 import akka.Done
 import akka.actor.typed.ActorSystem
 import akka.actor.{Cancellable, PoisonPill}
+import akka.stream.OverflowStrategy
 import akka.stream.scaladsl.{Sink, Source}
-import akka.stream.{Attributes, OverflowStrategy}
 import csw.event.api.exceptions.PublishFailure
 import csw.params.events.Event
 
 import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.concurrent.{Future, Promise}
 import scala.util.control.NonFatal
 
 /**
  * Utility class to provided common functionalities to different implementations of EventPublisher
  */
-private[event] class EventPublisherUtil(implicit ec: ExecutionContext, actorSystem: ActorSystem[_], attributes: Attributes) {
+private[event] class EventPublisherUtil(implicit actorSystem: ActorSystem[_]) {
 
   private val logger = EventServiceLogger.getLogger
+
+  import EventStreamSupervisionStrategy.attributes
+  import actorSystem.executionContext
 
   lazy val (actorRef, stream) = Source
     .actorRef[(Event, Promise[Done])](

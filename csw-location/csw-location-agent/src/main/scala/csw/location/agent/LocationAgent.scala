@@ -2,8 +2,6 @@ package csw.location.agent
 
 import akka.Done
 import akka.actor.CoordinatedShutdown
-import akka.actor.CoordinatedShutdown.Reason
-import csw.location.agent.commons.CoordinatedShutdownReasons.{FailureReason, ProcessTerminated}
 import csw.location.agent.commons.LocationAgentLogger
 import csw.location.agent.models.Command
 import csw.location.agent.wiring.Wiring
@@ -36,7 +34,7 @@ class LocationAgent(prefixes: List[Prefix], command: Command, wiring: Wiring) {
       log.info(s"Executing specified command: ${command.commandText}")
       val process = Runtime.getRuntime.exec(command.commandText)
       // shutdown location agent on termination of external program started using provided command
-      process.onExit().toScala.onComplete(_ => shutdown(ProcessTerminated))
+      process.onExit().toScala.onComplete(_ => shutdown())
 
       // delay the registration of component after executing the command
       Thread.sleep(command.delay)
@@ -51,7 +49,7 @@ class LocationAgent(prefixes: List[Prefix], command: Command, wiring: Wiring) {
 
       process
     } catch {
-      case NonFatal(ex) => shutdown(FailureReason(ex)); throw ex
+      case NonFatal(ex) => shutdown(); throw ex
     }
 
   // ================= INTERNAL API =================
@@ -89,8 +87,5 @@ class LocationAgent(prefixes: List[Prefix], command: Command, wiring: Wiring) {
     }
   }
 
-  private def shutdown(reason: Reason) = {
-    typedSystem.terminate()
-    Await.result(typedSystem.whenTerminated, timeout)
-  }
+  private def shutdown() = Await.result(actorRuntime.shutdown(), timeout)
 }

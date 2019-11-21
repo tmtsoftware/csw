@@ -5,12 +5,12 @@ import java.net.URI
 import akka.Done
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
-import akka.stream.{ActorAttributes, Attributes}
+import akka.stream.Attributes
 import csw.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.event.api.scaladsl.{EventPublisher, EventService, EventSubscriber}
 import csw.event.client.helpers.TestFutureExt.RichFuture
-import csw.event.client.internal.commons.serviceresolver.EventServiceLocationResolver
 import csw.event.client.internal.commons.{EventServiceConnection, EventStreamSupervisionStrategy}
+import csw.event.client.internal.commons.serviceresolver.EventServiceLocationResolver
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.internal.LocationServiceClient
 import csw.location.models.TcpRegistration
@@ -32,7 +32,7 @@ trait BaseProperties {
 
   implicit val actorSystem: ActorSystem[_]
   implicit lazy val ec: ExecutionContext = actorSystem.executionContext
-  val attributes: Attributes             = ActorAttributes.supervisionStrategy(EventStreamSupervisionStrategy.decider)
+  val attributes: Attributes             = EventStreamSupervisionStrategy.attributes
 
   def resolveEventService(locationService: LocationService): Future[URI] = async {
     val eventServiceResolver = new EventServiceLocationResolver(locationService)

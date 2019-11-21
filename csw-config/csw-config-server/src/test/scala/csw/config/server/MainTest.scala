@@ -1,6 +1,5 @@
 package csw.config.server
 
-import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
@@ -67,7 +66,7 @@ class MainTest extends HTTPLocationService {
       response.status shouldBe StatusCodes.OK
       response.discardEntityBytes()
     } finally {
-      httpService.shutdown(UnknownReason).await
+      httpService.shutdown().await
     }
   }
 
@@ -75,7 +74,7 @@ class MainTest extends HTTPLocationService {
 
     // temporary start a server to create a repo and then shutdown the server
     val tmpHttpService = Main.start(Array("--initRepo")).get
-    tmpHttpService.shutdown(UnknownReason).await
+    tmpHttpService.shutdown().await
 
     val httpService = Main.start(Array.empty).get
 
@@ -89,7 +88,7 @@ class MainTest extends HTTPLocationService {
       val response = Http()(actorSystem.toClassic).singleRequest(request).await
       response.status shouldBe StatusCodes.OK
     } finally {
-      httpService.shutdown(UnknownReason).await
+      httpService.shutdown().await
     }
   }
 }

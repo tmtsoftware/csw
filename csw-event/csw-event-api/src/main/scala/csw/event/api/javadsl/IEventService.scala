@@ -2,14 +2,10 @@ package csw.event.api.javadsl
 
 import csw.event.api.scaladsl.EventService
 
-import scala.concurrent.ExecutionContext
-
 /**
  * An interface to provide access to [[csw.event.api.javadsl.IEventPublisher]] and [[csw.event.api.javadsl.IEventSubscriber]].
  */
 trait IEventService {
-
-  implicit val executionContext: ExecutionContext
 
   /**
    * A default instance of [[csw.event.api.javadsl.IEventPublisher]].

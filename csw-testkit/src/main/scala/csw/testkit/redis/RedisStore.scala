@@ -2,7 +2,7 @@ package csw.testkit.redis
 import java.util.Optional
 
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.{ActorSystem, CoordinatedShutdown, typed}
+import akka.actor.{ActorSystem, typed}
 import akka.util.Timeout
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
@@ -47,6 +47,6 @@ private[testkit] trait RedisStore extends EmbeddedRedis {
 
   def shutdown(): Unit = {
     stopRedis()
-    TestKitUtils.coordShutdown(CoordinatedShutdown(untypedSystem).run, timeout)
+    TestKitUtils.shutdown({ system.terminate(); system.whenTerminated }, timeout)
   }
 }

@@ -1,10 +1,9 @@
 package csw.event.cli.wiring
 
-import akka.{Done, actor}
 import akka.actor.CoordinatedShutdown
-import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import akka.{Done, actor}
 import csw.event.cli.BuildInfo
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.scaladsl.LoggingSystemFactory
@@ -25,8 +24,10 @@ class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol.Command]) {
   /**
    * Gracefully shutdown [[_typedSystem]]
    *
-   * @param reason the reason for shutdown
    * @return a future that completes when shutdown is successful
    */
-  def shutdown(reason: Reason): Future[Done] = coordinatedShutdown.run(reason)
+  def shutdown(): Future[Done] = {
+    typedSystem.terminate()
+    typedSystem.whenTerminated
+  }
 }

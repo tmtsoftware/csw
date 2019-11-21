@@ -19,5 +19,5 @@ trait SequencerCommandService {
    */
   def submitAndWait(sequence: Sequence): Future[SubmitResponse]
 
-  def queryFinal(sequenceId: Id): Future[SubmitResponse]
+  def queryFinal(runId: Id): Future[SubmitResponse]
 }

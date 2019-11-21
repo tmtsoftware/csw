@@ -4,7 +4,7 @@ import java.net.InetAddress
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior, SpawnProtocol}
-import akka.actor.{Actor, ActorSystem, CoordinatedShutdown, Props, typed}
+import akka.actor.{Actor, ActorSystem, Props, typed}
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.typed.scaladsl.ActorSink
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation

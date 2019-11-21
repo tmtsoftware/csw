@@ -3,7 +3,6 @@ package csw.event.client.internal.redis
 import akka.Done
 import akka.actor.Cancellable
 import akka.actor.typed.ActorSystem
-import akka.stream.Attributes
 import akka.stream.scaladsl.Source
 import csw.event.api.exceptions.PublishFailure
 import csw.event.api.scaladsl.EventPublisher
@@ -16,7 +15,7 @@ import romaine.async.RedisAsyncApi
 
 import scala.async.Async._
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{Await, Future}
 import scala.util.control.NonFatal
 
 /**
@@ -25,13 +24,13 @@ import scala.util.control.NonFatal
  *
  * @param redisURI    future containing connection details for the Redis/Sentinel connections.
  * @param redisClient redis client available from lettuce
- * @param attributes used for materializing underlying streams
+ * @param actorSystem provides Materializer, executionContext, etc
  */
 private[event] class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(
-    implicit attributes: Attributes,
-    actorSystem: ActorSystem[_],
-    ec: ExecutionContext
+    implicit actorSystem: ActorSystem[_]
 ) extends EventPublisher {
+
+  import actorSystem.executionContext
 
   // inorder to preserve the order of publishing events, the parallelism level is maintained to 1
   private val parallelism                         = 1

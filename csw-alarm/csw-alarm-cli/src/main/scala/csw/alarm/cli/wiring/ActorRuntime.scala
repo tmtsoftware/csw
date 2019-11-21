@@ -1,6 +1,6 @@
 package csw.alarm.cli.wiring
 
-import akka.Done
+import akka.{Done, actor}
 import akka.actor.CoordinatedShutdown
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
@@ -15,7 +15,7 @@ class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol.Command]) {
   implicit lazy val typedSystem: ActorSystem[SpawnProtocol.Command] = _typedSystem
   implicit lazy val ec: ExecutionContextExecutor                    = typedSystem.executionContext
 
-  lazy val classicSystem                            = typedSystem.toClassic
+  lazy val classicSystem: actor.ActorSystem         = typedSystem.toClassic
   lazy val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(classicSystem)
 
   def startLogging(name: String): LoggingSystem =

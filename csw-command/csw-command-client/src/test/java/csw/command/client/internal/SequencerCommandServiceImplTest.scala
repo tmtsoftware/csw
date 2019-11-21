@@ -8,7 +8,8 @@ import csw.command.client.messages.sequencer.SequencerMsg.{QueryFinal, SubmitSeq
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
-import csw.params.commands.CommandResponse.{Completed, SubmitResponse}
+import csw.params.commands.CommandIssue.UnsupportedCommandInStateIssue
+import csw.params.commands.CommandResponse.{Completed, Invalid, SubmitResponse}
 import csw.params.commands.{CommandName, Sequence, Setup}
 import csw.params.core.models.{Id, Prefix, Subsystem}
 import org.scalatest.concurrent.ScalaFutures
@@ -23,17 +24,17 @@ class SequencerCommandServiceImplTest
     with ScalaFutures {
 
   test("should submit sequence to the sequencer") {
-    val sequence   = Sequence(Setup(Prefix("csw.move"), CommandName("command-1"), None))
-    val sequenceId = sequence.runId
+    val sequence = Sequence(Setup(Prefix("csw.move"), CommandName("command-1"), None))
 
+    val invalidId                          = Id("invalid")
     val submitResponse: SubmitResponse     = Completed(Id())
-    val queryFinalResponse: SubmitResponse = Completed(sequenceId)
+    val queryFinalResponse: SubmitResponse = Invalid(invalidId, UnsupportedCommandInStateIssue("some reason"))
 
     val sequencer = spawn(Behaviors.receiveMessage[SequencerMsg] {
       case SubmitSequenceAndWait(`sequence`, replyTo) =>
         replyTo ! submitResponse
         Behaviors.same
-      case QueryFinal(`sequenceId`, replyTo) =>
+      case QueryFinal(`invalidId`, replyTo) =>
         replyTo ! queryFinalResponse
         Behaviors.same
       case _ => Behaviors.same
@@ -48,6 +49,6 @@ class SequencerCommandServiceImplTest
     val sequencerCommandService = SequencerCommandServiceFactory.make(location)
 
     sequencerCommandService.submitAndWait(sequence).futureValue should ===(submitResponse)
-    sequencerCommandService.queryFinal(sequenceId).futureValue should ===(queryFinalResponse)
+    sequencerCommandService.queryFinal(invalidId).futureValue should ===(queryFinalResponse)
   }
 }

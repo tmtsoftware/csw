@@ -1,8 +1,5 @@
 package csw.location.server.commons
 
-import akka.{Done, actor}
-import akka.actor.CoordinatedShutdown
-import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
@@ -12,9 +9,9 @@ import akka.cluster.ddata.typed.scaladsl.{DistributedData, Replicator}
 import akka.cluster.typed.{Cluster, Join}
 import akka.management.scaladsl.AkkaManagement
 import akka.util.Timeout
+import akka.{Done, actor}
 import csw.location.api.exceptions.CouldNotJoinCluster
 import csw.location.server.commons.ClusterConfirmationMessages.{HasJoinedCluster, Shutdown}
-import csw.location.server.commons.CoordinatedShutdownReasons.FailureReason
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 
@@ -38,7 +35,7 @@ class CswCluster private (_typedSystem: ActorSystem[SpawnProtocol.Command]) {
   val hostname: String = _typedSystem.settings.config.getString("akka.remote.artery.canonical.hostname")
 
   implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = _typedSystem
-  val untypedSystem: actor.ActorSystem                         = _typedSystem.toClassic
+  val classicSystem: actor.ActorSystem                         = _typedSystem.toClassic
   implicit val ec: ExecutionContext                            = typedSystem.executionContext
   implicit val cluster: Cluster                                = Cluster(typedSystem)
   private val distributedData: DistributedData                 = scaladsl.DistributedData(typedSystem)
@@ -48,11 +45,6 @@ class CswCluster private (_typedSystem: ActorSystem[SpawnProtocol.Command]) {
    * Gives the replicator for the current ActorSystem
    */
   private[location] val replicator: ActorRef[Replicator.Command] = distributedData.replicator
-
-  /**
-   * Gives handle to CoordinatedShutdown extension
-   */
-  val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(_typedSystem.toClassic)
 
   /**
    * If `startManagement` flag is set to true (which is true only when a managementPort is defined in ClusterSettings)
@@ -96,7 +88,10 @@ class CswCluster private (_typedSystem: ActorSystem[SpawnProtocol.Command]) {
   /**
    * Terminates the ActorSystem and gracefully leaves the cluster
    */
-  def shutdown(reason: Reason): Future[Done] = coordinatedShutdown.run(reason)
+  def shutdown(): Future[Done] = {
+    typedSystem.terminate()
+    typedSystem.whenTerminated
+  }
 }
 
 /**
@@ -136,7 +131,7 @@ object CswCluster {
       cswCluster
     } catch {
       case NonFatal(ex) =>
-        Await.result(cswCluster.shutdown(FailureReason(ex)), 10.seconds)
+        Await.result(cswCluster.shutdown(), 10.seconds)
         log.error(ex.getMessage, ex = ex)
         throw ex
     }
