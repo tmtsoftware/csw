@@ -4,12 +4,11 @@ import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.actor.typed.javadsl.Behaviors
 import csw.command.client.SequencerCommandServiceFactory
 import csw.command.client.messages.sequencer.SequencerMsg
-import csw.command.client.messages.sequencer.SequencerMsg.{QueryFinal, SubmitSequenceAndWait}
+import csw.command.client.messages.sequencer.SequencerMsg.{Query, QueryFinal, SubmitSequence}
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
-import csw.params.commands.CommandIssue.UnsupportedCommandInStateIssue
-import csw.params.commands.CommandResponse.{Completed, Invalid, SubmitResponse}
+import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, Sequence, Setup}
 import csw.params.core.models.{Id, Prefix}
 import org.scalatest.concurrent.ScalaFutures
@@ -26,17 +25,23 @@ class SequencerCommandServiceImplTest
   test("should submit sequence to the sequencer") {
     val sequence = Sequence(Setup(Prefix("csw.move"), CommandName("command-1"), None))
 
-    val invalidId                          = Id("invalid")
-    val submitResponse: SubmitResponse     = Completed(Id())
-    val queryFinalResponse: SubmitResponse = Invalid(invalidId, UnsupportedCommandInStateIssue("some reason"))
+    val queryFinalId                       = Id("queryFinalId")
+    val queryId                            = Id("queryId")
+    val submitResponse: SubmitResponse     = Started(Id())
+    val queryFinalResponse: SubmitResponse = Error(queryFinalId, "Failed")
+    val queryResponse: QueryResponse       = CommandNotAvailable(queryId)
 
     val sequencer = spawn(Behaviors.receiveMessage[SequencerMsg] {
-      case SubmitSequenceAndWait(`sequence`, replyTo) =>
+      case SubmitSequence(`sequence`, replyTo) =>
         replyTo ! submitResponse
         Behaviors.same
-      case QueryFinal(`invalidId`, replyTo) =>
+      case QueryFinal(_, replyTo) =>
         replyTo ! queryFinalResponse
         Behaviors.same
+      case Query(_, replyTo) =>
+        replyTo ! queryResponse
+        Behaviors.same
+
       case _ => Behaviors.same
     })
 
@@ -45,7 +50,9 @@ class SequencerCommandServiceImplTest
 
     val sequencerCommandService = SequencerCommandServiceFactory.make(location)
 
-    sequencerCommandService.submitAndWait(sequence).futureValue should ===(submitResponse)
-    sequencerCommandService.queryFinal(invalidId).futureValue should ===(queryFinalResponse)
+    sequencerCommandService.submit(sequence).futureValue should ===(submitResponse)
+    sequencerCommandService.submitAndWait(sequence).futureValue should ===(queryFinalResponse)
+    sequencerCommandService.query(queryId).futureValue should ===(queryResponse)
+    sequencerCommandService.queryFinal(queryFinalId).futureValue should ===(queryFinalResponse)
   }
 }

@@ -18,7 +18,7 @@ import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.messages._
-import csw.command.client.messages.sequencer.SequencerMsg.{QueryFinal, SubmitSequenceAndWait}
+import csw.command.client.messages.sequencer.SequencerMsg.{QueryFinal, SubmitSequence, Query}
 import csw.command.client.models.framework.LockingResponse._
 import csw.command.client.models.framework.PubSub.{Subscribe, SubscribeOnly, Unsubscribe}
 import csw.command.client.models.framework.SupervisorLifecycleState._
@@ -244,13 +244,15 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
 
   test("should use command serializer for (de)serialize SequencerMsg") {
     val submitResponseProbe      = TestProbe[SubmitResponse]
+    val queryResponseProbe       = TestProbe[QueryResponse]
     val command: SequenceCommand = Setup(Prefix("csw.move"), CommandName("c1"), Some(ObsId("obsId")))
     val sequence                 = Sequence(command)
     val sequenceId               = Id()
 
     val testData = Table(
       "SequencerMsg models",
-      SubmitSequenceAndWait(sequence, submitResponseProbe.ref),
+      SubmitSequence(sequence, submitResponseProbe.ref),
+      Query(sequenceId, queryResponseProbe.ref),
       QueryFinal(sequenceId, submitResponseProbe.ref)
     )
 

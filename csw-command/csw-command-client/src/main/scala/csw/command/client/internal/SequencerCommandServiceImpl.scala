@@ -6,9 +6,9 @@ import akka.util.Timeout
 import csw.command.api.scaladsl.SequencerCommandService
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.sequencer.SequencerMsg
-import csw.command.client.messages.sequencer.SequencerMsg.{QueryFinal, SubmitSequenceAndWait}
+import csw.command.client.messages.sequencer.SequencerMsg.{Query, QueryFinal, SubmitSequence}
 import csw.location.models.AkkaLocation
-import csw.params.commands.CommandResponse.SubmitResponse
+import csw.params.commands.CommandResponse.{QueryResponse, Started, SubmitResponse}
 import csw.params.commands.Sequence
 import csw.params.core.models.Id
 
@@ -18,12 +18,23 @@ import scala.concurrent.duration.DurationInt
 class SequencerCommandServiceImpl(sequencerLocation: AkkaLocation)(
     implicit system: ActorSystem[_]
 ) extends SequencerCommandService {
+
   private implicit val timeout: Timeout = Timeout(10.hour)
 
   private val sequencer: ActorRef[SequencerMsg] = sequencerLocation.sequencerRef
 
-  override def submitAndWait(sequence: Sequence): Future[SubmitResponse] =
-    sequencer ? (SubmitSequenceAndWait(sequence, _))
+  override def submit(sequence: Sequence): Future[SubmitResponse] = sequencer ? (SubmitSequence(sequence, _))
+
+  override def submitAndWait(sequence: Sequence): Future[SubmitResponse] = {
+    import system.executionContext
+
+    submit(sequence).flatMap {
+      case Started(runId) => queryFinal(runId)
+      case x              => Future.successful(x)
+    }
+  }
+
+  override def query(runId: Id): Future[QueryResponse] = sequencer ? (Query(runId, _))
 
   override def queryFinal(runId: Id): Future[SubmitResponse] = sequencer ? (QueryFinal(runId, _))
 }
