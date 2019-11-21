@@ -1,6 +1,7 @@
 package example.sequencerCommandService
 
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import akka.util.Timeout
 import csw.command.client.SequencerCommandServiceFactory
 import csw.command.client.internal.SequencerCommandServiceImpl
 import csw.location.client.ActorSystemFactory
@@ -29,7 +30,8 @@ object SequencerCommandServiceExample extends App {
   // #create-sequence-command-service
 
   // #submit-sequence
-  val sequence: Sequence = Sequence(Setup(Prefix("test.move"), CommandName("command-1"), None))
+  val sequence: Sequence        = Sequence(Setup(Prefix("test.move"), CommandName("command-1"), None))
+  implicit val timeout: Timeout = Timeout(10.seconds)
 
   private val submitResponse: SubmitResponse = Await.result(sequencerCommandService.submitAndWait(sequence), 5.seconds)
   // #submit-sequence

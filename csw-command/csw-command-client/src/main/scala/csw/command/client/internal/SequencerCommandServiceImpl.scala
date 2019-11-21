@@ -13,21 +13,18 @@ import csw.params.commands.Sequence
 import csw.params.core.models.Id
 
 import scala.concurrent.Future
-import scala.concurrent.duration.DurationInt
 
 class SequencerCommandServiceImpl(sequencerLocation: AkkaLocation)(
     implicit system: ActorSystem[_]
 ) extends SequencerCommandService {
 
-  private implicit val timeout: Timeout = Timeout(10.hour)
-
+  private implicit val timeout: Timeout         = Timeouts.DefaultTimeout
   private val sequencer: ActorRef[SequencerMsg] = sequencerLocation.sequencerRef
 
   override def submit(sequence: Sequence): Future[SubmitResponse] = sequencer ? (SubmitSequence(sequence, _))
 
-  override def submitAndWait(sequence: Sequence): Future[SubmitResponse] = {
+  override def submitAndWait(sequence: Sequence)(implicit timeout: Timeout): Future[SubmitResponse] = {
     import system.executionContext
-
     submit(sequence).flatMap {
       case Started(runId) => queryFinal(runId)
       case x              => Future.successful(x)
@@ -36,5 +33,5 @@ class SequencerCommandServiceImpl(sequencerLocation: AkkaLocation)(
 
   override def query(runId: Id): Future[QueryResponse] = sequencer ? (Query(runId, _))
 
-  override def queryFinal(runId: Id): Future[SubmitResponse] = sequencer ? (QueryFinal(runId, _))
+  override def queryFinal(runId: Id)(implicit timeout: Timeout): Future[SubmitResponse] = sequencer ? (QueryFinal(runId, _))
 }
