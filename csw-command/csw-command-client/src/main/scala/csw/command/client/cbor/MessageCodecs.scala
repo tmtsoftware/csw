@@ -17,7 +17,6 @@ import csw.command.client.messages.sequencer.SequencerMsg.{
   Query => SequencerQuery,
   QueryFinal => SequencerQueryFinal
 }
-import csw.command.client.messages.sequencer.SequencerMsg.{SubmitSequenceAndWait, QueryFinal => SequencerQueryFinal}
 import csw.command.client.models.framework.LockingResponse._
 import csw.command.client.models.framework.PubSub.{Publish, PublisherMessage, SubscriberMessage}
 import csw.command.client.models.framework.{PubSub, _}
