@@ -39,7 +39,6 @@ private[event] class EventPublisherUtil(implicit actorSystem: ActorSystem[_]) {
             case ex => p.tryFailure(ex)
           }
       }
-      .withAttributes(attributes)
       .runForeach(_ => ())
 
   // create an akka stream source out of eventGenerator function
