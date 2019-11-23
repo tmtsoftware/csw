@@ -28,7 +28,7 @@ object CommandServiceFactory {
    */
   def make(componentLocation: Location)(implicit actorSystem: ActorSystem[_]): CommandService = {
     componentLocation match {
-      case c: TcpLocation  => throw new RuntimeException(s"can not create command service using TcpLocation $c")
+      case c: TcpLocation  => throw new RuntimeException(s"Only AkkaLocation and HttpLocation can be used while command service")
       case c: AkkaLocation => new CommandServiceImpl(c.componentRef)
       case c: HttpLocation =>
         import csw.command.api.codecs.CommandServiceCodecs._

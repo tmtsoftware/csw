@@ -25,7 +25,7 @@ import csw.config.server.commons.TestFileUtils
 import csw.config.server.mocks.MockedAuthentication
 import csw.config.server.{ServerWiring, Settings}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.location.models.Connection.{AkkaConnection, HttpConnection}
+import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{ComponentId, ComponentType}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse.Invalid
@@ -154,12 +154,10 @@ class ContainerCmdTest(ignore: Int)
       enterBarrier("running")
 
       // resolve and send message to component running in different jvm or on different physical machine
-      val etonSupervisorF         = locationService.resolve(HttpConnection(ComponentId("Eton", ComponentType.HCD)), 2.seconds)
-      val etonSupervisorF2        = locationService.resolve(AkkaConnection(ComponentId("Eton", ComponentType.HCD)), 2.seconds)
-      val etonSupervisorLocation  = Await.result(etonSupervisorF, 15.seconds).get
-      val etonSupervisorLocation2 = Await.result(etonSupervisorF2, 15.seconds).get
+      val etonSupervisorF        = locationService.resolve(AkkaConnection(ComponentId("Eton", ComponentType.HCD)), 2.seconds)
+      val etonSupervisorLocation = Await.result(etonSupervisorF, 15.seconds).get
 
-      val etonSupervisorTypedRef = etonSupervisorLocation2.componentRef
+      val etonSupervisorTypedRef = etonSupervisorLocation.componentRef
       val eatonCompStateProbe    = TestProbe[CurrentState]
       val etonCommandService     = CommandServiceFactory.make(etonSupervisorLocation)
 

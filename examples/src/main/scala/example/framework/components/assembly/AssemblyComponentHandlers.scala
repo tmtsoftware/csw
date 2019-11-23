@@ -162,11 +162,11 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
   //#failureRestart-Exception
   case class HcdNotFoundException() extends FailureRestart("Could not resolve hcd location. Initialization failure.")
 
-  private def resolveHcd(): Future[Option[HttpLocation]] = {
+  private def resolveHcd(): Future[Option[AkkaLocation]] = {
     val maybeConnection = componentInfo.connections.find(connection => connection.componentId.componentType == ComponentType.HCD)
     maybeConnection match {
       case Some(hcd) =>
-        cswCtx.locationService.resolve(hcd.of[HttpLocation], 5.seconds).map {
+        cswCtx.locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
           case loc @ Some(akkaLocation) => loc
           case None                     =>
             // Hcd connection could not be resolved for this Assembly. One option to handle this could be to automatic restart which can give enough time
@@ -202,9 +202,9 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
     implicit val system: ActorSystem[Nothing] = ctx.system
 
     val eventualCommandService: Future[CommandService] =
-      cswCtx.locationService.resolve(hcdConnection.of[HttpLocation], 5.seconds).map {
-        case Some(hcdLocation) => CommandServiceFactory.make(hcdLocation)
-        case _                 => throw HcdNotFoundException()
+      cswCtx.locationService.resolve(hcdConnection.of[AkkaLocation], 5.seconds).map {
+        case Some(hcdLocation: AkkaLocation) => CommandServiceFactory.make(hcdLocation)
+        case _                               => throw HcdNotFoundException()
       }
 
     eventualCommandService.foreach { commandService =>

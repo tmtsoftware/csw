@@ -8,7 +8,7 @@ import csw.command.client.CommandServiceFactory
 import csw.common.components.command.ComponentStateForCommand.{acceptedCmd, cancelCmd, prefix}
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.helpers.{LSNodeSpec, OneMemberAndSeed}
-import csw.location.models.Connection.HttpConnection
+import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{ComponentId, ComponentType}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse._
@@ -53,7 +53,7 @@ class CancellableCommandTest(ignore: Int)
 
       // resolve the assembly running on seed
       val assemblyLocF =
-        locationService.resolve(HttpConnection(ComponentId("Monitor_Assembly", ComponentType.Assembly)), 5.seconds)
+        locationService.resolve(AkkaConnection(ComponentId("Monitor_Assembly", ComponentType.Assembly)), 5.seconds)
       val assemblyLoc = Await.result(assemblyLocF, 10.seconds).get
 
       val assemblyCommandService = CommandServiceFactory.make(assemblyLoc)

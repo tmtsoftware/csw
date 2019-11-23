@@ -1,17 +1,16 @@
 package csw.common.components.command
 
 import akka.actor.typed.scaladsl.ActorContext
+import csw.command.client.messages.TopLevelActorMessage
+import CommandComponentState._
 import akka.util.Timeout
 import csw.command.api.scaladsl.CommandService
-import csw.command.client.CommandResponseManager.{OverallFailure, OverallSuccess}
 import csw.command.client.CommandServiceFactory
-import csw.command.client.messages.TopLevelActorMessage
-import csw.common.components.command.CommandComponentState._
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.models.ComponentType.HCD
-import csw.location.models.Connection.HttpConnection
 import csw.location.models.{ComponentId, TrackingEvent}
+import csw.location.models.ComponentType.HCD
+import csw.location.models.Connection.AkkaConnection
 import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandIssue.OtherIssue
 import csw.params.commands.CommandResponse._
@@ -21,6 +20,7 @@ import csw.params.core.states.{CurrentState, StateName}
 import csw.time.core.models.UTCTime
 
 import scala.concurrent.duration._
+import csw.command.client.CommandResponseManager.{OverallFailure, OverallSuccess}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -33,7 +33,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   private implicit val ec: ExecutionContext = ctx.executionContext
   private implicit val timeout: Timeout     = 15.seconds
 
-  private val filterHCDConnection = HttpConnection(ComponentId("FilterHCD", HCD))
+  private val filterHCDConnection = AkkaConnection(ComponentId("FilterHCD", HCD))
   //val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient(ctx.system, clientMat)
 
   private val filterHCDLocation    = Await.result(locationService.resolve(filterHCDConnection, 5.seconds), 5.seconds)

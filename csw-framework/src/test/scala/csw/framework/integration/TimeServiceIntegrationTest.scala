@@ -11,7 +11,7 @@ import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.models.ComponentId
 import csw.location.models.ComponentType.Assembly
-import csw.location.models.Connection.HttpConnection
+import csw.location.models.Connection.AkkaConnection
 import csw.params.commands
 import csw.params.commands.CommandName
 import csw.params.core.states.CurrentState
@@ -23,7 +23,7 @@ class TimeServiceIntegrationTest extends FrameworkIntegrationSuite {
 
   import testWiring._
 
-  private val filterAssemblyConnection = HttpConnection(ComponentId("Filter", Assembly))
+  private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
   private val wiring                   = FrameworkWiring.make(seedActorSystem)
 
   override def afterAll(): Unit = {
