@@ -266,7 +266,7 @@ class CommandServiceTest(ignore: Int)
       //#validate
 
       // test CommandNotAvailable after timeout of 1 seconds
-      Await.result(assemblyCmdService.query(Id("blah"))(1.seconds), 2.seconds) shouldEqual
+      Await.result(assemblyCmdService.query(Id("blah")), 2.seconds) shouldEqual
       CommandNotAvailable(Id("blah"))
 
       //#query

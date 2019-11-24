@@ -28,33 +28,31 @@ private[command] class CommandServiceImpl(component: ActorRef[ComponentMessage])
 
   private implicit val ec: ExecutionContext = actorSystem.executionContext
 
-  private val ValidateTimeout = 1.seconds
-
   private val extension = new CommandServiceExtension(this)
 
+  implicit val timeout: Timeout = Timeout(5.seconds)
+
   override def validate(controlCommand: ControlCommand): Future[ValidateResponse] = {
-    implicit val timeout: Timeout = Timeout(ValidateTimeout)
     component ? (Validate(controlCommand, _))
   }
 
   def submitAndWait(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] =
     extension.submitAndWait(controlCommand)
 
-  override def submit(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] =
+  override def submit(controlCommand: ControlCommand): Future[SubmitResponse] =
     component ? (Submit(controlCommand, _))
 
   override def submitAllAndWait(submitCommands: List[ControlCommand])(implicit timeout: Timeout): Future[List[SubmitResponse]] =
     extension.submitAllAndWait(submitCommands)
 
-  override def oneway(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[OnewayResponse] =
+  override def oneway(controlCommand: ControlCommand): Future[OnewayResponse] =
     component ? (Oneway(controlCommand, _))
 
-  override def onewayAndMatch(controlCommand: ControlCommand, stateMatcher: StateMatcher)(
-      implicit timeout: Timeout
-  ): Future[MatchingResponse] = extension.onewayAndMatch(controlCommand, stateMatcher)
+  override def onewayAndMatch(controlCommand: ControlCommand, stateMatcher: StateMatcher): Future[MatchingResponse] =
+    extension.onewayAndMatch(controlCommand, stateMatcher)
 
   // components coming via this api will be removed from  subscriber's list after timeout
-  def query(commandRunId: Id)(implicit timeout: Timeout): Future[QueryResponse] = {
+  override def query(commandRunId: Id): Future[QueryResponse] = {
     val eventualResponse: Future[QueryResponse] = component ? (Query(commandRunId, _))
     eventualResponse recover {
       case _: TimeoutException => CommandNotAvailable(commandRunId)

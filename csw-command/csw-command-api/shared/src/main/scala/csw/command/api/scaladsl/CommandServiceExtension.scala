@@ -36,10 +36,7 @@ class CommandServiceExtension(commandService: CommandService)(implicit val actor
     }
   }
 
-  def onewayAndMatch(controlCommand: ControlCommand, stateMatcher: StateMatcher)(
-      implicit timeout: Timeout
-  ): Future[MatchingResponse] = {
-
+  def onewayAndMatch(controlCommand: ControlCommand, stateMatcher: StateMatcher)(): Future[MatchingResponse] = {
     val p: Promise[CurrentState] = Promise()
 
     val subscription = commandService.subscribeCurrentState { cs =>

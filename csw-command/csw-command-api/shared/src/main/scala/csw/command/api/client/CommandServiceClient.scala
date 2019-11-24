@@ -31,7 +31,7 @@ class CommandServiceClient(
   override def validate(controlCommand: ControlCommand): Future[ValidateResponse] =
     httpTransport.requestResponse[ValidateResponse](Validate(controlCommand))
 
-  override def submit(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] =
+  override def submit(controlCommand: ControlCommand): Future[SubmitResponse] =
     httpTransport.requestResponse[SubmitResponse](Submit(controlCommand))
 
   override def submitAndWait(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] =
@@ -41,14 +41,13 @@ class CommandServiceClient(
       implicit timeout: Timeout
   ): Future[List[SubmitResponse]] = extension.submitAllAndWait(submitCommands)
 
-  override def oneway(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[OnewayResponse] =
+  override def oneway(controlCommand: ControlCommand): Future[OnewayResponse] =
     httpTransport.requestResponse[OnewayResponse](Oneway(controlCommand))
 
-  override def onewayAndMatch(controlCommand: ControlCommand, stateMatcher: StateMatcher)(
-      implicit timeout: Timeout
-  ): Future[MatchingResponse] = extension.onewayAndMatch(controlCommand, stateMatcher)
+  override def onewayAndMatch(controlCommand: ControlCommand, stateMatcher: StateMatcher): Future[MatchingResponse] =
+    extension.onewayAndMatch(controlCommand, stateMatcher)
 
-  override def query(commandRunId: Id)(implicit timeout: Timeout): Future[QueryResponse] =
+  override def query(commandRunId: Id): Future[QueryResponse] =
     httpTransport.requestResponse[QueryResponse](Query(commandRunId))
 
   override def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse] =
