@@ -23,7 +23,7 @@ import csw.location.models.{ComponentId, ComponentType}
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup
 import csw.params.core.generics.KeyType
-import csw.params.core.models.{ObsId, Units}
+import csw.params.core.models.{ObsId, Prefix, Subsystem, Units}
 import csw.params.core.states.CurrentState
 import io.lettuce.core.RedisClient
 
@@ -35,10 +35,12 @@ class CommandHttpIntegrationTests extends FrameworkIntegrationSuite {
 
   import testWiring._
 
-  private val irisContainerConnection   = AkkaConnection(ComponentId("WFOS_Container", ComponentType.Container))
-  private val filterAssemblyConnection  = AkkaConnection(ComponentId("FilterASS", Assembly))
-  private val filterAssemblyConnection2 = AkkaConnection(ComponentId("FilterASS", Assembly))
-  private val filterHCDConnection       = AkkaConnection(ComponentId("FilterHCD", HCD))
+  private val wfosContainerConnection = AkkaConnection(
+    ComponentId(Prefix(Subsystem.Container, "WFOS_Container"), ComponentType.Container)
+  )
+  private val filterAssemblyConnection  = AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "FilterASS"), Assembly))
+  private val filterAssemblyConnection2 = AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "FilterASS"), Assembly))
+  private val filterHCDConnection       = AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "FilterHCD"), HCD))
   private val containerActorSystem: ActorSystem[SpawnProtocol.Command] =
     ActorSystemFactory.remote(SpawnProtocol(), "container-system")
   val obsId                         = Some(ObsId("Obs001"))
@@ -72,7 +74,7 @@ class CommandHttpIntegrationTests extends FrameworkIntegrationSuite {
     assertThatContainerIsRunning(containerRef, containerLifecycleStateProbe, 5.seconds)
 
     // resolve container using location service
-    val containerLocation = seedLocationService.resolve(irisContainerConnection, 5.seconds).await
+    val containerLocation = seedLocationService.resolve(wfosContainerConnection, 5.seconds).await
 
     containerLocation.isDefined shouldBe true
     val resolvedContainerRef = containerLocation.get.containerRef

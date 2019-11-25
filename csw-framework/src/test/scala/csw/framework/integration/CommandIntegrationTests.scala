@@ -23,7 +23,7 @@ import csw.location.models.Connection.AkkaConnection
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup
 import csw.params.core.generics.KeyType
-import csw.params.core.models.{ObsId, Units}
+import csw.params.core.models.{ObsId, Prefix, Subsystem, Units}
 import csw.params.core.states.{CurrentState, StateName}
 import io.lettuce.core.RedisClient
 
@@ -34,9 +34,11 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
 
   import testWiring._
 
-  private val wfosContainerConnection  = AkkaConnection(ComponentId("WFOS_Container", ComponentType.Container))
-  private val filterAssemblyConnection = AkkaConnection(ComponentId("FilterASS", Assembly))
-  private val filterHCDConnection      = AkkaConnection(ComponentId("FilterHCD", HCD))
+  private val wfosContainerConnection = AkkaConnection(
+    ComponentId(Prefix(Subsystem.Container, "WFOS_Container"), ComponentType.Container)
+  )
+  private val filterAssemblyConnection = AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "FilterASS"), Assembly))
+  private val filterHCDConnection      = AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "FilterHCD"), HCD))
   private val containerActorSystem: ActorSystem[SpawnProtocol.Command] =
     ActorSystemFactory.remote(SpawnProtocol(), "container-system")
   val obsId                         = Some(ObsId("Obs001"))

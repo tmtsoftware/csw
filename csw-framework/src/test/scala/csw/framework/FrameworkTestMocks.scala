@@ -18,7 +18,7 @@ import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.models.Connection.AkkaConnection
-import csw.location.models.{AkkaRegistration, HttpRegistration}
+import csw.location.models.HttpRegistration
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.LoggerFactory

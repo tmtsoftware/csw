@@ -74,11 +74,10 @@ private[framework] final class SupervisorBehavior(
   import ctx.executionContext
 
   private val log: Logger                        = loggerFactory.getLogger(ctx)
-  private val componentName: String              = componentInfo.name
-  private val componentActorName: String         = s"$prefix-$ComponentActorNameSuffix"
-  private val akkaConnection: AkkaConnection     = AkkaConnection(ComponentId(componentName, componentInfo.componentType))
-  private val httpConnection: HttpConnection     = HttpConnection(ComponentId(componentName, componentInfo.componentType))
   private val prefix: Prefix                     = componentInfo.prefix
+  private val componentActorName: String         = s"$prefix-$ComponentActorNameSuffix"
+  private val akkaConnection: AkkaConnection     = AkkaConnection(ComponentId(prefix, componentInfo.componentType))
+  private val httpConnection: HttpConnection     = HttpConnection(ComponentId(prefix, componentInfo.componentType))
   private val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(akkaConnection, ctx.self)
   private val route: Route                       = CommandServiceRoutesFactory.createRoutes(ctx.self)(ctx.system)
   private val httpService                        = new HttpService(locationService, route, log, httpConnection)(ctx.system)

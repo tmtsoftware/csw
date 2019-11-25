@@ -4,7 +4,6 @@ import java.net.URI
 
 import csw.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.models.codecs.LocationSerializable
-import csw.params.core.models.Prefix
 
 /**
  * Registration holds information about a connection and its live location. This model is used to register a connection with LocationService.

@@ -14,14 +14,6 @@ class ArgsParser(name: String) {
   val parser: OptionParser[Options] = new scopt.OptionParser[Options](name) {
     head(name, BuildInfo.version)
 
-    def acceptableServiceNames(services: Seq[String]): Either[String, Unit] = { // TODO modify to work with prefix or just elimninate?
-      val allValid = services.forall { service =>
-        !service.contains("-") && service.trim == service
-      }
-      if (allValid) success
-      else failure("Service name cannot have '-' or leading/trailing spaces")
-    }
-
     opt[Seq[String]]("prefix")
       .required()
       .valueName("<prefix1>[,<prefix2>,...]")
