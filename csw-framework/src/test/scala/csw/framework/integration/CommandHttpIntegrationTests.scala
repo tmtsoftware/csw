@@ -38,9 +38,8 @@ class CommandHttpIntegrationTests extends FrameworkIntegrationSuite {
   private val wfosContainerConnection = AkkaConnection(
     ComponentId(Prefix(Subsystem.Container, "WFOS_Container"), ComponentType.Container)
   )
-  private val filterAssemblyConnection  = AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "FilterASS"), Assembly))
-  private val filterAssemblyConnection2 = AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "FilterASS"), Assembly))
-  private val filterHCDConnection       = AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "FilterHCD"), HCD))
+  private val filterAssemblyConnection = AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "FilterASS"), Assembly))
+  private val filterHCDConnection      = AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "FilterHCD"), HCD))
   private val containerActorSystem: ActorSystem[SpawnProtocol.Command] =
     ActorSystemFactory.remote(SpawnProtocol(), "container-system")
   val obsId                         = Some(ObsId("Obs001"))
@@ -80,9 +79,8 @@ class CommandHttpIntegrationTests extends FrameworkIntegrationSuite {
     val resolvedContainerRef = containerLocation.get.containerRef
 
     // resolve all the components from container using location service
-    val filterAssemblyLocation  = seedLocationService.find(filterAssemblyConnection).await
-    val filterAssemblyLocation2 = seedLocationService.find(filterAssemblyConnection2).await
-    val filterHCDLocation       = seedLocationService.find(filterHCDConnection).await
+    val filterAssemblyLocation = seedLocationService.find(filterAssemblyConnection).await
+    val filterHCDLocation      = seedLocationService.find(filterHCDConnection).await
 
     filterAssemblyLocation.isDefined shouldBe true
     filterHCDLocation.isDefined shouldBe true
@@ -96,12 +94,12 @@ class CommandHttpIntegrationTests extends FrameworkIntegrationSuite {
     filterHcdCS.subscribeCurrentState(filterHCDStateProbe.ref ! _)
 
     // Subscribe to component's lifecycle state
-    filterAssemblyLocation2.foreach(
+    filterAssemblyLocation.foreach(
       l => l.componentRef ! LifecycleStateSubscription(PubSub.Subscribe(assemblyLifecycleStateProbe.ref))
     )
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
-    filterAssemblyLocation2.foreach(l => l.componentRef ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref))
+    filterAssemblyLocation.foreach(l => l.componentRef ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref))
 
     // make sure that all the components are in running lifecycle state before sending lifecycle messages
     supervisorLifecycleStateProbe.expectMessage(SupervisorLifecycleState.Running)
