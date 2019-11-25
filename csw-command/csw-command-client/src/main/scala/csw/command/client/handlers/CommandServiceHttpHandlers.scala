@@ -1,4 +1,4 @@
-package csw.framework.internal.supervisor
+package csw.command.client.handlers
 
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
