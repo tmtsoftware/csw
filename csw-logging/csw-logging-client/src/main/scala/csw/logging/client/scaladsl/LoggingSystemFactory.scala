@@ -33,4 +33,7 @@ object LoggingSystemFactory {
    */
   def start(name: String, version: String, hostName: String, actorSystem: ActorSystem[SpawnProtocol.Command]): LoggingSystem =
     new LoggingSystem(name, version, hostName, actorSystem)
+
+  def forTestingOnly()(implicit actorSystem: ActorSystem[SpawnProtocol.Command]): LoggingSystem =
+    new LoggingSystem("test-name", "test-version-1", "localhost", actorSystem)
 }

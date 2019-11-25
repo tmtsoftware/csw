@@ -1,7 +1,6 @@
-package csw.command.client.models.matchers
+package csw.command.api
 
 import akka.util.Timeout
-import csw.command.api.StateMatcher
 import csw.params.core.generics.Parameter
 import csw.params.core.models.Prefix
 import csw.params.core.states.{CurrentState, DemandState, StateName}

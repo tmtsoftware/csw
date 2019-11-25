@@ -3,14 +3,12 @@ package csw.framework.command
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import csw.command.api.StateMatcher
+import csw.command.api.{DemandMatcher, StateMatcher}
 import csw.command.client.CommandServiceFactory
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.CommandMessage.Submit
 import csw.command.client.models.framework.LockingResponse
 import csw.command.client.models.framework.LockingResponse.LockAcquired
-import csw.command.client.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
-import csw.command.client.models.matchers.{DemandMatcher, Matcher, MatcherResponse}
 import csw.common.utils.LockCommandFactory
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
@@ -27,7 +25,7 @@ import org.mockito.MockitoSugar
 
 import scala.async.Async._
 import scala.concurrent.duration.DurationDouble
-import scala.concurrent.{Await, ExecutionContext, Future, TimeoutException}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 /**
  * Test Configuration :
@@ -85,7 +83,6 @@ class CommandServiceTest(ignore: Int)
   import config._
   import csw.common.components.command.ComponentStateForCommand._
 
-//  implicit val actorSystem: ActorSystem[_] = system.toTyped
   private implicit val ec: ExecutionContext = typedSystem.executionContext
   private implicit val timeout: Timeout     = 5.seconds
 
@@ -270,7 +267,7 @@ class CommandServiceTest(ignore: Int)
       //#validate
 
       // test CommandNotAvailable after timeout of 1 seconds
-      Await.result(assemblyCmdService.query(Id("blah"))(1.seconds), 2.seconds) shouldEqual
+      Await.result(assemblyCmdService.query(Id("blah")), 2.seconds) shouldEqual
       CommandNotAvailable(Id("blah"))
 
       //#query
@@ -321,7 +318,7 @@ class CommandServiceTest(ignore: Int)
       cstate(encoder).head shouldBe expectedEncoderValue
 
       // Unsubscribe to CurrentState
-      subscription.unsubscribe()
+      subscription.cancel()
       //#subscribeCurrentState
 
       // DEOPSCSW-229: Provide matchers infrastructure for comparison
@@ -335,35 +332,9 @@ class CommandServiceTest(ignore: Int)
       val demandMatcher: StateMatcher =
         DemandMatcher(DemandState(prefix, StateName("testStateName")).add(param), withUnits = false, timeout)
 
-      // create matcher instance
-      val matcher = new Matcher(assemblyLocation.componentRef, demandMatcher)
-
-      // start the matcher so that it is ready to receive state published by the source
-      val matcherResponseF: Future[MatcherResponse] = matcher.start
-
       // Submit command as a oneway and if the command is successfully validated,
       // check for matching of demand state against current state
-      val matchResponseF: Future[MatchingResponse] = async {
-        val onewayResponse: OnewayResponse = await(assemblyCmdService.oneway(setupWithMatcher))
-        onewayResponse match {
-          case Accepted(runId) =>
-            val matcherResponse: MatcherResponse = await(matcherResponseF)
-            // create appropriate response if demand state was matched from among the published state or otherwise
-            // this would allow the response to be used to complete a command received by the Assembly
-            matcherResponse match {
-              case MatchCompleted =>
-                Completed(onewayResponse.runId)
-              case mf: MatchFailed =>
-                Error(onewayResponse.runId, mf.throwable.getMessage)
-            }
-          case invalid: Invalid =>
-            matcher.stop()
-            invalid
-          case locked: Locked =>
-            matcher.stop()
-            locked
-        }
-      }
+      val matchResponseF: Future[MatchingResponse] = assemblyCmdService.onewayAndMatch(setupWithMatcher, demandMatcher)
 
       val commandResponse = Await.result(matchResponseF, timeout.duration)
       commandResponse shouldBe a[Completed]
@@ -396,28 +367,8 @@ class CommandServiceTest(ignore: Int)
       // Test failed matching
       //#onewayMatchFail
       val setupWithFailedMatcher = Setup(prefix, matcherFailedCmd, obsId)
-      val failedMatcher          = new Matcher(assemblyLocation.componentRef, demandMatcher)
-
-      val failedMatcherResponseF: Future[MatcherResponse] = failedMatcher.start
-
-      val eventualCommandResponse2: Future[MatchingResponse] = async {
-        val initialResponse = await(assemblyCmdService.oneway(setupWithFailedMatcher))
-        initialResponse match {
-          case _: Accepted =>
-            val matcherResponse = await(failedMatcherResponseF)
-            // create appropriate response if demand state was matched from among the published state or otherwise
-            matcherResponse match {
-              case MatchCompleted  => Completed(initialResponse.runId)
-              case MatchFailed(ex) => Error(initialResponse.runId, ex.getMessage)
-            }
-          case invalid: Invalid =>
-            matcher.stop()
-            invalid
-          case locked: Locked =>
-            matcher.stop()
-            locked
-        }
-      }
+      val eventualCommandResponse2: Future[MatchingResponse] =
+        assemblyCmdService.onewayAndMatch(setupWithFailedMatcher, demandMatcher)
 
       val commandResponse2 = Await.result(eventualCommandResponse2, timeout.duration.+(1.second))
       commandResponse2 shouldBe an[Error]
@@ -431,31 +382,12 @@ class CommandServiceTest(ignore: Int)
       val demandMatcherToSimulateTimeout =
         DemandMatcher(DemandState(prefix, StateName("testStateName"), Set(param)), withUnits = false, 500.millis)
       val setupWithTimeoutMatcher = Setup(prefix, matcherTimeoutCmd, obsId)
-      val matcherForTimeout       = new Matcher(assemblyLocation.componentRef, demandMatcherToSimulateTimeout)
 
-      val matcherResponseF1: Future[MatcherResponse] = matcherForTimeout.start
-
-      val timeoutExMsg = "The stream has not been completed in 500 milliseconds."
-      val eventualCommandResponse1: Future[MatchingResponse] = async {
-        val initialResponse = await(assemblyCmdService.oneway(setupWithTimeoutMatcher))
-        initialResponse match {
-          case _: Accepted =>
-            val matcherResponse = await(matcherResponseF1)
-            matcherResponse match {
-              case MatchCompleted => Completed(initialResponse.runId)
-              case MatchFailed(ex) if ex.isInstanceOf[TimeoutException] =>
-                Error(initialResponse.runId, timeoutExMsg)
-              case MatchFailed(ex) => Error(initialResponse.runId, ex.getMessage)
-            }
-          case other @ (Invalid(_, _) | Locked(_)) =>
-            matcher.stop()
-            other.asInstanceOf[MatchingResponse]
-        }
-      }
+      val eventualCommandResponse1: Future[MatchingResponse] =
+        assemblyCmdService.onewayAndMatch(setupWithTimeoutMatcher, demandMatcherToSimulateTimeout)
 
       val commandResponseOnTimeout: MatchingResponse = Await.result(eventualCommandResponse1, timeout.duration)
       commandResponseOnTimeout shouldBe a[Error]
-      commandResponseOnTimeout.asInstanceOf[Error].message shouldBe timeoutExMsg
 
       enterBarrier("short-long-commands")
 

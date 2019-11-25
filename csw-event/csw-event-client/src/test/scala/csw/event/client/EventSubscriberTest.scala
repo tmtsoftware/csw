@@ -1,6 +1,8 @@
 package csw.event.client
 
 import akka.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.scaladsl.{Keep, Sink}
 import csw.event.api.scaladsl.SubscriptionModes
 import csw.event.client.helpers.TestFutureExt.RichFuture
@@ -555,16 +557,10 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   }
 
   private def resumingAsyncCallback(queue: mutable.Queue[Event]) = {
-    var counter = 0
-    val callback: Event => Future[Unit] = event => {
-      counter += 1
-      if (counter % 2 == 0) {
-        Future.failed(new RuntimeException("shouldResumeAfterThisException"))
-      } else {
-        queue.enqueue(event)
-        Future.successful(())
-      }
-    }
+    val system = ActorSystem(Behaviors.empty, "test")
+    import system.executionContext
+    val callback: Event => Future[Unit] = (event: Event) => Future(resumingCallback(queue)(event))
     callback
   }
+
 }

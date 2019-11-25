@@ -14,8 +14,8 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-location`,
   `csw-config`,
   `csw-logging`,
-  `csw-params-jvm`,
-  `csw-params-js`,
+  `csw-params`.jvm,
+  `csw-params`.js,
   `csw-framework`,
   `csw-command`,
   `csw-event`,
@@ -43,7 +43,9 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-time-core-js`,
   `csw-time-clock-js`,
   `csw-logging-macros`,
-  `csw-params-js`,
+  `csw-params`.jvm,
+  `csw-params`.js,
+  `csw-command-api`.js,
   `csw-location-models-js`,
   `csw-logging-models-js`,
   `csw-alarm-models-js`,
@@ -304,27 +306,23 @@ lazy val `csw-logging-client` = project
 lazy val `csw-params` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .dependsOn(`csw-time-core`)
+  .jvmConfigure(_.dependsOn(`csw-commons` % "test->test"))
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(
     libraryDependencies ++= Dependencies.Params.value,
     fork := false
   )
-
-lazy val `csw-params-js` = `csw-params`.js
-  .settings(
+  .jsSettings(
     libraryDependencies += Libs.`scalajs-java-time`.value
   )
-
-lazy val `csw-params-jvm` = `csw-params`.jvm
-  .dependsOn(`csw-commons` % "test->test")
-  .settings(
+  .jvmSettings(
     libraryDependencies ++= Dependencies.ParamsJvm.value
   )
 
 /* ================= Framework Project ============== */
 lazy val `csw-framework` = project
   .dependsOn(
-    `csw-params-jvm`,
+    `csw-params`.jvm,
     `csw-config-client`,
     `csw-logging-client`,
     `csw-command-client`,
@@ -346,24 +344,29 @@ lazy val `csw-framework` = project
 lazy val `csw-command` = project
   .in(file("csw-command"))
   .aggregate(
-    `csw-command-api`,
+    `csw-command-api`.jvm,
+    `csw-command-api`.js,
     `csw-command-client`
   )
 
-lazy val `csw-command-api` = project
+lazy val `csw-command-api` = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Full)
   .in(file("csw-command/csw-command-api"))
   .dependsOn(
-    `csw-params-jvm`,
-    `csw-location-api`
+    `csw-params`,
+    `csw-location-models`
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(libraryDependencies ++= Dependencies.CommandApi.value)
+  .settings(fork := false)
+  .jsSettings(SettingKey[Boolean]("ide-skip-project") := true)
 
 lazy val `csw-command-client` = project
   .in(file("csw-command/csw-command-client"))
   .dependsOn(
-    `csw-command-api`,
+    `csw-command-api`.jvm,
     `csw-logging-client`,
+    `csw-location-api`,
     `csw-location-client` % "test->test",
     `csw-location-server` % "test->test",
     `csw-commons`         % "test->test"
@@ -383,7 +386,7 @@ lazy val `csw-event` = project
 
 lazy val `csw-event-api` = project
   .in(file("csw-event/csw-event-api"))
-  .dependsOn(`csw-params-jvm`)
+  .dependsOn(`csw-params`.jvm)
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(libraryDependencies ++= Dependencies.EventApi.value)
 
@@ -572,7 +575,7 @@ lazy val examples = project
     `csw-config-client`,
     `csw-aas-http`,
     `csw-logging-client`,
-    `csw-params-jvm`,
+    `csw-params`.jvm,
     `csw-database`,
     `csw-framework`,
     `csw-aas-installed`,
@@ -594,7 +597,7 @@ lazy val examples = project
 lazy val `csw-benchmark` = project
   .dependsOn(
     `csw-logging-client`,
-    `csw-params-jvm`,
+    `csw-params`.jvm,
     `csw-command-client`,
     `csw-time-scheduler`,
     `csw-location-server` % "compile->test",

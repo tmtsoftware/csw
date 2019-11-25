@@ -1,6 +1,7 @@
 package csw.framework.internal.supervisor
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
+import csw.command.api.DemandMatcher
 import csw.command.client.messages.CommandMessage.{Oneway, Submit}
 import csw.command.client.messages.ComponentCommonMessage.{
   ComponentStateSubscription,
@@ -14,12 +15,11 @@ import csw.command.client.messages.SupervisorContainerCommonMessages.Restart
 import csw.command.client.models.framework.PubSub.Subscribe
 import csw.command.client.models.framework.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.command.client.models.framework.{ComponentInfo, LifecycleStateChanged, SupervisorLifecycleState}
-import csw.command.client.models.matchers.DemandMatcher
 import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestSuite
 import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInitializeTimeout}
 import csw.location.models.ComponentType.{Assembly, HCD}
-import csw.location.models.Connection.AkkaConnection
+import csw.location.models.Connection
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
 import csw.params.core.generics.{KeyType, Parameter}
@@ -318,7 +318,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
         containerIdleMessageProbe.expectMessage(SupervisorLifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
-        verify(locationService).unregister(any[AkkaConnection])
+        verify(locationService, times(2)).unregister(any[Connection])
         verify(locationService, times(2)).register(akkaRegistration)
       }
     }

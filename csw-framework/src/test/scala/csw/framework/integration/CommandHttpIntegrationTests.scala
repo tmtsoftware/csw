@@ -9,7 +9,7 @@ import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
-import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.command.client.messages.ContainerCommonMessage.GetContainerLifecycleState
 import csw.command.client.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.command.client.models.framework._
 import csw.common.FrameworkAssertions._
@@ -17,24 +17,25 @@ import csw.common.components.command.CommandComponentState._
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.client.ActorSystemFactory
-import csw.location.models.{ComponentId, ComponentType}
 import csw.location.models.ComponentType.{Assembly, HCD}
 import csw.location.models.Connection.AkkaConnection
+import csw.location.models.{ComponentId, ComponentType}
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup
 import csw.params.core.generics.KeyType
 import csw.params.core.models.{ObsId, Units}
-import csw.params.core.states.{CurrentState, StateName}
+import csw.params.core.states.CurrentState
 import io.lettuce.core.RedisClient
 
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, ExecutionContext}
 
-class CommandIntegrationTests extends FrameworkIntegrationSuite {
+//CSW-75: Provide HTTP access for components
+class CommandHttpIntegrationTests extends FrameworkIntegrationSuite {
 
   import testWiring._
 
-  private val wfosContainerConnection   = AkkaConnection(ComponentId("WFOS_Container", ComponentType.Container))
+  private val irisContainerConnection   = AkkaConnection(ComponentId("WFOS_Container", ComponentType.Container))
   private val filterAssemblyConnection  = AkkaConnection(ComponentId("FilterASS", Assembly))
   private val filterAssemblyConnection2 = AkkaConnection(ComponentId("FilterASS", Assembly))
   private val filterHCDConnection       = AkkaConnection(ComponentId("FilterHCD", HCD))
@@ -50,14 +51,13 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
     super.afterAll()
   }
 
-  test("should start multiple components within a single container and exercise features of Command Service") {
+  test("should start multiple components within a single container and exercise features of Command Service using http") {
 
     val wiring = FrameworkWiring.make(containerActorSystem, mock[RedisClient])
     // start a container and verify it moves to running lifecycle state
     val containerRef =
       Container.spawn(ConfigFactory.load("command_container.conf"), wiring).await
 
-    val componentsProbe              = TestProbe[Components]("comp-probe")
     val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]("container-lifecycle-state-probe")
     val filterAssemblyStateProbe     = TestProbe[CurrentState]("assembly-state-probe")
     val filterHCDStateProbe          = TestProbe[CurrentState]("hcd-state-probe")
@@ -72,15 +72,10 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
     assertThatContainerIsRunning(containerRef, containerLifecycleStateProbe, 5.seconds)
 
     // resolve container using location service
-    val containerLocation = seedLocationService.resolve(wfosContainerConnection, 5.seconds).await
+    val containerLocation = seedLocationService.resolve(irisContainerConnection, 5.seconds).await
 
     containerLocation.isDefined shouldBe true
     val resolvedContainerRef = containerLocation.get.containerRef
-
-    // ********** Message: GetComponents **********
-    resolvedContainerRef ! GetComponents(componentsProbe.ref)
-    val components = componentsProbe.expectMessageType[Components].components
-    components.size shouldBe 2
 
     // resolve all the components from container using location service
     val filterAssemblyLocation  = seedLocationService.find(filterAssemblyConnection).await
@@ -109,19 +104,9 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
     // make sure that all the components are in running lifecycle state before sending lifecycle messages
     supervisorLifecycleStateProbe.expectMessage(SupervisorLifecycleState.Running)
 
-    // Make sure errors are handled in validation
-    val invalid = Setup(seqPrefix, invalidCmd, obsId)
-    var result  = Await.result(filterAssemblyCS.submit(invalid), timeout.duration)
-    result shouldBe a[Invalid]
-
-    // Send short command to make sure basic functionality works
-    val short = Setup(seqPrefix, immediateCmd, obsId)
-    result = Await.result(filterAssemblyCS.submit(short), timeout.duration)
-    result shouldBe a[Completed]
-
     // Long running where command in Assembly completes after Started, uses Submit so returns right away
     val longRunning = Setup(seqPrefix, longRunningCmd, obsId)
-    result = Await.result(filterAssemblyCS.submit(longRunning), timeout.duration)
+    var result      = Await.result(filterAssemblyCS.submit(longRunning), timeout.duration)
     result shouldBe a[Started]
 
     // Check with query should be Started if quick
@@ -131,31 +116,11 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
     // Wait for completion with queryFinal
     Await.result(filterAssemblyCS.queryFinal(result.runId), timeout.duration) shouldBe Completed(result.runId)
 
-    // Now query should show Completed
-    Await.result(filterAssemblyCS.query(result.runId), timeout.duration) shouldBe Completed(result.runId)
-
-    // Make sure queryFinal returns immediately and properly for something already completed
-    Await.result(filterAssemblyCS.queryFinal(result.runId), timeout.duration) shouldBe Completed(result.runId)
-
     // Reuse the long running command, but now just wait, no way to use runId so no query or queryFinal is useful
     Await.result(filterAssemblyCS.submitAndWait(longRunning), timeout.duration) shouldBe a[Completed]
 
-    // Make sure invalid works
-    Await.result(filterAssemblyCS.submitAndWait(invalid), timeout.duration) shouldBe a[Invalid]
-
     // Hierarchy going through two layers of queryFinal
     val longRunningToAsm = Setup(seqPrefix, longRunningCmdToAsm, obsId)
-
-    // This executes a command in Assembly that goes to HCD
-    result = Await.result(filterAssemblyCS.submitAndWait(longRunningToAsm), timeout.duration)
-    result shouldBe a[Completed]
-
-    // Long running where command completes after Started, uses Submit so returns right away
-    result = Await.result(filterAssemblyCS.submit(longRunningToAsm), timeout.duration)
-    result shouldBe a[Started]
-
-    // Now wait with queryFinal
-    Await.result(filterAssemblyCS.queryFinal(result.runId), timeout.duration) shouldBe a[Completed]
 
     // Can also do the whole thing with oneway if necessary (same in old version)
     val onewayResult = Await.result(filterAssemblyCS.oneway(longRunningToAsm), timeout.duration)
@@ -163,19 +128,6 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
 
     // Can queryFinal also
     Await.result(filterAssemblyCS.queryFinal(onewayResult.runId), timeout.duration) shouldBe Completed(onewayResult.runId)
-
-    // Try using completer like behavior in Assembly
-    val longRunningToAsmComp = Setup(seqPrefix, longRunningCmdToAsmComp, obsId)
-    result = Await.result(filterAssemblyCS.submit(longRunningToAsmComp), timeout.duration)
-    result shouldBe a[Started]
-
-    Await.result(filterAssemblyCS.queryFinal(result.runId), timeout.duration) shouldBe Completed(result.runId)
-
-    // Long running that returns an error from HCD
-    val longRunningToAsmInvalid = Setup(seqPrefix, longRunningCmdToAsmInvalid, obsId)
-    result = Await.result(filterAssemblyCS.submit(longRunningToAsmInvalid), timeout.duration)
-    result shouldBe a[Started]
-    Await.result(filterAssemblyCS.queryFinal(result.runId), timeout.duration) shouldBe Error(result.runId, "ERROR")
 
     val submitAllSetup1       = Setup(seqPrefix, immediateCmd, obsId)
     val submitAllSetup2       = Setup(seqPrefix, longRunningCmd, obsId)
@@ -204,16 +156,6 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
     // ********** Message: Shutdown **********
     Http(containerActorSystem.toClassic).shutdownAllConnectionPools().await
     resolvedContainerRef ! Shutdown
-
-    // this proves that ComponentBehaviors postStop signal gets invoked for all components
-    // as onShutdownHook of all TLA gets invoked from postStop signal
-
-    filterAssemblyStateProbe.expectMessage(
-      CurrentState(filterAsmPrefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice)))
-    )
-    filterHCDStateProbe.expectMessage(
-      CurrentState(filterHcdPrefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice)))
-    )
 
     // this proves that on shutdown message, container's actor system gets terminated
     // if it does not get terminated in 5 seconds, future will fail which in turn fail this test

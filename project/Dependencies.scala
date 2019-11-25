@@ -225,6 +225,7 @@ object Dependencies {
 
   val CommandClient = Def.setting(
     Seq(
+      MSocket.`msocket-impl-jvm`,
       Libs.`enumeratum`.value,
       Libs.`config`,
       Libs.`play-json`.value,
@@ -246,7 +247,8 @@ object Dependencies {
 
   val CommandApi = Def.setting(
     Seq(
-      Akka.`akka-actor`
+      Libs.`scala-async`,
+      MSocket.`msocket-api`.value
     )
   )
 

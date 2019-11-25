@@ -6,17 +6,13 @@ import akka.actor.typed.ActorSystem;
 import akka.actor.typed.SpawnProtocol;
 import akka.util.Timeout;
 import com.typesafe.config.ConfigFactory;
-import csw.command.api.CurrentStateSubscription;
+import csw.command.api.DemandMatcher;
 import csw.command.api.StateMatcher;
 import csw.command.api.javadsl.ICommandService;
 import csw.command.client.CommandServiceFactory;
 import csw.command.client.extensions.AkkaLocationExt;
 import csw.command.client.messages.SupervisorLockMessage;
 import csw.command.client.models.framework.LockingResponse;
-import csw.command.client.models.matchers.DemandMatcher;
-import csw.command.client.models.matchers.Matcher;
-import csw.command.client.models.matchers.MatcherResponse;
-import csw.command.client.models.matchers.MatcherResponses;
 import csw.common.components.framework.SampleComponentState;
 import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;
@@ -43,6 +39,7 @@ import csw.params.core.states.StateName;
 import csw.params.javadsl.JKeyType;
 import csw.params.javadsl.JSubsystem;
 import io.lettuce.core.RedisClient;
+import msocket.api.models.Subscription;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -62,8 +59,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static csw.common.components.command.ComponentStateForCommand.*;
-
-import csw.location.api.javadsl.JComponentType;
 
 // DEOPSCSW-212: Send oneway command
 // DEOPSCSW-217: Execute RPC like commands
@@ -172,7 +167,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
 
         //#invalidSubmitCmd
         CompletableFuture<SubmitResponse> invalidSubmitCommandF =
-                hcdCmdService.submit(invalidSetup, timeout).thenApply(
+                hcdCmdService.submit(invalidSetup).thenApply(
                         response -> {
                             if (response instanceof Started) {
                                 //do something with completed result
@@ -216,7 +211,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
 
         // do some work before querying for the result of above command as needed
         SubmitResponse sresponse = longRunningCommandResultF.get();
-        CompletableFuture<QueryResponse> queryResponseF = hcdCmdService.query(sresponse.runId(), timeout);
+        CompletableFuture<QueryResponse> queryResponseF = hcdCmdService.query(sresponse.runId());
         queryResponseF.thenAccept(r -> {
             if (r instanceof Started) {
                 // happy case - no action needed
@@ -242,7 +237,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         //#queryLongRunning
 
         //#submitAndQueryFinal
-        CompletableFuture<SubmitResponse> longRunningResultF2 = hcdCmdService.submit(longRunningSetup, timeout)
+        CompletableFuture<SubmitResponse> longRunningResultF2 = hcdCmdService.submit(longRunningSetup)
                 .thenCompose(response -> {
                     if (response instanceof Started) {
                         // This extracts and returns the the first value of parameter encoder
@@ -257,11 +252,11 @@ public class JCommandIntegrationTest extends JUnitSuite {
         //#submitAndQueryFinal
 
         //#submitAndQuery
-        CompletableFuture<SubmitResponse> longRunningSubmitResultF3 = hcdCmdService.submit(longRunningSetup, timeout);
+        CompletableFuture<SubmitResponse> longRunningSubmitResultF3 = hcdCmdService.submit(longRunningSetup);
 
         // do some work before querying for the result of above command as needed
         CompletableFuture<QueryResponse> queryResponseF3 =
-                hcdCmdService.query(longRunningSubmitResultF3.get().runId(), timeout);
+                hcdCmdService.query(longRunningSubmitResultF3.get().runId());
         queryResponseF3.thenAccept(r -> {
             if (r instanceof Started) {
                 // happy case - no action needed
@@ -293,14 +288,14 @@ public class JCommandIntegrationTest extends JUnitSuite {
         //#queryFinal
 
         //#query
-        CompletableFuture<QueryResponse> queryResponseF2 = hcdCmdService.query(sresponse.runId(), timeout);
+        CompletableFuture<QueryResponse> queryResponseF2 = hcdCmdService.query(sresponse.runId());
         Assert.assertTrue(queryResponseF2.get() instanceof Completed);
         //#query
 
         //#oneway
         Setup onewaySetup = new Setup(prefix(), onewayCmd(), Optional.empty()).add(encoderValue);
         CompletableFuture onewayF = hcdCmdService
-                .oneway(onewaySetup, timeout)
+                .oneway(onewaySetup)
                 .thenAccept(onewayResponse -> {
                     if (onewayResponse instanceof Invalid) {
                         // log an error here
@@ -366,14 +361,14 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Setup currStateSetup = new Setup(prefix(), hcdCurrentStateCmd(), Optional.empty()).add(encoder.set(expectedEncoderValue));
         // Setup a callback response to CurrentState - use AtomicInteger to capture final value
         final AtomicInteger cstate = new AtomicInteger((1));
-        CurrentStateSubscription subscription = hcdCmdService.subscribeCurrentState(cs -> {
+        Subscription subscription = hcdCmdService.subscribeCurrentState(cs -> {
             // Example sets variable outside scope of closure
             cstate.set(cs.jGet(encoder).orElseThrow().head());
         });
 
         // Send a oneway to the HCD that will cause a publish of a CurrentState with the encoder value
         // in the command parameter "encoder"
-        hcdCmdService.oneway(currStateSetup, timeout);
+        hcdCmdService.oneway(currStateSetup);
 
         // Wait for a bit for the callback
         Thread.sleep(200);
@@ -381,7 +376,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Assert.assertEquals(expectedEncoderValue, cstate.get());
 
         // Unsubscribe from CurrentState
-        subscription.unsubscribe();
+        subscription.cancel();
         //#subscribeCurrentState
 
         // DEOPSCSW-229: Provide matchers infrastructure for comparison
@@ -393,30 +388,9 @@ public class JCommandIntegrationTest extends JUnitSuite {
         // create a StateMatcher which specifies the desired algorithm and state to be matched.
         DemandMatcher demandMatcher = new DemandMatcher(new DemandState(prefix(), new StateName("testStateName")).add(param), false, timeout);
 
-        // create the matcher instance
-        Matcher matcher = new Matcher(AkkaLocationExt.RichAkkaLocation(hcdLocation).componentRef(hcdActorSystem).narrow(), demandMatcher, hcdActorSystem);
-
-        // start the matcher so that it is ready to receive state published by the source
-        CompletableFuture<MatcherResponse> matcherResponseFuture = matcher.jStart();
-
         // Submit command as a oneway and if the command is successfully validated,
         // check for matching of demand state against current state
-        CompletableFuture<MatchingResponse> matchResponseF = hcdCmdService
-                .oneway(setupWithMatcher, timeout)
-                .thenCompose(initialCommandResponse -> {
-                    if (initialCommandResponse instanceof Accepted) {
-                        return matcherResponseFuture.thenApply(matcherResponse -> {
-                            if (matcherResponse.getClass().isAssignableFrom(MatcherResponses.jMatchCompleted().getClass()))
-                                return new Completed(initialCommandResponse.runId());
-                            else
-                                return new CommandResponse.Error(initialCommandResponse.runId(), "Match not completed");
-                        });
-
-                    } else {
-                        matcher.stop();
-                        return CompletableFuture.completedFuture(new CommandResponse.Error(initialCommandResponse.runId(), "Matcher failed"));
-                    }
-                });
+        CompletableFuture<MatchingResponse> matchResponseF = hcdCmdService.onewayAndMatch(setupWithMatcher, demandMatcher);
 
         MatchingResponse actualResponse = matchResponseF.get();
         Completed expectedResponse = new Completed(actualResponse.runId());
@@ -428,7 +402,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         StateMatcher stateMatcher = new DemandMatcher(new DemandState(prefix(), new StateName("testStateName")).add(param), false, timeout);
 
         CompletableFuture<MatchingResponse> matchedCommandResponseF =
-                hcdCmdService.onewayAndMatch(setupWithMatcher, stateMatcher, timeout);
+                hcdCmdService.onewayAndMatch(setupWithMatcher, stateMatcher);
 
         //#onewayAndMatch
         CommandResponse.MatchingResponse mresponse = matchedCommandResponseF.get();
@@ -460,7 +434,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         AkkaLocationExt.RichAkkaLocation(hcdLocation).componentRef(hcdActorSystem).tell(new SupervisorLockMessage.Unlock(prefix(), probe.ref()));
         probe.expectMessage(LockingResponse.lockReleased());
 
-        CompletableFuture<CommandResponse.SubmitResponse> cmdAfterUnlockResCompletableFuture = hcdCmdService.submit(imdSetupCommand, timeout);
+        CompletableFuture<CommandResponse.SubmitResponse> cmdAfterUnlockResCompletableFuture = hcdCmdService.submit(imdSetupCommand);
         CommandResponse.SubmitResponse actualCmdResponseAfterUnlock = cmdAfterUnlockResCompletableFuture.get();
         Assert.assertTrue(actualCmdResponseAfterUnlock instanceof CommandResponse.Completed);
     }
@@ -481,7 +455,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Assert.assertTrue(actualValidationResponse instanceof CommandResponse.Error);
 
         // using separate submit and subscribe API
-        CompletableFuture<SubmitResponse> validationResponse = hcdCmdService.submit(failureResCommand, timeout);
+        CompletableFuture<SubmitResponse> validationResponse = hcdCmdService.submit(failureResCommand);
         Id runId = validationResponse.get().runId();
         CompletableFuture<SubmitResponse> finalResponse = hcdCmdService.queryFinal(runId, timeout);
         Assert.assertTrue(finalResponse.get() instanceof CommandResponse.Error);  // This should fail but I guess not typed by compiler
@@ -518,7 +492,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         //#subscribeCurrentState
         // subscribe to the current state of an assembly component and use a callback which forwards each received
         // element to a test probe actor
-        CurrentStateSubscription subscription = hcdCmdService.subscribeCurrentState(currentState -> probe.ref().tell(currentState));
+        Subscription subscription = hcdCmdService.subscribeCurrentState(currentState -> probe.ref().tell(currentState));
         //#subscribeCurrentState
 
         hcdCmdService.submitAndWait(setup, timeout);
@@ -533,7 +507,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         probe.expectMessage(expectedSetupCurrentState);
 
         // unsubscribe and verify no messages received by probe
-        subscription.unsubscribe();
+        subscription.cancel();
         Thread.sleep(1000);
 
         hcdCmdService.submitAndWait(setup, timeout);
@@ -553,7 +527,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         //#subscribeOnlyCurrentState
         // subscribe to the current state of an assembly component and use a callback which forwards each received
         // element to a test probe actor
-        CurrentStateSubscription subscription = hcdCmdService.subscribeCurrentState(Set.of(StateName.apply("testStateSetup")), currentState -> inbox.getRef().tell(currentState));
+        Subscription subscription = hcdCmdService.subscribeCurrentState(Set.of(StateName.apply("testStateSetup")), currentState -> inbox.getRef().tell(currentState));
         //#subscribeOnlyCurrentState
 
         hcdCmdService.submitAndWait(setup, timeout);
@@ -570,7 +544,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Assert.assertFalse(receivedStates.contains(expectedSubmitCurrentState));
         Assert.assertTrue(receivedStates.contains(expectedSetupCurrentState));
 
-        subscription.unsubscribe();
+        subscription.cancel();
     }
 
     @Test
