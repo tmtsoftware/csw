@@ -37,9 +37,8 @@ class CommandServiceClient(
   override def submitAndWait(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] =
     extension.submitAndWait(controlCommand)
 
-  override def submitAllAndWait(submitCommands: List[ControlCommand])(
-      implicit timeout: Timeout
-  ): Future[List[SubmitResponse]] = extension.submitAllAndWait(submitCommands)
+  override def submitAllAndWait(submitCommands: List[ControlCommand])(implicit timeout: Timeout): Future[List[SubmitResponse]] =
+    extension.submitAllAndWait(submitCommands)
 
   override def oneway(controlCommand: ControlCommand): Future[OnewayResponse] =
     httpTransport.requestResponse[OnewayResponse](Oneway(controlCommand))

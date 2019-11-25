@@ -3,7 +3,7 @@ import sbt.Def.{setting => dep}
 import sbt._
 
 object Libs {
-  val ScalaVersion    = "2.13.0"
+  val ScalaVersion    = "2.13.1"
   val silencerVersion = "1.4.4"
 
   val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0" //BSD 3-clause "New" or "Revised" License
@@ -22,9 +22,9 @@ object Libs {
   val `scala-reflect`                = "org.scala-lang"                           % "scala-reflect"                 % ScalaVersion //BSD-3
   val `gson`                         = "com.google.code.gson"                     % "gson"                          % "2.8.6" //Apache 2.0
 
-  val `play-json`         = dep("com.typesafe.play" %%% "play-json"         % "2.7.4") //Apache 2.0
+  val `play-json`         = dep("com.typesafe.play" %%% "play-json"         % "2.8.0") //Apache 2.0
   val `enumeratum`        = dep("com.beachape"      %%% "enumeratum"        % "1.5.13") //MIT License
-  val `scalajs-java-time` = dep("org.scala-js"      %%% "scalajs-java-time" % "0.2.5")
+  val `scalajs-java-time` = dep("org.scala-js"      %%% "scalajs-java-time" % "0.2.6")
   val `scalatest`         = dep("org.scalatest"     %%% "scalatest"         % "3.0.8") //Apache License 2.0
 
   val `jwt-core`          = "com.pauldijou"       %% "jwt-core"          % "4.2.0"
