@@ -2,7 +2,6 @@ package csw.command.client.internal
 
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.actor.typed.javadsl.Behaviors
-import csw.command.client.SequencerCommandServiceFactory
 import csw.command.client.messages.sequencer.SequencerMsg
 import csw.command.client.messages.sequencer.SequencerMsg.{Query, QueryFinal, SubmitSequence}
 import csw.location.api.extensions.ActorExtension.RichActor
@@ -48,7 +47,7 @@ class SequencerCommandServiceImplTest
     val location =
       AkkaLocation(AkkaConnection(ComponentId("sequencer", ComponentType.Sequencer)), Prefix("iris.x.y"), sequencer.toURI)
 
-    val sequencerCommandService = SequencerCommandServiceFactory.make(location)
+    val sequencerCommandService = new SequencerCommandServiceImpl(location)
 
     sequencerCommandService.submit(sequence).futureValue should ===(submitResponse)
     sequencerCommandService.submitAndWait(sequence).futureValue should ===(queryFinalResponse)
