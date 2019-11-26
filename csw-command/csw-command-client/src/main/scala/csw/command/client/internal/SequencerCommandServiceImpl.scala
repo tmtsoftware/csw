@@ -17,6 +17,7 @@ import scala.concurrent.Future
 class SequencerCommandServiceImpl(sequencerLocation: AkkaLocation)(
     implicit system: ActorSystem[_]
 ) extends SequencerCommandService {
+  import system.executionContext
 
   private val extensions = new SequencerCommandServiceExtension(this)
 
