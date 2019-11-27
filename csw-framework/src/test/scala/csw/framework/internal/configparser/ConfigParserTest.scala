@@ -12,6 +12,7 @@ import csw.params.core.models.Subsystem
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationInt
+import scala.jdk.CollectionConverters._
 
 // DEOPSCSW-167: Creation and Deployment of Standalone Components
 // DEOPSCSW-170: Starting component using a file format
@@ -94,8 +95,11 @@ class ConfigParserTest extends FunSuite with Matchers {
 
   // ################### Start : Standalone Parsing ##################
   test("should able to parse standalone assembly config") {
-    val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/standalone/SampleStandalone.conf")
-    ConfigParser.parseStandalone(config) shouldEqual assemblyInfo
+    val config               = ConfigFactory.parseResources(getClass, "/parsing_test_conf/standalone/SampleStandalone.conf")
+    val expectedAssemblyInfo = ConfigParser.parseStandalone(config)
+    expectedAssemblyInfo shouldEqual assemblyInfo
+    expectedAssemblyInfo.getConnections.asScala should contain allElementsOf assemblyInfo.connections
+
   }
 
   test("should able to throw error when 'behaviorFactoryClassName' is missing for assembly") {

@@ -8,7 +8,8 @@ import csw.command.api.codecs.CommandServiceCodecs
 import csw.command.api.messages.CommandServiceHttpMessage._
 import csw.command.api.messages.CommandServiceWebsocketMessage._
 import csw.command.api.messages.{CommandServiceHttpMessage, CommandServiceWebsocketMessage}
-import csw.command.api.scaladsl.{CommandService, CommandServiceExtension}
+import csw.command.api.scaladsl.CommandService
+import csw.command.api.utils.CommandServiceExtension
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id

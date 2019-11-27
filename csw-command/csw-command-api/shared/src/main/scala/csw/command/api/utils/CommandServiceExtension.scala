@@ -1,14 +1,15 @@
-package csw.command.api.scaladsl
+package csw.command.api.utils
 
 import akka.actor.typed.ActorSystem
 import akka.util.Timeout
 import csw.command.api.StateMatcher
+import csw.command.api.scaladsl.CommandService
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
 import csw.params.core.states.CurrentState
 import portable.akka.extensions.PortableAkka
 
-import async.Async._
+import scala.async.Async._
 import scala.concurrent.{Future, Promise, TimeoutException}
 import scala.util.{Failure, Success}
 
