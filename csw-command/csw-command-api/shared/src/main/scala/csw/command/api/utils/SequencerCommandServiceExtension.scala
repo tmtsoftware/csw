@@ -1,6 +1,7 @@
-package csw.command.api.scaladsl
+package csw.command.api.utils
 
 import akka.util.Timeout
+import csw.command.api.scaladsl.SequencerCommandService
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Sequence
 

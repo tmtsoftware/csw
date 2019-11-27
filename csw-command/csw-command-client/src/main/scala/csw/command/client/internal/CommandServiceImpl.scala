@@ -9,7 +9,8 @@ import akka.stream.typed.scaladsl.ActorSource
 import akka.stream.{KillSwitches, OverflowStrategy}
 import akka.util.Timeout
 import csw.command.api.StateMatcher
-import csw.command.api.scaladsl.{CommandService, CommandServiceExtension}
+import csw.command.api.scaladsl.CommandService
+import csw.command.api.utils.CommandServiceExtension
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
 import csw.command.client.messages.ComponentCommonMessage.ComponentStateSubscription
 import csw.command.client.messages.{ComponentMessage, Query, QueryFinal}
