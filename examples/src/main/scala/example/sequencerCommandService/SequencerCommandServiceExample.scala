@@ -2,7 +2,6 @@ package example.sequencerCommandService
 
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.util.Timeout
-import csw.command.client.SequencerCommandServiceFactory
 import csw.command.client.internal.SequencerCommandServiceImpl
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
@@ -26,7 +25,7 @@ object SequencerCommandServiceExample extends App {
   private val connection             = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "sequencer"), ComponentType.Sequencer))
   private val location: AkkaLocation = Await.result(locationService.resolve(connection, 5.seconds), 5.seconds).get
 
-  val sequencerCommandService: SequencerCommandServiceImpl = SequencerCommandServiceFactory.make(location)
+  val sequencerCommandService: SequencerCommandServiceImpl = new SequencerCommandServiceImpl(location)
   // #create-sequence-command-service
 
   // #submit-sequence

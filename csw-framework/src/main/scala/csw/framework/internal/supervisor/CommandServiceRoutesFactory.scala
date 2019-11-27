@@ -4,6 +4,7 @@ import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.http.scaladsl.server.Route
 import csw.command.api.codecs.CommandServiceCodecs
 import csw.command.client.CommandServiceFactory
+import csw.command.client.handlers.{CommandServiceHttpHandlers, CommandServiceWebsocketHandlers}
 import csw.command.client.messages.ComponentMessage
 import msocket.impl.post.PostRouteFactory
 import msocket.impl.ws.WebsocketRouteFactory

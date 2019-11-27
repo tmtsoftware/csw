@@ -1,4 +1,4 @@
-package csw.framework.internal.supervisor
+package csw.command.client.handlers
 
 import akka.NotUsed
 import akka.http.scaladsl.model.ws.Message
