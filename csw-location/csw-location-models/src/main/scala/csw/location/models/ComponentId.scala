@@ -3,12 +3,12 @@ package csw.location.models
 import csw.params.core.models.Prefix
 
 /**
- * Represents a component based on its name and type.
+ * Represents a component based on its prefix and type.
  *
- * @note Name should not contain
+ * @note Prefix should not contain
  *  - leading or trailing spaces
  *  - and hyphen (-)
- *  @param prefix represents the prefix (subsystem and name) of the component
+ *  @param prefix represents the prefix (subsystem and name) of the component e.g. tcs.filter.wheel
  *  @param componentType represents a type of the Component e.g. Assembly, HCD, Sequencer etc
  */
 case class ComponentId private[location] (prefix: Prefix, componentType: ComponentType) {

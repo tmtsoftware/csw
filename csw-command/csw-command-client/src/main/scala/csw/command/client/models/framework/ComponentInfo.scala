@@ -30,6 +30,10 @@ final case class ComponentInfo(
     connections: Set[Connection] = Set.empty,
     initializeTimeout: FiniteDuration = 10.seconds
 ) {
+
+  /**
+   * Represents the prefix for the component with given `subsystem` and given `name`
+   */
   val prefix = Prefix(subsystem, name)
 
   /**
