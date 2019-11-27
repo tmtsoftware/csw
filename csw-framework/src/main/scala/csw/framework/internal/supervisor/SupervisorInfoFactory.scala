@@ -31,16 +31,15 @@ private[framework] class SupervisorInfoFactory(containerPrefix: String) {
       alarmServiceFactory: AlarmServiceFactory,
       registrationFactory: RegistrationFactory
   ): Future[Option[SupervisorInfo]] = {
-    implicit val system: ActorSystem[SpawnProtocol.Command] =
-      ActorSystemFactory.remote(SpawnProtocol(), s"${componentInfo.prefix.actorSystemName}-system")
-    implicit val ec: ExecutionContextExecutor = system.executionContext
-    val richSystem                            = new CswFrameworkSystem(system)
+    val systemName                                          = s"${componentInfo.prefix.value.replace('.', '_')}-system"
+    implicit val system: ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), systemName)
+    implicit val ec: ExecutionContextExecutor               = system.executionContext
+    val richSystem                                          = new CswFrameworkSystem(system)
 
     async {
-      val cswCtxF = CswContext.make(locationService, eventServiceFactory, alarmServiceFactory, componentInfo)(richSystem)
-      val supervisorBehavior =
-        SupervisorBehaviorFactory.make(Some(containerRef), registrationFactory, await(cswCtxF))
-      val actorRefF = richSystem.spawnTyped(supervisorBehavior, componentInfo.prefix.toString)
+      val cswCtxF            = CswContext.make(locationService, eventServiceFactory, alarmServiceFactory, componentInfo)(richSystem)
+      val supervisorBehavior = SupervisorBehaviorFactory.make(Some(containerRef), registrationFactory, await(cswCtxF))
+      val actorRefF          = richSystem.spawnTyped(supervisorBehavior, componentInfo.prefix.toString)
       Some(SupervisorInfo(system, Component(await(actorRefF), componentInfo)))
     } recoverWith {
       case NonFatal(exception) =>
