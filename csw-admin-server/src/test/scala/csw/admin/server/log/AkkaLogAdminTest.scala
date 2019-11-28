@@ -34,7 +34,6 @@ import io.lettuce.core.RedisClient
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
-import scala.jdk.CollectionConverters._
 
 class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
 
@@ -129,12 +128,9 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
     val slf4jLevel = Level(config.getString("slf4jLogLevel"))
     val componentLogLevel = Level(
       config
-        .getObject("component-log-levels")
-        .unwrapped()
-        .asScala(motionControllerConnection.componentId.prefix.toString)
-        .toString
+        .getConfig("component-log-levels")
+        .getString(motionControllerConnection.componentId.prefix.toString)
     )
-
     logMetadata1 shouldBe LogMetadata(logLevel, akkaLevel, slf4jLevel, componentLogLevel)
 
     // updating default and akka log level

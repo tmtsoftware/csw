@@ -21,11 +21,11 @@ private[logging] object ComponentLoggingStateManager {
   def from(loggingConfig: Config): ConcurrentHashMap[String, ComponentLoggingState] = {
     new ConcurrentHashMap[String, ComponentLoggingState](Try {
       loggingConfig
-        .getObject("component-log-levels")
-        .unwrapped()
+        .getConfig("component-log-levels")
+        .entrySet()
         .asScala
-        .map {
-          case (name, componentLogLevel) => (name, ComponentLoggingState(Level(componentLogLevel.toString)))
+        .map { entry =>
+          (entry.getKey, ComponentLoggingState(Level(entry.getValue.unwrapped().toString)))
         }
         .toMap
     }.getOrElse(Map.empty).asJava)

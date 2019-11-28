@@ -29,7 +29,7 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) {
     implicit val timeout: Timeout = Timeout(5.seconds)
     await(getLocation(connectionName)) match {
       case Some(location: AkkaLocation) =>
-        val componentName = location.connection.componentId.prefix.toString
+        val componentName = location.prefix.toString
         log.info(
           "Getting log information from logging system",
           Map(
