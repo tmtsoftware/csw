@@ -33,6 +33,11 @@ sealed abstract class Connection(val connectionType: ConnectionType) extends Loc
   def name: String = connectionInfo.toString
 
   /**
+   * Represents the fully qualified component name along with the subsystem for e.g. tcs.filter.wheel
+   */
+  def prefix: Prefix = componentId.prefix
+
+  /**
    * A helper method to cast this Connection to TypedConnection
    *
    * @tparam T A covariant of Location type that TypedConnection uses

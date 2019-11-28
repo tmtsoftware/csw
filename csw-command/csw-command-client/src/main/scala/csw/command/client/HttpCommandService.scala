@@ -41,7 +41,7 @@ case class HttpCommandService(
   implicit val sys: akka.actor.ActorSystem = system.toClassic
   implicit val ec: ExecutionContext        = system.executionContext
 
-  private val componentName = connection.componentId.prefix.toString
+  private val componentName = connection.prefix.toString
   private val componentType = ComponentType.Service.name
 
   private def concatByteStrings(source: Source[ByteString, _]): Future[ByteString] = {
@@ -83,7 +83,7 @@ case class HttpCommandService(
           Json.decode(bs.toArray).to[CommandResponse].value
         } else {
           // Server error: Return error with generated runId
-          val s = s"Error response from ${connection.componentId.prefix}: $response"
+          val s = s"Error response from ${connection.prefix}: $response"
           method match {
             case `submitCommand` => Error(Id(), s)
             case _               => Invalid(Id(), OtherIssue(s))
@@ -92,7 +92,7 @@ case class HttpCommandService(
         }
       case None =>
         // Couldn't locate the server: Return error with generated runId
-        val s = s"Can't locate connection for ${connection.componentId.prefix}"
+        val s = s"Can't locate connection for ${connection.prefix}"
         method match {
           case `submitCommand` => Error(Id(), s)
           case _               => Invalid(Id(), UnresolvedLocationsIssue(s))
@@ -204,11 +204,11 @@ case class HttpCommandService(
           Json.decode(bs.toArray).to[SubmitResponse].value
         } else {
           // Server error: Return error with generated runId
-          Error(commandRunId, s"Error response from ${connection.componentId.prefix}: $response")
+          Error(commandRunId, s"Error response from ${connection.prefix}: $response")
         }
       case None =>
         // Couldn't locate the server: Return error with generated runId
-        Error(commandRunId, s"Can't locate connection for ${connection.componentId.prefix}")
+        Error(commandRunId, s"Can't locate connection for ${connection.prefix}")
     }
   }
 

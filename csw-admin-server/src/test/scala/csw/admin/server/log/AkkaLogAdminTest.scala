@@ -129,7 +129,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
     val componentLogLevel = Level(
       config
         .getConfig("component-log-levels")
-        .getString(motionControllerConnection.componentId.prefix.toString)
+        .getString(motionControllerConnection.prefix.toString)
     )
     logMetadata1 shouldBe LogMetadata(logLevel, akkaLevel, slf4jLevel, componentLogLevel)
 
@@ -191,8 +191,8 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
     Thread.sleep(100)
 
     val groupByAfterFilter       = logBuffer.groupBy(json => json.getString("@componentName"))
-    val laserCompLogsAfterFilter = groupByAfterFilter(laserConnection.componentId.prefix.toString)
-    val galilCompLogsAfterFilter = groupByAfterFilter(galilConnection.componentId.prefix.toString)
+    val laserCompLogsAfterFilter = groupByAfterFilter(laserConnection.prefix.toString)
+    val galilCompLogsAfterFilter = groupByAfterFilter(galilConnection.prefix.toString)
 
     laserCompLogsAfterFilter.exists(log => log.getString("@severity").toLowerCase.equalsIgnoreCase("error")) shouldBe true
     laserCompLogsAfterFilter.foreach { log =>

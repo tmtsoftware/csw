@@ -21,6 +21,9 @@ sealed abstract class Location extends LocationSerializable {
    */
   def uri: URI
 
+  /**
+   * Represents the fully qualified component name along with the subsystem for e.g. tcs.filter.wheel
+   */
   def prefix: Prefix = connection.connectionInfo.prefix
 
 }

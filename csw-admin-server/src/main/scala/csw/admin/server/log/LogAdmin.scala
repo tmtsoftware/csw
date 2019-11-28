@@ -52,7 +52,7 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) {
     async {
       await(getLocation(connectionName)) match {
         case Some(location: AkkaLocation) =>
-          val componentName = location.connection.componentId.prefix.toString
+          val componentName = location.prefix.toString
           log.info(
             s"Setting log level to $logLevel",
             Map(
