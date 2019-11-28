@@ -28,17 +28,9 @@ object CommandServiceFactory {
    */
   def make(componentLocation: Location)(implicit actorSystem: ActorSystem[_]): CommandService = {
     componentLocation match {
-      case c: TcpLocation  => throw new RuntimeException(s"Only AkkaLocation and HttpLocation can be used while command service")
-      case c: AkkaLocation => new CommandServiceImpl(c.componentRef)
-      case c: HttpLocation =>
-        import csw.command.api.codecs.CommandServiceCodecs._
-        val baseUri      = c.uri.toString
-        val webSocketUri = Uri(baseUri).withScheme("ws").withPath(Path("/websocket-endpoint"))
-        val httpUri      = Uri(baseUri).withPath(Path("/post-endpoint"))
-        new CommandServiceClient(
-          new HttpPostTransport(httpUri.toString(), JsonText, () => None),
-          new WebsocketTransport(webSocketUri.toString(), JsonText)
-        )
+      case _: TcpLocation             => throw new RuntimeException("Only AkkaLocation and HttpLocation can be used to access a component")
+      case akkaLocation: AkkaLocation => new CommandServiceImpl(akkaLocation.componentRef)
+      case httpLocation: HttpLocation => httpClient(httpLocation)
     }
   }
 
@@ -51,4 +43,15 @@ object CommandServiceFactory {
    */
   def jMake(componentLocation: Location, actorSystem: ActorSystem[_]): ICommandService =
     new JCommandServiceImpl(make(componentLocation)(actorSystem))
+
+  private def httpClient(c: HttpLocation)(implicit system: ActorSystem[_]) = {
+    import csw.command.api.codecs.CommandServiceCodecs._
+    val baseUri      = c.uri.toString
+    val webSocketUri = Uri(baseUri).withScheme("ws").withPath(Path("/websocket-endpoint")).toString()
+    val httpUri      = Uri(baseUri).withPath(Path("/post-endpoint")).toString()
+    new CommandServiceClient(
+      new HttpPostTransport(httpUri, JsonText, () => None),
+      new WebsocketTransport(webSocketUri, JsonText)
+    )
+  }
 }
