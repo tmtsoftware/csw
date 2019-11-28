@@ -347,7 +347,7 @@ lazy val `csw-command-api` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("csw-command/csw-command-api"))
   .dependsOn(
-    `csw-params`
+    `csw-params`,
     `csw-location-api`
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin)
@@ -361,7 +361,7 @@ lazy val `csw-command-client` = project
   .dependsOn(
     `csw-command-api`.jvm,
     `csw-logging-client`,
-    `csw-location-api`,
+    `csw-location-api`.jvm,
     `csw-location-client` % "test->test",
     `csw-location-server` % "test->test",
     `csw-commons`         % "test->test"

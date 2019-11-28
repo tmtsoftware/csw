@@ -41,7 +41,3 @@ final case class ComponentInfo(
    */
   def getConnections: java.util.List[Connection] = connections.toList.asJava
 }
-
-case object ComponentInfo extends LocationCodecs {
-  implicit lazy val ComponentInfoCodec: Codec[ComponentInfo] = MapBasedCodecs.deriveCodec
-}
