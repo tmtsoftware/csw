@@ -358,8 +358,9 @@ lazy val `csw-command-api` = crossProject(JSPlatform, JVMPlatform)
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(libraryDependencies ++= Dependencies.CommandApi.value)
+  //  the following setting was required by older version of IntelliJ which could not handle cross-compiled Akka types
+  //  .jsSettings(SettingKey[Boolean]("ide-skip-project") := true)
   .settings(fork := false)
-  .jsSettings(SettingKey[Boolean]("ide-skip-project") := true)
 
 lazy val `csw-command-client` = project
   .in(file("csw-command/csw-command-client"))
