@@ -17,7 +17,6 @@ import csw.command.client.models.framework.{Component, Components, ContainerLife
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.client.ActorSystemFactory
-import csw.location.models
 import csw.location.models.ComponentId
 import csw.location.models.ComponentType.{Assembly, HCD}
 import csw.location.models.Connection.AkkaConnection
@@ -45,8 +44,8 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
   implicit val testKitSettings: TestKitSettings = TestKitSettings(typedSystem)
 
   private val laserConnection            = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "Laser"), Assembly))
-  private val motionControllerConnection = AkkaConnection(models.ComponentId(Prefix(Subsystem.TCS, "Motion_Controller"), HCD))
-  private val galilConnection            = AkkaConnection(models.ComponentId(Prefix(Subsystem.TCS, "Galil"), Assembly))
+  private val motionControllerConnection = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "Motion_Controller"), HCD))
+  private val galilConnection            = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "Galil"), Assembly))
 
   private var containerActorSystem: ActorSystem[SpawnProtocol.Command] = _
 

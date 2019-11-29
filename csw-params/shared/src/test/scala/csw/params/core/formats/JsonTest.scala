@@ -1,18 +1,7 @@
 package csw.params.core.formats
 
 import csw.params.commands._
-import csw.params.core.generics.KeyType.{
-  ByteMatrixKey,
-  ChoiceKey,
-  CoordKey,
-  DoubleKey,
-  DoubleMatrixKey,
-  IntMatrixKey,
-  LongMatrixKey,
-  ShortMatrixKey,
-  StringKey,
-  StructKey
-}
+import csw.params.core.generics.KeyType._
 import csw.params.core.generics._
 import csw.params.core.models.Coords.EqFrame.FK5
 import csw.params.core.models.Coords.SolarSystemObject.Venus
@@ -53,7 +42,7 @@ class JsonTest extends FunSpec {
     val prefix: Prefix = Prefix("wfos.filter.wheel")
 
     it("should encode and decode properly") {
-      val expectedJson = Json.obj("subsystem" -> "wfos", "componentName" -> "filter.wheel")
+      val expectedJson = Json.parse("\"wfos.filter.wheel\"")
       val json         = JsonSupport.writes(prefix)
       val sub          = JsonSupport.reads[Prefix](json)
       assert(sub == prefix)

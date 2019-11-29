@@ -1,8 +1,10 @@
 {
   "Setup": {
-    "source": {"subsystem":"wfos","componentName":"blue.filter"},
+    "source": "wfos.blue.filter",
     "commandName": "move",
-    "maybeObsId": ["Obs001"],
+    "maybeObsId": [
+      "Obs001"
+    ],
     "paramSet": [
       {
         "LongKey": {

@@ -1,6 +1,6 @@
 {
   "DemandState": {
-    "prefix": {"subsystem":"wfos","componentName":"blue.filter"},
+    "prefix": "wfos.blue.filter",
     "stateName": "testStateName",
     "paramSet": [
       {

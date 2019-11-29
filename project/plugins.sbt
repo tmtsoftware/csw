@@ -18,7 +18,7 @@ addSbtPlugin("org.portable-scala"                % "sbt-scalajs-crossproject"  %
 addSbtPlugin("org.scala-js"                      % "sbt-scalajs"               % "0.6.31")
 addSbtPlugin("com.github.cb372"                  % "sbt-explicit-dependencies" % "0.2.11")
 addSbtPlugin("ohnosequences"                     % "sbt-github-release"        % "0.7.0")
-
+addSbtPlugin("com.dwijnand"                      % "sbt-project-graph"         % "0.4.0")
 resolvers += Resolver.bintrayRepo("twtmt", "sbt-plugins")
 addSbtPlugin("com.github.tmtsoftware" % "sbt-docs" % "0.1.2")
 
