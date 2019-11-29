@@ -44,9 +44,9 @@ object CommandServiceFactory {
   def jMake(componentLocation: Location, actorSystem: ActorSystem[_]): ICommandService =
     new JCommandServiceImpl(make(componentLocation)(actorSystem))
 
-  private def httpClient(c: HttpLocation)(implicit system: ActorSystem[_]) = {
+  private def httpClient(httpLocation: HttpLocation)(implicit system: ActorSystem[_]) = {
     import csw.command.api.codecs.CommandServiceCodecs._
-    val baseUri      = c.uri.toString
+    val baseUri      = httpLocation.uri.toString
     val webSocketUri = Uri(baseUri).withScheme("ws").withPath(Path("/websocket-endpoint")).toString()
     val httpUri      = Uri(baseUri).withPath(Path("/post-endpoint")).toString()
     new CommandServiceClient(
