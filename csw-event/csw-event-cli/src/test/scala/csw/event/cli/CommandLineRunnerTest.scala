@@ -255,7 +255,7 @@ class CommandLineRunnerTest extends SeedData with Eventually with csw.params.cor
     val (k, v) = json.as[JsObject].value.head
 
     val jsObject = v.as[JsObject] ++ Json.obj(
-      ("source", Json.obj("subsystem" -> eventKey.source.subsystem.name, "componentName" -> eventKey.source.componentName)),
+      ("source", eventKey.source.toString),
       ("eventName", eventKey.eventName.name)
     )
 
