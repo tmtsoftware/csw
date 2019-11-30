@@ -134,7 +134,8 @@ lazy val `csw-location-api` = crossProject(JSPlatform, JVMPlatform)
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .dependsOn(`csw-location-models`)
   .jvmConfigure(_.dependsOn(`csw-logging-client`))
-  .jsSettings(SettingKey[Boolean]("ide-skip-project") := true)
+  //  the following setting was required by older version of IntelliJ which could not handle cross-compiled Akka types
+  //  .jsSettings(SettingKey[Boolean]("ide-skip-project") := true)
   .settings(libraryDependencies += MSocket.`msocket-api`.value)
   .settings(fork := false)
 
