@@ -29,7 +29,7 @@ object Libs {
 
   val `jwt-core`          = "com.pauldijou"       %% "jwt-core"          % "4.2.0"
   val `lettuce`           = "io.lettuce"          % "lettuce-core"       % "5.2.1.RELEASE"
-  val `reactor-core`      = "io.projectreactor"   % "reactor-core"       % "3.3.0.RELEASE"
+  val `reactor-core`      = "io.projectreactor"   % "reactor-core"       % "3.3.1.RELEASE"
   val `reactive-streams`  = "org.reactivestreams" % "reactive-streams"   % "1.0.3"
   val `akka-stream-kafka` = "com.typesafe.akka"   %% "akka-stream-kafka" % "1.0.5"
 //  val `embedded-kafka`      = "io.github.embeddedkafka" %% "embedded-kafka"      % "2.3.0"
@@ -90,7 +90,7 @@ object Akka {
 }
 
 object AkkaHttp {
-  val Version                = "10.1.10"
+  val Version                = "10.1.11"
   val `akka-http`            = "com.typesafe.akka" %% "akka-http" % Version //ApacheV2
   val `akka-http-testkit`    = "com.typesafe.akka" %% "akka-http-testkit" % Version //ApacheV2
   val `akka-http-cors`       = "ch.megard" %% "akka-http-cors" % "0.4.2"
@@ -114,7 +114,7 @@ object Jooq {
 }
 
 object MSocket {
-  val Version            = "0426b6a"
+  val Version            = "d29c627"
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-impl-jvm` = "com.github.tmtsoftware.msocket" %% "msocket-impl-jvm" % Version
 }
