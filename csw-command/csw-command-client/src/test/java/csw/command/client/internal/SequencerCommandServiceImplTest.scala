@@ -11,9 +11,9 @@ import csw.params.commands.CommandIssue.IdNotAvailableIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, Sequence, Setup}
 import csw.params.core.models.{Id, Prefix, Subsystem}
+import org.mockito.MockitoSugar
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSuiteLike, Matchers}
-import org.scalatestplus.mockito.MockitoSugar
 
 class SequencerCommandServiceImplTest
     extends ScalaTestWithActorTestKit

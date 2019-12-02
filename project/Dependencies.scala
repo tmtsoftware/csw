@@ -71,7 +71,7 @@ object Dependencies {
       MSocket.`msocket-impl-jvm`,
       Akka.`akka-actor-testkit-typed` % Test,
       Libs.`scalatest`.value          % Test,
-      Libs.`junit`                    % Test,
+      Libs.`junit-4-12`               % Test,
       Libs.`mockito-scala`            % Test,
       Akka.`akka-stream-testkit`      % Test,
       Akka.`akka-multi-node-testkit`  % Test
@@ -89,7 +89,8 @@ object Dependencies {
       Libs.`scala-async`,
       Libs.`scala-java8-compat`,
       MSocket.`msocket-impl-jvm`,
-      Libs.`scalatest`.value % Test
+      Libs.`scalatest`.value % Test,
+      Libs.`junit-4-12`      % Test
     )
   )
 
@@ -156,7 +157,7 @@ object Dependencies {
       Libs.`scala-async`,
       Libs.`scala-java8-compat`,
       Libs.`scalatest`.value         % Test,
-      Libs.`junit`                   % Test,
+      Libs.`junit-4-12`              % Test,
       Libs.`mockito-scala`           % Test,
       Akka.`akka-multi-node-testkit` % Test,
       Akka.`akka-stream-testkit`     % Test
@@ -195,7 +196,7 @@ object Dependencies {
       Akka.`akka-actor`,
       Akka.`akka-actor-typed`,
       Libs.`scalatest`.value % Test,
-      Libs.`junit`           % Test,
+      Libs.`junit-4-12`      % Test,
       Borer.`borer-core`.value,
       Libs.`gson` % Test
     )
@@ -212,7 +213,7 @@ object Dependencies {
 
   val ParamsJvm = Def.setting(
     Seq(
-      Libs.`junit` % Test
+      Libs.`junit-4-12` % Test
     )
   )
 
@@ -231,7 +232,7 @@ object Dependencies {
       Akka.`akka-actor-testkit-typed` % Test,
       Akka.`akka-stream-testkit`      % Test,
       Libs.`scalatest`.value          % Test,
-      Libs.`junit`                    % Test,
+      Libs.`junit-4-12`               % Test,
       Libs.`mockito-scala`            % Test
     )
   )
@@ -253,7 +254,7 @@ object Dependencies {
       Akka.`akka-actor-testkit-typed` % Test,
       Akka.`akka-stream-testkit`      % Test,
       Libs.`scalatest`.value          % Test,
-      Libs.`junit`                    % Test,
+      Libs.`junit-4-12`               % Test,
       Libs.`mockito-scala`            % Test
     )
   )
@@ -291,13 +292,13 @@ object Dependencies {
       Akka.`akka-actor-testkit-typed` % Test,
       Akka.`akka-stream-testkit`      % Test,
       Libs.`scalatest`.value          % Test,
-      Libs.`junit`                    % Test,
+      Libs.`junit-4-12`               % Test,
       Libs.`mockito-scala`            % Test,
       Libs.`embedded-redis`           % Test,
 //      Libs.`embedded-kafka`           % Test,
       Akka.`akka-multi-node-testkit` % Test,
       Libs.HdrHistogram              % Test,
-      Libs.testng                    % Test
+      Libs.`testng-6-7`              % Test
     )
   )
 
@@ -349,8 +350,8 @@ object Dependencies {
       Akka.`akka-actor-typed`,
       Akka.`akka-stream`,
       Akka.`akka-stream-typed`,
-      Libs.`junit`           % Test,
       Libs.`scalatest`.value % Test,
+      Libs.`junit-4-12`      % Test,
       Libs.`mockito-scala`   % Test
     )
   )
@@ -385,7 +386,7 @@ object Dependencies {
       //TODO: make this as provided deps
       Libs.`scalatest`.value,
       Libs.`embedded-redis`,
-      Libs.`junit`,
+      Libs.`junit-4-12`,
       Libs.`mockito-scala`
     )
   )
@@ -394,7 +395,7 @@ object Dependencies {
     Seq(
       Libs.`jna`,
       Libs.`scalatest`.value % Test,
-      Libs.`junit`           % Test
+      Libs.`junit-4-12`      % Test
     )
   )
 
@@ -402,7 +403,7 @@ object Dependencies {
     Seq(
       Libs.`play-json`.value,
       Libs.`scalatest`.value % Test,
-      Libs.`junit`           % Test
+      Libs.`junit-4-12`      % Test
     )
   )
 
@@ -427,8 +428,8 @@ object Dependencies {
       Jooq.`jooq-meta`,
       Jooq.`jooq-codegen`,
       Libs.`scalatest`.value % Test,
+      Libs.`junit-4-12`      % Test,
       Akka.`akka-actor`      % Test,
-      Libs.`junit`           % Test,
       Libs.`otj-pg-embedded` % Test
     )
   )
@@ -522,7 +523,7 @@ object Dependencies {
       AkkaHttp.`akka-http-cors`,
       Akka.`akka-actor-testkit-typed`,
       Libs.`scalatest`.value % Test,
-      Libs.`junit`           % Test
+      Libs.`junit-4-12`      % Test
     )
   )
 
@@ -539,7 +540,8 @@ object Dependencies {
       Jackson.`jackson-core`,
       Jackson.`jackson-databind`,
       Akka.`akka-actor-testkit-typed`,
-      Libs.`scalatest`.value % Test
+      Libs.`scalatest`.value % Test,
+      Libs.`junit-4-12`      % Test
     )
   )
 
