@@ -174,7 +174,7 @@ function start_db() {
     if [[ -x "$location_agent_script" ]]; then
         echo "[DATABASE] Starting Database Service on port; [$db_port] ..."
         echo "[DATABASE] Make sure to set PGDATA env variable to postgres data directory where postgres is installed e.g. for mac: /usr/local/var/postgres"
-        nohup ./csw-location-agent --name "DatabaseServer" --command "postgres --hba_file=$dbPgHbaConf --unix_socket_directories=$dbUnixSocketDirs -i -p $db_port" --port "$db_port" -J-Dcsw-location-client.server-http-port=${location_http_port} &
+        nohup ./csw-location-agent --prefix "csw.DatabaseServer" --command "postgres --hba_file=$dbPgHbaConf --unix_socket_directories=$dbUnixSocketDirs -i -p $db_port" --port "$db_port" -J-Dcsw-location-client.server-http-port=${location_http_port} &
         echo $! > ${DBPidFile}
         echo ${db_port} > ${DBPortFile}
     else
@@ -190,7 +190,7 @@ function start_sentinel() {
             cp -f ${sentinelTemplateConf} ${sentinelConf}
             sed -i- -e "s/eventServer 127.0.0.1/eventServer ${IP}/g" ${sentinelConf}
             sed -i- -e "s/alarmServer 127.0.0.1/alarmServer ${IP}/g" ${sentinelConf}
-            nohup ./csw-location-agent --name "EventServer,AlarmServer" --command "$redisSentinel ${sentinelConf} --port ${sentinel_port} --logfile ${TMT_LOG_HOME}/sentinel.log" --port "${sentinel_port}" -J-Dcsw-location-client.server-http-port=${location_http_port} &
+            nohup ./csw-location-agent --prefix "csw.EventServer,csw.AlarmServer" --command "$redisSentinel ${sentinelConf} --port ${sentinel_port} --logfile ${TMT_LOG_HOME}/sentinel.log" --port "${sentinel_port}" -J-Dcsw-location-client.server-http-port=${location_http_port} &
             echo $! > ${sentinelPidFile}
             echo ${sentinel_port} > ${sentinelPortFile}
         else
