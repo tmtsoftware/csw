@@ -23,8 +23,8 @@ import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.logging.models.Level.INFO
 import csw.logging.client.internal.LoggingSystem
-import csw.params.core.models.{Prefix, Subsystem}
 import csw.params.core.states.{CurrentState, StateName}
+import csw.prefix.{Prefix, Subsystem}
 import io.lettuce.core.RedisClient
 import play.api.libs.json.{JsObject, Json}
 

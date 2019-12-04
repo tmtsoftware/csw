@@ -9,10 +9,10 @@ import akka.Done
 import akka.actor.typed.ActorRef
 import akka.stream.javadsl.Source
 import csw.params.events.{Event, EventKey}
-import csw.params.core.models.Subsystem
 import csw.event.api.internal.EventServiceExts.RichEventSubscription
 import csw.event.api.javadsl.{IEventSubscriber, IEventSubscription}
 import csw.event.api.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
+import csw.prefix.Subsystem
 
 import scala.jdk.CollectionConverters._
 import scala.compat.java8.DurationConverters.DurationOps

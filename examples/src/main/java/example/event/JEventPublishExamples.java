@@ -8,8 +8,8 @@ import csw.params.events.Event;
 import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.command.client.models.framework.ComponentInfo;
-import csw.params.core.models.Prefix;
 import csw.event.client.internal.commons.javawrappers.JEventService;
+import csw.prefix.Prefix;
 
 import java.time.Duration;
 import java.util.Optional;

@@ -4,8 +4,9 @@ import java.time.Instant
 
 import csw.params.core.generics.Key
 import csw.params.core.generics.KeyType.{ByteKey, DoubleKey, LongKey}
-import csw.params.core.models.{Id, Prefix}
+import csw.params.core.models.Id
 import csw.params.events.{EventKey, EventName, SystemEvent}
+import csw.prefix.Prefix
 import csw.time.core.models.UTCTime
 
 object EventUtils {

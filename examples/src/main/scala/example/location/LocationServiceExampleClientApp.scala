@@ -22,7 +22,7 @@ import csw.logging.api.scaladsl._
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.scaladsl.{Keys, LoggerFactory, LoggingSystemFactory}
-import csw.params.core.models.{Prefix, Subsystem}
+import csw.prefix.{Prefix, Subsystem}
 import example.location.ExampleMessages.{AllDone, CustomException, TrackingEventAdapter}
 import example.location.LocationServiceExampleClient.locationInfoToString
 import example.location.LocationServiceExampleClientApp.typedSystem

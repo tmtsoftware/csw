@@ -3,7 +3,7 @@ package csw.alarm.models
 import csw.alarm.models.ActivationStatus.Active
 import csw.alarm.models.AlarmSeverity.{Indeterminate, Okay}
 import csw.alarm.models.Key.AlarmKey
-import csw.params.core.models.Subsystem
+import csw.prefix.Subsystem
 
 /**
  * Represents the metadata of an alarm e.g. name, subsystem it belongs to, supported severities, etc. This information is

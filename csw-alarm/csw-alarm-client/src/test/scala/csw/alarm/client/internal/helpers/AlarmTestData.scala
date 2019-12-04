@@ -4,7 +4,7 @@ import csw.alarm.models.AlarmSeverity._
 import csw.alarm.models.AlarmType.Absolute
 import csw.alarm.models.Key.AlarmKey
 import csw.alarm.models.{AlarmMetadata, AlarmType}
-import csw.params.core.models.Subsystem.{LGSF, NFIRAOS, TCS}
+import csw.prefix.Subsystem.{LGSF, NFIRAOS, TCS}
 
 trait AlarmTestData {
 

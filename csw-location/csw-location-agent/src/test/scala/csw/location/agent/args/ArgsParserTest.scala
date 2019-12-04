@@ -2,7 +2,7 @@ package csw.location.agent.args
 
 import java.io.ByteArrayOutputStream
 
-import csw.params.core.models.Prefix
+import csw.prefix.Prefix
 import org.scalatest.{BeforeAndAfterEach, FunSuite, Matchers}
 
 class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {

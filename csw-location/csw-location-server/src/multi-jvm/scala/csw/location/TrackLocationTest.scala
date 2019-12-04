@@ -9,7 +9,7 @@ import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.models._
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
-import csw.params.core.models.{Prefix, Subsystem}
+import csw.prefix.{Prefix, Subsystem}
 
 class TrackLocationTestMultiJvmNode1 extends TrackLocationTest(0, "cluster")
 class TrackLocationTestMultiJvmNode2 extends TrackLocationTest(0, "cluster")

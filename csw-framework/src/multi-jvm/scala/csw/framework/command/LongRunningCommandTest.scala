@@ -15,8 +15,9 @@ import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandIssue.OtherIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup
-import csw.params.core.models.{ObsId, Prefix, Subsystem}
+import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, StateName}
+import csw.prefix.{Prefix, Subsystem}
 import io.lettuce.core.RedisClient
 import org.mockito.MockitoSugar
 import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}

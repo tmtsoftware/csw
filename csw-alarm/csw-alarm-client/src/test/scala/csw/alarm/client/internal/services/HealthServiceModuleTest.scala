@@ -11,7 +11,7 @@ import csw.alarm.models.AlarmSeverity._
 import csw.alarm.models.FullAlarmSeverity.Disconnected
 import csw.alarm.models.Key.{ComponentKey, GlobalKey, SubsystemKey}
 import csw.alarm.models.ShelveStatus.Shelved
-import csw.params.core.models.Subsystem.{CSW, LGSF, NFIRAOS, TCS}
+import csw.prefix.Subsystem.{CSW, LGSF, NFIRAOS, TCS}
 
 import scala.concurrent.duration.DurationLong
 

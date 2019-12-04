@@ -11,7 +11,7 @@ import csw.location.server.internal.ServerWiring
 import csw.params.commands
 import csw.params.commands.CommandName
 import csw.params.commands.CommandResponse.SubmitResponse
-import csw.params.core.models.Prefix
+import csw.prefix.Prefix
 import org.openjdk.jmh.annotations._
 
 import scala.concurrent.Await

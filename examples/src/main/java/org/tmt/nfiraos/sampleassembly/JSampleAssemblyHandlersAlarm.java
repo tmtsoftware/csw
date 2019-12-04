@@ -23,13 +23,13 @@ import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.Id;
 import csw.params.core.models.ObsId;
-import csw.params.core.models.Prefix;
 import csw.params.events.Event;
 import csw.params.events.EventKey;
 import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
 import csw.params.javadsl.JUnits;
+import csw.prefix.Prefix;
 import csw.time.core.models.UTCTime;
 
 import java.util.Optional;
@@ -37,7 +37,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-import static csw.params.javadsl.JSubsystem.NFIRAOS;
+import static csw.prefix.javadsl.JSubsystem.NFIRAOS;
 
 /**
  * Domain specific logic should be written in below handlers.

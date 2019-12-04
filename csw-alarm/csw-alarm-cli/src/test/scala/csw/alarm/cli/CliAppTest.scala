@@ -23,7 +23,7 @@ import csw.config.client.scaladsl.ConfigClientFactory
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.mocks.MockedAuthentication
 import csw.config.server.{ServerWiring, Settings}
-import csw.params.core.models.Subsystem.{LGSF, NFIRAOS, TCS}
+import csw.prefix.Subsystem.{LGSF, NFIRAOS, TCS}
 
 class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
 

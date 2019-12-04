@@ -14,8 +14,8 @@ import csw.location.models.ComponentType.Assembly
 import csw.location.models.Connection.AkkaConnection
 import csw.params.commands
 import csw.params.commands.CommandName
-import csw.params.core.models.{Prefix, Subsystem}
 import csw.params.core.states.CurrentState
+import csw.prefix.{Prefix, Subsystem}
 
 import scala.concurrent.duration.DurationLong
 

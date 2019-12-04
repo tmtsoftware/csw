@@ -5,6 +5,7 @@ import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.KeyType.DoubleMatrixKey
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models._
+import csw.prefix.Prefix
 import org.scalatest.{FunSpec, Matchers}
 
 class ResultTest extends FunSpec with Matchers {

@@ -4,15 +4,15 @@ import akka.Done;
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.SpawnProtocol;
 import csw.alarm.api.javadsl.IAlarmService;
+import csw.alarm.api.javadsl.JAlarmSeverity;
 import csw.alarm.client.AlarmServiceFactory;
 import csw.location.api.javadsl.ILocationService;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import csw.alarm.api.javadsl.JAlarmSeverity;
 import static csw.alarm.models.Key.AlarmKey;
-import static csw.params.javadsl.JSubsystem.NFIRAOS;
+import static csw.prefix.javadsl.JSubsystem.NFIRAOS;
 
 public class JAlarmServiceClientExampleApp {
 

@@ -8,7 +8,7 @@ import csw.alarm.api.javadsl.JAlarmSeverity;
 import csw.alarm.api.scaladsl.AlarmAdminService;
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup;
 import csw.alarm.models.*;
-import csw.params.javadsl.JSubsystem;
+import csw.prefix.javadsl.JSubsystem;
 import csw.time.core.models.UTCTime;
 import org.junit.AfterClass;
 import org.junit.Before;

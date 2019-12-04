@@ -2,8 +2,6 @@ package csw.framework.javadsl.components;
 
 import akka.actor.Cancellable;
 import akka.actor.typed.javadsl.ActorContext;
-import akka.actor.typed.javadsl.Adapter;
-import akka.stream.Materializer;
 import akka.stream.ThrottleMode;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
@@ -22,13 +20,13 @@ import csw.params.commands.CommandResponse.*;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.Id;
-import csw.params.core.models.Prefix;
+import csw.prefix.Prefix;
 import csw.params.core.states.CurrentState;
 import csw.params.core.states.StateName;
 import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
-import csw.params.javadsl.JSubsystem;
+import csw.prefix.javadsl.JSubsystem;
 import csw.time.core.models.UTCTime;
 
 import java.time.Duration;

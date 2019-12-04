@@ -3,7 +3,7 @@ package csw.location.agent.args
 import java.io.File
 
 import csw.location.agent.BuildInfo
-import csw.params.core.models.Prefix
+import csw.prefix.Prefix
 import scopt.OptionParser
 
 /**

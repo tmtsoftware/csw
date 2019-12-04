@@ -17,7 +17,7 @@ import csw.location.models.{ComponentId, ComponentType}
 import csw.logging.client.internal._
 import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.network.utils.Networks
-import csw.params.core.models.{Prefix, Subsystem}
+import csw.prefix.{Prefix, Subsystem}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble

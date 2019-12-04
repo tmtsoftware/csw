@@ -9,14 +9,13 @@ import akka.stream.javadsl.Source;
 import csw.event.api.javadsl.IEventPublisher;
 import csw.event.api.javadsl.IEventSubscription;
 import csw.event.client.helpers.Utils;
-//import csw.event.client.internal.kafka.KafkaTestProps;
 import csw.event.client.internal.redis.RedisTestProps;
 import csw.event.client.internal.wiring.BaseProperties;
-import csw.params.core.models.Prefix;
 import csw.params.events.Event;
 import csw.params.events.Event$;
 import csw.params.events.EventKey;
-import csw.params.javadsl.JSubsystem;
+import csw.prefix.Prefix;
+import csw.prefix.javadsl.JSubsystem;
 import csw.time.core.models.UTCTime;
 import org.scalatestplus.testng.TestNGSuite;
 import org.testng.Assert;
@@ -32,6 +31,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
+
+//import csw.event.client.internal.kafka.KafkaTestProps;
 
 //DEOPSCSW-331: Event Service Accessible to all CSW component builders
 //DEOPSCSW-334: Publish an event

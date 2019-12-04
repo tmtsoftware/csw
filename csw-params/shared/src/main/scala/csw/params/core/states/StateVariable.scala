@@ -2,7 +2,7 @@ package csw.params.core.states
 
 import csw.params.commands.{Nameable, Setup}
 import csw.params.core.generics.{Parameter, ParameterSetKeyData, ParameterSetType}
-import csw.params.core.models.Prefix
+import csw.prefix.Prefix
 import csw.serializable.CommandSerializable
 
 import scala.annotation.varargs

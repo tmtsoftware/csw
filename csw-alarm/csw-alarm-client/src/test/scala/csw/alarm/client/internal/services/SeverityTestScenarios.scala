@@ -4,7 +4,7 @@ import csw.alarm.models.AlarmSeverity.{Critical, Major, Okay, Warning}
 import csw.alarm.models.FullAlarmSeverity.Disconnected
 import csw.alarm.models.Key.AlarmKey
 import csw.alarm.client.internal.helpers.{SetSeverityAckStatusTestCase, SetSeverityTestCase}
-import csw.params.core.models.Subsystem.AOESW
+import csw.prefix.Subsystem.AOESW
 
 object SeverityTestScenarios {
 

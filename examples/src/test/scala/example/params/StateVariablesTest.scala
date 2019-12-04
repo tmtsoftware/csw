@@ -3,9 +3,10 @@ package example.params
 import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.KeyType.DoubleMatrixKey
 import csw.params.core.generics.{Key, KeyType, Parameter}
-import csw.params.core.models.Units.{meter, NoUnits}
-import csw.params.core.models.{MatrixData, Prefix}
+import csw.params.core.models.Units.{NoUnits, meter}
+import csw.params.core.models.MatrixData
 import csw.params.core.states.{CurrentState, DemandState, StateName}
+import csw.prefix.Prefix
 import csw.time.core.models.UTCTime
 import org.scalatest.{FunSpec, Matchers}
 

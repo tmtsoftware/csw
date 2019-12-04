@@ -11,7 +11,7 @@ import csw.alarm.models.{AlarmHealth, AlarmMetadata, AlarmStatus, FullAlarmSever
 import csw.alarm.api.scaladsl.{AlarmAdminService, AlarmService, AlarmSubscription}
 import csw.alarm.client.AlarmServiceFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.params.core.models.Subsystem.{IRIS, NFIRAOS}
+import csw.prefix.Subsystem.{IRIS, NFIRAOS}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}

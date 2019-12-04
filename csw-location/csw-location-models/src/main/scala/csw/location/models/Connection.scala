@@ -2,7 +2,7 @@ package csw.location.models
 
 import csw.location.models.ConnectionType.{AkkaType, HttpType, TcpType}
 import csw.location.models.codecs.LocationSerializable
-import csw.params.core.models.Prefix
+import csw.prefix.Prefix
 
 /**
  * Represents a connection based on a componentId and the type of connection offered by the component

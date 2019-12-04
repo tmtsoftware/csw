@@ -188,6 +188,15 @@ object Dependencies {
     )
   )
 
+  val Prefix = Def.setting(
+    Seq(
+      Libs.`enumeratum`.value,
+      Borer.`borer-core`.value,
+      Borer.`borer-derivation`.value,
+      Libs.`scalatest`.value % Test
+    )
+  )
+
   val Params = Def.setting(
     Seq(
       Libs.`enumeratum`.value,

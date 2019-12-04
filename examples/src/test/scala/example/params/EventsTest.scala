@@ -6,6 +6,7 @@ import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.Units.arcmin
 import csw.params.core.models._
 import csw.params.events._
+import csw.prefix.Prefix
 import org.scalatest.{FunSpec, Matchers}
 
 //DEOPSCSW-331: Event Service Accessible to all CSW component builders

@@ -14,7 +14,8 @@ import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup
 import csw.params.core.generics.KeyType
-import csw.params.core.models.{ObsId, Prefix, Subsystem}
+import csw.params.core.models.ObsId
+import csw.prefix.{Prefix, Subsystem}
 import io.lettuce.core.RedisClient
 import org.mockito.MockitoSugar
 
@@ -32,8 +33,9 @@ class CancellableCommandTest(ignore: Int)
     with MockitoSugar {
   import config._
 
-  private implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = system.toTyped.asInstanceOf[ActorSystem[SpawnProtocol.Command]]
-  private implicit val timeout: Timeout                        = 5.seconds
+  private implicit val actorSystem: ActorSystem[SpawnProtocol.Command] =
+    system.toTyped.asInstanceOf[ActorSystem[SpawnProtocol.Command]]
+  private implicit val timeout: Timeout = 5.seconds
 
   test("a long running command should be cancellable") {
     runOn(seed) {
@@ -45,33 +47,40 @@ class CancellableCommandTest(ignore: Int)
     }
 
     runOn(member) {
-      val obsId = Some(ObsId("Obs001"))
-      val cancelCmdId = KeyType.StringKey.make("cancelCmdId")
+      val obsId         = Some(ObsId("Obs001"))
+      val cancelCmdId   = KeyType.StringKey.make("cancelCmdId")
       val cancelCmdName = KeyType.StringKey.make(name = "cancelCmdName")
 
       enterBarrier("spawned")
 
       // resolve the assembly running on seed
       val assemblyLocF =
-        locationService.resolve(AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "Monitor_Assembly"), ComponentType.Assembly)), 5.seconds)
+        locationService.resolve(
+          AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "Monitor_Assembly"), ComponentType.Assembly)),
+          5.seconds
+        )
       val assemblyLoc = Await.result(assemblyLocF, 10.seconds).get
 
       val assemblyCommandService = CommandServiceFactory.make(assemblyLoc)
 
       // original command is submit and Cancel command is also submit
       // This returns Started, so it is a long-running and we are free to cancel it
-      val originalSetup = Setup(prefix, acceptedCmd, obsId)
+      val originalSetup    = Setup(prefix, acceptedCmd, obsId)
       var originalResponse = Await.result(assemblyCommandService.submit(originalSetup), 5.seconds)
       originalResponse shouldBe a[Started]
 
       // This is the cancel command that is processed
-      val cancelSetup = Setup(prefix, cancelCmd, obsId,
-        Set(cancelCmdId.set(originalResponse.runId.id), cancelCmdName.set(originalSetup.commandName.name)))
+      val cancelSetup = Setup(
+        prefix,
+        cancelCmd,
+        obsId,
+        Set(cancelCmdId.set(originalResponse.runId.id), cancelCmdName.set(originalSetup.commandName.name))
+      )
       var cancelAsSubmitResponse = Await.result(assemblyCommandService.submit(cancelSetup), 5.seconds)
       cancelAsSubmitResponse shouldBe a[Completed]
 
-      var waitForCancel = assemblyCommandService.queryFinal(originalResponse.runId)
-      var originalFinalResponse:SubmitResponse = Await.result(waitForCancel, 5.seconds)
+      var waitForCancel                         = assemblyCommandService.queryFinal(originalResponse.runId)
+      var originalFinalResponse: SubmitResponse = Await.result(waitForCancel, 5.seconds)
       originalFinalResponse shouldBe a[Cancelled]
       originalFinalResponse.runId shouldEqual originalResponse.runId
 
@@ -79,8 +88,12 @@ class CancellableCommandTest(ignore: Int)
       originalResponse = Await.result(assemblyCommandService.submit(originalSetup), 5.seconds)
       originalResponse shouldBe a[Started]
 
-      val cancelSetup2 = Setup(prefix, cancelCmd, obsId,
-        Set(cancelCmdId.set(originalResponse.runId.id), cancelCmdName.set(originalSetup.commandName.name)))
+      val cancelSetup2 = Setup(
+        prefix,
+        cancelCmd,
+        obsId,
+        Set(cancelCmdId.set(originalResponse.runId.id), cancelCmdName.set(originalSetup.commandName.name))
+      )
       var cancelAsOnewayResponse = Await.result(assemblyCommandService.oneway(cancelSetup2), 5.seconds)
       cancelAsOnewayResponse shouldBe a[Accepted]
 

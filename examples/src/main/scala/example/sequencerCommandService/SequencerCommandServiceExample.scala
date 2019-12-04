@@ -9,7 +9,7 @@ import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.commands.{CommandName, Sequence, Setup}
-import csw.params.core.models.{Prefix, Subsystem}
+import csw.prefix.{Prefix, Subsystem}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong

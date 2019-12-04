@@ -11,8 +11,8 @@ import csw.alarm.models.Key.{AlarmKey, ComponentKey, GlobalKey, SubsystemKey}
 import csw.alarm.models.{ActivationStatus, AlarmStatus}
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
-import csw.params.core.models.Subsystem
-import csw.params.core.models.Subsystem.NFIRAOS
+import csw.prefix.Subsystem
+import csw.prefix.Subsystem.NFIRAOS
 
 // DEOPSCSW-486: Provide API to load alarm metadata in Alarm store from file
 class MetadataServiceModuleTest

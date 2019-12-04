@@ -12,8 +12,8 @@ import csw.event.client.perf.ocs.gateway.client.GatewayClient
 import csw.event.client.perf.reporter.{ResultReporter, TestRateReporter}
 import csw.event.client.perf.utils.EventUtils._
 import csw.event.client.perf.wiring.{TestConfigs, TestWiring}
-import csw.params.core.models.Prefix
 import csw.params.events.{Event, EventKey, EventName, SystemEvent}
+import csw.prefix.Prefix
 import org.HdrHistogram.Histogram
 
 import scala.concurrent.Future

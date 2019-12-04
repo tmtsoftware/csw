@@ -9,8 +9,9 @@ import csw.location.models.TrackingEvent
 import csw.logging.models.{Level, LogMetadata}
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
-import csw.params.core.models.{Id, Prefix}
+import csw.params.core.models.Id
 import csw.params.core.states.CurrentState
+import csw.prefix.Prefix
 import csw.serializable.CommandSerializable
 import csw.time.core.models.UTCTime
 

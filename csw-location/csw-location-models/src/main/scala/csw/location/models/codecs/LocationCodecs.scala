@@ -3,7 +3,7 @@ package csw.location.models.codecs
 import java.net.URI
 
 import csw.location.models._
-import csw.params.core.formats.CommonCodecs
+import csw.prefix.codecs.CommonCodecs
 import io.bullet.borer.Codec
 import io.bullet.borer.derivation.MapBasedCodecs._
 

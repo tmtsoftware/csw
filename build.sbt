@@ -10,6 +10,8 @@ docsParentDir in ThisBuild := "csw"
 gitCurrentRepo in ThisBuild := "https://github.com/tmtsoftware/csw"
 
 lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
+  `csw-prefix`.jvm,
+  `csw-prefix`.js,
   `csw-admin-server`,
   `csw-location`,
   `csw-config`,
@@ -93,6 +95,12 @@ lazy val `csw` = project
     bootstrap in Coursier := CoursierPlugin.bootstrapTask(githubReleases).value
   )
 
+lazy val `csw-prefix` = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Full)
+  .enablePlugins(PublishBintray)
+  .settings(fork := false)
+  .settings(libraryDependencies ++= Dependencies.Prefix.value)
+
 /* ================= Admin Project ============== */
 lazy val `csw-admin-server` = project
   .dependsOn(
@@ -123,8 +131,8 @@ lazy val `csw-location` = project
 lazy val `csw-location-models` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .in(file("csw-location/csw-location-models"))
+  .dependsOn(`csw-prefix`)
   .enablePlugins(PublishBintray, GenJavadocPlugin)
-  .dependsOn(`csw-params`)
   .settings(fork := false)
   .settings(libraryDependencies ++= Dependencies.LocationModels.value)
 
@@ -296,7 +304,7 @@ lazy val `csw-logging-api` = project
 
 lazy val `csw-logging-client` = project
   .in(file("csw-logging/csw-logging-client"))
-  .dependsOn(`csw-logging-macros`, `csw-logging-api`)
+  .dependsOn(`csw-logging-macros`, `csw-logging-api`, `csw-prefix`.jvm)
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.LoggingClient.value
@@ -305,7 +313,7 @@ lazy val `csw-logging-client` = project
 /* ================= Params ================ */
 lazy val `csw-params` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
-  .dependsOn(`csw-time-core`)
+  .dependsOn(`csw-time-core`, `csw-prefix`)
   .jvmConfigure(_.dependsOn(`csw-commons` % "test->test"))
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(
@@ -429,7 +437,7 @@ lazy val `csw-alarm` = project
 lazy val `csw-alarm-models` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .in(file("csw-alarm/csw-alarm-models"))
-  .dependsOn(`csw-params`, `csw-time-core`)
+  .dependsOn(`csw-time-core`, `csw-prefix`)
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(fork := false)
   .settings(libraryDependencies ++= Dependencies.AlarmModels.value)

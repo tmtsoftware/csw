@@ -3,7 +3,7 @@ package csw.alarm.cli.args
 import java.nio.file.Paths
 
 import csw.alarm.models.AlarmSeverity
-import csw.params.core.models.Subsystem
+import csw.prefix.Subsystem
 import scopt.{OptionDef, OptionParser}
 
 trait Arguments { self: OptionParser[Options] =>

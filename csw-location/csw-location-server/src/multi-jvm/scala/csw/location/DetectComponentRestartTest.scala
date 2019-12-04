@@ -13,7 +13,7 @@ import csw.location.models.{ComponentId, ComponentType, LocationRemoved, Locatio
 import csw.location.server.commons.CswCluster
 import csw.location.server.internal.{LocationServiceFactory, ServerWiring}
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
-import csw.params.core.models.{Prefix, Subsystem}
+import csw.prefix.{Prefix, Subsystem}
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
 import scala.concurrent.Await

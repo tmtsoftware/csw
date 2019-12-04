@@ -1,6 +1,6 @@
 package csw.params.core.generics
 
-import csw.params.core.models.{Prefix, Subsystem}
+import csw.prefix.{Prefix, Subsystem}
 
 /**
  * A trait to be mixed in that provides a parameter set and prefix info

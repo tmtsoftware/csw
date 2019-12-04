@@ -12,7 +12,8 @@ import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.generics.{KeyType, Parameter}
-import csw.params.core.models.{ObsId, Prefix, Subsystem}
+import csw.params.core.models.ObsId
+import csw.prefix.{Prefix, Subsystem}
 import org.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 

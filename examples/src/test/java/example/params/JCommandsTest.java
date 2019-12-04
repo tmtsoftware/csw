@@ -10,9 +10,9 @@ import csw.params.core.generics.Parameter;
 import csw.params.core.models.ArrayData;
 import csw.params.core.models.MatrixData;
 import csw.params.core.models.ObsId;
-import csw.params.core.models.Prefix;
 import csw.params.javadsl.JKeyType;
-import csw.params.javadsl.JSubsystem;
+import csw.prefix.Prefix;
+import csw.prefix.javadsl.JSubsystem;
 import csw.params.javadsl.JUnits;
 import csw.time.core.models.UTCTime;
 import org.junit.Assert;
@@ -302,7 +302,7 @@ public class JCommandsTest extends JUnitSuite {
 /*
     @Test
     public void showCloneCommandExample() {
-        Prefix prefix = new Prefix(JSubsystem.WFOS, "blue.filter");
+        Prefix prefix = new Prefix(csw.prefix.javadsl.JSubsystem.WFOS, "blue.filter");
         Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder");
         Parameter<Integer> encoderParam = encoderIntKey.set(22, 33);
         CommandName commandName = new CommandName("move");

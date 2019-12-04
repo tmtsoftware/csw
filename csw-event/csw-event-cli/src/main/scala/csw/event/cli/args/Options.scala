@@ -3,8 +3,8 @@ package csw.event.cli.args
 import java.io.File
 
 import csw.params.core.generics.Parameter
-import csw.params.core.models.Subsystem
 import csw.params.events.EventKey
+import csw.prefix.Subsystem
 
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 

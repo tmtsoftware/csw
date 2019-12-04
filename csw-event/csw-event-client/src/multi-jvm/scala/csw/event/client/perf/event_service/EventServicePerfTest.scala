@@ -9,7 +9,7 @@ import com.typesafe.config.ConfigFactory
 import csw.event.client.perf.BasePerfSuite
 import csw.event.client.perf.commons.{EventsSetting, PerfPublisher, PerfSubscriber}
 import csw.event.client.perf.reporter._
-import csw.params.core.models.Prefix
+import csw.prefix.Prefix
 
 import scala.collection.immutable
 import scala.concurrent.duration._

@@ -36,7 +36,8 @@ import csw.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.LogAdminUtil
 import csw.params.commands.CommandResponse.Locked
-import csw.params.core.models.{Id, Prefix}
+import csw.params.core.models.Id
+import csw.prefix.Prefix
 
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.util.{Failure, Success}

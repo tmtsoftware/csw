@@ -2,21 +2,23 @@ package example.params;
 
 import csw.params.commands.Result;
 import csw.params.core.formats.JavaJsonSupport;
-import csw.params.core.models.Prefix;
-import csw.params.javadsl.JKeyType;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
+import csw.params.core.models.Id;
 import csw.params.core.models.MatrixData;
 import csw.params.core.models.ObsId;
-import csw.params.core.models.Id;
-import csw.params.javadsl.JSubsystem;
+import csw.params.javadsl.JKeyType;
+import csw.prefix.Prefix;
+import csw.prefix.javadsl.JSubsystem;
 import org.junit.Assert;
 import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
 import play.api.libs.json.JsValue;
 import play.api.libs.json.Json;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class JResultTest extends JUnitSuite {

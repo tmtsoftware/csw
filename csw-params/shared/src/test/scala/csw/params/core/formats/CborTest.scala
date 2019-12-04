@@ -5,6 +5,7 @@ import csw.params.commands._
 import csw.params.core.models._
 import csw.params.events.{Event, EventName, ObserveEvent, SystemEvent}
 import csw.params.testdata.ParamSetData
+import csw.prefix.Prefix
 import io.bullet.borer.Cbor
 import org.scalatest.{FunSuite, Matchers}
 

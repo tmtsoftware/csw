@@ -9,7 +9,8 @@ import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, Sequence, Setup}
-import csw.params.core.models.{Id, Prefix, Subsystem}
+import csw.params.core.models.Id
+import csw.prefix.{Prefix, Subsystem}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSuiteLike, Matchers}
 import org.scalatestplus.mockito.MockitoSugar

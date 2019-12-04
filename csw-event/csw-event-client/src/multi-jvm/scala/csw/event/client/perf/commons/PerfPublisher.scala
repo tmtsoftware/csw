@@ -6,8 +6,8 @@ import akka.stream.scaladsl.{Keep, Source}
 import csw.event.api.scaladsl.EventPublisher
 import csw.event.client.perf.utils.EventUtils._
 import csw.event.client.perf.wiring.{TestConfigs, TestWiring}
-import csw.params.core.models.Prefix
 import csw.params.events.{EventName, SystemEvent}
+import csw.prefix.Prefix
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future

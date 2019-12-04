@@ -1,7 +1,7 @@
 package csw.params.events
 
 import csw.params.core.generics.KeyType
-import csw.params.core.models.Prefix
+import csw.prefix.Prefix
 import org.scalatest.{FunSpec, Matchers}
 
 // DEOPSCSW-183: Configure attributes and values

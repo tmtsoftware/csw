@@ -27,8 +27,8 @@ import csw.logging.api.javadsl.ILogger;
 import csw.logging.client.commons.AkkaTypedExtension;
 import csw.logging.client.javadsl.JLoggerFactory;
 import csw.network.utils.Networks;
-import csw.params.core.models.Prefix;
-import csw.params.javadsl.JSubsystem;
+import csw.prefix.Prefix;
+import csw.prefix.javadsl.JSubsystem;
 import org.junit.*;
 import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
@@ -55,12 +55,12 @@ public class JLocationServiceImplTest extends JUnitSuite {
     private ComponentId akkaHcdComponentId = new ComponentId(new Prefix(JSubsystem.CSW, "hcd1"), JComponentType.HCD());
     private AkkaConnection akkaHcdConnection = new AkkaConnection(akkaHcdComponentId);
 
-    private ComponentId tcpServiceComponentId = new ComponentId(new Prefix(JSubsystem.CSW,"exampleTcpService"), JComponentType.Service());
+    private ComponentId tcpServiceComponentId = new ComponentId(new Prefix(JSubsystem.CSW, "exampleTcpService"), JComponentType.Service());
     private TcpConnection tcpServiceConnection = new TcpConnection(tcpServiceComponentId);
 
     private static ActorRef<Object> actorRef;
 
-    private ComponentId httpServiceComponentId = new ComponentId(new Prefix(JSubsystem.CSW,"exampleHTTPService"), JComponentType.Service());
+    private ComponentId httpServiceComponentId = new ComponentId(new Prefix(JSubsystem.CSW, "exampleHTTPService"), JComponentType.Service());
     private HttpConnection httpServiceConnection = new HttpConnection(httpServiceComponentId);
     private String Path = "/path/to/resource";
 
@@ -210,7 +210,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
     @Test
     public void testListComponentsByComponentType() throws ExecutionException, InterruptedException {
         //  Register HCD type component
-        ComponentId akkaHcdComponentId = new ComponentId(new Prefix(JSubsystem.NFIRAOS,"tromboneHCD"), JComponentType.HCD());
+        ComponentId akkaHcdComponentId = new ComponentId(new Prefix(JSubsystem.NFIRAOS, "tromboneHCD"), JComponentType.HCD());
         AkkaConnection akkaHcdConnection = new AkkaConnection(akkaHcdComponentId);
         AkkaRegistration akkaHcdRegistration = new RegistrationFactory().akkaTyped(akkaHcdConnection, actorRef);
         locationService.register(akkaHcdRegistration).get();

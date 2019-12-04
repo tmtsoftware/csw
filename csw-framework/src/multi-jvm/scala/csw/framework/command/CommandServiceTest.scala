@@ -18,8 +18,9 @@ import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
 import csw.params.core.generics.Parameter
-import csw.params.core.models.{Id, ObsId, Prefix, Subsystem}
+import csw.params.core.models.{Id, ObsId}
 import csw.params.core.states.{CurrentState, DemandState, StateName}
+import csw.prefix.{Prefix, Subsystem}
 import io.lettuce.core.RedisClient
 import org.mockito.MockitoSugar
 
@@ -93,7 +94,10 @@ class CommandServiceTest(ignore: Int)
       enterBarrier("spawned")
 
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
-      val assemblyLocF  = locationService.resolve(AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "Assembly"), ComponentType.Assembly)), 5.seconds)
+      val assemblyLocF = locationService.resolve(
+        AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "Assembly"), ComponentType.Assembly)),
+        5.seconds
+      )
       val maybeLocation = Await.result(assemblyLocF, 10.seconds)
 
       maybeLocation.isDefined shouldBe true
@@ -124,13 +128,17 @@ class CommandServiceTest(ignore: Int)
       enterBarrier("spawned")
 
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
-      val assemblyLocF                   =
-        locationService.resolve(AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "Assembly"), ComponentType.Assembly)), 5.seconds)
+      val assemblyLocF =
+        locationService.resolve(
+          AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "Assembly"), ComponentType.Assembly)),
+          5.seconds
+        )
       val assemblyLocation: AkkaLocation = Await.result(assemblyLocF, 10.seconds).get
       val assemblyCmdService             = CommandServiceFactory.make(assemblyLocation)
 
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
-      val hcdLocF                   = locationService.resolve(AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "HCD"), ComponentType.HCD)), 5.seconds)
+      val hcdLocF =
+        locationService.resolve(AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "HCD"), ComponentType.HCD)), 5.seconds)
       val hcdLocation: AkkaLocation = Await.result(hcdLocF, 10.seconds).get
       val hcdCmdService             = CommandServiceFactory.make(hcdLocation)
 

@@ -1,7 +1,6 @@
 package csw.params.core.formats
 
 import java.lang.{Byte => JByte}
-import java.time.Instant
 
 import com.github.ghik.silencer.silent
 import csw.params.commands.CommandIssue._
@@ -12,6 +11,7 @@ import csw.params.core.models.Coords._
 import csw.params.core.models._
 import csw.params.core.states.{CurrentState, DemandState, StateName, StateVariable}
 import csw.params.events.{Event, EventName, ObserveEvent, SystemEvent}
+import csw.prefix.codecs.CommonCodecs
 import csw.time.core.models.{TAITime, UTCTime}
 import io.bullet.borer._
 import io.bullet.borer.derivation.ArrayBasedCodecs.deriveUnaryCodec
@@ -48,16 +48,6 @@ trait ParamCodecs extends CommonCodecs {
   implicit lazy val cometCoordCodec: Codec[CometCoord]             = deriveCodec
   implicit lazy val altAzCoordCodec: Codec[AltAzCoord]             = deriveCodec
   implicit lazy val coordCodec: Codec[Coord]                       = deriveCodec
-
-  implicit lazy val instantEnc: Encoder[Instant] = Encoder.targetSpecific(
-    cbor = deriveEncoder[Timestamp].contramap(instant => Timestamp(instant.getEpochSecond, instant.getNano)),
-    json = Encoder.forString.contramap(_.toString)
-  )
-
-  implicit lazy val instantDec: Decoder[Instant] = Decoder.targetSpecific(
-    cbor = deriveDecoder[Timestamp].map(ts => Instant.ofEpochSecond(ts.seconds, ts.nanos)),
-    json = Decoder.forString.map(Instant.parse)
-  )
 
   implicit lazy val utcTimeCodec: Codec[UTCTime] = deriveUnaryCodec
   implicit lazy val taiTimeCodec: Codec[TAITime] = deriveUnaryCodec

@@ -2,9 +2,10 @@ package csw.event.client.helpers
 
 import csw.params.core.generics.KeyType.{IntKey, LongKey}
 import csw.params.core.generics.{Key, Parameter}
-import csw.params.core.models.{Id, Prefix}
+import csw.params.core.models.Id
 import csw.params.events.{Event, EventName, SystemEvent}
 import csw.params.javadsl.JKeyType
+import csw.prefix.Prefix
 import csw.time.core.models.UTCTime
 
 object Utils {

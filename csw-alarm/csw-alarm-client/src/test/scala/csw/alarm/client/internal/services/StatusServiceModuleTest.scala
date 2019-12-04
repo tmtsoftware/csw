@@ -15,8 +15,8 @@ import csw.alarm.models.{AlarmSeverity, AlarmStatus, FullAlarmSeverity, Key}
 import csw.alarm.client.internal.extensions.TimeExtensions
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
-import csw.params.core.models.Subsystem
-import csw.params.core.models.Subsystem.CSW
+import csw.prefix.Subsystem
+import csw.prefix.Subsystem.CSW
 import org.scalatest.AppendedClues
 import reactor.core.publisher.FluxSink.OverflowStrategy
 import romaine.{RedisResult, RedisValueChange}

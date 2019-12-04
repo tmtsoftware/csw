@@ -23,6 +23,7 @@ import csw.params.core.generics.KeyType._
 import csw.params.core.models.Coords.EqFrame.FK5
 import csw.params.core.models.Coords.SolarSystemObject.Venus
 import csw.params.core.models._
+import csw.prefix.{Prefix, Subsystem}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationLong

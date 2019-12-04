@@ -9,8 +9,9 @@ import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.params.commands.{Command, CommandName, Setup}
 import csw.params.core.generics.{KeyType, Parameter}
-import csw.params.core.models.{ObsId, Prefix}
+import csw.params.core.models.ObsId
 import csw.params.events.SystemEvent
+import csw.prefix.Prefix
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.Await

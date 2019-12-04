@@ -4,7 +4,7 @@ import java.net.URI
 import com.typesafe.config.{ConfigException, ConfigFactory, ConfigValueFactory}
 import csw.location.models.Connection.HttpConnection
 import csw.location.models.{ComponentId, ComponentType, HttpLocation}
-import csw.params.core.models.{Prefix, Subsystem}
+import csw.prefix.{Prefix, Subsystem}
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.jdk.CollectionConverters._

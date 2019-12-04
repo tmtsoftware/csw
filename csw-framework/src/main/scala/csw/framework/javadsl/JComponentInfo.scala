@@ -5,7 +5,7 @@ import java.util
 
 import csw.command.client.models.framework.{ComponentInfo, LocationServiceUsage}
 import csw.location.models.{ComponentType, Connection}
-import csw.params.core.models.Subsystem
+import csw.prefix.Subsystem
 
 import scala.compat.java8.DurationConverters.DurationOps
 import scala.jdk.CollectionConverters._

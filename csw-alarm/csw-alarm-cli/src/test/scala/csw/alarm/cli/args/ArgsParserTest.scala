@@ -4,7 +4,7 @@ import java.nio.file.Paths
 
 import csw.alarm.models.AlarmSeverity.Major
 import csw.alarm.cli.BuildInfo
-import csw.params.core.models.Subsystem.NFIRAOS
+import csw.prefix.Subsystem.NFIRAOS
 import org.scalatest.{FunSuite, Matchers}
 
 class ArgsParserTest extends FunSuite with Matchers {

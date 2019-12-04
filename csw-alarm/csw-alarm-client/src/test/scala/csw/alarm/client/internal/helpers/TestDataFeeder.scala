@@ -6,7 +6,7 @@ import csw.alarm.models.Key.AlarmKey
 import csw.alarm.models._
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.alarm.client.internal.services.{MetadataServiceModule, SeverityServiceModule, StatusServiceModule}
-import csw.params.core.models.Subsystem.AOESW
+import csw.prefix.Subsystem.AOESW
 
 trait TestDataFeeder {
   self: SeverityServiceModule with MetadataServiceModule with StatusServiceModule =>

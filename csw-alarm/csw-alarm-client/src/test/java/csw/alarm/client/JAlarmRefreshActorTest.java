@@ -16,7 +16,8 @@ import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 
 import csw.alarm.api.javadsl.JAlarmSeverity;
-import static csw.params.javadsl.JSubsystem.NFIRAOS;
+
+import static csw.prefix.javadsl.JSubsystem.NFIRAOS;
 
 public class JAlarmRefreshActorTest extends JUnitSuite {
     private ActorSystem<SpawnProtocol.Command> typedSystem = ActorSystem.apply(SpawnProtocol.create(), "SpawnProtocolGuardian");

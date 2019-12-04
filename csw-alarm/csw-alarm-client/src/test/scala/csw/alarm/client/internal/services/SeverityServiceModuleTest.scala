@@ -19,7 +19,7 @@ import csw.logging.models.Level.DEBUG
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.utils.TestAppender
-import csw.params.core.models.Subsystem.{CSW, LGSF, NFIRAOS, TCS}
+import csw.prefix.Subsystem.{CSW, LGSF, NFIRAOS, TCS}
 import play.api.libs.json.{JsObject, Json}
 
 import scala.collection.mutable

@@ -2,7 +2,7 @@ package csw.alarm.models
 import csw.alarm.models.ActivationStatus.{Active, Inactive}
 import csw.alarm.models.AlarmSeverity._
 import csw.alarm.models.Key.AlarmKey
-import csw.params.core.models.Subsystem.NFIRAOS
+import csw.prefix.Subsystem.NFIRAOS
 import org.scalatest.{FunSuite, Matchers}
 
 // DEOPSCSW-439: Model to represent Alarm entity metadata
