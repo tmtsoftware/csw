@@ -143,7 +143,6 @@ trait ParamCodecs extends CommonCodecs {
     @silent implicit lazy val errorCodec: Codec[Error]                             = deriveCodec
     @silent implicit lazy val cancelledCodec: Codec[Cancelled]                     = deriveCodec
     @silent implicit lazy val lockedCodec: Codec[Locked]                           = deriveCodec
-    @silent implicit lazy val commandNotAvailableCodec: Codec[CommandNotAvailable] = deriveCodec
     deriveCodec
   }
 

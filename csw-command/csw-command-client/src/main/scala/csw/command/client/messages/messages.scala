@@ -283,7 +283,7 @@ private[csw] object FromSupervisorMessage {
  * @param runId represents an unique identifier of command
  * @param replyTo represents the actor that will receive the command status
  */
-case class Query(runId: Id, replyTo: ActorRef[QueryResponse]) extends SupervisorLockMessage with RemoteMsg
+case class Query(runId: Id, replyTo: ActorRef[SubmitResponse]) extends SupervisorLockMessage with RemoteMsg
 
 /**
  * Represents a message to subscribe to change in command status of a command running on some component

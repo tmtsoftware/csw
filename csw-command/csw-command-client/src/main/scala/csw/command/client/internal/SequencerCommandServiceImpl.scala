@@ -9,7 +9,7 @@ import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.sequencer.SequencerMsg
 import csw.command.client.messages.sequencer.SequencerMsg.{Query, QueryFinal, SubmitSequence}
 import csw.location.models.AkkaLocation
-import csw.params.commands.CommandResponse.{QueryResponse, SubmitResponse}
+import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.commands.Sequence
 import csw.params.core.models.Id
 
@@ -30,7 +30,7 @@ class SequencerCommandServiceImpl(sequencerLocation: AkkaLocation)(
   override def submitAndWait(sequence: Sequence)(implicit timeout: Timeout): Future[SubmitResponse] =
     extensions.submitAndWait(sequence)
 
-  override def query(runId: Id): Future[QueryResponse] = sequencer ? (Query(runId, _))
+  override def query(runId: Id): Future[SubmitResponse] = sequencer ? (Query(runId, _))
 
   override def queryFinal(runId: Id)(implicit timeout: Timeout): Future[SubmitResponse] = sequencer ? (QueryFinal(runId, _))
 }

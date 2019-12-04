@@ -211,7 +211,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
 
         // do some work before querying for the result of above command as needed
         SubmitResponse sresponse = longRunningCommandResultF.get();
-        CompletableFuture<QueryResponse> queryResponseF = hcdCmdService.query(sresponse.runId());
+        CompletableFuture<SubmitResponse> queryResponseF = hcdCmdService.query(sresponse.runId());
         queryResponseF.thenAccept(r -> {
             if (r instanceof Started) {
                 // happy case - no action needed
@@ -255,7 +255,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         CompletableFuture<SubmitResponse> longRunningSubmitResultF3 = hcdCmdService.submit(longRunningSetup);
 
         // do some work before querying for the result of above command as needed
-        CompletableFuture<QueryResponse> queryResponseF3 =
+        CompletableFuture<SubmitResponse> queryResponseF3 =
                 hcdCmdService.query(longRunningSubmitResultF3.get().runId());
         queryResponseF3.thenAccept(r -> {
             if (r instanceof Started) {
@@ -288,7 +288,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         //#queryFinal
 
         //#query
-        CompletableFuture<QueryResponse> queryResponseF2 = hcdCmdService.query(sresponse.runId());
+        CompletableFuture<SubmitResponse> queryResponseF2 = hcdCmdService.query(sresponse.runId());
         Assert.assertTrue(queryResponseF2.get() instanceof Completed);
         //#query
 

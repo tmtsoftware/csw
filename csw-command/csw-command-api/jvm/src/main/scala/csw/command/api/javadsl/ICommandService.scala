@@ -77,12 +77,12 @@ trait ICommandService {
   def onewayAndMatch(controlCommand: ControlCommand, stateMatcher: StateMatcher): CompletableFuture[MatchingResponse]
 
   /**
-   * Query for the result of a long running command which was sent as Submit to get a [[csw.params.commands.CommandResponse.QueryResponse]] as a Future
+   * Query for the result of a long running command which was sent as Submit to get a [[csw.params.commands.CommandResponse.SubmitResponse]] as a Future
    *
    * @param commandRunId the runId of the command for which response is required
    * @return a CommandResponse as a Future value
    */
-  def query(commandRunId: Id): CompletableFuture[QueryResponse]
+  def query(commandRunId: Id): CompletableFuture[SubmitResponse]
 
   /**
    * Query for the final result of a long running command which was sent as Submit to get a [[csw.params.commands.CommandResponse.SubmitResponse]] as a Future

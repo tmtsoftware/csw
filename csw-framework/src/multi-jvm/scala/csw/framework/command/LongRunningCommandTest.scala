@@ -117,7 +117,7 @@ class LongRunningCommandTest(ignore: Int)
       //do some work before querying for the result of above command as needed
       //Note at this point, the above submit would return quickly with the Started status so this is somewhat
       // redundant. This would allow you to see if it had completed since the first response
-      val test3QueryResponse: Future[QueryResponse] = assemblyCommandService.query(test3RunId)
+      val test3QueryResponse: Future[SubmitResponse] = assemblyCommandService.query(test3RunId)
 
       // Command is still just started
       //#query-response

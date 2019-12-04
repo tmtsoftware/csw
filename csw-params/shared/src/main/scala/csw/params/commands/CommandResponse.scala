@@ -42,13 +42,7 @@ object CommandResponse {
    * SubmitResponse is returned by Submit message which calls the onSubmit handler
    * Responses returned can be Invalid, Started, Completed, CompletedWithResult, Error, Cancelled, Locked
    */
-  sealed trait SubmitResponse extends QueryResponse
-
-  /**
-   * QueryResponse is returned by CommandService query
-   * Values can be Invalid, Started, Completed, CompletedWithResult, Error, Cancelled, Locked, CommandNotAvailable
-   */
-  sealed trait QueryResponse extends CommandResponse
+  sealed trait SubmitResponse extends CommandResponse
 
   /**
    * MatchingResponse is returned by matchers.
@@ -127,19 +121,12 @@ object CommandResponse {
   case class Locked(runId: Id) extends ValidateResponse with OnewayResponse with SubmitResponse with MatchingResponse
 
   /**
-   * A negative response stating that a command with given runId is not available or cannot be located
-   *
-   * @param runId of command for which this response is created
-   */
-  case class CommandNotAvailable(runId: Id) extends QueryResponse
-
-  /**
    * Tests a response to determine if it is a final command state
    *
    * @param qr response for testing
    * @return true if it is final
    */
-  def isFinal(qr: QueryResponse): Boolean = qr match {
+  def isFinal(qr: SubmitResponse): Boolean = qr match {
     case Started(_) => false
     case _          => true
   }
@@ -150,7 +137,7 @@ object CommandResponse {
    * @param qr response for testing
    * @return true if it is positive
    */
-  def isPositive(qr: QueryResponse): Boolean = qr match {
+  def isPositive(qr: SubmitResponse): Boolean = qr match {
     case Completed(_, _) => true
     case _               => false
   }
@@ -172,7 +159,7 @@ object CommandResponse {
    * @param qr response for testing
    * @return true if it is negative
    */
-  def isNegative(qr: QueryResponse): Boolean = !(isPositive(qr) || isIntermediate(qr))
+  def isNegative(qr: SubmitResponse): Boolean = !(isPositive(qr) || isIntermediate(qr))
 
   /**
    * Tests a response to determine if it is an intermediate response
@@ -180,7 +167,7 @@ object CommandResponse {
    * @param qr response for testing
    * @return returns true if it is intermediate
    */
-  def isIntermediate(qr: QueryResponse): Boolean = qr match {
+  def isIntermediate(qr: SubmitResponse): Boolean = qr match {
     case Started(_) => true
     case _          => false
   }

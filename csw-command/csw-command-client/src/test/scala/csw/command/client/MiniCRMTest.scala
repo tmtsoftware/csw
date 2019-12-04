@@ -2,16 +2,9 @@ package csw.command.client
 
 import akka.actor.testkit.typed.scaladsl.ActorTestKit
 import csw.command.client.MiniCRM.{Responses, Starters, Waiters}
-import csw.command.client.MiniCRM.MiniCRMMessage.{
-  AddResponse,
-  AddStarted,
-  GetResponses,
-  GetStarters,
-  GetWaiters,
-  Query,
-  QueryFinal
-}
-import csw.params.commands.CommandResponse.{CommandNotAvailable, Completed, QueryResponse, Started, SubmitResponse}
+import csw.command.client.MiniCRM.MiniCRMMessage.{AddResponse, AddStarted, GetResponses, GetStarters, GetWaiters, Query, QueryFinal}
+import csw.params.commands.CommandIssue.RunIdNotAvailableIssue
+import csw.params.commands.CommandResponse.{Completed, Invalid, Started, SubmitResponse}
 import csw.params.core.models.Id
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
@@ -19,7 +12,7 @@ import scala.concurrent.duration._
 
 class MiniCRMTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
-  val testKit = ActorTestKit()
+  private val testKit = ActorTestKit()
 
   override def afterAll(): Unit = testKit.shutdownTestKit()
 
@@ -246,7 +239,7 @@ class MiniCRMTest extends FunSuite with Matchers with BeforeAndAfterAll {
   // 4. Second query should still work and return the same complete
   test("query after starting, wait for final, then check query again") {
     val crm                  = testKit.spawn(MiniCRM.make())
-    val commandResponseProbe = testKit.createTestProbe[QueryResponse]()
+    val commandResponseProbe = testKit.createTestProbe[SubmitResponse]()
 
     val id1 = Id("1")
     val r0  = Started(id1)
@@ -360,7 +353,7 @@ class MiniCRMTest extends FunSuite with Matchers with BeforeAndAfterAll {
     val crm           = testKit.spawn(MiniCRM.make())
     val responseProbe = testKit.createTestProbe[Responses]()
     val startersProbe = testKit.createTestProbe[Starters]()
-    val queryProbe    = testKit.createTestProbe[QueryResponse]()
+    val queryProbe    = testKit.createTestProbe[SubmitResponse]()
 
     val id1 = Id("1")
     val id2 = Id("2")
@@ -400,6 +393,6 @@ class MiniCRMTest extends FunSuite with Matchers with BeforeAndAfterAll {
     crm ! Query(id3, queryProbe.ref)
     queryProbe.expectMessage(r5)
     crm ! Query(id4, queryProbe.ref)
-    queryProbe.expectMessage(CommandNotAvailable(id4))
+    queryProbe.expectMessage(Invalid(id4, RunIdNotAvailableIssue(id4.id)))
   }
 }

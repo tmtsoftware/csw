@@ -16,6 +16,13 @@ sealed trait CommandIssue {
 object CommandIssue {
 
   /**
+   * Returned when a CommandResponse associated with runId is not available
+   *
+   * @param reason describing the cause of this issue
+   */
+  final case class RunIdNotAvailableIssue(reason: String) extends CommandIssue
+
+  /**
    * Returned when a command is missing a required key/parameter
    *
    * @param reason describing the cause of this issue

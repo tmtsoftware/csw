@@ -45,7 +45,7 @@ private[command] class JCommandServiceImpl(commandService: CommandService) exten
   override def onewayAndMatch(controlCommand: ControlCommand, stateMatcher: StateMatcher): CompletableFuture[MatchingResponse] =
     commandService.onewayAndMatch(controlCommand, stateMatcher).toJava.toCompletableFuture
 
-  override def query(commandRunId: Id): CompletableFuture[QueryResponse] =
+  override def query(commandRunId: Id): CompletableFuture[SubmitResponse] =
     commandService.query(commandRunId).toJava.toCompletableFuture
 
   override def queryFinal(commandRunId: Id, timeout: Timeout): CompletableFuture[SubmitResponse] =
