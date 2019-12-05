@@ -9,7 +9,7 @@ import csw.location.models.codecs.LocationCodecs
 import io.bullet.borer.Codec
 import io.bullet.borer.derivation.ArrayBasedCodecs.deriveUnaryCodec
 import io.bullet.borer.derivation.MapBasedCodecs.deriveCodec
-import msocket.api.ErrorType
+import msocket.api.ErrorProtocol
 
 trait LocationServiceCodecs extends LocationCodecs {
 
@@ -49,9 +49,9 @@ trait LocationServiceCodecs extends LocationCodecs {
     deriveCodec
   }
 
-  implicit lazy val locationHttpMessageErrorTye: ErrorType[LocationHttpMessage] =
-    ErrorType.bind[LocationHttpMessage, LocationServiceError]
+  implicit lazy val locationHttpMessageErrorProtocol: ErrorProtocol[LocationHttpMessage] =
+    ErrorProtocol.bind[LocationHttpMessage, LocationServiceError]
 
-  implicit lazy val locationWebsocketMessageErrorTye: ErrorType[LocationWebsocketMessage] =
-    ErrorType.bind[LocationWebsocketMessage, LocationServiceError]
+  implicit lazy val locationWebsocketMessageErrorProtocol: ErrorProtocol[LocationWebsocketMessage] =
+    ErrorProtocol.bind[LocationWebsocketMessage, LocationServiceError]
 }

@@ -10,7 +10,7 @@ import akka.Done
 import akka.stream.javadsl.Source
 import csw.location.api.scaladsl.LocationService
 import csw.location.models._
-import msocket.api.models.Subscription
+import msocket.api.Subscription
 
 /**
  * A LocationService interface to manage connections and their registrations. All operations are non-blocking.

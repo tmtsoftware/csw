@@ -9,9 +9,8 @@ import csw.location.api.messages.LocationWebsocketMessage.Track
 import csw.location.api.messages.{LocationHttpMessage, LocationWebsocketMessage}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.models._
-import msocket.api.Transport
+import msocket.api.{Subscription, Transport}
 import msocket.api.codecs.BasicCodecs
-import msocket.api.models.Subscription
 import portable.akka.extensions.PortableAkka.SourceWithSubscribe
 
 import scala.concurrent.Future

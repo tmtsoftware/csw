@@ -22,7 +22,7 @@ import csw.location.server.commons.{CswCluster, LocationServiceLogger}
 import csw.location.server.internal.Registry.AllServices
 import csw.location.server.internal.StreamExt.RichSource
 import csw.logging.api.scaladsl.Logger
-import msocket.api.models.Subscription
+import msocket.api.Subscription
 
 import scala.async.Async._
 import scala.concurrent.Future
