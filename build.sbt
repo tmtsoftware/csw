@@ -40,15 +40,16 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-config-cli`,
   `csw-event-cli`,
   `csw-alarm-cli`,
-  `csw-time-core-js`,
-  `csw-time-clock-js`,
+  `csw-time-core`.js,
+  `csw-time-clock`.js,
   `csw-logging-macros`,
+  `csw-logging-models`.js,
   `csw-params`.js,
   `csw-command-api`.js,
   `csw-location-models`.js,
-  `csw-logging-models-js`,
-  `csw-alarm-models-js`,
-  `csw-config-models-js`,
+  `csw-location-api`.js,
+  `csw-alarm-models`.js,
+  `csw-config-models`.js,
   `csw-network-utils`,
   `csw-commons`,
   `csw-benchmark`,
@@ -180,8 +181,8 @@ lazy val `csw-location-agent` = project
 lazy val `csw-config` = project
   .in(file("csw-config"))
   .aggregate(
-    `csw-config-models-jvm`,
-    `csw-config-models-js`,
+    `csw-config-models`.jvm,
+    `csw-config-models`.js,
     `csw-config-api`,
     `csw-config-server`,
     `csw-config-client`,
@@ -196,13 +197,10 @@ lazy val `csw-config-models` = crossProject(JSPlatform, JVMPlatform)
   .settings(fork := false)
   .settings(libraryDependencies ++= Dependencies.LocationModels.value)
 
-lazy val `csw-config-models-jvm` = `csw-config-models`.jvm
-lazy val `csw-config-models-js`  = `csw-config-models`.js
-
 lazy val `csw-config-api` = project
   .in(file("csw-config/csw-config-api"))
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
-  .dependsOn(`csw-logging-api`, `csw-config-models-jvm`)
+  .dependsOn(`csw-logging-api`, `csw-config-models`.jvm)
   .settings(
     libraryDependencies ++= Dependencies.ConfigApi.value
   )
@@ -256,8 +254,8 @@ lazy val `csw-logging` = project
   .in(file("csw-logging"))
   .aggregate(
     `csw-logging-macros`,
-    `csw-logging-models-jvm`,
-    `csw-logging-models-js`,
+    `csw-logging-models`.jvm,
+    `csw-logging-models`.js,
     `csw-logging-api`,
     `csw-logging-client`
   )
@@ -275,14 +273,11 @@ lazy val `csw-logging-models` = crossProject(JSPlatform, JVMPlatform)
   .settings(fork := false)
   .settings(libraryDependencies ++= Dependencies.LoggingModels.value)
 
-lazy val `csw-logging-models-jvm` = `csw-logging-models`.jvm
-lazy val `csw-logging-models-js`  = `csw-logging-models`.js
-
 lazy val `csw-logging-api` = project
   .in(file("csw-logging/csw-logging-api"))
   .dependsOn(
     `csw-logging-macros`,
-    `csw-logging-models-jvm`
+    `csw-logging-models`.jvm
   )
   .settings(
     libraryDependencies += Libs.`enumeratum`.value
@@ -414,8 +409,8 @@ lazy val `csw-event-cli` = project
 lazy val `csw-alarm` = project
   .in(file("csw-alarm"))
   .aggregate(
-    `csw-alarm-models-jvm`,
-    `csw-alarm-models-js`,
+    `csw-alarm-models`.jvm,
+    `csw-alarm-models`.js,
     `csw-alarm-api`,
     `csw-alarm-client`,
     `csw-alarm-cli`
@@ -426,17 +421,13 @@ lazy val `csw-alarm-models` = crossProject(JSPlatform, JVMPlatform)
   .in(file("csw-alarm/csw-alarm-models"))
   .dependsOn(`csw-params`, `csw-time-core`)
   .enablePlugins(PublishBintray, GenJavadocPlugin)
+  .jvmConfigure(_.enablePlugins(MaybeCoverage))
   .settings(fork := false)
   .settings(libraryDependencies ++= Dependencies.AlarmModels.value)
 
-lazy val `csw-alarm-models-jvm` = `csw-alarm-models`.jvm
-  .enablePlugins(MaybeCoverage)
-
-lazy val `csw-alarm-models-js` = `csw-alarm-models`.js
-
 lazy val `csw-alarm-api` = project
   .in(file("csw-alarm/csw-alarm-api"))
-  .dependsOn(`csw-alarm-models-jvm`)
+  .dependsOn(`csw-alarm-models`.jvm)
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(libraryDependencies ++= Dependencies.AlarmApi.value)
 
@@ -471,10 +462,10 @@ lazy val `csw-alarm-cli` = project
 lazy val `csw-time` = project
   .in(file("csw-time"))
   .aggregate(
-    `csw-time-clock-jvm`,
-    `csw-time-clock-js`,
-    `csw-time-core-jvm`,
-    `csw-time-core-js`,
+    `csw-time-clock`.jvm,
+    `csw-time-clock`.js,
+    `csw-time-core`.jvm,
+    `csw-time-core`.js,
     `csw-time-scheduler`
   )
   .settings(
@@ -489,9 +480,6 @@ lazy val `csw-time-clock` = crossProject(JSPlatform, JVMPlatform)
   .jsSettings(libraryDependencies += Libs.`scalajs-java-time`.value)
   .settings(fork := false)
 
-lazy val `csw-time-clock-js`  = `csw-time-clock`.js
-lazy val `csw-time-clock-jvm` = `csw-time-clock`.jvm
-
 lazy val `csw-time-core` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("csw-time/csw-time-core"))
@@ -502,13 +490,10 @@ lazy val `csw-time-core` = crossProject(JSPlatform, JVMPlatform)
     fork := false
   )
 
-lazy val `csw-time-core-js`  = `csw-time-core`.js
-lazy val `csw-time-core-jvm` = `csw-time-core`.jvm
-
 lazy val `csw-time-scheduler` = project
   .in(file("csw-time/csw-time-scheduler"))
   .dependsOn(
-    `csw-time-core-jvm` % "compile->compile;test->test",
+    `csw-time-core`.jvm % "compile->compile;test->test",
     `csw-logging-client`
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
@@ -577,7 +562,7 @@ lazy val examples = project
     `csw-aas-installed`,
     `csw-location-client`,
     `csw-time-scheduler`,
-    `csw-time-core-jvm`,
+    `csw-time-core`.jvm,
     `csw-testkit`       % "test->compile",
     `csw-config-server` % "test->test"
   )
