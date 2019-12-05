@@ -39,7 +39,7 @@ import csw.params.core.states.StateName;
 import csw.params.javadsl.JKeyType;
 import csw.params.javadsl.JSubsystem;
 import io.lettuce.core.RedisClient;
-import msocket.api.models.Subscription;
+import msocket.api.Subscription;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;

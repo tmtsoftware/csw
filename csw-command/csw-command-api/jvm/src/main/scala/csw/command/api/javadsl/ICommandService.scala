@@ -10,7 +10,7 @@ import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
-import msocket.api.models.Subscription
+import msocket.api.Subscription
 
 /**
  * A Command Service API of a csw component. This model provides method based APIs for command interactions with a component.
