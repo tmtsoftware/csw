@@ -21,10 +21,10 @@ private[csw] class ServerWiring extends LocationServiceCodecs {
   implicit lazy val actorSystem: ActorSystem[SpawnProtocol.Command] = clusterSettings.system
   lazy val untypedActorSystem: actor.ActorSystem                    = clusterSettings.system.toClassic
   lazy val actorRuntime                                             = new ActorRuntime(actorSystem)
-  lazy val locationService: LocationService                         = LocationServiceFactory.withSystem(actorSystem)
-  private val postHandler                                           = new LocationHttpHandler(locationService.locationServiceE)
-  private def websocketHandlerFactory(encoding: Encoding[_]) =
-    new LocationWebsocketHandler(locationService.locationServiceE, encoding)
+  import actorSystem.executionContext
+  lazy val locationService: LocationService                  = LocationServiceFactory.withSystem(actorSystem)
+  private val postHandler                                    = new LocationHttpHandler(locationService)
+  private def websocketHandlerFactory(encoding: Encoding[_]) = new LocationWebsocketHandler(locationService, encoding)
 
   lazy val locationRoutes: Route = RouteFactory.combine(
     new PostRouteFactory("post-endpoint", postHandler),

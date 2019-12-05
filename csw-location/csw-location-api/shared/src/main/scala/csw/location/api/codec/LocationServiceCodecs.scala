@@ -9,6 +9,7 @@ import csw.location.models.codecs.LocationCodecs
 import io.bullet.borer.Codec
 import io.bullet.borer.derivation.ArrayBasedCodecs.deriveUnaryCodec
 import io.bullet.borer.derivation.MapBasedCodecs.deriveCodec
+import msocket.api.ErrorType
 
 trait LocationServiceCodecs extends LocationCodecs {
 
@@ -37,14 +38,20 @@ trait LocationServiceCodecs extends LocationCodecs {
     deriveCodec
   }
 
-  implicit def RegistrationErrorCodec[T <: RegistrationError]: Codec[T] =
-    RegistrationErrorCodecValue.asInstanceOf[Codec[T]]
-  lazy val RegistrationErrorCodecValue: Codec[RegistrationError] = {
+  implicit def LocationServiceErrorrCodec[T <: LocationServiceError]: Codec[T] =
+    LocationServiceErrorCodecValue.asInstanceOf[Codec[T]]
+
+  lazy val LocationServiceErrorCodecValue: Codec[LocationServiceError] = {
     @silent implicit lazy val RegistrationFailedCodec: Codec[RegistrationFailed]               = deriveUnaryCodec
     @silent implicit lazy val OtherLocationIsRegisteredCodec: Codec[OtherLocationIsRegistered] = deriveUnaryCodec
+    @silent implicit lazy val UnregistrationFailedCodec: Codec[UnregistrationFailed]           = deriveUnaryCodec
+    @silent implicit lazy val RegistrationListingFailedCodec: Codec[RegistrationListingFailed] = deriveCodec
     deriveCodec
   }
 
-  implicit lazy val UnregistrationFailedCodec: Codec[UnregistrationFailed]           = deriveUnaryCodec
-  implicit lazy val RegistrationListingFailedCodec: Codec[RegistrationListingFailed] = deriveCodec
+  implicit lazy val locationHttpMessageErrorTye: ErrorType[LocationHttpMessage] =
+    ErrorType.bind[LocationHttpMessage, LocationServiceError]
+
+  implicit lazy val locationWebsocketMessageErrorTye: ErrorType[LocationWebsocketMessage] =
+    ErrorType.bind[LocationWebsocketMessage, LocationServiceError]
 }

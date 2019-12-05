@@ -129,6 +129,4 @@ trait LocationService {
    * @return a killswitch which can be shutdown to unsubscribe the consumer
    */
   def subscribe(connection: Connection, callback: TrackingEvent => Unit): Subscription
-
-  def locationServiceE: LocationServiceE
 }
