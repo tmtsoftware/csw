@@ -61,7 +61,8 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
       Invalid(Id(), CommandIssue.OtherIssue("test issue")),
       Error(Id(), "test"),
       Cancelled(Id()),
-      Locked(Id()))
+      Locked(Id())
+    )
 
     forAll(testData) { commandResponse =>
       val serializer = serialization.findSerializerFor(commandResponse)

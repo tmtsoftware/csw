@@ -20,7 +20,7 @@ object CommandIssue {
    *
    * @param reason describing the cause of this issue
    */
-  final case class RunIdNotAvailableIssue(reason: String) extends CommandIssue
+  final case class IdNotAvailableIssue(reason: String) extends CommandIssue
 
   /**
    * Returned when a command is missing a required key/parameter

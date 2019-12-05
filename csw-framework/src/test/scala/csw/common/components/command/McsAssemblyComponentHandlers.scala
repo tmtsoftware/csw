@@ -84,7 +84,6 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
 
       // Execute code when long completes
       val longresult: Future[SubmitResponse] = hcdComponent.queryFinal(await(longsubmit).runId) map { sr =>
-        println("Long completed: " + sr.runId)
         currentStatePublisher
           .publish(CurrentState(assemblyPrefix, StateName("testStateName"), Set(choiceKey.set(longCmdCompleted))))
         sr
@@ -92,7 +91,6 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
 
       // Execute coe when medium completes
       val mediumresult: Future[SubmitResponse] = hcdComponent.queryFinal(await(medium).runId) map { sr =>
-        println("Medium completed: " + sr.runId)
         currentStatePublisher
           .publish(CurrentState(assemblyPrefix, StateName("testStateName"), Set(choiceKey.set(mediumCmdCompleted))))
         sr
@@ -100,7 +98,6 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
 
       //
       val shortresult: Future[SubmitResponse] = hcdComponent.queryFinal(await(shortsubmit).runId) map { sr =>
-        println("Short completed: " + sr.runId)
         currentStatePublisher
           .publish(CurrentState(assemblyPrefix, StateName("testStateName"), Set(choiceKey.set(shortCmdCompleted))))
         sr
@@ -108,16 +105,13 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
 
       commandResponseManager.queryFinalAll(shortresult, mediumresult, longresult).onComplete {
         case Success(response) =>
-          println("Send final completion")
           currentStatePublisher.publish(
             CurrentState(controlCommand.source, StateName("testStateName"), Set(choiceKey.set(longRunningCmdCompleted)))
           )
           response match {
             case OverallSuccess(r) =>
-              println("Overall success")
               commandResponseManager.updateCommand(Completed(prunId))
             case OverallFailure(responses) =>
-              println("Overall failure")
               commandResponseManager.updateCommand(Error(prunId, s"$responses"))
           }
         case Failure(ex) =>

@@ -2,8 +2,16 @@ package csw.command.client
 
 import akka.actor.testkit.typed.scaladsl.ActorTestKit
 import csw.command.client.MiniCRM.{Responses, Starters, Waiters}
-import csw.command.client.MiniCRM.MiniCRMMessage.{AddResponse, AddStarted, GetResponses, GetStarters, GetWaiters, Query, QueryFinal}
-import csw.params.commands.CommandIssue.RunIdNotAvailableIssue
+import csw.command.client.MiniCRM.MiniCRMMessage.{
+  AddResponse,
+  AddStarted,
+  GetResponses,
+  GetStarters,
+  GetWaiters,
+  Query,
+  QueryFinal
+}
+import csw.params.commands.CommandIssue.IdNotAvailableIssue
 import csw.params.commands.CommandResponse.{Completed, Invalid, Started, SubmitResponse}
 import csw.params.core.models.Id
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -393,6 +401,6 @@ class MiniCRMTest extends FunSuite with Matchers with BeforeAndAfterAll {
     crm ! Query(id3, queryProbe.ref)
     queryProbe.expectMessage(r5)
     crm ! Query(id4, queryProbe.ref)
-    queryProbe.expectMessage(Invalid(id4, RunIdNotAvailableIssue(id4.id)))
+    queryProbe.expectMessage(Invalid(id4, IdNotAvailableIssue(id4.id)))
   }
 }

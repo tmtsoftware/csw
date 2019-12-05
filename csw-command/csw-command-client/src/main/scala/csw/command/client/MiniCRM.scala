@@ -2,7 +2,7 @@ package csw.command.client
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
-import csw.params.commands.CommandIssue.RunIdNotAvailableIssue
+import csw.params.commands.CommandIssue.IdNotAvailableIssue
 import csw.params.commands.CommandResponse.{Invalid, Started, SubmitResponse}
 import csw.params.core.models.Id
 
@@ -138,7 +138,7 @@ object MiniCRM {
       .getOrElse(
         startedList
           .query(_.runId == runId)
-          .getOrElse(Invalid(runId, RunIdNotAvailableIssue(runId.id)))
+          .getOrElse(Invalid(runId, IdNotAvailableIssue(runId.id)))
       )
 
   /**

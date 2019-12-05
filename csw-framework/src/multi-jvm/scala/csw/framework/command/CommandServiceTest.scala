@@ -15,7 +15,7 @@ import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.server.http.MultiNodeHTTPLocationService
-import csw.params.commands.CommandIssue.RunIdNotAvailableIssue
+import csw.params.commands.CommandIssue.IdNotAvailableIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
 import csw.params.core.generics.Parameter
@@ -269,7 +269,7 @@ class CommandServiceTest(ignore: Int)
 
       // test CommandNotAvailable after timeout of 1 seconds
       Await.result(assemblyCmdService.query(Id("blah")), 2.seconds) shouldEqual
-        Invalid(Id("blah"), RunIdNotAvailableIssue(Id("blah").id))
+        Invalid(Id("blah"), IdNotAvailableIssue(Id("blah").id))
 
       //#query
       // Check on a command that was completed in the past

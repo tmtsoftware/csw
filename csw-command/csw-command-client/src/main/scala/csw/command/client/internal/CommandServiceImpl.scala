@@ -15,7 +15,7 @@ import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
 import csw.command.client.messages.ComponentCommonMessage.ComponentStateSubscription
 import csw.command.client.messages.{ComponentMessage, Query, QueryFinal}
 import csw.command.client.models.framework.PubSub.{Subscribe, SubscribeOnly}
-import csw.params.commands.CommandIssue.RunIdNotAvailableIssue
+import csw.params.commands.CommandIssue.IdNotAvailableIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
@@ -57,7 +57,7 @@ private[command] class CommandServiceImpl(component: ActorRef[ComponentMessage])
   override def query(commandRunId: Id): Future[SubmitResponse] = {
     val eventualResponse: Future[SubmitResponse] = component ? (Query(commandRunId, _))
     eventualResponse recover {
-      case _: TimeoutException => Invalid(commandRunId, RunIdNotAvailableIssue(commandRunId.id))
+      case _: TimeoutException => Invalid(commandRunId, IdNotAvailableIssue(commandRunId.id))
     }
   }
 
