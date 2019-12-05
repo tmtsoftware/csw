@@ -8,7 +8,9 @@ import csw.params.core.formats.ParamCodecs
 import io.bullet.borer.Codec
 import io.bullet.borer.derivation.MapBasedCodecs.deriveCodec
 import io.bullet.borer.derivation.ArrayBasedCodecs.deriveUnaryCodec
+import msocket.api.ErrorType
 import msocket.api.codecs.BasicCodecs
+import msocket.api.models.ServiceException
 
 object CommandServiceCodecs extends CommandServiceCodecs
 trait CommandServiceCodecs extends ParamCodecs with BasicCodecs {
@@ -30,5 +32,11 @@ trait CommandServiceCodecs extends ParamCodecs with BasicCodecs {
     @silent implicit lazy val subscribeCurrentStateCodec: Codec[SubscribeCurrentState] = deriveUnaryCodec
     deriveCodec
   }
+
+  implicit lazy val CommandServiceHttpMessageErrorType: ErrorType[CommandServiceHttpMessage] =
+    ErrorType.bind[CommandServiceHttpMessage, ServiceException]
+
+  implicit lazy val CommandServiceWebsocketMessage: ErrorType[CommandServiceWebsocketMessage] =
+    ErrorType.bind[CommandServiceWebsocketMessage, ServiceException]
 
 }
