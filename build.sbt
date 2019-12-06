@@ -101,7 +101,6 @@ lazy val `csw-admin` = project
     `csw-admin-server`,
     `csw-admin-api-jvm`,
     `csw-admin-api-js`,
-    `csw-admin-handlers`,
     `csw-admin-impl`
   )
 
@@ -145,16 +144,6 @@ lazy val `csw-admin-api-jvm` = `csw-admin-api`.jvm
   .enablePlugins(MaybeCoverage)
 
 lazy val `csw-admin-api-js` = `csw-admin-api`.js
-
-lazy val `csw-admin-handlers` = project
-  .in(file("csw-admin/csw-admin-handlers"))
-  .dependsOn(
-    `csw-admin-impl`
-  )
-  .enablePlugins(DeployApp, MaybeCoverage)
-  .settings(
-    libraryDependencies ++= Dependencies.AdminHandlers.value
-  )
 
 /* ================= Location Service ============== */
 
