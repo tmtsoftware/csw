@@ -123,21 +123,21 @@ object CommandResponse {
   /**
    * Tests a response to determine if it is a final command state
    *
-   * @param qr response for testing
+   * @param sr response for testing
    * @return true if it is final
    */
-  def isFinal(qr: SubmitResponse): Boolean = qr match {
+  def isFinal(sr: SubmitResponse): Boolean = sr match {
     case Started(_) => false
     case _          => true
   }
 
   /**
-   * Test a QueryResponse to determine if it is a positive response
+   * Test a response to determine if it is a positive response
    *
-   * @param qr response for testing
+   * @param sr response for testing
    * @return true if it is positive
    */
-  def isPositive(qr: SubmitResponse): Boolean = qr match {
+  def isPositive(sr: SubmitResponse): Boolean = sr match {
     case Completed(_, _) => true
     case _               => false
   }
@@ -156,18 +156,18 @@ object CommandResponse {
   /**
    * Tests a response to determine if it is a negative response
    *
-   * @param qr response for testing
+   * @param sr response for testing
    * @return true if it is negative
    */
-  def isNegative(qr: SubmitResponse): Boolean = !(isPositive(qr) || isIntermediate(qr))
+  def isNegative(sr: SubmitResponse): Boolean = !(isPositive(sr) || isIntermediate(sr))
 
   /**
    * Tests a response to determine if it is an intermediate response
    *
-   * @param qr response for testing
+   * @param sr response for testing
    * @return returns true if it is intermediate
    */
-  def isIntermediate(qr: SubmitResponse): Boolean = qr match {
+  def isIntermediate(sr: SubmitResponse): Boolean = sr match {
     case Started(_) => true
     case _          => false
   }

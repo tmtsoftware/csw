@@ -125,8 +125,8 @@ object MiniCRM {
    * ResponseList only has updates from Started commands. If it finds it in the responseList, that means that the
    * final response has been updated by the component. If it doesn't find it in the responseList, it looks in the
    * StartedList that contains all commands that have Started, but are still executing (i.e., no final response yet)
-   * When the input Id is matched, the QueryResponse is found and returned.
-   * If the runId is not in either list, CommandNotAvailable is returned -- QueryResponse.
+   * When the input Id is matched, the SubmitResponse is found and returned.
+   * If the runId is not in either list, Invalid SubmitResponse is returned with IdNotAvailableIssue.
    * @param startedList contains Started responses for Ids that have started, but not finished
    * @param responseList contains SubmitResponses that have been received from the destination component
    * @param runId the runId the query is interested in
