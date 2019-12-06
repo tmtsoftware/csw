@@ -128,7 +128,7 @@ lazy val `csw-admin-impl` = project
     `csw-framework`     % "test->test",
     `csw-config-server` % "test->test"
   )
-  .enablePlugins(DeployApp, MaybeCoverage)
+  .enablePlugins(DeployApp)
   .settings(
     libraryDependencies ++= Dependencies.AdminServer.value
   )
@@ -142,7 +142,7 @@ lazy val `csw-admin-api` = crossProject(JSPlatform, JVMPlatform)
   .settings(libraryDependencies ++= Dependencies.AdminApi.value)
 
 lazy val `csw-admin-api-jvm` = `csw-admin-api`.jvm
-  .enablePlugins(MaybeCoverage)
+  .enablePlugins()
 
 lazy val `csw-admin-api-js` = `csw-admin-api`.js
 
