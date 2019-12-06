@@ -48,6 +48,7 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-command-api`.js,
   `csw-location-models`.js,
   `csw-location-api`.js,
+  `csw-admin-api`.js,
   `csw-alarm-models`.js,
   `csw-config-models`.js,
   `csw-network-utils`,
