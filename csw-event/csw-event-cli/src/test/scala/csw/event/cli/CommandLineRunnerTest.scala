@@ -119,8 +119,8 @@ class CommandLineRunnerTest extends SeedData with Eventually with csw.params.cor
 
     // invalid event + 7 events published in previous step
     eventually(queue.size shouldBe 8)
-    queue should contain allElementsOf Seq(eventToSanitizedJson(Event.invalidEvent(eventKey))) ++ (1 to 5).map(
-      _ => expectedEventJson
+    queue should contain allElementsOf Seq(eventToSanitizedJson(Event.invalidEvent(eventKey))) ++ (1 to 5).map(_ =>
+      expectedEventJson
     )
   }
 

@@ -39,16 +39,15 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val componentActorName                                         = s"${compInfo.prefix}-${SupervisorBehavior.ComponentActorNameSuffix}"
     val supervisorBehaviorKit = BehaviorTestKit(
       Behaviors
-        .setup[SupervisorMessage](
-          ctx =>
-            new SupervisorBehavior(
-              ctx,
-              timerScheduler,
-              None,
-              new SampleComponentBehaviorFactory,
-              registrationFactory,
-              cswCtx.copy(compInfo)
-            )
+        .setup[SupervisorMessage](ctx =>
+          new SupervisorBehavior(
+            ctx,
+            timerScheduler,
+            None,
+            new SampleComponentBehaviorFactory,
+            registrationFactory,
+            cswCtx.copy(compInfo)
+          )
         )
     )
 

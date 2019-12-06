@@ -25,7 +25,8 @@ object Main extends App {
         println(
           "[ERROR] CLUSTER_SEEDS setting is not specified either as env variable or system property. Please check online documentation for this set-up."
         )
-      } else {
+      }
+      else {
         val wiring = ServerWiring.make(maybeClusterPort)
 
         import wiring._

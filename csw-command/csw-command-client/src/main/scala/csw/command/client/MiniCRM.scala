@@ -151,11 +151,10 @@ object MiniCRM {
    */
   private def updateWaiters(waiterList: WaiterList, response: SubmitResponse): WaiterList = {
     // Send final response to any waiters that match runId
-    waiterList.foreach(
-      w =>
-        if (w._1 == response.runId) {
-          w._2 ! response
-        }
+    waiterList.foreach(w =>
+      if (w._1 == response.runId) {
+        w._2 ! response
+      }
     )
     // Remove all waiters that match runId and return
     waiterList.remove(_._1 == response.runId)

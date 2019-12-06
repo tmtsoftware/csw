@@ -79,7 +79,8 @@ private[logging] class FileAppenderHelper(path: String, name: String, category: 
       val fileTimestamp = FileAppender.decideTimestampForFile(maybeTimestamp.get)
       fileSpanTimestamp = Some(fileTimestamp.plusDays(1L))
       s"$path/${name}_$fileTimestamp$catSuffix.log"
-    } else {
+    }
+    else {
       s"$path/$name$catSuffix.log"
     }
 
@@ -188,7 +189,8 @@ class FileAppender(system: ActorSystem[_], stdHeaders: JsObject) extends LogAppe
       val maybeTimestamp = if (rotateFlag) {
         val timestamp = baseMsg.getString(LoggingKeys.TIMESTAMP)
         Some(TMTDateTimeFormatter.parse(timestamp))
-      } else None
+      }
+      else None
 
       fileAppender.add(maybeTimestamp, msg.toString(), rotateFlag)
     }

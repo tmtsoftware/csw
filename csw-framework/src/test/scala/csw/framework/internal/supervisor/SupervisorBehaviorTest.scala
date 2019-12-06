@@ -109,16 +109,15 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
   private def createBehavior(timerScheduler: TimerScheduler[SupervisorMessage]): Behavior[ComponentMessage] = {
 
     Behaviors
-      .setup[SupervisorMessage](
-        ctx =>
-          new SupervisorBehavior(
-            ctx,
-            timerScheduler,
-            None,
-            new SampleComponentBehaviorFactory,
-            registrationFactory,
-            cswCtx.copy(hcdInfo)
-          )
+      .setup[SupervisorMessage](ctx =>
+        new SupervisorBehavior(
+          ctx,
+          timerScheduler,
+          None,
+          new SampleComponentBehaviorFactory,
+          registrationFactory,
+          cswCtx.copy(hcdInfo)
+        )
       )
       .narrow
   }

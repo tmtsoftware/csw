@@ -66,7 +66,8 @@ private[aas] class InstalledAppAuthAdapterImpl(
 
     if (disabled) {
       Some(AccessToken())
-    } else {
+    }
+    else {
       val mayBeAccessTokenVerification = maybeStore match {
         case Some(store) => store.getAccessTokenString.map(tokenVerifier.verifyAndDecode(_).block())
         case None        => Some(tokenVerifier.verifyAndDecode(keycloakInstalled.getTokenString).block())

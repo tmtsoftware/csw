@@ -108,7 +108,8 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
     LoggingState.doTime = true
     val timeActor = system.spawn(new TimeActor(timeActorDonePromise).behavior, name = "TimingActor")
     LoggingState.timeActorOption = Some(timeActor)
-  } else {
+  }
+  else {
     timeActorDonePromise.success(())
   }
 

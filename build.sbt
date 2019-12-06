@@ -10,7 +10,7 @@ docsParentDir in ThisBuild := "csw"
 gitCurrentRepo in ThisBuild := "https://github.com/tmtsoftware/csw"
 
 lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
-  `csw-admin-server`,
+  `csw-admin`,
   `csw-location`,
   `csw-config`,
   `csw-logging`,
@@ -94,10 +94,21 @@ lazy val `csw` = project
   )
 
 /* ================= Admin Project ============== */
+
+lazy val `csw-admin` = project
+  .in(file("csw-admin"))
+  .aggregate(
+    `csw-admin-server`,
+    `csw-admin-api-jvm`,
+    `csw-admin-api-js`,
+    `csw-admin-handlers`,
+    `csw-admin-impl`
+  )
+
 lazy val `csw-admin-server` = project
+  .in(file("csw-admin/csw-admin-server"))
   .dependsOn(
-    `csw-location-client`,
-    `csw-command-client`,
+    `csw-admin-impl`,
     `csw-commons`       % "compile->compile;test->test",
     `csw-framework`     % "test->test",
     `csw-config-server` % "test->test"
@@ -105,6 +116,44 @@ lazy val `csw-admin-server` = project
   .enablePlugins(DeployApp, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.AdminServer.value
+  )
+
+lazy val `csw-admin-impl` = project
+  .in(file("csw-admin/csw-admin-impl"))
+  .dependsOn(
+    `csw-location-client`,
+    `csw-command-client`,
+    `csw-admin-api-jvm`,
+    `csw-commons`       % "compile->compile;test->test",
+    `csw-framework`     % "test->test",
+    `csw-config-server` % "test->test"
+  )
+  .enablePlugins(DeployApp, MaybeCoverage)
+  .settings(
+    libraryDependencies ++= Dependencies.AdminServer.value
+  )
+
+lazy val `csw-admin-api` = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("csw-admin/csw-admin-api"))
+  .dependsOn(`csw-logging-models`, `csw-location-models`)
+  .enablePlugins(PublishBintray, GenJavadocPlugin)
+  .settings(fork := false)
+  .settings(libraryDependencies ++= Dependencies.AdminApi.value)
+
+lazy val `csw-admin-api-jvm` = `csw-admin-api`.jvm
+  .enablePlugins(MaybeCoverage)
+
+lazy val `csw-admin-api-js` = `csw-admin-api`.js
+
+lazy val `csw-admin-handlers` = project
+  .in(file("csw-admin/csw-admin-handlers"))
+  .dependsOn(
+    `csw-admin-impl`
+  )
+  .enablePlugins(DeployApp, MaybeCoverage)
+  .settings(
+    libraryDependencies ++= Dependencies.AdminHandlers.value
   )
 
 /* ================= Location Service ============== */

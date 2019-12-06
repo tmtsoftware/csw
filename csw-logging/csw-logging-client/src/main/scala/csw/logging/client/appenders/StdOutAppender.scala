@@ -61,20 +61,24 @@ class StdOutAppender(system: ActorSystem[_], stdHeaders: JsObject, logPrinter: A
       val msg = if (fullHeaders) stdHeaders ++ baseMsg else baseMsg
       val normalText = if (oneLine) {
         oneLine(baseMsg, level, maybeKind)
-      } else if (pretty) {
+      }
+      else if (pretty) {
         Json.prettyPrint(msg - LoggingKeys.CATEGORY)
-      } else {
+      }
+      else {
         (msg - LoggingKeys.CATEGORY).toString()
       }
 
       val finalText = if (color) {
         coloredText(level, normalText)
-      } else {
+      }
+      else {
         normalText
       }
       logPrinter(finalText)
 
-    } else if (summary) {
+    }
+    else if (summary) {
       val categoryCount = categories.getOrElse(category, 0) + 1
       categories += (category -> categoryCount)
     }
@@ -133,7 +137,8 @@ class StdOutAppender(system: ActorSystem[_], stdHeaders: JsObject, logPrinter: A
       val txt  = Json.prettyPrint(levs ++ cats ++ knds)
       val colorTxt = if (color) {
         s"${Console.BLUE}$txt${Console.RESET}"
-      } else {
+      }
+      else {
         txt
       }
       logPrinter(colorTxt)

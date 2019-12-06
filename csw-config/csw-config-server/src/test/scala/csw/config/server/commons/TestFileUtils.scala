@@ -28,7 +28,8 @@ class TestFileUtils(settings: Settings) {
         val file = new File(dir, filePath)
         if (file.isDirectory) {
           deleteDirectoryRecursively(file)
-        } else {
+        }
+        else {
           file.delete()
         }
       }

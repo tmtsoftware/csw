@@ -96,8 +96,8 @@ class CommandHttpIntegrationTests extends FrameworkIntegrationSuite {
     filterHcdCS.subscribeCurrentState(filterHCDStateProbe.ref ! _)
 
     // Subscribe to component's lifecycle state
-    filterAssemblyLocation2.foreach(
-      l => l.componentRef ! LifecycleStateSubscription(PubSub.Subscribe(assemblyLifecycleStateProbe.ref))
+    filterAssemblyLocation2.foreach(l =>
+      l.componentRef ! LifecycleStateSubscription(PubSub.Subscribe(assemblyLifecycleStateProbe.ref))
     )
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]

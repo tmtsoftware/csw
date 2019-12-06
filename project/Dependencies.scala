@@ -1,4 +1,4 @@
-import sbt._
+import sbt.{Def, _}
 
 object Dependencies {
 
@@ -13,6 +13,31 @@ object Dependencies {
       Libs.`scala-async`,
       Borer.`borer-compat-akka`.value,
       Libs.`scopt`,
+      Libs.`scalatest`.value % Test
+    )
+  )
+
+  val AdminImpl = Def.setting(
+    Seq(
+      Akka.`akka-actor-typed`,
+      Libs.`scalatest`.value % Test
+    )
+  )
+
+  val AdminApi = Def.setting(
+    Seq(
+      Borer.`borer-core`.value,
+      Borer.`borer-derivation`.value,
+      MSocket.`msocket-api`.value
+    )
+  )
+
+  val AdminHandlers = Def.setting(
+    Seq(
+      Akka.`akka-actor-typed`,
+      AkkaHttp.`akka-http`,
+      Libs.`scala-async`,
+      Borer.`borer-compat-akka`.value,
       Libs.`scalatest`.value % Test
     )
   )

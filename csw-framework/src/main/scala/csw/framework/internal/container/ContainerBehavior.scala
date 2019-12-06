@@ -135,7 +135,8 @@ private[framework] final class ContainerBehavior(
       if (supervisorInfos.isEmpty) {
         log.error(s"Failed to spawn supervisors for ComponentInfo's :[${containerInfo.components.mkString(", ")}]")
         ctx.system.terminate()
-      } else {
+      }
+      else {
         supervisors = supervisorInfos
         log.info(s"Container created following supervisors :[${supervisors.map(_.component.supervisor).mkString(",")}]")
         supervisors.foreach(supervisorInfo => ctx.watch(supervisorInfo.component.supervisor))

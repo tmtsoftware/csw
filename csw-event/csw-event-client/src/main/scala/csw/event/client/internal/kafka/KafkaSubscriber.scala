@@ -135,8 +135,7 @@ private[event] class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[S
   private def getLatestOffsets(eventKeys: Set[EventKey]): Future[Map[TopicPartition, Long]] = {
     val topicPartitions = eventKeys.map(e => new TopicPartition(e.key, 0)).toList
     // any interaction with kafka consumer needs special care to handle multi-threaded access
-    consumer.map(
-      consumer => this.synchronized(consumer.endOffsets(topicPartitions.asJava)).asScala.view.mapValues(_.toLong).toMap
+    consumer.map(consumer => this.synchronized(consumer.endOffsets(topicPartitions.asJava)).asScala.view.mapValues(_.toLong).toMap
     )
   }
 

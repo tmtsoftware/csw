@@ -10,7 +10,6 @@ import io.bullet.borer.{Decoder, Encoder, Json}
 
 import scala.collection.immutable.Seq
 
-object HttpCodecs extends HttpCodecs
 trait HttpCodecs {
 
   lazy val mediaTypes: Seq[MediaType.WithFixedCharset]     = List(`application/json`)
@@ -28,3 +27,5 @@ trait HttpCodecs {
       .compose(Json.encode(_).to[ByteString].result)
   }
 }
+
+object HttpCodecs extends HttpCodecs

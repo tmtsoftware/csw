@@ -132,7 +132,8 @@ class SecurityDirectives private[csw] (
             case Success(authorized) =>
               if (authorized) {
                 debug(s"authorization succeeded for '${accessToken.userOrClientName}' via a custom policy")
-              } else {
+              }
+              else {
                 warn(s"'${accessToken.userOrClientName}' failed custom policy authorization")
               }
             case Failure(exception) =>
