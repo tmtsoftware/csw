@@ -3,8 +3,7 @@ package csw.admin.impl
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.AskPattern.{Askable, _}
 import akka.util.Timeout
-import csw.admin.api.AdminService
-import csw.admin.api.AdminServiceError.UnresolvedAkkaLocation
+import csw.admin.api.{AdminService, UnresolvedAkkaLocationException}
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.{GetComponentLogMetadata, SetComponentLogLevel}
 import csw.location.api.scaladsl.LocationService
@@ -41,7 +40,7 @@ class AdminServiceImpl(locationService: LocationService)(implicit actorSystem: A
             }
             response
           })
-          .getOrElse[Future[LogMetadata]](throw UnresolvedAkkaLocation(componentName))
+          .getOrElse[Future[LogMetadata]](throw new UnresolvedAkkaLocationException(componentName))
       )
   }
 
@@ -63,7 +62,7 @@ class AdminServiceImpl(locationService: LocationService)(implicit actorSystem: A
               case _         => akkaLocation.componentRef ! SetComponentLogLevel(componentName, level)
             }
           })
-          .getOrElse[Unit](throw UnresolvedAkkaLocation(componentName))
+          .getOrElse[Unit](throw new UnresolvedAkkaLocationException(componentName))
       )
   }
 }
