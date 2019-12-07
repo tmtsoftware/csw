@@ -6,6 +6,7 @@ import akka.http.scaladsl.server.Route
 import csw.location.server.internal.{ActorRuntime, Settings}
 
 import scala.concurrent.Future
+import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 
 class LocationHttpService(locationRoutes: Route, actorRuntime: ActorRuntime, settings: Settings) {
 
@@ -13,7 +14,7 @@ class LocationHttpService(locationRoutes: Route, actorRuntime: ActorRuntime, set
 
   def start(): Future[Http.ServerBinding] = {
     Http().bindAndHandle(
-      handler = locationRoutes,
+      handler = cors()(locationRoutes),
       interface = "0.0.0.0",
       port = settings.httpPort
     )
