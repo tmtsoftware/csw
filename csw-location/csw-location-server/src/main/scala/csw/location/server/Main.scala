@@ -42,7 +42,8 @@ object Main extends App {
           ) { () =>
             locationBindingF.flatMap(_.terminate(30.seconds)).map(_ => Done)
           }
-        } catch {
+        }
+        catch {
           case NonFatal(ex) =>
             println(s"[ERROR] Failed to start location server.")
             ex.printStackTrace()

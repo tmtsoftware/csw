@@ -19,7 +19,8 @@ object Main extends App {
 
   try {
     command.foreach(_.run())
-  } finally {
+  }
+  finally {
     actorSystem.terminate()
   }
 }

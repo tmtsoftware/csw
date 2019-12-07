@@ -46,7 +46,8 @@ private[logging] class Slf4jAppender[E]() extends UnsynchronizedAppenderBase[E] 
         val ex =
           try {
             e.getThrowableProxy.asInstanceOf[ThrowableProxy].getThrowable
-          } catch {
+          }
+          catch {
             case ex: Any => NoLogException
           }
         val msg =

@@ -182,7 +182,8 @@ class DatabaseServiceFactory private[database] (actorSystem: ActorSystem[_], val
       val hikariConfig = new HikariConfig(toProperties(finalDataSourceConfig))
       log.info(s"Connecting to database using config :[$finalDataSourceConfig]")
       DSL.using(new HikariDataSource(hikariConfig), SQLDialect.POSTGRES)
-    } catch {
+    }
+    catch {
       case NonFatal(ex) =>
         val exception = DatabaseException(ex.getMessage, ex.getCause)
         log.error(exception.getMessage, ex = exception)

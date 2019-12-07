@@ -56,7 +56,8 @@ private[containercmd] class ContainerCmd(
         val actorRef = Await.result(createF(standalone, isLocal, inputFilePath, defaultConfig), 30.seconds)
         log.info(s"Component is successfully created with actor actorRef $actorRef")
         actorRef
-      } catch {
+      }
+      catch {
         case NonFatal(ex) =>
           log.error(s"${ex.getMessage}", ex = ex)
           shutdown()

@@ -54,7 +54,8 @@ private[logging] trait Timing {
       MessageHandler.timeStart(id, name, uid)
       try {
         body
-      } finally {
+      }
+      finally {
         MessageHandler.timeEnd(id, name, uid)
       }
     }
