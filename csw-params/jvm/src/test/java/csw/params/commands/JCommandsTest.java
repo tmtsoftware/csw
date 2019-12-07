@@ -34,7 +34,7 @@ public class JCommandsTest extends JUnitSuite {
     private final Parameter<Integer> epochIntParam = epochIntKey.set(44, 55);
 
     private final ObsId obsId = new ObsId("obsId");
-    private final Prefix prefix = new Prefix(WFOS, "red.detector");
+    private final Prefix prefix = new Prefix(WFOS(), "red.detector");
     private final CommandName commandName = new CommandName("move");
 
     private void assertOnCommandAPI(ParameterSetType<?> command) {
@@ -89,7 +89,7 @@ public class JCommandsTest extends JUnitSuite {
         //Assert.assertNotNull(setup.runId());
         Assert.assertEquals(Optional.of(obsId), setup.jMaybeObsId());
         Assert.assertEquals(prefix, setup.source());
-        Assert.assertEquals(WFOS, setup.source().subsystem());
+        Assert.assertEquals(WFOS(), setup.source().subsystem());
         Assert.assertEquals(commandName, setup.commandName());
 
         // complete API
@@ -120,7 +120,7 @@ public class JCommandsTest extends JUnitSuite {
         Assert.assertEquals(Optional.empty(), observe.jMaybeObsId());
         Assert.assertEquals(prefix, observe.source());
         Assert.assertEquals(commandName, observe.commandName());
-        Assert.assertEquals(WFOS, observe.source().subsystem());
+        Assert.assertEquals(WFOS(), observe.source().subsystem());
 
 
         // complete API
@@ -149,7 +149,7 @@ public class JCommandsTest extends JUnitSuite {
         Assert.assertEquals(obsId, wait.jMaybeObsId().orElseThrow());
         Assert.assertEquals(prefix, wait.source());
         Assert.assertEquals(commandName, wait.commandName());
-        Assert.assertEquals(WFOS, wait.source().subsystem());
+        Assert.assertEquals(WFOS(), wait.source().subsystem());
 
 
         // complete API

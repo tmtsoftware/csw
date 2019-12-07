@@ -17,7 +17,7 @@ import java.util.Set;
 
 public abstract class JavaCommandHandler {
 
-    private static final Prefix prefix = new Prefix(JSubsystem.WFOS, "red.detector");
+    private static final Prefix prefix = new Prefix(JSubsystem.WFOS(), "red.detector");
 
     private static final Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder");
     private static final Key<String> epochStringKey = JKeyType.StringKey().make("epoch");

@@ -88,7 +88,7 @@ public class JResultTest extends JUnitSuite {
         ObsId obsId = new ObsId("Obs001");
 
         //prefix
-        Prefix prefix = new Prefix(JSubsystem.WFOS, "prog.cloudcover");
+        Prefix prefix = new Prefix(JSubsystem.WFOS(), "prog.cloudcover");
 
         //result
         Result result = new Result().add(i1);
@@ -118,7 +118,7 @@ public class JResultTest extends JUnitSuite {
         ObsId obsId = new ObsId("Obs001");
 
         //prefix
-        Prefix prefix = new Prefix(JSubsystem.WFOS, "blue.filter");
+        Prefix prefix = new Prefix(JSubsystem.WFOS(), "blue.filter");
 
         //params
         Parameter<Integer> encParam1 = encoderKey.set(1);

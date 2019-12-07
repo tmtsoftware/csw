@@ -92,7 +92,7 @@ public class JCborTest extends JUnitSuite {
         Assert.assertEquals(param, parameterFromBytes);
 
         // ===== Test Event SERDE =====
-        Prefix source = new Prefix(JSubsystem.WFOS, "filter");
+        Prefix source = new Prefix(JSubsystem.WFOS(), "filter");
         EventName eventName = new EventName("move");
         SystemEvent originalEvent = new SystemEvent(source, eventName).add(param);
 
