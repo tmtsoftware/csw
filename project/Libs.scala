@@ -54,7 +54,7 @@ object Libs {
 }
 
 object Borer {
-  val Version = "1.1.0"
+  val Version = "1.2.1"
   val Org     = "io.bullet"
 
   val `borer-core`        = dep(Org %%% "borer-core"        % Version)
@@ -63,9 +63,10 @@ object Borer {
 }
 
 object Jackson {
-  val Version                = "2.10.1"
-  val `jackson-core`         = "com.fasterxml.jackson.core" % "jackson-core" % Version
-  val `jackson-databind`     = "com.fasterxml.jackson.core" % "jackson-databind" % Version
+  val Version = "2.10.1"
+
+  val `jackson-core`         = "com.fasterxml.jackson.core"   % "jackson-core"          % Version
+  val `jackson-databind`     = "com.fasterxml.jackson.core"   % "jackson-databind"      % Version
   val `jackson-module-scala` = "com.fasterxml.jackson.module" %% "jackson-module-scala" % Version
 }
 
@@ -90,31 +91,35 @@ object Akka {
 }
 
 object AkkaHttp {
-  val Version                = "10.1.11"
-  val `akka-http`            = "com.typesafe.akka" %% "akka-http" % Version //ApacheV2
-  val `akka-http-testkit`    = "com.typesafe.akka" %% "akka-http-testkit" % Version //ApacheV2
-  val `akka-http-cors`       = "ch.megard" %% "akka-http-cors" % "0.4.2"
+  val Version = "10.1.11"
+
+  val `akka-http`            = "com.typesafe.akka" %% "akka-http"            % Version //ApacheV2
+  val `akka-http-testkit`    = "com.typesafe.akka" %% "akka-http-testkit"    % Version //ApacheV2
+  val `akka-http-cors`       = "ch.megard"         %% "akka-http-cors"       % "0.4.2"
   val `akka-http-spray-json` = "com.typesafe.akka" %% "akka-http-spray-json" % Version
 }
 
 object Keycloak {
-  val Version                 = "8.0.0"
-  val `keycloak-adapter-core` = "org.keycloak" % "keycloak-adapter-core" % Version
-  val `keycloak-core`         = "org.keycloak" % "keycloak-core" % Version
+  val Version = "8.0.1"
+
+  val `keycloak-adapter-core` = "org.keycloak" % "keycloak-adapter-core"      % Version
+  val `keycloak-core`         = "org.keycloak" % "keycloak-core"              % Version
   val `keycloak-installed`    = "org.keycloak" % "keycloak-installed-adapter" % Version
-  val `keycloak-authz`        = "org.keycloak" % "keycloak-authz-client" % Version
-  val `keycloak-test-helper`  = "org.keycloak" % "keycloak-test-helper" % Version
+  val `keycloak-authz`        = "org.keycloak" % "keycloak-authz-client"      % Version
+  val `keycloak-test-helper`  = "org.keycloak" % "keycloak-test-helper"       % Version
 }
 
 object Jooq {
-  val Version        = "3.12.3"
-  val `jooq`         = "org.jooq" % "jooq" % Version
-  val `jooq-meta`    = "org.jooq" % "jooq-meta" % Version
+  val Version = "3.12.3"
+
+  val `jooq`         = "org.jooq" % "jooq"         % Version
+  val `jooq-meta`    = "org.jooq" % "jooq-meta"    % Version
   val `jooq-codegen` = "org.jooq" % "jooq-codegen" % Version
 }
 
 object MSocket {
-  val Version            = "a3f5b95"
+  val Version = "5d44eef"
+
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-impl-jvm` = "com.github.tmtsoftware.msocket" %% "msocket-impl-jvm" % Version
 }
