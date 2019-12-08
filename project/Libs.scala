@@ -25,7 +25,7 @@ object Libs {
   val `play-json`         = dep("com.typesafe.play" %%% "play-json"         % "2.8.0") //Apache 2.0
   val `enumeratum`        = dep("com.beachape"      %%% "enumeratum"        % "1.5.13") //MIT License
   val `scalajs-java-time` = dep("org.scala-js"      %%% "scalajs-java-time" % "0.2.6")
-  val `scalatest`         = dep("org.scalatest"     %%% "scalatest"         % "3.0.8") //Apache License 2.0
+  val `scalatest`         = dep("org.scalatest"     %%% "scalatest"         % "3.1.0") //Apache License 2.0
 
   val `jwt-core`          = "com.pauldijou"       %% "jwt-core"          % "4.2.0"
   val `lettuce`           = "io.lettuce"          % "lettuce-core"       % "5.2.1.RELEASE"
