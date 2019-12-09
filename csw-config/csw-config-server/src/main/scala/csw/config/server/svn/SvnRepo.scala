@@ -42,7 +42,8 @@ class SvnRepo(userName: String, settings: Settings, blockingIoDispatcher: Messag
       FSRepositoryFactory.setup()
       SVNRepositoryFactory.createLocalRepository(settings.repositoryFile, false, false)
       log.info(s"New Repository created at ${settings.svnUrl}")
-    } catch {
+    }
+    catch {
       // If the repo already exists, print stacktrace and continue to boot
       case ex: SVNException if ex.getErrorMessage.getErrorCode == SVNErrorCode.IO_ERROR =>
         log.error(s"Repository already exists at ${settings.svnUrl}", ex = ex)
@@ -176,7 +177,8 @@ class SvnRepo(userName: String, settings: Settings, blockingIoDispatcher: Messag
   private def checkPath(path: Path, kind: SVNNodeKind, revision: Long): Boolean = withSvn { svn =>
     try {
       svn.checkPath(path.toString, revision) == kind
-    } catch {
+    }
+    catch {
       case ex: SVNException if ex.getErrorMessage.getErrorCode == SVNErrorCode.FS_NO_SUCH_REVISION => false
     }
   }

@@ -30,7 +30,8 @@ class TromboneHcd() {
     try {
       val result = number1 / number2
       s"Result of computation is $result"
-    } catch {
+    }
+    catch {
       case ex: ArithmeticException => log.error(exceptionMsg, ex = ex); exceptionMsg
     }
   }

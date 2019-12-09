@@ -12,7 +12,7 @@ import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
-import msocket.api.models.Subscription
+import msocket.api.Subscription
 
 import scala.compat.java8.FunctionConverters.enrichAsScalaFromConsumer
 import scala.compat.java8.FutureConverters.FutureOps
@@ -45,7 +45,7 @@ private[command] class JCommandServiceImpl(commandService: CommandService) exten
   override def onewayAndMatch(controlCommand: ControlCommand, stateMatcher: StateMatcher): CompletableFuture[MatchingResponse] =
     commandService.onewayAndMatch(controlCommand, stateMatcher).toJava.toCompletableFuture
 
-  override def query(commandRunId: Id): CompletableFuture[QueryResponse] =
+  override def query(commandRunId: Id): CompletableFuture[SubmitResponse] =
     commandService.query(commandRunId).toJava.toCompletableFuture
 
   override def queryFinal(commandRunId: Id, timeout: Timeout): CompletableFuture[SubmitResponse] =

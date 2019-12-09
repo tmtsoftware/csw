@@ -24,7 +24,8 @@ object SourceFactory {
     def allOwners(s: c.Symbol): Seq[c.Symbol] =
       if (s == `NoSymbol`) {
         Seq()
-      } else {
+      }
+      else {
         s +: allOwners(s.owner)
       }
     val owners = allOwners(c.internal.enclosingOwner)

@@ -2,7 +2,8 @@ package csw.command.client
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
-import csw.params.commands.CommandResponse.{CommandNotAvailable, QueryResponse, Started, SubmitResponse}
+import csw.params.commands.CommandIssue.IdNotAvailableIssue
+import csw.params.commands.CommandResponse.{Invalid, Started, SubmitResponse}
 import csw.params.core.models.Id
 
 import scala.collection.mutable.ListBuffer
@@ -33,7 +34,7 @@ import scala.collection.mutable.ListBuffer
 object MiniCRM {
 
   type Responses            = List[SubmitResponse]
-  type Starters             = List[QueryResponse]
+  type Starters             = List[SubmitResponse]
   type Waiters              = List[(Id, ActorRef[SubmitResponse])]
   private type ResponseList = SizedList[SubmitResponse]
   private type StartedList  = SizedList[SubmitResponse]
@@ -44,7 +45,7 @@ object MiniCRM {
     case class AddResponse(commandResponse: SubmitResponse)             extends CRMMessage
     case class AddStarted(startedResponse: Started)                     extends CRMMessage
     case class QueryFinal(runId: Id, replyTo: ActorRef[SubmitResponse]) extends CRMMessage
-    case class Query(runId: Id, replyTo: ActorRef[QueryResponse])       extends CRMMessage
+    case class Query(runId: Id, replyTo: ActorRef[SubmitResponse])      extends CRMMessage
 
     case class Print(replyTo: ActorRef[String])                                    extends CRMMessage
     case class GetResponses(replyTo: ActorRef[List[SubmitResponse]])               extends CRMMessage
@@ -80,7 +81,7 @@ object MiniCRM {
               // Just add the new waiter to the WaiterList
               handle(startedList, responseList, augmentedWaiterList)
           }
-        case Query(runId, replyTo: ActorRef[QueryResponse]) =>
+        case Query(runId, replyTo: ActorRef[SubmitResponse]) =>
           // check for a response or started and return the first match
           replyTo ! getResponse(startedList, responseList, runId)
           Behaviors.same
@@ -124,20 +125,20 @@ object MiniCRM {
    * ResponseList only has updates from Started commands. If it finds it in the responseList, that means that the
    * final response has been updated by the component. If it doesn't find it in the responseList, it looks in the
    * StartedList that contains all commands that have Started, but are still executing (i.e., no final response yet)
-   * When the input Id is matched, the QueryResponse is found and returned.
-   * If the runId is not in either list, CommandNotAvailable is returned -- QueryResponse.
+   * When the input Id is matched, the SubmitResponse is found and returned.
+   * If the runId is not in either list, Invalid SubmitResponse is returned with IdNotAvailableIssue.
    * @param startedList contains Started responses for Ids that have started, but not finished
    * @param responseList contains SubmitResponses that have been received from the destination component
    * @param runId the runId the query is interested in
    * @return a QueryResponse that matches the Id or CommandNotAvailable
    */
-  private def getResponse(startedList: StartedList, responseList: ResponseList, runId: Id): QueryResponse =
+  private def getResponse(startedList: StartedList, responseList: ResponseList, runId: Id): SubmitResponse =
     responseList
       .query(_.runId == runId)
       .getOrElse(
         startedList
           .query(_.runId == runId)
-          .getOrElse(CommandNotAvailable(runId))
+          .getOrElse(Invalid(runId, IdNotAvailableIssue(runId.id)))
       )
 
   /**
@@ -150,11 +151,10 @@ object MiniCRM {
    */
   private def updateWaiters(waiterList: WaiterList, response: SubmitResponse): WaiterList = {
     // Send final response to any waiters that match runId
-    waiterList.foreach(
-      w =>
-        if (w._1 == response.runId) {
-          w._2 ! response
-        }
+    waiterList.foreach(w =>
+      if (w._1 == response.runId) {
+        w._2 ! response
+      }
     )
     // Remove all waiters that match runId and return
     waiterList.remove(_._1 == response.runId)

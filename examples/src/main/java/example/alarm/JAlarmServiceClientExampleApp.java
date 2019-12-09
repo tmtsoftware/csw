@@ -34,7 +34,7 @@ public class JAlarmServiceClientExampleApp {
     //#create-java-api
 
     //#setSeverity-java
-    private AlarmKey alarmKey = new AlarmKey(NFIRAOS, "trombone", "tromboneAxisLowLimitAlarm");
+    private AlarmKey alarmKey = new AlarmKey(NFIRAOS(), "trombone", "tromboneAxisLowLimitAlarm");
     Future<Done> doneF = jclientAPI1.setSeverity(alarmKey, JAlarmSeverity.Okay());
     //#setSeverity-java
 }

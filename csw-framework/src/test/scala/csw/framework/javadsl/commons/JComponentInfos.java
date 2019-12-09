@@ -14,7 +14,7 @@ public class JComponentInfos {
 
     public static ComponentInfo jHcdInfo = JComponentInfo.from(
             "JSampleHcd",
-            JSubsystem.WFOS,
+            JSubsystem.WFOS(),
             JComponentType.HCD(),
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
             LocationServiceUsage.JRegisterOnly(),
@@ -24,7 +24,7 @@ public class JComponentInfos {
 
     public static ComponentInfo jHcdInfoWithInitializeTimeout = JComponentInfo.from(
             "trombone",
-            JSubsystem.WFOS,
+            JSubsystem.WFOS(),
             JComponentType.HCD(),
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
             LocationServiceUsage.JRegisterOnly(),

@@ -34,18 +34,18 @@ public class JCommandsTest extends JUnitSuite {
     public void showUsageOfUtilityFunctions() {
         //#prefix
         //using constructor, supplying subsystem and prefix both
-        Prefix prefix1 = new Prefix(JSubsystem.NFIRAOS, "ncc.trombone");
+        Prefix prefix1 = new Prefix(JSubsystem.NFIRAOS(), "ncc.trombone");
 
         //just by supplying prefix
-        Prefix prefix2 = new Prefix(JSubsystem.TCS, "mobie.blue.filter");
+        Prefix prefix2 = new Prefix(JSubsystem.TCS(), "mobie.blue.filter");
 
         //invalid prefix string which does not contain valid subsystem in the beginning will throw an exception,
         // Prefix badPrefix = new Prefix("abcdefgh");
         //#prefix
 
         //validations
-        Assert.assertSame(prefix1.subsystem(), JSubsystem.NFIRAOS);
-        Assert.assertSame(prefix2.subsystem(), JSubsystem.TCS);
+        Assert.assertSame(prefix1.subsystem(), JSubsystem.NFIRAOS());
+        Assert.assertSame(prefix2.subsystem(), JSubsystem.TCS());
     }
 
     @Test
@@ -59,7 +59,7 @@ public class JCommandsTest extends JUnitSuite {
         Key<Float> k4 = JKeyType.FloatKey().make("correction");
 
         //prefix
-        Prefix prefix = new Prefix(JSubsystem.WFOS, "red.detector");
+        Prefix prefix = new Prefix(JSubsystem.WFOS(), "red.detector");
 
         //parameters
         Parameter<Integer> i1 = k1.set(22);
@@ -76,7 +76,7 @@ public class JCommandsTest extends JUnitSuite {
         Optional<Parameter<Integer>> optK2Bad = sc1.jGet(k2bad); //absent
 
         //add more than one parameters, using madd
-        Setup sc2 = sc1.madd(k3.set(1, 2, 3, 4).withUnits(JUnits.day), k4.set(1.0f, 2.0f));
+        Setup sc2 = sc1.madd(k3.set(1, 2, 3, 4).withUnits(JUnits.day()), k4.set(1.0f, 2.0f));
         int paramSize = sc2.size();
 
         //add binary payload
@@ -118,7 +118,7 @@ public class JCommandsTest extends JUnitSuite {
         Key<UTCTime> k4 = JKeyType.UTCTimeKey().make("creation-time");
 
         //prefix
-        Prefix prefix = new Prefix(JSubsystem.WFOS, "red.detector");
+        Prefix prefix = new Prefix(JSubsystem.WFOS(), "red.detector");
 
         //parameters
         Boolean[] boolArray = {true, false, true, false};
@@ -136,7 +136,7 @@ public class JCommandsTest extends JUnitSuite {
         Optional<Parameter<ArrayData<Float>>> k2BadParam = oc1.jGet(k2bad.keyName(), JKeyType.FloatArrayKey());
 
         //add more than one parameters, using madd
-        Observe oc2 = oc1.madd(k3.set(1, 2, 3, 4).withUnits(JUnits.day), k4.set(UTCTime.now()));
+        Observe oc2 = oc1.madd(k3.set(1, 2, 3, 4).withUnits(JUnits.day()), k4.set(UTCTime.now()));
         int paramSize = oc2.size();
 
         //update existing key with set
@@ -170,7 +170,7 @@ public class JCommandsTest extends JUnitSuite {
         Key<UTCTime> k4 = JKeyType.UTCTimeKey().make("creation-time");
 
         //prefix
-        Prefix prefix = new Prefix(JSubsystem.WFOS, "red.detector");
+        Prefix prefix = new Prefix(JSubsystem.WFOS(), "red.detector");
 
         //parameters
         Boolean[] boolArray = {true, false, true, false};
@@ -188,7 +188,7 @@ public class JCommandsTest extends JUnitSuite {
         Optional<Parameter<ArrayData<Float>>> k2BadParam = wc1.jGet("absentKeyHere", JKeyType.FloatArrayKey());
 
         //add more than one parameters, using madd
-        Wait wc2 = wc1.madd(k3.set(1, 2, 3, 4).withUnits(JUnits.day), k4.set(UTCTime.now()));
+        Wait wc2 = wc1.madd(k3.set(1, 2, 3, 4).withUnits(JUnits.day()), k4.set(UTCTime.now()));
         int paramSize = wc2.size();
 
         //update existing key with set
@@ -224,7 +224,7 @@ public class JCommandsTest extends JUnitSuite {
         //parameter
         Parameter<MatrixData<Double>> i1 = k1.set(m1);
 
-        Prefix prefix = new Prefix(JSubsystem.WFOS, "blue.filter");
+        Prefix prefix = new Prefix(JSubsystem.WFOS(), "blue.filter");
 
         //commands
         Setup sc = new Setup(prefix, new CommandName("move"), Optional.of(obsId)).add(i1);
@@ -259,7 +259,7 @@ public class JCommandsTest extends JUnitSuite {
         Key<Integer> miscKey = JKeyType.IntKey().make("misc.");
 
         //prefix
-        Prefix prefix = new Prefix(JSubsystem.WFOS, "blue.filter");
+        Prefix prefix = new Prefix(JSubsystem.WFOS(), "blue.filter");
 
         //params
         Parameter<Integer> encParam1 = encoderKey.set(1);
@@ -302,7 +302,7 @@ public class JCommandsTest extends JUnitSuite {
 /*
     @Test
     public void showCloneCommandExample() {
-        Prefix prefix = new Prefix(csw.prefix.javadsl.JSubsystem.WFOS, "blue.filter");
+        Prefix prefix = new Prefix(JSubsystem.WFOS(), "blue.filter");
         Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder");
         Parameter<Integer> encoderParam = encoderIntKey.set(22, 33);
         CommandName commandName = new CommandName("move");

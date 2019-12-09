@@ -95,7 +95,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
       enterBarrier("member-re-registered")
       testProbe.expectMsgType[LocationUpdated](5.seconds)
 
-      killSwitch.shutdown()
+      killSwitch.cancel()
     }
 
     enterBarrier("after-2")

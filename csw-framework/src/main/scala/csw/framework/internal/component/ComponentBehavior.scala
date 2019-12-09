@@ -61,7 +61,8 @@ private[framework] object ComponentBehavior {
           try {
             log.info("Invoking lifecycle handler's onShutdown hook")
             Await.result(lifecycleHandlers.onShutdown(), shutdownTimeout)
-          } catch {
+          }
+          catch {
             case NonFatal(throwable) => log.error(throwable.getMessage, ex = throwable)
           }
           Behaviors.same
@@ -94,11 +95,9 @@ private[framework] object ComponentBehavior {
             lifecycleState = ComponentLifecycleState.Initialized
             // track all connections in component info for location updates
             if (componentInfo.locationServiceUsage == RegisterAndTrackServices) {
-              componentInfo.connections.foreach(
-                connection => {
-                  locationService.subscribe(connection, trackingEvent => ctx.self ! TrackingEventReceived(trackingEvent))
-                }
-              )
+              componentInfo.connections.foreach(connection => {
+                locationService.subscribe(connection, trackingEvent => ctx.self ! TrackingEventReceived(trackingEvent))
+              })
             }
             lifecycleState = ComponentLifecycleState.Running
             lifecycleHandlers.isOnline = true

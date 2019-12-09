@@ -81,7 +81,8 @@ case class HttpCommandService(
         if (response.status == StatusCodes.OK) {
           val bs = await(concatByteStrings(response.entity.dataBytes))
           Json.decode(bs.toArray).to[CommandResponse].value
-        } else {
+        }
+        else {
           // Server error: Return error with generated runId
           val s = s"Error response from ${connection.prefix}: $response"
           method match {
@@ -202,7 +203,8 @@ case class HttpCommandService(
         if (response.status == StatusCodes.OK) {
           val bs = await(concatByteStrings(response.entity.dataBytes))
           Json.decode(bs.toArray).to[SubmitResponse].value
-        } else {
+        }
+        else {
           // Server error: Return error with generated runId
           Error(commandRunId, s"Error response from ${connection.prefix}: $response")
         }

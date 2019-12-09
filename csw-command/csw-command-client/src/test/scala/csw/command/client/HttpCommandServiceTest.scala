@@ -1,5 +1,6 @@
 package csw.command.client
 
+import akka.actor
 import akka.actor.typed
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.javadsl.Behaviors
@@ -8,7 +9,6 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives.{entity, _}
 import akka.http.scaladsl.server.Route
 import akka.util.Timeout
-import csw.location.client.HttpCodecs
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.models.Connection.HttpConnection
 import csw.location.models.{ComponentId, ComponentType, HttpRegistration}
@@ -32,10 +32,10 @@ import scala.concurrent.{ExecutionContext, Future}
 //noinspection ScalaStyle
 class HttpCommandServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with HTTPLocationService {
 
-  val typedSystem: typed.ActorSystem[_] = ActorSystem(Behaviors.empty, "HttpCommandServiceTest")
-  implicit val classicSystem            = typedSystem.toClassic
-  implicit val ec: ExecutionContext     = typedSystem.executionContext
-  implicit val timeout: Timeout         = Timeout(5.seconds)
+  val typedSystem: typed.ActorSystem[_]         = ActorSystem(Behaviors.empty, "HttpCommandServiceTest")
+  implicit val classicSystem: actor.ActorSystem = typedSystem.toClassic
+  implicit val ec: ExecutionContext             = typedSystem.executionContext
+  implicit val timeout: Timeout                 = Timeout(5.seconds)
 
   private val locationService = HttpLocationServiceFactory.makeLocalClient(typedSystem)
   private val testCompName    = "csw.testComponent"

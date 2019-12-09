@@ -48,7 +48,8 @@ class LocationAgent(prefixes: List[Prefix], command: Command, wiring: Wiring) {
       unregisterOnTermination(results)
 
       process
-    } catch {
+    }
+    catch {
       case NonFatal(ex) => shutdown(); throw ex
     }
 

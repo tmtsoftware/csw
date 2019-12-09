@@ -17,7 +17,8 @@ private[csw] object BlockingUtils {
     def loop(): Boolean =
       if (predicate || now > stop) {
         predicate
-      } else {
+      }
+      else {
         Thread.sleep(100)
         loop()
       }

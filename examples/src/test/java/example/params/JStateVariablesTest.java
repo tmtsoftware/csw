@@ -32,7 +32,7 @@ public class JStateVariablesTest extends JUnitSuite {
     public void showUsageOfDemandState() {
         //#demandstate
         //prefix
-        Prefix prefix = new Prefix(JSubsystem.WFOS, "prog.cloudcover");
+        Prefix prefix = new Prefix(JSubsystem.WFOS(), "prog.cloudcover");
 
         //keys
         Key<Character> charKey = JKeyType.CharKey().make("charKey");
@@ -46,8 +46,8 @@ public class JStateVariablesTest extends JUnitSuite {
         ObsId obsId = new ObsId("Obs001");
 
         //parameters
-        Parameter<Character> charParam = charKey.set('A', 'B', 'C').withUnits(NoUnits);
-        Parameter<Integer> intParam = intKey.set(1, 2, 3).withUnits(meter);
+        Parameter<Character> charParam = charKey.set('A', 'B', 'C').withUnits(NoUnits());
+        Parameter<Integer> intParam = intKey.set(1, 2, 3).withUnits(meter());
         Parameter<Boolean> booleanParam = booleanKey.set(true, false);
         Parameter<UTCTime> timestamp = utcTimeKey.set(UTCTime.now());
 
@@ -94,7 +94,7 @@ public class JStateVariablesTest extends JUnitSuite {
     public void showUsageOfCurrentState() {
         //#currentstate
         //prefix
-        Prefix prefix = new Prefix(JSubsystem.WFOS, "prog.cloudcover");
+        Prefix prefix = new Prefix(JSubsystem.WFOS(), "prog.cloudcover");
 
         //keys
         Key<Character> charKey = JKeyType.CharKey().make("charKey");
@@ -108,8 +108,8 @@ public class JStateVariablesTest extends JUnitSuite {
         ObsId obsId = new ObsId("Obs001");
 
         //parameters
-        Parameter<Character> charParam = charKey.set('A', 'B', 'C').withUnits(NoUnits);
-        Parameter<Integer> intParam = intKey.set(1, 2, 3).withUnits(meter);
+        Parameter<Character> charParam = charKey.set('A', 'B', 'C').withUnits(NoUnits());
+        Parameter<Integer> intParam = intKey.set(1, 2, 3).withUnits(meter());
         Parameter<Boolean> booleanParam = booleanKey.set(true, false);
         Parameter<UTCTime> timestamp = timestampKey.set(UTCTime.now());
 
@@ -166,8 +166,8 @@ public class JStateVariablesTest extends JUnitSuite {
         Parameter<MatrixData<Double>> i1 = k1.set(m1);
 
         //state variables
-        DemandState ds = new DemandState(new Prefix(JSubsystem.WFOS, "blue.filter"), new StateName("testStateName")).add(i1);
-        CurrentState cs = new CurrentState(new Prefix(JSubsystem.WFOS, "blue.filter"), new StateName("testStateName")).add(i1);
+        DemandState ds = new DemandState(new Prefix(JSubsystem.WFOS(), "blue.filter"), new StateName("testStateName")).add(i1);
+        CurrentState cs = new CurrentState(new Prefix(JSubsystem.WFOS(), "blue.filter"), new StateName("testStateName")).add(i1);
 
         //json support - write
         JsValue dsJson = JavaJsonSupport.writeStateVariable(ds);
@@ -199,7 +199,7 @@ public class JStateVariablesTest extends JUnitSuite {
         Key<Integer> miscKey = JKeyType.IntKey().make("misc.");
 
         //prefix
-        Prefix prefix = new Prefix(JSubsystem.WFOS, "blue.filter");
+        Prefix prefix = new Prefix(JSubsystem.WFOS(), "blue.filter");
 
         //params
         Parameter<Integer> encParam1 = encoderKey.set(1);

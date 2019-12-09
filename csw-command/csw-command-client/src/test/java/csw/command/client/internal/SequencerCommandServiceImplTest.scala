@@ -7,6 +7,7 @@ import csw.command.client.messages.sequencer.SequencerMsg.{Query, QueryFinal, Su
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.params.commands.CommandIssue.IdNotAvailableIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, Sequence, Setup}
 import csw.params.core.models.Id
@@ -29,7 +30,7 @@ class SequencerCommandServiceImplTest
     val queryId                            = Id("queryId")
     val submitResponse: SubmitResponse     = Started(Id())
     val queryFinalResponse: SubmitResponse = Error(queryFinalId, "Failed")
-    val queryResponse: QueryResponse       = CommandNotAvailable(queryId)
+    val queryResponse: SubmitResponse      = Invalid(queryId, IdNotAvailableIssue(queryId.id))
 
     val sequencer = spawn(Behaviors.receiveMessage[SequencerMsg] {
       case SubmitSequence(`sequence`, replyTo) =>

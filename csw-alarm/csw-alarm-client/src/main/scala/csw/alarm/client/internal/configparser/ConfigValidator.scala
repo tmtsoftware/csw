@@ -64,7 +64,8 @@ private[client] object ConfigValidator {
       val processingReport = jsonSchema.validate(jsonInput, true)
       if (processingReport.isSuccess) Success
       else Failure(processingReport.asScala.map(formatMsg(_, source)).toList)
-    } catch {
+    }
+    catch {
       case e: Exception =>
         e.printStackTrace()
         Failure(List(s"fatal: ${e.toString}"))

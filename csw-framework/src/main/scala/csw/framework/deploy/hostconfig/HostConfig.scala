@@ -56,11 +56,13 @@ private[hostconfig] class HostConfig(name: String, startLogging: Boolean = false
       val processes = bootstrapContainers(containerScript, bootstrapInfo)
       val pids      = processes.map(_.pid())
       log.info(s"Started processes with following PID's: ${pids.mkString("[", ", ", "]")}")
-    } catch {
+    }
+    catch {
       case NonFatal(ex) =>
         log.error(s"${ex.getMessage}", ex = ex)
         throw ex
-    } finally {
+    }
+    finally {
       log.info("Exiting host config application.")
       // once all the processes are started for each container,
       // host applications actor system is no longer needed

@@ -26,7 +26,8 @@ class BlockingUtilsTest extends FunSuite with Matchers with BeforeAndAfterAll wi
       if (replicaCountF.isCompleted) replicaCountF.value match {
         case Some(Success(v)) => v
         case _                => -1
-      } else -1
+      }
+      else -1
 
     def predicate = replicaCount == upMembers
 

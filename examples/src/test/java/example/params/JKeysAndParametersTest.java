@@ -38,14 +38,14 @@ public class JKeysAndParametersTest extends JUnitSuite {
 
         //associating units
         String[] weekDays = {"Sunday", "Monday", "Tuesday"};
-        Parameter<String> paramWithUnits1 = k3.set(weekDays, JUnits.day);
-        Parameter<String> paramWithUnits2 = k3.set(weekDays).withUnits(JUnits.day);
+        Parameter<String> paramWithUnits1 = k3.set(weekDays, JUnits.day());
+        Parameter<String> paramWithUnits2 = k3.set(weekDays).withUnits(JUnits.day());
 
-        //deault unit is NoUnits
-        boolean hasDefaultUnit = booleanParam.units() == JUnits.NoUnits; //true
+        //deault unit is NoUnits()
+        boolean hasDefaultUnit = booleanParam.units() == JUnits.NoUnits(); //true
 
         //set units explicitly on an existing Parameter
-        Parameter<Short> paramWithUnits3 = paramWithManyShorts1.withUnits(JUnits.meter);
+        Parameter<Short> paramWithUnits3 = paramWithManyShorts1.withUnits(JUnits.meter());
 
         //retrieve values from Parameter
         Short[] allValues = (Short[]) paramWithManyShorts1.values();
@@ -60,9 +60,9 @@ public class JKeysAndParametersTest extends JUnitSuite {
         Assert.assertArrayEquals(shortArray, (Short[]) paramWithManyShorts2.values());
         Assert.assertArrayEquals(weekDays, (String[]) paramWithUnits1.values());
         Assert.assertArrayEquals(weekDays, (String[]) paramWithUnits2.values());
-        Assert.assertEquals(JUnits.day, paramWithUnits1.units());
-        Assert.assertEquals(JUnits.day, paramWithUnits2.units());
-        Assert.assertEquals(JUnits.meter, paramWithUnits3.units());
+        Assert.assertEquals(JUnits.day(), paramWithUnits1.units());
+        Assert.assertEquals(JUnits.day(), paramWithUnits2.units());
+        Assert.assertEquals(JUnits.meter(), paramWithUnits3.units());
         Assert.assertEquals(1, (short) head);
     }
 
@@ -78,13 +78,13 @@ public class JKeysAndParametersTest extends JUnitSuite {
 
         //Store some values using helper method in ArrayData
         Parameter<ArrayData<Double>> p1 = filterKey.set(ArrayData.fromJavaArray(arr1), ArrayData.fromJavaArray(arr2));
-        Parameter<ArrayData<Double>> p2 = filterKey.set(ArrayData.fromJavaArray(arr2)).withUnits(JUnits.liter);
+        Parameter<ArrayData<Double>> p2 = filterKey.set(ArrayData.fromJavaArray(arr2)).withUnits(JUnits.liter());
 
         //add units to existing parameters
-        Parameter<ArrayData<Double>> p1AsCount = p1.withUnits(JUnits.count);
+        Parameter<ArrayData<Double>> p1AsCount = p1.withUnits(JUnits.count());
 
-        //default unit is NoUnits
-        boolean bDefaultUnit = JUnits.NoUnits == p1.units();
+        //default unit is NoUnits()
+        boolean bDefaultUnit = JUnits.NoUnits() == p1.units();
 
         //retrieving values
         List<Double> head = p1.head().jValues();
@@ -93,9 +93,9 @@ public class JKeysAndParametersTest extends JUnitSuite {
         //#arrays
 
         //validations
-        Assert.assertEquals(JUnits.NoUnits, p1.units());
-        Assert.assertEquals(JUnits.liter, p2.units());
-        Assert.assertEquals(JUnits.count, p1AsCount.units());
+        Assert.assertEquals(JUnits.NoUnits(), p1.units());
+        Assert.assertEquals(JUnits.liter(), p2.units());
+        Assert.assertEquals(JUnits.count(), p1AsCount.units());
         Assert.assertTrue(bDefaultUnit);
         Assert.assertEquals(2, listOfArrayData.size());
         Assert.assertArrayEquals(arr1, (Double[]) listOfArrayData.get(0).values());
@@ -120,13 +120,13 @@ public class JKeysAndParametersTest extends JUnitSuite {
                 MatrixData.fromJavaArrays(Byte.class, m2));
         Parameter<MatrixData<Byte>> p2 = encoderKey.set(
                 MatrixData.fromJavaArrays(Byte.class, m2)
-        ).withUnits(JUnits.liter);
+        ).withUnits(JUnits.liter());
 
         //add units to existing parameters
-        Parameter<MatrixData<Byte>> p1AsLiter = p1.withUnits(JUnits.liter);
+        Parameter<MatrixData<Byte>> p1AsLiter = p1.withUnits(JUnits.liter());
 
-        //default unit is NoUnits
-        boolean bDefaultUnit = JUnits.NoUnits == p1.units();
+        //default unit is NoUnits()
+        boolean bDefaultUnit = JUnits.NoUnits() == p1.units();
 
         //retrieving values
         MatrixData<Byte> head = p1.head();
@@ -136,9 +136,9 @@ public class JKeysAndParametersTest extends JUnitSuite {
         //#matrices
 
         //validations
-        Assert.assertEquals(JUnits.NoUnits, p1.units());
-        Assert.assertEquals(JUnits.liter, p2.units());
-        Assert.assertEquals(JUnits.liter, p1AsLiter.units());
+        Assert.assertEquals(JUnits.NoUnits(), p1.units());
+        Assert.assertEquals(JUnits.liter(), p2.units());
+        Assert.assertEquals(JUnits.liter(), p1AsLiter.units());
         Assert.assertTrue(bDefaultUnit);
         Assert.assertEquals(2, matrixData1.size());
         Assert.assertArrayEquals(m1, (Byte[][]) matrixData1.get(0).values());
@@ -162,14 +162,14 @@ public class JKeysAndParametersTest extends JUnitSuite {
                         new Choice("a")));
 
         //store values
-        Parameter<Choice> p1 = choice1Key.set(new Choice("A")).withUnits(JUnits.foot);
+        Parameter<Choice> p1 = choice1Key.set(new Choice("A")).withUnits(JUnits.foot());
         Parameter<Choice> p2 = choice2Key.set(new Choice("c"));
 
         //add units
-        Parameter<Choice> paramWithFoot = p1.withUnits(JUnits.foot);
+        Parameter<Choice> paramWithFoot = p1.withUnits(JUnits.foot());
 
-        //default unit is NoUnits
-        boolean bDefaultUnit = JUnits.NoUnits == p2.units();
+        //default unit is NoUnits()
+        boolean bDefaultUnit = JUnits.NoUnits() == p2.units();
 
         //retrieving values
         Choice head = p1.head();
@@ -177,9 +177,9 @@ public class JKeysAndParametersTest extends JUnitSuite {
         //#choice
 
         //validations
-        Assert.assertEquals(JUnits.foot, p1.units());
-        Assert.assertEquals(JUnits.NoUnits, p2.units());
-        Assert.assertEquals(JUnits.foot, paramWithFoot.units());
+        Assert.assertEquals(JUnits.foot(), p1.units());
+        Assert.assertEquals(JUnits.NoUnits(), p2.units());
+        Assert.assertEquals(JUnits.foot(), paramWithFoot.units());
         Assert.assertTrue(bDefaultUnit);
         Assert.assertEquals("A", head.name());
         Assert.assertEquals(values, Arrays.asList(new Choice("c")));
@@ -197,13 +197,13 @@ public class JKeysAndParametersTest extends JUnitSuite {
 
         //store values
         Parameter<RaDec> p1 = raDecKey.set(raDec1);
-        Parameter<RaDec> p2 = raDecKey.set(raDec1, raDec2).withUnits(JUnits.degree);
+        Parameter<RaDec> p2 = raDecKey.set(raDec1, raDec2).withUnits(JUnits.degree());
 
         //add units
-        Parameter<RaDec> paramWithDegree = p1.withUnits(JUnits.degree);
+        Parameter<RaDec> paramWithDegree = p1.withUnits(JUnits.degree());
 
-        //default unit is NoUnits
-        boolean bDefaultUnit = JUnits.NoUnits == p1.units();
+        //default unit is NoUnits()
+        boolean bDefaultUnit = JUnits.NoUnits() == p1.units();
 
         //retrieving values
         RaDec head = p1.head();
@@ -211,9 +211,9 @@ public class JKeysAndParametersTest extends JUnitSuite {
         //#radec
 
         //validations
-        Assert.assertEquals(JUnits.NoUnits, p1.units());
-        Assert.assertEquals(JUnits.degree, p2.units());
-        Assert.assertEquals(JUnits.degree, paramWithDegree.units());
+        Assert.assertEquals(JUnits.NoUnits(), p1.units());
+        Assert.assertEquals(JUnits.degree(), p2.units());
+        Assert.assertEquals(JUnits.degree(), paramWithDegree.units());
         Assert.assertTrue(bDefaultUnit);
         Assert.assertEquals(raDec1, head);
         Assert.assertEquals(values, Arrays.asList(raDec1, raDec2));
@@ -283,10 +283,10 @@ public class JKeysAndParametersTest extends JUnitSuite {
         Parameter<Struct> p2 = skey.set(struct1, struct2);
 
         //add units
-        Parameter<Struct> paramWithLightYear = p1.withUnits(JUnits.lightyear);
+        Parameter<Struct> paramWithLightYear = p1.withUnits(JUnits.lightyear());
 
-        //default unit is NoUnits
-        boolean bDefaultUnit = JUnits.NoUnits == p1.units();
+        //default unit is NoUnits()
+        boolean bDefaultUnit = JUnits.NoUnits() == p1.units();
 
         //retrieving values
         Struct head = p1.head();
@@ -312,7 +312,7 @@ public class JKeysAndParametersTest extends JUnitSuite {
         //validations
         Assert.assertTrue(bDefaultUnit);
         Assert.assertEquals(struct1, head);
-        Assert.assertEquals(JUnits.lightyear, paramWithLightYear.units());
+        Assert.assertEquals(JUnits.lightyear(), paramWithLightYear.units());
         Assert.assertEquals(struct1.parameter(dec), secondKey.orElseThrow());
         Assert.assertEquals(struct1.parameter(epoch), thirdKey.orElseThrow());
         Assert.assertEquals(expectedMissingKeys, missingKeySet);
@@ -331,9 +331,9 @@ public class JKeysAndParametersTest extends JUnitSuite {
         Key<Short> k2 = JKeyType.ShortKey().make("RandomKeyName");
         Key<String> k3 = JKeyType.StringKey().make(s1);
 
-        //storing a single value, default unit is NoUnits
+        //storing a single value, default unit is NoUnits()
         Parameter<Boolean> bParam = k1.set(true);
-        boolean bDefaultUnitSet = bParam.units() == JUnits.NoUnits; //true
+        boolean bDefaultUnitSet = bParam.units() == JUnits.NoUnits(); //true
 
         //default unit for TimestampKey
         Parameter<UTCTime> tParam = JKeyType
@@ -354,18 +354,18 @@ public class JKeysAndParametersTest extends JUnitSuite {
         String[] weekDays = {"Sunday", "Monday", "Tuesday"};
 
         //associating units via set
-        Parameter<String> paramWithUnits1 = k3.set(weekDays, JUnits.day);
+        Parameter<String> paramWithUnits1 = k3.set(weekDays, JUnits.day());
         //associating units via withUnits
-        Parameter<String> paramWithUnits2 = k3.set(weekDays).withUnits(JUnits.day);
+        Parameter<String> paramWithUnits2 = k3.set(weekDays).withUnits(JUnits.day());
         //change existing unit
-        Parameter<Short> paramWithUnits3 = paramOfShorts.withUnits(JUnits.meter);
+        Parameter<Short> paramWithUnits3 = paramOfShorts.withUnits(JUnits.meter());
         //#units
 
         //validations
         Assert.assertTrue(bDefaultUnitSet);
-        Assert.assertSame(defaultTimeUnit, JUnits.second);
-        Assert.assertSame(paramWithUnits1.units(), JUnits.day);
-        Assert.assertSame(paramWithUnits2.units(), JUnits.day);
-        Assert.assertSame(paramWithUnits3.units(), JUnits.meter);
+        Assert.assertSame(defaultTimeUnit, JUnits.second());
+        Assert.assertSame(paramWithUnits1.units(), JUnits.day());
+        Assert.assertSame(paramWithUnits2.units(), JUnits.day());
+        Assert.assertSame(paramWithUnits3.units(), JUnits.meter());
     }
 }

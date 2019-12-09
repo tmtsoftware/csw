@@ -140,18 +140,6 @@ sealed trait CommonMessage extends ComponentCommonMessage with ContainerCommonMe
 object SupervisorContainerCommonMessages {
 
   /**
-   * Represents a shutdown message for a component. When received, component takes necessary clean up action and unregisters
-   * itself with location service. If the component is a container or run as a standalone process, then shutdown will also
-   * kill the jvm process it is running in.
-   */
-  case object Shutdown extends CommonMessage with RemoteMsg
-
-  /**
-   * Represents a restart message for a component
-   */
-  case object Restart extends CommonMessage with RemoteMsg
-
-  /**
    * A Java helper that represents a message for a component. When received, component takes necessary clean up action and unregisters
    * itself with location service. If the component is a container or run as a standalone process, then shutdown will also
    * kill the jvm process it is running in.
@@ -162,6 +150,18 @@ object SupervisorContainerCommonMessages {
    * A Java helper that represents a restart message for a component
    */
   def jRestart(): CommonMessage = Restart
+
+  /**
+   * Represents a shutdown message for a component. When received, component takes necessary clean up action and unregisters
+   * itself with location service. If the component is a container or run as a standalone process, then shutdown will also
+   * kill the jvm process it is running in.
+   */
+  case object Shutdown extends CommonMessage with RemoteMsg
+
+  /**
+   * Represents a restart message for a component
+   */
+  case object Restart extends CommonMessage with RemoteMsg
 }
 ////////////////////
 
@@ -186,8 +186,9 @@ private[csw] object SupervisorInternalRunningMessage {
 
 private[csw] sealed trait SupervisorRestartMessage extends SupervisorMessage
 private[csw] object SupervisorRestartMessage {
-  case object UnRegistrationComplete                    extends SupervisorRestartMessage
   case class UnRegistrationFailed(throwable: Throwable) extends SupervisorRestartMessage
+
+  case object UnRegistrationComplete extends SupervisorRestartMessage
 }
 
 /**
@@ -284,7 +285,7 @@ private[csw] object FromSupervisorMessage {
  * @param runId represents an unique identifier of command
  * @param replyTo represents the actor that will receive the command status
  */
-case class Query(runId: Id, replyTo: ActorRef[QueryResponse]) extends SupervisorLockMessage with RemoteMsg
+case class Query(runId: Id, replyTo: ActorRef[SubmitResponse]) extends SupervisorLockMessage with RemoteMsg
 
 /**
  * Represents a message to subscribe to change in command status of a command running on some component

@@ -22,6 +22,7 @@ import csw.location.server.commons.{CswCluster, LocationServiceLogger}
 import csw.location.server.internal.Registry.AllServices
 import csw.location.server.internal.StreamExt.RichSource
 import csw.logging.api.scaladsl.Logger
+import msocket.api.Subscription
 
 import scala.async.Async._
 import scala.concurrent.Future
@@ -196,7 +197,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
   /**
    * Track the status of given connection
    */
-  def track(connection: Connection): Source[TrackingEvent, KillSwitch] = {
+  def track(connection: Connection): Source[TrackingEvent, Subscription] = {
     log.debug(s"Tracking connection: [${connection.name}]")
     //Create a message handler for this connection
     val service = new Registry.Service(connection)
@@ -225,13 +226,15 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     }
     //Allow stream to be cancellable by giving it a KillSwitch in mat value.
     // Also, deduplicate identical messages in case multiple DeathWatch actors unregisters the same location.
-    trackingEvents.cancellable.distinctUntilChanged
+    trackingEvents.cancellable.distinctUntilChanged.mapMaterializedValue(createSubscription)
   }
+
+  private def createSubscription(x: KillSwitch): Subscription = () => x.shutdown()
 
   /**
    * Subscribe to events of a connection by providing a callback.
    */
-  override def subscribe(connection: Connection, callback: TrackingEvent => Unit): KillSwitch = {
+  override def subscribe(connection: Connection, callback: TrackingEvent => Unit): Subscription = {
     log.info(s"Subscribing to connection: [${connection.name}]")
     track(connection).to(Sink.foreach(callback)).run()
   }

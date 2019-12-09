@@ -47,7 +47,8 @@ private[logging] object LogActorOperations {
       if (logSlf4j.ex != NoLogException) jsonObject = jsonObject ++ exceptionJson(logSlf4j.ex)
 
       Some(jsonObject)
-    } else None
+    }
+    else None
 
   def generateLogAkkaJson(logAkka: LogAkka, akkaLogLevel: Level): Option[JsObject] =
     if (logAkka.level.pos >= akkaLogLevel.pos) {
@@ -64,7 +65,8 @@ private[logging] object LogActorOperations {
 
       if (logAkka.cause.isDefined) jsonObject = jsonObject ++ exceptionJson(logAkka.cause.get)
       Some(jsonObject)
-    } else None
+    }
+    else None
 
   // Convert exception stack trace to JSON
   def getStack(ex: Throwable): Seq[JsObject] = {

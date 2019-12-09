@@ -41,10 +41,9 @@ trait Arguments { self: OptionParser[Options] =>
     opt[File]("data")
       .valueName("<file>")
       .action((x, c) => c.copy(eventData = Some(x)))
-      .validate(
-        file =>
-          if (file.exists()) success
-          else failure(s"file [${file.getAbsolutePath}] does not exist")
+      .validate(file =>
+        if (file.exists()) success
+        else failure(s"file [${file.getAbsolutePath}] does not exist")
       )
       .text("file path which contains event json")
 

@@ -65,7 +65,8 @@ class MainTest extends HTTPLocationService {
       val response = Http()(actorSystem.toClassic).singleRequest(request).await
       response.status shouldBe StatusCodes.OK
       response.discardEntityBytes()
-    } finally {
+    }
+    finally {
       httpService.shutdown().await
     }
   }
@@ -87,7 +88,8 @@ class MainTest extends HTTPLocationService {
       val request  = HttpRequest(uri = uri)
       val response = Http()(actorSystem.toClassic).singleRequest(request).await
       response.status shouldBe StatusCodes.OK
-    } finally {
+    }
+    finally {
       httpService.shutdown().await
     }
   }

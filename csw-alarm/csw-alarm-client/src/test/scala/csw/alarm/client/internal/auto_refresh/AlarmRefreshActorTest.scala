@@ -37,8 +37,8 @@ class AlarmRefreshActorTest
   test("should refresh severity") {
     val probe = TestProbe[String]()
     val actor = spawn(
-      Behaviors.withTimers[AutoRefreshSeverityMessage](
-        t => AlarmRefreshActor.behavior(t, (_, _) => send("severity set", probe.ref), 5.seconds)
+      Behaviors.withTimers[AutoRefreshSeverityMessage](t =>
+        AlarmRefreshActor.behavior(t, (_, _) => send("severity set", probe.ref), 5.seconds)
       )
     )
     actor ! SetSeverity(tcsAxisHighLimitAlarmKey, Major)
@@ -48,8 +48,8 @@ class AlarmRefreshActorTest
   test("should set severity and refresh it") {
     val probe = TestProbe[String]()
     val actor = spawn(
-      Behaviors.withTimers[AutoRefreshSeverityMessage](
-        t => AlarmRefreshActor.behavior(t, (_, _) => send("severity refreshed", probe.ref), 5.seconds)
+      Behaviors.withTimers[AutoRefreshSeverityMessage](t =>
+        AlarmRefreshActor.behavior(t, (_, _) => send("severity refreshed", probe.ref), 5.seconds)
       )
     )
 
@@ -63,8 +63,8 @@ class AlarmRefreshActorTest
   test("should cancel the refreshing of alarm severity") {
     val probe = TestProbe[String]()
     val actor = spawn(
-      Behaviors.withTimers[AutoRefreshSeverityMessage](
-        t => AlarmRefreshActor.behavior(t, (_, _) => send("severity refreshed", probe.ref), 5.seconds)
+      Behaviors.withTimers[AutoRefreshSeverityMessage](t =>
+        AlarmRefreshActor.behavior(t, (_, _) => send("severity refreshed", probe.ref), 5.seconds)
       )
     )
 
@@ -82,8 +82,8 @@ class AlarmRefreshActorTest
     val queue: mutable.Queue[AlarmKey] = mutable.Queue.empty[AlarmKey]
 
     val actor = spawn(
-      Behaviors.withTimers[AutoRefreshSeverityMessage](
-        t => AlarmRefreshActor.behavior(t, (key, _) => Future { queue.enqueue(key); Done }, 5.seconds)
+      Behaviors.withTimers[AutoRefreshSeverityMessage](t =>
+        AlarmRefreshActor.behavior(t, (key, _) => Future { queue.enqueue(key); Done }, 5.seconds)
       )
     )
 

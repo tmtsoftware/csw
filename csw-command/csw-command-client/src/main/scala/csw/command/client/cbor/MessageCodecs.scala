@@ -26,9 +26,8 @@ import csw.params.core.formats.ParamCodecs
 import io.bullet.borer.derivation.ArrayBasedCodecs.deriveUnaryCodec
 import io.bullet.borer.derivation.MapBasedCodecs._
 import io.bullet.borer.{Codec, Decoder, Encoder}
-import msocket.api.codecs.BasicCodecs
 
-trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs with BasicCodecs {
+trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
 
   implicit def actorSystem: ActorSystem[_]
 

@@ -108,7 +108,8 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
     LoggingState.doTime = true
     val timeActor = system.spawn(new TimeActor(timeActorDonePromise).behavior, name = "TimingActor")
     LoggingState.timeActorOption = Some(timeActor)
-  } else {
+  }
+  else {
     timeActorDonePromise.success(())
   }
 
@@ -266,12 +267,14 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
         try {
           val directByteBufferConstr = buf.getClass.getDeclaredConstructor(classOf[Long], classOf[Int], classOf[Any])
           directByteBufferConstr.setAccessible(true)
-        } catch {
+        }
+        catch {
           case e: Exception =>
         }
         Class.forName(appender).getDeclaredConstructor().newInstance().asInstanceOf[LogAppenderBuilder]
       }
-    } catch {
+    }
+    catch {
       case _: Throwable => throw AppenderNotFoundException(appender)
     }
   }

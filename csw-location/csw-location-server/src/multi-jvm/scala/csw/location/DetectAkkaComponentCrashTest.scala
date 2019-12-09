@@ -67,7 +67,7 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec
       locationService.list.await.size shouldBe 1
 
       // clean up
-      switch.shutdown()
+      switch.cancel()
     }
 
     runOn(member1) {
@@ -104,7 +104,7 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec
       }
 
       // clean up
-      switch.shutdown()
+      switch.cancel()
     }
     enterBarrier("end")
   }

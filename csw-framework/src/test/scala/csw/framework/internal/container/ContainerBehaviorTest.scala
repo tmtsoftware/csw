@@ -83,18 +83,17 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar wit
     when(registrationResult.unregister()).thenReturn(eventualDone)
 
     val containerBehaviorTestkit: BehaviorTestKit[ContainerActorMessage] = BehaviorTestKit(
-      Behaviors.setup(
-        ctx =>
-          new ContainerBehavior(
-            ctx,
-            containerInfo,
-            supervisorInfoFactory,
-            registrationFactory,
-            locationService,
-            eventService,
-            alarmService,
-            mocks.loggerFactory
-          )
+      Behaviors.setup(ctx =>
+        new ContainerBehavior(
+          ctx,
+          containerInfo,
+          supervisorInfoFactory,
+          registrationFactory,
+          locationService,
+          eventService,
+          alarmService,
+          mocks.loggerFactory
+        )
       )
     )
   }
@@ -102,9 +101,8 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar wit
   class RunningContainer() extends IdleContainer {
     containerBehaviorTestkit.run(SupervisorsCreated(supervisorInfos))
     val components = Components(supervisorInfos.map(_.component))
-    components.components.foreach(
-      component =>
-        containerBehaviorTestkit.run(SupervisorLifecycleStateChanged(component.supervisor, SupervisorLifecycleState.Running))
+    components.components.foreach(component =>
+      containerBehaviorTestkit.run(SupervisorLifecycleStateChanged(component.supervisor, SupervisorLifecycleState.Running))
     )
   }
 
@@ -133,9 +131,8 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar wit
       .retrieveAllEffects() shouldBe components.components.map(component => Watched(component.supervisor)).toList
 
     // simulate that container receives LifecycleStateChanged to Running message from all components
-    components.components.foreach(
-      component =>
-        containerBehaviorTestkit.run(SupervisorLifecycleStateChanged(component.supervisor, SupervisorLifecycleState.Running))
+    components.components.foreach(component =>
+      containerBehaviorTestkit.run(SupervisorLifecycleStateChanged(component.supervisor, SupervisorLifecycleState.Running))
     )
 
     // verify that Container changes its state to Running after all component supervisors change their state to Running
@@ -174,9 +171,8 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar wit
     containerLifecycleStateProbe.expectMessage(ContainerLifecycleState.Idle)
 
     // simulate that container receives LifecycleStateChanged to Running message from all components
-    components.components.foreach(
-      component =>
-        containerBehaviorTestkit.run(SupervisorLifecycleStateChanged(component.supervisor, SupervisorLifecycleState.Running))
+    components.components.foreach(component =>
+      containerBehaviorTestkit.run(SupervisorLifecycleStateChanged(component.supervisor, SupervisorLifecycleState.Running))
     )
 
     // verify that Container changes its state to Running after all component supervisors change their state to Running

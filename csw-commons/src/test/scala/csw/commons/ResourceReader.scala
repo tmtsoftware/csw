@@ -15,7 +15,8 @@ object ResourceReader {
       val tempFile = File.createTempFile(String.valueOf(resourceStream.hashCode), suffix)
       tempFile.deleteOnExit()
       Files.write(tempFile.toPath, resourceStream.readAllBytes())
-    } finally {
+    }
+    finally {
       resourceStream.close()
     }
   }
@@ -25,7 +26,8 @@ object ResourceReader {
     val source   = Source.fromFile(tempPath.toFile)
     try {
       (tempPath, source.mkString)
-    } finally {
+    }
+    finally {
       source.close()
     }
   }

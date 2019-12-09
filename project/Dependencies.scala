@@ -1,4 +1,4 @@
-import sbt._
+import sbt.{Def, _}
 
 object Dependencies {
 
@@ -17,23 +17,36 @@ object Dependencies {
     )
   )
 
+  val AdminImpl = Def.setting(
+    Seq(
+      Akka.`akka-actor-typed`,
+      Libs.`scalatest`.value % Test
+    )
+  )
+
+  val AdminApi = Def.setting(
+    Seq(
+      Borer.`borer-core`.value,
+      Borer.`borer-derivation`.value,
+      MSocket.`msocket-api`.value
+    )
+  )
+
+  val AdminHandlers = Def.setting(
+    Seq(
+      Akka.`akka-actor-typed`,
+      AkkaHttp.`akka-http`,
+      Libs.`scala-async`,
+      Borer.`borer-compat-akka`.value,
+      Libs.`scalatest`.value % Test
+    )
+  )
+
   val LocationModels = Def.setting(
     Seq(
       Libs.`enumeratum`.value,
       Libs.`play-json`.value,
-      Borer.`borer-core`.value,
-      Borer.`borer-derivation`.value,
-      Libs.`scalatest`.value % Test,
-      Libs.`mockito-scala`   % Test
-    )
-  )
-
-  val LocationApi = Def.setting(
-    Seq(
-      Akka.`akka-actor`,
-      Akka.`akka-actor-typed`,
-      Akka.`akka-stream`,
-      Akka.`akka-stream-typed`
+      Libs.`scalatest`.value % Test
     )
   )
 
@@ -55,7 +68,7 @@ object Dependencies {
       Akka.`akka-persistence`,
       Libs.`akka-management-cluster-http`,
       AkkaHttp.`akka-http`,
-      Borer.`borer-compat-akka`.value,
+      MSocket.`msocket-impl-jvm`,
       Akka.`akka-actor-testkit-typed` % Test,
       Libs.`scalatest`.value          % Test,
       Libs.`junit`                    % Test,
@@ -75,7 +88,7 @@ object Dependencies {
       Akka.`akka-remote`,
       Libs.`scala-async`,
       Libs.`scala-java8-compat`,
-      Borer.`borer-compat-akka`.value,
+      MSocket.`msocket-impl-jvm`,
       Libs.`scalatest`.value % Test
     )
   )

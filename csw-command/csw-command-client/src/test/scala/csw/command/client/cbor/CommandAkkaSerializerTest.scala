@@ -62,8 +62,7 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
       Invalid(Id(), CommandIssue.OtherIssue("test issue")),
       Error(Id(), "test"),
       Cancelled(Id()),
-      Locked(Id()),
-      CommandNotAvailable(Id())
+      Locked(Id())
     )
 
     forAll(testData) { commandResponse =>
@@ -109,7 +108,7 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
     val submitResponseProbe   = TestProbe[SubmitResponse]
     val onewayResponseProbe   = TestProbe[OnewayResponse]
     val validateResponseProbe = TestProbe[ValidateResponse]
-    val queryResponseProbe    = TestProbe[QueryResponse]
+    val queryResponseProbe    = TestProbe[SubmitResponse]
     val lockingResponseProbe  = TestProbe[LockingResponse]
 
     val lifecycleProbe                = TestProbe[LifecycleStateChanged]
@@ -251,7 +250,7 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
 
   test("should use command serializer for (de)serialize SequencerMsg") {
     val submitResponseProbe      = TestProbe[SubmitResponse]
-    val queryResponseProbe       = TestProbe[QueryResponse]
+    val queryResponseProbe       = TestProbe[SubmitResponse]
     val command: SequenceCommand = Setup(Prefix("csw.move"), CommandName("c1"), Some(ObsId("obsId")))
     val sequence                 = Sequence(command)
     val sequenceId               = Id()
