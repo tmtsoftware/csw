@@ -1,7 +1,10 @@
-package csw.params.javadsl
+package csw.prefix.javadsl
 
-import csw.params.core.models.Subsystem
+import csw.prefix.Subsystem
 
+/**
+ * Helper class for Java to get handle of TMT subsystem
+ */
 object JSubsystem {
   val AOESW: Subsystem   = Subsystem.AOESW
   val APS: Subsystem     = Subsystem.APS
