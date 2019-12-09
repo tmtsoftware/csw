@@ -1,6 +1,5 @@
-package csw.params.core.models
+package csw.prefix.models
 
-import csw.prefix.models.{Prefix, Subsystem}
 import org.scalatest.{FunSuite, Matchers}
 
 class PrefixTest extends FunSuite with Matchers {
