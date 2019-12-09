@@ -23,7 +23,7 @@ private[csw] class ServerWiring extends LocationServiceCodecs {
   lazy val actorRuntime                                             = new ActorRuntime(actorSystem)
   import actorSystem.executionContext
   lazy val locationService: LocationService                  = LocationServiceFactory.withSystem(actorSystem)
-  private val postHandler                                    = new LocationHttpHandler(locationService)
+  private lazy val postHandler                               = new LocationHttpHandler(locationService)
   private def websocketHandlerFactory(encoding: Encoding[_]) = new LocationWebsocketHandler(locationService, encoding)
 
   lazy val locationRoutes: Route = RouteFactory.combine(
