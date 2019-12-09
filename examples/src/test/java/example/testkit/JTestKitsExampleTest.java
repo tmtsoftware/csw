@@ -9,7 +9,7 @@ import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import csw.location.models.AkkaLocation;
 import csw.location.models.ComponentId;
 import csw.location.models.Connection.AkkaConnection;
-import csw.prefix.Prefix;
+import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
 import csw.testkit.FrameworkTestKit;
 import csw.testkit.javadsl.JCSWService;

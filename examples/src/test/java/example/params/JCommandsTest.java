@@ -11,7 +11,7 @@ import csw.params.core.models.ArrayData;
 import csw.params.core.models.MatrixData;
 import csw.params.core.models.ObsId;
 import csw.params.javadsl.JKeyType;
-import csw.prefix.Prefix;
+import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
 import csw.params.javadsl.JUnits;
 import csw.time.core.models.UTCTime;

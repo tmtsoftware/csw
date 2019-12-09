@@ -18,7 +18,7 @@ import csw.event.client.perf.utils.EventUtils
 import csw.location.client.ActorSystemFactory
 import csw.params.core.formats.JsonSupport
 import csw.params.events.{Event, EventKey, EventName}
-import csw.prefix.Prefix
+import csw.prefix.models.Prefix
 import play.api.libs.json.Json
 
 import scala.async.Async._

@@ -7,7 +7,7 @@ import csw.event.api.exceptions.EventServerNotAvailable
 import csw.event.api.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import csw.event.client.internal.commons.{EventServiceLogger, EventSubscriberUtil}
 import csw.params.events._
-import csw.prefix.Subsystem
+import csw.prefix.models.Subsystem
 import io.lettuce.core.{RedisClient, RedisURI}
 import reactor.core.publisher.FluxSink.OverflowStrategy
 import romaine.RomaineFactory

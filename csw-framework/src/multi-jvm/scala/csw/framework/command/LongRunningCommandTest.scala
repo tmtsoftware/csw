@@ -17,7 +17,8 @@ import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup
 import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, StateName}
-import csw.prefix.{Prefix, Subsystem}
+import csw.prefix.models.Subsystem
+import csw.prefix.models.Prefix
 import io.lettuce.core.RedisClient
 import org.mockito.MockitoSugar
 import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}

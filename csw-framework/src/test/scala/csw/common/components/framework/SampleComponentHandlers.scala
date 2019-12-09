@@ -14,7 +14,7 @@ import csw.params.commands._
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 import csw.params.events.{Event, EventName, SystemEvent}
-import csw.prefix.Prefix
+import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime
 
 import scala.concurrent.duration.DurationLong

@@ -1,7 +1,8 @@
 package csw.framework.models
 
 import csw.command.client.models.framework.ComponentInfo
-import csw.prefix.{Prefix, Subsystem}
+import csw.prefix.models.Subsystem
+import csw.prefix.models.{Prefix, Subsystem}
 
 /**
  * Container information as represented in the configuration file

@@ -4,7 +4,7 @@ import java.util.regex.Pattern
 
 import csw.alarm.extension.RichStringExtentions.RichString
 import csw.alarm.commons.Separators.KeySeparator
-import csw.prefix.Subsystem
+import csw.prefix.models.Subsystem
 
 /**
  * A wrapper class representing the key for an alarm/component/subsystem/system

@@ -8,7 +8,7 @@ import csw.framework.models.ContainerMode.{Container, Standalone}
 import csw.framework.models.{ContainerBootstrapInfo, ContainerInfo, HostBootstrapInfo}
 import csw.location.models.ComponentType.{Assembly, HCD}
 import csw.location.models.Connection
-import csw.prefix.Subsystem
+import csw.prefix.models.Subsystem
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationInt

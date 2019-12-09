@@ -37,7 +37,7 @@ import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.LogAdminUtil
 import csw.params.commands.CommandResponse.Locked
 import csw.params.core.models.Id
-import csw.prefix.Prefix
+import csw.prefix.models.Prefix
 
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.util.{Failure, Success}

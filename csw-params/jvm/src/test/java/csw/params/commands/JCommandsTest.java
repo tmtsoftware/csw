@@ -5,7 +5,7 @@ import csw.params.core.generics.Parameter;
 import csw.params.core.generics.ParameterSetType;
 import csw.params.core.models.ObsId;
 import csw.params.javadsl.JKeyType;
-import csw.prefix.Prefix;
+import csw.prefix.models.Prefix;
 import org.junit.Assert;
 import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;

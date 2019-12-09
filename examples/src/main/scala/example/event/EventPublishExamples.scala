@@ -9,7 +9,7 @@ import csw.params.core.models.Id
 import csw.event.api.exceptions.PublishFailure
 import csw.event.api.scaladsl.EventService
 import csw.logging.api.scaladsl.Logger
-import csw.prefix.Prefix
+import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime
 
 import scala.concurrent.Future

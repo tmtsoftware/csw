@@ -15,7 +15,7 @@ import csw.location.models.{ComponentId, ComponentType}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.{LoggerFactory, LoggingSystemFactory}
-import csw.prefix.{Prefix, Subsystem}
+import csw.prefix.models.{Prefix, Subsystem}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}

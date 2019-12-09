@@ -15,7 +15,7 @@ import csw.location.models.ComponentId
 import csw.location.models.ComponentType.HCD
 import csw.location.models.Connection.AkkaConnection
 import csw.params.commands.Setup
-import csw.prefix.{Prefix, Subsystem}
+import csw.prefix.models.{Prefix, Subsystem}
 import redis.embedded.{RedisSentinel, RedisServer}
 
 import scala.concurrent.duration.DurationLong

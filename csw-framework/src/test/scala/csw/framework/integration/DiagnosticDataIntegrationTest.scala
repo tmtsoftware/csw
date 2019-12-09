@@ -15,7 +15,8 @@ import csw.location.models.ComponentType.HCD
 import csw.location.models.Connection.AkkaConnection
 import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.params.events.{Event, EventKey, SystemEvent}
-import csw.prefix.{Prefix, Subsystem}
+import csw.prefix.models.Subsystem
+import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime
 import redis.embedded.{RedisSentinel, RedisServer}
 

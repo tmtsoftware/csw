@@ -16,7 +16,7 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.server.commons.BlockingUtils
-import csw.prefix.{Prefix, Subsystem}
+import csw.prefix.models.{Prefix, Subsystem}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{Duration, DurationDouble}

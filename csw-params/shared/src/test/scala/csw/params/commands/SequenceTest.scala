@@ -1,6 +1,6 @@
 package csw.params.commands
 
-import csw.prefix.Prefix
+import csw.prefix.models.Prefix
 import org.scalatest.{FunSuite, Matchers}
 
 class SequenceTest extends FunSuite with Matchers {

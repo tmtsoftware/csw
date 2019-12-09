@@ -13,7 +13,7 @@ import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.ObsId
-import csw.prefix.{Prefix, Subsystem}
+import csw.prefix.models.{Prefix, Subsystem}
 import org.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 

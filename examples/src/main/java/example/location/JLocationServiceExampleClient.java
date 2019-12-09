@@ -34,7 +34,7 @@ import csw.logging.client.internal.LoggingSystem;
 import csw.logging.client.javadsl.JKeys;
 import csw.logging.client.javadsl.JLoggerFactory;
 import csw.logging.client.javadsl.JLoggingSystemFactory;
-import csw.prefix.Prefix;
+import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
 import scala.concurrent.Await;
 import scala.concurrent.duration.FiniteDuration;

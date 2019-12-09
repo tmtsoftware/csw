@@ -4,26 +4,26 @@ import java.nio.file.Paths
 
 import com.typesafe.config.ConfigFactory
 import csw.alarm.api.exceptions.KeyNotFoundException
+import csw.alarm.cli.args.Options
+import csw.alarm.cli.utils.IterableExtensions.RichStringIterable
+import csw.alarm.cli.utils.TestFutureExt.RichFuture
 import csw.alarm.commons.Separators.KeySeparator
 import csw.alarm.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.alarm.models.ActivationStatus.{Active, Inactive}
+import csw.alarm.models.AlarmHealth
 import csw.alarm.models.AlarmHealth.{Bad, Good, Ill}
 import csw.alarm.models.AlarmSeverity._
 import csw.alarm.models.AutoRefreshSeverityMessage.CancelAutoRefresh
 import csw.alarm.models.FullAlarmSeverity.Disconnected
 import csw.alarm.models.Key.{AlarmKey, GlobalKey}
 import csw.alarm.models.ShelveStatus.{Shelved, Unshelved}
-import csw.alarm.cli.args.Options
-import csw.alarm.cli.utils.IterableExtensions.RichStringIterable
-import csw.alarm.cli.utils.TestFutureExt.RichFuture
-import csw.alarm.models.AlarmHealth
 import csw.commons.ResourceReader
 import csw.config.api.ConfigData
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.mocks.MockedAuthentication
 import csw.config.server.{ServerWiring, Settings}
-import csw.prefix.Subsystem.{LGSF, NFIRAOS, TCS}
+import csw.prefix.models.Subsystem.{LGSF, NFIRAOS, TCS}
 
 class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
 

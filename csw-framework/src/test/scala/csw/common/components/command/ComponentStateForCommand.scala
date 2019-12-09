@@ -4,7 +4,7 @@ import csw.params.commands.CommandName
 import csw.params.core.generics.{GChoiceKey, KeyType}
 import csw.params.core.generics.KeyType.ChoiceKey
 import csw.params.core.models.{Choice, Choices}
-import csw.prefix.Prefix
+import csw.prefix.models.Prefix
 
 // Fixme: This file may be merged with `CommandComponentState` or may be renamed
 object ComponentStateForCommand {

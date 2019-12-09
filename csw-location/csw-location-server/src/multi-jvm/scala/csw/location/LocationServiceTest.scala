@@ -4,7 +4,7 @@ import csw.location.helpers.{LSNodeSpec, OneMemberAndSeed}
 import csw.location.models.Connection.{HttpConnection, TcpConnection}
 import csw.location.models.{ComponentId, ComponentType, HttpRegistration, TcpRegistration}
 import csw.location.server.commons.TestFutureExtension.RichFuture
-import csw.prefix.{Prefix, Subsystem}
+import csw.prefix.models.{Prefix, Subsystem}
 import org.scalatest.BeforeAndAfterEach
 
 import scala.collection.immutable.Set

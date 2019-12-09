@@ -47,6 +47,7 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-logging-macros`,
   `csw-logging-models`.js,
   `csw-params`.js,
+  `csw-prefix`.js,
   `csw-command-api`.js,
   `csw-location-models`.js,
   `csw-location-api`.js,
@@ -99,6 +100,7 @@ lazy val `csw` = project
 lazy val `csw-prefix` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .enablePlugins(PublishBintray)
+  .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
   .settings(fork := false)
   .settings(libraryDependencies ++= Dependencies.Prefix.value)
 

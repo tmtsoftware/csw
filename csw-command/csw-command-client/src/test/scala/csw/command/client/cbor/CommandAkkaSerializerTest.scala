@@ -34,7 +34,7 @@ import csw.params.core.generics.{Key, Parameter}
 import csw.params.core.models.Units.{coulomb, pascal}
 import csw.params.core.models.{ArrayData, Id, ObsId}
 import csw.params.core.states.{CurrentState, DemandState, StateName}
-import csw.prefix.Prefix
+import csw.prefix.models.Prefix
 import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.prop.Tables.Table
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}

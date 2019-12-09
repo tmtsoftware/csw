@@ -20,7 +20,7 @@ import csw.params.commands.CommandResponse.*;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.Id;
-import csw.prefix.Prefix;
+import csw.prefix.models.Prefix;
 import csw.params.core.states.CurrentState;
 import csw.params.core.states.StateName;
 import csw.params.events.EventName;

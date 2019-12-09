@@ -1,6 +1,6 @@
 package csw.prefix.javadsl
 
-import csw.prefix.Subsystem
+import csw.prefix.models.Subsystem
 
 /**
  * Helper class for Java to get handle of TMT subsystem

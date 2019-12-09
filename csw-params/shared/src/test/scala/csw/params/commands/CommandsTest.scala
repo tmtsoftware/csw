@@ -4,7 +4,7 @@ import csw.params.core.generics.KeyType.ByteKey
 import csw.params.core.generics._
 import csw.params.core.models.Units.{NoUnits, degree, meter}
 import csw.params.core.models.{ArrayData, ObsId}
-import csw.prefix.Prefix
+import csw.prefix.models.Prefix
 import org.scalatest.FunSpec
 
 import scala.util.Try

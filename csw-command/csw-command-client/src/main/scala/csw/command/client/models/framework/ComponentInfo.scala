@@ -1,7 +1,8 @@
 package csw.command.client.models.framework
 
 import csw.location.models.{ComponentType, Connection}
-import csw.prefix.{Prefix, Subsystem}
+import csw.prefix.models.Subsystem
+import csw.prefix.models.{Prefix, Subsystem}
 
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.jdk.CollectionConverters._

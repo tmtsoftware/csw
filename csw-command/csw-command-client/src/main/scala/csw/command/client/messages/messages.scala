@@ -11,7 +11,7 @@ import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.params.core.states.CurrentState
-import csw.prefix.Prefix
+import csw.prefix.models.Prefix
 import csw.serializable.CommandSerializable
 import csw.time.core.models.UTCTime
 

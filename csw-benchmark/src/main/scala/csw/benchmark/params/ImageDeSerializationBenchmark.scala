@@ -12,7 +12,7 @@ import csw.params.core.generics.KeyType.ByteArrayKey
 import csw.params.core.generics.{Key, Parameter}
 import csw.params.core.models.Units.pascal
 import csw.params.core.models.{ArrayData, ObsId}
-import csw.prefix.Prefix
+import csw.prefix.models.Prefix
 import org.openjdk.jmh.annotations._
 
 import scala.concurrent.Await

@@ -21,7 +21,7 @@ import csw.params.commands._
 import csw.params.core.generics.Parameter
 import csw.params.core.models.{Id, ObsId}
 import csw.params.core.states.{CurrentState, DemandState, StateName}
-import csw.prefix.{Prefix, Subsystem}
+import csw.prefix.models.{Prefix, Subsystem}
 import io.lettuce.core.RedisClient
 import org.mockito.MockitoSugar
 
@@ -277,7 +277,7 @@ class CommandServiceTest(ignore: Int)
 
       // test CommandNotAvailable after timeout of 1 seconds
       Await.result(assemblyCmdService.query(Id("blah")), 2.seconds) shouldEqual
-        Invalid(Id("blah"), IdNotAvailableIssue(Id("blah").id))
+      Invalid(Id("blah"), IdNotAvailableIssue(Id("blah").id))
 
       //#query
       // Check on a command that was completed in the past

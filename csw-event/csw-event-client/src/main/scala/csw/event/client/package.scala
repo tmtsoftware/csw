@@ -4,7 +4,7 @@ package csw.event
  * == Event Service ==
  *
  * This module implements an Event Service responsible for publishing an [[csw.params.events.Event]] or subscribing to an [[csw.params.events.Event]].
- * An event is published on a [[csw.params.events.EventKey]]. The event key is composed of a [[Prefix]] depicting the source and an [[csw.params.events.EventName]].
+ * An event is published on a [[csw.params.events.EventKey]]. The event key is composed of a [[csw.prefix.models.Prefix]] depicting the source and an [[csw.params.events.EventName]].
  * The subscriber can subscribe to the [[csw.params.events.EventKey]] to receive all events published on the Key.
  *
  * === Example: Event Service ===

@@ -12,7 +12,7 @@ import csw.framework.FrameworkTestMocks
 import csw.location.client.ActorSystemFactory
 import csw.logging.api.scaladsl.Logger
 import csw.params.core.states.{CurrentState, StateName}
-import csw.prefix.Prefix
+import csw.prefix.models.Prefix
 import org.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 

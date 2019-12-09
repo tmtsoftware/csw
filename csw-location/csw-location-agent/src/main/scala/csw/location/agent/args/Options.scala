@@ -1,7 +1,7 @@
 package csw.location.agent.args
 import java.io.File
 
-import csw.prefix.Prefix
+import csw.prefix.models.Prefix
 
 /**
  * Command line options ("csw-location-agent --help" prints a usage message with descriptions of all the options)

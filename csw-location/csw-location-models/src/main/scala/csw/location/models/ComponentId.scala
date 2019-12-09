@@ -1,6 +1,6 @@
 package csw.location.models
 
-import csw.prefix.Prefix
+import csw.prefix.models.Prefix
 
 /**
  * Represents a component based on its prefix and type.

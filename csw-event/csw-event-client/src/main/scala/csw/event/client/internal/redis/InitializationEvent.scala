@@ -1,7 +1,7 @@
 package csw.event.client.internal.redis
 import csw.params.core.generics.KeyType.StringKey
 import csw.params.events.{EventKey, SystemEvent}
-import csw.prefix.Subsystem
+import csw.prefix.models.Subsystem
 
 private[event] object InitializationEvent {
 

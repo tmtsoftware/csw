@@ -24,7 +24,8 @@ import csw.location.models.{ComponentId, LocationRemoved, LocationUpdated, Track
 import csw.logging.models.Level.INFO
 import csw.logging.client.internal.LoggingSystem
 import csw.params.core.states.{CurrentState, StateName}
-import csw.prefix.{Prefix, Subsystem}
+import csw.prefix.models.Subsystem
+import csw.prefix.models.Prefix
 import io.lettuce.core.RedisClient
 import play.api.libs.json.{JsObject, Json}
 

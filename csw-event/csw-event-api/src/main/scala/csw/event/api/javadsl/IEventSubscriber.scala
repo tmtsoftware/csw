@@ -9,7 +9,7 @@ import akka.actor.typed.ActorRef
 import akka.stream.javadsl.Source
 import csw.event.api.scaladsl.SubscriptionMode
 import csw.params.events.{Event, EventKey}
-import csw.prefix.Subsystem
+import csw.prefix.models.Subsystem
 
 /**
  * An EventSubscriber interface to subscribe events. The events can be subscribed on [[csw.params.events.EventKey]]. All events
@@ -174,7 +174,7 @@ trait IEventSubscriber {
    * and the subscription is stopped after logging appropriately. [[csw.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine this
    * state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
-   * @param subsystem a valid [[Subsystem]] which represents the source of the events
+   * @param subsystem a valid `Subsystem` which represents the source of the events
    * @param pattern   Subscribes the client to the given patterns. Supported glob-style patterns:
    *                  - h?llo subscribes to hello, hallo and hxllo
    *                  - h*llo subscribes to hllo and heeeello
@@ -194,7 +194,7 @@ trait IEventSubscriber {
    *
    * Note that callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
    *
-   * @param subsystem a valid [[Subsystem]] which represents the source of the events
+   * @param subsystem a valid `Subsystem` which represents the source of the events
    * @param pattern   Subscribes the client to the given patterns. Supported glob-style patterns:
    *- h?llo subscribes to hello, hallo and hxllo
    *- h*llo subscribes to hllo and heeeello

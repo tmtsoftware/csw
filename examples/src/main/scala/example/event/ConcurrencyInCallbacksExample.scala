@@ -8,7 +8,7 @@ import akka.util.Timeout
 import csw.event.api.scaladsl.EventPublisher
 import csw.params.core.generics.{Key, KeyType}
 import csw.params.events.{EventName, SystemEvent}
-import csw.prefix.Prefix
+import csw.prefix.models.Prefix
 import example.event.TemperatureMessage._
 
 import scala.concurrent.ExecutionContext

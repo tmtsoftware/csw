@@ -4,7 +4,7 @@ import csw.params.commands._
 import csw.params.core.models.{Id, ObsId, Struct}
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.params.events._
-import csw.prefix.Prefix
+import csw.prefix.models.Prefix
 import org.scalatest.{FunSpec, Matchers}
 
 //DEOPSCSW-184: Change configurations - attributes and values

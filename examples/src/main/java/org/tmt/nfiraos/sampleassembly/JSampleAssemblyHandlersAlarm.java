@@ -29,7 +29,7 @@ import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
 import csw.params.javadsl.JUnits;
-import csw.prefix.Prefix;
+import csw.prefix.models.Prefix;
 import csw.time.core.models.UTCTime;
 
 import java.util.Optional;

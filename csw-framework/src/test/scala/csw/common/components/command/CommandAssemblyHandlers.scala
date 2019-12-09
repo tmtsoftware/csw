@@ -21,7 +21,8 @@ import csw.time.core.models.UTCTime
 
 import scala.concurrent.duration._
 import csw.command.client.CommandResponseManager.{OverallFailure, OverallSuccess}
-import csw.prefix.{Prefix, Subsystem}
+import csw.prefix.models.Subsystem
+import csw.prefix.models.Prefix
 
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}

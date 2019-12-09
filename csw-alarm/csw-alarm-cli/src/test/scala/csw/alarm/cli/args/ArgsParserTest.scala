@@ -2,9 +2,9 @@ package csw.alarm.cli.args
 import java.io.ByteArrayOutputStream
 import java.nio.file.Paths
 
-import csw.alarm.models.AlarmSeverity.Major
 import csw.alarm.cli.BuildInfo
-import csw.prefix.Subsystem.NFIRAOS
+import csw.alarm.models.AlarmSeverity.Major
+import csw.prefix.models.Subsystem.NFIRAOS
 import org.scalatest.{FunSuite, Matchers}
 
 class ArgsParserTest extends FunSuite with Matchers {

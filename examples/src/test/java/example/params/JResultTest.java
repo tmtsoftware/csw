@@ -8,7 +8,7 @@ import csw.params.core.models.Id;
 import csw.params.core.models.MatrixData;
 import csw.params.core.models.ObsId;
 import csw.params.javadsl.JKeyType;
-import csw.prefix.Prefix;
+import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
 import org.junit.Assert;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package csw.prefix
+package csw.prefix.models
 
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry}

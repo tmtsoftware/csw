@@ -1,7 +1,7 @@
 package csw.params.core.generics
 
 import csw.params.commands.{Observe, SequenceCommand, Setup, Wait}
-import csw.prefix.Subsystem
+import csw.prefix.models.Subsystem
 
 /**
  * A collection of Utility functions for filtering Commands and Parameters from an input sequence

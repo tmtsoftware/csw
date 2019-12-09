@@ -5,7 +5,7 @@ import csw.params.core.generics.{Key, Parameter}
 import csw.params.core.models.Id
 import csw.params.events.{Event, EventName, SystemEvent}
 import csw.params.javadsl.JKeyType
-import csw.prefix.Prefix
+import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime
 
 object Utils {

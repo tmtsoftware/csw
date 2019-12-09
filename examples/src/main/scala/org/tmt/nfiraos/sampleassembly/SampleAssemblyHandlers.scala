@@ -14,7 +14,7 @@ import csw.params.commands.{CommandName, CommandResponse, ControlCommand, Setup}
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.{Id, ObsId, Units}
 import csw.params.events._
-import csw.prefix.Prefix
+import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime
 
 import scala.async.Async._

@@ -26,7 +26,7 @@ import csw.location.models.ComponentType.{Assembly, HCD}
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
 import csw.params.core.states.{CurrentState, StateName}
-import csw.prefix.{Prefix, Subsystem}
+import csw.prefix.models.{Prefix, Subsystem}
 import io.lettuce.core.RedisClient
 
 import scala.concurrent.duration.DurationLong

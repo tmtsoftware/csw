@@ -12,7 +12,7 @@ import csw.params.events.{Event, EventKey}
 import csw.event.api.internal.EventServiceExts.RichEventSubscription
 import csw.event.api.javadsl.{IEventSubscriber, IEventSubscription}
 import csw.event.api.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
-import csw.prefix.Subsystem
+import csw.prefix.models.Subsystem
 
 import scala.jdk.CollectionConverters._
 import scala.compat.java8.DurationConverters.DurationOps

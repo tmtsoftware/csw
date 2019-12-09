@@ -18,7 +18,7 @@ import csw.logging.client.scaladsl.{LoggerFactory, LoggingSystemFactory}
 import csw.network.utils.Networks
 import csw.params.commands.CommandResponse.OnewayResponse
 import csw.params.commands.{CommandName, Setup}
-import csw.prefix.Prefix
+import csw.prefix.models.Prefix
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt

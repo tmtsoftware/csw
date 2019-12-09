@@ -8,7 +8,7 @@ package csw.alarm
  * level api e.g. set the severity of an alarm.
  *
  * An alarm is uniquely identified within the component with [[csw.alarm.models.Key.AlarmKey]]. The alarm key is composed of
- * a [[Subsystem]], component name, alarm name.
+ * a [[csw.prefix.models.Subsystem]], component name, alarm name.
  *
  * === Example: Alarm Service ===
  *

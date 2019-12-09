@@ -5,7 +5,7 @@ import csw.params.commands.Setup;
 import csw.params.core.formats.JParamCodecs;
 import csw.params.core.formats.JavaJsonSupport;
 import csw.params.core.models.Coords.*;
-import csw.prefix.Prefix;
+import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
 import org.junit.Test;
 

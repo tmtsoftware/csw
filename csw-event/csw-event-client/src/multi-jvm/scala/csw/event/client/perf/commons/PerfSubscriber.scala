@@ -13,7 +13,7 @@ import csw.event.client.perf.reporter.{ResultReporter, TestRateReporter}
 import csw.event.client.perf.utils.EventUtils._
 import csw.event.client.perf.wiring.{TestConfigs, TestWiring}
 import csw.params.events.{Event, EventKey, EventName, SystemEvent}
-import csw.prefix.Prefix
+import csw.prefix.models.Prefix
 import org.HdrHistogram.Histogram
 
 import scala.concurrent.Future
@@ -62,7 +62,8 @@ class PerfSubscriber(
     if (isPatternSubscriber) {
       val pattern = if (redisEnabled) redisPattern else kafkaPattern
       subscriber.pSubscribe(prefix.subsystem, pattern)
-    } else {
+    }
+    else {
       eventKeys = Set(EventKey(prefix, testEventName), EventKey(prefix, endEventName))
       timeBeforeSubscribe = getNanos(Instant.now()).toLong
       subscriber.subscribe(eventKeys)
@@ -110,7 +111,8 @@ class PerfSubscriber(
 
     try {
       histogram.recordValue(latency)
-    } catch {
+    }
+    catch {
       case _: ArrayIndexOutOfBoundsException =>
     }
 

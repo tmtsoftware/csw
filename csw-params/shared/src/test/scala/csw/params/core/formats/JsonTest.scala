@@ -9,7 +9,7 @@ import csw.params.core.models.Units.{NoUnits, degree, encoder, meter}
 import csw.params.core.models._
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.params.events.{EventName, ObserveEvent, SystemEvent}
-import csw.prefix.{Prefix, Subsystem}
+import csw.prefix.models.{Prefix, Subsystem}
 import org.scalatest.FunSpec
 import play.api.libs.json.Json
 

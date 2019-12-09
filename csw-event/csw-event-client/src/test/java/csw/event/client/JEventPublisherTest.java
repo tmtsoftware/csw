@@ -14,7 +14,7 @@ import csw.event.client.internal.wiring.BaseProperties;
 import csw.params.events.Event;
 import csw.params.events.Event$;
 import csw.params.events.EventKey;
-import csw.prefix.Prefix;
+import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
 import csw.time.core.models.UTCTime;
 import org.scalatestplus.testng.TestNGSuite;

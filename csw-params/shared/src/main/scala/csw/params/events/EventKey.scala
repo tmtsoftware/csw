@@ -1,6 +1,6 @@
 package csw.params.events
 
-import csw.prefix.Prefix
+import csw.prefix.models.Prefix
 
 /**
  * A wrapper class representing the key for an event e.g. tcs.prog.cloudcover.oiwfsProbeDemands

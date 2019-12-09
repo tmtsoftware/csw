@@ -25,6 +25,7 @@ import csw.config.server.commons.TestFileUtils
 import csw.config.server.mocks.MockedAuthentication
 import csw.config.server.{ServerWiring, Settings}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
+import csw.location.models.ComponentType.Container
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{ComponentId, ComponentType}
 import csw.location.server.http.MultiNodeHTTPLocationService
@@ -33,8 +34,7 @@ import csw.params.commands.{CommandName, Setup}
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, StateName}
-import csw.prefix.Subsystem.Container
-import csw.prefix.{Prefix, Subsystem}
+import csw.prefix.models.{Prefix, Subsystem}
 
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, ExecutionContextExecutor}
@@ -76,7 +76,8 @@ class ContainerCmdTest(ignore: Int)
     runOn(seed) {
       try {
         testFileUtils.deleteServerFiles()
-      } catch {
+      }
+      catch {
         case NonFatal(ex) => println(s"Exception in deleting server files - ${ex.printStackTrace()}")
       }
     }

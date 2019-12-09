@@ -14,7 +14,7 @@ import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, StateName}
-import csw.prefix.Prefix
+import csw.prefix.models.Prefix
 import org.scalatest.BeforeAndAfterEach
 
 import scala.concurrent.duration.DurationDouble

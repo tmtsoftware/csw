@@ -9,7 +9,7 @@ import csw.event.api.scaladsl.{EventSubscriber, EventSubscription, SubscriptionM
 import csw.event.client.internal.commons.{EventConverter, EventSubscriberUtil}
 import csw.event.client.utils.Utils
 import csw.params.events._
-import csw.prefix.Subsystem
+import csw.prefix.models.Subsystem
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.common.TopicPartition
 

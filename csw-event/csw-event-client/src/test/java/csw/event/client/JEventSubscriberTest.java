@@ -12,7 +12,7 @@ import csw.event.client.helpers.Utils;
 import csw.event.client.internal.redis.RedisTestProps;
 import csw.event.client.internal.wiring.BaseProperties;
 import csw.params.events.*;
-import csw.prefix.Prefix;
+import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
 import org.scalatestplus.testng.TestNGSuite;
 import org.testng.Assert;

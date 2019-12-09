@@ -7,7 +7,7 @@ import csw.command.client.messages.TopLevelActorMessage
 import csw.event.api.scaladsl.{EventService, EventSubscription, SubscriptionModes}
 import csw.location.models.AkkaLocation
 import csw.params.events.{Event, EventKey, EventName}
-import csw.prefix.Subsystem
+import csw.prefix.models.Subsystem
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble

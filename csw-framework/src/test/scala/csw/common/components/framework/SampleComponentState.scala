@@ -11,8 +11,9 @@ import csw.params.core.generics.{GChoiceKey, Parameter}
 import csw.params.core.models.{Choice, Choices}
 import csw.params.core.states.StateName
 import csw.params.events.EventName
-import csw.prefix.Subsystem.NFIRAOS
-import csw.prefix.{Prefix, Subsystem}
+import csw.prefix.models.Subsystem.NFIRAOS
+import csw.prefix.models.Subsystem
+import csw.prefix.models.Prefix
 
 object SampleComponentState {
   val restartChoice             = Choice("Restart")

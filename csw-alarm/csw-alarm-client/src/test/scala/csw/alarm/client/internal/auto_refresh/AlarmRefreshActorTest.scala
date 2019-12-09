@@ -8,7 +8,7 @@ import csw.alarm.models.AlarmSeverity.Major
 import csw.alarm.models.AutoRefreshSeverityMessage
 import csw.alarm.models.AutoRefreshSeverityMessage.{AutoRefreshSeverity, CancelAutoRefresh, SetSeverity}
 import csw.alarm.models.Key.AlarmKey
-import csw.prefix.Subsystem.NFIRAOS
+import csw.prefix.models.Subsystem.NFIRAOS
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers}
 

@@ -6,7 +6,7 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.models.ComponentId
 import csw.location.models.ComponentType.Assembly
 import csw.location.models.Connection.AkkaConnection
-import csw.prefix.{Prefix, Subsystem}
+import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.FrameworkTestKit
 import csw.testkit.scaladsl.CSWService.{ConfigServer, EventServer}
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}

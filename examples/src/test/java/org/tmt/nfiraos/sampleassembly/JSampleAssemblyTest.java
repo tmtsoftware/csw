@@ -5,7 +5,7 @@ import csw.location.api.javadsl.JComponentType;
 import csw.location.models.AkkaLocation;
 import csw.location.models.ComponentId;
 import csw.location.models.Connection;
-import csw.prefix.Prefix;
+import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
 import csw.testkit.javadsl.FrameworkTestKitJunitResource;
 import csw.testkit.javadsl.JCSWService;

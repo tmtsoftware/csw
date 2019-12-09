@@ -4,7 +4,7 @@ import java.time.Instant
 
 import csw.params.core.generics.{Parameter, ParameterSetType}
 import csw.params.core.models.Id
-import csw.prefix.{Prefix, Subsystem}
+import csw.prefix.models.{Prefix, Subsystem}
 import csw.time.core.models.UTCTime
 
 /**

@@ -25,7 +25,8 @@ import csw.params.commands.Setup
 import csw.params.core.generics.KeyType
 import csw.params.core.models.{ObsId, Units}
 import csw.params.core.states.CurrentState
-import csw.prefix.{Prefix, Subsystem}
+import csw.prefix.models.Subsystem
+import csw.prefix.models.Prefix
 import io.lettuce.core.RedisClient
 
 import scala.concurrent.duration.DurationLong

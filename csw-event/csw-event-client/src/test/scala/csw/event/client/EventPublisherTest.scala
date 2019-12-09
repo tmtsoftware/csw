@@ -8,7 +8,7 @@ import csw.event.client.helpers.Utils.{makeDistinctEvent, makeEvent, makeEventWi
 import csw.params.core.generics.{Key, Parameter}
 import csw.params.core.generics.KeyType.ByteKey
 import csw.params.events.{EventName, SystemEvent}
-import csw.prefix.{Prefix, Subsystem}
+import csw.prefix.models.{Prefix, Subsystem}
 //import csw.event.client.internal.kafka.KafkaTestProps
 import csw.event.client.internal.redis.{InitializationEvent, RedisTestProps}
 import csw.event.client.internal.wiring._

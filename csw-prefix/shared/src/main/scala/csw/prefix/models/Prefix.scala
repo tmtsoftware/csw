@@ -1,4 +1,4 @@
-package csw.prefix
+package csw.prefix.models
 
 /**
  * A top level key for a parameter set: combination of subsystem and the subsystem's prefix

@@ -17,7 +17,7 @@ import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, ControlCommand, Observe, Setup}
 import csw.params.core.generics.KeyType
 import csw.params.core.models.{Id, ObsId}
-import csw.prefix.Prefix
+import csw.prefix.models.Prefix
 import org.mockito.captor.ArgCaptor
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 

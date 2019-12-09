@@ -1,7 +1,7 @@
 package csw.event.client.perf.model_obs
 
 import csw.event.client.perf.model_obs.BaseSetting.{PubSetting, SubSetting}
-import csw.prefix.Prefix
+import csw.prefix.models.Prefix
 
 sealed trait BaseSetting {
   def prefix: Prefix

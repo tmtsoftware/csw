@@ -24,7 +24,7 @@ import csw.location.models.*;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.*;
 import csw.params.core.models.Id;
-import csw.prefix.Prefix;
+import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
 import csw.time.core.models.UTCTime;
 import scala.concurrent.duration.FiniteDuration;

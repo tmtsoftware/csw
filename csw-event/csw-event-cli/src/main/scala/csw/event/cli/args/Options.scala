@@ -4,7 +4,7 @@ import java.io.File
 
 import csw.params.core.generics.Parameter
 import csw.params.events.EventKey
-import csw.prefix.Subsystem
+import csw.prefix.models.Subsystem
 
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 

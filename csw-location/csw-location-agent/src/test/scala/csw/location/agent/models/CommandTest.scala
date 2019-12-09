@@ -2,7 +2,7 @@ package csw.location.agent.models
 
 import csw.commons.ResourceReader
 import csw.location.agent.args.Options
-import csw.prefix.Prefix
+import csw.prefix.models.Prefix
 import org.scalatest.{FunSuite, Matchers}
 
 class CommandTest extends FunSuite with Matchers {

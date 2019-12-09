@@ -3,7 +3,7 @@ import java.nio.file.Path
 
 import csw.alarm.models.Key.{AlarmKey, ComponentKey, GlobalKey, SubsystemKey}
 import csw.alarm.models.{AlarmSeverity, Key}
-import csw.prefix.Subsystem
+import csw.prefix.models.Subsystem
 
 case class Options(
     cmd: String = "",
