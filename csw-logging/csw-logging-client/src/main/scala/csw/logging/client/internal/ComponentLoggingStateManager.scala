@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentHashMap
 import com.typesafe.config.Config
 import csw.logging.client.models.ComponentLoggingState
 import csw.logging.models.Level
+import csw.prefix.models.Prefix
 
 import scala.jdk.CollectionConverters._
 import scala.util.Try
@@ -18,8 +19,8 @@ private[logging] object ComponentLoggingStateManager {
    * @param loggingConfig the logging configuration object
    * @return set of Filters
    */
-  def from(loggingConfig: Config): ConcurrentHashMap[String, ComponentLoggingState] = {
-    new ConcurrentHashMap[String, ComponentLoggingState](Try {
+  def from(loggingConfig: Config): ConcurrentHashMap[Prefix, ComponentLoggingState] = {
+    val stringToState = Try {
       loggingConfig
         .getConfig("component-log-levels")
         .entrySet()
@@ -28,17 +29,21 @@ private[logging] object ComponentLoggingStateManager {
           (entry.getKey, ComponentLoggingState(Level(entry.getValue.unwrapped().toString)))
         }
         .toMap
-    }.getOrElse(Map.empty).asJava)
+        .map[Prefix, ComponentLoggingState] {
+          case (k, v) => (Prefix(k), v)
+        }
+    }.getOrElse(Map.empty)
+    new ConcurrentHashMap(stringToState.asJava)
   }
 
   /**
    * Add the component logging state for a component in map componentName -> ComponentLoggingState
    *
-   * @param componentName the name of the component
+   * @param prefix the subsystem and componentName of the component e.g. tcs.filter.wheel
    * @param level the log level for the component
    */
-  def add(componentName: String, level: Level): Unit = {
+  def add(prefix: Prefix, level: Level): Unit = {
     import csw.logging.client.internal.LoggingState._
-    componentsLoggingState.put(componentName, ComponentLoggingState(level))
+    componentsLoggingState.put(prefix, ComponentLoggingState(level))
   }
 }

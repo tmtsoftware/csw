@@ -299,7 +299,7 @@ case class QueryFinal(runId: Id, replyTo: ActorRef[SubmitResponse]) extends Supe
 sealed trait LogControlMessage extends ComponentMessage with SequencerMsg with CommandSerializable
 
 // Message to get Logging configuration metadata of the receiver
-case class GetComponentLogMetadata(componentName: String, replyTo: ActorRef[LogMetadata]) extends LogControlMessage with RemoteMsg
+case class GetComponentLogMetadata(prefix: Prefix, replyTo: ActorRef[LogMetadata]) extends LogControlMessage with RemoteMsg
 
 // Message to change the log level of any component
-case class SetComponentLogLevel(componentName: String, logLevel: Level) extends LogControlMessage with RemoteMsg
+case class SetComponentLogLevel(prefix: Prefix, logLevel: Level) extends LogControlMessage with RemoteMsg

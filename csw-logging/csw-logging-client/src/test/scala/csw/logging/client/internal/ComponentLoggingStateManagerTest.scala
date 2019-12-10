@@ -2,6 +2,7 @@ package csw.logging.client.internal
 
 import com.typesafe.config.ConfigFactory
 import csw.logging.models.Level.{DEBUG, ERROR, FATAL, INFO}
+import csw.prefix.models.Prefix
 import org.scalatest.{FunSuite, Matchers}
 
 class ComponentLoggingStateManagerTest extends FunSuite with Matchers {
@@ -11,9 +12,9 @@ class ComponentLoggingStateManagerTest extends FunSuite with Matchers {
   test("should able to parse logging configuration and extract component log levels state") {
     val componentsLoggingState = ComponentLoggingStateManager.from(config)
 
-    componentsLoggingState.get("tromboneHcd").componentLogLevel shouldBe DEBUG
-    componentsLoggingState.get("IRIS").componentLogLevel shouldBe ERROR
-    componentsLoggingState.get("jTromboneHcdActor").componentLogLevel shouldBe INFO
+    componentsLoggingState.get(Prefix("csw.tromboneHcd")).componentLogLevel shouldBe DEBUG
+    componentsLoggingState.get(Prefix("csw.IRIS")).componentLogLevel shouldBe ERROR
+    componentsLoggingState.get(Prefix("csw.jTromboneHcdActor")).componentLogLevel shouldBe INFO
   }
 
   test("should able to add/update component logging level") {
@@ -22,17 +23,17 @@ class ComponentLoggingStateManagerTest extends FunSuite with Matchers {
     LoggingState.componentsLoggingState.putAll(componentsLoggingState)
 
     // adding new component
-    ComponentLoggingStateManager.add("tromboneAssembly", INFO)
-    LoggingState.componentsLoggingState.get("tromboneAssembly").componentLogLevel shouldBe INFO
+    ComponentLoggingStateManager.add(Prefix("csw.tromboneAssembly"), INFO)
+    LoggingState.componentsLoggingState.get(Prefix("csw.tromboneAssembly")).componentLogLevel shouldBe INFO
 
     // updating log level of component
-    LoggingState.componentsLoggingState.get("tromboneHcd").componentLogLevel shouldBe DEBUG
-    ComponentLoggingStateManager.add("tromboneHcd", FATAL)
-    LoggingState.componentsLoggingState.get("tromboneHcd").componentLogLevel shouldBe FATAL
+    LoggingState.componentsLoggingState.get(Prefix("csw.tromboneHcd")).componentLogLevel shouldBe DEBUG
+    ComponentLoggingStateManager.add(Prefix("csw.tromboneHcd"), FATAL)
+    LoggingState.componentsLoggingState.get(Prefix("csw.tromboneHcd")).componentLogLevel shouldBe FATAL
 
     // undoing above change to avoid its affect on other tests
-    ComponentLoggingStateManager.add("tromboneHcd", DEBUG)
-    LoggingState.componentsLoggingState.remove("tromboneAssembly")
+    ComponentLoggingStateManager.add(Prefix("csw.tromboneHcd"), DEBUG)
+    LoggingState.componentsLoggingState.remove(Prefix("csw.tromboneAssembly"))
   }
 
   test("should return empty map if component log levels are not provided in configuration file") {

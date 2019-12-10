@@ -80,7 +80,7 @@ object LocationServiceExampleClient {
   //#tracking
   def sinkBehavior: Behaviors.Receive[ExampleMessages] = Behaviors.receive[ExampleMessages] { (ctx, msg) =>
     {
-      val log: Logger = new LoggerFactory("my-component-name").getLogger(ctx)
+      val log: Logger = new LoggerFactory(Prefix("csw.my-component-name")).getLogger(ctx)
 
       msg match {
         case TrackingEventAdapter(LocationUpdated(loc)) => log.info(s"Location updated ${locationInfoToString(loc)}")
@@ -100,7 +100,7 @@ object LocationServiceExampleClient {
  */
 class LocationServiceExampleClient(locationService: LocationService, loggingSystem: LoggingSystem) extends akka.actor.Actor {
 
-  val log: Logger = new LoggerFactory("my-component-name").getLogger(context)
+  val log: Logger = new LoggerFactory(Prefix("csw.my-component-name")).getLogger(context)
 
   private val timeout             = 5.seconds
   private val waitForResolveLimit = 30.seconds

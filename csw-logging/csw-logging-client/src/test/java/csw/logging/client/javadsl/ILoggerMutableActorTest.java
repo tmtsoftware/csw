@@ -16,6 +16,7 @@ import csw.logging.client.commons.LoggingKeys$;
 import csw.logging.client.components.iris.JIrisSupervisorMutableActor;
 import csw.logging.client.internal.LoggingSystem;
 import csw.logging.client.utils.TestAppender;
+import csw.prefix.models.Prefix;
 import org.junit.*;
 import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
@@ -69,7 +70,7 @@ public class ILoggerMutableActorTest extends JUnitSuite {
                 AkkaTypedExtension
                         .UserActorFactory(actorSystem)
                         .spawn(
-                                JIrisSupervisorMutableActor.irisBeh("jIRISTyped"),
+                                JIrisSupervisorMutableActor.irisBeh(Prefix.apply("csw.jIRISTyped")),
                                 "irisTyped",
                                 Props.empty()
                         );
@@ -82,7 +83,7 @@ public class ILoggerMutableActorTest extends JUnitSuite {
         eventually(java.time.Duration.ofSeconds(10), () -> Assert.assertEquals(4, logBuffer.size()));
 
         logBuffer.forEach(log -> {
-            Assert.assertEquals("jIRISTyped", log.get(LoggingKeys$.MODULE$.COMPONENT_NAME()).getAsString());
+            Assert.assertEquals("csw.jIRISTyped", log.get(LoggingKeys$.MODULE$.COMPONENT_NAME()).getAsString());
             Assert.assertEquals(actorPath, log.get(LoggingKeys$.MODULE$.ACTOR()).getAsString());
 
             Assert.assertTrue(log.has(LoggingKeys$.MODULE$.SEVERITY()));

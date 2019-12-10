@@ -8,12 +8,13 @@ import csw.logging.client.components.IRIS._
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.LoggingTestSuite
 import csw.logging.models.Level
+import csw.prefix.models.Prefix
 
 class ActorLoggingTest extends LoggingTestSuite {
   private val irisActorRef =
-    actorSystem.spawn(IRIS.behavior(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
+    actorSystem.spawn(IRIS.behavior(Prefix(IRIS.COMPONENT_NAME)), name = "IRIS-Supervisor-Actor")
 
-  def sendMessagesToActor() = {
+  def sendMessagesToActor(): Unit = {
     irisActorRef ! LogTrace
     irisActorRef ! LogDebug
     irisActorRef ! LogInfo

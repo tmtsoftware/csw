@@ -34,6 +34,7 @@ import csw.params.commands.{CommandName, Setup}
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, StateName}
+import csw.prefix.models.Subsystem.CSW
 import csw.prefix.models.{Prefix, Subsystem}
 
 import scala.concurrent.duration.DurationLong
@@ -133,7 +134,7 @@ class ContainerCmdTest(ignore: Int)
       val testProbe = TestProbe[ContainerLifecycleState]
 
       // withEntries required for multi-node test where seed node is picked up from environment variable
-      val containerCmd = new ContainerCmd("laser_container_app", false)
+      val containerCmd = new ContainerCmd("laser_container_app", CSW, false)
 
       // only file path is provided, by default - file will be fetched from configuration service
       // and will be considered as container configuration.
@@ -217,7 +218,7 @@ class ContainerCmdTest(ignore: Int)
 
       val testProbe = TestProbe[SupervisorLifecycleState]
 
-      val containerCmd = new ContainerCmd("eaton_hcd_standalone_app", false)
+      val containerCmd = new ContainerCmd("eaton_hcd_standalone_app", CSW, false)
 
       // this step is required for multi-node, as eaton_hcd_standalone.conf file is not directly available
       // when sbt-assembly creates fat jar

@@ -11,6 +11,7 @@ import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.location.client.utils.LocationServerStatus
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
+import csw.prefix.models.{Prefix, Subsystem}
 
 import scala.async.Async.{async, await}
 import scala.concurrent.duration.DurationDouble
@@ -29,16 +30,17 @@ object ContainerCmd {
    *alone without any container
    * @return                  Actor ref of the container or supervisor of the component started without container
    */
-  def start(name: String, args: Array[String], defaultConfig: Option[Config] = None): ActorRef[_] =
-    new ContainerCmd(name, true, defaultConfig).start(args)
+  def start(name: String, subsystem: Subsystem, args: Array[String], defaultConfig: Option[Config] = None): ActorRef[_] =
+    new ContainerCmd(name, subsystem, true, defaultConfig).start(args)
 }
 
 private[containercmd] class ContainerCmd(
     name: String,
+    subsystem: Subsystem,
     startLogging: Boolean,
     defaultConfig: Option[Config] = None
 ) {
-  private val log: Logger = new LoggerFactory(name).getLogger
+  private val log: Logger = new LoggerFactory(Prefix(subsystem, name)).getLogger
 
   private lazy val wiring: FrameworkWiring = new FrameworkWiring
   import wiring.actorRuntime._

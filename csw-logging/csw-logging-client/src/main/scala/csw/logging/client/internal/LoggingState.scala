@@ -3,12 +3,11 @@ package csw.logging.client.internal
 import java.util.concurrent.ConcurrentHashMap
 
 import akka.actor.typed.ActorRef
-import csw.logging.client.commons.Constants
 import csw.logging.client.internal.TimeActorMessages.TimeActorMessage
 import csw.logging.client.models.ComponentLoggingState
 import csw.logging.models.Level
+import csw.prefix.models.Prefix
 
-import scala.jdk.CollectionConverters._
 import scala.collection.mutable
 import scala.concurrent.Promise
 
@@ -38,6 +37,5 @@ private[logging] object LoggingState {
   val akkaStopPromise: Promise[Unit] = Promise[Unit]
 
   // a concurrent map of componentName -> LoggingState
-  val componentsLoggingState: ConcurrentHashMap[String, ComponentLoggingState] =
-    new ConcurrentHashMap(Map(Constants.DEFAULT_KEY -> ComponentLoggingState(defaultLogLevel)).asJava)
+  val componentsLoggingState: ConcurrentHashMap[Prefix, ComponentLoggingState] = new ConcurrentHashMap()
 }

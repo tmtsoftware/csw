@@ -54,7 +54,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class JLocationServiceExampleClient extends AbstractActor {
 
-    private ILogger log = new JLoggerFactory("my-component-name").getLogger(context(), getClass());
+    private ILogger log = new JLoggerFactory(Prefix.apply("csw.my-component-name")).getLogger(context(), getClass());
     private ActorSystem<Void> typedSystem = Adapter.toTyped(this.system);
     //#create-location-service
     private akka.actor.ActorSystem system = context().system();

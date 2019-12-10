@@ -12,6 +12,7 @@ import csw.logging.client.components.IRIS._
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.{FileUtils, LoggingTestSuite}
 import csw.logging.models.RequestId
+import csw.prefix.models.Prefix
 import play.api.libs.json.{JsObject, Json}
 
 import scala.collection.mutable
@@ -25,7 +26,7 @@ class TimingTest extends LoggingTestSuite with Timing {
   override lazy val loggingSystem =
     new LoggingSystem(loggingSystemName, "version", "localhost", actorSystem)
 
-  private val irisActorRef = actorSystem.spawn(IRIS.behavior(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
+  private val irisActorRef = actorSystem.spawn(IRIS.behavior(Prefix(IRIS.COMPONENT_NAME)), name = "IRIS-Supervisor-Actor")
 
   private val fileTimestamp   = FileAppender.decideTimestampForFile(ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC)))
   private val timeLogFilePath = s"$logFileDir/${loggingSystemName}_${fileTimestamp}_time.log"

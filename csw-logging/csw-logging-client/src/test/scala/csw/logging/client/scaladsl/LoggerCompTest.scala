@@ -9,6 +9,7 @@ import csw.logging.client.components._
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.LoggingTestSuite
 import csw.logging.models.Level
+import csw.prefix.models.Prefix
 import play.api.libs.json.JsObject
 
 import scala.collection.mutable
@@ -17,7 +18,7 @@ import scala.collection.mutable.ArrayBuffer
 // DEOPSCSW-316: Improve Logger accessibility for component developers
 class LoggerCompTest extends LoggingTestSuite {
 
-  private val irisSupervisorActorRef = actorSystem.spawn(IRIS.behavior(IRIS.COMPONENT_NAME), "IrisSupervisorActor")
+  private val irisSupervisorActorRef = actorSystem.spawn(IRIS.behavior(Prefix(IRIS.COMPONENT_NAME)), "IrisSupervisorActor")
   private val irisUtilActorRef       = actorSystem.spawn(IrisActorUtil.behavior, "IrisUtilActor")
   private val irisTLA                = new IrisTLA()
   private val irisUtil               = new IrisUtil()
@@ -107,7 +108,7 @@ class LoggerCompTest extends LoggingTestSuite {
     testLogBuffer(tromboneHcdLogBuffer, DEBUG, logMsgMap, TromboneHcd.FILE_NAME, TromboneHcd.COMPONENT_NAME)
 
     // setting log level of IRIS comp to FATAL and it should not change log levels of other comps or generic classes
-    loggingSystem.setComponentLogLevel(IRIS.COMPONENT_NAME, FATAL)
+    loggingSystem.setComponentLogLevel(Prefix(IRIS.COMPONENT_NAME), FATAL)
 
     // start logging at all component levels
     allComponentsStartLogging()

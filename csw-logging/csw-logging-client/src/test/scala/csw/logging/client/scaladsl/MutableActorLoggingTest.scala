@@ -9,6 +9,7 @@ import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.LoggingTestSuite
 import csw.logging.models.Level
+import csw.prefix.models.Prefix
 
 object TromboneMutableActor {
   def behavior(loggerFactory: LoggerFactory): Behaviors.Receive[LogCommand] = Behaviors.receive { (ctx, msg) =>
@@ -31,7 +32,10 @@ object TromboneMutableActor {
 class MutableActorLoggingTest extends LoggingTestSuite {
 
   private val tromboneActorRef =
-    actorSystem.spawn(TromboneMutableActor.behavior(new LoggerFactory("tromboneMutableHcdActor")), "TromboneMutableActor")
+    actorSystem.spawn(
+      TromboneMutableActor.behavior(new LoggerFactory(Prefix("csw.tromboneMutableHcdActor"))),
+      "csw.TromboneMutableActor"
+    )
 
   def sendMessagesToActor(): Unit = {
     tromboneActorRef ! LogTrace
@@ -55,7 +59,7 @@ class MutableActorLoggingTest extends LoggingTestSuite {
     logBuffer.foreach { log =>
       log.contains("@componentName") shouldBe true
       log.contains("actor") shouldBe true
-      log.getString("@componentName") shouldBe "tromboneMutableHcdActor"
+      log.getString("@componentName") shouldBe "csw.tromboneMutableHcdActor"
       log.getString("actor") shouldBe tromboneActorRef.path.toString
       log.getString("file") shouldBe "MutableActorLoggingTest.scala"
       log.contains("line") shouldBe true
@@ -71,7 +75,7 @@ class MutableActorLoggingTest extends LoggingTestSuite {
     //  As per the filter, hcd should log 3 message of level ERROR and FATAL
     val groupByComponentNamesLog =
       logBuffer.groupBy(json => json.getString("@componentName"))
-    val tromboneHcdLogs = groupByComponentNamesLog("tromboneMutableHcdActor")
+    val tromboneHcdLogs = groupByComponentNamesLog("csw.tromboneMutableHcdActor")
 
     tromboneHcdLogs.size shouldBe 3
 

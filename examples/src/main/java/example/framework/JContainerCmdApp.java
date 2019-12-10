@@ -1,6 +1,7 @@
 package example.framework;
 
 import csw.framework.javadsl.JContainerCmd;
+import csw.prefix.javadsl.JSubsystem;
 
 import java.util.Optional;
 
@@ -8,7 +9,7 @@ import java.util.Optional;
 public class JContainerCmdApp {
 
     public static void main(String args[]) {
-        JContainerCmd.start("JContainer-Cmd-App", args, Optional.empty());
+        JContainerCmd.start("JContainer-Cmd-App", JSubsystem.CSW(),args, Optional.empty());
     }
 
 }

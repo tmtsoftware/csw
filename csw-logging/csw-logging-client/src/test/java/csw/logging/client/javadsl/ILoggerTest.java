@@ -21,6 +21,7 @@ import csw.logging.client.utils.JGenericActor;
 import csw.logging.client.utils.JGenericSimple;
 import csw.logging.client.utils.JLogUtil;
 import csw.logging.client.utils.TestAppender;
+import csw.prefix.models.Prefix;
 import org.junit.*;
 import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
@@ -59,8 +60,8 @@ public class ILoggerTest extends JUnitSuite {
 
     private static AkkaTypedExtension.UserActorFactory userActorFactory = AkkaTypedExtension.UserActorFactory(actorSystem);
 
-    private static ActorRef<String> irisSupervisorActor = userActorFactory.<String>spawn(JIrisSupervisorActor.behavior, "JIRISActor", Props.empty());
-    private static ActorRef<String> tromboneSupervisorActor = userActorFactory.<String>spawn(JTromboneHCDSupervisorActor.behavior(new JLoggerFactory("jTromboneHcdActor")), "JTromboneActor", Props.empty());
+    private static ActorRef<String> irisSupervisorActor = userActorFactory.<String>spawn(JIrisSupervisorActor.behavior, "csw.JIRISActor", Props.empty());
+    private static ActorRef<String> tromboneSupervisorActor = userActorFactory.<String>spawn(JTromboneHCDSupervisorActor.behavior(new JLoggerFactory(Prefix.apply("csw.jTromboneHcdActor"))), "csw.JTromboneActor", Props.empty());
     private static ActorRef<String> genericActor = userActorFactory.<String>spawn(JGenericActor.behavior, "JGenericActor", Props.empty());
 
     @BeforeClass
@@ -82,7 +83,7 @@ public class ILoggerTest extends JUnitSuite {
     }
 
     private void allComponentsStartLogging() {
-        JIrisTLA irisTLA = new JIrisTLA(new JLoggerFactory("jIRIS"));
+        JIrisTLA irisTLA = new JIrisTLA(new JLoggerFactory(Prefix.apply("csw.jIRIS")));
         JGenericSimple genericSimple = new JGenericSimple();
 
         //componentName = jIRIS
@@ -110,8 +111,8 @@ public class ILoggerTest extends JUnitSuite {
                 genericLogBuffer.add(log);
         });
 
-        irisLogBuffer = componentLogBuffer.get("jIRIS");
-        tromboneHcdLogBuffer = componentLogBuffer.get("jTromboneHcdActor");
+        irisLogBuffer = componentLogBuffer.get("csw.jIRIS");
+        tromboneHcdLogBuffer = componentLogBuffer.get("csw.jTromboneHcdActor");
 
         logBuffer.clear();
     }
@@ -125,14 +126,14 @@ public class ILoggerTest extends JUnitSuite {
 
     @Test
     public void testDefaultLogConfigurationAndDefaultComponentLogLevel() throws InterruptedException {
-        JTromboneHCDTLA jTromboneHCD = new JTromboneHCDTLA(new JLoggerFactory("tromboneHcd"));
+        JTromboneHCDTLA jTromboneHCD = new JTromboneHCDTLA(new JLoggerFactory(Prefix.apply("csw.tromboneHcd")));
         String tromboneHcdClassName = jTromboneHCD.getClass().getName();
 
         jTromboneHCD.startLogging();
         eventually(java.time.Duration.ofSeconds(10), () -> Assert.assertEquals(5, logBuffer.size()));
 
         logBuffer.forEach(log -> {
-            Assert.assertEquals("tromboneHcd", log.get(LoggingKeys$.MODULE$.COMPONENT_NAME()).getAsString());
+            Assert.assertEquals("csw.tromboneHcd", log.get(LoggingKeys$.MODULE$.COMPONENT_NAME()).getAsString());
 
             Assert.assertTrue(log.has(LoggingKeys$.MODULE$.SEVERITY()));
             String severity = log.get(LoggingKeys$.MODULE$.SEVERITY()).getAsString().toLowerCase();
@@ -169,7 +170,7 @@ public class ILoggerTest extends JUnitSuite {
         testLogBuffer(genericLogBuffer, Level.TRACE$.MODULE$);
 
         // Set log level of IRIS component to FATAL
-        loggingSystem.setComponentLogLevel("jIRIS", Level.FATAL$.MODULE$);
+        loggingSystem.setComponentLogLevel(Prefix.apply("csw.jIRIS"), Level.FATAL$.MODULE$);
 
         allComponentsStartLogging();
         eventually(java.time.Duration.ofSeconds(10), () -> Assert.assertEquals(18, logBuffer.size()));

@@ -2,8 +2,9 @@ package csw.logging.client.components
 
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
+import csw.prefix.models.Prefix
 
-object InnerSourceLogger extends LoggerFactory("InnerSourceComponent")
+object InnerSourceLogger extends LoggerFactory(Prefix("csw.InnerSourceComponent"))
 
 class InnerSourceComponent {
 
@@ -28,7 +29,7 @@ class InnerSourceComponent {
 }
 
 object InnerSourceComponent {
-  val TRACE_LINE_NO = 20
+  val TRACE_LINE_NO = 21
   val DEBUG_LINE_NO = TRACE_LINE_NO + 1
   val INFO_LINE_NO  = TRACE_LINE_NO + 2
   val WARN_LINE_NO  = TRACE_LINE_NO + 3

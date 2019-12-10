@@ -19,11 +19,12 @@ import csw.network.utils.Networks
 import csw.params.commands.CommandResponse.OnewayResponse
 import csw.params.commands.{CommandName, Setup}
 import csw.prefix.models.Prefix
+import csw.prefix.models.Subsystem.CSW
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
-object AppLogger extends LoggerFactory("app")
+object AppLogger extends LoggerFactory(Prefix(CSW, "app"))
 
 /*
   This app is for testing runtime changes of component log level

@@ -132,7 +132,7 @@ private[logging] object LogActorOperations {
 
     if (log.actorName.isDefined) jsonObject = jsonObject ++ Json.obj(LoggingKeys.ACTOR -> log.actorName.get)
 
-    if (log.componentName.isDefined) jsonObject = jsonObject ++ Json.obj(LoggingKeys.COMPONENT_NAME -> log.componentName.get)
+    if (log.prefix.isDefined) jsonObject = jsonObject ++ Json.obj(LoggingKeys.COMPONENT_NAME -> log.prefix.get.value)
 
     if (log.ex != NoLogException) jsonObject = jsonObject ++ exceptionJson(log.ex)
 

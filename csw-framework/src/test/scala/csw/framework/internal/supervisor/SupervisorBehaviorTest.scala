@@ -14,6 +14,7 @@ import csw.framework.ComponentInfos._
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.logging.models.Level.WARN
 import csw.logging.models.LogMetadata
+import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime
 import org.mockito.{ArgumentMatchers, MockitoSugar}
 
@@ -74,12 +75,12 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
     import typedSystem.executionContext
 
     Future {
-      supervisorBehaviorTestKit.run(SetComponentLogLevel("DummyHcd", WARN))
-      supervisorBehaviorTestKit.run(GetComponentLogMetadata("DummyHcd", logMetadataProbe.ref))
+      supervisorBehaviorTestKit.run(SetComponentLogLevel(Prefix("csw.DummyHcd"), WARN))
+      supervisorBehaviorTestKit.run(GetComponentLogMetadata(Prefix("csw.DummyHcd"), logMetadataProbe.ref))
     }
     Future {
-      supervisorBehaviorTestKit.run(SetComponentLogLevel("SampleHcd", WARN))
-      supervisorBehaviorTestKit.run(GetComponentLogMetadata("SampleHcd", logMetadataProbe.ref))
+      supervisorBehaviorTestKit.run(SetComponentLogLevel(Prefix("csw.SampleHcd"), WARN))
+      supervisorBehaviorTestKit.run(GetComponentLogMetadata(Prefix("csw.SampleHcd"), logMetadataProbe.ref))
     }
 
     val logMetadata1 = logMetadataProbe.expectMessageType[LogMetadata]
