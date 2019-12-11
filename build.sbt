@@ -134,7 +134,6 @@ lazy val `csw-admin-api` = crossProject(JSPlatform, JVMPlatform)
   .enablePlugins(PublishBintray)
   .jvmConfigure(_.enablePlugins(MaybeCoverage, GenJavadocPlugin))
   .settings(fork := false)
-  .settings(libraryDependencies ++= Dependencies.AdminApi.value)
 
 /* ================= Location Service ============== */
 
@@ -166,8 +165,8 @@ lazy val `csw-location-api` = crossProject(JSPlatform, JVMPlatform)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
   .dependsOn(`csw-location-models`)
   .jvmConfigure(_.dependsOn(`csw-logging-client`).enablePlugins(MaybeCoverage))
-  //  the following setting was required by older version of IntelliJ which could not handle cross-compiled Akka types
-  //  .jsSettings(SettingKey[Boolean]("ide-skip-project") := true)
+  //  the following setting was required by IntelliJ as it can not handle cross-compiled Akka types
+  .jsSettings(SettingKey[Boolean]("ide-skip-project") := true)
   .settings(libraryDependencies += MSocket.`msocket-api`.value)
   .settings(fork := false)
 
@@ -383,8 +382,8 @@ lazy val `csw-command-api` = crossProject(JSPlatform, JVMPlatform)
   .enablePlugins(PublishBintray)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
   .settings(libraryDependencies ++= Dependencies.CommandApi.value)
-  //  the following setting was required by older version of IntelliJ which could not handle cross-compiled Akka types
-  //  .jsSettings(SettingKey[Boolean]("ide-skip-project") := true)
+  //  the following setting was required by IntelliJ as it can not handle cross-compiled Akka types
+  .jsSettings(SettingKey[Boolean]("ide-skip-project") := true)
   .settings(fork := false)
 
 lazy val `csw-command-client` = project

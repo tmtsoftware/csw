@@ -9,14 +9,6 @@ object Dependencies {
     )
   )
 
-  val AdminApi = Def.setting(
-    Seq(
-      Borer.`borer-core`.value,
-      Borer.`borer-derivation`.value,
-      MSocket.`msocket-api`.value
-    )
-  )
-
   val AdminHandlers = Def.setting(
     Seq(
       Akka.`akka-actor-typed`,
