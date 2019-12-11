@@ -35,7 +35,6 @@ import csw.params.core.models.Units.{coulomb, pascal}
 import csw.params.core.models.{ArrayData, Id, ObsId}
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.prefix.models.Prefix
-import csw.prefix.models.Subsystem.CSW
 import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.prop.Tables.Table
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -140,8 +139,8 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
       GetComponents(componentsProbe.ref),
       GetContainerLifecycleState(containerLifecycleStateProbe.ref),
       Query(Id(), queryResponseProbe.ref),
-      GetComponentLogMetadata(Prefix(CSW, "component_name"), logMetadataProbe.ref),
-      SetComponentLogLevel(Prefix(CSW, "component_name"), Level.WARN)
+      GetComponentLogMetadata(logMetadataProbe.ref),
+      SetComponentLogLevel(Level.WARN)
     )
 
     forAll(testData) { command =>

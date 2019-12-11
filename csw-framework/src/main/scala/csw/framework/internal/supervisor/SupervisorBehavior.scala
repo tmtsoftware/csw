@@ -114,8 +114,8 @@ private[framework] final class SupervisorBehavior(
       case (SupervisorLifecycleState.Running, message: SupervisorInternalRunningMessage)       => onInternalRunning(message)
       case (SupervisorLifecycleState.Running, runningMessage: SupervisorRunningMessage)        => onRunning(runningMessage)
       case (SupervisorLifecycleState.RunningOffline, runningMessage: SupervisorRunningMessage) => onRunning(runningMessage)
-      case (_, GetComponentLogMetadata(prefix, replyTo))                                       => replyTo ! LogAdminUtil.getLogMetadata(prefix)
-      case (_, SetComponentLogLevel(prefix, logLevel))                                         => LogAdminUtil.setComponentLogLevel(prefix, logLevel)
+      case (_, GetComponentLogMetadata(replyTo))                                               => replyTo ! LogAdminUtil.getLogMetadata(prefix)
+      case (_, SetComponentLogLevel(logLevel))                                                 => LogAdminUtil.setComponentLogLevel(prefix, logLevel)
       case (_, message)                                                                        => ignore(message)
     }
     this

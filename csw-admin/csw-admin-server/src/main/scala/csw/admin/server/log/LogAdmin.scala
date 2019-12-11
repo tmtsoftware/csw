@@ -29,7 +29,6 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) {
     implicit val timeout: Timeout = Timeout(5.seconds)
     await(getLocation(connectionName)) match {
       case Some(location: AkkaLocation) =>
-        val prefix = location.prefix
         log.info(
           "Getting log information from logging system",
           Map(
@@ -39,8 +38,8 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) {
         )
 
         val metadataF: Future[LogMetadata] = location.connection.componentId.componentType match {
-          case Sequencer => location.sequencerRef ? (GetComponentLogMetadata(prefix, _))
-          case _         => location.componentRef ? (GetComponentLogMetadata(prefix, _))
+          case Sequencer => location.sequencerRef ? GetComponentLogMetadata
+          case _         => location.componentRef ? GetComponentLogMetadata
         }
 
         await(metadataF)
@@ -52,7 +51,6 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) {
     async {
       await(getLocation(connectionName)) match {
         case Some(location: AkkaLocation) =>
-          val prefix = location.prefix
           log.info(
             s"Setting log level to $logLevel",
             Map(
@@ -61,8 +59,8 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) {
             )
           )
           location.connection.componentId.componentType match {
-            case Sequencer => location.sequencerRef ! SetComponentLogLevel(prefix, logLevel)
-            case _         => location.componentRef ! SetComponentLogLevel(prefix, logLevel)
+            case Sequencer => location.sequencerRef ! SetComponentLogLevel(logLevel)
+            case _         => location.componentRef ! SetComponentLogLevel(logLevel)
           }
         case _ => throw UnresolvedAkkaLocationException(connectionName)
       }

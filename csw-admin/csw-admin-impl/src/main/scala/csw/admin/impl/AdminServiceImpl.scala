@@ -35,8 +35,8 @@ class AdminServiceImpl(locationService: LocationService)(implicit actorSystem: A
               Map("prefix" -> prefix.toString, "location" -> akkaLocation.toString)
             )
             val response: Future[LogMetadata] = componentId.componentType match {
-              case Sequencer => akkaLocation.sequencerRef ? (GetComponentLogMetadata(prefix, _))
-              case _         => akkaLocation.componentRef ? (GetComponentLogMetadata(prefix, _))
+              case Sequencer => akkaLocation.sequencerRef ? GetComponentLogMetadata
+              case _         => akkaLocation.componentRef ? GetComponentLogMetadata
             }
             response
           })
@@ -58,8 +58,8 @@ class AdminServiceImpl(locationService: LocationService)(implicit actorSystem: A
               Map("prefix" -> prefix.toString, "location" -> akkaLocation.toString)
             )
             componentId.componentType match {
-              case Sequencer => akkaLocation.sequencerRef ! SetComponentLogLevel(prefix, level)
-              case _         => akkaLocation.componentRef ! SetComponentLogLevel(prefix, level)
+              case Sequencer => akkaLocation.sequencerRef ! SetComponentLogLevel(level)
+              case _         => akkaLocation.componentRef ! SetComponentLogLevel(level)
             }
           })
           .getOrElse[Unit](throw new UnresolvedAkkaLocationException(prefix))
