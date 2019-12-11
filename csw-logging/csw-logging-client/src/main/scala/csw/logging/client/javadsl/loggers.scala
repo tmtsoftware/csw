@@ -22,7 +22,7 @@ abstract class JBaseLoggerFactory private[logging] (maybePrefix: Option[Prefix])
 }
 
 /**
- * When using the `JLoggerFactory`, log statements will have `@componentName` tag with provided `componentName`
+ * When using the `JLoggerFactory`, log statements will have `@componentName` tag with provided `prefix`
  *
  * @param prefix to appear in log statements
  */

@@ -14,7 +14,7 @@ private[logging] object ComponentLoggingStateManager {
 
   /**
    * Extracts the component-log-levels from logging configuration. It takes the config properties and stores in the map
-   * componentName ->
+   * Prefix -> ComponentLoggingState
    *
    * @param loggingConfig the logging configuration object
    * @return set of Filters
@@ -37,7 +37,7 @@ private[logging] object ComponentLoggingStateManager {
   }
 
   /**
-   * Add the component logging state for a component in map componentName -> ComponentLoggingState
+   * Add the component logging state for a component in map prefix -> ComponentLoggingState
    *
    * @param prefix the subsystem and componentName of the component e.g. tcs.filter.wheel
    * @param level the log level for the component

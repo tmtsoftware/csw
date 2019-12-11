@@ -19,7 +19,7 @@ abstract class BaseLoggerFactory private[logging] (maybePrefix: Option[Prefix]) 
 }
 
 /**
- * When using the `LoggerFactory`, log statements will have `@componentName` tag with provided `componentName`
+ * When using the `LoggerFactory`, log statements will have `@componentName` tag with provided `prefix`
  *
  * @param prefix to appear in log statements
  */
