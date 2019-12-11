@@ -2,21 +2,6 @@ import sbt.{Def, _}
 
 object Dependencies {
 
-  val AdminServer = Def.setting(
-    Seq(
-      Libs.`config`,
-      Akka.`akka-actor`,
-      Akka.`akka-stream`,
-      Akka.`akka-stream-typed`,
-      Akka.`akka-actor-typed`,
-      AkkaHttp.`akka-http`,
-      Libs.`scala-async`,
-      Borer.`borer-compat-akka`.value,
-      Libs.`scopt`,
-      Libs.`scalatest`.value % Test
-    )
-  )
-
   val AdminImpl = Def.setting(
     Seq(
       Akka.`akka-actor-typed`,

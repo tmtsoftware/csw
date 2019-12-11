@@ -35,7 +35,6 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
 )
 
 lazy val unidocExclusions: Seq[ProjectReference] = Seq(
-  `csw-admin-server`,
   `csw-location-server`,
   `csw-config-server`,
   `csw-location-agent`,
@@ -63,7 +62,6 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
 )
 
 lazy val githubReleases: Seq[ProjectReference] = Seq(
-  `csw-admin-server`,
   `csw-location-server`,
   `csw-location-agent`,
   `csw-config-server`,
@@ -109,23 +107,9 @@ lazy val `csw-prefix` = crossProject(JSPlatform, JVMPlatform)
 lazy val `csw-admin` = project
   .in(file("csw-admin"))
   .aggregate(
-    `csw-admin-server`,
     `csw-admin-api`.jvm,
     `csw-admin-api`.js,
     `csw-admin-impl`
-  )
-
-lazy val `csw-admin-server` = project
-  .in(file("csw-admin/csw-admin-server"))
-  .dependsOn(
-    `csw-admin-impl`,
-    `csw-commons`       % "compile->compile;test->test",
-    `csw-framework`     % "test->test",
-    `csw-config-server` % "test->test"
-  )
-  .enablePlugins(DeployApp, MaybeCoverage)
-  .settings(
-    libraryDependencies ++= Dependencies.AdminServer.value
   )
 
 lazy val `csw-admin-impl` = project

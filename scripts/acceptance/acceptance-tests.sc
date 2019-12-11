@@ -27,7 +27,8 @@ def entryPoint(version: String, projects: String*): Unit = {
 }
 
 lazy val allProjects = List(
-  "csw-admin-server",
+  "csw-admin-api",
+  "csw-admin-impl",
   "csw-location-agent",
   "csw-location-api",
   "csw-location-client",
