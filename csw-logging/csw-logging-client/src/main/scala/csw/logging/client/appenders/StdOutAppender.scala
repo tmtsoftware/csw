@@ -95,16 +95,17 @@ class StdOutAppender(system: ActorSystem[_], stdHeaders: JsObject, logPrinter: A
 
   private def oneLine(baseMsg: JsObject, level: String, maybeKind: String) = {
     val msg       = baseMsg.getString(LoggingKeys.MESSAGE)
-    val kind      = if (!maybeKind.isEmpty) s":$maybeKind" else ""
+    val kind      = if (maybeKind.nonEmpty) s":$maybeKind" else ""
     val file      = baseMsg.getString(LoggingKeys.FILE)
-    val where     = if (!file.isEmpty) s" ($file ${baseMsg.getString(LoggingKeys.LINE)})" else ""
+    val where     = if (file.nonEmpty) s" ($file ${baseMsg.getString(LoggingKeys.LINE)})" else ""
     val comp      = baseMsg.getString(LoggingKeys.COMPONENT_NAME)
+    val subsystem = if (comp.nonEmpty) s"${baseMsg.getString(LoggingKeys.SUBSYSTEM)}." else ""
     val timestamp = baseMsg.getString(LoggingKeys.TIMESTAMP)
 
     val plainStack =
       if (baseMsg.contains(LoggingKeys.PLAINSTACK)) " [Stacktrace] " ++ baseMsg.getString(LoggingKeys.PLAINSTACK) else ""
 
-    f"$timestamp $level%-5s$kind $comp$where - $msg$plainStack"
+    f"$timestamp $level%-5s$kind $subsystem$comp$where - $msg$plainStack"
   }
 
   private def buildSummary(level: String, kind: String): Unit = {

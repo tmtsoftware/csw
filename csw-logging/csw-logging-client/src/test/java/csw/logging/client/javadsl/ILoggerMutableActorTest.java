@@ -83,7 +83,8 @@ public class ILoggerMutableActorTest extends JUnitSuite {
         eventually(java.time.Duration.ofSeconds(10), () -> Assert.assertEquals(4, logBuffer.size()));
 
         logBuffer.forEach(log -> {
-            Assert.assertEquals("csw.jIRISTyped", log.get(LoggingKeys$.MODULE$.COMPONENT_NAME()).getAsString());
+            Assert.assertEquals("jIRISTyped", log.get(LoggingKeys$.MODULE$.COMPONENT_NAME()).getAsString());
+            Assert.assertEquals("csw", log.get(LoggingKeys$.MODULE$.SUBSYSTEM()).getAsString());
             Assert.assertEquals(actorPath, log.get(LoggingKeys$.MODULE$.ACTOR()).getAsString());
 
             Assert.assertTrue(log.has(LoggingKeys$.MODULE$.SEVERITY()));

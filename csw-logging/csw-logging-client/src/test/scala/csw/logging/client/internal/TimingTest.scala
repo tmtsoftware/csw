@@ -13,6 +13,7 @@ import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.{FileUtils, LoggingTestSuite}
 import csw.logging.models.RequestId
 import csw.prefix.models.Prefix
+import csw.prefix.models.Subsystem.CSW
 import play.api.libs.json.{JsObject, Json}
 
 import scala.collection.mutable
@@ -26,7 +27,7 @@ class TimingTest extends LoggingTestSuite with Timing {
   override lazy val loggingSystem =
     new LoggingSystem(loggingSystemName, "version", "localhost", actorSystem)
 
-  private val irisActorRef = actorSystem.spawn(IRIS.behavior(Prefix(IRIS.COMPONENT_NAME)), name = "IRIS-Supervisor-Actor")
+  private val irisActorRef = actorSystem.spawn(IRIS.behavior(Prefix(CSW, IRIS.COMPONENT_NAME)), name = "IRIS-Supervisor-Actor")
 
   private val fileTimestamp   = FileAppender.decideTimestampForFile(ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC)))
   private val timeLogFilePath = s"$logFileDir/${loggingSystemName}_${fileTimestamp}_time.log"
@@ -104,6 +105,7 @@ class TimingTest extends LoggingTestSuite with Timing {
         log.getString(LoggingKeys.MESSAGE) shouldBe IRIS.irisLogs(currentLogLevel)
 
         log.getString(LoggingKeys.COMPONENT_NAME) shouldBe IRIS.COMPONENT_NAME
+        log.getString(LoggingKeys.SUBSYSTEM) shouldBe CSW.name
         log.getString(LoggingKeys.ACTOR) shouldBe irisActorRef.path.toString
         log.getString(LoggingKeys.FILE) shouldBe IRIS.FILE_NAME
         log.getString(LoggingKeys.CLASS) shouldBe IRIS.CLASS_NAME
@@ -111,5 +113,4 @@ class TimingTest extends LoggingTestSuite with Timing {
       }
     }
   }
-
 }

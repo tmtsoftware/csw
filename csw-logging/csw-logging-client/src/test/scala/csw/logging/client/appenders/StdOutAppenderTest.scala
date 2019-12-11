@@ -92,15 +92,17 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
       stdOutAppenderForOneLineMsg.append(expectedLogJson, Category.Common.name)
     }
 
-    val actualOneLineLogMsg   = outCapture.toString.replace("\n", "")
-    val severity              = expectedLogJson.getString(LoggingKeys.SEVERITY)
-    val msg                   = expectedLogJson.getString(LoggingKeys.MESSAGE)
-    val fileName              = expectedLogJson.getString(LoggingKeys.FILE)
-    val lineNumber            = expectedLogJson.getString(LoggingKeys.LINE)
-    val plainStack            = expectedLogJson.getString(LoggingKeys.PLAINSTACK)
-    val timestamp             = expectedLogJson.getString(LoggingKeys.TIMESTAMP)
-    val component             = expectedLogJson.getString(LoggingKeys.COMPONENT_NAME)
-    val expectedOneLineLogMsg = f"$timestamp $severity%-5s $component ($fileName $lineNumber) - $msg [Stacktrace] $plainStack"
+    val actualOneLineLogMsg = outCapture.toString.replace("\n", "")
+    val severity            = expectedLogJson.getString(LoggingKeys.SEVERITY)
+    val msg                 = expectedLogJson.getString(LoggingKeys.MESSAGE)
+    val fileName            = expectedLogJson.getString(LoggingKeys.FILE)
+    val lineNumber          = expectedLogJson.getString(LoggingKeys.LINE)
+    val plainStack          = expectedLogJson.getString(LoggingKeys.PLAINSTACK)
+    val timestamp           = expectedLogJson.getString(LoggingKeys.TIMESTAMP)
+    val component           = expectedLogJson.getString(LoggingKeys.COMPONENT_NAME)
+    val subsystem           = expectedLogJson.getString(LoggingKeys.SUBSYSTEM)
+    val expectedOneLineLogMsg =
+      f"$timestamp $severity%-5s $subsystem.$component ($fileName $lineNumber) - $msg [Stacktrace] $plainStack"
 
     actualOneLineLogMsg shouldBe expectedOneLineLogMsg
 

@@ -4,8 +4,9 @@ import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.scaladsl.{LoggerFactory, RichException}
 import csw.prefix.models.Prefix
+import csw.prefix.models.Subsystem.CSW
 
-object TromboneHcdLogger extends LoggerFactory(Prefix(TromboneHcd.COMPONENT_NAME))
+object TromboneHcdLogger extends LoggerFactory(Prefix(CSW, TromboneHcd.COMPONENT_NAME))
 
 class TromboneHcd() {
 
@@ -43,13 +44,13 @@ class TromboneHcd() {
 }
 
 object TromboneHcd {
-  val TRACE_LINE_NO = 20
+  val TRACE_LINE_NO = 21
   val DEBUG_LINE_NO = TRACE_LINE_NO + 1
   val INFO_LINE_NO  = TRACE_LINE_NO + 2
   val WARN_LINE_NO  = TRACE_LINE_NO + 3
   val ERROR_LINE_NO = TRACE_LINE_NO + 4
   val FATAL_LINE_NO = TRACE_LINE_NO + 5
 
-  val COMPONENT_NAME = "csw.tromboneHcd"
+  val COMPONENT_NAME = "tromboneHcd"
   val FILE_NAME      = "TromboneHcd.scala"
 }

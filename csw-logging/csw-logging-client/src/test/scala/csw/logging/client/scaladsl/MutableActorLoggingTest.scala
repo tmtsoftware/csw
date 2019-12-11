@@ -59,7 +59,8 @@ class MutableActorLoggingTest extends LoggingTestSuite {
     logBuffer.foreach { log =>
       log.contains("@componentName") shouldBe true
       log.contains("actor") shouldBe true
-      log.getString("@componentName") shouldBe "csw.tromboneMutableHcdActor"
+      log.getString("@componentName") shouldBe "tromboneMutableHcdActor"
+      log.getString("@subsystem") shouldBe "csw"
       log.getString("actor") shouldBe tromboneActorRef.path.toString
       log.getString("file") shouldBe "MutableActorLoggingTest.scala"
       log.contains("line") shouldBe true
@@ -75,7 +76,7 @@ class MutableActorLoggingTest extends LoggingTestSuite {
     //  As per the filter, hcd should log 3 message of level ERROR and FATAL
     val groupByComponentNamesLog =
       logBuffer.groupBy(json => json.getString("@componentName"))
-    val tromboneHcdLogs = groupByComponentNamesLog("csw.tromboneMutableHcdActor")
+    val tromboneHcdLogs = groupByComponentNamesLog("tromboneMutableHcdActor")
 
     tromboneHcdLogs.size shouldBe 3
 

@@ -88,7 +88,8 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     Thread.sleep(100)
     assertThatExceptionIsLogged(
       logBuffer,
-      "wfos.SampleHcd",
+      "wfos",
+      "SampleHcd",
       failureStopExMsg,
       ERROR,
       ComponentBehavior.getClass.getName,
@@ -146,7 +147,8 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     // component handlers initialize block throws FailureRestart exception which we expect akka logs it
     assertThatExceptionIsLogged(
       logBuffer,
-      "wfos.SampleHcd",
+      "wfos",
+      "SampleHcd",
       failureRestartExMsg,
       ERROR,
       ComponentBehavior.getClass.getName,

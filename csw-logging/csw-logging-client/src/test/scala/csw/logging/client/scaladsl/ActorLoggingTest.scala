@@ -9,10 +9,11 @@ import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.LoggingTestSuite
 import csw.logging.models.Level
 import csw.prefix.models.Prefix
+import csw.prefix.models.Subsystem.CSW
 
 class ActorLoggingTest extends LoggingTestSuite {
   private val irisActorRef =
-    actorSystem.spawn(IRIS.behavior(Prefix(IRIS.COMPONENT_NAME)), name = "IRIS-Supervisor-Actor")
+    actorSystem.spawn(IRIS.behavior(Prefix(CSW, IRIS.COMPONENT_NAME)), name = "IRIS-Supervisor-Actor")
 
   def sendMessagesToActor(): Unit = {
     irisActorRef ! LogTrace
@@ -39,6 +40,7 @@ class ActorLoggingTest extends LoggingTestSuite {
 
     logBuffer.foreach { log =>
       log.getString(LoggingKeys.COMPONENT_NAME) shouldBe IRIS.COMPONENT_NAME
+      log.getString(LoggingKeys.SUBSYSTEM) shouldBe CSW.name
       log.getString(LoggingKeys.ACTOR) shouldBe irisActorRef.path.toString
       log.getString(LoggingKeys.FILE) shouldBe IRIS.FILE_NAME
       // todo : create method getNumber as extension to JsObject.

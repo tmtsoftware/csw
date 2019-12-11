@@ -109,7 +109,8 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
     // DEOPSCSW-180: Generic and Specific Log messages
     assertThatMessageIsLogged(
       logBuffer,
-      "iris.IFS_Detector",
+      "iris",
+      "IFS_Detector",
       "Invoking lifecycle handler's initialize hook",
       INFO,
       ComponentBehavior.getClass.getName
@@ -117,7 +118,8 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
     // log message from Component handler
     assertThatMessageIsLogged(
       logBuffer,
-      "iris.IFS_Detector",
+      "iris",
+      "IFS_Detector",
       "Initializing Component TLA",
       INFO,
       classOf[SampleComponentHandlers].getName

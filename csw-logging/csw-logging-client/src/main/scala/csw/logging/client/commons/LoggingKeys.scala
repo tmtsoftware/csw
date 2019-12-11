@@ -24,6 +24,7 @@ private[csw] object LoggingKeys {
   val LINE  = "line"  // source location macro
 
   //  these items are only present if applicable.
+  val SUBSYSTEM      = "@subsystem"     // Passed into LoggerImpl on instantiation of a ComponentLogger.  Passed in Log Message
   val COMPONENT_NAME = "@componentName" // Passed into LoggerImpl on instantiation of a ComponentLogger.  Passed in Log Message
   val ACTOR          = "actor"          // Passed into LoggerImpl on instantiation of a ComponentLogger.Actor.  Passed in Log Message
 

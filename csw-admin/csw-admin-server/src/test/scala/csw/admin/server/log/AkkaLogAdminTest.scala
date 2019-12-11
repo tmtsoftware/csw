@@ -158,7 +158,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
     val groupByComponentNamesLog = logBuffer.groupBy { json =>
       if (json.contains("@componentName")) json.getString("@componentName")
     }
-    val laserComponentLogs = groupByComponentNamesLog(laserComponent.info.prefix.toString)
+    val laserComponentLogs = groupByComponentNamesLog(laserComponent.info.prefix.componentName)
 
     laserComponentLogs.exists(log => log.getString("@severity").toLowerCase.equalsIgnoreCase("info")) shouldBe true
     laserComponentLogs.foreach { log =>
@@ -191,8 +191,8 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpParameter {
     Thread.sleep(100)
 
     val groupByAfterFilter       = logBuffer.groupBy(json => json.getString("@componentName"))
-    val laserCompLogsAfterFilter = groupByAfterFilter(laserConnection.prefix.toString)
-    val galilCompLogsAfterFilter = groupByAfterFilter(galilConnection.prefix.toString)
+    val laserCompLogsAfterFilter = groupByAfterFilter(laserConnection.prefix.componentName)
+    val galilCompLogsAfterFilter = groupByAfterFilter(galilConnection.prefix.componentName)
 
     laserCompLogsAfterFilter.exists(log => log.getString("@severity").toLowerCase.equalsIgnoreCase("error")) shouldBe true
     laserCompLogsAfterFilter.foreach { log =>
