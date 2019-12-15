@@ -7,8 +7,7 @@ import csw.command.api.codecs.CommandServiceCodecs
 import csw.command.api.messages.CommandServiceWebsocketMessage
 import csw.command.api.messages.CommandServiceWebsocketMessage._
 import csw.command.api.scaladsl.CommandService
-import msocket.api.MessageHandler
-import msocket.impl.Encoding
+import msocket.api.{Encoding, MessageHandler}
 import msocket.impl.ws.WebsocketStreamExtensions
 
 class CommandServiceWebsocketHandlers(commandService: CommandService, val encoding: Encoding[_])

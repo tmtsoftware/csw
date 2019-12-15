@@ -6,8 +6,8 @@ import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.messages.{LocationHttpMessage, LocationWebsocketMessage}
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.internal.Settings
+import msocket.api.Encoding.JsonText
 import msocket.api.Transport
-import msocket.impl.Encoding.JsonText
 import msocket.impl.post.HttpPostTransport
 import msocket.impl.ws.WebsocketTransport
 

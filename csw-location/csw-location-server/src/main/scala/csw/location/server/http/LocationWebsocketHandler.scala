@@ -7,8 +7,7 @@ import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.messages.LocationWebsocketMessage
 import csw.location.api.messages.LocationWebsocketMessage.Track
 import csw.location.api.scaladsl.LocationService
-import msocket.api.MessageHandler
-import msocket.impl.Encoding
+import msocket.api.{Encoding, MessageHandler}
 import msocket.impl.ws.WebsocketStreamExtensions
 
 class LocationWebsocketHandler(locationService: LocationService, val encoding: Encoding[_])
