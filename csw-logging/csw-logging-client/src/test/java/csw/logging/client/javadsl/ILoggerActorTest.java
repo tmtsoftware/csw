@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 import static csw.logging.client.utils.Eventually.eventually;
 
+// CSW-78: PrefixRedesign for logging
 public class ILoggerActorTest extends JUnitSuite {
     protected static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
     protected static LoggingSystem loggingSystem;
@@ -78,6 +79,7 @@ public class ILoggerActorTest extends JUnitSuite {
         logBuffer.forEach(log -> {
             Assert.assertEquals("jTromboneHcdActor", log.get(LoggingKeys$.MODULE$.COMPONENT_NAME()).getAsString());
             Assert.assertEquals("csw", log.get(LoggingKeys$.MODULE$.SUBSYSTEM()).getAsString());
+            Assert.assertEquals("csw.jTromboneHcdActor", log.get(LoggingKeys$.MODULE$.PREFIX()).getAsString());
             Assert.assertEquals(actorPath, log.get(LoggingKeys$.MODULE$.ACTOR()).getAsString());
 
             Assert.assertTrue(log.has(LoggingKeys$.MODULE$.SEVERITY()));

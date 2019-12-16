@@ -25,6 +25,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
   // DEOPSCSW-118: Provide UTC time for each log message
   // DEOPSCSW-119: Associate source with each log message
   // DEOPSCSW-121: Define structured tags for log messages
+  // CSW-78: PrefixRedesign for logging
   test("logs should contain component name and source location in terms of file name, class name and line number") {
     val expectedDateTime = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
     new TromboneHcd().startLogging(logMsgMap)
@@ -49,6 +50,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
 
       log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "tromboneHcd"
       log.getString(LoggingKeys.SUBSYSTEM) shouldBe "csw"
+      log.getString(LoggingKeys.PREFIX) shouldBe "csw.tromboneHcd"
       log.getString(LoggingKeys.FILE) shouldBe "TromboneHcd.scala"
       log(LoggingKeys.LINE).as[Int] shouldBe logMsgLineNumber
       log.getString(LoggingKeys.CLASS) shouldBe "csw.logging.client.components.TromboneHcd"
