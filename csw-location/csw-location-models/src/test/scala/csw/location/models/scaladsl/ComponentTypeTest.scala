@@ -5,12 +5,13 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 class ComponentTypeTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
-  // DEOPSCSW-14: Codec for data model
+  // DEOPSCSW-14: Codec for data modelCSW-80
+  //CSW-80: Prefix should be in lowercase
   test(
-    "ComponentType should be any one of this types : 'container', 'hcd', 'assembly', 'sequence', 'sequencecomponent' and 'service'"
+    "ComponentType should be any one of this types : 'container', 'hcd', 'assembly', 'sequence', 'sequence_component' and 'service'"
   ) {
 
-    val expectedComponentTypeValues = Set("container", "hcd", "assembly", "service", "sequencer", "sequencecomponent")
+    val expectedComponentTypeValues = Set("container", "hcd", "assembly", "service", "sequencer", "sequence_component")
     val actualComponentTypeValues: Set[String] =
       ComponentType.values.map(componentType => componentType.entryName).toSet
 
