@@ -270,7 +270,7 @@ public class JEventPublisherTest extends TestNGSuite {
     public void should_be_able_to_publish_event_via_asynchronous_event_generator_with_start_time(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         List<Event> events = new ArrayList<>();
         for (int i = 31; i < 41; i++) {
-            events.add(Utils.makeEventWithPrefix(i, new Prefix(JSubsystem.CSW(), "start.time.test.publishAsync")));
+            events.add(Utils.makeEventWithPrefix(i, Prefix.apply(JSubsystem.CSW(), "start.time.test.publishAsync")));
         }
 
         EventKey eventKey = events.get(0).eventKey();

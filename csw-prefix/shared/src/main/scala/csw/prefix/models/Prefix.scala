@@ -8,9 +8,9 @@ package csw.prefix.models
  *  - leading or trailing spaces
  *  - and hyphen (-)
  * @param subsystem     component subsystem - tcs (TCS), wfos (WFOS)
- * @param componentName component name - filter.wheel, prog.cloudcover
+ * @param componentName component name - filter.wheel, prog.cloudcover. It is changed to lowercase while constructing the Prefix.
  */
-case class Prefix(subsystem: Subsystem, componentName: String) {
+case class Prefix private (subsystem: Subsystem, componentName: String) {
   require(componentName == componentName.trim, "component name has leading and trailing whitespaces")
   require(!componentName.contains("-"), "component name has '-'")
 
@@ -40,4 +40,16 @@ object Prefix {
     val Array(subsystem, componentName) = value.split(s"\\$SEPARATOR", 2)
     Prefix(Subsystem.withNameInsensitive(subsystem), componentName)
   }
+
+  /**
+   * A top level key for a parameter set: combination of subsystem and the subsystem's prefix
+   * e.g. tcs.filter.wheel, wfos.prog.cloudcover, etc
+   *
+   * @note Component name should not contain
+   *  - leading or trailing spaces
+   *  - and hyphen (-)
+   * @param subsystem     component subsystem - tcs (TCS), wfos (WFOS)
+   * @param componentName component name - filter.wheel, prog.cloudcover. It is changed to lowercase while constructing the Prefix.
+   */
+  def apply(subsystem: Subsystem, componentName: String): Prefix = new Prefix(subsystem, componentName.toLowerCase)
 }

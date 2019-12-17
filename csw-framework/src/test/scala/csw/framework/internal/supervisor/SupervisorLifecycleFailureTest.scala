@@ -89,7 +89,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     assertThatExceptionIsLogged(
       logBuffer,
       "wfos",
-      "SampleHcd",
+      "samplehcd",
       failureStopExMsg,
       ERROR,
       ComponentBehavior.getClass.getName,
@@ -148,7 +148,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     assertThatExceptionIsLogged(
       logBuffer,
       "wfos",
-      "SampleHcd",
+      "samplehcd",
       failureRestartExMsg,
       ERROR,
       ComponentBehavior.getClass.getName,

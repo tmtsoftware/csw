@@ -110,7 +110,7 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
     assertThatMessageIsLogged(
       logBuffer,
       "iris",
-      "IFS_Detector",
+      "ifs_detector",
       "Invoking lifecycle handler's initialize hook",
       INFO,
       ComponentBehavior.getClass.getName
@@ -119,7 +119,7 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
     assertThatMessageIsLogged(
       logBuffer,
       "iris",
-      "IFS_Detector",
+      "ifs_detector",
       "Initializing Component TLA",
       INFO,
       classOf[SampleComponentHandlers].getName

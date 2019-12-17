@@ -65,7 +65,9 @@ component-log-levels {
 @@@ note
 
 Here `trombonehcd` and `tromboneassembly` is the name of component that will be registered with `LocationService`, 
-which is the `name` field in the ComponentInfo file (see @ref:[DeployingComponents](../framework/deploying-components.md)). By default, all components will log at level specified by `csw-logging.logLevel`. 
+which is the `name` field in the ComponentInfo file (see @ref:[DeployingComponents](../framework/deploying-components.md)). 
+By default, all components will log at level specified by `csw-logging.logLevel`. Also, the component specific log levels will be case-insensitive
+i.e `TCS.tromboneHcd` and `tcs.trombonehcd` will represent the same component and the one specified later will take preference. 
 
 @@@
 

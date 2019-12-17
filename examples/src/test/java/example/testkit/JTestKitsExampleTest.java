@@ -56,7 +56,7 @@ public class JTestKitsExampleTest extends JUnitSuite {
 
         //#spawn-using-testkit
 
-        AkkaConnection connection = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS(), "JSampleAssembly"), JComponentType.Assembly()));
+        AkkaConnection connection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.NFIRAOS(), "JSampleAssembly"), JComponentType.Assembly()));
         Optional<AkkaLocation> akkaLocation = locationService.resolve(connection, Duration.ofSeconds(5)).get();
 
         Assert.assertTrue(akkaLocation.isPresent());
