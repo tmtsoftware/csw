@@ -46,8 +46,8 @@ import scala.concurrent.{Await, ExecutionContext, Future}
  * 2. Assembly (JVM-3) receives command and update its validation status as Accepted in CSRM
  * 3. Commanding Assembly (JVM-2) receives validation response as Accepted
  * 4. Commanding Assembly then waits for Command Completion response
- * 5. Assembly from JVM-3 updates Command Completion status which is CompletedWithResult in CSRM
- * 6. Commanding Assembly (JVM-2) receives Command Completion response which is CompletedWithResult
+ * 5. Assembly from JVM-3 updates Command Completion status which is Completed (with result) in CSRM
+ * 6. Commanding Assembly (JVM-2) receives Command Completion response which is Completed (with result)
  *
  * Scenario 3 : Long Running Command with matcher
  * 1. Commanding Assembly sends long running command to another assembly (JVM-3)

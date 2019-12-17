@@ -40,7 +40,7 @@ object CommandResponse {
 
   /**
    * SubmitResponse is returned by Submit message which calls the onSubmit handler
-   * Responses returned can be Invalid, Started, Completed, CompletedWithResult, Error, Cancelled, Locked
+   * Responses returned can be Invalid, Started, Completed, Error, Cancelled, Locked
    */
   sealed trait SubmitResponse extends CommandResponse
 

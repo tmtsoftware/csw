@@ -78,7 +78,7 @@ that the command could not be validated.
 
 The immediate completion behavior is similar to a remote procedure call although the execution is entirely asynchronous. 
 If the actions do not produce a value for the client, the `Completed` `SubmitResponse` is returned. If there is a result, the
-`CompletedWithResult` `SubmitResult` is returned with a parameter set of `Result` type.
+`Completed` `SubmitResult` is returned with a parameter set of `Result` type.
 
 ####Long Running Actions Scenario
 When actions take longer than 1 second, `onSubmit` should start the actions and return the `Started` `SubmitResponse`. The
@@ -97,7 +97,7 @@ The following table summarizes all the possible values for `SubmitResponse`.
 | :---: | --- |
 | Invalid | The command is not valid and cannot be executed. The response includes a reason in the form of a `CommandIssue`.  `onSubmit` is not executed. |
 | Completed | This response is returned when the actions associated with a command are complete. |
-| CompletedWithResult | This response is returned when the actions associated with a command are complete and a result is returned. |
+| Completed(Result) | This response is returned when the actions associated with a command are complete and a result is returned. |
 | Started | Returned when long running actions have been started. |
 | Error | Error is returned the the actions started by a command do not complete properly. A message is returned explaining the error. |
 | Cancelled | The actions associated with a long running command have been cancelled. |
@@ -143,7 +143,7 @@ The API can be exercised as follows for different scenarios of command-based com
 
 ### submit
 Sending a `submit` message with a command returns a `SubmitResponse` as a Future.
-The Future returned by `submit` will always be the final response in case of short running command which may be a positive completion (`Completed` or `CompletedWithResult`)
+The Future returned by `submit` will always be the final response in case of short running command which may be a positive completion (`Completed`)
 or a negative completion (`Invalid`, `Error`, `Cancelled`, `Locked`) or initial response in case of long running command which can be `Started`. 
 In case of long running command, `Started` or `Invalid` response is returned and then user can either `query` for response or `queryFinal`  for final response.
 
@@ -194,8 +194,7 @@ Java/submit long running/query
 ### submitAndWait
 `submitAndWait` is wrapper method which sends `submit` message and waits for final response.
 Sending a `submit` message with a command returns a `SubmitResponse` as a Future.
-The Future returned by `submitAndWait` will always be the final response, which may be a positive completion (`Completed` or
-`CompletedWithResult`) or a negative completion (`Invalid`, `Error`, `Cancelled`, `Locked`). The `Started` response is never seen
+The Future returned by `submitAndWait` will always be the final response, which may be a positive completion (`Completed`) or a negative completion (`Invalid`, `Error`, `Cancelled`, `Locked`). The `Started` response is never seen
 by the programmer when using the `submitAndWait` of `CommandService`.The handling of long-running and immediate completion 
 commands look the same from the command sender's perspective
 
