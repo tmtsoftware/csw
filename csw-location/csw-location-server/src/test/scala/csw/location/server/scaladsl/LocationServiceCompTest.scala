@@ -461,11 +461,7 @@ class LocationServiceCompTest(mode: String)
     locationService.register(make(akkaConnection2, actorRef2.toURI)).await
     locationService.register(make(akkaConnection3, actorRef3.toURI)).await
 
-    locationService.listByPrefix(Prefix("nfiraos.ncc.trombone")).await.map(_.connection).toSet shouldBe Set(
-      akkaConnection1,
-      akkaConnection2,
-      akkaConnection3
-    )
+    locationService.listByPrefix(Prefix("nfiraos.ncc.trombone.hcd3")).await.map(_.connection).toSet shouldBe Set(akkaConnection3)
   }
 
   // DEOPSCSW-12: Create location service API
