@@ -40,6 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 // DEOPSCSW-178: Lifecycle success/failure notification
 // DEOPSCSW-181: Multiple Examples for Lifecycle Support
+// CSW-80: Prefix should be in lowercase
 class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
   val supervisorLifecycleStateProbe: TestProbe[SupervisorLifecycleState] = TestProbe[SupervisorLifecycleState]

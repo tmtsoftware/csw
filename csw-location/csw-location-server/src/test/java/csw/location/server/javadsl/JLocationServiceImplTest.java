@@ -46,6 +46,7 @@ import java.util.concurrent.TimeUnit;
 
 import static csw.prefix.javadsl.JSubsystem.CSW;
 
+// CSW-80: Prefix should be in lowercase
 @SuppressWarnings("ConstantConditions")
 public class JLocationServiceImplTest extends JUnitSuite {
 

@@ -30,6 +30,7 @@ import static csw.logging.client.utils.Eventually.eventually;
 
 // DEOPSCSW-280 SPIKE: Introduce Akkatyped in logging
 // CSW-78: PrefixRedesign for logging
+// CSW-80: Prefix should be in lowercase
 public class ILoggerMutableActorTest extends JUnitSuite {
     protected static ActorSystem<SpawnProtocol.Command> actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
     protected static LoggingSystem loggingSystem;

@@ -36,6 +36,7 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-167: Creation and Deployment of Standalone Components
 // DEOPSCSW-177: Hooks for lifecycle management
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
+// CSW-80: Prefix should be in lowercase
 class StandaloneComponentTest extends FrameworkIntegrationSuite {
   import testWiring._
   // all log messages will be captured in log buffer

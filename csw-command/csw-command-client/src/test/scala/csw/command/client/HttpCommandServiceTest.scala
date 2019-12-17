@@ -30,6 +30,7 @@ import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContext, Future}
 
 //noinspection ScalaStyle
+// CSW-80: Prefix should be in lowercase
 class HttpCommandServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with HTTPLocationService {
 
   val typedSystem: typed.ActorSystem[_]         = ActorSystem(Behaviors.empty, "HttpCommandServiceTest")

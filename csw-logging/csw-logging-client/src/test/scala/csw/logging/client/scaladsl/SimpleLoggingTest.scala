@@ -26,6 +26,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
   // DEOPSCSW-119: Associate source with each log message
   // DEOPSCSW-121: Define structured tags for log messages
   // CSW-78: PrefixRedesign for logging
+  // CSW-80: Prefix should be in lowercase
   test("logs should contain component name and source location in terms of file name, class name and line number") {
     val expectedDateTime = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
     new TromboneHcd().startLogging(logMsgMap)
