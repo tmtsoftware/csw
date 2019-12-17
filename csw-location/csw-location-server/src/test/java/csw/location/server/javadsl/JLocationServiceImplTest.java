@@ -335,7 +335,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
                 (AkkaLocation) akkaRegistration2.location(Networks.apply().hostname()),
                 (AkkaLocation) akkaRegistration3.location(Networks.apply().hostname())
         );
-        Assert.assertEquals(akkaLocations, locationService.listByPrefix("nfiraos.ncc.trombone").get());
+        Assert.assertEquals(akkaLocations, locationService.listByPrefix(Prefix.apply("nfiraos.ncc.trombone")).get());
     }
 
     // DEOPSCSW-26: Track a connection

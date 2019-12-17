@@ -461,7 +461,7 @@ class LocationServiceCompTest(mode: String)
     locationService.register(make(akkaConnection2, actorRef2.toURI)).await
     locationService.register(make(akkaConnection3, actorRef3.toURI)).await
 
-    locationService.listByPrefix("nfiraos.ncc.trombone").await.map(_.connection).toSet shouldBe Set(
+    locationService.listByPrefix(Prefix("nfiraos.ncc.trombone")).await.map(_.connection).toSet shouldBe Set(
       akkaConnection1,
       akkaConnection2,
       akkaConnection3

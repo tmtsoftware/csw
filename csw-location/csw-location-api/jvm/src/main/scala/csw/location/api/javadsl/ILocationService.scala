@@ -10,6 +10,7 @@ import akka.Done
 import akka.stream.javadsl.Source
 import csw.location.api.scaladsl.LocationService
 import csw.location.models._
+import csw.prefix.models.Prefix
 import msocket.api.Subscription
 
 /**
@@ -113,7 +114,7 @@ trait ILocationService {
    * @return a CompletableFuture which completes with filtered locations or can fail with
    *         [[csw.location.api.exceptions.RegistrationListingFailed]]
    */
-  def listByPrefix(prefix: String): CompletableFuture[ju.List[AkkaLocation]]
+  def listByPrefix(prefix: Prefix): CompletableFuture[ju.List[Location]]
 
   /**
    * Tracks the connection and send events for modification or removal of its location
