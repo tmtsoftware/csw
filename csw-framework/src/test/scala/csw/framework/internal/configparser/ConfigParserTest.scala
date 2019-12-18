@@ -19,6 +19,7 @@ import scala.jdk.CollectionConverters._
 // DEOPSCSW-172: Starting a container from configuration file
 // DEOPSCSW-283: Parsing HOCON conf file
 // CSW-82: ComponentInfo should take prefix
+// CSW-83: Alarm models should take prefix
 class ConfigParserTest extends FunSuite with Matchers {
 
   private val assemblyInfo = ComponentInfo(

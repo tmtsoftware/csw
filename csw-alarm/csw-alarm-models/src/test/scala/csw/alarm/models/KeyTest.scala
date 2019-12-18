@@ -1,15 +1,16 @@
 package csw.alarm.models
 import csw.alarm.commons.Separators.KeySeparator
 import csw.alarm.models.Key.{AlarmKey, ComponentKey, GlobalKey, SubsystemKey}
-import csw.prefix.models.Subsystem
+import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.NFIRAOS
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.{FunSuite, Matchers}
 
 // DEOPSCSW-435: Identify Alarm by Subsystem, component and AlarmName
+// CSW-83: Alarm models should take prefix
 class KeyTest extends FunSuite with Matchers with TableDrivenPropertyChecks {
   test("AlarmKey should be representing a unique alarm") {
-    val tromboneAxisHighLimitAlarm = AlarmKey(NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm")
+    val tromboneAxisHighLimitAlarm = AlarmKey(Prefix(NFIRAOS, "trombone"), "tromboneAxisHighLimitAlarm")
     tromboneAxisHighLimitAlarm.value shouldEqual s"nfiraos${KeySeparator}trombone${KeySeparator}tromboneaxishighlimitalarm"
   }
 
@@ -19,7 +20,7 @@ class KeyTest extends FunSuite with Matchers with TableDrivenPropertyChecks {
   }
 
   test("ComponentKey should be representing keys for all alarms of a component") {
-    val subsystemKey = ComponentKey(NFIRAOS, "trombone")
+    val subsystemKey = ComponentKey(Prefix(NFIRAOS, "trombone"))
     subsystemKey.value shouldEqual s"nfiraos${KeySeparator}trombone$KeySeparator*"
   }
 
@@ -32,7 +33,7 @@ class KeyTest extends FunSuite with Matchers with TableDrivenPropertyChecks {
   invalidCharacers.foreach(character => {
     test(s"AlarmKey should not allow '$character' character") {
       intercept[IllegalArgumentException] {
-        AlarmKey(NFIRAOS, "trombone", character)
+        AlarmKey(Prefix(NFIRAOS, "trombone"), character)
       }
     }
   })
@@ -40,20 +41,20 @@ class KeyTest extends FunSuite with Matchers with TableDrivenPropertyChecks {
   invalidCharacers.foreach(character => {
     test(s"ComponentKey should not allow '$character' character") {
       intercept[IllegalArgumentException] {
-        ComponentKey(NFIRAOS, character)
+        ComponentKey(Prefix(NFIRAOS, character))
       }
     }
   })
 
   test("ComponentKey should not allow empty values") {
     intercept[IllegalArgumentException] {
-      ComponentKey(Subsystem.CSW, null)
+      ComponentKey(Prefix(NFIRAOS, ""))
     }
   }
 
   test("AlarmKey should not allow empty values") {
     intercept[IllegalArgumentException] {
-      Key.AlarmKey(Subsystem.CSW, "test", "")
+      Key.AlarmKey(Prefix(NFIRAOS, "test"), "")
     }
   }
 }

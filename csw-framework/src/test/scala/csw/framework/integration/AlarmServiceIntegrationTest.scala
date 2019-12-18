@@ -23,6 +23,7 @@ import scala.concurrent.duration.DurationLong
 //DEOPSCSW-490: Alarm service integration with framework
 //DEOPSCSW-481: Component Developer API available to all CSW components
 //CSW-82: ComponentInfo should take prefix
+//CSW-83: Alarm models should take prefix
 class AlarmServiceIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 

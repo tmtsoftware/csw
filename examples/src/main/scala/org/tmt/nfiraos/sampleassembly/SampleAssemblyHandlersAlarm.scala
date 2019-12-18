@@ -140,8 +140,7 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
     case _                          => AlarmSeverity.Critical
   }
 
-  private val counterAlarmKey =
-    AlarmKey(componentInfo.prefix.subsystem, componentInfo.prefix.componentName, "CounterTooHighAlarm")
+  private val counterAlarmKey = AlarmKey(componentInfo.prefix, "CounterTooHighAlarm")
   private def setCounterAlarm(counter: Int) = {
     // fire alarm according to counter value
     val severity = getCounterSeverity(counter)

@@ -3,7 +3,7 @@ package csw.alarm.models
 import csw.alarm.models.ActivationStatus.Active
 import csw.alarm.models.AlarmSeverity.{Indeterminate, Okay}
 import csw.alarm.models.Key.AlarmKey
-import csw.prefix.models.Subsystem
+import csw.prefix.models.Prefix
 
 /**
  * Represents the metadata of an alarm e.g. name, subsystem it belongs to, supported severities, etc. This information is
@@ -13,8 +13,7 @@ import csw.prefix.models.Subsystem
  * @note Indeterminate and Okay severities are supported by all alarms implicitly.
  */
 case class AlarmMetadata private[alarm] (
-    subsystem: Subsystem,
-    component: String,
+    prefix: Prefix,
     name: String,
     description: String,
     location: String,
@@ -32,7 +31,7 @@ case class AlarmMetadata private[alarm] (
    *
    * @return an instance of AlarmKey composed of subsystem, component and name of the alarm
    */
-  def alarmKey: AlarmKey = AlarmKey(subsystem, component, name)
+  def alarmKey: AlarmKey = AlarmKey(prefix, name)
 
   /**
    * Represents whether the alarm is active or not

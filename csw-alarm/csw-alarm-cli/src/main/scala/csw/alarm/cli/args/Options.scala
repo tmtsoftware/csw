@@ -3,7 +3,7 @@ import java.nio.file.Path
 
 import csw.alarm.models.Key.{AlarmKey, ComponentKey, GlobalKey, SubsystemKey}
 import csw.alarm.models.{AlarmSeverity, Key}
-import csw.prefix.models.Subsystem
+import csw.prefix.models.{Prefix, Subsystem}
 
 case class Options(
     cmd: String = "",
@@ -22,14 +22,14 @@ case class Options(
 ) {
 
   def alarmKey: AlarmKey = (maybeSubsystem, maybeComponent, maybeAlarmName) match {
-    case (Some(subsystem), Some(component), Some(name)) => AlarmKey(subsystem, component, name)
+    case (Some(subsystem), Some(component), Some(name)) => AlarmKey(Prefix(subsystem, component), name)
     case _                                              => throw new IllegalArgumentException("Subsystem, Component or Alarm Name required.")
   }
 
   def key: Key = (maybeSubsystem, maybeComponent, maybeAlarmName) match {
     case (None, None, None)                       => GlobalKey
     case (Some(subsystem), None, None)            => SubsystemKey(subsystem)
-    case (Some(subsystem), Some(component), None) => ComponentKey(subsystem, component)
+    case (Some(subsystem), Some(component), None) => ComponentKey(Prefix(subsystem, component))
     case _                                        => alarmKey
   }
 }
