@@ -23,6 +23,7 @@ import redis.embedded.{RedisSentinel, RedisServer}
 import scala.concurrent.duration.DurationLong
 
 // DEOPSCSW-37: Add diagnosticMode handler to component handlers
+// CSW-82: ComponentInfo should take prefix
 class DiagnosticDataIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 

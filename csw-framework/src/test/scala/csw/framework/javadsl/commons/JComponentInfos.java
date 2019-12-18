@@ -4,7 +4,7 @@ import csw.command.client.models.framework.ComponentInfo;
 import csw.command.client.models.framework.LocationServiceUsage;
 import csw.framework.javadsl.JComponentInfo;
 import csw.location.api.javadsl.JComponentType;
-import csw.prefix.javadsl.JSubsystem;
+import csw.prefix.models.Prefix;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -13,8 +13,7 @@ import java.util.Collections;
 public class JComponentInfos {
 
     public static ComponentInfo jHcdInfo = JComponentInfo.from(
-            "JSampleHcd",
-            JSubsystem.WFOS(),
+            Prefix.apply("wfos.jsamplehcd"),
             JComponentType.HCD(),
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
             LocationServiceUsage.JRegisterOnly(),
@@ -23,8 +22,7 @@ public class JComponentInfos {
     );
 
     public static ComponentInfo jHcdInfoWithInitializeTimeout = JComponentInfo.from(
-            "trombone",
-            JSubsystem.WFOS(),
+            Prefix.apply("wfos.trombone"),
             JComponentType.HCD(),
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
             LocationServiceUsage.JRegisterOnly(),

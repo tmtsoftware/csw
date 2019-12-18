@@ -33,6 +33,7 @@ import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, ExecutionContext}
 
 //CSW-75: Provide HTTP access for components
+//CSW-82: ComponentInfo should take prefix
 class CommandHttpIntegrationTests extends FrameworkIntegrationSuite {
 
   import testWiring._

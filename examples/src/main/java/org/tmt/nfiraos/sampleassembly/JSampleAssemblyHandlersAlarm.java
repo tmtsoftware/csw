@@ -205,7 +205,7 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
     }
 
     private void setCounterAlarm(int counter) {
-        AlarmKey counterAlarmKey = new AlarmKey(NFIRAOS(), cswCtx.componentInfo().name(), "CounterTooHighAlarm");
+        AlarmKey counterAlarmKey = new AlarmKey(NFIRAOS(), cswCtx.componentInfo().prefix().componentName(), "CounterTooHighAlarm");
         AlarmSeverity severity = getCounterSeverity(counter);
         cswCtx.alarmService().setSeverity(counterAlarmKey, severity)
                 .whenComplete((d, ex) -> {

@@ -25,6 +25,7 @@ import csw.params.commands._
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, DemandState, StateName}
+import csw.prefix.models.Prefix
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.prop.Tables.Table
@@ -87,9 +88,11 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     )
 
     // This proves that data used in this test contains HCD and Assembly ComponentType
-    testData.find(info => info.componentType == HCD && info.name == "SampleHcd") shouldBe Some(hcdInfo)
-    testData.find(info => info.componentType == HCD && info.name == "JSampleHcd") shouldBe Some(jHcdInfo)
-    testData.find(info => info.componentType == Assembly && info.name == "SampleAssembly") shouldBe Some(assemblyInfo)
+    testData.find(info => info.componentType == HCD && info.prefix == Prefix("wfos.samplehcd")) shouldBe Some(hcdInfo)
+    testData.find(info => info.componentType == HCD && info.prefix == Prefix("wfos.jsamplehcd")) shouldBe Some(jHcdInfo)
+    testData.find(info => info.componentType == Assembly && info.prefix == Prefix("wfos.sampleassembly")) shouldBe Some(
+      assemblyInfo
+    )
 
     forAll(testData) { info =>
       {

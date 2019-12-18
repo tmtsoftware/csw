@@ -32,6 +32,7 @@ import io.lettuce.core.RedisClient
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, ExecutionContext}
 
+// CSW-82: ComponentInfo should take prefix
 class CommandIntegrationTests extends FrameworkIntegrationSuite {
 
   import testWiring._
