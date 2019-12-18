@@ -27,16 +27,16 @@ object Libs {
   val `scalajs-java-time` = dep("org.scala-js"      %%% "scalajs-java-time" % "0.2.6")
   val `scalatest`         = dep("org.scalatest"     %%% "scalatest"         % "3.0.8") //Apache License 2.0
 
-  val `jwt-core`          = "com.pauldijou"       %% "jwt-core"          % "4.2.0"
-  val `lettuce`           = "io.lettuce"          % "lettuce-core"       % "5.2.1.RELEASE"
-  val `reactor-core`      = "io.projectreactor"   % "reactor-core"       % "3.3.1.RELEASE"
-  val `reactive-streams`  = "org.reactivestreams" % "reactive-streams"   % "1.0.3"
-  val `akka-stream-kafka` = "com.typesafe.akka"   %% "akka-stream-kafka" % "1.0.5"
-//  val `embedded-kafka`      = "io.github.embeddedkafka" %% "embedded-kafka"      % "2.3.0"
-  val `embedded-redis` = "com.github.kstyrc" % "embedded-redis" % "0.6"
-  val `scala-compiler` = "org.scala-lang"    % "scala-compiler" % ScalaVersion
-  val `HdrHistogram`   = "org.hdrhistogram"  % "HdrHistogram"   % "2.1.11"
-  val `testng`         = "org.testng"        % "testng"         % "6.14.3"
+  val `jwt-core`          = "com.pauldijou"           %% "jwt-core"          % "4.2.0"
+  val `lettuce`           = "io.lettuce"              % "lettuce-core"       % "5.2.1.RELEASE"
+  val `reactor-core`      = "io.projectreactor"       % "reactor-core"       % "3.3.1.RELEASE"
+  val `reactive-streams`  = "org.reactivestreams"     % "reactive-streams"   % "1.0.3"
+  val `akka-stream-kafka` = "com.typesafe.akka"       %% "akka-stream-kafka" % "2.0.0-RC1"
+  val `embedded-kafka`    = "io.github.embeddedkafka" %% "embedded-kafka"    % "2.4.0"
+  val `embedded-redis`    = "com.github.kstyrc"       % "embedded-redis"     % "0.6"
+  val `scala-compiler`    = "org.scala-lang"          % "scala-compiler"     % ScalaVersion
+  val `HdrHistogram`      = "org.hdrhistogram"        % "HdrHistogram"       % "2.1.11"
+  val `testng`            = "org.testng"              % "testng"             % "6.14.3"
 
   val `scala-csv`             = "com.github.tototoshi" %% "scala-csv"            % "1.3.6"
   val `json-schema-validator` = "com.github.fge"       % "json-schema-validator" % "2.2.11" //LGPL/ASL

@@ -9,12 +9,12 @@ import csw.params.core.generics.{Key, Parameter}
 import csw.params.core.generics.KeyType.ByteKey
 import csw.params.events.{EventName, SystemEvent}
 import csw.prefix.models.{Prefix, Subsystem}
-//import csw.event.client.internal.kafka.KafkaTestProps
+import csw.event.client.internal.kafka.KafkaTestProps
 import csw.event.client.internal.redis.{InitializationEvent, RedisTestProps}
 import csw.event.client.internal.wiring._
 import csw.params.events.{Event, EventKey}
 import csw.time.core.models.UTCTime
-//import net.manub.embeddedkafka.EmbeddedKafka
+import net.manub.embeddedkafka.EmbeddedKafka
 import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
 import org.scalatestplus.testng.TestNGSuite
@@ -33,31 +33,31 @@ import scala.util.Random
 //DEOPSCSW-395: Provide EventService handle to component developers
 //DEOPSCSW-515: Include Start Time in API
 //DEOPSCSW-516: Optionally Publish - API Change
-class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*with EmbeddedKafka*/ {
+class EventPublisherTest extends TestNGSuite with Matchers with Eventually with EmbeddedKafka {
 
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
 
   var redisTestProps: RedisTestProps = _
-//  var kafkaTestProps: KafkaTestProps = _
+  var kafkaTestProps: KafkaTestProps = _
 
   @BeforeSuite
   def beforeAll(): Unit = {
     redisTestProps = RedisTestProps.createRedisProperties()
-//    kafkaTestProps = KafkaTestProps.createKafkaProperties()
+    kafkaTestProps = KafkaTestProps.createKafkaProperties()
     redisTestProps.start()
-//    kafkaTestProps.start()
+    kafkaTestProps.start()
   }
 
   @AfterSuite
   def afterAll(): Unit = {
     redisTestProps.shutdown()
-//    kafkaTestProps.shutdown()
+    kafkaTestProps.shutdown()
   }
 
   @DataProvider(name = "event-service-provider")
   def pubSubProvider: Array[Array[_ <: BaseProperties]] = Array(
-    Array(redisTestProps)
-//    Array(kafkaTestProps)
+    Array(redisTestProps),
+    Array(kafkaTestProps)
   )
 
   //DEOPSCSW-659: Investigate initial latency in event service pub sub API for single publish
