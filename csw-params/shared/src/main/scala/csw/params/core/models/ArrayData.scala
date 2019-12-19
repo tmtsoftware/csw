@@ -16,14 +16,14 @@ import scala.jdk.CollectionConverters._
 case class ArrayData[T](data: mutable.ArraySeq[T]) {
 
   /**
-   * A Java helper that returns an Array of values this parameter holds
-   */
-  def jValues: java.util.List[T] = data.asJava
-
-  /**
    * An Array of values this parameter holds
    */
   def values: Array[T] = data.array.asInstanceOf[Array[T]]
+
+  /**
+   * A Java helper that returns an Array of values this parameter holds
+   */
+  def jValues: java.util.List[T] = data.asJava
 
   /**
    * A comma separated string representation of all values this ArrayData holds

@@ -12,10 +12,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static csw.params.core.models.Coords.*;
 import static csw.params.core.models.JCoords.*;
@@ -145,6 +143,8 @@ public class JKeysAndParametersTest extends JUnitSuite {
         Assert.assertEquals(JUnits.liter(), p1AsLiter.units());
         Assert.assertTrue(bDefaultUnit);
         Assert.assertEquals(2, matrixData1.size());
+        Assert.assertEquals(5, head.apply(1,1).intValue());
+        Assert.assertEquals(Arrays.asList(m1[0]), head.jValues().get(0));
         Assert.assertArrayEquals(m1, (Byte[][]) matrixData1.get(0).values());
         Assert.assertArrayEquals(m2, (Byte[][]) matrixData2.get(0).values());
         Assert.assertArrayEquals(m1, head.values());

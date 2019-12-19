@@ -1,9 +1,12 @@
 package csw.params.core.models
 
+import java.util
+
 import com.github.ghik.silencer.silent
 
 import scala.annotation.varargs
 import scala.collection.mutable
+import scala.jdk.CollectionConverters._
 import scala.language.implicitConversions
 import scala.reflect.ClassTag
 
@@ -20,6 +23,11 @@ abstract case class MatrixData[T] private (data: mutable.ArraySeq[mutable.ArrayS
    * @return a value represented by T
    */
   def apply(row: Int, col: Int): T = data(row)(col)
+
+  /**
+   * A Java helper that returns an Array of values this parameter holds
+   */
+  def jValues: util.List[util.List[T]] = data.map(_.asJava).asJava
 
   /**
    * A comma separated string representation of all values this MatrixData holds
@@ -48,6 +56,7 @@ object MatrixData {
    */
   @varargs
   def fromArrays[T](first: Array[T], rest: Array[T]*): MatrixData[T] = {
+    // getComponentType gives the Class type of T from Array[T]
     @silent
     implicit val ct: ClassTag[T] = ClassTag[T](first.getClass.getComponentType)
     MatrixData.fromArrays((first +: rest).toArray)
