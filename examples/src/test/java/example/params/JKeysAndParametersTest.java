@@ -1,21 +1,24 @@
 package example.params;
 
-import csw.params.javadsl.JUnits;
 import csw.params.core.generics.GChoiceKey;
-import csw.params.javadsl.JKeyType;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.*;
+import csw.params.core.models.Coords.*;
+import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JUnits;
 import csw.time.core.models.UTCTime;
 import org.junit.Assert;
 import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
-import csw.params.core.models.Coords.*;
 
-import static csw.params.core.models.JCoords.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 import static csw.params.core.models.Coords.*;
-
-import java.util.*;
+import static csw.params.core.models.JCoords.*;
 
 @SuppressWarnings({"unused", "RedundantCast", "unchecked", "ArraysAsListWithZeroOrOneArgument"})
 public class JKeysAndParametersTest extends JUnitSuite {
@@ -78,8 +81,8 @@ public class JKeysAndParametersTest extends JUnitSuite {
         Key<ArrayData<Double>> filterKey = JKeyType.DoubleArrayKey().make("filter");
 
         //Store some values using helper method in ArrayData
-        Parameter<ArrayData<Double>> p1 = filterKey.set(ArrayData.fromJavaArray(arr1), ArrayData.fromJavaArray(arr2));
-        Parameter<ArrayData<Double>> p2 = filterKey.set(ArrayData.fromJavaArray(arr2)).withUnits(JUnits.liter());
+        Parameter<ArrayData<Double>> p1 = filterKey.set(ArrayData.fromArray(arr1), ArrayData.fromArray(arr2));
+        Parameter<ArrayData<Double>> p2 = filterKey.set(ArrayData.fromArray(arr2)).withUnits(JUnits.liter());
 
         //add units to existing parameters
         Parameter<ArrayData<Double>> p1AsCount = p1.withUnits(JUnits.count());
@@ -120,7 +123,7 @@ public class JKeysAndParametersTest extends JUnitSuite {
                 MatrixData.fromArrays(m1),
                 MatrixData.fromArrays(m2));
         Parameter<MatrixData<Byte>> p2 = encoderKey.set(
-                MatrixData.fromJavaArrays(Byte.class, m2)
+                MatrixData.fromArrays(m2)
         ).withUnits(JUnits.liter());
 
         //add units to existing parameters
