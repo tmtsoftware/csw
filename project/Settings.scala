@@ -10,8 +10,12 @@ object Settings {
       "test; multi-jvm:test"
     ) ++
     addCommandAlias(
+      "compileAll",
+      ";set every enableFatalWarnings := true; scalafmtCheck; scalastyle; test:compile; multi-jvm:compile; set every enableFatalWarnings := false"
+    ) ++
+    addCommandAlias(
       "buildAll",
-      ";set every enableFatalWarnings := true; scalafmtCheck; scalastyle; clean; makeSite; test:compile; multi-jvm:compile; set every enableFatalWarnings := false"
+      ";set every enableFatalWarnings := true; scalafmtCheck; scalastyle; clean; makeSite; test:compile; multi-jvm:compile; set every enableFatalWarnings := false;"
     )
   }
 
@@ -20,7 +24,7 @@ object Settings {
 
     Seq(
       MultiJvm / test / aggregate := false,
-      MultiJvm / test := Def.sequential(tasks.init, tasks.last).value
+      MultiJvm / test := Def.sequential(tasks).value
     )
   }
 

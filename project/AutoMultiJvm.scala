@@ -13,6 +13,8 @@ object AutoMultiJvm extends AutoPlugin {
       assemblyMergeStrategy in assembly in MultiJvm := {
         case "application.conf"                     => MergeStrategy.concat
         case x if x.contains("versions.properties") => MergeStrategy.discard
+        case x if x.contains("mailcap.default")     => MergeStrategy.last
+        case x if x.contains("mimetypes.default")   => MergeStrategy.last
         case x =>
           val oldStrategy = (assemblyMergeStrategy in assembly in MultiJvm).value
           oldStrategy(x)

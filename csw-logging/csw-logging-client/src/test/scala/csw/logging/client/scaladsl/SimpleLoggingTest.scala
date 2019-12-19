@@ -4,13 +4,15 @@ import java.time._
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
-import csw.logging.models.Level._
-import csw.logging.client.commons.{Constants, LoggingKeys, TMTDateTimeFormatter}
+import csw.logging.client.commons.{LoggingKeys, TMTDateTimeFormatter}
 import csw.logging.client.components.{InnerSourceComponent, SingletonComponent, TromboneAssembly, TromboneHcd}
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.internal.LoggingState
 import csw.logging.client.utils.LoggingTestSuite
 import csw.logging.models.Level
+import csw.logging.models.Level._
+import csw.prefix.models.Prefix
+import csw.prefix.models.Subsystem.CSW
 import org.scalatest.concurrent.Eventually
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import play.api.libs.json.JsObject
@@ -23,13 +25,15 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
   // DEOPSCSW-118: Provide UTC time for each log message
   // DEOPSCSW-119: Associate source with each log message
   // DEOPSCSW-121: Define structured tags for log messages
+  // CSW-78: PrefixRedesign for logging
+  // CSW-80: Prefix should be in lowercase
   test("logs should contain component name and source location in terms of file name, class name and line number") {
     val expectedDateTime = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
     new TromboneHcd().startLogging(logMsgMap)
-    Thread.sleep(300)
+    Thread.sleep(400)
 
     // Verify log level for tromboneHcd is at debug level in config
-    LoggingState.componentsLoggingState.get(TromboneHcd.COMPONENT_NAME).componentLogLevel shouldBe DEBUG
+    LoggingState.componentsLoggingState.get(Prefix(CSW, TromboneHcd.COMPONENT_NAME)).componentLogLevel shouldBe DEBUG
 
     var logMsgLineNumber = TromboneHcd.DEBUG_LINE_NO
 
@@ -45,7 +49,9 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
       val actualDateTime = TMTDateTimeFormatter.parse(log.getString(LoggingKeys.TIMESTAMP))
       ChronoUnit.MILLIS.between(expectedDateTime, actualDateTime) <= 50 shouldBe true
 
-      log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "tromboneHcd"
+      log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "trombonehcd"
+      log.getString(LoggingKeys.SUBSYSTEM) shouldBe "csw"
+      log.getString(LoggingKeys.PREFIX) shouldBe "csw.trombonehcd"
       log.getString(LoggingKeys.FILE) shouldBe "TromboneHcd.scala"
       log(LoggingKeys.LINE).as[Int] shouldBe logMsgLineNumber
       log.getString(LoggingKeys.CLASS) shouldBe "csw.logging.client.components.TromboneHcd"
@@ -62,13 +68,14 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     Thread.sleep(100)
 
     //   Verify that default level is TRACE in config
-    LoggingState.componentsLoggingState.get(Constants.DEFAULT_KEY).componentLogLevel shouldBe TRACE
+    LoggingState.defaultLogLevel shouldBe TRACE
 
     var logMsgLineNumber = InnerSourceComponent.TRACE_LINE_NO
 
     eventually(logBuffer.size shouldBe 6)
     logBuffer.foreach { log =>
-      log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "InnerSourceComponent"
+      log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "innersourcecomponent"
+      log.getString(LoggingKeys.SUBSYSTEM) shouldBe "csw"
       log.getString(LoggingKeys.FILE) shouldBe "InnerSourceComponent.scala"
       log(LoggingKeys.LINE).as[Int] shouldBe logMsgLineNumber
       log.getString(LoggingKeys.CLASS) shouldBe "csw.logging.client.components.InnerSourceComponent$InnerSource"
@@ -85,14 +92,15 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     Thread.sleep(100)
 
     //   Verify that default level is TRACE in config
-    LoggingState.componentsLoggingState.get(Constants.DEFAULT_KEY).componentLogLevel shouldBe TRACE
+    LoggingState.defaultLogLevel shouldBe TRACE
 
     var logMsgLineNumber = SingletonComponent.TRACE_LINE_NO
 
     eventually(logBuffer.size shouldBe 6)
     logBuffer.foreach { log =>
       log.contains(LoggingKeys.COMPONENT_NAME) shouldBe true
-      log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "SingletonComponent"
+      log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "singletoncomponent"
+      log.getString(LoggingKeys.SUBSYSTEM) shouldBe "csw"
       log.getString(LoggingKeys.FILE) shouldBe "SingletonComponent.scala"
       log(LoggingKeys.LINE).as[Int] shouldBe logMsgLineNumber
       log.getString(LoggingKeys.CLASS) shouldBe "csw.logging.client.components.SingletonComponent"
@@ -111,7 +119,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     Thread.sleep(100)
 
     //   Verify that default level is TRACE in config
-    LoggingState.componentsLoggingState.get("default").componentLogLevel shouldBe TRACE
+    LoggingState.defaultLogLevel shouldBe TRACE
 
     var logMsgLineNumber = SingletonComponent.USER_TRACE_LINE_NO
 
@@ -120,7 +128,8 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
       //  Count the user messages for test at the end
       var userMsgCount = 0
       log.contains("@componentName") shouldBe true
-      log.getString("@componentName") shouldBe "SingletonComponent"
+      log.getString("@componentName") shouldBe "singletoncomponent"
+      log.getString(LoggingKeys.SUBSYSTEM) shouldBe "csw"
       log.getString("file") shouldBe "SingletonComponent.scala"
       log("line").as[Int] shouldBe logMsgLineNumber
       log.getString("class") shouldBe "csw.logging.client.components.SingletonComponent"
@@ -144,14 +153,14 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     Thread.sleep(200)
 
     //  Verify that level is DEBUG
-    LoggingState.componentsLoggingState.get(TromboneHcd.COMPONENT_NAME).componentLogLevel shouldBe DEBUG
+    LoggingState.componentsLoggingState.get(Prefix(CSW, TromboneHcd.COMPONENT_NAME)).componentLogLevel shouldBe DEBUG
 
     //  TromboneHcd component is logging 6 messages each of unique level
     //  As per the filter, hcd should log 5 message of all level except TRACE
     eventually(logBuffer.size shouldBe 5)
 
     val groupByComponentNamesLog = logBuffer.groupBy(json => json.getString(LoggingKeys.COMPONENT_NAME))
-    val tromboneHcdLogs          = groupByComponentNamesLog("tromboneHcd")
+    val tromboneHcdLogs          = groupByComponentNamesLog("trombonehcd")
 
     tromboneHcdLogs.size shouldBe 5
 
@@ -168,18 +177,18 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
   // DEOPSCSW-126 : Configurability of logging characteristics for component / log instance
   test("should apply default log level provided in configuration file for normal logging messages") {
 
-    new TromboneAssembly(new LoggerFactory("tromboneAssembly")).startLogging(logMsgMap)
+    new TromboneAssembly(new LoggerFactory(Prefix("csw.tromboneAssembly"))).startLogging(logMsgMap)
     Thread.sleep(300)
 
     //   Verify that default level is TRACE in config
-    LoggingState.componentsLoggingState.get(Constants.DEFAULT_KEY).componentLogLevel shouldBe TRACE
+    LoggingState.defaultLogLevel shouldBe TRACE
 
     //  TromboneAssembly component is logging 6 messages each of unique level
     //  As per the default loglevel = trace, assembly should log all 6 message
     eventually(logBuffer.size shouldBe 6)
 
     val groupByComponentNamesLog = logBuffer.groupBy(json => json.getString(LoggingKeys.COMPONENT_NAME))
-    val tromboneAssemblyLogs     = groupByComponentNamesLog("tromboneAssembly")
+    val tromboneAssemblyLogs     = groupByComponentNamesLog("tromboneassembly")
 
     tromboneAssemblyLogs.size shouldBe 6
 
@@ -205,7 +214,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
       (DEBUG, 5),
       (TRACE, 6)
     )
-    val compName = "tromboneAssembly"
+    val prefix = Prefix("csw.tromboneAssembly")
 
     def filterLogsByComponentName(compName: String): Seq[JsObject] = {
       val groupByComponentNamesLog = logBuffer.toList.groupBy(json => json.getString(LoggingKeys.COMPONENT_NAME))
@@ -215,15 +224,15 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     val defaultLogLevel = loggingSystem.getDefaultLogLevel
 
     forAll(testData) { (logLevel: Level, logCount: Int) =>
-      loggingSystem.setComponentLogLevel(compName, logLevel)
+      loggingSystem.setComponentLogLevel(prefix, logLevel)
 
       // confirm default log level is not changing when we change the component log level
       loggingSystem.getDefaultLogLevel shouldBe defaultLogLevel
 
-      new TromboneAssembly(new LoggerFactory("tromboneAssembly")).startLogging(logMsgMap)
+      new TromboneAssembly(new LoggerFactory(prefix)).startLogging(logMsgMap)
       Thread.sleep(200)
 
-      val tromboneAssemblyLogs = filterLogsByComponentName(compName)
+      val tromboneAssemblyLogs = filterLogsByComponentName(prefix.componentName)
       tromboneAssemblyLogs.size shouldBe logCount
 
       tromboneAssemblyLogs.toList.foreach { log =>
@@ -251,7 +260,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
       (DEBUG, 5),
       (TRACE, 6)
     )
-    val compName = TromboneHcd.COMPONENT_NAME
+    val prefix = Prefix(CSW, TromboneHcd.COMPONENT_NAME)
 
     def filterLogsByComponentName(compName: String): Seq[JsObject] = {
       val groupByComponentNamesLog = logBuffer.toList.groupBy(json => json.getString(LoggingKeys.COMPONENT_NAME))
@@ -261,7 +270,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     val defaultLogLevel = loggingSystem.getDefaultLogLevel
 
     forAll(testData) { (logLevel: Level, logCount: Int) =>
-      loggingSystem.setComponentLogLevel(compName, logLevel)
+      loggingSystem.setComponentLogLevel(prefix, logLevel)
 
       // confirm default log level is not changing when we change the component log level
       loggingSystem.getDefaultLogLevel shouldBe defaultLogLevel
@@ -269,7 +278,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
       new TromboneHcd().startLogging(logMsgMap)
       Thread.sleep(200)
 
-      val tromboneHcdLogs = filterLogsByComponentName(compName)
+      val tromboneHcdLogs = filterLogsByComponentName(prefix.componentName)
       tromboneHcdLogs.size shouldBe logCount
 
       tromboneHcdLogs.toList.foreach { log =>
@@ -320,7 +329,8 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
      * }
      */
     logBuffer.foreach { log =>
-      log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "tromboneHcd"
+      log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "trombonehcd"
+      log.getString(LoggingKeys.SUBSYSTEM) shouldBe "csw"
       log.getString(LoggingKeys.SEVERITY) shouldBe ERROR.name
       log.getString(LoggingKeys.CLASS) shouldBe tromboneHcdClassName
       log.getString(LoggingKeys.MESSAGE) shouldBe computationResultMsg

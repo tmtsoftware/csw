@@ -19,12 +19,14 @@ import csw.logging.models.Level.DEBUG
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.utils.TestAppender
-import csw.params.core.models.Subsystem.{CSW, LGSF, NFIRAOS, TCS}
+import csw.prefix.models.Prefix
+import csw.prefix.models.Subsystem.{CSW, LGSF, NFIRAOS, TCS}
 import play.api.libs.json.{JsObject, Json}
 
 import scala.collection.mutable
 import scala.concurrent.duration.DurationInt
 
+//CSW-83:Alarm models should take prefix
 class SeverityServiceModuleTest
     extends AlarmServiceTestSetup
     with SeverityServiceModule
@@ -51,7 +53,7 @@ class SeverityServiceModuleTest
     loggingSystem.setAppenders(List(testAppender))
     loggingSystem.setDefaultLogLevel(DEBUG)
     setCurrentSeverity(tromboneAxisLowLimitAlarmKey, AlarmSeverity.Critical).await
-    Thread.sleep(100)
+    Thread.sleep(200)
     val messages = logBuffer.map(log => log.getString("message"))
     messages.contains(expectedMessage1) shouldBe true
     messages.contains(expectedMessage2) shouldBe true
@@ -87,7 +89,7 @@ class SeverityServiceModuleTest
 
   // DEOPSCSW-444: Set severity api for component
   test("setSeverity should throw KeyNotFoundException when tried to set severity for key which does not exists in alarm store") {
-    val invalidKey = AlarmKey(CSW, "trombone", "fakeAlarm")
+    val invalidKey = AlarmKey(Prefix(TCS, "trombone"), "fakeAlarm")
     an[KeyNotFoundException] shouldBe thrownBy(setSeverity(invalidKey, Critical).await)
   }
 
@@ -178,13 +180,13 @@ class SeverityServiceModuleTest
 
   // DEOPSCSW-457: Fetch current alarm severity
   test("getCurrentSeverity should throw exception if key does not exist") {
-    val invalidAlarm = AlarmKey(CSW, "invalid", "invalid")
+    val invalidAlarm = AlarmKey(Prefix(CSW, "invalid"), "invalid")
     an[KeyNotFoundException] shouldBe thrownBy(getCurrentSeverity(invalidAlarm).await)
   }
 
   // DEOPSCSW-465: Fetch alarm severity, component or subsystem
   test("getAggregatedSeverity should get aggregated severity for component") {
-    val tromboneKey = ComponentKey(NFIRAOS, "trombone")
+    val tromboneKey = ComponentKey(Prefix(NFIRAOS, "trombone"))
     getAggregatedSeverity(tromboneKey).await shouldBe Disconnected
 
     setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
@@ -240,7 +242,7 @@ class SeverityServiceModuleTest
     enclosureTempLowAlarm.isActive shouldBe false
     setSeverity(enclosureTempLowAlarmKey, Critical).await
 
-    getAggregatedSeverity(ComponentKey(NFIRAOS, "enclosure")).await shouldBe Indeterminate
+    getAggregatedSeverity(ComponentKey(Prefix(NFIRAOS, "enclosure"))).await shouldBe Indeterminate
   }
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
@@ -249,7 +251,7 @@ class SeverityServiceModuleTest
     shelve(cpuExceededAlarmKey).await
     getStatus(cpuExceededAlarmKey).await.shelveStatus shouldBe Shelved
 
-    val componentKey = ComponentKey(cpuExceededAlarmKey.subsystem, cpuExceededAlarmKey.component)
+    val componentKey = ComponentKey(cpuExceededAlarmKey.prefix)
     getAggregatedSeverity(componentKey).await shouldBe Disconnected
 
     // there is only one alarm in TCS.tcsPk component
@@ -259,7 +261,7 @@ class SeverityServiceModuleTest
 
   // DEOPSCSW-465: Fetch alarm severity, component or subsystem
   test("getAggregatedSeverity should get aggregated to Disconnected for Warning and Critical severities") {
-    val tromboneKey = ComponentKey(NFIRAOS, "trombone")
+    val tromboneKey = ComponentKey(Prefix(NFIRAOS, "trombone"))
     getAggregatedSeverity(tromboneKey).await shouldBe Disconnected
     setSeverity(tromboneAxisLowLimitAlarmKey, Critical).await
     setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
@@ -269,13 +271,13 @@ class SeverityServiceModuleTest
 
   // DEOPSCSW-465: Fetch alarm severity, component or subsystem
   test("getAggregatedSeverity should throw KeyNotFoundException when key is invalid") {
-    val invalidAlarm = ComponentKey(CSW, "invalid")
+    val invalidAlarm = ComponentKey(Prefix(CSW, "invalid"))
     an[KeyNotFoundException] shouldBe thrownBy(getAggregatedSeverity(invalidAlarm).await)
   }
 
   // DEOPSCSW-465: Fetch alarm severity, component or subsystem
   test("getAggregatedSeverity should throw InactiveAlarmException when all resolved keys are inactive") {
-    val invalidAlarm = ComponentKey(LGSF, "tcsPkInactive")
+    val invalidAlarm = ComponentKey(Prefix(LGSF, "tcspkinactive"))
     an[InactiveAlarmException] shouldBe thrownBy(getAggregatedSeverity(invalidAlarm).await)
   }
 
@@ -337,7 +339,7 @@ class SeverityServiceModuleTest
 
     // component subscription - nfiraos.trombone
     val testProbe1         = TestProbe[FullAlarmSeverity]()(actorSystem)
-    val alarmSubscription1 = subscribeAggregatedSeverityCallback(ComponentKey(NFIRAOS, "trombone"), testProbe1.ref ! _)
+    val alarmSubscription1 = subscribeAggregatedSeverityCallback(ComponentKey(Prefix(NFIRAOS, "trombone")), testProbe1.ref ! _)
     alarmSubscription1.ready().await
     testProbe1.expectMessage(Disconnected) // on subscription, current aggregated severity will be calculated
 
@@ -378,7 +380,7 @@ class SeverityServiceModuleTest
     getCurrentSeverity(enclosureTempLowAlarmKey).await shouldBe Disconnected
 
     val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem)
-    val alarmSubscription = subscribeAggregatedSeverityCallback(ComponentKey(NFIRAOS, "enclosure"), testProbe.ref ! _)
+    val alarmSubscription = subscribeAggregatedSeverityCallback(ComponentKey(Prefix(NFIRAOS, "enclosure")), testProbe.ref ! _)
     alarmSubscription.ready().await
     testProbe.expectMessage(Disconnected) // on subscription, current aggregated severity will be calculated
 
@@ -409,7 +411,7 @@ class SeverityServiceModuleTest
 
   // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
   test("subscribeAggregatedSeverity should throw KeyNotFoundException when key is invalid") {
-    val invalidAlarm = ComponentKey(CSW, "invalid")
+    val invalidAlarm = ComponentKey(Prefix(CSW, "invalid"))
     a[KeyNotFoundException] shouldBe thrownBy(subscribeAggregatedSeverityCallback(invalidAlarm, println).ready().await)
   }
 
@@ -461,7 +463,7 @@ class SeverityServiceModuleTest
   test("shelved alarms should be considered while subscribing aggregated severity") {
     val testProbe = TestProbe[FullAlarmSeverity]()(actorSystem)
     // there is only one alarm in TCS.tcsPk component
-    val componentKey = ComponentKey(cpuExceededAlarmKey.subsystem, cpuExceededAlarmKey.component)
+    val componentKey = ComponentKey(cpuExceededAlarmKey.prefix)
 
     getCurrentSeverity(cpuExceededAlarmKey).await shouldBe Disconnected
 

@@ -2,7 +2,6 @@ package example.location;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
-import akka.actor.CoordinatedShutdown;
 import akka.actor.Props;
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.Behavior;
@@ -11,15 +10,12 @@ import akka.actor.typed.javadsl.Adapter;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.japi.Pair;
 import akka.japi.pf.ReceiveBuilder;
-import akka.stream.ActorMaterializer;
 import akka.stream.KillSwitch;
-import akka.stream.Materializer;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
 import csw.command.client.extensions.AkkaLocationExt;
 import csw.command.client.messages.ComponentMessage;
 import csw.command.client.messages.ContainerMessage;
-import csw.framework.commons.CoordinatedShutdownReasons;
 import csw.location.api.extensions.ActorExtension;
 import csw.location.api.extensions.URIExtension;
 import csw.location.api.javadsl.ILocationService;
@@ -38,7 +34,8 @@ import csw.logging.client.internal.LoggingSystem;
 import csw.logging.client.javadsl.JKeys;
 import csw.logging.client.javadsl.JLoggerFactory;
 import csw.logging.client.javadsl.JLoggingSystemFactory;
-import csw.params.core.models.Prefix;
+import csw.prefix.models.Prefix;
+import csw.prefix.javadsl.JSubsystem;
 import scala.concurrent.Await;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -57,12 +54,11 @@ import java.util.concurrent.TimeUnit;
  */
 public class JLocationServiceExampleClient extends AbstractActor {
 
-    private ILogger log = new JLoggerFactory("my-component-name").getLogger(context(), getClass());
+    private ILogger log = new JLoggerFactory(Prefix.apply("csw.my-component-name")).getLogger(context(), getClass());
     private ActorSystem<Void> typedSystem = Adapter.toTyped(this.system);
     //#create-location-service
     private akka.actor.ActorSystem system = context().system();
-    private ActorMaterializer mat = ActorMaterializer.create(system);
-    private ILocationService locationService = JHttpLocationServiceFactory.makeLocalClient(Adapter.toTyped(system), mat);
+    private ILocationService locationService = JHttpLocationServiceFactory.makeLocalClient(Adapter.toTyped(system));
     //#create-location-service
 
     private AkkaConnection exampleConnection = LocationServiceExampleComponent.connection();
@@ -100,14 +96,14 @@ public class JLocationServiceExampleClient extends AbstractActor {
         //#Components-Connections-Registrations
 
         // dummy http connection
-        HttpConnection httpConnection = new HttpConnection(new ComponentId("configuration", JComponentType.Service()));
+        HttpConnection httpConnection = new HttpConnection(new ComponentId(Prefix.apply(JSubsystem.CSW(), "configuration"), JComponentType.Service()));
         HttpRegistration httpRegistration = new HttpRegistration(httpConnection, 8080, "path123");
         httpRegResult = locationService.register(httpRegistration).get();
 
         // ************************************************************************************************************
 
         // dummy HCD connection
-        AkkaConnection hcdConnection = new AkkaConnection(new ComponentId("hcd1", JComponentType.HCD()));
+        AkkaConnection hcdConnection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.NFIRAOS(), "hcd1"), JComponentType.HCD()));
         ActorRef actorRef = getContext().actorOf(Props.create(AbstractActor.class, () -> new AbstractActor() {
                     @Override
                     public Receive createReceive() {
@@ -121,20 +117,18 @@ public class JLocationServiceExampleClient extends AbstractActor {
         // to Typed ActorRef[Nothing]
 
         URI actorRefURI = ActorExtension.RichActor(Adapter.toTyped(actorRef)).toURI();
-        AkkaRegistration hcdRegistration = csw.location.api.AkkaRegistrationFactory.make(hcdConnection, new Prefix("nfiraos.ncc.tromboneHcd"), actorRefURI);
+        AkkaRegistration hcdRegistration = csw.location.api.AkkaRegistrationFactory.make(hcdConnection, actorRefURI);
         hcdRegResult = locationService.register(hcdRegistration).get();
 
         // ************************************************************************************************************
 
-        Behavior<String> behavior = Behaviors.setup(ctx -> {
-            return Behaviors.same();
-        });
+        Behavior<String> behavior = Behaviors.setup(ctx -> Behaviors.same());
         akka.actor.typed.ActorRef<String> typedActorRef = Adapter.spawn(context(), behavior, "typed-actor-ref");
 
-        AkkaConnection assemblyConnection = new AkkaConnection(new ComponentId("assembly1", JComponentType.Assembly()));
+        AkkaConnection assemblyConnection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.NFIRAOS(), "assembly1"), JComponentType.Assembly()));
 
         // Register Typed ActorRef[String] with Location Service
-        AkkaRegistration assemblyRegistration = new RegistrationFactory().akkaTyped(assemblyConnection, new Prefix("nfiraos.ncc.tromboneAssembly"), typedActorRef);
+        AkkaRegistration assemblyRegistration = new RegistrationFactory().akkaTyped(assemblyConnection, typedActorRef);
 
 
         assemblyRegResult = locationService.register(assemblyRegistration).get();
@@ -199,7 +193,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         // example code showing how to get the actorRef for remote component and send it a message
         if (resolveResult.isPresent()) {
             AkkaLocation loc = resolveResult.orElseThrow();
-            ActorRef actorRef = Adapter.toUntyped(new URIExtension.RichURI(loc.uri()).toActorRef(typedSystem));
+            ActorRef actorRef = Adapter.toClassic(new URIExtension.RichURI(loc.uri()).toActorRef(typedSystem));
 //            actorRef.tell(LocationServiceExampleComponent.ClientMessage, getSelf());
         }
     }
@@ -234,8 +228,8 @@ public class JLocationServiceExampleClient extends AbstractActor {
         //#filtering-connection
 
         //#filtering-prefix
-        List<AkkaLocation> akkaLocations = locationService.listByPrefix("nfiraos.ncc").get();
-        log.info("Registered akka locations for nfiraos.ncc");
+        List<Location> akkaLocations = locationService.listByPrefix(Prefix.apply("nfiraos.ncc.assembly1")).get();
+        log.info("Registered akka locations for nfiraos.ncc.assembly1");
         for (Location loc : akkaLocations) {
             log.info("--- " + connectionInfo(loc.connection()));
         }
@@ -249,13 +243,12 @@ public class JLocationServiceExampleClient extends AbstractActor {
 
         // track connection to LocationServiceExampleComponent
         // Calls track method for example connection and forwards location messages to this actor
-        Materializer mat = ActorMaterializer.create(getContext());
         log.info("Starting to track " + exampleConnection);
-        locationService.track(exampleConnection).toMat(Sink.actorRef(getSelf(), AllDone.class), Keep.both()).run(mat);
+        locationService.track(exampleConnection).toMat(Sink.actorRef(getSelf(), AllDone.class), Keep.both()).run(typedSystem);
 
         //track returns a Killswitch, that can be used to turn off notifications arbitarily
         //in this case track a connection for 5 seconds, after that schedule switching off the stream
-        Pair pair = locationService.track(exampleConnection).toMat(Sink.ignore(), Keep.both()).run(mat);
+        Pair pair = locationService.track(exampleConnection).toMat(Sink.ignore(), Keep.both()).run(typedSystem);
         context().system().scheduler().scheduleOnce(
                 Duration.ofSeconds(5),
                 () -> ((KillSwitch) pair.first()).shutdown(),
@@ -287,7 +280,8 @@ public class JLocationServiceExampleClient extends AbstractActor {
         //#unregister
 
         try {
-            CoordinatedShutdown.get(context().system()).runAll(CoordinatedShutdownReasons.actorTerminatedReason()).toCompletableFuture().get();
+            context().system().terminate();
+            context().system().getWhenTerminated().toCompletableFuture().get();
             // #log-info-error
         } catch (InterruptedException | ExecutionException ex) {
             log.info(ex.getMessage(), ex);
@@ -330,7 +324,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         Await.result(locationWiring.locationHttpService().start(), new FiniteDuration(5, TimeUnit.SECONDS));
 
         //#create-actor-system
-        ActorSystem<SpawnProtocol> typedSystem = ActorSystemFactory.remote(SpawnProtocol.behavior(), "csw-examples-locationServiceClient");
+        ActorSystem<SpawnProtocol.Command> typedSystem = ActorSystemFactory.remote(SpawnProtocol.create(), "csw-examples-locationServiceClient");
         //#create-actor-system
 
         //#create-logging-system

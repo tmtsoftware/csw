@@ -2,11 +2,11 @@ package csw.framework.internal.component
 
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import akka.actor.typed.Behavior
-import csw.command.client.CommandResponseManager
+import csw.command.client.{CommandResponseManager, MiniCRM}
 import csw.command.client.messages.DiagnosticDataMessage.DiagnosticMode
 import csw.command.client.messages.FromComponentLifecycleMessage.Running
 import csw.command.client.messages.TopLevelActorIdleMessage.Initialize
-import csw.command.client.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
+import csw.command.client.messages.{FromComponentLifecycleMessage, TopLevelActorMessage}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{ComponentInfos, CurrentStatePublisher, FrameworkTestSuite}
@@ -25,7 +25,7 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar with Ma
     when(sampleComponentHandler.initialize()).thenReturn(Future.unit)
 
     val commandResponseManager: CommandResponseManager = mock[CommandResponseManager]
-    when(commandResponseManager.commandResponseManagerActor).thenReturn(TestProbe[CommandResponseManagerMessage].ref)
+    when(commandResponseManager.commandResponseManagerActor).thenReturn(TestProbe[MiniCRM.CRMMessage].ref)
 
     val cswCtx: CswContext = new CswContext(
       frameworkTestMocks().locationService,

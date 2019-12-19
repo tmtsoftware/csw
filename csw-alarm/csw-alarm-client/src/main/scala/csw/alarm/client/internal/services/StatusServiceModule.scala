@@ -163,7 +163,8 @@ private[client] trait StatusServiceModule extends StatusService {
         if (originalStatus != targetAlarmStatus) {
           log.info(s"Updating alarm status from: [$originalStatus] to: [$targetAlarmStatus]")
           setStatus(alarmKey, targetAlarmStatus)
-        } else Future.successful(Done)
+        }
+        else Future.successful(Done)
     }
 
     await(

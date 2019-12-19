@@ -4,7 +4,6 @@ import akka.Done
 import akka.actor.CoordinatedShutdown
 import csw.location.server.cli.{ArgsParser, Options}
 import csw.location.server.commons.ClusterAwareSettings
-import csw.location.server.commons.CoordinatedShutdownReasons.FailureReason
 import csw.location.server.internal.ServerWiring
 
 import scala.concurrent.duration.DurationDouble
@@ -26,7 +25,8 @@ object Main extends App {
         println(
           "[ERROR] CLUSTER_SEEDS setting is not specified either as env variable or system property. Please check online documentation for this set-up."
         )
-      } else {
+      }
+      else {
         val wiring = ServerWiring.make(maybeClusterPort)
 
         import wiring._
@@ -42,11 +42,12 @@ object Main extends App {
           ) { () =>
             locationBindingF.flatMap(_.terminate(30.seconds)).map(_ => Done)
           }
-        } catch {
+        }
+        catch {
           case NonFatal(ex) =>
             println(s"[ERROR] Failed to start location server.")
             ex.printStackTrace()
-            shutdown(FailureReason(ex))
+            shutdown()
         }
       }
   }

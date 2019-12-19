@@ -1,9 +1,9 @@
 package csw.common.components.command
 
-import akka.actor.Scheduler
 import akka.actor.typed.scaladsl.ActorContext
 import akka.util.Timeout
 import csw.command.api.scaladsl.CommandService
+import csw.command.client.CommandResponseManager.{OverallFailure, OverallSuccess}
 import csw.command.client.CommandServiceFactory
 import csw.command.client.messages.TopLevelActorMessage
 import csw.common.components.command.ComponentStateForCommand.{longRunningCmdCompleted, _}
@@ -17,20 +17,18 @@ import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 import csw.time.core.models.UTCTime
 
+import scala.async.Async._
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
     extends ComponentHandlers(ctx, cswCtx) {
 
-  implicit val timeout: Timeout     = 10.seconds
-  implicit val scheduler: Scheduler = ctx.system.scheduler
-  implicit val ec: ExecutionContext = ctx.executionContext
-  var hcdComponent: CommandService  = _
-  var runId: Id                     = _
-  var shortSetup: Setup             = _
-  var mediumSetup: Setup            = _
-  var longSetup: Setup              = _
+  private implicit val timeout: Timeout     = 10.seconds
+  private implicit val ec: ExecutionContext = ctx.executionContext
+  private var hcdComponent: CommandService  = _
+  private val assemblyPrefix                = prefix
 
   import cswCtx._
 
@@ -47,117 +45,90 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ()
 
-  override def validateCommand(controlCommand: ControlCommand): ValidateCommandResponse = {
+  override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse = {
     controlCommand.commandName match {
-      case `longRunning` => Accepted(controlCommand.runId)
-      case `moveCmd`     => Accepted(controlCommand.runId)
-      case `initCmd`     => Accepted(controlCommand.runId)
-      case `invalidCmd`  => Invalid(controlCommand.runId, CommandIssue.OtherIssue("Invalid"))
-      case _             => Invalid(controlCommand.runId, UnsupportedCommandIssue(controlCommand.commandName.name))
+      case `longRunning` => Accepted(runId)
+      case `moveCmd`     => Accepted(runId)
+      case `initCmd`     => Accepted(runId)
+      case `invalidCmd`  => Invalid(runId, CommandIssue.OtherIssue("Invalid"))
+      case _             => Invalid(runId, UnsupportedCommandIssue(controlCommand.commandName.name))
     }
   }
 
-  override def onSubmit(controlCommand: ControlCommand): SubmitResponse = {
+  override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse = {
     controlCommand.commandName match {
       case `longRunning` =>
-        runId = controlCommand.runId
-
-        // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
-        //#addSubCommand
-        // When receiving the command, onSubmit adds three subCommands
-        commandResponseManager.addOrUpdateCommand(Started(runId))
-        shortSetup = Setup(prefix, shortRunning, controlCommand.maybeObsId)
-        commandResponseManager.addSubCommand(runId, shortSetup.runId)
-
-        mediumSetup = Setup(prefix, mediumRunning, controlCommand.maybeObsId)
-        commandResponseManager.addSubCommand(runId, mediumSetup.runId)
-
-        longSetup = Setup(prefix, longRunning, controlCommand.maybeObsId)
-        commandResponseManager.addSubCommand(runId, longSetup.runId)
-        //#addSubCommand
-
-        // this is to simulate that assembly is splitting command into three sub commands and forwarding same to hcd
-        // longSetup takes 5 seconds to finish
-        // shortSetup takes 1 second to finish
-        // mediumSetup takes 3 seconds to finish
-        processCommand(longSetup)
-        processCommand(shortSetup)
-        processCommand(mediumSetup)
-
-        // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
-        //#subscribe-to-command-response-manager
-        // query the status of original command received and publish the state when its status changes to
-        // Completed
-        commandResponseManager
-          .queryFinal(controlCommand.runId)
-          .foreach {
-            case Completed(_) =>
-              currentStatePublisher.publish(
-                CurrentState(controlCommand.source, StateName("testStateName"), Set(choiceKey.set(longRunningCmdCompleted)))
-              )
-            case _ =>
-          }
-        //#subscribe-to-command-response-manager
-
-        //#query-command-response-manager
-        // query CommandResponseManager to get the current status of Command, for example: Accepted/Completed/Invalid etc.
-        commandResponseManager
-          .query(controlCommand.runId)
-          .map(
-            _ => () // may choose to publish current state to subscribers or do other operations
-          )
+        processLongRunningCommand(runId, controlCommand)
         // Return response
-        Started(controlCommand.runId)
-      //#query-command-response-manager
-
-      case `initCmd` => Completed(controlCommand.runId)
-
-      case `moveCmd` => Completed(controlCommand.runId)
-
-      case _ => //do nothing
-        Completed(controlCommand.runId)
-
+        Started(runId)
+      case `initCmd` =>
+        Completed(runId)
+      case `moveCmd` =>
+        Completed(runId)
+      case _ => // do nothing
+        Completed(runId)
     }
   }
 
-  private def processCommand(controlCommand: ControlCommand) = {
-    hcdComponent
-      .submitAndWait(controlCommand)
-      .map {
-        // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
-        //#updateSubCommand
-        // An original command is split into sub-commands and sent to a component.
-        // The current state publishing is not relevant to the updateSubCommand usage.
-        case _: Completed =>
-          controlCommand.runId match {
-            case id if id == shortSetup.runId =>
-              currentStatePublisher
-                .publish(CurrentState(shortSetup.source, StateName("testStateName"), Set(choiceKey.set(shortCmdCompleted))))
-              // As the commands get completed, the results are updated in the commandResponseManager
-              commandResponseManager.updateSubCommand(Completed(id))
-            case id if id == mediumSetup.runId =>
-              currentStatePublisher
-                .publish(CurrentState(mediumSetup.source, StateName("testStateName"), Set(choiceKey.set(mediumCmdCompleted))))
-              commandResponseManager.updateSubCommand(Completed(id))
-            case id if id == longSetup.runId =>
-              currentStatePublisher
-                .publish(CurrentState(longSetup.source, StateName("testStateName"), Set(choiceKey.set(longCmdCompleted))))
-              commandResponseManager.updateSubCommand(Completed(id))
-          }
-        //#updateSubCommand
-        case _ => // Do nothing
+  private def processLongRunningCommand(prunId: Id, controlCommand: ControlCommand): Unit = {
+    // Could be different components, can't actually submit parallel commands to an HCD
+    val shortSetup  = Setup(assemblyPrefix, shortRunning, None)
+    val mediumSetup = Setup(assemblyPrefix, mediumRunning, None)
+    val longSetup   = Setup(assemblyPrefix, longRunning, None)
+
+    async {
+      // Start 3 commands, could be going to 3 different HCDs
+      val longsubmit: Future[SubmitResponse] = hcdComponent.submit(longSetup)
+      val shortsubmit                        = hcdComponent.submit(shortSetup)
+      val medium                             = hcdComponent.submit(mediumSetup)
+
+      // Execute code when long completes
+      val longresult: Future[SubmitResponse] = hcdComponent.queryFinal(await(longsubmit).runId) map { sr =>
+        currentStatePublisher
+          .publish(CurrentState(assemblyPrefix, StateName("testStateName"), Set(choiceKey.set(longCmdCompleted))))
+        sr
       }
+
+      // Execute coe when medium completes
+      val mediumresult: Future[SubmitResponse] = hcdComponent.queryFinal(await(medium).runId) map { sr =>
+        currentStatePublisher
+          .publish(CurrentState(assemblyPrefix, StateName("testStateName"), Set(choiceKey.set(mediumCmdCompleted))))
+        sr
+      }
+
+      //
+      val shortresult: Future[SubmitResponse] = hcdComponent.queryFinal(await(shortsubmit).runId) map { sr =>
+        currentStatePublisher
+          .publish(CurrentState(assemblyPrefix, StateName("testStateName"), Set(choiceKey.set(shortCmdCompleted))))
+        sr
+      }
+
+      commandResponseManager.queryFinalAll(shortresult, mediumresult, longresult).onComplete {
+        case Success(response) =>
+          currentStatePublisher.publish(
+            CurrentState(controlCommand.source, StateName("testStateName"), Set(choiceKey.set(longRunningCmdCompleted)))
+          )
+          response match {
+            case OverallSuccess(r) =>
+              commandResponseManager.updateCommand(Completed(prunId))
+            case OverallFailure(responses) =>
+              commandResponseManager.updateCommand(Error(prunId, s"$responses"))
+          }
+        case Failure(ex) =>
+          commandResponseManager.updateCommand(Error(prunId, ex.toString))
+      }
+    }
   }
 
-  override def onOneway(controlCommand: ControlCommand): Unit = ???
+  override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
 
-  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = ???
+  override def onShutdown(): Future[Unit] = Future.unit
 
-  override def onOperationsMode(): Unit = ???
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {}
 
-  override def onShutdown(): Future[Unit] = Future.successful(())
+  override def onOperationsMode(): Unit = {}
 
-  override def onGoOffline(): Unit = ???
+  override def onGoOffline(): Unit = {}
 
-  override def onGoOnline(): Unit = ???
+  override def onGoOnline(): Unit = {}
 }

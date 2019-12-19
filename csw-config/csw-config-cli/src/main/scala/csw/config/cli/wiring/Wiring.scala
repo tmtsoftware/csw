@@ -21,11 +21,11 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 private[config] class Wiring {
   lazy val config: Config = ConfigFactory.load()
   lazy val settings       = new Settings(config)
-  lazy val actorSystem    = ActorSystem(SpawnProtocol.behavior, "config-cli", config)
+  lazy val actorSystem    = ActorSystem(SpawnProtocol(), "config-cli", config)
   lazy val actorRuntime   = new ActorRuntime(actorSystem)
   import actorRuntime._
 
-  lazy val locationService: LocationService           = HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
+  lazy val locationService: LocationService           = HttpLocationServiceFactory.makeLocalClient(actorSystem)
   lazy val authStore                                  = new FileAuthStore(settings.authStorePath)
   lazy val nativeAuthAdapter: InstalledAppAuthAdapter = InstalledAppAuthAdapterFactory.make(config, locationService, authStore)
   lazy val tokenFactory: TokenFactory                 = new CliTokenFactory(nativeAuthAdapter)
@@ -39,7 +39,7 @@ private[config] object Wiring {
 
   def make(locationHost: String): Wiring = new Wiring {
     override lazy val locationService: LocationService =
-      HttpLocationServiceFactory.make(locationHost)(actorSystem, actorRuntime.mat)
+      HttpLocationServiceFactory.make(locationHost)(actorSystem)
   }
 
   def noPrinting(_config: Config): Wiring =

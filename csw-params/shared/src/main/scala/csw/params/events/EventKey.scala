@@ -1,6 +1,6 @@
 package csw.params.events
 
-import csw.params.core.models.Prefix
+import csw.prefix.models.Prefix
 
 /**
  * A wrapper class representing the key for an event e.g. tcs.prog.cloudcover.oiwfsProbeDemands
@@ -9,7 +9,7 @@ import csw.params.core.models.Prefix
  * @param eventName represents the name of the event
  */
 case class EventKey(source: Prefix, eventName: EventName) {
-  val key                       = s"${source.prefix}${EventKey.SEPARATOR}$eventName"
+  val key                       = s"${source}${EventKey.SEPARATOR}$eventName"
   override def toString: String = key
 }
 

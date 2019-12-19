@@ -5,7 +5,7 @@ import java.io.File
 import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.stream.scaladsl.{Keep, Sink, Source}
-import akka.stream.{KillSwitches, Materializer}
+import akka.stream.{KillSwitches}
 import csw.event.api.scaladsl.SubscriptionModes.RateAdapterMode
 import csw.event.api.scaladsl.{EventService, EventSubscription}
 import csw.event.cli.args.Options
@@ -50,7 +50,7 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
     }
   }
 
-  def subscribe(options: Options)(implicit mat: Materializer): (EventSubscription, Future[Done]) = {
+  def subscribe(options: Options): (EventSubscription, Future[Done]) = {
     val keys        = options.eventsMap.keys.toSet
     val subscriberF = eventService.defaultSubscriber
 

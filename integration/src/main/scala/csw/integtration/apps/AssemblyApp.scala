@@ -7,13 +7,13 @@ import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.scaladsl.RegistrationResult
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.models.{ComponentId, ComponentType}
 import csw.location.models.Connection.AkkaConnection
+import csw.location.models.{ComponentId, ComponentType}
 import csw.location.server.commons.ClusterAwareSettings
 import csw.location.server.internal.ServerWiring
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.LoggingSystemFactory
-import csw.params.core.models.Prefix
+import csw.prefix.models.{Prefix, Subsystem}
 
 object AssemblyApp {
 
@@ -24,10 +24,10 @@ object AssemblyApp {
   import adminWiring.actorRuntime._
 
   val assemblyActorRef: typed.ActorRef[String] = typedSystem.spawn(behavior, "assembly")
-  val componentId                              = ComponentId("assembly", ComponentType.Assembly)
+  val componentId                              = ComponentId(Prefix(Subsystem.NFIRAOS, "assembly"), ComponentType.Assembly)
   val connection                               = AkkaConnection(componentId)
 
-  val registration                           = AkkaRegistrationFactory.make(connection, Prefix("nfiraos.ncc.trombone"), assemblyActorRef.toURI)
+  val registration                           = AkkaRegistrationFactory.make(connection, assemblyActorRef.toURI)
   val registrationResult: RegistrationResult = HttpLocationServiceFactory.makeLocalClient.register(registration).await
 
   def main(args: Array[String]): Unit = {}

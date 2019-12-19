@@ -1,7 +1,7 @@
 package csw.database;
 
 import akka.actor.typed.ActorSystem;
-import akka.actor.typed.Behavior;
+import akka.actor.typed.javadsl.Behaviors;
 import com.opentable.db.postgres.embedded.EmbeddedPostgres;
 import csw.database.commons.DBTestHelper;
 import csw.database.javadsl.JooqHelper;
@@ -38,7 +38,7 @@ public class JDatabaseServiceTest extends JUnitSuite {
 
     @BeforeClass
     public static void setup() {
-        system = ActorSystem.apply(Behavior.empty(), "test");
+        system = ActorSystem.apply(Behaviors.empty(), "test");
         postgres = DBTestHelper.postgres(0); // 0 is random port
         dsl = DBTestHelper.dslContext(system, postgres.getPort());
 

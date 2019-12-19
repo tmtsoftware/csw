@@ -4,24 +4,26 @@ import java.nio.ByteBuffer
 import java.util.concurrent.CompletableFuture
 
 import akka.Done
-import akka.actor.typed.{ActorSystem, Props, SpawnProtocol}
+import akka.actor.typed.{ActorSystem, MailboxSelector, SpawnProtocol}
 import ch.qos.logback.classic.LoggerContext
-import csw.logging.models.{Level, Levels, LogMetadata}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.appenders.LogAppenderBuilder
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
-import csw.logging.client.commons.{Constants, LoggingKeys}
+import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.exceptions.AppenderNotFoundException
 import csw.logging.client.internal.LogActorMessages._
 import csw.logging.client.internal.TimeActorMessages.TimeDone
+import csw.logging.client.models.ComponentLoggingState
 import csw.logging.client.scaladsl.GenericLoggerFactory
 import csw.logging.macros.DefaultSourceLocation
+import csw.logging.models.{Level, Levels, LogMetadata}
+import csw.prefix.models.Prefix
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsObject, Json}
 
-import scala.jdk.CollectionConverters._
 import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.jdk.CollectionConverters._
 
 /**
  * This class is responsible for programmatic interaction with the configuration of the logging system. It initializes
@@ -34,7 +36,7 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
  * @param host host name (to log).
  * @param system an ActorSystem used to create log actors
  */
-class LoggingSystem private[csw] (name: String, version: String, host: String, val system: ActorSystem[SpawnProtocol]) {
+class LoggingSystem private[csw] (name: String, version: String, host: String, val system: ActorSystem[SpawnProtocol.Command]) {
 
   private val log: Logger = GenericLoggerFactory.getLogger
 
@@ -94,7 +96,7 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
   private[this] val logActor = system.spawn(
     LogActor.behavior(done, appenders, defaultLevel, defaultSlf4jLogLevel, defaultAkkaLogLevel),
     name = "LoggingActor",
-    Props.empty.withDispatcherFromConfig("logging-dispatcher")
+    MailboxSelector.fromConfig("logging-dispatcher")
   )
 
   LoggingState.maybeLogActor = Some(logActor)
@@ -108,7 +110,8 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
     LoggingState.doTime = true
     val timeActor = system.spawn(new TimeActor(timeActorDonePromise).behavior, name = "TimingActor")
     LoggingState.timeActorOption = Some(timeActor)
-  } else {
+  }
+  else {
     timeActorDonePromise.success(())
   }
 
@@ -137,8 +140,8 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
    * @param level the new logging level for the logger API.
    */
   def setDefaultLogLevel(level: Level): Unit = {
+    LoggingState.defaultLogLevel = level
     LoggingState.logLevel = level
-    LoggingState.componentsLoggingState.get(Constants.DEFAULT_KEY).setLevel(level)
   }
 
   /**
@@ -195,21 +198,21 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
     logActor ! SetAppenders(appenders)
   }
 
-  def setComponentLogLevel(componentName: String, level: Level): Unit =
-    ComponentLoggingStateManager.add(componentName, level)
+  def setComponentLogLevel(prefix: Prefix, level: Level): Unit =
+    ComponentLoggingStateManager.add(prefix, level)
 
   /**
    * Get the basic logging configuration values
    *
    * @return LogMetadata which comprises of current root log level, akka log level, sl4j log level and component log level
    */
-  def getLogMetadata(componentName: String): LogMetadata =
+  def getLogMetadata(prefix: Prefix): LogMetadata =
     LogMetadata(
       getDefaultLogLevel.current,
       getAkkaLevel.current,
       getSlf4jLevel.current,
       LoggingState.componentsLoggingState
-        .getOrDefault(componentName, LoggingState.componentsLoggingState.get(Constants.DEFAULT_KEY))
+        .getOrDefault(prefix, ComponentLoggingState(LoggingState.defaultLogLevel))
         .componentLogLevel
     )
 
@@ -266,12 +269,14 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
         try {
           val directByteBufferConstr = buf.getClass.getDeclaredConstructor(classOf[Long], classOf[Int], classOf[Any])
           directByteBufferConstr.setAccessible(true)
-        } catch {
+        }
+        catch {
           case e: Exception =>
         }
         Class.forName(appender).getDeclaredConstructor().newInstance().asInstanceOf[LogAppenderBuilder]
       }
-    } catch {
+    }
+    catch {
       case _: Throwable => throw AppenderNotFoundException(appender)
     }
   }

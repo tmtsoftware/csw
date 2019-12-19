@@ -2,6 +2,7 @@ package csw.config.server.files
 
 import java.nio.file.{Path, Paths}
 
+import akka.stream.Materializer.matFromSystem
 import akka.stream.scaladsl.{FileIO, Keep}
 import csw.config.api.ConfigData
 import csw.config.server.commons.ConfigServerLogger
@@ -19,7 +20,7 @@ import scala.concurrent.Future
  *
  * @param settings retrieve the directory path to store annex files from settings
  * @param fileRepo FileRepo performs file operations with a blocking dispatcher
- * @param actorRuntime ActorRuntime provides runtime accessories related to ActorSystem like Materializer, ExecutionContext etc.
+ * @param actorRuntime ActorRuntime provides runtime accessories related to ActorSystem like ExecutionContext etc.
  */
 class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime: ActorRuntime) {
 
@@ -38,14 +39,16 @@ class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime
       log.debug(s"Annex file already exists at path ${outPath.toString}")
       await(fileRepo.delete(tempFilePath))
       sha
-    } else {
+    }
+    else {
       log.debug(s"Creating directory at ${outPath.getParent.toString}")
       await(fileRepo.createDirectories(outPath.getParent))
       await(fileRepo.move(tempFilePath, outPath))
       log.debug("Validating if annex file is created with intended contents")
       if (await(validate(sha, outPath))) {
         sha
-      } else {
+      }
+      else {
         log.debug(
           s"Deleting annex file from path ${outPath.toString} and temporary file from path ${tempFilePath.toString}"
         )
@@ -63,7 +66,8 @@ class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime
     log.debug(s"Checking if annex file exists at ${repoFilePath.toString}")
     if (await(fileRepo.exists(repoFilePath))) {
       Some(ConfigData.fromPath(repoFilePath))
-    } else {
+    }
+    else {
       None
     }
   }
@@ -105,8 +109,8 @@ class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime
     val (resultF, shaF) = configData.source
       .alsoToMat(FileIO.toPath(path))(Keep.right)
       .toMat(Sha1.sink)(Keep.both)
-      .run()
-    await(resultF).status.get
+      .run()(matFromSystem(typedSystem))
+    await(resultF)
     (path, await(shaF))
   }
 

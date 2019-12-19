@@ -15,8 +15,6 @@ private[location] object LocationServiceFactory {
   /**
    * Create a LocationService instance to manage registrations
    *
-   * @throws csw.location.api.exceptions.CouldNotEnsureDataReplication
-   * @throws csw.location.api.exceptions.CouldNotJoinCluster
    * @return an instance of `LocationService`
    */
   def make(): LocationService = withCluster(CswCluster.make())
@@ -25,11 +23,9 @@ private[location] object LocationServiceFactory {
    * Create an LocationService instance to manage registrations
    *
    * @param actorSystem the actorSystem used to feed in `CswCluster` and use it's config properties to join the cluster
-   * @throws csw.location.api.exceptions.CouldNotEnsureDataReplication
-   * @throws csw.location.api.exceptions.CouldNotJoinCluster
    * @return an instance of `LocationService`
    */
-  def withSystem(actorSystem: ActorSystem[SpawnProtocol]): LocationService =
+  def withSystem(actorSystem: ActorSystem[SpawnProtocol.Command]): LocationService =
     withCluster(CswCluster.withSystem(actorSystem))
 
   /**
@@ -37,8 +33,6 @@ private[location] object LocationServiceFactory {
    *
    * @note it is highly recommended to use this method for testing purpose only
    * @param clusterSettings the custom clusterSettings used to join the cluster
-   * @throws csw.location.api.exceptions.CouldNotEnsureDataReplication
-   * @throws csw.location.api.exceptions.CouldNotJoinCluster
    * @return an instance of `LocationService`
    */
   def withSettings(clusterSettings: ClusterSettings): LocationService =
@@ -49,8 +43,6 @@ private[location] object LocationServiceFactory {
    *
    * @note it is highly recommended to use it for testing purpose only
    * @param cswCluster the cswCluster instance used to join the cluster
-   * @throws csw.location.api.exceptions.CouldNotEnsureDataReplication
-   * @throws csw.location.api.exceptions.CouldNotJoinCluster
    * @return an instance of `LocationService`
    */
   def withCluster(cswCluster: CswCluster): LocationService = {

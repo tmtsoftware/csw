@@ -40,15 +40,9 @@ object CommandResponse {
 
   /**
    * SubmitResponse is returned by Submit message which calls the onSubmit handler
-   * Responses returned can be Invalid, Started, Completed, CompletedWithResult, Error, Cancelled, Locked
+   * Responses returned can be Invalid, Started, Completed, Error, Cancelled, Locked
    */
-  sealed trait SubmitResponse extends QueryResponse
-
-  /**
-   * QueryResponse is returned by CommandService query
-   * Values can be Invalid, Started, Completed, CompletedWithResult, Error, Cancelled, Locked, CommandNotAvailable
-   */
-  sealed trait QueryResponse extends CommandResponse
+  sealed trait SubmitResponse extends CommandResponse
 
   /**
    * MatchingResponse is returned by matchers.
@@ -57,36 +51,42 @@ object CommandResponse {
   sealed trait MatchingResponse extends CommandResponse
 
   /**
-   * Represents a final response stating acceptance of a command received
+   * Represents a final response stating acceptance of a command received meaning passed validation
    *
    * @param runId the runId of command for which this response is created
    */
   case class Accepted(runId: Id) extends ValidateCommandResponse with ValidateResponse with OnewayResponse
 
   /**
-   * Represents an intermediate response stating a long running command has been started
+   * Represents a preliminary response stating a long running command has been started
    *
    * @param runId of command for which this response is created
    */
   case class Started(runId: Id) extends SubmitResponse
 
   /**
-   * Represents a positive response stating completion of command
+   * Represents a final positive response stating completion of command with no errors
+   * A result may be included or may be empty
    *
    * @param runId of command for which this response is created
-   * @param result describing the result of completion
+   * @param result describing the result of completion if needed
    */
-  case class CompletedWithResult(runId: Id, result: Result) extends SubmitResponse
+  case class Completed(runId: Id, result: Result = Result.emptyResult) extends SubmitResponse with MatchingResponse {
+
+    /**
+     * Check to see if this response has a result
+     * @return `true` if the response contains a non-empty result, `false` otherwise.
+     */
+    def hasResult: Boolean = result.nonEmpty
+
+    /**
+     * A java helper to construct a Completed response
+     */
+    def this(runId: Id) = this(runId, Result())
+  }
 
   /**
-   * Represents a positive response stating completion of command
-   *
-   * @param runId of command for which this response is created
-   */
-  case class Completed(runId: Id) extends SubmitResponse with MatchingResponse
-
-  /**
-   * Represents a negative response invalidating a command received
+   * Represents a final negative response invalidating a command received has failed validation
    *
    * @param runId of command for which this response is created
    * @param issue describing the cause of invalidation
@@ -121,49 +121,25 @@ object CommandResponse {
   case class Locked(runId: Id) extends ValidateResponse with OnewayResponse with SubmitResponse with MatchingResponse
 
   /**
-   * A negative response stating that a command with given runId is not available or cannot be located
-   *
-   * @param runId of command for which this response is created
-   */
-  case class CommandNotAvailable(runId: Id) extends QueryResponse
-
-  /**
-   * Transform a given CommandResponse to a response with the provided Id
-   *
-   * @param id       the RunId for the new CommandResponse
-   * @param response the CommandResponse to be transformed
-   * @return a CommandResponse that has runId as provided id
-   */
-  def withRunId(id: Id, response: SubmitResponse): SubmitResponse = response match {
-    case started: Started                         => started.copy(runId = id)
-    case invalid: Invalid                         => invalid.copy(runId = id)
-    case completedWithResult: CompletedWithResult => completedWithResult.copy(runId = id)
-    case completed: Completed                     => completed.copy(runId = id)
-    case locked: Locked                           => locked.copy(runId = id)
-    case error: Error                             => error.copy(runId = id)
-    case cancelled: Cancelled                     => cancelled.copy(runId = id)
-  }
-
-  /**
    * Tests a response to determine if it is a final command state
    *
-   * @param qr response for testing
+   * @param sr response for testing
    * @return true if it is final
    */
-  def isFinal(qr: QueryResponse): Boolean = qr match {
+  def isFinal(sr: SubmitResponse): Boolean = sr match {
     case Started(_) => false
     case _          => true
   }
 
   /**
-   * Test a QueryResponse to determine if it is a positive response
+   * Test a response to determine if it is a positive response
    *
-   * @param qr response for testing
+   * @param sr response for testing
    * @return true if it is positive
    */
-  def isPositive(qr: QueryResponse): Boolean = qr match {
-    case Completed(_) | CompletedWithResult(_, _) => true
-    case _                                        => false
+  def isPositive(sr: SubmitResponse): Boolean = sr match {
+    case Completed(_, _) => true
+    case _               => false
   }
 
   /**
@@ -173,27 +149,26 @@ object CommandResponse {
    * @return true if positive, false otherwise
    */
   def isPositive(or: OnewayResponse): Boolean = or match {
-    case Accepted(runId) => true
-    case _               => false
+    case Accepted(_) => true
+    case _           => false
   }
 
   /**
    * Tests a response to determine if it is a negative response
    *
-   * @param qr response for testing
+   * @param sr response for testing
    * @return true if it is negative
    */
-  def isNegative(qr: QueryResponse): Boolean = !(isPositive(qr) || isIntermediate(qr))
+  def isNegative(sr: SubmitResponse): Boolean = !(isPositive(sr) || isIntermediate(sr))
 
   /**
    * Tests a response to determine if it is an intermediate response
    *
-   * @param qr response for testing
+   * @param sr response for testing
    * @return returns true if it is intermediate
    */
-  def isIntermediate(qr: QueryResponse): Boolean = qr match {
+  def isIntermediate(sr: SubmitResponse): Boolean = sr match {
     case Started(_) => true
     case _          => false
   }
-
 }

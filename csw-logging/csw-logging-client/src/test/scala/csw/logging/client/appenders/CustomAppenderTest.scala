@@ -8,6 +8,7 @@ import com.typesafe.config.ConfigFactory
 import csw.logging.api.scaladsl._
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.scaladsl.{LoggerFactory, LoggingSystemFactory}
+import csw.prefix.models.Prefix
 import org.scalatest.{FunSuite, Matchers}
 import play.api.libs.json.{JsObject, Json}
 
@@ -15,7 +16,7 @@ import scala.collection.mutable
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 
-object MyFavLibraryLogger extends LoggerFactory("MyFavComponent")
+object MyFavLibraryLogger extends LoggerFactory(Prefix("csw.MyFavComponent"))
 
 class MyFavComponent {
 
@@ -79,7 +80,7 @@ class CustomAppenderTest extends FunSuite with Matchers {
         |}
       """.stripMargin)
 
-    val actorSystem   = typed.ActorSystem(SpawnProtocol.behavior, "test", config.resolve())
+    val actorSystem   = typed.ActorSystem(SpawnProtocol(), "test", config.resolve())
     val loggingSystem = LoggingSystemFactory.start("foo-name", "foo-version", hostName, actorSystem)
     loggingSystem.setAppenders(List(CustomAppenderBuilderObject))
 
@@ -108,7 +109,7 @@ class CustomAppenderTest extends FunSuite with Matchers {
         |}
       """.stripMargin)
 
-    val actorSystem    = typed.ActorSystem(SpawnProtocol.behavior, "test", config.resolve())
+    val actorSystem    = typed.ActorSystem(SpawnProtocol(), "test", config.resolve())
     val loggingSystem  = LoggingSystemFactory.start("foo-name", "foo-version", hostName, actorSystem)
     val customAppender = new CustomAppenderBuilderClass
     loggingSystem.setAppenders(List(customAppender))
@@ -141,7 +142,7 @@ class CustomAppenderTest extends FunSuite with Matchers {
                                              |}
                                            """.stripMargin)
 
-    val actorSystem    = typed.ActorSystem(SpawnProtocol.behavior, "test", config.resolve())
+    val actorSystem    = typed.ActorSystem(SpawnProtocol(), "test", config.resolve())
     val loggingSystem  = LoggingSystemFactory.start("foo-name", "foo-version", hostName, actorSystem)
     val customAppender = new CustomAppenderBuilderClass
     loggingSystem.setAppenders(List(customAppender))

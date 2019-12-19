@@ -1,9 +1,9 @@
 package example.event;
 
 import akka.actor.typed.ActorRef;
+import akka.actor.typed.ActorSystem;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.ActorContext;
-import akka.stream.Materializer;
 import akka.stream.javadsl.Sink;
 import csw.command.client.messages.TopLevelActorMessage;
 import csw.event.api.javadsl.IEventSubscriber;
@@ -11,10 +11,10 @@ import csw.event.api.javadsl.IEventSubscription;
 import csw.event.api.scaladsl.SubscriptionModes;
 import csw.event.client.internal.commons.javawrappers.JEventService;
 import csw.location.models.AkkaLocation;
-import csw.params.core.models.Subsystem;
 import csw.params.events.Event;
 import csw.params.events.EventKey;
 import csw.params.events.EventName;
+import csw.prefix.models.Subsystem;
 
 import java.time.Duration;
 import java.util.Set;
@@ -24,12 +24,12 @@ public class JEventSubscribeExamples {
 
     private JEventService eventService;
     private AkkaLocation hcdLocation;
-    private Materializer mat;
+    private ActorSystem<Void> system;
 
-    public JEventSubscribeExamples(JEventService eventService, AkkaLocation hcdLocation, Materializer mat) {
+    public JEventSubscribeExamples(JEventService eventService, AkkaLocation hcdLocation, ActorSystem<Void> system) {
         this.eventService = eventService;
         this.hcdLocation = hcdLocation;
-        this.mat = mat;
+        this.system = system;
     }
 
     public IEventSubscription callback() {
@@ -83,7 +83,7 @@ public class JEventSubscribeExamples {
         IEventSubscriber subscriber = eventService.defaultSubscriber();
 
         EventKey filterWheelEventKey = new EventKey(hcdLocation.prefix(), new EventName("filter_wheel"));
-        return subscriber.subscribe(Set.of(filterWheelEventKey)).to(Sink.foreach(event -> { /*do something*/ })).run(mat);
+        return subscriber.subscribe(Set.of(filterWheelEventKey)).to(Sink.foreach(event -> { /*do something*/ })).run(system);
 
         //#with-source
     }

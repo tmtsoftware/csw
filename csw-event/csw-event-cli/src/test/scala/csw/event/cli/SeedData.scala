@@ -1,6 +1,5 @@
 package csw.event.cli
 
-import akka.actor.CoordinatedShutdown.UnknownReason
 import com.typesafe.config.ConfigFactory
 import csw.commons.redis.EmbeddedRedis
 import csw.event.api.scaladsl.EventPublisher
@@ -54,7 +53,7 @@ trait SeedData extends HTTPLocationService with Matchers with BeforeAndAfterEach
 
   override def afterAll(): Unit = {
     stopSentinel(redisSentinel, redisServer)
-    cliWiring.actorRuntime.shutdown(UnknownReason).await
+    cliWiring.actorRuntime.shutdown().await
     super.afterAll()
   }
 

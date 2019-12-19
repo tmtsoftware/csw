@@ -1,7 +1,7 @@
 package csw.config.api.internal
 
 import akka.NotUsed
-import akka.stream.Materializer
+import akka.actor.typed.ActorSystem
 import akka.stream.scaladsl.{Sink, Source}
 
 import scala.concurrent.{Future, Promise}
@@ -26,15 +26,15 @@ private[config] object ConfigStreamExts {
      *
      * @param n number of elements to be extracted as prefix
      */
-    def prefixAndStitch(n: Int)(implicit mat: Materializer): (Future[Seq[Out]], Source[Out, Future[NotUsed]]) = {
-      import mat.executionContext
+    def prefixAndStitch(n: Int)(implicit system: ActorSystem[_]): (Future[Seq[Out]], Source[Out, Future[NotUsed]]) = {
+      import system.executionContext
       val p = Promise[Seq[Out]]
       val futureSource = source.prefixAndTail(n).runWith(Sink.head).map {
         case (prefix, remainingSource) =>
           p.success(prefix)
           Source(prefix) ++ remainingSource
       }
-      (p.future, Source.fromFutureSource(futureSource))
+      (p.future, Source.futureSource(futureSource))
     }
 
   }

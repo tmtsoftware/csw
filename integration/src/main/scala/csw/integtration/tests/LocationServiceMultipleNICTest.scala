@@ -1,6 +1,5 @@
 package csw.integtration.tests
 
-import akka.actor.CoordinatedShutdown.UnknownReason
 import csw.integtration.common.TestFutureExtension.RichFuture
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.models.Connection.AkkaConnection
@@ -9,6 +8,7 @@ import csw.location.server.commons.ClusterAwareSettings
 import csw.location.server.internal.ServerWiring
 import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.network.utils.Networks
+import csw.prefix.models.{Prefix, Subsystem}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.time.Span
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -29,11 +29,11 @@ class LocationServiceMultipleNICTest() extends FunSuite with Matchers with Befor
   import adminWiring.actorRuntime._
   private val locationService = HttpLocationServiceFactory.makeLocalClient
 
-  override def afterAll(): Unit = Await.result(adminWiring.actorRuntime.shutdown(UnknownReason), 5.seconds)
+  override def afterAll(): Unit = Await.result(adminWiring.actorRuntime.shutdown(), 5.seconds)
 
   test("should list and resolve component having multiple-nic's") {
 
-    val componentId = ComponentId("assembly", ComponentType.Assembly)
+    val componentId = ComponentId(Prefix(Subsystem.CSW, "assembly"), ComponentType.Assembly)
     val connection  = AkkaConnection(componentId)
 
     eventually(locationService.list.await should have size 1)

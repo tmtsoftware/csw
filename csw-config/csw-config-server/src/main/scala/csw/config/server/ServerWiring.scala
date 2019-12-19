@@ -16,7 +16,7 @@ private[csw] class ServerWiring {
   lazy val config: Config = ConfigFactory.load()
   lazy val settings       = new Settings(config)
 
-  lazy val actorSystem  = ActorSystem(SpawnProtocol.behavior, "config-server")
+  lazy val actorSystem  = ActorSystem(SpawnProtocol(), "config-server")
   lazy val actorRuntime = new ActorRuntime(actorSystem, settings)
   import actorRuntime._
 
@@ -27,7 +27,7 @@ private[csw] class ServerWiring {
   lazy val configServiceFactory = new SvnConfigServiceFactory(actorRuntime, annexFileService)
 
   lazy val locationService: LocationService =
-    HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
+    HttpLocationServiceFactory.makeLocalClient(actorSystem)
 
   lazy val configHandlers     = new ConfigHandlers
   lazy val securityDirectives = SecurityDirectives(config, locationService)

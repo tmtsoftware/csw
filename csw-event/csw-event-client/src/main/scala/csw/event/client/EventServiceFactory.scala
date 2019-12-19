@@ -1,12 +1,8 @@
 package csw.event.client
 
 import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.stream.typed.scaladsl.ActorMaterializer
-import akka.stream.{ActorMaterializerSettings, Materializer}
 import csw.event.api.javadsl.IEventService
 import csw.event.api.scaladsl.EventService
-import csw.event.client.internal.commons.EventStreamSupervisionStrategy
 import csw.event.client.internal.commons.javawrappers.JEventService
 import csw.event.client.internal.commons.serviceresolver.{
   EventServiceHostPortResolver,
@@ -19,8 +15,6 @@ import csw.event.client.models.EventStore
 import csw.event.client.models.EventStores.{KafkaStore, RedisStore}
 import csw.location.api.javadsl.ILocationService
 import csw.location.api.scaladsl.LocationService
-
-import scala.concurrent.ExecutionContext
 
 /**
  * Factory to create EventService
@@ -78,17 +72,8 @@ class EventServiceFactory(store: EventStore = RedisStore()) {
     new JEventService(eventService)
   }
 
-  private def mat()(implicit actorSystem: ActorSystem[_]): Materializer =
-    ActorMaterializer(
-      Some(ActorMaterializerSettings(actorSystem.toUntyped).withSupervisionStrategy(EventStreamSupervisionStrategy.decider))
-    )
-
   private def eventService(eventServiceResolver: EventServiceResolver)(implicit system: ActorSystem[_]) = {
-    implicit val ec: ExecutionContext       = system.executionContext
-    implicit val materializer: Materializer = mat()
-
     def masterId = system.settings.config.getString("csw-event.redis.masterId")
-
     store match {
       case RedisStore(client) => new RedisEventService(eventServiceResolver, masterId, client)
       case KafkaStore         => new KafkaEventService(eventServiceResolver)

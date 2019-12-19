@@ -54,7 +54,7 @@ By default, the elastic stack exposes the following ports on which the configura
 
 In order to aggregate logs generated from TMT apps, the Filebeat application is used to watch them. The recommended practice is for apps to generate log files
 at a common place so that Filebeat can find them. This common place is defined by an environment variable `TMT_LOG_HOME`,
- e.g. `TMT_LOG_HOME = /<<user-accessible-space>>/tmt/logs`.
+ e.g. `TMT_LOG_HOME = /<<user-accessible-space>>/tmt/logs/csw`.
 
 @@@ note
 
@@ -307,9 +307,9 @@ For Modules like System, Postgres, Redis and Elasticsearch go to `Dashboard` and
 
 For development purposes [Docker compose](https://docs.docker.com/compose/) is used to start Elasticsearch, Logstash, Kibana and Filebeat in a container.
 Hence, make sure that latest Docker setup is installed and running before starting the Elastic stack. The Docker container is responsible for aggregating logs
-generated in `tmp/csw/logs`. Hence, developers writing Scala/Java/Python/C++/C applications need to generate log files under `/tmp/csw/logs`. 
+generated in `tmp/tmt/logs/csw`. Hence, developers writing Scala/Java/Python/C++/C applications need to generate log files under `/tmp/tmt/logs/csw`. 
 
-Also, note that csw apps started via `csw-services.sh` will generate log files under `/tmp/csw/logs` and thus, it will be aggregated by the Elastic docker container.
+Also, note that csw apps started via `csw-services.sh` will generate log files under `/tmp/tmt/logs/csw` and thus, it will be aggregated by the Elastic docker container.
 To know more about setting up docker and starting Elastic, please refer to @ref:[Starting Elastic logging aggregator for Development](apps.md#starting-elk-logging-aggregator-for-development). 
 
 @@@ note

@@ -17,11 +17,14 @@ import csw.location.models.Connection.AkkaConnection
 import csw.params.commands
 import csw.params.commands.CommandName
 import csw.params.core.states.{CurrentState, StateName}
+import csw.prefix.models.Subsystem
+import csw.prefix.models.Prefix
 import redis.embedded.{RedisSentinel, RedisServer}
 
 import scala.concurrent.duration.DurationLong
 
 //DEOPSCSW-395: Provide EventService handle to component developers
+//CSW-82: ComponentInfo should take prefix
 class EventServiceIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 
@@ -29,8 +32,8 @@ class EventServiceIntegrationTest extends FrameworkIntegrationSuite {
   private var sentinel: RedisSentinel = _
   private var server: RedisServer     = _
 
-  private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
-  private val disperserHcdConnection   = AkkaConnection(models.ComponentId("Disperser", HCD))
+  private val filterAssemblyConnection = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "Filter"), Assembly))
+  private val disperserHcdConnection   = AkkaConnection(models.ComponentId(Prefix(Subsystem.TCS, "Disperser"), HCD))
   private val wiring                   = FrameworkWiring.make(seedActorSystem)
 
   override protected def beforeAll(): Unit = {

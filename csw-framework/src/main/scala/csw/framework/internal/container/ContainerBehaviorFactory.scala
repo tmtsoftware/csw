@@ -22,20 +22,19 @@ private[framework] object ContainerBehaviorFactory {
       alarmServiceFactory: AlarmServiceFactory,
       registrationFactory: RegistrationFactory
   ): Behavior[ContainerActorMessage] = {
-    val supervisorFactory = new SupervisorInfoFactory(containerInfo.name)
-    val loggerFactory     = new LoggerFactory(containerInfo.name)
-    Behaviors.setup(
-      ctx =>
-        new ContainerBehavior(
-          ctx,
-          containerInfo,
-          supervisorFactory,
-          registrationFactory,
-          locationService,
-          eventServiceFactory,
-          alarmServiceFactory,
-          loggerFactory
-        )
+    val supervisorFactory = new SupervisorInfoFactory(containerInfo.prefix)
+    val loggerFactory     = new LoggerFactory(containerInfo.prefix)
+    Behaviors.setup(ctx =>
+      new ContainerBehavior(
+        ctx,
+        containerInfo,
+        supervisorFactory,
+        registrationFactory,
+        locationService,
+        eventServiceFactory,
+        alarmServiceFactory,
+        loggerFactory
+      )
     )
   }
 }

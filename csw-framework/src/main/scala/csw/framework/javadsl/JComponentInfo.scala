@@ -5,7 +5,7 @@ import java.util
 
 import csw.command.client.models.framework.{ComponentInfo, LocationServiceUsage}
 import csw.location.models.{ComponentType, Connection}
-import csw.params.core.models.Prefix
+import csw.prefix.models.Prefix
 
 import scala.compat.java8.DurationConverters.DurationOps
 import scala.jdk.CollectionConverters._
@@ -18,9 +18,8 @@ object JComponentInfo {
   /**
    * The information needed to create a component. This class is created after de-serializing the config file for the component.
    *
-   * @param name the name of the component
+   * @param prefix prefix for the component with `subsystem` and `name`
    * @param componentType the type of the component as defined by [[csw.location.models.ComponentType]]
-   * @param prefix identifies the subsystem
    * @param className specifies the component to be created by name of the class of it's factory
    * @param locationServiceUsage specifies component's usage of location service
    * @param connections set of connections that will be used by this component for interaction
@@ -28,17 +27,15 @@ object JComponentInfo {
    * @return an instance of ComponentInfo
    */
   def from(
-      name: String,
-      componentType: ComponentType,
       prefix: Prefix,
+      componentType: ComponentType,
       className: String,
       locationServiceUsage: LocationServiceUsage,
       connections: util.Set[Connection],
       initializeTimeout: Duration
   ): ComponentInfo = ComponentInfo(
-    name,
-    componentType,
     prefix,
+    componentType,
     className,
     locationServiceUsage,
     connections.asScala.toSet,

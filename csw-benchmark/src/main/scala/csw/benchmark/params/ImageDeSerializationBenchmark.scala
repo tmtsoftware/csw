@@ -11,7 +11,8 @@ import csw.params.commands.{CommandName, Observe}
 import csw.params.core.generics.KeyType.ByteArrayKey
 import csw.params.core.generics.{Key, Parameter}
 import csw.params.core.models.Units.pascal
-import csw.params.core.models.{ArrayData, ObsId, Prefix}
+import csw.params.core.models.{ArrayData, ObsId}
+import csw.prefix.models.Prefix
 import org.openjdk.jmh.annotations._
 
 import scala.concurrent.Await
@@ -45,7 +46,7 @@ class ImageDeSerializationBenchmark {
   @Setup(Level.Trial)
   def setup(): Unit = {
     system = ActorSystem(Behaviors.empty, "example")
-    serialization = SerializationExtension(system.toUntyped)
+    serialization = SerializationExtension(system.toClassic)
     prefixStr = "wfos.prog.cloudcover"
     obsId = ObsId("Obs001")
 

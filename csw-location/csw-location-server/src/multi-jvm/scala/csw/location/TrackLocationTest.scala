@@ -1,7 +1,7 @@
 package csw.location
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.Behavior
+import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.scaladsl.{Keep, Sink}
 import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
@@ -9,7 +9,8 @@ import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.models._
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
-import csw.params.core.models.Prefix
+import csw.prefix.models.Subsystem
+import csw.prefix.models.Prefix
 
 class TrackLocationTestMultiJvmNode1 extends TrackLocationTest(0, "cluster")
 class TrackLocationTestMultiJvmNode2 extends TrackLocationTest(0, "cluster")
@@ -18,24 +19,21 @@ class TrackLocationTestMultiJvmNode3 extends TrackLocationTest(0, "cluster")
 class TrackLocationTest(ignore: Int, mode: String) extends LSNodeSpec(config = new TwoMembersAndSeed, mode) {
 
   import config._
-  import cswCluster.mat
 
   // DEOPSCSW-26: Track a connection
   test("two components should able to track same connection and single component should able to track two components") {
     //create akka connection
-    val akkaConnection = AkkaConnection(ComponentId("tromboneHcd", ComponentType.HCD))
+    val akkaConnection = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneHcd"), ComponentType.HCD))
 
     //create http connection
-    val httpConnection = HttpConnection(ComponentId("Assembly1", ComponentType.Assembly))
+    val httpConnection = HttpConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "Assembly1"), ComponentType.Assembly))
 
     //create tcp connection
-    val tcpConnection = TcpConnection(models.ComponentId("redis1", ComponentType.Service))
-
-    val prefix = Prefix("nfiraos.ncc.trombone")
+    val tcpConnection = TcpConnection(models.ComponentId(Prefix(Subsystem.CSW, "redis1"), ComponentType.Service))
 
     runOn(seed) {
-      val actorRef = cswCluster.typedSystem.spawn(Behavior.empty, "trombone-hcd")
-      locationService.register(AkkaRegistrationFactory.make(akkaConnection, prefix, actorRef.toURI)).await
+      val actorRef = cswCluster.typedSystem.spawn(Behaviors.empty, "trombone-hcd")
+      locationService.register(AkkaRegistrationFactory.make(akkaConnection, actorRef.toURI)).await
       enterBarrier("Registration")
 
       locationService.unregister(akkaConnection).await

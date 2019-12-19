@@ -4,7 +4,6 @@ import java.io.InputStream
 import java.nio.file.{Files, Path, Paths}
 import java.time.Instant
 
-import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.stream.scaladsl.StreamConverters
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.commons.ResourceReader
@@ -945,7 +944,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     // This test verifies that the file was stored in the annex because the file with the sha1-suffix only exists if in the annex
     val svnConfigData = cs.getById(Paths.get(s"$fileName${serverWiring.settings.`sha1-suffix`}"), configId).await.get
     svnConfigData.toStringF.await shouldBe Sha1.fromConfigData(configData).await
-    serverWiringAnnexTest.actorRuntime.shutdown(UnknownReason).await
+    serverWiringAnnexTest.actorRuntime.shutdown().await
   }
 
   //DEOPSCSW-75 List the names of configuration files that match a path
@@ -1092,6 +1091,6 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     metadata.annexPath shouldBe "/test/csw-config-temp"
     metadata.annexMinFileSize shouldBe "333 MiB"
     metadata.maxConfigFileSize shouldBe "500 MiB"
-    serverWiringMetadataTest.actorRuntime.shutdown(UnknownReason).await
+    serverWiringMetadataTest.actorRuntime.shutdown().await
   }
 }

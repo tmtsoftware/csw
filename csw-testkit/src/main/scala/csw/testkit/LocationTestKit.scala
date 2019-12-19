@@ -45,7 +45,7 @@ final class LocationTestKit private (testKitSettings: TestKitSettings) {
    */
   def shutdownLocationServer(): Unit = {
     locationServer.foreach(TestKitUtils.terminateHttpServerBinding(_, timeout))
-    TestKitUtils.coordShutdown(shutdown, timeout.duration)
+    TestKitUtils.shutdown(shutdown(), timeout.duration)
   }
 
 }

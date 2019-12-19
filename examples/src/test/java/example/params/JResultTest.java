@@ -2,19 +2,23 @@ package example.params;
 
 import csw.params.commands.Result;
 import csw.params.core.formats.JavaJsonSupport;
-import csw.params.javadsl.JKeyType;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
+import csw.params.core.models.Id;
 import csw.params.core.models.MatrixData;
 import csw.params.core.models.ObsId;
-import csw.params.core.models.Id;
+import csw.params.javadsl.JKeyType;
+import csw.prefix.models.Prefix;
+import csw.prefix.javadsl.JSubsystem;
 import org.junit.Assert;
 import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
 import play.api.libs.json.JsValue;
 import play.api.libs.json.Json;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class JResultTest extends JUnitSuite {
@@ -32,23 +36,17 @@ public class JResultTest extends JUnitSuite {
         Key<String> k3 = JKeyType.StringKey().make("filter");
         Key<Integer> k4 = JKeyType.IntKey().make("notUsed");
 
-        //prefix
-        String prefix = "wfos.prog.cloudcover";
-
-        //#obsid
-        ObsId obsId = new ObsId("Obs001");
-
         //parameters
         Parameter<Integer> p1 = k1.set(22);
         Parameter<Integer> p2 = k2.set(44);
         Parameter<String> p3 = k3.set("A", "B", "C", "D");
 
         //Create Result using madd
-        Result r1 = new Result(prefix).madd(p1, p2);
-        //Create Result using madd
-        Result r2 = new Result(prefix).madd(p1, p2);
+        Result r1 = new Result().madd(p1, p2);
+        //Create Result in line
+        Result r2 = new Result().madd(p1, p2);
         //Create Result and use madd, add
-        Result r3 = new Result(prefix).madd(p1, p2).add(p3);
+        Result r3 = new Result().madd(p1, p2).add(p3);
 
         //access keys
         boolean k1Exists = r1.exists(k1); //true
@@ -92,10 +90,10 @@ public class JResultTest extends JUnitSuite {
         ObsId obsId = new ObsId("Obs001");
 
         //prefix
-        String prefix = "wfos.prog.cloudcover";
+        Prefix prefix = new Prefix(JSubsystem.WFOS(), "prog.cloudcover");
 
         //result
-        Result result = new Result(prefix).add(i1);
+        Result result = new Result().add(i1);
 
         //json support - write
         JsValue resultJson = JavaJsonSupport.writeResult(result);
@@ -122,7 +120,7 @@ public class JResultTest extends JUnitSuite {
         ObsId obsId = new ObsId("Obs001");
 
         //prefix
-        String prefix = "wfos.blue.filter";
+        Prefix prefix = new Prefix(JSubsystem.WFOS(), "blue.filter");
 
         //params
         Parameter<Integer> encParam1 = encoderKey.set(1);
@@ -136,7 +134,7 @@ public class JResultTest extends JUnitSuite {
         Parameter<Integer> miscParam1 = miscKey.set(100);
 
         //Setup command with duplicate key via madd
-        Result result = new Result(prefix).madd(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3);
+        Result result = new Result().madd(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3);
         //four duplicate keys are removed; now contains one Encoder and one Filter key
         Set<String> uniqueKeys1 = result.jParamSet().stream().map(Parameter::keyName).collect(Collectors.toUnmodifiableSet());
 

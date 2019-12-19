@@ -1,10 +1,6 @@
 package csw.framework.internal.container
 
-import akka.Done
-import akka.actor.CoordinatedShutdown
-import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed._
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext}
 import csw.alarm.client.AlarmServiceFactory
 import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
@@ -15,10 +11,6 @@ import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, S
 import csw.command.client.messages.{ComponentMessage, ContainerActorMessage, ContainerCommonMessage, ContainerIdleMessage}
 import csw.command.client.models.framework._
 import csw.event.client.EventServiceFactory
-import csw.framework.commons.CoordinatedShutdownReasons.{
-  AllActorsWithinContainerTerminatedReason,
-  FailedToCreateSupervisorsReason
-}
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models._
 import csw.framework.scaladsl.RegistrationFactory
@@ -27,8 +19,6 @@ import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{AkkaRegistration, ComponentId, ComponentType}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
-import csw.params.core.models.Prefix
-import csw.params.core.models.Subsystem.Container
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
@@ -54,14 +44,14 @@ private[framework] final class ContainerBehavior(
     eventServiceFactory: EventServiceFactory,
     alarmServiceFactory: AlarmServiceFactory,
     loggerFactory: LoggerFactory
-) extends AbstractBehavior[ContainerActorMessage] {
+) extends AbstractBehavior[ContainerActorMessage](ctx) {
 
   import ctx.executionContext
   private val log: Logger     = loggerFactory.getLogger(ctx)
-  private val containerPrefix = Prefix(s"${Container.entryName}.${containerInfo.name}")
-  private val akkaConnection  = AkkaConnection(ComponentId(containerInfo.name, ComponentType.Container))
+  private val containerPrefix = containerInfo.prefix
+  private val akkaConnection  = AkkaConnection(ComponentId(containerPrefix, ComponentType.Container))
   private val akkaRegistration: AkkaRegistration =
-    registrationFactory.akkaTyped(akkaConnection, containerPrefix, ctx.self)
+    registrationFactory.akkaTyped(akkaConnection, ctx.self)
 
   // Set of successfully created supervisors for components
   var supervisors: Set[SupervisorInfo] = Set.empty
@@ -69,7 +59,6 @@ private[framework] final class ContainerBehavior(
   // Set of created supervisors which moved into Running state
   var runningComponents: Set[ActorRef[ComponentMessage]] = Set.empty
   var lifecycleState: ContainerLifecycleState            = ContainerLifecycleState.Idle
-
   registerWithLocationService()
 
   // Failure in registration above doesn't affect creation of components
@@ -106,7 +95,7 @@ private[framework] final class ContainerBehavior(
       supervisors = supervisors.filterNot(_.component.supervisor == supervisor)
       if (supervisors.isEmpty) {
         log.warn("All supervisors from this container are terminated. Initiating co-ordinated shutdown.")
-        coordinatedShutdown(AllActorsWithinContainerTerminatedReason)
+        ctx.system.terminate()
       }
       this
     case PostStop =>
@@ -145,8 +134,9 @@ private[framework] final class ContainerBehavior(
     case SupervisorsCreated(supervisorInfos) =>
       if (supervisorInfos.isEmpty) {
         log.error(s"Failed to spawn supervisors for ComponentInfo's :[${containerInfo.components.mkString(", ")}]")
-        coordinatedShutdown(FailedToCreateSupervisorsReason)
-      } else {
+        ctx.system.terminate()
+      }
+      else {
         supervisors = supervisorInfos
         log.info(s"Container created following supervisors :[${supervisors.map(_.component.supervisor).mkString(",")}]")
         supervisors.foreach(supervisorInfo => ctx.watch(supervisorInfo.component.supervisor))
@@ -165,7 +155,7 @@ private[framework] final class ContainerBehavior(
    * @param componentInfos components to be created as specified in the configuration file
    */
   private def createComponents(componentInfos: Set[ComponentInfo]): Unit = {
-    log.info(s"Container is creating following components :[${componentInfos.map(_.name).mkString(", ")}]")
+    log.info(s"Container is creating following components :[${componentInfos.map(_.prefix.toString).mkString(", ")}]")
     Future
       .traverse(componentInfos) { ci =>
         supervisorInfoFactory.make(ctx.self, ci, locationService, eventServiceFactory, alarmServiceFactory, registrationFactory)
@@ -194,6 +184,4 @@ private[framework] final class ContainerBehavior(
       case Failure(throwable) => log.error(throwable.getMessage, ex = throwable)
     }
   }
-
-  private def coordinatedShutdown(reason: Reason): Future[Done] = CoordinatedShutdown(ctx.system.toUntyped).run(reason)
 }

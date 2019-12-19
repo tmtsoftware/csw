@@ -19,18 +19,6 @@ package csw.command
  *
  * Important classes in this project are:
  *
- * - [[csw.command.client.CommandResponseManager]]
- *
- * This class wraps CommandResponseManagerActor and provides helpers to interact with actor which is responsible for adding/updating/querying command result.
- * Component writers will get handle to CommandResponseManager in their handlers.
- *
- * - `CommandResponseManagerActor` maintains four states:
- *  - `CommandResponseState`:
- *      It maintains [[csw.params.core.models.Id]] of Commands and their corresponding [[csw.params.commands.CommandResponse.SubmitResponse]].
- *  - `CommandCorrelation` :
- *      It maintains commands [[csw.params.core.models.Id]] correlation between parent to child and child to parent.
- *  - [[csw.command.client.Store]] for command subscribers and query subscribers
- *
  * - [[csw.command.api.scaladsl.CommandService]]
  *
  * This class wraps the [[csw.location.models.AkkaLocation]] and provides helpers to send commands to component actor extracted from provided location.

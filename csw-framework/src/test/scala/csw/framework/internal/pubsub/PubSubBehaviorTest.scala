@@ -4,15 +4,15 @@ import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestInbox, TestProbe}
 import akka.actor.typed.SpawnProtocol
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.{typed, ActorSystem}
+import akka.actor.{ActorSystem, typed}
 import csw.command.client.messages.ComponentMessage
 import csw.command.client.models.framework.PubSub.{Publish, Subscribe, SubscribeOnly, Unsubscribe}
 import csw.command.client.models.framework.{LifecycleStateChanged, PubSub, SupervisorLifecycleState}
 import csw.framework.FrameworkTestMocks
 import csw.location.client.ActorSystemFactory
 import csw.logging.api.scaladsl.Logger
-import csw.params.core.models.Prefix
 import csw.params.core.states.{CurrentState, StateName}
+import csw.prefix.models.Prefix
 import org.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
@@ -25,19 +25,20 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
     protected lazy val log: Logger = MockitoSugar.mock[Logger]
   }
 
-  implicit val system: typed.ActorSystem[SpawnProtocol] = ActorSystemFactory.remote(SpawnProtocol.behavior, "test-1")
-  implicit val untypedSystem: ActorSystem               = system.toUntyped
-  implicit val testKitSettings: TestKitSettings         = TestKitSettings(system)
-  private val mocks                                     = new FrameworkTestMocks()
-  private val prefix                                    = Prefix("wfos.red.detector")
+  implicit val system: typed.ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "test-1")
+  implicit val untypedSystem: ActorSystem                       = system.toClassic
+  implicit val testKitSettings: TestKitSettings                 = TestKitSettings(system)
+  private val mocks                                             = new FrameworkTestMocks()
+  private val prefix                                            = Prefix("wfos.red.detector")
 
   private val lifecycleProbe1    = TestProbe[LifecycleStateChanged]
   private val lifecycleProbe2    = TestProbe[LifecycleStateChanged]
   private val currentStateProbe1 = TestInbox[CurrentState]()
   private val currentStateProbe2 = TestInbox[CurrentState]()
-  val currentState1              = CurrentState(prefix, StateName("testStateName1"))
-  val currentState2              = CurrentState(prefix, StateName("testStateName2"))
-  val currentState3              = CurrentState(prefix, StateName("testStateName3"))
+
+  val currentState1 = CurrentState(prefix, StateName("testStateName1"))
+  val currentState2 = CurrentState(prefix, StateName("testStateName2"))
+  val currentState3 = CurrentState(prefix, StateName("testStateName3"))
 
   def createLifecycleStatePubSubBehavior(): BehaviorTestKit[PubSub[LifecycleStateChanged]] =
     BehaviorTestKit(PubSubBehavior.make(mocks.loggerFactory))

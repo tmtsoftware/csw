@@ -2,14 +2,11 @@ package csw.config.server
 
 import java.util.concurrent.CompletableFuture
 
-import akka.{actor, Done}
 import akka.actor.CoordinatedShutdown
-import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.dispatch.MessageDispatcher
-import akka.stream.Materializer
-import akka.stream.typed.scaladsl.ActorMaterializer
+import akka.{Done, actor}
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.network.utils.Networks
@@ -18,22 +15,24 @@ import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 /**
- * A convenient class wrapping actor system and providing handles for execution context, materializer and clean up of actor system
+ * A convenient class wrapping actor system and providing handles for execution context and clean up of actor system
  */
-private[config] class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol], val settings: Settings) {
-  implicit val typedSystem: ActorSystem[SpawnProtocol] = _typedSystem
-  implicit val untypedSystem: actor.ActorSystem        = _typedSystem.toUntyped
-  implicit val ec: ExecutionContextExecutor            = typedSystem.executionContext
-  implicit val mat: Materializer                       = ActorMaterializer()
+private[config] class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol.Command], val settings: Settings) {
+  implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = _typedSystem
+  implicit val ec: ExecutionContextExecutor                    = typedSystem.executionContext
 
-  val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(untypedSystem)
+  val classicSystem: actor.ActorSystem         = typedSystem.toClassic
+  val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(classicSystem)
 
-  val blockingIoDispatcher: MessageDispatcher = untypedSystem.dispatchers.lookup(settings.`blocking-io-dispatcher`)
+  val blockingIoDispatcher: MessageDispatcher = classicSystem.dispatchers.lookup(settings.`blocking-io-dispatcher`)
 
   def startLogging(name: String): LoggingSystem =
     LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, typedSystem)
 
-  def shutdown(reason: Reason): Future[Done] = coordinatedShutdown.run(reason)
+  def shutdown(): Future[Done] = {
+    typedSystem.terminate()
+    typedSystem.whenTerminated
+  }
 
-  def jShutdown(reason: Reason): CompletableFuture[Done] = shutdown(reason).toJava.toCompletableFuture
+  def jShutdown(): CompletableFuture[Done] = shutdown().toJava.toCompletableFuture
 }

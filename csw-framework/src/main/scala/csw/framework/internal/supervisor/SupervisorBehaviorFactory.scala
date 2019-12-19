@@ -36,20 +36,18 @@ private[framework] object SupervisorBehaviorFactory {
       cswCtx: CswContext
   ): Behavior[ComponentMessage] = {
     Behaviors
-      .withTimers[SupervisorMessage](
-        timerScheduler =>
-          Behaviors
-            .setup[SupervisorMessage](
-              ctx =>
-                new SupervisorBehavior(
-                  ctx,
-                  timerScheduler,
-                  containerRef,
-                  componentBehaviorFactory,
-                  registrationFactory,
-                  cswCtx
-                )
+      .withTimers[SupervisorMessage](timerScheduler =>
+        Behaviors
+          .setup[SupervisorMessage](ctx =>
+            new SupervisorBehavior(
+              ctx,
+              timerScheduler,
+              containerRef,
+              componentBehaviorFactory,
+              registrationFactory,
+              cswCtx
             )
+          )
       )
       .narrow
   }

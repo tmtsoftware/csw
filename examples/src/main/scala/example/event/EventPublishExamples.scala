@@ -5,10 +5,11 @@ import akka.actor.Cancellable
 import akka.stream.scaladsl.{Keep, Source}
 import csw.params.events._
 import csw.command.client.models.framework.ComponentInfo
-import csw.params.core.models.{Id, Prefix}
+import csw.params.core.models.Id
 import csw.event.api.exceptions.PublishFailure
 import csw.event.api.scaladsl.EventService
 import csw.logging.api.scaladsl.Logger
+import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime
 
 import scala.concurrent.Future

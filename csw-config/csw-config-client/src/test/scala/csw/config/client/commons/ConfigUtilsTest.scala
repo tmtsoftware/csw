@@ -4,8 +4,6 @@ import java.nio.file.{Files, Paths}
 
 import akka.actor.typed
 import akka.actor.typed.scaladsl.Behaviors
-import akka.stream.Materializer
-import akka.stream.typed.scaladsl
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.config.api.ConfigData
 import csw.config.api.exceptions.{LocalFileNotFound, UnableToParseOptions}
@@ -19,11 +17,10 @@ import scala.concurrent.{Await, Future}
 class ConfigUtilsTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll with MockitoSugar {
 
   implicit val system: typed.ActorSystem[Nothing] = typed.ActorSystem(Behaviors.empty, "test")
-  implicit val mat: Materializer                  = scaladsl.ActorMaterializer()
 
   test("should throw exception if input file and default config is empty") {
     val mockedConfigClientService = mock[ConfigClientService]
-    val configUtils               = new ConfigUtils(mockedConfigClientService)(system, mat)
+    val configUtils               = new ConfigUtils(mockedConfigClientService)(system)
 
     val exception = intercept[UnableToParseOptions.type] {
       Await.result(configUtils.getConfig(isLocal = false, inputFilePath = None, defaultConfig = None), 7.seconds)
@@ -34,7 +31,7 @@ class ConfigUtilsTest extends FunSuite with Matchers with BeforeAndAfterEach wit
 
   test("should return default config if input file if not provided") {
     val mockedConfigClientService = mock[ConfigClientService]
-    val configUtils               = new ConfigUtils(mockedConfigClientService)(system, mat)
+    val configUtils               = new ConfigUtils(mockedConfigClientService)(system)
     val testConfig: Config        = system.settings.config
 
     val actualConfig =
@@ -45,7 +42,7 @@ class ConfigUtilsTest extends FunSuite with Matchers with BeforeAndAfterEach wit
 
   test("should use input file for config") {
     val mockedConfigClientService = mock[ConfigClientService]
-    val configUtils               = new ConfigUtils(mockedConfigClientService)(system, mat)
+    val configUtils               = new ConfigUtils(mockedConfigClientService)(system)
     val tmpFile                   = File.createTempFile("temp-config", ".conf")
     val tmpPath                   = tmpFile.toPath
     tmpFile.deleteOnExit()
@@ -59,7 +56,7 @@ class ConfigUtilsTest extends FunSuite with Matchers with BeforeAndAfterEach wit
 
   test("should throw exception if input file does not exist") {
     val mockedConfigClientService = mock[ConfigClientService]
-    val configUtils               = new ConfigUtils(mockedConfigClientService)(system, mat)
+    val configUtils               = new ConfigUtils(mockedConfigClientService)(system)
     val invalidFilePath           = Paths.get("/invalidPath.conf")
 
     val exception = intercept[LocalFileNotFound] {
@@ -71,7 +68,7 @@ class ConfigUtilsTest extends FunSuite with Matchers with BeforeAndAfterEach wit
 
   test("should get config from remote input file") {
     val mockedConfigClientService = mock[ConfigClientService]
-    val configUtils               = new ConfigUtils(mockedConfigClientService)(system, mat)
+    val configUtils               = new ConfigUtils(mockedConfigClientService)(system)
     val remoteFilePath            = Paths.get("remoteFile.conf")
     val configValue1: String =
       """

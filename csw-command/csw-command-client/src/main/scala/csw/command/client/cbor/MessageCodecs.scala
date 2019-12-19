@@ -1,12 +1,9 @@
 package csw.command.client.cbor
 
-import java.util.concurrent.TimeUnit
-
 import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.serialization.{Serialization, SerializationExtension}
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
-import csw.command.client.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
 import csw.command.client.messages.CommandSerializationMarker.RemoteMsg
 import csw.command.client.messages.ComponentCommonMessage._
 import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
@@ -15,7 +12,11 @@ import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.messages._
-import csw.command.client.messages.sequencer.SubmitSequenceAndWait
+import csw.command.client.messages.sequencer.SequencerMsg.{
+  SubmitSequence,
+  Query => SequencerQuery,
+  QueryFinal => SequencerQueryFinal
+}
 import csw.command.client.models.framework.LockingResponse._
 import csw.command.client.models.framework.PubSub.{Publish, PublisherMessage, SubscriberMessage}
 import csw.command.client.models.framework.{PubSub, _}
@@ -26,17 +27,15 @@ import io.bullet.borer.derivation.ArrayBasedCodecs.deriveUnaryCodec
 import io.bullet.borer.derivation.MapBasedCodecs._
 import io.bullet.borer.{Codec, Decoder, Encoder}
 
-import scala.concurrent.duration.FiniteDuration
-
 trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
 
   implicit def actorSystem: ActorSystem[_]
 
   implicit def actorRefCodec[T]: Codec[ActorRef[T]] =
     Codec.bimap[String, ActorRef[T]](
-      actorRef => Serialization.serializedActorPath(actorRef.toUntyped),
+      actorRef => Serialization.serializedActorPath(actorRef.toClassic),
       path => {
-        val provider = SerializationExtension(actorSystem.toUntyped).system.provider
+        val provider = SerializationExtension(actorSystem.toClassic).system.provider
         provider.resolveActorRef(path)
       }
     )
@@ -48,11 +47,6 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
   implicit def publishCodec[T: Encoder: Decoder]: Codec[Publish[T]]                           = deriveCodec
   implicit def publisherMessageCodec[T: Encoder: Decoder]: Codec[PublisherMessage[T]]         = deriveCodec
   implicit def pubSubCodec[T: Encoder: Decoder]: Codec[PubSub[T]]                             = deriveCodec
-
-  implicit lazy val durationCodec: Codec[FiniteDuration] = Codec.bimap[(Long, String), FiniteDuration](
-    finiteDuration => (finiteDuration.length, finiteDuration.unit.toString),
-    { case (length, unitStr) => FiniteDuration(length, TimeUnit.valueOf(unitStr)) }
-  )
 
   // ************************ LockingResponse Codecs ********************
 
@@ -76,8 +70,7 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
   implicit lazy val shutdownCodec: Codec[Shutdown.type]                                  = deriveCodec
   implicit lazy val restartCodec: Codec[Restart.type]                                    = deriveCodec
   implicit lazy val queryCodec: Codec[Query]                                             = deriveCodec
-  implicit lazy val subscribeCodec: Codec[Subscribe]                                     = deriveCodec
-  implicit lazy val unsubscribeCodec: Codec[Unsubscribe]                                 = deriveCodec
+  implicit lazy val queryFinalCodec: Codec[QueryFinal]                                   = deriveCodec
   implicit lazy val submitCodec: Codec[Submit]                                           = deriveCodec
   implicit lazy val oneWayCodec: Codec[Oneway]                                           = deriveCodec
   implicit lazy val validateCodec: Codec[Validate]                                       = deriveCodec
@@ -99,5 +92,7 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
 
   // ************************ SequencerMsg Codecs ********************
 
-  implicit lazy val submitSequenceAndWaitCodec: Codec[SubmitSequenceAndWait] = deriveCodec
+  implicit lazy val submitSequenceCodec: Codec[SubmitSequence]           = deriveCodec
+  implicit lazy val sequencerQueryFinalCodec: Codec[SequencerQueryFinal] = deriveCodec
+  implicit lazy val sequencerQueryCodec: Codec[SequencerQuery]           = deriveCodec
 }

@@ -3,14 +3,10 @@ package csw.event.client.internal.commons.javawrappers
 import csw.event.api.javadsl.IEventService
 import csw.event.api.scaladsl.EventService
 
-import scala.concurrent.ExecutionContext
-
 /**
  * Java API for [[csw.event.api.scaladsl.EventService]]
  */
 class JEventService(eventService: EventService) extends IEventService {
-
-  implicit val executionContext: ExecutionContext = eventService.executionContext
 
   override def makeNewPublisher(): JEventPublisher = new JEventPublisher(eventService.makeNewPublisher())
 

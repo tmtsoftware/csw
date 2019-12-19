@@ -1,14 +1,13 @@
 package csw.event.client.internal.redis
 
-import akka.actor.typed.ActorRef
-import akka.stream.Materializer
+import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.{Keep, Source}
 import akka.{Done, NotUsed}
-import csw.params.events._
-import csw.params.core.models.Subsystem
 import csw.event.api.exceptions.EventServerNotAvailable
 import csw.event.api.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import csw.event.client.internal.commons.{EventServiceLogger, EventSubscriberUtil}
+import csw.params.events._
+import csw.prefix.models.Subsystem
 import io.lettuce.core.{RedisClient, RedisURI}
 import reactor.core.publisher.FluxSink.OverflowStrategy
 import romaine.RomaineFactory
@@ -18,8 +17,8 @@ import romaine.exceptions.RedisServerNotAvailable
 import romaine.reactive.{RedisSubscription, RedisSubscriptionApi}
 
 import scala.async.Async._
+import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.{ExecutionContext, Future}
 
 /**
  * An implementation of [[csw.event.api.scaladsl.EventSubscriber]] API which uses Redis as the provider for publishing
@@ -27,15 +26,14 @@ import scala.concurrent.{ExecutionContext, Future}
  *
  * @param redisURI    future containing connection details for the Redis/Sentinel connections.
  * @param redisClient redis client available from lettuce
- * @param ec          the execution context to be used for performing asynchronous operations
- * @param mat         the materializer to be used for materializing underlying streams
+ * @param actorSystem to be used for performing asynchronous operations
  */
 private[event] class RedisSubscriber(redisURI: Future[RedisURI], redisClient: RedisClient)(
-    implicit ec: ExecutionContext,
-    mat: Materializer
+    implicit actorSystem: ActorSystem[_]
 ) extends EventSubscriber {
 
   import EventRomaineCodecs._
+  import actorSystem.executionContext
 
   private val log                 = EventServiceLogger.getLogger
   private val eventSubscriberUtil = new EventSubscriberUtil()
@@ -51,7 +49,7 @@ private[event] class RedisSubscriber(redisURI: Future[RedisURI], redisClient: Re
     log.info(s"Subscribing to event keys: $eventKeys")
     val eventSubscriptionApi: RedisSubscriptionApi[EventKey, Event] = subscriptionApi()
 
-    val latestEventStream: Source[Event, NotUsed] = Source.fromFuture(get(eventKeys)).mapConcat(identity)
+    val latestEventStream: Source[Event, NotUsed] = Source.future(get(eventKeys)).mapConcat(identity)
     val redisStream: Source[Event, RedisSubscription] =
       eventSubscriptionApi.subscribe(eventKeys.toList, OverflowStrategy.LATEST).map(_.value)
 

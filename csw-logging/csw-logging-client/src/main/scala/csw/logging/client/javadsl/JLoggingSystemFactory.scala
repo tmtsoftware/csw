@@ -5,6 +5,7 @@ import java.net.InetAddress
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.logging.client.appenders.LogAppenderBuilder
 import csw.logging.client.internal.LoggingSystem
+import csw.logging.client.scaladsl.LoggingSystemFactory
 
 import scala.jdk.CollectionConverters._
 
@@ -20,7 +21,7 @@ object JLoggingSystemFactory {
    * @param actorSystem the ActorSystem used to create LogActor from LoggingSystem
    * @return the instance of LoggingSystem
    */
-  def start(name: String, version: String, hostName: String, actorSystem: ActorSystem[SpawnProtocol]): LoggingSystem =
+  def start(name: String, version: String, hostName: String, actorSystem: ActorSystem[SpawnProtocol.Command]): LoggingSystem =
     new LoggingSystem(name, version, hostName, actorSystem)
 
   /**
@@ -35,7 +36,7 @@ object JLoggingSystemFactory {
       "foo-name",
       "foo-version",
       InetAddress.getLocalHost.getHostName,
-      ActorSystem(SpawnProtocol.behavior, "logging")
+      ActorSystem(SpawnProtocol(), "logging")
     )
 
   /**
@@ -55,11 +56,14 @@ object JLoggingSystemFactory {
       name: String,
       version: String,
       hostName: String,
-      actorSystem: ActorSystem[SpawnProtocol],
+      actorSystem: ActorSystem[SpawnProtocol.Command],
       appenders: java.util.List[LogAppenderBuilder]
   ): LoggingSystem = {
     val loggingSystem = new LoggingSystem(name, version, hostName, actorSystem)
     loggingSystem.setAppenders(appenders.asScala.toList)
     loggingSystem
   }
+
+  def forTestingOnly(implicit actorSystem: ActorSystem[SpawnProtocol.Command]): LoggingSystem =
+    LoggingSystemFactory.forTestingOnly()
 }

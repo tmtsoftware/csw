@@ -1,9 +1,10 @@
 package csw.params.core.generics
 
 import csw.params.commands._
-import csw.params.events._
-import csw.params.core.models.{Id, ObsId, Prefix, Struct}
+import csw.params.core.models.{Id, ObsId, Struct}
 import csw.params.core.states.{CurrentState, DemandState, StateName}
+import csw.params.events._
+import csw.prefix.models.Prefix
 import org.scalatest.{FunSpec, Matchers}
 
 //DEOPSCSW-184: Change configurations - attributes and values
@@ -101,7 +102,7 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
 
       //parameters with duplicate key via constructor
       val result =
-        Result(prefix, Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
+        Result(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3)
       result.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
       //parameters with duplicate key via add + madd

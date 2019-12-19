@@ -4,7 +4,7 @@ import java.net.URI
 
 import akka.actor.typed
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorSystem, Behavior, SpawnProtocol}
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.exceptions.LocalAkkaActorRegistrationNotAllowed
@@ -12,10 +12,10 @@ import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.client.ActorSystemFactory
 import csw.location.models
 import csw.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.location.models._
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.network.utils.Networks
-import csw.params.core.models.Prefix
+import csw.prefix.models.Subsystem
+import csw.prefix.models.Prefix
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.Await
@@ -23,17 +23,16 @@ import scala.concurrent.duration.DurationDouble
 
 class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
-  implicit val actorSystem: typed.ActorSystem[_] = ActorSystemFactory.remote(Behavior.empty, "my-actor-1")
+  implicit val actorSystem: typed.ActorSystem[_] = ActorSystemFactory.remote(Behaviors.empty, "my-actor-1")
 
   test("should able to create the AkkaRegistration which should internally create AkkaLocation") {
     val hostname = Networks().hostname
 
-    val akkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
+    val akkaConnection = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
     val actorRefUri    = actorSystem.toURI
-    val prefix         = Prefix("nfiraos.ncc.trombone")
 
-    val akkaRegistration     = AkkaRegistrationFactory.make(akkaConnection, prefix, actorRefUri)
-    val expectedAkkaLocation = AkkaLocation(akkaConnection, prefix, actorRefUri)
+    val akkaRegistration     = AkkaRegistrationFactory.make(akkaConnection, actorRefUri)
+    val expectedAkkaLocation = AkkaLocation(akkaConnection, actorRefUri)
 
     akkaRegistration.location(hostname) shouldBe expectedAkkaLocation
   }
@@ -43,7 +42,7 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     val port     = 9595
     val prefix   = "/trombone/hcd"
 
-    val httpConnection   = HttpConnection(ComponentId("trombone", ComponentType.HCD))
+    val httpConnection   = HttpConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "trombone"), ComponentType.HCD))
     val httpRegistration = HttpRegistration(httpConnection, port, prefix)
 
     val expectedhttpLocation = HttpLocation(httpConnection, new URI(s"http://$hostname:$port/$prefix"))
@@ -55,7 +54,7 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     val hostname = Networks().hostname
     val port     = 9596
 
-    val tcpConnection   = TcpConnection(models.ComponentId("lgsTrombone", ComponentType.HCD))
+    val tcpConnection   = TcpConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "lgsTrombone"), ComponentType.HCD))
     val tcpRegistration = TcpRegistration(tcpConnection, port)
 
     val expectedTcpLocation = TcpLocation(tcpConnection, new URI(s"tcp://$hostname:$port"))
@@ -68,13 +67,12 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
         akka.actor.provider = local
       """)
 
-    implicit val actorSystem: ActorSystem[SpawnProtocol] = ActorSystem(SpawnProtocol.behavior, "local-actor-system", config)
-    val actorRefURI                                      = actorSystem.spawn(Behaviors.empty, "my-actor-2").toURI
-    val akkaConnection                                   = AkkaConnection(models.ComponentId("hcd1", ComponentType.HCD))
-    val prefix                                           = Prefix("nfiraos.ncc.trombone")
+    implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "local-actor-system", config)
+    val actorRefURI                                              = actorSystem.spawn(Behaviors.empty, "my-actor-2").toURI
+    val akkaConnection                                           = AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
 
     intercept[LocalAkkaActorRegistrationNotAllowed] {
-      AkkaRegistrationFactory.make(akkaConnection, prefix, actorRefURI)
+      AkkaRegistrationFactory.make(akkaConnection, actorRefURI)
     }
     actorSystem.terminate()
     Await.result(actorSystem.whenTerminated, 10.seconds)

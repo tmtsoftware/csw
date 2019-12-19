@@ -2,14 +2,14 @@ package csw.event.client.perf.event_service
 
 import akka.Done
 import akka.actor.testkit.typed.scaladsl
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.scaladsl.adapter._
 import akka.remote.testconductor.RoleName
 import akka.remote.testkit.MultiNodeConfig
 import com.typesafe.config.ConfigFactory
 import csw.event.client.perf.BasePerfSuite
 import csw.event.client.perf.commons.{EventsSetting, PerfPublisher, PerfSubscriber}
 import csw.event.client.perf.reporter._
-import csw.params.core.models.Prefix
+import csw.prefix.models.Prefix
 
 import scala.collection.immutable
 import scala.concurrent.duration._
@@ -57,15 +57,13 @@ class EventServicePerfTest extends BasePerfSuite(EventServiceMultiNodeConfig) {
       latencyPlots.printTable()
     }
     enterBarrier("results-printed")
-    topProcess.foreach(
-      _ =>
-        scenarios.foreach(
-          s =>
-            plotLatencyHistogram(
-              s"${BenchmarkFileReporter.targetDirectory.getAbsolutePath}/${s.name}/Aggregated-*",
-              s"[${testConfigs.frequency}Hz]"
-            )
+    topProcess.foreach(_ =>
+      scenarios.foreach(s =>
+        plotLatencyHistogram(
+          s"${BenchmarkFileReporter.targetDirectory.getAbsolutePath}/${s.name}/Aggregated-*",
+          s"[${testConfigs.frequency}Hz]"
         )
+      )
     )
     super.afterAll()
   }
@@ -140,16 +138,15 @@ class EventServicePerfTest extends BasePerfSuite(EventServiceMultiNodeConfig) {
       enterBarrier(subscriberName + "-started")
 
       val pubIds = if (singlePublisher) List(1) else pubSubAllocationPerNode(nodeId - 1)
-      pubIds.foreach(
-        id =>
-          new PerfPublisher(
-            Prefix(testName),
-            id,
-            EventsSetting(totalTestMsgs, payloadSize, warmupMsgs, frequency),
-            testConfigs,
-            testWiring,
-            sharedPublisher
-          ).startPublishingWithEventGenerator()
+      pubIds.foreach(id =>
+        new PerfPublisher(
+          Prefix(testName),
+          id,
+          EventsSetting(totalTestMsgs, payloadSize, warmupMsgs, frequency),
+          testConfigs,
+          testWiring,
+          sharedPublisher
+        ).startPublishingWithEventGenerator()
       )
 
       enterBarrier(testName + "-done")

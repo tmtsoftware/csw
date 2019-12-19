@@ -28,7 +28,7 @@ import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.commands.{CommandName, ControlCommand, Setup}
 import csw.params.core.generics.{KeyType, Parameter}
-import csw.params.core.models.ObsId
+import csw.params.core.models.{Id, ObsId}
 import csw.params.core.states.{CurrentState, StateName}
 import org.mockito.stubbing.Answer
 import org.scalatest.BeforeAndAfterEach
@@ -40,6 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 // DEOPSCSW-178: Lifecycle success/failure notification
 // DEOPSCSW-181: Multiple Examples for Lifecycle Support
+// CSW-80: Prefix should be in lowercase
 class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
   val supervisorLifecycleStateProbe: TestProbe[SupervisorLifecycleState] = TestProbe[SupervisorLifecycleState]
@@ -88,7 +89,8 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     Thread.sleep(100)
     assertThatExceptionIsLogged(
       logBuffer,
-      "SampleHcd",
+      "wfos",
+      "samplehcd",
       failureStopExMsg,
       ERROR,
       ComponentBehavior.getClass.getName,
@@ -146,7 +148,8 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     // component handlers initialize block throws FailureRestart exception which we expect akka logs it
     assertThatExceptionIsLogged(
       logBuffer,
-      "SampleHcd",
+      "wfos",
+      "samplehcd",
       failureRestartExMsg,
       ERROR,
       ComponentBehavior.getClass.getName,
@@ -174,7 +177,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
     doThrow(TestFailureRestart(failureRestartExMsg))
       .when(componentHandlers)
-      .validateCommand(any[ControlCommand])
+      .validateCommand(any[Id], any[ControlCommand])
 
     createSupervisorAndStartTLA(testMocks, componentHandlers)
 
@@ -219,7 +222,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
         cswCtx.eventService,
         cswCtx.alarmService,
         cswCtx.timeServiceScheduler,
-        new LoggerFactory(hcdInfo.name),
+        new LoggerFactory(hcdInfo.prefix),
         cswCtx.configClientService,
         currentStatePublisher,
         commandResponseManager,

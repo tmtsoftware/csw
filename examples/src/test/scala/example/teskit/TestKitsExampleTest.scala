@@ -6,6 +6,7 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.models.ComponentId
 import csw.location.models.ComponentType.Assembly
 import csw.location.models.Connection.AkkaConnection
+import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.FrameworkTestKit
 import csw.testkit.scaladsl.CSWService.{ConfigServer, EventServer}
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
@@ -45,7 +46,7 @@ class TestKitsExampleTest extends FunSuiteLike with BeforeAndAfterAll with Match
 
     //#spawn-using-testkit
 
-    val connection       = AkkaConnection(ComponentId("SampleAssembly", Assembly))
+    val connection       = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "SampleAssembly"), Assembly))
     val assemblyLocation = Await.result(locationService.resolve(connection, 5.seconds), 10.seconds)
     assemblyLocation.value.connection shouldBe connection
   }

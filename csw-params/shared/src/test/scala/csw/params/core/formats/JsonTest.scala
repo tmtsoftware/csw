@@ -1,18 +1,7 @@
 package csw.params.core.formats
 
 import csw.params.commands._
-import csw.params.core.generics.KeyType.{
-  ByteMatrixKey,
-  ChoiceKey,
-  CoordKey,
-  DoubleKey,
-  DoubleMatrixKey,
-  IntMatrixKey,
-  LongMatrixKey,
-  ShortMatrixKey,
-  StringKey,
-  StructKey
-}
+import csw.params.core.generics.KeyType._
 import csw.params.core.generics._
 import csw.params.core.models.Coords.EqFrame.FK5
 import csw.params.core.models.Coords.SolarSystemObject.Venus
@@ -20,6 +9,7 @@ import csw.params.core.models.Units.{NoUnits, degree, encoder, meter}
 import csw.params.core.models._
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.params.events.{EventName, ObserveEvent, SystemEvent}
+import csw.prefix.models.{Prefix, Subsystem}
 import org.scalatest.FunSpec
 import play.api.libs.json.Json
 
@@ -485,7 +475,7 @@ class JsonTest extends FunSpec {
   describe("Test Long Array items") {
     it("Should allow long array values") {
       val k1: Key[ArrayData[Long]]       = KeyType.LongArrayKey.make("myArray")
-      val m1: ArrayData[Long]            = ArrayData(Array(1, 2, 3))
+      val m1: ArrayData[Long]            = ArrayData(Array(1L, 2L, 3L))
       val i1: Parameter[ArrayData[Long]] = k1.set(m1)
       val sc1                            = Setup(ck, CommandName("move"), Some(obsId)).add(i1)
       assert(sc1(k1).head == m1)

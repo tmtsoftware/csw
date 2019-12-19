@@ -20,16 +20,19 @@ import csw.location.models.{ComponentId, HttpRegistration, TcpRegistration}
 import csw.params.commands
 import csw.params.commands.CommandName
 import csw.params.core.states.{CurrentState, StateName}
+import csw.prefix.models.Subsystem
+import csw.prefix.models.Prefix
 import io.lettuce.core.RedisClient
 
 import scala.concurrent.TimeoutException
 import scala.concurrent.duration.DurationLong
 
+//CSW-82: ComponentInfo should take prefix
 class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 
-  private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
-  private val disperserHcdConnection   = AkkaConnection(ComponentId("Disperser", HCD))
+  private val filterAssemblyConnection = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "Filter"), Assembly))
+  private val disperserHcdConnection   = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "Disperser"), HCD))
 
   override def afterAll(): Unit = {
     super.afterAll()
@@ -39,7 +42,7 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
   // DEOPSCSW-220: Access and Monitor components for current values
   // DEOPSCSW-221: Avoid sending commands to non-executing components
   test("should track connections when locationServiceUsage is RegisterAndTrackServices") {
-    val containerActorSystem    = ActorSystemFactory.remote(SpawnProtocol.behavior, "test1")
+    val containerActorSystem    = ActorSystemFactory.remote(SpawnProtocol(), "test1")
     val wiring: FrameworkWiring = FrameworkWiring.make(containerActorSystem, mock[RedisClient])
 
     // start a container and verify it moves to running lifecycle state
@@ -86,7 +89,7 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
       disperserCommandService.submitAndWait(commands.Setup(prefix, CommandName("isAlive"), None)).await(200.millis)
     )
 
-    subscription.unsubscribe()
+    subscription.cancel()
     containerActorSystem.terminate()
     containerActorSystem.whenTerminated.await
   }
@@ -98,13 +101,13 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
    * */
   //DEOPSCSW-219 Discover component connection using HTTP protocol
   test("component should be able to track http and tcp connections") {
-    val componentActorSystem    = ActorSystemFactory.remote(SpawnProtocol.behavior, "test2")
+    val componentActorSystem    = ActorSystemFactory.remote(SpawnProtocol(), "test2")
     val wiring: FrameworkWiring = FrameworkWiring.make(componentActorSystem, mock[RedisClient])
     // start component in standalone mode
     val assemblySupervisor = Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring).await
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")
-    val akkaConnection                = AkkaConnection(models.ComponentId("IFS_Detector", HCD))
+    val akkaConnection                = AkkaConnection(models.ComponentId(Prefix(Subsystem.IRIS, "IFS_Detector"), HCD))
 
     assertThatSupervisorIsRunning(assemblySupervisor, supervisorLifecycleStateProbe, 5.seconds)
 

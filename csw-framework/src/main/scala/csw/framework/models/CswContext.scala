@@ -1,10 +1,9 @@
 package csw.framework.models
-import akka.actor.{Scheduler, typed}
-import akka.actor.typed.SpawnProtocol
+import akka.actor.typed.{ActorSystem, Scheduler, SpawnProtocol}
 import csw.alarm.api.scaladsl.AlarmService
 import csw.alarm.client.AlarmServiceFactory
+import csw.command.client.{CommandResponseManager, MiniCRM}
 import csw.command.client.models.framework.ComponentInfo
-import csw.command.client.{CRMCacheProperties, CommandResponseManager, CommandResponseManagerActor}
 import csw.config.api.scaladsl.ConfigClientService
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.event.api.scaladsl.EventService
@@ -24,13 +23,13 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 /**
  * Bundles all the services provided by csw
  *
- * @param locationService the single instance of location service
- * @param eventService the single instance of event service with default publishers and subscribers as well as the capability to create new ones
- * @param alarmService the single instance of alarm service that allows setting severity for an alarm
- * @param loggerFactory factory to create suitable logger instance
+ * @param locationService       the single instance of location service
+ * @param eventService          the single instance of event service with default publishers and subscribers as well as the capability to create new ones
+ * @param alarmService          the single instance of alarm service that allows setting severity for an alarm
+ * @param loggerFactory         factory to create suitable logger instance
  * @param currentStatePublisher the pub sub actor to publish state represented by [[csw.params.core.states.CurrentState]] for this component
- * @param commandResponseManager manages state of a received Submit command
- * @param componentInfo component related information as described in the configuration file
+ * @param commandResponseManager manages state of a started Submit command
+ * @param componentInfo         component related information as described in the configuration file
  *
  */
 class CswContext(
@@ -57,15 +56,15 @@ object CswContext {
       componentInfo: ComponentInfo
   )(implicit richSystem: CswFrameworkSystem): Future[CswContext] = {
 
-    implicit val typedSystem: typed.ActorSystem[SpawnProtocol] = richSystem.system
-    implicit val scheduler: Scheduler                          = richSystem.scheduler
-    implicit val ec: ExecutionContextExecutor                  = typedSystem.executionContext
+    implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = richSystem.system
+    implicit val scheduler: Scheduler                            = richSystem.scheduler
+    implicit val ec: ExecutionContextExecutor                    = typedSystem.executionContext
 
     val eventService         = eventServiceFactory.make(locationService)
     val alarmService         = alarmServiceFactory.makeClientApi(locationService)
     val timeServiceScheduler = new TimeServiceSchedulerFactory().make()
 
-    val loggerFactory       = new LoggerFactory(componentInfo.name)
+    val loggerFactory       = new LoggerFactory(componentInfo.prefix)
     val configClientService = ConfigClientFactory.clientApi(typedSystem, locationService)
     async {
 
@@ -75,7 +74,7 @@ object CswContext {
       val currentStatePublisher = new CurrentStatePublisher(pubSubComponentActor)
 
       // create CommandResponseManager (CRM)
-      val crmBehavior = CommandResponseManagerActor.behavior(CRMCacheProperties(), loggerFactory)
+      val crmBehavior = MiniCRM.make()
       val crmActor    = await(richSystem.spawnTyped(crmBehavior, CommandResponseManagerActorName))
       val crm         = new CommandResponseManager(crmActor)
 

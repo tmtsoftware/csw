@@ -15,7 +15,8 @@ import scala.concurrent.Future
 
 class JMockedAuthentication extends MockedAuthentication
 
-trait MockedAuthentication extends MockitoSugar {
+trait MockedAuthentication {
+  import MockitoSugar._
   val authentication: Authentication = mock[Authentication]
 
   private val keycloakDeployment = new KeycloakDeployment()

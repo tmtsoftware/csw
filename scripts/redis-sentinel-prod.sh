@@ -12,7 +12,7 @@ sentinel_port=26379
 
 script_name=$0
 
-logDir=/tmp/csw/logs
+logDir=/tmp/tmt/logs/csw
 test -d ${logDir} || mkdir -p ${logDir}
 
 # We need at least this version of Redis

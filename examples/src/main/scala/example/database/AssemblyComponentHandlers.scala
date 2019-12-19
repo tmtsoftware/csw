@@ -8,6 +8,7 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.location.models.TrackingEvent
 import csw.params.commands.CommandResponse.Completed
 import csw.params.commands.{CommandResponse, ControlCommand}
+import csw.params.core.models.Id
 import csw.time.core.models.UTCTime
 import org.jooq.{DSLContext, Query}
 
@@ -44,7 +45,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
     //#dbFactory-test-access
   }
 
-  override def onSubmit(controlCommand: ControlCommand): CommandResponse.SubmitResponse = {
+  override def onSubmit(runId: Id, controlCommand: ControlCommand): CommandResponse.SubmitResponse = {
 
     //#dsl-create
     val createQuery: Query = dsl.query("CREATE TABLE films (id SERIAL PRIMARY KEY, Name VARCHAR (10) NOT NULL)")
@@ -95,14 +96,14 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
     functionResultF.foreach(result => println(s"Function inc created with $result"))
     //#dsl-function
 
-    Completed(controlCommand.runId)
+    Completed(runId)
   }
-  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit                              = ???
-  override def validateCommand(controlCommand: ControlCommand): CommandResponse.ValidateCommandResponse = ???
-  override def onOneway(controlCommand: ControlCommand): Unit                                           = ???
-  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit                                 = ???
-  override def onOperationsMode(): Unit                                                                 = ???
-  override def onShutdown(): Future[Unit]                                                               = ???
-  override def onGoOffline(): Unit                                                                      = ???
-  override def onGoOnline(): Unit                                                                       = ???
+  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit                                         = ???
+  override def validateCommand(runId: Id, controlCommand: ControlCommand): CommandResponse.ValidateCommandResponse = ???
+  override def onOneway(runId: Id, controlCommand: ControlCommand): Unit                                           = ???
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit                                            = ???
+  override def onOperationsMode(): Unit                                                                            = ???
+  override def onShutdown(): Future[Unit]                                                                          = ???
+  override def onGoOffline(): Unit                                                                                 = ???
+  override def onGoOnline(): Unit                                                                                  = ???
 }

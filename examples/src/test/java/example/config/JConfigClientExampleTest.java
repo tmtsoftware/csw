@@ -2,7 +2,6 @@ package example.config;
 
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.SpawnProtocol;
-import akka.stream.Materializer;
 import csw.config.api.ConfigData;
 import csw.config.api.javadsl.IConfigClientService;
 import csw.config.api.javadsl.IConfigService;
@@ -42,8 +41,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
     private static JMockedAuthentication mocks = new JMockedAuthentication();
     private static ConfigTestKit configTestKit = testKit.frameworkTestKit().configTestKit();
     private static ServerWiring configWiring = configTestKit.configWiring();
-    private static ActorSystem<SpawnProtocol> actorSystem = configWiring.actorSystem();
-    private static Materializer mat = configWiring.actorRuntime().mat();
+    private static ActorSystem<SpawnProtocol.Command> actorSystem = configWiring.actorSystem();
 
     private static ILocationService clientLocationService = testKit.jLocationService();
 
@@ -94,7 +92,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
         adminApi.create(filePath, ConfigData.fromString(defaultStrConf), false, "First commit").get();
 
         ConfigData activeFile = clientApi.getActive(filePath).get().orElseThrow();
-        Assert.assertEquals(activeFile.toJConfigObject(mat).get().getString("foo.bar.baz"), "1234");
+        Assert.assertEquals(activeFile.toJConfigObject(actorSystem).get().getString("foo.bar.baz"), "1234");
         //#getActive
     }
 
@@ -142,7 +140,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
 
         //validate
         ConfigData actualData = adminApi.getById(filePath, id).get().orElseThrow();
-        Assert.assertEquals(defaultStrConf, actualData.toJStringF(mat).get());
+        Assert.assertEquals(defaultStrConf, actualData.toJStringF(actorSystem).get());
         //#getById
     }
 
@@ -161,7 +159,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
         //get the latest file
         ConfigData newConfigData = adminApi.getLatest(filePath).get().orElseThrow();
         //validate
-        Assert.assertEquals(newConfigData.toJStringF(mat).get(), newContent);
+        Assert.assertEquals(newConfigData.toJStringF(actorSystem).get(), newContent);
         //#getLatest
     }
 
@@ -180,10 +178,10 @@ public class JConfigClientExampleTest extends JUnitSuite {
         adminApi.update(filePath, ConfigData.fromString(newContent), "changed!!").get();
 
         ConfigData initialData = adminApi.getByTime(filePath, tInitial).get().orElseThrow();
-        Assert.assertEquals(defaultStrConf, initialData.toJStringF(mat).get());
+        Assert.assertEquals(defaultStrConf, initialData.toJStringF(actorSystem).get());
 
         ConfigData latestData = adminApi.getByTime(filePath, Instant.now()).get().orElseThrow();
-        Assert.assertEquals(newContent, latestData.toJStringF(mat).get());
+        Assert.assertEquals(newContent, latestData.toJStringF(actorSystem).get());
         //#getByTime
     }
 
@@ -311,7 +309,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
                 adminApi.historyActive(filePath, 3).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
 
         //get contents of active version at a specified instance
-        String initialContents = adminApi.getActiveByTime(filePath, tBegin).get().orElseThrow().toJStringF(mat).get();
+        String initialContents = adminApi.getActiveByTime(filePath, tBegin).get().orElseThrow().toJStringF(actorSystem).get();
         Assert.assertEquals(defaultStrConf, initialContents);
         //#active-file-mgmt
     }

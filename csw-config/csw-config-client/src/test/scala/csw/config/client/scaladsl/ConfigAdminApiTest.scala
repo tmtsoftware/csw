@@ -2,11 +2,10 @@ package csw.config.client.scaladsl
 
 import java.nio.file.{Files, Paths}
 
-import akka.actor.CoordinatedShutdown.UnknownReason
 import csw.commons.ResourceReader
-import csw.config.api.{ConfigData, TokenFactory}
 import csw.config.api.exceptions.{FileNotFound, InvalidInput, NotAllowed, Unauthorized}
 import csw.config.api.scaladsl.ConfigService
+import csw.config.api.{ConfigData, TokenFactory}
 import csw.config.client.ConfigClientBaseSuite
 import csw.config.models.FileType
 import csw.config.server.commons.TestFutureExtension.RichFuture
@@ -34,7 +33,7 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
   }
 
   override def afterAll(): Unit = {
-    httpService.shutdown(UnknownReason).await
+    httpService.shutdown().await
     super[ConfigServiceTest].afterAll()
     super[ConfigClientBaseSuite].afterAll()
   }

@@ -6,6 +6,8 @@ import csw.params.events.Event;
 import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
+import csw.prefix.models.Prefix;
+import csw.prefix.javadsl.JSubsystem;
 import csw.time.core.models.UTCTime;
 import io.bullet.borer.Cbor;
 import org.junit.Assert;
@@ -91,7 +93,7 @@ public class JCborTest extends JUnitSuite {
         Assert.assertEquals(param, parameterFromBytes);
 
         // ===== Test Event SERDE =====
-        Prefix source = new Prefix("wfos.filter");
+        Prefix source = new Prefix(JSubsystem.WFOS(), "filter");
         EventName eventName = new EventName("move");
         SystemEvent originalEvent = new SystemEvent(source, eventName).add(param);
 

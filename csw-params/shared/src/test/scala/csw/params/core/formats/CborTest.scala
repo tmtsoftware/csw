@@ -5,6 +5,7 @@ import csw.params.commands._
 import csw.params.core.models._
 import csw.params.events.{Event, EventName, ObserveEvent, SystemEvent}
 import csw.params.testdata.ParamSetData
+import csw.prefix.models.Prefix
 import io.bullet.borer.Cbor
 import org.scalatest.{FunSuite, Matchers}
 
@@ -117,7 +118,7 @@ class CborTest extends FunSuite with Matchers {
 
   test("should encode and decode Result") {
     import ParamCodecs.resultCodec
-    val result = Result(prefix, ParamSetData.paramSet)
+    val result = Result(ParamSetData.paramSet)
     val bytes  = Cbor.encode[Result](result).toByteArray
     Cbor.decode(bytes).to[Result].value shouldEqual result
   }

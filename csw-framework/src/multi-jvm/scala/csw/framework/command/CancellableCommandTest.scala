@@ -1,47 +1,42 @@
 package csw.framework.command
 
-import akka.actor.Scheduler
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.client.messages.CommandMessage.{Oneway, Submit}
-import csw.command.client.messages.CommandResponseManagerMessage.{Query, Subscribe}
+import csw.command.client.CommandServiceFactory
 import csw.common.components.command.ComponentStateForCommand.{acceptedCmd, cancelCmd, prefix}
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.helpers.{LSNodeSpec, OneMemberAndSeed}
-import csw.location.models.{ComponentId, ComponentType}
 import csw.location.models.Connection.AkkaConnection
+import csw.location.models.{ComponentId, ComponentType}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup
 import csw.params.core.generics.KeyType
 import csw.params.core.models.ObsId
+import csw.prefix.models.{Prefix, Subsystem}
 import io.lettuce.core.RedisClient
 import org.mockito.MockitoSugar
 
+import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, ExecutionContext}
 
 class CancellableCommandTestMultiJvm1 extends CancellableCommandTest(0)
 
 class CancellableCommandTestMultiJvm2 extends CancellableCommandTest(0)
 
 // DEOPSCSW-211 Notification of Interrupted Message
+// CSW-82: ComponentInfo should take prefix
 class CancellableCommandTest(ignore: Int)
     extends LSNodeSpec(config = new OneMemberAndSeed, mode = "http")
     with MultiNodeHTTPLocationService
     with MockitoSugar {
   import config._
 
-  implicit val actorSystem: ActorSystem[SpawnProtocol] = system.toTyped.asInstanceOf[ActorSystem[SpawnProtocol]]
-  implicit val mat: Materializer                       = ActorMaterializer()
-  implicit val ec: ExecutionContext                    = actorSystem.executionContext
-  implicit val timeout: Timeout                        = 5.seconds
-  implicit val scheduler: Scheduler                    = actorSystem.scheduler
+  private implicit val actorSystem: ActorSystem[SpawnProtocol.Command] =
+    system.toTyped.asInstanceOf[ActorSystem[SpawnProtocol.Command]]
+  private implicit val timeout: Timeout = 5.seconds
 
   test("a long running command should be cancellable") {
     runOn(seed) {
@@ -53,70 +48,89 @@ class CancellableCommandTest(ignore: Int)
     }
 
     runOn(member) {
-      val submitResponseProbe = TestProbe[SubmitResponse]
-      val queryResponseProbe  = TestProbe[QueryResponse]
-      val onewayResponseProbe = TestProbe[OnewayResponse]
-      val obsId               = Some(ObsId("Obs001"))
-      val cancelCmdId         = KeyType.StringKey.make("cancelCmdId")
+      val obsId         = Some(ObsId("Obs001"))
+      val cancelCmdId   = KeyType.StringKey.make("cancelCmdId")
+      val cancelCmdName = KeyType.StringKey.make(name = "cancelCmdName")
 
       enterBarrier("spawned")
 
       // resolve the assembly running on seed
       val assemblyLocF =
-        locationService.resolve(AkkaConnection(ComponentId("Monitor_Assembly", ComponentType.Assembly)), 5.seconds)
-      val assemblyRef = Await.result(assemblyLocF, 10.seconds).map(_.componentRef).get
+        locationService.resolve(
+          AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "Monitor_Assembly"), ComponentType.Assembly)),
+          5.seconds
+        )
+      val assemblyLoc = Await.result(assemblyLocF, 10.seconds).get
+
+      val assemblyCommandService = CommandServiceFactory.make(assemblyLoc)
 
       // original command is submit and Cancel command is also submit
       // This returns Started, so it is a long-running and we are free to cancel it
-      val originalSetup = Setup(prefix, acceptedCmd, obsId)
-      assemblyRef ! Submit(originalSetup, submitResponseProbe.ref)
-      submitResponseProbe.expectMessage(Started(originalSetup.runId))
+      val originalSetup    = Setup(prefix, acceptedCmd, obsId)
+      var originalResponse = Await.result(assemblyCommandService.submit(originalSetup), 5.seconds)
+      originalResponse shouldBe a[Started]
 
       // This is the cancel command that is processed
-      val cancelSetup = Setup(prefix, cancelCmd, obsId, Set(cancelCmdId.set(originalSetup.runId.id)))
-      assemblyRef ! Submit(cancelSetup, submitResponseProbe.ref)
-      submitResponseProbe.expectMessage(Completed(cancelSetup.runId))
+      val cancelSetup = Setup(
+        prefix,
+        cancelCmd,
+        obsId,
+        Set(cancelCmdId.set(originalResponse.runId.id), cancelCmdName.set(originalSetup.commandName.name))
+      )
+      var cancelAsSubmitResponse = Await.result(assemblyCommandService.submit(cancelSetup), 5.seconds)
+      cancelAsSubmitResponse shouldBe a[Completed]
 
-      assemblyRef ! Subscribe(cancelSetup.runId, submitResponseProbe.ref)
-      submitResponseProbe.expectMessage(Completed(cancelSetup.runId))
-
-      assemblyRef ! Subscribe(originalSetup.runId, submitResponseProbe.ref)
-      submitResponseProbe.expectMessage(Cancelled(originalSetup.runId))
+      var waitForCancel                         = assemblyCommandService.queryFinal(originalResponse.runId)
+      var originalFinalResponse: SubmitResponse = Await.result(waitForCancel, 5.seconds)
+      originalFinalResponse shouldBe a[Cancelled]
+      originalFinalResponse.runId shouldEqual originalResponse.runId
 
       // original command is submit but Cancel command is oneway
-      val originalSetup2 = Setup(prefix, acceptedCmd, obsId)
-      assemblyRef ! Submit(originalSetup2, submitResponseProbe.ref)
-      submitResponseProbe.expectMessage(Started(originalSetup2.runId))
+      originalResponse = Await.result(assemblyCommandService.submit(originalSetup), 5.seconds)
+      originalResponse shouldBe a[Started]
 
-      val cancelSetup2 = Setup(prefix, cancelCmd, obsId, Set(cancelCmdId.set(originalSetup2.runId.id)))
-      assemblyRef ! Oneway(cancelSetup2, onewayResponseProbe.ref)
-      onewayResponseProbe.expectMessage(Accepted(cancelSetup2.runId))
+      val cancelSetup2 = Setup(
+        prefix,
+        cancelCmd,
+        obsId,
+        Set(cancelCmdId.set(originalResponse.runId.id), cancelCmdName.set(originalSetup.commandName.name))
+      )
+      var cancelAsOnewayResponse = Await.result(assemblyCommandService.oneway(cancelSetup2), 5.seconds)
+      cancelAsOnewayResponse shouldBe a[Accepted]
 
-      assemblyRef ! Subscribe(originalSetup2.runId, submitResponseProbe.ref)
-      submitResponseProbe.expectMessage(Cancelled(originalSetup2.runId))
+      waitForCancel = assemblyCommandService.queryFinal(originalResponse.runId)
+      originalFinalResponse = Await.result(waitForCancel, 5.seconds)
+      originalFinalResponse shouldBe a[Cancelled]
+      originalFinalResponse.runId shouldEqual originalResponse.runId
 
       // original command is oneway but Cancel command is submit
-      val originalSetup3 = Setup(prefix, acceptedCmd, obsId)
-      assemblyRef ! Oneway(originalSetup3, onewayResponseProbe.ref)
-      onewayResponseProbe.expectMessage(Accepted(originalSetup3.runId))
+      // Here a oneway can only be Accepted
+      var originalResponse2 = Await.result(assemblyCommandService.oneway(originalSetup), 5.seconds)
+      originalResponse2 shouldBe a[Accepted]
 
-      val cancelSetup3 = Setup(prefix, cancelCmd, obsId, Set(cancelCmdId.set(originalSetup3.runId.id)))
-      assemblyRef ! Submit(cancelSetup3, submitResponseProbe.ref)
-      submitResponseProbe.expectMessage(Completed(cancelSetup3.runId))
+      cancelAsSubmitResponse = Await.result(assemblyCommandService.submit(cancelSetup), 5.seconds)
+      cancelAsSubmitResponse shouldBe a[Completed]
 
-      // Note that this works, even though initial Oneway was not in CRM, if code puts Cancelled for the runId into CRM
-      // the subscribe will work
-      assemblyRef ! Query(originalSetup3.runId, queryResponseProbe.ref)
-      queryResponseProbe.expectMessage(Cancelled(originalSetup3.runId))
+      // Note, even though initial was a oneway, with this approach a cancel can be used
+      // as long as original command updates with cancelled. This was same as commandResponseManager
+      waitForCancel = assemblyCommandService.queryFinal(originalResponse.runId)
+      originalFinalResponse = Await.result(waitForCancel, 5.seconds)
+      originalFinalResponse shouldBe a[Cancelled]
+      originalFinalResponse.runId shouldEqual originalResponse.runId
 
       // original command is oneway and Cancel command is also oneway
-      val originalSetup4 = Setup(prefix, acceptedCmd, obsId)
-      assemblyRef ! Oneway(originalSetup4, onewayResponseProbe.ref)
-      onewayResponseProbe.expectMessage(Accepted(originalSetup4.runId))
+      originalResponse2 = Await.result(assemblyCommandService.oneway(originalSetup), 5.seconds)
+      originalResponse2 shouldBe a[Accepted]
 
-      val cancelSetup4 = Setup(prefix, cancelCmd, obsId, Set(cancelCmdId.set(originalSetup4.runId.id)))
-      assemblyRef ! Oneway(cancelSetup4, onewayResponseProbe.ref)
-      onewayResponseProbe.expectMessage(Accepted(cancelSetup4.runId))
+      cancelAsOnewayResponse = Await.result(assemblyCommandService.oneway(cancelSetup2), 5.seconds)
+      cancelAsOnewayResponse shouldBe a[Accepted]
+
+      // Note, even though initial was a oneway, with this approach a cancel can be used
+      // as long as original command updates with cancelled. This was same as commandResponseManager
+      waitForCancel = assemblyCommandService.queryFinal(originalResponse.runId)
+      originalFinalResponse = Await.result(waitForCancel, 5.seconds)
+      originalFinalResponse shouldBe a[Cancelled]
+      originalFinalResponse.runId shouldEqual originalResponse.runId
     }
     enterBarrier("end")
   }

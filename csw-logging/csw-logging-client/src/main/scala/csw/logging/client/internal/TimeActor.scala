@@ -42,7 +42,8 @@ private[logging] class TimeActor(tdone: Promise[Unit]) {
             val j1 = Json.obj("name" -> timeStep.name, "time0" -> timeStep.start)
             val j2 = if (timeStep.end == 0) {
               Json.obj()
-            } else {
+            }
+            else {
               Json.obj("time1" -> timeStep.end, "total" -> (timeStep.end - timeStep.start))
             }
             j1 ++ j2
@@ -61,7 +62,8 @@ private[logging] class TimeActor(tdone: Promise[Unit]) {
       val first = if (!items.isDefinedAt(key)) {
         start(id, time)
         true
-      } else {
+      }
+      else {
         false
       }
       items.get(key) map (timeItem => timeItem.steps += (key1 -> TimeStep(name, time - timeItem.start, first = first)))

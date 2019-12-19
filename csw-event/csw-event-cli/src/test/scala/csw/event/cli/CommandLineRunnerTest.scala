@@ -1,22 +1,22 @@
 package csw.event.cli
 
-import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
+import csw.commons.ResourceReader
 import csw.event.cli.IterableExtensions.RichStringIterable
 import csw.event.client.helpers.TestFutureExt.RichFuture
-import csw.commons.ResourceReader
 import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.KeyType.{IntKey, StringKey}
 import csw.params.core.models.Id
 import csw.params.core.models.Units.meter
 import csw.params.events._
+import csw.prefix.codecs.CommonCodecs
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.SpanSugar.convertDoubleToGrainOfTime
 import play.api.libs.json._
 
 import scala.collection.{immutable, mutable}
 
-class CommandLineRunnerTest extends SeedData with Eventually {
+class CommandLineRunnerTest extends SeedData with Eventually with CommonCodecs {
 
   def events(name: EventName): immutable.Seq[Event] =
     for (i <- 1 to 10) yield event1.copy(eventName = name, eventId = Id(i.toString))
@@ -120,8 +120,8 @@ class CommandLineRunnerTest extends SeedData with Eventually {
 
     // invalid event + 7 events published in previous step
     eventually(queue.size shouldBe 8)
-    queue should contain allElementsOf Seq(eventToSanitizedJson(Event.invalidEvent(eventKey))) ++ (1 to 5).map(
-      _ => expectedEventJson
+    queue should contain allElementsOf Seq(eventToSanitizedJson(Event.invalidEvent(eventKey))) ++ (1 to 5).map(_ =>
+      expectedEventJson
     )
   }
 
@@ -174,8 +174,6 @@ class CommandLineRunnerTest extends SeedData with Eventually {
   // DEOPSCSW-433: [Event Cli] Subscribe command
   test("should be able to subscribe and get json output to event key") {
 
-    implicit val mat: Materializer = actorRuntime.mat
-
     val eventGenerator = new EventGenerator(EventName("system_1"))
     import eventGenerator._
     val eventKey: EventKey = eventsGroup.head.eventKey
@@ -203,8 +201,6 @@ class CommandLineRunnerTest extends SeedData with Eventually {
   test("should be able to subscribe to event key and get oneline output") {
     import cliWiring._
 
-    implicit val mat: Materializer = actorRuntime.mat
-
     val eventGenerator = new EventGenerator(EventName("system_2"))
     import eventGenerator._
 
@@ -227,8 +223,6 @@ class CommandLineRunnerTest extends SeedData with Eventually {
   // DEOPSCSW-433: [Event Cli] Subscribe command
   test("should be able to subscribe to event key using terse mode and get oneline output") {
     import cliWiring._
-
-    implicit val mat: Materializer = actorRuntime.mat
 
     val eventGenerator = new EventGenerator(EventName("system_3"))
     import eventGenerator._
@@ -262,7 +256,7 @@ class CommandLineRunnerTest extends SeedData with Eventually {
     val (k, v) = json.as[JsObject].value.head
 
     val jsObject = v.as[JsObject] ++ Json.obj(
-      ("source", eventKey.source.prefix),
+      ("source", eventKey.source.toString),
       ("eventName", eventKey.eventName.name)
     )
 

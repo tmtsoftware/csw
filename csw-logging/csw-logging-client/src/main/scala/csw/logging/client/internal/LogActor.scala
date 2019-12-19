@@ -75,7 +75,7 @@ private[logging] object LogActor {
           case SetSlf4jLevel(level1)        => slf4jLogLevel = level1; Behaviors.same
           case SetAkkaLevel(level1)         => akkaLogLevel = level1; Behaviors.same
           case SetAppenders(_appenders)     => appenders = _appenders; Behaviors.same
-          case LastAkkaMessage              => akka.event.Logging(ctx.system.toUntyped, this).error("DIE"); Behaviors.same
+          case LastAkkaMessage              => akka.event.Logging(ctx.system.toClassic, this).error("DIE"); Behaviors.same
           case StopLogging                  => Behaviors.stopped
         }
         .receiveSignal {

@@ -3,7 +3,6 @@ package csw.benchmark.command
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed
 import akka.actor.typed.{ActorRef, SpawnProtocol}
-import akka.stream.typed.scaladsl
 import com.typesafe.config.Config
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandServiceFactory
@@ -17,23 +16,28 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.server.commons.BlockingUtils
+import csw.prefix.models.{Prefix, Subsystem}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{Duration, DurationDouble}
 
 object BenchmarkHelpers {
 
-  def spawnStandaloneComponent(actorSystem: typed.ActorSystem[SpawnProtocol], config: Config): CommandService = {
-    val mat                                                    = scaladsl.ActorMaterializer()(actorSystem)
-    val locationService                                        = HttpLocationServiceFactory.makeLocalClient(actorSystem, mat)
-    val wiring: FrameworkWiring                                = FrameworkWiring.make(actorSystem, locationService)
-    implicit val typedSystem: typed.ActorSystem[SpawnProtocol] = actorSystem
+  def spawnStandaloneComponent(actorSystem: typed.ActorSystem[SpawnProtocol.Command], config: Config): CommandService = {
+    val locationService                                                = HttpLocationServiceFactory.makeLocalClient(actorSystem)
+    val wiring: FrameworkWiring                                        = FrameworkWiring.make(actorSystem, locationService)
+    implicit val typedSystem: typed.ActorSystem[SpawnProtocol.Command] = actorSystem
 
     val probe = TestProbe[SupervisorLifecycleState]
 
     Standalone.spawn(config, wiring)
     val akkaLocation: AkkaLocation =
-      Await.result(locationService.resolve(AkkaConnection(ComponentId("Perf", ComponentType.HCD)), 5.seconds), 5.seconds).get
+      Await
+        .result(
+          locationService.resolve(AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "Perf"), ComponentType.HCD)), 5.seconds),
+          5.seconds
+        )
+        .get
 
     assertThatSupervisorIsRunning(akkaLocation.componentRef, probe, 5.seconds)
 

@@ -4,8 +4,6 @@ import akka.Done
 import akka.actor.typed
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
-import akka.stream.Materializer
-import akka.stream.typed.scaladsl.ActorMaterializer
 import com.typesafe.config._
 import csw.alarm.models.AlarmSeverity.Okay
 import csw.alarm.models.Key.{AlarmKey, ComponentKey, SubsystemKey}
@@ -13,7 +11,8 @@ import csw.alarm.models.{AlarmHealth, AlarmMetadata, AlarmStatus, FullAlarmSever
 import csw.alarm.api.scaladsl.{AlarmAdminService, AlarmService, AlarmSubscription}
 import csw.alarm.client.AlarmServiceFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.params.core.models.Subsystem.{IRIS, NFIRAOS}
+import csw.prefix.models.Prefix
+import csw.prefix.models.Subsystem.{IRIS, NFIRAOS}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -22,7 +21,6 @@ object AlarmServiceClientExampleApp {
 
   implicit val actorSystem: ActorSystem[_] = typed.ActorSystem(Behaviors.empty, "")
   implicit val ec: ExecutionContext        = actorSystem.executionContext
-  implicit val mat: Materializer           = ActorMaterializer()
   private val locationService              = HttpLocationServiceFactory.makeLocalClient
 
   private def behaviour[T]: Behaviors.Receive[T] = Behaviors.receive { (ctx, msg) =>
@@ -48,7 +46,7 @@ object AlarmServiceClientExampleApp {
   val adminAPI: AlarmAdminService = adminAPI1
 
   //#setSeverity-scala
-  val alarmKey              = AlarmKey(NFIRAOS, "trombone", "tromboneAxisLowLimitAlarm")
+  val alarmKey              = AlarmKey(Prefix(NFIRAOS, "trombone"), "tromboneAxisLowLimitAlarm")
   val resultF: Future[Done] = clientAPI.setSeverity(alarmKey, Okay)
   //#setSeverity-scala
 
@@ -99,7 +97,7 @@ object AlarmServiceClientExampleApp {
   //#getCurrentSeverity
 
   //#getAggregatedSeverity
-  val componentKey                                   = ComponentKey(NFIRAOS, "tromboneAssembly")
+  val componentKey                                   = ComponentKey(Prefix(NFIRAOS, "tromboneassembly"))
   val aggregatedSeverityF: Future[FullAlarmSeverity] = adminAPI.getAggregatedSeverity(componentKey)
   aggregatedSeverityF.onComplete {
     case Success(severity)  => println(s"aggregate severity: ${severity.name}: ${severity.level}")
@@ -118,7 +116,7 @@ object AlarmServiceClientExampleApp {
 
   //#subscribeAggregatedSeverityCallback
   val alarmSubscription: AlarmSubscription = adminAPI.subscribeAggregatedSeverityCallback(
-    ComponentKey(NFIRAOS, "tromboneAssembly"),
+    ComponentKey(Prefix(NFIRAOS, "tromboneAssembly")),
     aggregatedSeverity => { /* do something*/ }
   )
   // to unsubscribe:
@@ -136,7 +134,7 @@ object AlarmServiceClientExampleApp {
 
   //#subscribeAggregatedHealthCallback
   val alarmSubscription3: AlarmSubscription = adminAPI.subscribeAggregatedHealthCallback(
-    ComponentKey(IRIS, "ImagerDetectorAssembly"),
+    ComponentKey(Prefix(IRIS, "ImagerDetectorAssembly")),
     aggregatedHealth => { /* do something*/ }
   )
 

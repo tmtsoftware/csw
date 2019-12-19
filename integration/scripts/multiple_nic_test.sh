@@ -42,12 +42,12 @@ docker network connect bridge Assembly
 docker network connect bridge Test-App
 
 printf "${YELLOW} Starting Assembly in network : tmt_net_1 ${NC}\n"
-docker exec -itd Assembly bash -c 'cd /source/csw && ./target/universal/stage/bin/assembly-app -DTMT_LOG_HOME=/tmt/csw/logs'
+docker exec -itd Assembly bash -c 'cd /source/csw && ./target/universal/stage/bin/assembly-app -DTMT_LOG_HOME=/tmt/logs/csw'
 
 printf "${PURPLE}------ Waiting for 10 seconds to let Assembly gets started ------${NC}\n"
 sleep 10
 printf "${YELLOW} Executing test in network : tmt_net_2 ${NC}\n"
-docker exec Test-App bash -c 'cd /source/csw && ./target/universal/stage/bin/test-multiple-nic-app -DCLUSTER_SEEDS=172.17.0.2:3553 -DTMT_LOG_HOME=/tmt/csw/logs -DINTERFACE_NAME=eth1'
+docker exec Test-App bash -c 'cd /source/csw && ./target/universal/stage/bin/test-multiple-nic-app -DCLUSTER_SEEDS=172.17.0.2:3553 -DTMT_LOG_HOME=/tmt/logs/csw -DINTERFACE_NAME=eth1'
 exit_code=$?
 
 printf "${ORANGE}------ [Debug] Inspecting docker bridge ------${NC}"

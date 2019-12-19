@@ -43,11 +43,13 @@ private[logging] class Slf4jAppender[E]() extends UnsynchronizedAppenderBase[E] 
       case e: ch.qos.logback.classic.spi.LoggingEvent =>
         val frame = e.getCallerData()(0)
         val level = Level(e.getLevel.toString)
-        val ex = try {
-          e.getThrowableProxy.asInstanceOf[ThrowableProxy].getThrowable
-        } catch {
-          case ex: Any => NoLogException
-        }
+        val ex =
+          try {
+            e.getThrowableProxy.asInstanceOf[ThrowableProxy].getThrowable
+          }
+          catch {
+            case ex: Any => NoLogException
+          }
         val msg =
           LogSlf4j(level, e.getTimeStamp, frame.getClassName, e.getFormattedMessage, frame.getLineNumber, frame.getFileName, ex)
         MessageHandler.sendMsg(msg)

@@ -15,15 +15,17 @@ import csw.location.models.Connection.AkkaConnection
 import csw.params.commands
 import csw.params.commands.CommandName
 import csw.params.core.states.CurrentState
+import csw.prefix.models.{Prefix, Subsystem}
 
 import scala.concurrent.duration.DurationLong
 
 //DEOPSCSW-550: Provide TimeService accessible to component developers
+//CSW-82: ComponentInfo should take prefix
 class TimeServiceIntegrationTest extends FrameworkIntegrationSuite {
 
   import testWiring._
 
-  private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
+  private val filterAssemblyConnection = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "Filter"), Assembly))
   private val wiring                   = FrameworkWiring.make(seedActorSystem)
 
   override def afterAll(): Unit = {
@@ -42,8 +44,9 @@ class TimeServiceIntegrationTest extends FrameworkIntegrationSuite {
     val assemblyCommandService = CommandServiceFactory.make(filterAssemblyLocation.get)
 
     assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)
+    Thread.sleep(500)
 
-    implicit val timeout: Timeout = Timeout(100.millis)
+    implicit val timeout: Timeout = Timeout(500.millis)
     assemblyCommandService.submitAndWait(commands.Setup(prefix, CommandName("time.service.scheduler.success"), None))
     Thread.sleep(1000)
 

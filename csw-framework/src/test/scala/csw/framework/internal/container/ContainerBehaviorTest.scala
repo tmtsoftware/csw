@@ -25,7 +25,6 @@ import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.ActorSystemFactory
 import csw.location.models.Connection.AkkaConnection
-import csw.params.core.models.Prefix
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import org.scalatest.{FunSuite, Matchers}
 
@@ -35,14 +34,14 @@ import scala.util.Success
 //DEOPSCSW-182-Control Life Cycle of Components
 //DEOPSCSW-216-Locate and connect components to send AKKA commands
 class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar with ArgumentMatchersSugar {
-  implicit val typedSystem: ActorSystem[SpawnProtocol] = ActorSystemFactory.remote(SpawnProtocol.behavior, "test")
-  implicit val settings: TestKitSettings               = TestKitSettings(typedSystem)
-  private val mocks                                    = new FrameworkTestMocks()
+  implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "test")
+  implicit val settings: TestKitSettings                       = TestKitSettings(typedSystem)
+  private val mocks                                            = new FrameworkTestMocks()
 
   class IdleContainer() {
     private val testActor: ActorRef[Any] = TestProbe("test-probe").ref
     val akkaRegistration =
-      AkkaRegistrationFactory.make(mock[AkkaConnection], Prefix("nfiraos.ncc.trombone"), testActor.toURI)
+      AkkaRegistrationFactory.make(mock[AkkaConnection], testActor.toURI)
     val locationService: LocationService                        = mock[LocationService]
     val eventService: EventServiceFactory                       = mock[EventServiceFactory]
     val alarmService: AlarmServiceFactory                       = mock[AlarmServiceFactory]
@@ -52,7 +51,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar wit
     val supervisorInfoFactory: SupervisorInfoFactory            = mock[SupervisorInfoFactory]
 
     private def answer(ci: ComponentInfo): Future[Some[SupervisorInfo]] = {
-      val componentProbe: TestProbe[ComponentMessage] = TestProbe(ci.name)
+      val componentProbe: TestProbe[ComponentMessage] = TestProbe(ci.prefix.value)
       val supervisorInfo                              = SupervisorInfo(typedSystem, Component(componentProbe.ref, ci))
 
       supervisorInfos += SupervisorInfo(typedSystem, Component(componentProbe.ref, ci))
@@ -73,7 +72,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar wit
     ).thenAnswer((_: ActorRef[ContainerIdleMessage], ci: ComponentInfo) => answer(ci))
 
     private val registrationFactory: RegistrationFactory = mock[RegistrationFactory]
-    when(registrationFactory.akkaTyped(any[AkkaConnection], any[Prefix], any[ActorRef[_]]))
+    when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]]))
       .thenReturn(akkaRegistration)
 
     private val eventualRegistrationResult: Future[RegistrationResult] =
@@ -84,18 +83,17 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar wit
     when(registrationResult.unregister()).thenReturn(eventualDone)
 
     val containerBehaviorTestkit: BehaviorTestKit[ContainerActorMessage] = BehaviorTestKit(
-      Behaviors.setup(
-        ctx =>
-          new ContainerBehavior(
-            ctx,
-            containerInfo,
-            supervisorInfoFactory,
-            registrationFactory,
-            locationService,
-            eventService,
-            alarmService,
-            mocks.loggerFactory
-          )
+      Behaviors.setup(ctx =>
+        new ContainerBehavior(
+          ctx,
+          containerInfo,
+          supervisorInfoFactory,
+          registrationFactory,
+          locationService,
+          eventService,
+          alarmService,
+          mocks.loggerFactory
+        )
       )
     )
   }
@@ -103,9 +101,8 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar wit
   class RunningContainer() extends IdleContainer {
     containerBehaviorTestkit.run(SupervisorsCreated(supervisorInfos))
     val components = Components(supervisorInfos.map(_.component))
-    components.components.foreach(
-      component =>
-        containerBehaviorTestkit.run(SupervisorLifecycleStateChanged(component.supervisor, SupervisorLifecycleState.Running))
+    components.components.foreach(component =>
+      containerBehaviorTestkit.run(SupervisorLifecycleStateChanged(component.supervisor, SupervisorLifecycleState.Running))
     )
   }
 
@@ -134,9 +131,8 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar wit
       .retrieveAllEffects() shouldBe components.components.map(component => Watched(component.supervisor)).toList
 
     // simulate that container receives LifecycleStateChanged to Running message from all components
-    components.components.foreach(
-      component =>
-        containerBehaviorTestkit.run(SupervisorLifecycleStateChanged(component.supervisor, SupervisorLifecycleState.Running))
+    components.components.foreach(component =>
+      containerBehaviorTestkit.run(SupervisorLifecycleStateChanged(component.supervisor, SupervisorLifecycleState.Running))
     )
 
     // verify that Container changes its state to Running after all component supervisors change their state to Running
@@ -175,9 +171,8 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar wit
     containerLifecycleStateProbe.expectMessage(ContainerLifecycleState.Idle)
 
     // simulate that container receives LifecycleStateChanged to Running message from all components
-    components.components.foreach(
-      component =>
-        containerBehaviorTestkit.run(SupervisorLifecycleStateChanged(component.supervisor, SupervisorLifecycleState.Running))
+    components.components.foreach(component =>
+      containerBehaviorTestkit.run(SupervisorLifecycleStateChanged(component.supervisor, SupervisorLifecycleState.Running))
     )
 
     // verify that Container changes its state to Running after all component supervisors change their state to Running

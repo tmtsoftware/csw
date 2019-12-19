@@ -2,15 +2,14 @@ package example.event;
 
 import akka.Done;
 import akka.actor.Cancellable;
-import akka.stream.Materializer;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Source;
 import csw.params.events.Event;
 import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.command.client.models.framework.ComponentInfo;
-import csw.params.core.models.Prefix;
 import csw.event.client.internal.commons.javawrappers.JEventService;
+import csw.prefix.models.Prefix;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -19,11 +18,9 @@ import java.util.concurrent.CompletionStage;
 public class JEventPublishExamples {
 
     private JEventService eventService;
-    private Materializer mat;
 
-    public JEventPublishExamples(JEventService eventService, Materializer mat) {
+    public JEventPublishExamples(JEventService eventService) {
         this.eventService = eventService;
-        this.mat = mat;
     }
 
     public void singleEvent(ComponentInfo componentInfo) {
@@ -41,12 +38,12 @@ public class JEventPublishExamples {
         int n = 10;
 
         //#with-source
-            Source<Event, CompletionStage<Done>> eventStream = Source
-                    .range(1, n)
-                    .map(id -> makeEvent(id, componentInfo.prefix(), new EventName("filter_wheel")))
-                    .watchTermination(Keep.right());
+        Source<Event, CompletionStage<Done>> eventStream = Source
+                .range(1, n)
+                .map(id -> makeEvent(id, componentInfo.prefix(), new EventName("filter_wheel")))
+                .watchTermination(Keep.right());
 
-            return eventService.defaultPublisher().<CompletionStage<Done>>publish(eventStream, failure -> { /*do something*/ });
+        return eventService.defaultPublisher().<CompletionStage<Done>>publish(eventStream, failure -> { /*do something*/ });
         //#with-source
     }
 

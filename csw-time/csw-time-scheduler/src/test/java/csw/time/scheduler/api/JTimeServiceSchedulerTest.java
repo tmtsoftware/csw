@@ -32,7 +32,7 @@ public class JTimeServiceSchedulerTest extends JUnitSuite {
     private TimeServiceScheduler timeServiceScheduler =
             new TimeServiceSchedulerFactory(typedSystem.scheduler()).make(typedSystem.executionContext());
 
-    private ActorSystem untypedSystem = ActorSystemAdapter.toUntyped(typedSystem);
+    private ActorSystem untypedSystem = ActorSystemAdapter.toClassic(typedSystem);
     private TestKit untypedTestKit = new TestKit(untypedSystem);
 
     //------------------------------Scheduling-------------------------------

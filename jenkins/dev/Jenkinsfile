@@ -19,7 +19,7 @@ pipeline {
             steps {
                 sh "sbt scalafmtCheck"
                 sh "sbt clean makeSite"
-                sh "sbt ';set every Seq(enableFatalWarnings := true, scalafmtOnCompile := false); scalastyle; compile'"
+                sh "sbt ';set every Seq(enableFatalWarnings := true, scalafmtOnCompile := false); scalastyle; test:compile; multi-jvm:compile;'"
             }
         }
 
@@ -41,7 +41,7 @@ pipeline {
                             allowMissing         : true,
                             alwaysLinkToLastBuild: false,
                             keepAll              : true,
-                            reportDir            : './target/scala-2.12/scoverage-report',
+                            reportDir            : './target/scala-2.13/scoverage-report',
                             reportFiles          : 'index.html',
                             reportName           : "Scoverage Report"
                     ])

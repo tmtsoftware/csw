@@ -5,11 +5,12 @@ import java.time.Instant
 import csw.params.commands.{CommandName, Observe, Setup, Wait}
 import csw.params.core.generics.KeyType
 import csw.params.core.generics.KeyType.{LongMatrixKey, StructKey}
-import csw.params.core.models.Units.{encoder, meter, second, NoUnits}
+import csw.params.core.models.Units.{NoUnits, encoder, meter, second}
 import csw.params.core.models._
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.params.events._
 import csw.params.testdata.ParamSetData
+import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime
 import org.scalatest.{FunSpec, Matchers}
 import play.api.libs.json.Json
@@ -47,7 +48,6 @@ class JsonContractTest extends FunSpec with Matchers {
           Source
             .fromResource("json/setup_command.json")
             .mkString
-            .replace("test-runId", setup.runId.id)
         )
 
       setupToJson shouldEqual expectedSetupJson
@@ -63,7 +63,7 @@ class JsonContractTest extends FunSpec with Matchers {
       val observeToJson = JsonSupport.writeSequenceCommand(observe)
 
       val expectedObserveJson =
-        Json.parse(Source.fromResource("json/observe_command.json").mkString.replace("test-runId", observe.runId.id))
+        Json.parse(Source.fromResource("json/observe_command.json").mkString) //.replace("test-runId", observe.runId.id))
 
       observeToJson shouldEqual expectedObserveJson
     }
@@ -78,7 +78,7 @@ class JsonContractTest extends FunSpec with Matchers {
       val waitToJson = JsonSupport.writeSequenceCommand(wait)
 
       val expectedWaitJson =
-        Json.parse(Source.fromResource("json/wait_command.json").mkString.replace("test-runId", wait.runId.id))
+        Json.parse(Source.fromResource("json/wait_command.json").mkString) //.replace("test-runId", wait.runId.id))
 
       waitToJson shouldEqual expectedWaitJson
     }
@@ -180,7 +180,6 @@ class JsonContractTest extends FunSpec with Matchers {
       val expectedSetupJson = Source
         .fromResource("json/setup_with_all_keys.json")
         .mkString
-        .replace("test-runId", setup.runId.id)
 
       val expectedSetup = JsonSupport.readSequenceCommand[Setup](Json.parse(expectedSetupJson))
       originalSetup shouldBe expectedSetup

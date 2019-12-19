@@ -2,8 +2,7 @@ package csw.config
 
 import java.nio.file.{Files, Paths}
 
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.stream.typed.scaladsl.ActorMaterializer
+import akka.actor.typed.scaladsl.adapter._
 import com.typesafe.config.ConfigFactory
 import csw.aas.installed.api.InstalledAppAuthAdapter
 import csw.commons.ResourceReader
@@ -18,6 +17,7 @@ import csw.config.server.{ServerWiring, Settings}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.helpers.LSNodeSpec
 import csw.location.server.http.MultiNodeHTTPLocationService
+import org.mockito.MockitoSugar
 import org.scalatest.FunSuiteLike
 
 class ConfigCliAppTestMultiJvmNode1 extends ConfigCliAppTest(0)
@@ -29,7 +29,8 @@ class ConfigCliAppTest(ignore: Int)
     extends LSNodeSpec(config = new TwoClientsAndServer, mode = "http")
     with MultiNodeHTTPLocationService
     with FunSuiteLike
-    with MockedAuthentication {
+    with MockedAuthentication
+    with MockitoSugar {
 
   import config._
 
@@ -67,7 +68,6 @@ class ConfigCliAppTest(ignore: Int)
     // config client command line app is exercised on client1
     runOn(client1) {
       enterBarrier("server-started")
-      implicit val mat: ActorMaterializer = ActorMaterializer()
 
       def cliApp() = Wiring.noPrinting(HttpLocationServiceFactory.makeLocalClient, factory, nativeAuthAdapter).cliApp
 
@@ -93,22 +93,23 @@ class ConfigCliAppTest(ignore: Int)
     // config client admin api is exercised on client2
     runOn(client2) {
       enterBarrier("server-started")
-      val actorRuntime = new ActorRuntime(system.toTyped)
-      import actorRuntime._
+      val actorRuntime  = new ActorRuntime(system.toTyped)
       val configService = ConfigClientFactory.adminApi(system.toTyped, locationService, factory)
 
       enterBarrier("client1-create")
-      val actualConfigValue = configService.getLatest(Paths.get(repoPath1)).await.get.toStringF.await
+      val actualConfigValue = configService.getLatest(Paths.get(repoPath1)).await.get.toStringF(actorRuntime.typedSystem).await
       actualConfigValue shouldBe inputFileContents
       enterBarrier("client2-create-pass")
 
       enterBarrier("client1-update")
-      val actualUpdatedConfigValue = configService.getLatest(Paths.get(repoPath1)).await.get.toStringF.await
+      val actualUpdatedConfigValue =
+        configService.getLatest(Paths.get(repoPath1)).await.get.toStringF(actorRuntime.typedSystem).await
       actualUpdatedConfigValue shouldBe updatedInputFileContents
       enterBarrier("client2-update-pass")
 
       enterBarrier("client1-setActive")
-      val actualActiveConfigValue = configService.getActive(Paths.get(repoPath1)).await.get.toStringF.await
+      val actualActiveConfigValue =
+        configService.getActive(Paths.get(repoPath1)).await.get.toStringF(actorRuntime.typedSystem).await
       actualActiveConfigValue shouldBe inputFileContents
 
       configService

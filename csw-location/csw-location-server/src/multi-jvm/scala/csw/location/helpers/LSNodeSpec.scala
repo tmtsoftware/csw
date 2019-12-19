@@ -1,7 +1,7 @@
 package csw.location.helpers
 
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.scaladsl.adapter._
 import akka.remote.testkit.{MultiNodeSpec, MultiNodeSpecCallbacks}
 import akka.testkit.ImplicitSender
 import csw.location.api.scaladsl.LocationService
@@ -18,10 +18,10 @@ abstract class LSNodeSpec[T <: NMembersAndSeed](val config: T, mode: String = "c
     with Matchers
     with BeforeAndAfterAll {
 
-  implicit val typedSystem: ActorSystem[SpawnProtocol] = system.toTyped.asInstanceOf[ActorSystem[SpawnProtocol]]
-  protected val cswCluster: CswCluster                 = CswCluster.withSystem(typedSystem)
+  implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = system.toTyped.asInstanceOf[ActorSystem[SpawnProtocol.Command]]
+  protected val cswCluster: CswCluster                         = CswCluster.withSystem(typedSystem)
   lazy protected val locationService: LocationService = mode match {
-    case "http"    => HttpLocationServiceFactory.makeLocalClient(typedSystem, cswCluster.mat)
+    case "http"    => HttpLocationServiceFactory.makeLocalClient(typedSystem)
     case "cluster" => LocationServiceFactory.withCluster(cswCluster)
   }
 

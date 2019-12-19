@@ -2,8 +2,7 @@ package csw.framework.deploy.hostconfig
 
 import java.nio.file.Path
 
-import akka.actor.CoordinatedShutdown.Reason
-import csw.framework.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
+import akka.Done
 import csw.framework.deploy.hostconfig.cli.{ArgsParser, Options}
 import csw.framework.exceptions.UnableToParseOptions
 import csw.framework.internal.configparser.ConfigParser
@@ -14,6 +13,7 @@ import csw.framework.models.{ContainerBootstrapInfo, HostBootstrapInfo}
 import csw.location.client.utils.LocationServerStatus
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
+import csw.prefix.models.{Prefix, Subsystem}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
@@ -28,12 +28,12 @@ object HostConfig {
    * @param name              The name to be used for the main app which uses this utility
    * @param args              The command line args accepted in the main app which uses this utility
    */
-  def start(name: String, args: Array[String]): Unit =
-    new HostConfig(name, startLogging = true).start(args)
+  def start(name: String, subsystem: Subsystem, args: Array[String]): Unit =
+    new HostConfig(name, subsystem, startLogging = true).start(args)
 }
 
-private[hostconfig] class HostConfig(name: String, startLogging: Boolean = false) {
-  private val log: Logger             = new LoggerFactory(name).getLogger
+private[hostconfig] class HostConfig(name: String, subsystem: Subsystem, startLogging: Boolean = false) {
+  private val log: Logger             = new LoggerFactory(Prefix(subsystem, name)).getLogger
   private val timeout: FiniteDuration = 10.seconds
 
   private lazy val wiring: FrameworkWiring = new FrameworkWiring
@@ -57,15 +57,17 @@ private[hostconfig] class HostConfig(name: String, startLogging: Boolean = false
       val processes = bootstrapContainers(containerScript, bootstrapInfo)
       val pids      = processes.map(_.pid())
       log.info(s"Started processes with following PID's: ${pids.mkString("[", ", ", "]")}")
-    } catch {
+    }
+    catch {
       case NonFatal(ex) =>
         log.error(s"${ex.getMessage}", ex = ex)
         throw ex
-    } finally {
+    }
+    finally {
       log.info("Exiting host config application.")
       // once all the processes are started for each container,
       // host applications actor system is no longer needed
-      shutdown(ApplicationFinishedReason)
+      shutdown()
     }
 
   private def bootstrapContainers(containerScript: String, bootstrapInfo: HostBootstrapInfo): Set[Process] =
@@ -88,6 +90,6 @@ private[hostconfig] class HostConfig(name: String, startLogging: Boolean = false
     new ProcessBuilder(cmd: _*).start()
   }
 
-  private def shutdown(reason: Reason) = Await.result(wiring.actorRuntime.shutdown(reason), timeout)
+  private def shutdown(): Done = Await.result(wiring.actorRuntime.shutdown(), timeout)
 }
 // $COVERAGE-ON$

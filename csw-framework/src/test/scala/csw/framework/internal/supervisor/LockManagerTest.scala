@@ -2,7 +2,7 @@ package csw.framework.internal.supervisor
 
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.scaladsl.adapter._
 import akka.actor.{ActorSystem, typed}
 import csw.command.client.messages.CommandMessage.Submit
 import csw.command.client.models.framework.LockingResponse
@@ -12,7 +12,8 @@ import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.generics.{KeyType, Parameter}
-import csw.params.core.models.{ObsId, Prefix, Subsystem}
+import csw.params.core.models.ObsId
+import csw.prefix.models.{Prefix, Subsystem}
 import org.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
@@ -20,8 +21,8 @@ import org.scalatest.{FunSuite, Matchers}
 // DEOPSCSW-301: Support UnLocking
 class LockManagerTest extends FunSuite with MockitoSugar with Matchers {
 
-  private val prefix        = Prefix("tcs.mobie.blue.filter")
-  private val invalidPrefix = Prefix("tcs.mobie.blue.filter.invalid")
+  private val prefix        = Prefix("wfos.blue.filter")
+  private val invalidPrefix = Prefix("wfos.blue.filter.invalid")
 
   implicit val system: ActorSystem                     = ActorSystem()
   implicit val typedSystem: typed.ActorSystem[Nothing] = system.toTyped
@@ -138,7 +139,6 @@ class LockManagerTest extends FunSuite with MockitoSugar with Matchers {
     lockManager.isLocked shouldBe true
 
     lockManager.allowCommand(Submit(invalidSetup, commandResponseProbe.ref)) shouldBe false
-
   }
 
   // DEOPSCSW-302: Support Unlocking by Admin

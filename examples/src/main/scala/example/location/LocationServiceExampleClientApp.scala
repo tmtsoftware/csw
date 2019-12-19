@@ -4,14 +4,11 @@ import java.net.InetAddress
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior, SpawnProtocol}
-import akka.actor.{Actor, ActorSystem, CoordinatedShutdown, Props, typed}
+import akka.actor.{Actor, ActorSystem, Props, typed}
 import akka.stream.scaladsl.{Keep, Sink}
-import akka.stream.typed.scaladsl
 import akka.stream.typed.scaladsl.ActorSink
-import akka.stream.{ActorMaterializer, Materializer}
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
-import csw.framework.commons.CoordinatedShutdownReasons.ActorTerminatedReason
 import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
@@ -25,7 +22,7 @@ import csw.logging.api.scaladsl._
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.scaladsl.{Keys, LoggerFactory, LoggingSystemFactory}
-import csw.params.core.models.Prefix
+import csw.prefix.models.{Prefix, Subsystem}
 import example.location.ExampleMessages.{AllDone, CustomException, TrackingEventAdapter}
 import example.location.LocationServiceExampleClient.locationInfoToString
 import example.location.LocationServiceExampleClientApp.typedSystem
@@ -46,14 +43,12 @@ object LocationServiceExampleClientApp extends App {
   Await.result(wiring.locationHttpService.start(), 5.seconds)
   val untypedSystem = ActorSystem("untyped-system")
   //#create-actor-system
-  implicit val typedSystem: typed.ActorSystem[SpawnProtocol] =
-    ActorSystemFactory.remote(SpawnProtocol.behavior, "csw-examples-locationServiceClient")
+  implicit val typedSystem: typed.ActorSystem[SpawnProtocol.Command] =
+    ActorSystemFactory.remote(SpawnProtocol(), "csw-examples-locationServiceClient")
   //#create-actor-system
 
-  implicit val mat: ActorMaterializer = scaladsl.ActorMaterializer()
-
   //#create-location-service
-  private val locationService = HttpLocationServiceFactory.makeLocalClient(typedSystem, mat)
+  private val locationService = HttpLocationServiceFactory.makeLocalClient(typedSystem)
   //#create-location-service
 
   //#create-logging-system
@@ -74,7 +69,7 @@ object ExampleMessages {
 
 object LocationServiceExampleClient {
 
-  def props(locationService: LocationService, loggingSystem: LoggingSystem)(implicit mat: Materializer): Props =
+  def props(locationService: LocationService, loggingSystem: LoggingSystem): Props =
     Props(new LocationServiceExampleClient(locationService, loggingSystem))
 
   def locationInfoToString(loc: Location): String = {
@@ -85,7 +80,7 @@ object LocationServiceExampleClient {
   //#tracking
   def sinkBehavior: Behaviors.Receive[ExampleMessages] = Behaviors.receive[ExampleMessages] { (ctx, msg) =>
     {
-      val log: Logger = new LoggerFactory("my-component-name").getLogger(ctx)
+      val log: Logger = new LoggerFactory(Prefix("csw.my-component-name")).getLogger(ctx)
 
       msg match {
         case TrackingEventAdapter(LocationUpdated(loc)) => log.info(s"Location updated ${locationInfoToString(loc)}")
@@ -103,10 +98,9 @@ object LocationServiceExampleClient {
 /**
  * A test client actor that uses the location service to resolve services
  */
-class LocationServiceExampleClient(locationService: LocationService, loggingSystem: LoggingSystem)(implicit mat: Materializer)
-    extends akka.actor.Actor {
+class LocationServiceExampleClient(locationService: LocationService, loggingSystem: LoggingSystem) extends akka.actor.Actor {
 
-  val log: Logger = new LoggerFactory("my-component-name").getLogger(context)
+  val log: Logger = new LoggerFactory(Prefix("csw.my-component-name")).getLogger(context)
 
   private val timeout             = 5.seconds
   private val waitForResolveLimit = 30.seconds
@@ -127,7 +121,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   // dummy http connection
   val httpPort                          = 8080
-  val httpConnection                    = HttpConnection(ComponentId("configuration", ComponentType.Service))
+  val httpConnection                    = HttpConnection(ComponentId(Prefix(Subsystem.CSW, "configuration"), ComponentType.Service))
   val httpRegistration                  = HttpRegistration(httpConnection, httpPort, "path123")
   val httpRegResult: RegistrationResult = Await.result(locationService.register(httpRegistration), 2.seconds)
 
@@ -137,10 +131,9 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   import akka.actor.typed.scaladsl.adapter._
 
   // dummy HCD connection
-  val hcdConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
+  val hcdConnection = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
   val hcdRegistration: AkkaRegistration = AkkaRegistrationFactory.make(
     hcdConnection,
-    Prefix("nfiraos.ncc.tromboneHcd"),
     context
       .actorOf(Props(new Actor {
         override def receive: Receive = {
@@ -164,11 +157,11 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   }
   val typedActorRef: ActorRef[String] = context.system.spawn(behavior(), "typed-actor-ref")
 
-  val assemblyConnection = AkkaConnection(models.ComponentId("assembly1", ComponentType.Assembly))
+  val assemblyConnection = AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "assembly1"), ComponentType.Assembly))
 
   // Register Typed ActorRef[String] with Location Service
   val assemblyRegistration: AkkaRegistration =
-    AkkaRegistrationFactory.make(assemblyConnection, Prefix("nfiraos.ncc.tromboneAssembly"), typedActorRef.toURI)
+    AkkaRegistrationFactory.make(assemblyConnection, typedActorRef.toURI)
 
   val assemblyRegResult: RegistrationResult = Await.result(locationService.register(assemblyRegistration), 2.seconds)
   //#Components-Connections-Registrations
@@ -238,8 +231,8 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   //#filtering-prefix
   // filter akka locations based on prefix
-  val akkaLocations: List[AkkaLocation] = Await.result(locationService.listByPrefix("nfiraos.ncc"), timeout)
-  log.info("Registered akka locations for nfiraos.ncc")
+  val akkaLocations: List[Location] = Await.result(locationService.listByPrefix(Prefix("nfiraos.ncc.assembly1")), timeout)
+  log.info("Registered akka locations for nfiraos.ncc.assmbly1")
   akkaLocations.foreach(c => log.info(s"--- ${locationInfoToString(c)}"))
   //#filtering-prefix
 
@@ -266,7 +259,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
       .toMat(Sink.foreach(println))(Keep.left)
       .run()
     context.system.scheduler.scheduleOnce(5.seconds) {
-      killswitch.shutdown()
+      killswitch.cancel()
     }
 
     // Method2: subscribe to LocationServiceExampleComponent events
@@ -300,7 +293,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
     //#unregister
 
     // Gracefully shutdown actor system
-    Await.result(CoordinatedShutdown(context.system).run(ActorTerminatedReason), 20.seconds)
+    Await.result(context.system.terminate(), 20.seconds)
 
     //#stop-logging-system
     // Only call this once per application

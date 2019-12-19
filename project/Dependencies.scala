@@ -1,18 +1,20 @@
-import sbt._
+import sbt.{Def, _}
 
 object Dependencies {
 
-  val AdminServer = Def.setting(
+  val AdminImpl = Def.setting(
     Seq(
-      Libs.`config`,
-      Akka.`akka-actor`,
-      Akka.`akka-stream`,
-      Akka.`akka-stream-typed`,
+      Akka.`akka-actor-typed`,
+      Libs.`scalatest`.value % Test
+    )
+  )
+
+  val AdminHandlers = Def.setting(
+    Seq(
       Akka.`akka-actor-typed`,
       AkkaHttp.`akka-http`,
       Libs.`scala-async`,
       Borer.`borer-compat-akka`.value,
-      Libs.`scopt`,
       Libs.`scalatest`.value % Test
     )
   )
@@ -21,19 +23,7 @@ object Dependencies {
     Seq(
       Libs.`enumeratum`.value,
       Libs.`play-json`.value,
-      Borer.`borer-core`.value,
-      Borer.`borer-derivation`.value,
-      Libs.`scalatest`.value % Test,
-      Libs.`mockito-scala`   % Test
-    )
-  )
-
-  val LocationApi = Def.setting(
-    Seq(
-      Akka.`akka-actor`,
-      Akka.`akka-actor-typed`,
-      Akka.`akka-stream`,
-      Akka.`akka-stream-typed`
+      Libs.`scalatest`.value % Test
     )
   )
 
@@ -55,7 +45,7 @@ object Dependencies {
       Akka.`akka-persistence`,
       Libs.`akka-management-cluster-http`,
       AkkaHttp.`akka-http`,
-      Borer.`borer-compat-akka`.value,
+      MSocket.`msocket-impl-jvm`,
       Akka.`akka-actor-testkit-typed` % Test,
       Libs.`scalatest`.value          % Test,
       Libs.`junit`                    % Test,
@@ -75,7 +65,7 @@ object Dependencies {
       Akka.`akka-remote`,
       Libs.`scala-async`,
       Libs.`scala-java8-compat`,
-      Borer.`borer-compat-akka`.value,
+      MSocket.`msocket-impl-jvm`,
       Libs.`scalatest`.value % Test
     )
   )
@@ -188,6 +178,15 @@ object Dependencies {
     )
   )
 
+  val Prefix = Def.setting(
+    Seq(
+      Libs.`enumeratum`.value,
+      Borer.`borer-core`.value,
+      Borer.`borer-derivation`.value,
+      Libs.`scalatest`.value % Test
+    )
+  )
+
   val Params = Def.setting(
     Seq(
       Libs.`enumeratum`.value,
@@ -225,6 +224,7 @@ object Dependencies {
 
   val CommandClient = Def.setting(
     Seq(
+      MSocket.`msocket-impl-jvm`,
       Libs.`enumeratum`.value,
       Libs.`config`,
       Libs.`play-json`.value,
@@ -246,7 +246,8 @@ object Dependencies {
 
   val CommandApi = Def.setting(
     Seq(
-      Akka.`akka-actor`
+      Libs.`scala-async`,
+      MSocket.`msocket-api`.value
     )
   )
 

@@ -1,14 +1,16 @@
 package csw.event.client
 
 import akka.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.scaladsl.{Keep, Sink}
 import csw.event.api.scaladsl.SubscriptionModes
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.helpers.Utils._
+import csw.prefix.models.{Prefix, Subsystem}
 //import csw.event.client.internal.kafka.KafkaTestProps
 import csw.event.client.internal.redis.RedisTestProps
 import csw.event.client.internal.wiring.BaseProperties
-import csw.params.core.models.{Prefix, Subsystem}
 import csw.params.events.{Event, EventKey, EventName, SystemEvent}
 import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
@@ -481,4 +483,84 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
     seqF.await should contain inOrder (Event.invalidEvent(eventKey), Event.badEvent())
   }
+
+  //CSW-73: Make event pub/sub resuming
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_resume_subscriber_after_exception(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
+    val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
+    val event1                      = makeEvent(1)
+
+    val cancellable = publisher.publish(eventGenerator(), 1.millis)
+    Thread.sleep(500) // Needed for redis set which is fire and forget operation
+
+    val subscription =
+      subscriber.subscribeCallback(Set(event1.eventKey), resumingCallback(queue), 200.millis, SubscriptionModes.RateAdapterMode)
+    Thread.sleep(1000)
+    subscription.unsubscribe().await
+
+    queue.size > 1 shouldBe true
+    cancellable.cancel()
+  }
+
+  //CSW-73: Make event pub/sub resuming
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_resume_async_subscriber_after_exception(baseProperties: BaseProperties): Unit = {
+    eventId = 0
+    import baseProperties._
+    val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
+    val event1                      = makeEvent(1)
+
+    val cancellable = publisher.publish(eventGenerator(), 1.millis)
+    Thread.sleep(500) // Needed for redis set which is fire and forget operation
+
+    val subscription2 = subscriber.subscribeAsync(
+      Set(event1.eventKey),
+      resumingAsyncCallback(queue),
+      200.millis,
+      SubscriptionModes.RateAdapterMode
+    )
+    Thread.sleep(1000)
+    subscription2.unsubscribe().await
+    queue.size > 1 shouldBe true
+
+    cancellable.cancel()
+  }
+
+  //CSW-73: Make event pub/sub resuming
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_resume_pattern_subscriber_after_exception(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
+    val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
+
+    val cancellable = publisher.publish(eventGenerator(), 1.millis)
+    Thread.sleep(500) // Needed for redis set which is fire and forget operation
+
+    val subscription = subscriber.pSubscribeCallback(Subsystem.CSW, eventPattern, resumingCallback(queue))
+    Thread.sleep(1000)
+    subscription.unsubscribe().await
+    queue.size > 2 shouldBe true
+
+    cancellable.cancel()
+  }
+
+  private def resumingCallback(queue: mutable.Queue[Event]) = {
+    var counter = 0
+    val callback: Event => Unit = event => {
+      counter += 1
+      if (counter % 2 == 0) {
+        throw new RuntimeException("shouldResumeAfterThisException")
+      }
+      queue.enqueue(event)
+    }
+    callback
+  }
+
+  private def resumingAsyncCallback(queue: mutable.Queue[Event]) = {
+    val system = ActorSystem(Behaviors.empty, "test")
+    import system.executionContext
+    val callback: Event => Future[Unit] = (event: Event) => Future(resumingCallback(queue)(event))
+    callback
+  }
+
 }

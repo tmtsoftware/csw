@@ -12,8 +12,9 @@ import csw.location.models.{AkkaLocation, LocationRemoved, LocationUpdated, Trac
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, CommandResponse, ControlCommand, Setup}
 import csw.params.core.generics.{Key, KeyType, Parameter}
-import csw.params.core.models.{ObsId, Prefix, Units}
+import csw.params.core.models.{Id, ObsId, Units}
 import csw.params.events._
+import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime
 
 import scala.async.Async._
@@ -111,7 +112,8 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
       case x =>
         x
     } recover {
-      case ex: RuntimeException => CommandResponse.Error(setupCommand.runId, ex.getMessage)
+      case ex: RuntimeException =>
+        CommandResponse.Error(Id(), ex.getMessage) //TODO Not sure what to do with this???
     }
 
     // Wait for final response, and log result
@@ -178,11 +180,12 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   }
   //#subscribe
 
-  override def validateCommand(controlCommand: ControlCommand): ValidateCommandResponse = Accepted(controlCommand.runId)
+  override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse =
+    Accepted(runId)
 
-  override def onSubmit(controlCommand: ControlCommand): SubmitResponse = Completed(controlCommand.runId)
+  override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse = Completed(runId)
 
-  override def onOneway(controlCommand: ControlCommand): Unit = {}
+  override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
 
   override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {
     // do something on Diagnostic Mode

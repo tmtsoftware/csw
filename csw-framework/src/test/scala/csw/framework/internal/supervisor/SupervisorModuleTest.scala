@@ -1,6 +1,7 @@
 package csw.framework.internal.supervisor
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
+import csw.command.api.DemandMatcher
 import csw.command.client.messages.CommandMessage.{Oneway, Submit}
 import csw.command.client.messages.ComponentCommonMessage.{
   ComponentStateSubscription,
@@ -14,17 +15,17 @@ import csw.command.client.messages.SupervisorContainerCommonMessages.Restart
 import csw.command.client.models.framework.PubSub.Subscribe
 import csw.command.client.models.framework.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.command.client.models.framework.{ComponentInfo, LifecycleStateChanged, SupervisorLifecycleState}
-import csw.command.client.models.matchers.DemandMatcher
 import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestSuite
 import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInitializeTimeout}
 import csw.location.models.ComponentType.{Assembly, HCD}
-import csw.location.models.Connection.AkkaConnection
+import csw.location.models.Connection
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, DemandState, StateName}
+import csw.prefix.models.Prefix
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.prop.Tables.Table
@@ -87,9 +88,11 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     )
 
     // This proves that data used in this test contains HCD and Assembly ComponentType
-    testData.find(info => info.componentType == HCD && info.name == "SampleHcd") shouldBe Some(hcdInfo)
-    testData.find(info => info.componentType == HCD && info.name == "JSampleHcd") shouldBe Some(jHcdInfo)
-    testData.find(info => info.componentType == Assembly && info.name == "SampleAssembly") shouldBe Some(assemblyInfo)
+    testData.find(info => info.componentType == HCD && info.prefix == Prefix("wfos.samplehcd")) shouldBe Some(hcdInfo)
+    testData.find(info => info.componentType == HCD && info.prefix == Prefix("wfos.jsamplehcd")) shouldBe Some(jHcdInfo)
+    testData.find(info => info.componentType == Assembly && info.prefix == Prefix("wfos.sampleassembly")) shouldBe Some(
+      assemblyInfo
+    )
 
     forAll(testData) { info =>
       {
@@ -115,7 +118,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
           DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(commandValidationChoice)))
         DemandMatcher(submitSetupValidationDemandState, timeout = 5.seconds)
           .check(submitSetupValidationCurrentState) shouldBe true
-        submitResponseProbe.expectMessage(Completed(setup.runId))
+        submitResponseProbe.expectMessageType[Completed] // (Completed(setup.runId))
 
         // verify that onSubmit handler is invoked
         val submitSetupCommandCurrentState = compStateProbe.expectMessageType[CurrentState]
@@ -141,7 +144,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
           DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(commandValidationChoice)))
         DemandMatcher(submitValidationDemandState, timeout = 5.seconds)
           .check(submitValidationCurrentState) shouldBe true
-        submitResponseProbe.expectMessage(Completed(observe.runId))
+        submitResponseProbe.expectMessageType[Completed] // (observe.runId))
 
         // verify that onSubmit handler is invoked
         val submitCommandCurrentState = compStateProbe.expectMessageType[CurrentState]
@@ -191,7 +194,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
           DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(commandValidationChoice)))
         DemandMatcher(onewaySetupValidationDemandState, timeout = 5.seconds)
           .check(onewaySetupValidationCurrentState) shouldBe true
-        onewayResposeProbe.expectMessage(Accepted(setup.runId))
+        onewayResposeProbe.expectMessageType[Accepted] // (setup.runId))
 
         // verify that onOneway handler is invoked and that data is transferred
         val onewaySetupCommandCurrentState = compStateProbe.expectMessageType[CurrentState]
@@ -217,7 +220,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
           DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(commandValidationChoice)))
         DemandMatcher(oneWayObserveValidationDemandState, timeout = 5.seconds)
           .check(oneWayObserveValidationCurrentState) shouldBe true
-        onewayResposeProbe.expectMessage(Accepted(observe.runId))
+        onewayResposeProbe.expectMessageType[Accepted] // (observe.runId))
 
         // verify that onObserve handler is invoked and parameter is successfully transferred
         val oneWayObserveCommandCurrentState = compStateProbe.expectMessageType[CurrentState]
@@ -318,7 +321,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
         containerIdleMessageProbe.expectMessage(SupervisorLifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
-        verify(locationService).unregister(any[AkkaConnection])
+        verify(locationService, times(2)).unregister(any[Connection])
         verify(locationService, times(2)).register(akkaRegistration)
       }
     }

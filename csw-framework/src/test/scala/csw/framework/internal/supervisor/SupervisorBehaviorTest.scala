@@ -40,7 +40,7 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
   doNothing.when(timerScheduler).cancel(ArgumentMatchers.eq(SupervisorBehavior.InitializeTimerKey))
 
   val supervisorBehavior: Behavior[ComponentMessage] = createBehavior(timerScheduler)
-  val componentTLAName                               = s"${hcdInfo.name}-${SupervisorBehavior.ComponentActorNameSuffix}"
+  val componentTLAName                               = s"${hcdInfo.prefix}-${SupervisorBehavior.ComponentActorNameSuffix}"
 
   test("Supervisor should create child actors for TLA, pub-sub actor for lifecycle and component state") {
     val supervisorBehaviorTestKit = BehaviorTestKit(supervisorBehavior)
@@ -74,12 +74,12 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
     import typedSystem.executionContext
 
     Future {
-      supervisorBehaviorTestKit.run(SetComponentLogLevel("DummyHcd", WARN))
-      supervisorBehaviorTestKit.run(GetComponentLogMetadata("DummyHcd", logMetadataProbe.ref))
+      supervisorBehaviorTestKit.run(SetComponentLogLevel(WARN))
+      supervisorBehaviorTestKit.run(GetComponentLogMetadata(logMetadataProbe.ref))
     }
     Future {
-      supervisorBehaviorTestKit.run(SetComponentLogLevel("SampleHcd", WARN))
-      supervisorBehaviorTestKit.run(GetComponentLogMetadata("SampleHcd", logMetadataProbe.ref))
+      supervisorBehaviorTestKit.run(SetComponentLogLevel(WARN))
+      supervisorBehaviorTestKit.run(GetComponentLogMetadata(logMetadataProbe.ref))
     }
 
     val logMetadata1 = logMetadataProbe.expectMessageType[LogMetadata]
@@ -109,16 +109,15 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
   private def createBehavior(timerScheduler: TimerScheduler[SupervisorMessage]): Behavior[ComponentMessage] = {
 
     Behaviors
-      .setup[SupervisorMessage](
-        ctx =>
-          new SupervisorBehavior(
-            ctx,
-            timerScheduler,
-            None,
-            new SampleComponentBehaviorFactory,
-            registrationFactory,
-            cswCtx.copy(hcdInfo)
-          )
+      .setup[SupervisorMessage](ctx =>
+        new SupervisorBehavior(
+          ctx,
+          timerScheduler,
+          None,
+          new SampleComponentBehaviorFactory,
+          registrationFactory,
+          cswCtx.copy(hcdInfo)
+        )
       )
       .narrow
   }

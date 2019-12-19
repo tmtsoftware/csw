@@ -1,7 +1,6 @@
 package csw.config.cli
 
 import csw.config.cli.args.{ArgsParser, Options}
-import csw.config.cli.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
 import csw.config.cli.wiring.Wiring
 import csw.location.client.utils.LocationServerStatus
 import csw.logging.client.scaladsl.LoggingSystemFactory
@@ -22,8 +21,9 @@ object Main extends App {
 
     try {
       cliApp.start(options)
-    } finally {
-      actorRuntime.shutdown(ApplicationFinishedReason)
+    }
+    finally {
+      actorRuntime.shutdown()
     }
   }
 }

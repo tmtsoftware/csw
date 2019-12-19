@@ -9,13 +9,13 @@ import akka.stream.javadsl.Source;
 import csw.event.api.javadsl.IEventPublisher;
 import csw.event.api.javadsl.IEventSubscription;
 import csw.event.client.helpers.Utils;
-//import csw.event.client.internal.kafka.KafkaTestProps;
 import csw.event.client.internal.redis.RedisTestProps;
 import csw.event.client.internal.wiring.BaseProperties;
-import csw.params.core.models.Prefix;
 import csw.params.events.Event;
 import csw.params.events.Event$;
 import csw.params.events.EventKey;
+import csw.prefix.models.Prefix;
+import csw.prefix.javadsl.JSubsystem;
 import csw.time.core.models.UTCTime;
 import org.scalatestplus.testng.TestNGSuite;
 import org.testng.Assert;
@@ -31,6 +31,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
+
+//import csw.event.client.internal.kafka.KafkaTestProps;
 
 //DEOPSCSW-331: Event Service Accessible to all CSW component builders
 //DEOPSCSW-334: Publish an event
@@ -80,7 +82,7 @@ public class JEventPublisherTest extends TestNGSuite {
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
         Thread.sleep(500); // Needed for redis set which is fire and forget operation
 
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(set).take(2).toMat(Sink.foreach(event -> probe.ref().tell(event)), Keep.left()).run(baseProperties.resumingMat());
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(set).take(2).toMat(Sink.foreach(event -> probe.ref().tell(event)), Keep.left()).withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
         subscription.ready().get(10, TimeUnit.SECONDS);
 
         probe.expectMessage(event1);
@@ -103,7 +105,7 @@ public class JEventPublisherTest extends TestNGSuite {
         EventKey eventKey = Utils.makeEvent(0).eventKey();
 
         List<Event> queue = new ArrayList<>();
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).toMat(Sink.foreach(queue::add), Keep.left()).run(baseProperties.resumingMat());
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).toMat(Sink.foreach(queue::add), Keep.left()).withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
         subscription.ready().get(10, TimeUnit.SECONDS);
         Thread.sleep(500); // Needed for getting the latest event
 
@@ -137,7 +139,7 @@ public class JEventPublisherTest extends TestNGSuite {
         }
 
         Set<Event> queue = new HashSet<>();
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(events.stream().map(Event::eventKey).collect(Collectors.toSet())).toMat(Sink.foreach(queue::add), Keep.left()).run(baseProperties.resumingMat());
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(events.stream().map(Event::eventKey).collect(Collectors.toSet())).toMat(Sink.foreach(queue::add), Keep.left()).withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
         subscription.ready().get(10, TimeUnit.SECONDS);
 
         baseProperties.jPublisher().publish(Source.fromIterator(events::iterator));
@@ -158,13 +160,13 @@ public class JEventPublisherTest extends TestNGSuite {
     public void should_be_able_to_publish_an_event_with_block_generating_future_of_event_with_duration(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         List<Event> events = new ArrayList<>();
         for (int i = 31; i < 41; i++) {
-            events.add(Utils.makeEventWithPrefix(i, new Prefix("csw.move")));
+            events.add(Utils.makeEventWithPrefix(i, new Prefix(JSubsystem.CSW(), "move")));
         }
 
         EventKey eventKey = events.get(0).eventKey();
 
         List<Event> queue = new ArrayList<>();
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).toMat(Sink.foreach(queue::add), Keep.left()).run(baseProperties.resumingMat());
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).toMat(Sink.foreach(queue::add), Keep.left()).withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
         subscription.ready().get(10, TimeUnit.SECONDS);
         Thread.sleep(500); // Needed for getting the latest event
 
@@ -205,7 +207,7 @@ public class JEventPublisherTest extends TestNGSuite {
         IEventSubscription subscription = baseProperties.jSubscriber()
                 .subscribe(Set.of(eventKey))
                 .toMat(Sink.foreach((Procedure<Event>) testProbe.ref()::tell), Keep.left())
-                .run(baseProperties.resumingMat());
+                .withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
 
         subscription.ready().get(10, TimeUnit.SECONDS);
         Thread.sleep(500);
@@ -232,13 +234,13 @@ public class JEventPublisherTest extends TestNGSuite {
     public void should_be_able_to_publish_event_via_event_generator_with_start_time(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         List<Event> events = new ArrayList<>();
         for (int i = 31; i < 41; i++) {
-            events.add(Utils.makeEventWithPrefix(i, new Prefix("csw.start.time.test.publish")));
+            events.add(Utils.makeEventWithPrefix(i, new Prefix(JSubsystem.CSW(), "start.time.test.publish")));
         }
 
         EventKey eventKey = events.get(0).eventKey();
 
         List<Event> queue = new ArrayList<>();
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).toMat(Sink.foreach(queue::add), Keep.left()).run(baseProperties.resumingMat());
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).toMat(Sink.foreach(queue::add), Keep.left()).withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
         subscription.ready().get(10, TimeUnit.SECONDS);
         Thread.sleep(500); // Needed for getting the latest event
 
@@ -268,13 +270,13 @@ public class JEventPublisherTest extends TestNGSuite {
     public void should_be_able_to_publish_event_via_asynchronous_event_generator_with_start_time(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         List<Event> events = new ArrayList<>();
         for (int i = 31; i < 41; i++) {
-            events.add(Utils.makeEventWithPrefix(i, new Prefix("csw.start.time.test.publishAsync")));
+            events.add(Utils.makeEventWithPrefix(i, Prefix.apply(JSubsystem.CSW(), "start.time.test.publishAsync")));
         }
 
         EventKey eventKey = events.get(0).eventKey();
 
         List<Event> queue = new ArrayList<>();
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).toMat(Sink.foreach(queue::add), Keep.left()).run(baseProperties.resumingMat());
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).toMat(Sink.foreach(queue::add), Keep.left()).withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
         subscription.ready().get(10, TimeUnit.SECONDS);
         Thread.sleep(500); // Needed for getting the latest event
 

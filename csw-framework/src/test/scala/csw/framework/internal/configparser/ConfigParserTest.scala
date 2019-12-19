@@ -8,44 +8,32 @@ import csw.framework.models.ContainerMode.{Container, Standalone}
 import csw.framework.models.{ContainerBootstrapInfo, ContainerInfo, HostBootstrapInfo}
 import csw.location.models.ComponentType.{Assembly, HCD}
 import csw.location.models.Connection
-import csw.params.core.models.Prefix
+import csw.prefix.models.Prefix
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationInt
+import scala.jdk.CollectionConverters._
 
 // DEOPSCSW-167: Creation and Deployment of Standalone Components
 // DEOPSCSW-170: Starting component using a file format
 // DEOPSCSW-172: Starting a container from configuration file
 // DEOPSCSW-283: Parsing HOCON conf file
+// CSW-82: ComponentInfo should take prefix
+// CSW-83: Alarm models should take prefix
 class ConfigParserTest extends FunSuite with Matchers {
 
   private val assemblyInfo = ComponentInfo(
-    "Assembly-1",
+    Prefix("tcs.assembly1"),
     Assembly,
-    Prefix("tcs.mobie.blue.filter"),
     "csw.pkgDemo.assembly1.Assembly1",
     DoNotRegister,
-    Set(Connection.from("HCD2A-hcd-akka"), Connection.from("HCD2C-hcd-akka")),
+    Set(Connection.from("tcs.HCD2A-hcd-akka"), Connection.from("tcs.HCD2C-hcd-akka")),
     5.seconds
   )
-  private val hcd2AInfo = ComponentInfo(
-    "HCD-2A",
-    HCD,
-    Prefix("tcs.mobie.blue.filter"),
-    "csw.pkgDemo.hcd2.Hcd2",
-    RegisterOnly,
-    Set.empty
-  )
-  private val hcd2BInfo = ComponentInfo(
-    "HCD-2B",
-    HCD,
-    Prefix("tcs.mobie.blue.disperser"),
-    "csw.pkgDemo.hcd2.Hcd2",
-    DoNotRegister,
-    Set.empty
-  )
+  private val hcd2AInfo = ComponentInfo(Prefix("tcs.hcd2a"), HCD, "csw.pkgDemo.hcd2.Hcd2", RegisterOnly, Set.empty)
+  private val hcd2BInfo = ComponentInfo(Prefix("tcs.hcd2b"), HCD, "csw.pkgDemo.hcd2.Hcd2", DoNotRegister, Set.empty)
 
-  private val containerInfo = ContainerInfo("Container-1", Set(assemblyInfo, hcd2AInfo, hcd2BInfo))
+  private val containerInfo = ContainerInfo("Container1", Set(assemblyInfo, hcd2AInfo, hcd2BInfo))
 
   private val containerBootstrapInfo = ContainerBootstrapInfo(
     Container,
@@ -94,8 +82,11 @@ class ConfigParserTest extends FunSuite with Matchers {
 
   // ################### Start : Standalone Parsing ##################
   test("should able to parse standalone assembly config") {
-    val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/standalone/SampleStandalone.conf")
-    ConfigParser.parseStandalone(config) shouldEqual assemblyInfo
+    val config               = ConfigFactory.parseResources(getClass, "/parsing_test_conf/standalone/SampleStandalone.conf")
+    val expectedAssemblyInfo = ConfigParser.parseStandalone(config)
+    expectedAssemblyInfo shouldEqual assemblyInfo
+    expectedAssemblyInfo.getConnections.asScala should contain allElementsOf assemblyInfo.connections
+
   }
 
   test("should able to throw error when 'behaviorFactoryClassName' is missing for assembly") {
@@ -106,7 +97,7 @@ class ConfigParserTest extends FunSuite with Matchers {
     }
   }
 
-  test("should able to throw error when 'prefix' is missing for assembly") {
+  test("should able to throw error when 'subsystem' is missing for assembly") {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/assembly/missing_prefix.conf")
 
     intercept[java.lang.RuntimeException] {
@@ -155,7 +146,7 @@ class ConfigParserTest extends FunSuite with Matchers {
     }
   }
 
-  test("should able to throw error when 'prefix' is missing for hcd") {
+  test("should able to throw error when 'subsystem' is missing for hcd") {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/hcd/missing_prefix.conf")
 
     intercept[java.lang.RuntimeException] {

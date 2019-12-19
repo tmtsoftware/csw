@@ -3,69 +3,72 @@ package csw.location.models.scaladsl
 import csw.location.models
 import csw.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.models.{ComponentId, ComponentType, Connection}
+import csw.prefix.models.{Prefix, Subsystem}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
+// CSW-80: Prefix should be in lowercase
 class ConnectionTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
   // DEOPSCSW-14: Codec for data model
   test("should able to form a string representation for akka connection for trombone HCD") {
-    val expectedAkkaConnectionName = "tromboneHcd-hcd-akka"
-    val akkaConnection             = AkkaConnection(ComponentId("tromboneHcd", ComponentType.HCD))
+    val expectedAkkaConnectionName = "nfiraos.trombonehcd-hcd-akka"
+    val akkaConnection             = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneHcd"), ComponentType.HCD))
     akkaConnection.name shouldBe expectedAkkaConnectionName
   }
 
   // DEOPSCSW-14: Codec for data model
   test("should able to form a string representation for tcp connection for redis") {
-    val expectedTcpConnectionName = "redis-service-tcp"
-    val tcpConnection             = TcpConnection(ComponentId("redis", ComponentType.Service))
+    val expectedTcpConnectionName = "csw.redis-service-tcp"
+    val tcpConnection             = TcpConnection(ComponentId(Prefix(Subsystem.CSW, "redis"), ComponentType.Service))
     tcpConnection.name shouldBe expectedTcpConnectionName
   }
 
   // DEOPSCSW-14: Codec for data model
   test("should able to form a string representation for http connection for config service") {
-    val expectedHttpConnectionName = "config-service-http"
-    val httpConnection             = HttpConnection(models.ComponentId("config", ComponentType.Service))
+    val expectedHttpConnectionName = "csw.config-service-http"
+    val httpConnection             = HttpConnection(models.ComponentId(Prefix(Subsystem.CSW, "config"), ComponentType.Service))
     httpConnection.name shouldBe expectedHttpConnectionName
   }
 
   // DEOPSCSW-14: Codec for data model
   test("should able to form a string representation for akka connection for trombone container") {
-    val expectedAkkaConnectionName = "tromboneContainer-container-akka"
-    val akkaConnection             = AkkaConnection(models.ComponentId("tromboneContainer", ComponentType.Container))
+    val expectedAkkaConnectionName = "container.trombonecontainer-container-akka"
+    val akkaConnection =
+      AkkaConnection(models.ComponentId(Prefix(Subsystem.Container, "tromboneContainer"), ComponentType.Container))
     akkaConnection.name shouldBe expectedAkkaConnectionName
   }
 
   // DEOPSCSW-14: Codec for data model
   test("should able to form a string representation for akka connection for trombone assembly") {
-    val expectedAkkaConnectionName = "tromboneAssembly-assembly-akka"
-    val akkaConnection             = AkkaConnection(models.ComponentId("tromboneAssembly", ComponentType.Assembly))
+    val expectedAkkaConnectionName = "nfiraos.tromboneassembly-assembly-akka"
+    val akkaConnection             = AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneAssembly"), ComponentType.Assembly))
     akkaConnection.name shouldBe expectedAkkaConnectionName
   }
 
   // DEOPSCSW-14: Codec for data model
   test("should able to form a connection for components from a valid string representation") {
-    Connection.from("tromboneAssembly-assembly-akka") shouldBe
-    AkkaConnection(models.ComponentId("tromboneAssembly", ComponentType.Assembly))
+    Connection.from("nfiraos.tromboneAssembly-assembly-akka") shouldBe
+    AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneAssembly"), ComponentType.Assembly))
 
-    Connection.from("tromboneHcd-hcd-akka") shouldBe
-    AkkaConnection(models.ComponentId("tromboneHcd", ComponentType.HCD))
+    Connection.from("nfiraos.tromboneHcd-hcd-akka") shouldBe
+    AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneHcd"), ComponentType.HCD))
 
-    Connection.from("redis-service-tcp") shouldBe
-    TcpConnection(models.ComponentId("redis", ComponentType.Service))
+    Connection.from("csw.redis-service-tcp") shouldBe
+    TcpConnection(models.ComponentId(Prefix(Subsystem.CSW, "redis"), ComponentType.Service))
 
-    Connection.from("configService-service-http") shouldBe
-    HttpConnection(models.ComponentId("configService", ComponentType.Service))
+    Connection.from("csw.configService-service-http") shouldBe
+    HttpConnection(models.ComponentId(Prefix(Subsystem.CSW, "configService"), ComponentType.Service))
   }
 
   // DEOPSCSW-14: Codec for data model
   test("should not be able to form a connection for components from an invalid string representation") {
-    val connection = "tromboneAssembly_assembly_akka"
+    val connection = "nfiraos.tromboneAssembly_assembly_akka"
     val exception = intercept[IllegalArgumentException] {
       Connection.from(connection)
     }
 
     exception.getMessage shouldBe s"Unable to parse '$connection' to make Connection object"
 
-    val connection2 = "trombone-hcd"
+    val connection2 = "nfiraos.trombone-hcd"
     val exception2 = intercept[IllegalArgumentException] {
       Connection.from(connection2)
     }

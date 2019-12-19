@@ -7,6 +7,7 @@ import csw.location.models
 import csw.location.models.Connection.HttpConnection
 import csw.location.models.{ComponentId, ComponentType, HttpRegistration}
 import csw.location.server.http.MultiNodeHTTPLocationService
+import csw.prefix.models.{Prefix, Subsystem}
 import org.scalatest.BeforeAndAfterEach
 import org.tmt.embedded_keycloak.KeycloakData.{ApplicationUser, Client, Realm}
 import org.tmt.embedded_keycloak.utils.{BearerToken, Ports}
@@ -51,8 +52,12 @@ class AuthIntegrationTest
       enterBarrier("keycloak started")
       locationService.resolve(AASConnection.value, defaultTimeout).await
 
-      val stopHandle   = new TestServer(locationService).start(testServerPort).await
-      val registration = HttpRegistration(HttpConnection(ComponentId("TestServer", ComponentType.Service)), testServerPort, "")
+      val stopHandle = new TestServer(locationService).start(testServerPort).await
+      val registration = HttpRegistration(
+        HttpConnection(ComponentId(Prefix(Subsystem.CSW, "TestServer"), ComponentType.Service)),
+        testServerPort,
+        ""
+      )
       locationService.register(registration).await
 
       enterBarrier("test-server started")
@@ -66,7 +71,7 @@ class AuthIntegrationTest
 
       val testServer =
         locationService
-          .resolve(HttpConnection(ComponentId("TestServer", ComponentType.Service)), defaultTimeout)
+          .resolve(HttpConnection(ComponentId(Prefix(Subsystem.CSW, "TestServer"), ComponentType.Service)), defaultTimeout)
           .await
           .get
 
@@ -110,7 +115,11 @@ class AuthIntegrationTest
 
       val stopHandle = new TestServer(locationService).start(testServerPort).await
       val registration =
-        HttpRegistration(HttpConnection(models.ComponentId("TestServer", ComponentType.Service)), testServerPort, "")
+        HttpRegistration(
+          HttpConnection(models.ComponentId(Prefix(Subsystem.CSW, "TestServer"), ComponentType.Service)),
+          testServerPort,
+          ""
+        )
       locationService.register(registration).await
 
       enterBarrier("test-server started")
@@ -133,7 +142,7 @@ class AuthIntegrationTest
 
       val testServer =
         locationService
-          .resolve(HttpConnection(models.ComponentId("TestServer", ComponentType.Service)), defaultTimeout)
+          .resolve(HttpConnection(models.ComponentId(Prefix(Subsystem.CSW, "TestServer"), ComponentType.Service)), defaultTimeout)
           .await
           .get
       requests
@@ -175,7 +184,11 @@ class AuthIntegrationTest
 
       val stopHandle = new TestServer(locationService).start(testServerPort).await
       val registration =
-        HttpRegistration(HttpConnection(models.ComponentId("TestServer", ComponentType.Service)), testServerPort, "")
+        HttpRegistration(
+          HttpConnection(models.ComponentId(Prefix(Subsystem.CSW, "TestServer"), ComponentType.Service)),
+          testServerPort,
+          ""
+        )
       locationService.register(registration).await
 
       enterBarrier("test-server started")
@@ -198,7 +211,7 @@ class AuthIntegrationTest
 
       val testServer =
         locationService
-          .resolve(HttpConnection(models.ComponentId("TestServer", ComponentType.Service)), defaultTimeout)
+          .resolve(HttpConnection(models.ComponentId(Prefix(Subsystem.CSW, "TestServer"), ComponentType.Service)), defaultTimeout)
           .await
           .get
       requests

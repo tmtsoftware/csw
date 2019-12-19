@@ -8,13 +8,13 @@ import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.scaladsl.RegistrationResult
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.models.{ComponentId, ComponentType}
 import csw.location.models.Connection.AkkaConnection
+import csw.location.models.{ComponentId, ComponentType}
 import csw.location.server.internal.ServerWiring
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.params.commands.{CommandName, Setup}
-import csw.params.core.models.Prefix
+import csw.prefix.models.{Prefix, Subsystem}
 
 object TromboneHCD {
 
@@ -26,10 +26,10 @@ object TromboneHCD {
   import adminWiring.actorRuntime._
 
   val tromboneHcdActorRef: ActorRef[Submit] = typedSystem.spawn(behavior, "trombone-hcd")
-  val componentId                           = ComponentId("trombonehcd", ComponentType.HCD)
+  val componentId                           = ComponentId(Prefix(Subsystem.NFIRAOS, "trombonehcd"), ComponentType.HCD)
   val connection                            = AkkaConnection(componentId)
 
-  val registration                           = AkkaRegistrationFactory.make(connection, Prefix("nfiraos.ncc.trombone"), tromboneHcdActorRef.toURI)
+  val registration                           = AkkaRegistrationFactory.make(connection, tromboneHcdActorRef.toURI)
   private val locationService                = HttpLocationServiceFactory.makeLocalClient
   val registrationResult: RegistrationResult = locationService.register(registration).await
 
@@ -38,7 +38,7 @@ object TromboneHCD {
   def main(args: Array[String]): Unit = {}
 
   def behavior: Behaviors.Receive[Submit] = Behaviors.receiveMessage[Submit] {
-    case Submit(Setup(_, _, CommandName("Unregister"), None, _), _) =>
+    case Submit(Setup(_, CommandName("Unregister"), None, _), _) =>
       registrationResult.unregister()
       Behaviors.same
     case x =>

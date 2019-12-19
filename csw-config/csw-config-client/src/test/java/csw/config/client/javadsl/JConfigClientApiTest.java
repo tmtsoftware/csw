@@ -1,11 +1,11 @@
 package csw.config.client.javadsl;
 
-import akka.stream.Materializer;
+import akka.actor.typed.ActorSystem;
+import csw.config.api.ConfigData;
 import csw.config.api.javadsl.IConfigClientService;
 import csw.config.api.javadsl.IConfigService;
-import csw.config.api.ConfigData;
-import csw.config.models.ConfigId;
 import csw.config.client.JConfigClientBaseSuite;
+import csw.config.models.ConfigId;
 import org.junit.*;
 import org.scalatestplus.junit.JUnitSuite;
 
@@ -20,7 +20,7 @@ public class JConfigClientApiTest extends JUnitSuite {
     private static JConfigClientBaseSuite jConfigClientBaseSuite;
     private static IConfigService configService;
     private static IConfigClientService configClientApi;
-    private static Materializer mat;
+    private static ActorSystem<?> system;
 
     @BeforeClass
     public static void beforeAll() throws Exception {
@@ -28,7 +28,7 @@ public class JConfigClientApiTest extends JUnitSuite {
         jConfigClientBaseSuite.setup();
         configService = jConfigClientBaseSuite.configService;
         configClientApi = jConfigClientBaseSuite.configClientApi;
-        mat = jConfigClientBaseSuite.mat;
+        system = jConfigClientBaseSuite.system;
     }
 
     @Before
@@ -60,13 +60,13 @@ public class JConfigClientApiTest extends JUnitSuite {
 
         ConfigId configId1 = configService.update(path, ConfigData.fromString(configValue2), "second commit").get();
         configService.update(path, ConfigData.fromString(configValue3), "third commit").get();
-        Assert.assertEquals(configClientApi.getActive(path).get().orElseThrow().toJStringF(mat).get(), configValue1);
+        Assert.assertEquals(configClientApi.getActive(path).get().orElseThrow().toJStringF(system).get(), configValue1);
         Assert.assertTrue(configClientApi.exists(path, configId1).get());
 
         configService.setActiveVersion(path, configId1, "setting active version").get();
-        Assert.assertEquals(configClientApi.getActive(path).get().orElseThrow().toJStringF(mat).get(), configValue2);
+        Assert.assertEquals(configClientApi.getActive(path).get().orElseThrow().toJStringF(system).get(), configValue2);
 
         configService.resetActiveVersion(path, "resetting active version of file").get();
-        Assert.assertEquals(configClientApi.getActive(path).get().orElseThrow().toJStringF(mat).get(), configValue3);
+        Assert.assertEquals(configClientApi.getActive(path).get().orElseThrow().toJStringF(system).get(), configValue3);
     }
 }

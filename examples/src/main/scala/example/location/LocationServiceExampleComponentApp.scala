@@ -5,8 +5,6 @@ import java.net.InetAddress
 import akka.actor.typed
 import akka.actor.typed.SpawnProtocol
 import akka.actor.typed.scaladsl.Behaviors
-import akka.stream.ActorMaterializer
-import akka.stream.typed.scaladsl
 import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
@@ -17,7 +15,7 @@ import csw.location.models.{ComponentId, ComponentType}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.{LoggerFactory, LoggingSystemFactory}
-import csw.params.core.models.Prefix
+import csw.prefix.models.{Prefix, Subsystem}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -26,9 +24,8 @@ import scala.concurrent.{Await, Future}
  * An example that shows how to register a component actor with the location service.
  */
 object LocationServiceExampleComponentApp extends App {
-  implicit val system: typed.ActorSystem[SpawnProtocol] = ActorSystemFactory.remote(SpawnProtocol.behavior, "example-system")
-  implicit val mat: ActorMaterializer                   = scaladsl.ActorMaterializer()
-  private val locationService                           = HttpLocationServiceFactory.makeLocalClient
+  implicit val system: typed.ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "example-system")
+  private val locationService                                   = HttpLocationServiceFactory.makeLocalClient
 
   //#create-logging-system
   private val host = InetAddress.getLocalHost.getHostName
@@ -40,7 +37,7 @@ object LocationServiceExampleComponentApp extends App {
 
 object LocationServiceExampleComponent {
   // Component ID of the service
-  val componentId = ComponentId("LocationServiceExampleComponent", ComponentType.Assembly)
+  val componentId = ComponentId(Prefix(Subsystem.CSW, "LocationServiceExampleComponent"), ComponentType.Assembly)
 
   // Connection for the service
   val connection = AkkaConnection(componentId)
@@ -50,14 +47,13 @@ object LocationServiceExampleComponent {
 
   def behaviour(locationService: LocationService): Behaviors.Receive[ClientMessage] =
     Behaviors.receive[ClientMessage]((ctx, msg) => {
-      val log: Logger = new LoggerFactory("my-component-name").getLogger(ctx)
+      val log: Logger = new LoggerFactory(Prefix("csw.my-component-name")).getLogger(ctx)
       log.info("In actor LocationServiceExampleComponent")
       // Register with the location service
       val registrationResult: Future[RegistrationResult] =
         locationService.register(
           AkkaRegistrationFactory.make(
             LocationServiceExampleComponent.connection,
-            Prefix("nfiraos.ncc.trombone"),
             ctx.self.toURI
           )
         )

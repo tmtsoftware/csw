@@ -2,10 +2,8 @@ package csw.framework.internal.supervisor
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import csw.command.client.messages.CommandMessage.Submit
-import csw.command.client.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, Query, Unsubscribe}
 import csw.command.client.messages.ComponentCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
-import csw.command.client.messages.{CommandResponseManagerMessage => CRM}
 import csw.command.client.models.framework.LockingResponse._
 import csw.command.client.models.framework.{LifecycleStateChanged, LockingResponse, PubSub, SupervisorLifecycleState}
 import csw.common.components.framework.SampleComponentState.{choiceKey, initChoice, prefix}
@@ -14,8 +12,9 @@ import csw.framework.ComponentInfos.assemblyInfo
 import csw.framework.FrameworkTestSuite
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, Setup}
-import csw.params.core.models.{ObsId, Prefix}
+import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, StateName}
+import csw.prefix.models.Prefix
 import org.scalatest.BeforeAndAfterEach
 
 import scala.concurrent.duration.DurationDouble
@@ -23,6 +22,7 @@ import scala.concurrent.duration.DurationDouble
 class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
   //DEOPSCSW-222: Locking a component for a specific duration
+  // CSW-80: Prefix should be in lowercase
   test("should able to lock and unlock a component") {
     val lockingStateProbe = TestProbe[LockingResponse]
     val mocks             = frameworkTestMocks()
@@ -45,7 +45,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     supervisorRef ! LockCommandFactory.make(Prefix("wfos.prog.cloudcover.Client2"), lockingStateProbe.ref)
     lockingStateProbe.expectMessage(
       AcquiringLockFailed(
-        s"Invalid source wfos.prog.cloudcover.Client2 for acquiring lock. Currently it is acquired by component: wfos.prog.cloudcover.Client1"
+        s"Invalid source wfos.prog.cloudcover.client2 for acquiring lock. Currently it is acquired by component: wfos.prog.cloudcover.client1"
       )
     )
 
@@ -57,7 +57,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     supervisorRef ! Unlock(Prefix("wfos.prog.cloudcover.Client2"), lockingStateProbe.ref)
     lockingStateProbe.expectMessage(
       ReleasingLockFailed(
-        s"Invalid source wfos.prog.cloudcover.Client2 for releasing lock. Currently it is acquired by component: wfos.prog.cloudcover.Client1"
+        s"Invalid source wfos.prog.cloudcover.client2 for releasing lock. Currently it is acquired by component: wfos.prog.cloudcover.client1"
       )
     )
 
@@ -131,7 +131,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-301: Support UnLocking
   test("should forward messages that are of type SupervisorLockMessage to TLA") {
     val lockingStateProbe  = TestProbe[LockingResponse]
-    val queryResponseProbe = TestProbe[QueryResponse]()(typedSystem)
+    val queryResponseProbe = TestProbe[SubmitResponse]()(typedSystem)
 
     val sourcePrefix = Prefix("wfos.prog.cloudcover.source")
     val commandName  = CommandName("move.Client1.success")
@@ -157,21 +157,6 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     val setup = Setup(sourcePrefix, commandName, Some(obsId))
     supervisorRef ! Submit(setup, queryResponseProbe.ref)
     queryResponseProbe.expectMessageType[Completed]
-    // Note there is a Started from ComponentBehavior as well as Completed
-    commandResponseManagerActor.expectMessage(AddOrUpdateCommand(Started(setup.runId)))
-    commandResponseManagerActor.expectMessage(AddOrUpdateCommand(Completed(setup.runId)))
-
-    // Ensure Query can be sent to component even in locked state
-    supervisorRef ! Query(setup.runId, queryResponseProbe.ref)
-    commandResponseManagerActor.expectMessage(Query(setup.runId, queryResponseProbe.ref))
-
-    // Ensure Subscribe can be sent to component even in locked state
-    supervisorRef ! CRM.Subscribe(setup.runId, queryResponseProbe.ref)
-    commandResponseManagerActor.expectMessage(CRM.Subscribe(setup.runId, queryResponseProbe.ref))
-
-    // Ensure Unsubscribe can be sent to component even in locked state
-    supervisorRef ! Unsubscribe(setup.runId, queryResponseProbe.ref)
-    commandResponseManagerActor.expectMessage(Unsubscribe(setup.runId, queryResponseProbe.ref))
   }
 
   // DEOPSCSW-223 Expiry of component Locking mode

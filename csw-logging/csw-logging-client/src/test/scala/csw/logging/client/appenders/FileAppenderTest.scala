@@ -19,7 +19,7 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-649: Fixed directory configuration for multi JVM scenario
 class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
   private val logFileDir                = Paths.get("/tmp/csw-test-logs/").toFile
-  private val actorSystem               = ActorSystem(SpawnProtocol.behavior, "test-1")
+  private val actorSystem               = ActorSystem(SpawnProtocol(), "test-1")
   private val standardHeaders: JsObject = Json.obj(LoggingKeys.HOST -> "localhost", LoggingKeys.NAME -> "test-service")
 
   private val fileAppender = new FileAppender(actorSystem, standardHeaders)
@@ -28,6 +28,8 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
     s"""{
       |  "${LoggingKeys.CATEGORY}": "alternative",
       |  "${LoggingKeys.COMPONENT_NAME}": "FileAppenderTest",
+      |  "${LoggingKeys.SUBSYSTEM}": "csw",
+      |  "${LoggingKeys.PREFIX}": "csw.FileAppenderTest",
       |  "${LoggingKeys.HOST}": "localhost",
       |  "${LoggingKeys.NAME}": "test-service",
       |  "${LoggingKeys.SEVERITY}": "ERROR",
@@ -43,6 +45,8 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
     s"""{
       |  "${LoggingKeys.CATEGORY}": "${Category.Common.name}",
       |  "${LoggingKeys.COMPONENT_NAME}": "FileAppenderTest",
+      |  "${LoggingKeys.SUBSYSTEM}": "csw",
+      |  "${LoggingKeys.PREFIX}": "csw.FileAppenderTest",
       |  "${LoggingKeys.HOST}": "localhost",
       |  "${LoggingKeys.NAME}": "test-service",
       |  "${LoggingKeys.SEVERITY}": "ERROR",
@@ -58,6 +62,8 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
     s"""{
       |  "${LoggingKeys.CATEGORY}": "${Category.Common.name}",
       |  "${LoggingKeys.COMPONENT_NAME}": "FileAppenderTest",
+      |  "${LoggingKeys.SUBSYSTEM}": "csw",
+      |  "${LoggingKeys.PREFIX}": "csw.FileAppenderTest",
       |  "${LoggingKeys.HOST}": "localhost",
       |  "${LoggingKeys.NAME}": "test-service",
       |  "${LoggingKeys.SEVERITY}": "INFO",
@@ -110,11 +116,12 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
                                            """.stripMargin)
 
     intercept[BaseLogPathNotDefined] {
-      new FileAppender(ActorSystem(SpawnProtocol.behavior, "test-2", config.resolve()), standardHeaders)
+      new FileAppender(ActorSystem(SpawnProtocol(), "test-2", config.resolve()), standardHeaders)
     }
   }
 
   //DEOPSCSW-151 : Manage log file size
+  // CSW-78: PrefixRedesign for logging
   test("log file is rotated every day") {
     fileAppender.append(expectedLogMsgJson1, "alternative")
     fileAppender.append(expectedLogMsgJson2, Category.Common.name)

@@ -12,6 +12,8 @@ import csw.logging.client.components.IRIS._
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.{FileUtils, LoggingTestSuite}
 import csw.logging.models.RequestId
+import csw.prefix.models.Prefix
+import csw.prefix.models.Subsystem.CSW
 import play.api.libs.json.{JsObject, Json}
 
 import scala.collection.mutable
@@ -21,11 +23,12 @@ class TimingTest extends LoggingTestSuite with Timing {
   private val logFileDir        = Paths.get("/tmp/csw-test-logs/").toFile
   private val loggingSystemName = "TimingTest"
 
-  override lazy val actorSystem = ActorSystem(SpawnProtocol.behavior, "timing-test-system")
+  override lazy val actorSystem = ActorSystem(SpawnProtocol(), "timing-test-system")
   override lazy val loggingSystem =
     new LoggingSystem(loggingSystemName, "version", "localhost", actorSystem)
 
-  private val irisActorRef = actorSystem.spawn(IRIS.behavior(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
+  private val prefix: Prefix = Prefix(CSW, IRIS.COMPONENT_NAME)
+  private val irisActorRef   = actorSystem.spawn(IRIS.behavior(prefix), name = "IRIS-Supervisor-Actor")
 
   private val fileTimestamp   = FileAppender.decideTimestampForFile(ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC)))
   private val timeLogFilePath = s"$logFileDir/${loggingSystemName}_${fileTimestamp}_time.log"
@@ -70,6 +73,7 @@ class TimingTest extends LoggingTestSuite with Timing {
   // DEOPSCSW-142: Flexibility of logging approaches
   // DEOPSCSW-122: Allow local component logs to be output to STDOUT
   // DEOPSCSW-123: Allow local component logs to be output to a file
+  // CSW-78: PrefixRedesign for logging
   test("should able to log messages to combination of standard out and file concurrently and also log time messages.") {
 
     logMessagesWithTimer()
@@ -103,6 +107,8 @@ class TimingTest extends LoggingTestSuite with Timing {
         log.getString(LoggingKeys.MESSAGE) shouldBe IRIS.irisLogs(currentLogLevel)
 
         log.getString(LoggingKeys.COMPONENT_NAME) shouldBe IRIS.COMPONENT_NAME
+        log.getString(LoggingKeys.SUBSYSTEM) shouldBe prefix.subsystem.name
+        log.getString(LoggingKeys.PREFIX) shouldBe prefix.value
         log.getString(LoggingKeys.ACTOR) shouldBe irisActorRef.path.toString
         log.getString(LoggingKeys.FILE) shouldBe IRIS.FILE_NAME
         log.getString(LoggingKeys.CLASS) shouldBe IRIS.CLASS_NAME
@@ -110,5 +116,4 @@ class TimingTest extends LoggingTestSuite with Timing {
       }
     }
   }
-
 }

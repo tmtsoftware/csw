@@ -36,7 +36,7 @@ class KafkaTestProps(
 
   private val eventServiceFactory = new EventServiceFactory(KafkaStore)
   private lazy val producerSettings: ProducerSettings[String, String] =
-    ProducerSettings(actorSystem.toUntyped, new StringSerializer, new StringSerializer)
+    ProducerSettings(actorSystem.toClassic, new StringSerializer, new StringSerializer)
       .withBootstrapServers(s"${Networks().hostname}:$kafkaPort")
 
   private lazy val kafkaProducer = producerSettings.createKafkaProducer()

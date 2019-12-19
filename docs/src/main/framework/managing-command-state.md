@@ -48,8 +48,9 @@ command sender.
 ## addSubCommand
 Use `addSubCommand` to associate sub-commands with a received command.
 
+#Fixme for Kim: This snip is broken. Fix #addSubCommand in McsAssemblyComponentHandlers and then make it `@@snip`.
 Scala
-:   @@snip [McsAssemblyComponentHandlers.scala](../../../../csw-framework/src/test/scala/csw/common/components/command/McsAssemblyComponentHandlers.scala) { #addSubCommand }
+:   snip [McsAssemblyComponentHandlers.scala](../../../../csw-framework/src/test/scala/csw/common/components/command/McsAssemblyComponentHandlers.scala) { #addSubCommand }
 
 Java
 :   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/assembly/JAssemblyComponentHandlers.java) { #addSubCommand }
@@ -61,8 +62,9 @@ status of all the sub-commands have been updated. A `SubmitResponse` indicating 
 of the sub-commands results in the error status of the parent command. Status of any other sub-commands will not be 
 considered in this case.
 
-Scala
-:   @@snip [McsAssemblyComponentHandlers.scala](../../../../csw-framework/src/test/scala/csw/common/components/command/McsAssemblyComponentHandlers.scala) { #updateSubCommand }
+#Fixme for Kim: This snip is broken. Fix #updateSubCommand in McsAssemblyComponentHandlers and then make it `@@snip`.
+Scala 
+:   snip [McsAssemblyComponentHandlers.scala](../../../../csw-framework/src/test/scala/csw/common/components/command/McsAssemblyComponentHandlers.scala) { #updateSubCommand }
 
 Java
 :   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/assembly/JAssemblyComponentHandlers.java) { #updateSubCommand }

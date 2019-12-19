@@ -53,8 +53,10 @@ public class JSampleHcdHandlers extends JComponentHandlers {
     private static final class Sleep implements WorkerCommand {
         private final Id runId;
         private final long timeInMillis;
+        private final ControlCommand setup;
 
-        private Sleep(Id runId, long timeInMillis) {
+        private Sleep(ControlCommand setup, Id runId, long timeInMillis) {
+            this.setup = setup;
             this.runId = runId;
             this.timeInMillis = timeInMillis;
         }
@@ -68,7 +70,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
                         log.trace(() -> "WorkerActor received sleep command with time of " + sleep.timeInMillis + " ms");
                         // simulate long running command
                         Thread.sleep(sleep.timeInMillis);
-                        cswCtx.commandResponseManager().addOrUpdateCommand(new CommandResponse.Completed(sleep.runId));
+                        cswCtx.commandResponseManager().updateCommand(new CommandResponse.Completed(sleep.runId));
                     } else {
                         log.error("Unsupported message type");
                     }
@@ -124,32 +126,32 @@ public class JSampleHcdHandlers extends JComponentHandlers {
 
     //#validate
     @Override
-    public CommandResponse.ValidateCommandResponse validateCommand(ControlCommand controlCommand) {
+    public CommandResponse.ValidateCommandResponse validateCommand(Id runId, ControlCommand controlCommand) {
         String commandName = controlCommand.commandName().name();
         log.info(() -> "Validating command: " + commandName);
         if (commandName.equals("sleep")) {
-            return new CommandResponse.Accepted(controlCommand.runId());
+            return new CommandResponse.Accepted(runId);
         }
-        return new CommandResponse.Invalid(controlCommand.runId(), new CommandIssue.UnsupportedCommandIssue("Command " + commandName + ". not supported."));
+        return new CommandResponse.Invalid(runId, new CommandIssue.UnsupportedCommandIssue("Command " + commandName + ". not supported."));
     }
     //#validate
 
 
     //#onSetup
     @Override
-    public CommandResponse.SubmitResponse onSubmit(ControlCommand controlCommand) {
+    public CommandResponse.SubmitResponse onSubmit(Id runId, ControlCommand controlCommand) {
         log.info(() -> "Handling command: " + controlCommand.commandName());
 
         if (controlCommand instanceof Setup) {
-            onSetup((Setup) controlCommand);
-            return new CommandResponse.Started(controlCommand.runId());
+            onSetup(runId, (Setup) controlCommand);
+            return new CommandResponse.Started(runId);
         } else if (controlCommand instanceof Observe) {
             // implement (or not)
         }
-        return new CommandResponse.Error(controlCommand.runId(), "Observe command not supported");
+        return new CommandResponse.Error(runId, "Observe command not supported");
     }
 
-    private void onSetup(Setup setup) {
+    private void onSetup(Id runId, Setup setup) {
         Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
 
         // get param from the Parameter Set in the Setup
@@ -162,14 +164,14 @@ public class JSampleHcdHandlers extends JComponentHandlers {
 
             log.info(() -> "command payload: " + sleepTimeParam.keyName() + " = " + sleepTimeInMillis);
 
-            workerActor.tell(new Sleep(setup.runId(), sleepTimeInMillis));
+            workerActor.tell(new Sleep(setup, runId, sleepTimeInMillis));
         }
     }
     //#onSetup
 
 
     @Override
-    public void onOneway(ControlCommand controlCommand) {
+    public void onOneway(Id runId, ControlCommand controlCommand) {
     }
 
     @Override

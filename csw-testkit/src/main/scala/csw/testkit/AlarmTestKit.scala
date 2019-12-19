@@ -30,12 +30,13 @@ import csw.testkit.redis.RedisStore
  * }}}
  *
  */
-final class AlarmTestKit private (_system: ActorSystem[SpawnProtocol], testKitSettings: TestKitSettings) extends RedisStore {
+final class AlarmTestKit private (_system: ActorSystem[SpawnProtocol.Command], testKitSettings: TestKitSettings)
+    extends RedisStore {
 
-  override implicit val system: ActorSystem[SpawnProtocol] = _system
-  override implicit lazy val timeout: Timeout              = testKitSettings.DefaultTimeout
-  override protected lazy val masterId: String             = system.settings.config.getString("csw-alarm.redis.masterId")
-  override protected lazy val connection: TcpConnection    = AlarmServiceConnection.value
+  override implicit val system: ActorSystem[SpawnProtocol.Command] = _system
+  override implicit lazy val timeout: Timeout                      = testKitSettings.DefaultTimeout
+  override protected lazy val masterId: String                     = system.settings.config.getString("csw-alarm.redis.masterId")
+  override protected lazy val connection: TcpConnection            = AlarmServiceConnection.value
 
   private def getSentinelPort: Int = testKitSettings.AlarmSentinelPort.getOrElse(getFreePort)
   private def getMasterPort: Int   = testKitSettings.AlarmMasterPort.getOrElse(getFreePort)
@@ -78,7 +79,7 @@ object AlarmTestKit {
    * @return handle to AlarmTestKit which can be used to start and stop alarm service
    */
   def apply(
-      actorSystem: ActorSystem[SpawnProtocol] = typed.ActorSystem(SpawnProtocol.behavior, "alarm-testkit"),
+      actorSystem: ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "alarm-testkit"),
       testKitSettings: TestKitSettings = TestKitSettings(ConfigFactory.load())
   ): AlarmTestKit = new AlarmTestKit(actorSystem, testKitSettings)
 
@@ -87,7 +88,7 @@ object AlarmTestKit {
    *
    * @return handle to EventTestKit which can be used to start and stop event service
    */
-  def create(actorSystem: ActorSystem[SpawnProtocol]): AlarmTestKit = apply(actorSystem)
+  def create(actorSystem: ActorSystem[SpawnProtocol.Command]): AlarmTestKit = apply(actorSystem)
 
   /**
    * Java API to create a AlarmTestKit

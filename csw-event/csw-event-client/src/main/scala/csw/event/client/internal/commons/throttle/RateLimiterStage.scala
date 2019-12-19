@@ -21,7 +21,7 @@ private[event] class RateLimiterStage[A](delay: FiniteDuration) extends GraphSta
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = new TimerGraphStageLogic(shape) {
     private var open = false
 
-    override def preStart(): Unit = schedulePeriodically(None, delay)
+    override def preStart(): Unit = scheduleAtFixedRate(None, delay, delay)
 
     setHandler(in, new InHandler {
       override def onPush(): Unit = {

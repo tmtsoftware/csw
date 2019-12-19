@@ -29,14 +29,14 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-279: Test logging performance
 @State(Scope.Benchmark)
 class E2ELoggingBenchmark {
-  var actorSystem: typed.ActorSystem[SpawnProtocol] = _
-  var log: Logger                                   = _
-  var fileAppender: FileAppender                    = _
-  var person: Person                                = _
+  var actorSystem: typed.ActorSystem[SpawnProtocol.Command] = _
+  var log: Logger                                           = _
+  var fileAppender: FileAppender                            = _
+  var person: Person                                        = _
 
   @Setup(Level.Trial)
   def setup(): Unit = {
-    actorSystem = typed.ActorSystem(SpawnProtocol.behavior, "logging")
+    actorSystem = typed.ActorSystem(SpawnProtocol(), "logging")
     val loggingSystem = new LoggingSystem("E2E", "SNAPSHOT-1.0", InetAddress.getLocalHost.getHostName, actorSystem)
     loggingSystem.setAppenders(List(FileAppender))
     loggingSystem.setDefaultLogLevel(INFO)

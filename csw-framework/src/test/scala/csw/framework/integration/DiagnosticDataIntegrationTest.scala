@@ -15,12 +15,15 @@ import csw.location.models.ComponentType.HCD
 import csw.location.models.Connection.AkkaConnection
 import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.params.events.{Event, EventKey, SystemEvent}
+import csw.prefix.models.Subsystem
+import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime
 import redis.embedded.{RedisSentinel, RedisServer}
 
 import scala.concurrent.duration.DurationLong
 
 // DEOPSCSW-37: Add diagnosticMode handler to component handlers
+// CSW-82: ComponentInfo should take prefix
 class DiagnosticDataIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 
@@ -49,7 +52,7 @@ class DiagnosticDataIntegrationTest extends FrameworkIntegrationSuite {
     Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring)
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")
-    val akkaConnection                = AkkaConnection(ComponentId("IFS_Detector", HCD))
+    val akkaConnection                = AkkaConnection(ComponentId(Prefix(Subsystem.IRIS, "IFS_Detector"), HCD))
     val location                      = locationService.resolve(akkaConnection, 5.seconds).await
 
     LoggingSystemFactory.start("", "", "", actorSystem)

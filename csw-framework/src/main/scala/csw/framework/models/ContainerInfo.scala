@@ -1,6 +1,8 @@
 package csw.framework.models
 
 import csw.command.client.models.framework.ComponentInfo
+import csw.prefix.models.Subsystem
+import csw.prefix.models.{Prefix, Subsystem}
 
 /**
  * Container information as represented in the configuration file
@@ -10,4 +12,9 @@ import csw.command.client.models.framework.ComponentInfo
  */
 private[framework] final case class ContainerInfo(name: String, components: Set[ComponentInfo]) {
   require(components.nonEmpty, "components can not be empty.")
+
+  /**
+   * Represents the prefix for the container with [[Subsystem.Container]] and given `name`
+   */
+  val prefix = Prefix(Subsystem.Container, name)
 }

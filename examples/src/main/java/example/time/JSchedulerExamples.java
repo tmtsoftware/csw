@@ -47,7 +47,7 @@ public class JSchedulerExamples {
     }
 
     Cancellable schedule() {
-        ActorRef actorRef = Adapter.toUntyped(ctx.asJava().spawnAnonymous(SchedulingHandler.behavior()));
+        ActorRef actorRef = Adapter.toClassic(ctx.asJava().spawnAnonymous(SchedulingHandler.behavior()));
 
         return scheduler.scheduleOnce(utcTime, actorRef, UTCTime.now());
     }

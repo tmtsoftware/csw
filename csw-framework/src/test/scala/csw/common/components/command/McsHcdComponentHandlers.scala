@@ -1,7 +1,6 @@
 package csw.common.components.command
 
 import akka.actor.typed.scaladsl.ActorContext
-import csw.command.client.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.command.client.messages.TopLevelActorMessage
 import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.models.CswContext
@@ -10,10 +9,10 @@ import csw.location.models.TrackingEvent
 import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
+import csw.params.core.models.Id
 import csw.time.core.models.UTCTime
 
 import scala.concurrent.Future
-import scala.concurrent.duration.DurationLong
 
 class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
     extends ComponentHandlers(ctx, cswCtx) {
@@ -21,61 +20,54 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   import cswCtx._
   override def initialize(): Future[Unit] = Future.unit
 
-  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
+  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}
 
-  override def validateCommand(controlCommand: ControlCommand): ValidateCommandResponse = {
+  override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse = {
     controlCommand.commandName match {
-      case `longRunning`               => Accepted(controlCommand.runId)
-      case `mediumRunning`             => Accepted(controlCommand.runId)
-      case `shortRunning`              => Accepted(controlCommand.runId)
-      case `failureAfterValidationCmd` => Accepted(controlCommand.runId)
-      case _ =>
-        Invalid(controlCommand.runId, UnsupportedCommandIssue(controlCommand.commandName.name))
+      case `longRunning`               => Accepted(runId)
+      case `mediumRunning`             => Accepted(runId)
+      case `shortRunning`              => Accepted(runId)
+      case `failureAfterValidationCmd` => Accepted(runId)
+      case _                           => Invalid(runId, UnsupportedCommandIssue(controlCommand.commandName.name))
     }
   }
 
   //#addOrUpdateCommand
-  override def onSubmit(controlCommand: ControlCommand): SubmitResponse = {
+  override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse = {
     controlCommand.commandName match {
       case `longRunning` =>
-        ctx.scheduleOnce(
-          5.seconds,
-          commandResponseManager.commandResponseManagerActor,
-          AddOrUpdateCommand(Completed(controlCommand.runId))
-        )
-        Started(controlCommand.runId)
+        timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plusSeconds(5))) {
+          commandResponseManager.updateCommand(Completed(runId))
+        }
+        Started(runId)
       //#addOrUpdateCommand
       case `mediumRunning` =>
-        ctx.scheduleOnce(
-          3.seconds,
-          commandResponseManager.commandResponseManagerActor,
-          AddOrUpdateCommand(Completed(controlCommand.runId))
-        )
-        Started(controlCommand.runId)
+        timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plusSeconds(3))) {
+          commandResponseManager.updateCommand(Completed(runId))
+        }
+        Started(runId)
       case `shortRunning` =>
-        ctx.scheduleOnce(
-          1.seconds,
-          commandResponseManager.commandResponseManagerActor,
-          AddOrUpdateCommand(Completed(controlCommand.runId))
-        )
-        Started(controlCommand.runId)
+        timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plusSeconds(1))) {
+          commandResponseManager.updateCommand(Completed(runId))
+          //commandResponseManager.updateCommand(Error(runId, "Totally fucked"))
+        }
+        Started(runId)
       case `failureAfterValidationCmd` =>
-        commandResponseManager.addOrUpdateCommand(Error(controlCommand.runId, "Failed command"))
-        Error(controlCommand.runId, "Failed command")
+        Error(runId, "Failed command")
       case _ =>
-        Error(controlCommand.runId, "Unknown Command")
+        Error(runId, "Unknown Command")
     }
   }
 
-  override def onOneway(controlCommand: ControlCommand): Unit = ???
+  override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
 
-  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = ???
+  override def onShutdown(): Future[Unit] = Future.unit
 
-  override def onOperationsMode(): Unit = ???
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {}
 
-  override def onShutdown(): Future[Unit] = ???
+  override def onOperationsMode(): Unit = {}
 
-  override def onGoOffline(): Unit = ???
+  override def onGoOffline(): Unit = {}
 
-  override def onGoOnline(): Unit = ???
+  override def onGoOnline(): Unit = {}
 }

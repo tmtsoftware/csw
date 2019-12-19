@@ -6,11 +6,12 @@ import akka.actor.typed.javadsl.Behaviors;
 import csw.logging.api.javadsl.ILogger;
 import csw.logging.client.LogCommand;
 import csw.logging.client.javadsl.JLoggerFactory;
+import csw.prefix.models.Prefix;
 
 public class JIrisSupervisorMutableActor {
 
-    public static Behavior<LogCommand> irisBeh(String componentName) {
-        JLoggerFactory loggerFactory = new JLoggerFactory(componentName);
+    public static Behavior<LogCommand> irisBeh(Prefix prefix) {
+        JLoggerFactory loggerFactory = new JLoggerFactory(prefix);
         return new JIrisSupervisorMutableActor().behavior(loggerFactory);
     }
 
@@ -22,39 +23,39 @@ public class JIrisSupervisorMutableActor {
             return BehaviorBuilder.<LogCommand>create()
                     .onMessage(LogCommand.class,
                             command -> command == LogCommand.LogTrace$.MODULE$,
-                            (ctx,command) -> {
+                            (command) -> {
                                 log.trace(command.toString());
                                 return Behaviors.same();
                             })
                     .onMessage(LogCommand.class,
                             command -> command == LogCommand.LogDebug$.MODULE$,
-                            (ctx,command) -> {
+                            (command) -> {
                                 log.debug(command.toString());
-                                return Behavior.same();
+                                return Behaviors.same();
                             })
                     .onMessage(LogCommand.class,
                             command -> command == LogCommand.LogInfo$.MODULE$,
-                            (ctx,command) -> {
+                            (command) -> {
                                 log.info(command.toString());
-                                return Behavior.same();
+                                return Behaviors.same();
                             })
                     .onMessage(LogCommand.class,
                             command -> command == LogCommand.LogWarn$.MODULE$,
-                            (ctx,command) -> {
+                            (command) -> {
                                 log.warn(command.toString());
-                                return Behavior.same();
+                                return Behaviors.same();
                             })
                     .onMessage(LogCommand.class,
                             command -> command == LogCommand.LogError$.MODULE$,
-                            (ctx,command) -> {
+                            (command) -> {
                                 log.error(command.toString());
-                                return Behavior.same();
+                                return Behaviors.same();
                             })
                     .onMessage(LogCommand.class,
                             command -> command == LogCommand.LogFatal$.MODULE$,
-                            (ctx,command) -> {
+                            (command) -> {
                                 log.fatal(command.toString());
-                                return Behavior.same();
+                                return Behaviors.same();
                             })
                     .build();
         });

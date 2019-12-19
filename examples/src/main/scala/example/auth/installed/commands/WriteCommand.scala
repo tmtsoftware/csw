@@ -21,7 +21,7 @@ class WriteCommand(val installedAppAuthAdapter: InstalledAppAuthAdapter, value: 
         val url         = s"http://localhost:7000/data?value=$value"
         val response =
           Await.result(
-            Http(actorSystem.toUntyped).singleRequest(
+            Http(actorSystem.toClassic).singleRequest(
               HttpRequest(
                 method = HttpMethods.POST,
                 uri = Uri(url),

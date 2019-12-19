@@ -5,6 +5,7 @@ import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.KeyType.DoubleMatrixKey
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models._
+import csw.prefix.models.Prefix
 import org.scalatest.{FunSpec, Matchers}
 
 class ResultTest extends FunSpec with Matchers {
@@ -32,11 +33,11 @@ class ResultTest extends FunSpec with Matchers {
       val p3: Parameter[String] = k3.set("A", "B", "C", "D")
 
       //Create Result using madd
-      val r1: Result = Result(prefix).madd(p1, p2)
+      val r1: Result = Result().madd(p1, p2)
       //Create Result using apply
-      val r2: Result = Result(prefix, Set(p1, p2))
+      val r2: Result = Result(p1, p2)
       //Create Result and use add
-      val r3: Result = Result(prefix).add(p1).add(p2).add(p3)
+      val r3: Result = Result().add(p1).add(p2).add(p3)
 
       //access keys
       val k1Exists: Boolean = r1.exists(k1) //true
@@ -64,6 +65,36 @@ class ResultTest extends FunSpec with Matchers {
     }
   }
 
+  describe("creating a result in various ways") {
+    val k1 = KeyType.IntKey.make("encoder")
+    val k2 = KeyType.StringKey.make("stringThing")
+    val k3 = KeyType.StringKey.make("not used")
+    val v1 = k1.set(22, 34)
+    val v2 = k2.set("wfos")
+
+    it("new one should be empty") {
+      val r = Result()
+      r.nonEmpty shouldEqual false
+      r.paramSet.size shouldEqual (0)
+    }
+
+    it("should allow madd params to an empty result") {
+      val r = Result().madd(v1, v2)
+      r.paramSet.size shouldBe 2
+      r.get(k1) shouldEqual Some(v1)
+      r.get(k2) shouldEqual Some(v2)
+      r.get(k3) shouldEqual None
+    }
+
+    it("should allow in place params in result constructor") {
+      val r = Result(v1, v2)
+      r.paramSet.size shouldBe 2
+      r.get(k1) shouldEqual Some(v1)
+      r.get(k2) shouldEqual Some(v2)
+      r.get(k3) shouldEqual None
+    }
+  }
+
   describe("Examples of serialization") {
     it("should show reading and writing of commands") {
 
@@ -86,7 +117,7 @@ class ResultTest extends FunSpec with Matchers {
       val i1: Parameter[MatrixData[Double]] = k1.set(m1)
 
       //result
-      val result: Result = Result(prefix).add(i1)
+      val result: Result = Result().add(i1)
 
       //json support - write
       val resultJson: JsValue = JsonSupport.writeResult(result)
@@ -131,7 +162,7 @@ class ResultTest extends FunSpec with Matchers {
       val miscParam1 = miscKey.set(100)
 
       //Setup command with duplicate key via constructor
-      val result = Result(prefix, Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
+      val result = Result(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3)
       //four duplicate keys are removed; now contains one Encoder and one Filter key
       val uniqueKeys1 = result.paramSet.toList.map(_.keyName)
 

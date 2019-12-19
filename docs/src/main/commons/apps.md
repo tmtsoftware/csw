@@ -4,7 +4,6 @@
 
 @@@ index
 * [csw-location-server](../apps/cswlocationserver.md): Start HTTP location server application, required for running the Location Service.
-* [csw-admin-server](../apps/cswadminserver.md): Start HTTP server that supports changing/getting log level of component.
 * [csw-location-agent](../apps/cswlocationagent.md): Application used to start non-CSW services so that register with Location Service.
 * [csw-config-server](../apps/cswonfigserverapp.md): Start a Configuration Service SVN repository.
 * [csw-config-cli](../apps/cswconfigcli.md): Application to perform administrative functions on the Configuration Service.
@@ -102,7 +101,7 @@ Go to `logging_aggreator/dev` and run
 * `docker-compose up  --force-recreate`
 
 This will start Filebeat, Elasticsearch, Logstash and Kibana in a Docker container. Note that `csw-services.sh` will generate all log files under 
-`/tmp/csw/logs/` and Filebeat will watch for them there.
+`/tmp/tmt/logs/csw` and Filebeat will watch for them there.
 
 Once, the Docker container is up, open an browser and go to `http://localhost:5601/` to use Kibana. Go to:
 
@@ -119,4 +118,3 @@ Always pay attention to the [upgrade instructions](https://www.elastic.co/guide/
 for each individual component before performing a stack upgrade.
 
 
- 

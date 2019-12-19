@@ -1,11 +1,13 @@
 package csw.framework.codecs
 
+import csw.command.client.models.framework.ComponentInfo
 import csw.framework.models.{ContainerBootstrapInfo, ContainerInfo, HostBootstrapInfo}
-import csw.params.core.formats.CommonCodecs
+import csw.location.models.codecs.LocationCodecs
 import io.bullet.borer.Codec
 import io.bullet.borer.derivation.MapBasedCodecs.deriveCodec
 
-trait FrameworkCodecs extends CommonCodecs {
+trait FrameworkCodecs extends LocationCodecs {
+  implicit lazy val componentInfoCodec: Codec[ComponentInfo]                   = deriveCodec
   implicit lazy val containerInfoCodec: Codec[ContainerInfo]                   = deriveCodec
   implicit lazy val containerBootstrapInfoCodec: Codec[ContainerBootstrapInfo] = deriveCodec
   implicit lazy val hostBootstrapInfoCodec: Codec[HostBootstrapInfo]           = deriveCodec

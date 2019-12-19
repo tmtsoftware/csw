@@ -4,42 +4,38 @@ import csw.command.client.models.framework.ComponentInfo
 import csw.command.client.models.framework.LocationServiceUsage.{DoNotRegister, RegisterOnly}
 import csw.framework.models.ContainerInfo
 import csw.location.models.ComponentType.{Assembly, HCD}
-import csw.params.core.models.Prefix
+import csw.prefix.models.Prefix
 
 import scala.concurrent.duration.DurationDouble
 
 object ComponentInfos {
   val assemblyInfo: ComponentInfo = ComponentInfo(
-    "SampleAssembly",
+    Prefix("wfos.sampleassembly"),
     Assembly,
-    Prefix("wfos.test"),
     "csw.common.components.framework.SampleComponentBehaviorFactory",
     DoNotRegister,
     Set.empty
   )
 
   val assemblyInfoToSimulateFailure: ComponentInfo = ComponentInfo(
-    "trombone",
+    Prefix("wfos.trombone"),
     Assembly,
-    Prefix("wfos.test"),
     "csw.common.components.framework.ComponentBehaviorFactoryToSimulateFailure",
     DoNotRegister,
     Set.empty
   )
 
   val hcdInfo: ComponentInfo = ComponentInfo(
-    "SampleHcd",
+    Prefix("wfos.samplehcd"),
     HCD,
-    Prefix("wfos.test"),
     "csw.common.components.framework.SampleComponentBehaviorFactory",
     RegisterOnly,
     Set.empty
   )
 
   val hcdInfoWithInitializeTimeout: ComponentInfo = ComponentInfo(
-    "SampleHcd",
+    Prefix("wfos.samplehcd"),
     HCD,
-    Prefix("wfos.test"),
     "csw.common.components.framework.SampleComponentBehaviorFactory",
     RegisterOnly,
     Set.empty,
@@ -47,22 +43,15 @@ object ComponentInfos {
   )
 
   val hcdInfoWithRunTimeout: ComponentInfo = ComponentInfo(
-    "SampleHcd",
+    Prefix("wfos.samplehcd"),
     HCD,
-    Prefix("wfos.test"),
     "csw.common.components.framework.SampleComponentBehaviorFactory",
     RegisterOnly,
     Set.empty,
     5.seconds
   )
 
-  val dummyInfo: ComponentInfo = ComponentInfo(
-    "DummyHcd",
-    HCD,
-    Prefix("wfos.test"),
-    "dummy",
-    DoNotRegister
-  )
+  val dummyInfo: ComponentInfo = ComponentInfo(Prefix("wfos.dummyhcd"), HCD, "dummy", DoNotRegister)
 
   val containerInfo: ContainerInfo = ContainerInfo("container", Set(hcdInfo, assemblyInfo))
 }

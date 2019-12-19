@@ -1,6 +1,6 @@
 package csw.event.client.internal.commons
 
-import akka.stream.Supervision
+import akka.stream.{ActorAttributes, Attributes, Supervision}
 import csw.event.api.exceptions.EventServerNotAvailable
 
 /**
@@ -8,8 +8,10 @@ import csw.event.api.exceptions.EventServerNotAvailable
  * in all other cases of exceptions
  */
 private[event] object EventStreamSupervisionStrategy {
-  val decider: Supervision.Decider = {
+  private val decider: Supervision.Decider = {
     case _: EventServerNotAvailable => Supervision.Stop
     case _                          => Supervision.Resume
   }
+
+  val attributes: Attributes = ActorAttributes.supervisionStrategy(decider)
 }

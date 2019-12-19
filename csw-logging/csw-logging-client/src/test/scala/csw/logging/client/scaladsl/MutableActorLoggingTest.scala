@@ -9,6 +9,7 @@ import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.LoggingTestSuite
 import csw.logging.models.Level
+import csw.prefix.models.Prefix
 
 object TromboneMutableActor {
   def behavior(loggerFactory: LoggerFactory): Behaviors.Receive[LogCommand] = Behaviors.receive { (ctx, msg) =>
@@ -31,7 +32,10 @@ object TromboneMutableActor {
 class MutableActorLoggingTest extends LoggingTestSuite {
 
   private val tromboneActorRef =
-    actorSystem.spawn(TromboneMutableActor.behavior(new LoggerFactory("tromboneMutableHcdActor")), "TromboneMutableActor")
+    actorSystem.spawn(
+      TromboneMutableActor.behavior(new LoggerFactory(Prefix("csw.tromboneMutableHcdActor"))),
+      "csw.TromboneMutableActor"
+    )
 
   def sendMessagesToActor(): Unit = {
     tromboneActorRef ! LogTrace
@@ -48,6 +52,7 @@ class MutableActorLoggingTest extends LoggingTestSuite {
   // DEOPSCSW-117: Provide unique name for each logging instance of components
   // DEOPSCSW-119: Associate source with each log message
   // DEOPSCSW-121: Define structured tags for log messages
+  // CSW-80: Prefix should be in lowercase
   test("messages logged from actor should contain component name, file name, class name, line number and actor path") {
 
     sendMessagesToActor()
@@ -55,7 +60,8 @@ class MutableActorLoggingTest extends LoggingTestSuite {
     logBuffer.foreach { log =>
       log.contains("@componentName") shouldBe true
       log.contains("actor") shouldBe true
-      log.getString("@componentName") shouldBe "tromboneMutableHcdActor"
+      log.getString("@componentName") shouldBe "trombonemutablehcdactor"
+      log.getString("@subsystem") shouldBe "csw"
       log.getString("actor") shouldBe tromboneActorRef.path.toString
       log.getString("file") shouldBe "MutableActorLoggingTest.scala"
       log.contains("line") shouldBe true
@@ -64,6 +70,7 @@ class MutableActorLoggingTest extends LoggingTestSuite {
   }
 
   // DEOPSCSW-126 : Configurability of logging characteristics for component / log instance
+  // CSW-80: Prefix should be in lowercase
   test("should load default filter provided in configuration file and applied to actor messages") {
 
     sendMessagesToActor()
@@ -71,7 +78,7 @@ class MutableActorLoggingTest extends LoggingTestSuite {
     //  As per the filter, hcd should log 3 message of level ERROR and FATAL
     val groupByComponentNamesLog =
       logBuffer.groupBy(json => json.getString("@componentName"))
-    val tromboneHcdLogs = groupByComponentNamesLog("tromboneMutableHcdActor")
+    val tromboneHcdLogs = groupByComponentNamesLog("trombonemutablehcdactor")
 
     tromboneHcdLogs.size shouldBe 3
 

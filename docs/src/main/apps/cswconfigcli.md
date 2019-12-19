@@ -34,6 +34,15 @@ password = config-admin
 These credentials will not be available in actual production environment.
 @@@ 
 
+For development and testing purposes, AAS comes pre-bundled with the following user accounts for config service:
+
+1. username: `admin` password: `tmt-admin` role: `admin`
+1. username: `dev` password: `tmt-dev` role: NONE
+
+@@@ note
+These credentials will not be available in actual production environment.
+@@@ 
+
 ### Examples
 1. 
 ```

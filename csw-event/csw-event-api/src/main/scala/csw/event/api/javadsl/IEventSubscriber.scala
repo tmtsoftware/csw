@@ -8,8 +8,8 @@ import java.util.function.Consumer
 import akka.actor.typed.ActorRef
 import akka.stream.javadsl.Source
 import csw.event.api.scaladsl.SubscriptionMode
-import csw.params.core.models.Subsystem
 import csw.params.events.{Event, EventKey}
+import csw.prefix.models.Subsystem
 
 /**
  * An EventSubscriber interface to subscribe events. The events can be subscribed on [[csw.params.events.EventKey]]. All events
@@ -174,7 +174,7 @@ trait IEventSubscriber {
    * and the subscription is stopped after logging appropriately. [[csw.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine this
    * state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
-   * @param subsystem a valid [[csw.params.core.models.Subsystem]] which represents the source of the events
+   * @param subsystem a valid `Subsystem` which represents the source of the events
    * @param pattern   Subscribes the client to the given patterns. Supported glob-style patterns:
    *                  - h?llo subscribes to hello, hallo and hxllo
    *                  - h*llo subscribes to hllo and heeeello
@@ -194,13 +194,13 @@ trait IEventSubscriber {
    *
    * Note that callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
    *
-   * @param subsystem a valid [[csw.params.core.models.Subsystem]] which represents the source of the events
+   * @param subsystem a valid `Subsystem` which represents the source of the events
    * @param pattern   Subscribes the client to the given patterns. Supported glob-style patterns:
    *- h?llo subscribes to hello, hallo and hxllo
    *- h*llo subscribes to hllo and heeeello
    *- h[ae]llo subscribes to hello and hallo, but not hillo
-   *Use \ to escape special characters if you want to match them verbatim.
-   * @param callback a consumer which defines an operation to execute on each received event
+   *                  Use \ to escape special characters if you want to match them verbatim.
+   * @param callback  a consumer which defines an operation to execute on each received event
    * @return an [[csw.event.api.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
   def pSubscribeCallback(subsystem: Subsystem, pattern: String, callback: Consumer[Event]): IEventSubscription

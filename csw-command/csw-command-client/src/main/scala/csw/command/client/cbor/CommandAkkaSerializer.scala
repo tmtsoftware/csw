@@ -2,10 +2,10 @@ package csw.command.client.cbor
 
 import akka.actor.ExtendedActorSystem
 import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.scaladsl.adapter._
 import akka.serialization.Serializer
 import csw.command.client.messages._
-import csw.command.client.messages.sequencer.SubmitSequenceAndWait
+import csw.command.client.messages.sequencer.SequencerMsg.{QueryFinal, SubmitSequence, Query}
 import csw.command.client.models.framework._
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.GenericLoggerFactory
@@ -31,7 +31,9 @@ class CommandAkkaSerializer(_actorSystem: ExtendedActorSystem) extends Serialize
     case x: LifecycleStateChanged                => Cbor.encode(x).toByteArray
     case x: Components                           => Cbor.encode(x).toByteArray
     case x: LockingResponse                      => Cbor.encode(x).toByteArray
-    case x: SubmitSequenceAndWait                => Cbor.encode(x).toByteArray
+    case x: SubmitSequence                       => Cbor.encode(x).toByteArray
+    case x: Query                                => Cbor.encode(x).toByteArray
+    case x: QueryFinal                           => Cbor.encode(x).toByteArray
     case _ =>
       val ex = new RuntimeException(s"does not support encoding of $o")
       logger.error(ex.getMessage, ex = ex)
@@ -56,7 +58,9 @@ class CommandAkkaSerializer(_actorSystem: ExtendedActorSystem) extends Serialize
       fromBinary[LifecycleStateChanged] orElse
       fromBinary[Components] orElse
       fromBinary[LockingResponse] orElse
-      fromBinary[SubmitSequenceAndWait]
+      fromBinary[SubmitSequence] orElse
+      fromBinary[QueryFinal] orElse
+      fromBinary[Query]
     } getOrElse {
       val ex = new RuntimeException(s"does not support decoding of ${manifest.get}")
       logger.error(ex.getMessage, ex = ex)

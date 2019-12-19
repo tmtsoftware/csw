@@ -21,14 +21,15 @@ import csw.params.commands.ControlCommand;
 import csw.params.commands.Setup;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
+import csw.params.core.models.Id;
 import csw.params.core.models.ObsId;
-import csw.params.core.models.Prefix;
 import csw.params.events.Event;
 import csw.params.events.EventKey;
 import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
 import csw.params.javadsl.JUnits;
+import csw.prefix.models.Prefix;
 import csw.time.core.models.UTCTime;
 
 import java.util.Optional;
@@ -36,7 +37,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-import static csw.params.javadsl.JSubsystem.NFIRAOS;
+import static csw.prefix.javadsl.JSubsystem.NFIRAOS;
 
 /**
  * Domain specific logic should be written in below handlers.
@@ -93,7 +94,7 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
 
         // Construct Setup command
         Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
-        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond);
+        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond());
 
         Setup setupCommand = new Setup(cswCtx.componentInfo().prefix(), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
 
@@ -158,7 +159,7 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
     }
     //#track-location
 
-    private EventKey counterEventKey = new EventKey(new Prefix("nfiraos.samplehcd"), new EventName("HcdCounter"));
+    private EventKey counterEventKey = new EventKey(Prefix.apply(NFIRAOS(), "samplehcd"), new EventName("HcdCounter"));
     private Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter");
 
 
@@ -204,7 +205,7 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
     }
 
     private void setCounterAlarm(int counter) {
-        AlarmKey counterAlarmKey = new AlarmKey(NFIRAOS, cswCtx.componentInfo().name(), "CounterTooHighAlarm");
+        AlarmKey counterAlarmKey = new AlarmKey(cswCtx.componentInfo().prefix(), "CounterTooHighAlarm");
         AlarmSeverity severity = getCounterSeverity(counter);
         cswCtx.alarmService().setSeverity(counterAlarmKey, severity)
                 .whenComplete((d, ex) -> {
@@ -218,17 +219,17 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
     //#alarm
 
     @Override
-    public CommandResponse.ValidateCommandResponse validateCommand(ControlCommand controlCommand) {
+    public CommandResponse.ValidateCommandResponse validateCommand(Id runId, ControlCommand controlCommand) {
         return null;
     }
 
     @Override
-    public CommandResponse.SubmitResponse onSubmit(ControlCommand controlCommand) {
-        return new CommandResponse.Completed(controlCommand.runId());
+    public CommandResponse.SubmitResponse onSubmit(Id runId, ControlCommand controlCommand) {
+        return new CommandResponse.Completed(runId);
     }
 
     @Override
-    public void onOneway(ControlCommand controlCommand) {
+    public void onOneway(Id runId, ControlCommand controlCommand) {
     }
 
     @Override

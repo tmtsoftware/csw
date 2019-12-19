@@ -18,14 +18,16 @@ import csw.params.commands.ControlCommand;
 import csw.params.commands.Setup;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
+import csw.params.core.models.Id;
 import csw.params.core.models.ObsId;
-import csw.params.core.models.Prefix;
 import csw.params.events.Event;
 import csw.params.events.EventKey;
 import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
 import csw.params.javadsl.JUnits;
+import csw.prefix.models.Prefix;
+import csw.prefix.javadsl.JSubsystem;
 import csw.time.core.models.UTCTime;
 
 import java.util.Optional;
@@ -88,18 +90,18 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
 
         // Construct Setup command
         Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
-        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond);
+        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond());
 
         Setup setupCommand = new Setup(cswCtx.componentInfo().prefix(), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
 
         Timeout commandResponseTimeout = new Timeout(10, TimeUnit.SECONDS);
 
         // Submit command and handle response
-        hcd.submitAndWait(setupCommand, commandResponseTimeout)
-                .exceptionally(ex -> new CommandResponse.Error(setupCommand.runId(), "Exception occurred when sending command: " + ex.getMessage()))
+        hcd.submitAndWait(setupCommand, commandResponseTimeout)   // FIXME -- NEED to ask about exceptionally runId
+                .exceptionally(ex -> new CommandResponse.Error(Id.apply(), "Exception occurred when sending command: " + ex.getMessage()))
                 .thenAccept(commandResponse -> {
                     if (commandResponse instanceof CommandResponse.Locked) {
-                        log.error("Sleed command failed: HCD is locked");
+                        log.error("Sleep command failed: HCD is locked");
                     } else if (commandResponse instanceof CommandResponse.Invalid) {
                         CommandResponse.Invalid inv = (CommandResponse.Invalid) commandResponse;
                         log.error("Sleep command invalid (" + inv.issue().getClass().getSimpleName() + "): " + inv.issue().reason());
@@ -119,7 +121,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
 
         // Construct Setup command
         Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
-        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond);
+        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond());
 
         Setup setupCommand = new Setup(cswCtx.componentInfo().prefix(), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
 
@@ -135,7 +137,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
                         log.error("Sleep command invalid");
                         return new CommandResponse.Error(commandResponse.runId(), "test error");
                     }
-                }).exceptionally(ex -> new CommandResponse.Error(setupCommand.runId(), ex.getMessage()))
+                }).exceptionally(ex -> new CommandResponse.Error(Id.apply(), ex.getMessage()))  //TODO Not sure how to handle this
                 .toCompletableFuture();
 
 
@@ -185,7 +187,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     //#track-location
 
     //#subscribe
-    private EventKey counterEventKey = new EventKey(new Prefix("nfiraos.samplehcd"), new EventName("HcdCounter"));
+    private EventKey counterEventKey = new EventKey(new Prefix(JSubsystem.NFIRAOS(), "samplehcd"), new EventName("HcdCounter"));
     private Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter");
 
     private void processEvent(Event event) {
@@ -216,17 +218,17 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     //#subscribe
 
     @Override
-    public CommandResponse.ValidateCommandResponse validateCommand(ControlCommand controlCommand) {
+    public CommandResponse.ValidateCommandResponse validateCommand(Id runId, ControlCommand controlCommand) {
         return null;
     }
 
     @Override
-    public CommandResponse.SubmitResponse onSubmit(ControlCommand controlCommand) {
-        return new CommandResponse.Completed(controlCommand.runId());
+    public CommandResponse.SubmitResponse onSubmit(Id runId, ControlCommand controlCommand) {
+        return new CommandResponse.Completed(runId);
     }
 
     @Override
-    public void onOneway(ControlCommand controlCommand) {
+    public void onOneway(Id runId, ControlCommand controlCommand) {
     }
 
     @Override

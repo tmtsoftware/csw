@@ -63,7 +63,7 @@ class LoggingSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
         | appenders = ["abcd"]
         |}
       """.stripMargin)
-    val actorSystem = ActorSystem(SpawnProtocol.behavior, "test", config)
+    val actorSystem = ActorSystem(SpawnProtocol(), "test", config)
     val exception = intercept[AppenderNotFoundException] {
       LoggingSystemFactory.start("foo-name", "foo-version", InetAddress.getLocalHost.getHostName, actorSystem)
     }

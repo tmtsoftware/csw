@@ -8,7 +8,8 @@ import csw.alarm.api.javadsl.JAlarmSeverity;
 import csw.alarm.api.scaladsl.AlarmAdminService;
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup;
 import csw.alarm.models.*;
-import csw.params.javadsl.JSubsystem;
+import csw.prefix.javadsl.JSubsystem;
+import csw.prefix.models.Prefix;
 import csw.time.core.models.UTCTime;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -22,16 +23,18 @@ import scala.concurrent.duration.FiniteDuration;
 import java.util.concurrent.TimeUnit;
 
 import static csw.alarm.models.Key.AlarmKey;
+import static csw.prefix.javadsl.JSubsystem.NFIRAOS;
 import static org.hamcrest.CoreMatchers.isA;
 import static org.junit.Assert.*;
 
 // DEOPSCSW-444: Set severity api for component
+// CSW-83: Alarm models should take prefix
 public class JSeverityServiceModuleTest extends JUnitSuite {
 
     private static AlarmServiceTestSetup alarmServiceTestSetup = new AlarmServiceTestSetup();
     private static IAlarmService jAlarmService = alarmServiceTestSetup.jAlarmService();
     private static AlarmAdminService alarmService = alarmServiceTestSetup.alarmService();
-
+    private Prefix prefix = Prefix.apply(NFIRAOS(), "trombone");
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
@@ -60,7 +63,7 @@ public class JSeverityServiceModuleTest extends JUnitSuite {
     // DEOPSCSW-500: Update alarm time on current severity change
     @Test
     public void setSeverity_shouldSetSeverityForAGivenKey() throws Exception {
-        AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey(JSubsystem.NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm");
+        AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey(prefix, "tromboneAxisHighLimitAlarm");
 
         FullAlarmSeverity initialSeverity = Await.result(alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarm), new FiniteDuration(2, TimeUnit.SECONDS));
         assertEquals(JAlarmSeverity.Disconnected(), initialSeverity);
@@ -89,7 +92,7 @@ public class JSeverityServiceModuleTest extends JUnitSuite {
 
     @Test
     public void setSeverity_shouldThrowInvalidSeverityExceptionWhenUnsupportedSeverityIsProvided() throws Exception {
-        AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey(JSubsystem.NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm");
+        AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey(prefix, "tromboneAxisHighLimitAlarm");
 
         exception.expectCause(isA(InvalidSeverityException.class));
         setSeverityAndGetStatus(tromboneAxisHighLimitAlarm, JAlarmSeverity.Critical());
@@ -99,7 +102,7 @@ public class JSeverityServiceModuleTest extends JUnitSuite {
     // DEOPSCSW-500: Update alarm time on current severity change
     @Test
     public void setSeverity_shouldLatchAlarmWhenItIsHigherThanPreviousLatchedSeverity() throws Exception {
-        AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey(JSubsystem.NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm");
+        AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey(prefix, "tromboneAxisHighLimitAlarm");
 
         FullAlarmSeverity initialSeverity = Await.result(alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarm), new FiniteDuration(2, TimeUnit.SECONDS));
         assertEquals(JAlarmSeverity.Disconnected(), initialSeverity);
@@ -129,7 +132,7 @@ public class JSeverityServiceModuleTest extends JUnitSuite {
 
     @Test
     public void setSeverity_shouldNotAutoAcknowledgeAlarmEvenWhenItIsAutoAcknowlegable() throws Exception {
-        AlarmKey tromboneAxisLowLimitAlarm = new AlarmKey(JSubsystem.NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm");
+        AlarmKey tromboneAxisLowLimitAlarm = new AlarmKey(prefix, "tromboneAxisHighLimitAlarm");
 
         FullAlarmSeverity initialSeverity = Await.result(alarmService.getCurrentSeverity(tromboneAxisLowLimitAlarm), new FiniteDuration(2, TimeUnit.SECONDS));
         assertEquals(JAlarmSeverity.Disconnected(), initialSeverity);
@@ -148,7 +151,7 @@ public class JSeverityServiceModuleTest extends JUnitSuite {
     @Test
     public void setSeverity_shouldNotUpdateAlarmTimeWhenSeverityDoesNotChange() throws Exception {
         // latchable alarm
-        AlarmKey highLimitAlarmKey = new AlarmKey(JSubsystem.NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm");
+        AlarmKey highLimitAlarmKey = new AlarmKey(prefix, "tromboneAxisHighLimitAlarm");
         UTCTime defaultAlarmTime = getStatus(highLimitAlarmKey).alarmTime();
 
         // latch it to major

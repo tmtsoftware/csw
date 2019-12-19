@@ -2,10 +2,10 @@ package example.time
 
 import java.time.Duration
 
-import akka.actor.typed.Behavior
+import akka.actor.typed.{Behavior, Scheduler}
 import akka.actor.typed.scaladsl.adapter.TypedActorRefOps
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
-import akka.actor.{ActorRef, Scheduler, typed}
+import akka.actor.{ActorRef, typed}
 import csw.time.core.models.UTCTime
 import csw.time.scheduler.TimeServiceSchedulerFactory
 import csw.time.scheduler.api.TimeServiceScheduler
@@ -42,7 +42,7 @@ class SchedulerExamples(ctx: ActorContext[UTCTime]) {
     }
   }
 
-  private val actorRef: ActorRef = ctx.spawnAnonymous(SchedulingHandler.behavior).toUntyped
+  private val actorRef: ActorRef = ctx.spawnAnonymous(SchedulingHandler.behavior).toClassic
 
   timeServiceScheduler.scheduleOnce(utcTime, actorRef, UTCTime.now())
 

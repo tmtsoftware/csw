@@ -20,6 +20,7 @@ object Common extends AutoPlugin {
 
   import autoImport._
   override lazy val projectSettings: Seq[Setting[_]] = Seq(
+    dependencyOverrides += AkkaHttp.`akka-http-spray-json`,
     organization := "com.github.tmtsoftware.csw",
     organizationName := "TMT Org",
     scalaVersion := Libs.ScalaVersion,
@@ -59,12 +60,13 @@ object Common extends AutoPlugin {
     fork := true,
     suppressAnnotatedWarnings := true,
     enableFatalWarnings := false,
-    libraryDependencies ++= Seq(`silencer-lib`),
+    libraryDependencies ++= Seq(`silencer-lib` % Provided),
     libraryDependencies ++= (if (suppressAnnotatedWarnings.value) Seq(compilerPlugin(`silencer-plugin`)) else Seq.empty),
     autoCompilerPlugins := true,
     cancelable in Global := true, // allow ongoing test(or any task) to cancel with ctrl + c and still remain inside sbt
     scalafmtOnCompile := true,
-    unidocGenjavadocVersion := "0.13",
-    dependencyUpdatesFilter := dependencyUpdatesFilter.value - moduleFilter(organization = "org.scala-lang")
+    unidocGenjavadocVersion := "0.15",
+    dependencyUpdatesFilter := dependencyUpdatesFilter.value - moduleFilter(organization = "org.scala-lang"),
+    scalacOptions += "-P:silencer:globalFilters=`silencer-plugin` was enabled but the @silent annotation was not found on classpath - have you added `silencer-lib` as a library dependency?"
   )
 }

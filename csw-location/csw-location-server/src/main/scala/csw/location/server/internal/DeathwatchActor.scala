@@ -3,9 +3,10 @@ package csw.location.server.internal
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior, Terminated}
 import akka.cluster.ddata.typed.scaladsl.Replicator
-import akka.cluster.ddata.typed.scaladsl.Replicator.Changed
+import akka.cluster.ddata.typed.scaladsl.Replicator.{Changed, SubscribeResponse}
 import csw.location.api.extensions.URIExtension.RichURI
 import csw.location.api.scaladsl.LocationService
+import csw.location.models.Connection.HttpConnection
 import csw.location.models.{AkkaLocation, Location}
 import csw.location.server.commons.{CswCluster, LocationServiceLogger}
 import csw.location.server.internal.Registry.AllServices
@@ -37,7 +38,7 @@ private[location] class DeathwatchActor(locationService: LocationService)(implic
 
       // Ignore HttpLocation or TcpLocation (Do not watch)
       unwatchedLocations.foreach {
-        case AkkaLocation(_, _, actorRefURI) =>
+        case AkkaLocation(_, actorRefURI) =>
           log.debug(s"Started watching actor: ${actorRefURI.toString}")
           context.watch(actorRefURI.toActorRef)
         case _ => // ignore http and tcp location
@@ -53,13 +54,16 @@ private[location] class DeathwatchActor(locationService: LocationService)(implic
         ctx.unwatch(deadActorRef)
         //Unregister the dead location and remove it from the list of watched locations
         val maybeLocation = watchedLocations.find {
-          case AkkaLocation(_, _, actorRefUri) => deadActorRef == actorRefUri.toActorRef
-          case _                               => false
+          case AkkaLocation(_, actorRefUri) => deadActorRef == actorRefUri.toActorRef
+          case _                            => false
         }
         maybeLocation match {
           case Some(location) =>
             //if deadActorRef is mapped to a location, unregister it and remove it from watched locations
             locationService.unregister(location.connection)
+            // unregister the http connection for an akka connection if present else do nothing, locationService.unregister is idempotent
+            val httpConnection = HttpConnection(location.connection.componentId)
+            locationService.unregister(httpConnection)
             behavior(watchedLocations - location)
           case None =>
             //if deadActorRef does not match any location, don't change a thing!
@@ -81,9 +85,13 @@ private[location] object DeathwatchActor {
    */
   def start(cswCluster: CswCluster, locationService: LocationService): ActorRef[Msg] = {
     log.debug("Starting Deathwatch actor")
-    val actorRef = cswCluster.typedSystem.spawn(
+    val behavior: Behavior[Msg] = new DeathwatchActor(locationService)(cswCluster.typedSystem).behavior(Set.empty)
+    val widenedBehaviour: Behavior[SubscribeResponse[AllServices.Value]] = behavior.transformMessages {
+      case x @ Changed(_) => x
+    }
+    val actorRef: ActorRef[SubscribeResponse[AllServices.Value]] = cswCluster.typedSystem.spawn(
       //span the actor with empty set of watched locations
-      new DeathwatchActor(locationService)(cswCluster.typedSystem).behavior(Set.empty),
+      widenedBehaviour,
       name = "location-service-death-watch-actor"
     )
 

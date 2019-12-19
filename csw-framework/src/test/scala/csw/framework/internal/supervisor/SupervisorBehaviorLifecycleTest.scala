@@ -4,14 +4,13 @@ import akka.actor.testkit.typed.Effect.Spawned
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestInbox, TestProbe}
 import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
 import akka.actor.typed.{ActorRef, Terminated}
-import csw.command.client.messages.CommandResponseManagerMessage.Query
 import csw.command.client.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.command.client.messages.FromComponentLifecycleMessage.Running
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.Restart
 import csw.command.client.messages.SupervisorIdleMessage.InitializeTimeout
 import csw.command.client.messages.SupervisorInternalRunningMessage.{RegistrationNotRequired, RegistrationSuccess}
-import csw.command.client.messages.{CommandResponseManagerMessage, ContainerIdleMessage, SupervisorMessage, TopLevelActorMessage}
+import csw.command.client.messages.{ContainerIdleMessage, SupervisorMessage, TopLevelActorMessage}
 import csw.command.client.models.framework.LocationServiceUsage.DoNotRegister
 import csw.command.client.models.framework.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.command.client.models.framework.ToComponentLifecycleMessage._
@@ -22,8 +21,6 @@ import csw.framework.ComponentInfos._
 import csw.framework.exceptions.InitializationFailed
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
-import csw.params.commands.CommandResponse.QueryResponse
-import csw.params.core.models.Id
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 
@@ -39,19 +36,18 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val sampleHcdHandler: ComponentHandlers                        = mock[ComponentHandlers]
     val timerScheduler: TimerScheduler[SupervisorMessage]          = mock[TimerScheduler[SupervisorMessage]]
     val containerIdleMessageProbe: TestProbe[ContainerIdleMessage] = TestProbe[ContainerIdleMessage]
-    val componentActorName                                         = s"${compInfo.name}-${SupervisorBehavior.ComponentActorNameSuffix}"
+    val componentActorName                                         = s"${compInfo.prefix}-${SupervisorBehavior.ComponentActorNameSuffix}"
     val supervisorBehaviorKit = BehaviorTestKit(
       Behaviors
-        .setup[SupervisorMessage](
-          ctx =>
-            new SupervisorBehavior(
-              ctx,
-              timerScheduler,
-              None,
-              new SampleComponentBehaviorFactory,
-              registrationFactory,
-              cswCtx.copy(compInfo)
-            )
+        .setup[SupervisorMessage](ctx =>
+          new SupervisorBehavior(
+            ctx,
+            timerScheduler,
+            None,
+            new SampleComponentBehaviorFactory,
+            registrationFactory,
+            cswCtx.copy(compInfo)
+          )
         )
     )
 
@@ -255,7 +251,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
       supervisorBehaviorKit.signal(Terminated(childComponentInbox.ref))
     }
   }
-
+  /*
   test("supervisor should handle Command Response Manager messages by forwarding it to Command Response Manager") {
     val testData = new TestData(hcdInfo)
     import testData._
@@ -279,4 +275,5 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
       CommandResponseManagerMessage.Unsubscribe(testCmdId, queryResponseProbe.ref)
     )
   }
+ */
 }

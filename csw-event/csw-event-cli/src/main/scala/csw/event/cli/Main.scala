@@ -1,7 +1,6 @@
 package csw.event.cli
 
 import csw.event.cli.args.{ArgsParser, Options}
-import csw.event.cli.commons.ApplicationFinishedReason
 import csw.event.cli.wiring.Wiring
 import csw.location.client.utils.LocationServerStatus
 
@@ -21,7 +20,7 @@ object Main extends App {
     startLogging(name)
 
     try cliApp.start(options)
-    finally actorRuntime.shutdown(ApplicationFinishedReason)
+    finally actorRuntime.shutdown()
   }
 }
 // $COVERAGE-ON$

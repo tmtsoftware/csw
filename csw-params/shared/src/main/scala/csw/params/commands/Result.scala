@@ -1,17 +1,13 @@
 package csw.params.commands
 
-import csw.params.core.generics.{Parameter, ParameterSetKeyData, ParameterSetType}
-import csw.params.core.models.Prefix
+import csw.params.core.generics.{Parameter, ParameterSetType}
 
 /**
  * A result containing parameters for command response
- *
- * @param prefix   identifies the subsystem that received the command and created command response out of it
- * @param paramSet an optional initial set of parameters (keys with values)
  */
-case class Result(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
-    extends ParameterSetType[Result]
-    with ParameterSetKeyData {
+case class Result private[params] (paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]) extends ParameterSetType[Result] {
+
+  def nonEmpty: Boolean = paramSet.nonEmpty
 
   /**
    * Create a new Result instance when a parameter is added or removed
@@ -24,19 +20,25 @@ case class Result(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parame
   /**
    * A java helper to construct Result
    */
-  def this(prefix: String) = this(Prefix(prefix))
+  def this() = this(Set.empty)
 
+  /**
+   * A String representation for concrete implementation of this trait
+   */
+  override def toString: String = s"$typeName($dataToString)"
 }
 
 object Result {
 
+  def emptyResult = Result()
+
   /**
    * A helper method to create Result instance
    *
-   * @param prefix identifies the subsystem that received the command and created command response out of it
-   * @param paramSet an optional initial set of parameters (keys with values)
-   * @return a Result instance with provided prefix and paramSet
+   * @param params an optional list of parameters (keys with values)
+   * @return a Result instance with provided paramSet
    */
-  def apply(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): Result =
-    new Result(prefix).madd(paramSet)
+  def apply(params: Parameter[_]*): Result = {
+    new Result().madd(params.toSet)
+  }
 }

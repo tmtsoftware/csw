@@ -4,7 +4,7 @@ import java.util.regex.Pattern
 
 import csw.alarm.extension.RichStringExtentions.RichString
 import csw.alarm.commons.Separators.KeySeparator
-import csw.params.core.models.Subsystem
+import csw.prefix.models.{Prefix, Subsystem}
 
 /**
  * A wrapper class representing the key for an alarm/component/subsystem/system
@@ -43,12 +43,11 @@ object Key {
    * Represents unique alarm in the given subsystem and component e.g. nfiraos.trombone.tromboneaxislowlimitalarm
    *
    * @note component and name cannot contain invalid characters i.e. `* [ ] ^ -`
-   * @param subsystem this alarm belongs to e.g. NFIRAOS
-   * @param component this alarm belongs to e.g trombone
+   * @param prefix this alarm belongs to e.g. tcs.filter.wheel
    * @param name represents the name of the alarm unique to the component e.g tromboneAxisLowLimitAlarm
    */
-  case class AlarmKey(subsystem: Subsystem, component: String, name: String) extends Key(subsystem.name, component, name) {
-    require(!component.matches(invalidChars), "key contains invalid characters")
+  case class AlarmKey(prefix: Prefix, name: String) extends Key(prefix.subsystem.name, prefix.componentName, name) {
+    require(!prefix.componentName.matches(invalidChars), "key contains invalid characters")
     require(!name.matches(invalidChars), "key contains invalid characters")
   }
 
@@ -56,11 +55,10 @@ object Key {
    * Represents a key for all the alarms of a component
    *
    * @note component cannot contain invalid characters i.e. `* [ ] ^ -`
-   * @param subsystem this component belongs to e.g. NFIRAOS
-   * @param component represents all alarms belonging to this component e.g trombone
+   * @param prefix this alarm belongs to e.g. tcs.filter.wheel
    */
-  case class ComponentKey(subsystem: Subsystem, component: String) extends Key(subsystem.name, component, "*") {
-    require(!component.matches(invalidChars), "component name contains invalid characters")
+  case class ComponentKey(prefix: Prefix) extends Key(prefix.subsystem.name, prefix.componentName, "*") {
+    require(!prefix.componentName.matches(invalidChars), "component name contains invalid characters")
   }
 
   /**
@@ -77,7 +75,7 @@ object Key {
 
   object AlarmKey {
     private[alarm] def apply(keyStr: String): AlarmKey = keyStr.split(KeySeparator) match {
-      case Array(subsystem, component, name) => AlarmKey(Subsystem.withName(subsystem), component, name)
+      case Array(subsystem, component, name) => AlarmKey(Prefix(Subsystem.withNameInsensitive(subsystem), component), name)
       case _                                 => throw new IllegalArgumentException(s"Unable to parse '$keyStr' to make AlarmKey object")
     }
   }

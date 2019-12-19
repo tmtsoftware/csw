@@ -2,7 +2,7 @@ package example.framework.components.hcd
 
 import java.nio.file.Paths
 
-import akka.actor.Scheduler
+import akka.actor.typed.Scheduler
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.AskPattern.Askable
@@ -15,6 +15,7 @@ import csw.location.models.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandResponse.{Accepted, Completed, SubmitResponse, ValidateCommandResponse}
 import csw.params.commands.{ControlCommand, Observe, Setup}
+import csw.params.core.models.Id
 import csw.time.core.models.UTCTime
 import example.framework.components.ConfigNotAvailableException
 import example.framework.components.assembly.WorkerActorMsgs.{GetStatistics, InitialState}
@@ -57,21 +58,21 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
   //#initialize-handler
 
   //#validateCommand-handler
-  override def validateCommand(controlCommand: ControlCommand): ValidateCommandResponse = controlCommand match {
-    case _: Setup   => Accepted(controlCommand.runId) // validation for setup goes here
-    case _: Observe => Accepted(controlCommand.runId) // validation for observe goes here
+  override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse = controlCommand match {
+    case _: Setup   => Accepted(runId) // validation for setup goes here
+    case _: Observe => Accepted(runId) // validation for observe goes here
   }
   //#validateCommand-handler
 
   //#onSubmit-handler
-  override def onSubmit(controlCommand: ControlCommand): SubmitResponse = controlCommand match {
-    case setup: Setup     => submitSetup(setup)     // includes logic to handle Submit with Setup config command
-    case observe: Observe => submitObserve(observe) // includes logic to handle Submit with Observe config command
+  override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse = controlCommand match {
+    case setup: Setup     => submitSetup(runId, setup)     // includes logic to handle Submit with Setup config command
+    case observe: Observe => submitObserve(runId, observe) // includes logic to handle Submit with Observe config command
   }
   //#onSubmit-handler
 
   //#onOneway-handler
-  override def onOneway(controlCommand: ControlCommand): Unit = controlCommand match {
+  override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = controlCommand match {
     case setup: Setup     => onewaySetup(setup)     // includes logic to handle Oneway with Setup config command
     case observe: Observe => onewayObserve(observe) // includes logic to handle Oneway with Setup config command
   }
@@ -131,14 +132,14 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
   /**
    * in case of submit command, component writer is required to update commandResponseManager with the result
    */
-  private def submitSetup(setup: Setup): SubmitResponse = {
+  private def submitSetup(runId: Id, setup: Setup): SubmitResponse = {
     processSetup(setup)
-    Completed(setup.runId)
+    Completed(runId)
   }
 
-  private def submitObserve(observe: Observe): SubmitResponse = {
+  private def submitObserve(runId: Id, observe: Observe): SubmitResponse = {
     processObserve(observe)
-    Completed(observe.runId)
+    Completed(runId)
   }
 
   private def onewaySetup(setup: Setup): Unit = processSetup(setup)

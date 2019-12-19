@@ -1,10 +1,7 @@
 package csw.config.client;
 
-import akka.actor.CoordinatedShutdown;
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.javadsl.Behaviors;
-import akka.http.javadsl.Http;
-import akka.stream.Materializer;
 import csw.config.api.javadsl.IConfigClientService;
 import csw.config.api.javadsl.IConfigService;
 import csw.config.client.internal.ActorRuntime;
@@ -20,24 +17,21 @@ import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
-import java.util.concurrent.TimeUnit;
-
 public class JConfigClientBaseSuite extends JMockedAuthentication {
 
     private csw.location.server.internal.ServerWiring locationWiring = new csw.location.server.internal.ServerWiring();
 
     private ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create(Behaviors.empty(), "Guardian"));
-    private ILocationService clientLocationService = JHttpLocationServiceFactory.makeLocalClient(actorRuntime.typedSystem(), actorRuntime.mat());
+    private ILocationService clientLocationService = JHttpLocationServiceFactory.makeLocalClient(actorRuntime.typedSystem());
 
     public IConfigService configService = JConfigClientFactory.adminApi(actorRuntime.typedSystem(), clientLocationService, factory());
     public IConfigClientService configClientApi = JConfigClientFactory.clientApi(actorRuntime.typedSystem(), clientLocationService);
+    public ActorSystem<?> system = actorRuntime.typedSystem();
 
     private ServerWiring serverWiring = ServerWiring$.MODULE$.make(securityDirectives());
     private HttpService httpService = serverWiring.httpService();
     private TestFileUtils testFileUtils = new TestFileUtils(serverWiring.settings());
     private FiniteDuration timeout = Duration.create(10, "seconds");
-
-    public Materializer mat = actorRuntime.mat();
 
     public void setup() throws Exception {
         Await.result(locationWiring.locationHttpService().start(), timeout);
@@ -53,9 +47,10 @@ public class JConfigClientBaseSuite extends JMockedAuthentication {
     }
 
     public void cleanup() throws Exception {
-        Await.result(httpService.shutdown(CoordinatedShutdown.unknownReason()), timeout);
-        Await.result(actorRuntime.untypedSystem().terminate(), timeout);
-        Await.result(serverWiring.actorRuntime().untypedSystem().terminate(), timeout);
-        Await.result(locationWiring.actorRuntime().shutdown(CoordinatedShutdown.unknownReason()), timeout);
+        Await.result(httpService.shutdown(), timeout);
+        actorRuntime.typedSystem().terminate();
+        Await.result(actorRuntime.typedSystem().whenTerminated(), timeout);
+        Await.result(serverWiring.actorRuntime().classicSystem().terminate(), timeout);
+        Await.result(locationWiring.actorRuntime().shutdown(), timeout);
     }
 }

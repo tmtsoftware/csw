@@ -24,6 +24,8 @@ import csw.location.models.{ComponentId, LocationRemoved, LocationUpdated, Track
 import csw.logging.models.Level.INFO
 import csw.logging.client.internal.LoggingSystem
 import csw.params.core.states.{CurrentState, StateName}
+import csw.prefix.models.Subsystem
+import csw.prefix.models.Prefix
 import io.lettuce.core.RedisClient
 import play.api.libs.json.{JsObject, Json}
 
@@ -34,6 +36,8 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-167: Creation and Deployment of Standalone Components
 // DEOPSCSW-177: Hooks for lifecycle management
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
+// CSW-80: Prefix should be in lowercase
+// CSW-82: ComponentInfo should take prefix
 class StandaloneComponentTest extends FrameworkIntegrationSuite {
   import testWiring._
   // all log messages will be captured in log buffer
@@ -42,8 +46,8 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
   private var loggingSystem: LoggingSystem = _
   // using standaloneActorSystem to start component instead of seedActorSystem,
   // to assert shutdown of the component(which will also shutdown standaloneActorSystem)
-  private val standaloneComponentActorSystem: ActorSystem[SpawnProtocol] =
-    ActorSystemFactory.remote(SpawnProtocol.behavior, "test")
+  private val standaloneComponentActorSystem: ActorSystem[SpawnProtocol.Command] =
+    ActorSystemFactory.remote(SpawnProtocol(), "test")
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
@@ -65,7 +69,7 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")
     val supervisorStateProbe          = TestProbe[CurrentState]("supervisor-state-probe")
-    val akkaConnection                = AkkaConnection(ComponentId("IFS_Detector", HCD))
+    val akkaConnection                = AkkaConnection(ComponentId(Prefix(Subsystem.IRIS, "IFS_Detector"), HCD))
 
     // verify component gets registered with location service
     val maybeLocation = seedLocationService.resolve(akkaConnection, 5.seconds).await
@@ -80,7 +84,7 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
     val supervisorCommandService = CommandServiceFactory.make(resolvedAkkaLocation)
 
     val (_, akkaProbe) =
-      seedLocationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent](seedActorSystem.toUntyped))(Keep.both).run()
+      seedLocationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent](seedActorSystem.toClassic))(Keep.both).run()
     akkaProbe.requestNext() shouldBe a[LocationUpdated]
 
     // on shutdown, component unregisters from location service
@@ -107,7 +111,8 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
     // DEOPSCSW-180: Generic and Specific Log messages
     assertThatMessageIsLogged(
       logBuffer,
-      "IFS_Detector",
+      "iris",
+      "ifs_detector",
       "Invoking lifecycle handler's initialize hook",
       INFO,
       ComponentBehavior.getClass.getName
@@ -115,7 +120,8 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
     // log message from Component handler
     assertThatMessageIsLogged(
       logBuffer,
-      "IFS_Detector",
+      "iris",
+      "ifs_detector",
       "Initializing Component TLA",
       INFO,
       classOf[SampleComponentHandlers].getName

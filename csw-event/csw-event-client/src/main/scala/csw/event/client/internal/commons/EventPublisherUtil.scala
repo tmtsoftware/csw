@@ -1,24 +1,35 @@
 package csw.event.client.internal.commons
 
 import akka.Done
+import akka.actor.typed.ActorSystem
 import akka.actor.{Cancellable, PoisonPill}
+import akka.stream.OverflowStrategy
 import akka.stream.scaladsl.{Sink, Source}
-import akka.stream.{Materializer, OverflowStrategy}
 import csw.event.api.exceptions.PublishFailure
 import csw.params.events.Event
 
 import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.concurrent.{Future, Promise}
 import scala.util.control.NonFatal
 
 /**
  * Utility class to provided common functionalities to different implementations of EventPublisher
  */
-private[event] class EventPublisherUtil(implicit ec: ExecutionContext, mat: Materializer) {
+private[event] class EventPublisherUtil(implicit actorSystem: ActorSystem[_]) {
 
   private val logger = EventServiceLogger.getLogger
 
-  lazy val (actorRef, stream) = Source.actorRef[(Event, Promise[Done])](1024, OverflowStrategy.dropHead).preMaterialize()
+  import EventStreamSupervisionStrategy.attributes
+  import actorSystem.executionContext
+
+  lazy val (actorRef, stream) = Source
+    .actorRef[(Event, Promise[Done])](
+      PartialFunction.empty,
+      PartialFunction.empty,
+      1024,
+      OverflowStrategy.dropHead
+    )
+    .preMaterialize()
 
   def streamTermination(f: Event => Future[Done]): Future[Done] =
     stream
@@ -49,6 +60,7 @@ private[event] class EventPublisherUtil(implicit ec: ExecutionContext, mat: Mate
       .mapAsync(parallelism) { event =>
         publishWithRecovery(event, publish, maybeOnError)
       }
+      .withAttributes(attributes)
       .to(Sink.ignore)
       .run()
 

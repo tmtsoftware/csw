@@ -9,12 +9,11 @@ import akka.stream.javadsl.Sink;
 import csw.event.api.javadsl.IEventSubscription;
 import csw.event.api.scaladsl.SubscriptionModes;
 import csw.event.client.helpers.Utils;
-//import csw.event.client.internal.kafka.KafkaTestProps;
 import csw.event.client.internal.redis.RedisTestProps;
 import csw.event.client.internal.wiring.BaseProperties;
-import csw.params.core.models.Prefix;
 import csw.params.events.*;
-import csw.params.javadsl.JSubsystem;
+import csw.prefix.models.Prefix;
+import csw.prefix.javadsl.JSubsystem;
 import org.scalatestplus.testng.TestNGSuite;
 import org.testng.Assert;
 import org.testng.annotations.AfterSuite;
@@ -26,6 +25,8 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Supplier;
+
+//import csw.event.client.internal.kafka.KafkaTestProps;
 
 //DEOPSCSW-331: Event Service Accessible to all CSW component builders
 //DEOPSCSW-334: Publish an event
@@ -92,7 +93,7 @@ public class JEventSubscriberTest extends TestNGSuite {
                 baseProperties.jSubscriber().subscribe(set)
                         .take(2)
                         .toMat(Sink.foreach(event -> probe.ref().tell(event)), Keep.left())
-                        .run(baseProperties.resumingMat());
+                        .withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
 
         subscription.ready().get(10, TimeUnit.SECONDS);
         probe.expectMessage(Event$.MODULE$.invalidEvent(eventKey));
@@ -242,14 +243,14 @@ public class JEventSubscriberTest extends TestNGSuite {
     // Pattern subscription doesn't work with embedded kafka hence not running it with the suite
     @Test(dataProvider = "redis-provider")
     public void should_be_able_to_subscribe_an_event_with_pattern_from_different_subsystem(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
-        Event testEvent1 = Utils.makeEventWithPrefix(1, new Prefix("csw.prefix"));
-        Event testEvent2 = Utils.makeEventWithPrefix(2, new Prefix("csw.prefix"));
-        Event tcsEvent1 = Utils.makeEventWithPrefix(1, new Prefix("tcs.prefix"));
+        Event testEvent1 = Utils.makeEventWithPrefix(1, new Prefix(JSubsystem.CSW(), "prefix"));
+        Event testEvent2 = Utils.makeEventWithPrefix(2, new Prefix(JSubsystem.CSW(), "prefix"));
+        Event tcsEvent1 = Utils.makeEventWithPrefix(1, new Prefix(JSubsystem.TCS(), "prefix"));
 
         TestProbe<Event> probe = TestProbe.create(baseProperties.actorSystem());
 
         // pattern is * for redis
-        IEventSubscription subscription = baseProperties.jSubscriber().pSubscribeCallback(JSubsystem.CSW, baseProperties.eventPattern(), event -> probe.ref().tell(event));
+        IEventSubscription subscription = baseProperties.jSubscriber().pSubscribeCallback(JSubsystem.CSW(), baseProperties.eventPattern(), event -> probe.ref().tell(event));
         subscription.ready().get(10, TimeUnit.SECONDS);
 
         baseProperties.jPublisher().publish(testEvent1).get(10, TimeUnit.SECONDS);
@@ -273,7 +274,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         Event testEvent3 = Utils.makeEventForKeyName(new EventName("temperature"), 3);
         Event testEvent4 = Utils.makeEventForKeyName(new EventName("move"), 3);
         Event testEvent5 = Utils.makeEventForKeyName(new EventName("cove"), 3);
-        Event testEvent6 = Utils.makeEventForPrefixAndKeyName(new Prefix("csw.test_prefix"), new EventName("move"), 6);
+        Event testEvent6 = Utils.makeEventForPrefixAndKeyName(new Prefix(JSubsystem.CSW(), "test_prefix"), new EventName("move"), 6);
 
         TestInbox<Event> inbox = TestInbox.create();
         TestInbox<Event> inbox2 = TestInbox.create();
@@ -288,11 +289,11 @@ public class JEventSubscriberTest extends TestNGSuite {
         String eventPattern5 = "*";                 //subscribe to all events with prefix `test_prefix` irresepective of event names
 
         // pattern is * for redis
-        IEventSubscription subscription = baseProperties.jSubscriber().pSubscribeCallback(JSubsystem.CSW, eventPattern, event -> inbox.getRef().tell(event));
-        IEventSubscription subscription2 = baseProperties.jSubscriber().pSubscribeCallback(JSubsystem.CSW, eventPattern2, event -> inbox2.getRef().tell(event));
-        IEventSubscription subscription3 = baseProperties.jSubscriber().pSubscribeCallback(JSubsystem.CSW, eventPattern3, event -> inbox3.getRef().tell(event));
-        IEventSubscription subscription4 = baseProperties.jSubscriber().pSubscribeCallback(JSubsystem.CSW, eventPattern4, event -> inbox4.getRef().tell(event));
-        IEventSubscription subscription5 = baseProperties.jSubscriber().pSubscribeCallback(JSubsystem.CSW, eventPattern5, event -> inbox5.getRef().tell(event));
+        IEventSubscription subscription = baseProperties.jSubscriber().pSubscribeCallback(JSubsystem.CSW(), eventPattern, event -> inbox.getRef().tell(event));
+        IEventSubscription subscription2 = baseProperties.jSubscriber().pSubscribeCallback(JSubsystem.CSW(), eventPattern2, event -> inbox2.getRef().tell(event));
+        IEventSubscription subscription3 = baseProperties.jSubscriber().pSubscribeCallback(JSubsystem.CSW(), eventPattern3, event -> inbox3.getRef().tell(event));
+        IEventSubscription subscription4 = baseProperties.jSubscriber().pSubscribeCallback(JSubsystem.CSW(), eventPattern4, event -> inbox4.getRef().tell(event));
+        IEventSubscription subscription5 = baseProperties.jSubscriber().pSubscribeCallback(JSubsystem.CSW(), eventPattern5, event -> inbox5.getRef().tell(event));
 
         subscription.ready().get(10, TimeUnit.SECONDS);
         subscription2.ready().get(10, TimeUnit.SECONDS);
@@ -332,16 +333,16 @@ public class JEventSubscriberTest extends TestNGSuite {
 
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_make_independent_subscriptions(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
-        Prefix prefix = new Prefix("csw.prefix");
+        Prefix prefix = new Prefix(JSubsystem.CSW(), "prefix");
         EventName eventName1 = new EventName("system1");
         EventName eventName2 = new EventName("system2");
         Event event1 = new SystemEvent(prefix, eventName1);
         Event event2 = new SystemEvent(prefix, eventName2);
 
-        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Set.of(event1.eventKey())).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
+        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Set.of(event1.eventKey())).take(2).toMat(Sink.seq(), Keep.both()).withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
         pair.first().ready().get(10, TimeUnit.SECONDS);
 
-        Pair<IEventSubscription, CompletionStage<List<Event>>> pair2 = baseProperties.jSubscriber().subscribe(Set.of(event2.eventKey())).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
+        Pair<IEventSubscription, CompletionStage<List<Event>>> pair2 = baseProperties.jSubscriber().subscribe(Set.of(event2.eventKey())).take(2).toMat(Sink.seq(), Keep.both()).withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
         pair2.first().ready().get(10, TimeUnit.SECONDS);
         Thread.sleep(500);
 
@@ -369,7 +370,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         baseProperties.jPublisher().publish(event2).get(10, TimeUnit.SECONDS); // latest event before subscribing
         Thread.sleep(500); // Needed for redis set which is fire and forget operation
 
-        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
+        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).take(2).toMat(Sink.seq(), Keep.both()).withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
         pair.first().ready().get(10, TimeUnit.SECONDS);
         Thread.sleep(500);
 
@@ -385,7 +386,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     public void should_be_able_to_retrieve_InvalidEvent(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         EventKey eventKey = EventKey.apply(Prefix.apply("csw.invalid"), EventName.apply("test"));
 
-        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).take(1).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
+        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).take(1).toMat(Sink.seq(), Keep.both()).withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
 
         Assert.assertEquals(List.of(Event$.MODULE$.invalidEvent(eventKey)), pair.second().toCompletableFuture().get(10, TimeUnit.SECONDS));
     }
@@ -404,7 +405,7 @@ public class JEventSubscriberTest extends TestNGSuite {
 
         Set<EventKey> eventKeys = Set.of(eventKey1, eventKey2);
 
-        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(eventKeys).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
+        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(eventKeys).take(2).toMat(Sink.seq(), Keep.both()).withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
 
         Set<Event> actualEvents = Set.copyOf(pair.second().toCompletableFuture().get(10, TimeUnit.SECONDS));
 

@@ -1,7 +1,6 @@
 package csw.command.client.messages
 
 import akka.actor.typed.ActorRef
-import csw.command.client.internal.{CommandCorrelation, CommandResponseState, CommandSubscribersState}
 import csw.command.client.messages.CommandSerializationMarker._
 import csw.command.client.messages.sequencer.SequencerMsg
 import csw.command.client.models.framework.PubSub.SubscriberMessage
@@ -10,8 +9,9 @@ import csw.location.models.TrackingEvent
 import csw.logging.models.{Level, LogMetadata}
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
-import csw.params.core.models.{Id, Prefix}
+import csw.params.core.models.Id
 import csw.params.core.states.CurrentState
+import csw.prefix.models.Prefix
 import csw.serializable.CommandSerializable
 import csw.time.core.models.UTCTime
 
@@ -140,18 +140,6 @@ sealed trait CommonMessage extends ComponentCommonMessage with ContainerCommonMe
 object SupervisorContainerCommonMessages {
 
   /**
-   * Represents a shutdown message for a component. When received, component takes necessary clean up action and unregisters
-   * itself with location service. If the component is a container or run as a standalone process, then shutdown will also
-   * kill the jvm process it is running in.
-   */
-  case object Shutdown extends CommonMessage with RemoteMsg
-
-  /**
-   * Represents a restart message for a component
-   */
-  case object Restart extends CommonMessage with RemoteMsg
-
-  /**
    * A Java helper that represents a message for a component. When received, component takes necessary clean up action and unregisters
    * itself with location service. If the component is a container or run as a standalone process, then shutdown will also
    * kill the jvm process it is running in.
@@ -162,6 +150,18 @@ object SupervisorContainerCommonMessages {
    * A Java helper that represents a restart message for a component
    */
   def jRestart(): CommonMessage = Restart
+
+  /**
+   * Represents a shutdown message for a component. When received, component takes necessary clean up action and unregisters
+   * itself with location service. If the component is a container or run as a standalone process, then shutdown will also
+   * kill the jvm process it is running in.
+   */
+  case object Shutdown extends CommonMessage with RemoteMsg
+
+  /**
+   * Represents a restart message for a component
+   */
+  case object Restart extends CommonMessage with RemoteMsg
 }
 ////////////////////
 
@@ -186,8 +186,9 @@ private[csw] object SupervisorInternalRunningMessage {
 
 private[csw] sealed trait SupervisorRestartMessage extends SupervisorMessage
 private[csw] object SupervisorRestartMessage {
-  case object UnRegistrationComplete                    extends SupervisorRestartMessage
   case class UnRegistrationFailed(throwable: Throwable) extends SupervisorRestartMessage
+
+  case object UnRegistrationComplete extends SupervisorRestartMessage
 }
 
 /**
@@ -278,57 +279,27 @@ private[csw] object FromSupervisorMessage {
 
 ////////////////
 
-sealed trait CommandResponseManagerMessage
-object CommandResponseManagerMessage {
-  case class AddOrUpdateCommand(commandResponse: SubmitResponse)                    extends CommandResponseManagerMessage
-  case class AddSubCommand(runId: Id, subCommandId: Id)                             extends CommandResponseManagerMessage
-  case class UpdateSubCommand(commandResponse: SubmitResponse)                      extends CommandResponseManagerMessage
-  case class GetCommandCorrelation(replyTo: ActorRef[CommandCorrelation])           extends CommandResponseManagerMessage
-  case class GetCommandResponseState(replyTo: ActorRef[CommandResponseState])       extends CommandResponseManagerMessage
-  case class SubscriberTerminated(terminated: ActorRef[SubmitResponse])             extends CommandResponseManagerMessage
-  case class QuerySubscriberTerminated(terminated: ActorRef[QueryResponse])         extends CommandResponseManagerMessage
-  case class GetCommandSubscribersState(replyTo: ActorRef[CommandSubscribersState]) extends CommandResponseManagerMessage
-  private[command] case object CleanUpCache                                         extends CommandResponseManagerMessage
+/**
+ * Represents a message to query the command status of a command running on some component
+ *
+ * @param runId represents an unique identifier of command
+ * @param replyTo represents the actor that will receive the command status
+ */
+case class Query(runId: Id, replyTo: ActorRef[SubmitResponse]) extends SupervisorLockMessage with RemoteMsg
 
-  /**
-   * Represents a message to query the command status of a command running on some component
-   *
-   * @param runId represents an unique identifier of command
-   * @param replyTo represents the actor that will receive the command status
-   */
-  case class Query(runId: Id, replyTo: ActorRef[QueryResponse])
-      extends CommandResponseManagerMessage
-      with SupervisorLockMessage
-      with RemoteMsg
-
-  /**
-   * Represents a message to subscribe to change in command status of a command running on some component
-   *
-   * @param runId represents an unique identifier of command
-   * @param replyTo represents the actor that will receive the notification of change in command status
-   */
-  case class Subscribe(runId: Id, replyTo: ActorRef[SubmitResponse])
-      extends CommandResponseManagerMessage
-      with SupervisorLockMessage
-      with RemoteMsg
-
-  /**
-   * Represents a message to un-subscribe to change in command status of a command running on some component
-   *
-   * @param runId represents an unique identifier of command
-   * @param replyTo represents the actor that will be stop receiving notification of change in command status
-   */
-  case class Unsubscribe(runId: Id, replyTo: ActorRef[SubmitResponse])
-      extends CommandResponseManagerMessage
-      with SupervisorLockMessage
-      with RemoteMsg
-}
+/**
+ * Represents a message to subscribe to change in command status of a command running on some component
+ *
+ * @param runId represents an unique identifier of command
+ * @param replyTo represents the actor that will receive the notification of change in command status
+ */
+case class QueryFinal(runId: Id, replyTo: ActorRef[SubmitResponse]) extends SupervisorLockMessage with RemoteMsg
 
 // Parent trait for Messages which will be send to components for interacting with its logging system
 sealed trait LogControlMessage extends ComponentMessage with SequencerMsg with CommandSerializable
 
 // Message to get Logging configuration metadata of the receiver
-case class GetComponentLogMetadata(componentName: String, replyTo: ActorRef[LogMetadata]) extends LogControlMessage with RemoteMsg
+case class GetComponentLogMetadata(replyTo: ActorRef[LogMetadata]) extends LogControlMessage with RemoteMsg
 
 // Message to change the log level of any component
-case class SetComponentLogLevel(componentName: String, logLevel: Level) extends LogControlMessage with RemoteMsg
+case class SetComponentLogLevel(logLevel: Level) extends LogControlMessage with RemoteMsg

@@ -4,17 +4,19 @@ import java.util.Optional
 
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.params.commands.{Command, CommandName, Setup}
 import csw.params.core.generics.{KeyType, Parameter}
-import csw.params.core.models.{ObsId, Prefix}
+import csw.params.core.models.ObsId
 import csw.params.events.SystemEvent
+import csw.prefix.models.Prefix
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
-import scala.jdk.CollectionConverters._
+import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, Future}
+import scala.jdk.CollectionConverters._
 
 case class CommandMsg(
     command: Command,
@@ -34,15 +36,13 @@ class InterOperabilityTest extends FunSuite with Matchers with BeforeAndAfterAll
   private val intParam     = intKey.set(22, 33)
   private val stringParam  = stringKey.set("First", "Second")
 
-  private implicit val system: ActorSystem[_] = ActorSystem(Behavior.empty, "test")
+  private implicit val system: ActorSystem[_] = ActorSystem(Behaviors.empty, "test")
   implicit val testKit: TestKitSettings       = TestKitSettings(system)
 
   private val scalaSetup = Setup(Prefix(prefixStr), CommandName(prefixStr), Some(obsId)).add(intParam).add(stringParam)
 
-  private val javaCmdHandlerBehavior: Future[ActorRef[CommandMsg]] =
+  private val jCommandHandlerActor: ActorRef[CommandMsg] =
     system.systemActorOf[CommandMsg](JavaCommandHandler.behavior(), "javaCommandHandler")
-
-  private val jCommandHandlerActor: ActorRef[CommandMsg] = Await.result(javaCmdHandlerBehavior, 5.seconds)
 
   override protected def afterAll(): Unit = {
     system.terminate()

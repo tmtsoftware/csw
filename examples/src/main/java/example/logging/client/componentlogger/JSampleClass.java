@@ -5,6 +5,7 @@ import csw.command.client.messages.ComponentMessage;
 import csw.logging.api.javadsl.ILogger;
 import csw.logging.client.javadsl.JLoggerFactory;
 import csw.logging.client.scaladsl.LoggerFactory;
+import csw.prefix.models.Prefix;
 
 //#component-logger-class
 public class JSampleClass {
@@ -44,7 +45,7 @@ class JSample {
 
     public void dummyMethod() {
         //#logger-factory-creation
-        JLoggerFactory jLoggerFactory = new JLoggerFactory("my-component-name");
+        JLoggerFactory jLoggerFactory = new JLoggerFactory(Prefix.apply("csw.my-component-name"));
 
         // convert a java JLoggerFactory to scala LoggerFactory
         LoggerFactory loggerFactory = jLoggerFactory.asScala();

@@ -1,13 +1,11 @@
 package csw.location.server.scaladsl
 
-import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.scaladsl
+import akka.actor.typed.SpawnProtocol
+import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.typed.{Behavior, SpawnProtocol}
-import akka.actor.{ActorSystem, CoordinatedShutdown, PoisonPill, typed}
-import akka.stream.Materializer
+import akka.actor.{PoisonPill, typed}
 import akka.stream.scaladsl.{Keep, Sink}
-import akka.stream.typed.scaladsl.ActorMaterializer
 import akka.testkit.TestProbe
 import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.AkkaRegistrationFactory.make
@@ -24,7 +22,7 @@ import csw.location.server.commons.TestFutureExtension.RichFuture
 import csw.location.server.internal.LocationServiceFactory
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.network.utils.Networks
-import csw.params.core.models.Prefix
+import csw.prefix.models.{Prefix, Subsystem}
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
@@ -44,21 +42,16 @@ class LocationServiceCompTest(mode: String)
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
-  implicit var untypedSystem: ActorSystem                    = _
-  implicit var typedSystem: typed.ActorSystem[SpawnProtocol] = _
-  implicit var ec: ExecutionContext                          = _
-  implicit var mat: Materializer                             = _
-  var clusterSystem: typed.ActorSystem[SpawnProtocol]        = _
-  private var locationService: LocationService               = _
+  implicit var typedSystem: typed.ActorSystem[SpawnProtocol.Command] = _
+  implicit var ec: ExecutionContext                                  = _
+  var clusterSystem: typed.ActorSystem[SpawnProtocol.Command]        = _
+  private var locationService: LocationService                       = _
 
-  private val prefix                    = Prefix("nfiraos.ncc.trombone")
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 100.millis)
 
   override protected def beforeAll(): Unit = {
-    typedSystem = ActorSystemFactory.remote(SpawnProtocol.behavior, "test")
-    untypedSystem = typedSystem.toUntyped
-    ec = untypedSystem.dispatcher
-    mat = ActorMaterializer()(typedSystem)
+    typedSystem = ActorSystemFactory.remote(SpawnProtocol(), "test")
+    ec = typedSystem.executionContext
     clusterSystem = ClusterAwareSettings.system
 
     locationService = mode match {
@@ -69,8 +62,12 @@ class LocationServiceCompTest(mode: String)
   override protected def afterEach(): Unit = locationService.unregisterAll().await
 
   override protected def afterAll(): Unit = {
-    if (mode == "cluster") CoordinatedShutdown(clusterSystem.toUntyped).run(UnknownReason).await
-    CoordinatedShutdown(untypedSystem).run(UnknownReason).await
+    if (mode == "cluster") {
+      clusterSystem.terminate()
+      clusterSystem.whenTerminated.await
+    }
+    typedSystem.terminate()
+    typedSystem.whenTerminated.await
   }
 
   // DEOPSCSW-12: Create location service API
@@ -80,7 +77,7 @@ class LocationServiceCompTest(mode: String)
   // DEOPSCSW-23: Unregister a comp/service
   // DEOPSCSW-34: Resolve a connection
   test("should able to register, resolve, list and unregister tcp location") {
-    val componentId: ComponentId         = ComponentId("exampleTCPService", ComponentType.Service)
+    val componentId: ComponentId         = ComponentId(Prefix(Subsystem.CSW, "exampleTCPService"), ComponentType.Service)
     val connection: TcpConnection        = TcpConnection(componentId)
     val Port: Int                        = 1234
     val tcpRegistration: TcpRegistration = TcpRegistration(connection, Port)
@@ -109,7 +106,7 @@ class LocationServiceCompTest(mode: String)
   // DEOPSCSW-23: Unregister a comp/service
   // DEOPSCSW-34: Resolve a connection
   test("should able to register, resolve, list and unregister http location") {
-    val componentId: ComponentId           = models.ComponentId("exampleHTTPService", ComponentType.Service)
+    val componentId: ComponentId           = models.ComponentId(Prefix(Subsystem.CSW, "exampleHTTPService"), ComponentType.Service)
     val httpConnection: HttpConnection     = HttpConnection(componentId)
     val Port: Int                          = 8080
     val Path: String                       = "path/to/resource"
@@ -141,10 +138,10 @@ class LocationServiceCompTest(mode: String)
   // DEOPSCSW-23: Unregister a comp/service
   // DEOPSCSW-34: Resolve a connection
   test("should able to register, resolve, list and unregister akka location") {
-    val componentId      = models.ComponentId("hcd1", ComponentType.HCD)
+    val componentId      = models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD)
     val connection       = AkkaConnection(componentId)
-    val actorRef         = typedSystem.spawn(Behavior.empty, "my-actor-1")
-    val akkaRegistration = AkkaRegistrationFactory.make(connection, Prefix("nfiraos.ncc.trombone"), actorRef.toURI)
+    val actorRef         = typedSystem.spawn(Behaviors.empty, "my-actor-1")
+    val akkaRegistration = AkkaRegistrationFactory.make(connection, actorRef.toURI)
 
     // register, resolve & list akka connection for the first time
     locationService.register(akkaRegistration).await.location.connection shouldBe connection
@@ -170,12 +167,12 @@ class LocationServiceCompTest(mode: String)
   // DEOPSCSW-35: CRDT detects comp/service crash
   // DEOPSCSW-36: Track a crashed service/comp
   test("akka location death watch actor should unregister services whose actorRef is terminated") {
-    val componentId = models.ComponentId("hcd1", ComponentType.HCD)
+    val componentId = models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD)
     val connection  = AkkaConnection(componentId)
-    val actorRef    = typedSystem.spawn(Behavior.empty[Any], "my-actor-to-die")
+    val actorRef    = typedSystem.spawn(Behaviors.empty[Any], "my-actor-to-die")
 
     locationService
-      .register(make(connection, prefix, actorRef.toURI))
+      .register(make(connection, actorRef.toURI))
       .await
       .location
       .connection shouldBe connection
@@ -183,7 +180,7 @@ class LocationServiceCompTest(mode: String)
     Thread.sleep(10)
 
     locationService.list.await shouldBe List(
-      make(connection, prefix, actorRef.toURI).location(Networks().hostname)
+      make(connection, actorRef.toURI).location(Networks().hostname)
     )
 
     actorRef ! PoisonPill
@@ -196,10 +193,10 @@ class LocationServiceCompTest(mode: String)
   // DEOPSCSW-36: Track a crashed service/comp
   test("should able to track tcp connection and get location updated(on registration) and remove(on unregistration) messages") {
     val Port               = 1234
-    val redis1Connection   = TcpConnection(models.ComponentId("redis1", ComponentType.Service))
+    val redis1Connection   = TcpConnection(models.ComponentId(Prefix(Subsystem.CSW, "redis1"), ComponentType.Service))
     val redis1Registration = TcpRegistration(redis1Connection, Port)
 
-    val redis2Connection   = TcpConnection(models.ComponentId("redis2", ComponentType.Service))
+    val redis2Connection   = TcpConnection(models.ComponentId(Prefix(Subsystem.CSW, "redis2"), ComponentType.Service))
     val redis2registration = TcpRegistration(redis2Connection, Port)
 
     val probe = scaladsl.TestProbe[TrackingEvent]("test-probe")
@@ -214,17 +211,17 @@ class LocationServiceCompTest(mode: String)
     result2.unregister().await
     probe.expectMessage(LocationRemoved(redis1Connection))
 
-    switch.shutdown()
+    switch.cancel()
   }
 
   // DEOPSCSW-12: Create location service API
   test("should be able to subscribe a tcp connection and receive notifications via callback") {
     val hostname           = Networks().hostname
     val Port               = 1234
-    val redis1Connection   = TcpConnection(models.ComponentId("redis1", ComponentType.Service))
+    val redis1Connection   = TcpConnection(models.ComponentId(Prefix(Subsystem.CSW, "redis1"), ComponentType.Service))
     val redis1Registration = TcpRegistration(redis1Connection, Port)
 
-    val probe = TestProbe()
+    val probe = TestProbe()(typedSystem.toClassic)
 
     val switch = locationService.subscribe(redis1Connection, te => probe.ref ! te)
 
@@ -234,25 +231,25 @@ class LocationServiceCompTest(mode: String)
     locationService.unregister(redis1Connection).await
     probe.expectMsg(LocationRemoved(redis1Registration.connection))
 
-    switch.shutdown()
+    switch.cancel()
     locationService.register(redis1Registration).await
     probe.expectNoMessage(200.millis)
   }
 
-  // DEOPSCSW-26: Track a connection
+  // DEOPSCSW-26: Track a connection  // TODO
   test("should able to track http and akka connection registered before tracking started") {
     val hostname = Networks().hostname
     //create http registration
     val port             = 9595
-    val prefix           = "csw.trombone.hcd"
-    val httpConnection   = HttpConnection(models.ComponentId("Assembly1", ComponentType.Assembly))
-    val httpRegistration = HttpRegistration(httpConnection, port, prefix)
+    val prefix           = Prefix(Subsystem.CSW, "Assembly1")
+    val httpConnection   = HttpConnection(models.ComponentId(prefix, ComponentType.Assembly))
+    val httpRegistration = HttpRegistration(httpConnection, port, prefix.toString)
 
     //create akka registration
-    val akkaComponentId  = models.ComponentId("container1", ComponentType.Container)
+    val akkaComponentId  = models.ComponentId(Prefix(Subsystem.CSW, "container1"), ComponentType.Container)
     val akkaConnection   = AkkaConnection(akkaComponentId)
-    val actorRef         = typedSystem.spawn(Behavior.empty, "container1-actor")
-    val akkaRegistration = AkkaRegistrationFactory.make(akkaConnection, Prefix(prefix), actorRef.toURI)
+    val actorRef         = typedSystem.spawn(Behaviors.empty, "container1-actor")
+    val akkaRegistration = AkkaRegistrationFactory.make(akkaConnection, actorRef.toURI)
 
     val httpRegistrationResult = locationService.register(httpRegistration).await
     val akkaRegistrationResult = locationService.register(akkaRegistration).await
@@ -271,13 +268,13 @@ class LocationServiceCompTest(mode: String)
     httpProbe.expectMessage(LocationRemoved(httpConnection))
 
     //stop tracking http connection
-    httpSwitch.shutdown()
+    httpSwitch.cancel()
 
     //unregister and stop tracking akka connection
     akkaRegistrationResult.unregister().await
     akkaProbe.expectMessage(LocationRemoved(akkaConnection))
 
-    akkaSwitch.shutdown()
+    akkaSwitch.cancel()
   }
 
   // DEOPSCSW-26: Track a connection
@@ -285,9 +282,9 @@ class LocationServiceCompTest(mode: String)
     val hostname = Networks().hostname
     //create http registration
     val port             = 9595
-    val prefix           = "csw.trombone.hcd"
-    val httpConnection   = HttpConnection(models.ComponentId("trombone1", ComponentType.HCD))
-    val httpRegistration = HttpRegistration(httpConnection, port, prefix)
+    val prefix           = Prefix(Subsystem.CSW, "trombone1")
+    val httpConnection   = HttpConnection(models.ComponentId(prefix, ComponentType.HCD))
+    val httpRegistration = HttpRegistration(httpConnection, port, prefix.toString)
 
     val httpRegistrationResult = locationService.register(httpRegistration).await
 
@@ -299,7 +296,7 @@ class LocationServiceCompTest(mode: String)
     httpProbe.expectMessage(LocationUpdated(httpRegistration.location(hostname)))
 
     //stop tracking http connection
-    httpSwitch.shutdown()
+    httpSwitch.cancel()
 
     httpRegistrationResult.unregister().await
 
@@ -309,7 +306,7 @@ class LocationServiceCompTest(mode: String)
   // DEOPSCSW-16: Register a component
   // DEOPSCSW-18: Validate unique registrations
   test("should not register a different Registration(connection + port/URI/actorRef) against already registered name") {
-    val connection = TcpConnection(models.ComponentId("redis4", ComponentType.Service))
+    val connection = TcpConnection(models.ComponentId(Prefix(Subsystem.CSW, "redis4"), ComponentType.Service))
 
     val duplicateTcpRegistration = TcpRegistration(connection, 1234)
     val tcpRegistration          = TcpRegistration(connection, 1111)
@@ -328,7 +325,7 @@ class LocationServiceCompTest(mode: String)
   test(
     "registering an already registered Registration(connection + port/URI/actorRef) on same machine should not result in failure"
   ) {
-    val componentId = models.ComponentId("redis4", ComponentType.Service)
+    val componentId = models.ComponentId(Prefix(Subsystem.CSW, "redis4"), ComponentType.Service)
     val connection  = TcpConnection(componentId)
 
     val duplicateTcpRegistration = TcpRegistration(connection, 1234)
@@ -351,7 +348,7 @@ class LocationServiceCompTest(mode: String)
 
   // DEOPSCSW-23: Unregister a comp/service
   test("unregistering an already unregistered connection does not result in failure") {
-    val connection = TcpConnection(models.ComponentId("redis4", ComponentType.Service))
+    val connection = TcpConnection(models.ComponentId(Prefix(Subsystem.CSW, "redis4"), ComponentType.Service))
 
     val tcpRegistration = TcpRegistration(connection, 1111)
 
@@ -363,7 +360,7 @@ class LocationServiceCompTest(mode: String)
 
   // DEOPSCSW-34: Resolve a connection
   test("should able to resolve tcp connection") {
-    val connection = TcpConnection(models.ComponentId("redis5", ComponentType.Service))
+    val connection = TcpConnection(models.ComponentId(Prefix(Subsystem.CSW, "redis5"), ComponentType.Service))
     locationService.register(TcpRegistration(connection, 1234)).await
 
     locationService.find(connection).await.get.connection shouldBe connection
@@ -372,15 +369,15 @@ class LocationServiceCompTest(mode: String)
   // DEOPSCSW-12: Create location service API
   // DEOPSCSW-24: Filter by comp/service type
   test("should filter components with component type") {
-    val hcdConnection = AkkaConnection(models.ComponentId("hcd1", ComponentType.HCD))
-    val actorRef      = typedSystem.spawn(Behavior.empty, "my-actor-2")
+    val hcdConnection = AkkaConnection(models.ComponentId(Prefix(Subsystem.CSW, "hcd1"), ComponentType.HCD))
+    val actorRef      = typedSystem.spawn(Behaviors.empty, "my-actor-2")
 
-    locationService.register(make(hcdConnection, prefix, actorRef.toURI)).await
+    locationService.register(make(hcdConnection, actorRef.toURI)).await
 
-    val redisConnection = TcpConnection(models.ComponentId("redis", ComponentType.Service))
+    val redisConnection = TcpConnection(models.ComponentId(Prefix(Subsystem.CSW, "redis"), ComponentType.Service))
     locationService.register(TcpRegistration(redisConnection, 1234)).await
 
-    val configServiceConnection = TcpConnection(models.ComponentId("configservice", ComponentType.Service))
+    val configServiceConnection = TcpConnection(models.ComponentId(Prefix(Subsystem.CSW, "configservice"), ComponentType.Service))
     locationService.register(TcpRegistration(configServiceConnection, 1234)).await
 
     locationService.list(ComponentType.HCD).await.map(_.connection) shouldBe List(hcdConnection)
@@ -393,21 +390,21 @@ class LocationServiceCompTest(mode: String)
   // DEOPSCSW-12: Create location service API
   // DEOPSCSW-32: Filter by connection type
   test("should filter connections based on Connection type") {
-    val hcdAkkaConnection = AkkaConnection(models.ComponentId("hcd1", ComponentType.HCD))
+    val hcdAkkaConnection = AkkaConnection(models.ComponentId(Prefix(Subsystem.CSW, "hcd1"), ComponentType.HCD))
     val actorRef = typedSystem.spawn(
-      Behavior.empty,
+      Behaviors.empty,
       "my-actor-3"
     )
 
-    locationService.register(make(hcdAkkaConnection, prefix, actorRef.toURI)).await
+    locationService.register(make(hcdAkkaConnection, actorRef.toURI)).await
 
-    val redisTcpConnection = TcpConnection(models.ComponentId("redis", ComponentType.Service))
+    val redisTcpConnection = TcpConnection(models.ComponentId(Prefix(Subsystem.CSW, "redis"), ComponentType.Service))
     locationService.register(TcpRegistration(redisTcpConnection, 1234)).await
 
-    val configTcpConnection = TcpConnection(models.ComponentId("configservice", ComponentType.Service))
+    val configTcpConnection = TcpConnection(models.ComponentId(Prefix(Subsystem.CSW, "configservice"), ComponentType.Service))
     locationService.register(TcpRegistration(configTcpConnection, 1234)).await
 
-    val assemblyHttpConnection = HttpConnection(models.ComponentId("assembly1", ComponentType.Assembly))
+    val assemblyHttpConnection = HttpConnection(models.ComponentId(Prefix(Subsystem.CSW, "assembly1"), ComponentType.Assembly))
     locationService.register(HttpRegistration(assemblyHttpConnection, 1234, "path123")).await
 
     locationService.list(ConnectionType.TcpType).await.map(_.connection).toSet shouldBe Set(
@@ -425,19 +422,19 @@ class LocationServiceCompTest(mode: String)
   // DEOPSCSW-12: Create location service API
   // DEOPSCSW-31: Filter by hostname
   test("should filter connections based on hostname") {
-    val tcpConnection = TcpConnection(models.ComponentId("redis", ComponentType.Service))
+    val tcpConnection = TcpConnection(models.ComponentId(Prefix(Subsystem.CSW, "redis"), ComponentType.Service))
     locationService.register(TcpRegistration(tcpConnection, 1234)).await
 
-    val httpConnection = HttpConnection(models.ComponentId("assembly1", ComponentType.Assembly))
+    val httpConnection = HttpConnection(models.ComponentId(Prefix(Subsystem.CSW, "assembly1"), ComponentType.Assembly))
     locationService.register(HttpRegistration(httpConnection, 1234, "path123")).await
 
-    val akkaConnection = AkkaConnection(models.ComponentId("hcd1", ComponentType.HCD))
+    val akkaConnection = AkkaConnection(models.ComponentId(Prefix(Subsystem.CSW, "hcd1"), ComponentType.HCD))
     val actorRef = typedSystem.spawn(
-      Behavior.empty,
+      Behaviors.empty,
       "my-actor-4"
     )
 
-    locationService.register(make(akkaConnection, prefix, actorRef.toURI)).await
+    locationService.register(make(akkaConnection, actorRef.toURI)).await
 
     locationService.list(Networks().hostname).await.map(_.connection).toSet shouldBe Set(
       tcpConnection,
@@ -450,35 +447,31 @@ class LocationServiceCompTest(mode: String)
 
   // DEOPSCSW-308: Add prefix in Location service models
   // DEOPSCSW-12: Create location service API
+  // CSW-80: Prefix should be in lowercase
   test("should filter akka connections based on prefix") {
-    val akkaConnection1 = AkkaConnection(models.ComponentId("hcd1", ComponentType.HCD))
-    val akkaConnection2 = AkkaConnection(models.ComponentId("assembly2", ComponentType.Assembly))
-    val akkaConnection3 = AkkaConnection(models.ComponentId("hcd3", ComponentType.HCD))
+    val akkaConnection1 = AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "ncc.trombone.hcd1"), ComponentType.HCD))
+    val akkaConnection2 =
+      AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "ncc.trombone.assembly2"), ComponentType.Assembly))
+    val akkaConnection3 = AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "ncc.trombone.hcd3"), ComponentType.HCD))
 
-    val actorRef  = typedSystem.spawn(Behavior.empty, "")
-    val actorRef2 = typedSystem.spawn(Behavior.empty, "")
-    val actorRef3 = typedSystem.spawn(Behavior.empty, "")
+    val actorRef  = typedSystem.spawn(Behaviors.empty, "")
+    val actorRef2 = typedSystem.spawn(Behaviors.empty, "")
+    val actorRef3 = typedSystem.spawn(Behaviors.empty, "")
 
-    locationService.register(make(akkaConnection1, Prefix("nfiraos.ncc.tromboneHcd1"), actorRef.toURI)).await
-    locationService
-      .register(make(akkaConnection2, Prefix("nfiraos.ncc.tromboneAssembly2"), actorRef2.toURI))
-      .await
-    locationService.register(make(akkaConnection3, Prefix("nfiraos.ncc.tromboneHcd3"), actorRef3.toURI)).await
+    locationService.register(make(akkaConnection1, actorRef.toURI)).await
+    locationService.register(make(akkaConnection2, actorRef2.toURI)).await
+    locationService.register(make(akkaConnection3, actorRef3.toURI)).await
 
-    locationService.listByPrefix("nfiraos.ncc.trombone").await.map(_.connection).toSet shouldBe Set(
-      akkaConnection1,
-      akkaConnection2,
-      akkaConnection3
-    )
+    locationService.listByPrefix(Prefix("nfiraos.ncc.trombone.hcd3")).await.map(_.connection).toSet shouldBe Set(akkaConnection3)
   }
 
   // DEOPSCSW-12: Create location service API
   test("should able to unregister all components") {
     val Port               = 1234
-    val redis1Connection   = TcpConnection(models.ComponentId("redis1", ComponentType.Service))
+    val redis1Connection   = TcpConnection(models.ComponentId(Prefix(Subsystem.CSW, "redis1"), ComponentType.Service))
     val redis1Registration = TcpRegistration(redis1Connection, Port)
 
-    val redis2Connection   = TcpConnection(models.ComponentId("redis2", ComponentType.Service))
+    val redis2Connection   = TcpConnection(models.ComponentId(Prefix(Subsystem.CSW, "redis2"), ComponentType.Service))
     val redis2registration = TcpRegistration(redis2Connection, Port)
 
     locationService.register(redis1Registration).await

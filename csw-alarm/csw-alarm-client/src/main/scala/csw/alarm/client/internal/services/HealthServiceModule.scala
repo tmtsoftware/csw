@@ -1,15 +1,13 @@
 package csw.alarm.client.internal.services
 
 import akka.actor.typed
-import akka.actor.typed.{ActorRef, _}
-import akka.stream.Materializer
+import akka.actor.typed.ActorRef
 import akka.stream.scaladsl.{Sink, Source}
-import akka.stream.typed.scaladsl
 import csw.alarm.api.internal.{HealthService, SeverityService}
-import csw.alarm.models.{AlarmHealth, Key}
 import csw.alarm.api.scaladsl.AlarmSubscription
 import csw.alarm.client.internal.AlarmServiceLogger
 import csw.alarm.client.internal.redis.RedisConnectionsFactory
+import csw.alarm.models.{AlarmHealth, Key}
 import romaine.extensions.SourceExtensions.RichSource
 
 import scala.concurrent.Future
@@ -21,8 +19,7 @@ private[client] trait HealthServiceModule extends HealthService {
   implicit val actorSystem: typed.ActorSystem[_]
   import redisConnectionsFactory._
 
-  private val log                             = AlarmServiceLogger.getLogger
-  private implicit lazy val mat: Materializer = scaladsl.ActorMaterializer()
+  private val log = AlarmServiceLogger.getLogger
 
   final override def getAggregatedHealth(key: Key): Future[AlarmHealth] = {
     log.debug(s"Get aggregated health for alarm [${key.value}]")

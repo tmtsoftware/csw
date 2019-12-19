@@ -5,16 +5,14 @@ import java.net.URI
 import akka.Done
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.stream.typed.scaladsl.ActorMaterializer
-import akka.stream.{ActorMaterializerSettings, Materializer}
+import akka.stream.Attributes
 import csw.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.event.api.scaladsl.{EventPublisher, EventService, EventSubscriber}
 import csw.event.client.helpers.TestFutureExt.RichFuture
-import csw.event.client.internal.commons.serviceresolver.EventServiceLocationResolver
 import csw.event.client.internal.commons.{EventServiceConnection, EventStreamSupervisionStrategy}
+import csw.event.client.internal.commons.serviceresolver.EventServiceLocationResolver
 import csw.location.api.scaladsl.LocationService
-import csw.location.client.internal.LocationServiceClient
+import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.models.TcpRegistration
 
 import scala.async.Async._
@@ -34,9 +32,7 @@ trait BaseProperties {
 
   implicit val actorSystem: ActorSystem[_]
   implicit lazy val ec: ExecutionContext = actorSystem.executionContext
-  lazy val settings: ActorMaterializerSettings =
-    ActorMaterializerSettings(actorSystem.toUntyped).withSupervisionStrategy(EventStreamSupervisionStrategy.decider)
-  implicit lazy val resumingMat: Materializer = ActorMaterializer(Some(settings))
+  val attributes: Attributes             = EventStreamSupervisionStrategy.attributes
 
   def resolveEventService(locationService: LocationService): Future[URI] = async {
     val eventServiceResolver = new EventServiceLocationResolver(locationService)
@@ -48,9 +44,8 @@ object BaseProperties {
   def createInfra(serverPort: Int, httpPort: Int): (LocationService, ActorSystem[Nothing]) = {
 
     implicit val typedSystem: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "event-server")
-    implicit val mat: Materializer                 = ActorMaterializer()
 
-    val locationService = new LocationServiceClient("localhost", httpPort)
+    val locationService = HttpLocationServiceFactory.make("localhost", httpPort)
     val tcpRegistration = TcpRegistration(EventServiceConnection.value, serverPort)
 
     locationService.register(tcpRegistration).await

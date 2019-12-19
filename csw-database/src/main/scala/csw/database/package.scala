@@ -10,7 +10,7 @@ package csw
  *
  * {{{
  *
- *      val system = ActorSystem(Behavior.empty, "test") // in component handlers the ActorSystem should be provided from ActorContext e.g. ctx.system
+ *      val system = ActorSystem(Behaviors.empty, "test") // in component handlers the ActorSystem should be provided from ActorContext e.g. ctx.system
  *      val dbFactory = new DatabaseServiceFactory(system)
  *      val dsl: DSLContext = dbFactory.makeDsl(locationService, "postgres") // postgres is a dbName here
  *

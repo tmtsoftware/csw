@@ -5,11 +5,12 @@ import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.MatrixData;
 import csw.params.core.models.ObsId;
-import csw.params.core.models.Prefix;
 import csw.params.core.states.CurrentState;
 import csw.params.core.states.DemandState;
 import csw.params.core.states.StateName;
 import csw.params.javadsl.JKeyType;
+import csw.prefix.models.Prefix;
+import csw.prefix.javadsl.JSubsystem;
 import csw.time.core.models.UTCTime;
 import org.junit.Assert;
 import org.junit.Test;
@@ -17,7 +18,9 @@ import org.scalatestplus.junit.JUnitSuite;
 import play.api.libs.json.JsValue;
 import play.api.libs.json.Json;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static csw.params.javadsl.JUnits.NoUnits;
@@ -29,7 +32,7 @@ public class JStateVariablesTest extends JUnitSuite {
     public void showUsageOfDemandState() {
         //#demandstate
         //prefix
-        Prefix prefix = new Prefix("wfos.prog.cloudcover");
+        Prefix prefix = new Prefix(JSubsystem.WFOS(), "prog.cloudcover");
 
         //keys
         Key<Character> charKey = JKeyType.CharKey().make("charKey");
@@ -43,8 +46,8 @@ public class JStateVariablesTest extends JUnitSuite {
         ObsId obsId = new ObsId("Obs001");
 
         //parameters
-        Parameter<Character> charParam = charKey.set('A', 'B', 'C').withUnits(NoUnits);
-        Parameter<Integer> intParam = intKey.set(1, 2, 3).withUnits(meter);
+        Parameter<Character> charParam = charKey.set('A', 'B', 'C').withUnits(NoUnits());
+        Parameter<Integer> intParam = intKey.set(1, 2, 3).withUnits(meter());
         Parameter<Boolean> booleanParam = booleanKey.set(true, false);
         Parameter<UTCTime> timestamp = utcTimeKey.set(UTCTime.now());
 
@@ -91,7 +94,7 @@ public class JStateVariablesTest extends JUnitSuite {
     public void showUsageOfCurrentState() {
         //#currentstate
         //prefix
-        Prefix prefix = new Prefix("wfos.prog.cloudcover");
+        Prefix prefix = new Prefix(JSubsystem.WFOS(), "prog.cloudcover");
 
         //keys
         Key<Character> charKey = JKeyType.CharKey().make("charKey");
@@ -105,8 +108,8 @@ public class JStateVariablesTest extends JUnitSuite {
         ObsId obsId = new ObsId("Obs001");
 
         //parameters
-        Parameter<Character> charParam = charKey.set('A', 'B', 'C').withUnits(NoUnits);
-        Parameter<Integer> intParam = intKey.set(1, 2, 3).withUnits(meter);
+        Parameter<Character> charParam = charKey.set('A', 'B', 'C').withUnits(NoUnits());
+        Parameter<Integer> intParam = intKey.set(1, 2, 3).withUnits(meter());
         Parameter<Boolean> booleanParam = booleanKey.set(true, false);
         Parameter<UTCTime> timestamp = timestampKey.set(UTCTime.now());
 
@@ -163,8 +166,8 @@ public class JStateVariablesTest extends JUnitSuite {
         Parameter<MatrixData<Double>> i1 = k1.set(m1);
 
         //state variables
-        DemandState ds = new DemandState(new Prefix("wfos.blue.filter"), new StateName("testStateName")).add(i1);
-        CurrentState cs = new CurrentState(new Prefix("wfos.blue.filter"), new StateName("testStateName")).add(i1);
+        DemandState ds = new DemandState(new Prefix(JSubsystem.WFOS(), "blue.filter"), new StateName("testStateName")).add(i1);
+        CurrentState cs = new CurrentState(new Prefix(JSubsystem.WFOS(), "blue.filter"), new StateName("testStateName")).add(i1);
 
         //json support - write
         JsValue dsJson = JavaJsonSupport.writeStateVariable(ds);
@@ -196,7 +199,7 @@ public class JStateVariablesTest extends JUnitSuite {
         Key<Integer> miscKey = JKeyType.IntKey().make("misc.");
 
         //prefix
-        Prefix prefix = new Prefix("wfos.blue.filter");
+        Prefix prefix = new Prefix(JSubsystem.WFOS(), "blue.filter");
 
         //params
         Parameter<Integer> encParam1 = encoderKey.set(1);

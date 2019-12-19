@@ -3,7 +3,6 @@ package csw.config.server
 import csw.aas.core.deployment.AASResolutionFailed
 import csw.config.server.cli.{ArgsParser, Options}
 import csw.config.server.commons.ConfigServerLogger
-import csw.config.server.commons.CoordinatedShutdownReasons.FailureReason
 import csw.config.server.http.HttpService
 import csw.location.client.utils.LocationServerStatus
 import csw.logging.api.scaladsl.Logger
@@ -30,7 +29,7 @@ object Main {
         import wiring._
 
         def shutdownAndLog(ex: Exception) = {
-          Await.result(actorRuntime.shutdown(FailureReason(ex)), 10.seconds)
+          Await.result(actorRuntime.shutdown(), 10.seconds)
           log.error(ex.getMessage, ex = ex)
           throw ex
         }
@@ -42,7 +41,8 @@ object Main {
           svnRepo.testConnection()                                    // first test if the svn repo can be accessed successfully
           Await.result(httpService.registeredLazyBinding, 15.seconds) // then start the config server and register it with location service
           httpService
-        } catch {
+        }
+        catch {
           case ex: SVNException =>
             shutdownAndLog(new RuntimeException(s"Could not open repository located at : ${settings.svnUrl}", ex))
           case ex: AASResolutionFailed => shutdownAndLog(ex)
