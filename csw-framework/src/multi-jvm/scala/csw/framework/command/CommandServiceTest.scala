@@ -14,7 +14,7 @@ import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
-import csw.location.server.http.MultiNodeHTTPLocationService
+import csw.location.impl.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandIssue.IdNotAvailableIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands._

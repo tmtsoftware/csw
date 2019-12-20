@@ -24,18 +24,19 @@ import csw.location.api.javadsl.JComponentType;
 import csw.location.api.javadsl.JConnectionType;
 import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
+import csw.location.impl.internal.ServerWiring;
+import csw.location.impl.internal.Settings;
+import csw.location.impl.scaladsl.RegistrationFactory;
 import csw.location.models.*;
 import csw.location.models.Connection.AkkaConnection;
 import csw.location.models.Connection.HttpConnection;
-import csw.location.server.internal.ServerWiring;
-import csw.location.server.scaladsl.RegistrationFactory;
 import csw.logging.api.javadsl.ILogger;
 import csw.logging.client.internal.LoggingSystem;
 import csw.logging.client.javadsl.JKeys;
 import csw.logging.client.javadsl.JLoggerFactory;
 import csw.logging.client.javadsl.JLoggingSystemFactory;
-import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
+import csw.prefix.models.Prefix;
 import scala.concurrent.Await;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -320,7 +321,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
     public static void main(String[] args) throws Exception {
         // http location service client expect that location server is running on local machine
         // here we are starting location http server so that httpLocationClient uses can be illustrated
-        ServerWiring locationWiring = new ServerWiring();
+        ServerWiring locationWiring = new ServerWiring(Settings.apply("csw-location-server"));
         Await.result(locationWiring.locationHttpService().start(), new FiniteDuration(5, TimeUnit.SECONDS));
 
         //#create-actor-system

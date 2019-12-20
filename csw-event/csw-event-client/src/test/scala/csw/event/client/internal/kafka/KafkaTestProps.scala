@@ -13,7 +13,7 @@ import csw.event.client.internal.wiring.BaseProperties.createInfra
 import csw.event.client.models.EventStores.KafkaStore
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.extensions.LocationServiceExt.RichLocationService
-import csw.location.server.http.HTTPLocationServiceOnPorts
+import csw.location.impl.http.HTTPLocationServiceOnPorts
 import csw.network.utils.Networks
 import csw.network.utils.SocketUtils.getFreePort
 import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}

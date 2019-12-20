@@ -6,7 +6,7 @@ import csw.location.helpers.LSNodeSpec
 import csw.location.models
 import csw.location.models.Connection.HttpConnection
 import csw.location.models.{ComponentId, ComponentType, HttpRegistration}
-import csw.location.server.http.MultiNodeHTTPLocationService
+import csw.location.impl.http.MultiNodeHTTPLocationService
 import csw.prefix.models.{Prefix, Subsystem}
 import org.scalatest.BeforeAndAfterEach
 import org.tmt.embedded_keycloak.KeycloakData.{ApplicationUser, Client, Realm}

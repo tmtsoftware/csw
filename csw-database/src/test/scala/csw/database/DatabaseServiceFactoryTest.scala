@@ -9,7 +9,7 @@ import csw.database.scaladsl.JooqExtentions.{RichQuery, RichResultQuery}
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.models.TcpRegistration
-import csw.location.server.http.HTTPLocationService
+import csw.location.impl.http.HTTPLocationService
 import org.jooq.DSLContext
 import org.scalatest.concurrent.PatienceConfiguration.Interval
 import org.scalatest.time.{Seconds, Span}

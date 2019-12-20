@@ -14,7 +14,7 @@ import csw.config.client.scaladsl.ConfigClientFactory
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.{ServerWiring, Settings}
 import csw.location.helpers.{LSNodeSpec, NMembersAndSeed}
-import csw.location.server.http.MultiNodeHTTPLocationService
+import csw.location.impl.http.MultiNodeHTTPLocationService
 import org.scalatest.FunSuiteLike
 import org.tmt.embedded_keycloak.KeycloakData._
 import org.tmt.embedded_keycloak.utils.Ports
@@ -123,7 +123,8 @@ class ConfigCliAuthTest(ignore: Int)
       try {
         System.setIn(stream)
         runner.login(Options(console = true))
-      } finally {
+      }
+      finally {
         System.setIn(stdIn)
       }
 

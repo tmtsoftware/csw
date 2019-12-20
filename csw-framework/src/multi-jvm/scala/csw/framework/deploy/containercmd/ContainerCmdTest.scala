@@ -28,7 +28,7 @@ import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.location.models.ComponentType.Container
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{ComponentId, ComponentType}
-import csw.location.server.http.MultiNodeHTTPLocationService
+import csw.location.impl.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse.Invalid
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.generics.{KeyType, Parameter}

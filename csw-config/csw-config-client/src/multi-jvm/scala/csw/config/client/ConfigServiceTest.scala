@@ -12,7 +12,7 @@ import csw.config.server.commons.TestFileUtils
 import csw.config.server.mocks.MockedAuthentication
 import csw.config.server.{ServerWiring, Settings}
 import csw.location.helpers.LSNodeSpec
-import csw.location.server.http.MultiNodeHTTPLocationService
+import csw.location.impl.http.MultiNodeHTTPLocationService
 
 class ConfigServiceTestMultiJvmNode1 extends ConfigServiceTest(0)
 class ConfigServiceTestMultiJvmNode2 extends ConfigServiceTest(0)

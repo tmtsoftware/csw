@@ -8,7 +8,7 @@ import csw.event.cli.wiring.Wiring
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.internal.commons.EventServiceConnection
 import csw.location.models.TcpRegistration
-import csw.location.server.http.HTTPLocationService
+import csw.location.impl.http.HTTPLocationService
 import csw.params.core.formats.JsonSupport
 import csw.params.events._
 import org.scalatest.{BeforeAndAfterEach, Matchers}
