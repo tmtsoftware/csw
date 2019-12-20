@@ -528,9 +528,9 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   }
 
   //CSW-73: Make event pub/sub resuming
-  @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_resume_pattern_subscriber_after_exception(baseProperties: BaseProperties): Unit = {
-    import baseProperties._
+  @Test(dataProvider = "redis-provider")
+  def should_be_able_to_resume_pattern_subscriber_after_exception(redisProps: RedisTestProps): Unit = {
+    import redisProps._
     val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
 
     val cancellable = publisher.publish(eventGenerator(), 1.millis)

@@ -93,7 +93,7 @@ private[event] class RedisSubscriber(redisURI: Future[RedisURI], redisClient: Re
   ): EventSubscription = subscribeCallback(eventKeys, eventSubscriberUtil.actorCallback(actorRef), every, mode)
 
   override def pSubscribe(subsystem: Subsystem, pattern: String): Source[Event, EventSubscription] = {
-    val keyPattern = s"${subsystem.entryName}.$pattern"
+    val keyPattern = s"${subsystem.name}.$pattern"
     log.info(s"Subscribing to event key pattern: $keyPattern")
 
     val patternSubscriptionApi: RedisSubscriptionApi[String, Event] = subscriptionApi()
