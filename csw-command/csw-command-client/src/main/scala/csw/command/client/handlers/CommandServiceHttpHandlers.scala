@@ -2,16 +2,14 @@ package csw.command.client.handlers
 
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import csw.command.api.codecs.CommandServiceCodecs
+import csw.command.api.codecs.CommandServiceCodecs._
 import csw.command.api.messages.CommandServiceHttpMessage
 import csw.command.api.messages.CommandServiceHttpMessage._
 import csw.command.api.scaladsl.CommandService
-import msocket.api.MessageHandler
-import msocket.impl.post.ServerHttpCodecs
+import msocket.impl.post.{HttpPostHandler, ServerHttpCodecs}
 
 class CommandServiceHttpHandlers(commandService: CommandService)
-    extends MessageHandler[CommandServiceHttpMessage, Route]
-    with CommandServiceCodecs
+    extends HttpPostHandler[CommandServiceHttpMessage]
     with ServerHttpCodecs {
 
   override def handle(request: CommandServiceHttpMessage): Route = request match {
