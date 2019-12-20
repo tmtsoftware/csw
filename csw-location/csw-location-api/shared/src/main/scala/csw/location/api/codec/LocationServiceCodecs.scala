@@ -11,6 +11,8 @@ import io.bullet.borer.derivation.ArrayBasedCodecs.deriveUnaryCodec
 import io.bullet.borer.derivation.MapBasedCodecs.deriveCodec
 import msocket.api.ErrorProtocol
 
+object LocationServiceCodecs extends LocationServiceCodecs
+
 trait LocationServiceCodecs extends LocationCodecs {
 
   implicit def locationHttpMessageCodec[T <: LocationHttpMessage]: Codec[LocationHttpMessage] =
