@@ -39,7 +39,7 @@ object SampleComponentState {
   val failedPrefix              = Prefix("wfos.prog.cloudcover.failure")
 
   val setSeverityCommand          = CommandName("alarm.setSeverity.success")
-  val testAlarmKey                = AlarmKey(NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm")
+  val testAlarmKey                = AlarmKey(Prefix(NFIRAOS, "trombone"), "tromboneAxisHighLimitAlarm")
   val testSeverity: AlarmSeverity = Warning
 
   val diagnosticDataEventName                = EventName("diagnostic-data")

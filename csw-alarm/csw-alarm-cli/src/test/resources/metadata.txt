@@ -1,6 +1,5 @@
 ===============================================================================================================
-Subsystem: NFIRAOS
-Component: trombone
+Prefix: nfiraos.trombone
 Name: tromboneAxisLowLimitAlarm
 Description: Warns when trombone axis has reached the low limit
 Location: south side

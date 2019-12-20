@@ -159,7 +159,7 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
     }
     //#track-location
 
-    private EventKey counterEventKey = new EventKey(new Prefix(NFIRAOS(), "samplehcd"), new EventName("HcdCounter"));
+    private EventKey counterEventKey = new EventKey(Prefix.apply(NFIRAOS(), "samplehcd"), new EventName("HcdCounter"));
     private Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter");
 
 
@@ -205,7 +205,7 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
     }
 
     private void setCounterAlarm(int counter) {
-        AlarmKey counterAlarmKey = new AlarmKey(NFIRAOS(), cswCtx.componentInfo().name(), "CounterTooHighAlarm");
+        AlarmKey counterAlarmKey = new AlarmKey(cswCtx.componentInfo().prefix(), "CounterTooHighAlarm");
         AlarmSeverity severity = getCounterSeverity(counter);
         cswCtx.alarmService().setSeverity(counterAlarmKey, severity)
                 .whenComplete((d, ex) -> {

@@ -27,6 +27,7 @@ import io.lettuce.core.RedisClient
 import scala.concurrent.TimeoutException
 import scala.concurrent.duration.DurationLong
 
+//CSW-82: ComponentInfo should take prefix
 class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 

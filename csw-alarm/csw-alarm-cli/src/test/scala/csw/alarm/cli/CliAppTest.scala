@@ -23,8 +23,10 @@ import csw.config.client.scaladsl.ConfigClientFactory
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.mocks.MockedAuthentication
 import csw.config.server.{ServerWiring, Settings}
+import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.{LGSF, NFIRAOS, TCS}
 
+//CSW-83:Alarm models should take prefix
 class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
 
   import cliWiring._
@@ -33,14 +35,14 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   private val successMsg = "[SUCCESS] Command executed successfully."
   private val failureMsg = "[FAILURE] Failed to execute the command."
 
-  private val tromboneAxisLowLimitKey  = AlarmKey(NFIRAOS, "trombone", "tromboneaxislowlimitalarm")
-  private val tromboneAxisHighLimitKey = AlarmKey(NFIRAOS, "trombone", "tromboneaxishighlimitalarm")
-  private val encTempLowKey            = AlarmKey(NFIRAOS, "enclosure", "templowalarm")
-  private val encTempHighKey           = AlarmKey(NFIRAOS, "enclosure", "temphighalarm")
-  private val beamSplitterLimitKey     = AlarmKey(NFIRAOS, "beamsplitter", "splitterlimitalarm")
-  private val cpuExceededKey           = AlarmKey(TCS, "tcspk", "cpuexceededalarm")
-  private val outOfRangeOffloadKey     = AlarmKey(TCS, "corrections", "outofrangeoffload")
-  private val cpuIdleKey               = AlarmKey(LGSF, "tcspkinactive", "cpuidlealarm")
+  private val tromboneAxisLowLimitKey  = AlarmKey(Prefix(NFIRAOS, "trombone"), "tromboneaxislowlimitalarm")
+  private val tromboneAxisHighLimitKey = AlarmKey(Prefix(NFIRAOS, "trombone"), "tromboneaxishighlimitalarm")
+  private val encTempLowKey            = AlarmKey(Prefix(NFIRAOS, "enclosure"), "templowalarm")
+  private val encTempHighKey           = AlarmKey(Prefix(NFIRAOS, "enclosure"), "temphighalarm")
+  private val beamSplitterLimitKey     = AlarmKey(Prefix(NFIRAOS, "beamsplitter"), "splitterlimitalarm")
+  private val cpuExceededKey           = AlarmKey(Prefix(TCS, "tcspk"), "cpuexceededalarm")
+  private val outOfRangeOffloadKey     = AlarmKey(Prefix(TCS, "corrections"), "outofrangeoffload")
+  private val cpuIdleKey               = AlarmKey(Prefix(LGSF, "tcspkinactive"), "cpuidlealarm")
 
   private val allAlarmKeys = Set(
     tromboneAxisLowLimitKey,
@@ -125,8 +127,8 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   test("should acknowledge the alarm") {
     val cmd = Options(
       "acknowledge",
-      maybeSubsystem = Some(tromboneAxisLowLimitKey.subsystem),
-      maybeComponent = Some(tromboneAxisLowLimitKey.component),
+      maybeSubsystem = Some(tromboneAxisLowLimitKey.prefix.subsystem),
+      maybeComponent = Some(tromboneAxisLowLimitKey.prefix.componentName),
       maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
 
@@ -143,8 +145,8 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   test("should unacknowledge the alarm") {
     val cmd = Options(
       "unacknowledge",
-      maybeSubsystem = Some(tromboneAxisLowLimitKey.subsystem),
-      maybeComponent = Some(tromboneAxisLowLimitKey.component),
+      maybeSubsystem = Some(tromboneAxisLowLimitKey.prefix.subsystem),
+      maybeComponent = Some(tromboneAxisLowLimitKey.prefix.componentName),
       maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
 
@@ -158,8 +160,8 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   test("should activate the alarm") {
     val cmd = Options(
       "activate",
-      maybeSubsystem = Some(cpuIdleKey.subsystem),
-      maybeComponent = Some(cpuIdleKey.component),
+      maybeSubsystem = Some(cpuIdleKey.prefix.subsystem),
+      maybeComponent = Some(cpuIdleKey.prefix.componentName),
       maybeAlarmName = Some(cpuIdleKey.name)
     )
 
@@ -173,8 +175,8 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   test("should deactivate the alarm") {
     val cmd = Options(
       "deactivate",
-      maybeSubsystem = Some(tromboneAxisLowLimitKey.subsystem),
-      maybeComponent = Some(tromboneAxisLowLimitKey.component),
+      maybeSubsystem = Some(tromboneAxisLowLimitKey.prefix.subsystem),
+      maybeComponent = Some(tromboneAxisLowLimitKey.prefix.componentName),
       maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
 
@@ -188,8 +190,8 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   test("should shelve the alarm") {
     val cmd = Options(
       "shelve",
-      maybeSubsystem = Some(tromboneAxisLowLimitKey.subsystem),
-      maybeComponent = Some(tromboneAxisLowLimitKey.component),
+      maybeSubsystem = Some(tromboneAxisLowLimitKey.prefix.subsystem),
+      maybeComponent = Some(tromboneAxisLowLimitKey.prefix.componentName),
       maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
 
@@ -203,8 +205,8 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   test("should unshelve the alarm") {
     val cmd = Options(
       "unshelve",
-      maybeSubsystem = Some(tromboneAxisLowLimitKey.subsystem),
-      maybeComponent = Some(tromboneAxisLowLimitKey.component),
+      maybeSubsystem = Some(tromboneAxisLowLimitKey.prefix.subsystem),
+      maybeComponent = Some(tromboneAxisLowLimitKey.prefix.componentName),
       maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
 
@@ -346,8 +348,8 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
       cmd = "severity",
       subCmd = "set",
       severity = Some(Major),
-      maybeSubsystem = Some(tromboneAxisHighLimitKey.subsystem),
-      maybeComponent = Some(tromboneAxisHighLimitKey.component),
+      maybeSubsystem = Some(tromboneAxisHighLimitKey.prefix.subsystem),
+      maybeComponent = Some(tromboneAxisHighLimitKey.prefix.componentName),
       maybeAlarmName = Some(tromboneAxisHighLimitKey.name)
     )
 
@@ -364,8 +366,8 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
     val cmd = Options(
       cmd = "severity",
       subCmd = "get",
-      maybeSubsystem = Some(tromboneAxisHighLimitKey.subsystem),
-      maybeComponent = Some(tromboneAxisHighLimitKey.component),
+      maybeSubsystem = Some(tromboneAxisHighLimitKey.prefix.subsystem),
+      maybeComponent = Some(tromboneAxisHighLimitKey.prefix.componentName),
       maybeAlarmName = Some(tromboneAxisHighLimitKey.name)
     )
 
@@ -381,13 +383,13 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
     val cmd = Options(
       cmd = "severity",
       subCmd = "get",
-      maybeSubsystem = Some(tromboneAxisHighLimitKey.subsystem),
-      maybeComponent = Some(tromboneAxisHighLimitKey.component)
+      maybeSubsystem = Some(tromboneAxisHighLimitKey.prefix.subsystem),
+      maybeComponent = Some(tromboneAxisHighLimitKey.prefix.componentName)
     )
 
     cliApp.execute(cmd)
     logBuffer.toList shouldEqual List(
-      s"Aggregated Severity of Component [${tromboneAxisHighLimitKey.subsystem}$KeySeparator${tromboneAxisHighLimitKey.component}]: $Major"
+      s"Aggregated Severity of Component [${tromboneAxisHighLimitKey.prefix.subsystem.name}$KeySeparator${tromboneAxisHighLimitKey.prefix.componentName}]: $Major"
     )
   }
 
@@ -396,7 +398,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
     val cmd = Options(
       cmd = "severity",
       subCmd = "get",
-      maybeSubsystem = Some(tromboneAxisHighLimitKey.subsystem)
+      maybeSubsystem = Some(tromboneAxisHighLimitKey.prefix.subsystem)
     )
 
     cliApp.execute(cmd)
@@ -418,8 +420,8 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
     val cmd = Options(
       cmd = "severity",
       subCmd = "subscribe",
-      maybeSubsystem = Some(tromboneAxisHighLimitKey.subsystem),
-      maybeComponent = Some(tromboneAxisHighLimitKey.component),
+      maybeSubsystem = Some(tromboneAxisHighLimitKey.prefix.subsystem),
+      maybeComponent = Some(tromboneAxisHighLimitKey.prefix.componentName),
       maybeAlarmName = Some(tromboneAxisHighLimitKey.name)
     )
 
@@ -449,8 +451,8 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
       cmd = "severity",
       subCmd = "set",
       severity = Some(Major),
-      maybeSubsystem = Some(tromboneAxisHighLimitKey.subsystem),
-      maybeComponent = Some(tromboneAxisHighLimitKey.component),
+      maybeSubsystem = Some(tromboneAxisHighLimitKey.prefix.subsystem),
+      maybeComponent = Some(tromboneAxisHighLimitKey.prefix.componentName),
       maybeAlarmName = Some(tromboneAxisHighLimitKey.name),
       autoRefresh = true
     )
@@ -474,8 +476,8 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
     val cmd = Options(
       cmd = "health",
       subCmd = "get",
-      maybeSubsystem = Some(tromboneAxisHighLimitKey.subsystem),
-      maybeComponent = Some(tromboneAxisHighLimitKey.component),
+      maybeSubsystem = Some(tromboneAxisHighLimitKey.prefix.subsystem),
+      maybeComponent = Some(tromboneAxisHighLimitKey.prefix.componentName),
       maybeAlarmName = Some(tromboneAxisHighLimitKey.name)
     )
 
@@ -491,13 +493,13 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
     val cmd = Options(
       cmd = "health",
       subCmd = "get",
-      maybeSubsystem = Some(tromboneAxisHighLimitKey.subsystem),
-      maybeComponent = Some(tromboneAxisHighLimitKey.component)
+      maybeSubsystem = Some(tromboneAxisHighLimitKey.prefix.subsystem),
+      maybeComponent = Some(tromboneAxisHighLimitKey.prefix.componentName)
     )
 
     cliApp.execute(cmd)
     logBuffer.toList shouldEqual List(
-      s"Aggregated Health of Component [${tromboneAxisHighLimitKey.subsystem}$KeySeparator${tromboneAxisHighLimitKey.component}]: $Ill"
+      s"Aggregated Health of Component [${tromboneAxisHighLimitKey.prefix.subsystem.name}$KeySeparator${tromboneAxisHighLimitKey.prefix.componentName}]: $Ill"
     )
   }
 
@@ -513,7 +515,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
     val cmd = Options(
       cmd = "health",
       subCmd = "get",
-      maybeSubsystem = Some(tromboneAxisHighLimitKey.subsystem)
+      maybeSubsystem = Some(tromboneAxisHighLimitKey.prefix.subsystem)
     )
 
     cliApp.execute(cmd)
@@ -530,9 +532,9 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
 
   // DEOPSCSW-479: Subscribe to health changes of component/subsystem/all alarms using CLI Interface
   test("should subscribe health of subsystem/component/alarm") {
-    val subsystem         = tromboneAxisHighLimitKey.subsystem
-    val component         = tromboneAxisHighLimitKey.component
-    val tromboneComponent = s"$subsystem-$component"
+    val subsystem         = tromboneAxisHighLimitKey.prefix.subsystem
+    val component         = tromboneAxisHighLimitKey.prefix.componentName
+    val tromboneComponent = s"${subsystem.name}-$component"
 
     val cmd = Options(
       cmd = "health",

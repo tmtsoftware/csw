@@ -20,6 +20,7 @@ import csw.prefix.models.{Prefix, Subsystem}
 import scala.concurrent.duration.DurationLong
 
 //DEOPSCSW-550: Provide TimeService accessible to component developers
+//CSW-82: ComponentInfo should take prefix
 class TimeServiceIntegrationTest extends FrameworkIntegrationSuite {
 
   import testWiring._

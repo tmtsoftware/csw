@@ -24,6 +24,7 @@ import redis.embedded.{RedisSentinel, RedisServer}
 import scala.concurrent.duration.DurationLong
 
 //DEOPSCSW-395: Provide EventService handle to component developers
+//CSW-82: ComponentInfo should take prefix
 class EventServiceIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 

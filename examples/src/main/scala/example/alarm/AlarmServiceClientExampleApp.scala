@@ -11,6 +11,7 @@ import csw.alarm.models.{AlarmHealth, AlarmMetadata, AlarmStatus, FullAlarmSever
 import csw.alarm.api.scaladsl.{AlarmAdminService, AlarmService, AlarmSubscription}
 import csw.alarm.client.AlarmServiceFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.{IRIS, NFIRAOS}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -45,7 +46,7 @@ object AlarmServiceClientExampleApp {
   val adminAPI: AlarmAdminService = adminAPI1
 
   //#setSeverity-scala
-  val alarmKey              = AlarmKey(NFIRAOS, "trombone", "tromboneAxisLowLimitAlarm")
+  val alarmKey              = AlarmKey(Prefix(NFIRAOS, "trombone"), "tromboneAxisLowLimitAlarm")
   val resultF: Future[Done] = clientAPI.setSeverity(alarmKey, Okay)
   //#setSeverity-scala
 
@@ -96,7 +97,7 @@ object AlarmServiceClientExampleApp {
   //#getCurrentSeverity
 
   //#getAggregatedSeverity
-  val componentKey                                   = ComponentKey(NFIRAOS, "tromboneAssembly")
+  val componentKey                                   = ComponentKey(Prefix(NFIRAOS, "tromboneassembly"))
   val aggregatedSeverityF: Future[FullAlarmSeverity] = adminAPI.getAggregatedSeverity(componentKey)
   aggregatedSeverityF.onComplete {
     case Success(severity)  => println(s"aggregate severity: ${severity.name}: ${severity.level}")
@@ -115,7 +116,7 @@ object AlarmServiceClientExampleApp {
 
   //#subscribeAggregatedSeverityCallback
   val alarmSubscription: AlarmSubscription = adminAPI.subscribeAggregatedSeverityCallback(
-    ComponentKey(NFIRAOS, "tromboneAssembly"),
+    ComponentKey(Prefix(NFIRAOS, "tromboneAssembly")),
     aggregatedSeverity => { /* do something*/ }
   )
   // to unsubscribe:
@@ -133,7 +134,7 @@ object AlarmServiceClientExampleApp {
 
   //#subscribeAggregatedHealthCallback
   val alarmSubscription3: AlarmSubscription = adminAPI.subscribeAggregatedHealthCallback(
-    ComponentKey(IRIS, "ImagerDetectorAssembly"),
+    ComponentKey(Prefix(IRIS, "ImagerDetectorAssembly")),
     aggregatedHealth => { /* do something*/ }
   )
 

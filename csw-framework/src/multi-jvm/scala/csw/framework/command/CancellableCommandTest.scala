@@ -27,6 +27,7 @@ class CancellableCommandTestMultiJvm1 extends CancellableCommandTest(0)
 class CancellableCommandTestMultiJvm2 extends CancellableCommandTest(0)
 
 // DEOPSCSW-211 Notification of Interrupted Message
+// CSW-82: ComponentInfo should take prefix
 class CancellableCommandTest(ignore: Int)
     extends LSNodeSpec(config = new OneMemberAndSeed, mode = "http")
     with MultiNodeHTTPLocationService

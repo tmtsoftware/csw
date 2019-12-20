@@ -105,10 +105,9 @@ class JsonContractTest extends FunSpec with Matchers {
 
     it("should adhere to specified standard SystemEvent json format") {
       val a1: Array[Byte] = Array[Byte](1, 2, 3, 4, 5)
-      val a2: Array[Byte] = Array[Byte](10, 20, 30, 40, 50)
 
       val arrayDataKey   = KeyType.ByteArrayKey.make("arrayDataKey")
-      val arrayDataParam = arrayDataKey.set(ArrayData(a1), ArrayData(a2))
+      val arrayDataParam = arrayDataKey.set(ArrayData.fromArray(a1), ArrayData.fromArrays[Byte](10, 20, 30, 40, 50))
 
       val systemEvent       = SystemEvent(eventId, prefix, eventName, eventTime, Set(arrayDataParam))
       val systemEventToJson = JsonSupport.writeEvent(systemEvent)

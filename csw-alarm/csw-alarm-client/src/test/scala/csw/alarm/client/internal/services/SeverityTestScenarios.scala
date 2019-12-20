@@ -4,6 +4,7 @@ import csw.alarm.models.AlarmSeverity.{Critical, Major, Okay, Warning}
 import csw.alarm.models.FullAlarmSeverity.Disconnected
 import csw.alarm.models.Key.AlarmKey
 import csw.alarm.client.internal.helpers.{SetSeverityAckStatusTestCase, SetSeverityTestCase}
+import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.AOESW
 
 object SeverityTestScenarios {
@@ -11,8 +12,7 @@ object SeverityTestScenarios {
   val SeverityTestCases = List(
     SetSeverityTestCase(
       alarmKey = AlarmKey(
-        AOESW,
-        "test_component",
+        Prefix(AOESW, "test_component"),
         "setSeverity, should increase latched severity, when new severity is higher than old and alarm is still initializing"
       ),
       oldLatchedSeverity = Warning,
@@ -23,8 +23,7 @@ object SeverityTestScenarios {
     ),
     SetSeverityTestCase(
       alarmKey = AlarmKey(
-        AOESW,
-        "test_component",
+        Prefix(AOESW, "test_component"),
         "setSeverity, should increase latched severity, when new severity is higher than old and alarm is done initializing"
       ),
       oldLatchedSeverity = Disconnected,
@@ -35,8 +34,7 @@ object SeverityTestScenarios {
     ),
     SetSeverityTestCase(
       alarmKey = AlarmKey(
-        AOESW,
-        "test_component",
+        Prefix(AOESW, "test_component"),
         "setSeverity, should decrease latched severity, when new severity is lower than old but alarm is still initializing"
       ),
       oldLatchedSeverity = Disconnected,
@@ -47,8 +45,7 @@ object SeverityTestScenarios {
     ),
     SetSeverityTestCase(
       alarmKey = AlarmKey(
-        AOESW,
-        "test_component",
+        Prefix(AOESW, "test_component"),
         "setSeverity, should not update latched severity, when new severity is lower than old and alarm is done initializing"
       ),
       oldLatchedSeverity = Major,
@@ -63,7 +60,7 @@ object SeverityTestScenarios {
     // ====== Severity change but not to Okay =====
     // AckStatus = Unacknowledged irrespective of AutoAck flag
     SetSeverityAckStatusTestCase(
-      alarmKey = AlarmKey(AOESW, "test", "alarm1"),
+      alarmKey = AlarmKey(Prefix(AOESW, "test"), "alarm1"),
       oldSeverity = Critical,
       newSeverity = Warning,
       isAutoAcknowledgeable = true,
@@ -71,7 +68,7 @@ object SeverityTestScenarios {
       newAckStatus = Unacknowledged
     ),
     SetSeverityAckStatusTestCase(
-      alarmKey = AlarmKey(AOESW, "test", "alarm2"),
+      alarmKey = AlarmKey(Prefix(AOESW, "test"), "alarm2"),
       oldSeverity = Critical,
       newSeverity = Warning,
       isAutoAcknowledgeable = true,
@@ -79,7 +76,7 @@ object SeverityTestScenarios {
       newAckStatus = Unacknowledged
     ),
     SetSeverityAckStatusTestCase(
-      alarmKey = AlarmKey(AOESW, "test", "alarm3"),
+      alarmKey = AlarmKey(Prefix(AOESW, "test"), "alarm3"),
       oldSeverity = Critical,
       newSeverity = Warning,
       isAutoAcknowledgeable = false,
@@ -89,7 +86,7 @@ object SeverityTestScenarios {
     // ====== Severity = Okay && AutoAck = true =====
     // AckStatus = Acknowledged
     SetSeverityAckStatusTestCase(
-      alarmKey = AlarmKey(AOESW, "test", "alarm4"),
+      alarmKey = AlarmKey(Prefix(AOESW, "test"), "alarm4"),
       oldSeverity = Disconnected,
       newSeverity = Okay,
       isAutoAcknowledgeable = true,
@@ -97,7 +94,7 @@ object SeverityTestScenarios {
       newAckStatus = Acknowledged
     ),
     SetSeverityAckStatusTestCase(
-      alarmKey = AlarmKey(AOESW, "test", "alarm5"),
+      alarmKey = AlarmKey(Prefix(AOESW, "test"), "alarm5"),
       oldSeverity = Critical,
       newSeverity = Okay,
       isAutoAcknowledgeable = true,
@@ -105,7 +102,7 @@ object SeverityTestScenarios {
       newAckStatus = Acknowledged
     ),
     SetSeverityAckStatusTestCase(
-      alarmKey = AlarmKey(AOESW, "test", "alarm6"),
+      alarmKey = AlarmKey(Prefix(AOESW, "test"), "alarm6"),
       oldSeverity = Okay,
       newSeverity = Okay,
       isAutoAcknowledgeable = true,
@@ -115,7 +112,7 @@ object SeverityTestScenarios {
     // ====== Severity = Okay && AutoAck = false =====
     // NewAckStatus = OldAckStatus
     SetSeverityAckStatusTestCase(
-      alarmKey = AlarmKey(AOESW, "test", "alarm7"),
+      alarmKey = AlarmKey(Prefix(AOESW, "test"), "alarm7"),
       oldSeverity = Warning,
       newSeverity = Okay,
       isAutoAcknowledgeable = false,
@@ -123,7 +120,7 @@ object SeverityTestScenarios {
       newAckStatus = Unacknowledged
     ),
     SetSeverityAckStatusTestCase(
-      alarmKey = AlarmKey(AOESW, "test", "alarm8"),
+      alarmKey = AlarmKey(Prefix(AOESW, "test"), "alarm8"),
       oldSeverity = Warning,
       newSeverity = Okay,
       isAutoAcknowledgeable = false,
@@ -134,7 +131,7 @@ object SeverityTestScenarios {
 
   val AckStatusTestCasesForDisconnected = List(
     SetSeverityAckStatusTestCase(
-      alarmKey = AlarmKey(AOESW, "test", "alarm1"),
+      alarmKey = AlarmKey(Prefix(AOESW, "test"), "alarm1"),
       oldSeverity = Okay,
       newSeverity = null,            // this won't be used, new Severity will be Disconnected when old severity expires
       isAutoAcknowledgeable = false, // this flag does not have any significance in this test
@@ -142,7 +139,7 @@ object SeverityTestScenarios {
       newAckStatus = Acknowledged
     ),
     SetSeverityAckStatusTestCase(
-      alarmKey = AlarmKey(AOESW, "test", "alarm2"),
+      alarmKey = AlarmKey(Prefix(AOESW, "test"), "alarm2"),
       oldSeverity = Warning,
       newSeverity = null,            // this won't be used, new Severity will be Disconnected when old severity expires
       isAutoAcknowledgeable = false, // this flag does not have any significance in this test

@@ -55,4 +55,9 @@ object ComponentType extends Enum[ComponentType] {
    * Represents a general purpose service component e.g. actor and/or web service application
    */
   case object Service extends ComponentType("")
+
+  /**
+   * Represents a Machine
+   */
+  case object Machine extends ComponentType("")
 }

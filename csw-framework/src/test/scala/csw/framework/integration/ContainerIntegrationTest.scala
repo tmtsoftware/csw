@@ -35,6 +35,7 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-177: Hooks for lifecycle management
 // DEOPSCSW-182: Control Life Cycle of Components
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
+// CSW-82: ComponentInfo should take prefix
 class ContainerIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 

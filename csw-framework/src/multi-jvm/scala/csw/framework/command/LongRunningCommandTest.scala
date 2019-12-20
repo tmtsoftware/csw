@@ -34,6 +34,7 @@ class LongRunningCommandTestMultiJvm3 extends LongRunningCommandTest(0)
 // DEOPSCSW-227: Distribute commands to multiple destinations
 // DEOPSCSW-228: Assist Components with command completion
 // DEOPSCSW-233: Hide implementation by having a CCS API
+// CSW-82: ComponentInfo should take prefix
 class LongRunningCommandTest(ignore: Int)
     extends LSNodeSpec(config = new TwoMembersAndSeed, mode = "http")
     with MultiNodeHTTPLocationService

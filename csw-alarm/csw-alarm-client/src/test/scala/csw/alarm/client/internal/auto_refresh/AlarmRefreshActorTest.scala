@@ -8,6 +8,7 @@ import csw.alarm.models.AlarmSeverity.Major
 import csw.alarm.models.AutoRefreshSeverityMessage
 import csw.alarm.models.AutoRefreshSeverityMessage.{AutoRefreshSeverity, CancelAutoRefresh, SetSeverity}
 import csw.alarm.models.Key.AlarmKey
+import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.NFIRAOS
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers}
@@ -18,6 +19,7 @@ import scala.concurrent.duration.DurationDouble
 
 // DEOPSCSW-491: Auto-refresh an alarm through alarm service cli
 // DEOPSCSW-507: Auto-refresh utility for component developers
+// CSW-83: Alarm models should take prefix
 class AlarmRefreshActorTest
     extends ScalaTestWithActorTestKit(ManualTime.config)
     with FunSuiteLike
@@ -28,8 +30,8 @@ class AlarmRefreshActorTest
   implicit val actorSystem: ActorSystem[Nothing] = system
   import actorSystem.executionContext
 
-  val tromboneAxisHighLimitAlarmKey = AlarmKey(NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm")
-  val tcsAxisHighLimitAlarmKey      = AlarmKey(NFIRAOS, "tcs", "tromboneAxisHighLimitAlarm")
+  val tromboneAxisHighLimitAlarmKey = AlarmKey(Prefix(NFIRAOS, "trombone"), "tromboneAxisHighLimitAlarm")
+  val tcsAxisHighLimitAlarmKey      = AlarmKey(Prefix(NFIRAOS, "tcs"), "tromboneAxisHighLimitAlarm")
   private val manualTime            = ManualTime()
 
   private def send[T](msg: T, to: ActorRef[T]): Future[Done] = Future { to ! msg; Done }

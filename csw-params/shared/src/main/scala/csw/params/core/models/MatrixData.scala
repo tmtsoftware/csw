@@ -4,8 +4,9 @@ import java.util
 
 import com.github.ghik.silencer.silent
 
-import scala.jdk.CollectionConverters._
+import scala.annotation.varargs
 import scala.collection.mutable
+import scala.jdk.CollectionConverters._
 import scala.language.implicitConversions
 import scala.reflect.ClassTag
 
@@ -14,7 +15,7 @@ import scala.reflect.ClassTag
  *
  * @param data input array of array
  */
-case class MatrixData[T: ClassTag](data: mutable.ArraySeq[mutable.ArraySeq[T]]) {
+abstract case class MatrixData[T] private (data: mutable.ArraySeq[mutable.ArraySeq[T]])(val values: Array[Array[T]]) {
 
   /**
    * Returns a value stored at position represented by [row][col]
@@ -22,13 +23,6 @@ case class MatrixData[T: ClassTag](data: mutable.ArraySeq[mutable.ArraySeq[T]]) 
    * @return a value represented by T
    */
   def apply(row: Int, col: Int): T = data(row)(col)
-
-  /**
-   * An Array of values this parameter holds
-   */
-  def values: Array[Array[T]] = {
-    data.array.asInstanceOf[Array[mutable.ArraySeq[T]]].map(_.array.asInstanceOf[Array[T]])
-  }
 
   /**
    * A Java helper that returns an Array of values this parameter holds
@@ -50,37 +44,21 @@ object MatrixData {
    * @tparam T the type of values
    * @return an instance of MatrixData
    */
-  implicit def fromArrays[T: ClassTag](values: Array[Array[T]]): MatrixData[T] =
-    new MatrixData[T](values.map(x => x: mutable.ArraySeq[T]))
+  implicit def fromArrays[T](values: Array[Array[T]]): MatrixData[T] =
+    new MatrixData[T](values.map(x => x: mutable.ArraySeq[T]))(values) {}
 
   /**
    * Create a MatrixData from Array[T]
    *
-   * @param values one or more arrays
+   * @param rest one or more arrays
    * @tparam T the type of values
    * @return an instance of MatrixData
    */
-  def fromArrays[T: ClassTag](values: Array[T]*): MatrixData[T] =
-    new MatrixData[T](values.toArray.map(x => x: mutable.ArraySeq[T]))
-
-  /**
-   * A Java helper to create an MatrixData from one or more arrays
-   *
-   * @param values an Array of one or more array of values
-   * @tparam T the type of values
-   * @return an instance of MatrixData
-   */
-  def fromJavaArrays[T](klass: Class[T], values: Array[Array[T]]): MatrixData[T] =
-    new MatrixData[T](values.map(x => x: mutable.ArraySeq[T]))(ClassTag(klass))
-
-  /**
-   * Convert a Matrix of data from one type to other
-   *
-   * @param conversion a function of type A => B
-   * @tparam A the source type of data
-   * @tparam B the destination type of data
-   * @return a function of type MatrixData[A] => MatrixData[B]
-   */
-  implicit def conversion[A, B](implicit @silent conversion: A => B): MatrixData[A] => MatrixData[B] =
-    _.asInstanceOf[MatrixData[B]]
+  @varargs
+  def fromArrays[T](first: Array[T], rest: Array[T]*): MatrixData[T] = {
+    // getComponentType gives the Class type of T from Array[T]
+    @silent
+    implicit val ct: ClassTag[T] = ClassTag[T](first.getClass.getComponentType)
+    MatrixData.fromArrays((first +: rest).toArray)
+  }
 }
