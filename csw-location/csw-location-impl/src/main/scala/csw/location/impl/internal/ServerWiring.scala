@@ -33,20 +33,15 @@ class ServerWiring(settings: Settings) extends LocationServiceCodecs {
 
 object ServerWiring {
 
-  def make(maybeClusterPort: Option[Int], configKey: String): ServerWiring = {
-    val settings    = Settings(configKey)
-    val newSettings = maybeClusterPort.map(p => settings.copy(clusterPort = p)).getOrElse(settings)
-    new ServerWiring(newSettings)
-  }
+  def make(maybeClusterPort: Option[Int], configKey: String): ServerWiring =
+    new ServerWiring(Settings(configKey).withClusterPort(maybeClusterPort))
 
-  //todo: Refactor
-  def make(maybeClusterPort: Option[Int], mayBeHttpPort: Option[Int], configKey: String): ServerWiring = {
-    val settings = Settings(configKey)
-    val newSettings = mayBeHttpPort
-      .map(p => settings.copy(httpPort = p))
-      .getOrElse(maybeClusterPort.map(p => settings.copy(clusterPort = p)).getOrElse(settings))
-    new ServerWiring(newSettings)
-  }
+  def make(maybeClusterPort: Option[Int], mayBeHttpPort: Option[Int], configKey: String): ServerWiring =
+    new ServerWiring(
+      Settings(configKey)
+        .withHttpPort(mayBeHttpPort)
+        .withClusterPort(maybeClusterPort)
+    )
 
   def make(_clusterSettings: ClusterSettings, configKey: String): ServerWiring = {
     val settings = Settings(configKey)

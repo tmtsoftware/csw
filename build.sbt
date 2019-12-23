@@ -196,7 +196,7 @@ lazy val `csw-location-impl` = project
     `csw-location-client` % "test->compile;multi-jvm->compile",
     `csw-commons`         % "compile->compile;test->test"
   )
-  .enablePlugins(AutoMultiJvm, MaybeCoverage)
+  .enablePlugins(PublishBintray, AutoMultiJvm, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.LocationImpl.value
   )
