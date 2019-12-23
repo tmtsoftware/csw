@@ -5,6 +5,7 @@ import csw.command.client.messages.ComponentMessage
 import csw.logging.client.javadsl.JLoggerFactory
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
+import csw.prefix.models.Prefix
 
 //#component-logger-class
 class SampleClass(loggerFactory: LoggerFactory) {
@@ -32,7 +33,7 @@ class SampleTypedActor(loggerFactory: LoggerFactory, ctx: ActorContext[Component
 
 object Sample {
   //#logger-factory-creation
-  val loggerFactory: LoggerFactory = new LoggerFactory("my-component-name")
+  val loggerFactory: LoggerFactory = new LoggerFactory(Prefix("csw.my-component-name"))
 
   // convert a scala LoggerFactory to java JLoggerFactory
   val jLoggerFactory: JLoggerFactory = loggerFactory.asJava

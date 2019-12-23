@@ -4,15 +4,14 @@ import csw.alarm.models.AlarmSeverity._
 import csw.alarm.models.AlarmType.Absolute
 import csw.alarm.models.Key.AlarmKey
 import csw.alarm.models.{AlarmMetadata, AlarmType}
-import csw.params.core.models.Subsystem.{LGSF, NFIRAOS, TCS}
+import csw.prefix.models.Prefix
+import csw.prefix.models.Subsystem.{LGSF, NFIRAOS, TCS}
 
 trait AlarmTestData {
-
   // latchable, not auto-acknowledgable alarm
-  val tromboneAxisLowLimitAlarmKey = AlarmKey(NFIRAOS, "trombone", "tromboneAxisLowLimitAlarm")
+  val tromboneAxisLowLimitAlarmKey = AlarmKey(Prefix(NFIRAOS, "trombone"), "tromboneAxisLowLimitAlarm")
   val tromboneAxisLowLimitAlarm = AlarmMetadata(
-    subsystem = NFIRAOS,
-    component = "trombone",
+    prefix = Prefix(NFIRAOS, "trombone"),
     name = "tromboneAxisLowLimitAlarm",
     description = "Warns when trombone axis has reached the low limit",
     location = "south side",
@@ -26,10 +25,9 @@ trait AlarmTestData {
   )
 
   // latchable and auto-Acknowledgeable alarm
-  val tromboneAxisHighLimitAlarmKey = AlarmKey(NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm")
+  val tromboneAxisHighLimitAlarmKey = AlarmKey(Prefix(NFIRAOS, "trombone"), "tromboneAxisHighLimitAlarm")
   val tromboneAxisHighLimitAlarm = AlarmMetadata(
-    subsystem = NFIRAOS,
-    component = "trombone",
+    prefix = Prefix(NFIRAOS, "trombone"),
     name = "tromboneAxisHighLimitAlarm",
     description = "Warns when trombone axis has reached the high limit",
     location = "south side",
@@ -43,10 +41,9 @@ trait AlarmTestData {
   )
 
   // Multiple alarms added - no auto ack no latch
-  val splitterLimitAlarmKey = AlarmKey(NFIRAOS, "beamsplitter", "splitterLimitAlarm")
+  val splitterLimitAlarmKey = AlarmKey(Prefix(NFIRAOS, "beamsplitter"), "splitterLimitAlarm")
   val splitterLimitAlarm = AlarmMetadata(
-    subsystem = NFIRAOS,
-    component = "beamsplitter",
+    prefix = Prefix(NFIRAOS, "beamsplitter"),
     name = "splitterLimitAlarm",
     description = "Warns when beam splitter hits a limit",
     location = "south side",
@@ -60,10 +57,9 @@ trait AlarmTestData {
   )
 
   // Enclosure alarms added - no auto ack yes latch
-  val enclosureTempHighAlarmKey = AlarmKey(NFIRAOS, "enclosure", "tempHighAlarm")
+  val enclosureTempHighAlarmKey = AlarmKey(Prefix(NFIRAOS, "enclosure"), "tempHighAlarm")
   val enclosureTempHighAlarm = AlarmMetadata(
-    subsystem = NFIRAOS,
-    component = "enclosure",
+    prefix = Prefix(NFIRAOS, "enclosure"),
     name = "tempHighAlarm",
     description = "Enclosure temperature has gone out of range high",
     location = "enclosure",
@@ -77,10 +73,9 @@ trait AlarmTestData {
   )
 
   // Enclosure alarms added - no auto ack no latch
-  val enclosureTempLowAlarmKey = AlarmKey(NFIRAOS, "enclosure", "tempLowAlarm")
+  val enclosureTempLowAlarmKey = AlarmKey(Prefix(NFIRAOS, "enclosure"), "tempLowAlarm")
   val enclosureTempLowAlarm = AlarmMetadata(
-    subsystem = NFIRAOS,
-    component = "enclosure",
+    prefix = Prefix(NFIRAOS, "enclosure"),
     name = "tempLowAlarm",
     description = "Enclosure temperature has gone out of range low",
     location = "enclosure",
@@ -94,10 +89,9 @@ trait AlarmTestData {
   )
 
   // un-latchable, auto-acknowledgable alarm
-  val cpuExceededAlarmKey = AlarmKey(TCS, "tcsPk", "cpuExceededAlarm")
+  val cpuExceededAlarmKey = AlarmKey(Prefix(TCS, "tcspk"), "cpuExceededAlarm")
   val cpuExceededAlarm = AlarmMetadata(
-    subsystem = TCS,
-    component = "tcsPk",
+    prefix = Prefix(TCS, "tcspk"),
     name = "cpuExceededAlarm",
     description =
       "This alarm is activated when the tcsPk Assembly can no longer calculate all of its pointing values in the time allocated. The CPU may lock power, or there may be pointing loops running that are not needed. Response: Check to see if pointing loops are executing that are not needed or see about a more powerful CPU.",
@@ -112,10 +106,9 @@ trait AlarmTestData {
   )
 
   // un-latchable, auto-acknowledgable alarm
-  val outOfRangeOffloadAlarmKey = AlarmKey(TCS, "corrections", "outOfRangeOffload")
+  val outOfRangeOffloadAlarmKey = AlarmKey(Prefix(TCS, "corrections"), "outOfRangeOffload")
   val outOfRangeOffloadAlarm = AlarmMetadata(
-    subsystem = TCS,
-    component = "corrections",
+    prefix = Prefix(TCS, "corrections"),
     name = "outOfRangeOffload",
     description = "Another system has sent an out of range offload that has caused the system to go into a bad state!",
     location = "Computer Room",
@@ -128,10 +121,9 @@ trait AlarmTestData {
     activationStatus = Active
   )
 
-  val cpuIdleAlarmKey = AlarmKey(LGSF, "tcsPkInactive", "cpuIdleAlarm")
+  val cpuIdleAlarmKey = AlarmKey(Prefix(LGSF, "tcspkinactive"), "cpuIdleAlarm")
   val cpuIdleAlarm = AlarmMetadata(
-    subsystem = LGSF,
-    component = "tcsPkInactive",
+    prefix = Prefix(LGSF, "tcspkinactive"),
     name = "cpuIdleAlarm",
     description = "This alarm is activated CPU is idle",
     location = "in computer...",

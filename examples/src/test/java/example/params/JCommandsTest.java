@@ -10,9 +10,9 @@ import csw.params.core.generics.Parameter;
 import csw.params.core.models.ArrayData;
 import csw.params.core.models.MatrixData;
 import csw.params.core.models.ObsId;
-import csw.params.core.models.Prefix;
 import csw.params.javadsl.JKeyType;
-import csw.params.javadsl.JSubsystem;
+import csw.prefix.models.Prefix;
+import csw.prefix.javadsl.JSubsystem;
 import csw.params.javadsl.JUnits;
 import csw.time.core.models.UTCTime;
 import org.junit.Assert;
@@ -219,7 +219,7 @@ public class JCommandsTest extends JUnitSuite {
 
         //values
         Double[][] doubles = {{1.0, 2.0, 3.0}, {4.1, 5.1, 6.1}, {7.2, 8.2, 9.2}};
-        MatrixData<Double> m1 = MatrixData.fromJavaArrays(Double.class, doubles);
+        MatrixData<Double> m1 = MatrixData.fromArrays(doubles);
 
         //parameter
         Parameter<MatrixData<Double>> i1 = k1.set(m1);

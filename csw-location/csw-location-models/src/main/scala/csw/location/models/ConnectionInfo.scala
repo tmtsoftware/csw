@@ -1,6 +1,6 @@
 package csw.location.models
 
-import csw.params.core.models.Prefix
+import csw.prefix.models.Prefix
 
 /**
  * ConnectionInfo represents a component name, component type and connection type

@@ -18,7 +18,7 @@ import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.messages._
-import csw.command.client.messages.sequencer.SequencerMsg.{QueryFinal, SubmitSequence, Query}
+import csw.command.client.messages.sequencer.SequencerMsg.{Query, QueryFinal, SubmitSequence}
 import csw.command.client.models.framework.LockingResponse._
 import csw.command.client.models.framework.PubSub.{Subscribe, SubscribeOnly, Unsubscribe}
 import csw.command.client.models.framework.SupervisorLifecycleState._
@@ -32,8 +32,9 @@ import csw.params.commands._
 import csw.params.core.generics.KeyType.{ByteArrayKey, IntKey}
 import csw.params.core.generics.{Key, Parameter}
 import csw.params.core.models.Units.{coulomb, pascal}
-import csw.params.core.models.{ArrayData, Id, ObsId, Prefix}
+import csw.params.core.models.{ArrayData, Id, ObsId}
 import csw.params.core.states.{CurrentState, DemandState, StateName}
+import csw.prefix.models.Prefix
 import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.prop.Tables.Table
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -138,8 +139,8 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
       GetComponents(componentsProbe.ref),
       GetContainerLifecycleState(containerLifecycleStateProbe.ref),
       Query(Id(), queryResponseProbe.ref),
-      GetComponentLogMetadata("component-name", logMetadataProbe.ref),
-      SetComponentLogLevel("component-name", Level.WARN)
+      GetComponentLogMetadata(logMetadataProbe.ref),
+      SetComponentLogLevel(Level.WARN)
     )
 
     forAll(testData) { command =>
@@ -230,8 +231,7 @@ class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAft
           Component(
             componentMessageProbe.ref,
             ComponentInfo(
-              "componentName",
-              prefix.subsystem,
+              prefix,
               ComponentType.HCD,
               "behavior-class-name",
               LocationServiceUsage.DoNotRegister

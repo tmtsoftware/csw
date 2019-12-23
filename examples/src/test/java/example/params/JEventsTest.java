@@ -5,13 +5,13 @@ import csw.params.core.formats.JavaJsonSupport;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.MatrixData;
-import csw.params.core.models.Prefix;
 import csw.params.core.models.RaDec;
 import csw.params.events.EventName;
 import csw.params.events.ObserveEvent;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
-import csw.params.javadsl.JSubsystem;
+import csw.prefix.models.Prefix;
+import csw.prefix.javadsl.JSubsystem;
 import csw.params.javadsl.JUnits;
 import csw.time.core.models.UTCTime;
 import org.junit.Assert;
@@ -165,7 +165,7 @@ public class JEventsTest extends JUnitSuite {
 
         //values
         Double[][] doubles = {{1.0, 2.0, 3.0}, {4.1, 5.1, 6.1}, {7.2, 8.2, 9.2}};
-        MatrixData<Double> m1 = MatrixData.fromJavaArrays(Double.class, doubles);
+        MatrixData<Double> m1 = MatrixData.fromArrays(doubles);
 
         //parameter
         Parameter<MatrixData<Double>> i1 = k1.set(m1);

@@ -55,6 +55,7 @@ object FrameworkAssertions extends Matchers with Eventually {
 
   def assertThatMessageIsLogged(
       logBuffer: mutable.Buffer[JsObject],
+      subsystem: String,
       componentName: String,
       message: String,
       expLevel: Level,
@@ -67,11 +68,13 @@ object FrameworkAssertions extends Matchers with Eventually {
     val logMsg = maybeLogMsg.get
     Level(logMsg.getString("@severity")) shouldBe expLevel
     logMsg.getString("@componentName") shouldBe componentName
+    logMsg.getString("@subsystem") shouldBe subsystem
     logMsg.getString("class") shouldBe sanitizeClassName(className)
   }
 
   def assertThatExceptionIsLogged(
       logBuffer: mutable.Buffer[JsObject],
+      subsystem: String,
       componentName: String,
       message: String,
       expLevel: Level,
@@ -86,6 +89,7 @@ object FrameworkAssertions extends Matchers with Eventually {
     val logMsg = maybeLogMsg.get
     Level(logMsg.getString("@severity")) shouldBe expLevel
     logMsg.getString("@componentName") shouldBe componentName
+    logMsg.getString("@subsystem") shouldBe subsystem
     logMsg.getString("class") shouldBe sanitizeClassName(className)
 
     logMsg.contains("trace") shouldBe true

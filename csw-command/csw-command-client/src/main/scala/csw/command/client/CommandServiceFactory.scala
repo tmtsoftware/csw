@@ -10,7 +10,7 @@ import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.internal.{CommandServiceImpl, JCommandServiceImpl}
 import csw.command.client.messages.ComponentMessage
 import csw.location.models.{AkkaLocation, HttpLocation, Location, TcpLocation}
-import msocket.impl.Encoding.JsonText
+import msocket.api.Encoding.JsonText
 import msocket.impl.post.HttpPostTransport
 import msocket.impl.ws.WebsocketTransport
 

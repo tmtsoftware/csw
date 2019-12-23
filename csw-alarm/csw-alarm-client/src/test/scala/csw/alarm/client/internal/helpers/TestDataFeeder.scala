@@ -1,12 +1,13 @@
 package csw.alarm.client.internal.helpers
+import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
+import csw.alarm.client.internal.services.{MetadataServiceModule, SeverityServiceModule, StatusServiceModule}
 import csw.alarm.models.AcknowledgementStatus.Acknowledged
 import csw.alarm.models.ActivationStatus.Active
 import csw.alarm.models.AlarmSeverity._
 import csw.alarm.models.Key.AlarmKey
 import csw.alarm.models._
-import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
-import csw.alarm.client.internal.services.{MetadataServiceModule, SeverityServiceModule, StatusServiceModule}
-import csw.params.core.models.Subsystem.AOESW
+import csw.prefix.models.Prefix
+import csw.prefix.models.Subsystem.AOESW
 
 trait TestDataFeeder {
   self: SeverityServiceModule with MetadataServiceModule with StatusServiceModule =>
@@ -37,8 +38,7 @@ trait TestDataFeeder {
     setMetadata(
       alarmKey,
       AlarmMetadata(
-        subsystem = AOESW,
-        component = "test",
+        prefix = Prefix(AOESW, "test"),
         name = alarmKey.name,
         description = "for test purpose",
         location = "testing",

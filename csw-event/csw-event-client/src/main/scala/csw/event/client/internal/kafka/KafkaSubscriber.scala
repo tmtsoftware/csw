@@ -8,8 +8,8 @@ import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.event.api.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import csw.event.client.internal.commons.{EventConverter, EventSubscriberUtil}
 import csw.event.client.utils.Utils
-import csw.params.core.models.Subsystem
 import csw.params.events._
+import csw.prefix.models.Subsystem
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.common.TopicPartition
 

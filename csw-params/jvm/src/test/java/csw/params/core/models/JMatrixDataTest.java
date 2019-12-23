@@ -16,19 +16,19 @@ public class JMatrixDataTest extends JUnitSuite {
         Float[][] floatData = {{10000.10f, 20000.20f, 30000.30f}, {40000.40f, 50000f, 60000f}};
         Double[][] doubleData = {{100000.100d, 200000.200d, 300000.300d}, {400000.400d, 500000d, 600000d}};
 
-        MatrixData<Byte> byteMatrixData = MatrixData.fromJavaArrays(Byte.class, byteData);
-        MatrixData<Short> shortMatrixData = MatrixData.fromJavaArrays(Short.class, shortData);
-        MatrixData<Long> longMatrixData = MatrixData.fromJavaArrays(Long.class, longData);
-        MatrixData<Integer> integerMatrixData = MatrixData.fromJavaArrays(Integer.class, intData);
-        MatrixData<Float> floatMatrixData = MatrixData.fromJavaArrays(Float.class, floatData);
-        MatrixData<Double> doubleMatrixData = MatrixData.fromJavaArrays(Double.class, doubleData);
+        MatrixData<Byte> byteMatrixData = MatrixData.fromArrays(byteData);
+        MatrixData<Short> shortMatrixData = MatrixData.fromArrays(shortData);
+        MatrixData<Long> longMatrixData = MatrixData.fromArrays(longData);
+        MatrixData<Integer> integerMatrixData = MatrixData.fromArrays(intData);
+        MatrixData<Float> floatMatrixData = MatrixData.fromArrays(floatData);
+        MatrixData<Double> doubleMatrixData = MatrixData.fromArrays(doubleData);
 
-        Byte[][] actualByteValuesArray = (Byte[][])byteMatrixData.values();
-        Short[][] actualShortValuesArray = (Short[][])shortMatrixData.values();
-        Long[][] actualLongValuesArray = (Long[][])longMatrixData.values();
-        Integer[][] actualIntValuesArray = (Integer[][])integerMatrixData.values();
-        Float[][] actualFloatValuesArray = (Float[][])floatMatrixData.values();
-        Double[][] actualDoubleValuesArray = (Double[][])doubleMatrixData.values();
+        Byte[][] actualByteValuesArray = (Byte[][]) byteMatrixData.values();
+        Short[][] actualShortValuesArray = (Short[][]) shortMatrixData.values();
+        Long[][] actualLongValuesArray = (Long[][]) longMatrixData.values();
+        Integer[][] actualIntValuesArray = (Integer[][]) integerMatrixData.values();
+        Float[][] actualFloatValuesArray = (Float[][]) floatMatrixData.values();
+        Double[][] actualDoubleValuesArray = (Double[][]) doubleMatrixData.values();
 
         Assert.assertArrayEquals(byteData, actualByteValuesArray);
         Assert.assertArrayEquals(shortData, actualShortValuesArray);

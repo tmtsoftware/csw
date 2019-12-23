@@ -1,12 +1,12 @@
 package csw.params.core.models
 
-import java.util
-
 import com.github.ghik.silencer.silent
-import scala.jdk.CollectionConverters._
+
+import scala.annotation.varargs
 import scala.collection.mutable
 import scala.language.implicitConversions
 import scala.reflect.ClassTag
+import scala.jdk.CollectionConverters._
 
 /**
  * A top level key for a parameter set representing an array like collection.
@@ -23,7 +23,7 @@ case class ArrayData[T](data: mutable.ArraySeq[T]) {
   /**
    * A Java helper that returns an Array of values this parameter holds
    */
-  def jValues: util.List[T] = data.asJava
+  def jValues: java.util.List[T] = data.asJava
 
   /**
    * A comma separated string representation of all values this ArrayData holds
@@ -45,28 +45,14 @@ object ArrayData {
   /**
    * Create an ArrayData from one or more values
    *
-   * @param values one or more values
+   * @param rest one or more values
    * @tparam T the type of values
    * @return an instance of ArrayData
    */
-  def fromArray[T: ClassTag](values: T*): ArrayData[T] = new ArrayData(values.toArray[T])
-
-  /**
-   * A Java helper to create an ArrayData from one or more values
-   *
-   * @param values an Array of one or more values
-   * @tparam T the type of values
-   * @return an instance of ArrayData
-   */
-  def fromJavaArray[T](values: Array[T]): ArrayData[T] = ArrayData.fromArray(values)
-
-  /**
-   * Convert an Array of data from one type to other
-   *
-   * @param conversion a function of type A => B
-   * @tparam A the source type of data
-   * @tparam B the destination type of data
-   * @return a function of type ArrayData[A] => ArrayData[B]
-   */
-  implicit def conversion[A, B](implicit @silent conversion: A => B): ArrayData[A] => ArrayData[B] = _.asInstanceOf[ArrayData[B]]
+  @varargs
+  def fromArrays[T](first: T, rest: T*): ArrayData[T] = {
+    @silent
+    implicit val ct: ClassTag[T] = ClassTag[T](first.getClass)
+    ArrayData.fromArray((first +: rest).toArray)
+  }
 }

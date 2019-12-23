@@ -6,6 +6,7 @@ import akka.cluster.ddata.typed.scaladsl.Replicator
 import akka.cluster.ddata.typed.scaladsl.Replicator.{Changed, SubscribeResponse}
 import csw.location.api.extensions.URIExtension.RichURI
 import csw.location.api.scaladsl.LocationService
+import csw.location.models.Connection.HttpConnection
 import csw.location.models.{AkkaLocation, Location}
 import csw.location.server.commons.{CswCluster, LocationServiceLogger}
 import csw.location.server.internal.Registry.AllServices
@@ -60,6 +61,9 @@ private[location] class DeathwatchActor(locationService: LocationService)(implic
           case Some(location) =>
             //if deadActorRef is mapped to a location, unregister it and remove it from watched locations
             locationService.unregister(location.connection)
+            // unregister the http connection for an akka connection if present else do nothing, locationService.unregister is idempotent
+            val httpConnection = HttpConnection(location.connection.componentId)
+            locationService.unregister(httpConnection)
             behavior(watchedLocations - location)
           case None =>
             //if deadActorRef does not match any location, don't change a thing!

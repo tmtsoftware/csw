@@ -51,7 +51,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar wit
     val supervisorInfoFactory: SupervisorInfoFactory            = mock[SupervisorInfoFactory]
 
     private def answer(ci: ComponentInfo): Future[Some[SupervisorInfo]] = {
-      val componentProbe: TestProbe[ComponentMessage] = TestProbe(ci.name)
+      val componentProbe: TestProbe[ComponentMessage] = TestProbe(ci.prefix.value)
       val supervisorInfo                              = SupervisorInfo(typedSystem, Component(componentProbe.ref, ci))
 
       supervisorInfos += SupervisorInfo(typedSystem, Component(componentProbe.ref, ci))

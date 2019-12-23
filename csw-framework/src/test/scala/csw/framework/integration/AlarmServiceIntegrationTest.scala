@@ -15,13 +15,15 @@ import csw.location.models.ComponentId
 import csw.location.models.ComponentType.HCD
 import csw.location.models.Connection.AkkaConnection
 import csw.params.commands.Setup
-import csw.params.core.models.{Prefix, Subsystem}
+import csw.prefix.models.{Prefix, Subsystem}
 import redis.embedded.{RedisSentinel, RedisServer}
 
 import scala.concurrent.duration.DurationLong
 
 //DEOPSCSW-490: Alarm service integration with framework
 //DEOPSCSW-481: Component Developer API available to all CSW components
+//CSW-82: ComponentInfo should take prefix
+//CSW-83: Alarm models should take prefix
 class AlarmServiceIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 

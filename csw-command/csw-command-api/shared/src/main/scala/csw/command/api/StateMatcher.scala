@@ -1,7 +1,7 @@
 package csw.command.api
 import akka.util.Timeout
-import csw.params.core.models.Prefix
 import csw.params.core.states.{CurrentState, StateName}
+import csw.prefix.models.Prefix
 
 /**
  * The base trait to build Matchers to match given state against a predicate

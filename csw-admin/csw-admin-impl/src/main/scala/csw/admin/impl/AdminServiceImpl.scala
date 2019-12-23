@@ -23,7 +23,7 @@ class AdminServiceImpl(locationService: LocationService)(implicit actorSystem: A
 
   override def getLogMetadata(componentId: ComponentId): Future[LogMetadata] = {
     val akkaConnection = AkkaConnection(componentId)
-    val componentName  = componentId.prefix.toString
+    val prefix         = componentId.prefix
 
     locationService
       .find(akkaConnection)
@@ -32,21 +32,21 @@ class AdminServiceImpl(locationService: LocationService)(implicit actorSystem: A
           .map(akkaLocation => {
             log.info(
               "Getting log information from logging system",
-              Map("componentName" -> componentName, "location" -> akkaLocation.toString)
+              Map("prefix" -> prefix.toString, "location" -> akkaLocation.toString)
             )
             val response: Future[LogMetadata] = componentId.componentType match {
-              case Sequencer => akkaLocation.sequencerRef ? (GetComponentLogMetadata(componentName, _))
-              case _         => akkaLocation.componentRef ? (GetComponentLogMetadata(componentName, _))
+              case Sequencer => akkaLocation.sequencerRef ? GetComponentLogMetadata
+              case _         => akkaLocation.componentRef ? GetComponentLogMetadata
             }
             response
           })
-          .getOrElse[Future[LogMetadata]](throw new UnresolvedAkkaLocationException(componentName))
+          .getOrElse[Future[LogMetadata]](throw new UnresolvedAkkaLocationException(prefix))
       )
   }
 
   override def setLogLevel(componentId: ComponentId, level: Level): Future[Unit] = {
     val akkaConnection = AkkaConnection(componentId)
-    val componentName  = componentId.prefix.toString
+    val prefix         = componentId.prefix
 
     locationService
       .find(akkaConnection)
@@ -55,14 +55,14 @@ class AdminServiceImpl(locationService: LocationService)(implicit actorSystem: A
           .map(akkaLocation => {
             log.info(
               s"Setting log level to $level",
-              Map("componentName" -> componentName, "location" -> akkaLocation.toString)
+              Map("prefix" -> prefix.toString, "location" -> akkaLocation.toString)
             )
             componentId.componentType match {
-              case Sequencer => akkaLocation.sequencerRef ! SetComponentLogLevel(componentName, level)
-              case _         => akkaLocation.componentRef ! SetComponentLogLevel(componentName, level)
+              case Sequencer => akkaLocation.sequencerRef ! SetComponentLogLevel(level)
+              case _         => akkaLocation.componentRef ! SetComponentLogLevel(level)
             }
           })
-          .getOrElse[Unit](throw new UnresolvedAkkaLocationException(componentName))
+          .getOrElse[Unit](throw new UnresolvedAkkaLocationException(prefix))
       )
   }
 }

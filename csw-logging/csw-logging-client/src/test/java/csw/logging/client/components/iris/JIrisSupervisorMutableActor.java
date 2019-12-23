@@ -6,11 +6,12 @@ import akka.actor.typed.javadsl.Behaviors;
 import csw.logging.api.javadsl.ILogger;
 import csw.logging.client.LogCommand;
 import csw.logging.client.javadsl.JLoggerFactory;
+import csw.prefix.models.Prefix;
 
 public class JIrisSupervisorMutableActor {
 
-    public static Behavior<LogCommand> irisBeh(String componentName) {
-        JLoggerFactory loggerFactory = new JLoggerFactory(componentName);
+    public static Behavior<LogCommand> irisBeh(Prefix prefix) {
+        JLoggerFactory loggerFactory = new JLoggerFactory(prefix);
         return new JIrisSupervisorMutableActor().behavior(loggerFactory);
     }
 

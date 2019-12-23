@@ -14,6 +14,7 @@ import msocket.api.codecs.BasicCodecs
 import msocket.api.models.ServiceError
 
 object CommandServiceCodecs extends CommandServiceCodecs
+
 trait CommandServiceCodecs extends ParamCodecs with BasicCodecs {
 
   implicit def httpCodec[T <: CommandServiceHttpMessage]: Codec[T] = httpCodecsValue.asInstanceOf[Codec[T]]
@@ -34,10 +35,10 @@ trait CommandServiceCodecs extends ParamCodecs with BasicCodecs {
     deriveCodec
   }
 
-  implicit lazy val CommandServiceHttpMessageErrorType: ErrorProtocol[CommandServiceHttpMessage] =
+  implicit lazy val CommandServiceHttpErrorProtocol: ErrorProtocol[CommandServiceHttpMessage] =
     ErrorProtocol.bind[CommandServiceHttpMessage, ServiceError]
 
-  implicit lazy val CommandServiceWebsocketMessage: api.ErrorProtocol[CommandServiceWebsocketMessage] =
+  implicit lazy val CommandServiceWebsocketErrorProtocol: api.ErrorProtocol[CommandServiceWebsocketMessage] =
     ErrorProtocol.bind[CommandServiceWebsocketMessage, ServiceError]
 
 }

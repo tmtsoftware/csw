@@ -9,8 +9,8 @@ import csw.command.client.CommandResponseManager;
 import csw.command.client.CommandServiceFactory;
 import csw.command.client.messages.TopLevelActorMessage;
 import csw.command.client.models.framework.ComponentInfo;
-import csw.config.api.javadsl.IConfigClientService;
 import csw.config.api.ConfigData;
+import csw.config.api.javadsl.IConfigClientService;
 import csw.config.client.javadsl.JConfigClientFactory;
 import csw.event.api.javadsl.IEventService;
 import csw.framework.CurrentStatePublisher;
@@ -23,13 +23,9 @@ import csw.location.api.javadsl.JComponentType;
 import csw.location.models.*;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.*;
-import csw.params.core.generics.Key;
 import csw.params.core.models.Id;
-import csw.params.core.models.Prefix;
-import csw.params.core.states.CurrentState;
-import csw.params.core.states.StateName;
-import csw.params.javadsl.JKeyType;
-import csw.params.javadsl.JSubsystem;
+import csw.prefix.models.Prefix;
+import csw.prefix.javadsl.JSubsystem;
 import csw.time.core.models.UTCTime;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -226,7 +222,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                             if (commandResponse instanceof CommandResponse.Completed) {
                                 // As the commands get completed, the results are updated in the commandResponseManager
                                 // TODO: FIX ME
-                               commandResponseManager.updateCommand(commandResponse);
+                                commandResponseManager.updateCommand(commandResponse);
                             } else {
                                 // do something
                             }

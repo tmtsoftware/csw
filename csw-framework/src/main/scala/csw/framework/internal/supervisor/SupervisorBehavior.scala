@@ -36,7 +36,8 @@ import csw.location.models.{AkkaRegistration, ComponentId}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.LogAdminUtil
 import csw.params.commands.CommandResponse.Locked
-import csw.params.core.models.{Id, Prefix}
+import csw.params.core.models.Id
+import csw.prefix.models.Prefix
 
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.util.{Failure, Success}
@@ -113,8 +114,8 @@ private[framework] final class SupervisorBehavior(
       case (SupervisorLifecycleState.Running, message: SupervisorInternalRunningMessage)       => onInternalRunning(message)
       case (SupervisorLifecycleState.Running, runningMessage: SupervisorRunningMessage)        => onRunning(runningMessage)
       case (SupervisorLifecycleState.RunningOffline, runningMessage: SupervisorRunningMessage) => onRunning(runningMessage)
-      case (_, GetComponentLogMetadata(prefixHandle, replyTo))                                 => replyTo ! LogAdminUtil.getLogMetadata(prefixHandle)
-      case (_, SetComponentLogLevel(prefixHandle, logLevel))                                   => LogAdminUtil.setComponentLogLevel(prefixHandle, logLevel)
+      case (_, GetComponentLogMetadata(replyTo))                                               => replyTo ! LogAdminUtil.getLogMetadata(prefix)
+      case (_, SetComponentLogLevel(logLevel))                                                 => LogAdminUtil.setComponentLogLevel(prefix, logLevel)
       case (_, message)                                                                        => ignore(message)
     }
     this

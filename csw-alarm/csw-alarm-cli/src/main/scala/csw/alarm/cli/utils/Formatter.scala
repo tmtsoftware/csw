@@ -1,10 +1,11 @@
 package csw.alarm.cli.utils
 
+import csw.alarm.cli.args.Options
+import csw.alarm.client.internal.models.Alarm
 import csw.alarm.commons.Separators.KeySeparator
 import csw.alarm.models.Key._
 import csw.alarm.models._
-import csw.alarm.cli.args.Options
-import csw.alarm.client.internal.models.Alarm
+import csw.prefix.models.Prefix
 
 object Formatter {
 
@@ -28,10 +29,11 @@ object Formatter {
   def formatRefreshSeverity(key: Key, severity: FullAlarmSeverity): String    = s"Severity for [$key] refreshed to: $severity"
 
   def msg(key: Key, property: String, value: String): String = key match {
-    case GlobalKey                          => s"Aggregated $property of Alarm Service: $value"
-    case SubsystemKey(subsystem)            => s"Aggregated $property of Subsystem [$subsystem]: $value"
-    case ComponentKey(subsystem, component) => s"Aggregated $property of Component [$subsystem$KeySeparator$component]: $value"
-    case _: AlarmKey                        => s"$property of Alarm [$key]: $value"
+    case GlobalKey               => s"Aggregated $property of Alarm Service: $value"
+    case SubsystemKey(subsystem) => s"Aggregated $property of Subsystem [$subsystem]: $value"
+    case ComponentKey(Prefix(subsystem, component)) =>
+      s"Aggregated $property of Component [${subsystem.name}$KeySeparator$component]: $value"
+    case _: AlarmKey => s"$property of Alarm [$key]: $value"
   }
 
   private def formatAlarm(alarm: Alarm): String =
@@ -41,8 +43,7 @@ object Formatter {
     import metadata._
 
     List(
-      s"Subsystem: $subsystem",
-      s"Component: $component",
+      s"Prefix: $prefix",
       s"Name: $name",
       s"Description: $description",
       s"Location: $location",

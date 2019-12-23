@@ -18,7 +18,7 @@ case class RegistrationFailed(msg: String) extends LocationServiceError(msg) {
  */
 case class OtherLocationIsRegistered(msg: String) extends LocationServiceError(msg) {
   def this(location: Location, otherLocation: Location) =
-    this(s"there is other location=$otherLocation registered against name=${location.connection.name}.")
+    this(s"there is another location=$otherLocation registered against name=${location.connection.name}.")
 }
 
 /**

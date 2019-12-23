@@ -1,9 +1,9 @@
 package csw.event.client.perf.model_obs
 
-import csw.params.core.models.Prefix
-import csw.params.core.models.Subsystem.{AOESW, DMS, IRIS, NFIRAOS, TCS, WFOS}
 import csw.event.client.perf.model_obs.BaseSetting.{PubSetting, SubSetting}
 import csw.event.client.perf.wiring.TestConfigs
+import csw.prefix.models.Subsystem._
+import csw.prefix.models.Prefix
 
 class ModelObsScenarios(testConfigs: TestConfigs) {
   import testConfigs._

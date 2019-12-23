@@ -3,18 +3,19 @@ package csw.alarm.client.internal.services
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.alarm.api.exceptions.KeyNotFoundException
 import csw.alarm.api.internal.MetadataKey
+import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
+import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.alarm.models.ActivationStatus.{Active, Inactive}
 import csw.alarm.models.AlarmHealth.Bad
 import csw.alarm.models.AlarmSeverity._
 import csw.alarm.models.FullAlarmSeverity.Disconnected
 import csw.alarm.models.Key.{AlarmKey, ComponentKey, GlobalKey, SubsystemKey}
 import csw.alarm.models.{ActivationStatus, AlarmStatus}
-import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
-import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
-import csw.params.core.models.Subsystem
-import csw.params.core.models.Subsystem.NFIRAOS
+import csw.prefix.models.{Prefix, Subsystem}
+import csw.prefix.models.Subsystem.{CSW, NFIRAOS}
 
 // DEOPSCSW-486: Provide API to load alarm metadata in Alarm store from file
+// CSW-83: Alarm models should take prefix
 class MetadataServiceModuleTest
     extends AlarmServiceTestSetup
     with MetadataServiceModule
@@ -36,19 +37,19 @@ class MetadataServiceModuleTest
 
   //  DEOPSCSW-445: Get api for alarm metadata
   test("getMetadata should throw exception while getting metadata if key does not exist") {
-    val invalidAlarm = AlarmKey(Subsystem.CSW, "invalid", "invalid")
+    val invalidAlarm = AlarmKey(Prefix(CSW, "invalid"), "invalid")
     an[KeyNotFoundException] shouldBe thrownBy(getMetadata(invalidAlarm).await)
   }
 
   // DEOPSCSW-463: Fetch Alarm List for a component name or pattern
   test("getMetadata should fetch all alarms for a component") {
     initTestAlarms()
-    val tromboneKey      = ComponentKey(NFIRAOS, "trombone")
+    val tromboneKey      = ComponentKey(Prefix(NFIRAOS, "trombone"))
     val tromboneMetadata = getMetadata(tromboneKey).await
     tromboneMetadata.length shouldBe 2
     tromboneMetadata should contain allElementsOf List(tromboneAxisLowLimitAlarm, tromboneAxisHighLimitAlarm)
 
-    val enclosureKey      = ComponentKey(NFIRAOS, "enclosure")
+    val enclosureKey      = ComponentKey(Prefix(NFIRAOS, "enclosure"))
     val enclosureMetadata = getMetadata(enclosureKey).await
     enclosureMetadata.length shouldBe 2
     enclosureMetadata should contain allElementsOf List(enclosureTempHighAlarm, enclosureTempLowAlarm)
@@ -207,7 +208,7 @@ class MetadataServiceModuleTest
   // DEOPSCSW-443: Model to represent Alarm Activation status
   // DEOPSCSW-448: Set Activation status for an alarm entity
   test("should throw exception when tried to activate/deactivate alarm which is not present in alarm store") {
-    val invalidKey = AlarmKey(Subsystem.CSW, "invalid", "invalid")
+    val invalidKey = AlarmKey(Prefix(CSW, "invalid"), "invalid")
 
     an[KeyNotFoundException] shouldBe thrownBy(activate(invalidKey).await)
     an[KeyNotFoundException] shouldBe thrownBy(deactivate(invalidKey).await)

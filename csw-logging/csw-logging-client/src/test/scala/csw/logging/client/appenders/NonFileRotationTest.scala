@@ -30,6 +30,8 @@ class NonFileRotationTest extends FunSuite with Matchers with BeforeAndAfterEach
     s"""{
       |  "${LoggingKeys.CATEGORY}": "alternative",
       |  "${LoggingKeys.COMPONENT_NAME}": "FileAppenderTest",
+      |  "${LoggingKeys.SUBSYSTEM}": "csw",
+      |  "${LoggingKeys.PREFIX}": "csw.FileAppenderTest",
       |  "${LoggingKeys.HOST}": "localhost",
       |  "${LoggingKeys.NAME}": "test-service",
       |  "${LoggingKeys.SEVERITY}": "ERROR",
@@ -45,6 +47,8 @@ class NonFileRotationTest extends FunSuite with Matchers with BeforeAndAfterEach
     s"""{
       |  "${LoggingKeys.CATEGORY}": "${Category.Common.name}",
       |  "${LoggingKeys.COMPONENT_NAME}": "FileAppenderTest",
+      |  "${LoggingKeys.SUBSYSTEM}": "csw",
+      |  "${LoggingKeys.PREFIX}": "csw.FileAppenderTest",
       |  "${LoggingKeys.HOST}": "localhost",
       |  "${LoggingKeys.NAME}": "test-service",
       |  "${LoggingKeys.SEVERITY}": "ERROR",
@@ -60,6 +64,8 @@ class NonFileRotationTest extends FunSuite with Matchers with BeforeAndAfterEach
     s"""{
       |  "${LoggingKeys.CATEGORY}": "${Category.Common.name}",
       |  "${LoggingKeys.COMPONENT_NAME}": "FileAppenderTest",
+      |  "${LoggingKeys.SUBSYSTEM}": "csw",
+      |  "${LoggingKeys.PREFIX}": "csw.FileAppenderTest",
       |  "${LoggingKeys.HOST}": "localhost",
       |  "${LoggingKeys.NAME}": "test-service",
       |  "${LoggingKeys.SEVERITY}": "INFO",
@@ -89,6 +95,7 @@ class NonFileRotationTest extends FunSuite with Matchers with BeforeAndAfterEach
   }
 
   // DEOPSCSW-281 Rolling File Configuration
+  // CSW-78: PrefixRedesign for logging
   test("verify log file rotation is off") {
     fileAppender.append(expectedLogMsgJson1, "alternative")
     fileAppender.append(expectedLogMsgJson2, Category.Common.name)

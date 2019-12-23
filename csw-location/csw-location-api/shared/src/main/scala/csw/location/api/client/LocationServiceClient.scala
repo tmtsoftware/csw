@@ -9,9 +9,9 @@ import csw.location.api.messages.LocationWebsocketMessage.Track
 import csw.location.api.messages.{LocationHttpMessage, LocationWebsocketMessage}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.models._
+import csw.prefix.models.Prefix
 import msocket.api.{Subscription, Transport}
 import msocket.api.codecs.BasicCodecs
-import portable.akka.extensions.PortableAkka.SourceWithSubscribe
 
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
@@ -52,12 +52,12 @@ class LocationServiceClient(
   override def list(connectionType: ConnectionType): Future[List[Location]] =
     httpTransport.requestResponse[List[Location]](ListByConnectionType(connectionType))
 
-  override def listByPrefix(prefix: String): Future[List[AkkaLocation]] =
+  override def listByPrefix(prefix: Prefix): Future[List[Location]] =
     httpTransport.requestResponse[List[AkkaLocation]](ListByPrefix(prefix))
 
   override def track(connection: Connection): Source[TrackingEvent, Subscription] =
     websocketTransport.requestStream[TrackingEvent](Track(connection))
 
   override def subscribe(connection: Connection, callback: TrackingEvent => Unit): Subscription =
-    track(connection).subscribe(callback)
+    websocketTransport.requestStream[TrackingEvent](Track(connection), callback)
 }

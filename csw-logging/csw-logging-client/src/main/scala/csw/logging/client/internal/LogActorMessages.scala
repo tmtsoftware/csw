@@ -3,6 +3,7 @@ package csw.logging.client.internal
 import csw.logging.client.appenders.LogAppender
 import csw.logging.macros.SourceLocation
 import csw.logging.models.{AnyId, Level}
+import csw.prefix.models.Prefix
 import play.api.libs.json.JsObject
 
 // Parent trait for Log messages shared with Log Actor
@@ -12,7 +13,7 @@ private[csw] object LogActorMessages {
 
   // Model for common Log messages shared with Log Actor
   case class Log(
-      componentName: Option[String],
+      prefix: Option[Prefix],
       level: Level,
       id: AnyId,
       time: Long,

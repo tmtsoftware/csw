@@ -1,6 +1,7 @@
 package csw.location.api.messages
 
 import csw.location.models._
+import csw.prefix.models.Prefix
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -16,5 +17,5 @@ object LocationHttpMessage {
   case class ListByComponentType(componentType: ComponentType)                      extends LocationHttpMessage
   case class ListByHostname(hostname: String)                                       extends LocationHttpMessage
   case class ListByConnectionType(connectionType: ConnectionType)                   extends LocationHttpMessage
-  case class ListByPrefix(prefix: String)                                           extends LocationHttpMessage
+  case class ListByPrefix(prefix: Prefix)                                           extends LocationHttpMessage
 }

@@ -3,13 +3,14 @@ package csw.location.models.scaladsl
 import csw.location.models
 import csw.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.models.{ComponentId, ComponentType, Connection}
-import csw.params.core.models.{Prefix, Subsystem}
+import csw.prefix.models.{Prefix, Subsystem}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
+// CSW-80: Prefix should be in lowercase
 class ConnectionTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
   // DEOPSCSW-14: Codec for data model
   test("should able to form a string representation for akka connection for trombone HCD") {
-    val expectedAkkaConnectionName = "nfiraos.tromboneHcd-hcd-akka"
+    val expectedAkkaConnectionName = "nfiraos.trombonehcd-hcd-akka"
     val akkaConnection             = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneHcd"), ComponentType.HCD))
     akkaConnection.name shouldBe expectedAkkaConnectionName
   }
@@ -30,7 +31,7 @@ class ConnectionTest extends FunSuite with Matchers with BeforeAndAfterAll with 
 
   // DEOPSCSW-14: Codec for data model
   test("should able to form a string representation for akka connection for trombone container") {
-    val expectedAkkaConnectionName = "container.tromboneContainer-container-akka"
+    val expectedAkkaConnectionName = "container.trombonecontainer-container-akka"
     val akkaConnection =
       AkkaConnection(models.ComponentId(Prefix(Subsystem.Container, "tromboneContainer"), ComponentType.Container))
     akkaConnection.name shouldBe expectedAkkaConnectionName
@@ -38,7 +39,7 @@ class ConnectionTest extends FunSuite with Matchers with BeforeAndAfterAll with 
 
   // DEOPSCSW-14: Codec for data model
   test("should able to form a string representation for akka connection for trombone assembly") {
-    val expectedAkkaConnectionName = "nfiraos.tromboneAssembly-assembly-akka"
+    val expectedAkkaConnectionName = "nfiraos.tromboneassembly-assembly-akka"
     val akkaConnection             = AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneAssembly"), ComponentType.Assembly))
     akkaConnection.name shouldBe expectedAkkaConnectionName
   }

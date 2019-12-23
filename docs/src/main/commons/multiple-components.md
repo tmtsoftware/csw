@@ -183,7 +183,7 @@ If a component wants to send a command to another component, it uses a `CommandS
 The Command Service provides a few different ways of performing `Submit` commands.   In particular, for sending single commands, there are two flavors: `submit`
 and `submitAndWait`.  Both commands take a `Setup` or `Observe` and return a Future response encapsulating a `SubmitResponse` type.  The 
 difference is when handling long running commands.  If the command is short, in both cases, the Future returned by the command
-is expected to complete quickly with the response as a `Completed ` or `CompletedWithResult` (or some error response).  If the 
+is expected to complete quickly with the response as a `Completed ` (or some error response).  If the 
 command is long running, the `submit` command should return a `Started` response.  Then the 
 final response of the command must be obtained from the `CommandResponseManager` through polling (`query`) or subscribing (`queryFinal`).
 A `submitAndWait` combines the `submit` with the `queryFinal`, so that the Future returned from the command doesn't complete until the long

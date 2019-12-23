@@ -23,8 +23,9 @@ import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.logging.models.Level.INFO
 import csw.logging.client.internal.LoggingSystem
-import csw.params.core.models.{Prefix, Subsystem}
 import csw.params.core.states.{CurrentState, StateName}
+import csw.prefix.models.Subsystem
+import csw.prefix.models.Prefix
 import io.lettuce.core.RedisClient
 import play.api.libs.json.{JsObject, Json}
 
@@ -35,6 +36,8 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-167: Creation and Deployment of Standalone Components
 // DEOPSCSW-177: Hooks for lifecycle management
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
+// CSW-80: Prefix should be in lowercase
+// CSW-82: ComponentInfo should take prefix
 class StandaloneComponentTest extends FrameworkIntegrationSuite {
   import testWiring._
   // all log messages will be captured in log buffer
@@ -108,7 +111,8 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
     // DEOPSCSW-180: Generic and Specific Log messages
     assertThatMessageIsLogged(
       logBuffer,
-      "iris.IFS_Detector",
+      "iris",
+      "ifs_detector",
       "Invoking lifecycle handler's initialize hook",
       INFO,
       ComponentBehavior.getClass.getName
@@ -116,7 +120,8 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
     // log message from Component handler
     assertThatMessageIsLogged(
       logBuffer,
-      "iris.IFS_Detector",
+      "iris",
+      "ifs_detector",
       "Initializing Component TLA",
       INFO,
       classOf[SampleComponentHandlers].getName

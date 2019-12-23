@@ -9,12 +9,11 @@ import akka.stream.javadsl.Sink;
 import csw.event.api.javadsl.IEventSubscription;
 import csw.event.api.scaladsl.SubscriptionModes;
 import csw.event.client.helpers.Utils;
-//import csw.event.client.internal.kafka.KafkaTestProps;
 import csw.event.client.internal.redis.RedisTestProps;
 import csw.event.client.internal.wiring.BaseProperties;
-import csw.params.core.models.Prefix;
 import csw.params.events.*;
-import csw.params.javadsl.JSubsystem;
+import csw.prefix.models.Prefix;
+import csw.prefix.javadsl.JSubsystem;
 import org.scalatestplus.testng.TestNGSuite;
 import org.testng.Assert;
 import org.testng.annotations.AfterSuite;
@@ -27,6 +26,8 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Supplier;
 
+import csw.event.client.internal.kafka.KafkaTestProps;
+
 //DEOPSCSW-331: Event Service Accessible to all CSW component builders
 //DEOPSCSW-334: Publish an event
 //DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
@@ -36,14 +37,14 @@ import java.util.function.Supplier;
 public class JEventSubscriberTest extends TestNGSuite {
 
     private RedisTestProps redisTestProps;
-//    private KafkaTestProps kafkaTestProps;
+    private KafkaTestProps kafkaTestProps;
 
     @BeforeSuite
     public void beforeAll() {
         redisTestProps = RedisTestProps.jCreateRedisProperties();
-//        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties();
+        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties();
         redisTestProps.start();
-//        kafkaTestProps.start();
+        kafkaTestProps.start();
     }
 
     public List<Event> getEvents() {
@@ -64,12 +65,12 @@ public class JEventSubscriberTest extends TestNGSuite {
     @AfterSuite
     public void afterAll() {
         redisTestProps.shutdown();
-//        kafkaTestProps.shutdown();
+        kafkaTestProps.shutdown();
     }
 
     @DataProvider(name = "event-service-provider")
     public Object[] pubsubProvider() {
-        return new Object[]{redisTestProps, /*kafkaTestProps*/};
+        return new Object[]{redisTestProps, kafkaTestProps};
     }
 
     @DataProvider(name = "redis-provider")
@@ -242,9 +243,9 @@ public class JEventSubscriberTest extends TestNGSuite {
     // Pattern subscription doesn't work with embedded kafka hence not running it with the suite
     @Test(dataProvider = "redis-provider")
     public void should_be_able_to_subscribe_an_event_with_pattern_from_different_subsystem(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
-        Event testEvent1 = Utils.makeEventWithPrefix(1, new Prefix(JSubsystem.CSW(), "prefix"));
-        Event testEvent2 = Utils.makeEventWithPrefix(2, new Prefix(JSubsystem.CSW(), "prefix"));
-        Event tcsEvent1 = Utils.makeEventWithPrefix(1, new Prefix(JSubsystem.TCS(), "prefix"));
+        Event testEvent1 = Utils.makeEventWithPrefix(1, Prefix.apply(JSubsystem.CSW(), "prefix"));
+        Event testEvent2 = Utils.makeEventWithPrefix(2, Prefix.apply(JSubsystem.CSW(), "prefix"));
+        Event tcsEvent1 = Utils.makeEventWithPrefix(1, Prefix.apply(JSubsystem.TCS(), "prefix"));
 
         TestProbe<Event> probe = TestProbe.create(baseProperties.actorSystem());
 
@@ -273,7 +274,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         Event testEvent3 = Utils.makeEventForKeyName(new EventName("temperature"), 3);
         Event testEvent4 = Utils.makeEventForKeyName(new EventName("move"), 3);
         Event testEvent5 = Utils.makeEventForKeyName(new EventName("cove"), 3);
-        Event testEvent6 = Utils.makeEventForPrefixAndKeyName(new Prefix(JSubsystem.CSW(), "test_prefix"), new EventName("move"), 6);
+        Event testEvent6 = Utils.makeEventForPrefixAndKeyName(Prefix.apply(JSubsystem.CSW(), "test_prefix"), new EventName("move"), 6);
 
         TestInbox<Event> inbox = TestInbox.create();
         TestInbox<Event> inbox2 = TestInbox.create();
@@ -332,7 +333,7 @@ public class JEventSubscriberTest extends TestNGSuite {
 
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_make_independent_subscriptions(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
-        Prefix prefix = new Prefix(JSubsystem.CSW(), "prefix");
+        Prefix prefix = Prefix.apply(JSubsystem.CSW(), "prefix");
         EventName eventName1 = new EventName("system1");
         EventName eventName2 = new EventName("system2");
         Event event1 = new SystemEvent(prefix, eventName1);

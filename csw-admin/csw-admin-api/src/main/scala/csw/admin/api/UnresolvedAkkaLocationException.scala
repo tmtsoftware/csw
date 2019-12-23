@@ -1,4 +1,6 @@
 package csw.admin.api
 
-class UnresolvedAkkaLocationException(componentName: String)
-    extends RuntimeException(s"Could not resolve $componentName to a valid Akka location")
+import csw.prefix.models.Prefix
+
+class UnresolvedAkkaLocationException(prefix: Prefix)
+    extends RuntimeException(s"Could not resolve ${prefix.value} to a valid Akka location")
