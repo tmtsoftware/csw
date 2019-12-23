@@ -48,7 +48,7 @@ object Libs {
   val httpclient        = "org.apache.httpcomponents"     % "httpclient"      % "4.5.10"
   val `jboss-logging`   = "org.jboss.logging"             % "jboss-logging"   % "3.4.1.Final"
   val `config`          = "com.typesafe"                  % "config"          % "1.4.0"
-  val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.4.2"
+  val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.5.0"
   val `caffeine`        = "com.github.ben-manes.caffeine" % "caffeine"        % "2.8.0"
 
 }
