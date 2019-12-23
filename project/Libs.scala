@@ -35,7 +35,7 @@ object Libs {
   val `embedded-kafka`    = "io.github.embeddedkafka" %% "embedded-kafka"    % "2.4.0"
   val `embedded-redis`    = "com.github.kstyrc"       % "embedded-redis"     % "0.6"
   val `scala-compiler`    = "org.scala-lang"          % "scala-compiler"     % ScalaVersion
-  val `HdrHistogram`      = "org.hdrhistogram"        % "HdrHistogram"       % "2.1.11"
+  val `HdrHistogram`      = "org.hdrhistogram"        % "HdrHistogram"       % "2.1.12"
   val `testng`            = "org.testng"              % "testng"             % "6.14.3"
 
   val `scala-csv`             = "com.github.tototoshi" %% "scala-csv"            % "1.3.6"
