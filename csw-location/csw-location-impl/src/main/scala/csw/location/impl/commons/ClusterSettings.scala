@@ -137,4 +137,4 @@ private[location] case class ClusterSettings(clusterName: String = Constants.Clu
  * can be used to add properties like port, seedNodes etc. `ClusterAwareSettings` is used internally in spawning many csw
  * apps like `csw-location-server`, `csw-config-cli`, `csw-config-server`, etc.
  */
-private[csw] object ClusterAwareSettings extends ClusterSettings
+object ClusterAwareSettings extends ClusterSettings
