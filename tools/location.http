@@ -15,6 +15,7 @@ Content-Type: application/json
     }
   }
 }
+
 ###
 // #register
 
@@ -29,6 +30,7 @@ Content-Type: application/json
     "connectionType": "http"
   }
 }
+
 ###
 // #un-register
 
@@ -43,6 +45,7 @@ Content-Type: application/json
     "connectionType": "http"
   }
 }
+
 ###
 // #find
 
@@ -60,6 +63,7 @@ Content-Type: application/json
     "within": "5 seconds"
   }
 }
+
 ###
 // #resolve
 
@@ -70,6 +74,7 @@ Content-Type: application/json
 {
   "ListEntries": {}
 }
+
 ###
 // #list
 
@@ -80,6 +85,7 @@ Content-Type: application/json
 {
   "ListByComponentType": "service"
 }
+
 ###
 // #list-by-componenttype
 
@@ -90,6 +96,7 @@ Content-Type: application/json
 {
   "ListByHostname": "192.168.5.105"
 }
+
 ###
 // #list-by-hostname
 
@@ -100,6 +107,7 @@ Content-Type: application/json
 {
   "ListByConnectionType": "tcp"
 }
+
 ###
 // #list-by-connectiontype
 
@@ -110,6 +118,7 @@ Content-Type: application/json
 {
   "ListByPrefix": "csw.eventserver"
 }
+
 ###
 // #list-by-prefix
 
@@ -120,6 +129,18 @@ Content-Type: application/json
 {
   "UnregisterAll": {}
 }
+
 ###
 // #un-register-all
 
+http://localhost:7654/websocket-endpoint
+Content-Type: application/json
+
+{
+  "Track": {
+    "prefix": "csw.server",
+    "componentType": "service",
+    "connectionType": "http"
+  }
+}
+###
