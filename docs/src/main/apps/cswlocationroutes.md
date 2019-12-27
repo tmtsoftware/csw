@@ -86,12 +86,4 @@ of location service.
 The `location.http` has first class support to execute http requests directly from IDEs like `IntelliJ IDEA` provided location server
 is already running.
 
-@@@   
-
-
-
-
-
-
-
- 
+@@@

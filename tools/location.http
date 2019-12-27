@@ -133,6 +133,7 @@ Content-Type: application/json
 ###
 // #un-register-all
 
+# Dummy websocket implementation
 http://localhost:7654/websocket-endpoint
 Content-Type: application/json
 
