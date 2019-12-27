@@ -2,7 +2,7 @@ package csw.config.client
 
 import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.config.server.mocks.MockedAuthentication
-import csw.location.impl.internal.{ServerWiring, Settings}
+import csw.location.server.internal.ServerWiring
 import org.mockito.MockitoSugar
 import org.scalatest._
 
@@ -13,7 +13,7 @@ trait ConfigClientBaseSuite
     with BeforeAndAfterEach
     with BeforeAndAfterAll
     with MockitoSugar {
-  private val locationWiring = new ServerWiring(Settings("csw-location-server"))
+  private val locationWiring = new ServerWiring
 
   override protected def beforeAll(): Unit = locationWiring.locationHttpService.start()
 

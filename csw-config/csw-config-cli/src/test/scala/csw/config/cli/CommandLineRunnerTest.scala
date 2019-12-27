@@ -14,7 +14,7 @@ import csw.config.models.ConfigId
 import csw.config.server.ServerWiring
 import csw.config.server.mocks.MockedAuthentication
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.impl.http.HTTPLocationService
+import csw.location.server.http.HTTPLocationService
 import org.scalatest.{BeforeAndAfterEach, Matchers}
 
 // DEOPSCSW-112: Command line interface client for Configuration service

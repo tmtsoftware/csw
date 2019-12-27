@@ -16,7 +16,7 @@ import csw.config.server.mocks.MockedAuthentication
 import csw.config.server.{ServerWiring, Settings}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.helpers.LSNodeSpec
-import csw.location.impl.http.MultiNodeHTTPLocationService
+import csw.location.server.http.MultiNodeHTTPLocationService
 import org.mockito.MockitoSugar
 import org.scalatest.FunSuiteLike
 

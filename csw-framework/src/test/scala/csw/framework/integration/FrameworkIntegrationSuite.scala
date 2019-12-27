@@ -1,7 +1,7 @@
 package csw.framework.integration
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.FrameworkTestWiring
-import csw.location.impl.internal.{ServerWiring, Settings}
+import csw.location.server.internal.ServerWiring
 import org.mockito.MockitoSugar
 import org.scalatest._
 import org.scalatest.concurrent.ScalaFutures
@@ -15,7 +15,7 @@ trait FrameworkIntegrationSuite
     with OptionValues
     with MockitoSugar {
 
-  private val locationWiring = new ServerWiring(Settings("csw-location-server"))
+  private val locationWiring = new ServerWiring
   val testWiring             = new FrameworkTestWiring()
 
   override protected def beforeAll(): Unit = locationWiring.locationHttpService.start()

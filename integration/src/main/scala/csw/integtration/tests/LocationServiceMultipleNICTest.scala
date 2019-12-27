@@ -2,10 +2,10 @@ package csw.integtration.tests
 
 import csw.integtration.common.TestFutureExtension.RichFuture
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.impl.commons.ClusterAwareSettings
-import csw.location.impl.internal.ServerWiring
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.location.server.commons.ClusterAwareSettings
+import csw.location.server.internal.ServerWiring
 import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.network.utils.Networks
 import csw.prefix.models.{Prefix, Subsystem}
@@ -21,8 +21,7 @@ class LocationServiceMultipleNICTest() extends FunSuite with Matchers with Befor
   implicit val patience: PatienceConfig =
     PatienceConfig(Span(5, org.scalatest.time.Seconds), Span(100, org.scalatest.time.Millis))
 
-  val adminWiring: ServerWiring =
-    ServerWiring.make(ClusterAwareSettings.onPort(3553).withInterface("eth1"), "csw-location-server")
+  val adminWiring: ServerWiring = ServerWiring.make(ClusterAwareSettings.onPort(3553).withInterface("eth1"))
   LoggingSystemFactory.start("Assembly", "1.0", Networks().hostname, adminWiring.actorSystem)
 
   adminWiring.locationHttpService.start().futureValue

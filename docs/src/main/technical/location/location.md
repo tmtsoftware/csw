@@ -26,7 +26,7 @@ See [here](https://medium.com/@unmeshvjoshi/service-discovery-with-crdts-fb02bb4
 
 The implementation of the Location Service is split into following four sub-modules:
 
-- @ref:[csw-location-api](./location-api.md) - common API implemented by the `csw-location-impl` and `csw-location-client`
-- @ref:[csw-location-server & csw-location-impl](./location-server.md) - think of it as an agent which runs on every machine and exposes HTTP routes which underneath uses akka cluster and distributed data.
+- @ref:[csw-location-api](./location-api.md) - common API implemented by the `csw-location-server` and `csw-location-client`
+- @ref:[csw-location-server](./location-server.md) - think of it as a agent which runs on every machine and exposes HTTP routes which underneath uses akka cluster and distributed data.
 - @ref:[csw-location-client](./location-client.md) - lightweight HTTP client for location service
 - @ref:[csw-location-agent](./location-agent.md) - an application used to register non-csw services (Http/Tcp).

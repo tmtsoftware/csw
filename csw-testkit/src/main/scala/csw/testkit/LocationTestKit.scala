@@ -3,7 +3,7 @@ package csw.testkit
 import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import csw.location.impl.internal.ServerWiring
+import csw.location.server.internal.ServerWiring
 import csw.testkit.internal.TestKitUtils
 
 /**
@@ -24,7 +24,7 @@ import csw.testkit.internal.TestKitUtils
  */
 final class LocationTestKit private (testKitSettings: TestKitSettings) {
 
-  private lazy val locationWiring = ServerWiring.make(testKitSettings.LocationClusterPort, "csw-location-server")
+  private lazy val locationWiring = ServerWiring.make(testKitSettings.LocationClusterPort)
   import locationWiring.actorRuntime._
 
   implicit lazy val timeout: Timeout = testKitSettings.DefaultTimeout

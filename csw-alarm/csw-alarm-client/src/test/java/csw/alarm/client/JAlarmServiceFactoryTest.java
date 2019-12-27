@@ -13,7 +13,7 @@ import csw.location.api.javadsl.ILocationService;
 import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import csw.location.models.TcpRegistration;
-import csw.location.impl.http.JHTTPLocationService;
+import csw.location.server.http.JHTTPLocationService;
 import org.junit.*;
 import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;

@@ -27,8 +27,7 @@ object Dependencies {
     )
   )
 
-  // todo: remove unnecessary dependencies
-  val LocationImpl = Def.setting(
+  val LocationServer = Def.setting(
     Seq(
       Libs.`config`,
       Akka.`akka-actor`,
@@ -40,9 +39,10 @@ object Dependencies {
       Akka.`akka-cluster-typed`,
       AkkaHttp.`akka-http-cors`,
       Libs.`scala-async`,
+      Libs.`scopt`,
       Libs.`enumeratum`.value,
       Akka.`cluster-sharding`,
-      Akka.`akka-persistence`, //todo: where is this used
+      Akka.`akka-persistence`,
       Libs.`akka-management-cluster-http`,
       AkkaHttp.`akka-http`,
       MSocket.`msocket-impl-jvm`,
@@ -52,18 +52,6 @@ object Dependencies {
       Libs.`mockito-scala`            % Test,
       Akka.`akka-stream-testkit`      % Test,
       Akka.`akka-multi-node-testkit`  % Test
-    )
-  )
-
-  val LocationServer = Def.setting(
-    Seq(
-      Libs.`config`,
-      Libs.`scala-async`,
-      Libs.`scopt`,
-      Libs.`enumeratum`.value,
-      Libs.`scalatest`.value % Test,
-      Libs.`junit`           % Test,
-      Libs.`mockito-scala`   % Test
     )
   )
 

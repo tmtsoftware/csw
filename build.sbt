@@ -36,7 +36,6 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
 
 lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-location-server`,
-  `csw-location-impl`,
   `csw-config-server`,
   `csw-location-agent`,
   `csw-config-cli`,
@@ -146,7 +145,6 @@ lazy val `csw-location` = project
     `csw-location-api`.jvm,
     `csw-location-api`.js,
     `csw-location-server`,
-    `csw-location-impl`,
     `csw-location-client`,
     `csw-location-agent`
   )
@@ -175,7 +173,6 @@ lazy val `csw-location-api` = crossProject(JSPlatform, JVMPlatform)
 lazy val `csw-location-server` = project
   .in(file("csw-location/csw-location-server"))
   .dependsOn(
-    `csw-location-impl`,
     `csw-location-api`.jvm,
     `csw-logging-client`,
     `csw-network-utils`,
@@ -185,20 +182,6 @@ lazy val `csw-location-server` = project
   .enablePlugins(DeployApp, AutoMultiJvm, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.LocationServer.value
-  )
-
-lazy val `csw-location-impl` = project
-  .in(file("csw-location/csw-location-impl"))
-  .dependsOn(
-    `csw-location-api`.jvm,
-    `csw-logging-client`,
-    `csw-network-utils`,
-    `csw-location-client` % "test->compile;multi-jvm->compile",
-    `csw-commons`         % "compile->compile;test->test"
-  )
-  .enablePlugins(PublishBintray, AutoMultiJvm, MaybeCoverage)
-  .settings(
-    libraryDependencies ++= Dependencies.LocationImpl.value
   )
 
 lazy val `csw-location-client` = project
@@ -259,8 +242,8 @@ lazy val `csw-config-server` = project
     `csw-config-api`,
     `csw-location-client`,
     `csw-aas-http`,
-    `csw-location-impl` % "test->test",
-    `csw-commons`       % "compile->compile;test->test"
+    `csw-location-server` % "test->test",
+    `csw-commons`         % "compile->compile;test->test"
   )
   .enablePlugins(DeployApp, MaybeCoverage)
   .settings(
@@ -272,9 +255,9 @@ lazy val `csw-config-client` = project
   .dependsOn(
     `csw-config-api`,
     `csw-location-api`.jvm,
-    `csw-commons`       % "compile->compile;test->test",
-    `csw-location-impl` % "multi-jvm->multi-jvm",
-    `csw-config-server` % "test->test;multi-jvm->test"
+    `csw-commons`         % "compile->compile;test->test",
+    `csw-location-server` % "multi-jvm->multi-jvm",
+    `csw-config-server`   % "test->test;multi-jvm->test"
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm, MaybeCoverage)
   .settings(
@@ -287,9 +270,9 @@ lazy val `csw-config-cli` = project
     `csw-config-client`,
     `csw-location-client`,
     `csw-aas-installed`,
-    `csw-location-impl` % "multi-jvm->multi-jvm",
-    `csw-config-server` % "test->test;multi-jvm->test",
-    `csw-commons`       % "test->test"
+    `csw-location-server` % "multi-jvm->multi-jvm",
+    `csw-config-server`   % "test->test;multi-jvm->test",
+    `csw-commons`         % "test->test"
   )
   .enablePlugins(DeployApp, AutoMultiJvm, MaybeCoverage)
   .settings(
@@ -370,10 +353,10 @@ lazy val `csw-framework` = project
     `csw-alarm-client`,
     `csw-time-scheduler`,
     `csw-location-client`,
-    `csw-event-client`  % "test->test",
-    `csw-location-impl` % "test->test;multi-jvm->multi-jvm",
-    `csw-config-server` % "multi-jvm->test",
-    `csw-commons`       % "test->test"
+    `csw-event-client`    % "test->test",
+    `csw-location-server` % "test->test;multi-jvm->multi-jvm",
+    `csw-config-server`   % "multi-jvm->test",
+    `csw-commons`         % "test->test"
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm, CswBuildInfo, MaybeCoverage)
   .settings(
@@ -410,7 +393,7 @@ lazy val `csw-command-client` = project
     `csw-logging-client`,
     `csw-location-api`.jvm,
     `csw-location-client` % "test->test",
-    `csw-location-impl`   % "test->test",
+    `csw-location-server` % "test->test",
     `csw-commons`         % "test->test"
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm, MaybeCoverage)
@@ -439,8 +422,8 @@ lazy val `csw-event-client` = project
     `csw-logging-client`,
     `romaine`,
     `csw-location-api`.jvm,
-    `csw-location-impl` % "test->test;multi-jvm->multi-jvm",
-    `csw-commons`       % "test->test"
+    `csw-location-server` % "test->test;multi-jvm->multi-jvm",
+    `csw-commons`         % "test->test"
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.EventClient.value)
@@ -490,9 +473,9 @@ lazy val `csw-alarm-client` = project
     `csw-location-api`.jvm,
     `csw-logging-client`,
     `romaine`,
-    `csw-logging-client` % "test->test",
-    `csw-commons`        % "test->test",
-    `csw-location-impl`  % "test->compile;test->test"
+    `csw-logging-client`  % "test->test",
+    `csw-commons`         % "test->test",
+    `csw-location-server` % "test->compile;test->test"
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.AlarmClient.value)
@@ -503,8 +486,8 @@ lazy val `csw-alarm-cli` = project
     `csw-alarm-client`,
     `csw-config-client`,
     `csw-location-client`,
-    `csw-location-impl` % "test->test",
-    `csw-config-server` % "test->test"
+    `csw-location-server` % "test->test",
+    `csw-config-server`   % "test->test"
   )
   .enablePlugins(DeployApp, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.AlarmCli.value)
@@ -555,7 +538,7 @@ lazy val `csw-time-scheduler` = project
 
 lazy val `csw-testkit` = project
   .dependsOn(
-    `csw-location-impl`,
+    `csw-location-server`,
     `csw-config-server`,
     `csw-framework`
   )
@@ -567,7 +550,7 @@ lazy val `csw-testkit` = project
 lazy val `csw-database` = project
   .dependsOn(
     `csw-location-api`.jvm,
-    `csw-location-impl` % "test->compile;test->test"
+    `csw-location-server` % "test->compile;test->test"
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.DatabaseClient.value)
@@ -606,7 +589,7 @@ lazy val docs = project
 /* =================== Examples ================ */
 lazy val examples = project
   .dependsOn(
-    `csw-location-impl`,
+    `csw-location-server`,
     `csw-config-client`,
     `csw-aas-http`,
     `csw-logging-client`,
@@ -635,8 +618,8 @@ lazy val `csw-benchmark` = project
     `csw-params`.jvm,
     `csw-command-client`,
     `csw-time-scheduler`,
-    `csw-location-impl` % "compile->test",
-    `csw-framework`     % "compile->compile;test->test"
+    `csw-location-server` % "compile->test",
+    `csw-framework`       % "compile->compile;test->test"
   )
   .enablePlugins(NoPublish, JmhPlugin)
   .disablePlugins(BintrayPlugin)
@@ -647,7 +630,7 @@ lazy val `csw-benchmark` = project
 /* ================ Integration Tests ============= */
 lazy val integration = project
   .dependsOn(
-    `csw-location-impl`,
+    `csw-location-server`,
     `csw-command-client`,
     `csw-location-agent`,
     `csw-network-utils`
@@ -686,7 +669,7 @@ lazy val `csw-aas-core` = project
 
 lazy val `csw-aas-http` = project
   .in(file("csw-aas/csw-aas-http"))
-  .dependsOn(`csw-aas-core`, `csw-location-impl` % "multi-jvm->multi-jvm")
+  .dependsOn(`csw-aas-core`, `csw-location-server` % "multi-jvm->multi-jvm")
   .enablePlugins(AutoMultiJvm)
   .settings(
     libraryDependencies ++= Dependencies.AuthAkkaHttpAdapter.value

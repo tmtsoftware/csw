@@ -23,7 +23,7 @@ import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import csw.location.models.AkkaLocation;
 import csw.location.models.ComponentId;
 import csw.location.models.Connection.AkkaConnection;
-import csw.location.impl.http.JHTTPLocationService;
+import csw.location.server.http.JHTTPLocationService;
 import csw.params.commands.CommandIssue;
 import csw.params.commands.CommandResponse;
 import csw.params.commands.CommandResponse.*;

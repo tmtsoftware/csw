@@ -23,4 +23,4 @@ which converts the returned `Future` and `Option` types to their Java equivalent
 
 ## Tests
 
-There are only a few tests in the `csw-location-client` project. Most of the features are actually tested in the `csw-location-impl` project.
+There are only a few tests in the `csw-location-client` project. Most of the features are actually tested in the `csw-location-server` project.

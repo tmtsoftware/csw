@@ -2,11 +2,11 @@ package csw.location.server
 
 import akka.Done
 import akka.actor.CoordinatedShutdown
-import csw.location.impl.commons.ClusterAwareSettings
-import csw.location.impl.internal.ServerWiring
 import csw.location.server.cli.{ArgsParser, Options}
+import csw.location.server.commons.ClusterAwareSettings
+import csw.location.server.internal.ServerWiring
 
-import scala.concurrent.duration.DurationLong
+import scala.concurrent.duration.DurationDouble
 import scala.util.control.NonFatal
 
 /**
@@ -27,12 +27,12 @@ object Main extends App {
         )
       }
       else {
-        val wiring = ServerWiring.make(maybeClusterPort, "csw-location-server")
+        val wiring = ServerWiring.make(maybeClusterPort)
 
         import wiring._
         import actorRuntime._
         try {
-          startLogging(name, clusterSettings.hostname, BuildInfo.version)
+          startLogging(name, clusterSettings.hostname)
 
           val locationBindingF = locationHttpService.start()
 

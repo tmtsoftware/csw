@@ -13,14 +13,13 @@ import csw.config.server.http.HttpService;
 import csw.config.server.mocks.JMockedAuthentication;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
-import csw.location.impl.internal.Settings;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
 public class JConfigClientBaseSuite extends JMockedAuthentication {
 
-    private csw.location.impl.internal.ServerWiring locationWiring = new csw.location.impl.internal.ServerWiring(Settings.apply("csw-location-server"));
+    private csw.location.server.internal.ServerWiring locationWiring = new csw.location.server.internal.ServerWiring();
 
     private ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create(Behaviors.empty(), "Guardian"));
     private ILocationService clientLocationService = JHttpLocationServiceFactory.makeLocalClient(actorRuntime.typedSystem());
