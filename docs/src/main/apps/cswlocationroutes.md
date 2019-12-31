@@ -115,6 +115,41 @@ ws://localhost:7654/websocket-endpoint
 
 ```
 
+### Responses
+
+Location Updated
+
+```json
+{
+  "LocationUpdated": {
+    "location": {
+      "HttpLocation": {
+        "connection": {
+          "prefix": "csw.server",
+          "componentType": "service",
+          "connectionType": "http"
+        },
+        "uri": "http://192.168.5.105:1234/root/path1"
+      }
+    }
+  }
+}
+```
+
+Location Removed
+
+```json
+{
+  "LocationRemoved": {
+    "connection": {
+      "prefix": "csw.server",
+      "componentType": "service",
+      "connectionType": "http"
+    }
+  }
+}
+```
+
 @@@ note
 
 One can use websocket plugin for [IntelliJ](https://plugins.jetbrains.com/plugin/7980-websocket-client/) or [chrome extension]
