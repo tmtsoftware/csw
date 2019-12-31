@@ -71,19 +71,6 @@ Content-Type: application/json
 ###
 // #un-register
 
-// #invalid-un-register
-POST http://localhost:7654/post-endpoint
-Content-Type: application/json
-
-{
-  "Unregister": {
-    "prefix": "csw.server",
-    "componentType": "service"
-  }
-}
-###
-// #invalid-un-register
-
 // #find
 POST http://localhost:7654/post-endpoint
 Content-Type: application/json

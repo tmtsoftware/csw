@@ -57,18 +57,6 @@ Content-Length: 6
 ###
 // #un-register-response
 
-// #un-register-bad-request-response
-HTTP/1.1 400 Bad Request
-Server: akka-http/10.1.11
-Date: Mon, 30 Dec 2019 12: 49: 36 GMT
-Content-Type: text/plain; charset=UTF-8
-Content-Length: 134
-
-The request content was malformed: Cannot decode `ConnectionInfo` instance due to missing map key "connectionType" (input position 81)
-
-###
-// #un-register-bad-request-response
-
 // #find-response
 HTTP/1.1 200 OK
 Server: akka-http/10.1.11

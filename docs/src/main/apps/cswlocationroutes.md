@@ -34,14 +34,6 @@ Unregister
 200 Ok
 :   @@snip [location-responses.http](../../../../tools/http/location-responses.http) { #un-register-response }
 
-### Malformed Request 
-
-Malformed Request
-:   @@snip [location.http](../../../../tools/http/location.http) { #invalid-un-register }
-
-400 Bad Request
-:   @@snip [location-responses.http](../../../../tools/http/location-responses.http) { #un-register-bad-request-response }
-
 ## Find a location
 
 Find
@@ -49,8 +41,6 @@ Find
 
 200 Ok
 :   @@snip [location-responses.http](../../../../tools/http/location-responses.http) { #find-response }
-
-* 400 Bad Request 
 
 ## Resolve a location
 
@@ -60,8 +50,6 @@ Resolve
 200 Ok
 :   @@snip [location-responses.http](../../../../tools/http/location-responses.http) { #resolve-response }
 
-* 400 Bad Request 
-
 ## List all locations
 
 List
@@ -69,8 +57,6 @@ List
 
 200 Ok
 :   @@snip [location-responses.http](../../../../tools/http/location-responses.http) { #list-response }
-
-* 400 Bad Request
 
 ## List all locations by component type
 
@@ -80,8 +66,6 @@ List by component type
 200 Ok
 :   @@snip [location-responses.http](../../../../tools/http/location-responses.http) { #list-by-componenttype-response }
 
-* 400 Bad Request
-
 ## List all locations by hostname
 
 List by hostname
@@ -89,8 +73,6 @@ List by hostname
 
 200 Ok
 :   @@snip [location-responses.http](../../../../tools/http/location-responses.http) { #list-by-hostname-response }
-
-* 400 Bad Request
 
 ## List all locations by connection type
 
@@ -100,8 +82,6 @@ List by connection type
 200 Ok
 :   @@snip [location-responses.http](../../../../tools/http/location-responses.http) { #list-by-connectiontype-response }
 
-* 400 Bad Request
-
 ## List all locations by prefix
 
 List by prefix
@@ -110,8 +90,6 @@ List by prefix
 200 Ok
 :   @@snip [location-responses.http](../../../../tools/http/location-responses.http) { #list-by-prefix-response }
 
-* 400 Bad Request
-
 ## Unregister all connections
 
 Unregister all
@@ -119,8 +97,6 @@ Unregister all
 
 200 Ok
 :   @@snip [location-responses.http](../../../../tools/http/location-responses.http) { #unregister-all-response }
-
-* 400 Bad Request
 
 ## Track a connection
 
@@ -144,6 +120,12 @@ ws://localhost:7654/websocket-endpoint
 One can use websocket plugin for [IntelliJ](https://plugins.jetbrains.com/plugin/7980-websocket-client/) or [chrome extension]
 (https://chrome.google.com/webstore/detail/simple-websocket-client/pfdhoblngboilpfeibdedpjgfnlcodoo?hl=en) to test the track functionality
 of location service.
+
+@@@
+
+@@@ note
+
+All the requests to location server can result in `400 Bad Request` or `500 Internal Server error`
 
 @@@  
 
