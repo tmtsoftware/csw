@@ -6,9 +6,10 @@ import csw.params.core.models.Coords.EqFrame.FK5
 import csw.params.core.models.Coords.SolarSystemObject.Venus
 import csw.params.core.models._
 import csw.time.core.models.UTCTime
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class KeysAndParametersTest extends FunSpec with Matchers {
+class KeysAndParametersTest extends AnyFunSpec with Matchers {
   // DEOPSCSW-196: Command Payloads for variable command content
   describe("Examples of keys and parameters") {
 

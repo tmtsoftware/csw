@@ -4,14 +4,16 @@ import java.net.InetAddress
 
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.logging.client.internal.LoggingSystem
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import play.api.libs.json.{JsObject, Json}
 
 import scala.collection.mutable
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-abstract class LoggingTestSuite() extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
+abstract class LoggingTestSuite() extends AnyFunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
 
   protected lazy val actorSystem                    = ActorSystem(SpawnProtocol(), "test")
   protected val logBuffer: mutable.Buffer[JsObject] = mutable.Buffer.empty[JsObject]

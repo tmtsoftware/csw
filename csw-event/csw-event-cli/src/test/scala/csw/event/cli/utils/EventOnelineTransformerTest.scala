@@ -4,12 +4,13 @@ import csw.event.cli.IterableExtensions.RichStringIterable
 import csw.event.cli.args.Options
 import csw.params.core.formats.JsonSupport
 import csw.params.events.{ObserveEvent, SystemEvent}
-import org.scalatest.{FunSuite, Matchers}
 import play.api.libs.json.Json
 
 import scala.io.Source
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class EventOnelineTransformerTest extends FunSuite with Matchers {
+class EventOnelineTransformerTest extends AnyFunSuite with Matchers {
 
   private val event1Str = Source.fromResource("seedData/event1.json").mkString
   private val event2Str = Source.fromResource("seedData/event2.json").mkString

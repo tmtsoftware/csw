@@ -17,19 +17,21 @@ import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.utils.FileUtils
 import csw.logging.models.Level
 import csw.logging.models.Level.{DEBUG, ERROR, INFO, TRACE}
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import play.api.libs.json.{JsObject, Json}
 
 import scala.collection.mutable
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 // DEOPSCSW-122: Allow local component logs to be output to STDOUT
 // DEOPSCSW-123: Allow local component logs to be output to a file
 // DEOPSCSW-126: Configurability of logging characteristics for component / log instance
 // DEOPSCSW-142: Flexibility of logging approaches
 // DEOPSCSW-649: Fixed directory configuration for multi JVM scenario
-class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
+class LoggingConfigurationTest extends AnyFunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
   val log: Logger                            = GenericLoggerFactory.getLogger
   private val logFileDir                     = Paths.get("/tmp/csw-test-logs").toFile
   private val sampleLogMessage               = "Sample log message"
@@ -358,7 +360,7 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
     }
     loggingSystem.getAppenders shouldBe List(StdOutAppender)
 
-    val expectedOneLineLog = " INFO   (LoggingConfigurationTest.scala 102) - Sample log message"
+    val expectedOneLineLog = " INFO   (LoggingConfigurationTest.scala 104) - Sample log message"
 
     val (timestamp, message) = os.toString.trim.splitAt(24)
 

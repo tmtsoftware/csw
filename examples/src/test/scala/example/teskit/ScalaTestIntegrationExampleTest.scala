@@ -4,9 +4,9 @@ package example.teskit
 import com.typesafe.config.ConfigFactory
 import csw.testkit.scaladsl.CSWService.{AlarmServer, EventServer}
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
-import org.scalatest.FunSuiteLike
+import org.scalatest.funsuite.AnyFunSuiteLike
 
-class ScalaTestIntegrationExampleTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with FunSuiteLike {
+class ScalaTestIntegrationExampleTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with AnyFunSuiteLike {
 
   test("test spawning component in standalone mode") {
     spawnStandalone(ConfigFactory.load("SampleHcdStandalone.conf"))

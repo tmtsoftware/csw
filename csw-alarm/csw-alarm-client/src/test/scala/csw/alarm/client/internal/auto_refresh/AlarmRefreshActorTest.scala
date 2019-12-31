@@ -11,18 +11,20 @@ import csw.alarm.models.Key.AlarmKey
 import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.NFIRAOS
 import org.scalatest.concurrent.Eventually
-import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers}
+import org.scalatest.BeforeAndAfterAll
 
 import scala.collection.mutable
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
+import org.scalatest.funsuite.AnyFunSuiteLike
+import org.scalatest.matchers.should.Matchers
 
 // DEOPSCSW-491: Auto-refresh an alarm through alarm service cli
 // DEOPSCSW-507: Auto-refresh utility for component developers
 // CSW-83: Alarm models should take prefix
 class AlarmRefreshActorTest
     extends ScalaTestWithActorTestKit(ManualTime.config)
-    with FunSuiteLike
+    with AnyFunSuiteLike
     with Eventually
     with Matchers
     with BeforeAndAfterAll {

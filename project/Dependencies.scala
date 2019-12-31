@@ -49,6 +49,7 @@ object Dependencies {
       Akka.`akka-actor-testkit-typed` % Test,
       Libs.`scalatest`.value          % Test,
       Libs.`junit`                    % Test,
+      Libs.`scalatestplus-junit`      % Test,
       Libs.`mockito-scala`            % Test,
       Akka.`akka-stream-testkit`      % Test,
       Akka.`akka-multi-node-testkit`  % Test
@@ -171,10 +172,11 @@ object Dependencies {
       Libs.`enumeratum`.value,
       Akka.`akka-actor`,
       Akka.`akka-actor-typed`,
-      Libs.`scalatest`.value % Test,
-      Libs.`junit`           % Test,
       Borer.`borer-core`.value,
-      Libs.`gson` % Test
+      Libs.`scalatest`.value     % Test,
+      Libs.`junit`               % Test,
+      Libs.`scalatestplus-junit` % Test,
+      Libs.`gson`                % Test
     )
   )
 
@@ -192,13 +194,15 @@ object Dependencies {
       Libs.`enumeratum`.value,
       Borer.`borer-core`.value,
       Borer.`borer-derivation`.value,
-      Libs.`scalatest`.value % Test
+      Libs.`scalatest`.value     % Test,
+      Libs.`scalatestplus-junit` % Test
     )
   )
 
   val ParamsJvm = Def.setting(
     Seq(
-      Libs.`junit` % Test
+      Libs.`junit`               % Test,
+      Libs.`scalatestplus-junit` % Test
     )
   )
 
@@ -218,6 +222,7 @@ object Dependencies {
       Akka.`akka-stream-testkit`      % Test,
       Libs.`scalatest`.value          % Test,
       Libs.`junit`                    % Test,
+      Libs.`scalatestplus-junit`      % Test,
       Libs.`mockito-scala`            % Test
     )
   )
@@ -240,6 +245,7 @@ object Dependencies {
       Akka.`akka-stream-testkit`      % Test,
       Libs.`scalatest`.value          % Test,
       Libs.`junit`                    % Test,
+      Libs.`scalatestplus-junit`      % Test,
       Libs.`mockito-scala`            % Test
     )
   )
@@ -281,9 +287,10 @@ object Dependencies {
       Libs.`mockito-scala`            % Test,
       Libs.`embedded-redis`           % Test,
       Libs.`embedded-kafka`           % Test,
-      Akka.`akka-multi-node-testkit` % Test,
-      Libs.HdrHistogram              % Test,
-      Libs.testng                    % Test
+      Akka.`akka-multi-node-testkit`  % Test,
+      Libs.HdrHistogram               % Test,
+      Libs.testng                     % Test,
+      Libs.`scalatestplus-testng`     % Test
     )
   )
 
@@ -372,6 +379,7 @@ object Dependencies {
       Libs.`scalatest`.value,
       Libs.`embedded-redis`,
       Libs.`junit`,
+      Libs.`scalatestplus-junit`,
       Libs.`mockito-scala`
     )
   )
@@ -379,16 +387,18 @@ object Dependencies {
   val TimeClockJvm = Def.setting(
     Seq(
       Libs.`jna`,
-      Libs.`scalatest`.value % Test,
-      Libs.`junit`           % Test
+      Libs.`scalatest`.value     % Test,
+      Libs.`junit`               % Test,
+      Libs.`scalatestplus-junit` % Test
     )
   )
 
   val TimeCore = Def.setting(
     Seq(
       Libs.`play-json`.value,
-      Libs.`scalatest`.value % Test,
-      Libs.`junit`           % Test
+      Libs.`scalatest`.value     % Test,
+      Libs.`junit`               % Test,
+      Libs.`scalatestplus-junit` % Test
     )
   )
 

@@ -1,20 +1,22 @@
 package csw.location.helpers
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.actor.typed.scaladsl.adapter._
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.remote.testkit.{MultiNodeSpec, MultiNodeSpecCallbacks}
 import akka.testkit.ImplicitSender
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.commons.CswCluster
 import csw.location.server.internal.LocationServiceFactory
-import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuiteLike
+import org.scalatest.matchers.should.Matchers
 
 abstract class LSNodeSpec[T <: NMembersAndSeed](val config: T, mode: String = "cluster")
     extends MultiNodeSpec(config, config.makeSystem)
     with ImplicitSender
     with MultiNodeSpecCallbacks
-    with FunSuiteLike
+    with AnyFunSuiteLike
     with Matchers
     with BeforeAndAfterAll {
 

@@ -10,12 +10,12 @@ import csw.params.core.models._
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.params.events.{EventName, ObserveEvent, SystemEvent}
 import csw.prefix.models.{Prefix, Subsystem}
-import org.scalatest.FunSpec
 import play.api.libs.json.Json
+import org.scalatest.funspec.AnyFunSpec
 
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-188: Efficient Serialization to/from JSON
-class JsonTest extends FunSpec {
+class JsonTest extends AnyFunSpec {
 
   import ParamCodecs._
 

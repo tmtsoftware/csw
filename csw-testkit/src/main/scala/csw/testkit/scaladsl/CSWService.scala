@@ -13,7 +13,7 @@ sealed trait CSWService extends Product with Serializable
  * {{{
  *   class ScalaTestFrameworkTestKitSpec
  *     extends ScalaTestFrameworkTestKit(LocationServer, ConfigServer, EventServer)
- *     with FunSuiteLike
+ *     with AnyFunSuiteLike
  * }}}
  *
  * == With FrameworkTestKit ==

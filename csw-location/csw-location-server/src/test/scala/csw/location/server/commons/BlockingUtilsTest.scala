@@ -1,13 +1,15 @@
 package csw.location.server.commons
 
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 import scala.util.Success
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class BlockingUtilsTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
+class BlockingUtilsTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 

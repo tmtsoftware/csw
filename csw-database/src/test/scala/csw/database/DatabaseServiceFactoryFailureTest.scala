@@ -6,13 +6,15 @@ import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import csw.database.commons.DBTestHelper
 import csw.database.exceptions.DatabaseException
 import org.scalatest.concurrent.ScalaFutures.convertScalaFuture
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import org.scalatest.BeforeAndAfterAll
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 //DEOPSCSW-615: DB service accessible to CSW component developers
-class DatabaseServiceFactoryFailureTest extends FunSuite with Matchers with BeforeAndAfterAll {
+class DatabaseServiceFactoryFailureTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
   private val system: ActorSystem[_]            = ActorSystem(Behaviors.empty, "test")
   private var postgres: EmbeddedPostgres        = _
   private var dbFactory: DatabaseServiceFactory = _

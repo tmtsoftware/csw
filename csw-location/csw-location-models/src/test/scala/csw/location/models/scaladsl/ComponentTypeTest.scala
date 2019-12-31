@@ -1,9 +1,11 @@
 package csw.location.models.scaladsl
 
 import csw.location.models.ComponentType
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 
-class ComponentTypeTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
+class ComponentTypeTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
   // DEOPSCSW-14: Codec for data modelCSW-80
   //CSW-80: Prefix should be in lowercase

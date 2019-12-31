@@ -10,12 +10,14 @@ import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.FrameworkTestKit
 import csw.testkit.scaladsl.CSWService.{ConfigServer, EventServer}
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
-import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers, OptionValues}
+import org.scalatest.{BeforeAndAfterAll, OptionValues}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
+import org.scalatest.funsuite.AnyFunSuiteLike
+import org.scalatest.matchers.should.Matchers
 
-class TestKitsExampleTest extends FunSuiteLike with BeforeAndAfterAll with Matchers with OptionValues {
+class TestKitsExampleTest extends AnyFunSuiteLike with BeforeAndAfterAll with Matchers with OptionValues {
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)

@@ -8,9 +8,10 @@ import csw.params.core.models.MatrixData
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class StateVariablesTest extends FunSpec with Matchers {
+class StateVariablesTest extends AnyFunSpec with Matchers {
   describe("Examples of State variables") {
 
     it("should show usages of DemandState") {

@@ -10,16 +10,17 @@ import csw.location.api.scaladsl.LocationService
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.logging.models.{Level, LogMetadata}
-import csw.prefix.models.Subsystem
-import csw.prefix.models.Prefix
+import csw.prefix.models.{Prefix, Subsystem}
 import org.mockito.MockitoSugar._
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures.convertScalaFuture
-import org.scalatest.{BeforeAndAfterEach, FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, Future}
 
-class AdminServiceImplTest extends FunSuite with Matchers with BeforeAndAfterEach {
+class AdminServiceImplTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
 
   var actorTestKit: ActorTestKit = _
 

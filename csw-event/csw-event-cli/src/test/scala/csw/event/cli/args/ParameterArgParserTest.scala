@@ -2,10 +2,11 @@ package csw.event.cli.args
 
 import csw.params.core.generics.KeyType.{BooleanKey, DoubleKey, FloatKey, IntKey, LongKey, StringKey}
 import csw.params.core.models.Units.{centimeter, meter, volt}
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 // DEOPSCSW-436: [Event Cli] Specialized Publish command (take params from command line)
-class ParameterArgParserTest extends FunSuite with Matchers {
+class ParameterArgParserTest extends AnyFunSuite with Matchers {
 
   test("should able to parse valid single param string when key name, type, units & values provided") {
     ParameterArgParser.parse("k1:i:meter=[1,2,3]|k2:d=10.11,20.22") shouldBe

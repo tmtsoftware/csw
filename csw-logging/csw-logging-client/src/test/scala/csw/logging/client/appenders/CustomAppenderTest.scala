@@ -9,12 +9,13 @@ import csw.logging.api.scaladsl._
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.scaladsl.{LoggerFactory, LoggingSystemFactory}
 import csw.prefix.models.Prefix
-import org.scalatest.{FunSuite, Matchers}
 import play.api.libs.json.{JsObject, Json}
 
 import scala.collection.mutable
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 object MyFavLibraryLogger extends LoggerFactory(Prefix("csw.MyFavComponent"))
 
@@ -62,7 +63,7 @@ class CustomAppender(system: typed.ActorSystem[_], stdHeaders: JsObject, callbac
 }
 
 //DEOPSCSW-272: Choose Appenders from Conf file
-class CustomAppenderTest extends FunSuite with Matchers {
+class CustomAppenderTest extends AnyFunSuite with Matchers {
   private val hostName = InetAddress.getLocalHost.getHostAddress
 
   test("should be able to add and configure a custom appender using an object extending from CustomAppenderBuilder") {

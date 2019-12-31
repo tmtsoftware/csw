@@ -3,13 +3,13 @@ package csw.time.core.models
 import java.time.{Duration, Instant}
 
 import csw.time.clock.natives.models.TimeConstants
-import org.scalatest.FunSuite
-import org.scalatest.Matchers._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration.DurationDouble
 
 // DEOPSCSW-549: Time service api
-class TMTTimeTest extends FunSuite {
+class TMTTimeTest extends AnyFunSuite with Matchers {
   private val jitter = 100
 
   test("should get utc time") {

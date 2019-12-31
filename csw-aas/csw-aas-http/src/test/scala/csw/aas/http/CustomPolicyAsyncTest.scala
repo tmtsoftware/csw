@@ -9,12 +9,13 @@ import akka.http.scaladsl.testkit.ScalatestRouteTest
 import csw.aas.core.token.AccessToken
 import csw.aas.http.AuthorizationPolicy.CustomPolicyAsync
 import org.mockito.MockitoSugar
-import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.Future
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
-class CustomPolicyAsyncTest extends FunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
+class CustomPolicyAsyncTest extends AnyFunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
   test("custom policy async should return AuthenticationFailedRejection when token is invalid") {
     val authentication: Authentication = mock[Authentication]

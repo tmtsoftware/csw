@@ -3,10 +3,12 @@ package csw.event.cli.utils
 import csw.event.cli.extenstion.RichStringExtentions.JsonDecodeRichString
 import csw.params.core.formats.ParamCodecs._
 import csw.params.events.Event
-import org.scalatest.{BeforeAndAfterEach, FunSuite, Matchers}
+import org.scalatest.BeforeAndAfterEach
 
 import scala.io.Source
-class EventTransformerTest extends FunSuite with Matchers with BeforeAndAfterEach {
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
+class EventTransformerTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
   private val event1 = Source.fromResource("seedData/event1.json").mkString.parse[Event]
 
   test("should be able to get entire event when no paths are specified") {

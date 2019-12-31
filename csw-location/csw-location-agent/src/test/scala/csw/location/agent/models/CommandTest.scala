@@ -3,9 +3,10 @@ package csw.location.agent.models
 import csw.commons.ResourceReader
 import csw.location.agent.args.Options
 import csw.prefix.models.Prefix
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class CommandTest extends FunSuite with Matchers {
+class CommandTest extends AnyFunSuite with Matchers {
 
   test("testParse with no options should return command with default values") {
     val opt        = Options()

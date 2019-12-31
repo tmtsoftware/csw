@@ -12,13 +12,13 @@ import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.testkit.TestProbe
 import csw.time.core.models.{TAITime, UTCTime}
 import csw.time.scheduler.TimeServiceSchedulerFactory
-import org.scalatest.FunSuiteLike
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext}
+import org.scalatest.funsuite.AnyFunSuiteLike
 
-class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.config) with FunSuiteLike {
+class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.config) with AnyFunSuiteLike {
 
   private val manualTime                    = ManualTime()(system)
   private val jitter                        = 10

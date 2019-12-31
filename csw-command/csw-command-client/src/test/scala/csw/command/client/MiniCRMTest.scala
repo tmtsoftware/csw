@@ -1,24 +1,18 @@
 package csw.command.client
 
 import akka.actor.testkit.typed.scaladsl.ActorTestKit
+import csw.command.client.MiniCRM.MiniCRMMessage._
 import csw.command.client.MiniCRM.{Responses, Starters, Waiters}
-import csw.command.client.MiniCRM.MiniCRMMessage.{
-  AddResponse,
-  AddStarted,
-  GetResponses,
-  GetStarters,
-  GetWaiters,
-  Query,
-  QueryFinal
-}
 import csw.params.commands.CommandIssue.IdNotAvailableIssue
 import csw.params.commands.CommandResponse.{Completed, Invalid, Started, SubmitResponse}
 import csw.params.core.models.Id
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration._
 
-class MiniCRMTest extends FunSuite with Matchers with BeforeAndAfterAll {
+class MiniCRMTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
 
   private val testKit = ActorTestKit()
 

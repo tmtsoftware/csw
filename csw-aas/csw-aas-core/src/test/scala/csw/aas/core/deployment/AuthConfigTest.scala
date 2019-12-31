@@ -5,11 +5,12 @@ import com.typesafe.config.{ConfigException, ConfigFactory, ConfigValueFactory}
 import csw.location.models.Connection.HttpConnection
 import csw.location.models.{ComponentId, ComponentType, HttpLocation}
 import csw.prefix.models.{Prefix, Subsystem}
-import org.scalatest.{FunSuite, Matchers}
 
 import scala.jdk.CollectionConverters._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class AuthConfigTest extends FunSuite with Matchers {
+class AuthConfigTest extends AnyFunSuite with Matchers {
   test("should create KeycloakDeployment from config") {
     val config     = ConfigFactory.load()
     val authConfig = AuthConfig.create(config)

@@ -6,13 +6,15 @@ object Libs {
   val ScalaVersion    = "2.13.1"
   val silencerVersion = "1.4.4"
 
-  val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0" //BSD 3-clause "New" or "Revised" License
-  val `scala-async`        = "org.scala-lang.modules" %% "scala-async"        % "0.10.0" //BSD 3-clause "New" or "Revised" License
-  val `scopt`              = "com.github.scopt"       %% "scopt"              % "3.7.1" //MIT License
-  val `junit`              = "junit"                  % "junit"               % "4.12" //Eclipse Public License 1.0
-  val `silencer-plugin`    = "com.github.ghik"        % "silencer-plugin"     % silencerVersion cross CrossVersion.full
-  val `silencer-lib`       = "com.github.ghik"        % "silencer-lib"        % silencerVersion cross CrossVersion.full
-  val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.7.1"
+  val `scala-java8-compat`   = "org.scala-lang.modules" %% "scala-java8-compat"   % "0.9.0" //BSD 3-clause "New" or "Revised" License
+  val `scala-async`          = "org.scala-lang.modules" %% "scala-async"          % "0.10.0" //BSD 3-clause "New" or "Revised" License
+  val `scopt`                = "com.github.scopt"       %% "scopt"                % "3.7.1" //MIT License
+  val `junit`                = "junit"                  % "junit"                 % "4.12" //Eclipse Public License 1.0
+  val `silencer-plugin`      = "com.github.ghik"        % "silencer-plugin"       % silencerVersion cross CrossVersion.full
+  val `silencer-lib`         = "com.github.ghik"        % "silencer-lib"          % silencerVersion cross CrossVersion.full
+  val `mockito-scala`        = "org.mockito"            %% "mockito-scala"        % "1.10.2"
+  val `scalatestplus-junit`  = "org.scalatestplus"      %% "scalatestplus-junit"  % "1.0.0-M2"
+  val `scalatestplus-testng` = "org.scalatestplus"      %% "scalatestplus-testng" % "1.0.0-M2"
 
   val `embedded-keycloak`            = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak"            % "c822dfa" //Apache 2.0
   val `logback-classic`              = "ch.qos.logback"                           % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
@@ -25,7 +27,7 @@ object Libs {
   val `play-json`         = dep("com.typesafe.play" %%% "play-json"         % "2.8.1") //Apache 2.0
   val `enumeratum`        = dep("com.beachape"      %%% "enumeratum"        % "1.5.14") //MIT License
   val `scalajs-java-time` = dep("org.scala-js"      %%% "scalajs-java-time" % "0.2.6")
-  val `scalatest`         = dep("org.scalatest"     %%% "scalatest"         % "3.0.8") //Apache License 2.0
+  val `scalatest`         = dep("org.scalatest"     %%% "scalatest"         % "3.1.0") //Apache License 2.0
 
   val `jwt-core`          = "com.pauldijou"           %% "jwt-core"          % "4.2.0"
   val `lettuce`           = "io.lettuce"              % "lettuce-core"       % "5.2.1.RELEASE"

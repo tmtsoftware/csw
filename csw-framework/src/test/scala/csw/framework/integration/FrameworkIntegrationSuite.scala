@@ -3,11 +3,13 @@ import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.FrameworkTestWiring
 import csw.location.server.internal.ServerWiring
 import org.mockito.MockitoSugar
-import org.scalatest._
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, OptionValues}
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 trait FrameworkIntegrationSuite
-    extends FunSuite
+    extends AnyFunSuite
     with Matchers
     with BeforeAndAfterAll
     with BeforeAndAfterEach

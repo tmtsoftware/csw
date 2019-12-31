@@ -37,12 +37,14 @@ import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.prefix.models.Prefix
 import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.prop.Tables.Table
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
-class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAfterAll {
+class CommandAkkaSerializerTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
 
   private final implicit val system: ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "example")
   private final val serialization                                       = SerializationExtension(system.toClassic)

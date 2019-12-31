@@ -5,11 +5,13 @@ import akka.actor.typed
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.serialization.SerializationExtension
 import csw.logging.models.{Level, LogMetadata}
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import org.scalatest.BeforeAndAfterAll
 import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.prop.Tables.Table
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class LoggingAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAfterAll {
+class LoggingAkkaSerializerTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
 
   private final implicit val system: ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "example")
   private final val serialization                                       = SerializationExtension(system.toClassic)

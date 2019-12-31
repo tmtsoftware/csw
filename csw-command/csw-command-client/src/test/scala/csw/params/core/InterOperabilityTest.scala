@@ -12,7 +12,9 @@ import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.ObsId
 import csw.params.events.SystemEvent
 import csw.prefix.models.Prefix
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
@@ -26,7 +28,7 @@ case class CommandMsg(
 )
 
 // DEOPSCSW-184: Change configurations - attributes and values
-class InterOperabilityTest extends FunSuite with Matchers with BeforeAndAfterAll {
+class InterOperabilityTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
   implicit val timeout: Timeout = Timeout(5.seconds)
 
   private val prefixStr    = "wfos.red.detector"

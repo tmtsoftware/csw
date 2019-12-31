@@ -11,14 +11,16 @@ import org.jooq.DSLContext
 import org.scalatest.concurrent.PatienceConfiguration.Interval
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Seconds, Span}
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import org.scalatest.BeforeAndAfterAll
 
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, ExecutionContext}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 //DEOPSCSW-601: Create Database API
 //DEOPSCSW-616: Create a method to send a query (select) sql string to a database
-class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with BeforeAndAfterAll {
+class DatabaseServiceTest extends AnyFunSuite with Matchers with ScalaFutures with BeforeAndAfterAll {
   private val system: ActorSystem[_]        = ActorSystem(Behaviors.empty, "test")
   private implicit val ec: ExecutionContext = system.executionContext
   private var postgres: EmbeddedPostgres    = _

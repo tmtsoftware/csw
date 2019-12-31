@@ -4,11 +4,12 @@ import csw.alarm.models.AlarmSeverity._
 import csw.alarm.models.Key.AlarmKey
 import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.NFIRAOS
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 // DEOPSCSW-439: Model to represent Alarm entity metadata
 // CSW-83: Alarm models should take prefix
-class AlarmMetadataTest extends FunSuite with Matchers {
+class AlarmMetadataTest extends AnyFunSuite with Matchers {
 
   val alarmMetadata = AlarmMetadata(
     prefix = Prefix(NFIRAOS, "trombone"),

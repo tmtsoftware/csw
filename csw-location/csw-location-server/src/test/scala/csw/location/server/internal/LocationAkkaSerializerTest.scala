@@ -15,12 +15,14 @@ import csw.prefix.models.Subsystem
 import csw.prefix.models.Prefix
 import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.prop.Tables.Table
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import org.scalatest.BeforeAndAfterAll
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-private[location] class LocationAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAfterAll {
+private[location] class LocationAkkaSerializerTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
   // need to instantiate from remote factory to wire up serializer
   private final implicit val system: ActorSystem[_] = ActorSystem(Behaviors.empty, "example")
   private final val serialization                   = SerializationExtension(system.toClassic)

@@ -9,7 +9,6 @@ import csw.event.client.internal.kafka.KafkaTestProps
 import csw.event.client.internal.redis.RedisTestProps
 import csw.event.client.internal.wiring.BaseProperties
 import csw.params.events.{Event, EventKey, EventName}
-import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
 import org.scalatestplus.testng.TestNGSuite
 import org.testng.annotations._
@@ -17,6 +16,7 @@ import org.testng.annotations._
 import scala.collection.{immutable, mutable}
 import scala.concurrent.duration.DurationLong
 import scala.util.Random
+import org.scalatest.matchers.should.Matchers
 
 //DEOPSCSW-331: Event Service Accessible to all CSW component builders
 class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Eventually {
