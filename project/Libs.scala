@@ -22,8 +22,8 @@ object Libs {
   val `scala-reflect`                = "org.scala-lang"                           % "scala-reflect"                 % ScalaVersion //BSD-3
   val `gson`                         = "com.google.code.gson"                     % "gson"                          % "2.8.6" //Apache 2.0
 
-  val `play-json`         = dep("com.typesafe.play" %%% "play-json"         % "2.8.0") //Apache 2.0
-  val `enumeratum`        = dep("com.beachape"      %%% "enumeratum"        % "1.5.13") //MIT License
+  val `play-json`         = dep("com.typesafe.play" %%% "play-json"         % "2.8.1") //Apache 2.0
+  val `enumeratum`        = dep("com.beachape"      %%% "enumeratum"        % "1.5.14") //MIT License
   val `scalajs-java-time` = dep("org.scala-js"      %%% "scalajs-java-time" % "0.2.6")
   val `scalatest`         = dep("org.scalatest"     %%% "scalatest"         % "3.0.8") //Apache License 2.0
 
@@ -42,7 +42,7 @@ object Libs {
   val `json-schema-validator` = "com.github.fge"       % "json-schema-validator" % "2.2.11" //LGPL/ASL
 
   val `jna`             = "net.java.dev.jna"              % "jna"             % "5.5.0"
-  val `postgresql`      = "org.postgresql"                % "postgresql"      % "42.2.8"
+  val `postgresql`      = "org.postgresql"                % "postgresql"      % "42.2.9"
   val `hikaricp`        = "com.zaxxer"                    % "HikariCP"        % "3.4.1" //Apache License 2.0
   val `otj-pg-embedded` = "com.opentable.components"      % "otj-pg-embedded" % "0.13.3"
   val httpclient        = "org.apache.httpcomponents"     % "httpclient"      % "4.5.10"
