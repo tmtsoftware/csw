@@ -15,8 +15,10 @@ import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandIssue.OtherIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup
-import csw.params.core.models.{ObsId, Prefix, Subsystem}
+import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, StateName}
+import csw.prefix.models.Subsystem
+import csw.prefix.models.Prefix
 import io.lettuce.core.RedisClient
 import org.mockito.MockitoSugar
 import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
@@ -32,6 +34,7 @@ class LongRunningCommandTestMultiJvm3 extends LongRunningCommandTest(0)
 // DEOPSCSW-227: Distribute commands to multiple destinations
 // DEOPSCSW-228: Assist Components with command completion
 // DEOPSCSW-233: Hide implementation by having a CCS API
+// CSW-82: ComponentInfo should take prefix
 class LongRunningCommandTest(ignore: Int)
     extends LSNodeSpec(config = new TwoMembersAndSeed, mode = "http")
     with MultiNodeHTTPLocationService
@@ -117,7 +120,7 @@ class LongRunningCommandTest(ignore: Int)
       //do some work before querying for the result of above command as needed
       //Note at this point, the above submit would return quickly with the Started status so this is somewhat
       // redundant. This would allow you to see if it had completed since the first response
-      val test3QueryResponse: Future[QueryResponse] = assemblyCommandService.query(test3RunId)
+      val test3QueryResponse: Future[SubmitResponse] = assemblyCommandService.query(test3RunId)
 
       // Command is still just started
       //#query-response

@@ -3,7 +3,7 @@ package csw.location.agent.args
 import java.io.File
 
 import csw.location.agent.BuildInfo
-import csw.params.core.models.Prefix
+import csw.prefix.models.Prefix
 import scopt.OptionParser
 
 /**
@@ -18,7 +18,7 @@ class ArgsParser(name: String) {
       .required()
       .valueName("<prefix1>[,<prefix2>,...]")
       .action((x, c) => c.copy(prefixes = x.map(Prefix(_)).toList))
-//      .validate(xs => acceptableServiceNames(xs))
+      //      .validate(xs => acceptableServiceNames(xs))
       .text(
         "Required: The prefix (or prefixes, separated by comma) used to register the application (also root name in config file)."
       )

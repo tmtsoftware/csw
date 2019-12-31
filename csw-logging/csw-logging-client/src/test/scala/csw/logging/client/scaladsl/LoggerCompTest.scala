@@ -9,6 +9,8 @@ import csw.logging.client.components._
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.LoggingTestSuite
 import csw.logging.models.Level
+import csw.prefix.models.Prefix
+import csw.prefix.models.Subsystem.CSW
 import play.api.libs.json.JsObject
 
 import scala.collection.mutable
@@ -17,7 +19,7 @@ import scala.collection.mutable.ArrayBuffer
 // DEOPSCSW-316: Improve Logger accessibility for component developers
 class LoggerCompTest extends LoggingTestSuite {
 
-  private val irisSupervisorActorRef = actorSystem.spawn(IRIS.behavior(IRIS.COMPONENT_NAME), "IrisSupervisorActor")
+  private val irisSupervisorActorRef = actorSystem.spawn(IRIS.behavior(Prefix(CSW, IRIS.COMPONENT_NAME)), "IrisSupervisorActor")
   private val irisUtilActorRef       = actorSystem.spawn(IrisActorUtil.behavior, "IrisUtilActor")
   private val irisTLA                = new IrisTLA()
   private val irisUtil               = new IrisUtil()
@@ -87,27 +89,28 @@ class LoggerCompTest extends LoggingTestSuite {
         configuredLogLevel: Level,
         expectedLogsMap: Map[String, String] = Map.empty,
         expectedFileName: String = "",
-        expectedCompName: String = ""
+        expectedSubsystem: String = ""
     ): Unit = {
       logBuffer.foreach { log =>
         val currentLogLevel = log.getString(LoggingKeys.SEVERITY).toLowerCase
         Level(currentLogLevel) >= configuredLogLevel shouldBe true
         if (expectedLogsMap.nonEmpty) log.getString(LoggingKeys.MESSAGE) shouldBe expectedLogsMap(currentLogLevel)
         if (!expectedFileName.isEmpty) log.getString(LoggingKeys.FILE) shouldBe expectedFileName
+        if (expectedFileName.nonEmpty) log.getString(LoggingKeys.SUBSYSTEM) shouldBe expectedSubsystem
       }
     }
 
     irisLogBuffer.size shouldBe 4
-    testLogBuffer(irisLogBuffer, ERROR, IRIS.irisLogs, IRIS.FILE_NAME, IRIS.COMPONENT_NAME)
+    testLogBuffer(irisLogBuffer, ERROR, IRIS.irisLogs, IRIS.FILE_NAME, CSW.name)
 
     genericLogBuffer.size shouldBe 12
     testLogBuffer(genericLogBuffer, TRACE)
 
     tromboneHcdLogBuffer.size shouldBe 5
-    testLogBuffer(tromboneHcdLogBuffer, DEBUG, logMsgMap, TromboneHcd.FILE_NAME, TromboneHcd.COMPONENT_NAME)
+    testLogBuffer(tromboneHcdLogBuffer, DEBUG, logMsgMap, TromboneHcd.FILE_NAME, CSW.name)
 
     // setting log level of IRIS comp to FATAL and it should not change log levels of other comps or generic classes
-    loggingSystem.setComponentLogLevel(IRIS.COMPONENT_NAME, FATAL)
+    loggingSystem.setComponentLogLevel(Prefix(CSW, IRIS.COMPONENT_NAME), FATAL)
 
     // start logging at all component levels
     allComponentsStartLogging()
@@ -116,12 +119,12 @@ class LoggerCompTest extends LoggingTestSuite {
     splitAndGroupLogs()
 
     irisLogBuffer.size shouldBe 2
-    testLogBuffer(irisLogBuffer, FATAL, IRIS.irisLogs, IRIS.FILE_NAME, IRIS.COMPONENT_NAME)
+    testLogBuffer(irisLogBuffer, FATAL, IRIS.irisLogs, IRIS.FILE_NAME, CSW.name)
 
     genericLogBuffer.size shouldBe 12
     testLogBuffer(genericLogBuffer, TRACE)
 
     tromboneHcdLogBuffer.size shouldBe 5
-    testLogBuffer(tromboneHcdLogBuffer, DEBUG, logMsgMap, TromboneHcd.FILE_NAME, TromboneHcd.COMPONENT_NAME)
+    testLogBuffer(tromboneHcdLogBuffer, DEBUG, logMsgMap, TromboneHcd.FILE_NAME, CSW.name)
   }
 }

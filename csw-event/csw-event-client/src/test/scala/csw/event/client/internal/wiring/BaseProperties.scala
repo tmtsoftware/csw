@@ -12,7 +12,7 @@ import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.internal.commons.{EventServiceConnection, EventStreamSupervisionStrategy}
 import csw.event.client.internal.commons.serviceresolver.EventServiceLocationResolver
 import csw.location.api.scaladsl.LocationService
-import csw.location.client.internal.LocationServiceClient
+import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.models.TcpRegistration
 
 import scala.async.Async._
@@ -45,7 +45,7 @@ object BaseProperties {
 
     implicit val typedSystem: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "event-server")
 
-    val locationService = new LocationServiceClient("localhost", httpPort)
+    val locationService = HttpLocationServiceFactory.make("localhost", httpPort)
     val tcpRegistration = TcpRegistration(EventServiceConnection.value, serverPort)
 
     locationService.register(tcpRegistration).await

@@ -132,21 +132,19 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
       case `matcherTimeoutCmd` => Thread.sleep(1000)
       case `matcherFailedCmd` =>
         Source(1 to 10)
-          .map(
-            i =>
-              currentStatePublisher.publish(
-                CurrentState(controlCommand.source, StateName("testStateName"), Set(KeyType.IntKey.make("encoder").set(i * 1)))
-              )
+          .map(i =>
+            currentStatePublisher.publish(
+              CurrentState(controlCommand.source, StateName("testStateName"), Set(KeyType.IntKey.make("encoder").set(i * 1)))
+            )
           )
           .throttle(1, 100.millis, 1, ThrottleMode.Shaping)
           .runWith(Sink.ignore)
       case _ =>
         Source(1 to 10)
-          .map(
-            i =>
-              currentStatePublisher.publish(
-                CurrentState(controlCommand.source, StateName("testStateName"), Set(KeyType.IntKey.make("encoder").set(i * 10)))
-              )
+          .map(i =>
+            currentStatePublisher.publish(
+              CurrentState(controlCommand.source, StateName("testStateName"), Set(KeyType.IntKey.make("encoder").set(i * 10)))
+            )
           )
           .throttle(1, 100.millis, 1, ThrottleMode.Shaping)
           .runWith(Sink.ignore)

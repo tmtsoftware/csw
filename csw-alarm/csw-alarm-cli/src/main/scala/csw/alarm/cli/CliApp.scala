@@ -32,7 +32,8 @@ class CliApp(alarmAdminClient: CommandLineRunner) {
             case "subscribe" => await { val (_, doneF) = alarmAdminClient.subscribeHealth(options); doneF }
           }
       }
-    } catch {
+    }
+    catch {
       case ex: Exception => println(ex.getMessage)
     }
 

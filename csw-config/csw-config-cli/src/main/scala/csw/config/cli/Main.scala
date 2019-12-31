@@ -21,7 +21,8 @@ object Main extends App {
 
     try {
       cliApp.start(options)
-    } finally {
+    }
+    finally {
       actorRuntime.shutdown()
     }
   }

@@ -2,9 +2,10 @@ package csw.params.commands
 
 import java.util.Optional
 
-import csw.params.extensions.OptionConverters.{RichOption, RichOptional}
 import csw.params.core.generics.{Parameter, ParameterSetType}
-import csw.params.core.models.{ObsId, Prefix}
+import csw.params.core.models.ObsId
+import csw.params.extensions.OptionConverters.{RichOption, RichOptional}
+import csw.prefix.models.Prefix
 
 /**
  * Common trait representing commands in TMT like Setup, Observe and Wait

@@ -74,12 +74,12 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
     import typedSystem.executionContext
 
     Future {
-      supervisorBehaviorTestKit.run(SetComponentLogLevel("DummyHcd", WARN))
-      supervisorBehaviorTestKit.run(GetComponentLogMetadata("DummyHcd", logMetadataProbe.ref))
+      supervisorBehaviorTestKit.run(SetComponentLogLevel(WARN))
+      supervisorBehaviorTestKit.run(GetComponentLogMetadata(logMetadataProbe.ref))
     }
     Future {
-      supervisorBehaviorTestKit.run(SetComponentLogLevel("SampleHcd", WARN))
-      supervisorBehaviorTestKit.run(GetComponentLogMetadata("SampleHcd", logMetadataProbe.ref))
+      supervisorBehaviorTestKit.run(SetComponentLogLevel(WARN))
+      supervisorBehaviorTestKit.run(GetComponentLogMetadata(logMetadataProbe.ref))
     }
 
     val logMetadata1 = logMetadataProbe.expectMessageType[LogMetadata]
@@ -109,16 +109,15 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
   private def createBehavior(timerScheduler: TimerScheduler[SupervisorMessage]): Behavior[ComponentMessage] = {
 
     Behaviors
-      .setup[SupervisorMessage](
-        ctx =>
-          new SupervisorBehavior(
-            ctx,
-            timerScheduler,
-            None,
-            new SampleComponentBehaviorFactory,
-            registrationFactory,
-            cswCtx.copy(hcdInfo)
-          )
+      .setup[SupervisorMessage](ctx =>
+        new SupervisorBehavior(
+          ctx,
+          timerScheduler,
+          None,
+          new SampleComponentBehaviorFactory,
+          registrationFactory,
+          cswCtx.copy(hcdInfo)
+        )
       )
       .narrow
   }

@@ -23,14 +23,17 @@ import csw.location.models.{ComponentId, ComponentType}
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup
 import csw.params.core.generics.KeyType
-import csw.params.core.models.{ObsId, Prefix, Subsystem, Units}
+import csw.params.core.models.{ObsId, Units}
 import csw.params.core.states.CurrentState
+import csw.prefix.models.Subsystem
+import csw.prefix.models.Prefix
 import io.lettuce.core.RedisClient
 
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, ExecutionContext}
 
 //CSW-75: Provide HTTP access for components
+//CSW-82: ComponentInfo should take prefix
 class CommandHttpIntegrationTests extends FrameworkIntegrationSuite {
 
   import testWiring._
@@ -96,8 +99,8 @@ class CommandHttpIntegrationTests extends FrameworkIntegrationSuite {
     filterHcdCS.subscribeCurrentState(filterHCDStateProbe.ref ! _)
 
     // Subscribe to component's lifecycle state
-    filterAssemblyLocation2.foreach(
-      l => l.componentRef ! LifecycleStateSubscription(PubSub.Subscribe(assemblyLifecycleStateProbe.ref))
+    filterAssemblyLocation2.foreach(l =>
+      l.componentRef ! LifecycleStateSubscription(PubSub.Subscribe(assemblyLifecycleStateProbe.ref))
     )
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]

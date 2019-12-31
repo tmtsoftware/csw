@@ -8,8 +8,8 @@ import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.event.api.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import csw.event.client.internal.commons.{EventConverter, EventSubscriberUtil}
 import csw.event.client.utils.Utils
-import csw.params.core.models.Subsystem
 import csw.params.events._
+import csw.prefix.models.Subsystem
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.common.TopicPartition
 
@@ -135,8 +135,7 @@ private[event] class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[S
   private def getLatestOffsets(eventKeys: Set[EventKey]): Future[Map[TopicPartition, Long]] = {
     val topicPartitions = eventKeys.map(e => new TopicPartition(e.key, 0)).toList
     // any interaction with kafka consumer needs special care to handle multi-threaded access
-    consumer.map(
-      consumer => this.synchronized(consumer.endOffsets(topicPartitions.asJava)).asScala.view.mapValues(_.toLong).toMap
+    consumer.map(consumer => this.synchronized(consumer.endOffsets(topicPartitions.asJava)).asScala.view.mapValues(_.toLong).toMap
     )
   }
 

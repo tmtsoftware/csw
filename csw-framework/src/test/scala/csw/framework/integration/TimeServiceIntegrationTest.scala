@@ -14,12 +14,13 @@ import csw.location.models.ComponentType.Assembly
 import csw.location.models.Connection.AkkaConnection
 import csw.params.commands
 import csw.params.commands.CommandName
-import csw.params.core.models.{Prefix, Subsystem}
 import csw.params.core.states.CurrentState
+import csw.prefix.models.{Prefix, Subsystem}
 
 import scala.concurrent.duration.DurationLong
 
 //DEOPSCSW-550: Provide TimeService accessible to component developers
+//CSW-82: ComponentInfo should take prefix
 class TimeServiceIntegrationTest extends FrameworkIntegrationSuite {
 
   import testWiring._

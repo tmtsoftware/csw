@@ -15,11 +15,13 @@ import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.server.http.MultiNodeHTTPLocationService
+import csw.params.commands.CommandIssue.IdNotAvailableIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
 import csw.params.core.generics.Parameter
-import csw.params.core.models.{Id, ObsId, Prefix, Subsystem}
+import csw.params.core.models.{Id, ObsId}
 import csw.params.core.states.{CurrentState, DemandState, StateName}
+import csw.prefix.models.{Prefix, Subsystem}
 import io.lettuce.core.RedisClient
 import org.mockito.MockitoSugar
 
@@ -44,8 +46,8 @@ import scala.concurrent.{Await, ExecutionContext, Future}
  * 2. Assembly (JVM-3) receives command and update its validation status as Accepted in CSRM
  * 3. Commanding Assembly (JVM-2) receives validation response as Accepted
  * 4. Commanding Assembly then waits for Command Completion response
- * 5. Assembly from JVM-3 updates Command Completion status which is CompletedWithResult in CSRM
- * 6. Commanding Assembly (JVM-2) receives Command Completion response which is CompletedWithResult
+ * 5. Assembly from JVM-3 updates Command Completion status which is Completed (with result) in CSRM
+ * 6. Commanding Assembly (JVM-2) receives Command Completion response which is Completed (with result)
  *
  * Scenario 3 : Long Running Command with matcher
  * 1. Commanding Assembly sends long running command to another assembly (JVM-3)
@@ -75,6 +77,7 @@ class CommandServiceTestMultiJvm3 extends CommandServiceTest(0)
 // DEOPSCSW-313: Support short running actions by providing immediate response
 // DEOPSCSW-321: AkkaLocation provides wrapper for ActorRef[ComponentMessage]
 // DEOPSCSW-623: Make query wait till Started
+// CSW-82: ComponentInfo should take prefix
 class CommandServiceTest(ignore: Int)
     extends LSNodeSpec(config = new TwoMembersAndSeed, mode = "http")
     with MultiNodeHTTPLocationService
@@ -93,7 +96,10 @@ class CommandServiceTest(ignore: Int)
       enterBarrier("spawned")
 
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
-      val assemblyLocF  = locationService.resolve(AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "Assembly"), ComponentType.Assembly)), 5.seconds)
+      val assemblyLocF = locationService.resolve(
+        AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "Assembly"), ComponentType.Assembly)),
+        5.seconds
+      )
       val maybeLocation = Await.result(assemblyLocF, 10.seconds)
 
       maybeLocation.isDefined shouldBe true
@@ -124,13 +130,17 @@ class CommandServiceTest(ignore: Int)
       enterBarrier("spawned")
 
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
-      val assemblyLocF                   =
-        locationService.resolve(AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "Assembly"), ComponentType.Assembly)), 5.seconds)
+      val assemblyLocF =
+        locationService.resolve(
+          AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "Assembly"), ComponentType.Assembly)),
+          5.seconds
+        )
       val assemblyLocation: AkkaLocation = Await.result(assemblyLocF, 10.seconds).get
       val assemblyCmdService             = CommandServiceFactory.make(assemblyLocation)
 
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
-      val hcdLocF                   = locationService.resolve(AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "HCD"), ComponentType.HCD)), 5.seconds)
+      val hcdLocF =
+        locationService.resolve(AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "HCD"), ComponentType.HCD)), 5.seconds)
       val hcdLocation: AkkaLocation = Await.result(hcdLocF, 10.seconds).get
       val hcdCmdService             = CommandServiceFactory.make(hcdLocation)
 
@@ -268,7 +278,7 @@ class CommandServiceTest(ignore: Int)
 
       // test CommandNotAvailable after timeout of 1 seconds
       Await.result(assemblyCmdService.query(Id("blah")), 2.seconds) shouldEqual
-      CommandNotAvailable(Id("blah"))
+      Invalid(Id("blah"), IdNotAvailableIssue(Id("blah").id))
 
       //#query
       // Check on a command that was completed in the past

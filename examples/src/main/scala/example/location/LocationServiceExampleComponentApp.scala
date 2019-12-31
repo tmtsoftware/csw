@@ -15,7 +15,7 @@ import csw.location.models.{ComponentId, ComponentType}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.{LoggerFactory, LoggingSystemFactory}
-import csw.params.core.models.{Prefix, Subsystem}
+import csw.prefix.models.{Prefix, Subsystem}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -47,7 +47,7 @@ object LocationServiceExampleComponent {
 
   def behaviour(locationService: LocationService): Behaviors.Receive[ClientMessage] =
     Behaviors.receive[ClientMessage]((ctx, msg) => {
-      val log: Logger = new LoggerFactory("my-component-name").getLogger(ctx)
+      val log: Logger = new LoggerFactory(Prefix("csw.my-component-name")).getLogger(ctx)
       log.info("In actor LocationServiceExampleComponent")
       // Register with the location service
       val registrationResult: Future[RegistrationResult] =

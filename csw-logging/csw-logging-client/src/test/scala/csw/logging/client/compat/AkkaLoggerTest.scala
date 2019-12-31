@@ -18,7 +18,7 @@ class MyActor extends Actor with ActorLogging {
     case "error" => log.error(exception, "error")
   }
 }
-
+// CSW-78: PrefixRedesign for logging
 class AkkaLoggerTest extends LoggingTestSuite with FunSuiteLike with Matchers {
 
   test("logging framework should capture akka log messages and log it") {
@@ -34,6 +34,8 @@ class AkkaLoggerTest extends LoggingTestSuite with FunSuiteLike with Matchers {
 
     logBuffer.foreach { log =>
       log.contains(LoggingKeys.COMPONENT_NAME) shouldBe false
+      log.contains(LoggingKeys.PREFIX) shouldBe false
+      log.contains(LoggingKeys.SUBSYSTEM) shouldBe false
 
       log.contains(LoggingKeys.SEVERITY) shouldBe true
       val currentLogLevel = log.getString(LoggingKeys.SEVERITY).toLowerCase

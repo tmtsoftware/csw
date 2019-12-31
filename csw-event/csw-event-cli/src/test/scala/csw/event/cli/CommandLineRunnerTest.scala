@@ -9,13 +9,14 @@ import csw.params.core.generics.KeyType.{IntKey, StringKey}
 import csw.params.core.models.Id
 import csw.params.core.models.Units.meter
 import csw.params.events._
+import csw.prefix.codecs.CommonCodecs
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.SpanSugar.convertDoubleToGrainOfTime
 import play.api.libs.json._
 
 import scala.collection.{immutable, mutable}
 
-class CommandLineRunnerTest extends SeedData with Eventually with csw.params.core.formats.CommonCodecs {
+class CommandLineRunnerTest extends SeedData with Eventually with CommonCodecs {
 
   def events(name: EventName): immutable.Seq[Event] =
     for (i <- 1 to 10) yield event1.copy(eventName = name, eventId = Id(i.toString))
@@ -119,8 +120,8 @@ class CommandLineRunnerTest extends SeedData with Eventually with csw.params.cor
 
     // invalid event + 7 events published in previous step
     eventually(queue.size shouldBe 8)
-    queue should contain allElementsOf Seq(eventToSanitizedJson(Event.invalidEvent(eventKey))) ++ (1 to 5).map(
-      _ => expectedEventJson
+    queue should contain allElementsOf Seq(eventToSanitizedJson(Event.invalidEvent(eventKey))) ++ (1 to 5).map(_ =>
+      expectedEventJson
     )
   }
 

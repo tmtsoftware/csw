@@ -55,15 +55,19 @@ Also `logLevel` for each component can be set in application.conf as follows:
 
 ```
 component-log-levels {
-    tromboneHcd = debug
-    tromboneAssembly = error
+    tcs {
+        trombonehcd = debug
+        tromboneassembly = error
+    }
   }
   
 ```
 @@@ note
 
-Here `tromboneHcd` and `tromboneAssembly` is the name of component that will be registered with `LocationService`, 
-which is the `name` field in the ComponentInfo file (see @ref:[DeployingComponents](../framework/deploying-components.md)). By default, all components will log at level specified by `csw-logging.logLevel`. 
+Here `trombonehcd` and `tromboneassembly` is the name of component that will be registered with `LocationService`, 
+which is the `name` field in the ComponentInfo file (see @ref:[DeployingComponents](../framework/deploying-components.md)). 
+By default, all components will log at level specified by `csw-logging.logLevel`. Also, the component specific log levels will be case-insensitive
+i.e `TCS.tromboneHcd` and `tcs.trombonehcd` will represent the same component and the one specified later will take preference. 
 
 @@@
 
@@ -90,7 +94,9 @@ Turning `pretty` **on** or **off** will produce log statements in following form
 pretty=true
 :   @@@vars
     ```
-    {"@componentName":"my-component-name",
+    {"@prefix":"my-subsystem.my-component-name",
+     "@subsystem":"my-subsystem",
+     "@componentName":"my-component-name",
      "@host":"INsaloni.local",
      "@name":"LocationServiceExampleClient",
      "@severity":"INFO",
@@ -109,7 +115,7 @@ pretty=true
 pretty=false
 :   @@@vars
     ```
-    {"@componentName":"my-component-name","@host":"INsaloni.local","@name":"LocationServiceExampleClient","@severity":"INFO","@version":"0.1","actor":"akka://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a","class":"csw.location.LocationServiceExampleClient","file":"LocationServiceExampleClientApp.scala","line":149,"message":"Result of the find call: None","timestamp":"2017-11-24T04:16:42.108Z"}
+    {"@prefix":"my-subsystem.my-component-name","@subsystem":"my-subsystem","@componentName":"my-component-name","@host":"INsaloni.local","@name":"LocationServiceExampleClient","@severity":"INFO","@version":"0.1","actor":"akka://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a","class":"csw.location.LocationServiceExampleClient","file":"LocationServiceExampleClientApp.scala","line":149,"message":"Result of the find call: None","timestamp":"2017-11-24T04:16:42.108Z"}
     ```
     @@@
     
@@ -148,6 +154,8 @@ These values can also be changed dynamically by calling methods on `LoggingSyste
 ## Log Structure
 All messages are logged by default as Json. Logs can contain following fields:
 
+* `@prefix`: The combination of @subsystem and @componentName of the component for e.g. `tcs.filter.wheel` 
+* `@subsystem`: The name of the subsystem, if present
 * `@componentName`: The name of the component, if present
 * `@host`: The local host name
 * `@name`: The name of the application being run
@@ -171,8 +179,8 @@ All messages are logged by default as Json. Logs can contain following fields:
 @@@
 
 ## Enable Component Logging
-Component developers will have an instance of `LoggerFactory` available from `csw-framework`. This instance will already have a `componentName` set by `csw-framework` which will
-appear in log statements in the `@componentName` tag. To get the `Logger` instance from the `LoggerFactory`, use one of the following:  
+Component developers will have an instance of `LoggerFactory` available from `csw-framework`. This instance will already have a `prefix` set by `csw-framework` which will
+appear in log statements in the `@prefix`,`@subsystem` and `@componentName` tags. To get the `Logger` instance from the `LoggerFactory`, use one of the following:  
 
 Scala Class
 :   @@snip [SampleClass](../../../../examples/src/main/scala/example/logging/client/componentlogger/loggers.scala) { #component-logger-class }
@@ -201,7 +209,7 @@ The `LoggerFactory` can be changed to `JLoggerFactory` by using `asJava` method 
 @@@
 
 ## Enable Generic Logging
-In case there is a need to log statements without having a `@componentName` tag, which can be due to unavailability of componentName in some utility code, then use the `GenericLoggerFactory`
+In case there is a need to log statements without having a `@prefix`, `@subsystem` and `@componentName` tags, which can be due to unavailability of componentName in some utility code, then use the `GenericLoggerFactory`
 as follows:
 
 Scala Class
@@ -249,7 +257,9 @@ The output of log statement will be:
 Scala
 :   @@@vars
     ```
-{"@componentName":"my-component-name",
+{"@prefix":"my-subsystem.my-component-name",
+ "@subsystem":"my-subsystem",
+ "@componentName":"my-component-name",
  "@host":"INsaloni.local",
  "@name":"LocationServiceExampleClient",
  "@severity":"INFO",
@@ -268,7 +278,9 @@ Scala
 Java
 :   @@@vars
     ```
-{"@componentName":"my-component-name",
+{"@prefix":"my-subsystem.my-component-name",
+ "@subsystem":"my-subsystem",
+ "@componentName":"my-component-name",
  "@host":"INsaloni.local",
  "@name":"JLocationServiceExampleClient",
  "@severity":"INFO",
@@ -285,7 +297,9 @@ Java
 Java (Supplier)
 :   @@@vars
     ```
-{"@componentName":"my-component-name",
+{"@prefix":"my-subsystem.my-component-name",
+ "@subsystem":"my-subsystem",
+ "@componentName":"my-component-name",
  "@host":"INsaloni.local",
  "@name":"JLocationServiceExampleClient",
  "@severity":"INFO",
@@ -315,7 +329,9 @@ The output of log statement will be:
 Scala
 :   @@@vars
     ```
-{"@componentName":"my-component-name",
+{"@prefix":"my-subsystem.my-component-name",
+ "@subsystem":"my-subsystem",
+ "@componentName":"my-component-name",
  "@host":"INsaloni.local",
  "@name":"LocationServiceExampleClient",
  "@severity":"INFO",
@@ -337,7 +353,9 @@ Scala
 Java
 :   @@@vars
     ```
-{"@componentName":"my-component-name",
+{"@prefix":"my-subsystem.my-component-name",
+ "@subsystem":"my-subsystem",
+ "@componentName":"my-component-name",
  "@host":"INsaloni.local",
  "@name":"JLocationServiceExampleClient",
  "@severity":"INFO",
@@ -357,7 +375,9 @@ Java
 Java (Supplier)
 :   @@@vars
     ```
-{"@componentName":"my-component-name",
+{"@prefix":"my-subsystem.my-component-name",
+ "@subsystem":"my-subsystem",
+ "@componentName":"my-component-name",
  "@host":"INsaloni.local",
  "@name":"JLocationServiceExampleClient",
  "@severity":"INFO",
@@ -394,7 +414,7 @@ This functionality is included in the framework code and users should not have t
 
 @@@
 
-In order to create a LoggerFactory with a custom componentName, refer to the following code:
+In order to create a LoggerFactory with a custom prefix, refer to the following code:
  
 Scala
 :   @@snip [Sample](../../../../examples/src/main/scala/example/logging/client/componentlogger/loggers.scala) { #logger-factory-creation }

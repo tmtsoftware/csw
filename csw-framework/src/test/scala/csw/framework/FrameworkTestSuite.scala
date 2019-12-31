@@ -50,7 +50,7 @@ private[csw] abstract class FrameworkTestSuite extends FunSuite with Matchers wi
         cswCtx.eventService,
         cswCtx.alarmService,
         cswCtx.timeServiceScheduler,
-        new LoggerFactory(componentInfo.prefix.toString),
+        new LoggerFactory(componentInfo.prefix),
         cswCtx.configClientService,
         cswCtx.currentStatePublisher,
         commandResponseManager,

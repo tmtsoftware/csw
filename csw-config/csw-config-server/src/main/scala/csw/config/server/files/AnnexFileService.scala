@@ -39,14 +39,16 @@ class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime
       log.debug(s"Annex file already exists at path ${outPath.toString}")
       await(fileRepo.delete(tempFilePath))
       sha
-    } else {
+    }
+    else {
       log.debug(s"Creating directory at ${outPath.getParent.toString}")
       await(fileRepo.createDirectories(outPath.getParent))
       await(fileRepo.move(tempFilePath, outPath))
       log.debug("Validating if annex file is created with intended contents")
       if (await(validate(sha, outPath))) {
         sha
-      } else {
+      }
+      else {
         log.debug(
           s"Deleting annex file from path ${outPath.toString} and temporary file from path ${tempFilePath.toString}"
         )
@@ -64,7 +66,8 @@ class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime
     log.debug(s"Checking if annex file exists at ${repoFilePath.toString}")
     if (await(fileRepo.exists(repoFilePath))) {
       Some(ConfigData.fromPath(repoFilePath))
-    } else {
+    }
+    else {
       None
     }
   }

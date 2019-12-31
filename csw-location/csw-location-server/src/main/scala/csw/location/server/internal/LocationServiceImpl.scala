@@ -22,6 +22,8 @@ import csw.location.server.commons.{CswCluster, LocationServiceLogger}
 import csw.location.server.internal.Registry.AllServices
 import csw.location.server.internal.StreamExt.RichSource
 import csw.logging.api.scaladsl.Logger
+import csw.prefix.models.Prefix
+import msocket.api.Subscription
 
 import scala.async.Async._
 import scala.concurrent.Future
@@ -169,34 +171,26 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
   /**
    * List all locations registered for the given componentType
    */
-  def list(componentType: ComponentType): Future[List[Location]] = async {
-    await(list).filter(_.connection.componentId.componentType == componentType)
-  }
+  def list(componentType: ComponentType): Future[List[Location]] =
+    list.map(_.filter(_.connection.componentId.componentType == componentType))
 
   /**
    * List all locations registered with the given hostname
    */
-  def list(hostname: String): Future[List[Location]] = async {
-    await(list).filter(_.uri.getHost == hostname)
-  }
+  def list(hostname: String): Future[List[Location]] = list.map(_.filter(_.uri.getHost == hostname))
 
   /**
    * List all locations registered with the given connection type
    */
-  def list(connectionType: ConnectionType): Future[List[Location]] = async {
-    await(list).filter(_.connection.connectionType == connectionType)
-  }
+  def list(connectionType: ConnectionType): Future[List[Location]] =
+    list.map(_.filter(_.connection.connectionType == connectionType))
 
-  override def listByPrefix(_prefix: String): Future[List[AkkaLocation]] = async {
-    await(list).collect {
-      case akkaLocation: AkkaLocation if akkaLocation.prefix.toString.startsWith(_prefix) => akkaLocation
-    }
-  }
+  override def listByPrefix(prefix: Prefix): Future[List[Location]] = list.map(_.filter(_.prefix == prefix))
 
   /**
    * Track the status of given connection
    */
-  def track(connection: Connection): Source[TrackingEvent, KillSwitch] = {
+  def track(connection: Connection): Source[TrackingEvent, Subscription] = {
     log.debug(s"Tracking connection: [${connection.name}]")
     //Create a message handler for this connection
     val service = new Registry.Service(connection)
@@ -225,13 +219,15 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     }
     //Allow stream to be cancellable by giving it a KillSwitch in mat value.
     // Also, deduplicate identical messages in case multiple DeathWatch actors unregisters the same location.
-    trackingEvents.cancellable.distinctUntilChanged
+    trackingEvents.cancellable.distinctUntilChanged.mapMaterializedValue(createSubscription)
   }
+
+  private def createSubscription(x: KillSwitch): Subscription = () => x.shutdown()
 
   /**
    * Subscribe to events of a connection by providing a callback.
    */
-  override def subscribe(connection: Connection, callback: TrackingEvent => Unit): KillSwitch = {
+  override def subscribe(connection: Connection, callback: TrackingEvent => Unit): Subscription = {
     log.info(s"Subscribing to connection: [${connection.name}]")
     track(connection).to(Sink.foreach(callback)).run()
   }

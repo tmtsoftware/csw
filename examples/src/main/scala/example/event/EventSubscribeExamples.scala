@@ -6,8 +6,8 @@ import akka.stream.scaladsl.Sink
 import csw.command.client.messages.TopLevelActorMessage
 import csw.event.api.scaladsl.{EventService, EventSubscription, SubscriptionModes}
 import csw.location.models.AkkaLocation
-import csw.params.core.models.Subsystem
 import csw.params.events.{Event, EventKey, EventName}
+import csw.prefix.models.Subsystem
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble

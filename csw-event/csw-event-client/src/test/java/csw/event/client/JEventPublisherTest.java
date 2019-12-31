@@ -9,14 +9,13 @@ import akka.stream.javadsl.Source;
 import csw.event.api.javadsl.IEventPublisher;
 import csw.event.api.javadsl.IEventSubscription;
 import csw.event.client.helpers.Utils;
-//import csw.event.client.internal.kafka.KafkaTestProps;
 import csw.event.client.internal.redis.RedisTestProps;
 import csw.event.client.internal.wiring.BaseProperties;
-import csw.params.core.models.Prefix;
 import csw.params.events.Event;
 import csw.params.events.Event$;
 import csw.params.events.EventKey;
-import csw.params.javadsl.JSubsystem;
+import csw.prefix.models.Prefix;
+import csw.prefix.javadsl.JSubsystem;
 import csw.time.core.models.UTCTime;
 import org.scalatestplus.testng.TestNGSuite;
 import org.testng.Assert;
@@ -33,6 +32,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+import csw.event.client.internal.kafka.KafkaTestProps;
+
 //DEOPSCSW-331: Event Service Accessible to all CSW component builders
 //DEOPSCSW-334: Publish an event
 //DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
@@ -44,7 +45,7 @@ import java.util.stream.Collectors;
 public class JEventPublisherTest extends TestNGSuite {
 
     private RedisTestProps redisTestProps;
-//    private KafkaTestProps kafkaTestProps;
+    private KafkaTestProps kafkaTestProps;
 
     private int counter = -1;
     private Cancellable cancellable;
@@ -52,20 +53,20 @@ public class JEventPublisherTest extends TestNGSuite {
     @BeforeSuite
     public void beforeAll() {
         redisTestProps = RedisTestProps.jCreateRedisProperties();
-//        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties();
+        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties();
         redisTestProps.start();
-//        kafkaTestProps.start();
+        kafkaTestProps.start();
     }
 
     @AfterSuite
     public void afterAll() {
         redisTestProps.shutdown();
-//        kafkaTestProps.shutdown();
+        kafkaTestProps.shutdown();
     }
 
     @DataProvider(name = "event-service-provider")
     public Object[] pubsubProvider() {
-        return new Object[]{redisTestProps, /*kafkaTestProps*/};
+        return new Object[]{redisTestProps, kafkaTestProps};
     }
 
     //DEOPSCSW-345: Publish events irrespective of subscriber existence
@@ -159,7 +160,7 @@ public class JEventPublisherTest extends TestNGSuite {
     public void should_be_able_to_publish_an_event_with_block_generating_future_of_event_with_duration(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         List<Event> events = new ArrayList<>();
         for (int i = 31; i < 41; i++) {
-            events.add(Utils.makeEventWithPrefix(i, new Prefix(JSubsystem.CSW, "move")));
+            events.add(Utils.makeEventWithPrefix(i, Prefix.apply(JSubsystem.CSW(), "move")));
         }
 
         EventKey eventKey = events.get(0).eventKey();
@@ -233,7 +234,7 @@ public class JEventPublisherTest extends TestNGSuite {
     public void should_be_able_to_publish_event_via_event_generator_with_start_time(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         List<Event> events = new ArrayList<>();
         for (int i = 31; i < 41; i++) {
-            events.add(Utils.makeEventWithPrefix(i, new Prefix(JSubsystem.CSW, "start.time.test.publish")));
+            events.add(Utils.makeEventWithPrefix(i, Prefix.apply(JSubsystem.CSW(), "start.time.test.publish")));
         }
 
         EventKey eventKey = events.get(0).eventKey();
@@ -269,7 +270,7 @@ public class JEventPublisherTest extends TestNGSuite {
     public void should_be_able_to_publish_event_via_asynchronous_event_generator_with_start_time(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         List<Event> events = new ArrayList<>();
         for (int i = 31; i < 41; i++) {
-            events.add(Utils.makeEventWithPrefix(i, new Prefix(JSubsystem.CSW, "start.time.test.publishAsync")));
+            events.add(Utils.makeEventWithPrefix(i, Prefix.apply(JSubsystem.CSW(), "start.time.test.publishAsync")));
         }
 
         EventKey eventKey = events.get(0).eventKey();

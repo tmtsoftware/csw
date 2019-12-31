@@ -12,7 +12,8 @@ final case class OptionsHandler(options: Options, appConfig: Option[Config]) {
   def stringOpt(entry: String, arg: Option[String] = None): Option[String] = {
     val value = if (arg.isDefined) {
       arg
-    } else {
+    }
+    else {
       appConfig.flatMap { c =>
         // XXX: Using only first name here
         val path = s"${options.prefixes.head}.$entry"
@@ -21,7 +22,8 @@ final case class OptionsHandler(options: Options, appConfig: Option[Config]) {
     }
     if (value.isDefined) {
       value
-    } else {
+    }
+    else {
       None
     }
   }

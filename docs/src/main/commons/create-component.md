@@ -324,7 +324,7 @@ was received.
 
 If the response was `Accepted`, the TLA adds the `Started` status for the command in the `CommandResponseManager` and then
 calls the `onSubmit` hook of `ComponentHandlers`. The return value of `onSubmit` is then returned to the sender,
-which can be a `Completed` or `CompletedWithResult` for commands that return quickly, or `Started` for long running commands.  If the response was `Invalid`, this is returned to the
+which can be a `Completed` for commands that return quickly, or `Started` for long running commands.  If the response was `Invalid`, this is returned to the
 sender of the command.
 
 In case the command received by a component a `Oneway`, the response is not added to the `CommandResponseManager`, and the `onOneway`

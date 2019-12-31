@@ -22,7 +22,7 @@ import csw.location.server.commons.TestFutureExtension.RichFuture
 import csw.location.server.internal.LocationServiceFactory
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.network.utils.Networks
-import csw.params.core.models.{Prefix, Subsystem}
+import csw.prefix.models.{Prefix, Subsystem}
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
@@ -211,7 +211,7 @@ class LocationServiceCompTest(mode: String)
     result2.unregister().await
     probe.expectMessage(LocationRemoved(redis1Connection))
 
-    switch.shutdown()
+    switch.cancel()
   }
 
   // DEOPSCSW-12: Create location service API
@@ -231,7 +231,7 @@ class LocationServiceCompTest(mode: String)
     locationService.unregister(redis1Connection).await
     probe.expectMsg(LocationRemoved(redis1Registration.connection))
 
-    switch.shutdown()
+    switch.cancel()
     locationService.register(redis1Registration).await
     probe.expectNoMessage(200.millis)
   }
@@ -268,13 +268,13 @@ class LocationServiceCompTest(mode: String)
     httpProbe.expectMessage(LocationRemoved(httpConnection))
 
     //stop tracking http connection
-    httpSwitch.shutdown()
+    httpSwitch.cancel()
 
     //unregister and stop tracking akka connection
     akkaRegistrationResult.unregister().await
     akkaProbe.expectMessage(LocationRemoved(akkaConnection))
 
-    akkaSwitch.shutdown()
+    akkaSwitch.cancel()
   }
 
   // DEOPSCSW-26: Track a connection
@@ -296,7 +296,7 @@ class LocationServiceCompTest(mode: String)
     httpProbe.expectMessage(LocationUpdated(httpRegistration.location(hostname)))
 
     //stop tracking http connection
-    httpSwitch.shutdown()
+    httpSwitch.cancel()
 
     httpRegistrationResult.unregister().await
 
@@ -447,6 +447,7 @@ class LocationServiceCompTest(mode: String)
 
   // DEOPSCSW-308: Add prefix in Location service models
   // DEOPSCSW-12: Create location service API
+  // CSW-80: Prefix should be in lowercase
   test("should filter akka connections based on prefix") {
     val akkaConnection1 = AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "ncc.trombone.hcd1"), ComponentType.HCD))
     val akkaConnection2 =
@@ -461,11 +462,7 @@ class LocationServiceCompTest(mode: String)
     locationService.register(make(akkaConnection2, actorRef2.toURI)).await
     locationService.register(make(akkaConnection3, actorRef3.toURI)).await
 
-    locationService.listByPrefix("nfiraos.ncc.trombone").await.map(_.connection).toSet shouldBe Set(
-      akkaConnection1,
-      akkaConnection2,
-      akkaConnection3
-    )
+    locationService.listByPrefix(Prefix("nfiraos.ncc.trombone.hcd3")).await.map(_.connection).toSet shouldBe Set(akkaConnection3)
   }
 
   // DEOPSCSW-12: Create location service API

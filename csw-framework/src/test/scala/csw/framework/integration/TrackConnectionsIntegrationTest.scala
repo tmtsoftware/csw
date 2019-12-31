@@ -19,13 +19,15 @@ import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{ComponentId, HttpRegistration, TcpRegistration}
 import csw.params.commands
 import csw.params.commands.CommandName
-import csw.params.core.models.{Prefix, Subsystem}
 import csw.params.core.states.{CurrentState, StateName}
+import csw.prefix.models.Subsystem
+import csw.prefix.models.Prefix
 import io.lettuce.core.RedisClient
 
 import scala.concurrent.TimeoutException
 import scala.concurrent.duration.DurationLong
 
+//CSW-82: ComponentInfo should take prefix
 class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 

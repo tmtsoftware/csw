@@ -3,7 +3,8 @@ package csw.common.components.command
 import csw.params.commands.CommandName
 import csw.params.core.generics.KeyType.ChoiceKey
 import csw.params.core.generics.GChoiceKey
-import csw.params.core.models.{Choice, Choices, Prefix}
+import csw.params.core.models.{Choice, Choices}
+import csw.prefix.models.Prefix
 
 object CommandComponentState {
   val seqPrefix       = Prefix("wfos.seq")

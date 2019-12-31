@@ -16,7 +16,7 @@ import static csw.params.javadsl.JUnits.*;
 // DEOPSCSW-184: Change configurations - attributes and values
 public class JArrayKeyTypeTest extends JUnitSuite {
 
-    private final Units NoUnit = NoUnits;
+    private final Units NoUnit = NoUnits();
 
     private void commonAssertions(String keyName, KeyType keyType, ArrayData[] testData, Parameter parameter, Units unit) {
         Assert.assertEquals(keyName, keyName);
@@ -44,8 +44,8 @@ public class JArrayKeyTypeTest extends JUnitSuite {
         Byte[] byteArray1 = {1, 2, 3};
         Byte[] byteArray2 = {4, 5, 6, 7};
 
-        ArrayData<Byte> data1 = ArrayData.fromJavaArray(byteArray1);
-        ArrayData<Byte> data2 = ArrayData.fromJavaArray(byteArray2);
+        ArrayData<Byte> data1 = ArrayData.fromArray(byteArray1);
+        ArrayData<Byte> data2 = ArrayData.fromArray(byteArray2);
 
         // key.set without Units
         ArrayData[] arrayData = new ArrayData[]{data1, data2};
@@ -53,8 +53,8 @@ public class JArrayKeyTypeTest extends JUnitSuite {
         commonAssertions(keyName, JKeyType.ByteArrayKey(), arrayData, parameterWithoutUnits, NoUnit);
 
         // key.set with Units
-        Parameter<ArrayData<Byte>> parameterWithUnits = key.set(arrayData, millisecond);
-        commonAssertions(keyName, JKeyType.ByteArrayKey(), arrayData, parameterWithUnits, millisecond);
+        Parameter<ArrayData<Byte>> parameterWithUnits = key.set(arrayData, millisecond());
+        commonAssertions(keyName, JKeyType.ByteArrayKey(), arrayData, parameterWithUnits, millisecond());
     }
 
     @Test
@@ -64,8 +64,8 @@ public class JArrayKeyTypeTest extends JUnitSuite {
         Short[] shortArray1 = {10, 20, 30};
         Short[] shortArray2 = {100, 200, 300, 400};
 
-        ArrayData<Short> data1 = ArrayData.fromJavaArray(shortArray1);
-        ArrayData<Short> data2 = ArrayData.fromJavaArray(shortArray2);
+        ArrayData<Short> data1 = ArrayData.fromArray(shortArray1);
+        ArrayData<Short> data2 = ArrayData.fromArray(shortArray2);
 
         // key.set without Units
         ArrayData[] arrayData = new ArrayData[]{data1, data2};
@@ -73,8 +73,8 @@ public class JArrayKeyTypeTest extends JUnitSuite {
         commonAssertions(keyName, JKeyType.ShortArrayKey(), arrayData, parameterWithoutUnits, NoUnit);
 
         // key.set with Units
-        Parameter<ArrayData<Short>> parameterWithUnits = key.set(arrayData, degree);
-        commonAssertions(keyName, JKeyType.ShortArrayKey(), arrayData, parameterWithUnits, degree);
+        Parameter<ArrayData<Short>> parameterWithUnits = key.set(arrayData, degree());
+        commonAssertions(keyName, JKeyType.ShortArrayKey(), arrayData, parameterWithUnits, degree());
     }
 
     @Test
@@ -84,8 +84,8 @@ public class JArrayKeyTypeTest extends JUnitSuite {
         Long[] longArray1 = {100L, 200L, 300L};
         Long[] longArray2 = {400L, 500L, 600L, 700L};
 
-        ArrayData<Long> data1 = ArrayData.fromJavaArray(longArray1);
-        ArrayData<Long> data2 = ArrayData.fromJavaArray(longArray2);
+        ArrayData<Long> data1 = ArrayData.fromArray(longArray1);
+        ArrayData<Long> data2 = ArrayData.fromArray(longArray2);
 
         // key.set without Units
         ArrayData[] arrayData = new ArrayData[]{data1, data2};
@@ -93,8 +93,8 @@ public class JArrayKeyTypeTest extends JUnitSuite {
         commonAssertions(keyName, JKeyType.LongArrayKey(), arrayData, parameterWithoutUnits, NoUnit);
 
         // key.set with Units
-        Parameter<ArrayData<Long>> parameterWithUnits = key.set(arrayData, millimeter);
-        commonAssertions(keyName, JKeyType.LongArrayKey(), arrayData, parameterWithUnits, millimeter);
+        Parameter<ArrayData<Long>> parameterWithUnits = key.set(arrayData, millimeter());
+        commonAssertions(keyName, JKeyType.LongArrayKey(), arrayData, parameterWithUnits, millimeter());
     }
 
     @Test
@@ -104,8 +104,8 @@ public class JArrayKeyTypeTest extends JUnitSuite {
         Integer[] integerArray1 = {100, 200, 300};
         Integer[] integerArray2 = {400, 500, 600, 700};
 
-        ArrayData<Integer> data1 = ArrayData.fromJavaArray(integerArray1);
-        ArrayData<Integer> data2 = ArrayData.fromJavaArray(integerArray2);
+        ArrayData<Integer> data1 = ArrayData.fromArray(integerArray1);
+        ArrayData<Integer> data2 = ArrayData.fromArray(integerArray2);
 
         // key.set without Units
         ArrayData[] arrayData = new ArrayData[]{data1, data2};
@@ -114,8 +114,8 @@ public class JArrayKeyTypeTest extends JUnitSuite {
         commonAssertions(keyName, JKeyType.IntArrayKey(), arrayData, parameterWithoutUnits, NoUnit);
 
         // key.set with Units
-        Parameter<ArrayData<Integer>> parameterWithUnits = key.set(arrayData, kilometer);
-        commonAssertions(keyName, JKeyType.IntArrayKey(), arrayData, parameterWithUnits, kilometer);
+        Parameter<ArrayData<Integer>> parameterWithUnits = key.set(arrayData, kilometer());
+        commonAssertions(keyName, JKeyType.IntArrayKey(), arrayData, parameterWithUnits, kilometer());
     }
 
     @Test
@@ -125,8 +125,8 @@ public class JArrayKeyTypeTest extends JUnitSuite {
         Float[] floatArray1 = {100f, 200f, 300f};
         Float[] floatArray2 = {400f, 500f, 600f, 700f};
 
-        ArrayData<Float> data1 = ArrayData.fromJavaArray(floatArray1);
-        ArrayData<Float> data2 = ArrayData.fromJavaArray(floatArray2);
+        ArrayData<Float> data1 = ArrayData.fromArray(floatArray1);
+        ArrayData<Float> data2 = ArrayData.fromArray(floatArray2);
 
         // key.set without Units
         ArrayData[] arrayData = new ArrayData[]{data1, data2};
@@ -134,8 +134,8 @@ public class JArrayKeyTypeTest extends JUnitSuite {
         commonAssertions(keyName, JKeyType.FloatArrayKey(), arrayData, parameterWithoutUnits, NoUnit);
 
         // key.set with Units
-        Parameter<ArrayData<Float>> parameterWithUnits = key.set(arrayData, meter);
-        commonAssertions(keyName, JKeyType.FloatArrayKey(), arrayData, parameterWithUnits, meter);
+        Parameter<ArrayData<Float>> parameterWithUnits = key.set(arrayData, meter());
+        commonAssertions(keyName, JKeyType.FloatArrayKey(), arrayData, parameterWithUnits, meter());
     }
 
     @Test
@@ -145,8 +145,8 @@ public class JArrayKeyTypeTest extends JUnitSuite {
         Double[] doubleArray1 = {100d, 200d, 300d};
         Double[] doubleArray2 = {400d, 500d, 600d, 700d};
 
-        ArrayData<Double> data1 = ArrayData.fromJavaArray(doubleArray1);
-        ArrayData<Double> data2 = ArrayData.fromJavaArray(doubleArray2);
+        ArrayData<Double> data1 = ArrayData.fromArray(doubleArray1);
+        ArrayData<Double> data2 = ArrayData.fromArray(doubleArray2);
 
         // key.set without Units
         ArrayData[] arrayData = new ArrayData[]{data1, data2};
@@ -154,7 +154,7 @@ public class JArrayKeyTypeTest extends JUnitSuite {
         commonAssertions(keyName, JKeyType.DoubleArrayKey(), arrayData, parameterWithoutUnits, NoUnit);
 
         // key.set with Units
-        Parameter<ArrayData<Double>> parameterWithUnits = key.set(arrayData, encoder);
-        commonAssertions(keyName, JKeyType.DoubleArrayKey(), arrayData, parameterWithUnits, encoder);
+        Parameter<ArrayData<Double>> parameterWithUnits = key.set(arrayData, encoder());
+        commonAssertions(keyName, JKeyType.DoubleArrayKey(), arrayData, parameterWithUnits, encoder());
     }
 }

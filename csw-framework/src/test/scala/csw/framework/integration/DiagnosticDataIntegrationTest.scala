@@ -14,14 +14,16 @@ import csw.location.models.ComponentId
 import csw.location.models.ComponentType.HCD
 import csw.location.models.Connection.AkkaConnection
 import csw.logging.client.scaladsl.LoggingSystemFactory
-import csw.params.core.models.{Prefix, Subsystem}
 import csw.params.events.{Event, EventKey, SystemEvent}
+import csw.prefix.models.Subsystem
+import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime
 import redis.embedded.{RedisSentinel, RedisServer}
 
 import scala.concurrent.duration.DurationLong
 
 // DEOPSCSW-37: Add diagnosticMode handler to component handlers
+// CSW-82: ComponentInfo should take prefix
 class DiagnosticDataIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 

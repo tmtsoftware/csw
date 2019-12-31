@@ -11,7 +11,7 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.models.Connection.{HttpConnection, TcpConnection}
 import csw.location.models.{ComponentId, ComponentType}
 import csw.network.utils.Networks
-import csw.params.core.models.Prefix
+import csw.prefix.models.Prefix
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
 import org.scalatest.FunSuiteLike
 

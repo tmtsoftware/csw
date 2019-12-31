@@ -32,14 +32,14 @@ import csw.params.commands.Setup;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.Id;
-import csw.params.core.models.Prefix;
 import csw.params.core.states.CurrentState;
 import csw.params.core.states.DemandState;
 import csw.params.core.states.StateName;
 import csw.params.javadsl.JKeyType;
-import csw.params.javadsl.JSubsystem;
+import csw.prefix.models.Prefix;
+import csw.prefix.javadsl.JSubsystem;
 import io.lettuce.core.RedisClient;
-import msocket.api.models.Subscription;
+import msocket.api.Subscription;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -101,7 +101,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         FrameworkWiring wiring = FrameworkWiring.make(hcdActorSystem, redisClient);
         Await.result(Standalone.spawn(ConfigFactory.load("aps_hcd_java.conf"), wiring), new FiniteDuration(5, TimeUnit.SECONDS));
 
-        AkkaConnection akkaConnection = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.IRIS, "Test_Component_Running_Long_Command_Java"), JComponentType.HCD()));
+        AkkaConnection akkaConnection = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.IRIS(), "Test_Component_Running_Long_Command_Java"), JComponentType.HCD()));
         CompletableFuture<Optional<AkkaLocation>> eventualLocation = locationService.resolve(akkaConnection, java.time.Duration.ofSeconds(5));
         Optional<AkkaLocation> maybeLocation = eventualLocation.get();
         Assert.assertTrue(maybeLocation.isPresent());
@@ -211,7 +211,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
 
         // do some work before querying for the result of above command as needed
         SubmitResponse sresponse = longRunningCommandResultF.get();
-        CompletableFuture<QueryResponse> queryResponseF = hcdCmdService.query(sresponse.runId());
+        CompletableFuture<SubmitResponse> queryResponseF = hcdCmdService.query(sresponse.runId());
         queryResponseF.thenAccept(r -> {
             if (r instanceof Started) {
                 // happy case - no action needed
@@ -255,7 +255,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         CompletableFuture<SubmitResponse> longRunningSubmitResultF3 = hcdCmdService.submit(longRunningSetup);
 
         // do some work before querying for the result of above command as needed
-        CompletableFuture<QueryResponse> queryResponseF3 =
+        CompletableFuture<SubmitResponse> queryResponseF3 =
                 hcdCmdService.query(longRunningSubmitResultF3.get().runId());
         queryResponseF3.thenAccept(r -> {
             if (r instanceof Started) {
@@ -288,7 +288,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         //#queryFinal
 
         //#query
-        CompletableFuture<QueryResponse> queryResponseF2 = hcdCmdService.query(sresponse.runId());
+        CompletableFuture<SubmitResponse> queryResponseF2 = hcdCmdService.query(sresponse.runId());
         Assert.assertTrue(queryResponseF2.get() instanceof Completed);
         //#query
 

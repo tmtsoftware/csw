@@ -5,9 +5,11 @@ import akka.actor.typed.scaladsl.Behaviors
 import csw.logging.api.scaladsl._
 import csw.logging.client.components.IRIS._
 import csw.logging.client.scaladsl.{GenericLoggerFactory, LoggerFactory}
+import csw.prefix.models.Prefix
+import csw.prefix.models.Subsystem.CSW
 
 // DEOPSCSW-316: Improve Logger accessibility for component developers
-object IRISLibraryLogger extends LoggerFactory(IRIS.COMPONENT_NAME)
+object IRISLibraryLogger extends LoggerFactory(Prefix(CSW, IRIS.COMPONENT_NAME))
 
 class IRIS(logger: LoggerFactory) {
 
@@ -34,7 +36,7 @@ class IRIS(logger: LoggerFactory) {
 
 object IRIS {
 
-  val TRACE_LINE_NO         = 22
+  val TRACE_LINE_NO         = 24
   val DEBUG_LINE_NO         = TRACE_LINE_NO + 1
   val INFO_LINE_NO          = TRACE_LINE_NO + 2
   val WARN_LINE_NO          = TRACE_LINE_NO + 3
@@ -42,7 +44,7 @@ object IRIS {
   val FATAL_LINE_NO         = TRACE_LINE_NO + 5
   val LOG_ERROR_WITH_MAP_NO = TRACE_LINE_NO + 6
 
-  val COMPONENT_NAME = "IRIS"
+  val COMPONENT_NAME = "iris"
   val CLASS_NAME     = "csw.logging.client.components.IRIS"
   val FILE_NAME      = "IRIS.scala"
 
@@ -57,7 +59,7 @@ object IRIS {
 
   case class LogErrorWithMap(x: String) extends IRISLogMessages
 
-  def behavior(componentName: String): Behavior[IRISLogMessages] = new IRIS(new LoggerFactory(componentName)).behavior
+  def behavior(prefix: Prefix): Behavior[IRISLogMessages] = new IRIS(new LoggerFactory(prefix)).behavior
 
   val irisLogs = Map(
     "trace" -> "iris: trace",

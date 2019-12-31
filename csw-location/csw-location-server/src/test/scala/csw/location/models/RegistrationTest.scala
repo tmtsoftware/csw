@@ -14,7 +14,8 @@ import csw.location.models
 import csw.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.network.utils.Networks
-import csw.params.core.models.{Prefix, Subsystem}
+import csw.prefix.models.Subsystem
+import csw.prefix.models.Prefix
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.Await

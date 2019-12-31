@@ -21,7 +21,8 @@ object Main extends App {
     try {
       startLogging(name)
       cliApp.execute(options)
-    } finally {
+    }
+    finally {
       shutdown()
     }
   }

@@ -28,6 +28,8 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
   private val logMessage: String =
     s"""{
       |  "${LoggingKeys.COMPONENT_NAME}": "FileAppenderTest",
+      |  "${LoggingKeys.SUBSYSTEM}": "csw",
+      |  "${LoggingKeys.PREFIX}": "csw.FileAppenderTest",
       |  "${LoggingKeys.HOST}": "localhost",
       |  "${LoggingKeys.SERVICE}": {
       |    "name": "logging",
@@ -79,6 +81,7 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
   }
 
   // DEOPSCSW-325: Include exception stack trace in stdout log message for exceptions
+  // CSW-78: PrefixRedesign for logging
   test("should able to pretty-print one log message to one line") {
 
     val config = ConfigFactory
@@ -92,15 +95,16 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
       stdOutAppenderForOneLineMsg.append(expectedLogJson, Category.Common.name)
     }
 
-    val actualOneLineLogMsg   = outCapture.toString.replace("\n", "")
-    val severity              = expectedLogJson.getString(LoggingKeys.SEVERITY)
-    val msg                   = expectedLogJson.getString(LoggingKeys.MESSAGE)
-    val fileName              = expectedLogJson.getString(LoggingKeys.FILE)
-    val lineNumber            = expectedLogJson.getString(LoggingKeys.LINE)
-    val plainStack            = expectedLogJson.getString(LoggingKeys.PLAINSTACK)
-    val timestamp             = expectedLogJson.getString(LoggingKeys.TIMESTAMP)
-    val component             = expectedLogJson.getString(LoggingKeys.COMPONENT_NAME)
-    val expectedOneLineLogMsg = f"$timestamp $severity%-5s $component ($fileName $lineNumber) - $msg [Stacktrace] $plainStack"
+    val actualOneLineLogMsg = outCapture.toString.replace("\n", "")
+    val severity            = expectedLogJson.getString(LoggingKeys.SEVERITY)
+    val msg                 = expectedLogJson.getString(LoggingKeys.MESSAGE)
+    val fileName            = expectedLogJson.getString(LoggingKeys.FILE)
+    val lineNumber          = expectedLogJson.getString(LoggingKeys.LINE)
+    val plainStack          = expectedLogJson.getString(LoggingKeys.PLAINSTACK)
+    val timestamp           = expectedLogJson.getString(LoggingKeys.TIMESTAMP)
+    val prefix              = expectedLogJson.getString(LoggingKeys.PREFIX)
+    val expectedOneLineLogMsg =
+      f"$timestamp $severity%-5s $prefix ($fileName $lineNumber) - $msg [Stacktrace] $plainStack"
 
     actualOneLineLogMsg shouldBe expectedOneLineLogMsg
 

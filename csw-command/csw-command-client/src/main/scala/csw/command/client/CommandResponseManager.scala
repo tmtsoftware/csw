@@ -37,7 +37,8 @@ class CommandResponseManager(val commandResponseManagerActor: ActorRef[MiniCRM.C
     Future.sequence(commands.toSet).map { s =>
       if (isSuccessful(s)) {
         OverallSuccess(s)
-      } else {
+      }
+      else {
         OverallFailure(s)
       }
     }

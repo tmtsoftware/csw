@@ -44,7 +44,8 @@ trait HttpParameter extends TokenMaskSupport with Directives with HttpCodecs {
       try {
         Pattern.compile(pattern)
         provide(p)
-      } catch {
+      }
+      catch {
         case ex: PatternSyntaxException => reject(MalformedQueryParamRejection("pattern", ex.getMessage))
       }
     case None => provide(None)

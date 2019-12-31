@@ -15,11 +15,12 @@ import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
 import csw.command.client.messages.ComponentCommonMessage.ComponentStateSubscription
 import csw.command.client.messages.{ComponentMessage, Query, QueryFinal}
 import csw.command.client.models.framework.PubSub.{Subscribe, SubscribeOnly}
+import csw.params.commands.CommandIssue.IdNotAvailableIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
-import msocket.api.models.Subscription
+import msocket.api.Subscription
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
@@ -53,10 +54,10 @@ private[command] class CommandServiceImpl(component: ActorRef[ComponentMessage])
     extension.onewayAndMatch(controlCommand, stateMatcher)
 
   // components coming via this api will be removed from  subscriber's list after timeout
-  override def query(commandRunId: Id): Future[QueryResponse] = {
-    val eventualResponse: Future[QueryResponse] = component ? (Query(commandRunId, _))
+  override def query(commandRunId: Id): Future[SubmitResponse] = {
+    val eventualResponse: Future[SubmitResponse] = component ? (Query(commandRunId, _))
     eventualResponse recover {
-      case _: TimeoutException => CommandNotAvailable(commandRunId)
+      case _: TimeoutException => Invalid(commandRunId, IdNotAvailableIssue(commandRunId.id))
     }
   }
 

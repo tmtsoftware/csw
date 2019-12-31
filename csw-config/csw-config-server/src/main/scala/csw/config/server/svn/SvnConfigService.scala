@@ -54,7 +54,8 @@ class SvnConfigService(settings: Settings, actorRuntime: ActorRuntime, svnRepo: 
           s"Either annex=$annex is specified or Input file length ${configData.length} exceeds ${settings.`annex-min-file-size`}; Storing file in Annex"
         )
         await(createAnnex())
-      } else {
+      }
+      else {
         await(put(path, configData, update = false, comment))
       }
     }
@@ -194,7 +195,8 @@ class SvnConfigService(settings: Settings, actorRuntime: ActorRuntime, svnRepo: 
       val history = Future.sequence(configFileRevisions.map(historyActiveRevisions(activePath, _)))
 
       await(history)
-    } else
+    }
+    else
       throw FileNotFound(path)
   }
 
@@ -210,7 +212,8 @@ class SvnConfigService(settings: Settings, actorRuntime: ActorRuntime, svnRepo: 
     if (present) {
       log.info(s"Updating active version for file with path ${path.toString}")
       await(update(activePath, ConfigData.fromString(id.id), comment))
-    } else {
+    }
+    else {
       log.info(s"Setting active version for file with path ${path.toString}")
       await(createFile(activePath, ConfigData.fromString(id.id), comment = comment))
     }
@@ -287,10 +290,12 @@ class SvnConfigService(settings: Settings, actorRuntime: ActorRuntime, svnRepo: 
     if (await(svnRepo.pathExists(path, revision))) {
       log.debug(s"Found the type of file at path ${path.toString} as a normal")
       PathStatus.NormalSize
-    } else if (await(svnRepo.pathExists(shaFilePath(path), revision))) {
+    }
+    else if (await(svnRepo.pathExists(shaFilePath(path), revision))) {
       log.debug(s"Found the type of file at path ${path.toString} as an annex")
       PathStatus.Annex
-    } else {
+    }
+    else {
       PathStatus.Missing
     }
   }
@@ -309,7 +314,8 @@ class SvnConfigService(settings: Settings, actorRuntime: ActorRuntime, svnRepo: 
     val commitInfo = if (update) {
       log.info(s"Updating normal file at path ${path.toString}")
       await(svnRepo.modifyFile(path, comment, inputStream))
-    } else {
+    }
+    else {
       log.info(s"Creating normal file at path ${path.toString}")
       await(svnRepo.addFile(path, comment, inputStream))
     }

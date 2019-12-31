@@ -14,9 +14,7 @@ import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
-import msocket.api.Transport
-import msocket.api.models.Subscription
-import portable.akka.extensions.PortableAkka.SourceWithSubscribe
+import msocket.api.{Subscription, Transport}
 
 import scala.concurrent.Future
 
@@ -47,8 +45,8 @@ class CommandServiceClient(
   override def onewayAndMatch(controlCommand: ControlCommand, stateMatcher: StateMatcher): Future[MatchingResponse] =
     extension.onewayAndMatch(controlCommand, stateMatcher)
 
-  override def query(commandRunId: Id): Future[QueryResponse] =
-    httpTransport.requestResponse[QueryResponse](Query(commandRunId))
+  override def query(commandRunId: Id): Future[SubmitResponse] =
+    httpTransport.requestResponse[SubmitResponse](Query(commandRunId))
 
   override def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse] =
     websocketTransport.requestResponse[SubmitResponse](QueryFinal(commandRunId, timeout), timeout.duration)
@@ -57,8 +55,8 @@ class CommandServiceClient(
     websocketTransport.requestStream[CurrentState](SubscribeCurrentState(names))
 
   override def subscribeCurrentState(callback: CurrentState => Unit): Subscription =
-    subscribeCurrentState().subscribe(callback)
+    websocketTransport.requestStream[CurrentState](SubscribeCurrentState(), callback)
 
   override def subscribeCurrentState(names: Set[StateName], callback: CurrentState => Unit): Subscription =
-    subscribeCurrentState(names).subscribe(callback)
+    websocketTransport.requestStream[CurrentState](SubscribeCurrentState(names), callback)
 }

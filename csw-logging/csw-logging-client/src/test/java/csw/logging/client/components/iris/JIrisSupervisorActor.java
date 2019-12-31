@@ -4,13 +4,14 @@ import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.Behaviors;
 import csw.logging.api.javadsl.ILogger;
 import csw.logging.client.javadsl.JLoggerFactory;
+import csw.prefix.models.Prefix;
 
 public class JIrisSupervisorActor {
 
     public static Behavior<String> behavior =
             Behaviors.setup(context -> {
                 // DEOPSCSW-316: Improve Logger accessibility for component developers
-                final ILogger log = new JLoggerFactory("jIRIS").getLogger(context, JIrisSupervisorActor.class);
+                final ILogger log = new JLoggerFactory(Prefix.apply("csw.jIRIS")).getLogger(context, JIrisSupervisorActor.class);
                 return Behaviors.receiveMessage(
                         msg -> {
                             switch (msg) {

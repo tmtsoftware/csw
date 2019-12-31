@@ -4,7 +4,7 @@ import java.net.URI
 
 import csw.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.models.codecs.LocationSerializable
-import csw.params.core.models.Prefix
+import csw.prefix.models.Prefix
 
 /**
  * Location represents a live Connection along with its URI

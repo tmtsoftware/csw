@@ -16,13 +16,15 @@ import csw.location.models.ComponentType.{Assembly, HCD}
 import csw.location.models.Connection.AkkaConnection
 import csw.params.commands
 import csw.params.commands.CommandName
-import csw.params.core.models.{Prefix, Subsystem}
 import csw.params.core.states.{CurrentState, StateName}
+import csw.prefix.models.Subsystem
+import csw.prefix.models.Prefix
 import redis.embedded.{RedisSentinel, RedisServer}
 
 import scala.concurrent.duration.DurationLong
 
 //DEOPSCSW-395: Provide EventService handle to component developers
+//CSW-82: ComponentInfo should take prefix
 class EventServiceIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 

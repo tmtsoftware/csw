@@ -6,6 +6,7 @@ import csw.params.core.generics.KeyType.{ByteKey, DoubleMatrixKey}
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.Units.degree
 import csw.params.core.models._
+import csw.prefix.models.{Prefix, Subsystem}
 import csw.time.core.models.UTCTime
 import org.scalatest.{FunSpec, Matchers}
 

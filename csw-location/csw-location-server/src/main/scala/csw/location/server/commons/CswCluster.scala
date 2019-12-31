@@ -129,7 +129,8 @@ object CswCluster {
       cswCluster.startClusterManagement()
       cswCluster.joinCluster()
       cswCluster
-    } catch {
+    }
+    catch {
       case NonFatal(ex) =>
         Await.result(cswCluster.shutdown(), 10.seconds)
         log.error(ex.getMessage, ex = ex)

@@ -30,7 +30,8 @@ private[logging] object MessageHandler {
   private[logging] def sendMsg(msg: LogActorMessages): Unit =
     if (loggerStopping) {
 //      println(s"*** Log message received after logger shutdown: $msg")
-    } else {
+    }
+    else {
       maybeLogActor match {
         case Some(logActor) => logActor ! msg
         case None =>

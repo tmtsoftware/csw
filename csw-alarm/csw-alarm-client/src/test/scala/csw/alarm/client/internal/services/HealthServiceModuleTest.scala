@@ -11,10 +11,12 @@ import csw.alarm.models.AlarmSeverity._
 import csw.alarm.models.FullAlarmSeverity.Disconnected
 import csw.alarm.models.Key.{ComponentKey, GlobalKey, SubsystemKey}
 import csw.alarm.models.ShelveStatus.Shelved
-import csw.params.core.models.Subsystem.{CSW, LGSF, NFIRAOS, TCS}
+import csw.prefix.models.Prefix
+import csw.prefix.models.Subsystem.{CSW, LGSF, NFIRAOS, TCS}
 
 import scala.concurrent.duration.DurationLong
 
+// CSW-83: Alarm models should take prefix
 class HealthServiceModuleTest
     extends AlarmServiceTestSetup
     with HealthServiceModule
@@ -44,7 +46,7 @@ class HealthServiceModuleTest
 
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
   test("getAggregatedHealth should get aggregated health for a component") {
-    val tromboneKey = ComponentKey(NFIRAOS, "trombone")
+    val tromboneKey = ComponentKey(Prefix(NFIRAOS, "trombone"))
     getAggregatedHealth(tromboneKey).await shouldBe Bad
 
     getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Disconnected
@@ -105,14 +107,14 @@ class HealthServiceModuleTest
     enclosureTempLowAlarm.isActive shouldBe false
     setSeverity(enclosureTempLowAlarmKey, Critical).await
 
-    val tromboneKey = ComponentKey(NFIRAOS, "enclosure")
+    val tromboneKey = ComponentKey(Prefix(NFIRAOS, "enclosure"))
     getAggregatedHealth(tromboneKey).await shouldBe Good
   }
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
   test("getAggregatedHealth should consider shelved alarms also for health aggregation") {
-    val componentKey = ComponentKey(cpuExceededAlarmKey.subsystem, cpuExceededAlarmKey.component)
+    val componentKey = ComponentKey(cpuExceededAlarmKey.prefix)
     getAggregatedHealth(componentKey).await shouldBe Bad
 
     shelve(cpuExceededAlarmKey).await
@@ -197,7 +199,7 @@ class HealthServiceModuleTest
 
     // component subscription - nfiraos.trombone
     val testProbe         = TestProbe[AlarmHealth]()(actorSystem)
-    val alarmSubscription = subscribeAggregatedHealthCallback(ComponentKey(NFIRAOS, "trombone"), testProbe.ref ! _)
+    val alarmSubscription = subscribeAggregatedHealthCallback(ComponentKey(Prefix(NFIRAOS, "trombone")), testProbe.ref ! _)
     alarmSubscription.ready().await
     testProbe.expectMessage(Bad) // on subscription, current aggregated health will be calculated
 
@@ -222,7 +224,7 @@ class HealthServiceModuleTest
 
     val testProbe = TestProbe[AlarmHealth]()(actorSystem)
     val alarmSubscription =
-      subscribeAggregatedHealthCallback(ComponentKey(NFIRAOS, "enclosure"), testProbe.ref ! _)
+      subscribeAggregatedHealthCallback(ComponentKey(Prefix(NFIRAOS, "enclosure")), testProbe.ref ! _)
     alarmSubscription.ready().await
     testProbe.expectMessage(Bad) // on subscription, current aggregated health will be calculated
 

@@ -288,11 +288,13 @@ object Angle {
     if (isNear(ra, H2R)) {
       val hour = math.round(ra * R2H).toInt
       s"${hour}h"
-    } else if (isNear(ra, H2R / 60)) {
+    }
+    else if (isNear(ra, H2R / 60)) {
       val hour = (ra * R2H).toInt
       val min  = Math.round((ra - H2R * hour) * R2H * 60).toInt
       s"${hour}h ${min}m"
-    } else {
+    }
+    else {
       val hour = (ra * R2H).toInt
       val min  = ((ra - H2R * hour) * R2H * 60).toInt
       val sec  = (ra - H2R * hour - min * H2R / 60) * R2H * 3600
@@ -314,11 +316,13 @@ object Angle {
     if (isNear(de, D2R)) {
       val deg = math.round(de * R2D).toInt
       sign + deg + DEGREE_SIGN
-    } else if (isNear(de, M2R)) {
+    }
+    else if (isNear(de, M2R)) {
       val deg = (de * R2D).toInt
       val min = ((de - D2R * deg) * R2M).toInt
       sign + deg + DEGREE_SIGN + min + "'"
-    } else {
+    }
+    else {
       val deg = (de * R2D).toInt
       val min = ((de - D2R * deg) * R2D * 60).toInt
       val sec = (de - D2R * deg - min * D2R / 60) * R2D * 3600

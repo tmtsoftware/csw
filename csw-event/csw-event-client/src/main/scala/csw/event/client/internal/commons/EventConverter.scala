@@ -12,7 +12,8 @@ private[event] object EventConverter {
   def toEvent[Chunk: Input.Provider](bytes: Chunk): Event = {
     try {
       Cbor.decode(bytes).withConfig(DecodingConfig(readDoubleAlsoAsFloat = true)).to[Event].value
-    } catch {
+    }
+    catch {
       case NonFatal(_) => Event.badEvent()
     }
   }
