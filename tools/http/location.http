@@ -15,9 +15,47 @@ Content-Type: application/json
     }
   }
 }
-
 ###
 // #register
+
+// #re-register
+POST http://localhost:7654/post-endpoint
+Content-Type: application/json
+
+{
+  "Register": {
+    "HttpRegistration": {
+      "connection": {
+        "prefix": "csw.server",
+        "componentType": "service",
+        "connectionType": "http"
+      },
+      "port": 1235,
+      "path": "root/path1"
+    }
+  }
+}
+###
+// #re-register
+
+// #invalid-register
+POST http://localhost:7654/post-endpoint
+Content-Type: application/json
+
+{
+  "Register": {
+    "HttpRegistration": {
+      "connection": {
+        "prefix": "csw.server",
+        "componentType": "service",
+        "connectionType": "http"
+      },
+      "path": "root/path1"
+    }
+  }
+}
+###
+// #invalid-register
 
 // #un-register
 POST http://localhost:7654/post-endpoint
@@ -30,9 +68,21 @@ Content-Type: application/json
     "connectionType": "http"
   }
 }
-
 ###
 // #un-register
+
+// #invalid-un-register
+POST http://localhost:7654/post-endpoint
+Content-Type: application/json
+
+{
+  "Unregister": {
+    "prefix": "csw.server",
+    "componentType": "service"
+  }
+}
+###
+// #invalid-un-register
 
 // #find
 POST http://localhost:7654/post-endpoint
@@ -40,7 +90,7 @@ Content-Type: application/json
 
 {
   "Find": {
-    "prefix": "csw.configserver",
+    "prefix": "csw.server",
     "componentType": "service",
     "connectionType": "http"
   }
@@ -56,7 +106,7 @@ Content-Type: application/json
 {
   "Resolve": {
     "connection": {
-      "prefix": "csw.configserver",
+      "prefix": "csw.server",
       "componentType": "service",
       "connectionType": "http"
     },
@@ -105,7 +155,7 @@ POST http://localhost:7654/post-endpoint
 Content-Type: application/json
 
 {
-  "ListByConnectionType": "tcp"
+  "ListByConnectionType": "http"
 }
 
 ###
@@ -116,7 +166,7 @@ POST http://localhost:7654/post-endpoint
 Content-Type: application/json
 
 {
-  "ListByPrefix": "csw.eventserver"
+  "ListByPrefix": "csw.server"
 }
 
 ###
@@ -133,15 +183,14 @@ Content-Type: application/json
 ###
 // #un-register-all
 
-# Dummy websocket implementation
-http://localhost:7654/websocket-endpoint
-Content-Type: application/json
-
-{
-  "Track": {
-    "prefix": "csw.server",
-    "componentType": "service",
-    "connectionType": "http"
-  }
-}
-###
+# Websocket example runnable with IntelliJ plugin or chrome extension for websockets
+# ws://localhost:7654/websocket-endpoint
+# Content-Type: application/json
+#
+# {
+#   "Track": {
+#     "prefix": "csw.server",
+#     "componentType": "service",
+#     "connectionType": "http"
+#   }
+# }
