@@ -17,7 +17,7 @@ case class Prefix private (subsystem: Subsystem, componentName: String) {
   /**
    * String representation of prefix e.g. tcs.filter.wheel where tcs is the subsystem name and filter.wheel is the component name
    */
-  val value: String = s"${subsystem.name}${Prefix.SEPARATOR}$componentName"
+  val value: String = s"${subsystem.name}${Prefix.SEPARATOR}$componentName".toLowerCase
 
   /**
    * String representation of prefix e.g. tcs.filter.wheel where tcs is the subsystem name and filter.wheel is the component name

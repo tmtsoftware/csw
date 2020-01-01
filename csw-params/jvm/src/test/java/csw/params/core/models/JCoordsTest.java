@@ -22,7 +22,7 @@ import static org.junit.Assert.assertEquals;
 @SuppressWarnings({"SameParameterValue", "FieldCanBeLocal"})
 public class JCoordsTest {
     private double delta = 0.00000001;
-    private Prefix src = new Prefix(JSubsystem.ESW(), "ocs.seq");
+    private Prefix src = Prefix.apply(JSubsystem.ESW(), "ocs.seq");
 
     // Basic Eq Coordinate Tests
 
