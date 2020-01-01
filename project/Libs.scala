@@ -23,7 +23,7 @@ object Libs {
   val `gson`                         = "com.google.code.gson"                     % "gson"                          % "2.8.6" //Apache 2.0
 
   val `play-json`         = dep("com.typesafe.play" %%% "play-json"         % "2.8.1") //Apache 2.0
-  val `enumeratum`        = dep("com.beachape"      %%% "enumeratum"        % "1.5.14") //MIT License
+  val `enumeratum`        = dep("com.beachape"      %%% "enumeratum"        % "1.5.15") //MIT License
   val `scalajs-java-time` = dep("org.scala-js"      %%% "scalajs-java-time" % "0.2.6")
   val `scalatest`         = dep("org.scalatest"     %%% "scalatest"         % "3.0.8") //Apache License 2.0
 
