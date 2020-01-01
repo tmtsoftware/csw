@@ -9,7 +9,7 @@ object Libs {
   val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0" //BSD 3-clause "New" or "Revised" License
   val `scala-async`        = "org.scala-lang.modules" %% "scala-async"        % "0.10.0" //BSD 3-clause "New" or "Revised" License
   val `scopt`              = "com.github.scopt"       %% "scopt"              % "3.7.1" //MIT License
-  val `junit`              = "junit"                  % "junit"               % "4.12" //Eclipse Public License 1.0
+  val `junit`              = "junit"                  % "junit"               % "4.13" //Eclipse Public License 1.0
   val `silencer-plugin`    = "com.github.ghik"        % "silencer-plugin"     % silencerVersion cross CrossVersion.full
   val `silencer-lib`       = "com.github.ghik"        % "silencer-lib"        % silencerVersion cross CrossVersion.full
   val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.7.1"
