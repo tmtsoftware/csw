@@ -3,7 +3,7 @@ package csw.logging.models.codecs
 import csw.logging.models.{Level, LogMetadata}
 import enumeratum.{Enum, EnumEntry}
 import io.bullet.borer.Codec
-import io.bullet.borer.derivation.MapBasedCodecs._
+import io.bullet.borer.derivation.CompactMapBasedCodecs._
 
 object LoggingCodecs extends LoggingCodecs
 trait LoggingCodecs {

@@ -4,7 +4,7 @@ import java.time.Instant
 
 import csw.prefix.models.Prefix
 import enumeratum.{Enum, EnumEntry}
-import io.bullet.borer.derivation.MapBasedCodecs.{deriveDecoder, deriveEncoder}
+import io.bullet.borer.derivation.CompactMapBasedCodecs._
 import io.bullet.borer.{Codec, Decoder, Encoder}
 
 import scala.concurrent.duration.FiniteDuration

@@ -10,8 +10,8 @@ import csw.location.api.messages.{LocationHttpMessage, LocationWebsocketMessage}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.models._
 import csw.prefix.models.Prefix
-import msocket.api.{Subscription, Transport}
 import msocket.api.codecs.BasicCodecs
+import msocket.api.{Subscription, Transport}
 
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
