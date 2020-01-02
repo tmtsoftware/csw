@@ -57,9 +57,9 @@ object Borer {
   val Version = "bdc7423"
   val Org     = "com.github.sirthias.borer"
 
-  val `borer-core`        = dep(Org %%% "borer-core"        % Version)
-  val `borer-derivation`  = dep(Org %%% "borer-derivation"  % Version)
-  val `borer-compat-akka` = dep(Org %%% "borer-compat-akka" % Version)
+  val `borer-core`        = dep(Org %%% "borer-core" % Version)
+  val `borer-derivation`  = dep(Org %%% "borer-derivation" % Version)
+  val `borer-compat-akka` = Org %% "borer-compat-akka" % Version
 }
 
 object Jackson {
@@ -118,7 +118,7 @@ object Jooq {
 }
 
 object MSocket {
-  val Version = "61d8852"
+  val Version = "d5afcfd"
 
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-impl-jvm` = "com.github.tmtsoftware.msocket" %% "msocket-impl-jvm" % Version

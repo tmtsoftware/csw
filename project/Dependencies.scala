@@ -14,7 +14,7 @@ object Dependencies {
       Akka.`akka-actor-typed`,
       AkkaHttp.`akka-http`,
       Libs.`scala-async`,
-      Borer.`borer-compat-akka`.value,
+      Borer.`borer-compat-akka`,
       Libs.`scalatest`.value % Test
     )
   )
@@ -108,7 +108,7 @@ object Dependencies {
       Akka.`akka-stream`,
       Akka.`akka-stream-typed`,
       Akka.`akka-actor`,
-      Borer.`borer-compat-akka`.value,
+      Borer.`borer-compat-akka`,
       Libs.`scala-async`,
       Libs.`scala-java8-compat`,
       Libs.`config`,
@@ -128,7 +128,7 @@ object Dependencies {
       Akka.`akka-actor`,
       Akka.`akka-stream`,
       Akka.`akka-stream-typed`,
-      Borer.`borer-compat-akka`.value,
+      Borer.`borer-compat-akka`,
       AkkaHttp.`akka-http`,
       Libs.`scala-async`,
       Libs.`scala-java8-compat`,
@@ -465,7 +465,7 @@ object Dependencies {
     Seq(
       Akka.`akka-actor`,
       AkkaHttp.`akka-http`,
-      Borer.`borer-compat-akka`.value,
+      Borer.`borer-compat-akka`,
       Libs.`scalatest`.value % Test,
       Libs.`embedded-redis`  % Test
     )
