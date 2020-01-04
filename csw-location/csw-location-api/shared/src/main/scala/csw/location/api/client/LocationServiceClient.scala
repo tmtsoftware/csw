@@ -59,5 +59,5 @@ class LocationServiceClient(
     websocketTransport.requestStream[TrackingEvent](Track(connection))
 
   override def subscribe(connection: Connection, callback: TrackingEvent => Unit): Subscription =
-    websocketTransport.requestStream[TrackingEvent](Track(connection), callback)
+    websocketTransport.requestStream[TrackingEvent](Track(connection), callback, (ex: Throwable) => throw ex)
 }

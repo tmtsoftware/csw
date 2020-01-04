@@ -55,8 +55,8 @@ class CommandServiceClient(
     websocketTransport.requestStream[CurrentState](SubscribeCurrentState(names))
 
   override def subscribeCurrentState(callback: CurrentState => Unit): Subscription =
-    websocketTransport.requestStream[CurrentState](SubscribeCurrentState(), callback)
+    websocketTransport.requestStream[CurrentState](SubscribeCurrentState(), callback, (ex: Throwable) => throw ex)
 
   override def subscribeCurrentState(names: Set[StateName], callback: CurrentState => Unit): Subscription =
-    websocketTransport.requestStream[CurrentState](SubscribeCurrentState(names), callback)
+    websocketTransport.requestStream[CurrentState](SubscribeCurrentState(names), callback, (ex: Throwable) => throw ex)
 }
