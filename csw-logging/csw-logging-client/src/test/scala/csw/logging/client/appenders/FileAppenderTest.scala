@@ -28,6 +28,8 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
     s"""{
       |  "${LoggingKeys.CATEGORY}": "alternative",
       |  "${LoggingKeys.COMPONENT_NAME}": "FileAppenderTest",
+      |  "${LoggingKeys.SUBSYSTEM}": "csw",
+      |  "${LoggingKeys.PREFIX}": "csw.FileAppenderTest",
       |  "${LoggingKeys.HOST}": "localhost",
       |  "${LoggingKeys.NAME}": "test-service",
       |  "${LoggingKeys.SEVERITY}": "ERROR",
@@ -43,6 +45,8 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
     s"""{
       |  "${LoggingKeys.CATEGORY}": "${Category.Common.name}",
       |  "${LoggingKeys.COMPONENT_NAME}": "FileAppenderTest",
+      |  "${LoggingKeys.SUBSYSTEM}": "csw",
+      |  "${LoggingKeys.PREFIX}": "csw.FileAppenderTest",
       |  "${LoggingKeys.HOST}": "localhost",
       |  "${LoggingKeys.NAME}": "test-service",
       |  "${LoggingKeys.SEVERITY}": "ERROR",
@@ -58,6 +62,8 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
     s"""{
       |  "${LoggingKeys.CATEGORY}": "${Category.Common.name}",
       |  "${LoggingKeys.COMPONENT_NAME}": "FileAppenderTest",
+      |  "${LoggingKeys.SUBSYSTEM}": "csw",
+      |  "${LoggingKeys.PREFIX}": "csw.FileAppenderTest",
       |  "${LoggingKeys.HOST}": "localhost",
       |  "${LoggingKeys.NAME}": "test-service",
       |  "${LoggingKeys.SEVERITY}": "INFO",
@@ -115,6 +121,7 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
   }
 
   //DEOPSCSW-151 : Manage log file size
+  // CSW-78: PrefixRedesign for logging
   test("log file is rotated every day") {
     fileAppender.append(expectedLogMsgJson1, "alternative")
     fileAppender.append(expectedLogMsgJson2, Category.Common.name)

@@ -30,7 +30,7 @@ trait JsonSupport {
    * @param result any instance of SequenceCommand
    * @return a JsValue object representing the SequenceCommand
    */
-  def writeSequenceCommand(result: Command): JsValue = writes(result)
+  def writeSequenceCommand(result: SequenceCommand): JsValue = writes(result)
 
   /**
    * Reads a SequenceCommand back from JSON
@@ -39,7 +39,7 @@ trait JsonSupport {
    * @tparam A the type of the command (implied)
    * @return an instance of the given SequenceCommand type, or an exception if the JSON is not valid for that type
    */
-  def readSequenceCommand[A <: Command](json: JsValue): A = reads[Command](json).asInstanceOf[A]
+  def readSequenceCommand[A <: SequenceCommand](json: JsValue): A = reads[SequenceCommand](json).asInstanceOf[A]
 
   /**
    * Writes a state variable to JSON

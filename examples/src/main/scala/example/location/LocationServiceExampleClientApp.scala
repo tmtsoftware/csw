@@ -5,8 +5,6 @@ import java.net.InetAddress
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior, SpawnProtocol}
 import akka.actor.{Actor, ActorSystem, Props, typed}
-import akka.actor.{Actor, ActorSystem, CoordinatedShutdown, Props, typed}
-import akka.stream.Materializer
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.typed.scaladsl.ActorSink
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
@@ -24,7 +22,7 @@ import csw.logging.api.scaladsl._
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.scaladsl.{Keys, LoggerFactory, LoggingSystemFactory}
-import csw.params.core.models.{Prefix, Subsystem}
+import csw.prefix.models.{Prefix, Subsystem}
 import example.location.ExampleMessages.{AllDone, CustomException, TrackingEventAdapter}
 import example.location.LocationServiceExampleClient.locationInfoToString
 import example.location.LocationServiceExampleClientApp.typedSystem
@@ -82,7 +80,7 @@ object LocationServiceExampleClient {
   //#tracking
   def sinkBehavior: Behaviors.Receive[ExampleMessages] = Behaviors.receive[ExampleMessages] { (ctx, msg) =>
     {
-      val log: Logger = new LoggerFactory("my-component-name").getLogger(ctx)
+      val log: Logger = new LoggerFactory(Prefix("csw.my-component-name")).getLogger(ctx)
 
       msg match {
         case TrackingEventAdapter(LocationUpdated(loc)) => log.info(s"Location updated ${locationInfoToString(loc)}")
@@ -102,7 +100,7 @@ object LocationServiceExampleClient {
  */
 class LocationServiceExampleClient(locationService: LocationService, loggingSystem: LoggingSystem) extends akka.actor.Actor {
 
-  val log: Logger = new LoggerFactory("my-component-name").getLogger(context)
+  val log: Logger = new LoggerFactory(Prefix("csw.my-component-name")).getLogger(context)
 
   private val timeout             = 5.seconds
   private val waitForResolveLimit = 30.seconds
@@ -233,8 +231,8 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   //#filtering-prefix
   // filter akka locations based on prefix
-  val akkaLocations: List[AkkaLocation] = Await.result(locationService.listByPrefix("nfiraos.ncc"), timeout)
-  log.info("Registered akka locations for nfiraos.ncc")
+  val akkaLocations: List[Location] = Await.result(locationService.listByPrefix(Prefix("nfiraos.ncc.assembly1")), timeout)
+  log.info("Registered akka locations for nfiraos.ncc.assmbly1")
   akkaLocations.foreach(c => log.info(s"--- ${locationInfoToString(c)}"))
   //#filtering-prefix
 

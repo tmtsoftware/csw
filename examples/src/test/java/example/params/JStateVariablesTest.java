@@ -5,12 +5,12 @@ import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.MatrixData;
 import csw.params.core.models.ObsId;
-import csw.params.core.models.Prefix;
 import csw.params.core.states.CurrentState;
 import csw.params.core.states.DemandState;
 import csw.params.core.states.StateName;
 import csw.params.javadsl.JKeyType;
-import csw.params.javadsl.JSubsystem;
+import csw.prefix.models.Prefix;
+import csw.prefix.javadsl.JSubsystem;
 import csw.time.core.models.UTCTime;
 import org.junit.Assert;
 import org.junit.Test;
@@ -18,7 +18,9 @@ import org.scalatestplus.junit.JUnitSuite;
 import play.api.libs.json.JsValue;
 import play.api.libs.json.Json;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static csw.params.javadsl.JUnits.NoUnits;
@@ -30,7 +32,7 @@ public class JStateVariablesTest extends JUnitSuite {
     public void showUsageOfDemandState() {
         //#demandstate
         //prefix
-        Prefix prefix = new Prefix(JSubsystem.WFOS(), "prog.cloudcover");
+        Prefix prefix = Prefix.apply(JSubsystem.WFOS(), "prog.cloudcover");
 
         //keys
         Key<Character> charKey = JKeyType.CharKey().make("charKey");
@@ -92,7 +94,7 @@ public class JStateVariablesTest extends JUnitSuite {
     public void showUsageOfCurrentState() {
         //#currentstate
         //prefix
-        Prefix prefix = new Prefix(JSubsystem.WFOS(), "prog.cloudcover");
+        Prefix prefix = Prefix.apply(JSubsystem.WFOS(), "prog.cloudcover");
 
         //keys
         Key<Character> charKey = JKeyType.CharKey().make("charKey");
@@ -158,14 +160,14 @@ public class JStateVariablesTest extends JUnitSuite {
 
         //values
         Double[][] doubles = {{1.0, 2.0, 3.0}, {4.1, 5.1, 6.1}, {7.2, 8.2, 9.2}};
-        MatrixData<Double> m1 = MatrixData.fromJavaArrays(Double.class, doubles);
+        MatrixData<Double> m1 = MatrixData.fromArrays(doubles);
 
         //parameter
         Parameter<MatrixData<Double>> i1 = k1.set(m1);
 
         //state variables
-        DemandState ds = new DemandState(new Prefix(JSubsystem.WFOS(), "blue.filter"), new StateName("testStateName")).add(i1);
-        CurrentState cs = new CurrentState(new Prefix(JSubsystem.WFOS(), "blue.filter"), new StateName("testStateName")).add(i1);
+        DemandState ds = new DemandState(Prefix.apply(JSubsystem.WFOS(), "blue.filter"), new StateName("testStateName")).add(i1);
+        CurrentState cs = new CurrentState(Prefix.apply(JSubsystem.WFOS(), "blue.filter"), new StateName("testStateName")).add(i1);
 
         //json support - write
         JsValue dsJson = JavaJsonSupport.writeStateVariable(ds);
@@ -197,7 +199,7 @@ public class JStateVariablesTest extends JUnitSuite {
         Key<Integer> miscKey = JKeyType.IntKey().make("misc.");
 
         //prefix
-        Prefix prefix = new Prefix(JSubsystem.WFOS(), "blue.filter");
+        Prefix prefix = Prefix.apply(JSubsystem.WFOS(), "blue.filter");
 
         //params
         Parameter<Integer> encParam1 = encoderKey.set(1);

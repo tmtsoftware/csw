@@ -47,18 +47,14 @@ class CommandServiceExtension(commandService: CommandService)(implicit val actor
     }
 
     PortableAkka.setTimeout(stateMatcher.timeout.duration) {
-      if (!p.isCompleted) {
-        p.tryFailure(new TimeoutException(s"matching could not be done within ${stateMatcher.timeout.duration}"))
-        subscription.cancel()
-      }
-      p.future
+      p.tryFailure(new TimeoutException(s"matching could not be done within ${stateMatcher.timeout.duration}"))
     }
 
-    val eventualCurrentState = p.future
+    p.future.onComplete(_ => subscription.cancel())
 
     commandService.oneway(controlCommand).flatMap {
       case Accepted(runId) =>
-        eventualCurrentState.transform {
+        p.future.transform {
           case Success(_)  => Success(Completed(runId))
           case Failure(ex) => Success(Error(runId, ex.getMessage))
         }

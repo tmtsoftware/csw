@@ -26,8 +26,9 @@ import csw.logging.api.javadsl.ILogger;
 import csw.logging.client.commons.AkkaTypedExtension;
 import csw.logging.client.javadsl.JLoggerFactory;
 import csw.network.utils.Networks;
-import csw.params.core.models.Prefix;
-import csw.params.javadsl.JSubsystem;
+import csw.prefix.models.Prefix;
+import csw.prefix.javadsl.JSubsystem;
+import csw.prefix.models.Subsystem;
 import msocket.api.Subscription;
 import org.junit.*;
 import org.scalatestplus.junit.JUnitSuite;
@@ -43,6 +44,9 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import static csw.prefix.javadsl.JSubsystem.CSW;
+
+// CSW-80: Prefix should be in lowercase
 @SuppressWarnings("ConstantConditions")
 public class JLocationServiceImplTest extends JUnitSuite {
 
@@ -52,19 +56,19 @@ public class JLocationServiceImplTest extends JUnitSuite {
     private static ActorSystem<SpawnProtocol.Command> typedSystem;
     private static ILocationService locationService;
 
-    private ComponentId akkaHcdComponentId = new ComponentId(new Prefix(JSubsystem.CSW(), "hcd1"), JComponentType.HCD());
+    private ComponentId akkaHcdComponentId = new ComponentId(Prefix.apply(CSW(), "hcd1"), JComponentType.HCD());
     private AkkaConnection akkaHcdConnection = new AkkaConnection(akkaHcdComponentId);
 
-    private ComponentId tcpServiceComponentId = new ComponentId(new Prefix(JSubsystem.CSW(),"exampleTcpService"), JComponentType.Service());
+    private ComponentId tcpServiceComponentId = new ComponentId(Prefix.apply(CSW(), "exampletcpservice"), JComponentType.Service());
     private TcpConnection tcpServiceConnection = new TcpConnection(tcpServiceComponentId);
 
     private static ActorRef<Object> actorRef;
 
-    private ComponentId httpServiceComponentId = new ComponentId(new Prefix(JSubsystem.CSW(),"exampleHTTPService"), JComponentType.Service());
+    private ComponentId httpServiceComponentId = new ComponentId(Prefix.apply(CSW(), "examplehttpservice"), JComponentType.Service());
     private HttpConnection httpServiceConnection = new HttpConnection(httpServiceComponentId);
     private String Path = "/path/to/resource";
 
-    private Prefix prefix = new Prefix(JSubsystem.NFIRAOS(), "ncc.trombone");
+    private Prefix prefix = Prefix.apply(JSubsystem.NFIRAOS(), "ncc.trombone");
 
     @BeforeClass
     public static void setup() throws Exception {
@@ -210,30 +214,30 @@ public class JLocationServiceImplTest extends JUnitSuite {
     @Test
     public void testListComponentsByComponentType() throws ExecutionException, InterruptedException {
         //  Register HCD type component
-        ComponentId akkaHcdComponentId = new ComponentId(new Prefix(JSubsystem.NFIRAOS(),"tromboneHCD"), JComponentType.HCD());
+        ComponentId akkaHcdComponentId = new ComponentId(Prefix.apply(JSubsystem.NFIRAOS(), "trombonehcd"), JComponentType.HCD());
         AkkaConnection akkaHcdConnection = new AkkaConnection(akkaHcdComponentId);
         AkkaRegistration akkaHcdRegistration = new RegistrationFactory().akkaTyped(akkaHcdConnection, actorRef);
         locationService.register(akkaHcdRegistration).get();
 
         //  Register Assembly type component
-        ComponentId akkaAssemblyComponentId = new ComponentId(new Prefix(JSubsystem.NFIRAOS(), "tromboneAssembly"), JComponentType.Assembly());
+        ComponentId akkaAssemblyComponentId = new ComponentId(Prefix.apply(JSubsystem.NFIRAOS(), "tromboneassembly"), JComponentType.Assembly());
         AkkaConnection akkaAssemblyConnection = new AkkaConnection(akkaAssemblyComponentId);
         AkkaRegistration akkaAssemblyRegistration = new RegistrationFactory().akkaTyped(akkaAssemblyConnection, actorRef);
         locationService.register(akkaAssemblyRegistration).get();
 
         //  Register Container type component
-        ComponentId akkaContainerComponentId = new ComponentId(new Prefix(JSubsystem.NFIRAOS(), "tromboneContainer"), JComponentType.Container());
+        ComponentId akkaContainerComponentId = new ComponentId(Prefix.apply(JSubsystem.NFIRAOS(), "trombonecontainer"), JComponentType.Container());
         AkkaConnection akkaContainerConnection = new AkkaConnection(akkaContainerComponentId);
         AkkaRegistration akkaContainerRegistration = new RegistrationFactory().akkaTyped(akkaContainerConnection, actorRef);
         locationService.register(akkaContainerRegistration).get();
 
         //  Register Tcp and Http Service
-        ComponentId tcpComponentId = new ComponentId(new Prefix(JSubsystem.CSW(), "redis"), JComponentType.Service());
+        ComponentId tcpComponentId = new ComponentId(Prefix.apply(CSW(), "redis"), JComponentType.Service());
         TcpConnection tcpConnection = new TcpConnection(tcpComponentId);
         TcpRegistration tcpServiceRegistration = new TcpRegistration(tcpConnection, 80);
         locationService.register(tcpServiceRegistration).get();
 
-        ComponentId httpServiceComponentId = new ComponentId(new Prefix(JSubsystem.CSW(), "ConfigService"), JComponentType.Service());
+        ComponentId httpServiceComponentId = new ComponentId(Prefix.apply(CSW(), "configservice"), JComponentType.Service());
         HttpConnection httpServiceConnection = new HttpConnection(httpServiceComponentId);
         HttpRegistration httpServiceRegistration = new HttpRegistration(httpServiceConnection, 4000, "/config/svn/");
         locationService.register(httpServiceRegistration).get();
@@ -314,9 +318,9 @@ public class JLocationServiceImplTest extends JUnitSuite {
     //DEOPSCSW-308: Add prefix in Location service models
     @Test
     public void testListakkaComponentsByPrefix() throws ExecutionException, InterruptedException {
-        AkkaConnection akkaHcdConnection1 = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS(), "ncc.trombone.hcd1"), JComponentType.HCD()));
-        AkkaConnection akkaHcdConnection2 = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS(), "ncc.trombone.assembly2"), JComponentType.HCD()));
-        AkkaConnection akkaHcdConnection3 = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS(), "ncc.trombone.hcd3"), JComponentType.HCD()));
+        AkkaConnection akkaHcdConnection1 = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.NFIRAOS(), "ncc.trombone.hcd1"), JComponentType.HCD()));
+        AkkaConnection akkaHcdConnection2 = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.NFIRAOS(), "ncc.trombone.assembly2"), JComponentType.HCD()));
+        AkkaConnection akkaHcdConnection3 = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.NFIRAOS(), "ncc.trombone.hcd3"), JComponentType.HCD()));
 
         // Register Akka connection
         AkkaRegistration akkaRegistration1 = new RegistrationFactory().akkaTyped(akkaHcdConnection1, actorRef);
@@ -327,12 +331,8 @@ public class JLocationServiceImplTest extends JUnitSuite {
         locationService.register(akkaRegistration3).get();
 
         // filter akka locations by prefix
-        List<AkkaLocation> akkaLocations = List.of(
-                (AkkaLocation) akkaRegistration1.location(Networks.apply().hostname()),
-                (AkkaLocation) akkaRegistration2.location(Networks.apply().hostname()),
-                (AkkaLocation) akkaRegistration3.location(Networks.apply().hostname())
-        );
-        Assert.assertEquals(akkaLocations, locationService.listByPrefix("nfiraos.ncc.trombone").get());
+        List<AkkaLocation> akkaLocations = List.of((AkkaLocation) akkaRegistration3.location(Networks.apply().hostname()));
+        Assert.assertEquals(akkaLocations, locationService.listByPrefix(Prefix.apply("nfiraos.ncc.trombone.hcd3")).get());
     }
 
     // DEOPSCSW-26: Track a connection
@@ -340,10 +340,10 @@ public class JLocationServiceImplTest extends JUnitSuite {
     @Test
     public void testTrackingConnection() throws ExecutionException, InterruptedException {
         int Port = 1234;
-        TcpConnection redis1Connection = new TcpConnection(new ComponentId(new Prefix(JSubsystem.CSW(), "redis1"), JComponentType.Service()));
+        TcpConnection redis1Connection = new TcpConnection(new ComponentId(Prefix.apply(CSW(), "redis1"), JComponentType.Service()));
         TcpRegistration redis1Registration = new TcpRegistration(redis1Connection, Port);
 
-        TcpConnection redis2Connection = new TcpConnection(new ComponentId(new Prefix(JSubsystem.CSW(), "redis2"), JComponentType.Service()));
+        TcpConnection redis2Connection = new TcpConnection(new ComponentId(Prefix.apply(CSW(), "redis2"), JComponentType.Service()));
         TcpRegistration redis2registration = new TcpRegistration(redis2Connection, Port);
 
         Pair<Subscription, TestSubscriber.Probe<TrackingEvent>> source = locationService.track(redis1Connection).toMat(TestSink.probe(untypedSystem), Keep.both()).run(typedSystem);
@@ -368,7 +368,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
     @Test
     public void testSubscribeConnection() throws ExecutionException, InterruptedException {
         int Port = 1234;
-        TcpConnection redis1Connection = new TcpConnection(new ComponentId(new Prefix(JSubsystem.CSW(), "redis1"), JComponentType.Service()));
+        TcpConnection redis1Connection = new TcpConnection(new ComponentId(Prefix.apply(CSW(), "redis1"), JComponentType.Service()));
         TcpRegistration redis1Registration = new TcpRegistration(redis1Connection, Port);
 
         //Test probe actor to receive the TrackingEvent notifications
@@ -390,7 +390,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
     class TestActor {
         public Behavior<Object> behavior() {
             return Behaviors.setup(ctx -> {
-                ILogger log = new JLoggerFactory(Constants.LocationService()).getLogger(ctx, TestActor.class);
+                ILogger log = new JLoggerFactory(Prefix.apply(CSW(), Constants.LocationService())).getLogger(ctx, TestActor.class);
                 log.info(() -> "in the test actor");
                 return Behaviors.same();
             });
@@ -400,7 +400,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
     // DEOPSCSW-35: CRDT detects comp/service crash
     @Test
     public void testUnregisteringDeadActorByDeathWatch() throws ExecutionException, InterruptedException {
-        ComponentId componentId = new ComponentId(new Prefix(JSubsystem.NFIRAOS(), "hcd1"), JComponentType.HCD());
+        ComponentId componentId = new ComponentId(Prefix.apply(JSubsystem.NFIRAOS(), "hcd1"), JComponentType.HCD());
         AkkaConnection connection = new AkkaConnection(componentId);
 
         ActorRef<Object> actorRef =

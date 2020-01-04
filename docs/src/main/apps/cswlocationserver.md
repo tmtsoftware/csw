@@ -52,3 +52,6 @@ Use the following command to get help on the options available with this app.
 Use the following command to get version information for this app.
   
 `./bin/csw-location-server --version`
+
+### Accessing location server via http
+Once the server is up and running it can be accessed via http as shown @ref[here](cswlocationroutes.md).

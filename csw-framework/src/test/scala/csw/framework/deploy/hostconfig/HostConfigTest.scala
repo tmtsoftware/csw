@@ -1,6 +1,7 @@
 package csw.framework.deploy.hostconfig
 
 import csw.commons.ResourceReader
+import csw.prefix.models.Subsystem.CSW
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatest.{FunSuite, Matchers}
 import org.scalatestplus.mockito.MockitoSugar
@@ -20,7 +21,7 @@ class HostConfigTest extends FunSuite with MockitoSugar with Matchers {
 
     var counter = 0
 
-    val hostConfig = new HostConfig("test") {
+    val hostConfig = new HostConfig("test", CSW) {
       override def executeScript(containerScript: String, args: String*): Process = {
         actualScripts = (containerScript, args.toList) :: actualScripts
         val process = mockedProcesses(counter)

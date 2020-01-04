@@ -20,14 +20,14 @@ import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.Id;
 import csw.params.core.models.ObsId;
-import csw.params.core.models.Prefix;
 import csw.params.events.Event;
 import csw.params.events.EventKey;
 import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
-import csw.params.javadsl.JSubsystem;
 import csw.params.javadsl.JUnits;
+import csw.prefix.models.Prefix;
+import csw.prefix.javadsl.JSubsystem;
 import csw.time.core.models.UTCTime;
 
 import java.util.Optional;
@@ -131,7 +131,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
         // Submit command, and handle validation response. Final response is returned as a Future
         CompletableFuture<CommandResponse.SubmitResponse> submitCommandResponseF = hcd.submitAndWait(setupCommand, submitTimeout)
                 .thenApply(commandResponse -> {
-                    if (! (commandResponse instanceof CommandResponse.Invalid || commandResponse instanceof CommandResponse.Locked)) {
+                    if (!(commandResponse instanceof CommandResponse.Invalid || commandResponse instanceof CommandResponse.Locked)) {
                         return commandResponse;
                     } else {
                         log.error("Sleep command invalid");
@@ -187,7 +187,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     //#track-location
 
     //#subscribe
-    private EventKey counterEventKey = new EventKey(new Prefix(JSubsystem.NFIRAOS(), "samplehcd"), new EventName("HcdCounter"));
+    private EventKey counterEventKey = new EventKey(Prefix.apply(JSubsystem.NFIRAOS(), "samplehcd"), new EventName("HcdCounter"));
     private Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter");
 
     private void processEvent(Event event) {

@@ -1,7 +1,7 @@
 package csw.command.client.models.framework
 
 import csw.location.models.{ComponentType, Connection}
-import csw.params.core.models.{Prefix, Subsystem}
+import csw.prefix.models.Prefix
 
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.jdk.CollectionConverters._
@@ -9,8 +9,7 @@ import scala.jdk.CollectionConverters._
 /**
  * The information needed to create a component. This class is created after de-serializing the config file for the component.
  *
- * @param name the name of the component
- * @param subsystem identifies the subsystem
+ * @param prefix prefix for the component with `subsystem` and `name`
  * @param componentType
  *  : the type of the component as defined by [[csw.location.models.ComponentType]]
  * @param behaviorFactoryClassName
@@ -22,19 +21,13 @@ import scala.jdk.CollectionConverters._
  *  : the timeout value used while initializing a component
  */
 final case class ComponentInfo(
-    name: String,
-    subsystem: Subsystem,
+    prefix: Prefix,
     componentType: ComponentType,
     behaviorFactoryClassName: String,
     locationServiceUsage: LocationServiceUsage,
     connections: Set[Connection] = Set.empty,
     initializeTimeout: FiniteDuration = 10.seconds
 ) {
-
-  /**
-   * Represents the prefix for the component with given `subsystem` and given `name`
-   */
-  val prefix = Prefix(subsystem, name)
 
   /**
    * Java API to get the list of connections for the assembly

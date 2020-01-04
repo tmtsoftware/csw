@@ -3,7 +3,7 @@ package csw.aas.core
 import csw.aas.core.token.AccessToken
 import csw.aas.core.token.claims.{Access, Audience, Authorization, Permission}
 import io.bullet.borer.Dom.{ArrayElem, Element, StringElem}
-import io.bullet.borer.derivation.MapBasedCodecs.deriveCodec
+import io.bullet.borer.derivation.MapBasedCodecs._
 import io.bullet.borer.{Codec, Decoder, Dom, Encoder}
 
 trait AuthCodecs {

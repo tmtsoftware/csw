@@ -8,12 +8,15 @@ import csw.logging.client.components.IRIS._
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.LoggingTestSuite
 import csw.logging.models.Level
+import csw.prefix.models.Prefix
+import csw.prefix.models.Subsystem.CSW
 
 class ActorLoggingTest extends LoggingTestSuite {
+  private val prefix: Prefix = Prefix(CSW, IRIS.COMPONENT_NAME)
   private val irisActorRef =
-    actorSystem.spawn(IRIS.behavior(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
+    actorSystem.spawn(IRIS.behavior(prefix), name = "IRIS-Supervisor-Actor")
 
-  def sendMessagesToActor() = {
+  def sendMessagesToActor(): Unit = {
     irisActorRef ! LogTrace
     irisActorRef ! LogDebug
     irisActorRef ! LogInfo
@@ -29,6 +32,7 @@ class ActorLoggingTest extends LoggingTestSuite {
   // DEOPSCSW-119: Associate source with each log message
   // DEOPSCSW-121: Define structured tags for log messages
   // DEOPSCSW-158: Logging service API implementation details to be hidden from component developer
+  // CSW-78: PrefixRedesign for logging
   test("messages logged from actor should contain component name, file name, class name, line number and actor path") {
 
     sendMessagesToActor()
@@ -38,6 +42,8 @@ class ActorLoggingTest extends LoggingTestSuite {
 
     logBuffer.foreach { log =>
       log.getString(LoggingKeys.COMPONENT_NAME) shouldBe IRIS.COMPONENT_NAME
+      log.getString(LoggingKeys.SUBSYSTEM) shouldBe CSW.name
+      log.getString(LoggingKeys.PREFIX) shouldBe prefix.value
       log.getString(LoggingKeys.ACTOR) shouldBe irisActorRef.path.toString
       log.getString(LoggingKeys.FILE) shouldBe IRIS.FILE_NAME
       // todo : create method getNumber as extension to JsObject.

@@ -9,8 +9,9 @@ import csw.location.models.TrackingEvent
 import csw.logging.models.{Level, LogMetadata}
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
-import csw.params.core.models.{Id, Prefix}
+import csw.params.core.models.Id
 import csw.params.core.states.CurrentState
+import csw.prefix.models.Prefix
 import csw.serializable.CommandSerializable
 import csw.time.core.models.UTCTime
 
@@ -298,7 +299,7 @@ case class QueryFinal(runId: Id, replyTo: ActorRef[SubmitResponse]) extends Supe
 sealed trait LogControlMessage extends ComponentMessage with SequencerMsg with CommandSerializable
 
 // Message to get Logging configuration metadata of the receiver
-case class GetComponentLogMetadata(componentName: String, replyTo: ActorRef[LogMetadata]) extends LogControlMessage with RemoteMsg
+case class GetComponentLogMetadata(replyTo: ActorRef[LogMetadata]) extends LogControlMessage with RemoteMsg
 
 // Message to change the log level of any component
-case class SetComponentLogLevel(componentName: String, logLevel: Level) extends LogControlMessage with RemoteMsg
+case class SetComponentLogLevel(logLevel: Level) extends LogControlMessage with RemoteMsg

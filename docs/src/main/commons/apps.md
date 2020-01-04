@@ -4,7 +4,6 @@
 
 @@@ index
 * [csw-location-server](../apps/cswlocationserver.md): Start HTTP location server application, required for running the Location Service.
-* [csw-admin-server](../apps/cswadminserver.md): Start HTTP server that supports changing/getting log level of component.
 * [csw-location-agent](../apps/cswlocationagent.md): Application used to start non-CSW services so that register with Location Service.
 * [csw-config-server](../apps/cswonfigserverapp.md): Start a Configuration Service SVN repository.
 * [csw-config-cli](../apps/cswconfigcli.md): Application to perform administrative functions on the Configuration Service.

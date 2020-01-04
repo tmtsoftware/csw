@@ -11,7 +11,7 @@ import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.location.models._
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
-import csw.params.core.models.{Prefix, Subsystem}
+import csw.prefix.models.{Prefix, Subsystem}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -31,6 +31,7 @@ class DetectAkkaComponentCrashTestMultiJvmNode3 extends DetectAkkaComponentCrash
  * => probe.requestNext(5.seconds) shouldBe a[LocationRemoved]
  *
 **/
+// CSW-81: Graceful removal of component
 class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec(config = new TwoMembersAndSeed, mode) {
 
   import config._
@@ -41,6 +42,7 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec
   test("akka component running on one node should detect if other component running on another node crashes") {
 
     val akkaConnection = AkkaConnection(ComponentId(Prefix(Subsystem.Container, "Container1"), ComponentType.Container))
+    val httpConnection = HttpConnection(ComponentId(Prefix(Subsystem.Container, "Container1"), ComponentType.Container))
 
     runOn(seed) {
 
@@ -53,6 +55,7 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec
       Thread.sleep(2000)
 
       Await.result(testConductor.exit(member1, 0), 5.seconds)
+      locationService.find(httpConnection).await.isDefined shouldBe true
       enterBarrier("after-crash")
 
       // Story CSW-15 requires crash detection within 10 seconds with a goal of 5 seconds.
@@ -65,6 +68,7 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec
       }
 
       locationService.list.await.size shouldBe 1
+      locationService.find(httpConnection).await.isDefined shouldBe false
 
       // clean up
       switch.cancel()
@@ -74,9 +78,9 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec
       val system   = ActorSystemFactory.remote(SpawnProtocol(), "test")
       val actorRef = system.spawn(Behaviors.empty, "trombone-hcd-1")
 
-      locationService
-        .register(make(akkaConnection, actorRef.toURI))
-        .await
+      locationService.register(make(akkaConnection, actorRef.toURI)).await
+      val port = 1234
+      locationService.register(HttpRegistration(httpConnection, port, "")).await
       enterBarrier("Registration")
 
       Await.ready(system.whenTerminated, 5.seconds)

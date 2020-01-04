@@ -6,7 +6,7 @@ addSbtPlugin("com.dwijnand"                      % "sbt-dynver"                %
 addSbtPlugin("com.thoughtworks.sbt-api-mappings" % "sbt-api-mappings"          % "3.0.0")
 addSbtPlugin("org.foundweekends"                 % "sbt-bintray"               % "0.5.5")
 addSbtPlugin("org.scoverage"                     % "sbt-scoverage"             % "1.6.1")
-addSbtPlugin("com.typesafe.sbt"                  % "sbt-native-packager"       % "1.5.1")
+addSbtPlugin("com.typesafe.sbt"                  % "sbt-native-packager"       % "1.5.2")
 addSbtPlugin("com.typesafe.sbt"                  % "sbt-multi-jvm"             % "0.4.0")
 addSbtPlugin("com.eed3si9n"                      % "sbt-buildinfo"             % "0.9.0")
 addSbtPlugin("pl.project13.scala"                % "sbt-jmh"                   % "0.3.7")

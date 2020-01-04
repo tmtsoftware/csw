@@ -4,9 +4,8 @@ import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.generics.ParameterSetType;
 import csw.params.core.models.ObsId;
-import csw.params.core.models.Prefix;
 import csw.params.javadsl.JKeyType;
-import csw.params.javadsl.JSubsystem;
+import csw.prefix.models.Prefix;
 import org.junit.Assert;
 import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
@@ -17,7 +16,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static csw.params.javadsl.JSubsystem.WFOS;
+import static csw.prefix.javadsl.JSubsystem.WFOS;
+
 
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-185: Easy to Use Syntax/Api
@@ -34,7 +34,7 @@ public class JCommandsTest extends JUnitSuite {
     private final Parameter<Integer> epochIntParam = epochIntKey.set(44, 55);
 
     private final ObsId obsId = new ObsId("obsId");
-    private final Prefix prefix = new Prefix(WFOS(), "red.detector");
+    private final Prefix prefix = Prefix.apply(WFOS(), "red.detector");
     private final CommandName commandName = new CommandName("move");
 
     private void assertOnCommandAPI(ParameterSetType<?> command) {
@@ -73,8 +73,8 @@ public class JCommandsTest extends JUnitSuite {
         List<String> encoderStringParam = encoderParam.jValues().stream().map(Object::toString)
                 .collect(Collectors.toList());
         Map<String, String> expectedParamMap = Map.of(
-            encoderParam.keyName(),  String.join(",", encoderStringParam),
-            epochStringParam.keyName(),  String.join(",", epochStringParam.jValues())
+                encoderParam.keyName(), String.join(",", encoderStringParam),
+                epochStringParam.keyName(), String.join(",", epochStringParam.jValues())
         );
         Assert.assertEquals(expectedParamMap, command.jGetStringMap());
     }

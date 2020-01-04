@@ -6,6 +6,7 @@ import csw.logging.client.commons.{Category, LoggingKeys, TMTDateTimeFormatter}
 import csw.logging.client.internal.LogActorMessages.Log
 import csw.logging.macros.SourceLocation
 import csw.logging.models.noId
+import csw.prefix.models.Prefix
 import play.api.libs.json.{JsObject, Json}
 
 object LogActorMock {
@@ -16,7 +17,7 @@ object LogActorMock {
 
   val sourceLocation = SourceLocation("hcd.scala", "iris", "tromboneHCD", 12)
   val log = Log(
-    Some("tromboneHCD"),
+    Some(Prefix("csw.tromboneHCD")),
     DEBUG,
     noId,
     System.currentTimeMillis(),
@@ -54,8 +55,8 @@ object LogActorMock {
     if (log.actorName.isDefined)
       jsonObject = jsonObject ++ Json.obj(LoggingKeys.ACTOR -> log.actorName.get)
 
-    if (log.componentName.isDefined)
-      jsonObject = jsonObject ++ Json.obj(LoggingKeys.COMPONENT_NAME -> log.componentName.get)
+    if (log.prefix.isDefined)
+      jsonObject = jsonObject ++ Json.obj(LoggingKeys.COMPONENT_NAME -> log.prefix.get.value)
 
     if (log.ex != noException) jsonObject = jsonObject
 

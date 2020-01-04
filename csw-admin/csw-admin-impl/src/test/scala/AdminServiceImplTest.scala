@@ -10,7 +10,8 @@ import csw.location.api.scaladsl.LocationService
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.logging.models.{Level, LogMetadata}
-import csw.params.core.models.{Prefix, Subsystem}
+import csw.prefix.models.Subsystem
+import csw.prefix.models.Prefix
 import org.mockito.MockitoSugar._
 import org.scalatest.concurrent.ScalaFutures.convertScalaFuture
 import org.scalatest.{BeforeAndAfterEach, FunSuite, Matchers}
@@ -37,7 +38,7 @@ class AdminServiceImplTest extends FunSuite with Matchers with BeforeAndAfterEac
     val locationService: LocationService = mock[LocationService]
     val expectedLogMetadata              = LogMetadata(Level.FATAL, Level.ERROR, Level.WARN, Level.DEBUG)
     val probe = actorTestKit.spawn(Behaviors.receiveMessage[GetComponentLogMetadata] {
-      case GetComponentLogMetadata(_, replyTo) =>
+      case GetComponentLogMetadata(replyTo) =>
         replyTo ! expectedLogMetadata
         Behaviors.same
     })
@@ -54,7 +55,7 @@ class AdminServiceImplTest extends FunSuite with Matchers with BeforeAndAfterEac
     val locationService: LocationService = mock[LocationService]
     val expectedLogMetadata              = LogMetadata(Level.FATAL, Level.ERROR, Level.WARN, Level.DEBUG)
     val probe = actorTestKit.spawn(Behaviors.receiveMessage[GetComponentLogMetadata] {
-      case GetComponentLogMetadata(_, replyTo) =>
+      case GetComponentLogMetadata(replyTo) =>
         replyTo ! expectedLogMetadata
         Behaviors.same
     })
@@ -87,7 +88,7 @@ class AdminServiceImplTest extends FunSuite with Matchers with BeforeAndAfterEac
     when(locationService.find(AkkaConnection(componentId)))
       .thenReturn(Future.successful(Some(AkkaLocation(AkkaConnection(componentId), new URI(probe.ref.path.toString)))))
     adminService.setLogLevel(componentId, Level.FATAL)
-    probe.expectMessage(500.millis, SetComponentLogLevel("aoesw.test_component", Level.FATAL))
+    probe.expectMessage(500.millis, SetComponentLogLevel(Level.FATAL))
   }
 
   test("setLogLevel should get log metadata when sequencer is discovered") {
@@ -99,7 +100,7 @@ class AdminServiceImplTest extends FunSuite with Matchers with BeforeAndAfterEac
     when(locationService.find(AkkaConnection(componentId)))
       .thenReturn(Future.successful(Some(AkkaLocation(AkkaConnection(componentId), new URI(probe.ref.path.toString)))))
     adminService.setLogLevel(componentId, Level.FATAL)
-    probe.expectMessage(500.millis, SetComponentLogLevel("aoesw.test_component", Level.FATAL))
+    probe.expectMessage(500.millis, SetComponentLogLevel(Level.FATAL))
   }
 
   test("setLogLevel should fail with UnresolvedAkkaLocationException when componentId is not not resolved") {

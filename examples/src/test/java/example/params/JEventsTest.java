@@ -5,13 +5,13 @@ import csw.params.core.formats.JavaJsonSupport;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.MatrixData;
-import csw.params.core.models.Prefix;
 import csw.params.core.models.RaDec;
 import csw.params.events.EventName;
 import csw.params.events.ObserveEvent;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
-import csw.params.javadsl.JSubsystem;
+import csw.prefix.models.Prefix;
+import csw.prefix.javadsl.JSubsystem;
 import csw.params.javadsl.JUnits;
 import csw.time.core.models.UTCTime;
 import org.junit.Assert;
@@ -63,9 +63,9 @@ public class JEventsTest extends JUnitSuite {
         Key<Integer> k4 = JKeyType.IntKey().make("notUsed");
 
         //prefixes
-        Prefix prefix1 = new Prefix(JSubsystem.WFOS(), "red.filter");
+        Prefix prefix1 = Prefix.apply(JSubsystem.WFOS(), "red.filter");
         EventName name1 = new EventName("filterWheel");
-        Prefix prefix2 = new Prefix(JSubsystem.IRIS(), "imager.filter");
+        Prefix prefix2 = Prefix.apply(JSubsystem.IRIS(), "imager.filter");
         EventName name2 = new EventName("status");
 
         //parameters
@@ -113,9 +113,9 @@ public class JEventsTest extends JUnitSuite {
         Key<Integer> k4 = JKeyType.IntKey().make("notUsed");
 
         //prefixes
-        Prefix prefix1 = new Prefix(JSubsystem.IRIS(), "ifu.detectorAssembly");
+        Prefix prefix1 = Prefix.apply(JSubsystem.IRIS(), "ifu.detectorAssembly");
         EventName name1 = new EventName("readoutEnd");
-        Prefix prefix2 = new Prefix(JSubsystem.WFOS(), "red.detector");
+        Prefix prefix2 = Prefix.apply(JSubsystem.WFOS(), "red.detector");
         EventName name2 = new EventName("exposureStarted");
 
         //parameters
@@ -160,12 +160,12 @@ public class JEventsTest extends JUnitSuite {
         Key<MatrixData<Double>> k1 = JKeyType.DoubleMatrixKey().make("myMatrix");
 
         //prefixes
-        Prefix prefix1 = new Prefix(JSubsystem.AOESW(), "rpg");
+        Prefix prefix1 = Prefix.apply(JSubsystem.AOESW(), "rpg");
         EventName name1 = new EventName("correctionInfo");
 
         //values
         Double[][] doubles = {{1.0, 2.0, 3.0}, {4.1, 5.1, 6.1}, {7.2, 8.2, 9.2}};
-        MatrixData<Double> m1 = MatrixData.fromJavaArrays(Double.class, doubles);
+        MatrixData<Double> m1 = MatrixData.fromArrays(doubles);
 
         //parameter
         Parameter<MatrixData<Double>> i1 = k1.set(m1);
@@ -205,7 +205,7 @@ public class JEventsTest extends JUnitSuite {
         Key<Integer> miscKey = JKeyType.IntKey().make("misc");
 
         //prefix
-        Prefix prefix1 = new Prefix(JSubsystem.WFOS(), "blue.filter");
+        Prefix prefix1 = Prefix.apply(JSubsystem.WFOS(), "blue.filter");
         EventName name1 = new EventName("filterWheel");
 
         //params
@@ -252,9 +252,9 @@ public class JEventsTest extends JUnitSuite {
         //#cbor
 
         //prefixes
-        Prefix prefix1 = new Prefix(JSubsystem.TCS(), "pk");
+        Prefix prefix1 = Prefix.apply(JSubsystem.TCS(), "pk");
         EventName name1 = new EventName("targetCoords");
-        Prefix prefix2 = new Prefix(JSubsystem.TCS(), "cm");
+        Prefix prefix2 = Prefix.apply(JSubsystem.TCS(), "cm");
         EventName name2 = new EventName("guiderCoords");
 
         //Key

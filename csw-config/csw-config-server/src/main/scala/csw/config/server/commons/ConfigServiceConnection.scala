@@ -2,7 +2,8 @@ package csw.config.server.commons
 
 import csw.location.models.{ComponentId, ComponentType}
 import csw.location.models.Connection.HttpConnection
-import csw.params.core.models.{Prefix, Subsystem}
+import csw.prefix.models.Subsystem
+import csw.prefix.models.Prefix
 
 /**
  * `ConfigServiceConnection` is a wrapper over predefined `HttpConnection` representing config server. It is used to register

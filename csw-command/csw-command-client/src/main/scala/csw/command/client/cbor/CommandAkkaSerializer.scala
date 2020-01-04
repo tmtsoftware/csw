@@ -5,11 +5,11 @@ import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter._
 import akka.serialization.Serializer
 import csw.command.client.messages._
-import csw.command.client.messages.sequencer.SequencerMsg.{QueryFinal, SubmitSequence, Query}
+import csw.command.client.messages.sequencer.SequencerMsg.{Query, QueryFinal, SubmitSequence}
 import csw.command.client.models.framework._
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.GenericLoggerFactory
-import csw.params.commands.CommandResponse
+import csw.params.commands.CommandResponse._
 import csw.params.core.states.StateVariable
 import io.bullet.borer.{Cbor, Decoder}
 
@@ -24,7 +24,11 @@ class CommandAkkaSerializer(_actorSystem: ExtendedActorSystem) extends Serialize
 
   override def toBinary(o: AnyRef): Array[Byte] = o match {
     case x: CommandSerializationMarker.RemoteMsg => Cbor.encode(x).toByteArray
-    case x: CommandResponse                      => Cbor.encode(x).toByteArray
+    case x: ValidateResponse                     => Cbor.encode(x).toByteArray
+    case x: SubmitResponse                       => Cbor.encode(x).toByteArray
+    case x: OnewayResponse                       => Cbor.encode(x).toByteArray
+    case x: MatchingResponse                     => Cbor.encode(x).toByteArray
+    case x: ValidateCommandResponse              => Cbor.encode(x).toByteArray
     case x: StateVariable                        => Cbor.encode(x).toByteArray
     case x: SupervisorLifecycleState             => Cbor.encode(x).toByteArray
     case x: ContainerLifecycleState              => Cbor.encode(x).toByteArray
@@ -50,7 +54,11 @@ class CommandAkkaSerializer(_actorSystem: ExtendedActorSystem) extends Serialize
     }
 
     {
-      fromBinary[CommandResponse] orElse
+      fromBinary[SubmitResponse] orElse
+      fromBinary[OnewayResponse] orElse
+      fromBinary[ValidateResponse] orElse
+      fromBinary[ValidateCommandResponse] orElse
+      fromBinary[MatchingResponse] orElse
       fromBinary[StateVariable] orElse
       fromBinary[CommandSerializationMarker.RemoteMsg] orElse
       fromBinary[SupervisorLifecycleState] orElse

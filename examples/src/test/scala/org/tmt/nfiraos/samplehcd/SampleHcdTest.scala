@@ -8,8 +8,9 @@ import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{ComponentId, ComponentType}
 import csw.params.commands.{CommandName, CommandResponse, Setup}
 import csw.params.core.generics.{Key, KeyType, Parameter}
-import csw.params.core.models.{ObsId, Prefix, Subsystem, Units}
+import csw.params.core.models.{ObsId, Units}
 import csw.params.events.{Event, EventKey, EventName, SystemEvent}
+import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.scaladsl.CSWService.{AlarmServer, EventServer}
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
 import org.scalatest.{BeforeAndAfterEach, FunSuiteLike}

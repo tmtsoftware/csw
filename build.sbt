@@ -10,6 +10,8 @@ docsParentDir in ThisBuild := "csw"
 gitCurrentRepo in ThisBuild := "https://github.com/tmtsoftware/csw"
 
 lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
+  `csw-prefix`.jvm,
+  `csw-prefix`.js,
   `csw-admin`,
   `csw-location`,
   `csw-config`,
@@ -33,7 +35,6 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
 )
 
 lazy val unidocExclusions: Seq[ProjectReference] = Seq(
-  `csw-admin-server`,
   `csw-location-server`,
   `csw-config-server`,
   `csw-location-agent`,
@@ -45,6 +46,7 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-logging-macros`,
   `csw-logging-models`.js,
   `csw-params`.js,
+  `csw-prefix`.js,
   `csw-command-api`.js,
   `csw-location-models`.js,
   `csw-location-api`.js,
@@ -60,7 +62,6 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
 )
 
 lazy val githubReleases: Seq[ProjectReference] = Seq(
-  `csw-admin-server`,
   `csw-location-server`,
   `csw-location-agent`,
   `csw-config-server`,
@@ -94,28 +95,21 @@ lazy val `csw` = project
     bootstrap in Coursier := CoursierPlugin.bootstrapTask(githubReleases).value
   )
 
+lazy val `csw-prefix` = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Full)
+  .enablePlugins(PublishBintray)
+  .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
+  .settings(fork := false)
+  .settings(libraryDependencies ++= Dependencies.Prefix.value)
+
 /* ================= Admin Project ============== */
 
 lazy val `csw-admin` = project
   .in(file("csw-admin"))
   .aggregate(
-    `csw-admin-server`,
     `csw-admin-api`.jvm,
     `csw-admin-api`.js,
     `csw-admin-impl`
-  )
-
-lazy val `csw-admin-server` = project
-  .in(file("csw-admin/csw-admin-server"))
-  .dependsOn(
-    `csw-admin-impl`,
-    `csw-commons`       % "compile->compile;test->test",
-    `csw-framework`     % "test->test",
-    `csw-config-server` % "test->test"
-  )
-  .enablePlugins(DeployApp, MaybeCoverage)
-  .settings(
-    libraryDependencies ++= Dependencies.AdminServer.value
   )
 
 lazy val `csw-admin-impl` = project
@@ -140,7 +134,6 @@ lazy val `csw-admin-api` = crossProject(JSPlatform, JVMPlatform)
   .enablePlugins(PublishBintray)
   .jvmConfigure(_.enablePlugins(MaybeCoverage, GenJavadocPlugin))
   .settings(fork := false)
-  .settings(libraryDependencies ++= Dependencies.AdminApi.value)
 
 /* ================= Location Service ============== */
 
@@ -161,7 +154,7 @@ lazy val `csw-location-models` = crossProject(JSPlatform, JVMPlatform)
   .in(file("csw-location/csw-location-models"))
   .enablePlugins(PublishBintray)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
-  .dependsOn(`csw-params`)
+  .dependsOn(`csw-prefix`)
   .settings(fork := false)
   .settings(libraryDependencies ++= Dependencies.LocationModels.value)
 
@@ -172,8 +165,8 @@ lazy val `csw-location-api` = crossProject(JSPlatform, JVMPlatform)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
   .dependsOn(`csw-location-models`)
   .jvmConfigure(_.dependsOn(`csw-logging-client`).enablePlugins(MaybeCoverage))
-  //  the following setting was required by older version of IntelliJ which could not handle cross-compiled Akka types
-  //  .jsSettings(SettingKey[Boolean]("ide-skip-project") := true)
+  //  the following setting was required by IntelliJ as it can not handle cross-compiled Akka types
+  .jsSettings(SettingKey[Boolean]("ide-skip-project") := true)
   .settings(libraryDependencies += MSocket.`msocket-api`.value)
   .settings(fork := false)
 
@@ -325,7 +318,7 @@ lazy val `csw-logging-api` = project
 
 lazy val `csw-logging-client` = project
   .in(file("csw-logging/csw-logging-client"))
-  .dependsOn(`csw-logging-macros`, `csw-logging-api`)
+  .dependsOn(`csw-logging-macros`, `csw-logging-api`, `csw-prefix`.jvm)
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.LoggingClient.value
@@ -334,7 +327,7 @@ lazy val `csw-logging-client` = project
 /* ================= Params ================ */
 lazy val `csw-params` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
-  .dependsOn(`csw-time-core`)
+  .dependsOn(`csw-time-core`, `csw-prefix`)
   .jvmConfigure(_.dependsOn(`csw-commons` % "test->test"))
   .enablePlugins(PublishBintray)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
@@ -389,8 +382,8 @@ lazy val `csw-command-api` = crossProject(JSPlatform, JVMPlatform)
   .enablePlugins(PublishBintray)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
   .settings(libraryDependencies ++= Dependencies.CommandApi.value)
-  //  the following setting was required by older version of IntelliJ which could not handle cross-compiled Akka types
-  //  .jsSettings(SettingKey[Boolean]("ide-skip-project") := true)
+  //  the following setting was required by IntelliJ as it can not handle cross-compiled Akka types
+  .jsSettings(SettingKey[Boolean]("ide-skip-project") := true)
   .settings(fork := false)
 
 lazy val `csw-command-client` = project
@@ -460,7 +453,7 @@ lazy val `csw-alarm` = project
 lazy val `csw-alarm-models` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .in(file("csw-alarm/csw-alarm-models"))
-  .dependsOn(`csw-params`, `csw-time-core`)
+  .dependsOn(`csw-prefix`, `csw-time-core`)
   .enablePlugins(PublishBintray)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
   .jvmConfigure(_.enablePlugins(MaybeCoverage))

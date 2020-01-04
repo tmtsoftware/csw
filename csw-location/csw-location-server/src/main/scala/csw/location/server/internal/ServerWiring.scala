@@ -9,9 +9,10 @@ import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.scaladsl.LocationService
 import csw.location.server.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.location.server.http.{LocationHttpHandler, LocationHttpService, LocationWebsocketHandler}
+import msocket.api.Encoding
+import msocket.impl.RouteFactory
 import msocket.impl.post.PostRouteFactory
 import msocket.impl.ws.WebsocketRouteFactory
-import msocket.impl.{Encoding, RouteFactory}
 
 // $COVERAGE-OFF$
 private[csw] class ServerWiring extends LocationServiceCodecs {

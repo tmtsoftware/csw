@@ -22,6 +22,7 @@ import csw.location.server.commons.{CswCluster, LocationServiceLogger}
 import csw.location.server.internal.Registry.AllServices
 import csw.location.server.internal.StreamExt.RichSource
 import csw.logging.api.scaladsl.Logger
+import csw.prefix.models.Prefix
 import msocket.api.Subscription
 
 import scala.async.Async._
@@ -170,29 +171,21 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
   /**
    * List all locations registered for the given componentType
    */
-  def list(componentType: ComponentType): Future[List[Location]] = async {
-    await(list).filter(_.connection.componentId.componentType == componentType)
-  }
+  def list(componentType: ComponentType): Future[List[Location]] =
+    list.map(_.filter(_.connection.componentId.componentType == componentType))
 
   /**
    * List all locations registered with the given hostname
    */
-  def list(hostname: String): Future[List[Location]] = async {
-    await(list).filter(_.uri.getHost == hostname)
-  }
+  def list(hostname: String): Future[List[Location]] = list.map(_.filter(_.uri.getHost == hostname))
 
   /**
    * List all locations registered with the given connection type
    */
-  def list(connectionType: ConnectionType): Future[List[Location]] = async {
-    await(list).filter(_.connection.connectionType == connectionType)
-  }
+  def list(connectionType: ConnectionType): Future[List[Location]] =
+    list.map(_.filter(_.connection.connectionType == connectionType))
 
-  override def listByPrefix(_prefix: String): Future[List[AkkaLocation]] = async {
-    await(list).collect {
-      case akkaLocation: AkkaLocation if akkaLocation.prefix.toString.startsWith(_prefix) => akkaLocation
-    }
-  }
+  override def listByPrefix(prefix: Prefix): Future[List[Location]] = list.map(_.filter(_.prefix == prefix))
 
   /**
    * Track the status of given connection

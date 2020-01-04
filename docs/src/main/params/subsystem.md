@@ -10,7 +10,7 @@ They are identified using an abbreviation typically of 3 or 4 letters.
 Subsystems are made available via separate files, for consumption in Scala and Java code.
 
  * Import `csw.messages.params.models.Subsystem` for **Scala** 
- * Import `csw.messages.javadsl.JSubsystem` for **Java**.  
+ * Import `csw.messages.javadsl.csw.prefix.javadsl.JSubsystem` for **Java**.  
 
 @@@
 

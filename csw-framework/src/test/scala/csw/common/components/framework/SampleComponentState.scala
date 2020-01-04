@@ -3,15 +3,17 @@ package csw.common.components.framework
 import csw.alarm.models.AlarmSeverity
 import csw.alarm.models.AlarmSeverity.Warning
 import csw.alarm.models.Key.AlarmKey
-import csw.location.models.{ComponentId, ComponentType}
 import csw.location.models.Connection.{HttpConnection, TcpConnection}
+import csw.location.models.{ComponentId, ComponentType}
 import csw.params.commands.CommandName
-import csw.params.core.generics.{GChoiceKey, Parameter}
 import csw.params.core.generics.KeyType.{ChoiceKey, StringKey}
-import csw.params.core.models.Subsystem.NFIRAOS
-import csw.params.core.models.{Choice, Choices, Prefix, Subsystem}
+import csw.params.core.generics.{GChoiceKey, Parameter}
+import csw.params.core.models.{Choice, Choices}
 import csw.params.core.states.StateName
 import csw.params.events.EventName
+import csw.prefix.models.Subsystem.NFIRAOS
+import csw.prefix.models.Subsystem
+import csw.prefix.models.Prefix
 
 object SampleComponentState {
   val restartChoice             = Choice("Restart")
@@ -37,7 +39,7 @@ object SampleComponentState {
   val failedPrefix              = Prefix("wfos.prog.cloudcover.failure")
 
   val setSeverityCommand          = CommandName("alarm.setSeverity.success")
-  val testAlarmKey                = AlarmKey(NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm")
+  val testAlarmKey                = AlarmKey(Prefix(NFIRAOS, "trombone"), "tromboneAxisHighLimitAlarm")
   val testSeverity: AlarmSeverity = Warning
 
   val diagnosticDataEventName                = EventName("diagnostic-data")

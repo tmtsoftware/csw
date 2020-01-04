@@ -5,7 +5,7 @@ import java.time.Instant
 
 import csw.config.models.{ConfigFileInfo, ConfigFileRevision, ConfigId, ConfigMetadata}
 import io.bullet.borer.Codec
-import io.bullet.borer.derivation.MapBasedCodecs._
+import io.bullet.borer.derivation.CompactMapBasedCodecs._
 
 object ConfigCodecs extends ConfigCodecs
 trait ConfigCodecs {

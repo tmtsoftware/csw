@@ -4,14 +4,13 @@ import csw.command.client.models.framework.ComponentInfo
 import csw.command.client.models.framework.LocationServiceUsage.{DoNotRegister, RegisterOnly}
 import csw.framework.models.ContainerInfo
 import csw.location.models.ComponentType.{Assembly, HCD}
-import csw.params.core.models.Subsystem
+import csw.prefix.models.Prefix
 
 import scala.concurrent.duration.DurationDouble
 
 object ComponentInfos {
   val assemblyInfo: ComponentInfo = ComponentInfo(
-    "SampleAssembly",
-    Subsystem.WFOS,
+    Prefix("wfos.sampleassembly"),
     Assembly,
     "csw.common.components.framework.SampleComponentBehaviorFactory",
     DoNotRegister,
@@ -19,8 +18,7 @@ object ComponentInfos {
   )
 
   val assemblyInfoToSimulateFailure: ComponentInfo = ComponentInfo(
-    "trombone",
-    Subsystem.WFOS,
+    Prefix("wfos.trombone"),
     Assembly,
     "csw.common.components.framework.ComponentBehaviorFactoryToSimulateFailure",
     DoNotRegister,
@@ -28,8 +26,7 @@ object ComponentInfos {
   )
 
   val hcdInfo: ComponentInfo = ComponentInfo(
-    "SampleHcd",
-    Subsystem.WFOS,
+    Prefix("wfos.samplehcd"),
     HCD,
     "csw.common.components.framework.SampleComponentBehaviorFactory",
     RegisterOnly,
@@ -37,8 +34,7 @@ object ComponentInfos {
   )
 
   val hcdInfoWithInitializeTimeout: ComponentInfo = ComponentInfo(
-    "SampleHcd",
-    Subsystem.WFOS,
+    Prefix("wfos.samplehcd"),
     HCD,
     "csw.common.components.framework.SampleComponentBehaviorFactory",
     RegisterOnly,
@@ -47,8 +43,7 @@ object ComponentInfos {
   )
 
   val hcdInfoWithRunTimeout: ComponentInfo = ComponentInfo(
-    "SampleHcd",
-    Subsystem.WFOS,
+    Prefix("wfos.samplehcd"),
     HCD,
     "csw.common.components.framework.SampleComponentBehaviorFactory",
     RegisterOnly,
@@ -56,13 +51,7 @@ object ComponentInfos {
     5.seconds
   )
 
-  val dummyInfo: ComponentInfo = ComponentInfo(
-    "DummyHcd",
-    Subsystem.WFOS,
-    HCD,
-    "dummy",
-    DoNotRegister
-  )
+  val dummyInfo: ComponentInfo = ComponentInfo(Prefix("wfos.dummyhcd"), HCD, "dummy", DoNotRegister)
 
   val containerInfo: ContainerInfo = ContainerInfo("container", Set(hcdInfo, assemblyInfo))
 }

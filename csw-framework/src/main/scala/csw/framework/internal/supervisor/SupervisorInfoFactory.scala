@@ -12,6 +12,7 @@ import csw.location.api.scaladsl.LocationService
 import csw.location.client.ActorSystemFactory
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
+import csw.prefix.models.Prefix
 
 import scala.async.Async._
 import scala.concurrent.{ExecutionContextExecutor, Future}
@@ -20,7 +21,7 @@ import scala.util.control.NonFatal
 /**
  * The factory for creating supervisor actors of a component specified by [[csw.command.client.models.framework.ComponentInfo]]
  */
-private[framework] class SupervisorInfoFactory(containerPrefix: String) {
+private[framework] class SupervisorInfoFactory(containerPrefix: Prefix) {
   private val log: Logger = new LoggerFactory(containerPrefix).getLogger
 
   def make(

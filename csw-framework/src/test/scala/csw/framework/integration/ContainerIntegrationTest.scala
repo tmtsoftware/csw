@@ -25,8 +25,8 @@ import csw.location.client.ActorSystemFactory
 import csw.location.models.ComponentType.{Assembly, HCD}
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
-import csw.params.core.models.{Prefix, Subsystem}
 import csw.params.core.states.{CurrentState, StateName}
+import csw.prefix.models.{Prefix, Subsystem}
 import io.lettuce.core.RedisClient
 
 import scala.concurrent.duration.DurationLong
@@ -35,6 +35,7 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-177: Hooks for lifecycle management
 // DEOPSCSW-182: Control Life Cycle of Components
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
+// CSW-82: ComponentInfo should take prefix
 class ContainerIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 

@@ -11,9 +11,10 @@ import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandIssue.OtherIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
-import csw.params.core.models.{Id, Prefix}
+import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 import csw.params.events.{Event, EventName, SystemEvent}
+import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime
 
 import scala.concurrent.duration.DurationLong

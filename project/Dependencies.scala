@@ -2,33 +2,10 @@ import sbt.{Def, _}
 
 object Dependencies {
 
-  val AdminServer = Def.setting(
-    Seq(
-      Libs.`config`,
-      Akka.`akka-actor`,
-      Akka.`akka-stream`,
-      Akka.`akka-stream-typed`,
-      Akka.`akka-actor-typed`,
-      AkkaHttp.`akka-http`,
-      Libs.`scala-async`,
-      Borer.`borer-compat-akka`.value,
-      Libs.`scopt`,
-      Libs.`scalatest`.value % Test
-    )
-  )
-
   val AdminImpl = Def.setting(
     Seq(
       Akka.`akka-actor-typed`,
       Libs.`scalatest`.value % Test
-    )
-  )
-
-  val AdminApi = Def.setting(
-    Seq(
-      Borer.`borer-core`.value,
-      Borer.`borer-derivation`.value,
-      MSocket.`msocket-api`.value
     )
   )
 
@@ -37,7 +14,7 @@ object Dependencies {
       Akka.`akka-actor-typed`,
       AkkaHttp.`akka-http`,
       Libs.`scala-async`,
-      Borer.`borer-compat-akka`.value,
+      Borer.`borer-compat-akka`,
       Libs.`scalatest`.value % Test
     )
   )
@@ -131,7 +108,7 @@ object Dependencies {
       Akka.`akka-stream`,
       Akka.`akka-stream-typed`,
       Akka.`akka-actor`,
-      Borer.`borer-compat-akka`.value,
+      Borer.`borer-compat-akka`,
       Libs.`scala-async`,
       Libs.`scala-java8-compat`,
       Libs.`config`,
@@ -151,7 +128,7 @@ object Dependencies {
       Akka.`akka-actor`,
       Akka.`akka-stream`,
       Akka.`akka-stream-typed`,
-      Borer.`borer-compat-akka`.value,
+      Borer.`borer-compat-akka`,
       AkkaHttp.`akka-http`,
       Libs.`scala-async`,
       Libs.`scala-java8-compat`,
@@ -198,6 +175,15 @@ object Dependencies {
       Libs.`junit`           % Test,
       Borer.`borer-core`.value,
       Libs.`gson` % Test
+    )
+  )
+
+  val Prefix = Def.setting(
+    Seq(
+      Libs.`enumeratum`.value,
+      Borer.`borer-core`.value,
+      Borer.`borer-derivation`.value,
+      Libs.`scalatest`.value % Test
     )
   )
 
@@ -294,7 +280,7 @@ object Dependencies {
       Libs.`junit`                    % Test,
       Libs.`mockito-scala`            % Test,
       Libs.`embedded-redis`           % Test,
-//      Libs.`embedded-kafka`           % Test,
+      Libs.`embedded-kafka`           % Test,
       Akka.`akka-multi-node-testkit` % Test,
       Libs.HdrHistogram              % Test,
       Libs.testng                    % Test
@@ -479,7 +465,7 @@ object Dependencies {
     Seq(
       Akka.`akka-actor`,
       AkkaHttp.`akka-http`,
-      Borer.`borer-compat-akka`.value,
+      Borer.`borer-compat-akka`,
       Libs.`scalatest`.value % Test,
       Libs.`embedded-redis`  % Test
     )

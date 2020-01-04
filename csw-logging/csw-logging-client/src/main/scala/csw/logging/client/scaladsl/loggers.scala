@@ -8,26 +8,27 @@ import akka.serialization.Serialization
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.internal.LoggerImpl
 import csw.logging.client.javadsl.JLoggerFactory
+import csw.prefix.models.Prefix
 
-abstract class BaseLoggerFactory private[logging] (maybeComponentName: Option[String]) {
-  def getLogger[T](ctx: ActorContext[T]): Logger = new LoggerImpl(maybeComponentName, Some(actorPath(ctx.self.toClassic)))
-  def getLogger(ctx: actor.ActorContext): Logger = new LoggerImpl(maybeComponentName, Some(actorPath(ctx.self)))
-  def getLogger: Logger                          = new LoggerImpl(maybeComponentName, None)
+abstract class BaseLoggerFactory private[logging] (maybePrefix: Option[Prefix]) {
+  def getLogger[T](ctx: ActorContext[T]): Logger = new LoggerImpl(maybePrefix, Some(actorPath(ctx.self.toClassic)))
+  def getLogger(ctx: actor.ActorContext): Logger = new LoggerImpl(maybePrefix, Some(actorPath(ctx.self)))
+  def getLogger: Logger                          = new LoggerImpl(maybePrefix, None)
 
   private def actorPath(actorRef: ActorRef): String = ActorPath.fromString(Serialization.serializedActorPath(actorRef)).toString
 }
 
 /**
- * When using the `LoggerFactory`, log statements will have `@componentName` tag with provided `componentName`
+ * When using the `LoggerFactory`, log statements will have `@componentName` tag with provided `prefix`
  *
- * @param componentName to appear in log statements
+ * @param prefix to appear in log statements
  */
-class LoggerFactory(componentName: String) extends BaseLoggerFactory(Some(componentName)) {
+class LoggerFactory(prefix: Prefix) extends BaseLoggerFactory(Some(prefix)) {
 
   /**
    * Returns the java API for this instance of LoggerFactory
    */
-  def asJava: JLoggerFactory = new JLoggerFactory(componentName)
+  def asJava: JLoggerFactory = new JLoggerFactory(prefix)
 }
 
 /**

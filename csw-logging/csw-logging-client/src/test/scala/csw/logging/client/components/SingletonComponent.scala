@@ -2,10 +2,11 @@ package csw.logging.client.components
 
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
+import csw.prefix.models.Prefix
 
 object SingletonComponent {
 
-  val log: Logger = new LoggerFactory("SingletonComponent").getLogger
+  val log: Logger = new LoggerFactory(Prefix("csw.SingletonComponent")).getLogger
 
   // Do not add any lines before this method
   // Tests are written to assert on this line numbers
@@ -19,7 +20,7 @@ object SingletonComponent {
     log.fatal(logs("fatal"))
   }
 
-  val TRACE_LINE_NO = 14
+  val TRACE_LINE_NO = 15
   val DEBUG_LINE_NO = TRACE_LINE_NO + 1
   val INFO_LINE_NO  = TRACE_LINE_NO + 2
   val WARN_LINE_NO  = TRACE_LINE_NO + 3
@@ -39,5 +40,5 @@ object SingletonComponent {
     log.fatal(logs("fatal"), userMsgMap)
   }
 
-  val USER_TRACE_LINE_NO = 34
+  val USER_TRACE_LINE_NO = 35
 }

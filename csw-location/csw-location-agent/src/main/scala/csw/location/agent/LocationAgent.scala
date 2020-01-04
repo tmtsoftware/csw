@@ -9,7 +9,7 @@ import csw.location.api.scaladsl.RegistrationResult
 import csw.location.models.Connection.{HttpConnection, TcpConnection}
 import csw.location.models._
 import csw.logging.api.scaladsl.Logger
-import csw.params.core.models.Prefix
+import csw.prefix.models.Prefix
 
 import scala.collection.immutable.Seq
 import scala.compat.java8.FutureConverters.CompletionStageOps

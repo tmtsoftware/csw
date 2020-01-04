@@ -5,11 +5,12 @@ import java.time.Instant
 import csw.params.commands.{CommandName, Observe, Setup, Wait}
 import csw.params.core.generics.KeyType
 import csw.params.core.generics.KeyType.{LongMatrixKey, StructKey}
-import csw.params.core.models.Units.{encoder, meter, second, NoUnits}
+import csw.params.core.models.Units.{NoUnits, encoder, meter, second}
 import csw.params.core.models._
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.params.events._
 import csw.params.testdata.ParamSetData
+import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime
 import org.scalatest.{FunSpec, Matchers}
 import play.api.libs.json.Json
@@ -104,10 +105,9 @@ class JsonContractTest extends FunSpec with Matchers {
 
     it("should adhere to specified standard SystemEvent json format") {
       val a1: Array[Byte] = Array[Byte](1, 2, 3, 4, 5)
-      val a2: Array[Byte] = Array[Byte](10, 20, 30, 40, 50)
 
       val arrayDataKey   = KeyType.ByteArrayKey.make("arrayDataKey")
-      val arrayDataParam = arrayDataKey.set(ArrayData(a1), ArrayData(a2))
+      val arrayDataParam = arrayDataKey.set(ArrayData.fromArray(a1), ArrayData.fromArrays[Byte](10, 20, 30, 40, 50))
 
       val systemEvent       = SystemEvent(eventId, prefix, eventName, eventTime, Set(arrayDataParam))
       val systemEventToJson = JsonSupport.writeEvent(systemEvent)

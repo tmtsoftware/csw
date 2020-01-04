@@ -2,18 +2,16 @@ package csw.location.server.http
 
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import csw.location.api.codec.LocationServiceCodecs
+import csw.location.api.codec.LocationServiceCodecs._
 import csw.location.api.messages.LocationHttpMessage
 import csw.location.api.messages.LocationHttpMessage._
 import csw.location.api.scaladsl.LocationService
-import msocket.api.MessageHandler
-import msocket.impl.post.ServerHttpCodecs
+import msocket.impl.post.{HttpPostHandler, ServerHttpCodecs}
 
 import scala.concurrent.ExecutionContext
 
 class LocationHttpHandler(locationService: LocationService)(implicit ex: ExecutionContext)
-    extends MessageHandler[LocationHttpMessage, Route]
-    with LocationServiceCodecs
+    extends HttpPostHandler[LocationHttpMessage]
     with ServerHttpCodecs {
 
   override def handle(request: LocationHttpMessage): Route = request match {

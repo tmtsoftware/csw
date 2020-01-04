@@ -6,7 +6,8 @@ import csw.params.events.Event;
 import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
-import csw.params.javadsl.JSubsystem;
+import csw.prefix.models.Prefix;
+import csw.prefix.javadsl.JSubsystem;
 import csw.time.core.models.UTCTime;
 import io.bullet.borer.Cbor;
 import org.junit.Assert;
@@ -46,12 +47,12 @@ public class JCborTest extends JUnitSuite {
         Float[][] floatData2D = {{10000.10f, 20000.20f, 30000.30f}, {40000.40f, 50000f, 60000f}};
         Double[][] doubleData2D = {{100000.100d, 200000.200d, 300000.300d}, {400000.400d, 500000d, 600000d}};
 
-        MatrixData<Byte> byteMatrixData = MatrixData.fromJavaArrays(Byte.class, byteData2D);
-        MatrixData<Short> shortMatrixData = MatrixData.fromJavaArrays(Short.class, shortData2D);
-        MatrixData<Long> longMatrixData = MatrixData.fromJavaArrays(Long.class, longData2D);
-        MatrixData<Integer> integerMatrixData = MatrixData.fromJavaArrays(Integer.class, intData2D);
-        MatrixData<Float> floatMatrixData = MatrixData.fromJavaArrays(Float.class, floatData2D);
-        MatrixData<Double> doubleMatrixData = MatrixData.fromJavaArrays(Double.class, doubleData2D);
+        MatrixData<Byte> byteMatrixData = MatrixData.fromArrays(byteData2D);
+        MatrixData<Short> shortMatrixData = MatrixData.fromArrays(shortData2D);
+        MatrixData<Long> longMatrixData = MatrixData.fromArrays(longData2D);
+        MatrixData<Integer> integerMatrixData = MatrixData.fromArrays(intData2D);
+        MatrixData<Float> floatMatrixData = MatrixData.fromArrays(floatData2D);
+        MatrixData<Double> doubleMatrixData = MatrixData.fromArrays(doubleData2D);
 
         return Arrays.asList(new Object[][]{
                 {"JChoiceKey", JKeyType.ChoiceKey().make("choiceKey", Choices.from("A", "B", "C")).set(new Choice("A"))},
@@ -68,12 +69,12 @@ public class JCborTest extends JUnitSuite {
                 {"JIntKey", JKeyType.IntKey().make("intKey").set(intData)},
                 {"JFloatKey", JKeyType.FloatKey().make("floatKey").set(floatData)},
                 {"JDoubleKey", JKeyType.DoubleKey().make("doubleKey").set(doubleData)},
-                {"JByteArrayKey", JKeyType.ByteArrayKey().make("byteArrayKey").set(ArrayData.fromJavaArray(byteData))},
-                {"JShortArrayKey", JKeyType.ShortArrayKey().make("shortArrayKey").set(ArrayData.fromJavaArray(shortData))},
-                {"JLongArrayKey", JKeyType.LongArrayKey().make("longArrayKey").set(ArrayData.fromJavaArray(longData))},
-                {"JIntArrayKey", JKeyType.IntArrayKey().make("intArrayKey").set(ArrayData.fromJavaArray(intData))},
-                {"JFloatArrayKey", JKeyType.FloatArrayKey().make("floatArrayKey").set(ArrayData.fromJavaArray(floatData))},
-                {"JDoubleArrayKey", JKeyType.DoubleArrayKey().make("doubleArrayKey").set(ArrayData.fromJavaArray(doubleData))},
+                {"JByteArrayKey", JKeyType.ByteArrayKey().make("byteArrayKey").set(ArrayData.fromArray(byteData))},
+                {"JShortArrayKey", JKeyType.ShortArrayKey().make("shortArrayKey").set(ArrayData.fromArray(shortData))},
+                {"JLongArrayKey", JKeyType.LongArrayKey().make("longArrayKey").set(ArrayData.fromArray(longData))},
+                {"JIntArrayKey", JKeyType.IntArrayKey().make("intArrayKey").set(ArrayData.fromArray(intData))},
+                {"JFloatArrayKey", JKeyType.FloatArrayKey().make("floatArrayKey").set(ArrayData.fromArray(floatData))},
+                {"JDoubleArrayKey", JKeyType.DoubleArrayKey().make("doubleArrayKey").set(ArrayData.fromArray(doubleData))},
                 {"JByteMatrixKey", JKeyType.ByteMatrixKey().make("byteMatrixKey").set(byteMatrixData)},
                 {"JShortMatrixKey", JKeyType.ShortMatrixKey().make("shortMatrixKey").set(shortMatrixData)},
                 {"JLongMatrixKey", JKeyType.LongMatrixKey().make("longMatrixKey").set(longMatrixData)},
@@ -92,7 +93,7 @@ public class JCborTest extends JUnitSuite {
         Assert.assertEquals(param, parameterFromBytes);
 
         // ===== Test Event SERDE =====
-        Prefix source = new Prefix(JSubsystem.WFOS(), "filter");
+        Prefix source = Prefix.apply(JSubsystem.WFOS(), "filter");
         EventName eventName = new EventName("move");
         SystemEvent originalEvent = new SystemEvent(source, eventName).add(param);
 
