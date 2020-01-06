@@ -76,7 +76,7 @@ The following hooks should be overridden in your ComponentHandlers implementatio
 
 The source code of `ComponentHandlers` can be found @github[here](/csw-framework/src/main/scala/csw/framework/scaladsl/ComponentHandlers.scala). 
 
-More details about handler significance and invocation can be found @ref:[here](./framework.md#handling-lifecycle)
+More details about handler significance and invocation can be found @ref:[here](../framework/handling-lifecycle.md)
 
 @@@ note { title=Note }
 
@@ -100,7 +100,7 @@ the component (see example below). The `csw-framework` picks up the full path of
 `ComponentBehaviorFactory` from configuration file and spawns the component handlers using this factory in a process of
 booting a component. The factory is instantiated using Java reflection.
 
-Additional sample code to implement the `ComponentBehaviorFactory` can be found @ref:[here](./framework.md#creating-components) 
+Additional sample code to implement the `ComponentBehaviorFactory` can be found @ref:[here](../framework/creating-components.md) 
 
 #### *Tutorial: Developing an HCD*
 
@@ -135,7 +135,7 @@ The configuration file is parsed to a `ComponentInfo` object and injected in the
 
 The configuration can also contain a list of components and services it wishes to track as dependencies. See @ref:[Tracking Dependencies](./multiple-components.md#tracking-dependencies).
 
-More details about `ComponentInfo` can be found @ref:[here](./framework.md#describing-components).
+More details about `ComponentInfo` can be found @ref:[here](../framework/describing-components.md).
 
 An additional sample configuration file can be found @github[here](/csw-benchmark/src/main/resources/container.conf).
 
@@ -339,7 +339,7 @@ commands to other components. This will be described in the next tutorial sectio
 When the `onSubmit` hook is called, it is the responsibility of component developers to update the status of the received command in the `CommandResponseManager` as it changes. An instance
 of `CommandResponseManager` is provided in the `CswContext` object in `ComponentHandlers` and should be injected in any worker actor or other actor/class created for the component that needs it.   
 
-More details on the methods available in `CommandResponseManager` can be found @ref:[here](./framework.md#managing-command-state).
+More details on the methods available in `CommandResponseManager` can be found @ref:[here](../framework/managing-command-state.md).
 
 #### *Tutorial: Developing an HCD*
 

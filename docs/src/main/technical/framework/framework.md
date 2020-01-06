@@ -84,7 +84,7 @@ The `CswContext` can be used to get the handle of all the services provided by C
 Every component needs to provide a startup config file called the Component Info File that contains component details such as name, type, handler class name, tracking details, etc.
 The contents of this file is used by Supervisor to create and setup the component as well as some customization.
 To know more about what is it and how to write the Component Info File, please refer to this @ref[section](../../framework/describing-components.md) and 
-this @ref[sample file](../../commons/multiple-components.md#component-configuration-componentinfo). 
+this @ref[sample file](../../commons/multiple-components.md#component-configuration-componentinfo-). 
 
 The name of the Component Info File needs to be passed to @ref[Container/Standalone app](../../framework/deploying-components.md) at the time of startup.
 The file is either fetched from `Configuration Service` or taken from local path on the machine to parse to a @github[ComponentInfo](/csw-command/csw-command-client/src/main/scala/csw/command/client/models/framework/ComponentInfo.scala)

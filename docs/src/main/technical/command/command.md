@@ -38,7 +38,7 @@ To understand the flow of Oneway, please refer to this @ref[section](../../commo
 
 ### Validate
 
-To understand the flow of the Validate command, please refer to this @ref[section](../../commons/command.md#the-validate-message) and the code base for the implementation can be
+To understand the flow of the Validate command, please refer to this @ref[section](../../commons/command.md#validate) and the code base for the implementation can be
 found @github[here](/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala#L154).
 
 ### Command Response Manager

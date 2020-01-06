@@ -50,7 +50,7 @@ Configuration server exposes set of HTTP routes to write or read configuration f
 - setActive
 - resetActive
 
-These are *admin* protected which uses utilities provided by [csw-aas-http](../aas/csw-aas-http.md) adapter for protection. `csw-aas-http` adapter internally uses [Keycloak](https://www.keycloak.org/) for authentication and authorization.
+These are *admin* protected which uses utilities provided by [csw-aas-http](../aas/csw-aas-http.html) adapter for protection. `csw-aas-http` adapter internally uses [Keycloak](https://www.keycloak.org/) for authentication and authorization.
 
 Admin protected routes expects `Access Token` to be passed in HTTP requests header field called `Authorization: Bearer ****`.
 This token then used to retrieve [RPT(Requesting Party Token)](https://www.keycloak.org/docs/latest/authorization_services/#_service_rpt_overview) from keycloak.
