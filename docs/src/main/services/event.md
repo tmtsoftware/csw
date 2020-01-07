@@ -2,7 +2,7 @@
 
 The Event Service implements the [publish/subscribe messaging paradigm](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) where 
 one component publishes an event and all clients that have subscribed receive the event. In CSW, the events published are
-described under the messages documentation @ref:[here](./../params/events.md).
+described under the `messages` documentation @ref:[here](./../params/events.md).
 One advantage of this type of message system for the Event Service is that publishers and subscribers are decoupled. 
 This decoupling of publishers and subscribers can allow for greater scalability and a more dynamic network topology.
 Publishers can publish regardless of whether there are subscribers, and subscribers can subscribe even if there are no publishers. 
@@ -241,10 +241,10 @@ If you are not using csw-framework, you can create the @scaladoc[EventService](c
 using an @scaladoc[EventServiceFactory](csw/event/EventServiceFactory).
 
 Scala
-:   @@snip [EventServiceCreationExamples.scala](../../../../examples/src/main/scala/example/event/EventServiceCreationExamples.scala) { #default-event-service }
+: @@snip [EventServiceCreationExamples.scala](../../../../examples/src/main/scala/example/event/EventServiceCreationExamples.scala) { #default-event-service }
 
 Java
-:   @@snip [JEventServiceCreationExamples.java](../../../../examples/src/main/java/example/event/JEventServiceCreationExamples.java) { #default-event-service }
+: @@snip [JEventServiceCreationExamples.java](../../../../examples/src/main/java/example/event/JEventServiceCreationExamples.java) { #default-event-service }
 
 The provided implementation of Event Service is backed up by Redis. The above example demonstrates creation of Event Service 
 with default Redis client options. 

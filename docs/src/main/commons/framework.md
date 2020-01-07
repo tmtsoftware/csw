@@ -5,7 +5,7 @@
 ## Dependencies
 
 sbt
-:   @@@vars
+: @@@vars
     ```scala
     libraryDependencies += "com.github.tmtsoftware.csw" %% "csw-framework" % "$version$"
     ```

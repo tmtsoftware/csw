@@ -2,6 +2,7 @@ package csw.command.client.internal
 
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.actor.typed.javadsl.Behaviors
+import csw.command.client.SequencerCommandServiceImpl
 import csw.command.client.messages.sequencer.SequencerMsg
 import csw.command.client.messages.sequencer.SequencerMsg.{Query, QueryFinal, SubmitSequence}
 import csw.location.api.extensions.ActorExtension.RichActor

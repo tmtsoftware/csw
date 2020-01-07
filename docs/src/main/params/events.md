@@ -1,13 +1,13 @@
 # Events
 
-Events are the most basic type of asynchronous notification in TMT when an activity occurs 
-somewhere in the TMT system and other components need to be notified. Each type of event has a unique 
+Events are the most basic type of asynchronous notification in TMT when an activity occurs
+somewhere in the TMT system and other components need to be notified. Each type of event has a unique
 purpose and unique information, but they all share same structural features. 
 All events have **EventInfo** and a **ParameterSet**.
 
 @@@ note
 
-The `csw-params` library offers out of the box support to serialize Events using **Cbor**, so that events can be produced and 
+The `csw-params` library offers out of the box support to serialize Events using **Cbor**, so that events can be produced and
 consumed by JVM (Java virtual machine) as well as Non-JVM applications.
 
 For more on Cbor, refer to the @ref:[technical doc](../technical/params/params.md).
@@ -18,15 +18,15 @@ For more on Cbor, refer to the @ref:[technical doc](../technical/params/params.m
 Each event includes its time of creation in UTC format. You can access that eventTime as follows:
 
 Scala
-:   @@snip [EventsTest.scala](../../../../examples/src/test/scala/example/params/EventsTest.scala) { #eventtime }
+: @@snip [EventsTest.scala](../../../../examples/src/test/scala/example/params/EventsTest.scala) { #eventtime }
 
 Java
-:   @@snip [JEventsTest.java](../../../../examples/src/test/java/example/params/JEventsTest.java) { #eventtime }
+: @@snip [JEventsTest.java](../../../../examples/src/test/java/example/params/JEventsTest.java) { #eventtime }
    
 ## System Event
 
-`SystemEvent` is the type used to describe the majority of events in the system. An example is a demand that is 
-the output of an algorithm in one component that is used as an input to another. `SystemEvent` is also used 
+`SystemEvent` is the type used to describe the majority of events in the system. An example is a demand that is
+the output of an algorithm in one component that is used as an input to another. `SystemEvent` is also used
 to publish internal state or status values of a component that may be of interest to other components in the system.
 
 Scala
