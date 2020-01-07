@@ -264,8 +264,7 @@ At any time, the `query` call of `CommandService` can be used to check the curre
 a command that has been sent via the `submit` message using the command's `runId`. 
 This is most useful with a long-running command but all commands that use `submit` are available.
 
-The `query` message returns a `QueryResponse`, which coubld be any of the values of `SubmitResponse`
-plus the `CommandNotAvailable` response. This response occurs when the framework has no knowledge
+The `query` message returns a `SubmitResponse`. This response occurs when the framework has no knowledge
 of the command associated with the `runId` passed with the `query`. The previous long-running
 example above showed the use of `query` to check that the actions associated with a command that
 had started. Another usage is to check the final

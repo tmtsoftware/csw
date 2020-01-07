@@ -45,7 +45,7 @@ class CommandResponseManager(val commandResponseManagerActor: ActorRef[MiniCRM.C
 
   // Returns true if all the commands in the response set have returned without Error
   private def isSuccessful(responses: Set[SubmitResponse]): Boolean = {
-    !responses.exists(CommandResponse.isNegative(_))
+    !responses.exists(CommandResponse.isNegative)
   }
 }
 

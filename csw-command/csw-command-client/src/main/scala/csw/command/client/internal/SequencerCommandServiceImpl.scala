@@ -15,10 +15,15 @@ import csw.params.core.models.Id
 
 import scala.concurrent.Future
 
+/**
+ * Create a SequencerCommandService for sending commands to sequencer
+ * @param sequencerLocation  the destination sequencer location to which sequence needs to be sent
+ * @param actorSystem required for sending sequence commands or querying the sequencer
+ */
 class SequencerCommandServiceImpl(sequencerLocation: AkkaLocation)(
-    implicit system: ActorSystem[_]
+    implicit actorSystem: ActorSystem[_]
 ) extends SequencerCommandService {
-  import system.executionContext
+  import actorSystem.executionContext
 
   private val extensions = new SequencerCommandServiceExtension(this)
 
