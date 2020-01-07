@@ -583,9 +583,21 @@ lazy val docs = project
   .settings(
     paradoxProperties in Paradox ++= Map(
       "extref.csw_js.base_url" -> s"https://tmtsoftware.github.io/csw-js/${Settings.cswJsVersion}/%s"
+    ),
+    paradoxRoots := List(
+      "apps/cswlocationroutes.html",
+      "index.html",
+      "services/aas/core-concepts-and-terms.html",
+      "services/aas/csw-aas-http.html",
+      "services/aas/csw-aas-installed.html",
+      "technical/aas/csw-aas-http.html",
+      "technical/aas/csw-aas-installed.html",
+      "technical/location/location-agent.html",
+      "technical/location/location-api.html",
+      "technical/location/location-client.html",
+      "technical/location/location-server.html"
     )
   )
-
 /* =================== Examples ================ */
 lazy val examples = project
   .dependsOn(
