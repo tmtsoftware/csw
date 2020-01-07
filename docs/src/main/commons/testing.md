@@ -170,7 +170,7 @@ Using the security token obtained from the Jenkins pipeline settings (available 
 ```
 curl -G 'http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/acceptance-dev/buildWithParameters'  \
     --data-urlencode token=$DEV_TOKEN \
-    --data-urlencode CSW_VERSION=0.1-SNAPSHOT
+    --data-urlencode CSW_VERSION=0.1.0-SNAPSHOT
 ```
 
 - For triggering an `acceptance-release` pipeline, run: (Modify parameters as applicable)

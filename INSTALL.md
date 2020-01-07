@@ -24,7 +24,7 @@ The CSW [paradox](https://developer.lightbend.com/docs/paradox/current/index.htm
 
     sbt clean makeSite
 
-This puts the documentation under `target/site` with the entry point at `target/site/csw/0.1-SNAPSHOT/index.html`.
+This puts the documentation under `target/site` with the entry point at `target/site/csw/0.1.0-SNAPSHOT/index.html`.
 
 For more details on the sbt tasks, see the [online documentation](https://tmtsoftware.github.io/csw/1.0.0/commons/sbt-tasks.html).
 
