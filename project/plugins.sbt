@@ -21,7 +21,7 @@ addSbtPlugin("ohnosequences"                     % "sbt-github-release"        %
 addSbtPlugin("com.dwijnand"                      % "sbt-project-graph"         % "0.4.0")
 
 resolvers += Resolver.bintrayRepo("twtmt", "sbt-plugins")
-addSbtPlugin("com.github.tmtsoftware" % "sbt-docs" % "0.1.2")
+addSbtPlugin("com.github.tmtsoftware" % "sbt-docs" % "0.1.3-RC1")
 
 classpathTypes += "maven-plugin"
 
