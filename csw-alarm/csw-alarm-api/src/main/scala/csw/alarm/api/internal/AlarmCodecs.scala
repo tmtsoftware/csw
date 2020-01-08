@@ -4,7 +4,7 @@ import csw.alarm.models._
 import csw.prefix.codecs.CommonCodecs
 import csw.time.core.models.UTCTime
 import io.bullet.borer.Codec
-import io.bullet.borer.derivation.CompactMapBasedCodecs._
+import io.bullet.borer.derivation.CompactMapBasedCodecs.deriveCodec
 import io.bullet.borer.derivation.MapBasedCodecs
 
 private[alarm] trait AlarmCodecs extends CommonCodecs {

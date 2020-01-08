@@ -1,32 +1,31 @@
 {
-  "SystemEvent": {
-    "eventId": "7a4cd6ab-6077-476d-a035-6f83be1de42c",
-    "source": "wfos.blue.filter",
-    "eventName": "filter wheel",
-    "eventTime": "2017-08-09T06:40:00.898Z",
-    "paramSet": [
-      {
-        "ByteArrayKey": {
-          "keyName": "arrayDataKey",
-          "values": [
-            [
-              1,
-              2,
-              3,
-              4,
-              5
-            ],
-            [
-              10,
-              20,
-              30,
-              40,
-              50
-            ]
+  "_type": "SystemEvent",
+  "eventId": "7a4cd6ab-6077-476d-a035-6f83be1de42c",
+  "source": "wfos.blue.filter",
+  "eventName": "filter wheel",
+  "eventTime": "2017-08-09T06:40:00.898Z",
+  "paramSet": [
+    {
+      "ByteArrayKey": {
+        "keyName": "arrayDataKey",
+        "values": [
+          [
+            1,
+            2,
+            3,
+            4,
+            5
           ],
-          "units": "NoUnits"
-        }
+          [
+            10,
+            20,
+            30,
+            40,
+            50
+          ]
+        ],
+        "units": "NoUnits"
       }
-    ]
-  }
+    }
+  ]
 }

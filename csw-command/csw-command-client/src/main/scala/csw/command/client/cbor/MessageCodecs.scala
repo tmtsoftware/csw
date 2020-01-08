@@ -10,11 +10,13 @@ import csw.command.client.messages.sequencer.SequencerMsg.{
   QueryFinal => SequencerQueryFinal
 }
 import csw.command.client.models.framework.PubSub.{Publish, PublisherMessage, SubscriberMessage}
-import csw.command.client.models.framework.{PubSub, _}
+import csw.command.client.models.framework._
 import csw.location.models.codecs.LocationCodecs
 import csw.logging.models.codecs.LoggingCodecs
 import csw.params.core.formats.ParamCodecs
-import io.bullet.borer.derivation.CompactMapBasedCodecs._
+import io.bullet.borer.derivation.CompactMapBasedCodecs.deriveCodec
+import io.bullet.borer.derivation.MapBasedCodecs
+import io.bullet.borer.derivation.MapBasedCodecs.deriveAllCodecs
 import io.bullet.borer.{Codec, Decoder, Encoder}
 
 trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
@@ -31,13 +33,13 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
     )
 
   //todo: deriveAllCodecs
-  implicit def subscribeMessageCodec[T: Encoder: Decoder]: Codec[PubSub.Subscribe[T]]         = deriveCodec
-  implicit def subscribeOnlyMessageCodec[T: Encoder: Decoder]: Codec[PubSub.SubscribeOnly[T]] = deriveCodec
-  implicit def unsubscribeMessageCodec[T: Encoder: Decoder]: Codec[PubSub.Unsubscribe[T]]     = deriveCodec
-  implicit def subscriberMessageCodec[T: Encoder: Decoder]: Codec[SubscriberMessage[T]]       = deriveCodec
-  implicit def publishCodec[T: Encoder: Decoder]: Codec[Publish[T]]                           = deriveCodec
-  implicit def publisherMessageCodec[T: Encoder: Decoder]: Codec[PublisherMessage[T]]         = deriveCodec
-  implicit def pubSubCodec[T: Encoder: Decoder]: Codec[PubSub[T]]                             = deriveCodec
+  implicit def subscribeMessageCodec[T: Encoder: Decoder]: Codec[PubSub.Subscribe[T]]         = MapBasedCodecs.deriveCodec
+  implicit def subscribeOnlyMessageCodec[T: Encoder: Decoder]: Codec[PubSub.SubscribeOnly[T]] = MapBasedCodecs.deriveCodec
+  implicit def unsubscribeMessageCodec[T: Encoder: Decoder]: Codec[PubSub.Unsubscribe[T]]     = MapBasedCodecs.deriveCodec
+  implicit def subscriberMessageCodec[T: Encoder: Decoder]: Codec[SubscriberMessage[T]]       = MapBasedCodecs.deriveCodec
+  implicit def publishCodec[T: Encoder: Decoder]: Codec[Publish[T]]                           = MapBasedCodecs.deriveCodec
+  implicit def publisherMessageCodec[T: Encoder: Decoder]: Codec[PublisherMessage[T]]         = MapBasedCodecs.deriveCodec
+  implicit def pubSubCodec[T: Encoder: Decoder]: Codec[PubSub[T]]                             = MapBasedCodecs.deriveCodec
 
   // ************************ LockingResponse Codecs ********************
 

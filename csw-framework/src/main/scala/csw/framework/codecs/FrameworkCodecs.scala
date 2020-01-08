@@ -4,7 +4,7 @@ import csw.command.client.models.framework.ComponentInfo
 import csw.framework.models.{ContainerBootstrapInfo, ContainerInfo, HostBootstrapInfo}
 import csw.location.models.codecs.LocationCodecs
 import io.bullet.borer.Codec
-import io.bullet.borer.derivation.CompactMapBasedCodecs._
+import io.bullet.borer.derivation.CompactMapBasedCodecs.deriveCodec
 import io.bullet.borer.derivation.MapBasedCodecs
 
 trait FrameworkCodecs extends LocationCodecs {

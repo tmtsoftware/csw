@@ -3,7 +3,7 @@ package csw.command.api.codecs
 import csw.command.api.messages.{CommandServiceHttpMessage, CommandServiceWebsocketMessage}
 import csw.params.core.formats.ParamCodecs
 import io.bullet.borer.Codec
-import io.bullet.borer.derivation.CompactMapBasedCodecs._
+import io.bullet.borer.derivation.MapBasedCodecs.deriveAllCodecs
 import msocket.api
 import msocket.api.ErrorProtocol
 import msocket.api.codecs.BasicCodecs

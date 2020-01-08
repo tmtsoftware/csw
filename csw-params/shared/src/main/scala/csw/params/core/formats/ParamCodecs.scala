@@ -12,7 +12,8 @@ import csw.params.events.{Event, EventName}
 import csw.prefix.codecs.CommonCodecs
 import csw.time.core.models.{TAITime, UTCTime}
 import io.bullet.borer._
-import io.bullet.borer.derivation.CompactMapBasedCodecs._
+import io.bullet.borer.derivation.CompactMapBasedCodecs.deriveCodec
+import io.bullet.borer.derivation.MapBasedCodecs.deriveAllCodecs
 import io.bullet.borer.derivation.MapBasedCodecs
 
 import scala.collection.mutable.{ArraySeq => ArrayS}
@@ -20,7 +21,7 @@ import scala.reflect.ClassTag
 
 object JParamCodecs extends ParamCodecs {
   //just needed for the Java test, which should not exist
-  val eqFrameCodec: Codec[EqFrame] = implicitly[Codec[EqFrame]]
+  val eqFrameCodec: Codec[EqFrame] = Codec.of[EqFrame]
 }
 object ParamCodecs extends ParamCodecs
 

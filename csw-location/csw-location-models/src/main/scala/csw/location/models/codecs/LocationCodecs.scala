@@ -6,7 +6,8 @@ import com.github.ghik.silencer.silent
 import csw.location.models._
 import csw.prefix.codecs.CommonCodecs
 import io.bullet.borer.Codec
-import io.bullet.borer.derivation.CompactMapBasedCodecs._
+import io.bullet.borer.derivation.CompactMapBasedCodecs.deriveCodec
+import io.bullet.borer.derivation.MapBasedCodecs.deriveAllCodecs
 
 object LocationCodecs extends LocationCodecs
 trait LocationCodecs extends LocationCodecsBase {

@@ -1,40 +1,39 @@
 {
-  "SystemEvent": {
-    "eventId": "3186979f-6cde-43a5-a42a-1ae37bfed669",
-    "source": "wfos.prog.cloudcover",
-    "eventName": "move",
-    "eventTime": "2018-07-02T09:23:26.477Z",
-    "paramSet": [
-      {
-        "StructKey": {
-          "keyName": "struct-1",
-          "values": [
-            {
-              "paramSet": [
-                {
-                  "StringKey": {
-                    "keyName": "ra",
-                    "values": [
-                      "12:13:14.1"
-                    ],
-                    "units": "NoUnits"
-                  }
-                },
-                {
-                  "StringKey": {
-                    "keyName": "dec",
-                    "values": [
-                      "32:33:34.4"
-                    ],
-                    "units": "NoUnits"
-                  }
+  "_type": "SystemEvent",
+  "eventId": "3186979f-6cde-43a5-a42a-1ae37bfed669",
+  "source": "wfos.prog.cloudcover",
+  "eventName": "move",
+  "eventTime": "2018-07-02T09:23:26.477Z",
+  "paramSet": [
+    {
+      "StructKey": {
+        "keyName": "struct-1",
+        "values": [
+          {
+            "paramSet": [
+              {
+                "StringKey": {
+                  "keyName": "ra",
+                  "values": [
+                    "12:13:14.1"
+                  ],
+                  "units": "NoUnits"
                 }
-              ]
-            }
-          ],
-          "units": "NoUnits"
-        }
+              },
+              {
+                "StringKey": {
+                  "keyName": "dec",
+                  "values": [
+                    "32:33:34.4"
+                  ],
+                  "units": "NoUnits"
+                }
+              }
+            ]
+          }
+        ],
+        "units": "NoUnits"
       }
-    ]
-  }
+    }
+  ]
 }
