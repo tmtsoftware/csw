@@ -150,10 +150,9 @@ The block diagram of an ordinary clock is shown in the following figure.
 A reference time is transmitted through the Ethernet LAN from a
 master/grandmaster clock. To achieve sub-microsecond accuracy and
 precision, the Network Interface Card (NIC) of the component must have
-the capability to perform hardware timestamping and an internal PTP
-Hardware Clock(PHC). A
-[webpage](https://github.com/openil/linuxptp#driver-support-matrix)
-mentions the valid list of such capable NICs while there are various new
+the capability to perform hardware timestamping, and an internal PTP
+Hardware Clock(PHC). Here's a [list](https://tmt-project.atlassian.net/wiki/spaces/DEOPSCSW/pages/452296820/PTP+Driver+Matrix+Support) 
+which mentions of such capable NICs while there are various new
 additions in the market. Most of the current NICs are able to handle PTP
 protocol by default. Run the following command to find the details of a
 NIC.
