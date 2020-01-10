@@ -207,10 +207,10 @@ See @ref:[Time Service Technical Description](../technical/time/time.md).
 
 ## Source code for TMTTime examples
 
-* @github[Scala Example](../../../../examples/src/main/scala/example/time/TMTTimeExamples.scala)
-* @github[Java Example](../../../../examples/src/main/java/example/time/JTMTTimeExamples.java)
+* [Scala Example]($github.base_url$/examples/src/main/scala/example/time/TMTTimeExamples.scala)
+* [Java Example]($github.base_url$/examples/src/main/java/example/time/JTMTTimeExamples.java)
 
 ## Source code for Scheduler examples
 
-* @github[Scala Example](../../../../examples/src/main/scala/example/time/SchedulerExamples.scala)
-* @github[Java Example](../../../../examples/src/main/java/example/time/JSchedulerExamples.java)
+* [Scala Example]($github.base_url$/examples/src/main/scala/example/time/SchedulerExamples.scala)
+* [Java Example]($github.base_url$/examples/src/main/java/example/time/JSchedulerExamples.java)

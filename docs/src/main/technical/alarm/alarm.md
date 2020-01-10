@@ -200,9 +200,9 @@ without polling them at regular intervals.
 
 ## Severity Latching
 
-[Alarm metadata](#metadata) JSON has a boolean attribute called "isLatchable". This determines the latching behaviour of an alarm. If an
+@ref:[Alarm metadata](#metadata) JSON has a boolean attribute called "isLatchable". This determines the latching behaviour of an alarm. If an
 alarm is latchable, its latched severity _sticks_ to the last highest severity reached until the alarm is reset. 
-Reset operation is provided the [admin api](#api-structure) of alarm service.
+Reset operation is provided the @ref:[admin api](#api-and-implementation-structure) of alarm service.
 
 ![latched-alarm-behaviour](alarm-latchable-behavior-with-reset.gif)
 
@@ -233,11 +233,11 @@ value in redis explicitly without any TTL.
 
 ## Acknowledging Alarms
 
-Alarms can be in either `acknowledged` or `unacknowledged` state. See [Acknowledgement Status](#acknowledgement-status) for more details. 
+Alarms can be in either `acknowledged` or `unacknowledged` state. See @ref:[Acknowledgement Status](#acknowledgement-status) for more details. 
 The state can be changed to `acknowledged` by simply using `acknowledge` api of alarm service. Apart from this api,
 setting severity can also change the Acknowledgement Status of an alarm.
 
-Alarm can either be auto-acknowledgeable or not auto-acknowledgeable. This behavior is driven from [alarm metadata](#metadata).
+Alarm can either be auto-acknowledgeable or not auto-acknowledgeable. This behavior is driven from @ref:[alarm metadata](#metadata).
 When an alarm is not auto-acknowledgeable, whenever it's severity changes to anything except Okay, it's Acknowledgement Status becomes
 `acknowledged`. If it is changing from any severity to Okay, Acknowledgement Status remains same.
 
@@ -248,26 +248,26 @@ If it changes to anything else, Acknowledgement Status remains same.
 
 ![api-structure](api-structure.png)
 
-The alarm functionality divided into two services @github[AlarmService](/csw-alarm/csw-alarm-api/src/main/scala/csw/alarm/api/scaladsl/AlarmService.scala)
-and @github[AlarmAdminService](/csw-alarm/csw-alarm-api/src/main/scala/csw/alarm/api/scaladsl/AlarmAdminService.scala)
+The alarm functionality divided into two services [AlarmService]($github.base_url$/csw-alarm/csw-alarm-api/src/main/scala/csw/alarm/api/scaladsl/AlarmService.scala)
+and [AlarmAdminService]($github.base_url$/csw-alarm/csw-alarm-api/src/main/scala/csw/alarm/api/scaladsl/AlarmAdminService.scala)
 
-@github[AlarmService](/csw-alarm/csw-alarm-api/src/main/scala/csw/alarm/api/scaladsl/AlarmService.scala) is meant for "Components" that can only 
+[AlarmService]($github.base_url$/csw-alarm/csw-alarm-api/src/main/scala/csw/alarm/api/scaladsl/AlarmService.scala) is meant for "Components" that can only 
 set their current alarm severity and hence for components, Alarm Service only exposes one api i.e. `setSeverity`
 
-@github[AlarmAdminService](/csw-alarm/csw-alarm-api/src/main/scala/csw/alarm/api/scaladsl/AlarmAdminService.scala) is meant for admin 
+[AlarmAdminService]($github.base_url$/csw-alarm/csw-alarm-api/src/main/scala/csw/alarm/api/scaladsl/AlarmAdminService.scala) is meant for admin 
 operations. 
 
 The Alarm Service implementation is further divided into four internal modules.
 
-**1. @github[SeverityServiceModule](/csw-alarm/csw-alarm-client/src/main/scala/csw/alarm/client/internal/services/SeverityServiceModule.scala)**
+**1. [SeverityServiceModule]($github.base_url$/csw-alarm/csw-alarm-client/src/main/scala/csw/alarm/client/internal/services/SeverityServiceModule.scala)**
 
 `SeverityServiceModule` allows reading, subscribing and modifying severity of alarms and subsystems.
 
-**2. @github[MetadataServiceModule](/csw-alarm/csw-alarm-client/src/main/scala/csw/alarm/client/internal/services/MetadataServiceModule.scala)**
+**2. [MetadataServiceModule]($github.base_url$/csw-alarm/csw-alarm-client/src/main/scala/csw/alarm/client/internal/services/MetadataServiceModule.scala)**
 
 `MetadataServiceModule` allows read-only access to alarm metadata. Initialisation of alarms is also performed using this module.
 
-**3. @github[StatusServiceModule](/csw-alarm/csw-alarm-client/src/main/scala/csw/alarm/client/internal/services/StatusServiceModule.scala)**
+**3. [StatusServiceModule]($github.base_url$/csw-alarm/csw-alarm-client/src/main/scala/csw/alarm/client/internal/services/StatusServiceModule.scala)**
 
 `StatusServiceModule` allows read-write access to alarm status via operations such as getStatus, shelveAlarm,
 reset, acknowledge, unshelve, etc.
@@ -280,7 +280,7 @@ AlarmStatus is a logical entity which contains:
   - `alarmTime`
   - `initializing`
 
-**4. @github[HealthServiceModule](/csw-alarm/csw-alarm-client/src/main/scala/csw/alarm/client/internal/services/HealthServiceModule.scala)**
+**4. [HealthServiceModule]($github.base_url$/csw-alarm/csw-alarm-client/src/main/scala/csw/alarm/client/internal/services/HealthServiceModule.scala)**
 
 `HealthServiceModule` allows reading and subscribing to alarm and subsystem healths.
 
@@ -292,7 +292,7 @@ These modules are interdependent on each other and use [self-type](https://docs.
 
 ![class-diagram](class-diagram.png)
 
-`AlarmAdminService` is consumed from @github[alarm cli](/csw-alarm/csw-alarm-cli) and Alarm Server. This API is also used by administrative
+`AlarmAdminService` is consumed from [alarm cli]($github.base_url$/csw-alarm/csw-alarm-cli) and Alarm Server. This API is also used by administrative
 clients such as the future Alarm Server.
 
 The API doc for Alarm Service can be found @scaladoc[here](csw/alarm/api/scaladsl/AlarmService) and @scaladoc[here](csw/alarm/api/scaladsl/AlarmAdminService).
@@ -324,10 +324,10 @@ The master and slave Redis instances are dedicated for alarm, however Sentinel i
 
 Once location is registered, components, alarm CLI & Alarm Server can resolve Redis location and start 
 interacting with it using the component alarm API & alarm admin API. While the interaction of components with Alarm Service is limited to the `setSeverity` API,
-Alarm CLI can perform all admin operations as discussed [above](#api-structure).
+Alarm CLI can perform all admin operations as discussed @ref:[above](#api-and-implementation-structure).
 
 Alarm Server is part of ESW.HCMS and is not yet built. When built, its functionality will be to watch 
-all severity changes using the admin API and [latch](#severity-latching) appropriate alarms to disconnected severity. 
+all severity changes using the admin API and @ref:[latch](#severity-latching) appropriate alarms to disconnected severity. 
 Apart from this, it will also be responsible for logging alarms and generating alarm events for 
 archiving in DMS.ENG. It provides an HTTP interface for various UI layer ESW.HCMS applications for 
 alarm and health visualisations.

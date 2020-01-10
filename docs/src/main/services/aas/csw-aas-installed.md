@@ -202,4 +202,4 @@ perform that action. In our example, this would occur if the user does not have 
 
 ## Source code for above examples
 
-@github[Example](/examples/src/main/scala/example/auth/installed)
+[Example]($github.base_url$/examples/src/main/scala/example/auth/installed)

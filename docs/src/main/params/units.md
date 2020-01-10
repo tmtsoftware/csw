@@ -105,5 +105,5 @@ Java
 
 ## Source Code for Examples
 
-* @github[Scala Example](/examples/src/test/scala/example/params/KeysAndParametersTest.scala)
-* @github[Java Example](/examples/src/test/java/example/params/JKeysAndParametersTest.java)
+* [Scala Example]($github.base_url$/examples/src/test/scala/example/params/KeysAndParametersTest.scala)
+* [Java Example]($github.base_url$/examples/src/test/java/example/params/JKeysAndParametersTest.java)

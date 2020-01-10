@@ -226,6 +226,6 @@ See @ref:[Database Service Technical Description](../technical/database/database
 
 ## Source code for examples
 
-* @github[Scala Example](/examples/src/main/scala/example/database/AssemblyComponentHandlers.scala)
-* @github[Java Example](/examples/src/main/java/example/database/JAssemblyComponentHandlers.java)
+* [Scala Example]($github.base_url$/examples/src/main/scala/example/database/AssemblyComponentHandlers.scala)
+* [Java Example]($github.base_url$/examples/src/main/java/example/database/JAssemblyComponentHandlers.java)
 

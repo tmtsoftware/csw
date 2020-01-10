@@ -293,5 +293,5 @@ See @ref:[Alarm Service Technical Description](../technical/alarm/alarm.md).
 
 ## Source code for examples
 
-* @github[Scala Example](/examples/src/main/scala/example/alarm/AlarmServiceClientExampleApp.scala)
-* @github[Java Example](/examples/src/main/java/example/alarm/JAlarmServiceClientExampleApp.java)
+* [Scala Example]($github.base_url$/examples/src/main/scala/example/alarm/AlarmServiceClientExampleApp.scala)
+* [Java Example]($github.base_url$/examples/src/main/java/example/alarm/JAlarmServiceClientExampleApp.java)

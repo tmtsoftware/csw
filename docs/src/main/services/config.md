@@ -226,9 +226,9 @@ The following Config Server routes are `Admin Protected`. To use these routes, t
 * resetActiveVersion
 
 `csw-config-client` provides factory to create admin config service which allows access to these protected routes.
-This requires you to implement @github[TokenFactory](/csw-config/csw-config-api/src/main/scala/csw/config/api/TokenFactory.scala) 
+This requires you to implement [TokenFactory]($github.base_url$/csw-config/csw-config-api/src/main/scala/csw/config/api/TokenFactory.scala) 
 interface. Currently `csw-config-cli` is the only user of config service admin api. 
-Refere to @github[CliTokenFactory](/csw-config/csw-config-cli/src/main/scala/csw/config/cli/CliTokenFactory.scala) which implements `TokenFactory` interface.
+Refere to [CliTokenFactory]($github.base_url$/csw-config/csw-config-cli/src/main/scala/csw/config/cli/CliTokenFactory.scala) which implements `TokenFactory` interface.
 
 @@@ note
 
@@ -241,5 +241,5 @@ See @ref:[Configuration Service Technical Description](../technical/configuratio
 
 ## Source code for examples
 
-* @github[Scala Example](/examples/src/test/scala/example/config/ConfigClientExampleTest.scala)
-* @github[Java Example](/examples/src/test/java/example/config/JConfigClientExampleTest.java)
+* [Scala Example]($github.base_url$/examples/src/test/scala/example/config/ConfigClientExampleTest.scala)
+* [Java Example]($github.base_url$/examples/src/test/java/example/config/JConfigClientExampleTest.java)

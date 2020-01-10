@@ -166,7 +166,7 @@ All the requests to location server can result in `400 Bad Request` or `500 Inte
 
 ## Source code for examples
 
-* @github[location.http](/tools/http/location.http)
+* [location.http]($github.base_url$/tools/http/location.http)
 
 @@@ note
 

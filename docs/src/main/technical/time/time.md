@@ -18,8 +18,8 @@ limitations of Scala and Java libraries which support only microsecond
 precision till date. These native calls are provided as wrapper over
 Java and Scala APIs for easy use by component developers familiar with
 Java/Scala. The TMT time service is responsible for primarily providing
-time in [Coordinated Universal Time (UTC)](#summary-of-relevant-time-metrics) and [International Atomic
-Time (TAI)](#summary-of-relevant-time-metrics) time scales. The handling of [leap second](#summary-of-relevant-time-metrics) event is taken care
+time in @ref:[Coordinated Universal Time (UTC)](#summary-of-relevant-time-metrics) and @ref:[International Atomic
+Time (TAI)](#summary-of-relevant-time-metrics) time scales. The handling of @ref:[leap second](#summary-of-relevant-time-metrics) event is taken care
 by the TMT time service automatically(without human intervention) as the PTP grandmaster distributes the accurate information 
 when received through GPS.
 
@@ -151,7 +151,7 @@ A reference time is transmitted through the Ethernet LAN from a
 master/grandmaster clock. To achieve sub-microsecond accuracy and
 precision, the Network Interface Card (NIC) of the component must have
 the capability to perform hardware timestamping, and an internal PTP
-Hardware Clock(PHC). Here's a [list](https://tmt-project.atlassian.net/wiki/spaces/DEOPSCSW/pages/452296820/PTP+Driver+Matrix+Support) 
+Hardware Clock(PHC). Here's a [list](https://id.atlassian.com/login?continue=https%3A%2F%2Ftmt-project.atlassian.net%2Flogin%3FredirectCount%3D1%26dest-url%3D%252Fwiki%252Fspaces%252FDEOPSCSW%252Fpages%252F452296820%252FPTP%252BDriver%252BMatrix%252BSupport%26application%3Dconfluence&application=confluence) 
 which mentions of such capable NICs while there are various new
 additions in the market. Most of the current NICs are able to handle PTP
 protocol by default. Run the following command to find the details of a
@@ -187,7 +187,7 @@ Run the following commands to update iptables.
  
 The recommendation is to utilise the PTP Hardware
 Timestamping(available at the PHY layer in a network stack) mechanism for TMT to
-meet the nanosecond requirement. [Various tests](https://tmt-project.atlassian.net/wiki/spaces/DEOPSCSW/pages/279543820/PTP+Hardware+TimeStamping) are performed and
+meet the nanosecond requirement. [Various tests](https://id.atlassian.com/login?continue=https%3A%2F%2Ftmt-project.atlassian.net%2Flogin%3FredirectCount%3D1%26dest-url%3D%252Fwiki%252Fspaces%252FDEOPSCSW%252Fpages%252F279543820%252FPTP%252BHardware%252BTimeStamping%26application%3Dconfluence&application=confluence) are performed and
 documented to support the sub-microsecond capability of IEEE 1588
 standard using H/W timestamping. In contrast, the PTP software
 timestamping makes use of the application layer timestamp having a
@@ -221,8 +221,8 @@ Scala
 
 @@@ note
 
-Based on the [comparison between JNA and
-JNI](https://tmt-project.atlassian.net/wiki/spaces/DEOPSCSW/pages/305102849/Comparative+study+of+JNI+vs+JNA)
+Based on the [comparison between JNA and JNI](https://id.atlassian.com/login?continue=https%3A%2F%2Ftmt-project.atlassian.net%2Flogin%3FredirectCount%3D1%26dest-url%3D%252Fwiki%252Fspaces%252FDEOPSCSW%252Fpages%252F305102849%252FComparative%252Bstudy%252Bof%252BJNI%252Bvs%252BJNA%26application%3Dconfluence&application=confluence)
+     
 and stakeholder agreement, JNA was fixed to make the low level kernel
 calls.
 
@@ -236,7 +236,7 @@ frequency or 1 task every millisecond. However, jitters and JVM garbage
 collection can degrade the performance of the schedulers at such a high
 frequency. Internally, the scheduler APIs makes use of ‘[Akka Scheduler
 Library](https://doc.akka.io/docs/akka/current/scheduler.html)’. The
-results published in [here](https://tmt-project.atlassian.net/wiki/spaces/DEOPSCSW/pages/298680332/Comparative+study+of+scheduler+options+for+1KHz+1ms+scheduling+rate)
+results published in [here](https://id.atlassian.com/login?continue=https%3A%2F%2Ftmt-project.atlassian.net%2Flogin%3FredirectCount%3D1%26dest-url%3D%252Fwiki%252Fspaces%252FDEOPSCSW%252Fpages%252F298680332%252FComparative%252Bstudy%252Bof%252Bscheduler%252Boptions%252Bfor%252B1KHz%252B1ms%252Bscheduling%252Brate%26application%3Dconfluence&application=confluence)
 compares some of the options and makes strong recommendation to use the
 Akka Schedulers. The snippets in the API documentation defines the schedule APIs in the
 CSW library.
@@ -249,4 +249,4 @@ scheduler APIs provide capability to schedule tasks on the absolute TAI
 time synchronized using the IEEE 1588 standard. This approach eliminates
 anomaly of a leap second event and provide robustness in the scheduling
 mechanism. Depending on developer’s choice, scheduled tasks are queued
-in either UTC or TAI time encapsulated inside @scaladoc[TMTTime](csw/time/core/models/TMTTime.scala).
+in either UTC or TAI time encapsulated inside @scaladoc[TMTTime](csw/time/core/models/TMTTime).

@@ -14,7 +14,7 @@ Cbor was finalized as it offers better performance and has much lesser overhead 
 ## Cbor
 
 We use scala [Borer](https://github.com/sirthias/borer) library for cbor. 
-@scaladoc[CborSupport](csw/params/core/formats/CborSupport$) object in `csw-params` contains 
+@scaladoc[CborSupport](csw/params/core/formats/ParamCodecs$) object in `csw-params` contains 
 codecs (encoders and decoders) for all the models defined in this project that need to be serialized.
 
 `CborSupport` needs to be imported wherever you need to encode/decode a model. This makes 
@@ -83,5 +83,4 @@ and it will validate and tell you if the object adheres to the given schema.
 
 `cddl csw-params/shared/src/test/cbor/schema/event_command.cddl validate csw-params/shared/src/test/cbor/data/event.cbor`
 
-Cddl schema for events and commands has been defined
-@github[here](../../../../../csw-params/shared/src/test/cbor/schema/event_command.cddl.txt).
+Cddl schema for events and commands has been defined [here]($github.base_url$/csw-params/shared/src/test/cbor/schema/event_command.cddl.txt).

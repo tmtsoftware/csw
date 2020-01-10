@@ -61,8 +61,8 @@ Java
 
 Full source at GitHub
 
-* @github[Scala](/examples/src/test/scala/example/teskit/TestKitsExampleTest.scala)
-* @github[Java](/examples/src/test/java/example/testkit/JTestKitsExampleTest.java)
+* [Scala]($github.base_url$/examples/src/test/scala/example/teskit/TestKitsExampleTest.scala)
+* [Java]($github.base_url$/examples/src/test/java/example/testkit/JTestKitsExampleTest.java)
 
 ## Test framework integration
 
@@ -104,7 +104,7 @@ a specific piece of functionality and ensuring it is working correctly.
 It is always a good idea to write more unit test cases and relatively fewer component and integration tests.
 If you want to get an idea of how many tests you should have in different types of testing phases (Unit/Component/Integration), refer to this [blog](https://martinfowler.com/articles/practical-test-pyramid.html)
 
-Unit testing simple Scala/Java classes or objects is straightforward. You can mock external dependencies using Mockito. Refer to the [Mockito](#mockito) section for more details. 
+Unit testing simple Scala/Java classes or objects is straightforward. You can mock external dependencies using Mockito. Refer to the @ref:[Mockito](#mockito) section for more details. 
 
 The following links provide guides for testing applications using different modules of Akka:
 
@@ -120,7 +120,7 @@ This is especially useful for integration testing where multiple systems communi
 
 You can find more details on multi-JVM tests [here](https://doc.akka.io/docs/akka/current/multi-jvm-testing.html).
 
-You can also refer to some examples in [CSW](https://github.com/tmtsoftware/csw) for writing your own multi-JVM tests. For example: @github[CommandServiceTest.scala](/csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala)  
+You can also refer to some examples in [CSW](https://github.com/tmtsoftware/csw) for writing your own multi-JVM tests. For example: [CommandServiceTest.scala]($github.base_url$/csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala)  
 
 In case you want to run your multi-JVM tests across machines, refer to this multi-node testing guide [here](https://doc.akka.io/docs/akka/current/multi-node-testing.html). 
 
@@ -130,7 +130,7 @@ Mocks are used so that unit tests can be written independent of dependencies.
 [CSW](https://github.com/tmtsoftware/csw) uses [Mockito](http://site.mockito.org/) for writing unit tests.
 ScalaTest comes with the [MockitoSugar](http://www.scalatest.org/user_guide/testing_with_mock_objects#mockito) trait which provides some basic syntax sugar for Mockito.
 
-For example: @github[ContainerBehaviorTest.scala](/csw-framework/src/test/scala/csw/framework/internal/container/ContainerBehaviorTest.scala)
+For example: [ContainerBehaviorTest.scala]($github.base_url$/csw-framework/src/test/scala/csw/framework/internal/container/ContainerBehaviorTest.scala)
 
 ## Acceptance Tests
 

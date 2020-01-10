@@ -152,18 +152,16 @@ This example shows an immediate response command using `submit` that returns `St
 Scala/submit w/immediate-response
 :   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #submit }
 
-#Fixme for Kim: This snip is broken. Fix #submit and then make it `@@snip`.
 Java/submit w/immediate-response
-:   snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #submit }
+:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #submitAndQueryFinal }
 
 Note that the Scala examples are using `async/await` which simplifies handling the Futures, but is not necessary.
 The `async/await` library is not available in Java.
 If using `submit` and the validation fails in the destination component, 
 the `Invalid` response is returned.
 
-#Fixme for Kim: This snip is broken. Fix #submit and then make it `@@snip`.
 Scala/submit w/invalid response
-:   snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #invalidSubmitCmd }
+:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #invalidCmd }
 
 Java/submit w/invalid response
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #invalidSubmitCmd }
@@ -312,7 +310,7 @@ the @ref:[CurrentState](../params/states.md) of a component by providing a callb
 is called with the arrival of every `CurrentState` item.
 
 @@@ note
-Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor. Here is an @github[example](/examples/src/main/scala/example/event/ConcurrencyInCallbacksExample.scala) of how it can be done.
+Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor. Here is an [example]($github.base_url$/examples/src/main/scala/example/event/ConcurrencyInCallbacksExample.scala) of how it can be done.
 @@@
 
 

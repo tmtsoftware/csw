@@ -106,4 +106,4 @@ The host config application internally executes the `container-cmd` application,
 
 Using systemd, you can configure a host configuration application to spawn containers on a machine to be run automatically on system startup.
 
-For detailed information on systemd configuration, please refer to @github[readme.md](/tools/systemd/readme.md) 
+For detailed information on systemd configuration, please refer to [readme.md]($github.base_url$/tools/systemd/readme.md) 

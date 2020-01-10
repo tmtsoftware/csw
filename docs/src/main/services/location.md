@@ -256,7 +256,7 @@ The API expects following parameters:
   * A callback that implements `Consumer` and receives the TrackEvent as a parameter.  
 
 @@@ note
-Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor. Here is an @github[example](/examples/src/main/scala/example/event/ConcurrencyInCallbacksExample.scala) of how it can be done.
+Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor. Here is an [example]($github.base_url$/examples/src/main/scala/example/event/ConcurrencyInCallbacksExample.scala) of how it can be done.
 @@@
 
 This API returns a KillSwitch that can be used to turn off the event notifications and release the supplied callback, if required.
@@ -311,5 +311,5 @@ See @ref:[Location Service Technical Description](../technical/location/location
 
 ## Source code for examples
 
-* @github[Scala Example](/examples/src/main/scala/example/location/LocationServiceExampleClientApp.scala)
-* @github[JavaBlocking Example](/examples/src/main/java/example/location/JLocationServiceExampleClient.java)
+* [Scala Example]($github.base_url$/examples/src/main/scala/example/location/LocationServiceExampleClientApp.scala)
+* [JavaBlocking Example]($github.base_url$/examples/src/main/java/example/location/JLocationServiceExampleClient.java)

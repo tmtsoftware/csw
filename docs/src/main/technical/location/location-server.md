@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The @github[csw-location-server](/csw-location/csw-location-server) project contains the main implementation of the Location Service.
+The [csw-location-server]($github.base_url$/csw-location/csw-location-server) project contains the main implementation of the Location Service.
 Think of it as a agent which is running on every machine.
 Normally one instance of the _Location Server_ will run on each host that is running CSW services (although clients can be configured to use a remote host).
 
@@ -129,9 +129,9 @@ At any point in time, `Assembly` can choose to cancel tracking. On cancellation,
 
 ## Internals
 
-The @github[Main](/csw-location/csw-location-server/src/main/scala/csw/location/server/Main.scala) class delegates the job of creating the cluster actor and HTTP server instance to the @github[ServerWiring](/csw-location/csw-location-server/src/main/scala/csw/location/server/internal/ServerWiring.scala) class.
+The [Main]($github.base_url$/csw-location/csw-location-server/src/main/scala/csw/location/server/Main.scala) class delegates the job of creating the cluster actor and HTTP server instance to the [ServerWiring]($github.base_url$/csw-location/csw-location-server/src/main/scala/csw/location/server/internal/ServerWiring.scala) class.
 
-The default TCP ports for the actor and HTTP servers are specified in @github[application.conf](/csw-location/csw-location-server/src/main/resources/application.conf).
+The default TCP ports for the actor and HTTP servers are specified in [application.conf]($github.base_url$/csw-location/csw-location-server/src/main/resources/application.conf).
 
 @@@ note
 Due to the way random port numbers are used for CSW components, firewalls should be disabled for these systems,
@@ -139,11 +139,11 @@ which are assumed to be in an internal network that is protected from outside ac
 @@@
 
 In order to determine the correct IP address to use for the local host, it is necessary to set the _INTERFACE_NAME_ environment variable or property to the name of the network interface to use (There could be multiple NICs).
-The @github[ClusterSettings](/csw-location/csw-location-server/src/main/scala/csw/location/server/commons/ClusterSettings.scala) class uses that information, along with other settings when starting the cluster actor.
+The [ClusterSettings]($github.base_url$/csw-location/csw-location-server/src/main/scala/csw/location/server/commons/ClusterSettings.scala) class uses that information, along with other settings when starting the cluster actor.
 It also needs to know the _cluster seeds_, a comma separated list of _host:port_ values for at least one other actor in the cluster.
 This information is needed in order to join the Location Service cluster.
 
-The Location Service HTTP server is implemented by the @github[LocationRoutes](/csw-location/csw-location-server/src/main/scala/csw/location/server/http/LocationRoutes.scala) class, which defines the HTTP routes and talks to the cluster actor on the client's behalf.
+The Location Service HTTP server is implemented by the [LocationRoutes]($github.base_url$/csw-location/csw-location-server/src/main/scala/csw/location/server/http/LocationRoutes.scala) class, which defines the HTTP routes and talks to the cluster actor on the client's behalf.
 
 ## Java API
 
