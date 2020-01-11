@@ -2,7 +2,6 @@ package csw.params.core.formats
 
 import java.lang.{Byte => JByte}
 
-import csw.params.commands.CommandResponse._
 import csw.params.commands._
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.Coords._
@@ -13,8 +12,8 @@ import csw.prefix.codecs.CommonCodecs
 import csw.time.core.models.{TAITime, UTCTime}
 import io.bullet.borer._
 import io.bullet.borer.derivation.CompactMapBasedCodecs.deriveCodec
-import io.bullet.borer.derivation.MapBasedCodecs.deriveAllCodecs
 import io.bullet.borer.derivation.MapBasedCodecs
+import io.bullet.borer.derivation.MapBasedCodecs.deriveAllCodecs
 
 import scala.collection.mutable.{ArraySeq => ArrayS}
 import scala.reflect.ClassTag
@@ -30,6 +29,7 @@ object ParamCodecs extends ParamCodecs
  */
 trait ParamCodecs extends ParamCodecsBase {
   implicit lazy val controlCommandCodecValue: Codec[ControlCommand] = deriveAllCodecs
+  implicit def commandResponseCodec[T <: CommandResponse]: Codec[T] = commandResponseCodecValue.asInstanceOf[Codec[T]]
 }
 
 trait ParamCodecsBase extends CommonCodecs {
@@ -111,12 +111,8 @@ trait ParamCodecsBase extends CommonCodecs {
   implicit lazy val sequenceCodec: Codec[Sequence]                    = deriveCodec
 
   // ************************ CommandResponse Codecs ********************
-  implicit lazy val resultCodec: Codec[Result]                                        = deriveCodec
-  implicit lazy val validateCommandResponseCodecValue: Codec[ValidateCommandResponse] = deriveAllCodecs
-  implicit lazy val validateResponseCodecValue: Codec[ValidateResponse]               = deriveAllCodecs
-  implicit lazy val submitResponseCodecValue: Codec[SubmitResponse]                   = deriveAllCodecs
-  implicit lazy val onewayResponseCodecValue: Codec[OnewayResponse]                   = deriveAllCodecs
-  implicit lazy val matchingResponseCodecValue: Codec[MatchingResponse]               = deriveAllCodecs
+  implicit lazy val resultCodec: Codec[Result]               = deriveCodec
+  lazy val commandResponseCodecValue: Codec[CommandResponse] = deriveAllCodecs
 
   // ************************ CommandIssue Codecs ********************
   implicit lazy val commandIssueCodecValue: Codec[CommandIssue] = deriveAllCodecs

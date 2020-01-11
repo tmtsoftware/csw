@@ -4,11 +4,7 @@ import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.serialization.{Serialization, SerializationExtension}
 import csw.command.client.messages.CommandSerializationMarker.RemoteMsg
-import csw.command.client.messages.sequencer.SequencerMsg.{
-  SubmitSequence,
-  Query => SequencerQuery,
-  QueryFinal => SequencerQueryFinal
-}
+import csw.command.client.messages.sequencer.CswSequencerMessage
 import csw.command.client.models.framework.PubSub.{Publish, PublisherMessage, SubscriberMessage}
 import csw.command.client.models.framework._
 import csw.location.models.codecs.LocationCodecs
@@ -58,7 +54,5 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
 
   // ************************ SequencerMsg Codecs ********************
 
-  implicit lazy val submitSequenceCodec: Codec[SubmitSequence]           = deriveCodec
-  implicit lazy val sequencerQueryFinalCodec: Codec[SequencerQueryFinal] = deriveCodec
-  implicit lazy val sequencerQueryCodec: Codec[SequencerQuery]           = deriveCodec
+  implicit lazy val cswSequencerMessageCodec: Codec[CswSequencerMessage] = deriveAllCodecs
 }

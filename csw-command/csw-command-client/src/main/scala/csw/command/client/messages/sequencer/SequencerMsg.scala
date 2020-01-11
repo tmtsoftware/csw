@@ -8,13 +8,10 @@ import csw.serializable.CommandSerializable
 
 trait SequencerMsg
 
+sealed trait CswSequencerMessage extends SequencerMsg with CommandSerializable
+
 object SequencerMsg {
-
-  final case class SubmitSequence(sequence: Sequence, replyTo: ActorRef[SubmitResponse])
-      extends SequencerMsg
-      with CommandSerializable
-
-  final case class Query(runId: Id, replyTo: ActorRef[SubmitResponse]) extends SequencerMsg with CommandSerializable
-
-  final case class QueryFinal(runId: Id, replyTo: ActorRef[SubmitResponse]) extends SequencerMsg with CommandSerializable
+  final case class SubmitSequence(sequence: Sequence, replyTo: ActorRef[SubmitResponse]) extends CswSequencerMessage
+  final case class Query(runId: Id, replyTo: ActorRef[SubmitResponse])                   extends CswSequencerMessage
+  final case class QueryFinal(runId: Id, replyTo: ActorRef[SubmitResponse])              extends CswSequencerMessage
 }
