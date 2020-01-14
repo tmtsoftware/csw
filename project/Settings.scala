@@ -16,12 +16,7 @@ object Settings {
     addCommandAlias(
       "buildAll",
       ";set every enableFatalWarnings := true; scalafmtCheck; scalastyle; clean; makeSite; test:compile; multi-jvm:compile; set every enableFatalWarnings := false;"
-    ) ++
-    addCommandAlias(
-      "openSite",
-      "docs/Paradox/paradoxBrowse"
     )
-
   }
 
   def multiJvmTestTask(multiJvmProjects: Seq[ProjectReference]): Seq[Setting[_]] = {
