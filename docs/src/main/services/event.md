@@ -238,7 +238,7 @@ of each API here:
 
 ## Create Event Service
 If you are not using csw-framework, you can create the @scaladoc[EventService](csw/event/api/scaladsl/EventService) 
-using an @scaladoc[EventServiceFactory](csw/event/EventServiceFactory).
+using an @scaladoc[EventServiceFactory](csw/event/client/EventServiceFactory).
 
 Scala
 : @@snip [EventServiceCreationExamples.scala](../../../../examples/src/main/scala/example/event/EventServiceCreationExamples.scala) { #default-event-service }

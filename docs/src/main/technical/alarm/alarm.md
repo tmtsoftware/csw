@@ -292,7 +292,7 @@ These modules are interdependent on each other and use [self-type](https://docs.
 
 ![class-diagram](class-diagram.png)
 
-`AlarmAdminService` is consumed from [alarm cli]($github.base_url$/csw-alarm/csw-alarm-cli) and Alarm Server. This API is also used by administrative
+`AlarmAdminService` is consumed from [alarm cli]($github.dir.base_url$/csw-alarm/csw-alarm-cli) and Alarm Server. This API is also used by administrative
 clients such as the future Alarm Server.
 
 The API doc for Alarm Service can be found @scaladoc[here](csw/alarm/api/scaladsl/AlarmService) and @scaladoc[here](csw/alarm/api/scaladsl/AlarmAdminService).

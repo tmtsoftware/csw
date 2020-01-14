@@ -140,7 +140,7 @@ For component developers, the scheduler API is provided as a @scaladoc[TimeServi
 object in the `CswContext` object injected into the ComponentHandlers class provided by the framework.  
 
 If you are not using csw-framework, you can create @scaladoc[TimeServiceScheduler](csw/time/scheduler/api/TimeServiceScheduler)
-using @scaladoc[TimeServiceSchedulerFactory](csw/time/scheduler/TimeServiceSchedulerFactory$) as follows:
+using @scaladoc[TimeServiceSchedulerFactory](csw/time/scheduler/TimeServiceSchedulerFactory) as follows:
 
 Scala
 :   @@snip [TimeSchedulerExamples.scala](../../../../examples/src/main/scala/example/time/SchedulerExamples.scala) { #create-scheduler }

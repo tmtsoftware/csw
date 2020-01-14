@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The [csw-location-agent]($github.base_url$/csw-location/csw-location-agent) project provides an application used to register and track non-csw services, such as Redis, which is used to implement the Event and Alarm Services.
+The [csw-location-agent]($github.dir.base_url$/csw-location/csw-location-agent) project provides an application used to register and track non-csw services, such as Redis, which is used to implement the Event and Alarm Services.
 
 ## Usage
 

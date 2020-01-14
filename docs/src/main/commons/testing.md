@@ -110,7 +110,7 @@ The following links provide guides for testing applications using different modu
 
 - [Akka Untyped Actors](https://doc.akka.io/docs/akka/current/testing.html)
 - [Akka Typed Actors](https://doc.akka.io/docs/akka/current/typed/testing.html)
-- [Akka Streams](https://doc.akka.io/docs/akka/current/scala/stream/stream-testkit.html)
+- [Akka Streams](https://doc.akka.io/docs/akka/current/stream/stream-testkit.html?language=scala)
 
 ## Multi-JVM Tests
 
@@ -127,28 +127,10 @@ In case you want to run your multi-JVM tests across machines, refer to this mult
 ## Mockito
 
 Mocks are used so that unit tests can be written independent of dependencies.  
-[CSW](https://github.com/tmtsoftware/csw) uses [Mockito](http://site.mockito.org/) for writing unit tests.
+[CSW](https://github.com/tmtsoftware/csw) uses [Mockito](https://site.mockito.org/) for writing unit tests.
 ScalaTest comes with the [MockitoSugar](http://www.scalatest.org/user_guide/testing_with_mock_objects#mockito) trait which provides some basic syntax sugar for Mockito.
 
 For example: [ContainerBehaviorTest.scala]($github.base_url$/csw-framework/src/test/scala/csw/framework/internal/container/ContainerBehaviorTest.scala)
-
-## Acceptance Tests
-
-This section explains how and where CSW maintains and executes acceptance tests. 
-If you are a component writer and want to maintain acceptance tests, you can create a repo similar to [csw-acceptance](https://github.com/tmtsoftware/csw-acceptance) and update dependencies, projects as per your need. 
-
-As required by TMT Systems Engineering, the acceptance pipeline runs all the existing Java and Scala tests from the [CSW](https://github.com/tmtsoftware/csw) repo on published binaries rather than directly on source code.
-
-More information can be found [here](https://github.com/tmtsoftware/csw-acceptance/blob/master/README.md).
-
-Below are the two separate Jenkins pipelines to run `csw` acceptance tests:
-
-1. [Acceptance Dev Pipeline](http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/acceptance-dev-nightly-build/)
-    - Automatically triggered every night to get fast feedback and intended for developer visibility.
-    
-2. [Acceptance Release Pipeline](http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/acceptance-release/)
-    - Automatically triggered on completion of the [csw-prod](http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/csw-prod/) pipeline.
-    - `csw-prod-release` pipeline publishes CSW artifacts to bintray, and must be manually triggered by an administrator.
 
 @@@ note { title=Note }
 
@@ -158,22 +140,8 @@ The [csw-prod](http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/j
 - publish binaries to bintray
 - publish paradox documentation
 - publish apps and release notes to Github releases
-- trigger the [acceptance-release](http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/acceptance-release/) pipeline 
 
 @@@
-
-Acceptance pipelines can also be triggered manually via an HTTP endpoint, for STIL acceptance tesing, for example. 
-Using the security token obtained from the Jenkins pipeline settings (available upon request), run the `curl` cmd as shown below:
-
-- For triggering the [acceptance-dev](http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/acceptance-dev-nightly-build/) pipeline, run:
-
-```
-curl -G 'http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/acceptance-dev/buildWithParameters'  \
-    --data-urlencode token=$DEV_TOKEN \
-    --data-urlencode CSW_VERSION=0.1.0-SNAPSHOT
-```
-
-- For triggering an `acceptance-release` pipeline, run: (Modify parameters as applicable)
 
 ```
 curl -G '$REMOTE_JENKINS_URL/job/$JOB_NAME/buildWithParameters' \

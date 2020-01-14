@@ -21,7 +21,7 @@
 
 Common Software is the package of services and infrastructure software that integrates the TMT software systems.
 
-Visit [TMT website](http://www.tmt.org) to know more about Thirty Meter Telescope.
+Visit [TMT website](https://www.tmt.org) to know more about Thirty Meter Telescope.
 
 ## Common Software Architecture
 

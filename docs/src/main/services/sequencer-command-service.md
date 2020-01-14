@@ -1,7 +1,7 @@
 # Sequencer Command Service
 
 The @scaladoc[SequencerCommandService](csw/command/api/scaladsl/SequencerCommandService) provides the ability to send a @scaladoc[Sequence](csw/params/commands/Sequence) of commands to a running `Sequencer`. 
-A future value of @scaladoc[SubmitResponse](csw/params/commands/CommandResponse/SubmitResponse) is returned on execution of the provided Sequence.
+A future value of @scaladoc[SubmitResponse](csw/params/commands/CommandResponse$$SubmitResponse) is returned on execution of the provided Sequence.
 
 ## Dependencies
 

@@ -33,8 +33,7 @@ network (or at multiple locations) and the necessary configuration, environment 
 properties should be defined to point to the correct host and port number(s).
 
 `LocationServiceFactory` provides a make method to create an instance of the LocationService API. 
-This call will look for configuration or environment variable settings as described 
-here: @scaladoc[ClusterSettings](csw/location/commons/ClusterSettings).
+This call will look for configuration or environment variable settings.
 
 Scala
 :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/example/location/LocationServiceExampleClientApp.scala) { #create-location-service }

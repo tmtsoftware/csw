@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The [csw-location-server]($github.base_url$/csw-location/csw-location-server) project contains the main implementation of the Location Service.
+The [csw-location-server](https://github.com/tmtsoftware/csw/tree/master/csw-location/csw-location-server) project contains the main implementation of the Location Service.
 Think of it as a agent which is running on every machine.
 Normally one instance of the _Location Server_ will run on each host that is running CSW services (although clients can be configured to use a remote host).
 
@@ -12,7 +12,7 @@ Main building blocks of location service are captured below, we will go through 
 
 - [Akka Cluster](https://doc.akka.io/docs/akka/current/index-cluster.html)
 - [Conflict Free Replicated Data Types (CRDTs)](https://doc.akka.io/docs/akka/current/typed/distributed-data.html): Shares location information within the network.
-- [Akka HTTP](https://doc.akka.io/docs/akka-http/current)
+- [Akka HTTP](https://doc.akka.io/docs/akka-http/current/)
 - DeathWatch Actor
 
 ![Location Service](../../images/locationservice/location-service.png)
@@ -36,7 +36,8 @@ By default, this actor system binds to port `3552`. Initially when there is no m
 Such a node is referred as seed node (introducer) and the location of this node needs to be known so that other nodes can join to this known address and form a larger cluster.
 After the joining process is complete, seed nodes are not special and they participate in the cluster in exactly the same way as other nodes.
 
-Akka Cluster provides cluster [membership](https://doc.akka.io/docs/akka/current/common/cluster.html#membership) service using [gossip](https://doc.akka.io/docs/akka/current/common/cluster.html#gossip) protocols and an automatic [failure detector](https://doc.akka.io/docs/akka/current/common/cluster.html#failure-detector).
+Akka Cluster provides cluster [membership](https://doc.akka.io/docs/akka/current/typed/cluster-membership.html) service using [gossip](https://doc.akka.io/docs/akka/current/typed/cluster-concepts.html#gossip)
+protocols and an automatic [failure detector](https://doc.akka.io/docs/akka/current/typed/cluster-concepts.html#failure-detector).
 
 Death watch uses the cluster failure detector for nodes in the cluster, i.e. it detects network failures and JVM crashes, in addition to graceful termination of watched actor.
 Death watch generates the `Terminated` message to the watching actor when the unreachable cluster node has been downed and removed. Hence we have kept `auto-down-unreachable-after = 10s` so that in case of failure, interested parties get the death watch notification for the location in around 10s.
@@ -47,11 +48,11 @@ We use Akka Distributed Data to share CSW component locations between nodes in a
 We store the following data in this key-value store (distributed data):
 
 - `AllServices`:
-  This uses [LWWMap](https://doc.akka.io/docs/akka/current/distributed-data.html?language=scala#maps) CRDT from `Connection` to `Location`. `Connection` and `Location` can be one of `Akka`, `Tcp` or `HTTP` type.
+  This uses [LWWMap](https://doc.akka.io/docs/akka/current/distributed-data.html?language=scala) CRDT from `Connection` to `Location`. `Connection` and `Location` can be one of `Akka`, `Tcp` or `HTTP` type.
   At any point in time, the value of this map represents all the locations registered with `Location Service` in a TMT environment.
 
 - `Service`:
-  This uses [LWWRegister](https://doc.akka.io/docs/akka/current/distributed-data.html?language=scala#flags-and-registers) which holds location of CSW component against unique connection name.
+  This uses [LWWRegister](https://doc.akka.io/docs/akka/current/distributed-data.html?language=scala) which holds location of CSW component against unique connection name.
 
 #### Consistency Guarantees
 
@@ -93,7 +94,7 @@ Let us go through each action step by step as shown in diagram:
 
     1. On receiving track request, location server internally subscribes to the `replicator` using `Service` key as explained in previous section and generates stream of `TrackingEvent`
 
-    1. Server then maps this stream of `TrackingEvent` to [SSE (ServerSentEvent)](https://doc.akka.io/docs/akka-http/current/sse-support.html)
+    1. Server then maps this stream of `TrackingEvent` to [Websocket] ($github.base_url$/csw-location/csw-location-server/src/main/scala/csw/location/server/http/LocationWebsocketHandler.scala)
 
     1. Server also keeps sending `ServerSentEvent.heartbeat` every `2 seconds` to keep connection alive
 
@@ -143,7 +144,8 @@ The [ClusterSettings]($github.base_url$/csw-location/csw-location-server/src/mai
 It also needs to know the _cluster seeds_, a comma separated list of _host:port_ values for at least one other actor in the cluster.
 This information is needed in order to join the Location Service cluster.
 
-The Location Service HTTP server is implemented by the [LocationRoutes]($github.base_url$/csw-location/csw-location-server/src/main/scala/csw/location/server/http/LocationRoutes.scala) class, which defines the HTTP routes and talks to the cluster actor on the client's behalf.
+The Location Service HTTP server is implemented by the [LocationHttpHandler]($github.base_url$/csw-location/csw-location-server/src/main/scala/csw/location/server/http/LocationHttpHandler.scala) class, 
+[LocationWebsocketHandler]($github.base_url$/csw-location/csw-location-server/src/main/scala/csw/location/server/http/LocationWebsocketHandler.scala) and talks to the cluster actor on the client's behalf.
 
 ## Java API
 

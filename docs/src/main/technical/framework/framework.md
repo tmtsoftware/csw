@@ -35,7 +35,7 @@ During component creation the CSW framework creates a [Supervisor]($github.base_
 first thing when creating any component. Each component has its own Supervisor. That Supervisor then goes on to create the 
 [Top Level Actor]($github.base_url$/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala) using the component's unique `Handlers`,
 [Pub-Sub Manager]($github.base_url$/csw-framework/src/main/scala/csw/framework/internal/pubsub/PubSubBehavior.scala) actor and 
-[Command Response Manager]($github.base_url$/csw-command/csw-command-client/src/main/scala/csw/command/client/CommandResponseManagerActor.scala) actor as part of
+[Command Response Manager]($github.base_url$/csw-command/csw-command-client/src/main/scala/csw/command/client/CommandResponseManager.scala) actor as part of
 the TMT framework supporting a component.
 
 ![anatomy](media/anatomy.gif)
@@ -49,7 +49,7 @@ specific handler method or `hooks` and implementation of `ComponentHandlers/JCom
 decides when to call [intialize]($github.base_url$/examples/src/main/scala/org/tmt/nfiraos/sampleassembly/SampleAssemblyHandlers.scala#L128) handler and handler
 provides implementation of how to initialize a component, may be by putting the hardware in default position, etc.
 - From the framework's viewpoint, the TLA is created with an instance of 
-[ComponentBehavior]($github.base_url$/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior) and the `Handlers` created by the developer.
+[ComponentBehavior]($github.base_url$/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala) and the `Handlers` created by the developer.
 The ComponentBehavior actor has the framework behavior such as lifecycle.  It manages incoming messages and calls the `Handlers` when appropriate.   
 
 @@@

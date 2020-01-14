@@ -14,7 +14,7 @@ Most of CSW is written using asynchronous programming.  Therefore, in the exampl
 and other asynchronous code in various ways.  The following constructs are commonly used throughout this manual:
 
  * **Scala:** The Scala async package is used extensively.  `async` marks a block of asynchronous code and allows 
-     to `await` the computation until the Future is complete. For more info, please refer to: https://github.com/scala/async.
+     to `await` the computation until the Future is complete. For more info, please refer to: https://github.com/scala/scala-async.
      
      Sometimes, an example may use the `Await.result` construct.  While this is often used in tests, it is a blocking call
      and typically should not be used in production code.

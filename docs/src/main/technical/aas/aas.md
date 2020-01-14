@@ -19,4 +19,4 @@ For more information on internals of these adapters, refer to following sections
 
 - @ref:[Akka HTTP Adapter - csw-aas-http](./csw-aas-http.md) 
 - @ref:[Installed Auth Adapter - csw-aas-installed](./csw-aas-installed.md) 
-- @extref[Javascript Adapter - csw-aas-js](csw_js:technical/csw-aas-js) 
+- @extref[Javascript Adapter - csw-aas-js](csw_js:aas/csw-aas-js) 
