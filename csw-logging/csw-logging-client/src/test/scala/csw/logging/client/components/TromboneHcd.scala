@@ -51,6 +51,6 @@ object TromboneHcd {
   val ERROR_LINE_NO = TRACE_LINE_NO + 4
   val FATAL_LINE_NO = TRACE_LINE_NO + 5
 
-  val COMPONENT_NAME = "trombonehcd"
+  val COMPONENT_NAME = "tromboneHcd"
   val FILE_NAME      = "TromboneHcd.scala"
 }

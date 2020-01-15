@@ -10,7 +10,7 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 class ConnectionTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
   // DEOPSCSW-14: Codec for data model
   test("should able to form a string representation for akka connection for trombone HCD") {
-    val expectedAkkaConnectionName = "nfiraos.trombonehcd-hcd-akka"
+    val expectedAkkaConnectionName = "nfiraos.tromboneHcd-hcd-akka"
     val akkaConnection             = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneHcd"), ComponentType.HCD))
     akkaConnection.name shouldBe expectedAkkaConnectionName
   }
@@ -31,7 +31,7 @@ class ConnectionTest extends FunSuite with Matchers with BeforeAndAfterAll with 
 
   // DEOPSCSW-14: Codec for data model
   test("should able to form a string representation for akka connection for trombone container") {
-    val expectedAkkaConnectionName = "container.trombonecontainer-container-akka"
+    val expectedAkkaConnectionName = "container.tromboneContainer-container-akka"
     val akkaConnection =
       AkkaConnection(models.ComponentId(Prefix(Subsystem.Container, "tromboneContainer"), ComponentType.Container))
     akkaConnection.name shouldBe expectedAkkaConnectionName
@@ -39,7 +39,7 @@ class ConnectionTest extends FunSuite with Matchers with BeforeAndAfterAll with 
 
   // DEOPSCSW-14: Codec for data model
   test("should able to form a string representation for akka connection for trombone assembly") {
-    val expectedAkkaConnectionName = "nfiraos.tromboneassembly-assembly-akka"
+    val expectedAkkaConnectionName = "nfiraos.tromboneAssembly-assembly-akka"
     val akkaConnection             = AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneAssembly"), ComponentType.Assembly))
     akkaConnection.name shouldBe expectedAkkaConnectionName
   }
