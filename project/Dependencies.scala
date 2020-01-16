@@ -281,9 +281,9 @@ object Dependencies {
       Libs.`mockito-scala`            % Test,
       Libs.`embedded-redis`           % Test,
       Libs.`embedded-kafka`           % Test,
-      Akka.`akka-multi-node-testkit` % Test,
-      Libs.HdrHistogram              % Test,
-      Libs.testng                    % Test
+      Akka.`akka-multi-node-testkit`  % Test,
+      Libs.HdrHistogram               % Test,
+      Libs.testng                     % Test
     )
   )
 
@@ -538,6 +538,14 @@ object Dependencies {
       AkkaHttp.`akka-http`,
       Akka.`akka-actor-testkit-typed`,
       Libs.`scalatest`.value
+    )
+  )
+
+  val ContractServer = Def.setting(
+    Seq(
+      Borer.`borer-core`.value,
+      Libs.`play-json`.value,
+      Libs.`scalatest`.value % Test
     )
   )
 
