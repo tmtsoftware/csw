@@ -16,7 +16,7 @@ addSbtPlugin("io.spray"                          % "sbt-revolver"              %
 addSbtPlugin("com.typesafe.sbt"                  % "sbt-git"                   % "1.0.0")
 addSbtPlugin("org.portable-scala"                % "sbt-scalajs-crossproject"  % "0.6.1")
 addSbtPlugin("org.scala-js"                      % "sbt-scalajs"               % "0.6.31")
-addSbtPlugin("com.github.cb372"                  % "sbt-explicit-dependencies" % "0.2.11")
+addSbtPlugin("com.github.cb372"                  % "sbt-explicit-dependencies" % "0.2.12")
 addSbtPlugin("ohnosequences"                     % "sbt-github-release"        % "0.7.0")
 addSbtPlugin("com.dwijnand"                      % "sbt-project-graph"         % "0.4.0")
 addSbtPlugin("com.lightbend.paradox"             % "sbt-paradox"               % "0.6.8")
