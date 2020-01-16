@@ -6,7 +6,7 @@ import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.messages.{LocationHttpMessage, LocationWebsocketMessage}
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.internal.Settings
-import msocket.api.Encoding.JsonText
+import msocket.api.ContentType.Json
 import msocket.api.Transport
 import msocket.impl.post.HttpPostTransport
 import msocket.impl.ws.WebsocketTransport
@@ -32,9 +32,9 @@ object HttpLocationServiceFactory extends LocationServiceCodecs {
     val httpUri      = s"http://$serverIp:$port/post-endpoint"
     val websocketUri = s"ws://$serverIp:$port/websocket-endpoint"
     val httpTransport: Transport[LocationHttpMessage] =
-      new HttpPostTransport[LocationHttpMessage](httpUri, JsonText, () => None)
+      new HttpPostTransport[LocationHttpMessage](httpUri, Json, () => None)
     val websocketTransport: Transport[LocationWebsocketMessage] =
-      new WebsocketTransport[LocationWebsocketMessage](websocketUri, JsonText)
+      new WebsocketTransport[LocationWebsocketMessage](websocketUri, Json)
     new LocationServiceClient(httpTransport, websocketTransport)
   }
 

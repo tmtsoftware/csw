@@ -9,7 +9,7 @@ import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.scaladsl.LocationService
 import csw.location.server.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.location.server.http.{LocationHttpHandler, LocationHttpService, LocationWebsocketHandler}
-import msocket.api.Encoding
+import msocket.api.ContentType
 import msocket.impl.RouteFactory
 import msocket.impl.post.PostRouteFactory
 import msocket.impl.ws.WebsocketRouteFactory
@@ -23,13 +23,13 @@ private[csw] class ServerWiring extends LocationServiceCodecs {
   lazy val untypedActorSystem: actor.ActorSystem                    = clusterSettings.system.toClassic
   lazy val actorRuntime                                             = new ActorRuntime(actorSystem)
   import actorSystem.executionContext
-  lazy val locationService: LocationService                  = LocationServiceFactory.withSystem(actorSystem)
-  private lazy val postHandler                               = new LocationHttpHandler(locationService)
-  private def websocketHandlerFactory(encoding: Encoding[_]) = new LocationWebsocketHandler(locationService, encoding)
+  lazy val locationService: LocationService              = LocationServiceFactory.withSystem(actorSystem)
+  private lazy val postHandler                           = new LocationHttpHandler(locationService)
+  private def websocketHandler(contentType: ContentType) = new LocationWebsocketHandler(locationService, contentType)
 
   lazy val locationRoutes: Route = RouteFactory.combine(
     new PostRouteFactory("post-endpoint", postHandler),
-    new WebsocketRouteFactory("websocket-endpoint", websocketHandlerFactory)
+    new WebsocketRouteFactory("websocket-endpoint", websocketHandler)
   )
   lazy val locationHttpService = new LocationHttpService(locationRoutes, actorRuntime, settings)
 }
