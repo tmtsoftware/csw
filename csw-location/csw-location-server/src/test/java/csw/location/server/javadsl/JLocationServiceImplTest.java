@@ -330,8 +330,12 @@ public class JLocationServiceImplTest extends JUnitSuite {
         locationService.register(akkaRegistration3).get();
 
         // filter akka locations by prefix
-        List<AkkaLocation> akkaLocations = List.of((AkkaLocation) akkaRegistration3.location(Networks.apply().hostname()));
-        Assert.assertEquals(akkaLocations, locationService.listByPrefix(Prefix.apply("nfiraos.ncc.trombone.hcd3")).get());
+        List<AkkaLocation> akkaLocations = List.of(
+                (AkkaLocation) akkaRegistration1.location(Networks.apply().hostname()),
+                (AkkaLocation) akkaRegistration2.location(Networks.apply().hostname()),
+                (AkkaLocation) akkaRegistration3.location(Networks.apply().hostname())
+        );
+        Assert.assertEquals(akkaLocations, locationService.listByPrefix(Prefix.apply("nfiraos.ncc.trombone")).get());
     }
 
     // DEOPSCSW-26: Track a connection
