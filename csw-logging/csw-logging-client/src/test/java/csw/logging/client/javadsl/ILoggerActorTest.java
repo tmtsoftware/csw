@@ -28,7 +28,6 @@ import java.util.concurrent.TimeUnit;
 import static csw.logging.client.utils.Eventually.eventually;
 
 // CSW-78: PrefixRedesign for logging
-// CSW-80: Prefix should be in lowercase
 public class ILoggerActorTest extends JUnitSuite {
     protected static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
     protected static LoggingSystem loggingSystem;

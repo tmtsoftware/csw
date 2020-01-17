@@ -21,11 +21,10 @@ import csw.location.client.ActorSystemFactory
 import csw.location.models.ComponentType.HCD
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.logging.models.Level.INFO
 import csw.logging.client.internal.LoggingSystem
+import csw.logging.models.Level.INFO
 import csw.params.core.states.{CurrentState, StateName}
-import csw.prefix.models.Subsystem
-import csw.prefix.models.Prefix
+import csw.prefix.models.{Prefix, Subsystem}
 import io.lettuce.core.RedisClient
 import play.api.libs.json.{JsObject, Json}
 
@@ -36,7 +35,6 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-167: Creation and Deployment of Standalone Components
 // DEOPSCSW-177: Hooks for lifecycle management
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
-// CSW-80: Prefix should be in lowercase
 // CSW-82: ComponentInfo should take prefix
 class StandaloneComponentTest extends FrameworkIntegrationSuite {
   import testWiring._

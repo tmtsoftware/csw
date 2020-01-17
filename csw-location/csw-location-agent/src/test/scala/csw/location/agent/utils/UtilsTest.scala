@@ -6,7 +6,6 @@ import com.typesafe.config.Config
 import csw.commons.ResourceReader
 import org.scalatest.{FunSuite, Matchers}
 
-// CSW-80: Prefix should be in lowercase
 class UtilsTest extends FunSuite with Matchers {
 
   test("testGetAppConfig") {

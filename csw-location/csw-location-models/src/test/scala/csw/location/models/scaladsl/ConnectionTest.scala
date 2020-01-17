@@ -6,7 +6,6 @@ import csw.location.models.{ComponentId, ComponentType, Connection}
 import csw.prefix.models.{Prefix, Subsystem}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
-// CSW-80: Prefix should be in lowercase
 class ConnectionTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
   // DEOPSCSW-14: Codec for data model
   test("should able to form a string representation for akka connection for trombone HCD") {

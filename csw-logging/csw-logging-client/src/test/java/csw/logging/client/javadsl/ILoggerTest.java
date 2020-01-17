@@ -37,7 +37,6 @@ import static csw.logging.client.utils.Eventually.eventually;
 
 // DEOPSCSW-316: Improve Logger accessibility for component developers
 // CSW-78: PrefixRedesign for logging
-// CSW-80: Prefix should be in lowercase
 public class ILoggerTest extends JUnitSuite {
     private static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
     private static LoggingSystem loggingSystem;

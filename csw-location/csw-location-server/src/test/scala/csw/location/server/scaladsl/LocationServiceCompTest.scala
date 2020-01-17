@@ -447,7 +447,6 @@ class LocationServiceCompTest(mode: String)
 
   // DEOPSCSW-308: Add prefix in Location service models
   // DEOPSCSW-12: Create location service API
-  // CSW-80: Prefix should be in lowercase
   test("should filter akka connections based on prefix") {
     val akkaConnection1 = AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "ncc.trombone.hcd1"), ComponentType.HCD))
     val akkaConnection2 =
