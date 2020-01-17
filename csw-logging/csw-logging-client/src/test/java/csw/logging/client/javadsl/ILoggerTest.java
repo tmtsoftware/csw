@@ -113,8 +113,8 @@ public class ILoggerTest extends JUnitSuite {
                 genericLogBuffer.add(log);
         });
 
-        irisLogBuffer = componentLogBuffer.get("jIRIS");
-        tromboneHcdLogBuffer = componentLogBuffer.get("jTromboneHcdActor");
+        irisLogBuffer = componentLogBuffer.get("jiris");
+        tromboneHcdLogBuffer = componentLogBuffer.get("jtrombonehcdactor");
 
         logBuffer.clear();
     }
@@ -135,9 +135,9 @@ public class ILoggerTest extends JUnitSuite {
         eventually(java.time.Duration.ofSeconds(10), () -> Assert.assertEquals(5, logBuffer.size()));
 
         logBuffer.forEach(log -> {
-            Assert.assertEquals("tromboneHcd", log.get(LoggingKeys$.MODULE$.COMPONENT_NAME()).getAsString());
+            Assert.assertEquals("trombonehcd", log.get(LoggingKeys$.MODULE$.COMPONENT_NAME()).getAsString());
             Assert.assertEquals("csw", log.get(LoggingKeys$.MODULE$.SUBSYSTEM()).getAsString());
-            Assert.assertEquals("csw.tromboneHcd", log.get(LoggingKeys$.MODULE$.PREFIX()).getAsString());
+            Assert.assertEquals("csw.trombonehcd", log.get(LoggingKeys$.MODULE$.PREFIX()).getAsString());
 
             Assert.assertTrue(log.has(LoggingKeys$.MODULE$.SEVERITY()));
             String severity = log.get(LoggingKeys$.MODULE$.SEVERITY()).getAsString().toLowerCase();

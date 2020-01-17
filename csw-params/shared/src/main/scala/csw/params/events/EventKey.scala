@@ -9,7 +9,7 @@ import csw.prefix.models.Prefix
  * @param eventName represents the name of the event
  */
 case class EventKey(source: Prefix, eventName: EventName) {
-  val key                       = s"${source.value}${EventKey.SEPARATOR}$eventName"
+  val key                       = s"${source}${EventKey.SEPARATOR}$eventName"
   override def toString: String = key
 }
 

@@ -56,7 +56,7 @@ object LogActorMock {
       jsonObject = jsonObject ++ Json.obj(LoggingKeys.ACTOR -> log.actorName.get)
 
     if (log.prefix.isDefined)
-      jsonObject = jsonObject ++ Json.obj(LoggingKeys.COMPONENT_NAME -> log.prefix.get.toString)
+      jsonObject = jsonObject ++ Json.obj(LoggingKeys.COMPONENT_NAME -> log.prefix.get.value)
 
     if (log.ex != noException) jsonObject = jsonObject
 

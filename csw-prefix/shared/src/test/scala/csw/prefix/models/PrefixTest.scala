@@ -21,8 +21,8 @@ class PrefixTest extends FunSuite with Matchers {
   test("should access subsystem and componentName in lowercase") {
     val prefix = Prefix("Tcs.Filter.Wheel")
     prefix.value shouldEqual "tcs.filter.wheel"
-    prefix.toString shouldEqual "tcs.Filter.Wheel"
+    prefix.toString shouldEqual prefix.value
     prefix.subsystem shouldBe TCS
-    prefix.componentName shouldBe "Filter.Wheel"
+    prefix.componentName shouldBe "filter.wheel"
   }
 }

@@ -72,7 +72,7 @@ private[location] object Registry {
    **/
   class Service(connection: Connection)(implicit node: SelfUniqueAddress)
       extends Registry[LWWRegisterKey[Option[Location]], LWWRegister[Option[Location]]](
-        Key = LWWRegisterKey(connection.name.toLowerCase),
+        Key = LWWRegisterKey(connection.name),
         EmptyValue = LWWRegister(node, Option.empty)
       )
 }

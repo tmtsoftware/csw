@@ -32,7 +32,7 @@ private[framework] class SupervisorInfoFactory(containerPrefix: Prefix) {
       alarmServiceFactory: AlarmServiceFactory,
       registrationFactory: RegistrationFactory
   ): Future[Option[SupervisorInfo]] = {
-    val systemName                                          = s"${componentInfo.prefix.toString.replace('.', '_')}-system"
+    val systemName                                          = s"${componentInfo.prefix.value.replace('.', '_')}-system"
     implicit val system: ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), systemName)
     implicit val ec: ExecutionContextExecutor               = system.executionContext
     val richSystem                                          = new CswFrameworkSystem(system)

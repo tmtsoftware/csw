@@ -43,7 +43,7 @@ class ActorLoggingTest extends LoggingTestSuite {
     logBuffer.foreach { log =>
       log.getString(LoggingKeys.COMPONENT_NAME) shouldBe IRIS.COMPONENT_NAME
       log.getString(LoggingKeys.SUBSYSTEM) shouldBe CSW.name
-      log.getString(LoggingKeys.PREFIX) shouldBe prefix.toString
+      log.getString(LoggingKeys.PREFIX) shouldBe prefix.value
       log.getString(LoggingKeys.ACTOR) shouldBe irisActorRef.path.toString
       log.getString(LoggingKeys.FILE) shouldBe IRIS.FILE_NAME
       // todo : create method getNumber as extension to JsObject.
