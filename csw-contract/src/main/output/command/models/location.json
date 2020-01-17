@@ -1,0 +1,17 @@
+[ {
+  "_type" : "AkkaLocation",
+  "connection" : {
+    "prefix" : "tcs.filter.wheel",
+    "componentType" : "hcd",
+    "connectionType" : "akka"
+  },
+  "uri" : "some_path"
+}, {
+  "_type" : "HttpLocation",
+  "connection" : {
+    "prefix" : "tcs.filter.wheel",
+    "componentType" : "hcd",
+    "connectionType" : "http"
+  },
+  "uri" : "some_path"
+} ]
