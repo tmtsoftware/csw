@@ -10,7 +10,7 @@ import scala.concurrent.duration.DurationDouble
 
 object ComponentInfos {
   val assemblyInfo: ComponentInfo = ComponentInfo(
-    Prefix("wfos.sampleassembly"),
+    Prefix("WFOS.SampleAssembly"),
     Assembly,
     "csw.common.components.framework.SampleComponentBehaviorFactory",
     DoNotRegister,
@@ -18,7 +18,7 @@ object ComponentInfos {
   )
 
   val assemblyInfoToSimulateFailure: ComponentInfo = ComponentInfo(
-    Prefix("wfos.trombone"),
+    Prefix("WFOS.Trombone"),
     Assembly,
     "csw.common.components.framework.ComponentBehaviorFactoryToSimulateFailure",
     DoNotRegister,
@@ -26,7 +26,7 @@ object ComponentInfos {
   )
 
   val hcdInfo: ComponentInfo = ComponentInfo(
-    Prefix("wfos.samplehcd"),
+    Prefix("WFOS.SampleHcd"),
     HCD,
     "csw.common.components.framework.SampleComponentBehaviorFactory",
     RegisterOnly,
@@ -34,7 +34,7 @@ object ComponentInfos {
   )
 
   val hcdInfoWithInitializeTimeout: ComponentInfo = ComponentInfo(
-    Prefix("wfos.samplehcd"),
+    Prefix("WFOS.SampleHcd"),
     HCD,
     "csw.common.components.framework.SampleComponentBehaviorFactory",
     RegisterOnly,
@@ -43,7 +43,7 @@ object ComponentInfos {
   )
 
   val hcdInfoWithRunTimeout: ComponentInfo = ComponentInfo(
-    Prefix("wfos.samplehcd"),
+    Prefix("WFOS.SampleHcd"),
     HCD,
     "csw.common.components.framework.SampleComponentBehaviorFactory",
     RegisterOnly,
@@ -51,7 +51,7 @@ object ComponentInfos {
     5.seconds
   )
 
-  val dummyInfo: ComponentInfo = ComponentInfo(Prefix("wfos.dummyhcd"), HCD, "dummy", DoNotRegister)
+  val dummyInfo: ComponentInfo = ComponentInfo(Prefix("WFOS.dummyhcd"), HCD, "dummy", DoNotRegister)
 
   val containerInfo: ContainerInfo = ContainerInfo("container", Set(hcdInfo, assemblyInfo))
 }

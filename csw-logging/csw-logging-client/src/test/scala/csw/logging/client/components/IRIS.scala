@@ -44,7 +44,7 @@ object IRIS {
   val FATAL_LINE_NO         = TRACE_LINE_NO + 5
   val LOG_ERROR_WITH_MAP_NO = TRACE_LINE_NO + 6
 
-  val COMPONENT_NAME = "iris"
+  val COMPONENT_NAME = "IRIS"
   val CLASS_NAME     = "csw.logging.client.components.IRIS"
   val FILE_NAME      = "IRIS.scala"
 

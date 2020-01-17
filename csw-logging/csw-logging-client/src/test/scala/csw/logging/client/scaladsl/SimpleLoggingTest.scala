@@ -48,9 +48,9 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
       val actualDateTime = TMTDateTimeFormatter.parse(log.getString(LoggingKeys.TIMESTAMP))
       ChronoUnit.MILLIS.between(expectedDateTime, actualDateTime) <= 50 shouldBe true
 
-      log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "trombonehcd"
+      log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "tromboneHcd"
       log.getString(LoggingKeys.SUBSYSTEM) shouldBe "csw"
-      log.getString(LoggingKeys.PREFIX) shouldBe "csw.trombonehcd"
+      log.getString(LoggingKeys.PREFIX) shouldBe "csw.tromboneHcd"
       log.getString(LoggingKeys.FILE) shouldBe "TromboneHcd.scala"
       log(LoggingKeys.LINE).as[Int] shouldBe logMsgLineNumber
       log.getString(LoggingKeys.CLASS) shouldBe "csw.logging.client.components.TromboneHcd"
@@ -73,7 +73,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
 
     eventually(logBuffer.size shouldBe 6)
     logBuffer.foreach { log =>
-      log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "innersourcecomponent"
+      log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "InnerSourceComponent"
       log.getString(LoggingKeys.SUBSYSTEM) shouldBe "csw"
       log.getString(LoggingKeys.FILE) shouldBe "InnerSourceComponent.scala"
       log(LoggingKeys.LINE).as[Int] shouldBe logMsgLineNumber
@@ -98,7 +98,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     eventually(logBuffer.size shouldBe 6)
     logBuffer.foreach { log =>
       log.contains(LoggingKeys.COMPONENT_NAME) shouldBe true
-      log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "singletoncomponent"
+      log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "SingletonComponent"
       log.getString(LoggingKeys.SUBSYSTEM) shouldBe "csw"
       log.getString(LoggingKeys.FILE) shouldBe "SingletonComponent.scala"
       log(LoggingKeys.LINE).as[Int] shouldBe logMsgLineNumber
@@ -127,7 +127,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
       //  Count the user messages for test at the end
       var userMsgCount = 0
       log.contains("@componentName") shouldBe true
-      log.getString("@componentName") shouldBe "singletoncomponent"
+      log.getString("@componentName") shouldBe "SingletonComponent"
       log.getString(LoggingKeys.SUBSYSTEM) shouldBe "csw"
       log.getString("file") shouldBe "SingletonComponent.scala"
       log("line").as[Int] shouldBe logMsgLineNumber
@@ -159,7 +159,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     eventually(logBuffer.size shouldBe 5)
 
     val groupByComponentNamesLog = logBuffer.groupBy(json => json.getString(LoggingKeys.COMPONENT_NAME))
-    val tromboneHcdLogs          = groupByComponentNamesLog("trombonehcd")
+    val tromboneHcdLogs          = groupByComponentNamesLog("tromboneHcd")
 
     tromboneHcdLogs.size shouldBe 5
 
@@ -187,7 +187,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     eventually(logBuffer.size shouldBe 6)
 
     val groupByComponentNamesLog = logBuffer.groupBy(json => json.getString(LoggingKeys.COMPONENT_NAME))
-    val tromboneAssemblyLogs     = groupByComponentNamesLog("tromboneassembly")
+    val tromboneAssemblyLogs     = groupByComponentNamesLog("tromboneAssembly")
 
     tromboneAssemblyLogs.size shouldBe 6
 
@@ -328,7 +328,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
      * }
      */
     logBuffer.foreach { log =>
-      log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "trombonehcd"
+      log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "tromboneHcd"
       log.getString(LoggingKeys.SUBSYSTEM) shouldBe "csw"
       log.getString(LoggingKeys.SEVERITY) shouldBe ERROR.name
       log.getString(LoggingKeys.CLASS) shouldBe tromboneHcdClassName

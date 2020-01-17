@@ -13,7 +13,7 @@ class UtilsTest extends FunSuite with Matchers {
     val x: Option[Config] = Utils.getAppConfig(configFile)
 
     x.isDefined shouldBe true
-    x.get.getString("csw.redistest.port") shouldBe "7777"
+    x.get.getString("csw.redisTest.port") shouldBe "7777"
   }
 
   test("testNonExistantAppConfig") {

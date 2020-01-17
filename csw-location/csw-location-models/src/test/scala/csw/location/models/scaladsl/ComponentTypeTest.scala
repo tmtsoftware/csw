@@ -9,7 +9,7 @@ class ComponentTypeTest extends FunSuite with Matchers with BeforeAndAfterAll wi
   test(
     "ComponentType should be any one of this types : 'container', 'hcd', 'assembly', 'sequence', 'sequencecomponent' and 'service'"
   ) {
-    val expectedComponentTypeValues = Set("container", "hcd", "assembly", "service", "sequencer", "sequencecomponent")
+    val expectedComponentTypeValues = Set("container", "hcd", "assembly", "service", "machine", "sequencer", "sequencecomponent")
     val actualComponentTypeValues: Set[String] =
       ComponentType.values.map(componentType => componentType.entryName).toSet
 
