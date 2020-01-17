@@ -18,6 +18,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks._
 import play.api.libs.json.JsObject
 
 // DEOPSCSW-158: Logging service API implementation details to be hidden from component developer
+// CSW-86: Subsystem should be case-insensitive
 class SimpleLoggingTest extends LoggingTestSuite with Eventually {
 
   // DEOPSCSW-114: Inherit the code base from persist-logger project
@@ -49,8 +50,8 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
       ChronoUnit.MILLIS.between(expectedDateTime, actualDateTime) <= 50 shouldBe true
 
       log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "tromboneHcd"
-      log.getString(LoggingKeys.SUBSYSTEM) shouldBe "csw"
-      log.getString(LoggingKeys.PREFIX) shouldBe "csw.tromboneHcd"
+      log.getString(LoggingKeys.SUBSYSTEM) shouldBe "CSW"
+      log.getString(LoggingKeys.PREFIX) shouldBe "CSW.tromboneHcd"
       log.getString(LoggingKeys.FILE) shouldBe "TromboneHcd.scala"
       log(LoggingKeys.LINE).as[Int] shouldBe logMsgLineNumber
       log.getString(LoggingKeys.CLASS) shouldBe "csw.logging.client.components.TromboneHcd"
@@ -74,7 +75,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     eventually(logBuffer.size shouldBe 6)
     logBuffer.foreach { log =>
       log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "InnerSourceComponent"
-      log.getString(LoggingKeys.SUBSYSTEM) shouldBe "csw"
+      log.getString(LoggingKeys.SUBSYSTEM) shouldBe "CSW"
       log.getString(LoggingKeys.FILE) shouldBe "InnerSourceComponent.scala"
       log(LoggingKeys.LINE).as[Int] shouldBe logMsgLineNumber
       log.getString(LoggingKeys.CLASS) shouldBe "csw.logging.client.components.InnerSourceComponent$InnerSource"
@@ -99,7 +100,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     logBuffer.foreach { log =>
       log.contains(LoggingKeys.COMPONENT_NAME) shouldBe true
       log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "SingletonComponent"
-      log.getString(LoggingKeys.SUBSYSTEM) shouldBe "csw"
+      log.getString(LoggingKeys.SUBSYSTEM) shouldBe "CSW"
       log.getString(LoggingKeys.FILE) shouldBe "SingletonComponent.scala"
       log(LoggingKeys.LINE).as[Int] shouldBe logMsgLineNumber
       log.getString(LoggingKeys.CLASS) shouldBe "csw.logging.client.components.SingletonComponent"
@@ -128,7 +129,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
       var userMsgCount = 0
       log.contains("@componentName") shouldBe true
       log.getString("@componentName") shouldBe "SingletonComponent"
-      log.getString(LoggingKeys.SUBSYSTEM) shouldBe "csw"
+      log.getString(LoggingKeys.SUBSYSTEM) shouldBe "CSW"
       log.getString("file") shouldBe "SingletonComponent.scala"
       log("line").as[Int] shouldBe logMsgLineNumber
       log.getString("class") shouldBe "csw.logging.client.components.SingletonComponent"
@@ -329,7 +330,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
      */
     logBuffer.foreach { log =>
       log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "tromboneHcd"
-      log.getString(LoggingKeys.SUBSYSTEM) shouldBe "csw"
+      log.getString(LoggingKeys.SUBSYSTEM) shouldBe "CSW"
       log.getString(LoggingKeys.SEVERITY) shouldBe ERROR.name
       log.getString(LoggingKeys.CLASS) shouldBe tromboneHcdClassName
       log.getString(LoggingKeys.MESSAGE) shouldBe computationResultMsg

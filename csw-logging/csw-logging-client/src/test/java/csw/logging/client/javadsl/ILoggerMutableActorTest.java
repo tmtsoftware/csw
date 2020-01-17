@@ -30,6 +30,7 @@ import static csw.logging.client.utils.Eventually.eventually;
 
 // DEOPSCSW-280 SPIKE: Introduce Akkatyped in logging
 // CSW-78: PrefixRedesign for logging
+// CSW-86: Subsystem should be case-insensitive
 public class ILoggerMutableActorTest extends JUnitSuite {
     protected static ActorSystem<SpawnProtocol.Command> actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
     protected static LoggingSystem loggingSystem;
@@ -85,8 +86,8 @@ public class ILoggerMutableActorTest extends JUnitSuite {
 
         logBuffer.forEach(log -> {
             Assert.assertEquals("jIRISTyped", log.get(LoggingKeys$.MODULE$.COMPONENT_NAME()).getAsString());
-            Assert.assertEquals("csw", log.get(LoggingKeys$.MODULE$.SUBSYSTEM()).getAsString());
-            Assert.assertEquals("csw.jIRISTyped", log.get(LoggingKeys$.MODULE$.PREFIX()).getAsString());
+            Assert.assertEquals("CSW", log.get(LoggingKeys$.MODULE$.SUBSYSTEM()).getAsString());
+            Assert.assertEquals("CSW.jIRISTyped", log.get(LoggingKeys$.MODULE$.PREFIX()).getAsString());
             Assert.assertEquals(actorPath, log.get(LoggingKeys$.MODULE$.ACTOR()).getAsString());
 
             Assert.assertTrue(log.has(LoggingKeys$.MODULE$.SEVERITY()));

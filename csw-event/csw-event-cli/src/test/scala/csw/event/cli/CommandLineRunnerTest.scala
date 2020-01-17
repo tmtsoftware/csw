@@ -58,9 +58,10 @@ class CommandLineRunnerTest extends SeedData with Eventually with CommonCodecs {
   }
 
   // DEOPSCSW-431: [Event Cli] Get command
+  // CSW-86: Subsystem should be case-insensitive
   test("should able to get appropriate error message when there is no event published for provided key") {
     commandLineRunner.get(argsParser.parse(Seq("get", "-e", "csw.x.y.invalid_key", "--out", "json")).get).await
-    logBuffer.head shouldEqual "[ERROR] No events published for key: [csw.x.y.invalid_key]"
+    logBuffer.head shouldEqual "[ERROR] No events published for key: [CSW.x.y.invalid_key]"
   }
 
   // DEOPSCSW-431: [Event Cli] Get command

@@ -40,6 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 // DEOPSCSW-178: Lifecycle success/failure notification
 // DEOPSCSW-181: Multiple Examples for Lifecycle Support
+// CSW-86: Subsystem should be case-insensitive
 class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
   val supervisorLifecycleStateProbe: TestProbe[SupervisorLifecycleState] = TestProbe[SupervisorLifecycleState]
@@ -88,7 +89,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     Thread.sleep(100)
     assertThatExceptionIsLogged(
       logBuffer,
-      "wfos",
+      "WFOS",
       "SampleHcd",
       failureStopExMsg,
       ERROR,
@@ -147,7 +148,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     // component handlers initialize block throws FailureRestart exception which we expect akka logs it
     assertThatExceptionIsLogged(
       logBuffer,
-      "wfos",
+      "WFOS",
       "SampleHcd",
       failureRestartExMsg,
       ERROR,

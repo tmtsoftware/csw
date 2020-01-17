@@ -1,6 +1,6 @@
 {
   "_type": "Observe",
-  "source": "wfos.blue.filter",
+  "source": "WFOS.blue.filter",
   "commandName": "move",
   "maybeObsId": [
     "Obs001"

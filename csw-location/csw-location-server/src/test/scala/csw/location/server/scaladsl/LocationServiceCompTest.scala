@@ -447,6 +447,7 @@ class LocationServiceCompTest(mode: String)
 
   // DEOPSCSW-308: Add prefix in Location service models
   // DEOPSCSW-12: Create location service API
+  // CSW-86: Subsystem should be case-insensitive
   test("should filter akka connections based on prefix") {
     val akkaConnection1 = AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "ncc.trombone.hcd1"), ComponentType.HCD))
     val akkaConnection2 =
@@ -461,7 +462,7 @@ class LocationServiceCompTest(mode: String)
     locationService.register(make(akkaConnection2, actorRef2.toURI)).await
     locationService.register(make(akkaConnection3, actorRef3.toURI)).await
 
-    locationService.listByPrefix("nfiraos.ncc.trombone").await.map(_.connection).toSet shouldBe Set(
+    locationService.listByPrefix("NFIRAOS.ncc.trombone").await.map(_.connection).toSet shouldBe Set(
       akkaConnection1,
       akkaConnection2,
       akkaConnection3

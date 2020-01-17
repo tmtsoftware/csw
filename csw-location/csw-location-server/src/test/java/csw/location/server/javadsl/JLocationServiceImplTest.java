@@ -315,6 +315,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
     }
 
     //DEOPSCSW-308: Add prefix in Location service models
+    //CSW-86: Subsystem should be case-insensitive
     @Test
     public void testListakkaComponentsByPrefix() throws ExecutionException, InterruptedException {
         AkkaConnection akkaHcdConnection1 = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS(), "ncc.trombone.hcd1"), JComponentType.HCD()));
@@ -335,7 +336,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
                 (AkkaLocation) akkaRegistration2.location(Networks.apply().hostname()),
                 (AkkaLocation) akkaRegistration3.location(Networks.apply().hostname())
         );
-        Assert.assertEquals(akkaLocations, locationService.listByPrefix("nfiraos.ncc.trombone").get());
+        Assert.assertEquals(akkaLocations, locationService.listByPrefix("NFIRAOS.ncc.trombone").get());
     }
 
     // DEOPSCSW-26: Track a connection

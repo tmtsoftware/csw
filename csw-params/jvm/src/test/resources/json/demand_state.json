@@ -1,6 +1,6 @@
 {
   "_type": "DemandState",
-  "prefix": "wfos.blue.filter",
+  "prefix": "WFOS.blue.filter",
   "stateName": "testStateName",
   "paramSet": [
     {

@@ -36,6 +36,7 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-177: Hooks for lifecycle management
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
 // CSW-82: ComponentInfo should take prefix
+// CSW-86: Subsystem should be case-insensitive
 class StandaloneComponentTest extends FrameworkIntegrationSuite {
   import testWiring._
   // all log messages will be captured in log buffer
@@ -109,7 +110,7 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
     // DEOPSCSW-180: Generic and Specific Log messages
     assertThatMessageIsLogged(
       logBuffer,
-      "iris",
+      "IRIS",
       "IFS_Detector",
       "Invoking lifecycle handler's initialize hook",
       INFO,
@@ -118,7 +119,7 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
     // log message from Component handler
     assertThatMessageIsLogged(
       logBuffer,
-      "iris",
+      "IRIS",
       "IFS_Detector",
       "Initializing Component TLA",
       INFO,

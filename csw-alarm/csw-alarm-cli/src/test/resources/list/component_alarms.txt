@@ -1,5 +1,5 @@
 ===============================================================================================================
-Prefix: nfiraos.trombone
+Prefix: NFIRAOS.trombone
 Name: tromboneAxisLowLimitAlarm
 Description: Warns when trombone axis has reached the low limit
 Location: south side
@@ -16,7 +16,7 @@ Shelve Status: Unshelved
 Alarm Time: 2018-08-30T09:26:27.787Z
 Current Severity: Disconnected
 ===============================================================================================================
-Prefix: nfiraos.trombone
+Prefix: NFIRAOS.trombone
 Name: tromboneAxisHighLimitAlarm
 Description: Warns when trombone axis has reached the high limit
 Location: south side

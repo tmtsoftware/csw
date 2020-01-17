@@ -52,6 +52,7 @@ class MutableActorLoggingTest extends LoggingTestSuite {
   // DEOPSCSW-117: Provide unique name for each logging instance of components
   // DEOPSCSW-119: Associate source with each log message
   // DEOPSCSW-121: Define structured tags for log messages
+  // CSW-86: Subsystem should be case-insensitive
   test("messages logged from actor should contain component name, file name, class name, line number and actor path") {
 
     sendMessagesToActor()
@@ -60,7 +61,7 @@ class MutableActorLoggingTest extends LoggingTestSuite {
       log.contains("@componentName") shouldBe true
       log.contains("actor") shouldBe true
       log.getString("@componentName") shouldBe "tromboneMutableHcdActor"
-      log.getString("@subsystem") shouldBe "csw"
+      log.getString("@subsystem") shouldBe "CSW"
       log.getString("actor") shouldBe tromboneActorRef.path.toString
       log.getString("file") shouldBe "MutableActorLoggingTest.scala"
       log.contains("line") shouldBe true

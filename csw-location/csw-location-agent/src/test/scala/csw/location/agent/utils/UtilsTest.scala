@@ -8,12 +8,13 @@ import org.scalatest.{FunSuite, Matchers}
 
 class UtilsTest extends FunSuite with Matchers {
 
+  // CSW-86: Subsystem should be case-insensitive
   test("testGetAppConfig") {
     val configFile        = ResourceReader.copyToTmp("/redisTest.conf").toFile
     val x: Option[Config] = Utils.getAppConfig(configFile)
 
     x.isDefined shouldBe true
-    x.get.getString("csw.redisTest.port") shouldBe "7777"
+    x.get.getString("CSW.redisTest.port") shouldBe "7777"
   }
 
   test("testNonExistantAppConfig") {
