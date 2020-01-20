@@ -1,7 +1,7 @@
 [ {
   "_type" : "AkkaLocation",
   "connection" : {
-    "prefix" : "tcs.filter.wheel",
+    "prefix" : "TCS.filter.wheel",
     "componentType" : "hcd",
     "connectionType" : "akka"
   },
@@ -9,7 +9,7 @@
 }, {
   "_type" : "HttpLocation",
   "connection" : {
-    "prefix" : "tcs.filter.wheel",
+    "prefix" : "TCS.filter.wheel",
     "componentType" : "hcd",
     "connectionType" : "http"
   },

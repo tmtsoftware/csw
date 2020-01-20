@@ -1,7 +1,7 @@
 [ {
   "_type" : "AkkaRegistration",
   "connection" : {
-    "prefix" : "tcs.filter.wheel",
+    "prefix" : "TCS.filter.wheel",
     "componentType" : "hcd",
     "connectionType" : "akka"
   },
@@ -9,7 +9,7 @@
 }, {
   "_type" : "HttpRegistration",
   "connection" : {
-    "prefix" : "tcs.filter.wheel",
+    "prefix" : "TCS.filter.wheel",
     "componentType" : "hcd",
     "connectionType" : "http"
   },

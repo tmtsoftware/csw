@@ -7,11 +7,11 @@ object ServiceData {
     Map(
       "location" -> Service(
         location.endpoints.Instances.endpoints,
-        location.models.Instances.models,
+        location.models.Instances.models
       ),
       "command" -> Service(
         command.endpoints.Instances.endpoints,
-        command.models.Instances.models,
+        command.models.Instances.models
       )
     )
   )

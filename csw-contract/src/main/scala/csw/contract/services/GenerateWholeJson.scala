@@ -5,7 +5,7 @@ import csw.contract.services.data.ServiceData
 import io.bullet.borer.Json
 import play.api.libs.json
 
-object Main extends ContractCodecs {
+object GenerateWholeJson extends ContractCodecs {
 
   def main(args: Array[String]): Unit = {
     val data         = Json.encode(ServiceData.data).toUtf8String

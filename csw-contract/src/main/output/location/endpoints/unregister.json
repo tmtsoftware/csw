@@ -2,7 +2,7 @@
   "requests" : [ {
     "_type" : "Unregister",
     "connection" : {
-      "prefix" : "tcs.filter.wheel",
+      "prefix" : "TCS.filter.wheel",
       "componentType" : "hcd",
       "connectionType" : "http"
     }
