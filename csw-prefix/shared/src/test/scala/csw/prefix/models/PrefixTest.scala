@@ -17,12 +17,11 @@ class PrefixTest extends FunSuite with Matchers {
     a[NoSuchElementException] shouldBe thrownBy(Prefix(prefixStr))
   }
 
-  //CSW-80: Prefix should be in lowercase
+  // CSW-86: Subsystem should be case-insensitive
   test("should access subsystem and componentName in lowercase") {
     val prefix = Prefix("Tcs.Filter.Wheel")
-    prefix.value shouldEqual "tcs.filter.wheel"
-    prefix.toString shouldEqual prefix.value
+    prefix.toString shouldEqual "TCS.Filter.Wheel"
     prefix.subsystem shouldBe TCS
-    prefix.componentName shouldBe "filter.wheel"
+    prefix.componentName shouldBe "Filter.Wheel"
   }
 }

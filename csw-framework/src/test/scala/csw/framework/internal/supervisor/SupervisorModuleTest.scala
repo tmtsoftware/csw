@@ -88,9 +88,9 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     )
 
     // This proves that data used in this test contains HCD and Assembly ComponentType
-    testData.find(info => info.componentType == HCD && info.prefix == Prefix("wfos.samplehcd")) shouldBe Some(hcdInfo)
-    testData.find(info => info.componentType == HCD && info.prefix == Prefix("wfos.jsamplehcd")) shouldBe Some(jHcdInfo)
-    testData.find(info => info.componentType == Assembly && info.prefix == Prefix("wfos.sampleassembly")) shouldBe Some(
+    testData.find(info => info.componentType == HCD && info.prefix == Prefix("WFOS.SampleHcd")) shouldBe Some(hcdInfo)
+    testData.find(info => info.componentType == HCD && info.prefix == Prefix("WFOS.jSampleHcd")) shouldBe Some(jHcdInfo)
+    testData.find(info => info.componentType == Assembly && info.prefix == Prefix("WFOS.SampleAssembly")) shouldBe Some(
       assemblyInfo
     )
 

@@ -1,29 +1,28 @@
 {
-  "Observe": {
-    "source": "wfos.blue.filter",
-    "commandName": "move",
-    "maybeObsId": [
-      "Obs001"
-    ],
-    "paramSet": [
-      {
-        "IntKey": {
-          "keyName": "repeat",
-          "values": [
-            22
-          ],
-          "units": "NoUnits"
-        }
-      },
-      {
-        "StringKey": {
-          "keyName": "expTime",
-          "values": [
-            "11:10"
-          ],
-          "units": "NoUnits"
-        }
+  "_type": "Observe",
+  "source": "WFOS.blue.filter",
+  "commandName": "move",
+  "maybeObsId": [
+    "Obs001"
+  ],
+  "paramSet": [
+    {
+      "IntKey": {
+        "keyName": "repeat",
+        "values": [
+          22
+        ],
+        "units": "NoUnits"
       }
-    ]
-  }
+    },
+    {
+      "StringKey": {
+        "keyName": "expTime",
+        "values": [
+          "11:10"
+        ],
+        "units": "NoUnits"
+      }
+    }
+  ]
 }

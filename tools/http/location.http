@@ -1,0 +1,188 @@
+// #register
+POST http://localhost:7654/post-endpoint
+Content-Type: application/json
+
+{
+  "Register": {
+    "HttpRegistration": {
+      "connection": {
+        "prefix": "csw.server",
+        "componentType": "service",
+        "connectionType": "http"
+      },
+      "port": 1234,
+      "path": "root/path1"
+    }
+  }
+}
+
+###
+// #register
+
+// #re-register
+POST http://localhost:7654/post-endpoint
+Content-Type: application/json
+
+{
+  "Register": {
+    "HttpRegistration": {
+      "connection": {
+        "prefix": "csw.server",
+        "componentType": "service",
+        "connectionType": "http"
+      },
+      "port": 1235,
+      "path": "root/path1"
+    }
+  }
+}
+
+###
+// #re-register
+
+// #invalid-register
+POST http://localhost:7654/post-endpoint
+Content-Type: application/json
+
+{
+  "Register": {
+    "HttpRegistration": {
+      "connection": {
+        "prefix": "csw.server",
+        "componentType": "service",
+        "connectionType": "http"
+      },
+      "path": "root/path1"
+    }
+  }
+}
+
+###
+// #invalid-register
+
+// #un-register
+POST http://localhost:7654/post-endpoint
+Content-Type: application/json
+
+{
+  "_type" : "Unregister",
+  "connection" : {
+    "prefix" : "tcs.filter.wheel",
+    "componentType" : "hcd",
+    "connectionType" : "http"
+  }
+}
+
+###
+// #un-register
+
+// #find
+POST http://localhost:7654/post-endpoint
+Content-Type: application/json
+
+{
+  "Find": {
+    "prefix": "csw.server",
+    "componentType": "service",
+    "connectionType": "http"
+  }
+}
+
+###
+// #find
+
+// #resolve
+POST http://localhost:7654/post-endpoint
+Content-Type: application/json
+
+{
+  "Resolve": {
+    "connection": {
+      "prefix": "csw.server",
+      "componentType": "service",
+      "connectionType": "http"
+    },
+    "within": "5 seconds"
+  }
+}
+
+###
+// #resolve
+
+// #list
+POST http://localhost:7654/post-endpoint
+Content-Type: application/json
+
+{
+  "ListEntries": {}
+}
+
+###
+// #list
+
+// #list-by-componenttype
+POST http://localhost:7654/post-endpoint
+Content-Type: application/json
+
+{
+  "ListByComponentType": "service"
+}
+
+###
+// #list-by-componenttype
+
+// #list-by-hostname
+POST http://localhost:7654/post-endpoint
+Content-Type: application/json
+
+{
+  "ListByHostname": "192.168.5.105"
+}
+
+###
+// #list-by-hostname
+
+// #list-by-connectiontype
+POST http://localhost:7654/post-endpoint
+Content-Type: application/json
+
+{
+  "ListByConnectionType": "http"
+}
+
+###
+// #list-by-connectiontype
+
+// #list-by-prefix
+POST http://localhost:7654/post-endpoint
+Content-Type: application/json
+
+{
+  "ListByPrefix": "csw.server"
+}
+
+###
+// #list-by-prefix
+
+// #un-register-all
+POST http://localhost:7654/post-endpoint
+Content-Type: application/json
+
+{
+  "UnregisterAll": {}
+}
+
+###
+// #un-register-all
+
+# Websocket example runnable with IntelliJ plugin or chrome extension for websockets
+# ws://localhost:7654/websocket-endpoint
+# Content-Type: application/json
+#
+# {
+#   "Track": {
+#     "prefix": "csw.server",
+#     "componentType": "service",
+#     "connectionType": "http"
+#   }
+# }

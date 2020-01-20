@@ -2,7 +2,7 @@
 
 The Event Service implements the [publish/subscribe messaging paradigm](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) where 
 one component publishes an event and all clients that have subscribed receive the event. In CSW, the events published are
-described under the messages documentation @ref:[here](./../params/events.md).
+described under the `messages` documentation @ref:[here](./../params/events.md).
 One advantage of this type of message system for the Event Service is that publishers and subscribers are decoupled. 
 This decoupling of publishers and subscribers can allow for greater scalability and a more dynamic network topology.
 Publishers can publish regardless of whether there are subscribers, and subscribers can subscribe even if there are no publishers. 
@@ -89,7 +89,7 @@ Java
 :   @@snip [JEventPublishExamples.java](../../../../examples/src/main/java/example/event/JEventPublishExamples.java) { #event-generator }
 
 @@@ note
-Callbacks like `eventGenerator` are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor. Here is an @github[example](/examples/src/main/scala/example/event/ConcurrencyInCallbacksExample.scala) of how it can be done.
+Callbacks like `eventGenerator` are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor. Here is an [example]($github.base_url$/examples/src/main/scala/example/event/ConcurrencyInCallbacksExample.scala) of how it can be done.
 @@@
 
 
@@ -238,13 +238,13 @@ of each API here:
 
 ## Create Event Service
 If you are not using csw-framework, you can create the @scaladoc[EventService](csw/event/api/scaladsl/EventService) 
-using an @scaladoc[EventServiceFactory](csw/event/EventServiceFactory).
+using an @scaladoc[EventServiceFactory](csw/event/client/EventServiceFactory).
 
 Scala
-:   @@snip [EventServiceCreationExamples.scala](../../../../examples/src/main/scala/example/event/EventServiceCreationExamples.scala) { #default-event-service }
+: @@snip [EventServiceCreationExamples.scala](../../../../examples/src/main/scala/example/event/EventServiceCreationExamples.scala) { #default-event-service }
 
 Java
-:   @@snip [JEventServiceCreationExamples.java](../../../../examples/src/main/java/example/event/JEventServiceCreationExamples.java) { #default-event-service }
+: @@snip [JEventServiceCreationExamples.java](../../../../examples/src/main/java/example/event/JEventServiceCreationExamples.java) { #default-event-service }
 
 The provided implementation of Event Service is backed up by Redis. The above example demonstrates creation of Event Service 
 with default Redis client options. 
@@ -266,15 +266,15 @@ See @ref:[Event Service Technical Description](../technical/event/event.md).
 
 ## Source code for examples of creation
 
-* @github[Scala Example](/examples/src/main/scala/example/event/EventServiceCreationExamples.scala)
-* @github[Java Example](/examples/src/main/java/example/event/JEventServiceCreationExamples.java)
+* [Scala Example]($github.base_url$/examples/src/main/scala/example/event/EventServiceCreationExamples.scala)
+* [Java Example]($github.base_url$/examples/src/main/java/example/event/JEventServiceCreationExamples.java)
 
 ## Source code for examples of publishing
 
-* @github[Scala Example](/examples/src/main/scala/example/event/EventPublishExamples.scala)
-* @github[Java Example](/examples/src/main/java/example/event/JEventPublishExamples.java)
+* [Scala Example]($github.base_url$/examples/src/main/scala/example/event/EventPublishExamples.scala)
+* [Java Example]($github.base_url$/examples/src/main/java/example/event/JEventPublishExamples.java)
 
 ## Source code for examples of subscribing
 
-* @github[Scala Example](/examples/src/main/scala/example/event/EventSubscribeExamples.scala)
-* @github[Java Example](/examples/src/main/java/example/event/JEventSubscribeExamples.java)
+* [Scala Example]($github.base_url$/examples/src/main/scala/example/event/EventSubscribeExamples.scala)
+* [Java Example]($github.base_url$/examples/src/main/java/example/event/JEventSubscribeExamples.java)

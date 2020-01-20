@@ -31,13 +31,12 @@ class LoggingAkkaSerializer extends Serializer {
       else None
     }
 
-    {
-      fromBinary[LogMetadata] orElse
-      fromBinary[Level]
-    } getOrElse {
-      val ex = new RuntimeException(s"does not support decoding of ${manifest.get}")
-      logger.error(ex.getMessage, ex = ex)
-      throw ex
-    }
+    fromBinary[LogMetadata]
+      .orElse(fromBinary[Level])
+      .getOrElse {
+        val ex = new RuntimeException(s"does not support decoding of ${manifest.get}")
+        logger.error(ex.getMessage, ex = ex)
+        throw ex
+      }
   }
 }

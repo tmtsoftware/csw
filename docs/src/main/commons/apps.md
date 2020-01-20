@@ -73,7 +73,7 @@ Docker setup is installed and running before starting the Elastic stack. To know
 
 For the host setup, follow the below given steps:
 
-* Install [Docker](https://www.docker.com/community-edition#/download) version **18.09+**
+* Install [Docker](https://www.docker.com/products/container-runtime) version **18.09+**
 * Install [Docker Compose](https://docs.docker.com/compose/install/) version **1.24.0+**
 
 On distributions which have SELinux enabled out-of-the-box, you will need to either re-context the files or set SELinux
@@ -85,7 +85,7 @@ $ chcon -R system_u:object_r:admin_home_t:s0 docker-elk/
 ```
 To know more about running Docker for Mac please refer to this [link](https://docs.docker.com/v17.12/docker-for-mac/). For Windows, ensure that the
 "Shared Drives" feature is enabled for the `C:` drive (Docker for Windows > Settings > Shared Drives).
-See [Configuring Docker for Windows Shared Drives](https://blogs.msdn.microsoft.com/stevelasker/2016/06/14/configuring-docker-for-windows-volumes/) (MSDN Blog).
+See [Configuring Docker for Windows Shared Drives](https://docs.microsoft.com/en-us/archive/blogs/stevelasker/configuring-docker-for-windows-volumes) (MSDN Blog).
 
 Assuming that the developer has downloaded `csw-apps-<some-version>.zip` from [csw releases](https://github.com/tmtsoftware/csw/releases)
 and unzipped it, there are four folders, as follows, in `csw-apps-<some-version>`:

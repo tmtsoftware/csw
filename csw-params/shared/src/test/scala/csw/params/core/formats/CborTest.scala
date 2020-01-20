@@ -73,16 +73,16 @@ class CborTest extends FunSuite with Matchers {
   }
 
   test("should encode base-type command and decode a concrete-type") {
-    val command: Command = Setup(prefix, commandName, maybeObsId)
-    val bytes            = CommandCbor.encode(command)
-    val parsedCommand    = CommandCbor.decode[Setup](bytes)
+    val command       = Setup(prefix, commandName, maybeObsId)
+    val bytes         = CommandCbor.encode(command)
+    val parsedCommand = CommandCbor.decode[Setup](bytes)
     parsedCommand shouldEqual command
   }
 
   test("should encode concrete-type command and decode base-type") {
     val command       = Setup(prefix, commandName, maybeObsId)
     val bytes         = CommandCbor.encode(command)
-    val parsedCommand = CommandCbor.decode[Command](bytes)
+    val parsedCommand = CommandCbor.decode[ControlCommand](bytes)
     parsedCommand shouldEqual command
   }
 

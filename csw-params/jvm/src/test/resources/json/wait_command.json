@@ -1,53 +1,52 @@
 {
-  "Wait": {
-    "source": "wfos.blue.filter",
-    "commandName": "move",
-    "maybeObsId": [
-      "Obs001"
-    ],
-    "paramSet": [
-      {
-        "LongMatrixKey": {
-          "keyName": "myMatrix",
-          "values": [
+  "_type": "Wait",
+  "source": "WFOS.blue.filter",
+  "commandName": "move",
+  "maybeObsId": [
+    "Obs001"
+  ],
+  "paramSet": [
+    {
+      "LongMatrixKey": {
+        "keyName": "myMatrix",
+        "values": [
+          [
             [
-              [
-                1,
-                2,
-                3
-              ],
-              [
-                2,
-                3,
-                6
-              ],
-              [
-                4,
-                6,
-                12
-              ]
+              1,
+              2,
+              3
             ],
             [
-              [
-                2,
-                3,
-                4
-              ],
-              [
-                5,
-                6,
-                7
-              ],
-              [
-                8,
-                9,
-                10
-              ]
+              2,
+              3,
+              6
+            ],
+            [
+              4,
+              6,
+              12
             ]
           ],
-          "units": "NoUnits"
-        }
+          [
+            [
+              2,
+              3,
+              4
+            ],
+            [
+              5,
+              6,
+              7
+            ],
+            [
+              8,
+              9,
+              10
+            ]
+          ]
+        ],
+        "units": "NoUnits"
       }
-    ]
-  }
+    }
+  ]
 }

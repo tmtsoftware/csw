@@ -43,6 +43,12 @@ pipeline {
                 sh "./integration/scripts/multiple_nic_test.sh"
             }
         }
+
+        stage('Paradox Validate Links') {
+            steps {
+                sh "sbt docs/Paradox/paradoxValidateLinks"
+            }
+        }
     }
     post {
         always {

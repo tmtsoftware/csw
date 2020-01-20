@@ -1,4 +1,4 @@
-package csw.command.client.internal
+package csw.command.client
 
 import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.typed.{ActorRef, ActorSystem}
@@ -6,6 +6,7 @@ import akka.util.Timeout
 import csw.command.api.scaladsl.SequencerCommandService
 import csw.command.api.utils.SequencerCommandServiceExtension
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.client.internal.Timeouts
 import csw.command.client.messages.sequencer.SequencerMsg
 import csw.command.client.messages.sequencer.SequencerMsg.{Query, QueryFinal, SubmitSequence}
 import csw.location.models.AkkaLocation
@@ -15,10 +16,15 @@ import csw.params.core.models.Id
 
 import scala.concurrent.Future
 
+/**
+ * Create a SequencerCommandService for sending commands to sequencer
+ * @param sequencerLocation  the destination sequencer location to which sequence needs to be sent
+ * @param actorSystem required for sending sequence commands or querying the sequencer
+ */
 class SequencerCommandServiceImpl(sequencerLocation: AkkaLocation)(
-    implicit system: ActorSystem[_]
+    implicit actorSystem: ActorSystem[_]
 ) extends SequencerCommandService {
-  import system.executionContext
+  import actorSystem.executionContext
 
   private val extensions = new SequencerCommandServiceExtension(this)
 

@@ -31,7 +31,8 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-benchmark`,
   `romaine`,
   `examples`,
-  `integration`
+  `integration`,
+  `csw-contract`
 )
 
 lazy val unidocExclusions: Seq[ProjectReference] = Seq(
@@ -58,7 +59,8 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-benchmark`,
   `romaine`,
   `examples`,
-  `integration`
+  `integration`,
+  `csw-contract`
 )
 
 lazy val githubReleases: Seq[ProjectReference] = Seq(
@@ -583,9 +585,20 @@ lazy val docs = project
   .settings(
     paradoxProperties in Paradox ++= Map(
       "extref.csw_js.base_url" -> s"https://tmtsoftware.github.io/csw-js/${Settings.cswJsVersion}/%s"
+    ),
+    paradoxRoots := List(
+      "index.html",
+      "services/aas/core-concepts-and-terms.html",
+      "services/aas/csw-aas-http.html",
+      "services/aas/csw-aas-installed.html",
+      "technical/aas/csw-aas-http.html",
+      "technical/aas/csw-aas-installed.html",
+      "technical/location/location-agent.html",
+      "technical/location/location-api.html",
+      "technical/location/location-client.html",
+      "technical/location/location-server.html"
     )
   )
-
 /* =================== Examples ================ */
 lazy val examples = project
   .dependsOn(
@@ -680,4 +693,12 @@ lazy val `csw-aas-installed` = project
   .dependsOn(`csw-aas-core`, `csw-location-client` % "test->compile")
   .settings(
     libraryDependencies ++= Dependencies.CswInstalledAdapter.value
+  )
+
+lazy val `csw-contract` = project
+  .dependsOn(
+    `csw-location-api`.jvm
+  )
+  .settings(
+    libraryDependencies ++= Dependencies.ContractServer.value
   )

@@ -34,7 +34,7 @@ public class JCommandsTest extends JUnitSuite {
     private final Parameter<Integer> epochIntParam = epochIntKey.set(44, 55);
 
     private final ObsId obsId = new ObsId("obsId");
-    private final Prefix prefix = new Prefix(WFOS(), "red.detector");
+    private final Prefix prefix = Prefix.apply(WFOS(), "red.detector");
     private final CommandName commandName = new CommandName("move");
 
     private void assertOnCommandAPI(ParameterSetType<?> command) {

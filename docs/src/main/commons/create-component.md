@@ -14,7 +14,7 @@ Most of CSW is written using asynchronous programming.  Therefore, in the exampl
 and other asynchronous code in various ways.  The following constructs are commonly used throughout this manual:
 
  * **Scala:** The Scala async package is used extensively.  `async` marks a block of asynchronous code and allows 
-     to `await` the computation until the Future is complete. For more info, please refer to: https://github.com/scala/async.
+     to `await` the computation until the Future is complete. For more info, please refer to: https://github.com/scala/scala-async.
      
      Sometimes, an example may use the `Await.result` construct.  While this is often used in tests, it is a blocking call
      and typically should not be used in production code.
@@ -36,7 +36,7 @@ which collectively act as the gateway from the framework to component code.
 
 A Supervisor actor is the actor first started for any component. The main responsibilities that the Supervisor performs is as follows:
 
--   Implement and manage the component lifecycle for the TLA and for the rest of the system (see [Lifecycle](#lifecycle) below).
+-   Implement and manage the component lifecycle for the TLA and for the rest of the system (see @ref:[Lifecycle](#lifecycle) below).
 -   Register itself with the Location Service.
 -   Provide an administrative interface to the component to the rest of the system. For
 instance, the Container can perform some administrative communication with the Supervisor such as restart or shutdown.
@@ -49,24 +49,24 @@ Because the Supervisor registers itself with the Location Service, it serves as 
 
 @@@
 
-The source code of the Supervisor actor can be found @github[here](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala)
+The source code of the Supervisor actor can be found [here]($github.base_url$/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala)
 
 ## Top level actor
 
 While the Supervisor works as the external interface for the component and the manager of its Lifecycle, the functional implementation
 of a component is implemented in a Top Level Actor (TLA), spawned by the Supervisor actor for any component. 
 However, the developer is not expected to implement TLA code directly.  Instead, the functionality of the TLA is added by
-implementing the `ComponentHandlers` abstract class, consisting of a list of a methods, or `hooks`, called by the TLA during specific lifecycle and command events (see [Handlers](#handlers)).
-The `ComponentHandlers` implementation is specified during construction using a factory (see [Constructing The Component](#constructing-the-component)) 
+implementing the `ComponentHandlers` abstract class, consisting of a list of a methods, or `hooks`, called by the TLA during specific lifecycle and command events (see @ref:[Handlers](#handlers)).
+The `ComponentHandlers` implementation is specified during construction using a factory (see @ref:[Constructing The Component](#constructing-the-component)) 
 
-The source code of the Top Level Actor can be found @github[here](/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala).
+The source code of the Top Level Actor can be found [here]($github.base_url$/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala).
 
 ## Handlers
 
 The following hooks should be overridden in your ComponentHandlers implementation class:
 
 -   `initialize`: called when the component is starting up, prior to be put into the Running state.
--   `validateCommand`: called when the component receives a command to validate it can be executed.  (see [Validation](#validation))  
+-   `validateCommand`: called when the component receives a command to validate it can be executed.  (see @ref:[Validation](#validation))  
 -   `onSubmit`: called on Submit command if validateCommand returns `Accepted`.
 -   `onOneway`: called on Oneway command if validateCommand returns `Accepted`.
 -   `onGoOffline`: called when the component receives an external message from an administrative client to go offline.
@@ -74,14 +74,14 @@ The following hooks should be overridden in your ComponentHandlers implementatio
 -   `onLocationTrackingEvent`: called when a tracked dependency changes location state. (see @ref:[Tracking Dependencies](./multiple-components.md#tracking-dependencies))
 -   `onShutdown`: called when the component is shutting down.
 
-The source code of `ComponentHandlers` can be found @github[here](/csw-framework/src/main/scala/csw/framework/scaladsl/ComponentHandlers.scala). 
+The source code of `ComponentHandlers` can be found [here]($github.base_url$/csw-framework/src/main/scala/csw/framework/scaladsl/ComponentHandlers.scala). 
 
-More details about handler significance and invocation can be found @ref:[here](./framework.md#handling-lifecycle)
+More details about handler significance and invocation can be found @ref:[here](../framework/handling-lifecycle.md)
 
 @@@ note { title=Note }
 
 If the component developer wishes to write the handler implementation in Java, then he/she needs to implement the Java version of `ComponentHandlers`
-which is `JComponentHandlers`. The source code of `JComponentHandlers` can be found @github[here](/csw-framework/src/main/scala/csw/framework/javadsl/JComponentHandlers.scala).
+which is `JComponentHandlers`. The source code of `JComponentHandlers` can be found [here]($github.base_url$/csw-framework/src/main/scala/csw/framework/javadsl/JComponentHandlers.scala).
 Any further reference to `ComponentHandlers` should implicitly also apply to `JComponentHandlers`.
 
 @@@
@@ -100,7 +100,7 @@ the component (see example below). The `csw-framework` picks up the full path of
 `ComponentBehaviorFactory` from configuration file and spawns the component handlers using this factory in a process of
 booting a component. The factory is instantiated using Java reflection.
 
-Additional sample code to implement the `ComponentBehaviorFactory` can be found @ref:[here](./framework.md#creating-components) 
+Additional sample code to implement the `ComponentBehaviorFactory` can be found @ref:[here](../framework/creating-components.md) 
 
 #### *Tutorial: Developing an HCD*
 
@@ -135,9 +135,9 @@ The configuration file is parsed to a `ComponentInfo` object and injected in the
 
 The configuration can also contain a list of components and services it wishes to track as dependencies. See @ref:[Tracking Dependencies](./multiple-components.md#tracking-dependencies).
 
-More details about `ComponentInfo` can be found @ref:[here](./framework.md#describing-components).
+More details about `ComponentInfo` can be found @ref:[here](../framework/describing-components.md).
 
-An additional sample configuration file can be found @github[here](/csw-benchmark/src/main/resources/container.conf).
+An additional sample configuration file can be found [here]($github.base_url$/csw-benchmark/src/main/resources/container.conf).
 
 ## Lifecycle 
 
@@ -295,7 +295,7 @@ validation of command, whether it is valid to execute, and return a `ValidateCom
 The component developer should return either an `Accepted` response or an
 or `Invalid` response specifying whether the command is valid to be executed or not.
  
-If this handler is being called as part of a `submit` or `oneway` call, the command will automatically be processed in the `onSubmit` or `onOneway` handlers (see [Command Response](#command-response)) if the 
+If this handler is being called as part of a `submit` or `oneway` call, the command will automatically be processed in the `onSubmit` or `onOneway` handlers (see @ref:[Command Response](#command-response)) if the 
 `ValidationCommandResponse` is `Accepted`.
 
 Different types of command responses and their significance can be found @ref:[here](./command.md#command-based-communication-between-components).
@@ -339,7 +339,7 @@ commands to other components. This will be described in the next tutorial sectio
 When the `onSubmit` hook is called, it is the responsibility of component developers to update the status of the received command in the `CommandResponseManager` as it changes. An instance
 of `CommandResponseManager` is provided in the `CswContext` object in `ComponentHandlers` and should be injected in any worker actor or other actor/class created for the component that needs it.   
 
-More details on the methods available in `CommandResponseManager` can be found @ref:[here](./framework.md#managing-command-state).
+More details on the methods available in `CommandResponseManager` can be found @ref:[here](../framework/managing-command-state.md).
 
 #### *Tutorial: Developing an HCD*
 

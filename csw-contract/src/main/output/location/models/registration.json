@@ -1,0 +1,18 @@
+[ {
+  "_type" : "AkkaRegistration",
+  "connection" : {
+    "prefix" : "TCS.filter.wheel",
+    "componentType" : "hcd",
+    "connectionType" : "akka"
+  },
+  "actorRefURI" : "some_path"
+}, {
+  "_type" : "HttpRegistration",
+  "connection" : {
+    "prefix" : "TCS.filter.wheel",
+    "componentType" : "hcd",
+    "connectionType" : "http"
+  },
+  "port" : 8080,
+  "path" : "paht1"
+} ]

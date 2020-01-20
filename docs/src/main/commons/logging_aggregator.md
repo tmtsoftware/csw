@@ -1,7 +1,7 @@
 # Logging Aggregator
 
 The logging aggregator provides aggregation of logs generated from TMT applications written in Scala, Java, Python, C, C++, modules like System logs,
-Redis logs, Postgres logs, ElasticSearch logs, Keycloak logs using the widely used Elastic [ELK stack](https://www.elastic.co/elk-stack) ([Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html),
+Redis logs, Postgres logs, ElasticSearch logs, Keycloak logs using the widely used Elastic [ELK stack](https://www.elastic.co/what-is/elk-stack) ([Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html),
 [Logstash](https://www.elastic.co/guide/en/logstash/current/index.html), [Kibana](https://www.elastic.co/guide/en/kibana/current/index.html)),
 and the [Filebeat](https://www.elastic.co/guide/en/beats/filebeat/current/index.html) utility.
 
@@ -272,25 +272,25 @@ Logs generated from Keycloak needs to be watched by Filebeat and aggregated. Hen
 to start JBoss server which will make JBoss server to log in JSON format, enable keycloak logs, and generate log files under `TMT_LOG_HOME`.
 
 Note that system generated logs on Keycloak machine also needs to be watched by Filebeat and aggregated. In order to watch Keycloak logs from 
-`TMT_LOG_HOME` and enable system module, refer to the steps from @ref:[here](logging_aggregator.md#filebeat-watching-tmt-app-logs-and-system-generated-logs).  
+`TMT_LOG_HOME` and enable system module, refer to the steps from @ref:[here](logging_aggregator.md#setting-up-filebeat-to-watch-tmt-app-logs-and-system-generated-logs).  
 
 ## System logs on Logstash and Kibana machines
 
 Machines running Logstash and Kibana will require to aggregate system logs from their machines too. Hence, in order to enable system module on their
 machines follow the below given steps:
 
-* Run Elasticsearch using [elasticsearch.yml](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/elasticsearch/elasticsearch.yml).
+* Run Elasticsearch using [elasticsearch.yml]($github.base_url$/scripts/logging_aggregator/prod/elasticsearch/elasticsearch.yml).
   Place `elasticsearch.yml` in <<Elasticsearch installation folder>>/config/ and execute `./bin/elasticsearch` (on Mac) or `bin/elasticsearch` (on Linux).
-* Go to <<Filebeat installation folder>> place [Logstash/filebeat.yml](https://github.com/tmtsoftware/csw/tree/master/scripts/logging_aggregator/prod/logstash/filebeat.yml) 
-  and execute [Logstash/filebeat-init.sh](https://github.com/tmtsoftware/csw/tree/master/scripts/logging_aggregator/prod/logstash/filebeat-init.sh) or
-  place [Kibana/filebeat.yml](https://github.com/tmtsoftware/csw/tree/master/scripts/logging_aggregator/prod/kibana/filebeat.yml)
-  and execute [Kibana/filebeat-init.sh](https://github.com/tmtsoftware/csw/tree/master/scripts/logging_aggregator/prod/kibana/filebeat-init.sh) 
+* Go to <<Filebeat installation folder>> place [Logstash/filebeat.yml]($github.base_url$/scripts/logging_aggregator/prod/logstash/filebeat.yml) 
+  and execute [Logstash/filebeat-init.sh]($github.base_url$/scripts/logging_aggregator/prod/logstash/filebeat-init.sh) or
+  place [Kibana/filebeat.yml]($github.base_url$/scripts/logging_aggregator/prod/kibana/filebeat.yml)
+  and execute [Kibana/filebeat-init.sh]($github.base_url$/scripts/logging_aggregator/prod/kibana/filebeat-init.sh) 
   from Logstash or Kibana machines respectively. This will make Elasticsearch aware of System module.
 * Run Filebeat from <<Filebeat installation folder>> by executing `./filebeat -e` (on Mac) or `filebeat -e` (on Linux).
-* Run LogStash using [logstash.conf](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/logstash/logstash.conf).
+* Run LogStash using [logstash.conf]($github.base_url$/scripts/logging_aggregator/prod/logstash/logstash.conf).
   Place `logstash.conf` in <<Logstash installation folder>>/config/ and execute `./bin/logstash -f config/logstash.conf` (on mac) or
   `bin/logstash -f config/logstash.conf` (on Linux).
-* Run Kibana using [kibana.yml](https://github.com/tmtsoftware/csw/blob/master/scripts/logging_aggregator/prod/kibana/kibana.yml). 
+* Run Kibana using [kibana.yml]($github.base_url$/scripts/logging_aggregator/prod/kibana/kibana.yml). 
   Place `kibana.yml` in <<Kibana installation folder>>/config/ and execute `./bin/kibana` (on mac) or `bin/kibana` (on Linux). This will give GUI over
   logs aggregated in Elasticsearch.
 
@@ -310,7 +310,7 @@ Hence, make sure that latest Docker setup is installed and running before starti
 generated in `tmp/tmt/logs/csw`. Hence, developers writing Scala/Java/Python/C++/C applications need to generate log files under `/tmp/tmt/logs/csw`. 
 
 Also, note that csw apps started via `csw-services.sh` will generate log files under `/tmp/tmt/logs/csw` and thus, it will be aggregated by the Elastic docker container.
-To know more about setting up docker and starting Elastic, please refer to @ref:[Starting Elastic logging aggregator for Development](apps.md#starting-elk-logging-aggregator-for-development). 
+To know more about setting up docker and starting Elastic, please refer to @ref:[Starting Elastic logging aggregator for Development](apps.md#starting-elastic-logging-aggregator-for-development). 
 
 @@@ note
 

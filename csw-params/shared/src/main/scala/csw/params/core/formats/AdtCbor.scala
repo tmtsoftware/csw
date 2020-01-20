@@ -1,6 +1,6 @@
 package csw.params.core.formats
 
-import csw.params.commands.{Command, CommandIssue}
+import csw.params.commands.{CommandIssue, SequenceCommand}
 import csw.params.core.formats.ParamCodecs._
 import csw.params.events.Event
 import io.bullet.borer.{Cbor, Decoder, Encoder}
@@ -11,5 +11,5 @@ abstract class AdtCbor[T: Encoder: Decoder] {
 }
 
 object EventCbor        extends AdtCbor[Event]
-object CommandCbor      extends AdtCbor[Command]
+object CommandCbor      extends AdtCbor[SequenceCommand]
 object CommandIssueCbor extends AdtCbor[CommandIssue]

@@ -4,12 +4,15 @@ import java.time.Instant
 
 import csw.prefix.models.Prefix
 import enumeratum.{Enum, EnumEntry}
-import io.bullet.borer.derivation.MapBasedCodecs.{deriveDecoder, deriveEncoder}
-import io.bullet.borer.{Codec, Decoder, Encoder}
+import io.bullet.borer.derivation.CompactMapBasedCodecs.deriveEncoder
+import io.bullet.borer.derivation.CompactMapBasedCodecs.deriveDecoder
+import io.bullet.borer.{AdtEncodingStrategy, Codec, Decoder, Encoder}
 
 import scala.concurrent.duration.FiniteDuration
 
 trait CommonCodecs {
+  implicit val flatAdtEncoding: AdtEncodingStrategy = AdtEncodingStrategy.flat()
+
   implicit lazy val prefixCodec: Codec[Prefix] = Codec.bimap[String, Prefix](_.toString, Prefix(_))
 
   case class Timestamp(seconds: Long, nanos: Long)

@@ -21,7 +21,7 @@ with an event.
 There were two good candidates for the backend of Event Service - [Apache Kafka](https://kafka.apache.org/) and [Redis](https://redis.io/). 
 The Event Service API is implemented with both these backends and performance testing was done to select one particular backend 
 which would best satisfy the service latency requirements. Results of the performance tests can be found 
-[here](https://tmt-project.atlassian.net/wiki/spaces/DEOPSCSW/pages/191791210/Event+Service+Raw+Performance+Results+Results+May+Change).
+[here](https://id.atlassian.com/login?continue=https%3A%2F%2Ftmt-project.atlassian.net%2Flogin%3FredirectCount%3D1%26dest-url%3D%252Fwiki%252Fspaces%252FDEOPSCSW%252Fpages%252F191791210%252FEvent%252BService%252BRaw%252BPerformance%252BResults%252BResults%252BMay%252BChange%26application%3Dconfluence&application=confluence).
 Redis was the best choice for the backend as it turned out to be better at providing low latency 
 unlike Kafka which is more suited for high throughput systems.
 Hence you can see 2 implementations of the API in the Event Service client. The code is structured in a way that it is easy to switch the implementations.
@@ -35,7 +35,7 @@ It provides low-level APIs to make a new
 and @scaladoc[IEventService](csw.event.api.javadsl.IEventService) from Java.
 It takes an @scaladoc[EventStore](csw.event.client.models.EventStore) which could be either
 @scaladoc[RedisStore](csw.event.client.models.EventStores.RedisStore) or
-@scaladoc[KafkaStore](csw.event.client.models.EventStores.KafkaStore).
+@scaladoc[KafkaStore](csw.event.client.models.EventStores$$KafkaStore$).
 
 These APIs are not needed by component developers. The CSW framework provides the correct service implementation.
 
@@ -112,7 +112,7 @@ Two modes are provided - RateAdapterMode and RateLimiter mode. Details of when t
 
 Subscriber API also provides a `get` API which could be used to fetch the latest events for the specified event keys.
 
-In case, when the underlying event implementation is not available, the Subscribe APIs would fail with an exception @scaladoc[EventServiceNotAvailable](csw.event.api.exceptions.EventServiceNotAvailable)
+In case, when the underlying event implementation is not available, the Subscribe APIs would fail with an exception @scaladoc[EventServiceNotAvailable](csw.event.api.exceptions.EventServerNotAvailable)
 
 ## Architecture
 

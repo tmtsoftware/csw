@@ -13,7 +13,7 @@ import java.util.Collections;
 public class JComponentInfos {
 
     public static ComponentInfo jHcdInfo = JComponentInfo.from(
-            Prefix.apply("wfos.jsamplehcd"),
+            Prefix.apply("wfos.jSampleHcd"),
             JComponentType.HCD(),
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
             LocationServiceUsage.JRegisterOnly(),

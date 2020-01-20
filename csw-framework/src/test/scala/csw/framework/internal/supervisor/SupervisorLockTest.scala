@@ -22,7 +22,7 @@ import scala.concurrent.duration.DurationDouble
 class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
   //DEOPSCSW-222: Locking a component for a specific duration
-  // CSW-80: Prefix should be in lowercase
+  //CSW-86: Subsystem should be case-insensitive
   test("should able to lock and unlock a component") {
     val lockingStateProbe = TestProbe[LockingResponse]
     val mocks             = frameworkTestMocks()
@@ -45,7 +45,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     supervisorRef ! LockCommandFactory.make(Prefix("wfos.prog.cloudcover.Client2"), lockingStateProbe.ref)
     lockingStateProbe.expectMessage(
       AcquiringLockFailed(
-        s"Invalid source wfos.prog.cloudcover.client2 for acquiring lock. Currently it is acquired by component: wfos.prog.cloudcover.client1"
+        s"Invalid source WFOS.prog.cloudcover.Client2 for acquiring lock. Currently it is acquired by component: WFOS.prog.cloudcover.Client1"
       )
     )
 
@@ -57,7 +57,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     supervisorRef ! Unlock(Prefix("wfos.prog.cloudcover.Client2"), lockingStateProbe.ref)
     lockingStateProbe.expectMessage(
       ReleasingLockFailed(
-        s"Invalid source wfos.prog.cloudcover.client2 for releasing lock. Currently it is acquired by component: wfos.prog.cloudcover.client1"
+        s"Invalid source WFOS.prog.cloudcover.Client2 for releasing lock. Currently it is acquired by component: WFOS.prog.cloudcover.Client1"
       )
     )
 

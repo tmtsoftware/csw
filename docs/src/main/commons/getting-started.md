@@ -2,7 +2,7 @@
 
 In this tutorial, you’ll see how to create a Scala/Java project using a [giter8](http://www.foundweekends.org/giter8/) template for CSW ([csw.g8](https://github.com/tmtsoftware/csw.g8)) which contains sample handlers for creating HCD and Assembly. 
 It also contains a deploy project which is responsible for starting multiple components or containers. You can use this as a starting point for your own projects for writing component. 
-We’ll use the [sbt](http://www.scala-sbt.org/1.x/docs/index.html) build tool which compiles, runs, and tests your projects among other related tasks.
+We’ll use the [sbt](https://www.scala-sbt.org/1.x/docs/index.html) build tool which compiles, runs, and tests your projects among other related tasks.
 
 ## Installation
 Supported Operating Systems are: CentOS and MacOS
@@ -11,13 +11,13 @@ Supported Operating Systems are: CentOS and MacOS
     -   Run  `javac -version`  in the command line and make sure you see  `javac 11._._`
     -   If you don’t have version 11 or higher, links given below will help you to reach there.
         - [Mac](https://github.com/AdoptOpenJDK/homebrew-openjdk)
-        - [Linux](https://adoptopenjdk.net/installation.html?variant=openjdk11&jvmVariant=hotspot#x64_linux-jdk)                
+        - [Linux](https://adoptopenjdk.net/installation.html?variant=openjdk11&jvmVariant=hotspot)                
 2.  Install sbt
-    -   [Mac](http://www.scala-sbt.org/1.x/docs/Installing-sbt-on-Mac.html)
-    -   [Linux](http://www.scala-sbt.org/1.x/docs/Installing-sbt-on-Linux.html)
+    -   [Mac](https://www.scala-sbt.org/1.x/docs/Installing-sbt-on-Mac.html)
+    -   [Linux](https://www.scala-sbt.org/1.x/docs/Installing-sbt-on-Linux.html)
 3. Install IntelliJ 
-	- [MAC](https://www.jetbrains.com/idea/download/#section=mac)
-	- [Linux](https://www.jetbrains.com/idea/download/#section=linux)
+	- [MAC](https://www.jetbrains.com/idea/download/)
+	- [Linux](https://www.jetbrains.com/idea/download/)
 4. Install following IntelliJ Plugins
     - [Scala](https://plugins.jetbrains.com/plugin/1347-scala)
     - [Scalafmt](https://plugins.jetbrains.com/plugin/8236-scalafmt)

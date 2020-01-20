@@ -1,4 +1,4 @@
-[ERROR] No events published for key: [wfos.prog.cloudcover.system_3]
+[ERROR] No events published for key: [WFOS.prog.cloudcover.system_3]
 "12:13:14.1"
 "32:33:34.4"
 1950.0

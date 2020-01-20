@@ -1,6 +1,8 @@
 import Libs._
 import com.timushev.sbt.updates.UpdatesPlugin.autoImport.dependencyUpdatesFilter
+import com.typesafe.sbt.site.SitePlugin.autoImport.siteDirectory
 import org.scalafmt.sbt.ScalafmtPlugin.autoImport.scalafmtOnCompile
+import org.tmt.sbt.docs.DocKeys.docsParentDir
 import sbt.Keys._
 import sbt._
 import sbt.plugins.JvmPlugin
@@ -53,7 +55,7 @@ object Common extends AutoPlugin {
     version := {
       sys.props.get("prod.publish") match {
         case Some("true") => version.value
-        case _            => "0.1-SNAPSHOT"
+        case _            => "0.1.0-SNAPSHOT"
       }
     },
     isSnapshot := !sys.props.get("prod.publish").contains("true"),
@@ -67,6 +69,12 @@ object Common extends AutoPlugin {
     scalafmtOnCompile := true,
     unidocGenjavadocVersion := "0.15",
     dependencyUpdatesFilter := dependencyUpdatesFilter.value - moduleFilter(organization = "org.scala-lang"),
-    scalacOptions += "-P:silencer:globalFilters=`silencer-plugin` was enabled but the @silent annotation was not found on classpath - have you added `silencer-lib` as a library dependency?"
+    scalacOptions += "-P:silencer:globalFilters=`silencer-plugin` was enabled but the @silent annotation was not found on classpath - have you added `silencer-lib` as a library dependency?",
+    commands += Command.command("openSite") { state =>
+      val uri = s"file://${Project.extract(state).get(siteDirectory)}/${docsParentDir.value}/${version.value}/index.html"
+      state.log.info(s"Opening browser at $uri ...")
+      java.awt.Desktop.getDesktop.browse(new java.net.URI(uri))
+      state
+    }
   )
 }

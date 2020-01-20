@@ -5,7 +5,7 @@
 ## Dependencies
 
 sbt
-:   @@@vars
+: @@@vars
     ```scala
     libraryDependencies += "com.github.tmtsoftware.csw" %% "csw-framework" % "$version$"
     ```
@@ -29,10 +29,10 @@ See @ref:[CSW Framework Technical Description](../technical/framework/framework.
 
 ## Source code for examples
 
-* @github[Assembly Scala Example](/examples/src/main/scala/example/framework/components/assembly/AssemblyComponentHandlers.scala)
-* @github[HCD Scala Example](/examples/src/main/scala/example/framework/components/hcd/HcdComponentHandlers.scala)
-* @github[Assembly Java Example](/examples/src/main/java/example/framework/components/assembly/JAssemblyComponentHandlers.java)
-* @github[HCD Java Example](/examples/src/main/java/example/framework/components/hcd/JHcdComponentHandlers.java)
+* [Assembly Scala Example]($github.base_url$/examples/src/main/scala/example/framework/components/assembly/AssemblyComponentHandlers.scala)
+* [HCD Scala Example]($github.base_url$/examples/src/main/scala/example/framework/components/hcd/HcdComponentHandlers.scala)
+* [Assembly Java Example]($github.base_url$/examples/src/main/java/example/framework/components/assembly/JAssemblyComponentHandlers.java)
+* [HCD Java Example]($github.base_url$/examples/src/main/java/example/framework/components/hcd/JHcdComponentHandlers.java)
     
 
 

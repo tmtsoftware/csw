@@ -152,18 +152,16 @@ This example shows an immediate response command using `submit` that returns `St
 Scala/submit w/immediate-response
 :   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #submit }
 
-#Fixme for Kim: This snip is broken. Fix #submit and then make it `@@snip`.
 Java/submit w/immediate-response
-:   snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #submit }
+:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #submitAndQueryFinal }
 
 Note that the Scala examples are using `async/await` which simplifies handling the Futures, but is not necessary.
 The `async/await` library is not available in Java.
 If using `submit` and the validation fails in the destination component, 
 the `Invalid` response is returned.
 
-#Fixme for Kim: This snip is broken. Fix #submit and then make it `@@snip`.
 Scala/submit w/invalid response
-:   snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #invalidSubmitCmd }
+:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #invalidCmd }
 
 Java/submit w/invalid response
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #invalidSubmitCmd }
@@ -264,8 +262,7 @@ At any time, the `query` call of `CommandService` can be used to check the curre
 a command that has been sent via the `submit` message using the command's `runId`. 
 This is most useful with a long-running command but all commands that use `submit` are available.
 
-The `query` message returns a `QueryResponse`, which coubld be any of the values of `SubmitResponse`
-plus the `CommandNotAvailable` response. This response occurs when the framework has no knowledge
+The `query` message returns a `SubmitResponse`. This response occurs when the framework has no knowledge
 of the command associated with the `runId` passed with the `query`. The previous long-running
 example above showed the use of `query` to check that the actions associated with a command that
 had started. Another usage is to check the final
@@ -313,7 +310,7 @@ the @ref:[CurrentState](../params/states.md) of a component by providing a callb
 is called with the arrival of every `CurrentState` item.
 
 @@@ note
-Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor. Here is an @github[example](/examples/src/main/scala/example/event/ConcurrencyInCallbacksExample.scala) of how it can be done.
+Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor. Here is an [example]($github.base_url$/examples/src/main/scala/example/event/ConcurrencyInCallbacksExample.scala) of how it can be done.
 @@@
 
 

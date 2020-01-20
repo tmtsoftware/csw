@@ -19,13 +19,13 @@ The following table provides an overview of the packages and files in the Databa
 
 | Package  | File  | Description |
 |---:|:---|:---|
-| `commons`  |  @github[DatabaseLogger](/csw-database/src/main/scala/csw/database/commons/DatabaseLogger.scala)  | An internal class to allow Database Service to log to Logging Service |
-| `commons`  | @github[DatabaseServiceConnection](/csw-database/src/main/scala/csw/database/commons/DatabaseServiceConnection.scala)  | `DatabaseServiceConnection` is a wrapper over predefined `TcpConnection` representing Database Service. It is used to resolve the Database Service location.|
-| `commons`  | @github[DatabaseServiceLocationResolver](/csw-database/src/main/scala/csw/database/commons/DatabaseServiceLocationResolver.scala)  | Provides the connection information of `Database Service` by resolving the location. |
-| `exception`  | @github[DatabaseException](/csw-database/src/main/scala/csw/database/exceptions/DatabaseException.scala) | Represents an exception while connecting to the database server e.g. in case of providing incorrect username or password. |
-| `javadsl`  | @github[AsyncHelper](/csw-database/src/main/scala/csw/database/javadsl/AsyncHelper.scala) |  A Java helper to schedule and execute blocking operations on a dedicated thread pool. This mechanism will prevent any blocking operation to be scheduled on a thread pool designated for async operations.|
-| `javadsl`  |  @github[JooqHelper](/csw-database/src/main/scala/csw/database/javadsl/JooqHelper.scala)| A Java helper wrapping some of the Jooq operations.|
-| `scaladsl`  | @github[JooqExtensions](/csw-database/src/main/scala/csw/database/scaladsl/JooqExtentions.scala)  | A Scala extension, extending few of the Jooq operations. |
-|   | @github[DatabaseServiceFactory](/csw-database/src/main/scala/csw/database/DatabaseServiceFactory.scala)  |  DatabaseServiceFactory provides a mechanism to connect to the database server and get the handle of Jooq's DSLContext.|
+| `commons`  |  [DatabaseLogger](/csw-database/src/main/scala/csw/database/commons/DatabaseLogger.scala)  | An internal class to allow Database Service to log to Logging Service |
+| `commons`  | [DatabaseServiceConnection](/csw-database/src/main/scala/csw/database/commons/DatabaseServiceConnection.scala)  | `DatabaseServiceConnection` is a wrapper over predefined `TcpConnection` representing Database Service. It is used to resolve the Database Service location.|
+| `commons`  | [DatabaseServiceLocationResolver](/csw-database/src/main/scala/csw/database/commons/DatabaseServiceLocationResolver.scala)  | Provides the connection information of `Database Service` by resolving the location. |
+| `exception`  | [DatabaseException](/csw-database/src/main/scala/csw/database/exceptions/DatabaseException.scala) | Represents an exception while connecting to the database server e.g. in case of providing incorrect username or password. |
+| `javadsl`  | [AsyncHelper](/csw-database/src/main/scala/csw/database/javadsl/AsyncHelper.scala) |  A Java helper to schedule and execute blocking operations on a dedicated thread pool. This mechanism will prevent any blocking operation to be scheduled on a thread pool designated for async operations.|
+| `javadsl`  |  [JooqHelper](/csw-database/src/main/scala/csw/database/javadsl/JooqHelper.scala)| A Java helper wrapping some of the Jooq operations.|
+| `scaladsl`  | [JooqExtensions](/csw-database/src/main/scala/csw/database/scaladsl/JooqExtentions.scala)  | A Scala extension, extending few of the Jooq operations. |
+|   | [DatabaseServiceFactory](/csw-database/src/main/scala/csw/database/DatabaseServiceFactory.scala)  |  DatabaseServiceFactory provides a mechanism to connect to the database server and get the handle of Jooq's DSLContext.|
 
 For all other Database Service information see the @ref[user documentation](../../services/database.md).

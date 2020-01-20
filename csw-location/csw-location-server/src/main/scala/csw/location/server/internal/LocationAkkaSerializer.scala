@@ -34,15 +34,14 @@ class LocationAkkaSerializer extends Serializer with LocationCodecs {
       else None
     }
 
-    {
-      fromBinary[Connection] orElse
-      fromBinary[Location] orElse
-      fromBinary[Registration] orElse
-      fromBinary[TrackingEvent]
-    } getOrElse {
-      val ex = new RuntimeException(s"does not support decoding of ${manifest.get}")
-      logger.error(ex.getMessage, ex = ex)
-      throw ex
-    }
+    fromBinary[Connection]
+      .orElse(fromBinary[Location])
+      .orElse(fromBinary[Registration])
+      .orElse(fromBinary[TrackingEvent])
+      .getOrElse {
+        val ex = new RuntimeException(s"does not support decoding of ${manifest.get}")
+        logger.error(ex.getMessage, ex = ex)
+        throw ex
+      }
   }
 }

@@ -47,11 +47,12 @@ class MainTest extends ScalaTestFrameworkTestKit with FunSuiteLike {
     testWithHttp(args, name, port, path)
   }
 
+  // CSW-86: Subsystem should be case-insensitive
   test("Test with config file") {
-    val name       = "csw.test2"
+    val name       = "CSW.test2"
     val configFile = ResourceReader.copyToTmp("/test2.conf").toFile
     val config     = ConfigFactory.parseFile(configFile)
-    val port       = config.getInt("csw.test2.port")
+    val port       = config.getInt("CSW.test2.port")
 
     val args = Array("--prefix", name, "--no-exit", configFile.getAbsolutePath)
     testWithTcp(args, name, port)

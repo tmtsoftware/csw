@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The @github[csw-location-agent](/csw-location/csw-location-agent) project provides an application used to register and track non-csw services, such as Redis, which is used to implement the Event and Alarm Services.
+The [csw-location-agent]($github.dir.base_url$/csw-location/csw-location-agent) project provides an application used to register and track non-csw services, such as Redis, which is used to implement the Event and Alarm Services.
 
 ## Usage
 
@@ -26,4 +26,4 @@ On execution, Location agent performs following actions in sequence:
 
 1. Adds shutdown hook to unregister services on termination (this is done as a part of step 2)
 
-Log messages are configured in @github[application.conf](/csw-location/csw-location-agent/src/main/resources/application.conf) to log only to file (under `$TMT_LOG_HOME/csw/logs`).
+Log messages are configured in [application.conf]($github.base_url$/csw-location/csw-location-agent/src/main/resources/application.conf) to log only to file (under `$TMT_LOG_HOME/csw/logs`).

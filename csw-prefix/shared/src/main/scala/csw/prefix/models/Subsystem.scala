@@ -1,6 +1,5 @@
 package csw.prefix.models
 
-import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry}
 
 import scala.collection.immutable
@@ -10,7 +9,7 @@ import scala.collection.immutable
  *
  * @param description of subsystem
  */
-sealed abstract class Subsystem(description: String) extends EnumEntry with Lowercase with Serializable {
+sealed abstract class Subsystem(description: String) extends EnumEntry with Serializable {
 
   /**
    * Represents a string with entryName and description of a subsystem

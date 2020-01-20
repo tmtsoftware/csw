@@ -62,5 +62,5 @@ Java
 
 ## Source Code for Examples
 
-* @github[Scala Example](/examples/src/test/scala/example/params/StateVariablesTest.scala)
-* @github[Java Example](/examples/src/test/java/example/params/JStateVariablesTest.java)
+* [Scala Example]($github.base_url$/examples/src/test/scala/example/params/StateVariablesTest.scala)
+* [Java Example]($github.base_url$/examples/src/test/java/example/params/JStateVariablesTest.java)

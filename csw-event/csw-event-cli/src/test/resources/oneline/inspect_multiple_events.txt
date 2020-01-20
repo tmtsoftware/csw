@@ -1,11 +1,11 @@
 ===============================================================================================================
-EventKey: wfos.prog.cloudcover.move
+EventKey: WFOS.prog.cloudcover.move
 
 epoch = DoubleKey[NoUnits]
 struct-1/dec = StringKey[NoUnits]
 struct-1/ra = StringKey[NoUnits]
 ===============================================================================================================
-EventKey: wfos.prog.filter.stop
+EventKey: WFOS.prog.filter.stop
 
 struct-2/dec = StringKey[NoUnits]
 struct-2/ra = StringKey[NoUnits]

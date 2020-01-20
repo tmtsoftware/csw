@@ -231,8 +231,8 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   //#filtering-prefix
   // filter akka locations based on prefix
-  val akkaLocations: List[Location] = Await.result(locationService.listByPrefix(Prefix("nfiraos.ncc.assembly1")), timeout)
-  log.info("Registered akka locations for nfiraos.ncc.assmbly1")
+  val akkaLocations: List[Location] = Await.result(locationService.listByPrefix("NFIRAOS.ncc"), timeout)
+  log.info("Registered akka locations for nfiraos.ncc")
   akkaLocations.foreach(c => log.info(s"--- ${locationInfoToString(c)}"))
   //#filtering-prefix
 
