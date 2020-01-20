@@ -36,7 +36,7 @@ object Libs {
   val `embedded-redis`    = "com.github.kstyrc"       % "embedded-redis"     % "0.6"
   val `scala-compiler`    = "org.scala-lang"          % "scala-compiler"     % ScalaVersion
   val `HdrHistogram`      = "org.hdrhistogram"        % "HdrHistogram"       % "2.1.12"
-  val `testng`            = "org.testng"              % "testng"             % "6.14.3"
+  val `testng`            = "org.testng"              % "testng"             % "7.1.1"
 
   val `scala-csv`             = "com.github.tototoshi" %% "scala-csv"            % "1.3.6"
   val `json-schema-validator` = "com.github.fge"       % "json-schema-validator" % "2.2.13" //LGPL/ASL
