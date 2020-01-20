@@ -107,7 +107,7 @@ trait LocationService {
    * @return a future which completes with filtered locations or can fail with
    *         [[csw.location.api.exceptions.RegistrationListingFailed]]
    */
-  def listByPrefix(prefix: String): Future[List[AkkaLocation]]
+  def listByPrefix(prefix: String): Future[List[Location]]
 
   /**
    * Tracks the connection and send events for modification or removal of its location

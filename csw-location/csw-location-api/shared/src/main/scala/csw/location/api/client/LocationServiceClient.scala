@@ -51,8 +51,8 @@ class LocationServiceClient(
   override def list(connectionType: ConnectionType): Future[List[Location]] =
     httpTransport.requestResponse[List[Location]](ListByConnectionType(connectionType))
 
-  override def listByPrefix(prefix: String): Future[List[AkkaLocation]] =
-    httpTransport.requestResponse[List[AkkaLocation]](ListByPrefix(prefix))
+  override def listByPrefix(prefix: String): Future[List[Location]] =
+    httpTransport.requestResponse[List[Location]](ListByPrefix(prefix))
 
   override def track(connection: Connection): Source[TrackingEvent, Subscription] =
     websocketTransport.requestStream[TrackingEvent](Track(connection))

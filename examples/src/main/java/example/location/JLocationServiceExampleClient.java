@@ -228,9 +228,9 @@ public class JLocationServiceExampleClient extends AbstractActor {
         //#filtering-connection
 
         //#filtering-prefix
-        List<AkkaLocation> akkaLocations = locationService.listByPrefix("nfiraos.ncc").get();
+        List<Location> locations = locationService.listByPrefix("NFIRAOS.ncc").get();
         log.info("Registered akka locations for nfiraos.ncc");
-        for (Location loc : akkaLocations) {
+        for (Location loc : locations) {
             log.info("--- " + connectionInfo(loc.connection()));
         }
         //#filtering-prefix
