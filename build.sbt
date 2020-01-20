@@ -587,7 +587,6 @@ lazy val docs = project
       "extref.csw_js.base_url" -> s"https://tmtsoftware.github.io/csw-js/${Settings.cswJsVersion}/%s"
     ),
     paradoxRoots := List(
-      "apps/cswlocationroutes.html",
       "index.html",
       "services/aas/core-concepts-and-terms.html",
       "services/aas/csw-aas-http.html",
