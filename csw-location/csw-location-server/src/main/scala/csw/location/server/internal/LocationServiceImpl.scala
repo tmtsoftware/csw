@@ -17,6 +17,8 @@ import csw.location.api.exceptions.{
   UnregistrationFailed
 }
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
+import csw.location.models.ComponentType.{Assembly, HCD, Sequencer}
+import csw.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.location.models._
 import csw.location.server.commons.{CswCluster, LocationServiceLogger}
 import csw.location.server.internal.Registry.AllServices
@@ -61,9 +63,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     val updateValue = service.update(
       {
         case r @ LWWRegister(Some(`location`) | None) => r.withValueOf(Some(location))
-        case LWWRegister(Some(otherLocation)) =>
-          val locationIsRegistered = new OtherLocationIsRegistered(location, otherLocation)
-          throw locationIsRegistered
+        case LWWRegister(Some(otherLocation))         => throw logException(new OtherLocationIsRegistered(location, otherLocation))
       },
       await(initialValue)
     )
@@ -77,30 +77,32 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
       case _: UpdateSuccess[_] =>
         (replicator ? updateRegistry).map {
           case _: UpdateSuccess[_] =>
-            log.info(
-              s"Successfully registered connection: [${registration.connection.name}] with location [${location.uri}]"
-            )
+            log.info(s"Successfully registered connection: [${registration.connection.name}] with location [${location.uri}]")
             registrationResult(location)
-          case _ =>
-            val registrationFailed = new RegistrationFailed(registration.connection)
-            log.error(registrationFailed.getMessage, ex = registrationFailed)
-            throw registrationFailed
+          case _ => throw logException(new RegistrationFailed(registration.connection))
         }
       case ModifyFailure(service.Key, _, cause, _) =>
-        log.error(cause.getMessage, ex = cause)
-        throw cause // this exception gets mapped onto OtherLocationIsRegistered
-      case _ =>
-        val registrationFailed = new RegistrationFailed(registration.connection)
-        log.error(registrationFailed.getMessage, ex = registrationFailed)
-        throw registrationFailed
+        throw logException(cause) // // this exception gets mapped onto OtherLocationIsRegistered
+      case _ => throw logException(new RegistrationFailed(registration.connection))
     }
     await(registrationResultF)
   }
 
   /**
    * Unregister the connection from CRDT
+   * HCD, Assembly and Sequencer components runs in a embedded mode where they registers akka and http connections
+   * hence we are unregistering both connections here
    */
-  def unregister(connection: Connection): Future[Done] = {
+  def unregister(connection: Connection): Future[Done] =
+    connection.componentId.componentType match {
+      case HCD | Assembly | Sequencer => unregisterEmbeddedComponent(connection.componentId)
+      case _                          => unregister0(connection)
+    }
+
+  private def unregisterEmbeddedComponent(componentId: ComponentId): Future[Done] =
+    (unregister0(AkkaConnection(componentId)) zip unregister0(HttpConnection(componentId))).map(_ => Done)
+
+  private def unregister0(connection: Connection): Future[Done] = {
     log.info(s"Un-registering connection: [${connection.name}]")
     //Create a message handler for this connection
     val service = new Registry.Service(connection)
@@ -108,18 +110,12 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     //Send an update message to replicator to update the connection key with None. On success send another message to remove the
     //corresponding connection -> location entry from map. In case of any failure throw an exception otherwise return Done.
     (replicator ? service.update(_.withValueOf(None))).flatMap {
-      case x: UpdateSuccess[_] =>
+      case _: UpdateSuccess[_] =>
         (replicator ? AllServices.update(_.remove(node, connection))).map {
           case _: UpdateSuccess[_] => Done
-          case _ =>
-            val unregistrationFailed = UnregistrationFailed(connection)
-            log.error(unregistrationFailed.getMessage, ex = unregistrationFailed)
-            throw unregistrationFailed
+          case _                   => throw logException(UnregistrationFailed(connection))
         }
-      case _ =>
-        val unregistrationFailed = UnregistrationFailed(connection)
-        log.error(unregistrationFailed.getMessage, ex = unregistrationFailed)
-        throw unregistrationFailed
+      case _ => throw logException(UnregistrationFailed(connection))
     }
   }
 
@@ -134,7 +130,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     val locations = await(list)
 
     //for each location unregister it's corresponding connection
-    await(Future.traverse(locations)(loc => unregister(loc.connection)))
+    await(Future.traverse(locations)(loc => unregister0(loc.connection)))
     Done
   }
 
@@ -161,10 +157,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
   def list: Future[List[Location]] = (replicator ? AllServices.get).map {
     case x @ GetSuccess(_)            => x.get(AllServices.Key).entries.values.toList
     case NotFound(AllServices.Key, _) => List.empty
-    case _ =>
-      val listingFailed = RegistrationListingFailed()
-      log.error(listingFailed.getMessage, ex = listingFailed)
-      throw listingFailed
+    case _                            => throw logException(RegistrationListingFailed())
   }
 
   /**
@@ -248,4 +241,9 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
       }
       .takeWithin(waitTime)
       .runWith(Sink.headOption)
+
+  private def logException(ex: Throwable): Throwable = {
+    log.error(ex.getMessage, ex = ex)
+    ex
+  }
 }
