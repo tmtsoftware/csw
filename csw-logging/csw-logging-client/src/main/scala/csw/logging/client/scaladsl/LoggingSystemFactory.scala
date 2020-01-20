@@ -3,6 +3,7 @@ package csw.logging.client.scaladsl
 import java.net.InetAddress
 
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import csw.logging.client.appenders.StdOutAppender
 import csw.logging.client.internal.LoggingSystem
 
 object LoggingSystemFactory {
@@ -34,6 +35,9 @@ object LoggingSystemFactory {
   def start(name: String, version: String, hostName: String, actorSystem: ActorSystem[SpawnProtocol.Command]): LoggingSystem =
     new LoggingSystem(name, version, hostName, actorSystem)
 
-  def forTestingOnly()(implicit actorSystem: ActorSystem[SpawnProtocol.Command]): LoggingSystem =
-    new LoggingSystem("test-name", "test-version-1", "localhost", actorSystem)
+  def forTestingOnly()(implicit actorSystem: ActorSystem[SpawnProtocol.Command]): LoggingSystem = {
+    val loggingSystem = new LoggingSystem("test-name", "test-version-1", "localhost", actorSystem)
+    loggingSystem.setAppenders(List(StdOutAppender))
+    loggingSystem
+  }
 }
