@@ -700,5 +700,14 @@ lazy val `csw-contract` = project
     `csw-location-api`.jvm
   )
   .settings(
-    libraryDependencies ++= Dependencies.ContractServer.value
+    libraryDependencies ++= Dependencies.ContractServer.value,
   )
+
+lazy val generateDocs = taskKey[Unit]("documents")
+
+generateDocs := {
+  (`csw-contract`/Compile/runMain).toTask(" csw.contract.services.GenerateDocs target/output").value
+}
+
+
+

@@ -2,33 +2,30 @@ package csw.contract.services
 
 import java.io.{File, PrintWriter}
 
-import com.typesafe.config.ConfigFactory
 import csw.contract.services.codecs.ContractCodecs
 import csw.contract.services.data.ServiceData
 import io.bullet.borer.Json
 import play.api.libs.json
 
 object GenerateDocs extends ContractCodecs {
-  private val config     = ConfigFactory.load()
-  private val outputPath = config.getString("csw-contract.outputPath")
+  val DefaultOutputPath = "target/output"
 
   def main(args: Array[String]): Unit = {
+    val outputPath = if (args.isEmpty) DefaultOutputPath else args(0)
+
     ServiceData.data.services.foreach {
-      case (serviceName, service) => {
+      case (serviceName, service) =>
         service.endpoints.foreach {
-          case (endpointName, endpoint) => {
+          case (endpointName, endpoint) =>
             write(
               s"$outputPath/$serviceName/endpoints/$endpointName.json",
               Json.encode(Map("requests" -> endpoint.requests, "responses" -> endpoint.responses)).toUtf8String
             )
-          }
         }
         service.models.foreach {
-          case (modelName, model) => {
+          case (modelName, model) =>
             write(s"$outputPath/$serviceName/models/$modelName.json", Json.encode(model.models).toUtf8String)
-          }
         }
-      }
     }
   }
 
