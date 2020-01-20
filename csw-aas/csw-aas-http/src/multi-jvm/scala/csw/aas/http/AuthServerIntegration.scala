@@ -76,7 +76,7 @@ class AuthIntegrationTest
           .get
 
       requests
-        .post(testServer.uri.toString)
+        .post(testServer.uri.toString, check = false)
         .statusCode shouldBe 401
       enterBarrier("test finished")
     }
@@ -146,7 +146,7 @@ class AuthIntegrationTest
           .await
           .get
       requests
-        .post(url = testServer.uri.toString, auth = token)
+        .post(url = testServer.uri.toString, auth = token, check = false)
         .statusCode shouldBe 200
       enterBarrier("test finished")
     }
@@ -215,7 +215,7 @@ class AuthIntegrationTest
           .await
           .get
       requests
-        .post(url = testServer.uri.toString, auth = token)
+        .post(url = testServer.uri.toString, auth = token, check = false)
         .statusCode shouldBe 403
       enterBarrier("test finished")
     }
