@@ -184,7 +184,9 @@ private[framework] final class SupervisorBehavior(
       ctx.self ! RegistrationNotRequired(componentRef)
     else {
 
-      // fixme: handle a scenario when akka registration succeeds but http registration fails
+      // fixme: handle following scenarios
+      //  1. when akka registration succeeds but http registration fails
+      //  2. on Restart message, registeredLazyBinding should get re-evaluated, in that case gracefully shutdown previous server binding
       locationService.register(akkaRegistration).flatMap(_ => httpService.registeredLazyBinding).onComplete {
         case Success(_)         => ctx.self ! RegistrationSuccess(componentRef)
         case Failure(throwable) => ctx.self ! RegistrationFailed(throwable)
