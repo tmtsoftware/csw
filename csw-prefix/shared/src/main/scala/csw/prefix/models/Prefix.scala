@@ -17,7 +17,7 @@ case class Prefix(subsystem: Subsystem, componentName: String) {
   /**
    * String representation of prefix e.g. tcs.filter.wheel where tcs is the subsystem name and filter.wheel is the component name
    */
-  override val toString: String = s"${subsystem.name}${Prefix.SEPARATOR}$componentName"
+  override def toString: String = s"${subsystem.name}${Prefix.SEPARATOR}$componentName"
 }
 
 object Prefix {
