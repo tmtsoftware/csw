@@ -18,7 +18,7 @@ import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.models.Connection.AkkaConnection
-import csw.location.models.HttpRegistration
+import csw.location.models.{AkkaRegistration, HttpRegistration}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.LoggerFactory
@@ -33,7 +33,7 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol.Command]) ex
 
   ///////////////////////////////////////////////
   val testActor: ActorRef[Any]                   = TestProbe("test-probe").ref
-  val akkaRegistration                           = AkkaRegistrationFactory.make(mock[AkkaConnection], testActor.toURI)
+  val akkaRegistration: AkkaRegistration         = AkkaRegistrationFactory.make(mock[AkkaConnection], testActor.toURI)
   val locationService: LocationService           = mock[LocationService]
   val eventServiceFactory: EventServiceFactory   = mock[EventServiceFactory]
   val eventService: EventService                 = mock[EventService]
@@ -42,8 +42,7 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol.Command]) ex
   val registrationResult: RegistrationResult     = mock[RegistrationResult]
   val registrationFactory: RegistrationFactory   = mock[RegistrationFactory]
 
-  when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]]))
-    .thenReturn(akkaRegistration)
+  when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]])).thenReturn(akkaRegistration)
   when(locationService.register(akkaRegistration)).thenReturn(Future.successful(registrationResult))
   when(locationService.register(any[HttpRegistration])).thenReturn(Future.successful(registrationResult))
   when(locationService.unregister(any[AkkaConnection])).thenReturn(Future.successful(Done))

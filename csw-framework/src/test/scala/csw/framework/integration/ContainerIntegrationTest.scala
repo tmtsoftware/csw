@@ -190,11 +190,9 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
     assertConnectionIsRegistered(filterAssemblyAkkaConnection)
     assertConnectionIsRegistered(instrumentHcdAkkaConnection)
     assertConnectionIsRegistered(disperserHcdAkkaConnection)
-
-    // fixme: uncomment these lines when fix is applied in SupervisorBehavior
-//    assertConnectionIsRegistered(filterAssemblyHttpConnection)
-//    assertConnectionIsRegistered(instrumentHcdHttpConnection)
-//    assertConnectionIsRegistered(disperserHcdHttpConnection)
+    assertConnectionIsRegistered(filterAssemblyHttpConnection)
+    assertConnectionIsRegistered(instrumentHcdHttpConnection)
+    assertConnectionIsRegistered(disperserHcdHttpConnection)
 
     val containerTracker      = testkit.TestProbe()(seedActorSystem.toClassic)
     val filterAssemblyTracker = testkit.TestProbe()(seedActorSystem.toClassic)

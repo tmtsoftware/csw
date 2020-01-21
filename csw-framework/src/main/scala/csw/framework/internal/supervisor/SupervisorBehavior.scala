@@ -1,7 +1,9 @@
 package csw.framework.internal.supervisor
 
+import akka.Done
 import akka.actor.typed._
 import akka.actor.typed.scaladsl._
+import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.server.Route
 import csw.command.client.MiniCRM.MiniCRMMessage
 import csw.command.client.messages.ComponentCommonMessage.{
@@ -39,6 +41,7 @@ import csw.params.commands.CommandResponse.Locked
 import csw.params.core.models.Id
 import csw.prefix.models.Prefix
 
+import scala.concurrent.Future
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.util.{Failure, Success}
 
@@ -87,6 +90,7 @@ private[framework] final class SupervisorBehavior(
   private[framework] val initializeTimeout: FiniteDuration                        = componentInfo.initializeTimeout
   private[framework] val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] = makePubSubLifecycle()
 
+  private var embeddedServer: Option[ServerBinding]               = None
   private var runningComponent: Option[ActorRef[RunningMessage]]  = None
   private var lockManager: LockManager                            = new LockManager(None, loggerFactory)
   private[framework] var lifecycleState: SupervisorLifecycleState = SupervisorLifecycleState.Idle
@@ -136,21 +140,25 @@ private[framework] final class SupervisorBehavior(
 
   private def onRestart(): Unit = {
     updateLifecycleState(SupervisorLifecycleState.Restart)
-    unRegisterFromLocationService()
-  }
-
-  private def unRegisterFromLocationService(): Unit = {
     log.debug(s"Un-registering supervisor from location service")
-    locationService.unregister(httpConnection).flatMap(_ => locationService.unregister(akkaConnection)).onComplete {
+    unregisterAndStopEmbeddedServer().onComplete {
       case Success(_)         => ctx.self ! UnRegistrationComplete
       case Failure(throwable) => ctx.self ! UnRegistrationFailed(throwable)
     }
   }
 
-  private def onShutdown() = {
+  private def unregisterAndStopEmbeddedServer(): Future[Done] = {
+    val unregistrationResult = locationService.unregister(akkaConnection)
+    val embeddedServerTerminationResult =
+      embeddedServer.map(_.terminate(20.seconds).map(_ => Done)).getOrElse(Future.successful(Done))
+
+    (unregistrationResult zip embeddedServerTerminationResult).map(_ => Done)
+  }
+
+  private def onShutdown(): Unit = {
     updateLifecycleState(SupervisorLifecycleState.Shutdown)
     ctx.child(componentActorName) match {
-      case Some(ref) => ctx.stop(ref) // stop component actor for a graceful shutdown before shutting down the actor system
+      case Some(ref) => ctx.stop(ref) // stop a component actor for a graceful shutdown before shutting down the actor system
       case None      => ctx.system.terminate()
     }
   }
@@ -180,18 +188,13 @@ private[framework] final class SupervisorBehavior(
   }
 
   private def registerWithLocationService(componentRef: ActorRef[RunningMessage]): Unit = {
-    if (componentInfo.locationServiceUsage == DoNotRegister) //Honour DoNotRegister received in componentInfo
-      ctx.self ! RegistrationNotRequired(componentRef)
-    else {
-
-      // fixme: handle following scenarios
-      //  1. when akka registration succeeds but http registration fails
-      //  2. on Restart message, registeredLazyBinding should get re-evaluated, in that case gracefully shutdown previous server binding
-      locationService.register(akkaRegistration).flatMap(_ => httpService.registeredLazyBinding).onComplete {
-        case Success(_)         => ctx.self ! RegistrationSuccess(componentRef)
-        case Failure(throwable) => ctx.self ! RegistrationFailed(throwable)
+    //Honour DoNotRegister received in componentInfo
+    if (componentInfo.locationServiceUsage == DoNotRegister) ctx.self ! RegistrationNotRequired(componentRef)
+    else
+      (locationService.register(akkaRegistration) zip httpService.bindAndRegister()).onComplete {
+        case Success((_, (binding, _))) => embeddedServer = Some(binding); ctx.self ! RegistrationSuccess(componentRef)
+        case Failure(throwable)         => ctx.self ! RegistrationFailed(throwable)
       }
-    }
   }
 
   /**
@@ -236,6 +239,8 @@ private[framework] final class SupervisorBehavior(
   }
 
   private def onRegistrationFailed(throwable: Throwable) = {
+    // unregister connections if one of them got registered in the startup process otherwise this is no-op
+    unregisterAndStopEmbeddedServer() // fixme: what if exception is thrown while unregistering connection?
     updateLifecycleState(SupervisorLifecycleState.Idle)
     runningComponent = None
     log.error(throwable.getMessage, ex = throwable)
@@ -318,7 +323,7 @@ private[framework] final class SupervisorBehavior(
       this
     case PostStop =>
       log.warn("Supervisor is shutting down. Un-registering supervisor from location service")
-      locationService.unregister(httpConnection).flatMap(_ => locationService.unregister(akkaConnection))
+      unregisterAndStopEmbeddedServer()
       this
   }
 

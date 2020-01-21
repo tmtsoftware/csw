@@ -30,10 +30,10 @@ private[csw] abstract class FrameworkTestSuite extends FunSuite with Matchers wi
   }
 
   def getSampleHcdWiring(componentHandlers: ComponentHandlers): ComponentBehaviorFactory =
-    (ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) => componentHandlers
+    (_: ActorContext[TopLevelActorMessage], _: CswContext) => componentHandlers
 
   def getSampleAssemblyWiring(assemblyHandlers: ComponentHandlers): ComponentBehaviorFactory =
-    (ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) => assemblyHandlers
+    (_: ActorContext[TopLevelActorMessage], _: CswContext) => assemblyHandlers
 
   def createSupervisorAndStartTLA(
       componentInfo: ComponentInfo,
@@ -58,7 +58,7 @@ private[csw] abstract class FrameworkTestSuite extends FunSuite with Matchers wi
       )
     )
 
-    // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
+    // it creates a supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
     typedSystem.spawn(supervisorBehavior, "")
   }
 
