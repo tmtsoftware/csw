@@ -67,7 +67,7 @@ class ConfigCliAuthTest(ignore: Int)
         "csw-config-server",
         "bearer-only",
         passwordGrantEnabled = false,
-        authorizationEnabled = true,
+        authorizationEnabled = false,
         clientRoles = Set(configAdmin)
       )
 
@@ -123,7 +123,8 @@ class ConfigCliAuthTest(ignore: Int)
       try {
         System.setIn(stream)
         runner.login(Options(console = true))
-      } finally {
+      }
+      finally {
         System.setIn(stdIn)
       }
 
