@@ -6,10 +6,12 @@ import csw.aas.core.deployment.{AuthConfig, AuthServiceLocation}
 import csw.aas.installed.api.{AuthStore, InstalledAppAuthAdapter}
 import csw.aas.installed.internal.InstalledAppAuthAdapterImpl
 import csw.location.api.scaladsl.LocationService
+import csw.location.models.HttpLocation
 import org.keycloak.adapters.installed.KeycloakInstalled
 
-import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration.DurationInt
+import scala.concurrent.{Await, ExecutionContext}
+import scala.util.Try
 
 object InstalledAppAuthAdapterFactory {
 
@@ -76,9 +78,8 @@ object InstalledAppAuthAdapterFactory {
   private def make(locationService: LocationService, secretStore: Option[AuthStore], config: Config = ConfigFactory.load())(
       implicit executionContext: ExecutionContext
   ): InstalledAppAuthAdapter = {
-    val authServiceLocationF = Await.result(AuthServiceLocation(locationService).resolve(5.seconds), 6.seconds)
-    val authConfig           = AuthConfig.create(config = config, authServerLocation = Some(authServiceLocationF))
-    val tokenVerifier        = TokenVerifier(authConfig)
+    val authConfig    = makeAuthConfig(locationService, config)
+    val tokenVerifier = TokenVerifier(authConfig)
     new InstalledAppAuthAdapterImpl(authConfig, new KeycloakInstalled(authConfig.getDeployment), tokenVerifier, secretStore)
   }
 
@@ -86,5 +87,20 @@ object InstalledAppAuthAdapterFactory {
     val authConfig    = AuthConfig.create()
     val tokenVerifier = TokenVerifier(authConfig)
     new InstalledAppAuthAdapterImpl(authConfig, new KeycloakInstalled(authConfig.getDeployment), tokenVerifier, secretStore)
+  }
+
+  private def disabled(config: Config): Boolean = {
+    val mayBeValue = Try { config.getConfig(AuthConfig.authConfigKey).getBoolean(AuthConfig.disabledKey) }.toOption
+    mayBeValue.nonEmpty && mayBeValue.get
+  }
+
+  private def authLocation(locationService: LocationService)(implicit ec: ExecutionContext): HttpLocation =
+    Await.result(AuthServiceLocation(locationService).resolve(5.seconds), 6.seconds)
+
+  private def makeAuthConfig(locationService: LocationService, config: Config)(
+      implicit executionContext: ExecutionContext
+  ) = {
+    val maybeLocation: Option[HttpLocation] = if (disabled(config)) None else Some(authLocation(locationService))
+    AuthConfig.create(config, maybeLocation)
   }
 }
