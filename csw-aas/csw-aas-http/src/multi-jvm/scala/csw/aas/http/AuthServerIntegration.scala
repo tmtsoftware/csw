@@ -92,8 +92,8 @@ class AuthIntegrationTest
             Realm(
               "example",
               clients = Set(
-                Client("my-app", "public", passwordGrantEnabled = true, authorizationEnabled = true),
-                Client("my-server", "bearer-only", passwordGrantEnabled = false, authorizationEnabled = true)
+                Client("my-app", "public", passwordGrantEnabled = true, authorizationEnabled = false),
+                Client("my-server", "bearer-only", passwordGrantEnabled = false, authorizationEnabled = false)
               ),
               users = Set(ApplicationUser("john", "secret", realmRoles = Set("admin"))),
               realmRoles = Set("admin")
@@ -162,7 +162,7 @@ class AuthIntegrationTest
             Realm(
               "example",
               clients = Set(
-                Client("my-app", "public", passwordGrantEnabled = true, authorizationEnabled = true)
+                Client("my-app", "public", passwordGrantEnabled = true, authorizationEnabled = false)
               ),
               users = Set(ApplicationUser("john", "secret")),
               realmRoles = Set("admin")
