@@ -89,7 +89,7 @@ eventMasterConf="../conf/event_service/master.conf"
 alarmMasterConf="../conf/alarm_service/master.conf"
 dbPgHbaConf="../conf/database_service/pg_hba.conf"
 dbUnixSocketDirs="/tmp"
-keycloakScript="keycloak-4.6.0.Final/bin"
+keycloakScript="keycloak-8.0.1/bin"
 
 sortVersion="sort -V"
 
