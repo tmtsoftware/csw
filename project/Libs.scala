@@ -12,7 +12,7 @@ object Libs {
   val `junit`              = "junit"                  % "junit"               % "4.13" //Eclipse Public License 1.0
   val `silencer-plugin`    = "com.github.ghik"        % "silencer-plugin"     % silencerVersion cross CrossVersion.full
   val `silencer-lib`       = "com.github.ghik"        % "silencer-lib"        % silencerVersion cross CrossVersion.full
-  val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.7.1"
+  val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.11.0"
 
   val `embedded-keycloak`            = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak"            % "3d4767caa9" //Apache 2.0
   val `logback-classic`              = "ch.qos.logback"                           % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
