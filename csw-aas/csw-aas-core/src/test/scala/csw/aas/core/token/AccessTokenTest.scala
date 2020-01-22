@@ -2,6 +2,7 @@ package csw.aas.core.token
 
 import csw.aas.core.token
 import csw.aas.core.token.claims.{Access, Authorization, Permission, TokenSubsystems}
+import csw.prefix.models.Subsystem.{CSW, ESW}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 
