@@ -1,7 +1,8 @@
 package csw.aas.core.token
 
 import csw.aas.core.token
-import csw.aas.core.token.claims.{Access, Authorization, Permission}
+import csw.aas.core.token.claims.{Access, Authorization, Permission, TokenSubsystems}
+import csw.prefix.models.Subsystem.{CSW, ESW}
 import org.scalatest.{FunSuite, Matchers}
 
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
@@ -48,6 +49,16 @@ class AccessTokenTest extends FunSuite with Matchers {
     val accessToken = AccessToken(realm_access = Access(Set("test-realm-role")))
 
     accessToken.hasRealmRole("invalid-realm-role") shouldEqual false
+  }
+
+  test("should able to subsystem for access token") {
+    val accessToken = AccessToken(subsystem = TokenSubsystems(Set(CSW, ESW)))
+    accessToken.hasSubsystem(ESW) shouldEqual true
+  }
+
+  test("should fail check for subsystem") {
+    val accessToken = AccessToken(subsystem = TokenSubsystems(Set(ESW)))
+    accessToken.hasSubsystem(CSW) shouldEqual false
   }
 
   test("should able to check client role for access token") {

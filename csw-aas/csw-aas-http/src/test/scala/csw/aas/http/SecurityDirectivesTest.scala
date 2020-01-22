@@ -113,6 +113,33 @@ class SecurityDirectivesTest extends FunSuite with MockitoSugar with Directives 
     }
   }
 
+  test("sPost using subsystem should return 200 OK when token is valid & has subsystem") {
+    val authentication: Authentication = mock[Authentication]
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
+    import securityDirectives._
+
+    val validTokenWithSubsystemStr    = "validTokenWithSubsystemStr"
+    val validTokenWithSubsystemRole   = mock[AccessToken]
+    val validTokenWithSubsystemHeader = Authorization(OAuth2BearerToken(validTokenWithSubsystemStr))
+    when(validTokenWithSubsystemRole.hasRealmRole("admin"))
+      .thenReturn(true)
+
+    val authenticator: AsyncAuthenticator[AccessToken] = {
+      case Provided(`validTokenWithSubsystemStr`) => Future.successful(Some(validTokenWithSubsystemRole))
+      case _                                      => Future.successful(None)
+    }
+
+    when(authentication.authenticator).thenReturn(authenticator)
+
+    val route: Route = sPost(RealmRolePolicy("admin")) { _ =>
+      complete("OK")
+    }
+
+    Post("/").addHeader(validTokenWithSubsystemHeader) ~> route ~> check {
+      status shouldBe StatusCodes.OK
+    }
+  }
+
   test("sPut using permission should return 200 OK when token is valid & has permission") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)

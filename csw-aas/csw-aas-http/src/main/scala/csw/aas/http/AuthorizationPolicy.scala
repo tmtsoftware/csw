@@ -3,6 +3,7 @@ package csw.aas.http
 import csw.aas.core.token.AccessToken
 import csw.aas.http.AuthorizationPolicy.PolicyExpression
 import csw.aas.http.AuthorizationPolicy.PolicyExpression.{And, ExpressionOperator, Or}
+import csw.prefix.models.Subsystem
 
 import scala.concurrent.Future
 
@@ -78,6 +79,15 @@ object AuthorizationPolicy {
    * @param resource Name of resource for which permissions is applicable.
    */
   final case class PermissionPolicy(scope: String, resource: String = "Default Resource") extends AuthorizationPolicy
+
+  /**
+   * This policy filters requests based on subsystem.
+   * @param requiredSubsystem the subsystem required to authorize user
+   */
+  final case class SubsystemPolicy(requiredSubsystem: Subsystem) extends AuthorizationPolicy
+  object SubsystemPolicy {
+    def apply(requiredSubsystem: String): SubsystemPolicy = new SubsystemPolicy(Subsystem.withNameInsensitive(requiredSubsystem))
+  }
 
   /**
    * Allows custom request filtering based on access token properties.

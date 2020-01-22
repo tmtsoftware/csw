@@ -2,7 +2,7 @@ package csw.aas.http
 
 import akka.http.scaladsl.model.HttpMethod
 import akka.http.scaladsl.model.HttpMethods._
-import akka.http.scaladsl.server.Directives.{authorize => keycloakAuthorize, authorizeAsync => keycloakAuthorizeAsync, _}
+import akka.http.scaladsl.server.Directives.{entity, authorize => keycloakAuthorize, authorizeAsync => keycloakAuthorizeAsync, _}
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.directives.AuthenticationDirective
 import com.typesafe.config.{Config, ConfigFactory}
@@ -115,9 +115,10 @@ class SecurityDirectives private[csw] (
 
   private[aas] def authorize(authorizationPolicy: AuthorizationPolicy, accessToken: AccessToken): Directive0 =
     authorizationPolicy match {
-      case ClientRolePolicy(name)           => keycloakAuthorize(accessToken.hasClientRole(name, resourceName))
-      case RealmRolePolicy(name)            => keycloakAuthorize(accessToken.hasRealmRole(name))
-      case PermissionPolicy(name, resource) => keycloakAuthorize(accessToken.hasPermission(name, resource))
+      case ClientRolePolicy(name)             => keycloakAuthorize(accessToken.hasClientRole(name, resourceName))
+      case RealmRolePolicy(name)              => keycloakAuthorize(accessToken.hasRealmRole(name))
+      case PermissionPolicy(name, resource)   => keycloakAuthorize(accessToken.hasPermission(name, resource))
+      case SubsystemPolicy(requiredSubsystem) => keycloakAuthorize(accessToken.hasSubsystem(requiredSubsystem))
       case CustomPolicy(predicate) =>
         keycloakAuthorize {
           val result = predicate(accessToken)

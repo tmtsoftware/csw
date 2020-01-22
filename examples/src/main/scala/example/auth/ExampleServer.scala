@@ -9,13 +9,21 @@ import csw.aas.http.SecurityDirectives
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.client.utils.LocationServerStatus
 import csw.logging.client.scaladsl.LoggingSystemFactory
+import csw.prefix.codecs.CommonCodecs
+import csw.prefix.models.Subsystem
+import csw.prefix.models.Subsystem.CSW
 import example.auth.AsyncSupport.actorSystem
+import io.bullet.borer.Codec
+import io.bullet.borer.derivation.MapBasedCodecs
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.implicitConversions
 
-object ExampleServer extends HttpApp with App {
+object ExampleServer extends HttpApp with App with CommonCodecs {
+
+  case class RequestPayload(subsystem: Subsystem, data: String)
+  implicit lazy val reqCodec: Codec[RequestPayload] = MapBasedCodecs.deriveCodec
 
   import AsyncSupport._
 
@@ -34,6 +42,24 @@ object ExampleServer extends HttpApp with App {
         complete("SUCCESS")
       } ~
       sPost(RealmRolePolicy("example-admin-role")) {
+        complete("SUCCESS")
+      } ~
+      path("subsystems" / Segment) { subsystem => //route: http://localhost/subsystems/ESW
+        sGet(SubsystemPolicy(subsystem)) {
+          complete("SUCCESS")
+        }
+      } ~
+      entity(as[RequestPayload]) { request =>
+        sPost(SubsystemPolicy(request.subsystem)) {
+          complete("SUCCESS")
+        }
+      } ~
+      entity(as[RequestPayload]) { req =>
+        sPost(CustomPolicy(_.subsystem.values.contains(req.subsystem))) {
+          complete("SUCCESS")
+        }
+      } ~
+      sPost(SubsystemPolicy(CSW)) {
         complete("SUCCESS")
       } ~
       sPut(ClientRolePolicy("person-role")) {

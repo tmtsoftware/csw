@@ -1,7 +1,8 @@
 package csw.aas.core.token
 
 import csw.aas.core.commons.AuthLogger
-import csw.aas.core.token.claims.{Access, Audience, Authorization}
+import csw.aas.core.token.claims.{Access, Audience, Authorization, TokenSubsystems}
+import csw.prefix.models.Subsystem
 
 /**
  * Represents JSON Web Token (JWT) for TMT.
@@ -44,6 +45,7 @@ case class AccessToken(
     name: Option[String] = None,
     preferred_username: Option[String] = None,
     email: Option[String] = None,
+    subsystem: TokenSubsystems = TokenSubsystems.empty,
     scope: Option[String] = None,
     //auth
     realm_access: Access = Access.empty,
@@ -57,6 +59,13 @@ case class AccessToken(
 
   private val logger = AuthLogger.getLogger
   import logger._
+
+  def hasSubsystem(requiredSubsystem: Subsystem): Boolean = {
+    val result = subsystem.values.contains(requiredSubsystem)
+    if (!result) debug(s"'$userOrClientName' doesn't have subsystem '$requiredSubsystem'")
+    else debug(s"authorization granted for user '$userOrClientName' via subsystem '$requiredSubsystem'")
+    result
+  }
 
   /**
    * Checks whether this access token has given permission or not
