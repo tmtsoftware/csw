@@ -1,11 +1,11 @@
-package csw.contract.services.data.location.endpoints
+package csw.contract.data.location.endpoints
 
 import java.util.concurrent.TimeUnit
 
 import akka.Done
-import csw.contract.services.data.location.models.Instances._
-import csw.contract.services.models.DomHelpers._
-import csw.contract.services.models.Endpoint
+import csw.contract.data.location.models.Instances._
+import csw.contract.generator.models.DomHelpers._
+import csw.contract.generator.models.Endpoint
 import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.messages.LocationHttpMessage
 import csw.location.api.messages.LocationHttpMessage.{
