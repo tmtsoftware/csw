@@ -1,14 +1,13 @@
 package csw.contract.services
 
-import java.io.{File, PrintWriter}
+import java.nio.file.{Files, Paths}
 
 import csw.contract.services.codecs.ContractCodecs
 import csw.contract.services.data.ServiceData
 import io.bullet.borer.Json
-import play.api.libs.json
 
 object GenerateDocs extends ContractCodecs {
-  val DefaultOutputPath = "target/output"
+  val DefaultOutputPath = "csw-contract/target/output"
 
   def main(args: Array[String]): Unit = {
     val outputPath = if (args.isEmpty) DefaultOutputPath else args(0)
@@ -17,23 +16,17 @@ object GenerateDocs extends ContractCodecs {
       case (serviceName, service) =>
         service.endpoints.foreach {
           case (endpointName, endpoint) =>
-            write(
-              s"$outputPath/$serviceName/endpoints/$endpointName.json",
-              Json.encode(Map("requests" -> endpoint.requests, "responses" -> endpoint.responses)).toUtf8String
-            )
+            write(s"$outputPath/$serviceName/endpoints", endpointName, Json.encode(endpoint).toUtf8String)
         }
         service.models.foreach {
           case (modelName, model) =>
-            write(s"$outputPath/$serviceName/models/$modelName.json", Json.encode(model.models).toUtf8String)
+            write(s"$outputPath/$serviceName/models", modelName, Json.encode(model.models).toUtf8String)
         }
     }
   }
 
-  def write(filePath: String, jsonString: String): Unit = {
-    val file = new File(filePath)
-    file.getParentFile.mkdirs
-    val printWriter = new PrintWriter(file)
-    printWriter.write(json.Json.prettyPrint(json.Json.parse(jsonString)))
-    printWriter.close()
+  def write(dir: String, fileName: String, jsonData: String): Unit = {
+    Files.createDirectories(Paths.get(dir))
+    Files.writeString(Paths.get(dir, fileName), jsonData)
   }
 }
