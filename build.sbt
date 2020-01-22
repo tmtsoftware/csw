@@ -711,6 +711,6 @@ lazy val `csw-contract` = project
 lazy val generateDocs = taskKey[Seq[(File, String)]]("documents")
 
 generateDocs := {
-  (`csw-contract` / Compile / runMain).toTask(" csw.contract.services.GenerateDocs target/output").value
+  (`csw-contract` / Compile / runMain).toTask(" csw.contract.Main target/output").value
   Path.contentOf((`csw-contract` / target).value / "output")
 }
