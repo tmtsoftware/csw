@@ -23,5 +23,6 @@ case class Service(
 case class Services(services: Map[String, Service])
 
 object DomHelpers {
-  implicit def encode[T: Encoder: Decoder](x: T): Element = Json.decode(Json.encode(x).toByteArray).to[Element].value
+  implicit def encode[T: Encoder: Decoder](x: T): Element           = Json.decode(Json.encode(x).toByteArray).to[Element].value
+  implicit def encodeList[T: Encoder: Decoder](x: List[T]): Element = Json.decode(Json.encode(x).toByteArray).to[Element].value
 }
