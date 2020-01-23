@@ -2,8 +2,7 @@ package csw.config.server.http
 
 import java.net.BindException
 
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.aas.core.commons.AASConnection
 import csw.config.server.ServerWiring
 import csw.config.server.commons.ConfigServiceConnection
@@ -19,8 +18,8 @@ import scala.util.control.NonFatal
 
 class HttpServiceTest extends HTTPLocationService {
 
-  implicit val system: ActorSystem[_]              = ActorSystem(Behaviors.empty, "test")
-  private val testLocationService: LocationService = HttpLocationServiceFactory.makeLocalClient
+  implicit val system: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "test")
+  private val testLocationService: LocationService        = HttpLocationServiceFactory.makeLocalClient
 
   //register AAS with location service
   private val AASPort = 8080

@@ -2,7 +2,7 @@ package csw.database.commons
 
 import java.nio.file.Paths
 
-import akka.actor.typed.ActorSystem
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import csw.commons.ResourceReader
 import csw.database.DatabaseServiceFactory
@@ -22,10 +22,10 @@ object DBTestHelper {
       .setPort(port)
       .start
 
-  def dbServiceFactory(system: ActorSystem[_]) =
+  def dbServiceFactory(system: ActorSystem[SpawnProtocol.Command]) =
     new DatabaseServiceFactory(system, Map(ReadUsernameHolder -> "postgres", ReadPasswordHolder -> "postgres"))
 
-  def dslContext(system: ActorSystem[_], port: Int): DSLContext =
+  def dslContext(system: ActorSystem[SpawnProtocol.Command], port: Int): DSLContext =
     dbServiceFactory(system)
       .makeDsl(port)
       .futureValue(Interval(Span(5, Seconds)))

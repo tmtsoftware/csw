@@ -1,6 +1,7 @@
 package csw.database;
 
 import akka.actor.typed.ActorSystem;
+import akka.actor.typed.SpawnProtocol;
 import akka.actor.typed.javadsl.Behaviors;
 import com.opentable.db.postgres.embedded.EmbeddedPostgres;
 import csw.database.commons.DBTestHelper;
@@ -22,13 +23,13 @@ import static org.hamcrest.CoreMatchers.isA;
 //DEOPSCSW-615: DB service accessible to CSW component developers
 public class JDatabaseServiceFactoryFailureTest extends JUnitSuite {
 
-    private static ActorSystem system;
+    private static ActorSystem<SpawnProtocol.Command> system;
     private static EmbeddedPostgres postgres;
     private static DatabaseServiceFactory dbFactory;
 
     @BeforeClass
     public static void setup() {
-        system = ActorSystem.apply(Behaviors.empty(), "test");
+        system = ActorSystem.apply(SpawnProtocol.create(), "test");
         dbFactory = DBTestHelper.dbServiceFactory(system);
         postgres = DBTestHelper.postgres(0); // 0 is random port
     }

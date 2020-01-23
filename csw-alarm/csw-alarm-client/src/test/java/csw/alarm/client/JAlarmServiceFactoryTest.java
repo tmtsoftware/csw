@@ -1,6 +1,7 @@
 package csw.alarm.client;
 
 import akka.actor.typed.ActorSystem;
+import akka.actor.typed.SpawnProtocol;
 import akka.actor.typed.javadsl.Behaviors;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -32,7 +33,7 @@ public class JAlarmServiceFactoryTest extends JUnitSuite {
 
     private static AlarmServiceTestSetup testSetup = new AlarmServiceTestSetup();
     private AlarmServiceFactory alarmServiceFactory = testSetup.alarmServiceFactory();
-    private static ActorSystem<Object> seedSystem = ActorSystemFactory.remote(Behaviors.empty(), "test");
+    private static ActorSystem<SpawnProtocol.Command> seedSystem = ActorSystemFactory.remote(SpawnProtocol.create(), "test");
     private static ILocationService locationService = JHttpLocationServiceFactory.makeLocalClient(seedSystem);
     private AlarmAdminService alarmService = testSetup.alarmService();
 
