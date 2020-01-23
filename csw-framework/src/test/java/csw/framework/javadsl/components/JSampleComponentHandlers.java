@@ -144,7 +144,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         return new CommandResponse.Completed(runId);
     }
 
-    //#addOrUpdateCommand
+    //#updateCommand
     private CommandResponse.SubmitResponse crmAddOrUpdate(Setup setup, Id runId) {
         // This simulates some worker task doing something that finishes after onSubmit returns
         Runnable task = new Runnable() {
@@ -161,7 +161,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         // Return Started from onSubmit
         return new Started(runId);
     }
-    //#addOrUpdateCommand
+    //#updateCommand
 
     private void processCurrentStateOnewayCommand(Setup setup) {
         //#subscribeCurrentState
@@ -206,6 +206,13 @@ public class JSampleComponentHandlers extends JComponentHandlers {
             sendCRM(1, new CommandResponse.Completed(runId, result));
             return new Started(runId);
         }
+    }
+
+    private SubmitResponse processLongRunning(Id runId, ControlCommand controlCommand) {
+        Setup shortSetup  = Setup(, shortRunning, None)
+        val mediumSetup = Setup(assemblyPrefix, mediumRunning, None)
+        val longSetup   = Setup(assemblyPrefix, longRunning, None)
+
     }
 
     private void parameterDelay(Id runId, Setup setup) {

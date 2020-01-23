@@ -23,7 +23,6 @@ object ComponentStateForCommand {
   val matcherTimeoutCmd         = CommandName("move.accept.matcher.success.timeout")
   val assemCurrentStateCmd      = CommandName("assem.send.current.state")
   val hcdCurrentStateCmd        = CommandName("hcd.send.current.state")
-  val crmParentCommandCmd       = CommandName("hcd.parent.crm")
   val crmAddOrUpdateCmd         = CommandName("hcd.update.crm")
   val immediateCmd              = CommandName("move.immediate")
   val immediateResCmd           = CommandName("move.immediate.result")

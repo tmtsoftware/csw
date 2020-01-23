@@ -106,6 +106,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         // Assembly starts long-running and returns started
         Started(runId)
 
+      //#queryFinalAll
       case `longRunningCmdToAsmComp` =>
         // In this case, assembly does not need to do anything until both commands complete
         // Could wait and return directly if commands are fast, but this is better
@@ -124,6 +125,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
             commandResponseManager.updateCommand(Error(runId, ex.toString))
         }
         Started(runId)
+      //#queryFinalAll
 
       case `longRunningCmdToAsmInvalid` =>
         val long    = hcdComponent.submitAndWait(longRunning)

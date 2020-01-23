@@ -66,7 +66,7 @@ object CommandResponse {
    * @param runId of command for which this response is created
    */
   case class Started(runId: Id) extends SubmitResponse {
-    def withRunId(newRunId: Id):Started = copy(runId = newRunId)
+    def withRunId(newRunId: Id): Started = copy(runId = newRunId)
   }
 
   /**
@@ -89,7 +89,7 @@ object CommandResponse {
      */
     def this(runId: Id) = this(runId, Result())
 
-    def withRunId(newRunId: Id):Completed = copy(runId = newRunId)
+    def withRunId(newRunId: Id): Completed = copy(runId = newRunId)
   }
 
   /**
@@ -105,7 +105,7 @@ object CommandResponse {
       with SubmitResponse
       with MatchingResponse {
 
-    def withRunId(newRunId: Id):Invalid = copy(runId = newRunId)
+    def withRunId(newRunId: Id): Invalid = copy(runId = newRunId)
   }
 
   /**
@@ -116,7 +116,7 @@ object CommandResponse {
    */
   case class Error(runId: Id, message: String) extends SubmitResponse with MatchingResponse {
 
-    def withRunId(newRunId: Id):Error = copy(runId = newRunId)
+    def withRunId(newRunId: Id): Error = copy(runId = newRunId)
   }
 
   /**
@@ -126,7 +126,7 @@ object CommandResponse {
    */
   case class Cancelled(runId: Id) extends SubmitResponse {
 
-    def withRunId(newRunId: Id):Cancelled = copy(runId = newRunId)
+    def withRunId(newRunId: Id): Cancelled = copy(runId = newRunId)
   }
 
   /**
@@ -136,7 +136,7 @@ object CommandResponse {
    */
   case class Locked(runId: Id) extends ValidateResponse with OnewayResponse with SubmitResponse with MatchingResponse {
 
-    def withRunId(newRunId: Id):Locked = copy(runId = newRunId)
+    def withRunId(newRunId: Id): Locked = copy(runId = newRunId)
   }
 
   /**
