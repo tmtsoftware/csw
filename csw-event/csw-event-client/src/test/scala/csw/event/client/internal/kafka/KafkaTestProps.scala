@@ -1,7 +1,7 @@
 package csw.event.client.internal.kafka
 
 import akka.Done
-import akka.actor.typed.ActorSystem
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.kafka.ProducerSettings
 import csw.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
@@ -28,7 +28,7 @@ class KafkaTestProps(
     locationService: LocationService,
     locationServer: HTTPLocationServiceOnPorts,
     additionalBrokerProps: Map[String, String]
-)(implicit val actorSystem: ActorSystem[_])
+)(implicit val actorSystem: ActorSystem[SpawnProtocol.Command])
     extends BaseProperties {
   private val brokers          = s"PLAINTEXT://${Networks().hostname}:$kafkaPort"
   private val brokerProperties = Map("listeners" -> brokers, "advertised.listeners" -> brokers) ++ additionalBrokerProps

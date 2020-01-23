@@ -2,8 +2,7 @@ package csw.database
 
 import java.util.concurrent.CompletionException
 
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import csw.database.commons.DBTestHelper
 import csw.database.scaladsl.JooqExtentions.{RichQueries, RichQuery, RichResultQuery}
@@ -19,10 +18,10 @@ import scala.concurrent.{Await, ExecutionContext}
 //DEOPSCSW-601: Create Database API
 //DEOPSCSW-616: Create a method to send a query (select) sql string to a database
 class DatabaseServiceTest extends FunSuite with Matchers with ScalaFutures with BeforeAndAfterAll {
-  private val system: ActorSystem[_]        = ActorSystem(Behaviors.empty, "test")
-  private implicit val ec: ExecutionContext = system.executionContext
-  private var postgres: EmbeddedPostgres    = _
-  private var dsl: DSLContext               = _
+  private val system: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "test")
+  private implicit val ec: ExecutionContext              = system.executionContext
+  private var postgres: EmbeddedPostgres                 = _
+  private var dsl: DSLContext                            = _
 
   override def beforeAll: Unit = {
     postgres = DBTestHelper.postgres(0) // 0 is random port

@@ -1,6 +1,7 @@
 package csw.config.client;
 
 import akka.actor.typed.ActorSystem;
+import akka.actor.typed.SpawnProtocol;
 import akka.actor.typed.javadsl.Behaviors;
 import csw.config.api.javadsl.IConfigClientService;
 import csw.config.api.javadsl.IConfigService;
@@ -21,12 +22,12 @@ public class JConfigClientBaseSuite extends JMockedAuthentication {
 
     private csw.location.server.internal.ServerWiring locationWiring = new csw.location.server.internal.ServerWiring();
 
-    private ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create(Behaviors.empty(), "Guardian"));
+    private ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create(SpawnProtocol.create(), "Guardian"));
     private ILocationService clientLocationService = JHttpLocationServiceFactory.makeLocalClient(actorRuntime.typedSystem());
 
     public IConfigService configService = JConfigClientFactory.adminApi(actorRuntime.typedSystem(), clientLocationService, factory());
     public IConfigClientService configClientApi = JConfigClientFactory.clientApi(actorRuntime.typedSystem(), clientLocationService);
-    public ActorSystem<?> system = actorRuntime.typedSystem();
+    public ActorSystem<SpawnProtocol.Command> system = (ActorSystem<SpawnProtocol.Command>) actorRuntime.typedSystem();
 
     private ServerWiring serverWiring = ServerWiring$.MODULE$.make(securityDirectives());
     private HttpService httpService = serverWiring.httpService();

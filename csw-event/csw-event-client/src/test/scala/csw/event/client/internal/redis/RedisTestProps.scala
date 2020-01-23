@@ -1,7 +1,7 @@
 package csw.event.client.internal.redis
 
 import akka.Done
-import akka.actor.typed.ActorSystem
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.ConfigFactory
 import csw.commons.redis.EmbeddedRedis
 import csw.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
@@ -30,7 +30,7 @@ class RedisTestProps(
     val redisClient: RedisClient,
     locationService: LocationService,
     locationServer: HTTPLocationServiceOnPorts
-)(implicit val actorSystem: ActorSystem[_])
+)(implicit val actorSystem: ActorSystem[SpawnProtocol.Command])
     extends BaseProperties
     with EmbeddedRedis {
 
