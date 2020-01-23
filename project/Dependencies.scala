@@ -541,7 +541,7 @@ object Dependencies {
     )
   )
 
-  val ContractServer = Def.setting(
+  val Contract = Def.setting(
     Seq(
       Borer.`borer-core`.value,
       Libs.`play-json`.value,
