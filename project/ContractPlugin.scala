@@ -1,32 +1,31 @@
-import com.typesafe.sbt.site.SitePlugin
-import com.typesafe.sbt.site.SitePlugin.autoImport._
 import sbt.Keys._
 import sbt._
 
 import scala.language.postfixOps
+import sbt.{Def, _}
 
 object ContractPlugin extends AutoPlugin {
 
   override def requires: Plugins = SitePlugin
 
   object autoImport {
-    val generateDocs    = taskKey[Seq[(File, String)]]("generate contracts")
-    val generateDocsDir = settingKey[String]("top folder for the generated contracts")
+    val generateDocs        = taskKey[Seq[(File, String)]]("generate contracts")
+    val generateDocsDirName = "output"
+    val generateDocsDirPath = settingKey[String]("path of the folder for the generated contracts")
   }
 
   import autoImport._
 
   override def projectSettings: Seq[Setting[_]] = Seq(
-    generateDocsDir := "output",
-    siteSubdirName := "/" + generateDocsDir.value,
-    addMappingsToSiteDir(generateDocs, siteSubdirName)
+    generateDocsDirPath := "/" + generateDocsDirName,
+    addMappingsToSiteDir(generateDocs, generateDocsDirPath)
   )
 
-  def generate(generatorProject: Project) = Def.taskDyn {
-    val outputDir = s" ${target.value}/${generateDocsDir.value}"
+  def generate(generatorProject: Project): Def.Initialize[Task[Seq[(File, String)]]] = Def.taskDyn {
+    val outputDir = s" ${target.value}/$generateDocsDirName"
     Def.task {
       (generatorProject / Compile / run).toTask(outputDir).value
-      Path.contentOf(target.value / generateDocsDir.value)
+      Path.contentOf(target.value / generateDocsDirName)
     }
   }
 }
