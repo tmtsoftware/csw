@@ -1,6 +1,5 @@
 import org.tmt.sbt.docs.DocKeys._
 import org.tmt.sbt.docs.{Settings => DocSettings}
-import sbt.taskKey
 import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
 
 val enableCoverage         = sys.props.get("enableCoverage").contains("true")
@@ -96,7 +95,7 @@ lazy val `csw` = project
   .settings(GithubRelease.githubReleases(githubReleases))
   .settings(
     bootstrap in Coursier := CoursierPlugin.bootstrapTask(githubReleases).value,
-    generateDocs := ContractPlugin.generate(`csw-contract`).value,
+    generateDocs := ContractPlugin.generate(`csw-contract`).value
   )
 
 lazy val `csw-contract` = project
@@ -660,15 +659,6 @@ lazy val integration = project
   .settings(
     libraryDependencies ++= Dependencies.Integration.value
   )
-
-/* ================================================ */
-lazy val alarm = taskKey[Unit]("alarm")
-
-alarm := {
-  (test in (`csw-alarm-client`, Test)).value
-  (test in (`csw-alarm-api`, Test)).value
-  (test in (`csw-alarm-cli`, Test)).value
-}
 
 // ================================================
 /* ===================== Auth ================== */
