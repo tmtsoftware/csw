@@ -1,8 +1,9 @@
+import com.typesafe.sbt.site.util.SiteHelpers.addMappingsToSiteDir
+import com.typesafe.sbt.site.SitePlugin
 import sbt.Keys._
-import sbt._
+import sbt.{Def, _}
 
 import scala.language.postfixOps
-import sbt.{Def, _}
 
 object ContractPlugin extends AutoPlugin {
 
