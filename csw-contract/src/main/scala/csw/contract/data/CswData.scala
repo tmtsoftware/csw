@@ -1,9 +1,9 @@
-package csw.contract.services.data
+package csw.contract.data
 
-import csw.contract.services.models.{Service, Services}
+import csw.contract.generator.models.{Service, Services}
 
-object ServiceData {
-  val data: Services = Services(
+object CswData {
+  val services: Services = Services(
     Map(
       "location" -> Service(
         location.endpoints.Instances.endpoints,

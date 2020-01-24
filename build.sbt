@@ -86,7 +86,7 @@ lazy val multiJvmProjects: Seq[ProjectReference] = Seq(
 /* ================= Root Project ============== */
 lazy val `csw` = project
   .in(file("."))
-  .enablePlugins(NoPublish, UnidocSitePlugin, GithubPublishPlugin, GitBranchPrompt, GithubRelease, CoursierPlugin)
+  .enablePlugins(NoPublish, UnidocSitePlugin, GithubPublishPlugin, GitBranchPrompt, GithubRelease, CoursierPlugin, ContractPlugin)
   .disablePlugins(BintrayPlugin)
   .aggregate(aggregatedProjects: _*)
   .settings(DocSettings.makeSiteMappings(docs))
@@ -95,11 +95,14 @@ lazy val `csw` = project
   .settings(Settings.multiJvmTestTask(multiJvmProjects))
   .settings(GithubRelease.githubReleases(githubReleases))
   .settings(
-    bootstrap in Coursier := CoursierPlugin.bootstrapTask(githubReleases).value
+    bootstrap in Coursier := CoursierPlugin.bootstrapTask(githubReleases).value,
+    generateDocs := ContractPlugin.generate(`csw-contract`).value,
   )
+
+lazy val `csw-contract` = project
+  .dependsOn(`csw-location-api`.jvm)
   .settings(
-    siteSubdirName := s"${name.value}/${version.value}/contractDocs/",
-    addMappingsToSiteDir(generateDocs, siteSubdirName)
+    libraryDependencies ++= Dependencies.Contract.value
   )
 
 lazy val `csw-prefix` = crossProject(JSPlatform, JVMPlatform)
@@ -699,18 +702,3 @@ lazy val `csw-aas-installed` = project
   .settings(
     libraryDependencies ++= Dependencies.CswInstalledAdapter.value
   )
-
-lazy val `csw-contract` = project
-  .dependsOn(
-    `csw-location-api`.jvm
-  )
-  .settings(
-    libraryDependencies ++= Dependencies.ContractServer.value
-  )
-
-lazy val generateDocs = taskKey[Seq[(File, String)]]("documents")
-
-generateDocs := {
-  (`csw-contract` / Compile / runMain).toTask(" csw.contract.services.GenerateDocs target/output").value
-  Path.contentOf((`csw-contract` / target).value / "output")
-}

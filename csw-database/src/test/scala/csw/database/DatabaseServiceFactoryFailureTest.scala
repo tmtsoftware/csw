@@ -1,7 +1,6 @@
 package csw.database
 
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import csw.database.commons.DBTestHelper
 import csw.database.exceptions.DatabaseException
@@ -13,9 +12,9 @@ import scala.concurrent.duration.DurationDouble
 
 //DEOPSCSW-615: DB service accessible to CSW component developers
 class DatabaseServiceFactoryFailureTest extends FunSuite with Matchers with BeforeAndAfterAll {
-  private val system: ActorSystem[_]            = ActorSystem(Behaviors.empty, "test")
-  private var postgres: EmbeddedPostgres        = _
-  private var dbFactory: DatabaseServiceFactory = _
+  private val system: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "test")
+  private var postgres: EmbeddedPostgres                 = _
+  private var dbFactory: DatabaseServiceFactory          = _
 
   override def beforeAll(): Unit = {
     postgres = DBTestHelper.postgres(0)

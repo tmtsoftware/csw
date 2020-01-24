@@ -1,6 +1,7 @@
 package csw.database;
 
 import akka.actor.typed.ActorSystem;
+import akka.actor.typed.SpawnProtocol;
 import akka.actor.typed.javadsl.Behaviors;
 import com.opentable.db.postgres.embedded.EmbeddedPostgres;
 import csw.database.commons.DBTestHelper;
@@ -32,13 +33,13 @@ import static org.junit.Assert.*;
 //DEOPSCSW-601: Create Database API
 //DEOPSCSW-616: Create a method to send a query (select) sql string to a database
 public class JDatabaseServiceTest extends JUnitSuite {
-    private static ActorSystem system;
+    private static ActorSystem<SpawnProtocol.Command> system;
     private static EmbeddedPostgres postgres;
     private static DSLContext dsl;
 
     @BeforeClass
     public static void setup() {
-        system = ActorSystem.apply(Behaviors.empty(), "test");
+        system = ActorSystem.apply(SpawnProtocol.create(), "test");
         postgres = DBTestHelper.postgres(0); // 0 is random port
         dsl = DBTestHelper.dslContext(system, postgres.getPort());
 

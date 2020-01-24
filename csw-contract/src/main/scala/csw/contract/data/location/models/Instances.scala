@@ -1,9 +1,9 @@
-package csw.contract.services.data.command.models
+package csw.contract.data.location.models
 
 import java.net.URI
 
-import csw.contract.services.models.DomHelpers.encode
-import csw.contract.services.models.ModelAdt
+import csw.contract.generator.models.DomHelpers.encode
+import csw.contract.generator.models.ModelAdt
 import csw.location.api.exceptions.{LocationServiceError, RegistrationFailed}
 import csw.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.location.models._

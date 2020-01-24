@@ -45,7 +45,6 @@ public class JDatabaseServiceFactoryTest extends JUnitSuite {
     @BeforeClass
     public static void setup() throws ExecutionException, InterruptedException, TimeoutException {
         typedSystem = akka.actor.typed.ActorSystem.apply(SpawnProtocol.create(), "test");
-//        untypedSystem = Adapter.toClassic(typedSystem);
 
         dbFactory = DBTestHelper.dbServiceFactory(typedSystem);
         postgres = DBTestHelper.postgres(port); // 0 is random port

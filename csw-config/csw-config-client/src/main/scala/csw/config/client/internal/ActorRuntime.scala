@@ -1,8 +1,7 @@
 package csw.config.client.internal
 
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.{Done, actor}
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
@@ -10,7 +9,7 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 /**
  * A convenient class wrapping actor system and providing handles for execution context and clean up of actor system
  */
-private[csw] class ActorRuntime(_typedSystem: ActorSystem[_] = ActorSystem(Behaviors.empty, "config-client-system")) {
+private[csw] class ActorRuntime(_typedSystem: ActorSystem[_] = ActorSystem(SpawnProtocol(), "config-client-system")) {
   implicit val typedSystem: ActorSystem[_]  = _typedSystem
   implicit val ec: ExecutionContextExecutor = typedSystem.executionContext
 
