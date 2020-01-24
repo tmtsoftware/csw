@@ -198,6 +198,9 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
     logActor ! SetAppenders(appenders)
   }
 
+  def addAppenders(_appenderBuilders: LogAppenderBuilder*): Unit =
+    setAppenders(getAppenders ++ _appenderBuilders)
+
   def setComponentLogLevel(prefix: Prefix, level: Level): Unit =
     ComponentLoggingStateManager.add(prefix, level)
 
