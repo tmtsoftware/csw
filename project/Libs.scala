@@ -53,7 +53,7 @@ object Libs {
 }
 
 object Borer {
-  val Version = "1.3.0"
+  val Version = "1.4.0"
   val Org     = "io.bullet"
 
   val `borer-core`        = dep(Org %%% "borer-core" % Version)
@@ -117,7 +117,7 @@ object Jooq {
 }
 
 object MSocket {
-  val Version = "a2e4ec0"
+  val Version = "21399f8"
 
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-impl-jvm` = "com.github.tmtsoftware.msocket" %% "msocket-impl-jvm" % Version
