@@ -54,7 +54,7 @@ public class JSampleHcdTest extends JUnitSuite {
     // DEOPSCSW-39: examples of Location Service
     @Test
     public void testHCDShouldBeLocatableUsingLocationService() throws ExecutionException, InterruptedException {
-        Connection.AkkaConnection connection = new Connection.AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.NFIRAOS(), "JSampleHcd"), JComponentType.HCD()));
+        Connection.AkkaConnection connection = new Connection.AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.ESW(), "JSampleHcd"), JComponentType.HCD()));
         ILocationService locationService = testKit.jLocationService();
         AkkaLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().orElseThrow();
 

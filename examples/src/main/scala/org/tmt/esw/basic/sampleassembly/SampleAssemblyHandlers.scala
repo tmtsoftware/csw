@@ -42,12 +42,13 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   private implicit val timeout: Timeout             = 10.seconds
   private val log                                   = loggerFactory.getLogger
   private val prefix: Prefix                        = cswCtx.componentInfo.prefix
-  private val hcdConnection                         = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "samplehcd"), ComponentType.HCD))
+  private val hcdConnection                         = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "samplehcd"), ComponentType.HCD))
   private var hcdLocation: AkkaLocation             = _
   private var hcdCS: Option[CommandService]         = None
 
   //#initialize
   private var maybeEventSubscription: Option[EventSubscription] = None
+
   override def initialize(): Future[Unit] = {
     log.info(s"Assembly: $prefix initialize")
     maybeEventSubscription = Some(subscribeToHcd())
@@ -115,6 +116,8 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
         setup.commandName match {
           case `sleep` =>
             validateSleep(runId, setup)
+          case `cancelLongCommand` =>
+            validateCancel(runId, setup)
           case `immediateCommand` | `shortCommand` | `mediumCommand` | `longCommand` | `complexCommand` =>
             Accepted(runId)
           case _ =>
@@ -135,6 +138,15 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
     else {
       Invalid(runId, MissingKeyIssue(s"required sleep command key: $sleepTimeKey is missing."))
     }
+
+  private def validateCancel(runId: Id, setup: Setup): ValidateCommandResponse =
+    if (setup.exists(cancelKey)) {
+      Accepted(runId)
+    }
+    else {
+      Invalid(runId, MissingKeyIssue(s"required cancel command key: $cancelKey is missing."))
+    }
+
   //#validate
 
   override def onSubmit(runId: Id, command: ControlCommand): SubmitResponse =

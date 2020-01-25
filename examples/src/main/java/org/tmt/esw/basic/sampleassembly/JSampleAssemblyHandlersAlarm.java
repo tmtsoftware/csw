@@ -37,7 +37,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-import static csw.prefix.javadsl.JSubsystem.NFIRAOS;
+import static csw.prefix.javadsl.JSubsystem.ESW;
 
 /**
  * Domain specific logic should be written in below handlers.
@@ -160,7 +160,7 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
     }
     //#track-location
 
-    private EventKey counterEventKey = new EventKey(Prefix.apply(NFIRAOS(), "samplehcd"), new EventName("HcdCounter"));
+    private EventKey counterEventKey = new EventKey(Prefix.apply(ESW(), "samplehcd"), new EventName("HcdCounter"));
     private Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter");
 
 

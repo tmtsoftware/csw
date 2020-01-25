@@ -29,7 +29,7 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
 
   import scala.concurrent.duration._
   test("HCD should be locatable using Location Service") {
-    val connection   = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "SampleHcd"), ComponentType.HCD))
+    val connection   = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
     val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
 
     akkaLocation.connection shouldBe connection

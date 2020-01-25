@@ -10,17 +10,21 @@ import csw.framework.models.JCswContext;
 import csw.location.models.TrackingEvent;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.*;
-import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.Id;
 import csw.params.events.Event;
 import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
+import csw.prefix.models.Prefix;
 import csw.time.core.models.UTCTime;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+
+import static org.tmt.esw.shared.JSampleInfo.*;
+import static csw.params.commands.CommandResponse.*;
+import static csw.params.commands.CommandIssue.*;
 
 /**
  * Domain specific logic should be written in below handlers.
@@ -30,163 +34,149 @@ import java.util.concurrent.CompletableFuture;
  * and if validation is successful, then onSubmit hook gets invoked.
  * You can find more information on this here : https://tmtsoftware.github.io/csw/framework.html
  */
+@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "unused"})
 public class JSampleHcdHandlers extends JComponentHandlers {
 
-    private JCswContext cswCtx;
-    private ILogger log;
-    private ActorContext<TopLevelActorMessage> actorContext;
-    private ActorRef<WorkerCommand> workerActor;
+  private final JCswContext cswCtx;
+  private final ILogger log;
+  private final Prefix prefix;
+  private final ActorContext<TopLevelActorMessage> ctx;
 
+  JSampleHcdHandlers(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
+    super(ctx, cswCtx);
+    this.ctx = ctx;
+    this.cswCtx = cswCtx;
+    this.log = cswCtx.loggerFactory().getLogger(getClass());
+    prefix = cswCtx.componentInfo().prefix();
+  }
 
-    JSampleHcdHandlers(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
-        super(ctx, cswCtx);
-        this.cswCtx = cswCtx;
-        this.log = cswCtx.loggerFactory().getLogger(getClass());
-        this.actorContext = ctx;
-        workerActor = createWorkerActor();
+  //#initialize
+  private Optional<Cancellable> maybePublishingGenerator = Optional.empty();
+
+  @Override
+  public CompletableFuture<Void> jInitialize() {
+    return CompletableFuture.runAsync(() -> {
+      log.info("In HCD initialize");
+      maybePublishingGenerator = Optional.of(publishCounter());
+    });
+  }
+
+  @Override
+  public void onLocationTrackingEvent(TrackingEvent trackingEvent) {
+    log.debug(() -> "TrackingEvent received: " + trackingEvent.connection().name());
+  }
+
+  @Override
+  public CompletableFuture<Void> jOnShutdown() {
+    return CompletableFuture.runAsync(() -> log.info("HCD is shutting down"));
+  }
+  //#initialize
+
+  //#publish
+  private int counter = 0;
+
+  private Optional<Event> incrementCounterEvent() {
+    counter += 1;
+    Parameter<Integer> param = JKeyType.IntKey().make("counter").set(counter);
+    return Optional.of(new SystemEvent(cswCtx.componentInfo().prefix(), new EventName("HcdCounter")).add(param));
+  }
+
+  private Cancellable publishCounter() {
+    log.info("HCD: " + prefix + " started publishing stream.");
+    return cswCtx.eventService().defaultPublisher().publish(this::incrementCounterEvent, java.time.Duration.ofSeconds(2));
+  }
+
+  private void stopPublishingGenerator() {
+    log.info("HCD: " + prefix + " stops publishing stream");
+    maybePublishingGenerator.ifPresent(Cancellable::cancel);
+  }
+  //#publish
+
+  //#validate
+  @Override
+  public ValidateCommandResponse validateCommand(Id runId, ControlCommand command) {
+    if (command.commandName().equals(hcdSleep)) {
+      return new Accepted(runId);
     }
+    log.error("HCD: " + prefix + " received an unsupported command: " + command.commandName().name());
+    return new Invalid(runId, new UnsupportedCommandIssue("Command " + command.commandName().name() + " is not supported fpr HCD: " + prefix + "."));
+  }
+  //#validate
 
-    //#worker-actor
-    private interface WorkerCommand {
+  //#onSetup
+  @Override
+  public SubmitResponse onSubmit(Id runId, ControlCommand command) {
+    log.info(() -> "HCD: " + prefix + " handling command: " + command.commandName());
+
+    if (command instanceof Setup)
+      return onSetup(runId, (Setup) command);
+    // implement (or not)
+    return new Invalid(runId, new UnsupportedCommandIssue("HCD: " + prefix + " only supports Setup commands"));
+  }
+
+  private SubmitResponse onSetup(Id runId, Setup setup) {
+    log.info("HCD: " + prefix + " onSubmit received command: " + setup);
+
+    if (setup.commandName().equals(hcdSleep)) {
+      Long sleepTime = setup.apply(sleepTimeKey).head();
+      ActorRef<WorkerCommand> worker = createWorkerActor();
+      worker.tell(new Sleep(runId, sleepTime));
+      return new Started(runId);
     }
+    return new Invalid(runId, new UnsupportedCommandIssue("HCD: " + prefix + " does not implement command: " + setup.commandName()));
+  }
+  //#onSetup
 
-    private static final class Sleep implements WorkerCommand {
-        private final Id runId;
-        private final long timeInMillis;
-        private final ControlCommand setup;
 
-        private Sleep(ControlCommand setup, Id runId, long timeInMillis) {
-            this.setup = setup;
-            this.runId = runId;
-            this.timeInMillis = timeInMillis;
-        }
+  @Override
+  public void onOneway(Id runId, ControlCommand controlCommand) {
+  }
+
+  @Override
+  public void onGoOffline() {
+  }
+
+  @Override
+  public void onGoOnline() {
+  }
+
+  @Override
+  public void onDiagnosticMode(UTCTime startTime, String hint) {
+  }
+
+  @Override
+  public void onOperationsMode() {
+  }
+
+  //#worker-actor
+  private interface WorkerCommand {
+  }
+
+  private static final class Sleep implements WorkerCommand {
+    private final Id runId;
+    private final long sleepTime;
+
+    private Sleep(Id runId, long sleepTime) {
+      this.runId = runId;
+      this.sleepTime = sleepTime;
     }
+  }
 
-    private ActorRef<WorkerCommand> createWorkerActor() {
-        return actorContext.spawn(
-                Behaviors.receiveMessage(msg -> {
-                    if (msg instanceof Sleep) {
-                        Sleep sleep = (Sleep) msg;
-                        log.trace(() -> "WorkerActor received sleep command with time of " + sleep.timeInMillis + " ms");
-                        // simulate long running command
-                        Thread.sleep(sleep.timeInMillis);
-                        cswCtx.commandResponseManager().updateCommand(new CommandResponse.Completed(sleep.runId));
-                    } else {
-                        log.error("Unsupported message type");
-                    }
-                    return Behaviors.same();
-                }),
-                "WorkerActor"
-        );
-    }
-    //#worker-actor
-
-
-    //#initialize
-    private Optional<Cancellable> maybePublishingGenerator = Optional.empty();
-
-    @Override
-    public CompletableFuture<Void> jInitialize() {
-        return CompletableFuture.runAsync(() -> {
-            log.info("In HCD initialize");
-            maybePublishingGenerator = Optional.of(publishCounter());
-        });
-    }
-
-    @Override
-    public void onLocationTrackingEvent(TrackingEvent trackingEvent) {
-        log.debug(() -> "TrackingEvent received: " + trackingEvent.connection().name());
-    }
-
-    @Override
-    public CompletableFuture<Void> jOnShutdown() {
-        return CompletableFuture.runAsync(() -> log.info("HCD is shutting down"));
-    }
-    //#initialize
-
-    //#publish
-    private int counter = 0;
-
-    private Optional<Event> incrementCounterEvent() {
-        counter += 1;
-        Parameter<Integer> param = JKeyType.IntKey().make("counter").set(counter);
-        return Optional.of(new SystemEvent(cswCtx.componentInfo().prefix(), new EventName("HcdCounter")).add(param));
-    }
-
-    private Cancellable publishCounter() {
-        log.info("Starting publish stream.");
-        return cswCtx.eventService().defaultPublisher().publish(this::incrementCounterEvent, java.time.Duration.ofSeconds(2));
-    }
-
-    private void stopPublishingGenerator() {
-        log.info("Stopping publish stream");
-        maybePublishingGenerator.ifPresent(Cancellable::cancel);
-    }
-    //#publish
-
-    //#validate
-    @Override
-    public CommandResponse.ValidateCommandResponse validateCommand(Id runId, ControlCommand controlCommand) {
-        String commandName = controlCommand.commandName().name();
-        log.info(() -> "Validating command: " + commandName);
-        if (commandName.equals("sleep")) {
-            return new CommandResponse.Accepted(runId);
-        }
-        return new CommandResponse.Invalid(runId, new CommandIssue.UnsupportedCommandIssue("Command " + commandName + ". not supported."));
-    }
-    //#validate
-
-
-    //#onSetup
-    @Override
-    public CommandResponse.SubmitResponse onSubmit(Id runId, ControlCommand controlCommand) {
-        log.info(() -> "Handling command: " + controlCommand.commandName());
-
-        if (controlCommand instanceof Setup) {
-            onSetup(runId, (Setup) controlCommand);
-            return new CommandResponse.Started(runId);
-        } else if (controlCommand instanceof Observe) {
-            // implement (or not)
-        }
-        return new CommandResponse.Error(runId, "Observe command not supported");
-    }
-
-    private void onSetup(Id runId, Setup setup) {
-        Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
-
-        // get param from the Parameter Set in the Setup
-        Optional<Parameter<Long>> sleepTimeParamOption = setup.jGet(sleepTimeKey);
-
-        // values of parameters are arrays.  Get the first one (the only one in our case) using `head` method available as a convenience method on `Parameter`.
-        if (sleepTimeParamOption.isPresent()) {
-            Parameter<Long> sleepTimeParam = sleepTimeParamOption.orElseThrow();
-            long sleepTimeInMillis = sleepTimeParam.head();
-
-            log.info(() -> "command payload: " + sleepTimeParam.keyName() + " = " + sleepTimeInMillis);
-
-            workerActor.tell(new Sleep(setup, runId, sleepTimeInMillis));
-        }
-    }
-    //#onSetup
-
-
-    @Override
-    public void onOneway(Id runId, ControlCommand controlCommand) {
-    }
-
-    @Override
-    public void onGoOffline() {
-    }
-
-    @Override
-    public void onGoOnline() {
-    }
-
-    @Override
-    public void onDiagnosticMode(UTCTime startTime, String hint) {
-    }
-
-    @Override
-    public void onOperationsMode() {
-    }
+  private ActorRef<WorkerCommand> createWorkerActor() {
+    return ctx.spawn(
+        Behaviors.receiveMessage(msg -> {
+          if (msg instanceof Sleep) {
+            Sleep sleep = (Sleep) msg;
+            // simulate long running command
+            Thread.sleep(sleep.sleepTime);
+            cswCtx.commandResponseManager().updateCommand(new Completed(sleep.runId));
+          } else {
+            log.error("Unsupported message type");
+          }
+          return Behaviors.stopped();
+        }),
+        "WorkerActor"
+    );
+  }
+  //#worker-actor
 }

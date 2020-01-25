@@ -2,7 +2,7 @@ package org.tmt.esw.basic.shared
 
 import csw.params.commands.CommandName
 import csw.params.core.generics.{Key, KeyType, Parameter}
-import csw.params.core.models.Units
+import csw.params.core.models.{Id, Units}
 import csw.prefix.models.Prefix
 
 object SampleInfo {
@@ -15,13 +15,14 @@ object SampleInfo {
   val longSleepPeriod: Long   = 4000L
 
   // AssemblyCommands
-  val sleep: CommandName            = CommandName("sleep")
-  val immediateCommand: CommandName = CommandName("immediateCommand")
-  val shortCommand: CommandName     = CommandName("shortCommand")
-  val mediumCommand: CommandName    = CommandName("mediumCommand")
-  val longCommand: CommandName      = CommandName("longCommand")
-  val complexCommand: CommandName   = CommandName("complexCommand")
-  val badCommand: CommandName       = CommandName("badCommand")
+  val sleep: CommandName             = CommandName("sleep")
+  val cancelLongCommand: CommandName = CommandName("cancelLongCommand")
+  val immediateCommand: CommandName  = CommandName("immediateCommand")
+  val shortCommand: CommandName      = CommandName("shortCommand")
+  val mediumCommand: CommandName     = CommandName("mediumCommand")
+  val longCommand: CommandName       = CommandName("longCommand")
+  val complexCommand: CommandName    = CommandName("complexCommand")
+  val badCommand: CommandName        = CommandName("badCommand")
 
   // Command parameters and helpers
   val maxSleep: Long          = 5000
@@ -30,6 +31,11 @@ object SampleInfo {
   def setSleepTime(milli: Long): Parameter[Long] = sleepTimeKey.set(milli).withUnits(Units.millisecond)
 
   val resultKey: Key[Long] = KeyType.LongKey.make("result")
+
+  // For cancelling sleep
+  val cancelKey: Key[String] = KeyType.StringKey.make("runId")
+
+  def setCancelRunId(runId: Id): Parameter[String] = cancelKey.set(runId.id)
 
   // HCD Commands
   val hcdSleep: CommandName = CommandName("hcdSleep")

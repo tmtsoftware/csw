@@ -1,7 +1,7 @@
 package org.tmt.esw.basic.sampleassembly
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.ActorRef
+import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import akka.util.Timeout
 import csw.command.client.CommandServiceFactory
 import csw.command.client.messages.ContainerMessage
@@ -46,8 +46,8 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
     containerRef = spawnContainer(com.typesafe.config.ConfigFactory.load("ModerateSampleContainer.conf"))
   }
 
-  private implicit val actorSystem      = frameworkTestKit.actorSystem
-  private implicit val timeout: Timeout = 12.seconds
+  private implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = frameworkTestKit.actorSystem
+  private implicit val timeout: Timeout                                = 12.seconds
 
   //#locate
   import org.tmt.esw.moderate.shared.SampleInfo._
