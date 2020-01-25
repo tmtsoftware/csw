@@ -31,6 +31,7 @@ import scala.util.{Failure, Success}
  * and if validation is successful, then onSubmit hook gets invoked.
  * You can find more information on this here : https://tmtsoftware.github.io/csw/framework.html
  */
+//noinspection ScalaStyle
 class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
     extends ComponentHandlers(ctx, cswCtx) {
 
@@ -123,7 +124,7 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
             setCounterAlarm(counter)
           case _ => log.warn("Unexpected event received.")
         }
-      case e: ObserveEvent => log.warn("Unexpected ObserveEvent received.") // not expected
+      case _: ObserveEvent => log.warn("Unexpected ObserveEvent received.") // not expected
     }
   }
   //#subscribe
@@ -140,12 +141,12 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
   }
 
   private val counterAlarmKey = AlarmKey(componentInfo.prefix, "CounterTooHighAlarm")
-  private def setCounterAlarm(counter: Int) = {
+  private def setCounterAlarm(counter: Int): Unit = {
     // fire alarm according to counter value
     val severity = getCounterSeverity(counter)
     alarmService.setSeverity(counterAlarmKey, severity).onComplete {
-      case Success(value) => log.info(s"Severity for alarm ${counterAlarmKey.name} set to " + severity.toString)
-      case Failure(ex)    => log.error(s"Error setting severity for alarm ${counterAlarmKey.name}: ${ex.getMessage}")
+      case Success(_)  => log.info(s"Severity for alarm ${counterAlarmKey.name} set to " + severity.toString)
+      case Failure(ex) => log.error(s"Error setting severity for alarm ${counterAlarmKey.name}: ${ex.getMessage}")
     }
   }
   //#alarm
@@ -155,6 +156,7 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
     eventService.defaultSubscriber.subscribeCallback(Set(counterEventKey), processEvent)
   }
 
+  //noinspection ScalaUnusedSymbol
   private def unsubscribeHcd(): Unit = {
     log.info("Stopping subscription.")
     maybeEventSubscription.foreach(_.unsubscribe())

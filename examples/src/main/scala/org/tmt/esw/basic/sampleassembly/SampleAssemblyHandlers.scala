@@ -33,6 +33,7 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
  * and if validation is successful, then onSubmit hook gets invoked.
  * You can find more information on this here : https://tmtsoftware.github.io/csw/framework.html
  */
+//noinspection DuplicatedCode
 class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {
 
   import cswCtx._
@@ -48,13 +49,13 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   //#initialize
   private var maybeEventSubscription: Option[EventSubscription] = None
   override def initialize(): Future[Unit] = {
-    log.info("Assembly: $prefix initialize")
+    log.info(s"Assembly: $prefix initialize")
     maybeEventSubscription = Some(subscribeToHcd())
     Future.unit
   }
 
   override def onShutdown(): Future[Unit] = {
-    log.info("Assembly: $prefix is shutting down.")
+    log.info(s"Assembly: $prefix is shutting down.")
     Future.unit
   }
   //#initialize
@@ -91,7 +92,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
             log.info(s"Counter = $counter")
           case _ => log.warn("Unexpected event received.")
         }
-      case e: ObserveEvent => log.warn("Unexpected ObserveEvent received.") // not expected
+      case _: ObserveEvent => log.warn("Unexpected ObserveEvent received.") // not expected
     }
   }
 
@@ -100,6 +101,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
     eventService.defaultSubscriber.subscribeCallback(Set(counterEventKey), processEvent)
   }
 
+  //noinspection ScalaUnusedSymbol
   private def unsubscribeHcd(): Unit = {
     log.info("Assembly: $prefix stopping subscription.")
     maybeEventSubscription.foreach(_.unsubscribe())
@@ -118,6 +120,8 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
           case _ =>
             Invalid(runId, UnsupportedCommandIssue(s"Command: ${setup.commandName.name} is not supported for sample Assembly."))
         }
+      case _ =>
+        Invalid(runId, UnsupportedCommandIssue(s"Command: ${command.commandName.name} is not supported for sample Assembly."))
     }
 
   private def validateSleep(runId: Id, setup: Setup): ValidateCommandResponse =
@@ -166,7 +170,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
               commandResponseManager.updateCommand(Completed(runId))
             case OverallFailure(responses) =>
               // There must be at least one error
-              val errors = responses.filter(isNegative(_))
+              val errors = responses.filter(isNegative)
               commandResponseManager.updateCommand(errors.head.withRunId(runId))
           }
           .recover(ex => commandResponseManager.updateCommand(Error(runId, ex.toString)))

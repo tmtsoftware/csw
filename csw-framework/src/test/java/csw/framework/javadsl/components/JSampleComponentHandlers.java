@@ -35,6 +35,7 @@ import java.util.concurrent.*;
 
 import static csw.common.components.command.ComponentStateForCommand.*;
 
+@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "unused"})
 public class JSampleComponentHandlers extends JComponentHandlers {
 
     // Demonstrating logger accessibility in Java Component handlers
@@ -147,12 +148,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     //#updateCommand
     private CommandResponse.SubmitResponse crmAddOrUpdate(Setup setup, Id runId) {
         // This simulates some worker task doing something that finishes after onSubmit returns
-        Runnable task = new Runnable() {
-            @Override
-            public void run() {
-                commandResponseManager.updateCommand(new Completed(runId));
-            }
-        };
+        Runnable task = () -> commandResponseManager.updateCommand(new Completed(runId));
 
         // Wait a bit and then set CRM to Completed
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
@@ -197,22 +193,14 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
             // Set CRM to Error after 1 second
             sendCRM(1, new CommandResponse.Error(runId, "Unknown Error occurred"));
-            return new CommandResponse.Started(runId);
         } else {
             Parameter<Integer> parameter = JKeyType.IntKey().make("encoder").set(20);
             Result result = new Result().add(parameter);
 
             // Returns Started and completes through CRM after 1 second
             sendCRM(1, new CommandResponse.Completed(runId, result));
-            return new Started(runId);
         }
-    }
-
-    private SubmitResponse processLongRunning(Id runId, ControlCommand controlCommand) {
-        Setup shortSetup  = Setup(, shortRunning, None)
-        val mediumSetup = Setup(assemblyPrefix, mediumRunning, None)
-        val longSetup   = Setup(assemblyPrefix, longRunning, None)
-
+        return new Started(runId);
     }
 
     private void parameterDelay(Id runId, Setup setup) {
@@ -223,9 +211,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
 
     // This test routine just delays before updating CRM - delay is always in seconds
     private void sendCRM(long delay, CommandResponse.SubmitResponse response) {
-        Runnable task = () -> {
-            commandResponseManager.updateCommand(response);
-        };
+        Runnable task = () -> commandResponseManager.updateCommand(response);
         // Wait a bit and then set CRM to response
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         executor.schedule(task, delay, TimeUnit.SECONDS);

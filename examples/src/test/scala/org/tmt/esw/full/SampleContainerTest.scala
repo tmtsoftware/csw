@@ -1,17 +1,12 @@
 package org.tmt.esw.full
 
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.ActorRef
+import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import akka.util.Timeout
 import csw.command.client.CommandServiceFactory
 import csw.command.client.messages.ContainerMessage
-import csw.command.client.messages.SupervisorLockMessage.Unlock
-import csw.command.client.models.framework.LockingResponse
-import csw.command.client.models.framework.LockingResponse.{LockAcquired, LockReleased}
-import csw.common.utils.LockCommandFactory
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
-import csw.params.commands.CommandResponse.{Cancelled, Completed, Locked, Started}
+import csw.params.commands.CommandResponse.{Cancelled, Completed, Started}
 import csw.params.commands.Setup
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.scaladsl.CSWService.{AlarmServer, EventServer}
@@ -21,6 +16,7 @@ import org.scalatest.WordSpecLike
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
+//noinspection ScalaStyle
 //#intro
 class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with WordSpecLike {
 
@@ -34,8 +30,8 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
     ComponentId(Prefix(Subsystem.ESW, "sampleassembly"), ComponentType.Assembly)
   )
   private var assemblyLocation: AkkaLocation = _
-  private val hcdConnection = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "samplehcd"), ComponentType.HCD))
-  private var hcdLocation: AkkaLocation = _
+  private val hcdConnection                  = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "samplehcd"), ComponentType.HCD))
+  private var hcdLocation: AkkaLocation      = _
 
   private var containerRef: ActorRef[ContainerMessage] = _
 
@@ -44,8 +40,8 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
     containerRef = spawnContainer(com.typesafe.config.ConfigFactory.load("FullSampleContainer.conf"))
   }
 
-  private implicit val actorSystem = frameworkTestKit.actorSystem
-  private implicit val timeout: Timeout = 12.seconds
+  private implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = frameworkTestKit.actorSystem
+  private implicit val timeout: Timeout                                = 12.seconds
 
   //#locate
 
@@ -102,7 +98,7 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
       r1 shouldBe a[Started]
       Thread.sleep(2000)
       val cancelSetup = Setup(testPrefix, cancelLongCommand, None).add(cancelKey.set(r1.runId.id))
-      val r2 = Await.result(assemblyCS.submitAndWait(cancelSetup), 10.seconds)
+      val r2          = Await.result(assemblyCS.submitAndWait(cancelSetup), 10.seconds)
       println("SampleContainerTest cancel response: " + r2)
       r2 shouldBe a[Completed]
 
@@ -112,9 +108,9 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
     }
 
     "Accept a short, medium and long command" in {
-      val shortSetup: Setup = Setup(testPrefix, shortCommand, None)
+      val shortSetup: Setup  = Setup(testPrefix, shortCommand, None)
       val mediumSetup: Setup = Setup(testPrefix, mediumCommand, None)
-      val longSetup: Setup = Setup(testPrefix, longCommand, None)
+      val longSetup: Setup   = Setup(testPrefix, longCommand, None)
 
       val assemblyCS = CommandServiceFactory.make(assemblyLocation)
 
@@ -132,7 +128,7 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
       Await.result(assemblyCS.submitAndWait(complexSetup), 10.seconds) shouldBe a[Completed]
       println("Got final completed")
     }
-/*
+    /*
     import csw.command.client.extensions.AkkaLocationExt._
 
     import scala.concurrent.Await
@@ -155,7 +151,7 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
 
       Await.result(assemblyCS.submitAndWait(setup), 10.seconds) shouldBe a[Completed]
     }
-*/
+   */
   }
 
 }

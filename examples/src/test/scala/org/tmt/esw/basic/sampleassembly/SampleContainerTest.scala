@@ -5,10 +5,9 @@ import akka.actor.typed.ActorRef
 import akka.util.Timeout
 import csw.command.client.CommandServiceFactory
 import csw.command.client.messages.ContainerMessage
-import csw.command.client.messages.SupervisorLockMessage.Unlock
+import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.models.framework.LockingResponse
 import csw.command.client.models.framework.LockingResponse.{LockAcquired, LockReleased}
-import csw.common.utils.LockCommandFactory
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.params.commands.CommandResponse.{Cancelled, Completed, Locked, Started}
@@ -20,6 +19,10 @@ import org.scalatest.WordSpecLike
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
+
+object LockCommandFactory {
+  def make(prefix: Prefix, replyTo: ActorRef[LockingResponse]): Lock = Lock(prefix, replyTo, 10.seconds)
+}
 
 //#intro
 class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with WordSpecLike {
@@ -110,9 +113,9 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
     }
 
     "Accept a short, medium and long command" in {
-      val shortSetup: Setup = Setup(testPrefix, shortCommand, None)
+      val shortSetup: Setup  = Setup(testPrefix, shortCommand, None)
       val mediumSetup: Setup = Setup(testPrefix, mediumCommand, None)
-      val longSetup: Setup = Setup(testPrefix, longCommand, None)
+      val longSetup: Setup   = Setup(testPrefix, longCommand, None)
 
       val assemblyCS = CommandServiceFactory.make(assemblyLocation)
 
@@ -142,7 +145,7 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
       hcdLocation2.componentRef ! LockCommandFactory.make(testPrefix, lockingStateProbe.ref)
       lockingStateProbe.expectMessage(LockAcquired)
 
-      val assemblyCS = CommandServiceFactory.make(assemblyLocation)
+      val assemblyCS   = CommandServiceFactory.make(assemblyLocation)
       val setup: Setup = Setup(testPrefix, sleep, None).add(setSleepTime(1500))
 
       Await.result(assemblyCS.submitAndWait(setup), 10.seconds) shouldBe a[Locked]

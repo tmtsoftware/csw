@@ -47,6 +47,7 @@ import static csw.prefix.javadsl.JSubsystem.NFIRAOS;
  * and if validation is successful, then onSubmit hook gets invoked.
  * You can find more information on this here : https://tmtsoftware.github.io/csw/framework.html
  */
+@SuppressWarnings({"unused", "OptionalUsedAsFieldOrParameterType"})
 public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
 
     private JCswContext cswCtx;
@@ -151,7 +152,7 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
         if (trackingEvent instanceof LocationUpdated) {
             LocationUpdated updated = (LocationUpdated) trackingEvent;
             Location location = updated.location();
-            ICommandService hcd = CommandServiceFactory.jMake((AkkaLocation) (location), actorContext.getSystem());
+            ICommandService hcd = CommandServiceFactory.jMake(location, actorContext.getSystem());
             commandSender.tell(new SendCommand(hcd));
         } else if (trackingEvent instanceof LocationRemoved) {
             log.info("HCD no longer available");
