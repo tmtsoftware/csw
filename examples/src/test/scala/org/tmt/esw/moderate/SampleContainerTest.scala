@@ -4,7 +4,6 @@ import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import akka.util.Timeout
 import csw.command.client.CommandServiceFactory
-import csw.command.client.messages.ContainerMessage
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.models.framework.LockingResponse
 import csw.command.client.models.framework.LockingResponse.{LockAcquired, LockReleased}
@@ -24,6 +23,7 @@ object LockCommandFactory {
   def make(prefix: Prefix, replyTo: ActorRef[LockingResponse]): Lock = Lock(prefix, replyTo, 10.seconds)
 }
 
+//noinspection ScalaStyle
 //#intro
 class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with WordSpecLike {
   import frameworkTestKit.frameworkWiring._
@@ -31,19 +31,14 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
   private val containerConnection = AkkaConnection(
     ComponentId(Prefix(Subsystem.Container, "SampleContainer"), ComponentType.Container)
   )
-  private var containerLocation: AkkaLocation = _
   private val assemblyConnection = AkkaConnection(
     ComponentId(Prefix(Subsystem.ESW, "SampleAssembly"), ComponentType.Assembly)
   )
-  private var assemblyLocation: AkkaLocation = _
   private val hcdConnection                  = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
-  private var hcdLocation: AkkaLocation      = _
-
-  private var containerRef: ActorRef[ContainerMessage] = _
 
   override def beforeAll(): Unit = {
     super.beforeAll()
-    containerRef = spawnContainer(com.typesafe.config.ConfigFactory.load("ModerateSampleContainer.conf"))
+    spawnContainer(com.typesafe.config.ConfigFactory.load("ModerateSampleContainer.conf"))
   }
 
   private implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = frameworkTestKit.actorSystem
@@ -56,17 +51,17 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
 
   "startupContainer" must {
     "Ensure container is locatable using Location Service" in {
-      containerLocation = Await.result(locationService.resolve(containerConnection, 10.seconds), 10.seconds).get
+      val containerLocation = Await.result(locationService.resolve(containerConnection, 10.seconds), 10.seconds).get
       containerLocation.connection shouldBe containerConnection
     }
 
     "Ensure Assembly is locatable using Location Service" in {
-      assemblyLocation = Await.result(locationService.resolve(assemblyConnection, 10.seconds), 10.seconds).get
+      val assemblyLocation = Await.result(locationService.resolve(assemblyConnection, 10.seconds), 10.seconds).get
       assemblyLocation.connection shouldBe assemblyConnection
     }
 
     "Ensure HCD is locatable using Location Service" in {
-      hcdLocation = Await.result(locationService.resolve(hcdConnection, 10.seconds), 10.seconds).get
+      val hcdLocation = Await.result(locationService.resolve(hcdConnection, 10.seconds), 10.seconds).get
       hcdLocation.connection shouldBe hcdConnection
 
     }
@@ -74,6 +69,7 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
 
   "sending sleep" must {
     "Accept a valid sleep command" in {
+      val assemblyLocation = Await.result(locationService.resolve(assemblyConnection, 10.seconds), 10.seconds).get
       val setup: Setup = Setup(testPrefix, sleep, None).add(setSleepTime(1500))
 
       val assemblyCS = CommandServiceFactory.make(assemblyLocation)
@@ -86,6 +82,7 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
     "Accept an immediate command" in {
       val setup: Setup = Setup(testPrefix, immediateCommand, None)
 
+      val assemblyLocation = Await.result(locationService.resolve(assemblyConnection, 10.seconds), 10.seconds).get
       val assemblyCS = CommandServiceFactory.make(assemblyLocation)
 
       val x = Await.result(assemblyCS.submitAndWait(setup), 10.seconds)
@@ -96,6 +93,7 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
     "Accept a longCommand and then cancel it" in {
       val setup: Setup = Setup(testPrefix, longCommand, None)
 
+      val assemblyLocation = Await.result(locationService.resolve(assemblyConnection, 10.seconds), 10.seconds).get
       val assemblyCS = CommandServiceFactory.make(assemblyLocation)
 
       val r1 = Await.result(assemblyCS.submit(setup), 10.seconds)
@@ -117,6 +115,7 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
       val mediumSetup: Setup = Setup(testPrefix, mediumCommand, None)
       val longSetup: Setup   = Setup(testPrefix, longCommand, None)
 
+      val assemblyLocation = Await.result(locationService.resolve(assemblyConnection, 10.seconds), 10.seconds).get
       val assemblyCS = CommandServiceFactory.make(assemblyLocation)
 
       Await.result(assemblyCS.submitAndWait(shortSetup), 10.seconds) shouldBe a[Completed]
@@ -128,6 +127,7 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
     "Accept a complex command and wait for all to finish" in {
       val complexSetup: Setup = Setup(testPrefix, complexCommand, None)
 
+      val assemblyLocation = Await.result(locationService.resolve(assemblyConnection, 10.seconds), 10.seconds).get
       val assemblyCS = CommandServiceFactory.make(assemblyLocation)
 
       Await.result(assemblyCS.submitAndWait(complexSetup), 10.seconds) shouldBe a[Completed]
@@ -145,6 +145,7 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
       hcdLocation2.componentRef ! LockCommandFactory.make(testPrefix, lockingStateProbe.ref)
       lockingStateProbe.expectMessage(LockAcquired)
 
+      val assemblyLocation = Await.result(locationService.resolve(assemblyConnection, 10.seconds), 10.seconds).get
       val assemblyCS   = CommandServiceFactory.make(assemblyLocation)
       val setup: Setup = Setup(testPrefix, sleep, None).add(setSleepTime(1500))
 
