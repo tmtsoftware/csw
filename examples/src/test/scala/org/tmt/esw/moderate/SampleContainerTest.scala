@@ -34,7 +34,7 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
   private val assemblyConnection = AkkaConnection(
     ComponentId(Prefix(Subsystem.ESW, "SampleAssembly"), ComponentType.Assembly)
   )
-  private val hcdConnection                  = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
+  private val hcdConnection = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
 
   override def beforeAll(): Unit = {
     super.beforeAll()
@@ -70,7 +70,7 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
   "sending sleep" must {
     "Accept a valid sleep command" in {
       val assemblyLocation = Await.result(locationService.resolve(assemblyConnection, 10.seconds), 10.seconds).get
-      val setup: Setup = Setup(testPrefix, sleep, None).add(setSleepTime(1500))
+      val setup: Setup     = Setup(testPrefix, sleep, None).add(setSleepTime(1500))
 
       val assemblyCS = CommandServiceFactory.make(assemblyLocation)
 
@@ -83,7 +83,7 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
       val setup: Setup = Setup(testPrefix, immediateCommand, None)
 
       val assemblyLocation = Await.result(locationService.resolve(assemblyConnection, 10.seconds), 10.seconds).get
-      val assemblyCS = CommandServiceFactory.make(assemblyLocation)
+      val assemblyCS       = CommandServiceFactory.make(assemblyLocation)
 
       val x = Await.result(assemblyCS.submitAndWait(setup), 10.seconds)
       println("X: " + x)
@@ -94,7 +94,7 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
       val setup: Setup = Setup(testPrefix, longCommand, None)
 
       val assemblyLocation = Await.result(locationService.resolve(assemblyConnection, 10.seconds), 10.seconds).get
-      val assemblyCS = CommandServiceFactory.make(assemblyLocation)
+      val assemblyCS       = CommandServiceFactory.make(assemblyLocation)
 
       val r1 = Await.result(assemblyCS.submit(setup), 10.seconds)
       println("SampleContainerTest submit response: " + r1)
@@ -116,7 +116,7 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
       val longSetup: Setup   = Setup(testPrefix, longCommand, None)
 
       val assemblyLocation = Await.result(locationService.resolve(assemblyConnection, 10.seconds), 10.seconds).get
-      val assemblyCS = CommandServiceFactory.make(assemblyLocation)
+      val assemblyCS       = CommandServiceFactory.make(assemblyLocation)
 
       Await.result(assemblyCS.submitAndWait(shortSetup), 10.seconds) shouldBe a[Completed]
       Await.result(assemblyCS.submitAndWait(mediumSetup), 10.seconds) shouldBe a[Completed]
@@ -128,7 +128,7 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
       val complexSetup: Setup = Setup(testPrefix, complexCommand, None)
 
       val assemblyLocation = Await.result(locationService.resolve(assemblyConnection, 10.seconds), 10.seconds).get
-      val assemblyCS = CommandServiceFactory.make(assemblyLocation)
+      val assemblyCS       = CommandServiceFactory.make(assemblyLocation)
 
       Await.result(assemblyCS.submitAndWait(complexSetup), 10.seconds) shouldBe a[Completed]
       println("Got final completed")
@@ -146,8 +146,8 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
       lockingStateProbe.expectMessage(LockAcquired)
 
       val assemblyLocation = Await.result(locationService.resolve(assemblyConnection, 10.seconds), 10.seconds).get
-      val assemblyCS   = CommandServiceFactory.make(assemblyLocation)
-      val setup: Setup = Setup(testPrefix, sleep, None).add(setSleepTime(1500))
+      val assemblyCS       = CommandServiceFactory.make(assemblyLocation)
+      val setup: Setup     = Setup(testPrefix, sleep, None).add(setSleepTime(1500))
 
       Await.result(assemblyCS.submitAndWait(setup), 10.seconds) shouldBe a[Locked]
       println("Got final locked")

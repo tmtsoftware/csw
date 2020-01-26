@@ -147,7 +147,7 @@ class SampleAssemblyHandlersWithMonitor(ctx: ActorContext[TopLevelActorMessage],
         val cancelRunId = Id(setup(cancelKey).head)
         println(s"Assembly received cancel worker: $cancelRunId")
 
-        val workerId: Future[Response[Id]] = workerMonitor.ask(replyTo => GetWorker(cancelRunId, replyTo))
+        val workerId: Future[Response[Id]] = workerMonitor.ask(GetWorker(cancelRunId, _))
         workerId.map { res =>
           println("Id: " + res.response)
           hcdCS match {
@@ -192,9 +192,18 @@ class SampleAssemblyHandlersWithMonitor(ctx: ActorContext[TopLevelActorMessage],
     hcdCS match {
       case Some(cs) =>
         println("Input setup: " + setup)
-        cs.submitAndWait(setup).map { sr =>
-          commandResponseManager.updateCommand(sr.withRunId(runId))
+        cs.submit(setup).map {
+          case started: Started =>
+            println("Assembly received started")
+            workerMonitor ! AddWorker(runId, started.runId)
+            cs.queryFinal(started.runId).foreach { sr =>
+              println(s"Query Final final returned: $sr")
+              commandResponseManager.updateCommand(sr.withRunId(runId))
+            }
+          case other =>
+            commandResponseManager.updateCommand(other.withRunId(runId))
         }
+
       case None =>
         commandResponseManager.updateCommand(Error(runId, s"A needed HCD is not available: ${hcdConnection.componentId}"))
     }
