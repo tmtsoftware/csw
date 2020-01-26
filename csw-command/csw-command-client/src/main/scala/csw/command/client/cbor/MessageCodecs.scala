@@ -5,17 +5,20 @@ import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.serialization.{Serialization, SerializationExtension}
 import csw.command.client.messages.CommandSerializationMarker.RemoteMsg
 import csw.command.client.messages.sequencer.CswSequencerMessage
-import csw.command.client.models.framework.PubSub.{Publish, PublisherMessage, SubscriberMessage}
 import csw.command.client.models.framework._
 import csw.location.models.codecs.LocationCodecs
 import csw.logging.models.codecs.LoggingCodecs
 import csw.params.core.formats.ParamCodecs
 import io.bullet.borer.derivation.CompactMapBasedCodecs.deriveCodec
-import io.bullet.borer.derivation.MapBasedCodecs
 import io.bullet.borer.derivation.MapBasedCodecs.deriveAllCodecs
 import io.bullet.borer.{Codec, Decoder, Encoder}
 
-trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
+trait MessageCodecs extends MessageCodecsBase {
+  implicit def pubSubCodec[T: Encoder: Decoder, PS[_] <: PubSub[_]]: Codec[PS[T]] = pubSubCodecValue[T].asInstanceOf[Codec[PS[T]]]
+  implicit lazy val messageRemoteMsgCodec: Codec[RemoteMsg]                       = deriveAllCodecs
+}
+
+trait MessageCodecsBase extends ParamCodecs with LoggingCodecs with LocationCodecs {
 
   implicit def actorSystem: ActorSystem[_]
 
@@ -28,14 +31,7 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
       }
     )
 
-  //todo: deriveAllCodecs
-  implicit def subscribeMessageCodec[T: Encoder: Decoder]: Codec[PubSub.Subscribe[T]]         = MapBasedCodecs.deriveCodec
-  implicit def subscribeOnlyMessageCodec[T: Encoder: Decoder]: Codec[PubSub.SubscribeOnly[T]] = MapBasedCodecs.deriveCodec
-  implicit def unsubscribeMessageCodec[T: Encoder: Decoder]: Codec[PubSub.Unsubscribe[T]]     = MapBasedCodecs.deriveCodec
-  implicit def subscriberMessageCodec[T: Encoder: Decoder]: Codec[SubscriberMessage[T]]       = MapBasedCodecs.deriveCodec
-  implicit def publishCodec[T: Encoder: Decoder]: Codec[Publish[T]]                           = MapBasedCodecs.deriveCodec
-  implicit def publisherMessageCodec[T: Encoder: Decoder]: Codec[PublisherMessage[T]]         = MapBasedCodecs.deriveCodec
-  implicit def pubSubCodec[T: Encoder: Decoder]: Codec[PubSub[T]]                             = MapBasedCodecs.deriveCodec
+  def pubSubCodecValue[T: Encoder: Decoder]: Codec[PubSub[T]] = deriveAllCodecs
 
   // ************************ LockingResponse Codecs ********************
 
@@ -49,7 +45,6 @@ trait MessageCodecs extends ParamCodecs with LoggingCodecs with LocationCodecs {
 
   // ************************ RemoteMsg Codecs ********************
 
-  implicit lazy val messageRemoteMsgCodec: Codec[RemoteMsg]                  = deriveAllCodecs
   implicit lazy val lifecycleStateChangedCodec: Codec[LifecycleStateChanged] = deriveCodec
 
   // ************************ SequencerMsg Codecs ********************

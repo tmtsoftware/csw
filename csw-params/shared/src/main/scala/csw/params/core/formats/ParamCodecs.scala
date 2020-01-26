@@ -28,7 +28,6 @@ object ParamCodecs extends ParamCodecs
  * Supports (de)serialization of csw models
  */
 trait ParamCodecs extends ParamCodecsBase {
-  implicit lazy val controlCommandCodecValue: Codec[ControlCommand] = deriveAllCodecs
   implicit def commandResponseCodec[T <: CommandResponse]: Codec[T] = commandResponseCodecValue.asInstanceOf[Codec[T]]
 }
 
@@ -105,10 +104,11 @@ trait ParamCodecsBase extends CommonCodecs {
   implicit lazy val eventCodec: Codec[Event]         = deriveAllCodecs
 
   // ************************ Command Codecs ********************
-  implicit lazy val commandNameCodec: Codec[CommandName]              = deriveCodec
-  implicit lazy val obsIdCodec: Codec[ObsId]                          = deriveCodec
-  implicit lazy val sequenceCommandCodecValue: Codec[SequenceCommand] = deriveAllCodecs
-  implicit lazy val sequenceCodec: Codec[Sequence]                    = deriveCodec
+  implicit lazy val commandNameCodec: Codec[CommandName]         = deriveCodec
+  implicit lazy val obsIdCodec: Codec[ObsId]                     = deriveCodec
+  implicit lazy val controlCommandCodec: Codec[ControlCommand]   = deriveAllCodecs
+  implicit lazy val sequenceCommandCodec: Codec[SequenceCommand] = deriveAllCodecs
+  implicit lazy val sequenceCodec: Codec[Sequence]               = deriveCodec
 
   // ************************ CommandResponse Codecs ********************
   implicit lazy val resultCodec: Codec[Result]               = deriveCodec
