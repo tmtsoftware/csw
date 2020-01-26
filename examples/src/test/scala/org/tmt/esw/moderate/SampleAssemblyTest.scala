@@ -1,4 +1,4 @@
-package org.tmt.esw.basic.sampleassembly
+package org.tmt.esw.moderate
 
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{ComponentId, ComponentType}

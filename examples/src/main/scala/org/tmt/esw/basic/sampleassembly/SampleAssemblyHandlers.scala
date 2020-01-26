@@ -170,32 +170,6 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
       case `longCommand` =>
         sleepHCD(runId, setup, longSleepPeriod)
         Started(runId)
-        // XXX TODO Allan: Does the basic version need to handle `cancelLongCommand`?
-//      case `cancelLongCommand` =>
-//        val cancelRunId = Id(setup(cancelKey).head)
-//        println(s"Assembly received cancel worker: $cancelRunId")
-//
-//        val workerId: Future[Response[Id]] = workerMonitor.ask(replyTo => GetWorker(cancelRunId, replyTo))
-//        workerId.map { res =>
-//          println("Id: " + res.response)
-//          hcdCS match {
-//            case Some(cs) =>
-//              val s = Setup(cswCtx.componentInfo.prefix, hcdCancelLong, setup.maybeObsId).add(cancelKey.set(res.response.id))
-//              println("Assembly setup for cancel HCD: " + s)
-//              cs.submitAndWait(s).map {
-//                case completed: Completed =>
-//                  println("Assembly received cancel completed")
-//                  commandResponseManager.updateCommand(completed.copy(runId = runId))
-//                case other =>
-//                  println(s"Got an: $other response")
-//                  commandResponseManager.updateCommand(other.withRunId(runId))
-//              }
-//            case None =>
-//              commandResponseManager.updateCommand(Error(runId, s"A needed HCD is not available: ${hcdConnection.componentId}"))
-//          }
-//        }
-//        Started(runId)
-
       case `complexCommand` =>
         val medium = simpleHCD(runId, Setup(prefix, hcdSleep, setup.maybeObsId).add(setSleepTime(mediumSleepPeriod)))
         val long   = simpleHCD(runId, Setup(prefix, hcdSleep, setup.maybeObsId).add(setSleepTime(longSleepPeriod)))

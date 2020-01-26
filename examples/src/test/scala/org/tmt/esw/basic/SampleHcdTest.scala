@@ -7,17 +7,19 @@ import csw.location.models
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{ComponentId, ComponentType}
 import csw.params.commands.{CommandName, CommandResponse, Setup}
-import csw.params.core.generics.{Key, KeyType, Parameter}
+import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.{ObsId, Units}
 import csw.params.events.{Event, EventKey, EventName, SystemEvent}
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.scaladsl.CSWService.{AlarmServer, EventServer}
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
 import org.scalatest.{BeforeAndAfterEach, FunSuiteLike}
+import org.tmt.esw.basic.shared.SampleInfo._
 
 import scala.collection.mutable
 import scala.concurrent.Await
 
+//noinspection ScalaStyle
 //#setup
 class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with FunSuiteLike with BeforeAndAfterEach {
   import frameworkTestKit.frameworkWiring._
@@ -77,15 +79,13 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
 
   //#submit
   implicit val typedActorSystem: ActorSystem[_] = actorSystem
-  test("should be able to send sleep command to HCD") {
+  test("basic: should be able to send sleep command to HCD") {
     import scala.concurrent.duration._
     implicit val sleepCommandTimeout: Timeout = Timeout(10000.millis)
 
     // Construct Setup command
     val testPrefix: Prefix = Prefix("ESW.test")
 
-    val hcdSleep: CommandName   = CommandName("hcdSleep")
-    val sleepTimeKey: Key[Long] = KeyType.LongKey.make("sleepTime")
     // Helper to get units set
     def setSleepTime(setup: Setup, milli: Long): Setup = setup.add(sleepTimeKey.set(milli).withUnits(Units.millisecond))
 
@@ -111,7 +111,6 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
     // Construct Setup command
     val testPrefix: Prefix      = Prefix("ESW.test")
     val hcdSleep: CommandName   = CommandName("hcdSleep")
-    val sleepTimeKey: Key[Long] = KeyType.LongKey.make("sleepTime")
     // Helper to get units set
     def setSleepTime(milli: Long): Parameter[Long] = sleepTimeKey.set(milli).withUnits(Units.millisecond)
 

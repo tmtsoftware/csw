@@ -1,4 +1,4 @@
-package org.tmt.esw.shared;
+package org.tmt.esw.basic.shared;
 
 import csw.params.commands.CommandName;
 import csw.params.core.generics.Key;
@@ -27,7 +27,7 @@ public class JSampleInfo {
 
   // Command parameters and helpers
   public static final Long maxSleep = 5000L;
-  public static final Key<Long> sleepTimeKey = JKeyType.LongKey().make("sleepTime");
+  public static final Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
 
   // Helper to get units set
   public static Parameter<Long> setSleepTime(Long milli) {

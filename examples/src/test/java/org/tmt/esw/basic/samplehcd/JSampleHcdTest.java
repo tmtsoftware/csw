@@ -12,7 +12,6 @@ import csw.location.api.javadsl.JComponentType;
 import csw.location.models.AkkaLocation;
 import csw.location.models.ComponentId;
 import csw.location.models.Connection;
-import csw.params.commands.CommandName;
 import csw.params.commands.CommandResponse;
 import csw.params.commands.Setup;
 import csw.params.core.generics.Key;
@@ -36,7 +35,10 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
+
+import static org.tmt.esw.basic.shared.JSampleInfo.*;
 
 //#setup
 public class JSampleHcdTest extends JUnitSuite {
@@ -65,7 +67,7 @@ public class JSampleHcdTest extends JUnitSuite {
     //#subscribe
     @Test
     public void testShouldBeAbleToSubscribeToHCDEvents() throws InterruptedException {
-        EventKey counterEventKey = new EventKey(Prefix.apply(JSubsystem.NFIRAOS(), "JSampleHcd"), new EventName("HcdCounter"));
+        EventKey counterEventKey = new EventKey(Prefix.apply(JSubsystem.ESW(), "JSampleHcd"), new EventName("HcdCounter"));
         Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter");
 
         IEventService eventService = testKit.jEventService();
@@ -113,23 +115,22 @@ public class JSampleHcdTest extends JUnitSuite {
 
     // DEOPSCSW-39: examples of Location Service
     @Test
-    public void testShouldBeAbleToSendSleepCommandToHCD() throws ExecutionException, InterruptedException {
+    public void testShouldBeAbleToSendSleepCommandToHCD() throws ExecutionException, InterruptedException, TimeoutException {
 
         // Construct Setup command
-        Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
         Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond());
 
-        Setup setupCommand = new Setup(Prefix.apply(JSubsystem.CSW(), "move"), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
+        Setup setupCommand = new Setup(Prefix.apply(JSubsystem.CSW(), "move"), hcdSleep, Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
 
         Timeout commandResponseTimeout = new Timeout(10, TimeUnit.SECONDS);
 
-        Connection.AkkaConnection connection = new Connection.AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.NFIRAOS(), "JSampleHcd"), JComponentType.HCD()));
+        Connection.AkkaConnection connection = new Connection.AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.ESW(), "JSampleHcd"), JComponentType.HCD()));
         ILocationService locationService = testKit.jLocationService();
         AkkaLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().orElseThrow();
 
         ICommandService hcd = CommandServiceFactory.jMake(location, typedActorSystem);
 
-        CommandResponse.SubmitResponse result = hcd.submitAndWait(setupCommand, commandResponseTimeout).get();
+        CommandResponse.SubmitResponse result = hcd.submitAndWait(setupCommand, commandResponseTimeout).get(10, TimeUnit.SECONDS);
         Assert.assertTrue(result instanceof CommandResponse.Completed);
     }
     //#submitAndWait
@@ -145,11 +146,11 @@ public class JSampleHcdTest extends JUnitSuite {
         Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
         Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond());
 
-        Setup setupCommand = new Setup(Prefix.apply(JSubsystem.CSW(), "move"), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
+        Setup setupCommand = new Setup(Prefix.apply(JSubsystem.CSW(), "move"), hcdSleep, Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
 
         Timeout commandResponseTimeout = new Timeout(1, TimeUnit.SECONDS);
 
-        Connection.AkkaConnection connection = new Connection.AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.NFIRAOS(), "JSampleHcd"), JComponentType.HCD()));
+        Connection.AkkaConnection connection = new Connection.AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.ESW(), "JSampleHcd"), JComponentType.HCD()));
         ILocationService locationService = testKit.jLocationService();
         AkkaLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().orElseThrow();
 

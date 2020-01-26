@@ -18,6 +18,7 @@ import csw.params.core.models.{Id, ObsId, Units}
 import csw.params.events._
 import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime
+import org.tmt.esw.basic.shared.SampleInfo._
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContextExecutor, Future}
@@ -61,9 +62,8 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
   def handle(hcd: CommandService): Unit = {
 
     // Construct Setup command
-    val sleepTimeKey: Key[Long]         = KeyType.LongKey.make("SleepTime")
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
-    val setupCommand                    = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
+    val setupCommand                    = Setup(componentInfo.prefix, hcdSleep, Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
     // Submit command, and handle validation response. Final response is returned as a Future
     val submitCommandResponseF: Future[SubmitResponse] = hcd.submitAndWait(setupCommand).flatMap {

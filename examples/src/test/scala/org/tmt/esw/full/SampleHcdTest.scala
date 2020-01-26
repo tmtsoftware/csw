@@ -6,7 +6,7 @@ import csw.command.client.CommandServiceFactory
 import csw.location.models
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{ComponentId, ComponentType}
-import csw.params.commands.{CommandName, CommandResponse, Setup}
+import csw.params.commands.{CommandResponse, Setup}
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.{ObsId, Units}
 import csw.params.events.{Event, EventKey, EventName, SystemEvent}
@@ -14,10 +14,12 @@ import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.scaladsl.CSWService.{AlarmServer, EventServer, LocationServer}
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
 import org.scalatest.{BeforeAndAfterEach, FunSuiteLike}
+import org.tmt.esw.full.shared.SampleInfo._
 
 import scala.collection.mutable
 import scala.concurrent.Await
 
+//noinspection ScalaStyle
 //#setup
 class SampleHcdTest
     extends ScalaTestFrameworkTestKit(AlarmServer, EventServer, LocationServer)
@@ -80,14 +82,13 @@ class SampleHcdTest
 
   //#submit
   implicit val typedActorSystem: ActorSystem[_] = actorSystem
-  test("should be able to send sleep command to HCD") {
+  test("full: should be able to send sleep command to HCD") {
     import scala.concurrent.duration._
     implicit val sleepCommandTimeout: Timeout = Timeout(10000.millis)
 
     // Construct Setup command
-    val sleepTimeKey: Key[Long]         = KeyType.LongKey.make("SleepTime")
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
-    val setupCommand                    = Setup(Prefix("csw.move"), CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
+    val setupCommand                    = Setup(Prefix("csw.move"), hcdSleep, Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
     val connection = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
 
@@ -107,9 +108,8 @@ class SampleHcdTest
     implicit val sleepCommandTimeout: Timeout = Timeout(1000.millis)
 
     // Construct Setup command
-    val sleepTimeKey: Key[Long]         = KeyType.LongKey.make("SleepTime")
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
-    val setupCommand                    = Setup(Prefix("csw.move"), CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
+    val setupCommand                    = Setup(Prefix("csw.move"), hcdSleep, Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
     val connection = AkkaConnection(models.ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
 

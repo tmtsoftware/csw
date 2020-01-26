@@ -15,7 +15,6 @@ import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
 import csw.location.models.*;
 import csw.logging.api.javadsl.ILogger;
-import csw.params.commands.CommandName;
 import csw.params.commands.CommandResponse;
 import csw.params.commands.ControlCommand;
 import csw.params.commands.Setup;
@@ -38,6 +37,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import static csw.prefix.javadsl.JSubsystem.ESW;
+import static org.tmt.esw.basic.shared.JSampleInfo.hcdSleep;
 
 /**
  * Domain specific logic should be written in below handlers.
@@ -97,7 +97,7 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
         Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
         Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond());
 
-        Setup setupCommand = new Setup(cswCtx.componentInfo().prefix(), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
+        Setup setupCommand = new Setup(cswCtx.componentInfo().prefix(), hcdSleep, Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
 
         Timeout submitTimeout = new Timeout(1, TimeUnit.SECONDS);
         Timeout commandResponseTimeout = new Timeout(10, TimeUnit.SECONDS);

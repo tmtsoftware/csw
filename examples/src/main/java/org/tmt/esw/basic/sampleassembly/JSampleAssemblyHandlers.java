@@ -32,7 +32,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static org.tmt.esw.shared.JSampleInfo.*;
+import static org.tmt.esw.basic.shared.JSampleInfo.*;
 import static csw.params.commands.CommandResponse.*;
 import static csw.params.commands.CommandIssue.*;
 import static csw.command.client.CommandResponseManager.*;

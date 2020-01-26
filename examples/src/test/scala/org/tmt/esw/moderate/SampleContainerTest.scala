@@ -1,4 +1,4 @@
-package org.tmt.esw.basic.sampleassembly
+package org.tmt.esw.moderate
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}

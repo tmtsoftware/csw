@@ -2,6 +2,7 @@ package org.tmt.esw.basic.samplehcd;
 
 import akka.actor.Cancellable;
 import akka.actor.typed.ActorRef;
+import akka.actor.typed.internal.adapter.ActorRefAdapter;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import csw.command.client.messages.TopLevelActorMessage;
@@ -18,11 +19,13 @@ import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
 import csw.prefix.models.Prefix;
 import csw.time.core.models.UTCTime;
+import scala.concurrent.duration.FiniteDuration;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-import static org.tmt.esw.shared.JSampleInfo.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.tmt.esw.basic.shared.JSampleInfo.*;
 import static csw.params.commands.CommandResponse.*;
 import static csw.params.commands.CommandIssue.*;
 
@@ -162,20 +165,36 @@ public class JSampleHcdHandlers extends JComponentHandlers {
     }
   }
 
+  private static final class Finished implements WorkerCommand {
+    private final Id runId;
+    private final long sleepTime;
+
+    private Finished(Id runId, long sleepTime) {
+      this.runId = runId;
+      this.sleepTime = sleepTime;
+    }
+  }
+
   private ActorRef<WorkerCommand> createWorkerActor() {
-    return ctx.spawn(
-        Behaviors.receiveMessage(msg -> {
+    log.info("XXX Create worker actor");
+    return ctx.spawnAnonymous(
+        Behaviors.receive( (workerCtx, msg) -> {
           if (msg instanceof Sleep) {
             Sleep sleep = (Sleep) msg;
-            // simulate long running command
-            Thread.sleep(sleep.sleepTime);
-            cswCtx.commandResponseManager().updateCommand(new Completed(sleep.runId));
+            log.info("XXX Received Sleep " + sleep.sleepTime);
+            UTCTime when = UTCTime.after(new FiniteDuration(sleep.sleepTime, MILLISECONDS));
+            cswCtx.timeServiceScheduler().scheduleOnce(when, ActorRefAdapter.toClassic(workerCtx.getSelf()), new Finished(sleep.runId, sleep.sleepTime));
+            return Behaviors.same();
+          } else if (msg instanceof Finished) {
+            Finished finished = (Finished) msg;
+            log.info("XXX Received Finished " + finished.sleepTime);
+            cswCtx.commandResponseManager().updateCommand(new Completed(finished.runId, new Result().madd(resultKey.set(finished.sleepTime))));
+            return Behaviors.stopped();
           } else {
-            log.error("Unsupported message type");
+            log.error("XXX Received unknown " + msg);
+            return Behaviors.stopped();
           }
-          return Behaviors.stopped();
-        }),
-        "WorkerActor"
+        })
     );
   }
   //#worker-actor
