@@ -42,7 +42,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   private implicit val timeout: Timeout             = 10.seconds
   private val log                                   = loggerFactory.getLogger
   private val prefix: Prefix                        = cswCtx.componentInfo.prefix
-  private val hcdConnection                         = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "samplehcd"), ComponentType.HCD))
+  private val hcdConnection                         = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
   private var hcdLocation: AkkaLocation             = _
   private var hcdCS: Option[CommandService]         = None
 
@@ -80,7 +80,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   //#track-location
 
   //#subscribe
-  private val counterEventKey = EventKey(Prefix("nfiraos.samplehcd"), EventName("HcdCounter"))
+  private val counterEventKey = EventKey(Prefix("ESW.SampleHcd"), EventName("HcdCounter"))
   private val hcdCounterKey   = KeyType.IntKey.make("counter")
 
   private def processEvent(event: Event): Unit = {

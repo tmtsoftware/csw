@@ -109,8 +109,8 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
     implicit val sleepCommandTimeout: Timeout = Timeout(1000.millis)
 
     // Construct Setup command
-    val testPrefix: Prefix      = Prefix("ESW.test")
-    val hcdSleep: CommandName   = CommandName("hcdSleep")
+    val testPrefix: Prefix    = Prefix("ESW.test")
+    val hcdSleep: CommandName = CommandName("hcdSleep")
     // Helper to get units set
     def setSleepTime(milli: Long): Parameter[Long] = sleepTimeKey.set(milli).withUnits(Units.millisecond)
 

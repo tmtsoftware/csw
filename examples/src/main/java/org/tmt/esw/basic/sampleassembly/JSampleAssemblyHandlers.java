@@ -65,7 +65,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     timeout = new Timeout(10, TimeUnit.SECONDS);
     this.log = cswCtx.loggerFactory().getLogger(getClass());
     prefix = cswCtx.componentInfo().prefix();
-    hcdConnection = new Connection.AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.ESW(), "samplehcd"), JComponentType.HCD()));
+    hcdConnection = new Connection.AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.ESW(), "SampleHcd"), JComponentType.HCD()));
   }
 
 
@@ -109,7 +109,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
   //#track-location
 
   //#subscribe
-  private EventKey counterEventKey = new EventKey(Prefix.apply(JSubsystem.ESW(), "samplehcd"), new EventName("HcdCounter"));
+  private EventKey counterEventKey = new EventKey(Prefix.apply(JSubsystem.ESW(), "SampleHcd"), new EventName("HcdCounter"));
   private Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter");
 
   private void processEvent(Event event) {

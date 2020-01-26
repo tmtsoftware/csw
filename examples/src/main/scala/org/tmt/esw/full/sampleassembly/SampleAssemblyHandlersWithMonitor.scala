@@ -45,7 +45,7 @@ class SampleAssemblyHandlersWithMonitor(ctx: ActorContext[TopLevelActorMessage],
   private implicit val timeout: Timeout             = 10.seconds
   private implicit val sched: Scheduler             = ctx.system.scheduler
   private val log                                   = loggerFactory.getLogger
-  private val hcdConnection                         = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "samplehcd"), ComponentType.HCD))
+  private val hcdConnection                         = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
   private var hcdLocation: AkkaLocation             = _
   private var hcdCS: Option[CommandService]         = None
   private val prefix: Prefix                        = cswCtx.componentInfo.prefix

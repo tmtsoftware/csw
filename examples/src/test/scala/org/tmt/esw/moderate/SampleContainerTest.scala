@@ -33,10 +33,10 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
   )
   private var containerLocation: AkkaLocation = _
   private val assemblyConnection = AkkaConnection(
-    ComponentId(Prefix(Subsystem.ESW, "sampleassembly"), ComponentType.Assembly)
+    ComponentId(Prefix(Subsystem.ESW, "SampleAssembly"), ComponentType.Assembly)
   )
   private var assemblyLocation: AkkaLocation = _
-  private val hcdConnection                  = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "samplehcd"), ComponentType.HCD))
+  private val hcdConnection                  = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
   private var hcdLocation: AkkaLocation      = _
 
   private var containerRef: ActorRef[ContainerMessage] = _

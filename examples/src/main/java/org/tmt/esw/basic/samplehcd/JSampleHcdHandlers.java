@@ -176,22 +176,18 @@ public class JSampleHcdHandlers extends JComponentHandlers {
   }
 
   private ActorRef<WorkerCommand> createWorkerActor() {
-    log.info("XXX Create worker actor");
     return ctx.spawnAnonymous(
         Behaviors.receive( (workerCtx, msg) -> {
           if (msg instanceof Sleep) {
             Sleep sleep = (Sleep) msg;
-            log.info("XXX Received Sleep " + sleep.sleepTime);
             UTCTime when = UTCTime.after(new FiniteDuration(sleep.sleepTime, MILLISECONDS));
             cswCtx.timeServiceScheduler().scheduleOnce(when, ActorRefAdapter.toClassic(workerCtx.getSelf()), new Finished(sleep.runId, sleep.sleepTime));
             return Behaviors.same();
           } else if (msg instanceof Finished) {
             Finished finished = (Finished) msg;
-            log.info("XXX Received Finished " + finished.sleepTime);
             cswCtx.commandResponseManager().updateCommand(new Completed(finished.runId, new Result().madd(resultKey.set(finished.sleepTime))));
             return Behaviors.stopped();
           } else {
-            log.error("XXX Received unknown " + msg);
             return Behaviors.stopped();
           }
         })

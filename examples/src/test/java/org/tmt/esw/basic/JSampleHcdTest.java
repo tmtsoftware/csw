@@ -1,4 +1,4 @@
-package org.tmt.esw.basic.samplehcd;
+package org.tmt.esw.basic;
 
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.SpawnProtocol;
