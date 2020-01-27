@@ -34,18 +34,18 @@ public class JCommandsTest extends JUnitSuite {
     public void showUsageOfUtilityFunctions() {
         //#prefix
         //using constructor, supplying subsystem and prefix both
-        Prefix prefix1 = Prefix.apply(JSubsystem.NFIRAOS(), "ncc.trombone");
+        Prefix prefix1 = Prefix.apply(JSubsystem.NFIRAOS, "ncc.trombone");
 
         //just by supplying prefix
-        Prefix prefix2 = Prefix.apply(JSubsystem.TCS(), "mobie.blue.filter");
+        Prefix prefix2 = Prefix.apply(JSubsystem.TCS, "mobie.blue.filter");
 
         //invalid prefix string which does not contain valid subsystem in the beginning will throw an exception,
         // Prefix badPrefix = Prefix.apply("abcdefgh");
         //#prefix
 
         //validations
-        Assert.assertSame(prefix1.subsystem(), JSubsystem.NFIRAOS());
-        Assert.assertSame(prefix2.subsystem(), JSubsystem.TCS());
+        Assert.assertSame(prefix1.subsystem(), JSubsystem.NFIRAOS);
+        Assert.assertSame(prefix2.subsystem(), JSubsystem.TCS);
     }
 
     @Test
@@ -59,7 +59,7 @@ public class JCommandsTest extends JUnitSuite {
         Key<Float> k4 = JKeyType.FloatKey().make("correction");
 
         //prefix
-        Prefix prefix = Prefix.apply(JSubsystem.WFOS(), "red.detector");
+        Prefix prefix = Prefix.apply(JSubsystem.WFOS, "red.detector");
 
         //parameters
         Parameter<Integer> i1 = k1.set(22);
@@ -118,7 +118,7 @@ public class JCommandsTest extends JUnitSuite {
         Key<UTCTime> k4 = JKeyType.UTCTimeKey().make("creation-time");
 
         //prefix
-        Prefix prefix = Prefix.apply(JSubsystem.WFOS(), "red.detector");
+        Prefix prefix = Prefix.apply(JSubsystem.WFOS, "red.detector");
 
         //parameters
         Boolean[] boolArray = {true, false, true, false};
@@ -170,7 +170,7 @@ public class JCommandsTest extends JUnitSuite {
         Key<UTCTime> k4 = JKeyType.UTCTimeKey().make("creation-time");
 
         //prefix
-        Prefix prefix = Prefix.apply(JSubsystem.WFOS(), "red.detector");
+        Prefix prefix = Prefix.apply(JSubsystem.WFOS, "red.detector");
 
         //parameters
         Boolean[] boolArray = {true, false, true, false};
@@ -224,7 +224,7 @@ public class JCommandsTest extends JUnitSuite {
         //parameter
         Parameter<MatrixData<Double>> i1 = k1.set(m1);
 
-        Prefix prefix = Prefix.apply(JSubsystem.WFOS(), "blue.filter");
+        Prefix prefix = Prefix.apply(JSubsystem.WFOS, "blue.filter");
 
         //commands
         Setup sc = new Setup(prefix, new CommandName("move"), Optional.of(obsId)).add(i1);
@@ -259,7 +259,7 @@ public class JCommandsTest extends JUnitSuite {
         Key<Integer> miscKey = JKeyType.IntKey().make("misc.");
 
         //prefix
-        Prefix prefix = Prefix.apply(JSubsystem.WFOS(), "blue.filter");
+        Prefix prefix = Prefix.apply(JSubsystem.WFOS, "blue.filter");
 
         //params
         Parameter<Integer> encParam1 = encoderKey.set(1);
@@ -302,7 +302,7 @@ public class JCommandsTest extends JUnitSuite {
 /*
     @Test
     public void showCloneCommandExample() {
-        Prefix prefix = Prefix.apply(JSubsystem.WFOS(), "blue.filter");
+        Prefix prefix = Prefix.apply(JSubsystem.WFOS, "blue.filter");
         Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder");
         Parameter<Integer> encoderParam = encoderIntKey.set(22, 33);
         CommandName commandName = new CommandName("move");

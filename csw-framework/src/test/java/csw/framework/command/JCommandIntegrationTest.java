@@ -101,7 +101,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         FrameworkWiring wiring = FrameworkWiring.make(hcdActorSystem, redisClient);
         Await.result(Standalone.spawn(ConfigFactory.load("aps_hcd_java.conf"), wiring), new FiniteDuration(5, TimeUnit.SECONDS));
 
-        AkkaConnection akkaConnection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.IRIS(), "Test_Component_Running_Long_Command_Java"), JComponentType.HCD()));
+        AkkaConnection akkaConnection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.IRIS, "Test_Component_Running_Long_Command_Java"), JComponentType.HCD()));
         CompletableFuture<Optional<AkkaLocation>> eventualLocation = locationService.resolve(akkaConnection, java.time.Duration.ofSeconds(5));
         Optional<AkkaLocation> maybeLocation = eventualLocation.get();
         Assert.assertTrue(maybeLocation.isPresent());
