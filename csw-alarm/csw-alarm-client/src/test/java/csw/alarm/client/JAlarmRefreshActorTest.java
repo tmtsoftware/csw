@@ -34,7 +34,7 @@ public class JAlarmRefreshActorTest extends JUnitSuite {
             return Done.done();
         }), Duration.ofMillis(200), typedSystem);
 
-        ref.tell(new AutoRefreshSeverity(alarmKey, JAlarmSeverity.Major()));
+        ref.tell(new AutoRefreshSeverity(alarmKey, JAlarmSeverity.Major));
         probe.expectMessage(refreshMsg);
         probe.expectNoMessage(Duration.ofMillis(190));
         probe.expectMessage(Duration.ofMillis(50), refreshMsg);
