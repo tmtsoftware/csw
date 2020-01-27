@@ -25,7 +25,7 @@ object LockCommandFactory {
 
 //noinspection ScalaStyle
 //#intro
-class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with WordSpecLike {
+class ModerateSampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with WordSpecLike {
   import frameworkTestKit.frameworkWiring._
 
   private val containerConnection = AkkaConnection(
@@ -67,50 +67,47 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
     }
   }
 
-  "sending sleep" must {
-    "Accept a valid sleep command" in {
+  "excercising assembly public API" must {
+    "Accept and execute a valid sleep command" in {
       val assemblyLocation = Await.result(locationService.resolve(assemblyConnection, 10.seconds), 10.seconds).get
       val setup: Setup     = Setup(testPrefix, sleep, None).add(setSleepTime(1500))
 
       val assemblyCS = CommandServiceFactory.make(assemblyLocation)
 
-      val x = Await.result(assemblyCS.submitAndWait(setup), 10.seconds)
-      println("X: " + x)
-
+      Await.result(assemblyCS.submitAndWait(setup), 10.seconds) shouldBe a[Completed]
     }
 
-    "Accept an immediate command" in {
+    "Accept and execute an immediate command" in {
       val setup: Setup = Setup(testPrefix, immediateCommand, None)
 
       val assemblyLocation = Await.result(locationService.resolve(assemblyConnection, 10.seconds), 10.seconds).get
       val assemblyCS       = CommandServiceFactory.make(assemblyLocation)
 
-      val x = Await.result(assemblyCS.submitAndWait(setup), 10.seconds)
-      println("X: " + x)
-
+      Await.result(assemblyCS.submitAndWait(setup), 10.seconds) shouldBe a[Completed]
     }
 
-    "Accept a longCommand and then cancel it" in {
+    "Accept and execute a longCommand and then cancel it after a couple seconds" in {
       val setup: Setup = Setup(testPrefix, longCommand, None)
 
       val assemblyLocation = Await.result(locationService.resolve(assemblyConnection, 10.seconds), 10.seconds).get
       val assemblyCS       = CommandServiceFactory.make(assemblyLocation)
 
       val r1 = Await.result(assemblyCS.submit(setup), 10.seconds)
-      println("SampleContainerTest submit response: " + r1)
       r1 shouldBe a[Started]
+
+      // Wait 2 seconds, then cancel
       Thread.sleep(2000)
       val cancelSetup = Setup(testPrefix, cancelLongCommand, None).add(cancelKey.set(r1.runId.id))
       val r2          = Await.result(assemblyCS.submitAndWait(cancelSetup), 10.seconds)
-      println("SampleContainerTest cancel response: " + r2)
+      // Cancel should complete
       r2 shouldBe a[Completed]
 
+      // Original command returns Cancelled
       val r3 = Await.result(assemblyCS.queryFinal(r1.runId), 10.seconds)
-      println("SampleContainerTest queryFinal response: " + r3)
       r3 shouldBe a[Cancelled]
     }
 
-    "Accept a short, medium and long command" in {
+    "Accept and execute a short, medium and long command in order" in {
       val shortSetup: Setup  = Setup(testPrefix, shortCommand, None)
       val mediumSetup: Setup = Setup(testPrefix, mediumCommand, None)
       val longSetup: Setup   = Setup(testPrefix, longCommand, None)
@@ -121,24 +118,22 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
       Await.result(assemblyCS.submitAndWait(shortSetup), 10.seconds) shouldBe a[Completed]
       Await.result(assemblyCS.submitAndWait(mediumSetup), 10.seconds) shouldBe a[Completed]
       Await.result(assemblyCS.submitAndWait(longSetup), 10.seconds) shouldBe a[Completed]
-
     }
 
-    "Accept a complex command and wait for all to finish" in {
+    "Accept and execute a complex command on Assembly and wait for all to finish" in {
       val complexSetup: Setup = Setup(testPrefix, complexCommand, None)
 
       val assemblyLocation = Await.result(locationService.resolve(assemblyConnection, 10.seconds), 10.seconds).get
       val assemblyCS       = CommandServiceFactory.make(assemblyLocation)
 
       Await.result(assemblyCS.submitAndWait(complexSetup), 10.seconds) shouldBe a[Completed]
-      println("Got final completed")
     }
 
     import csw.command.client.extensions.AkkaLocationExt._
 
     import scala.concurrent.Await
 
-    "Lock HCD and send command and wait" in {
+    "Lock HCD and send command then unlock and send again" in {
       val lockingStateProbe = TestProbe[LockingResponse]
 
       val hcdLocation2: AkkaLocation = Await.result(locationService.resolve(hcdConnection, 5.seconds), 5.seconds).get
@@ -150,8 +145,8 @@ class SampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSe
       val setup: Setup     = Setup(testPrefix, sleep, None).add(setSleepTime(1500))
 
       Await.result(assemblyCS.submitAndWait(setup), 10.seconds) shouldBe a[Locked]
-      println("Got final locked")
 
+      // Now unlock and command
       hcdLocation2.componentRef ! Unlock(testPrefix, lockingStateProbe.ref)
       lockingStateProbe.expectMessage(LockReleased)
 

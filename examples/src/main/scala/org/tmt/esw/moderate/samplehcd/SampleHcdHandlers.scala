@@ -8,7 +8,7 @@ import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.models.TrackingEvent
-import csw.params.commands.CommandIssue.{MissingKeyIssue, ParameterValueOutOfRangeIssue, UnsupportedCommandIssue}
+import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
 import csw.params.core.generics.{KeyType, Parameter}
@@ -17,6 +17,7 @@ import csw.params.events.{EventName, SystemEvent}
 import csw.time.core.models.UTCTime
 import org.tmt.esw.moderate.samplehcd.SleepWorker.{Cancel, Sleep, SleepWorkerMessages}
 import org.tmt.esw.moderate.shared.SampleInfo._
+import org.tmt.esw.moderate.shared.SampleValidation
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
@@ -86,45 +87,8 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   //#validate
   override def validateCommand(runId: Id, command: ControlCommand): ValidateCommandResponse = {
     log.info(s"Validating command: ${command.commandName.name}")
-    println(s"Validating command: ${command.commandName.name}")
-    command match {
-      case setup: Setup =>
-        setup.commandName match {
-          case `hcdSleep` =>
-            validateSleep(runId, setup)
-          case `hcdCancelLong` =>
-            validateCancel(runId, setup)
-          case `hcdShort` | `hcdMedium` | `hcdLong` =>
-            Accepted(runId)
-          case _ =>
-            Invalid(runId, UnsupportedCommandIssue(s"Command: ${setup.commandName.name} is not supported for sample HCD."))
-        }
-      case _ =>
-        Invalid(runId, UnsupportedCommandIssue("Sample assembly only supports Setup commands."))
-    }
+    SampleValidation.doHcdValidation(runId, command)
   }
-
-  private def validateSleep(runId: Id, setup: Setup): ValidateCommandResponse =
-    if (setup.exists(sleepTimeKey)) {
-      val sleepTime: Long = setup(sleepTimeKey).head
-      if (sleepTime < maxSleep)
-        Accepted(runId)
-      else
-        Invalid(runId, ParameterValueOutOfRangeIssue("sleepTime must be < 2000"))
-    }
-    else {
-      Invalid(runId, MissingKeyIssue(s"required sleep command key: $sleepTimeKey is missing."))
-    }
-  //#validate
-
-  private def validateCancel(runId: Id, setup: Setup): ValidateCommandResponse =
-    if (setup.exists(cancelKey)) {
-      Accepted(runId)
-    }
-    else {
-      Invalid(runId, MissingKeyIssue(s"required cancel command key: $cancelKey is missing."))
-    }
-  //#validate
 
   //#onSetup
   override def onSubmit(runId: Id, command: ControlCommand): SubmitResponse = {
@@ -139,7 +103,6 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
 
   def onSetup(runId: Id, setup: Setup): SubmitResponse = {
     log.info(s"HCD onSubmit received command: $setup")
-    println(s"HCD onSubmit received command: $setup")
     setup.commandName match {
       case `hcdShort` =>
         val worker = ctx.spawnAnonymous(SleepWorker(cswCtx))
@@ -162,7 +125,6 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
         Started(runId)
       case `hcdCancelLong` =>
         val cancelRunId = Id(setup(cancelKey).head)
-        println(s"HCD Received cancel worker: $cancelRunId")
         implicit val timeout: Timeout = 10.seconds
         implicit val sched: Scheduler = ctx.system.scheduler
         // Kill long here
@@ -170,11 +132,9 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
         longWorker = None
         Completed(runId)
       case other =>
-        println(s"HCD Bad command: $other")
         Invalid(runId, UnsupportedCommandIssue(s"Sample HCD does not support: $other"))
     }
   }
-
   //#onSetup
 
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}

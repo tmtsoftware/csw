@@ -157,7 +157,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
     }
 
   //#sending-command
-  private def onSetup(runId: Id, setup: Setup): SubmitResponse = {
+  private def onSetup(runId: Id, setup: Setup): SubmitResponse =
     setup.commandName match {
       case `immediateCommand` =>
         Completed(runId)
@@ -194,13 +194,12 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
       case _ =>
         Invalid(runId, CommandIssue.UnsupportedCommandIssue(s"${setup.commandName.name}"))
     }
-  }
 
   private def sleepHCD(runId: Id, setup: Setup, sleepTime: Long): Unit =
     hcdCS match {
       case Some(cs) =>
         val s = Setup(prefix, hcdSleep, None).add(setSleepTime(sleepTime))
-        cs.submit(s).map {
+        cs.submit(s).foreach {
           case started: Started =>
             // Can insert extra code during execution here
             cs.queryFinal(started.runId).foreach(sr => commandResponseManager.updateCommand(sr.withRunId(runId)))

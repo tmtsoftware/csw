@@ -149,7 +149,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
       if (cmd.equals(sleep)) {
         return validateSleep(runId, setup);
       }
-      if (cmd.equals(immediateCommand) || cmd.equals(shortCommand) || cmd.equals(mediumCommand) || cmd.equals(complexCommand)) {
+      if (cmd.equals(immediateCommand) || cmd.equals(shortCommand) || cmd.equals(mediumCommand) || cmd.equals(longCommand)|| cmd.equals(complexCommand)) {
         return new Accepted(runId);
       }
     }

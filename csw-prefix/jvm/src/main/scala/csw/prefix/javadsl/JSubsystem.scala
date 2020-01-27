@@ -34,4 +34,6 @@ object JSubsystem {
   val SOSS: Subsystem    = Subsystem.SOSS
   val TCS: Subsystem     = Subsystem.TCS
   val WFOS: Subsystem    = Subsystem.WFOS
+
+  val Container: Subsystem = Subsystem.Container
 }
