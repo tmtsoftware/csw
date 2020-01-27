@@ -21,9 +21,9 @@ object Instances extends CommandServiceCodecs {
   private val setupSubmit: CommandServiceHttpMessage         = Submit(setup)
   private val observeOneway: CommandServiceHttpMessage       = Oneway(observe)
   private val setupOneway: CommandServiceHttpMessage         = Oneway(setup)
-  private val setupQuery: CommandServiceHttpMessage          = Query(runId)
+  private val setupQuery: CommandServiceHttpMessage          = Query(id)
   private val seconds                                        = 30
-  private val queryFinal: CommandServiceWebsocketMessage     = QueryFinal(runId, Timeout(FiniteDuration(seconds, TimeUnit.SECONDS)))
+  private val queryFinal: CommandServiceWebsocketMessage     = QueryFinal(id, Timeout(FiniteDuration(seconds, TimeUnit.SECONDS)))
   private val subscribeState: CommandServiceWebsocketMessage = SubscribeCurrentState(states)
 
   val endpoints: Map[String, Endpoint] = Map(

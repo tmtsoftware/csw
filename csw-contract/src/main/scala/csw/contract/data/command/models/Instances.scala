@@ -1,29 +1,73 @@
 package csw.contract.data.command.models
+import java.util.concurrent.TimeUnit
 
-import csw.location.models.codecs.LocationCodecs
+import akka.util.Timeout
+import csw.command.api.codecs.CommandServiceCodecs
+import csw.command.api.{DemandMatcher, DemandMatcherAll, PresenceMatcher, StateMatcher}
+import csw.contract.generator.models.DomHelpers._
+import csw.contract.generator.models.ModelAdt
 import csw.params.commands.CommandIssue.OtherIssue
-import csw.params.commands.CommandResponse.{Accepted, Cancelled, Invalid, Started}
+import csw.params.commands.CommandResponse._
 import csw.params.commands._
-import csw.params.core.generics.{Key, KeyType, Parameter}
+import csw.params.core.generics.KeyType
 import csw.params.core.models.{Id, ObsId}
-import csw.params.core.states.{CurrentState, StateName}
+import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.prefix.models.{Prefix, Subsystem}
 
-object Instances extends LocationCodecs {
-  private val encoder: Key[Int] = KeyType.IntKey.make("encoder")
-  private val values            = 100
-  private val prefix            = new Prefix(Subsystem.CSW, "someComponent")
+import scala.concurrent.duration.FiniteDuration
+
+object Instances extends CommandServiceCodecs {
+  private val encoder = KeyType.IntKey.make("encoder")
+  private val values  = 100
+  private val prefix  = new Prefix(Subsystem.CSW, "someComponent")
+  private val param   = encoder.set(values)
+  val id              = Id("runId")
+
+  private val idleState: StateName = StateName("idle")
+  val currentState: CurrentState   = CurrentState(prefix, idleState, Set(param))
+  val states: Set[StateName]       = Set(idleState)
+
+  val accepted: CommandResponse  = Accepted(id)
+  val cancelled: CommandResponse = Cancelled(id)
+  val completed: CommandResponse = Completed(id, Result(param))
+  val error: CommandResponse     = Error(id, "Some error")
+  val invalid: CommandResponse   = Invalid(id, OtherIssue("Internal issue"))
+  val locked: CommandResponse    = Locked(id)
+  val started: CommandResponse   = Started(id)
+
   val observe: ControlCommand =
     Observe(prefix, CommandName("command"), Some(ObsId("obsId")))
   val setup: ControlCommand =
     Setup(prefix, CommandName("command"), Some(ObsId("obsId")))
-  val runId: Id                    = Id("runId")
-  val param: Parameter[Int]        = encoder.set(values)
-  private val idleState: StateName = StateName("idle")
-  val currentState: CurrentState   = CurrentState(prefix, idleState, Set(param))
-  val states: Set[StateName]       = Set(idleState)
-  val accepted: CommandResponse    = Accepted(runId)
-  val cancelled: CommandResponse   = Cancelled(runId)
-  val invalid: CommandResponse     = Invalid(runId, OtherIssue("Internal issue"))
-  val started: CommandResponse     = Started(runId)
+
+  val demandMatcher: StateMatcher =
+    DemandMatcher(DemandState(prefix, idleState, Set(param)), withUnits = true, Timeout(FiniteDuration(values, TimeUnit.SECONDS)))
+  val demandMatcherAll: StateMatcher =
+    DemandMatcherAll(DemandState(prefix, idleState, Set(param)), Timeout(FiniteDuration(values, TimeUnit.SECONDS)))
+  val presenceMatcher: StateMatcher =
+    PresenceMatcher(prefix, idleState, Timeout(FiniteDuration(values, TimeUnit.SECONDS)))
+
+  val models: Map[String, ModelAdt] = Map(
+    "controlCommand" -> ModelAdt(
+      List(observe, setup)
+    ),
+    "id" -> ModelAdt(
+      List(id)
+    ),
+    "stateName" -> ModelAdt(
+      List(idleState)
+    ),
+    "submitResponse" -> ModelAdt(
+      List(cancelled, completed, error, invalid, locked, started)
+    ),
+    "oneWayResponse" -> ModelAdt(
+      List(accepted, invalid, locked)
+    ),
+    "validateResponse" -> ModelAdt(
+      List(accepted, invalid, locked)
+    ),
+    "currentState" -> ModelAdt(
+      List(currentState)
+    )
+  )
 }
