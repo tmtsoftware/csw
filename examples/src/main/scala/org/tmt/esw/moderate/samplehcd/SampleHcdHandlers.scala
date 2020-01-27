@@ -1,17 +1,23 @@
-package org.tmt.nfiraos.samplehcd
+package org.tmt.esw.moderate.samplehcd
 
 import akka.actor.Cancellable
-import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
+import akka.actor.typed.scaladsl.ActorContext
+import akka.actor.typed.{ActorRef, Scheduler}
+import akka.util.Timeout
 import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.api.models.TrackingEvent
+import csw.location.models.TrackingEvent
+import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
-import csw.params.core.generics.{Key, KeyType, Parameter}
+import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.Id
 import csw.params.events.{EventName, SystemEvent}
 import csw.time.core.models.UTCTime
+import org.tmt.esw.moderate.samplehcd.SleepWorker.{Cancel, Sleep, SleepWorkerMessages}
+import org.tmt.esw.moderate.shared.SampleInfo._
+import org.tmt.esw.moderate.shared.SampleValidation
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
@@ -28,25 +34,16 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
   private val log                           = loggerFactory.getLogger
 
-  //#worker-actor
-  sealed trait WorkerCommand
-  case class Sleep(controlCommand: Setup, runId: Id, timeInMillis: Long) extends WorkerCommand
+  // Storage for most recent long command for cancel - not a great implementation, but here to show async possible
+  var longWorker: Option[ActorRef[SleepWorkerMessages]] = None
 
-  private val workerActor =
-    ctx.spawn(
-      Behaviors.receiveMessage[WorkerCommand](msg => {
-        msg match {
-          case sleep: Sleep =>
-            log.trace(s"WorkerActor received sleep command with time of ${sleep.timeInMillis} ms")
-            // simulate long running command
-            Thread.sleep(sleep.timeInMillis)
-            commandResponseManager.updateCommand(CommandResponse.Completed(sleep.runId))
-          case _ => log.error("Unsupported message type")
-        }
-        Behaviors.same
-      }),
-      "WorkerActor"
-    )
+  // Sleep periods in milliseconds for short, medium, and long commands
+  private val shortSleepPeriod: Long  = 600L
+  private val mediumSleepPeriod: Long = 2000L
+  private val longSleepPeriod: Long   = 4000L
+
+  //#worker-actor
+
   //#worker-actor
 
   //#initialize
@@ -88,40 +85,55 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   //#publish
 
   //#validate
-  override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse = {
-    log.info(s"Validating command: ${controlCommand.commandName.name}")
-    controlCommand.commandName.name match {
-      case "sleep" => Accepted(runId)
-      case x       => Invalid(runId, CommandIssue.UnsupportedCommandIssue(s"Command $x. not supported."))
-    }
+  override def validateCommand(runId: Id, command: ControlCommand): ValidateCommandResponse = {
+    log.info(s"Validating command: ${command.commandName.name}")
+    SampleValidation.doHcdValidation(runId, command)
   }
-  //#validate
 
   //#onSetup
-  override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse = {
-    log.info(s"Handling command: ${controlCommand.commandName}")
+  override def onSubmit(runId: Id, command: ControlCommand): SubmitResponse = {
+    log.info(s"Handling command: ${command.commandName}")
 
-    controlCommand match {
-      case setupCommand: Setup => onSetup(runId, setupCommand)
-      case observeCommand: Observe => // implement (or not)
-        Error(runId, "Observe not supported")
+    command match {
+      case setup: Setup => onSetup(runId, setup)
+      case _: Observe => // implement (or not)
+        Invalid(runId, UnsupportedCommandIssue("Observe commands not supported"))
     }
   }
 
   def onSetup(runId: Id, setup: Setup): SubmitResponse = {
-    val sleepTimeKey: Key[Long] = KeyType.LongKey.make("SleepTime")
-
-    // get param from the Parameter Set in the Setup
-    val sleepTimeParam: Parameter[Long] = setup(sleepTimeKey)
-
-    // values of parameters are arrays. Get the first one (the only one in our case) using `head` method available as a convenience method on `Parameter`.
-    val sleepTimeInMillis: Long = sleepTimeParam.head
-
-    log.info(s"command payload: ${sleepTimeParam.keyName} = $sleepTimeInMillis")
-
-    workerActor ! Sleep(setup, runId, sleepTimeInMillis)
-
-    Started(runId)
+    log.info(s"HCD onSubmit received command: $setup")
+    setup.commandName match {
+      case `hcdShort` =>
+        val worker = ctx.spawnAnonymous(SleepWorker(cswCtx))
+        worker ! Sleep(runId, shortSleepPeriod)
+        Started(runId)
+      case `hcdMedium` =>
+        val worker = ctx.spawnAnonymous(SleepWorker(cswCtx))
+        worker ! Sleep(runId, mediumSleepPeriod)
+        Started(runId)
+      case `hcdLong` =>
+        val worker = ctx.spawnAnonymous(SleepWorker(cswCtx))
+        // Store the value of the current long worker for potential cancel
+        longWorker = Some(worker)
+        worker ! Sleep(runId, longSleepPeriod)
+        Started(runId)
+      case `hcdSleep` =>
+        val sleepTime = setup(sleepTimeKey).head
+        val worker    = ctx.spawnAnonymous(SleepWorker(cswCtx))
+        worker ! Sleep(runId, sleepTime)
+        Started(runId)
+      case `hcdCancelLong` =>
+        val cancelRunId = Id(setup(cancelKey).head)
+        implicit val timeout: Timeout = 10.seconds
+        implicit val sched: Scheduler = ctx.system.scheduler
+        // Kill long here
+        longWorker.map(_ ! Cancel)
+        longWorker = None
+        Completed(runId)
+      case other =>
+        Invalid(runId, UnsupportedCommandIssue(s"Sample HCD does not support: $other"))
+    }
   }
   //#onSetup
 

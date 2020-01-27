@@ -18,20 +18,17 @@ import scala.concurrent.duration._
 
 //noinspection ScalaStyle
 //#intro
-class SampleIntegrationTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with WordSpecLike {
+class BasicSampleIntegrationTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with WordSpecLike {
 
   import frameworkTestKit.frameworkWiring._
 
-  private val containerConnection = AkkaConnection(
-    ComponentId(Prefix(Subsystem.Container, "SampleContainer"), ComponentType.Container)
-  )
-  private var containerLocation: AkkaLocation = _
+  private val containerConnection = AkkaConnection(ComponentId(Prefix(Subsystem.Container, "SampleContainer"),
+    ComponentType.Container))
+
   private val assemblyConnection = AkkaConnection(
     ComponentId(Prefix(Subsystem.ESW, "SampleAssembly"), ComponentType.Assembly)
   )
-  private var assemblyLocation: AkkaLocation = _
   private val hcdConnection                  = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
-  private var hcdLocation: AkkaLocation      = _
 
   private var containerRef: ActorRef[ContainerMessage] = _
 
@@ -51,41 +48,45 @@ class SampleIntegrationTest extends ScalaTestFrameworkTestKit(AlarmServer, Event
 
   "startupContainer" must {
     "Ensure container is locatable using Location Service" in {
-      containerLocation = Await.result(locationService.resolve(containerConnection, 10.seconds), 10.seconds).get
+      val containerLocation = Await.result(locationService.resolve(containerConnection, 10.seconds), 10.seconds).get
       containerLocation.connection shouldBe containerConnection
     }
 
     "Ensure Assembly is locatable using Location Service" in {
-      assemblyLocation = Await.result(locationService.resolve(assemblyConnection, 10.seconds), 10.seconds).get
+      val assemblyLocation = Await.result(locationService.resolve(assemblyConnection, 10.seconds), 10.seconds).get
       assemblyLocation.connection shouldBe assemblyConnection
     }
 
     "Ensure HCD is locatable using Location Service" in {
-      hcdLocation = Await.result(locationService.resolve(hcdConnection, 10.seconds), 10.seconds).get
+      val hcdLocation = Await.result(locationService.resolve(hcdConnection, 10.seconds), 10.seconds).get
       hcdLocation.connection shouldBe hcdConnection
     }
   }
 
   "sending sleep" must {
     "Accept a valid sleep command" in {
-      val setup: Setup = Setup(testPrefix, sleep, None).add(setSleepTime(1500))
+      val assemblyLocation = Await.result(locationService.resolve(assemblyConnection, 10.seconds), 10.seconds).get
 
+      val testSleep = 1500L
+      val setup: Setup = Setup(testPrefix, sleep, None).add(setSleepTime(testSleep))
       val assemblyCS = CommandServiceFactory.make(assemblyLocation)
 
-      val x = Await.result(assemblyCS.submitAndWait(setup), 10.seconds)
-      println("X: " + x)
+      val sr: Completed = (Await.result(assemblyCS.submitAndWait(setup), 10.seconds)).asInstanceOf[Completed]
+      sr.result(resultKey).head shouldBe testSleep
     }
 
-    "Accept an immediate command" in {
-      val setup: Setup = Setup(testPrefix, immediateCommand, None)
+    "Accept and execute an immediate command" in {
+      val assemblyLocation = Await.result(locationService.resolve(assemblyConnection, 10.seconds), 10.seconds).get
 
+      val setup: Setup = Setup(testPrefix, immediateCommand, None)
       val assemblyCS = CommandServiceFactory.make(assemblyLocation)
 
-      val x = Await.result(assemblyCS.submitAndWait(setup), 10.seconds)
-      println("X: " + x)
+      Await.result(assemblyCS.submitAndWait(setup), 10.seconds) shouldBe a[Completed]
     }
 
     "Accept a short, medium and long command" in {
+      val assemblyLocation = Await.result(locationService.resolve(assemblyConnection, 10.seconds), 10.seconds).get
+
       val shortSetup: Setup  = Setup(testPrefix, shortCommand, None)
       val mediumSetup: Setup = Setup(testPrefix, mediumCommand, None)
       val longSetup: Setup   = Setup(testPrefix, longCommand, None)
@@ -103,12 +104,12 @@ class SampleIntegrationTest extends ScalaTestFrameworkTestKit(AlarmServer, Event
     }
 
     "Accept a complex command and wait for all to finish" in {
-      val complexSetup: Setup = Setup(testPrefix, complexCommand, None)
+      val assemblyLocation = Await.result(locationService.resolve(assemblyConnection, 10.seconds), 10.seconds).get
 
+      val complexSetup: Setup = Setup(testPrefix, complexCommand, None)
       val assemblyCS = CommandServiceFactory.make(assemblyLocation)
 
       Await.result(assemblyCS.submitAndWait(complexSetup), 10.seconds) shouldBe a[Completed]
-      println("Got final completed")
     }
   }
 

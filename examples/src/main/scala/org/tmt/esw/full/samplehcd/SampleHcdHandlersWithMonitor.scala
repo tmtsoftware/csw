@@ -109,38 +109,35 @@ class SampleHcdHandlersWithMonitor(ctx: ActorContext[TopLevelActorMessage], cswC
       case `hcdShort` =>
         val worker = ctx.spawnAnonymous(SleepWorkerWithMonitor(cswCtx))
         worker ! Sleep(runId, shortSleepPeriod, workerMonitor)
+        workerMonitor ! AddWorker(runId, worker)
         Started(runId)
       case `hcdMedium` =>
         val worker = ctx.spawnAnonymous(SleepWorkerWithMonitor(cswCtx))
         worker ! Sleep(runId, mediumSleepPeriod, workerMonitor)
+        workerMonitor ! AddWorker(runId, worker)
         Started(runId)
       case `hcdLong` =>
         val worker = ctx.spawnAnonymous(SleepWorkerWithMonitor(cswCtx))
-        // Store the value of the current long worker for potential cancel
-//        longWorker = Some(worker)
         worker ! Sleep(runId, longSleepPeriod, workerMonitor)
+        workerMonitor ! AddWorker(runId, worker)
         Started(runId)
       case `hcdSleep` =>
-        println(s"HCD Received command: $setup")
         val sleepTime = setup(sleepTimeKey).head
         val worker    = ctx.spawnAnonymous(SleepWorkerWithMonitor(cswCtx))
         workerMonitor ! AddWorker(runId, worker)
         worker ! Sleep(runId, sleepTime, workerMonitor)
         Started(runId)
       case `hcdCancelLong` =>
+        // A runId is received for cancelling
         val cancelRunId = Id(setup(cancelKey).head)
-        println(s"HCD Received cancel worker: $cancelRunId")
+        // HCD asks worker monitor for an actor associated with the runId
         implicit val timeout: Timeout = 10.seconds
         implicit val sched: Scheduler = ctx.system.scheduler
-        val r: Future[Response[ActorRef[SleepWorkerWithMonitorMessages]]] =
+        val sleepActor: Future[Response[ActorRef[SleepWorkerWithMonitorMessages]]] =
           workerMonitor.ask(replyTo => GetWorker(cancelRunId, replyTo))
-        r.foreach { res =>
-          println(s"Cancelling: $res")
-          res.response ! Cancel
-        }
+        sleepActor.foreach(_.response ! Cancel)
         Completed(runId)
       case other =>
-        println(s"HCD Bad command: $other")
         Invalid(runId, UnsupportedCommandIssue(s"Sample HCD does not support: $other"))
     }
   //#onSetup

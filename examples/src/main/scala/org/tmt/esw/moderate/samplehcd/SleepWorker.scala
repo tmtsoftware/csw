@@ -34,21 +34,16 @@ object SleepWorker {
           Behaviors.same
         case Tick(runId, current, sleepTime) =>
           if (cancelFlag || current >= sleepTime) {
-            println("CancelFlag: " + cancelFlag)
             if (cancelFlag) {
               cswContext.commandResponseManager.updateCommand(Cancelled(runId))
-              println(s"Worker cancelled at: $current")
             }
             else {
-              println(s"Worker times up at: $current")
               cswContext.commandResponseManager.updateCommand(Completed(runId, Result().madd(resultKey.set(current))))
             }
             Behaviors.stopped
           }
           else {
             // Schedule another period
-            println(s"Current: $current $cancelFlag")
-
             // If slice is more than needed, then use what is left
             val nextSlice = if (current + slice > sleepTime) {
               sleepTime - current
@@ -58,13 +53,13 @@ object SleepWorker {
             }
             cswContext.timeServiceScheduler.scheduleOnce(
               UTCTime.after(FiniteDuration(slice, MILLISECONDS)),
-              (ctx.self).toClassic,
+              ctx.self.toClassic,
               Tick(runId, current + nextSlice, sleepTime)
             )
             Behaviors.same
           }
         case Cancel =>
-          println("Setting cancel flag to true")
+          // Set the cancel flag to true, next Tick will cancel
           cancelFlag = true
           Behaviors.same
       }

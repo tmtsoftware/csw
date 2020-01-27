@@ -1,4 +1,4 @@
-package org.tmt.esw.basic
+package org.tmt.esw.full
 
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{ComponentId, ComponentType}
@@ -10,7 +10,7 @@ import org.scalatest.FunSuiteLike
 import scala.concurrent.Await
 
 //#intro
-class SampleAssemblyTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with FunSuiteLike {
+class FullSampleAssemblyTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with FunSuiteLike {
   import frameworkTestKit.frameworkWiring._
 //#intro
 

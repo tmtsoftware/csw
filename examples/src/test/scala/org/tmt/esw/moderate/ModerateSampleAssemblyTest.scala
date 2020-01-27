@@ -10,7 +10,7 @@ import org.scalatest.FunSuiteLike
 import scala.concurrent.Await
 
 //#intro
-class SampleAssemblyTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with FunSuiteLike {
+class ModerateSampleAssemblyTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with FunSuiteLike {
   import frameworkTestKit.frameworkWiring._
 //#intro
 

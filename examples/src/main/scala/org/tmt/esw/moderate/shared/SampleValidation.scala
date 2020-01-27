@@ -9,15 +9,13 @@ object SampleValidation {
 
   import SampleInfo._
 
-  def doAssemblyValidation(runId: Id, command: ControlCommand): ValidateCommandResponse = {
-    println("Assembly validation")
+  def doAssemblyValidation(runId: Id, command: ControlCommand): ValidateCommandResponse =
     command match {
       case s: Setup =>
         doAssemblySetupValidation(runId, s)
       case a =>
         Invalid(runId, UnsupportedCommandIssue("Sample assembly only supports Setup commands."))
     }
-  }
 
   private def doAssemblySetupValidation(runId: Id, setup: Setup): ValidateCommandResponse =
     setup.commandName match {
@@ -26,28 +24,25 @@ object SampleValidation {
       case `cancelLongCommand` =>
         validateCancel(runId, setup)
       case `immediateCommand` | `shortCommand` | `mediumCommand` | `longCommand` | `complexCommand` =>
-        println("Got here")
         Accepted(runId)
       case _ =>
         Invalid(runId, UnsupportedCommandIssue(s"Command: ${setup.commandName.name} is not supported for sample Assembly."))
     }
 
-  def doHcdValidation(runId: Id, command: ControlCommand): ValidateCommandResponse = {
-    println(s"HCD validation: $command")
+  def doHcdValidation(runId: Id, command: ControlCommand): ValidateCommandResponse =
     command match {
       case s: Setup =>
         doHcdSetupValidation(runId, s)
-      case a =>
+      case _ =>
         Invalid(runId, UnsupportedCommandIssue("Sample HCD only supports Setup commands."))
     }
-  }
 
   //#validate
   private def doHcdSetupValidation(runId: Id, setup: Setup): ValidateCommandResponse =
     setup.commandName match {
       case `hcdSleep` =>
         validateSleep(runId, setup)
-      case `cancelLongCommand` =>
+      case `hcdCancelLong` =>
         validateCancel(runId, setup)
       case `hcdShort` | `hcdMedium` | `hcdLong` =>
         Accepted(runId)
@@ -61,7 +56,7 @@ object SampleValidation {
       if (sleepTime < maxSleep)
         Accepted(runId)
       else
-        Invalid(runId, ParameterValueOutOfRangeIssue("sleepTime must be < 2000"))
+        Invalid(runId, ParameterValueOutOfRangeIssue("sleepTime must be < $maxSleep"))
     }
     else {
       Invalid(runId, MissingKeyIssue(s"required sleep command key: $sleepTimeKey is missing."))
@@ -75,5 +70,4 @@ object SampleValidation {
     else {
       Invalid(runId, MissingKeyIssue(s"required cancel command key: $cancelKey is missing."))
     }
-
 }
