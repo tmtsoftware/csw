@@ -99,7 +99,11 @@ lazy val `csw` = project
   )
 
 lazy val `csw-contract` = project
-  .dependsOn(`csw-location-api`.jvm)
+  .dependsOn(
+    `csw-location-api`.jvm,
+    `csw-command-api`.jvm,
+    `csw-params`.jvm
+  )
   .settings(
     libraryDependencies ++= Dependencies.Contract.value
   )
