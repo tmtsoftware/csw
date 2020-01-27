@@ -153,6 +153,8 @@ class FileAppender(system: ActorSystem[_], stdHeaders: JsObject) extends LogAppe
   private[this] val config =
     system.settings.config.getConfig("csw-logging.appender-config.file")
 
+  println(s">>>>>>>>>>.. got file config $config")
+
   if (!config.hasPath(FileAppender.BaseLogPath)) throw BaseLogPathNotDefined(FileAppender.TMT_LOG_HOME)
   private[this] val fullHeaders   = config.getBoolean("fullHeaders")
   private[this] val logPath       = s"${config.getString(FileAppender.BaseLogPath)}/${config.getString("logPath")}"
@@ -182,6 +184,7 @@ class FileAppender(system: ActorSystem[_], stdHeaders: JsObject) extends LogAppe
         case Some(appender) => appender
         case None           =>
           // Create a file appender with logging file directory as logging system name within the log file path
+          println(s">>>>>.... creating log file ${logPath} for ${loggingSystemName}")
           val filesAppender = new FilesAppender(logPath, loggingSystemName, category)
           fileAppenders += (fileAppenderKey -> filesAppender)
           filesAppender

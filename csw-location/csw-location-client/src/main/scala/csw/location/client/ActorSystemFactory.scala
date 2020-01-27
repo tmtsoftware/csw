@@ -1,7 +1,7 @@
 package csw.location.client
 
-import akka.actor.typed.{ActorSystem => TypedActorSystem, Behavior}
-import com.typesafe.config.ConfigFactory
+import akka.actor.typed.{Behavior, ActorSystem => TypedActorSystem}
+import com.typesafe.config.{Config, ConfigFactory}
 import csw.location.api.commons.{Constants, LocationServiceLogger}
 import csw.logging.api.scaladsl.Logger
 import csw.network.utils.Networks
@@ -30,6 +30,11 @@ object ActorSystemFactory {
   def remote[T](behavior: Behavior[T], name: String): TypedActorSystem[T] = {
     log.info(s"Creating remote actor system with name $name")
     TypedActorSystem(behavior, name, config)
+  }
+
+  def remote[T](behavior: Behavior[T], name: String, _config: Config): TypedActorSystem[T] = {
+    log.info(s"Creating remote actor system with name $name")
+    TypedActorSystem(behavior, name, _config.withFallback(config))
   }
 
   /**
