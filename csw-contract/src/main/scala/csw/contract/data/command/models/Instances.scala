@@ -48,25 +48,25 @@ object Instances extends CommandServiceCodecs {
     PresenceMatcher(prefix, idleState, Timeout(FiniteDuration(values, TimeUnit.SECONDS)))
 
   val models: Map[String, ModelAdt] = Map(
-    "controlCommand" -> ModelAdt(
+    "ControlCommand" -> ModelAdt(
       List(observe, setup)
     ),
-    "id" -> ModelAdt(
+    "Id" -> ModelAdt(
       List(id)
     ),
-    "stateName" -> ModelAdt(
+    "StateName" -> ModelAdt(
       List(idleState)
     ),
-    "submitResponse" -> ModelAdt(
+    "SubmitResponse" -> ModelAdt(
       List(cancelled, completed, error, invalid, locked, started)
     ),
-    "oneWayResponse" -> ModelAdt(
+    "OneWayResponse" -> ModelAdt(
       List(accepted, invalid, locked)
     ),
-    "validateResponse" -> ModelAdt(
+    "ValidateResponse" -> ModelAdt(
       List(accepted, invalid, locked)
     ),
-    "currentState" -> ModelAdt(
+    "CurrentState" -> ModelAdt(
       List(currentState)
     )
   )
