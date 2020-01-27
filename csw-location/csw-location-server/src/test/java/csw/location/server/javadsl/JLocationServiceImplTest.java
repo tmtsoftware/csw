@@ -52,15 +52,15 @@ public class JLocationServiceImplTest extends JUnitSuite {
     private static ActorSystem<SpawnProtocol.Command> typedSystem;
     private static ILocationService locationService;
 
-    private ComponentId akkaHcdComponentId = new ComponentId(new Prefix(JSubsystem.CSW, "hcd1"), JComponentType.HCD());
+    private ComponentId akkaHcdComponentId = new ComponentId(new Prefix(JSubsystem.CSW, "hcd1"), JComponentType.HCD);
     private AkkaConnection akkaHcdConnection = new AkkaConnection(akkaHcdComponentId);
 
-    private ComponentId tcpServiceComponentId = new ComponentId(new Prefix(JSubsystem.CSW, "exampleTcpService"), JComponentType.Service());
+    private ComponentId tcpServiceComponentId = new ComponentId(new Prefix(JSubsystem.CSW, "exampleTcpService"), JComponentType.Service);
     private TcpConnection tcpServiceConnection = new TcpConnection(tcpServiceComponentId);
 
     private static ActorRef<Object> actorRef;
 
-    private ComponentId httpServiceComponentId = new ComponentId(new Prefix(JSubsystem.CSW, "exampleHTTPService"), JComponentType.Service());
+    private ComponentId httpServiceComponentId = new ComponentId(new Prefix(JSubsystem.CSW, "exampleHTTPService"), JComponentType.Service);
     private HttpConnection httpServiceConnection = new HttpConnection(httpServiceComponentId);
     private String Path = "/path/to/resource";
 
@@ -210,52 +210,52 @@ public class JLocationServiceImplTest extends JUnitSuite {
     @Test
     public void testListComponentsByComponentType() throws ExecutionException, InterruptedException {
         //  Register HCD type component
-        ComponentId akkaHcdComponentId = new ComponentId(new Prefix(JSubsystem.NFIRAOS, "tromboneHCD"), JComponentType.HCD());
+        ComponentId akkaHcdComponentId = new ComponentId(new Prefix(JSubsystem.NFIRAOS, "tromboneHCD"), JComponentType.HCD);
         AkkaConnection akkaHcdConnection = new AkkaConnection(akkaHcdComponentId);
         AkkaRegistration akkaHcdRegistration = new RegistrationFactory().akkaTyped(akkaHcdConnection, actorRef);
         locationService.register(akkaHcdRegistration).get();
 
         //  Register Assembly type component
-        ComponentId akkaAssemblyComponentId = new ComponentId(new Prefix(JSubsystem.NFIRAOS, "tromboneAssembly"), JComponentType.Assembly());
+        ComponentId akkaAssemblyComponentId = new ComponentId(new Prefix(JSubsystem.NFIRAOS, "tromboneAssembly"), JComponentType.Assembly);
         AkkaConnection akkaAssemblyConnection = new AkkaConnection(akkaAssemblyComponentId);
         AkkaRegistration akkaAssemblyRegistration = new RegistrationFactory().akkaTyped(akkaAssemblyConnection, actorRef);
         locationService.register(akkaAssemblyRegistration).get();
 
         //  Register Container type component
-        ComponentId akkaContainerComponentId = new ComponentId(new Prefix(JSubsystem.NFIRAOS, "tromboneContainer"), JComponentType.Container());
+        ComponentId akkaContainerComponentId = new ComponentId(new Prefix(JSubsystem.NFIRAOS, "tromboneContainer"), JComponentType.Container);
         AkkaConnection akkaContainerConnection = new AkkaConnection(akkaContainerComponentId);
         AkkaRegistration akkaContainerRegistration = new RegistrationFactory().akkaTyped(akkaContainerConnection, actorRef);
         locationService.register(akkaContainerRegistration).get();
 
         //  Register Tcp and Http Service
-        ComponentId tcpComponentId = new ComponentId(new Prefix(JSubsystem.CSW, "redis"), JComponentType.Service());
+        ComponentId tcpComponentId = new ComponentId(new Prefix(JSubsystem.CSW, "redis"), JComponentType.Service);
         TcpConnection tcpConnection = new TcpConnection(tcpComponentId);
         TcpRegistration tcpServiceRegistration = new TcpRegistration(tcpConnection, 80);
         locationService.register(tcpServiceRegistration).get();
 
-        ComponentId httpServiceComponentId = new ComponentId(new Prefix(JSubsystem.CSW, "ConfigService"), JComponentType.Service());
+        ComponentId httpServiceComponentId = new ComponentId(new Prefix(JSubsystem.CSW, "ConfigService"), JComponentType.Service);
         HttpConnection httpServiceConnection = new HttpConnection(httpServiceComponentId);
         HttpRegistration httpServiceRegistration = new HttpRegistration(httpServiceConnection, 4000, "/config/svn/");
         locationService.register(httpServiceRegistration).get();
 
         //  Filter by HCD type
         List<Location> hcdLocations = List.of(akkaHcdRegistration.location(Networks.apply().hostname()));
-        Assert.assertEquals(hcdLocations, locationService.list(JComponentType.HCD()).get());
+        Assert.assertEquals(hcdLocations, locationService.list(JComponentType.HCD).get());
 
         //  Filter by Assembly type
         List<Location> assemblyLocations = List.of(akkaAssemblyRegistration.location(Networks.apply().hostname()));
-        Assert.assertEquals(assemblyLocations, locationService.list(JComponentType.Assembly()).get());
+        Assert.assertEquals(assemblyLocations, locationService.list(JComponentType.Assembly).get());
 
         //  Filter by Container type
         List<Location> containerLocations = List.of(akkaContainerRegistration.location(Networks.apply().hostname()));
-        Assert.assertEquals(containerLocations, locationService.list(JComponentType.Container()).get());
+        Assert.assertEquals(containerLocations, locationService.list(JComponentType.Container).get());
 
         //  Filter by Service type
         Set<Location> serviceLocations = Set.of(
                 tcpServiceRegistration.location(Networks.apply().hostname()),
                 httpServiceRegistration.location(Networks.apply().hostname())
         );
-        Set<Location> actualSetOfLocations = Set.copyOf(locationService.list(JComponentType.Service()).get());
+        Set<Location> actualSetOfLocations = Set.copyOf(locationService.list(JComponentType.Service).get());
         Assert.assertEquals(serviceLocations, actualSetOfLocations);
     }
 
@@ -300,24 +300,24 @@ public class JLocationServiceImplTest extends JUnitSuite {
 
         //  filter by Tcp type
         List<Location> tcpLocations = List.of(tcpRegistration.location(Networks.apply().hostname()));
-        Assert.assertEquals(tcpLocations, locationService.list(JConnectionType.TcpType()).get());
+        Assert.assertEquals(tcpLocations, locationService.list(JConnectionType.TcpType).get());
 
         //  filter by Http type
         List<Location> httpLocations = List.of(httpRegistration.location(Networks.apply().hostname()));
-        Assert.assertEquals(httpLocations, locationService.list(JConnectionType.HttpType()).get());
+        Assert.assertEquals(httpLocations, locationService.list(JConnectionType.HttpType).get());
 
         //  filter by Akka type
         List<Location> akkaLocations = List.of(akkaRegistration.location(Networks.apply().hostname()));
-        Assert.assertEquals(akkaLocations, locationService.list(JConnectionType.AkkaType()).get());
+        Assert.assertEquals(akkaLocations, locationService.list(JConnectionType.AkkaType).get());
     }
 
     //DEOPSCSW-308: Add prefix in Location service models
     //CSW-86: Subsystem should be case-insensitive
     @Test
     public void testListakkaComponentsByPrefix() throws ExecutionException, InterruptedException {
-        AkkaConnection akkaHcdConnection1 = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "ncc.trombone.hcd1"), JComponentType.HCD()));
-        AkkaConnection akkaHcdConnection2 = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "ncc.trombone.assembly2"), JComponentType.HCD()));
-        AkkaConnection akkaHcdConnection3 = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "ncc.trombone.hcd3"), JComponentType.HCD()));
+        AkkaConnection akkaHcdConnection1 = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "ncc.trombone.hcd1"), JComponentType.HCD));
+        AkkaConnection akkaHcdConnection2 = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "ncc.trombone.assembly2"), JComponentType.HCD));
+        AkkaConnection akkaHcdConnection3 = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "ncc.trombone.hcd3"), JComponentType.HCD));
 
         // Register Akka connection
         AkkaRegistration akkaRegistration1 = new RegistrationFactory().akkaTyped(akkaHcdConnection1, actorRef);
@@ -341,10 +341,10 @@ public class JLocationServiceImplTest extends JUnitSuite {
     @Test
     public void testTrackingConnection() throws ExecutionException, InterruptedException {
         int Port = 1234;
-        TcpConnection redis1Connection = new TcpConnection(new ComponentId(new Prefix(JSubsystem.CSW, "redis1"), JComponentType.Service()));
+        TcpConnection redis1Connection = new TcpConnection(new ComponentId(new Prefix(JSubsystem.CSW, "redis1"), JComponentType.Service));
         TcpRegistration redis1Registration = new TcpRegistration(redis1Connection, Port);
 
-        TcpConnection redis2Connection = new TcpConnection(new ComponentId(new Prefix(JSubsystem.CSW, "redis2"), JComponentType.Service()));
+        TcpConnection redis2Connection = new TcpConnection(new ComponentId(new Prefix(JSubsystem.CSW, "redis2"), JComponentType.Service));
         TcpRegistration redis2registration = new TcpRegistration(redis2Connection, Port);
 
         Pair<Subscription, TestSubscriber.Probe<TrackingEvent>> source = locationService.track(redis1Connection).toMat(TestSink.probe(untypedSystem), Keep.both()).run(typedSystem);
@@ -369,7 +369,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
     @Test
     public void testSubscribeConnection() throws ExecutionException, InterruptedException {
         int Port = 1234;
-        TcpConnection redis1Connection = new TcpConnection(new ComponentId(new Prefix(JSubsystem.CSW, "redis1"), JComponentType.Service()));
+        TcpConnection redis1Connection = new TcpConnection(new ComponentId(new Prefix(JSubsystem.CSW, "redis1"), JComponentType.Service));
         TcpRegistration redis1Registration = new TcpRegistration(redis1Connection, Port);
 
         //Test probe actor to receive the TrackingEvent notifications
@@ -401,7 +401,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
     // DEOPSCSW-35: CRDT detects comp/service crash
     @Test
     public void testUnregisteringDeadActorByDeathWatch() throws ExecutionException, InterruptedException {
-        ComponentId componentId = new ComponentId(new Prefix(JSubsystem.NFIRAOS, "hcd1"), JComponentType.HCD());
+        ComponentId componentId = new ComponentId(new Prefix(JSubsystem.NFIRAOS, "hcd1"), JComponentType.HCD);
         AkkaConnection connection = new AkkaConnection(componentId);
 
         ActorRef<Object> actorRef =

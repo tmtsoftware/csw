@@ -84,7 +84,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
         // find a Hcd connection from the connections provided in componentInfo
         Optional<Connection> mayBeConnection = componentInfo.getConnections().stream()
-                .filter(connection -> connection.componentId().componentType() == JComponentType.HCD())
+                .filter(connection -> connection.componentId().componentType() == JComponentType.HCD)
                 .findFirst();
 
         // If an Hcd is found as a connection, resolve its location from location service and create other
@@ -293,7 +293,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     private CompletableFuture<Optional<AkkaLocation>> resolveHcd() {
         // find a Hcd connection from the connections provided in componentInfo
         Optional<Connection> mayBeConnection = componentInfo.getConnections().stream()
-                .filter(connection -> connection.componentId().componentType() == JComponentType.HCD())
+                .filter(connection -> connection.componentId().componentType() == JComponentType.HCD)
                 .findFirst();
 
         // If an Hcd is found as a connection, resolve its location from location service and create other
@@ -333,7 +333,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     private void resolveHcdAndCreateCommandService() throws ExecutionException, InterruptedException {
 
         TypedConnection<AkkaLocation> hcdConnection = componentInfo.getConnections().stream()
-                .filter(connection -> connection.componentId().componentType() == JComponentType.HCD())
+                .filter(connection -> connection.componentId().componentType() == JComponentType.HCD)
                 .findFirst().orElseThrow().<AkkaLocation>of();
 
         // #resolve-hcd-and-create-commandservice
