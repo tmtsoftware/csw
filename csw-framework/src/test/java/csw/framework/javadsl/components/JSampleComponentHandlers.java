@@ -261,7 +261,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     @Override
     public void onDiagnosticMode(UTCTime startTime, String hint) {
         if (hint.equals("engineering")) {
-            var event = new SystemEvent(Prefix.apply(JSubsystem.TCS(), "prefix"), new EventName("eventName"))
+            var event = new SystemEvent(Prefix.apply(JSubsystem.TCS, "prefix"), new EventName("eventName"))
                     .add(JKeyType.IntKey().make("diagnostic-data").set(1));
             diagModeCancellable.map(Cancellable::cancel); // cancel previous diagnostic publishing
             diagModeCancellable = Optional.of(
