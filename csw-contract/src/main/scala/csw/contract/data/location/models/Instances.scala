@@ -44,20 +44,20 @@ object Instances extends LocationCodecs with LocationServiceCodecs {
   val locationRemoved: TrackingEvent = LocationRemoved(akkaConnection)
 
   val models: Map[String, ModelAdt] = Map(
-    "registration" -> ModelAdt(
+    "Registration" -> ModelAdt(
       List(akkaRegistration, httpRegistration, tcpRegistration)
     ),
-    "location" -> ModelAdt(
+    "Location" -> ModelAdt(
       List(akkaLocation, httpLocation, tcpLocation)
     ),
-    "trackingEvent" -> ModelAdt(
+    "TrackingEvent" -> ModelAdt(
       List(locationUpdated, locationRemoved)
     ),
-    "connectionType" -> ModelAdt(List(akkaType, httpType, tcpType)),
-    "connectionInfo" -> ModelAdt(List(connectionInfo)),
-    "connection"     -> ModelAdt(List(akkaConnection, httpConnection, tcpConnection)),
-    "componentId"    -> ModelAdt(List(ComponentId(prefix, ComponentType.HCD))),
-    "componentType" -> ModelAdt(
+    "ConnectionType" -> ModelAdt(List(akkaType, httpType, tcpType)),
+    "ConnectionInfo" -> ModelAdt(List(connectionInfo)),
+    "Connection"     -> ModelAdt(List(akkaConnection, httpConnection, tcpConnection)),
+    "ComponentId"    -> ModelAdt(List(ComponentId(prefix, ComponentType.HCD))),
+    "ComponentType" -> ModelAdt(
       List(
         ComponentType.HCD.name,
         ComponentType.Assembly.name,
@@ -68,7 +68,7 @@ object Instances extends LocationCodecs with LocationServiceCodecs {
         ComponentType.Machine.name
       )
     ),
-    "locationServiceError" -> ModelAdt(
+    "LocationServiceError" -> ModelAdt(
       List(
         registrationFailed,
         otherLocationIsRegistered,
