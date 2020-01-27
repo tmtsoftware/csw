@@ -7,7 +7,7 @@ import csw.prefix.javadsl.JSubsystem;
 public class JHostConfigApp {
 
     public static void main(String args[]) {
-        JHostConfig.start("JHost-Config-App", JSubsystem.CSW(), args);
+        JHostConfig.start("JHost-Config-App", JSubsystem.CSW, args);
     }
 
 }

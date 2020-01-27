@@ -29,6 +29,7 @@ import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
 import csw.params.javadsl.JUnits;
+import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 import csw.time.core.models.UTCTime;
 
@@ -36,8 +37,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-
-import static csw.prefix.javadsl.JSubsystem.NFIRAOS;
 
 /**
  * Domain specific logic should be written in below handlers.
@@ -159,7 +158,7 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
     }
     //#track-location
 
-    private EventKey counterEventKey = new EventKey(Prefix.apply(NFIRAOS(), "samplehcd"), new EventName("HcdCounter"));
+    private EventKey counterEventKey = new EventKey(Prefix.apply(JSubsystem.NFIRAOS, "samplehcd"), new EventName("HcdCounter"));
     private Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter");
 
 

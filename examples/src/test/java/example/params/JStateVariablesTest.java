@@ -32,7 +32,7 @@ public class JStateVariablesTest extends JUnitSuite {
     public void showUsageOfDemandState() {
         //#demandstate
         //prefix
-        Prefix prefix = Prefix.apply(JSubsystem.WFOS(), "prog.cloudcover");
+        Prefix prefix = Prefix.apply(JSubsystem.WFOS, "prog.cloudcover");
 
         //keys
         Key<Character> charKey = JKeyType.CharKey().make("charKey");
@@ -94,7 +94,7 @@ public class JStateVariablesTest extends JUnitSuite {
     public void showUsageOfCurrentState() {
         //#currentstate
         //prefix
-        Prefix prefix = Prefix.apply(JSubsystem.WFOS(), "prog.cloudcover");
+        Prefix prefix = Prefix.apply(JSubsystem.WFOS, "prog.cloudcover");
 
         //keys
         Key<Character> charKey = JKeyType.CharKey().make("charKey");
@@ -166,8 +166,8 @@ public class JStateVariablesTest extends JUnitSuite {
         Parameter<MatrixData<Double>> i1 = k1.set(m1);
 
         //state variables
-        DemandState ds = new DemandState(Prefix.apply(JSubsystem.WFOS(), "blue.filter"), new StateName("testStateName")).add(i1);
-        CurrentState cs = new CurrentState(Prefix.apply(JSubsystem.WFOS(), "blue.filter"), new StateName("testStateName")).add(i1);
+        DemandState ds = new DemandState(Prefix.apply(JSubsystem.WFOS, "blue.filter"), new StateName("testStateName")).add(i1);
+        CurrentState cs = new CurrentState(Prefix.apply(JSubsystem.WFOS, "blue.filter"), new StateName("testStateName")).add(i1);
 
         //json support - write
         JsValue dsJson = JavaJsonSupport.writeStateVariable(ds);
@@ -199,7 +199,7 @@ public class JStateVariablesTest extends JUnitSuite {
         Key<Integer> miscKey = JKeyType.IntKey().make("misc.");
 
         //prefix
-        Prefix prefix = Prefix.apply(JSubsystem.WFOS(), "blue.filter");
+        Prefix prefix = Prefix.apply(JSubsystem.WFOS, "blue.filter");
 
         //params
         Parameter<Integer> encParam1 = encoderKey.set(1);

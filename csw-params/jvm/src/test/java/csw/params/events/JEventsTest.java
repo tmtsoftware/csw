@@ -30,7 +30,7 @@ public class JEventsTest extends JUnitSuite {
     private final Parameter<Integer> epochIntParam = epochIntKey.set(44, 55);
     private final Parameter<Byte> epochByteParam = epochByteKey.set(new Byte[]{10, 20});
 
-    private final Prefix prefix = Prefix.apply(JSubsystem.WFOS(), "red.detector");
+    private final Prefix prefix = Prefix.apply(JSubsystem.WFOS, "red.detector");
 
     private <T extends ParameterSetType & Event> void assertOnEventsAPI(T event) {
 

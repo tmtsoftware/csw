@@ -23,7 +23,6 @@ import scala.concurrent.duration.FiniteDuration;
 import java.util.concurrent.TimeUnit;
 
 import static csw.alarm.models.Key.AlarmKey;
-import static csw.prefix.javadsl.JSubsystem.NFIRAOS;
 import static org.hamcrest.CoreMatchers.isA;
 import static org.junit.Assert.*;
 
@@ -34,7 +33,7 @@ public class JSeverityServiceModuleTest extends JUnitSuite {
     private static AlarmServiceTestSetup alarmServiceTestSetup = new AlarmServiceTestSetup();
     private static IAlarmService jAlarmService = alarmServiceTestSetup.jAlarmService();
     private static AlarmAdminService alarmService = alarmServiceTestSetup.alarmService();
-    private Prefix prefix = Prefix.apply(NFIRAOS(), "trombone");
+    private Prefix prefix = Prefix.apply(JSubsystem.NFIRAOS, "trombone");
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
