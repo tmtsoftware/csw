@@ -7,7 +7,7 @@ import csw.contract.data.location.models.Instances._
 import csw.contract.generator.models.DomHelpers._
 import csw.contract.generator.models.Endpoint
 import csw.location.api.codec.LocationServiceCodecs
-import csw.location.api.messages.LocationHttpMessage
+import csw.location.api.messages.{LocationHttpMessage, LocationWebsocketMessage}
 import csw.location.api.messages.LocationHttpMessage.{
   Find,
   ListByComponentType,
@@ -18,27 +18,40 @@ import csw.location.api.messages.LocationHttpMessage.{
   Resolve,
   Unregister
 }
-import csw.location.models.{ComponentType, ConnectionType, Location, TypedConnection}
+import csw.location.api.messages.LocationWebsocketMessage.Track
+import csw.location.models.{
+  ComponentType,
+  ConnectionType,
+  Location,
+  LocationRemoved,
+  LocationUpdated,
+  TrackingEvent,
+  TypedConnection
+}
 import msocket.api.codecs.BasicCodecs
 
 import scala.concurrent.duration.FiniteDuration
 
 object Instances extends LocationServiceCodecs with BasicCodecs {
 
+  private val seconds                   = 23
   val registerAkka: LocationHttpMessage = Register(akkaRegistration)
   val registerHttp: LocationHttpMessage = Register(httpRegistration)
   val unregister: LocationHttpMessage   = Unregister(connection)
   val find: LocationHttpMessage         = Find(akkaConnection.asInstanceOf[TypedConnection[Location]])
   val resolve: LocationHttpMessage =
-    Resolve(akkaConnection.asInstanceOf[TypedConnection[Location]], FiniteDuration(23, TimeUnit.SECONDS))
+    Resolve(akkaConnection.asInstanceOf[TypedConnection[Location]], FiniteDuration(seconds, TimeUnit.SECONDS))
   val listByComponentType: LocationHttpMessage  = ListByComponentType(ComponentType.HCD)
   val listByHostname: LocationHttpMessage       = ListByHostname("hostname")
   val listByConnectionType: LocationHttpMessage = ListByConnectionType(ConnectionType.AkkaType)
   val listByPrefix: LocationHttpMessage         = ListByPrefix("TCS.filter.wheel")
+  val track: LocationWebsocketMessage           = Track(akkaConnection)
 
-  val done: Done                = Done
-  val option: Option[Location]  = Some(akkaLocation)
-  val locations: List[Location] = List(akkaLocation, httpLocation)
+  val done: Done                          = Done
+  val option: Option[Location]            = Some(akkaLocation)
+  val locations: List[Location]           = List(akkaLocation, httpLocation)
+  val locationRemovedEvent: TrackingEvent = LocationRemoved(akkaConnection)
+  val locationUpdatedEvent: TrackingEvent = LocationUpdated(akkaLocation)
 
   val endpoints: Map[String, Endpoint] = Map(
     "register" -> Endpoint(
@@ -80,6 +93,10 @@ object Instances extends LocationServiceCodecs with BasicCodecs {
     "listByPrefix" -> Endpoint(
       requests = List(listByPrefix),
       responses = List(locations)
+    ),
+    "track" -> Endpoint(
+      requests = List(track),
+      responses = List(locationRemovedEvent, locationUpdatedEvent)
     )
   )
 }
