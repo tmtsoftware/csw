@@ -11,7 +11,7 @@ object CswData {
       ),
       "command" -> Service(
         command.endpoints.Instances.endpoints,
-        Map.empty
+        command.models.Instances.models
       )
     )
   )

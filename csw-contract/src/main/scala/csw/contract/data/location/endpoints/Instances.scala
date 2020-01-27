@@ -37,7 +37,7 @@ object Instances extends LocationServiceCodecs with BasicCodecs {
   private val seconds                   = 23
   val registerAkka: LocationHttpMessage = Register(akkaRegistration)
   val registerHttp: LocationHttpMessage = Register(httpRegistration)
-  val unregister: LocationHttpMessage   = Unregister(connection)
+  val unregister: LocationHttpMessage   = Unregister(httpConnection)
   val find: LocationHttpMessage         = Find(akkaConnection.asInstanceOf[TypedConnection[Location]])
   val resolve: LocationHttpMessage =
     Resolve(akkaConnection.asInstanceOf[TypedConnection[Location]], FiniteDuration(seconds, TimeUnit.SECONDS))
