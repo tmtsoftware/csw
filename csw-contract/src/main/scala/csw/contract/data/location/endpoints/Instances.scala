@@ -7,27 +7,10 @@ import csw.contract.data.location.models.Instances._
 import csw.contract.generator.models.DomHelpers._
 import csw.contract.generator.models.Endpoint
 import csw.location.api.codec.LocationServiceCodecs
-import csw.location.api.messages.{LocationHttpMessage, LocationWebsocketMessage}
-import csw.location.api.messages.LocationHttpMessage.{
-  Find,
-  ListByComponentType,
-  ListByConnectionType,
-  ListByHostname,
-  ListByPrefix,
-  Register,
-  Resolve,
-  Unregister
-}
+import csw.location.api.messages.LocationHttpMessage._
 import csw.location.api.messages.LocationWebsocketMessage.Track
-import csw.location.models.{
-  ComponentType,
-  ConnectionType,
-  Location,
-  LocationRemoved,
-  LocationUpdated,
-  TrackingEvent,
-  TypedConnection
-}
+import csw.location.api.messages.{LocationHttpMessage, LocationWebsocketMessage}
+import csw.location.models.{ComponentType, ConnectionType, Location, TypedConnection}
 import msocket.api.codecs.BasicCodecs
 
 import scala.concurrent.duration.FiniteDuration
@@ -47,11 +30,9 @@ object Instances extends LocationServiceCodecs with BasicCodecs {
   val listByPrefix: LocationHttpMessage         = ListByPrefix("TCS.filter.wheel")
   val track: LocationWebsocketMessage           = Track(akkaConnection)
 
-  val done: Done                          = Done
-  val option: Option[Location]            = Some(akkaLocation)
-  val locations: List[Location]           = List(akkaLocation, httpLocation)
-  val locationRemovedEvent: TrackingEvent = LocationRemoved(akkaConnection)
-  val locationUpdatedEvent: TrackingEvent = LocationUpdated(akkaLocation)
+  val done: Done                = Done
+  val option: Option[Location]  = Some(akkaLocation)
+  val locations: List[Location] = List(akkaLocation, httpLocation)
 
   val endpoints: Map[String, Endpoint] = Map(
     "register" -> Endpoint(
@@ -96,7 +77,7 @@ object Instances extends LocationServiceCodecs with BasicCodecs {
     ),
     "track" -> Endpoint(
       requests = List(track),
-      responses = List(locationRemovedEvent, locationUpdatedEvent)
+      responses = List(locationRemoved, locationUpdated)
     )
   )
 }
