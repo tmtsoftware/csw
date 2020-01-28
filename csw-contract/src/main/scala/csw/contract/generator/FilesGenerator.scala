@@ -11,7 +11,8 @@ object FilesGenerator extends ContractCodecs {
   def generate(services: Services, outputPath: String): Unit = {
     services.data.foreach {
       case (serviceName, service) =>
-        writeData(s"$outputPath/$serviceName/endpoints", "contract", service.endpoints)
+        writeData(s"$outputPath/$serviceName/endpoints", "httpContracts", service.httpEndpoints)
+        writeData(s"$outputPath/$serviceName/endpoints", "websocketContracts", service.webSocketEndpoints)
         service.models.foreach {
           case (modelName, model) => writeData(s"$outputPath/$serviceName/models", modelName, model)
         }
