@@ -14,11 +14,13 @@ import csw.command.client.MiniCRM.MiniCRMMessage.{
 import csw.params.commands.CommandIssue.IdNotAvailableIssue
 import csw.params.commands.CommandResponse.{Completed, Invalid, Started, SubmitResponse}
 import csw.params.core.models.Id
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import org.scalatest.BeforeAndAfterAll
 
 import scala.concurrent.duration._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class MiniCRMTest extends FunSuite with Matchers with BeforeAndAfterAll {
+class MiniCRMTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
 
   private val testKit = ActorTestKit()
 

@@ -3,11 +3,13 @@ package csw.framework.deploy.hostconfig.cli
 import java.io.ByteArrayOutputStream
 import java.nio.file.Paths
 
-import org.scalatest.{BeforeAndAfterEach, Matchers}
+import org.scalatest.BeforeAndAfterEach
+import org.scalatest
+import org.scalatest.matchers.should.Matchers
 
 // DEOPSCSW-174: Starting Multiple Containers with an init Script
 // DEOPSCSW-175: Starting multiple containers from command Line
-class ArgsParserTest extends org.scalatest.FunSuite with Matchers with BeforeAndAfterEach {
+class ArgsParserTest extends scalatest.funsuite.AnyFunSuite with Matchers with BeforeAndAfterEach {
   val inputFilePath         = "/tmp/some/input/file"
   val containerCmdAppScript = "./bin/container-cmd-app"
 

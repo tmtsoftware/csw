@@ -10,9 +10,9 @@ import csw.params.core.generics.KeyType.{
   ShortMatrixKey
 }
 import csw.params.core.models.{ArrayData, MatrixData}
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
-class EqualityTest extends FunSpec {
+class EqualityTest extends AnyFunSpec {
 
   describe("Array-based long array equality") {
     val k1                  = KeyType.LongArrayKey.make("myLongArray")

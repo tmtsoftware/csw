@@ -6,9 +6,10 @@ import csw.commons.ResourceReader
 import csw.params.core.generics.KeyType.ByteArrayKey
 import csw.params.core.models.Units.encoder
 import csw.params.core.models._
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class BinaryImageByteArrayTest extends FunSpec with Matchers {
+class BinaryImageByteArrayTest extends AnyFunSpec with Matchers {
 
   // DEOPSCSW-186: Binary value payload
   // DEOPSCSW-331: Complex payload - Include byte in paramset for Event and ObserveEvent

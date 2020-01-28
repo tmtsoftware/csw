@@ -9,10 +9,11 @@ import csw.framework.models.{ContainerBootstrapInfo, ContainerInfo, HostBootstra
 import csw.location.models.ComponentType.{Assembly, HCD}
 import csw.location.models.Connection
 import csw.prefix.models.Prefix
-import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationInt
 import scala.jdk.CollectionConverters._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 // DEOPSCSW-167: Creation and Deployment of Standalone Components
 // DEOPSCSW-170: Starting component using a file format
@@ -20,7 +21,7 @@ import scala.jdk.CollectionConverters._
 // DEOPSCSW-283: Parsing HOCON conf file
 // CSW-82: ComponentInfo should take prefix
 // CSW-83: Alarm models should take prefix
-class ConfigParserTest extends FunSuite with Matchers {
+class ConfigParserTest extends AnyFunSuite with Matchers {
 
   private val assemblyInfo = ComponentInfo(
     Prefix("tcs.assembly1"),

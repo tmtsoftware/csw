@@ -6,9 +6,10 @@ import csw.params.core.generics.KeyType.DoubleMatrixKey
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models._
 import csw.prefix.models.Prefix
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class ResultTest extends FunSpec with Matchers {
+class ResultTest extends AnyFunSpec with Matchers {
 
   //#runid
   val runId: Id = Id()

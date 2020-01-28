@@ -26,14 +26,15 @@ import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.ActorSystemFactory
 import csw.location.models.Connection.AkkaConnection
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
-import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.{Future, Promise}
 import scala.util.Success
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 //DEOPSCSW-182-Control Life Cycle of Components
 //DEOPSCSW-216-Locate and connect components to send AKKA commands
-class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar with ArgumentMatchersSugar {
+class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar with ArgumentMatchersSugar {
   implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "test")
   implicit val settings: TestKitSettings                       = TestKitSettings(typedSystem)
   private val mocks                                            = new FrameworkTestMocks()

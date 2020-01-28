@@ -7,9 +7,10 @@ import csw.command.client.models.framework.LockingResponse.{
   LockExpiringShortly,
   LockReleased
 }
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class LockingResponseTest extends FunSuite with Matchers {
+class LockingResponseTest extends AnyFunSuite with Matchers {
 
   test("verify java API's mapping to scala API's") {
     LockingResponse.lockAcquired should ===(LockAcquired)

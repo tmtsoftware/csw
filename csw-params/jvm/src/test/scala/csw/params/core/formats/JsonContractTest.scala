@@ -12,10 +12,11 @@ import csw.params.events._
 import csw.params.testdata.ParamSetData
 import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime
-import org.scalatest.{FunSpec, Matchers}
 import play.api.libs.json.Json
 
 import scala.io.Source
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-188: Efficient Serialization to/from JSON
@@ -23,7 +24,7 @@ import scala.io.Source
 // DEOPSCSW-184: Change configurations - attributes and values
 // DEOPSCSW-423: Introduce name for CurrentState and DemandState
 // DEOPSCSW-401: Remove implicit apply method from prefix
-class JsonContractTest extends FunSpec with Matchers {
+class JsonContractTest extends AnyFunSpec with Matchers {
 
   private val prefix: Prefix       = Prefix("wfos.blue.filter")
   private val obsId: ObsId         = ObsId("Obs001")

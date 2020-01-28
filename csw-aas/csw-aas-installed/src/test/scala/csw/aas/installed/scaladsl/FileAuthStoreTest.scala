@@ -2,11 +2,13 @@ package csw.aas.installed.scaladsl
 
 import java.io.File
 
-import org.scalatest.Matchers.convertToAnyShouldWrapper
-import org.scalatest.{BeforeAndAfterEach, FunSuite}
+import org.scalatest.matchers
+import matchers.should.Matchers.convertToAnyShouldWrapper
+import org.scalatest.BeforeAndAfterEach
 import os.Path
+import org.scalatest.funsuite.AnyFunSuite
 
-class FileAuthStoreTest extends FunSuite with BeforeAndAfterEach {
+class FileAuthStoreTest extends AnyFunSuite with BeforeAndAfterEach {
 
   private val path: os.Path    = os.Path(new File("test-tokens").getAbsolutePath)
   private val testAccessToken  = "test-access-token"

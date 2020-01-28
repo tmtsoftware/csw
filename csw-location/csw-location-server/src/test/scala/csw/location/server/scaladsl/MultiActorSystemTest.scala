@@ -9,11 +9,13 @@ import csw.location.server.commons._
 import csw.location.server.internal.LocationServiceFactory
 import csw.prefix.models.Subsystem
 import csw.prefix.models.Prefix
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 
 import scala.concurrent.duration.DurationInt
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class MultiActorSystemTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
+class MultiActorSystemTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
   var connection: TcpConnection = _
 

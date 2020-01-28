@@ -9,12 +9,14 @@ import csw.config.api.ConfigData
 import csw.config.api.exceptions.{LocalFileNotFound, UnableToParseOptions}
 import csw.config.api.scaladsl.ConfigClientService
 import org.mockito.MockitoSugar
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, Future}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class ConfigUtilsTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll with MockitoSugar {
+class ConfigUtilsTest extends AnyFunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll with MockitoSugar {
 
   implicit val system: typed.ActorSystem[Nothing] = typed.ActorSystem(Behaviors.empty, "test")
 

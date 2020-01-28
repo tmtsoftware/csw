@@ -6,9 +6,10 @@ import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.Coords.EqFrame.{FK5, ICRS}
 import csw.params.core.models.Coords.SolarSystemObject.{Pluto, Venus}
 import csw.prefix.models.Prefix
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class CoordsTests extends FunSpec with Matchers {
+class CoordsTests extends AnyFunSpec with Matchers {
 
   import Angle._
   import Coords._

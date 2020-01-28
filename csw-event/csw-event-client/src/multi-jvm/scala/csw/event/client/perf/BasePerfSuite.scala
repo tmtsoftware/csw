@@ -15,7 +15,9 @@ import csw.event.client.perf.utils.EventUtils.nanosToSeconds
 import csw.event.client.perf.utils.{EventUtils, SystemMonitoringSupport}
 import csw.event.client.perf.wiring.{TestConfigs, TestWiring}
 import org.HdrHistogram.Histogram
-import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuiteLike
+import org.scalatest.matchers.should.Matchers
 
 import scala.collection.immutable
 import scala.concurrent.duration.{Duration, DurationDouble, FiniteDuration}
@@ -24,7 +26,7 @@ import scala.concurrent.{Await, Future}
 class BasePerfSuite(config: MultiNodeConfig)
     extends MultiNodeSpec(config)
     with MultiNodeSpecCallbacks
-    with FunSuiteLike
+    with AnyFunSuiteLike
     with Matchers
     with ImplicitSender
     with SystemMonitoringSupport

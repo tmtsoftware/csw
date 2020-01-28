@@ -10,12 +10,13 @@ import akka.actor.typed.scaladsl.Behaviors
 import csw.time.core.models.UTCTime
 import csw.time.scheduler.TimeServiceSchedulerFactory
 import org.HdrHistogram.Histogram
-import org.scalatest.{BeforeAndAfterAll, FunSuiteLike}
+import org.scalatest.BeforeAndAfterAll
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
+import org.scalatest.funsuite.AnyFunSuiteLike
 
-class TimeServiceSchedulerPerfTest extends ScalaTestWithActorTestKit with FunSuiteLike with BeforeAndAfterAll {
+class TimeServiceSchedulerPerfTest extends ScalaTestWithActorTestKit with AnyFunSuiteLike with BeforeAndAfterAll {
 
   private val sys                                         = ActorSystem(Behaviors.empty, "test")
   private implicit val executionContext: ExecutionContext = sys.executionContext

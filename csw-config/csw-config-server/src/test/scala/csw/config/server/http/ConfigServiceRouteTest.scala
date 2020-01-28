@@ -15,9 +15,11 @@ import csw.config.server.commons.TestFileUtils
 import csw.config.server.mocks.MockedAuthentication
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.mockito.MockitoSugar
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 
 import scala.collection.mutable.ArrayBuffer
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 // DEOPSCSW-80: HTTP based access for configuration file
 // DEOPSCSW-576: Auth token for Configuration service
@@ -25,7 +27,7 @@ import scala.collection.mutable.ArrayBuffer
 // DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
 // DEOPSCSW-626: Get route of config server with path for empty config file
 class ConfigServiceRouteTest
-    extends FunSuite
+    extends AnyFunSuite
     with ScalatestRouteTest
     with BeforeAndAfterAll
     with BeforeAndAfterEach

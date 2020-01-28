@@ -9,15 +9,17 @@ import csw.logging.client.commons.{Category, LoggingKeys, TMTDateTimeFormatter}
 import csw.logging.client.exceptions.BaseLogPathNotDefined
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.FileUtils
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import play.api.libs.json.{JsObject, Json}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 // DEOPSCSW-123: Allow local component logs to be output to a file
 // DEOPSCSW-649: Fixed directory configuration for multi JVM scenario
-class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
+class FileAppenderTest extends AnyFunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
   private val logFileDir                = Paths.get("/tmp/csw-test-logs/").toFile
   private val actorSystem               = ActorSystem(SpawnProtocol(), "test-1")
   private val standardHeaders: JsObject = Json.obj(LoggingKeys.HOST -> "localhost", LoggingKeys.NAME -> "test-service")

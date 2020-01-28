@@ -1,9 +1,10 @@
 package csw.prefix.models
 
 import csw.prefix.models.Subsystem.TCS
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class PrefixTest extends FunSuite with Matchers {
+class PrefixTest extends AnyFunSuite with Matchers {
 
   test("should able to create Prefix and access subsystem from valid prefix string") {
     val prefixStr = "tcs.mobie.blue.filter"

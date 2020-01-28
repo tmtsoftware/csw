@@ -1,9 +1,11 @@
 package csw.network.utils
 import java.net.ServerSocket
 
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class SocketUtilsTest extends FunSuite with BeforeAndAfterAll with Matchers {
+class SocketUtilsTest extends AnyFunSuite with BeforeAndAfterAll with Matchers {
   val serverPort   = 7654
   val serverSocket = new ServerSocket(serverPort)
 

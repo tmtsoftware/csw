@@ -25,15 +25,17 @@ import csw.network.utils.Networks
 import csw.prefix.models.{Prefix, Subsystem}
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.concurrent.Eventually
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 class LocationServiceCompTestWithCluster extends LocationServiceCompTest("cluster")
 
 class LocationServiceCompTest(mode: String)
-    extends FunSuite
+    extends AnyFunSuite
     with Matchers
     with BeforeAndAfterAll
     with BeforeAndAfterEach

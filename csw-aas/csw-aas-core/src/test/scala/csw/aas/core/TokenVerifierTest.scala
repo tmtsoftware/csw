@@ -9,14 +9,16 @@ import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.exceptions.{TokenNotActiveException, TokenSignatureInvalidException}
 import org.keycloak.representations.{AccessToken => KeycloakAccessToken}
 import org.mockito.MockitoSugar
-import org.scalatest.{EitherValues, FunSuite, Matchers}
+import org.scalatest.EitherValues
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 //DEOPSCSW-558: SPIKE: Token containing user info and roles
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
-class TokenVerifierTest extends FunSuite with MockitoSugar with Matchers with EitherValues {
+class TokenVerifierTest extends AnyFunSuite with MockitoSugar with Matchers with EitherValues {
   private val keycloakTokenVerifier: KeycloakTokenVerifier = mock[KeycloakTokenVerifier]
   private val authConfig: AuthConfig                       = mock[AuthConfig]
   private val deployment: KeycloakDeployment               = authConfig.getDeployment

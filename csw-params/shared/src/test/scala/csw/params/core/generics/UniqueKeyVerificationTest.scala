@@ -5,10 +5,11 @@ import csw.params.core.models.{Id, ObsId, Struct}
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.params.events._
 import csw.prefix.models.Prefix
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
 //DEOPSCSW-184: Change configurations - attributes and values
-class UniqueKeyVerificationTest extends FunSpec with Matchers {
+class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
 
   val encoderKey: Key[Int] = KeyType.IntKey.make("encoder")
   val filterKey: Key[Int]  = KeyType.IntKey.make("filter")

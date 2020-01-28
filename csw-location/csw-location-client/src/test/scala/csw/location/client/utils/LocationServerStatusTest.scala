@@ -1,9 +1,11 @@
 package csw.location.client.utils
 import java.net.ServerSocket
 
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class LocationServerStatusTest extends FunSuite with Matchers with BeforeAndAfterAll {
+class LocationServerStatusTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
   val serverPort   = 7654
   val serverSocket = new ServerSocket(serverPort)
 

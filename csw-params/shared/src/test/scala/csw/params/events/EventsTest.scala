@@ -2,7 +2,8 @@ package csw.params.events
 
 import csw.params.core.generics.KeyType
 import csw.prefix.models.Prefix
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-185: Easy to Use Syntax/Api
@@ -11,7 +12,7 @@ import org.scalatest.{FunSpec, Matchers}
 // DEOPSCSW-329: Providing Mandatory information during Event Creation
 // DEOPSCSW-330: Include complex payloads - paramset in Event and ObserveEvent
 // DEOPSCSW-331: Complex payload - Include byte in paramset for Event and ObserveEvent
-class EventsTest extends FunSpec with Matchers {
+class EventsTest extends AnyFunSpec with Matchers {
   private val s1: String = "encoder"
 
   private val s1Key = KeyType.IntKey.make(s1)

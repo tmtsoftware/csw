@@ -3,12 +3,12 @@ import csw.alarm.client.internal.commons.AlarmServiceConnection
 import csw.config.client.commons.ConfigServiceConnection
 import csw.event.client.internal.commons.EventServiceConnection
 import csw.testkit.scaladsl.CSWService.{ConfigServer, EventServer, LocationServer}
-import org.scalatest.FunSuiteLike
+import org.scalatest.funsuite.AnyFunSuiteLike
 
 // DEOPSCSW-592: Create csw testkit for component writers
 class ScalaTestFrameworkTestKitSpec
     extends ScalaTestFrameworkTestKit(LocationServer, ConfigServer, EventServer)
-    with FunSuiteLike {
+    with AnyFunSuiteLike {
 
   import frameworkTestKit.frameworkWiring._
 

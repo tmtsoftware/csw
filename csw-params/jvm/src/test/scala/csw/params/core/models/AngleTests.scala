@@ -1,7 +1,8 @@
 package csw.params.core.models
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class AngleTests extends FunSpec with Matchers {
+class AngleTests extends AnyFunSpec with Matchers {
 
   describe("Basic parsing of radec as strings") {
     import Angle._

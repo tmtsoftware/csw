@@ -3,9 +3,10 @@ package csw.logging.client.internal
 import com.typesafe.config.ConfigFactory
 import csw.logging.models.Level.{DEBUG, ERROR, FATAL, INFO}
 import csw.prefix.models.Prefix
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class ComponentLoggingStateManagerTest extends FunSuite with Matchers {
+class ComponentLoggingStateManagerTest extends AnyFunSuite with Matchers {
 
   private val config = ConfigFactory.load().getConfig("csw-logging")
 

@@ -8,11 +8,12 @@ import akka.testkit.TestKit
 import com.typesafe.config.{Config, ConfigException}
 import csw.config.api.ConfigData
 import csw.config.api.commons.TestFutureExtension.RichFuture
-import org.scalatest.{FunSuiteLike, Matchers}
 
 import scala.jdk.CollectionConverters._
+import org.scalatest.funsuite.AnyFunSuiteLike
+import org.scalatest.matchers.should.Matchers
 
-class ConfigDataTest extends TestKit(ActorSystem("test-system")) with FunSuiteLike with Matchers {
+class ConfigDataTest extends TestKit(ActorSystem("test-system")) with AnyFunSuiteLike with Matchers {
 
   implicit val typedSystem = system.toTyped
 

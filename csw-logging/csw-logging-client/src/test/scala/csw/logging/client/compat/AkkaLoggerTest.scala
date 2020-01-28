@@ -6,7 +6,8 @@ import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.LoggingTestSuite
 import csw.logging.models.Level
-import org.scalatest.{FunSuiteLike, Matchers}
+import org.scalatest.funsuite.AnyFunSuiteLike
+import org.scalatest.matchers.should.Matchers
 
 class MyActor extends Actor with ActorLogging {
   val exception = new RuntimeException("Exception occurred")
@@ -19,7 +20,7 @@ class MyActor extends Actor with ActorLogging {
   }
 }
 // CSW-78: PrefixRedesign for logging
-class AkkaLoggerTest extends LoggingTestSuite with FunSuiteLike with Matchers {
+class AkkaLoggerTest extends LoggingTestSuite with AnyFunSuiteLike with Matchers {
 
   test("logging framework should capture akka log messages and log it") {
     val actorRef  = ActorSystem("test1").actorOf(Props(new MyActor()), "my-actor")

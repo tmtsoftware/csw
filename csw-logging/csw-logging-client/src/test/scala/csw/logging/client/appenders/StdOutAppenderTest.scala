@@ -6,14 +6,16 @@ import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.ConfigFactory
 import csw.logging.client.commons.{Category, LoggingKeys}
 import csw.logging.client.internal.JsonExtensions.RichJsObject
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import play.api.libs.json.{JsObject, Json}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 // DEOPSCSW-122: Allow local component logs to be output to STDOUT
-class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
+class StdOutAppenderTest extends AnyFunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
 
   private val actorSystem = ActorSystem(SpawnProtocol(), "test-1")
 

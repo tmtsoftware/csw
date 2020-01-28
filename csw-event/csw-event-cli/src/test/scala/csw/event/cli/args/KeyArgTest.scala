@@ -1,10 +1,11 @@
 package csw.event.cli.args
 
 import csw.params.core.models.Units.{volt, NoUnits}
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 // DEOPSCSW-436: [Event Cli] Specialized Publish command (take params from command line)
-class KeyArgTest extends FunSuite with Matchers {
+class KeyArgTest extends AnyFunSuite with Matchers {
 
   test("should able to parse valid ':' separated string when key name, type and units provided") {
     KeyArg("name:s:volt") shouldBe KeyArg("name", 's', volt)
