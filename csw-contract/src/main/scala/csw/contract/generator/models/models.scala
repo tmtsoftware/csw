@@ -1,5 +1,6 @@
 package csw.contract.generator.models
 
+import enumeratum._
 import io.bullet.borer.Dom.Element
 import io.bullet.borer.{Decoder, Encoder, Json}
 
@@ -10,6 +11,12 @@ case class Endpoint(requests: List[Element], responses: List[Element])
 
 // single file (e.g., registration.json)
 case class ModelAdt(models: List[Element])
+
+object ModelAdt {
+  import DomHelpers._
+  def apply(models: Element*): ModelAdt                 = new ModelAdt(models.toList)
+  def fromEnum[T <: EnumEntry](enum: Enum[T]): ModelAdt = new ModelAdt(enum.values.map(_.entryName).toList.map(encode[String]))
+}
 
 case class Service(
     // a folder called endpoints for all endpoints for this service
