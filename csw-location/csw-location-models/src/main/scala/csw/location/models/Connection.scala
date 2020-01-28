@@ -13,11 +13,6 @@ sealed abstract class Connection(val connectionType: ConnectionType) extends Loc
   self: TypedConnection[_] =>
 
   /**
-   * A covariant Location type
-   */
-  type L <: Location
-
-  /**
    * The component that is providing this connection
    */
   def componentId: ComponentId
@@ -52,9 +47,7 @@ sealed abstract class Connection(val connectionType: ConnectionType) extends Loc
  * @param connectionType represents the type of connection e.g akka, http, tcp
  * @tparam T represents the type of Location
  */
-abstract sealed class TypedConnection[T <: Location](connectionType: ConnectionType) extends Connection(connectionType) {
-  override type L = T
-}
+abstract sealed class TypedConnection[+T <: Location](connectionType: ConnectionType) extends Connection(connectionType)
 
 object Connection {
 
