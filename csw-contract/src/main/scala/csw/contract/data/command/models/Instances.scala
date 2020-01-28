@@ -21,7 +21,7 @@ object Instances extends CommandServiceCodecs {
   private val values  = 100
   private val prefix  = new Prefix(Subsystem.CSW, "someComponent")
   private val param   = encoder.set(values)
-  val id              = Id("runId")
+  val id: Id          = Id("runId")
 
   private val idleState: StateName = StateName("idle")
   val currentState: CurrentState   = CurrentState(prefix, idleState, Set(param))
