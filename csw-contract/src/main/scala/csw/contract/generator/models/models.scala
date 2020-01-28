@@ -20,9 +20,10 @@ object ModelAdt {
 }
 
 case class Service(
-    // a file called contract for all endpoints for this service
+    // a file called contract having sections for http and websocket endpoints for this service
     // List("register" -> {request:"",response:"",errors:[""]})
-    endpoints: List[Endpoint],
+    httpEndpoints: List[Endpoint],
+    webSocketEndpoints: List[Endpoint],
     // a folder called models for all models for this service
     // Map("registration" -> [])
     models: Map[String, ModelAdt]

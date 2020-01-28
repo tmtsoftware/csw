@@ -48,8 +48,10 @@ object Models extends LocationCodecs with LocationServiceCodecs {
 
   val register: LocationHttpMessage             = Register(akkaRegistration)
   val unregister: LocationHttpMessage           = Unregister(httpConnection)
+  val unregisterAll: LocationHttpMessage        = UnregisterAll
   val find: LocationHttpMessage                 = Find(akkaConnection)
   val resolve: LocationHttpMessage              = Resolve(akkaConnection, FiniteDuration(seconds, TimeUnit.SECONDS))
+  val listEntries: LocationHttpMessage          = ListEntries
   val listByComponentType: LocationHttpMessage  = ListByComponentType(ComponentType.HCD)
   val listByHostname: LocationHttpMessage       = ListByHostname("hostname")
   val listByConnectionType: LocationHttpMessage = ListByConnectionType(ConnectionType.AkkaType)
@@ -74,31 +76,36 @@ object Models extends LocationCodecs with LocationServiceCodecs {
       unregisterFailed,
       registrationListingFailed
     ),
-    name[LocationHttpMessage] -> ModelAdt(
+    "Requests" -> ModelAdt(
       register,
       unregister,
+      unregisterAll,
       find,
       resolve,
+      listEntries,
       listByComponentType,
       listByHostname,
       listByConnectionType,
-      listByPrefix
+      listByPrefix,
+      track
     ),
-    name[LocationWebsocketMessage] -> ModelAdt(track),
-    name[Subsystem]                -> ModelAdt.fromEnum(Subsystem),
-    name[Prefix]                   -> ModelAdt(prefix)
+    name[Subsystem] -> ModelAdt.fromEnum(Subsystem),
+    name[Prefix]    -> ModelAdt(prefix)
   )
 
-  val endpoints = List(
+  val httpEndpoints = List(
     Endpoint(name[Register], name[Location], List(name[RegistrationFailed])),
     Endpoint(name[Unregister], name[Done], List(name[UnregistrationFailed])),
-    Endpoint(name[UnregisterAll.type], name[Done], List(name[UnregistrationFailed])),
-    Endpoint(name[Find], optionName[Location], List()),
-    Endpoint(name[Resolve], optionName[Location], List()),
-    Endpoint(name[ListEntries.type], listName[Location], List(name[RegistrationListingFailed])),
+    Endpoint("UnregisterAll", name[Done], List(name[UnregistrationFailed])),
+    Endpoint(name[Find], optionName[Location], List.empty),
+    Endpoint(name[Resolve], optionName[Location], List.empty),
+    Endpoint("ListEntries", listName[Location], List(name[RegistrationListingFailed])),
     Endpoint(name[ListByComponentType], listName[Location], List(name[RegistrationListingFailed])),
     Endpoint(name[ListByConnectionType], listName[Location], List(name[RegistrationListingFailed])),
     Endpoint(name[ListByHostname], listName[Location], List(name[RegistrationListingFailed])),
     Endpoint(name[ListByPrefix], listName[Location], List(name[RegistrationListingFailed]))
+  )
+  val webSocketEndpoints = List(
+    Endpoint(name[Track], name[TrackingEvent], List.empty)
   )
 }
