@@ -3,9 +3,10 @@ package csw.time.core
 import java.time._
 
 import csw.time.core.models.{TAITime, UTCTime}
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class TMTTimeHelperTest extends FunSuite with Matchers {
+class TMTTimeHelperTest extends AnyFunSuite with Matchers {
   private val instant = ZonedDateTime.of(2007, 12, 3, 10, 15, 30, 11, ZoneOffset.UTC).toInstant
 
   /* TMTTime contains ZonedDateTime which has all the date time info along with Zone

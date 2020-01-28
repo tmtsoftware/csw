@@ -13,14 +13,16 @@ import csw.location.server.http.HTTPLocationService
 import org.jooq.DSLContext
 import org.scalatest.concurrent.PatienceConfiguration.Interval
 import org.scalatest.time.{Seconds, Span}
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import org.scalatest.BeforeAndAfterAll
 
 import scala.concurrent.ExecutionContext
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 //DEOPSCSW-620: Session Creation to access data
 //DEOPSCSW-621: Session creation to access data with single connection
 //DEOPSCSW-615: DB service accessible to CSW component developers
-class DatabaseServiceFactoryTest extends FunSuite with Matchers with BeforeAndAfterAll with HTTPLocationService {
+class DatabaseServiceFactoryTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with HTTPLocationService {
   private implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "test")
   private implicit val ec: ExecutionContext                            = typedSystem.executionContext
 

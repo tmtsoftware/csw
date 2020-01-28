@@ -7,10 +7,11 @@ import csw.config.models.FileType
 import csw.config.server.{ServerWiring, Settings}
 import csw.config.server.commons.SVNDirEntryExt.RichSvnDirEntry
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
-import org.scalatest.{FunSuite, Matchers}
 import org.tmatesoft.svn.core.{SVNDirEntry, SVNNodeKind}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class SVNDirEntryExtTest extends FunSuite with Matchers {
+class SVNDirEntryExtTest extends AnyFunSuite with Matchers {
   val settings: Settings = new ServerWiring().settings
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'

@@ -6,9 +6,10 @@ import csw.command.client.models.framework.LocationServiceUsage.{DoNotRegister, 
 import io.bullet.borer.Cbor
 import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.prop.Tables.Table
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class CborTest extends FunSuite with Matchers with MessageCodecs {
+class CborTest extends AnyFunSuite with Matchers with MessageCodecs {
   override implicit def actorSystem: ActorSystem[_] = ???
   test("should encode concrete-type LocationServiceUsage and decode base-type") {
     val testData = Table(

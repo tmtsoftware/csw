@@ -11,12 +11,19 @@ import csw.network.utils.Networks
 import csw.prefix.models.{Prefix, Subsystem}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.time.Span
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import org.scalatest.BeforeAndAfterAll
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class LocationServiceMultipleNICTest() extends FunSuite with Matchers with BeforeAndAfterAll with ScalaFutures with Eventually {
+class LocationServiceMultipleNICTest()
+    extends AnyFunSuite
+    with Matchers
+    with BeforeAndAfterAll
+    with ScalaFutures
+    with Eventually {
 
   implicit val patience: PatienceConfig =
     PatienceConfig(Span(5, org.scalatest.time.Seconds), Span(100, org.scalatest.time.Millis))

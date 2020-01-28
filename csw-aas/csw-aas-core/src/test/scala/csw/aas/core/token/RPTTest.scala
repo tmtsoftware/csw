@@ -7,15 +7,16 @@ import org.keycloak.representations.idm.authorization.AuthorizationResponse
 import org.mockito.MockitoSugar
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Seconds, Span}
-import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationDouble
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 // DEOPSCSW-558: SPIKE: Token containing user info and roles
 // DEOPSCSW-578: Programming Interface for accessing userinfo
-class RPTTest extends FunSuite with MockitoSugar with Matchers with ScalaFutures {
+class RPTTest extends AnyFunSuite with MockitoSugar with Matchers with ScalaFutures {
 
   implicit override val patienceConfig: PatienceConfig = PatienceConfig(Span(1, Seconds), Span(1, Seconds))
 

@@ -8,12 +8,14 @@ import csw.logging.client.appenders.{FileAppender, StdOutAppender}
 import csw.logging.client.exceptions.AppenderNotFoundException
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.models.Level
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import org.scalatest.BeforeAndAfterAll
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class LoggingSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
+class LoggingSystemTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
   // This will load default configuration in application.conf file if provided
   private var loggingSystem: LoggingSystem = _
   private val config                       = ConfigFactory.load().getConfig("csw-logging")

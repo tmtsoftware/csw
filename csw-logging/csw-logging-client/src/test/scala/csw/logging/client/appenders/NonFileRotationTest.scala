@@ -6,16 +6,18 @@ import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.ConfigFactory
 import csw.logging.client.commons.{Category, LoggingKeys}
 import csw.logging.client.utils.FileUtils
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import play.api.libs.json.{JsObject, Json}
 
 import scala.jdk.CollectionConverters._
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 // DEOPSCSW-281 Rolling File Configuration
 // DEOPSCSW-649: Fixed directory configuration for multi JVM scenario
-class NonFileRotationTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
+class NonFileRotationTest extends AnyFunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
   private val logFileDir = Paths.get("/tmp/csw-test-logs/").toFile
   private val map: Map[String, Any] = Map(
     "csw-logging.appender-config.file.rotate" -> false

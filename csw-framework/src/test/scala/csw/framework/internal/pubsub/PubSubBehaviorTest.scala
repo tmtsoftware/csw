@@ -14,12 +14,14 @@ import csw.logging.api.scaladsl.Logger
 import csw.params.core.states.{CurrentState, StateName}
 import csw.prefix.models.Prefix
 import org.mockito.MockitoSugar
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import org.scalatest.BeforeAndAfterAll
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
+class PubSubBehaviorTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
 
   trait MutableActorMock[T] {
     protected lazy val log: Logger = MockitoSugar.mock[Logger]

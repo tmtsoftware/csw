@@ -1,9 +1,10 @@
 package csw.config.api.commons
 
 import akka.util.ByteString
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class BinaryUtilsTest extends FunSuite with Matchers {
+class BinaryUtilsTest extends AnyFunSuite with Matchers {
   test("testIsNotTextIsFalseForMoreThan85percentASCIICharacters") {
     val testString = """testingIsNotTextShøuldReturnFålse"""
     BinaryUtils.isNotText(testString.getBytes) shouldBe false

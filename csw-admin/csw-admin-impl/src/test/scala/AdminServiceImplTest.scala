@@ -14,12 +14,14 @@ import csw.prefix.models.Subsystem
 import csw.prefix.models.Prefix
 import org.mockito.MockitoSugar._
 import org.scalatest.concurrent.ScalaFutures.convertScalaFuture
-import org.scalatest.{BeforeAndAfterEach, FunSuite, Matchers}
+import org.scalatest.BeforeAndAfterEach
 
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, Future}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class AdminServiceImplTest extends FunSuite with Matchers with BeforeAndAfterEach {
+class AdminServiceImplTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
 
   var actorTestKit: ActorTestKit = _
 

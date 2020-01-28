@@ -3,11 +3,12 @@ import com.typesafe.config.ConfigFactory
 import csw.alarm.api.exceptions.ConfigParseException
 import csw.alarm.client.internal.helpers.AlarmTestData
 import csw.commons.tagobjects.FileSystemSensitive
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 // DEOPSCSW-451: Create set of alarms based on Configuration file
 // DEOPSCSW-452: Represent alarm in a model as defined in Configuration file
-class ConfigParserTest extends FunSuite with Matchers with AlarmTestData {
+class ConfigParserTest extends AnyFunSuite with Matchers with AlarmTestData {
 
   test("should able to parse valid alarm metadata's config file") {
     val config = ConfigFactory.parseResources("test-alarms/valid-alarms.conf")

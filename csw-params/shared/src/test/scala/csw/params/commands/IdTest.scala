@@ -1,9 +1,10 @@
 package csw.params.commands
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 //DEOPSCSW-205 Return unique id on successful command verification
-class IdTest extends FunSuite with Matchers {
+class IdTest extends AnyFunSuite with Matchers {
   // No longer needed
   /*
   test("should able to create setup commands having unique runId") {

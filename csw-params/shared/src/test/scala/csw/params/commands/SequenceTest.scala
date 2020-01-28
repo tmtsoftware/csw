@@ -1,9 +1,10 @@
 package csw.params.commands
 
 import csw.prefix.models.Prefix
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class SequenceTest extends FunSuite with Matchers {
+class SequenceTest extends AnyFunSuite with Matchers {
 
   test("apply - create sequence from provided list of commands") {
     val setup    = Setup(Prefix("csw.setup"), CommandName("setup-test"), None)

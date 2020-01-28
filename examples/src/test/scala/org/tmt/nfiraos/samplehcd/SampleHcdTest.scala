@@ -13,13 +13,14 @@ import csw.params.events.{Event, EventKey, EventName, SystemEvent}
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.scaladsl.CSWService.{AlarmServer, EventServer}
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
-import org.scalatest.{BeforeAndAfterEach, FunSuiteLike}
+import org.scalatest.BeforeAndAfterEach
 
 import scala.collection.mutable
 import scala.concurrent.Await
+import org.scalatest.funsuite.AnyFunSuiteLike
 
 //#setup
-class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with FunSuiteLike with BeforeAndAfterEach {
+class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with AnyFunSuiteLike with BeforeAndAfterEach {
   import frameworkTestKit.frameworkWiring._
 
   override def beforeAll(): Unit = {

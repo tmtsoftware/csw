@@ -1,8 +1,7 @@
 package csw.event.cli
 
-import org.scalatest.Matchers
-
 import scala.io.Source
+import org.scalatest.matchers.should.Matchers
 
 object IterableExtensions extends Matchers {
 

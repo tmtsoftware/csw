@@ -2,13 +2,13 @@ package csw.framework.deploy.hostconfig
 
 import csw.commons.ResourceReader
 import csw.prefix.models.Subsystem.CSW
-import org.mockito.Mockito.{times, verify, when}
 import org.mockito.MockitoSugar
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 // DEOPSCSW-174: Starting Multiple Containers with an init Script
 // DEOPSCSW-314: End to End Automated Test for host-config-app
-class HostConfigTest extends FunSuite with MockitoSugar with Matchers {
+class HostConfigTest extends AnyFunSuite with MockitoSugar with Matchers {
 
   private val configPath            = ResourceReader.copyToTmp("/parsing_test_conf/hostconfig/valid_hostconfig.conf")
   private val containerCmdAppScript = "containerCmd.sh"

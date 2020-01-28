@@ -7,9 +7,10 @@ import csw.event.client.helpers.Utils
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.params.events.Event
-import org.scalatest.{BeforeAndAfterAll, FunSuite}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuite
 
-class InitialPublishLatencyTest extends FunSuite with BeforeAndAfterAll {
+class InitialPublishLatencyTest extends AnyFunSuite with BeforeAndAfterAll {
 
   private implicit val system: ActorSystem               = ActorSystem()
   private implicit val typedSystem: typed.ActorSystem[_] = system.toTyped

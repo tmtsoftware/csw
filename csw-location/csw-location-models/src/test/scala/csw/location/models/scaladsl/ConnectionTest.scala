@@ -4,10 +4,12 @@ import csw.location.models
 import csw.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.models.{ComponentId, ComponentType, Connection}
 import csw.prefix.models.{Prefix, Subsystem}
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 // CSW-86: Subsystem should be case-insensitive
-class ConnectionTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
+class ConnectionTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
   // DEOPSCSW-14: Codec for data model
   test("should able to form a string representation for akka connection for trombone HCD") {
     val expectedAkkaConnectionName = "NFIRAOS.tromboneHcd-hcd-akka"

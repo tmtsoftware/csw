@@ -16,14 +16,16 @@ import csw.commons.redis.EmbeddedRedis
 import csw.network.utils.SocketUtils.getFreePort
 import io.lettuce.core.RedisClient
 import org.mockito.MockitoSugar
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import romaine.RomaineFactory
 import romaine.async.RedisAsyncApi
 
 import scala.concurrent.ExecutionContext
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 class AlarmServiceTestSetup
-    extends FunSuite
+    extends AnyFunSuite
     with Matchers
     with MockitoSugar
     with EmbeddedRedis

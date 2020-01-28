@@ -1,9 +1,10 @@
 package csw.logging.client.models
 
 import csw.logging.models.Level.{DEBUG, ERROR}
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class ComponentLoggingStateTest extends FunSuite with Matchers {
+class ComponentLoggingStateTest extends AnyFunSuite with Matchers {
 
   test("should initialize component logging state with provided level") {
     val componentLoggingState = ComponentLoggingState(DEBUG)

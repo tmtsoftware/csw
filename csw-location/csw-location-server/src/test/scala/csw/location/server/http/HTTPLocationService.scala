@@ -4,10 +4,12 @@ import csw.location.server.commons.TestFutureExtension.RichFuture
 import csw.location.server.internal.ServerWiring
 import org.mockito.MockitoSugar
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuiteLike, Matchers}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
+import org.scalatest.funsuite.AnyFunSuiteLike
+import org.scalatest.matchers.should.Matchers
 
 trait HTTPLocationService
-    extends FunSuiteLike
+    extends AnyFunSuiteLike
     with Matchers
     with BeforeAndAfterAll
     with BeforeAndAfterEach

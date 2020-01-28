@@ -9,12 +9,13 @@ import akka.http.scaladsl.testkit.ScalatestRouteTest
 import csw.aas.core.token.AccessToken
 import csw.aas.http.AuthorizationPolicy.{ClientRolePolicy, CustomPolicy, PermissionPolicy, RealmRolePolicy}
 import org.mockito.MockitoSugar
-import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.Future
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
-class SecurityDirectivesTest extends FunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
+class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
   test("secure using customPolicy should return 200 OK when policy matches") {
     val authentication: Authentication = mock[Authentication]

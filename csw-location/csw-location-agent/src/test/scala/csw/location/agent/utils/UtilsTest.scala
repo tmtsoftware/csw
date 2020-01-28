@@ -4,9 +4,10 @@ import java.io.File
 
 import com.typesafe.config.Config
 import csw.commons.ResourceReader
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class UtilsTest extends FunSuite with Matchers {
+class UtilsTest extends AnyFunSuite with Matchers {
 
   // CSW-86: Subsystem should be case-insensitive
   test("testGetAppConfig") {

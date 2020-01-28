@@ -16,14 +16,15 @@ import csw.params.core.models.Coords.SolarSystemObject.Venus
 import csw.params.core.models.Units.{NoUnits, degree, meter, second}
 import csw.params.core.models._
 import csw.time.core.models.{TAITime, UTCTime}
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-185: Easy to Use Syntax/Api
 // DEOPSCSW-188: Efficient Serialization to/from JSON
 // DEOPSCSW-184: Change configurations - attributes and values
 // DEOPSCSW-196: Command Payloads for variable command content
-class KeyParameterTest extends FunSpec with Matchers {
+class KeyParameterTest extends AnyFunSpec with Matchers {
 
   private val s1: String = "encoder"
   private val s2: String = "filter"

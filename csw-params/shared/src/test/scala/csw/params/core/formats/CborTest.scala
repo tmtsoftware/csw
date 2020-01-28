@@ -7,9 +7,10 @@ import csw.params.events.{Event, EventName, ObserveEvent, SystemEvent}
 import csw.params.testdata.ParamSetData
 import csw.prefix.models.Prefix
 import io.bullet.borer.Cbor
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class CborTest extends FunSuite with Matchers {
+class CborTest extends AnyFunSuite with Matchers {
 
   private val prefix      = Prefix("wfos.blue.filter")
   private val eventName   = EventName("filter wheel")

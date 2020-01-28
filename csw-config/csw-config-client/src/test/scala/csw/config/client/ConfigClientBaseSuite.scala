@@ -5,10 +5,12 @@ import csw.config.server.mocks.MockedAuthentication
 import csw.location.server.internal.ServerWiring
 import org.mockito.MockitoSugar
 import org.scalatest._
+import org.scalatest.funsuite.AnyFunSuiteLike
+import org.scalatest.matchers.should.Matchers
 
 trait ConfigClientBaseSuite
     extends MockedAuthentication
-    with FunSuiteLike
+    with AnyFunSuiteLike
     with Matchers
     with BeforeAndAfterEach
     with BeforeAndAfterAll
