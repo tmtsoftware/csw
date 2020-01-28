@@ -10,20 +10,20 @@ import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.messages.LocationHttpMessage._
 import csw.location.api.messages.LocationWebsocketMessage.Track
 import csw.location.api.messages.{LocationHttpMessage, LocationWebsocketMessage}
-import csw.location.models.{ComponentType, ConnectionType, Location, TypedConnection}
+import csw.location.models.{ComponentType, ConnectionType, Location}
 import msocket.api.codecs.BasicCodecs
 
 import scala.concurrent.duration.FiniteDuration
 
 object Instances extends LocationServiceCodecs with BasicCodecs {
 
-  private val seconds                   = 23
-  val registerAkka: LocationHttpMessage = Register(akkaRegistration)
-  val registerHttp: LocationHttpMessage = Register(httpRegistration)
-  val unregister: LocationHttpMessage   = Unregister(httpConnection)
-  val find: LocationHttpMessage         = Find(akkaConnection.asInstanceOf[TypedConnection[Location]])
-  val resolve: LocationHttpMessage =
-    Resolve(akkaConnection.asInstanceOf[TypedConnection[Location]], FiniteDuration(seconds, TimeUnit.SECONDS))
+  val seconds = 23
+
+  val registerAkka: LocationHttpMessage         = Register(akkaRegistration)
+  val registerHttp: LocationHttpMessage         = Register(httpRegistration)
+  val unregister: LocationHttpMessage           = Unregister(httpConnection)
+  val find: LocationHttpMessage                 = Find(akkaConnection)
+  val resolve: LocationHttpMessage              = Resolve(akkaConnection, FiniteDuration(seconds, TimeUnit.SECONDS))
   val listByComponentType: LocationHttpMessage  = ListByComponentType(ComponentType.HCD)
   val listByHostname: LocationHttpMessage       = ListByHostname("hostname")
   val listByConnectionType: LocationHttpMessage = ListByConnectionType(ConnectionType.AkkaType)
