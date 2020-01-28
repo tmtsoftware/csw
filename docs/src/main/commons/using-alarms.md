@@ -55,7 +55,7 @@ Scala
 :   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/sampleassembly/SampleAssemblyHandlersAlarm.scala) { #alarm }
 
 Java
-:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/esw/sampleassembly/JSampleAssemblyHandlersAlarm.java) { #alarm }
+:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/sampleassembly/JSampleAssemblyHandlersAlarm.java) { #alarm }
 
 This code determines the severity of the alarm based on the rules we established above:
 
@@ -71,7 +71,7 @@ Scala
 :   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/sampleassembly/SampleAssemblyHandlersAlarm.scala) { #subscribe }
 
 Java
-:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/esw/sampleassembly/JSampleAssemblyHandlersAlarm.java) { #subscribe }
+:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/sampleassembly/JSampleAssemblyHandlersAlarm.java) { #subscribe }
 
 To see the effect, let's use the CLI to set up a subscription to the alarm.  Note the alarm key is the component's prefix 
 (`esw.sampleassembly` for Scala, `jsampleassembly` for Java), and the alarm name (`counterTooHighAlarm`).
