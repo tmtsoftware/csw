@@ -1,34 +1,24 @@
-package csw.contract.data.location.models
+package csw.contract.data.location
 
 import java.net.URI
 import java.util.concurrent.TimeUnit
 
 import akka.Done
-import csw.contract.generator.models.DomHelpers.encode
-import csw.contract.generator.models.ModelAdt
+import csw.contract.generator.models.ClassNameHelpers._
+import csw.contract.generator.models.{Endpoint, ModelAdt}
 import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.exceptions._
-import csw.location.api.messages.{LocationHttpMessage, LocationWebsocketMessage}
-import csw.location.api.messages.LocationHttpMessage.{
-  Find,
-  ListByComponentType,
-  ListByConnectionType,
-  ListByHostname,
-  ListByPrefix,
-  Register,
-  Resolve,
-  Unregister
-}
+import csw.location.api.messages.LocationHttpMessage._
 import csw.location.api.messages.LocationWebsocketMessage.Track
+import csw.location.api.messages.{LocationHttpMessage, LocationWebsocketMessage}
 import csw.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.models._
 import csw.location.models.codecs.LocationCodecs
 import csw.prefix.models.{Prefix, Subsystem}
-
+import csw.contract.generator.models.DomHelpers._
 import scala.concurrent.duration.FiniteDuration
-import scala.reflect.ClassTag
 
-object Instances extends LocationCodecs with LocationServiceCodecs {
+object Models extends LocationCodecs with LocationServiceCodecs {
   val port                     = 8080
   val prefix: Prefix           = Prefix(Subsystem.TCS, "filter.wheel")
   val componentId: ComponentId = ComponentId(prefix, ComponentType.HCD)
@@ -56,8 +46,7 @@ object Instances extends LocationCodecs with LocationServiceCodecs {
 
   val seconds = 23
 
-  val registerAkka: LocationHttpMessage         = Register(akkaRegistration)
-  val registerHttp: LocationHttpMessage         = Register(httpRegistration)
+  val register: LocationHttpMessage             = Register(akkaRegistration)
   val unregister: LocationHttpMessage           = Unregister(httpConnection)
   val find: LocationHttpMessage                 = Find(akkaConnection)
   val resolve: LocationHttpMessage              = Resolve(akkaConnection, FiniteDuration(seconds, TimeUnit.SECONDS))
@@ -70,28 +59,23 @@ object Instances extends LocationCodecs with LocationServiceCodecs {
 
   val done: Done = Done
 
-  //prefix and susbsystem
-
-  def name[T: ClassTag]: String = scala.reflect.classTag[T].runtimeClass.getSimpleName
-
   val models: Map[String, ModelAdt] = Map(
-    name[Registration] -> ModelAdt(akkaRegistration, httpRegistration, tcpRegistration),
-    "Location"         -> ModelAdt(akkaLocation, httpLocation, tcpLocation),
-    "TrackingEvent"    -> ModelAdt(locationUpdated, locationRemoved),
-    "ConnectionType"   -> ModelAdt.fromEnum(ConnectionType),
-    "ConnectionInfo"   -> ModelAdt(connectionInfo),
-    "Connection"       -> ModelAdt(akkaConnection, httpConnection, tcpConnection),
-    "ComponentId"      -> ModelAdt(ComponentId(prefix, ComponentType.HCD)),
-    "ComponentType"    -> ModelAdt.fromEnum(ComponentType),
-    "LocationServiceError" -> ModelAdt(
+    name[Registration]   -> ModelAdt(akkaRegistration, httpRegistration, tcpRegistration),
+    name[Location]       -> ModelAdt(akkaLocation, httpLocation, tcpLocation),
+    name[TrackingEvent]  -> ModelAdt(locationUpdated, locationRemoved),
+    name[ConnectionType] -> ModelAdt.fromEnum(ConnectionType),
+    name[ConnectionInfo] -> ModelAdt(connectionInfo),
+    name[Connection]     -> ModelAdt(akkaConnection, httpConnection, tcpConnection),
+    name[ComponentId]    -> ModelAdt(ComponentId(prefix, ComponentType.HCD)),
+    name[ComponentType]  -> ModelAdt.fromEnum(ComponentType),
+    name[LocationServiceError] -> ModelAdt(
       registrationFailed,
       otherLocationIsRegistered,
       unregisterFailed,
       registrationListingFailed
     ),
     name[LocationHttpMessage] -> ModelAdt(
-      registerAkka,
-      registerHttp,
+      register,
       unregister,
       find,
       resolve,
@@ -100,6 +84,21 @@ object Instances extends LocationCodecs with LocationServiceCodecs {
       listByConnectionType,
       listByPrefix
     ),
-    name[LocationWebsocketMessage] -> ModelAdt(track)
+    name[LocationWebsocketMessage] -> ModelAdt(track),
+    name[Subsystem]                -> ModelAdt.fromEnum(Subsystem),
+    name[Prefix]                   -> ModelAdt(prefix)
+  )
+
+  val endpoints = List(
+    Endpoint(name[Register], name[Location], List(name[RegistrationFailed])),
+    Endpoint(name[Unregister], name[Done], List(name[UnregistrationFailed])),
+    Endpoint(name[UnregisterAll.type], name[Done], List(name[UnregistrationFailed])),
+    Endpoint(name[Find], optionName[Location], List()),
+    Endpoint(name[Resolve], optionName[Location], List()),
+    Endpoint(name[ListEntries.type], listName[Location], List(name[RegistrationListingFailed])),
+    Endpoint(name[ListByComponentType], listName[Location], List(name[RegistrationListingFailed])),
+    Endpoint(name[ListByConnectionType], listName[Location], List(name[RegistrationListingFailed])),
+    Endpoint(name[ListByHostname], listName[Location], List(name[RegistrationListingFailed])),
+    Endpoint(name[ListByPrefix], listName[Location], List(name[RegistrationListingFailed]))
   )
 }
