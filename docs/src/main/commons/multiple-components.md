@@ -22,7 +22,7 @@ Scala
 :   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/sampleassembly/SampleAssemblyHandlers.scala) { #initialize }
 
 Java
-:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/esw/sampleassembly/JSampleAssemblyHandlers.java) { #initialize }
+:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/sampleassembly/JSampleAssemblyHandlers.java) { #initialize }
 
 Once again, ignore the code about setting up the event subscription. 
 This will be covered later when we discuss subscribing to events.
@@ -154,7 +154,7 @@ Scala
 :   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/sampleassembly/SampleAssemblyHandlers.scala) { #track-location }
 
 Java
-:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/esw/sampleassembly/JSampleAssemblyHandlers.java) { #track-location }
+:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/sampleassembly/JSampleAssemblyHandlers.java) { #track-location }
 
 
 
@@ -228,7 +228,7 @@ Scala
 :   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/sampleassembly/SampleAssemblyHandlers.scala) { #sending-command }
 
 Java
-:   @@snip [SampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/esw/sampleassembly/JSampleAssemblyHandlers.java) { #worker-actor }
+:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/sampleassembly/JSampleAssemblyHandlers.java) { #sending-command }
 
 This example shows a number of useful ideas. First, for a long-running
 command such as `mediumCommand`, `onSetup` calls the `sleepHCD` command and returns `Started` indicating to the caller that 
@@ -295,7 +295,7 @@ Scala
 :   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/sampleassembly/SampleAssemblyHandlers.scala) { #subscribe }
 
 Java
-:   @@snip [SampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/esw/sampleassembly/JSampleAssemblyHandlers.java) { #subscribe }
+:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/sampleassembly/JSampleAssemblyHandlers.java) { #subscribe }
 
 
 We use the `subscribeCallback` method from the API and specify the method `processEvent` as our callback, in which we 
@@ -309,7 +309,7 @@ Scala
 :   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/sampleassembly/SampleAssemblyHandlers.scala) { #initialize }
 
 Java
-:   @@snip [SampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/esw/sampleassembly/JSampleAssemblyHandlers.java) { #initialize }
+:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/sampleassembly/JSampleAssemblyHandlers.java) { #initialize }
 
 
 ## Deploying and Running Components

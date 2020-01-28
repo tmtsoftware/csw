@@ -279,7 +279,7 @@ Scala
 :   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/samplehcd/SampleHcdHandlers.scala) { #initialize }
 
 Java
-:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/org/tmt/esw/samplehcd/JSampleHcdHandlers.java) { #initialize }
+:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/samplehcd/JSampleHcdHandlers.java) { #initialize }
 
 
 In the example code, you'll notice we have added some functionality to start publishing events.  We will cover the Event Service later.
@@ -342,7 +342,7 @@ Scala
 :   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/samplehcd/SampleHcdHandlers.scala) { #validate }
 
 Java
-:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/org/tmt/esw/samplehcd/JSampleHcdHandlers.java) { #validate }
+:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/samplehcd/JSampleHcdHandlers.java) { #validate }
 
 
 ## Command Response
@@ -386,7 +386,7 @@ Scala
 :   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/samplehcd/SampleHcdHandlers.scala) { #onSetup }
 
 Java
-:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/org/tmt/esw/samplehcd/JSampleHcdHandlers.java) { #onSetup }
+:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/samplehcd/JSampleHcdHandlers.java) { #onSetup }
 
 
 In our example, the `hcdSleep` command has one parameter called `sleepTime`.  We retrieve this parameter from the `Setup` 
@@ -415,7 +415,7 @@ Scala
 :   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/samplehcd/SampleHcdHandlers.scala) { #worker-actor }
 
 Java
-:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/org/tmt/esw/samplehcd/JSampleHcdHandlers.java) { #worker-actor }
+:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/samplehcd/JSampleHcdHandlers.java) { #worker-actor }
 
 This worker actor simply takes the time passed in the message, sleeps that amount, 
 and then updates the `CommandResponseManager` that the command is complete. The scheduler of the TimeService is used
@@ -447,7 +447,7 @@ Scala
 :   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/samplehcd/SampleHcdHandlers.scala) { #publish }
 
 Java
-:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/org/tmt/esw/samplehcd/JSampleHcdHandlers.java) { #publish }
+:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/samplehcd/JSampleHcdHandlers.java) { #publish }
 
 We encapsulate the starting of the publishing in our method `publishCounter`.  Our `EventGenerator` is the `incrementCounterEvent`
 method which increments our integer variable `counter` and stores it in the `ParameterSet`
@@ -466,7 +466,7 @@ Scala
 :   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/samplehcd/SampleHcdHandlers.scala) { #initialize }
 
 Java
-:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/org/tmt/esw/samplehcd/JSampleHcdHandlers.java) { #initialize }
+:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/samplehcd/JSampleHcdHandlers.java) { #initialize }
 
 ## Starting CSW Services
 
