@@ -360,7 +360,7 @@ class LoggingConfigurationTest extends AnyFunSuite with Matchers with BeforeAndA
     }
     loggingSystem.getAppenders shouldBe List(StdOutAppender)
 
-    val expectedOneLineLog = " INFO   (LoggingConfigurationTest.scala 102) - Sample log message"
+    val expectedOneLineLog = " INFO   (LoggingConfigurationTest.scala 104) - Sample log message"
 
     val (timestamp, message) = os.toString.trim.splitAt(24)
 
