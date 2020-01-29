@@ -1,13 +1,13 @@
 package org.tmt.nfiraos.sampleassembly
 
-import csw.location.models.Connection.AkkaConnection
-import csw.location.models.{ComponentId, ComponentType}
+import csw.location.api.models.{ComponentId, ComponentType}
+import csw.location.api.models.Connection.AkkaConnection
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.scaladsl.CSWService.{AlarmServer, EventServer}
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
+import org.scalatest.funsuite.AnyFunSuiteLike
 
 import scala.concurrent.Await
-import org.scalatest.funsuite.AnyFunSuiteLike
 
 //#intro
 class SampleAssemblyTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with AnyFunSuiteLike {

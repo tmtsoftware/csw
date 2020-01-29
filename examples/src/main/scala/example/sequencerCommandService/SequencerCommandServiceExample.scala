@@ -4,14 +4,13 @@ import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.util.Timeout
 import csw.command.api.scaladsl.SequencerCommandService
 import csw.command.client.SequencerCommandServiceImpl
+import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.models.Connection.AkkaConnection
-import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.commands.{CommandName, Sequence, Setup}
-import csw.prefix.models.Subsystem
-import csw.prefix.models.Prefix
+import csw.prefix.models.{Prefix, Subsystem}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong

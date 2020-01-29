@@ -6,10 +6,10 @@ import akka.util.Timeout
 import csw.admin.api.{AdminService, UnresolvedAkkaLocationException}
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.{GetComponentLogMetadata, SetComponentLogLevel}
+import csw.location.api.models.ComponentId
 import csw.location.api.scaladsl.LocationService
-import csw.location.models.ComponentId
-import csw.location.models.ComponentType._
-import csw.location.models.Connection.AkkaConnection
+import csw.location.api.models.ComponentType._
+import csw.location.api.models.Connection.AkkaConnection
 import csw.logging.api.scaladsl.Logger
 import csw.logging.models.{Level, LogMetadata}
 

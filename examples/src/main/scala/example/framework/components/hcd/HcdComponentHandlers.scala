@@ -2,8 +2,7 @@ package example.framework.components.hcd
 
 import java.nio.file.Paths
 
-import akka.actor.typed.Scheduler
-import akka.actor.typed.ActorRef
+import akka.actor.typed.{ActorRef, Scheduler}
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.AskPattern.Askable
 import akka.util.Timeout
@@ -11,7 +10,7 @@ import csw.command.client.messages.TopLevelActorMessage
 import csw.config.api.ConfigData
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.models.{LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.location.api.models.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandResponse.{Accepted, Completed, SubmitResponse, ValidateCommandResponse}
 import csw.params.commands.{ControlCommand, Observe, Setup}

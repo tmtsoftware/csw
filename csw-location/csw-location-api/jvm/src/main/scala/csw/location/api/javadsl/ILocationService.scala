@@ -8,8 +8,8 @@ import java.{util => ju}
 
 import akka.Done
 import akka.stream.javadsl.Source
+import csw.location.api.models._
 import csw.location.api.scaladsl.LocationService
-import csw.location.models._
 import msocket.api.Subscription
 
 /**

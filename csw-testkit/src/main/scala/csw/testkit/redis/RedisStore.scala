@@ -6,8 +6,8 @@ import akka.actor.{ActorSystem, typed}
 import akka.util.Timeout
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.models.Connection.TcpConnection
-import csw.location.models.TcpRegistration
+import csw.location.api.models.Connection.TcpConnection
+import csw.location.api.models.TcpRegistration
 import csw.network.utils.SocketUtils.getFreePort
 import csw.testkit.internal.TestKitUtils
 import redis.embedded.{RedisSentinel, RedisServer}

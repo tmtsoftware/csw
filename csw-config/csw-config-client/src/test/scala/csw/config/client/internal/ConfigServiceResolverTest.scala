@@ -6,9 +6,9 @@ import csw.config.client.ConfigClientBaseSuite
 import csw.config.client.commons.ConfigServiceConnection
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.config.server.commons.TestFutureExtension.RichFuture
+import csw.location.api.models
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.models.HttpLocation
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -39,7 +39,7 @@ class ConfigServiceResolverTest extends ConfigClientBaseSuite {
 
     val mockedLocationService  = mock[LocationService]
     val uri                    = new URI(s"http://config-host:4000")
-    val resolvedConfigLocation = Future(Some(HttpLocation(ConfigServiceConnection.value, uri)))
+    val resolvedConfigLocation = Future(Some(models.HttpLocation(ConfigServiceConnection.value, uri)))
     when(mockedLocationService.resolve(ConfigServiceConnection.value, 5.seconds)).thenReturn(resolvedConfigLocation)
 
     val configServiceResolver = new ConfigServiceResolver(mockedLocationService, actorRuntime)

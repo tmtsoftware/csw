@@ -1,9 +1,9 @@
-package csw.location.models.codecs
+package csw.location.api.codec
 
 import java.net.URI
 
 import com.github.ghik.silencer.silent
-import csw.location.models._
+import csw.location.api.models._
 import csw.prefix.codecs.CommonCodecs
 import io.bullet.borer.Codec
 import io.bullet.borer.derivation.CompactMapBasedCodecs.deriveCodec

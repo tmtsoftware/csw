@@ -4,7 +4,7 @@ import akka.actor.typed.{ActorRef, ActorSystem}
 import csw.command.client.messages.sequencer.SequencerMsg
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.location.api.extensions.URIExtension.RichURI
-import csw.location.models.AkkaLocation
+import csw.location.api.models.AkkaLocation
 
 import scala.reflect.ClassTag
 

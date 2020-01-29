@@ -2,7 +2,6 @@ package csw.location.api.codec
 
 import csw.location.api.exceptions._
 import csw.location.api.messages.{LocationHttpMessage, LocationWebsocketMessage}
-import csw.location.models.codecs.LocationCodecs
 import io.bullet.borer.Codec
 import io.bullet.borer.derivation.MapBasedCodecs.deriveAllCodecs
 import msocket.api.ErrorProtocol

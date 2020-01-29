@@ -18,8 +18,8 @@ import csw.command.client.models.framework.{ComponentInfo, LifecycleStateChanged
 import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestSuite
 import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInitializeTimeout}
-import csw.location.models.ComponentType.{Assembly, HCD}
-import csw.location.models.{Connection, Registration}
+import csw.location.api.models.ComponentType.{Assembly, HCD}
+import csw.location.api.models.{Connection, Registration}
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
 import csw.params.core.generics.{KeyType, Parameter}

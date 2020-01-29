@@ -5,17 +5,17 @@ import java.util.concurrent.TimeUnit
 
 import akka.Done
 import csw.contract.generator.models.ClassNameHelpers._
+import csw.contract.generator.models.DomHelpers._
 import csw.contract.generator.models.{Endpoint, ModelAdt}
-import csw.location.api.codec.LocationServiceCodecs
+import csw.location.api.codec.{LocationCodecs, LocationServiceCodecs}
 import csw.location.api.exceptions._
 import csw.location.api.messages.LocationHttpMessage._
 import csw.location.api.messages.LocationWebsocketMessage.Track
 import csw.location.api.messages.{LocationHttpMessage, LocationWebsocketMessage}
-import csw.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.location.models._
-import csw.location.models.codecs.LocationCodecs
+import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.location.api.models._
 import csw.prefix.models.{Prefix, Subsystem}
-import csw.contract.generator.models.DomHelpers._
+
 import scala.concurrent.duration.FiniteDuration
 
 object Models extends LocationCodecs with LocationServiceCodecs {

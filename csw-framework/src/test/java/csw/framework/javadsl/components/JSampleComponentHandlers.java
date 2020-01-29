@@ -13,7 +13,7 @@ import csw.event.api.javadsl.IEventService;
 import csw.framework.CurrentStatePublisher;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
-import csw.location.models.TrackingEvent;
+import csw.location.api.models.TrackingEvent;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.*;
 import csw.params.commands.CommandResponse.*;

@@ -8,7 +8,7 @@ import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.event.client.internal.commons.EventServiceConnection
 import csw.location.api.scaladsl.RegistrationResult
-import csw.location.models.Connection.TcpConnection
+import csw.location.api.models.Connection.TcpConnection
 import csw.network.utils.SocketUtils.getFreePort
 import csw.testkit.redis.RedisStore
 

@@ -19,10 +19,11 @@ object Dependencies {
     )
   )
 
-  val LocationModels = Def.setting(
+  val LocationApi = Def.setting(
     Seq(
       Libs.`enumeratum`.value,
       Libs.`play-json`.value,
+      MSocket.`msocket-api`.value,
       Libs.`scalatest`.value % Test
     )
   )

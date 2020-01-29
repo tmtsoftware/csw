@@ -5,7 +5,7 @@ import csw.command.client.messages.CommandSerializationMarker._
 import csw.command.client.messages.sequencer.SequencerMsg
 import csw.command.client.models.framework.PubSub.SubscriberMessage
 import csw.command.client.models.framework._
-import csw.location.models.TrackingEvent
+import csw.location.api.models.TrackingEvent
 import csw.logging.models.{Level, LogMetadata}
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand

@@ -8,9 +8,9 @@ import csw.config.server.ServerWiring
 import csw.config.server.commons.ConfigServiceConnection
 import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.location.api.exceptions.OtherLocationIsRegistered
+import csw.location.api.models
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.models.HttpRegistration
 import csw.location.server.http.HTTPLocationService
 import csw.network.utils.Networks
 
@@ -26,7 +26,7 @@ class HttpServiceTest extends HTTPLocationService {
 
   override def beforeAll(): Unit = {
     super.beforeAll()
-    testLocationService.register(HttpRegistration(AASConnection.value, AASPort, "auth")).await
+    testLocationService.register(models.HttpRegistration(AASConnection.value, AASPort, "auth")).await
   }
 
   override def afterAll(): Unit = {
@@ -62,7 +62,7 @@ class HttpServiceTest extends HTTPLocationService {
     val _servicePort = 4007
     val serverWiring = ServerWiring.make(Some(_servicePort))
     import serverWiring._
-    locationService.register(HttpRegistration(ConfigServiceConnection.value, 21212, "")).await
+    locationService.register(models.HttpRegistration(ConfigServiceConnection.value, 21212, "")).await
 
     locationService.find(ConfigServiceConnection.value).await.get.connection shouldBe ConfigServiceConnection.value
 

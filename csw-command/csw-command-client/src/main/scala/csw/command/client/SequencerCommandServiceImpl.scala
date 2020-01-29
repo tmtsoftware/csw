@@ -9,7 +9,7 @@ import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.internal.Timeouts
 import csw.command.client.messages.sequencer.SequencerMsg
 import csw.command.client.messages.sequencer.SequencerMsg.{Query, QueryFinal, SubmitSequence}
-import csw.location.models.AkkaLocation
+import csw.location.api.models.AkkaLocation
 import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.commands.Sequence
 import csw.params.core.models.Id

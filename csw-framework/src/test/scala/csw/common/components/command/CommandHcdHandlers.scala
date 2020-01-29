@@ -5,7 +5,7 @@ import csw.command.client.messages.TopLevelActorMessage
 import csw.common.components.command.CommandComponentState._
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.models.TrackingEvent
+import csw.location.api.models.TrackingEvent
 import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandIssue.OtherIssue
 import csw.params.commands.CommandResponse._

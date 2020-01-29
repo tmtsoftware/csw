@@ -10,9 +10,9 @@ import com.typesafe.config.ConfigFactory
 import csw.aas.core.commons.AASConnection
 import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.config.server.commons.{ConfigServiceConnection, TestFileUtils}
+import csw.location.api.models
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.models.HttpRegistration
 import csw.location.server.http.HTTPLocationService
 import org.tmatesoft.svn.core.SVNException
 
@@ -31,7 +31,7 @@ class MainTest extends HTTPLocationService {
     super.beforeAll()
     testFileUtils.deleteServerFiles()
     //register AAS with location service
-    locationService.register(HttpRegistration(AASConnection.value, AASPort, "auth"))
+    locationService.register(models.HttpRegistration(AASConnection.value, AASPort, "auth"))
   }
 
   override def afterEach(): Unit = testFileUtils.deleteServerFiles()

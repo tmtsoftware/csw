@@ -9,7 +9,7 @@ import csw.command.api.scaladsl.CommandService
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.internal.{CommandServiceImpl, JCommandServiceImpl}
 import csw.command.client.messages.ComponentMessage
-import csw.location.models.{AkkaLocation, HttpLocation, Location, TcpLocation}
+import csw.location.api.models.{AkkaLocation, HttpLocation, Location, TcpLocation}
 import msocket.api.ContentType.Json
 import msocket.impl.post.HttpPostTransport
 import msocket.impl.ws.WebsocketTransport

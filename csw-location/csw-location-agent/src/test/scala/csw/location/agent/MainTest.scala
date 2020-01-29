@@ -7,15 +7,16 @@ import akka.actor.typed.scaladsl.Behaviors
 import com.typesafe.config.ConfigFactory
 import csw.commons.ResourceReader
 import csw.location.agent.common.TestFutureExtension.RichFuture
+import csw.location.api.models
+import csw.location.api.models.{ComponentId, ComponentType}
+import csw.location.api.models.Connection.{HttpConnection, TcpConnection}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.models.Connection.{HttpConnection, TcpConnection}
-import csw.location.models.{ComponentId, ComponentType}
 import csw.network.utils.Networks
 import csw.prefix.models.Prefix
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
+import org.scalatest.funsuite.AnyFunSuiteLike
 
 import scala.concurrent.duration._
-import org.scalatest.funsuite.AnyFunSuiteLike
 
 // DEOPSCSW-592: Create csw testkit for component writers
 class MainTest extends ScalaTestFrameworkTestKit with AnyFunSuiteLike {
@@ -74,7 +75,7 @@ class MainTest extends ScalaTestFrameworkTestKit with AnyFunSuiteLike {
   private def testWithHttp(args: Array[String], name: String, port: Int, path: String) = {
     val process = Main.start(args).get
 
-    val connection       = HttpConnection(ComponentId(Prefix(name), ComponentType.Service))
+    val connection       = HttpConnection(models.ComponentId(Prefix(name), ComponentType.Service))
     val resolvedLocation = locationService.resolve(connection, 5.seconds).await.get
 
     resolvedLocation.connection shouldBe connection

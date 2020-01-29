@@ -12,8 +12,8 @@ import csw.aas.core.deployment.{AuthConfig, AuthServiceLocation}
 import csw.aas.core.token.{AccessToken, TokenFactory}
 import csw.aas.http.AuthorizationPolicy.PolicyExpression.{And, Or}
 import csw.aas.http.AuthorizationPolicy.{EmptyPolicy, _}
+import csw.location.api.models.HttpLocation
 import csw.location.api.scaladsl.LocationService
-import csw.location.models.HttpLocation
 
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, ExecutionContext, Future}

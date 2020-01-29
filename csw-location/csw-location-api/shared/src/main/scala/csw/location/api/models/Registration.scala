@@ -1,9 +1,9 @@
-package csw.location.models
+package csw.location.api.models
 
 import java.net.URI
 
-import csw.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.location.models.codecs.LocationSerializable
+import csw.location.api.codec.LocationSerializable
+import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 
 /**
  * Registration holds information about a connection and its live location. This model is used to register a connection with LocationService.

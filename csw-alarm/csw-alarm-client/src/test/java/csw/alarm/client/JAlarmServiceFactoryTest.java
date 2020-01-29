@@ -2,7 +2,6 @@ package csw.alarm.client;
 
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.SpawnProtocol;
-import akka.actor.typed.javadsl.Behaviors;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import csw.alarm.api.javadsl.IAlarmService;
@@ -13,7 +12,7 @@ import csw.alarm.models.FullAlarmSeverity;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
-import csw.location.models.TcpRegistration;
+import csw.location.api.models.TcpRegistration;
 import csw.location.server.http.JHTTPLocationService;
 import org.junit.*;
 import org.scalatestplus.junit.JUnitSuite;

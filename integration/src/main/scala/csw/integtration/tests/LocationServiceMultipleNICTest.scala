@@ -1,22 +1,22 @@
 package csw.integtration.tests
 
 import csw.integtration.common.TestFutureExtension.RichFuture
+import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.models.Connection.AkkaConnection
-import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.server.commons.ClusterAwareSettings
 import csw.location.server.internal.ServerWiring
 import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.network.utils.Networks
 import csw.prefix.models.{Prefix, Subsystem}
-import org.scalatest.concurrent.{Eventually, ScalaFutures}
-import org.scalatest.time.Span
 import org.scalatest.BeforeAndAfterAll
+import org.scalatest.concurrent.{Eventually, ScalaFutures}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.time.Span
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
-import org.scalatest.funsuite.AnyFunSuite
-import org.scalatest.matchers.should.Matchers
 
 class LocationServiceMultipleNICTest()
     extends AnyFunSuite

@@ -24,17 +24,17 @@ import csw.config.client.scaladsl.ConfigClientFactory
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.mocks.MockedAuthentication
 import csw.config.server.{ServerWiring, Settings}
+import csw.location.api.models
+import csw.location.api.models.{ComponentId, ComponentType}
+import csw.location.api.models.Connection.AkkaConnection
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.location.models.ComponentType.Container
-import csw.location.models.Connection.AkkaConnection
-import csw.location.models.{ComponentId, ComponentType}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse.Invalid
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, StateName}
-import csw.prefix.models.Subsystem.CSW
+import csw.prefix.models.Subsystem.{CSW, Container}
 import csw.prefix.models.{Prefix, Subsystem}
 
 import scala.concurrent.duration.DurationLong
@@ -160,7 +160,7 @@ class ContainerCmdTest(ignore: Int)
 
       // resolve and send message to component running in different jvm or on different physical machine
       val etonSupervisorF =
-        locationService.resolve(AkkaConnection(ComponentId(Prefix(Subsystem.IRIS, "Eton"), ComponentType.HCD)), 2.seconds)
+        locationService.resolve(AkkaConnection(models.ComponentId(Prefix(Subsystem.IRIS, "Eton"), ComponentType.HCD)), 2.seconds)
       val etonSupervisorLocation = Await.result(etonSupervisorF, 15.seconds).get
 
       val etonSupervisorTypedRef = etonSupervisorLocation.componentRef

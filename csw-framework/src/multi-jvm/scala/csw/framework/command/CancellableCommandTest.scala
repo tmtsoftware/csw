@@ -7,9 +7,9 @@ import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
 import csw.common.components.command.ComponentStateForCommand.{acceptedCmd, cancelCmd, prefix}
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
+import csw.location.api.models.{ComponentId, ComponentType}
+import csw.location.api.models.Connection.AkkaConnection
 import csw.location.helpers.{LSNodeSpec, OneMemberAndSeed}
-import csw.location.models.Connection.AkkaConnection
-import csw.location.models.{ComponentId, ComponentType}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup

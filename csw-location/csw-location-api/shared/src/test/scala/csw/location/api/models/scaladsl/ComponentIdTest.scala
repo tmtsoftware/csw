@@ -1,6 +1,6 @@
-package csw.location.models.scaladsl
+package csw.location.api.models.scaladsl
 
-import csw.location.models.{ComponentId, ComponentType}
+import csw.location.api.models.{ComponentId, ComponentType}
 import csw.prefix.models.{Prefix, Subsystem}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import org.scalatest.funsuite.AnyFunSuite
