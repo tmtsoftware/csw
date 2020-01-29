@@ -71,7 +71,7 @@ object Jackson {
 }
 
 object Akka {
-  val Version = "2.6.2" //all akka is Apache License 2.0
+  val Version = "2.6.3" //all akka is Apache License 2.0
 
   val `akka-stream`              = "com.typesafe.akka" %% "akka-stream"              % Version
   val `akka-stream-typed`        = "com.typesafe.akka" %% "akka-stream-typed"        % Version
@@ -118,7 +118,7 @@ object Jooq {
 }
 
 object MSocket {
-  val Version = "4bfc50d"
+  val Version = "57a4ca8"
 
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-impl-jvm` = "com.github.tmtsoftware.msocket" %% "msocket-impl-jvm" % Version
