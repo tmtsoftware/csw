@@ -71,7 +71,8 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
 
   test("Supervisor should support concurrent updates to log-levels of components") {
     // start LoggingSystem to initialize logLevel, akkaLogLevel, slf4jLogLevel to legitimate level instead of staying null
-    // null levels error out while serializing LogMetadata
+    // null levels error out while serializing LogMetadata (expected in production that LoggingSystem will be started and
+    // then someone can query `GetLogMetadata`)
     LoggingSystemFactory.start("test", "test", "test", typedSystem)
 
     val supervisorBehaviorTestKit = BehaviorTestKit(supervisorBehavior)

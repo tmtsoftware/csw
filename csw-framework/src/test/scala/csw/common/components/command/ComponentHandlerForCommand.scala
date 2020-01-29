@@ -8,7 +8,7 @@ import akka.stream.ThrottleMode
 import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.models.TrackingEvent
+import csw.location.api.models.TrackingEvent
 import csw.params.commands.CommandIssue.{OtherIssue, WrongPrefixIssue}
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{ControlCommand, Result, Setup}

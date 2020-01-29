@@ -1,7 +1,8 @@
-package csw.location.models
+package csw.location.api.models
 
-import csw.location.models.ConnectionType.{AkkaType, HttpType, TcpType}
-import csw.location.models.codecs.LocationSerializable
+import csw.location.api.codec.LocationSerializable
+import csw.location.api.models
+import csw.location.api.models.ConnectionType.{AkkaType, HttpType, TcpType}
 import csw.prefix.models.Prefix
 
 /**
@@ -59,7 +60,7 @@ object Connection {
    */
   def from(input: String): Connection = input.split("-") match {
     case Array(name, componentType, connectionType) =>
-      from(ConnectionInfo(Prefix(name), ComponentType.withName(componentType), ConnectionType.withName(connectionType)))
+      from(models.ConnectionInfo(Prefix(name), ComponentType.withName(componentType), ConnectionType.withName(connectionType)))
     case _ => throw new IllegalArgumentException(s"Unable to parse '$input' to make Connection object")
   }
 

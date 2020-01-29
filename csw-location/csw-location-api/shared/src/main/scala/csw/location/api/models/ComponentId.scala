@@ -1,4 +1,4 @@
-package csw.location.models
+package csw.location.api.models
 
 import csw.prefix.models.Prefix
 

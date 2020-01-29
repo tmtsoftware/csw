@@ -17,10 +17,10 @@ import csw.common.utils.TestAppender
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
+import csw.location.api.models.ComponentType.HCD
+import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.location.client.ActorSystemFactory
-import csw.location.models.ComponentType.HCD
-import csw.location.models.Connection.AkkaConnection
-import csw.location.models.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.models.Level.INFO
 import csw.params.core.states.{CurrentState, StateName}

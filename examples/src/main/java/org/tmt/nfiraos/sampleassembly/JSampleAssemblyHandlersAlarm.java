@@ -13,7 +13,7 @@ import csw.command.client.messages.TopLevelActorMessage;
 import csw.event.api.javadsl.IEventSubscription;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
-import csw.location.models.*;
+import csw.location.api.models.*;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.CommandName;
 import csw.params.commands.CommandResponse;

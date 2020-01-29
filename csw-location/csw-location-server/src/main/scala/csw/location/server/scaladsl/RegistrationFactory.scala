@@ -3,8 +3,8 @@ package csw.location.server.scaladsl
 import akka.actor.typed.ActorRef
 import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
-import csw.location.models.AkkaRegistration
-import csw.location.models.Connection.AkkaConnection
+import csw.location.api.models.AkkaRegistration
+import csw.location.api.models.Connection.AkkaConnection
 
 /**
  * `RegistrationFactory` helps creating an AkkaRegistration. It is currently used by `csw-framework` to register different components on jvm boot-up.

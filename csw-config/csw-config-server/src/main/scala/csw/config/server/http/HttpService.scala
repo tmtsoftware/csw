@@ -8,8 +8,8 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import csw.config.server.commons.{ConfigServerLogger, ConfigServiceConnection}
 import csw.config.server.{ActorRuntime, Settings}
+import csw.location.api.models.HttpRegistration
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
-import csw.location.models
 import csw.logging.api.scaladsl.Logger
 import csw.network.utils.{Networks, SocketUtils}
 
@@ -81,7 +81,7 @@ class HttpService(
   }
 
   private def register(binding: ServerBinding): Future[RegistrationResult] = {
-    val registration = models.HttpRegistration(
+    val registration = HttpRegistration(
       connection = ConfigServiceConnection.value,
       port = binding.localAddress.getPort,
       path = ""

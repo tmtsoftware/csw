@@ -6,14 +6,14 @@ import csw.command.client.models.framework.LocationServiceUsage.{DoNotRegister, 
 import csw.framework.models.ConfigFileLocation.{Local, Remote}
 import csw.framework.models.ContainerMode.{Container, Standalone}
 import csw.framework.models.{ContainerBootstrapInfo, ContainerInfo, HostBootstrapInfo}
-import csw.location.models.ComponentType.{Assembly, HCD}
-import csw.location.models.Connection
+import csw.location.api.models.ComponentType.{Assembly, HCD}
+import csw.location.api.models.Connection
 import csw.prefix.models.Prefix
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration.DurationInt
 import scala.jdk.CollectionConverters._
-import org.scalatest.funsuite.AnyFunSuite
-import org.scalatest.matchers.should.Matchers
 
 // DEOPSCSW-167: Creation and Deployment of Standalone Components
 // DEOPSCSW-170: Starting component using a file format

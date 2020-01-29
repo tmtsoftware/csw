@@ -12,16 +12,15 @@ import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentState._
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
+import csw.location.api
+import csw.location.api.models.ComponentType.{Assembly, HCD}
+import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{ComponentId, HttpRegistration, TcpRegistration}
 import csw.location.client.ActorSystemFactory
-import csw.location.models
-import csw.location.models.ComponentType.{Assembly, HCD}
-import csw.location.models.Connection.AkkaConnection
-import csw.location.models.{ComponentId, HttpRegistration, TcpRegistration}
 import csw.params.commands
 import csw.params.commands.CommandName
 import csw.params.core.states.{CurrentState, StateName}
-import csw.prefix.models.Subsystem
-import csw.prefix.models.Prefix
+import csw.prefix.models.{Prefix, Subsystem}
 import io.lettuce.core.RedisClient
 
 import scala.concurrent.TimeoutException
@@ -31,8 +30,8 @@ import scala.concurrent.duration.DurationLong
 class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 
-  private val filterAssemblyConnection = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "Filter"), Assembly))
-  private val disperserHcdConnection   = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "Disperser"), HCD))
+  private val filterAssemblyConnection = AkkaConnection(api.models.ComponentId(Prefix(Subsystem.TCS, "Filter"), Assembly))
+  private val disperserHcdConnection   = AkkaConnection(api.models.ComponentId(Prefix(Subsystem.TCS, "Disperser"), HCD))
 
   override def afterAll(): Unit = {
     super.afterAll()
@@ -107,7 +106,7 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
     val assemblySupervisor = Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring).await
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")
-    val akkaConnection                = AkkaConnection(models.ComponentId(Prefix(Subsystem.IRIS, "IFS_Detector"), HCD))
+    val akkaConnection                = AkkaConnection(ComponentId(Prefix(Subsystem.IRIS, "IFS_Detector"), HCD))
 
     assertThatSupervisorIsRunning(assemblySupervisor, supervisorLifecycleStateProbe, 5.seconds)
 

@@ -1,7 +1,7 @@
 package csw.config.client.commons
 
-import csw.location.models.Connection.HttpConnection
-import csw.location.models.{ComponentId, ComponentType}
+import csw.location.api.models.{ComponentId, ComponentType}
+import csw.location.api.models.Connection.HttpConnection
 import csw.prefix.models.{Prefix, Subsystem}
 
 /**

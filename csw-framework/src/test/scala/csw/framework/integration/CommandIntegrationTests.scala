@@ -16,17 +16,17 @@ import csw.common.FrameworkAssertions._
 import csw.common.components.command.CommandComponentState._
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
+import csw.location.api.models
+import csw.location.api.models.{ComponentId, ComponentType}
+import csw.location.api.models.ComponentType.{Assembly, HCD}
+import csw.location.api.models.Connection.AkkaConnection
 import csw.location.client.ActorSystemFactory
-import csw.location.models.{ComponentId, ComponentType}
-import csw.location.models.ComponentType.{Assembly, HCD}
-import csw.location.models.Connection.AkkaConnection
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup
 import csw.params.core.generics.KeyType
 import csw.params.core.models.{ObsId, Units}
 import csw.params.core.states.{CurrentState, StateName}
-import csw.prefix.models.Subsystem
-import csw.prefix.models.Prefix
+import csw.prefix.models.{Prefix, Subsystem}
 import io.lettuce.core.RedisClient
 
 import scala.concurrent.duration.DurationLong
@@ -40,8 +40,8 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
   private val wfosContainerConnection = AkkaConnection(
     ComponentId(Prefix(Subsystem.Container, "WFOS_Container"), ComponentType.Container)
   )
-  private val filterAssemblyConnection = AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "FilterASS"), Assembly))
-  private val filterHCDConnection      = AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "FilterHCD"), HCD))
+  private val filterAssemblyConnection = AkkaConnection(models.ComponentId(Prefix(Subsystem.WFOS, "FilterASS"), Assembly))
+  private val filterHCDConnection      = AkkaConnection(models.ComponentId(Prefix(Subsystem.WFOS, "FilterHCD"), HCD))
   private val containerActorSystem: ActorSystem[SpawnProtocol.Command] =
     ActorSystemFactory.remote(SpawnProtocol(), "container-system")
   val obsId                         = Some(ObsId("Obs001"))

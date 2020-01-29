@@ -5,7 +5,7 @@ import csw.command.client.messages.TopLevelActorMessage
 import csw.database.DatabaseServiceFactory
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.models.TrackingEvent
+import csw.location.api.models.TrackingEvent
 import csw.params.commands.CommandResponse.Completed
 import csw.params.commands.{CommandResponse, ControlCommand}
 import csw.params.core.models.Id

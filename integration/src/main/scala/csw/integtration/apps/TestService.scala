@@ -1,10 +1,10 @@
 package csw.integtration.apps
 
 import csw.integtration.common.TestFutureExtension.RichFuture
+import csw.location.api.models.Connection.HttpConnection
+import csw.location.api.models.{ComponentId, ComponentType, HttpRegistration}
 import csw.location.api.scaladsl.RegistrationResult
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.models.Connection.HttpConnection
-import csw.location.models.{ComponentId, ComponentType, HttpRegistration}
 import csw.location.server.internal.ServerWiring
 import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.prefix.models.{Prefix, Subsystem}

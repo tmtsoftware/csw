@@ -1,7 +1,7 @@
 package csw.database.commons
 
-import csw.location.models.Connection.TcpConnection
-import csw.location.models.{ComponentId, ComponentType}
+import csw.location.api.models.{ComponentId, ComponentType}
+import csw.location.api.models.Connection.TcpConnection
 import csw.prefix.models.{Prefix, Subsystem}
 
 /**

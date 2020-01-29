@@ -25,7 +25,7 @@ import csw.command.client.models.framework.SupervisorLifecycleState._
 import csw.command.client.models.framework.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.command.client.models.framework._
 import csw.commons.ResourceReader
-import csw.location.models.ComponentType
+import csw.location.api.models.ComponentType
 import csw.logging.models.{Level, LogMetadata}
 import csw.params.commands.CommandResponse._
 import csw.params.commands._

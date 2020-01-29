@@ -6,7 +6,7 @@ import csw.database.DatabaseServiceFactory;
 import csw.database.javadsl.JooqHelper;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
-import csw.location.models.TrackingEvent;
+import csw.location.api.models.TrackingEvent;
 import csw.params.commands.CommandResponse;
 import csw.params.commands.ControlCommand;
 import csw.params.core.models.Id;

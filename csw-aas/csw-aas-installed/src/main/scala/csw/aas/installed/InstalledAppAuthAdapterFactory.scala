@@ -5,8 +5,8 @@ import csw.aas.core.TokenVerifier
 import csw.aas.core.deployment.{AuthConfig, AuthServiceLocation}
 import csw.aas.installed.api.{AuthStore, InstalledAppAuthAdapter}
 import csw.aas.installed.internal.InstalledAppAuthAdapterImpl
+import csw.location.api.models.HttpLocation
 import csw.location.api.scaladsl.LocationService
-import csw.location.models.HttpLocation
 import org.keycloak.adapters.installed.KeycloakInstalled
 
 import scala.concurrent.duration.DurationInt

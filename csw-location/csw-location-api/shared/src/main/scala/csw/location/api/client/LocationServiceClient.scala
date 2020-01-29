@@ -7,8 +7,8 @@ import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.messages.LocationHttpMessage._
 import csw.location.api.messages.LocationWebsocketMessage.Track
 import csw.location.api.messages.{LocationHttpMessage, LocationWebsocketMessage}
+import csw.location.api.models._
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
-import csw.location.models._
 import msocket.api.codecs.BasicCodecs
 import msocket.api.{Subscription, Transport}
 

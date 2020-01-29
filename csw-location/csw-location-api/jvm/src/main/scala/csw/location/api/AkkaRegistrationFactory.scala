@@ -4,8 +4,8 @@ import java.net.URI
 
 import csw.location.api.commons.LocationServiceLogger
 import csw.location.api.exceptions.LocalAkkaActorRegistrationNotAllowed
-import csw.location.models.AkkaRegistration
-import csw.location.models.Connection.AkkaConnection
+import csw.location.api.models.AkkaRegistration
+import csw.location.api.models.Connection.AkkaConnection
 import csw.logging.api.scaladsl.Logger
 
 /**
@@ -29,6 +29,6 @@ object AkkaRegistrationFactory {
       throw registrationNotAllowed
     }
 
-    AkkaRegistration(connection, actorRefURI)
+    models.AkkaRegistration(connection, actorRefURI)
   }
 }

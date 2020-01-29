@@ -16,10 +16,10 @@ import csw.location.api.exceptions.{
   RegistrationListingFailed,
   UnregistrationFailed
 }
+import csw.location.api.models.ComponentType.{Assembly, HCD, Sequencer}
+import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
+import csw.location.api.models._
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
-import csw.location.models.ComponentType.{Assembly, HCD, Sequencer}
-import csw.location.models.Connection.{AkkaConnection, HttpConnection}
-import csw.location.models._
 import csw.location.server.commons.{CswCluster, LocationServiceLogger}
 import csw.location.server.internal.Registry.AllServices
 import csw.location.server.internal.StreamExt.RichSource

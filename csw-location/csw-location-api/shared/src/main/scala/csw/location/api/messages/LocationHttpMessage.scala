@@ -1,6 +1,6 @@
 package csw.location.api.messages
 
-import csw.location.models._
+import csw.location.api.models._
 
 import scala.concurrent.duration.FiniteDuration
 

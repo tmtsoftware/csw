@@ -1,21 +1,21 @@
 package example.teskit
 
 import com.typesafe.config.ConfigFactory
+import csw.location.api.models
+import csw.location.api.models.ComponentType.Assembly
+import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.models.ComponentId
-import csw.location.models.ComponentType.Assembly
-import csw.location.models.Connection.AkkaConnection
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.FrameworkTestKit
 import csw.testkit.scaladsl.CSWService.{ConfigServer, EventServer}
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
+import org.scalatest.funsuite.AnyFunSuiteLike
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.{BeforeAndAfterAll, OptionValues}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
-import org.scalatest.funsuite.AnyFunSuiteLike
-import org.scalatest.matchers.should.Matchers
 
 class TestKitsExampleTest extends AnyFunSuiteLike with BeforeAndAfterAll with Matchers with OptionValues {
 
@@ -48,7 +48,7 @@ class TestKitsExampleTest extends AnyFunSuiteLike with BeforeAndAfterAll with Ma
 
     //#spawn-using-testkit
 
-    val connection       = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "SampleAssembly"), Assembly))
+    val connection       = AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "SampleAssembly"), Assembly))
     val assemblyLocation = Await.result(locationService.resolve(connection, 5.seconds), 10.seconds)
     assemblyLocation.value.connection shouldBe connection
   }

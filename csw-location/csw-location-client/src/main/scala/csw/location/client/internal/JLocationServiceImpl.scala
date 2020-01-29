@@ -9,8 +9,8 @@ import java.util.function.Consumer
 import akka.Done
 import akka.stream.javadsl.Source
 import csw.location.api.javadsl.{ILocationService, IRegistrationResult}
+import csw.location.api.models._
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
-import csw.location.models._
 import msocket.api.Subscription
 
 import scala.compat.java8.DurationConverters.DurationOps

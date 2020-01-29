@@ -2,13 +2,13 @@ package csw.aas.core.deployment
 import java.net.URI
 
 import com.typesafe.config.{ConfigException, ConfigFactory, ConfigValueFactory}
-import csw.location.models.Connection.HttpConnection
-import csw.location.models.{ComponentId, ComponentType, HttpLocation}
+import csw.location.api.models.Connection.HttpConnection
+import csw.location.api.models.{ComponentId, ComponentType, HttpLocation}
 import csw.prefix.models.{Prefix, Subsystem}
-
-import scala.jdk.CollectionConverters._
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+
+import scala.jdk.CollectionConverters._
 
 class AuthConfigTest extends AnyFunSuite with Matchers {
   test("should create KeycloakDeployment from config") {

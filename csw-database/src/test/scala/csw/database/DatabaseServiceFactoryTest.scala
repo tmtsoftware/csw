@@ -6,18 +6,18 @@ import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import csw.database.DatabaseServiceFactory.{ReadPasswordHolder, ReadUsernameHolder}
 import csw.database.commons.{DBTestHelper, DatabaseServiceConnection}
 import csw.database.scaladsl.JooqExtentions.{RichQuery, RichResultQuery}
+import csw.location.api.models
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.models.TcpRegistration
 import csw.location.server.http.HTTPLocationService
 import org.jooq.DSLContext
-import org.scalatest.concurrent.PatienceConfiguration.Interval
-import org.scalatest.time.{Seconds, Span}
 import org.scalatest.BeforeAndAfterAll
-
-import scala.concurrent.ExecutionContext
+import org.scalatest.concurrent.PatienceConfiguration.Interval
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.time.{Seconds, Span}
+
+import scala.concurrent.ExecutionContext
 
 //DEOPSCSW-620: Session Creation to access data
 //DEOPSCSW-621: Session creation to access data with single connection
@@ -42,7 +42,7 @@ class DatabaseServiceFactoryTest extends AnyFunSuite with Matchers with BeforeAn
 
     super.beforeAll()
     locationService
-      .register(TcpRegistration(DatabaseServiceConnection.value, port))
+      .register(models.TcpRegistration(DatabaseServiceConnection.value, port))
       .futureValue(Interval(Span(5, Seconds)))
   }
 

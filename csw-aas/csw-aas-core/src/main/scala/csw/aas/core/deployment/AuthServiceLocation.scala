@@ -1,8 +1,8 @@
 package csw.aas.core.deployment
 
 import csw.aas.core.commons.{AASConnection, AuthLogger}
+import csw.location.api.models.{HttpLocation, HttpRegistration}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
-import csw.location.models.{HttpLocation, HttpRegistration}
 
 import scala.async.Async.{async, _}
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
