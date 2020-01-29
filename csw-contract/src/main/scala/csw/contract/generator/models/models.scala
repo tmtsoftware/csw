@@ -8,25 +8,25 @@ import scala.language.implicitConversions
 import scala.reflect.ClassTag
 
 // single file (e.g., contract.json)
-case class Endpoint(request: String, response: String, errors: List[String] = Nil)
+case class Endpoint(request: Element, responseType: String, errorTypes: List[String] = Nil)
 
 // single file (e.g., registration.json)
-case class ModelAdt(models: List[Element])
+case class ModelType(models: List[Element])
 
-object ModelAdt {
+object ModelType {
   import DomHelpers._
-  def apply(models: Element*): ModelAdt                 = new ModelAdt(models.toList)
-  def fromEnum[T <: EnumEntry](enum: Enum[T]): ModelAdt = new ModelAdt(enum.values.map(_.entryName).toList.map(encode[String]))
+  def apply(models: Element*): ModelType                 = new ModelType(models.toList)
+  def fromEnum[T <: EnumEntry](enum: Enum[T]): ModelType = new ModelType(enum.values.map(_.entryName).toList.map(encode[String]))
 }
 
 case class Service(
     // a file called contract having sections for http and websocket endpoints for this service
     // List("register" -> {request:"",response:"",errors:[""]})
-    httpEndpoints: List[Endpoint],
-    webSocketEndpoints: List[Endpoint],
+    `http-endpoints`: Map[String, Endpoint],
+    `websocket-endpoints`: Map[String, Endpoint],
     // a folder called models for all models for this service
     // Map("registration" -> [])
-    models: Map[String, ModelAdt]
+    models: Map[String, ModelType]
 )
 
 case class Services(data: Map[String, Service])
@@ -37,7 +37,7 @@ object DomHelpers {
 }
 
 object ClassNameHelpers {
-  def name[T: ClassTag]: String       = scala.reflect.classTag[T].runtimeClass.getSimpleName
-  def listName[T: ClassTag]: String   = s"List[${name[T]}]"
-  def optionName[T: ClassTag]: String = s"Option[${name[T]}]"
+  def name[T: ClassTag]: String                = scala.reflect.classTag[T].runtimeClass.getSimpleName
+  def arrayName[T: ClassTag]: String           = s"[${name[T]}]"
+  def objectName[T <: Singleton](x: T): String = x.toString
 }

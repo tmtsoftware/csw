@@ -4,15 +4,10 @@ import java.net.URI
 import java.nio.file.{Files, Paths}
 
 import csw.contract.generator.models.DomHelpers._
-import csw.contract.generator.models.{Endpoint, Service, Services}
+import csw.contract.generator.models.{Endpoint, ModelType, Service, Services}
 import csw.location.api.codec.LocationServiceCodecs
-import csw.location.api.exceptions.{LocationServiceError, RegistrationFailed}
-import csw.location.api.messages.LocationHttpMessage
-import csw.location.api.messages.LocationHttpMessage.Register
-import csw.location.api.models
-import csw.location.api.models.{AkkaRegistration, ComponentId, Registration}
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.models.{AkkaRegistration, ComponentType, Registration}
+import csw.location.models.Connection.AkkaConnection
+import csw.location.models._
 import csw.prefix.models.Prefix
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
@@ -27,22 +22,32 @@ class FilesGeneratorTest extends FunSuite with Matchers with BeforeAndAfterAll w
     }
   }
   test("should generate samples for given services") {
-    val componentId: ComponentId                 = models.ComponentId(Prefix("tcs.filter.wheel"), ComponentType.HCD)
-    val akkaConnection: AkkaConnection           = AkkaConnection(componentId)
-    val akkaRegistration: Registration           = AkkaRegistration(akkaConnection, new URI("some_path"))
-    val registerAkka: LocationHttpMessage        = Register(akkaRegistration)
-    val registrationFailed: LocationServiceError = RegistrationFailed("message")
-    val endpoints: Map[String, Endpoint] = Map(
-      "register" -> Endpoint(
-        requests = List(registerAkka),
-        responses = List(registrationFailed)
+    val componentId: ComponentId       = ComponentId(Prefix("tcs.filter.wheel"), ComponentType.HCD)
+    val akkaConnection: AkkaConnection = AkkaConnection(componentId)
+    val akkaLocation: Location         = AkkaLocation(akkaConnection, new URI("some_path"))
+    val httpEndpoints: List[Endpoint] = List(
+      Endpoint(
+        request = "Register",
+        response = "RegistrationFailed",
+        errors = Nil
       )
+    )
+    val websocketEndpoints: List[Endpoint] = List(
+      Endpoint(
+        request = "Track",
+        response = "TrackingEvent",
+        errors = List("ServiceError")
+      )
+    )
+    val models: Map[String, ModelType] = Map(
+      "Registration" -> ModelType(akkaLocation)
     )
     val services: Services = Services(
       Map(
         "location" -> Service(
-          endpoints,
-          Map.empty
+          httpEndpoints = httpEndpoints,
+          webSocketEndpoints = websocketEndpoints,
+          models
         )
       )
     )
