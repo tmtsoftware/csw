@@ -19,12 +19,14 @@ import csw.prefix.models.{Prefix, Subsystem}
 import scala.concurrent.duration.FiniteDuration
 
 object LocationData extends LocationCodecs with LocationServiceCodecs {
-  val port                     = 8080
-  val seconds                  = 23
-  private val pathString       = "path"
-  private val uriPath          = new URI("path")
-  private val message          = "failure message"
-  private val hostname         = "hostname"
+  val port       = 8080
+  val seconds    = 23
+  val pathString = "path"
+  val uriPath    = new URI("path")
+  val message    = "failure message"
+  val hostname   = "hostname"
+  val done: Done = Done
+
   val prefix: Prefix           = Prefix(Subsystem.TCS, "filter.wheel")
   val componentId: ComponentId = ComponentId(prefix, ComponentType.HCD)
 
@@ -61,8 +63,6 @@ object LocationData extends LocationCodecs with LocationServiceCodecs {
   val listByPrefix: LocationHttpMessage         = ListByPrefix(prefix.toString)
 
   val track: LocationWebsocketMessage = Track(akkaConnection)
-
-  val done: Done = Done
 
   val models: Map[String, ModelType] = Map(
     name[Registration]   -> ModelType(akkaRegistration, httpRegistration, tcpRegistration),
