@@ -10,7 +10,7 @@ import csw.command.api.messages.{CommandServiceHttpMessage, CommandServiceWebsoc
 import csw.command.api.{DemandMatcher, DemandMatcherAll, PresenceMatcher, StateMatcher}
 import csw.contract.generator.models.ClassNameHelpers.name
 import csw.contract.generator.models.DomHelpers._
-import csw.contract.generator.models.{Endpoint, ModelAdt}
+import csw.contract.generator.models.{Endpoint, ModelType}
 import csw.params.commands.CommandIssue.OtherIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
@@ -21,7 +21,7 @@ import csw.prefix.models.{Prefix, Subsystem}
 
 import scala.concurrent.duration.FiniteDuration
 
-object Models extends CommandServiceCodecs {
+object CommandData extends CommandServiceCodecs {
   val values                = 100
   val encoder: Key[Int]     = KeyType.IntKey.make("encoder")
   val prefix                = new Prefix(Subsystem.CSW, "someComponent")
@@ -50,44 +50,30 @@ object Models extends CommandServiceCodecs {
   val presenceMatcher: StateMatcher  = PresenceMatcher(prefix, idleState, timeout)
 
   val observeValidate: CommandServiceHttpMessage     = Validate(observe)
-  val setupValidate: CommandServiceHttpMessage       = Validate(setup)
   val observeSubmit: CommandServiceHttpMessage       = Submit(observe)
-  val setupSubmit: CommandServiceHttpMessage         = Submit(setup)
   val observeOneway: CommandServiceHttpMessage       = Oneway(observe)
-  val setupOneway: CommandServiceHttpMessage         = Oneway(setup)
   val setupQuery: CommandServiceHttpMessage          = Query(id)
   val queryFinal: CommandServiceWebsocketMessage     = QueryFinal(id, timeout)
   val subscribeState: CommandServiceWebsocketMessage = SubscribeCurrentState(states)
 
-  val models: Map[String, ModelAdt] = Map(
-    name[ControlCommand]   -> ModelAdt(observe, setup),
-    name[Id]               -> ModelAdt(id),
-    name[StateName]        -> ModelAdt(idleState),
-    name[SubmitResponse]   -> ModelAdt(cancelled, completed, error, invalid, locked, started),
-    name[OnewayResponse]   -> ModelAdt(accepted, invalid, locked),
-    name[ValidateResponse] -> ModelAdt(accepted, invalid, locked),
-    name[CurrentState]     -> ModelAdt(currentState),
-    "Requests" -> ModelAdt(
-      observeValidate,
-      setupValidate,
-      observeSubmit,
-      setupSubmit,
-      observeOneway,
-      setupOneway,
-      setupQuery,
-      queryFinal,
-      subscribeState
-    )
+  val models: Map[String, ModelType] = Map(
+    name[ControlCommand]   -> ModelType(observe, setup),
+    name[Id]               -> ModelType(id),
+    name[StateName]        -> ModelType(idleState),
+    name[SubmitResponse]   -> ModelType(cancelled, completed, error, invalid, locked, started),
+    name[OnewayResponse]   -> ModelType(accepted, invalid, locked),
+    name[ValidateResponse] -> ModelType(accepted, invalid, locked),
+    name[CurrentState]     -> ModelType(currentState)
   )
 
-  val httpEndpoints = List(
-    Endpoint(name[Validate], name[ValidateResponse]),
-    Endpoint(name[Submit], name[SubmitResponse]),
-    Endpoint(name[Query], name[SubmitResponse]),
-    Endpoint(name[Oneway], name[OnewayResponse])
+  val httpEndpoints = Map(
+    name[Validate] -> Endpoint(observeValidate, name[ValidateResponse]),
+    name[Submit]   -> Endpoint(observeSubmit, name[SubmitResponse]),
+    name[Query]    -> Endpoint(queryFinal, name[SubmitResponse]),
+    name[Oneway]   -> Endpoint(observeOneway, name[OnewayResponse])
   )
-  val webSocketsEndpoints = List(
-    Endpoint(name[QueryFinal], name[SubmitResponse]),
-    Endpoint(name[SubscribeCurrentState], name[CurrentState])
+  val webSocketsEndpoints = Map(
+    name[QueryFinal]            -> Endpoint(queryFinal, name[SubmitResponse]),
+    name[SubscribeCurrentState] -> Endpoint(subscribeState, name[CurrentState])
   )
 }

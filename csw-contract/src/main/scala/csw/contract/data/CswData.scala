@@ -6,14 +6,14 @@ object CswData {
   val services: Services = Services(
     Map(
       "location" -> Service(
-        location.Models.httpEndpoints,
-        location.Models.webSocketEndpoints,
-        location.Models.models
+        location.LocationData.httpEndpoints,
+        location.LocationData.webSocketEndpoints,
+        location.LocationData.models
       ),
       "command" -> Service(
-        command.Models.httpEndpoints,
-        command.Models.webSocketsEndpoints,
-        command.Models.models
+        command.CommandData.httpEndpoints,
+        command.CommandData.webSocketsEndpoints,
+        command.CommandData.models
       )
     )
   )
