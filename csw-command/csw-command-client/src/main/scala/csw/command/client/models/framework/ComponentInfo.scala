@@ -11,7 +11,7 @@ import scala.jdk.CollectionConverters._
  *
  * @param prefix prefix for the component with `subsystem` and `name`
  * @param componentType
- *  : the type of the component as defined by [[ComponentType]]
+ *  : the type of the component as defined by [[csw.location.api.models.ComponentType]]
  * @param behaviorFactoryClassName
  *  : specifies the component to be created by name of the class of it's factory
  * @param locationServiceUsage
