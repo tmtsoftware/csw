@@ -97,8 +97,8 @@ object Models extends LocationCodecs with LocationServiceCodecs {
     Endpoint(name[Register], name[Location], List(name[RegistrationFailed])),
     Endpoint(name[Unregister], name[Done], List(name[UnregistrationFailed])),
     Endpoint("UnregisterAll", name[Done], List(name[UnregistrationFailed])),
-    Endpoint(name[Find], optionName[Location], List.empty),
-    Endpoint(name[Resolve], optionName[Location], List.empty),
+    Endpoint(name[Find], optionName[Location]),
+    Endpoint(name[Resolve], optionName[Location]),
     Endpoint("ListEntries", listName[Location], List(name[RegistrationListingFailed])),
     Endpoint(name[ListByComponentType], listName[Location], List(name[RegistrationListingFailed])),
     Endpoint(name[ListByConnectionType], listName[Location], List(name[RegistrationListingFailed])),
@@ -106,6 +106,6 @@ object Models extends LocationCodecs with LocationServiceCodecs {
     Endpoint(name[ListByPrefix], listName[Location], List(name[RegistrationListingFailed]))
   )
   val webSocketEndpoints = List(
-    Endpoint(name[Track], name[TrackingEvent], List.empty)
+    Endpoint(name[Track], name[TrackingEvent])
   )
 }

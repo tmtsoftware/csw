@@ -8,7 +8,7 @@ import scala.language.implicitConversions
 import scala.reflect.ClassTag
 
 // single file (e.g., contract.json)
-case class Endpoint(request: String, response: String, errors: List[String])
+case class Endpoint(request: String, response: String, errors: List[String] = Nil)
 
 // single file (e.g., registration.json)
 case class ModelAdt(models: List[Element])
