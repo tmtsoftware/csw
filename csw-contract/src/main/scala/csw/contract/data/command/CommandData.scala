@@ -7,7 +7,6 @@ import csw.command.api.codecs.CommandServiceCodecs
 import csw.command.api.messages.CommandServiceHttpMessage.{Oneway, Query, Submit, Validate}
 import csw.command.api.messages.CommandServiceWebsocketMessage.{QueryFinal, SubscribeCurrentState}
 import csw.command.api.messages.{CommandServiceHttpMessage, CommandServiceWebsocketMessage}
-import csw.command.api.{DemandMatcher, DemandMatcherAll, PresenceMatcher, StateMatcher}
 import csw.contract.generator.models.ClassNameHelpers.name
 import csw.contract.generator.models.DomHelpers._
 import csw.contract.generator.models.{Endpoint, ModelType}
@@ -16,8 +15,9 @@ import csw.params.commands.CommandResponse._
 import csw.params.commands._
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.{Id, ObsId}
-import csw.params.core.states.{CurrentState, DemandState, StateName}
+import csw.params.core.states.{CurrentState, StateName}
 import csw.prefix.models.{Prefix, Subsystem}
+import enumeratum.EnumEntry
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -43,11 +43,7 @@ object CommandData extends CommandServiceCodecs {
   val observe: ControlCommand = Observe(prefix, CommandName("command"), Some(ObsId("obsId")))
   val setup: ControlCommand   = Setup(prefix, CommandName("command"), Some(ObsId("obsId")))
 
-  val timeout: Timeout               = Timeout(FiniteDuration(values, TimeUnit.SECONDS))
-  val state: DemandState             = DemandState(prefix, idleState, Set(param))
-  val demandMatcher: StateMatcher    = DemandMatcher(state, withUnits = true, timeout)
-  val demandMatcherAll: StateMatcher = DemandMatcherAll(state, timeout)
-  val presenceMatcher: StateMatcher  = PresenceMatcher(prefix, idleState, timeout)
+  val timeout: Timeout = Timeout(FiniteDuration(values, TimeUnit.SECONDS))
 
   val observeValidate: CommandServiceHttpMessage     = Validate(observe)
   val observeSubmit: CommandServiceHttpMessage       = Submit(observe)
@@ -57,13 +53,14 @@ object CommandData extends CommandServiceCodecs {
   val subscribeState: CommandServiceWebsocketMessage = SubscribeCurrentState(states)
 
   val models: Map[String, ModelType] = Map(
-    name[ControlCommand]   -> ModelType(observe, setup),
-    name[Id]               -> ModelType(id),
-    name[StateName]        -> ModelType(idleState),
-    name[SubmitResponse]   -> ModelType(cancelled, completed, error, invalid, locked, started),
-    name[OnewayResponse]   -> ModelType(accepted, invalid, locked),
-    name[ValidateResponse] -> ModelType(accepted, invalid, locked),
-    name[CurrentState]     -> ModelType(currentState)
+    name[ControlCommand]     -> ModelType(observe, setup),
+    name[Id]                 -> ModelType(id),
+    name[KeyType[EnumEntry]] -> ModelType.fromEnum(KeyType),
+    name[StateName]          -> ModelType(idleState),
+    name[SubmitResponse]     -> ModelType(cancelled, completed, error, invalid, locked, started),
+    name[OnewayResponse]     -> ModelType(accepted, invalid, locked),
+    name[ValidateResponse]   -> ModelType(accepted, invalid, locked),
+    name[CurrentState]       -> ModelType(currentState)
   )
 
   val httpEndpoints = Map(
