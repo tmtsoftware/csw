@@ -94,7 +94,7 @@ trait CommandService {
   def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse]
 
   /**
-   * Subscribe to the current state of a component corresponding to the [[AkkaLocation]] of the component
+   * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
    *
    * @param names subscribe to states which have any of the provided value for name.
    *              If no states are provided, all the current states will be received.
@@ -103,7 +103,7 @@ trait CommandService {
   def subscribeCurrentState(names: Set[StateName] = Set.empty): Source[CurrentState, Subscription]
 
   /**
-   * Subscribe to the current state of a component corresponding to the [[AkkaLocation]] of the component
+   * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
    *
    * @note Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
    * @param callback the action to be applied on the CurrentState element received as a result of subscription
@@ -112,7 +112,7 @@ trait CommandService {
   def subscribeCurrentState(callback: CurrentState => Unit): Subscription
 
   /**
-   * Subscribe to the current state of a component corresponding to the [[AkkaLocation]] of the component
+   * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
    *
    * @note Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
    * @param names subscribe to only those states which have any of the provided value for name
