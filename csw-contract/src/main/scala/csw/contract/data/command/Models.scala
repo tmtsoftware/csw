@@ -81,13 +81,13 @@ object Models extends CommandServiceCodecs {
   )
 
   val httpEndpoints = List(
-    Endpoint(name[Validate], name[ValidateResponse], List.empty),
-    Endpoint(name[Submit], name[SubmitResponse], List.empty),
-    Endpoint(name[Query], name[SubmitResponse], List.empty),
-    Endpoint(name[Oneway], name[OnewayResponse], List.empty)
+    Endpoint(name[Validate], name[ValidateResponse]),
+    Endpoint(name[Submit], name[SubmitResponse]),
+    Endpoint(name[Query], name[SubmitResponse]),
+    Endpoint(name[Oneway], name[OnewayResponse])
   )
   val webSocketsEndpoints = List(
-    Endpoint(name[QueryFinal], name[SubmitResponse], List.empty),
-    Endpoint(name[SubscribeCurrentState], name[CurrentState], List.empty)
+    Endpoint(name[QueryFinal], name[SubmitResponse]),
+    Endpoint(name[SubscribeCurrentState], name[CurrentState])
   )
 }
