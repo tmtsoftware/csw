@@ -14,8 +14,8 @@ case class ModelType(models: List[Element])
 
 object ModelType {
   import DomHelpers._
-  def apply(models: Element*): ModelType                 = new ModelType(models.toList)
-  def fromEnum[T <: EnumEntry](enum: Enum[T]): ModelType = new ModelType(enum.values.map(_.entryName).toList.map(encode[String]))
+  def apply(models: Element*): ModelType                    = new ModelType(models.toList)
+  def apply[T <: EnumEntry: Enum](enum: Enum[T]): ModelType = new ModelType(enum.values.toList.map(_.entryName))
 }
 
 case class Service(
@@ -31,8 +31,8 @@ case class Service(
 case class Services(data: Map[String, Service])
 
 object DomHelpers {
-  implicit def encode[T: Encoder: Decoder](x: T): Element           = Json.decode(Json.encode(x).toByteArray).to[Element].value
-  implicit def encodeList[T: Encoder: Decoder](x: List[T]): Element = Json.decode(Json.encode(x).toByteArray).to[Element].value
+  implicit def encode[T: Encoder: Decoder](x: T): Element                  = Json.decode(Json.encode(x).toByteArray).to[Element].value
+  implicit def encodeList[T: Encoder: Decoder](xs: List[T]): List[Element] = xs.map(encode[T])
 }
 
 object ClassNameHelpers {
