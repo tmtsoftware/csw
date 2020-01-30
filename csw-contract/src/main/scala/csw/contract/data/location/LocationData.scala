@@ -68,18 +68,18 @@ object LocationData extends LocationCodecs with LocationServiceCodecs {
     name[Registration]   -> ModelType(akkaRegistration, httpRegistration, tcpRegistration),
     name[Location]       -> ModelType(akkaLocation, httpLocation, tcpLocation),
     name[TrackingEvent]  -> ModelType(locationUpdated, locationRemoved),
-    name[ConnectionType] -> ModelType.fromEnum(ConnectionType),
+    name[ConnectionType] -> ModelType(ConnectionType),
     name[ConnectionInfo] -> ModelType(connectionInfo),
     name[Connection]     -> ModelType(akkaConnection, httpConnection, tcpConnection),
     name[ComponentId]    -> ModelType(ComponentId(prefix, ComponentType.HCD)),
-    name[ComponentType]  -> ModelType.fromEnum(ComponentType),
+    name[ComponentType]  -> ModelType(ComponentType),
     name[LocationServiceError] -> ModelType(
       registrationFailed,
       otherLocationIsRegistered,
       unregisterFailed,
       registrationListingFailed
     ),
-    name[Subsystem] -> ModelType.fromEnum(Subsystem),
+    name[Subsystem] -> ModelType(Subsystem),
     name[Prefix]    -> ModelType(prefix)
   )
 

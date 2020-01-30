@@ -10,6 +10,7 @@ import io.bullet.borer.{AdtEncodingStrategy, Codec, Decoder, Encoder}
 
 import scala.concurrent.duration.FiniteDuration
 
+object CommonCodecs extends CommonCodecs
 trait CommonCodecs {
   implicit val flatAdtEncoding: AdtEncodingStrategy = AdtEncodingStrategy.flat()
 
