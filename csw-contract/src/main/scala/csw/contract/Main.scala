@@ -8,6 +8,5 @@ object Main {
     val DefaultOutputPath = "csw-contract/target/output"
     val outputPath        = if (args.isEmpty) DefaultOutputPath else args(0)
     FilesGenerator.generate(CswData.services, outputPath)
-    FilesGenerator.generateEntireJson(CswData.services, outputPath)
   }
 }

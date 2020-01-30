@@ -10,4 +10,5 @@ trait ContractCodecs {
 
   implicit lazy val serviceCodec: Codec[Service]   = deriveCodec
   implicit lazy val servicesCodec: Codec[Services] = deriveCodec
+  implicit lazy val contractCodec: Codec[Contract] = deriveCodec
 }

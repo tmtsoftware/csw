@@ -17,9 +17,11 @@ object ModelType {
   def apply[T <: EnumEntry: Enum](enum: Enum[T]): ModelType = new ModelType(enum.values.toList.map(_.entryName))
 }
 
+case class Contract(endpoints: List[Endpoint], requests: Map[String, ModelType])
+
 case class Service(
-    http: Map[String, Element],
-    websocket: Map[String, Element],
+    `http-contract`: Contract,
+    `websocket-contract`: Contract,
     models: Map[String, ModelType]
 )
 

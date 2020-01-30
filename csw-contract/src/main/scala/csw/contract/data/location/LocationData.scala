@@ -48,16 +48,19 @@ trait LocationData extends LocationServiceCodecs {
   val locationUpdated: TrackingEvent = LocationUpdated(akkaLocation)
   val locationRemoved: TrackingEvent = LocationRemoved(akkaConnection)
 
-  val register: LocationHttpMessage             = Register(akkaRegistration)
-  val unregister: LocationHttpMessage           = Unregister(httpConnection)
-  val unregisterAll: LocationHttpMessage        = UnregisterAll
-  val find: LocationHttpMessage                 = Find(akkaConnection)
-  val resolve: LocationHttpMessage              = Resolve(akkaConnection, FiniteDuration(seconds, TimeUnit.SECONDS))
-  val listEntries: LocationHttpMessage          = ListEntries
-  val listByComponentType: LocationHttpMessage  = ListByComponentType(ComponentType.HCD)
-  val listByHostname: LocationHttpMessage       = ListByHostname(hostname)
-  val listByConnectionType: LocationHttpMessage = ListByConnectionType(ConnectionType.AkkaType)
-  val listByPrefix: LocationHttpMessage         = ListByPrefix(prefix.toString)
+  val akkaRegister: LocationHttpMessage                = Register(akkaRegistration)
+  val httpRegister: LocationHttpMessage                = Register(httpRegistration)
+  val unregister: LocationHttpMessage                  = Unregister(httpConnection)
+  val unregisterAll: LocationHttpMessage               = UnregisterAll
+  val find: LocationHttpMessage                        = Find(akkaConnection)
+  val resolve: LocationHttpMessage                     = Resolve(akkaConnection, FiniteDuration(seconds, TimeUnit.SECONDS))
+  val listEntries: LocationHttpMessage                 = ListEntries
+  val listByComponentTypeHcd: LocationHttpMessage      = ListByComponentType(ComponentType.HCD)
+  val listByComponentTypeAssembly: LocationHttpMessage = ListByComponentType(ComponentType.Assembly)
+  val listByHostname: LocationHttpMessage              = ListByHostname(hostname)
+  val listByAkkaConnectionType: LocationHttpMessage    = ListByConnectionType(ConnectionType.AkkaType)
+  val listByHttpConnectionType: LocationHttpMessage    = ListByConnectionType(ConnectionType.HttpType)
+  val listByPrefix: LocationHttpMessage                = ListByPrefix(prefix.toString)
 
   val track: LocationWebsocketMessage = Track(akkaConnection)
 }
