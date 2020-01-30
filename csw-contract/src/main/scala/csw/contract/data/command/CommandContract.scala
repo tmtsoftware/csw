@@ -1,10 +1,11 @@
 package csw.contract.data.command
 
 import csw.command.api.messages.CommandServiceHttpMessage.{Oneway, Query, Submit, Validate}
+import csw.command.api.messages.{CommandServiceHttpMessage, CommandServiceWebsocketMessage}
 import csw.command.api.messages.CommandServiceWebsocketMessage.{QueryFinal, SubscribeCurrentState}
 import csw.contract.generator.ClassNameHelpers.name
 import csw.contract.generator.DomHelpers._
-import csw.contract.generator.{Endpoint, ModelType}
+import csw.contract.generator.{ContractCodecs, Endpoint, ModelType}
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
 import csw.params.core.generics.{KeyType, Parameter}
@@ -13,7 +14,7 @@ import csw.params.core.states.CurrentState
 import enumeratum.EnumEntry
 import io.bullet.borer.Dom.Element
 
-object CommandContract extends CommandData {
+object CommandContract extends CommandData with ContractCodecs {
   val models: Map[String, ModelType] = Map(
     name[ControlCommand]     -> ModelType(observe, setup),
     name[CommandName]        -> ModelType(commandName),
@@ -46,27 +47,37 @@ object CommandContract extends CommandData {
     )
   )
 
-  val httpRequests: List[Element] = List(
+  val httpRequests: List[CommandServiceHttpMessage] = List(
     observeValidate,
     observeSubmit,
     setupQuery,
     observeOneway
   )
 
-  val websocketRequests: List[Element] = List(
+  val websocketRequests: List[CommandServiceWebsocketMessage] = List(
     queryFinal,
     subscribeState
   )
 
-  val httpEndpoints = List(
+  val httpEndpoints: List[Endpoint] = List(
     Endpoint(name[Validate], name[ValidateResponse]),
     Endpoint(name[Submit], name[SubmitResponse]),
     Endpoint(name[Query], name[SubmitResponse]),
     Endpoint(name[Oneway], name[OnewayResponse])
   )
 
-  val webSocketsEndpoints = List(
+  val webSocketEndpoints: List[Endpoint] = List(
     Endpoint(name[QueryFinal], name[SubmitResponse]),
     Endpoint(name[SubscribeCurrentState], name[CurrentState])
+  )
+
+  val http: Map[String, Element] = Map(
+    "endpoints" -> httpEndpoints,
+    "requests"  -> httpRequests
+  )
+
+  val webSockets: Map[String, Element] = Map(
+    "endpoints" -> webSocketEndpoints,
+    "requests"  -> websocketRequests
   )
 }
