@@ -18,18 +18,16 @@ object ModelType {
 }
 
 case class Service(
-    `http-endpoints`: List[Endpoint],
-    `websocket-endpoints`: List[Endpoint],
-    `http-requests`: List[Element],
-    `websocket-requests`: List[Element],
+    http: Map[String, Element],
+    websocket: Map[String, Element],
     models: Map[String, ModelType]
 )
 
 case class Services(data: Map[String, Service])
 
 object DomHelpers {
-  implicit def encode[T: Encoder: Decoder](x: T): Element                  = Json.decode(Json.encode(x).toByteArray).to[Element].value
-  implicit def encodeList[T: Encoder: Decoder](xs: List[T]): List[Element] = xs.map(encode[T])
+  implicit def encode[T: Encoder: Decoder](x: T): Element            = Json.decode(Json.encode(x).toByteArray).to[Element].value
+  implicit def encodeList[T: Encoder: Decoder](xs: List[T]): Element = encode(xs)
 }
 
 object ClassNameHelpers {
