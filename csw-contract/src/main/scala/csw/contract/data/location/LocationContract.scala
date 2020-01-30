@@ -4,7 +4,13 @@ import akka.Done
 import csw.contract.generator.ClassNameHelpers._
 import csw.contract.generator.DomHelpers._
 import csw.contract.generator._
-import csw.location.api.exceptions.{LocationServiceError, RegistrationFailed, RegistrationListingFailed, UnregistrationFailed}
+import csw.location.api.exceptions.{
+  LocationServiceError,
+  OtherLocationIsRegistered,
+  RegistrationFailed,
+  RegistrationListingFailed,
+  UnregistrationFailed
+}
 import csw.location.api.messages.LocationHttpMessage._
 import csw.location.api.messages.LocationWebsocketMessage.Track
 import csw.location.api.models._
@@ -16,7 +22,6 @@ object LocationContract extends LocationData with ContractCodecs {
     name[Location]       -> ModelType(akkaLocation, httpLocation, tcpLocation),
     name[TrackingEvent]  -> ModelType(locationUpdated, locationRemoved),
     name[ConnectionType] -> ModelType(ConnectionType),
-    name[ConnectionInfo] -> ModelType(connectionInfo),
     name[Connection]     -> ModelType(akkaConnection, httpConnection, tcpConnection),
     name[ComponentId]    -> ModelType(ComponentId(prefix, ComponentType.HCD)),
     name[ComponentType]  -> ModelType(ComponentType),
@@ -31,7 +36,7 @@ object LocationContract extends LocationData with ContractCodecs {
   )
 
   val httpEndpoints: List[Endpoint] = List(
-    Endpoint(name[Register], name[Location], List(name[RegistrationFailed])),
+    Endpoint(name[Register], name[Location], List(name[RegistrationFailed], name[OtherLocationIsRegistered])),
     Endpoint(name[Unregister], name[Done], List(name[UnregistrationFailed])),
     Endpoint(objectName(UnregisterAll), name[Done], List(name[UnregistrationFailed])),
     Endpoint(name[Find], arrayName[Location]),
