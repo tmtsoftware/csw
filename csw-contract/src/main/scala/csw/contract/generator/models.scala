@@ -1,4 +1,4 @@
-package csw.contract.generator.models
+package csw.contract.generator
 
 import enumeratum._
 import io.bullet.borer.Dom.Element

@@ -3,8 +3,8 @@ import java.io.File
 import java.net.URI
 import java.nio.file.{Files, Paths}
 
-import csw.contract.generator.models.DomHelpers._
-import csw.contract.generator.models.{Endpoint, ModelType, Service, Services}
+import DomHelpers._
+import csw.contract.generator.models.Services
 import csw.location.api.codec.LocationServiceCodecs
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models._

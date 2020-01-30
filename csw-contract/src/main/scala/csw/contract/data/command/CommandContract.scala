@@ -2,9 +2,9 @@ package csw.contract.data.command
 
 import csw.command.api.messages.CommandServiceHttpMessage.{Oneway, Query, Submit, Validate}
 import csw.command.api.messages.CommandServiceWebsocketMessage.{QueryFinal, SubscribeCurrentState}
-import csw.contract.generator.models.ClassNameHelpers.name
-import csw.contract.generator.models.DomHelpers._
-import csw.contract.generator.models.{Endpoint, ModelType}
+import csw.contract.generator.ClassNameHelpers.name
+import csw.contract.generator.DomHelpers._
+import csw.contract.generator.{Endpoint, ModelType}
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
 import csw.params.core.generics.{KeyType, Parameter}

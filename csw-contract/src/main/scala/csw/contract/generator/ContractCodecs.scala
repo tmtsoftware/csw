@@ -1,6 +1,5 @@
-package csw.contract.generator.codecs
+package csw.contract.generator
 
-import csw.contract.generator.models._
 import io.bullet.borer.Codec
 import io.bullet.borer.derivation.CompactMapBasedCodecs.deriveCodec
 
