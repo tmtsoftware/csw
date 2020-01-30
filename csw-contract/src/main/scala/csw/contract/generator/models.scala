@@ -7,7 +7,7 @@ import io.bullet.borer.{Decoder, Encoder, Json}
 import scala.language.implicitConversions
 import scala.reflect.ClassTag
 
-case class Endpoint(request: Element, responseType: String, errorTypes: List[String] = Nil)
+case class Endpoint(responseType: Element, errorTypes: List[String] = Nil)
 
 // single file (e.g., registration.json)
 case class ModelType(models: List[Element])
@@ -23,6 +23,7 @@ case class Service(
     // List("register" -> {request:"",response:"",errors:[""]})
     `http-endpoints`: Map[String, Endpoint],
     `websocket-endpoints`: Map[String, Endpoint],
+    requests: List[Element],
     // a folder called models for all models for this service
     // Map("registration" -> [])
     models: Map[String, ModelType]
@@ -36,7 +37,8 @@ object DomHelpers {
 }
 
 object ClassNameHelpers {
+  import DomHelpers._
   def name[T: ClassTag]: String                = scala.reflect.classTag[T].runtimeClass.getSimpleName
-  def arrayName[T: ClassTag]: String           = s"[${name[T]}]"
+  def arrayName[T: ClassTag]: Element          = encode(encodeList(List(name[T])))
   def objectName[T <: Singleton](x: T): String = x.toString
 }

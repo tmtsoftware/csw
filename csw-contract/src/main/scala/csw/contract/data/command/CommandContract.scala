@@ -11,6 +11,7 @@ import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.Units
 import csw.params.core.states.CurrentState
 import enumeratum.EnumEntry
+import io.bullet.borer.Dom.Element
 
 object CommandContract extends CommandData {
   val models: Map[String, ModelType] = Map(
@@ -45,15 +46,19 @@ object CommandContract extends CommandData {
     )
   )
 
+  val requests: List[Element] = List(
+    observeSubmit
+  )
+
   val httpEndpoints = Map(
-    name[Validate] -> Endpoint(observeValidate, name[ValidateResponse]),
-    name[Submit]   -> Endpoint(observeSubmit, name[SubmitResponse]),
-    name[Query]    -> Endpoint(queryFinal, name[SubmitResponse]),
-    name[Oneway]   -> Endpoint(observeOneway, name[OnewayResponse])
+    name[Validate] -> Endpoint(name[ValidateResponse]),
+    name[Submit]   -> Endpoint(name[SubmitResponse]),
+    name[Query]    -> Endpoint(name[SubmitResponse]),
+    name[Oneway]   -> Endpoint(name[OnewayResponse])
   )
 
   val webSocketsEndpoints = Map(
-    name[QueryFinal]            -> Endpoint(queryFinal, name[SubmitResponse]),
-    name[SubscribeCurrentState] -> Endpoint(subscribeState, name[CurrentState])
+    name[QueryFinal]            -> Endpoint(name[SubmitResponse]),
+    name[SubscribeCurrentState] -> Endpoint(name[CurrentState])
   )
 }
