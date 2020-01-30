@@ -4,7 +4,7 @@ The [csw-location-api]($github.dir.base_url$/csw-location/csw-location-api) proj
 [common API]($github.base_url$/csw-location/csw-location-api/shared/src/main/scala/csw/location/api/scaladsl/LocationService.scala) for the the `csw-location-server` and `csw-location-client` implementations.
 
 This also includes the model classes used for connections, registration and component types as well as the
-[TrackingEvent]($github.base_url$/csw-location/csw-location-models/src/main/scala/csw/location/models/TrackingEvent.scala) class that clients receive whenever new location information is received.
+[TrackingEvent]($github.base_url$/csw-location/csw-location-api/shared/src/main/scala/csw/location/api/models/TrackingEvent.scala) class that clients receive whenever new location information is received.
 
 ## Java API
 
