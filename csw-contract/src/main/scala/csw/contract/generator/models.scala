@@ -7,9 +7,8 @@ import io.bullet.borer.{Decoder, Encoder, Json}
 import scala.language.implicitConversions
 import scala.reflect.ClassTag
 
-case class Endpoint(responseType: Element, errorTypes: List[String] = Nil)
+case class Endpoint(requestType: String, responseType: Element, errorTypes: List[String] = Nil)
 
-// single file (e.g., registration.json)
 case class ModelType(models: List[Element])
 
 object ModelType {
@@ -19,13 +18,10 @@ object ModelType {
 }
 
 case class Service(
-    // a file called contract having sections for http and websocket endpoints for this service
-    // List("register" -> {request:"",response:"",errors:[""]})
-    `http-endpoints`: Map[String, Endpoint],
-    `websocket-endpoints`: Map[String, Endpoint],
-    requests: List[Element],
-    // a folder called models for all models for this service
-    // Map("registration" -> [])
+    `http-endpoints`: List[Endpoint],
+    `websocket-endpoints`: List[Endpoint],
+    `http-requests`: List[Element],
+    `websocket-requests`: List[Element],
     models: Map[String, ModelType]
 )
 

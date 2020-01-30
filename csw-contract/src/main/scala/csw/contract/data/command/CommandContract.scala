@@ -46,19 +46,27 @@ object CommandContract extends CommandData {
     )
   )
 
-  val requests: List[Element] = List(
-    observeSubmit
+  val httpRequests: List[Element] = List(
+    observeValidate,
+    observeSubmit,
+    setupQuery,
+    observeOneway
   )
 
-  val httpEndpoints = Map(
-    name[Validate] -> Endpoint(name[ValidateResponse]),
-    name[Submit]   -> Endpoint(name[SubmitResponse]),
-    name[Query]    -> Endpoint(name[SubmitResponse]),
-    name[Oneway]   -> Endpoint(name[OnewayResponse])
+  val websocketRequests: List[Element] = List(
+    queryFinal,
+    subscribeState
   )
 
-  val webSocketsEndpoints = Map(
-    name[QueryFinal]            -> Endpoint(name[SubmitResponse]),
-    name[SubscribeCurrentState] -> Endpoint(name[CurrentState])
+  val httpEndpoints = List(
+    Endpoint(name[Validate], name[ValidateResponse]),
+    Endpoint(name[Submit], name[SubmitResponse]),
+    Endpoint(name[Query], name[SubmitResponse]),
+    Endpoint(name[Oneway], name[OnewayResponse])
+  )
+
+  val webSocketsEndpoints = List(
+    Endpoint(name[QueryFinal], name[SubmitResponse]),
+    Endpoint(name[SubscribeCurrentState], name[CurrentState])
   )
 }
