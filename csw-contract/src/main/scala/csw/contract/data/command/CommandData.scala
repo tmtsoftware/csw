@@ -10,7 +10,6 @@ import csw.command.api.messages.{CommandServiceHttpMessage, CommandServiceWebsoc
 import csw.params.commands.CommandIssue._
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
-import csw.params.core.formats.ParamCodecs
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.{Id, ObsId}
 import csw.params.core.states.{CurrentState, StateName}
@@ -18,7 +17,7 @@ import csw.prefix.models.{Prefix, Subsystem}
 
 import scala.concurrent.duration.FiniteDuration
 
-trait CommandData extends CommandServiceCodecs with ParamCodecs {
+trait CommandData extends CommandServiceCodecs {
   val values                     = 100
   val encoder: Key[Int]          = KeyType.IntKey.make("encoder")
   val prefix                     = new Prefix(Subsystem.CSW, "someComponent")

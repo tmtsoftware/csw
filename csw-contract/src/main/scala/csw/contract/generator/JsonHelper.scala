@@ -1,6 +1,5 @@
 package csw.contract.generator
 
-import csw.contract.generator.codecs.ContractCodecs
 import io.bullet.borer.{Encoder, Json}
 import play.api.libs.json
 

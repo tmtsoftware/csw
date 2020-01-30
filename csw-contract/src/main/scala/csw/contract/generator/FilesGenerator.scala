@@ -2,8 +2,6 @@ package csw.contract.generator
 
 import java.nio.file.{Files, Paths}
 
-import csw.contract.generator.codecs.ContractCodecs
-import csw.contract.generator.models.Services
 import io.bullet.borer.Encoder
 
 object FilesGenerator extends ContractCodecs {

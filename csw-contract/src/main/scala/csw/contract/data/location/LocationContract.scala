@@ -1,14 +1,15 @@
 package csw.contract.data.location
 
 import akka.Done
-import csw.contract.generator.models.ClassNameHelpers.{arrayName, name, objectName}
-import csw.contract.generator.models.DomHelpers._
-import csw.contract.generator.models.{Endpoint, ModelType}
+import csw.contract.generator.ClassNameHelpers.{arrayName, name, objectName}
+import csw.contract.generator.DomHelpers._
+import csw.contract.generator.{Endpoint, ModelType}
 import csw.location.api.exceptions.{LocationServiceError, RegistrationFailed, RegistrationListingFailed, UnregistrationFailed}
 import csw.location.api.messages.LocationHttpMessage._
 import csw.location.api.messages.LocationWebsocketMessage.Track
 import csw.location.api.models._
 import csw.prefix.models.{Prefix, Subsystem}
+
 object LocationContract extends LocationData {
   val models: Map[String, ModelType] = Map(
     name[Registration]   -> ModelType(akkaRegistration, httpRegistration, tcpRegistration),

@@ -2,7 +2,8 @@ package csw.contract.data
 
 import csw.contract.data.command.CommandContract
 import csw.contract.data.location.LocationContract
-import csw.contract.generator.models.{Service, Services}
+import csw.contract.generator
+import csw.contract.generator.{Service, Services}
 
 object CswData {
   val services: Services = Services(
@@ -12,7 +13,7 @@ object CswData {
         LocationContract.webSocketEndpoints,
         LocationContract.models
       ),
-      "command" -> Service(
+      "command" -> generator.Service(
         CommandContract.httpEndpoints,
         CommandContract.webSocketsEndpoints,
         CommandContract.models
