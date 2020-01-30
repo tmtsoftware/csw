@@ -11,13 +11,15 @@ object CswData {
       "Location-Service" -> Service(
         LocationContract.httpEndpoints,
         LocationContract.webSocketEndpoints,
-        LocationContract.requests,
+        LocationContract.httpRequests,
+        LocationContract.websocketRequests,
         LocationContract.models
       ),
       "Command-Service" -> generator.Service(
         CommandContract.httpEndpoints,
         CommandContract.webSocketsEndpoints,
-        CommandContract.requests,
+        CommandContract.httpRequests,
+        CommandContract.websocketRequests,
         CommandContract.models
       )
     )

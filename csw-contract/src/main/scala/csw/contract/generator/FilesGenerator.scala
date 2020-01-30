@@ -11,6 +11,8 @@ object FilesGenerator extends ContractCodecs {
       case (serviceName, service) =>
         writeData(s"$outputPath/$serviceName/endpoints", "http-endpoints", service.`http-endpoints`)
         writeData(s"$outputPath/$serviceName/endpoints", "websocket-endpoints", service.`websocket-endpoints`)
+        writeData(s"$outputPath/$serviceName/endpoints", "http-requests", service.`http-requests`)
+        writeData(s"$outputPath/$serviceName/endpoints", "websocket-requests", service.`websocket-requests`)
         service.models.foreach {
           case (modelName, model) => writeData(s"$outputPath/$serviceName/models", modelName, model)
         }

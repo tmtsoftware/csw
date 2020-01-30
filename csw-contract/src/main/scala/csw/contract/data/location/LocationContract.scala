@@ -31,24 +31,37 @@ object LocationContract extends LocationData {
     name[Prefix]    -> ModelType(prefix)
   )
 
-  val requests: List[Element] = List(
-    register
+  val httpRequests: List[Element] = List(
+    register,
+    unregister,
+    unregisterAll,
+    find,
+    resolve,
+    listEntries,
+    listByComponentType,
+    listByConnectionType,
+    listByHostname,
+    listByPrefix
   )
 
-  val httpEndpoints = Map(
-    name[Register]             -> Endpoint(name[Location], List(name[RegistrationFailed])),
-    name[Unregister]           -> Endpoint(name[Done], List(name[UnregistrationFailed])),
-    objectName(UnregisterAll)  -> Endpoint(name[Done], List(name[UnregistrationFailed])),
-    name[Find]                 -> Endpoint(arrayName[Location]),
-    name[Resolve]              -> Endpoint(arrayName[Location]),
-    objectName(ListEntries)    -> Endpoint(arrayName[Location], List(name[RegistrationListingFailed])),
-    name[ListByComponentType]  -> Endpoint(arrayName[Location], List(name[RegistrationListingFailed])),
-    name[ListByConnectionType] -> Endpoint(arrayName[Location], List(name[RegistrationListingFailed])),
-    name[ListByHostname]       -> Endpoint(arrayName[Location], List(name[RegistrationListingFailed])),
-    name[ListByPrefix]         -> Endpoint(arrayName[Location], List(name[RegistrationListingFailed]))
+  val websocketRequests: List[Element] = List(
+    track
   )
 
-  val webSocketEndpoints = Map(
-    name[Track] -> Endpoint(name[TrackingEvent])
+  val httpEndpoints = List(
+    Endpoint(name[Register], name[Location], List(name[RegistrationFailed])),
+    Endpoint(name[Unregister], name[Done], List(name[UnregistrationFailed])),
+    Endpoint(objectName(UnregisterAll), name[Done], List(name[UnregistrationFailed])),
+    Endpoint(name[Find], arrayName[Location]),
+    Endpoint(name[Resolve], arrayName[Location]),
+    Endpoint(objectName(ListEntries), arrayName[Location], List(name[RegistrationListingFailed])),
+    Endpoint(name[ListByComponentType], arrayName[Location], List(name[RegistrationListingFailed])),
+    Endpoint(name[ListByConnectionType], arrayName[Location], List(name[RegistrationListingFailed])),
+    Endpoint(name[ListByHostname], arrayName[Location], List(name[RegistrationListingFailed])),
+    Endpoint(name[ListByPrefix], arrayName[Location], List(name[RegistrationListingFailed]))
+  )
+
+  val webSocketEndpoints = List(
+    Endpoint(name[Track], name[TrackingEvent])
   )
 }
