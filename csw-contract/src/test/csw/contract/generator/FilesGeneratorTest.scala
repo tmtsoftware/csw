@@ -1,19 +1,7 @@
 package csw.contract.generator
-import java.io.File
-import java.net.URI
-import java.nio.file.{Files, Paths}
-
-import DomHelpers._
-import csw.contract.generator.models.Services
 import csw.location.api.codec.LocationServiceCodecs
-import csw.location.models.Connection.AkkaConnection
-import csw.location.models._
-import csw.prefix.models.Prefix
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
-import scala.reflect.io.Directory
-
-class FilesGeneratorTest extends FunSuite with Matchers with BeforeAndAfterAll with LocationServiceCodecs {
+class FilesGeneratorTest{}
 
 //  override def afterAll(): Unit = {
 //    val dir = new Directory(new File("testOutput"))
@@ -57,4 +45,3 @@ class FilesGeneratorTest extends FunSuite with Matchers with BeforeAndAfterAll w
 //    Files.exists(path) shouldBe true
 //    Files.size(path) should be > 0L
 //  }
-}
