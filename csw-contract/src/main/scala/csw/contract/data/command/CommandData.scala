@@ -10,7 +10,7 @@ import csw.command.api.messages.{CommandServiceHttpMessage, CommandServiceWebsoc
 import csw.contract.generator.models.ClassNameHelpers.name
 import csw.contract.generator.models.DomHelpers._
 import csw.contract.generator.models.{Endpoint, ModelType}
-import csw.params.commands.CommandIssue.OtherIssue
+import csw.params.commands.CommandIssue._
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
 import csw.params.core.formats.ParamCodecs
@@ -57,23 +57,23 @@ object CommandData extends CommandServiceCodecs with ParamCodecs {
   val queryFinal: CommandServiceWebsocketMessage     = QueryFinal(id, timeout)
   val subscribeState: CommandServiceWebsocketMessage = SubscribeCurrentState(states)
 
-  val assemblyBusyIssue: CommandIssue                 = CommandIssue.AssemblyBusyIssue(reason)
-  val idNotAvailableIssue: CommandIssue               = CommandIssue.IdNotAvailableIssue(reason)
-  val missingKeyIssue: CommandIssue                   = CommandIssue.MissingKeyIssue(reason)
-  val parameterValueOutOfRangeIssue: CommandIssue     = CommandIssue.ParameterValueOutOfRangeIssue(reason)
-  val requiredAssemblyUnavailableIssue: CommandIssue  = CommandIssue.RequiredAssemblyUnavailableIssue(reason)
-  val requiredSequencerUnavailableIssue: CommandIssue = CommandIssue.RequiredSequencerUnavailableIssue(reason)
-  val requiredServiceUnavailableIssue: CommandIssue   = CommandIssue.RequiredServiceUnavailableIssue(reason)
-  val requiredHCDUnavailableIssue: CommandIssue       = CommandIssue.RequiredHCDUnavailableIssue(reason)
-  val unresolvedLocationsIssue: CommandIssue          = CommandIssue.UnresolvedLocationsIssue(reason)
-  val unsupportedCommandInStateIssue: CommandIssue    = CommandIssue.UnsupportedCommandInStateIssue(reason)
-  val unsupportedCommandIssue: CommandIssue           = CommandIssue.UnsupportedCommandIssue(reason)
-  val wrongInternalStateIssue: CommandIssue           = CommandIssue.WrongInternalStateIssue(reason)
-  val wrongNumberOfParametersIssue: CommandIssue      = CommandIssue.WrongNumberOfParametersIssue(reason)
-  val wrongParameterTypeIssue: CommandIssue           = CommandIssue.WrongParameterTypeIssue(reason)
-  val wrongPrefixIssue: CommandIssue                  = CommandIssue.WrongPrefixIssue(reason)
-  val wrongUnitsIssue: CommandIssue                   = CommandIssue.WrongUnitsIssue(reason)
-  val otherIssue: CommandIssue                        = CommandIssue.OtherIssue(reason)
+  val assemblyBusyIssue: CommandIssue                 = AssemblyBusyIssue(reason)
+  val idNotAvailableIssue: CommandIssue               = IdNotAvailableIssue(reason)
+  val missingKeyIssue: CommandIssue                   = MissingKeyIssue(reason)
+  val parameterValueOutOfRangeIssue: CommandIssue     = ParameterValueOutOfRangeIssue(reason)
+  val requiredAssemblyUnavailableIssue: CommandIssue  = RequiredAssemblyUnavailableIssue(reason)
+  val requiredSequencerUnavailableIssue: CommandIssue = RequiredSequencerUnavailableIssue(reason)
+  val requiredServiceUnavailableIssue: CommandIssue   = RequiredServiceUnavailableIssue(reason)
+  val requiredHCDUnavailableIssue: CommandIssue       = RequiredHCDUnavailableIssue(reason)
+  val unresolvedLocationsIssue: CommandIssue          = UnresolvedLocationsIssue(reason)
+  val unsupportedCommandInStateIssue: CommandIssue    = UnsupportedCommandInStateIssue(reason)
+  val unsupportedCommandIssue: CommandIssue           = UnsupportedCommandIssue(reason)
+  val wrongInternalStateIssue: CommandIssue           = WrongInternalStateIssue(reason)
+  val wrongNumberOfParametersIssue: CommandIssue      = WrongNumberOfParametersIssue(reason)
+  val wrongParameterTypeIssue: CommandIssue           = WrongParameterTypeIssue(reason)
+  val wrongPrefixIssue: CommandIssue                  = WrongPrefixIssue(reason)
+  val wrongUnitsIssue: CommandIssue                   = WrongUnitsIssue(reason)
+  val otherIssue: CommandIssue                        = OtherIssue(reason)
 
   val result: Result = Result(param)
 
