@@ -4,9 +4,6 @@ import java.net.URI
 import java.util.concurrent.TimeUnit
 
 import akka.Done
-import csw.contract.generator.models.ClassNameHelpers._
-import csw.contract.generator.models.DomHelpers._
-import csw.contract.generator.models.{Endpoint, ModelType}
 import csw.location.api.codec.{LocationCodecs, LocationServiceCodecs}
 import csw.location.api.exceptions._
 import csw.location.api.messages.LocationHttpMessage._
@@ -18,7 +15,7 @@ import csw.prefix.models.{Prefix, Subsystem}
 
 import scala.concurrent.duration.FiniteDuration
 
-object LocationData extends LocationCodecs with LocationServiceCodecs {
+trait LocationData extends LocationCodecs with LocationServiceCodecs {
   val port       = 8080
   val seconds    = 23
   val pathString = "path"
@@ -63,40 +60,4 @@ object LocationData extends LocationCodecs with LocationServiceCodecs {
   val listByPrefix: LocationHttpMessage         = ListByPrefix(prefix.toString)
 
   val track: LocationWebsocketMessage = Track(akkaConnection)
-
-  val models: Map[String, ModelType] = Map(
-    name[Registration]   -> ModelType(akkaRegistration, httpRegistration, tcpRegistration),
-    name[Location]       -> ModelType(akkaLocation, httpLocation, tcpLocation),
-    name[TrackingEvent]  -> ModelType(locationUpdated, locationRemoved),
-    name[ConnectionType] -> ModelType(ConnectionType),
-    name[ConnectionInfo] -> ModelType(connectionInfo),
-    name[Connection]     -> ModelType(akkaConnection, httpConnection, tcpConnection),
-    name[ComponentId]    -> ModelType(ComponentId(prefix, ComponentType.HCD)),
-    name[ComponentType]  -> ModelType(ComponentType),
-    name[LocationServiceError] -> ModelType(
-      registrationFailed,
-      otherLocationIsRegistered,
-      unregisterFailed,
-      registrationListingFailed
-    ),
-    name[Subsystem] -> ModelType(Subsystem),
-    name[Prefix]    -> ModelType(prefix)
-  )
-
-  val httpEndpoints = Map(
-    name[Register]             -> Endpoint(register, name[Location], List(name[RegistrationFailed])),
-    name[Unregister]           -> Endpoint(unregister, name[Done], List(name[UnregistrationFailed])),
-    objectName(UnregisterAll)  -> Endpoint(unregisterAll, name[Done], List(name[UnregistrationFailed])),
-    name[Find]                 -> Endpoint(find, arrayName[Location]),
-    name[Resolve]              -> Endpoint(resolve, arrayName[Location]),
-    objectName(ListEntries)    -> Endpoint(listEntries, arrayName[Location], List(name[RegistrationListingFailed])),
-    name[ListByComponentType]  -> Endpoint(listByComponentType, arrayName[Location], List(name[RegistrationListingFailed])),
-    name[ListByConnectionType] -> Endpoint(listByConnectionType, arrayName[Location], List(name[RegistrationListingFailed])),
-    name[ListByHostname]       -> Endpoint(listByHostname, arrayName[Location], List(name[RegistrationListingFailed])),
-    name[ListByPrefix]         -> Endpoint(listByPrefix, arrayName[Location], List(name[RegistrationListingFailed]))
-  )
-
-  val webSocketEndpoints = Map(
-    name[Track] -> Endpoint(track, name[TrackingEvent])
-  )
 }
