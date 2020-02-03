@@ -9,7 +9,7 @@ import scala.reflect.ClassTag
 
 case class Endpoint(requestType: String, responseType: Element, errorTypes: List[String] = Nil)
 
-case class ModelType private (models: List[Element])
+case class ModelType(models: List[Element])
 
 object ModelType {
   import DomHelpers._
