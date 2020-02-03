@@ -16,7 +16,7 @@ object CommandContract extends CommandData with ContractCodecs {
   val models: Map[String, ModelType] = Map(
     name[ControlCommand]     -> ModelType(observe, setup),
     name[CommandName]        -> ModelType(commandName),
-    name[Parameter[Int]]     -> ModelType(param),
+    name[Parameter[_]]       -> ModelType(paramSet),
     name[KeyType[EnumEntry]] -> ModelType(KeyType),
     name[Units]              -> ModelType(Units),
     name[Result]             -> ModelType(result),
