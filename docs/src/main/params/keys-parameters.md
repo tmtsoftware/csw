@@ -32,7 +32,8 @@ A key is **unique** in a `ParameterSet` since it is a Set.
 | Float           | KeyType.FloatKey            | JKeyType.FloatKey             |
 | Double          | KeyType.DoubleKey           | JKeyType.DoubleKey            |
 | String          | KeyType.StringKey           | JKeyType.StringKey            |
-| Timestamp       | KeyType.TimestampKey        | JKeyType.TimestampKey         |
+| UtcTime         | KeyType.UTCTimeKey          | JKeyType.UTCTimeKey           |
+| TaiTime         | KeyType.TAITimeKey          | JKeyType.TAITimeKey           |
 
 Scala
 :   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersTest.scala) { #primitives }

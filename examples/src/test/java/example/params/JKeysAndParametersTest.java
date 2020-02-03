@@ -339,7 +339,7 @@ public class JKeysAndParametersTest extends JUnitSuite {
         Parameter<Boolean> bParam = k1.set(true);
         boolean bDefaultUnitSet = bParam.units() == JUnits.NoUnits(); //true
 
-        //default unit for TimestampKey
+        //default unit for UTCTimeKey/TAITimeKey
         Parameter<UTCTime> tParam = JKeyType
                 .UTCTimeKey()
                 .make("now")
