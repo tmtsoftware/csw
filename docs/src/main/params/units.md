@@ -20,7 +20,7 @@ The set of supported Units will be modified as more required Units are discovere
 
 ## Default Units for Keys
 
-The default unit for `TimestampKey`(in Scala and Java both) is `second`. For all the remaining keys, default unit is NoUnits.  
+The default unit for `UTCTimeKey` and `TAITimeKey` (in Scala and Java both) is `second`. For all the remaining keys, default unit is NoUnits.  
 
 ## SI Units
 
