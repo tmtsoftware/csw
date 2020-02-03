@@ -7,7 +7,7 @@ import csw.params.core.models.Units.second
 import csw.params.core.models._
 import csw.time.core.models.{TAITime, UTCTime}
 import enumeratum.{Enum, EnumEntry}
-import io.bullet.borer.{Codec, Decoder, Encoder}
+import io.bullet.borer.{Decoder, Encoder}
 
 import scala.reflect.ClassTag
 
@@ -121,6 +121,4 @@ object KeyType extends Enum[KeyType[_]] {
   case object IntMatrixKey    extends MatrixKeyType[Int]
   case object FloatMatrixKey  extends MatrixKeyType[Float]
   case object DoubleMatrixKey extends MatrixKeyType[Double]
-
-  implicit def coordCodec[T <: Coord]: Codec[T] = coordCodecValue.asInstanceOf[Codec[T]]
 }

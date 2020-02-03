@@ -29,6 +29,7 @@ object ParamCodecs extends ParamCodecs
  */
 trait ParamCodecs extends ParamCodecsBase {
   implicit def commandResponseCodec[T <: CommandResponse]: Codec[T] = commandResponseCodecValue.asInstanceOf[Codec[T]]
+  implicit def coordCodec[T <: Coord]: Codec[T]                     = coordCodecValue.asInstanceOf[Codec[T]]
 }
 
 trait ParamCodecsBase extends CommonCodecs {
@@ -43,7 +44,7 @@ trait ParamCodecsBase extends CommonCodecs {
   implicit lazy val angleCodec: Codec[Angle]               = deriveCodec
   implicit lazy val properMotionCodec: Codec[ProperMotion] = deriveCodec
 
-  implicit lazy val coordCodecValue: Codec[Coord] = deriveAllCodecs
+  lazy val coordCodecValue: Codec[Coord] = deriveAllCodecs
 
   implicit lazy val utcTimeCodec: Codec[UTCTime] = deriveCodec
   implicit lazy val taiTimeCodec: Codec[TAITime] = deriveCodec
@@ -111,7 +112,7 @@ trait ParamCodecsBase extends CommonCodecs {
   implicit lazy val sequenceCodec: Codec[Sequence]               = deriveCodec
 
   // ************************ CommandResponse Codecs ********************
-  implicit lazy val resultCodec: Codec[Result]               = deriveCodec
+  implicit lazy val resultCodec: Codec[Result]               = MapBasedCodecs.deriveCodec
   lazy val commandResponseCodecValue: Codec[CommandResponse] = deriveAllCodecs
 
   // ************************ CommandIssue Codecs ********************

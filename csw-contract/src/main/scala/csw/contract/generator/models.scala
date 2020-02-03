@@ -9,7 +9,7 @@ import scala.reflect.ClassTag
 
 case class Endpoint(requestType: String, responseType: Element, errorTypes: List[String] = Nil)
 
-case class ModelType(models: List[Element])
+case class ModelType private (models: List[Element])
 
 object ModelType {
   import DomHelpers._
@@ -28,13 +28,12 @@ case class Service(
 case class Services(data: Map[String, Service])
 
 object DomHelpers {
-  implicit def encode[T: Encoder: Decoder](x: T): Element            = Json.decode(Json.encode(x).toByteArray).to[Element].value
-  implicit def encodeList[T: Encoder: Decoder](xs: List[T]): Element = encode(xs)
+  implicit def encode[T: Encoder: Decoder](x: T): Element = Json.decode(Json.encode(x).toByteArray).to[Element].value
 }
 
 object ClassNameHelpers {
   import DomHelpers._
   def name[T: ClassTag]: String                = scala.reflect.classTag[T].runtimeClass.getSimpleName
-  def arrayName[T: ClassTag]: Element          = encode(encodeList(List(name[T])))
+  def arrayName[T: ClassTag]: Element          = encode(List(name[T]))
   def objectName[T <: Singleton](x: T): String = x.toString
 }

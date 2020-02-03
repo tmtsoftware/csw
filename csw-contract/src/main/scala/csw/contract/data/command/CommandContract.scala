@@ -14,9 +14,18 @@ import enumeratum.EnumEntry
 
 object CommandContract extends CommandData with ContractCodecs {
   val models: Map[String, ModelType] = Map(
-    name[ControlCommand]     -> ModelType(observe, setup),
-    name[CommandName]        -> ModelType(commandName),
-    name[Parameter[_]]       -> ModelType(paramSet),
+    name[ControlCommand] -> ModelType(observe, setup),
+    name[CommandName]    -> ModelType(commandName),
+    name[Parameter[_]] -> ModelType(
+      intParameter,
+      arrayParameter,
+      structParameter,
+      matrixParameter,
+      coordsParameter,
+      utcTimeParam,
+      raDecParameter,
+      choiceParameter
+    ),
     name[KeyType[EnumEntry]] -> ModelType(KeyType),
     name[Units]              -> ModelType(Units),
     name[Result]             -> ModelType(result),
