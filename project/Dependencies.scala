@@ -238,6 +238,7 @@ object Dependencies {
       AkkaHttp.`akka-http`,
       Libs.`scala-async`,
       Libs.`caffeine`,
+      Libs.`reflections`,
       Akka.`akka-actor-testkit-typed` % Test,
       Akka.`akka-stream-testkit`      % Test,
       Libs.`scalatest`.value          % Test,

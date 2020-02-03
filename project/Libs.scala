@@ -51,6 +51,7 @@ object Libs {
   val `config`          = "com.typesafe"                  % "config"          % "1.4.0"
   val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.6.3"
   val `caffeine`        = "com.github.ben-manes.caffeine" % "caffeine"        % "2.8.1"
+  val `reflections`     = "org.reflections"               % "reflections"     % "0.9.12"
 }
 
 object Borer {
