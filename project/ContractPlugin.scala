@@ -14,7 +14,6 @@ object ContractPlugin extends AutoPlugin {
     val generateDocsDirName = "output"
     val generateDocsDirPath = settingKey[String]("path of the folder for the generated contracts")
   }
-
   import autoImport._
 
   override def projectSettings: Seq[Setting[_]] = Seq(
@@ -23,9 +22,10 @@ object ContractPlugin extends AutoPlugin {
   )
 
   def generate(generatorProject: Project): Def.Initialize[Task[Seq[(File, String)]]] = Def.taskDyn {
-    val outputDir = s" ${target.value}/$generateDocsDirName"
+    val outputDir   = s" ${target.value}/$generateDocsDirName"
+    val resourceDir = "src/main/resources"
     Def.task {
-      (generatorProject / Compile / run).toTask(outputDir).value
+      (generatorProject / Compile / run).toTask(s" $outputDir $resourceDir").value
       Path.contentOf(target.value / generateDocsDirName)
     }
   }
