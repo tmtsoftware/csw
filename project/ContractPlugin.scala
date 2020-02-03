@@ -11,7 +11,7 @@ object ContractPlugin extends AutoPlugin {
 
   object autoImport {
     val generateDocs        = taskKey[Seq[(File, String)]]("generate contracts")
-    val generateDocsDirName = "output"
+    val generateDocsDirName = "contracts"
     val generateDocsDirPath = settingKey[String]("path of the folder for the generated contracts")
   }
   import autoImport._
