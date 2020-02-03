@@ -18,27 +18,27 @@ trait CborAkkaSerializer[Ser] extends Serializer {
 
   override def includeManifest: Boolean = true
 
-  override def toBinary(o: AnyRef): Array[Byte] = getCodec(o.getClass) match {
-    case Some(codec) =>
-      val encoder = codec.encoder.asInstanceOf[Encoder[AnyRef]]
-      Cbor.encode(o)(encoder).toByteArray
-    case None =>
-      val ex = new RuntimeException(s"does not support encoding of ${o.getClass}")
-      logger.error(ex.getMessage, ex = ex)
-      throw ex
+  override def toBinary(o: AnyRef): Array[Byte] = {
+    val codec   = getCodec(o.getClass, "encoding")
+    val encoder = codec.encoder.asInstanceOf[Encoder[AnyRef]]
+    Cbor.encode(o)(encoder).toByteArray
   }
 
-  override def fromBinary(bytes: Array[Byte], manifest: Option[Class[_]]): AnyRef = getCodec(manifest.get) match {
-    case Some(codec) =>
-      val decoder = codec.decoder.asInstanceOf[Decoder[AnyRef]]
-      Cbor.decode(bytes).to[AnyRef](decoder).value
-    case None =>
-      val ex = new RuntimeException(s"does not support decoding of ${manifest.get}")
-      logger.error(ex.getMessage, ex = ex)
-      throw ex
+  override def fromBinary(bytes: Array[Byte], manifest: Option[Class[_]]): AnyRef = {
+    val codec   = getCodec(manifest.get, "decoding")
+    val decoder = codec.decoder.asInstanceOf[Decoder[AnyRef]]
+    Cbor.decode(bytes).to[AnyRef](decoder).value
   }
 
-  private def getCodec(classValue: Class[_]): Option[Codec[_]] = registrations.collectFirst {
-    case (clazz, codec) if clazz.isAssignableFrom(classValue) => codec
+  private def getCodec(classValue: Class[_], action: String): Codec[_] = {
+    registrations
+      .collectFirst {
+        case (clazz, codec) if clazz.isAssignableFrom(classValue) => codec
+      }
+      .getOrElse {
+        val ex = new RuntimeException(s"$action of $classValue is not configured")
+        logger.error(ex.getMessage, ex = ex)
+        throw ex
+      }
   }
 }
