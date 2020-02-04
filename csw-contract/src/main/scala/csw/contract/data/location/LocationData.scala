@@ -7,7 +7,6 @@ import akka.Done
 import csw.location.api.exceptions._
 import csw.location.api.messages.LocationHttpMessage._
 import csw.location.api.messages.LocationWebsocketMessage.Track
-import csw.location.api.messages.{LocationHttpMessage, LocationWebsocketMessage}
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.api.models._
 import csw.prefix.models.{Prefix, Subsystem}
@@ -47,19 +46,19 @@ trait LocationData {
   val locationUpdated: TrackingEvent = LocationUpdated(akkaLocation)
   val locationRemoved: TrackingEvent = LocationRemoved(akkaConnection)
 
-  val akkaRegister: LocationHttpMessage                = Register(akkaRegistration)
-  val httpRegister: LocationHttpMessage                = Register(httpRegistration)
-  val unregister: LocationHttpMessage                  = Unregister(httpConnection)
-  val unregisterAll: LocationHttpMessage               = UnregisterAll
-  val find: LocationHttpMessage                        = Find(akkaConnection)
-  val resolve: LocationHttpMessage                     = Resolve(akkaConnection, FiniteDuration(seconds, TimeUnit.SECONDS))
-  val listEntries: LocationHttpMessage                 = ListEntries
-  val listByComponentTypeHcd: LocationHttpMessage      = ListByComponentType(ComponentType.HCD)
-  val listByComponentTypeAssembly: LocationHttpMessage = ListByComponentType(ComponentType.Assembly)
-  val listByHostname: LocationHttpMessage              = ListByHostname(hostname)
-  val listByAkkaConnectionType: LocationHttpMessage    = ListByConnectionType(ConnectionType.AkkaType)
-  val listByHttpConnectionType: LocationHttpMessage    = ListByConnectionType(ConnectionType.HttpType)
-  val listByPrefix: LocationHttpMessage                = ListByPrefix(prefix.toString)
+  val akkaRegister: Register                           = Register(akkaRegistration)
+  val httpRegister: Register                           = Register(httpRegistration)
+  val unregister: Unregister                           = Unregister(httpConnection)
+  val unregisterAll: UnregisterAll.type                = UnregisterAll
+  val find: Find                                       = Find(akkaConnection)
+  val resolve: Resolve                                 = Resolve(akkaConnection, FiniteDuration(seconds, TimeUnit.SECONDS))
+  val listEntries: ListEntries.type                    = ListEntries
+  val listByComponentTypeHcd: ListByComponentType      = ListByComponentType(ComponentType.HCD)
+  val listByComponentTypeAssembly: ListByComponentType = ListByComponentType(ComponentType.Assembly)
+  val listByHostname: ListByHostname                   = ListByHostname(hostname)
+  val listByAkkaConnectionType: ListByConnectionType   = ListByConnectionType(ConnectionType.AkkaType)
+  val listByHttpConnectionType: ListByConnectionType   = ListByConnectionType(ConnectionType.HttpType)
+  val listByPrefix: ListByPrefix                       = ListByPrefix(prefix.toString)
 
-  val track: LocationWebsocketMessage = Track(akkaConnection)
+  val track: Track = Track(akkaConnection)
 }

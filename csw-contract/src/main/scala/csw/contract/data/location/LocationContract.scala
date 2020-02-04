@@ -7,8 +7,10 @@ import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.exceptions._
 import csw.location.api.messages.LocationHttpMessage._
 import csw.location.api.messages.LocationWebsocketMessage.Track
+import csw.location.api.messages.{LocationHttpMessage, LocationWebsocketMessage}
 import csw.location.api.models._
 import csw.prefix.models.Subsystem
+import io.bullet.borer.Encoder
 
 object LocationContract extends LocationData with LocationServiceCodecs {
   val models: ModelSet = ModelSet(
@@ -42,36 +44,33 @@ object LocationContract extends LocationData with LocationServiceCodecs {
     Endpoint(name[ListByPrefix], arrayName[Location], List(name[RegistrationListingFailed]))
   )
 
-  val httpRequests: Map[String, ModelType[_]] = Map(
-    name[Register]             -> ModelType(akkaRegister, httpRegister),
-    name[Unregister]           -> ModelType(unregister),
-    objectName(UnregisterAll)  -> ModelType(unregisterAll),
-    name[Find]                 -> ModelType(find),
-    name[Resolve]              -> ModelType(resolve),
-    objectName(ListEntries)    -> ModelType(listEntries),
-    name[ListByComponentType]  -> ModelType(listByComponentTypeHcd, listByComponentTypeAssembly),
-    name[ListByConnectionType] -> ModelType(listByAkkaConnectionType, listByHttpConnectionType),
-    name[ListByHostname]       -> ModelType(listByHostname),
-    name[ListByPrefix]         -> ModelType(listByPrefix)
-  )
+  implicit def httpEnc[Sub <: LocationHttpMessage]: Encoder[Sub]           = SubTypeCodec.encoder(locationHttpMessageCodec)
+  implicit def websocketEnc[Sub <: LocationWebsocketMessage]: Encoder[Sub] = SubTypeCodec.encoder(locationWebsocketMessageCodec)
 
-  val httpContract: Contract = Contract(
-    httpEndpoints,
-    httpRequests
+  val httpRequests: ModelSet = ModelSet(
+    ModelType(akkaRegister, httpRegister),
+    ModelType(unregister),
+    ModelType(unregisterAll),
+    ModelType(find),
+    ModelType(resolve),
+    ModelType(listEntries),
+    ModelType(listByComponentTypeHcd, listByComponentTypeAssembly),
+    ModelType(listByAkkaConnectionType, listByHttpConnectionType),
+    ModelType(listByHostname),
+    ModelType(listByPrefix)
   )
 
   val webSocketEndpoints: List[Endpoint] = List(
     Endpoint(name[Track], name[TrackingEvent])
   )
 
-  val websocketRequests: Map[String, ModelType[_]] = Map(
-    name[Track] -> ModelType(track)
+  val websocketRequests: ModelSet = ModelSet(
+    ModelType(track)
   )
 
-  val webSocketContract: Contract = Contract(
-    webSocketEndpoints,
-    websocketRequests
+  val service: Service = Service(
+    Contract(httpEndpoints, httpRequests),
+    Contract(webSocketEndpoints, websocketRequests),
+    models
   )
-
-  val service: Service = Service(httpContract, webSocketContract, models)
 }

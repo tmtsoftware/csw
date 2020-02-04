@@ -11,7 +11,7 @@ case class Endpoint(requestType: String, responseType: String, errorTypes: List[
 class ModelType[T: Encoder: ClassTag] private (val models: List[T]) {
   implicit def enc: Encoder[ModelType[T]] = Encoder[List[T]].contramap(_.models)
   def write(w: Writer): w.type            = w.write(this)
-  def name: String                        = scala.reflect.classTag[T].runtimeClass.getSimpleName
+  def name: String                        = scala.reflect.classTag[T].runtimeClass.getSimpleName.stripSuffix("$")
 }
 
 case class ModelSet(modelTypes: List[ModelType[_]])
@@ -24,7 +24,7 @@ object ModelType extends CommonCodecs {
   def apply[T <: EnumEntry: Enum: ClassTag](enum: Enum[T]): ModelType[T] = new ModelType(enum.values.toList)
 }
 
-case class Contract(endpoints: List[Endpoint], requests: Map[String, ModelType[_]])
+case class Contract(endpoints: List[Endpoint], requests: ModelSet)
 
 case class Service(
     `http-contract`: Contract,

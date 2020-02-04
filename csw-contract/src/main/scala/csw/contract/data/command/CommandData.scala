@@ -6,7 +6,6 @@ import java.util.concurrent.TimeUnit
 import akka.util.Timeout
 import csw.command.api.messages.CommandServiceHttpMessage.{Oneway, Query, Submit, Validate}
 import csw.command.api.messages.CommandServiceWebsocketMessage.{QueryFinal, SubscribeCurrentState}
-import csw.command.api.messages.{CommandServiceHttpMessage, CommandServiceWebsocketMessage}
 import csw.params.commands.CommandIssue._
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
@@ -83,12 +82,13 @@ trait CommandData {
 
   val timeout: Timeout = Timeout(FiniteDuration(values, TimeUnit.SECONDS))
 
-  val observeValidate: CommandServiceHttpMessage     = Validate(observe)
-  val observeSubmit: CommandServiceHttpMessage       = Submit(observe)
-  val observeOneway: CommandServiceHttpMessage       = Oneway(observe)
-  val setupQuery: CommandServiceHttpMessage          = Query(id)
-  val queryFinal: CommandServiceWebsocketMessage     = QueryFinal(id, timeout)
-  val subscribeState: CommandServiceWebsocketMessage = SubscribeCurrentState(states)
+  val observeValidate: Validate = Validate(observe)
+  val observeSubmit: Submit     = Submit(observe)
+  val observeOneway: Oneway     = Oneway(observe)
+  val setupQuery: Query         = Query(id)
+
+  val queryFinal: QueryFinal                = QueryFinal(id, timeout)
+  val subscribeState: SubscribeCurrentState = SubscribeCurrentState(states)
 
   val assemblyBusyIssue: CommandIssue                 = AssemblyBusyIssue(reason)
   val idNotAvailableIssue: CommandIssue               = IdNotAvailableIssue(reason)

@@ -3,12 +3,14 @@ package csw.contract.data.command
 import csw.command.api.codecs.CommandServiceCodecs
 import csw.command.api.messages.CommandServiceHttpMessage.{Oneway, Query, Submit, Validate}
 import csw.command.api.messages.CommandServiceWebsocketMessage.{QueryFinal, SubscribeCurrentState}
+import csw.command.api.messages.{CommandServiceHttpMessage, CommandServiceWebsocketMessage}
 import csw.contract.generator.ClassNameHelpers.name
 import csw.contract.generator._
 import csw.params.commands.CommandResponse._
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.Units
 import csw.params.core.states.CurrentState
+import io.bullet.borer.Encoder
 
 object CommandContract extends CommandData with CommandServiceCodecs {
   val models: ModelSet = ModelSet(
@@ -52,16 +54,19 @@ object CommandContract extends CommandData with CommandServiceCodecs {
     )
   )
 
-  val httpRequests: Map[String, ModelType[_]] = Map(
-    name[Validate] -> ModelType(observeValidate),
-    name[Submit]   -> ModelType(observeSubmit),
-    name[Query]    -> ModelType(setupQuery),
-    name[Oneway]   -> ModelType(observeOneway)
+  implicit def httpEnc[Sub <: CommandServiceHttpMessage]: Encoder[Sub]           = SubTypeCodec.encoder(httpCodecsValue)
+  implicit def websocketEnc[Sub <: CommandServiceWebsocketMessage]: Encoder[Sub] = SubTypeCodec.encoder(websocketCodecs)
+
+  val httpRequests: ModelSet = ModelSet(
+    ModelType(observeValidate),
+    ModelType(observeSubmit),
+    ModelType(setupQuery),
+    ModelType(observeOneway)
   )
 
-  val websocketRequests: Map[String, ModelType[_]] = Map(
-    name[QueryFinal]            -> ModelType(queryFinal),
-    name[SubscribeCurrentState] -> ModelType(subscribeState)
+  val websocketRequests: ModelSet = ModelSet(
+    ModelType(queryFinal),
+    ModelType(subscribeState)
   )
 
   val httpEndpoints: List[Endpoint] = List(
@@ -76,9 +81,9 @@ object CommandContract extends CommandData with CommandServiceCodecs {
     Endpoint(name[SubscribeCurrentState], name[CurrentState])
   )
 
-  val httpContract: Contract = Contract(httpEndpoints, httpRequests)
-
-  val webSocketContract: Contract = Contract(webSocketEndpoints, websocketRequests)
-
-  val service: Service = Service(httpContract, webSocketContract, models)
+  val service: Service = Service(
+    `http-contract` = Contract(httpEndpoints, httpRequests),
+    `websocket-contract` = Contract(webSocketEndpoints, websocketRequests),
+    models = models
+  )
 }
