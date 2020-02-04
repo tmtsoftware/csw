@@ -46,7 +46,9 @@ pipeline {
                             reportFiles          : 'index.html',
                             reportName           : "Scoverage Report"
                     ])
-                    sh "rm -rf csw-params/js/target csw-time/csw-time-core/js/target csw--logging/csw-logging-models/.js/target csw-location/csw-location-models/.js/target csw-config/csw-config-models/.js/target csw-alarm/csw-alarm-models/.js/target csw-time/csw-time-clock/js/target"
+                    sh "rm -rf csw-params/js/target csw-time/csw-time-core/js/target csw--logging/csw-logging-models/.js/target csw-location/csw-location-api/js/target/ " +
+                            "csw-config/csw-config-models/.js/target csw-alarm/csw-alarm-models/.js/target csw-time/csw-time-clock/js/target csw-prefix/js/target/ " +
+                            "csw-admin/csw-admin-api/.js/target csw-command/csw-command-api/js/target/"
                 }
             }
         }

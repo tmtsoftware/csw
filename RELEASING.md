@@ -27,7 +27,8 @@
 2. Update top level `CHANGELOG.md`
 3. Update top level `README.md`
 4. Exclude projects from `build.sbt` which you do not want to release
-5. Run `csw-prod` pipeline by providing `VERSION` number.
+5. Remove targets of newly added js projects in jenkins prod file  
+6. Run `csw-prod` pipeline by providing `VERSION` number.
 
 ### csw.g8
 1. Merge `dev` branch to master
