@@ -21,4 +21,4 @@ Make sure to replace the `host` and `port` of the running location service on lo
 
 ## Change
 
-This is the base version - 1.0.0
+This is the base version - 1
