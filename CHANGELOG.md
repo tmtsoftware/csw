@@ -9,7 +9,7 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
-## [CSW v1.1.0-RC1] - 2020-02-03
+## [CSW v1.1.0-RC1] - 2020-02-04
 
 This is the release candidate 1 for the release 1.1.0 of the TMT Common Software for project stakeholders.
 See [here](https://tmtsoftware.github.io/csw/1.1.0-RC1/) for a detailed documentation of this version of the CSW software.
@@ -24,6 +24,7 @@ See [here](https://tmtsoftware.github.io/csw/1.1.0-RC1/) for a detailed document
 - Subsystem is displayed in uppercase instead of lowercase
 - ArrayData and MatrixData does not require classtag for creation 
 - Admin routes for setting log level and getting log level are now available via gateway
+- JSON contracts for location and command service added in paradox documentation
 
 ### Version Upgrades
 - Scala version upgrade to 2.13.1

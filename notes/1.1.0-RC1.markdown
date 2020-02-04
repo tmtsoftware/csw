@@ -15,6 +15,7 @@ See [CHANGELOG.md](CHANGELOG.md) for details of all releases.
 - Subsystem is displayed in uppercase instead of lowercase
 - ArrayData and MatrixData does not require classtag for creation 
 - Admin routes for setting log level and getting log level are now available via gateway
+- JSON contracts for location and command service added in paradox documentation 
 
 ### Version Upgrades
 - Scala version upgrade to 2.13.1
