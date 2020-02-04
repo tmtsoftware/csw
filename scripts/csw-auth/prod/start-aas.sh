@@ -4,7 +4,7 @@ trap 'trap - SIGTERM && kill -- -$$' SIGINT SIGTERM EXIT
 
 currentDir=$(pwd)
 keycloakDir=~
-keycloakVersion=5.0.0
+keycloakVersion=8.0.1
 keycloakBinaryUnzipped=keycloak-${keycloakVersion}
 keycloakBinaryZipped=${keycloakBinaryUnzipped}.tar.gz
 script_name=$0
@@ -15,10 +15,8 @@ host="0.0.0.0"
 userName=""
 password=""
 testMode=false
-exampleDemo=false
 
 configImportJsonPath="../conf/auth_service/tmt-realm-export.json"
-exampleImportJsonPath="../conf/auth_service/example-realm.json"
 standaloneXmlPath="../conf/auth_service/standalone.xml"
 
 # Run from the directory containing the script
@@ -78,9 +76,6 @@ function parse_cmd_args {
                 --testMode)
                     testMode=true
                     ;;
-                --exampleMode)
-                    exampleDemo=true
-                    ;;
                 --help)
                     usage
                     ;;
@@ -111,7 +106,6 @@ function usage {
     echo "  --user | -u <user_name>         add AAS with provided user as admin"
     echo "  --password <password>           add provided password for admin user"
     echo "  --testMode                      Optional parameter which sets up AAS for config server and cli testing"
-    echo "  --exampleMode                   Optional parameter which sets up AAS for example server and react app demo"
     exit 1
 }
 
@@ -148,35 +142,22 @@ function wait_till_AAS_starts {
 function addTestUsers {
     cd ${keycloakDir}/${keycloakBinaryUnzipped}/bin
     echo "[INFO] Adding test users"
-    if ${exampleDemo} ; then
-        ./add-user-keycloak.sh -u test-user -p abcd -r example
-    else
-        ./add-user-keycloak.sh -u "config-admin" -p "config-admin" -r TMT
-        ./add-user-keycloak.sh -u "config-user" -p "config-user" -r TMT
-    fi
+    ./add-user-keycloak.sh -u "config-admin" -p "config-admin" -r TMT
+    ./add-user-keycloak.sh -u "config-user" -p "config-user" -r TMT
 }
 
 function associateRoleToTestUsers {
     wait_till_AAS_starts
     cd ${keycloakDir}/${keycloakBinaryUnzipped}/bin
         ./kcadm.sh config credentials --server http://${host}:${port}/auth --realm master --user ${userName} --password ${password}
-    if ${exampleDemo} ; then
-        echo "[INFO] Associate roles to example users"
-        ./kcadm.sh add-roles --uusername test-user --rolename person-role --cclientid example-server -r example
-        ./kcadm.sh add-roles --uusername test-user --rolename example-admin-role -r example
-    else
-        echo "[INFO] Associate roles to test users"
-        ./kcadm.sh add-roles --uusername "config-admin" --rolename admin --cclientid csw-config-server -r TMT
-    fi
+    echo "[INFO] Associate roles to test users"
+    ./kcadm.sh add-roles --uusername "config-admin" --rolename admin --cclientid csw-config-server -r TMT
 }
 
 function startAndRegister {
     cd ${currentDir}
     echo "[INFO] starting server at $host:$port"
     path=${currentDir}/${configImportJsonPath}
-    if ${exampleDemo}; then
-        path=${currentDir}/${exampleImportJsonPath}
-    fi
     cp ${standaloneXmlPath} ${keycloakDir}/${keycloakBinaryUnzipped}/standalone/configuration/standalone.xml
     ./csw-location-agent --prefix "csw.AAS" --http "auth" -c "${keycloakDir}/${keycloakBinaryUnzipped}/bin/standalone.sh -Djboss.bind.address=${host} -Djboss.http.port=${port} -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=$path" -p "$port" -J-Dcsw-location-client.server-http-port=${location_http_port}
 }
@@ -186,8 +167,8 @@ function start {
     checkIfKeycloakIsInstalled
     setJvmOpts
     addAdminUser
-    if [[ ${testMode} || ${exampleDemo} ]] ; then addTestUsers ; fi
-    if [[ ${testMode} || ${exampleDemo} ]] ; then
+    if [[ ${testMode} ]] ; then addTestUsers ; fi
+    if [[ ${testMode} ]] ; then
      associateRoleToTestUsers &
     fi
     startAndRegister
