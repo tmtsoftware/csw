@@ -10,9 +10,9 @@ object LocationServiceCodecs extends LocationServiceCodecs
 
 trait LocationServiceCodecs extends LocationCodecs {
 
-  implicit lazy val locationHttpMessageCodecValue: Codec[LocationHttpMessage]           = deriveAllCodecs
-  implicit lazy val locationWebsocketMessageCodecValue: Codec[LocationWebsocketMessage] = deriveAllCodecs
-  implicit lazy val LocationServiceErrorCodecValue: Codec[LocationServiceError]         = deriveAllCodecs
+  implicit lazy val locationHttpMessageCodec: Codec[LocationHttpMessage]           = deriveAllCodecs
+  implicit lazy val locationWebsocketMessageCodec: Codec[LocationWebsocketMessage] = deriveAllCodecs
+  implicit lazy val LocationServiceErrorCodec: Codec[LocationServiceError]         = deriveAllCodecs
 
   implicit lazy val locationHttpMessageErrorProtocol: ErrorProtocol[LocationHttpMessage] =
     ErrorProtocol.bind[LocationHttpMessage, LocationServiceError]
