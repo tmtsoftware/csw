@@ -1,39 +1,35 @@
 package csw.contract.generator
 
 import enumeratum._
-import io.bullet.borer.Dom.Element
-import io.bullet.borer.{Decoder, Encoder, Json}
+import io.bullet.borer.derivation.CompactMapBasedCodecs
+import io.bullet.borer.{Encoder, Writer}
 
-import scala.language.implicitConversions
 import scala.reflect.ClassTag
 
-case class Endpoint(requestType: String, responseType: Element, errorTypes: List[String] = Nil)
+case class Endpoint(requestType: String, responseType: String, errorTypes: List[String] = Nil)
 
-case class ModelType(models: List[Element])
-
-object ModelType {
-  import DomHelpers._
-  def apply(models: Element*): ModelType                    = new ModelType(models.toList)
-  def apply[T <: EnumEntry: Enum](enum: Enum[T]): ModelType = new ModelType(enum.values.toList.map(_.entryName))
+case class ModelType[T: Encoder](models: List[T]) {
+  implicit def enc: Encoder[ModelType[T]] = CompactMapBasedCodecs.deriveEncoder
+  def write(w: Writer): w.type            = w.write(this)
 }
 
-case class Contract(endpoints: List[Endpoint], requests: Map[String, ModelType])
+object ModelType {
+  def apply[T: Encoder](models: T*): ModelType[T]                   = new ModelType(models.toList)
+  def apply[T <: EnumEntry: Enum](enum: Enum[T]): ModelType[String] = new ModelType(enum.values.toList.map(_.entryName))
+}
+
+case class Contract(endpoints: List[Endpoint], requests: Map[String, ModelType[_]])
 
 case class Service(
     `http-contract`: Contract,
     `websocket-contract`: Contract,
-    models: Map[String, ModelType]
+    models: Map[String, ModelType[_]]
 )
 
 case class Services(data: Map[String, Service])
 
-object DomHelpers {
-  implicit def encode[T: Encoder: Decoder](x: T): Element = Json.decode(Json.encode(x).toByteArray).to[Element].value
-}
-
 object ClassNameHelpers {
-  import DomHelpers._
   def name[T: ClassTag]: String                = scala.reflect.classTag[T].runtimeClass.getSimpleName
-  def arrayName[T: ClassTag]: Element          = encode(List(name[T]))
+  def arrayName[T: ClassTag]: String           = s"[${name[T]}]"
   def objectName[T <: Singleton](x: T): String = x.toString
 }

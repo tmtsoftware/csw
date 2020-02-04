@@ -1,9 +1,9 @@
 package csw.contract.data.command
 
+import csw.command.api.codecs.CommandServiceCodecs
 import csw.command.api.messages.CommandServiceHttpMessage.{Oneway, Query, Submit, Validate}
 import csw.command.api.messages.CommandServiceWebsocketMessage.{QueryFinal, SubscribeCurrentState}
 import csw.contract.generator.ClassNameHelpers.name
-import csw.contract.generator.DomHelpers._
 import csw.contract.generator._
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
@@ -12,11 +12,11 @@ import csw.params.core.models.Units
 import csw.params.core.states.CurrentState
 import enumeratum.EnumEntry
 
-object CommandContract extends CommandData with ContractCodecs {
-  val models: Map[String, ModelType] = Map(
+object CommandContract extends CommandData with CommandServiceCodecs {
+  val models: Map[String, ModelType[_]] = Map(
     name[ControlCommand] -> ModelType(observe, setup),
     name[CommandName]    -> ModelType(commandName),
-    name[Parameter[_]] -> ModelType(
+    name[Parameter[_]] -> ModelType[Parameter[_]](
       intParameter,
       arrayParameter,
       structParameter,
@@ -54,14 +54,14 @@ object CommandContract extends CommandData with ContractCodecs {
     )
   )
 
-  val httpRequests: Map[String, ModelType] = Map(
+  val httpRequests: Map[String, ModelType[_]] = Map(
     name[Validate] -> ModelType(observeValidate),
     name[Submit]   -> ModelType(observeSubmit),
     name[Query]    -> ModelType(setupQuery),
     name[Oneway]   -> ModelType(observeOneway)
   )
 
-  val websocketRequests: Map[String, ModelType] = Map(
+  val websocketRequests: Map[String, ModelType[_]] = Map(
     name[QueryFinal]            -> ModelType(queryFinal),
     name[SubscribeCurrentState] -> ModelType(subscribeState)
   )

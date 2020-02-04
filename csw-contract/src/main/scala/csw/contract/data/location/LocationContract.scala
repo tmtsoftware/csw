@@ -2,22 +2,16 @@ package csw.contract.data.location
 
 import akka.Done
 import csw.contract.generator.ClassNameHelpers._
-import csw.contract.generator.DomHelpers._
 import csw.contract.generator._
-import csw.location.api.exceptions.{
-  LocationServiceError,
-  OtherLocationIsRegistered,
-  RegistrationFailed,
-  RegistrationListingFailed,
-  UnregistrationFailed
-}
+import csw.location.api.codec.LocationServiceCodecs
+import csw.location.api.exceptions._
 import csw.location.api.messages.LocationHttpMessage._
 import csw.location.api.messages.LocationWebsocketMessage.Track
 import csw.location.api.models._
 import csw.prefix.models.{Prefix, Subsystem}
 
-object LocationContract extends LocationData with ContractCodecs {
-  val models: Map[String, ModelType] = Map(
+object LocationContract extends LocationData with LocationServiceCodecs {
+  val models: Map[String, ModelType[_]] = Map(
     name[Registration]   -> ModelType(akkaRegistration, httpRegistration, tcpRegistration),
     name[Location]       -> ModelType(akkaLocation, httpLocation, tcpLocation),
     name[TrackingEvent]  -> ModelType(locationUpdated, locationRemoved),
@@ -48,7 +42,7 @@ object LocationContract extends LocationData with ContractCodecs {
     Endpoint(name[ListByPrefix], arrayName[Location], List(name[RegistrationListingFailed]))
   )
 
-  val httpRequests: Map[String, ModelType] = Map(
+  val httpRequests: Map[String, ModelType[_]] = Map(
     name[Register]             -> ModelType(akkaRegister, httpRegister),
     name[Unregister]           -> ModelType(unregister),
     objectName(UnregisterAll)  -> ModelType(unregisterAll),
@@ -70,7 +64,7 @@ object LocationContract extends LocationData with ContractCodecs {
     Endpoint(name[Track], name[TrackingEvent])
   )
 
-  val websocketRequests: Map[String, ModelType] = Map(
+  val websocketRequests: Map[String, ModelType[_]] = Map(
     name[Track] -> ModelType(track)
   )
 

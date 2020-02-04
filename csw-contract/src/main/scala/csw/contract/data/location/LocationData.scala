@@ -4,7 +4,6 @@ import java.net.URI
 import java.util.concurrent.TimeUnit
 
 import akka.Done
-import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.exceptions._
 import csw.location.api.messages.LocationHttpMessage._
 import csw.location.api.messages.LocationWebsocketMessage.Track
@@ -15,7 +14,7 @@ import csw.prefix.models.{Prefix, Subsystem}
 
 import scala.concurrent.duration.FiniteDuration
 
-trait LocationData extends LocationServiceCodecs {
+trait LocationData {
   val port       = 8080
   val seconds    = 23
   val pathString = "path"
