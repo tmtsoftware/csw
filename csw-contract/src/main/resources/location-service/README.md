@@ -29,7 +29,3 @@ Make sure to replace the `host` and `port` of the running location service on lo
 * Request sample, response types and error types for http endpoint is described in `http-contract.json`     
 * Request sample, response types and error types for webservice endpoint is described in `websocket-contract.json`
 * Samples describing how to create requests, possible responses and possible errors can be found in `models.json`
-
-## Change
-
-This is the base version - 1.0.0
