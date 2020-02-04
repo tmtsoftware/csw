@@ -16,6 +16,11 @@
 
 ## Steps to release
 
+### Release msocket
+1. Release `msocket`
+    There is not pieline to release msocket but only `git tag v0.0.0` and `git push origin v0.0.0` 
+2. update msocket tag version in csw
+    
 ### csw
 1. Update release notes (`notes/<version>.markdown`) in `csw` repo
 #### Note - The version in `notes` should be of format `v1.0.0` but while triggering the pipeline build parameter should be of format `1.0.0` 
@@ -36,10 +41,10 @@
 3. Update top level `README.md`
 4. Refer the RELEASING.md of csw-js
 
-### Release csw-client
+### Release csw-shell
 1. Update the csw version in `build.sbt`
-2. Release `csw-client` with the latest `VERSION` of csw.
-    There is not pieline to release csw-client but only `git tag v0.0.0` and `git push origin v0.0.0` 
+2. Release `csw-shell` with the latest `VERSION` of csw.
+    There is not pieline to release csw-shell but only `git tag v0.0.0` and `git push origin v0.0.0` 
 
 #### Note - `VERSION` tag is version number with 'v' as prefix. For eg. `v0.0.0`
 
