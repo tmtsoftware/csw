@@ -6,17 +6,15 @@ import csw.command.api.messages.CommandServiceWebsocketMessage.{QueryFinal, Subs
 import csw.contract.generator.ClassNameHelpers.name
 import csw.contract.generator._
 import csw.params.commands.CommandResponse._
-import csw.params.commands._
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.Units
 import csw.params.core.states.CurrentState
-import enumeratum.EnumEntry
 
 object CommandContract extends CommandData with CommandServiceCodecs {
-  val models: Map[String, ModelType[_]] = Map(
-    name[ControlCommand] -> ModelType(observe, setup),
-    name[CommandName]    -> ModelType(commandName),
-    name[Parameter[_]] -> ModelType[Parameter[_]](
+  val models: ModelSet = ModelSet(
+    ModelType(observe, setup),
+    ModelType(commandName),
+    ModelType[Parameter[_]](
       intParameter,
       arrayParameter,
       structParameter,
@@ -26,14 +24,14 @@ object CommandContract extends CommandData with CommandServiceCodecs {
       raDecParameter,
       choiceParameter
     ),
-    name[KeyType[EnumEntry]] -> ModelType(KeyType),
-    name[Units]              -> ModelType(Units),
-    name[Result]             -> ModelType(result),
-    name[SubmitResponse]     -> ModelType(cancelled, completed, error, invalid, locked, started),
-    name[OnewayResponse]     -> ModelType(accepted, invalid, locked),
-    name[ValidateResponse]   -> ModelType(accepted, invalid, locked),
-    name[CurrentState]       -> ModelType(currentState),
-    name[CommandIssue] -> ModelType(
+    ModelType(KeyType),
+    ModelType(Units),
+    ModelType(result),
+    ModelType(cancelled, completed, error, invalid, locked, started),
+    ModelType(accepted, invalid, locked),
+    ModelType(accepted, invalid, locked),
+    ModelType(currentState),
+    ModelType(
       assemblyBusyIssue,
       idNotAvailableIssue,
       missingKeyIssue,

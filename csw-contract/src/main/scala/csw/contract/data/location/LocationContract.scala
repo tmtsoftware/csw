@@ -8,25 +8,25 @@ import csw.location.api.exceptions._
 import csw.location.api.messages.LocationHttpMessage._
 import csw.location.api.messages.LocationWebsocketMessage.Track
 import csw.location.api.models._
-import csw.prefix.models.{Prefix, Subsystem}
+import csw.prefix.models.Subsystem
 
 object LocationContract extends LocationData with LocationServiceCodecs {
-  val models: Map[String, ModelType[_]] = Map(
-    name[Registration]   -> ModelType(akkaRegistration, httpRegistration, tcpRegistration),
-    name[Location]       -> ModelType(akkaLocation, httpLocation, tcpLocation),
-    name[TrackingEvent]  -> ModelType(locationUpdated, locationRemoved),
-    name[ConnectionType] -> ModelType(ConnectionType),
-    name[Connection]     -> ModelType(akkaConnection, httpConnection, tcpConnection),
-    name[ComponentId]    -> ModelType(ComponentId(prefix, ComponentType.HCD)),
-    name[ComponentType]  -> ModelType(ComponentType),
-    name[LocationServiceError] -> ModelType(
+  val models: ModelSet = ModelSet(
+    ModelType(akkaRegistration, httpRegistration, tcpRegistration),
+    ModelType(akkaLocation, httpLocation, tcpLocation),
+    ModelType(locationUpdated, locationRemoved),
+    ModelType(ConnectionType),
+    ModelType[Connection](akkaConnection, httpConnection, tcpConnection),
+    ModelType(ComponentId(prefix, ComponentType.HCD)),
+    ModelType(ComponentType),
+    ModelType(
       registrationFailed,
       otherLocationIsRegistered,
       unregisterFailed,
       registrationListingFailed
     ),
-    name[Subsystem] -> ModelType(Subsystem),
-    name[Prefix]    -> ModelType(prefix)
+    ModelType(Subsystem),
+    ModelType(prefix)
   )
 
   val httpEndpoints: List[Endpoint] = List(
