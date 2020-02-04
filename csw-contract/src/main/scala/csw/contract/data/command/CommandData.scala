@@ -4,7 +4,6 @@ import java.time.Instant
 import java.util.concurrent.TimeUnit
 
 import akka.util.Timeout
-import csw.command.api.codecs.CommandServiceCodecs
 import csw.command.api.messages.CommandServiceHttpMessage.{Oneway, Query, Submit, Validate}
 import csw.command.api.messages.CommandServiceWebsocketMessage.{QueryFinal, SubscribeCurrentState}
 import csw.command.api.messages.{CommandServiceHttpMessage, CommandServiceWebsocketMessage}
@@ -21,7 +20,7 @@ import csw.time.core.models.UTCTime
 
 import scala.concurrent.duration.FiniteDuration
 
-trait CommandData extends CommandServiceCodecs {
+trait CommandData {
   val values                              = 100
   val intKey: Key[Int]                    = KeyType.IntKey.make("encoder")
   val structKey: Key[Struct]              = KeyType.StructKey.make("structs")
