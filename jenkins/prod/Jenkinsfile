@@ -83,11 +83,11 @@ pipeline {
             }
         }
 
-        stage('Bintray Publish') {
-            steps {
-                sh "./publish.sh"
-            }
-        }
+//        stage('Bintray Publish') {
+//            steps {
+//                sh "./publish.sh"
+//            }
+//        }
     }
     post {
         always {
