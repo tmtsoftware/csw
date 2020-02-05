@@ -46,8 +46,8 @@ public class JStateVariablesTest extends JUnitSuite {
         ObsId obsId = new ObsId("Obs001");
 
         //parameters
-        Parameter<Character> charParam = charKey.set('A', 'B', 'C').withUnits(NoUnits());
-        Parameter<Integer> intParam = intKey.set(1, 2, 3).withUnits(meter());
+        Parameter<Character> charParam = charKey.set('A', 'B', 'C').withUnits(NoUnits);
+        Parameter<Integer> intParam = intKey.set(1, 2, 3).withUnits(meter);
         Parameter<Boolean> booleanParam = booleanKey.set(true, false);
         Parameter<UTCTime> timestamp = utcTimeKey.set(UTCTime.now());
 
@@ -108,8 +108,8 @@ public class JStateVariablesTest extends JUnitSuite {
         ObsId obsId = new ObsId("Obs001");
 
         //parameters
-        Parameter<Character> charParam = charKey.set('A', 'B', 'C').withUnits(NoUnits());
-        Parameter<Integer> intParam = intKey.set(1, 2, 3).withUnits(meter());
+        Parameter<Character> charParam = charKey.set('A', 'B', 'C').withUnits(NoUnits);
+        Parameter<Integer> intParam = intKey.set(1, 2, 3).withUnits(meter);
         Parameter<Boolean> booleanParam = booleanKey.set(true, false);
         Parameter<UTCTime> timestamp = timestampKey.set(UTCTime.now());
 

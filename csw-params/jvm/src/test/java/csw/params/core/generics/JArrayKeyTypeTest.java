@@ -16,7 +16,7 @@ import static csw.params.javadsl.JUnits.*;
 // DEOPSCSW-184: Change configurations - attributes and values
 public class JArrayKeyTypeTest extends JUnitSuite {
 
-    private final Units NoUnit = NoUnits();
+    private final Units NoUnit = NoUnits;
 
     private void commonAssertions(String keyName, KeyType keyType, ArrayData[] testData, Parameter parameter, Units unit) {
         Assert.assertEquals(keyName, keyName);
@@ -53,8 +53,8 @@ public class JArrayKeyTypeTest extends JUnitSuite {
         commonAssertions(keyName, JKeyType.ByteArrayKey(), arrayData, parameterWithoutUnits, NoUnit);
 
         // key.set with Units
-        Parameter<ArrayData<Byte>> parameterWithUnits = key.set(arrayData, millisecond());
-        commonAssertions(keyName, JKeyType.ByteArrayKey(), arrayData, parameterWithUnits, millisecond());
+        Parameter<ArrayData<Byte>> parameterWithUnits = key.set(arrayData, millisecond);
+        commonAssertions(keyName, JKeyType.ByteArrayKey(), arrayData, parameterWithUnits, millisecond);
     }
 
     @Test
@@ -73,8 +73,8 @@ public class JArrayKeyTypeTest extends JUnitSuite {
         commonAssertions(keyName, JKeyType.ShortArrayKey(), arrayData, parameterWithoutUnits, NoUnit);
 
         // key.set with Units
-        Parameter<ArrayData<Short>> parameterWithUnits = key.set(arrayData, degree());
-        commonAssertions(keyName, JKeyType.ShortArrayKey(), arrayData, parameterWithUnits, degree());
+        Parameter<ArrayData<Short>> parameterWithUnits = key.set(arrayData, degree);
+        commonAssertions(keyName, JKeyType.ShortArrayKey(), arrayData, parameterWithUnits, degree);
     }
 
     @Test
@@ -93,8 +93,8 @@ public class JArrayKeyTypeTest extends JUnitSuite {
         commonAssertions(keyName, JKeyType.LongArrayKey(), arrayData, parameterWithoutUnits, NoUnit);
 
         // key.set with Units
-        Parameter<ArrayData<Long>> parameterWithUnits = key.set(arrayData, millimeter());
-        commonAssertions(keyName, JKeyType.LongArrayKey(), arrayData, parameterWithUnits, millimeter());
+        Parameter<ArrayData<Long>> parameterWithUnits = key.set(arrayData, millimeter);
+        commonAssertions(keyName, JKeyType.LongArrayKey(), arrayData, parameterWithUnits, millimeter);
     }
 
     @Test
@@ -114,8 +114,8 @@ public class JArrayKeyTypeTest extends JUnitSuite {
         commonAssertions(keyName, JKeyType.IntArrayKey(), arrayData, parameterWithoutUnits, NoUnit);
 
         // key.set with Units
-        Parameter<ArrayData<Integer>> parameterWithUnits = key.set(arrayData, kilometer());
-        commonAssertions(keyName, JKeyType.IntArrayKey(), arrayData, parameterWithUnits, kilometer());
+        Parameter<ArrayData<Integer>> parameterWithUnits = key.set(arrayData, kilometer);
+        commonAssertions(keyName, JKeyType.IntArrayKey(), arrayData, parameterWithUnits, kilometer);
     }
 
     @Test
@@ -134,8 +134,8 @@ public class JArrayKeyTypeTest extends JUnitSuite {
         commonAssertions(keyName, JKeyType.FloatArrayKey(), arrayData, parameterWithoutUnits, NoUnit);
 
         // key.set with Units
-        Parameter<ArrayData<Float>> parameterWithUnits = key.set(arrayData, meter());
-        commonAssertions(keyName, JKeyType.FloatArrayKey(), arrayData, parameterWithUnits, meter());
+        Parameter<ArrayData<Float>> parameterWithUnits = key.set(arrayData, meter);
+        commonAssertions(keyName, JKeyType.FloatArrayKey(), arrayData, parameterWithUnits, meter);
     }
 
     @Test
@@ -154,7 +154,7 @@ public class JArrayKeyTypeTest extends JUnitSuite {
         commonAssertions(keyName, JKeyType.DoubleArrayKey(), arrayData, parameterWithoutUnits, NoUnit);
 
         // key.set with Units
-        Parameter<ArrayData<Double>> parameterWithUnits = key.set(arrayData, encoder());
-        commonAssertions(keyName, JKeyType.DoubleArrayKey(), arrayData, parameterWithUnits, encoder());
+        Parameter<ArrayData<Double>> parameterWithUnits = key.set(arrayData, encoder);
+        commonAssertions(keyName, JKeyType.DoubleArrayKey(), arrayData, parameterWithUnits, encoder);
     }
 }
