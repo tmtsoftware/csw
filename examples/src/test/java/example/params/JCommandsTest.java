@@ -76,7 +76,7 @@ public class JCommandsTest extends JUnitSuite {
         Optional<Parameter<Integer>> optK2Bad = sc1.jGet(k2bad); //absent
 
         //add more than one parameters, using madd
-        Setup sc2 = sc1.madd(k3.set(1, 2, 3, 4).withUnits(JUnits.day()), k4.set(1.0f, 2.0f));
+        Setup sc2 = sc1.madd(k3.set(1, 2, 3, 4).withUnits(JUnits.day), k4.set(1.0f, 2.0f));
         int paramSize = sc2.size();
 
         //add binary payload
@@ -136,7 +136,7 @@ public class JCommandsTest extends JUnitSuite {
         Optional<Parameter<ArrayData<Float>>> k2BadParam = oc1.jGet(k2bad.keyName(), JKeyType.FloatArrayKey());
 
         //add more than one parameters, using madd
-        Observe oc2 = oc1.madd(k3.set(1, 2, 3, 4).withUnits(JUnits.day()), k4.set(UTCTime.now()));
+        Observe oc2 = oc1.madd(k3.set(1, 2, 3, 4).withUnits(JUnits.day), k4.set(UTCTime.now()));
         int paramSize = oc2.size();
 
         //update existing key with set
@@ -188,7 +188,7 @@ public class JCommandsTest extends JUnitSuite {
         Optional<Parameter<ArrayData<Float>>> k2BadParam = wc1.jGet("absentKeyHere", JKeyType.FloatArrayKey());
 
         //add more than one parameters, using madd
-        Wait wc2 = wc1.madd(k3.set(1, 2, 3, 4).withUnits(JUnits.day()), k4.set(UTCTime.now()));
+        Wait wc2 = wc1.madd(k3.set(1, 2, 3, 4).withUnits(JUnits.day), k4.set(UTCTime.now()));
         int paramSize = wc2.size();
 
         //update existing key with set

@@ -265,7 +265,7 @@ public class JEventsTest extends JUnitSuite {
         RaDec raDec2 = new RaDec(11.20, 50.20);
 
         //parameters
-        Parameter<RaDec> param = raDecKey.set(raDec1, raDec2).withUnits(JUnits.arcmin());
+        Parameter<RaDec> param = raDecKey.set(raDec1, raDec2).withUnits(JUnits.arcmin);
 
         //events
         ObserveEvent observeEvent = new ObserveEvent(prefix1, name1).add(param);
