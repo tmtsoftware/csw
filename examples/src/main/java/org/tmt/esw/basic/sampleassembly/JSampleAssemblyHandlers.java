@@ -169,6 +169,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
   }
   //#validate
 
+  //#submit-split
   @Override
   public SubmitResponse onSubmit(Id runId, ControlCommand command) {
     if (command instanceof Setup) {
@@ -176,13 +177,17 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     }
     return new Invalid(runId, new UnsupportedCommandIssue("Observe commands not supported"));
   }
+  //#submit-split
 
   //#sending-command
+  //#immediate-command
   private SubmitResponse onSetup(Id runId, Setup setup) {
     CommandName cmd = setup.commandName();
     if (cmd.equals(immediateCommand)) {
-      return new Completed(runId);
+      // Assembly preforms a calculation or reads state information storing in a result
+      return new Completed(runId, new Result().madd(resultKey.set(1000L)));
     }
+    //#immediate-command
     if (cmd.equals(shortCommand)) {
       sleepHCD(runId, setup, shortSleepPeriod);
       return new Started(runId);
@@ -195,6 +200,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
       sleepHCD(runId, setup, longSleepPeriod);
       return new Started(runId);
     }
+    //#queryF
     if (cmd.equals(complexCommand)) {
       CompletableFuture<SubmitResponse> medium = simpleHCD(runId, new Setup(prefix, hcdSleep, setup.jMaybeObsId()).add(setSleepTime(mediumSleepPeriod)));
       CompletableFuture<SubmitResponse> long_ = simpleHCD(runId, new Setup(prefix, hcdSleep, setup.jMaybeObsId()).add(setSleepTime(longSleepPeriod)));
@@ -221,7 +227,19 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     return new Invalid(runId, new CommandIssue.UnsupportedCommandIssue(setup.commandName().name()));
   }
 
+  private CompletableFuture<SubmitResponse> simpleHCD(Id runId, Setup setup) {
+    if (hcdCS.isPresent()) {
+      ICommandService cs = hcdCS.get();
+      return cs.submitAndWait(setup, timeout);
+    }
+    return CompletableFuture.completedFuture(
+            new CommandResponse.Error(runId, "A needed HCD is not available: " + hcdConnection.componentId()));
+  }
+  //#queryF
+
   @SuppressWarnings("unused")
+  //#submitAndQueryFinal
+  //#updateCommand
   private void sleepHCD(Id runId, Setup setup, Long sleepTime) {
     if (hcdCS.isPresent()) {
       ICommandService cs = hcdCS.get();
@@ -241,16 +259,9 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
       );
     }
   }
+  //#updateCommand
+  //#submitAndQueryFinal
   //#sending-command
-
-  private CompletableFuture<SubmitResponse> simpleHCD(Id runId, Setup setup) {
-    if (hcdCS.isPresent()) {
-      ICommandService cs = hcdCS.get();
-      return cs.submitAndWait(setup, timeout);
-    }
-    return CompletableFuture.completedFuture(
-        new CommandResponse.Error(runId, "A needed HCD is not available: " + hcdConnection.componentId()));
-  }
 
 
   @Override

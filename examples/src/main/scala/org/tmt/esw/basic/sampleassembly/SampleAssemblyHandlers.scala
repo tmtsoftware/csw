@@ -14,7 +14,7 @@ import csw.location.models.Connection.AkkaConnection
 import csw.location.models._
 import csw.params.commands.CommandIssue.{MissingKeyIssue, ParameterValueOutOfRangeIssue, UnsupportedCommandIssue}
 import csw.params.commands.CommandResponse._
-import csw.params.commands.{CommandIssue, ControlCommand, Observe, Setup}
+import csw.params.commands.{CommandIssue, ControlCommand, Observe, Result, Setup}
 import csw.params.core.generics.KeyType
 import csw.params.core.models.Id
 import csw.params.events._
@@ -23,7 +23,7 @@ import csw.time.core.models.UTCTime
 import org.tmt.esw.basic.shared.SampleInfo._
 
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.concurrent.{Await, ExecutionContextExecutor, Future}
 
 /**
  * Domain specific logic should be written in below handlers.
@@ -116,8 +116,6 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
         setup.commandName match {
           case `sleep` =>
             validateSleep(runId, setup)
-          case `cancelLongCommand` =>
-            validateCancel(runId, setup)
           case `immediateCommand` | `shortCommand` | `mediumCommand` | `longCommand` | `complexCommand` =>
             Accepted(runId)
           case _ =>
@@ -138,38 +136,38 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
     else {
       Invalid(runId, MissingKeyIssue(s"required sleep command key: $sleepTimeKey is missing."))
     }
-
-  private def validateCancel(runId: Id, setup: Setup): ValidateCommandResponse =
-    if (setup.exists(cancelKey)) {
-      Accepted(runId)
-    }
-    else {
-      Invalid(runId, MissingKeyIssue(s"required cancel command key: $cancelKey is missing."))
-    }
-
   //#validate
 
+  //#submit-split
   override def onSubmit(runId: Id, command: ControlCommand): SubmitResponse =
     command match {
       case s: Setup => onSetup(runId, s)
       case _: Observe =>
         Invalid(runId, UnsupportedCommandIssue("Observe commands not supported"))
     }
+  //#submit-split
 
   //#sending-command
+  //#immediate-command
   private def onSetup(runId: Id, setup: Setup): SubmitResponse =
     setup.commandName match {
       case `immediateCommand` =>
-        Completed(runId)
+        // Assembly preforms a calculation or reads state information storing in a result
+        Completed(runId, Result().add(resultKey.set(1000L)))
+      //#immediate-command
       case `shortCommand` =>
         sleepHCD(runId, setup, shortSleepPeriod)
         Started(runId)
+
       case `mediumCommand` =>
         sleepHCD(runId, setup, mediumSleepPeriod)
         Started(runId)
+
       case `longCommand` =>
         sleepHCD(runId, setup, longSleepPeriod)
         Started(runId)
+      //#queryF
+
       case `complexCommand` =>
         val medium = simpleHCD(runId, Setup(prefix, hcdSleep, setup.maybeObsId).add(setSleepTime(mediumSleepPeriod)))
         val long   = simpleHCD(runId, Setup(prefix, hcdSleep, setup.maybeObsId).add(setSleepTime(longSleepPeriod)))
@@ -195,6 +193,17 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
         Invalid(runId, CommandIssue.UnsupportedCommandIssue(s"${setup.commandName.name}"))
     }
 
+  private def simpleHCD(runId: Id, setup: Setup): Future[SubmitResponse] =
+    hcdCS match {
+      case Some(cs) =>
+        cs.submitAndWait(setup)
+      case None =>
+        Future(Error(runId, s"A needed HCD is not available: ${hcdConnection.componentId}"))
+    }
+  //#queryF
+
+  //#updateCommand
+  //#submitAndQueryFinal
   private def sleepHCD(runId: Id, setup: Setup, sleepTime: Long): Unit =
     hcdCS match {
       case Some(cs) =>
@@ -211,15 +220,9 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
           Error(runId, s"A needed HCD is not available: ${hcdConnection.componentId} for $prefix")
         )
     }
+  //#updateCommand
+  //#submitAndQueryFinal
   //#sending-command
-
-  private def simpleHCD(runId: Id, setup: Setup): Future[SubmitResponse] =
-    hcdCS match {
-      case Some(cs) =>
-        cs.submitAndWait(setup)
-      case None =>
-        Future(Error(runId, s"A needed HCD is not available: ${hcdConnection.componentId}"))
-    }
 
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
 

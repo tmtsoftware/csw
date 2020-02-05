@@ -22,7 +22,8 @@ import scala.concurrent.Await
 
 //noinspection ScalaStyle
 //#setup
-class FullSampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer, LocationServer)
+class FullSampleHcdTest
+    extends ScalaTestFrameworkTestKit(AlarmServer, EventServer, LocationServer)
     with FunSuiteLike
     with BeforeAndAfterEach {
   import frameworkTestKit.frameworkWiring._

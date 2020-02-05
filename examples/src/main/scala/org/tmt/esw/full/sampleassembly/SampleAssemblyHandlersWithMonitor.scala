@@ -15,13 +15,13 @@ import csw.location.models.Connection.AkkaConnection
 import csw.location.models._
 import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 import csw.params.commands.CommandResponse._
-import csw.params.commands.{ControlCommand, Observe, Setup}
+import csw.params.commands.{ControlCommand, Observe, Result, Setup}
 import csw.params.core.generics.KeyType
 import csw.params.core.models.Id
 import csw.params.events._
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.time.core.models.UTCTime
-import org.tmt.esw.basic.shared.SampleInfo.shortCommand
+import org.tmt.esw.basic.shared.SampleInfo.{resultKey, shortCommand}
 import org.tmt.esw.full.shared.{SampleValidation, WorkerMonitor}
 import org.tmt.esw.full.shared.WorkerMonitor.{AddWorker, GetWorker, RemoveWorker, Response}
 import org.tmt.esw.moderate.shared.SampleInfo._
@@ -126,7 +126,8 @@ class SampleAssemblyHandlersWithMonitor(ctx: ActorContext[TopLevelActorMessage],
   private def onSetup(runId: Id, setup: Setup): SubmitResponse =
     setup.commandName match {
       case `immediateCommand` =>
-        Completed(runId)
+        // Assembly preforms a calculation or reads state information storing in a result
+        Completed(runId, Result().add(resultKey.set(1000L)))
 
       case `shortCommand` =>
         commandHCD(runId, Setup(prefix, hcdShort, setup.maybeObsId))
@@ -151,7 +152,7 @@ class SampleAssemblyHandlersWithMonitor(ctx: ActorContext[TopLevelActorMessage],
         log.info(s"Assembly: $prefix received cancel worker: $cancelRunId")
 
         val workerId: Future[Response[Id]] = workerMonitor.ask(GetWorker(cancelRunId, _))
-        workerId.map { res =>
+        workerId.foreach { res =>
           hcdCS match {
             case Some(cs) =>
               val s = Setup(cswCtx.componentInfo.prefix, hcdCancelLong, setup.maybeObsId).add(cancelKey.set(res.response.id))
@@ -172,7 +173,9 @@ class SampleAssemblyHandlersWithMonitor(ctx: ActorContext[TopLevelActorMessage],
         val medium = simpleHCD(runId, Setup(prefix, hcdMedium, setup.maybeObsId))
         val long   = simpleHCD(runId, Setup(prefix, hcdLong, setup.maybeObsId))
 
-        commandResponseManager.queryFinalAll(medium, long).map {
+        commandResponseManager
+          .queryFinalAll(medium, long)
+          .map {
             case OverallSuccess(_) =>
               // Don't care about individual responses with success
               commandResponseManager.updateCommand(Completed(runId))

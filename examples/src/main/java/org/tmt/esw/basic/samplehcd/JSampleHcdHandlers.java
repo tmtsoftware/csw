@@ -98,7 +98,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
   //#validate
   @Override
   public ValidateCommandResponse validateCommand(Id runId, ControlCommand command) {
-    if (command.commandName().equals(hcdSleep)) {
+    if (command.commandName().equals(hcdSleep) || command.commandName().equals(hcdImmediate)) {
       return new Accepted(runId);
     }
     log.error("HCD: " + prefix + " received an unsupported command: " + command.commandName().name());
@@ -119,14 +119,15 @@ public class JSampleHcdHandlers extends JComponentHandlers {
 
   private SubmitResponse onSetup(Id runId, Setup setup) {
     log.info("HCD: " + prefix + " onSubmit received command: " + setup);
-
     if (setup.commandName().equals(hcdSleep)) {
       Long sleepTime = setup.apply(sleepTimeKey).head();
       ActorRef<WorkerCommand> worker = createWorkerActor();
       worker.tell(new Sleep(runId, sleepTime));
       return new Started(runId);
-    }
-    return new Invalid(runId, new UnsupportedCommandIssue("HCD: " + prefix + " does not implement command: " + setup.commandName()));
+    } else if (setup.commandName().equals(hcdImmediate)) {
+      return new Completed(runId);
+    } else
+      return new Invalid(runId, new UnsupportedCommandIssue("HCD: " + prefix + " does not implement command: " + setup.commandName()));
   }
   //#onSetup
 

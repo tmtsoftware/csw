@@ -43,12 +43,27 @@ found [here]($github.base_url$/csw-framework/src/main/scala/csw/framework/intern
 
 ### Command Response Manager
 
-Upon receiving a `Submit` command by a component (for example an Assembly receives a Submit command), the component can choose to send one or more
-commands to HCD(s) as part of the Submit command's execution. Once, all the response(s) are received from downstream HCD(s), the Assembly needs to complete
-the `Submit` as either `Completed` or `Error`. The [CommandResponseManager]($github.base_url$/csw-command/csw-command-client/src/main/scala/csw/command/client/CommandResponseManager.scala)
-provides different mechanisms to assist in generating the original `Submit` command's final state.
+Each component contains a Command Response Manager (CRM) with the sole purpose of helping to manage responses for long-running comamnds.
+If an Assembly sends a command to an HCD that is long-running, the HCD returns the `Started` response. The framework in the HCD notices the
+`Started` response and makes an entry in its CRM that a sender actor is may be expecting a final response for the command with the associated
+runId. It also tracks the most recent `SubmitResponse` for the command, which will always be `Started` when entered into the CRM.
 
-![crm](media/crm.png)
+If the Assembly (or any component) issues a `query`, the message is passed by the HCD's Supervisor to the CRM, which returns the most recent
+response associated with the runId. If the Assembly (or any component) issues a `queryFinal` the HCD's Supervisor forwards the request to the
+CRM, which makes an entry to remmber that there is an Actor that needs to be updated with the final response for the runId. If the current
+response is already a final response, the Actor is updated immediately and no entry is made in the CRM.
+
+When the actions in the HCD complete, the HCD uses the `updateCommand` method of the CRM.  WHen this happens, the CRM updates the
+most recent response for the runId and then checks it's table to
+determine if there are any Actors waiting for the runId's final response. If there are waiting Actors, each of them is sent the final response, 
+and each is then removed from the CRM tables.  If there are no waiting Actors, only the current response for the runId is updated ready for the
+possibiity that there will be a future `query` or `queryFinal`.
+
+The CRM remembers roughly 10 recent commands, so `query` and `queryFinal` may be used successfully with commands that have completed for some
+amount of time. If there is no entry in the CRM for a provided runId, the CRM returns an `Error` response indicating it does not know the runId.
+ 
+The CRM also provides a utility method called `queryFinalAll`. This is just a wrapper around the Future.sequence call that allows components sending
+sub-commands to wait for all the sub-commands to complete.
 
 The Assembly worker can communicate with `CommandResponseManagerActor` using [CommandResponseManager]($github.base_url$/csw-command/csw-command-client/src/main/scala/csw/command/client/CommandResponseManager.scala)
 coming via [CswContext]($github.base_url$/csw-framework/src/main/scala/csw/framework/models/CswContext.scala#L43).

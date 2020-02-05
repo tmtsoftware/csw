@@ -37,6 +37,16 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   private val log                                   = loggerFactory.getLogger
   private val prefix: Prefix                        = cswCtx.componentInfo.prefix
 
+  override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
+
+  override def onGoOffline(): Unit = {}
+
+  override def onGoOnline(): Unit = {}
+
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {}
+
+  override def onOperationsMode(): Unit = {}
+
   //#initialize
   var maybePublishingGenerator: Option[Cancellable] = None
 
@@ -79,7 +89,7 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   //#validate
   override def validateCommand(runId: Id, command: ControlCommand): ValidateCommandResponse =
     command.commandName match {
-      case `hcdSleep` =>
+      case `hcdSleep` | `hcdImmediate` =>
         Accepted(runId)
       case _ =>
         log.error(s"HCD: $prefix received an unsupported command: ${command.commandName.name}")
@@ -107,25 +117,17 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
         val worker    = ctx.spawnAnonymous(SleepWorker(cswCtx))
         worker ! Sleep(runId, sleepTime)
         Started(runId)
+      case `hcdImmediate` =>
+        Completed(runId)
       case other =>
         Invalid(runId, UnsupportedCommandIssue(s"HCD: $prefix does not implement command: $other"))
     }
   }
   //#onSetup
-
-  override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
-
-  override def onGoOffline(): Unit = {}
-
-  override def onGoOnline(): Unit = {}
-
-  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {}
-
-  override def onOperationsMode(): Unit = {}
-
 }
 
 //#worker-actor
+//#updateCommand
 object SleepWorker {
   import org.tmt.esw.basic.shared.SampleInfo._
 
@@ -146,4 +148,5 @@ object SleepWorker {
       }
     }
 }
+//#updateCommand
 //#worker-actor

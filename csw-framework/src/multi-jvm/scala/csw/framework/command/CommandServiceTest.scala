@@ -151,9 +151,9 @@ class CommandServiceTest(ignore: Int)
       async {
         await(invalidCommandF) match {
           case Completed(_, _) =>
-          // Do Completed thing
+            // Do Completed thing
           case Invalid(_, _) =>
-          //issue shouldBe a[Invalid]
+            //issue shouldBe a[Invalid]
           case other =>
             // Unexpected result
             log.error(s"Some other response: $other")
@@ -199,8 +199,9 @@ class CommandServiceTest(ignore: Int)
 
       // DEOPSCSW-233: Hide implementation by having a CCS API
       // long running command which does not use matcher
-      // #queryLongRunning
       var longRunningRunId: Id = Id("blah") // Is updated below for use in later test
+
+      // #queryLongRunning
       val longRunningQueryResultF = async {
         // The following val is set so we can do query and work and complete later
         val longRunningF = assemblyCmdService.submit(longRunningSetup)
@@ -210,10 +211,10 @@ class CommandServiceTest(ignore: Int)
         await(assemblyCmdService.query(longRunningRunId)) match {
           case Started(runId) =>
             runId shouldEqual longRunningRunId
-          // happy case - no action needed
-          // Do some other work
+            // happy case - no action needed
+            // Do some other work
           case a =>
-          // log.error. This indicates that the command probably failed to start.
+            // log.error. This indicates that the command probably failed to start.
         }
 
         // Now wait for completion and result
@@ -247,6 +248,24 @@ class CommandServiceTest(ignore: Int)
       }
       Await.result(queryFinalF, timeout.duration) shouldBe Some(20)
       // #queryFinal
+
+      // #queryFinalWithSubmitAndWait
+      val encoderValue:Future[Option[Int]] = async {
+        // The following submit is made without saving the Future!
+        val runId = await(assemblyCmdService.submitAndWait(longRunningSetup)).runId
+
+        // Use queryFinal and runId to wait for completion and result
+        await(assemblyCmdService.queryFinal(runId)) match {
+          case Completed(_, result) =>
+            Some(result(encoder).head)
+
+          case otherResponse =>
+            // log a message?
+            None
+        }
+      }
+      Await.result(encoderValue, timeout.duration) shouldBe Some(20)
+      // #queryFinalWithSubmitAndWait
 
       //#oneway
       // `onewayCmd` is a sample to demonstrate oneway without any actions

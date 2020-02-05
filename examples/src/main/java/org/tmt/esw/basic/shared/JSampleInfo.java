@@ -38,4 +38,5 @@ public class JSampleInfo {
 
   // HCD Commands
   public static final CommandName hcdSleep = new CommandName("hcdSleep");
+  public static final CommandName hcdImmediate = new CommandName("hcdImmediate");
 }

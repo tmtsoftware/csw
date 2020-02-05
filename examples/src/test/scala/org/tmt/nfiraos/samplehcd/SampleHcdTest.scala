@@ -1,4 +1,4 @@
-package org.tmt.esw.moderate
+package org.tmt.nfiraos.samplehcd
 
 import akka.actor.typed.ActorSystem
 import akka.util.Timeout
@@ -6,36 +6,32 @@ import csw.command.client.CommandServiceFactory
 import csw.location.models
 import csw.location.models.Connection.AkkaConnection
 import csw.location.models.{ComponentId, ComponentType}
-import csw.params.commands.CommandResponse.{Cancelled, Completed, Started}
-import csw.params.commands.{CommandResponse, Setup}
-import csw.params.core.generics.{KeyType, Parameter}
+import csw.params.commands.CommandResponse.Completed
+import csw.params.commands.{CommandName, Setup}
+import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.{ObsId, Units}
 import csw.params.events.{Event, EventKey, EventName, SystemEvent}
-import csw.prefix.models.{Prefix, Subsystem}
+import csw.prefix.models.Prefix
+import csw.prefix.models.Subsystem.NFIRAOS
 import csw.testkit.scaladsl.CSWService.{AlarmServer, EventServer}
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
 import org.scalatest.{BeforeAndAfterEach, FunSuiteLike}
-import org.tmt.esw.moderate.shared.SampleInfo._
 
 import scala.collection.mutable
 import scala.concurrent.Await
 
-//noinspection ScalaStyle
 //#setup
-class ModerateSampleHcdTest
-    extends ScalaTestFrameworkTestKit(AlarmServer, EventServer)
-    with FunSuiteLike
-    with BeforeAndAfterEach {
+class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with FunSuiteLike with BeforeAndAfterEach {
   import frameworkTestKit.frameworkWiring._
 
   override def beforeAll(): Unit = {
     super.beforeAll()
-    spawnStandalone(com.typesafe.config.ConfigFactory.load("ModerateSampleHcdStandalone.conf"))
+    spawnStandalone(com.typesafe.config.ConfigFactory.load("SampleHcdStandalone.conf"))
   }
 
   import scala.concurrent.duration._
   test("HCD should be locatable using Location Service") {
-    val connection   = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
+    val connection   = AkkaConnection(ComponentId(Prefix("NFIRAOS.SampleHcd"), ComponentType.HCD))
     val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
 
     akkaLocation.connection shouldBe connection
@@ -44,7 +40,7 @@ class ModerateSampleHcdTest
 
   //#subscribe
   test("should be able to subscribe to HCD events") {
-    val counterEventKey = EventKey(Prefix("ESW.SampleHcd"), EventName("HcdCounter"))
+    val counterEventKey = EventKey(Prefix("nfiraos.samplehcd"), EventName("HcdCounter"))
     val hcdCounterKey   = KeyType.IntKey.make("counter")
 
     val eventService = eventServiceFactory.make(locationService)(actorSystem)
@@ -83,15 +79,16 @@ class ModerateSampleHcdTest
 
   //#submit
   implicit val typedActorSystem: ActorSystem[_] = actorSystem
-  test("moderate: should be able to send sleep command to HCD") {
+  test("should be able to send sleep command to HCD") {
     import scala.concurrent.duration._
     implicit val sleepCommandTimeout: Timeout = Timeout(10000.millis)
 
     // Construct Setup command
-    val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(3000).withUnits(Units.millisecond)
-    val setupCommand                    = Setup(Prefix("csw.move"), hcdSleep, Some(ObsId("2018A-001"))).add(sleepTimeParam)
+    val sleepTimeKey: Key[Long]         = KeyType.LongKey.make("SleepTime")
+    val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
+    val setupCommand                    = Setup(Prefix("csw.move"), CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
-    val connection = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
+    val connection = AkkaConnection(ComponentId(Prefix(NFIRAOS, "SampleHcd"), ComponentType.HCD))
 
     val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
 
@@ -99,30 +96,9 @@ class ModerateSampleHcdTest
     // submit command and handle response
     val responseF = hcd.submitAndWait(setupCommand)
 
-    Await.result(responseF, 10000.millis) shouldBe a[CommandResponse.Completed]
+    Await.result(responseF, 10000.millis) shouldBe a[Completed]
   }
   //#submit
-
-  test("should handle long command and cancel") {
-    implicit val timeout: Timeout = 10.seconds
-    val connection                = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
-    val akkaLocation              = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
-
-    val hcdCS = CommandServiceFactory.make(akkaLocation)
-
-    // Start a long command
-    val longResponse = Await.result(hcdCS.submit((Setup(testPrefix, hcdLong, None))), 10.seconds)
-    longResponse shouldBe a[Started]
-
-    // Wait 2 seconds, then cancel
-    Thread.sleep(2000)
-    val cancelSetup    = Setup(testPrefix, hcdCancelLong, None).add(cancelKey.set(longResponse.runId.id))
-    val cancelResponse = Await.result(hcdCS.submitAndWait(cancelSetup), 10.seconds)
-    cancelResponse shouldBe a[Completed]
-
-    val finalResponse = Await.result(hcdCS.queryFinal(longResponse.runId), 10.seconds)
-    finalResponse shouldBe a[Cancelled]
-  }
 
   //#exception
   test("should get timeout exception if submit timeout is too small") {
@@ -130,10 +106,11 @@ class ModerateSampleHcdTest
     implicit val sleepCommandTimeout: Timeout = Timeout(1000.millis)
 
     // Construct Setup command
-    val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(4000).withUnits(Units.millisecond)
-    val setupCommand                    = Setup(Prefix("csw.move"), hcdSleep, Some(ObsId("2018A-001"))).add(sleepTimeParam)
+    val sleepTimeKey: Key[Long]         = KeyType.LongKey.make("SleepTime")
+    val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
+    val setupCommand                    = Setup(Prefix("csw.move"), CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
-    val connection = AkkaConnection(models.ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
+    val connection = AkkaConnection(models.ComponentId(Prefix(NFIRAOS, "SampleHcd"), ComponentType.HCD))
 
     val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
 
@@ -142,7 +119,7 @@ class ModerateSampleHcdTest
     // submit command and handle response
     intercept[java.util.concurrent.TimeoutException] {
       val responseF = hcd.submitAndWait(setupCommand)
-      Await.result(responseF, 10000.millis) shouldBe a[CommandResponse.Completed]
+      Await.result(responseF, 10000.millis) shouldBe a[Completed]
     }
   }
   //#exception

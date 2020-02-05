@@ -14,12 +14,13 @@ import csw.location.models.Connection.AkkaConnection
 import csw.location.models._
 import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 import csw.params.commands.CommandResponse._
-import csw.params.commands.{ControlCommand, Observe, Setup}
+import csw.params.commands.{ControlCommand, Observe, Result, Setup}
 import csw.params.core.generics.KeyType
 import csw.params.core.models.Id
 import csw.params.events._
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.time.core.models.UTCTime
+import org.tmt.esw.basic.shared.SampleInfo.resultKey
 import org.tmt.esw.moderate.shared.SampleInfo._
 import org.tmt.esw.moderate.shared.SampleValidation
 
@@ -47,7 +48,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   private var hcdCS: Option[CommandService]         = None
   private val prefix: Prefix                        = cswCtx.componentInfo.prefix
   // Var to store most recent long command for cancel demo - not a great implementation, but showing async is possible
-  private var saveLastLongId: Option[Id]            = None
+  private var saveLastLongId: Option[Id] = None
 
   //#initialize
   private var maybeEventSubscription: Option[EventSubscription] = None
@@ -124,20 +125,26 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
 
     setup.commandName match {
       case `immediateCommand` =>
-        Completed(runId)
+        // Assembly preforms a calculation or reads state information storing in a result
+        Completed(runId, Result().add(resultKey.set(1000L)))
+
       case `shortCommand` =>
         commandHCD(runId, Setup(prefix, hcdShort, setup.maybeObsId))
         Started(runId)
+
       case `mediumCommand` =>
         commandHCD(runId, Setup(prefix, hcdMedium, setup.maybeObsId))
         Started(runId)
+
       case `longCommand` =>
         commandHCD(runId, Setup(prefix, hcdLong, setup.maybeObsId))
         saveLastLongId = Some(runId)
         Started(runId)
+
       case `sleep` =>
         sleepHCD(runId, setup, setup(sleepTimeKey).head)
         Started(runId)
+
       case `cancelLongCommand` =>
         saveLastLongId.foreach { longRunId =>
           hcdCS match {
@@ -156,6 +163,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
           }
         }
         Started(runId)
+
       case `complexCommand` =>
         val medium = simpleHCD(runId, Setup(prefix, hcdMedium, setup.maybeObsId))
         val long   = simpleHCD(runId, Setup(prefix, hcdLong, setup.maybeObsId))

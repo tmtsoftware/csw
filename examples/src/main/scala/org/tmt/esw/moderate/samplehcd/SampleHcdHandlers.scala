@@ -124,7 +124,7 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
         worker ! Sleep(runId, sleepTime)
         Started(runId)
       case `hcdCancelLong` =>
-        val cancelRunId = Id(setup(cancelKey).head)
+        val cancelRunId               = Id(setup(cancelKey).head)
         implicit val timeout: Timeout = 10.seconds
         implicit val sched: Scheduler = ctx.system.scheduler
         // Kill long here

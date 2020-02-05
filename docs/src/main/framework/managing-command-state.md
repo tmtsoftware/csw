@@ -21,16 +21,19 @@ In the first scenario, the developer has a long-running command. In this case, o
 the actions are completed, `updateCommand` is used to notify the CRM that the actions are complete. This will cause
 the original sender to be notified of completion using the `SubmitResponse` passed to `updateCommand`.
 
-### updateCommand
-`updateCommand` is used to update the status of a `Started` command. The following example
-simulates a worker that takes some time to complete. The `onSubmit` handler returns `Started` and later the actions
-complete with `Completed`, which completes the command. 
+### Using updateCommand
+
+`updateCommand` is used to update the status of a `Started` command. The following example from the SampleAssembly
+shows the Assembly sends a command to SampleHcd. It then does a `queryFinal` and when it returns, it
+updates the parent runId with the response received from the HCD. 
+The `onSubmit` handler (not shown) already has returned `Started` to the sender of the original command,
+and the asynchronous completion is used to update the parent command. 
 
 Scala
-:   @@snip [McsHcdComponentHandlers.scala](../../../../csw-framework/src/test/scala/csw/common/components/command/McsHcdComponentHandlers.scala) { #updateCommand }
+:   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/sampleassembly/SampleAssemblyHandlers.scala) { #updateCommand }
 
 Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../csw-framework/src/test/java/csw/framework/javadsl/components/JSampleComponentHandlers.java) { #updateCommand }
+:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/sampleassembly/JSampleAssemblyHandlers.java) { #updateCommand }
 
 
 ## Using the CRM with Subcommands
@@ -40,21 +43,20 @@ sending commands to one or more HCDs) it can use the CRM to help manage response
 the typical use case is that the sender such as an Assembly needs to send one or more sub-commands to HCDs and needs to
 wait until all the sub-commands complete. It then makes a decision on how to update the original command received by the
 Assembly based on the results of the sub-commands. The CRM provides a helper method to wait for one or more sub-commands. 
-Then the `updateCommand` CRM method is used to update the original command.
+Then the previous `updateCommand` CRM method is used to update the original command.
 
 ### Using queryFinalAll
-Use `addSubCommand` to associate sub-commands with a received command.
+The CRM provides a method called `queryFinalAll`. This method takes a list of responses from `submit` or `submitAndWait`
+and allows a block of code to be completed when *all* the commands in the list have completed, either successfully or unsuccessfully.
+A response is returned from `queryFinalAll` of type `OverallSuccess`, which can be `OverallSuccess` or `OverallFailure`. Each of
+these returns the individual responses from the original commands to allow a decision on how to proceed.
+
+In this example of a `complexCommand`, the Assembly sends two *sub-commands* to HCDs. It then uses `queryFinalAll` to wait for the
+sub-commands to finish. In the `OverallSuccess` case `commandResponseManager.updateCommand` is used to return `Completed` to the parent.
+If one or more of the sub-commands fails, the negative response of the first failed command is returned to the parent.
 
 Scala
-:   @@snip [McsAssemblyComponentHandlers.scala](../../../../csw-framework/src/test/scala/csw/common/components/command/McsAssemblyComponentHandlers.scala) { #queryF }
+:   @@snip [McsAssemblyComponentHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/sampleassembly/SampleAssemblyHandlers.scala) { #queryF }
 
 Java
-:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #queryF }
-
-@@@ note
-
-It may be the case that the component wants to avoid automatic inference of a command based on the result of the
-sub-commands. It should refrain from updating the status of the sub-commands in this case and update the status
-of the parent command directly as required.
-
-@@@
+:   @@snip [JCommandIntegrationTest.java](../../../../examples/src/main/java/org/tmt/esw/basic/sampleassembly/JSampleAssemblyHandlers.java) { #queryF }

@@ -33,7 +33,7 @@ public class JSampleIntegrationTest extends JUnitSuite {
     private static AkkaLocation containerLocation;
 
     private static AkkaConnection assemblyConnection = new AkkaConnection(
-            new ComponentId(Prefix.apply(JSubsystem.ESW(), "JSampleAssembly"), JComponentType.Assembly()));
+            new ComponentId(Prefix.apply(JSubsystem.ESW(), "JSampleAssemblyHandlers"), JComponentType.Assembly()));
     private static AkkaLocation assemblyLocation;
 
     private static AkkaConnection hcdConnection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.ESW(), "JSampleHcd"), JComponentType.HCD()));
@@ -97,6 +97,7 @@ public class JSampleIntegrationTest extends JUnitSuite {
         Assert.assertNotNull(assemblyCS);
 
         SubmitResponse sr = assemblyCS.submitAndWait(setup, timeout).get();
+        System.out.println("SR : " + sr);
         Assert.assertTrue(sr instanceof Completed);
     }
 

@@ -19,10 +19,10 @@ Like we did for the HCD, let's add some log messages for the `initialize` and `o
 `onTrackingLocationEvent` hook.  We'll cover that in more detail later.
 
 Scala
-:   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/sampleassembly/SampleAssemblyHandlers.scala) { #initialize }
+:   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/sampleassembly/SampleAssemblyHandlers.scala) { #initialize }
 
 Java
-:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/sampleassembly/JSampleAssemblyHandlers.java) { #initialize }
+:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/nfiraos/sampleassembly/JSampleAssemblyHandlers.java) { #initialize }
 
 Once again, ignore the code about setting up the event subscription. 
 This will be covered later when we discuss subscribing to events.
@@ -36,12 +36,12 @@ Scala
 :    
 ```
 componentType = assembly
-behaviorFactoryClassName = "org.tmt.esw.basic.sampleassembly.SampleAssemblyBehaviorFactory"
-prefix = "esw.SampleAssembly"
+behaviorFactoryClassName = "org.tmt.nfiraos.sampleassembly.SampleAssemblyBehaviorFactory"
+prefix = "nfiraos.SampleAssembly"
 locationServiceUsage = RegisterAndTrackServices
 connections = [
   {
-        prefix: "esw.SampleHcd"
+        prefix: "nfiraos.SampleHcd"
         componentType: hcd
         connectionType: akka
   }
@@ -52,12 +52,12 @@ Java
 :    
 ```
 componentType = assembly
-behaviorFactoryClassName = "org.tmt.esw.basic.sampleassembly.JSampleAssemblyBehaviorFactory"
-prefix = "esw.JSampleAssembly"
+behaviorFactoryClassName = "org.tmt.nfiraos.sampleassembly.JSampleAssemblyBehaviorFactory"
+prefix = "nfiraos.JSampleAssembly"
 locationServiceUsage = RegisterAndTrackServices
 connections = [
   {
-        prefix: "esw.JSampleHcd"
+        prefix: "nfiraos.JSampleHcd"
         componentType: hcd
         connectionType: akka
   }
@@ -100,7 +100,7 @@ Scala
 :    
 ```
 {
-    prefix: "esw.SampleHcd"
+    prefix: "nfiraos.SampleHcd"
     componentType: hcd
     connectionType: akka
 }
@@ -110,7 +110,7 @@ Java
 :    
 ```
 {
-    prefix: "esw.JSampleHcd"
+    prefix: "nfiraos.JSampleHcd"
     componentType: hcd
     connectionType: akka
 }
@@ -151,10 +151,10 @@ is shown here for demonstration purposes.
 Similarly, if the HCD is removed, a message is logged and the Command Service variable is set to none.  
 
 Scala
-:   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/sampleassembly/SampleAssemblyHandlers.scala) { #track-location }
+:   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/sampleassembly/SampleAssemblyHandlers.scala) { #track-location }
 
 Java
-:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/sampleassembly/JSampleAssemblyHandlers.java) { #track-location }
+:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/nfiraos/sampleassembly/JSampleAssemblyHandlers.java) { #track-location }
 
 
 
@@ -191,7 +191,7 @@ If a component wants to send a command to another component, it uses a `CommandS
 
 ## Handling Short and Long Running Commands
 
-The Command Service provides a few different ways of performing `Submit` commands.   In particular, for sending single commands, there are two flavors: `submit`
+The Command Service provides a two different ways of performing `Submit` commands.   In particular, for sending single commands, there are two flavors: `submit`
 and `submitAndWait`.  Both commands take a `Setup` or `Observe` and return a Future response encapsulating a `SubmitResponse` type.  
 
 To understand the difference between `submit` and `submitAndWait` and how to choose between them it is necessary to understand
@@ -203,7 +203,7 @@ If `validateCommand` returns `Invalid`, the submit returns immediately. If `vali
 If a command is short, less than 1 second, it completes quickly with the response of `Completed ` or an `Error` response. In
 this case `submit` and `submitAndWait` behave the same working like a function call or RPC command. The `Completed` response can also return a result if needed.
  
-If the command is long running, longer than 1 second, an `onSubmit` handler should start the actions and return a `Started` response. The 
+If the command is long-running, longer than 1 second, an `onSubmit` handler should start the actions and return a `Started` response. The 
 sender of the command obtains the final response of the command by polling using the Command Service `query` call or by waiting using `queryFinal`.
 When an `onSubmit` handler returns `Started` it is expected to update the command with the final response when the actions complete 
 using the `updateCommand` call of the `CommandResponseManager` that is provided to the TLA in the `CswContext`.
@@ -216,35 +216,13 @@ be handled explicitly using Future exception handling (this can be done many way
 
 #### *Tutorial: Developing an Assembly*
 
-The sample Assembly defines a number of commands as shown in the following snippet: `immediateCommand`, 
-`shortCommand`, `mediumCommand`, `longCommand`,
-`complexCommand`, and `sleep`. `immediateCommand` returns a `Completed` immediately without calling the HCD. `shortCommand`,
-`mediumCommand`, and `longCommand` represent different Assembly commands, but all end up sending an `hcdSleep` command with
-different sleep times. The `sleep` command allows the sender to wait for a specified time.
-
-The following example shows how the Assembly uses `submit` and `queryFinal` to send an `hcdSleep` command to the sample HCD with a specified sleepTime.
-
-Scala
-:   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/sampleassembly/SampleAssemblyHandlers.scala) { #sending-command }
-
-Java
-:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/sampleassembly/JSampleAssemblyHandlers.java) { #sending-command }
-
-This example shows a number of useful ideas. First, for a long-running
-command such as `mediumCommand`, `onSetup` calls the `sleepHCD` command and returns `Started` indicating to the caller that 
-the command is a long-running command. `sleepHCD` sends the `hcdSleep` command to the HCD. This function shows how to use
-`submit` and `queryFinal`. 
-A new HCD setup is created with the sleep time passed into the function. The command is submitted and if successful, the HCD
-returns `Started` as it should for a long-running command. Any other returned `SubmitResponse` is passed back to the Assembly
-using `updateCommand` call of `CommandResponseManager` with the runId of the original command. 
-Note also that if the HCD is not available, the command is updated with an Error.
-
-The `complexCommand` shows an Assembly command that sends two commands to HCDs (in this case the same HCD). In this case, the
-Assembly must wait until *all* the commands it sends are completed before updating the original command with the final
-completion value. In this case, the example shows starting two commands using `submitAndWait` and then the `queryFinalAll`
-call provided by `CommandResponseManager` is used to wait. This call returns an `OverallResponse`, which includes the
-responses from all the input commands. It returns `OverallSuccess` if all the commands were positive (i.e. `Completed`) or
-`OverallFailure` if any of the commands do not complete successfully.
+TWe use our worker actor to submit the command to the HCD, and then subscribe to the HCD's `CommandResponseManager` for command completion, using the shortcut `submitAndWait`.
+ 
+ Scala
+ :   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/sampleassembly/SampleAssemblyHandlers.scala) { #worker-actor }
+ 
+ Java
+ :   @@snip [SampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/nfiraos/sampleassembly/JSampleAssemblyHandlers.java) { #worker-actor }
 
 @@@ note { title="Waiting is not Waiting" }
 
@@ -292,10 +270,10 @@ to be applied.
 We will setup our subscription to the counter events generated by our HCD in the `subscribeToHCD` method.  
 
 Scala
-:   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/sampleassembly/SampleAssemblyHandlers.scala) { #subscribe }
+:   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/sampleassembly/SampleAssemblyHandlers.scala) { #subscribe }
 
 Java
-:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/sampleassembly/JSampleAssemblyHandlers.java) { #subscribe }
+:   @@snip [SampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/nfiraos/sampleassembly/JSampleAssemblyHandlers.java) { #subscribe }
 
 
 We use the `subscribeCallback` method from the API and specify the method `processEvent` as our callback, in which we 
@@ -306,10 +284,10 @@ Again, we return to our `initialize` method to show how subscription is started,
 for later use.
 
 Scala
-:   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/sampleassembly/SampleAssemblyHandlers.scala) { #initialize }
+:   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/sampleassembly/SampleAssemblyHandlers.scala) { #initialize }
 
 Java
-:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/sampleassembly/JSampleAssemblyHandlers.java) { #initialize }
+:   @@snip [SampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/nfiraos/sampleassembly/JSampleAssemblyHandlers.java) { #initialize }
 
 
 ## Deploying and Running Components

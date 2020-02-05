@@ -276,10 +276,10 @@ Add some simple log messages in the `initialize` and `onShutdown` hooks,
 and to the `onLocationTrackingEvent` hook as well, although we won't be using it for this HCD:
 
 Scala
-:   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/samplehcd/SampleHcdHandlers.scala) { #initialize }
+:   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/samplehcd/SampleHcdHandlers.scala) { #initialize }
 
 Java
-:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/samplehcd/JSampleHcdHandlers.java) { #initialize }
+:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/org/tmt/nfiraos/samplehcd/JSampleHcdHandlers.java) { #initialize }
 
 
 In the example code, you'll notice we have added some functionality to start publishing events.  We will cover the Event Service later.
@@ -332,17 +332,17 @@ Different types of command responses and their significance can be found @ref:[h
 #### *Tutorial: Developing an HCD*
 
 Let's add some command validation to our HCD.  For our sample HCD, we will only handle one command, `sleep`, in which we will
-cause the HCD to sleep for the time specified in a parameter of the command.  This will simulate a long running command.
+cause the HCD to sleep for the time specified in a parameter of the command.  This will simulate a long-running command.
    
 Add some code to ensure the command we receive is the `sleep` command, and return an `Invalid` response if not.  You could 
 imagine much more checking could be added, such as checking the types and values of the parameters of our `sleep` command, but
 we will keep it simple for our demonstration.
 
 Scala
-:   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/samplehcd/SampleHcdHandlers.scala) { #validate }
+:   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/samplehcd/SampleHcdHandlers.scala) { #validate }
 
 Java
-:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/samplehcd/JSampleHcdHandlers.java) { #validate }
+:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/org/tmt/nfiraos/samplehcd/JSampleHcdHandlers.java) { #validate }
 
 
 ## Command Response
@@ -356,7 +356,7 @@ calls the `onSubmit` hook of `ComponentHandlers`. The return value of `onSubmit`
 which can be a `Completed` for commands that return quickly, or `Started` for long running commands.  If the response from validation was `Invalid`, 
 this is returned to the sender of the command without calling the `onSubmit` or `onOneway` handler.
 
-If `onSubmit` returns `Started`, the component's `CommandResponseManager` keeps track of the status of long running submit commands. 
+If `onSubmit` returns `Started`, the component's `CommandResponseManager` keeps track of the status of long-running submit commands. 
 The sender of a `Started` command (and any component, really) can query a `Started` command's status or wait 
 for the final response using `queryFinal` of the `CommandService` API.
 
@@ -383,13 +383,13 @@ can be either a `Setup` or an `Observe`.  We will use pattern matching to handle
 handling method.  `Observe` commands will be ignored and returned with as Invalid.  
 
 Scala
-:   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/samplehcd/SampleHcdHandlers.scala) { #onSetup }
+:   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/samplehcd/SampleHcdHandlers.scala) { #onSetup }
 
 Java
-:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/samplehcd/JSampleHcdHandlers.java) { #onSetup }
+:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/org/tmt/nfiraos/samplehcd/JSampleHcdHandlers.java) { #onSetup }
 
 
-In our example, the `hcdSleep` command has one parameter called `sleepTime`.  We retrieve this parameter from the `Setup` 
+In our example, the `sleep` command has one parameter called `SleepTime`.  We retrieve this parameter from the `Setup` 
 by creating a `Key` to this parameter using the name and type, and then calling an `apply` method on the `Setup` (the `setup(sleepKey)` shorthand)
 which finds the matching `Parameter` in the `Setup`'s `ParameterSet` (use the `Setup.jget()` method in Java).  By doing this, the `Parameter` is returned with the proper typing, and 
 so the values retrieved from the `Parameter` are typed as well.  Note, all values are stored as an array, so we get our single value for `sleepTime` by using
@@ -412,15 +412,13 @@ there is no sleepTime parameter. Good validation code would ensure this so `onSe
 the tutorial code show this.
 
 Scala
-:   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/samplehcd/SampleHcdHandlers.scala) { #worker-actor }
+:   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/samplehcd/SampleHcdHandlers.scala) { #worker-actor }
 
 Java
-:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/samplehcd/JSampleHcdHandlers.java) { #worker-actor }
+:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/org/tmt/nfiraos/samplehcd/JSampleHcdHandlers.java) { #worker-actor }
 
-This worker actor simply takes the time passed in the message, sleeps that amount, 
-and then updates the `CommandResponseManager` that the command is complete. The scheduler of the TimeService is used
-to delay for the requested time. SleepWorker also returns the final
-sleep time as a result in the Complete result using the same key to demonstrate returning a result.
+This worker actor takes the time passed in the message and sleeps that amount using the TimeService scheduling API. 
+When the time is expired, the worker updates the `CommandResponseManager` that the command is `Completed`. 
 
 ## Events
 
@@ -444,10 +442,10 @@ Let's add a publisher to our component. We will use the default publisher that w
 generated by an `EventGenerator`. 
 
 Scala
-:   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/samplehcd/SampleHcdHandlers.scala) { #publish }
+:   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/samplehcd/SampleHcdHandlers.scala) { #publish }
 
 Java
-:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/samplehcd/JSampleHcdHandlers.java) { #publish }
+:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/org/tmt/nfiraos/samplehcd/JSampleHcdHandlers.java) { #publish }
 
 We encapsulate the starting of the publishing in our method `publishCounter`.  Our `EventGenerator` is the `incrementCounterEvent`
 method which increments our integer variable `counter` and stores it in the `ParameterSet`
@@ -463,10 +461,10 @@ to our `publishCounter` method.  We save a reference to the `Cancellable` object
 method.   
 
 Scala
-:   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/samplehcd/SampleHcdHandlers.scala) { #initialize }
+:   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/samplehcd/SampleHcdHandlers.scala) { #initialize }
 
 Java
-:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/samplehcd/JSampleHcdHandlers.java) { #initialize }
+:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/org/tmt/nfiraos/samplehcd/JSampleHcdHandlers.java) { #initialize }
 
 ## Starting CSW Services
 

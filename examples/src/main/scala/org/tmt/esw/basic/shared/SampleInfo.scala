@@ -38,5 +38,6 @@ object SampleInfo {
   def setCancelRunId(runId: Id): Parameter[String] = cancelKey.set(runId.id)
 
   // HCD Commands
-  val hcdSleep: CommandName = CommandName("hcdSleep")
+  val hcdSleep: CommandName     = CommandName("hcdSleep")
+  val hcdImmediate: CommandName = CommandName("hcdImmediate")
 }
