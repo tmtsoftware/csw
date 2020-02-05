@@ -65,14 +65,14 @@ trait CommandData {
   val currentState: CurrentState = CurrentState(prefix, idleState, paramSet)
   val states: Set[StateName]     = Set(idleState)
 
-  val accepted: CommandResponse  = Accepted(id)
-  val cancelled: CommandResponse = Cancelled(id)
-  val completed: CommandResponse = Completed(id, Result(paramSet))
-  val error: CommandResponse     = Error(id, reason)
+  val accepted: Accepted   = Accepted(id)
+  val cancelled: Cancelled = Cancelled(id)
+  val completed: Completed = Completed(id, Result(paramSet))
+  val error: Error         = Error(id, reason)
 
-  val invalid: CommandResponse = Invalid(id, OtherIssue(reason))
-  val locked: CommandResponse  = Locked(id)
-  val started: CommandResponse = Started(id)
+  val invalid: Invalid = Invalid(id, OtherIssue(reason))
+  val locked: Locked   = Locked(id)
+  val started: Started = Started(id)
 
   val obsId: ObsId             = ObsId("obs001")
   val commandName: CommandName = CommandName("move")

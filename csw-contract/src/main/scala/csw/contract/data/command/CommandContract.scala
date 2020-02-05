@@ -29,9 +29,9 @@ object CommandContract extends CommandData with CommandServiceCodecs {
     ModelType(KeyType),
     ModelType(Units),
     ModelType(result),
-    ModelType(cancelled, completed, error, invalid, locked, started),
-    ModelType(accepted, invalid, locked),
-    ModelType(accepted, invalid, locked),
+    ModelType[SubmitResponse](cancelled, completed, error, invalid, locked, started),
+    ModelType[OnewayResponse](accepted, invalid, locked),
+    ModelType[ValidateResponse](accepted, invalid, locked),
     ModelType(currentState),
     ModelType(
       assemblyBusyIssue,
