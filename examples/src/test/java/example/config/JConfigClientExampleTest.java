@@ -210,20 +210,20 @@ public class JConfigClientExampleTest extends JUnitSuite {
 
         //retrieve list of files based on type; for demonstration purpose validate return values
         Assert.assertEquals(Set.of(tromboneId, fits1Id, testId),
-                adminApi.list(JFileType.Annex()).get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
+                adminApi.list(JFileType.Annex).get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
         Assert.assertEquals(Set.of(hcdId, fits2Id),
-                adminApi.list(JFileType.Normal()).get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
+                adminApi.list(JFileType.Normal).get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
 
         //retrieve list using pattern; for demonstration purpose validate return values
         Assert.assertEquals(Set.of(tromboneId, hcdId, testId),
                 adminApi.list(".*.conf").get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
         //retrieve list using pattern and file type; for demonstration purpose validate return values
         Assert.assertEquals(Set.of(tromboneId, testId),
-                adminApi.list(JFileType.Annex(), ".*.conf").get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
+                adminApi.list(JFileType.Annex, ".*.conf").get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
         Assert.assertEquals(Set.of(tromboneId),
-                adminApi.list(JFileType.Annex(), "a/c.*").get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
+                adminApi.list(JFileType.Annex, "a/c.*").get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
         Assert.assertEquals(Set.of(testId),
-                adminApi.list(JFileType.Annex(), "test.*").get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
+                adminApi.list(JFileType.Annex, "test.*").get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
         //#list
     }
 
