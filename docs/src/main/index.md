@@ -208,17 +208,7 @@ The framework provides templates for @ref:[creating](./commons/create-component.
 defined by TMT as well as service access interfaces for these components. It also provides @ref:[application](./apps/hostconfig.md) support
 for running multiple components on a host machine.
 
-The framework also contains the structures that are common to components, such as commands and event structures.
-
-## CSW Roadmap
-The current release 0.7.0 is a crucial milestone towards the first major release 1.0.0 of Common Software (CSW).
-All the deliverable services of Common Software are a part of this release. New features or API changes could be expected before 
-1.0.0 release, but no new services would be added after 0.7.0 release.
-
-**What to expect from 1.0.0 release?**
-
-- Upgrade to Scala 2.13
-- Upgrade to Akka 2.6 
+The framework also contains the structures that are common to components, such as commands and event structures. 
 
 ## HTTP-based services API documentation
 **Documentation for HTTP based services could be found [here](swagger/index.html).**
