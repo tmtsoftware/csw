@@ -492,7 +492,7 @@ class JsonTest extends AnyFunSpec {
 
   describe("Test Choice items") {
     it("Should allow choice/enum values") {
-      val k1  = ChoiceKey.make("myChoice", Choices.from("A", "B", "C"))
+      val k1  = ChoiceKey.make("myChoice", NoUnits, Choices.from("A", "B", "C"))
       val c1  = Choice("B")
       val i1  = k1.set(c1)
       val sc1 = Setup(ck, CommandName("move"), Some(obsId)).add(i1)

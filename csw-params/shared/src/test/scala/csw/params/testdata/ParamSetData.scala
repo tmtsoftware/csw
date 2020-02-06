@@ -7,6 +7,7 @@ import csw.params.core.generics.Parameter
 import csw.params.core.models.Coords.EqFrame.FK5
 import csw.params.core.models.Coords.SolarSystemObject.Venus
 import csw.params.core.models.Coords.{AltAzCoord, CometCoord, EqCoord, MinorPlanetCoord, SolarSystemCoord, Tag}
+import csw.params.core.models.Units.NoUnits
 import csw.params.core.models.{Angle, ArrayData, Choices, MatrixData, ProperMotion, RaDec, Struct}
 import csw.time.core.models.{TAITime, UTCTime}
 
@@ -49,7 +50,7 @@ object ParamSetData {
   // RaDec Key
   private val p23 = RaDecKey.make("RaDecKey").set(RaDec(7.3, 12.1))
   // Choice Key
-  private val p24 = ChoiceKey.make("ChoiceKey", Choices.from("First", "Second")).set("First", "Second")
+  private val p24 = ChoiceKey.make("ChoiceKey", NoUnits, Choices.from("First", "Second")).set("First", "Second")
   // Struct Key
   private val p25 = StructKey.make("StructKey").set(Struct(Set(p1, p2)))
   private val p26 = StringKey.make("StringKey").set("Str1", "Str2")

@@ -92,8 +92,8 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
     private void handle(ICommandService hcd) {
 
         // Construct Setup command
-        Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
-        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond);
+        Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime", JUnits.millisecond);
+        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L);
 
         Setup setupCommand = new Setup(cswCtx.componentInfo().prefix(), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
 
@@ -159,8 +159,7 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
     //#track-location
 
     private EventKey counterEventKey = new EventKey(Prefix.apply("nfiraos.samplehcd"), new EventName("HcdCounter"));
-    private Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter");
-
+    private Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter", JUnits.NoUnits);
 
     //#subscribe
     private void processEvent(Event event) {

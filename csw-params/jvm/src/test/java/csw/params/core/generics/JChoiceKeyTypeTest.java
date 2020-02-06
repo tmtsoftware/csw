@@ -21,7 +21,7 @@ public class JChoiceKeyTypeTest extends JUnitSuite {
     private final String keyName = " choiceKey";
     private final Choices choices = Choices.from("A", "B", "C");
 
-    private final GChoiceKey choiceKey = JKeyType.ChoiceKey().make(keyName, choices);
+    private final GChoiceKey choiceKey = JKeyType.ChoiceKey().make(keyName, kilometer, choices);
 
     @Test
     public void choicesAPIShouldBeAccessible() {
@@ -57,13 +57,13 @@ public class JChoiceKeyTypeTest extends JUnitSuite {
     }
 
     @Test
-    public void shouldAbleToCreateChoiceParameterWithUnits() {
+    public void shouldAbleToCreateChoiceParameterWithUnits() {   ///  REVISIT: remove?
         Choice choice1 = new Choice("A");
         Choice choice2 = new Choice("B");
         Choice[] choicesArr = {choice1, choice2};
 
         // set with Array and Units
-        Parameter<Choice> choiceParameter = choiceKey.set(choicesArr, kilometer);
+        Parameter<Choice> choiceParameter = choiceKey.set(choicesArr);
         Assert.assertEquals(kilometer, choiceParameter.units());
         Assert.assertEquals(choice1, choiceParameter.jGet(0).orElseThrow());
         Assert.assertEquals(choice2, choiceParameter.jGet(1).orElseThrow());

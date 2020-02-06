@@ -17,6 +17,7 @@ import csw.params.events.Event;
 import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JUnits;
 import csw.time.core.models.UTCTime;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -110,7 +111,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
 
     private Optional<Event> incrementCounterEvent() {
         counter += 1;
-        Parameter<Integer> param = JKeyType.IntKey().make("counter").set(counter);
+        Parameter<Integer> param = JKeyType.IntKey().make("counter", JUnits.NoUnits).set(counter);
         return Optional.of(new SystemEvent(cswCtx.componentInfo().prefix(), new EventName("HcdCounter")).add(param));
     }
 
@@ -153,7 +154,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
     }
 
     private void onSetup(Id runId, Setup setup) {
-        Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
+        Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime", JUnits.millisecond);
 
         // get param from the Parameter Set in the Setup
         Optional<Parameter<Long>> sleepTimeParamOption = setup.jGet(sleepTimeKey);

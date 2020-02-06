@@ -67,8 +67,7 @@ public class JSampleHcdTest extends JUnitSuite {
     @Test
     public void testShouldBeAbleToSubscribeToHCDEvents() throws InterruptedException {
         EventKey counterEventKey = new EventKey(Prefix.apply("nfiraos.JSampleHcd"), new EventName("HcdCounter"));
-        Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter");
-
+        Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter", JUnits.NoUnits);
         IEventService eventService = testKit.jEventService();
         IEventSubscriber subscriber = eventService.defaultSubscriber();
 
@@ -113,8 +112,8 @@ public class JSampleHcdTest extends JUnitSuite {
     public void testShouldBeAbleToSendSleepCommandToHCD() throws ExecutionException, InterruptedException, TimeoutException {
 
         // Construct Setup command
-        Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
-        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond);
+        Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime", JUnits.millisecond);
+        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L);
 
         Setup setupCommand = new Setup(Prefix.apply(JSubsystem.CSW, "move"), new CommandName(("sleep")), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
 
@@ -139,8 +138,8 @@ public class JSampleHcdTest extends JUnitSuite {
     public void testShouldGetExecutionExceptionIfSubmitTimeoutIsTooSmall() throws ExecutionException, InterruptedException {
 
         // Construct Setup command
-        Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
-        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond);
+        Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime", JUnits.millisecond);
+        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L);
 
         Setup setupCommand = new Setup(Prefix.apply(JSubsystem.CSW, "move"), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
 

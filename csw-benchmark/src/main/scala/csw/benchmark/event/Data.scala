@@ -3,6 +3,7 @@ package csw.benchmark.event
 import java.time.Instant
 
 import csw.params.core.generics.{KeyType, Parameter}
+import csw.params.core.models.Units.NoUnits
 import csw.params.core.models._
 import csw.params.events.{EventName, SystemEvent}
 import csw.prefix.models.Prefix
@@ -15,7 +16,7 @@ object Data {
   private val floatKey      = KeyType.FloatKey.make("floats")
   private val stringKey     = KeyType.StringKey.make("strings")
   private val radecKey      = KeyType.RaDecKey.make("radecs")
-  private val choiceKey     = KeyType.ChoiceKey.make("choices", Choices(Set(Choice("100"))))
+  private val choiceKey     = KeyType.ChoiceKey.make("choices", NoUnits, Choices(Set(Choice("100"))))
   private val taiTimeKey    = KeyType.TAITimeKey.make("tai-times")
   private val arrayDataKey  = KeyType.IntArrayKey.make("intarrays")
   private val matrixDataKey = KeyType.IntMatrixKey.make("intmatrices")

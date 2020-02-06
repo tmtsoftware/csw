@@ -4,6 +4,7 @@ import csw.params.core.generics.KeyType.{ChoiceKey, CoordKey, StructKey}
 import csw.params.core.generics.{GChoiceKey, Key, KeyType, Parameter}
 import csw.params.core.models.Coords.EqFrame.FK5
 import csw.params.core.models.Coords.SolarSystemObject.Venus
+import csw.params.core.models.Units.NoUnits
 import csw.params.core.models._
 import csw.time.core.models.UTCTime
 import org.scalatest.funspec.AnyFunSpec
@@ -34,7 +35,7 @@ class KeysAndParametersTest extends AnyFunSpec with Matchers {
 
       //associating units
       val weekDays: Array[String]            = Array("Sunday", "Monday", "Tuesday")
-      val paramWithUnits1: Parameter[String] = k3.set(weekDays, Units.day)
+      val paramWithUnits1: Parameter[String] = k3.set(weekDays)
       val paramWithUnits2: Parameter[String] = k3 -> weekDays withUnits Units.day
 
       //deault unit is NoUnits
@@ -127,9 +128,9 @@ class KeysAndParametersTest extends AnyFunSpec with Matchers {
       val choices = Choices.from("A", "B", "C")
 
       //keys
-      val choice1Key: GChoiceKey = ChoiceKey.make("mode", choices)
+      val choice1Key: GChoiceKey = ChoiceKey.make("mode", NoUnits, choices)
       val choice2Key: GChoiceKey = ChoiceKey.make(
-        "mode-reset",
+        "mode-reset", NoUnits,
         Choices.fromChoices(Choice("c"), Choice("b"), Choice("a"))
       )
 
@@ -296,10 +297,10 @@ class KeysAndParametersTest extends AnyFunSpec with Matchers {
       //values to store
       val weekDays: Array[String] = Array("Sunday", "Monday", "Tuesday")
 
-      //associating units via set
-      val paramWithUnits1: Parameter[String] = k3.set(weekDays, Units.day)
+      //default units via set
+      val paramWithUnits1: Parameter[String] = k3.set(weekDays)
       //associating units via withUnits
-      val paramWithUnits2: Parameter[String] = k3 -> weekDays withUnits Units.count
+      val paramWithUnits2: Parameter[String] = k3 -> weekDays withUnits Units.day
       //change existing unit
       val paramWithUnits3: Parameter[Short] = paramOfShorts.withUnits(Units.meter)
       //#units
@@ -307,8 +308,8 @@ class KeysAndParametersTest extends AnyFunSpec with Matchers {
       //validations
       assert(bDefaultUnitSet === true)
       assert(defaultTimeUnit === Units.second)
-      assert(paramWithUnits1.units === Units.day)
-      assert(paramWithUnits2.units === Units.count)
+      assert(paramWithUnits1.units === Units.NoUnits)
+      assert(paramWithUnits2.units === Units.day)
       assert(paramWithUnits3.units === Units.meter)
     }
   }

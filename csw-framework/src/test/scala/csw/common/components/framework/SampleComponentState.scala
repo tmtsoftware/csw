@@ -9,6 +9,7 @@ import csw.location.api.models.Connection.{HttpConnection, TcpConnection}
 import csw.params.commands.CommandName
 import csw.params.core.generics.KeyType.{ChoiceKey, StringKey}
 import csw.params.core.generics.{GChoiceKey, Parameter}
+import csw.params.core.models.Units.NoUnits
 import csw.params.core.models.{Choice, Choices}
 import csw.params.core.states.StateName
 import csw.params.events.EventName
@@ -66,7 +67,7 @@ object SampleComponentState {
       tcpLocationRemovedChoice,
       eventReceivedChoice
     )
-  val choiceKey: GChoiceKey = ChoiceKey.make("choiceKey", choices)
+  val choiceKey: GChoiceKey = ChoiceKey.make("choiceKey", NoUnits, choices)
   val httpConnection: HttpConnection = HttpConnection(
     ComponentId(Prefix(Subsystem.CSW, "exampleHTTPService"), ComponentType.Service)
   )

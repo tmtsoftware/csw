@@ -327,8 +327,8 @@ class CommandsTest extends AnyFunSpec {
   }
 
   describe("testing for getting typed items") {
-    val t1  = KeyType.IntKey.make("test1")
-    val sc1 = Setup(Prefix(ck3), commandName, Some(obsId)).add(t1.set(Array(22), degree))
+    val t1  = KeyType.IntKey.make("test1", degree)
+    val sc1 = Setup(Prefix(ck3), commandName, Some(obsId)).add(t1.set(Array(22)))
 
     val item: Option[Parameter[Int]] = sc1.get(t1) // Works now!
     val itm: Parameter[Int]          = item.get

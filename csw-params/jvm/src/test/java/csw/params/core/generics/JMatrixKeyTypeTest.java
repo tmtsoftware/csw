@@ -65,8 +65,8 @@ public class JMatrixKeyTypeTest extends JUnitSuite {
         MatrixData matrixData = MatrixData.fromArrays(data);
         MatrixData[] paramValues = {matrixData};
 
-        if (units.isPresent()) parameter = matrixKey.make(keyName).set(paramValues, units.orElseThrow());
-        else parameter = matrixKey.make(keyName).set(paramValues);
+        if (units.isPresent()) parameter = matrixKey.make(keyName, units.orElseThrow()).set(paramValues);
+        else parameter = matrixKey.make(keyName, NoUnits).set(paramValues);
 
         Assert.assertEquals(keyName, parameter.keyName());
         Assert.assertEquals(units.orElse(NoUnits), parameter.units());

@@ -12,6 +12,7 @@ import csw.params.commands._
 import csw.params.core.generics.KeyType.ChoiceKey
 import csw.params.core.generics.{GChoiceKey, Key, KeyType, Parameter}
 import csw.params.core.models.Coords.{CometCoord, Tag}
+import csw.params.core.models.Units.NoUnits
 import csw.params.core.models._
 import csw.params.core.states.{CurrentState, StateName}
 import csw.prefix.models.{Prefix, Subsystem}
@@ -31,7 +32,7 @@ trait CommandData {
   val raDecKey: Key[RaDec]                = KeyType.RaDecKey.make("raDecKey")
   val coordsKey: Key[Coords.CometCoord]   = KeyType.CometCoordKey.make("halley's")
   val choice2Key: GChoiceKey = ChoiceKey.make(
-    "mode-reset",
+    "mode-reset", NoUnits,
     Choices.fromChoices(Choice("c"), Choice("b"), Choice("a"))
   )
 

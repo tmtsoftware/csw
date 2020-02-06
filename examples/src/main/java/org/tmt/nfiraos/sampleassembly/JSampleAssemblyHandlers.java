@@ -89,8 +89,8 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     private void handle(Id runId, ICommandService hcd) {
 
         // Construct Setup command
-        Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
-        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond);
+        Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime", JUnits.millisecond);
+        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L);
 
         Setup setupCommand = new Setup(cswCtx.componentInfo().prefix(), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
 
@@ -120,8 +120,8 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     private void handle2Stage(Id runId, ICommandService hcd) {
 
         // Construct Setup command
-        Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
-        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond);
+        Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime", JUnits.millisecond);
+        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L);
 
         Setup setupCommand = new Setup(cswCtx.componentInfo().prefix(), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
 
@@ -188,7 +188,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
 
     //#subscribe
     private EventKey counterEventKey = new EventKey(Prefix.apply(JSubsystem.NFIRAOS, "samplehcd"), new EventName("HcdCounter"));
-    private Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter");
+    private Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter", JUnits.NoUnits);
 
     private void processEvent(Event event) {
         log.info("Event received: " + event.eventKey());

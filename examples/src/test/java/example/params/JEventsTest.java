@@ -57,10 +57,10 @@ public class JEventsTest extends JUnitSuite {
     public void showUsageOfSystemEvent() {
         //#systemevent
         //keys
-        Key<Integer> k1 = JKeyType.IntKey().make("encoder");
-        Key<Integer> k2 = JKeyType.IntKey().make("speed");
-        Key<String> k3 = JKeyType.StringKey().make("filter");
-        Key<Integer> k4 = JKeyType.IntKey().make("notUsed");
+        Key<Integer> k1 = JKeyType.IntKey().make("encoder", JUnits.encoder);
+        Key<Integer> k2 = JKeyType.IntKey().make("speed", JUnits.NoUnits);
+        Key<String> k3 = JKeyType.StringKey().make("filter", JUnits.NoUnits);
+        Key<Integer> k4 = JKeyType.IntKey().make("notUsed", JUnits.NoUnits);
 
         //prefixes
         Prefix prefix1 = Prefix.apply(JSubsystem.WFOS, "red.filter");
@@ -107,10 +107,10 @@ public class JEventsTest extends JUnitSuite {
     public void showUsageOfObserveEvent() {
         //#observeevent
         //keys
-        Key<Integer> k1 = JKeyType.IntKey().make("readoutsCompleted");
-        Key<Integer> k2 = JKeyType.IntKey().make("coaddsCompleted");
-        Key<String> k3 = JKeyType.StringKey().make("fileID");
-        Key<Integer> k4 = JKeyType.IntKey().make("notUsed");
+        Key<Integer> k1 = JKeyType.IntKey().make("readoutsCompleted", JUnits.NoUnits);
+        Key<Integer> k2 = JKeyType.IntKey().make("coaddsCompleted", JUnits.NoUnits);
+        Key<String> k3 = JKeyType.StringKey().make("fileID", JUnits.NoUnits);
+        Key<Integer> k4 = JKeyType.IntKey().make("notUsed", JUnits.NoUnits);
 
         //prefixes
         Prefix prefix1 = Prefix.apply(JSubsystem.IRIS, "ifu.detectorAssembly");
@@ -157,7 +157,7 @@ public class JEventsTest extends JUnitSuite {
     public void showUsageOfJsonSerialization() {
         //#json-serialization
         //key
-        Key<MatrixData<Double>> k1 = JKeyType.DoubleMatrixKey().make("myMatrix");
+        Key<MatrixData<Double>> k1 = JKeyType.DoubleMatrixKey().make("myMatrix", JUnits.NoUnits);
 
         //prefixes
         Prefix prefix1 = Prefix.apply(JSubsystem.AOESW, "rpg");
@@ -200,9 +200,9 @@ public class JEventsTest extends JUnitSuite {
     public void showUniqueKeyConstraintExample() {
         //#unique-key
         //keys
-        Key<Integer> encoderKey = JKeyType.IntKey().make("encoder");
-        Key<Integer> filterKey = JKeyType.IntKey().make("filter");
-        Key<Integer> miscKey = JKeyType.IntKey().make("misc");
+        Key<Integer> encoderKey = JKeyType.IntKey().make("encoder", JUnits.encoder);
+        Key<Integer> filterKey = JKeyType.IntKey().make("filter", JUnits.NoUnits);
+        Key<Integer> miscKey = JKeyType.IntKey().make("misc", JUnits.NoUnits);
 
         //prefix
         Prefix prefix1 = Prefix.apply(JSubsystem.WFOS, "blue.filter");
@@ -258,7 +258,7 @@ public class JEventsTest extends JUnitSuite {
         EventName name2 = new EventName("guiderCoords");
 
         //Key
-        Key<RaDec> raDecKey = JKeyType.RaDecKey().make("raDecKey");
+        Key<RaDec> raDecKey = JKeyType.RaDecKey().make("raDecKey", JUnits.NoUnits);
 
         //values
         RaDec raDec1 = new RaDec(10.20, 40.20);

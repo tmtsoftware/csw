@@ -6,6 +6,7 @@ import csw.params.events.Event;
 import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JUnits;
 import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
 import csw.time.core.models.UTCTime;
@@ -55,32 +56,32 @@ public class JCborTest extends JUnitSuite {
         MatrixData<Double> doubleMatrixData = MatrixData.fromArrays(doubleData2D);
 
         return Arrays.asList(new Object[][]{
-                {"JChoiceKey", JKeyType.ChoiceKey().make("choiceKey", Choices.from("A", "B", "C")).set(new Choice("A"))},
-                {"JRaDecKey", JKeyType.RaDecKey().make("raDecKey").set(new RaDec(10, 20))},
-                {"JStructKey", JKeyType.StructKey().make("structKey").set(new Struct().add(JKeyType.RaDecKey().make("raDecKey").set(new RaDec(10, 20))))},
-                {"JStringKey", JKeyType.StringKey().make("stringKey").set("str1", "str2")},
+                {"JChoiceKey", JKeyType.ChoiceKey().make("choiceKey", JUnits.NoUnits, Choices.from("A", "B", "C")).set(new Choice("A"))},
+                {"JRaDecKey", JKeyType.RaDecKey().make("raDecKey", JUnits.NoUnits).set(new RaDec(10, 20))},
+                {"JStructKey", JKeyType.StructKey().make("structKey", JUnits.NoUnits).set(new Struct().add(JKeyType.RaDecKey().make("raDecKey", JUnits.NoUnits).set(new RaDec(10, 20))))},
+                {"JStringKey", JKeyType.StringKey().make("stringKey", JUnits.NoUnits).set("str1", "str2")},
                 {"JUTCTimeKey", JKeyType.UTCTimeKey().make("UTCTimeKey").set(UTCTime.now())},
                 {"JTAITimeKey", JKeyType.UTCTimeKey().make("TAITimeKey").set(UTCTime.now())},
-                {"JBooleanKey", JKeyType.BooleanKey().make("booleanKey").set(true)},
-                {"JCharKey", JKeyType.CharKey().make("charKey").set('A', 'B')},
-                {"JByteKey", JKeyType.ByteKey().make("byteKey").set(byteData)},
-                {"JShortKey", JKeyType.ShortKey().make("shortKey").set(shortData)},
-                {"JLongKey", JKeyType.LongKey().make("longKey").set(longData)},
-                {"JIntKey", JKeyType.IntKey().make("intKey").set(intData)},
-                {"JFloatKey", JKeyType.FloatKey().make("floatKey").set(floatData)},
-                {"JDoubleKey", JKeyType.DoubleKey().make("doubleKey").set(doubleData)},
-                {"JByteArrayKey", JKeyType.ByteArrayKey().make("byteArrayKey").set(ArrayData.fromArray(byteData))},
-                {"JShortArrayKey", JKeyType.ShortArrayKey().make("shortArrayKey").set(ArrayData.fromArray(shortData))},
-                {"JLongArrayKey", JKeyType.LongArrayKey().make("longArrayKey").set(ArrayData.fromArray(longData))},
-                {"JIntArrayKey", JKeyType.IntArrayKey().make("intArrayKey").set(ArrayData.fromArray(intData))},
-                {"JFloatArrayKey", JKeyType.FloatArrayKey().make("floatArrayKey").set(ArrayData.fromArray(floatData))},
-                {"JDoubleArrayKey", JKeyType.DoubleArrayKey().make("doubleArrayKey").set(ArrayData.fromArray(doubleData))},
-                {"JByteMatrixKey", JKeyType.ByteMatrixKey().make("byteMatrixKey").set(byteMatrixData)},
-                {"JShortMatrixKey", JKeyType.ShortMatrixKey().make("shortMatrixKey").set(shortMatrixData)},
-                {"JLongMatrixKey", JKeyType.LongMatrixKey().make("longMatrixKey").set(longMatrixData)},
-                {"JIntMatrixKey", JKeyType.IntMatrixKey().make("intMatrixKey").set(integerMatrixData)},
-                {"JFloatMatrixKey", JKeyType.FloatMatrixKey().make("floatMatrixKey").set(floatMatrixData)},
-                {"JDoubleMatrixKey", JKeyType.DoubleMatrixKey().make("doubleMatrixKey").set(doubleMatrixData)}
+                {"JBooleanKey", JKeyType.BooleanKey().make("booleanKey", JUnits.NoUnits).set(true)},
+                {"JCharKey", JKeyType.CharKey().make("charKey", JUnits.NoUnits).set('A', 'B')},
+                {"JByteKey", JKeyType.ByteKey().make("byteKey", JUnits.NoUnits).set(byteData)},
+                {"JShortKey", JKeyType.ShortKey().make("shortKey", JUnits.NoUnits).set(shortData)},
+                {"JLongKey", JKeyType.LongKey().make("longKey", JUnits.NoUnits).set(longData)},
+                {"JIntKey", JKeyType.IntKey().make("intKey", JUnits.NoUnits).set(intData)},
+                {"JFloatKey", JKeyType.FloatKey().make("floatKey", JUnits.NoUnits).set(floatData)},
+                {"JDoubleKey", JKeyType.DoubleKey().make("doubleKey", JUnits.NoUnits).set(doubleData)},
+                {"JByteArrayKey", JKeyType.ByteArrayKey().make("byteArrayKey", JUnits.NoUnits).set(ArrayData.fromArray(byteData))},
+                {"JShortArrayKey", JKeyType.ShortArrayKey().make("shortArrayKey", JUnits.NoUnits).set(ArrayData.fromArray(shortData))},
+                {"JLongArrayKey", JKeyType.LongArrayKey().make("longArrayKey", JUnits.NoUnits).set(ArrayData.fromArray(longData))},
+                {"JIntArrayKey", JKeyType.IntArrayKey().make("intArrayKey", JUnits.NoUnits).set(ArrayData.fromArray(intData))},
+                {"JFloatArrayKey", JKeyType.FloatArrayKey().make("floatArrayKey", JUnits.NoUnits).set(ArrayData.fromArray(floatData))},
+                {"JDoubleArrayKey", JKeyType.DoubleArrayKey().make("doubleArrayKey", JUnits.NoUnits).set(ArrayData.fromArray(doubleData))},
+                {"JByteMatrixKey", JKeyType.ByteMatrixKey().make("byteMatrixKey", JUnits.NoUnits).set(byteMatrixData)},
+                {"JShortMatrixKey", JKeyType.ShortMatrixKey().make("shortMatrixKey", JUnits.NoUnits).set(shortMatrixData)},
+                {"JLongMatrixKey", JKeyType.LongMatrixKey().make("longMatrixKey", JUnits.NoUnits).set(longMatrixData)},
+                {"JIntMatrixKey", JKeyType.IntMatrixKey().make("intMatrixKey", JUnits.NoUnits).set(integerMatrixData)},
+                {"JFloatMatrixKey", JKeyType.FloatMatrixKey().make("floatMatrixKey", JUnits.NoUnits).set(floatMatrixData)},
+                {"JDoubleMatrixKey", JKeyType.DoubleMatrixKey().make("doubleMatrixKey", JUnits.NoUnits).set(doubleMatrixData)}
         });
     }
 

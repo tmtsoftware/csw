@@ -6,6 +6,7 @@ import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.ObsId;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JUnits;
 import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
 import org.junit.Assert;
@@ -21,9 +22,9 @@ import java.util.Set;
 // DEOPSCSW-185: Easy to Use Syntax/Api
 public class JStateVariableTest extends JUnitSuite {
 
-    private final Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder");
-    private final Key<String> epochStringKey = JKeyType.StringKey().make("epoch");
-    private final Key<Integer> epochIntKey = JKeyType.IntKey().make("epoch");
+    private final Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder", JUnits.encoder);
+    private final Key<String> epochStringKey = JKeyType.StringKey().make("epoch", JUnits.year);
+    private final Key<Integer> epochIntKey = JKeyType.IntKey().make("epoch", JUnits.year);
 
     private final Parameter<Integer> encoderParam = encoderIntKey.set(22, 33);
     private final Parameter<String> epochStringParam = epochStringKey.set("A", "B");

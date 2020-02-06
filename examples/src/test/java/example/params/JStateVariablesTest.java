@@ -9,6 +9,7 @@ import csw.params.core.states.CurrentState;
 import csw.params.core.states.DemandState;
 import csw.params.core.states.StateName;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JUnits;
 import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
 import csw.time.core.models.UTCTime;
@@ -35,11 +36,11 @@ public class JStateVariablesTest extends JUnitSuite {
         Prefix prefix = Prefix.apply(JSubsystem.WFOS, "prog.cloudcover");
 
         //keys
-        Key<Character> charKey = JKeyType.CharKey().make("charKey");
-        Key<Integer> intKey = JKeyType.IntKey().make("intKey");
-        Key<Boolean> booleanKey = JKeyType.BooleanKey().make("booleanKey");
+        Key<Character> charKey = JKeyType.CharKey().make("charKey", JUnits.NoUnits);
+        Key<Integer> intKey = JKeyType.IntKey().make("intKey", JUnits.NoUnits);
+        Key<Boolean> booleanKey = JKeyType.BooleanKey().make("booleanKey", JUnits.NoUnits);
         Key<UTCTime> utcTimeKey = JKeyType.UTCTimeKey().make("utcTimeKey");
-        Key<String> notUsedKey = JKeyType.StringKey().make("notUsed");
+        Key<String> notUsedKey = JKeyType.StringKey().make("notUsed", JUnits.NoUnits);
 
 
         //#obsid
@@ -97,11 +98,11 @@ public class JStateVariablesTest extends JUnitSuite {
         Prefix prefix = Prefix.apply(JSubsystem.WFOS, "prog.cloudcover");
 
         //keys
-        Key<Character> charKey = JKeyType.CharKey().make("charKey");
-        Key<Integer> intKey = JKeyType.IntKey().make("intKey");
-        Key<Boolean> booleanKey = JKeyType.BooleanKey().make("booleanKey");
+        Key<Character> charKey = JKeyType.CharKey().make("charKey", JUnits.NoUnits);
+        Key<Integer> intKey = JKeyType.IntKey().make("intKey", JUnits.NoUnits);
+        Key<Boolean> booleanKey = JKeyType.BooleanKey().make("booleanKey", JUnits.NoUnits);
         Key<UTCTime> timestampKey = JKeyType.UTCTimeKey().make("timestampKey");
-        Key<String> notUsedKey = JKeyType.StringKey().make("notUsed");
+        Key<String> notUsedKey = JKeyType.StringKey().make("notUsed", JUnits.NoUnits);
 
 
         //#obsid
@@ -156,7 +157,7 @@ public class JStateVariablesTest extends JUnitSuite {
     public void showJsonSerialization() {
         //#json-serialization
         //key
-        Key<MatrixData<Double>> k1 = JKeyType.DoubleMatrixKey().make("myMatrix");
+        Key<MatrixData<Double>> k1 = JKeyType.DoubleMatrixKey().make("myMatrix", JUnits.NoUnits);
 
         //values
         Double[][] doubles = {{1.0, 2.0, 3.0}, {4.1, 5.1, 6.1}, {7.2, 8.2, 9.2}};
@@ -194,9 +195,9 @@ public class JStateVariablesTest extends JUnitSuite {
     public void showUniqueKeyConstraintExample() {
         //#unique-key
         //keys
-        Key<Integer> encoderKey = JKeyType.IntKey().make("encoder");
-        Key<Integer> filterKey = JKeyType.IntKey().make("filter");
-        Key<Integer> miscKey = JKeyType.IntKey().make("misc.");
+        Key<Integer> encoderKey = JKeyType.IntKey().make("encoder", JUnits.encoder);
+        Key<Integer> filterKey = JKeyType.IntKey().make("filter", JUnits.NoUnits);
+        Key<Integer> miscKey = JKeyType.IntKey().make("misc.", JUnits.NoUnits);
 
         //prefix
         Prefix prefix = Prefix.apply(JSubsystem.WFOS, "blue.filter");

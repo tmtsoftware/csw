@@ -52,11 +52,11 @@ public class JCommandsTest extends JUnitSuite {
     public void showUsageOfSetupCommand() {
         //#setup
         //keys
-        Key<Integer> k1 = JKeyType.IntKey().make("encoder");
-        Key<String> k2 = JKeyType.StringKey().make("stringThing");
-        Key<Integer> k2bad = JKeyType.IntKey().make("missingKey");
-        Key<Integer> k3 = JKeyType.IntKey().make("filter");
-        Key<Float> k4 = JKeyType.FloatKey().make("correction");
+        Key<Integer> k1 = JKeyType.IntKey().make("encoder", JUnits.encoder);
+        Key<String> k2 = JKeyType.StringKey().make("stringThing", JUnits.NoUnits);
+        Key<Integer> k2bad = JKeyType.IntKey().make("missingKey", JUnits.NoUnits);
+        Key<Integer> k3 = JKeyType.IntKey().make("filter", JUnits.NoUnits);
+        Key<Float> k4 = JKeyType.FloatKey().make("correction", JUnits.NoUnits);
 
         //prefix
         Prefix prefix = Prefix.apply(JSubsystem.WFOS, "red.detector");
@@ -80,8 +80,8 @@ public class JCommandsTest extends JUnitSuite {
         int paramSize = sc2.size();
 
         //add binary payload
-        Key<Byte> byteKey1 = JKeyType.ByteKey().make("byteKey1");
-        Key<Byte> byteKey2 = JKeyType.ByteKey().make("byteKey2");
+        Key<Byte> byteKey1 = JKeyType.ByteKey().make("byteKey1", JUnits.NoUnits);
+        Key<Byte> byteKey2 = JKeyType.ByteKey().make("byteKey2", JUnits.NoUnits);
         Byte[] bytes1 = {10, 20};
         Byte[] bytes2 = {30, 40};
 
@@ -111,10 +111,10 @@ public class JCommandsTest extends JUnitSuite {
     public void showUsageOfObserveCommand() {
         //#observe
         //keys
-        Key<Boolean> k1 = JKeyType.BooleanKey().make("repeat");
-        Key<Integer> k2 = JKeyType.IntKey().make("expTime");
-        Key<Integer> k2bad = JKeyType.IntKey().make("missingKey");
-        Key<Integer> k3 = JKeyType.IntKey().make("filter");
+        Key<Boolean> k1 = JKeyType.BooleanKey().make("repeat", JUnits.NoUnits);
+        Key<Integer> k2 = JKeyType.IntKey().make("expTime", JUnits.second);
+        Key<Integer> k2bad = JKeyType.IntKey().make("missingKey", JUnits.NoUnits);
+        Key<Integer> k3 = JKeyType.IntKey().make("filter", JUnits.NoUnits);
         Key<UTCTime> k4 = JKeyType.UTCTimeKey().make("creation-time");
 
         //prefix
@@ -163,10 +163,10 @@ public class JCommandsTest extends JUnitSuite {
     public void showUsageOfWaitCommand() {
         //#wait
         //keys
-        Key<Boolean> k1 = JKeyType.BooleanKey().make("repeat");
-        Key<Integer> k2 = JKeyType.IntKey().make("expTime");
-        Key<Integer> k2bad = JKeyType.IntKey().make("missingKey");
-        Key<Integer> k3 = JKeyType.IntKey().make("filter");
+        Key<Boolean> k1 = JKeyType.BooleanKey().make("repeat", JUnits.NoUnits);
+        Key<Integer> k2 = JKeyType.IntKey().make("expTime", JUnits.second);
+        Key<Integer> k2bad = JKeyType.IntKey().make("missingKey", JUnits.NoUnits);
+        Key<Integer> k3 = JKeyType.IntKey().make("filter", JUnits.NoUnits);
         Key<UTCTime> k4 = JKeyType.UTCTimeKey().make("creation-time");
 
         //prefix
@@ -215,7 +215,7 @@ public class JCommandsTest extends JUnitSuite {
     public void showJsonSerialization() {
         //#json-serialization
         //key
-        Key<MatrixData<Double>> k1 = JKeyType.DoubleMatrixKey().make("myMatrix");
+        Key<MatrixData<Double>> k1 = JKeyType.DoubleMatrixKey().make("myMatrix", JUnits.NoUnits);
 
         //values
         Double[][] doubles = {{1.0, 2.0, 3.0}, {4.1, 5.1, 6.1}, {7.2, 8.2, 9.2}};
@@ -254,9 +254,9 @@ public class JCommandsTest extends JUnitSuite {
     public void showUniqueKeyConstraintExample() {
         //#unique-key
         //keys
-        Key<Integer> encoderKey = JKeyType.IntKey().make("encoder");
-        Key<Integer> filterKey = JKeyType.IntKey().make("filter");
-        Key<Integer> miscKey = JKeyType.IntKey().make("misc.");
+        Key<Integer> encoderKey = JKeyType.IntKey().make("encoder", JUnits.encoder);
+        Key<Integer> filterKey = JKeyType.IntKey().make("filter", JUnits.NoUnits);
+        Key<Integer> miscKey = JKeyType.IntKey().make("misc.", JUnits.NoUnits);
 
         //prefix
         Prefix prefix = Prefix.apply(JSubsystem.WFOS, "blue.filter");

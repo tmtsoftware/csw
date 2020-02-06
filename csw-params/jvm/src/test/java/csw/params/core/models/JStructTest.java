@@ -3,6 +3,7 @@ package csw.params.core.models;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JUnits;
 import csw.time.core.models.TAITime;
 import csw.time.core.models.UTCTime;
 import org.junit.Assert;
@@ -20,9 +21,9 @@ public class JStructTest extends JUnitSuite {
 
     private final String keyName = "StructKey";
     private final Key<Struct> key = JKeyType.StructKey().make(keyName);
-    private final Key<String> ra = JKeyType.StringKey().make("ra");
-    private final Key<String> dec = JKeyType.StringKey().make("dec");
-    private final Key<Double> epoch = JKeyType.DoubleKey().make("epoch");
+    private final Key<String> ra = JKeyType.StringKey().make("ra", NoUnits);
+    private final Key<String> dec = JKeyType.StringKey().make("dec", NoUnits);
+    private final Key<Double> epoch = JKeyType.DoubleKey().make("epoch", JUnits.year);
     private final Key<UTCTime> utcTime = JKeyType.UTCTimeKey().make("now");
     private final Key<TAITime> taiTime = JKeyType.TAITimeKey().make("tai_now");
     private final Parameter<String> raParameter = ra.set("12:13:14.1");
@@ -49,7 +50,7 @@ public class JStructTest extends JUnitSuite {
         Struct struct1 = JStruct.create(parameterSet1);
         Struct struct2 = JStruct.create(parameterSet2);
 
-        Parameter<Struct> structParameter = key.set(new Struct[]{struct1, struct2}, NoUnits);
+        Parameter<Struct> structParameter = key.set(new Struct[]{struct1, struct2});
 
         Assert.assertEquals(Arrays.asList(struct1, struct2), structParameter.jValues());
         Assert.assertArrayEquals(new Struct[]{struct1, struct2}, (Struct[]) structParameter.values());

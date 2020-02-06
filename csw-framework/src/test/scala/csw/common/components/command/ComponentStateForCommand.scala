@@ -3,6 +3,7 @@ package csw.common.components.command
 import csw.params.commands.CommandName
 import csw.params.core.generics.{GChoiceKey, KeyType}
 import csw.params.core.generics.KeyType.ChoiceKey
+import csw.params.core.models.Units.NoUnits
 import csw.params.core.models.{Choice, Choices}
 import csw.prefix.models.Prefix
 
@@ -47,5 +48,5 @@ object ComponentStateForCommand {
     longRunningCmdCompleted,
     longRunningCurrentStatus
   )
-  val choiceKey: GChoiceKey = ChoiceKey.make("choiceKey", choices)
+  val choiceKey: GChoiceKey = ChoiceKey.make("choiceKey", NoUnits, choices)
 }
