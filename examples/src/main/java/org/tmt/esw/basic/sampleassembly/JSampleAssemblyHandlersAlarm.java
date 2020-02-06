@@ -13,7 +13,10 @@ import csw.command.client.messages.TopLevelActorMessage;
 import csw.event.api.javadsl.IEventSubscription;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
-import csw.location.models.*;
+import csw.location.api.models.Location;
+import csw.location.api.models.LocationRemoved;
+import csw.location.api.models.LocationUpdated;
+import csw.location.api.models.TrackingEvent;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.CommandResponse;
 import csw.params.commands.ControlCommand;
@@ -95,7 +98,7 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
 
         // Construct Setup command
         Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
-        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond());
+        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond);
 
         Setup setupCommand = new Setup(cswCtx.componentInfo().prefix(), hcdSleep, Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
 
@@ -160,7 +163,7 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
     }
     //#track-location
 
-    private EventKey counterEventKey = new EventKey(Prefix.apply(ESW(), "SampleHcd"), new EventName("HcdCounter"));
+    private EventKey counterEventKey = new EventKey(Prefix.apply(ESW, "SampleHcd"), new EventName("HcdCounter"));
     private Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter");
 
 
@@ -196,13 +199,13 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
     //#alarm
     private AlarmSeverity getCounterSeverity(int counter) {
         if (counter >= 0 && counter <= 10) {
-            return JAlarmSeverity.Okay();
+            return JAlarmSeverity.Okay;
         } else if (counter >= 11 && counter <= 15) {
-            return JAlarmSeverity.Warning();
+            return JAlarmSeverity.Warning;
         } else if (counter >= 16 && counter <= 20) {
-            return JAlarmSeverity.Major();
+            return JAlarmSeverity.Major;
         }
-        return JAlarmSeverity.Critical();
+        return JAlarmSeverity.Critical;
     }
 
     private void setCounterAlarm(int counter) {

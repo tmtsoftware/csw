@@ -2,9 +2,9 @@ package org.tmt.nfiraos.sampleassembly;
 
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.JComponentType;
-import csw.location.models.AkkaLocation;
-import csw.location.models.ComponentId;
-import csw.location.models.Connection;
+import csw.location.api.models.AkkaLocation;
+import csw.location.api.models.ComponentId;
+import csw.location.api.models.Connection.*;
 import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 import csw.testkit.javadsl.FrameworkTestKitJunitResource;
@@ -37,7 +37,7 @@ public class JSampleAssemblyTest extends JUnitSuite {
     //#locate
     @Test
     public void testAssemblyShouldBeLocatableUsingLocationService() throws ExecutionException, InterruptedException {
-        Connection.AkkaConnection connection = new Connection.AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.NFIRAOS(), "JSampleAssembly"), JComponentType.Assembly()));
+        AkkaConnection connection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.NFIRAOS, "JSampleAssembly"), JComponentType.Assembly));
         ILocationService locationService = testKit.jLocationService();
         AkkaLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().orElseThrow();
 

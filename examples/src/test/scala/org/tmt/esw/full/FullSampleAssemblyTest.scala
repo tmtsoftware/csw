@@ -1,23 +1,23 @@
 package org.tmt.esw.full
 
-import csw.location.models.Connection.AkkaConnection
-import csw.location.models.{ComponentId, ComponentType}
+import csw.location.api.models.{ComponentId, ComponentType}
+import csw.location.api.models.Connection.AkkaConnection
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.scaladsl.CSWService.{AlarmServer, EventServer}
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
-import org.scalatest.FunSuiteLike
+import org.scalatest.funsuite.AnyFunSuiteLike
 
 import scala.concurrent.Await
 
 //#intro
-class FullSampleAssemblyTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with FunSuiteLike {
+class FullSampleAssemblyTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with AnyFunSuiteLike {
   import frameworkTestKit.frameworkWiring._
 //#intro
 
   //#setup
   override def beforeAll(): Unit = {
     super.beforeAll()
-    spawnStandalone(com.typesafe.config.ConfigFactory.load("SampleAssemblyStandalone.conf"))
+    spawnStandalone(com.typesafe.config.ConfigFactory.load("FullSampleAssemblyStandalone.conf"))
   }
 //#setup
 

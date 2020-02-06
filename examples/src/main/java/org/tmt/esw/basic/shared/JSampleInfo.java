@@ -31,7 +31,7 @@ public class JSampleInfo {
 
   // Helper to get units set
   public static Parameter<Long> setSleepTime(Long milli) {
-    return sleepTimeKey.set(milli).withUnits(JUnits.millisecond());
+    return sleepTimeKey.set(milli).withUnits(JUnits.millisecond);
   }
 
   public static final Key<Long> resultKey = JKeyType.LongKey().make("result");

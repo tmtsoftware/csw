@@ -10,7 +10,7 @@ import csw.event.api.javadsl.IEventSubscription;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
 import csw.location.api.javadsl.JComponentType;
-import csw.location.models.*;
+import csw.location.api.models.*;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.*;
 import csw.params.core.generics.Key;
@@ -65,7 +65,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     timeout = new Timeout(10, TimeUnit.SECONDS);
     this.log = cswCtx.loggerFactory().getLogger(getClass());
     prefix = cswCtx.componentInfo().prefix();
-    hcdConnection = new Connection.AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.ESW(), "SampleHcd"), JComponentType.HCD()));
+    hcdConnection = new Connection.AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.ESW, "SampleHcd"), JComponentType.HCD));
   }
 
 
@@ -109,7 +109,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
   //#track-location
 
   //#subscribe
-  private EventKey counterEventKey = new EventKey(Prefix.apply(JSubsystem.ESW(), "SampleHcd"), new EventName("HcdCounter"));
+  private EventKey counterEventKey = new EventKey(Prefix.apply(JSubsystem.ESW, "SampleHcd"), new EventName("HcdCounter"));
   private Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter");
 
   private void processEvent(Event event) {

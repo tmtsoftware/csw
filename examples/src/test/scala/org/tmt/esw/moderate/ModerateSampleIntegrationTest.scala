@@ -7,14 +7,14 @@ import csw.command.client.CommandServiceFactory
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.models.framework.LockingResponse
 import csw.command.client.models.framework.LockingResponse.{LockAcquired, LockReleased}
-import csw.location.models.Connection.AkkaConnection
-import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.location.api.models.Connection.AkkaConnection
 import csw.params.commands.CommandResponse.{Cancelled, Completed, Locked, Started}
 import csw.params.commands.Setup
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.scaladsl.CSWService.{AlarmServer, EventServer}
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
-import org.scalatest.WordSpecLike
+import org.scalatest.wordspec.AnyWordSpecLike
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -25,7 +25,7 @@ object LockCommandFactory {
 
 //noinspection ScalaStyle
 //#intro
-class ModerateSampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with WordSpecLike {
+class ModerateSampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with AnyWordSpecLike {
   import frameworkTestKit.frameworkWiring._
 
   private val containerConnection = AkkaConnection(

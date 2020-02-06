@@ -10,7 +10,7 @@ import csw.command.client.messages.TopLevelActorMessage
 import csw.event.api.scaladsl.EventSubscription
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.models.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.location.api.models.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, CommandResponse, ControlCommand, Setup}
 import csw.params.core.generics.{Key, KeyType, Parameter}
@@ -32,7 +32,7 @@ import scala.util.{Failure, Success}
  * You can find more information on this here : https://tmtsoftware.github.io/csw/framework.html
  */
 class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
-  extends ComponentHandlers(ctx, cswCtx) {
+    extends ComponentHandlers(ctx, cswCtx) {
 
   import cswCtx._
   implicit val ec: ExecutionContextExecutor = ctx.executionContext

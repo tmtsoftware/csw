@@ -31,4 +31,6 @@ public interface JSubsystem {
     Subsystem SOSS = Subsystem.SOSS$.MODULE$;
     Subsystem TCS = Subsystem.TCS$.MODULE$;
     Subsystem WFOS = Subsystem.WFOS$.MODULE$;
+
+    Subsystem Container = Subsystem.Container$.MODULE$;
 }

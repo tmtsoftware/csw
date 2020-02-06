@@ -5,9 +5,9 @@ import csw.command.api.javadsl.ICommandService;
 import csw.command.client.CommandServiceFactory;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.JComponentType;
-import csw.location.models.AkkaLocation;
-import csw.location.models.ComponentId;
-import csw.location.models.Connection.*;
+import csw.location.api.models.AkkaLocation;
+import csw.location.api.models.ComponentId;
+import csw.location.api.models.Connection.*;
 import csw.params.commands.CommandResponse.*;
 import csw.params.commands.Setup;
 import csw.prefix.javadsl.JSubsystem;
@@ -28,15 +28,15 @@ import static org.tmt.esw.basic.shared.JSampleInfo.*;
 
 public class JSampleIntegrationTest extends JUnitSuite {
 
-    private static AkkaConnection containerConnection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.Container(), "JSampleContainer"),
-            JComponentType.Container()));
+    private static AkkaConnection containerConnection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.Container, "JSampleContainer"),
+            JComponentType.Container));
     private static AkkaLocation containerLocation;
 
     private static AkkaConnection assemblyConnection = new AkkaConnection(
-            new ComponentId(Prefix.apply(JSubsystem.ESW(), "JSampleAssemblyHandlers"), JComponentType.Assembly()));
+            new ComponentId(Prefix.apply(JSubsystem.ESW, "JSampleAssembly"), JComponentType.Assembly));
     private static AkkaLocation assemblyLocation;
 
-    private static AkkaConnection hcdConnection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.ESW(), "JSampleHcd"), JComponentType.HCD()));
+    private static AkkaConnection hcdConnection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.ESW, "JSampleHcd"), JComponentType.HCD));
     private static AkkaLocation hcdLocation;
 
     private Timeout timeout = new Timeout(12, TimeUnit.SECONDS);

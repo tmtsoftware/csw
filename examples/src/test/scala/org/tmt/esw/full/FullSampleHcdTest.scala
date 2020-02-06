@@ -3,9 +3,8 @@ package org.tmt.esw.full
 import akka.actor.typed.ActorSystem
 import akka.util.Timeout
 import csw.command.client.CommandServiceFactory
-import csw.location.models
-import csw.location.models.Connection.AkkaConnection
-import csw.location.models.{ComponentId, ComponentType}
+import csw.location.api.models.{ComponentId, ComponentType}
+import csw.location.api.models.Connection.AkkaConnection
 import csw.params.commands.CommandResponse.{Cancelled, Completed, Started}
 import csw.params.commands.{CommandResponse, Setup}
 import csw.params.core.generics.{KeyType, Parameter}
@@ -14,7 +13,8 @@ import csw.params.events.{Event, EventKey, EventName, SystemEvent}
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.scaladsl.CSWService.{AlarmServer, EventServer, LocationServer}
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
-import org.scalatest.{BeforeAndAfterEach, FunSuiteLike}
+import org.scalatest.funsuite.AnyFunSuiteLike
+import org.scalatest.BeforeAndAfterEach
 import org.tmt.esw.full.shared.SampleInfo._
 
 import scala.collection.mutable
@@ -24,7 +24,7 @@ import scala.concurrent.Await
 //#setup
 class FullSampleHcdTest
     extends ScalaTestFrameworkTestKit(AlarmServer, EventServer, LocationServer)
-    with FunSuiteLike
+    with AnyFunSuiteLike
     with BeforeAndAfterEach {
   import frameworkTestKit.frameworkWiring._
 
@@ -133,7 +133,7 @@ class FullSampleHcdTest
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(4000).withUnits(Units.millisecond)
     val setupCommand                    = Setup(testPrefix, hcdSleep, Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
-    val connection = AkkaConnection(models.ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
+    val connection = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
 
     val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
 

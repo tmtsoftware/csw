@@ -10,8 +10,8 @@ import csw.command.client.messages.TopLevelActorMessage
 import csw.event.api.scaladsl.EventSubscription
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.models.Connection.AkkaConnection
-import csw.location.models._
+import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType, LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.location.api.models.Connection.AkkaConnection
 import csw.params.commands.CommandIssue.{MissingKeyIssue, ParameterValueOutOfRangeIssue, UnsupportedCommandIssue}
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandIssue, ControlCommand, Observe, Result, Setup}
@@ -23,7 +23,7 @@ import csw.time.core.models.UTCTime
 import org.tmt.esw.basic.shared.SampleInfo._
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContextExecutor, Future}
+import scala.concurrent.{ExecutionContextExecutor, Future}
 
 /**
  * Domain specific logic should be written in below handlers.
@@ -152,8 +152,9 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   private def onSetup(runId: Id, setup: Setup): SubmitResponse =
     setup.commandName match {
       case `immediateCommand` =>
+        val localValue = 1000L
         // Assembly preforms a calculation or reads state information storing in a result
-        Completed(runId, Result().add(resultKey.set(1000L)))
+        Completed(runId, Result().add(resultKey.set(localValue)))
       //#immediate-command
       case `shortCommand` =>
         sleepHCD(runId, setup, shortSleepPeriod)

@@ -10,7 +10,7 @@ import csw.command.client.messages.TopLevelActorMessage;
 import csw.event.api.javadsl.IEventSubscription;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
-import csw.location.models.*;
+import csw.location.api.models.*;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.CommandName;
 import csw.params.commands.CommandResponse;
@@ -90,7 +90,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
 
         // Construct Setup command
         Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
-        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond());
+        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond);
 
         Setup setupCommand = new Setup(cswCtx.componentInfo().prefix(), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
 
@@ -121,7 +121,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
 
         // Construct Setup command
         Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
-        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond());
+        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond);
 
         Setup setupCommand = new Setup(cswCtx.componentInfo().prefix(), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
 
@@ -178,7 +178,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
         if (trackingEvent instanceof LocationUpdated) {
             LocationUpdated updated = (LocationUpdated) trackingEvent;
             Location location = updated.location();
-            ICommandService hcd = CommandServiceFactory.jMake((AkkaLocation) (location), actorContext.getSystem());
+            ICommandService hcd = CommandServiceFactory.jMake(location, actorContext.getSystem());
             commandSender.tell(new SendCommand(hcd));
         } else if (trackingEvent instanceof LocationRemoved) {
             log.info("HCD no longer available");
@@ -187,7 +187,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     //#track-location
 
     //#subscribe
-    private EventKey counterEventKey = new EventKey(Prefix.apply(JSubsystem.NFIRAOS(), "samplehcd"), new EventName("HcdCounter"));
+    private EventKey counterEventKey = new EventKey(Prefix.apply(JSubsystem.NFIRAOS, "samplehcd"), new EventName("HcdCounter"));
     private Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter");
 
     private void processEvent(Event event) {

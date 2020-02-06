@@ -1,11 +1,11 @@
 package example.teskit
 
 import com.typesafe.config.ConfigFactory
+import csw.location.api.models.ComponentId
+import csw.location.api.models.ComponentType.Assembly
+import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.models.ComponentId
-import csw.location.models.ComponentType.Assembly
-import csw.location.models.Connection.AkkaConnection
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.FrameworkTestKit
 import csw.testkit.scaladsl.CSWService.{ConfigServer, EventServer}

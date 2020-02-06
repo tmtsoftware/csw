@@ -3,9 +3,8 @@ package org.tmt.nfiraos.samplehcd
 import akka.actor.typed.ActorSystem
 import akka.util.Timeout
 import csw.command.client.CommandServiceFactory
-import csw.location.models
-import csw.location.models.Connection.AkkaConnection
-import csw.location.models.{ComponentId, ComponentType}
+import csw.location.api.models.{ComponentId, ComponentType}
+import csw.location.api.models.Connection.AkkaConnection
 import csw.params.commands.CommandResponse.Completed
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.generics.{Key, KeyType, Parameter}
@@ -15,13 +14,14 @@ import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.NFIRAOS
 import csw.testkit.scaladsl.CSWService.{AlarmServer, EventServer}
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
-import org.scalatest.{BeforeAndAfterEach, FunSuiteLike}
+import org.scalatest.BeforeAndAfterEach
+import org.scalatest.funsuite.AnyFunSuiteLike
 
 import scala.collection.mutable
 import scala.concurrent.Await
 
 //#setup
-class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with FunSuiteLike with BeforeAndAfterEach {
+class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with AnyFunSuiteLike with BeforeAndAfterEach {
   import frameworkTestKit.frameworkWiring._
 
   override def beforeAll(): Unit = {
@@ -40,7 +40,7 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
 
   //#subscribe
   test("should be able to subscribe to HCD events") {
-    val counterEventKey = EventKey(Prefix("nfiraos.samplehcd"), EventName("HcdCounter"))
+    val counterEventKey = EventKey(Prefix("nfiraos.SampleHcd"), EventName("HcdCounter"))
     val hcdCounterKey   = KeyType.IntKey.make("counter")
 
     val eventService = eventServiceFactory.make(locationService)(actorSystem)
@@ -110,7 +110,7 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
     val setupCommand                    = Setup(Prefix("csw.move"), CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
-    val connection = AkkaConnection(models.ComponentId(Prefix(NFIRAOS, "SampleHcd"), ComponentType.HCD))
+    val connection = AkkaConnection(ComponentId(Prefix(NFIRAOS, "SampleHcd"), ComponentType.HCD))
 
     val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
 

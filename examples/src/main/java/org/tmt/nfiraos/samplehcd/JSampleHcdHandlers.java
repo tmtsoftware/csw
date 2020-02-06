@@ -2,13 +2,12 @@ package org.tmt.nfiraos.samplehcd;
 
 import akka.actor.Cancellable;
 import akka.actor.typed.ActorRef;
-import akka.actor.typed.internal.adapter.ActorRefAdapter;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import csw.command.client.messages.TopLevelActorMessage;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
-import csw.location.models.TrackingEvent;
+import csw.location.api.models.TrackingEvent;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.*;
 import csw.params.core.generics.Key;

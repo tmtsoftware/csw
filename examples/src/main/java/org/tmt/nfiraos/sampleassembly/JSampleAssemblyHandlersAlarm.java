@@ -13,7 +13,7 @@ import csw.command.client.messages.TopLevelActorMessage;
 import csw.event.api.javadsl.IEventSubscription;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
-import csw.location.models.*;
+import csw.location.api.models.*;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.CommandName;
 import csw.params.commands.CommandResponse;
@@ -29,7 +29,6 @@ import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
 import csw.params.javadsl.JUnits;
-import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 import csw.time.core.models.UTCTime;
 
@@ -93,7 +92,7 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
 
         // Construct Setup command
         Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
-        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond());
+        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond);
 
         Setup setupCommand = new Setup(cswCtx.componentInfo().prefix(), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
 
@@ -194,13 +193,13 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
     //#alarm
     private AlarmSeverity getCounterSeverity(int counter) {
         if (counter >= 0 && counter <= 10) {
-            return JAlarmSeverity.Okay();
+            return JAlarmSeverity.Okay;
         } else if (counter >= 11 && counter <= 15) {
-            return JAlarmSeverity.Warning();
+            return JAlarmSeverity.Warning;
         } else if (counter >= 16 && counter <= 20) {
-            return JAlarmSeverity.Major();
+            return JAlarmSeverity.Major;
         }
-        return JAlarmSeverity.Critical();
+        return JAlarmSeverity.Critical;
     }
 
     private void setCounterAlarm(int counter) {

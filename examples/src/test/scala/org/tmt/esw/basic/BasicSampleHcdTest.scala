@@ -3,9 +3,8 @@ package org.tmt.esw.basic
 import akka.actor.typed.ActorSystem
 import akka.util.Timeout
 import csw.command.client.CommandServiceFactory
-import csw.location.models
-import csw.location.models.Connection.AkkaConnection
-import csw.location.models.{ComponentId, ComponentType}
+import csw.location.api.models.{ComponentId, ComponentType}
+import csw.location.api.models.Connection.AkkaConnection
 import csw.params.commands.{CommandName, CommandResponse, Setup}
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.{ObsId, Units}
@@ -13,7 +12,8 @@ import csw.params.events.{Event, EventKey, EventName, SystemEvent}
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.scaladsl.CSWService.{AlarmServer, EventServer}
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
-import org.scalatest.{BeforeAndAfterEach, FunSuiteLike}
+import org.scalatest.BeforeAndAfterEach
+import org.scalatest.funsuite.AnyFunSuiteLike
 import org.tmt.esw.basic.shared.SampleInfo._
 
 import scala.collection.mutable
@@ -21,12 +21,12 @@ import scala.concurrent.Await
 
 //noinspection ScalaStyle
 //#setup
-class BasicSampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with FunSuiteLike with BeforeAndAfterEach {
+class BasicSampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with AnyFunSuiteLike with BeforeAndAfterEach {
   import frameworkTestKit.frameworkWiring._
 
   override def beforeAll(): Unit = {
     super.beforeAll()
-    spawnStandalone(com.typesafe.config.ConfigFactory.load("SampleHcdStandalone.conf"))
+    spawnStandalone(com.typesafe.config.ConfigFactory.load("BasicSampleHcdStandalone.conf"))
   }
 
   import scala.concurrent.duration._
@@ -116,7 +116,7 @@ class BasicSampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSer
 
     val setupCommand = Setup(testPrefix, hcdSleep, Some(ObsId("2018A-001"))).add(setSleepTime(5000))
 
-    val connection = AkkaConnection(models.ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
+    val connection = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
 
     val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
 
