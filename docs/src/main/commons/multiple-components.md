@@ -189,7 +189,7 @@ If a component wants to send a command to another component, it uses a `CommandS
 @ref:[here](./command.md#commandservice).
 
 
-## Handling Short and Long Running Commands
+## Handling Short and Long-Running Commands
 
 The Command Service provides a two different ways of performing `Submit` commands.   In particular, for sending single commands, there are two flavors: `submit`
 and `submitAndWait`.  Both commands take a `Setup` or `Observe` and return a Future response encapsulating a `SubmitResponse` type.  
@@ -208,7 +208,7 @@ sender of the command obtains the final response of the command by polling using
 When an `onSubmit` handler returns `Started` it is expected to update the command with the final response when the actions complete 
 using the `updateCommand` call of the `CommandResponseManager` that is provided to the TLA in the `CswContext`.
 
-On the sender side, `submitAndWait` doesn't complete until the long running command completes and returns the final 
+On the sender side, `submitAndWait` doesn't complete until the long-running command completes and returns the final 
 `SubmitResponse`.  That is to say, if the Future completes, 
 no matter whether the command has an immediate response or is long-running, is invalid, or encounters an error at any point, 
 the Future completes with the final response.  If there is an exception, which may occur if the command times out, that must
