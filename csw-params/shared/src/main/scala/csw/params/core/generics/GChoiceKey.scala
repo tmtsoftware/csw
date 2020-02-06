@@ -9,7 +9,8 @@ import csw.params.core.models.{Choice, Choices, Units}
  * @param keyType reference to an object of type KeyType[Choice]
  * @param choices the available choices, the values set must be in the choices
  */
-class GChoiceKey(name: String, keyType: KeyType[Choice], units: Units, val choices: Choices) extends Key[Choice](name, keyType, units) {
+class GChoiceKey(name: String, keyType: KeyType[Choice], units: Units, val choices: Choices)
+    extends Key[Choice](name, keyType, units) {
 
   /**
    * validates the input Seq of choices
@@ -25,8 +26,8 @@ class GChoiceKey(name: String, keyType: KeyType[Choice], units: Units, val choic
    * @param values one or more values
    * @return a parameter containing the key name, values
    */
-  override def set(values: Choice*): Parameter[Choice] = {
+  override def set(value: Choice, values: Choice*): Parameter[Choice] = {
     validate(values.toList)
-    super.set(values: _*)
+    super.set(value, values: _*)
   }
 }

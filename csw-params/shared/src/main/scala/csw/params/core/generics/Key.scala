@@ -34,7 +34,8 @@ case class Key[S: ClassTag] private[generics] (keyName: String, keyType: KeyType
    * @return an instance of Parameter[S] containing the key name, values (call withUnits() on the result to set the units)
    */
   @varargs
-  def set(values: S*): Parameter[S] = Parameter(keyName, keyType, mutable.ArraySeq.make(values.toArray[S]), units)
+  def set(value: S, values: S*): Parameter[S] =
+    Parameter(keyName, keyType, mutable.ArraySeq.make(value +: values.toArray[S]), units)
 
   /**
    * Sets the values for the key
@@ -50,7 +51,7 @@ case class Key[S: ClassTag] private[generics] (keyName: String, keyType: KeyType
    * @param values one or more values
    * @return a parameter containing the key name and one value (call withUnits() on the result to set the units)
    */
-  def ->(values: S*): Parameter[S] = set(values: _*)
+  def ->(value: S, values: S*): Parameter[S] = set(value, values: _*)
 
   /**
    * Sets the values for the key as a Scala Vector

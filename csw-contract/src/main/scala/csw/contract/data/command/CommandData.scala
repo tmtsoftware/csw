@@ -32,7 +32,8 @@ trait CommandData {
   val raDecKey: Key[RaDec]                = KeyType.RaDecKey.make("raDecKey")
   val coordsKey: Key[Coords.CometCoord]   = KeyType.CometCoordKey.make("halley's")
   val choice2Key: GChoiceKey = ChoiceKey.make(
-    "mode-reset", NoUnits,
+    "mode-reset",
+    NoUnits,
     Choices.fromChoices(Choice("c"), Choice("b"), Choice("a"))
   )
 
