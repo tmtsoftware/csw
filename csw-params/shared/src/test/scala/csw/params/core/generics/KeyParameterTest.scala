@@ -790,7 +790,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
   describe("test doubleItem") {
     val tval: Double = 123.456
-    val lk           = KeyType.DoubleKey.make(s1,  encoder)
+    val lk           = KeyType.DoubleKey.make(s1, encoder)
 
     it("should allow single val") {
       val li = lk.set(tval)
@@ -822,7 +822,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
     val la1 = ArrayData(a1)
     val la2 = ArrayData(a2)
-    val lk  = KeyType.DoubleArrayKey.make(s1,  encoder)
+    val lk  = KeyType.DoubleArrayKey.make(s1, encoder)
 
     it("should test single item") {
       val di = lk.set(la1)
