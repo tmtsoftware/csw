@@ -57,7 +57,7 @@ class SimpleKeyType[S: ClassTag: ArrayEnc: ArrayDec] extends KeyType[S] {
  * @param defaultUnits applicable units
  * @tparam S the type of values that will sit against the key in Parameter
  */
-sealed class SimpleKeyTypeWithUnits[S: ClassTag: ArrayEnc: ArrayDec](defaultUnits: Units) extends KeyType[S] {
+class SimpleKeyTypeWithUnits[S: ClassTag: ArrayEnc: ArrayDec](defaultUnits: Units) extends KeyType[S] {
 
   /**
    * Make a Key from provided name

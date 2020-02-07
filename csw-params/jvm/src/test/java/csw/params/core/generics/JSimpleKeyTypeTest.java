@@ -22,7 +22,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
     @Test
     public void testBooleanKeyParameter() {
         String keyName = "encoder()";
-        Key<Boolean> key = JKeyType.BooleanKey().make(keyName, NoUnits);
+        Key<Boolean> key = JKeyType.BooleanKey().make(keyName);
         Boolean[] paramData = {true, false, true};
         Assert.assertEquals(keyName, key.keyName());
         Assert.assertEquals(JKeyType.BooleanKey(), key.keyType());

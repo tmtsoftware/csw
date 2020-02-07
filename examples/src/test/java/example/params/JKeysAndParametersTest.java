@@ -26,7 +26,7 @@ public class JKeysAndParametersTest extends JUnitSuite {
         //#primitives
         //making 3 keys
         String keyName = "encoder";
-        Key<Boolean> k1 = JKeyType.BooleanKey().make(keyName, JUnits.NoUnits);
+        Key<Boolean> k1 = JKeyType.BooleanKey().make(keyName);
         Key<Short> k2 = JKeyType.ShortKey().make(keyName, JUnits.NoUnits);
         Key<String> k3 = JKeyType.StringKey().make(keyName, JUnits.day);
 
@@ -331,7 +331,7 @@ public class JKeysAndParametersTest extends JUnitSuite {
         String s1 = "encoder";
 
         //making 3 keys
-        Key<Boolean> k1 = JKeyType.BooleanKey().make(s1, JUnits.NoUnits);
+        Key<Boolean> k1 = JKeyType.BooleanKey().make(s1);
         Key<Short> k2 = JKeyType.ShortKey().make("RandomKeyName", JUnits.NoUnits);
         Key<String> k3 = JKeyType.StringKey().make(s1, JUnits.NoUnits);
 
