@@ -321,7 +321,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         // http location service client expect that location server is running on local machine
         // here we are starting location http server so that httpLocationClient uses can be illustrated
         ServerWiring locationWiring = new ServerWiring();
-        Await.result(locationWiring.locationHttpService().start(), new FiniteDuration(5, TimeUnit.SECONDS));
+        Await.result(locationWiring.locationHttpService().start("127.0.0.1"), new FiniteDuration(5, TimeUnit.SECONDS));
 
         //#create-actor-system
         ActorSystem<SpawnProtocol.Command> typedSystem = ActorSystemFactory.remote(SpawnProtocol.create(), "csw-examples-locationServiceClient");

@@ -12,10 +12,10 @@ class LocationHttpService(locationRoutes: Route, actorRuntime: ActorRuntime, set
 
   implicit val classicSystem: ActorSystem = actorRuntime.classicSystem
 
-  def start(): Future[Http.ServerBinding] = {
+  def start(httpBindHost: String = "127.0.0.1"): Future[Http.ServerBinding] = {
     Http().bindAndHandle(
       handler = cors()(locationRoutes),
-      interface = "0.0.0.0",
+      interface = httpBindHost,
       port = settings.httpPort
     )
   }
