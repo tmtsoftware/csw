@@ -94,7 +94,7 @@ lazy val `csw` = project
   .settings(GithubRelease.githubReleases(githubReleases))
   .settings(
     bootstrap in Coursier := CoursierPlugin.bootstrapTask(githubReleases).value,
-    generateDocs := ContractPlugin.generate(`csw-contract`).value
+    generateContract := ContractPlugin.generate(`csw-contract`).value
   )
 
 lazy val `csw-contract` = project

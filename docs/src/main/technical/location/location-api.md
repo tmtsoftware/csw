@@ -10,4 +10,4 @@ This also includes the model classes used for connections, registration and comp
 
 The Java API is defined partly in Scala code with traits like
 [ILocationService]($github.base_url$/csw-location/csw-location-api/jvm/src/main/scala/csw/location/api/javadsl/ILocationService.scala), and partly in Java, where classes like
-[JComponentType]($github.base_url$/csw-location/csw-location-api/jvm/src/main/scala/csw/location/api/javadsl/JComponentType.scala) are needed to provide easy access to Scala objects constants.
+[JComponentType]($github.base_url$/csw-location/csw-location-api/jvm/src/main/java/csw/location/api/javadsl/JComponentType.java) are needed to provide easy access to Scala objects constants.

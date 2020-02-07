@@ -6,7 +6,7 @@ import io.bullet.borer.{Encoder, Writer}
 
 import scala.reflect.ClassTag
 
-case class Endpoint(requestType: String, responseType: String, errorTypes: List[String] = Nil)
+case class Endpoint(requestType: String, responseType: String, errorTypes: List[String] = Nil, description: Option[String] = None)
 
 class ModelType[T: Encoder: ClassTag] private (val models: List[T]) {
   implicit def enc: Encoder[ModelType[T]] = Encoder[List[T]].contramap(_.models)

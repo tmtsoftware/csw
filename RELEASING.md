@@ -42,10 +42,13 @@
 3. Update top level `README.md`
 4. Refer the RELEASING.md of csw-js
 
+### Release esw
+1. Refer to RELEASING.md in `esw` repo
+
 ### Release csw-shell
 1. Update the csw version in `build.sbt`
 2. Release `csw-shell` with the latest `VERSION` of csw.
-    There is not pieline to release csw-shell but only `git tag v0.0.0` and `git push origin v0.0.0` 
+    There is no pipeline to release csw-shell but only `git tag v0.0.0` and `git push origin v0.0.0` 
 
 #### Note - `VERSION` tag is version number with 'v' as prefix. For eg. `v0.0.0`
 
