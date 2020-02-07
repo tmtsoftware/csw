@@ -50,14 +50,14 @@ runId. It also tracks the most recent `SubmitResponse` for the command, which wi
 
 If the Assembly (or any component) issues a `query`, the message is passed by the HCD's Supervisor to the CRM, which returns the most recent
 response associated with the runId. If the Assembly (or any component) issues a `queryFinal` the HCD's Supervisor forwards the request to the
-CRM, which makes an entry to remmber that there is an Actor that needs to be updated with the final response for the runId. If the current
+CRM, which makes an entry to remember that there is an Actor that needs to be updated with the final response for the runId. If the current
 response is already a final response, the Actor is updated immediately and no entry is made in the CRM.
 
-When the actions in the HCD complete, the HCD uses the `updateCommand` method of the CRM.  WHen this happens, the CRM updates the
+When the actions in the HCD completes, the HCD uses the `updateCommand` method of the CRM.  When this happens, the CRM updates the
 most recent response for the runId and then checks it's table to
 determine if there are any Actors waiting for the runId's final response. If there are waiting Actors, each of them is sent the final response, 
-and each is then removed from the CRM tables.  If there are no waiting Actors, only the current response for the runId is updated ready for the
-possibiity that there will be a future `query` or `queryFinal`.
+and each is then removed from the CRM tables. If there are no waiting Actors, only the current response for the runId is updated ready for the
+possibility that there will be a future `query` or `queryFinal`.
 
 The CRM remembers roughly 10 recent commands, so `query` and `queryFinal` may be used successfully with commands that have completed for some
 amount of time. If there is no entry in the CRM for a provided runId, the CRM returns an `Error` response indicating it does not know the runId.

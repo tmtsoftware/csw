@@ -68,30 +68,23 @@ object CommandResponseManager {
 
   trait OverallResponse {
     def responses: Set[SubmitResponse]
+
+    /**
+     * Java API to get the set of responses
+     */
+    def getResponses: java.util.Set[SubmitResponse] = responses.asJava
   }
 
   /**
    * Indicates that all responses included completed successfully.
    * @param responses the set of responses
    */
-  case class OverallSuccess(responses: Set[SubmitResponse]) extends OverallResponse {
-
-    /**
-     * Java API to get the set of responses
-     */
-    def getResponses: java.util.Set[SubmitResponse] = responses.asJava
-  }
+  case class OverallSuccess(responses: Set[SubmitResponse]) extends OverallResponse
 
   /**
    * Indicates that at least one of the responses ended with a negative response
    * @param responses the set of responses
    */
-  case class OverallFailure(responses: Set[SubmitResponse]) extends OverallResponse {
-
-    /**
-     * Java API to get the set of responses
-     */
-    def getResponses: java.util.Set[SubmitResponse] = responses.asJava
-  }
+  case class OverallFailure(responses: Set[SubmitResponse]) extends OverallResponse
 
 }

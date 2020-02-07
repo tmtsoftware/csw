@@ -17,6 +17,6 @@ private[framework] final case class ContainerInfo(name: String, components: Set[
    */
   val prefix: Prefix = Prefix(Subsystem.Container, name)
 
-  // Override in order to show containe Prefix
+  // Override in order to show contained Prefix
   override def toString: String = s"ContainerInfo($prefix, $components)"
 }

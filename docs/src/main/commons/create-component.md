@@ -259,7 +259,7 @@ And the following information and support utilities:
 ## Logging
 
 `csw-framework` provides a `LoggerFactory` in the `CswContext` injected in the constructor of `ComponentHandlers`. The `LoggerFactory` will 
-has the component's Prefix predefined so long messages have a clear source. 
+have the component's Prefix predefined so long messages have a clear source. 
 The component developer is expected to and must use this factory to log messages that work with the centralized logging facility.
 
 Logging works much like other popular loggers such as *log4j*.  However, with the development of log management tools such as *logstash*, 
