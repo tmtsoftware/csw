@@ -22,15 +22,16 @@ import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.scaladsl.RegistrationFactory
 import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
+import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.ActorSystemFactory
-import csw.location.api.models.Connection.AkkaConnection
+import csw.logging.client.scaladsl.LoggingSystemFactory
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.{Future, Promise}
 import scala.util.Success
-import org.scalatest.funsuite.AnyFunSuite
-import org.scalatest.matchers.should.Matchers
 
 //DEOPSCSW-182-Control Life Cycle of Components
 //DEOPSCSW-216-Locate and connect components to send AKKA commands
@@ -102,43 +103,18 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
   class RunningContainer() extends IdleContainer {
     containerBehaviorTestkit.run(SupervisorsCreated(supervisorInfos))
     val components = Components(supervisorInfos.map(_.component))
+
     components.components.foreach(component =>
       containerBehaviorTestkit.run(SupervisorLifecycleStateChanged(component.supervisor, SupervisorLifecycleState.Running))
     )
   }
 
-  test("should change its lifecycle state to running after all components move to running lifecycle state") {
-    val idleContainer = new IdleContainer
-    import idleContainer._
-    verify(locationService).register(akkaRegistration)
+  test("should watch the components created in the container") {
+    val runningContainer = new RunningContainer
+    import runningContainer._
 
-    val getComponentsProbe           = TestProbe[Components]
-    val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]
-
-    containerBehaviorTestkit.run(GetComponents(getComponentsProbe.ref))
-    getComponentsProbe.expectMessageType[Components]
-
-    // verify that given components in ContainerInfo are created
-    containerBehaviorTestkit.selfInbox().receiveMessage() shouldBe a[SupervisorsCreated]
-
-    containerBehaviorTestkit.run(SupervisorsCreated(supervisorInfos))
-
-    containerBehaviorTestkit.run(GetComponents(getComponentsProbe.ref))
-    val components = Components(supervisorInfos.map(_.component))
-    getComponentsProbe.expectMessage(components)
-
-    // verify that created components are watched by the container
     containerBehaviorTestkit
       .retrieveAllEffects() shouldBe components.components.map(component => Watched(component.supervisor)).toList
-
-    // simulate that container receives LifecycleStateChanged to Running message from all components
-    components.components.foreach(component =>
-      containerBehaviorTestkit.run(SupervisorLifecycleStateChanged(component.supervisor, SupervisorLifecycleState.Running))
-    )
-
-    // verify that Container changes its state to Running after all component supervisors change their state to Running
-    containerBehaviorTestkit.run(GetContainerLifecycleState(containerLifecycleStateProbe.ref))
-    containerLifecycleStateProbe.expectMessage(ContainerLifecycleState.Running)
   }
 
   test("should handle restart message by changing its lifecycle state to Idle") {
