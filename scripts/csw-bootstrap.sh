@@ -34,6 +34,9 @@ fetch_artifacts() {
     echo "Artifacts successfully generated at $COURSIER_STAGE_DIR"
 }
 
+# Run from the directory containing the script
+cd "$(dirname "${BASH_SOURCE[0]}")" || exit
+
 if [ "$#" == 1 ]; then
     fetch_artifacts "$1" ".."
 elif [ "$#" -gt 1 ]; then

@@ -26,7 +26,7 @@
 #
 
 # Run from the directory containing the script
-cd "$(dirname "${BASH_SOURCE[0]}")"
+cd "$(dirname "${BASH_SOURCE[0]}")" || exit
 
 export TMT_LOG_HOME=/tmp/tmt/logs/csw
 
