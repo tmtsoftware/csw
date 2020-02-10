@@ -130,7 +130,8 @@ class KeysAndParametersTest extends AnyFunSpec with Matchers {
       //keys
       val choice1Key: GChoiceKey = ChoiceKey.make("mode", NoUnits, choices)
       val choice2Key: GChoiceKey = ChoiceKey.make(
-        "mode-reset", NoUnits,
+        "mode-reset",
+        NoUnits,
         Choices.fromChoices(Choice("c"), Choice("b"), Choice("a"))
       )
 
