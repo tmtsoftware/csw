@@ -28,7 +28,7 @@ class LocationServiceMultipleNICTest()
   implicit val patience: PatienceConfig =
     PatienceConfig(Span(5, org.scalatest.time.Seconds), Span(100, org.scalatest.time.Millis))
 
-  val adminWiring: ServerWiring = ServerWiring.make(ClusterAwareSettings.onPort(3553).withInterface("eth1"))
+  val adminWiring: ServerWiring = ServerWiring.make(ClusterAwareSettings.onPort(3553).withInterface("eth1"), enableAuth = false)
   LoggingSystemFactory.start("Assembly", "1.0", Networks().hostname, adminWiring.actorSystem)
 
   adminWiring.locationHttpService.start().futureValue

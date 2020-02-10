@@ -18,7 +18,7 @@ import csw.prefix.models.{Prefix, Subsystem}
 
 object TromboneHCD {
 
-  val adminWiring: ServerWiring = ServerWiring.make(Some(3553))
+  val adminWiring: ServerWiring = ServerWiring.make(Some(3553), enableAuth = false)
   LoggingSystemFactory.start("Assembly", "1.0", adminWiring.clusterSettings.hostname, adminWiring.actorSystem)
 
   adminWiring.locationHttpService.start().await

@@ -68,7 +68,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
 
     @BeforeClass
     public static void setup() throws Exception {
-        wiring = new ServerWiring();
+        wiring = new ServerWiring(false);
         typedSystem = ActorSystemFactory.remote(SpawnProtocol.create(), "test");
         untypedSystem = Adapter.toClassic(typedSystem);
         TestProbe<Object> actorTestProbe = TestProbe.create("test-actor", typedSystem);

@@ -5,6 +5,7 @@ import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.http.scaladsl.server.Route
 import com.typesafe.config.{Config, ConfigFactory}
+import csw.aas.http.SecurityDirectives
 import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.scaladsl.LocationService
 import csw.location.server.commons.{ClusterAwareSettings, ClusterSettings}
@@ -15,7 +16,7 @@ import msocket.impl.post.PostRouteFactory
 import msocket.impl.ws.WebsocketRouteFactory
 
 // $COVERAGE-OFF$
-private[csw] class ServerWiring extends LocationServiceCodecs {
+private[csw] class ServerWiring(enableAuth: Boolean) extends LocationServiceCodecs {
   lazy val config: Config                                           = ConfigFactory.load()
   lazy val settings                                                 = new Settings(config)
   lazy val clusterSettings: ClusterSettings                         = ClusterAwareSettings.onPort(settings.clusterPort)
@@ -23,8 +24,11 @@ private[csw] class ServerWiring extends LocationServiceCodecs {
   lazy val untypedActorSystem: actor.ActorSystem                    = clusterSettings.system.toClassic
   lazy val actorRuntime                                             = new ActorRuntime(actorSystem)
   import actorSystem.executionContext
-  lazy val locationService: LocationService              = LocationServiceFactory.withSystem(actorSystem)
-  private lazy val postHandler                           = new LocationHttpHandler(locationService)
+  lazy val locationService: LocationService = LocationServiceFactory.withSystem(actorSystem)
+
+  lazy val securityDirectives: SecurityDirectives = SecurityDirectives(locationService, enableAuth)
+
+  private lazy val postHandler                           = new LocationHttpHandler(locationService, securityDirectives)
   private def websocketHandler(contentType: ContentType) = new LocationWebsocketHandler(locationService, contentType)
 
   lazy val locationRoutes: Route = RouteFactory.combine(
@@ -36,15 +40,15 @@ private[csw] class ServerWiring extends LocationServiceCodecs {
 
 private[csw] object ServerWiring {
 
-  def make(maybeClusterPort: Option[Int]): ServerWiring =
-    new ServerWiring {
+  def make(maybeClusterPort: Option[Int], enableAuth: Boolean): ServerWiring =
+    new ServerWiring(enableAuth) {
       override lazy val settings: Settings = new Settings(config) {
         override val clusterPort: Int = maybeClusterPort.getOrElse(super.clusterPort)
       }
     }
 
-  def make(maybeClusterPort: Option[Int], mayBeHttpPort: Option[Int]): ServerWiring =
-    new ServerWiring {
+  def make(maybeClusterPort: Option[Int], mayBeHttpPort: Option[Int], enableAuth: Boolean): ServerWiring =
+    new ServerWiring(enableAuth) {
       override lazy val settings: Settings = {
         new Settings(config) {
           override val clusterPort: Int = maybeClusterPort.getOrElse(super.clusterPort)
@@ -53,13 +57,13 @@ private[csw] object ServerWiring {
       }
     }
 
-  def make(_clusterSettings: ClusterSettings): ServerWiring =
-    new ServerWiring {
+  def make(_clusterSettings: ClusterSettings, enableAuth: Boolean): ServerWiring =
+    new ServerWiring(enableAuth) {
       override lazy val clusterSettings: ClusterSettings = _clusterSettings
     }
 
-  def make(_actorSystem: ActorSystem[SpawnProtocol.Command]): ServerWiring =
-    new ServerWiring {
+  def make(_actorSystem: ActorSystem[SpawnProtocol.Command], enableAuth: Boolean): ServerWiring =
+    new ServerWiring(enableAuth) {
       override lazy val actorSystem: ActorSystem[SpawnProtocol.Command] = _actorSystem
     }
 }
