@@ -27,7 +27,7 @@ object Main extends App {
         )
       }
       else {
-        val wiring = ServerWiring.make(maybeClusterPort)
+        val wiring = ServerWiring.make(maybeClusterPort, options.publicNetwork)
 
         import wiring._
         import actorRuntime._

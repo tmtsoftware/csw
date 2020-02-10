@@ -20,7 +20,7 @@ trait HTTPLocationService
   private var locationWiring: Option[ServerWiring] = None
 
   def start(clusterPort: Option[Int] = Some(locationPort), httpPort: Option[Int] = None): Unit = {
-    locationWiring = Some(ServerWiring.make(clusterPort, httpPort))
+    locationWiring = Some(ServerWiring.make(clusterPort, httpPort, enableAuth = false))
     locationWiring.map(_.locationHttpService.start().await)
   }
 
