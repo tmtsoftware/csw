@@ -56,7 +56,7 @@ pipeline {
                 sh "sbt ';set every enableFatalWarnings := true; csw-config-client/multi-jvm:test'"
                 sh "sbt ';set every enableFatalWarnings := true; csw-config-cli/multi-jvm:test'"
                 sh "sbt ';set every enableFatalWarnings := true; csw-framework/multi-jvm:test'"
-                sh "sbt ';set every enableFatalWarnings := true; csw-aas-http/multi-jvm:test'"
+                sh "sbt ';set every enableFatalWarnings := true; integration/multi-jvm:test'"
             }
         }
     }

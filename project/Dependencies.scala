@@ -458,7 +458,6 @@ object Dependencies {
       Libs.`scalatest`.value         % Test,
       AkkaHttp.`akka-http-testkit`   % Test,
       Libs.`mockito-scala`           % Test,
-      Libs.`embedded-keycloak`       % Test,
       Akka.`akka-multi-node-testkit` % Test
     )
   )
@@ -540,7 +539,8 @@ object Dependencies {
       Akka.`akka-actor-typed`,
       AkkaHttp.`akka-http`,
       Akka.`akka-actor-testkit-typed`,
-      Libs.`scalatest`.value
+      Libs.`scalatest`.value,
+      Libs.`embedded-keycloak` % Test
     )
   )
 

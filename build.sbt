@@ -179,6 +179,7 @@ lazy val `csw-location-server` = project
   .dependsOn(
     `csw-location-api`.jvm,
     `csw-logging-client`,
+    `csw-aas-http`,
     `csw-network-utils`,
     `csw-location-client` % "test->compile;multi-jvm->compile",
     `csw-commons`         % "compile->compile;test->test"
@@ -645,12 +646,12 @@ lazy val `csw-benchmark` = project
 /* ================ Integration Tests ============= */
 lazy val integration = project
   .dependsOn(
-    `csw-location-server`,
+    `csw-location-server` % "compile->compile;multi-jvm->multi-jvm",
     `csw-command-client`,
     `csw-location-agent`,
     `csw-network-utils`
   )
-  .enablePlugins(NoPublish, DeployApp)
+  .enablePlugins(NoPublish, AutoMultiJvm, DeployApp)
   .settings(
     libraryDependencies ++= Dependencies.Integration.value
   )
@@ -675,8 +676,7 @@ lazy val `csw-aas-core` = project
 
 lazy val `csw-aas-http` = project
   .in(file("csw-aas/csw-aas-http"))
-  .dependsOn(`csw-aas-core`, `csw-location-server` % "multi-jvm->multi-jvm")
-  .enablePlugins(AutoMultiJvm)
+  .dependsOn(`csw-aas-core`)
   .settings(
     libraryDependencies ++= Dependencies.AuthAkkaHttpAdapter.value
   )
