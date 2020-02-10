@@ -34,11 +34,11 @@ fetch_artifacts() {
     echo "Artifacts successfully generated at $COURSIER_STAGE_DIR"
 }
 
-# Run from the directory containing the script
-cd "$(dirname "${BASH_SOURCE[0]}")" || exit
+BOOTSTRAP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+WORK_DIR="$(dirname "$BOOTSTRAP_DIR")"
 
 if [ "$#" == 1 ]; then
-    fetch_artifacts "$1" ".."
+    fetch_artifacts "$1" "$WORK_DIR"
 elif [ "$#" -gt 1 ]; then
     fetch_artifacts "$1" "$2"
 else
