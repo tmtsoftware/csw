@@ -7,7 +7,7 @@ import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import csw.alarm.client.AlarmServiceFactory
-import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.command.client.messages.ContainerCommonMessage.GetContainerLifecycleState
 import csw.command.client.messages.ContainerIdleMessage.SupervisorsCreated
 import csw.command.client.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.command.client.messages.RunningMessage.Lifecycle
@@ -25,7 +25,6 @@ import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.ActorSystemFactory
-import csw.logging.client.scaladsl.LoggingSystemFactory
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
