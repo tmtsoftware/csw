@@ -35,7 +35,7 @@ public class JConfigClientBaseSuite extends JMockedAuthentication {
     private FiniteDuration timeout = Duration.create(10, "seconds");
 
     public void setup() throws Exception {
-        Await.result(locationWiring.locationHttpService().start(), timeout);
+        Await.result(locationWiring.locationHttpService().start("127.0.0.1"), timeout);
         Await.result(httpService.registeredLazyBinding(), timeout);
     }
 

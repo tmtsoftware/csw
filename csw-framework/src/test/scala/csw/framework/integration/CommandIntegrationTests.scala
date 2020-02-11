@@ -35,14 +35,14 @@ import scala.concurrent.{Await, ExecutionContext}
 // CSW-82: ComponentInfo should take prefix
 class CommandIntegrationTests extends FrameworkIntegrationSuite {
 
-  import testWiring._
+  import testWiring.seedLocationService
 
   private val wfosContainerConnection = AkkaConnection(
     ComponentId(Prefix(Subsystem.Container, "WFOS_Container"), ComponentType.Container)
   )
   private val filterAssemblyConnection = AkkaConnection(models.ComponentId(Prefix(Subsystem.WFOS, "FilterASS"), Assembly))
   private val filterHCDConnection      = AkkaConnection(models.ComponentId(Prefix(Subsystem.WFOS, "FilterHCD"), HCD))
-  private val containerActorSystem: ActorSystem[SpawnProtocol.Command] =
+  private implicit val containerActorSystem: ActorSystem[SpawnProtocol.Command] =
     ActorSystemFactory.remote(SpawnProtocol(), "container-system")
   val obsId                         = Some(ObsId("Obs001"))
   implicit val timeout: Timeout     = 12.seconds

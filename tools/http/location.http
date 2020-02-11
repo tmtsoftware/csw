@@ -109,7 +109,7 @@ POST http://localhost:7654/post-endpoint
 Content-Type: application/json
 
 {
-  "ListEntries": {}
+  "_type": "ListEntries"
 }
 
 ###

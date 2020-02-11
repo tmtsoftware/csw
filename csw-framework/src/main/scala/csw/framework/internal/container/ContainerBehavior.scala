@@ -30,7 +30,7 @@ import scala.util.{Failure, Success}
  * @param containerInfo         container related information as described in the configuration file
  * @param supervisorInfoFactory the factory for creating the Supervisors for components described in ContainerInfo
  * @param registrationFactory   the factory for creating a typed [[AkkaRegistration]] from
- *                              [[Connection.AkkaConnection]]
+ *                              [[AkkaConnection]]
  * @param eventServiceFactory   the factory to create instance of event service to be used by components to use and/or create publishers and subscribers
  * @param locationService       the single instance of Location service created for a running application
  * @param loggerFactory         factory to create suitable logger instance
@@ -160,9 +160,23 @@ private[framework] final class ContainerBehavior(
       .traverse(componentInfos) { ci =>
         supervisorInfoFactory.make(ctx.self, ci, locationService, eventServiceFactory, alarmServiceFactory, registrationFactory)
       }
-      .foreach(x => {
-        ctx.self ! SupervisorsCreated(x.flatten)
+      .foreach(infos => {
+        val infosWithRemoteRefs = infos.flatten(_.map(treatSupervisorRefAsRemote))
+        ctx.self ! SupervisorsCreated(infosWithRemoteRefs)
       })
+  }
+
+  private def treatSupervisorRefAsRemote(info: SupervisorInfo): SupervisorInfo = {
+    // use Supervisor ActorSystem to Serialize
+    val refStr = ActorRefResolver(info.system).toSerializationFormat(info.component.supervisor)
+    // use Container ActorSystem to Deserialize
+    val ref = ActorRefResolver(ctx.system).resolveActorRef(refStr)
+
+    // Above (de)serialization is need as actorRefs shouldn't be shared across actorSystem by Reference,
+    // they should be shared as via messages, or should be treated as Remote. Above (de)serialization treats ActorRef as remote.
+    // reffer to issue - https://discuss.lightbend.com/t/akka-typed-serialization/4336
+
+    info.copy(component = info.component.copy(supervisor = ref))
   }
 
   /**

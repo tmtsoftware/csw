@@ -74,7 +74,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
         TestProbe<Object> actorTestProbe = TestProbe.create("test-actor", typedSystem);
         actorRef = actorTestProbe.ref();
         locationService = JHttpLocationServiceFactory.makeLocalClient(typedSystem);
-        Await.result(wiring.locationHttpService().start(), FiniteDuration.create(5, TimeUnit.SECONDS));
+        Await.result(wiring.locationHttpService().start("127.0.0.1"), FiniteDuration.create(5, TimeUnit.SECONDS));
     }
 
     @After
