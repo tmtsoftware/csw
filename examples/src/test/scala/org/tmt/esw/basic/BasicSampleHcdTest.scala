@@ -21,7 +21,10 @@ import scala.concurrent.Await
 
 //noinspection ScalaStyle
 //#setup
-class BasicSampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with AnyFunSuiteLike with BeforeAndAfterEach {
+class BasicSampleHcdTest
+    extends ScalaTestFrameworkTestKit(AlarmServer, EventServer)
+    with AnyFunSuiteLike
+    with BeforeAndAfterEach {
   import frameworkTestKit.frameworkWiring._
 
   override def beforeAll(): Unit = {

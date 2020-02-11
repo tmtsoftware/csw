@@ -32,7 +32,7 @@ import scala.util.{Failure, Success}
  * You can find more information on this here : https://tmtsoftware.github.io/csw/framework.html
  */
 class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
-  extends ComponentHandlers(ctx, cswCtx) {
+    extends ComponentHandlers(ctx, cswCtx) {
 
   import cswCtx._
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
