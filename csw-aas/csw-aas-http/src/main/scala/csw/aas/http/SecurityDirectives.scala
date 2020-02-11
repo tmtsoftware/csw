@@ -201,7 +201,7 @@ object SecurityDirectives {
       implicit ec: ExecutionContext
   ): SecurityDirectives = {
     val maybeLocation = if (disabled) None else Some(authLocation(locationService))
-    from(AuthConfig.create(ConfigFactory.load(), maybeLocation))
+    from(AuthConfig.create(ConfigFactory.load(), maybeLocation, Some(disabled)))
   }
 
   /**

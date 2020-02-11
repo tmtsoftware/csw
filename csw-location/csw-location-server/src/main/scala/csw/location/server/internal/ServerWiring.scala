@@ -26,7 +26,7 @@ private[csw] class ServerWiring(enableAuth: Boolean) extends LocationServiceCode
   import actorSystem.executionContext
   lazy val locationService: LocationService = LocationServiceFactory.withSystem(actorSystem)
 
-  lazy val securityDirectives: SecurityDirectives = SecurityDirectives(locationService, enableAuth)
+  lazy val securityDirectives: SecurityDirectives = SecurityDirectives(locationService, !enableAuth)
 
   private lazy val postHandler                           = new LocationHttpHandler(locationService, securityDirectives)
   private def websocketHandler(contentType: ContentType) = new LocationWebsocketHandler(locationService, contentType)
