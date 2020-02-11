@@ -687,3 +687,10 @@ lazy val `csw-aas-installed` = project
   .settings(
     libraryDependencies ++= Dependencies.CswInstalledAdapter.value
   )
+
+lazy val `csw-services` = project
+  .in(file("csw-services"))
+  .dependsOn(`csw-location-server`, `csw-config-server`, `csw-location-agent`, `csw-commons`)
+  .settings(
+    libraryDependencies ++= Dependencies.CswServices.value
+  )
