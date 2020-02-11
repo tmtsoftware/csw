@@ -65,6 +65,8 @@ amount of time. If there is no entry in the CRM for a provided runId, the CRM re
 The CRM also provides a utility method called `queryFinalAll`. This is just a wrapper around the Future.sequence call that allows components sending
 sub-commands to wait for all the sub-commands to complete.
 
+![crm](media/crm.png)
+
 The Assembly worker can communicate with `CommandResponseManagerActor` using [CommandResponseManager]($github.base_url$/csw-command/csw-command-client/src/main/scala/csw/command/client/CommandResponseManager.scala)
 coming via [CswContext]($github.base_url$/csw-framework/src/main/scala/csw/framework/models/CswContext.scala#L43).
 
