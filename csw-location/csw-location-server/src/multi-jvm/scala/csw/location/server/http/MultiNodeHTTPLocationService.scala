@@ -11,7 +11,7 @@ import scala.util.Try
 trait MultiNodeHTTPLocationService {
   self: LSNodeSpec[_] with BeforeAndAfterAll =>
   private val maybeBinding: Option[Http.ServerBinding] = Try {
-    val binding = ServerWiring.make(self.typedSystem).locationHttpService.start()
+    val binding = ServerWiring.make(self.typedSystem, enableAuth = false).locationHttpService.start()
     Some(binding.await)
   } match {
     case _ => None // ignore binding errors

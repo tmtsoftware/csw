@@ -190,6 +190,21 @@ object SecurityDirectives {
   }
 
   /**
+   * Creates instance of [[csw.aas.http.SecurityDirectives]] using configurations
+   * from application and reference.conf.
+   *
+   * @param locationService LocationService instance used to resolve auth server url (blocking call)
+   * Resolves auth server url using location service (blocking call)
+   * @param disabled if explicitly disabled/enabled, it will ignore `disabled` key from config
+   */
+  private[csw] def apply(locationService: LocationService, disabled: Boolean)(
+      implicit ec: ExecutionContext
+  ): SecurityDirectives = {
+    val maybeLocation = if (disabled) None else Some(authLocation(locationService))
+    from(AuthConfig.create(ConfigFactory.load(), maybeLocation))
+  }
+
+  /**
    * Creates instance of [[csw.aas.http.SecurityDirectives]] using provided configurations
    * and auth server url using location service
    *

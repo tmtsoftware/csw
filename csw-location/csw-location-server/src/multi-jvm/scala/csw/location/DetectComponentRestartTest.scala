@@ -58,7 +58,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
 
       val freshLocationService = mode match {
         case "http" =>
-          Try(ServerWiring.make(newTypedSystem).locationHttpService.start().await) match {
+          Try(ServerWiring.make(newTypedSystem, enableAuth = false).locationHttpService.start().await) match {
             case _ => // ignore binding errors
           }
           HttpLocationServiceFactory.makeLocalClient(newTypedSystem)

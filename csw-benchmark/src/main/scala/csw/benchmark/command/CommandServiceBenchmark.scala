@@ -42,7 +42,7 @@ class CommandServiceBenchmark {
 
   @Setup(Level.Trial)
   def setup(): Unit = {
-    adminWiring = ServerWiring.make(Some(3553))
+    adminWiring = ServerWiring.make(Some(3553), enableAuth = false)
     Await.result(adminWiring.locationHttpService.start(), 5.seconds)
     componentRef = spawnStandaloneComponent(adminWiring.actorSystem, ConfigFactory.load("standalone.conf"))
     setupCommand = commands.Setup(Prefix("wfos.blue.filter"), CommandName("jmh"), None)
