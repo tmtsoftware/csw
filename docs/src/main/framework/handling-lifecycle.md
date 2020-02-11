@@ -175,7 +175,7 @@ are a number of pre-defined reasons for failing validation. These pre-defined re
 @@@ note {title="I have an issue you should add!" }
 
 If you run across a validation issue you think should be added to `CommandIssue`, please submit a ticket to the CSW
-maintenance JIRA page at this [location](https://tmt-project.atlassian.net/projects/CSW/issues). 
+maintenance JIRA page at this [location](/login.jsp?permissionViolation=true&os_destination=%2Fprojects%2FCSW%2Fissues&page_caps=&user_role=). 
 
 @@@
 

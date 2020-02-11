@@ -227,7 +227,7 @@ Common Software are included in the 1.0.0 release and subsequent releases. Relea
 primary deliverable of the CSW construction work package.
 CSW is now in the maintenance phase. During the maintenance phase we expect twice per year maintenance releases of CSW.
 
-Members of TMT work packages can add issues at the internal maintenance [site](https://tmt-project.atlassian.net/secure/RapidBoard.jspa?rapidView=57).    
+Members of TMT work packages can add issues at the internal maintenance [site](/login.jsp?os_destination=%2Fsecure%2FRapidBoard.jspa%3FrapidView%3D57).    
 
 **What to expect from releases after 1.0.0?**
 

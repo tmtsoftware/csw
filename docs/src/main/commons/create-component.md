@@ -36,13 +36,13 @@ which collectively act as the gateway from the framework to the developer's comp
 A Supervisor actor is the actor first started for any component. The main responsibilities that the Supervisor performs is as follows:
 
 -   Creation of the TLA when the component starts up
--   Implement and manage the component lifecycle for the TLA and for the component (see [Lifecycle](#lifecycle) below).
+-   Implement and manage the component lifecycle for the TLA and for the component (see @ref:[Lifecycle](#lifecycle) below).
 -   Register the component with the Location Service.
 -   Provide an administrative interface to the component to the rest of the system. For
 instance, the Container can perform some administrative communication with the Supervisor such as restart or shutdown of the component.
 -   Allow components outside of the Supervisor and TLA to monitor the lifecycle state of the TLA. This is particularly useful for testing, when the test needs to know that the component is
 ready before performing its test actions.
--   Supports the locking functionality for the component (see [Locking](#lock))
+-   Supports the locking functionality for the component (see @ref:[Locking](#lock))
 -   Receives external commands and passes them to the correct component handlers.
 
 The source code of the Supervisor actor can be found [here]($github.base_url$/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala)
@@ -52,8 +52,8 @@ The source code of the Supervisor actor can be found [here]($github.base_url$/cs
 While the Supervisor works as the external interface for the component and the manager of its lifecycle, the functional implementation
 of a component is implemented in a Top Level Actor (TLA), spawned by the Supervisor actor for each component. 
 However, the developer is not expected to implement a TLA code entirely.  Instead, the component-specific functionality of the TLA is added by
-implementing the `ComponentHandlers` abstract class, consisting of a set of methods, or `hooks`, called by the TLA during specific lifecycle and command events (see [Handlers](#handlers)).
-The `ComponentHandlers` implementation is specified during construction using a factory (see [Constructing The Component](#constructing-the-component)) 
+implementing the `ComponentHandlers` abstract class, consisting of a set of methods, or `hooks`, called by the TLA during specific lifecycle and command events (see @ref:[Handlers](#handlers)).
+The `ComponentHandlers` implementation is specified during construction using a factory (see @ref:[Constructing The Component](#constructing-the-component)) 
 
 The source code of the Top Level Actor can be found [here]($github.base_url$/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala).
 
