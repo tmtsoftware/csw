@@ -90,8 +90,13 @@ object KeyType extends Enum[KeyType[_]] {
 
   case object ChoiceKey extends KeyType[Choice] {
     def make(name: String, units: Units, choices: Choices): GChoiceKey = new GChoiceKey(name, this, units, choices)
+    def make(name: String, choices: Choices): GChoiceKey               = make(name, NoUnits, choices)
+
     def make(name: String, units: Units, firstChoice: Choice, restChoices: Choice*): GChoiceKey =
       new GChoiceKey(name, this, units, Choices(restChoices.toSet + firstChoice))
+
+    def make(name: String, firstChoice: Choice, restChoices: Choice*): GChoiceKey =
+      make(name, NoUnits, firstChoice, restChoices: _*)
   }
 
   case object StringKey  extends SimpleKeyType[String]

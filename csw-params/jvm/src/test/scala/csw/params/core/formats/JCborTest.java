@@ -56,7 +56,7 @@ public class JCborTest extends JUnitSuite {
         MatrixData<Double> doubleMatrixData = MatrixData.fromArrays(doubleData2D);
 
         return Arrays.asList(new Object[][]{
-                {"JChoiceKey", JKeyType.ChoiceKey().make("choiceKey", JUnits.NoUnits, Choices.from("A", "B", "C")).set(new Choice("A"))},
+                {"JChoiceKey", JKeyType.ChoiceKey().make("choiceKey", Choices.from("A", "B", "C")).set(new Choice("A"))},
                 {"JRaDecKey", JKeyType.RaDecKey().make("raDecKey").set(new RaDec(10, 20))},
                 {"JStructKey", JKeyType.StructKey().make("structKey").set(new Struct().add(JKeyType.RaDecKey().make("raDecKey").set(new RaDec(10, 20))))},
                 {"JStringKey", JKeyType.StringKey().make("stringKey").set("str1", "str2")},

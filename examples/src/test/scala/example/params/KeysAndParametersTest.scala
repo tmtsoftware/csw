@@ -17,7 +17,7 @@ class KeysAndParametersTest extends AnyFunSpec with Matchers {
     it("should show usage of primitive types") {
 
       //#primitives
-      //declare keyname
+      //declare keyName
       val s1: String = "encoder"
 
       //making 3 keys
@@ -38,7 +38,7 @@ class KeysAndParametersTest extends AnyFunSpec with Matchers {
       val paramWithUnits1: Parameter[String] = k3.set(weekDays)
       val paramWithUnits2: Parameter[String] = k3 -> weekDays withUnits Units.day
 
-      //deault unit is NoUnits
+      //default unit is NoUnits
       assert(booleanParam.units === Units.NoUnits)
 
       //set units explicitly on an existing Parameter

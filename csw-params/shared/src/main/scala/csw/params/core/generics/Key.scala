@@ -1,7 +1,6 @@
 package csw.params.core.generics
 
 import csw.params.core.models.Units
-import csw.params.core.models.Units.NoUnits
 
 import scala.annotation.varargs
 import scala.collection.mutable
