@@ -31,7 +31,7 @@ class AuthConfigTest extends AnyFunSuite with Matchers {
 
     val deployment = authConfig.getDeployment
 
-    deployment.getResourceName shouldBe config.getConfig("auth-config").getString("client-id")
+    deployment.getResourceName shouldBe "security-disabled-client"
     deployment.getRealm shouldBe config.getConfig("auth-config").getString("realm")
     deployment.getAuthServerBaseUrl shouldBe "http://disabled-auth-service"
   }
