@@ -46,7 +46,7 @@ class TestKitsExampleTest extends FunSuiteLike with BeforeAndAfterAll with Match
 
     //#spawn-using-testkit
 
-    val connection       = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleAssembly"), Assembly))
+    val connection       = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "SampleAssembly"), Assembly))
     val assemblyLocation = Await.result(locationService.resolve(connection, 5.seconds), 10.seconds)
     assemblyLocation.value.connection shouldBe connection
   }
