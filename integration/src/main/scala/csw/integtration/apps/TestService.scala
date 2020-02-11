@@ -16,7 +16,7 @@ object TestService {
   private val Path = "redisservice.org/test"
   private val Port = 9999
 
-  val adminWiring: ServerWiring = ServerWiring.make(Some(3553))
+  val adminWiring: ServerWiring = ServerWiring.make(Some(3553), enableAuth = false)
   LoggingSystemFactory.start("Assembly", "1.0", adminWiring.clusterSettings.hostname, adminWiring.actorSystem)
 
   adminWiring.locationHttpService.start().await

@@ -20,21 +20,21 @@ object Main extends App {
   private val name = BuildInfo.name
 
   new ArgsParser(name).parse(args.toList).foreach {
-    case Options(maybeClusterPort) =>
+    case options @ Options(maybeClusterPort, _) =>
       if (ClusterAwareSettings.seedNodes.isEmpty) {
         println(
           "[ERROR] CLUSTER_SEEDS setting is not specified either as env variable or system property. Please check online documentation for this set-up."
         )
       }
       else {
-        val wiring = ServerWiring.make(maybeClusterPort)
+        val wiring = ServerWiring.make(maybeClusterPort, options.publicNetwork)
 
         import wiring._
         import actorRuntime._
         try {
           startLogging(name, clusterSettings.hostname)
 
-          val locationBindingF = locationHttpService.start()
+          val locationBindingF = locationHttpService.start(options.httpBindHost)
 
           coordinatedShutdown.addTask(
             CoordinatedShutdown.PhaseServiceUnbind,
