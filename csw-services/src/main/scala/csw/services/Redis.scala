@@ -1,16 +1,18 @@
 package csw.services
 
-import csw.services.internal.{ResourceReader, Settings}
+import csw.services.internal.Settings
+import csw.services.utils.ResourceReader
 
 class Redis(settings: Settings) {
   import settings._
   private val eventMasterConf: String = updatedRedisConf(eventPort, "event_master.pid", "dump_event_master.rdb")
   private val alarmMasterConf: String = updatedRedisConf(alarmPort, "alarm_master.pid", "dump_alarm_master.rdb", "\"Kg$x\"")
 
-  def startRedis(port: String, conf: String): Process =
-    new ProcessBuilder("redis-server", conf, "--port", port).inheritIO().start()
-  def startEvent(): Process = startRedis(eventPort, eventMasterConf)
-  def startAlarm(): Process = startRedis(alarmPort, alarmMasterConf)
+  def startRedis(name: String, port: String, conf: String): Process =
+    Service.start(name, new ProcessBuilder("redis-server", conf, "--port", port).inheritIO().start())
+
+  def startEvent(): Process = startRedis("Event Service", eventPort, eventMasterConf)
+  def startAlarm(): Process = startRedis("Alarm Service", alarmPort, alarmMasterConf)
 
   private def replacePid(name: String): String => String =
     _.replace("pidfile /var/run/redis_6379.pid", s"pidfile /var/run/$name")

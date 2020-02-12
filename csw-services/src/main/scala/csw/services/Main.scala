@@ -8,6 +8,7 @@ import csw.services.internal.Wiring
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
+import scala.util.control.NonFatal
 
 object Main extends CommandApp[Command] {
   override def appName: String    = getClass.getSimpleName.dropRight(1) // remove $ from class name
@@ -32,22 +33,29 @@ object Main extends CommandApp[Command] {
   ): Unit = {
     val wiring = new Wiring(maybeInterface)
     import wiring._
-    environment.setup()
+    try {
+      environment.setup()
 
-    val locationServer = Future(LocationServer.start(settings.clusterPort))
-    if (event) redis.startEvent()
-    if (alarm) redis.startAlarm()
-    Future(locationAgent.startSentinel(event, alarm))
-    if (database) Future(locationAgent.startPostgres())
+      val locationServer = Future(LocationServer.start(settings.clusterPort))
+      if (event) redis.startEvent()
+      if (alarm) redis.startAlarm()
+      Future(locationAgent.startSentinel(event, alarm))
+      if (database) Future(locationAgent.startPostgres())
 
-    // if config is true, then start auth + config
-    if (config) {
-      keycloak.start()
-      ConfigServer.start(settings.configPort)
+      // if config is true, then start auth + config
+      if (config) {
+        keycloak.start()
+        ConfigServer.start(settings.configPort)
+      }
+      else if (auth) keycloak.start()
+
+      Await.result(locationServer, Duration.Inf)
     }
-    else if (auth) keycloak.start()
-
-    Await.result(locationServer, Duration.Inf)
+    catch {
+      case NonFatal(e) =>
+        e.printStackTrace()
+        exit(1)
+    }
   }
 
 }
