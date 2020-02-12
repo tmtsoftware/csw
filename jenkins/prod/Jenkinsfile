@@ -56,7 +56,7 @@ pipeline {
         // These tests cover the scenario of multiple components in multiple containers on same machine.
         stage('Multi-Jvm Test') {
             steps {
-                sh "sbt ';set every enableFatalWarnings := true; csw-aas-http/multi-jvm:test'"
+                sh "sbt ';set every enableFatalWarnings := true; integration/multi-jvm:test'"
                 sh "sbt ';set every enableFatalWarnings := true; csw-location-server/multi-jvm:test'"
                 sh "sbt ';set every enableFatalWarnings := true; csw-config-client/multi-jvm:test'"
                 sh "sbt ';set every enableFatalWarnings := true; csw-config-cli/multi-jvm:test'"

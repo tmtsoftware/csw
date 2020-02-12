@@ -28,7 +28,7 @@ pipeline {
                 sh "sbt -DenableCoverage=false csw-config-client/multiNodeTest"
                 sh "sbt -DenableCoverage=false csw-config-cli/multiNodeTest"
                 sh "sbt -DenableCoverage=false csw-framework/multiNodeTest"
-                sh "sbt -DenableCoverage=false csw-aas-http/multiNodeTest"
+                sh "sbt -DenableCoverage=false integration/multiNodeTest"
             }
         }
 
