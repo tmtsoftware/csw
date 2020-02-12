@@ -552,6 +552,11 @@ object Dependencies {
     )
   )
 
-  val CswServices = Def.setting(Seq(Libs.`case-app`))
+  val CswServices = Def.setting(
+    Seq(
+      Libs.`case-app`,
+      Libs.`embedded-keycloak`
+    )
+  )
 
 }

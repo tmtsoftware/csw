@@ -13,7 +13,10 @@ case class Settings(
     alarmPort: String,
     sentinelPort: String,
     logHome: String,
-    interfaceName: String
+    interfaceName: String,
+    keycloakPort: String,
+    configAdminUsername: String,
+    configAdminPassword: String
 ) {
   val hostName: String = Networks(Some(interfaceName)).hostname
 }
@@ -35,7 +38,10 @@ object Settings {
       config.getString("alarmPort"),
       config.getString("sentinelPort"),
       config.getString("logHome"),
-      interfaceName
+      interfaceName,
+      config.getString("keycloakPort"),
+      config.getString("configAdminUsername"),
+      config.getString("configAdminPassword")
     )
   }
 }

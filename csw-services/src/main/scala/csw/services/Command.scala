@@ -23,6 +23,9 @@ object Command {
       @HelpMessage("start alarm server")
       @Short("d")
       database: Boolean = false,
+      @HelpMessage("start auth/aas service")
+      @Short("k")
+      auth: Boolean = false,
       @HelpMessage("name of the interface")
       @Short("i")
       interfaceName: Option[String]

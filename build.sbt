@@ -32,7 +32,8 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `romaine`,
   `examples`,
   `integration`,
-  `csw-contract`
+  `csw-contract`,
+  `csw-services`
 )
 
 lazy val unidocExclusions: Seq[ProjectReference] = Seq(
@@ -59,7 +60,8 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `romaine`,
   `examples`,
   `integration`,
-  `csw-contract`
+  `csw-contract`,
+  `csw-services`
 )
 
 lazy val githubReleases: Seq[ProjectReference] = Seq(
@@ -690,6 +692,7 @@ lazy val `csw-aas-installed` = project
 
 lazy val `csw-services` = project
   .in(file("csw-services"))
+  .enablePlugins(CswBuildInfo)
   .dependsOn(`csw-location-server`, `csw-config-server`, `csw-location-agent`, `csw-commons`)
   .settings(
     libraryDependencies ++= Dependencies.CswServices.value
