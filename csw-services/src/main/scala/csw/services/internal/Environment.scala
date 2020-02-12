@@ -1,9 +1,7 @@
-package csw.services.utils
+package csw.services.internal
 
-import csw.services.Settings
-
-object Environment {
-  def setup(settings: Settings): Unit = {
+class Environment(settings: Settings) {
+  def setup(): Unit = {
     import settings._
     System.setProperty("CLUSTER_SEEDS", s"$hostName:$clusterPort")
     System.setProperty("csw-location-server.http-port", locationHttpPort)

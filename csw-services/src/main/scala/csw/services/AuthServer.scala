@@ -2,13 +2,15 @@ package csw.services
 
 import csw.aas.core.deployment.AuthServiceLocation
 import csw.location.api.scaladsl.LocationService
+import csw.services.internal.Settings
 import org.tmt.embedded_keycloak.KeycloakData.{ApplicationUser, Client, ClientRole, Realm}
 import org.tmt.embedded_keycloak.impl.StopHandle
 import org.tmt.embedded_keycloak.{EmbeddedKeycloak, KeycloakData}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.DurationDouble
+import scala.concurrent.{Await, ExecutionContext}
 
-class AuthServer(locationService: LocationService, settings: Settings) {
+class AuthServer(locationService: LocationService, settings: Settings)(implicit ec: ExecutionContext) {
   import settings._
 
   private val configAdminRole = "admin"
@@ -50,11 +52,14 @@ class AuthServer(locationService: LocationService, settings: Settings) {
     )
   )
 
-  def start(implicit ec: ExecutionContext): Future[StopHandle] =
-    embeddedKeycloak
-      .startServer()
-      .flatMap { s =>
-        new AuthServiceLocation(locationService).register(keycloakPort.toInt).map(_ => s)
-      }
+  def start(): StopHandle =
+    Await.result(
+      embeddedKeycloak
+        .startServer()
+        .flatMap { s =>
+          new AuthServiceLocation(locationService).register(keycloakPort.toInt).map(_ => s)
+        },
+      20.minutes
+    )
 
 }

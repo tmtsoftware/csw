@@ -1,4 +1,4 @@
-package csw.services
+package csw.services.internal
 
 import com.typesafe.config.ConfigFactory
 import csw.network.utils.Networks

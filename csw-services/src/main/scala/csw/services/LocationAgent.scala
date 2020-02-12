@@ -1,6 +1,7 @@
 package csw.services
+
 import csw.location.agent.{Main => LocationAgentMain}
-import csw.services.utils.ResourceReader
+import csw.services.internal.{ResourceReader, Settings}
 
 import scala.collection.mutable
 
@@ -40,7 +41,7 @@ class LocationAgent(settings: Settings) {
           "--prefix",
           prefixes.mkString(","),
           "--command",
-          s"redis-sentinel ${sentinelConf} --port $sentinelPort"
+          s"redis-sentinel $sentinelConf --port $sentinelPort"
         )
       )
   }

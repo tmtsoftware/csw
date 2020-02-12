@@ -1,16 +1,13 @@
 package csw.services
 
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.Behaviors
 import caseapp.core.RemainingArgs
 import caseapp.core.app.CommandApp
-import csw.location.client.ActorSystemFactory
-import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.services.Command.Start
-import csw.services.utils.Environment
+import csw.services.cli.Command
+import csw.services.cli.Command.Start
+import csw.services.internal.Wiring
 
-import scala.concurrent.duration.{Duration, DurationDouble}
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
 object Main extends CommandApp[Command] {
   override def appName: String    = getClass.getSimpleName.dropRight(1) // remove $ from class name
@@ -33,29 +30,22 @@ object Main extends CommandApp[Command] {
       auth: Boolean,
       maybeInterface: Option[String]
   ): Unit = {
-    val settings = Settings(maybeInterface)
-    Environment.setup(settings)
-
-    implicit val actorSystem: ActorSystem[Nothing] = ActorSystemFactory.remote(Behaviors.empty)
-    implicit val ec: ExecutionContext              = actorSystem.executionContext
-
-    val locationService = HttpLocationServiceFactory.makeLocalClient
-    val agent           = new LocationAgent(settings)
-    val redis           = new Redis(settings)
-    val keycloak        = new AuthServer(locationService, settings)
+    val wiring = new Wiring(maybeInterface)
+    import wiring._
+    environment.setup()
 
     val locationServer = Future(LocationServer.start(settings.clusterPort))
     if (event) redis.startEvent()
     if (alarm) redis.startAlarm()
-    Future(agent.startSentinel(event, alarm))
-    if (database) Future(agent.startPostgres())
+    Future(locationAgent.startSentinel(event, alarm))
+    if (database) Future(locationAgent.startPostgres())
 
     // if config is true, then start auth + config
     if (config) {
-      Await.result(keycloak.start, 20.minutes)
+      keycloak.start()
       ConfigServer.start(settings.configPort)
     }
-    else if (auth) Await.result(keycloak.start, 20.minutes)
+    else if (auth) keycloak.start()
 
     Await.result(locationServer, Duration.Inf)
   }

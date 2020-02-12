@@ -1,6 +1,6 @@
 package csw.services
 
-import csw.services.utils.ResourceReader
+import csw.services.internal.{ResourceReader, Settings}
 
 class Redis(settings: Settings) {
   import settings._
@@ -23,6 +23,7 @@ class Redis(settings: Settings) {
     ResourceReader
       .copyToTmp(
         "redis/master.conf",
+        suffix = ".conf",
         transform = replacePort(port) andThen replacePid(pid) andThen replaceDbName(dbName) andThen replaceKeyspace(keyspaceEvent)
       )
       .getAbsolutePath

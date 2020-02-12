@@ -1,4 +1,4 @@
-package csw.services
+package csw.services.cli
 
 import caseapp.{CommandName, HelpMessage, ExtraName => Short}
 
@@ -20,7 +20,7 @@ object Command {
       @HelpMessage("start alarm server")
       @Short("r")
       alarm: Boolean = false,
-      @HelpMessage("start alarm server")
+      @HelpMessage("start database service")
       @Short("d")
       database: Boolean = false,
       @HelpMessage("start auth/aas service")
