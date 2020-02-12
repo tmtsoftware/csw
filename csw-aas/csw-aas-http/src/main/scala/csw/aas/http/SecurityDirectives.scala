@@ -190,6 +190,18 @@ object SecurityDirectives {
   }
 
   /**
+   * Creates instance of [[csw.aas.http.SecurityDirectives]] using provided configurations
+   * and auth server url using location service
+   *
+   * @param config Config object provided
+   * @param locationService LocationService instance used to resolve auth server url (blocking call)
+   */
+  def apply(config: Config, locationService: LocationService)(implicit ec: ExecutionContext): SecurityDirectives = {
+    val maybeLocation = if (disabled(config)) None else Some(authLocation(locationService))
+    from(AuthConfig.create(config, maybeLocation))
+  }
+
+  /**
    * Creates instance of [[csw.aas.http.SecurityDirectives]] using configurations
    * from application and reference.conf.
    *
@@ -202,18 +214,6 @@ object SecurityDirectives {
   ): SecurityDirectives = {
     val maybeLocation = if (disabled) None else Some(authLocation(locationService))
     from(AuthConfig.create(ConfigFactory.load(), maybeLocation, Some(disabled)))
-  }
-
-  /**
-   * Creates instance of [[csw.aas.http.SecurityDirectives]] using provided configurations
-   * and auth server url using location service
-   *
-   * @param config Config object provided
-   * @param locationService LocationService instance used to resolve auth server url (blocking call)
-   */
-  def apply(config: Config, locationService: LocationService)(implicit ec: ExecutionContext): SecurityDirectives = {
-    val maybeLocation = if (disabled(config)) None else Some(authLocation(locationService))
-    from(AuthConfig.create(config, maybeLocation))
   }
 
   private def from(authConfig: AuthConfig)(implicit ec: ExecutionContext): SecurityDirectives = {

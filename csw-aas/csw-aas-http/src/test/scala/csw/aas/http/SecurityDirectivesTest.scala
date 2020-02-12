@@ -1,18 +1,26 @@
 package csw.aas.http
 
+import java.net.URI
+
 import akka.http.javadsl.server.AuthenticationFailedRejection
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
 import akka.http.scaladsl.server.directives.Credentials.Provided
 import akka.http.scaladsl.server.{Directives, Route}
 import akka.http.scaladsl.testkit.ScalatestRouteTest
+import csw.aas.core.commons.AASConnection
 import csw.aas.core.token.AccessToken
 import csw.aas.http.AuthorizationPolicy.{ClientRolePolicy, CustomPolicy, PermissionPolicy, RealmRolePolicy}
+import csw.location.api.models.Connection.HttpConnection
+import csw.location.api.models.HttpLocation
+import csw.location.api.scaladsl.LocationService
+import org.mockito.ArgumentMatchersSugar._
 import org.mockito.MockitoSugar
-
-import scala.concurrent.Future
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+
+import scala.concurrent.Future
+import scala.concurrent.duration.FiniteDuration
 
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
 class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
@@ -213,5 +221,19 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
     Patch("/") ~> route ~> check {
       rejection shouldBe a[AuthenticationFailedRejection]
     }
+  }
+
+  test("apply should not resolve AAS location when auth is disabled") {
+    val locationService: LocationService = mock[LocationService]
+    SecurityDirectives(locationService, disabled = true)
+    verify(locationService, never).resolve(any[HttpConnection], any[FiniteDuration])
+  }
+
+  test("apply should resolve AAS location when auth is enabled") {
+    val locationService: LocationService = mock[LocationService]
+    when(locationService.resolve(any[HttpConnection], any[FiniteDuration]))
+      .thenReturn(Future.successful(Some(HttpLocation(AASConnection.value, URI.create("")))))
+    SecurityDirectives(locationService, disabled = false)
+    verify(locationService).resolve(any[HttpConnection], any[FiniteDuration])
   }
 }
