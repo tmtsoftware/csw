@@ -44,7 +44,9 @@ class LocationAgent(settings: Settings) {
           "--prefix",
           prefixes.mkString(","),
           "--command",
-          s"redis-sentinel $sentinelConf --port $sentinelPort"
+          s"redis-sentinel $sentinelConf --port $sentinelPort",
+          "--port",
+          sentinelPort
         )
       )
   }
