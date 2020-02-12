@@ -558,10 +558,10 @@ features of each version. Moderate adds functionality to Basic, and Full adds fu
 
 The code for the enhanced tutorials is in the CSW distribution at the following locations:
 
- Scala versions are [here]($github.base_url$/examples/src/main/scala/org/tmt/esw/)  
- Scala test code is [here]($github.base_url$/examples/src/test/scala/org/tmt/esw/)  
- Java version of basic is [here]($github.base_url$/examples/src/main/java/org/tmt/esw/)  
- Java test code is [here]($github.base_url$/examples/src/test/java/org/tmt/esw/)
+ Scala versions are [here](https://github.com/tmtsoftware/csw/tree/master/examples/src/main/scala/org/tmt/esw)  
+ Scala test code is [here](https://github.com/tmtsoftware/csw/tree/master/examples/src/test/scala/org/tmt/esw)  
+ Java version of basic is [here](https://github.com/tmtsoftware/csw/tree/master/examples/src/main/java/org/tmt/esw)  
+ Java test code is [here](https://github.com/tmtsoftware/csw/tree/master/examples/src/test/java/org/tmt/esw)
  
  At this time there is no Java versions of moderate and full.
  
