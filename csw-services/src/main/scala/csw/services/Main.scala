@@ -35,21 +35,14 @@ object Main extends CommandApp[Command] {
     try {
       environment.setup()
       LoggingSystemFactory.start(appName, appVersion, settings.hostName, actorSystem)
-
       LocationServer.start(settings.clusterPort)
 
-      if (event) ignoreException(redis.startEvent())
-      if (alarm) ignoreException(redis.startAlarm())
-      ignoreException(locationAgent.startSentinel(event, alarm))
-      if (database) ignoreException(locationAgent.startPostgres())
-
-      // if config is true, then start auth + config
-      if (config)
-        ignoreException {
-          keycloak.start()
-          ConfigServer.start(settings.configPort)
-        }
-      else if (auth) ignoreException(keycloak.start())
+      start(event, redis.startEvent())
+      start(alarm, redis.startAlarm())
+      start(event || alarm, locationAgent.startSentinel(event, alarm))
+      start(database, locationAgent.startPostgres())
+      start(config || auth, keycloak.start())
+      start(config, ConfigServer.start(settings.configPort))
     }
     catch {
       case NonFatal(e) =>
@@ -58,7 +51,9 @@ object Main extends CommandApp[Command] {
     }
   }
 
-  def ignoreException(thunk: => Unit): Unit =
+  private def start(flag: Boolean, service: => Unit): Unit = if (flag) ignoreException(service)
+
+  private def ignoreException(thunk: => Unit): Unit =
     try thunk
     catch {
       case NonFatal(_) =>
