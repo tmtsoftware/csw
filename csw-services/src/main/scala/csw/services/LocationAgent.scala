@@ -10,9 +10,9 @@ class LocationAgent(settings: Settings) {
   import settings._
   private val pgHbaConf: String = ResourceReader.copyToTmp("database/pg_hba.conf").getAbsolutePath
 
-  def start(name: String, args: Array[String]): Unit = Service.start(name, LocationAgentMain.main(args))
+  def start(name: String, args: Array[String]): Option[Process] = Service.start(name, LocationAgentMain.start(args))
 
-  def startPostgres(): Unit = {
+  def startPostgres(): Option[Process] = {
     start(
       "Database Service",
       Array(

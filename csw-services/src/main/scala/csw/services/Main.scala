@@ -2,12 +2,11 @@ package csw.services
 
 import caseapp.core.RemainingArgs
 import caseapp.core.app.CommandApp
+import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.services.cli.Command
 import csw.services.cli.Command.Start
 import csw.services.internal.Wiring
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
 import scala.util.control.NonFatal
 
 object Main extends CommandApp[Command] {
@@ -35,21 +34,22 @@ object Main extends CommandApp[Command] {
     import wiring._
     try {
       environment.setup()
+      LoggingSystemFactory.start(appName, appVersion, settings.hostName, actorSystem)
 
-      val locationServer = Future(LocationServer.start(settings.clusterPort))
-      if (event) redis.startEvent()
-      if (alarm) redis.startAlarm()
-      Future(locationAgent.startSentinel(event, alarm))
-      if (database) Future(locationAgent.startPostgres())
+      LocationServer.start(settings.clusterPort)
+
+      if (event) ignoreException(redis.startEvent())
+      if (alarm) ignoreException(redis.startAlarm())
+      ignoreException(locationAgent.startSentinel(event, alarm))
+      if (database) ignoreException(locationAgent.startPostgres())
 
       // if config is true, then start auth + config
-      if (config) {
-        keycloak.start()
-        ConfigServer.start(settings.configPort)
-      }
-      else if (auth) keycloak.start()
-
-      Await.result(locationServer, Duration.Inf)
+      if (config)
+        ignoreException {
+          keycloak.start()
+          ConfigServer.start(settings.configPort)
+        }
+      else if (auth) ignoreException(keycloak.start())
     }
     catch {
       case NonFatal(e) =>
@@ -57,5 +57,11 @@ object Main extends CommandApp[Command] {
         exit(1)
     }
   }
+
+  def ignoreException(thunk: => Unit): Unit =
+    try thunk
+    catch {
+      case NonFatal(_) =>
+    }
 
 }

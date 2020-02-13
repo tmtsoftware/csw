@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 
-DEFAULT_CSW_VERSION="2.0.0-RC1"
-WORK_DIR="$HOME/.csw-services"
-BOOTSTRAP_SCRIPT=$WORK_DIR/scripts/csw-bootstrap.sh
-CSW_SERVICES_SCRIPT=$WORK_DIR/scripts/csw-services.sh
+DEFAULT_CSW_VERSION="master-SNAPSHOT"
 
 # ================================================ #
 # Read csw.version property from build.properties file
@@ -27,70 +24,24 @@ else
 fi
 # ================================================ #
 
-function checkout_scripts() {
-    if hash svn 2>/dev/null; then
-        echo "[INFO] Checking out scripts from csw repo here: $WORK_DIR"
-        svn checkout https://github.com/tmtsoftware/csw/trunk/scripts
-        echo "[INFO] Checked out scripts"
-    else
-        echo "[ERROR] svn is not installed, follow installation instructions here http://subversion.apache.org/packages.html"
-    fi
-}
-
 function run_csw_services() {
-    if [ -f "$CSW_SERVICES_SCRIPT" ]; then
-        $CSW_SERVICES_SCRIPT "$@"
-    else
-        checkout_scripts
-        $CSW_SERVICES_SCRIPT "$@"
-    fi
+    echo "====== CSW Version [$CSW_VERSION] ====="
+    coursier launch -r jitpack com.github.tmtsoftware.csw:csw-services_2.13:"$CSW_VERSION" com.typesafe.akka:akka-http-spray-json_2.13:10.1.11 -- "$@"
 }
 
-function bootstrap_and_execute() {
-    CSW_SERVICES=$WORK_DIR/target/coursier/stage/bin/csw-services.sh
-    checkout_scripts
+# capture version number and store rest of the arguments to arr variable which then passed to run csw_services.sh
+while (("$#")); do
+    case "$1" in
+    -v | --version)
+        CSW_VERSION="$2"
+        shift
+        shift
+        ;;
+    *)
+        arr+=("$1")
+        shift
+        ;;
+    esac
+done
 
-    echo "[INFO] Bootstrapping csw services with version [$CSW_VERSION]"
-    $BOOTSTRAP_SCRIPT $CSW_VERSION "$WORK_DIR"
-
-    echo "[INFO] Running csw services with version [$CSW_VERSION]"
-    $CSW_SERVICES "$@"
-}
-
-mkdir -p "$WORK_DIR"
-
-# Change working directory
-pushd "$WORK_DIR" || exit
-
-case "$1" in
-stop)
-    run_csw_services stop
-    ;;
-start)
-    shift
-    arr=("start")
-
-    # capture version number and store rest of the arguments to arr variable which then passed to run csw_services.sh
-    while (("$#")); do
-        case "$1" in
-        -v | --version)
-            CSW_VERSION="$2"
-            shift
-            shift
-            ;;
-        *)
-            arr+=("$1")
-            shift
-            ;;
-        esac
-    done
-
-    bootstrap_and_execute "${arr[@]}"
-    ;;
---help | "" | -h | *)
-    run_csw_services --help
-    ;;
-esac
-
-# Go back to original working directory
-popd || exit
+run_csw_services "${arr[@]}"
