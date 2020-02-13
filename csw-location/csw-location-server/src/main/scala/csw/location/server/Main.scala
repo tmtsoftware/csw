@@ -2,10 +2,12 @@ package csw.location.server
 
 import akka.Done
 import akka.actor.CoordinatedShutdown
+import akka.http.scaladsl.Http.ServerBinding
 import csw.location.server.cli.{ArgsParser, Options}
 import csw.location.server.commons.ClusterAwareSettings
 import csw.location.server.internal.ServerWiring
 
+import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 import scala.util.control.NonFatal
 
@@ -16,39 +18,40 @@ import scala.util.control.NonFatal
  *
  * */
 // $COVERAGE-OFF$
-object Main extends App {
-  private val name = BuildInfo.name
+object Main {
+  private val name    = BuildInfo.name
+  private val timeout = 30.seconds
 
-  new ArgsParser(name).parse(args.toList).foreach {
-    case options @ Options(maybeClusterPort, _) =>
-      if (ClusterAwareSettings.seedNodes.isEmpty) {
-        println(
+  def main(args: Array[String]): Unit = start(args, startLogging = true)
+
+  def start(args: Array[String], startLogging: Boolean = false): Option[ServerBinding] =
+    new ArgsParser(name).parse(args.toList).map {
+      case options @ Options(maybeClusterPort, publicNetwork) =>
+        require(
+          ClusterAwareSettings.seedNodes.nonEmpty,
           "[ERROR] CLUSTER_SEEDS setting is not specified either as env variable or system property. Please check online documentation for this set-up."
         )
-      }
-      else {
-        val wiring = ServerWiring.make(maybeClusterPort, options.publicNetwork)
+
+        val wiring = ServerWiring.make(maybeClusterPort, publicNetwork)
 
         import wiring._
-        import actorRuntime._
         try {
-          startLogging(name, clusterSettings.hostname)
+          if (startLogging) actorRuntime.startLogging(name, clusterSettings.hostname)
 
-          val locationBindingF = locationHttpService.start(options.httpBindHost)
+          val locationBinding = Await.result(locationHttpService.start(options.httpBindHost), timeout)
 
-          coordinatedShutdown.addTask(
+          actorRuntime.coordinatedShutdown.addTask(
             CoordinatedShutdown.PhaseServiceUnbind,
             "unbind-services"
-          ) { () =>
-            locationBindingF.flatMap(_.terminate(30.seconds)).map(_ => Done)
-          }
+          )(() => locationBinding.terminate(30.seconds).map(_ => Done)(actorRuntime.ec))
+          locationBinding
         }
         catch {
           case NonFatal(ex) =>
-            println(s"[ERROR] Failed to start location server.")
             ex.printStackTrace()
-            shutdown()
+            Await.result(actorRuntime.shutdown(), timeout)
+            throw ex
         }
-      }
-  }
+    }
+
 }
