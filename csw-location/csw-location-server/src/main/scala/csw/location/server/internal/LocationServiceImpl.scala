@@ -211,14 +211,9 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
         LocationUpdated(c.get(service.Key).value.get)
       case c @ Changed(service.Key) => LocationRemoved(connection)
     }
-
-    // find the already existing location if present to notify the subscriber
-    val eventualEvent = find(connection.asInstanceOf[TypedConnection[_ <: Location]]).map(_.toList.map(LocationUpdated))
-    val firstEvent    = Source.future(eventualEvent).mapConcat(identity)
-
     //Allow stream to be cancellable by giving it a KillSwitch in mat value.
     // Also, deduplicate identical messages in case multiple DeathWatch actors unregisters the same location.
-    trackingEvents.cancellable.distinctUntilChanged.mapMaterializedValue(createSubscription).prepend(firstEvent)
+    trackingEvents.cancellable.distinctUntilChanged.mapMaterializedValue(createSubscription)
   }
 
   private def createSubscription(x: KillSwitch): Subscription = () => x.shutdown()
