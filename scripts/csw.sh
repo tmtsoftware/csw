@@ -1,26 +1,17 @@
 #!/usr/bin/env bash
 
-DEFAULT_CSW_VERSION="master-SNAPSHOT"
+PWD="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+ROOT_DIR="$(dirname "$BOOTSTRAP_DIR")"
 
 # ================================================ #
 # Read csw.version property from build.properties file
 # Use DEFAULT_CSW_VERSION if build.properties file does not exist or csw.version property does not present
 # ================================================ #
-BUILD_PROPERTIES="../project/build.properties"
-function read_property() {
-    if [ -f "$BUILD_PROPERTIES" ]; then
-        grep "${1}" $BUILD_PROPERTIES | cut -d'=' -f2
-    else
-        return 1
-    fi
-}
+BUILD_PROPERTIES="$ROOT_DIR/project/build.properties"
+CSW_VERSION=$(grep "csw.version" "$BUILD_PROPERTIES" 2>/dev/null | cut -d'=' -f2)
 
-MAYBE_CSW_VERSION=$(read_property 'csw.version') || echo $DEFAULT_CSW_VERSION
-
-if [ -z "$MAYBE_CSW_VERSION" ]; then
-    CSW_VERSION=$DEFAULT_CSW_VERSION
-else
-    CSW_VERSION=$MAYBE_CSW_VERSION
+if [ -z "$CSW_VERSION" ]; then
+    CSW_VERSION="master-SNAPSHOT"
 fi
 # ================================================ #
 
