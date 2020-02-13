@@ -65,7 +65,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     timeout = new Timeout(10, TimeUnit.SECONDS);
     this.log = cswCtx.loggerFactory().getLogger(getClass());
     prefix = cswCtx.componentInfo().prefix();
-    hcdConnection = new Connection.AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.ESW, "SampleHcd"), JComponentType.HCD));
+    hcdConnection = new Connection.AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.ESW, "JSampleHcd"), JComponentType.HCD));
   }
 
 
