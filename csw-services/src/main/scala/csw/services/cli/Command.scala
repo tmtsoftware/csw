@@ -20,7 +20,9 @@ object Command {
       @HelpMessage("start alarm server")
       @Short("r")
       alarm: Boolean = false,
-      @HelpMessage("start database service")
+      @HelpMessage(
+        "start database service, set 'PGDATA' env variable where postgres is installed e.g. for mac: /usr/local/var/postgres"
+      )
       @Short("d")
       database: Boolean = false,
       @HelpMessage("start auth/aas service")

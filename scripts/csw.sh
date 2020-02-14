@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-PWD="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-ROOT_DIR="$(dirname "$BOOTSTRAP_DIR")"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 
 # ================================================ #
 # Read csw.version property from build.properties file
@@ -17,7 +17,7 @@ fi
 
 function run_csw_services() {
     echo "====== CSW Version [$CSW_VERSION] ====="
-    coursier launch -r jitpack com.github.tmtsoftware.csw:csw-services_2.13:"$CSW_VERSION" com.typesafe.akka:akka-http-spray-json_2.13:10.1.11 -- "$@"
+    "$SCRIPT_DIR"/coursier launch -r jitpack com.github.tmtsoftware.csw:csw-services_2.13:"$CSW_VERSION" com.typesafe.akka:akka-http-spray-json_2.13:10.1.11 -- "$@"
 }
 
 # capture version number and store rest of the arguments to arr variable which then passed to run csw_services.sh
