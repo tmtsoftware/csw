@@ -3,26 +3,32 @@ package org.tmt.esw.basic;
 import akka.util.Timeout;
 import csw.command.api.javadsl.ICommandService;
 import csw.command.client.CommandServiceFactory;
+import csw.event.api.javadsl.IEventSubscriber;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.JComponentType;
 import csw.location.api.models.AkkaLocation;
 import csw.location.api.models.ComponentId;
-import csw.location.api.models.Connection.*;
-import csw.params.commands.CommandResponse.*;
+import csw.location.api.models.Connection.AkkaConnection;
+import csw.params.commands.CommandResponse.Completed;
+import csw.params.commands.CommandResponse.SubmitResponse;
 import csw.params.commands.Setup;
+import csw.params.events.EventKey;
+import csw.params.events.EventName;
 import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 import csw.testkit.javadsl.FrameworkTestKitJunitResource;
 import csw.testkit.javadsl.JCSWService;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.scalatestplus.junit.JUnitSuite;
 
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-
-import org.scalatestplus.junit.JUnitSuite;
 
 import static org.tmt.esw.basic.shared.JSampleInfo.*;
 
@@ -38,7 +44,8 @@ public class JSampleIntegrationTest extends JUnitSuite {
 
     private static AkkaConnection hcdConnection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.ESW, "JSampleHcd"), JComponentType.HCD));
     private static AkkaLocation hcdLocation;
-
+    private static IEventSubscriber subscriber;
+    private static EventKey receivedHcdEvent;
     private Timeout timeout = new Timeout(12, TimeUnit.SECONDS);
 
 
@@ -50,6 +57,9 @@ public class JSampleIntegrationTest extends JUnitSuite {
     @BeforeClass
     public static void setup() throws ExecutionException, InterruptedException {
         ILocationService locationService = testKit.jLocationService();
+        receivedHcdEvent = EventKey.apply(assemblyConnection.prefix(), EventName.apply("receivedHcdLocation"));
+
+        subscriber = testKit.jEventService().defaultSubscriber();
 
         testKit.spawnContainer(com.typesafe.config.ConfigFactory.load("JBasicSampleContainer.conf"));
 
@@ -81,6 +91,8 @@ public class JSampleIntegrationTest extends JUnitSuite {
         ICommandService assemblyCS = CommandServiceFactory.jMake(assemblyLocation, testKit.actorSystem());
         Assert.assertNotNull(assemblyCS);
 
+        waitTillHcdIsTracked();
+
         SubmitResponse sr = assemblyCS.submitAndWait(setup, timeout).get();
         Assert.assertTrue(sr instanceof Completed);
         // Check completed value
@@ -97,7 +109,6 @@ public class JSampleIntegrationTest extends JUnitSuite {
         Assert.assertNotNull(assemblyCS);
 
         SubmitResponse sr = assemblyCS.submitAndWait(setup, timeout).get();
-        System.out.println("SR : " + sr);
         Assert.assertTrue(sr instanceof Completed);
     }
 
@@ -109,6 +120,8 @@ public class JSampleIntegrationTest extends JUnitSuite {
 
         ICommandService assemblyCS = CommandServiceFactory.jMake(assemblyLocation, testKit.actorSystem());
         Assert.assertNotNull(assemblyCS);
+
+        waitTillHcdIsTracked();
 
         Completed r1 = (Completed)assemblyCS.submitAndWait(shortSetup, timeout).get();
         Assert.assertEquals(r1.result().jGet(resultKey).orElseThrow().head(), shortSleepPeriod);
@@ -127,7 +140,19 @@ public class JSampleIntegrationTest extends JUnitSuite {
         ICommandService assemblyCS = CommandServiceFactory.jMake(assemblyLocation, testKit.actorSystem());
         Assert.assertNotNull(assemblyCS);
 
+        waitTillHcdIsTracked();
+
         SubmitResponse sr = assemblyCS.submitAndWait(setup, timeout).get();
         Assert.assertTrue(sr instanceof Completed);
+    }
+
+    private void waitTillHcdIsTracked() {
+        Eventually.eventually(Duration.ofSeconds(5), () -> {
+            try {
+                Assert.assertFalse(subscriber.get(receivedHcdEvent).get().isInvalid());
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        });
     }
 }

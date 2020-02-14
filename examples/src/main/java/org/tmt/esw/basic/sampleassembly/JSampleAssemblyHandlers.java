@@ -20,8 +20,8 @@ import csw.params.events.EventKey;
 import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
-import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
+import csw.prefix.models.Prefix;
 import csw.time.core.models.UTCTime;
 
 import java.util.Arrays;
@@ -32,10 +32,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static org.tmt.esw.basic.shared.JSampleInfo.*;
-import static csw.params.commands.CommandResponse.*;
+import static csw.command.client.CommandResponseManager.OverallFailure;
+import static csw.command.client.CommandResponseManager.OverallSuccess;
 import static csw.params.commands.CommandIssue.*;
-import static csw.command.client.CommandResponseManager.*;
+import static csw.params.commands.CommandResponse.*;
+import static org.tmt.esw.basic.shared.JSampleInfo.*;
 
 /**
  * Domain specific logic should be written in below handlers.
@@ -96,6 +97,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     if (trackingEvent instanceof LocationUpdated) {
       Location location = ((LocationUpdated) trackingEvent).location();
       hcdLocation = (AkkaLocation) location;
+      cswCtx.eventService().defaultPublisher().publish(new SystemEvent(prefix, new EventName("receivedHcdLocation")));
       hcdCS = Optional.of(CommandServiceFactory.jMake(location, system));
       onSetup(Id.apply(), new Setup(prefix, shortCommand, Optional.empty()));
     } else if (trackingEvent instanceof LocationRemoved) {
