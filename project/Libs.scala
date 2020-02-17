@@ -51,8 +51,8 @@ object Libs {
   val `config`          = "com.typesafe"                  % "config"          % "1.4.0"
   val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.6.3"
   val `caffeine`        = "com.github.ben-manes.caffeine" % "caffeine"        % "2.8.1"
-
-  val `case-app` = "com.github.alexarchambault" %% "case-app" % "2.0.0-M9"
+  val netty             = "io.netty"                      % "netty"           % "3.10.6.Final"
+  val `case-app`        = "com.github.alexarchambault"    %% "case-app"       % "2.0.0-M9"
 }
 
 object Borer {
