@@ -43,7 +43,7 @@ class LocationAuthTestWithKeycloak
   override def beforeAll(): Unit = {
     super.beforeAll()
     keycloakStopHandle = startKeycloak(aasPort)
-    locationWiring.get.locationService.register(HttpRegistration(AASConnection.value, aasPort, "/auth")).await
+    locationWiring.get.locationService.register(HttpRegistration(AASConnection.value, aasPort, "auth")).await
   }
 
   private implicit def actorSystem: ActorSystem[SpawnProtocol.Command] = locationWiring.get.actorSystem
@@ -73,7 +73,7 @@ class LocationAuthTestWithKeycloak
         )
       )
     )
-    val embeddedKeycloak = new EmbeddedKeycloak(keycloakData, Settings(port = port))
+    val embeddedKeycloak = new EmbeddedKeycloak(keycloakData, Settings(port = port, printProcessLogs = false))
     embeddedKeycloak.startServer().awaitWithTimeout(1.minute)
   }
 
