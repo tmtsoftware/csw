@@ -2,6 +2,8 @@
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
+# DO NOT CHANGE THIS => this string is used in publishing.scala file
+DEFAULT_CSW_VERSION="master-SNAPSHOT"
 
 # ================================================ #
 # Read csw.version property from build.properties file
@@ -11,7 +13,7 @@ BUILD_PROPERTIES="$ROOT_DIR/project/build.properties"
 CSW_VERSION=$(grep "csw.version" "$BUILD_PROPERTIES" 2>/dev/null | cut -d'=' -f2)
 
 if [ -z "$CSW_VERSION" ]; then
-    CSW_VERSION="master-SNAPSHOT"
+    CSW_VERSION=$DEFAULT_CSW_VERSION
 fi
 # ================================================ #
 
