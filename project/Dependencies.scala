@@ -52,7 +52,8 @@ object Dependencies {
       Libs.`junit-4-12`               % Test,
       Libs.`mockito-scala`            % Test,
       Akka.`akka-stream-testkit`      % Test,
-      Akka.`akka-multi-node-testkit`  % Test
+      Akka.`akka-multi-node-testkit`  % Test,
+      Libs.`embedded-keycloak`        % Test
     )
   )
 
