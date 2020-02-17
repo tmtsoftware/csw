@@ -1,6 +1,5 @@
 package csw.location.server.http
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.location.server.commons.TestFutureExtension.RichFuture
 import csw.location.server.internal.ServerWiring
 import org.mockito.MockitoSugar
@@ -9,7 +8,7 @@ import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 
-trait HTTPLocationService
+private[csw] trait HTTPLocationService
     extends AnyFunSuiteLike
     with Matchers
     with BeforeAndAfterAll
@@ -32,9 +31,10 @@ trait HTTPLocationService
 
 }
 
-class JHTTPLocationService extends HTTPLocationService
+private[csw] class JHTTPLocationService extends HTTPLocationService
 
-class HTTPLocationServiceOnPorts(clusterPort: Int, val httpPort: Int, auth: Boolean = false) extends HTTPLocationService {
+private[csw] class HTTPLocationServiceOnPorts(clusterPort: Int, val httpPort: Int, auth: Boolean = false)
+    extends HTTPLocationService {
   override val locationPort: Int             = clusterPort
   override val enableAuth: Boolean           = auth
   override val httpLocationPort: Option[Int] = Some(httpPort)
