@@ -44,17 +44,17 @@ public class JMatrixKeyTypeTest extends JUnitSuite {
 
         return Arrays.asList(new Object[][]{
                         {"byteKey1", JKeyType.ByteMatrixKey(), byteData, Optional.empty()},
-                        {"byteKey2", JKeyType.ByteMatrixKey(), byteData, Optional.of(encoder())},
+                        {"byteKey2", JKeyType.ByteMatrixKey(), byteData, Optional.of(encoder)},
                         {"shortKey1", JKeyType.ShortMatrixKey(), shortData, Optional.empty()},
-                        {"shortKey2", JKeyType.ShortMatrixKey(), shortData, Optional.of(degree())},
+                        {"shortKey2", JKeyType.ShortMatrixKey(), shortData, Optional.of(degree)},
                         {"longKey1", JKeyType.LongMatrixKey(), longData, Optional.empty()},
-                        {"longKey2", JKeyType.LongMatrixKey(), longData, Optional.of(kilometer())},
+                        {"longKey2", JKeyType.LongMatrixKey(), longData, Optional.of(kilometer)},
                         {"intKey1", JKeyType.IntMatrixKey(), intData, Optional.empty()},
-                        {"intKey2", JKeyType.IntMatrixKey(), intData, Optional.of(meter())},
+                        {"intKey2", JKeyType.IntMatrixKey(), intData, Optional.of(meter)},
                         {"floatKey1", JKeyType.FloatMatrixKey(), floatData, Optional.empty()},
-                        {"floatKey2", JKeyType.FloatMatrixKey(), floatData, Optional.of(millimeter())},
+                        {"floatKey2", JKeyType.FloatMatrixKey(), floatData, Optional.of(millimeter)},
                         {"doubleKey1", JKeyType.DoubleMatrixKey(), doubleData, Optional.empty()},
-                        {"doubleKey2", JKeyType.DoubleMatrixKey(), doubleData, Optional.of(millisecond())}
+                        {"doubleKey2", JKeyType.DoubleMatrixKey(), doubleData, Optional.of(millisecond)}
                 }
         );
     }
@@ -69,7 +69,7 @@ public class JMatrixKeyTypeTest extends JUnitSuite {
         else parameter = matrixKey.make(keyName).set(paramValues);
 
         Assert.assertEquals(keyName, parameter.keyName());
-        Assert.assertEquals(units.orElse(NoUnits()), parameter.units());
+        Assert.assertEquals(units.orElse(NoUnits), parameter.units());
         Assert.assertEquals(paramValues.length, parameter.size());
         Assert.assertEquals(matrixData, parameter.head());
         Assert.assertEquals(matrixData, parameter.get(0).get());

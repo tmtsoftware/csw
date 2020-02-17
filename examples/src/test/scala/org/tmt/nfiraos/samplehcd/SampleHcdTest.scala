@@ -3,23 +3,25 @@ package org.tmt.nfiraos.samplehcd
 import akka.actor.typed.ActorSystem
 import akka.util.Timeout
 import csw.command.client.CommandServiceFactory
-import csw.location.models
-import csw.location.models.Connection.AkkaConnection
-import csw.location.models.{ComponentId, ComponentType}
-import csw.params.commands.{CommandName, CommandResponse, Setup}
+import csw.location.api.models.{ComponentId, ComponentType}
+import csw.location.api.models.Connection.AkkaConnection
+import csw.params.commands.CommandResponse.Completed
+import csw.params.commands.{CommandName, Setup}
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.{ObsId, Units}
 import csw.params.events.{Event, EventKey, EventName, SystemEvent}
-import csw.prefix.models.{Prefix, Subsystem}
+import csw.prefix.models.Prefix
+import csw.prefix.models.Subsystem.NFIRAOS
 import csw.testkit.scaladsl.CSWService.{AlarmServer, EventServer}
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
-import org.scalatest.{BeforeAndAfterEach, FunSuiteLike}
+import org.scalatest.BeforeAndAfterEach
+import org.scalatest.funsuite.AnyFunSuiteLike
 
 import scala.collection.mutable
 import scala.concurrent.Await
 
 //#setup
-class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with FunSuiteLike with BeforeAndAfterEach {
+class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with AnyFunSuiteLike with BeforeAndAfterEach {
   import frameworkTestKit.frameworkWiring._
 
   override def beforeAll(): Unit = {
@@ -29,7 +31,7 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
 
   import scala.concurrent.duration._
   test("HCD should be locatable using Location Service") {
-    val connection   = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "SampleHcd"), ComponentType.HCD))
+    val connection   = AkkaConnection(ComponentId(Prefix("NFIRAOS.SampleHcd"), ComponentType.HCD))
     val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
 
     akkaLocation.connection shouldBe connection
@@ -86,7 +88,7 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
     val setupCommand                    = Setup(Prefix("csw.move"), CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
-    val connection = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "SampleHcd"), ComponentType.HCD))
+    val connection = AkkaConnection(ComponentId(Prefix(NFIRAOS, "SampleHcd"), ComponentType.HCD))
 
     val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
 
@@ -94,7 +96,7 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
     // submit command and handle response
     val responseF = hcd.submitAndWait(setupCommand)
 
-    Await.result(responseF, 10000.millis) shouldBe a[CommandResponse.Completed]
+    Await.result(responseF, 10000.millis) shouldBe a[Completed]
   }
   //#submit
 
@@ -108,7 +110,7 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
     val setupCommand                    = Setup(Prefix("csw.move"), CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
-    val connection = AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "SampleHcd"), ComponentType.HCD))
+    val connection = AkkaConnection(ComponentId(Prefix(NFIRAOS, "SampleHcd"), ComponentType.HCD))
 
     val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
 
@@ -117,7 +119,7 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
     // submit command and handle response
     intercept[java.util.concurrent.TimeoutException] {
       val responseF = hcd.submitAndWait(setupCommand)
-      Await.result(responseF, 10000.millis) shouldBe a[CommandResponse.Completed]
+      Await.result(responseF, 10000.millis) shouldBe a[Completed]
     }
   }
   //#exception

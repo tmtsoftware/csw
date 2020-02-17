@@ -1,29 +1,27 @@
 package csw.common.components.command
 
 import akka.actor.typed.scaladsl.ActorContext
-import csw.command.client.messages.TopLevelActorMessage
-import CommandComponentState._
 import akka.util.Timeout
 import csw.command.api.scaladsl.CommandService
+import csw.command.client.CommandResponseManager.{OverallFailure, OverallSuccess}
 import csw.command.client.CommandServiceFactory
+import csw.command.client.messages.TopLevelActorMessage
+import csw.common.components.command.CommandComponentState._
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.models.{ComponentId, TrackingEvent}
-import csw.location.models.ComponentType.HCD
-import csw.location.models.Connection.AkkaConnection
+import csw.location.api.models.ComponentType.HCD
+import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{ComponentId, TrackingEvent}
 import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandIssue.OtherIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
+import csw.prefix.models.{Prefix, Subsystem}
 import csw.time.core.models.UTCTime
 
 import scala.concurrent.duration._
-import csw.command.client.CommandResponseManager.{OverallFailure, OverallSuccess}
-import csw.prefix.models.Subsystem
-import csw.prefix.models.Prefix
-
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -88,6 +86,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
     command.commandName match {
       case `immediateCmd` =>
         Completed(runId)
+
       case `longRunningCmd` =>
         // A local assembly command that takes some time returning Started
         timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plusSeconds(2))) {
@@ -96,16 +95,21 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         }
         // Starts long-runing and returns started
         Started(runId)
+
+      //#longRunning
       case `longRunningCmdToAsm` =>
-        hcdComponent.submitAndWait(longRunning).map {
-          case r: Completed =>
+        hcdComponent.submitAndWait(longRunning).foreach {
+          case _: Completed =>
             commandResponseManager.updateCommand(Completed(runId))
-          case x =>
-          //println("Some other response in asm: " + x)
+          case other =>
+            // Handle some other response besides Completed
+            commandResponseManager.updateCommand(other.withRunId(runId))
         }
         // Assembly starts long-running and returns started
         Started(runId)
 
+      //#longRunning
+      //#queryFinalAll
       case `longRunningCmdToAsmComp` =>
         // In this case, assembly does not need to do anything until both commands complete
         // Could wait and return directly if commands are fast, but this is better
@@ -124,6 +128,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
             commandResponseManager.updateCommand(Error(runId, ex.toString))
         }
         Started(runId)
+      //#queryFinalAll
 
       case `longRunningCmdToAsmInvalid` =>
         val long    = hcdComponent.submitAndWait(longRunning)

@@ -12,9 +12,9 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{ComponentInfos, CurrentStatePublisher, FrameworkTestSuite}
 import csw.time.core.models.UTCTime
 import org.mockito.MockitoSugar
-import org.scalatest.Matchers
 
 import scala.concurrent.Future
+import org.scalatest.matchers.should.Matchers
 
 // DEOPSCSW-165-CSW Assembly Creation
 // DEOPSCSW-166-CSW HCD Creation

@@ -16,17 +16,17 @@ import csw.common.FrameworkAssertions._
 import csw.common.components.command.CommandComponentState._
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
+import csw.location.api.models
+import csw.location.api.models.ComponentType.{Assembly, HCD}
+import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
+import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.client.ActorSystemFactory
-import csw.location.models.ComponentType.{Assembly, HCD}
-import csw.location.models.Connection.{AkkaConnection, HttpConnection}
-import csw.location.models.{ComponentId, ComponentType}
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup
 import csw.params.core.generics.KeyType
 import csw.params.core.models.{ObsId, Units}
 import csw.params.core.states.CurrentState
-import csw.prefix.models.Subsystem
-import csw.prefix.models.Prefix
+import csw.prefix.models.{Prefix, Subsystem}
 import io.lettuce.core.RedisClient
 
 import scala.concurrent.duration.DurationLong
@@ -36,15 +36,15 @@ import scala.concurrent.{Await, ExecutionContext}
 //CSW-82: ComponentInfo should take prefix
 class CommandHttpIntegrationTests extends FrameworkIntegrationSuite {
 
-  import testWiring._
+  import testWiring.seedLocationService
 
   private val wfosContainerConnection = AkkaConnection(
     ComponentId(Prefix(Subsystem.Container, "WFOS_Container"), ComponentType.Container)
   )
-  private val filterAssemblyConnection  = HttpConnection(ComponentId(Prefix(Subsystem.WFOS, "FilterASS"), Assembly))
-  private val filterAssemblyConnection2 = AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "FilterASS"), Assembly))
-  private val filterHCDConnection       = HttpConnection(ComponentId(Prefix(Subsystem.WFOS, "FilterHCD"), HCD))
-  private val containerActorSystem: ActorSystem[SpawnProtocol.Command] =
+  private val filterAssemblyConnection  = HttpConnection(models.ComponentId(Prefix(Subsystem.WFOS, "FilterASS"), Assembly))
+  private val filterAssemblyConnection2 = AkkaConnection(models.ComponentId(Prefix(Subsystem.WFOS, "FilterASS"), Assembly))
+  private val filterHCDConnection       = HttpConnection(models.ComponentId(Prefix(Subsystem.WFOS, "FilterHCD"), HCD))
+  implicit private val containerActorSystem: ActorSystem[SpawnProtocol.Command] =
     ActorSystemFactory.remote(SpawnProtocol(), "container-system")
   val obsId                         = Some(ObsId("Obs001"))
   implicit val timeout: Timeout     = 12.seconds

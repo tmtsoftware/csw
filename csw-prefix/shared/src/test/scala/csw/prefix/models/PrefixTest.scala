@@ -1,9 +1,10 @@
 package csw.prefix.models
 
 import csw.prefix.models.Subsystem.TCS
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class PrefixTest extends FunSuite with Matchers {
+class PrefixTest extends AnyFunSuite with Matchers {
 
   test("should able to create Prefix and access subsystem from valid prefix string") {
     val prefixStr = "tcs.mobie.blue.filter"
@@ -17,12 +18,11 @@ class PrefixTest extends FunSuite with Matchers {
     a[NoSuchElementException] shouldBe thrownBy(Prefix(prefixStr))
   }
 
-  //CSW-80: Prefix should be in lowercase
+  // CSW-86: Subsystem should be case-insensitive
   test("should access subsystem and componentName in lowercase") {
     val prefix = Prefix("Tcs.Filter.Wheel")
-    prefix.value shouldEqual "tcs.filter.wheel"
-    prefix.toString shouldEqual prefix.value
+    prefix.toString shouldEqual "TCS.Filter.Wheel"
     prefix.subsystem shouldBe TCS
-    prefix.componentName shouldBe "filter.wheel"
+    prefix.componentName shouldBe "Filter.Wheel"
   }
 }

@@ -58,9 +58,10 @@ class CommandLineRunnerTest extends SeedData with Eventually with CommonCodecs {
   }
 
   // DEOPSCSW-431: [Event Cli] Get command
+  // CSW-86: Subsystem should be case-insensitive
   test("should able to get appropriate error message when there is no event published for provided key") {
     commandLineRunner.get(argsParser.parse(Seq("get", "-e", "csw.x.y.invalid_key", "--out", "json")).get).await
-    logBuffer.head shouldEqual "[ERROR] No events published for key: [csw.x.y.invalid_key]"
+    logBuffer.head shouldEqual "[ERROR] No events published for key: [CSW.x.y.invalid_key]"
   }
 
   // DEOPSCSW-431: [Event Cli] Get command
@@ -245,25 +246,20 @@ class CommandLineRunnerTest extends SeedData with Eventually with CommonCodecs {
 
   // publish command generates new id and event time while publishing, hence assertions exclude these keys from json
   private def removeDynamicKeys(json: JsValue) = {
-    val (k, v)   = json.as[JsObject].value.head
-    val jsObject = v.as[JsObject].value.toMap -- Seq("eventId", "eventTime")
-    Json.obj(k -> jsObject)
+    JsObject(json.as[JsObject].value.toMap -- Seq("eventId", "eventTime"))
   }
 
   // publish command with -e argument updates existing prefix and event name from provided json if already present
   // else adds new entry
   private def addEventIdAndName(json: JsValue, eventKey: EventKey) = {
-    val (k, v) = json.as[JsObject].value.head
-
-    val jsObject = v.as[JsObject] ++ Json.obj(
+    json.as[JsObject] ++ Json.obj(
       ("source", eventKey.source.toString),
       ("eventName", eventKey.eventName.name)
     )
-
-    Json.obj(k -> jsObject)
   }
 
   private def eventToSanitizedJson(event: Event)                = removeDynamicKeys(JsonSupport.writeEvent(event))
   private def stringToEvent[T <: Event](eventString: String): T = JsonSupport.readEvent[T](Json.parse(eventString))
   private def strToJsObject(js: String)                         = Json.parse(js).as[JsObject]
+
 }

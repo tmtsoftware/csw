@@ -1,9 +1,9 @@
 package csw.location.server.internal
 
 import akka.serialization.Serializer
+import csw.location.api.codec.LocationCodecs
 import csw.location.api.commons.LocationServiceLogger
-import csw.location.models.codecs.LocationCodecs
-import csw.location.models.{Connection, Location, Registration, TrackingEvent}
+import csw.location.api.models.{Connection, Location, Registration, TrackingEvent}
 import csw.logging.api.scaladsl.Logger
 import io.bullet.borer.{Cbor, Decoder}
 
@@ -34,15 +34,14 @@ class LocationAkkaSerializer extends Serializer with LocationCodecs {
       else None
     }
 
-    {
-      fromBinary[Connection] orElse
-      fromBinary[Location] orElse
-      fromBinary[Registration] orElse
-      fromBinary[TrackingEvent]
-    } getOrElse {
-      val ex = new RuntimeException(s"does not support decoding of ${manifest.get}")
-      logger.error(ex.getMessage, ex = ex)
-      throw ex
-    }
+    fromBinary[Connection]
+      .orElse(fromBinary[Location])
+      .orElse(fromBinary[Registration])
+      .orElse(fromBinary[TrackingEvent])
+      .getOrElse {
+        val ex = new RuntimeException(s"does not support decoding of ${manifest.get}")
+        logger.error(ex.getMessage, ex = ex)
+        throw ex
+      }
   }
 }

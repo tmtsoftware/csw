@@ -15,7 +15,7 @@ import csw.config.server.commons.TestFileUtils
 import csw.config.server.{ServerWiring, Settings}
 import csw.location.helpers.{LSNodeSpec, NMembersAndSeed}
 import csw.location.server.http.MultiNodeHTTPLocationService
-import org.scalatest.FunSuiteLike
+import org.scalatest.funsuite.AnyFunSuiteLike
 import org.tmt.embedded_keycloak.KeycloakData._
 import org.tmt.embedded_keycloak.utils.Ports
 import org.tmt.embedded_keycloak.{EmbeddedKeycloak, KeycloakData, Settings => KeycloakSettings}
@@ -36,7 +36,7 @@ class ConfigCliAuthTestMultiJvmNode3 extends ConfigCliAuthTest(0)
 class ConfigCliAuthTest(ignore: Int)
     extends LSNodeSpec(config = new MultiNodeTestConfig, mode = "http")
     with MultiNodeHTTPLocationService
-    with FunSuiteLike {
+    with AnyFunSuiteLike {
 
   import config._
   import system.dispatcher
@@ -67,7 +67,7 @@ class ConfigCliAuthTest(ignore: Int)
         "csw-config-server",
         "bearer-only",
         passwordGrantEnabled = false,
-        authorizationEnabled = true,
+        authorizationEnabled = false,
         clientRoles = Set(configAdmin)
       )
 
@@ -123,7 +123,8 @@ class ConfigCliAuthTest(ignore: Int)
       try {
         System.setIn(stream)
         runner.login(Options(console = true))
-      } finally {
+      }
+      finally {
         System.setIn(stdIn)
       }
 

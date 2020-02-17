@@ -15,7 +15,6 @@ import csw.event.client.internal.wiring._
 import csw.params.events.{Event, EventKey}
 import csw.time.core.models.UTCTime
 import net.manub.embeddedkafka.EmbeddedKafka
-import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
 import org.scalatestplus.testng.TestNGSuite
 import org.testng.annotations._
@@ -24,6 +23,7 @@ import scala.collection.{immutable, mutable}
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 import scala.util.Random
+import org.scalatest.matchers.should.Matchers
 
 //DEOPSCSW-331: Event Service Accessible to all CSW component builders
 //DEOPSCSW-334: Publish an event

@@ -9,6 +9,65 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
+## [CSW v2.0.0-RC1] - 2020-02-06
+
+This is the release candidate 1 for the release 1.1.0 of the TMT Common Software for project stakeholders.
+See [here](https://tmtsoftware.github.io/csw/2.0.0-RC1/) for a detailed documentation of this version of the CSW software.
+
+### Changes
+- Simplified CommandResponseManager and removed auto-completion of commands
+- Prefix has Subsystem in constructor 
+- Log statements have subsystem and prefix along with componentName
+- AlarmKey and ComponentKey is constructed from prefix instead of string
+- TcpLocation and HttpLocation has prefix along with AkkaLocation
+- ComponentType is displayed to snake_case from lowercase 
+- Subsystem is displayed in uppercase instead of lowercase
+- ArrayData and MatrixData does not require classtag for creation 
+- Admin routes for setting log level and getting log level are now available via gateway
+- JSON contracts for location and command service added in paradox documentation
+
+### Version Upgrades
+- Scala version upgrade to 2.13.1
+- SBT version upgrade to 1.3.7
+- Akka version upgrade to 2.6.3
+- Kafka version upgrade to 2.4.0
+- Borer version upgrade to 1.4.0
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/2.0.0-RC1/
+- Scaladoc: https://tmtsoftware.github.io/csw/2.0.0-RC1/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/2.0.0-RC1/api/java/index.html
+
+## [CSW v1.1.0-RC1] - 2020-02-04
+
+This is the release candidate 1 for the release 1.1.0 of the TMT Common Software for project stakeholders.
+See [here](https://tmtsoftware.github.io/csw/1.1.0-RC1/) for a detailed documentation of this version of the CSW software.
+
+### Changes
+- Simplified CommandResponseManager and removed auto-completion of commands
+- Prefix has Subsystem in constructor 
+- Log statements have subsystem and prefix along with componentName
+- AlarmKey and ComponentKey is constructed from prefix instead of string
+- TcpLocation and HttpLocation has prefix along with AkkaLocation
+- ComponentType is displayed to snake_case from lowercase 
+- Subsystem is displayed in uppercase instead of lowercase
+- ArrayData and MatrixData does not require classtag for creation 
+- Admin routes for setting log level and getting log level are now available via gateway
+- JSON contracts for location and command service added in paradox documentation
+
+### Version Upgrades
+- Scala version upgrade to 2.13.1
+- SBT version upgrade to 1.3.7
+- Akka version upgrade to 2.6.3
+- Kafka version upgrade to 2.4.0
+- Borer version upgrade to 1.4.0
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/1.1.0-RC1/
+- Scaladoc: https://tmtsoftware.github.io/csw/1.1.0-RC1/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/1.1.0-RC1/api/java/index.html
+
+
 ## [CSW v1.0.0] - 2019-08-30
 
 This is the first major release of the TMT Common Software for project stakeholders. 

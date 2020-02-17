@@ -8,7 +8,7 @@ import csw.command.client.messages.TopLevelActorMessage
 import csw.event.api.scaladsl.EventSubscription
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.models.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.location.api.models.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, CommandResponse, ControlCommand, Setup}
 import csw.params.core.generics.{Key, KeyType, Parameter}
@@ -97,7 +97,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
     }
   }
 
-  def handleUsingMap(hcd: CommandService): Unit = {
+  def handleUsingMap(runId: Id, hcd: CommandService): Unit = {
 
     // Construct Setup command
     val sleepTimeKey: Key[Long]         = KeyType.LongKey.make("SleepTime")
@@ -112,8 +112,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
       case x =>
         x
     } recover {
-      case ex: RuntimeException =>
-        CommandResponse.Error(Id(), ex.getMessage) //TODO Not sure what to do with this???
+      case ex: RuntimeException => CommandResponse.Error(runId, ex.getMessage)
     }
 
     // Wait for final response, and log result
@@ -180,23 +179,17 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   }
   //#subscribe
 
-  override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse =
-    Accepted(runId)
+  override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse = Accepted(runId)
 
   override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse = Completed(runId)
 
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
 
-  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {
-    // do something on Diagnostic Mode
-  }
-
-  override def onOperationsMode(): Unit = {
-    // do something on Operations Mode
-  }
-
   override def onGoOffline(): Unit = {}
 
   override def onGoOnline(): Unit = {}
 
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {}
+
+  override def onOperationsMode(): Unit = {}
 }

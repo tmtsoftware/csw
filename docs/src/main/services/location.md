@@ -33,8 +33,7 @@ network (or at multiple locations) and the necessary configuration, environment 
 properties should be defined to point to the correct host and port number(s).
 
 `LocationServiceFactory` provides a make method to create an instance of the LocationService API. 
-This call will look for configuration or environment variable settings as described 
-here: @scaladoc[ClusterSettings](csw/location/commons/ClusterSettings).
+This call will look for configuration or environment variable settings.
 
 Scala
 :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/example/location/LocationServiceExampleClientApp.scala) { #create-location-service }
@@ -256,7 +255,7 @@ The API expects following parameters:
   * A callback that implements `Consumer` and receives the TrackEvent as a parameter.  
 
 @@@ note
-Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor. Here is an @github[example](/examples/src/main/scala/example/event/ConcurrencyInCallbacksExample.scala) of how it can be done.
+Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor. Here is an [example]($github.base_url$/examples/src/main/scala/example/event/ConcurrencyInCallbacksExample.scala) of how it can be done.
 @@@
 
 This API returns a KillSwitch that can be used to turn off the event notifications and release the supplied callback, if required.
@@ -311,5 +310,5 @@ See @ref:[Location Service Technical Description](../technical/location/location
 
 ## Source code for examples
 
-* @github[Scala Example](/examples/src/main/scala/example/location/LocationServiceExampleClientApp.scala)
-* @github[JavaBlocking Example](/examples/src/main/java/example/location/JLocationServiceExampleClient.java)
+* [Scala Example]($github.base_url$/examples/src/main/scala/example/location/LocationServiceExampleClientApp.scala)
+* [JavaBlocking Example]($github.base_url$/examples/src/main/java/example/location/JLocationServiceExampleClient.java)

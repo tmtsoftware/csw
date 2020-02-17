@@ -4,9 +4,10 @@ import csw.params.core.formats.ParamCodecs._
 import csw.params.core.generics.{Key, Parameter}
 import csw.params.javadsl.JKeyType
 import io.bullet.borer.Cbor
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class CborInterOpTest extends FunSuite with Matchers {
+class CborInterOpTest extends AnyFunSuite with Matchers {
 
   test("should decode java bytes to scala bytes") {
     val jByteKey: Key[java.lang.Byte]    = JKeyType.ByteKey.make("bytes")

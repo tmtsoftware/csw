@@ -10,12 +10,13 @@ import csw.aas.core.token.AccessToken
 import csw.aas.http.AuthorizationPolicy.PolicyExpression.{And, ExpressionOperator, Or}
 import csw.aas.http.AuthorizationPolicy.{ClientRolePolicy, CustomPolicy, RealmRolePolicy}
 import org.mockito.MockitoSugar
-import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.Future
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
-class PolicyExpressionTest extends FunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
+class PolicyExpressionTest extends AnyFunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
   case class TestCase(left: Boolean, operator: ExpressionOperator, right: Boolean, expectedOutcome: Boolean)
 

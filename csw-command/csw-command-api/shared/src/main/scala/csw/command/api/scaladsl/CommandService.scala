@@ -38,6 +38,7 @@ trait CommandService {
    * final [[csw.params.commands.CommandResponse.SubmitResponse]] as a Future
    *
    * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
+   * @param timeout max-time to wait for a final response
    * @return a SubmitResponse as a Future value
    */
   def submitAndWait(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse]
@@ -47,6 +48,7 @@ trait CommandService {
    * of validation (Accepted, Invalid) or a final Response. In case of response as `Accepted`, final CommandResponse can be obtained by using `subscribe` API.
    *
    * @param submitCommands the set of [[csw.params.commands.ControlCommand]] payloads
+   * @param timeout max-time to wait for a final response
    * @return a future list of SubmitResponse, one for each command
    */
   def submitAllAndWait(submitCommands: List[ControlCommand])(implicit timeout: Timeout): Future[List[SubmitResponse]]
@@ -86,12 +88,13 @@ trait CommandService {
    * Query for the final result of a long running command which was sent as Submit to get a [[csw.params.commands.CommandResponse.SubmitResponse]] as a Future
    *
    * @param commandRunId the runId of the command for which response is required
+   * @param timeout max-time to wait for a final response
    * @return a SubmitResponse as a Future value
    */
   def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse]
 
   /**
-   * Subscribe to the current state of a component corresponding to the [[csw.location.models.AkkaLocation]] of the component
+   * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
    *
    * @param names subscribe to states which have any of the provided value for name.
    *              If no states are provided, all the current states will be received.
@@ -100,7 +103,7 @@ trait CommandService {
   def subscribeCurrentState(names: Set[StateName] = Set.empty): Source[CurrentState, Subscription]
 
   /**
-   * Subscribe to the current state of a component corresponding to the [[csw.location.models.AkkaLocation]] of the component
+   * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
    *
    * @note Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
    * @param callback the action to be applied on the CurrentState element received as a result of subscription
@@ -109,7 +112,7 @@ trait CommandService {
   def subscribeCurrentState(callback: CurrentState => Unit): Subscription
 
   /**
-   * Subscribe to the current state of a component corresponding to the [[csw.location.models.AkkaLocation]] of the component
+   * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
    *
    * @note Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
    * @param names subscribe to only those states which have any of the provided value for name

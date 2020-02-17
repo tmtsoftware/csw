@@ -4,11 +4,12 @@ import csw.alarm.models.Key.{AlarmKey, ComponentKey, GlobalKey, SubsystemKey}
 import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.NFIRAOS
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 // DEOPSCSW-435: Identify Alarm by Subsystem, component and AlarmName
 // CSW-83: Alarm models should take prefix
-class KeyTest extends FunSuite with Matchers with TableDrivenPropertyChecks {
+class KeyTest extends AnyFunSuite with Matchers with TableDrivenPropertyChecks {
   test("AlarmKey should be representing a unique alarm") {
     val tromboneAxisHighLimitAlarm = AlarmKey(Prefix(NFIRAOS, "trombone"), "tromboneAxisHighLimitAlarm")
     tromboneAxisHighLimitAlarm.value shouldEqual s"nfiraos${KeySeparator}trombone${KeySeparator}tromboneaxishighlimitalarm"

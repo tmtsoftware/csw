@@ -7,7 +7,7 @@ import akka.actor.typed.javadsl.Behaviors;
 import csw.command.client.messages.TopLevelActorMessage;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
-import csw.location.models.TrackingEvent;
+import csw.location.api.models.TrackingEvent;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.*;
 import csw.params.core.generics.Key;
@@ -18,9 +18,12 @@ import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
 import csw.time.core.models.UTCTime;
+import scala.concurrent.duration.FiniteDuration;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
  * Domain specific logic should be written in below handlers.
@@ -53,10 +56,8 @@ public class JSampleHcdHandlers extends JComponentHandlers {
     private static final class Sleep implements WorkerCommand {
         private final Id runId;
         private final long timeInMillis;
-        private final ControlCommand setup;
 
-        private Sleep(ControlCommand setup, Id runId, long timeInMillis) {
-            this.setup = setup;
+        private Sleep(Id runId, long timeInMillis) {
             this.runId = runId;
             this.timeInMillis = timeInMillis;
         }
@@ -68,9 +69,10 @@ public class JSampleHcdHandlers extends JComponentHandlers {
                     if (msg instanceof Sleep) {
                         Sleep sleep = (Sleep) msg;
                         log.trace(() -> "WorkerActor received sleep command with time of " + sleep.timeInMillis + " ms");
-                        // simulate long running command
-                        Thread.sleep(sleep.timeInMillis);
-                        cswCtx.commandResponseManager().updateCommand(new CommandResponse.Completed(sleep.runId));
+                        UTCTime when = UTCTime.after(new FiniteDuration(sleep.timeInMillis, MILLISECONDS));
+                        Runnable task = () -> cswCtx.commandResponseManager().updateCommand(new CommandResponse.Completed(sleep.runId));
+                        // simulate long running command that updates CRM when completed
+                        cswCtx.timeServiceScheduler().scheduleOnce(when, task);
                     } else {
                         log.error("Unsupported message type");
                     }
@@ -80,7 +82,6 @@ public class JSampleHcdHandlers extends JComponentHandlers {
         );
     }
     //#worker-actor
-
 
     //#initialize
     private Optional<Cancellable> maybePublishingGenerator = Optional.empty();
@@ -164,7 +165,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
 
             log.info(() -> "command payload: " + sleepTimeParam.keyName() + " = " + sleepTimeInMillis);
 
-            workerActor.tell(new Sleep(setup, runId, sleepTimeInMillis));
+            workerActor.tell(new Sleep(runId, sleepTimeInMillis));
         }
     }
     //#onSetup
@@ -181,6 +182,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
     @Override
     public void onGoOnline() {
     }
+
 
     @Override
     public void onDiagnosticMode(UTCTime startTime, String hint) {

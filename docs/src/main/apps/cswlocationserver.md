@@ -9,7 +9,7 @@ In a production environment, it is required that all machines running components
 ## Prerequisite
 
 The CSW Location Server application can be installed as binaries or constructed from source. To download the application,
-go to the [CSW Release page](https://tmtsoftware.github.com/csw/releases/) and follow instructions.
+go to the [CSW Release page](https://github.com/tmtsoftware/csw/releases) and follow instructions.
 
 To install from source, the command `sbt csw-location-server/universal:publishLocal` will publish necessary artifacts to run the csw-location-server application. 
 The target of the above command is a zip file titled "csw-location-server.zip" and its path will be printed on console. 
@@ -52,6 +52,3 @@ Use the following command to get help on the options available with this app.
 Use the following command to get version information for this app.
   
 `./bin/csw-location-server --version`
-
-### Accessing location server via http
-Once the server is up and running it can be accessed via http as shown @ref[here](cswlocationroutes.md).

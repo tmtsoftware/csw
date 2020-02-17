@@ -1,5 +1,5 @@
 ===============================================================================================================
-Prefix: tcs.tcspk
+Prefix: TCS.tcspk
 Name: cpuExceededAlarm
 Description: This alarm is activated when the tcsPk Assembly can no longer calculate all of its pointing values in the time allocated. The CPU may lock power, or there may be pointing loops running that are not needed. Response: Check to see if pointing loops are executing that are not needed or see about a more powerful CPU.
 Location: in computer...
@@ -16,7 +16,7 @@ Shelve Status: Unshelved
 Alarm Time: 2018-09-14T04:51:40.762Z
 Current Severity: Disconnected
 ===============================================================================================================
-Prefix: tcs.corrections
+Prefix: TCS.corrections
 Name: outOfRangeOffload
 Description: Another system has sent an out of range offload that has caused the system to go into a bad state!
 Location: Computer Room
@@ -33,7 +33,7 @@ Shelve Status: Unshelved
 Alarm Time: 2018-09-14T04:51:40.762Z
 Current Severity: Disconnected
 ===============================================================================================================
-Prefix: nfiraos.trombone
+Prefix: NFIRAOS.trombone
 Name: tromboneAxisLowLimitAlarm
 Description: Warns when trombone axis has reached the low limit
 Location: south side
@@ -50,7 +50,7 @@ Shelve Status: Unshelved
 Alarm Time: 2018-09-14T04:51:40.762Z
 Current Severity: Disconnected
 ===============================================================================================================
-Prefix: nfiraos.trombone
+Prefix: NFIRAOS.trombone
 Name: tromboneAxisHighLimitAlarm
 Description: Warns when trombone axis has reached the high limit
 Location: south side
@@ -67,7 +67,7 @@ Shelve Status: Unshelved
 Alarm Time: 2018-09-14T04:51:40.762Z
 Current Severity: Disconnected
 ===============================================================================================================
-Prefix: nfiraos.enclosure
+Prefix: NFIRAOS.enclosure
 Name: tempLowAlarm
 Description: Enclosure temperature has gone out of range low
 Location: enclosure
@@ -84,7 +84,7 @@ Shelve Status: Unshelved
 Alarm Time: 2018-09-14T04:51:40.762Z
 Current Severity: Disconnected
 ===============================================================================================================
-Prefix: nfiraos.enclosure
+Prefix: NFIRAOS.enclosure
 Name: tempHighAlarm
 Description: Enclosure temperature has gone out of range high
 Location: enclosure
@@ -101,7 +101,7 @@ Shelve Status: Unshelved
 Alarm Time: 2018-09-14T04:51:40.762Z
 Current Severity: Disconnected
 ===============================================================================================================
-Prefix: nfiraos.beamsplitter
+Prefix: NFIRAOS.beamsplitter
 Name: splitterLimitAlarm
 Description: Warns when beam splitter hits a limit
 Location: south side
@@ -118,7 +118,7 @@ Shelve Status: Unshelved
 Alarm Time: 2018-09-14T04:51:40.762Z
 Current Severity: Disconnected
 ===============================================================================================================
-Prefix: lgsf.tcspkinactive
+Prefix: LGSF.tcspkinactive
 Name: cpuIdleAlarm
 Description: This alarm is activated CPU is idle
 Location: in computer...

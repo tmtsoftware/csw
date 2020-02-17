@@ -6,10 +6,11 @@ import csw.command.client.models.framework.LocationServiceUsage.{DoNotRegister, 
 import csw.framework.models.ConfigFileLocation.{Local, Remote}
 import csw.framework.models.ContainerMode.{Container, Standalone}
 import csw.framework.models.{ContainerBootstrapInfo, ContainerInfo, HostBootstrapInfo}
-import csw.location.models.ComponentType.{Assembly, HCD}
-import csw.location.models.Connection
+import csw.location.api.models.ComponentType.{Assembly, HCD}
+import csw.location.api.models.Connection
 import csw.prefix.models.Prefix
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration.DurationInt
 import scala.jdk.CollectionConverters._
@@ -20,18 +21,18 @@ import scala.jdk.CollectionConverters._
 // DEOPSCSW-283: Parsing HOCON conf file
 // CSW-82: ComponentInfo should take prefix
 // CSW-83: Alarm models should take prefix
-class ConfigParserTest extends FunSuite with Matchers {
+class ConfigParserTest extends AnyFunSuite with Matchers {
 
   private val assemblyInfo = ComponentInfo(
     Prefix("tcs.assembly1"),
     Assembly,
     "csw.pkgDemo.assembly1.Assembly1",
     DoNotRegister,
-    Set(Connection.from("tcs.HCD2A-hcd-akka"), Connection.from("tcs.HCD2C-hcd-akka")),
+    Set(Connection.from("TCS.HCD2A-hcd-akka"), Connection.from("tcs.HCD2C-hcd-akka")),
     5.seconds
   )
-  private val hcd2AInfo = ComponentInfo(Prefix("tcs.hcd2a"), HCD, "csw.pkgDemo.hcd2.Hcd2", RegisterOnly, Set.empty)
-  private val hcd2BInfo = ComponentInfo(Prefix("tcs.hcd2b"), HCD, "csw.pkgDemo.hcd2.Hcd2", DoNotRegister, Set.empty)
+  private val hcd2AInfo = ComponentInfo(Prefix("TCS.HCD2A"), HCD, "csw.pkgDemo.hcd2.Hcd2", RegisterOnly, Set.empty)
+  private val hcd2BInfo = ComponentInfo(Prefix("TCS.HCD2B"), HCD, "csw.pkgDemo.hcd2.Hcd2", DoNotRegister, Set.empty)
 
   private val containerInfo = ContainerInfo("Container1", Set(assemblyInfo, hcd2AInfo, hcd2BInfo))
 

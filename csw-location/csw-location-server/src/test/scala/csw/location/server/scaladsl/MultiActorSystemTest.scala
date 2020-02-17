@@ -1,19 +1,20 @@
 package csw.location.server.scaladsl
 
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import csw.location.api.models.Connection.TcpConnection
+import csw.location.api.models.{ComponentId, ComponentType, TcpRegistration}
 import csw.location.api.scaladsl.LocationService
-import csw.location.models.Connection.TcpConnection
-import csw.location.models.{ComponentId, ComponentType, TcpRegistration}
 import csw.location.server.commons.TestFutureExtension.RichFuture
 import csw.location.server.commons._
 import csw.location.server.internal.LocationServiceFactory
-import csw.prefix.models.Subsystem
-import csw.prefix.models.Prefix
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import csw.prefix.models.{Prefix, Subsystem}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 
 import scala.concurrent.duration.DurationInt
 
-class MultiActorSystemTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
+class MultiActorSystemTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
   var connection: TcpConnection = _
 

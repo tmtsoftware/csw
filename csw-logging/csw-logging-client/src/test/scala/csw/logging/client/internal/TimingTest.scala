@@ -108,7 +108,7 @@ class TimingTest extends LoggingTestSuite with Timing {
 
         log.getString(LoggingKeys.COMPONENT_NAME) shouldBe IRIS.COMPONENT_NAME
         log.getString(LoggingKeys.SUBSYSTEM) shouldBe prefix.subsystem.name
-        log.getString(LoggingKeys.PREFIX) shouldBe prefix.value
+        log.getString(LoggingKeys.PREFIX) shouldBe prefix.toString
         log.getString(LoggingKeys.ACTOR) shouldBe irisActorRef.path.toString
         log.getString(LoggingKeys.FILE) shouldBe IRIS.FILE_NAME
         log.getString(LoggingKeys.CLASS) shouldBe IRIS.CLASS_NAME

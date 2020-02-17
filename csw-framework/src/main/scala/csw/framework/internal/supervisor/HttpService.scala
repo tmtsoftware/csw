@@ -8,9 +8,9 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.server.Route
 import akka.stream.Materializer
+import csw.location.api.models.Connection.HttpConnection
+import csw.location.api.models.HttpRegistration
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
-import csw.location.models
-import csw.location.models.Connection.HttpConnection
 import csw.logging.api.scaladsl.Logger
 
 import scala.async.Async._
@@ -31,7 +31,7 @@ class HttpService(
 
   import actorSystem.executionContext
 
-  lazy val registeredLazyBinding: Future[(ServerBinding, RegistrationResult)] = async {
+  def bindAndRegister(): Future[(ServerBinding, RegistrationResult)] = async {
     val binding            = await(bind())            // create HttpBinding with appropriate hostname and port
     val registrationResult = await(register(binding)) // create HttpRegistration and register it with location service
 
@@ -57,7 +57,7 @@ class HttpService(
   }
 
   private def register(binding: ServerBinding): Future[RegistrationResult] = {
-    val registration = models.HttpRegistration(
+    val registration = HttpRegistration(
       connection = httpConnection,
       port = binding.localAddress.getPort,
       path = ""

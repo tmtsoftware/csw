@@ -9,7 +9,7 @@ class LocationServiceCompTestWithHttp extends LocationServiceCompTest("http") {
   private var wiring: ServerWiring = _
 
   override protected def beforeAll(): Unit = {
-    wiring = new ServerWiring
+    wiring = new ServerWiring(enableAuth = false)
     wiring.locationHttpService.start().await
     super.beforeAll()
   }

@@ -1,6 +1,7 @@
 package csw.config.client;
 
 import akka.actor.typed.ActorSystem;
+import akka.actor.typed.SpawnProtocol;
 import akka.actor.typed.javadsl.Behaviors;
 import csw.config.api.javadsl.IConfigClientService;
 import csw.config.api.javadsl.IConfigService;
@@ -19,14 +20,14 @@ import scala.concurrent.duration.FiniteDuration;
 
 public class JConfigClientBaseSuite extends JMockedAuthentication {
 
-    private csw.location.server.internal.ServerWiring locationWiring = new csw.location.server.internal.ServerWiring();
+    private csw.location.server.internal.ServerWiring locationWiring = new csw.location.server.internal.ServerWiring(false);
 
-    private ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create(Behaviors.empty(), "Guardian"));
+    private ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create(SpawnProtocol.create(), "Guardian"));
     private ILocationService clientLocationService = JHttpLocationServiceFactory.makeLocalClient(actorRuntime.typedSystem());
 
     public IConfigService configService = JConfigClientFactory.adminApi(actorRuntime.typedSystem(), clientLocationService, factory());
     public IConfigClientService configClientApi = JConfigClientFactory.clientApi(actorRuntime.typedSystem(), clientLocationService);
-    public ActorSystem<?> system = actorRuntime.typedSystem();
+    public ActorSystem<SpawnProtocol.Command> system = (ActorSystem<SpawnProtocol.Command>) actorRuntime.typedSystem();
 
     private ServerWiring serverWiring = ServerWiring$.MODULE$.make(securityDirectives());
     private HttpService httpService = serverWiring.httpService();
@@ -34,7 +35,7 @@ public class JConfigClientBaseSuite extends JMockedAuthentication {
     private FiniteDuration timeout = Duration.create(10, "seconds");
 
     public void setup() throws Exception {
-        Await.result(locationWiring.locationHttpService().start(), timeout);
+        Await.result(locationWiring.locationHttpService().start("127.0.0.1"), timeout);
         Await.result(httpService.registeredLazyBinding(), timeout);
     }
 

@@ -3,7 +3,20 @@ package csw.logging.client.scaladsl
 import java.net.InetAddress
 
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import csw.logging.client.appenders.{LogAppenderBuilder, StdOutAppender}
 import csw.logging.client.internal.LoggingSystem
+import play.api.libs.json.JsObject
+
+private[csw] class StdOutTestAppender(system: ActorSystem[_], stdHeaders: JsObject, logPrinter: Any => Unit)
+    extends StdOutAppender(system, stdHeaders, logPrinter) {
+  override val color   = true
+  override val oneLine = true
+}
+
+private[csw] object StdOutTestAppender extends LogAppenderBuilder {
+  def apply(system: ActorSystem[_], stdHeaders: JsObject): StdOutTestAppender =
+    new StdOutTestAppender(system, stdHeaders, println)
+}
 
 object LoggingSystemFactory {
 
@@ -34,6 +47,9 @@ object LoggingSystemFactory {
   def start(name: String, version: String, hostName: String, actorSystem: ActorSystem[SpawnProtocol.Command]): LoggingSystem =
     new LoggingSystem(name, version, hostName, actorSystem)
 
-  def forTestingOnly()(implicit actorSystem: ActorSystem[SpawnProtocol.Command]): LoggingSystem =
-    new LoggingSystem("test-name", "test-version-1", "localhost", actorSystem)
+  def forTestingOnly()(implicit actorSystem: ActorSystem[SpawnProtocol.Command]): LoggingSystem = {
+    val loggingSystem = new LoggingSystem("test-name", "test-version-1", "localhost", actorSystem)
+    loggingSystem.addAppenders(StdOutTestAppender)
+    loggingSystem
+  }
 }

@@ -6,21 +6,23 @@ import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import csw.database.DatabaseServiceFactory.{ReadPasswordHolder, ReadUsernameHolder}
 import csw.database.commons.{DBTestHelper, DatabaseServiceConnection}
 import csw.database.scaladsl.JooqExtentions.{RichQuery, RichResultQuery}
+import csw.location.api.models
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.models.TcpRegistration
 import csw.location.server.http.HTTPLocationService
 import org.jooq.DSLContext
+import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.PatienceConfiguration.Interval
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.time.{Seconds, Span}
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.ExecutionContext
 
 //DEOPSCSW-620: Session Creation to access data
 //DEOPSCSW-621: Session creation to access data with single connection
 //DEOPSCSW-615: DB service accessible to CSW component developers
-class DatabaseServiceFactoryTest extends FunSuite with Matchers with BeforeAndAfterAll with HTTPLocationService {
+class DatabaseServiceFactoryTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with HTTPLocationService {
   private implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "test")
   private implicit val ec: ExecutionContext                            = typedSystem.executionContext
 
@@ -40,7 +42,7 @@ class DatabaseServiceFactoryTest extends FunSuite with Matchers with BeforeAndAf
 
     super.beforeAll()
     locationService
-      .register(TcpRegistration(DatabaseServiceConnection.value, port))
+      .register(models.TcpRegistration(DatabaseServiceConnection.value, port))
       .futureValue(Interval(Span(5, Seconds)))
   }
 

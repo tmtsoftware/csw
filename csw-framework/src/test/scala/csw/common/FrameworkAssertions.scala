@@ -8,12 +8,12 @@ import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.command.client.models.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.models.Level
-import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
 import play.api.libs.json.{JsObject, JsString}
 
 import scala.collection.mutable
 import scala.concurrent.duration.Duration
+import org.scalatest.matchers.should.Matchers
 
 object FrameworkAssertions extends Matchers with Eventually {
 

@@ -1,12 +1,12 @@
 package csw.alarm.client
 import com.typesafe.config.ConfigFactory
-import csw.alarm.models.AlarmSeverity.Indeterminate
 import csw.alarm.api.scaladsl.{AlarmAdminService, AlarmService}
 import csw.alarm.client.internal.commons.AlarmServiceConnection
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
+import csw.alarm.models.AlarmSeverity.Indeterminate
+import csw.location.api.models
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.models.TcpRegistration
 import csw.location.server.http.HTTPLocationService
 
 // DEOPSCSW-481: Component Developer API available to all CSW components
@@ -16,7 +16,7 @@ class AlarmServiceFactoryTest extends AlarmServiceTestSetup with HTTPLocationSer
 
   override def beforeAll(): Unit = {
     super.beforeAll()
-    locationService.register(TcpRegistration(AlarmServiceConnection.value, sentinelPort)).await
+    locationService.register(models.TcpRegistration(AlarmServiceConnection.value, sentinelPort)).await
   }
 
   override def beforeEach(): Unit = {

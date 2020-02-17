@@ -10,12 +10,12 @@ import csw.params.core.models._
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.params.events.{EventName, ObserveEvent, SystemEvent}
 import csw.prefix.models.{Prefix, Subsystem}
-import org.scalatest.FunSpec
 import play.api.libs.json.Json
+import org.scalatest.funspec.AnyFunSpec
 
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-188: Efficient Serialization to/from JSON
-class JsonTest extends FunSpec {
+class JsonTest extends AnyFunSpec {
 
   import ParamCodecs._
 
@@ -30,8 +30,9 @@ class JsonTest extends FunSpec {
   describe("Test Subsystem JSON") {
     val wfos: Subsystem = Subsystem.WFOS
 
+    // CSW-86: Subsystem should be case-insensitive
     it("should encode and decode properly") {
-      val expectedJson = Json.parse("\"wfos\"")
+      val expectedJson = Json.parse("\"WFOS\"")
       val json         = JsonSupport.writes(wfos)
       val sub          = JsonSupport.reads[Subsystem](json)
       assert(sub == wfos)
@@ -42,8 +43,9 @@ class JsonTest extends FunSpec {
   describe("Test Prefix") {
     val prefix: Prefix = Prefix("wfos.filter.wheel")
 
+    // CSW-86: Subsystem should be case-insensitive
     it("should encode and decode properly") {
-      val expectedJson = Json.parse("\"wfos.filter.wheel\"")
+      val expectedJson = Json.parse("\"WFOS.filter.wheel\"")
       val json         = JsonSupport.writes(prefix)
       val sub          = JsonSupport.reads[Prefix](json)
       assert(sub == prefix)

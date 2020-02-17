@@ -7,16 +7,17 @@ import csw.event.cli.args.ArgsParser
 import csw.event.cli.wiring.Wiring
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.internal.commons.EventServiceConnection
-import csw.location.models.TcpRegistration
+import csw.location.api.models.TcpRegistration
 import csw.location.server.http.HTTPLocationService
 import csw.params.core.formats.JsonSupport
 import csw.params.events._
-import org.scalatest.{BeforeAndAfterEach, Matchers}
+import org.scalatest.BeforeAndAfterEach
 import play.api.libs.json.Json
 import redis.embedded.{RedisSentinel, RedisServer}
 
 import scala.collection.mutable
 import scala.io.Source
+import org.scalatest.matchers.should.Matchers
 
 trait SeedData extends HTTPLocationService with Matchers with BeforeAndAfterEach with EmbeddedRedis {
 

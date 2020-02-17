@@ -1,5 +1,5 @@
 ===============================================================================================================
-Prefix: nfiraos.trombone
+Prefix: NFIRAOS.trombone
 Name: tromboneAxisLowLimitAlarm
 Description: Warns when trombone axis has reached the low limit
 Location: south side

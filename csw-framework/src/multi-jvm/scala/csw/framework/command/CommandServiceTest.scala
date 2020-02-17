@@ -11,9 +11,10 @@ import csw.command.client.models.framework.LockingResponse
 import csw.command.client.models.framework.LockingResponse.LockAcquired
 import csw.common.utils.LockCommandFactory
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
+import csw.location.api.models
+import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.location.models.Connection.AkkaConnection
-import csw.location.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandIssue.IdNotAvailableIssue
 import csw.params.commands.CommandResponse._
@@ -132,7 +133,7 @@ class CommandServiceTest(ignore: Int)
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
       val assemblyLocF =
         locationService.resolve(
-          AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "Assembly"), ComponentType.Assembly)),
+          AkkaConnection(models.ComponentId(Prefix(Subsystem.WFOS, "Assembly"), ComponentType.Assembly)),
           5.seconds
         )
       val assemblyLocation: AkkaLocation = Await.result(assemblyLocF, 10.seconds).get
@@ -140,7 +141,7 @@ class CommandServiceTest(ignore: Int)
 
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
       val hcdLocF =
-        locationService.resolve(AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "HCD"), ComponentType.HCD)), 5.seconds)
+        locationService.resolve(AkkaConnection(models.ComponentId(Prefix(Subsystem.WFOS, "HCD"), ComponentType.HCD)), 5.seconds)
       val hcdLocation: AkkaLocation = Await.result(hcdLocF, 10.seconds).get
       val hcdCmdService             = CommandServiceFactory.make(hcdLocation)
 
@@ -150,9 +151,9 @@ class CommandServiceTest(ignore: Int)
       async {
         await(invalidCommandF) match {
           case Completed(_, _) =>
-          // Do Completed thing
+            // Do Completed thing
           case Invalid(_, _) =>
-          //issue shouldBe a[Invalid]
+            //issue shouldBe a[Invalid]
           case other =>
             // Unexpected result
             log.error(s"Some other response: $other")
@@ -198,8 +199,9 @@ class CommandServiceTest(ignore: Int)
 
       // DEOPSCSW-233: Hide implementation by having a CCS API
       // long running command which does not use matcher
-      // #queryLongRunning
       var longRunningRunId: Id = Id("blah") // Is updated below for use in later test
+
+      // #queryLongRunning
       val longRunningQueryResultF = async {
         // The following val is set so we can do query and work and complete later
         val longRunningF = assemblyCmdService.submit(longRunningSetup)
@@ -209,10 +211,10 @@ class CommandServiceTest(ignore: Int)
         await(assemblyCmdService.query(longRunningRunId)) match {
           case Started(runId) =>
             runId shouldEqual longRunningRunId
-          // happy case - no action needed
-          // Do some other work
+            // happy case - no action needed
+            // Do some other work
           case a =>
-          // log.error. This indicates that the command probably failed to start.
+            // log.error. This indicates that the command probably failed to start.
         }
 
         // Now wait for completion and result
@@ -246,6 +248,24 @@ class CommandServiceTest(ignore: Int)
       }
       Await.result(queryFinalF, timeout.duration) shouldBe Some(20)
       // #queryFinal
+
+      // #queryFinalWithSubmitAndWait
+      val encoderValue:Future[Option[Int]] = async {
+        // The following submit is made without saving the Future!
+        val runId = await(assemblyCmdService.submitAndWait(longRunningSetup)).runId
+
+        // Use queryFinal and runId to wait for completion and result
+        await(assemblyCmdService.queryFinal(runId)) match {
+          case Completed(_, result) =>
+            Some(result(encoder).head)
+
+          case otherResponse =>
+            // log a message?
+            None
+        }
+      }
+      Await.result(encoderValue, timeout.duration) shouldBe Some(20)
+      // #queryFinalWithSubmitAndWait
 
       //#oneway
       // `onewayCmd` is a sample to demonstrate oneway without any actions

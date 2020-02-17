@@ -20,9 +20,9 @@ import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.JComponentType;
 import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
-import csw.location.models.AkkaLocation;
-import csw.location.models.ComponentId;
-import csw.location.models.Connection.AkkaConnection;
+import csw.location.api.models.AkkaLocation;
+import csw.location.api.models.ComponentId;
+import csw.location.api.models.Connection.AkkaConnection;
 import csw.location.server.http.JHTTPLocationService;
 import csw.params.commands.CommandIssue;
 import csw.params.commands.CommandResponse;
@@ -101,7 +101,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
         FrameworkWiring wiring = FrameworkWiring.make(hcdActorSystem, redisClient);
         Await.result(Standalone.spawn(ConfigFactory.load("aps_hcd_java.conf"), wiring), new FiniteDuration(5, TimeUnit.SECONDS));
 
-        AkkaConnection akkaConnection = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.IRIS(), "Test_Component_Running_Long_Command_Java"), JComponentType.HCD()));
+        AkkaConnection akkaConnection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.IRIS, "Test_Component_Running_Long_Command_Java"), JComponentType.HCD));
         CompletableFuture<Optional<AkkaLocation>> eventualLocation = locationService.resolve(akkaConnection, java.time.Duration.ofSeconds(5));
         Optional<AkkaLocation> maybeLocation = eventualLocation.get();
         Assert.assertTrue(maybeLocation.isPresent());
@@ -354,6 +354,20 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Assert.assertTrue(submitAllResponse2.get(0) instanceof Completed);
         Assert.assertTrue(submitAllResponse2.get(1) instanceof Invalid);
         //#submitAllInvalid
+
+        //#queryF
+        // Test Test
+        Setup qfAllSetup1 = new Setup(prefix(), shortRunning(), Optional.empty());
+        Setup qfAllSetup2 = new Setup(prefix(), mediumRunning(), Optional.empty());
+        Setup qfAllSetup3 = new Setup(prefix(), longRunning(), Optional.empty());
+        CompletableFuture<SubmitResponse> shortSubmit = hcdCmdService.submitAndWait(qfAllSetup1, timeout);
+        CompletableFuture<SubmitResponse> mediumSubmit = hcdCmdService.submitAndWait(qfAllSetup2, timeout);
+        CompletableFuture<SubmitResponse> longSubmit = hcdCmdService.submitAndWait(qfAllSetup3, timeout);
+
+        
+
+
+        //#queryF
 
         //#subscribeCurrentState
         // Subscriber code

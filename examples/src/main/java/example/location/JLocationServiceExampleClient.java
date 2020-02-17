@@ -22,11 +22,11 @@ import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.IRegistrationResult;
 import csw.location.api.javadsl.JComponentType;
 import csw.location.api.javadsl.JConnectionType;
+import csw.location.api.models.*;
 import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
-import csw.location.models.*;
-import csw.location.models.Connection.AkkaConnection;
-import csw.location.models.Connection.HttpConnection;
+import csw.location.api.models.Connection.AkkaConnection;
+import csw.location.api.models.Connection.HttpConnection;
 import csw.location.server.internal.ServerWiring;
 import csw.location.server.scaladsl.RegistrationFactory;
 import csw.logging.api.javadsl.ILogger;
@@ -96,14 +96,14 @@ public class JLocationServiceExampleClient extends AbstractActor {
         //#Components-Connections-Registrations
 
         // dummy http connection
-        HttpConnection httpConnection = new HttpConnection(new ComponentId(Prefix.apply(JSubsystem.CSW(), "configuration"), JComponentType.Service()));
+        HttpConnection httpConnection = new HttpConnection(new ComponentId(new Prefix(JSubsystem.CSW, "configuration"), JComponentType.Service));
         HttpRegistration httpRegistration = new HttpRegistration(httpConnection, 8080, "path123");
         httpRegResult = locationService.register(httpRegistration).get();
 
         // ************************************************************************************************************
 
         // dummy HCD connection
-        AkkaConnection hcdConnection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.NFIRAOS(), "hcd1"), JComponentType.HCD()));
+        AkkaConnection hcdConnection = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "hcd1"), JComponentType.HCD));
         ActorRef actorRef = getContext().actorOf(Props.create(AbstractActor.class, () -> new AbstractActor() {
                     @Override
                     public Receive createReceive() {
@@ -125,7 +125,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         Behavior<String> behavior = Behaviors.setup(ctx -> Behaviors.same());
         akka.actor.typed.ActorRef<String> typedActorRef = Adapter.spawn(context(), behavior, "typed-actor-ref");
 
-        AkkaConnection assemblyConnection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.NFIRAOS(), "assembly1"), JComponentType.Assembly()));
+        AkkaConnection assemblyConnection = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "assembly1"), JComponentType.Assembly));
 
         // Register Typed ActorRef[String] with Location Service
         AkkaRegistration assemblyRegistration = new RegistrationFactory().akkaTyped(assemblyConnection, typedActorRef);
@@ -210,7 +210,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
 
         //#filtering-component
         // filter connections based on component type
-        List<Location> componentList = locationService.list(JComponentType.Assembly()).get();
+        List<Location> componentList = locationService.list(JComponentType.Assembly).get();
         log.info("Registered Assemblies:");
         for (Location loc : componentList) {
             log.info("--- " + connectionInfo(loc.connection()));
@@ -220,7 +220,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
 
         //#filtering-connection
         // filter connections based on connection type
-        List<Location> akkaList = locationService.list(JConnectionType.AkkaType()).get();
+        List<Location> akkaList = locationService.list(JConnectionType.AkkaType).get();
         log.info("Registered Akka connections:");
         for (Location loc : akkaList) {
             log.info("--- " + connectionInfo(loc.connection()));
@@ -228,9 +228,9 @@ public class JLocationServiceExampleClient extends AbstractActor {
         //#filtering-connection
 
         //#filtering-prefix
-        List<Location> akkaLocations = locationService.listByPrefix(Prefix.apply("nfiraos.ncc.assembly1")).get();
-        log.info("Registered akka locations for nfiraos.ncc.assembly1");
-        for (Location loc : akkaLocations) {
+        List<Location> locations = locationService.listByPrefix("NFIRAOS.ncc").get();
+        log.info("Registered akka locations for nfiraos.ncc");
+        for (Location loc : locations) {
             log.info("--- " + connectionInfo(loc.connection()));
         }
         //#filtering-prefix
@@ -320,8 +320,8 @@ public class JLocationServiceExampleClient extends AbstractActor {
     public static void main(String[] args) throws Exception {
         // http location service client expect that location server is running on local machine
         // here we are starting location http server so that httpLocationClient uses can be illustrated
-        ServerWiring locationWiring = new ServerWiring();
-        Await.result(locationWiring.locationHttpService().start(), new FiniteDuration(5, TimeUnit.SECONDS));
+        ServerWiring locationWiring = new ServerWiring(false);
+        Await.result(locationWiring.locationHttpService().start("127.0.0.1"), new FiniteDuration(5, TimeUnit.SECONDS));
 
         //#create-actor-system
         ActorSystem<SpawnProtocol.Command> typedSystem = ActorSystemFactory.remote(SpawnProtocol.create(), "csw-examples-locationServiceClient");

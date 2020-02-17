@@ -106,12 +106,15 @@ handler is called. The component should make any changes in its operation for of
 If a component is to transition from the offline state to the online state, the `onGoOnline`
 handler is called. The component should make any changes in its operation needed for online use.
 
-@@@ note
+@@@ note {title="Online vs Offline"}
 
 Unless implemented by the developer, there is no fundamental difference in the inherent behavior of a component when in 
 either state.  These two states provide a standard way for code to be implemented via these handlers for the transition
 from one state to another, allowing the component to prepare itself to be online (ready for operations) or offline (stowed 
 or dormant).  Any call to transition to a online/offline state when the component is already in that state is a no op.
+
+However, when offline, a component should take actions that make sense when offline. For instance, it should not
+follow the telescope motion or take actions as if online.  
 
 @@@
 
@@ -165,39 +168,59 @@ see the @ref:[Communication using Commands](../commons/command.md) page.
 The `validateCommand` handler allows the component to inspect a command and its parameters to determine if the actions related to the command
 can be executed or started. If it is okay, an `Accepted` response is returned.  If not, `Invalid` is returned. Validation may 
 also take into consideration the state of the component. For instance, if an Assembly or HCD can only handle one command
-at a time, `validateCommand` should return an return `Invalid` if a second command is received.
+at a time, `validateCommand` should return an return `Invalid` if a second command is received. The `Invalid` returns a `CommandIssue`, which
+are a number of pre-defined reasons for failing validation. These pre-defined reasons should be used whenever possible, but there is also an
+`OtherIssue` defined.
 
-The handler is called whenever a command is sent as a `Submit` or `Oneway` message to the component. If the handler returns `Accepted`,
-the corresponding `onSubmit` or `onOneway` handler is called.   This handler can also be called when the Command Service method
-`validateCommand` is used, to preview the acceptance of a command before it is sent using `submit` or `oneway`.  In this case, 
+@@@ note {title="I have an issue you should add!" }
+
+If you run across a validation issue you think should be added to `CommandIssue`, please submit a ticket to the CSW
+maintenance JIRA page at this [location](/login.jsp?permissionViolation=true&os_destination=%2Fprojects%2FCSW%2Fissues&page_caps=&user_role=). 
+
+@@@
+
+The handler is called whenever a command is sent as a `Submit`, `SubmitAndWait`, or `Oneway` message to the component. 
+If the handler returns `Accepted`, the corresponding `onSubmit` or `onOneway` handler is called.   
+This handler can also be called when the Command Service method `validateCommand` is used, to preview the acceptance of a command before it is sent using `submit` or `oneway`.  In this case, 
 the `onSubmit` or `onOneway` handler is not called.
 
 Assembly/Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/assembly/AssemblyComponentHandlers.scala) { #validateCommand-handler }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/sampleassembly/SampleAssemblyHandlers.scala) { #validate }
 
 Assembly/Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/assembly/JAssemblyComponentHandlers.java) { #validateCommand-handler }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/sampleassembly/JSampleAssemblyHandlers.java) { #validate }
 
 Hcd/Scala
-:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/hcd/HcdComponentHandlers.scala) { #validateCommand-handler }
+:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/samplehcd/SampleHcdHandlers.scala) { #validate }
 
 Hcd/Java
-:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/hcd/JHcdComponentHandlers.java) { #validateCommand-handler }
+:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/samplehcd/JSampleHcdHandlers.java) { #validate }
 
 ### onSubmit
 
-On receiving a command sent using the `submit` message, the `onSubmit` handler is invoked for a component only if the `validateCommand` handler returns `Accepted`. 
-The `onSubmit` handler returns a `SubmitResponse` indicating if the command is completed immediately, or if it is long-running by returning a `Started` response. 
-Completion of a long running command is then tracked using the `CommandResponseManager`, described in more detail in the
+On receiving a command sent using a `submit` or `submitAndWait` message, the `onSubmit` handler is invoked only if the `validateCommand` handler returns `Accepted`. 
+The `onSubmit` handler returns a `SubmitResponse` indicating if the command is completed immediately, or if it is long-running, by returning a `Started` response. 
+Completion of long-running commands is tracked using the `CommandResponseManager`, described in more detail in the
 @ref:[Managing Command State](managing-command-state.md) page.  
 
-The example shows one way to process `Setup` and `Observe` commands separately.
+The example shows one way to split `Setup` and `Observe` commands into separate handlers. In this case, the Assembly does not support `Observe` and returns
+`Invalid` with the `UnsupportedCommandIssue`. 
 
 Assembly/Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/assembly/AssemblyComponentHandlers.scala) { #onSubmit-handler }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/sampleassembly/SampleAssemblyHandlers.scala) { #submit-split }
 
 Assembly/Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/assembly/JAssemblyComponentHandlers.java) { #onSubmit-handler }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/sampleassembly/JSampleAssemblyHandlers.java) { #submit-split }
+
+Ideally, in the above example, lack of support for `Observe` should be determined in the `validateCommand`
+handler and checking in `onSetup` should not be needed.
+
+@@@ note {title="Invalid or Error?" }
+
+The `Invalid` response should be used when an issue is found with validation of the command or other issues prior to starting actions. 
+`Error` is reserved for issues with the actions started by the command.
+
+@@@
 
 ### onOneway
 
@@ -222,6 +245,15 @@ The diagnosticMode handler contains a `startTime` which is a @scaladoc[UTCTime](
 and a String parameter called `hint` with the name of the technical data mode. The component should read the hint and 
 publish events accordingly.
 
+The startTime is included so a diagnosticMode can be synchronized in time with diagnosticMode starting in other components.
+The Time Service can be used to schedule execution of some tasks at the specified startTime.
+Event Service publish API can also be used in order to start publishing events at the specified startTime.
+A component can only be in one technical data mode at a time. If the component is in one technical data, then on
+receiving command to go in another technical mode, the component should stop/halt the previous  
+diagnosticMode handler, and should enter the new technical data mode.
+Even if the component does not define any diagnostic modes, it must be prepared to receive and process diagnosticMode 
+handler without an error by completing with no changes. This is equivalent to leaving the handler empty.
+
 @@@note
 
 A component developer should be careful to make any changes in the component's internal state in any callbacks. For example,
@@ -230,15 +262,6 @@ A component developer should be careful to make any changes in the component's i
  use a `WorkerActor` to manage the state.
 
 @@@
-
-The startTime is included so a diagnosticMode can be synchronized in time with diagnosticMode starting in other components.
-The Time Service can be used to schedule execution of some tasks at the specified startTime.
-Event Service publish Api can also be used in order to start publishing events at the specified startTime.
-A component can only be in one technical data mode at a time. If the component is in one technical data, then on
-receiving command to go in another technical mode, the component should stop/halt the previous  
-diagnosticMode handler, and should enter the new technical data mode.
-Even if the component does not define any diagnostic modes, it must be prepared to receive and process diagnosticMode 
-handler without an error by completing with no changes.
 
 The supported diagnostic mode hints of a component are published in the component's model files.
 Unsupported hints should be rejected by a component.

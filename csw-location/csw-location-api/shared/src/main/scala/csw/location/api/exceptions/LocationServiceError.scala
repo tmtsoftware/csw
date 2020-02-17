@@ -1,6 +1,6 @@
 package csw.location.api.exceptions
 
-import csw.location.models.{Connection, Location}
+import csw.location.api.models.{Connection, Location}
 
 sealed abstract class LocationServiceError(msg: String) extends RuntimeException(msg)
 

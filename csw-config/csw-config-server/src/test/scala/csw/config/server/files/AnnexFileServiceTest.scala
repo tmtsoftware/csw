@@ -6,9 +6,11 @@ import csw.config.api.ConfigData
 import csw.config.server.ServerWiring
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.commons.TestFutureExtension.RichFuture
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class AnnexFileServiceTest extends FunSuite with Matchers with BeforeAndAfterAll {
+class AnnexFileServiceTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
 
   private val wiring = new ServerWiring
 

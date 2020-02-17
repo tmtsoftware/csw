@@ -1,8 +1,9 @@
 package csw.location
 
+import csw.location.api.models
+import csw.location.api.models.Connection.{HttpConnection, TcpConnection}
+import csw.location.api.models.{ComponentId, ComponentType, HttpRegistration, TcpRegistration}
 import csw.location.helpers.{LSNodeSpec, OneMemberAndSeed}
-import csw.location.models.Connection.{HttpConnection, TcpConnection}
-import csw.location.models.{ComponentId, ComponentType, HttpRegistration, TcpRegistration}
 import csw.location.server.commons.TestFutureExtension.RichFuture
 import csw.prefix.models.{Prefix, Subsystem}
 import org.scalatest.BeforeAndAfterEach
@@ -27,7 +28,7 @@ class LocationServiceTest(ignore: Int, mode: String)
 
     val httpPort         = 81
     val httpPath         = "/test/hcd"
-    val httpConnection   = HttpConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneHcd"), ComponentType.HCD))
+    val httpConnection   = HttpConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneHcd"), ComponentType.HCD))
     val httpRegistration = HttpRegistration(httpConnection, httpPort, httpPath)
 
     runOn(seed) {

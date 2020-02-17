@@ -1,6 +1,6 @@
 package csw.location.api.messages
 
-import csw.location.models.Connection
+import csw.location.api.models.Connection
 
 sealed trait LocationWebsocketMessage
 

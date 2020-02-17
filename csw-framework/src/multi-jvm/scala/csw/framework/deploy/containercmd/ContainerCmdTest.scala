@@ -6,6 +6,7 @@ import java.nio.file.{Files, Path, Paths}
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.ActorRef
+import akka.actor.typed.scaladsl.AskPattern._
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
@@ -24,21 +25,21 @@ import csw.config.client.scaladsl.ConfigClientFactory
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.mocks.MockedAuthentication
 import csw.config.server.{ServerWiring, Settings}
+import csw.location.api.models
+import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.location.models.ComponentType.Container
-import csw.location.models.Connection.AkkaConnection
-import csw.location.models.{ComponentId, ComponentType}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse.Invalid
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, StateName}
-import csw.prefix.models.Subsystem.CSW
+import csw.prefix.models.Subsystem.{CSW, Container}
 import csw.prefix.models.{Prefix, Subsystem}
 
 import scala.concurrent.duration.DurationLong
-import scala.concurrent.{Await, ExecutionContextExecutor}
+import scala.concurrent.{Await, ExecutionContextExecutor, Future}
 import scala.io.Source
 import scala.util.control.NonFatal
 
@@ -85,6 +86,19 @@ class ContainerCmdTest(ignore: Int)
     super.afterAll()
   }
 
+  private def resolveContainer(name: String): ActorRef[ContainerMessage] = {
+    val maybeContainerLocF = locationService.resolve(
+      AkkaConnection(ComponentId(Prefix(Container, name), ComponentType.Container)),
+      5.seconds
+    )
+
+    maybeContainerLocF.await.get.containerRef
+  }
+
+  private def resolveEtonHcd(): Future[Option[AkkaLocation]] = {
+    locationService.resolve(AkkaConnection(models.ComponentId(Prefix(Subsystem.IRIS, "Eton"), ComponentType.HCD)), 2.seconds)
+  }
+
   def createStandaloneTmpFile(): Path = {
     val hcdConfiguration       = scala.io.Source.fromResource("eaton_hcd_standalone.conf").mkString
     val standaloneConfFilePath = Files.createTempFile("eaton_hcd_standalone", ".conf")
@@ -111,7 +125,7 @@ class ContainerCmdTest(ignore: Int)
       )
 
       enterBarrier("config-file-uploaded")
-      enterBarrier("running")
+      enterBarrier("container-started")
 
       val maybeContainerLoc =
         locationService
@@ -122,6 +136,24 @@ class ContainerCmdTest(ignore: Int)
 
       //DEOPSCSW-430: Update AkkaLocation model to take Prefix model instead of Option[String]
       maybeContainerLoc.get.prefix shouldBe Prefix(s"${Container.entryName}.LGSF_Container")
+
+      val containerRef = maybeContainerLoc.get.containerRef
+
+      val componentsProbe               = TestProbe[Components]
+      val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
+
+      containerRef ! GetComponents(componentsProbe.ref)
+      val laserContainerComponents = componentsProbe.expectMessageType[Components].components
+      laserContainerComponents.size shouldBe 3
+
+      // check that all the components within supervisor moves to Running lifecycle state
+      laserContainerComponents
+        .foreach { component =>
+          component.supervisor ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
+          supervisorLifecycleStateProbe.expectMessage(SupervisorLifecycleState.Running)
+        }
+
+      enterBarrier("running")
 
       enterBarrier("offline")
       enterBarrier("before-shutdown")
@@ -138,29 +170,21 @@ class ContainerCmdTest(ignore: Int)
 
       // only file path is provided, by default - file will be fetched from configuration service
       // and will be considered as container configuration.
-      val args         = Array("/laser_container.conf")
-      val containerRef = containerCmd.start(args).asInstanceOf[ActorRef[ContainerMessage]]
+      val args = Array("/laser_container.conf")
+      containerCmd.start(args).asInstanceOf[ActorRef[ContainerMessage]]
+
+      val containerRef = resolveContainer("LGSF_Container")
 
       assertThatContainerIsRunning(containerRef, testProbe, 5.seconds)
 
-      val componentsProbe               = TestProbe[Components]
-      val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
-
-      containerRef ! GetComponents(componentsProbe.ref)
-      val laserContainerComponents = componentsProbe.expectMessageType[Components].components
-      laserContainerComponents.size shouldBe 3
-
-      // check that all the components within supervisor moves to Running lifecycle state
-      laserContainerComponents
-        .foreach { component =>
-          component.supervisor ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
-          supervisorLifecycleStateProbe.expectMessage(SupervisorLifecycleState.Running)
-        }
+      enterBarrier("container-started")
       enterBarrier("running")
 
+      val laserContainerComponentsF: Future[Components] = containerRef ? (x => GetComponents(x))
+      val laserContainerComponents                      = laserContainerComponentsF.await.components
+
       // resolve and send message to component running in different jvm or on different physical machine
-      val etonSupervisorF =
-        locationService.resolve(AkkaConnection(ComponentId(Prefix(Subsystem.IRIS, "Eton"), ComponentType.HCD)), 2.seconds)
+      val etonSupervisorF        = resolveEtonHcd()
       val etonSupervisorLocation = Await.result(etonSupervisorF, 15.seconds).get
 
       val etonSupervisorTypedRef = etonSupervisorLocation.componentRef
@@ -198,7 +222,15 @@ class ContainerCmdTest(ignore: Int)
 
       etonSupervisorTypedRef ! Lifecycle(GoOffline)
       Thread.sleep(500)
+
       enterBarrier("offline")
+
+      val supervisorRef = resolveEtonHcd().await.get.componentRef
+      Thread.sleep(500)
+
+      val lifecycleProbe = TestProbe[SupervisorLifecycleState]
+      supervisorRef ! GetSupervisorLifecycleState(lifecycleProbe.ref)
+      lifecycleProbe.expectMessage(SupervisorLifecycleState.RunningOffline)
 
       enterBarrier("before-shutdown")
       laserAssemblySupervisor ! ComponentStateSubscription(Subscribe(laserCompStateProbe.ref))
@@ -224,16 +256,16 @@ class ContainerCmdTest(ignore: Int)
       // when sbt-assembly creates fat jar
       val standaloneConfFilePath = createStandaloneTmpFile()
 
-      val args          = Array("--standalone", "--local", standaloneConfFilePath.toString)
-      val supervisorRef = containerCmd.start(args).asInstanceOf[ActorRef[ComponentMessage]]
+      val args = Array("--standalone", "--local", standaloneConfFilePath.toString)
+      containerCmd.start(args).asInstanceOf[ActorRef[ComponentMessage]]
+
+      val supervisorRef = resolveEtonHcd().await.get.componentRef
 
       assertThatSupervisorIsRunning(supervisorRef, testProbe, 5.seconds)
+      enterBarrier("container-started")
       enterBarrier("running")
 
       enterBarrier("offline")
-      Thread.sleep(500)
-      supervisorRef ! GetSupervisorLifecycleState(testProbe.ref)
-      testProbe.expectMessage(SupervisorLifecycleState.RunningOffline)
 
       enterBarrier("before-shutdown")
       supervisorRef ! Shutdown

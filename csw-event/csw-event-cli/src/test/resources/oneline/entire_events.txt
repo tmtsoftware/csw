@@ -1,21 +1,21 @@
 ===============================================================================================================
-EventKey: wfos.prog.cloudcover.system_2 | Id: -1
+EventKey: WFOS.prog.cloudcover.system_2 | Id: -1
 
-[ERROR] No events published for key: [wfos.prog.cloudcover.system_2]
+[ERROR] No events published for key: [WFOS.prog.cloudcover.system_2]
 ===============================================================================================================
-EventKey: wfos.prog.cloudcover.system_2 | Id: 1
-
-epoch = 1950.0
-struct-1/dec = "32:33:34.4"
-struct-1/ra = "12:13:14.1"
-===============================================================================================================
-EventKey: wfos.prog.cloudcover.system_2 | Id: 2
+EventKey: WFOS.prog.cloudcover.system_2 | Id: 1
 
 epoch = 1950.0
 struct-1/dec = "32:33:34.4"
 struct-1/ra = "12:13:14.1"
 ===============================================================================================================
-EventKey: wfos.prog.cloudcover.system_2 | Id: 3
+EventKey: WFOS.prog.cloudcover.system_2 | Id: 2
+
+epoch = 1950.0
+struct-1/dec = "32:33:34.4"
+struct-1/ra = "12:13:14.1"
+===============================================================================================================
+EventKey: WFOS.prog.cloudcover.system_2 | Id: 3
 
 epoch = 1950.0
 struct-1/dec = "32:33:34.4"

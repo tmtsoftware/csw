@@ -42,11 +42,13 @@ pipeline {
                             allowMissing         : true,
                             alwaysLinkToLastBuild: false,
                             keepAll              : true,
-                            reportDir            : './target/scala-2.12/scoverage-report',
+                            reportDir            : './target/scala-2.13/scoverage-report',
                             reportFiles          : 'index.html',
                             reportName           : "Scoverage Report"
                     ])
-                    sh "rm -rf csw-params/js/target csw-time/csw-time-core/js/target csw--logging/csw-logging-models/.js/target csw-location/csw-location-models/.js/target csw-config/csw-config-models/.js/target csw-alarm/csw-alarm-models/.js/target csw-time/csw-time-clock/js/target"
+                    sh "rm -rf csw-params/js/target csw-time/csw-time-core/js/target csw--logging/csw-logging-models/.js/target csw-location/csw-location-api/js/target/ " +
+                            "csw-config/csw-config-models/.js/target csw-alarm/csw-alarm-models/.js/target csw-time/csw-time-clock/js/target csw-prefix/js/target/ " +
+                            "csw-admin/csw-admin-api/.js/target csw-command/csw-command-api/js/target/"
                 }
             }
         }
@@ -54,7 +56,7 @@ pipeline {
         // These tests cover the scenario of multiple components in multiple containers on same machine.
         stage('Multi-Jvm Test') {
             steps {
-                sh "sbt ';set every enableFatalWarnings := true; csw-aas-http/multi-jvm:test'"
+                sh "sbt ';set every enableFatalWarnings := true; integration/multi-jvm:test'"
                 sh "sbt ';set every enableFatalWarnings := true; csw-location-server/multi-jvm:test'"
                 sh "sbt ';set every enableFatalWarnings := true; csw-config-client/multi-jvm:test'"
                 sh "sbt ';set every enableFatalWarnings := true; csw-config-cli/multi-jvm:test'"
@@ -81,11 +83,11 @@ pipeline {
             }
         }
 
-        stage('Bintray Publish') {
-            steps {
-                sh "./publish.sh"
-            }
-        }
+//        stage('Bintray Publish') {
+//            steps {
+//                sh "./publish.sh"
+//            }
+//        }
     }
     post {
         always {

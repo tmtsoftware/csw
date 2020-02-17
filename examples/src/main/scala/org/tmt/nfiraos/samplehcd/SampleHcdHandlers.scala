@@ -5,7 +5,7 @@ import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.models.TrackingEvent
+import csw.location.api.models.TrackingEvent
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
 import csw.params.core.generics.{Key, KeyType, Parameter}
@@ -13,6 +13,7 @@ import csw.params.core.models.Id
 import csw.params.events.{EventName, SystemEvent}
 import csw.time.core.models.UTCTime
 
+import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 /**
@@ -30,7 +31,7 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
 
   //#worker-actor
   sealed trait WorkerCommand
-  case class Sleep(controlCommand: Setup, runId: Id, timeInMillis: Long) extends WorkerCommand
+  case class Sleep(runId: Id, timeInMillis: Long) extends WorkerCommand
 
   private val workerActor =
     ctx.spawn(
@@ -39,8 +40,10 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
           case sleep: Sleep =>
             log.trace(s"WorkerActor received sleep command with time of ${sleep.timeInMillis} ms")
             // simulate long running command
-            Thread.sleep(sleep.timeInMillis)
-            commandResponseManager.updateCommand(CommandResponse.Completed(sleep.runId))
+            val when: UTCTime = UTCTime.after(FiniteDuration(sleep.timeInMillis, MILLISECONDS))
+            timeServiceScheduler.scheduleOnce(when) {
+              commandResponseManager.updateCommand(CommandResponse.Completed(sleep.runId))
+            }
           case _ => log.error("Unsupported message type")
         }
         Behaviors.same
@@ -119,20 +122,20 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
 
     log.info(s"command payload: ${sleepTimeParam.keyName} = $sleepTimeInMillis")
 
-    workerActor ! Sleep(setup, runId, sleepTimeInMillis)
+    workerActor ! Sleep(runId, sleepTimeInMillis)
 
     Started(runId)
   }
   //#onSetup
+
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {}
+
+  override def onOperationsMode(): Unit = {}
 
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
 
   override def onGoOffline(): Unit = {}
 
   override def onGoOnline(): Unit = {}
-
-  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {}
-
-  override def onOperationsMode(): Unit = {}
 
 }

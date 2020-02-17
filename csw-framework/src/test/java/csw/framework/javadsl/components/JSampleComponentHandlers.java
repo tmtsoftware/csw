@@ -13,7 +13,7 @@ import csw.event.api.javadsl.IEventService;
 import csw.framework.CurrentStatePublisher;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
-import csw.location.models.TrackingEvent;
+import csw.location.api.models.TrackingEvent;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.*;
 import csw.params.commands.CommandResponse.*;
@@ -35,6 +35,7 @@ import java.util.concurrent.*;
 
 import static csw.common.components.command.ComponentStateForCommand.*;
 
+@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "unused"})
 public class JSampleComponentHandlers extends JComponentHandlers {
 
     // Demonstrating logger accessibility in Java Component handlers
@@ -144,15 +145,10 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         return new CommandResponse.Completed(runId);
     }
 
-    //#addOrUpdateCommand
+    //#updateCommand
     private CommandResponse.SubmitResponse crmAddOrUpdate(Setup setup, Id runId) {
         // This simulates some worker task doing something that finishes after onSubmit returns
-        Runnable task = new Runnable() {
-            @Override
-            public void run() {
-                commandResponseManager.updateCommand(new Completed(runId));
-            }
-        };
+        Runnable task = () -> commandResponseManager.updateCommand(new Completed(runId));
 
         // Wait a bit and then set CRM to Completed
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
@@ -161,7 +157,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         // Return Started from onSubmit
         return new Started(runId);
     }
-    //#addOrUpdateCommand
+    //#updateCommand
 
     private void processCurrentStateOnewayCommand(Setup setup) {
         //#subscribeCurrentState
@@ -197,15 +193,14 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
             // Set CRM to Error after 1 second
             sendCRM(1, new CommandResponse.Error(runId, "Unknown Error occurred"));
-            return new CommandResponse.Started(runId);
         } else {
             Parameter<Integer> parameter = JKeyType.IntKey().make("encoder").set(20);
             Result result = new Result().add(parameter);
 
             // Returns Started and completes through CRM after 1 second
             sendCRM(1, new CommandResponse.Completed(runId, result));
-            return new Started(runId);
         }
+        return new Started(runId);
     }
 
     private void parameterDelay(Id runId, Setup setup) {
@@ -216,9 +211,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
 
     // This test routine just delays before updating CRM - delay is always in seconds
     private void sendCRM(long delay, CommandResponse.SubmitResponse response) {
-        Runnable task = () -> {
-            commandResponseManager.updateCommand(response);
-        };
+        Runnable task = () -> commandResponseManager.updateCommand(response);
         // Wait a bit and then set CRM to response
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         executor.schedule(task, delay, TimeUnit.SECONDS);
@@ -261,7 +254,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     @Override
     public void onDiagnosticMode(UTCTime startTime, String hint) {
         if (hint.equals("engineering")) {
-            var event = new SystemEvent(new Prefix(JSubsystem.TCS(), "prefix"), new EventName("eventName"))
+            var event = new SystemEvent(Prefix.apply(JSubsystem.TCS, "prefix"), new EventName("eventName"))
                     .add(JKeyType.IntKey().make("diagnostic-data").set(1));
             diagModeCancellable.map(Cancellable::cancel); // cancel previous diagnostic publishing
             diagModeCancellable = Optional.of(

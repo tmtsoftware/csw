@@ -3,18 +3,14 @@ POST http://localhost:7654/post-endpoint
 Content-Type: application/json
 
 {
-  "Register": {
-    "HttpRegistration": {
-      "connection": {
-        "prefix": "csw.server",
-        "componentType": "service",
-        "connectionType": "http"
-      },
-      "port": 1234,
-      "path": "root/path1"
-    }
+  "_type" : "Unregister",
+  "connection" : {
+    "prefix" : "TCS.filter.wheel",
+    "componentType" : "hcd",
+    "connectionType" : "http"
   }
 }
+
 ###
 // #register
 
@@ -35,6 +31,7 @@ Content-Type: application/json
     }
   }
 }
+
 ###
 // #re-register
 
@@ -54,6 +51,7 @@ Content-Type: application/json
     }
   }
 }
+
 ###
 // #invalid-register
 
@@ -62,12 +60,14 @@ POST http://localhost:7654/post-endpoint
 Content-Type: application/json
 
 {
-  "Unregister": {
-    "prefix": "csw.server",
-    "componentType": "service",
-    "connectionType": "http"
+  "_type" : "Unregister",
+  "connection" : {
+    "prefix" : "tcs.filter.wheel",
+    "componentType" : "hcd",
+    "connectionType" : "http"
   }
 }
+
 ###
 // #un-register
 
@@ -109,7 +109,7 @@ POST http://localhost:7654/post-endpoint
 Content-Type: application/json
 
 {
-  "ListEntries": {}
+  "_type": "ListEntries"
 }
 
 ###

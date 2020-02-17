@@ -1,50 +1,49 @@
 {
-  "DemandState": {
-    "prefix": "wfos.blue.filter",
-    "stateName": "testStateName",
-    "paramSet": [
-      {
-        "CharKey": {
-          "keyName": "charKey",
-          "values": [
-            65,
-            66,
-            67
-          ],
-          "units": "NoUnits"
-        }
-      },
-      {
-        "IntKey": {
-          "keyName": "intKey",
-          "values": [
-            1,
-            2,
-            3
-          ],
-          "units": "meter"
-        }
-      },
-      {
-        "BooleanKey": {
-          "keyName": "booleanKey",
-          "values": [
-            true,
-            false
-          ],
-          "units": "NoUnits"
-        }
-      },
-      {
-        "UTCTimeKey": {
-          "keyName": "utcTimeKey",
-          "values": [
-            "1970-01-01T00:00:00Z",
-            "2017-09-04T16:28:00.123456789Z"
-          ],
-          "units": "second"
-        }
+  "_type": "DemandState",
+  "prefix": "WFOS.blue.filter",
+  "stateName": "testStateName",
+  "paramSet": [
+    {
+      "CharKey": {
+        "keyName": "charKey",
+        "values": [
+          65,
+          66,
+          67
+        ],
+        "units": "NoUnits"
       }
-    ]
-  }
+    },
+    {
+      "IntKey": {
+        "keyName": "intKey",
+        "values": [
+          1,
+          2,
+          3
+        ],
+        "units": "meter"
+      }
+    },
+    {
+      "BooleanKey": {
+        "keyName": "booleanKey",
+        "values": [
+          true,
+          false
+        ],
+        "units": "NoUnits"
+      }
+    },
+    {
+      "UTCTimeKey": {
+        "keyName": "utcTimeKey",
+        "values": [
+          "1970-01-01T00:00:00Z",
+          "2017-09-04T16:28:00.123456789Z"
+        ],
+        "units": "second"
+      }
+    }
+  ]
 }

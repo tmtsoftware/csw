@@ -140,7 +140,7 @@ For component developers, the scheduler API is provided as a @scaladoc[TimeServi
 object in the `CswContext` object injected into the ComponentHandlers class provided by the framework.  
 
 If you are not using csw-framework, you can create @scaladoc[TimeServiceScheduler](csw/time/scheduler/api/TimeServiceScheduler)
-using @scaladoc[TimeServiceSchedulerFactory](csw/time/scheduler/TimeServiceSchedulerFactory$) as follows:
+using @scaladoc[TimeServiceSchedulerFactory](csw/time/scheduler/TimeServiceSchedulerFactory) as follows:
 
 Scala
 :   @@snip [TimeSchedulerExamples.scala](../../../../examples/src/main/scala/example/time/SchedulerExamples.scala) { #create-scheduler }
@@ -207,10 +207,10 @@ See @ref:[Time Service Technical Description](../technical/time/time.md).
 
 ## Source code for TMTTime examples
 
-* @github[Scala Example](../../../../examples/src/main/scala/example/time/TMTTimeExamples.scala)
-* @github[Java Example](../../../../examples/src/main/java/example/time/JTMTTimeExamples.java)
+* [Scala Example]($github.base_url$/examples/src/main/scala/example/time/TMTTimeExamples.scala)
+* [Java Example]($github.base_url$/examples/src/main/java/example/time/JTMTTimeExamples.java)
 
 ## Source code for Scheduler examples
 
-* @github[Scala Example](../../../../examples/src/main/scala/example/time/SchedulerExamples.scala)
-* @github[Java Example](../../../../examples/src/main/java/example/time/JSchedulerExamples.java)
+* [Scala Example]($github.base_url$/examples/src/main/scala/example/time/SchedulerExamples.scala)
+* [Java Example]($github.base_url$/examples/src/main/java/example/time/JSchedulerExamples.java)

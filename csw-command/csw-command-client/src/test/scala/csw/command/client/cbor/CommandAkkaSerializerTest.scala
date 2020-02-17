@@ -25,7 +25,7 @@ import csw.command.client.models.framework.SupervisorLifecycleState._
 import csw.command.client.models.framework.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.command.client.models.framework._
 import csw.commons.ResourceReader
-import csw.location.models.ComponentType
+import csw.location.api.models.ComponentType
 import csw.logging.models.{Level, LogMetadata}
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
@@ -37,12 +37,14 @@ import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.prefix.models.Prefix
 import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.prop.Tables.Table
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import org.scalatest.BeforeAndAfterAll
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class CommandAkkaSerializerTest extends FunSuite with Matchers with BeforeAndAfterAll {
+class CommandAkkaSerializerTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
 
   private final implicit val system: ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "example")
   private final val serialization                                       = SerializationExtension(system.toClassic)

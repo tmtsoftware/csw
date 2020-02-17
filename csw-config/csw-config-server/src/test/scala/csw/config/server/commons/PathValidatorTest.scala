@@ -1,10 +1,11 @@
 package csw.config.server.commons
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 // DEOPSCSW-47: Unique name for configuration file
 // DEOPSCSW-135: Validation of suffix for active and sha files
-class PathValidatorTest extends FunSuite with Matchers {
+class PathValidatorTest extends AnyFunSuite with Matchers {
 
   test("should return false for invalid path") {
 

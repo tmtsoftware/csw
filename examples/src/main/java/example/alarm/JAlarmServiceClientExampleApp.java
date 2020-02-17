@@ -7,23 +7,21 @@ import csw.alarm.api.javadsl.IAlarmService;
 import csw.alarm.api.javadsl.JAlarmSeverity;
 import csw.alarm.client.AlarmServiceFactory;
 import csw.location.api.javadsl.ILocationService;
+import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import static csw.alarm.models.Key.AlarmKey;
-import static csw.prefix.javadsl.JSubsystem.NFIRAOS;
 
 public class JAlarmServiceClientExampleApp {
 
     private ActorSystem<SpawnProtocol.Command> actorSystem;
     private ILocationService jLocationService;
 
-    public JAlarmServiceClientExampleApp(akka.actor.typed.ActorSystem<SpawnProtocol.Command> actorSystem, ILocationService locationService) throws ExecutionException, InterruptedException {
+    public JAlarmServiceClientExampleApp(akka.actor.typed.ActorSystem<SpawnProtocol.Command> actorSystem, ILocationService locationService) {
         this.actorSystem = actorSystem;
         this.jLocationService = locationService;
-
     }
 
     //#create-java-api
@@ -35,7 +33,7 @@ public class JAlarmServiceClientExampleApp {
     //#create-java-api
 
     //#setSeverity-java
-    private AlarmKey alarmKey = new AlarmKey(Prefix.apply(NFIRAOS(), "trombone"), "tromboneAxisLowLimitAlarm");
-    Future<Done> doneF = jclientAPI1.setSeverity(alarmKey, JAlarmSeverity.Okay());
+    private AlarmKey alarmKey = new AlarmKey(Prefix.apply(JSubsystem.NFIRAOS, "trombone"), "tromboneAxisLowLimitAlarm");
+    Future<Done> doneF = jclientAPI1.setSeverity(alarmKey, JAlarmSeverity.Okay);
     //#setSeverity-java
 }

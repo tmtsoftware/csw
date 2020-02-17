@@ -15,11 +15,12 @@ import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.ObsId
 import csw.prefix.models.{Prefix, Subsystem}
 import org.mockito.MockitoSugar
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 // DEOPSCSW-222: Locking a component for a specific duration
 // DEOPSCSW-301: Support UnLocking
-class LockManagerTest extends FunSuite with MockitoSugar with Matchers {
+class LockManagerTest extends AnyFunSuite with MockitoSugar with Matchers {
 
   private val prefix        = Prefix("wfos.blue.filter")
   private val invalidPrefix = Prefix("wfos.blue.filter.invalid")

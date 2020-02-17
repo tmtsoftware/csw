@@ -7,7 +7,7 @@ import csw.database.commons.DatabaseServiceConnection;
 import csw.database.javadsl.JooqHelper;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
-import csw.location.models.TcpRegistration;
+import csw.location.api.models.TcpRegistration;
 import csw.location.server.http.JHTTPLocationService;
 import org.jooq.DSLContext;
 import org.junit.AfterClass;
@@ -45,7 +45,6 @@ public class JDatabaseServiceFactoryTest extends JUnitSuite {
     @BeforeClass
     public static void setup() throws ExecutionException, InterruptedException, TimeoutException {
         typedSystem = akka.actor.typed.ActorSystem.apply(SpawnProtocol.create(), "test");
-//        untypedSystem = Adapter.toClassic(typedSystem);
 
         dbFactory = DBTestHelper.dbServiceFactory(typedSystem);
         postgres = DBTestHelper.postgres(port); // 0 is random port

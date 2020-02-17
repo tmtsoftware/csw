@@ -28,7 +28,7 @@ public class JStateVariableTest extends JUnitSuite {
     private final Parameter<Integer> encoderParam = encoderIntKey.set(22, 33);
     private final Parameter<String> epochStringParam = epochStringKey.set("A", "B");
 
-    private final Prefix prefix = new Prefix(JSubsystem.WFOS(), "red.detector");
+    private final Prefix prefix = Prefix.apply(JSubsystem.WFOS, "red.detector");
 
     @Test
     public void shouldAbleToCreateCurrentState() {

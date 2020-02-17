@@ -5,10 +5,10 @@ import akka.actor.typed.SpawnProtocol;
 import com.typesafe.config.ConfigFactory;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.JComponentType;
+import csw.location.api.models.AkkaLocation;
+import csw.location.api.models.ComponentId;
+import csw.location.api.models.Connection.*;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
-import csw.location.models.AkkaLocation;
-import csw.location.models.ComponentId;
-import csw.location.models.Connection.AkkaConnection;
 import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
 import csw.testkit.FrameworkTestKit;
@@ -56,7 +56,7 @@ public class JTestKitsExampleTest extends JUnitSuite {
 
         //#spawn-using-testkit
 
-        AkkaConnection connection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.NFIRAOS(), "JSampleAssembly"), JComponentType.Assembly()));
+        AkkaConnection connection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.NFIRAOS, "JSampleAssembly"), JComponentType.Assembly));
         Optional<AkkaLocation> akkaLocation = locationService.resolve(connection, Duration.ofSeconds(5)).get();
 
         Assert.assertTrue(akkaLocation.isPresent());

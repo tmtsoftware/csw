@@ -31,7 +31,9 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-benchmark`,
   `romaine`,
   `examples`,
-  `integration`
+  `integration`,
+  `csw-contract`,
+  `csw-services`
 )
 
 lazy val unidocExclusions: Seq[ProjectReference] = Seq(
@@ -48,7 +50,6 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-params`.js,
   `csw-prefix`.js,
   `csw-command-api`.js,
-  `csw-location-models`.js,
   `csw-location-api`.js,
   `csw-admin-api`.js,
   `csw-alarm-models`.js,
@@ -58,7 +59,9 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-benchmark`,
   `romaine`,
   `examples`,
-  `integration`
+  `integration`,
+  `csw-contract`,
+  `csw-services`
 )
 
 lazy val githubReleases: Seq[ProjectReference] = Seq(
@@ -83,7 +86,7 @@ lazy val multiJvmProjects: Seq[ProjectReference] = Seq(
 /* ================= Root Project ============== */
 lazy val `csw` = project
   .in(file("."))
-  .enablePlugins(NoPublish, UnidocSitePlugin, GithubPublishPlugin, GitBranchPrompt, GithubRelease, CoursierPlugin)
+  .enablePlugins(NoPublish, UnidocSitePlugin, GithubPublishPlugin, GitBranchPrompt, GithubRelease, CoursierPlugin, ContractPlugin)
   .disablePlugins(BintrayPlugin)
   .aggregate(aggregatedProjects: _*)
   .settings(DocSettings.makeSiteMappings(docs))
@@ -92,7 +95,19 @@ lazy val `csw` = project
   .settings(Settings.multiJvmTestTask(multiJvmProjects))
   .settings(GithubRelease.githubReleases(githubReleases))
   .settings(
-    bootstrap in Coursier := CoursierPlugin.bootstrapTask(githubReleases).value
+    bootstrap in Coursier := CoursierPlugin.bootstrapTask(githubReleases).value,
+    generateContract := ContractPlugin.generate(`csw-contract`).value
+  )
+
+lazy val `csw-contract` = project
+  .dependsOn(
+    `csw-location-api`.jvm,
+    `csw-command-api`.jvm,
+    `csw-command-client`,
+    `csw-params`.jvm
+  )
+  .settings(
+    libraryDependencies ++= Dependencies.Contract.value
   )
 
 lazy val `csw-prefix` = crossProject(JSPlatform, JVMPlatform)
@@ -130,8 +145,10 @@ lazy val `csw-admin-impl` = project
 lazy val `csw-admin-api` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .in(file("csw-admin/csw-admin-api"))
-  .dependsOn(`csw-logging-models`, `csw-location-models`)
+  .dependsOn(`csw-logging-models`, `csw-location-api`)
   .enablePlugins(PublishBintray)
+  //  the following setting was required by IntelliJ as it can not handle cross-compiled Akka types
+  .jsSettings(SettingKey[Boolean]("ide-skip-project") := true)
   .jvmConfigure(_.enablePlugins(MaybeCoverage, GenJavadocPlugin))
   .settings(fork := false)
 
@@ -140,8 +157,6 @@ lazy val `csw-admin-api` = crossProject(JSPlatform, JVMPlatform)
 lazy val `csw-location` = project
   .in(file("csw-location"))
   .aggregate(
-    `csw-location-models`.jvm,
-    `csw-location-models`.js,
     `csw-location-api`.jvm,
     `csw-location-api`.js,
     `csw-location-server`,
@@ -149,25 +164,16 @@ lazy val `csw-location` = project
     `csw-location-agent`
   )
 
-lazy val `csw-location-models` = crossProject(JSPlatform, JVMPlatform)
-  .crossType(CrossType.Pure)
-  .in(file("csw-location/csw-location-models"))
-  .enablePlugins(PublishBintray)
-  .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
-  .dependsOn(`csw-prefix`)
-  .settings(fork := false)
-  .settings(libraryDependencies ++= Dependencies.LocationModels.value)
-
 lazy val `csw-location-api` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("csw-location/csw-location-api"))
   .enablePlugins(PublishBintray)
+  .dependsOn(`csw-prefix`)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
-  .dependsOn(`csw-location-models`)
   .jvmConfigure(_.dependsOn(`csw-logging-client`).enablePlugins(MaybeCoverage))
   //  the following setting was required by IntelliJ as it can not handle cross-compiled Akka types
   .jsSettings(SettingKey[Boolean]("ide-skip-project") := true)
-  .settings(libraryDependencies += MSocket.`msocket-api`.value)
+  .settings(libraryDependencies ++= Dependencies.LocationApi.value)
   .settings(fork := false)
 
 lazy val `csw-location-server` = project
@@ -175,6 +181,7 @@ lazy val `csw-location-server` = project
   .dependsOn(
     `csw-location-api`.jvm,
     `csw-logging-client`,
+    `csw-aas-http`,
     `csw-network-utils`,
     `csw-location-client` % "test->compile;multi-jvm->compile",
     `csw-commons`         % "compile->compile;test->test"
@@ -226,7 +233,7 @@ lazy val `csw-config-models` = crossProject(JSPlatform, JVMPlatform)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
   .dependsOn(`csw-params`)
   .settings(fork := false)
-  .settings(libraryDependencies ++= Dependencies.LocationModels.value)
+  .settings(libraryDependencies ++= Dependencies.ConfigModels.value)
 
 lazy val `csw-config-api` = project
   .in(file("csw-config/csw-config-api"))
@@ -583,9 +590,20 @@ lazy val docs = project
   .settings(
     paradoxProperties in Paradox ++= Map(
       "extref.csw_js.base_url" -> s"https://tmtsoftware.github.io/csw-js/${Settings.cswJsVersion}/%s"
+    ),
+    paradoxRoots := List(
+      "index.html",
+      "services/aas/core-concepts-and-terms.html",
+      "services/aas/csw-aas-http.html",
+      "services/aas/csw-aas-installed.html",
+      "technical/aas/csw-aas-http.html",
+      "technical/aas/csw-aas-installed.html",
+      "technical/location/location-agent.html",
+      "technical/location/location-api.html",
+      "technical/location/location-client.html",
+      "technical/location/location-server.html"
     )
   )
-
 /* =================== Examples ================ */
 lazy val examples = project
   .dependsOn(
@@ -630,24 +648,15 @@ lazy val `csw-benchmark` = project
 /* ================ Integration Tests ============= */
 lazy val integration = project
   .dependsOn(
-    `csw-location-server`,
+    `csw-location-server` % "compile->compile;multi-jvm->multi-jvm",
     `csw-command-client`,
     `csw-location-agent`,
     `csw-network-utils`
   )
-  .enablePlugins(NoPublish, DeployApp)
+  .enablePlugins(NoPublish, AutoMultiJvm, DeployApp)
   .settings(
     libraryDependencies ++= Dependencies.Integration.value
   )
-
-/* ================================================ */
-lazy val alarm = taskKey[Unit]("alarm")
-
-alarm := {
-  (test in (`csw-alarm-client`, Test)).value
-  (test in (`csw-alarm-api`, Test)).value
-  (test in (`csw-alarm-cli`, Test)).value
-}
 
 // ================================================
 /* ===================== Auth ================== */
@@ -669,8 +678,7 @@ lazy val `csw-aas-core` = project
 
 lazy val `csw-aas-http` = project
   .in(file("csw-aas/csw-aas-http"))
-  .dependsOn(`csw-aas-core`, `csw-location-server` % "multi-jvm->multi-jvm")
-  .enablePlugins(AutoMultiJvm)
+  .dependsOn(`csw-aas-core`)
   .settings(
     libraryDependencies ++= Dependencies.AuthAkkaHttpAdapter.value
   )
@@ -680,4 +688,12 @@ lazy val `csw-aas-installed` = project
   .dependsOn(`csw-aas-core`, `csw-location-client` % "test->compile")
   .settings(
     libraryDependencies ++= Dependencies.CswInstalledAdapter.value
+  )
+
+lazy val `csw-services` = project
+  .in(file("csw-services"))
+  .enablePlugins(CswBuildInfo, DeployApp)
+  .dependsOn(`csw-location-server`, `csw-config-server`, `csw-location-agent`, `csw-commons`)
+  .settings(
+    libraryDependencies ++= Dependencies.CswServices.value
   )

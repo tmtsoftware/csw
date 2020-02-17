@@ -5,15 +5,15 @@ import csw.params.core.generics._
 import csw.params.core.models.Units.{NoUnits, degree, meter}
 import csw.params.core.models.{ArrayData, ObsId}
 import csw.prefix.models.Prefix
-import org.scalatest.FunSpec
 
 import scala.util.Try
+import org.scalatest.funspec.AnyFunSpec
 
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-185: Easy to Use Syntax/Api
 // DEOPSCSW-196: Command Payloads for variable command content
 // DEOPSCSW-320: Add command type in Setup, observe and wait
-class CommandsTest extends FunSpec {
+class CommandsTest extends AnyFunSpec {
 
   private val ck1         = "wfos.prog.cloudcover"
   private val ck3         = "wfos.red.detector"

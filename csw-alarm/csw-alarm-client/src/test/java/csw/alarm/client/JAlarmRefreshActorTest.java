@@ -10,14 +10,13 @@ import csw.alarm.models.AutoRefreshSeverityMessage;
 import csw.alarm.models.AutoRefreshSeverityMessage.AutoRefreshSeverity;
 import csw.alarm.models.AutoRefreshSeverityMessage.CancelAutoRefresh;
 import csw.alarm.models.Key.AlarmKey;
+import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
-
-import static csw.prefix.javadsl.JSubsystem.NFIRAOS;
 
 //CSW-83:Alarm models should take prefix
 public class JAlarmRefreshActorTest extends JUnitSuite {
@@ -26,7 +25,7 @@ public class JAlarmRefreshActorTest extends JUnitSuite {
     // DEOPSCSW-507: Auto-refresh utility for component developers
     @Test
     public void should_refresh_severity() {
-        AlarmKey alarmKey = new AlarmKey(Prefix.apply(NFIRAOS(), "trombone"), "tromboneAxisHighLimitAlarm");
+        AlarmKey alarmKey = new AlarmKey(Prefix.apply(JSubsystem.NFIRAOS, "trombone"), "tromboneAxisHighLimitAlarm");
         TestProbe<String> probe = TestProbe.create(typedSystem);
         String refreshMsg = "severity refreshed";
 
@@ -35,7 +34,7 @@ public class JAlarmRefreshActorTest extends JUnitSuite {
             return Done.done();
         }), Duration.ofMillis(200), typedSystem);
 
-        ref.tell(new AutoRefreshSeverity(alarmKey, JAlarmSeverity.Major()));
+        ref.tell(new AutoRefreshSeverity(alarmKey, JAlarmSeverity.Major));
         probe.expectMessage(refreshMsg);
         probe.expectNoMessage(Duration.ofMillis(190));
         probe.expectMessage(Duration.ofMillis(50), refreshMsg);

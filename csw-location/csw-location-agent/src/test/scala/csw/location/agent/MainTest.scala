@@ -7,18 +7,19 @@ import akka.actor.typed.scaladsl.Behaviors
 import com.typesafe.config.ConfigFactory
 import csw.commons.ResourceReader
 import csw.location.agent.common.TestFutureExtension.RichFuture
+import csw.location.api.models
+import csw.location.api.models.{ComponentId, ComponentType}
+import csw.location.api.models.Connection.{HttpConnection, TcpConnection}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.models.Connection.{HttpConnection, TcpConnection}
-import csw.location.models.{ComponentId, ComponentType}
 import csw.network.utils.Networks
 import csw.prefix.models.Prefix
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
-import org.scalatest.FunSuiteLike
+import org.scalatest.funsuite.AnyFunSuiteLike
 
 import scala.concurrent.duration._
 
 // DEOPSCSW-592: Create csw testkit for component writers
-class MainTest extends ScalaTestFrameworkTestKit with FunSuiteLike {
+class MainTest extends ScalaTestFrameworkTestKit with AnyFunSuiteLike {
 
   implicit private val system: typed.ActorSystem[_] = typed.ActorSystem(Behaviors.empty, "test-system")
   private val locationService                       = HttpLocationServiceFactory.makeLocalClient
@@ -47,11 +48,12 @@ class MainTest extends ScalaTestFrameworkTestKit with FunSuiteLike {
     testWithHttp(args, name, port, path)
   }
 
+  // CSW-86: Subsystem should be case-insensitive
   test("Test with config file") {
-    val name       = "csw.test2"
+    val name       = "CSW.test2"
     val configFile = ResourceReader.copyToTmp("/test2.conf").toFile
     val config     = ConfigFactory.parseFile(configFile)
-    val port       = config.getInt("csw.test2.port")
+    val port       = config.getInt("CSW.test2.port")
 
     val args = Array("--prefix", name, "--no-exit", configFile.getAbsolutePath)
     testWithTcp(args, name, port)
@@ -73,7 +75,7 @@ class MainTest extends ScalaTestFrameworkTestKit with FunSuiteLike {
   private def testWithHttp(args: Array[String], name: String, port: Int, path: String) = {
     val process = Main.start(args).get
 
-    val connection       = HttpConnection(ComponentId(Prefix(name), ComponentType.Service))
+    val connection       = HttpConnection(models.ComponentId(Prefix(name), ComponentType.Service))
     val resolvedLocation = locationService.resolve(connection, 5.seconds).await.get
 
     resolvedLocation.connection shouldBe connection

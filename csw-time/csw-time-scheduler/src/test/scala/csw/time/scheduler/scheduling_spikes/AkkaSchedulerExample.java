@@ -24,7 +24,7 @@ public class AkkaSchedulerExample {
 class MyTask1 implements Runnable {
 
     private ArrayList<String> buf = new ArrayList<>();
-    private int numWarningBeeps = 1000;
+    private int numWarningBeeps = 901000;
 
     @Override
     public void run() {
@@ -34,7 +34,7 @@ class MyTask1 implements Runnable {
             TimeLibrary.clock_gettime(0, timeSpec);
             long s = timeSpec.seconds.longValue();
             String n = String.format("%09d", timeSpec.nanoseconds.longValue());
-            buf.add(s + "" + n);
+            if (numWarningBeeps <= 1000) buf.add(s + "" + n);
             numWarningBeeps -= 1;
         } else {
             for (int i = 0; i < 1000; i++) {

@@ -6,15 +6,14 @@ import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.testkit.TestProbe
 import csw.location.api.AkkaRegistrationFactory.make
 import csw.location.api.extensions.ActorExtension.RichActor
+import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{ComponentId, ComponentType, LocationRemoved, LocationUpdated}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.location.models.Connection.AkkaConnection
-import csw.location.models.{ComponentId, ComponentType, LocationRemoved, LocationUpdated}
 import csw.location.server.commons.CswCluster
 import csw.location.server.internal.{LocationServiceFactory, ServerWiring}
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
-import csw.prefix.models.Subsystem
-import csw.prefix.models.Prefix
+import csw.prefix.models.{Prefix, Subsystem}
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
 import scala.concurrent.Await
@@ -59,7 +58,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
 
       val freshLocationService = mode match {
         case "http" =>
-          Try(ServerWiring.make(newTypedSystem).locationHttpService.start().await) match {
+          Try(ServerWiring.make(newTypedSystem, enableAuth = false).locationHttpService.start().await) match {
             case _ => // ignore binding errors
           }
           HttpLocationServiceFactory.makeLocalClient(newTypedSystem)

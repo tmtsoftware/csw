@@ -3,17 +3,16 @@ package csw.event.client.internal.wiring
 import java.net.URI
 
 import akka.Done
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.stream.Attributes
 import csw.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.event.api.scaladsl.{EventPublisher, EventService, EventSubscriber}
 import csw.event.client.helpers.TestFutureExt.RichFuture
-import csw.event.client.internal.commons.{EventServiceConnection, EventStreamSupervisionStrategy}
 import csw.event.client.internal.commons.serviceresolver.EventServiceLocationResolver
+import csw.event.client.internal.commons.{EventServiceConnection, EventStreamSupervisionStrategy}
+import csw.location.api.models
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.models.TcpRegistration
 
 import scala.async.Async._
 import scala.concurrent.{ExecutionContext, Future}
@@ -30,7 +29,7 @@ trait BaseProperties {
   def start(): Unit
   def shutdown(): Unit
 
-  implicit val actorSystem: ActorSystem[_]
+  implicit val actorSystem: ActorSystem[SpawnProtocol.Command]
   implicit lazy val ec: ExecutionContext = actorSystem.executionContext
   val attributes: Attributes             = EventStreamSupervisionStrategy.attributes
 
@@ -41,12 +40,12 @@ trait BaseProperties {
 }
 
 object BaseProperties {
-  def createInfra(serverPort: Int, httpPort: Int): (LocationService, ActorSystem[Nothing]) = {
+  def createInfra(serverPort: Int, httpPort: Int): (LocationService, ActorSystem[SpawnProtocol.Command]) = {
 
-    implicit val typedSystem: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "event-server")
+    implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "event-server")
 
     val locationService = HttpLocationServiceFactory.make("localhost", httpPort)
-    val tcpRegistration = TcpRegistration(EventServiceConnection.value, serverPort)
+    val tcpRegistration = models.TcpRegistration(EventServiceConnection.value, serverPort)
 
     locationService.register(tcpRegistration).await
     (locationService, typedSystem)

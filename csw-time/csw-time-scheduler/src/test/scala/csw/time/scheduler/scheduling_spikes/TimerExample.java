@@ -13,40 +13,38 @@ import java.util.TimerTask;
  */
 class TimerExample {
     public static void main(String[] args) {
-    Timer timer= new Timer();
-    System.out.println("About to schedule task.");
-    timer.schedule(new MyTask(), 0, 100);
-    System.out.println("Task scheduled.");
-  }
+        Timer timer = new Timer();
+        System.out.println("About to schedule task.");
+        timer.schedule(new MyTask(), 0, 1);
+        System.out.println("Task scheduled.");
+    }
 }
 
 class MyTask extends TimerTask {
 
     private LinkedList<String> buf = new LinkedList<String>();
 
-    private int numWarningBeeps = 1000;
+    private int numWarningBeeps = 901000;
 
     @Override
     public void run() {
 
-    if (numWarningBeeps > 0) {
+        if (numWarningBeeps > 0) {
 //      Instant instant = Instant.now();
 //      buf.add(instant.toEpochMilli());
 
+            TimeSpec timeSpec = new TimeSpec();
 
-        TimeSpec timeSpec = new TimeSpec();
+            TimeLibrary.clock_gettime(0, timeSpec);
+            long s = timeSpec.seconds.longValue();
+            String n = String.format("%09d", timeSpec.nanoseconds.longValue());
+            if (numWarningBeeps <= 1000) buf.add(s + "" + n);
 
-        TimeLibrary.clock_gettime(0, timeSpec);
-        long s = timeSpec.seconds.longValue();
-        String n = String.format("%09d",timeSpec.nanoseconds.longValue());
-        buf.add(s+""+n);
-
-
-        numWarningBeeps -= 1;
-    } else {
-      System.out.println(buf);
+            numWarningBeeps -= 1;
+        } else {
+            buf.forEach(System.out::println);
 //    timer.cancel(); //Not necessary because we call System.exit
-      System.exit(0); //Stops the AWT thread (and everything else)
+            System.exit(0); //Stops the AWT thread (and everything else)
+        }
     }
-  }
 }

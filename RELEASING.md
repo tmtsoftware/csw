@@ -16,17 +16,19 @@
 
 ## Steps to release
 
+### Release msocket
+1. Release `msocket`
+    There is not pieline to release msocket but only `git tag v0.0.0` and `git push origin v0.0.0` 
+2. update msocket tag version in csw
+    
 ### csw
-1. Update release notes (`notes/<version>.markdown`) in `csw` and `csw-acceptance` repo
+1. Update release notes (`notes/<version>.markdown`) in `csw` repo
 #### Note - The version in `notes` should be of format `v1.0.0` but while triggering the pipeline build parameter should be of format `1.0.0` 
 2. Update top level `CHANGELOG.md`
 3. Update top level `README.md`
 4. Exclude projects from `build.sbt` which you do not want to release
-5. Run `csw-prod` pipeline by providing `VERSION` number. (This automatically triggers `acceptance-release` pipeline)
-
-### csw-acceptance
-- Update the release notes (`notes/<version>.markdown`)
-- Pipeline will automatically triggered on the successful run of `csw-prod` pipeline
+5. Remove targets of newly added js projects in jenkins prod file  
+6. Run `csw-prod` pipeline by providing `VERSION` number.
 
 ### csw.g8
 1. Merge `dev` branch to master
@@ -40,10 +42,13 @@
 3. Update top level `README.md`
 4. Refer the RELEASING.md of csw-js
 
-### Release csw-client
+### Release esw
+1. Refer to RELEASING.md in `esw` repo
+
+### Release csw-shell
 1. Update the csw version in `build.sbt`
-2. Release `csw-client` with the latest `VERSION` of csw.
-    There is not pieline to release csw-client but only `git tag v0.0.0` and `git push origin v0.0.0` 
+2. Release `csw-shell` with the latest `VERSION` of csw.
+    There is no pipeline to release csw-shell but only `git tag v0.0.0` and `git push origin v0.0.0` 
 
 #### Note - `VERSION` tag is version number with 'v' as prefix. For eg. `v0.0.0`
 

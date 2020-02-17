@@ -18,8 +18,8 @@ import csw.command.client.models.framework.{ComponentInfo, LifecycleStateChanged
 import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestSuite
 import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInitializeTimeout}
-import csw.location.models.ComponentType.{Assembly, HCD}
-import csw.location.models.Connection
+import csw.location.api.models.ComponentType.{Assembly, HCD}
+import csw.location.api.models.{Connection, Registration}
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
 import csw.params.core.generics.{KeyType, Parameter}
@@ -88,9 +88,9 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     )
 
     // This proves that data used in this test contains HCD and Assembly ComponentType
-    testData.find(info => info.componentType == HCD && info.prefix == Prefix("wfos.samplehcd")) shouldBe Some(hcdInfo)
-    testData.find(info => info.componentType == HCD && info.prefix == Prefix("wfos.jsamplehcd")) shouldBe Some(jHcdInfo)
-    testData.find(info => info.componentType == Assembly && info.prefix == Prefix("wfos.sampleassembly")) shouldBe Some(
+    testData.find(info => info.componentType == HCD && info.prefix == Prefix("WFOS.SampleHcd")) shouldBe Some(hcdInfo)
+    testData.find(info => info.componentType == HCD && info.prefix == Prefix("WFOS.jSampleHcd")) shouldBe Some(jHcdInfo)
+    testData.find(info => info.componentType == Assembly && info.prefix == Prefix("WFOS.SampleAssembly")) shouldBe Some(
       assemblyInfo
     )
 
@@ -321,8 +321,10 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
         containerIdleMessageProbe.expectMessage(SupervisorLifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
-        verify(locationService, times(2)).unregister(any[Connection])
+        verify(locationService, times(1)).unregister(any[Connection])
         verify(locationService, times(2)).register(akkaRegistration)
+        // this includes akka and http registrations before restart and after restart
+        verify(locationService, times(4)).register(any[Registration])
       }
     }
   }

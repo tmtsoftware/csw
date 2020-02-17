@@ -1,7 +1,6 @@
 package csw.framework.models
 
 import csw.command.client.models.framework.ComponentInfo
-import csw.prefix.models.Subsystem
 import csw.prefix.models.{Prefix, Subsystem}
 
 /**
@@ -16,5 +15,8 @@ private[framework] final case class ContainerInfo(name: String, components: Set[
   /**
    * Represents the prefix for the container with [[Subsystem.Container]] and given `name`
    */
-  val prefix = Prefix(Subsystem.Container, name)
+  val prefix: Prefix = Prefix(Subsystem.Container, name)
+
+  // Override in order to show contained Prefix
+  override def toString: String = s"ContainerInfo($prefix, $components)"
 }

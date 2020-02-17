@@ -63,9 +63,9 @@ public class JEventsTest extends JUnitSuite {
         Key<Integer> k4 = JKeyType.IntKey().make("notUsed");
 
         //prefixes
-        Prefix prefix1 = new Prefix(JSubsystem.WFOS(), "red.filter");
+        Prefix prefix1 = Prefix.apply(JSubsystem.WFOS, "red.filter");
         EventName name1 = new EventName("filterWheel");
-        Prefix prefix2 = new Prefix(JSubsystem.IRIS(), "imager.filter");
+        Prefix prefix2 = Prefix.apply(JSubsystem.IRIS, "imager.filter");
         EventName name2 = new EventName("status");
 
         //parameters
@@ -113,9 +113,9 @@ public class JEventsTest extends JUnitSuite {
         Key<Integer> k4 = JKeyType.IntKey().make("notUsed");
 
         //prefixes
-        Prefix prefix1 = new Prefix(JSubsystem.IRIS(), "ifu.detectorAssembly");
+        Prefix prefix1 = Prefix.apply(JSubsystem.IRIS, "ifu.detectorAssembly");
         EventName name1 = new EventName("readoutEnd");
-        Prefix prefix2 = new Prefix(JSubsystem.WFOS(), "red.detector");
+        Prefix prefix2 = Prefix.apply(JSubsystem.WFOS, "red.detector");
         EventName name2 = new EventName("exposureStarted");
 
         //parameters
@@ -160,7 +160,7 @@ public class JEventsTest extends JUnitSuite {
         Key<MatrixData<Double>> k1 = JKeyType.DoubleMatrixKey().make("myMatrix");
 
         //prefixes
-        Prefix prefix1 = new Prefix(JSubsystem.AOESW(), "rpg");
+        Prefix prefix1 = Prefix.apply(JSubsystem.AOESW, "rpg");
         EventName name1 = new EventName("correctionInfo");
 
         //values
@@ -205,7 +205,7 @@ public class JEventsTest extends JUnitSuite {
         Key<Integer> miscKey = JKeyType.IntKey().make("misc");
 
         //prefix
-        Prefix prefix1 = new Prefix(JSubsystem.WFOS(), "blue.filter");
+        Prefix prefix1 = Prefix.apply(JSubsystem.WFOS, "blue.filter");
         EventName name1 = new EventName("filterWheel");
 
         //params
@@ -252,9 +252,9 @@ public class JEventsTest extends JUnitSuite {
         //#cbor
 
         //prefixes
-        Prefix prefix1 = new Prefix(JSubsystem.TCS(), "pk");
+        Prefix prefix1 = Prefix.apply(JSubsystem.TCS, "pk");
         EventName name1 = new EventName("targetCoords");
-        Prefix prefix2 = new Prefix(JSubsystem.TCS(), "cm");
+        Prefix prefix2 = Prefix.apply(JSubsystem.TCS, "cm");
         EventName name2 = new EventName("guiderCoords");
 
         //Key
@@ -265,7 +265,7 @@ public class JEventsTest extends JUnitSuite {
         RaDec raDec2 = new RaDec(11.20, 50.20);
 
         //parameters
-        Parameter<RaDec> param = raDecKey.set(raDec1, raDec2).withUnits(JUnits.arcmin());
+        Parameter<RaDec> param = raDecKey.set(raDec1, raDec2).withUnits(JUnits.arcmin);
 
         //events
         ObserveEvent observeEvent = new ObserveEvent(prefix1, name1).add(param);

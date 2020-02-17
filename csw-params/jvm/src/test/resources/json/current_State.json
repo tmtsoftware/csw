@@ -1,51 +1,50 @@
 {
-  "CurrentState": {
-    "prefix": "wfos.blue.filter",
-    "stateName": "testStateName",
-    "paramSet": [
-      {
-        "CharKey": {
-          "keyName": "charKey",
-          "values": [
-            65,
-            66,
-            67
-          ],
-          "units": "encoder"
-        }
-      },
-      {
-        "IntArrayKey": {
-          "keyName": "intArrayKey",
-          "values": [
-            [
-              1,
-              2,
-              3,
-              4,
-              5
-            ],
-            [
-              10,
-              20,
-              30,
-              40,
-              50
-            ]
-          ],
-          "units": "meter"
-        }
-      },
-      {
-        "UTCTimeKey": {
-          "keyName": "utcTimeKey",
-          "values": [
-            "1970-01-01T00:00:00Z",
-            "2017-09-04T16:28:00.123456789Z"
-          ],
-          "units": "second"
-        }
+  "_type": "CurrentState",
+  "prefix": "WFOS.blue.filter",
+  "stateName": "testStateName",
+  "paramSet": [
+    {
+      "CharKey": {
+        "keyName": "charKey",
+        "values": [
+          65,
+          66,
+          67
+        ],
+        "units": "encoder"
       }
-    ]
-  }
+    },
+    {
+      "IntArrayKey": {
+        "keyName": "intArrayKey",
+        "values": [
+          [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          [
+            10,
+            20,
+            30,
+            40,
+            50
+          ]
+        ],
+        "units": "meter"
+      }
+    },
+    {
+      "UTCTimeKey": {
+        "keyName": "utcTimeKey",
+        "values": [
+          "1970-01-01T00:00:00Z",
+          "2017-09-04T16:28:00.123456789Z"
+        ],
+        "units": "second"
+      }
+    }
+  ]
 }

@@ -12,6 +12,7 @@ import csw.common.components.framework.SampleComponentBehaviorFactory
 import csw.common.extensions.CswContextExtensions.RichCswContext
 import csw.framework.ComponentInfos._
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
+import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.logging.models.Level.WARN
 import csw.logging.models.LogMetadata
 import csw.time.core.models.UTCTime
@@ -69,6 +70,11 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
   }
 
   test("Supervisor should support concurrent updates to log-levels of components") {
+    // start LoggingSystem to initialize logLevel, akkaLogLevel, slf4jLogLevel to legitimate level instead of staying null
+    // null levels error out while serializing LogMetadata (expected in production that LoggingSystem will be started and
+    // then someone can query `GetLogMetadata`)
+    LoggingSystemFactory.start("test", "test", "test", typedSystem)
+
     val supervisorBehaviorTestKit = BehaviorTestKit(supervisorBehavior)
     val logMetadataProbe          = TestProbe[LogMetadata]("log")
     import typedSystem.executionContext

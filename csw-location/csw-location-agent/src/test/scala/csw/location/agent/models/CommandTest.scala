@@ -3,9 +3,10 @@ package csw.location.agent.models
 import csw.commons.ResourceReader
 import csw.location.agent.args.Options
 import csw.prefix.models.Prefix
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class CommandTest extends FunSuite with Matchers {
+class CommandTest extends AnyFunSuite with Matchers {
 
   test("testParse with no options should return command with default values") {
     val opt        = Options()
@@ -28,10 +29,9 @@ class CommandTest extends FunSuite with Matchers {
     c.noExit shouldBe true
   }
 
-  // CSW-80: Prefix should be in lowercase
   test("testParse with config file should honour config options") {
     val configFile = ResourceReader.copyToTmp("/redisTest.conf").toFile
-    val opt        = Options(List(Prefix("csw.redistest")), None, None, Option(configFile))
+    val opt        = Options(List(Prefix("csw.redisTest")), None, None, Option(configFile))
     val c: Command = Command.parse(opt)
 
     c.commandText shouldBe "redis-server --port 7777"

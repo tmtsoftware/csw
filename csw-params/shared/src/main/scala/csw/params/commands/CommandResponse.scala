@@ -42,7 +42,10 @@ object CommandResponse {
    * SubmitResponse is returned by Submit message which calls the onSubmit handler
    * Responses returned can be Invalid, Started, Completed, Error, Cancelled, Locked
    */
-  sealed trait SubmitResponse extends CommandResponse
+  sealed trait SubmitResponse extends CommandResponse {
+
+    def withRunId(runId: Id): SubmitResponse
+  }
 
   /**
    * MatchingResponse is returned by matchers.
@@ -62,7 +65,9 @@ object CommandResponse {
    *
    * @param runId of command for which this response is created
    */
-  case class Started(runId: Id) extends SubmitResponse
+  case class Started(runId: Id) extends SubmitResponse {
+    def withRunId(newRunId: Id): Started = copy(runId = newRunId)
+  }
 
   /**
    * Represents a final positive response stating completion of command with no errors
@@ -83,6 +88,8 @@ object CommandResponse {
      * A java helper to construct a Completed response
      */
     def this(runId: Id) = this(runId, Result())
+
+    def withRunId(newRunId: Id): Completed = copy(runId = newRunId)
   }
 
   /**
@@ -96,7 +103,10 @@ object CommandResponse {
       with ValidateResponse
       with OnewayResponse
       with SubmitResponse
-      with MatchingResponse
+      with MatchingResponse {
+
+    def withRunId(newRunId: Id): Invalid = copy(runId = newRunId)
+  }
 
   /**
    * Represents a negative response that describes an error in executing the command
@@ -104,21 +114,30 @@ object CommandResponse {
    * @param runId of command for which this response is created
    * @param message describing the reason or cause or action item of the error encountered while executing the command
    */
-  case class Error(runId: Id, message: String) extends SubmitResponse with MatchingResponse
+  case class Error(runId: Id, message: String) extends SubmitResponse with MatchingResponse {
+
+    def withRunId(newRunId: Id): Error = copy(runId = newRunId)
+  }
 
   /**
    * Represents a negative response that describes the cancellation of command
    *
    * @param runId of command for which this response is created
    */
-  case class Cancelled(runId: Id) extends SubmitResponse
+  case class Cancelled(runId: Id) extends SubmitResponse {
+
+    def withRunId(newRunId: Id): Cancelled = copy(runId = newRunId)
+  }
 
   /**
    * Represents a negative response stating that a component is Locked and command was not validated or executed
    *
    * @param runId of command for which this response is created
    */
-  case class Locked(runId: Id) extends ValidateResponse with OnewayResponse with SubmitResponse with MatchingResponse
+  case class Locked(runId: Id) extends ValidateResponse with OnewayResponse with SubmitResponse with MatchingResponse {
+
+    def withRunId(newRunId: Id): Locked = copy(runId = newRunId)
+  }
 
   /**
    * Tests a response to determine if it is a final command state

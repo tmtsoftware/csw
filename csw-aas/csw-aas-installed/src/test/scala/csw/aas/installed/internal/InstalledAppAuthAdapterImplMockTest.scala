@@ -9,14 +9,15 @@ import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.adapters.installed.KeycloakInstalled
 import org.keycloak.representations.AccessTokenResponse
 import org.mockito.MockitoSugar
-import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 //DEOPSCSW-575: Client Library for AAS to be accessed by CSW cli apps
-class InstalledAppAuthAdapterImplMockTest extends FunSuite with MockitoSugar with Matchers {
+class InstalledAppAuthAdapterImplMockTest extends AnyFunSuite with MockitoSugar with Matchers {
 
   class AuthMocks {
     val keycloakInstalled: KeycloakInstalled     = mock[KeycloakInstalled]

@@ -1,6 +1,6 @@
 package csw.command.client.models.framework
 
-import csw.location.models.{ComponentType, Connection}
+import csw.location.api.models.{ComponentType, Connection}
 import csw.prefix.models.Prefix
 
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
@@ -11,7 +11,7 @@ import scala.jdk.CollectionConverters._
  *
  * @param prefix prefix for the component with `subsystem` and `name`
  * @param componentType
- *  : the type of the component as defined by [[csw.location.models.ComponentType]]
+ *  : the type of the component as defined by [[csw.location.api.models.ComponentType]]
  * @param behaviorFactoryClassName
  *  : specifies the component to be created by name of the class of it's factory
  * @param locationServiceUsage

@@ -6,10 +6,12 @@ import java.time.Instant
 
 import csw.config.cli.args.{ArgsParser, Options}
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
-import org.scalatest.{BeforeAndAfterEach, FunSuite, Matchers}
+import org.scalatest.BeforeAndAfterEach
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 // DEOPSCSW-112: Command line interface client for Configuration service
-class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
+class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
 
   val relativeRepoPath = "path/in/repository"
   val inputFilePath    = "/tmp/some/input/file"

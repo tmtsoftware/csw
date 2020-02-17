@@ -2,8 +2,7 @@ package csw.location.api.scaladsl
 
 import akka.Done
 import akka.stream.scaladsl.Source
-import csw.location.models._
-import csw.prefix.models.Prefix
+import csw.location.api.models._
 import msocket.api.Subscription
 
 import scala.concurrent.Future
@@ -108,7 +107,7 @@ trait LocationService {
    * @return a future which completes with filtered locations or can fail with
    *         [[csw.location.api.exceptions.RegistrationListingFailed]]
    */
-  def listByPrefix(prefix: Prefix): Future[List[Location]]
+  def listByPrefix(prefix: String): Future[List[Location]]
 
   /**
    * Tracks the connection and send events for modification or removal of its location

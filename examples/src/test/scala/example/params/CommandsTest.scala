@@ -8,12 +8,13 @@ import csw.params.core.models.Units.degree
 import csw.params.core.models._
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.time.core.models.UTCTime
-import org.scalatest.{FunSpec, Matchers}
 
 import scala.util.Try
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
 // DEOPSCSW-196: Command Payloads for variable command content
-class CommandsTest extends FunSpec with Matchers {
+class CommandsTest extends AnyFunSpec with Matchers {
 
   //#obsid
   val obsId: ObsId = ObsId("Obs001")

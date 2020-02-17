@@ -11,15 +11,17 @@ import csw.time.core.models.UTCTime
 import io.lettuce.core.ClientOptions.DisconnectedBehavior
 import io.lettuce.core.{ClientOptions, RedisException}
 import org.mockito.MockitoSugar
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import org.scalatest.BeforeAndAfterAll
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 import scala.util.Random
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 //DEOPSCSW-398: Propagate failure for publish api (eventGenerator)
 //DEOPSCSW-399: Propagate failure for publish api when redis/kafka server is down
-class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with BeforeAndAfterAll {
+class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with BeforeAndAfterAll {
 
   private val redisClientOptions = ClientOptions
     .builder()

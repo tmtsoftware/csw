@@ -9,7 +9,7 @@ import csw.command.client.messages.TopLevelActorMessage
 import csw.common.components.command.ComponentStateForCommand.{longRunningCmdCompleted, _}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.models.{AkkaLocation, TrackingEvent}
+import csw.location.api.models.{AkkaLocation, TrackingEvent}
 import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandIssue, ControlCommand, Setup}
@@ -70,6 +70,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
     }
   }
 
+  //#queryF
   private def processLongRunningCommand(prunId: Id, controlCommand: ControlCommand): Unit = {
     // Could be different components, can't actually submit parallel commands to an HCD
     val shortSetup  = Setup(assemblyPrefix, shortRunning, None)
@@ -89,29 +90,32 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
         sr
       }
 
-      // Execute coe when medium completes
+      // Execute code when medium completes
       val mediumresult: Future[SubmitResponse] = hcdComponent.queryFinal(await(medium).runId) map { sr =>
         currentStatePublisher
           .publish(CurrentState(assemblyPrefix, StateName("testStateName"), Set(choiceKey.set(mediumCmdCompleted))))
         sr
       }
 
-      //
+      // Execute code when short completes
       val shortresult: Future[SubmitResponse] = hcdComponent.queryFinal(await(shortsubmit).runId) map { sr =>
         currentStatePublisher
           .publish(CurrentState(assemblyPrefix, StateName("testStateName"), Set(choiceKey.set(shortCmdCompleted))))
         sr
       }
 
+      // Execute some code when all three of the commands have completed
       commandResponseManager.queryFinalAll(shortresult, mediumresult, longresult).onComplete {
         case Success(response) =>
           currentStatePublisher.publish(
             CurrentState(controlCommand.source, StateName("testStateName"), Set(choiceKey.set(longRunningCmdCompleted)))
           )
           response match {
-            case OverallSuccess(r) =>
+            case OverallSuccess(_) =>
+              // update parent with a positive result
               commandResponseManager.updateCommand(Completed(prunId))
             case OverallFailure(responses) =>
+              // update parent with an Error including all the individual responses
               commandResponseManager.updateCommand(Error(prunId, s"$responses"))
           }
         case Failure(ex) =>
@@ -119,6 +123,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
       }
     }
   }
+  //#queryF
 
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
 

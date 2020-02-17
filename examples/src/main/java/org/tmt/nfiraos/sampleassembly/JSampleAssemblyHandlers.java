@@ -10,7 +10,7 @@ import csw.command.client.messages.TopLevelActorMessage;
 import csw.event.api.javadsl.IEventSubscription;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
-import csw.location.models.*;
+import csw.location.api.models.*;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.CommandName;
 import csw.params.commands.CommandResponse;
@@ -26,8 +26,8 @@ import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
 import csw.params.javadsl.JUnits;
-import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
+import csw.prefix.models.Prefix;
 import csw.time.core.models.UTCTime;
 
 import java.util.Optional;
@@ -76,7 +76,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
                     if (msg instanceof SendCommand) {
                         SendCommand command = (SendCommand) msg;
                         log.trace("WorkerActor received SendCommand message.");
-                        handle(command.hcd);
+                        handle(Id.apply(), command.hcd);
                     } else {
                         log.error("Unsupported messsage type");
                     }
@@ -86,22 +86,22 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
         );
     }
 
-    private void handle(ICommandService hcd) {
+    private void handle(Id runId, ICommandService hcd) {
 
         // Construct Setup command
         Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
-        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond());
+        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond);
 
         Setup setupCommand = new Setup(cswCtx.componentInfo().prefix(), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
 
         Timeout commandResponseTimeout = new Timeout(10, TimeUnit.SECONDS);
 
         // Submit command and handle response
-        hcd.submitAndWait(setupCommand, commandResponseTimeout)   // FIXME -- NEED to ask about exceptionally runId
-                .exceptionally(ex -> new CommandResponse.Error(Id.apply(), "Exception occurred when sending command: " + ex.getMessage()))
+        hcd.submitAndWait(setupCommand, commandResponseTimeout)
+                .exceptionally(ex -> new CommandResponse.Error(runId, "Exception occurred when sending command: " + ex.getMessage()))
                 .thenAccept(commandResponse -> {
                     if (commandResponse instanceof CommandResponse.Locked) {
-                        log.error("Sleep command failed: HCD is locked");
+                        log.error("Sleed command failed: HCD is locked");
                     } else if (commandResponse instanceof CommandResponse.Invalid) {
                         CommandResponse.Invalid inv = (CommandResponse.Invalid) commandResponse;
                         log.error("Sleep command invalid (" + inv.issue().getClass().getSimpleName() + "): " + inv.issue().reason());
@@ -117,11 +117,11 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     }
     //#worker-actor
 
-    private void handle2Stage(ICommandService hcd) {
+    private void handle2Stage(Id runId, ICommandService hcd) {
 
         // Construct Setup command
         Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
-        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond());
+        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond);
 
         Setup setupCommand = new Setup(cswCtx.componentInfo().prefix(), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
 
@@ -137,7 +137,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
                         log.error("Sleep command invalid");
                         return new CommandResponse.Error(commandResponse.runId(), "test error");
                     }
-                }).exceptionally(ex -> new CommandResponse.Error(Id.apply(), ex.getMessage()))  //TODO Not sure how to handle this
+                }).exceptionally(ex -> new CommandResponse.Error(runId, ex.getMessage()))
                 .toCompletableFuture();
 
 
@@ -178,7 +178,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
         if (trackingEvent instanceof LocationUpdated) {
             LocationUpdated updated = (LocationUpdated) trackingEvent;
             Location location = updated.location();
-            ICommandService hcd = CommandServiceFactory.jMake((AkkaLocation) (location), actorContext.getSystem());
+            ICommandService hcd = CommandServiceFactory.jMake(location, actorContext.getSystem());
             commandSender.tell(new SendCommand(hcd));
         } else if (trackingEvent instanceof LocationRemoved) {
             log.info("HCD no longer available");
@@ -187,7 +187,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     //#track-location
 
     //#subscribe
-    private EventKey counterEventKey = new EventKey(new Prefix(JSubsystem.NFIRAOS(), "samplehcd"), new EventName("HcdCounter"));
+    private EventKey counterEventKey = new EventKey(Prefix.apply(JSubsystem.NFIRAOS, "samplehcd"), new EventName("HcdCounter"));
     private Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter");
 
     private void processEvent(Event event) {

@@ -5,9 +5,10 @@ import akka.actor.CoordinatedShutdown
 import csw.location.agent.commons.LocationAgentLogger
 import csw.location.agent.models.Command
 import csw.location.agent.wiring.Wiring
+import csw.location.api.models
+import csw.location.api.models.Connection.{HttpConnection, TcpConnection}
+import csw.location.api.models._
 import csw.location.api.scaladsl.RegistrationResult
-import csw.location.models.Connection.{HttpConnection, TcpConnection}
-import csw.location.models._
 import csw.logging.api.scaladsl.Logger
 import csw.prefix.models.Prefix
 
@@ -64,7 +65,7 @@ class LocationAgent(prefixes: List[Prefix], command: Command, wiring: Wiring) {
 
   // Registers a single service as a HTTP service with provided path
   private def registerHttpName(prefix: Prefix, path: String): Future[RegistrationResult] = {
-    val componentId = ComponentId(prefix, ComponentType.Service)
+    val componentId = models.ComponentId(prefix, ComponentType.Service)
     val connection  = HttpConnection(componentId)
     locationService.register(HttpRegistration(connection, command.port, path))
   }

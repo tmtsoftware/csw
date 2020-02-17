@@ -138,7 +138,7 @@ csw-database.hikari-datasource.dataSource {
 @@@note
 
 By default, CSW configures `HikariCP` connection pool for managing connections with PostgreSQL server. To know more about `HikariCP`
-please refer to this [link](http://brettwooldridge.github.io/HikariCP/). 
+please refer to this [link](https://github.com/brettwooldridge/HikariCP). 
 
 @@@  
 
@@ -226,6 +226,6 @@ See @ref:[Database Service Technical Description](../technical/database/database
 
 ## Source code for examples
 
-* @github[Scala Example](/examples/src/main/scala/example/database/AssemblyComponentHandlers.scala)
-* @github[Java Example](/examples/src/main/java/example/database/JAssemblyComponentHandlers.java)
+* [Scala Example]($github.base_url$/examples/src/main/scala/example/database/AssemblyComponentHandlers.scala)
+* [Java Example]($github.base_url$/examples/src/main/java/example/database/JAssemblyComponentHandlers.java)
 

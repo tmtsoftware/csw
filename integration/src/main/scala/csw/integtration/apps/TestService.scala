@@ -1,10 +1,10 @@
 package csw.integtration.apps
 
 import csw.integtration.common.TestFutureExtension.RichFuture
+import csw.location.api.models.Connection.HttpConnection
+import csw.location.api.models.{ComponentId, ComponentType, HttpRegistration}
 import csw.location.api.scaladsl.RegistrationResult
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.models.Connection.HttpConnection
-import csw.location.models.{ComponentId, ComponentType, HttpRegistration}
 import csw.location.server.internal.ServerWiring
 import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.prefix.models.{Prefix, Subsystem}
@@ -16,7 +16,7 @@ object TestService {
   private val Path = "redisservice.org/test"
   private val Port = 9999
 
-  val adminWiring: ServerWiring = ServerWiring.make(Some(3553))
+  val adminWiring: ServerWiring = ServerWiring.make(Some(3553), enableAuth = false)
   LoggingSystemFactory.start("Assembly", "1.0", adminWiring.clusterSettings.hostname, adminWiring.actorSystem)
 
   adminWiring.locationHttpService.start().await

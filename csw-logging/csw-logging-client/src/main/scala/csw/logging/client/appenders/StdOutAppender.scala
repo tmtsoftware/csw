@@ -34,11 +34,11 @@ object StdOutAppender extends LogAppenderBuilder {
 class StdOutAppender(system: ActorSystem[_], stdHeaders: JsObject, logPrinter: Any => Unit) extends LogAppender {
   private[this] val config        = system.settings.config.getConfig("csw-logging.appender-config.stdout")
   private[this] val fullHeaders   = config.getBoolean("fullHeaders")
-  private[this] val color         = config.getBoolean("color")
   private[this] val summary       = config.getBoolean("summary")
   private[this] val pretty        = config.getBoolean("pretty")
-  private[this] val oneLine       = config.getBoolean("oneLine")
   private[this] val logLevelLimit = Level(config.getString("logLevelLimit"))
+  private[csw] val color          = config.getBoolean("color")
+  private[csw] val oneLine        = config.getBoolean("oneLine")
 
   private[this] var categories = Map.empty[String, Int]
   private[this] var levels     = Map.empty[String, Int]

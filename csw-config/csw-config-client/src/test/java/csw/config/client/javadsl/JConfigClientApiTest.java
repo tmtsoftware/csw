@@ -1,6 +1,7 @@
 package csw.config.client.javadsl;
 
 import akka.actor.typed.ActorSystem;
+import akka.actor.typed.SpawnProtocol;
 import csw.config.api.ConfigData;
 import csw.config.api.javadsl.IConfigClientService;
 import csw.config.api.javadsl.IConfigService;
@@ -20,7 +21,7 @@ public class JConfigClientApiTest extends JUnitSuite {
     private static JConfigClientBaseSuite jConfigClientBaseSuite;
     private static IConfigService configService;
     private static IConfigClientService configClientApi;
-    private static ActorSystem<?> system;
+    private static ActorSystem<SpawnProtocol.Command> system;
 
     @BeforeClass
     public static void beforeAll() throws Exception {

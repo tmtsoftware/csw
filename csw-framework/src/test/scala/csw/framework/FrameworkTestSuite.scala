@@ -13,12 +13,14 @@ import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.location.client.ActorSystemFactory
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.LoggerFactory
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import org.scalatest.BeforeAndAfterAll
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-private[csw] abstract class FrameworkTestSuite extends FunSuite with Matchers with BeforeAndAfterAll {
+private[csw] abstract class FrameworkTestSuite extends AnyFunSuite with Matchers with BeforeAndAfterAll {
   implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "testHcd")
   implicit val settings: TestKitSettings                       = TestKitSettings(typedSystem)
   implicit val timeout: Timeout                                = Timeout(5.seconds)
@@ -30,10 +32,10 @@ private[csw] abstract class FrameworkTestSuite extends FunSuite with Matchers wi
   }
 
   def getSampleHcdWiring(componentHandlers: ComponentHandlers): ComponentBehaviorFactory =
-    (ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) => componentHandlers
+    (_: ActorContext[TopLevelActorMessage], _: CswContext) => componentHandlers
 
   def getSampleAssemblyWiring(assemblyHandlers: ComponentHandlers): ComponentBehaviorFactory =
-    (ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) => assemblyHandlers
+    (_: ActorContext[TopLevelActorMessage], _: CswContext) => assemblyHandlers
 
   def createSupervisorAndStartTLA(
       componentInfo: ComponentInfo,
@@ -58,7 +60,7 @@ private[csw] abstract class FrameworkTestSuite extends FunSuite with Matchers wi
       )
     )
 
-    // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
+    // it creates a supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
     typedSystem.spawn(supervisorBehavior, "")
   }
 

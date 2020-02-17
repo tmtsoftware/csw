@@ -9,8 +9,8 @@ import csw.command.api.scaladsl.CommandService
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.internal.{CommandServiceImpl, JCommandServiceImpl}
 import csw.command.client.messages.ComponentMessage
-import csw.location.models.{AkkaLocation, HttpLocation, Location, TcpLocation}
-import msocket.api.Encoding.JsonText
+import csw.location.api.models.{AkkaLocation, HttpLocation, Location, TcpLocation}
+import msocket.api.ContentType.Json
 import msocket.impl.post.HttpPostTransport
 import msocket.impl.ws.WebsocketTransport
 
@@ -50,8 +50,8 @@ object CommandServiceFactory {
     val webSocketUri = Uri(baseUri).withScheme("ws").withPath(Path("/websocket-endpoint")).toString()
     val httpUri      = Uri(baseUri).withPath(Path("/post-endpoint")).toString()
     new CommandServiceClient(
-      new HttpPostTransport(httpUri, JsonText, () => None),
-      new WebsocketTransport(webSocketUri, JsonText)
+      new HttpPostTransport(httpUri, Json, () => None),
+      new WebsocketTransport(webSocketUri, Json)
     )
   }
 }

@@ -86,7 +86,7 @@ In the above example,
 * `GET http://localhost:9003/api` does not use any security directive and hence is accessible to all. 
 
 * `POST http://localhost:9003/api` uses `sPost` which is secure directive. This directive takes care of authentication (access token signature and expiration validation).
-For authorization, it needs an [authorization policy](#authorization-policies). The authorizing policy specifies one or more conditions for request validation. 
+For authorization, it needs an @ref:[authorization policy](#authorization-policies). The authorizing policy specifies one or more conditions for request validation. 
 
 In this instance, the `sPost` directive has been given a `RealmRolePolicy` policy with the parameter value `admin`.
 
@@ -109,12 +109,12 @@ To know more about realm roles, check out the [Keycloak documentation](https://w
 An authorization policy is a way to provide filtering on incoming HTTP requests based on standard rules. Following policies can
 be applied to protect routes.
 
- - [ReamRolePolicy](#realmrolepolicy)
- - [ClientRolePolicy](#clientrolepolicy)
- - [PermissionPolicy](#permissionpolicy)
- - [CustomPolicy](#custompolicy)
- - [CustomPolicyAsync](#custompolicyasync)
- - [EmptyPolicy](#emptypolicy)
+ - @ref:[ReamRolePolicy](#realmrolepolicy)
+ - @ref:[ClientRolePolicy](#clientrolepolicy)
+ - @ref:[PermissionPolicy](#permissionpolicy)
+ - @ref:[CustomPolicy](#custompolicy)
+ - @ref:[CustomPolicyAsync](#custompolicyasync)
+ - @ref:[EmptyPolicy](#emptypolicy)
 
 ### RealmRolePolicy
 
@@ -251,5 +251,5 @@ about performance.
 
 ## Source code for above examples
 
-* @github[Example http server](/examples/src/main/scala/example/auth/ExampleServer.scala)
+* [Example http server]($github.base_url$/examples/src/main/scala/example/auth/ExampleServer.scala)
 
