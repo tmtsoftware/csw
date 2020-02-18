@@ -450,9 +450,10 @@ object Dependencies {
       Libs.`config`,
       AkkaHttp.`akka-http`,
       Libs.`play-json`.value,
-      Libs.`scalatest`.value       % Test,
-      AkkaHttp.`akka-http-testkit` % Test,
-      Libs.`mockito-scala`         % Test
+      Libs.`scalatest`.value          % Test,
+      Akka.`akka-actor-testkit-typed` % Test,
+      AkkaHttp.`akka-http-testkit`    % Test,
+      Libs.`mockito-scala`            % Test
     )
   )
 
