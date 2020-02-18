@@ -228,8 +228,8 @@ The log output should contain:
 
 ```
 [INFO] Registered akka locations for nfiraos.ncc
-[INFO] --- hcd1-hcd-akka, component type=HCD, connection type=AkkaType
-[INFO] --- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
+[INFO] --- nfiraos.ncc.hcd1-hcd-akka, component type=HCD, connection type=AkkaType
+[INFO] --- nfiraos.ncc.assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
 ```
 
 ## Tracking and Subscribing

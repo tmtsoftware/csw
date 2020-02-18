@@ -74,7 +74,7 @@ Java
 :   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/sampleassembly/JSampleAssemblyHandlersAlarm.java) { #subscribe }
 
 To see the effect, let's use the CLI to set up a subscription to the alarm.  Note the alarm key is the component's prefix 
-(`esw.sampleassembly` for Scala, `jsampleassembly` for Java), and the alarm name (`counterTooHighAlarm`).
+(`esw.sampleassembly` for Scala, `esw.jsampleassembly` for Java), and the alarm name (`counterTooHighAlarm`).
 
 Scala
 :   
