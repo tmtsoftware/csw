@@ -14,4 +14,7 @@ are the important changes from 1.0.0:
 * Admin routes for setting log level and getting log level are now available via gateway
 * JSON contracts for location and command service added in paradox documentation
 
-UtcTime and TaiTime replace Timestamp Param types
+Details on how to work with the updated Prefix type are given @ref[here](prefix.md).
+
+Details on how to work with the new Command Service changes are given @ref[here](commandService.md).
+
