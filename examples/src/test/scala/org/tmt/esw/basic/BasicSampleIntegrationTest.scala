@@ -4,22 +4,22 @@ import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import akka.util.Timeout
 import csw.command.client.CommandServiceFactory
 import csw.command.client.messages.ContainerMessage
-import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{ComponentId, ComponentType}
 import csw.params.commands.CommandResponse.Completed
 import csw.params.commands.Setup
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.scaladsl.CSWService.{AlarmServer, EventServer}
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
-import org.scalatest.WordSpecLike
+import org.scalatest.wordspec.AnyWordSpecLike
 import org.tmt.esw.basic.shared.SampleInfo._
 
-import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration._
+import scala.concurrent.{Await, ExecutionContext}
 
 //noinspection ScalaStyle
 //#intro
-class BasicSampleIntegrationTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with WordSpecLike {
+class BasicSampleIntegrationTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with AnyWordSpecLike {
   import frameworkTestKit.frameworkWiring._
 
   private implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = frameworkTestKit.actorSystem

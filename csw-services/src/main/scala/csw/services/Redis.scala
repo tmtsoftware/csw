@@ -1,5 +1,6 @@
 package csw.services
 
+import csw.services.internal.Settings
 import csw.services.utils.ResourceReader
 
 class Redis(settings: Settings) {
@@ -7,10 +8,11 @@ class Redis(settings: Settings) {
   private val eventMasterConf: String = updatedRedisConf(eventPort, "event_master.pid", "dump_event_master.rdb")
   private val alarmMasterConf: String = updatedRedisConf(alarmPort, "alarm_master.pid", "dump_alarm_master.rdb", "\"Kg$x\"")
 
-  def startRedis(port: String, conf: String): Process =
-    new ProcessBuilder("redis-server", conf, "--port", port).inheritIO().start()
-  def startEvent(): Process = startRedis(eventPort, eventMasterConf)
-  def startAlarm(): Process = startRedis(alarmPort, alarmMasterConf)
+  def startRedis(name: String, port: String, conf: String): Process =
+    Service.start(name, new ProcessBuilder("redis-server", conf, "--port", port).inheritIO().start())
+
+  def startEvent(): Process = startRedis("Event Service", eventPort, eventMasterConf)
+  def startAlarm(): Process = startRedis("Alarm Service", alarmPort, alarmMasterConf)
 
   private def replacePid(name: String): String => String =
     _.replace("pidfile /var/run/redis_6379.pid", s"pidfile /var/run/$name")
@@ -23,6 +25,7 @@ class Redis(settings: Settings) {
     ResourceReader
       .copyToTmp(
         "redis/master.conf",
+        suffix = ".conf",
         transform = replacePort(port) andThen replacePid(pid) andThen replaceDbName(dbName) andThen replaceKeyspace(keyspaceEvent)
       )
       .getAbsolutePath

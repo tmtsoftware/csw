@@ -34,7 +34,7 @@ object ContainerCmd {
     new ContainerCmd(name, subsystem, true, defaultConfig).start(args)
 }
 
-private[containercmd] class ContainerCmd(
+private[framework] class ContainerCmd(
     name: String,
     subsystem: Subsystem,
     startLogging: Boolean,

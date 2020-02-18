@@ -12,17 +12,19 @@ import msocket.impl.post.{HttpPostHandler, ServerHttpCodecs}
 
 import scala.concurrent.ExecutionContext
 
-class LocationHttpHandler(locationService: LocationService, securityDirectives: SecurityDirectives)(
+class LocationHttpHandler(locationService: LocationService, securityDirectives: => SecurityDirectives)(
     implicit ex: ExecutionContext
 ) extends HttpPostHandler[LocationHttpMessage]
     with ServerHttpCodecs {
 
-  import securityDirectives._
+  private lazy val securityDirectivesCached: SecurityDirectives = securityDirectives
 
   override def handle(request: LocationHttpMessage): Route = request match {
-    case Register(registration)               => secure(EmptyPolicy)(complete(locationService.register(registration).map(_.location)))
-    case Unregister(connection)               => secure(EmptyPolicy)(complete(locationService.unregister(connection)))
-    case UnregisterAll                        => secure(EmptyPolicy)(complete(locationService.unregisterAll()))
+    case Register(registration) =>
+      securityDirectivesCached.secure(EmptyPolicy)(_ => complete(locationService.register(registration).map(_.location)))
+    case Unregister(connection) =>
+      securityDirectivesCached.secure(EmptyPolicy)(_ => complete(locationService.unregister(connection)))
+    case UnregisterAll                        => securityDirectivesCached.secure(EmptyPolicy)(_ => complete(locationService.unregisterAll()))
     case Find(connection)                     => complete(locationService.find(connection))
     case Resolve(connection, within)          => complete(locationService.resolve(connection, within))
     case ListEntries                          => complete(locationService.list)

@@ -1,4 +1,5 @@
 import java.io.File
+import java.nio.file.Files
 
 import sbt.Keys._
 import sbt.io.Path
@@ -36,18 +37,33 @@ object DeployApp extends AutoPlugin {
 
   override def projectSettings: Seq[Setting[_]] =
     SettingsHelper.makeDeploymentSettings(Universal, packageBin in Universal, "zip") ++
-    SettingsHelper.makeDeploymentSettings(UniversalDocs, packageBin in UniversalDocs, "zip") ++ Seq(
+      SettingsHelper.makeDeploymentSettings(UniversalDocs, packageBin in UniversalDocs, "zip") ++ Seq(
       target in Universal := file(".") / "target" / "universal",
       mappings in Universal := (mappings in Universal).value ++ scriptsAndConfsMapping.value
     )
 
+  private def replace(inputFile: File, from: String, to: String) = {
+    val modified = IO.read(inputFile).replace(from, to)
+    val tmpFile  = Files.createTempFile(inputFile.getName, ".sh").toFile
+    tmpFile.setExecutable(true)
+    IO.write(tmpFile, modified)
+    tmpFile
+  }
+
   private def scriptsAndConfsMapping = Def.task {
-    val scriptsDir       = file(".") / "scripts"
-    val sentinelConf     = scriptsDir / "conf" / "redis_sentinel" / "sentinel.conf"
-    val authServerDir    = scriptsDir / "csw-auth" / "prod"
+    val scriptsDir    = file(".") / "scripts"
+    val sentinelConf  = scriptsDir / "conf" / "redis_sentinel" / "sentinel.conf"
+    val authServerDir = scriptsDir / "csw-auth" / "prod"
+    // csw-services.sh, redis-sentinel-prod.sh and start-aas.sh scripts are deprecated, use "csw.sh" script instead
     val serviceScript    = scriptsDir / "csw-services.sh"
     val prodScript       = scriptsDir / "redis-sentinel-prod.sh"
     val authServerScript = authServerDir / "start-aas.sh"
+
+    // replace default csw version to current build version in csw.sh script
+    val v                 = version.value
+    val originalCswScript = scriptsDir / "csw.sh"
+    val cswScript         = replace(originalCswScript, "DEFAULT_CSW_VERSION=\"master-SNAPSHOT\"", s"DEFAULT_CSW_VERSION=$v")
+    val coursierLauncher  = scriptsDir / "coursier"
     val confs = Path
       .directory(new File(scriptsDir, "conf"))
       .filterNot { case (f, s) => s.equals("conf/redis_sentinel/sentinel.conf") }
@@ -59,6 +75,8 @@ object DeployApp extends AutoPlugin {
     ((serviceScript, s"bin/${serviceScript.getName}")) :+
     ((prodScript, s"bin/${prodScript.getName}")) :+
     ((authServerScript, s"bin/${authServerScript.getName}")) :+
+    ((cswScript, s"bin/${originalCswScript.getName}")) :+
+    ((coursierLauncher, s"bin/${coursierLauncher.getName}")) :+
     ((sentinelConf, s"conf/redis_sentinel/sentinel-template.conf"))
   }
 }

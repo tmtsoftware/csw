@@ -4,11 +4,11 @@ import csw.location.server.commons.TestFutureExtension.RichFuture
 import csw.location.server.internal.ServerWiring
 import org.mockito.MockitoSugar
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 
-trait HTTPLocationService
+private[csw] trait HTTPLocationService
     extends AnyFunSuiteLike
     with Matchers
     with BeforeAndAfterAll
@@ -16,11 +16,13 @@ trait HTTPLocationService
     with ScalaFutures
     with MockitoSugar {
 
-  private val locationPort                         = 3553
-  private var locationWiring: Option[ServerWiring] = None
+  protected val locationPort: Int             = 3553
+  protected val httpLocationPort: Option[Int] = None
+  var locationWiring: Option[ServerWiring]    = None
+  protected val enableAuth: Boolean           = false
 
-  def start(clusterPort: Option[Int] = Some(locationPort), httpPort: Option[Int] = None): Unit = {
-    locationWiring = Some(ServerWiring.make(clusterPort, httpPort, enableAuth = false))
+  def start(clusterPort: Option[Int] = Some(locationPort), httpPort: Option[Int] = httpLocationPort): Unit = {
+    locationWiring = Some(ServerWiring.make(clusterPort, httpPort, enableAuth = enableAuth))
     locationWiring.map(_.locationHttpService.start().await)
   }
 
@@ -29,8 +31,11 @@ trait HTTPLocationService
 
 }
 
-class JHTTPLocationService extends HTTPLocationService
+private[csw] class JHTTPLocationService extends HTTPLocationService
 
-class HTTPLocationServiceOnPorts(clusterPort: Int, httpPort: Int) extends HTTPLocationService {
-  override def beforeAll(): Unit = start(Some(clusterPort), Some(httpPort))
+private[csw] class HTTPLocationServiceOnPorts(clusterPort: Int, val httpPort: Int, auth: Boolean = false)
+    extends HTTPLocationService {
+  override val locationPort: Int             = clusterPort
+  override val enableAuth: Boolean           = auth
+  override val httpLocationPort: Option[Int] = Some(httpPort)
 }

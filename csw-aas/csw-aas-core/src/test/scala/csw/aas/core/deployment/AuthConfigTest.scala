@@ -22,12 +22,26 @@ class AuthConfigTest extends AnyFunSuite with Matchers {
     deployment.getAuthServerBaseUrl shouldBe config.getConfig("auth-config").getString("auth-server-url")
   }
 
-  test("should not resolve auth service when auth is disabled") {
+  test("should not resolve auth service when auth is disabled via config") {
     val config = ConfigFactory
       .load()
       .withValue("auth-config.disabled", ConfigValueFactory.fromAnyRef("true"))
 
     val authConfig = AuthConfig.create(config)
+
+    val deployment = authConfig.getDeployment
+
+    deployment.getResourceName shouldBe "security-disabled-client"
+    deployment.getRealm shouldBe config.getConfig("auth-config").getString("realm")
+    deployment.getAuthServerBaseUrl shouldBe "http://disabled-auth-service"
+  }
+
+  test("should not resolve auth service when auth is disabled via parameter") {
+    val config = ConfigFactory
+      .load()
+      .withValue("auth-config.disabled", ConfigValueFactory.fromAnyRef("true"))
+
+    val authConfig = AuthConfig.create(config, disabledMaybe = Some(true))
 
     val deployment = authConfig.getDeployment
 

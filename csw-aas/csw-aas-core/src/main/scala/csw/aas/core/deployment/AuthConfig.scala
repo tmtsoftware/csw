@@ -47,10 +47,10 @@ class AuthConfig private (config: Config, authServiceLocation: Option[HttpLocati
 
         convertToDeployment(configForDisabledAuth)
       case None =>
-        debug("creating keycloak deployment with keycloak location from location service")
+        debug("creating keycloak deployment with pre-configured keycloak location")
         convertToDeployment(config)
       case Some(location) =>
-        debug("creating keycloak deployment with pre-configured keycloak location")
+        debug("creating keycloak deployment with keycloak location from location service")
         val configWithResolvedAuthUrl = config.withValue("auth-server-url", ConfigValueFactory.fromAnyRef(location.uri.toString))
         convertToDeployment(configWithResolvedAuthUrl)
     }

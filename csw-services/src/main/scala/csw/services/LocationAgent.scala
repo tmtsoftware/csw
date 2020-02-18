@@ -1,5 +1,7 @@
 package csw.services
+
 import csw.location.agent.{Main => LocationAgentMain}
+import csw.services.internal.Settings
 import csw.services.utils.ResourceReader
 
 import scala.collection.mutable
@@ -8,10 +10,11 @@ class LocationAgent(settings: Settings) {
   import settings._
   private val pgHbaConf: String = ResourceReader.copyToTmp("database/pg_hba.conf").getAbsolutePath
 
-  def start(args: Array[String]): Unit = LocationAgentMain.main(args)
+  def start(name: String, args: Array[String]): Option[Process] = Service.start(name, LocationAgentMain.start(args))
 
-  def startPostgres(): Unit = {
+  def startPostgres(): Option[Process] = {
     start(
+      "Database Service",
       Array(
         "--prefix",
         "CSW.DatabaseServer",
@@ -36,11 +39,14 @@ class LocationAgent(settings: Settings) {
     if (alarm) prefixes.addOne("CSW.AlarmServer")
     if (alarm || event)
       start(
+        "Redis Sentinel",
         Array(
           "--prefix",
           prefixes.mkString(","),
           "--command",
-          s"redis-sentinel ${sentinelConf} --port $sentinelPort"
+          s"redis-sentinel $sentinelConf --port $sentinelPort",
+          "--port",
+          sentinelPort
         )
       )
   }

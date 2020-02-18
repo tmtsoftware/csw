@@ -12,7 +12,7 @@ AssemblyInfo
     locationServiceUsage = RegisterAndTrackServices
     connections = [
         {
-          name: "Sample_HCD"
+          prefix: "ESW.Sample_HCD"
           componentType: assembly
           connectionType: akka
         }

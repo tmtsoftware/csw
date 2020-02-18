@@ -1,16 +1,13 @@
 package csw.services
 
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.Behaviors
 import caseapp.core.RemainingArgs
 import caseapp.core.app.CommandApp
-import csw.location.client.ActorSystemFactory
-import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.services.Command.Start
-import csw.services.utils.Environment
+import csw.logging.client.scaladsl.LoggingSystemFactory
+import csw.services.cli.Command
+import csw.services.cli.Command.Start
+import csw.services.internal.Wiring
 
-import scala.concurrent.duration.{Duration, DurationDouble}
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 object Main extends CommandApp[Command] {
   override def appName: String    = getClass.getSimpleName.dropRight(1) // remove $ from class name
@@ -33,31 +30,33 @@ object Main extends CommandApp[Command] {
       auth: Boolean,
       maybeInterface: Option[String]
   ): Unit = {
-    val settings = Settings(maybeInterface)
-    Environment.setup(settings)
+    val wiring = new Wiring(maybeInterface)
+    import wiring._
+    try {
+      environment.setup()
+      LoggingSystemFactory.start(appName, appVersion, settings.hostName, actorSystem)
+      LocationServer.start(settings.clusterPort)
 
-    implicit val actorSystem: ActorSystem[Nothing] = ActorSystemFactory.remote(Behaviors.empty)
-    implicit val ec: ExecutionContext              = actorSystem.executionContext
-
-    val locationService = HttpLocationServiceFactory.makeLocalClient
-    val agent           = new LocationAgent(settings)
-    val redis           = new Redis(settings)
-    val keycloak        = new AuthServer(locationService, settings)
-
-    val locationServer = Future(LocationServer.start(settings.clusterPort))
-    if (event) redis.startEvent()
-    if (alarm) redis.startAlarm()
-    Future(agent.startSentinel(event, alarm))
-    if (database) Future(agent.startPostgres())
-
-    // if config is true, then start auth + config
-    if (config) {
-      Await.result(keycloak.start, 20.minutes)
-      ConfigServer.start(settings.configPort)
+      start(event, redis.startEvent())
+      start(alarm, redis.startAlarm())
+      start(event || alarm, locationAgent.startSentinel(event, alarm))
+      start(database, locationAgent.startPostgres())
+      start(config || auth, keycloak.start())
+      start(config, ConfigServer.start(settings.configPort))
     }
-    else if (auth) Await.result(keycloak.start, 20.minutes)
-
-    Await.result(locationServer, Duration.Inf)
+    catch {
+      case NonFatal(e) =>
+        e.printStackTrace()
+        exit(1)
+    }
   }
+
+  private def start(flag: Boolean, service: => Unit): Unit = if (flag) ignoreException(service)
+
+  private def ignoreException(thunk: => Unit): Unit =
+    try thunk
+    catch {
+      case NonFatal(_) =>
+    }
 
 }
