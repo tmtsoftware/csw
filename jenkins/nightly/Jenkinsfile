@@ -24,10 +24,6 @@ pipeline {
         stage('Multi-Node Test') {
             // These tests cover the scenario of multiple components in multiple containers on different machines.
             steps {
-                sh "sbt -DenableCoverage=false csw-location-server/multiNodeTest"
-                sh "sbt -DenableCoverage=false csw-config-client/multiNodeTest"
-                sh "sbt -DenableCoverage=false csw-config-cli/multiNodeTest"
-                sh "sbt -DenableCoverage=false csw-framework/multiNodeTest"
                 sh "sbt -DenableCoverage=false integration/multiNodeTest"
             }
         }

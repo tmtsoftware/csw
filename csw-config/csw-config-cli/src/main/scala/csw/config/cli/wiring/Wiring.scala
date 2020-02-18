@@ -18,7 +18,7 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
  * of config server using `ConfigServiceResolver` from `csw-config-client` and then starts the app catering cli features
  * over admin api of config service.
  */
-private[config] class Wiring {
+private[csw] class Wiring {
   lazy val config: Config = ConfigFactory.load()
   lazy val settings       = new Settings(config)
   lazy val actorSystem    = ActorSystem(SpawnProtocol(), "config-cli", config)

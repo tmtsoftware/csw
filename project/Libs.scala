@@ -13,7 +13,7 @@ object Libs {
   val `silencer-lib`       = "com.github.ghik"        % "silencer-lib"        % silencerVersion cross CrossVersion.full
   val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.11.0"
 
-  val `embedded-keycloak`            = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak"            % "v0.1.6" //Apache 2.0
+  val `embedded-keycloak`            = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak"            % "eeef8b8286" //Apache 2.0
   val `logback-classic`              = "ch.qos.logback"                           % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `akka-management-cluster-http` = "com.lightbend.akka.management"            %% "akka-management-cluster-http" % "1.0.5"
   val `svnkit`                       = "org.tmatesoft.svnkit"                     % "svnkit"                        % "1.10.1" //TMate Open Source License
@@ -51,8 +51,8 @@ object Libs {
   val `config`          = "com.typesafe"                  % "config"          % "1.4.0"
   val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.6.3"
   val `caffeine`        = "com.github.ben-manes.caffeine" % "caffeine"        % "2.8.1"
-
-  val `case-app` = "com.github.alexarchambault" %% "case-app" % "2.0.0-M9"
+  val netty             = "io.netty"                      % "netty"           % "3.10.6.Final"
+  val `case-app`        = "com.github.alexarchambault"    %% "case-app"       % "2.0.0-M9"
 }
 
 object Borer {
@@ -120,7 +120,7 @@ object Jooq {
 }
 
 object MSocket {
-  val Version = "3c0220b9"
+  val Version = "cb1e6d9"
 
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-impl-jvm` = "com.github.tmtsoftware.msocket" %% "msocket-impl" % Version

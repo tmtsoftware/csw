@@ -9,8 +9,8 @@ They are identified using an abbreviation typically of 3 or 4 letters.
 
 Subsystems are made available via separate files, for consumption in Scala and Java code.
 
- * Import `csw.messages.params.models.Subsystem` for **Scala** 
- * Import `csw.messages.javadsl.csw.prefix.javadsl.JSubsystem` for **Java**.  
+ * Import `csw.prefix.models.Subsystem` for **Scala** 
+ * Import `csw.prefix.javadsl.JSubsystem` for **Java**.  
 
 @@@
 
@@ -46,6 +46,7 @@ Subsystems are made available via separate files, for consumption in Scala and J
 |  SOSS         | Science Operations Support System |
 |  TCS          | Telescope Control System |
 |  WFOS         | Wide Field Optical Spectrometer |
+|  Container    | Container subsystem |
 
 ## Usage Examples
 The usage examples can be found in [Events](events.html), [Commands](commands.html), [States](states.html)

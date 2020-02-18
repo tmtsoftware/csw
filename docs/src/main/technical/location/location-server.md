@@ -158,4 +158,4 @@ There are numerous tests for the location server, including multi-jvm tests. The
 
 - Unit/Component Tests: `sbt csw-location-server/test:test`
 
-- Multi-Jvm Tests: `sbt csw-location-server/multi-jvm:test`
+- Multi-Jvm Tests: `sbt integration/multi-jvm:testOnly csw.location*`

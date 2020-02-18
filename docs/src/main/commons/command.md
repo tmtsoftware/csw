@@ -197,7 +197,7 @@ is possible to handle an `Invalid` response locally, but in most cases it must s
 shows how to process individual responses from a `submit`:
 
 Scala/submit w/invalid response
-:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #invalidCmd }
+:   @@snip [CommandServiceTest.scala](../../../../integration/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #invalidCmd }
 
 Java/submit w/invalid response
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #invalidSubmitCmd }
@@ -225,7 +225,7 @@ commands look the same from the command sender's perspective when using `submitA
 This example shows an immediate completion command using `submitAndWait`.
 
 Scala/submitAndWait w/immediate-response
-:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #immediate-response }
+:   @@snip [CommandServiceTest.scala](../../../../integration/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #immediate-response }
 
 Java/submitAndWait w/immediate-response
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #immediate-response }
@@ -252,7 +252,7 @@ Oneway is useful for communication between an Assembly when it needs to send com
 validated on the destination and the validation response is returned, but no other responses are provided.
 
 Scala
-:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #oneway }
+:   @@snip [CommandServiceTest.scala](../../../../integration/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #oneway }
 
 Java
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #oneway }
@@ -262,7 +262,7 @@ Sometimes it may be useful to test whether or not a component can execute a comm
 actions. The `validate` message can be used for this purpose. `Validate` returns a `ValidateResponse` of `Accepted`, `Invalid`, or `Locked`.
 
 Scala
-:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #validate }
+:   @@snip [CommandServiceTest.scala](../../../../integration/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #validate }
 
 Java
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #validate }
@@ -274,7 +274,7 @@ the `query` method of `CommandService` can be used as shown in the
 following example without using the Future returned by `submitAndWait`, which provides the final completion notification.
 
 Scala/submit w/query
-:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #queryLongRunning }
+:   @@snip [CommandServiceTest.scala](../../../../integration/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #queryLongRunning }
 
 Java/submit w/query
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #queryLongRunning }
@@ -290,7 +290,7 @@ you can use the runId returned by `submitAndWait` with `queryFinal`.
 
 
 Scala/submitAndWait long running/queryFinal
-:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #queryFinalWithSubmitAndWait }
+:   @@snip [CommandServiceTest.scala](../../../../integration/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #queryFinalWithSubmitAndWait }
 
 Java/submitAndWait long running/queryFinal
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #queryFinal }
@@ -305,7 +305,7 @@ as a Future, `submitAllAndWait` returns a list of `SubmitResponse`s as a future,
 all the commands in the list have completed. 
 
 Scala/query usage
-:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #submitAll }
+:   @@snip [CommandServiceTest.scala](../../../../integration/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #submitAll }
 
 Java/query usage
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #submitAll }
@@ -335,7 +335,7 @@ The example sends a `Setup` with an encoder parameter value to the HCD as a `one
 causes the HCD to publish `CurrentState` with the value that was sent to it.
 
 Scala
-:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #subscribeCurrentState }
+:   @@snip [CommandServiceTest.scala](../../../../integration/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #subscribeCurrentState }
 
 Java
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #subscribeCurrentState }
@@ -378,7 +378,7 @@ The developer is not limited to these `StateMatcher`s. Any class the implements 
 interface can be provided to a `Matcher`.
   
 Scala
-:   @@snip [LongRunningCommandTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #matcher }
+:   @@snip [LongRunningCommandTest.scala](../../../../integration/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #matcher }
 
 Java
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #matcher }
@@ -391,7 +391,7 @@ the `stop` method of the matcher as shown in the example.
  and implements much of the boilerplate of the previous example.
  
 Scala
-:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #onewayAndMatch }
+:   @@snip [CommandServiceTest.scala](../../../../integration/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #onewayAndMatch }
 
 Java
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #onewayAndMatch }

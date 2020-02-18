@@ -9,7 +9,7 @@ import csw.location.api.models.Connection.HttpConnection
 import csw.location.api.models.{ComponentId, ComponentType, HttpLocation, HttpRegistration}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.commons.TestFutureExtension.RichFuture
-import csw.network.utils.{Networks, SocketUtils}
+import csw.network.utils.SocketUtils
 import csw.prefix.models.Prefix
 import msocket.impl.HttpError
 import org.scalatest.funsuite.AnyFunSuiteLike
@@ -30,11 +30,13 @@ class LocationAuthTestWithKeycloak
 
   private val aasPort: Int = SocketUtils.getFreePort
 
+  private lazy val hostname: String = locationWiring.get.clusterSettings.hostname
+
   private val tokenFactory: () => Option[String] =
     () =>
       Some(
         BearerToken
-          .fromServer(port = aasPort, host = Networks().hostname, username = "john", password = "abcd", realm = "test")
+          .fromServer(port = aasPort, username = "john", host = hostname, password = "abcd", realm = "test")
           .token
       )
 
@@ -43,7 +45,10 @@ class LocationAuthTestWithKeycloak
   override def beforeAll(): Unit = {
     super.beforeAll()
     keycloakStopHandle = startKeycloak(aasPort)
+    println(s"registration hostname: $hostname")
     locationWiring.get.locationService.register(HttpRegistration(AASConnection.value, aasPort, "auth")).await
+    //test
+    locationWiring.get.locationService.list.await.foreach(println)
   }
 
   private implicit def actorSystem: ActorSystem[SpawnProtocol.Command] = locationWiring.get.actorSystem
@@ -55,12 +60,13 @@ class LocationAuthTestWithKeycloak
   }
 
   test("register (protected route) should return 200 when when a valid token is present in request") {
+    println(s"token: ${tokenFactory()}")
     val locationAuthClient = HttpLocationServiceFactory.make("localhost", httpPort, tokenFactory)
     val connection         = HttpConnection(ComponentId(Prefix("TCS.comp1"), ComponentType.Service))
     val servicePort        = 2345
     val registration       = HttpRegistration(connection, servicePort, "abc")
     val registrationResult = locationAuthClient.register(registration).await
-    registrationResult.location shouldBe HttpLocation(connection, URI.create(s"http://${Networks().hostname}:$servicePort/abc"))
+    registrationResult.location shouldBe HttpLocation(connection, URI.create(s"http://$hostname:$servicePort/abc"))
   }
 
   private def startKeycloak(port: Int): StopHandle = {
@@ -73,8 +79,9 @@ class LocationAuthTestWithKeycloak
         )
       )
     )
-    val embeddedKeycloak = new EmbeddedKeycloak(keycloakData, Settings(port = port, printProcessLogs = false))
-    embeddedKeycloak.startServer().awaitWithTimeout(1.minute)
+    println(s"keycloak binding: $hostname")
+    val embeddedKeycloak = new EmbeddedKeycloak(keycloakData, Settings(port = port, printProcessLogs = true))
+    embeddedKeycloak.startServer().awaitWithTimeout(2.minute)
   }
 
   override def afterAll(): Unit = {

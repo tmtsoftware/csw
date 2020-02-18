@@ -47,38 +47,37 @@ SampleContainerInfo
     name = "Sample_Container"
     components: [
       {
-        name = "SampleAssembly"
         componentType = assembly
         behaviorFactoryClassName = package.component.SampleAssembly
-        prefix = abc.sample.prefix
+        prefix = wfos.SampleAssembly
         locationServiceUsage = RegisterAndTrackServices
         connections = [
           {
-            name: Sample_Hcd_1
+            prefix: wfos.Sample_Hcd_1
             componentType: hcd
             connectionType: akka
           },
           {
-            name: Sample_Hcd_2
+            prefix: wfos.Sample_Hcd_2
             componentType: hcd
             connectionType: akka
           },
           {
-            name: Sample_Hcd_3
+            prefix: wfos.Sample_Hcd_3
             componentType: hcd
             connectionType: akka
           }
         ]
       },
       {
-        name = "Sample_Hcd_1"
+        prefix = "wfos.Sample_Hcd_1"
         componentType = hcd
         behaviorFactoryClassName = package.component.SampleHcd
         prefix = abc.sample.prefix
         locationServiceUsage = RegisterOnly
       },
       {
-        name = "Sample_Hcd_2"
+        prefix = "wfos.Sample_Hcd_2"
         componentType: hcd
         behaviorFactoryClassName: package.component.SampleHcd
         prefix: abc.sample.prefix
@@ -95,10 +94,9 @@ A component can be run alone in a standalone mode without sharing its JVM space 
 Sample Info for an assembly
 :   @@@vars
     ```
-    name = "Monitor_Assembly"
     componentType = assembly
     behaviorFactoryClassName = csw.common.components.command.ComponentBehaviorFactoryForCommand
-    prefix = tcs.mobie.blue.monitor
+    prefix = tcs.mobie.blue.monitor.Monitor_Assembly
     locationServiceUsage = RegisterOnly
     ```
     @@@

@@ -57,10 +57,6 @@ pipeline {
         stage('Multi-Jvm Test') {
             steps {
                 sh "sbt ';set every enableFatalWarnings := true; integration/multi-jvm:test'"
-                sh "sbt ';set every enableFatalWarnings := true; csw-location-server/multi-jvm:test'"
-                sh "sbt ';set every enableFatalWarnings := true; csw-config-client/multi-jvm:test'"
-                sh "sbt ';set every enableFatalWarnings := true; csw-config-cli/multi-jvm:test'"
-                sh "sbt ';set every enableFatalWarnings := true; csw-framework/multi-jvm:test'"
             }
         }
 
