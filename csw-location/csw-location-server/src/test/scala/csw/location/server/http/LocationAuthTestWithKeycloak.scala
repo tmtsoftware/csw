@@ -36,7 +36,7 @@ class LocationAuthTestWithKeycloak
     () =>
       Some(
         BearerToken
-          .fromServer(port = aasPort, host = hostname, username = "john", password = "abcd", realm = "test")
+          .fromServer(port = aasPort, username = "john", host = hostname, password = "abcd", realm = "test")
           .token
       )
 
@@ -45,7 +45,10 @@ class LocationAuthTestWithKeycloak
   override def beforeAll(): Unit = {
     super.beforeAll()
     keycloakStopHandle = startKeycloak(aasPort)
+    println(s"registration hostname: $hostname")
     locationWiring.get.locationService.register(HttpRegistration(AASConnection.value, aasPort, "auth")).await
+    //test
+    locationWiring.get.locationService.list.await.foreach(println)
   }
 
   private implicit def actorSystem: ActorSystem[SpawnProtocol.Command] = locationWiring.get.actorSystem
@@ -57,6 +60,7 @@ class LocationAuthTestWithKeycloak
   }
 
   test("register (protected route) should return 200 when when a valid token is present in request") {
+    println(s"token: ${tokenFactory()}")
     val locationAuthClient = HttpLocationServiceFactory.make("localhost", httpPort, tokenFactory)
     val connection         = HttpConnection(ComponentId(Prefix("TCS.comp1"), ComponentType.Service))
     val servicePort        = 2345
@@ -75,8 +79,9 @@ class LocationAuthTestWithKeycloak
         )
       )
     )
-    val embeddedKeycloak = new EmbeddedKeycloak(keycloakData, Settings(port = port, printProcessLogs = false))
-    embeddedKeycloak.startServer().awaitWithTimeout(1.minute)
+    println(s"keycloak binding: $hostname")
+    val embeddedKeycloak = new EmbeddedKeycloak(keycloakData, Settings(port = port, printProcessLogs = true))
+    embeddedKeycloak.startServer().awaitWithTimeout(2.minute)
   }
 
   override def afterAll(): Unit = {
