@@ -1,6 +1,6 @@
 # Prefix in CSW 2
 
-The use of prefixes has been made more consistent in CSW 2.0.0.  Before this update, Prefix was a dot-separated String 
+The use of prefixes has been made more consistent in CSW 2.0.0. Before this update, Prefix was a dot-separated String 
 starting with a subsystem, where the component name was considered to be the last item.
 The Subsystem was extracted from the String on creation.
 
@@ -11,7 +11,7 @@ e.g IRIS.imager.filterWheelAssembly =>
 There was some confusion about what was the Prefix: the entire string (IRIS.imager.filterWheelAssembly), or everything
 except the component name (IRIS.imager)?
 
-With CSW 2, we expect this to be less confusing.  Prefix is the whole string and is made up of exactly two parts:
+With CSW 2, we expect this to be less confusing. Prefix is the whole string and is made up of exactly two parts:
 the subsystem (explicitly as a Subsystem type) and a String component name, where everything after the subsystem is considered to 
 be the component name.
 
@@ -20,13 +20,13 @@ e.g. IRIS.imager.filterWheelAssembly =>
   Component Name: imager.filterWheelAssembly
 
 Prefixes can be still be constructed using a String, but it must have a part at the beginning before the first dot
-that matches one of the valid TMT subsystems as specified in the Subsystem.scala.
+that matches one of the valid TMT subsystems as specified in the [Subsystem.scala](($github.base_url$/csw-prefix/shared/src/main/scala/csw/prefix/models/Subsystem.scala)).
 
 This change will have the following effects on your code:
 
 ## Component Creation
 
-ComponentInfo files now take a Prefix as a String instead of an ambiguous prefix and a component name.  Similarly, 
+ComponentInfo files now take a Prefix as a String instead of an ambiguous prefix and a component name. Similarly, 
 Container configuration files also reference their components using Prefix instead of component name.
 
 For example, in CSW 1:
@@ -126,8 +126,8 @@ val alarmKey = AlarmKey(Prefix(NFIRAOS, "trombone"), "tromboneAxisLowLimitAlarm"
 
 # Logging Service
 
-The constuction of a Logging Service is typically done using a `LoggerFactory`.  `LoggerFactory` now takes a Prefix
-instead of just a component name String.  For components, this is done for you automatically in the framework.
+The construction of a Logging Service is typically done using a `LoggerFactory`. `LoggerFactory` now takes a Prefix
+instead of just a component name String.  For components, this is done automatically for you in the framework.
 This has the additional effect that the Subsystem and Component Name are now added to the log messages.
 
 For example, in CSW 1:
