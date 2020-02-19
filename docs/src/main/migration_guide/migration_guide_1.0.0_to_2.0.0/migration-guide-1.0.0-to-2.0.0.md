@@ -1,4 +1,4 @@
-# Migration Guide to CSW Version 2.0.0 from 1.0.0
+# Migration Guide from 1.0.0 to 2.0.0
 
 This guide shows how to migrate from CSW Version 1.0.0 to CSW Version 2.0.0. From the release notes, the following
 are the important changes from 1.0.0:

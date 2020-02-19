@@ -585,6 +585,8 @@ lazy val docs = project
     paradoxRoots := List(
       "index.html",
       "services/aas/core-concepts-and-terms.html",
+      "migration_guide/migration_guide_1.0.0_to_2.0.0/prefix.html",
+      "migration_guide/migration_guide_1.0.0_to_2.0.0/commandService.html",
       "services/aas/csw-aas-http.html",
       "services/aas/csw-aas-installed.html",
       "technical/aas/csw-aas-http.html",
