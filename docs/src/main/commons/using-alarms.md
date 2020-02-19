@@ -52,10 +52,10 @@ Now we will add code to our assembly to publish an alarm severity on every count
 to take the counter as an argument and generate an alarm:
 
 Scala
-:   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/sampleassembly/SampleAssemblyHandlersAlarm.scala) { #alarm }
+:   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/example/tutorial/basic/sampleassembly/SampleAssemblyHandlersAlarm.scala) { #alarm }
 
 Java
-:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/sampleassembly/JSampleAssemblyHandlersAlarm.java) { #alarm }
+:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/example/tutorial/basic/sampleassembly/JSampleAssemblyHandlersAlarm.java) { #alarm }
 
 This code determines the severity of the alarm based on the rules we established above:
 
@@ -68,10 +68,10 @@ Now, all we have to do is call this whenever we receive a counter event.  We add
 in the `processEvent` method:
 
 Scala
-:   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/sampleassembly/SampleAssemblyHandlersAlarm.scala) { #subscribe }
+:   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/example/tutorial/basic/sampleassembly/SampleAssemblyHandlersAlarm.scala) { #subscribe }
 
 Java
-:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/sampleassembly/JSampleAssemblyHandlersAlarm.java) { #subscribe }
+:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/example/tutorial/basic/sampleassembly/JSampleAssemblyHandlersAlarm.java) { #subscribe }
 
 To see the effect, let's use the CLI to set up a subscription to the alarm.  Note the alarm key is the component's prefix 
 (`esw.sampleassembly` for Scala, `esw.jsampleassembly` for Java), and the alarm name (`counterTooHighAlarm`).

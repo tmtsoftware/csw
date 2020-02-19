@@ -187,10 +187,10 @@ In the case of a long-running command the `Started` response can be used with ei
 This example shows a command using `submit` that returns `Started` followed by a `queryFinal` to get the final response.
 
 Scala/submit w/queryFinal
-:   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/sampleassembly/SampleAssemblyHandlers.scala) { #submitAndQueryFinal }
+:   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/example/tutorial/basic/sampleassembly/SampleAssemblyHandlers.scala) { #submitAndQueryFinal }
 
 Java/submit w/queryFinal
-:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/sampleassembly/JSampleAssemblyHandlers.java) { #submitAndQueryFinal }
+:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/example/tutorial/basic/sampleassembly/JSampleAssemblyHandlers.java) { #submitAndQueryFinal }
 
 If using `submit` and the validation fails in the destination component, the `Invalid` response is returned. Sometimes it
 is possible to handle an `Invalid` response locally, but in most cases it must simply be returned to the caller. The following example
@@ -209,10 +209,10 @@ if an Assembly needs to contact an HCD to get a response, the Assembly must firs
 shows a portion of an `onSetup` handler that returns some local state as an immediate completion. 
 
 Scala/submit immediate command
-:   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/sampleassembly/SampleAssemblyHandlers.scala) { #immediate-command }
+:   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/example/tutorial/basic/sampleassembly/SampleAssemblyHandlers.scala) { #immediate-command }
 
 Java/submit immediate command
-:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/sampleassembly/JSampleAssemblyHandlers.java) { #immediate-command }
+:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/example/tutorial/basic/sampleassembly/JSampleAssemblyHandlers.java) { #immediate-command }
 
 ### submitAndWait
 `submitAndWait` is a convenience method which sends a `submit` message and then, if the command is long-running, it waits for final completion.

@@ -185,16 +185,16 @@ This handler can also be called when the Command Service method `validateCommand
 the `onSubmit` or `onOneway` handler is not called.
 
 Assembly/Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/sampleassembly/SampleAssemblyHandlers.scala) { #validate }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/tutorial/basic/sampleassembly/SampleAssemblyHandlers.scala) { #validate }
 
 Assembly/Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/sampleassembly/JSampleAssemblyHandlers.java) { #validate }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/tutorial/basic/sampleassembly/JSampleAssemblyHandlers.java) { #validate }
 
 Hcd/Scala
-:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/samplehcd/SampleHcdHandlers.scala) { #validate }
+:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/example/tutorial/basic/samplehcd/SampleHcdHandlers.scala) { #validate }
 
 Hcd/Java
-:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/samplehcd/JSampleHcdHandlers.java) { #validate }
+:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/example/tutorial/basic/samplehcd/JSampleHcdHandlers.java) { #validate }
 
 ### onSubmit
 
@@ -207,10 +207,10 @@ The example shows one way to split `Setup` and `Observe` commands into separate 
 `Invalid` with the `UnsupportedCommandIssue`. 
 
 Assembly/Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/sampleassembly/SampleAssemblyHandlers.scala) { #submit-split }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/tutorial/basic/sampleassembly/SampleAssemblyHandlers.scala) { #submit-split }
 
 Assembly/Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/sampleassembly/JSampleAssemblyHandlers.java) { #submit-split }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/tutorial/basic/sampleassembly/JSampleAssemblyHandlers.java) { #submit-split }
 
 Ideally, in the above example, lack of support for `Observe` should be determined in the `validateCommand`
 handler and checking in `onSetup` should not be needed.
