@@ -98,6 +98,7 @@ trait CommandData {
   val requiredSequencerUnavailableIssue: CommandIssue = RequiredSequencerUnavailableIssue(reason)
   val requiredServiceUnavailableIssue: CommandIssue   = RequiredServiceUnavailableIssue(reason)
   val requiredHCDUnavailableIssue: CommandIssue       = RequiredHCDUnavailableIssue(reason)
+  val hcdBusyIssue: CommandIssue                      = HCDBusyIssue(reason)
   val unresolvedLocationsIssue: CommandIssue          = UnresolvedLocationsIssue(reason)
   val unsupportedCommandInStateIssue: CommandIssue    = UnsupportedCommandInStateIssue(reason)
   val unsupportedCommandIssue: CommandIssue           = UnsupportedCommandIssue(reason)
