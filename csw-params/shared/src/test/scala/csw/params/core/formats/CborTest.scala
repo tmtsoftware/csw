@@ -106,6 +106,7 @@ class CborTest extends AnyFunSuite with Matchers {
       UnsupportedCommandInStateIssue(""),
       RequiredServiceUnavailableIssue(""),
       RequiredHCDUnavailableIssue(""),
+      HCDBusyIssue(""),
       RequiredAssemblyUnavailableIssue(""),
       RequiredSequencerUnavailableIssue(""),
       OtherIssue("")

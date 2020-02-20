@@ -42,6 +42,7 @@ object CommandContract extends CommandData with CommandServiceCodecs {
       requiredSequencerUnavailableIssue,
       requiredServiceUnavailableIssue,
       requiredHCDUnavailableIssue,
+      hcdBusyIssue,
       unresolvedLocationsIssue,
       unsupportedCommandInStateIssue,
       unsupportedCommandIssue,
