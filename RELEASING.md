@@ -51,7 +51,3 @@
     There is no pipeline to release csw-shell but only `git tag v0.0.0` and `git push origin v0.0.0` 
 
 #### Note - `VERSION` tag is version number with 'v' as prefix. For eg. `v0.0.0`
-
-### More detailed instructions
-
-https://docs.google.com/document/d/1tK9W6NClJOB0wq3bFVEzdrYynCxES6BnPdSLNtyGMXo/edit?usp=sharing
