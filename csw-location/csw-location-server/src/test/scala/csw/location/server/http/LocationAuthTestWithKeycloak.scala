@@ -75,7 +75,6 @@ class LocationAuthTestWithKeycloak
         )
       )
     )
-    println(s"keycloak binding: $hostname")
     val embeddedKeycloak = new EmbeddedKeycloak(keycloakData, Settings(port = port, printProcessLogs = false))
     embeddedKeycloak.startServer().awaitWithTimeout(1.minute)
   }
