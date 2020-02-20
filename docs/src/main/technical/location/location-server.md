@@ -135,24 +135,22 @@ Note : `Outside` below means any machine not present in this Akka cluster.
 
 Below diagram illustrate how Akka cluster will look when authentication and authorization is enabled in `Location Server`. 
 By default when you start `Location Server`, it will start in local-only mode (Authentication and authorization
- Disabled) and bound to `127.0.0.1`.
-To start `Location Server` in public mode (Authentication and authorization enabled) and bound to `0.0.0.0`, use
+ Disabled) and bind to `127.0.0.1`.
+To start `Location Server` in public mode (Authentication and authorization enabled) and bind to `0.0.0.0`, use
  `--publicNetwork` command line
  option when @ref:[starting location server](../../apps/cswlocationserver.md)
  
 ![Location Authentication and Authorization](../../images/locationservice/location-service-auth.png)
 
-Why is this needed:
+Why is this needed ?
 
-1. As `Location Server` is by default bound to `127.0.0.1`, any application cannot establish Http connection from
+1. As `Location Server` is by default bind to `127.0.0.1`, no application can establish Http connection from
  `Outside`.
-2. In production environment, you may need a capability to access protected resources of Location Server and provide
+2. In production environment, you may need a capability to access protected resources of `Location Server` and provide
  Authentication and Authorization for such resources. E.g. ability to register/unregister components(which has to
   undergo maintenance) from a system operator machine present `Outside`. 
 3. To enable this we need to bind few instances of `Location Server` to `0.0.0.0`, so that `Outside` Http connections
- can be established to it.
-4. For such `Location Server` instances, we have added authentication and authorization so that, applications with valid token can only
- access these protected resources.
+ can be made and applications with valid token, can access its protected resources.
    
 
 ## Internals
