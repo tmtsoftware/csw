@@ -23,7 +23,7 @@ case class Key[S: ClassTag] private[generics] (keyName: String, keyType: KeyType
    * @param values an Array of values
    * @return an instance of Parameter[S] containing the key name, values (call withUnits() on the result to set the units)
    */
-  def set(values: Array[S]): Parameter[S] =
+  def setAll(values: Array[S]): Parameter[S] =
     Parameter(keyName, keyType, mutable.ArraySeq.make(values), units)
 
   /**
@@ -65,7 +65,7 @@ case class Key[S: ClassTag] private[generics] (keyName: String, keyType: KeyType
    * @param values an Array of values
    * @return a parameter containing the key name and values (call withUnits() on the result to set the units)
    */
-  def ->(values: Array[S]): Parameter[S] = set(values)
+  def ->(values: Array[S]): Parameter[S] = setAll(values)
 
   /**
    * Returns a string representation of Key as keyName

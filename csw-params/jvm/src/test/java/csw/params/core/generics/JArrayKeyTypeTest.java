@@ -52,7 +52,7 @@ public class JArrayKeyTypeTest extends JUnitSuite {
         commonAssertions(keyName, JKeyType.ByteArrayKey(), arrayData, parameterWithoutUnits, NoUnits);
 
         // key.set with Units
-        Parameter<ArrayData<Byte>> parameterWithUnits = keyUnits.set(arrayData);
+        Parameter<ArrayData<Byte>> parameterWithUnits = keyUnits.setAll(arrayData);
         commonAssertions(keyName, JKeyType.ByteArrayKey(), arrayData, parameterWithUnits, millisecond);
     }
 
@@ -73,7 +73,7 @@ public class JArrayKeyTypeTest extends JUnitSuite {
         commonAssertions(keyName, JKeyType.ShortArrayKey(), arrayData, parameterWithoutUnits, NoUnits);
 
         // key.set with Units
-        Parameter<ArrayData<Short>> parameterWithUnits = keyUnits.set(arrayData);
+        Parameter<ArrayData<Short>> parameterWithUnits = keyUnits.setAll(arrayData);
         commonAssertions(keyName, JKeyType.ShortArrayKey(), arrayData, parameterWithUnits, degree);
     }
 
@@ -94,7 +94,7 @@ public class JArrayKeyTypeTest extends JUnitSuite {
         commonAssertions(keyName, JKeyType.LongArrayKey(), arrayData, parameterWithoutUnits, NoUnits);
 
         // key.set with Units
-        Parameter<ArrayData<Long>> parameterWithUnits = keyUnits.set(arrayData);
+        Parameter<ArrayData<Long>> parameterWithUnits = keyUnits.setAll(arrayData);
         commonAssertions(keyName, JKeyType.LongArrayKey(), arrayData, parameterWithUnits, millimeter);
     }
 
@@ -116,7 +116,7 @@ public class JArrayKeyTypeTest extends JUnitSuite {
         commonAssertions(keyName, JKeyType.IntArrayKey(), arrayData, parameterWithoutUnits, NoUnits);
 
         // key.set with Units
-        Parameter<ArrayData<Integer>> parameterWithUnits = keyUnits.set(arrayData);
+        Parameter<ArrayData<Integer>> parameterWithUnits = keyUnits.setAll(arrayData);
         commonAssertions(keyName, JKeyType.IntArrayKey(), arrayData, parameterWithUnits, kilometer);
     }
 
@@ -137,7 +137,7 @@ public class JArrayKeyTypeTest extends JUnitSuite {
         commonAssertions(keyName, JKeyType.FloatArrayKey(), arrayData, parameterWithoutUnits, NoUnits);
 
         // key.set with Units
-        Parameter<ArrayData<Float>> parameterWithUnits = keyUnits.set(arrayData);
+        Parameter<ArrayData<Float>> parameterWithUnits = keyUnits.setAll(arrayData);
         commonAssertions(keyName, JKeyType.FloatArrayKey(), arrayData, parameterWithUnits, meter);
     }
 
@@ -158,7 +158,7 @@ public class JArrayKeyTypeTest extends JUnitSuite {
         commonAssertions(keyName, JKeyType.DoubleArrayKey(), arrayData, parameterWithoutUnits, NoUnits);
 
         // key.set with Units
-        Parameter<ArrayData<Double>> parameterWithUnits = keyUnits.set(arrayData);
+        Parameter<ArrayData<Double>> parameterWithUnits = keyUnits.setAll(arrayData);
         commonAssertions(keyName, JKeyType.DoubleArrayKey(), arrayData, parameterWithUnits, encoder);
     }
 }

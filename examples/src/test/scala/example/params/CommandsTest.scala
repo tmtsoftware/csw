@@ -82,8 +82,8 @@ class CommandsTest extends AnyFunSpec with Matchers {
       val bytes1: Array[Byte] = Array[Byte](10, 20)
       val bytes2: Array[Byte] = Array[Byte](30, 40)
 
-      val b1: Parameter[Byte] = byteKey1.set(bytes1)
-      val b2: Parameter[Byte] = byteKey2.set(bytes2)
+      val b1: Parameter[Byte] = byteKey1.setAll(bytes1)
+      val b2: Parameter[Byte] = byteKey2.setAll(bytes2)
 
       val sc3: Setup = Setup(prefix, CommandName("move"), Some(obsId), Set(b1, b2))
 

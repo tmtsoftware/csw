@@ -28,7 +28,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(JKeyType.BooleanKey(), key.keyType());
 
         // key.set without Units
-        Parameter<Boolean> parameterWithoutUnits = key.set(paramData);
+        Parameter<Boolean> parameterWithoutUnits = key.setAll(paramData);
 
         Assert.assertArrayEquals(paramData, (Boolean[]) parameterWithoutUnits.values());
 
@@ -48,7 +48,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(JKeyType.CharKey(), key.keyType());
 
         // key.set without Units
-        Parameter<Character> parameterWithoutUnits = key.set(paramData);
+        Parameter<Character> parameterWithoutUnits = key.setAll(paramData);
 
         Assert.assertArrayEquals(paramData, (Character[]) parameterWithoutUnits.values());
 
@@ -58,7 +58,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
         // key.set with Units
-        Parameter<Character> parameterWithUnits = keyUnits.set(paramData);
+        Parameter<Character> parameterWithUnits = keyUnits.setAll(paramData);
         Assert.assertEquals(encoder, parameterWithUnits.units());
 
         Assert.assertArrayEquals(paramData, (Character[]) parameterWithUnits.values());
@@ -79,7 +79,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(JKeyType.ByteKey(), key.keyType());
 
         // key.set without Units
-        Parameter<Byte> parameterWithoutUnits = key.set(paramData);
+        Parameter<Byte> parameterWithoutUnits = key.setAll(paramData);
 
         Assert.assertArrayEquals(paramData, (Byte[]) parameterWithoutUnits.values());
 
@@ -89,7 +89,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
         // key.set with Units
-        Parameter<Byte> parameterWithUnits = keyUnits.set(paramData);
+        Parameter<Byte> parameterWithUnits = keyUnits.setAll(paramData);
         Assert.assertEquals(encoder, parameterWithUnits.units());
 
         Assert.assertArrayEquals(paramData, (Byte[]) parameterWithUnits.values());
@@ -109,7 +109,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(JKeyType.ShortKey(), key.keyType());
 
         // key.set without Units
-        Parameter<Short> parameterWithoutUnits = key.set(paramData);
+        Parameter<Short> parameterWithoutUnits = key.setAll(paramData);
 
         Assert.assertArrayEquals(paramData, (Short[]) parameterWithoutUnits.values());
 
@@ -119,7 +119,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
         // key.set with Units
-        Parameter<Short> parameterWithUnits = keyUnits.set(paramData);
+        Parameter<Short> parameterWithUnits = keyUnits.setAll(paramData);
         Assert.assertEquals(encoder, parameterWithUnits.units());
 
         Assert.assertArrayEquals(paramData, (Short[]) parameterWithUnits.values());
@@ -139,7 +139,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(JKeyType.LongKey(), key.keyType());
 
         // key.set without Units
-        Parameter<Long> parameterWithoutUnits = key.set(paramData);
+        Parameter<Long> parameterWithoutUnits = key.setAll(paramData);
 
         Assert.assertArrayEquals(paramData, (Long[]) parameterWithoutUnits.values());
 
@@ -149,7 +149,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
         // key.set with Units
-        Parameter<Long> parameterWithUnits = keyUnits.set(paramData);
+        Parameter<Long> parameterWithUnits = keyUnits.setAll(paramData);
         Assert.assertEquals(micrometer, parameterWithUnits.units());
 
         Assert.assertArrayEquals(paramData, (Long[]) parameterWithUnits.values());
@@ -169,7 +169,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(JKeyType.IntKey(), key.keyType());
 
         // key.set without Units
-        Parameter<Integer> parameterWithoutUnits = key.set(paramData);
+        Parameter<Integer> parameterWithoutUnits = key.setAll(paramData);
 
         Assert.assertArrayEquals(paramData, (Integer[]) parameterWithoutUnits.values());
 
@@ -179,7 +179,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
         // key.set with Units
-        Parameter<Integer> parameterWithUnits = keyUnits.set(paramData);
+        Parameter<Integer> parameterWithUnits = keyUnits.setAll(paramData);
         Assert.assertEquals(millisecond, parameterWithUnits.units());
 
         Assert.assertArrayEquals(paramData, (Integer[]) parameterWithUnits.values());
@@ -199,7 +199,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(JKeyType.FloatKey(), key.keyType());
 
         // key.set without Units
-        Parameter<Float> parameterWithoutUnits = key.set(paramData);
+        Parameter<Float> parameterWithoutUnits = key.setAll(paramData);
 
         Assert.assertArrayEquals(paramData, (Float[]) parameterWithoutUnits.values());
 
@@ -209,7 +209,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
         // key.set with Units
-        Parameter<Float> parameterWithUnits = keyUnits.set(paramData);
+        Parameter<Float> parameterWithUnits = keyUnits.setAll(paramData);
         Assert.assertEquals(millimeter, parameterWithUnits.units());
 
         Assert.assertArrayEquals(paramData, (Float[]) parameterWithUnits.values());
@@ -229,7 +229,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(JKeyType.DoubleKey(), key.keyType());
 
         // key.set without Units
-        Parameter<Double> parameterWithoutUnits = key.set(paramData);
+        Parameter<Double> parameterWithoutUnits = key.setAll(paramData);
 
         Assert.assertArrayEquals(paramData, (Double[]) parameterWithoutUnits.values());
 
@@ -239,7 +239,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
         // key.set with Units
-        Parameter<Double> parameterWithUnits = keyUnits.set(paramData);
+        Parameter<Double> parameterWithUnits = keyUnits.setAll(paramData);
         Assert.assertEquals(kilometer, parameterWithUnits.units());
 
         Assert.assertArrayEquals(paramData, (Double[]) parameterWithUnits.values());
@@ -260,7 +260,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(JKeyType.UTCTimeKey(), key.keyType());
 
         // key.set without Units
-        Parameter<UTCTime> parameterWithoutUnits = key.set(paramData);
+        Parameter<UTCTime> parameterWithoutUnits = key.setAll(paramData);
 
         Assert.assertArrayEquals(paramData, (UTCTime[]) parameterWithoutUnits.values());
 
@@ -270,7 +270,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
         // key.set with Units
-        Parameter<UTCTime> parameterWithUnits = key.set(paramData).withUnits(millisecond);
+        Parameter<UTCTime> parameterWithUnits = key.setAll(paramData).withUnits(millisecond);
         Assert.assertEquals(millisecond, parameterWithUnits.units());
 
         Assert.assertArrayEquals(paramData, (UTCTime[]) parameterWithUnits.values());
@@ -290,7 +290,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(JKeyType.TAITimeKey(), key.keyType());
 
         // key.set without Units
-        Parameter<TAITime> parameterWithoutUnits = key.set(paramData);
+        Parameter<TAITime> parameterWithoutUnits = key.setAll(paramData);
 
         Assert.assertArrayEquals(paramData, (TAITime[]) parameterWithoutUnits.values());
 
@@ -300,7 +300,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
         // key.set with Units
-        Parameter<TAITime> parameterWithUnits = key.set(paramData).withUnits(millisecond);
+        Parameter<TAITime> parameterWithUnits = key.setAll(paramData).withUnits(millisecond);
         Assert.assertEquals(millisecond, parameterWithUnits.units());
 
         Assert.assertArrayEquals(paramData, (TAITime[]) parameterWithUnits.values());
@@ -320,7 +320,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(JKeyType.RaDecKey(), key.keyType());
 
         // key.set without Units
-        Parameter<RaDec> parameterWithoutUnits = key.set(paramData);
+        Parameter<RaDec> parameterWithoutUnits = key.setAll(paramData);
 
         Assert.assertArrayEquals(paramData, (RaDec[]) parameterWithoutUnits.values());
 
@@ -330,7 +330,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
         // key.set with Units
-        Parameter<RaDec> parameterWithUnits = key.set(paramData);
+        Parameter<RaDec> parameterWithUnits = keyUnits.setAll(paramData);
         Assert.assertEquals(meter, parameterWithUnits.units());
 
         Assert.assertArrayEquals(paramData, (RaDec[]) parameterWithUnits.values());
@@ -350,7 +350,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(JKeyType.StringKey(), key.keyType());
 
         // key.set without Units
-        Parameter<String> parameterWithoutUnits = key.set(paramData);
+        Parameter<String> parameterWithoutUnits = key.setAll(paramData);
 
         Assert.assertArrayEquals(paramData, (String[]) parameterWithoutUnits.values());
 
@@ -360,7 +360,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
         // key.set with Units
-        Parameter<String> parameterWithUnits = key.set(paramData);
+        Parameter<String> parameterWithUnits = keyUnits.setAll(paramData);
         Assert.assertEquals(degree, parameterWithUnits.units());
 
         Assert.assertArrayEquals(paramData, (String[]) parameterWithUnits.values());
@@ -387,7 +387,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(JKeyType.StructKey(), key.keyType());
 
         // key.set without Units
-        Parameter<Struct> parameterWithoutUnits = key.set(paramData);
+        Parameter<Struct> parameterWithoutUnits = key.setAll(paramData);
 
         Assert.assertArrayEquals(paramData, (Struct[]) parameterWithoutUnits.values());
 
@@ -397,7 +397,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
         // key.set with Units
-        Parameter<Struct> parameterWithUnits = key.set(paramData);
+        Parameter<Struct> parameterWithUnits = key.setAll(paramData);
         Assert.assertEquals(NoUnits, parameterWithUnits.units());
 
         Assert.assertArrayEquals(paramData, (Struct[]) parameterWithUnits.values());

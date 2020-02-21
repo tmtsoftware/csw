@@ -29,7 +29,7 @@ public class JEventsTest extends JUnitSuite {
     private final Parameter<Integer> encoderParam = encoderIntKey.set(22, 33);
     private final Parameter<String> epochStringParam = epochStringKey.set("A", "B");
     private final Parameter<Integer> epochIntParam = epochIntKey.set(44, 55);
-    private final Parameter<Byte> epochByteParam = epochByteKey.set(new Byte[]{10, 20});
+    private final Parameter<Byte> epochByteParam = epochByteKey.setAll(new Byte[]{10, 20});
 
     private final Prefix prefix = Prefix.apply(JSubsystem.WFOS, "red.detector");
 

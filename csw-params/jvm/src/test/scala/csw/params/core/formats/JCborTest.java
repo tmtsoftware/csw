@@ -6,7 +6,6 @@ import csw.params.events.Event;
 import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
-import csw.params.javadsl.JUnits;
 import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
 import csw.time.core.models.UTCTime;
@@ -64,12 +63,12 @@ public class JCborTest extends JUnitSuite {
                 {"JTAITimeKey", JKeyType.UTCTimeKey().make("TAITimeKey").set(UTCTime.now())},
                 {"JBooleanKey", JKeyType.BooleanKey().make("booleanKey").set(true)},
                 {"JCharKey", JKeyType.CharKey().make("charKey").set('A', 'B')},
-                {"JByteKey", JKeyType.ByteKey().make("byteKey").set(byteData)},
-                {"JShortKey", JKeyType.ShortKey().make("shortKey").set(shortData)},
-                {"JLongKey", JKeyType.LongKey().make("longKey").set(longData)},
-                {"JIntKey", JKeyType.IntKey().make("intKey").set(intData)},
-                {"JFloatKey", JKeyType.FloatKey().make("floatKey").set(floatData)},
-                {"JDoubleKey", JKeyType.DoubleKey().make("doubleKey").set(doubleData)},
+                {"JByteKey", JKeyType.ByteKey().make("byteKey").setAll(byteData)},
+                {"JShortKey", JKeyType.ShortKey().make("shortKey").setAll(shortData)},
+                {"JLongKey", JKeyType.LongKey().make("longKey").setAll(longData)},
+                {"JIntKey", JKeyType.IntKey().make("intKey").setAll(intData)},
+                {"JFloatKey", JKeyType.FloatKey().make("floatKey").setAll(floatData)},
+                {"JDoubleKey", JKeyType.DoubleKey().make("doubleKey").setAll(doubleData)},
                 {"JByteArrayKey", JKeyType.ByteArrayKey().make("byteArrayKey").set(ArrayData.fromArray(byteData))},
                 {"JShortArrayKey", JKeyType.ShortArrayKey().make("shortArrayKey").set(ArrayData.fromArray(shortData))},
                 {"JLongArrayKey", JKeyType.LongArrayKey().make("longArrayKey").set(ArrayData.fromArray(longData))},

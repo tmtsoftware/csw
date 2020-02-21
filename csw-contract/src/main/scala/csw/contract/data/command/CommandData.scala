@@ -41,7 +41,7 @@ trait CommandData {
   val utcTimeParam: Parameter[UTCTime] = utcTimeKey.set(UTCTime(Instant.parse("2017-09-04T16:28:00.123456789Z")))
   val raDecParameter: Parameter[RaDec] = raDecKey.set(RaDec(100, 100))
 
-  val choiceParameter: Parameter[Choice] = choice2Key.set(Array(Choice("c")))
+  val choiceParameter: Parameter[Choice] = choice2Key.setAll(Array(Choice("c")))
 
   val paramSet: Set[Parameter[_]] =
     Set(

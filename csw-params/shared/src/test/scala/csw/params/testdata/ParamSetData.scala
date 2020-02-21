@@ -16,13 +16,13 @@ object ParamSetData {
 
   // Simple Key's
   private val p1 = BooleanKey.make("BooleanKey").set(true, false)
-  private val p2 = ByteKey.make("ByteKey").set(Array[Byte](10, 20))
+  private val p2 = ByteKey.make("ByteKey").setAll(Array[Byte](10, 20))
   private val p3 = CharKey.make("CharKey").set('A', 'B')
-  private val p4 = ShortKey.make("ShortKey").set(Array[Short](30, 40))
-  private val p5 = LongKey.make("LongKey").set(Array[Long](50, 60))
+  private val p4 = ShortKey.make("ShortKey").setAll(Array[Short](30, 40))
+  private val p5 = LongKey.make("LongKey").setAll(Array[Long](50, 60))
   private val p6 = IntKey.make("IntKey").set(70, 80)
-  private val p7 = FloatKey.make("FloatKey").set(Array[Float](90, 100))
-  private val p8 = DoubleKey.make("DoubleKey").set(Array[Double](110, 120))
+  private val p7 = FloatKey.make("FloatKey").setAll(Array[Float](90, 100))
+  private val p8 = DoubleKey.make("DoubleKey").setAll(Array[Double](110, 120))
   private val p9 =
     UTCTimeKey
       .make("UTCTimeKey")

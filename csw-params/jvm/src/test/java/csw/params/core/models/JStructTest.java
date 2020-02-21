@@ -50,7 +50,7 @@ public class JStructTest extends JUnitSuite {
         Struct struct1 = JStruct.create(parameterSet1);
         Struct struct2 = JStruct.create(parameterSet2);
 
-        Parameter<Struct> structParameter = key.set(new Struct[]{struct1, struct2});
+        Parameter<Struct> structParameter = key.setAll(new Struct[]{struct1, struct2});
 
         Assert.assertEquals(Arrays.asList(struct1, struct2), structParameter.jValues());
         Assert.assertArrayEquals(new Struct[]{struct1, struct2}, (Struct[]) structParameter.values());

@@ -13,7 +13,6 @@ import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static csw.params.core.models.Coords.*;
 import static csw.params.core.models.JCoords.*;
@@ -35,13 +34,13 @@ public class JKeysAndParametersTest extends JUnitSuite {
 
         //storing multiple values
         Short[] shortArray = {1, 2, 3, 4};
-        Parameter<Short> paramWithManyShorts1 = k2.set(shortArray);
+        Parameter<Short> paramWithManyShorts1 = k2.setAll(shortArray);
         Parameter<Short> paramWithManyShorts2 = k2.set((short) 1, (short) 2, (short) 3, (short) 4);
 
         //associating units
         String[] weekDays = {"Sunday", "Monday", "Tuesday"};
-        Parameter<String> paramWithUnits1 = k3.set(weekDays);
-        Parameter<String> paramWithUnits2 = k3.set(weekDays).withUnits(JUnits.day);
+        Parameter<String> paramWithUnits1 = k3.setAll(weekDays);
+        Parameter<String> paramWithUnits2 = k3.setAll(weekDays).withUnits(JUnits.day);
 
         //deault unit is NoUnits()
         boolean hasDefaultUnit = booleanParam.units() == JUnits.NoUnits; //true
@@ -358,9 +357,9 @@ public class JKeysAndParametersTest extends JUnitSuite {
         String[] weekDays = {"Sunday", "Monday", "Tuesday"};
 
         //defaults units via set
-        Parameter<String> paramWithUnits1 = k3.set(weekDays);
+        Parameter<String> paramWithUnits1 = k3.setAll(weekDays);
         //associating units via withUnits
-        Parameter<String> paramWithUnits2 = k3.set(weekDays).withUnits(JUnits.day);
+        Parameter<String> paramWithUnits2 = k3.setAll(weekDays).withUnits(JUnits.day);
         //change existing unit
         Parameter<Short> paramWithUnits3 = paramOfShorts.withUnits(JUnits.meter);
         //#units

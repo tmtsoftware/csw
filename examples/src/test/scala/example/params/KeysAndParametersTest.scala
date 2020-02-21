@@ -35,7 +35,7 @@ class KeysAndParametersTest extends AnyFunSpec with Matchers {
 
       //associating units
       val weekDays: Array[String]            = Array("Sunday", "Monday", "Tuesday")
-      val paramWithUnits1: Parameter[String] = k3.set(weekDays)
+      val paramWithUnits1: Parameter[String] = k3.setAll(weekDays)
       val paramWithUnits2: Parameter[String] = k3 -> weekDays withUnits Units.day
 
       //default unit is NoUnits
@@ -137,9 +137,9 @@ class KeysAndParametersTest extends AnyFunSpec with Matchers {
 
       //store values
       val p1: Parameter[Choice] = choice1Key
-        .set(Array(Choice("A")))
+        .setAll(Array(Choice("A")))
         .withUnits(Units.foot)
-      val p2: Parameter[Choice] = choice2Key.set(Array(Choice("c")))
+      val p2: Parameter[Choice] = choice2Key.setAll(Array(Choice("c")))
 
       //add units
       val paramWithFoot = p1.withUnits(Units.foot)
@@ -299,7 +299,7 @@ class KeysAndParametersTest extends AnyFunSpec with Matchers {
       val weekDays: Array[String] = Array("Sunday", "Monday", "Tuesday")
 
       //default units via set
-      val paramWithUnits1: Parameter[String] = k3.set(weekDays)
+      val paramWithUnits1: Parameter[String] = k3.setAll(weekDays)
       //associating units via withUnits
       val paramWithUnits2: Parameter[String] = k3 -> weekDays withUnits Units.day
       //change existing unit
