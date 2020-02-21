@@ -653,7 +653,7 @@ lazy val integration = project
     `csw-commons`       % "multi-jvm->test",
     `csw-config-server` % "multi-jvm->test"
   )
-  .enablePlugins(NoPublish, AutoMultiJvm, DeployApp)
+  .enablePlugins(AutoMultiJvm, DeployApp)
   .settings(
     libraryDependencies ++= Dependencies.Integration.value
   )
