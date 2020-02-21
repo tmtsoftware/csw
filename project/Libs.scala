@@ -4,7 +4,7 @@ import sbt._
 
 object Libs {
   val ScalaVersion    = "2.13.1"
-  val silencerVersion = "1.4.4"
+  val silencerVersion = "1.6.0"
 
   val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0" //BSD 3-clause "New" or "Revised" License
   val `scala-async`        = "org.scala-lang.modules" %% "scala-async"        % "0.10.0" //BSD 3-clause "New" or "Revised" License
