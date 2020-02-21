@@ -40,7 +40,7 @@ See [here](https://tmtsoftware.github.io/csw/2.0.0/) for a detailed documentatio
 
 ## [CSW v2.0.0-RC1] - 2020-02-06
 
-This is the release candidate 1 for the release 1.1.0 of the TMT Common Software for project stakeholders.
+This is the release candidate 1 for the release 2.0.0 of the TMT Common Software for project stakeholders.
 See [here](https://tmtsoftware.github.io/csw/2.0.0-RC1/) for a detailed documentation of this version of the CSW software.
 
 ### Changes
