@@ -20,7 +20,7 @@ object Main {
 
   def main(args: Array[String]): Unit = start(args, startLogging = true)
 
-  def start(args: Array[String], startLogging: Boolean = false): Option[HttpService] =
+  def start(args: Array[String], startLogging: Boolean = false): Option[(HttpService, ServerWiring)] =
     new ArgsParser(name).parse(args.toList).map {
       case Options(init, maybePort) =>
         LocationServerStatus.requireUpLocally()
@@ -40,7 +40,7 @@ object Main {
         try {
           svnRepo.testConnection()                                    // first test if the svn repo can be accessed successfully
           Await.result(httpService.registeredLazyBinding, 15.seconds) // then start the config server and register it with location service
-          httpService
+          (httpService, wiring)
         }
         catch {
           case ex: SVNException =>

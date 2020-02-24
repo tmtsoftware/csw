@@ -53,7 +53,7 @@ class MainTest extends HTTPLocationService {
   }
 
   test("should init svn repo and register with location service if --initRepo option is provided") {
-    val httpService = Main.start(Array("--initRepo")).get
+    val httpService = Main.start(Array("--initRepo")).get._1
 
     try {
       val configServiceLocation = locationService.resolve(ConfigServiceConnection.value, 5.seconds).await.get
@@ -74,10 +74,10 @@ class MainTest extends HTTPLocationService {
   test("should not initialize svn repo if --initRepo option is not provided and should use existing repo if available") {
 
     // temporary start a server to create a repo and then shutdown the server
-    val tmpHttpService = Main.start(Array("--initRepo")).get
+    val tmpHttpService = Main.start(Array("--initRepo")).get._1
     tmpHttpService.shutdown().await
 
-    val httpService = Main.start(Array.empty).get
+    val httpService = Main.start(Array.empty).get._1
 
     try {
       val configServiceLocation = locationService.resolve(ConfigServiceConnection.value, 5.seconds).await.get

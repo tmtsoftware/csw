@@ -1,5 +1,6 @@
 package csw.services
 
+import csw.location.agent.wiring.Wiring
 import csw.location.agent.{Main => LocationAgentMain}
 import csw.services.internal.Settings
 import csw.services.utils.ResourceReader
@@ -10,9 +11,9 @@ class LocationAgent(settings: Settings) {
   import settings._
   private val pgHbaConf: String = ResourceReader.copyToTmp("database/pg_hba.conf").getAbsolutePath
 
-  def start(name: String, args: Array[String]): Option[Process] = Service.start(name, LocationAgentMain.start(args))
+  def start(name: String, args: Array[String]): Option[(Process, Wiring)] = Service.start(name, LocationAgentMain.start(args))
 
-  def startPostgres(): Option[Process] = {
+  def startPostgres(): Option[(Process, Wiring)] = {
     start(
       "Database Service",
       Array(
@@ -33,7 +34,7 @@ class LocationAgent(settings: Settings) {
       )
       .getAbsolutePath
 
-  def startSentinel(event: Boolean, alarm: Boolean): Unit = {
+  def startSentinel(event: Boolean, alarm: Boolean): Option[(Process, Wiring)] = {
     val prefixes: mutable.Buffer[String] = mutable.Buffer.empty
     if (event) prefixes.addOne("CSW.EventServer")
     if (alarm) prefixes.addOne("CSW.AlarmServer")
@@ -49,6 +50,7 @@ class LocationAgent(settings: Settings) {
           sentinelPort
         )
       )
+    else throw new IllegalArgumentException("Either event flag or alarm flag needs to be true")
   }
 
 }

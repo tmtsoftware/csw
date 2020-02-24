@@ -33,4 +33,18 @@ object Command {
       interfaceName: Option[String]
   ) extends Command
 
+  object Start {
+    def apply(
+        all: Boolean = false,
+        config: Boolean = false,
+        event: Boolean = false,
+        alarm: Boolean = false,
+        database: Boolean = false,
+        auth: Boolean = false,
+        interfaceName: Option[String] = None
+    ): Start =
+      if (all) new Start(all, true, true, true, true, true, interfaceName)
+      else new Start(all, config, event, alarm, database, auth, interfaceName)
+  }
+
 }
