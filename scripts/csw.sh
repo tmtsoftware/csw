@@ -17,9 +17,11 @@ if [ -z "$CSW_VERSION" ]; then
 fi
 # ================================================ #
 
+CSW_SERVICES_LIB=com.github.tmtsoftware.csw:csw-services_2.13
+
 function run_csw_services() {
     echo "====== CSW Version [$CSW_VERSION] ====="
-    "$SCRIPT_DIR"/coursier launch -r jitpack com.github.tmtsoftware.csw:csw-services_2.13:"$CSW_VERSION" com.typesafe.akka:akka-http-spray-json_2.13:10.1.11 -- "$@"
+    "$SCRIPT_DIR"/coursier launch -r jitpack $CSW_SERVICES_LIB:"$CSW_VERSION" com.typesafe.akka:akka-http-spray-json_2.13:10.1.11 -- "$@"
 }
 
 # capture version number and store rest of the arguments to arr variable which then passed to run csw_services.sh
@@ -29,6 +31,10 @@ while (("$#")); do
         CSW_VERSION="$2"
         shift
         shift
+        ;;
+    stop)
+        jps -m | grep $CSW_SERVICES_LIB | awk '{print $1}' | xargs kill
+        exit 0
         ;;
     *)
         arr+=("$1")
