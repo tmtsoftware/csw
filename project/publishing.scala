@@ -54,19 +54,19 @@ object DeployApp extends AutoPlugin {
     val scriptsDir    = file(".") / "scripts"
     val sentinelConf  = scriptsDir / "conf" / "redis_sentinel" / "sentinel.conf"
     val authServerDir = scriptsDir / "csw-auth" / "prod"
-    // csw-services.sh, redis-sentinel-prod.sh and start-aas.sh scripts are deprecated, use "csw.sh" script instead
-    val serviceScript    = scriptsDir / "csw-services.sh"
+    // csw-services-old.sh, redis-sentinel-prod.sh and start-aas.sh scripts are deprecated, use "csw-services.sh" script instead
+    val serviceScript    = scriptsDir / "csw-services-old.sh"
     val prodScript       = scriptsDir / "redis-sentinel-prod.sh"
     val authServerScript = authServerDir / "start-aas.sh"
 
-    // replace default csw version to current build version in csw.sh script
+    // replace default csw version to current build version in csw-services.sh script
     val v                 = version.value
-    val originalCswScript = scriptsDir / "csw.sh"
+    val originalCswScript = scriptsDir / "csw-services.sh"
     val cswScript         = replace(originalCswScript, "DEFAULT_CSW_VERSION=\"master-SNAPSHOT\"", s"DEFAULT_CSW_VERSION=$v")
     val coursierLauncher  = scriptsDir / "coursier"
     val confs = Path
       .directory(new File(scriptsDir, "conf"))
-      .filterNot { case (f, s) => s.equals("conf/redis_sentinel/sentinel.conf") }
+      .filterNot { case (_, s) => s.equals("conf/redis_sentinel/sentinel.conf") }
     val loggingAggregator = Path
       .directory(new File(scriptsDir, "logging_aggregator"))
       .filterNot { case (_, s) => s.startsWith("logging_aggregator/prod") }

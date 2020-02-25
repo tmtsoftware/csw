@@ -308,7 +308,7 @@ See [here](https://tmtsoftware.github.io/csw/0.6.0/) for a detailed documentatio
     
 - Test Kits
 
-    - Test kits are now avaiable that can start and stop CSW services inside tests so that
+    - Test kits are now available that can start and stop CSW services inside tests so that
       there is no need to run csw-services.sh before running the tests.
       See `ScalaTestFrameworkTestKit` and `FrameworkTestKit` (for Java).
 
