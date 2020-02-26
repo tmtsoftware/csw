@@ -9,6 +9,22 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
+## [CSW v2.0.0-RC2] - 2020-02-26
+
+This is the release candidate 2 for the second major release of the TMT Common Software for project stakeholders.
+See [here](https://tmtsoftware.github.io/csw/2.0.0-RC2/) for a detailed documentation of this version of the CSW software.
+Migration guide for v2.0.0-RC2 can be found [here](https://tmtsoftware.github.io/csw/2.0.0-RC2/migration_guide/migration-guides.html).
+
+### Changes
+Internal implementation of csw-services.sh script has changed. It is now based on Coursier and newly created csw-services sbt module.
+To start all the CSW services, run `csw-services.sh start -a command` (-a or --all indicates starting all services).
+csw-services.sh runs all services in the foreground, pressing `ctr+c` will stop all the services.
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/2.0.0-RC2/
+- Scaladoc: https://tmtsoftware.github.io/csw/2.0.0-RC2/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/2.0.0-RC2/api/java/index.html
+
 ## [CSW v2.0.0-RC1] - 2020-02-06
 
 This is the release candidate 1 for the release 2.0.0 of the TMT Common Software for project stakeholders.

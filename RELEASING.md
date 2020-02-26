@@ -13,15 +13,16 @@
 ## Steps to release
 
 ### Release msocket
-Refer RELEASING.md of `msocket` repo.
+1. Refer RELEASING.md of `msocket` repo.
+2. Use the tagged version in csw repo.
     
 ### csw
-1. Update release notes (`notes/<version>.markdown`) in `csw` repo
+1. Update release notes (`notes/<version>.markdown`) in `csw` repo and link the migration guide
 #### Note - The version in `notes` should be of format `v1.0.0` but while triggering the pipeline build parameter should be of format `1.0.0` 
 2. Update top-level `CHANGELOG.md`
 3. Update top-level `README.md`
 4. Exclude projects from `build.sbt` which you do not want to release
-5. Remove targets of newly added js projects in jenkins prod file  
+5. Remove targets of newly added js projects in jenkins prod file (if needed).  
 6. Run `csw-prod` pipeline by providing `VERSION` number.
 
 ### csw.g8
