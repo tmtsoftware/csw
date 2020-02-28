@@ -6,11 +6,8 @@ sealed trait Command
 
 object Command {
   @CommandName("start")
-  @HelpMessage("start csw services")
+  @HelpMessage("starts all the CSW services by default if no other option is provided")
   final case class Start(
-      @HelpMessage("start all services")
-      @Short("a")
-      all: Boolean = false,
       @HelpMessage("start config server")
       @Short("c")
       config: Boolean = false,
@@ -35,7 +32,6 @@ object Command {
 
   object Start {
     def apply(
-        all: Boolean = false,
         config: Boolean = false,
         event: Boolean = false,
         alarm: Boolean = false,
@@ -43,8 +39,9 @@ object Command {
         auth: Boolean = false,
         interfaceName: Option[String] = None
     ): Start =
-      if (all) new Start(all, true, true, true, true, true, interfaceName)
-      else new Start(all, config, event, alarm, database, auth, interfaceName)
+      // mark all flags=true when no option is provided to start command
+      if (config || event || alarm || database || auth) new Start(config, event, alarm, database, auth, interfaceName)
+      else new Start(true, true, true, true, true, interfaceName)
   }
 
 }

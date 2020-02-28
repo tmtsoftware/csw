@@ -503,7 +503,7 @@ Let's go ahead and start our CSW Services using the script. Go to the [release p
 and download and unpack the CSW application bundle. Then go into the `bin` directory and enter the command
 
 ```
-./csw-services.sh start -a -i <iname>
+./csw-services.sh start -i <iname>
 ```
 
 where `<iname>` is your interface name (e.g. `en0`).

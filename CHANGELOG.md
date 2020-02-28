@@ -16,9 +16,9 @@ See [here](https://tmtsoftware.github.io/csw/2.0.0-RC2/) for a detailed document
 Migration guide for v2.0.0-RC2 can be found [here](https://tmtsoftware.github.io/csw/2.0.0-RC2/migration_guide/migration-guides.html).
 
 ### Changes
-Internal implementation of csw-services.sh script has changed. It is now based on Coursier and newly created csw-services sbt module.
-To start all the CSW services, run `csw-services.sh start -a command` (-a or --all indicates starting all services).
-csw-services.sh runs all services in the foreground, pressing `ctr+c` will stop all the services.
+Internal implementation of `csw-services.sh` script has changed. It is now based on Coursier and newly created `csw-services` sbt module.
+To start all the CSW services, run `csw-services.sh start` command. 
+`csw-services.sh` runs all services in the foreground, pressing `ctr+c` will stop all the services.
 
 ### Documentation
 - Reference paradox documentation: https://tmtsoftware.github.io/csw/2.0.0-RC2/

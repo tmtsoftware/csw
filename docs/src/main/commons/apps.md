@@ -73,7 +73,7 @@ Let's say you want to start all the services for CSW version of `2.0.0`, then yo
 @@@ note
 
 By default `csw-services.sh` script runs services in the foreground, you can press `ctr+c` to stop all the services.
-If you start services in background by running `./csw-services.sh start -a &` command, then you can stop these services using `csw-services.sh stop` command.
+If you start services in background by running `./csw-services.sh start &` command, then you can stop these services using `csw-services.sh stop` command.
 
 @@@
 
