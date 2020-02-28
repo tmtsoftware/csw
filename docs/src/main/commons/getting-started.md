@@ -21,7 +21,8 @@ Supported Operating Systems are: CentOS and MacOS
 4. Install following IntelliJ Plugins
     - [Scala](https://plugins.jetbrains.com/plugin/1347-scala)
     - [Scalafmt](https://plugins.jetbrains.com/plugin/8236-scalafmt)
-5. Recommended testing frameworks/tools: 
+5. Install [Redis](https://redis.io/download) - Version should be greater than 4.0.0
+6. Recommended testing frameworks/tools: 
 	- [ScalaTest](http://www.scalatest.org/)
 	- [JUnit](https://junit.org/junit4/), JUnit Interface
 	- Note: These frameworks are typically downloaded and made available by the sbt tool by specifying them as dependencies.
