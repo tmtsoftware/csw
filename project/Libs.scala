@@ -26,7 +26,7 @@ object Libs {
   val `scalajs-java-time` = dep("org.scala-js"      %%% "scalajs-java-time" % "0.2.6")
   val `scalatest`         = dep("org.scalatest"     %%% "scalatest"         % "3.1.0") //Apache License 2.0
 
-  val `jwt-core`          = "com.pauldijou"           %% "jwt-core"          % "4.2.0"
+  val `jwt-core`          = "com.pauldijou"           %% "jwt-core"          % "4.3.0"
   val `lettuce`           = "io.lettuce"              % "lettuce-core"       % "5.2.1.RELEASE"
   val `reactor-core`      = "io.projectreactor"       % "reactor-core"       % "3.3.2.RELEASE"
   val `reactive-streams`  = "org.reactivestreams"     % "reactive-streams"   % "1.0.3"
