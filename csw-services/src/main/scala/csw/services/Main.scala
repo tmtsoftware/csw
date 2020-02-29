@@ -26,19 +26,13 @@ object Main extends CommandApp[Command] {
     try {
       environment.setup()
       LoggingSystemFactory.start(appName, appVersion, settings.hostName, actorSystem)
-      lazyLocationService
-      lazyEventProcess
-      lazyAlarmProcess
-      lazySentinel
-      lazyDatabaseService
-      lazyKeycloak
-      lazyConfigService
-
+      serviceList.foreach(_.start)
       CoordinatedShutdown(actorSystem).addJvmShutdownHook(shutdown())
     }
     catch {
       case NonFatal(e) =>
         e.printStackTrace()
+        shutdown()
         exit(1)
     }
   }

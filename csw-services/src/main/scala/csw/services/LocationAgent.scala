@@ -2,26 +2,61 @@ package csw.services
 
 import csw.location.agent.wiring.Wiring
 import csw.location.agent.{Main => LocationAgentMain}
-import csw.services.internal.Settings
-import csw.services.utils.ResourceReader
+import csw.services.internal.FutureExt._
+import csw.services.internal.{ManagedService, Settings}
+import csw.services.utils.{ColoredConsole, ResourceReader}
 
 import scala.collection.mutable
+import scala.util.control.NonFatal
 
 class LocationAgent(settings: Settings) {
+  private val databaseServiceName = "Database Service"
+  private val sentinelServiceName = "Redis Sentinel"
+
   import settings._
   private val pgHbaConf: String = ResourceReader.copyToTmp("database/pg_hba.conf").getAbsolutePath
 
-  def start(name: String, args: Array[String]): Option[(Process, Wiring)] = Service.start(name, LocationAgentMain.start(args))
-
-  def startPostgres(): Option[(Process, Wiring)] = start(
-    "Database Service",
-    Array(
-      "--prefix",
-      "CSW.DatabaseServer",
-      "--command",
-      s"postgres --hba_file=$pgHbaConf --unix_socket_directories=$dbUnixSocketDirs -i -p $dbPort"
+  def databaseService(enable: Boolean): ManagedService[Option[(Process, Wiring)], Unit] =
+    ManagedService(
+      databaseServiceName,
+      enable,
+      () => startPostgres(),
+      killAgent
     )
-  )
+
+  def sentinelService(event: Boolean, alarm: Boolean): ManagedService[Option[(Process, Wiring)], Unit] =
+    ManagedService(
+      sentinelServiceName,
+      event || alarm,
+      () => startSentinel(event, alarm),
+      killAgent
+    )
+
+  private def startAgent(args: Array[String]): Option[(Process, Wiring)] = LocationAgentMain.start(args)
+
+  private def startPostgres(): Option[(Process, Wiring)] =
+    try {
+      startAgent(
+        Array(
+          "--prefix",
+          "CSW.DatabaseServer",
+          "--command",
+          s"postgres --hba_file=$pgHbaConf --unix_socket_directories=$dbUnixSocketDirs -i -p $dbPort"
+        )
+      )
+    }
+    catch {
+      case NonFatal(e) =>
+        ColoredConsole.RED.println(
+          "Make sure 'PGDATA' env variable is set where postgres is installed e.g. for mac: /usr/local/var/postgres"
+        )
+        throw e
+    }
+
+  private val killAgent: Option[(Process, Wiring)] => Unit =
+    _.foreach {
+      case (process, wiring) => process.destroyForcibly(); wiring.actorRuntime.shutdown().await()
+    }
 
   private val sentinelConf: String =
     ResourceReader
@@ -32,14 +67,13 @@ class LocationAgent(settings: Settings) {
       )
       .getAbsolutePath
 
-  def startSentinel(event: Boolean, alarm: Boolean): Option[(Process, Wiring)] = {
+  private def startSentinel(event: Boolean, alarm: Boolean): Option[(Process, Wiring)] = {
     Redis.requireRedisInstalled()
     val prefixes: mutable.Buffer[String] = mutable.Buffer.empty
     if (event) prefixes.addOne("CSW.EventServer")
     if (alarm) prefixes.addOne("CSW.AlarmServer")
-    if (alarm || event)
-      start(
-        "Redis Sentinel",
+    if (alarm || event) {
+      startAgent(
         Array(
           "--prefix",
           prefixes.mkString(","),
@@ -49,6 +83,7 @@ class LocationAgent(settings: Settings) {
           sentinelPort
         )
       )
+    }
     else throw new IllegalArgumentException("Either event flag or alarm flag needs to be true")
   }
 
