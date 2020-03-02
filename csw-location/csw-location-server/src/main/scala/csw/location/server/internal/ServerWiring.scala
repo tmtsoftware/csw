@@ -31,7 +31,7 @@ private[csw] class ServerWiring(enableAuth: Boolean) extends LocationServiceCode
   private lazy val postHandler                           = new LocationHttpHandler(locationService, securityDirectives)
   private def websocketHandler(contentType: ContentType) = new LocationWebsocketHandler(locationService, contentType)
 
-  lazy val locationRoutes: Route = RouteFactory.combine(
+  lazy val locationRoutes: Route = RouteFactory.combine(metricsEnabled = false)(
     new PostRouteFactory("post-endpoint", postHandler),
     new WebsocketRouteFactory("websocket-endpoint", websocketHandler)
   )
