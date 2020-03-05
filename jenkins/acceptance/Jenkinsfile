@@ -22,7 +22,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh "sbt scalafmtCheck"
-                sh "sbt clean makeSite"
+                // sh "sbt clean makeSite"
                 sh "sbt ';set every Seq(enableFatalWarnings := true, scalafmtOnCompile := false); scalastyle; test:compile; multi-jvm:compile;'"
             }
         }
