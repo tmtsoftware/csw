@@ -12,7 +12,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 git 'git@github.com:tmtsoftware/csw.git'
-                git checkout tags/$VERSION
+                sh "git checkout tags/$VERSION"
             }
         }
 
