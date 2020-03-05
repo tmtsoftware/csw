@@ -90,9 +90,9 @@ def sendNotification(String buildStatus = 'STARTED') {
         emailext(
                 subject: subject,
                 body: details,
-                to: "tmt-csw@thoughtworks.com"
+                to: "jweiss@tmt.org"
         )
     }
 
-    slackSend(channel: "#csw-build", color: colorCode, message: summary)
+    slackSend(channel: "#stil-csw-acceptance", color: colorCode, message: summary)
 }
