@@ -30,10 +30,10 @@ The `onSubmit` handler (not shown) already has returned `Started` to the sender 
 and the asynchronous completion is used to update the parent command. 
 
 Scala
-:   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/sampleassembly/SampleAssemblyHandlers.scala) { #updateCommand }
+:   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/example/tutorial/basic/sampleassembly/SampleAssemblyHandlers.scala) { #updateCommand }
 
 Java
-:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/org/tmt/esw/basic/sampleassembly/JSampleAssemblyHandlers.java) { #updateCommand }
+:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/example/tutorial/basic/sampleassembly/JSampleAssemblyHandlers.java) { #updateCommand }
 
 
 ## Using the CRM with Subcommands
@@ -56,7 +56,7 @@ sub-commands to finish. In the `OverallSuccess` case `commandResponseManager.upd
 If one or more of the sub-commands fails, the negative response of the first failed command is returned to the parent.
 
 Scala
-:   @@snip [McsAssemblyComponentHandlers.scala](../../../../examples/src/main/scala/org/tmt/esw/basic/sampleassembly/SampleAssemblyHandlers.scala) { #queryF }
+:   @@snip [McsAssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/tutorial/basic/sampleassembly/SampleAssemblyHandlers.scala) { #queryF }
 
 Java
-:   @@snip [JCommandIntegrationTest.java](../../../../examples/src/main/java/org/tmt/esw/basic/sampleassembly/JSampleAssemblyHandlers.java) { #queryF }
+:   @@snip [JCommandIntegrationTest.java](../../../../examples/src/main/java/example/tutorial/basic/sampleassembly/JSampleAssemblyHandlers.java) { #queryF }

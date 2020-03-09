@@ -93,8 +93,8 @@ class CommandsTest extends AnyFunSpec {
       val bytes1   = Array[Byte](10, 20)
       val bytes2   = Array[Byte](30, 40)
 
-      val i1 = byteKey1.set(bytes1)
-      val i2 = byteKey2.set(bytes2)
+      val i1 = byteKey1.setAll(bytes1)
+      val i2 = byteKey2.setAll(bytes2)
 
       val sc1 = Setup(Prefix(ck3), commandName, Some(obsId), Set(i1, i2))
       assert(sc1.size == 2)
@@ -327,8 +327,8 @@ class CommandsTest extends AnyFunSpec {
   }
 
   describe("testing for getting typed items") {
-    val t1  = KeyType.IntKey.make("test1")
-    val sc1 = Setup(Prefix(ck3), commandName, Some(obsId)).add(t1.set(Array(22), degree))
+    val t1  = KeyType.IntKey.make("test1", degree)
+    val sc1 = Setup(Prefix(ck3), commandName, Some(obsId)).add(t1.setAll(Array(22)))
 
     val item: Option[Parameter[Int]] = sc1.get(t1) // Works now!
     val itm: Parameter[Int]          = item.get

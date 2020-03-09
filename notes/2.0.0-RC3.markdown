@@ -1,0 +1,11 @@
+## CSW - TMT Common Software v2.0.0-RC3
+
+This is release v2.0.0-RC3 of the TMT Common Software.
+
+See [CHANGELOG.md](CHANGELOG.md) for details of all releases.
+Migration guide for v2.0.0-RC3 can be found [here](https://tmtsoftware.github.io/csw/2.0.0-RC3/migration_guide/migration-guides.html). 
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/2.0.0-RC3/
+- Scaladoc: https://tmtsoftware.github.io/csw/2.0.0-RC3/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/2.0.0-RC3/api/java/index.html

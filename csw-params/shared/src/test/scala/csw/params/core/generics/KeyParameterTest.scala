@@ -1,19 +1,9 @@
 package csw.params.core.generics
 
-import csw.params.core.generics.KeyType.{
-  ByteMatrixKey,
-  ChoiceKey,
-  CoordKey,
-  DoubleMatrixKey,
-  FloatMatrixKey,
-  IntMatrixKey,
-  LongMatrixKey,
-  ShortMatrixKey,
-  StructKey
-}
+import csw.params.core.generics.KeyType._
 import csw.params.core.models.Coords.EqFrame.FK5
 import csw.params.core.models.Coords.SolarSystemObject.Venus
-import csw.params.core.models.Units.{NoUnits, degree, meter, second}
+import csw.params.core.models.Units._
 import csw.params.core.models._
 import csw.time.core.models.{TAITime, UTCTime}
 import org.scalatest.funspec.AnyFunSpec
@@ -30,13 +20,13 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
   private val s2: String = "filter"
 
   describe("basic key tests") {
-    val k1: Key[Int] = KeyType.IntKey.make(s1)
-    val k2: Key[Int] = KeyType.IntKey.make(s2)
+    val k1: Key[Int] = KeyType.IntKey.make(s1, Units.count)
+    val k2: Key[Int] = KeyType.IntKey.make(s2, Units.NoUnits)
     it("should have correct name") {
       assert(k1.keyName.equals(s1))
     }
 
-    val k3: Key[Int] = KeyType.IntKey.make(s1)
+    val k3: Key[Int] = KeyType.IntKey.make(s1, Units.encoder)
 
     it("should have equality based on name") {
       assert(k3 == k1)
@@ -60,16 +50,16 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
     // DEOPSCSW-190: Implement Unit Support
     it("should work with list, withUnits") {
-      val ii = bk.set(listIn).withUnits(degree)
+      val ii = bk.setAll(listIn).withUnits(degree)
       ii.units should be(degree)
       ii.value(1) should equal(listIn(1))
       ii.values should equal(listIn)
     }
 
     // DEOPSCSW-190: Implement Unit Support
-    it("should work with list, units") {
-      val ii = bk.set(listIn, degree)
-      ii.units should be(degree)
+    it("should work with list") {
+      val ii = bk.setAll(listIn)
+      ii.units should be(NoUnits)
       ii.value(1) should equal(listIn(1))
       ii.values should equal(listIn)
     }
@@ -77,7 +67,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
   describe("test charItem") {
     val tval = 'K'
-    val lk   = KeyType.CharKey.make(s1)
+    val lk   = KeyType.CharKey.make(s1, encoder)
 
     it("should allow single val") {
       val li = lk.set(tval)
@@ -90,15 +80,15 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
     // DEOPSCSW-190: Implement Unit Support
     it("should work with list, withUnits") {
-      val li = lk.set(listIn).withUnits(degree)
+      val li = lk.setAll(listIn).withUnits(degree)
       li.units should be(degree)
       li.value(1) should equal(listIn(1))
       li.values should equal(listIn)
     }
 
-    it("should work with list, units") {
-      val li = lk.set(listIn, degree)
-      li.units should be(degree)
+    it("should work with list") {
+      val li = lk.setAll(listIn)
+      li.units should be(encoder)
       li.value(1) should equal(listIn(1))
       li.values should equal(listIn)
     }
@@ -107,7 +97,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
   // DEOPSCSW-186: Binary value payload
   describe("test ByteItem") {
     val tval: Byte = 123
-    val lk         = KeyType.ByteKey.make(s1)
+    val lk         = KeyType.ByteKey.make(s1, encoder)
 
     it("should allow single val") {
       val li = lk.set(tval)
@@ -119,16 +109,16 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     val byteIn = Array[Byte](121, 122)
 
     it("should work with list, withUnits") {
-      val li = lk.set(byteIn).withUnits(degree)
+      val li = lk.setAll(byteIn).withUnits(degree)
       li.units should be(degree)
       li.value(0) should equal(byteIn(0))
       li.value(1) should equal(byteIn(1))
       li.values should equal(byteIn)
     }
 
-    it("should work with list, units") {
-      val li = lk.set(byteIn, degree)
-      li.units should be(degree)
+    it("should work with list") {
+      val li = lk.setAll(byteIn)
+      li.units should be(encoder)
       li.value(1) should equal(byteIn(1))
       li.values should equal(byteIn)
     }
@@ -141,7 +131,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
     val la1 = ArrayData(a1)
     val la2 = ArrayData(a2)
-    val lk  = KeyType.ByteArrayKey.make(s1)
+    val lk  = KeyType.ByteArrayKey.make(s1, encoder)
 
     it("should test single item") {
       val di: Parameter[ArrayData[Byte]] = lk.set(la1)
@@ -154,16 +144,16 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
     // DEOPSCSW-190: Implement Unit Support
     it("should test with list, withUnits") {
-      val li2: Parameter[ArrayData[Byte]] = lk.set(listIn).withUnits(degree)
+      val li2: Parameter[ArrayData[Byte]] = lk.setAll(listIn).withUnits(degree)
       li2.units should be(degree)
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
     }
 
     // DEOPSCSW-190: Implement Unit Support
-    it("should test with list, units") {
-      val li2 = lk.set(listIn, degree)
-      li2.units should be theSameInstanceAs degree
+    it("should test with list") {
+      val li2 = lk.setAll(listIn)
+      li2.units should be theSameInstanceAs encoder
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
     }
@@ -200,7 +190,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
     val lm1 = MatrixData.fromArrays(m1)
     val lm2 = MatrixData.fromArrays(m2)
-    val dk  = ByteMatrixKey.make(s1)
+    val dk  = ByteMatrixKey.make(s1, encoder)
 
     it("should work with a single item") {
       val di = dk.set(lm1)
@@ -213,16 +203,16 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
     // DEOPSCSW-190: Implement Unit Support
     it("should work with list and withUnits") {
-      val di = dk.set(listIn).withUnits(degree)
+      val di = dk.setAll(listIn).withUnits(degree)
       di.units should be theSameInstanceAs degree
       di.value(1) should equal(listIn(1))
       di.values should equal(listIn)
     }
 
     // DEOPSCSW-190: Implement Unit Support
-    it("should work with list and units") {
-      val di = dk.set(listIn, degree)
-      di.units should be theSameInstanceAs degree
+    it("should work with list") {
+      val di = dk.setAll(listIn)
+      di.units should be theSameInstanceAs encoder
       di.value(1) should equal(listIn(1))
       di.values should equal(listIn)
     }
@@ -255,7 +245,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
   describe("test ShortItem") {
     val tval: Short = 1234
-    val lk          = KeyType.ShortKey.make(s1)
+    val lk          = KeyType.ShortKey.make(s1, encoder)
 
     it("should allow single val") {
       val li = lk.set(tval)
@@ -267,16 +257,16 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     val listIn = Array[Short](123, 456)
 
     it("should work with list, withUnits") {
-      val li = lk.set(listIn).withUnits(degree)
+      val li = lk.setAll(listIn).withUnits(degree)
       li.units should be(degree)
       li.value(0) should equal(listIn(0))
       li.value(1) should equal(listIn(1))
       li.values should equal(listIn)
     }
 
-    it("should work with list, units") {
-      val li = lk.set(listIn, degree)
-      li.units should be(degree)
+    it("should work with list") {
+      val li = lk.setAll(listIn)
+      li.units should be(encoder)
       li.value(1) should equal(listIn(1))
       li.values should equal(listIn)
     }
@@ -288,7 +278,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
     val la1 = ArrayData(a1)
     val la2 = ArrayData(a2)
-    val lk  = KeyType.ShortArrayKey.make(s1)
+    val lk  = KeyType.ShortArrayKey.make(s1, encoder)
 
     it("should test single item") {
       val di = lk.set(la1)
@@ -300,15 +290,15 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     val listIn = Array(la1, la2)
 
     it("should test with list, withUnits") {
-      val li2 = lk.set(listIn).withUnits(degree)
+      val li2 = lk.setAll(listIn).withUnits(degree)
       li2.units should be(degree)
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
     }
 
-    it("should test with list, units") {
-      val li2 = lk.set(listIn, degree)
-      li2.units should be theSameInstanceAs degree
+    it("should test with list") {
+      val li2 = lk.setAll(listIn)
+      li2.units should be theSameInstanceAs encoder
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
     }
@@ -342,7 +332,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
     val lm1 = MatrixData.fromArrays(m1)
     val lm2 = MatrixData.fromArrays(m2)
-    val dk  = ShortMatrixKey.make(s1)
+    val dk  = ShortMatrixKey.make(s1, encoder)
 
     it("should work with a single item") {
       val di = dk.set(lm1)
@@ -354,15 +344,15 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     val listIn = Array(lm1, lm2)
 
     it("should work with list and withUnits") {
-      val di = dk.set(listIn).withUnits(degree)
+      val di = dk.setAll(listIn).withUnits(degree)
       di.units should be theSameInstanceAs degree
       di.value(1) should equal(listIn(1))
       di.values should equal(listIn)
     }
 
-    it("should work with list and units") {
-      val di = dk.set(listIn, degree)
-      di.units should be theSameInstanceAs degree
+    it("should work with list") {
+      val di = dk.setAll(listIn)
+      di.units should be theSameInstanceAs encoder
       di.value(1) should equal(listIn(1))
       di.values should equal(listIn)
     }
@@ -392,7 +382,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
   describe("test IntItem") {
     val tval: Int = 1234
-    val lk        = KeyType.IntKey.make(s1)
+    val lk        = KeyType.IntKey.make(s1, encoder)
 
     it("should allow single val") {
       val li = lk.set(tval)
@@ -404,16 +394,16 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     val listIn = Array[Int](123, 456)
 
     it("should work with list, withUnits") {
-      val li = lk.set(listIn).withUnits(degree)
+      val li = lk.setAll(listIn).withUnits(degree)
       li.units should be(degree)
       li.value(0) should equal(listIn(0))
       li.value(1) should equal(listIn(1))
       li.values should equal(listIn)
     }
 
-    it("should work with list, units") {
-      val li = lk.set(listIn, degree)
-      li.units should be(degree)
+    it("should work with list") {
+      val li = lk.setAll(listIn)
+      li.units should be(encoder)
       li.value(1) should equal(listIn(1))
       li.values should equal(listIn)
     }
@@ -425,7 +415,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
     val la1 = ArrayData(a1)
     val la2 = ArrayData(a2)
-    val lk  = KeyType.IntArrayKey.make(s1)
+    val lk  = KeyType.IntArrayKey.make(s1, encoder)
 
     it("should test single item") {
       val di = lk.set(la1)
@@ -437,15 +427,15 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     val listIn = Array(la1, la2)
 
     it("should test with list, withUnits") {
-      val li2 = lk.set(listIn).withUnits(degree)
+      val li2 = lk.setAll(listIn).withUnits(degree)
       li2.units should be(degree)
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
     }
 
-    it("should test with list, units") {
-      val li2 = lk.set(listIn, degree)
-      li2.units should be theSameInstanceAs degree
+    it("should test with list") {
+      val li2 = lk.setAll(listIn)
+      li2.units should be theSameInstanceAs encoder
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
     }
@@ -479,7 +469,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
     val lm1 = MatrixData.fromArrays(m1)
     val lm2 = MatrixData.fromArrays(m2)
-    val dk  = IntMatrixKey.make(s1)
+    val dk  = IntMatrixKey.make(s1, encoder)
 
     it("should work with a single item") {
       val di = dk.set(lm1)
@@ -491,15 +481,15 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     val listIn = Array(lm1, lm2)
 
     it("should work with list and withUnits") {
-      val di = dk.set(listIn).withUnits(degree)
+      val di = dk.setAll(listIn).withUnits(degree)
       di.units should be theSameInstanceAs degree
       di.value(1) should equal(listIn(1))
       di.values should equal(listIn)
     }
 
-    it("should work with list and units") {
-      val di = dk.set(listIn, degree)
-      di.units should be theSameInstanceAs degree
+    it("should work with list") {
+      val di = dk.setAll(listIn)
+      di.units should be theSameInstanceAs encoder
       di.value(1) should equal(listIn(1))
       di.values should equal(listIn)
     }
@@ -529,7 +519,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
   describe("test longKey") {
     val lval          = 1234L
-    val lk: Key[Long] = KeyType.LongKey.make(s1)
+    val lk: Key[Long] = KeyType.LongKey.make(s1, encoder)
 
     it("should allow single val") {
       val li = lk.set(lval)
@@ -540,15 +530,15 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     val listIn = Array[Long](123L, 456L)
 
     it("should work with list, withUnits") {
-      val li = lk.set(listIn).withUnits(degree)
+      val li = lk.setAll(listIn).withUnits(degree)
       li.units should be(degree)
       li.value(1) should equal(listIn(1))
       li.values should equal(listIn)
     }
 
-    it("should work with list, units") {
-      val li = lk.set(listIn, degree)
-      li.units should be(degree)
+    it("should work with list") {
+      val li = lk.setAll(listIn)
+      li.units should be(encoder)
       li.value(1) should equal(listIn(1))
       li.values should equal(listIn)
     }
@@ -560,7 +550,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
     val la1: ArrayData[Long]     = ArrayData(a1)
     val la2: ArrayData[Long]     = ArrayData(a2)
-    val lk: Key[ArrayData[Long]] = KeyType.LongArrayKey.make(s1)
+    val lk: Key[ArrayData[Long]] = KeyType.LongArrayKey.make(s1, encoder)
 
     it("should test single item") {
       val di: Parameter[ArrayData[Long]] = lk.set(la1)
@@ -572,15 +562,15 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     val listIn = Array(la1, la2)
 
     it("should test with list, withUnits") {
-      val li2: Parameter[ArrayData[Long]] = lk.set(listIn).withUnits(degree)
+      val li2: Parameter[ArrayData[Long]] = lk.setAll(listIn).withUnits(degree)
       li2.units should be(degree)
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
     }
 
-    it("should test with list, units") {
-      val li2 = lk.set(listIn, degree)
-      li2.units should be theSameInstanceAs degree
+    it("should test with list") {
+      val li2 = lk.setAll(listIn)
+      li2.units should be theSameInstanceAs encoder
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
     }
@@ -614,7 +604,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
     val lm1: MatrixData[Long]     = MatrixData.fromArrays(m1)
     val lm2: MatrixData[Long]     = MatrixData.fromArrays(m2)
-    val dk: Key[MatrixData[Long]] = LongMatrixKey.make(s1)
+    val dk: Key[MatrixData[Long]] = LongMatrixKey.make(s1, encoder)
 
     it("should work with a single item") {
       val di = dk.set(lm1)
@@ -626,15 +616,15 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     val listIn = Array(lm1, lm2)
 
     it("should work with list and withUnits") {
-      val di = dk.set(listIn).withUnits(degree)
+      val di = dk.setAll(listIn).withUnits(degree)
       di.units should be theSameInstanceAs degree
       di.value(1) should equal(listIn(1))
       di.values should equal(listIn)
     }
 
-    it("should work with list and units") {
-      val di = dk.set(listIn, degree)
-      di.units should be theSameInstanceAs degree
+    it("should work with list") {
+      val di = dk.setAll(listIn)
+      di.units should be theSameInstanceAs encoder
       di.value(1) should equal(listIn(1))
       di.values should equal(listIn)
     }
@@ -664,7 +654,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
   describe("test floatItem") {
     val tval: Float = 123.456f
-    val lk          = KeyType.FloatKey.make(s1)
+    val lk          = KeyType.FloatKey.make(s1, encoder)
 
     it("should allow single val") {
       val li = lk.set(tval)
@@ -676,15 +666,15 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     val listIn = Array[Float](123.0f, 456.0f)
 
     it("should work with list, withUnits") {
-      val li = lk.set(listIn).withUnits(degree)
+      val li = lk.setAll(listIn).withUnits(degree)
       li.units should be(degree)
       li.value(1) should equal(listIn(1))
       li.values should equal(listIn)
     }
 
-    it("should work with list, units") {
-      val li = lk.set(listIn, degree)
-      li.units should be(degree)
+    it("should work with list") {
+      val li = lk.setAll(listIn)
+      li.units should be(encoder)
       li.value(1) should equal(listIn(1))
       li.values should equal(listIn)
     }
@@ -696,7 +686,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
     val la1 = ArrayData(a1)
     val la2 = ArrayData(a2)
-    val lk  = KeyType.FloatArrayKey.make(s1)
+    val lk  = KeyType.FloatArrayKey.make(s1, encoder)
 
     it("should test single item") {
       val di = lk.set(la1)
@@ -708,15 +698,15 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     val listIn = Array(la1, la2)
 
     it("should test with list, withUnits") {
-      val li2 = lk.set(listIn).withUnits(degree)
+      val li2 = lk.setAll(listIn).withUnits(degree)
       li2.units should be(degree)
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
     }
 
-    it("should test with list, units") {
-      val li2 = lk.set(listIn, degree)
-      li2.units should be theSameInstanceAs degree
+    it("should test with list") {
+      val li2 = lk.setAll(listIn)
+      li2.units should be theSameInstanceAs encoder
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
     }
@@ -750,7 +740,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
     val lm1 = MatrixData.fromArrays(m1)
     val lm2 = MatrixData.fromArrays(m2)
-    val dk  = FloatMatrixKey.make(s1)
+    val dk  = FloatMatrixKey.make(s1, encoder)
 
     it("should work with a single item") {
       val di = dk.set(lm1)
@@ -762,15 +752,15 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     val listIn = Array(lm1, lm2)
 
     it("should work with list and withUnits") {
-      val di = dk.set(listIn).withUnits(degree)
+      val di = dk.setAll(listIn).withUnits(degree)
       di.units should be theSameInstanceAs degree
       di.value(1) should equal(listIn(1))
       di.values should equal(listIn)
     }
 
-    it("should work with list and units") {
-      val di = dk.set(listIn, degree)
-      di.units should be theSameInstanceAs degree
+    it("should work with list") {
+      val di = dk.setAll(listIn)
+      di.units should be theSameInstanceAs encoder
       di.value(1) should equal(listIn(1))
       di.values should equal(listIn)
     }
@@ -800,7 +790,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
   describe("test doubleItem") {
     val tval: Double = 123.456
-    val lk           = KeyType.DoubleKey.make(s1)
+    val lk           = KeyType.DoubleKey.make(s1, encoder)
 
     it("should allow single val") {
       val li = lk.set(tval)
@@ -812,15 +802,15 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     val listIn = Array[Double](123.0, 456.0)
 
     it("should work with list, withUnits") {
-      val li = lk.set(listIn).withUnits(degree)
+      val li = lk.setAll(listIn).withUnits(degree)
       li.units should be(degree)
       li.value(1) should equal(listIn(1))
       li.values should equal(listIn)
     }
 
-    it("should work with list, units") {
-      val li = lk.set(listIn, degree)
-      li.units should be(degree)
+    it("should work with list") {
+      val li = lk.setAll(listIn)
+      li.units should be(encoder)
       li.value(1) should equal(listIn(1))
       li.values should equal(listIn)
     }
@@ -832,7 +822,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
     val la1 = ArrayData(a1)
     val la2 = ArrayData(a2)
-    val lk  = KeyType.DoubleArrayKey.make(s1)
+    val lk  = KeyType.DoubleArrayKey.make(s1, encoder)
 
     it("should test single item") {
       val di = lk.set(la1)
@@ -844,15 +834,15 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     val listIn = Array(la1, la2)
 
     it("should test with list, withUnits") {
-      val li2 = lk.set(listIn).withUnits(degree)
+      val li2 = lk.setAll(listIn).withUnits(degree)
       li2.units should be(degree)
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
     }
 
-    it("should test with list, units") {
-      val li2 = lk.set(listIn, degree)
-      li2.units should be theSameInstanceAs degree
+    it("should test with list") {
+      val li2 = lk.setAll(listIn)
+      li2.units should be theSameInstanceAs encoder
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
     }
@@ -886,7 +876,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
     val lm1 = MatrixData.fromArrays(m1)
     val lm2 = MatrixData.fromArrays(m2)
-    val dk  = DoubleMatrixKey.make(s1)
+    val dk  = DoubleMatrixKey.make(s1, encoder)
 
     it("should work with a single item") {
       val di = dk.set(lm1)
@@ -898,15 +888,15 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     val listIn = Array(lm1, lm2)
 
     it("should work with list and withUnits") {
-      val di = dk.set(listIn).withUnits(degree)
+      val di = dk.setAll(listIn).withUnits(degree)
       di.units should be theSameInstanceAs degree
       di.value(1) should equal(listIn(1))
       di.values should equal(listIn)
     }
 
-    it("should work with list and units") {
-      val di = dk.set(listIn, degree)
-      di.units should be theSameInstanceAs degree
+    it("should work with list") {
+      val di = dk.setAll(listIn)
+      di.units should be theSameInstanceAs encoder
       di.value(1) should equal(listIn(1))
       di.values should equal(listIn)
     }
@@ -963,7 +953,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     )
 
     it("should work with list, withUnits") {
-      val li = utcTimeKey.set(listIn).withUnits(second)
+      val li = utcTimeKey.setAll(listIn).withUnits(second)
       li.units should be(second)
       li.value(0) should equal(listIn(0))
       li.value(1) should equal(listIn(1))
@@ -971,8 +961,8 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
       li.values should equal(listIn)
     }
 
-    it("should work with list, units") {
-      val li: Parameter[UTCTime] = utcTimeKey.set(listIn, second)
+    it("should work with list") {
+      val li: Parameter[UTCTime] = utcTimeKey.setAll(listIn)
       li.units should be(second)
       li.value(0) should equal(listIn(0))
       li.value(1) should equal(listIn(1))
@@ -1009,7 +999,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     )
 
     it("should work with list, withUnits") {
-      val li = taiTimeKey.set(listIn).withUnits(second)
+      val li = taiTimeKey.setAll(listIn).withUnits(second)
       li.units should be(second)
       li.value(0) should equal(listIn(0))
       li.value(1) should equal(listIn(1))
@@ -1017,8 +1007,8 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
       li.values should equal(listIn)
     }
 
-    it("should work with list, units") {
-      val li: Parameter[TAITime] = taiTimeKey.set(listIn, second)
+    it("should work with list") {
+      val li: Parameter[TAITime] = taiTimeKey.setAll(listIn)
       li.units should be(second)
       li.value(0) should equal(listIn(0))
       li.value(1) should equal(listIn(1))
@@ -1032,7 +1022,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
       // Choices as object with String input
       val choices = Choices.from("A", "B", "C")
 
-      val ci1 = ChoiceKey.make("mode", choices)
+      val ci1 = ChoiceKey.make("mode", NoUnits, choices)
       ci1.choices should equal(choices)
       ci1.keyName should be("mode")
 
@@ -1044,7 +1034,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
     it("should allow creating with varargs of Strings") {
       // Create directly with keyname, and Choice names
-      val ci2 = ChoiceKey.make("test", "A", "B")
+      val ci2 = ChoiceKey.make("test", NoUnits, "A", "B")
       ci2.choices should equal(Choices.from("A", "B"))
       ci2.keyName should be("test")
 
@@ -1062,7 +1052,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
       val continuous    = Choice("continuous")
       val error         = Choice("error")
 
-      val cmd = ChoiceKey.make("cmd", uninitialized, ready, busy, continuous, error)
+      val cmd = ChoiceKey.make("cmd", NoUnits, uninitialized, ready, busy, continuous, error)
       cmd.choices should be(Choices(Set(uninitialized, ready, busy, continuous, error)))
 
       // setting values
@@ -1076,7 +1066,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     val keyName  = "raDecKey"
     val raDec1   = RaDec(1.0, 2.0)
     val raDec2   = RaDec(3.0, 4.0)
-    val raDecKey = KeyType.RaDecKey.make(keyName)
+    val raDecKey = KeyType.RaDecKey.make(keyName, degree)
 
     it("should allow single val") {
       val ii = raDecKey.set(raDec1)
@@ -1087,14 +1077,14 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     val listIn = Array(raDec1, raDec2)
 
     it("should work with list, withUnits") {
-      val ii = raDecKey.set(listIn).withUnits(degree)
+      val ii = raDecKey.setAll(listIn).withUnits(degree)
       ii.units should be(degree)
       ii.value(1) should equal(listIn(1))
       ii.values should equal(listIn)
     }
 
-    it("should work with list, units") {
-      val ii = raDecKey.set(listIn, degree)
+    it("should work with list") {
+      val ii = raDecKey.setAll(listIn)
       ii.units should be(degree)
       ii.value(1) should equal(listIn(1))
       ii.values should equal(listIn)
@@ -1137,15 +1127,15 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     val listIn = Array("First", "Second")
 
     it("should work with list, withUnits") {
-      val ii = stringKey.set(listIn).withUnits(degree)
+      val ii = stringKey.setAll(listIn).withUnits(degree)
       ii.units should be(degree)
       ii.value(1) should equal(listIn(1))
       ii.values should equal(listIn)
     }
 
-    it("should work with list, units") {
-      val ii = stringKey.set(listIn, degree)
-      ii.units should be(degree)
+    it("should work with list") {
+      val ii = stringKey.setAll(listIn)
+      ii.units should be(NoUnits)
       ii.value(1) should equal(listIn(1))
       ii.values should equal(listIn)
     }
@@ -1155,9 +1145,9 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     it("should allow creating Struct items") {
       val skey = StructKey.make("myStruct")
 
-      val ra    = KeyType.StringKey.make("ra")
-      val dec   = KeyType.StringKey.make("dec")
-      val epoch = KeyType.DoubleKey.make("epoch")
+      val ra    = KeyType.StringKey.make("ra", degree)
+      val dec   = KeyType.StringKey.make("dec", degree)
+      val epoch = KeyType.DoubleKey.make("epoch", year)
       val sc1   = Struct().madd(ra.set("12:13:14.1"), dec.set("32:33:34.4"), epoch.set(1950.0))
 
       val citem = skey.set(sc1)
@@ -1188,7 +1178,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
       assert(i1.units == NoUnits)
       assert(i1(1) == 3)
 
-      val i2 = intKey.set(Array(10, 30, 50, 70)).withUnits(degree)
+      val i2 = intKey.setAll(Array(10, 30, 50, 70)).withUnits(degree)
       assert(i2.values === Array(10, 30, 50, 70))
       assert(i2.units == degree)
       assert(i2(1) == 30)
@@ -1199,7 +1189,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     }
     it("should also allow setting with sequence") {
       val s1 = Array(2, 4, 6, 8)
-      val i1 = intKey.set(s1).withUnits(meter)
+      val i1 = intKey.setAll(s1).withUnits(meter)
       assert(i1.values === s1)
       assert(i1.values.length == s1.length)
       assert(i1.units == meter)

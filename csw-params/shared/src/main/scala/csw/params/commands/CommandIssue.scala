@@ -110,11 +110,18 @@ object CommandIssue {
   final case class RequiredServiceUnavailableIssue(reason: String) extends CommandIssue
 
   /**
-   *  sA required HCD is not available
+   *  A required HCD is not available
    *
    * @param reason describing the cause of this issue
    */
   final case class RequiredHCDUnavailableIssue(reason: String) extends CommandIssue
+
+  /**
+   *  A required HCD is busy and cannot be used
+   *
+   * @param reason describing the cause of this issue
+   */
+  final case class HCDBusyIssue(reason: String) extends CommandIssue
 
   /**
    * A required Assembly is not available

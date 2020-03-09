@@ -15,7 +15,7 @@ object Main {
 
   def main(args: Array[String]): Unit = start(args, startLogging = true)
 
-  def start(args: Array[String], startLogging: Boolean = false): Option[Process] =
+  def start(args: Array[String], startLogging: Boolean = false): Option[(Process, Wiring)] =
     new ArgsParser(name).parse(args.toList).map { options =>
       LocationServerStatus.requireUpLocally()
 
@@ -26,6 +26,7 @@ object Main {
       log.info(s"commandText: ${command.commandText}, command: ${command.toString}")
 
       val locationAgent = new LocationAgent(options.prefixes, command, wiring)
-      locationAgent.run()
+      val process       = locationAgent.run()
+      (process, wiring)
     }
 }

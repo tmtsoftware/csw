@@ -4,6 +4,7 @@ import csw.params.core.generics.KeyType.{ChoiceKey, CoordKey, StructKey}
 import csw.params.core.generics.{GChoiceKey, Key, KeyType, Parameter}
 import csw.params.core.models.Coords.EqFrame.FK5
 import csw.params.core.models.Coords.SolarSystemObject.Venus
+import csw.params.core.models.Units.NoUnits
 import csw.params.core.models._
 import csw.time.core.models.UTCTime
 import org.scalatest.funspec.AnyFunSpec
@@ -16,7 +17,7 @@ class KeysAndParametersTest extends AnyFunSpec with Matchers {
     it("should show usage of primitive types") {
 
       //#primitives
-      //declare keyname
+      //declare keyName
       val s1: String = "encoder"
 
       //making 3 keys
@@ -34,10 +35,10 @@ class KeysAndParametersTest extends AnyFunSpec with Matchers {
 
       //associating units
       val weekDays: Array[String]            = Array("Sunday", "Monday", "Tuesday")
-      val paramWithUnits1: Parameter[String] = k3.set(weekDays, Units.day)
+      val paramWithUnits1: Parameter[String] = k3.setAll(weekDays)
       val paramWithUnits2: Parameter[String] = k3 -> weekDays withUnits Units.day
 
-      //deault unit is NoUnits
+      //default unit is NoUnits
       assert(booleanParam.units === Units.NoUnits)
 
       //set units explicitly on an existing Parameter
@@ -127,17 +128,18 @@ class KeysAndParametersTest extends AnyFunSpec with Matchers {
       val choices = Choices.from("A", "B", "C")
 
       //keys
-      val choice1Key: GChoiceKey = ChoiceKey.make("mode", choices)
+      val choice1Key: GChoiceKey = ChoiceKey.make("mode", NoUnits, choices)
       val choice2Key: GChoiceKey = ChoiceKey.make(
         "mode-reset",
+        NoUnits,
         Choices.fromChoices(Choice("c"), Choice("b"), Choice("a"))
       )
 
       //store values
       val p1: Parameter[Choice] = choice1Key
-        .set(Array(Choice("A")))
+        .setAll(Array(Choice("A")))
         .withUnits(Units.foot)
-      val p2: Parameter[Choice] = choice2Key.set(Array(Choice("c")))
+      val p2: Parameter[Choice] = choice2Key.setAll(Array(Choice("c")))
 
       //add units
       val paramWithFoot = p1.withUnits(Units.foot)
@@ -296,10 +298,10 @@ class KeysAndParametersTest extends AnyFunSpec with Matchers {
       //values to store
       val weekDays: Array[String] = Array("Sunday", "Monday", "Tuesday")
 
-      //associating units via set
-      val paramWithUnits1: Parameter[String] = k3.set(weekDays, Units.day)
+      //default units via set
+      val paramWithUnits1: Parameter[String] = k3.setAll(weekDays)
       //associating units via withUnits
-      val paramWithUnits2: Parameter[String] = k3 -> weekDays withUnits Units.count
+      val paramWithUnits2: Parameter[String] = k3 -> weekDays withUnits Units.day
       //change existing unit
       val paramWithUnits3: Parameter[Short] = paramOfShorts.withUnits(Units.meter)
       //#units
@@ -307,8 +309,8 @@ class KeysAndParametersTest extends AnyFunSpec with Matchers {
       //validations
       assert(bDefaultUnitSet === true)
       assert(defaultTimeUnit === Units.second)
-      assert(paramWithUnits1.units === Units.day)
-      assert(paramWithUnits2.units === Units.count)
+      assert(paramWithUnits1.units === Units.NoUnits)
+      assert(paramWithUnits2.units === Units.day)
       assert(paramWithUnits3.units === Units.meter)
     }
   }

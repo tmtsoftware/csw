@@ -43,7 +43,7 @@ class EventsTest extends AnyFunSpec with Matchers {
     it("should create with prefix, eventName, paramSet") {
       val i1 = k1.set(22)
       val i2 = k2.set(44)
-      val i4 = k4.set("sensor image".getBytes)
+      val i4 = k4.setAll("sensor image".getBytes)
 
       val sc1 = SystemEvent(prefix, eventName, Set(i1, i2, i4))
       assert(sc1.size == 3)
@@ -137,7 +137,7 @@ class EventsTest extends AnyFunSpec with Matchers {
     it("should create with prefix, eventName and paramSet") {
       val i1 = k1.set(22)
       val i2 = k2.set(44)
-      val i4 = k4.set("sensor image".getBytes)
+      val i4 = k4.setAll("sensor image".getBytes)
 
       val sc1 = ObserveEvent(prefix, eventName, Set(i1, i2, i4))
       assert(sc1.size == 3)

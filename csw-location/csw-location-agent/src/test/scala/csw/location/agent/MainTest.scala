@@ -60,7 +60,7 @@ class MainTest extends ScalaTestFrameworkTestKit with AnyFunSuiteLike {
   }
 
   private def testWithTcp(args: Array[String], name: String, port: Int) = {
-    val process = Main.start(args).get
+    val process = Main.start(args).get._1
 
     val connection       = TcpConnection(ComponentId(Prefix(name), ComponentType.Service))
     val resolvedLocation = locationService.resolve(connection, 5.seconds).await.get
@@ -73,7 +73,7 @@ class MainTest extends ScalaTestFrameworkTestKit with AnyFunSuiteLike {
   }
 
   private def testWithHttp(args: Array[String], name: String, port: Int, path: String) = {
-    val process = Main.start(args).get
+    val process = Main.start(args).get._1
 
     val connection       = HttpConnection(models.ComponentId(Prefix(name), ComponentType.Service))
     val resolvedLocation = locationService.resolve(connection, 5.seconds).await.get

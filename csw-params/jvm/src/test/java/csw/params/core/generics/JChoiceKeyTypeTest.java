@@ -21,7 +21,7 @@ public class JChoiceKeyTypeTest extends JUnitSuite {
     private final String keyName = " choiceKey";
     private final Choices choices = Choices.from("A", "B", "C");
 
-    private final GChoiceKey choiceKey = JKeyType.ChoiceKey().make(keyName, choices);
+    private final GChoiceKey choiceKey = JKeyType.ChoiceKey().make(keyName, kilometer, choices);
 
     @Test
     public void choicesAPIShouldBeAccessible() {
@@ -45,25 +45,6 @@ public class JChoiceKeyTypeTest extends JUnitSuite {
 
         // set with varargs
         Parameter<Choice> choiceParameter = choiceKey.set(choice1, choice2);
-        Assert.assertEquals(NoUnits, choiceParameter.units());
-        Assert.assertEquals(choice1, choiceParameter.jGet(0).orElseThrow());
-        Assert.assertEquals(choice2, choiceParameter.jGet(1).orElseThrow());
-        Assert.assertEquals(choice1, choiceParameter.head());
-        Assert.assertEquals(choice1, choiceParameter.value(0));
-        Assert.assertEquals(choice2, choiceParameter.value(1));
-        Assert.assertEquals(2, choiceParameter.size());
-        Assert.assertArrayEquals(choicesArr, (Choice[])choiceParameter.values());
-        Assert.assertEquals(Arrays.asList(choicesArr), choiceParameter.jValues());
-    }
-
-    @Test
-    public void shouldAbleToCreateChoiceParameterWithUnits() {
-        Choice choice1 = new Choice("A");
-        Choice choice2 = new Choice("B");
-        Choice[] choicesArr = {choice1, choice2};
-
-        // set with Array and Units
-        Parameter<Choice> choiceParameter = choiceKey.set(choicesArr, kilometer);
         Assert.assertEquals(kilometer, choiceParameter.units());
         Assert.assertEquals(choice1, choiceParameter.jGet(0).orElseThrow());
         Assert.assertEquals(choice2, choiceParameter.jGet(1).orElseThrow());
@@ -71,7 +52,26 @@ public class JChoiceKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(choice1, choiceParameter.value(0));
         Assert.assertEquals(choice2, choiceParameter.value(1));
         Assert.assertEquals(2, choiceParameter.size());
-        Assert.assertArrayEquals(choicesArr, (Choice[])choiceParameter.values());
+        Assert.assertArrayEquals(choicesArr, (Choice[]) choiceParameter.values());
+        Assert.assertEquals(Arrays.asList(choicesArr), choiceParameter.jValues());
+    }
+
+    @Test
+    public void shouldAbleToCreateChoiceParameterWithUnits() {   ///  REVISIT: remove?
+        Choice choice1 = new Choice("A");
+        Choice choice2 = new Choice("B");
+        Choice[] choicesArr = {choice1, choice2};
+
+        // set with Array and Units
+        Parameter<Choice> choiceParameter = choiceKey.setAll(choicesArr);
+        Assert.assertEquals(kilometer, choiceParameter.units());
+        Assert.assertEquals(choice1, choiceParameter.jGet(0).orElseThrow());
+        Assert.assertEquals(choice2, choiceParameter.jGet(1).orElseThrow());
+        Assert.assertEquals(choice1, choiceParameter.head());
+        Assert.assertEquals(choice1, choiceParameter.value(0));
+        Assert.assertEquals(choice2, choiceParameter.value(1));
+        Assert.assertEquals(2, choiceParameter.size());
+        Assert.assertArrayEquals(choicesArr, (Choice[]) choiceParameter.values());
         Assert.assertEquals(Arrays.asList(choicesArr), choiceParameter.jValues());
     }
 

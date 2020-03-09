@@ -36,8 +36,8 @@ object EventUtils {
   ): SystemEvent =
     basePerfEvent.copy(
       paramSet = Set(
-        histogramKey.set(payload),
-        initialLatencyHistogramKey.set(initialLatencyPayload),
+        histogramKey.setAll(payload),
+        initialLatencyHistogramKey.setAll(initialLatencyPayload),
         throughputKey.set(throughput),
         totalDroppedKey.set(totalDropped),
         totalOutOfOrderKey.set(totalOutOfOrder),
@@ -50,7 +50,7 @@ object EventUtils {
       eventId = Id(id.toString),
       source = prefix,
       eventName = name,
-      paramSet = Set(payloadKey.set(payload)),
+      paramSet = Set(payloadKey.setAll(payload)),
       eventTime = UTCTime.now()
     )
 

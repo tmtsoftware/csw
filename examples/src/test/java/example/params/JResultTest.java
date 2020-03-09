@@ -8,6 +8,7 @@ import csw.params.core.models.Id;
 import csw.params.core.models.MatrixData;
 import csw.params.core.models.ObsId;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JUnits;
 import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
 import org.junit.Assert;
@@ -31,10 +32,10 @@ public class JResultTest extends JUnitSuite {
     public void showUsageOfResult() {
         //#result
         //keys
-        Key<Integer> k1 = JKeyType.IntKey().make("encoder");
-        Key<Integer> k2 = JKeyType.IntKey().make("windspeed");
-        Key<String> k3 = JKeyType.StringKey().make("filter");
-        Key<Integer> k4 = JKeyType.IntKey().make("notUsed");
+        Key<Integer> k1 = JKeyType.IntKey().make("encoder", JUnits.encoder);
+        Key<Integer> k2 = JKeyType.IntKey().make("windspeed", JUnits.NoUnits);
+        Key<String> k3 = JKeyType.StringKey().make("filter", JUnits.NoUnits);
+        Key<Integer> k4 = JKeyType.IntKey().make("notUsed", JUnits.NoUnits);
 
         //parameters
         Parameter<Integer> p1 = k1.set(22);
@@ -77,7 +78,7 @@ public class JResultTest extends JUnitSuite {
     public void showJsonSerialization() {
         //#json-serialization
         //key
-        Key<MatrixData<Double>> k1 = JKeyType.DoubleMatrixKey().make("myMatrix");
+        Key<MatrixData<Double>> k1 = JKeyType.DoubleMatrixKey().make("myMatrix", JUnits.NoUnits);
 
         //values
         Double[][] doubles = {{1.0, 2.0, 3.0}, {4.1, 5.1, 6.1}, {7.2, 8.2, 9.2}};
@@ -112,9 +113,9 @@ public class JResultTest extends JUnitSuite {
     public void showUniqueKeyConstraintExample() {
         //#unique-key
         //keys
-        Key<Integer> encoderKey = JKeyType.IntKey().make("encoder");
-        Key<Integer> filterKey = JKeyType.IntKey().make("filter");
-        Key<Integer> miscKey = JKeyType.IntKey().make("misc.");
+        Key<Integer> encoderKey = JKeyType.IntKey().make("encoder", JUnits.encoder);
+        Key<Integer> filterKey = JKeyType.IntKey().make("filter", JUnits.NoUnits);
+        Key<Integer> miscKey = JKeyType.IntKey().make("misc.", JUnits.NoUnits);
 
         //ObsId
         ObsId obsId = new ObsId("Obs001");

@@ -482,8 +482,8 @@ and the script is named `csw-services.sh`. The version must match the CSW releas
 
 The `csw-services.sh` script has two basic commands: `start` and `stop`.  The start command can start specific services using
 passed in flags, or all services without any.  Services are started on default ports but those ports can be overridden using
-command line arguments.  It is important to pass in a network interface name that is appropriate for your system.  These
-can be obtained using `ifconfig` on Linux and Mac computers.  `en0` typically works for most machines.  This can alternatively be set
+command line arguments. It is important to pass in a network interface name that is appropriate for your system.  These
+can be obtained using `ifconfig` on Linux and Mac computers. `en0` typically, works for most machines. This can alternatively be set
 using the environment variable `INTERFACE_NAME`.  Setting the interface name at the command with this script also sets this 
 environment variable.
 
@@ -494,13 +494,13 @@ The environment variables used by CSW services are specified @ref:[here](../depl
 
 @@@
 
-To get information on the arguments for the tool, use `csw-services.sh --help`.
+To get information on the arguments for the tool, use `csw-services.sh --help` or `csw-services.sh start --help`.
 
 
 #### *Tutorial: Developing an HCD*
 
-Let's go ahead and start our CSW Services using the script.  Go to the [release page](https://github.com/tmtsoftware/csw/releases)
-and download and unpack the CSW application bundle.  Then go into the `bin` directory and enter the command
+Let's go ahead and start our CSW Services using the script. Go to the [release page](https://github.com/tmtsoftware/csw/releases)
+and download and unpack the CSW application bundle. Then go into the `bin` directory and enter the command
 
 ```
 ./csw-services.sh start -i <iname>
@@ -510,15 +510,15 @@ where `<iname>` is your interface name (e.g. `en0`).
 
 ## Building and Running component in standalone mode
 
-Once the component is ready, it is started using the `ContainerCmd` object in standalone mode. 
-The details for starting the `ContainerCmd` in standalone mode can be found @ref:[here](../framework/deploying-components.md).
+Once the component is ready, it is started using the `ContainerCmd` object in a standalone mode. 
+The details for starting the `ContainerCmd` in a standalone mode can be found @ref:[here](../framework/deploying-components.md).
 
 There are various ways to build and run the project.  A simple way during development is to to use sbt to run it. 
 The sbt command `runMain` can be used to specify an application with a main method and run it with arguments specified at the command line.  When this
 command is executed, sbt will take care of any downloading of dependencies, compiling, or building necessary to run
 your application. 
 
-Our template includes a wrapper application around ContainerCmd that we can use in the deployment module.  To run our HCD in standalone mode,
+Our template includes a wrapper application around ContainerCmd that we can use in the deployment module.  To run our HCD in a standalone mode,
 go to the project root directory and type `sbt "<deploy-module>/runMain <mainClass> --local --standalone <path-to-config-file>"`, where
  
 - `<deploy-module>` is the name of the deployment module created by the template (`sample-deploy` if using defaults) 
@@ -544,7 +544,7 @@ sbt "sample-deploy/runMain org.tmt.esw.sampledeploy.SampleContainerCmdApp --loca
 
 To run the component using the deployment package, perform the following steps:
 
--   Run `sbt <project>/universal:packageBin`, where `<project>` is your deployment module (e.g. `sample-deploy`). This will create self contained zip in `<project>/target/universal` directory
+-   Run `sbt <project>/universal:packageBin`, where `<project>` is your deployment module (e.g. `sample-deploy`). This will create self-contained zip in `<project>/target/universal` directory
 -   Unzip generated zip file and enter into bin directory
 -   Run the `./<project>-cmd-app --local --standalone <path-to-local-config-file-to-start-the-component>`
 
@@ -558,10 +558,10 @@ features of each version. Moderate adds functionality to Basic, and Full adds fu
 
 The code for the enhanced tutorials is in the CSW distribution at the following locations:
 
- Scala versions are [here]($github.dir.base_url$/examples/src/main/scala/org/tmt/esw/)  
- Scala test code is [here]($github.dir.base_url$/examples/src/test/scala/org/tmt/esw/)  
- Java version of basic is [here]($github.dir.base_url$/examples/src/main/java/org/tmt/esw/)  
- Java test code is [here]($github.dir.base_url$/examples/src/test/java/org/tmt/esw/)
+ Scala versions are [here]($github.dir.base_url$/examples/src/main/scala/example/tutorial/)  
+ Scala test code is [here]($github.dir.base_url$/examples/src/test/scala/example/tutorial/)  
+ Java version of basic is [here]($github.dir.base_url$/examples/src/main/java/example/tutorial/)  
+ Java test code is [here]($github.dir.base_url$/examples/src/test/java/example/tutorial/)
  
  At this time there is no Java versions of moderate and full.
  
@@ -577,7 +577,7 @@ The code for the enhanced tutorials is in the CSW distribution at the following 
 * Provides simple validation in HCD and Assembly. 
 * Assembly shows how to use onTrackEvent to manage CommandService creation and loss of HCD.
 * Code shows how to send a command while noticing if HCD is available.
-* Simulates different commands that use the sleep functinoality of HCD.
+* Simulates different commands that use the sleep functionality of HCD.
 * Shows how to use CommandResponseManager to update a long-running command.
 * Shows a "complex" command that uses CommandResponseManager queryFinalAll call.
 * Shows how to subscribe to events and process events. 

@@ -16,6 +16,7 @@
  - [Testing](commons/testing.md)
  - [sbt tasks](commons/sbt-tasks.md)
  - [Manuals](commons/manuals.md)
+ - [Migration Guides](migration_guide/migration-guides.md)
  - [CSW Service Contract](commons/contract.md)
  - [Technical Documentation](technical/technical.md)
 @@@

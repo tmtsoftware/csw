@@ -3,8 +3,8 @@
 # Starts redis sentinel required by CSW and registers them with the location service.
 # This script uses the csw-location-agent app to start Redis Sentinel and register it with the Location Service
 #
-#    csw-services.sh start    :to start redis sentinel and register it to location service as EventServer and AlarmServer
-#    csw-services.sh stop     :to stop redis sentinel and unregister it from the location service
+#    csw-services-old.sh start    :to start redis sentinel and register it to location service as EventServer and AlarmServer
+#    csw-services-old.sh stop     :to stop redis sentinel and unregister it from the location service
 #
 
 # Setting default values

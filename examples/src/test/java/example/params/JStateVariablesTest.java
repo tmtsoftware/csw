@@ -9,6 +9,7 @@ import csw.params.core.states.CurrentState;
 import csw.params.core.states.DemandState;
 import csw.params.core.states.StateName;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JUnits;
 import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
 import csw.time.core.models.UTCTime;
@@ -194,7 +195,7 @@ public class JStateVariablesTest extends JUnitSuite {
     public void showUniqueKeyConstraintExample() {
         //#unique-key
         //keys
-        Key<Integer> encoderKey = JKeyType.IntKey().make("encoder");
+        Key<Integer> encoderKey = JKeyType.IntKey().make("encoder", JUnits.encoder);
         Key<Integer> filterKey = JKeyType.IntKey().make("filter");
         Key<Integer> miscKey = JKeyType.IntKey().make("misc.");
 

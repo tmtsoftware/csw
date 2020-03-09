@@ -4,6 +4,7 @@ import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.generics.ParameterSetType;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JUnits;
 import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
 import org.junit.Assert;
@@ -19,16 +20,16 @@ import java.util.stream.Collectors;
 // DEOPSCSW-328: Basic information of Event needed for routing and Diagnostic use
 // DEOPSCSW-329: Providing Mandatory information during Event Creation
 public class JEventsTest extends JUnitSuite {
-    private final Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder");
-    private final Key<String> epochStringKey = JKeyType.StringKey().make("epoch");
-    private final Key<Integer> epochIntKey = JKeyType.IntKey().make("epoch");
-    private final Key<Byte> epochByteKey = JKeyType.ByteKey().make("epoch");
-    private final Key<Integer> notUsedKey = JKeyType.IntKey().make("notUsed");
+    private final Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder", JUnits.encoder);
+    private final Key<String> epochStringKey = JKeyType.StringKey().make("epoch", JUnits.year);
+    private final Key<Integer> epochIntKey = JKeyType.IntKey().make("epoch", JUnits.year);
+    private final Key<Byte> epochByteKey = JKeyType.ByteKey().make("epoch", JUnits.year);
+    private final Key<Integer> notUsedKey = JKeyType.IntKey().make("notUsed", JUnits.NoUnits);
 
     private final Parameter<Integer> encoderParam = encoderIntKey.set(22, 33);
     private final Parameter<String> epochStringParam = epochStringKey.set("A", "B");
     private final Parameter<Integer> epochIntParam = epochIntKey.set(44, 55);
-    private final Parameter<Byte> epochByteParam = epochByteKey.set(new Byte[]{10, 20});
+    private final Parameter<Byte> epochByteParam = epochByteKey.setAll(new Byte[]{10, 20});
 
     private final Prefix prefix = Prefix.apply(JSubsystem.WFOS, "red.detector");
 
