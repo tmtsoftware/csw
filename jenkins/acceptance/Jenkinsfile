@@ -3,6 +3,10 @@ pipeline {
         label 'master'
     }
 
+    environment {
+        SBT_OPTS = "-XX:ReservedCodeCacheSize=512M -Xmx3500M -Xss2M -Dfile.encoding=UTF-8 -XX:+CMSClassUnloadingEnabled"
+    }
+
     options {
         timeout(time: 2, unit: 'HOURS')
         timestamps()
