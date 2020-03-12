@@ -3,10 +3,6 @@ pipeline {
         label 'master'
     }
 
-    environment {
-        JAVA_HOME = '/usr/lib/jvm/adoptopenjdk-11-hotspot'
-    }
-
     options {
         timeout(time: 2, unit: 'HOURS')
         timestamps()
