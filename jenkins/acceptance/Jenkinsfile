@@ -4,7 +4,7 @@ pipeline {
     }
 
     environment {
-        SBT_OPTS = "-XX:ReservedCodeCacheSize=512M -Xmx3500M -Xss2M -Dfile.encoding=UTF-8 -XX:+CMSClassUnloadingEnabled"
+        SBT_OPTS = "-XX:ReservedCodeCacheSize=512M -XX:MaxPermSize=256M -Xms1024M -Xmx5G -Xss2M -XX:MaxMetaspaceSize=2G -Dfile.encoding=UTF-8 -XX:+CMSClassUnloadingEnabled"
     }
 
     options {
