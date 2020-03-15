@@ -61,7 +61,7 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
   }
 
   // DEOPSCSW-181: Multiple Examples for Lifecycle Support
-  test("should start a component in standalone mode and register with location service | DEOPSCSW-167, DEOPSCSW-177, DEOPSCSW-216, DEOPSCSW-181") {
+  test("should start a component in standalone mode and register with location service | DEOPSCSW-167, DEOPSCSW-177, DEOPSCSW-216, DEOPSCSW-181, DEOPSCSW-153, DEOPSCSW-180") {
     // start component in standalone mode
     val wiring: FrameworkWiring = FrameworkWiring.make(standaloneComponentActorSystem, mock[RedisClient])
     Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring)

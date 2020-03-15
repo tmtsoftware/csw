@@ -26,7 +26,7 @@ class CommandsTest extends AnyFunSpec {
     val k2bad = KeyType.IntKey.make("stringThing")
     val k3    = KeyType.IntKey.make("notUsed")
 
-    it("Should allow adding keys using single set") {
+    it("Should allow adding keys using single set | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320") {
       val i1  = k1.set(22)
       val i2  = k2.set("A")
       val sc1 = Setup(Prefix(ck3), commandName, Some(obsId)).add(i1).add(i2)
@@ -50,7 +50,7 @@ class CommandsTest extends AnyFunSpec {
     }
 
     // DEOPSCSW-190: Implement Unit Support
-    it("Should allow setting with units") {
+    it("Should allow setting with units | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320, DEOPSCSW-190") {
       var sc1 = Setup(Prefix(ck3), commandName, Some(obsId))
       sc1 = sc1.madd(k1.set(22).withUnits(degree), k2.set("B"))
       assert(sc1.size == 2)
@@ -60,7 +60,7 @@ class CommandsTest extends AnyFunSpec {
       assert(sc1.get(k2).get.units == NoUnits)
     }
 
-    it("Should allow apply which returns values") {
+    it("Should allow apply which returns values | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320") {
       var sc1 = Setup(Prefix(ck3), commandName, Some(obsId))
       sc1 = sc1.madd(k1.set(22).withUnits(degree), k2.set("C"))
 
@@ -74,7 +74,7 @@ class CommandsTest extends AnyFunSpec {
     }
 
     // DEOPSCSW-190: Implement Unit Support
-    it("should update for the same key with set") {
+    it("should update for the same key with set | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320, DEOPSCSW-190") {
       var sc1 = Setup(Prefix(ck3), commandName, Some(obsId))
       sc1 = sc1.add(k2.set("D"))
       assert(sc1.exists(k2))
@@ -87,7 +87,7 @@ class CommandsTest extends AnyFunSpec {
     }
 
     // DEOPSCSW-186: Binary value payload
-    it("Should able to create with Byte Parameteret") {
+    it("Should able to create with Byte ParameterSet | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320, DEOPSCSW-186") {
       val byteKey1 = ByteKey.make("byteKey1")
       val byteKey2 = ByteKey.make("byteKey2")
       val bytes1   = Array[Byte](10, 20)
@@ -108,7 +108,7 @@ class CommandsTest extends AnyFunSpec {
     }
 
     // DEOPSCSW-190: Implement Unit Support
-    it("Should allow updates") {
+    it("Should allow updates | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320, DEOPSCSW-190") {
       val i1 = k1.set(22)
       assert(i1.head == 22)
       assert(i1.units == NoUnits)
@@ -128,7 +128,7 @@ class CommandsTest extends AnyFunSpec {
     }
 
     // DEOPSCSW-315: Make ObsID optional in commands
-    it("Should allow to create setup without obsId") {
+    it("Should allow to create setup without obsId | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320, DEOPSCSW-315") {
       val i1 = k1.set(22)
 
       val sc = Setup(Prefix(ck1), commandName, None).add(i1)
@@ -139,7 +139,7 @@ class CommandsTest extends AnyFunSpec {
     }
 
     // DEOPSCSW-369: Unique runId for commands
-    it("Should create new RunId when a parameter is added or removed") {
+    it("Should create new RunId when a parameter is added or removed | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320, DEOPSCSW-369") {
       val i1 = k1.set(22)
 
       val sc1 = Setup(Prefix(ck3), commandName, Some(obsId))
@@ -164,7 +164,7 @@ class CommandsTest extends AnyFunSpec {
 
     val k1 = KeyType.IntKey.make("repeat")
     val k2 = KeyType.IntKey.make("expTime")
-    it("Should allow adding keys") {
+    it("Should allow adding keys | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320") {
       val i1  = k1.set(22)
       val i2  = k2.set(44)
       val oc1 = Observe(Prefix(ck3), commandName, Some(obsId)).add(i1).add(i2)
@@ -178,7 +178,7 @@ class CommandsTest extends AnyFunSpec {
     }
 
     // DEOPSCSW-315: Make ObsID optional in commands
-    it("Should allow setting") {
+    it("Should allow setting | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320, DEOPSCSW-315") {
       var oc1 = Observe(Prefix(ck3), commandName, Some(obsId))
       oc1 = oc1.add(k1.set(22)).add(k2.set(44))
       assert(oc1.size == 2)
@@ -187,7 +187,7 @@ class CommandsTest extends AnyFunSpec {
       assert(oc1.exists(k2))
     }
 
-    it("Should allow apply") {
+    it("Should allow apply | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320") {
       var oc1 = Observe(Prefix(ck3), commandName, Some(obsId))
       oc1 = oc1.add(k1.set(22)).add(k2.set(44))
 
@@ -199,7 +199,7 @@ class CommandsTest extends AnyFunSpec {
       assert(v2.head == 44)
     }
 
-    it("should update for the same key with set") {
+    it("should update for the same key with set | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320") {
       var oc1 = Observe(Prefix(ck3), commandName, Some(obsId))
       oc1 = oc1.add(k2.set(22))
       assert(oc1.exists(k2))
@@ -210,7 +210,7 @@ class CommandsTest extends AnyFunSpec {
       assert(oc1(k2).values === Array(33))
     }
 
-    it("should update for the same key with add") {
+    it("should update for the same key with add | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320") {
       var oc1 = Observe(Prefix(ck3), commandName, Some(obsId))
       oc1 = oc1.add(k2.set(22).withUnits(NoUnits))
       assert(oc1.exists(k2))
@@ -222,7 +222,7 @@ class CommandsTest extends AnyFunSpec {
     }
 
     // DEOPSCSW-369: Unique runId for commands
-    it("Should create new RunId when a parameter is added or removed") {
+    it("Should create new RunId when a parameter is added or removed | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320, DEOPSCSW-369") {
       val i1 = k1.set(22)
 
       val oc1 = Observe(Prefix(ck3), commandName, Some(obsId))
@@ -247,7 +247,7 @@ class CommandsTest extends AnyFunSpec {
 
     val k1 = KeyType.IntKey.make("repeat")
     val k2 = KeyType.IntKey.make("expTime")
-    it("Should allow adding keys") {
+    it("Should allow adding keys | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320") {
       val i1  = k1.set(22)
       val i2  = k2.set(44)
       val wc1 = Wait(Prefix(ck3), commandName, Some(obsId)).add(i1).add(i2)
@@ -261,7 +261,7 @@ class CommandsTest extends AnyFunSpec {
     }
 
     // DEOPSCSW-315: Make ObsID optional in commands
-    it("Should allow setting") {
+    it("Should allow setting | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320, DEOPSCSW-315") {
       var wc1 = Wait(Prefix(ck3), commandName, Some(obsId))
       wc1 = wc1.add(k1.set(22)).add(k2.set(44))
       assert(wc1.size == 2)
@@ -270,7 +270,7 @@ class CommandsTest extends AnyFunSpec {
       assert(wc1.exists(k2))
     }
 
-    it("Should allow apply") {
+    it("Should allow apply | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320") {
       var wc1 = Wait(Prefix(ck3), commandName, Some(obsId))
       wc1 = wc1.add(k1.set(22)).add(k2.set(44))
 
@@ -282,7 +282,7 @@ class CommandsTest extends AnyFunSpec {
       assert(v2.head == 44)
     }
 
-    it("should update for the same key with set") {
+    it("should update for the same key with set | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320") {
       var wc1 = Wait(Prefix(ck3), commandName, Some(obsId))
       wc1 = wc1.add(k2.set(22))
       assert(wc1.exists(k2))
@@ -293,7 +293,7 @@ class CommandsTest extends AnyFunSpec {
       assert(wc1(k2).values === Array(33))
     }
 
-    it("should update for the same key with add") {
+    it("should update for the same key with add | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320") {
       var wc1 = Wait(Prefix(ck3), commandName, Some(obsId))
       wc1 = wc1.add(k2.set(22).withUnits(NoUnits))
       assert(wc1.exists(k2))
@@ -305,7 +305,7 @@ class CommandsTest extends AnyFunSpec {
     }
 
     // DEOPSCSW-369: Unique runId for commands
-    it("Should create new RunId when a parameter is added or removed") {
+    it("Should create new RunId when a parameter is added or removed | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320, DEOPSCSW-369") {
       val i1 = k1.set(22)
 
       val wc1 = Wait(Prefix(ck3), commandName, Some(obsId))
@@ -326,7 +326,7 @@ class CommandsTest extends AnyFunSpec {
     }
   }
 
-  describe("testing for getting typed items") {
+  describe("testing for getting typed items | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320") {
     val t1  = KeyType.IntKey.make("test1", degree)
     val sc1 = Setup(Prefix(ck3), commandName, Some(obsId)).add(t1.setAll(Array(22)))
 
@@ -350,7 +350,7 @@ class CommandsTest extends AnyFunSpec {
     val i2 = k2.set(1.0, 2.0, 3.0).withUnits(meter)
     val i3 = k3.set("A", "B", "C")
 
-    it("Should get as IntItem") {
+    it("Should get as IntItem | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320") {
       val sc = Setup(Prefix(ck3), commandName, Some(obsId)).add(i1).add(i2).add(i3)
 
       val out1: Option[Parameter[Int]]    = sc.get(k1)
@@ -372,7 +372,7 @@ class CommandsTest extends AnyFunSpec {
     val i2 = k2.set(1.0, 2.0, 3.0).withUnits(meter)
     val i3 = k3.set("A", "B", "C")
 
-    it("Should allow vararg add") {
+    it("Should allow vararg add | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320") {
       val sc = Setup(Prefix(ck3), commandName, Some(obsId)).madd(i1, i2, i3)
       assert(sc.size == 3)
       assert(sc.exists(k1))
@@ -392,7 +392,7 @@ class CommandsTest extends AnyFunSpec {
     val i3 = k3.set("A", "B", "C")
     val i4 = k4.set(ArrayData(Array.fill[Long](100)(10)), ArrayData(Array.fill[Long](100)(100)))
 
-    it("Setup command should allow removing one at a time") {
+    it("Setup command should allow removing one at a time | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320") {
       var sc1 = Setup(Prefix(ck3), commandName, Some(obsId)).madd(i1, i2, i3, i4)
       assert(sc1.size == 4)
       assert(sc1.get(k1).isDefined)
@@ -445,7 +445,7 @@ class CommandsTest extends AnyFunSpec {
       assert(sc1.get(k4).isDefined)
     }
 
-    it("Observe command should allow removing one at a time") {
+    it("Observe command should allow removing one at a time | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320") {
       var sc1 = Observe(Prefix(ck3), commandName, Some(obsId)).madd(i1, i2, i3, i4)
       assert(sc1.size == 4)
       assert(sc1.get(k1).isDefined)
@@ -477,7 +477,7 @@ class CommandsTest extends AnyFunSpec {
       assert(sc1.get(k4).isDefined)
     }
 
-    it("Wait command should allow removing one at a time") {
+    it("Wait command should allow removing one at a time | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320") {
       var sc1 = Wait(Prefix(ck3), commandName, Some(obsId)).madd(i1, i2, i3, i4)
       assert(sc1.size == 4)
       assert(sc1.get(k1).isDefined)
@@ -525,7 +525,7 @@ class CommandsTest extends AnyFunSpec {
     val i4  = k4.set(ArrayData(Array.fill[Long](100)(10)), ArrayData(Array.fill[Long](100)(100)))
     val i5  = k1.set(22) // This is not added for testing not present removal
 
-    it("Should allow removing one at a time") {
+    it("Should allow removing one at a time | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320") {
       var sc1 = Setup(Prefix(ck3), commandName, Some(obsId)).madd(i1, i2, i3, i4)
       assert(sc1.size == 4)
       assert(sc1.get(k1).isDefined)
@@ -608,7 +608,7 @@ class CommandsTest extends AnyFunSpec {
       (observe, observe.cloneCommand),
       (wait, wait.cloneCommand)
     )
-    it("clone command creates a command from existing command with a new RunId for Setup, Observe or Wait") {
+    it("clone command creates a command from existing command with a new RunId for Setup, Observe or Wait | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320") {
       forAll(testData) { (command, commandClone) =>
         assert(command.runId != commandClone.runId)
         assert(command.commandName == commandClone.commandName)

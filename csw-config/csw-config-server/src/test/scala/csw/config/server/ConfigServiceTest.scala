@@ -93,7 +93,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   // DEOPSCSW-42: Storing text based component configuration (uploading files with various sizes)
   // DEOPSCSW-71: Retrieve any version of a configuration file using its unique id
   // DEOPSCSW-48: Store new configuration file in Config. service
-  test("should able to upload and get component configurations from config service") {
+  test("should able to upload and get component configurations from config service | DEOPSCSW-42, DEOPSCSW-71, DEOPSCSW-48") {
     val configFileNames            = Set("tromboneAssemblyTest.conf", "tromboneContainerTest.conf", "tromboneHCDTest.conf")
     val configIds                  = createConfigs(configFileNames)
     val configFilePaths: Set[Path] = configFileNames.map(name => Paths.get(name))
@@ -116,7 +116,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   // DEOPSCSW-27: Storing binary component configurations
   // DEOPSCSW-81: Storing large files in the configuration service
   // DEOPSCSW-131: Detect and handle oversize files
-  test("should able to upload and get binary configurations from config service") {
+  test("should able to upload and get binary configurations from config service | DEOPSCSW-27, DEOPSCSW-71, DEOPSCSW-48, DEOPSCSW-81, DEOPSCSW-131") {
     val binaryFileName = "binaryConf.bin"
     val binaryConfPath = Paths.get("tmt/trombone/test/conf/large/" + binaryFileName)
 
@@ -135,14 +135,14 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   }
 
   //  DEOPSCSW-42: Storing text based component configuration (exercise deep path)
-  test("should able to create a file and retrieve the same") {
+  test("should able to create a file and retrieve the same | DEOPSCSW-42") {
     val file = Paths.get("/tmt/trombone/assembly/conf/normalfiles/test/test.conf")
     configService.create(file, ConfigData.fromString(configValue1), annex = false, "commit test file").await
     configService.getLatest(file).await.get.toStringF.await shouldBe configValue1
   }
 
   //  DEOPSCSW-42: Storing text based component configuration
-  test("should ignore '/' at the beginning of file path and create a file") {
+  test("should ignore '/' at the beginning of file path and create a file  | DEOPSCSW-42") {
     val fileName             = "csw.conf/1/2/3"
     val file                 = Paths.get(s"/$fileName")
     val fileWithoutBackslash = Paths.get(fileName)
@@ -160,7 +160,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   // DEOPSCSW-42: Storing text based component configuration
   // DEOPSCSW-48: Store new configuration file in Config. service
   // DEOPSCSW-47: Unique name for configuration file
-  test("should throw FileAlreadyExists while creating a file if it already exists in repository - assume svn first") {
+  test("should throw FileAlreadyExists while creating a file if it already exists in repository - assume svn first | DEOPSCSW-42, DEOPSCSW-48, DEOPSCSW-47") {
     val file = Paths.get("/tmt/tcp/redis/text/redis.conf")
     configService
       .create(file, ConfigData.fromString(configValue1), annex = false, "commit redis conf for first time")
@@ -188,7 +188,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   // DEOPSCSW-42: Storing text based component configuration
   // DEOPSCSW-48: Store new configuration file in Config. service
   // DEOPSCSW-47: Unique name for configuration file
-  test("should throw FileAlreadyExists while creating a file if it already exists in repository - assume annex first") {
+  test("should throw FileAlreadyExists while creating a file if it already exists in repository - assume annex first | DEOPSCSW-42, DEOPSCSW-48, DEOPSCSW-47") {
     val file = Paths.get("/tmt/tcp/redis/text/redis.conf")
     configService
       .create(file, ConfigData.fromString(configValue1), annex = true, "commit redis conf for first time")
@@ -214,7 +214,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   }
 
   // DEOPSCSW-49: Update an Existing File with a New Version
-  test("should able to update existing file and get the file with updated content") {
+  test("should able to update existing file and get the file with updated content | DEOPSCSW-49") {
     val file = Paths.get("/tmt/text/trombone/test/assembly.conf")
 
     configService.create(file, ConfigData.fromString(configValue1), annex = false, "commit assembly conf").await
@@ -225,7 +225,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   }
 
   // DEOPSCSW-49: Update an Existing File with a New Version
-  test("update should throw FileNotFoundException if a file does not exists in repository") {
+  test("update should throw FileNotFoundException if a file does not exists in repository | DEOPSCSW-49") {
     val file = Paths.get("/assembly.conf")
 
     intercept[FileNotFound] {
@@ -234,7 +234,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   }
 
   // DEOPSCSW-46: Unique identifier for configuration file version
-  test("each revision of file should have unique identifier") {
+  test("each revision of file should have unique identifier | DEOPSCSW-46") {
     val tromboneHcdConf       = Paths.get("trombone/test/hcd/akka/hcd.conf")
     val tromboneAssemblyConf  = Paths.get("trombone/test/assembly/akka/assembly.conf")
     val tromboneContainerConf = Paths.get("trombone/test/container/akka/container.conf")
@@ -272,7 +272,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
 
   // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
   // DEOPSCSW-71: Retrieve any version of a configuration file using its unique id
-  test("get call should return `None` if a file does not exists in repository") {
+  test("get call should return `None` if a file does not exists in repository | DEOPSCSW-70, DEOPSCSW-71") {
     val file = Paths.get("/test.conf")
 
     configService.getLatest(file).await shouldBe None
@@ -281,7 +281,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
   // DEOPSCSW-71: Retrieve any version of a configuration file using its unique id
   // DEOPSCSW-45: Saving version information for config. file
-  test("should able to retrieve the specific version of file by config ID") {
+  test("should able to retrieve the specific version of file by config ID | DEOPSCSW-70, DEOPSCSW-71, DEOPSCSW-45") {
     val tromboneHcdConf       = Paths.get("trombone/test/hcd/akka/hcd.conf")
     val tromboneAssemblyConf  = Paths.get("trombone/test/assembly/akka/assembly.conf")
     val tromboneContainerConf = Paths.get("trombone/test/container/akka/container.conf")
@@ -357,7 +357,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   }
 
   //DEOPSCSW-85 Record of time and date when config file is created/updated
-  test("should record datetime for creation of config file") {
+  test("should record datetime for creation of config file | DEOPSCSW-85") {
     val file       = Paths.get("/tmt/lgs/trombone/hcd.conf")
     val commitMsg1 = "commit version: 1"
 
@@ -372,7 +372,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   }
 
   //DEOPSCSW-85 Record of time and date when config file is created/updated
-  test("should record datetime when config file is updated") {
+  test("should record datetime when config file is updated | DEOPSCSW-85") {
     val file       = Paths.get("/tmt/lgs/trombone/hcd.conf")
     val configData = ConfigData.fromString(configValue1)
     configService.create(file, configData, annex = false, "commit version: 1").await
@@ -391,7 +391,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   // DEOPSCSW-76: Access a list of all the versions of a stored configuration file
   // DEOPSCSW-63: Add comment while creating or updating a configuration file
   // DEOPSCSW-83: Retrieve file based on range of time for being most recent version
-  test("should get the history of a file") {
+  test("should get the history of a file | DEOPSCSW-45, DEOPSCSW-76, DEOPSCSW-63, DEOPSCSW-83") {
     val file = Paths.get("/tmt/lgs/trombone/hcd.conf")
 
     intercept[FileNotFound] {
@@ -440,7 +440,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   }
 
   // DEOPSCSW-48: Store new configuration file in Config. service
-  test("should list all the available config files") {
+  test("should list all the available config files | DEOPSCSW-48") {
     val tromboneConfig = Paths.get("trombone.conf")
     val assemblyConfig = Paths.get("a/b/assembly/assembly.conf")
 
@@ -469,14 +469,14 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   }
 
   // DEOPSCSW-74: Check config file existence by unique name
-  test("exists should return false if file does not exist") {
+  test("exists should return false if file does not exist | DEOPSCSW-74") {
     val file = Paths.get("/test.conf")
 
     configService.exists(file).await shouldBe false
   }
 
   // DEOPSCSW-74: Check config file existence by unique name
-  test("exists should return true if file exist") {
+  test("exists should return true if file exist | DEOPSCSW-74") {
     val textFile = Paths.get("a/test.csw.conf")
 
     configService.create(textFile, ConfigData.fromString(configValue1), annex = false, "commit config file").await
@@ -490,7 +490,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   }
 
   // DEOPSCSW-91: Delete a given path
-  test("should able to delete existing file") {
+  test("should able to delete existing file | DEOPSCSW-91") {
     val file = Paths.get("tromboneHCD.conf")
     configService
       .create(file, ConfigData.fromString(configValue1), annex = false, "commit trombone config file")
@@ -503,7 +503,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   }
 
   // DEOPSCSW-91: Delete a given path
-  test("deleting non existing file should throw FileNotFoundException") {
+  test("deleting non existing file should throw FileNotFoundException | DEOPSCSW-91") {
     val file = Paths.get("tromboneHCD.conf")
     intercept[FileNotFound] {
       configService.delete(file, "not needed").await
@@ -511,7 +511,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   }
 
   // DEOPSCSW-91: Delete a given path
-  test("delete removes all versions of a file") {
+  test("delete removes all versions of a file | DEOPSCSW-91") {
     val file = Paths.get("/a/b/csw.conf")
 
     configService.create(file, ConfigData.fromString(configValue1), annex = false, "commit config file").await
@@ -539,7 +539,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
   // DEOPSCSW-79: Reset the default version of a configuration file
   // DEOPSCSW-139: Provide new routes to get/set the current active version of the file
-  test("should able to get, set and reset the active version of config file") {
+  test("should able to get, set and reset the active version of config file | DEOPSCSW-77, DEOPSCSW-78, DEOPSCSW-70, DEOPSCSW-79, DEOPSCSW-139") {
     // create file
     val file = Paths.get("/tmt/test/setactive/getactive/resetactive/active.conf")
     configService.create(file, ConfigData.fromString(configValue1), annex = false, "create").await
@@ -576,7 +576,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   }
 
   //DEOPSCSW-86: Retrieve a version of a configuration file based on time range for being default version
-  test("should able to get history of active versions of file") {
+  test("should able to get history of active versions of file | DEOPSCSW-86") {
     val file = Paths.get("/tmt/test/setactive/getactive/resetactive/active.conf")
     // on create call, active file gets created with this comment by default, note that this is an internal implementation
     val createActiveComment = "initializing active file with the first version"
@@ -641,7 +641,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   // DEOPSCSW-78: Get the default version of a configuration file
   // DEOPSCSW-79: Reset the default version of a configuration file
   // DEOPSCSW-139: Provide new routes to get/set the current active version of the file
-  test("getActive and getActiveVersion should return None if file does not exists") {
+  test("getActive and getActiveVersion should return None if file does not exists | DEOPSCSW-77, DEOPSCSW-78, DEOPSCSW-79, DEOPSCSW-139") {
     val file = Paths.get("/tmt/test/ahgvfyfgpp.conf")
 
     configService.getActive(file).await shouldBe None
@@ -653,7 +653,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   // DEOPSCSW-78: Get the default version of a configuration file
   // DEOPSCSW-79: Reset the default version of a configuration file
   // DEOPSCSW-139: Provide new routes to get/set the current active version of the file
-  test("set and reset active should throw FileNotFound exception if file or version does not exists") {
+  test("set and reset active should throw FileNotFound exception if file or version does not exists | DEOPSCSW-77, DEOPSCSW-78, DEOPSCSW-79, DEOPSCSW-139") {
     val file = Paths.get("/tmt/test/temp.conf")
 
     intercept[FileNotFound] {
@@ -668,7 +668,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   }
 
   // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
-  test("should be able to store and retrieve file from annex store") {
+  test("should be able to store and retrieve file from annex store | DEOPSCSW-70") {
     val file    = Paths.get("SomeAnnexFile.txt")
     val content = "testing annex file"
 
@@ -692,7 +692,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   }
 
   // DEOPSCSW-135: Validation of suffix for active and sha files
-  test("should list files from annex store without .$sha1 suffix") {
+  test("should list files from annex store without .$sha1 suffix | DEOPSCSW-135") {
     val file1    = Paths.get("AnnexFile1.txt")
     val comment1 = "committing annex file"
 
@@ -714,7 +714,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
 
   // DEOPSCSW-49: Update an Existing File with a New Version
   // DEOPSCSW-83: Retrieve file based on range of time for being most recent version
-  test("should be able to update and retrieve the history of a file in annex store") {
+  test("should be able to update and retrieve the history of a file in annex store | DEOPSCSW-83, DEOPSCSW-49") {
     val file = Paths.get("SomeAnnexFile.txt")
 
     val comment1    = "create"
@@ -777,7 +777,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   }
 
   //DEOPSCSW-86: Retrieve a version of a configuration file based on time range for being default version
-  test("should able to get history of active versions of file from annex store") {
+  test("should able to get history of active versions of file from annex store | DEOPSCSW-86") {
     val file = Paths.get("/tmt/annex/hcd.bin")
     // on create call, active file gets created with this comment by default, note that this is an internal implementation
     val createActiveComment = "initializing active file with the first version"
@@ -829,7 +829,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   // DEOPSCSW-77: Set default version of configuration file in config service
   // DEOPSCSW-78: Get the default version of a configuration file
   // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
-  test("should be able to get active file from annex store") {
+  test("should be able to get active file from annex store | DEOPSCSW-77, DEOPSCSW-78, DEOPSCSW-70") {
     val file    = Paths.get("SomeAnnexFile.txt")
     val content = "testing annex file"
     val configId =
@@ -929,7 +929,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   // DEOPSCSW-27: Storing binary component configurations
   // DEOPSCSW-81: Storing large files in the configuration service
   // DEOPSCSW-131: Detect and handle oversize files
-  test("should be able to store and retrieve text file from annex store when size is greater than configured size") {
+  test("should be able to store and retrieve text file from annex store when size is greater than configured size | DEOPSCSW-27, DEOPSCSW-81, DEOPSCSW-131") {
     val fileName              = "/tromboneContainerTest.conf"
     val path                  = ResourceReader.copyToTmp(fileName)
     val configData            = ConfigData.fromPath(path)
@@ -950,7 +950,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   }
 
   //DEOPSCSW-75 List the names of configuration files that match a path
-  test("should list all files in a repository") {
+  test("should list all files in a repository | DEOPSCSW-75") {
     val tromboneConfig        = Paths.get("a/c/trombone.conf")
     val hcdConfig             = Paths.get("a/b/c/hcd/hcd.conf")
     val assemblyBinaryConfig1 = Paths.get("a/b/assembly/assembly1.fits")
@@ -971,7 +971,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   }
 
   //DEOPSCSW-75 List the names of configuration files that match a path
-  test("should give empty list if pattern does not match any file") {
+  test("should give empty list if pattern does not match any file | DEOPSCSW-75") {
     val tromboneConfig = Paths.get("a/c/trombone.conf")
     val assemblyConfig = Paths.get("a/b/assembly/assembly.conf")
     val hcdConfig      = Paths.get("a/b/c/hcd/hcd.conf")
@@ -985,7 +985,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   }
 
   //DEOPSCSW-75 List the names of configuration files that match a path
-  test("should filter list based on the pattern") {
+  test("should filter list based on the pattern | DEOPSCSW-75") {
     val tromboneConfig = Paths.get("a/c/trombone.conf")
     val assemblyConfig = Paths.get("a/b/assembly/assembly.conf")
     val hcdConfig      = Paths.get("a/b/c/hcd/hcd.conf")
@@ -1009,7 +1009,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
 
   //DEOPSCSW-132 List oversize and normal sized files
   //DEOPSCSW-75 List the names of configuration files that match a path
-  test("should filter list based on the type and pattern") {
+  test("should filter list based on the type and pattern | DEOPSCSW-75, DEOPSCSW-132") {
     val tromboneConfig   = Paths.get("a/c/trombone.conf")
     val hcdConfig        = Paths.get("a/b/c/hcd/hcd.conf")
     val assemblyBinConf1 = Paths.get("a/b/assembly/assembly1.fits")
@@ -1054,7 +1054,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   }
 
   //DEOPSCSW-140 Provide new routes to get active file as of date
-  test("should get the correct active version of the file based on time") {
+  test("should get the correct active version of the file based on time | DEOPSCSW-140") {
 
     // create file
     val file = Paths.get("/tmt/test/setactive/getactive/resetactive/active.conf")
@@ -1077,7 +1077,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   }
 
   //DEOPSCSW-133: Provide meta config for normal and oversize repo
-  test("should get metadata") {
+  test("should get metadata | DEOPSCSW-133") {
     val config: Config = ConfigFactory.parseString("""
     |csw-config-server.repository-dir=/test/csw-config-svn
     |csw-config-server.annex-dir=/test/csw-config-temp

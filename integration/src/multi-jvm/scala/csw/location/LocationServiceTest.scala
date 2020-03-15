@@ -21,7 +21,7 @@ class LocationServiceTest(ignore: Int, mode: String)
   import config._
 
   // DEOPSCSW-16: Register a component
-  test("ensure that a component registered by one node is resolved and listed on all the nodes | DEOPSCSW-16") {
+  test("ensure that a component registered by one node is resolved and listed on all the nodes | DEOPSCSW-16, DEOPSCSW-429") {
     val tcpPort         = 446
     val tcpConnection   = TcpConnection(ComponentId(Prefix(Subsystem.CSW, "redis"), ComponentType.Service))
     val tcpRegistration = TcpRegistration(tcpConnection, tcpPort)
