@@ -8,7 +8,7 @@ import org.scalatestplus.junit.JUnitSuite;
 public class JArrayDataTest extends JUnitSuite {
 
     @Test
-    public void shouldCreateArrayDataFromJavaArray() {
+    public void shouldCreateArrayDataFromJavaArray__DEOPSCSW_183() {
         Byte[] byteData = {1, 2, 3};
         Short[] shortData = {10, 20, 30};
         Long[] longData = {100L, 200L, 300L};

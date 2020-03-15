@@ -106,7 +106,7 @@ class LoggingConfigurationTest extends AnyFunSuite with Matchers with BeforeAndA
   }
 
   // DEOPSCSW-118: Provide UTC time for each log message
-  test("should log messages in the file with standard headers") {
+  test("should log messages in the file with standard headers | DEOPSCSW-122, DEOPSCSW-649, DEOPSCSW-118, DEOPSCSW-123, DEOPSCSW-126, DEOPSCSW-142") {
     val config =
       ConfigFactory
         .parseString(s"""
@@ -143,7 +143,7 @@ class LoggingConfigurationTest extends AnyFunSuite with Matchers with BeforeAndA
     Await.result(actorSystem.whenTerminated, 5.seconds)
   }
 
-  test("should log messages in the file without standard headers based on the log level configured in the config") {
+  test("should log messages in the file without standard headers based on the log level configured in the config | DEOPSCSW-122, DEOPSCSW-649, DEOPSCSW-123, DEOPSCSW-126, DEOPSCSW-142") {
     val config =
       ConfigFactory
         .parseString(s"""
@@ -179,9 +179,7 @@ class LoggingConfigurationTest extends AnyFunSuite with Matchers with BeforeAndA
     Await.result(actorSystem.whenTerminated, 5.seconds)
   }
 
-  test(
-    "should log messages in the file and on console based on the log level configured in the file and stdout appender config"
-  ) {
+  test("should log messages in the file and on console based on the log level configured in the file and stdout appender config | DEOPSCSW-122, DEOPSCSW-649, DEOPSCSW-123, DEOPSCSW-126, DEOPSCSW-142") {
     val config =
       ConfigFactory
         .parseString(s"""
@@ -251,7 +249,7 @@ class LoggingConfigurationTest extends AnyFunSuite with Matchers with BeforeAndA
   }
 
   // DEOPSCSW-118: Provide UTC time for each log message
-  test("should log messages on the console with standard headers based on the log level configured in the config") {
+  test("should log messages on the console with standard headers based on the log level configured in the config | DEOPSCSW-122, DEOPSCSW-649, DEOPSCSW-118, DEOPSCSW-123, DEOPSCSW-126, DEOPSCSW-142") {
     val config =
       ConfigFactory
         .parseString("""
@@ -288,7 +286,7 @@ class LoggingConfigurationTest extends AnyFunSuite with Matchers with BeforeAndA
     Await.result(actorSystem.whenTerminated, 5.seconds)
   }
 
-  test("should log messages on the console without standard headers") {
+  test("should log messages on the console without standard headers | DEOPSCSW-122, DEOPSCSW-649, DEOPSCSW-123, DEOPSCSW-126, DEOPSCSW-142") {
     val config =
       ConfigFactory
         .parseString("""
@@ -331,7 +329,7 @@ class LoggingConfigurationTest extends AnyFunSuite with Matchers with BeforeAndA
     Await.result(actorSystem.whenTerminated, 5.seconds)
   }
 
-  test("should log messages on the console in one line") {
+  test("should log messages on the console in one line | DEOPSCSW-122, DEOPSCSW-649, DEOPSCSW-123, DEOPSCSW-126, DEOPSCSW-142") {
     val os = new ByteArrayOutputStream
     val config =
       ConfigFactory

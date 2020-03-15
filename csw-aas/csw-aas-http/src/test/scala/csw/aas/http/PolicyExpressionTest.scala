@@ -75,7 +75,7 @@ class PolicyExpressionTest extends AnyFunSuite with MockitoSugar with Directives
     }
   })
 
-  test("policy expression should return AuthenticationFailedRejection when token is invalid") {
+  test("policy expression should return AuthenticationFailedRejection when token is invalid | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
@@ -99,7 +99,7 @@ class PolicyExpressionTest extends AnyFunSuite with MockitoSugar with Directives
     }
   }
 
-  test("policy expression policy should return AuthenticationFailedRejection when token is not present") {
+  test("policy expression policy should return AuthenticationFailedRejection when token is not present | DEOPSCSW-579") {
     val authentication: Authentication                 = mock[Authentication]
     val securityDirectives                             = new SecurityDirectives(authentication, "TMT", "test", false)
     val authenticator: AsyncAuthenticator[AccessToken] = _ => Future.successful(None)
@@ -119,7 +119,7 @@ class PolicyExpressionTest extends AnyFunSuite with MockitoSugar with Directives
     }
   }
 
-  test("policy expression policy should return AuthorizationFailedRejection when expression resolves to false") {
+  test("policy expression policy should return AuthorizationFailedRejection when expression resolves to false | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
@@ -150,7 +150,7 @@ class PolicyExpressionTest extends AnyFunSuite with MockitoSugar with Directives
     }
   }
 
-  test("policy expression policy should return 200 OK when token is valid & policy expression resolves to true") {
+  test("policy expression policy should return 200 OK when token is valid & policy expression resolves to true | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
     val tokenStr                       = "token"

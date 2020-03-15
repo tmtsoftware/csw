@@ -49,7 +49,7 @@ class AlarmServiceIntegrationTest extends FrameworkIntegrationSuite {
     super.afterAll()
   }
 
-  test("component should be able to set severity of an alarm") {
+  test("component should be able to set severity of an alarm | DEOPSCSW-490, DEOPSCSW-481") {
     import wiring._
     Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring)
 

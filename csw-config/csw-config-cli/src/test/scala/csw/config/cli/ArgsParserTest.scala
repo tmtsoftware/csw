@@ -40,19 +40,19 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
       }
     }
 
-  test("test arguments without specifying operation") {
+  test("test arguments without specifying operation | DEOPSCSW-112") {
     val args               = Array("", relativeRepoPath, "-o", outputFilePath)
     val x: Option[Options] = silentParse(args)
     x shouldEqual None
   }
 
-  test("test create with no sub-options") {
+  test("test create with no sub-options | DEOPSCSW-112") {
     val args               = Array("create")
     val x: Option[Options] = silentParse(args)
     x shouldEqual None
   }
 
-  test("test create with all applicable sub-options") {
+  test("test create with all applicable sub-options | DEOPSCSW-112") {
     val args               = Array("create", relativeRepoPath, "-i", inputFilePath, "--annex", "-c", comment)
     val x: Option[Options] = silentParse(args)
     x should contain(
@@ -69,7 +69,7 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
     )
   }
 
-  test("test create with bare minimum sub-options") {
+  test("test create with bare minimum sub-options | DEOPSCSW-112") {
     val args               = Array("create", relativeRepoPath, "-i", inputFilePath, "-c", comment)
     val x: Option[Options] = silentParse(args)
     x should contain(
@@ -85,13 +85,13 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
     )
   }
 
-  test("test update with no sub-options") {
+  test("test update with no sub-options | DEOPSCSW-112") {
     val args               = Array("update")
     val x: Option[Options] = silentParse(args)
     x shouldEqual None
   }
 
-  test("test update with all applicable sub-options") {
+  test("test update with all applicable sub-options | DEOPSCSW-112") {
     val args               = Array("update", relativeRepoPath, "-i", inputFilePath, "-c", comment)
     val x: Option[Options] = silentParse(args)
     x should contain(
@@ -107,13 +107,13 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
     )
   }
 
-  test("test get with no sub-options") {
+  test("test get with no sub-options | DEOPSCSW-112") {
     val args               = Array("get")
     val x: Option[Options] = silentParse(args)
     x shouldEqual None
   }
 
-  test("test get with all applicable sub-options") {
+  test("test get with all applicable sub-options | DEOPSCSW-112") {
     val args               = Array("get", relativeRepoPath, "-o", outputFilePath, "--id", id)
     val x: Option[Options] = silentParse(args)
     x should contain(
@@ -121,7 +121,7 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
     )
   }
 
-  test("test get with date sub-option") {
+  test("test get with date sub-option | DEOPSCSW-112") {
     val args               = Array("get", relativeRepoPath, "-o", outputFilePath, "--date", date)
     val x: Option[Options] = silentParse(args)
     x should contain(
@@ -129,7 +129,7 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
     )
   }
 
-  test("test get with bare minimum sub-options") {
+  test("test get with bare minimum sub-options | DEOPSCSW-112") {
     val args               = Array("get", relativeRepoPath, "-o", outputFilePath)
     val x: Option[Options] = silentParse(args)
     x should contain(
@@ -137,13 +137,13 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
     )
   }
 
-  test("test delete with no sub-options") {
+  test("test delete with no sub-options | DEOPSCSW-112") {
     val args               = Array("delete")
     val x: Option[Options] = silentParse(args)
     x shouldEqual None
   }
 
-  test("test delete with sub-options") {
+  test("test delete with sub-options | DEOPSCSW-112") {
     val args               = Array("delete", relativeRepoPath, "-c", comment)
     val x: Option[Options] = silentParse(args)
     x should contain(
@@ -151,37 +151,37 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
     )
   }
 
-  test("test list") {
+  test("test list | DEOPSCSW-112") {
     val args               = Array("list")
     val x: Option[Options] = silentParse(args)
     x should contain(Options("list", None, None, None, None, None))
   }
 
-  test("test list with pattern") {
+  test("test list with pattern | DEOPSCSW-112") {
     val args               = Array("list", "--pattern", "a/b")
     val x: Option[Options] = silentParse(args)
     x should contain(Options("list", None, None, None, None, None, pattern = Some("a/b")))
   }
 
-  test("test list with type") {
+  test("test list with type | DEOPSCSW-112") {
     val args               = Array("list", "--annex")
     val x: Option[Options] = silentParse(args)
     x should contain(Options("list", None, None, None, None, None, annex = true))
   }
 
-  test("test list with type and pattern") {
+  test("test list with type and pattern | DEOPSCSW-112") {
     val args               = Array("list", "--normal", "--annex", "--pattern", "a/b")
     val x: Option[Options] = silentParse(args)
     x should contain(Options("list", None, None, None, None, None, annex = true, pattern = Some("a/b"), normal = true))
   }
 
-  test("test history with no sub-options") {
+  test("test history with no sub-options | DEOPSCSW-112") {
     val args               = Array("history")
     val x: Option[Options] = silentParse(args)
     x shouldEqual None
   }
 
-  test("test history with all sub-options") {
+  test("test history with all sub-options | DEOPSCSW-112") {
     val args               = Array("history", relativeRepoPath, "--from", date, "--to", date, "--max", maxFileVersions.toString)
     val x: Option[Options] = silentParse(args)
     x should contain(
@@ -195,7 +195,7 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
     )
   }
 
-  test("test history with max sub-option") {
+  test("test history with max sub-option | DEOPSCSW-112") {
     val args               = Array("history", relativeRepoPath, "--max", maxFileVersions.toString)
     val x: Option[Options] = silentParse(args)
     x should contain(
@@ -203,7 +203,7 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
     )
   }
 
-  test("test history with from and to sub-options") {
+  test("test history with from and to sub-options | DEOPSCSW-112") {
     val args               = Array("history", relativeRepoPath, "--from", date, "--to", date)
     val x: Option[Options] = silentParse(args)
     x should contain(
@@ -211,7 +211,7 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
     )
   }
 
-  test("test setActiveVersion with all sub-options") {
+  test("test setActiveVersion with all sub-options | DEOPSCSW-112") {
     val args               = Array("setActiveVersion", relativeRepoPath, "--id", id, "--comment", comment)
     val x: Option[Options] = silentParse(args)
     x should contain(
@@ -219,13 +219,13 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
     )
   }
 
-  test("test resetActiveVersion with no sub-options") {
+  test("test resetActiveVersion with no sub-options | DEOPSCSW-112") {
     val args               = Array("resetActiveVersion")
     val x: Option[Options] = silentParse(args)
     x shouldEqual None
   }
 
-  test("test resetActiveVersion with sub-options") {
+  test("test resetActiveVersion with sub-options | DEOPSCSW-112") {
     val args               = Array("resetActiveVersion", relativeRepoPath, "--comment", comment)
     val x: Option[Options] = silentParse(args)
     x should contain(
@@ -233,13 +233,13 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
     )
   }
 
-  test("test getActiveVersion") {
+  test("test getActiveVersion | DEOPSCSW-112") {
     val args               = Array("getActiveVersion", relativeRepoPath)
     val x: Option[Options] = silentParse(args)
     x should contain(Options("getActiveVersion", Some(Paths.get(relativeRepoPath)), None, None, None, None))
   }
 
-  test("test getActiveByTime with date sub-option") {
+  test("test getActiveByTime with date sub-option | DEOPSCSW-112") {
     val args               = Array("getActiveByTime", relativeRepoPath, "--date", date, "-o", outputFilePath)
     val x: Option[Options] = silentParse(args)
     x should contain(
@@ -254,13 +254,13 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
     )
   }
 
-  test("test historyActive with no sub-options") {
+  test("test historyActive with no sub-options | DEOPSCSW-112") {
     val args               = Array("historyActive")
     val x: Option[Options] = silentParse(args)
     x shouldEqual None
   }
 
-  test("test historyActive with all sub-options") {
+  test("test historyActive with all sub-options | DEOPSCSW-112") {
     val args =
       Array("historyActive", relativeRepoPath, "--from", date, "--to", date, "--max", maxFileVersions.toString)
     val x: Option[Options] = silentParse(args)
@@ -275,7 +275,7 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
     )
   }
 
-  test("test historyActive with max sub-option") {
+  test("test historyActive with max sub-option | DEOPSCSW-112") {
     val args               = Array("historyActive", relativeRepoPath, "--max", maxFileVersions.toString)
     val x: Option[Options] = silentParse(args)
     x should contain(
@@ -283,7 +283,7 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
     )
   }
 
-  test("test historyActive with from and to sub-options") {
+  test("test historyActive with from and to sub-options | DEOPSCSW-112") {
     val args               = Array("historyActive", relativeRepoPath, "--from", date, "--to", date)
     val x: Option[Options] = silentParse(args)
     x should contain(
@@ -291,31 +291,31 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
     )
   }
 
-  test("test getMetadata") {
+  test("test getMetadata | DEOPSCSW-112") {
     val args               = Array("getMetadata")
     val x: Option[Options] = silentParse(args)
     x should contain(Options("getMetadata", None, None, None, None, None))
   }
 
-  test("test getMetadata with locationHost") {
+  test("test getMetadata with locationHost | DEOPSCSW-112") {
     val args               = Array("getMetadata", "--locationHost", "location.server")
     val x: Option[Options] = silentParse(args)
     x should contain(Options(op = "getMetadata", locationHost = "location.server"))
   }
 
-  test("test exists with no sub-options") {
+  test("test exists with no sub-options | DEOPSCSW-112") {
     val args               = Array("exists")
     val x: Option[Options] = silentParse(args)
     x shouldEqual None
   }
 
-  test("test exists with sub-options") {
+  test("test exists with sub-options | DEOPSCSW-112") {
     val args               = Array("exists", relativeRepoPath)
     val x: Option[Options] = silentParse(args)
     x should contain(Options("exists", Some(Paths.get(relativeRepoPath)), None, None, None, None))
   }
 
-  test("test getActive") {
+  test("test getActive | DEOPSCSW-112") {
     val args               = Array("getActive", relativeRepoPath, "-o", outputFilePath)
     val x: Option[Options] = silentParse(args)
     x should contain(
@@ -323,13 +323,13 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
     )
   }
 
-  test("test login") {
+  test("test login | DEOPSCSW-112") {
     val args               = Array("login")
     val x: Option[Options] = silentParse(args)
     x should contain(Options("login"))
   }
 
-  test("test logout") {
+  test("test logout | DEOPSCSW-112") {
     val args               = Array("logout")
     val x: Option[Options] = silentParse(args)
     x should contain(Options("logout"))

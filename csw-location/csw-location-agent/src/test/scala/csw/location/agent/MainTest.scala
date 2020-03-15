@@ -32,7 +32,7 @@ class MainTest extends ScalaTestFrameworkTestKit with AnyFunSuiteLike {
     super.afterAll()
   }
 
-  test("Test with command line args") {
+  test("Test with command line args | DEOPSCSW-592") {
     val name = "csw.test1"
     val port = 9999
     val args = Array("--prefix", name, "--command", "sleep 200", "--port", port.toString, "--no-exit")
@@ -40,7 +40,7 @@ class MainTest extends ScalaTestFrameworkTestKit with AnyFunSuiteLike {
   }
 
   //DEOPSCSW-628: Add support for registering service as HTTP in location agent
-  test("Test with command line args with http option") {
+  test("Test with command line args with http option | DEOPSCSW-592, DEOPSCSW-628") {
     val name = "csw.test3"
     val port = 9998
     val path = "testPath"
@@ -49,7 +49,7 @@ class MainTest extends ScalaTestFrameworkTestKit with AnyFunSuiteLike {
   }
 
   // CSW-86: Subsystem should be case-insensitive
-  test("Test with config file") {
+  test("Test with config file | DEOPSCSW-592") {
     val name       = "CSW.test2"
     val configFile = ResourceReader.copyToTmp("/test2.conf").toFile
     val config     = ConfigFactory.parseFile(configFile)

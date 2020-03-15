@@ -33,7 +33,7 @@ public class JStructTest extends JUnitSuite {
     private final Parameter<TAITime> taiTimeParameter = taiTime.set(TAITime.now());
 
     @Test
-    public void shouldAbleToCreateWithVarArgs() {
+    public void shouldAbleToCreateWithVarArgs__DEOPSCSW_183_DEOPSCSW_282() {
         Struct struct1 = JStruct.create(raParameter, decParameter, epochParameter, currentTimeParameter, taiTimeParameter);
         Struct struct2 = JStruct.create(decParameter, epochParameter);
         Parameter<Struct> structParameter = key.set(struct1, struct2);
@@ -43,7 +43,7 @@ public class JStructTest extends JUnitSuite {
     }
 
     @Test
-    public void shouldAbleToCreateWithSetOfParams() {
+    public void shouldAbleToCreateWithSetOfParams__DEOPSCSW_183_DEOPSCSW_282() {
 
         Set<Parameter<?>> parameterSet1 = Set.of(raParameter, decParameter, epochParameter);
         Set<Parameter<?>> parameterSet2 = Set.of(decParameter, epochParameter, currentTimeParameter, taiTimeParameter);

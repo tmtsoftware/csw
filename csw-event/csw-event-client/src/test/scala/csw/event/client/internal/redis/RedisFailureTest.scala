@@ -35,7 +35,7 @@ class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
 
   override def afterAll(): Unit = redisTestProps.shutdown()
 
-  test("should throw PublishFailed exception on publish failure") {
+  test("should throw PublishFailed exception on publish failure | DEOPSCSW-398, DEOPSCSW-399") {
     import redisTestProps._
     val publisher = eventService.makeNewPublisher()
     publisher.publish(Utils.makeEvent(1)).await
@@ -56,7 +56,7 @@ class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
   }
 
   //DEOPSCSW-334: Publish an event
-  test("should invoke onError callback on publish failure [stream API]") {
+  test("should invoke onError callback on publish failure [stream API] | DEOPSCSW-398, DEOPSCSW-399, DEOPSCSW-334") {
     import redisTestProps._
     val publisher = eventService.makeNewPublisher()
     val testProbe = TestProbe[PublishFailure]()(actorSystem)
@@ -77,7 +77,7 @@ class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
   }
 
   //DEOPSCSW-334: Publish an event
-  test("should invoke onError callback on publish failure [eventGenerator API]") {
+  test("should invoke onError callback on publish failure [eventGenerator API] | DEOPSCSW-398, DEOPSCSW-399, DEOPSCSW-334") {
     import redisTestProps._
     val publisher = eventService.makeNewPublisher()
     val testProbe = TestProbe[PublishFailure]()(actorSystem)
@@ -96,7 +96,7 @@ class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
     failure.getCause shouldBe a[RedisException]
   }
 
-  test("should throw EventServerNotAvailable exception on subscription failure") {
+  test("should throw EventServerNotAvailable exception on subscription failure | DEOPSCSW-398, DEOPSCSW-399") {
     import redisTestProps._
     val event1             = makeDistinctEvent(Random.nextInt())
     val eventKey: EventKey = event1.eventKey
@@ -112,7 +112,7 @@ class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
   }
 
   //DEOPSCSW-000: Publish an event with block generating future of event
-  test("should invoke onError callback on publish failure [eventGenerator API] with future of event generator") {
+  test("should invoke onError callback on publish failure [eventGenerator API] with future of event generator | DEOPSCSW-398, DEOPSCSW-399, DEOPSCSW-000") {
     import redisTestProps._
     val publisher = eventService.makeNewPublisher()
     val testProbe = TestProbe[PublishFailure]()(actorSystem)
@@ -132,7 +132,7 @@ class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
   }
 
   //DEOPSCSW-515: Include Start Time in API
-  test("should invoke onError callback on publish failure [eventGenerator API] with start time and event generator") {
+  test("should invoke onError callback on publish failure [eventGenerator API] with start time and event generator | DEOPSCSW-398, DEOPSCSW-399, DEOPSCSW-515") {
     import redisTestProps._
     val publisher = eventService.makeNewPublisher()
     val testProbe = TestProbe[PublishFailure]()(actorSystem)
@@ -154,7 +154,7 @@ class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
   }
 
   //DEOPSCSW-515: Include Start Time in API
-  test("should invoke onError callback on publish failure [eventGenerator API] with start time and future of event generator") {
+  test("should invoke onError callback on publish failure [eventGenerator API] with start time and future of event generator | DEOPSCSW-398, DEOPSCSW-399, DEOPSCSW-515") {
     import redisTestProps._
     val publisher = eventService.makeNewPublisher()
     val testProbe = TestProbe[PublishFailure]()(actorSystem)
@@ -176,7 +176,7 @@ class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
   }
 
   //DEOPSCSW-516: Optionally Publish - API Change
-  test("should not invoke onError on opting to not publish event with eventGenerator") {
+  test("should not invoke onError on opting to not publish event with eventGenerator | DEOPSCSW-398, DEOPSCSW-399, DEOPSCSW-516") {
     import redisTestProps._
     val publisher = eventService.makeNewPublisher()
     val testProbe = TestProbe[PublishFailure]()(actorSystem)
@@ -195,9 +195,7 @@ class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
   }
 
   //DEOPSCSW-516: Optionally Publish - API Change
-  test(
-    "should not invoke onError on opting to not publish event with async eventGenerator"
-  ) {
+  test("should not invoke onError on opting to not publish event with async eventGenerator | DEOPSCSW-398, DEOPSCSW-399, DEOPSCSW-516") {
     import redisTestProps._
     val publisher = eventService.makeNewPublisher()
     val testProbe = TestProbe[PublishFailure]()(actorSystem)
@@ -217,7 +215,7 @@ class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
     testProbe.expectNoMessage(500.millis)
   }
 
-  test("should fail with EventServerNotAvailable for get event when redis is down") {
+  test("should fail with EventServerNotAvailable for get event when redis is down | DEOPSCSW-398, DEOPSCSW-399") {
     import redisTestProps._
 
     val subscriber = eventService.makeNewSubscriber()

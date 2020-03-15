@@ -61,7 +61,7 @@ public class JSeverityServiceModuleTest extends JUnitSuite {
     // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
     // DEOPSCSW-500: Update alarm time on current severity change
     @Test
-    public void setSeverity_shouldSetSeverityForAGivenKey() throws Exception {
+    public void setSeverity_shouldSetSeverityForAGivenKey__DEOPSCSW_444_DEOPSCSW_459_DEOPSCSW_462_DEOPSCSW_500() throws Exception {
         AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey(prefix, "tromboneAxisHighLimitAlarm");
 
         FullAlarmSeverity initialSeverity = Await.result(alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarm), new FiniteDuration(2, TimeUnit.SECONDS));
@@ -90,7 +90,7 @@ public class JSeverityServiceModuleTest extends JUnitSuite {
     }
 
     @Test
-    public void setSeverity_shouldThrowInvalidSeverityExceptionWhenUnsupportedSeverityIsProvided() throws Exception {
+    public void setSeverity_shouldThrowInvalidSeverityExceptionWhenUnsupportedSeverityIsProvided__DEOPSCSW_444() throws Exception {
         AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey(prefix, "tromboneAxisHighLimitAlarm");
 
         exception.expectCause(isA(InvalidSeverityException.class));
@@ -100,7 +100,7 @@ public class JSeverityServiceModuleTest extends JUnitSuite {
     // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
     // DEOPSCSW-500: Update alarm time on current severity change
     @Test
-    public void setSeverity_shouldLatchAlarmWhenItIsHigherThanPreviousLatchedSeverity() throws Exception {
+    public void setSeverity_shouldLatchAlarmWhenItIsHigherThanPreviousLatchedSeverity__DEOPSCSW_444_DEOPSCSW_462_DEOPSCSW_500() throws Exception {
         AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey(prefix, "tromboneAxisHighLimitAlarm");
 
         FullAlarmSeverity initialSeverity = Await.result(alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarm), new FiniteDuration(2, TimeUnit.SECONDS));
@@ -130,7 +130,7 @@ public class JSeverityServiceModuleTest extends JUnitSuite {
     }
 
     @Test
-    public void setSeverity_shouldNotAutoAcknowledgeAlarmEvenWhenItIsAutoAcknowlegable() throws Exception {
+    public void setSeverity_shouldNotAutoAcknowledgeAlarmEvenWhenItIsAutoAcknowlegable__DEOPSCSW_444() throws Exception {
         AlarmKey tromboneAxisLowLimitAlarm = new AlarmKey(prefix, "tromboneAxisHighLimitAlarm");
 
         FullAlarmSeverity initialSeverity = Await.result(alarmService.getCurrentSeverity(tromboneAxisLowLimitAlarm), new FiniteDuration(2, TimeUnit.SECONDS));
@@ -148,7 +148,7 @@ public class JSeverityServiceModuleTest extends JUnitSuite {
     // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
     // DEOPSCSW-500: Update alarm time on current severity change
     @Test
-    public void setSeverity_shouldNotUpdateAlarmTimeWhenSeverityDoesNotChange() throws Exception {
+    public void setSeverity_shouldNotUpdateAlarmTimeWhenSeverityDoesNotChange__DEOPSCSW_444_DEOPSCSW_462_DEOPSCSW_500() throws Exception {
         // latchable alarm
         AlarmKey highLimitAlarmKey = new AlarmKey(prefix, "tromboneAxisHighLimitAlarm");
         UTCTime defaultAlarmTime = getStatus(highLimitAlarmKey).alarmTime();

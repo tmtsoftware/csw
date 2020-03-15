@@ -24,25 +24,25 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
       }
     }
 
-  test("should set init to false and port to None if no options are provided") {
+  test("should set init to false and port to None if no options are provided | DEOPSCSW-130") {
     val args               = Array[String]()
     val x: Option[Options] = silentParse(args)
     x.get shouldEqual Options(initRepo = false, None)
   }
 
-  test("should set init to true if option --initRepo is provided") {
+  test("should set init to true if option --initRepo is provided | DEOPSCSW-130") {
     val args               = Array("--initRepo")
     val x: Option[Options] = silentParse(args)
     x.get shouldEqual Options(initRepo = true, None)
   }
 
-  test("should set port with the value provided with -- port option") {
+  test("should set port with the value provided with -- port option | DEOPSCSW-130") {
     val args               = Array("--port", "2345")
     val x: Option[Options] = silentParse(args)
     x.get shouldEqual Options(initRepo = false, Some(2345))
   }
 
-  test("should set init to true if --initRepo option is provided and port with the value provided with -- port option") {
+  test("should set init to true if --initRepo option is provided and port with the value provided with -- port option | DEOPSCSW-130") {
     val args               = Array("--initRepo", "--port", "2345")
     val x: Option[Options] = silentParse(args)
     x.get shouldEqual Options(initRepo = true, Some(2345))

@@ -17,7 +17,7 @@ import org.scalatest.matchers.should.Matchers
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
 class CustomPolicyTest extends AnyFunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
-  test("custom policy should return AuthenticationFailedRejection when token is invalid") {
+  test("custom policy should return AuthenticationFailedRejection when token is invalid | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
@@ -45,7 +45,7 @@ class CustomPolicyTest extends AnyFunSuite with MockitoSugar with Directives wit
     }
   }
 
-  test("custom policy should return AuthenticationFailedRejection when token is not present") {
+  test("custom policy should return AuthenticationFailedRejection when token is not present | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
@@ -66,7 +66,7 @@ class CustomPolicyTest extends AnyFunSuite with MockitoSugar with Directives wit
     }
   }
 
-  test("custom policy should return AuthorizationFailedRejection when policy does not match") {
+  test("custom policy should return AuthorizationFailedRejection when policy does not match | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
@@ -95,7 +95,7 @@ class CustomPolicyTest extends AnyFunSuite with MockitoSugar with Directives wit
     }
   }
 
-  test("custom policy should return 200 OK when policy matches") {
+  test("custom policy should return 200 OK when policy matches | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 

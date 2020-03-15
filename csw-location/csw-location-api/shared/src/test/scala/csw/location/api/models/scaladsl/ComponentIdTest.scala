@@ -9,7 +9,7 @@ import org.scalatest.matchers.should.Matchers
 class ComponentIdTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
   // DEOPSCSW-14: Codec for data model
-  test("should not contain leading or trailing spaces in component's name") {
+  test("should not contain leading or trailing spaces in component's name | DEOPSCSW-14") {
 
     val illegalArgumentException = intercept[IllegalArgumentException] {
       ComponentId(Prefix(Subsystem.CSW, " redis "), ComponentType.Service)
@@ -19,7 +19,7 @@ class ComponentIdTest extends AnyFunSuite with Matchers with BeforeAndAfterAll w
   }
 
   // DEOPSCSW-14: Codec for data model
-  test("should not contain '-' in component's name") {
+  test("should not contain '-' in component's name | DEOPSCSW-14") {
     val illegalArgumentException = intercept[IllegalArgumentException] {
       ComponentId(Prefix(Subsystem.CSW, "redis-service"), ComponentType.Service)
     }

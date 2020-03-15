@@ -68,7 +68,7 @@ class ConfigServiceRouteTest
   /**
    * test HTTP response codes
    */
-  test("create - success status code") {
+  test("create - success status code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     // try to create by providing optional comment parameter
     Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
@@ -81,7 +81,7 @@ class ConfigServiceRouteTest
 
   }
 
-  test("create - failure status codes") {
+  test("create - failure status codes | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
 
     Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
@@ -98,7 +98,7 @@ class ConfigServiceRouteTest
 
   }
 
-  test("update - success status code") {
+  test("update - success status code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
 
     Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
@@ -120,7 +120,7 @@ class ConfigServiceRouteTest
 
   }
 
-  test("update - failure status codes") {
+  test("update - failure status codes | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     // path missing
     Post("/update").addHeader(validTokenHeader) ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.NotFound
@@ -138,7 +138,7 @@ class ConfigServiceRouteTest
 
   }
 
-  test("get - success status code") {
+  test("get - success status code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
@@ -155,7 +155,7 @@ class ConfigServiceRouteTest
 
   }
 
-  test("get - failure status codes") {
+  test("get - failure status codes | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
 
     //consumes 2 revisions, one for actual file one for active file
     Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
@@ -175,7 +175,7 @@ class ConfigServiceRouteTest
   }
 
   //DEOPSCSW-626: Get route of config server with path for empty config file
-  test("get - success status code for empty file") {
+  test("get - success status code for empty file | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     Post("/config/test.conf?annex=true&comment=commit1", emptyConfigFile).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
@@ -190,7 +190,7 @@ class ConfigServiceRouteTest
     }
   }
 
-  test("get by date - success status code") {
+  test("get by date - success status code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     val timeWhenRepoWasEmpty = Instant.now()
     Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
@@ -210,7 +210,7 @@ class ConfigServiceRouteTest
     }
   }
 
-  test("get by date - failure status codes") {
+  test("get by date - failure status codes | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     val timeWhenRepoWasEmpty = Instant.now()
 
     Get(s"/config/test.conf?date=$timeWhenRepoWasEmpty") ~> Route.seal(route) ~> check {
@@ -218,7 +218,7 @@ class ConfigServiceRouteTest
     }
   }
 
-  test("get latest - success status code") {
+  test("get latest - success status code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
@@ -237,14 +237,14 @@ class ConfigServiceRouteTest
     }
   }
 
-  test("get latest - failure status code") {
+  test("get latest - failure status code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     // try to fetch file which does not exists
     Get("/get?path=test1.conf") ~> Route.seal(route) ~> check {
       status shouldBe StatusCodes.NotFound
     }
   }
 
-  test("list - success status code") {
+  test("list - success status code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     // when list is empty
     Get("/list") ~> route ~> check {
       status shouldEqual StatusCodes.OK
@@ -263,7 +263,7 @@ class ConfigServiceRouteTest
   }
 
   // DEOPSCSW-577: Ability to view detailed change log in SVN
-  test("list - with correct author") {
+  test("list - with correct author | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-577, DEOPSCSW-69") {
     Get("/list") ~> route ~> check {
       status shouldEqual StatusCodes.OK
       responseAs[List[ConfigFileInfo]].size shouldBe 0
@@ -281,7 +281,7 @@ class ConfigServiceRouteTest
     }
   }
 
-  test("list by pattern - success code") {
+  test("list by pattern - success code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     Get("/list?pattern=a/b") ~> route ~> check {
       status shouldEqual StatusCodes.OK
       responseAs[List[ConfigFileInfo]].size shouldBe 0
@@ -297,7 +297,7 @@ class ConfigServiceRouteTest
     }
   }
 
-  test("list by pattern - rejection") {
+  test("list by pattern - rejection | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     Get("/list?pattern=?i)") ~> route ~> check {
       status shouldEqual StatusCodes.BadRequest
       responseAs[ErrorResponse].error.code shouldBe StatusCodes.BadRequest.intValue
@@ -305,7 +305,7 @@ class ConfigServiceRouteTest
     }
   }
 
-  test("list by file type - success code") {
+  test("list by file type - success code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
@@ -321,7 +321,7 @@ class ConfigServiceRouteTest
     }
   }
 
-  test("list by file type - rejection") {
+  test("list by file type - rejection | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     Get("/list?type=invalidtype") ~> route ~> check {
       status shouldEqual StatusCodes.BadRequest
       responseAs[ErrorResponse].error.code shouldBe StatusCodes.BadRequest.intValue
@@ -329,7 +329,7 @@ class ConfigServiceRouteTest
     }
   }
 
-  test("list by file type and pattern - success code") {
+  test("list by file type and pattern - success code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
@@ -342,7 +342,7 @@ class ConfigServiceRouteTest
 
   // DEOPSCSW-577: Ability to view detailed change log in SVN
   // DEOPSCSW-625: Include username from svn in history model of config service
-  test("history - success  status code") {
+  test("history - success  status code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-577, DEOPSCSW-69, DEOPSCSW-625") {
     val bilal  = "bilal"
     val poorva = "poorva"
 
@@ -395,7 +395,7 @@ class ConfigServiceRouteTest
 
   }
 
-  test("history - failure  status codes") {
+  test("history - failure  status codes | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
 
     // query parameter missing
     Get("/history") ~> Route.seal(route) ~> check {
@@ -413,7 +413,7 @@ class ConfigServiceRouteTest
 
   }
 
-  test("getActive - success status code") {
+  test("getActive - success status code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
 
     Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
@@ -426,7 +426,7 @@ class ConfigServiceRouteTest
     }
   }
 
-  test("getActive - failure status codes") {
+  test("getActive - failure status codes | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
 
     //  try to fetch active version of file which does not exists
     Get("/active-config/test1.conf") ~> Route.seal(route) ~> check {
@@ -435,7 +435,7 @@ class ConfigServiceRouteTest
 
   }
 
-  test("getActive by date - success status code") {
+  test("getActive by date - success status code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
 
     val timeWhenRepoWasEmpty = Instant.now()
     Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
@@ -475,7 +475,7 @@ class ConfigServiceRouteTest
     }
   }
 
-  test("getActive by date - failure status codes") {
+  test("getActive by date - failure status codes | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
 
     //  try to fetch active version of file which does not exists
     Get("/active-config/test1.conf") ~> Route.seal(route) ~> check {
@@ -487,7 +487,7 @@ class ConfigServiceRouteTest
     }
   }
 
-  test("setActive - success status code") {
+  test("setActive - success status code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
 
     Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
@@ -508,7 +508,7 @@ class ConfigServiceRouteTest
     }
   }
 
-  test("setActive - failure status codes") {
+  test("setActive - failure status codes | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
 
     // try to set active version of file which does not exist
     Put("/active-version/test.conf?id=1&comment=commit1").addHeader(validTokenHeader) ~> Route.seal(route) ~> check {
@@ -527,7 +527,7 @@ class ConfigServiceRouteTest
 
   }
 
-  test("resetActive - success status code") {
+  test("resetActive - success status code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
 
     Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
@@ -550,7 +550,7 @@ class ConfigServiceRouteTest
     }
   }
 
-  test("resetActive - failure status codes") {
+  test("resetActive - failure status codes | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
 
     //  try to reset active version of file which does not exists
     Put("/active-version/test.conf").addHeader(validTokenHeader) ~> Route.seal(route) ~> check {
@@ -561,7 +561,7 @@ class ConfigServiceRouteTest
 
   // DEOPSCSW-577: Ability to view detailed change log in SVN
   // DEOPSCSW-625: Include username from svn in history model of config service
-  test("history-active - success  status code") {
+  test("history-active - success  status code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-577, DEOPSCSW-69, DEOPSCSW-625") {
     val bilal   = "bilal"
     val poorva  = "poorva"
     val shubham = "shubham"
@@ -627,7 +627,7 @@ class ConfigServiceRouteTest
 
   }
 
-  test("history-active - failure  status codes") {
+  test("history-active - failure  status codes | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
 
     // query parameter missing
     Get("/history-active") ~> Route.seal(route) ~> check {
@@ -645,7 +645,7 @@ class ConfigServiceRouteTest
 
   }
 
-  test("exists - success status code") {
+  test("exists - success status code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
 
     Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
@@ -656,7 +656,7 @@ class ConfigServiceRouteTest
     }
   }
 
-  test("exists - failure status code") {
+  test("exists - failure status code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
 
     Head("/config/test.conf?id=3") ~> route ~> check {
       status shouldEqual StatusCodes.NotFound
@@ -666,7 +666,7 @@ class ConfigServiceRouteTest
     }
   }
 
-  test("getMetadata - success status code") {
+  test("getMetadata - success status code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     Get("/metadata") ~> route ~> check {
       status shouldEqual StatusCodes.OK
       responseAs[ConfigMetadata].repoPath should not be empty
@@ -680,57 +680,57 @@ class ConfigServiceRouteTest
   // DEOPSCSW-69: Use authorization token to get identity of user creating/updating a configuration file
   /** Auth Based routes **/
   /* ================ Unauthorized code ================*/
-  test("create - Unauthorized code") {
+  test("create - Unauthorized code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     Post("/config/test.conf?comment=create") ~> route ~> check {
       status shouldEqual StatusCodes.Unauthorized
     }
   }
 
-  test("update - Unauthorized code") {
+  test("update - Unauthorized code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     Put("/config/test.conf?comment=update") ~> route ~> check {
       status shouldEqual StatusCodes.Unauthorized
     }
   }
 
-  test("delete - Unauthorized code") {
+  test("delete - Unauthorized code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     Delete("/config/test.conf?comment=deleting") ~> route ~> check {
       status shouldEqual StatusCodes.Unauthorized
     }
   }
 
-  test("set active-version - Unauthorized code") {
+  test("set active-version - Unauthorized code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     Put("/active-version/test.conf?id=1&comment=active") ~> route ~> check {
       status shouldEqual StatusCodes.Unauthorized
     }
   }
 
   /* ================ Forbidden code ================*/
-  test("create - Forbidden code") {
+  test("create - Forbidden code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     Post("/config/test.conf?comment=create").addHeader(roleMissingTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Forbidden
     }
   }
 
-  test("update - Forbidden code") {
+  test("update - Forbidden code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     Put("/config/test.conf?comment=update").addHeader(roleMissingTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Forbidden
     }
   }
 
-  test("set active-version - Forbidden code") {
+  test("set active-version - Forbidden code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     Put("/active-version/test.conf?id=1&comment=active").addHeader(roleMissingTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Forbidden
     }
   }
 
-  test("delete - Forbidden code") {
+  test("delete - Forbidden code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     Delete("/config/test.conf?comment=deleting").addHeader(roleMissingTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Forbidden
     }
   }
 
   // DEOPSCSW-629: Token masking in logs
-  test("should mask authorization token while logging") {
+  test("should mask authorization token while logging | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69, DEOPSCSW-629") {
     val requests = ArrayBuffer.empty[HttpRequest]
 
     import serverWiring._

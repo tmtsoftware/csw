@@ -71,7 +71,7 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
   }
 
   // DEOPSCSW-181: Multiple Examples for Lifecycle Support
-  test("should start multiple components within a single container and able to accept lifecycle messages") {
+  test("should start multiple components within a single container and able to accept lifecycle messages | DEOPSCSW-182, DEOPSCSW-177, DEOPSCSW-181, DEOPSCSW-216, DEOPSCSW-169") {
 
     val wiring = FrameworkWiring.make(containerActorSystem, mock[RedisClient])
     // start a container and verify it moves to running lifecycle state

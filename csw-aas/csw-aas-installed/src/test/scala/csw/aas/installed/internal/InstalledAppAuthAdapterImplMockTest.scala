@@ -60,7 +60,7 @@ class InstalledAppAuthAdapterImplMockTest extends AnyFunSuite with MockitoSugar 
 //    val disabledAuthService = new InstalledAppAuthAdapterImpl(authConfig, keycloakInstalled, tokenVerifier, Some(store))
   }
 
-  test("login") {
+  test("login | DEOPSCSW-575") {
     val mocks = new AuthMocks
     import mocks._
 
@@ -70,7 +70,7 @@ class InstalledAppAuthAdapterImplMockTest extends AnyFunSuite with MockitoSugar 
     verify(store).saveTokens(idTokenStr, accessTokenStr, refreshTokenStr)
   }
 
-  test("loginDesktop") {
+  test("loginDesktop | DEOPSCSW-575") {
     val mocks = new AuthMocks
     import mocks._
 
@@ -80,7 +80,7 @@ class InstalledAppAuthAdapterImplMockTest extends AnyFunSuite with MockitoSugar 
     verify(store).saveTokens(idTokenStr, accessTokenStr, refreshTokenStr)
   }
 
-  test("loginManual") {
+  test("loginManual | DEOPSCSW-575") {
     val mocks = new AuthMocks
     import mocks._
 
@@ -90,7 +90,7 @@ class InstalledAppAuthAdapterImplMockTest extends AnyFunSuite with MockitoSugar 
     verify(store).saveTokens(idTokenStr, accessTokenStr, refreshTokenStr)
   }
 
-  test("logout") {
+  test("logout | DEOPSCSW-575") {
     val mocks = new AuthMocks
     import mocks._
 
@@ -99,7 +99,7 @@ class InstalledAppAuthAdapterImplMockTest extends AnyFunSuite with MockitoSugar 
     verify(store).clearStorage()
   }
 
-  test("getAccessToken") {
+  test("getAccessToken | DEOPSCSW-575") {
     val mocks = new AuthMocks
     import mocks._
 
@@ -115,7 +115,7 @@ class InstalledAppAuthAdapterImplMockTest extends AnyFunSuite with MockitoSugar 
     verify(tokenVerifier).verifyAndDecode(accessTokenStr)
   }
 
-  test("getAccessToken - disabled auth") {
+  test("getAccessToken - disabled auth | DEOPSCSW-575") {
     val mocks = new AuthMocks
     import mocks._
 
@@ -124,7 +124,7 @@ class InstalledAppAuthAdapterImplMockTest extends AnyFunSuite with MockitoSugar 
     authService.getAccessToken() shouldBe Some(AccessToken())
   }
 
-  test("getAccessToken - expired token") {
+  test("getAccessToken - expired token | DEOPSCSW-575") {
     val mocks = new AuthMocks
     import mocks._
 
@@ -139,7 +139,7 @@ class InstalledAppAuthAdapterImplMockTest extends AnyFunSuite with MockitoSugar 
     verify(tokenVerifier).verifyAndDecode(refreshedAccessTokenStr)
   }
 
-  test("getAccessToken - expired token with min validity") {
+  test("getAccessToken - expired token with min validity | DEOPSCSW-575") {
     val mocks = new AuthMocks
     import mocks._
 

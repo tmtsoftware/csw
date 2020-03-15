@@ -25,22 +25,22 @@ class ConfigDataTest extends TestKit(ActorSystem("test-system")) with AnyFunSuit
       |""".stripMargin
 
   //DEOPSCSW-73: Retrieve a configuration file to memory
-  test("should able to retrieve string from Config Data source") {
+  test("should able to retrieve string from Config Data source | DEOPSCSW-73") {
     ConfigData.fromString(expectedStringConfigData).toStringF.await shouldEqual expectedStringConfigData
   }
 
-  test("should able to generate InputStream from Config Data source") {
+  test("should able to generate InputStream from Config Data source | ") {
     val inputStream = ConfigData.fromString(expectedStringConfigData).toInputStream
     scala.io.Source.fromInputStream(inputStream).mkString shouldEqual expectedStringConfigData
   }
 
-  test("should create source of ByteString from string") {
+  test("should create source of ByteString from string | ") {
     val configData = ConfigData.fromString(expectedStringConfigData)
     configData.source.runFold("")(_ + _.utf8String).await shouldEqual expectedStringConfigData
   }
 
   //DEOPSCSW-72: Retrieve a configuration file to a specified file location on a local disk
-  test("should be able to save ConfigData to local disc") {
+  test("should be able to save ConfigData to local disc | DEOPSCSW-72") {
     val configData     = ConfigData.fromString(expectedStringConfigData)
     val tempOutputFile = Files.createTempFile("temp-config", ".conf")
     configData.toPath(tempOutputFile).await
@@ -48,7 +48,7 @@ class ConfigDataTest extends TestKit(ActorSystem("test-system")) with AnyFunSuit
     Files.delete(tempOutputFile)
   }
 
-  test("should be able to get Config object when data is in valid HOCON format") {
+  test("should be able to get Config object when data is in valid HOCON format | ") {
     val configStr = s"""
                      container {
                      |  name = Container-1
@@ -85,7 +85,7 @@ class ConfigDataTest extends TestKit(ActorSystem("test-system")) with AnyFunSuit
       .toSet shouldBe List("HCD-2A", "HCD-2B").toSet
   }
 
-  test("config object conversion should receive exception when data is NOT in valid HOCON format") {
+  test("config object conversion should receive exception when data is NOT in valid HOCON format | ") {
     val configStr = s"""
                      container {
                        |    }

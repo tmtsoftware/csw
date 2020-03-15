@@ -60,7 +60,7 @@ public class JMatrixKeyTypeTest extends JUnitSuite {
     }
 
     @Test
-    public void matrixKeyParameterTest() {
+    public void matrixKeyParameterTest__DEOPSCSW_183_DEOPSCSW_190_DEOPSCSW_184() {
         Parameter parameter;
         MatrixData matrixData = MatrixData.fromArrays(data);
         MatrixData[] paramValues = {matrixData};

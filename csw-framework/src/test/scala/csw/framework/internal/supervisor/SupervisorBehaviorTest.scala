@@ -43,7 +43,7 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
   val supervisorBehavior: Behavior[ComponentMessage] = createBehavior(timerScheduler)
   val componentTLAName                               = s"${hcdInfo.prefix}-${SupervisorBehavior.ComponentActorNameSuffix}"
 
-  test("Supervisor should create child actors for TLA, pub-sub actor for lifecycle and component state") {
+  test("Supervisor should create child actors for TLA, pub-sub actor for lifecycle and component state | DEOPSCSW-163") {
     val supervisorBehaviorTestKit = BehaviorTestKit(supervisorBehavior)
 
     val effects: immutable.Seq[Effect] = supervisorBehaviorTestKit.retrieveAllEffects()
@@ -59,7 +59,7 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
     )
   }
 
-  test("Supervisor should watch child component actor [TLA]") {
+  test("Supervisor should watch child component actor [TLA] | DEOPSCSW-163") {
     val supervisorBehaviorTestKit = BehaviorTestKit(supervisorBehavior)
 
     val componentActor       = supervisorBehaviorTestKit.childInbox(componentTLAName).ref
@@ -69,7 +69,7 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
     supervisorBehaviorTestKit.retrieveAllEffects() should not contain Watched(pubSubLifecycleActor)
   }
 
-  test("Supervisor should support concurrent updates to log-levels of components") {
+  test("Supervisor should support concurrent updates to log-levels of components | DEOPSCSW-163") {
     // start LoggingSystem to initialize logLevel, akkaLogLevel, slf4jLogLevel to legitimate level instead of staying null
     // null levels error out while serializing LogMetadata (expected in production that LoggingSystem will be started and
     // then someone can query `GetLogMetadata`)
@@ -97,7 +97,7 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
   }
 
   // DEOPSCSW-37: Add diagnosticMode handler to component handlers
-  test("Supervisor should forward DiagnosticMode to componentTLA") {
+  test("Supervisor should forward DiagnosticMode to componentTLA | DEOPSCSW-163, DEOPSCSW-37") {
     val supervisorBehaviorTestKit = BehaviorTestKit(supervisorBehavior)
 
     val childInbox: TestInbox[RunningMessage] = supervisorBehaviorTestKit.childInbox(componentTLAName)

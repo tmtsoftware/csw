@@ -12,7 +12,7 @@ class ScalaTestFrameworkTestKitSpec
 
   import frameworkTestKit.frameworkWiring._
 
-  test("should start all the provided services") {
+  test("should start all the provided services | DEOPSCSW-592") {
 
     val configLocation = locationService.find(ConfigServiceConnection.value).futureValue.value
     configLocation.connection shouldBe ConfigServiceConnection.value

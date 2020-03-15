@@ -108,7 +108,7 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
     )
   }
 
-  test("should watch the components created in the container") {
+  test("should watch the components created in the container | DEOPSCSW-182, DEOPSCSW-216") {
     val runningContainer = new RunningContainer
     import runningContainer._
 
@@ -116,7 +116,7 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
       .retrieveAllEffects() shouldBe components.components.map(component => Watched(component.supervisor)).toList
   }
 
-  test("should handle restart message by changing its lifecycle state to Idle") {
+  test("should handle restart message by changing its lifecycle state to Idle | DEOPSCSW-182, DEOPSCSW-216") {
     val runningContainer = new RunningContainer
     import runningContainer._
     val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]
@@ -135,7 +135,7 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
     componentProbes.map(_.expectMessage(Restart))
   }
 
-  test("should change its lifecycle state from Idle to Running after all components have restarted") {
+  test("should change its lifecycle state from Idle to Running after all components have restarted | DEOPSCSW-182, DEOPSCSW-216") {
     val runningContainer = new RunningContainer
     import runningContainer._
     val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]
@@ -157,7 +157,7 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
 
   }
 
-  test("should handle GoOnline and GoOffline Lifecycle messages by forwarding to all components") {
+  test("should handle GoOnline and GoOffline Lifecycle messages by forwarding to all components | DEOPSCSW-182, DEOPSCSW-216") {
     val runningContainer = new RunningContainer
     import runningContainer._
     val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]

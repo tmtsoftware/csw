@@ -29,20 +29,20 @@ class MetadataServiceModuleTest
   }
 
   //  DEOPSCSW-445: Get api for alarm metadata
-  test("getMetadata should fetch metadata of the given Alarm key") {
+  test("getMetadata should fetch metadata of the given Alarm key | DEOPSCSW-486, DEOPSCSW-445") {
     initTestAlarms()
     getMetadata(tromboneAxisHighLimitAlarmKey).await shouldBe tromboneAxisHighLimitAlarm
     getMetadata(splitterLimitAlarmKey).await shouldBe splitterLimitAlarm
   }
 
   //  DEOPSCSW-445: Get api for alarm metadata
-  test("getMetadata should throw exception while getting metadata if key does not exist") {
+  test("getMetadata should throw exception while getting metadata if key does not exist | DEOPSCSW-486, DEOPSCSW-445") {
     val invalidAlarm = AlarmKey(Prefix(CSW, "invalid"), "invalid")
     an[KeyNotFoundException] shouldBe thrownBy(getMetadata(invalidAlarm).await)
   }
 
   // DEOPSCSW-463: Fetch Alarm List for a component name or pattern
-  test("getMetadata should fetch all alarms for a component") {
+  test("getMetadata should fetch all alarms for a component | DEOPSCSW-486, DEOPSCSW-463") {
     initTestAlarms()
     val tromboneKey      = ComponentKey(Prefix(NFIRAOS, "trombone"))
     val tromboneMetadata = getMetadata(tromboneKey).await
@@ -56,7 +56,7 @@ class MetadataServiceModuleTest
   }
 
   // DEOPSCSW-464: Fetch Alarm name list for a subsystem name or pattern
-  test("getMetadata should fetch all alarms for a subsystem") {
+  test("getMetadata should fetch all alarms for a subsystem | DEOPSCSW-486, DEOPSCSW-464") {
     initTestAlarms()
     val nfiraosKey = SubsystemKey(NFIRAOS)
     val metadata   = getMetadata(nfiraosKey).await
@@ -71,7 +71,7 @@ class MetadataServiceModuleTest
   }
 
   // DEOPSCSW-464: Fetch Alarm name list for a subsystem name or pattern
-  test("getMetadata should fetch all alarms of whole system") {
+  test("getMetadata should fetch all alarms of whole system | DEOPSCSW-486, DEOPSCSW-464") {
     initTestAlarms()
     val globalKey = GlobalKey
     val metadata  = getMetadata(globalKey).await
@@ -89,14 +89,14 @@ class MetadataServiceModuleTest
   }
 
   // DEOPSCSW-464: Fetch Alarm name list for a subsystem name or pattern
-  test("getMetadata should throw exception if no alarms are found while getting metadata by subsystem") {
+  test("getMetadata should throw exception if no alarms are found while getting metadata by subsystem | DEOPSCSW-486, DEOPSCSW-464") {
     an[KeyNotFoundException] shouldBe thrownBy(getMetadata(SubsystemKey(Subsystem.CSW)).await)
   }
 
   val fourAlarmsConfig: Config = ConfigFactory.parseResources("test-alarms/valid-alarms.conf")
   val twoAlarmsConfig: Config  = ConfigFactory.parseResources("test-alarms/two-valid-alarms.conf")
 
-  test("initAlarms should load alarms from provided config file") {
+  test("initAlarms should load alarms from provided config file | DEOPSCSW-486") {
     clearAlarmStore().await
     a[KeyNotFoundException] shouldBe thrownBy(getMetadata(GlobalKey).await)
 
@@ -114,7 +114,7 @@ class MetadataServiceModuleTest
     getAggregatedHealth(tromboneAxisHighLimitAlarmKey).await shouldBe Bad
   }
 
-  test("initAlarms should reset the previous alarm data in redis and load with newly provided") {
+  test("initAlarms should reset the previous alarm data in redis and load with newly provided | DEOPSCSW-486") {
     clearAlarmStore().await
     a[KeyNotFoundException] shouldBe thrownBy(getMetadata(GlobalKey).await)
 
@@ -139,7 +139,7 @@ class MetadataServiceModuleTest
     getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Disconnected
   }
 
-  test("initAlarm with reset should not delete keys other than alarm service, for example sentinel related keys") {
+  test("initAlarm with reset should not delete keys other than alarm service, for example sentinel related keys | DEOPSCSW-486") {
     clearAlarmStore().await
     a[KeyNotFoundException] shouldBe thrownBy(getMetadata(GlobalKey).await)
 
@@ -157,7 +157,7 @@ class MetadataServiceModuleTest
     testMetadataApi.get(MetadataKey("sentinel.a.b.c")).await shouldBe Some(cpuExceededAlarm)
   }
 
-  test("initAlarm with reset=false should preserve existing alarm keys") {
+  test("initAlarm with reset=false should preserve existing alarm keys | DEOPSCSW-486") {
     clearAlarmStore().await
     a[KeyNotFoundException] shouldBe thrownBy(getMetadata(GlobalKey).await)
 
@@ -181,7 +181,7 @@ class MetadataServiceModuleTest
 
   // DEOPSCSW-443: Model to represent Alarm Activation status
   // DEOPSCSW-448: Set Activation status for an alarm entity
-  test("activate should activate an inactive alarm") {
+  test("activate should activate an inactive alarm | DEOPSCSW-486, DEOPSCSW-443, DEOPSCSW-448") {
     initTestAlarms()
 
     //ensure alarm is Inactive first
@@ -194,7 +194,7 @@ class MetadataServiceModuleTest
 
   // DEOPSCSW-443: Model to represent Alarm Activation status
   // DEOPSCSW-448: Set Activation status for an alarm entity
-  test("deActivate should deactivate an active alarm") {
+  test("deActivate should deactivate an active alarm | DEOPSCSW-486, DEOPSCSW-443, DEOPSCSW-448") {
     initTestAlarms()
 
     //ensure alarm is Active first
@@ -207,7 +207,7 @@ class MetadataServiceModuleTest
 
   // DEOPSCSW-443: Model to represent Alarm Activation status
   // DEOPSCSW-448: Set Activation status for an alarm entity
-  test("should throw exception when tried to activate/deactivate alarm which is not present in alarm store") {
+  test("should throw exception when tried to activate/deactivate alarm which is not present in alarm store | DEOPSCSW-486, DEOPSCSW-443, DEOPSCSW-448") {
     val invalidKey = AlarmKey(Prefix(CSW, "invalid"), "invalid")
 
     an[KeyNotFoundException] shouldBe thrownBy(activate(invalidKey).await)

@@ -40,7 +40,7 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
   // DEOPSCSW-218: Discover component connection information using Akka protocol
   // DEOPSCSW-220: Access and Monitor components for current values
   // DEOPSCSW-221: Avoid sending commands to non-executing components
-  test("should track connections when locationServiceUsage is RegisterAndTrackServices") {
+  test("should track connections when locationServiceUsage is RegisterAndTrackServices | DEOPSCSW-218, DEOPSCSW-220, DEOPSCSW-221") {
     implicit val containerActorSystem = ActorSystemFactory.remote(SpawnProtocol(), "test1")
     val wiring: FrameworkWiring       = FrameworkWiring.make(containerActorSystem, mock[RedisClient])
 
@@ -99,7 +99,7 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
    * Uses of this are shown in [[csw.common.components.framework.SampleComponentHandlers]]
    * */
   //DEOPSCSW-219 Discover component connection using HTTP protocol
-  test("component should be able to track http and tcp connections") {
+  test("component should be able to track http and tcp connections | DEOPSCSW-219") {
     implicit val componentActorSystem = ActorSystemFactory.remote(SpawnProtocol(), "test2")
     val wiring: FrameworkWiring       = FrameworkWiring.make(componentActorSystem, mock[RedisClient])
     // start component in standalone mode

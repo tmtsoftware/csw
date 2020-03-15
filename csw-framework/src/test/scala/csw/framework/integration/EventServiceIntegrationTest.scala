@@ -46,7 +46,7 @@ class EventServiceIntegrationTest extends FrameworkIntegrationSuite {
     super.afterAll()
   }
 
-  test("should be able to publish and subscribe to events") {
+  test("should be able to publish and subscribe to events | DEOPSCSW-395") {
     val containerRef = Container.spawn(ConfigFactory.load("container_tracking_connections.conf"), wiring).await
 
     val assemblyProbe                = TestInbox[CurrentState]()

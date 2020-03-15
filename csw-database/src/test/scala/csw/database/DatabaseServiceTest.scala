@@ -37,7 +37,7 @@ class DatabaseServiceTest extends AnyFunSuite with Matchers with ScalaFutures wi
   }
 
   //DEOPSCSW-608: Examples of database creation
-  test("should be able to create a new Database") {
+  test("should be able to create a new Database | DEOPSCSW-601, DEOPSCSW-616, DEOPSCSW-608") {
     // ensure database isn't already present
     val getDatabaseQuery = dsl.resultQuery("SELECT datname FROM pg_database WHERE datistemplate = false")
 
@@ -74,7 +74,7 @@ class DatabaseServiceTest extends AnyFunSuite with Matchers with ScalaFutures wi
   }
 
   //DEOPSCSW-622: Modify a table using update sql string
-  test("should be able to alter/drop a table") {
+  test("should be able to alter/drop a table | DEOPSCSW-601, DEOPSCSW-616, DEOPSCSW-622") {
     // create films
     dsl.query("CREATE TABLE films (id SERIAL PRIMARY KEY)").executeAsyncScala().futureValue
 
@@ -118,7 +118,7 @@ class DatabaseServiceTest extends AnyFunSuite with Matchers with ScalaFutures wi
   //DEOPSCSW-616: Create a method to send a query (select) sql string to a database
   //DEOPSCSW-610: Examples of Reading Records
   //DEOPSCSW-609: Examples of Record creation
-  test("should be able to query records from the table") {
+  test("should be able to query records from the table | DEOPSCSW-610, DEOPSCSW-616, DEOPSCSW-609, DEOPSCSW-613, DEOPSCSW-601") {
     // create films and insert movie_1
     val movieName  = "movie_1"
     val movieName2 = "movie_2"
@@ -146,7 +146,7 @@ class DatabaseServiceTest extends AnyFunSuite with Matchers with ScalaFutures wi
   //DEOPSCSW-609: Examples of Record creation
   //DEOPSCSW-613: Examples of querying records
   //DEOPSCSW-610: Examples of Reading Records
-  test("should be able to create, join and group records") {
+  test("should be able to create, join and group records | DEOPSCSW-607, DEOPSCSW-610, DEOPSCSW-616, DEOPSCSW-609, DEOPSCSW-613, DEOPSCSW-601") {
     // create tables films and budget and insert records
     dsl
       .queries(
@@ -192,7 +192,7 @@ class DatabaseServiceTest extends AnyFunSuite with Matchers with ScalaFutures wi
 
   //DEOPSCSW-611: Examples of updating records
   //DEOPSCSW-619: Create a method to send an update sql string to a database
-  test("should be able to update record") {
+  test("should be able to update record | DEOPSCSW-601, DEOPSCSW-616, DEOPSCSW-611, DEOPSCSW-619") {
     // create films and insert record
     val movie_2 = "movie_2"
     dsl
@@ -219,7 +219,7 @@ class DatabaseServiceTest extends AnyFunSuite with Matchers with ScalaFutures wi
   }
 
   //DEOPSCSW-612: Examples of deleting records
-  test("should be able to delete records") {
+  test("should be able to delete records | DEOPSCSW-601, DEOPSCSW-616, DEOPSCSW-612") {
     // create films and insert records
     val movie4 = "movie_4"
     dsl
@@ -247,13 +247,13 @@ class DatabaseServiceTest extends AnyFunSuite with Matchers with ScalaFutures wi
     dsl.query("DROP TABLE films").executeAsyncScala().futureValue
   }
 
-  test("should be throwing exception in case of syntax error") {
+  test("should be throwing exception in case of syntax error | DEOPSCSW-601, DEOPSCSW-616") {
     a[CompletionException] shouldBe thrownBy {
       Await.result(dsl.query("create1 table tableName (id SERIAL PRIMARY KEY)").executeAsyncScala(), 5.seconds)
     }
   }
 
-  test("should be able to create a function and query it") {
+  test("should be able to create a function and query it | DEOPSCSW-601, DEOPSCSW-616") {
     dsl
       .query(
         """

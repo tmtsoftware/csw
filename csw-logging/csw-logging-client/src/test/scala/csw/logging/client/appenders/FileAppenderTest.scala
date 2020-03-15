@@ -104,7 +104,7 @@ class FileAppenderTest extends AnyFunSuite with Matchers with BeforeAndAfterEach
   }
 
   // DEOPSCSW-649: Fixed directory configuration for multi JVM scenario
-  test("should throw BaseLogPathNotDefined exception if TMT_LOG_HOME is not defined") {
+  test("should throw BaseLogPathNotDefined exception if TMT_LOG_HOME is not defined | DEOPSCSW-123, DEOPSCSW-649") {
     val config = ConfigFactory.parseString("""
                                              |include "logging.conf"
                                              |csw-logging {
@@ -124,7 +124,7 @@ class FileAppenderTest extends AnyFunSuite with Matchers with BeforeAndAfterEach
 
   //DEOPSCSW-151 : Manage log file size
   // CSW-78: PrefixRedesign for logging
-  test("log file is rotated every day") {
+  test("log file is rotated every day | DEOPSCSW-123, DEOPSCSW-649") {
     fileAppender.append(expectedLogMsgJson1, "alternative")
     fileAppender.append(expectedLogMsgJson2, Category.Common.name)
     fileAppender.append(expectedLogMsgJson3, Category.Common.name)

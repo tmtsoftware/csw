@@ -32,7 +32,7 @@ class TimeServiceIntegrationTest extends FrameworkIntegrationSuite {
     super.afterAll()
   }
 
-  test("should be able to schedule using time service") {
+  test("should be able to schedule using time service | DEOPSCSW-550") {
     val containerRef = Container.spawn(ConfigFactory.load("container_tracking_connections.conf"), wiring).await
 
     val assemblyProbe                = TestInbox[CurrentState]()

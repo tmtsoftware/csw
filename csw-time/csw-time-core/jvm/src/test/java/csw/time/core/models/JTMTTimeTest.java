@@ -28,7 +28,7 @@ public class JTMTTimeTest extends JUnitSuite {
     // This test is sufficient to show code works in both Scala and Java
     // since UTCTime.now is used in both languages.
     @Test
-    public void should_get_utc_time() {
+    public void should_get_utc_time__DEOPSCSW_532_DEOPSCSW_549() {
         UTCTime utcTime = UTCTime.now();
         Instant fixedInstant = Instant.now();
 
@@ -41,7 +41,7 @@ public class JTMTTimeTest extends JUnitSuite {
     //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
     //DEOPSCSW-549: Time service api
     @Test
-    public void should_convert_utc_to_tai() {
+    public void should_convert_utc_to_tai__DEOPSCSW_537_DEOPSCSW_530_DEOPSCSW_549() {
         UTCTime utcTime = UTCTime.now();
         TAITime taiTime = utcTime.toTAI();
 
@@ -51,7 +51,7 @@ public class JTMTTimeTest extends JUnitSuite {
     //DEOPSCSW-534: PTP accuracy and precision while reading UTC
     //DEOPSCSW-549: Time service api
     @Test
-    public void should_get_maximum_precision_supported_by_system_in_utc() {
+    public void should_get_maximum_precision_supported_by_system_in_utc__DEOPSCSW_534_DEOPSCSW_549() {
         assertFalse(TestUtil.formatWithPrecision(UTCTime.now().value(), testProperties.precision()).endsWith("000"));
     }
 
@@ -61,7 +61,7 @@ public class JTMTTimeTest extends JUnitSuite {
     //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
     //DEOPSCSW-549: Time service api
     @Test
-    public void should_get_tai_time() {
+    public void should_get_tai_time__DEOPSCSW_535_DEOPSCSW_530_DEOPSCSW_549() {
         TAITime taiTime = TAITime.now();
         Instant expectedTaiInstant = Instant.now().plusSeconds(TaiOffset);
 
@@ -98,7 +98,7 @@ public class JTMTTimeTest extends JUnitSuite {
     //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
     //DEOPSCSW-549: Time service api
     @Test
-    public void should_convert_tai_to_utc() {
+    public void should_convert_tai_to_utc__DEOPSCSW_537_DEOPSCSW_530_DEOPSCSW_549() {
         TAITime taiTime = TAITime.now();
         UTCTime utcTime = taiTime.toUTC();
 
@@ -108,7 +108,7 @@ public class JTMTTimeTest extends JUnitSuite {
     //DEOPSCSW-538: PTP accuracy and precision while reading TAI
     //DEOPSCSW-549: Time service api
     @Test
-    public void should_get_maximum_precision_supported_by_system_in_tai() {
+    public void should_get_maximum_precision_supported_by_system_in_tai__DEOPSCSW_538_DEOPSCSW_549() {
         assertFalse(TestUtil.formatWithPrecision(TAITime.now().value(), testProperties.precision()).endsWith("000"));
     }
 }

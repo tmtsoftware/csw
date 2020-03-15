@@ -20,7 +20,7 @@ import static csw.params.javadsl.JUnits.*;
 public class JSimpleKeyTypeTest extends JUnitSuite {
 
     @Test
-    public void testBooleanKeyParameter() {
+    public void testBooleanKeyParameter__DEOPSCSW_183_DEOPSCSW_185_DEOPSCSW_190_DEOPSCSW_184() {
         String keyName = "encoder()";
         Key<Boolean> key = JKeyType.BooleanKey().make(keyName);
         Boolean[] paramData = {true, false, true};
@@ -39,7 +39,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
     }
 
     @Test
-    public void testCharKeyParameter() {
+    public void testCharKeyParameter__DEOPSCSW_183_DEOPSCSW_185_DEOPSCSW_190_DEOPSCSW_184() {
         String keyName = "charKey";
         Key<Character> key = JKeyType.CharKey().make(keyName, NoUnits);
         Key<Character> keyUnits = JKeyType.CharKey().make(keyName, encoder);
@@ -70,7 +70,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
 
     // DEOPSCSW-186: Binary value payload
     @Test
-    public void testByteKeyParameter() {
+    public void testByteKeyParameter__DEOPSCSW_185_DEOPSCSW_183_DEOPSCSW_190_DEOPSCSW_184_DEOPSCSW_186() {
         String keyName = "ByteKey";
         Key<Byte> key = JKeyType.ByteKey().make(keyName, NoUnits);
         Key<Byte> keyUnits = JKeyType.ByteKey().make(keyName, encoder);
@@ -100,7 +100,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
     }
 
     @Test
-    public void testShortKeyParameter() {
+    public void testShortKeyParameter__DEOPSCSW_183_DEOPSCSW_185_DEOPSCSW_190_DEOPSCSW_184() {
         String keyName = "ShortKey";
         Key<Short> key = JKeyType.ShortKey().make(keyName, NoUnits);
         Key<Short> keyUnits = JKeyType.ShortKey().make(keyName, encoder);
@@ -130,7 +130,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
     }
 
     @Test
-    public void testLongKeyParameter() {
+    public void testLongKeyParameter__DEOPSCSW_183_DEOPSCSW_185_DEOPSCSW_190_DEOPSCSW_184() {
         String keyName = "LongKey";
         Key<Long> key = JKeyType.LongKey().make(keyName, NoUnits);
         Key<Long> keyUnits = JKeyType.LongKey().make(keyName, micrometer);
@@ -160,7 +160,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
     }
 
     @Test
-    public void testIntegerKeyParameter() {
+    public void testIntegerKeyParameter__DEOPSCSW_183_DEOPSCSW_185_DEOPSCSW_190_DEOPSCSW_184() {
         String keyName = "IntegerKey";
         Key<Integer> key = JKeyType.IntKey().make(keyName, NoUnits);
         Key<Integer> keyUnits = JKeyType.IntKey().make(keyName, millisecond);
@@ -190,7 +190,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
     }
 
     @Test
-    public void testFloatKeyParameter() {
+    public void testFloatKeyParameter__DEOPSCSW_183_DEOPSCSW_185_DEOPSCSW_190_DEOPSCSW_184() {
         String keyName = "FloatKey";
         Key<Float> key = JKeyType.FloatKey().make(keyName, NoUnits);
         Key<Float> keyUnits = JKeyType.FloatKey().make(keyName, millimeter);
@@ -220,7 +220,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
     }
 
     @Test
-    public void testDoubleKeyParameter() {
+    public void testDoubleKeyParameter__DEOPSCSW_183_DEOPSCSW_185_DEOPSCSW_190_DEOPSCSW_184() {
         String keyName = "DoubleKey";
         Key<Double> key = JKeyType.DoubleKey().make(keyName, NoUnits);
         Key<Double> keyUnits = JKeyType.DoubleKey().make(keyName, kilometer);
@@ -252,7 +252,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
     //DEOPSCSW-282: Add a timestamp Key and Parameter
     //DEOPSCSW-661: Create UTCTimeKey and TAITimeKey replacing TimestampKey in Protobuf parameters
     @Test
-    public void testUTCTimeKeyParameter() {
+    public void testUTCTimeKeyParameter__DEOPSCSW_661_DEOPSCSW_185_DEOPSCSW_282_DEOPSCSW_183_DEOPSCSW_190_DEOPSCSW_184() {
         String keyName = "UTCTimeKey";
         Key<UTCTime> key = JKeyType.UTCTimeKey().make(keyName);
         UTCTime[] paramData = {UTCTime.now(), new UTCTime(Instant.ofEpochSecond(3600))};
@@ -282,7 +282,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
 
     //DEOPSCSW-661: Create UTCTimeKey and TAITimeKey replacing TimestampKey in Protobuf parameters
     @Test
-    public void testTAITimeKeyParameter() {
+    public void testTAITimeKeyParameter__DEOPSCSW_661_DEOPSCSW_185_DEOPSCSW_183_DEOPSCSW_190_DEOPSCSW_184() {
         String keyName = "TAITimeKey";
         Key<TAITime> key = JKeyType.TAITimeKey().make(keyName);
         TAITime[] paramData = {TAITime.now(), new TAITime(Instant.ofEpochSecond(3600))};
@@ -311,7 +311,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
     }
 
     @Test
-    public void testRaDecKeyParameter() {
+    public void testRaDecKeyParameter__DEOPSCSW_183_DEOPSCSW_185_DEOPSCSW_190_DEOPSCSW_184() {
         String keyName = "RaDecKey";
         Key<RaDec> key = JKeyType.RaDecKey().make(keyName, NoUnits);
         Key<RaDec> keyUnits = JKeyType.RaDecKey().make(keyName, meter);
@@ -341,7 +341,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
     }
 
     @Test
-    public void testStringKeyParameter() {
+    public void testStringKeyParameter__DEOPSCSW_183_DEOPSCSW_185_DEOPSCSW_190_DEOPSCSW_184() {
         String keyName = "StringKey";
         Key<String> key = JKeyType.StringKey().make(keyName, NoUnits);
         Key<String> keyUnits = JKeyType.StringKey().make(keyName, degree);
@@ -371,7 +371,7 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
     }
 
     @Test
-    public void testStructKeyParameter() {
+    public void testStructKeyParameter__DEOPSCSW_183_DEOPSCSW_185_DEOPSCSW_190_DEOPSCSW_184() {
         String keyName = "StructKey";
         Key<Struct> key = JKeyType.StructKey().make(keyName, NoUnits);
 

@@ -10,7 +10,7 @@ import org.scalatest.matchers.should.Matchers
 // DEOPSCSW-452: Represent alarm in a model as defined in Configuration file
 class ConfigParserTest extends AnyFunSuite with Matchers with AlarmTestData {
 
-  test("should able to parse valid alarm metadata's config file") {
+  test("should able to parse valid alarm metadata's config file | DEOPSCSW-451, DEOPSCSW-452") {
     val config = ConfigFactory.parseResources("test-alarms/valid-alarms.conf")
 
     val expectedAlarmMetadataSet = Set(tromboneAxisHighLimitAlarm, tromboneAxisLowLimitAlarm, cpuExceededAlarm, cpuIdleAlarm)
@@ -20,7 +20,7 @@ class ConfigParserTest extends AnyFunSuite with Matchers with AlarmTestData {
     actualAlarmMetadataSet.alarms shouldEqual expectedAlarmMetadataSet
   }
 
-  test("should throw Exception while parsing invalid alarms metadata config file", FileSystemSensitive) {
+  test("should throw Exception while parsing invalid alarms metadata config file | DEOPSCSW-451, DEOPSCSW-452", FileSystemSensitive) {
     val config = ConfigFactory.parseResources("test-alarms/invalid-alarms.conf")
 
     val parseException = the[ConfigParseException] thrownBy ConfigParser.parseAlarmMetadataSet(config)

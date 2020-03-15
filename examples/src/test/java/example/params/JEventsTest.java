@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 public class JEventsTest extends JUnitSuite {
 
     @Test
-    public void showUsageOfEventTime() {
+    public void showUsageOfEventTime__DEOPSCSW_331() {
         //#eventtime
 
         //apply returns current time in UTC
@@ -54,7 +54,7 @@ public class JEventsTest extends JUnitSuite {
     }
 
     @Test
-    public void showUsageOfSystemEvent() {
+    public void showUsageOfSystemEvent__DEOPSCSW_331() {
         //#systemevent
         //keys
         Key<Integer> k1 = JKeyType.IntKey().make("encoder", JUnits.encoder);
@@ -104,7 +104,7 @@ public class JEventsTest extends JUnitSuite {
     }
 
     @Test
-    public void showUsageOfObserveEvent() {
+    public void showUsageOfObserveEvent__DEOPSCSW_331() {
         //#observeevent
         //keys
         Key<Integer> k1 = JKeyType.IntKey().make("readoutsCompleted", JUnits.NoUnits);
@@ -154,7 +154,7 @@ public class JEventsTest extends JUnitSuite {
     }
 
     @Test
-    public void showUsageOfJsonSerialization() {
+    public void showUsageOfJsonSerialization__DEOPSCSW_331() {
         //#json-serialization
         //key
         Key<MatrixData<Double>> k1 = JKeyType.DoubleMatrixKey().make("myMatrix");
@@ -197,7 +197,7 @@ public class JEventsTest extends JUnitSuite {
     }
 
     @Test
-    public void showUniqueKeyConstraintExample() {
+    public void showUniqueKeyConstraintExample__DEOPSCSW_331() {
         //#unique-key
         //keys
         Key<Integer> encoderKey = JKeyType.IntKey().make("encoder", JUnits.encoder);
@@ -248,7 +248,7 @@ public class JEventsTest extends JUnitSuite {
     }
 
     @Test
-    public void showUsageOfCbor() {
+    public void showUsageOfCbor__DEOPSCSW_331() {
         //#cbor
 
         //prefixes

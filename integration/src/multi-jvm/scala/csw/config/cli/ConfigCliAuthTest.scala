@@ -61,7 +61,7 @@ class ConfigCliAuthTest(ignore: Int)
     Ports.stop(keycloakPort)
   }
 
-  test("should upload, update, get and set active version of configuration files") {
+  test("should upload, update, get and set active version of configuration files | DEOPSCSW-43") {
     runOn(keycloak) {
       val configAdmin = "admin"
 

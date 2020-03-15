@@ -56,7 +56,7 @@ public class JAlarmServiceFactoryTest extends JUnitSuite {
     }
 
     @Test
-    public void shouldCreateClientAlarmServiceUsingLocationService() throws Exception {
+    public void shouldCreateClientAlarmServiceUsingLocationService__DEOPSCSW_481() throws Exception {
         IAlarmService alarmServiceUsingLS = alarmServiceFactory.jMakeClientApi(locationService, seedSystem);
         alarmServiceUsingLS.setSeverity(testSetup.tromboneAxisHighLimitAlarmKey(), JAlarmSeverity.Indeterminate).get();
 
@@ -65,7 +65,7 @@ public class JAlarmServiceFactoryTest extends JUnitSuite {
     }
 
     @Test
-    public void shouldCreateClientAlarmServiceUsingHostAndPort() throws Exception {
+    public void shouldCreateClientAlarmServiceUsingHostAndPort__DEOPSCSW_481() throws Exception {
         IAlarmService alarmServiceUsingHostPort = alarmServiceFactory.jMakeClientApi(testSetup.hostname(), testSetup.sentinelPort(), seedSystem);
         alarmServiceUsingHostPort.setSeverity(testSetup.tromboneAxisHighLimitAlarmKey(), JAlarmSeverity.Indeterminate).get();
 

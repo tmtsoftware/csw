@@ -49,7 +49,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     jHcdInfo
   )
 
-  test("onInitialized and onRun hooks of comp handlers should be invoked when supervisor creates comp") {
+  test("onInitialized and onRun hooks of comp handlers should be invoked when supervisor creates comp | DEOPSCSW-166, DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-165, DEOPSCSW-176") {
 
     forAll(testData) { info: ComponentInfo =>
       {
@@ -79,7 +79,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-213: Sender to know that oneway configuration command's validation was successful
   // DEOPSCSW-293: Sanitise handlers in Component Handlers
   // DEOPSCSW-306: Include runId in Command response
-  test("onSubmit hook should be invoked and command validation should be successful on receiving Setup config") {
+  test("onSubmit hook should be invoked and command validation should be successful on receiving Setup config | DEOPSCSW-198, DEOPSCSW-200, DEOPSCSW-306, DEOPSCSW-201, DEOPSCSW-204, DEOPSCSW-199, DEOPSCSW-293, DEOPSCSW-166, DEOPSCSW-213, DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-203, DEOPSCSW-165, DEOPSCSW-176") {
     val testData = Table(
       "componentInfo",
       hcdInfo,
@@ -168,7 +168,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-213: Sender to know that oneway configuration command's validation was successful
   // DEOPSCSW-293: Sanitise handlers in Component Handlers
   // DEOPSCSW-306: Include runId in Command response
-  test("onOneway hook should be invoked and command validation should be successful on receiving Observe config") {
+  test("onOneway hook should be invoked and command validation should be successful on receiving Observe config | DEOPSCSW-198, DEOPSCSW-200, DEOPSCSW-306, DEOPSCSW-204, DEOPSCSW-293, DEOPSCSW-166, DEOPSCSW-213, DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-203, DEOPSCSW-165, DEOPSCSW-176") {
     forAll(testData) { info: ComponentInfo =>
       {
         val mocks = frameworkTestMocks()
@@ -241,7 +241,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
   // DEOPSCSW-206: Sender to know that Submit configuration command's validation failed
   // DEOPSCSW-214: Sender to know that oneway configuration command's validation failed
-  test("component handler should be able to validate a Setup or Observe command as failure during validation") {
+  test("component handler should be able to validate a Setup or Observe command as failure during validation | DEOPSCSW-206, DEOPSCSW-166, DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-165, DEOPSCSW-176, DEOPSCSW-214") {
     forAll(testData) { info: ComponentInfo =>
       {
         val mocks                                          = frameworkTestMocks()
@@ -270,7 +270,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     }
   }
 
-  test("onGoOffline and goOnline hooks of comp handlers should be invoked when supervisor receives Lifecycle messages") {
+  test("onGoOffline and goOnline hooks of comp handlers should be invoked when supervisor receives Lifecycle messages | DEOPSCSW-166, DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-165, DEOPSCSW-176") {
     forAll(testData) { info: ComponentInfo =>
       {
         val mocks = frameworkTestMocks()
@@ -298,7 +298,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     }
   }
 
-  test("should invoke onShutdown hook when supervisor restarts component using Restart external message") {
+  test("should invoke onShutdown hook when supervisor restarts component using Restart external message | DEOPSCSW-166, DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-165, DEOPSCSW-176") {
     forAll(testData) { info: ComponentInfo =>
       {
         val mocks = frameworkTestMocks()
@@ -329,7 +329,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     }
   }
 
-  test("running component should ignore RunOnline lifecycle message when it is already online") {
+  test("running component should ignore RunOnline lifecycle message when it is already online | DEOPSCSW-166, DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-165, DEOPSCSW-176") {
     forAll(testData) { info: ComponentInfo =>
       {
         val mocks = frameworkTestMocks()
@@ -348,7 +348,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     }
   }
 
-  test("running component should ignore RunOffline lifecycle message when it is already offline") {
+  test("running component should ignore RunOffline lifecycle message when it is already offline | DEOPSCSW-166, DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-165, DEOPSCSW-176") {
     forAll(testData) { info: ComponentInfo =>
       {
         val mocks = frameworkTestMocks()
@@ -374,7 +374,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   }
 
   // DEOPSCSW-284: Move Timeouts to Config file
-  test("handle InitializeTimeout by stopping TLA") {
+  test("handle InitializeTimeout by stopping TLA | DEOPSCSW-284, DEOPSCSW-166, DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-165, DEOPSCSW-176") {
     val supervisorLifecycleStateProbe: TestProbe[SupervisorLifecycleState] = TestProbe[SupervisorLifecycleState]
 
     val testData = Table(
