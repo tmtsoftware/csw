@@ -94,7 +94,7 @@ public class JEventSubscriptionFrequencyTest extends TestNGSuite {
 
     //DEOPSCSW-342: Subscription with consumption frequency
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_subscribe_with_duration_with_rate_adapter_mode_for_slow_publisher(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+    public void should_be_able_to_subscribe_with_duration_with_rate_adapter_mode_for_slow_publisher__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_395_DEOPSCSW_342(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         EventGenerator eventGenerator = new EventGenerator(new EventName("system_"+ new Random().nextInt()));
         EventKey eventKey = eventGenerator.eventsGroup.get(0).eventKey();
 
@@ -118,7 +118,7 @@ public class JEventSubscriptionFrequencyTest extends TestNGSuite {
     //DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
     //DEOPSCSW-342: Subscription with consumption frequency
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_subscribe_with_duration_with_rate_adapter_for_fast_publisher(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+    public void should_be_able_to_subscribe_with_duration_with_rate_adapter_for_fast_publisher__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_395_DEOPSCSW_342_DEOPSCSW_346(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
 
         EventGenerator eventGenerator = new EventGenerator(new EventName("system_"+ new Random().nextInt()));
         EventKey eventKey = eventGenerator.eventsGroup.get(0).eventKey();
@@ -152,7 +152,7 @@ public class JEventSubscriptionFrequencyTest extends TestNGSuite {
 
     //DEOPSCSW-342: Subscription with consumption frequency
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_subscribe_with_duration_with_rate_limiter_mode_for_slow_publisher(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+    public void should_be_able_to_subscribe_with_duration_with_rate_limiter_mode_for_slow_publisher__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_395_DEOPSCSW_342(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         EventGenerator eventGenerator = new EventGenerator(new EventName("system_"+ new Random().nextInt()));
         EventKey eventKey = eventGenerator.eventsGroup.get(0).eventKey();
         TestInbox<Event> inbox = TestInbox.create();
@@ -173,7 +173,7 @@ public class JEventSubscriptionFrequencyTest extends TestNGSuite {
 
     //DEOPSCSW-342: Subscription with consumption frequency
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_subscribe_with_duration_with_rate_limiter_mode_for_fast_publisher(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+    public void should_be_able_to_subscribe_with_duration_with_rate_limiter_mode_for_fast_publisher__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_395_DEOPSCSW_342(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         EventGenerator eventGenerator = new EventGenerator(new EventName("system_"+ new Random().nextInt()));
         EventKey eventKey = eventGenerator.eventsGroup.get(0).eventKey();
 

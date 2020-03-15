@@ -86,7 +86,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   //DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
   //DEOPSCSW-343: Unsubscribe based on prefix and event name
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_subscribe_an_event(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_subscribe_an_event__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_346_DEOPSCSW_343(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
     val event1             = makeDistinctEvent(Random.nextInt())
@@ -109,7 +109,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   //DEOPSCSW-338: Provide callback for Event alerts
   //DEOPSCSW-343: Unsubscribe based on prefix and event name
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_subscribe_with_async_callback(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_subscribe_with_async_callback__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_338_DEOPSCSW_343(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
     val event1    = makeEvent(1)
@@ -132,7 +132,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   //DEOPSCSW-338: Provide callback for Event alerts
   //DEOPSCSW-342: Subscription with consumption frequency
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_subscribe_with_async_callback_with_duration(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_subscribe_with_async_callback_with_duration__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_338_DEOPSCSW_342(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
     val queue: mutable.Queue[Event]  = new mutable.Queue[Event]()
@@ -158,7 +158,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   //DEOPSCSW-338: Provide callback for Event alerts
   //DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_subscribe_with_callback(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_subscribe_with_callback__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_338_DEOPSCSW_346(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
     val listOfPublishedEvents: ArrayBuffer[Event] = ArrayBuffer.empty
@@ -185,7 +185,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   //DEOPSCSW-338: Provide callback for Event alerts
   //DEOPSCSW-342: Subscription with consumption frequency
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_subscribe_with_callback_with_duration(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_subscribe_with_callback_with_duration__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_338_DEOPSCSW_342(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
     val queue: mutable.Queue[Event]  = new mutable.Queue[Event]()
@@ -211,7 +211,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
   //DEOPSCSW-339: Provide actor ref to alert about Event arrival
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_subscribe_with_an_ActorRef(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_subscribe_with_an_ActorRef__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_339(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
     val event1 = makeDistinctEvent(Random.nextInt())
@@ -231,7 +231,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   //DEOPSCSW-339: Provide actor ref to alert about Event arrival
   //DEOPSCSW-342: Subscription with consumption frequency
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_subscribe_with_an_ActorRef_with_duration(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_subscribe_with_an_ActorRef_with_duration__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_339_DEOPSCSW_342(baseProperties: BaseProperties): Unit = {
     import baseProperties._
     val inbox  = TestInbox[Event]()
     val event1 = makeEvent(205)
@@ -249,7 +249,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   // DEOPSCSW-420: Implement Pattern based subscription
   // Pattern subscription doesn't work with embedded kafka hence not running it with the suite
   @Test(dataProvider = "redis-provider")
-  def should_be_able_to_subscribe_an_event_with_pattern_from_different_subsystem(redisProps: RedisTestProps): Unit = {
+  def should_be_able_to_subscribe_an_event_with_pattern_from_different_subsystem__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_420(redisProps: RedisTestProps): Unit = {
     import redisProps._
 
     val testEvent1 = makeEventWithPrefix(1, Prefix("csw.prefix"))
@@ -277,7 +277,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   // DEOPSCSW-420: Implement Pattern based subscription
   // Pattern subscription doesn't work with embedded kafka hence not running it with the suite
   @Test(dataProvider = "redis-provider")
-  def should_be_able_to_subscribe_an_event_with_pattern_from_same_subsystem(redisProps: RedisTestProps): Unit = {
+  def should_be_able_to_subscribe_an_event_with_pattern_from_same_subsystem__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_420(redisProps: RedisTestProps): Unit = {
     import redisProps._
 
     val testEvent1 = makeEventForKeyName(EventName("movement.linear"), 1)
@@ -342,7 +342,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   }
 
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_make_independent_subscriptions(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_make_independent_subscriptions__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
     val prefix        = Prefix("csw.prefix")
@@ -367,7 +367,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
   //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_retrieve_recently_published_event_on_subscription(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_retrieve_recently_published_event_on_subscription__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_340(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
     val event1   = makeEvent(1)
@@ -391,7 +391,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
   //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_retrieve_InvalidEvent(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_retrieve_InvalidEvent__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_340(baseProperties: BaseProperties): Unit = {
     import baseProperties._
     val eventKey = EventKey("csw.a.b.c")
 
@@ -402,7 +402,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
   //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_retrieve_valid_as_well_as_invalid_event_when_events_are_published_for_some_and_not_for_other_keys(
+  def should_be_able_to_retrieve_valid_as_well_as_invalid_event_when_events_are_published_for_some_and_not_for_other_keys__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_340(
       baseProperties: BaseProperties
   ): Unit = {
     import baseProperties._
@@ -422,7 +422,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
   //DEOPSCSW-344: Retrieve recently published event using prefix and eventname
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_get_an_event_without_subscribing_for_it(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_get_an_event_without_subscribing_for_it__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_344(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
     val event1   = makeDistinctEvent(Random.nextInt())
@@ -437,7 +437,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
   //DEOPSCSW-344: Retrieve recently published event using prefix and eventname
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_get_InvalidEvent(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_get_InvalidEvent__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_344(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
     val prefix    = Prefix("wfos.blue.test_filter")
@@ -452,7 +452,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
   //DEOPSCSW-344: Retrieve recently published event using prefix and eventname
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_get_events_for_multiple_event_keys(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_get_events_for_multiple_event_keys__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_344(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
     val event1    = makeDistinctEvent(Random.nextInt())
@@ -469,7 +469,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   }
 
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_get_invalid_event_on_event_parse_failure(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_get_invalid_event_on_event_parse_failure__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395(baseProperties: BaseProperties): Unit = {
     import baseProperties._
     val eventKey = makeEvent(0).eventKey
 
@@ -486,7 +486,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
   //CSW-73: Make event pub/sub resuming
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_resume_subscriber_after_exception(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_resume_subscriber_after_exception__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395(baseProperties: BaseProperties): Unit = {
     import baseProperties._
     val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
     val event1                      = makeEvent(1)
@@ -505,7 +505,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
   //CSW-73: Make event pub/sub resuming
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_resume_async_subscriber_after_exception(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_resume_async_subscriber_after_exception__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395(baseProperties: BaseProperties): Unit = {
     eventId = 0
     import baseProperties._
     val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
@@ -529,7 +529,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
   //CSW-73: Make event pub/sub resuming
   @Test(dataProvider = "redis-provider")
-  def should_be_able_to_resume_pattern_subscriber_after_exception(redisProps: RedisTestProps): Unit = {
+  def should_be_able_to_resume_pattern_subscriber_after_exception__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395(redisProps: RedisTestProps): Unit = {
     import redisProps._
     val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
 
