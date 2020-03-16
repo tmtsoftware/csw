@@ -64,7 +64,9 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
   override protected def afterEach(): Unit = logBuffer.clear()
 
-  test("handle TLA failure with FailureStop exception in initialize with Restart message | DEOPSCSW-178, DEOPSCSW-181, DEOPSCSW-180") {
+  test(
+    "handle TLA failure with FailureStop exception in initialize with Restart message | DEOPSCSW-178, DEOPSCSW-181, DEOPSCSW-180"
+  ) {
     val testMocks = frameworkTestMocks()
     import testMocks._
 
