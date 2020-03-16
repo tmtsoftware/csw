@@ -116,7 +116,9 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   // DEOPSCSW-27: Storing binary component configurations
   // DEOPSCSW-81: Storing large files in the configuration service
   // DEOPSCSW-131: Detect and handle oversize files
-  test("should able to upload and get binary configurations from config service | DEOPSCSW-27, DEOPSCSW-71, DEOPSCSW-48, DEOPSCSW-81, DEOPSCSW-131") {
+  test(
+    "should able to upload and get binary configurations from config service | DEOPSCSW-27, DEOPSCSW-71, DEOPSCSW-48, DEOPSCSW-81, DEOPSCSW-131"
+  ) {
     val binaryFileName = "binaryConf.bin"
     val binaryConfPath = Paths.get("tmt/trombone/test/conf/large/" + binaryFileName)
 
@@ -160,7 +162,9 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   // DEOPSCSW-42: Storing text based component configuration
   // DEOPSCSW-48: Store new configuration file in Config. service
   // DEOPSCSW-47: Unique name for configuration file
-  test("should throw FileAlreadyExists while creating a file if it already exists in repository - assume svn first | DEOPSCSW-42, DEOPSCSW-48, DEOPSCSW-47") {
+  test(
+    "should throw FileAlreadyExists while creating a file if it already exists in repository - assume svn first | DEOPSCSW-42, DEOPSCSW-48, DEOPSCSW-47"
+  ) {
     val file = Paths.get("/tmt/tcp/redis/text/redis.conf")
     configService
       .create(file, ConfigData.fromString(configValue1), annex = false, "commit redis conf for first time")
@@ -188,7 +192,9 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   // DEOPSCSW-42: Storing text based component configuration
   // DEOPSCSW-48: Store new configuration file in Config. service
   // DEOPSCSW-47: Unique name for configuration file
-  test("should throw FileAlreadyExists while creating a file if it already exists in repository - assume annex first | DEOPSCSW-42, DEOPSCSW-48, DEOPSCSW-47") {
+  test(
+    "should throw FileAlreadyExists while creating a file if it already exists in repository - assume annex first | DEOPSCSW-42, DEOPSCSW-48, DEOPSCSW-47"
+  ) {
     val file = Paths.get("/tmt/tcp/redis/text/redis.conf")
     configService
       .create(file, ConfigData.fromString(configValue1), annex = true, "commit redis conf for first time")
@@ -539,7 +545,9 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
   // DEOPSCSW-79: Reset the default version of a configuration file
   // DEOPSCSW-139: Provide new routes to get/set the current active version of the file
-  test("should able to get, set and reset the active version of config file | DEOPSCSW-77, DEOPSCSW-78, DEOPSCSW-70, DEOPSCSW-79, DEOPSCSW-139") {
+  test(
+    "should able to get, set and reset the active version of config file | DEOPSCSW-77, DEOPSCSW-78, DEOPSCSW-70, DEOPSCSW-79, DEOPSCSW-139"
+  ) {
     // create file
     val file = Paths.get("/tmt/test/setactive/getactive/resetactive/active.conf")
     configService.create(file, ConfigData.fromString(configValue1), annex = false, "create").await
@@ -641,7 +649,9 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   // DEOPSCSW-78: Get the default version of a configuration file
   // DEOPSCSW-79: Reset the default version of a configuration file
   // DEOPSCSW-139: Provide new routes to get/set the current active version of the file
-  test("getActive and getActiveVersion should return None if file does not exists | DEOPSCSW-77, DEOPSCSW-78, DEOPSCSW-79, DEOPSCSW-139") {
+  test(
+    "getActive and getActiveVersion should return None if file does not exists | DEOPSCSW-77, DEOPSCSW-78, DEOPSCSW-79, DEOPSCSW-139"
+  ) {
     val file = Paths.get("/tmt/test/ahgvfyfgpp.conf")
 
     configService.getActive(file).await shouldBe None
@@ -653,7 +663,9 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   // DEOPSCSW-78: Get the default version of a configuration file
   // DEOPSCSW-79: Reset the default version of a configuration file
   // DEOPSCSW-139: Provide new routes to get/set the current active version of the file
-  test("set and reset active should throw FileNotFound exception if file or version does not exists | DEOPSCSW-77, DEOPSCSW-78, DEOPSCSW-79, DEOPSCSW-139") {
+  test(
+    "set and reset active should throw FileNotFound exception if file or version does not exists | DEOPSCSW-77, DEOPSCSW-78, DEOPSCSW-79, DEOPSCSW-139"
+  ) {
     val file = Paths.get("/tmt/test/temp.conf")
 
     intercept[FileNotFound] {
@@ -929,7 +941,9 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   // DEOPSCSW-27: Storing binary component configurations
   // DEOPSCSW-81: Storing large files in the configuration service
   // DEOPSCSW-131: Detect and handle oversize files
-  test("should be able to store and retrieve text file from annex store when size is greater than configured size | DEOPSCSW-27, DEOPSCSW-81, DEOPSCSW-131") {
+  test(
+    "should be able to store and retrieve text file from annex store when size is greater than configured size | DEOPSCSW-27, DEOPSCSW-81, DEOPSCSW-131"
+  ) {
     val fileName              = "/tromboneContainerTest.conf"
     val path                  = ResourceReader.copyToTmp(fileName)
     val configData            = ConfigData.fromPath(path)

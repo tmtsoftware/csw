@@ -171,7 +171,9 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
   }
 
   //DEOPSCSW-313: Support short running actions by providing immediate response
-  test("running component can send an immediate response to a submit command and avoid invoking further processing | DEOPSCSW-177, DEOPSCSW-179, DEOPSCSW-313") {
+  test(
+    "running component can send an immediate response to a submit command and avoid invoking further processing | DEOPSCSW-177, DEOPSCSW-179, DEOPSCSW-313"
+  ) {
     val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]
     val submitResponseProbe       = TestProbe[SubmitResponse]
     val commandStatusServiceProbe = TestProbe[CRMMessage]

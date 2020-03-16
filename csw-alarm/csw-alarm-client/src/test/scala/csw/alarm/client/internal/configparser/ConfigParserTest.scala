@@ -20,7 +20,10 @@ class ConfigParserTest extends AnyFunSuite with Matchers with AlarmTestData {
     actualAlarmMetadataSet.alarms shouldEqual expectedAlarmMetadataSet
   }
 
-  test("should throw Exception while parsing invalid alarms metadata config file | DEOPSCSW-451, DEOPSCSW-452", FileSystemSensitive) {
+  test(
+    "should throw Exception while parsing invalid alarms metadata config file | DEOPSCSW-451, DEOPSCSW-452",
+    FileSystemSensitive
+  ) {
     val config = ConfigFactory.parseResources("test-alarms/invalid-alarms.conf")
 
     val parseException = the[ConfigParseException] thrownBy ConfigParser.parseAlarmMetadataSet(config)

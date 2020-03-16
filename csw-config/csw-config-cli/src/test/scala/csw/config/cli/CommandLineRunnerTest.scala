@@ -60,7 +60,9 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
   }
 
   //DEOPSCSW-72: Retrieve a configuration file to a specified file location on a local disk
-  test("should able to create a file in repo and read it from repo to local disk | DEOPSCSW-112, DEOPSCSW-43, DEOPSCSW-576, DEOPSCSW-72") {
+  test(
+    "should able to create a file in repo and read it from repo to local disk | DEOPSCSW-112, DEOPSCSW-43, DEOPSCSW-576, DEOPSCSW-72"
+  ) {
 
     commandLineRunner.create(argsParser.parse(createMinimalArgs).get) shouldBe ConfigId(1)
 
@@ -223,7 +225,9 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
   // DEOPSCSW-66: Include identity of configuration file creator/editor
   // DEOPSCSW-577: Ability to view detailed change log in SVN
   // DEOPSCSW-625: Include username from svn in history model of config service
-  test("should able to fetch history of active files. | DEOPSCSW-576, DEOPSCSW-43, DEOPSCSW-577, DEOPSCSW-112, DEOPSCSW-66, DEOPSCSW-625") {
+  test(
+    "should able to fetch history of active files. | DEOPSCSW-576, DEOPSCSW-43, DEOPSCSW-577, DEOPSCSW-112, DEOPSCSW-66, DEOPSCSW-625"
+  ) {
     val user1 = "user1"
     val user2 = "user2"
     val user3 = "user3"

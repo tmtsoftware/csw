@@ -342,7 +342,9 @@ class ConfigServiceRouteTest
 
   // DEOPSCSW-577: Ability to view detailed change log in SVN
   // DEOPSCSW-625: Include username from svn in history model of config service
-  test("history - success  status code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-577, DEOPSCSW-69, DEOPSCSW-625") {
+  test(
+    "history - success  status code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-577, DEOPSCSW-69, DEOPSCSW-625"
+  ) {
     val bilal  = "bilal"
     val poorva = "poorva"
 
@@ -561,7 +563,9 @@ class ConfigServiceRouteTest
 
   // DEOPSCSW-577: Ability to view detailed change log in SVN
   // DEOPSCSW-625: Include username from svn in history model of config service
-  test("history-active - success  status code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-577, DEOPSCSW-69, DEOPSCSW-625") {
+  test(
+    "history-active - success  status code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-577, DEOPSCSW-69, DEOPSCSW-625"
+  ) {
     val bilal   = "bilal"
     val poorva  = "poorva"
     val shubham = "shubham"
@@ -730,7 +734,9 @@ class ConfigServiceRouteTest
   }
 
   // DEOPSCSW-629: Token masking in logs
-  test("should mask authorization token while logging | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69, DEOPSCSW-629") {
+  test(
+    "should mask authorization token while logging | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69, DEOPSCSW-629"
+  ) {
     val requests = ArrayBuffer.empty[HttpRequest]
 
     import serverWiring._

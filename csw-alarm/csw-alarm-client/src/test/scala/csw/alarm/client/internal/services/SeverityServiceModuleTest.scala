@@ -88,7 +88,9 @@ class SeverityServiceModuleTest
   }
 
   // DEOPSCSW-444: Set severity api for component
-  test("setSeverity should throw KeyNotFoundException when tried to set severity for key which does not exists in alarm store | DEOPSCSW-444") {
+  test(
+    "setSeverity should throw KeyNotFoundException when tried to set severity for key which does not exists in alarm store | DEOPSCSW-444"
+  ) {
     val invalidKey = AlarmKey(Prefix(TCS, "trombone"), "fakeAlarm")
     an[KeyNotFoundException] shouldBe thrownBy(setSeverity(invalidKey, Critical).await)
   }
@@ -102,7 +104,9 @@ class SeverityServiceModuleTest
   // DEOPSCSW-444: Set severity api for component
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
   // DEOPSCSW-500: Update alarm time on current severity change
-  test("setSeverity should latch alarm when it is higher than previous latched severity | DEOPSCSW-440, DEOPSCSW-444, DEOPSCSW-462, DEOPSCSW-500") {
+  test(
+    "setSeverity should latch alarm when it is higher than previous latched severity | DEOPSCSW-440, DEOPSCSW-444, DEOPSCSW-462, DEOPSCSW-500"
+  ) {
     getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Disconnected
 
     val status = getStatus(tromboneAxisHighLimitAlarmKey).await
@@ -333,7 +337,9 @@ class SeverityServiceModuleTest
   }
 
   // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
-  test("subscribe aggregated severity via callback for two different subscriptions, one for a component and other for all | DEOPSCSW-467") {
+  test(
+    "subscribe aggregated severity via callback for two different subscriptions, one for a component and other for all | DEOPSCSW-467"
+  ) {
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldBe Disconnected
     getCurrentSeverity(splitterLimitAlarmKey).await shouldBe Disconnected
 
@@ -402,7 +408,9 @@ class SeverityServiceModuleTest
 
   // DEOPSCSW-448: Set Activation status for an alarm entity
   // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
-  test("subscribeAggregatedSeverityCallback should throw InactiveAlarmException when all resolved keys are inactive | DEOPSCSW-448, DEOPSCSW-467") {
+  test(
+    "subscribeAggregatedSeverityCallback should throw InactiveAlarmException when all resolved keys are inactive | DEOPSCSW-448, DEOPSCSW-467"
+  ) {
     enclosureTempLowAlarm.isActive shouldBe false
     a[InactiveAlarmException] shouldBe thrownBy(
       subscribeAggregatedSeverityCallback(enclosureTempLowAlarmKey, println).ready().await

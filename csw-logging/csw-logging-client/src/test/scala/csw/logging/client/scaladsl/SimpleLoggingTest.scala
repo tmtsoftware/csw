@@ -27,7 +27,9 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
   // DEOPSCSW-119: Associate source with each log message
   // DEOPSCSW-121: Define structured tags for log messages
   // CSW-78: PrefixRedesign for logging
-  test("logs should contain component name and source location in terms of file name, class name and line number | DEOPSCSW-114, DEOPSCSW-121, DEOPSCSW-118, DEOPSCSW-116, DEOPSCSW-158, DEOPSCSW-119") {
+  test(
+    "logs should contain component name and source location in terms of file name, class name and line number | DEOPSCSW-114, DEOPSCSW-121, DEOPSCSW-118, DEOPSCSW-116, DEOPSCSW-158, DEOPSCSW-119"
+  ) {
     val expectedDateTime = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
     new TromboneHcd().startLogging(logMsgMap)
     Thread.sleep(400)
@@ -63,7 +65,9 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
   // DEOPSCSW-116: Make log messages identifiable with components
   // DEOPSCSW-119: Associate source with each log message
   // DEOPSCSW-121: Define structured tags for log messages
-  test("inner class logs should contain source location in terms of file name, class name and line number | DEOPSCSW-114, DEOPSCSW-121, DEOPSCSW-116, DEOPSCSW-158, DEOPSCSW-119") {
+  test(
+    "inner class logs should contain source location in terms of file name, class name and line number | DEOPSCSW-114, DEOPSCSW-121, DEOPSCSW-116, DEOPSCSW-158, DEOPSCSW-119"
+  ) {
     new InnerSourceComponent().startLogging(logMsgMap)
     Thread.sleep(100)
 
@@ -87,7 +91,9 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
   // DEOPSCSW-116: Make log messages identifiable with components
   // DEOPSCSW-119: Associate source with each log message
   // DEOPSCSW-121: Define structured tags for log messages
-  test("singleton object logs should contain source location in terms of file name, class name and line number | DEOPSCSW-114, DEOPSCSW-121, DEOPSCSW-116, DEOPSCSW-158, DEOPSCSW-119") {
+  test(
+    "singleton object logs should contain source location in terms of file name, class name and line number | DEOPSCSW-114, DEOPSCSW-121, DEOPSCSW-116, DEOPSCSW-158, DEOPSCSW-119"
+  ) {
     SingletonComponent.startLogging(logMsgMap)
     Thread.sleep(100)
 
@@ -112,7 +118,9 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
   // DEOPSCSW-116: Make log messages identifiable with components
   // DEOPSCSW-119: Associate source with each log message
   // DEOPSCSW-121: Define structured tags for log messages
-  test("object logs should allow user definable keys and values | DEOPSCSW-114, DEOPSCSW-121, DEOPSCSW-116, DEOPSCSW-158, DEOPSCSW-119") {
+  test(
+    "object logs should allow user definable keys and values | DEOPSCSW-114, DEOPSCSW-121, DEOPSCSW-116, DEOPSCSW-158, DEOPSCSW-119"
+  ) {
 
     //  Use SingletonComponent for test, but works identically for all cases
     SingletonComponent.startLogging(logMsgMap, userMsgMap)
@@ -145,7 +153,9 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
   }
 
   // DEOPSCSW-126 : Configurability of logging characteristics for component / log instance
-  test("should load default filter provided in configuration file and applied to normal logging messages | DEOPSCSW-158, DEOPSCSW-126") {
+  test(
+    "should load default filter provided in configuration file and applied to normal logging messages | DEOPSCSW-158, DEOPSCSW-126"
+  ) {
 
     //  TromboneHcd component is logging 6 messages
     //  As per the filter, hcd should log 5 message of all the levels except TRACE
@@ -204,7 +214,9 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
 
   // DEOPSCSW-124: Define severity levels for log messages
   // DEOPSCSW-125: Define severity levels for specific components/log instances
-  test("should able to filter logs based on configured/updated log level (covers all levels) | DEOPSCSW-158, DEOPSCSW-124, DEOPSCSW-125") {
+  test(
+    "should able to filter logs based on configured/updated log level (covers all levels) | DEOPSCSW-158, DEOPSCSW-124, DEOPSCSW-125"
+  ) {
     val testData = Table(
       ("logLevel", "expectedLogCount"),
       (FATAL, 1),
@@ -250,7 +262,9 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
   // DEOPSCSW-125: Define severity levels for specific components/log instances
   // This test is identical to above test, except uses a TromboneHcd, which differs from the TromboneAssembly
   // because it gets its default log level from the configuration file.
-  test("should able to filter logs based on configured/updated log level (covers all levels) with non-default level | DEOPSCSW-124, DEOPSCSW-125, DEOPSCSW-158") {
+  test(
+    "should able to filter logs based on configured/updated log level (covers all levels) with non-default level | DEOPSCSW-124, DEOPSCSW-125, DEOPSCSW-158"
+  ) {
     val testData = Table(
       ("logLevel", "expectedLogCount"),
       (FATAL, 1),

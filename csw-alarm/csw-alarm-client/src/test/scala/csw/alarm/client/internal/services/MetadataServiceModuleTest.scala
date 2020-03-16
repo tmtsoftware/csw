@@ -89,7 +89,9 @@ class MetadataServiceModuleTest
   }
 
   // DEOPSCSW-464: Fetch Alarm name list for a subsystem name or pattern
-  test("getMetadata should throw exception if no alarms are found while getting metadata by subsystem | DEOPSCSW-486, DEOPSCSW-464") {
+  test(
+    "getMetadata should throw exception if no alarms are found while getting metadata by subsystem | DEOPSCSW-486, DEOPSCSW-464"
+  ) {
     an[KeyNotFoundException] shouldBe thrownBy(getMetadata(SubsystemKey(Subsystem.CSW)).await)
   }
 
@@ -207,7 +209,9 @@ class MetadataServiceModuleTest
 
   // DEOPSCSW-443: Model to represent Alarm Activation status
   // DEOPSCSW-448: Set Activation status for an alarm entity
-  test("should throw exception when tried to activate/deactivate alarm which is not present in alarm store | DEOPSCSW-486, DEOPSCSW-443, DEOPSCSW-448") {
+  test(
+    "should throw exception when tried to activate/deactivate alarm which is not present in alarm store | DEOPSCSW-486, DEOPSCSW-443, DEOPSCSW-448"
+  ) {
     val invalidKey = AlarmKey(Prefix(CSW, "invalid"), "invalid")
 
     an[KeyNotFoundException] shouldBe thrownBy(activate(invalidKey).await)

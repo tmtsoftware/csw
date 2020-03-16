@@ -63,7 +63,9 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
   // DEOPSCSW-545: Start a repeating task with initial offset
   // DEOPSCSW-547: Cancel scheduled timers for periodic tasks
   // DEOPSCSW-549: Time service api
-  test("[TAITime] should schedule a task periodically at given interval after start time | DEOPSCSW-545, DEOPSCSW-547, DEOPSCSW-549") {
+  test(
+    "[TAITime] should schedule a task periodically at given interval after start time | DEOPSCSW-545, DEOPSCSW-547, DEOPSCSW-549"
+  ) {
     val buffer: ArrayBuffer[Int] = ArrayBuffer.empty
     val atomicInt                = new AtomicInteger(0)
     val startTime: TAITime       = new TAITime(TAITime.now().value.plusSeconds(1))

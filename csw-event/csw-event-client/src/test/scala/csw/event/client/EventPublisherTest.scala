@@ -62,7 +62,8 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
 
   //DEOPSCSW-659: Investigate initial latency in event service pub sub API for single publish
   @Test
-  def should_publish_initialization_event_on_publisher_creation__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516_DEOPSCSW_659(): Unit = {
+  def should_publish_initialization_event_on_publisher_creation__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516_DEOPSCSW_659()
+      : Unit = {
     redisTestProps.publisher // access lazy publisher so that it gets evaluated
     val initEventKey = EventKey(s"${Subsystem.CSW}.first.event.init")
     val initEvent    = redisTestProps.subscriber.get(initEventKey).await
@@ -71,7 +72,9 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
 
   //DEOPSCSW-345: Publish events irrespective of subscriber existence
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_publish_and_subscribe_an_event__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516_DEOPSCSW_345(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_publish_and_subscribe_an_event__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516_DEOPSCSW_345(
+      baseProperties: BaseProperties
+  ): Unit = {
     import baseProperties._
 
     val event1             = makeDistinctEvent(Random.nextInt())
@@ -96,7 +99,9 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
   //DEOPSCSW-516: Optionally Publish - API Change
   var cancellable: Cancellable = _
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_publish_an_event_with_duration__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516_DEOPSCSW_345(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_publish_an_event_with_duration__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516_DEOPSCSW_345(
+      baseProperties: BaseProperties
+  ): Unit = {
     import baseProperties._
 
     var counter                      = -1
@@ -126,7 +131,9 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
 
   //DEOPSCSW-341: Allow to reuse single connection for subscribing to multiple EventKeys
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_publish_concurrently_to_the_different_channel__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516_DEOPSCSW_341(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_publish_concurrently_to_the_different_channel__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516_DEOPSCSW_341(
+      baseProperties: BaseProperties
+  ): Unit = {
     import baseProperties._
 
     val queue: mutable.Queue[Event]  = new mutable.Queue[Event]()
@@ -147,7 +154,9 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
   //DEOPSCSW-000: Publish events with block generating future of event
   //DEOPSCSW-516: Optionally Publish - API Change
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_publish_an_event_with_block_generating_future_of_event__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_publish_an_event_with_block_generating_future_of_event__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516(
+      baseProperties: BaseProperties
+  ): Unit = {
     import baseProperties._
 
     var counter                      = -1
@@ -177,7 +186,9 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
 
   //DEOPSCSW-595: Enforce ordering in publish
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_maintain_ordering_while_publish__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516_DEOPSCSW_595(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_maintain_ordering_while_publish__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516_DEOPSCSW_595(
+      baseProperties: BaseProperties
+  ): Unit = {
     import baseProperties._
 
     val prefix             = Prefix("csw.ordering.prefix")
@@ -214,7 +225,9 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
   //DEOPSCSW-515: Include Start Time in API
   //DEOPSCSW-516: Optionally Publish - API Change
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_publish_event_via_event_generator_with_start_time__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_publish_event_via_event_generator_with_start_time__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516(
+      baseProperties: BaseProperties
+  ): Unit = {
     import baseProperties._
 
     val eventKey: EventKey = EventKey("csw.publish.system")
@@ -264,7 +277,9 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
   //DEOPSCSW-515: Include Start Time in API
   //DEOPSCSW-516: Optionally Publish - API Change
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_publish_event_via_asynchronous_event_generator_with_start_time__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_publish_event_via_asynchronous_event_generator_with_start_time__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516(
+      baseProperties: BaseProperties
+  ): Unit = {
     import baseProperties._
 
     var counter                      = -1
@@ -297,7 +312,9 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
   }
 
   @Test(dataProvider = "event-service-provider")
-  def large_event_test__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516(baseProperties: BaseProperties): Unit = {
+  def large_event_test__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516(
+      baseProperties: BaseProperties
+  ): Unit = {
     import baseProperties._
 
     val payloadKey: Key[Byte]       = ByteKey.make("payloadKey")

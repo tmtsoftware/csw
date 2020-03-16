@@ -28,7 +28,9 @@ class EventsTest extends AnyFunSpec with Matchers {
     val k4     = KeyType.ByteKey.make("image")
     val prefix = Prefix("wfos.prog.cloudcover")
 
-    it("should create with prefix and eventName | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-327, DEOPSCSW-328, DEOPSCSW-329, DEOPSCSW-330, DEOPSCSW-331") {
+    it(
+      "should create with prefix and eventName | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-327, DEOPSCSW-328, DEOPSCSW-329, DEOPSCSW-330, DEOPSCSW-331"
+    ) {
       val i1 = k1.set(22)
       val i2 = k2.set(44)
 
@@ -41,7 +43,9 @@ class EventsTest extends AnyFunSpec with Matchers {
       assert(sc1.missingKeys(k1, k2, k3) == Set(k3.keyName))
     }
 
-    it("should create with prefix, eventName, paramSet | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-327, DEOPSCSW-328, DEOPSCSW-329, DEOPSCSW-330, DEOPSCSW-331") {
+    it(
+      "should create with prefix, eventName, paramSet | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-327, DEOPSCSW-328, DEOPSCSW-329, DEOPSCSW-330, DEOPSCSW-331"
+    ) {
       val i1 = k1.set(22)
       val i2 = k2.set(44)
       val i4 = k4.setAll("sensor image".getBytes)
@@ -86,7 +90,9 @@ class EventsTest extends AnyFunSpec with Matchers {
       assert(mutatedSc1.eventId != sc1.eventId)
     }
 
-    it("Should access metadata fields | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-327, DEOPSCSW-328, DEOPSCSW-329, DEOPSCSW-330, DEOPSCSW-331") {
+    it(
+      "Should access metadata fields | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-327, DEOPSCSW-328, DEOPSCSW-329, DEOPSCSW-330, DEOPSCSW-331"
+    ) {
       val i1  = k1.set(22)
       val sc1 = SystemEvent(prefix, eventName).madd(i1)
 
@@ -100,7 +106,9 @@ class EventsTest extends AnyFunSpec with Matchers {
 
     }
 
-    it("each event created should be unique | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-327, DEOPSCSW-328, DEOPSCSW-329, DEOPSCSW-330, DEOPSCSW-331") {
+    it(
+      "each event created should be unique | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-327, DEOPSCSW-328, DEOPSCSW-329, DEOPSCSW-330, DEOPSCSW-331"
+    ) {
       val ev1 = SystemEvent(ck, eventName)
       val ev2 = ev1.add(s1Key -> 2)
       val ev3 = ev2.remove(s1Key)
@@ -122,7 +130,9 @@ class EventsTest extends AnyFunSpec with Matchers {
     val k4     = KeyType.ByteKey.make("image")
     val prefix = Prefix("wfos.prog.cloudcover")
 
-    it("should create with prefix and eventName | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-327, DEOPSCSW-328, DEOPSCSW-329, DEOPSCSW-330, DEOPSCSW-331") {
+    it(
+      "should create with prefix and eventName | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-327, DEOPSCSW-328, DEOPSCSW-329, DEOPSCSW-330, DEOPSCSW-331"
+    ) {
       val i1 = k1.set(22)
       val i2 = k2.set(44)
 
@@ -135,7 +145,9 @@ class EventsTest extends AnyFunSpec with Matchers {
       assert(sc1.missingKeys(k1, k2, k3) == Set(k3.keyName))
     }
 
-    it("should create with prefix, eventName and paramSet | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-327, DEOPSCSW-328, DEOPSCSW-329, DEOPSCSW-330, DEOPSCSW-331") {
+    it(
+      "should create with prefix, eventName and paramSet | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-327, DEOPSCSW-328, DEOPSCSW-329, DEOPSCSW-330, DEOPSCSW-331"
+    ) {
       val i1 = k1.set(22)
       val i2 = k2.set(44)
       val i4 = k4.setAll("sensor image".getBytes)
@@ -180,7 +192,9 @@ class EventsTest extends AnyFunSpec with Matchers {
       assert(mutatedOc1.eventId != oc1.eventId)
     }
 
-    it("Should access metadata fields | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-327, DEOPSCSW-328, DEOPSCSW-329, DEOPSCSW-330, DEOPSCSW-331") {
+    it(
+      "Should access metadata fields | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-327, DEOPSCSW-328, DEOPSCSW-329, DEOPSCSW-330, DEOPSCSW-331"
+    ) {
       val i1  = k1.set(22)
       val oc1 = ObserveEvent(prefix, eventName).madd(i1)
 
@@ -194,7 +208,9 @@ class EventsTest extends AnyFunSpec with Matchers {
 
     }
 
-    it("each event created should be unique | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-327, DEOPSCSW-328, DEOPSCSW-329, DEOPSCSW-330, DEOPSCSW-331") {
+    it(
+      "each event created should be unique | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-327, DEOPSCSW-328, DEOPSCSW-329, DEOPSCSW-330, DEOPSCSW-331"
+    ) {
       val ev1 = ObserveEvent(ck, eventName)
       val ev2 = ev1.add(s1Key -> 2)
       val ev3 = ev2.remove(s1Key)

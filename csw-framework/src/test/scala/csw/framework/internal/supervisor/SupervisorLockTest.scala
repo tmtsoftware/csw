@@ -76,7 +76,9 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
   // DEOPSCSW-222: Locking a component for a specific duration
   // DEOPSCSW-301: Support UnLocking
-  test("should forward command messages from client that locked the component and reject for other clients  | DEOPSCSW-222, DEOPSCSW-301") {
+  test(
+    "should forward command messages from client that locked the component and reject for other clients  | DEOPSCSW-222, DEOPSCSW-301"
+  ) {
     val lockingStateProbe   = TestProbe[LockingResponse]
     val submitResponseProbe = TestProbe[SubmitResponse]
 

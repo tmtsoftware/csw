@@ -40,7 +40,9 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
 
   // DEOPSCSW-47: Unique name for configuration file
   // DEOPSCSW-135: Validation of suffix for active and sha files
-  test("should throw exception for invalid path | DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-135, DEOPSCSW-47, DEOPSCSW-88, DEOPSCSW-138") {
+  test(
+    "should throw exception for invalid path | DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-135, DEOPSCSW-47, DEOPSCSW-88, DEOPSCSW-138"
+  ) {
     val filePath = Paths.get("/test/sample.$active")
 
     a[InvalidInput] shouldBe thrownBy(
@@ -51,7 +53,9 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
   // DEOPSCSW-27: Storing binary component configurations
   // DEOPSCSW-81: Storing large files in the configuration service
   // DEOPSCSW-131: Detect and handle oversize files
-  test("should be able to store and retrieve binary file in annex dir | DEOPSCSW-131, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-27, DEOPSCSW-81, DEOPSCSW-88, DEOPSCSW-138") {
+  test(
+    "should be able to store and retrieve binary file in annex dir | DEOPSCSW-131, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-27, DEOPSCSW-81, DEOPSCSW-88, DEOPSCSW-138"
+  ) {
     val fileName   = "smallBinary.bin"
     val path       = ResourceReader.copyToTmp("/" + fileName, ".bin")
     val configData = ConfigData.fromPath(path)
@@ -81,13 +85,17 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
   }
 
   //DEOPSCSW-75 List the names of configuration files that match a path
-  test("should throw invalid input exception if pattern is invalid | DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-75, DEOPSCSW-88, DEOPSCSW-138") {
+  test(
+    "should throw invalid input exception if pattern is invalid | DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-75, DEOPSCSW-88, DEOPSCSW-138"
+  ) {
     a[InvalidInput] shouldBe thrownBy(configService.list(pattern = Some("?i)")).await)
   }
 
   // DEOPSCSW-576: Auth token for Configuration service
   // DEOPSCSW-69: Use authorization token to get identity of user creating/updating a configuration file
-  test("should throw Unauthorized exception when not logged in | DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-69, DEOPSCSW-88, DEOPSCSW-138") {
+  test(
+    "should throw Unauthorized exception when not logged in | DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-69, DEOPSCSW-88, DEOPSCSW-138"
+  ) {
     val invalidTFactory: TokenFactory = mock[TokenFactory]
     when(invalidTFactory.getToken).thenReturn("")
 
@@ -103,7 +111,9 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
 
   // DEOPSCSW-576: Auth token for Configuration service
   // DEOPSCSW-69: Use authorization token to get identity of user creating/updating a configuration file
-  test("should throw NotAllowed exception when user does not have correct role | DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-69, DEOPSCSW-88, DEOPSCSW-138") {
+  test(
+    "should throw NotAllowed exception when user does not have correct role | DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-69, DEOPSCSW-88, DEOPSCSW-138"
+  ) {
     val invalidTFactory: TokenFactory = mock[TokenFactory]
     when(invalidTFactory.getToken).thenReturn(roleMissingTokenStr)
 
@@ -119,7 +129,9 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
 
   // DEOPSCSW-577: Ability to view detailed change log in SVN
   // DEOPSCSW-625: Include username from svn in history model of config service
-  test("should get the history of a file with correct username | DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-577, DEOPSCSW-625, DEOPSCSW-88, DEOPSCSW-138") {
+  test(
+    "should get the history of a file with correct username | DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-577, DEOPSCSW-625, DEOPSCSW-88, DEOPSCSW-138"
+  ) {
     val user1 = "user1"
     val user2 = "user2"
     val user3 = "user3"
@@ -152,7 +164,9 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
 
   // DEOPSCSW-577: Ability to view detailed change log in SVN
   // DEOPSCSW-625: Include username from svn in history model of config service
-  test("should able to get history of active versions of file with correct user names | DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-577, DEOPSCSW-625, DEOPSCSW-88, DEOPSCSW-138") {
+  test(
+    "should able to get history of active versions of file with correct user names | DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-577, DEOPSCSW-625, DEOPSCSW-88, DEOPSCSW-138"
+  ) {
     val user1 = "user1"
     val user2 = "user2"
     val user3 = "user3"

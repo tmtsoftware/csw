@@ -139,7 +139,9 @@ class CommandsTest extends AnyFunSpec {
     }
 
     // DEOPSCSW-369: Unique runId for commands
-    it("Should create new RunId when a parameter is added or removed | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320, DEOPSCSW-369") {
+    it(
+      "Should create new RunId when a parameter is added or removed | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320, DEOPSCSW-369"
+    ) {
       val i1 = k1.set(22)
 
       val sc1 = Setup(Prefix(ck3), commandName, Some(obsId))
@@ -222,7 +224,9 @@ class CommandsTest extends AnyFunSpec {
     }
 
     // DEOPSCSW-369: Unique runId for commands
-    it("Should create new RunId when a parameter is added or removed | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320, DEOPSCSW-369") {
+    it(
+      "Should create new RunId when a parameter is added or removed | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320, DEOPSCSW-369"
+    ) {
       val i1 = k1.set(22)
 
       val oc1 = Observe(Prefix(ck3), commandName, Some(obsId))
@@ -305,7 +309,9 @@ class CommandsTest extends AnyFunSpec {
     }
 
     // DEOPSCSW-369: Unique runId for commands
-    it("Should create new RunId when a parameter is added or removed | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320, DEOPSCSW-369") {
+    it(
+      "Should create new RunId when a parameter is added or removed | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320, DEOPSCSW-369"
+    ) {
       val i1 = k1.set(22)
 
       val wc1 = Wait(Prefix(ck3), commandName, Some(obsId))

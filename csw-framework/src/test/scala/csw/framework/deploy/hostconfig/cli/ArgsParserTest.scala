@@ -37,7 +37,9 @@ class ArgsParserTest extends scalatest.funsuite.AnyFunSuite with Matchers with B
     )
   }
 
-  test("should able to parse arguments with default value of false when local option is not provided | DEOPSCSW-174, DEOPSCSW-175") {
+  test(
+    "should able to parse arguments with default value of false when local option is not provided | DEOPSCSW-174, DEOPSCSW-175"
+  ) {
     val args                     = Array(inputFilePath, "-s", containerCmdAppScript)
     val options: Option[Options] = silentParse(args)
     options should contain(

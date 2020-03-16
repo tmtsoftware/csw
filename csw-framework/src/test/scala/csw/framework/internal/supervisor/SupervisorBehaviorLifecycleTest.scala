@@ -74,7 +74,9 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   }
 
   // *************** Begin testing of onIdleMessages ***************
-  test("supervisor should accept Running message and register with Location service when LocationServiceUsage is RegisterOnly | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181") {
+  test(
+    "supervisor should accept Running message and register with Location service when LocationServiceUsage is RegisterOnly | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181"
+  ) {
     val testData = new TestData(hcdInfo)
     import testData._
     import testData.testMocks._
@@ -90,7 +92,9 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     supervisorLifecycleStateProbe.expectMessage(SupervisorLifecycleState.Running)
   }
 
-  test("supervisor should accept Running message and should not register when LocationServiceUsage is DoNotRegister | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181") {
+  test(
+    "supervisor should accept Running message and should not register when LocationServiceUsage is DoNotRegister | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181"
+  ) {
     val testData = new TestData(hcdInfo.copy(locationServiceUsage = DoNotRegister))
     import testData._
     import testData.testMocks._
@@ -109,7 +113,9 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   // *************** End of testing onIdleMessages ***************
 
   // *************** Begin testing of onInternalMessage ***************
-  test("supervisor should publish state change after successful registration with location service | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181") {
+  test(
+    "supervisor should publish state change after successful registration with location service | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181"
+  ) {
     val testData = new TestData(hcdInfo)
     import testData._
 
@@ -130,7 +136,9 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     )
   }
 
-  test("supervisor should publish state change if locationServiceUsage is DoNotRegister | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181") {
+  test(
+    "supervisor should publish state change if locationServiceUsage is DoNotRegister | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181"
+  ) {
     val testData = new TestData(hcdInfo)
     import testData._
     val supervisorLifecycleStateProbe            = TestProbe[SupervisorLifecycleState]
@@ -152,7 +160,9 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   // *************** End of testing onInternalMessage ***************
 
   // *************** Begin testing of onCommonMessages ***************
-  test("supervisor should handle LifecycleStateSubscription message by coordinating with pub sub actor | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181") {
+  test(
+    "supervisor should handle LifecycleStateSubscription message by coordinating with pub sub actor | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181"
+  ) {
     val testData = new TestData(hcdInfo)
     import testData._
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]

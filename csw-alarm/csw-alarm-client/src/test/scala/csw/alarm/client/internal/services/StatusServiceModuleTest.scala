@@ -91,7 +91,9 @@ class StatusServiceModuleTest
   // DEOPSCSW-447: Reset api for alarm
   // DEOPSCSW-494: Incorporate changes in set severity, reset, acknowledgement and latch status
   List(Okay, Warning, Major, Indeterminate, Critical).foreach { currentSeverity =>
-    test(s"reset should set latchedSeverity to current severity when current severity is $currentSeverity | DEOPSCSW-447, DEOPSCSW-494" ) {
+    test(
+      s"reset should set latchedSeverity to current severity when current severity is $currentSeverity | DEOPSCSW-447, DEOPSCSW-494"
+    ) {
       val defaultStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
       getMetadata(tromboneAxisLowLimitAlarmKey).await.isLatchable shouldBe true
       defaultStatus.latchedSeverity shouldEqual Disconnected

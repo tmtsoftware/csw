@@ -146,7 +146,9 @@ class DatabaseServiceTest extends AnyFunSuite with Matchers with ScalaFutures wi
   //DEOPSCSW-609: Examples of Record creation
   //DEOPSCSW-613: Examples of querying records
   //DEOPSCSW-610: Examples of Reading Records
-  test("should be able to create, join and group records | DEOPSCSW-607, DEOPSCSW-610, DEOPSCSW-616, DEOPSCSW-609, DEOPSCSW-613, DEOPSCSW-601") {
+  test(
+    "should be able to create, join and group records | DEOPSCSW-607, DEOPSCSW-610, DEOPSCSW-616, DEOPSCSW-609, DEOPSCSW-613, DEOPSCSW-601"
+  ) {
     // create tables films and budget and insert records
     dsl
       .queries(

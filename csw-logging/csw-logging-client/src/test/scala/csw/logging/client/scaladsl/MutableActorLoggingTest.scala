@@ -53,7 +53,9 @@ class MutableActorLoggingTest extends LoggingTestSuite {
   // DEOPSCSW-119: Associate source with each log message
   // DEOPSCSW-121: Define structured tags for log messages
   // CSW-86: Subsystem should be case-insensitive
-  test("messages logged from actor should contain component name, file name, class name, line number and actor path | DEOPSCSW-280, DEOPSCSW-121, DEOPSCSW-117, DEOPSCSW-116, DEOPSCSW-119") {
+  test(
+    "messages logged from actor should contain component name, file name, class name, line number and actor path | DEOPSCSW-280, DEOPSCSW-121, DEOPSCSW-117, DEOPSCSW-116, DEOPSCSW-119"
+  ) {
 
     sendMessagesToActor()
 

@@ -70,7 +70,9 @@ class KafkaFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
   }
 
   //DEOPSCSW-000: Publish events with block generating futre of event
-  test("handle failed publish event with an eventGenerator generating future of event and a callback | DEOPSCSW-398, DEOPSCSW-000") {
+  test(
+    "handle failed publish event with an eventGenerator generating future of event and a callback | DEOPSCSW-398, DEOPSCSW-000"
+  ) {
     val testProbe   = TestProbe[PublishFailure]()(kafkaTestProps.actorSystem)
     val failedEvent = Utils.makeEvent(1)
 
@@ -85,7 +87,9 @@ class KafkaFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
   }
 
   //DEOPSCSW-515: Include Start Time in API
-  test("should invoke onError callback on publish failure [eventGenerator API] with start time and event generator | DEOPSCSW-398, DEOPSCSW-515") {
+  test(
+    "should invoke onError callback on publish failure [eventGenerator API] with start time and event generator | DEOPSCSW-398, DEOPSCSW-515"
+  ) {
     val testProbe   = TestProbe[PublishFailure]()(kafkaTestProps.actorSystem)
     val failedEvent = Utils.makeEvent(1)
 
@@ -103,7 +107,9 @@ class KafkaFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
   }
 
   //DEOPSCSW-515: Include Start Time in API
-  test("should invoke onError callback on publish failure [eventGenerator API] with start time and future of event generator | DEOPSCSW-398, DEOPSCSW-515") {
+  test(
+    "should invoke onError callback on publish failure [eventGenerator API] with start time and future of event generator | DEOPSCSW-398, DEOPSCSW-515"
+  ) {
     val testProbe   = TestProbe[PublishFailure]()(kafkaTestProps.actorSystem)
     val failedEvent = Utils.makeEvent(1)
 
