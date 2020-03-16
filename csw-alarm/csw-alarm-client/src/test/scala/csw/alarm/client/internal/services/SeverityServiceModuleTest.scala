@@ -486,7 +486,7 @@ class SeverityServiceModuleTest
   // DEOPSCSW-444: Set severity api for component
   // DEOPSCSW-494: Incorporate changes in set severity, reset, acknowledgement and latch status
   SeverityTestCases.foreach { testCase =>
-    test(testCase.name) {
+    test(testCase.name + " | DEOPSCSW-444, DEOPSCSW-494") {
       feedTestData(testCase)
       import testCase._
 
@@ -504,7 +504,7 @@ class SeverityServiceModuleTest
   // DEOPSCSW-496: Set Ack status on setSeverity
   // DEOPSCSW-494: Incorporate changes in set severity, reset, acknowledgement and latch status
   AckStatusTestCases.foreach { testCase =>
-    test(testCase.name()) {
+    test(testCase.name() + " | DEOPSCSW-444, DEOPSCSW-494, DEOPSCSW-496") {
       feedTestData(testCase)
       import testCase._
 
@@ -520,7 +520,7 @@ class SeverityServiceModuleTest
 
   // DEOPSCSW-496 : Set Ack status on setSeverity
   AckStatusTestCasesForDisconnected.foreach { testCase =>
-    test(testCase.name(Disconnected)) {
+    test(testCase.name(Disconnected) + " | DEOPSCSW-496") {
       feedTestData(testCase)
       import testCase._
 

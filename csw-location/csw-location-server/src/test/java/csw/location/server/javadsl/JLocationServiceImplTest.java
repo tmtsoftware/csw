@@ -314,7 +314,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
     //DEOPSCSW-308: Add prefix in Location service models
     //CSW-86: Subsystem should be case-insensitive
     @Test
-    public void testListakkaComponentsByPrefix() throws ExecutionException, InterruptedException {
+    public void testListakkaComponentsByPrefix__DEOPSCSW_308() throws ExecutionException, InterruptedException {
         AkkaConnection akkaHcdConnection1 = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "ncc.trombone.hcd1"), JComponentType.HCD));
         AkkaConnection akkaHcdConnection2 = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "ncc.trombone.assembly2"), JComponentType.HCD));
         AkkaConnection akkaHcdConnection3 = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "ncc.trombone.hcd3"), JComponentType.HCD));

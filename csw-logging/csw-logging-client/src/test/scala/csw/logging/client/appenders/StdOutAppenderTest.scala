@@ -84,7 +84,7 @@ class StdOutAppenderTest extends AnyFunSuite with Matchers with BeforeAndAfterEa
 
   // DEOPSCSW-325: Include exception stack trace in stdout log message for exceptions
   // CSW-78: PrefixRedesign for logging
-  test("should able to pretty-print one log message to one line | DEOPSCSW-122") {
+  test("should able to pretty-print one log message to one line | DEOPSCSW-122, DEOPSCSW-325") {
 
     val config = ConfigFactory
       .parseString("csw-logging.appender-config.stdout.oneLine=true")

@@ -250,7 +250,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
   // DEOPSCSW-125: Define severity levels for specific components/log instances
   // This test is identical to above test, except uses a TromboneHcd, which differs from the TromboneAssembly
   // because it gets its default log level from the configuration file.
-  test("should able to filter logs based on configured/updated log level (covers all levels) with non-default level | DEOPSCSW-158") {
+  test("should able to filter logs based on configured/updated log level (covers all levels) with non-default level | DEOPSCSW-124, DEOPSCSW-125, DEOPSCSW-158") {
     val testData = Table(
       ("logLevel", "expectedLogCount"),
       (FATAL, 1),
@@ -301,7 +301,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     }
   }
 
-  test("should able to log exception at ERROR level with complete stacktrace | DEOPSCSW-158") {
+  test("should able to log exception at ERROR level with complete stacktrace | DEOPSCSW-158 | DEOPSCSW-325") {
     val tromboneHcd          = new TromboneHcd()
     val tromboneHcdClassName = tromboneHcd.getClass.getName
 

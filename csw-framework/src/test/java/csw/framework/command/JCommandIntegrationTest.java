@@ -111,7 +111,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
     }
 
     @Test
-    public void testCommandExecutionBetweenComponents__DEOPSCSW_224_DEOPSCSW_317_DEOPSCSW_212_DEOPSCSW_227_DEOPSCSW_228_DEOPSCSW_217_DEOPSCSW_321_DEOPSCSW_234_DEOPSCSW_225() throws Exception {
+    public void testCommandExecutionBetweenComponents__DEOPSCSW_224_DEOPSCSW_317_DEOPSCSW_212_DEOPSCSW_227_DEOPSCSW_228_DEOPSCSW_217_DEOPSCSW_321_DEOPSCSW_234_DEOPSCSW_225_DEOPSCSW_229() throws Exception {
 
         Key<Integer> encoder = JKeyType.IntKey().make("encoder", JUnits.encoder);
         Parameter<Integer> encoderValue = encoder.set(22, 23);
@@ -496,7 +496,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
     }
 
     @Test
-    public void testSubscribeCurrentState__DEOPSCSW_224_DEOPSCSW_317_DEOPSCSW_212_DEOPSCSW_227_DEOPSCSW_228_DEOPSCSW_217_DEOPSCSW_321_DEOPSCSW_234_DEOPSCSW_225() throws InterruptedException {
+    public void testSubscribeCurrentState__DEOPSCSW_224_DEOPSCSW_317_DEOPSCSW_212_DEOPSCSW_227_DEOPSCSW_228_DEOPSCSW_217_DEOPSCSW_321_DEOPSCSW_234_DEOPSCSW_225_DEOPSCSW_372() throws InterruptedException {
         Key<Integer> intKey1 = JKeyType.IntKey().make("encoder", JUnits.encoder);
         Parameter<Integer> intParameter1 = intKey1.set(22, 23);
         Setup setup = new Setup(prefix(), acceptedCmd(), Optional.empty()).add(intParameter1);
@@ -530,7 +530,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
     }
 
     @Test
-    public void testSubscribeOnlyCurrentState__DEOPSCSW_224_DEOPSCSW_317_DEOPSCSW_212_DEOPSCSW_227_DEOPSCSW_228_DEOPSCSW_217_DEOPSCSW_321_DEOPSCSW_234_DEOPSCSW_225() throws InterruptedException {
+    public void testSubscribeOnlyCurrentState__DEOPSCSW_224_DEOPSCSW_317_DEOPSCSW_212_DEOPSCSW_227_DEOPSCSW_228_DEOPSCSW_217_DEOPSCSW_321_DEOPSCSW_234_DEOPSCSW_225_DEOPSCSW_434() throws InterruptedException {
         Key<Integer> intKey1 = JKeyType.IntKey().make("encoder", JUnits.encoder);
         Parameter<Integer> intParameter1 = intKey1.set(22, 23);
         Setup setup = new Setup(prefix(), acceptedCmd(), Optional.empty()).add(intParameter1);
@@ -571,8 +571,8 @@ public class JCommandIntegrationTest extends JUnitSuite {
     }
 
     @Test
-__DEOPSCSW_224_DEOPSCSW_317_DEOPSCSW_212_DEOPSCSW_227_DEOPSCSW_228_DEOPSCSW_217_DEOPSCSW_321_DEOPSCSW_234_DEOPSCSW_225    // Note this is exactly the same as the previous test
-    public void testCRMUsageForSubCommands() throws Exception {
+    // Note this is exactly the same as the previous test
+    public void testCRMUsageForSubCommands__DEOPSCSW_224_DEOPSCSW_317_DEOPSCSW_212_DEOPSCSW_227_DEOPSCSW_228_DEOPSCSW_217_DEOPSCSW_321_DEOPSCSW_234_DEOPSCSW_225() throws Exception {
         Setup crmAddSetup = new Setup(prefix(), crmAddOrUpdateCmd(), Optional.empty());
         CompletableFuture<CommandResponse.SubmitResponse> addOrUpdateCommandF =
                 hcdCmdService.submitAndWait(crmAddSetup, timeout);

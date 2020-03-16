@@ -112,7 +112,7 @@ class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
   }
 
   //DEOPSCSW-000: Publish an event with block generating future of event
-  test("should invoke onError callback on publish failure [eventGenerator API] with future of event generator | DEOPSCSW-398, DEOPSCSW-399, DEOPSCSW-000") {
+  test("should invoke onError callback on publish failure [eventGenerator API] with future of event generator | DEOPSCSW-398, DEOPSCSW-399") {
     import redisTestProps._
     val publisher = eventService.makeNewPublisher()
     val testProbe = TestProbe[PublishFailure]()(actorSystem)
