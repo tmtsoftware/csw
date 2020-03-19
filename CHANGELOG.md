@@ -9,6 +9,40 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
+## [CSW v2.0.0] - 2020-03-19
+
+This is the Second major release of the TMT Common Software for project stakeholders.
+See [here](https://tmtsoftware.github.io/csw/2.0.0/) for a detailed documentation of this version of the CSW software.
+Migration guide for v2.0.0 can be found [here](https://tmtsoftware.github.io/csw/2.0.0/migration_guide/migration-guides.html).
+
+### Changes
+- Simplified CommandResponseManager and removed auto-completion of commands
+- Prefix has Subsystem in constructor 
+- Log statements have subsystem and prefix along with componentName
+- AlarmKey and ComponentKey is constructed from prefix instead of string
+- TcpLocation and HttpLocation has prefix along with AkkaLocation
+- ComponentType is displayed to snake_case from lowercase 
+- Subsystem is displayed in uppercase instead of lowercase
+- ArrayData and MatrixData does not require classtag for creation 
+- Admin routes for setting log level and getting log level are now available via gateway
+- JSON contracts for location and command service added in paradox documentation
+- Internal implementation of csw-services.sh script has changed. It is now based on Coursier and newly created `csw-services` sbt module.
+To start all the CSW services, run `csw-services.sh start` command.
+`csw-services.sh` runs all services in the foreground, pressing `ctr+c` will stop all the services. 
+
+### Version Upgrades
+- Scala version upgrade to 2.13.1
+- SBT version upgrade to 1.3.7
+- Akka version upgrade to 2.6.3
+- Kafka version upgrade to 2.4.0
+- Borer version upgrade to 1.4.0
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/2.0.0/
+- Scaladoc: https://tmtsoftware.github.io/csw/2.0.0/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/2.0.0/api/java/index.html
+
+
 ## [CSW v2.0.0-RC3] - 2020-03-03
 
 This is the release candidate 3 for the second major release of the TMT Common Software for project stakeholders.
