@@ -1,4 +1,4 @@
-package org.tmt.nfiraos.samplehcd;
+package org.tmt.csw.samplehcd;
 
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.SpawnProtocol;

@@ -1,4 +1,4 @@
-package org.tmt.nfiraos.sampleassembly;
+package org.tmt.csw.sample;
 
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.ActorContext;
@@ -29,7 +29,6 @@ import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
 import csw.params.javadsl.JUnits;
-import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 import csw.time.core.models.UTCTime;
 
@@ -46,14 +45,14 @@ import java.util.concurrent.TimeUnit;
  * and if validation is successful, then onSubmit hook gets invoked.
  * You can find more information on this here : https://tmtsoftware.github.io/csw/framework.html
  */
-public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
+public class JSampleHandlersAlarm extends JComponentHandlers {
 
     private JCswContext cswCtx;
     private ILogger log;
     private ActorContext<TopLevelActorMessage> actorContext;
     private final ActorRef<WorkerCommand> commandSender;
 
-    JSampleAssemblyHandlersAlarm(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
+    JSampleHandlersAlarm(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
         super(ctx, cswCtx);
         this.cswCtx = cswCtx;
         this.log = cswCtx.loggerFactory().getLogger(getClass());
@@ -158,7 +157,7 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
     }
     //#track-location
 
-    private EventKey counterEventKey = new EventKey(Prefix.apply("nfiraos.samplehcd"), new EventName("HcdCounter"));
+    private EventKey counterEventKey = new EventKey(Prefix.apply("csw.samplehcd"), new EventName("HcdCounter"));
     private Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter", JUnits.NoUnits);
 
     //#subscribe

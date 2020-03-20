@@ -1,4 +1,4 @@
-package org.tmt.nfiraos.sampleassembly;
+package org.tmt.csw.sample;
 
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.JComponentType;
@@ -30,7 +30,7 @@ public class JSampleAssemblyTest extends JUnitSuite {
     //#setup
     @BeforeClass
     public static void setup() {
-        testKit.spawnStandalone(com.typesafe.config.ConfigFactory.load("JSampleAssemblyStandalone.conf"));
+        testKit.spawnStandalone(com.typesafe.config.ConfigFactory.load("JSampleStandalone.conf"));
     }
 //#setup
 

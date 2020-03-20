@@ -1,4 +1,4 @@
-package org.tmt.nfiraos.samplehcd
+package org.tmt.csw.samplehcd
 
 import akka.actor.Cancellable
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
