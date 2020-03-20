@@ -5,7 +5,7 @@ import akka.actor.testkit.typed.Effect.Watched
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
+import akka.actor.typed.{ActorRef, ActorRefResolver, ActorSystem, SpawnProtocol}
 import csw.alarm.client.AlarmServiceFactory
 import csw.command.client.messages.ContainerCommonMessage.GetContainerLifecycleState
 import csw.command.client.messages.ContainerIdleMessage.SupervisorsCreated
@@ -50,6 +50,7 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
     private[container] var supervisorInfos: Set[SupervisorInfo] = Set.empty
     var componentProbes: Set[TestProbe[ComponentMessage]]       = Set.empty
     val supervisorInfoFactory: SupervisorInfoFactory            = mock[SupervisorInfoFactory]
+    val actorRefResolver: ActorRefResolver                      = mock[ActorRefResolver]
 
     private def answer(ci: ComponentInfo): Future[Some[SupervisorInfo]] = {
       val componentProbe: TestProbe[ComponentMessage] = TestProbe(ci.prefix.toString)
@@ -71,6 +72,7 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
           any[RegistrationFactory]
         )
     ).thenAnswer((_: ActorRef[ContainerIdleMessage], ci: ComponentInfo) => answer(ci))
+    when(actorRefResolver.resolveActorRef(any[String])).thenReturn(TestProbe().ref)
 
     private val registrationFactory: RegistrationFactory = mock[RegistrationFactory]
     when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]]))
@@ -93,7 +95,8 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
           locationService,
           eventService,
           alarmService,
-          mocks.loggerFactory
+          mocks.loggerFactory,
+          actorRefResolver
         )
       )
     )
