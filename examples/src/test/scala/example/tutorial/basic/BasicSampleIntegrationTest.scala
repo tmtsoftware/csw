@@ -31,9 +31,9 @@ class BasicSampleIntegrationTest extends ScalaTestFrameworkTestKit(AlarmServer, 
   )
 
   private val assemblyConnection = AkkaConnection(
-    ComponentId(Prefix(Subsystem.ESW, "SampleAssembly"), ComponentType.Assembly)
+    ComponentId(Prefix(Subsystem.CSW, "sample"), ComponentType.Assembly)
   )
-  private val hcdConnection = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
+  private val hcdConnection = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "samplehcd"), ComponentType.HCD))
 
   private var containerRef: ActorRef[ContainerMessage] = _
 

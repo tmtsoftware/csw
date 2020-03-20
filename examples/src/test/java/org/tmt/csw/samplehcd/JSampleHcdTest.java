@@ -52,10 +52,9 @@ public class JSampleHcdTest extends JUnitSuite {
         testKit.spawnStandalone(com.typesafe.config.ConfigFactory.load("JSampleHcdStandalone.conf"));
     }
 
-    // DEOPSCSW-39: examples of Location Service
     @Test
     public void testHCDShouldBeLocatableUsingLocationService() throws ExecutionException, InterruptedException {
-        AkkaConnection connection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.NFIRAOS, "JSampleHcd"), JComponentType.HCD));
+        AkkaConnection connection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.CSW, "samplehcd"), JComponentType.HCD));
         ILocationService locationService = testKit.jLocationService();
         AkkaLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().orElseThrow();
 
@@ -66,7 +65,7 @@ public class JSampleHcdTest extends JUnitSuite {
     //#subscribe
     @Test
     public void testShouldBeAbleToSubscribeToHCDEvents() throws InterruptedException {
-        EventKey counterEventKey = new EventKey(Prefix.apply("nfiraos.JSampleHcd"), new EventName("HcdCounter"));
+        EventKey counterEventKey = new EventKey(Prefix.apply("csw.samplehcd"), new EventName("HcdCounter"));
         Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter", JUnits.NoUnits);
         IEventService eventService = testKit.jEventService();
         IEventSubscriber subscriber = eventService.defaultSubscriber();
@@ -119,7 +118,7 @@ public class JSampleHcdTest extends JUnitSuite {
 
         Timeout commandResponseTimeout = new Timeout(10, TimeUnit.SECONDS);
 
-        AkkaConnection connection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.NFIRAOS, "JSampleHcd"), JComponentType.HCD));
+        AkkaConnection connection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.CSW, "samplehcd"), JComponentType.HCD));
         ILocationService locationService = testKit.jLocationService();
         AkkaLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().orElseThrow();
 
@@ -145,7 +144,7 @@ public class JSampleHcdTest extends JUnitSuite {
 
         Timeout commandResponseTimeout = new Timeout(1, TimeUnit.SECONDS);
 
-        AkkaConnection connection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.NFIRAOS, "JSampleHcd"), JComponentType.HCD));
+        AkkaConnection connection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.CSW, "samplehcd"), JComponentType.HCD));
         ILocationService locationService = testKit.jLocationService();
         AkkaLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().orElseThrow();
 

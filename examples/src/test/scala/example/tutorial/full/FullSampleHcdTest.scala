@@ -35,7 +35,7 @@ class FullSampleHcdTest
 
   import scala.concurrent.duration._
   test("HCD should be locatable using Location Service") {
-    val connection   = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
+    val connection   = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "samplehcd"), ComponentType.HCD))
     val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
 
     akkaLocation.connection shouldBe connection
@@ -44,7 +44,7 @@ class FullSampleHcdTest
 
   //#subscribe
   test("should be able to subscribe to HCD events") {
-    val counterEventKey = EventKey(Prefix("esw.SampleHcd"), EventName("HcdCounter"))
+    val counterEventKey = EventKey(Prefix("CSW.samplehcd"), EventName("HcdCounter"))
     val hcdCounterKey   = KeyType.IntKey.make("counter")
 
     val eventService = eventServiceFactory.make(locationService)(actorSystem)
@@ -91,7 +91,7 @@ class FullSampleHcdTest
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(4000).withUnits(Units.millisecond)
     val setupCommand                    = Setup(testPrefix, hcdSleep, Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
-    val connection = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
+    val connection = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "samplehcd"), ComponentType.HCD))
 
     val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
 
@@ -105,7 +105,7 @@ class FullSampleHcdTest
 
   test("should handle long command and cancel") {
     implicit val timeout: Timeout = 10.seconds
-    val connection                = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
+    val connection                = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "samplehcd"), ComponentType.HCD))
     val akkaLocation              = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
 
     val hcdCS = CommandServiceFactory.make(akkaLocation)
@@ -133,7 +133,7 @@ class FullSampleHcdTest
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(4000).withUnits(Units.millisecond)
     val setupCommand                    = Setup(testPrefix, hcdSleep, Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
-    val connection = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
+    val connection = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "samplehcd"), ComponentType.HCD))
 
     val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
 

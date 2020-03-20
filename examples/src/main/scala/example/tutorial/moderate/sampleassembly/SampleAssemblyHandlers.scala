@@ -43,7 +43,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   private implicit val timeout: Timeout             = 10.seconds
   private implicit val sched: Scheduler             = ctx.system.scheduler
   private val log                                   = loggerFactory.getLogger
-  private val hcdConnection                         = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
+  private val hcdConnection                         = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "samplehcd"), ComponentType.HCD))
   private var hcdLocation: AkkaLocation             = _
   private var hcdCS: Option[CommandService]         = None
   private val prefix: Prefix                        = cswCtx.componentInfo.prefix
@@ -82,7 +82,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   //#track-location
 
   //#subscribe
-  private val counterEventKey = EventKey(prefix, EventName("HcdCounter"))
+  private val counterEventKey = EventKey(Prefix("CSW.samplehcd"), EventName("HcdCounter"))
   private val hcdCounterKey   = KeyType.IntKey.make("counter")
 
   private def processEvent(event: Event): Unit = {
