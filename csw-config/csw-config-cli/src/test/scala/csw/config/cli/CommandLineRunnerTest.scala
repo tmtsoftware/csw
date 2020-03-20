@@ -60,7 +60,9 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
   }
 
   //DEOPSCSW-72: Retrieve a configuration file to a specified file location on a local disk
-  test("should able to create a file in repo and read it from repo to local disk") {
+  test(
+    "should able to create a file in repo and read it from repo to local disk | DEOPSCSW-112, DEOPSCSW-43, DEOPSCSW-576, DEOPSCSW-72"
+  ) {
 
     commandLineRunner.create(argsParser.parse(createMinimalArgs).get) shouldBe ConfigId(1)
 
@@ -71,7 +73,7 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
     readFile(outputFilePath) shouldEqual inputFileContents
   }
 
-  test("should able to update, delete and check for existence of a file from repo") {
+  test("should able to update, delete and check for existence of a file from repo | DEOPSCSW-112, DEOPSCSW-43, DEOPSCSW-576") {
 
     commandLineRunner.create(argsParser.parse(createMinimalArgs).get)
 
@@ -109,7 +111,7 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
   }
 
   // DEOPSCSW-577: Ability to view detailed change log in SVN
-  test("should be able to list files with author and use filter pattern") {
+  test("should be able to list files with author and use filter pattern | DEOPSCSW-112, DEOPSCSW-43, DEOPSCSW-576, DEOPSCSW-577") {
     val normalFileName                                = "troubleshooting"
     val annexFileName                                 = "firmware"
     def relativeRepoPath(fileName: String, i: String) = s"path/hcd/$fileName$i.conf"
@@ -149,7 +151,7 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
       .toSet shouldBe (annexFiles ++ normalFiles).toSet
   }
 
-  test("should able to set, reset and get the active version of file.") {
+  test("should able to set, reset and get the active version of file. | DEOPSCSW-112, DEOPSCSW-43, DEOPSCSW-576") {
 
     commandLineRunner.create(argsParser.parse(createMinimalArgs).get)
 
@@ -191,7 +193,7 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
   // DEOPSCSW-66: Include identity of configuration file creator/editor
   // DEOPSCSW-577: Ability to view detailed change log in SVN
   // DEOPSCSW-625: Include username from svn in history model of config service
-  test("should able to fetch history of file.") {
+  test("should able to fetch history of file. | DEOPSCSW-576, DEOPSCSW-43, DEOPSCSW-577, DEOPSCSW-112, DEOPSCSW-66, DEOPSCSW-625") {
     val user1 = "user1"
     val user2 = "user2"
     val user3 = "user3"
@@ -223,7 +225,9 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
   // DEOPSCSW-66: Include identity of configuration file creator/editor
   // DEOPSCSW-577: Ability to view detailed change log in SVN
   // DEOPSCSW-625: Include username from svn in history model of config service
-  test("should able to fetch history of active files.") {
+  test(
+    "should able to fetch history of active files. | DEOPSCSW-576, DEOPSCSW-43, DEOPSCSW-577, DEOPSCSW-112, DEOPSCSW-66, DEOPSCSW-625"
+  ) {
     val user1 = "user1"
     val user2 = "user2"
     val user3 = "user3"
@@ -260,7 +264,7 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
       .map(_.id) shouldBe List(update2ConfigId, updateConfigId)
   }
 
-  test("get repository MetaData from server") {
+  test("get repository MetaData from server | DEOPSCSW-112, DEOPSCSW-43, DEOPSCSW-576") {
     val parsedMetaDataArgs: Option[Options] = argsParser.parse(meteDataArgs)
     val actualMetadata                      = commandLineRunner.getMetadata(parsedMetaDataArgs.get)
     actualMetadata.toString should not be empty
@@ -269,14 +273,14 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
   // DEOPSCSW-576: Auth token for Configuration service
   // DEOPSCSW-69: Use authorization token to get identity of user creating/updating a configuration file
   // DEOPSCSW-65: Support name or role of configuration file creator/updater
-  test("login") {
+  test("login | DEOPSCSW-576, DEOPSCSW-43, DEOPSCSW-69, DEOPSCSW-112, DEOPSCSW-65") {
     val loginParams = argsParser.parse(List("login"))
     commandLineRunner.login(loginParams.get)
     verify(nativeAuthAdapter).login()
   }
 
   // DEOPSCSW-576: Auth token for Configuration service
-  test("logout") {
+  test("logout | DEOPSCSW-112, DEOPSCSW-43, DEOPSCSW-576") {
     commandLineRunner.logout()
     verify(nativeAuthAdapter).logout()
   }

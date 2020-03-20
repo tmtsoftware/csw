@@ -47,7 +47,7 @@ public class JRedisFailureTest extends JUnitSuite {
     }
 
     @Test
-    public void failureInPublishingShouldFailFutureWithPublishFailedException() throws InterruptedException, ExecutionException, TimeoutException {
+    public void failureInPublishingShouldFailFutureWithPublishFailedException__DEOPSCSW_398() throws InterruptedException, ExecutionException, TimeoutException {
         IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
         Event event = Utils.makeEvent(2);
         publisher.publish(event).get(10, TimeUnit.SECONDS);
@@ -62,7 +62,7 @@ public class JRedisFailureTest extends JUnitSuite {
 
     //DEOPSCSW-334: Publish an event
     @Test
-    public void handleFailedPublishEventWithACallback() throws InterruptedException, ExecutionException, TimeoutException {
+    public void handleFailedPublishEventWithACallback__DEOPSCSW_398_DEOPSCSW_334() throws InterruptedException, ExecutionException, TimeoutException {
         IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
         TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.actorSystem());
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
@@ -83,7 +83,7 @@ public class JRedisFailureTest extends JUnitSuite {
 
     //DEOPSCSW-334: Publish an event
     @Test
-    public void handleFailedPublishEventWithAnEventGeneratorAndACallback() throws InterruptedException, ExecutionException, TimeoutException {
+    public void handleFailedPublishEventWithAnEventGeneratorAndACallback__DEOPSCSW_398_DEOPSCSW_334() throws InterruptedException, ExecutionException, TimeoutException {
         IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
         TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.actorSystem());
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
@@ -103,7 +103,7 @@ public class JRedisFailureTest extends JUnitSuite {
 
     //DEOPSCSW-000: Publish events with block generating futre of event
     @Test
-    public void handleFailedPublishEventWithAnEventGeneratorGeneratingFutureOfEventAndACallback() throws InterruptedException, ExecutionException, TimeoutException {
+    public void handleFailedPublishEventWithAnEventGeneratorGeneratingFutureOfEventAndACallback__DEOPSCSW_398_DEOPSCSW_000() throws InterruptedException, ExecutionException, TimeoutException {
         IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
         TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.actorSystem());
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
@@ -123,7 +123,7 @@ public class JRedisFailureTest extends JUnitSuite {
 
     //DEOPSCSW-515: Include Start Time in API
     @Test
-    public void handleFailedPublishEventWithAnEventGeneratorGeneratingEventAtSpecificTimeAndACallback() throws InterruptedException, ExecutionException, TimeoutException {
+    public void handleFailedPublishEventWithAnEventGeneratorGeneratingEventAtSpecificTimeAndACallback__DEOPSCSW_398_DEOPSCSW_515() throws InterruptedException, ExecutionException, TimeoutException {
         IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
         TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.actorSystem());
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
@@ -145,7 +145,7 @@ public class JRedisFailureTest extends JUnitSuite {
 
     //DEOPSCSW-515: Include Start Time in API
     @Test
-    public void handleFailedPublishEventWithAnEventGeneratorGeneratingFutureOfEventAtSpecificTimeAndACallback() throws InterruptedException, ExecutionException, TimeoutException {
+    public void handleFailedPublishEventWithAnEventGeneratorGeneratingFutureOfEventAtSpecificTimeAndACallback__DEOPSCSW_398_DEOPSCSW_515() throws InterruptedException, ExecutionException, TimeoutException {
         IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
         TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.actorSystem());
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
@@ -167,7 +167,7 @@ public class JRedisFailureTest extends JUnitSuite {
 
     //DEOPSCSW-516: Optionally Publish - API Change
     @Test
-    public void shouldNotInvokeOnErrorOnOptingToNotPublishEventWithEventGenerator() throws InterruptedException, ExecutionException, TimeoutException {
+    public void shouldNotInvokeOnErrorOnOptingToNotPublishEventWithEventGenerator__DEOPSCSW_398_DEOPSCSW_516() throws InterruptedException, ExecutionException, TimeoutException {
         IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
         TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.actorSystem());
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
@@ -186,7 +186,7 @@ public class JRedisFailureTest extends JUnitSuite {
 
     //DEOPSCSW-516: Optionally Publish - API Change
     @Test
-    public void shouldNotInvokeOnErrorOnOptingToNotPublishEventWithAsyncEventGenerator() throws InterruptedException, ExecutionException, TimeoutException {
+    public void shouldNotInvokeOnErrorOnOptingToNotPublishEventWithAsyncEventGenerator__DEOPSCSW_398_DEOPSCSW_516() throws InterruptedException, ExecutionException, TimeoutException {
         IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
         TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.actorSystem());
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);

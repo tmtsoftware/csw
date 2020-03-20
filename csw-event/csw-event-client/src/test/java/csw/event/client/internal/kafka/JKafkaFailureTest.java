@@ -50,7 +50,7 @@ public class JKafkaFailureTest extends JUnitSuite {
     }
 
     @Test
-    public void failureInPublishingShouldFailFutureWithPublishFailedException() throws InterruptedException, ExecutionException, TimeoutException {
+    public void failureInPublishingShouldFailFutureWithPublishFailedException__DEOPSCSW_398() throws InterruptedException, ExecutionException, TimeoutException {
         exception.expectCause(isA(PublishFailure.class));
 
         // simulate publishing failure as message size is greater than message.max.bytes(1 byte) configured in broker
@@ -59,7 +59,7 @@ public class JKafkaFailureTest extends JUnitSuite {
 
     //DEOPSCSW-334: Publish an event
     @Test
-    public void handleFailedPublishEventWithACallback() {
+    public void handleFailedPublishEventWithACallback__DEOPSCSW_398_DEOPSCSW_334() {
 
         TestProbe<PublishFailure> testProbe = TestProbe.create(kafkaTestProps.actorSystem());
         Event event = Utils.makeEvent(1);
@@ -75,7 +75,7 @@ public class JKafkaFailureTest extends JUnitSuite {
 
     //DEOPSCSW-334: Publish an event
     @Test
-    public void handleFailedPublishEventWithAnEventGeneratorAndACallback() {
+    public void handleFailedPublishEventWithAnEventGeneratorAndACallback__DEOPSCSW_398_DEOPSCSW_334() {
         TestProbe<PublishFailure> testProbe = TestProbe.create(kafkaTestProps.actorSystem());
         Event event = Utils.makeEvent(1);
 
@@ -89,7 +89,7 @@ public class JKafkaFailureTest extends JUnitSuite {
 
     //DEOPSCSW-000: Publish events with block generating futre of event
     @Test
-    public void handleFailedPublishEventWithAnEventGeneratorGeneratingFutureOfEventAndACallback() {
+    public void handleFailedPublishEventWithAnEventGeneratorGeneratingFutureOfEventAndACallback__DEOPSCSW_398_DEOPSCSW_000() {
         TestProbe<PublishFailure> testProbe = TestProbe.create(kafkaTestProps.actorSystem());
         Event event = Utils.makeEvent(1);
 
@@ -103,7 +103,7 @@ public class JKafkaFailureTest extends JUnitSuite {
 
     //DEOPSCSW-515: Include Start Time in API
     @Test
-    public void handleFailedPublishEventWithAnEventGeneratorGeneratingEventAtSpecificStartTimeAndACallback() {
+    public void handleFailedPublishEventWithAnEventGeneratorGeneratingEventAtSpecificStartTimeAndACallback__DEOPSCSW_398_DEOPSCSW_515() {
         TestProbe<PublishFailure> testProbe = TestProbe.create(kafkaTestProps.actorSystem());
         Event event = Utils.makeEvent(1);
 
@@ -119,7 +119,7 @@ public class JKafkaFailureTest extends JUnitSuite {
 
     //DEOPSCSW-515: Include Start Time in API
     @Test
-    public void handleFailedPublishEventWithAnEventGeneratorGeneratingFutureOfEventAtSpecificStartTimeAndACallback() {
+    public void handleFailedPublishEventWithAnEventGeneratorGeneratingFutureOfEventAtSpecificStartTimeAndACallback__DEOPSCSW_398_DEOPSCSW_515() {
         TestProbe<PublishFailure> testProbe = TestProbe.create(kafkaTestProps.actorSystem());
         Event event = Utils.makeEvent(1);
 
@@ -135,7 +135,7 @@ public class JKafkaFailureTest extends JUnitSuite {
 
     //DEOPSCSW-516: Optionally Publish - API Change
     @Test
-    public void shouldNotInvokeOnErrorOnOptingToNotPublishEventWithEventGenerator() {
+    public void shouldNotInvokeOnErrorOnOptingToNotPublishEventWithEventGenerator__DEOPSCSW_398_DEOPSCSW_516() {
         TestProbe<PublishFailure> testProbe = TestProbe.create(kafkaTestProps.actorSystem());
 
         Cancellable cancellable = publisher.publish(Optional::empty, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
@@ -149,7 +149,7 @@ public class JKafkaFailureTest extends JUnitSuite {
 
     //DEOPSCSW-516: Optionally Publish - API Change
     @Test
-    public void shouldNotInvokeOnErrorOnOptingToNotPublishEventWithAsyncEventGenerator() {
+    public void shouldNotInvokeOnErrorOnOptingToNotPublishEventWithAsyncEventGenerator__DEOPSCSW_398_DEOPSCSW_516() {
         TestProbe<PublishFailure> testProbe = TestProbe.create(kafkaTestProps.actorSystem());
         Supplier<CompletableFuture<Optional<Event>>> eventGenerator = () -> CompletableFuture.completedFuture(Optional.empty());
 

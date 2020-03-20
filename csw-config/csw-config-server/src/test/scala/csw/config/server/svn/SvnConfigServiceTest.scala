@@ -14,7 +14,7 @@ class SvnConfigServiceTest extends ConfigServiceTest {
   import serverWiring.actorRuntime._
 
   // DEOPSCSW-141: Change the 'create' API
-  test("create call should create a normal file and active file in repo and reset should not delete active file") {
+  test("create call should create a normal file and active file in repo and reset should not delete active file | DEOPSCSW-141") {
 
     val filePath       = Paths.get("/tmt/tcp/redis/text/redis.conf")
     val activeFilePath = Paths.get(filePath.toString + serverWiring.settings.`active-config-suffix`)

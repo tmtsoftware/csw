@@ -29,6 +29,7 @@ import static csw.logging.client.utils.Eventually.eventually;
 
 // CSW-78: PrefixRedesign for logging
 // CSW-86: Subsystem should be case-insensitive
+// DEOPSCSW-316: Improve Logger accessibility for component developers
 public class ILoggerActorTest extends JUnitSuite {
     protected static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
     protected static LoggingSystem loggingSystem;
@@ -64,7 +65,7 @@ public class ILoggerActorTest extends JUnitSuite {
     }
 
     @Test
-    public void testDefaultLogConfigurationForActor() {
+    public void testDefaultLogConfigurationForActor_DEOPSCSW_316() {
 
         AkkaTypedExtension.UserActorFactory userActorFactory = AkkaTypedExtension.UserActorFactory(actorSystem);
 

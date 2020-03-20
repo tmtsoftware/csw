@@ -147,7 +147,7 @@ public class JLoggerImplAPITest extends JUnitSuite {
     }
 
     @Test
-    public void testOverloadedTraceLogLevel() {
+    public void testOverloadedTraceLogLevel__DEOPSCSW_115_DEOPSCSW_114_DEOPSCSW_278_DEOPSCSW_158_DEOPSCSW_325_DEOPSCSW_271() {
         // test trace overloads with supplier
         logger.trace(() -> message);
         logger.trace(() -> message, runtimeException);
@@ -175,7 +175,7 @@ public class JLoggerImplAPITest extends JUnitSuite {
 
 
     @Test
-    public void testOverloadedDebugLogLevel() {
+    public void testOverloadedDebugLogLevel__DEOPSCSW_115_DEOPSCSW_114_DEOPSCSW_278_DEOPSCSW_158_DEOPSCSW_271() {
         // test debug overloads with supplier
         logger.debug(() -> message);
         logger.debug(() -> message, runtimeException);
@@ -202,7 +202,7 @@ public class JLoggerImplAPITest extends JUnitSuite {
     }
 
     @Test
-    public void testOverloadedInfoLogLevel() {
+    public void testOverloadedInfoLogLevel__DEOPSCSW_115_DEOPSCSW_114_DEOPSCSW_278_DEOPSCSW_158_DEOPSCSW_271() {
         // test info overloads with supplier
         logger.info(() -> message);
         logger.info(() -> message, runtimeException);
@@ -229,7 +229,7 @@ public class JLoggerImplAPITest extends JUnitSuite {
     }
 
     @Test
-    public void testOverloadedWarnLogLevel() {
+    public void testOverloadedWarnLogLevel__DEOPSCSW_115_DEOPSCSW_114_DEOPSCSW_278_DEOPSCSW_158_DEOPSCSW_271() {
         // test warn overloads with supplier
         logger.warn(() -> message);
         logger.warn(() -> message, runtimeException);
@@ -256,7 +256,7 @@ public class JLoggerImplAPITest extends JUnitSuite {
     }
 
     @Test
-    public void testOverloadedErrorLogLevel() {
+    public void testOverloadedErrorLogLevel__DEOPSCSW_115_DEOPSCSW_114_DEOPSCSW_278_DEOPSCSW_158_DEOPSCSW_271() {
         // test error overloads with supplier
         logger.error(() -> message);
         logger.error(() -> message, runtimeException);
@@ -283,7 +283,7 @@ public class JLoggerImplAPITest extends JUnitSuite {
     }
 
     @Test
-    public void testOverloadedFatalLogLevel() {
+    public void testOverloadedFatalLogLevel__DEOPSCSW_115_DEOPSCSW_114_DEOPSCSW_278_DEOPSCSW_158_DEOPSCSW_271() {
 
         // test fatal overloads with supplier
         logger.fatal(() -> message);

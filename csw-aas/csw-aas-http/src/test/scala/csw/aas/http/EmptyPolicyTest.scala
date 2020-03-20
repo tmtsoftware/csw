@@ -17,7 +17,7 @@ import org.scalatest.matchers.should.Matchers
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
 class EmptyPolicyTest extends AnyFunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
-  test("empty policy should return AuthenticationFailedRejection when token is invalid") {
+  test("empty policy should return AuthenticationFailedRejection when token is invalid | DEOPSCSW-579") {
     val authentication: Authentication         = mock[Authentication]
     val securityDirectives: SecurityDirectives = new SecurityDirectives(authentication, "TMT", "test", false)
     //new SecurityDirectives(authentication, authConfig)
@@ -45,7 +45,7 @@ class EmptyPolicyTest extends AnyFunSuite with MockitoSugar with Directives with
     }
   }
 
-  test("empty policy should return AuthenticationFailedRejection when token is not present") {
+  test("empty policy should return AuthenticationFailedRejection when token is not present | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
@@ -66,7 +66,7 @@ class EmptyPolicyTest extends AnyFunSuite with MockitoSugar with Directives with
     }
   }
 
-  test("empty policy should return 200 OK when token is valid & has permission") {
+  test("empty policy should return 200 OK when token is valid & has permission | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 

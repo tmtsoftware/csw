@@ -38,14 +38,14 @@ class CommandLineRunnerTest extends SeedData with Eventually with CommonCodecs {
   import actorRuntime._
 
   // DEOPSCSW-364: [Event Cli] Inspect command
-  test("should able to inspect events containing multiple parameters including recursive structs") {
+  test("should able to inspect events containing multiple parameters including recursive structs | DEOPSCSW-364") {
 
     commandLineRunner.inspect(argsParser.parse(Seq("inspect", "-e", s"${event1.eventKey},${event2.eventKey}")).get).await
     logBuffer shouldEqualContentsOf "oneline/inspect_multiple_events.txt"
   }
 
   // DEOPSCSW-431: [Event Cli] Get command
-  test("should able to get events in json format") {
+  test("should able to get events in json format | DEOPSCSW-431") {
 
     commandLineRunner.get(argsParser.parse(Seq("get", "-e", event1.eventKey.key, "-o", "json")).get).await
     stringToEvent[SystemEvent](logBuffer.head) shouldBe event1
@@ -59,13 +59,13 @@ class CommandLineRunnerTest extends SeedData with Eventually with CommonCodecs {
 
   // DEOPSCSW-431: [Event Cli] Get command
   // CSW-86: Subsystem should be case-insensitive
-  test("should able to get appropriate error message when there is no event published for provided key") {
+  test("should able to get appropriate error message when there is no event published for provided key | DEOPSCSW-431") {
     commandLineRunner.get(argsParser.parse(Seq("get", "-e", "csw.x.y.invalid_key", "--out", "json")).get).await
     logBuffer.head shouldEqual "[ERROR] No events published for key: [CSW.x.y.invalid_key]"
   }
 
   // DEOPSCSW-431: [Event Cli] Get command
-  test("should able to get events in oneline format") {
+  test("should able to get events in oneline format | DEOPSCSW-431") {
 
     commandLineRunner
       .get(argsParser.parse(Seq("get", "--id", "-u", "-t", "-e", s"${event1.eventKey},${event2.eventKey}")).get)
@@ -74,7 +74,7 @@ class CommandLineRunnerTest extends SeedData with Eventually with CommonCodecs {
   }
 
   // DEOPSCSW-431: [Event Cli] Get command
-  test("should able to get events in oneline terse format") {
+  test("should able to get events in oneline terse format | DEOPSCSW-431") {
 
     // note: terse does not sort parameters
     commandLineRunner
@@ -84,7 +84,7 @@ class CommandLineRunnerTest extends SeedData with Eventually with CommonCodecs {
   }
 
   // DEOPSCSW-432: [Event Cli] Publish command
-  test("should able to publish event when event key and event json file provided") {
+  test("should able to publish event when event key and event json file provided | DEOPSCSW-432") {
     val (path, eventContent) = ResourceReader.readAndCopyToTmp("/publish/observe_event.json")
     val eventJson            = Json.parse(eventContent)
 
@@ -102,7 +102,7 @@ class CommandLineRunnerTest extends SeedData with Eventually with CommonCodecs {
   }
 
   // DEOPSCSW-432: [Event Cli] Publish command
-  test("should able to publish event with interval") {
+  test("should able to publish event with interval | DEOPSCSW-432") {
     val queue                = new mutable.Queue[JsObject]()
     val eventKey             = EventKey("tcs.mobie.blue.filter")
     val (path, eventContent) = ResourceReader.readAndCopyToTmp("/publish/observe_event.json")
@@ -127,7 +127,7 @@ class CommandLineRunnerTest extends SeedData with Eventually with CommonCodecs {
   }
 
   // DEOPSCSW-436: [Event Cli] Specialized Publish command (take params from command line)
-  test("should able to publish event when params are provided") {
+  test("should able to publish event when params are provided | DEOPSCSW-436") {
     val filePath                    = "/publish/observe_event.json"
     val (path, observeEventContent) = ResourceReader.readAndCopyToTmp(filePath)
     val eventKey                    = EventKey("wfos.test.move")
@@ -173,7 +173,7 @@ class CommandLineRunnerTest extends SeedData with Eventually with CommonCodecs {
   }
 
   // DEOPSCSW-433: [Event Cli] Subscribe command
-  test("should be able to subscribe and get json output to event key") {
+  test("should be able to subscribe and get json output to event key | DEOPSCSW-433") {
 
     val eventGenerator = new EventGenerator(EventName("system_1"))
     import eventGenerator._
@@ -199,7 +199,7 @@ class CommandLineRunnerTest extends SeedData with Eventually with CommonCodecs {
   }
 
   // DEOPSCSW-433: [Event Cli] Subscribe command
-  test("should be able to subscribe to event key and get oneline output") {
+  test("should be able to subscribe to event key and get oneline output | DEOPSCSW-433") {
     import cliWiring._
 
     val eventGenerator = new EventGenerator(EventName("system_2"))
@@ -222,7 +222,7 @@ class CommandLineRunnerTest extends SeedData with Eventually with CommonCodecs {
   }
 
   // DEOPSCSW-433: [Event Cli] Subscribe command
-  test("should be able to subscribe to event key using terse mode and get oneline output") {
+  test("should be able to subscribe to event key using terse mode and get oneline output | DEOPSCSW-433") {
     import cliWiring._
 
     val eventGenerator = new EventGenerator(EventName("system_3"))

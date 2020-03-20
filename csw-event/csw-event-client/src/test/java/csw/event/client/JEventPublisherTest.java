@@ -71,7 +71,7 @@ public class JEventPublisherTest extends TestNGSuite {
 
     //DEOPSCSW-345: Publish events irrespective of subscriber existence
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_publish_and_subscribe_an_event(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+    public void should_be_able_to_publish_and_subscribe_an_event__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516_DEOPSCSW_345(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         Event event1 = Utils.makeDistinctJavaEvent(new Random().nextInt());
         EventKey eventKey = event1.eventKey();
 
@@ -96,7 +96,7 @@ public class JEventPublisherTest extends TestNGSuite {
     //DEOPSCSW-345: Publish events irrespective of subscriber existence
     //DEOPSCSW-516: Optionally Publish - API Change
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_publish_an_event_with_duration(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
+    public void should_be_able_to_publish_an_event_with_duration__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516_DEOPSCSW_345(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         List<Event> events = new ArrayList<>();
         for (int i = 11; i < 21; i++) {
             events.add(Utils.makeEvent(i));
@@ -132,7 +132,7 @@ public class JEventPublisherTest extends TestNGSuite {
 
     //DEOPSCSW-341: Allow to reuse single connection for subscribing to multiple EventKeys
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_publish_concurrently_to_the_different_channel(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
+    public void should_be_able_to_publish_concurrently_to_the_different_channel__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516_DEOPSCSW_341(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         List<Event> events = new ArrayList<>();
         for (int i = 101; i < 111; i++) {
             events.add(Utils.makeDistinctJavaEvent(i));
@@ -157,7 +157,7 @@ public class JEventPublisherTest extends TestNGSuite {
     //DEOPSCSW-000: Publish events with block generating future of event
     //DEOPSCSW-516: Optionally Publish - API Change
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_publish_an_event_with_block_generating_future_of_event_with_duration(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
+    public void should_be_able_to_publish_an_event_with_block_generating_future_of_event_with_duration__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         List<Event> events = new ArrayList<>();
         for (int i = 31; i < 41; i++) {
             events.add(Utils.makeEventWithPrefix(i, Prefix.apply(JSubsystem.CSW, "move")));
@@ -193,7 +193,7 @@ public class JEventPublisherTest extends TestNGSuite {
 
     //DEOPSCSW-595: Enforce ordering in publish
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_maintain_ordering_while_publish(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
+    public void should_be_able_to_maintain_ordering_while_publish__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516_DEOPSCSW_595(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         Prefix prefix = Prefix.apply("csw.ordering.prefix");
         Event event1 = Utils.makeEventWithPrefix(6, prefix);
         Event event2 = Utils.makeEventWithPrefix(7, prefix);
@@ -231,7 +231,7 @@ public class JEventPublisherTest extends TestNGSuite {
     //DEOPSCSW-515: Include Start Time in API
     //DEOPSCSW-516: Optionally Publish - API Change
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_publish_event_via_event_generator_with_start_time(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
+    public void should_be_able_to_publish_event_via_event_generator_with_start_time__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         List<Event> events = new ArrayList<>();
         for (int i = 31; i < 41; i++) {
             events.add(Utils.makeEventWithPrefix(i, Prefix.apply(JSubsystem.CSW, "start.time.test.publish")));
@@ -267,7 +267,7 @@ public class JEventPublisherTest extends TestNGSuite {
     //DEOPSCSW-515: Include Start Time in API
     //DEOPSCSW-516: Optionally Publish - API Change
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_publish_event_via_asynchronous_event_generator_with_start_time(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
+    public void should_be_able_to_publish_event_via_asynchronous_event_generator_with_start_time__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         List<Event> events = new ArrayList<>();
         for (int i = 31; i < 41; i++) {
             events.add(Utils.makeEventWithPrefix(i, new Prefix(JSubsystem.CSW, "start.time.test.publishAsync")));

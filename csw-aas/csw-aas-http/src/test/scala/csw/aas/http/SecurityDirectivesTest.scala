@@ -25,7 +25,7 @@ import scala.concurrent.duration.FiniteDuration
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
 class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
-  test("secure using customPolicy should return 200 OK when policy matches") {
+  test("secure using customPolicy should return 200 OK when policy matches | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
     import securityDirectives._
@@ -53,7 +53,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
     }
   }
 
-  test("secure using customPolicy should return 200 OK when token not passed and auth is disabled") {
+  test("secure using customPolicy should return 200 OK when token not passed and auth is disabled | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", true)
     import securityDirectives._
@@ -69,7 +69,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
     }
   }
 
-  test("sGet using customPolicy should return 200 OK when policy matches") {
+  test("sGet using customPolicy should return 200 OK when policy matches | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
     import securityDirectives._
@@ -95,7 +95,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
     }
   }
 
-  test("sPost using realmRole should return 200 OK when token is valid & has realmRole") {
+  test("sPost using realmRole should return 200 OK when token is valid & has realmRole | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
     import securityDirectives._
@@ -122,7 +122,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
     }
   }
 
-  test("sPut using permission should return 200 OK when token is valid & has permission") {
+  test("sPut using permission should return 200 OK when token is valid & has permission | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
     import securityDirectives._
@@ -151,7 +151,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
     }
   }
 
-  test("sDelete using clientRole should return 200 OK when token is valid & has clientRole") {
+  test("sDelete using clientRole should return 200 OK when token is valid & has clientRole | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
     import securityDirectives._
@@ -178,7 +178,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
     }
   }
 
-  test("sHead using clientRole should return 200 OK when token is valid & has clientRole") {
+  test("sHead using clientRole should return 200 OK when token is valid & has clientRole | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
     import securityDirectives._
@@ -205,7 +205,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
     }
   }
 
-  test("sPatch using customPolicy should return AuthenticationFailedRejection when token is not present") {
+  test("sPatch using customPolicy should return AuthenticationFailedRejection when token is not present | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
     import securityDirectives._
@@ -223,13 +223,13 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
     }
   }
 
-  test("apply should not resolve AAS location when auth is disabled") {
+  test("apply should not resolve AAS location when auth is disabled | DEOPSCSW-579") {
     val locationService: LocationService = mock[LocationService]
     SecurityDirectives(locationService, disabled = true)
     verify(locationService, never).resolve(any[HttpConnection], any[FiniteDuration])
   }
 
-  test("apply should resolve AAS location when auth is enabled") {
+  test("apply should resolve AAS location when auth is enabled | DEOPSCSW-579") {
     val locationService: LocationService = mock[LocationService]
     when(locationService.resolve(any[HttpConnection], any[FiniteDuration]))
       .thenReturn(Future.successful(Some(HttpLocation(AASConnection.value, URI.create("")))))

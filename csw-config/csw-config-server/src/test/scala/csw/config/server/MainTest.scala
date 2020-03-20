@@ -42,7 +42,7 @@ class MainTest extends HTTPLocationService {
     super.afterAll()
   }
 
-  test("should not start HTTP server if repo does not exist") {
+  test("should not start HTTP server if repo does not exist | DEOPSCSW-130") {
     val actualException = intercept[Exception] {
       Main.start(Array.empty).get
     }
@@ -52,7 +52,7 @@ class MainTest extends HTTPLocationService {
     locationService.find(ConfigServiceConnection.value).await shouldBe None
   }
 
-  test("should init svn repo and register with location service if --initRepo option is provided") {
+  test("should init svn repo and register with location service if --initRepo option is provided | DEOPSCSW-130") {
     val httpService = Main.start(Array("--initRepo")).get._1
 
     try {
@@ -71,7 +71,9 @@ class MainTest extends HTTPLocationService {
     }
   }
 
-  test("should not initialize svn repo if --initRepo option is not provided and should use existing repo if available") {
+  test(
+    "should not initialize svn repo if --initRepo option is not provided and should use existing repo if available | DEOPSCSW-130"
+  ) {
 
     // temporary start a server to create a repo and then shutdown the server
     val tmpHttpService = Main.start(Array("--initRepo")).get._1

@@ -75,7 +75,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
     // DEOPSCSW-42: Storing text based component configuration
     // DEOPSCSW-48: Store new configuration file in Config. service
     @Test
-    public void testCreateAndRetrieveFile() throws ExecutionException, InterruptedException {
+    public void testCreateAndRetrieveFile__DEOPSCSW_42_DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_103_DEOPSCSW_48() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/trombone/assembly/conf/normalfiles/test/test.conf");
         configService.create(path, ConfigData.fromString(configValue1), false, "commit test file").get();
         Optional<ConfigData> configData = configService.getLatest(path).get();
@@ -85,7 +85,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
     // DEOPSCSW-42: Storing text based component configuration
     // DEOPSCSW-48: Store new configuration file in Config. service
     @Test
-    public void testFileAlreadyExistsExceptionOnCreate() throws ExecutionException, InterruptedException {
+    public void testFileAlreadyExistsExceptionOnCreate__DEOPSCSW_42_DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_103_DEOPSCSW_48() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/trombone/assembly/conf/normalfiles/test/test.conf");
         configService.create(path, ConfigData.fromString(configValue1), false, "commit test file").get();
         exception.expectCause(isA(FileAlreadyExists.class));
@@ -93,7 +93,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
     }
 
     @Test
-    public void testCreateFileInAnnexStore() throws ExecutionException, InterruptedException {
+    public void testCreateFileInAnnexStore__DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_103() throws ExecutionException, InterruptedException {
         Path path = Paths.get("SomeAnnexFile.txt");
         configService.create(path, ConfigData.fromString(configValue1), true, "creating file for annex store").get();
         Optional<ConfigData> configData = configService.getLatest(path).get();
@@ -102,7 +102,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
 
     // DEOPSCSW-49: Update an Existing File with a New Version
     @Test
-    public void testUpdateExistingFile() throws ExecutionException, InterruptedException {
+    public void testUpdateExistingFile__DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_103_DEOPSCSW_49() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/assembly.conf");
         configService.create(path, ConfigData.fromString(configValue1), false, "commit assembly conf").get();
         Optional<ConfigData> configData = configService.getLatest(path).get();
@@ -115,7 +115,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
 
     // DEOPSCSW-49: Update an Existing File with a New Version
     @Test
-    public void testUpdateReturnsFileNotFoundExceptionOnAbsenceOfFile() throws ExecutionException, InterruptedException {
+    public void testUpdateReturnsFileNotFoundExceptionOnAbsenceOfFile__DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_103_DEOPSCSW_49() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/trombone/assembly.conf");
         exception.expectCause(isA(FileNotFound.class));
         configService.update(path, ConfigData.fromString(configValue1), "commit assembly conf").get();
@@ -124,14 +124,14 @@ public class JConfigAdminApiTest extends JUnitSuite {
     // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
     // DEOPSCSW-71: Retrieve any version of a configuration file using its unique id
     @Test
-    public void testGetReturnsNoneIfFileNotExists() throws ExecutionException, InterruptedException {
+    public void testGetReturnsNoneIfFileNotExists__DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_71_DEOPSCSW_103_DEOPSCSW_70() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/text/file/not/exist/app.conf");
         Assert.assertEquals(configService.getLatest(path).get(), Optional.empty());
     }
 
     // DEOPSCSW-46: Unique identifier for configuration file version
     @Test
-    public void testEachRevisionHasUniqueId() throws ExecutionException, InterruptedException {
+    public void testEachRevisionHasUniqueId__DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_103_DEOPSCSW_46() throws ExecutionException, InterruptedException {
         Path tromboneHcdConf = Paths.get("trombone/test/hcd/akka/hcd.conf");
         Path tromboneAssemblyConf = Paths.get("trombone/test/assembly/akka/assembly.conf");
         Path tromboneContainerConf = Paths.get("trombone/test/container/akka/container.conf");
@@ -166,7 +166,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
     // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
     // DEOPSCSW-71: Retrieve any version of a configuration file using its unique id
     @Test
-    public void testSpecificVersionRetrieval() throws ExecutionException, InterruptedException {
+    public void testSpecificVersionRetrieval__DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_71_DEOPSCSW_103_DEOPSCSW_70() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/a/b/csw.conf");
         configService.create(path, ConfigData.fromString(configValue1), false, "commit csw conf path").get();
         Assert.assertEquals(configService.getLatest(path).get().orElseThrow().toJStringF(system).get(), configValue1);
@@ -180,7 +180,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
     }
 
     @Test
-    public void testRetrieveVersionBasedOnDate() throws ExecutionException, InterruptedException {
+    public void testRetrieveVersionBasedOnDate__DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_103() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/test.conf");
         configService.create(path, ConfigData.fromString(configValue1), false, "commit initial configuration").get();
         Assert.assertEquals(configService.getLatest(path).get().orElseThrow().toJStringF(system).get(), configValue1);
@@ -199,7 +199,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
     // DEOPSCSW-83: Retrieve file based on range of time for being most recent version
     // DEOPSCSW-577: Ability to view detailed change log in SVN
     @Test
-    public void testHistoryOfAFile() throws ExecutionException, InterruptedException {
+    public void testHistoryOfAFile__DEOPSCSW_63_DEOPSCSW_83_DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_577_DEOPSCSW_45_DEOPSCSW_103_DEOPSCSW_76() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/test.conf");
 
         String firstUser = "firstUser";
@@ -264,7 +264,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
     // DEOPSCSW-48: Store new configuration file in Config. service
     // DEOPSCSW-577: Ability to view detailed change log in SVN
     @Test
-    public void testListAllFiles() throws ExecutionException, InterruptedException {
+    public void testListAllFiles__DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_577_DEOPSCSW_103_DEOPSCSW_48() throws ExecutionException, InterruptedException {
         Path tromboneConfig = Paths.get("trombone.conf");
         Path assemblyConfig = Paths.get("a/b/assembly/assembly.conf");
 
@@ -287,7 +287,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
 
     // DEOPSCSW-74: Check config file existence by unique name
     @Test
-    public void testExists() throws ExecutionException, InterruptedException {
+    public void testExists__DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_103_DEOPSCSW_74() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/test.conf");
         Assert.assertFalse(configService.exists(path).get());
 
@@ -299,7 +299,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
 
     // DEOPSCSW-91: Delete a given path
     @Test
-    public void testDelete() throws ExecutionException, InterruptedException {
+    public void testDelete__DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_103_DEOPSCSW_91() throws ExecutionException, InterruptedException {
         Path path = Paths.get("tromboneHCD.conf");
         configService.create(path, ConfigData.fromString(configValue1), false, "commit trombone config file").get();
 
@@ -315,7 +315,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
     // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
     // DEOPSCSW-139: Provide new routes to get/set the current active version of the file
     @Test
-    public void testGetSetAndResetActiveConfigFile() throws ExecutionException, InterruptedException {
+    public void testGetSetAndResetActiveConfigFile__DEOPSCSW_77_DEOPSCSW_139_DEOPSCSW_78_DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_103_DEOPSCSW_79_DEOPSCSW_70() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/text-files/trombone_hcd/application.conf");
         configService.create(path, ConfigData.fromString(configValue1), false, "hello world").get();
         Assert.assertEquals(configService.getLatest(path).get().orElseThrow().toJStringF(system).get(), configValue1);
@@ -336,7 +336,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
 
     //DEOPSCSW-86: Retrieve a version of a configuration file based on time range for being default version
     @Test
-    public void testGetHistoryOfActiveVersionsOfFile() throws ExecutionException, InterruptedException {
+    public void testGetHistoryOfActiveVersionsOfFile__DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_103_DEOPSCSW_86() throws ExecutionException, InterruptedException {
         String createActiveComment = "initializing active file with the first version";
         // create file
         Path file = Paths.get("/tmt/test/setactive/getactive/resetactive/active.conf");
@@ -391,13 +391,13 @@ public class JConfigAdminApiTest extends JUnitSuite {
     // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
     // DEOPSCSW-139: Provide new routes to get/set the current active version of the file
     @Test
-    public void testGetActiveReturnsNoneIfFileNotExist() throws ExecutionException, InterruptedException {
+    public void testGetActiveReturnsNoneIfFileNotExist__DEOPSCSW_139_DEOPSCSW_78_DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_103_DEOPSCSW_70() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/text-files/trombone_hcd/application.conf");
         Assert.assertEquals(configService.getActive(path).get(), Optional.empty());
     }
 
     @Test
-    public void testListFilesFromAnnexStoreWithoutShaSuffix() throws ExecutionException, InterruptedException {
+    public void testListFilesFromAnnexStoreWithoutShaSuffix__DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_103() throws ExecutionException, InterruptedException {
         Path tromboneConfig = Paths.get("trombone.conf");
         Path assemblyConfig = Paths.get("a/b/assembly/assembly.conf");
 
@@ -424,7 +424,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
 
     // DEOPSCSW-74: Check config file existence by unique name
     @Test
-    public void testFileExistsInAnnexStore() throws ExecutionException, InterruptedException {
+    public void testFileExistsInAnnexStore__DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_103_DEOPSCSW_74() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/test.conf");
         Assert.assertFalse(configService.exists(path).get());
 
@@ -437,7 +437,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
     // DEOPSCSW-49: Update an Existing File with a New Version
     // DEOPSCSW-83: Retrieve file based on range of time for being most recent version
     @Test
-    public void testUpdateAndHistoryOfFilesInAnnexStore() throws ExecutionException, InterruptedException {
+    public void testUpdateAndHistoryOfFilesInAnnexStore__DEOPSCSW_83_DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_103_DEOPSCSW_49() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/binary-files/trombone_hcd/app.bin");
         ConfigId configIdCreate = configService.create(path, ConfigData.fromString(configValue1), true, "commit initial configuration").get();
         Instant createTS = Instant.now();
@@ -473,7 +473,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
     // DEOPSCSW-78: Get the default version of a configuration file
     // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
     @Test
-    public void testGetAndSetActiveConfigFileFromAnnexStore() throws ExecutionException, InterruptedException {
+    public void testGetAndSetActiveConfigFileFromAnnexStore__DEOPSCSW_77_DEOPSCSW_78_DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_103_DEOPSCSW_70() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/binary-files/trombone_hcd/app.bin");
         configService.create(path, ConfigData.fromString(configValue1), true, "some comment").get();
         Assert.assertEquals(configService.getLatest(path).get().orElseThrow().toJStringF(system).get(), configValue1);
@@ -492,7 +492,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
     }
 
     @Test
-    public void testRetrieveVersionBasedOnDateForFileInAnnexStore() throws ExecutionException, InterruptedException {
+    public void testRetrieveVersionBasedOnDateForFileInAnnexStore__DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_103() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/test.conf");
         configService.create(path, ConfigData.fromString(configValue1), true, "commit initial configuration to annex store").get();
         Assert.assertEquals(configService.getLatest(path).get().orElseThrow().toJStringF(system).get(), configValue1);
@@ -506,7 +506,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
     }
 
     @Test
-    public void testActiveFilesAreExcludedInList() throws ExecutionException, InterruptedException {
+    public void testActiveFilesAreExcludedInList__DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_103() throws ExecutionException, InterruptedException {
         Path tromboneConfig = Paths.get("trombone.conf");
         Path assemblyConfig = Paths.get("a/b/assembly/assembly.conf");
 
@@ -541,7 +541,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
 
     //DEOPSCSW-75 List the names of configuration files that match a path
     @Test
-    public void testListIsFilteredBasedOnPattern() throws ExecutionException, InterruptedException {
+    public void testListIsFilteredBasedOnPattern__DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_103_DEOPSCSW_75() throws ExecutionException, InterruptedException {
         Path tromboneConfig = Paths.get("trombone.conf");
         Path assemblyConfig = Paths.get("a/b/assembly/assembly.conf");
         Path hcdConfig = Paths.get("a/b/c/hcd/hcd.conf");
@@ -575,7 +575,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
     //DEOPSCSW-132 List oversize and normal sized files
     //DEOPSCSW-75 List the names of configuration files that match a path
     @Test
-    public void testListIsFilteredBasedOnTypeAndPattern() throws ExecutionException, InterruptedException {
+    public void testListIsFilteredBasedOnTypeAndPattern__DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_132_DEOPSCSW_103_DEOPSCSW_75() throws ExecutionException, InterruptedException {
         Path tromboneConfig = Paths.get("trombone.conf");
         Path hcdConfig = Paths.get("a/b/c/hcd/hcd.conf");
         Path assemblyConfig1 = Paths.get("a/b/assembly/assembly1.conf");
@@ -618,7 +618,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
 
     //DEOPSCSW-140 Provide new routes to get active file as of date
     @Test
-    public void testActiveVersionBasedOnTime() throws ExecutionException, InterruptedException {
+    public void testActiveVersionBasedOnTime__DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_103_DEOPSCSW_140() throws ExecutionException, InterruptedException {
 
         // create file
         Path file = Paths.get("/tmt/test/setactive/getactive/resetactive/active.conf");
@@ -642,7 +642,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
 
     //DEOPSCSW-133: Provide meta config for normal and oversize repo
     @Test
-    public void testGetMetadata() throws ExecutionException, InterruptedException {
+    public void testGetMetadata__DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_103_DEOPSCSW_133() throws ExecutionException, InterruptedException {
         ConfigMetadata metadata = configService.getMetadata().get();
         Assert.assertNotEquals(metadata.repoPath(), "");
         Assert.assertNotEquals(metadata.annexPath(), "");

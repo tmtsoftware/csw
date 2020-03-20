@@ -25,7 +25,7 @@ public class FrameworkTestKitJunitTest extends JUnitSuite {
     private ILocationService locationService = testKit.jLocationService();
 
     @Test
-    public void shouldStartAllProvidedCSWServices() throws ExecutionException, InterruptedException {
+    public void shouldStartAllProvidedCSWServices__DEOPSCSW_592() throws ExecutionException, InterruptedException {
         Optional<TcpLocation> alarmLocation = locationService.find(AlarmServiceConnection.value()).get();
         Assert.assertTrue(alarmLocation.isPresent());
         Assert.assertEquals(alarmLocation.orElseThrow().connection(), AlarmServiceConnection.value());

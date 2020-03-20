@@ -70,7 +70,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
     }
 
     @Test
-    public void testExists() throws ExecutionException, InterruptedException {
+    public void testExists__DEOPSCSW_592() throws ExecutionException, InterruptedException {
         //#exists
         Path filePath = Paths.get("/tmt/trmobone/assembly/hcd.conf");
 
@@ -84,7 +84,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
 
     // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
     @Test
-    public void testGetActive() throws ExecutionException, InterruptedException {
+    public void testGetActive__DEOPSCSW_89() throws ExecutionException, InterruptedException {
         //#getActive
         // construct the path
         Path filePath = Paths.get("/tmt/trmobone/assembly/hcd.conf");
@@ -98,7 +98,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
 
     // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
     @Test
-    public void testCreateUpdateDelete() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
+    public void testCreateUpdateDelete__DEOPSCSW_89() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
         //#create
         //construct ConfigData from String containing ASCII text
         String configString = "axisName11111 = tromboneAxis\naxisName22222 = tromboneAxis2\naxisName3 = tromboneAxis3333";
@@ -133,7 +133,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
 
     // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
     @Test
-    public void testGetById() throws ExecutionException, InterruptedException {
+    public void testGetById__DEOPSCSW_89() throws ExecutionException, InterruptedException {
         //#getById
         Path filePath = Paths.get("/tmt/trombone/assembly/hcd.conf");
         ConfigId id = adminApi.create(filePath, ConfigData.fromString(defaultStrConf), false, "First commit").get();
@@ -146,7 +146,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
 
     // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
     @Test
-    public void testGetLatest() throws ExecutionException, InterruptedException {
+    public void testGetLatest__DEOPSCSW_89() throws ExecutionException, InterruptedException {
         //#getLatest
         //create a file
         Path filePath = Paths.get("/test.conf");
@@ -165,7 +165,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
 
     // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
     @Test
-    public void testGetByTime() throws ExecutionException, InterruptedException {
+    public void testGetByTime__DEOPSCSW_89() throws ExecutionException, InterruptedException {
         //#getByTime
         Instant tInitial = Instant.now();
 
@@ -187,7 +187,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
 
     // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
     @Test
-    public void testList() throws ExecutionException, InterruptedException {
+    public void testList__DEOPSCSW_89() throws ExecutionException, InterruptedException {
         //#list
         Path trombonePath = Paths.get("a/c/trombone.conf");
         Path hcdPath = Paths.get("a/b/c/hcd/hcd.conf");
@@ -229,7 +229,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
 
     // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
     @Test
-    public void testHistory() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
+    public void testHistory__DEOPSCSW_89() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
         //#history
         Path filePath = Paths.get("/a/test.conf");
         ConfigId id0 = adminApi.create(filePath, ConfigData.fromString(defaultStrConf), false, "first commit").get();
@@ -258,7 +258,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
 
     // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
     @Test
-    public void testActiveFileManagement() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
+    public void testActiveFileManagement__DEOPSCSW_89() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
         //#active-file-mgmt
         Instant tBegin = Instant.now();
         Path filePath = Paths.get("/a/test.conf");

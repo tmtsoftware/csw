@@ -98,7 +98,7 @@ class NonFileRotationTest extends AnyFunSuite with Matchers with BeforeAndAfterE
 
   // DEOPSCSW-281 Rolling File Configuration
   // CSW-78: PrefixRedesign for logging
-  test("verify log file rotation is off") {
+  test("verify log file rotation is off | DEOPSCSW-281, DEOPSCSW-649") {
     fileAppender.append(expectedLogMsgJson1, "alternative")
     fileAppender.append(expectedLogMsgJson2, Category.Common.name)
     fileAppender.append(expectedLogMsgJson3, Category.Common.name)

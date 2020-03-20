@@ -36,7 +36,7 @@ public class JArrayKeyTypeTest extends JUnitSuite {
 
     // DEOPSCSW-186: Binary value payload
     @Test
-    public void testByteArrayKeyParameter() {
+    public void testByteArrayKeyParameter__DEOPSCSW_183_DEOPSCSW_190_DEOPSCSW_184_DEOPSCSW_186() {
         String keyName = "ByteKey";
         Key<ArrayData<Byte>> key = JKeyType.ByteArrayKey().make(keyName, NoUnits);
         Key<ArrayData<Byte>> keyUnits = JKeyType.ByteArrayKey().make(keyName, millisecond);
@@ -57,7 +57,7 @@ public class JArrayKeyTypeTest extends JUnitSuite {
     }
 
     @Test
-    public void testShortArrayKeyParameter() {
+    public void testShortArrayKeyParameter__DEOPSCSW_183_DEOPSCSW_190_DEOPSCSW_184() {
         String keyName = "shortKey";
         Key<ArrayData<Short>> key = JKeyType.ShortArrayKey().make(keyName, NoUnits);
         Key<ArrayData<Short>> keyUnits = JKeyType.ShortArrayKey().make(keyName, degree);
@@ -78,7 +78,7 @@ public class JArrayKeyTypeTest extends JUnitSuite {
     }
 
     @Test
-    public void testLongArrayKeyParameter() {
+    public void testLongArrayKeyParameter__DEOPSCSW_183_DEOPSCSW_190_DEOPSCSW_184() {
         String keyName = "longKey";
         Key<ArrayData<Long>> key = JKeyType.LongArrayKey().make(keyName, NoUnits);
         Key<ArrayData<Long>> keyUnits = JKeyType.LongArrayKey().make(keyName, millimeter);
@@ -99,7 +99,7 @@ public class JArrayKeyTypeTest extends JUnitSuite {
     }
 
     @Test
-    public void testIntArrayKeyParameter() {
+    public void testIntArrayKeyParameter__DEOPSCSW_183_DEOPSCSW_190_DEOPSCSW_184() {
         String keyName = "integerKey";
         Key<ArrayData<Integer>> key = JKeyType.IntArrayKey().make(keyName, NoUnits);
         Key<ArrayData<Integer>> keyUnits = JKeyType.IntArrayKey().make(keyName, kilometer);
@@ -121,7 +121,7 @@ public class JArrayKeyTypeTest extends JUnitSuite {
     }
 
     @Test
-    public void testFloatArrayKeyParameter() {
+    public void testFloatArrayKeyParameter__DEOPSCSW_183_DEOPSCSW_190_DEOPSCSW_184() {
         String keyName = "floatKey";
         Key<ArrayData<Float>> key = JKeyType.FloatArrayKey().make(keyName, NoUnits);
         Key<ArrayData<Float>> keyUnits = JKeyType.FloatArrayKey().make(keyName, meter);
@@ -142,7 +142,7 @@ public class JArrayKeyTypeTest extends JUnitSuite {
     }
 
     @Test
-    public void testDoubleArrayKeyParameter() {
+    public void testDoubleArrayKeyParameter__DEOPSCSW_183_DEOPSCSW_190_DEOPSCSW_184() {
         String keyName = "doubleKey";
         Key<ArrayData<Double>> key = JKeyType.DoubleArrayKey().make(keyName, NoUnits);
         Key<ArrayData<Double>> keyUnits = JKeyType.DoubleArrayKey().make(keyName, encoder);

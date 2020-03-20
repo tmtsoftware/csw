@@ -72,7 +72,7 @@ public class JDatabaseServiceFactoryTest extends JUnitSuite {
     //DEOPSCSW-618: Integration with Location Service
     //DEOPSCSW-606: Examples for storing and using authentication information
     @Test
-    public void shouldCreateDSLContextUsingLocationServiceAndDbName() throws InterruptedException, ExecutionException, TimeoutException {
+    public void shouldCreateDSLContextUsingLocationServiceAndDbName__DEOPSCSW_618_DEOPSCSW_620_DEOPSCSW_615_DEOPSCSW_621_DEOPSCSW_606() throws InterruptedException, ExecutionException, TimeoutException {
         DSLContext dsl = dbFactory.jMakeDsl(locationService, dbName).get();
         List<String> resultSet =
                 JooqHelper.fetchAsync(
@@ -86,7 +86,7 @@ public class JDatabaseServiceFactoryTest extends JUnitSuite {
     //DEOPSCSW-618: Integration with Location Service
     //DEOPSCSW-606: Examples for storing and using authentication information
     @Test
-    public void shouldCreateDSLContextUsingLocationServiceDbNameUsernameHolderAndPasswordHolder() throws InterruptedException, ExecutionException, TimeoutException {
+    public void shouldCreateDSLContextUsingLocationServiceDbNameUsernameHolderAndPasswordHolder__DEOPSCSW_618_DEOPSCSW_620_DEOPSCSW_615_DEOPSCSW_621_DEOPSCSW_606() throws InterruptedException, ExecutionException, TimeoutException {
         DSLContext dsl = dbFactory.jMakeDsl(locationService, dbName, ReadUsernameHolder(), ReadPasswordHolder()).get();
 
         List<String> resultSet =
@@ -99,7 +99,7 @@ public class JDatabaseServiceFactoryTest extends JUnitSuite {
     }
 
     @Test
-    public void shouldCreateDSLContextUsingConfig() throws InterruptedException, ExecutionException, TimeoutException {
+    public void shouldCreateDSLContextUsingConfig__DEOPSCSW_620_DEOPSCSW_621_DEOPSCSW_615() throws InterruptedException, ExecutionException, TimeoutException {
         DSLContext dsl = dbFactory.jMakeDsl().get();
 
         List<String> resultSet =
@@ -113,7 +113,7 @@ public class JDatabaseServiceFactoryTest extends JUnitSuite {
 
     //DEOPSCSW-605: Examples for multiple database support
     @Test
-    public void shouldBeAbleToConnectToOtherDatabase() throws InterruptedException, ExecutionException, TimeoutException {
+    public void shouldBeAbleToConnectToOtherDatabase__DEOPSCSW_620_DEOPSCSW_621_DEOPSCSW_615_DEOPSCSW_605() throws InterruptedException, ExecutionException, TimeoutException {
         // create a new database
         testDsl.query("CREATE DATABASE postgres2").executeAsync().toCompletableFuture().get(5, SECONDS);
 

@@ -36,7 +36,7 @@ class AuthIntegrationTest
   private val defaultTimeout: FiniteDuration = 10.seconds
   private val serverTimeout: FiniteDuration  = 30.minutes
 
-  test("it should return 401 for unauthenticated request") {
+  test("it should return 401 for unauthenticated request | DEOPSCSW-571, DEOPSCSW-579") {
 
     runOn(keycloak) {
       val embeddedKeycloak = new EmbeddedKeycloak(KeycloakData.empty, Settings(printProcessLogs = false))
@@ -87,7 +87,7 @@ class AuthIntegrationTest
     enterBarrier("end")
   }
 
-  test("it should return 200 for authenticated request - valid authorization") {
+  test("it should return 200 for authenticated request - valid authorization | DEOPSCSW-571, DEOPSCSW-579") {
     runOn(keycloak) {
       val embeddedKeycloak = new EmbeddedKeycloak(
         KeycloakData(
@@ -160,7 +160,7 @@ class AuthIntegrationTest
     enterBarrier("end")
   }
 
-  test("it should return 403 for unauthorized request") {
+  test("it should return 403 for unauthorized request | DEOPSCSW-571, DEOPSCSW-579") {
     runOn(keycloak) {
       val embeddedKeycloak = new EmbeddedKeycloak(
         KeycloakData(

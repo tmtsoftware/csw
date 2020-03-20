@@ -24,21 +24,21 @@ public class JChoiceKeyTypeTest extends JUnitSuite {
     private final GChoiceKey choiceKey = JKeyType.ChoiceKey().make(keyName, kilometer, choices);
 
     @Test
-    public void choicesAPIShouldBeAccessible() {
+    public void choicesAPIShouldBeAccessible__DEOPSCSW_183_DEOPSCSW_190() {
         Assert.assertTrue(choices.contains(new Choice("B")));
         List<Choice> expectedChoiceList = Arrays.asList(new Choice("A"), new Choice("B"), new Choice("C"));
         Assert.assertEquals(expectedChoiceList, choices.jValues());
     }
 
     @Test
-    public void choiceKeyShouldHaveNameTypeAndChoices() {
+    public void choiceKeyShouldHaveNameTypeAndChoices__DEOPSCSW_183_DEOPSCSW_190() {
         Assert.assertEquals(choices, choiceKey.choices());
         Assert.assertEquals(keyName, choiceKey.keyName());
         Assert.assertEquals(choices, choiceKey.choices());
     }
 
     @Test
-    public void shouldAbleToCreateChoiceParameterWithoutUnits() {
+    public void shouldAbleToCreateChoiceParameterWithoutUnits__DEOPSCSW_183_DEOPSCSW_190() {
         Choice choice1 = new Choice("A");
         Choice choice2 = new Choice("B");
         Choice[] choicesArr = {choice1, choice2};
@@ -57,7 +57,7 @@ public class JChoiceKeyTypeTest extends JUnitSuite {
     }
 
     @Test
-    public void shouldAbleToCreateChoiceParameterWithUnits() {   ///  REVISIT: remove?
+    public void shouldAbleToCreateChoiceParameterWithUnits__DEOPSCSW_183_DEOPSCSW_190() {   ///  REVISIT: remove?
         Choice choice1 = new Choice("A");
         Choice choice2 = new Choice("B");
         Choice[] choicesArr = {choice1, choice2};
@@ -79,7 +79,7 @@ public class JChoiceKeyTypeTest extends JUnitSuite {
     public final ExpectedException exception = ExpectedException.none();
 
     @Test
-    public void shouldThrowExceptionForInvalidChoice() {
+    public void shouldThrowExceptionForInvalidChoice__DEOPSCSW_183_DEOPSCSW_190() {
         Choice invalidChoice = new Choice("D");
         exception.expect(AssertionError.class);
         choiceKey.set(invalidChoice);

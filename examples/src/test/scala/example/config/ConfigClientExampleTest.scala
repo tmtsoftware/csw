@@ -48,7 +48,7 @@ class ConfigClientExampleTest
   val defaultStrConf: String = "foo { bar { baz : 1234 } }"
   //#declare_string_config
 
-  test("exists") {
+  test("exists | DEOPSCSW-89, DEOPSCSW-592") {
     //#exists
     //construct the path
     val filePath = Paths.get("/tmt/trmobone/assembly/hcd.conf")
@@ -65,7 +65,7 @@ class ConfigClientExampleTest
     //#exists
   }
 
-  test("getActive") {
+  test("getActive | DEOPSCSW-89, DEOPSCSW-592") {
     //#getActive
     val doneF = async {
       // construct the path
@@ -80,7 +80,7 @@ class ConfigClientExampleTest
     //#getActive
   }
 
-  test("create-update-delete") {
+  test("create-update-delete | DEOPSCSW-89, DEOPSCSW-592") {
     val futC =
       //#create
       async {
@@ -150,7 +150,7 @@ class ConfigClientExampleTest
     //#delete
   }
 
-  test("getById") {
+  test("getById | DEOPSCSW-89, DEOPSCSW-592") {
     //#getById
     val doneF = async {
       // create a file using API first
@@ -166,7 +166,7 @@ class ConfigClientExampleTest
     //#getById
   }
 
-  test("getLatest") {
+  test("getLatest | DEOPSCSW-89, DEOPSCSW-592") {
     //#getLatest
     val assertionF: Future[Assertion] = async {
       //create a file
@@ -186,7 +186,7 @@ class ConfigClientExampleTest
     //#getLatest
   }
 
-  test("getByTime") {
+  test("getByTime | DEOPSCSW-89, DEOPSCSW-592") {
     //#getByTime
     val assertionF = async {
       val tInitial = Instant.MIN
@@ -208,7 +208,7 @@ class ConfigClientExampleTest
     //#getByTime
   }
 
-  test("list") {
+  test("list | DEOPSCSW-89, DEOPSCSW-592") {
     //#list
     //Here's a list of tuples containing FilePath and FileTyepe(Annex / Normal)
     val paths: List[(Path, FileType)] = List[(Path, FileType)](
@@ -262,7 +262,7 @@ class ConfigClientExampleTest
     //#list
   }
 
-  test("history") {
+  test("history | DEOPSCSW-89, DEOPSCSW-592") {
     //#history
     val assertionF = async {
       val filePath = Paths.get("/a/test.conf")
@@ -289,7 +289,7 @@ class ConfigClientExampleTest
     //#history
   }
 
-  test("historyActive-setActiveVersion-resetActiveVersion-getActiveVersion-getActiveByTime") {
+  test("historyActive-setActiveVersion-resetActiveVersion-getActiveVersion-getActiveByTime | DEOPSCSW-89, DEOPSCSW-592") {
     //#active-file-mgmt
     val assertionF = async {
       val tBegin   = Instant.now()
@@ -347,7 +347,7 @@ class ConfigClientExampleTest
     //#active-file-mgmt
   }
 
-  test("getMetadata") {
+  test("getMetadata | DEOPSCSW-89, DEOPSCSW-592") {
     //#getMetadata
     val assertF = async {
       val metaData: ConfigMetadata = await(adminApi.getMetadata)

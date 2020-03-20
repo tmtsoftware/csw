@@ -29,7 +29,7 @@ class DatabaseServiceFactoryFailureTest extends AnyFunSuite with Matchers with B
     system.whenTerminated.futureValue
   }
 
-  test("should throw DatabaseConnection while connecting with incorrect port") {
+  test("should throw DatabaseConnection while connecting with incorrect port | DEOPSCSW-615") {
     intercept[DatabaseException] {
       // postgres starts on random port but while connecting it tries to look at 5432
       Await.result(dbFactory.makeDsl(), 5.seconds)

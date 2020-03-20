@@ -14,7 +14,7 @@ class BinaryImageByteArrayTest extends AnyFunSpec with Matchers {
   // DEOPSCSW-186: Binary value payload
   // DEOPSCSW-331: Complex payload - Include byte in paramset for Event and ObserveEvent
   describe("test ByteArrayKey") {
-    it("should able to create parameter representing binary image") {
+    it("should able to create parameter representing binary image | DEOPSCSW-186, DEOPSCSW-331") {
       val keyName                        = "imageKey"
       val imageKey: Key[ArrayData[Byte]] = ByteArrayKey.make(keyName)
 

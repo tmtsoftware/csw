@@ -17,7 +17,7 @@ import org.scalatest.matchers.should.Matchers
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
 class PermissionPolicyTest extends AnyFunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
-  test("permission policy should return AuthenticationFailedRejection when token is invalid") {
+  test("permission policy should return AuthenticationFailedRejection when token is invalid | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
@@ -44,7 +44,7 @@ class PermissionPolicyTest extends AnyFunSuite with MockitoSugar with Directives
     }
   }
 
-  test("permission policy should return AuthenticationFailedRejection when token is not present") {
+  test("permission policy should return AuthenticationFailedRejection when token is not present | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
@@ -65,7 +65,7 @@ class PermissionPolicyTest extends AnyFunSuite with MockitoSugar with Directives
     }
   }
 
-  test("permission policy should return AuthorizationFailedRejection when token does not have permission") {
+  test("permission policy should return AuthorizationFailedRejection when token does not have permission | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
@@ -97,7 +97,7 @@ class PermissionPolicyTest extends AnyFunSuite with MockitoSugar with Directives
     }
   }
 
-  test("permission policy should return 200 OK when token is valid & has permission") {
+  test("permission policy should return 200 OK when token is valid & has permission | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
