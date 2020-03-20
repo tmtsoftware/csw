@@ -48,7 +48,7 @@ class TestKitsExampleTest extends AnyFunSuiteLike with BeforeAndAfterAll with Ma
 
     //#spawn-using-testkit
 
-    val connection       = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "SampleAssembly"), Assembly))
+    val connection       = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "sample"), Assembly))
     val assemblyLocation = Await.result(locationService.resolve(connection, 5.seconds), 10.seconds)
     assemblyLocation.value.connection shouldBe connection
   }
