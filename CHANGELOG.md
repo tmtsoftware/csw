@@ -9,6 +9,20 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
+## [CSW v2.0.1] - 2020-03-20
+
+This is a First minor release post Second major release of the TMT Common Software for project stakeholders.
+See [here](https://tmtsoftware.github.io/csw/2.0.1/) for a detailed documentation of this version of the CSW software.
+
+### Changes
+- Updated giter8 template
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/2.0.1/
+- Scaladoc: https://tmtsoftware.github.io/csw/2.0.1/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/2.0.1/api/java/index.html
+
+
 ## [CSW v2.0.0] - 2020-03-19
 
 This is the Second major release of the TMT Common Software for project stakeholders.

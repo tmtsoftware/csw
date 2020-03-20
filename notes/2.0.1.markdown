@@ -1,0 +1,13 @@
+## CSW - TMT Common Software v2.0.1
+
+This is release v2.0.1 of the TMT Common Software.
+
+See [CHANGELOG.md](CHANGELOG.md) for details of all releases.
+
+### Changes
+- Updated giter8 template
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/2.0.1/
+- Scaladoc: https://tmtsoftware.github.io/csw/2.0.1/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/2.0.1/api/java/index.html
