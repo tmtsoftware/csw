@@ -80,7 +80,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   //#track-location
 
   //#subscribe
-  private val counterEventKey = EventKey(Prefix("ESW.SampleHcd"), EventName("HcdCounter"))
+  private val counterEventKey = EventKey(Prefix("CSW.samplehcd"), EventName("HcdCounter"))
   private val hcdCounterKey   = KeyType.IntKey.make("counter")
 
   private def processEvent(event: Event): Unit = {

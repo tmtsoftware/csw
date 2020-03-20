@@ -7,9 +7,9 @@ import csw.prefix.models.Prefix
 
 object SampleInfo {
 
-  val testPrefix: Prefix     = Prefix("ESW.test")
-  val assemblyPrefix: Prefix = Prefix("ESW.sampleassembly")
-  val hcdPrefix: Prefix      = Prefix("ESW.SampleHcd")
+  val testPrefix: Prefix     = Prefix("CSW.test")
+  val assemblyPrefix: Prefix = Prefix("CSW.sampleassembly")
+  val hcdPrefix: Prefix      = Prefix("CSW.samplehcd")
 
   // AssemblyCommands
   val sleep: CommandName             = CommandName("sleep")

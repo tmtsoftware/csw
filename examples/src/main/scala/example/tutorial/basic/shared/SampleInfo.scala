@@ -7,7 +7,7 @@ import csw.prefix.models.Prefix
 
 object SampleInfo {
 
-  val testPrefix: Prefix = Prefix("ESW.test")
+  val testPrefix: Prefix = Prefix("CSW.test")
 
   // Sleep periods in milliseconds for short, medium, and long commands
   val shortSleepPeriod: Long  = 600L

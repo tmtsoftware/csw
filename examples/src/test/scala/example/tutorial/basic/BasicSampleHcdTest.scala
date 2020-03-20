@@ -34,7 +34,7 @@ class BasicSampleHcdTest
 
   import scala.concurrent.duration._
   test("HCD should be locatable using Location Service") {
-    val connection   = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
+    val connection   = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "samplehcd"), ComponentType.HCD))
     val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
 
     akkaLocation.connection shouldBe connection
@@ -43,7 +43,7 @@ class BasicSampleHcdTest
 
   //#subscribe
   test("should be able to subscribe to HCD events") {
-    val counterEventKey = EventKey(Prefix("ESW.SampleHcd"), EventName("HcdCounter"))
+    val counterEventKey = EventKey(Prefix("CSW.samplehcd"), EventName("HcdCounter"))
     val hcdCounterKey   = KeyType.IntKey.make("counter")
 
     val eventService = eventServiceFactory.make(locationService)(actorSystem)
@@ -87,14 +87,14 @@ class BasicSampleHcdTest
     implicit val sleepCommandTimeout: Timeout = Timeout(10000.millis)
 
     // Construct Setup command
-    val testPrefix: Prefix = Prefix("ESW.test")
+    val testPrefix: Prefix = Prefix("CSW.test")
 
     // Helper to get units set
     def setSleepTime(setup: Setup, milli: Long): Setup = setup.add(sleepTimeKey.set(milli).withUnits(Units.millisecond))
 
     val setupCommand = setSleepTime(Setup(testPrefix, hcdSleep, Some(ObsId("2018A-001"))), 5000)
 
-    val connection = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
+    val connection = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "samplehcd"), ComponentType.HCD))
 
     val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
 
@@ -112,14 +112,14 @@ class BasicSampleHcdTest
     implicit val sleepCommandTimeout: Timeout = Timeout(1000.millis)
 
     // Construct Setup command
-    val testPrefix: Prefix    = Prefix("ESW.test")
+    val testPrefix: Prefix    = Prefix("CSW.test")
     val hcdSleep: CommandName = CommandName("hcdSleep")
     // Helper to get units set
     def setSleepTime(milli: Long): Parameter[Long] = sleepTimeKey.set(milli).withUnits(Units.millisecond)
 
     val setupCommand = Setup(testPrefix, hcdSleep, Some(ObsId("2018A-001"))).add(setSleepTime(5000))
 
-    val connection = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
+    val connection = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "samplehcd"), ComponentType.HCD))
 
     val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
 

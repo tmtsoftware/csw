@@ -21,7 +21,7 @@ import java.util.concurrent.ExecutionException;
 
 // DEOPSCSW-39: examples of Location Service
 //#intro
-public class JSampleAssemblyTest extends JUnitSuite {
+public class JSampleTest extends JUnitSuite {
     @ClassRule
     public static final FrameworkTestKitJunitResource testKit =
             new FrameworkTestKitJunitResource(Arrays.asList(JCSWService.AlarmServer, JCSWService.EventServer));
@@ -37,7 +37,7 @@ public class JSampleAssemblyTest extends JUnitSuite {
     //#locate
     @Test
     public void testAssemblyShouldBeLocatableUsingLocationService() throws ExecutionException, InterruptedException {
-        AkkaConnection connection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.NFIRAOS, "JSampleAssembly"), JComponentType.Assembly));
+        AkkaConnection connection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.CSW, "sample"), JComponentType.Assembly));
         ILocationService locationService = testKit.jLocationService();
         AkkaLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().orElseThrow();
 

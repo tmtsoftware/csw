@@ -39,10 +39,10 @@ public class JSampleIntegrationTest extends JUnitSuite {
     private static AkkaLocation containerLocation;
 
     private static AkkaConnection assemblyConnection = new AkkaConnection(
-            new ComponentId(Prefix.apply(JSubsystem.ESW, "JSampleAssembly"), JComponentType.Assembly));
+            new ComponentId(Prefix.apply(JSubsystem.CSW, "sample"), JComponentType.Assembly));
     private static AkkaLocation assemblyLocation;
 
-    private static AkkaConnection hcdConnection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.ESW, "JSampleHcd"), JComponentType.HCD));
+    private static AkkaConnection hcdConnection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.CSW, "samplehcd"), JComponentType.HCD));
     private static AkkaLocation hcdLocation;
     private static IEventSubscriber subscriber;
     private static EventKey receivedHcdEvent;

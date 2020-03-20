@@ -32,9 +32,9 @@ class ModerateSampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer,
     ComponentId(Prefix(Subsystem.Container, "SampleContainer"), ComponentType.Container)
   )
   private val assemblyConnection = AkkaConnection(
-    ComponentId(Prefix(Subsystem.ESW, "SampleAssembly"), ComponentType.Assembly)
+    ComponentId(Prefix(Subsystem.CSW, "sample"), ComponentType.Assembly)
   )
-  private val hcdConnection = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
+  private val hcdConnection = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "samplehcd"), ComponentType.HCD))
 
   override def beforeAll(): Unit = {
     super.beforeAll()
