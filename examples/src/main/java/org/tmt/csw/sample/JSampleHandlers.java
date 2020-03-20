@@ -1,4 +1,4 @@
-package org.tmt.nfiraos.sampleassembly;
+package org.tmt.csw.sample;
 
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.ActorContext;
@@ -43,14 +43,14 @@ import java.util.concurrent.TimeUnit;
  * and if validation is successful, then onSubmit hook gets invoked.
  * You can find more information on this here : https://tmtsoftware.github.io/csw/framework.html
  */
-public class JSampleAssemblyHandlers extends JComponentHandlers {
+public class JSampleHandlers extends JComponentHandlers {
 
     private JCswContext cswCtx;
     private ILogger log;
     private ActorContext<TopLevelActorMessage> actorContext;
     private final ActorRef<WorkerCommand> commandSender;
 
-    JSampleAssemblyHandlers(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
+    JSampleHandlers(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
         super(ctx, cswCtx);
         this.cswCtx = cswCtx;
         this.log = cswCtx.loggerFactory().getLogger(getClass());
@@ -187,7 +187,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     //#track-location
 
     //#subscribe
-    private EventKey counterEventKey = new EventKey(Prefix.apply(JSubsystem.NFIRAOS, "samplehcd"), new EventName("HcdCounter"));
+    private EventKey counterEventKey = new EventKey(Prefix.apply(JSubsystem.CSW, "samplehcd"), new EventName("HcdCounter"));
     private Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter", JUnits.NoUnits);
 
     private void processEvent(Event event) {

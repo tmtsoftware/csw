@@ -1,4 +1,4 @@
-package org.tmt.nfiraos.sampleassembly
+package org.tmt.csw.sample
 
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.util.Timeout
@@ -31,7 +31,7 @@ import scala.util.{Failure, Success}
  * and if validation is successful, then onSubmit hook gets invoked.
  * You can find more information on this here : https://tmtsoftware.github.io/csw/framework.html
  */
-class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
+class SampleHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
     extends ComponentHandlers(ctx, cswCtx) {
 
   import cswCtx._
@@ -108,7 +108,7 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
   }
   //#track-location
 
-  private val counterEventKey = EventKey(Prefix("nfiraos.samplehcd"), EventName("HcdCounter"))
+  private val counterEventKey = EventKey(Prefix("CSW.samplehcd"), EventName("HcdCounter"))
   private val hcdCounterKey   = KeyType.IntKey.make("counter")
 
   //#subscribe

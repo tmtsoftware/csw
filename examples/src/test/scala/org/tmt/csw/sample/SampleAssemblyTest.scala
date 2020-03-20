@@ -1,4 +1,4 @@
-package org.tmt.nfiraos.sampleassembly
+package org.tmt.csw.sample
 
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.api.models.Connection.AkkaConnection
@@ -18,7 +18,7 @@ class SampleAssemblyTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSer
   //#setup
   override def beforeAll(): Unit = {
     super.beforeAll()
-    spawnStandalone(com.typesafe.config.ConfigFactory.load("SampleAssemblyStandalone.conf"))
+    spawnStandalone(com.typesafe.config.ConfigFactory.load("SampleStandalone.conf"))
   }
   //#setup
 
