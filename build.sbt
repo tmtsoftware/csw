@@ -556,7 +556,7 @@ lazy val `csw-database` = project
 /* =============== Common Utilities ============ */
 lazy val `csw-network-utils` = project
   .dependsOn(`csw-logging-client`)
-  .enablePlugins(PublishBintray)
+  .enablePlugins(PublishBintray, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.NetworkUtils.value
   )
