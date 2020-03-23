@@ -21,14 +21,14 @@ jobs:
 
       - name: Build
         run: |
-          sbt scalafmtCheck
-          sbt clean makeSite
+          sbt clean scalafmtCheck
+          sbt makeSite
           sbt ';set every Seq(enableFatalWarnings := true, scalafmtOnCompile := false); scalastyle; test:compile; multi-jvm:compile;'
 
       - name: Unit and Component Tests
         run: |
-          sbt -DenableCoverage=true -DdisableTimeTests ';set every enableFatalWarnings := true; test:test'
           sbt -DenableCoverage=true ';set every enableFatalWarnings := true; csw-time/test:test'
+          sbt -DenableCoverage=true -DdisableTimeTests ';set every enableFatalWarnings := true; test:test'
 
       - name: Coverage Report
         run: |
