@@ -20,7 +20,7 @@ import scala.concurrent.duration.FiniteDuration;
 
 public class JConfigClientBaseSuite extends JMockedAuthentication {
 
-    private csw.location.server.internal.ServerWiring locationWiring = new csw.location.server.internal.ServerWiring();
+    private csw.location.server.internal.ServerWiring locationWiring = new csw.location.server.internal.ServerWiring(false);
 
     private ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create(SpawnProtocol.create(), "Guardian"));
     private ILocationService clientLocationService = JHttpLocationServiceFactory.makeLocalClient(actorRuntime.typedSystem());

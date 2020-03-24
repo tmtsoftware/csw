@@ -17,9 +17,9 @@ import csw.common.components.command.CommandComponentState._
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.api.models
-import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
+import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.client.ActorSystemFactory
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup
@@ -36,7 +36,7 @@ import scala.concurrent.{Await, ExecutionContext}
 //CSW-82: ComponentInfo should take prefix
 class CommandHttpIntegrationTests extends FrameworkIntegrationSuite {
 
-  import testWiring._
+  import testWiring.seedLocationService
 
   private val wfosContainerConnection = AkkaConnection(
     ComponentId(Prefix(Subsystem.Container, "WFOS_Container"), ComponentType.Container)
@@ -44,7 +44,7 @@ class CommandHttpIntegrationTests extends FrameworkIntegrationSuite {
   private val filterAssemblyConnection  = HttpConnection(models.ComponentId(Prefix(Subsystem.WFOS, "FilterASS"), Assembly))
   private val filterAssemblyConnection2 = AkkaConnection(models.ComponentId(Prefix(Subsystem.WFOS, "FilterASS"), Assembly))
   private val filterHCDConnection       = HttpConnection(models.ComponentId(Prefix(Subsystem.WFOS, "FilterHCD"), HCD))
-  private val containerActorSystem: ActorSystem[SpawnProtocol.Command] =
+  implicit private val containerActorSystem: ActorSystem[SpawnProtocol.Command] =
     ActorSystemFactory.remote(SpawnProtocol(), "container-system")
   val obsId                         = Some(ObsId("Obs001"))
   implicit val timeout: Timeout     = 12.seconds
@@ -56,7 +56,9 @@ class CommandHttpIntegrationTests extends FrameworkIntegrationSuite {
     super.afterAll()
   }
 
-  test("should start multiple components within a single container and exercise features of Command Service using http") {
+  test(
+    "should start multiple components within a single container and exercise features of Command Service using http | DEOPSCSW-372"
+  ) {
 
     val wiring = FrameworkWiring.make(containerActorSystem, mock[RedisClient])
     // start a container and verify it moves to running lifecycle state

@@ -35,7 +35,9 @@ class JsonContractTest extends AnyFunSpec with Matchers {
 
   describe("Test Sequence Commands") {
 
-    it("should adhere to specified standard Setup json format") {
+    it(
+      "should adhere to specified standard Setup json format | DEOPSCSW-183, DEOPSCSW-188, DEOPSCSW-282, DEOPSCSW-184, DEOPSCSW-423, DEOPSCSW-401"
+    ) {
       val raDecKey   = KeyType.RaDecKey.make("coords")
       val raDec1     = RaDec(7.3, 12.1)
       val raDec2     = RaDec(9.1, 2.9)
@@ -54,7 +56,9 @@ class JsonContractTest extends AnyFunSpec with Matchers {
       setupToJson shouldEqual expectedSetupJson
     }
 
-    it("should adhere to specified standard Observe json format") {
+    it(
+      "should adhere to specified standard Observe json format | DEOPSCSW-183, DEOPSCSW-188, DEOPSCSW-282, DEOPSCSW-184, DEOPSCSW-423, DEOPSCSW-401"
+    ) {
       val k1      = KeyType.IntKey.make("repeat")
       val k2      = KeyType.StringKey.make("expTime")
       val i1      = k1.set(22)
@@ -69,7 +73,9 @@ class JsonContractTest extends AnyFunSpec with Matchers {
       observeToJson shouldEqual expectedObserveJson
     }
 
-    it("should adhere to specified standard Wait json format") {
+    it(
+      "should adhere to specified standard Wait json format | DEOPSCSW-183, DEOPSCSW-188, DEOPSCSW-282, DEOPSCSW-184, DEOPSCSW-423, DEOPSCSW-401"
+    ) {
       val k1                   = LongMatrixKey.make("myMatrix")
       val m1: MatrixData[Long] = MatrixData.fromArrays(Array(1, 2, 3), Array(2, 3, 6), Array(4, 6, 12))
       val m2: MatrixData[Long] = MatrixData.fromArrays(Array(2, 3, 4), Array(5, 6, 7), Array(8, 9, 10))
@@ -87,7 +93,9 @@ class JsonContractTest extends AnyFunSpec with Matchers {
 
   describe("Test Events") {
 
-    it("should adhere to specified standard ObserveEvent json format") {
+    it(
+      "should adhere to specified standard ObserveEvent json format | DEOPSCSW-183, DEOPSCSW-188, DEOPSCSW-282, DEOPSCSW-184, DEOPSCSW-423, DEOPSCSW-401"
+    ) {
       val structKey = StructKey.make("myStruct")
 
       val ra         = KeyType.StringKey.make("ra")
@@ -104,7 +112,9 @@ class JsonContractTest extends AnyFunSpec with Matchers {
       observeEventToJson shouldEqual expectedObserveEventJson
     }
 
-    it("should adhere to specified standard SystemEvent json format") {
+    it(
+      "should adhere to specified standard SystemEvent json format | DEOPSCSW-183, DEOPSCSW-188, DEOPSCSW-282, DEOPSCSW-184, DEOPSCSW-423, DEOPSCSW-401"
+    ) {
       val a1: Array[Byte] = Array[Byte](1, 2, 3, 4, 5)
 
       val arrayDataKey   = KeyType.ByteArrayKey.make("arrayDataKey")
@@ -120,7 +130,9 @@ class JsonContractTest extends AnyFunSpec with Matchers {
 
   describe("Test State Variables") {
 
-    it("should adhere to specified standard CurrentState json format") {
+    it(
+      "should adhere to specified standard CurrentState json format | DEOPSCSW-183, DEOPSCSW-188, DEOPSCSW-282, DEOPSCSW-184, DEOPSCSW-423, DEOPSCSW-401"
+    ) {
       val charKey        = KeyType.CharKey.make("charKey")
       val intArrayKey    = KeyType.IntArrayKey.make("intArrayKey")
       val a1: Array[Int] = Array(1, 2, 3, 4, 5)
@@ -146,7 +158,9 @@ class JsonContractTest extends AnyFunSpec with Matchers {
       currentStateToJson shouldBe expectedCurrentStateJson
     }
 
-    it("should adhere to specified standard DemandState json format") {
+    it(
+      "should adhere to specified standard DemandState json format | DEOPSCSW-183, DEOPSCSW-188, DEOPSCSW-282, DEOPSCSW-184, DEOPSCSW-423, DEOPSCSW-401"
+    ) {
       val charKey    = KeyType.CharKey.make("charKey")
       val intKey     = KeyType.IntKey.make("intKey")
       val booleanKey = KeyType.BooleanKey.make("booleanKey")
@@ -172,7 +186,9 @@ class JsonContractTest extends AnyFunSpec with Matchers {
 
   // DEOPSCSW-661: Create UTCTimeKey and TAITimeKey replacing TimestampKey in Protobuf parameters
   describe("Exercise all types of keys") {
-    it("should able to serialize and deserialize Setup command with all keys to and from json") {
+    it(
+      "should able to serialize and deserialize Setup command with all keys to and from json | DEOPSCSW-183, DEOPSCSW-188, DEOPSCSW-282, DEOPSCSW-184, DEOPSCSW-423, DEOPSCSW-401, DEOPSCSW-661"
+    ) {
       val setup         = Setup(prefix, CommandName("move"), Some(obsId), ParamSetData.paramSet)
       val setupToJson   = JsonSupport.writeSequenceCommand(setup)
       val originalSetup = JsonSupport.readSequenceCommand[Setup](setupToJson)

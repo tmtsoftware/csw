@@ -35,12 +35,12 @@ object ParameterArgParser {
   private def createParam(keyArg: KeyArg, values: Array[String]): Parameter[_] = {
     import keyArg._
     keyType match {
-      case 'i' => IntKey.make(keyName).set(values.map(_.toInt), units)
-      case 's' => StringKey.make(keyName).set(values.map(_.toString), units)
-      case 'f' => FloatKey.make(keyName).set(values.map(_.toFloat), units)
-      case 'd' => DoubleKey.make(keyName).set(values.map(_.toDouble), units)
-      case 'l' => LongKey.make(keyName).set(values.map(_.toLong), units)
-      case 'b' => BooleanKey.make(keyName).set(values.map(_.toBoolean), units)
+      case 'i' => IntKey.make(keyName, units).setAll(values.map(_.toInt))
+      case 's' => StringKey.make(keyName, units).setAll(values.map(_.toString))
+      case 'f' => FloatKey.make(keyName, units).setAll(values.map(_.toFloat))
+      case 'd' => DoubleKey.make(keyName, units).setAll(values.map(_.toDouble))
+      case 'l' => LongKey.make(keyName, units).setAll(values.map(_.toLong))
+      case 'b' => BooleanKey.make(keyName).setAll(values.map(_.toBoolean))
       case _   => throw new RuntimeException(s"""
            |Unsupported key type [${keyArg.keyType}] provided.
            |Supported key types are:

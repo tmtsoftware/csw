@@ -1,7 +1,6 @@
 package csw.params.core.generics
 
 import csw.params.core.models.Units
-import csw.params.core.models.Units.NoUnits
 
 import scala.annotation.varargs
 import scala.collection.mutable
@@ -19,22 +18,12 @@ import scala.runtime.ScalaRunTime._
 case class Key[S: ClassTag] private[generics] (keyName: String, keyType: KeyType[S], units: Units) {
 
   /**
-   * An overloaded constructor to create Key with no units
-   *
-   * @param keyName the name of the key
-   * @param keyType reference to an object of type KeyType[S]
-   * @return an instance of Key[S]
-   */
-  def this(keyName: String, keyType: KeyType[S]) = this(keyName, keyType, NoUnits)
-
-  /**
    * Set values against this key
    *
    * @param values an Array of values
-   * @param units applicable units
    * @return an instance of Parameter[S] containing the key name, values (call withUnits() on the result to set the units)
    */
-  def set(values: Array[S], units: Units = NoUnits): Parameter[S] =
+  def setAll(values: Array[S]): Parameter[S] =
     Parameter(keyName, keyType, mutable.ArraySeq.make(values), units)
 
   /**
@@ -44,7 +33,8 @@ case class Key[S: ClassTag] private[generics] (keyName: String, keyType: KeyType
    * @return an instance of Parameter[S] containing the key name, values (call withUnits() on the result to set the units)
    */
   @varargs
-  def set(values: S*): Parameter[S] = Parameter(keyName, keyType, mutable.ArraySeq.make(values.toArray[S]), units)
+  def set(value: S, values: S*): Parameter[S] =
+    Parameter(keyName, keyType, mutable.ArraySeq.make(value +: values.toArray[S]), units)
 
   /**
    * Sets the values for the key
@@ -60,23 +50,7 @@ case class Key[S: ClassTag] private[generics] (keyName: String, keyType: KeyType
    * @param values one or more values
    * @return a parameter containing the key name and one value (call withUnits() on the result to set the units)
    */
-  def ->(values: S*): Parameter[S] = set(values: _*)
-
-  /**
-   * Sets the value and units for the key
-   * This definition enables writing code like this:
-   * {{{
-   *   val setup = sc(
-   *    prefix,
-   *     key1 -> (value1, units1),
-   *     key2 -> (value2, units2)
-   *   )
-   * }}}
-   *
-   * @param values a pair containing a single value for the key and the units of the value
-   * @return a parameter containing the key name, values and units
-   */
-  def ->(values: (S, Units)): Parameter[S] = set(Array(values._1), values._2)
+  def ->(value: S, values: S*): Parameter[S] = set(value, values: _*)
 
   /**
    * Sets the values for the key as a Scala Vector
@@ -91,7 +65,7 @@ case class Key[S: ClassTag] private[generics] (keyName: String, keyType: KeyType
    * @param values an Array of values
    * @return a parameter containing the key name and values (call withUnits() on the result to set the units)
    */
-  def ->(values: Array[S]): Parameter[S] = set(values)
+  def ->(values: Array[S]): Parameter[S] = setAll(values)
 
   /**
    * Returns a string representation of Key as keyName

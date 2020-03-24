@@ -7,6 +7,7 @@ import csw.params.commands.Setup;
 import csw.params.commands.Wait;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
+import csw.params.javadsl.JUnits;
 import csw.prefix.models.Prefix;
 import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
@@ -19,8 +20,8 @@ public abstract class JavaCommandHandler {
 
     private static final Prefix prefix = Prefix.apply(JSubsystem.WFOS, "red.detector");
 
-    private static final Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder");
-    private static final Key<String> epochStringKey = JKeyType.StringKey().make("epoch");
+    private static final Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder", JUnits.encoder);
+    private static final Key<String> epochStringKey = JKeyType.StringKey().make("epoch", JUnits.year);
 
     static final Parameter<Integer> encoderParam = encoderIntKey.set(55, 66);
     static final Parameter<String> epochStringParam = epochStringKey.set("Event1", "Event2");

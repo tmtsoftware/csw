@@ -24,43 +24,43 @@ class ArgsParserTest extends AnyFunSuite with Matchers {
       }
     }
 
-  test("parse without arguments") {
+  test("parse without arguments | ") {
     val args = Array("")
     silentParse(args) shouldBe None
   }
 
   // DEOPSCSW-364: [Event Cli] Inspect command
-  test("parse inspect command without any options") {
+  test("parse inspect command without any options | DEOPSCSW-364") {
     val args = Array("inspect")
     silentParse(args) shouldBe None
   }
 
   // DEOPSCSW-364: [Event Cli] Inspect command
-  test("parse inspect command with only mandatory options") {
+  test("parse inspect command with only mandatory options | DEOPSCSW-364") {
     val args = Array("inspect", "-e", "csw.a.b.c,csw.x.y.z")
     silentParse(args) shouldBe Some(Options("inspect", eventKeys = eventKeys))
   }
 
-  test("parse get command without any options") {
+  test("parse get command without any options | ") {
     val args = Array("get")
     silentParse(args) shouldBe None
   }
 
-  test("parse get with only mandatory options") {
+  test("parse get with only mandatory options | ") {
     val args = Array("get", "-e", "csw.a.b.c,csw.x.y.z")
     silentParse(args) shouldBe Some(
       Options("get", eventsMap = Map(EventKey("csw.a.b.c") -> Set(), EventKey("csw.x.y.z") -> Set()))
     )
   }
 
-  test("parse get with json output") {
+  test("parse get with json output | ") {
     val args = Array("get", "-e", "csw.a.b.c,csw.x.y.z:k2:k3", "-o", "json")
     silentParse(args) shouldBe Some(
       Options("get", eventsMap = Map(EventKey("csw.a.b.c") -> Set(), EventKey("csw.x.y.z") -> Set("k2", "k3")), out = "json")
     )
   }
 
-  test("parse get with all options") {
+  test("parse get with all options | ") {
     val args =
       Array("get", "-e", "csw.a.b.c,csw.x.y.z:k2:k3", "-o", "terse", "-t", "--id", "-u", "--locationHost", "location.server")
     silentParse(args) shouldBe Some(
@@ -77,13 +77,13 @@ class ArgsParserTest extends AnyFunSuite with Matchers {
   }
 
   // DEOPSCSW-432: [Event Cli] Publish command
-  test("parse publish when input data file does not exist") {
+  test("parse publish when input data file does not exist | DEOPSCSW-432") {
     val args = Array("publish", "-e", "csw.a.b.c", "--data", "json/observe_event.json")
     silentParse(args) shouldBe None
   }
 
   // DEOPSCSW-432: [Event Cli] Publish command
-  test("parse publish with mandatory fields when input data file exist") {
+  test("parse publish with mandatory fields when input data file exist | DEOPSCSW-432") {
     val observeEventJson = File.createTempFile("observe_event", "json")
     val args             = Array("publish", "-e", "csw.a.b.c", "--data", observeEventJson.getAbsolutePath)
     observeEventJson.deleteOnExit()
@@ -92,7 +92,7 @@ class ArgsParserTest extends AnyFunSuite with Matchers {
   }
 
   // DEOPSCSW-432: [Event Cli] Publish command
-  test("parse publish with all fields when input data file exist") {
+  test("parse publish with all fields when input data file exist | DEOPSCSW-432") {
     val observeEventJson = File.createTempFile("observe_event", "json")
     val args             = Array("publish", "-e", "csw.a.b.c", "--data", observeEventJson.getAbsolutePath, "-i", "20", "--period", "10")
     observeEventJson.deleteOnExit()
@@ -108,7 +108,7 @@ class ArgsParserTest extends AnyFunSuite with Matchers {
     )
   }
 
-  test("parse publish with only params provided") {
+  test("parse publish with only params provided | ") {
     val args     = Array("publish", "-e", "csw.a.b.c", "--params", "k1:i=[1,2,3]|k2:s:volt=[5v]")
     val intParam = IntKey.make("k1").set(1, 2, 3)
     val strParam = StringKey.make("k2").set("5v").withUnits(volt)

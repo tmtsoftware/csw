@@ -1,78 +1,62 @@
 # Managing Command State
 
-A component has access to the `commandResponseManager` which is used to manage the state of commands during its execution.
-On receiving a command as a part of `onSubmit`, and if the command is accepted by the component, 
-the framework adds the command to an internal CommandResponseManager (CRM).
-The framework also uses the `SubmitResponse` returned by the `onSubmit` handler to update the CommandResponseManager. 
-In many cases, this is adequate and no other information is required to handle completion information.
+A component is provided with a `commandResponseManager` which is used to update the state of commands that start long-running
+actions. A long-running command is one that starts actions that take longer than 1 second.
 
-The CommandResponseManager can provide additional support in the following scenarios. These scenarios require
-the developer to update the CRM.
+The CommandResponseManager (CRM) is used to provide the final `SubmitResponse` in the following two scenarios. 
+These scenarios require the developer to update the CRM.
 
-1. The command received in `onSubmit` returns `Started` indicating a long-running command that requires notification of 
+1. The `onSubmit` handler returns `Started` indicating a long-running command that requires notification of 
 completion at a later time.
 2. To process an `onSubmit` that starts long-running actions, the component needs to send one or more commands to other
-components that may also take time to complete. 
+components that may also take time to complete.
+
+On receiving a command as a part of `onSubmit`, and if the `onSubmit` handler returns `Started`, 
+the framework adds the command to an internal CommandResponseManager that keeps track of the command and the sender
+of the command. The sender is then sent the final `SubmitResponse` when CRM `updateCommand` is called. 
 
 ## Updating a Long-running Command
 
-In the first scenario, the developer has a long-running command and does not start any sub-commands or
-does not need to use the CRM to help manage subcommands. In this case, once
-the actions are completed, `addOrUpdateCommand` is used to notify the CRM that the actions are complete. This will cause
-the original sender to be notified of completion using the `SubmitResponse` passed to `addOrUpdateCommand`.
+In the first scenario, the developer has a long-running command. In this case, once
+the actions are completed, `updateCommand` is used to notify the CRM that the actions are complete. This will cause
+the original sender to be notified of completion using the `SubmitResponse` passed to `updateCommand`.
 
-### addOrUpdateCommand
-`AddOrUpdateCommand` is used to add a new command or update the status of an existing command. The following example
-simulates a worker that takes some time to complete. The `onSubmit` handler returns `Started` and later the actions
-complete with `Completed`, which completes the command. 
+### Using updateCommand
+
+`updateCommand` is used to update the status of a `Started` command. The following example from the SampleAssembly
+shows the Assembly sends a command to SampleHcd. It then does a `queryFinal` and when it returns, it
+updates the parent runId with the response received from the HCD. 
+The `onSubmit` handler (not shown) already has returned `Started` to the sender of the original command,
+and the asynchronous completion is used to update the parent command. 
 
 Scala
-:   @@snip [McsAssemblyComponentHandlers.scala](../../../../csw-framework/src/test/scala/csw/common/components/command/McsHcdComponentHandlers.scala) { #addOrUpdateCommand }
+:   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/example/tutorial/basic/sampleassembly/SampleAssemblyHandlers.scala) { #updateCommand }
 
 Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../csw-framework/src/test/java/csw/framework/javadsl/components/JSampleComponentHandlers.java) { #addOrUpdateCommand }
+:   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/example/tutorial/basic/sampleassembly/JSampleAssemblyHandlers.java) { #updateCommand }
+
 
 ## Using the CRM with Subcommands
 
 If while processing a received command, the component needs to create and send commands to other components (e.g. an Assembly
-sending commands to one or more HCDs) it can use the CRM to help manage responses from the sub-commands.
+sending commands to one or more HCDs) it can use the CRM to help manage responses from the sub-commands. In this case,
+the typical use case is that the sender such as an Assembly needs to send one or more sub-commands to HCDs and needs to
+wait until all the sub-commands complete. It then makes a decision on how to update the original command received by the
+Assembly based on the results of the sub-commands. The CRM provides a helper method to wait for one or more sub-commands. 
+Then the previous `updateCommand` CRM method is used to update the original command.
 
-A received command that requires one or more sub-commands must first associate the sub-commands with the received
-command using the `addSubCommand` CRM method. When the sub-commands complete, `updateSubCommand` is used to update
-the status of sub-commands. 
+### Using queryFinalAll
+The CRM provides a method called `queryFinalAll`. This method takes a list of responses from `submit` or `submitAndWait`
+and allows a block of code to be completed when *all* the commands in the list have completed, either successfully or unsuccessfully.
+A response is returned from `queryFinalAll` of type `OverallSuccess`, which can be `OverallSuccess` or `OverallFailure`. Each of
+these returns the individual responses from the original commands to allow a decision on how to proceed.
 
-The status of original command can then be derived from the status of the sub-commands and when all the sub-commands
-have completed either successfully or not, the original command will complete and a response returned to the original
-command sender.
+In this example of a `complexCommand`, the Assembly sends two *sub-commands* to HCDs. It then uses `queryFinalAll` to wait for the
+sub-commands to finish. In the `OverallSuccess` case `commandResponseManager.updateCommand` is used to return `Completed` to the parent.
+If one or more of the sub-commands fails, the negative response of the first failed command is returned to the parent.
 
-## addSubCommand
-Use `addSubCommand` to associate sub-commands with a received command.
-
-#Fixme for Kim: This snip is broken. Fix #addSubCommand in McsAssemblyComponentHandlers and then make it `@@snip`.
 Scala
-:   snip [McsAssemblyComponentHandlers.scala](../../../../csw-framework/src/test/scala/csw/common/components/command/McsAssemblyComponentHandlers.scala) { #addSubCommand }
+:   @@snip [McsAssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/tutorial/basic/sampleassembly/SampleAssemblyHandlers.scala) { #queryF }
 
 Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/assembly/JAssemblyComponentHandlers.java) { #addSubCommand }
-
-## updateSubCommand
-Use `updateSubCommand` to update the CRM with the `SubmitResponse` of the sub-commands. 
-This can trigger the delivery of the status of the original/parent command when
-status of all the sub-commands have been updated. A `SubmitResponse` indicating failure such as `Cancelled` or `Error` in any one 
-of the sub-commands results in the error status of the parent command. Status of any other sub-commands will not be 
-considered in this case.
-
-#Fixme for Kim: This snip is broken. Fix #updateSubCommand in McsAssemblyComponentHandlers and then make it `@@snip`.
-Scala 
-:   snip [McsAssemblyComponentHandlers.scala](../../../../csw-framework/src/test/scala/csw/common/components/command/McsAssemblyComponentHandlers.scala) { #updateSubCommand }
-
-Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/assembly/JAssemblyComponentHandlers.java) { #updateSubCommand }
-
-@@@ note
-
-It may be the case that the component wants to avoid automatic inference of a command based on the result of the
-sub-commands. It should refrain from updating the status of the sub-commands in this case and update the status
-of the parent command directly as required.
-
-@@@
+:   @@snip [JCommandIntegrationTest.java](../../../../examples/src/main/java/example/tutorial/basic/sampleassembly/JSampleAssemblyHandlers.java) { #queryF }

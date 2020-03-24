@@ -38,7 +38,7 @@ class AlarmRefreshActorTest
 
   private def send[T](msg: T, to: ActorRef[T]): Future[Done] = Future { to ! msg; Done }
 
-  test("should refresh severity") {
+  test("should refresh severity | DEOPSCSW-491, DEOPSCSW-507") {
     val probe = TestProbe[String]()
     val actor = spawn(
       Behaviors.withTimers[AutoRefreshSeverityMessage](t =>
@@ -49,7 +49,7 @@ class AlarmRefreshActorTest
     probe.expectMessage("severity set")
   }
 
-  test("should set severity and refresh it") {
+  test("should set severity and refresh it | DEOPSCSW-491, DEOPSCSW-507") {
     val probe = TestProbe[String]()
     val actor = spawn(
       Behaviors.withTimers[AutoRefreshSeverityMessage](t =>
@@ -64,7 +64,7 @@ class AlarmRefreshActorTest
     probe.expectMessage("severity refreshed")
   }
 
-  test("should cancel the refreshing of alarm severity") {
+  test("should cancel the refreshing of alarm severity | DEOPSCSW-491, DEOPSCSW-507") {
     val probe = TestProbe[String]()
     val actor = spawn(
       Behaviors.withTimers[AutoRefreshSeverityMessage](t =>
@@ -82,7 +82,7 @@ class AlarmRefreshActorTest
     manualTime.expectNoMessageFor(10.seconds)
   }
 
-  test("should refresh for multiple alarms") {
+  test("should refresh for multiple alarms | DEOPSCSW-491, DEOPSCSW-507") {
     val queue: mutable.Queue[AlarmKey] = mutable.Queue.empty[AlarmKey]
 
     val actor = spawn(

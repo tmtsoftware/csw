@@ -1,8 +1,8 @@
 package csw.common.components.command
 
 import csw.params.commands.CommandName
-import csw.params.core.generics.{GChoiceKey, KeyType}
 import csw.params.core.generics.KeyType.ChoiceKey
+import csw.params.core.generics.{GChoiceKey, KeyType}
 import csw.params.core.models.{Choice, Choices}
 import csw.prefix.models.Prefix
 
@@ -23,7 +23,6 @@ object ComponentStateForCommand {
   val matcherTimeoutCmd         = CommandName("move.accept.matcher.success.timeout")
   val assemCurrentStateCmd      = CommandName("assem.send.current.state")
   val hcdCurrentStateCmd        = CommandName("hcd.send.current.state")
-  val crmParentCommandCmd       = CommandName("hcd.parent.crm")
   val crmAddOrUpdateCmd         = CommandName("hcd.update.crm")
   val immediateCmd              = CommandName("move.immediate")
   val immediateResCmd           = CommandName("move.immediate.result")

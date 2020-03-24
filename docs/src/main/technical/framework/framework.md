@@ -46,7 +46,7 @@ the TMT framework supporting a component.
 - The `Handlers` shown above is implemented by extending [ComponentHandlers]($github.base_url$/csw-framework/src/main/scala/csw/framework/scaladsl/ComponentHandlers.scala)/
 [JComponentHandlers]($github.base_url$/csw-framework/src/main/scala/csw/framework/javadsl/JComponentHandlers.scala) framework class. So, the TLA decides when to call a
 specific handler method or `hooks` and implementation of `ComponentHandlers/JComponentHandlers` decides what to do when it is called, for e.g. TLA
-decides when to call [intialize]($github.base_url$/examples/src/main/scala/org/tmt/nfiraos/sampleassembly/SampleAssemblyHandlers.scala#L128) handler and handler
+decides when to call [intialize]($github.base_url$/examples/src/main/scala/org/tmt/csw/sample/SampleHandlers.scala#L128) handler and handler
 provides implementation of how to initialize a component, may be by putting the hardware in default position, etc.
 - From the framework's viewpoint, the TLA is created with an instance of 
 [ComponentBehavior]($github.base_url$/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala) and the `Handlers` created by the developer.

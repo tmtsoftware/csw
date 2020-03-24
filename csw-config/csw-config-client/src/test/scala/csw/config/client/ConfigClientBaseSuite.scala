@@ -15,7 +15,7 @@ trait ConfigClientBaseSuite
     with BeforeAndAfterEach
     with BeforeAndAfterAll
     with MockitoSugar {
-  private val locationWiring = new ServerWiring
+  private val locationWiring = new ServerWiring(enableAuth = false)
 
   override protected def beforeAll(): Unit = locationWiring.locationHttpService.start()
 

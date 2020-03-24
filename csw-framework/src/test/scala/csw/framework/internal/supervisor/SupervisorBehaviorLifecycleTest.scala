@@ -54,7 +54,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     verify(timerScheduler).startSingleTimer(SupervisorBehavior.InitializeTimerKey, InitializeTimeout, hcdInfo.initializeTimeout)
   }
 
-  test("supervisor should start in Idle lifecycle state and spawn two actors") {
+  test("supervisor should start in Idle lifecycle state and spawn two actors | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181") {
     val testData = new TestData(hcdInfo)
     import testData._
 
@@ -74,7 +74,9 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   }
 
   // *************** Begin testing of onIdleMessages ***************
-  test("supervisor should accept Running message and register with Location service when LocationServiceUsage is RegisterOnly") {
+  test(
+    "supervisor should accept Running message and register with Location service when LocationServiceUsage is RegisterOnly | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181"
+  ) {
     val testData = new TestData(hcdInfo)
     import testData._
     import testData.testMocks._
@@ -90,7 +92,9 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     supervisorLifecycleStateProbe.expectMessage(SupervisorLifecycleState.Running)
   }
 
-  test("supervisor should accept Running message and should not register when LocationServiceUsage is DoNotRegister") {
+  test(
+    "supervisor should accept Running message and should not register when LocationServiceUsage is DoNotRegister | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181"
+  ) {
     val testData = new TestData(hcdInfo.copy(locationServiceUsage = DoNotRegister))
     import testData._
     import testData.testMocks._
@@ -109,7 +113,9 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   // *************** End of testing onIdleMessages ***************
 
   // *************** Begin testing of onInternalMessage ***************
-  test("supervisor should publish state change after successful registration with location service") {
+  test(
+    "supervisor should publish state change after successful registration with location service | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181"
+  ) {
     val testData = new TestData(hcdInfo)
     import testData._
 
@@ -130,7 +136,9 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     )
   }
 
-  test("supervisor should publish state change if locationServiceUsage is DoNotRegister") {
+  test(
+    "supervisor should publish state change if locationServiceUsage is DoNotRegister | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181"
+  ) {
     val testData = new TestData(hcdInfo)
     import testData._
     val supervisorLifecycleStateProbe            = TestProbe[SupervisorLifecycleState]
@@ -152,7 +160,9 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   // *************** End of testing onInternalMessage ***************
 
   // *************** Begin testing of onCommonMessages ***************
-  test("supervisor should handle LifecycleStateSubscription message by coordinating with pub sub actor") {
+  test(
+    "supervisor should handle LifecycleStateSubscription message by coordinating with pub sub actor | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181"
+  ) {
     val testData = new TestData(hcdInfo)
     import testData._
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
@@ -191,7 +201,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   **/
   // *************** Begin testing of onRunning Messages ***************
 
-  test("supervisor should handle lifecycle Restart message") {
+  test("supervisor should handle lifecycle Restart message | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181") {
     val testData = new TestData(hcdInfo)
     import testData._
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
@@ -201,7 +211,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     supervisorLifecycleStateProbe.expectMessage(SupervisorLifecycleState.Restart)
   }
 
-  test("supervisor should handle lifecycle GoOffline message") {
+  test("supervisor should handle lifecycle GoOffline message | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181") {
     val testData = new TestData(hcdInfo)
     import testData._
 
@@ -219,7 +229,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     childComponentInbox.receiveAll() should contain(Lifecycle(GoOffline))
   }
 
-  test("supervisor should handle lifecycle GoOnline message") {
+  test("supervisor should handle lifecycle GoOnline message | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181") {
     val testData = new TestData(hcdInfo)
     import testData._
     val supervisorLifecycleStateProbe                        = TestProbe[SupervisorLifecycleState]
@@ -237,7 +247,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
   // *************** End of testing onRunning Messages ***************
 
-  test("supervisor should handle Terminated signal for Idle lifecycle state") {
+  test("supervisor should handle Terminated signal for Idle lifecycle state | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181") {
     val testData = new TestData(hcdInfo)
     import testData._
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
@@ -252,7 +262,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     }
   }
   /*
-  test("supervisor should handle Command Response Manager messages by forwarding it to Command Response Manager") {
+  test("supervisor should handle Command Response Manager messages by forwarding it to Command Response Manager | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181") {
     val testData = new TestData(hcdInfo)
     import testData._
 

@@ -17,7 +17,7 @@ import org.scalatest.matchers.should.Matchers
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
 class CustomPolicyAsyncTest extends AnyFunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
-  test("custom policy async should return AuthenticationFailedRejection when token is invalid") {
+  test("custom policy async should return AuthenticationFailedRejection when token is invalid | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
@@ -45,7 +45,7 @@ class CustomPolicyAsyncTest extends AnyFunSuite with MockitoSugar with Directive
     }
   }
 
-  test("custom policy async should return AuthenticationFailedRejection when token is not present") {
+  test("custom policy async should return AuthenticationFailedRejection when token is not present | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
@@ -66,7 +66,7 @@ class CustomPolicyAsyncTest extends AnyFunSuite with MockitoSugar with Directive
     }
   }
 
-  test("custom policy async should return AuthorizationFailedRejection when policy does not match") {
+  test("custom policy async should return AuthorizationFailedRejection when policy does not match | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
@@ -95,7 +95,7 @@ class CustomPolicyAsyncTest extends AnyFunSuite with MockitoSugar with Directive
     }
   }
 
-  test("custom policy async should return 200 OK when policy matches") {
+  test("custom policy async should return 200 OK when policy matches | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
@@ -124,7 +124,7 @@ class CustomPolicyAsyncTest extends AnyFunSuite with MockitoSugar with Directive
     }
   }
 
-  test("custom policy async should return AuthorizationFailedRejection when async execution fails") {
+  test("custom policy async should return AuthorizationFailedRejection when async execution fails | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 

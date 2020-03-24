@@ -14,7 +14,7 @@ class TimeExtensionsTest extends AnyFunSuite with Matchers {
 
   private val EpochClock: Clock = Clock.fixed(Instant.EPOCH, ZoneOffset.UTC)
 
-  test("untilNext text") {
+  test("untilNext text | DEOPSCSW-449") {
     EpochClock.untilNext("10:30:30 AM").getSeconds shouldBe 10.hours.plus(30.minutes).plus(30.seconds).toSeconds
     EpochClock.plusHours(11).untilNext("10:30:30 AM").getSeconds shouldBe 23.hours.plus(30.minutes).plus(30.seconds).toSeconds
 

@@ -66,7 +66,9 @@ class CustomAppender(system: typed.ActorSystem[_], stdHeaders: JsObject, callbac
 class CustomAppenderTest extends AnyFunSuite with Matchers {
   private val hostName = InetAddress.getLocalHost.getHostAddress
 
-  test("should be able to add and configure a custom appender using an object extending from CustomAppenderBuilder") {
+  test(
+    "should be able to add and configure a custom appender using an object extending from CustomAppenderBuilder | DEOPSCSW-272"
+  ) {
 
     val config =
       ConfigFactory.parseString("""
@@ -96,7 +98,7 @@ class CustomAppenderTest extends AnyFunSuite with Matchers {
     Await.result(actorSystem.whenTerminated, 10.seconds)
   }
 
-  test("should be able to add and configure a custom appender using a class extending from CustomAppenderBuilder") {
+  test("should be able to add and configure a custom appender using a class extending from CustomAppenderBuilder | DEOPSCSW-272") {
 
     val config = ConfigFactory.parseString("""
         |include "logging.conf"
@@ -128,7 +130,7 @@ class CustomAppenderTest extends AnyFunSuite with Matchers {
 
   // Added this test to show that custom appender config file changes work
   test(
-    "should be able to add and configure a custom appender using a class extending from CustomAppenderBuilder showing config changes"
+    "should be able to add and configure a custom appender using a class extending from CustomAppenderBuilder showing config changes | DEOPSCSW-272"
   ) {
 
     val config = ConfigFactory.parseString("""

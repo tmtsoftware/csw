@@ -4,6 +4,7 @@ import akka.actor.Status
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import akka.stream.Materializer.matFromSystem
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.testkit
 import com.typesafe.config.ConfigFactory
@@ -38,7 +39,7 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
 // CSW-82: ComponentInfo should take prefix
 class ContainerIntegrationTest extends FrameworkIntegrationSuite {
-  import testWiring._
+  import testWiring.seedLocationService
 
   private val irisContainerConnection = AkkaConnection(
     ComponentId(Prefix(Subsystem.Container, "IRIS_Container"), ComponentType.Container)
@@ -54,7 +55,7 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
   private val disperserHcdAkkaConnection   = AkkaConnection(disperserHcd)
   private val disperserHcdHttpConnection   = HttpConnection(disperserHcd)
 
-  private val containerActorSystem: ActorSystem[SpawnProtocol.Command] =
+  private implicit val containerActorSystem: ActorSystem[SpawnProtocol.Command] =
     ActorSystemFactory.remote(SpawnProtocol(), "container-system")
 
   override def afterAll(): Unit = {
@@ -70,7 +71,9 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
   }
 
   // DEOPSCSW-181: Multiple Examples for Lifecycle Support
-  test("should start multiple components within a single container and able to accept lifecycle messages") {
+  test(
+    "should start multiple components within a single container and able to accept lifecycle messages | DEOPSCSW-182, DEOPSCSW-177, DEOPSCSW-181, DEOPSCSW-216, DEOPSCSW-169, DEOPSCSW-372"
+  ) {
 
     val wiring = FrameworkWiring.make(containerActorSystem, mock[RedisClient])
     // start a container and verify it moves to running lifecycle state
@@ -104,6 +107,11 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
     resolvedContainerRef ! GetComponents(componentsProbe.ref)
     val components = componentsProbe.expectMessageType[Components].components
     components.size shouldBe 3
+
+    // To verify that Container gets in Running state once all components start
+    // ********** Message: GetContainerLifecycleState **********
+    containerRef ! GetContainerLifecycleState(containerLifecycleStateProbe.ref)
+    containerLifecycleStateProbe.expectMessage(ContainerLifecycleState.Running)
 
     // resolve all the components from container using location service
     val filterAssemblyLocation = assertConnectionIsRegistered(filterAssemblyAkkaConnection)
@@ -195,31 +203,32 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
     assertConnectionIsRegistered(instrumentHcdHttpConnection)
     assertConnectionIsRegistered(disperserHcdHttpConnection)
 
-    val containerTracker      = testkit.TestProbe()(seedActorSystem.toClassic)
-    val filterAssemblyTracker = testkit.TestProbe()(seedActorSystem.toClassic)
-    val instrumentHcdTracker  = testkit.TestProbe()(seedActorSystem.toClassic)
-    val disperserHcdTracker   = testkit.TestProbe()(seedActorSystem.toClassic)
+    //Using seedActorSystem in trackers as they are needed to be external to Container and components
+    val containerTracker      = testkit.TestProbe()(testWiring.seedActorSystem.toClassic)
+    val filterAssemblyTracker = testkit.TestProbe()(testWiring.seedActorSystem.toClassic)
+    val instrumentHcdTracker  = testkit.TestProbe()(testWiring.seedActorSystem.toClassic)
+    val disperserHcdTracker   = testkit.TestProbe()(testWiring.seedActorSystem.toClassic)
 
     // start tracking container and all the components, so that on Shutdown message, all the trackers gets LocationRemoved event
     seedLocationService
       .track(irisContainerConnection)
       .toMat(Sink.actorRef[TrackingEvent](containerTracker.ref, "Completed", t => Status.Failure(t)))(Keep.both)
-      .run()
+      .run()((matFromSystem(testWiring.seedActorSystem)))
 
     seedLocationService
       .track(filterAssemblyAkkaConnection)
       .toMat(Sink.actorRef[TrackingEvent](filterAssemblyTracker.ref, "Completed", t => Status.Failure(t)))(Keep.both)
-      .run()
+      .run()((matFromSystem(testWiring.seedActorSystem)))
 
     seedLocationService
       .track(instrumentHcdAkkaConnection)
       .toMat(Sink.actorRef[TrackingEvent](instrumentHcdTracker.ref, "Completed", t => Status.Failure(t)))(Keep.both)
-      .run()
+      .run()((matFromSystem(testWiring.seedActorSystem)))
 
     seedLocationService
       .track(disperserHcdAkkaConnection)
       .toMat(Sink.actorRef[TrackingEvent](disperserHcdTracker.ref, "Completed", t => Status.Failure(t)))(Keep.both)
-      .run()
+      .run()((matFromSystem(testWiring.seedActorSystem)))
 
     // ********** Message: Shutdown **********
     resolvedContainerRef ! Shutdown

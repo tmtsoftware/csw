@@ -18,13 +18,13 @@ import scala.util.Try
  * @param authServiceLocation if authServiceLocation is provided, it will use it,
  *                            otherwise it will rely on config for auth-service-url
  */
-class AuthConfig private (config: Config, authServiceLocation: Option[HttpLocation]) {
+class AuthConfig private (config: Config, authServiceLocation: Option[HttpLocation], disabledMaybe: Option[Boolean]) {
 
   private val enablePermissionsKey = "enable-permissions"
   private val clientIdKey          = "client-id"
 
   val permissionsEnabled: Boolean = optionalBoolean(config, enablePermissionsKey)
-  val disabled: Boolean           = optionalBoolean(config, disabledKey)
+  val disabled: Boolean           = disabledMaybe.getOrElse(optionalBoolean(config, disabledKey))
   private val logger              = AuthLogger.getLogger
 
   import logger._
@@ -38,16 +38,19 @@ class AuthConfig private (config: Config, authServiceLocation: Option[HttpLocati
    */
   private[csw] def getDeployment: KeycloakDeployment =
     authServiceLocation match {
-      case None if (disabled) =>
+      case None if disabled =>
         debug("creating keycloak deployment for disabled configuration")
-        val configWithDisabledUrl =
-          config.withValue("auth-server-url", ConfigValueFactory.fromAnyRef("http://disabled-auth-service"))
-        convertToDeployment(configWithDisabledUrl)
+        val configForDisabledAuth =
+          config
+            .withValue("auth-server-url", ConfigValueFactory.fromAnyRef("http://disabled-auth-service"))
+            .withValue(clientIdKey, ConfigValueFactory.fromAnyRef("security-disabled-client"))
+
+        convertToDeployment(configForDisabledAuth)
       case None =>
-        debug("creating keycloak deployment with configured keycloak location")
+        debug("creating keycloak deployment with pre-configured keycloak location")
         convertToDeployment(config)
       case Some(location) =>
-        debug("creating keycloak deployment with resolved keycloak location")
+        debug("creating keycloak deployment with keycloak location from location service")
         val configWithResolvedAuthUrl = config.withValue("auth-server-url", ConfigValueFactory.fromAnyRef(location.uri.toString))
         convertToDeployment(configWithResolvedAuthUrl)
     }
@@ -88,13 +91,15 @@ object AuthConfig {
    * @param config application config. If not provided, it will load the config automatically
    * @param authServerLocation if authServerLocation is provided, it will use it,
    *                            otherwise it will rely on config for auth-service-url
+   * @param disabledMaybe if provided, will ignore `disabled` key in configuration
    */
   def create(
       config: Config = ConfigFactory.load(),
-      authServerLocation: Option[HttpLocation] = None
+      authServerLocation: Option[HttpLocation] = None,
+      disabledMaybe: Option[Boolean] = None
   ): AuthConfig = {
     debug("loading auth config")
-    new AuthConfig(config.getConfig(authConfigKey), authServerLocation)
+    new AuthConfig(config.getConfig(authConfigKey), authServerLocation, disabledMaybe)
   }
 
   private def optionalBoolean(config: Config, key: String) = {

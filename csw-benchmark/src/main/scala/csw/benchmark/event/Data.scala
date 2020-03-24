@@ -63,9 +63,8 @@ object Data {
       RaDec(100, 100)
     )
   )
-
   private val baseEvent       = SystemEvent(Prefix("a.b"), EventName("eventName1"))
-  val data: Parameter[Struct] = structKey.set((1 to 150).map(_ => Struct(paramSet)): _*)
+  val data: Parameter[Struct] = structKey.setAll((1 to 150).map(_ => Struct(paramSet)).toArray)
   val bigEvent: SystemEvent   = baseEvent.copy(paramSet = Set(data))
 
   val smallEvent: SystemEvent = baseEvent.copy(

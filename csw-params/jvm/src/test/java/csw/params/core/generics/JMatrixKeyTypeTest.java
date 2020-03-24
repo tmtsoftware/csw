@@ -60,13 +60,13 @@ public class JMatrixKeyTypeTest extends JUnitSuite {
     }
 
     @Test
-    public void matrixKeyParameterTest() {
+    public void matrixKeyParameterTest__DEOPSCSW_183_DEOPSCSW_190_DEOPSCSW_184() {
         Parameter parameter;
         MatrixData matrixData = MatrixData.fromArrays(data);
         MatrixData[] paramValues = {matrixData};
 
-        if (units.isPresent()) parameter = matrixKey.make(keyName).set(paramValues, units.orElseThrow());
-        else parameter = matrixKey.make(keyName).set(paramValues);
+        if (units.isPresent()) parameter = matrixKey.make(keyName, units.orElseThrow()).setAll(paramValues);
+        else parameter = matrixKey.make(keyName, NoUnits).setAll(paramValues);
 
         Assert.assertEquals(keyName, parameter.keyName());
         Assert.assertEquals(units.orElse(NoUnits), parameter.units());

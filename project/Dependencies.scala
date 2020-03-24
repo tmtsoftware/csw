@@ -47,12 +47,14 @@ object Dependencies {
       Libs.`akka-management-cluster-http`,
       AkkaHttp.`akka-http`,
       MSocket.`msocket-impl-jvm`,
-      Akka.`akka-actor-testkit-typed` % Test,
       Libs.`scalatest`.value          % Test,
       Libs.`junit-4-12`               % Test,
       Libs.`mockito-scala`            % Test,
-      Akka.`akka-stream-testkit`      % Test,
-      Akka.`akka-multi-node-testkit`  % Test
+      Akka.`akka-actor-testkit-typed` % Test,
+      Libs.`jboss-logging`            % Test,
+      Libs.`embedded-keycloak`        % Test,
+      Libs.netty                      % Test,
+      Akka.`akka-stream-testkit`      % Test
     )
   )
 
@@ -134,11 +136,9 @@ object Dependencies {
       AkkaHttp.`akka-http`,
       Libs.`scala-async`,
       Libs.`scala-java8-compat`,
-      Libs.`scalatest`.value         % Test,
-      Libs.`junit-4-12`              % Test,
-      Libs.`mockito-scala`           % Test,
-      Akka.`akka-multi-node-testkit` % Test,
-      Akka.`akka-stream-testkit`     % Test
+      Libs.`scalatest`.value % Test,
+      Libs.`junit-4-12`      % Test,
+      Libs.`mockito-scala`   % Test
     )
   )
 
@@ -150,9 +150,7 @@ object Dependencies {
       Akka.`akka-stream`,
       Akka.`akka-stream-typed`,
       Libs.`scopt`,
-      Libs.`scalatest`.value         % Test,
-      Akka.`akka-multi-node-testkit` % Test,
-      Libs.`embedded-keycloak`       % Test
+      Libs.`scalatest`.value % Test
     )
   )
 
@@ -277,14 +275,11 @@ object Dependencies {
       Libs.`lettuce`,
       Libs.`reactor-core`,
       Akka.`akka-actor-testkit-typed` % Test,
-      Akka.`akka-stream-testkit`      % Test,
       Libs.`scalatest`.value          % Test,
       Libs.`junit-4-12`               % Test,
       Libs.`mockito-scala`            % Test,
       Libs.`embedded-redis`           % Test,
       Libs.`embedded-kafka`           % Test,
-      Akka.`akka-multi-node-testkit`  % Test,
-      Libs.HdrHistogram               % Test,
       Libs.`testng-6-7`               % Test
     )
   )
@@ -455,11 +450,10 @@ object Dependencies {
       Libs.`config`,
       AkkaHttp.`akka-http`,
       Libs.`play-json`.value,
-      Libs.`scalatest`.value         % Test,
-      AkkaHttp.`akka-http-testkit`   % Test,
-      Libs.`mockito-scala`           % Test,
-      Libs.`embedded-keycloak`       % Test,
-      Akka.`akka-multi-node-testkit` % Test
+      Libs.`scalatest`.value          % Test,
+      Akka.`akka-actor-testkit-typed` % Test,
+      AkkaHttp.`akka-http-testkit`    % Test,
+      Libs.`mockito-scala`            % Test
     )
   )
 
@@ -534,13 +528,20 @@ object Dependencies {
 
   val Integration = Def.setting(
     Seq(
+      Libs.`scalatest`.value,
+      Libs.`junit-4-12`,
+      Libs.`mockito-scala`,
       Akka.`akka-actor`,
+      Akka.`akka-actor-typed`,
+      Akka.`akka-actor-testkit-typed`,
       Akka.`akka-stream`,
       Akka.`akka-stream-typed`,
-      Akka.`akka-actor-typed`,
+      Akka.`akka-stream-testkit`,
       AkkaHttp.`akka-http`,
-      Akka.`akka-actor-testkit-typed`,
-      Libs.`scalatest`.value
+      Akka.`akka-multi-node-testkit`,
+      Libs.`embedded-keycloak`,
+      Libs.`HdrHistogram`,
+      Libs.`lettuce`
     )
   )
 
@@ -549,6 +550,13 @@ object Dependencies {
       Borer.`borer-core`.value,
       Libs.`play-json`.value,
       Libs.`scalatest`.value % Test
+    )
+  )
+
+  val CswServices = Def.setting(
+    Seq(
+      Libs.`case-app`,
+      Libs.`embedded-keycloak`
     )
   )
 

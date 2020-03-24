@@ -19,7 +19,7 @@ object CommandServiceRoutesFactory {
     val commandService                              = CommandServiceFactory.make(component)
     val httpHandlers                                = new CommandServiceHttpHandlers(commandService)
     def websocketHandlers(contentType: ContentType) = new CommandServiceWebsocketHandlers(commandService, contentType)
-    RouteFactory.combine(
+    RouteFactory.combine(metricsEnabled = false)(
       new PostRouteFactory("post-endpoint", httpHandlers),
       new WebsocketRouteFactory("websocket-endpoint", websocketHandlers)
     )

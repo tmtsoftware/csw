@@ -30,10 +30,7 @@ trait CommandData {
   val utcTimeKey: Key[UTCTime]            = KeyType.UTCTimeKey.make("utcTimeKey")
   val raDecKey: Key[RaDec]                = KeyType.RaDecKey.make("raDecKey")
   val coordsKey: Key[Coords.CometCoord]   = KeyType.CometCoordKey.make("halley's")
-  val choice2Key: GChoiceKey = ChoiceKey.make(
-    "mode-reset",
-    Choices.fromChoices(Choice("c"), Choice("b"), Choice("a"))
-  )
+  val choice2Key: GChoiceKey              = ChoiceKey.make("mode-reset", Choices.fromChoices(Choice("c"), Choice("b"), Choice("a")))
 
   val intParameter: Parameter[Int]                = intKey.set(values)
   val arrayParameter: Parameter[ArrayData[Int]]   = arrayDataKey.set(ArrayData(arr1), ArrayData(arr2))
@@ -44,7 +41,7 @@ trait CommandData {
   val utcTimeParam: Parameter[UTCTime] = utcTimeKey.set(UTCTime(Instant.parse("2017-09-04T16:28:00.123456789Z")))
   val raDecParameter: Parameter[RaDec] = raDecKey.set(RaDec(100, 100))
 
-  val choiceParameter: Parameter[Choice] = choice2Key.set(Array(Choice("c")))
+  val choiceParameter: Parameter[Choice] = choice2Key.setAll(Array(Choice("c")))
 
   val paramSet: Set[Parameter[_]] =
     Set(
@@ -98,6 +95,7 @@ trait CommandData {
   val requiredSequencerUnavailableIssue: CommandIssue = RequiredSequencerUnavailableIssue(reason)
   val requiredServiceUnavailableIssue: CommandIssue   = RequiredServiceUnavailableIssue(reason)
   val requiredHCDUnavailableIssue: CommandIssue       = RequiredHCDUnavailableIssue(reason)
+  val hcdBusyIssue: CommandIssue                      = HCDBusyIssue(reason)
   val unresolvedLocationsIssue: CommandIssue          = UnresolvedLocationsIssue(reason)
   val unsupportedCommandInStateIssue: CommandIssue    = UnsupportedCommandInStateIssue(reason)
   val unsupportedCommandIssue: CommandIssue           = UnsupportedCommandIssue(reason)

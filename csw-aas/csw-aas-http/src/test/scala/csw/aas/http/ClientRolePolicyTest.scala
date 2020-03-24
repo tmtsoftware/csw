@@ -17,7 +17,7 @@ import org.scalatest.matchers.should.Matchers
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
 class ClientRolePolicyTest extends AnyFunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
-  test("clientRole policy should return AuthenticationFailedRejection when token is invalid") {
+  test("clientRole policy should return AuthenticationFailedRejection when token is invalid | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
@@ -46,7 +46,9 @@ class ClientRolePolicyTest extends AnyFunSuite with MockitoSugar with Directives
 
   // DEOPSCSW-572: REQ: Associate each role with set of privileges/restrictions
   // DEOPSCSW-573: REQ:Support configurable roles
-  test("clientRole policy should return AuthenticationFailedRejection when token is not present") {
+  test(
+    "clientRole policy should return AuthenticationFailedRejection when token is not present | DEOPSCSW-579, DEOPSCSW-572, DEOPSCSW-573"
+  ) {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
@@ -69,7 +71,9 @@ class ClientRolePolicyTest extends AnyFunSuite with MockitoSugar with Directives
 
   // DEOPSCSW-572: REQ: Associate each role with set of privileges/restrictions
   // DEOPSCSW-573: REQ:Support configurable roles
-  test("clientRole policy should return AuthorizationFailedRejection when token does not have clientRole") {
+  test(
+    "clientRole policy should return AuthorizationFailedRejection when token does not have clientRole | DEOPSCSW-579, DEOPSCSW-572, DEOPSCSW-573"
+  ) {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
@@ -104,7 +108,7 @@ class ClientRolePolicyTest extends AnyFunSuite with MockitoSugar with Directives
 
   // DEOPSCSW-572: REQ: Associate each role with set of privileges/restrictions
   // DEOPSCSW-573: REQ:Support configurable roles
-  test("clientRole policy should return 200 OK when token is valid & has clientRole") {
+  test("clientRole policy should return 200 OK when token is valid & has clientRole | DEOPSCSW-579, DEOPSCSW-572, DEOPSCSW-573") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 

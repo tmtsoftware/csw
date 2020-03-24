@@ -1,0 +1,65 @@
+name: dev
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - uses: olafurpg/setup-scala@v5
+        with:
+          java-version: adopt@1.11
+
+      - name: Configure ntp time
+        run: |
+          sudo apt-get install ntp -y
+          sudo ntptime -T 37
+
+      - name: Build
+        run: |
+          sbt clean scalafmtCheck
+          sbt makeSite
+          sbt ';set every Seq(enableFatalWarnings := true, scalafmtOnCompile := false); scalastyle; test:compile; multi-jvm:compile;'
+
+      - name: Unit and Component Tests
+        run: |
+          sbt -DenableCoverage=true ';set every enableFatalWarnings := true; csw-time/test:test'
+          sbt -DenableCoverage=true -DdisableTimeTests ';set every enableFatalWarnings := true; test:test'
+
+      - name: Coverage Report
+        run: |
+          sbt -DenableCoverage=true coverageReport
+          sbt coverageAggregate
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: Coverage Report
+          path: target/scala-2.13/scoverage-report
+
+      - name: Multi-Jvm Tests
+        run: sbt ';set every enableFatalWarnings := true; integration/multi-jvm:test'
+
+      - name: Build Status
+        if: always()
+        id: build_status
+        run: |
+          if [[ ${{job.status}} == Success ]]
+          then
+          echo ::set-output name=status_icon::'white_check_mark'
+          echo ::set-output name=build_status::'SUCCESS'
+          else
+          echo ::set-output name=status_icon::'x'
+          echo ::set-output name=build_status::'FAILURE'
+          fi
+
+      - name: Notify slack
+        if: always()
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        uses: pullreminders/slack-action@master
+        with:
+          args: '{\"channel\":\"#csw-build\",\"text\":\":${{ steps.build_status.outputs.status_icon }}: ${{ steps.build_status.outputs.build_status }} \n https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}\"}'

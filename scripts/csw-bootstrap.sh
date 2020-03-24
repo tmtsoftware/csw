@@ -29,13 +29,16 @@ fetch_artifacts() {
     cp -r "$SCRIPTS_PATH"/conf "$COURSIER_STAGE_DIR"
     mv "$SENTINEL_CONF" "$SENTINEL_TEMPLATE_CONF"
     cp "$SCRIPTS_PATH"/csw-auth/prod/start-aas.sh "$TARGET_PATH"
-    cp "$SCRIPTS_PATH"/csw-services.sh "$TARGET_PATH"
+    cp "$SCRIPTS_PATH"/csw-services-old.sh "$TARGET_PATH"
     cp "$SCRIPTS_PATH"/redis-sentinel-prod.sh "$TARGET_PATH"
     echo "Artifacts successfully generated at $COURSIER_STAGE_DIR"
 }
 
+BOOTSTRAP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+WORK_DIR="$(dirname "$BOOTSTRAP_DIR")"
+
 if [ "$#" == 1 ]; then
-    fetch_artifacts "$1" ".."
+    fetch_artifacts "$1" "$WORK_DIR"
 elif [ "$#" -gt 1 ]; then
     fetch_artifacts "$1" "$2"
 else

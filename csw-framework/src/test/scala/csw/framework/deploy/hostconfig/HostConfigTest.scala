@@ -16,7 +16,7 @@ class HostConfigTest extends AnyFunSuite with MockitoSugar with Matchers {
 
   mockedProcesses.foreach(p => when(p.pid()).thenReturn(1))
 
-  test("should parse host configuration file and invoke container cmd app with valid arguments") {
+  test("should parse host configuration file and invoke container cmd app with valid arguments | DEOPSCSW-174, DEOPSCSW-314") {
     var actualScripts: List[(String, List[String])] = Nil
 
     var counter = 0

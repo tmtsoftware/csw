@@ -70,7 +70,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   }
 
   // DEOPSCSW-470: CLI application to exercise and test the alarm API
-  test("should initialize alarms in alarm store from local config") {
+  test("should initialize alarms in alarm store from local config | DEOPSCSW-470") {
     val filePath = ResourceReader.copyToTmp("/valid-alarms.conf")
     val cmd      = Options(cmd = "init", filePath = Some(filePath), isLocal = true, reset = true)
 
@@ -86,7 +86,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   }
 
   // DEOPSCSW-470: CLI application to exercise and test the alarm API
-  test("should initialize alarms in alarm store from remote config") {
+  test("should initialize alarms in alarm store from remote config | DEOPSCSW-470") {
     val serverWiring = ServerWiring.make(locationService, securityDirectives)
     serverWiring.svnRepo.initSvnRepo()
     val (binding, regResult) = serverWiring.httpService.registeredLazyBinding.futureValue
@@ -113,7 +113,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   }
 
   // DEOPSCSW-470: CLI application to exercise and test the alarm API
-  test("should fail to initialize alarms in alarm store when config service is down") {
+  test("should fail to initialize alarms in alarm store when config service is down | DEOPSCSW-470") {
     val configPath = Paths.get("valid-alarms.conf")
     val cmd        = Options(cmd = "init", filePath = Some(configPath), reset = true)
 
@@ -124,7 +124,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   }
 
   // DEOPSCSW-471: Acknowledge alarm from CLI application
-  test("should acknowledge the alarm") {
+  test("should acknowledge the alarm | DEOPSCSW-471") {
     val cmd = Options(
       "acknowledge",
       maybeSubsystem = Some(tromboneAxisLowLimitKey.prefix.subsystem),
@@ -142,7 +142,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   }
 
   // DEOPSCSW-471: Acknowledge alarm from CLI application
-  test("should unacknowledge the alarm") {
+  test("should unacknowledge the alarm | DEOPSCSW-471") {
     val cmd = Options(
       "unacknowledge",
       maybeSubsystem = Some(tromboneAxisLowLimitKey.prefix.subsystem),
@@ -157,7 +157,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   }
 
   // DEOPSCSW-472: Exercise Alarm CLI for activate/out of service alarm behaviour
-  test("should activate the alarm") {
+  test("should activate the alarm | DEOPSCSW-472") {
     val cmd = Options(
       "activate",
       maybeSubsystem = Some(cpuIdleKey.prefix.subsystem),
@@ -172,7 +172,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   }
 
   // DEOPSCSW-472: Exercise Alarm CLI for activate/out of service alarm behaviour
-  test("should deactivate the alarm") {
+  test("should deactivate the alarm | DEOPSCSW-472") {
     val cmd = Options(
       "deactivate",
       maybeSubsystem = Some(tromboneAxisLowLimitKey.prefix.subsystem),
@@ -187,7 +187,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   }
 
   // DEOPSCSW-473: Shelve/Unshelve alarm from CLI interface
-  test("should shelve the alarm") {
+  test("should shelve the alarm | DEOPSCSW-473") {
     val cmd = Options(
       "shelve",
       maybeSubsystem = Some(tromboneAxisLowLimitKey.prefix.subsystem),
@@ -202,7 +202,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   }
 
   // DEOPSCSW-473: Shelve/Unshelve alarm from CLI interface
-  test("should unshelve the alarm") {
+  test("should unshelve the alarm | DEOPSCSW-473") {
     val cmd = Options(
       "unshelve",
       maybeSubsystem = Some(tromboneAxisLowLimitKey.prefix.subsystem),
@@ -221,7 +221,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
   // DEOPSCSW-503: List alarms should show all data of an alarm (metadata, status, severity)
-  test("should list all alarms present in the alarm store") {
+  test("should list all alarms present in the alarm store | DEOPSCSW-492, DEOPSCSW-503") {
     val cmd = Options("list")
 
     cliApp.execute(cmd)
@@ -230,7 +230,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
   // DEOPSCSW-503: List alarms should show all data of an alarm (metadata, status, severity)
-  test("should list alarms for specified subsystem") {
+  test("should list alarms for specified subsystem | DEOPSCSW-492, DEOPSCSW-503") {
     val cmd = Options("list", maybeSubsystem = Some(NFIRAOS))
 
     cliApp.execute(cmd)
@@ -239,7 +239,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
   // DEOPSCSW-503: List alarms should show all data of an alarm (metadata, status, severity)
-  test("should list alarms for specified component") {
+  test("should list alarms for specified component | DEOPSCSW-492, DEOPSCSW-503") {
     val cmd = Options(
       "list",
       maybeSubsystem = Some(NFIRAOS),
@@ -252,7 +252,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
   // DEOPSCSW-503: List alarms should show all data of an alarm (metadata, status, severity)
-  test("should list the alarm for specified name") {
+  test("should list the alarm for specified name | DEOPSCSW-492, DEOPSCSW-503") {
     val cmd = Options(
       "list",
       maybeSubsystem = Some(NFIRAOS),
@@ -266,7 +266,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
   // DEOPSCSW-503: List alarms should show all data of an alarm (metadata, status, severity)
-  test("should list the metadata of alarm for specified name") {
+  test("should list the metadata of alarm for specified name | DEOPSCSW-492, DEOPSCSW-503") {
     val cmd = Options(
       "list",
       maybeSubsystem = Some(NFIRAOS),
@@ -282,7 +282,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
   // DEOPSCSW-503: List alarms should show all data of an alarm (metadata, status, severity)
   // DEOPSCSW-475: Fetch alarm status from CLI Interface
-  test("should list status of alarms") {
+  test("should list status of alarms | DEOPSCSW-492, DEOPSCSW-503, DEOPSCSW-475") {
     val cmd = Options(
       "list",
       maybeSubsystem = Some(NFIRAOS),
@@ -299,7 +299,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
   // DEOPSCSW-503: List alarms should show all data of an alarm (metadata, status, severity)
-  test("should list no alarm for invalid key/pattern") {
+  test("should list no alarm for invalid key/pattern | DEOPSCSW-492, DEOPSCSW-503") {
     val invalidComponentCmd = Options(
       "list",
       maybeSubsystem = Some(NFIRAOS),
@@ -319,7 +319,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   }
 
   // DEOPSCSW-474: Latch an alarm from CLI Interface
-  test("should reset the severity of latched alarm") {
+  test("should reset the severity of latched alarm | DEOPSCSW-474") {
     val cmd = Options(
       "reset",
       maybeSubsystem = Some(NFIRAOS),
@@ -343,7 +343,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   // -------------------------------------------Severity--------------------------------------------
 
   // DEOPSCSW-480: Set alarm Severity from CLI Interface
-  test("should set severity of alarm") {
+  test("should set severity of alarm | DEOPSCSW-480") {
     val cmd = Options(
       cmd = "severity",
       subCmd = "set",
@@ -360,7 +360,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   }
 
   // DEOPSCSW-476: Fetch alarm severity from CLI Interface
-  test("should get severity of alarm") {
+  test("should get severity of alarm | DEOPSCSW-476") {
     setSeverity(tromboneAxisHighLimitKey, Okay).futureValue
 
     val cmd = Options(
@@ -376,7 +376,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   }
 
   // DEOPSCSW-476: Fetch alarm severity from CLI Interface
-  test("should get severity of a component") {
+  test("should get severity of a component | DEOPSCSW-476") {
     setSeverity(tromboneAxisLowLimitKey, Okay).futureValue
     setSeverity(tromboneAxisHighLimitKey, Major).futureValue
 
@@ -394,7 +394,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   }
 
   // DEOPSCSW-476: Fetch alarm severity from CLI Interface
-  test("should get severity of a subsystem") {
+  test("should get severity of a subsystem | DEOPSCSW-476") {
     val cmd = Options(
       cmd = "severity",
       subCmd = "get",
@@ -406,7 +406,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   }
 
   // DEOPSCSW-476: Fetch alarm severity from CLI Interface
-  test("should get severity of Alarm Service") {
+  test("should get severity of Alarm Service | DEOPSCSW-476") {
     setSeverity(cpuExceededKey, Indeterminate).futureValue
 
     val cmd = Options(cmd = "severity", subCmd = "get")
@@ -416,7 +416,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   }
 
   // DEOPSCSW-477: Subscribe to alarm severities for component or subsystem from CLI Interface
-  test("should subscribe severity of alarm") {
+  test("should subscribe severity of alarm | DEOPSCSW-477") {
     val cmd = Options(
       cmd = "severity",
       subCmd = "subscribe",
@@ -446,7 +446,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
 
   // DEOPSCSW-491: Auto-refresh an alarm through alarm service cli
   // DEOPSCSW-507: Auto-refresh utility for component developers
-  test("should refresh severity of alarm") {
+  test("should refresh severity of alarm | DEOPSCSW-491, DEOPSCSW-507") {
     val cmd = Options(
       cmd = "severity",
       subCmd = "set",
@@ -472,7 +472,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   // -------------------------------------------Health--------------------------------------------
 
   // DEOPSCSW-478: Fetch health of component/subsystem from CLI Interface
-  test("should get health of alarm") {
+  test("should get health of alarm | DEOPSCSW-478") {
     val cmd = Options(
       cmd = "health",
       subCmd = "get",
@@ -486,7 +486,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   }
 
   // DEOPSCSW-478: Fetch health of component/subsystem from CLI Interface
-  test("should get health of component") {
+  test("should get health of component | DEOPSCSW-478") {
     setSeverity(tromboneAxisHighLimitKey, Okay).futureValue
     setSeverity(tromboneAxisLowLimitKey, Major).futureValue
 
@@ -504,7 +504,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   }
 
   // DEOPSCSW-478: Fetch health of component/subsystem from CLI Interface
-  test("should get health of subsystem") {
+  test("should get health of subsystem | DEOPSCSW-478") {
     setSeverity(tromboneAxisHighLimitKey, Warning).futureValue
     setSeverity(tromboneAxisLowLimitKey, Okay).futureValue
     setSeverity(outOfRangeOffloadKey, Okay).futureValue
@@ -523,7 +523,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   }
 
   // DEOPSCSW-478: Fetch health of component/subsystem from CLI Interface
-  test("should get health of alarm service") {
+  test("should get health of alarm service | DEOPSCSW-478") {
     val cmd = Options(cmd = "health", subCmd = "get")
 
     cliApp.execute(cmd)
@@ -531,7 +531,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
   }
 
   // DEOPSCSW-479: Subscribe to health changes of component/subsystem/all alarms using CLI Interface
-  test("should subscribe health of subsystem/component/alarm") {
+  test("should subscribe health of subsystem/component/alarm | DEOPSCSW-479") {
     val subsystem         = tromboneAxisHighLimitKey.prefix.subsystem
     val component         = tromboneAxisHighLimitKey.prefix.componentName
     val tromboneComponent = s"${subsystem.name}-$component"

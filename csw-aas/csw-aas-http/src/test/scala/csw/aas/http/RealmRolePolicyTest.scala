@@ -17,7 +17,7 @@ import org.scalatest.matchers.should.Matchers
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
 class RealmRolePolicyTest extends AnyFunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
-  test("realmRole policy should return AuthenticationFailedRejection when token is invalid") {
+  test("realmRole policy should return AuthenticationFailedRejection when token is invalid | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
@@ -44,7 +44,7 @@ class RealmRolePolicyTest extends AnyFunSuite with MockitoSugar with Directives 
     }
   }
 
-  test("realmRole policy should return AuthenticationFailedRejection when token is not present") {
+  test("realmRole policy should return AuthenticationFailedRejection when token is not present | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
@@ -65,7 +65,7 @@ class RealmRolePolicyTest extends AnyFunSuite with MockitoSugar with Directives 
     }
   }
 
-  test("realmRole policy should return AuthorizationFailedRejection when token does not have realmRole") {
+  test("realmRole policy should return AuthorizationFailedRejection when token does not have realmRole | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 
@@ -98,7 +98,7 @@ class RealmRolePolicyTest extends AnyFunSuite with MockitoSugar with Directives 
     }
   }
 
-  test("realmRole policy should return 200 OK when token is valid & has realmRole") {
+  test("realmRole policy should return 200 OK when token is valid & has realmRole | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
 

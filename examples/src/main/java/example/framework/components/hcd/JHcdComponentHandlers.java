@@ -93,7 +93,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
             // validation for observe goes here
             return new CommandResponse.Accepted(runId);
         } else {
-            return new CommandResponse.Invalid(runId, new CommandIssue.UnsupportedCommandIssue(controlCommand.commandName().name()));
+            return new CommandResponse.Invalid(runId, new CommandIssue.HCDBusyIssue("HCD is currently processing other command"));
         }
     }
     //#validateCommand-handler

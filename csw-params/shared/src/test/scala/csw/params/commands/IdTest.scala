@@ -7,7 +7,7 @@ import org.scalatest.matchers.should.Matchers
 class IdTest extends AnyFunSuite with Matchers {
   // No longer needed
   /*
-  test("should able to create setup commands having unique runId") {
+  test("should able to create setup commands having unique runId | DEOPSCSW-205") {
 
     var runIds: Set[Id] = Set.empty
 
@@ -21,7 +21,7 @@ class IdTest extends AnyFunSuite with Matchers {
     runIds.size shouldBe 10
   }
 
-  test("should able to create observe commands having unique runId") {
+  test("should able to create observe commands having unique runId | DEOPSCSW-205") {
 
     var runIds: Set[Id] = Set.empty
 
@@ -35,7 +35,7 @@ class IdTest extends AnyFunSuite with Matchers {
     runIds.size shouldBe 10
   }
 
-  test("should able to create wait commands having unique runId") {
+  test("should able to create wait commands having unique runId | DEOPSCSW-205") {
 
     var runIds: Set[Id] = Set.empty
 

@@ -3,7 +3,7 @@ package csw.params.core.generics
 import csw.params.core.formats.ParamCodecs._
 import csw.params.core.formats.{ParamCodecs, ParamCore}
 import csw.params.core.models.Coords._
-import csw.params.core.models.Units.second
+import csw.params.core.models.Units.{NoUnits, second}
 import csw.params.core.models._
 import csw.time.core.models.{TAITime, UTCTime}
 import enumeratum.{Enum, EnumEntry}
@@ -37,7 +37,17 @@ class SimpleKeyType[S: ClassTag: ArrayEnc: ArrayDec] extends KeyType[S] {
    * @param name represents keyName in Key
    * @return a Key[S] with NoUnits where S is the type of values that will sit against the key in Parameter
    */
-  def make(name: String): Key[S] = new Key[S](name, this)
+  def make(name: String): Key[S] = new Key[S](name, this, NoUnits)
+
+  /**
+   * Make a Key from provided name and units
+   *
+   * @param name represents keyName in Key
+   *             @param units represents the units of the values
+   * @return a Key[S] with units where S is the type of values that will sit against the key in Parameter
+   */
+  def make(name: String, units: Units): Key[S] = new Key[S](name, this, units)
+
 }
 
 /**
@@ -47,7 +57,7 @@ class SimpleKeyType[S: ClassTag: ArrayEnc: ArrayDec] extends KeyType[S] {
  * @param defaultUnits applicable units
  * @tparam S the type of values that will sit against the key in Parameter
  */
-sealed class SimpleKeyTypeWithUnits[S: ClassTag: ArrayEnc: ArrayDec](defaultUnits: Units) extends KeyType[S] {
+class SimpleKeyTypeWithUnits[S: ClassTag: ArrayEnc: ArrayDec](defaultUnits: Units) extends KeyType[S] {
 
   /**
    * Make a Key from provided name
@@ -79,9 +89,14 @@ object KeyType extends Enum[KeyType[_]] {
   override def values: IndexedSeq[KeyType[_]] = findValues
 
   case object ChoiceKey extends KeyType[Choice] {
-    def make(name: String, choices: Choices): GChoiceKey = new GChoiceKey(name, this, choices)
+    def make(name: String, units: Units, choices: Choices): GChoiceKey = new GChoiceKey(name, this, units, choices)
+    def make(name: String, choices: Choices): GChoiceKey               = make(name, NoUnits, choices)
+
+    def make(name: String, units: Units, firstChoice: Choice, restChoices: Choice*): GChoiceKey =
+      new GChoiceKey(name, this, units, Choices(restChoices.toSet + firstChoice))
+
     def make(name: String, firstChoice: Choice, restChoices: Choice*): GChoiceKey =
-      new GChoiceKey(name, this, Choices(restChoices.toSet + firstChoice))
+      make(name, NoUnits, firstChoice, restChoices: _*)
   }
 
   case object StringKey  extends SimpleKeyType[String]
@@ -98,7 +113,7 @@ object KeyType extends Enum[KeyType[_]] {
   case object CoordKey            extends SimpleKeyType[Coord]
 
   //scala
-  case object BooleanKey extends SimpleKeyType[Boolean]
+  case object BooleanKey extends SimpleKeyTypeWithUnits[Boolean](NoUnits)
   case object CharKey    extends SimpleKeyType[Char]
 
   case object ByteKey   extends SimpleKeyType[Byte]

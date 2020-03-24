@@ -6,6 +6,7 @@ import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.ObsId;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JUnits;
 import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
 import org.junit.Assert;
@@ -21,9 +22,9 @@ import java.util.Set;
 // DEOPSCSW-185: Easy to Use Syntax/Api
 public class JStateVariableTest extends JUnitSuite {
 
-    private final Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder");
-    private final Key<String> epochStringKey = JKeyType.StringKey().make("epoch");
-    private final Key<Integer> epochIntKey = JKeyType.IntKey().make("epoch");
+    private final Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder", JUnits.encoder);
+    private final Key<String> epochStringKey = JKeyType.StringKey().make("epoch", JUnits.year);
+    private final Key<Integer> epochIntKey = JKeyType.IntKey().make("epoch", JUnits.year);
 
     private final Parameter<Integer> encoderParam = encoderIntKey.set(22, 33);
     private final Parameter<String> epochStringParam = epochStringKey.set("A", "B");
@@ -31,7 +32,7 @@ public class JStateVariableTest extends JUnitSuite {
     private final Prefix prefix = Prefix.apply(JSubsystem.WFOS, "red.detector");
 
     @Test
-    public void shouldAbleToCreateCurrentState() {
+    public void shouldAbleToCreateCurrentState__DEOPSCSW_183_DEOPSCSW_185() {
         CurrentState currentState = new CurrentState(prefix, new StateName("testStateName")).add(encoderParam).add(epochStringParam);
 
         // typeName and prefix
@@ -48,7 +49,7 @@ public class JStateVariableTest extends JUnitSuite {
     }
 
     @Test
-    public void shouldAbleToCreateCurrentStateFromSetup() {
+    public void shouldAbleToCreateCurrentStateFromSetup__DEOPSCSW_183_DEOPSCSW_185() {
         Prefix source = prefix;
         Setup setup = new Setup(source, new CommandName("move"), Optional.of(new ObsId("obsId"))).add(encoderParam).add(epochStringParam);
         CurrentState currentState = new CurrentState(new StateName("testStateName"), setup);
@@ -67,7 +68,7 @@ public class JStateVariableTest extends JUnitSuite {
     }
 
     @Test
-    public void shouldAbleToCreateDemandState() {
+    public void shouldAbleToCreateDemandState__DEOPSCSW_183_DEOPSCSW_185() {
         DemandState demandState = new DemandState(prefix, new StateName("testStateName")).add(encoderParam).add(epochStringParam);
 
         // typeName and prefix
@@ -84,7 +85,7 @@ public class JStateVariableTest extends JUnitSuite {
     }
 
     @Test
-    public void shouldAbleToCreateDemandStateFromSetup() {
+    public void shouldAbleToCreateDemandStateFromSetup__DEOPSCSW_183_DEOPSCSW_185() {
         Prefix source = prefix;
         Setup setup = new Setup(source, new CommandName("move"), Optional.of(new ObsId("obsId"))).add(encoderParam).add(epochStringParam);
         DemandState demandState = new DemandState(new StateName("testStateName"), setup);
@@ -103,7 +104,7 @@ public class JStateVariableTest extends JUnitSuite {
     }
 
     @Test
-    public void shouldAbleToMatchWithDefaultMatcher() {
+    public void shouldAbleToMatchWithDefaultMatcher__DEOPSCSW_183_DEOPSCSW_185() {
         CurrentState currentState = new CurrentState(prefix, new StateName("testStateName")).add(encoderParam).add(epochStringParam);
         DemandState demandState = new DemandState(prefix, new StateName("testStateName")).add(encoderParam).add(epochStringParam);
 
@@ -111,7 +112,7 @@ public class JStateVariableTest extends JUnitSuite {
     }
 
     @Test
-    public void shouldAbleToCreateCurrentStatesUsingVargs() {
+    public void shouldAbleToCreateCurrentStatesUsingVargs__DEOPSCSW_183_DEOPSCSW_185() {
         CurrentState currentState1 = new CurrentState(prefix, new StateName("testStateName")).add(encoderParam);
         CurrentState currentState2 = new CurrentState(prefix, new StateName("testStateName")).add(epochStringParam);
         CurrentState currentState3 = new CurrentState(prefix, new StateName("testStateName")).add(epochStringParam);
@@ -124,7 +125,7 @@ public class JStateVariableTest extends JUnitSuite {
     }
 
     @Test
-    public void shouldAbleToCreateCurrentStatesUsingList() {
+    public void shouldAbleToCreateCurrentStatesUsingList__DEOPSCSW_183_DEOPSCSW_185() {
         CurrentState currentState1 = new CurrentState(prefix, new StateName("testStateName")).add(encoderParam);
         CurrentState currentState2 = new CurrentState(prefix, new StateName("testStateName")).add(epochStringParam);
         CurrentState currentState3 = new CurrentState(prefix, new StateName("testStateName")).add(epochStringParam);

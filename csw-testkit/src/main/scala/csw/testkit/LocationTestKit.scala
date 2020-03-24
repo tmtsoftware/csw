@@ -24,7 +24,7 @@ import csw.testkit.internal.TestKitUtils
  */
 final class LocationTestKit private (testKitSettings: TestKitSettings) {
 
-  private lazy val locationWiring = ServerWiring.make(testKitSettings.LocationClusterPort)
+  private lazy val locationWiring = ServerWiring.make(testKitSettings.LocationClusterPort, enableAuth = false)
   import locationWiring.actorRuntime._
 
   implicit lazy val timeout: Timeout = testKitSettings.DefaultTimeout

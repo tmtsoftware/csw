@@ -6,7 +6,7 @@ import csw.prefix.models.Subsystem.CSW
 //#host-config-app
 object HostConfigApp extends App {
 
-  HostConfig.start("Host-Config-App", CSW, args)
+  HostConfig.start("HostConfigApp", CSW, args)
 
 }
 //#host-config-app

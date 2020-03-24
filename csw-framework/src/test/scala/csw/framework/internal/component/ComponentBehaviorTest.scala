@@ -45,7 +45,7 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar with Ma
       BehaviorTestKit(behavior.asInstanceOf[Behavior[TopLevelActorMessage]])
   }
 
-  test("component should send itself initialize message and handle initialization") {
+  test("component should send itself initialize message and handle initialization | DEOPSCSW-165, DEOPSCSW-166") {
     val supervisorProbe = TestProbe[FromComponentLifecycleMessage]
     val testData        = new TestData(supervisorProbe)
     import testData._
@@ -59,7 +59,7 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar with Ma
   }
 
   // DEOPSCSW-37: Add diagnosticMode handler to component handlers
-  test("component should handle DiagnosticMode message") {
+  test("component should handle DiagnosticMode message | DEOPSCSW-165, DEOPSCSW-166, DEOPSCSW-37") {
     val supervisorProbe = TestProbe[FromComponentLifecycleMessage]
     val testData        = new TestData(supervisorProbe)
     import testData._

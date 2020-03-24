@@ -1,5 +1,7 @@
 package csw.command.client
 
+import java.util.concurrent.CompletableFuture
+
 import akka.actor.typed.{ActorRef, ActorSystem}
 import csw.command.client.CommandResponseManager.{OverallFailure, OverallResponse, OverallSuccess}
 import csw.command.client.MiniCRM.MiniCRMMessage.AddResponse
@@ -7,6 +9,8 @@ import csw.params.commands.CommandResponse
 import csw.params.commands.CommandResponse.SubmitResponse
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.jdk.CollectionConverters._
+import scala.jdk.FutureConverters._
 
 /**
  * Wrapper API for interacting with Command Response Manager of a component
@@ -43,6 +47,17 @@ class CommandResponseManager(val commandResponseManagerActor: ActorRef[MiniCRM.C
       }
     }
 
+  /**
+   * Java API: queryFinal allows executing code when all the provided commands have completed.
+   *
+   * @param commands commands that have been started with submit or submitAndWait
+   * @return An overall response indicated success or failure
+   */
+  def queryFinalAll(commands: java.util.List[CompletableFuture[SubmitResponse]]): CompletableFuture[OverallResponse] = {
+    val args = commands.asScala.toList.map(_.asScala)
+    queryFinalAll(args: _*).asJava.toCompletableFuture
+  }
+
   // Returns true if all the commands in the response set have returned without Error
   private def isSuccessful(responses: Set[SubmitResponse]): Boolean = {
     !responses.exists(CommandResponse.isNegative)
@@ -53,6 +68,11 @@ object CommandResponseManager {
 
   trait OverallResponse {
     def responses: Set[SubmitResponse]
+
+    /**
+     * Java API to get the set of responses
+     */
+    def getResponses: java.util.Set[SubmitResponse] = responses.asJava
   }
 
   /**

@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 public class JEventsTest extends JUnitSuite {
 
     @Test
-    public void showUsageOfEventTime() {
+    public void showUsageOfEventTime__DEOPSCSW_331() {
         //#eventtime
 
         //apply returns current time in UTC
@@ -54,10 +54,10 @@ public class JEventsTest extends JUnitSuite {
     }
 
     @Test
-    public void showUsageOfSystemEvent() {
+    public void showUsageOfSystemEvent__DEOPSCSW_331() {
         //#systemevent
         //keys
-        Key<Integer> k1 = JKeyType.IntKey().make("encoder");
+        Key<Integer> k1 = JKeyType.IntKey().make("encoder", JUnits.encoder);
         Key<Integer> k2 = JKeyType.IntKey().make("speed");
         Key<String> k3 = JKeyType.StringKey().make("filter");
         Key<Integer> k4 = JKeyType.IntKey().make("notUsed");
@@ -104,11 +104,11 @@ public class JEventsTest extends JUnitSuite {
     }
 
     @Test
-    public void showUsageOfObserveEvent() {
+    public void showUsageOfObserveEvent__DEOPSCSW_331() {
         //#observeevent
         //keys
-        Key<Integer> k1 = JKeyType.IntKey().make("readoutsCompleted");
-        Key<Integer> k2 = JKeyType.IntKey().make("coaddsCompleted");
+        Key<Integer> k1 = JKeyType.IntKey().make("readoutsCompleted", JUnits.NoUnits);
+        Key<Integer> k2 = JKeyType.IntKey().make("coaddsCompleted", JUnits.NoUnits);
         Key<String> k3 = JKeyType.StringKey().make("fileID");
         Key<Integer> k4 = JKeyType.IntKey().make("notUsed");
 
@@ -154,7 +154,7 @@ public class JEventsTest extends JUnitSuite {
     }
 
     @Test
-    public void showUsageOfJsonSerialization() {
+    public void showUsageOfJsonSerialization__DEOPSCSW_331() {
         //#json-serialization
         //key
         Key<MatrixData<Double>> k1 = JKeyType.DoubleMatrixKey().make("myMatrix");
@@ -197,10 +197,10 @@ public class JEventsTest extends JUnitSuite {
     }
 
     @Test
-    public void showUniqueKeyConstraintExample() {
+    public void showUniqueKeyConstraintExample__DEOPSCSW_331() {
         //#unique-key
         //keys
-        Key<Integer> encoderKey = JKeyType.IntKey().make("encoder");
+        Key<Integer> encoderKey = JKeyType.IntKey().make("encoder", JUnits.encoder);
         Key<Integer> filterKey = JKeyType.IntKey().make("filter");
         Key<Integer> miscKey = JKeyType.IntKey().make("misc");
 
@@ -248,7 +248,7 @@ public class JEventsTest extends JUnitSuite {
     }
 
     @Test
-    public void showUsageOfCbor() {
+    public void showUsageOfCbor__DEOPSCSW_331() {
         //#cbor
 
         //prefixes
@@ -258,7 +258,7 @@ public class JEventsTest extends JUnitSuite {
         EventName name2 = new EventName("guiderCoords");
 
         //Key
-        Key<RaDec> raDecKey = JKeyType.RaDecKey().make("raDecKey");
+        Key<RaDec> raDecKey = JKeyType.RaDecKey().make("raDecKey", JUnits.NoUnits);
 
         //values
         RaDec raDec1 = new RaDec(10.20, 40.20);

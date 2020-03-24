@@ -6,7 +6,7 @@ import csw.prefix.models.Subsystem.CSW
 //#container-app
 object ContainerCmdApp extends App {
 
-  ContainerCmd.start("Container-Cmd-App", CSW, args)
+  ContainerCmd.start("ContainerCmdApp", CSW, args)
 
 }
 //#container-app

@@ -56,7 +56,9 @@ class DatabaseServiceFactoryTest extends AnyFunSuite with Matchers with BeforeAn
 
   //DEOPSCSW-618: Integration with Location Service
   //DEOPSCSW-606: Examples for storing and using authentication information
-  test("should create DSLContext using location service and dbName") {
+  test(
+    "should create DSLContext using location service and dbName | DEOPSCSW-618, DEOPSCSW-621, DEOPSCSW-615, DEOPSCSW-620, DEOPSCSW-606"
+  ) {
     val dsl: DSLContext = dbFactory.makeDsl(locationService, dbName).futureValue(Interval(Span(5, Seconds)))
 
     val resultSet = dsl
@@ -69,7 +71,9 @@ class DatabaseServiceFactoryTest extends AnyFunSuite with Matchers with BeforeAn
 
   //DEOPSCSW-618: Integration with Location Service
   //DEOPSCSW-606: Examples for storing and using authentication information
-  test("should create DSLContext using location service, dbName, usernameHolder and passwordHolder") {
+  test(
+    "should create DSLContext using location service, dbName, usernameHolder and passwordHolder | DEOPSCSW-618, DEOPSCSW-621, DEOPSCSW-615, DEOPSCSW-620, DEOPSCSW-606"
+  ) {
     val dsl =
       dbFactory.makeDsl(locationService, dbName, ReadUsernameHolder, ReadPasswordHolder).futureValue(Interval(Span(5, Seconds)))
 
@@ -81,7 +85,7 @@ class DatabaseServiceFactoryTest extends AnyFunSuite with Matchers with BeforeAn
     resultSet should contain("box_office")
   }
 
-  test("should create DSLContext using config") {
+  test("should create DSLContext using config | DEOPSCSW-620, DEOPSCSW-621, DEOPSCSW-615") {
     val dsl = dbFactory.makeDsl().futureValue(Interval(Span(5, Seconds)))
 
     val resultSet = dsl
@@ -93,7 +97,7 @@ class DatabaseServiceFactoryTest extends AnyFunSuite with Matchers with BeforeAn
   }
 
   //DEOPSCSW-605: Examples for multiple database support
-  test("should be able to connect to other database") {
+  test("should be able to connect to other database | DEOPSCSW-620, DEOPSCSW-621, DEOPSCSW-615, DEOPSCSW-605") {
     // create a new database
     testDsl.query("CREATE DATABASE postgres2").executeAsyncScala().futureValue(Interval(Span(5, Seconds)))
 

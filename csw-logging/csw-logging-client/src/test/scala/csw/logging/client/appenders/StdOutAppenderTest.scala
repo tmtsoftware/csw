@@ -62,7 +62,7 @@ class StdOutAppenderTest extends AnyFunSuite with Matchers with BeforeAndAfterEa
     Await.result(actorSystem.whenTerminated, 5.seconds)
   }
 
-  test("should print message to standard output stream if category is \'common\'") {
+  test("should print message to standard output stream if category is \'common\' | DEOPSCSW-122") {
 
     Console.withOut(outCapture) {
       stdOutAppender.append(expectedLogJson, Category.Common.name)
@@ -72,7 +72,7 @@ class StdOutAppenderTest extends AnyFunSuite with Matchers with BeforeAndAfterEa
     actualLogJson shouldBe expectedLogJson
   }
 
-  test("should not print message to standard output stream if category is not \'common\'") {
+  test("should not print message to standard output stream if category is not \'common\' | DEOPSCSW-122") {
     val category = "foo"
 
     Console.withOut(outCapture) {
@@ -84,7 +84,7 @@ class StdOutAppenderTest extends AnyFunSuite with Matchers with BeforeAndAfterEa
 
   // DEOPSCSW-325: Include exception stack trace in stdout log message for exceptions
   // CSW-78: PrefixRedesign for logging
-  test("should able to pretty-print one log message to one line") {
+  test("should able to pretty-print one log message to one line | DEOPSCSW-122, DEOPSCSW-325") {
 
     val config = ConfigFactory
       .parseString("csw-logging.appender-config.stdout.oneLine=true")

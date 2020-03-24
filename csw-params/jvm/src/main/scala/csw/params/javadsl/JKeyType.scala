@@ -1,12 +1,13 @@
 package csw.params.javadsl
 
-import csw.params.core.generics.{ArrayKeyType, KeyType, MatrixKeyType, SimpleKeyType}
+import csw.params.core.generics.{ArrayKeyType, KeyType, MatrixKeyType, SimpleKeyType, SimpleKeyTypeWithUnits}
+import csw.params.core.models.Units.NoUnits
 
 object JSimpleKeyType {
   //required for Scala compatible and efficient ByteArray codecs
   import csw.params.core.formats.ParamCodecs.{javaByteArrayDec, javaByteArrayEnc}
 
-  case object BooleanKey extends SimpleKeyType[java.lang.Boolean]
+  case object BooleanKey extends SimpleKeyTypeWithUnits[java.lang.Boolean](NoUnits)
   case object CharKey    extends SimpleKeyType[java.lang.Character]
 
   case object ByteKey   extends SimpleKeyType[java.lang.Byte]
