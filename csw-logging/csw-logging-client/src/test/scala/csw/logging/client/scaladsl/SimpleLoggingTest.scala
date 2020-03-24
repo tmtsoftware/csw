@@ -2,7 +2,6 @@ package csw.logging.client.scaladsl
 
 import java.time._
 import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
 
 import csw.logging.client.commons.{LoggingKeys, TMTDateTimeFormatter}
 import csw.logging.client.components.{InnerSourceComponent, SingletonComponent, TromboneAssembly, TromboneHcd}
@@ -30,8 +29,9 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
   test(
     "logs should contain component name and source location in terms of file name, class name and line number | DEOPSCSW-114, DEOPSCSW-121, DEOPSCSW-118, DEOPSCSW-116, DEOPSCSW-158, DEOPSCSW-119"
   ) {
+    val hcd              = new TromboneHcd()
     val expectedDateTime = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
-    new TromboneHcd().startLogging(logMsgMap)
+    hcd.startLogging(logMsgMap)
     Thread.sleep(400)
 
     // Verify log level for tromboneHcd is at debug level in config
@@ -48,8 +48,10 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
       //      2017-07-19T01:23:55.360Z      :=> DateTimeFormatter.ISO_INSTANT.parse will not throw exception
       noException shouldBe thrownBy(DateTimeFormatter.ISO_INSTANT.parse(log.getString(LoggingKeys.TIMESTAMP)))
 
-      val actualDateTime = TMTDateTimeFormatter.parse(log.getString(LoggingKeys.TIMESTAMP))
-      ChronoUnit.MILLIS.between(expectedDateTime, actualDateTime) <= 50 shouldBe true
+      val actualDateTime    = TMTDateTimeFormatter.parse(log.getString(LoggingKeys.TIMESTAMP))
+      val expectedMillis    = expectedDateTime.toInstant.toEpochMilli
+      val beWithinTolerance = be >= expectedMillis and be <= expectedMillis + 100
+      actualDateTime.toInstant.toEpochMilli should beWithinTolerance
 
       log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "tromboneHcd"
       log.getString(LoggingKeys.SUBSYSTEM) shouldBe "CSW"
