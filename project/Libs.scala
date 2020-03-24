@@ -36,7 +36,7 @@ object Libs {
   val `scala-compiler`    = "org.scala-lang"          % "scala-compiler"     % ScalaVersion
   val `HdrHistogram`      = "org.hdrhistogram"        % "HdrHistogram"       % "2.1.12"
   val `testng`            = "org.testng"              % "testng"             % "6.14.3"
-  val `junit-4-12`        = "org.scalatestplus"       %% "junit-4-12"        % "3.1.1.0"
+  val `junit-4-12`        = "org.scalatestplus"       %% "junit-4-12"        % "3.1.0.0"
   val `testng-6-7`        = "org.scalatestplus"       %% "testng-6-7"        % "3.1.1.0"
 
   val `scala-csv`             = "com.github.tototoshi"          %% "scala-csv"            % "1.3.6"
@@ -121,7 +121,7 @@ object Jooq {
 }
 
 object MSocket {
-  val Version = "3ebf05d"
+  val Version = "4304ecb"
 
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-impl-jvm` = "com.github.tmtsoftware.msocket" %% "msocket-impl" % Version
