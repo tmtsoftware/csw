@@ -20,6 +20,12 @@ object Common extends AutoPlugin {
 
   override def requires: Plugins = JvmPlugin
 
+  private val storyReport: Boolean         = sys.props.get("generateStoryReport").contains("true")
+  private val reporterOptions: Seq[String] =
+    // "-oDF" - show full stack traces and test case durations
+    // -C - to generate CSV story and test mapping
+    if (storyReport) Seq("-oDF", "-C", "tmt.test.reporter.TestReporter") else Seq("-oDF")
+
   import autoImport._
   override lazy val projectSettings: Seq[Setting[_]] = Seq(
     dependencyOverrides += AkkaHttp.`akka-http-spray-json`,
@@ -51,8 +57,7 @@ object Common extends AutoPlugin {
     javacOptions in (Compile, doc) ++= Seq("-Xdoclint:none"),
     javacOptions in doc ++= Seq("--ignore-source-errors"),
     testOptions in Test ++= Seq(
-      // show full stack traces and test case durations
-      Tests.Argument("-oDF")
+      Tests.Argument(reporterOptions: _*)
     ),
     publishArtifact in (Test, packageBin) := true,
     version := {

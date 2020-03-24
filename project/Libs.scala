@@ -42,17 +42,18 @@ object Libs {
   val `scala-csv`             = "com.github.tototoshi" %% "scala-csv"            % "1.3.6"
   val `json-schema-validator` = "com.github.fge"       % "json-schema-validator" % "2.2.13" //LGPL/ASL
 
-  val `jna`             = "net.java.dev.jna"              % "jna"             % "5.5.0"
-  val `postgresql`      = "org.postgresql"                % "postgresql"      % "42.2.9"
-  val `hikaricp`        = "com.zaxxer"                    % "HikariCP"        % "3.4.2" //Apache License 2.0
-  val `otj-pg-embedded` = "com.opentable.components"      % "otj-pg-embedded" % "0.13.3"
-  val httpclient        = "org.apache.httpcomponents"     % "httpclient"      % "4.5.11"
-  val `jboss-logging`   = "org.jboss.logging"             % "jboss-logging"   % "3.4.1.Final"
-  val `config`          = "com.typesafe"                  % "config"          % "1.4.0"
-  val `os-lib`          = "com.lihaoyi"                   %% "os-lib"         % "0.6.3"
-  val `caffeine`        = "com.github.ben-manes.caffeine" % "caffeine"        % "2.8.1"
-  val netty             = "io.netty"                      % "netty"           % "3.10.6.Final"
-  val `case-app`        = "com.github.alexarchambault"    %% "case-app"       % "2.0.0-M13"
+  val `jna`               = "net.java.dev.jna"              % "jna"             % "5.5.0"
+  val `postgresql`        = "org.postgresql"                % "postgresql"      % "42.2.9"
+  val `hikaricp`          = "com.zaxxer"                    % "HikariCP"        % "3.4.2" //Apache License 2.0
+  val `otj-pg-embedded`   = "com.opentable.components"      % "otj-pg-embedded" % "0.13.3"
+  val httpclient          = "org.apache.httpcomponents"     % "httpclient"      % "4.5.11"
+  val `jboss-logging`     = "org.jboss.logging"             % "jboss-logging"   % "3.4.1.Final"
+  val `config`            = "com.typesafe"                  % "config"          % "1.4.0"
+  val `os-lib`            = "com.lihaoyi"                   %% "os-lib"         % "0.6.3"
+  val `caffeine`          = "com.github.ben-manes.caffeine" % "caffeine"        % "2.8.1"
+  val netty               = "io.netty"                      % "netty"           % "3.10.6.Final"
+  val `case-app`          = "com.github.alexarchambault"    %% "case-app"       % "2.0.0-M13"
+  val `tmt-test-reporter` = "com.github.tmtsoftware"        %% "rtm"            % "3326621466"
 }
 
 object Borer {

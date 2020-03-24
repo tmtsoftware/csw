@@ -9,6 +9,8 @@ docsRepo in ThisBuild := "git@github.com:tmtsoftware/tmtsoftware.github.io.git"
 docsParentDir in ThisBuild := "csw"
 gitCurrentRepo in ThisBuild := "https://github.com/tmtsoftware/csw"
 
+libraryDependencies in ThisBuild += (Libs.`tmt-test-reporter` % Test)
+
 lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-prefix`.jvm,
   `csw-prefix`.js,
