@@ -51,12 +51,12 @@ class ConfigParserTest extends AnyFunSuite with Matchers {
   private val hostBootstrapInfo = HostBootstrapInfo(Set(standaloneBootstrapInfo, containerBootstrapInfo))
 
   // ################### Start : Container Parsing ###################
-  test("should able to parse container config") {
+  test("should able to parse container config | DEOPSCSW-167, DEOPSCSW-170, DEOPSCSW-172, DEOPSCSW-283") {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/SampleContainer.conf")
     ConfigParser.parseContainer(config) shouldEqual containerInfo
   }
 
-  test("should able to throw error when 'name' is missing") {
+  test("should able to throw error when 'name' is missing | DEOPSCSW-167, DEOPSCSW-170, DEOPSCSW-172, DEOPSCSW-283") {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/container/missing_componentname.conf")
 
     intercept[java.lang.RuntimeException] {
@@ -64,7 +64,7 @@ class ConfigParserTest extends AnyFunSuite with Matchers {
     }
   }
 
-  test("should able to throw error when 'components' is missing") {
+  test("should able to throw error when 'components' is missing | DEOPSCSW-167, DEOPSCSW-170, DEOPSCSW-172, DEOPSCSW-283") {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/container/missing_components.conf")
 
     intercept[java.lang.RuntimeException] {
@@ -72,7 +72,9 @@ class ConfigParserTest extends AnyFunSuite with Matchers {
     }
   }
 
-  test("should able to throw error when 'components' is not a config object") {
+  test(
+    "should able to throw error when 'components' is not a config object | DEOPSCSW-167, DEOPSCSW-170, DEOPSCSW-172, DEOPSCSW-283"
+  ) {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/container/invalid_components.conf")
 
     intercept[java.lang.RuntimeException] {
@@ -82,7 +84,7 @@ class ConfigParserTest extends AnyFunSuite with Matchers {
   // ################### End : Container Parsing #####################
 
   // ################### Start : Standalone Parsing ##################
-  test("should able to parse standalone assembly config") {
+  test("should able to parse standalone assembly config | DEOPSCSW-167, DEOPSCSW-170, DEOPSCSW-172, DEOPSCSW-283") {
     val config               = ConfigFactory.parseResources(getClass, "/parsing_test_conf/standalone/SampleStandalone.conf")
     val expectedAssemblyInfo = ConfigParser.parseStandalone(config)
     expectedAssemblyInfo shouldEqual assemblyInfo
@@ -90,7 +92,9 @@ class ConfigParserTest extends AnyFunSuite with Matchers {
 
   }
 
-  test("should able to throw error when 'behaviorFactoryClassName' is missing for assembly") {
+  test(
+    "should able to throw error when 'behaviorFactoryClassName' is missing for assembly | DEOPSCSW-167, DEOPSCSW-170, DEOPSCSW-172, DEOPSCSW-283"
+  ) {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/assembly/missing_classname.conf")
 
     intercept[java.lang.RuntimeException] {
@@ -98,7 +102,9 @@ class ConfigParserTest extends AnyFunSuite with Matchers {
     }
   }
 
-  test("should able to throw error when 'subsystem' is missing for assembly") {
+  test(
+    "should able to throw error when 'subsystem' is missing for assembly | DEOPSCSW-167, DEOPSCSW-170, DEOPSCSW-172, DEOPSCSW-283"
+  ) {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/assembly/missing_prefix.conf")
 
     intercept[java.lang.RuntimeException] {
@@ -106,7 +112,9 @@ class ConfigParserTest extends AnyFunSuite with Matchers {
     }
   }
 
-  test("should able to throw error when 'locationServiceUsage' is missing for assembly") {
+  test(
+    "should able to throw error when 'locationServiceUsage' is missing for assembly | DEOPSCSW-167, DEOPSCSW-170, DEOPSCSW-172, DEOPSCSW-283"
+  ) {
     val config =
       ConfigFactory.parseResources(getClass, "/parsing_test_conf/assembly/missing_location_service_usage.conf")
 
@@ -115,7 +123,9 @@ class ConfigParserTest extends AnyFunSuite with Matchers {
     }
   }
 
-  test("should able to throw error when 'connections' is not an array for assembly") {
+  test(
+    "should able to throw error when 'connections' is not an array for assembly | DEOPSCSW-167, DEOPSCSW-170, DEOPSCSW-172, DEOPSCSW-283"
+  ) {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/assembly/invalid_connections.conf")
 
     intercept[java.lang.RuntimeException] {
@@ -123,7 +133,9 @@ class ConfigParserTest extends AnyFunSuite with Matchers {
     }
   }
 
-  test("should able to throw error when connection ingredients has typos for 'connections' in assembly") {
+  test(
+    "should able to throw error when connection ingredients has typos for 'connections' in assembly | DEOPSCSW-167, DEOPSCSW-170, DEOPSCSW-172, DEOPSCSW-283"
+  ) {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/assembly/connection_entry_typo.conf")
 
     intercept[java.lang.RuntimeException] {
@@ -131,7 +143,9 @@ class ConfigParserTest extends AnyFunSuite with Matchers {
     }
   }
 
-  test("should able to throw error when 'componentType' is missing for assembly") {
+  test(
+    "should able to throw error when 'componentType' is missing for assembly | DEOPSCSW-167, DEOPSCSW-170, DEOPSCSW-172, DEOPSCSW-283"
+  ) {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/assembly/missing_componenttype.conf")
 
     intercept[java.lang.RuntimeException] {
@@ -139,7 +153,9 @@ class ConfigParserTest extends AnyFunSuite with Matchers {
     }
   }
 
-  test("should able to throw error when 'behaviorFactoryClassName' is missing for hcd") {
+  test(
+    "should able to throw error when 'behaviorFactoryClassName' is missing for hcd | DEOPSCSW-167, DEOPSCSW-170, DEOPSCSW-172, DEOPSCSW-283"
+  ) {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/hcd/missing_classname.conf")
 
     intercept[java.lang.RuntimeException] {
@@ -147,7 +163,7 @@ class ConfigParserTest extends AnyFunSuite with Matchers {
     }
   }
 
-  test("should able to throw error when 'subsystem' is missing for hcd") {
+  test("should able to throw error when 'subsystem' is missing for hcd | DEOPSCSW-167, DEOPSCSW-170, DEOPSCSW-172, DEOPSCSW-283") {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/hcd/missing_prefix.conf")
 
     intercept[java.lang.RuntimeException] {
@@ -155,7 +171,9 @@ class ConfigParserTest extends AnyFunSuite with Matchers {
     }
   }
 
-  test("should able to throw error when 'locationServiceUsage' is missing for hcd") {
+  test(
+    "should able to throw error when 'locationServiceUsage' is missing for hcd | DEOPSCSW-167, DEOPSCSW-170, DEOPSCSW-172, DEOPSCSW-283"
+  ) {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/hcd/missing_location_service_usage.conf")
 
     intercept[java.lang.RuntimeException] {
@@ -163,7 +181,9 @@ class ConfigParserTest extends AnyFunSuite with Matchers {
     }
   }
 
-  test("should able to throw error when 'componentType' is missing for hcd") {
+  test(
+    "should able to throw error when 'componentType' is missing for hcd | DEOPSCSW-167, DEOPSCSW-170, DEOPSCSW-172, DEOPSCSW-283"
+  ) {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/hcd/missing_componenttype.conf")
 
     intercept[java.lang.RuntimeException] {
@@ -171,7 +191,9 @@ class ConfigParserTest extends AnyFunSuite with Matchers {
     }
   }
 
-  test("should able to throw error when 'name' is missing for standalone mode") {
+  test(
+    "should able to throw error when 'name' is missing for standalone mode | DEOPSCSW-167, DEOPSCSW-170, DEOPSCSW-172, DEOPSCSW-283"
+  ) {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/standalone/invalid_standalone.conf")
 
     intercept[java.lang.RuntimeException] {
@@ -183,12 +205,14 @@ class ConfigParserTest extends AnyFunSuite with Matchers {
   // DEOPSCSW-173: Host Configuration in file format
   // DEOPSCSW-175: Starting multiple containers from command Line
   // ################### Start : Host Parsing ######################
-  test("should able to parse host config") {
+  test("should able to parse host config | DEOPSCSW-167, DEOPSCSW-170, DEOPSCSW-172, DEOPSCSW-283, DEOPSCSW-173, DEOPSCSW-175") {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/hostconfig/valid_hostconfig.conf")
     ConfigParser.parseHost(config) shouldEqual hostBootstrapInfo
   }
 
-  test("should able to throw error when provided mode is invalid in host config") {
+  test(
+    "should able to throw error when provided mode is invalid in host config | DEOPSCSW-167, DEOPSCSW-170, DEOPSCSW-172, DEOPSCSW-283, DEOPSCSW-173, DEOPSCSW-175"
+  ) {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/hostconfig/invalid_mode.conf")
 
     intercept[java.lang.RuntimeException] {
@@ -196,7 +220,9 @@ class ConfigParserTest extends AnyFunSuite with Matchers {
     }
   }
 
-  test("should able to throw error when provided location is invalid in host config") {
+  test(
+    "should able to throw error when provided location is invalid in host config | DEOPSCSW-167, DEOPSCSW-170, DEOPSCSW-172, DEOPSCSW-283, DEOPSCSW-173, DEOPSCSW-175"
+  ) {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/hostconfig/invalid_location.conf")
 
     intercept[java.lang.RuntimeException] {

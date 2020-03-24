@@ -274,6 +274,8 @@ object Dependencies {
       Libs.`akka-stream-kafka`,
       Libs.`lettuce`,
       Libs.`reactor-core`,
+      Libs.`HdrHistogram`             % Test,
+      Akka.`akka-multi-node-testkit`  % Test,
       Akka.`akka-actor-testkit-typed` % Test,
       Libs.`scalatest`.value          % Test,
       Libs.`junit-4-12`               % Test,
@@ -540,7 +542,6 @@ object Dependencies {
       AkkaHttp.`akka-http`,
       Akka.`akka-multi-node-testkit`,
       Libs.`embedded-keycloak`,
-      Libs.`HdrHistogram`,
       Libs.`lettuce`
     )
   )

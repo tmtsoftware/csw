@@ -28,7 +28,7 @@ class KafkaFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
 
   override def afterAll(): Unit = kafkaTestProps.shutdown()
 
-  test("failure in publishing should fail future with PublishFailed exception") {
+  test("failure in publishing should fail future with PublishFailed exception | DEOPSCSW-398") {
 
     // simulate publishing failure as message size is greater than message.max.bytes(1 byte) configured in broker
     val failedEvent = Utils.makeEvent(2)
@@ -41,7 +41,7 @@ class KafkaFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
   }
 
   //DEOPSCSW-334: Publish an event
-  test("handle failed publish event with a callback") {
+  test("handle failed publish event with a callback | DEOPSCSW-398, DEOPSCSW-334") {
 
     val testProbe   = TestProbe[PublishFailure]()(kafkaTestProps.actorSystem)
     val failedEvent = Utils.makeEvent(1)
@@ -56,7 +56,7 @@ class KafkaFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
   }
 
   //DEOPSCSW-334: Publish an event
-  test("handle failed publish event with an eventGenerator and a callback") {
+  test("handle failed publish event with an eventGenerator and a callback | DEOPSCSW-398, DEOPSCSW-334") {
     val testProbe   = TestProbe[PublishFailure]()(kafkaTestProps.actorSystem)
     val failedEvent = Utils.makeEvent(1)
 
@@ -70,7 +70,9 @@ class KafkaFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
   }
 
   //DEOPSCSW-000: Publish events with block generating futre of event
-  test("handle failed publish event with an eventGenerator generating future of event and a callback") {
+  test(
+    "handle failed publish event with an eventGenerator generating future of event and a callback | DEOPSCSW-398, DEOPSCSW-000"
+  ) {
     val testProbe   = TestProbe[PublishFailure]()(kafkaTestProps.actorSystem)
     val failedEvent = Utils.makeEvent(1)
 
@@ -85,7 +87,9 @@ class KafkaFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
   }
 
   //DEOPSCSW-515: Include Start Time in API
-  test("should invoke onError callback on publish failure [eventGenerator API] with start time and event generator") {
+  test(
+    "should invoke onError callback on publish failure [eventGenerator API] with start time and event generator | DEOPSCSW-398, DEOPSCSW-515"
+  ) {
     val testProbe   = TestProbe[PublishFailure]()(kafkaTestProps.actorSystem)
     val failedEvent = Utils.makeEvent(1)
 
@@ -103,7 +107,9 @@ class KafkaFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
   }
 
   //DEOPSCSW-515: Include Start Time in API
-  test("should invoke onError callback on publish failure [eventGenerator API] with start time and future of event generator") {
+  test(
+    "should invoke onError callback on publish failure [eventGenerator API] with start time and future of event generator | DEOPSCSW-398, DEOPSCSW-515"
+  ) {
     val testProbe   = TestProbe[PublishFailure]()(kafkaTestProps.actorSystem)
     val failedEvent = Utils.makeEvent(1)
 
@@ -121,7 +127,7 @@ class KafkaFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
   }
 
   //DEOPSCSW-516: Optionally Publish - API Change
-  test("should not invoke onError on opting to not publish event with eventGenerator") {
+  test("should not invoke onError on opting to not publish event with eventGenerator | DEOPSCSW-398, DEOPSCSW-516") {
     val testProbe = TestProbe[PublishFailure]()(kafkaTestProps.actorSystem)
 
     val cancellable = kafkaTestProps.publisher.publish(None, 20.millis, onError = testProbe.ref ! _)
@@ -134,7 +140,7 @@ class KafkaFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
   }
 
   //DEOPSCSW-516: Optionally Publish - API Change
-  test("should not invoke onError on opting to not publish event with async eventGenerator") {
+  test("should not invoke onError on opting to not publish event with async eventGenerator | DEOPSCSW-398, DEOPSCSW-516") {
     val testProbe = TestProbe[PublishFailure]()(kafkaTestProps.actorSystem)
 
     def eventGenerator(): Future[Option[Event]] = Future.successful(None)

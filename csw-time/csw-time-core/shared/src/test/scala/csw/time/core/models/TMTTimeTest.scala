@@ -13,7 +13,7 @@ import org.scalatest.funsuite.AnyFunSuite
 class TMTTimeTest extends AnyFunSuite {
   private val jitter = 100
 
-  test("should get utc time") {
+  test("should get utc time | DEOPSCSW-549") {
     val utcTime        = UTCTime.now()
     val fixedInstant   = Instant.now()
     val expectedMillis = fixedInstant.toEpochMilli
@@ -21,26 +21,26 @@ class TMTTimeTest extends AnyFunSuite {
     utcTime.value.toEpochMilli.toDouble shouldEqual expectedMillis.toDouble +- jitter
   }
 
-  test("should convert utc to tai") {
+  test("should convert utc to tai | DEOPSCSW-549") {
     val utcTime = UTCTime.now()
     val taiTime = utcTime.toTAI
     Duration.between(utcTime.value, taiTime.value).getSeconds shouldEqual TimeConstants.taiOffset
   }
 
-  test("should give time duration between given timestamp and current time") {
+  test("should give time duration between given timestamp and current time | DEOPSCSW-549") {
     val expectedDuration = 1.second.toMillis +- jitter.millis.toMillis
     val futureTime       = UTCTime(Instant.now().plusSeconds(1))
     futureTime.durationFromNow.toMillis shouldBe expectedDuration
   }
 
-  test("should give utc time after specified duration") {
+  test("should give utc time after specified duration | DEOPSCSW-549") {
     val tenSeconds = 10.seconds
     val futureTime = UTCTime.after(tenSeconds)
 
     futureTime.durationFromNow.toMillis shouldBe (tenSeconds.toMillis +- jitter.millis.toMillis)
   }
 
-  test("should give tai time after specified duration") {
+  test("should give tai time after specified duration | DEOPSCSW-549") {
     val tenSeconds = 10.seconds
     val futureTime = TAITime.after(tenSeconds)
 

@@ -423,7 +423,7 @@ lazy val `csw-event-client` = project
     `csw-location-server` % "test->test",
     `csw-commons`         % "test->test"
   )
-  .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
+  .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.EventClient.value)
 
 lazy val `csw-event-cli` = project
@@ -556,7 +556,7 @@ lazy val `csw-database` = project
 /* =============== Common Utilities ============ */
 lazy val `csw-network-utils` = project
   .dependsOn(`csw-logging-client`)
-  .enablePlugins(PublishBintray)
+  .enablePlugins(PublishBintray, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.NetworkUtils.value
   )
@@ -653,7 +653,7 @@ lazy val integration = project
     `csw-commons`       % "multi-jvm->test",
     `csw-config-server` % "multi-jvm->test"
   )
-  .enablePlugins(NoPublish, AutoMultiJvm, DeployApp)
+  .enablePlugins(AutoMultiJvm, DeployApp)
   .settings(
     libraryDependencies ++= Dependencies.Integration.value
   )

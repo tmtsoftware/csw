@@ -8,7 +8,7 @@ import org.scalatestplus.junit.JUnitSuite;
 public class JMatrixDataTest extends JUnitSuite {
 
     @Test
-    public void shouldCreateMatrixDataFromJavaArrays() {
+    public void shouldCreateMatrixDataFromJavaArrays__DEOPSCSW_183() {
         Byte[][] byteData = {{1, 2, 3}, {4, 5, 6}};
         Short[][] shortData = {{10, 20, 30}, {40, 50, 60}};
         Long[][] longData = {{100L, 200L, 300L}, {400L, 500L, 600L}};

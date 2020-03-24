@@ -10,8 +10,8 @@ import csw.params.core.models._
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.params.events.{EventName, ObserveEvent, SystemEvent}
 import csw.prefix.models.{Prefix, Subsystem}
-import play.api.libs.json.Json
 import org.scalatest.funspec.AnyFunSpec
+import play.api.libs.json.Json
 
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-188: Efficient Serialization to/from JSON
@@ -31,7 +31,7 @@ class JsonTest extends AnyFunSpec {
     val wfos: Subsystem = Subsystem.WFOS
 
     // CSW-86: Subsystem should be case-insensitive
-    it("should encode and decode properly") {
+    it("should encode and decode properly | DEOPSCSW-183, DEOPSCSW-188") {
       val expectedJson = Json.parse("\"WFOS\"")
       val json         = JsonSupport.writes(wfos)
       val sub          = JsonSupport.reads[Subsystem](json)
@@ -44,7 +44,7 @@ class JsonTest extends AnyFunSpec {
     val prefix: Prefix = Prefix("wfos.filter.wheel")
 
     // CSW-86: Subsystem should be case-insensitive
-    it("should encode and decode properly") {
+    it("should encode and decode properly | DEOPSCSW-183, DEOPSCSW-188") {
       val expectedJson = Json.parse("\"WFOS.filter.wheel\"")
       val json         = JsonSupport.writes(prefix)
       val sub          = JsonSupport.reads[Prefix](json)
@@ -56,7 +56,7 @@ class JsonTest extends AnyFunSpec {
   describe("Test Units JSON") {
     val encoderUnit: Units = encoder
 
-    it("should encode and decode properly") {
+    it("should encode and decode properly | DEOPSCSW-183, DEOPSCSW-188") {
       val json                 = JsonSupport.writes(encoderUnit)
       val encoderUnitsFromJson = JsonSupport.reads[Units](json)
       assert(encoderUnit == encoderUnitsFromJson)
@@ -65,7 +65,7 @@ class JsonTest extends AnyFunSpec {
 
   describe("Test concrete items") {
 
-    it("char item encode/decode without units") {
+    it("char item encode/decode without units | DEOPSCSW-183, DEOPSCSW-188") {
       val k1 = KeyType.CharKey.make(s3)
       val i1 = k1.set('d').withUnits(NoUnits)
 
@@ -76,7 +76,7 @@ class JsonTest extends AnyFunSpec {
       assert(in1.units == NoUnits)
     }
 
-    it("char item encode/decode with units") {
+    it("char item encode/decode with units | DEOPSCSW-183, DEOPSCSW-188") {
       val k1 = KeyType.CharKey.make(s3)
       val i1 = k1.set('d').withUnits(encoder)
 
@@ -87,7 +87,7 @@ class JsonTest extends AnyFunSpec {
       assert(in1.units == encoder)
     }
 
-    it("short item encode/decode") {
+    it("short item encode/decode | DEOPSCSW-183, DEOPSCSW-188") {
       val k1       = KeyType.ShortKey.make(s3)
       val s: Short = -1
       val i1       = k1.set(s).withUnits(NoUnits)
@@ -97,7 +97,7 @@ class JsonTest extends AnyFunSpec {
       assert(in1 == i1)
     }
 
-    it("int item encode/decode") {
+    it("int item encode/decode | DEOPSCSW-183, DEOPSCSW-188") {
       val k1 = KeyType.IntKey.make(s3)
       val i1 = k1.set(23).withUnits(NoUnits)
 
@@ -106,7 +106,7 @@ class JsonTest extends AnyFunSpec {
       assert(in1 == i1)
     }
 
-    it("long item encode/decode") {
+    it("long item encode/decode | DEOPSCSW-183, DEOPSCSW-188") {
       val k1 = KeyType.LongKey.make(s1)
       val i1 = k1.set(123456L).withUnits(NoUnits)
 
@@ -115,7 +115,7 @@ class JsonTest extends AnyFunSpec {
       assert(in1 == i1)
     }
 
-    it("float item encode/decode") {
+    it("float item encode/decode | DEOPSCSW-183, DEOPSCSW-188") {
       val k1 = KeyType.FloatKey.make(s1)
       val i1 = k1.set(123.456f).withUnits(NoUnits)
 
@@ -124,7 +124,7 @@ class JsonTest extends AnyFunSpec {
       assert(in1 == i1)
     }
 
-    it("double item encode/decode") {
+    it("double item encode/decode | DEOPSCSW-183, DEOPSCSW-188") {
       val k1 = KeyType.DoubleKey.make(s1)
       val i1 = k1.set(123.456).withUnits(NoUnits)
 
@@ -133,7 +133,7 @@ class JsonTest extends AnyFunSpec {
       assert(in1 == i1)
     }
 
-    it("boolean item encode/decode") {
+    it("boolean item encode/decode | DEOPSCSW-183, DEOPSCSW-188") {
       val k1 = KeyType.BooleanKey.make(s1)
       val i1 = k1.set(true, false).withUnits(NoUnits)
 
@@ -149,7 +149,7 @@ class JsonTest extends AnyFunSpec {
       assert(in2 == i2)
     }
 
-    it("string item encode/decode") {
+    it("string item encode/decode | DEOPSCSW-183, DEOPSCSW-188") {
       val k1 = KeyType.StringKey.make(s2)
       val i1 = k1.set("Blue", "Green").withUnits(NoUnits)
 
@@ -167,7 +167,7 @@ class JsonTest extends AnyFunSpec {
     val i1 = k1.set(22, 33, 44)
     val i2 = k2.set("a", "b", "c").withUnits(degree)
 
-    it("should encode and decode items list") {
+    it("should encode and decode items list | DEOPSCSW-183, DEOPSCSW-188") {
       // Use this to get a list to test
       val sc1   = Setup(ck, CommandName("move"), Some(obsId)).add(i1).add(i2)
       val items = sc1.paramSet
@@ -196,7 +196,7 @@ class JsonTest extends AnyFunSpec {
     val i6 = k6.set(false)
     val i7 = k7.set("GG495").withUnits(degree)
 
-    it("Should encode/decode a Setup") {
+    it("Should encode/decode a Setup | DEOPSCSW-183, DEOPSCSW-188") {
       val c1 = Setup(ck, CommandName("move"), Some(obsId)).add(i1).add(i2).add(i3).add(i4).add(i5).add(i6).add(i7)
       assert(c1.size == 7)
       val c1out = JsonSupport.writeSequenceCommand(c1)
@@ -206,7 +206,7 @@ class JsonTest extends AnyFunSpec {
     }
 
     // DEOPSCSW-315: Make ObsID optional in commands
-    it("Should encode/decode an Observe") {
+    it("Should encode/decode an Observe | DEOPSCSW-183, DEOPSCSW-188, DEOPSCSW-315") {
       val c1 = Observe(ck, CommandName("move"), Some(obsId)).add(i1).add(i2).add(i3).add(i4).add(i5).add(i6).add(i7)
       assert(c1.size == 7)
       val c1out = JsonSupport.writeSequenceCommand(c1)
@@ -217,7 +217,7 @@ class JsonTest extends AnyFunSpec {
     }
 
     // DEOPSCSW-315: Make ObsID optional in commands
-    it("Should encode/decode an Wait") {
+    it("Should encode/decode an Wait | DEOPSCSW-183, DEOPSCSW-188, DEOPSCSW-315") {
       val c1 = Wait(ck, CommandName("move"), None).add(i1).add(i2).add(i3).add(i4).add(i5).add(i6).add(i7)
       assert(c1.size == 7)
       val c1out = JsonSupport.writeSequenceCommand(c1)
@@ -227,7 +227,7 @@ class JsonTest extends AnyFunSpec {
       assert(c1in.maybeObsId.isEmpty)
     }
 
-    it("Should encode/decode an ObserveEvent") {
+    it("Should encode/decode an ObserveEvent | DEOPSCSW-183, DEOPSCSW-188") {
       val e1 = ObserveEvent(ck, EventName("")).add(i1).add(i2).add(i3).add(i4).add(i5).add(i6).add(i7)
       assert(e1.size == 7)
       val e1out = JsonSupport.writeEvent(e1)
@@ -236,7 +236,7 @@ class JsonTest extends AnyFunSpec {
       assert(e1in == e1)
     }
 
-    it("Should encode/decode an SystemEvent") {
+    it("Should encode/decode an SystemEvent | DEOPSCSW-183, DEOPSCSW-188") {
       val e1 = SystemEvent(ck, EventName("")).add(i1).add(i2).add(i3).add(i4).add(i5).add(i6).add(i7)
       assert(e1.size == 7)
       val e1out = JsonSupport.writeEvent(e1)
@@ -245,7 +245,7 @@ class JsonTest extends AnyFunSpec {
       assert(e1in == e1)
     }
 
-    it("Should encode/decode an CurrentState") {
+    it("Should encode/decode an CurrentState | DEOPSCSW-183, DEOPSCSW-188") {
       val c1 = CurrentState(ck, StateName("testStateName")).add(i1).add(i2).add(i3).add(i4).add(i5).add(i6).add(i7)
       assert(c1.size == 7)
       val c1out = JsonSupport.writeStateVariable(c1)
@@ -254,7 +254,7 @@ class JsonTest extends AnyFunSpec {
       assert(c1in == c1)
     }
 
-    it("Should encode/decode an DemandState") {
+    it("Should encode/decode an DemandState | DEOPSCSW-183, DEOPSCSW-188") {
       val c1 = DemandState(ck, StateName("testStateName")).add(i1).add(i2).add(i3).add(i4).add(i5).add(i6).add(i7)
       assert(c1.size == 7)
       val c1out = JsonSupport.writeStateVariable(c1)
@@ -265,7 +265,7 @@ class JsonTest extends AnyFunSpec {
   }
 
   describe("Test Custom RaDecItem") {
-    it("Should allow custom RaDecItem") {
+    it("Should allow custom RaDecItem | DEOPSCSW-183, DEOPSCSW-188") {
       val k1  = KeyType.RaDecKey.make("coords")
       val c1  = RaDec(7.3, 12.1)
       val c2  = RaDec(9.1, 2.9)
@@ -289,7 +289,7 @@ class JsonTest extends AnyFunSpec {
   describe("Test Coordinate Types") {
     import Angle._
     import Coords._
-    it("Should allow coordinate types") {
+    it("Should allow coordinate types | DEOPSCSW-183, DEOPSCSW-188") {
       val basePosKey       = CoordKey.make("BasePosition")
       val pm               = ProperMotion(0.5, 2.33)
       val eqCoord          = EqCoord(ra = "12:13:14.15", dec = "-30:31:32.3", frame = FK5, pmx = pm.pmx, pmy = pm.pmy)
@@ -322,7 +322,7 @@ class JsonTest extends AnyFunSpec {
   }
 
   describe("Test Double Matrix items") {
-    it("Should allow double matrix values") {
+    it("Should allow double matrix values | DEOPSCSW-183, DEOPSCSW-188") {
       val k1  = DoubleMatrixKey.make("myMatrix")
       val m1  = MatrixData.fromArrays(Array(1.0, 2.0, 3.0), Array(4.1, 5.1, 6.1), Array(7.2, 8.2, 9.2))
       val sc1 = Setup(ck, CommandName("move"), Some(obsId)).add(k1.set(m1))
@@ -339,7 +339,7 @@ class JsonTest extends AnyFunSpec {
   }
 
   describe("Test Double Array items") {
-    it("Should allow double array values") {
+    it("Should allow double array values | DEOPSCSW-183, DEOPSCSW-188") {
       val k1  = KeyType.DoubleArrayKey.make("myArray")
       val m1  = ArrayData(Array(1.0, 2.0, 3.0))
       val i1  = k1.set(m1)
@@ -356,7 +356,7 @@ class JsonTest extends AnyFunSpec {
   }
 
   describe("Test Int Matrix items") {
-    it("Should allow int matrix values") {
+    it("Should allow int matrix values | DEOPSCSW-183, DEOPSCSW-188") {
       val k1  = IntMatrixKey.make("myMatrix")
       val m1  = MatrixData.fromArrays(Array(1, 2, 3), Array(4, 5, 6), Array(7, 8, 9))
       val i1  = k1.set(m1)
@@ -373,7 +373,7 @@ class JsonTest extends AnyFunSpec {
   }
 
   describe("Test Int Array items") {
-    it("Should allow int array values") {
+    it("Should allow int array values | DEOPSCSW-183, DEOPSCSW-188") {
       val k1  = KeyType.IntArrayKey.make("myArray")
       val m1  = ArrayData(Array(1, 2, 3))
       val i1  = k1.set(m1)
@@ -391,7 +391,7 @@ class JsonTest extends AnyFunSpec {
 
   // DEOPSCSW-186: Binary value payload
   describe("Test Byte Matrix items") {
-    it("Should allow byte matrix values") {
+    it("Should allow byte matrix values | DEOPSCSW-183, DEOPSCSW-188, DEOPSCSW-186") {
       val k1  = ByteMatrixKey.make("myMatrix")
       val m1  = MatrixData.fromArrays(Array[Byte](1, 2, 3), Array[Byte](4, 5, 6), Array[Byte](7, 8, 9))
       val i1  = k1.set(m1)
@@ -408,7 +408,7 @@ class JsonTest extends AnyFunSpec {
 
   // DEOPSCSW-186: Binary value payload
   describe("Test Byte Array items") {
-    it("Should allow byte array values") {
+    it("Should allow byte array values | DEOPSCSW-183, DEOPSCSW-188, DEOPSCSW-186") {
       val k1  = KeyType.ByteArrayKey.make("myArray")
       val m1  = ArrayData(Array[Byte](1, 2, 3))
       val i1  = k1.set(m1)
@@ -425,7 +425,7 @@ class JsonTest extends AnyFunSpec {
   }
 
   describe("Test Short Matrix items") {
-    it("Should allow short matrix values") {
+    it("Should allow short matrix values | DEOPSCSW-183, DEOPSCSW-188") {
       val k1  = ShortMatrixKey.make("myMatrix")
       val m1  = MatrixData.fromArrays(Array.ofDim[Short](3, 3))
       val i1  = k1.set(m1)
@@ -442,7 +442,7 @@ class JsonTest extends AnyFunSpec {
   }
 
   describe("Test Short Array items") {
-    it("Should allow short array values") {
+    it("Should allow short array values | DEOPSCSW-183, DEOPSCSW-188") {
       val k1  = KeyType.ShortArrayKey.make("myArray")
       val m1  = ArrayData(Array[Short](1, 2, 3))
       val i1  = k1.set(m1)
@@ -459,7 +459,7 @@ class JsonTest extends AnyFunSpec {
   }
 
   describe("Test Long Matrix items") {
-    it("Should allow long matrix values") {
+    it("Should allow long matrix values | DEOPSCSW-183, DEOPSCSW-188") {
       val k1                   = LongMatrixKey.make("myMatrix")
       val m1: MatrixData[Long] = MatrixData.fromArrays(Array(1, 2, 3), Array(4, 5, 6), Array(7, 8, 9))
       val i1                   = k1.set(m1)
@@ -475,7 +475,7 @@ class JsonTest extends AnyFunSpec {
   }
 
   describe("Test Long Array items") {
-    it("Should allow long array values") {
+    it("Should allow long array values | DEOPSCSW-183, DEOPSCSW-188") {
       val k1: Key[ArrayData[Long]]       = KeyType.LongArrayKey.make("myArray")
       val m1: ArrayData[Long]            = ArrayData(Array(1L, 2L, 3L))
       val i1: Parameter[ArrayData[Long]] = k1.set(m1)
@@ -491,7 +491,7 @@ class JsonTest extends AnyFunSpec {
   }
 
   describe("Test Choice items") {
-    it("Should allow choice/enum values") {
+    it("Should allow choice/enum values | DEOPSCSW-183, DEOPSCSW-188") {
       val k1  = ChoiceKey.make("myChoice", Choices.from("A", "B", "C"))
       val c1  = Choice("B")
       val i1  = k1.set(c1)
@@ -508,7 +508,7 @@ class JsonTest extends AnyFunSpec {
   }
 
   describe("testing StructItem JSON support") {
-    it("should allow Struct values") {
+    it("should allow Struct values | DEOPSCSW-183, DEOPSCSW-188") {
       val k1    = StructKey.make("myStruct")
       val ra    = StringKey.make("ra")
       val dec   = StringKey.make("dec")

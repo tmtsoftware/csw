@@ -14,15 +14,15 @@ import org.scalatest.matchers.should.Matchers
 class NetworksTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach with MockitoSugar {
 
   // DEOPSCSW-673: Make interfaceName environment variable mandatory
-  test("hostname should throw NetworkInterfaceNotProvided when INTERFACE_NAME env variable is not set") {
+  test("hostname should throw NetworkInterfaceNotProvided when INTERFACE_NAME env variable is not set | DEOPSCSW-673") {
     a[NetworkInterfaceNotProvided] shouldBe thrownBy(Networks().hostname)
   }
 
-  test("testGetIpv4Address throws NetworkInterfaceNotFound when provided interface name is not present/valid") {
+  test("testGetIpv4Address throws NetworkInterfaceNotFound when provided interface name is not present/valid | ") {
     a[NetworkInterfaceNotFound] shouldBe thrownBy(Networks(Some("test")))
   }
 
-  test("Should filter ipv6 addresses") {
+  test("Should filter ipv6 addresses | ") {
     val mockedNetworkProvider = mock[NetworkInterfaceProvider]
     val inet4Address          = InetAddress.getByAddress(Array[Byte](192.toByte, 168.toByte, 1, 2))
     val inet6Address = InetAddress.getByAddress(
@@ -65,7 +65,7 @@ class NetworksTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with
     Networks("", mockedNetworkProvider).ipv4AddressWithInterfaceName._2 shouldBe inet4Address1
   }
 
-  test("testGetIpv4Address returns inet address when provided a valid interface name") {
+  test("testGetIpv4Address returns inet address when provided a valid interface name | ") {
     val inetAddresses: List[(String, InetAddress)] =
       NetworkInterface.getNetworkInterfaces.asScala.toList.map { iface =>
         Networks(Some(iface.getName)).ipv4AddressWithInterfaceName

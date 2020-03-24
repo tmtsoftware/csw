@@ -66,7 +66,7 @@ public class ILoggerMutableActorTest extends JUnitSuite {
     }
 
     @Test
-    public void testDefaultLogConfigurationForActor() {
+    public void testDefaultLogConfigurationForActor__DEOPSCSW_280() {
 
         ActorRef<LogCommand> irisTyped =
                 AkkaTypedExtension

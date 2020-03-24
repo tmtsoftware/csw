@@ -6,11 +6,8 @@ sealed trait Command
 
 object Command {
   @CommandName("start")
-  @HelpMessage("start csw services")
+  @HelpMessage("starts all the CSW services by default if no other option is provided")
   final case class Start(
-      @HelpMessage("start all services")
-      @Short("a")
-      all: Boolean = false,
       @HelpMessage("start config server")
       @Short("c")
       config: Boolean = false,
@@ -18,7 +15,7 @@ object Command {
       @Short("e")
       event: Boolean = false,
       @HelpMessage("start alarm server")
-      @Short("r")
+      @Short("a")
       alarm: Boolean = false,
       @HelpMessage(
         "start database service, set 'PGDATA' env variable where postgres is installed e.g. for mac: /usr/local/var/postgres"
@@ -32,5 +29,19 @@ object Command {
       @Short("i")
       interfaceName: Option[String]
   ) extends Command
+
+  object Start {
+    def apply(
+        config: Boolean = false,
+        event: Boolean = false,
+        alarm: Boolean = false,
+        database: Boolean = false,
+        auth: Boolean = false,
+        interfaceName: Option[String] = None
+    ): Start =
+      // mark all flags=true when no option is provided to start command
+      if (config || event || alarm || database || auth) new Start(config, event, alarm, database, auth, interfaceName)
+      else new Start(true, true, true, true, true, interfaceName)
+  }
 
 }

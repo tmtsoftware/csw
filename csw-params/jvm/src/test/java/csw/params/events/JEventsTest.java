@@ -4,6 +4,7 @@ import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.generics.ParameterSetType;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JUnits;
 import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
 import org.junit.Assert;
@@ -19,16 +20,16 @@ import java.util.stream.Collectors;
 // DEOPSCSW-328: Basic information of Event needed for routing and Diagnostic use
 // DEOPSCSW-329: Providing Mandatory information during Event Creation
 public class JEventsTest extends JUnitSuite {
-    private final Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder");
-    private final Key<String> epochStringKey = JKeyType.StringKey().make("epoch");
-    private final Key<Integer> epochIntKey = JKeyType.IntKey().make("epoch");
-    private final Key<Byte> epochByteKey = JKeyType.ByteKey().make("epoch");
-    private final Key<Integer> notUsedKey = JKeyType.IntKey().make("notUsed");
+    private final Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder", JUnits.encoder);
+    private final Key<String> epochStringKey = JKeyType.StringKey().make("epoch", JUnits.year);
+    private final Key<Integer> epochIntKey = JKeyType.IntKey().make("epoch", JUnits.year);
+    private final Key<Byte> epochByteKey = JKeyType.ByteKey().make("epoch", JUnits.year);
+    private final Key<Integer> notUsedKey = JKeyType.IntKey().make("notUsed", JUnits.NoUnits);
 
     private final Parameter<Integer> encoderParam = encoderIntKey.set(22, 33);
     private final Parameter<String> epochStringParam = epochStringKey.set("A", "B");
     private final Parameter<Integer> epochIntParam = epochIntKey.set(44, 55);
-    private final Parameter<Byte> epochByteParam = epochByteKey.set(new Byte[]{10, 20});
+    private final Parameter<Byte> epochByteParam = epochByteKey.setAll(new Byte[]{10, 20});
 
     private final Prefix prefix = Prefix.apply(JSubsystem.WFOS, "red.detector");
 
@@ -84,19 +85,19 @@ public class JEventsTest extends JUnitSuite {
     }
 
     @Test
-    public void shouldAbleToCreateAndAccessSystemEvent() {
+    public void shouldAbleToCreateAndAccessSystemEvent__DEOPSCSW_327_DEOPSCSW_328_DEOPSCSW_185_DEOPSCSW_329_DEOPSCSW_183() {
         SystemEvent systemEvent = new SystemEvent(prefix, new EventName("filter wheel")).add(encoderParam).add(epochStringParam);
         assertOnEventsAPI(systemEvent);
     }
 
     @Test
-    public void shouldAbleToCreateAndAccessObserveEvent() {
+    public void shouldAbleToCreateAndAccessObserveEvent__DEOPSCSW_327_DEOPSCSW_328_DEOPSCSW_185_DEOPSCSW_329_DEOPSCSW_183() {
         ObserveEvent observeEvent = new ObserveEvent(prefix, new EventName("filter wheel")).add(encoderParam).add(epochStringParam);
         assertOnEventsAPI(observeEvent);
     }
 
     @Test
-    public void shouldAbleToRemoveParamsInSystemEvent() {
+    public void shouldAbleToRemoveParamsInSystemEvent__DEOPSCSW_327_DEOPSCSW_328_DEOPSCSW_185_DEOPSCSW_329_DEOPSCSW_183() {
         SystemEvent systemEvent = new SystemEvent(prefix, new EventName("filter wheel")).add(encoderParam).add(epochByteParam);
         Assert.assertEquals(2, systemEvent.size());
         Assert.assertArrayEquals(new Byte[]{10, 20}, systemEvent.jGet(epochByteKey).orElseThrow().jValues().toArray());
@@ -105,7 +106,7 @@ public class JEventsTest extends JUnitSuite {
     }
 
     @Test
-    public void shouldAbleToRemoveParamsInObserveEvent() {
+    public void shouldAbleToRemoveParamsInObserveEvent__DEOPSCSW_327_DEOPSCSW_328_DEOPSCSW_185_DEOPSCSW_329_DEOPSCSW_183() {
         ObserveEvent observeEvent = new ObserveEvent(prefix, new EventName("filter wheel")).add(encoderParam).add(epochByteParam);
         Assert.assertEquals(2, observeEvent.size());
         Assert.assertArrayEquals(new Byte[]{10, 20}, observeEvent.jGet(epochByteKey).orElseThrow().jValues().toArray());
@@ -114,7 +115,7 @@ public class JEventsTest extends JUnitSuite {
     }
 
     @Test
-    public void shouldBeUniqueWhenParametersAreAddedOrRemovedForSystem() {
+    public void shouldBeUniqueWhenParametersAreAddedOrRemovedForSystem__DEOPSCSW_327_DEOPSCSW_328_DEOPSCSW_185_DEOPSCSW_329_DEOPSCSW_183() {
         SystemEvent systemEvent1 = new SystemEvent(prefix, new EventName("filter wheel")).add(encoderParam).add(epochStringParam);
         SystemEvent systemEvent2 = systemEvent1.add(epochIntParam);
         SystemEvent systemEvent3 = systemEvent2.remove(epochIntKey);
@@ -130,7 +131,7 @@ public class JEventsTest extends JUnitSuite {
     }
 
     @Test
-    public void shouldBeUniqueIdWhenParametersAreAddedOrRemovedForObserve() {
+    public void shouldBeUniqueIdWhenParametersAreAddedOrRemovedForObserve__DEOPSCSW_327_DEOPSCSW_328_DEOPSCSW_185_DEOPSCSW_329_DEOPSCSW_183() {
         ObserveEvent observeEvent1 = new ObserveEvent(prefix, new EventName("filter wheel")).add(encoderParam).add(epochStringParam);
         ObserveEvent observeEvent2 = observeEvent1.add(epochIntParam);
         ObserveEvent observeEvent3 = observeEvent2.remove(epochIntKey);

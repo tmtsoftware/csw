@@ -26,46 +26,46 @@ class AlarmMetadataTest extends AnyFunSuite with Matchers {
   )
 
   // DEOPSCSW-435: Identify Alarm by Subsystem, component and AlarmName
-  test("should get alarm key from AlarmMetadata") {
+  test("should get alarm key from AlarmMetadata | DEOPSCSW-439, DEOPSCSW-435") {
     alarmMetadata.alarmKey shouldBe AlarmKey(Prefix(NFIRAOS, "trombone"), "tromboneAxisHighLimitAlarm")
   }
 
-  test("should always support Indeterminate and Okay severities ") {
+  test("should always support Indeterminate and Okay severities  | DEOPSCSW-439") {
     alarmMetadata.allSupportedSeverities shouldEqual Set(Indeterminate, Okay, Warning, Major, Critical)
   }
 
-  test("should tell if the alarm is active or not") {
+  test("should tell if the alarm is active or not | DEOPSCSW-439") {
     alarmMetadata.isActive shouldBe true
 
     // for Inactive activation status
     alarmMetadata.copy(activationStatus = Inactive).isActive shouldBe false
   }
 
-  test("should be able to get description of the alarm") {
+  test("should be able to get description of the alarm | DEOPSCSW-439") {
     alarmMetadata.description shouldBe "Warns when trombone axis has reached the low limit"
   }
 
-  test("should be able to get alarm type") {
+  test("should be able to get alarm type | DEOPSCSW-439") {
     AlarmType.values should contain allElementsOf Set(alarmMetadata.alarmType)
   }
 
   // DEOPSCSW-453: Identify Probable cause of alarm
-  test("should get probable cause from AlarmMetadata") {
+  test("should get probable cause from AlarmMetadata | DEOPSCSW-439, DEOPSCSW-453") {
     alarmMetadata.probableCause shouldBe "the trombone software has failed or the stage was driven into the low limit"
   }
 
   // DEOPSCSW-454: Instructions for corrective actions to handle the alarm
-  test("should get operator response from AlarmMetadata") {
+  test("should get operator response from AlarmMetadata | DEOPSCSW-439, DEOPSCSW-454") {
     alarmMetadata.operatorResponse shouldBe "go to the NFIRAOS engineering user interface and select the datum axis command"
   }
 
   // DEOPSCSW-455: Identify Alarm auto acknowledgement
-  test("should be able to determine if alarm can be auto-acknowledged") {
+  test("should be able to determine if alarm can be auto-acknowledged | DEOPSCSW-439, DEOPSCSW-455") {
     alarmMetadata.isAutoAcknowledgeable shouldBe true
   }
 
   // DEOPSCSW-456: Examine alarm latching state of each alarm
-  test("should be able to determine if alarm can be latched") {
+  test("should be able to determine if alarm can be latched | DEOPSCSW-439, DEOPSCSW-456") {
     alarmMetadata.isLatchable shouldBe true
   }
 }

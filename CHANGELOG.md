@@ -9,10 +9,25 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
-## [CSW v2.0.0] - 2020-02-21
+## [CSW v2.0.1] - 2020-03-20
 
-This is the second major release of the TMT Common Software for project stakeholders. 
+This is a First minor release post Second major release of the TMT Common Software for project stakeholders.
+See [here](https://tmtsoftware.github.io/csw/2.0.1/) for a detailed documentation of this version of the CSW software.
+
+### Changes
+- Updated giter8 template
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/2.0.1/
+- Scaladoc: https://tmtsoftware.github.io/csw/2.0.1/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/2.0.1/api/java/index.html
+
+
+## [CSW v2.0.0] - 2020-03-19
+
+This is the Second major release of the TMT Common Software for project stakeholders.
 See [here](https://tmtsoftware.github.io/csw/2.0.0/) for a detailed documentation of this version of the CSW software.
+Migration guide for v2.0.0 can be found [here](https://tmtsoftware.github.io/csw/2.0.0/migration_guide/migration-guides.html).
 
 ### Changes
 - Simplified CommandResponseManager and removed auto-completion of commands
@@ -24,7 +39,10 @@ See [here](https://tmtsoftware.github.io/csw/2.0.0/) for a detailed documentatio
 - Subsystem is displayed in uppercase instead of lowercase
 - ArrayData and MatrixData does not require classtag for creation 
 - Admin routes for setting log level and getting log level are now available via gateway
-- JSON contracts for location and command service added in paradox documentation 
+- JSON contracts for location and command service added in paradox documentation
+- Internal implementation of csw-services.sh script has changed. It is now based on Coursier and newly created `csw-services` sbt module.
+To start all the CSW services, run `csw-services.sh start` command.
+`csw-services.sh` runs all services in the foreground, pressing `ctr+c` will stop all the services. 
 
 ### Version Upgrades
 - Scala version upgrade to 2.13.1
@@ -34,13 +52,41 @@ See [here](https://tmtsoftware.github.io/csw/2.0.0/) for a detailed documentatio
 - Borer version upgrade to 1.4.0
 
 ### Documentation
-- Reference paradox documentation: https://tmtsoftware.github.io/csw/2.0.0-RC1/
-- Scaladoc: https://tmtsoftware.github.io/csw/2.0.0-RC1/api/scala/index.html
-- Javadoc: https://tmtsoftware.github.io/csw/2.0.0-RC1/api/java/index.html
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/2.0.0/
+- Scaladoc: https://tmtsoftware.github.io/csw/2.0.0/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/2.0.0/api/java/index.html
+
+
+## [CSW v2.0.0-RC3] - 2020-03-03
+
+This is the release candidate 3 for the second major release of the TMT Common Software for project stakeholders.
+See [here](https://tmtsoftware.github.io/csw/2.0.0-RC3/) for a detailed documentation of this version of the CSW software.
+Migration guide for v2.0.0-RC3 can be found [here](https://tmtsoftware.github.io/csw/2.0.0-RC3/migration_guide/migration-guides.html).
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/2.0.0-RC3/
+- Scaladoc: https://tmtsoftware.github.io/csw/2.0.0-RC3/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/2.0.0-RC3/api/java/index.html
+
+## [CSW v2.0.0-RC2] - 2020-02-26
+
+This is the release candidate 2 for the second major release of the TMT Common Software for project stakeholders.
+See [here](https://tmtsoftware.github.io/csw/2.0.0-RC2/) for a detailed documentation of this version of the CSW software.
+Migration guide for v2.0.0-RC2 can be found [here](https://tmtsoftware.github.io/csw/2.0.0-RC2/migration_guide/migration-guides.html).
+
+### Changes
+Internal implementation of `csw-services.sh` script has changed. It is now based on Coursier and newly created `csw-services` sbt module.
+To start all the CSW services, run `csw-services.sh start` command. 
+`csw-services.sh` runs all services in the foreground, pressing `ctr+c` will stop all the services.
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/2.0.0-RC2/
+- Scaladoc: https://tmtsoftware.github.io/csw/2.0.0-RC2/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/2.0.0-RC2/api/java/index.html
 
 ## [CSW v2.0.0-RC1] - 2020-02-06
 
-This is the release candidate 1 for the release 1.1.0 of the TMT Common Software for project stakeholders.
+This is the release candidate 1 for the release 2.0.0 of the TMT Common Software for project stakeholders.
 See [here](https://tmtsoftware.github.io/csw/2.0.0-RC1/) for a detailed documentation of this version of the CSW software.
 
 ### Changes
@@ -308,7 +354,7 @@ See [here](https://tmtsoftware.github.io/csw/0.6.0/) for a detailed documentatio
     
 - Test Kits
 
-    - Test kits are now avaiable that can start and stop CSW services inside tests so that
+    - Test kits are now available that can start and stop CSW services inside tests so that
       there is no need to run csw-services.sh before running the tests.
       See `ScalaTestFrameworkTestKit` and `FrameworkTestKit` (for Java).
 

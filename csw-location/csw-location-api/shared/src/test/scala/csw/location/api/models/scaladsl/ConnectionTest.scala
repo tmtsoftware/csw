@@ -10,28 +10,28 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 // CSW-86: Subsystem should be case-insensitive
 class ConnectionTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
   // DEOPSCSW-14: Codec for data model
-  test("should able to form a string representation for akka connection for trombone HCD") {
+  test("should able to form a string representation for akka connection for trombone HCD | DEOPSCSW-14") {
     val expectedAkkaConnectionName = "NFIRAOS.tromboneHcd-hcd-akka"
     val akkaConnection             = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneHcd"), ComponentType.HCD))
     akkaConnection.name shouldBe expectedAkkaConnectionName
   }
 
   // DEOPSCSW-14: Codec for data model
-  test("should able to form a string representation for tcp connection for redis") {
+  test("should able to form a string representation for tcp connection for redis | DEOPSCSW-14") {
     val expectedTcpConnectionName = "CSW.redis-service-tcp"
     val tcpConnection             = TcpConnection(ComponentId(Prefix(Subsystem.CSW, "redis"), ComponentType.Service))
     tcpConnection.name shouldBe expectedTcpConnectionName
   }
 
   // DEOPSCSW-14: Codec for data model
-  test("should able to form a string representation for http connection for config service") {
+  test("should able to form a string representation for http connection for config service | DEOPSCSW-14") {
     val expectedHttpConnectionName = "CSW.config-service-http"
     val httpConnection             = HttpConnection(ComponentId(Prefix(Subsystem.CSW, "config"), ComponentType.Service))
     httpConnection.name shouldBe expectedHttpConnectionName
   }
 
   // DEOPSCSW-14: Codec for data model
-  test("should able to form a string representation for akka connection for trombone container") {
+  test("should able to form a string representation for akka connection for trombone container | DEOPSCSW-14") {
     val expectedAkkaConnectionName = "Container.tromboneContainer-container-akka"
     val akkaConnection =
       AkkaConnection(ComponentId(Prefix(Subsystem.Container, "tromboneContainer"), ComponentType.Container))
@@ -39,14 +39,14 @@ class ConnectionTest extends AnyFunSuite with Matchers with BeforeAndAfterAll wi
   }
 
   // DEOPSCSW-14: Codec for data model
-  test("should able to form a string representation for akka connection for trombone assembly") {
+  test("should able to form a string representation for akka connection for trombone assembly | DEOPSCSW-14") {
     val expectedAkkaConnectionName = "NFIRAOS.tromboneAssembly-assembly-akka"
     val akkaConnection             = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneAssembly"), ComponentType.Assembly))
     akkaConnection.name shouldBe expectedAkkaConnectionName
   }
 
   // DEOPSCSW-14: Codec for data model
-  test("should able to form a connection for components from a valid string representation") {
+  test("should able to form a connection for components from a valid string representation | DEOPSCSW-14") {
     Connection.from("nfiraos.tromboneAssembly-assembly-akka") shouldBe
     AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneAssembly"), ComponentType.Assembly))
 
@@ -61,7 +61,7 @@ class ConnectionTest extends AnyFunSuite with Matchers with BeforeAndAfterAll wi
   }
 
   // DEOPSCSW-14: Codec for data model
-  test("should not be able to form a connection for components from an invalid string representation") {
+  test("should not be able to form a connection for components from an invalid string representation | DEOPSCSW-14") {
     val connection = "nfiraos.tromboneAssembly_assembly_akka"
     val exception = intercept[IllegalArgumentException] {
       Connection.from(connection)

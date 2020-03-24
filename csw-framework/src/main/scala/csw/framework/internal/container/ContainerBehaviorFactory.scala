@@ -1,6 +1,6 @@
 package csw.framework.internal.container
 
-import akka.actor.typed.Behavior
+import akka.actor.typed.{ActorRefResolver, Behavior}
 import akka.actor.typed.scaladsl.Behaviors
 import csw.alarm.client.AlarmServiceFactory
 import csw.command.client.messages.ContainerActorMessage
@@ -33,7 +33,8 @@ private[framework] object ContainerBehaviorFactory {
         locationService,
         eventServiceFactory,
         alarmServiceFactory,
-        loggerFactory
+        loggerFactory,
+        ActorRefResolver(ctx.system)
       )
     )
   }

@@ -25,7 +25,7 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
       }
     }
 
-  test("test parser with valid arguments") {
+  test("test parser with valid arguments | ") {
     val port     = 5555
     val services = "csw.redis,csw.alarm,csw.watchdog"
     val args     = Array("--prefix", services, "--port", port.toString, "--command", "sleep 5")
@@ -37,7 +37,7 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
   }
 
   // DEOPSCSW-628: Add support for registering service as HTTP in location agent
-  test("test parser for http command line argument") {
+  test("test parser for http command line argument | DEOPSCSW-628") {
     val port     = 5555
     val services = "csw.aas"
     val args     = Array("--prefix", services, "--port", port.toString, "--command", "sleep 5", "--http", "testPath")
@@ -46,7 +46,7 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
     x should contain(Options(List(Prefix("csw.aas")), Some("sleep 5"), Some(port), None, None, httpPath = Some("testPath")))
   }
 
-  test("test parser with invalid service name combinations") {
+  test("test parser with invalid service name combinations | ") {
     val port = 5555
     val listOfInvalidServices: List[String] =
       List("re-dis,alarm", "redis, alarm", " redis,alarm-service", "redis, alarm ", "redis, ,alarm")
@@ -57,48 +57,48 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
     }
   }
 
-  test("test parser with only --prefix option, should be allowed") {
+  test("test parser with only --prefix option, should be allowed | ") {
     val args               = Array[String]("--prefix", "csw.myService")
     val x: Option[Options] = silentParse(args)
 
     x should contain(Options(List("csw.myService").map(Prefix(_)), None, None, None, None))
   }
 
-  test("test parser without --prefix option, should error out") {
+  test("test parser without --prefix option, should error out | ") {
     val args               = Array[String]("csw.abcd")
     val x: Option[Options] = silentParse(args)
 
     x shouldEqual None
   }
 
-  test("test parser with prefix containing '-' character, should error out") {
+  test("test parser with prefix containing '-' character, should error out | ") {
     val args               = Array[String]("--prefix", "csw.alarm-service")
     val x: Option[Options] = silentParse(args)
     x shouldEqual None
   }
 
-  test("test parser with list of services containing leading/trailing whitespace, should error out") {
+  test("test parser with list of services containing leading/trailing whitespace, should error out | ") {
     val args               = Array[String]("--prefix", "   csw.redis-server,   csw.alarm,csw.watchdog   ")
     val x: Option[Options] = silentParse(args)
 
     x shouldEqual None
   }
 
-  test("test parser with prerfix containing leading whitespace, should error out") {
+  test("test parser with prerfix containing leading whitespace, should error out | ") {
     val args               = Array[String]("--prefix", " csw.someService")
     val x: Option[Options] = silentParse(args)
 
     x shouldEqual None
   }
 
-  test("test parser with prefix containing trailing whitespace, should error out") {
+  test("test parser with prefix containing trailing whitespace, should error out | ") {
     val args               = Array[String]("--prefix", "csw.someService ")
     val x: Option[Options] = silentParse(args)
 
     x shouldEqual None
   }
 
-  test("test parser with prefix containing both leading and trailing whitespaces, error is shown") {
+  test("test parser with prefix containing both leading and trailing whitespaces, error is shown | ") {
     val args               = Array[String]("--prefix", " csw.someService ")
     val x: Option[Options] = silentParse(args)
 

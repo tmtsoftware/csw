@@ -35,10 +35,10 @@ started in the superclass's `beforeAll` method. In the Java version, we must cre
 services we want to start passed into the constructor of this object.
 
 Scala
-:   @@snip [BasicSampleAssemblyTest.scala](../../../../examples/src/test/scala/example/tutorial/basic/BasicSampleAssemblyTest.scala) { #intro }
+:   @@snip [AssemblyTest.scala](../../../../examples/src/test/scala/org/tmt/csw/sample/SampleTest.scala) { #intro }
 
 Java
-:   @@snip [JSampleAssemblyTest.java](../../../../examples/src/test/java/example/tutorial/basic/JSampleAssemblyTest.java) { #intro }
+:   @@snip [JSampleAssemblyTest.java](../../../../examples/src/test/java/org/tmt/csw/sample/JSampleTest.java) { #intro }
 
 For our tests, we will want to run the Assembly first.  We will do this in the `beforeAll` method in Scala, and
 in a method with a `@BeforeClass` annotation in Java, so that it is run only once, before any of the tests are run.
@@ -47,15 +47,15 @@ Note that for Scala, we must call the superclass's `beforeAll` method to ensure 
 
 @@@ note
 
-This code has been provided as part of the giter8 template, so the relevant line only needs to be uncommented.
+This code has been provided as part of the giter8 template.
 
 @@@
 
 Scala
-:   @@snip [BasicSampleAssemblyTest.scala](../../../../examples/src/test/scala/example/tutorial/basic/BasicSampleAssemblyTest.scala) { #setup }
+:   @@snip [AssemblyTest.scala](../../../../examples/src/test/scala/org/tmt/csw/sample/SampleTest.scala) { #setup }
 
 Java
-:   @@snip [JSampleAssemblyTest.java](../../../../examples/src/test/java/example/tutorial/basic/JSampleAssemblyTest.java) { #setup }
+:   @@snip [JSampleAssemblyTest.java](../../../../examples/src/test/java/org/tmt/csw/sample/JSampleTest.java) { #setup }
 
 Next, let's add a test.  We will add a simple test that uses the Location Service to make sure the Assembly is
 running and resolve the registration information for it.  
@@ -67,14 +67,14 @@ This test has been provided as part of the giter8 template as an example.
 @@@
 
 Scala
-:   @@snip [BasicSampleAssemblyTest.scala](../../../../examples/src/test/scala/example/tutorial/basic/BasicSampleAssemblyTest.scala) { #locate }
+:   @@snip [AssemblyTest.scala](../../../../examples/src/test/scala/org/tmt/csw/sample/SampleTest.scala) { #locate }
 
 Java
-:   @@snip [JSampleAssemblyTest.java](../../../../examples/src/test/java/example/tutorial/basic/JSampleAssemblyTest.java) { #locate }
+:   @@snip [JSampleAssemblyTest.java](../../../../examples/src/test/java/org/tmt/csw/sample/JSampleTest.java) { #locate }
 
 You can try running the test either using sbt (`sbt test` from the project root directory) or directly in the
 IDE.  If you are using IntelliJ, you can run the test by right-clicking on the file in the project explorer
-and clicking on `Run 'SampleAssemblyTest'` or `Run 'JSampleAssemblyTest'`.  You can also right-click in the class body
+and clicking on `Run 'SampleTest'` or `Run 'JSampleTest'`.  You can also right-click in the class body
 or the specific test body, if you want to run a single test.
 
 The Assembly we have written does not have much of a public API, so we'll turn to the HCD now, which has a few
@@ -85,15 +85,15 @@ the component registers itself with the Location Service on startup.
 
 @@@ note
 
-This also has been provided in the giter8 template.  Uncomment the line that launches the HCD before tests are run.
+This also has been provided in the giter8 template.
 
 @@@
 
 Scala
-:   @@snip [BasicSampleHcdTest.scala](../../../../examples/src/test/scala/example/tutorial/basic/BasicSampleHcdTest.scala) { #setup }
+:   @@snip [SampleHcdTest.scala](../../../../examples/src/test/scala/org/tmt/csw/samplehcd/SampleHcdTest.scala) { #setup }
 
 Java
-:   @@snip [JSampleHcdTest.java](../../../../examples/src/test/java/example/tutorial/basic/JSampleHcdTest.java) { #setup }
+:   @@snip [JSampleHcdTest.java](../../../../examples/src/test/java/org/tmt/csw/samplehcd/JSampleHcdTest.java) { #setup }
 
 Now let's add a test to verify our component is publishing.  We will set up a test subscriber to the
 `counterEvent` Events published by the HCD.  Since we cannot guarantee the order in which the

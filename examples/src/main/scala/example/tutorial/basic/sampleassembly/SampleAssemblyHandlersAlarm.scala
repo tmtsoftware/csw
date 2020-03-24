@@ -109,7 +109,7 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
   }
   //#track-location
 
-  private val counterEventKey = EventKey(Prefix("ESW.SampleHcd"), EventName("HcdCounter"))
+  private val counterEventKey = EventKey(Prefix("CSW.samplehcd"), EventName("HcdCounter"))
   private val hcdCounterKey   = KeyType.IntKey.make("counter")
 
   //#subscribe

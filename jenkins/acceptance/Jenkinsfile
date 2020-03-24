@@ -1,0 +1,94 @@
+pipeline {
+    agent {
+        label 'master'
+    }
+
+    options {
+        timeout(time: 2, unit: 'HOURS')
+        timestamps()
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                sh "git checkout tags/$VERSION"
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh "sbt scalafmtCheck"
+                // sh "sbt clean makeSite"
+                sh "sbt ';set every Seq(enableFatalWarnings := true, scalafmtOnCompile := false); scalastyle; test:compile; multi-jvm:compile;'"
+            }
+        }
+
+        // Component tests cover the scenario of multiple components in single container
+        stage('Unit and Component Tests') {
+            steps {
+                // Run all tests except csw-time tests
+                sh "sbt -DenableCoverage=true -DdisableTimeTests ';set every enableFatalWarnings := true; test:test'"
+
+                // Run csw-time module tests
+                sh "sbt -DenableCoverage=true ';set every enableFatalWarnings := true; csw-time/test:test'"
+            }
+            post {
+                always {
+                    sh "sbt -DenableCoverage=true coverageReport"
+                    sh "sbt coverageAggregate"
+                    junit '**/target/test-reports/*.xml'
+                    publishHTML(target: [
+                            allowMissing         : true,
+                            alwaysLinkToLastBuild: false,
+                            keepAll              : true,
+                            reportDir            : './target/scala-2.13/scoverage-report',
+                            reportFiles          : 'index.html',
+                            reportName           : "Scoverage Report"
+                    ])
+                }
+            }
+        }
+
+        // These tests cover the scenario of multiple components in multiple containers on same machine.
+        stage('Multi-Jvm Test') {
+            steps {
+                sh "sbt ';set every enableFatalWarnings := true; integration/multi-jvm:test'"
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                sendNotification(currentBuild.result)
+            }
+        }
+    }
+}
+
+def sendNotification(String buildStatus = 'STARTED') {
+    buildStatus = buildStatus ?: 'SUCCESS'
+
+    def colorCode = '#FF0000'
+    def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
+    def summary = "${subject} (${env.BUILD_URL})"
+    def details = '${JELLY_SCRIPT,template="html"}'
+
+    // Override default values based on build status
+    if (buildStatus == 'STARTED') {
+        color = 'YELLOW'
+        colorCode = '#FFFF00'
+    } else if (buildStatus == 'SUCCESS') {
+        color = 'GREEN'
+        colorCode = '#00FF00'
+    } else {
+        color = 'RED'
+        colorCode = '#FF0000'
+        emailext(
+                subject: subject,
+                body: details,
+                to: "jweiss@tmt.org"
+        )
+    }
+
+    slackSend(channel: "#stil-csw-acceptance", color: colorCode, message: summary)
+}

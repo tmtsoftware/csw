@@ -5,6 +5,7 @@ import csw.params.commands.Setup;
 import csw.params.core.formats.JParamCodecs;
 import csw.params.core.formats.JavaJsonSupport;
 import csw.params.core.models.Coords.*;
+import csw.params.javadsl.JUnits;
 import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
 import org.junit.Test;
@@ -153,7 +154,7 @@ public class JCoordsTest {
         // Check EqCoordinate
         var eq = new EqCoord(180.0, 32.0, FK5(), BASE(), DEFAULT_CATNAME(), pm.pmx(), pm.pmy());
 
-        var baseKey = EqCoordKey().make("BasePosition");
+        var baseKey = EqCoordKey().make("BasePosition", JUnits.NoUnits);
         var posParam = baseKey.set(eq);
 
         var setup = new Setup(src, new CommandName("test"), Optional.empty()).add(posParam);
@@ -169,7 +170,7 @@ public class JCoordsTest {
         // Check EqCoordinate
         var eq = new EqCoord(180.0, 32.0, FK5(), BASE(), DEFAULT_CATNAME(), pm.pmx(), pm.pmy());
 
-        var baseKey = CoordKey().make("BasePosition");
+        var baseKey = CoordKey().make("BasePosition", JUnits.NoUnits);
         var posParam = baseKey.set(eq);
 
         var setup = new Setup(src, new CommandName("test"), Optional.empty()).add(posParam);

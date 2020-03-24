@@ -39,7 +39,7 @@ class StatusServiceModuleTest
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
   // DEOPSCSW-447: Reset api for alarm
   // DEOPSCSW-500: Update alarm time on current severity change
-  test("reset should never update the alarm time") {
+  test("reset should never update the alarm time | DEOPSCSW-462, DEOPSCSW-447, DEOPSCSW-500") {
     // Initially latch and current are disconnected
     val defaultStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
     defaultStatus.latchedSeverity shouldEqual Disconnected
@@ -59,7 +59,7 @@ class StatusServiceModuleTest
   }
 
   // DEOPSCSW-447: Reset api for alarm
-  test("simple test to check behavior of latch and reset") {
+  test("simple test to check behavior of latch and reset | DEOPSCSW-447") {
     getStatus(tromboneAxisLowLimitAlarmKey).await.latchedSeverity shouldEqual Disconnected
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Disconnected
 
@@ -91,7 +91,9 @@ class StatusServiceModuleTest
   // DEOPSCSW-447: Reset api for alarm
   // DEOPSCSW-494: Incorporate changes in set severity, reset, acknowledgement and latch status
   List(Okay, Warning, Major, Indeterminate, Critical).foreach { currentSeverity =>
-    test(s"reset should set latchedSeverity to current severity when current severity is $currentSeverity") {
+    test(
+      s"reset should set latchedSeverity to current severity when current severity is $currentSeverity | DEOPSCSW-447, DEOPSCSW-494"
+    ) {
       val defaultStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
       getMetadata(tromboneAxisLowLimitAlarmKey).await.isLatchable shouldBe true
       defaultStatus.latchedSeverity shouldEqual Disconnected
@@ -119,7 +121,7 @@ class StatusServiceModuleTest
 
   // DEOPSCSW-447: Reset api for alarm
   // DEOPSCSW-494: Incorporate changes in set severity, reset, acknowledgement and latch status
-  test("reset should set latchedSeverity to current severity when current severity is Disconnected") {
+  test("reset should set latchedSeverity to current severity when current severity is Disconnected | DEOPSCSW-447, DEOPSCSW-494") {
     getMetadata(tromboneAxisLowLimitAlarmKey).await.isLatchable shouldBe true
     val defaultStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
     defaultStatus.latchedSeverity shouldEqual Disconnected
@@ -156,13 +158,13 @@ class StatusServiceModuleTest
   }
 
   // DEOPSCSW-447: Reset api for alarm
-  test("reset should throw exception if key does not exist") {
+  test("reset should throw exception if key does not exist | DEOPSCSW-447") {
     val invalidAlarm = AlarmKey(Prefix(CSW, "invalid"), "invalid")
     a[KeyNotFoundException] shouldBe thrownBy(reset(invalidAlarm).await)
   }
 
   // DEOPSCSW-446: Acknowledge api for alarm
-  test("acknowledge should set acknowledgementStatus to Acknowledged of an alarm") {
+  test("acknowledge should set acknowledgementStatus to Acknowledged of an alarm | DEOPSCSW-446") {
     getStatus(tromboneAxisLowLimitAlarmKey).await.acknowledgementStatus shouldEqual Acknowledged
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Disconnected
 
@@ -176,7 +178,7 @@ class StatusServiceModuleTest
   }
 
   // DEOPSCSW-446: Acknowledge api for alarm
-  test("unacknowledge should set acknowledgementStatus to Unacknowledged of an alarm") {
+  test("unacknowledge should set acknowledgementStatus to Unacknowledged of an alarm | DEOPSCSW-446") {
     getStatus(tromboneAxisLowLimitAlarmKey).await.acknowledgementStatus shouldBe Acknowledged
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Disconnected
 
@@ -189,19 +191,19 @@ class StatusServiceModuleTest
   }
 
   // DEOPSCSW-446: Acknowledge api for alarm
-  test("acknowledge should throw exception if key does not exist") {
+  test("acknowledge should throw exception if key does not exist | DEOPSCSW-446") {
     val invalidAlarm = AlarmKey(Prefix(CSW, "invalid"), "invalid")
     a[KeyNotFoundException] shouldBe thrownBy(acknowledge(invalidAlarm).await)
   }
 
   // DEOPSCSW-446: Acknowledge api for alarm
-  test("unacknowledge should throw exception if key does not exist") {
+  test("unacknowledge should throw exception if key does not exist | DEOPSCSW-446") {
     val invalidAlarm = AlarmKey(Prefix(CSW, "invalid"), "invalid")
     a[KeyNotFoundException] shouldBe thrownBy(unacknowledge(invalidAlarm).await)
   }
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
-  test("shelve should update the status of the alarm to shelved") {
+  test("shelve should update the status of the alarm to shelved | DEOPSCSW-449") {
     getStatus(tromboneAxisHighLimitAlarmKey).await.shelveStatus shouldBe Unshelved
     shelve(tromboneAxisHighLimitAlarmKey).await
     getStatus(tromboneAxisHighLimitAlarmKey).await.shelveStatus shouldBe Shelved
@@ -211,7 +213,7 @@ class StatusServiceModuleTest
   }
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
-  test("shelve alarm should automatically get unshelved on configured time") {
+  test("shelve alarm should automatically get unshelved on configured time | DEOPSCSW-449") {
     // initially make sure the shelve status of alarm is unshelved
     getStatus(tromboneAxisLowLimitAlarmKey).await.shelveStatus shouldBe Unshelved
 
@@ -228,7 +230,7 @@ class StatusServiceModuleTest
   }
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
-  test("unshelve should update the alarm status to unshelved") {
+  test("unshelve should update the alarm status to unshelved | DEOPSCSW-449") {
     // initialize alarm with Shelved status just for this test
     shelve(tromboneAxisHighLimitAlarmKey).await
     getStatus(tromboneAxisHighLimitAlarmKey).await.shelveStatus shouldBe Shelved
@@ -240,13 +242,13 @@ class StatusServiceModuleTest
     noException shouldBe thrownBy(unshelve(tromboneAxisHighLimitAlarmKey).await)
   }
 
-  test("getStatus should throw exception if key does not exist") {
+  test("getStatus should throw exception if key does not exist | ") {
     val invalidAlarm = AlarmKey(Prefix(CSW, "invalid"), "invalid")
     a[KeyNotFoundException] shouldBe thrownBy(getStatus(invalidAlarm).await)
   }
 
   // DEOPSCSW-501: AlarmServer update time and latch severity
-  test("latchToDisconnected should latch the status to disconnected") {
+  test("latchToDisconnected should latch the status to disconnected | DEOPSCSW-501") {
 
     //starts a "mini alarm server". This is a small alarm server impl created just for testing
     //'latchToDisconnected' api

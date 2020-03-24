@@ -30,7 +30,7 @@ class LoggingSeverityTest
     loggingSystem.setDefaultLogLevel(DEBUG)
   }
 
-  test("setCurrentSeverity should log a message") {
+  test("setCurrentSeverity should log a message | DEOPSCSW-461") {
     val expectedMessage1 =
       "Setting severity [critical] for alarm [nfiraos-trombone-tromboneaxislowlimitalarm] with expire timeout [1] seconds"
     val expectedMessage2 = "Updating current severity [critical] in alarm store"

@@ -109,7 +109,7 @@ class ContainerCmdTest(ignore: Int)
     standaloneConfFilePath
   }
 
-  test("should able to start components in container mode and in standalone mode through configuration service") {
+  test("should able to start components in container mode and in standalone mode through configuration service | DEOPSCSW-171, DEOPSCSW-168, DEOPSCSW-182, DEOPSCSW-167, DEOPSCSW-43, DEOPSCSW-172, DEOPSCSW-216, DEOPSCSW-203, DEOPSCSW-169, DEOPSCSW-430") {
 
     // start config server and upload laser_container.conf file
     runOn(seed) {

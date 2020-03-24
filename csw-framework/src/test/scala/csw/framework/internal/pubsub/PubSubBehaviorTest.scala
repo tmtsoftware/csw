@@ -50,7 +50,7 @@ class PubSubBehaviorTest extends AnyFunSuite with Matchers with BeforeAndAfterAl
 
   override protected def afterAll(): Unit = Await.result(untypedSystem.terminate(), 5.seconds)
 
-  test("message should be published to all the subscribers") {
+  test("message should be published to all the subscribers | ") {
     val pubSubBehavior: BehaviorTestKit[PubSub[LifecycleStateChanged]] = createLifecycleStatePubSubBehavior()
     val supervisorProbe                                                = TestProbe[ComponentMessage]
 
@@ -65,7 +65,7 @@ class PubSubBehaviorTest extends AnyFunSuite with Matchers with BeforeAndAfterAl
   }
 
   // DEOPSCSW-434 : Allow subscription of CurrentState using StateName
-  test("message should be published to the subscribers depending on names") {
+  test("message should be published to the subscribers depending on names | DEOPSCSW-434") {
     val pubSubBehavior: BehaviorTestKit[PubSub[CurrentState]] = createCurrentStatePubSubBehavior()
 
     pubSubBehavior.run(Subscribe(currentStateProbe1.ref))
@@ -82,7 +82,7 @@ class PubSubBehaviorTest extends AnyFunSuite with Matchers with BeforeAndAfterAl
     currentStates2 shouldEqual Seq(currentState2, currentState3)
   }
 
-  test("should not receive messages on un-subscription") {
+  test("should not receive messages on un-subscription | ") {
     val pubSubBehavior: BehaviorTestKit[PubSub[LifecycleStateChanged]] = createLifecycleStatePubSubBehavior()
     val supervisorProbe                                                = TestProbe[ComponentMessage]
 

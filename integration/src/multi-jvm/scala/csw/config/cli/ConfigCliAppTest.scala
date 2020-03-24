@@ -52,7 +52,7 @@ class ConfigCliAppTest(ignore: Int)
     testFileUtils.deleteServerFiles()
   }
 
-  test("should upload, update, get and set active version of configuration files") {
+  test("should upload, update, get and set active version of configuration files | DEOPSCSW-43") {
     runOn(server) {
       // Start server on first node
       val serverWiring = ServerWiring.make(locationService, securityDirectives)

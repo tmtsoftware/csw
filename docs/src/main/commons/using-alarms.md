@@ -74,18 +74,18 @@ Java
 :   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/example/tutorial/basic/sampleassembly/JSampleAssemblyHandlersAlarm.java) { #subscribe }
 
 To see the effect, let's use the CLI to set up a subscription to the alarm.  Note the alarm key is the component's prefix 
-(`esw.sampleassembly` for Scala, `esw.jsampleassembly` for Java), and the alarm name (`counterTooHighAlarm`).
+(`csw.sample`), and the alarm name (`counterTooHighAlarm`).
 
 Scala
 :   
 ```
-csw-alarm-cli severity subscribe --subsystem esw --component sampleassembly --name counterTooHighAlarm
+csw-alarm-cli severity subscribe --subsystem csw --component sample --name counterTooHighAlarm
 ```
 
 Java
 :   
 ```
-csw-alarm-cli severity subscribe --subsystem esw --component jsampleassembly --name counterTooHighAlarm
+csw-alarm-cli severity subscribe --subsystem csw --component sample --name counterTooHighAlarm
 ```
 
 Note that the alarm severity is currently `Disconnected`.  This is the appropriate state, since we are not running the 

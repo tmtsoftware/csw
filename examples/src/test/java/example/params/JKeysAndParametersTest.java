@@ -13,7 +13,6 @@ import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static csw.params.core.models.Coords.*;
 import static csw.params.core.models.JCoords.*;
@@ -27,21 +26,21 @@ public class JKeysAndParametersTest extends JUnitSuite {
         //making 3 keys
         String keyName = "encoder";
         Key<Boolean> k1 = JKeyType.BooleanKey().make(keyName);
-        Key<Short> k2 = JKeyType.ShortKey().make(keyName);
-        Key<String> k3 = JKeyType.StringKey().make(keyName);
+        Key<Short> k2 = JKeyType.ShortKey().make(keyName, JUnits.NoUnits);
+        Key<String> k3 = JKeyType.StringKey().make(keyName, JUnits.day);
 
         //storing a single value
         Parameter<Boolean> booleanParam = k1.set(true);
 
         //storing multiple values
         Short[] shortArray = {1, 2, 3, 4};
-        Parameter<Short> paramWithManyShorts1 = k2.set(shortArray);
+        Parameter<Short> paramWithManyShorts1 = k2.setAll(shortArray);
         Parameter<Short> paramWithManyShorts2 = k2.set((short) 1, (short) 2, (short) 3, (short) 4);
 
         //associating units
         String[] weekDays = {"Sunday", "Monday", "Tuesday"};
-        Parameter<String> paramWithUnits1 = k3.set(weekDays, JUnits.day);
-        Parameter<String> paramWithUnits2 = k3.set(weekDays).withUnits(JUnits.day);
+        Parameter<String> paramWithUnits1 = k3.setAll(weekDays);
+        Parameter<String> paramWithUnits2 = k3.setAll(weekDays).withUnits(JUnits.day);
 
         //deault unit is NoUnits()
         boolean hasDefaultUnit = booleanParam.units() == JUnits.NoUnits; //true
@@ -76,7 +75,7 @@ public class JKeysAndParametersTest extends JUnitSuite {
         Double[] arr2 = {10.0, 20.0, 30.0, 40.0, 50.0};
 
         //keys
-        Key<ArrayData<Double>> filterKey = JKeyType.DoubleArrayKey().make("filter");
+        Key<ArrayData<Double>> filterKey = JKeyType.DoubleArrayKey().make("filter", JUnits.NoUnits);
 
         //Store some values using helper method in ArrayData
         Parameter<ArrayData<Double>> p1 = filterKey.set(ArrayData.fromArray(arr1), ArrayData.fromArray(arr2));
@@ -114,7 +113,7 @@ public class JKeysAndParametersTest extends JUnitSuite {
         Byte[][] m2 = {{1, 2, 3, 4, 5}, {10, 20, 30, 40, 50}};
 
         //keys
-        Key<MatrixData<Byte>> encoderKey = JKeyType.ByteMatrixKey().make("encoder");
+        Key<MatrixData<Byte>> encoderKey = JKeyType.ByteMatrixKey().make("encoder", JUnits.NoUnits);
 
         //Store some values using helper method in ArrayData
         Parameter<MatrixData<Byte>> p1 = encoderKey.set(
@@ -157,9 +156,9 @@ public class JKeysAndParametersTest extends JUnitSuite {
         final Choices choices = Choices.from("A", "B", "C");
 
         //keys
-        GChoiceKey choice1Key = JKeyType.ChoiceKey().make("mode", choices);
+        GChoiceKey choice1Key = JKeyType.ChoiceKey().make("mode", JUnits.NoUnits, choices);
         GChoiceKey choice2Key = JKeyType.ChoiceKey().make(
-                "mode-reset",
+                "mode-reset", JUnits.NoUnits,
                 Choices.fromChoices(
                         new Choice("c"),
                         new Choice("b"),
@@ -197,7 +196,7 @@ public class JKeysAndParametersTest extends JUnitSuite {
         RaDec raDec2 = new RaDec(3.0, 4.0);
 
         //keys
-        Key<RaDec> raDecKey = JKeyType.RaDecKey().make("raDecKey");
+        Key<RaDec> raDecKey = JKeyType.RaDecKey().make("raDecKey", JUnits.NoUnits);
 
         //store values
         Parameter<RaDec> p1 = raDecKey.set(raDec1);
@@ -248,7 +247,7 @@ public class JKeysAndParametersTest extends JUnitSuite {
         AltAzCoord altAzCoord = new AltAzCoord(BASE(), JAngle.degree(301), JAngle.degree(42.5));
 
         // Can use base trait CoordKey to store values for all types
-        Key<Coord> basePosKey = JKeyType.CoordKey().make("BasePosition");
+        Key<Coord> basePosKey = JKeyType.CoordKey().make("BasePosition", JUnits.NoUnits);
 
         Parameter<Coord> posParam = basePosKey.set(eqCoord, solarSystemCoord, minorPlanetCoord, cometCoord, altAzCoord);
 
@@ -266,11 +265,11 @@ public class JKeysAndParametersTest extends JUnitSuite {
     public void showUsageOfStruct() {
         //#struct
         //keys
-        Key<Struct> skey = JKeyType.StructKey().make("myStruct");
+        Key<Struct> skey = JKeyType.StructKey().make("myStruct", JUnits.NoUnits);
 
-        Key<String> ra = JKeyType.StringKey().make("ra");
-        Key<String> dec = JKeyType.StringKey().make("dec");
-        Key<Double> epoch = JKeyType.DoubleKey().make("epoch");
+        Key<String> ra = JKeyType.StringKey().make("ra", JUnits.NoUnits);
+        Key<String> dec = JKeyType.StringKey().make("dec", JUnits.NoUnits);
+        Key<Double> epoch = JKeyType.DoubleKey().make("epoch", JUnits.year);
 
         //initialize struct
         Struct struct1 = new Struct().madd(
@@ -297,7 +296,7 @@ public class JKeysAndParametersTest extends JUnitSuite {
         List<Struct> structs = p2.jValues();
 
         //get individual keys
-        Optional<Parameter<String>> firstKey = struct1.jGet(JKeyType.StringKey().make("ra"));
+        Optional<Parameter<String>> firstKey = struct1.jGet(JKeyType.StringKey().make("ra", JUnits.NoUnits));
         Optional<Parameter<String>> secondKey = struct1.jGet("dec", JKeyType.StringKey());
         Optional<Parameter<Double>> thirdKey = struct1.jGet("epoch", JKeyType.DoubleKey());
 
@@ -309,7 +308,7 @@ public class JKeysAndParametersTest extends JUnitSuite {
         Struct mutated2 = struct1.remove(firstKey.orElseThrow());
 
         //find out missing keys
-        Set<String> missingKeySet = mutated1.jMissingKeys(ra, dec, epoch, JKeyType.StringKey().make("someRandomKey"));
+        Set<String> missingKeySet = mutated1.jMissingKeys(ra, dec, epoch, JKeyType.StringKey().make("someRandomKey", JUnits.NoUnits));
         Set<String> expectedMissingKeys = Set.of("ra", "someRandomKey");
         //#struct
 
@@ -332,8 +331,8 @@ public class JKeysAndParametersTest extends JUnitSuite {
 
         //making 3 keys
         Key<Boolean> k1 = JKeyType.BooleanKey().make(s1);
-        Key<Short> k2 = JKeyType.ShortKey().make("RandomKeyName");
-        Key<String> k3 = JKeyType.StringKey().make(s1);
+        Key<Short> k2 = JKeyType.ShortKey().make("RandomKeyName", JUnits.NoUnits);
+        Key<String> k3 = JKeyType.StringKey().make(s1, JUnits.NoUnits);
 
         //storing a single value, default unit is NoUnits()
         Parameter<Boolean> bParam = k1.set(true);
@@ -357,10 +356,10 @@ public class JKeysAndParametersTest extends JUnitSuite {
         //values to store
         String[] weekDays = {"Sunday", "Monday", "Tuesday"};
 
-        //associating units via set
-        Parameter<String> paramWithUnits1 = k3.set(weekDays, JUnits.day);
+        //defaults units via set
+        Parameter<String> paramWithUnits1 = k3.setAll(weekDays);
         //associating units via withUnits
-        Parameter<String> paramWithUnits2 = k3.set(weekDays).withUnits(JUnits.day);
+        Parameter<String> paramWithUnits2 = k3.setAll(weekDays).withUnits(JUnits.day);
         //change existing unit
         Parameter<Short> paramWithUnits3 = paramOfShorts.withUnits(JUnits.meter);
         //#units
@@ -368,7 +367,7 @@ public class JKeysAndParametersTest extends JUnitSuite {
         //validations
         Assert.assertTrue(bDefaultUnitSet);
         Assert.assertSame(defaultTimeUnit, JUnits.second);
-        Assert.assertSame(paramWithUnits1.units(), JUnits.day);
+        Assert.assertSame(paramWithUnits1.units(), JUnits.NoUnits);
         Assert.assertSame(paramWithUnits2.units(), JUnits.day);
         Assert.assertSame(paramWithUnits3.units(), JUnits.meter);
     }

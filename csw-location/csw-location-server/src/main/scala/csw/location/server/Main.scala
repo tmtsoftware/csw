@@ -24,7 +24,7 @@ object Main {
 
   def main(args: Array[String]): Unit = start(args, startLogging = true)
 
-  def start(args: Array[String], startLogging: Boolean = false): Option[ServerBinding] =
+  def start(args: Array[String], startLogging: Boolean = false): Option[(ServerBinding, ServerWiring)] =
     new ArgsParser(name).parse(args.toList).map {
       case options @ Options(maybeClusterPort, publicNetwork) =>
         require(
@@ -44,7 +44,7 @@ object Main {
             CoordinatedShutdown.PhaseServiceUnbind,
             "unbind-services"
           )(() => locationBinding.terminate(30.seconds).map(_ => Done)(actorRuntime.ec))
-          locationBinding
+          (locationBinding, wiring)
         }
         catch {
           case NonFatal(ex) =>

@@ -54,7 +54,7 @@ public class JDatabaseServiceTest extends JUnitSuite {
 
     //DEOPSCSW-608: Examples of database creation
     @Test
-    public void shouldBeAbleToCreateANewDatabase() throws InterruptedException, ExecutionException, TimeoutException {
+    public void shouldBeAbleToCreateANewDatabase__DEOPSCSW_601_DEOPSCSW_616_DEOPSCSW_608() throws InterruptedException, ExecutionException, TimeoutException {
         String getDatabases = "SELECT datname FROM pg_database WHERE datistemplate = false";
         List<String> resultSet = JooqHelper.fetchAsync(dsl.resultQuery(getDatabases), String.class).get(5, SECONDS);
 
@@ -82,7 +82,7 @@ public class JDatabaseServiceTest extends JUnitSuite {
 
     //DEOPSCSW-622: Modify a table using update sql string
     @Test
-    public void shouldBeAbleToAlterOrDropATable() throws InterruptedException, ExecutionException, TimeoutException {
+    public void shouldBeAbleToAlterOrDropATable__DEOPSCSW_601_DEOPSCSW_616_DEOPSCSW_622() throws InterruptedException, ExecutionException, TimeoutException {
         // create films
         dsl.query("CREATE TABLE films (id SERIAL PRIMARY KEY)").executeAsync().toCompletableFuture().get(5, SECONDS);
 
@@ -114,7 +114,7 @@ public class JDatabaseServiceTest extends JUnitSuite {
     //DEOPSCSW-610: Examples of Reading Records
     //DEOPSCSW-609: Examples of Record creation
     @Test
-    public void shouldBeAbleToQueryRecordsFromTheTable() throws InterruptedException, ExecutionException, TimeoutException {
+    public void shouldBeAbleToQueryRecordsFromTheTable__DEOPSCSW_613_DEOPSCSW_610_DEOPSCSW_601_DEOPSCSW_609_DEOPSCSW_616() throws InterruptedException, ExecutionException, TimeoutException {
         // create films and insert movie_1
         String movieName = "movie_1";
         String movieName2 = "movie_2";
@@ -134,7 +134,7 @@ public class JDatabaseServiceTest extends JUnitSuite {
     //DEOPSCSW-613: Examples of querying records
     //DEOPSCSW-610: Examples of Reading Records
     @Test
-    public void shouldBeAbleToCreateJoinAndGroupRecordsUsingForeignKey() throws InterruptedException, ExecutionException, TimeoutException {
+    public void shouldBeAbleToCreateJoinAndGroupRecordsUsingForeignKey__DEOPSCSW_607_DEOPSCSW_613_DEOPSCSW_610_DEOPSCSW_601_DEOPSCSW_609_DEOPSCSW_616() throws InterruptedException, ExecutionException, TimeoutException {
         // create tables films and budget and insert records
         Queries queries = dsl.queries(
                 dsl.query("CREATE TABLE films (id SERIAL PRIMARY KEY, name VARCHAR (10) UNIQUE NOT NULL)"),
@@ -178,7 +178,7 @@ public class JDatabaseServiceTest extends JUnitSuite {
     //DEOPSCSW-611: Examples of updating records
     //DEOPSCSW-619: Create a method to send an update sql string to a database
     @Test
-    public void shouldBeAbleToUpdateRecord() throws InterruptedException, ExecutionException, TimeoutException {
+    public void shouldBeAbleToUpdateRecord__DEOPSCSW_601_DEOPSCSW_616_DEOPSCSW_611_DEOPSCSW_619() throws InterruptedException, ExecutionException, TimeoutException {
         // create films and insert record
         String movie_2 = "movie_2";
         Queries queries = dsl.queries(
@@ -200,7 +200,7 @@ public class JDatabaseServiceTest extends JUnitSuite {
 
     //DEOPSCSW-612: Examples of deleting records
     @Test
-    public void shouldBeAbleToDeleteRecordsFromTable() throws InterruptedException, ExecutionException, TimeoutException {
+    public void shouldBeAbleToDeleteRecordsFromTable__DEOPSCSW_601_DEOPSCSW_616_DEOPSCSW_612() throws InterruptedException, ExecutionException, TimeoutException {
         String movie4 = "movie_4";
         Queries queries = dsl.queries(
                 dsl.query("CREATE TABLE films (id SERIAL PRIMARY KEY, name VARCHAR (10) UNIQUE NOT NULL)"),
@@ -229,13 +229,13 @@ public class JDatabaseServiceTest extends JUnitSuite {
     public final ExpectedException exception = ExpectedException.none();
 
     @Test
-    public void shouldBeThrowingExceptionInCaseOfSyntaxError() throws InterruptedException, ExecutionException {
+    public void shouldBeThrowingExceptionInCaseOfSyntaxError__DEOPSCSW_601_DEOPSCSW_616() throws InterruptedException, ExecutionException {
         exception.expectCause(isA(DataAccessException.class));
         dsl.query("create1 table tableName (id SERIAL PRIMARY KEY)").executeAsync().toCompletableFuture().get();
     }
 
     @Test
-    public void shouldBeAbleToCreateAFunctionAndQueryIt() throws InterruptedException, ExecutionException, TimeoutException {
+    public void shouldBeAbleToCreateAFunctionAndQueryIt__DEOPSCSW_601_DEOPSCSW_616() throws InterruptedException, ExecutionException, TimeoutException {
         dsl.query("CREATE FUNCTION inc(val integer) RETURNS integer AS $$\n" +
                 "BEGIN\n" +
                 "RETURN val + 1;\n" +

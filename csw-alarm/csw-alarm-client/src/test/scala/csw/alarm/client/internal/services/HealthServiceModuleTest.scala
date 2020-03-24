@@ -30,7 +30,7 @@ class HealthServiceModuleTest
   }
 
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
-  test("getAggregatedHealth should get aggregated health for a alarm") {
+  test("getAggregatedHealth should get aggregated health for a alarm | DEOPSCSW-466") {
     getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Disconnected
     getAggregatedHealth(tromboneAxisHighLimitAlarmKey).await shouldBe Bad
 
@@ -45,7 +45,7 @@ class HealthServiceModuleTest
   }
 
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
-  test("getAggregatedHealth should get aggregated health for a component") {
+  test("getAggregatedHealth should get aggregated health for a component | DEOPSCSW-466") {
     val tromboneKey = ComponentKey(Prefix(NFIRAOS, "trombone"))
     getAggregatedHealth(tromboneKey).await shouldBe Bad
 
@@ -59,7 +59,7 @@ class HealthServiceModuleTest
   }
 
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
-  test("getAggregatedHealth should get aggregated health for a subsystem") {
+  test("getAggregatedHealth should get aggregated health for a subsystem | DEOPSCSW-466") {
     val tcsKey = SubsystemKey(TCS)
     getAggregatedHealth(tcsKey).await shouldBe Bad
 
@@ -73,7 +73,7 @@ class HealthServiceModuleTest
   }
 
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
-  test("getAggregatedHealth should get aggregated health for global system") {
+  test("getAggregatedHealth should get aggregated health for global system | DEOPSCSW-466") {
     //feeding data of four alarms only, one inactive
     val validAlarmsConfig = ConfigFactory.parseResources("test-alarms/valid-alarms.conf")
     initAlarms(validAlarmsConfig, reset = true).await
@@ -96,7 +96,7 @@ class HealthServiceModuleTest
 
   // DEOPSCSW-448: Set Activation status for an alarm entity
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
-  test("getAggregatedHealth should not consider inactive alarms for health aggregation") {
+  test("getAggregatedHealth should not consider inactive alarms for health aggregation | DEOPSCSW-448, DEOPSCSW-466") {
     getAggregatedHealth(GlobalKey).await shouldBe Bad
     getCurrentSeverity(enclosureTempLowAlarmKey).await shouldBe Disconnected
     getCurrentSeverity(enclosureTempHighAlarmKey).await shouldBe Disconnected
@@ -113,7 +113,7 @@ class HealthServiceModuleTest
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
-  test("getAggregatedHealth should consider shelved alarms also for health aggregation") {
+  test("getAggregatedHealth should consider shelved alarms also for health aggregation | DEOPSCSW-449, DEOPSCSW-466") {
     val componentKey = ComponentKey(cpuExceededAlarmKey.prefix)
     getAggregatedHealth(componentKey).await shouldBe Bad
 
@@ -128,17 +128,17 @@ class HealthServiceModuleTest
   }
 
   // DEOPSCSW-466: Fetch alarm severity, component or subsystem
-  test("getAggregatedHealth should throw KeyNotFoundException when key is invalid") {
+  test("getAggregatedHealth should throw KeyNotFoundException when key is invalid | DEOPSCSW-466") {
     an[KeyNotFoundException] shouldBe thrownBy(getAggregatedHealth(SubsystemKey(CSW)).await)
   }
 
   // DEOPSCSW-466: Fetch alarm severity, component or subsystem
-  test("getAggregatedHealth should throw InactiveAlarmException when all resolved keys are inactive") {
+  test("getAggregatedHealth should throw InactiveAlarmException when all resolved keys are inactive | DEOPSCSW-466") {
     an[InactiveAlarmException] shouldBe thrownBy(getAggregatedHealth(SubsystemKey(LGSF)).await)
   }
 
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
-  test("subscribe aggregated health via callback for an alarm") {
+  test("subscribe aggregated health via callback for an alarm | DEOPSCSW-468") {
     getAggregatedHealth(GlobalKey).await shouldBe Bad
     getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Disconnected
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldBe Disconnected
@@ -166,7 +166,7 @@ class HealthServiceModuleTest
   }
 
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
-  test("subscribe aggregated health via callback for a subsystem") {
+  test("subscribe aggregated health via callback for a subsystem | DEOPSCSW-468") {
     getAggregatedHealth(GlobalKey).await shouldBe Bad
     getCurrentSeverity(cpuExceededAlarmKey).await shouldBe Disconnected
     getCurrentSeverity(outOfRangeOffloadAlarmKey).await shouldBe Disconnected
@@ -193,7 +193,7 @@ class HealthServiceModuleTest
   }
 
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
-  test("subscribe aggregated health via callback for a component") {
+  test("subscribe aggregated health via callback for a component | DEOPSCSW-468") {
     getAggregatedHealth(GlobalKey).await shouldBe Bad
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldBe Disconnected
 
@@ -217,7 +217,7 @@ class HealthServiceModuleTest
 
   // DEOPSCSW-448: Set Activation status for an alarm entity
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
-  test("subscribeAggregatedHealthCallback should not consider inactive alarm for aggregation") {
+  test("subscribeAggregatedHealthCallback should not consider inactive alarm for aggregation | DEOPSCSW-448, DEOPSCSW-468") {
     getAggregatedHealth(GlobalKey).await shouldBe Bad
     getCurrentSeverity(enclosureTempHighAlarmKey).await shouldBe Disconnected
     getCurrentSeverity(enclosureTempLowAlarmKey).await shouldBe Disconnected
@@ -245,24 +245,24 @@ class HealthServiceModuleTest
   }
 
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
-  test("subscribeAggregatedSeverityCallback should throw KeyNotFoundException if the key does not match any key") {
+  test("subscribeAggregatedSeverityCallback should throw KeyNotFoundException if the key does not match any key | DEOPSCSW-468") {
     a[KeyNotFoundException] shouldBe thrownBy(subscribeAggregatedHealthCallback(SubsystemKey(CSW), println).ready().await)
   }
 
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
-  test("subscribeAggregatedHealthCallback should throw KeyNotFoundException when key is invalid") {
+  test("subscribeAggregatedHealthCallback should throw KeyNotFoundException when key is invalid | DEOPSCSW-468") {
     a[KeyNotFoundException] shouldBe thrownBy(subscribeAggregatedHealthCallback(SubsystemKey(CSW), println).ready().await)
   }
 
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
-  test("subscribeAggregatedHealthCallback should throw InactiveAlarmException when all resolved keys are inactive") {
+  test("subscribeAggregatedHealthCallback should throw InactiveAlarmException when all resolved keys are inactive | DEOPSCSW-468") {
     val metadataList = getMetadata(SubsystemKey(LGSF)).await
     metadataList.foreach(m => m.isActive shouldBe false)
     a[InactiveAlarmException] shouldBe thrownBy(subscribeAggregatedHealthCallback(SubsystemKey(LGSF), println).ready().await)
   }
 
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
-  test("subscribe aggregated health via actorRef for a subsystem") {
+  test("subscribe aggregated health via actorRef for a subsystem | DEOPSCSW-468") {
     getAggregatedHealth(GlobalKey).await shouldBe Bad
     getCurrentSeverity(cpuExceededAlarmKey).await shouldBe Disconnected
     getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Disconnected
@@ -286,7 +286,7 @@ class HealthServiceModuleTest
   }
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
-  test("shelved alarms should be considered in health aggregation") {
+  test("shelved alarms should be considered in health aggregation | DEOPSCSW-449") {
     getAggregatedHealth(GlobalKey).await shouldBe Bad
     getCurrentSeverity(cpuExceededAlarmKey).await shouldBe Disconnected
 
@@ -309,7 +309,7 @@ class HealthServiceModuleTest
   }
 
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
-  test("subscribeAggregatedHealthActorRef should throw InactiveAlarmException when all resolved keys are inactive") {
+  test("subscribeAggregatedHealthActorRef should throw InactiveAlarmException when all resolved keys are inactive | DEOPSCSW-468") {
     val metadataList = getMetadata(SubsystemKey(LGSF)).await
     metadataList.foreach(m => m.isActive shouldBe false)
     a[InactiveAlarmException] shouldBe thrownBy {
