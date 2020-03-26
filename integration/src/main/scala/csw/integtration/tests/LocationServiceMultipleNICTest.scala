@@ -6,8 +6,6 @@ import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.commons.ClusterAwareSettings
 import csw.location.server.internal.ServerWiring
-import csw.logging.client.scaladsl.LoggingSystemFactory
-import csw.network.utils.Networks
 import csw.prefix.models.{Prefix, Subsystem}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
@@ -18,34 +16,25 @@ import org.scalatest.time.Span
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
-class LocationServiceMultipleNICTest()
-    extends AnyFunSuite
-    with Matchers
-    with BeforeAndAfterAll
-    with ScalaFutures
-    with Eventually {
+class LocationServiceMultipleNICTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with ScalaFutures with Eventually {
 
   implicit val patience: PatienceConfig =
     PatienceConfig(Span(5, org.scalatest.time.Seconds), Span(100, org.scalatest.time.Millis))
 
-  val adminWiring: ServerWiring = ServerWiring.make(ClusterAwareSettings.onPort(3553).withInterface("eth1"), enableAuth = false)
-  LoggingSystemFactory.start("Assembly", "1.0", Networks().hostname, adminWiring.actorSystem)
+  private val locationWiring = ServerWiring.make(ClusterAwareSettings.onPort(3553).withInterface("eth1"), enableAuth = false)
+  locationWiring.actorRuntime.startLogging("Test", locationWiring.clusterSettings.hostname)
+  locationWiring.locationHttpService.start().futureValue
 
-  adminWiring.locationHttpService.start().futureValue
-
-  import adminWiring.actorRuntime._
+  import locationWiring.actorRuntime._
   private val locationService = HttpLocationServiceFactory.makeLocalClient
 
-  override def afterAll(): Unit = Await.result(adminWiring.actorRuntime.shutdown(), 5.seconds)
+  override def afterAll(): Unit = Await.result(locationWiring.actorRuntime.shutdown(), 5.seconds)
 
   test("should list and resolve component having multiple-nic's") {
-
-    val componentId = ComponentId(Prefix(Subsystem.CSW, "assembly"), ComponentType.Assembly)
+    val componentId = ComponentId(Prefix(Subsystem.NFIRAOS, "assembly"), ComponentType.Assembly)
     val connection  = AkkaConnection(componentId)
 
-    eventually(locationService.list.await should have size 1)
-
+    eventually(locationService.list.await.size shouldBe 1)
     locationService.find(connection).await.get shouldBe a[AkkaLocation]
   }
-
 }

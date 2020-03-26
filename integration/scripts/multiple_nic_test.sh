@@ -12,51 +12,55 @@
 #    8.  Run AssemblyApp.scala with Interface eth1 (docker bridge Interface) on `Assembly` container with clusterPort=3552 (This will act as a seed to form cluster and register assembly with LocationService)
 #    9.  Run TestMultipleNicApp.scala with Interface eth1 (docker bridge Interface) on `Test-App` container. (This will resolve/find a assembly connection which is registers on `Assembly` container)
 
-RED='\033[0;31m'
 YELLOW='\033[1;33m'
 ORANGE='\033[0;33m'
 PURPLE='\033[0;35m'
 NC='\033[0m' # No Color
 
-HOST_DIR_MAPPING="-v $(pwd):/source/csw"
-echo ${HOST_DIR_MAPPING}
+HOST_DIR_MAPPING="-v$(pwd):/source/csw"
+echo "${HOST_DIR_MAPPING}"
 
-sbtImg=twtmt/scala-sbt
+SBT_IMG_TAG="hseeberger/scala-sbt:11.0.6_1.3.8_2.13.1"
 
-csw_root="$( cd "$(dirname "$0")" || exit ; pwd -P )"
+# colered print
+function printc() {
+  declare msg=$1
+  declare color=$2
+  printf "$color $msg $NC\n"
+}
 
-docker build --tag=${sbtImg} ${csw_root}
+function createDockerNetwork() {
+  declare name=$1
+  declare subnet=$2
+  printc "Creating docker subnet : $name" "$PURPLE"
+  docker network create --subnet="$subnet" "$name"
+}
 
-printf "${YELLOW} Executing multiple nic's test... ${NC}\n"
-printf "${PURPLE} Creating docker subnet : tmt_net_1 ${NC}\n"
-docker network create --subnet=192.168.10.0/24 tmt_net_1
+printc "Executing multiple NIC's test.." "$YELLOW"
+createDockerNetwork tmt_net_1 192.168.10.0/24
+createDockerNetwork tmt_net_2 192.168.20.0/24
 
-printf "${PURPLE} Creating another docker subnet : tmt_net_2 ${NC}\n"
-docker network create --subnet=192.168.20.0/24 tmt_net_2
-
-docker run -itd --name=Assembly --net=tmt_net_1 ${HOST_DIR_MAPPING} ${sbtImg} bash
-
-docker run -itd --name=Test-App --net=tmt_net_2 ${HOST_DIR_MAPPING} ${sbtImg} bash
+docker run -itd --name=Assembly --net=tmt_net_1 "${HOST_DIR_MAPPING}" ${SBT_IMG_TAG} bash
+docker run -itd --name=Test-App --net=tmt_net_2 "${HOST_DIR_MAPPING}" ${SBT_IMG_TAG} bash
 
 docker network connect bridge Assembly
 docker network connect bridge Test-App
 
-printf "${YELLOW} Starting Assembly in network : tmt_net_1 ${NC}\n"
+printc "Starting Assembly in network : tmt_net_1" "${YELLOW}"
 docker exec -itd Assembly bash -c 'cd /source/csw && ./target/universal/stage/bin/assembly-app -DTMT_LOG_HOME=/tmt/logs/csw'
 
-printf "${PURPLE}------ Waiting for 10 seconds to let Assembly gets started ------${NC}\n"
+printc "------ Waiting 10 seconds for Assembly to gets started ------" "${PURPLE}"
 sleep 10
-printf "${YELLOW} Executing test in network : tmt_net_2 ${NC}\n"
-docker exec Test-App bash -c 'cd /source/csw && ./target/universal/stage/bin/test-multiple-nic-app -DCLUSTER_SEEDS=172.17.0.2:3553 -DTMT_LOG_HOME=/tmt/logs/csw -DINTERFACE_NAME=eth1'
+printc "Executing test in network : tmt_net_2" "${YELLOW}"
+docker exec Test-App bash -c 'cd /source/csw && ./target/universal/stage/bin/test-multiple-nic-app -DCLUSTER_SEEDS=172.17.0.2:3553 -DINTERFACE_NAME=eth1'
 exit_code=$?
 
-printf "${ORANGE}------ [Debug] Inspecting docker bridge ------${NC}"
+#printc "------ [Debug] Inspecting docker bridge ------" "${ORANGE}"
 #brctl show
-docker inspect Assembly
-docker inspect Test-App
+#docker inspect Assembly
+#docker inspect Test-App
 
-printf "${PURPLE} Stopping and removing containers and networks. ${NC}\n"
-
+printc "Stopping and removing containers and networks." "${PURPLE}"
 docker stop Assembly Test-App
 docker rm Assembly Test-App
 docker network rm tmt_net_1 tmt_net_2
