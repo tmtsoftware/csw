@@ -6,29 +6,13 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - uses: actions/checkout@v2
       - uses: olafurpg/setup-scala@v5
         with:
           java-version: adopt@1.11
-
-      - name: Cache ~/.cache
-        uses: actions/cache@v1
-        with:
-          path: ~/.cache
-          key: ${{ runner.os }}-coursier-${{ hashFiles('project/Libs.scala') }}
-          restore-keys: |
-            ${{ runner.os }}-coursier-
-
-      - name: Cache ~/.sbt
-        uses: actions/cache@v1
-        with:
-          path: ~/.sbt
-          key: ${{ runner.os }}-sbt-${{ hashFiles('project/build.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-sbt-
 
       - name: Docker Permissions
         run: sudo chmod 666 /var/run/docker.sock
@@ -61,4 +45,4 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         uses: pullreminders/slack-action@master
         with:
-          args: '{\"channel\":\"#csw-build\",\"text\":\":${{ steps.build_status.outputs.status_icon }}: ${{ steps.build_status.outputs.build_status }} Job ${{ github.event.repository.name }}:${{github.workflow}} \n https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}\"}'
+          args: '{\"channel\":\"#csw-build\",\"text\":\":${{ steps.build_status.outputs.status_icon }}: ${{ steps.build_status.outputs.build_status }}:Job ${{ github.event.repository.name }}:${{github.workflow}} \n https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}\"}'
