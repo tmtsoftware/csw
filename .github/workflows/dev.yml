@@ -5,7 +5,7 @@ on:
     branches: [master]
 
 jobs:
-  test:
+  unit-tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -35,13 +35,7 @@ jobs:
           sudo apt-get install ntp -y
           sudo ntptime -T 37
 
-      - name: Build
-        run: |
-          sbt clean scalafmtCheck
-          sbt makeSite
-          sbt ';set every Seq(enableFatalWarnings := true, scalafmtOnCompile := false); scalastyle; test:compile; multi-jvm:compile;'
-
-      - name: Unit and Component Tests
+      - name: Tests
         run: |
           sbt -DenableCoverage=true ';set every enableFatalWarnings := true; csw-time/test:test'
           sbt -DenableCoverage=true -DdisableTimeTests ';set every enableFatalWarnings := true; test:test'
@@ -56,11 +50,45 @@ jobs:
           name: Coverage Report
           path: target/scala-2.13/scoverage-report
 
+  multi-jvm-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - uses: olafurpg/setup-scala@v5
+        with:
+          java-version: adopt@1.11
+
+      - name: Cache ~/.cache
+        uses: actions/cache@v1
+        with:
+          path: ~/.cache
+          key: ${{ runner.os }}-coursier-${{ hashFiles('project/Libs.scala') }}
+          restore-keys: |
+            ${{ runner.os }}-coursier-
+
+      - name: Cache ~/.sbt
+        uses: actions/cache@v1
+        with:
+          path: ~/.sbt
+          key: ${{ runner.os }}-sbt-${{ hashFiles('project/build.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-sbt-
+
+      - name: Docs Check
+        run: |
+          sbt clean scalafmtCheck scalastyle
+          sbt makeSite
+
       - name: Multi-Jvm Tests
         run: sbt ';set every enableFatalWarnings := true; integration/multi-jvm:test'
 
+  slack-notify:
+    needs: [unit-tests, multi-jvm-tests]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
       - name: Build Status
-        if: always()
         id: build_status
         run: |
           if [[ ${{job.status}} == Success ]]
@@ -73,7 +101,6 @@ jobs:
           fi
 
       - name: Notify slack
-        if: always()
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         uses: pullreminders/slack-action@master
